@@ -18,6 +18,7 @@ export interface FlagDefinition {
 
 export interface FlagMatch {
   flagName: string;
+  matchedFlagName: string;
   filePath: string;
   lineNumber: number;
   column: number;

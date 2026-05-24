@@ -191,7 +191,12 @@ if (featureFlags.old_payment) {
 const useNewUI = isFeatureEnabled("new_ui");
 `;
         const tempFile = createTempTestFile(content, '.ts');
-        const matches = (0, scanner_1.findAllFlagMatches)(tempFile, content, ['new_checkout', 'old_payment', 'new_ui'], []);
+        const flags = [
+            { name: 'new_checkout', defaultValue: false, status: 'completed' },
+            { name: 'old_payment', defaultValue: false, status: 'completed' },
+            { name: 'new_ui', defaultValue: false, status: 'completed' },
+        ];
+        const matches = (0, scanner_1.findAllFlagMatches)(tempFile, content, flags);
         cleanupTempFile(tempFile);
         return {
             name: 'TypeScript Flag 匹配',
@@ -220,7 +225,11 @@ if feature_flags['old_feature']:
     print('old feature')
 `;
         const tempFile = createTempTestFile(content, '.py');
-        const matches = (0, scanner_1.findAllFlagMatches)(tempFile, content, ['new_feature', 'old_feature'], []);
+        const flags = [
+            { name: 'new_feature', defaultValue: false, status: 'completed' },
+            { name: 'old_feature', defaultValue: false, status: 'completed' },
+        ];
+        const matches = (0, scanner_1.findAllFlagMatches)(tempFile, content, flags);
         cleanupTempFile(tempFile);
         return {
             name: 'Python Flag 匹配',
@@ -245,10 +254,10 @@ function testDefaultValueInversionDetection() {
             status: 'completed'
         };
         const matches = [
-            { flagName: 'test_flag', filePath: '', lineNumber: 1, column: 1, matchType: 'negated', context: '', isNegated: true, language: 'typescript' },
-            { flagName: 'test_flag', filePath: '', lineNumber: 2, column: 1, matchType: 'negated', context: '', isNegated: true, language: 'typescript' },
-            { flagName: 'test_flag', filePath: '', lineNumber: 3, column: 1, matchType: 'negated', context: '', isNegated: true, language: 'typescript' },
-            { flagName: 'test_flag', filePath: '', lineNumber: 4, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
+            { flagName: 'test_flag', matchedFlagName: 'test_flag', filePath: '', lineNumber: 1, column: 1, matchType: 'negated', context: '', isNegated: true, language: 'typescript' },
+            { flagName: 'test_flag', matchedFlagName: 'test_flag', filePath: '', lineNumber: 2, column: 1, matchType: 'negated', context: '', isNegated: true, language: 'typescript' },
+            { flagName: 'test_flag', matchedFlagName: 'test_flag', filePath: '', lineNumber: 3, column: 1, matchType: 'negated', context: '', isNegated: true, language: 'typescript' },
+            { flagName: 'test_flag', matchedFlagName: 'test_flag', filePath: '', lineNumber: 4, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
         ];
         const { inverted } = (0, analyzer_1.detectDefaultValueInversion)(flag, matches);
         return {
@@ -355,20 +364,27 @@ function testTerminalSummaryGeneration() {
 function testDynamicFlagPattern() {
     try {
         const content = `
-const flagName = getDynamicFlag();
-if (isEnabled(flagName)) {
+const flagName = 'ab_test_home_123';
+if (isEnabled('ab_test_home_123')) {
   console.log('dynamic flag');
 }
 `;
         const tempFile = createTempTestFile(content, '.ts');
-        const dynamicPatterns = [/getDynamicFlag\(\)/g];
-        const matches = (0, scanner_1.findAllFlagMatches)(tempFile, content, [], dynamicPatterns);
+        const flags = [
+            {
+                name: 'dynamic_ab_test',
+                defaultValue: false,
+                status: 'completed',
+                dynamicPattern: 'ab_test_\\w+_\\d+'
+            },
+        ];
+        const matches = (0, scanner_1.findAllFlagMatches)(tempFile, content, flags);
         cleanupTempFile(tempFile);
         return {
             name: '动态 Flag 模式匹配',
-            passed: matches.length > 0,
+            passed: matches.length > 0 && matches[0].flagName === 'dynamic_ab_test',
             message: `匹配到 ${matches.length} 个动态 flag`,
-            details: { matches: matches.map(m => ({ flag: m.flagName, line: m.lineNumber })) }
+            details: { matches: matches.map(m => ({ flag: m.flagName, matched: m.matchedFlagName, line: m.lineNumber })) }
         };
     }
     catch (error) {
@@ -414,9 +430,9 @@ function testMultipleFileAnalysis() {
             { name: 'flag2', defaultValue: false, status: 'archived' },
         ];
         const matches = [
-            { flagName: 'flag1', filePath: '/a.ts', lineNumber: 1, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
-            { flagName: 'flag1', filePath: '/b.ts', lineNumber: 2, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
-            { flagName: 'flag2', filePath: '/a.ts', lineNumber: 3, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
+            { flagName: 'flag1', matchedFlagName: 'flag1', filePath: '/a.ts', lineNumber: 1, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
+            { flagName: 'flag1', matchedFlagName: 'flag1', filePath: '/b.ts', lineNumber: 2, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
+            { flagName: 'flag2', matchedFlagName: 'flag2', filePath: '/a.ts', lineNumber: 3, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
         ];
         const options = (0, config_1.mergeScanOptions)({
             sourceDir: '/tmp',
@@ -465,8 +481,8 @@ function createMockAnalysisResult() {
         outputDir: '/tmp/output'
     });
     return (0, analyzer_2.analyzeAllFlags)(flags, [
-        { flagName: 'completed_flag', filePath: '/tmp/test/a.ts', lineNumber: 1, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
-        { flagName: 'active_flag', filePath: '/tmp/test/b.ts', lineNumber: 2, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
+        { flagName: 'completed_flag', matchedFlagName: 'completed_flag', filePath: '/tmp/test/a.ts', lineNumber: 1, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
+        { flagName: 'active_flag', matchedFlagName: 'active_flag', filePath: '/tmp/test/b.ts', lineNumber: 2, column: 1, matchType: 'direct', context: '', isNegated: false, language: 'typescript' },
     ], options, ['/tmp/test/a.ts', '/tmp/test/b.ts'], [], Date.now() - 100);
 }
 //# sourceMappingURL=self-check.js.map

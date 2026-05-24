@@ -119,10 +119,11 @@ function isNegatedContext(content, matchIndex, language) {
     }
     return false;
 }
-function findAllFlagMatches(filePath, content, flagNames, dynamicPatterns) {
+function findAllFlagMatches(filePath, content, flagDefinitions) {
     const language = detectLanguage(filePath);
     const matches = [];
-    flagNames.forEach(flagName => {
+    flagDefinitions.forEach(flag => {
+        const flagName = flag.name;
         const escapedFlagName = flagName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const flagPatterns = [];
         if (language === 'typescript' || language === 'javascript') {
@@ -144,6 +145,7 @@ function findAllFlagMatches(filePath, content, flagNames, dynamicPatterns) {
                     m.lineNumber === lineNumber)) {
                     matches.push({
                         flagName,
+                        matchedFlagName: flagName,
                         filePath,
                         lineNumber,
                         column,
@@ -186,6 +188,7 @@ function findAllFlagMatches(filePath, content, flagNames, dynamicPatterns) {
             const isNegated = isNegatedContext(content, matchIndex, language);
             matches.push({
                 flagName,
+                matchedFlagName: flagName,
                 filePath,
                 lineNumber,
                 column,
@@ -195,26 +198,34 @@ function findAllFlagMatches(filePath, content, flagNames, dynamicPatterns) {
                 language,
             });
         }
-    });
-    dynamicPatterns.forEach(pattern => {
-        let dynamicMatch;
-        while ((dynamicMatch = pattern.exec(content)) !== null) {
-            const matchedFlagName = dynamicMatch[1] || dynamicMatch[0];
-            const lineNumber = getLineNumber(content, dynamicMatch.index);
-            if (!matches.some(m => m.flagName === matchedFlagName &&
-                m.lineNumber === lineNumber)) {
-                const column = getColumn(content, dynamicMatch.index);
-                const isNegated = isNegatedContext(content, dynamicMatch.index, language);
-                matches.push({
-                    flagName: matchedFlagName,
-                    filePath,
-                    lineNumber,
-                    column,
-                    matchType: 'dynamic',
-                    context: extractLineContext(content, lineNumber),
-                    isNegated,
-                    language,
-                });
+        if (flag.dynamicPattern) {
+            try {
+                const dynamicRegex = new RegExp(flag.dynamicPattern, 'g');
+                let dynamicMatch;
+                while ((dynamicMatch = dynamicRegex.exec(content)) !== null) {
+                    const matchedFlagName = dynamicMatch[1] || dynamicMatch[0];
+                    const lineNumber = getLineNumber(content, dynamicMatch.index);
+                    if (matches.some(m => m.flagName === flagName &&
+                        m.lineNumber === lineNumber)) {
+                        continue;
+                    }
+                    const column = getColumn(content, dynamicMatch.index);
+                    const isNegated = isNegatedContext(content, dynamicMatch.index, language);
+                    matches.push({
+                        flagName,
+                        matchedFlagName: typeof matchedFlagName === 'string' ? matchedFlagName : flagName,
+                        filePath,
+                        lineNumber,
+                        column,
+                        matchType: 'dynamic',
+                        context: extractLineContext(content, lineNumber),
+                        isNegated,
+                        language,
+                    });
+                }
+            }
+            catch (regexError) {
+                // 忽略无效的正则表达式
             }
         }
     });
@@ -224,14 +235,10 @@ async function scanSourceFiles(options) {
     const allMatches = [];
     const errors = [];
     const files = await findSourceFiles(options);
-    const flagNames = options.flagDefinitions.map(f => f.name);
-    const dynamicPatterns = options.flagDefinitions
-        .filter(f => f.dynamicPattern)
-        .map(f => new RegExp(f.dynamicPattern, 'g'));
     for (const filePath of files) {
         try {
             const content = readFileContent(filePath);
-            const matches = findAllFlagMatches(filePath, content, flagNames, dynamicPatterns);
+            const matches = findAllFlagMatches(filePath, content, options.flagDefinitions);
             allMatches.push(...matches);
         }
         catch (error) {

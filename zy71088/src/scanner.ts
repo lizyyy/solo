@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { glob } from 'glob';
-import { ProgrammingLanguage, FlagMatch, ScanOptions } from './types';
+import { ProgrammingLanguage, FlagMatch, ScanOptions, FlagDefinition } from './types';
 import { LANGUAGE_EXTENSIONS, LANGUAGE_PATTERNS } from './constants';
 
 export function detectLanguage(filePath: string): ProgrammingLanguage {
@@ -98,13 +98,13 @@ export function isNegatedContext(content: string, matchIndex: number, language: 
 export function findAllFlagMatches(
   filePath: string,
   content: string,
-  flagNames: string[],
-  dynamicPatterns: RegExp[]
+  flagDefinitions: FlagDefinition[]
 ): FlagMatch[] {
   const language = detectLanguage(filePath);
   const matches: FlagMatch[] = [];
   
-  flagNames.forEach(flagName => {
+  flagDefinitions.forEach(flag => {
+    const flagName = flag.name;
     const escapedFlagName = flagName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     
     const flagPatterns: RegExp[] = [];
@@ -149,6 +149,7 @@ export function findAllFlagMatches(
         )) {
           matches.push({
             flagName,
+            matchedFlagName: flagName,
             filePath,
             lineNumber,
             column,
@@ -201,6 +202,7 @@ export function findAllFlagMatches(
       
       matches.push({
         flagName,
+        matchedFlagName: flagName,
         filePath,
         lineNumber,
         column,
@@ -210,31 +212,39 @@ export function findAllFlagMatches(
         language,
       });
     }
-  });
 
-  dynamicPatterns.forEach(pattern => {
-    let dynamicMatch;
-    while ((dynamicMatch = pattern.exec(content)) !== null) {
-      const matchedFlagName = dynamicMatch[1] || dynamicMatch[0];
-      const lineNumber = getLineNumber(content, dynamicMatch.index);
-      
-      if (!matches.some(m => 
-        m.flagName === matchedFlagName && 
-        m.lineNumber === lineNumber
-      )) {
-        const column = getColumn(content, dynamicMatch.index);
-        const isNegated = isNegatedContext(content, dynamicMatch.index, language);
-        
-        matches.push({
-          flagName: matchedFlagName,
-          filePath,
-          lineNumber,
-          column,
-          matchType: 'dynamic',
-          context: extractLineContext(content, lineNumber),
-          isNegated,
-          language,
-        });
+    if (flag.dynamicPattern) {
+      try {
+        const dynamicRegex = new RegExp(flag.dynamicPattern, 'g');
+        let dynamicMatch;
+        while ((dynamicMatch = dynamicRegex.exec(content)) !== null) {
+          const matchedFlagName = dynamicMatch[1] || dynamicMatch[0];
+          const lineNumber = getLineNumber(content, dynamicMatch.index);
+          
+          if (matches.some(m => 
+            m.flagName === flagName && 
+            m.lineNumber === lineNumber
+          )) {
+            continue;
+          }
+          
+          const column = getColumn(content, dynamicMatch.index);
+          const isNegated = isNegatedContext(content, dynamicMatch.index, language);
+          
+          matches.push({
+            flagName,
+            matchedFlagName: typeof matchedFlagName === 'string' ? matchedFlagName : flagName,
+            filePath,
+            lineNumber,
+            column,
+            matchType: 'dynamic',
+            context: extractLineContext(content, lineNumber),
+            isNegated,
+            language,
+          });
+        }
+      } catch (regexError) {
+        // 忽略无效的正则表达式
       }
     }
   });
@@ -249,16 +259,11 @@ export async function scanSourceFiles(
   const errors: string[] = [];
   
   const files = await findSourceFiles(options);
-  
-  const flagNames = options.flagDefinitions.map(f => f.name);
-  const dynamicPatterns = options.flagDefinitions
-    .filter(f => f.dynamicPattern)
-    .map(f => new RegExp(f.dynamicPattern!, 'g'));
 
   for (const filePath of files) {
     try {
       const content = readFileContent(filePath);
-      const matches = findAllFlagMatches(filePath, content, flagNames, dynamicPatterns);
+      const matches = findAllFlagMatches(filePath, content, options.flagDefinitions);
       allMatches.push(...matches);
     } catch (error) {
       errors.push(`Error scanning ${filePath}: ${(error as Error).message}`);
