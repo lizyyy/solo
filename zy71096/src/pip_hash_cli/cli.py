@@ -94,7 +94,7 @@ class HashCheckOrchestrator:
             report.packages = attributor.merge_package_sources(wheel_packages, requirements)
             
             hash_checker = HashChecker(strict=self.strict)
-            self._perform_hash_checks(report, requirements, hash_checker, wheel_scanner, attributor)
+            self._perform_hash_checks(report, requirements, hash_checker, wheel_packages, wheel_scanner, attributor)
             
             exit_code = self._determine_exit_code(report)
             
@@ -120,6 +120,7 @@ class HashCheckOrchestrator:
         report: ValidationReport,
         requirements,
         hash_checker: HashChecker,
+        wheel_packages: dict,
         wheel_scanner: WheelScanner,
         attributor: SourceAttributor
     ):
@@ -130,29 +131,29 @@ class HashCheckOrchestrator:
             if req.specifier and req.specifier.startswith('=='):
                 version = req.specifier[2:].strip()
             
-            pkg_version = None
-            if canonical in report.packages:
-                versions = report.packages[canonical]
+            wheel_pkg = None
+            if canonical in wheel_packages:
+                versions = wheel_packages[canonical]
                 if version and version in versions:
-                    pkg_version = versions[version]
+                    wheel_pkg = versions[version]
                 elif versions:
-                    pkg_version = next(iter(versions.values()))
+                    wheel_pkg = next(iter(versions.values()))
             
             if req.hashes:
-                result, passed = hash_checker.check_requirement_against_package(req, pkg_version)
-                if result:
-                    report.hash_checks.append(result)
-                
-                if not pkg_version:
+                if wheel_pkg:
+                    result, passed = hash_checker.check_requirement_against_package(req, wheel_pkg)
+                    if result:
+                        report.hash_checks.append(result)
+                    
+                    actual_hashes = wheel_pkg.hashes
+                    attr = attributor.attribute_source(req.name, wheel_pkg.version, actual_hashes)
+                    report.source_attributions.append(attr)
+                else:
                     report.missing_packages.append({
                         'name': req.name,
                         'specifier': req.specifier,
-                        'reason': '在 wheelhouse 中未找到匹配版本'
+                        'reason': '在 wheelhouse 中未找到匹配版本，无法验证实际哈希'
                     })
-                
-                if pkg_version:
-                    attr = attributor.attribute_source(req.name, pkg_version.version, req.hashes + pkg_version.hashes)
-                    report.source_attributions.append(attr)
             else:
                 report.missing_hashes.append({
                     'name': req.name,
@@ -184,8 +185,11 @@ class HashCheckOrchestrator:
         if report.constraint_conflicts:
             return ExitCode.CONSTRAINT_CONFLICT
         
-        failed_checks = [c for c in report.hash_checks if not c.match]
-        if failed_checks:
+        hash_mismatches = [
+            c for c in report.hash_checks 
+            if not c.match and "找不到匹配的包版本" not in str(c.mismatch_details)
+        ]
+        if hash_mismatches:
             return ExitCode.HASH_MISMATCH
         
         if report.missing_packages:

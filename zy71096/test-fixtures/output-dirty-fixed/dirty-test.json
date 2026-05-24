@@ -1,0 +1,214 @@
+{
+  "timestamp": "2026-05-24T23:29:12.896764",
+  "input_files": {
+    "requirements": "/Users/lzy/pro/solo/workspaces/zy71096/test-fixtures/dirty/requirements.txt",
+    "constraints": "/Users/lzy/pro/solo/workspaces/zy71096/test-fixtures/dirty/constraints.txt"
+  },
+  "packages": {
+    "click": {
+      "8.1.7": {
+        "version": "8.1.7",
+        "hashes": [],
+        "source": "unknown",
+        "source_url": null,
+        "wheel_path": null,
+        "extras": []
+      }
+    },
+    "packaging": {},
+    "jinja2": {
+      "3.0.0": {
+        "version": "3.0.0",
+        "hashes": [],
+        "source": "unknown",
+        "source_url": null,
+        "wheel_path": null,
+        "extras": []
+      }
+    },
+    "pyyaml": {}
+  },
+  "requirements": [
+    {
+      "name": "click",
+      "raw": "click==8.1.7 --hash=sha256:0000000000000000000000000000000000000000000000000000000000000000 --hash=sha256:ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6d1",
+      "specifier": "==8.1.7",
+      "extras": [],
+      "hashes": [
+        {
+          "algorithm": "sha256",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000",
+          "source": "requirements_file",
+          "verified": false
+        },
+        {
+          "algorithm": "sha256",
+          "value": "ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6d1",
+          "source": "requirements_file",
+          "verified": false
+        }
+      ],
+      "source": "unknown",
+      "source_line": 1,
+      "from_constraint": false
+    },
+    {
+      "name": "packaging",
+      "raw": "packaging>=23.0 --hash=sha256:026ed72c8ed3fcce5bf8950572258698927fd1dbda10a5e981cdf0ac37f4f002 (constrained by packaging<22.0)",
+      "specifier": "<22.0",
+      "extras": [],
+      "hashes": [
+        {
+          "algorithm": "sha256",
+          "value": "026ed72c8ed3fcce5bf8950572258698927fd1dbda10a5e981cdf0ac37f4f002",
+          "source": "requirements_file",
+          "verified": false
+        }
+      ],
+      "source": "unknown",
+      "source_line": 5,
+      "from_constraint": true
+    },
+    {
+      "name": "jinja2",
+      "raw": "jinja2==3.1.3 --hash=sha256:7d6d50dd97d52cbc355597bd845fabfbac3f551e1f99619e39a35ce8c370b5fa (constrained by jinja2==3.0.0 --hash=sha256:1111111111111111111111111111111111111111111111111111111111111111)",
+      "specifier": "==3.0.0",
+      "extras": [],
+      "hashes": [
+        {
+          "algorithm": "sha256",
+          "value": "7d6d50dd97d52cbc355597bd845fabfbac3f551e1f99619e39a35ce8c370b5fa",
+          "source": "requirements_file",
+          "verified": false
+        },
+        {
+          "algorithm": "sha256",
+          "value": "1111111111111111111111111111111111111111111111111111111111111111",
+          "source": "constraints_file",
+          "verified": false
+        }
+      ],
+      "source": "unknown",
+      "source_line": 8,
+      "from_constraint": true
+    },
+    {
+      "name": "pyyaml",
+      "raw": "pyyaml",
+      "specifier": "",
+      "extras": [],
+      "hashes": [],
+      "source": "unknown",
+      "source_line": 11,
+      "from_constraint": false
+    }
+  ],
+  "hash_checks": [
+    {
+      "package_name": "click",
+      "version": "==8.1.7",
+      "expected_hashes": [
+        {
+          "algorithm": "sha256",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000",
+          "source": "requirements_file",
+          "verified": false
+        },
+        {
+          "algorithm": "sha256",
+          "value": "ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6d1",
+          "source": "requirements_file",
+          "verified": false
+        }
+      ],
+      "actual_hashes": [],
+      "match": false,
+      "mismatch_details": [
+        "找不到匹配的包版本"
+      ]
+    },
+    {
+      "package_name": "packaging",
+      "version": "<22.0",
+      "expected_hashes": [
+        {
+          "algorithm": "sha256",
+          "value": "026ed72c8ed3fcce5bf8950572258698927fd1dbda10a5e981cdf0ac37f4f002",
+          "source": "requirements_file",
+          "verified": false
+        }
+      ],
+      "actual_hashes": [],
+      "match": false,
+      "mismatch_details": [
+        "找不到匹配的包版本"
+      ]
+    },
+    {
+      "package_name": "jinja2",
+      "version": "==3.0.0",
+      "expected_hashes": [
+        {
+          "algorithm": "sha256",
+          "value": "7d6d50dd97d52cbc355597bd845fabfbac3f551e1f99619e39a35ce8c370b5fa",
+          "source": "requirements_file",
+          "verified": false
+        },
+        {
+          "algorithm": "sha256",
+          "value": "1111111111111111111111111111111111111111111111111111111111111111",
+          "source": "constraints_file",
+          "verified": false
+        }
+      ],
+      "actual_hashes": [],
+      "match": false,
+      "mismatch_details": [
+        "找不到匹配的包版本"
+      ]
+    }
+  ],
+  "source_attributions": [],
+  "constraint_conflicts": [
+    {
+      "package_name": "packaging",
+      "requirement_spec": ">=23.0",
+      "constraint_spec": "<22.0",
+      "resolution": null
+    },
+    {
+      "package_name": "jinja2",
+      "requirement_spec": "==3.1.3",
+      "constraint_spec": "==3.0.0",
+      "resolution": null
+    }
+  ],
+  "missing_packages": [
+    {
+      "name": "click",
+      "specifier": "==8.1.7",
+      "reason": "在 wheelhouse 中未找到匹配版本，无法验证实际哈希"
+    },
+    {
+      "name": "packaging",
+      "specifier": "<22.0",
+      "reason": "在 wheelhouse 中未找到匹配版本，无法验证实际哈希"
+    },
+    {
+      "name": "jinja2",
+      "specifier": "==3.0.0",
+      "reason": "在 wheelhouse 中未找到匹配版本，无法验证实际哈希"
+    }
+  ],
+  "missing_hashes": [
+    {
+      "name": "pyyaml",
+      "specifier": "",
+      "reason": "requirements/constraints 中未提供哈希"
+    }
+  ],
+  "warnings": [],
+  "errors": [],
+  "exit_code": 4,
+  "exit_code_description": "依赖约束存在冲突"
+}

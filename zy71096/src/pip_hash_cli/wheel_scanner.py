@@ -181,12 +181,10 @@ class SourceAttributor:
                 if version not in merged[canonical]:
                     merged[canonical][version] = PackageVersion(
                         version=version,
-                        source=req.source
+                        source=PackageSource.UNKNOWN
                     )
                 
                 pkg_ver = merged[canonical][version]
-                for h in req.hashes:
-                    pkg_ver.add_hash(h.algorithm, h.value, h.source)
                 pkg_ver.extras.update(req.extras)
 
         return merged

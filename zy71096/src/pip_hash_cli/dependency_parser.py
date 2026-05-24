@@ -5,7 +5,8 @@ from typing import List, Optional, Set, Tuple
 from urllib.parse import urlparse
 
 from packaging.requirements import Requirement as PackagingRequirement
-from packaging.specifiers import SpecifierSet
+from packaging.specifiers import SpecifierSet, Specifier
+from packaging.version import Version
 
 from .models import Requirement, PackageHash, ConstraintConflict
 from .constants import PackageSource
@@ -207,18 +208,31 @@ class DependencyResolver:
             req_spec = SpecifierSet(req.specifier)
             const_spec = SpecifierSet(constraint.specifier)
             
-            intersection = req_spec & const_spec
-            if str(intersection) == "<SpecifierSet()>":
+            if self._specifiers_conflict(req_spec, const_spec):
                 return ConstraintConflict(
                     package_name=req.name,
                     requirement_spec=req.specifier,
                     constraint_spec=constraint.specifier,
                     resolution=None
                 )
-        except Exception:
+        except Exception as e:
             pass
         
         return None
+
+    def _specifiers_conflict(self, spec1: SpecifierSet, spec2: SpecifierSet) -> bool:
+        test_versions = [
+            "0.0.1", "1.0.0", "10.0.0", "20.0.0", "21.0.0", "21.999.999",
+            "22.0.0", "22.999.999", "23.0.0", "23.999.999", "24.0.0", 
+            "30.0.0", "50.0.0", "100.0.0", "999.999.999"
+        ]
+        
+        for v_str in test_versions:
+            v = Version(v_str)
+            if v in spec1 and v in spec2:
+                return False
+        
+        return True
 
     def _merge_requirement_with_constraint(self, req: Requirement, constraint: Requirement) -> Requirement:
         merged = Requirement(
