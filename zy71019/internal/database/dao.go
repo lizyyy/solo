@@ -160,10 +160,12 @@ func CreateAppeal(a *models.Appeal) (int64, error) {
 func GetAppealByArbitrationID(arbitrationID int64) (*models.Appeal, error) {
 	var a models.Appeal
 	var evidenceStr sql.NullString
+	var isApproved sql.NullBool
+	var refundAmount sql.NullFloat64
 	err := DB.QueryRow(`
-		SELECT id, arbitration_id, user_id, content, evidence_urls, submitted_at, handler_id, handler_remark, handled_at
+		SELECT id, arbitration_id, user_id, content, evidence_urls, submitted_at, handler_id, handler_remark, is_approved, refund_amount, handled_at
 		FROM appeals WHERE arbitration_id = ?
-	`, arbitrationID).Scan(&a.ID, &a.ArbitrationID, &a.UserID, &a.Content, &evidenceStr, &a.SubmittedAt, &a.HandlerID, &a.HandlerRemark, &a.HandledAt)
+	`, arbitrationID).Scan(&a.ID, &a.ArbitrationID, &a.UserID, &a.Content, &evidenceStr, &a.SubmittedAt, &a.HandlerID, &a.HandlerRemark, &isApproved, &refundAmount, &a.HandledAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -173,14 +175,20 @@ func GetAppealByArbitrationID(arbitrationID int64) (*models.Appeal, error) {
 	if evidenceStr.Valid {
 		json.Unmarshal([]byte(evidenceStr.String), &a.EvidenceURLs)
 	}
+	if isApproved.Valid {
+		a.IsApproved = &isApproved.Bool
+	}
+	if refundAmount.Valid {
+		a.RefundAmount = &refundAmount.Float64
+	}
 	return &a, nil
 }
 
-func UpdateAppeal(arbitrationID int64, handlerID, handlerRemark string, handledAt time.Time) error {
+func UpdateAppeal(arbitrationID int64, handlerID, handlerRemark string, isApproved bool, refundAmount float64, handledAt time.Time) error {
 	_, err := DB.Exec(`
-		UPDATE appeals SET handler_id = ?, handler_remark = ?, handled_at = ?
+		UPDATE appeals SET handler_id = ?, handler_remark = ?, is_approved = ?, refund_amount = ?, handled_at = ?
 		WHERE arbitration_id = ?
-	`, handlerID, handlerRemark, handledAt, arbitrationID)
+	`, handlerID, handlerRemark, isApproved, refundAmount, handledAt, arbitrationID)
 	return err
 }
 

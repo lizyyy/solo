@@ -103,6 +103,8 @@ func createTables() error {
 		submitted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		handler_id TEXT,
 		handler_remark TEXT,
+		is_approved INTEGER,
+		refund_amount REAL,
 		handled_at DATETIME,
 		FOREIGN KEY (arbitration_id) REFERENCES arbitrations(id) ON DELETE CASCADE
 	);

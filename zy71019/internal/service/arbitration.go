@@ -68,10 +68,15 @@ func (s *ArbitrationService) CreateArbitration(req *models.CreateArbitrationRequ
 		}
 	}
 
+	hasDuplicateDamage := false
 	for _, d := range req.Damages {
 		matchResult, err := s.validationService.CheckDuplicateDamage(req.VehicleID, d.DamageType, d.Location)
 		if err != nil {
 			return nil, fmt.Errorf("检查重复损伤失败: %w", err)
+		}
+
+		if matchResult.IsDuplicate {
+			hasDuplicateDamage = true
 		}
 
 		damage := &models.DamageDetail{
@@ -124,15 +129,6 @@ func (s *ArbitrationService) CreateArbitration(req *models.CreateArbitrationRequ
 
 	photos, _ := database.GetPhotosByArbitrationID(arbitrationID)
 	validationResult := s.validationService.ValidatePhotos(photos, &req.PickupTime, &req.ReturnTime)
-
-	hasDuplicateDamage := false
-	for _, d := range req.Damages {
-		matchResult, _ := s.validationService.CheckDuplicateDamage(req.VehicleID, d.DamageType, d.Location)
-		if matchResult.IsDuplicate {
-			hasDuplicateDamage = true
-			break
-		}
-	}
 
 	if len(validationResult.Warnings) > 0 || hasDuplicateDamage {
 		if err := s.transitionStatus(arbitrationID, models.StatusBlocked, req.OperatorID, req.OperatorName, "校验发现问题，需要人工审核"); err != nil {
@@ -355,17 +351,35 @@ func (s *ArbitrationService) HandleAppeal(req *models.HandleAppealRequest) error
 		return fmt.Errorf("申诉不存在")
 	}
 
-	if err := database.UpdateAppeal(req.ArbitrationID, req.HandlerID, req.HandlerRemark, time.Now()); err != nil {
+	if err := database.UpdateAppeal(req.ArbitrationID, req.HandlerID, req.HandlerRemark, req.Approve, req.RefundAmount, time.Now()); err != nil {
 		return fmt.Errorf("更新申诉失败: %w", err)
 	}
 
-	newStatus := models.StatusProcessing
-	if req.Approve {
-		newStatus = models.StatusProcessing
-	}
+	if req.Approve && req.RefundAmount > 0 {
+		conclusion := &models.Conclusion{
+			ArbitrationID: req.ArbitrationID,
+			FinalResult:   "申诉通过",
+			FinalRemark:   req.HandlerRemark,
+			RefundAmount:  req.RefundAmount,
+			HandlerID:     req.HandlerID,
+			HandlerName:   req.HandlerName,
+			ClosedAt:      time.Now(),
+		}
+		if _, err := database.CreateConclusion(conclusion); err != nil {
+			return fmt.Errorf("创建申诉结论失败: %w", err)
+		}
 
-	if err := s.transitionStatus(req.ArbitrationID, newStatus, req.HandlerID, req.HandlerName, fmt.Sprintf("申诉处理完成: %s", req.HandlerRemark)); err != nil {
-		return err
+		if err := s.logAction(req.ArbitrationID, "appeal_approved", req.HandlerID, req.HandlerName, string(models.StatusAppealing), string(models.StatusClosed), fmt.Sprintf("申诉通过，退款 %.2f 元", req.RefundAmount)); err != nil {
+			return err
+		}
+
+		if err := database.UpdateArbitrationStatus(req.ArbitrationID, models.StatusClosed, req.HandlerID, req.HandlerName); err != nil {
+			return fmt.Errorf("更新仲裁状态失败: %w", err)
+		}
+	} else {
+		if err := s.transitionStatus(req.ArbitrationID, models.StatusProcessing, req.HandlerID, req.HandlerName, fmt.Sprintf("申诉驳回: %s", req.HandlerRemark)); err != nil {
+			return err
+		}
 	}
 
 	return nil
