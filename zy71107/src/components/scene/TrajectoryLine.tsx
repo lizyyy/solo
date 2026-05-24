@@ -10,20 +10,28 @@ interface TrajectoryLineProps {
   progress: number;
 }
 
+const MIN_CURVE_POINTS = 2;
+
 const TrajectoryLine: React.FC<TrajectoryLineProps> = ({ trajectory, color, progress }) => {
   const movingPointRef = useRef<THREE.Mesh>(null!);
 
-  const points = useMemo(() => {
-    return trajectory.points.map((p) => new THREE.Vector3(p.position.x, p.position.y, p.position.z));
+  const validPoints = useMemo(() => {
+    return trajectory.points
+      .filter((p) => p.confidence > 0.1)
+      .map((p) => new THREE.Vector3(p.position.x, p.position.y, p.position.z));
   }, [trajectory.points]);
 
-  const curve = useMemo(() => {
-    return new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.5);
-  }, [points]);
+  const hasValidCurve = validPoints.length >= MIN_CURVE_POINTS;
 
-  const tubeGeometry = useMemo(() => {
-    return new THREE.TubeGeometry(curve, 100, 0.05, 8, false);
-  }, [curve]);
+  const curve = useMemo(() => {
+    if (!hasValidCurve) return null;
+    return new THREE.CatmullRomCurve3(validPoints, false, 'catmullrom', 0.5);
+  }, [validPoints, hasValidCurve]);
+
+  const lineGeometry = useMemo(() => {
+    if (!hasValidCurve) return null;
+    return new THREE.TubeGeometry(curve!, 100, 0.05, 8, false);
+  }, [curve, hasValidCurve]);
 
   useFrame(() => {
     if (movingPointRef.current && curve) {
@@ -34,7 +42,24 @@ const TrajectoryLine: React.FC<TrajectoryLineProps> = ({ trajectory, color, prog
 
   if (progress <= 0) return null;
 
-  const clipGeometry = tubeGeometry.clone();
+  if (!hasValidCurve) {
+    return (
+      <group>
+        {validPoints.map((point, i) => (
+          <mesh key={i} position={[point.x, point.y, point.z]}>
+            <sphereGeometry args={[0.1, 8, 8]} />
+            <meshBasicMaterial color="#ff6b35" transparent opacity={0.6} />
+          </mesh>
+        ))}
+        <mesh position={[validPoints[0]?.x || 0, validPoints[0]?.y || 1.2, validPoints[0]?.z || 0]}>
+          <sphereGeometry args={[0.2, 16, 16]} />
+          <meshBasicMaterial color="#ff3333" />
+        </mesh>
+      </group>
+    );
+  }
+
+  const clipGeometry = lineGeometry!.clone();
   const positions = clipGeometry.attributes.position;
   const totalPoints = positions.count;
   const visiblePoints = Math.floor(totalPoints * progress);
@@ -50,8 +75,8 @@ const TrajectoryLine: React.FC<TrajectoryLineProps> = ({ trajectory, color, prog
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={points.length}
-            array={new Float32Array(points.flatMap((p) => [p.x, p.y, p.z]))}
+            count={validPoints.length}
+            array={new Float32Array(validPoints.flatMap((p) => [p.x, p.y, p.z]))}
             itemSize={3}
           />
         </bufferGeometry>

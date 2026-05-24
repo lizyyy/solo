@@ -134,32 +134,39 @@ export const conflictSample = {
     { id: 'b1', name: '测试场次', startTime: 0, endTime: 150000, visitorCount: 5 },
   ] as BatchData[],
   trajectories: [
-    {
-      ...generateTrajectory('v1', 'b1',
+    (() => {
+      const baseTraj = generateTrajectory('v1', 'b1',
         [{ x: -12, z: 8 }, { x: -10, z: 5 }, { x: -5, z: 5 }, { x: 0, z: 5 }, { x: 12, z: -8 }],
         [{ showcaseId: 's6', startTime: 10000, duration: 15000, isCongestion: false },
          { showcaseId: 's7', startTime: 35000, duration: 20000, isCongestion: false },
          { showcaseId: 'invalid_s99', startTime: 70000, duration: 25000, isCongestion: false }],
         0
-      ),
-      points: [
-        ...generateTrajectory('v1', 'b1', [], [], 0).points.slice(0, 20),
-        { timestamp: 50000, position: { x: 100, y: 1.2, z: 100 }, confidence: 0.9 },
-        ...generateTrajectory('v1', 'b1', [], [], 0).points.slice(20),
-      ],
-    },
-    {
-      ...generateTrajectory('v2', 'b1',
+      );
+      const midIndex = Math.floor(baseTraj.points.length / 2);
+      return {
+        ...baseTraj,
+        points: [
+          ...baseTraj.points.slice(0, midIndex),
+          { timestamp: baseTraj.points[midIndex]?.timestamp || 50000, position: { x: 100, y: 1.2, z: 100 }, confidence: 0.9 },
+          ...baseTraj.points.slice(midIndex + 1),
+        ],
+      };
+    })(),
+    (() => {
+      const baseTraj = generateTrajectory('v2', 'b1',
         [{ x: -12, z: 8 }, { x: -10, z: -5 }, { x: -5, z: -5 }, { x: 12, z: -8 }],
         [{ showcaseId: 's1', startTime: 15000, duration: 30000, isCongestion: true },
          { showcaseId: 's2', startTime: 50000, duration: 10000, isCongestion: false }],
         5000
-      ),
-      points: generateTrajectory('v2', 'b1', [], [], 5000).points.map((p, i) => ({
-        ...p,
-        confidence: i % 5 === 0 ? 0.3 : 0.9,
-      })),
-    },
+      );
+      return {
+        ...baseTraj,
+        points: baseTraj.points.map((p, i) => ({
+          ...p,
+          confidence: i % 5 === 0 ? 0.05 : 0.9,
+        })),
+      };
+    })(),
     generateTrajectory('v3', 'b1',
       [{ x: 12, z: 8 }, { x: 10, z: 0 }, { x: 5, z: 0 }, { x: 12, z: -8 }],
       [{ showcaseId: 's5', startTime: 18000, duration: 25000, isCongestion: true }],
