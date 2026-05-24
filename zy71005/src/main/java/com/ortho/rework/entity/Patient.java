@@ -22,6 +22,8 @@ public class Patient {
 
     private String email;
 
+    private String doctorName;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

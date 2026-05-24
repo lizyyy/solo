@@ -5,14 +5,18 @@ import lombok.Data;
 
 @Data
 public class ShipRequest {
-    @NotBlank(message = "Tracking number is required")
-    private String trackingNumber;
-
-    private String courier;
-
-    private String sender;
-
+    @NotBlank(message = "返工单号不能为空")
+    private String reworkNo;
+    
+    @NotBlank(message = "快递单号不能为空")
+    private String expressNo;
+    
+    private String expressCompany;
+    
+    @NotBlank(message = "寄件人不能为空")
+    private String shippedBy;
+    
     private String receiver;
-
-    private String operator;
+    
+    private String receiverPhone;
 }

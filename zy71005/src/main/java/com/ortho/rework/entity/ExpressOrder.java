@@ -12,29 +12,39 @@ public class ExpressOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
+    private String expressNo;
+
+    private String expressCompany;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rework_order_id")
     private ReworkOrder reworkOrder;
 
-    @Column(nullable = false)
-    private String trackingNumber;
-
-    private String courier;
-
     private String sender;
+
+    private String senderPhone;
 
     private String receiver;
 
-    @Column(name = "shipped_at")
-    private LocalDateTime shippedAt;
+    private String receiverPhone;
 
-    @Column(name = "received_at")
-    private LocalDateTime receivedAt;
+    private LocalDateTime sentTime;
 
-    @Column(name = "created_at")
+    private LocalDateTime receivedTime;
+
+    private String status;
+
+    private Boolean isLost = false;
+
+    private String lostRemark;
+
+    private LocalDateTime lostMarkTime;
+
+    private String lostMarkBy;
+
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @PrePersist

@@ -33,6 +33,34 @@ public class ReworkOrder {
     @Column(length = 2000)
     private String doctorNote;
 
+    private String inspectionRemark;
+
+    private String inspectionBy;
+
+    private LocalDateTime processingStartTime;
+
+    private String processingBy;
+
+    private LocalDateTime reviewTime;
+
+    private String reviewResult;
+
+    private String reviewBy;
+
+    private LocalDateTime shippedTime;
+
+    private String shippedBy;
+
+    private LocalDateTime closedTime;
+
+    private String closedBy;
+
+    private String closeReason;
+
+    private Boolean isDuplicate = false;
+
+    private String duplicateRemark;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

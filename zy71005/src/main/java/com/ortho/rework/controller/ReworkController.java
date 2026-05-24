@@ -1,72 +1,77 @@
 package com.ortho.rework.controller;
 
 import com.ortho.rework.dto.*;
+import com.ortho.rework.entity.ReworkReport;
+import com.ortho.rework.enums.ReworkStatus;
 import com.ortho.rework.service.ReworkService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/rework")
+@RequiredArgsConstructor
 public class ReworkController {
+    private final ReworkService reworkService;
 
-    @Autowired
-    private ReworkService reworkService;
-
-    @PostMapping
-    public ApiResponse<ReworkDetailDTO> createReworkOrder(@Valid @RequestBody CreateReworkRequest request) {
-        return ApiResponse.success(reworkService.createReworkOrder(request));
+    @PostMapping("/create")
+    public ApiResponse<ReworkDetailDTO> create(@Valid @RequestBody CreateReworkRequest request) {
+        return reworkService.createRework(request);
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse<ReworkDetailDTO> getReworkOrder(@PathVariable Long id) {
-        return ApiResponse.success(reworkService.getReworkOrder(id));
+    @PostMapping("/receive")
+    public ApiResponse<ReworkDetailDTO> receive(@Valid @RequestBody ReceiveRequest request) {
+        return reworkService.receive(request);
     }
 
-    @GetMapping
-    public ApiResponse<List<ReworkDetailDTO>> getAllReworkOrders() {
-        return ApiResponse.success(reworkService.getAllReworkOrders());
+    @PostMapping("/inspect")
+    public ApiResponse<ReworkDetailDTO> inspect(@Valid @RequestBody InspectionRequest request) {
+        return reworkService.inspect(request);
     }
 
-    @PostMapping("/{id}/review")
-    public ApiResponse<ReworkDetailDTO> startReview(@PathVariable Long id, @RequestBody ReviewRequest request) {
-        return ApiResponse.success(reworkService.startReview(id, request));
+    @PostMapping("/technician-note")
+    public ApiResponse<ReworkDetailDTO> technicianNote(@Valid @RequestBody TechnicianNoteRequest request) {
+        return reworkService.addTechnicianNote(request);
     }
 
-    @PostMapping("/{id}/technician-note")
-    public ApiResponse<ReworkDetailDTO> addTechnicianNote(@PathVariable Long id, @RequestBody TechnicianNoteRequest request) {
-        return ApiResponse.success(reworkService.addTechnicianNote(id, request));
+    @PostMapping("/doctor-confirm")
+    public ApiResponse<ReworkDetailDTO> doctorConfirm(@Valid @RequestBody DoctorConfirmRequest request) {
+        return reworkService.doctorConfirm(request);
     }
 
-    @PostMapping("/{id}/doctor-confirm")
-    public ApiResponse<ReworkDetailDTO> doctorConfirm(@PathVariable Long id, @RequestBody DoctorConfirmRequest request) {
-        return ApiResponse.success(reworkService.doctorConfirm(id, request));
+    @PostMapping("/review")
+    public ApiResponse<ReworkDetailDTO> review(@Valid @RequestBody ReviewRequest request) {
+        return reworkService.review(request);
     }
 
-    @PostMapping("/{id}/ship")
-    public ApiResponse<ReworkDetailDTO> ship(@PathVariable Long id, @Valid @RequestBody ShipRequest request) {
-        return ApiResponse.success(reworkService.ship(id, request));
+    @PostMapping("/ship")
+    public ApiResponse<ReworkDetailDTO> ship(@Valid @RequestBody ShipRequest request) {
+        return reworkService.ship(request);
     }
 
-    @PostMapping("/{id}/receive")
-    public ApiResponse<ReworkDetailDTO> receive(@PathVariable Long id, @RequestBody ReceiveRequest request) {
-        return ApiResponse.success(reworkService.receive(id, request));
+    @PostMapping("/close")
+    public ApiResponse<ReworkDetailDTO> close(@Valid @RequestBody CloseRequest request) {
+        return reworkService.close(request);
     }
 
-    @PostMapping("/{id}/inspect")
-    public ApiResponse<ReworkDetailDTO> inspect(@PathVariable Long id, @RequestBody InspectionRequest request) {
-        return ApiResponse.success(reworkService.inspect(id, request));
+    @PostMapping("/mark-lost")
+    public ApiResponse<ReworkDetailDTO> markLost(@Valid @RequestBody MarkLostRequest request) {
+        return reworkService.markLost(request);
     }
 
-    @PostMapping("/{id}/close")
-    public ApiResponse<ReworkDetailDTO> close(@PathVariable Long id, @RequestBody CloseRequest request) {
-        return ApiResponse.success(reworkService.close(id, request));
+    @GetMapping("/{reworkNo}")
+    public ApiResponse<ReworkDetailDTO> getDetail(@PathVariable String reworkNo) {
+        return reworkService.getReworkDetail(reworkNo);
     }
 
-    @PostMapping("/{id}/mark-lost")
-    public ApiResponse<ReworkDetailDTO> markLost(@PathVariable Long id, @RequestBody MarkLostRequest request) {
-        return ApiResponse.success(reworkService.markLost(id, request));
+    @GetMapping("/list")
+    public ApiResponse<List<ReworkDetailDTO>> list(@RequestParam(required = false) ReworkStatus status) {
+        return reworkService.listReworks(status);
+    }
+
+    @PostMapping("/export/{reworkNo}")
+    public ApiResponse<ReworkReport> export(@PathVariable String reworkNo) {
+        return reworkService.exportReport(reworkNo);
     }
 }

@@ -1,7 +1,6 @@
 package com.ortho.rework.entity;
 
 import com.ortho.rework.enums.OperationType;
-import com.ortho.rework.enums.ReworkStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -14,29 +13,31 @@ public class AuditLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long reworkOrderId;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OperationType operationType;
 
-    @Enumerated(EnumType.STRING)
-    private ReworkStatus fromStatus;
+    private String reworkNo;
 
-    @Enumerated(EnumType.STRING)
-    private ReworkStatus toStatus;
+    private String batchNo;
 
-    @Column(length = 2000)
-    private String remark;
+    private String patientNo;
 
     private String operator;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Column(length = 1000)
+    private String remark;
+
+    private String beforeStatus;
+
+    private String afterStatus;
+
+    private Boolean isDuplicateAttempt = false;
+
+    private LocalDateTime operationTime;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        operationTime = LocalDateTime.now();
     }
 }

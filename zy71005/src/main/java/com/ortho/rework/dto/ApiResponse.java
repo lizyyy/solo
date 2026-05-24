@@ -1,30 +1,49 @@
 package com.ortho.rework.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class ApiResponse<T> {
     private int code;
     private String message;
     private T data;
+    private LocalDateTime timestamp;
+    private String reason;
 
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(200, "Success", data);
+        ApiResponse<T> response = new ApiResponse<>();
+        response.setCode(200);
+        response.setMessage("success");
+        response.setData(data);
+        response.setTimestamp(LocalDateTime.now());
+        return response;
     }
 
-    public static <T> ApiResponse<T> success() {
-        return new ApiResponse<>(200, "Success", null);
+    public static <T> ApiResponse<T> success(T data, String message) {
+        ApiResponse<T> response = success(data);
+        response.setMessage(message);
+        return response;
     }
 
-    public static <T> ApiResponse<T> error(String message) {
-        return new ApiResponse<>(500, message, null);
+    public static <T> ApiResponse<T> error(int code, String message, String reason) {
+        ApiResponse<T> response = new ApiResponse<>();
+        response.setCode(code);
+        response.setMessage(message);
+        response.setReason(reason);
+        response.setTimestamp(LocalDateTime.now());
+        return response;
     }
 
-    public static <T> ApiResponse<T> error(int code, String message) {
-        return new ApiResponse<>(code, message, null);
+    public static <T> ApiResponse<T> badRequest(String message, String reason) {
+        return error(400, message, reason);
+    }
+
+    public static <T> ApiResponse<T> notFound(String message, String reason) {
+        return error(404, message, reason);
+    }
+
+    public static <T> ApiResponse<T> duplicate(String message, String reason) {
+        return error(409, message, reason);
     }
 }

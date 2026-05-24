@@ -1,46 +1,53 @@
 package com.ortho.rework.service;
 
 import com.ortho.rework.entity.AuditLog;
+import com.ortho.rework.entity.ReworkOrder;
 import com.ortho.rework.enums.OperationType;
 import com.ortho.rework.enums.ReworkStatus;
 import com.ortho.rework.repository.AuditLogRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
+@RequiredArgsConstructor
 public class AuditService {
-
-    @Autowired
-    private AuditLogRepository auditLogRepository;
+    private final AuditLogRepository auditLogRepository;
 
     @Transactional
-    public AuditLog logOperation(Long reworkOrderId, OperationType operationType, 
-                                  ReworkStatus fromStatus, ReworkStatus toStatus, 
-                                  String remark, String operator) {
-        AuditLog auditLog = new AuditLog();
-        auditLog.setReworkOrderId(reworkOrderId);
-        auditLog.setOperationType(operationType);
-        auditLog.setFromStatus(fromStatus);
-        auditLog.setToStatus(toStatus);
-        auditLog.setRemark(remark);
-        auditLog.setOperator(operator);
-        return auditLogRepository.save(auditLog);
+    public AuditLog logOperation(OperationType operationType,
+                                  ReworkOrder order,
+                                  String operator,
+                                  String remark,
+                                  ReworkStatus beforeStatus,
+                                  ReworkStatus afterStatus) {
+        AuditLog log = new AuditLog();
+        log.setOperationType(operationType);
+        log.setReworkNo(order.getReworkNo());
+        log.setBatchNo(order.getBatch().getBatchNo());
+        log.setPatientNo(order.getPatient().getPatientNo());
+        log.setOperator(operator);
+        log.setRemark(remark);
+        log.setBeforeStatus(beforeStatus != null ? beforeStatus.name() : null);
+        log.setAfterStatus(afterStatus != null ? afterStatus.name() : null);
+        return auditLogRepository.save(log);
     }
 
     @Transactional
-    public AuditLog logCreate(Long reworkOrderId, String operator) {
-        return logOperation(reworkOrderId, OperationType.CREATE, null, ReworkStatus.PENDING_REVIEW, "Create rework order", operator);
-    }
-
-    @Transactional
-    public AuditLog logStatusChange(Long reworkOrderId, ReworkStatus fromStatus, ReworkStatus toStatus, String remark, String operator) {
-        return logOperation(reworkOrderId, OperationType.STATUS_CHANGE, fromStatus, toStatus, remark, operator);
-    }
-
-    public List<AuditLog> getAuditLogsByReworkOrderId(Long reworkOrderId) {
-        return auditLogRepository.findByReworkOrderIdOrderByCreatedAtDesc(reworkOrderId);
+    public AuditLog logDuplicateAttempt(OperationType operationType,
+                                         String reworkNo,
+                                         String batchNo,
+                                         String patientNo,
+                                         String operator,
+                                         String remark) {
+        AuditLog log = new AuditLog();
+        log.setOperationType(operationType);
+        log.setReworkNo(reworkNo);
+        log.setBatchNo(batchNo);
+        log.setPatientNo(patientNo);
+        log.setOperator(operator);
+        log.setRemark(remark);
+        log.setIsDuplicateAttempt(true);
+        return auditLogRepository.save(log);
     }
 }

@@ -1,69 +1,90 @@
 package com.ortho.rework.config;
 
-import com.ortho.rework.entity.Patient;
 import com.ortho.rework.entity.ImpressionBatch;
-import com.ortho.rework.entity.ReworkOrder;
-import com.ortho.rework.enums.ReworkStatus;
-import com.ortho.rework.repository.PatientRepository;
+import com.ortho.rework.entity.Patient;
 import com.ortho.rework.repository.ImpressionBatchRepository;
-import com.ortho.rework.repository.ReworkOrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ortho.rework.repository.PatientRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import java.time.LocalDateTime;
 
-@Component
-public class DataInitializer implements CommandLineRunner {
+@Configuration
+@RequiredArgsConstructor
+public class DataInitializer {
 
-    @Autowired
-    private PatientRepository patientRepository;
+    private final PatientRepository patientRepository;
+    private final ImpressionBatchRepository batchRepository;
 
-    @Autowired
-    private ImpressionBatchRepository impressionBatchRepository;
+    @Bean
+    CommandLineRunner initData() {
+        return args -> {
+            Patient p1 = new Patient();
+            p1.setPatientNo("P2024001");
+            p1.setName("张三");
+            p1.setPhone("13800138001");
+            p1.setDoctorName("王医生");
+            p1.setCreatedAt(LocalDateTime.now());
+            p1.setUpdatedAt(LocalDateTime.now());
+            patientRepository.save(p1);
 
-    @Autowired
-    private ReworkOrderRepository reworkOrderRepository;
+            Patient p2 = new Patient();
+            p2.setPatientNo("P2024002");
+            p2.setName("李四");
+            p2.setPhone("13800138002");
+            p2.setDoctorName("李医生");
+            p2.setCreatedAt(LocalDateTime.now());
+            p2.setUpdatedAt(LocalDateTime.now());
+            patientRepository.save(p2);
 
-    @Override
-    public void run(String... args) {
-        Patient patient1 = new Patient();
-        patient1.setPatientId("P001");
-        patient1.setName("张三");
-        patient1.setPhone("13800138000");
-        patient1 = patientRepository.save(patient1);
+            Patient p3 = new Patient();
+            p3.setPatientNo("P2024003");
+            p3.setName("王五");
+            p3.setPhone("13800138003");
+            p3.setDoctorName("王医生");
+            p3.setCreatedAt(LocalDateTime.now());
+            p3.setUpdatedAt(LocalDateTime.now());
+            patientRepository.save(p3);
 
-        Patient patient2 = new Patient();
-        patient2.setPatientId("P002");
-        patient2.setName("李四");
-        patient2.setPhone("13900139000");
-        patient2 = patientRepository.save(patient2);
+            ImpressionBatch b1 = new ImpressionBatch();
+            b1.setBatchNo("BATCH-2024-001");
+            b1.setPatient(p1);
+            b1.setImpressionType("隐形矫治器");
+            b1.setOriginalBatchNo("BATCH-2024-001");
+            b1.setReworkCount(0);
+            b1.setProductionDate(LocalDateTime.now().minusDays(7));
+            b1.setCreatedAt(LocalDateTime.now());
+            b1.setUpdatedAt(LocalDateTime.now());
+            batchRepository.save(b1);
 
-        ImpressionBatch batch1 = new ImpressionBatch();
-        batch1.setBatchNumber("BATCH-001");
-        batch1.setPatient(patient1);
-        batch1.setDescription("正畸牙模批次1");
-        batch1 = impressionBatchRepository.save(batch1);
+            ImpressionBatch b2 = new ImpressionBatch();
+            b2.setBatchNo("BATCH-2024-002");
+            b2.setPatient(p2);
+            b2.setImpressionType("托槽");
+            b2.setOriginalBatchNo("BATCH-2024-002");
+            b2.setReworkCount(1);
+            b2.setProductionDate(LocalDateTime.now().minusDays(14));
+            b2.setCreatedAt(LocalDateTime.now());
+            b2.setUpdatedAt(LocalDateTime.now());
+            batchRepository.save(b2);
 
-        ImpressionBatch batch2 = new ImpressionBatch();
-        batch2.setBatchNumber("BATCH-002");
-        batch2.setPatient(patient2);
-        batch2.setDescription("正畸牙模批次2");
-        batch2 = impressionBatchRepository.save(batch2);
+            ImpressionBatch b3 = new ImpressionBatch();
+            b3.setBatchNo("BATCH-2024-003");
+            b3.setPatient(p3);
+            b3.setImpressionType("保持器");
+            b3.setOriginalBatchNo("BATCH-2024-003");
+            b3.setReworkCount(0);
+            b3.setProductionDate(LocalDateTime.now().minusDays(3));
+            b3.setCreatedAt(LocalDateTime.now());
+            b3.setUpdatedAt(LocalDateTime.now());
+            batchRepository.save(b3);
 
-        ReworkOrder order1 = new ReworkOrder();
-        order1.setOrderNumber("RW1001");
-        order1.setBatch(batch1);
-        order1.setStatus(ReworkStatus.PENDING_REVIEW);
-        order1.setReworkReason("牙模边缘不清晰");
-        reworkOrderRepository.save(order1);
-
-        ReworkOrder order2 = new ReworkOrder();
-        order2.setOrderNumber("RW1002");
-        order2.setBatch(batch2);
-        order2.setStatus(ReworkStatus.TECHNICIAN_REVIEW);
-        order2.setReworkReason("咬合关系不准确");
-        order2.setTechnicianNote("正在检查中...");
-        reworkOrderRepository.save(order2);
-
-        System.out.println("Sample data initialized successfully!");
+            System.out.println("========================================");
+            System.out.println("  测试数据初始化完成");
+            System.out.println("  患者数据: 3 条 (P2024001, P2024002, P2024003)");
+            System.out.println("  批次数据: 3 条 (BATCH-2024-001~003)");
+            System.out.println("========================================");
+        };
     }
 }

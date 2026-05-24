@@ -7,5 +7,6 @@ import java.util.Optional;
 
 @Repository
 public interface ReworkReportRepository extends JpaRepository<ReworkReport, Long> {
+    Optional<ReworkReport> findByReportNo(String reportNo);
     Optional<ReworkReport> findByReworkOrderId(Long reworkOrderId);
 }

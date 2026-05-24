@@ -7,5 +7,8 @@ import java.util.List;
 
 @Repository
 public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
-    List<AuditLog> findByReworkOrderIdOrderByCreatedAtDesc(Long reworkOrderId);
+    List<AuditLog> findByReworkNoOrderByOperationTimeDesc(String reworkNo);
+    List<AuditLog> findByBatchNoOrderByOperationTimeDesc(String batchNo);
+    List<AuditLog> findByPatientNoOrderByOperationTimeDesc(String patientNo);
+    List<AuditLog> findByIsDuplicateAttemptTrueOrderByOperationTimeDesc();
 }

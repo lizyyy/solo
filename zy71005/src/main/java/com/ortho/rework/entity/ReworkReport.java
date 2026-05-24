@@ -12,36 +12,38 @@ public class ReworkReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
+    private String reportNo;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rework_order_id")
     private ReworkOrder reworkOrder;
 
-    @Column(length = 3000)
+    private LocalDateTime reportGeneratedTime;
+
+    private String generatedBy;
+
+    @Column(length = 2000)
+    private String summary;
+
+    private String technicianNote;
+
+    private String doctorConfirmation;
+
     private String inspectionResult;
 
-    @Column(length = 3000)
-    private String conclusion;
+    private String reviewResult;
 
-    private String reporter;
+    private String closeReason;
 
-    @Column(name = "reported_at")
-    private LocalDateTime reportedAt;
+    private Integer totalReworkCount;
 
-    @Column(name = "created_at")
+    private Long totalProcessingDays;
+
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-        reportedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 }
