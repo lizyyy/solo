@@ -1,13 +1,17 @@
 ignoreOrder: true
 ignoreFields:
-  - body.id
-  - body.created_at
-  - body.updated_at
-  - body.timestamp
-  - query.timestamp
-  - query.nonce
-  - header.x-request-id
-  - header.x-trace-id
+  - response.body.id
+  - response.body.created_at
+  - response.body.updated_at
+  - response.body.timestamp
+  - response.body.*_id
+  - response.body.*_at
+  - request.body.id
+  - request.body.created_at
+  - request.query.timestamp
+  - request.query.nonce
+  - request.headers.x-request-id
+  - request.headers.x-trace-id
 maskingRules:
   - field: authorization
     type: header

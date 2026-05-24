@@ -1,6 +1,6 @@
 # API Cassette 差异报告
 
-**生成时间**: 2026/5/24 21:32:14
+**生成时间**: 2026/5/24 23:41:36
 **比较文件**:
 - 期望: `examples/expected.yml`
 - 实际: `examples/actual.yml`
@@ -32,16 +32,15 @@
 
 **源代码位置**:
 
-- 期望: `examples/expected.yml:1`
-- 实际: `examples/actual.yml:1`
+- 期望: `examples/expected.yml:4`
+- 实际: `examples/actual.yml:4`
 
 <details>
-<summary>查看 2 项详细差异</summary>
+<summary>查看 1 项详细差异</summary>
 
 | 路径 | 类型 | 期望值 | 实际值 |
 |------|------|--------|--------|
 | `response.body.email` | 变更 | `john@example.com` | `john.doe@example.com` |
-| `response.body.created_at` | 变更 | `2024-01-01T00:00:00Z` | `2024-01-15T00:00:00Z` |
 
 </details>
 
@@ -52,8 +51,8 @@
 
 **源代码位置**:
 
-- 期望: `examples/expected.yml:11`
-- 实际: `examples/actual.yml:11`
+- 期望: `examples/expected.yml:22`
+- 实际: `examples/actual.yml:22`
 
 <details>
 <summary>查看 1 项详细差异</summary>
@@ -71,15 +70,14 @@
 
 **源代码位置**:
 
-- 期望: `examples/expected.yml:11`
-- 实际: `examples/actual.yml:11`
+- 期望: `examples/expected.yml:22`
+- 实际: `examples/actual.yml:22`
 
 <details>
-<summary>查看 2 项详细差异</summary>
+<summary>查看 1 项详细差异</summary>
 
 | 路径 | 类型 | 期望值 | 实际值 |
 |------|------|--------|--------|
-| `response.body.id` | 变更 | `456` | `789` |
 | `response.body.role` | 新增 | *(不存在)* | `user` |
 
 </details>
@@ -93,7 +91,7 @@
 
 **源代码位置**:
 
-- 实际: `examples/actual.yml:21`
+- 实际: `examples/actual.yml:41`
 
 
 
@@ -116,14 +114,18 @@
 {
   "ignoreOrder": true,
   "ignoreFields": [
-    "body.id",
-    "body.created_at",
-    "body.updated_at",
-    "body.timestamp",
-    "query.timestamp",
-    "query.nonce",
-    "header.x-request-id",
-    "header.x-trace-id"
+    "response.body.id",
+    "response.body.created_at",
+    "response.body.updated_at",
+    "response.body.timestamp",
+    "response.body.*_id",
+    "response.body.*_at",
+    "request.body.id",
+    "request.body.created_at",
+    "request.query.timestamp",
+    "request.query.nonce",
+    "request.headers.x-request-id",
+    "request.headers.x-trace-id"
   ],
   "maskingRules": [
     {

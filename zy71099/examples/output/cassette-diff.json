@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generatedAt": "2026-05-24T13:32:14.855Z",
+    "generatedAt": "2026-05-24T15:41:36.351Z",
     "version": "1.0.0",
     "expectedFile": "examples/expected.yml",
     "actualFile": "examples/actual.yml"
@@ -20,14 +20,18 @@
   "config": {
     "ignoreOrder": true,
     "ignoreFields": [
-      "body.id",
-      "body.created_at",
-      "body.updated_at",
-      "body.timestamp",
-      "query.timestamp",
-      "query.nonce",
-      "header.x-request-id",
-      "header.x-trace-id"
+      "response.body.id",
+      "response.body.created_at",
+      "response.body.updated_at",
+      "response.body.timestamp",
+      "response.body.*_id",
+      "response.body.*_at",
+      "request.body.id",
+      "request.body.created_at",
+      "request.query.timestamp",
+      "request.query.nonce",
+      "request.headers.x-request-id",
+      "request.headers.x-trace-id"
     ],
     "maskingRules": [
       {
@@ -71,21 +75,15 @@
           "expected": "john@example.com",
           "actual": "john.doe@example.com",
           "type": "changed"
-        },
-        {
-          "path": "response.body.created_at",
-          "expected": "2024-01-01T00:00:00Z",
-          "actual": "2024-01-15T00:00:00Z",
-          "type": "changed"
         }
       ],
       "expectedSource": {
         "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/expected.yml",
-        "line": 1
+        "line": 4
       },
       "actualSource": {
         "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/actual.yml",
-        "line": 1
+        "line": 4
       }
     },
     {
@@ -103,11 +101,11 @@
       ],
       "expectedSource": {
         "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/expected.yml",
-        "line": 11
+        "line": 22
       },
       "actualSource": {
         "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/actual.yml",
-        "line": 11
+        "line": 22
       }
     },
     {
@@ -117,12 +115,6 @@
       "message": "响应体存在差异",
       "details": [
         {
-          "path": "response.body.id",
-          "expected": 456,
-          "actual": 789,
-          "type": "changed"
-        },
-        {
           "path": "response.body.role",
           "actual": "user",
           "type": "added"
@@ -130,11 +122,11 @@
       ],
       "expectedSource": {
         "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/expected.yml",
-        "line": 11
+        "line": 22
       },
       "actualSource": {
         "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/actual.yml",
-        "line": 11
+        "line": 22
       }
     },
     {
@@ -145,7 +137,7 @@
       "details": [],
       "actualSource": {
         "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/actual.yml",
-        "line": 21
+        "line": 41
       }
     }
   ],

@@ -291,19 +291,52 @@ export class CassetteParser {
     index: number,
     lineOffsets: number[]
   ): number | undefined {
-    try {
-      const searchStr = JSON.stringify(interaction).substring(0, 100);
-      const escapedSearch = searchStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s*');
-      const regex = new RegExp(escapedSearch.substring(0, 50));
-      const match = this.rawContent.match(regex);
+    const request = interaction.request || interaction;
+    const method = request.method;
+    const uri = request.uri || request.url;
+    
+    if (method && uri) {
+      const searchPatterns = [
+        `method:\\s*["']?${method}`,
+        `uri:\\s*["']?${uri.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`,
+        `${method}\\s+${uri.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`
+      ];
       
-      if (match && match.index !== undefined) {
+      for (const pattern of searchPatterns) {
+        try {
+          const regex = new RegExp(pattern, 'gi');
+          let match;
+          let lastIndex = 0;
+          const matches = [];
+          
+          while ((match = regex.exec(this.rawContent)) !== null) {
+            matches.push(match.index);
+            if (matches.length > index) break;
+          }
+          
+          if (matches.length > index) {
+            return this.findLineNumber(matches[index], lineOffsets);
+          }
+          if (matches.length > 0) {
+            return this.findLineNumber(matches[0], lineOffsets);
+          }
+        } catch {
+        }
+      }
+    }
+    
+    const interactionsPattern = /^(\s*)-\s*(request|method|uri|url):/gm;
+    let match;
+    let count = 0;
+    
+    while ((match = interactionsPattern.exec(this.rawContent)) !== null) {
+      if (count === index) {
         return this.findLineNumber(match.index, lineOffsets);
       }
-    } catch {
+      count++;
     }
-
-    return Math.max(1, index * 10 + 1);
+    
+    return Math.max(1, index * 15 + 3);
   }
 
   private createParseError(error: any): ParseError {

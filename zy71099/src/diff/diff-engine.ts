@@ -527,7 +527,14 @@ export class DiffEngine {
   private matchPattern(path: string, pattern: string): boolean {
     if (path === pattern) return true;
     
-    const regexPattern = pattern
+    if (path.endsWith('.' + pattern) || path.endsWith('[' + pattern)) {
+      return true;
+    }
+    
+    const flexiblePattern = pattern
+      .replace(/^(request\.|response\.)?/, '(request\\.|response\\.)?');
+    
+    const regexPattern = flexiblePattern
       .replace(/\./g, '\\.')
       .replace(/\*/g, '.*')
       .replace(/\?/g, '.');
