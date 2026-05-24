@@ -64,13 +64,8 @@ function validateBitrate(bitrate) {
 }
 
 function validateTargetProfile(profile) {
-  const validProfiles = ['480p', '720p', '1080p', '4k'];
-  if (profile && !validProfiles.includes(profile.toLowerCase())) {
-    console.error(chalk.red(`错误: 无效的目标规格: ${profile}`));
-    console.error(chalk.gray(`支持规格: ${validProfiles.join(', ')}`));
-    process.exit(EXIT_CODES.INVALID_INPUT);
-  }
-  return profile?.toLowerCase();
+  if (!profile) return null;
+  return profile.toLowerCase();
 }
 
 async function checkFFprobe() {

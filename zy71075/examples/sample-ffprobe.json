@@ -1,0 +1,126 @@
+[
+  {
+    "format": {
+      "filename": "test-video.mp4",
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "duration": "120.500000",
+      "size": "125000000",
+      "bit_rate": "8300000"
+    },
+    "streams": [
+      {
+        "index": 0,
+        "codec_type": "video",
+        "codec_name": "h264",
+        "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+        "width": 1920,
+        "height": 1080,
+        "display_aspect_ratio": "16:9",
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "bit_rate": "8000000",
+        "pix_fmt": "yuv420p"
+      },
+      {
+        "index": 1,
+        "codec_type": "audio",
+        "codec_name": "aac",
+        "codec_long_name": "AAC (Advanced Audio Coding)",
+        "channels": 2,
+        "channel_layout": "stereo",
+        "sample_rate": "44100",
+        "bit_rate": "192000",
+        "tags": {
+          "language": "eng"
+        }
+      }
+    ]
+  },
+  {
+    "format": {
+      "filename": "vfr-video.mkv",
+      "format_name": "matroska,webm",
+      "duration": "65.234000",
+      "size": "98000000",
+      "bit_rate": "12000000"
+    },
+    "streams": [
+      {
+        "index": 0,
+        "codec_type": "video",
+        "codec_name": "h265",
+        "codec_long_name": "H.265 / HEVC (High Efficiency Video Coding)",
+        "width": 3840,
+        "height": 2160,
+        "display_aspect_ratio": "16:9",
+        "r_frame_rate": "60/1",
+        "avg_frame_rate": "58.5/1",
+        "bit_rate": "11500000",
+        "pix_fmt": "yuv420p10le"
+      },
+      {
+        "index": 1,
+        "codec_type": "audio",
+        "codec_name": "opus",
+        "codec_long_name": "Opus",
+        "channels": 6,
+        "channel_layout": "5.1",
+        "sample_rate": "48000",
+        "bit_rate": "384000",
+        "tags": {
+          "language": "jpn"
+        }
+      },
+      {
+        "index": 2,
+        "codec_type": "audio",
+        "codec_name": "opus",
+        "channels": 2,
+        "sample_rate": "48000",
+        "tags": {
+          "language": "eng"
+        }
+      },
+      {
+        "index": 3,
+        "codec_type": "subtitle",
+        "codec_name": "subrip",
+        "tags": {
+          "language": "eng"
+        }
+      }
+    ],
+    "frames": [
+      {
+        "stream_index": 0,
+        "pts_time": "0.000",
+        "pkt_duration_time": "0.016667"
+      },
+      {
+        "stream_index": 0,
+        "pts_time": "0.016667",
+        "pkt_duration_time": "0.016667"
+      },
+      {
+        "stream_index": 0,
+        "pts_time": "0.033334",
+        "pkt_duration_time": "0.033333"
+      },
+      {
+        "stream_index": 0,
+        "pts_time": "0.066667",
+        "pkt_duration_time": "0.016667"
+      },
+      {
+        "stream_index": 0,
+        "pts_time": "0.083334",
+        "pkt_duration_time": "0.016667"
+      },
+      {
+        "stream_index": 0,
+        "pts_time": "0.100001",
+        "pkt_duration_time": "0.050000"
+      }
+    ]
+  }
+]

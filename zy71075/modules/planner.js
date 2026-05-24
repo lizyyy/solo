@@ -16,6 +16,11 @@ async function generatePlan(input, options = {}) {
   const config = configPath ? rules.loadConfig(configPath) : null;
   const { profiles, rules: bitrateRules } = rules.mergeWithDefaults(config);
 
+  if (targetProfile && !profiles[targetProfile]) {
+    const availableProfiles = Object.keys(profiles).join(', ');
+    throw new Error(`无效的目标规格: ${targetProfile}\n可用规格: ${availableProfiles}`);
+  }
+
   let mediaFiles = [];
 
   if (Array.isArray(input)) {

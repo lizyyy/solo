@@ -228,16 +228,31 @@ async function probeDirectory(dirPath, options = {}) {
 function loadProbeData(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const data = JSON.parse(content);
+  const fileName = path.basename(filePath);
+  
+  const normalizeItem = (item, idx) => {
+    if (isAlreadyParsed(item)) {
+      return item;
+    }
+    
+    const itemPath = item.path || item.filename || `${fileName}#${idx}`;
+    return parseProbeData(item, itemPath);
+  };
   
   if (Array.isArray(data)) {
-    return data.map(item => {
-      if (item.path) return parseProbeData(item, item.path);
-      return item;
-    });
+    return data.map((item, idx) => normalizeItem(item, idx));
   }
   
-  if (data.path) return [parseProbeData(data, data.path)];
-  return [data];
+  return [normalizeItem(data, 0)];
+}
+
+function isAlreadyParsed(data) {
+  return (
+    data.success !== undefined ||
+    (data.video !== undefined && Array.isArray(data.video)) ||
+    (data.audio !== undefined && Array.isArray(data.audio)) ||
+    data.frameRateAnalysis !== undefined
+  );
 }
 
 module.exports = {
