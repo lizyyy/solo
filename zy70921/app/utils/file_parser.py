@@ -27,4 +27,4 @@ def parse_date(date_str: str) -> datetime:
 
 def generate_report_no() -> str:
     now = datetime.now()
-    return 'RPT' + now.strftime('%Y%m%d%H%M%S')
+    return f"RPT{now.strftime('%Y%m%d%H%M%S')}"

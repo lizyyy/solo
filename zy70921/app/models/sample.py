@@ -1,9 +1,10 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text
+from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
 
 class Sample(Base):
-    __tablename__ = 'samples'
+    __tablename__ = "samples"
 
     id = Column(Integer, primary_key=True, index=True)
     batch_no = Column(String, index=True)
@@ -19,5 +20,10 @@ class Sample(Base):
     production_base = Column(String)
     harvest_date = Column(DateTime)
     remarks = Column(Text)
+    mixed_batch_info = Column(Text)
+    is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    test_items = relationship("TestItem", back_populates="sample")
+    test_results = relationship("TestResult", back_populates="sample")

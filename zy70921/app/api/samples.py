@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Form
 from sqlalchemy.orm import Session
 from datetime import datetime
 
 from app.database import get_db
 from app.models import Sample, TestItem, TestResult
 from app.schemas import ProcessResponse
-from app.utils.file_parser import parse_csv_file, parse_json_file
+from app.utils.file_parser import parse_csv_file, parse_json_file, parse_date, generate_report_no
 from app.rules.engine import RuleEngine
 
 router = APIRouter(prefix="/api", tags=["samples"])
@@ -14,6 +14,7 @@ router = APIRouter(prefix="/api", tags=["samples"])
 async def process_samples(
     samples_file: UploadFile = File(...),
     test_items_file: UploadFile = File(...),
+    operator: str = Form("system"),
     db: Session = Depends(get_db)
 ):
     samples_content = await samples_file.read()
@@ -35,6 +36,16 @@ async def process_samples(
         sample_test_items = test_items_data.get(sample_code, [])
         result = engine.process_sample(sample_data, sample_test_items)
         
+        failed_reason = None
+        if result.get("issues"):
+            failed_reason = "; ".join([f"{issue.get('item_name')}: {issue.get('status')}" for issue in result["issues"]])
+        
+        suggestion = None
+        if result.get("status") == "failed":
+            suggestion = "建议重新检测或拒收该批次样品"
+        elif result.get("status") == "pending":
+            suggestion = "建议人工复核检测结果"
+        
         result_data = {
             "batch_no": batch_no,
             "sample_code": sample_code,
@@ -42,9 +53,9 @@ async def process_samples(
             "cooperative": sample_data.get("cooperative", ""),
             "original_data": result.get("sample", sample_data),
             "test_items": result["test_items"],
-            "failed_reason": None,
-            "suggestion": None,
-            "rule_triggered": False,
+            "failed_reason": failed_reason,
+            "suggestion": suggestion,
+            "rule_triggered": result.get("retest_required", False),
             "processed_at": datetime.now().isoformat()
         }
         
@@ -60,7 +71,7 @@ async def process_samples(
         pending=pending_items,
         failed=failed_items,
         total_processed=len(samples_data),
-        message="Done"
+        message=f"处理完成: 正常{len(normal_items)}项, 待确认{len(pending_items)}项, 失败{len(failed_items)}项"
     )
 
 @router.get("/trace/{sample_code}")
