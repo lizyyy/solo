@@ -273,6 +273,66 @@ curl -X POST "http://localhost:8000/toppings/" \
 }
 ```
 
+### 场景 5: 补录批次错配被拦截
+
+**问题**: 补录时使用错误的酒液批次
+
+```bash
+curl -X POST "http://localhost:8000/toppings/TOP-SEED-003/resubmit" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "barrel_code": "BARREL-001",
+    "source_batch_code": "MER-2023-001",
+    "evaporation_volume": 2.0,
+    "topping_volume": 2.0,
+    "topping_date": "2024-05-20T10:00:00",
+    "operator": "测试补录",
+    "notes": "使用错误批次"
+  }'
+```
+
+**预期结果**:
+```json
+{
+  "success": false,
+  "message": "添酒批次不匹配：桶内批次 ID 1，添酒批次 ID 2",
+  "data": {
+    "record_code": "TOP-XXXXXXX",
+    "status": "blocked"
+  }
+}
+```
+
+**重要说明**: 旧记录被标记为无效，新记录为 `blocked` 状态，始终只看到一条可解释的结果
+
+### 场景 6: 补录不存在的桶/批次
+
+**问题**: 补录时使用不存在的橡木桶编号
+
+```bash
+curl -X POST "http://localhost:8000/toppings/TOP-SEED-002/resubmit" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "barrel_code": "NONEXISTENT-999",
+    "source_batch_code": "CAB-2023-001",
+    "evaporation_volume": 2.0,
+    "topping_volume": 2.0,
+    "topping_date": "2024-05-20T10:00:00",
+    "operator": "测试补录"
+  }'
+```
+
+**预期结果**:
+```json
+{
+  "success": false,
+  "message": "橡木桶 NONEXISTENT-999 不存在",
+  "data": null
+}
+```
+
+**数据保证**: 参数错误时旧记录保持有效，不破坏闭环
+
 ## 状态机流程
 
 ```

@@ -194,10 +194,54 @@ def resubmit_topping(db: Session, record_code: str, new_topping: schemas.Topping
         return False, "原添酒记录不存在", None
 
     barrel = get_barrel_by_code(db, new_topping.barrel_code)
+    if not barrel:
+        return False, f"橡木桶 {new_topping.barrel_code} 不存在", None
+
     batch = get_batch_by_code(db, new_topping.source_batch_code)
+    if not batch:
+        return False, f"酒液批次 {new_topping.source_batch_code} 不存在", None
+
+    is_duplicate, existing_record, dup_msg = DuplicateHandler.check_duplicate(
+        db, barrel.id, batch.id, new_topping.topping_date
+    )
+    if is_duplicate and existing_record.id != old_topping.id:
+        return False, dup_msg, existing_record
+
+    validation_errors = []
+
+    valid, msg = BatchValidator.validate_barrel_batch_match(db, barrel.id, batch.id)
+    if not valid:
+        validation_errors.append(msg)
+
+    valid, msg = BatchValidator.validate_barrel_capacity(db, barrel.id, new_topping.topping_volume)
+    if not valid:
+        validation_errors.append(msg)
+
+    valid, msg = BatchValidator.validate_batch_volume(db, batch.id, new_topping.topping_volume)
+    if not valid:
+        validation_errors.append(msg)
 
     old_topping.is_valid = False
-    db.commit()
+
+    if validation_errors:
+        error_msg = " | ".join(validation_errors)
+        db_topping = models.ToppingRecord(
+            record_code=generate_record_code(),
+            barrel_id=barrel.id,
+            source_batch_id=batch.id,
+            evaporation_volume=new_topping.evaporation_volume,
+            topping_volume=new_topping.topping_volume,
+            topping_date=new_topping.topping_date,
+            operator=new_topping.operator,
+            status=ToppingStatus.BLOCKED,
+            version=old_topping.version + 1,
+            parent_id=old_topping.id,
+            notes=f"补录记录，原记录: {record_code} | 拦截原因: {error_msg} | {new_topping.notes or ''}"
+        )
+        db.add(db_topping)
+        db.commit()
+        db.refresh(db_topping)
+        return False, error_msg, db_topping
 
     db_topping = models.ToppingRecord(
         record_code=generate_record_code(),

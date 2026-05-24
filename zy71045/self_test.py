@@ -120,6 +120,66 @@ def test_export_csv():
     return False
 
 
+def test_resubmit_wrong_batch():
+    payload = {
+        "barrel_code": "BARREL-001",
+        "source_batch_code": "MER-2023-001",
+        "evaporation_volume": 2.0,
+        "topping_volume": 2.0,
+        "topping_date": datetime.now().isoformat(),
+        "operator": "测试补录",
+        "notes": "故意使用错误批次"
+    }
+    response = requests.post(f"{BASE_URL}/toppings/TOP-SEED-003/resubmit", json=payload)
+    if response.status_code == 200:
+        data = response.json()
+        print(f"补录结果 success: {data['success']}")
+        print(f"拦截信息: {data['message']}")
+        if not data['success'] and "批次" in data['message']:
+            print("✅ 批次错配被正确拦截")
+            return True
+    return False
+
+
+def test_resubmit_nonexistent_barrel():
+    payload = {
+        "barrel_code": "NONEXISTENT-999",
+        "source_batch_code": "CAB-2023-001",
+        "evaporation_volume": 2.0,
+        "topping_volume": 2.0,
+        "topping_date": datetime.now().isoformat(),
+        "operator": "测试补录",
+        "notes": "使用不存在的桶"
+    }
+    response = requests.post(f"{BASE_URL}/toppings/TOP-SEED-002/resubmit", json=payload)
+    if response.status_code == 200:
+        data = response.json()
+        print(f"补录结果 success: {data['success']}")
+        print(f"拦截信息: {data['message']}")
+        if not data['success'] and "不存在" in data['message']:
+            print("✅ 不存在的桶被正确拦截")
+            return True
+    return False
+
+
+def test_resubmit_data_consistency():
+    response = requests.get(f"{BASE_URL}/toppings/?only_valid=false")
+    if response.status_code == 200:
+        all_records = response.json()
+        print(f"总记录数: {len(all_records)}")
+
+        response_valid = requests.get(f"{BASE_URL}/toppings/?only_valid=true")
+        if response_valid.status_code == 200:
+            valid_records = response_valid.json()
+            print(f"有效记录数: {len(valid_records)}")
+
+            record_codes = [r['record_code'] for r in valid_records]
+            if len(record_codes) == len(set(record_codes)):
+                print("✅ 有效记录编号无重复")
+                return True
+    return False
+
+
 def run_all_tests():
     print("\n" + "="*60)
     print("酒庄橡木桶添酒 API - 轻量自检")
@@ -133,6 +193,9 @@ def run_all_tests():
         ("检验后放行", test_inspection_interception),
         ("查询添酒记录", test_query_toppings),
         ("导出 CSV 报告", test_export_csv),
+        ("补录-批次错配拦截", test_resubmit_wrong_batch),
+        ("补录-不存在桶拦截", test_resubmit_nonexistent_barrel),
+        ("补录-数据一致性检查", test_resubmit_data_consistency),
     ]
 
     results = []
