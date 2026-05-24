@@ -45,6 +45,7 @@ type SafetyVisitRepository interface {
 	GetByRouteID(routeID string) (*models.SafetyVisit, error)
 	Update(visit *models.SafetyVisit) error
 	ListPendingFollowUps() ([]*models.SafetyVisit, error)
+	ListPendingFollowUpsByDate(date string) ([]*models.SafetyVisit, error)
 }
 
 type ServiceReportRepository interface {
@@ -491,6 +492,32 @@ func (r *safetyVisitRepo) ListPendingFollowUps() ([]*models.SafetyVisit, error) 
 		FROM safety_visits WHERE needs_follow_up = 1 AND (follow_up_status IS NULL OR follow_up_status != 'completed')
 		ORDER BY created_at DESC
 	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var list []*models.SafetyVisit
+	for rows.Next() {
+		visit := &models.SafetyVisit{}
+		if err := scanSafetyVisitRows(rows, visit); err != nil {
+			return nil, err
+		}
+		list = append(list, visit)
+	}
+	return list, nil
+}
+
+func (r *safetyVisitRepo) ListPendingFollowUpsByDate(date string) ([]*models.SafetyVisit, error) {
+	rows, err := database.DB.Query(`
+		SELECT sv.id, sv.route_id, sv.result, sv.evidence_url, sv.notes, sv.needs_follow_up, sv.follow_up_status, sv.followed_by, sv.followed_at, sv.created_at, sv.updated_at
+		FROM safety_visits sv
+		INNER JOIN delivery_routes dr ON sv.route_id = dr.id
+		WHERE sv.needs_follow_up = 1 
+			AND (sv.follow_up_status IS NULL OR sv.follow_up_status != 'completed')
+			AND dr.date = ?
+		ORDER BY sv.created_at DESC
+	`, date)
 	if err != nil {
 		return nil, err
 	}

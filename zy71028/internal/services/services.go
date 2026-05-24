@@ -49,6 +49,7 @@ type SafetyVisitService interface {
 	GetByID(id string) (*models.SafetyVisit, error)
 	GetByRouteID(routeID string) (*models.SafetyVisit, error)
 	ListPendingFollowUps() ([]*models.SafetyVisit, error)
+	ListPendingFollowUpsByDate(date string) ([]*models.SafetyVisit, error)
 }
 
 type ReportService interface {
@@ -73,6 +74,7 @@ type deliveryRouteService struct {
 	repo           repository.DeliveryRouteRepository
 	suspensionRepo repository.MealSuspensionRepository
 	elderlyRepo    repository.ElderlyRepository
+	volunteerRepo  repository.VolunteerRepository
 }
 
 type safetyVisitService struct {
@@ -105,6 +107,7 @@ func NewDeliveryRouteService() DeliveryRouteService {
 		repo:           repository.NewDeliveryRouteRepository(),
 		suspensionRepo: repository.NewMealSuspensionRepository(),
 		elderlyRepo:    repository.NewElderlyRepository(),
+		volunteerRepo:  repository.NewVolunteerRepository(),
 	}
 }
 
@@ -387,6 +390,14 @@ func (s *deliveryRouteService) Assign(routeID, volunteerID string) (*models.Deli
 		return nil, appErrors.NewMissingField("volunteer_id")
 	}
 
+	volunteer, err := s.volunteerRepo.GetByID(volunteerID)
+	if err != nil {
+		return nil, err
+	}
+	if volunteer == nil {
+		return nil, appErrors.NewNotFound("volunteer")
+	}
+
 	route, err := s.repo.GetByID(routeID)
 	if err != nil {
 		return nil, err
@@ -599,6 +610,10 @@ func (s *safetyVisitService) ListPendingFollowUps() ([]*models.SafetyVisit, erro
 	return s.repo.ListPendingFollowUps()
 }
 
+func (s *safetyVisitService) ListPendingFollowUpsByDate(date string) ([]*models.SafetyVisit, error) {
+	return s.repo.ListPendingFollowUpsByDate(date)
+}
+
 func (s *reportService) GenerateDailyReport(date string) (*models.ServiceReport, error) {
 	if date == "" {
 		return nil, appErrors.NewMissingField("date")
@@ -636,7 +651,7 @@ func (s *reportService) GenerateDailyReport(date string) (*models.ServiceReport,
 		}
 	}
 
-	pendingFollowUps, err := s.visitRepo.ListPendingFollowUps()
+	pendingFollowUps, err := s.visitRepo.ListPendingFollowUpsByDate(date)
 	if err != nil {
 		return nil, err
 	}
