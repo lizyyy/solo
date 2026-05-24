@@ -1,0 +1,72 @@
+{
+  "version": "1.0",
+  "defaultSamplingRatio": 0.1,
+  "defaultDecision": "RECORD_AND_SAMPLE",
+  "globalPerSecondLimit": 100,
+  "caseSensitive": false,
+  "strictAttributeMatch": false,
+  "rules": [
+    {
+      "name": "error-traces",
+      "description": "错误 trace 全采样",
+      "priority": 100,
+      "attributes": [
+        {
+          "key": "error",
+          "value": true
+        },
+        {
+          "key": "http.status_code",
+          "pattern": "^5[0-9]{2}$"
+        }
+      ],
+      "samplingRatio": 1.0,
+      "perSecondLimit": 20,
+      "decision": "RECORD_AND_SAMPLE"
+    },
+    {
+      "name": "api-gateway",
+      "description": "API 网关采样",
+      "priority": 50,
+      "serviceName": "api-gateway",
+      "attributes": [
+        {
+          "key": "http.method",
+          "value": "POST"
+        }
+      ],
+      "samplingRatio": 0.5,
+      "perSecondLimit": 30,
+      "decision": "RECORD_AND_SAMPLE"
+    },
+    {
+      "name": "user-service",
+      "description": "用户服务采样",
+      "priority": 40,
+      "serviceNamePattern": "^user-",
+      "samplingRatio": 0.3,
+      "decision": "RECORD_AND_SAMPLE"
+    },
+    {
+      "name": "health-checks",
+      "description": "健康检查丢弃",
+      "priority": 30,
+      "attributes": [
+        {
+          "key": "http.route",
+          "value": "/health"
+        }
+      ],
+      "samplingRatio": 0.0,
+      "decision": "DROP"
+    },
+    {
+      "name": "low-priority-services",
+      "description": "低优先级服务低采样率",
+      "priority": 20,
+      "serviceNamePattern": "^(worker|batch)-",
+      "samplingRatio": 0.05,
+      "decision": "RECORD_AND_SAMPLE"
+    }
+  ]
+}

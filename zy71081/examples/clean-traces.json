@@ -1,0 +1,239 @@
+[
+  {
+    "resourceSpans": [
+      {
+        "resource": {
+          "attributes": [
+            {
+              "key": "service.name",
+              "value": {
+                "stringValue": "api-gateway"
+              }
+            }
+          ]
+        },
+        "scopeSpans": [
+          {
+            "spans": [
+              {
+                "traceId": "00000000000000000000000000000001",
+                "spanId": "0000000000000001",
+                "name": "POST /api/users",
+                "startTimeUnixNano": 1716000000000000000,
+                "endTimeUnixNano": 1716000000050000000,
+                "attributes": [
+                  {
+                    "key": "http.method",
+                    "value": {
+                      "stringValue": "POST"
+                    }
+                  },
+                  {
+                    "key": "http.status_code",
+                    "value": {
+                      "intValue": "201"
+                    }
+                  },
+                  {
+                    "key": "http.route",
+                    "value": {
+                      "stringValue": "/api/users"
+                    }
+                  }
+                ],
+                "status": {
+                  "code": 1
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceSpans": [
+      {
+        "resource": {
+          "attributes": [
+            {
+              "key": "service.name",
+              "value": {
+                "stringValue": "api-gateway"
+              }
+            }
+          ]
+        },
+        "scopeSpans": [
+          {
+            "spans": [
+              {
+                "traceId": "00000000000000000000000000000002",
+                "spanId": "0000000000000002",
+                "name": "GET /health",
+                "startTimeUnixNano": 1716000000100000000,
+                "endTimeUnixNano": 1716000000101000000,
+                "attributes": [
+                  {
+                    "key": "http.method",
+                    "value": {
+                      "stringValue": "GET"
+                    }
+                  },
+                  {
+                    "key": "http.status_code",
+                    "value": {
+                      "intValue": "200"
+                    }
+                  },
+                  {
+                    "key": "http.route",
+                    "value": {
+                      "stringValue": "/health"
+                    }
+                  }
+                ],
+                "status": {
+                  "code": 1
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceSpans": [
+      {
+        "resource": {
+          "attributes": [
+            {
+              "key": "service.name",
+              "value": {
+                "stringValue": "user-service"
+              }
+            }
+          ]
+        },
+        "scopeSpans": [
+          {
+            "spans": [
+              {
+                "traceId": "00000000000000000000000000000003",
+                "spanId": "0000000000000003",
+                "name": "getUser",
+                "startTimeUnixNano": 1716000000200000000,
+                "endTimeUnixNano": 1716000000250000000,
+                "attributes": [
+                  {
+                    "key": "db.statement",
+                    "value": {
+                      "stringValue": "SELECT * FROM users WHERE id = ?"
+                    }
+                  }
+                ],
+                "status": {
+                  "code": 1
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceSpans": [
+      {
+        "resource": {
+          "attributes": [
+            {
+              "key": "service.name",
+              "value": {
+                "stringValue": "api-gateway"
+              }
+            }
+          ]
+        },
+        "scopeSpans": [
+          {
+            "spans": [
+              {
+                "traceId": "00000000000000000000000000000004",
+                "spanId": "0000000000000004",
+                "name": "POST /api/orders",
+                "startTimeUnixNano": 1716000000300000000,
+                "endTimeUnixNano": 1716000000400000000,
+                "attributes": [
+                  {
+                    "key": "http.method",
+                    "value": {
+                      "stringValue": "POST"
+                    }
+                  },
+                  {
+                    "key": "http.status_code",
+                    "value": {
+                      "intValue": "500"
+                    }
+                  },
+                  {
+                    "key": "error",
+                    "value": {
+                      "boolValue": true
+                    }
+                  }
+                ],
+                "status": {
+                  "code": 2,
+                  "message": "Internal Server Error"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "resourceSpans": [
+      {
+        "resource": {
+          "attributes": [
+            {
+              "key": "service.name",
+              "value": {
+                "stringValue": "worker-processor"
+              }
+            }
+          ]
+        },
+        "scopeSpans": [
+          {
+            "spans": [
+              {
+                "traceId": "00000000000000000000000000000005",
+                "spanId": "0000000000000005",
+                "name": "processJob",
+                "startTimeUnixNano": 1716000000500000000,
+                "endTimeUnixNano": 1716000001500000000,
+                "attributes": [
+                  {
+                    "key": "job.type",
+                    "value": {
+                      "stringValue": "data-export"
+                    }
+                  }
+                ],
+                "status": {
+                  "code": 1
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

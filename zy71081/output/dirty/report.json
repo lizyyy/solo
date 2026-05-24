@@ -1,0 +1,402 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-24T12:53:23.384Z",
+    "toolVersion": "1.0.0",
+    "inputConfig": {
+      "configFile": "/Users/lzy/pro/solo/workspaces/zy71081/examples/sampling-config.json",
+      "traceFile": "/Users/lzy/pro/solo/workspaces/zy71081/examples/dirty-traces.json",
+      "outputDir": "/Users/lzy/pro/solo/workspaces/zy71081/output/dirty"
+    }
+  },
+  "configValidation": {
+    "valid": true,
+    "errors": [],
+    "warnings": []
+  },
+  "traceAnalysis": {
+    "totalTraces": 6,
+    "totalSpans": 6,
+    "uniqueServices": [
+      "unknown",
+      "API-Gateway",
+      "unknown-service",
+      "api-gateway",
+      "USER-SERVICE",
+      "batch-worker"
+    ],
+    "missingFields": [],
+    "fieldCaseIssues": [
+      {
+        "field": "traceId",
+        "occurrences": 1,
+        "examples": [
+          "traceID"
+        ]
+      },
+      {
+        "field": "spanId",
+        "occurrences": 1,
+        "examples": [
+          "spanID"
+        ]
+      }
+    ]
+  },
+  "samplingResults": {
+    "summary": {
+      "totalEvaluated": 6,
+      "sampled": 6,
+      "dropped": 0,
+      "recordOnly": 0,
+      "sampledPercentage": 100,
+      "droppedPercentage": 0
+    },
+    "byService": {
+      "unknown": {
+        "total": 1,
+        "sampled": 1,
+        "dropped": 0,
+        "sampledPercentage": 100
+      },
+      "API-Gateway": {
+        "total": 1,
+        "sampled": 1,
+        "dropped": 0,
+        "sampledPercentage": 100
+      },
+      "unknown-service": {
+        "total": 1,
+        "sampled": 1,
+        "dropped": 0,
+        "sampledPercentage": 100
+      },
+      "api-gateway": {
+        "total": 1,
+        "sampled": 1,
+        "dropped": 0,
+        "sampledPercentage": 100
+      },
+      "USER-SERVICE": {
+        "total": 1,
+        "sampled": 1,
+        "dropped": 0,
+        "sampledPercentage": 100
+      },
+      "batch-worker": {
+        "total": 1,
+        "sampled": 1,
+        "dropped": 0,
+        "sampledPercentage": 100
+      }
+    },
+    "byRule": {
+      "error-traces": {
+        "matched": 6,
+        "sampled": 6,
+        "dropped": 0,
+        "budgetExhausted": 0
+      }
+    },
+    "details": [
+      {
+        "traceId": "00000000000000000000000000000007",
+        "finalDecision": "RECORD_AND_SAMPLE",
+        "matchedRule": {
+          "name": "error-traces",
+          "description": "错误 trace 全采样",
+          "priority": 100,
+          "attributes": [
+            {
+              "key": "error",
+              "value": true
+            },
+            {
+              "key": "http.status_code",
+              "pattern": "^5[0-9]{2}$"
+            }
+          ],
+          "samplingRatio": 1,
+          "perSecondLimit": 20,
+          "decision": "RECORD_AND_SAMPLE"
+        },
+        "effectiveSamplingRatio": 1,
+        "randomNumber": 0.36805635349971977,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": true,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": []
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [],
+        "timing": {
+          "evaluationStart": 1779627203383,
+          "evaluationEnd": 1779627203383,
+          "totalDurationMs": 0
+        }
+      },
+      {
+        "traceId": "00000000000000000000000000000006",
+        "finalDecision": "RECORD_AND_SAMPLE",
+        "matchedRule": {
+          "name": "error-traces",
+          "description": "错误 trace 全采样",
+          "priority": 100,
+          "attributes": [
+            {
+              "key": "error",
+              "value": true
+            },
+            {
+              "key": "http.status_code",
+              "pattern": "^5[0-9]{2}$"
+            }
+          ],
+          "samplingRatio": 1,
+          "perSecondLimit": 20,
+          "decision": "RECORD_AND_SAMPLE"
+        },
+        "effectiveSamplingRatio": 1,
+        "randomNumber": 0.26205400276786917,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": true,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": []
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [],
+        "timing": {
+          "evaluationStart": 1779627203383,
+          "evaluationEnd": 1779627203383,
+          "totalDurationMs": 0
+        }
+      },
+      {
+        "traceId": "00000000000000000000000000000008",
+        "finalDecision": "RECORD_AND_SAMPLE",
+        "matchedRule": {
+          "name": "error-traces",
+          "description": "错误 trace 全采样",
+          "priority": 100,
+          "attributes": [
+            {
+              "key": "error",
+              "value": true
+            },
+            {
+              "key": "http.status_code",
+              "pattern": "^5[0-9]{2}$"
+            }
+          ],
+          "samplingRatio": 1,
+          "perSecondLimit": 20,
+          "decision": "RECORD_AND_SAMPLE"
+        },
+        "effectiveSamplingRatio": 1,
+        "randomNumber": 0.8466970650118056,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": true,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": []
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [],
+        "timing": {
+          "evaluationStart": 1779627203383,
+          "evaluationEnd": 1779627203383,
+          "totalDurationMs": 0
+        }
+      },
+      {
+        "traceId": "00000000000000000000000000000009",
+        "finalDecision": "RECORD_AND_SAMPLE",
+        "matchedRule": {
+          "name": "error-traces",
+          "description": "错误 trace 全采样",
+          "priority": 100,
+          "attributes": [
+            {
+              "key": "error",
+              "value": true
+            },
+            {
+              "key": "http.status_code",
+              "pattern": "^5[0-9]{2}$"
+            }
+          ],
+          "samplingRatio": 1,
+          "perSecondLimit": 20,
+          "decision": "RECORD_AND_SAMPLE"
+        },
+        "effectiveSamplingRatio": 1,
+        "randomNumber": 0.9883407833248157,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": true,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": []
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [],
+        "timing": {
+          "evaluationStart": 1779627203383,
+          "evaluationEnd": 1779627203383,
+          "totalDurationMs": 0
+        }
+      },
+      {
+        "traceId": "00000000000000000000000000000010",
+        "finalDecision": "RECORD_AND_SAMPLE",
+        "matchedRule": {
+          "name": "error-traces",
+          "description": "错误 trace 全采样",
+          "priority": 100,
+          "attributes": [
+            {
+              "key": "error",
+              "value": true
+            },
+            {
+              "key": "http.status_code",
+              "pattern": "^5[0-9]{2}$"
+            }
+          ],
+          "samplingRatio": 1,
+          "perSecondLimit": 20,
+          "decision": "RECORD_AND_SAMPLE"
+        },
+        "effectiveSamplingRatio": 1,
+        "randomNumber": 0.24173117807515365,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": true,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": []
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [],
+        "timing": {
+          "evaluationStart": 1779627203383,
+          "evaluationEnd": 1779627203383,
+          "totalDurationMs": 0
+        }
+      },
+      {
+        "traceId": "00000000000000000000000000000011",
+        "finalDecision": "RECORD_AND_SAMPLE",
+        "matchedRule": {
+          "name": "error-traces",
+          "description": "错误 trace 全采样",
+          "priority": 100,
+          "attributes": [
+            {
+              "key": "error",
+              "value": true
+            },
+            {
+              "key": "http.status_code",
+              "pattern": "^5[0-9]{2}$"
+            }
+          ],
+          "samplingRatio": 1,
+          "perSecondLimit": 20,
+          "decision": "RECORD_AND_SAMPLE"
+        },
+        "effectiveSamplingRatio": 1,
+        "randomNumber": 0.6132852276238923,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": true,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": []
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [],
+        "timing": {
+          "evaluationStart": 1779627203383,
+          "evaluationEnd": 1779627203383,
+          "totalDurationMs": 0
+        }
+      }
+    ]
+  },
+  "budgetAnalysis": {
+    "globalBudget": {
+      "limitPerSecond": 100,
+      "allocated": 100,
+      "used": 6,
+      "remaining": 94,
+      "exhausted": false
+    },
+    "ruleBudgets": {
+      "error-traces": {
+        "limitPerSecond": 20,
+        "used": 6,
+        "remaining": 14,
+        "exhausted": false
+      },
+      "api-gateway": {
+        "limitPerSecond": 30,
+        "used": 0,
+        "remaining": 30,
+        "exhausted": false
+      }
+    },
+    "totalTracesEvaluated": 6,
+    "totalTracesSampled": 6,
+    "totalTracesDropped": 0,
+    "effectiveSamplingRate": 1
+  },
+  "conclusions": {
+    "rootCauses": [
+      {
+        "type": "case_mismatch",
+        "description": "发现字段大小写不一致问题，可能导致规则匹配失败",
+        "severity": "medium",
+        "affectedTraces": 0,
+        "recommendation": "统一字段命名规范，或在配置中设置 caseSensitive: false"
+      }
+    ],
+    "recommendations": [
+      "检查字段大小写一致性，建议使用统一的命名规范"
+    ]
+  }
+}
