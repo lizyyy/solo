@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Layers, BarChart3, Filter, CheckSquare, Square } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Layers, BarChart3, Filter, CheckSquare, Square, Activity } from 'lucide-react';
 import { useSceneStore } from '../../store/useSceneStore';
 import { useTimeStore } from '../../store/useTimeStore';
 
@@ -23,11 +23,21 @@ export function RightPanel() {
     setFilter,
     getFilteredComponents,
     getComponentGroups,
+    realTimeShadows,
   } = useSceneStore();
   const { month } = useTimeStore();
 
   const filteredComponents = getFilteredComponents();
   const groups = getComponentGroups();
+
+  const getComponentShadowRate = useCallback((componentId: string): number => {
+    const shadowResult = realTimeShadows.find((s) => s.componentId === componentId);
+    if (shadowResult) {
+      return shadowResult.shadowRate;
+    }
+    const component = components.find((c) => c.id === componentId);
+    return component ? component.shadowStats.shadowRate : 0;
+  }, [realTimeShadows, components]);
 
   const getShadowRateColor = (rate: number) => {
     if (rate < 10) return 'text-green-400';
@@ -111,25 +121,28 @@ export function RightPanel() {
                     </span>
                   </div>
                   <div className="mt-2 flex items-center justify-between">
-                    <span className="text-gray-400 text-xs">遮挡率</span>
+                    <span className="text-gray-400 text-xs flex items-center gap-1">
+                      <Activity className="w-3 h-3" />
+                      实时遮挡率
+                    </span>
                     <span
                       className={`font-mono text-sm ${getShadowRateColor(
-                        comp.shadowStats.shadowRate
+                        getComponentShadowRate(comp.id)
                       )}`}
                     >
-                      {comp.shadowStats.shadowRate.toFixed(1)}%
+                      {getComponentShadowRate(comp.id).toFixed(1)}%
                     </span>
                   </div>
                   <div className="mt-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
-                        comp.shadowStats.shadowRate < 25
+                        getComponentShadowRate(comp.id) < 25
                           ? 'bg-green-500'
-                          : comp.shadowStats.shadowRate < 50
+                          : getComponentShadowRate(comp.id) < 50
                           ? 'bg-yellow-500'
                           : 'bg-red-500'
                       }`}
-                      style={{ width: `${comp.shadowStats.shadowRate}%` }}
+                      style={{ width: `${getComponentShadowRate(comp.id)}%` }}
                     />
                   </div>
                 </div>
@@ -228,7 +241,10 @@ export function RightPanel() {
         {activeTab === 'statistics' && (
           <div className="p-4 space-y-6">
             <div>
-              <h4 className="text-white font-medium mb-3">总体统计</h4>
+              <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+                <Activity className="w-4 h-4 text-teal-400" />
+                实时统计
+              </h4>
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 bg-gray-800 rounded-lg">
                   <div className="text-gray-400 text-xs">组件总数</div>
@@ -248,7 +264,7 @@ export function RightPanel() {
                     {components.length > 0
                       ? (
                           components.reduce(
-                            (sum, c) => sum + c.shadowStats.shadowRate,
+                            (sum, c) => sum + getComponentShadowRate(c.id),
                             0
                           ) / components.length
                         ).toFixed(1)
@@ -257,17 +273,9 @@ export function RightPanel() {
                   </div>
                 </div>
                 <div className="p-3 bg-gray-800 rounded-lg">
-                  <div className="text-gray-400 text-xs">总遮挡时长</div>
-                  <div className="text-xl font-bold text-yellow-400 mt-1">
-                    {components.length > 0
-                      ? (
-                          components.reduce(
-                            (sum, c) => sum + c.shadowStats.shadowHours,
-                            0
-                          ) / components.length
-                        ).toFixed(1)
-                      : 0}
-                    h
+                  <div className="text-gray-400 text-xs">实时计算</div>
+                  <div className="text-lg font-bold text-green-400 mt-1">
+                    {realTimeShadows.length > 0 ? '活跃' : '等待'}
                   </div>
                 </div>
               </div>
@@ -275,13 +283,13 @@ export function RightPanel() {
 
             <div>
               <h4 className="text-white font-medium mb-3">
-                {month}月遮挡排行
+                {month}月实时遮挡排行
               </h4>
               <div className="space-y-2">
                 {[...components]
                   .sort(
                     (a, b) =>
-                      b.shadowStats.shadowRate - a.shadowStats.shadowRate
+                      getComponentShadowRate(b.id) - getComponentShadowRate(a.id)
                   )
                   .slice(0, 5)
                   .map((comp, index) => (
@@ -307,10 +315,10 @@ export function RightPanel() {
                       </span>
                       <span
                         className={`font-mono text-sm ${getShadowRateColor(
-                          comp.shadowStats.shadowRate
+                          getComponentShadowRate(comp.id)
                         )}`}
                       >
-                        {comp.shadowStats.shadowRate.toFixed(1)}%
+                        {getComponentShadowRate(comp.id).toFixed(1)}%
                       </span>
                     </div>
                   ))}
@@ -326,7 +334,7 @@ export function RightPanel() {
                   );
                   const avgShadowRate =
                     groupComponents.reduce(
-                      (sum, c) => sum + c.shadowStats.shadowRate,
+                      (sum, c) => sum + getComponentShadowRate(c.id),
                       0
                     ) / groupComponents.length;
                   return (

@@ -14,6 +14,22 @@ const monthNames = [
   '七月', '八月', '九月', '十月', '十一月', '十二月',
 ];
 
+function getComponentRealTimeShadowRate(componentId: string): number {
+  const sceneState = useSceneStore.getState();
+  const shadowResult = sceneState.realTimeShadows.find((s: any) => s.componentId === componentId);
+  if (shadowResult) {
+    return shadowResult.shadowRate;
+  }
+  const component = sceneState.components.find((c: any) => c.id === componentId);
+  return component ? component.shadowStats.shadowRate : 0;
+}
+
+function getComponentShadowHours(componentId: string): number {
+  const sceneState = useSceneStore.getState();
+  const component = sceneState.components.find((c: any) => c.id === componentId);
+  return component ? component.shadowStats.shadowHours : 0;
+}
+
 export function generateStatistics(): ReportStatistics {
   const { components, filter, getFilteredComponents, selectedComponents } = useSceneStore.getState();
   const filteredComponents = getFilteredComponents();
@@ -26,13 +42,13 @@ export function generateStatistics(): ReportStatistics {
     id: c.id,
     name: c.name,
     group: c.group,
-    shadowRate: c.shadowStats.shadowRate,
-    shadowHours: c.shadowStats.shadowHours,
+    shadowRate: getComponentRealTimeShadowRate(c.id),
+    shadowHours: getComponentShadowHours(c.id),
   }));
 
-  const shadowRates = targetComponents.map((c) => c.shadowStats.shadowRate);
+  const shadowRates = targetComponents.map((c) => getComponentRealTimeShadowRate(c.id));
   const totalShadowHours = targetComponents.reduce(
-    (sum, c) => sum + c.shadowStats.shadowHours,
+    (sum, c) => sum + getComponentShadowHours(c.id),
     0
   );
 

@@ -10,6 +10,19 @@ import {
 } from '../types';
 import { sampleScene } from '../data/sampleScenes';
 
+export interface RealTimeShadowResult {
+  componentId: string;
+  shadowRate: number;
+  shadowedPoints: number;
+  totalPoints: number;
+}
+
+export interface ShadowCalculationState {
+  realTimeShadows: RealTimeShadowResult[];
+  isCalculating: boolean;
+  lastCalculationTime: number;
+}
+
 const defaultRoof: Roof = {
   width: 30,
   depth: 20,
@@ -29,7 +42,7 @@ const defaultFilter: FilterCondition = {
   shadowRateMax: 100,
 };
 
-interface SceneState {
+interface SceneState extends ShadowCalculationState {
   roof: Roof;
   trees: Tree[];
   components: PVComponent[];
@@ -58,6 +71,9 @@ interface SceneActions {
   reset: () => void;
   getFilteredComponents: () => PVComponent[];
   getComponentGroups: () => string[];
+  updateRealTimeShadows: (results: RealTimeShadowResult[]) => void;
+  setIsCalculating: (isCalculating: boolean) => void;
+  getComponentShadowRate: (componentId: string) => number;
 }
 
 export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
@@ -68,6 +84,9 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
   selectedComponents: [],
   camera: defaultCamera,
   viewPreset: 'overview',
+  realTimeShadows: [],
+  isCalculating: false,
+  lastCalculationTime: 0,
 
   setRoof: (roof) => set({ roof }),
 
@@ -137,18 +156,23 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
     selectedComponents: [],
     camera: defaultCamera,
     viewPreset: 'overview',
+    realTimeShadows: [],
+    isCalculating: false,
+    lastCalculationTime: 0,
   }),
 
   getFilteredComponents: () => {
-    const { components, filter } = get();
+    const { components, filter, realTimeShadows } = get();
     return components.filter((c) => {
       if (filter.groups.length > 0 && !filter.groups.includes(c.group)) {
         return false;
       }
-      if (c.shadowStats.shadowRate < filter.shadowRateMin) {
+      const shadowResult = realTimeShadows.find((s) => s.componentId === c.id);
+      const shadowRate = shadowResult ? shadowResult.shadowRate : c.shadowStats.shadowRate;
+      if (shadowRate < filter.shadowRateMin) {
         return false;
       }
-      if (c.shadowStats.shadowRate > filter.shadowRateMax) {
+      if (shadowRate > filter.shadowRateMax) {
         return false;
       }
       return true;
@@ -159,5 +183,22 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
     const { components } = get();
     const groups = new Set(components.map((c) => c.group));
     return Array.from(groups).sort();
+  },
+
+  updateRealTimeShadows: (results: RealTimeShadowResult[]) => set({
+    realTimeShadows: results,
+    lastCalculationTime: Date.now(),
+  }),
+
+  setIsCalculating: (isCalculating: boolean) => set({ isCalculating }),
+
+  getComponentShadowRate: (componentId: string) => {
+    const { realTimeShadows, components } = get();
+    const shadowResult = realTimeShadows.find((s) => s.componentId === componentId);
+    if (shadowResult) {
+      return shadowResult.shadowRate;
+    }
+    const component = components.find((c) => c.id === componentId);
+    return component ? component.shadowStats.shadowRate : 0;
   },
 }));

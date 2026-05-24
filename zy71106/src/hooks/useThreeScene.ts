@@ -1,9 +1,10 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { useSceneStore } from '../store/useSceneStore';
 import { useTimeStore } from '../store/useTimeStore';
 import { calculateSolarPosition, isSunVisible } from '../utils/solarMath';
+import { createSceneOccluders, calculateComponentShadowRate } from '../utils/shadowUtils';
 import { CameraState, ViewPreset } from '../types';
 
 interface UseThreeSceneReturn {
@@ -47,12 +48,14 @@ export function useThreeScene(): UseThreeSceneReturn {
   const componentMeshesRef = useRef<Map<string, THREE.Mesh>>(new Map());
   const treeMeshesRef = useRef<Map<string, THREE.Group>>(new Map());
   const roofGroupRef = useRef<THREE.Group | null>(null);
+  const raycasterRef = useRef<THREE.Raycaster>(new THREE.Raycaster());
+  const occludersRef = useRef<THREE.Object3D[]>([]);
+  const lastShadowCalcRef = useRef<number>(0);
 
-  const { roof, trees, components, selectedComponents, getFilteredComponents, setCamera } =
-    useSceneStore();
-  const { month, day, hour, isPlaying, playSpeed, setHour } = useTimeStore();
+  const [captureFn, setCaptureFn] = useState<(() => string | null) | null>(null);
+  const [viewPresetFn, setViewPresetFn] = useState<((preset: ViewPreset) => void) | null>(null);
 
-  const createRoof = useCallback((scene: THREE.Scene, roofData: typeof roof) => {
+  const createRoof = useCallback((scene: THREE.Scene, roofData: any) => {
     if (roofGroupRef.current) {
       scene.remove(roofGroupRef.current);
       roofGroupRef.current = null;
@@ -131,7 +134,7 @@ export function useThreeScene(): UseThreeSceneReturn {
     roofGroupRef.current = group;
   }, []);
 
-  const createTree = useCallback((treeData: typeof trees[0]): THREE.Group => {
+  const createTree = useCallback((treeData: any): THREE.Group => {
     const group = new THREE.Group();
 
     const trunkGeometry = new THREE.CylinderGeometry(0.3, 0.5, treeData.height * 0.4, 8);
@@ -171,7 +174,7 @@ export function useThreeScene(): UseThreeSceneReturn {
     return group;
   }, []);
 
-  const createComponent = useCallback((comp: typeof components[0], isSelected: boolean, isFiltered: boolean): THREE.Mesh => {
+  const createComponent = useCallback((comp: any, isSelected: boolean, isFiltered: boolean): THREE.Mesh => {
     const geometry = new THREE.BoxGeometry(comp.size.width, 0.05, comp.size.height);
     const material = new THREE.MeshStandardMaterial({
       color: isSelected ? 0xf97316 : isFiltered ? 0x0f766e : 0x64748b,
@@ -189,29 +192,10 @@ export function useThreeScene(): UseThreeSceneReturn {
     return mesh;
   }, []);
 
-  const updateSunPosition = useCallback(() => {
-    if (!sunLightRef.current || !sunMeshRef.current) return;
-
-    const solarPos = calculateSolarPosition(month, day, hour);
-
-    sunLightRef.current.position.set(solarPos.x, solarPos.y, solarPos.z);
-    sunMeshRef.current.position.set(solarPos.x, solarPos.y, solarPos.z);
-
-    const visible = isSunVisible(solarPos.altitude);
-    sunLightRef.current.visible = visible;
-    sunMeshRef.current.visible = visible;
-
-    if (visible) {
-      const intensity = Math.max(0.2, Math.min(1, solarPos.altitude / 60));
-      sunLightRef.current.intensity = intensity;
-    }
-  }, [month, day, hour]);
-
   const captureScreenshot = useCallback((): string | null => {
     if (!rendererRef.current || !sceneRef.current || !cameraRef.current) {
       return null;
     }
-
     rendererRef.current.render(sceneRef.current, cameraRef.current);
     return rendererRef.current.domElement.toDataURL('image/png');
   }, []);
@@ -233,6 +217,11 @@ export function useThreeScene(): UseThreeSceneReturn {
     controlsRef.current.update();
     useSceneStore.getState().setViewPreset(preset);
   }, []);
+
+  useEffect(() => {
+    setCaptureFn(() => captureScreenshot);
+    setViewPresetFn(() => setViewPreset);
+  }, [captureScreenshot, setViewPreset]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -320,26 +309,93 @@ export function useThreeScene(): UseThreeSceneReturn {
     const animate = (time: number) => {
       animationIdRef.current = requestAnimationFrame(animate);
 
-      if (isPlaying) {
+      const timeState = useTimeStore.getState();
+      const sceneState = useSceneStore.getState();
+
+      if (timeState.isPlaying) {
         const delta = (time - lastTime) / 1000;
         lastTime = time;
 
-        const newHour = useTimeStore.getState().hour + delta * playSpeed * 2;
-        if (newHour >= 24) {
-          setHour(6);
+        const newHour = timeState.hour + delta * timeState.playSpeed * 2;
+        if (newHour >= 18) {
+          useTimeStore.getState().setHour(6);
         } else if (newHour < 6) {
-          setHour(6);
+          useTimeStore.getState().setHour(6);
         } else {
-          setHour(newHour);
+          useTimeStore.getState().setHour(newHour);
         }
       } else {
         lastTime = time;
       }
 
-      updateSunPosition();
+      const currentTimeState = useTimeStore.getState();
+      const solarPos = calculateSolarPosition(
+        currentTimeState.month,
+        currentTimeState.day,
+        currentTimeState.hour
+      );
+
+      if (sunLightRef.current && sunMeshRef.current) {
+        sunLightRef.current.position.set(solarPos.x, solarPos.y, solarPos.z);
+        sunMeshRef.current.position.set(solarPos.x, solarPos.y, solarPos.z);
+
+        const visible = isSunVisible(solarPos.altitude);
+        sunLightRef.current.visible = visible;
+        sunMeshRef.current.visible = visible;
+
+        if (visible) {
+          const intensity = Math.max(0.2, Math.min(1, solarPos.altitude / 60));
+          sunLightRef.current.intensity = intensity;
+        }
+      }
+
+      const now = Date.now();
+      if (now - lastShadowCalcRef.current > 100) {
+        lastShadowCalcRef.current = now;
+
+        if (sceneState.components.length > 0 && solarPos.altitude > 0) {
+          if (occludersRef.current.length === 0) {
+            occludersRef.current = createSceneOccluders(sceneState.trees, sceneState.roof);
+          }
+
+          const shadowResults = sceneState.components.map((comp) => {
+            const result = calculateComponentShadowRate(
+              comp,
+              solarPos,
+              occludersRef.current,
+              raycasterRef.current,
+              3
+            );
+            return {
+              componentId: comp.id,
+              shadowRate: result.shadowRate,
+              shadowedPoints: result.shadowedPoints,
+              totalPoints: result.totalPoints,
+            };
+          });
+
+          useSceneStore.getState().updateRealTimeShadows(shadowResults);
+
+          componentMeshesRef.current.forEach((mesh, componentId) => {
+            const shadowResult = shadowResults.find((s) => s.componentId === componentId);
+            if (shadowResult && mesh.material instanceof THREE.MeshStandardMaterial) {
+              const shadowIntensity = shadowResult.shadowRate / 100;
+              const baseColor = mesh.userData.isSelected
+                ? new THREE.Color(0xf97316)
+                : mesh.userData.isFiltered
+                ? new THREE.Color(0x0f766e)
+                : new THREE.Color(0x64748b);
+
+              const shadowedColor = baseColor.clone().multiplyScalar(1 - shadowIntensity * 0.5);
+              mesh.material.color.copy(shadowedColor);
+            }
+          });
+        }
+      }
+
       controls.update();
 
-      setCamera({
+      useSceneStore.getState().setCamera({
         position: {
           x: camera.position.x,
           y: camera.position.y,
@@ -371,8 +427,9 @@ export function useThreeScene(): UseThreeSceneReturn {
 
   useEffect(() => {
     if (!sceneRef.current) return;
-    createRoof(sceneRef.current, roof);
-  }, [roof, createRoof]);
+    createRoof(sceneRef.current, useSceneStore.getState().roof);
+    occludersRef.current = [];
+  }, [useSceneStore.getState().roof, createRoof]);
 
   useEffect(() => {
     if (!sceneRef.current) return;
@@ -382,35 +439,48 @@ export function useThreeScene(): UseThreeSceneReturn {
     });
     treeMeshesRef.current.clear();
 
+    const trees = useSceneStore.getState().trees;
     trees.forEach((tree) => {
       const treeMesh = createTree(tree);
       sceneRef.current?.add(treeMesh);
       treeMeshesRef.current.set(tree.id, treeMesh);
     });
-  }, [trees, createTree]);
+
+    occludersRef.current = [];
+  }, [useSceneStore.getState().trees, createTree]);
 
   useEffect(() => {
     if (!sceneRef.current) return;
+
+    const sceneState = useSceneStore.getState();
+    const filteredIds = new Set(sceneState.getFilteredComponents().map((c) => c.id));
 
     componentMeshesRef.current.forEach((mesh) => {
       sceneRef.current?.remove(mesh);
     });
     componentMeshesRef.current.clear();
 
-    const filteredIds = new Set(getFilteredComponents().map((c) => c.id));
-
-    components.forEach((comp) => {
-      const isSelected = selectedComponents.includes(comp.id);
+    sceneState.components.forEach((comp) => {
+      const isSelected = sceneState.selectedComponents.includes(comp.id);
       const isFiltered = filteredIds.has(comp.id);
       const mesh = createComponent(comp, isSelected, isFiltered);
+      mesh.userData.isSelected = isSelected;
+      mesh.userData.isFiltered = isFiltered;
       sceneRef.current?.add(mesh);
       componentMeshesRef.current.set(comp.id, mesh);
     });
-  }, [components, selectedComponents, createComponent, getFilteredComponents]);
+
+    occludersRef.current = [];
+  }, [
+    useSceneStore.getState().components,
+    useSceneStore.getState().selectedComponents,
+    useSceneStore.getState().filter,
+    createComponent,
+  ]);
 
   return {
     containerRef,
-    captureScreenshot,
-    setViewPreset,
+    captureScreenshot: captureFn || (() => null),
+    setViewPreset: viewPresetFn || (() => {}),
   };
 }
