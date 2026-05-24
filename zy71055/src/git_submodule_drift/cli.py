@@ -264,7 +264,14 @@ def generate_lock(repo_path: Path, format: str, output: Optional[str]):
 
 def _calculate_exit_code(report, fail_on: Optional[str], strict: bool) -> int:
     if strict:
-        if report.drifted_count > 0 or report.detached_count > 0 or report.dirty_count > 0:
+        has_issues = (
+            report.drifted_count > 0
+            or report.detached_count > 0
+            or report.dirty_count > 0
+            or len(report.missing_in_lock) > 0
+            or len(report.not_in_repo) > 0
+        )
+        if has_issues:
             return EXIT_DRIFT
 
     if not fail_on:
@@ -281,6 +288,10 @@ def _calculate_exit_code(report, fail_on: Optional[str], strict: bool) -> int:
     threshold = risk_thresholds.get(fail_on, set())
     for submodule in report.submodules:
         if submodule.risk_level in threshold:
+            return EXIT_DRIFT
+
+    if fail_on in {"any", "low", "medium", "high"}:
+        if len(report.missing_in_lock) > 0 or len(report.not_in_repo) > 0:
             return EXIT_DRIFT
 
     return EXIT_OK

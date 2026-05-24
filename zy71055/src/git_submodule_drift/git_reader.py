@@ -195,6 +195,8 @@ class GitReader:
                             for n in nested:
                                 n.is_nested = True
                                 n.parent_path = path
+                                n.path = f"{path}/{n.path}"
+                                n.name = f"{name}/{n.name}"
                             submodules.extend(nested)
                 else:
                     submodule.status = SubmoduleStatus.MISSING
