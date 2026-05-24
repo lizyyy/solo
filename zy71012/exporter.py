@@ -18,11 +18,12 @@ def export_to_excel(
     maintenance_person: str = None,
     has_merged: bool = None,
     has_resubmit: bool = None,
+    include_merged: bool = False,
 ) -> Workbook:
     alarms, total = crud.get_alarms(
         db, 0, 10000, status, elevator_no, is_timeout,
         start_time, end_time, source, maintenance_person,
-        has_merged, has_resubmit
+        has_merged, has_resubmit, include_merged
     )
     
     wb = Workbook()
@@ -34,7 +35,7 @@ def export_to_excel(
         "报警编号", "电梯编号", "报警时间", "乘客人数", "报警来源",
         "位置", "状态", "是否超时", "超时原因", "维保人员",
         "派单时间", "到场时间", "解决时间", "处理结果",
-        "合并次数", "重新提交次数", "创建人", "创建时间"
+        "合并到主记录ID", "合并次数", "重新提交次数", "创建人", "创建时间"
     ]
     
     header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
@@ -74,17 +75,18 @@ def export_to_excel(
         ws_main.cell(row=row, column=12, value=alarm.arrived_time.strftime("%Y-%m-%d %H:%M:%S") if alarm.arrived_time else "")
         ws_main.cell(row=row, column=13, value=alarm.resolved_time.strftime("%Y-%m-%d %H:%M:%S") if alarm.resolved_time else "")
         ws_main.cell(row=row, column=14, value=alarm.resolution or "")
-        ws_main.cell(row=row, column=15, value=alarm.merge_count)
-        ws_main.cell(row=row, column=16, value=alarm.resubmit_count)
-        ws_main.cell(row=row, column=17, value=alarm.created_by)
-        ws_main.cell(row=row, column=18, value=alarm.created_at.strftime("%Y-%m-%d %H:%M:%S") if alarm.created_at else "")
+        ws_main.cell(row=row, column=15, value=alarm.parent_id or "")
+        ws_main.cell(row=row, column=16, value=alarm.merge_count)
+        ws_main.cell(row=row, column=17, value=alarm.resubmit_count)
+        ws_main.cell(row=row, column=18, value=alarm.created_by)
+        ws_main.cell(row=row, column=19, value=alarm.created_at.strftime("%Y-%m-%d %H:%M:%S") if alarm.created_at else "")
         
         status_color = status_colors.get(alarm.status, "FFFFFF")
         fill = PatternFill(start_color=status_color, end_color=status_color, fill_type="solid")
         for col in range(1, len(headers) + 1):
             ws_main.cell(row=row, column=col).fill = fill
     
-    column_widths = [18, 12, 20, 10, 10, 20, 18, 10, 20, 12, 20, 20, 20, 30, 10, 12, 12, 20]
+    column_widths = [18, 12, 20, 10, 10, 20, 18, 10, 20, 12, 20, 20, 20, 30, 18, 10, 12, 12, 20]
     for col, width in enumerate(column_widths, 1):
         ws_main.column_dimensions[get_column_letter(col)].width = width
     
@@ -202,6 +204,12 @@ def export_single_to_excel(db: Session, alarm_id: int) -> Workbook:
         ["到场时间", alarm.arrived_time.strftime("%Y-%m-%d %H:%M:%S") if alarm.arrived_time else ""],
         ["解决时间", alarm.resolved_time.strftime("%Y-%m-%d %H:%M:%S") if alarm.resolved_time else ""],
         ["处理结果", alarm.resolution or ""],
+    ]
+    
+    if alarm.parent_id:
+        info_data.append(["已合并到主记录ID", alarm.parent_id])
+    
+    info_data.extend([
         ["合并记录数", alarm.merge_count],
         ["重新提交次数", alarm.resubmit_count],
         ["审核人", alarm.reviewer or ""],
@@ -209,7 +217,7 @@ def export_single_to_excel(db: Session, alarm_id: int) -> Workbook:
         ["审核时间", alarm.review_time.strftime("%Y-%m-%d %H:%M:%S") if alarm.review_time else ""],
         ["创建人", alarm.created_by],
         ["创建时间", alarm.created_at.strftime("%Y-%m-%d %H:%M:%S") if alarm.created_at else ""],
-    ]
+    ])
     
     header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
     header_font = Font(bold=True, color="FFFFFF")

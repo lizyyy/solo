@@ -45,6 +45,7 @@ def read_alarms(
     maintenance_person: Optional[str] = Query(None, description="维保人员"),
     has_merged: Optional[bool] = Query(None, description="是否有合并记录"),
     has_resubmit: Optional[bool] = Query(None, description="是否有重新提交"),
+    include_merged: bool = Query(False, description="是否包含已合并的子记录"),
     db: Session = Depends(get_db)
 ):
     skip = (page - 1) * page_size
@@ -53,7 +54,8 @@ def read_alarms(
         elevator_no=elevator_no, is_timeout=is_timeout,
         start_time=start_time, end_time=end_time,
         source=source, maintenance_person=maintenance_person,
-        has_merged=has_merged, has_resubmit=has_resubmit
+        has_merged=has_merged, has_resubmit=has_resubmit,
+        include_merged=include_merged
     )
     return {
         "total": total,
@@ -217,6 +219,7 @@ def export_alarms(
     maintenance_person: Optional[str] = Query(None, description="维保人员"),
     has_merged: Optional[bool] = Query(None, description="是否有合并记录"),
     has_resubmit: Optional[bool] = Query(None, description="是否有重新提交"),
+    include_merged: bool = Query(False, description="是否包含已合并的子记录"),
     db: Session = Depends(get_db)
 ):
     wb = exporter.export_to_excel(
@@ -224,7 +227,8 @@ def export_alarms(
         is_timeout=is_timeout, start_time=start_time,
         end_time=end_time, source=source,
         maintenance_person=maintenance_person,
-        has_merged=has_merged, has_resubmit=has_resubmit
+        has_merged=has_merged, has_resubmit=has_resubmit,
+        include_merged=include_merged
     )
     
     output = BytesIO()

@@ -117,8 +117,12 @@ def get_alarms(
     maintenance_person: str = None,
     has_merged: bool = None,
     has_resubmit: bool = None,
+    include_merged: bool = False,
 ) -> tuple[list, int]:
     query = db.query(models.ElevatorAlarm)
+    
+    if not include_merged:
+        query = query.filter(models.ElevatorAlarm.parent_id.is_(None))
     
     if status:
         query = query.filter(models.ElevatorAlarm.status == status)
@@ -387,14 +391,23 @@ def merge_alarm_internal(
     for call in source_alarm.call_records:
         call.alarm_id = target_alarm.id
     
-    status_history = models.StatusHistory(
+    source_status_history = models.StatusHistory(
+        alarm_id=source_alarm.id,
+        from_status=source_alarm.status,
+        to_status=source_alarm.status,
+        operator=operator,
+        remark=f"已合并到主记录 {target_alarm.alarm_no}，不再独立展示"
+    )
+    db.add(source_status_history)
+    
+    target_status_history = models.StatusHistory(
         alarm_id=target_alarm.id,
         from_status=target_alarm.status,
         to_status=target_alarm.status,
         operator=operator,
         remark=f"{remark}: 合并 {source_alarm.alarm_no}"
     )
-    db.add(status_history)
+    db.add(target_status_history)
     db.commit()
 
 

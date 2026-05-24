@@ -140,6 +140,7 @@ class ElevatorAlarmList(BaseModel):
     maintenance_person: Optional[str] = None
     arrived_time: Optional[datetime] = None
     resolved_time: Optional[datetime] = None
+    parent_id: Optional[int] = None
     merge_count: int
     resubmit_count: int
     created_by: str
