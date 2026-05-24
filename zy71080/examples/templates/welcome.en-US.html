@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to {{ companyName }}</title>
+</head>
+<body>
+    <h1>Welcome, {{ username }}!</h1>
+
+    <p>Dear {{ username }}, welcome to the {{ companyName }} family!</p>
+
+    <p>Your login email: {{ userEmail | default: "Not set" }}</p>
+
+    {% if isVip %}
+    <div class="vip-badge">
+        <strong>Dear VIP Member</strong>
+        <p>Exclusive code: {{ vip_code }}</p>
+    </div>
+    {% endif %}
+
+    <h2>Your Account Info</h2>
+    <ul>
+        <li>Username: {{ username }}</li>
+        <li>Registered: {{ registerDate }}</li>
+        <li>Member Level: {{ membershipLevel | default: "Regular" }}</li>
+    </ul>
+
+    {% if hasPromotion %}
+    <div class="promotion">
+        <h3>Limited Offer</h3>
+        <p>{{ promotionText }}</p>
+    </div>
+    {% endif %}
+
+    <p>{{ extraMessage }}</p>
+
+    <footer>
+        <p>If you have any questions, please contact our support team</p>
+        <p>The {{ companyName }} Team</p>
+    </footer>
+</body>
+</html>

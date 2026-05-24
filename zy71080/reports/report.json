@@ -1,0 +1,759 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "generatedAt": "2026-05-24T12:49:56.752Z",
+    "tool": "email-template-lint"
+  },
+  "summary": {
+    "templatesScanned": 2,
+    "totalVariables": 17,
+    "localesCount": 2,
+    "errors": 2,
+    "warnings": 11,
+    "info": 0
+  },
+  "exitCode": 2,
+  "templateResults": [
+    {
+      "templatePath": "/Users/lzy/pro/solo/workspaces/zy71080/examples/templates/welcome.en-US.html",
+      "locale": "en-US",
+      "analysis": {
+        "variables": [
+          {
+            "name": "companyname",
+            "rawName": "companyName",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 79,
+                "line": 5,
+                "rawName": "companyName",
+                "defaultValue": null,
+                "context": "<meta charset=\"UTF-8\">     <title>Welcome to {{ companyName }}</title> </head> <body>     <h1>W"
+              },
+              {
+                "position": 202,
+                "line": 10,
+                "rawName": "companyName",
+                "defaultValue": null,
+                "context": "</h1>      <p>Dear {{ username }}, welcome to the {{ companyName }} family!</p>      <p>Your login e"
+              },
+              {
+                "position": 958,
+                "line": 39,
+                "rawName": "companyName",
+                "defaultValue": null,
+                "context": "lease contact our support team</p>         <p>The {{ companyName }} Team</p>     </footer> </body> <"
+              }
+            ],
+            "caseVariations": [
+              "companyName"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "username",
+            "rawName": "username",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 137,
+                "line": 8,
+                "rawName": "username",
+                "defaultValue": null,
+                "context": "nyName }}</title> </head> <body>     <h1>Welcome, {{ username }}!</h1>      <p>Dear {{ username }},"
+              },
+              {
+                "position": 171,
+                "line": 10,
+                "rawName": "username",
+                "defaultValue": null,
+                "context": "<h1>Welcome, {{ username }}!</h1>      <p>Dear {{ username }}, welcome to the {{ companyName }} f"
+              },
+              {
+                "position": 524,
+                "line": 23,
+                "rawName": "username",
+                "defaultValue": null,
+                "context": "Account Info</h2>     <ul>         <li>Username: {{ username }}</li>         <li>Registered: {{ reg"
+              }
+            ],
+            "caseVariations": [
+              "username"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "useremail",
+            "rawName": "userEmail",
+            "defaultValue": "Not set",
+            "hasDefault": true,
+            "occurrences": [
+              {
+                "position": 258,
+                "line": 12,
+                "rawName": "userEmail",
+                "defaultValue": "Not set",
+                "context": "panyName }} family!</p>      <p>Your login email: {{ userEmail | default: \"Not set\" }}</p>      {% i"
+              }
+            ],
+            "caseVariations": [
+              "userEmail"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "vip_code",
+            "rawName": "vip_code",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 415,
+                "line": 17,
+                "rawName": "vip_code",
+                "defaultValue": null,
+                "context": "ar VIP Member</strong>         <p>Exclusive code: {{ vip_code }}</p>     </div>     {% endif %}"
+              }
+            ],
+            "caseVariations": [
+              "vip_code"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "registerdate",
+            "rawName": "registerDate",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 568,
+                "line": 24,
+                "rawName": "registerDate",
+                "defaultValue": null,
+                "context": "name: {{ username }}</li>         <li>Registered: {{ registerDate }}</li>         <li>Member Level:"
+              }
+            ],
+            "caseVariations": [
+              "registerDate"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "membershiplevel",
+            "rawName": "membershipLevel",
+            "defaultValue": "Regular",
+            "hasDefault": true,
+            "occurrences": [
+              {
+                "position": 618,
+                "line": 25,
+                "rawName": "membershipLevel",
+                "defaultValue": "Regular",
+                "context": "{{ registerDate }}</li>         <li>Member Level: {{ membershipLevel | default: \"Regular\" }}</li>"
+              }
+            ],
+            "caseVariations": [
+              "membershipLevel"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "promotiontext",
+            "rawName": "promotionText",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 773,
+                "line": 31,
+                "rawName": "promotionText",
+                "defaultValue": null,
+                "context": "otion\">         <h3>Limited Offer</h3>         <p>{{ promotionText }}</p>     </div>     {% endif %}"
+              }
+            ],
+            "caseVariations": [
+              "promotionText"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "extramessage",
+            "rawName": "extraMessage",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 832,
+                "line": 35,
+                "rawName": "extraMessage",
+                "defaultValue": null,
+                "context": "ionText }}</p>     </div>     {% endif %}      <p>{{ extraMessage }}</p>      <footer>         <p>If"
+              }
+            ],
+            "caseVariations": [
+              "extraMessage"
+            ],
+            "hasCaseInconsistency": false
+          }
+        ],
+        "conditionalVariables": [
+          "isvip",
+          "haspromotion"
+        ],
+        "blocks": [
+          {
+            "id": "block_0",
+            "condition": "isVip",
+            "hasElse": false,
+            "ifContent": "\n    <div class=\"vip-badge\">\n        <strong>Dear VIP Member</strong>\n        <p>Exclusive code: {{ vip_code }}</p>\n    </div>\n    ",
+            "elseContent": "",
+            "startPos": 304,
+            "endPos": 460,
+            "variablesInCondition": [
+              "isvip"
+            ],
+            "variablesInIf": [
+              "vip_code"
+            ],
+            "variablesInElse": []
+          },
+          {
+            "id": "block_1",
+            "condition": "hasPromotion",
+            "hasElse": false,
+            "ifContent": "\n    <div class=\"promotion\">\n        <h3>Limited Offer</h3>\n        <p>{{ promotionText }}</p>\n    </div>\n    ",
+            "elseContent": "",
+            "startPos": 681,
+            "endPos": 823,
+            "variablesInCondition": [
+              "haspromotion"
+            ],
+            "variablesInIf": [
+              "promotiontext"
+            ],
+            "variablesInElse": []
+          }
+        ]
+      },
+      "validation": {
+        "summary": {
+          "total": 6,
+          "errors": 0,
+          "warnings": 4,
+          "missingVariables": 0,
+          "extraVariables": 1,
+          "caseIssues": 0,
+          "conditionalIssues": 0,
+          "defaultIssues": 2
+        },
+        "issues": [
+          {
+            "type": "missing_default",
+            "severity": "warning",
+            "variable": "companyname",
+            "message": "必填变量 \"companyName\" 建议设置默认值",
+            "details": {
+              "description": "公司名称",
+              "occurrences": [
+                5,
+                10,
+                39
+              ]
+            }
+          },
+          {
+            "type": "missing_default",
+            "severity": "warning",
+            "variable": "username",
+            "message": "必填变量 \"username\" 建议设置默认值",
+            "details": {
+              "description": "用户姓名",
+              "occurrences": [
+                8,
+                10,
+                23
+              ]
+            }
+          },
+          {
+            "type": "default_value_mismatch",
+            "severity": "info",
+            "variable": "useremail",
+            "message": "变量 \"userEmail\" 的默认值与清单不一致",
+            "details": {
+              "templateDefault": "Not set",
+              "manifestDefault": "未设置"
+            }
+          },
+          {
+            "type": "extra_variable",
+            "severity": "warning",
+            "variable": "vip_code",
+            "message": "模板中使用的变量 \"vip_code\" 不在变量清单中",
+            "details": {
+              "occurrences": [
+                {
+                  "line": 17,
+                  "context": "ar VIP Member</strong>         <p>Exclusive code: {{ vip_code }}</p>     </div>     {% endif %}"
+                }
+              ]
+            }
+          },
+          {
+            "type": "missing_default",
+            "severity": "warning",
+            "variable": "registerdate",
+            "message": "必填变量 \"registerDate\" 建议设置默认值",
+            "details": {
+              "description": "注册日期",
+              "occurrences": [
+                24
+              ]
+            }
+          },
+          {
+            "type": "default_value_mismatch",
+            "severity": "info",
+            "variable": "membershiplevel",
+            "message": "变量 \"membershipLevel\" 的默认值与清单不一致",
+            "details": {
+              "templateDefault": "Regular",
+              "manifestDefault": "普通会员"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "templatePath": "/Users/lzy/pro/solo/workspaces/zy71080/examples/templates/welcome.zh-CN.html",
+      "locale": "zh-CN",
+      "analysis": {
+        "variables": [
+          {
+            "name": "companyname",
+            "rawName": "companyName",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 73,
+                "line": 5,
+                "rawName": "companyName",
+                "defaultValue": null,
+                "context": "<head>     <meta charset=\"UTF-8\">     <title>欢迎加入 {{ companyName }}</title> </head> <body>     <h1>欢"
+              },
+              {
+                "position": 178,
+                "line": 10,
+                "rawName": "companyName",
+                "defaultValue": null,
+                "context": "userName }}！</h1>      <p>亲爱的 {{ userName }}，欢迎加入 {{ companyName }} 大家庭！</p>      <p>您的登录邮箱是：{{ user"
+              },
+              {
+                "position": 909,
+                "line": 42,
+                "rawName": "companyName",
+                "defaultValue": null,
+                "context": "oter>         <p>如有任何问题，请联系我们的客服团队</p>         <p>{{ companyName }} 团队</p>         <p>{{ footerText"
+              }
+            ],
+            "caseVariations": [
+              "companyName"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "username",
+            "rawName": "userName",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 125,
+                "line": 8,
+                "rawName": "userName",
+                "defaultValue": null,
+                "context": "companyName }}</title> </head> <body>     <h1>欢迎，{{ userName }}！</h1>      <p>亲爱的 {{ userName }}，欢迎"
+              },
+              {
+                "position": 158,
+                "line": 10,
+                "rawName": "userName",
+                "defaultValue": null,
+                "context": "body>     <h1>欢迎，{{ userName }}！</h1>      <p>亲爱的 {{ userName }}，欢迎加入 {{ companyName }} 大家庭！</p>"
+              },
+              {
+                "position": 534,
+                "line": 27,
+                "rawName": "userName",
+                "defaultValue": null,
+                "context": "%}      <h2>您的账户信息</h2>     <ul>         <li>用户名：{{ userName }}</li>         <li>注册时间：{{ registerDa"
+              }
+            ],
+            "caseVariations": [
+              "userName"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "useremail",
+            "rawName": "userEmail",
+            "defaultValue": "未设置",
+            "hasDefault": true,
+            "occurrences": [
+              {
+                "position": 221,
+                "line": 12,
+                "rawName": "userEmail",
+                "defaultValue": "未设置",
+                "context": "}，欢迎加入 {{ companyName }} 大家庭！</p>      <p>您的登录邮箱是：{{ userEmail | default: \"未设置\" }}</p>      {% if is"
+              }
+            ],
+            "caseVariations": [
+              "userEmail"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "vipcode",
+            "rawName": "vipCode",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 357,
+                "line": 17,
+                "rawName": "vipCode",
+                "defaultValue": null,
+                "context": "<strong>尊敬的VIP会员</strong>         <p>专享优惠码：{{ vipCode }}</p>     </div>     {% else %}     <d"
+              }
+            ],
+            "caseVariations": [
+              "vipCode"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "registerdate",
+            "rawName": "registerDate",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 571,
+                "line": 28,
+                "rawName": "registerDate",
+                "defaultValue": null,
+                "context": "<li>用户名：{{ userName }}</li>         <li>注册时间：{{ registerDate }}</li>         <li>会员等级：{{ member"
+              }
+            ],
+            "caseVariations": [
+              "registerDate"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "membershiplevel",
+            "rawName": "membershipLevel",
+            "defaultValue": "普通会员",
+            "hasDefault": true,
+            "occurrences": [
+              {
+                "position": 612,
+                "line": 29,
+                "rawName": "membershipLevel",
+                "defaultValue": "普通会员",
+                "context": "<li>注册时间：{{ registerDate }}</li>         <li>会员等级：{{ membershipLevel | default: \"普通会员\" }}</li>     <"
+              }
+            ],
+            "caseVariations": [
+              "membershipLevel"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "promotiontext",
+            "rawName": "promotionText",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 755,
+                "line": 35,
+                "rawName": "promotionText",
+                "defaultValue": null,
+                "context": "ass=\"promotion\">         <h3>限时优惠</h3>         <p>{{ promotionText }}</p>         <p>优惠截止日期：{{ promo"
+              }
+            ],
+            "caseVariations": [
+              "promotionText"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "promotionenddate",
+            "rawName": "promotionEndDate",
+            "defaultValue": null,
+            "hasDefault": false,
+            "occurrences": [
+              {
+                "position": 797,
+                "line": 36,
+                "rawName": "promotionEndDate",
+                "defaultValue": null,
+                "context": "<p>{{ promotionText }}</p>         <p>优惠截止日期：{{ promotionEndDate }}</p>     </div>     {% endif"
+              }
+            ],
+            "caseVariations": [
+              "promotionEndDate"
+            ],
+            "hasCaseInconsistency": false
+          },
+          {
+            "name": "footertext",
+            "rawName": "footerText",
+            "defaultValue": "感谢您的支持！",
+            "hasDefault": true,
+            "occurrences": [
+              {
+                "position": 945,
+                "line": 43,
+                "rawName": "footerText",
+                "defaultValue": "感谢您的支持！",
+                "context": "p>         <p>{{ companyName }} 团队</p>         <p>{{ footerText | default: \"感谢您的支持！\" }}</p>     </fo"
+              }
+            ],
+            "caseVariations": [
+              "footerText"
+            ],
+            "hasCaseInconsistency": false
+          }
+        ],
+        "conditionalVariables": [
+          "isvip",
+          "haspromotion"
+        ],
+        "blocks": [
+          {
+            "id": "block_0",
+            "condition": "isVip",
+            "hasElse": true,
+            "ifContent": "\n    <div class=\"vip-badge\">\n        <strong>尊敬的VIP会员</strong>\n        <p>专享优惠码：{{ vipCode }}</p>\n    </div>\n    ",
+            "elseContent": "\n    <div class=\"regular\">\n        <p>升级为VIP会员，享受更多专属特权！</p>\n    </div>\n    ",
+            "startPos": 263,
+            "endPos": 487,
+            "variablesInCondition": [
+              "isvip"
+            ],
+            "variablesInIf": [
+              "vipcode"
+            ],
+            "variablesInElse": []
+          },
+          {
+            "id": "block_1",
+            "condition": "hasPromotion",
+            "hasElse": false,
+            "ifContent": "\n    <div class=\"promotion\">\n        <h3>限时优惠</h3>\n        <p>{{ promotionText }}</p>\n        <p>优惠截止日期：{{ promotionEndDate }}</p>\n    </div>\n    ",
+            "elseContent": "",
+            "startPos": 672,
+            "endPos": 850,
+            "variablesInCondition": [
+              "haspromotion"
+            ],
+            "variablesInIf": [
+              "promotiontext",
+              "promotionenddate"
+            ],
+            "variablesInElse": []
+          }
+        ]
+      },
+      "validation": {
+        "summary": {
+          "total": 3,
+          "errors": 0,
+          "warnings": 3,
+          "missingVariables": 0,
+          "extraVariables": 0,
+          "caseIssues": 0,
+          "conditionalIssues": 0,
+          "defaultIssues": 0
+        },
+        "issues": [
+          {
+            "type": "missing_default",
+            "severity": "warning",
+            "variable": "companyname",
+            "message": "必填变量 \"companyName\" 建议设置默认值",
+            "details": {
+              "description": "公司名称",
+              "occurrences": [
+                5,
+                10,
+                42
+              ]
+            }
+          },
+          {
+            "type": "missing_default",
+            "severity": "warning",
+            "variable": "username",
+            "message": "必填变量 \"userName\" 建议设置默认值",
+            "details": {
+              "description": "用户姓名",
+              "occurrences": [
+                8,
+                10,
+                27
+              ]
+            }
+          },
+          {
+            "type": "missing_default",
+            "severity": "warning",
+            "variable": "registerdate",
+            "message": "必填变量 \"registerDate\" 建议设置默认值",
+            "details": {
+              "description": "注册日期",
+              "occurrences": [
+                28
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "i18nComparison": {
+    "summary": {
+      "total": 6,
+      "errors": 2,
+      "warnings": 4
+    },
+    "issues": [
+      {
+        "type": "i18n_missing_variable",
+        "severity": "error",
+        "variable": "vip_code",
+        "message": "变量 \"vip_code\" 在 zh-CN 版本中缺失",
+        "details": {
+          "baseLocale": "en-US",
+          "missingLocale": "zh-CN",
+          "variable": "vip_code"
+        }
+      },
+      {
+        "type": "i18n_missing_variable",
+        "severity": "error",
+        "variable": "extramessage",
+        "message": "变量 \"extramessage\" 在 zh-CN 版本中缺失",
+        "details": {
+          "baseLocale": "en-US",
+          "missingLocale": "zh-CN",
+          "variable": "extramessage"
+        }
+      },
+      {
+        "type": "i18n_extra_variable",
+        "severity": "warning",
+        "variable": "vipcode",
+        "message": "变量 \"vipcode\" 在 zh-CN 版本中存在但 en-US 版本中没有",
+        "details": {
+          "extraLocale": "zh-CN",
+          "baseLocale": "en-US",
+          "variable": "vipcode"
+        }
+      },
+      {
+        "type": "i18n_extra_variable",
+        "severity": "warning",
+        "variable": "promotionenddate",
+        "message": "变量 \"promotionenddate\" 在 zh-CN 版本中存在但 en-US 版本中没有",
+        "details": {
+          "extraLocale": "zh-CN",
+          "baseLocale": "en-US",
+          "variable": "promotionenddate"
+        }
+      },
+      {
+        "type": "i18n_extra_variable",
+        "severity": "warning",
+        "variable": "footertext",
+        "message": "变量 \"footertext\" 在 zh-CN 版本中存在但 en-US 版本中没有",
+        "details": {
+          "extraLocale": "zh-CN",
+          "baseLocale": "en-US",
+          "variable": "footertext"
+        }
+      },
+      {
+        "type": "i18n_case_inconsistency",
+        "severity": "warning",
+        "variable": "username",
+        "message": "变量 \"username\" 在各语言版本中命名不一致",
+        "details": {
+          "variations": [
+            "username",
+            "userName"
+          ],
+          "locales": [
+            "en-US",
+            "zh-CN"
+          ]
+        }
+      }
+    ],
+    "localeVariables": {
+      "en-US": [
+        "companyname",
+        "username",
+        "useremail",
+        "vip_code",
+        "registerdate",
+        "membershiplevel",
+        "promotiontext",
+        "extramessage"
+      ],
+      "zh-CN": [
+        "companyname",
+        "username",
+        "useremail",
+        "vipcode",
+        "registerdate",
+        "membershiplevel",
+        "promotiontext",
+        "promotionenddate",
+        "footertext"
+      ]
+    }
+  },
+  "renderedSamples": [
+    {
+      "templatePath": "/Users/lzy/pro/solo/workspaces/zy71080/examples/templates/welcome.en-US.html",
+      "locale": "en-US",
+      "renderResult": {
+        "hasErrors": false,
+        "hasWarnings": false,
+        "errors": [],
+        "warnings": []
+      },
+      "previewPath": "/Users/lzy/pro/solo/workspaces/zy71080/reports/previews/welcome.en-US_en-US.html"
+    },
+    {
+      "templatePath": "/Users/lzy/pro/solo/workspaces/zy71080/examples/templates/welcome.zh-CN.html",
+      "locale": "zh-CN",
+      "renderResult": {
+        "hasErrors": false,
+        "hasWarnings": false,
+        "errors": [],
+        "warnings": []
+      },
+      "previewPath": "/Users/lzy/pro/solo/workspaces/zy71080/reports/previews/welcome.zh-CN_zh-CN.html"
+    }
+  ]
+}

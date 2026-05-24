@@ -1,0 +1,27 @@
+{
+  "zh-CN": {
+    "companyName": "示例科技",
+    "userName": "张三",
+    "userEmail": "zhangsan@example.com",
+    "isVip": true,
+    "vipCode": "VIP2024",
+    "registerDate": "2024-01-15",
+    "membershipLevel": "黄金会员",
+    "hasPromotion": true,
+    "promotionText": "新用户专享：首单立减50元！",
+    "promotionEndDate": "2024-02-28",
+    "footerText": "示例科技团队敬上"
+  },
+  "en-US": {
+    "companyName": "Example Tech",
+    "username": "John Doe",
+    "userEmail": "john@example.com",
+    "isVip": false,
+    "vip_code": "VIP2024",
+    "registerDate": "2024-01-15",
+    "membershipLevel": "Gold",
+    "hasPromotion": true,
+    "promotionText": "New user special: $10 off your first order!",
+    "extraMessage": "Don't forget to check our blog for the latest updates!"
+  }
+}

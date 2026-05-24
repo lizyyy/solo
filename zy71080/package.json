@@ -1,0 +1,27 @@
+{
+  "name": "email-template-lint",
+  "version": "1.0.0",
+  "description": "邮件模板变量预检CLI工具 - 检测缺失变量、多语言不一致等问题",
+  "main": "src/index.js",
+  "bin": {
+    "email-lint": "bin/email-lint.js"
+  },
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "lint": "node bin/email-lint.js"
+  },
+  "keywords": [
+    "email",
+    "template",
+    "lint",
+    "i18n",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "glob": "^10.3.10"
+  }
+}

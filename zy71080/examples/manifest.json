@@ -1,0 +1,83 @@
+{
+  "variables": [
+    {
+      "name": "companyName",
+      "required": true,
+      "description": "公司名称",
+      "type": "string"
+    },
+    {
+      "name": "userName",
+      "required": true,
+      "description": "用户姓名",
+      "type": "string"
+    },
+    {
+      "name": "userEmail",
+      "required": true,
+      "description": "用户邮箱",
+      "type": "string",
+      "default": "未设置"
+    },
+    {
+      "name": "isVip",
+      "required": false,
+      "description": "是否VIP用户",
+      "type": "boolean"
+    },
+    {
+      "name": "vipCode",
+      "required": false,
+      "description": "VIP优惠码",
+      "type": "string"
+    },
+    {
+      "name": "registerDate",
+      "required": true,
+      "description": "注册日期",
+      "type": "string"
+    },
+    {
+      "name": "membershipLevel",
+      "required": false,
+      "description": "会员等级",
+      "type": "string",
+      "default": "普通会员"
+    },
+    {
+      "name": "hasPromotion",
+      "required": false,
+      "description": "是否有促销活动",
+      "type": "boolean"
+    },
+    {
+      "name": "promotionText",
+      "required": false,
+      "description": "促销文案",
+      "type": "string"
+    },
+    {
+      "name": "promotionEndDate",
+      "required": false,
+      "description": "促销结束日期",
+      "type": "string"
+    },
+    {
+      "name": "footerText",
+      "required": false,
+      "description": "页脚文本",
+      "type": "string",
+      "default": "感谢您的支持！"
+    }
+  ],
+  "locales": {
+    "en-US": [
+      {
+        "name": "extraMessage",
+        "required": false,
+        "description": "额外消息（英文版本专属）",
+        "type": "string"
+      }
+    ]
+  }
+}

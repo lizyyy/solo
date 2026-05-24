@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎加入 {{ companyName }}</title>
+</head>
+<body>
+    <h1>欢迎，{{ userName }}！</h1>
+
+    <p>亲爱的 {{ userName }}，欢迎加入 {{ companyName }} 大家庭！</p>
+
+    <p>您的登录邮箱是：{{ userEmail | default: "未设置" }}</p>
+
+    {% if isVip %}
+    <div class="vip-badge">
+        <strong>尊敬的VIP会员</strong>
+        <p>专享优惠码：{{ vipCode }}</p>
+    </div>
+    {% else %}
+    <div class="regular">
+        <p>升级为VIP会员，享受更多专属特权！</p>
+    </div>
+    {% endif %}
+
+    <h2>您的账户信息</h2>
+    <ul>
+        <li>用户名：{{ userName }}</li>
+        <li>注册时间：{{ registerDate }}</li>
+        <li>会员等级：{{ membershipLevel | default: "普通会员" }}</li>
+    </ul>
+
+    {% if hasPromotion %}
+    <div class="promotion">
+        <h3>限时优惠</h3>
+        <p>{{ promotionText }}</p>
+        <p>优惠截止日期：{{ promotionEndDate }}</p>
+    </div>
+    {% endif %}
+
+    <footer>
+        <p>如有任何问题，请联系我们的客服团队</p>
+        <p>{{ companyName }} 团队</p>
+        <p>{{ footerText | default: "感谢您的支持！" }}</p>
+    </footer>
+</body>
+</html>
