@@ -199,6 +199,32 @@ public class RentalService {
     }
 
     @Transactional
+    public ApiResponse<RentalOrder> requestReturn(String orderNo, String operator) {
+        RentalOrder order = rentalOrderRepository.findByOrderNo(orderNo)
+            .orElseThrow(() -> new RuntimeException("订单不存在: " + orderNo));
+
+        if (order.getStatus() == RentalStatus.RETURN_PENDING || order.getStatus() == RentalStatus.RETURN_INSPECTING) {
+            auditService.logDuplicateAttempt(orderNo, order.getBatchNo(), AuditAction.RETURN_CHECK,
+                operator, "重复归还申请拦截");
+            return ApiResponse.error("该订单已申请归还，重复操作已记录审计");
+        }
+
+        if (!stateMachine.canTransition(order.getStatus(), RentalStatus.RETURN_PENDING)) {
+            return ApiResponse.error(stateMachine.getInvalidTransitionMessage(
+                order.getStatus(), RentalStatus.RETURN_PENDING));
+        }
+
+        String beforeState = order.getStatus().name();
+        order.setStatus(RentalStatus.RETURN_PENDING);
+        order = rentalOrderRepository.save(order);
+
+        auditService.logAudit(orderNo, order.getBatchNo(), AuditAction.RETURN_CHECK,
+            operator, beforeState, RentalStatus.RETURN_PENDING.name(), "申请归还");
+
+        return ApiResponse.ok("归还申请已提交", order);
+    }
+
+    @Transactional
     public ApiResponse<ReturnInspection> submitReturnInspection(ReturnInspectionRequest request) {
         RentalOrder order = rentalOrderRepository.findByOrderNo(request.getOrderNo())
             .orElseThrow(() -> new RuntimeException("订单不存在: " + request.getOrderNo()));
@@ -208,6 +234,14 @@ public class RentalService {
             auditService.logDuplicateAttempt(request.getOrderNo(), order.getBatchNo(), AuditAction.RETURN_CHECK,
                 request.getInspector(), "重复归还检查拦截");
             return ApiResponse.error("该订单已提交归还检查，重复操作已记录审计");
+        }
+
+        if (order.getStatus() == RentalStatus.RENTED) {
+            order.setStatus(RentalStatus.RETURN_PENDING);
+            order = rentalOrderRepository.save(order);
+            auditService.logAudit(order.getOrderNo(), order.getBatchNo(), AuditAction.RETURN_CHECK,
+                request.getInspector(), RentalStatus.RENTED.name(),
+                RentalStatus.RETURN_PENDING.name(), "自动申请归还");
         }
 
         if (!stateMachine.canTransition(order.getStatus(), RentalStatus.RETURN_INSPECTING)) {

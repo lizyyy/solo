@@ -281,6 +281,7 @@ PENDING_SUBMIT → PARAMS_VALIDATING → PARAMS_MISMATCH
 | POST | `/api/rental/batch` | 批次提交租赁单 |
 | POST | `/api/rental/single` | 单条提交租赁单 |
 | POST | `/api/rental/{orderNo}/rent-out` | 完成出租 |
+| POST | `/api/rental/{orderNo}/request-return` | 申请归还 |
 | POST | `/api/rental/return-inspection` | 提交归还检查 |
 | POST | `/api/rental/damage-review` | 损伤复核 |
 | POST | `/api/rental/{orderNo}/charge-fee` | 收取费用 |

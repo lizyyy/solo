@@ -50,6 +50,12 @@ public class RentalController {
         return rentalService.rentOut(orderNo, operator != null ? operator : "API");
     }
 
+    @PostMapping("/{orderNo}/request-return")
+    public ApiResponse<RentalOrder> requestReturn(@PathVariable String orderNo,
+                                                  @RequestParam(required = false) String operator) {
+        return rentalService.requestReturn(orderNo, operator != null ? operator : "API");
+    }
+
     @PostMapping("/return-inspection")
     public ApiResponse<ReturnInspection> returnInspection(@Valid @RequestBody ReturnInspectionRequest request) {
         return rentalService.submitReturnInspection(request);

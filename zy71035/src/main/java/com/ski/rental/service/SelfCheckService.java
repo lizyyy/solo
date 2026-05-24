@@ -131,6 +131,21 @@ public class SelfCheckService {
                 failed.add("3. 重复出租拦截失败");
             }
 
+            ApiResponse<?> returnReqResult = rentalService.requestReturn(orderNo, "SELF_CHECK");
+            if (returnReqResult.isSuccess()) {
+                passed.add("4. 归还申请成功");
+            } else {
+                failed.add("4. 归还申请失败: " + returnReqResult.getMessage());
+                return;
+            }
+
+            ApiResponse<?> duplicateReturnResult = rentalService.requestReturn(orderNo, "SELF_CHECK");
+            if (!duplicateReturnResult.isSuccess() && duplicateReturnResult.getMessage().contains("重复操作已记录审计")) {
+                passed.add("5. 重复归还申请拦截成功");
+            } else {
+                failed.add("5. 重复归还申请拦截失败");
+            }
+
             ReturnInspectionRequest inspectionReq = new ReturnInspectionRequest();
             inspectionReq.setOrderNo(orderNo);
             inspectionReq.setOverallDamageLevel(DamageLevel.MINOR);
@@ -146,9 +161,9 @@ public class SelfCheckService {
 
             ApiResponse<?> inspectionResult = rentalService.submitReturnInspection(inspectionReq);
             if (inspectionResult.isSuccess()) {
-                passed.add("4. 归还检查提交成功（带损伤）");
+                passed.add("6. 归还检查提交成功（带损伤）");
             } else {
-                failed.add("4. 归还检查提交失败: " + inspectionResult.getMessage());
+                failed.add("6. 归还检查提交失败: " + inspectionResult.getMessage());
                 return;
             }
 
@@ -161,32 +176,32 @@ public class SelfCheckService {
 
             ApiResponse<?> reviewResult = rentalService.reviewDamage(reviewReq);
             if (reviewResult.isSuccess()) {
-                passed.add("5. 损伤复核成功");
+                passed.add("7. 损伤复核成功");
             } else {
-                failed.add("5. 损伤复核失败: " + reviewResult.getMessage());
+                failed.add("7. 损伤复核失败: " + reviewResult.getMessage());
                 return;
             }
 
             ApiResponse<?> chargeResult = rentalService.chargeFee(orderNo, "CASHIER");
             if (chargeResult.isSuccess()) {
-                passed.add("6. 费用收取成功");
+                passed.add("8. 费用收取成功");
             } else {
-                failed.add("6. 费用收取失败: " + chargeResult.getMessage());
+                failed.add("8. 费用收取失败: " + chargeResult.getMessage());
                 return;
             }
 
             ApiResponse<?> archiveResult = rentalService.archiveOrder(orderNo, "ADMIN");
             if (archiveResult.isSuccess()) {
-                passed.add("7. 订单归档成功");
+                passed.add("9. 订单归档成功");
             } else {
-                failed.add("7. 订单归档失败: " + archiveResult.getMessage());
+                failed.add("9. 订单归档失败: " + archiveResult.getMessage());
             }
 
             ApiResponse<?> reportResult = reportService.exportOrderDetail(orderNo);
             if (reportResult.isSuccess()) {
-                passed.add("8. 订单详情导出成功");
+                passed.add("10. 订单详情导出成功");
             } else {
-                failed.add("8. 订单详情导出失败: " + reportResult.getMessage());
+                failed.add("10. 订单详情导出失败: " + reportResult.getMessage());
             }
 
         } catch (Exception e) {
