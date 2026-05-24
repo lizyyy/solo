@@ -1,6 +1,12 @@
 import * as yaml from 'js-yaml';
 import { ExpansionContext, ExpansionResult, AnchorInfo, MergeKeyInfo, OverrideInfo } from './types';
 
+interface MergeKeyLocation {
+  line: number;
+  path: string;
+  sources: string[];
+}
+
 function createContext(): ExpansionContext {
   return {
     anchors: new Map(),
@@ -29,6 +35,108 @@ function deepClone<T>(obj: T): T {
     }
   }
   return cloned;
+}
+
+function scanYamlStructure(content: string): {
+  anchorDefs: Map<string, { line: number; path: string }>;
+  aliasRefs: Array<{ name: string; line: number; path: string }>;
+  mergeKeyLocations: MergeKeyLocation[];
+} {
+  const anchorDefs = new Map<string, { line: number; path: string }>();
+  const aliasRefs: Array<{ name: string; line: number; path: string }> = [];
+  const mergeKeyLocations: MergeKeyLocation[] = [];
+
+  const lines = content.split('\n');
+  const pathStack: Array<{ key: string; indent: number }> = [];
+  let inSequence = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const lineNum = i + 1;
+
+    if (!line.trim() || line.trim().startsWith('#')) continue;
+
+    const indentMatch = line.match(/^(\s*)/);
+    const currentIndent = indentMatch ? indentMatch[1].length : 0;
+
+    while (pathStack.length > 0 && pathStack[pathStack.length - 1].indent >= currentIndent) {
+      pathStack.pop();
+    }
+
+    const sequenceItemMatch = line.match(/^\s*-\s+/);
+    if (sequenceItemMatch) {
+      inSequence = true;
+    }
+
+    const keyMatch = line.match(/^\s*([^:\s\-][^:]*):\s*/);
+    if (keyMatch) {
+      const key = keyMatch[1];
+      pathStack.push({ key, indent: currentIndent });
+      inSequence = false;
+    }
+
+    const currentPath = pathStack.map(p => p.key).join('.');
+
+    const anchorMatch = line.match(/&(\w+)/);
+    if (anchorMatch) {
+      const name = anchorMatch[1];
+      anchorDefs.set(name, { line: lineNum, path: currentPath });
+    }
+
+    const aliasMatches = line.matchAll(/\*(\w+)/g);
+    for (const match of aliasMatches) {
+      aliasRefs.push({ name: match[1], line: lineNum, path: currentPath });
+    }
+
+    const mergeMatch = line.match(/<<:?\s*\[?([^\]]*)\]?/);
+    if (mergeMatch) {
+      const sourcesStr = mergeMatch[1] || '';
+      const sources = sourcesStr
+        .split(',')
+        .map(s => s.trim().replace(/^\*/, ''))
+        .filter(s => s);
+      mergeKeyLocations.push({ line: lineNum, path: currentPath, sources });
+    }
+  }
+
+  return { anchorDefs, aliasRefs, mergeKeyLocations };
+}
+
+function getValueAtPath(obj: any, path: string): any {
+  if (!path) return obj;
+  const parts = path.split('.').filter(p => p);
+  let current = obj;
+  for (const part of parts) {
+    if (current === null || current === undefined) return undefined;
+    current = current[part];
+  }
+  return current;
+}
+
+function findMergedKeys(
+  targetObj: any,
+  sourceAnchors: Map<string, any>,
+  mergeSources: string[]
+): string[] {
+  const mergedKeys: string[] = [];
+  if (!targetObj || typeof targetObj !== 'object') return mergedKeys;
+
+  for (const sourceName of mergeSources) {
+    const sourceValue = sourceAnchors.get(sourceName);
+    if (sourceValue && typeof sourceValue === 'object') {
+      for (const key of Object.keys(sourceValue)) {
+        if (Object.prototype.hasOwnProperty.call(targetObj, key)) {
+          const targetVal = JSON.stringify(targetObj[key]);
+          const sourceVal = JSON.stringify(sourceValue[key]);
+          if (targetVal === sourceVal && !mergedKeys.includes(key)) {
+            mergedKeys.push(key);
+          }
+        }
+      }
+    }
+  }
+
+  return mergedKeys;
 }
 
 function trackMergeKey(
@@ -66,6 +174,8 @@ export function expandYaml(content: string, envOverrides?: string[]): ExpansionR
   const warnings: string[] = [];
   const errors: string[] = [];
 
+  const { anchorDefs, aliasRefs, mergeKeyLocations } = scanYamlStructure(content);
+
   let original: any;
   try {
     original = yaml.load(content);
@@ -81,6 +191,43 @@ export function expandYaml(content: string, envOverrides?: string[]): ExpansionR
       errors,
       cycleDetected: false,
     };
+  }
+
+  const anchorValues = new Map<string, any>();
+  for (const [name, def] of anchorDefs.entries()) {
+    const value = getValueAtPath(original, def.path);
+    anchorValues.set(name, value);
+
+    ctx.anchors.set(name, {
+      name,
+      path: def.path,
+      value: deepClone(value),
+      referencedBy: [],
+      sourceType: 'anchor',
+    });
+  }
+
+  for (const alias of aliasRefs) {
+    const anchor = ctx.anchors.get(alias.name);
+    if (anchor) {
+      anchor.referencedBy.push(alias.path || `line:${alias.line}`);
+    } else {
+      ctx.anchors.set(alias.name, {
+        name: alias.name,
+        path: alias.path,
+        value: null,
+        referencedBy: [alias.path || `line:${alias.line}`],
+        sourceType: 'alias',
+      });
+      warnings.push(`未定义的 anchor 引用: ${alias.name} (行 ${alias.line})`);
+    }
+  }
+
+  for (const mk of mergeKeyLocations) {
+    const targetPath = mk.path.replace(/\.<<$/, '');
+    const targetObj = getValueAtPath(original, targetPath);
+    const mergedKeys = findMergedKeys(targetObj, anchorValues, mk.sources);
+    trackMergeKey(ctx, targetPath, mk.sources, mergedKeys);
   }
 
   const expanded = deepClone(original);
@@ -103,39 +250,10 @@ export function expandYaml(content: string, envOverrides?: string[]): ExpansionR
       }
 
       const result: Record<string, any> = {};
-      const mergeItems: any[] = [];
 
       for (const [key, value] of Object.entries(obj)) {
-        if (key === '<<' || key === '<<:') {
-          mergeItems.push(value);
-          continue;
-        }
-
         const keyPath = pathJoin(path, key);
         result[key] = expandValue(value, keyPath, new Set(visited));
-      }
-
-      for (const mergeItem of mergeItems) {
-        const sources = Array.isArray(mergeItem) ? mergeItem : [mergeItem];
-        const sourceNames: string[] = [];
-        const mergedKeys: string[] = [];
-
-        for (const source of sources) {
-          const expandedSource = expandValue(source, `${path}.<<`, new Set(visited));
-
-          if (expandedSource && typeof expandedSource === 'object') {
-            for (const [sKey, sValue] of Object.entries(expandedSource)) {
-              if (!Object.prototype.hasOwnProperty.call(result, sKey)) {
-                result[sKey] = sValue;
-                mergedKeys.push(sKey);
-              }
-            }
-          }
-        }
-
-        if (mergedKeys.length > 0) {
-          trackMergeKey(ctx, path, sourceNames, mergedKeys);
-        }
       }
 
       return result;

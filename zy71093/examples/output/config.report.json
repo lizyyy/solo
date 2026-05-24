@@ -1,20 +1,112 @@
 {
   "meta": {
     "inputFile": "examples/config.yaml",
-    "timestamp": "2026-05-24T13:08:21.318Z",
+    "timestamp": "2026-05-24T15:23:02.353Z",
     "version": "1.0.0"
   },
   "summary": {
-    "totalAnchors": 0,
+    "totalAnchors": 2,
     "totalAliases": 0,
-    "totalMergeKeys": 0,
+    "totalMergeKeys": 5,
     "totalOverrides": 6,
     "warnings": 0,
     "errors": 0,
     "hasCycle": false
   },
-  "anchors": [],
-  "mergeKeys": [],
+  "anchors": [
+    {
+      "name": "defaults",
+      "path": "defaults",
+      "value": {
+        "adapter": "postgres",
+        "host": "localhost",
+        "port": 5432,
+        "pool": {
+          "min": 2,
+          "max": 10
+        },
+        "timeout": 30000
+      },
+      "referencedBy": [
+        "development.<<",
+        "test.<<",
+        "production.<<"
+      ],
+      "sourceType": "anchor"
+    },
+    {
+      "name": "logging",
+      "path": "logging",
+      "value": {
+        "level": "info",
+        "format": "json",
+        "timestamp": true
+      },
+      "referencedBy": [
+        "development.logging.<<",
+        "production.logging.<<"
+      ],
+      "sourceType": "anchor"
+    }
+  ],
+  "mergeKeys": [
+    {
+      "path": "development",
+      "sources": [
+        "defaults"
+      ],
+      "mergedKeys": [
+        "adapter",
+        "host",
+        "port",
+        "pool",
+        "timeout"
+      ]
+    },
+    {
+      "path": "development.logging",
+      "sources": [
+        "logging"
+      ],
+      "mergedKeys": [
+        "format",
+        "timestamp"
+      ]
+    },
+    {
+      "path": "test",
+      "sources": [
+        "defaults"
+      ],
+      "mergedKeys": [
+        "adapter",
+        "host",
+        "port",
+        "timeout"
+      ]
+    },
+    {
+      "path": "production",
+      "sources": [
+        "defaults"
+      ],
+      "mergedKeys": [
+        "adapter",
+        "port",
+        "pool"
+      ]
+    },
+    {
+      "path": "production.logging",
+      "sources": [
+        "logging"
+      ],
+      "mergedKeys": [
+        "format",
+        "timestamp"
+      ]
+    }
+  ],
   "overrides": [
     {
       "path": "production.host",

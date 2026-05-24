@@ -1,20 +1,37 @@
 # YAML Anchor 展开报告
 
 - **输入文件**: examples/config.yaml
-- **生成时间**: 2026-05-24T13:08:21.318Z
+- **生成时间**: 2026-05-24T15:23:02.353Z
 - **工具版本**: 1.0.0
 
 ## 摘要
 
 | 项目 | 数量 | 状态 |
 |------|------|------|
-| Anchor 定义 | 0 | - |
+| Anchor 定义 | 2 | ✅ |
 | Alias 引用 | 0 | - |
-| Merge Key | 0 | - |
+| Merge Key | 5 | ✅ |
 | 环境覆盖 | 6 | ✅ |
 | 警告 | 0 | ✅ |
 | 错误 | 0 | ✅ |
 | 循环引用 | 否 | ✅ |
+
+## Anchor 详情
+
+| 名称 | 类型 | 位置 | 引用位置 |
+|------|------|------|----------|
+| defaults | anchor | defaults | development.<<, test.<<, production.<< |
+| logging | anchor | logging | development.logging.<<, production.logging.<< |
+
+## Merge Key 详情
+
+| 位置 | 来源 | 合并键 |
+|------|------|--------|
+| development | defaults | adapter, host, port, pool, timeout |
+| development.logging | logging | format, timestamp |
+| test | defaults | adapter, host, port, timeout |
+| production | defaults | adapter, port, pool |
+| production.logging | logging | format, timestamp |
 
 ## 覆盖链详情
 
