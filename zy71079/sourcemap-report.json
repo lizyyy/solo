@@ -1,0 +1,326 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "timestamp": "2026-05-24T12:41:16.113Z",
+    "cliOptions": {
+      "dist": "test-dist",
+      "publicPath": "https://example.com/assets/",
+      "exceptions": "smcheck-exceptions.json",
+      "output": "./sourcemap-report",
+      "failOnLeak": true,
+      "verbose": false,
+      "quiet": false
+    }
+  },
+  "summary": {
+    "totalFiles": 3,
+    "scannedFiles": 2,
+    "excludedFiles": 1,
+    "criticalIssues": 5,
+    "highIssues": 1,
+    "mediumIssues": 1,
+    "lowIssues": 0,
+    "expiredExceptions": 1,
+    "scanDuration": 8,
+    "scanTimestamp": "2026-05-24T12:41:16.113Z"
+  },
+  "results": [
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71079/test-dist/chunk.js",
+      "fileType": "js",
+      "references": [
+        {
+          "type": "hidden",
+          "value": "hidden.js.map",
+          "line": 2,
+          "column": 5,
+          "raw": "sourceMappingURL=\"hidden.js.map"
+        },
+        {
+          "type": "url",
+          "value": "hidden.js.map",
+          "line": 2,
+          "column": 22,
+          "raw": "\"hidden.js.map\""
+        }
+      ],
+      "issues": [],
+      "isExcluded": true,
+      "exceptionRule": {
+        "path": "**/chunk.js",
+        "reason": "测试例外规则",
+        "expiresAt": "2027-12-31",
+        "createdAt": "2026-01-01",
+        "createdBy": "test-user"
+      }
+    },
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71079/test-dist/app.js.map",
+      "fileType": "map",
+      "references": [],
+      "issues": [
+        {
+          "id": "a9679fe3c094",
+          "severity": "critical",
+          "type": "sourcemap_file",
+          "file": "app.js.map",
+          "message": "发现 sourcemap 文件: app.js.map",
+          "details": {
+            "suggestedFix": "删除 sourcemap 文件或配置构建工具不生成 sourcemap"
+          }
+        },
+        {
+          "id": "c5c8deb6a5f3",
+          "severity": "critical",
+          "type": "publicly_accessible",
+          "file": "app.js.map",
+          "message": "Sourcemap 文件公开可访问: https://example.com/assets/app.js.map",
+          "details": {
+            "publicUrl": "https://example.com/assets/app.js.map",
+            "suggestedFix": "从 Web 服务器配置中禁止 .map 文件访问，或删除 sourcemap 文件"
+          }
+        }
+      ],
+      "isExcluded": false
+    },
+    {
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71079/test-dist/app.js",
+      "fileType": "js",
+      "references": [
+        {
+          "type": "comment",
+          "value": "app.js.map",
+          "line": 5,
+          "column": 1,
+          "raw": "//# sourceMappingURL=app.js.map"
+        },
+        {
+          "type": "hidden",
+          "value": "app.js.map",
+          "line": 5,
+          "column": 5,
+          "raw": "sourceMappingURL=app.js.map"
+        }
+      ],
+      "issues": [
+        {
+          "id": "8dab3cdc84a8",
+          "severity": "high",
+          "type": "sourcemap_reference",
+          "file": "app.js",
+          "line": 5,
+          "column": 1,
+          "message": "发现 sourcemap 注释引用: \"app.js.map\"",
+          "details": {
+            "reference": {
+              "type": "comment",
+              "value": "app.js.map",
+              "line": 5,
+              "column": 1,
+              "raw": "//# sourceMappingURL=app.js.map"
+            },
+            "suggestedFix": "移除 sourceMappingURL 注释，或确保引用的 sourcemap 不公开"
+          }
+        },
+        {
+          "id": "de3ca9151e49",
+          "severity": "critical",
+          "type": "publicly_accessible",
+          "file": "app.js",
+          "line": 5,
+          "column": 1,
+          "message": "Sourcemap 可能公开可访问: https://example.com/assets/app.js.map",
+          "details": {
+            "reference": {
+              "type": "comment",
+              "value": "app.js.map",
+              "line": 5,
+              "column": 1,
+              "raw": "//# sourceMappingURL=app.js.map"
+            },
+            "publicUrl": "https://example.com/assets/app.js.map",
+            "suggestedFix": "确保 sourcemap 文件不会被公开访问，或从构建产物中移除"
+          }
+        },
+        {
+          "id": "2c0565723888",
+          "severity": "critical",
+          "type": "hidden_sourcemap",
+          "file": "app.js",
+          "line": 5,
+          "column": 5,
+          "message": "发现 隐藏的 sourcemap 引用: \"app.js.map\"",
+          "details": {
+            "reference": {
+              "type": "hidden",
+              "value": "app.js.map",
+              "line": 5,
+              "column": 5,
+              "raw": "sourceMappingURL=app.js.map"
+            },
+            "suggestedFix": "检查代码中隐藏的 sourcemap 引用，可能在字符串或变量中"
+          }
+        },
+        {
+          "id": "de3ca9151e49",
+          "severity": "critical",
+          "type": "publicly_accessible",
+          "file": "app.js",
+          "line": 5,
+          "column": 5,
+          "message": "Sourcemap 可能公开可访问: https://example.com/assets/app.js.map",
+          "details": {
+            "reference": {
+              "type": "hidden",
+              "value": "app.js.map",
+              "line": 5,
+              "column": 5,
+              "raw": "sourceMappingURL=app.js.map"
+            },
+            "publicUrl": "https://example.com/assets/app.js.map",
+            "suggestedFix": "确保 sourcemap 文件不会被公开访问，或从构建产物中移除"
+          }
+        }
+      ],
+      "isExcluded": false
+    }
+  ],
+  "issues": [
+    {
+      "id": "a9679fe3c094",
+      "severity": "critical",
+      "type": "sourcemap_file",
+      "file": "app.js.map",
+      "message": "发现 sourcemap 文件: app.js.map",
+      "details": {
+        "suggestedFix": "删除 sourcemap 文件或配置构建工具不生成 sourcemap"
+      }
+    },
+    {
+      "id": "c5c8deb6a5f3",
+      "severity": "critical",
+      "type": "publicly_accessible",
+      "file": "app.js.map",
+      "message": "Sourcemap 文件公开可访问: https://example.com/assets/app.js.map",
+      "details": {
+        "publicUrl": "https://example.com/assets/app.js.map",
+        "suggestedFix": "从 Web 服务器配置中禁止 .map 文件访问，或删除 sourcemap 文件"
+      }
+    },
+    {
+      "id": "8dab3cdc84a8",
+      "severity": "high",
+      "type": "sourcemap_reference",
+      "file": "app.js",
+      "line": 5,
+      "column": 1,
+      "message": "发现 sourcemap 注释引用: \"app.js.map\"",
+      "details": {
+        "reference": {
+          "type": "comment",
+          "value": "app.js.map",
+          "line": 5,
+          "column": 1,
+          "raw": "//# sourceMappingURL=app.js.map"
+        },
+        "suggestedFix": "移除 sourceMappingURL 注释，或确保引用的 sourcemap 不公开"
+      }
+    },
+    {
+      "id": "de3ca9151e49",
+      "severity": "critical",
+      "type": "publicly_accessible",
+      "file": "app.js",
+      "line": 5,
+      "column": 1,
+      "message": "Sourcemap 可能公开可访问: https://example.com/assets/app.js.map",
+      "details": {
+        "reference": {
+          "type": "comment",
+          "value": "app.js.map",
+          "line": 5,
+          "column": 1,
+          "raw": "//# sourceMappingURL=app.js.map"
+        },
+        "publicUrl": "https://example.com/assets/app.js.map",
+        "suggestedFix": "确保 sourcemap 文件不会被公开访问，或从构建产物中移除"
+      }
+    },
+    {
+      "id": "2c0565723888",
+      "severity": "critical",
+      "type": "hidden_sourcemap",
+      "file": "app.js",
+      "line": 5,
+      "column": 5,
+      "message": "发现 隐藏的 sourcemap 引用: \"app.js.map\"",
+      "details": {
+        "reference": {
+          "type": "hidden",
+          "value": "app.js.map",
+          "line": 5,
+          "column": 5,
+          "raw": "sourceMappingURL=app.js.map"
+        },
+        "suggestedFix": "检查代码中隐藏的 sourcemap 引用，可能在字符串或变量中"
+      }
+    },
+    {
+      "id": "de3ca9151e49",
+      "severity": "critical",
+      "type": "publicly_accessible",
+      "file": "app.js",
+      "line": 5,
+      "column": 5,
+      "message": "Sourcemap 可能公开可访问: https://example.com/assets/app.js.map",
+      "details": {
+        "reference": {
+          "type": "hidden",
+          "value": "app.js.map",
+          "line": 5,
+          "column": 5,
+          "raw": "sourceMappingURL=app.js.map"
+        },
+        "publicUrl": "https://example.com/assets/app.js.map",
+        "suggestedFix": "确保 sourcemap 文件不会被公开访问，或从构建产物中移除"
+      }
+    },
+    {
+      "id": "642eafb34a26",
+      "severity": "medium",
+      "type": "expired_exception",
+      "file": "**/old-file.js",
+      "message": "例外规则已过期: **/old-file.js",
+      "details": {
+        "exception": {
+          "path": "**/old-file.js",
+          "reason": "已过期的例外",
+          "expiresAt": "2024-01-01",
+          "createdAt": "2023-01-01",
+          "createdBy": "test-user"
+        },
+        "suggestedFix": "更新例外规则的过期时间，或移除该例外并修复问题"
+      }
+    }
+  ],
+  "exceptions": {
+    "active": [
+      {
+        "path": "**/chunk.js",
+        "reason": "测试例外规则",
+        "expiresAt": "2027-12-31",
+        "createdAt": "2026-01-01",
+        "createdBy": "test-user"
+      }
+    ],
+    "expired": [
+      {
+        "path": "**/old-file.js",
+        "reason": "已过期的例外",
+        "expiresAt": "2024-01-01",
+        "createdAt": "2023-01-01",
+        "createdBy": "test-user"
+      }
+    ]
+  }
+}

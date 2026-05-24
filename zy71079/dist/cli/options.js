@@ -1,0 +1,128 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.validateOptions = validateOptions;
+exports.normalizeOptions = normalizeOptions;
+exports.getScanTargets = getScanTargets;
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
+function validateOptions(options) {
+    const errors = [];
+    const warnings = [];
+    if (!options.dist && !options.sourcemap && !options.js) {
+        errors.push('必须指定至少一个扫描目标: --dist, --sourcemap, 或 --js');
+    }
+    if (options.dist) {
+        if (!fs.existsSync(options.dist)) {
+            errors.push(`dist 目录不存在: ${options.dist}`);
+        }
+        else if (!fs.statSync(options.dist).isDirectory()) {
+            errors.push(`--dist 必须是一个目录: ${options.dist}`);
+        }
+    }
+    if (options.sourcemap) {
+        if (!fs.existsSync(options.sourcemap)) {
+            errors.push(`sourcemap 文件/目录不存在: ${options.sourcemap}`);
+        }
+    }
+    if (options.js) {
+        if (!fs.existsSync(options.js)) {
+            errors.push(`JS 文件/目录不存在: ${options.js}`);
+        }
+    }
+    if (options.exceptions && fs.existsSync(options.exceptions)) {
+        try {
+            const content = fs.readFileSync(options.exceptions, 'utf-8');
+            JSON.parse(content);
+        }
+        catch (error) {
+            errors.push(`例外规则文件格式无效 (必须是 JSON): ${options.exceptions}`);
+        }
+    }
+    if (options.output) {
+        try {
+            const outputDir = path.dirname(options.output);
+            if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+            }
+        }
+        catch (error) {
+            errors.push(`无法创建输出目录: ${error.message}`);
+        }
+    }
+    if (options.publicPath && !isValidPublicPath(options.publicPath)) {
+        warnings.push(`公开路径格式可能不正确: ${options.publicPath}`);
+    }
+    return { valid: errors.length === 0, errors, warnings };
+}
+function isValidPublicPath(publicPath) {
+    if (publicPath.startsWith('http://') || publicPath.startsWith('https://')) {
+        return true;
+    }
+    if (publicPath.startsWith('/')) {
+        return true;
+    }
+    if (publicPath === '') {
+        return true;
+    }
+    return false;
+}
+function normalizeOptions(options) {
+    return {
+        dist: options.dist || '',
+        sourcemap: options.sourcemap,
+        js: options.js,
+        publicPath: options.publicPath || '/',
+        exceptions: options.exceptions || '',
+        output: options.output || './sourcemap-report',
+        failOnLeak: options.failOnLeak ?? true,
+        verbose: options.verbose ?? false,
+        quiet: options.quiet ?? false,
+    };
+}
+function getScanTargets(options) {
+    const targets = [];
+    if (options.dist) {
+        targets.push(path.resolve(options.dist));
+    }
+    if (options.sourcemap) {
+        targets.push(path.resolve(options.sourcemap));
+    }
+    if (options.js) {
+        targets.push(path.resolve(options.js));
+    }
+    return [...new Set(targets)];
+}
+//# sourceMappingURL=options.js.map
