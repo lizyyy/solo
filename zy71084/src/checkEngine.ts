@@ -429,6 +429,13 @@ export class CheckEngine {
     const certificateResults = certificates.map(c => this.checkCertificate(c, options));
     const targetResults = targets.map(t => this.checkTarget(t, profiles, certificates, options));
 
+    this.addCrossTargetConflictChecks(targetResults, targets, profiles);
+    this.addWildcardUsageChecks(targetResults, targets, profiles);
+
+    targetResults.forEach(result => {
+      result.overallStatus = this.getOverallStatus(result.checks);
+    });
+
     const allChecks = [
       ...profileResults.flatMap(r => r.checks),
       ...certificateResults.flatMap(r => r.checks),
@@ -456,6 +463,54 @@ export class CheckEngine {
       summary,
       exitCode
     };
+  }
+
+  private static addCrossTargetConflictChecks(
+    targetResults: TargetCheckResult[],
+    targets: TargetConfig[],
+    profiles: MobileProvision[]
+  ): void {
+    const conflicts = BundleMatcher.detectCrossTargetConflicts(targets, profiles);
+
+    conflicts.forEach(conflict => {
+      const targetNames = conflict.targets.map(t => t.name).join(', ');
+      
+      conflict.targets.forEach(target => {
+        const targetResult = targetResults.find(r => r.target.name === target.name);
+        if (targetResult) {
+          targetResult.checks.push({
+            checkName: '多 Target Profile 共享检测',
+            status: CheckStatus.WARN,
+            message: `Profile 被多个 Target 共享`,
+            details: `Profile "${conflict.profile.name}" 同时被 ${conflict.targets.length} 个 Target 使用: ${targetNames}`,
+            location: { file: target.source, line: target.lineNumber },
+            severity: 'medium'
+          });
+        }
+      });
+    });
+  }
+
+  private static addWildcardUsageChecks(
+    targetResults: TargetCheckResult[],
+    targets: TargetConfig[],
+    profiles: MobileProvision[]
+  ): void {
+    const wildcardIssues = BundleMatcher.detectWildcardIssues(profiles, targets);
+
+    wildcardIssues.forEach(issue => {
+      const targetResult = targetResults.find(r => r.target.name === issue.target.name);
+      if (targetResult) {
+        targetResult.checks.push({
+          checkName: '通配符 Profile 使用检测',
+          status: CheckStatus.WARN,
+          message: issue.issue,
+          details: issue.suggestion,
+          location: { file: issue.target.source, line: issue.target.lineNumber },
+          severity: 'low'
+        });
+      }
+    });
   }
 
   private static getOverallStatus(checks: CheckResultItem[]): CheckStatus {

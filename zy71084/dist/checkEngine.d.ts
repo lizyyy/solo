@@ -13,5 +13,7 @@ export declare class CheckEngine {
     static checkTarget(target: TargetConfig, profiles: MobileProvision[], certificates: CertificateInfo[], options: CheckOptions): TargetCheckResult;
     private static checkTargetBundleId;
     static runFullCheck(profiles: MobileProvision[], certificates: CertificateInfo[], targets: TargetConfig[], options: CheckOptions): CheckReport;
+    private static addCrossTargetConflictChecks;
+    private static addWildcardUsageChecks;
     private static getOverallStatus;
 }
