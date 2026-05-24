@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>体育馆入口排队模拟系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>🏟️ 体育馆入口排队模拟系统</h1>
+            <div class="header-actions">
+                <select id="exampleSelect" class="btn">
+                    <option value="">-- 选择样例 --</option>
+                    <option value="normal">正常场景</option>
+                    <option value="conflict">冲突场景</option>
+                    <option value="empty">空结果场景</option>
+                </select>
+                <button id="importBtn" class="btn">📂 导入配置</button>
+                <button id="exportBtn" class="btn">📊 导出报告</button>
+                <button id="resetBtn" class="btn btn-danger">🔄 重置</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="panel">
+                    <h3>🎮 模拟控制</h3>
+                    <div class="control-group">
+                        <label>模拟速度</label>
+                        <input type="range" id="speedSlider" min="0.1" max="5" step="0.1" value="1">
+                        <span id="speedValue">1x</span>
+                    </div>
+                    <div class="control-group">
+                        <button id="playBtn" class="btn btn-primary">▶️ 播放</button>
+                        <button id="pauseBtn" class="btn">⏸️ 暂停</button>
+                    </div>
+                    <div class="control-group">
+                        <label>时间轴</label>
+                        <input type="range" id="timeSlider" min="0" max="100" value="0">
+                        <span id="timeValue">0s</span>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>👁️ 视角切换</h3>
+                    <div class="control-group">
+                        <button id="view3dBtn" class="btn btn-primary">3D 视角</button>
+                        <button id="view2dBtn" class="btn">2D 俯视</button>
+                    </div>
+                    <div class="control-group">
+                        <button id="viewFrontBtn" class="btn">正面视角</button>
+                        <button id="viewSideBtn" class="btn">侧面视角</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>🚪 闸机配置</h3>
+                    <div id="gateList" class="gate-list"></div>
+                    <button id="addGateBtn" class="btn btn-success">+ 添加闸机</button>
+                </div>
+
+                <div class="panel">
+                    <h3>👥 观众批次</h3>
+                    <div id="batchList" class="batch-list"></div>
+                    <button id="addBatchBtn" class="btn btn-success">+ 添加批次</button>
+                </div>
+
+                <div class="panel">
+                    <h3>📊 实时统计</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-label">总人数:</span>
+                            <span id="totalPeople" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">已入场:</span>
+                            <span id="enteredPeople" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">排队中:</span>
+                            <span id="queuingPeople" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">安检中:</span>
+                            <span id="scanningPeople" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">平均等待:</span>
+                            <span id="avgWaitTime" class="stat-value">0s</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">最长队列:</span>
+                            <span id="maxQueueLen" class="stat-value">0</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="viewport">
+                <canvas id="mainCanvas"></canvas>
+                <div class="viewport-overlay">
+                    <div id="heatmapToggle" class="toggle-btn">🔥 热力图</div>
+                    <div id="compareMode" class="toggle-btn">📊 方案对比</div>
+                </div>
+                <div id="tooltip" class="tooltip"></div>
+            </main>
+
+            <aside class="sidebar right">
+                <div class="panel">
+                    <h3>🔥 拥堵预警</h3>
+                    <div id="warningList" class="warning-list">
+                        <div class="warning-item info">暂无预警信息</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>📋 事件日志</h3>
+                    <div id="eventLog" class="event-log"></div>
+                </div>
+
+                <div class="panel">
+                    <h3>🎯 方案对比</h3>
+                    <div id="comparePanel" class="compare-panel">
+                        <div class="compare-empty">点击"方案对比"按钮添加方案</div>
+                    </div>
+                    <button id="clearCompareBtn" class="btn">清空对比</button>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+
+    <script src="js/config.js?v=3"></script>
+    <script src="js/models.js?v=3"></script>
+    <script src="js/simulation.js?v=3"></script>
+    <script src="js/visualization.js?v=3"></script>
+    <script src="js/ui.js?v=3"></script>
+    <script src="js/main.js?v=3"></script>
+</body>
+</html>
