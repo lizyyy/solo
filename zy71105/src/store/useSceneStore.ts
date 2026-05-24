@@ -102,16 +102,24 @@ export const useSceneStore = create<SceneState & SceneActions>()(
       },
       
       setCurrentTime: (time) => {
-        const { programSegments } = get();
+        const { programSegments, currentSegmentId } = get();
         const segment = programSegments.find(
           (s) => time >= s.startTime && time < s.endTime
         );
         
+        const newSegmentId = segment?.id || null;
+        const segmentChanged = newSegmentId !== currentSegmentId;
+        
         set({
           currentTime: time,
-          currentSegmentId: segment?.id || null
+          currentSegmentId: newSegmentId
         });
-        get().checkCollisions();
+        
+        if (segmentChanged && newSegmentId) {
+          get().applySegmentState(newSegmentId as string);
+        } else {
+          get().checkCollisions();
+        }
       },
       
       setIsPlaying: (playing) => set({ isPlaying: playing }),
