@@ -49,6 +49,7 @@ export interface ReportData {
   cameraPosition: [number, number, number];
   cameraTarget: [number, number, number];
   currentTime: number;
+  timeRange: [number, number];
   filterLevel: CrackLevel[];
   filterStatus: RecheckStatus[];
   annotations: Annotation[];

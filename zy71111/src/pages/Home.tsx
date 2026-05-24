@@ -12,8 +12,9 @@ export default function Home() {
   const [exporting, setExporting] = useState(false);
 
   const inspectionData = useInspectionStore((state) => state.inspectionData);
-  const filterLevel = useInspectionStore((state) => state.filterLevel);
-  const filterStatus = useInspectionStore((state) => state.filterStatus);
+  const cameraPosition = useInspectionStore((state) => state.cameraPosition);
+  const cameraTarget = useInspectionStore((state) => state.cameraTarget);
+  const currentTime = useInspectionStore((state) => state.currentTime);
 
   const handleExport = async () => {
     if (!inspectionData) return;
@@ -22,15 +23,20 @@ export default function Home() {
     try {
       const state = useInspectionStore.getState();
       const filteredAnnotations = state.inspectionData?.annotations.filter(
-        (ann) => state.filterLevel.includes(ann.crackLevel) && state.filterStatus.includes(ann.recheckStatus)
+        (ann) =>
+          state.filterLevel.includes(ann.crackLevel) &&
+          state.filterStatus.includes(ann.recheckStatus) &&
+          ann.timestamp >= state.timeRange[0] &&
+          ann.timestamp <= state.timeRange[1]
       ) || [];
 
       await exportAsHTML({
         bladeId: inspectionData.bladeId,
         exportTime: Date.now(),
-        cameraPosition: [0, 0, 12],
-        cameraTarget: [0, 0, 0],
+        cameraPosition: state.cameraPosition,
+        cameraTarget: state.cameraTarget,
         currentTime: state.currentTime,
+        timeRange: state.timeRange,
         filterLevel: state.filterLevel,
         filterStatus: state.filterStatus,
         annotations: filteredAnnotations,

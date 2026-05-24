@@ -27,6 +27,14 @@ export function generateReportHTML(data: ReportData): string {
     });
   };
 
+  const formatTimeOnly = (timestamp: number) => {
+    return new Date(timestamp).toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+  };
+
   const formatPosition = (pos: [number, number, number]) => {
     return `X: ${pos[0].toFixed(2)}, Y: ${pos[1].toFixed(2)}, Z: ${pos[2].toFixed(2)}`;
   };
@@ -89,6 +97,38 @@ export function generateReportHTML(data: ReportData): string {
           font-size: 14px;
           font-weight: 500;
           color: #1e293b;
+        }
+        .timeline-info {
+          background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+          border: 1px solid #a5f3fc;
+          padding: 20px;
+          border-radius: 12px;
+          margin-bottom: 24px;
+        }
+        .timeline-info h3 {
+          font-size: 14px;
+          font-weight: 600;
+          color: #0e7490;
+          margin-bottom: 12px;
+        }
+        .timeline-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+        }
+        .timeline-item {
+          text-align: center;
+        }
+        .timeline-label {
+          font-size: 11px;
+          color: #0891b2;
+          margin-bottom: 4px;
+        }
+        .timeline-value {
+          font-size: 14px;
+          font-weight: 600;
+          color: #0e7490;
+          font-family: monospace;
         }
         .annotation-list {
           display: flex;
@@ -202,6 +242,25 @@ export function generateReportHTML(data: ReportData): string {
               </div>
             </div>
           </div>
+
+          <div class="timeline-info">
+            <h3>⏱️ 巡检时间轴状态</h3>
+            <div class="timeline-grid">
+              <div class="timeline-item">
+                <div class="timeline-label">时间范围起点</div>
+                <div class="timeline-value">${formatTimeOnly(data.timeRange[0])}</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-label">当前播放位置</div>
+                <div class="timeline-value">${formatTimeOnly(data.currentTime)}</div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-label">时间范围终点</div>
+                <div class="timeline-value">${formatTimeOnly(data.timeRange[1])}</div>
+              </div>
+            </div>
+          </div>
+
           <div class="section">
             <div class="section-title">裂纹标注 (${data.annotations.length} 条)</div>
             <div class="annotation-list">
@@ -230,7 +289,7 @@ export function generateReportHTML(data: ReportData): string {
           </div>
         </div>
         <div class="footer">
-          本报告由风机叶片巡检标注系统自动生成 | 导出时筛选条件: ${data.filterLevel.map((l) => levelLabels[l]).join(', ')} | 状态: ${data.filterStatus.map((s) => statusLabels[s]).join(', ')}
+          本报告由风机叶片巡检标注系统自动生成 | 导出时筛选条件: ${data.filterLevel.map((l) => levelLabels[l]).join(', ')} | 状态: ${data.filterStatus.map((s) => statusLabels[s]).join(', ')} | 时间范围: ${formatTimeOnly(data.timeRange[0])} - ${formatTimeOnly(data.timeRange[1])}
         </div>
       </div>
     </body>

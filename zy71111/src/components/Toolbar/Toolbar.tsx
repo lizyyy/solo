@@ -12,7 +12,13 @@ interface ToolbarProps {
 export function Toolbar({ onExport }: ToolbarProps) {
   const [viewMenuOpen, setViewMenuOpen] = useState(false);
   const resetState = useInspectionStore((state) => state.resetState);
+  const setCameraState = useInspectionStore((state) => state.setCameraState);
   const inspectionData = useInspectionStore((state) => state.inspectionData);
+
+  const handleViewChange = (preset: typeof cameraPresets[0]) => {
+    setCameraState(preset.position, preset.target);
+    setViewMenuOpen(false);
+  };
 
   return (
     <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
@@ -48,9 +54,7 @@ export function Toolbar({ onExport }: ToolbarProps) {
                     {cameraPresets.map((preset) => (
                       <button
                         key={preset.id}
-                        onClick={() => {
-                          setViewMenuOpen(false);
-                        }}
+                        onClick={() => handleViewChange(preset)}
                         className="w-full px-4 py-2 text-left text-sm text-slate-300 hover:bg-slate-700/50 transition-colors"
                       >
                         {preset.name}

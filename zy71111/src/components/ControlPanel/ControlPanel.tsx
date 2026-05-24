@@ -11,10 +11,15 @@ export function ControlPanel() {
   const inspectionData = useInspectionStore((state) => state.inspectionData);
   const filterLevel = useInspectionStore((state) => state.filterLevel);
   const filterStatus = useInspectionStore((state) => state.filterStatus);
+  const timeRange = useInspectionStore((state) => state.timeRange);
 
   const annotations = inspectionData?.annotations || EMPTY_ARRAY;
   const filteredAnnotations = annotations.filter(
-    (ann) => filterLevel.includes(ann.crackLevel) && filterStatus.includes(ann.recheckStatus)
+    (ann) =>
+      filterLevel.includes(ann.crackLevel) &&
+      filterStatus.includes(ann.recheckStatus) &&
+      ann.timestamp >= timeRange[0] &&
+      ann.timestamp <= timeRange[1]
   );
 
   return (

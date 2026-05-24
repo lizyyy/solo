@@ -7,6 +7,7 @@ interface InspectionState {
   inspectionData: InspectionData | null;
   filterLevel: CrackLevel[];
   filterStatus: RecheckStatus[];
+  timeRange: [number, number];
   currentTime: number;
   isPlaying: boolean;
   playbackSpeed: number;
@@ -17,6 +18,7 @@ interface InspectionState {
   loadSampleData: () => void;
   setFilterLevel: (levels: CrackLevel[]) => void;
   setFilterStatus: (status: RecheckStatus[]) => void;
+  setTimeRange: (range: [number, number]) => void;
   setCurrentTime: (time: number | ((prev: number) => number)) => void;
   togglePlay: () => void;
   setPlaybackSpeed: (speed: number) => void;
@@ -31,6 +33,7 @@ const initialState = {
   inspectionData: null,
   filterLevel: [CrackLevel.LIGHT, CrackLevel.MODERATE, CrackLevel.SEVERE],
   filterStatus: [RecheckStatus.PENDING, RecheckStatus.VERIFIED, RecheckStatus.RESOLVED],
+  timeRange: [0, Date.now()] as [number, number],
   currentTime: 0,
   isPlaying: false,
   playbackSpeed: 1,
@@ -46,12 +49,15 @@ export const useInspectionStore = create<InspectionState>((set, get) => ({
     set({
       inspectionData: mockInspectionData,
       currentTime: mockInspectionData.startTime,
+      timeRange: [mockInspectionData.startTime, mockInspectionData.endTime],
     });
   },
 
   setFilterLevel: (levels) => set({ filterLevel: levels }),
 
   setFilterStatus: (status) => set({ filterStatus: status }),
+
+  setTimeRange: (range) => set({ timeRange: range }),
 
   setCurrentTime: (time) =>
     set((state) => ({
@@ -86,8 +92,11 @@ export const useInspectionStore = create<InspectionState>((set, get) => ({
       ...initialState,
       inspectionData: data,
       currentTime: data?.startTime || 0,
+      timeRange: data ? [data.startTime, data.endTime] : [0, Date.now()],
       filterLevel: [CrackLevel.LIGHT, CrackLevel.MODERATE, CrackLevel.SEVERE],
       filterStatus: [RecheckStatus.PENDING, RecheckStatus.VERIFIED, RecheckStatus.RESOLVED],
+      cameraPosition: [0, 0, 12],
+      cameraTarget: [0, 0, 0],
     });
   },
 
@@ -97,7 +106,9 @@ export const useInspectionStore = create<InspectionState>((set, get) => ({
     return state.inspectionData.annotations.filter(
       (ann) =>
         state.filterLevel.includes(ann.crackLevel) &&
-        state.filterStatus.includes(ann.recheckStatus)
+        state.filterStatus.includes(ann.recheckStatus) &&
+        ann.timestamp >= state.timeRange[0] &&
+        ann.timestamp <= state.timeRange[1]
     );
   },
 }));
