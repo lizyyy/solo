@@ -175,8 +175,8 @@ jenkins-snapshot archive build_123_fail.json --rerun-suffix failed
 # 重跑成功
 jenkins-snapshot archive build_123_success.json --rerun-suffix success
 
-# 比较差异
-jenkins-snapshot diff MyJob 123 123 --rerun-suffixes failed success
+# 比较同一构建号的两个重跑变体差异
+jenkins-snapshot diff MyJob 123 123 --old-rerun-suffix failed --new-rerun-suffix success
 ```
 
 ### 场景 3：批量导出给同事排查
