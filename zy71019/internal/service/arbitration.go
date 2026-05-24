@@ -355,7 +355,7 @@ func (s *ArbitrationService) HandleAppeal(req *models.HandleAppealRequest) error
 		return fmt.Errorf("更新申诉失败: %w", err)
 	}
 
-	if req.Approve && req.RefundAmount > 0 {
+	if req.Approve {
 		conclusion := &models.Conclusion{
 			ArbitrationID: req.ArbitrationID,
 			FinalResult:   "申诉通过",
@@ -369,7 +369,14 @@ func (s *ArbitrationService) HandleAppeal(req *models.HandleAppealRequest) error
 			return fmt.Errorf("创建申诉结论失败: %w", err)
 		}
 
-		if err := s.logAction(req.ArbitrationID, "appeal_approved", req.HandlerID, req.HandlerName, string(models.StatusAppealing), string(models.StatusClosed), fmt.Sprintf("申诉通过，退款 %.2f 元", req.RefundAmount)); err != nil {
+		logRemark := "申诉通过"
+		if req.RefundAmount > 0 {
+			logRemark = fmt.Sprintf("申诉通过，退款 %.2f 元", req.RefundAmount)
+		} else {
+			logRemark = "申诉通过，无需退款"
+		}
+
+		if err := s.logAction(req.ArbitrationID, "appeal_approved", req.HandlerID, req.HandlerName, string(models.StatusAppealing), string(models.StatusClosed), logRemark); err != nil {
 			return err
 		}
 

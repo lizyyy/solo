@@ -177,6 +177,89 @@ func TestAppealConclusionWriteback(t *testing.T) {
 	t.Log("✓ Appeal conclusion writeback works correctly!")
 }
 
+func TestAppealApprovedZeroRefund(t *testing.T) {
+	setupTestDB(t)
+	defer cleanupTestDB()
+
+	service := NewArbitrationService()
+
+	req := &models.CreateArbitrationRequest{
+		OrderID:    "ORDER005",
+		VehicleID:  "VEH005",
+		UserID:     "USER005",
+		PickupTime: time.Now().Add(-24 * time.Hour),
+		ReturnTime: time.Now(),
+		PickupPhotos: []models.PhotoInfo{
+			{PhotoURL: "http://test.com/p5.jpg", PhotoTime: time.Now().Add(-24 * time.Hour)},
+		},
+		ReturnPhotos: []models.PhotoInfo{
+			{PhotoURL: "http://test.com/r5.jpg", PhotoTime: time.Now()},
+		},
+		Damages: []models.DamageInfo{
+			{DamageType: models.DamageTypeOther, Location: "车身污渍", DeductAmount: 0},
+		},
+		OperatorID:   "OP001",
+		OperatorName: "张三",
+	}
+
+	arb, err := service.CreateArbitration(req)
+	if err != nil {
+		t.Fatalf("Failed to create arbitration: %v", err)
+	}
+
+	appealReq := &models.SubmitAppealRequest{
+		ArbitrationID: arb.ID,
+		UserID:        "USER005",
+		Content:       "污渍不是我弄的",
+	}
+	if err := service.SubmitAppeal(appealReq); err != nil {
+		t.Fatalf("Failed to submit appeal: %v", err)
+	}
+
+	handleReq := &models.HandleAppealRequest{
+		ArbitrationID: arb.ID,
+		HandlerID:     "OP002",
+		HandlerName:   "李四",
+		HandlerRemark: "申诉属实，该污渍在取车前已有，无需退款",
+		Approve:       true,
+		RefundAmount:  0,
+	}
+	if err := service.HandleAppeal(handleReq); err != nil {
+		t.Fatalf("Failed to handle appeal: %v", err)
+	}
+
+	detail, err := service.GetArbitrationDetail(arb.ID)
+	if err != nil {
+		t.Fatalf("Failed to get arbitration detail: %v", err)
+	}
+
+	if detail.Appeal.IsApproved == nil || !*detail.Appeal.IsApproved {
+		t.Errorf("Expected appeal to be approved, got: %v", detail.Appeal.IsApproved)
+	}
+
+	if detail.Appeal.RefundAmount == nil || *detail.Appeal.RefundAmount != 0 {
+		t.Errorf("Expected refund amount to be 0, got: %v", detail.Appeal.RefundAmount)
+	}
+
+	if detail.Arbitration.Status != models.StatusClosed {
+		t.Errorf("Expected arbitration status to be 'closed' after appeal approval (even with 0 refund), got '%s'", detail.Arbitration.Status)
+	}
+
+	if detail.Conclusion == nil {
+		t.Fatal("Conclusion should not be nil after appeal approval")
+	}
+
+	if detail.Conclusion.FinalResult != "申诉通过" {
+		t.Errorf("Expected conclusion result to be '申诉通过', got '%s'", detail.Conclusion.FinalResult)
+	}
+
+	if detail.Conclusion.RefundAmount != 0 {
+		t.Errorf("Expected conclusion refund amount to be 0, got: %v", detail.Conclusion.RefundAmount)
+	}
+
+	t.Log("✓ Appeal approved with 0 refund works correctly!")
+}
+
 func TestAppealRejected(t *testing.T) {
 	setupTestDB(t)
 	defer cleanupTestDB()
