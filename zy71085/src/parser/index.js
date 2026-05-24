@@ -6,6 +6,10 @@ const {
   parseModuleManifest,
   parseModulesDirectory,
   parseManifestBuffer,
+  extractAppInfo,
+  extractPermissions,
+  extractFeatures,
+  extractSdkInfo,
   ApkParserError
 } = require('./apk-parser')
 
@@ -31,6 +35,10 @@ module.exports = {
   parseModuleManifest,
   parseModulesDirectory,
   parseManifestBuffer,
+  extractAppInfo,
+  extractPermissions,
+  extractFeatures,
+  extractSdkInfo,
   parseXml,
   parseBinaryXml,
   isBinaryXml,

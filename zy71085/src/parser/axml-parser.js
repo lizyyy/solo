@@ -197,12 +197,17 @@ class AxmlParser {
       element.$[attrName] = attrValue != null ? String(attrValue) : ''
     }
 
-    const parent = this.elementStack[this.elementStack.length - 1]
-    if (!parent[tagName]) {
-      parent[tagName] = []
+    if (tagName === 'manifest' && this.elementStack.length === 1) {
+      Object.assign(this.manifest.$, element.$)
+      this.elementStack = [this.manifest]
+    } else {
+      const parent = this.elementStack[this.elementStack.length - 1]
+      if (!parent[tagName]) {
+        parent[tagName] = []
+      }
+      parent[tagName].push(element)
+      this.elementStack.push(element)
     }
-    parent[tagName].push(element)
-    this.elementStack.push(element)
 
     this.offset = startOffset + chunkSize
   }
@@ -212,9 +217,13 @@ class AxmlParser {
     this.readInt32()
     this.readInt32()
     this.readInt32()
-    this.readInt32()
+    const nameIdx = this.readInt32()
+    const tagName = this.stringPool[nameIdx] || 'unknown'
 
-    this.elementStack.pop()
+    if (tagName === 'manifest' && this.elementStack.length <= 1) {
+    } else {
+      this.elementStack.pop()
+    }
     this.offset = startOffset + chunkSize
   }
 

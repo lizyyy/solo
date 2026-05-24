@@ -260,5 +260,10 @@ module.exports = {
   parseManifestFile,
   parseModuleManifest,
   parseModulesDirectory,
+  parseManifestBuffer,
+  extractAppInfo,
+  extractPermissions,
+  extractFeatures,
+  extractSdkInfo,
   ApkParserError
 }
