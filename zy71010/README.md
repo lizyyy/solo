@@ -42,7 +42,7 @@ go build -o cold_chain_api
 ./cold_chain_api
 ```
 
-服务默认运行在 `http://localhost:8080`
+服务默认运行在 `http://localhost:8090`
 
 ### 3. 生成测试数据
 
@@ -64,10 +64,10 @@ go run scripts/seed.go
 
 ```bash
 # 健康检查
-curl http://localhost:8080/api/v1/health
+curl http://localhost:8090/api/v1/health
 
 # 数据一致性检查
-curl http://localhost:8080/api/v1/consistency
+curl http://localhost:8090/api/v1/consistency
 ```
 
 ## API 接口速查
@@ -106,7 +106,7 @@ curl http://localhost:8080/api/v1/consistency
 ### 1. 提交材料（自动评估）
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/submissions \
+curl -X POST http://localhost:8090/api/v1/submissions \
   -H "Content-Type: application/json" \
   -d '{
     "business_key": "CV2024001_FRIDGE_A",
@@ -125,7 +125,7 @@ curl -X POST http://localhost:8080/api/v1/submissions \
 ### 2. 冷链窗口校验
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/cold-chain/validate \
+curl -X POST http://localhost:8090/api/v1/cold-chain/validate \
   -H "Content-Type: application/json" \
   -d '{
     "refrigerator_id": "替换为实际冰箱ID",
@@ -138,7 +138,7 @@ curl -X POST http://localhost:8080/api/v1/cold-chain/validate \
 
 ```bash
 # 替换为实际开瓶记录ID
-curl http://localhost:8080/api/v1/open-vial/替换为开瓶ID/status
+curl http://localhost:8090/api/v1/open-vial/替换为开瓶ID/status
 ```
 
 **响应说明**：
@@ -149,7 +149,7 @@ curl http://localhost:8080/api/v1/open-vial/替换为开瓶ID/status
 ### 4. 查询调拨留痕
 
 ```bash
-curl http://localhost:8080/api/v1/transfers/CV2024001/trail
+curl http://localhost:8090/api/v1/transfers/CV2024001/trail
 ```
 
 **响应说明**：
@@ -161,7 +161,7 @@ curl http://localhost:8080/api/v1/transfers/CV2024001/trail
 
 ```bash
 # 先创建废弃记录
-curl -X POST http://localhost:8080/api/v1/discards \
+curl -X POST http://localhost:8090/api/v1/discards \
   -H "Content-Type: application/json" \
   -d '{
     "batch_number": "CV2024001",
@@ -171,7 +171,7 @@ curl -X POST http://localhost:8080/api/v1/discards \
   }'
 
 # 然后确认废弃
-curl -X POST http://localhost:8080/api/v1/discards/confirm \
+curl -X POST http://localhost:8090/api/v1/discards/confirm \
   -H "Content-Type: application/json" \
   -d '{
     "discard_id": "替换为废弃记录ID",
@@ -183,7 +183,7 @@ curl -X POST http://localhost:8080/api/v1/discards/confirm \
 
 ```bash
 # 生成报告
-curl -X POST http://localhost:8080/api/v1/reports/generate \
+curl -X POST http://localhost:8090/api/v1/reports/generate \
   -H "Content-Type: application/json" \
   -d '{
     "start_date": "2024-01-01T00:00:00Z",
@@ -192,13 +192,13 @@ curl -X POST http://localhost:8080/api/v1/reports/generate \
   }'
 
 # 导出 CSV（替换为报告ID）
-curl -OJ http://localhost:8080/api/v1/reports/替换为报告ID/export
+curl -OJ http://localhost:8090/api/v1/reports/替换为报告ID/export
 ```
 
 ### 7. 结果核对（证据链+业务结果）
 
 ```bash
-curl "http://localhost:8080/api/v1/verify?business_key=CV2024001_FRIDGE_A&business_type=temperature_compliance"
+curl "http://localhost:8090/api/v1/verify?business_key=CV2024001_FRIDGE_A&business_type=temperature_compliance"
 ```
 
 **响应说明**：
@@ -212,7 +212,7 @@ curl "http://localhost:8080/api/v1/verify?business_key=CV2024001_FRIDGE_A&busine
 
 ```bash
 # 1. 创建一个超时的开瓶记录（7小时前）
-curl -X POST http://localhost:8080/api/v1/open-records \
+curl -X POST http://localhost:8090/api/v1/open-records \
   -H "Content-Type: application/json" \
   -d '{
     "inventory_id": "库存ID",
@@ -224,10 +224,10 @@ curl -X POST http://localhost:8080/api/v1/open-records \
   }'
 
 # 2. 查询状态 - 应显示 expired: true
-curl http://localhost:8080/api/v1/open-vial/返回的开瓶ID/status
+curl http://localhost:8090/api/v1/open-vial/返回的开瓶ID/status
 
 # 3. 提交评估 - 结果应为 non_compliant
-curl -X POST http://localhost:8080/api/v1/submissions \
+curl -X POST http://localhost:8090/api/v1/submissions \
   -H "Content-Type: application/json" \
   -d '{
     "business_key": "EXPIRED_VIAL_TEST",
@@ -244,7 +244,7 @@ curl -X POST http://localhost:8080/api/v1/submissions \
 造数脚本已故意生成一些温度异常点，运行冷链校验会检测到：
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/cold-chain/validate \
+curl -X POST http://localhost:8090/api/v1/cold-chain/validate \
   -H "Content-Type: application/json" \
   -d '{
     "refrigerator_id": "替换为冰箱A的ID",
@@ -257,7 +257,7 @@ curl -X POST http://localhost:8080/api/v1/cold-chain/validate \
 
 ```bash
 # 第一次提交
-curl -X POST http://localhost:8080/api/v1/submissions \
+curl -X POST http://localhost:8090/api/v1/submissions \
   -H "Content-Type: application/json" \
   -d '{
     "business_key": "DUPLICATE_TEST",
@@ -269,7 +269,7 @@ curl -X POST http://localhost:8080/api/v1/submissions \
   }'
 
 # 第二次提交（同一 business_key）- 证据版本变为 2，业务结果不重复
-curl -X POST http://localhost:8080/api/v1/submissions \
+curl -X POST http://localhost:8090/api/v1/submissions \
   -H "Content-Type: application/json" \
   -d '{
     "business_key": "DUPLICATE_TEST",
@@ -281,7 +281,7 @@ curl -X POST http://localhost:8080/api/v1/submissions \
   }'
 
 # 查看证据链 - 会看到两个版本
-curl "http://localhost:8080/api/v1/verify?business_key=DUPLICATE_TEST&business_type=temperature"
+curl "http://localhost:8090/api/v1/verify?business_key=DUPLICATE_TEST&business_type=temperature"
 ```
 
 ## 配置说明

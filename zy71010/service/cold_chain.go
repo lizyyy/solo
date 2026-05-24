@@ -127,20 +127,28 @@ func GetTransferTrail(batchNumber string) (*models.TransferTrail, error) {
 func ProcessVaccineTransfer(batchNumber, fromFridge, toFridge string, doses int, transferredBy, reason string) error {
 	fromInventory, err := repository.GetInventoryByBatchAndFridge(batchNumber, fromFridge)
 	if err != nil {
-		return err
+		return fmt.Errorf("查询源库存失败: %w", err)
 	}
-	if fromInventory == nil || fromInventory.DosesCount < doses {
-		return fmt.Errorf("源冰箱库存不足")
+	if fromInventory == nil {
+		return fmt.Errorf("源冰箱中未找到该批号疫苗")
+	}
+	if fromInventory.DosesCount < doses {
+		return fmt.Errorf("源冰箱库存不足: 当前 %d 剂, 请求 %d 剂", fromInventory.DosesCount, doses)
 	}
 
 	fromInventory.DosesCount -= doses
 	if fromInventory.DosesCount == 0 {
 		fromInventory.Status = "transferred_out"
+	} else {
+		fromInventory.Status = "in_stock"
+	}
+	if err := repository.UpdateVaccineInventory(fromInventory); err != nil {
+		return fmt.Errorf("更新源库存失败: %w", err)
 	}
 
 	toInventory, err := repository.GetInventoryByBatchAndFridge(batchNumber, toFridge)
 	if err != nil {
-		return err
+		return fmt.Errorf("查询目标库存失败: %w", err)
 	}
 	if toInventory == nil {
 		toInventory = &models.VaccineInventory{
@@ -150,10 +158,14 @@ func ProcessVaccineTransfer(batchNumber, fromFridge, toFridge string, doses int,
 			Status:         "in_stock",
 		}
 		if err := repository.CreateVaccineInventory(toInventory); err != nil {
-			return err
+			return fmt.Errorf("创建目标库存失败: %w", err)
 		}
 	} else {
 		toInventory.DosesCount += doses
+		toInventory.Status = "in_stock"
+		if err := repository.UpdateVaccineInventory(toInventory); err != nil {
+			return fmt.Errorf("更新目标库存失败: %w", err)
+		}
 	}
 
 	transfer := &models.TransferRecord{
@@ -165,7 +177,7 @@ func ProcessVaccineTransfer(batchNumber, fromFridge, toFridge string, doses int,
 		Reason:             reason,
 	}
 	if err := repository.CreateTransferRecord(transfer); err != nil {
-		return err
+		return fmt.Errorf("创建调拨记录失败: %w", err)
 	}
 
 	return nil

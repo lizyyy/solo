@@ -13,7 +13,7 @@ type Config struct {
 
 func Load() *Config {
 	return &Config{
-		ServerPort:        ":8080",
+		ServerPort:        ":8090",
 		DatabasePath:      "./cold_chain.db",
 		ColdChainMinTemp:  2.0,
 		ColdChainMaxTemp:  8.0,

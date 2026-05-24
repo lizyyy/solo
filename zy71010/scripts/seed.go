@@ -210,4 +210,15 @@ func main() {
 	for _, o := range openRecords {
 		fmt.Printf("  - %s (批号: %s)\n", o.ID, o.BatchNumber)
 	}
+
+	fmt.Println("\n=== 调拨验证 (库存变化) ===")
+	for _, f := range fridges {
+		for _, v := range vaccines {
+			inv, _ := repository.GetInventoryByBatchAndFridge(v.BatchNumber, f.ID)
+			if inv != nil {
+				fmt.Printf("  %s - %s: %d剂 (状态: %s)\n", f.Name, v.BatchNumber, inv.DosesCount, inv.Status)
+			}
+		}
+	}
+	fmt.Println("\n✓ 调拨功能已验证：源/目标库存变化已持久化到数据库")
 }

@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/google/uuid"
 	"vet-vaccine-cold-chain/database"
 	"vet-vaccine-cold-chain/models"
+
+	"github.com/google/uuid"
 )
 
 func CreateRefrigerator(r *models.Refrigerator) error {
@@ -247,6 +248,90 @@ func GetInventoryByBatchAndFridge(batchNumber, refrigeratorID string) (*models.V
 		return nil, err
 	}
 	return &inv, nil
+}
+
+func UpdateVaccineInventory(inv *models.VaccineInventory) error {
+	_, err := database.DB.Exec(
+		"UPDATE vaccine_inventory SET doses_count = ?, status = ? WHERE id = ?",
+		inv.DosesCount, inv.Status, inv.ID,
+	)
+	return err
+}
+
+func GetAllInventory() ([]models.VaccineInventory, error) {
+	rows, err := database.DB.Query("SELECT id, batch_number, refrigerator_id, doses_count, status, received_at FROM vaccine_inventory")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var inventories []models.VaccineInventory
+	for rows.Next() {
+		var inv models.VaccineInventory
+		err := rows.Scan(&inv.ID, &inv.BatchNumber, &inv.RefrigeratorID, &inv.DosesCount, &inv.Status, &inv.ReceivedAt)
+		if err != nil {
+			return nil, err
+		}
+		inventories = append(inventories, inv)
+	}
+	return inventories, nil
+}
+
+func GetAllOpenRecords() ([]models.OpenRecord, error) {
+	rows, err := database.DB.Query("SELECT id, inventory_id, batch_number, opened_at, opened_by, doses_used, status, closed_at, closed_by, evidence_id FROM open_records")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var records []models.OpenRecord
+	for rows.Next() {
+		var or models.OpenRecord
+		err := rows.Scan(&or.ID, &or.InventoryID, &or.BatchNumber, &or.OpenedAt, &or.OpenedBy, &or.DosesUsed, &or.Status, &or.ClosedAt, &or.ClosedBy, &or.EvidenceID)
+		if err != nil {
+			return nil, err
+		}
+		records = append(records, or)
+	}
+	return records, nil
+}
+
+func GetAllDiscardRecords() ([]models.DiscardRecord, error) {
+	rows, err := database.DB.Query("SELECT id, batch_number, inventory_id, open_record_id, doses_count, reason, discarded_at, discarded_by, confirmed, confirmed_at, confirmed_by, evidence_id FROM discard_records")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var records []models.DiscardRecord
+	for rows.Next() {
+		var dr models.DiscardRecord
+		err := rows.Scan(&dr.ID, &dr.BatchNumber, &dr.InventoryID, &dr.OpenRecordID, &dr.DosesCount, &dr.Reason, &dr.DiscardedAt, &dr.DiscardedBy, &dr.Confirmed, &dr.ConfirmedAt, &dr.ConfirmedBy, &dr.EvidenceID)
+		if err != nil {
+			return nil, err
+		}
+		records = append(records, dr)
+	}
+	return records, nil
+}
+
+func GetAllVaccines() ([]models.Vaccine, error) {
+	rows, err := database.DB.Query("SELECT batch_number, name, manufacturer, expiry_date, total_doses, created_at FROM vaccines")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var vaccines []models.Vaccine
+	for rows.Next() {
+		var v models.Vaccine
+		err := rows.Scan(&v.BatchNumber, &v.Name, &v.Manufacturer, &v.ExpiryDate, &v.TotalDoses, &v.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		vaccines = append(vaccines, v)
+	}
+	return vaccines, nil
 }
 
 func CreateColdChainReport(report *models.ColdChainReport) error {
