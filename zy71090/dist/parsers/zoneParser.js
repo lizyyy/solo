@@ -46,13 +46,16 @@ function parseJSONFormat(content, zoneName) {
                 records: data.records.map(parseJSONRecord).filter(Boolean)
             };
         }
-        throw new Error('无法识别的 JSON 格式');
+        throw new errors_1.ParseError('无法识别的 JSON 格式');
     }
     catch (error) {
         if (error instanceof SyntaxError) {
-            throw new Error(`JSON 解析失败: ${error.message}`);
+            throw new errors_1.ParseError(`JSON 解析失败: ${error.message}`);
         }
-        throw error;
+        if (error instanceof errors_1.ParseError) {
+            throw error;
+        }
+        throw new errors_1.ParseError(String(error));
     }
 }
 function parseAWSFormat(data, zoneName) {

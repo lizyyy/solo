@@ -48,12 +48,15 @@ function parseJSONFormat(content: string, zoneName: string): ZoneData {
       };
     }
     
-    throw new Error('无法识别的 JSON 格式');
+    throw new ParseError('无法识别的 JSON 格式');
   } catch (error) {
     if (error instanceof SyntaxError) {
-      throw new Error(`JSON 解析失败: ${error.message}`);
+      throw new ParseError(`JSON 解析失败: ${error.message}`);
     }
-    throw error;
+    if (error instanceof ParseError) {
+      throw error;
+    }
+    throw new ParseError(String(error));
   }
 }
 

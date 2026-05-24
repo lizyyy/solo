@@ -48,13 +48,13 @@ npm run dev -- --version
 
 ```bash
 # 分析单个 Zone 文件
-r53-ttl analyze -z examples/example.zone
+r53-ttl analyze -z examples/example.com.zone
 
 # 指定输出目录和格式
-r53-ttl analyze -z examples/example.zone -o ./reports -f json,markdown,terminal
+r53-ttl analyze -z examples/example.com.zone -o ./reports -f json,markdown,terminal
 
 # 指定要对比的环境
-r53-ttl analyze -z examples/example.zone -e production,staging,testing
+r53-ttl analyze -z examples/example.com.zone -e production,staging,testing
 ```
 
 ### 常用命令
