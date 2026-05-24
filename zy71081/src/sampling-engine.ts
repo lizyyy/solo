@@ -218,12 +218,13 @@ export class SamplingEngine {
         let attrMatched = false;
 
         if (actualValue === undefined) {
+          attributeMatches.push({
+            key: attrFilter.key,
+            matched: false,
+            actual: undefined
+          });
           if (this.config.strictAttributeMatch) {
             mismatchReasons.push(`属性缺失: ${attrFilter.key}`);
-            attributeMatches.push({
-              key: attrFilter.key,
-              matched: false
-            });
           }
           continue;
         }
@@ -277,10 +278,23 @@ export class SamplingEngine {
       }
     }
 
+    let attributesConditionMet = true;
+    if (rule.attributes && rule.attributes.length > 0) {
+      const hasAnyActualValue = attributeMatches.some(m => m.actual !== undefined);
+      const allExistingMatched = attributeMatches.every(m => 
+        m.matched || (this.config.strictAttributeMatch === false && m.actual === undefined)
+      );
+      
+      if (this.config.strictAttributeMatch) {
+        attributesConditionMet = allExistingMatched && hasAnyActualValue;
+      } else {
+        attributesConditionMet = hasAnyActualValue ? allExistingMatched : false;
+      }
+    }
+
     const allConditionsMet =
       (serviceNameMatch === undefined || serviceNameMatch) &&
-      (rule.attributes === undefined || rule.attributes.length === 0 ||
-        attributeMatches.every(m => m.matched || this.config.strictAttributeMatch === false && m.actual !== undefined));
+      attributesConditionMet;
 
     return {
       ruleName: rule.name,

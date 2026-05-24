@@ -1,0 +1,653 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-24T15:02:23.799Z",
+    "toolVersion": "1.0.0",
+    "inputConfig": {
+      "configFile": "/Users/lzy/pro/solo/workspaces/zy71081/examples/sampling-config.json",
+      "traceFile": "/Users/lzy/pro/solo/workspaces/zy71081/examples/dirty-traces.json",
+      "outputDir": "/Users/lzy/pro/solo/workspaces/zy71081/output/dirty-fixed"
+    }
+  },
+  "configValidation": {
+    "valid": true,
+    "errors": [],
+    "warnings": []
+  },
+  "traceAnalysis": {
+    "totalTraces": 6,
+    "totalSpans": 6,
+    "uniqueServices": [
+      "unknown",
+      "API-Gateway",
+      "unknown-service",
+      "api-gateway",
+      "USER-SERVICE",
+      "batch-worker"
+    ],
+    "missingFields": [],
+    "fieldCaseIssues": [
+      {
+        "field": "traceId",
+        "occurrences": 1,
+        "examples": [
+          "traceID"
+        ]
+      },
+      {
+        "field": "spanId",
+        "occurrences": 1,
+        "examples": [
+          "spanID"
+        ]
+      }
+    ]
+  },
+  "samplingResults": {
+    "summary": {
+      "totalEvaluated": 6,
+      "sampled": 1,
+      "dropped": 5,
+      "recordOnly": 0,
+      "sampledPercentage": 16.666666666666664,
+      "droppedPercentage": 83.33333333333334
+    },
+    "byService": {
+      "unknown": {
+        "total": 1,
+        "sampled": 0,
+        "dropped": 1,
+        "sampledPercentage": 0
+      },
+      "API-Gateway": {
+        "total": 1,
+        "sampled": 1,
+        "dropped": 0,
+        "sampledPercentage": 100
+      },
+      "unknown-service": {
+        "total": 1,
+        "sampled": 0,
+        "dropped": 1,
+        "sampledPercentage": 0
+      },
+      "api-gateway": {
+        "total": 1,
+        "sampled": 0,
+        "dropped": 1,
+        "sampledPercentage": 0
+      },
+      "USER-SERVICE": {
+        "total": 1,
+        "sampled": 0,
+        "dropped": 1,
+        "sampledPercentage": 0
+      },
+      "batch-worker": {
+        "total": 1,
+        "sampled": 0,
+        "dropped": 1,
+        "sampledPercentage": 0
+      }
+    },
+    "byRule": {
+      "default": {
+        "matched": 2,
+        "sampled": 0,
+        "dropped": 2,
+        "budgetExhausted": 0
+      },
+      "api-gateway": {
+        "matched": 2,
+        "sampled": 1,
+        "dropped": 1,
+        "budgetExhausted": 0
+      },
+      "user-service": {
+        "matched": 1,
+        "sampled": 0,
+        "dropped": 1,
+        "budgetExhausted": 0
+      },
+      "low-priority-services": {
+        "matched": 1,
+        "sampled": 0,
+        "dropped": 1,
+        "budgetExhausted": 0
+      }
+    },
+    "details": [
+      {
+        "traceId": "00000000000000000000000000000007",
+        "finalDecision": "DROP",
+        "effectiveSamplingRatio": 0.1,
+        "randomNumber": 0.9725556898863772,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": [
+              {
+                "key": "error",
+                "matched": false
+              },
+              {
+                "key": "http.status_code",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "api-gateway",
+            "rulePriority": 50,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [
+              "服务名不匹配: 期望 api-gateway, 实际 [unknown]"
+            ],
+            "serviceNameMatch": false,
+            "attributeMatches": [
+              {
+                "key": "http.method",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "user-service",
+            "rulePriority": 40,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [
+              "服务名模式不匹配: ^user-"
+            ],
+            "serviceNameMatch": false,
+            "attributeMatches": []
+          },
+          {
+            "ruleName": "health-checks",
+            "rulePriority": 30,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": [
+              {
+                "key": "http.route",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "low-priority-services",
+            "rulePriority": 20,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [
+              "服务名模式不匹配: ^(worker|batch)-"
+            ],
+            "serviceNameMatch": false,
+            "attributeMatches": []
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [],
+        "timing": {
+          "evaluationStart": 1779634943798,
+          "evaluationEnd": 1779634943798,
+          "totalDurationMs": 0
+        }
+      },
+      {
+        "traceId": "00000000000000000000000000000006",
+        "finalDecision": "RECORD_AND_SAMPLE",
+        "matchedRule": {
+          "name": "api-gateway",
+          "description": "API 网关采样",
+          "priority": 50,
+          "serviceName": "api-gateway",
+          "attributes": [
+            {
+              "key": "http.method",
+              "value": "POST"
+            }
+          ],
+          "samplingRatio": 0.5,
+          "perSecondLimit": 30,
+          "decision": "RECORD_AND_SAMPLE"
+        },
+        "effectiveSamplingRatio": 0.5,
+        "randomNumber": 0.4732447862232685,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": [
+              {
+                "key": "error",
+                "matched": false
+              },
+              {
+                "key": "http.status_code",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "api-gateway",
+            "rulePriority": 50,
+            "matched": true,
+            "matchReasons": [
+              "服务名匹配: api-gateway",
+              "属性匹配: http.method=POST"
+            ],
+            "mismatchReasons": [],
+            "serviceNameMatch": true,
+            "attributeMatches": [
+              {
+                "key": "http.method",
+                "expected": "POST",
+                "actual": "post",
+                "matched": true,
+                "caseAdjusted": true
+              }
+            ]
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [
+          {
+            "field": "serviceName",
+            "original": "API-Gateway",
+            "adjusted": "api-gateway"
+          }
+        ],
+        "timing": {
+          "evaluationStart": 1779634943798,
+          "evaluationEnd": 1779634943798,
+          "totalDurationMs": 0
+        }
+      },
+      {
+        "traceId": "00000000000000000000000000000008",
+        "finalDecision": "DROP",
+        "effectiveSamplingRatio": 0.1,
+        "randomNumber": 0.9183249970826723,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": [
+              {
+                "key": "error",
+                "matched": false
+              },
+              {
+                "key": "http.status_code",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "api-gateway",
+            "rulePriority": 50,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [
+              "服务名不匹配: 期望 api-gateway, 实际 [unknown-service]"
+            ],
+            "serviceNameMatch": false,
+            "attributeMatches": [
+              {
+                "key": "http.method",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "user-service",
+            "rulePriority": 40,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [
+              "服务名模式不匹配: ^user-"
+            ],
+            "serviceNameMatch": false,
+            "attributeMatches": []
+          },
+          {
+            "ruleName": "health-checks",
+            "rulePriority": 30,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": [
+              {
+                "key": "http.route",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "low-priority-services",
+            "rulePriority": 20,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [
+              "服务名模式不匹配: ^(worker|batch)-"
+            ],
+            "serviceNameMatch": false,
+            "attributeMatches": []
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [],
+        "timing": {
+          "evaluationStart": 1779634943798,
+          "evaluationEnd": 1779634943798,
+          "totalDurationMs": 0
+        }
+      },
+      {
+        "traceId": "00000000000000000000000000000009",
+        "finalDecision": "DROP",
+        "matchedRule": {
+          "name": "api-gateway",
+          "description": "API 网关采样",
+          "priority": 50,
+          "serviceName": "api-gateway",
+          "attributes": [
+            {
+              "key": "http.method",
+              "value": "POST"
+            }
+          ],
+          "samplingRatio": 0.5,
+          "perSecondLimit": 30,
+          "decision": "RECORD_AND_SAMPLE"
+        },
+        "effectiveSamplingRatio": 0.5,
+        "randomNumber": 0.9675925250733481,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": [
+              {
+                "key": "error",
+                "matched": false
+              },
+              {
+                "key": "http.status_code",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "api-gateway",
+            "rulePriority": 50,
+            "matched": true,
+            "matchReasons": [
+              "服务名匹配: api-gateway",
+              "属性匹配: http.method=POST"
+            ],
+            "mismatchReasons": [],
+            "serviceNameMatch": true,
+            "attributeMatches": [
+              {
+                "key": "http.method",
+                "expected": "POST",
+                "actual": "POST",
+                "matched": true,
+                "caseAdjusted": false
+              }
+            ]
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [],
+        "timing": {
+          "evaluationStart": 1779634943798,
+          "evaluationEnd": 1779634943798,
+          "totalDurationMs": 0
+        }
+      },
+      {
+        "traceId": "00000000000000000000000000000010",
+        "finalDecision": "DROP",
+        "matchedRule": {
+          "name": "user-service",
+          "description": "用户服务采样",
+          "priority": 40,
+          "serviceNamePattern": "^user-",
+          "samplingRatio": 0.3,
+          "decision": "RECORD_AND_SAMPLE"
+        },
+        "effectiveSamplingRatio": 0.3,
+        "randomNumber": 0.7974080818269003,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": [
+              {
+                "key": "error",
+                "matched": false
+              },
+              {
+                "key": "http.status_code",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "api-gateway",
+            "rulePriority": 50,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [
+              "服务名不匹配: 期望 api-gateway, 实际 [USER-SERVICE]"
+            ],
+            "serviceNameMatch": false,
+            "attributeMatches": [
+              {
+                "key": "http.method",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "user-service",
+            "rulePriority": 40,
+            "matched": true,
+            "matchReasons": [
+              "服务名模式匹配: ^user-"
+            ],
+            "mismatchReasons": [],
+            "serviceNameMatch": true,
+            "attributeMatches": []
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [],
+        "timing": {
+          "evaluationStart": 1779634943798,
+          "evaluationEnd": 1779634943798,
+          "totalDurationMs": 0
+        }
+      },
+      {
+        "traceId": "00000000000000000000000000000011",
+        "finalDecision": "DROP",
+        "matchedRule": {
+          "name": "low-priority-services",
+          "description": "低优先级服务低采样率",
+          "priority": 20,
+          "serviceNamePattern": "^(worker|batch)-",
+          "samplingRatio": 0.05,
+          "decision": "RECORD_AND_SAMPLE"
+        },
+        "effectiveSamplingRatio": 0.05,
+        "randomNumber": 0.3027357412916024,
+        "ruleEvaluations": [
+          {
+            "ruleName": "error-traces",
+            "rulePriority": 100,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": [
+              {
+                "key": "error",
+                "matched": false
+              },
+              {
+                "key": "http.status_code",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "api-gateway",
+            "rulePriority": 50,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [
+              "服务名不匹配: 期望 api-gateway, 实际 [batch-worker]"
+            ],
+            "serviceNameMatch": false,
+            "attributeMatches": [
+              {
+                "key": "http.method",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "user-service",
+            "rulePriority": 40,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [
+              "服务名模式不匹配: ^user-"
+            ],
+            "serviceNameMatch": false,
+            "attributeMatches": []
+          },
+          {
+            "ruleName": "health-checks",
+            "rulePriority": 30,
+            "matched": false,
+            "matchReasons": [],
+            "mismatchReasons": [],
+            "attributeMatches": [
+              {
+                "key": "http.route",
+                "matched": false
+              }
+            ]
+          },
+          {
+            "ruleName": "low-priority-services",
+            "rulePriority": 20,
+            "matched": true,
+            "matchReasons": [
+              "服务名模式匹配: ^(worker|batch)-"
+            ],
+            "mismatchReasons": [],
+            "serviceNameMatch": true,
+            "attributeMatches": []
+          }
+        ],
+        "droppedDueToBudget": false,
+        "budgetExhausted": false,
+        "missingFields": [],
+        "caseAdjustments": [],
+        "timing": {
+          "evaluationStart": 1779634943798,
+          "evaluationEnd": 1779634943798,
+          "totalDurationMs": 0
+        }
+      }
+    ]
+  },
+  "budgetAnalysis": {
+    "globalBudget": {
+      "limitPerSecond": 100,
+      "allocated": 100,
+      "used": 1,
+      "remaining": 99,
+      "exhausted": false
+    },
+    "ruleBudgets": {
+      "error-traces": {
+        "limitPerSecond": 20,
+        "used": 0,
+        "remaining": 20,
+        "exhausted": false
+      },
+      "api-gateway": {
+        "limitPerSecond": 30,
+        "used": 1,
+        "remaining": 29,
+        "exhausted": false
+      }
+    },
+    "totalTracesEvaluated": 6,
+    "totalTracesSampled": 1,
+    "totalTracesDropped": 5,
+    "effectiveSamplingRate": 0.16666666666666666
+  },
+  "conclusions": {
+    "rootCauses": [
+      {
+        "type": "rule_mismatch",
+        "description": "2 条 trace 未匹配任何采样规则，使用默认策略",
+        "severity": "high",
+        "affectedTraces": 2,
+        "recommendation": "检查采样规则是否覆盖了所有服务，或调整默认采样策略"
+      },
+      {
+        "type": "case_mismatch",
+        "description": "发现字段大小写不一致问题，可能导致规则匹配失败",
+        "severity": "medium",
+        "affectedTraces": 1,
+        "recommendation": "统一字段命名规范，或在配置中设置 caseSensitive: false"
+      },
+      {
+        "type": "sampling_ratio",
+        "description": "部分规则的采样率过低 (< 10%)，导致 1 条 trace 因随机采样被丢弃",
+        "severity": "low",
+        "affectedTraces": 1,
+        "recommendation": "如果需要更高的采样覆盖率，考虑提高关键服务的采样率"
+      }
+    ],
+    "recommendations": [
+      "检查字段大小写一致性，建议使用统一的命名规范",
+      "添加覆盖更多服务的采样规则，或调整默认采样率"
+    ]
+  }
+}
