@@ -22,10 +22,12 @@ var validTransitions = map[string][]StateTransition{
 		{FromState: model.VersionStatusSubmitted, Action: "start_review", ToState: model.VersionStatusReviewing},
 	},
 	model.VersionStatusAutoPass: {
+		{FromState: model.VersionStatusAutoPass, Action: "start_review", ToState: model.VersionStatusReviewing},
 		{FromState: model.VersionStatusAutoPass, Action: "finalize", ToState: model.VersionStatusFinalized},
 		{FromState: model.VersionStatusAutoPass, Action: "reject", ToState: model.VersionStatusRejected},
 	},
 	model.VersionStatusAutoFail: {
+		{FromState: model.VersionStatusAutoFail, Action: "start_review", ToState: model.VersionStatusReviewing},
 		{FromState: model.VersionStatusAutoFail, Action: "need_supplement", ToState: model.VersionStatusNeedSupplement},
 		{FromState: model.VersionStatusAutoFail, Action: "reject", ToState: model.VersionStatusRejected},
 	},

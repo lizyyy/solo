@@ -96,8 +96,10 @@ draft → submit → submitted
 submitted → auto_pass → auto_pass
 submitted → auto_fail → auto_fail
 submitted → start_review → reviewing
+auto_pass → start_review → reviewing
 auto_pass → finalize → finalized
 auto_pass → reject → rejected
+auto_fail → start_review → reviewing
 auto_fail → need_supplement → need_supplement
 auto_fail → reject → rejected
 reviewing → approve → approved
