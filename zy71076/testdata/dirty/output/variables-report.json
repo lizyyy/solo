@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-24T20:42:14.078377+08:00",
+  "generated_at": "2026-05-24T22:58:07.971373+08:00",
   "version": "1.0.0",
   "summary": {
     "TotalVariables": 12,
@@ -30,8 +30,8 @@
           "Type": "multiple_tfvars",
           "Description": "Variable 'app_name' is set in multiple tfvars files",
           "Sources": [
-            "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
-            "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars"
+            "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
+            "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars"
           ],
           "Severity": "warning"
         }
@@ -43,25 +43,25 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "dev-app",
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
+          "source_type": "",
+          "value": "dev-app"
         },
         {
-          "Value": "production-app",
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
+          "source_type": "",
+          "value": "production-app"
         },
         {
-          "Value": "my-app",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
+          "source_type": "",
+          "value": "my-app"
         }
       ]
     },
@@ -76,18 +76,18 @@
       "type": "bool",
       "value_sources": [
         {
-          "Value": true,
-          "Source": "module_input",
-          "SourceFile": "",
-          "SourceType": "module",
-          "Priority": 5
+          "priority": 5,
+          "source": "module_input",
+          "source_file": "",
+          "source_type": "module",
+          "value": true
         },
         {
-          "Value": true,
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf",
+          "source_type": "",
+          "value": true
         }
       ]
     },
@@ -112,18 +112,18 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "production_db",
-          "Source": "module_input",
-          "SourceFile": "",
-          "SourceType": "module",
-          "Priority": 5
+          "priority": 5,
+          "source": "module_input",
+          "source_file": "",
+          "source_type": "module",
+          "value": "production_db"
         },
         {
-          "Value": "appdb",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf",
+          "source_type": "",
+          "value": "appdb"
         }
       ]
     },
@@ -135,8 +135,8 @@
           "Type": "value_override",
           "Description": "Variable 'db_pass' has multiple values, 'module_input' takes precedence",
           "Sources": [
-            "module_input (value: prod-secure-pass-2024)",
-            "default (value: password123)"
+            "module_input (value: p***4)",
+            "default (value: p***3)"
           ],
           "Severity": "info"
         }
@@ -148,18 +148,18 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "prod-secure-pass-2024",
-          "Source": "module_input",
-          "SourceFile": "",
-          "SourceType": "module",
-          "Priority": 5
+          "priority": 5,
+          "source": "module_input",
+          "source_file": "",
+          "source_type": "module",
+          "value": "p***4"
         },
         {
-          "Value": "password123",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf",
+          "source_type": "",
+          "value": "p***3"
         }
       ]
     },
@@ -184,18 +184,18 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "prod_admin",
-          "Source": "module_input",
-          "SourceFile": "",
-          "SourceType": "module",
-          "Priority": 5
+          "priority": 5,
+          "source": "module_input",
+          "source_file": "",
+          "source_type": "module",
+          "value": "prod_admin"
         },
         {
-          "Value": "admin",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf",
+          "source_type": "",
+          "value": "admin"
         }
       ]
     },
@@ -220,18 +220,18 @@
       "type": "number",
       "value_sources": [
         {
-          "Value": 100,
-          "Source": "module_input",
-          "SourceFile": "",
-          "SourceType": "module",
-          "Priority": 5
+          "priority": 5,
+          "source": "module_input",
+          "source_file": "",
+          "source_type": "module",
+          "value": 100
         },
         {
-          "Value": 20,
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf",
+          "source_type": "",
+          "value": 20
         }
       ]
     },
@@ -243,9 +243,9 @@
           "Type": "value_override",
           "Description": "Variable 'db_password' has multiple values, 'environment' takes precedence",
           "Sources": [
-            "environment (value: env-db-pass)",
-            "tfvars (value: dev-pass-12345)",
-            "default (value: changeme)"
+            "environment (value: e***s)",
+            "tfvars (value: d***5)",
+            "default (value: c***e)"
           ],
           "Severity": "info"
         }
@@ -257,25 +257,25 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "env-db-pass",
-          "Source": "environment",
-          "SourceFile": "",
-          "SourceType": "TF_VAR_db_password",
-          "Priority": 15
+          "priority": 15,
+          "source": "environment",
+          "source_file": "",
+          "source_type": "TF_VAR_db_password",
+          "value": "e***s"
         },
         {
-          "Value": "dev-pass-12345",
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
+          "source_type": "",
+          "value": "d***5"
         },
         {
-          "Value": "changeme",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
+          "source_type": "",
+          "value": "c***e"
         }
       ]
     },
@@ -310,25 +310,25 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "development",
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
+          "source_type": "",
+          "value": "development"
         },
         {
-          "Value": "production",
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
+          "source_type": "",
+          "value": "production"
         },
         {
-          "Value": "dev",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
+          "source_type": "",
+          "value": "dev"
         }
       ]
     },
@@ -357,39 +357,39 @@
       "type": "map",
       "value_sources": [
         {
-          "Value": {
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
+          "source_type": "",
+          "value": {
             "beta_api": true,
             "caching": true,
             "new_ui": true
-          },
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          }
         },
         {
-          "Value": {
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
+          "source_type": "",
+          "value": {
             "beta_api": false,
             "caching": true,
             "new_ui": false
-          },
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          }
         }
       ]
     },
     "instance_size": {
       "active_source": "tfvars",
-      "active_source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
+      "active_source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
       "conflicts": [
         {
           "Type": "value_override",
           "Description": "Variable 'instance_size' has multiple values, 'tfvars' takes precedence",
           "Sources": [
-            "tfvars (value: medium)",
             "tfvars (value: large)",
+            "tfvars (value: medium)",
             "default (value: small)"
           ],
           "Severity": "info"
@@ -398,38 +398,38 @@
           "Type": "multiple_tfvars",
           "Description": "Variable 'instance_size' is set in multiple tfvars files",
           "Sources": [
-            "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
-            "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars"
+            "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
+            "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars"
           ],
           "Severity": "warning"
         }
       ],
-      "effective_value": "medium",
+      "effective_value": "large",
       "module_path": "root",
       "name": "instance_size",
       "sensitive": false,
       "type": "string",
       "value_sources": [
         {
-          "Value": "medium",
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
+          "source_type": "",
+          "value": "large"
         },
         {
-          "Value": "large",
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
+          "source_type": "",
+          "value": "medium"
         },
         {
-          "Value": "small",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
+          "source_type": "",
+          "value": "small"
         }
       ]
     },
@@ -464,25 +464,25 @@
       "type": "number",
       "value_sources": [
         {
-          "Value": 1,
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
+          "source_type": "",
+          "value": 1
         },
         {
-          "Value": 3,
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
+          "source_type": "",
+          "value": 3
         },
         {
-          "Value": 1,
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf",
+          "source_type": "",
+          "value": 1
         }
       ]
     },
@@ -497,11 +497,11 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "env-secret-12345",
-          "Source": "environment",
-          "SourceFile": "",
-          "SourceType": "TF_VAR_secret_key",
-          "Priority": 15
+          "priority": 15,
+          "source": "environment",
+          "source_file": "",
+          "source_type": "TF_VAR_secret_key",
+          "value": "e***5"
         }
       ]
     }
@@ -513,6 +513,54 @@
       "Sources": [
         "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/override.tf",
         "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf"
+      ],
+      "Severity": "warning"
+    },
+    {
+      "Type": "value_override",
+      "Description": "Variable 'environment' has multiple values, 'tfvars' takes precedence",
+      "Sources": [
+        "tfvars (value: development)",
+        "tfvars (value: production)",
+        "default (value: dev)"
+      ],
+      "Severity": "info"
+    },
+    {
+      "Type": "multiple_tfvars",
+      "Description": "Variable 'environment' is set in multiple tfvars files",
+      "Sources": [
+        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
+        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars"
+      ],
+      "Severity": "warning"
+    },
+    {
+      "Type": "value_override",
+      "Description": "Variable 'db_password' has multiple values, 'environment' takes precedence",
+      "Sources": [
+        "environment (value: e***s)",
+        "tfvars (value: d***5)",
+        "default (value: c***e)"
+      ],
+      "Severity": "info"
+    },
+    {
+      "Type": "value_override",
+      "Description": "Variable 'instance_size' has multiple values, 'tfvars' takes precedence",
+      "Sources": [
+        "tfvars (value: large)",
+        "tfvars (value: medium)",
+        "default (value: small)"
+      ],
+      "Severity": "info"
+    },
+    {
+      "Type": "multiple_tfvars",
+      "Description": "Variable 'instance_size' is set in multiple tfvars files",
+      "Sources": [
+        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
+        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars"
       ],
       "Severity": "warning"
     },
@@ -558,56 +606,8 @@
       "Type": "multiple_tfvars",
       "Description": "Variable 'app_name' is set in multiple tfvars files",
       "Sources": [
-        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
-        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars"
-      ],
-      "Severity": "warning"
-    },
-    {
-      "Type": "value_override",
-      "Description": "Variable 'environment' has multiple values, 'tfvars' takes precedence",
-      "Sources": [
-        "tfvars (value: development)",
-        "tfvars (value: production)",
-        "default (value: dev)"
-      ],
-      "Severity": "info"
-    },
-    {
-      "Type": "multiple_tfvars",
-      "Description": "Variable 'environment' is set in multiple tfvars files",
-      "Sources": [
-        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
-        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars"
-      ],
-      "Severity": "warning"
-    },
-    {
-      "Type": "value_override",
-      "Description": "Variable 'db_password' has multiple values, 'environment' takes precedence",
-      "Sources": [
-        "environment (value: env-db-pass)",
-        "tfvars (value: dev-pass-12345)",
-        "default (value: changeme)"
-      ],
-      "Severity": "info"
-    },
-    {
-      "Type": "value_override",
-      "Description": "Variable 'instance_size' has multiple values, 'tfvars' takes precedence",
-      "Sources": [
-        "tfvars (value: medium)",
-        "tfvars (value: large)",
-        "default (value: small)"
-      ],
-      "Severity": "info"
-    },
-    {
-      "Type": "multiple_tfvars",
-      "Description": "Variable 'instance_size' is set in multiple tfvars files",
-      "Sources": [
-        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars",
-        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars"
+        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars",
+        "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars"
       ],
       "Severity": "warning"
     },
@@ -624,8 +624,8 @@
       "Type": "value_override",
       "Description": "Variable 'db_pass' has multiple values, 'module_input' takes precedence",
       "Sources": [
-        "module_input (value: prod-secure-pass-2024)",
-        "default (value: password123)"
+        "module_input (value: p***4)",
+        "default (value: p***3)"
       ],
       "Severity": "info"
     },
@@ -653,7 +653,7 @@
     "/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars"
   ],
   "environment_variables": {
-    "TF_VAR_db_password": "env-db-pass",
-    "TF_VAR_secret_key": "env-secret-12345"
+    "TF_VAR_db_password": "e***s",
+    "TF_VAR_secret_key": "e***5"
   }
 }

@@ -1,6 +1,6 @@
 # Terraform 变量溯源报告
 
-**生成时间**: 2026-05-24 20:42:14
+**生成时间**: 2026-05-24 22:58:07
 
 ---
 
@@ -40,7 +40,7 @@
 | `db_password` | `string` | ✅ | `environment` | `e***s` (已遮蔽) | - |
 | `environment` | `string` | ❌ | `tfvars` | `development` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars` |
 | `feature_flags` | `map` | ❌ | `tfvars` | `map[beta_api:true caching:true new_ui:true]` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars` |
-| `instance_size` | `string` | ❌ | `tfvars` | `medium` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars` |
+| `instance_size` | `string` | ❌ | `tfvars` | `large` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars` |
 | `replicas` | `number` | ❌ | `tfvars` | `1` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars` |
 | `secret_key` | `string` | ✅ | `environment` | `e***5` (已遮蔽) | - |
 
@@ -68,7 +68,7 @@
 - **[INFO]** Variable 'app_name' has multiple values, 'tfvars' takes precedence
   - 涉及来源: tfvars (value: dev-app), tfvars (value: production-app), default (value: my-app)
 - **[WARNING]** Variable 'app_name' is set in multiple tfvars files
-  - 涉及来源: /Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars, /Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars
+  - 涉及来源: /Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars, /Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars
 
 ### database.backup_enabled
 
@@ -115,12 +115,12 @@
 | 优先级 | 来源类型 | 值 | 来源文件 |
 |--------|----------|----|----------|
 | 5 | `module_input` | `p***4` | - |
-| 0 | `default` | `p***4` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf` |
+| 0 | `default` | `p***3` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/modules/database/variables.tf` |
 
 #### ⚠️ 检测到的问题
 
 - **[INFO]** Variable 'db_pass' has multiple values, 'module_input' takes precedence
-  - 涉及来源: module_input (value: prod-secure-pass-2024), default (value: password123)
+  - 涉及来源: module_input (value: p***4), default (value: p***3)
 
 ### database.db_user
 
@@ -172,13 +172,13 @@
 | 优先级 | 来源类型 | 值 | 来源文件 |
 |--------|----------|----|----------|
 | 15 | `environment` | `e***s` | - |
-| 10 | `tfvars` | `e***s` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars` |
-| 0 | `default` | `e***s` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf` |
+| 10 | `tfvars` | `d***5` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars` |
+| 0 | `default` | `c***e` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf` |
 
 #### ⚠️ 检测到的问题
 
 - **[INFO]** Variable 'db_password' has multiple values, 'environment' takes precedence
-  - 涉及来源: environment (value: env-db-pass), tfvars (value: dev-pass-12345), default (value: changeme)
+  - 涉及来源: environment (value: e***s), tfvars (value: d***5), default (value: c***e)
 
 ### environment
 
@@ -225,23 +225,23 @@
 
 - **类型**: `string`
 - **敏感变量**: false
-- **当前生效值**: `medium`
+- **当前生效值**: `large`
 - **生效来源**: `tfvars`
 
 #### 所有值来源（按优先级排序）
 
 | 优先级 | 来源类型 | 值 | 来源文件 |
 |--------|----------|----|----------|
-| 10 | `tfvars` | `medium` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars` |
 | 10 | `tfvars` | `large` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars` |
+| 10 | `tfvars` | `medium` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars` |
 | 0 | `default` | `small` | `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf` |
 
 #### ⚠️ 检测到的问题
 
 - **[INFO]** Variable 'instance_size' has multiple values, 'tfvars' takes precedence
-  - 涉及来源: tfvars (value: medium), tfvars (value: large), default (value: small)
+  - 涉及来源: tfvars (value: large), tfvars (value: medium), default (value: small)
 - **[WARNING]** Variable 'instance_size' is set in multiple tfvars files
-  - 涉及来源: /Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars, /Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars
+  - 涉及来源: /Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars, /Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars
 
 ### replicas
 
@@ -286,70 +286,70 @@
 - `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/override.tf`
 - `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/variables.tf`
 
-### 2. [INFO] Variable 'replicas' has multiple values, 'tfvars' takes precedence
-
-**涉及来源:**
-- `tfvars (value: 1)`
-- `tfvars (value: 3)`
-- `default (value: 1)`
-
-### 3. [WARNING] Variable 'replicas' is set in multiple tfvars files
-
-**涉及来源:**
-- `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars`
-- `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars`
-
-### 4. [INFO] Variable 'feature_flags' has multiple values, 'tfvars' takes precedence
-
-**涉及来源:**
-- `tfvars (value: map[beta_api:true caching:true new_ui:true])`
-- `default (value: map[beta_api:false caching:true new_ui:false])`
-
-### 5. [INFO] Variable 'app_name' has multiple values, 'tfvars' takes precedence
-
-**涉及来源:**
-- `tfvars (value: dev-app)`
-- `tfvars (value: production-app)`
-- `default (value: my-app)`
-
-### 6. [WARNING] Variable 'app_name' is set in multiple tfvars files
-
-**涉及来源:**
-- `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars`
-- `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars`
-
-### 7. [INFO] Variable 'environment' has multiple values, 'tfvars' takes precedence
+### 2. [INFO] Variable 'environment' has multiple values, 'tfvars' takes precedence
 
 **涉及来源:**
 - `tfvars (value: development)`
 - `tfvars (value: production)`
 - `default (value: dev)`
 
-### 8. [WARNING] Variable 'environment' is set in multiple tfvars files
+### 3. [WARNING] Variable 'environment' is set in multiple tfvars files
 
 **涉及来源:**
 - `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars`
 - `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars`
 
-### 9. [INFO] Variable 'db_password' has multiple values, 'environment' takes precedence
+### 4. [INFO] Variable 'db_password' has multiple values, 'environment' takes precedence
 
 **涉及来源:**
-- `environment (value: env-db-pass)`
-- `tfvars (value: dev-pass-12345)`
-- `default (value: changeme)`
+- `environment (value: e***s)`
+- `tfvars (value: d***5)`
+- `default (value: c***e)`
 
-### 10. [INFO] Variable 'instance_size' has multiple values, 'tfvars' takes precedence
+### 5. [INFO] Variable 'instance_size' has multiple values, 'tfvars' takes precedence
 
 **涉及来源:**
-- `tfvars (value: medium)`
 - `tfvars (value: large)`
+- `tfvars (value: medium)`
 - `default (value: small)`
 
-### 11. [WARNING] Variable 'instance_size' is set in multiple tfvars files
+### 6. [WARNING] Variable 'instance_size' is set in multiple tfvars files
+
+**涉及来源:**
+- `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars`
+- `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars`
+
+### 7. [INFO] Variable 'replicas' has multiple values, 'tfvars' takes precedence
+
+**涉及来源:**
+- `tfvars (value: 1)`
+- `tfvars (value: 3)`
+- `default (value: 1)`
+
+### 8. [WARNING] Variable 'replicas' is set in multiple tfvars files
 
 **涉及来源:**
 - `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars`
 - `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars`
+
+### 9. [INFO] Variable 'feature_flags' has multiple values, 'tfvars' takes precedence
+
+**涉及来源:**
+- `tfvars (value: map[beta_api:true caching:true new_ui:true])`
+- `default (value: map[beta_api:false caching:true new_ui:false])`
+
+### 10. [INFO] Variable 'app_name' has multiple values, 'tfvars' takes precedence
+
+**涉及来源:**
+- `tfvars (value: dev-app)`
+- `tfvars (value: production-app)`
+- `default (value: my-app)`
+
+### 11. [WARNING] Variable 'app_name' is set in multiple tfvars files
+
+**涉及来源:**
+- `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/terraform.tfvars`
+- `/Users/lzy/pro/solo/workspaces/zy71076/testdata/dirty/dev.tfvars`
 
 ### 12. [INFO] Variable 'db_user' has multiple values, 'module_input' takes precedence
 
@@ -360,8 +360,8 @@
 ### 13. [INFO] Variable 'db_pass' has multiple values, 'module_input' takes precedence
 
 **涉及来源:**
-- `module_input (value: prod-secure-pass-2024)`
-- `default (value: password123)`
+- `module_input (value: p***4)`
+- `default (value: p***3)`
 
 ### 14. [INFO] Variable 'storage_gb' has multiple values, 'module_input' takes precedence
 

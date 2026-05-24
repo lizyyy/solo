@@ -134,29 +134,52 @@ func (r *Reporter) writeJSONReport(result *types.AnalysisResult) error {
 	filename := filepath.Join(r.config.OutputDir, "variables-report.json")
 
 	type JSONOutput struct {
-		GeneratedAt   time.Time              `json:"generated_at"`
-		Version       string                 `json:"version"`
-		Summary       types.Summary          `json:"summary"`
-		Variables     map[string]interface{} `json:"variables"`
-		Conflicts     []types.Conflict       `json:"conflicts"`
-		TFVarsFiles   []string               `json:"tfvars_files"`
-		Environment   map[string]string      `json:"environment_variables"`
+		GeneratedAt time.Time              `json:"generated_at"`
+		Version     string                 `json:"version"`
+		Summary     types.Summary          `json:"summary"`
+		Variables   map[string]interface{} `json:"variables"`
+		Conflicts   []types.Conflict       `json:"conflicts"`
+		TFVarsFiles []string               `json:"tfvars_files"`
+		Environment map[string]string      `json:"environment_variables"`
 	}
 
 	variables := make(map[string]interface{})
 	for name, v := range result.AllVariables {
+		safeValueSources := make([]interface{}, len(v.ValueSources))
+		for i, vs := range v.ValueSources {
+			safeValueSources[i] = map[string]interface{}{
+				"value":       vs.GetDisplayValue(r.config.MaskSensitive),
+				"source":      vs.Source,
+				"source_file": vs.SourceFile,
+				"source_type": vs.SourceType,
+				"priority":    vs.Priority,
+			}
+		}
+
 		varData := map[string]interface{}{
-			"name":              v.Name,
-			"type":              v.Type,
-			"sensitive":         v.Sensitive,
-			"effective_value":   r.getDisplayValue(v),
-			"active_source":     v.ActiveSource,
+			"name":               v.Name,
+			"type":               v.Type,
+			"sensitive":          v.Sensitive,
+			"effective_value":    r.getDisplayValue(v),
+			"active_source":      v.ActiveSource,
 			"active_source_file": v.ActiveSourceFile,
-			"module_path":       v.ModulePath,
-			"conflicts":         v.Conflicts,
-			"value_sources":     v.ValueSources,
+			"module_path":        v.ModulePath,
+			"conflicts":          v.Conflicts,
+			"value_sources":      safeValueSources,
 		}
 		variables[name] = varData
+	}
+
+	safeEnvVars := make(map[string]string)
+	for k, v := range result.EnvironmentVars {
+		if r.config.MaskSensitive {
+			varName := strings.TrimPrefix(k, "TF_VAR_")
+			if variable, ok := result.AllVariables[varName]; ok && variable.Sensitive {
+				safeEnvVars[k] = r.maskValueStr(v)
+				continue
+			}
+		}
+		safeEnvVars[k] = v
 	}
 
 	output := JSONOutput{
@@ -166,7 +189,7 @@ func (r *Reporter) writeJSONReport(result *types.AnalysisResult) error {
 		Variables:   variables,
 		Conflicts:   result.Conflicts,
 		TFVarsFiles: result.TFVarsFiles,
-		Environment: result.EnvironmentVars,
+		Environment: safeEnvVars,
 	}
 
 	data, err := json.MarshalIndent(output, "", "  ")
@@ -180,6 +203,13 @@ func (r *Reporter) writeJSONReport(result *types.AnalysisResult) error {
 
 	fmt.Printf("✅ JSON 报告已生成: %s\n", filename)
 	return nil
+}
+
+func (r *Reporter) maskValueStr(value string) string {
+	if len(value) <= 2 {
+		return "***"
+	}
+	return string(value[0]) + "***" + string(value[len(value)-1])
 }
 
 func (r *Reporter) getDisplayValue(v *types.ResolvedVariable) interface{} {
@@ -268,10 +298,7 @@ func (r *Reporter) writeMarkdownReport(result *types.AnalysisResult) error {
 			sb.WriteString("| 优先级 | 来源类型 | 值 | 来源文件 |\n")
 			sb.WriteString("|--------|----------|----|----------|\n")
 			for _, vs := range v.ValueSources {
-				val := vs.Value
-				if v.Sensitive && r.config.MaskSensitive {
-					val = v.MaskedValue
-				}
+				val := vs.GetDisplayValue(r.config.MaskSensitive)
 				sourceFile := "-"
 				if vs.SourceFile != "" {
 					sourceFile = fmt.Sprintf("`%s`", vs.SourceFile)

@@ -42,41 +42,49 @@ type VariableDefinition struct {
 }
 
 type VariableValue struct {
-	Value      interface{}
-	Source     VariableSource
-	SourceFile string
-	SourceType string
-	Priority   int
+	Value       interface{}
+	MaskedValue string
+	Source      VariableSource
+	SourceFile  string
+	SourceType  string
+	Priority    int
+}
+
+func (vv *VariableValue) GetDisplayValue(mask bool) interface{} {
+	if mask && vv.MaskedValue != "" {
+		return vv.MaskedValue
+	}
+	return vv.Value
 }
 
 type ResolvedVariable struct {
-	Name            string
-	Type            VariableType
-	Sensitive       bool
-	EffectiveValue  interface{}
-	MaskedValue     string
-	ValueSources    []VariableValue
-	ActiveSource    VariableSource
+	Name             string
+	Type             VariableType
+	Sensitive        bool
+	EffectiveValue   interface{}
+	MaskedValue      string
+	ValueSources     []VariableValue
+	ActiveSource     VariableSource
 	ActiveSourceFile string
-	Conflicts       []Conflict
-	ModulePath      string
+	Conflicts        []Conflict
+	ModulePath       string
 }
 
 type Conflict struct {
-	Type         string
-	Description  string
-	Sources      []string
-	Severity     string
+	Type        string
+	Description string
+	Sources     []string
+	Severity    string
 }
 
 type Module struct {
-	Name          string
-	Source        string
-	Path          string
-	Variables     map[string]*ResolvedVariable
-	SubModules    map[string]*Module
+	Name           string
+	Source         string
+	Path           string
+	Variables      map[string]*ResolvedVariable
+	SubModules     map[string]*Module
 	VariableInputs map[string]interface{}
-	SourceFile    string
+	SourceFile     string
 }
 
 type AnalysisResult struct {
@@ -102,16 +110,16 @@ type Summary struct {
 }
 
 type OutputConfig struct {
-	OutputDir     string
-	FormatJSON    bool
+	OutputDir      string
+	FormatJSON     bool
 	FormatMarkdown bool
-	FormatConsole bool
-	MaskSensitive bool
-	Verbose       bool
+	FormatConsole  bool
+	MaskSensitive  bool
+	Verbose        bool
 }
 
 const (
-	ExitSuccess        = 0
+	ExitSuccess         = 0
 	ExitValidationError = 1
 	ExitParseError      = 2
 	ExitConflict        = 3

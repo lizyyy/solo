@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-24T20:41:46.279804+08:00",
+  "generated_at": "2026-05-24T22:59:42.729496+08:00",
   "version": "1.0.0",
   "summary": {
     "TotalVariables": 11,
@@ -23,11 +23,11 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "default-key-123",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "source_type": "",
+          "value": "d***3"
         }
       ]
     },
@@ -42,18 +42,18 @@
       "type": "bool",
       "value_sources": [
         {
-          "Value": true,
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "source_type": "",
+          "value": true
         },
         {
-          "Value": true,
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "source_type": "",
+          "value": true
         }
       ]
     },
@@ -78,18 +78,18 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "production",
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "source_type": "",
+          "value": "production"
         },
         {
-          "Value": "development",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "source_type": "",
+          "value": "development"
         }
       ]
     },
@@ -114,18 +114,18 @@
       "type": "number",
       "value_sources": [
         {
-          "Value": 3,
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "source_type": "",
+          "value": 3
         },
         {
-          "Value": 1,
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "source_type": "",
+          "value": 1
         }
       ]
     },
@@ -150,18 +150,18 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "ecs.c6.large",
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "source_type": "",
+          "value": "ecs.c6.large"
         },
         {
-          "Value": "ecs.t5.large",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "source_type": "",
+          "value": "ecs.t5.large"
         }
       ]
     },
@@ -186,18 +186,18 @@
       "type": "bool",
       "value_sources": [
         {
-          "Value": true,
-          "Source": "module_input",
-          "SourceFile": "",
-          "SourceType": "module",
-          "Priority": 5
+          "priority": 5,
+          "source": "module_input",
+          "source_file": "",
+          "source_type": "module",
+          "value": true
         },
         {
-          "Value": false,
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
+          "source_type": "",
+          "value": false
         }
       ]
     },
@@ -224,22 +224,22 @@
       "type": "map",
       "value_sources": [
         {
-          "Value": {
+          "priority": 5,
+          "source": "module_input",
+          "source_file": "",
+          "source_type": "module",
+          "value": {
             "Project": "production-app"
-          },
-          "Source": "module_input",
-          "SourceFile": "",
-          "SourceType": "module",
-          "Priority": 5
+          }
         },
         {
-          "Value": {
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
+          "source_type": "",
+          "value": {
             "Component": "network"
-          },
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          }
         }
       ]
     },
@@ -264,18 +264,18 @@
       "type": "number",
       "value_sources": [
         {
-          "Value": 3,
-          "Source": "module_input",
-          "SourceFile": "",
-          "SourceType": "module",
-          "Priority": 5
+          "priority": 5,
+          "source": "module_input",
+          "source_file": "",
+          "source_type": "module",
+          "value": 3
         },
         {
-          "Value": 2,
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
+          "source_type": "",
+          "value": 2
         }
       ]
     },
@@ -300,18 +300,18 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "172.16.0.0/16",
-          "Source": "module_input",
-          "SourceFile": "",
-          "SourceType": "module",
-          "Priority": 5
+          "priority": 5,
+          "source": "module_input",
+          "source_file": "",
+          "source_type": "module",
+          "value": "172.16.0.0/16"
         },
         {
-          "Value": "10.0.0.0/16",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
+          "source_type": "",
+          "value": "10.0.0.0/16"
         }
       ]
     },
@@ -336,18 +336,18 @@
       "type": "string",
       "value_sources": [
         {
-          "Value": "cn-shanghai",
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "source_type": "",
+          "value": "cn-shanghai"
         },
         {
-          "Value": "cn-beijing",
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "source_type": "",
+          "value": "cn-beijing"
         }
       ]
     },
@@ -376,25 +376,25 @@
       "type": "map",
       "value_sources": [
         {
-          "Value": {
+          "priority": 10,
+          "source": "tfvars",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "source_type": "",
+          "value": {
             "Env": "prod",
             "Project": "production-app",
             "Tier": "web"
-          },
-          "Source": "tfvars",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
-          "SourceType": "",
-          "Priority": 10
+          }
         },
         {
-          "Value": {
+          "priority": 0,
+          "source": "default",
+          "source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "source_type": "",
+          "value": {
             "Owner": "devops",
             "Project": "demo"
-          },
-          "Source": "default",
-          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
-          "SourceType": "",
-          "Priority": 0
+          }
         }
       ]
     }

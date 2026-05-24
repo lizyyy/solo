@@ -20,9 +20,9 @@ const (
 )
 
 type Tracer struct {
-	parser        *hclparser.Parser
-	moduleCache   map[string]*types.Module
-	envVarPrefix  string
+	parser       *hclparser.Parser
+	moduleCache  map[string]*types.Module
+	envVarPrefix string
 }
 
 func NewTracer() *Tracer {
@@ -130,44 +130,60 @@ func (t *Tracer) resolveVariable(
 	}
 
 	if varDef.Default != nil {
-		resolved.ValueSources = append(resolved.ValueSources, types.VariableValue{
+		vv := types.VariableValue{
 			Value:      varDef.Default,
 			Source:     types.SourceDefault,
 			SourceFile: varDef.SourceFile,
 			Priority:   PriorityDefault,
-		})
+		}
+		if varDef.Sensitive {
+			vv.MaskedValue = t.maskValue(varDef.Default)
+		}
+		resolved.ValueSources = append(resolved.ValueSources, vv)
 	}
 
 	if moduleInputs != nil {
 		if val, ok := moduleInputs[varName]; ok {
-			resolved.ValueSources = append(resolved.ValueSources, types.VariableValue{
+			vv := types.VariableValue{
 				Value:      val,
 				Source:     types.SourceModuleInput,
 				SourceType: "module",
 				Priority:   PriorityModuleInput,
-			})
+			}
+			if varDef.Sensitive {
+				vv.MaskedValue = t.maskValue(val)
+			}
+			resolved.ValueSources = append(resolved.ValueSources, vv)
 		}
 	}
 
 	for tfvarsFile, values := range tfvarsValues {
 		if val, ok := values[varName]; ok {
-			resolved.ValueSources = append(resolved.ValueSources, types.VariableValue{
+			vv := types.VariableValue{
 				Value:      val,
 				Source:     types.SourceTFVars,
 				SourceFile: tfvarsFile,
 				Priority:   PriorityTFVars,
-			})
+			}
+			if varDef.Sensitive {
+				vv.MaskedValue = t.maskValue(val)
+			}
+			resolved.ValueSources = append(resolved.ValueSources, vv)
 		}
 	}
 
 	envVarName := t.envVarPrefix + varName
 	if val, ok := envVars[envVarName]; ok {
-		resolved.ValueSources = append(resolved.ValueSources, types.VariableValue{
+		vv := types.VariableValue{
 			Value:      val,
 			Source:     types.SourceEnvVar,
 			SourceType: envVarName,
 			Priority:   PriorityEnvVar,
-		})
+		}
+		if varDef.Sensitive {
+			vv.MaskedValue = t.maskValue(val)
+		}
+		resolved.ValueSources = append(resolved.ValueSources, vv)
 	}
 
 	sort.Slice(resolved.ValueSources, func(i, j int) bool {
@@ -208,12 +224,16 @@ func (t *Tracer) detectConflicts(resolved *types.ResolvedVariable) {
 	if len(differentSources) > 0 {
 		var sourceDescs []string
 		for _, s := range resolved.ValueSources {
-			desc := fmt.Sprintf("%s (value: %v)", s.Source, s.Value)
+			displayValue := s.Value
+			if resolved.Sensitive && s.MaskedValue != "" {
+				displayValue = s.MaskedValue
+			}
+			desc := fmt.Sprintf("%s (value: %v)", s.Source, displayValue)
 			sourceDescs = append(sourceDescs, desc)
 		}
 
 		resolved.Conflicts = append(resolved.Conflicts, types.Conflict{
-			Type:        "value_override",
+			Type: "value_override",
 			Description: fmt.Sprintf("Variable '%s' has multiple values, '%s' takes precedence",
 				resolved.Name, resolved.ActiveSource),
 			Sources:  sourceDescs,
@@ -224,7 +244,11 @@ func (t *Tracer) detectConflicts(resolved *types.ResolvedVariable) {
 	tfvarsSources := make(map[string][]string)
 	for _, s := range resolved.ValueSources {
 		if s.Source == types.SourceTFVars && s.SourceFile != "" {
-			tfvarsSources[s.SourceFile] = append(tfvarsSources[s.SourceFile], fmt.Sprintf("%v", s.Value))
+			displayValue := s.Value
+			if resolved.Sensitive && s.MaskedValue != "" {
+				displayValue = s.MaskedValue
+			}
+			tfvarsSources[s.SourceFile] = append(tfvarsSources[s.SourceFile], fmt.Sprintf("%v", displayValue))
 		}
 	}
 
