@@ -1,6 +1,5 @@
 import { BarChart3, Activity, Flame, Sliders } from 'lucide-react';
 import { useStore } from '../store/useStore';
-import { pickingOrders, aisles } from '../data/mockData';
 import { getHeatmapColorStops } from '../utils/heatmap';
 import { calculateTotalDistance, calculateAvgSpeed } from '../utils/path';
 import { calculateHeatmap } from '../utils/heatmap';
@@ -12,6 +11,8 @@ export function SidebarRight() {
     setHeatmapIntensity,
     rightPanelOpen,
     selectedOrders,
+    pickingOrders,
+    aisles,
   } = useStore();
 
   const visibleOrders = selectedOrders.length === 0

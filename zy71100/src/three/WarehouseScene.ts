@@ -197,7 +197,38 @@ export class WarehouseScene {
     }
   }
 
-  public updatePaths(selectedOrders: string[], currentTime: number, showPaths: boolean) {
+  public updateData(warehouse: Warehouse, shelves: Shelf[], aisles: Aisle[], orders: PickingOrder[]) {
+    this.warehouse = warehouse;
+    this.shelves = shelves;
+    this.aisles = aisles;
+    this.orders = orders;
+
+    if (this.shelfMeshes) {
+      this.scene.remove(this.shelfMeshes);
+      this.shelfMeshes.geometry.dispose();
+      (this.shelfMeshes.material as THREE.Material).dispose();
+    }
+
+    for (const marker of this.aisleMarkers) {
+      this.scene.remove(marker);
+      marker.geometry.dispose();
+      (marker.material as THREE.Material).dispose();
+    }
+    this.aisleMarkers = [];
+
+    this.createShelves();
+    this.createAisleMarkers();
+
+    this.controls.target.set(warehouse.width / 2, 0, warehouse.depth / 2);
+    this.controls.update();
+  }
+
+  public updatePaths(
+    selectedOrders: string[],
+    currentTime: number,
+    showPaths: boolean,
+    timeRange?: { start: number; end: number }
+  ) {
     for (const line of this.pathLines) {
       this.scene.remove(line);
       line.geometry.dispose();
@@ -212,12 +243,20 @@ export class WarehouseScene {
 
     if (!showPaths) return;
 
-    const ordersToShow = selectedOrders.length === 0
+    let ordersToShow = selectedOrders.length === 0
       ? this.orders
       : this.orders.filter(o => selectedOrders.includes(o.id));
 
+    if (timeRange) {
+      ordersToShow = ordersToShow.filter(
+        o => o.startTime >= timeRange.start && o.endTime <= timeRange.end
+      );
+    }
+
     for (const order of ordersToShow) {
-      const visiblePoints = order.path.filter(p => p.timestamp <= currentTime);
+      const visiblePoints = order.path.filter(
+        p => p.timestamp <= currentTime && (!timeRange || p.timestamp >= timeRange.start)
+      );
       if (visiblePoints.length < 2) continue;
 
       const points = visiblePoints.map(p => new THREE.Vector3(p.x, p.y, p.z));

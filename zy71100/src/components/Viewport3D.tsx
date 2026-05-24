@@ -1,13 +1,17 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { WarehouseScene } from '../three/WarehouseScene';
 import { useStore } from '../store/useStore';
-import { warehouseData, shelves, aisles, pickingOrders } from '../data/mockData';
 import { calculateHeatmap } from '../utils/heatmap';
 
 export function Viewport3D() {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<WarehouseScene | null>(null);
   const {
+    warehouse,
+    shelves,
+    aisles,
+    pickingOrders,
+    dataVersion,
     selectedOrders,
     currentTime,
     showHeatmap,
@@ -28,7 +32,7 @@ export function Viewport3D() {
 
     const scene = new WarehouseScene(
       containerRef.current,
-      warehouseData,
+      warehouse,
       shelves,
       aisles,
       pickingOrders
@@ -44,7 +48,12 @@ export function Viewport3D() {
       scene.dispose();
       sceneRef.current = null;
     };
-  }, [setCameraPosition]);
+  }, []);
+
+  useEffect(() => {
+    if (!sceneRef.current || dataVersion === 0) return;
+    sceneRef.current.updateData(warehouse, shelves, aisles, pickingOrders);
+  }, [dataVersion, warehouse, shelves, aisles, pickingOrders]);
 
   useEffect(() => {
     if (!sceneRef.current) return;
@@ -53,8 +62,8 @@ export function Viewport3D() {
 
   useEffect(() => {
     if (!sceneRef.current) return;
-    sceneRef.current.updatePaths(selectedOrders, currentTime, showPaths);
-  }, [selectedOrders, currentTime, showPaths]);
+    sceneRef.current.updatePaths(selectedOrders, currentTime, showPaths, timeRange);
+  }, [selectedOrders, currentTime, showPaths, timeRange]);
 
   useEffect(() => {
     if (!sceneRef.current) return;
@@ -82,11 +91,12 @@ export function Viewport3D() {
 
     const maxValue = Math.max(...heatmapData.map((d) => d.value), 1);
     sceneRef.current.updateHeatmap(heatmapData, showHeatmap, maxValue);
-  }, [selectedOrders, currentTime, showHeatmap, heatmapIntensity, timeRange]);
+  }, [selectedOrders, currentTime, showHeatmap, heatmapIntensity, timeRange, pickingOrders, aisles]);
 
   return (
     <div
       ref={containerRef}
+      data-viewport="true"
       className="absolute inset-0"
       style={{ top: '56px', bottom: '96px' }}
     />

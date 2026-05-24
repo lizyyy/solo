@@ -1,9 +1,22 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Vector3Tuple, TimeRange } from '../data/types';
-import { defaultTimeRange, viewModes } from '../data/mockData';
+import type { Vector3Tuple, TimeRange, Warehouse, Shelf, Aisle, PickingOrder } from '../data/types';
+import { defaultTimeRange, viewModes, warehouseData, shelves, aisles, pickingOrders } from '../data/mockData';
+
+interface ImportedData {
+  warehouse?: Warehouse;
+  shelves?: Shelf[];
+  aisles?: Aisle[];
+  pickingOrders?: PickingOrder[];
+}
 
 interface AppState {
+  warehouse: Warehouse;
+  shelves: Shelf[];
+  aisles: Aisle[];
+  pickingOrders: PickingOrder[];
+  dataVersion: number;
+
   warehouseLoaded: boolean;
   selectedOrders: string[];
   timeRange: TimeRange;
@@ -36,14 +49,29 @@ interface AppState {
   toggleLeftPanel: () => void;
   toggleRightPanel: () => void;
   setWarehouseLoaded: (loaded: boolean) => void;
+  importData: (data: ImportedData) => void;
+  loadSampleData: () => void;
   resetState: () => void;
 }
 
+const defaultPickingOrders = pickingOrders;
+const allStartTimes = defaultPickingOrders.map((o) => o.startTime);
+const allEndTimes = defaultPickingOrders.map((o) => o.endTime);
+const globalTimeRange: TimeRange = {
+  start: Math.min(...allStartTimes),
+  end: Math.max(...allEndTimes),
+};
+
 const initialState = {
-  warehouseLoaded: false,
+  warehouse: warehouseData,
+  shelves: shelves,
+  aisles: aisles,
+  pickingOrders: defaultPickingOrders,
+  dataVersion: 0,
+  warehouseLoaded: true,
   selectedOrders: [],
-  timeRange: defaultTimeRange,
-  currentTime: defaultTimeRange.start,
+  timeRange: globalTimeRange,
+  currentTime: globalTimeRange.start,
   isPlaying: false,
   playbackSpeed: 1,
   cameraPosition: viewModes.perspective.position,
@@ -106,13 +134,52 @@ export const useStore = create<AppState>()(
 
       setWarehouseLoaded: (loaded) => set({ warehouseLoaded: loaded }),
 
+      importData: (data) =>
+        set((state) => {
+          const newWarehouse = data.warehouse || state.warehouse;
+          const newShelves = data.shelves || state.shelves;
+          const newAisles = data.aisles || state.aisles;
+          const newPickingOrders = data.pickingOrders || state.pickingOrders;
+
+          const startTimes = newPickingOrders.map((o) => o.startTime);
+          const endTimes = newPickingOrders.map((o) => o.endTime);
+          const newTimeRange: TimeRange = {
+            start: Math.min(...startTimes),
+            end: Math.max(...endTimes),
+          };
+
+          return {
+            warehouse: newWarehouse,
+            shelves: newShelves,
+            aisles: newAisles,
+            pickingOrders: newPickingOrders,
+            timeRange: newTimeRange,
+            currentTime: newTimeRange.start,
+            selectedOrders: [],
+            dataVersion: state.dataVersion + 1,
+            warehouseLoaded: true,
+          };
+        }),
+
+      loadSampleData: () =>
+        set({
+          warehouse: warehouseData,
+          shelves: shelves,
+          aisles: aisles,
+          pickingOrders: defaultPickingOrders,
+          timeRange: globalTimeRange,
+          currentTime: globalTimeRange.start,
+          selectedOrders: [],
+          dataVersion: initialState.dataVersion + 1,
+          warehouseLoaded: true,
+        }),
+
       resetState: () => set(initialState),
     }),
     {
       name: 'warehouse-heatmap-storage',
       partialize: (state) => ({
         selectedOrders: state.selectedOrders,
-        timeRange: state.timeRange,
         viewMode: state.viewMode,
         showHeatmap: state.showHeatmap,
         showPaths: state.showPaths,

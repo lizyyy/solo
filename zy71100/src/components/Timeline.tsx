@@ -1,7 +1,6 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useMemo } from 'react';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { useStore } from '../store/useStore';
-import { pickingOrders, defaultTimeRange } from '../data/mockData';
 
 export function Timeline() {
   const {
@@ -12,13 +11,28 @@ export function Timeline() {
     playbackSpeed,
     timeRange,
     setTimeRange,
+    pickingOrders,
   } = useStore();
 
   const progressRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
 
-  const totalDuration = defaultTimeRange.end - defaultTimeRange.start;
-  const progress = ((currentTime - defaultTimeRange.start) / totalDuration) * 100;
+  const dataTimeRange = useMemo(() => {
+    if (pickingOrders.length === 0) {
+      return { start: Date.now(), end: Date.now() + 3600000 };
+    }
+    const startTimes = pickingOrders.map((o) => o.startTime);
+    const endTimes = pickingOrders.map((o) => o.endTime);
+    return {
+      start: Math.min(...startTimes),
+      end: Math.max(...endTimes),
+    };
+  }, [pickingOrders]);
+
+  const totalDuration = dataTimeRange.end - dataTimeRange.start;
+  const progress = totalDuration > 0
+    ? ((currentTime - dataTimeRange.start) / totalDuration) * 100
+    : 0;
 
   const formatTime = (timestamp: number) => {
     return new Date(timestamp).toLocaleTimeString('zh-CN', {
@@ -28,19 +42,25 @@ export function Timeline() {
     });
   };
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    isDragging.current = true;
-    updateTimeFromMouse(e);
-  }, []);
+  const updateTimeFromMouse = useCallback(
+    (e: React.MouseEvent | MouseEvent) => {
+      if (!progressRef.current || totalDuration <= 0) return;
+      const rect = progressRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = Math.max(0, Math.min(1, x / rect.width));
+      const newTime = dataTimeRange.start + percentage * totalDuration;
+      setCurrentTime(newTime);
+    },
+    [setCurrentTime, totalDuration, dataTimeRange]
+  );
 
-  const updateTimeFromMouse = useCallback((e: React.MouseEvent | MouseEvent) => {
-    if (!progressRef.current) return;
-    const rect = progressRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percentage = Math.max(0, Math.min(1, x / rect.width));
-    const newTime = defaultTimeRange.start + percentage * totalDuration;
-    setCurrentTime(newTime);
-  }, [setCurrentTime, totalDuration]);
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      isDragging.current = true;
+      updateTimeFromMouse(e);
+    },
+    [updateTimeFromMouse]
+  );
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -63,28 +83,36 @@ export function Timeline() {
   }, [updateTimeFromMouse]);
 
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying || totalDuration <= 0) return;
 
     const increment = playbackSpeed * 1000;
     const interval = setInterval(() => {
       setCurrentTime((prev) => {
         const next = prev + increment;
-        if (next >= defaultTimeRange.end) {
-          return defaultTimeRange.start;
+        if (next >= dataTimeRange.end) {
+          return dataTimeRange.start;
         }
         return next;
       });
     }, 100);
 
     return () => clearInterval(interval);
-  }, [isPlaying, playbackSpeed, setCurrentTime]);
+  }, [isPlaying, playbackSpeed, setCurrentTime, dataTimeRange, totalDuration]);
 
-  const orderMarkers = pickingOrders.map((order) => ({
-    id: order.id,
-    color: order.color,
-    start: ((order.startTime - defaultTimeRange.start) / totalDuration) * 100,
-    end: ((order.endTime - defaultTimeRange.start) / totalDuration) * 100,
-  }));
+  const orderMarkers = useMemo(
+    () =>
+      pickingOrders.map((order) => ({
+        id: order.id,
+        color: order.color,
+        start: totalDuration > 0
+          ? ((order.startTime - dataTimeRange.start) / totalDuration) * 100
+          : 0,
+        end: totalDuration > 0
+          ? ((order.endTime - dataTimeRange.start) / totalDuration) * 100
+          : 0,
+      })),
+    [pickingOrders, dataTimeRange, totalDuration]
+  );
 
   return (
     <div className="absolute bottom-0 left-0 right-0 h-24 bg-slate-900/95 backdrop-blur-sm border-t border-slate-700 z-20">
@@ -124,7 +152,7 @@ export function Timeline() {
         <div className="flex items-center gap-4 flex-1">
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setCurrentTime(defaultTimeRange.start)}
+              onClick={() => setCurrentTime(dataTimeRange.start)}
               className="p-1.5 rounded hover:bg-slate-700 transition-colors"
               title="回到开始"
             >
@@ -137,7 +165,7 @@ export function Timeline() {
               {isPlaying ? <Pause className="w-5 h-5 text-white" /> : <Play className="w-5 h-5 text-white" />}
             </button>
             <button
-              onClick={() => setCurrentTime(defaultTimeRange.end)}
+              onClick={() => setCurrentTime(dataTimeRange.end)}
               className="p-1.5 rounded hover:bg-slate-700 transition-colors"
               title="跳到结束"
             >
@@ -153,7 +181,7 @@ export function Timeline() {
                     key={marker.id}
                     className="h-3 rounded-full"
                     style={{
-                      width: `${Math.max(marker.end - marker.start, 1)}%`,
+                      width: `${Math.max(marker.end - marker.start, 0.5)}%`,
                       marginLeft: `${marker.start}%`,
                       backgroundColor: marker.color,
                       opacity: 0.6,
@@ -183,9 +211,9 @@ export function Timeline() {
             </div>
 
             <div className="flex justify-between mt-1 text-xs text-slate-500">
-              <span>{formatTime(defaultTimeRange.start)}</span>
-              <span>{formatTime((defaultTimeRange.start + defaultTimeRange.end) / 2)}</span>
-              <span>{formatTime(defaultTimeRange.end)}</span>
+              <span>{formatTime(dataTimeRange.start)}</span>
+              <span>{formatTime((dataTimeRange.start + dataTimeRange.end) / 2)}</span>
+              <span>{formatTime(dataTimeRange.end)}</span>
             </div>
           </div>
         </div>

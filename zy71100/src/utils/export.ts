@@ -1,8 +1,39 @@
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import type { PickingOrder, Aisle, TimeRange, HeatmapCell } from '../data/types';
-import { calculateTotalDistance, calculateAvgSpeed } from './path';
+import type { PickingOrder, Aisle, TimeRange, HeatmapCell, PathPoint } from '../data/types';
 import { calculateHeatmap } from './heatmap';
+
+function calculateFilteredTotalDistance(orders: PickingOrder[], timeRange: TimeRange): number {
+  let total = 0;
+  for (const order of orders) {
+    const filteredPath = order.path.filter(
+      (p) => p.timestamp >= timeRange.start && p.timestamp <= timeRange.end
+    );
+    for (let i = 1; i < filteredPath.length; i++) {
+      const dx = filteredPath[i].x - filteredPath[i - 1].x;
+      const dz = filteredPath[i].z - filteredPath[i - 1].z;
+      total += Math.sqrt(dx * dx + dz * dz);
+    }
+  }
+  return total;
+}
+
+function calculateFilteredAvgSpeed(orders: PickingOrder[], timeRange: TimeRange): number {
+  let totalSpeed = 0;
+  let count = 0;
+
+  for (const order of orders) {
+    const filteredPath = order.path.filter(
+      (p) => p.timestamp >= timeRange.start && p.timestamp <= timeRange.end
+    );
+    for (const point of filteredPath) {
+      totalSpeed += point.speed;
+      count++;
+    }
+  }
+
+  return count > 0 ? totalSpeed / count : 0;
+}
 
 export async function exportReport(
   viewportElement: HTMLElement,
@@ -40,8 +71,8 @@ export async function exportReport(
   pdf.setTextColor(15, 23, 42);
   pdf.text('统计数据', 10, statsY);
 
-  const totalDistance = calculateTotalDistance(orders);
-  const avgSpeed = calculateAvgSpeed(orders);
+  const totalDistance = calculateFilteredTotalDistance(orders, timeRange);
+  const avgSpeed = calculateFilteredAvgSpeed(orders, timeRange);
 
   pdf.setFontSize(10);
   pdf.setTextColor(51, 65, 85);

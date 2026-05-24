@@ -15,11 +15,19 @@ import {
   Upload,
   FileJson,
   FileText,
+  Database,
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { exportReport, exportHeatmapData } from '../utils/export';
-import { pickingOrders, aisles } from '../data/mockData';
 import { calculateHeatmap } from '../utils/heatmap';
+import type { Warehouse, Shelf, Aisle, PickingOrder } from '../data/types';
+
+interface ImportedData {
+  warehouse?: Warehouse;
+  shelves?: Shelf[];
+  aisles?: Aisle[];
+  pickingOrders?: PickingOrder[];
+}
 
 export function Toolbar() {
   const {
@@ -43,12 +51,29 @@ export function Toolbar() {
     heatmapIntensity,
     timeRange,
     selectedOrders,
+    importData,
+    loadSampleData,
+    pickingOrders,
+    aisles,
   } = useStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showViewMenu, setShowViewMenu] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [showImportMenu, setShowImportMenu] = useState(false);
+
+  const validateImportData = (data: unknown): data is ImportedData => {
+    if (!data || typeof data !== 'object') return false;
+    const obj = data as Record<string, unknown>;
+
+    if (obj.warehouse && typeof obj.warehouse !== 'object') return false;
+    if (obj.shelves && !Array.isArray(obj.shelves)) return false;
+    if (obj.aisles && !Array.isArray(obj.aisles)) return false;
+    if (obj.pickingOrders && !Array.isArray(obj.pickingOrders)) return false;
+
+    return true;
+  };
 
   const handleImportData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,14 +82,31 @@ export function Toolbar() {
       reader.onload = (event) => {
         try {
           const data = JSON.parse(event.target?.result as string);
-          console.log('Imported data:', data);
+          if (validateImportData(data)) {
+            importData(data);
+            setShowImportMenu(false);
+          } else {
+            alert('数据格式不正确，请检查导入文件');
+          }
         } catch {
           alert('文件格式错误，请导入有效的 JSON 文件');
         }
       };
       reader.readAsText(file);
     }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
+
+  const visibleOrders = selectedOrders.length === 0
+    ? pickingOrders
+    : pickingOrders.filter((o) => selectedOrders.includes(o.id));
+
+  const timeFilteredOrders = visibleOrders.filter(
+    (order) =>
+      order.startTime >= timeRange.start && order.endTime <= timeRange.end
+  );
 
   return (
     <div className="absolute top-0 left-0 right-0 h-14 bg-slate-900/90 backdrop-blur-sm border-b border-slate-700 flex items-center justify-between px-4 z-20">
@@ -100,6 +142,7 @@ export function Toolbar() {
               setShowSpeedMenu(!showSpeedMenu);
               setShowViewMenu(false);
               setShowExportMenu(false);
+              setShowImportMenu(false);
             }}
             className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded transition-colors text-sm text-slate-200"
           >
@@ -165,6 +208,7 @@ export function Toolbar() {
               setShowViewMenu(!showViewMenu);
               setShowExportMenu(false);
               setShowSpeedMenu(false);
+              setShowImportMenu(false);
             }}
             className="p-2 bg-slate-700 hover:bg-slate-600 rounded transition-colors flex items-center gap-1"
             title="视角切换"
@@ -199,6 +243,7 @@ export function Toolbar() {
               setShowExportMenu(!showExportMenu);
               setShowViewMenu(false);
               setShowSpeedMenu(false);
+              setShowImportMenu(false);
             }}
             className="p-2 bg-slate-700 hover:bg-slate-600 rounded transition-colors"
             title="导出"
@@ -206,15 +251,12 @@ export function Toolbar() {
             <Download className="w-5 h-5 text-slate-300" />
           </button>
           {showExportMenu && (
-            <div className="absolute top-full right-0 mt-1 bg-slate-800 rounded shadow-lg py-1 min-w-44">
+            <div className="absolute top-full right-0 mt-1 bg-slate-800 rounded shadow-lg py-1 min-w-44 z-30">
               <button
                 onClick={() => {
-                  const viewport = document.querySelector('[class*="absolute inset-0"]') as HTMLElement;
+                  const viewport = document.querySelector('[data-viewport]') as HTMLElement;
                   if (viewport) {
-                    const visibleOrders = selectedOrders.length === 0
-                      ? pickingOrders
-                      : pickingOrders.filter((o) => selectedOrders.includes(o.id));
-                    exportReport(viewport, visibleOrders, aisles, timeRange, heatmapIntensity);
+                    exportReport(viewport, timeFilteredOrders, aisles, timeRange, heatmapIntensity);
                   }
                   setShowExportMenu(false);
                 }}
@@ -225,10 +267,7 @@ export function Toolbar() {
               </button>
               <button
                 onClick={() => {
-                  const visibleOrders = selectedOrders.length === 0
-                    ? pickingOrders
-                    : pickingOrders.filter((o) => selectedOrders.includes(o.id));
-                  const heatmapData = calculateHeatmap(visibleOrders, aisles, timeRange, 1, heatmapIntensity);
+                  const heatmapData = calculateHeatmap(timeFilteredOrders, aisles, timeRange, 1, heatmapIntensity);
                   exportHeatmapData(heatmapData, timeRange);
                   setShowExportMenu(false);
                 }}
@@ -241,20 +280,48 @@ export function Toolbar() {
           )}
         </div>
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json"
-          onChange={handleImportData}
-          className="hidden"
-        />
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="p-2 bg-slate-700 hover:bg-slate-600 rounded transition-colors"
-          title="导入数据"
-        >
-          <Upload className="w-5 h-5 text-slate-300" />
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => {
+              setShowImportMenu(!showImportMenu);
+              setShowExportMenu(false);
+              setShowViewMenu(false);
+              setShowSpeedMenu(false);
+            }}
+            className="p-2 bg-slate-700 hover:bg-slate-600 rounded transition-colors"
+            title="导入数据"
+          >
+            <Upload className="w-5 h-5 text-slate-300" />
+          </button>
+          {showImportMenu && (
+            <div className="absolute top-full right-0 mt-1 bg-slate-800 rounded shadow-lg py-1 min-w-44 z-30">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleImportData}
+                className="hidden"
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full px-4 py-1.5 text-left text-sm hover:bg-slate-700 text-slate-300 flex items-center gap-2"
+              >
+                <FileJson className="w-4 h-4" />
+                导入 JSON 数据
+              </button>
+              <button
+                onClick={() => {
+                  loadSampleData();
+                  setShowImportMenu(false);
+                }}
+                className="w-full px-4 py-1.5 text-left text-sm hover:bg-slate-700 text-slate-300 flex items-center gap-2"
+              >
+                <Database className="w-4 h-4" />
+                加载样例数据
+              </button>
+            </div>
+          )}
+        </div>
 
         <div className="h-6 w-px bg-slate-700 mx-1" />
 

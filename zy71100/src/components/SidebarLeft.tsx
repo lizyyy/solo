@@ -1,10 +1,9 @@
 import { Package, Truck, Filter, Check } from 'lucide-react';
 import { useStore } from '../store/useStore';
-import { pickingOrders, aisles } from '../data/mockData';
 import { cn } from '../lib/utils';
 
 export function SidebarLeft() {
-  const { selectedOrders, selectOrder, clearSelection, timeRange, setTimeRange, leftPanelOpen } = useStore();
+  const { selectedOrders, selectOrder, clearSelection, timeRange, setTimeRange, leftPanelOpen, pickingOrders, aisles } = useStore();
 
   const vehicleTypeLabels: Record<string, string> = {
     forklift: '叉车',
