@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node src/cli.js",
     "test": "node tests/run-tests.js",
-    "lint": "node --check src/**/*.js"
+    "lint": "node scripts/lint.js"
   },
   "keywords": [
     "ical",
