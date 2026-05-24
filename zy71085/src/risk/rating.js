@@ -179,41 +179,48 @@ function getGroupRiskAssessment (groupId) {
 }
 
 function generateRiskReport (ratedDiff) {
+  const risk = ratedDiff.summary.risk || {
+    addedByLevel: { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, UNKNOWN: 0 },
+    removedByLevel: { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, UNKNOWN: 0 },
+    hasHighAdded: false,
+    highestAddedRisk: null
+  }
+
   const report = {
     overall: {
-      hasHighRiskChanges: ratedDiff.summary.risk.hasHighAdded,
-      highestAddedRisk: ratedDiff.summary.risk.highestAddedRisk,
-      needsReview: ratedDiff.summary.risk.hasHighAdded || ratedDiff.summary.addedByLevel.UNKNOWN > 0
+      hasHighRiskChanges: risk.hasHighAdded || false,
+      highestAddedRisk: risk.highestAddedRisk || null,
+      needsReview: (risk.hasHighAdded || false) || (risk.addedByLevel.UNKNOWN || 0) > 0
     },
     critical: {
       added: ratedDiff.added.filter(i => i.risk.key === 'CRITICAL'),
       removed: ratedDiff.removed.filter(i => i.risk.key === 'CRITICAL'),
-      addedCount: ratedDiff.summary.risk.addedByLevel.CRITICAL,
-      removedCount: ratedDiff.summary.risk.removedByLevel.CRITICAL
+      addedCount: risk.addedByLevel.CRITICAL || 0,
+      removedCount: risk.removedByLevel.CRITICAL || 0
     },
     high: {
       added: ratedDiff.added.filter(i => i.risk.key === 'HIGH'),
       removed: ratedDiff.removed.filter(i => i.risk.key === 'HIGH'),
-      addedCount: ratedDiff.summary.risk.addedByLevel.HIGH,
-      removedCount: ratedDiff.summary.risk.removedByLevel.HIGH
+      addedCount: risk.addedByLevel.HIGH || 0,
+      removedCount: risk.removedByLevel.HIGH || 0
     },
     medium: {
       added: ratedDiff.added.filter(i => i.risk.key === 'MEDIUM'),
       removed: ratedDiff.removed.filter(i => i.risk.key === 'MEDIUM'),
-      addedCount: ratedDiff.summary.risk.addedByLevel.MEDIUM,
-      removedCount: ratedDiff.summary.risk.removedByLevel.MEDIUM
+      addedCount: risk.addedByLevel.MEDIUM || 0,
+      removedCount: risk.removedByLevel.MEDIUM || 0
     },
     low: {
       added: ratedDiff.added.filter(i => i.risk.key === 'LOW'),
       removed: ratedDiff.removed.filter(i => i.risk.key === 'LOW'),
-      addedCount: ratedDiff.summary.risk.addedByLevel.LOW,
-      removedCount: ratedDiff.summary.risk.removedByLevel.LOW
+      addedCount: risk.addedByLevel.LOW || 0,
+      removedCount: risk.removedByLevel.LOW || 0
     },
     unknown: {
       added: ratedDiff.added.filter(i => i.risk.key === 'UNKNOWN'),
       removed: ratedDiff.removed.filter(i => i.risk.key === 'UNKNOWN'),
-      addedCount: ratedDiff.summary.risk.addedByLevel.UNKNOWN,
-      removedCount: ratedDiff.summary.risk.removedByLevel.UNKNOWN
+      addedCount: risk.addedByLevel.UNKNOWN || 0,
+      removedCount: risk.removedByLevel.UNKNOWN || 0
     }
   }
 

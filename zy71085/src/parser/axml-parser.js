@@ -45,8 +45,8 @@ class AxmlParser {
     this.offset = 0
     this.stringPool = []
     this.resourceIds = []
-    this.result = { manifest: {} }
-    this.elementStack = [this.result.manifest]
+    this.manifest = { $: {} }
+    this.elementStack = [this.manifest]
   }
 
   readInt32 () {
@@ -168,8 +168,7 @@ class AxmlParser {
     const tagName = this.stringPool[nameIdx] || 'unknown'
 
     const element = {
-      $: {},
-      _children: []
+      $: {}
     }
 
     for (let i = 0; i < attributeCount; i++) {
@@ -190,7 +189,7 @@ class AxmlParser {
 
       if (attrNs !== 0xFFFFFFFF) {
         const ns = this.stringPool[attrNs] || ''
-        if (ns.includes('android.com')) {
+        if (ns.includes('android.com') || ns === 'http://schemas.android.com/apk/res/android') {
           attrName = `android:${attrName}`
         }
       }
@@ -300,27 +299,7 @@ class AxmlParser {
       }
     }
 
-    return this.normalizeResult(this.result.manifest)
-  }
-
-  normalizeResult (obj) {
-    if (obj && obj.$ && Object.keys(obj.$).length === 0) {
-      delete obj.$
-    }
-
-    if (obj && obj._children) {
-      delete obj._children
-    }
-
-    for (const key in obj) {
-      if (Array.isArray(obj[key])) {
-        obj[key].forEach(item => this.normalizeResult(item))
-      } else if (typeof obj[key] === 'object') {
-        this.normalizeResult(obj[key])
-      }
-    }
-
-    return obj
+    return this.manifest
   }
 }
 
