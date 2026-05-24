@@ -1,0 +1,18 @@
+package com.ski.rental.enums;
+
+public enum RentalStatus {
+    PENDING_SUBMIT,
+    PARAMS_VALIDATING,
+    PARAMS_MISMATCH,
+    RENTAL_READY,
+    RENTED,
+    RETURN_PENDING,
+    RETURN_INSPECTING,
+    DAMAGE_FOUND,
+    DAMAGE_REVIEWING,
+    DAMAGE_CONFIRMED,
+    FEE_CHARGED,
+    COMPLETED,
+    ARCHIVED,
+    CANCELLED
+}
