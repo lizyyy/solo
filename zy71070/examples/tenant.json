@@ -1,0 +1,25 @@
+{
+  "appName": "Tenant App - ACME Corp",
+  "port": 9000,
+  "Database": {
+    "host": "tenant-db.acme.com",
+    "username": "acme_user",
+    "password": null
+  },
+  "features": {
+    "notifications": false,
+    "billing": true
+  },
+  "allowedOrigins": [
+    "https://acme.app.com"
+  ],
+  "rateLimit": {
+    "max": 500
+  },
+  "apiKeys": {
+    "stripe": null,
+    "sendgrid": "SG.tenant_abc123"
+  },
+  "tenantId": "acme_001",
+  "customDomain": "app.acme.com"
+}

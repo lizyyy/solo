@@ -1,0 +1,29 @@
+{
+  "name": "config-merge-trace",
+  "version": "1.0.0",
+  "description": "JSON配置合并轨迹CLI工具 - 追踪多层配置合并过程",
+  "main": "src/index.js",
+  "bin": {
+    "config-trace": "./bin/config-trace.js"
+  },
+  "scripts": {
+    "test": "node examples/run-example.js",
+    "lint": "node --check src/**/*.js"
+  },
+  "keywords": [
+    "config",
+    "merge",
+    "trace",
+    "json",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

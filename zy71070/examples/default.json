@@ -1,0 +1,31 @@
+{
+  "appName": "MyApp",
+  "debug": false,
+  "port": 3000,
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "app_db",
+    "username": "admin",
+    "password": "default_pass",
+    "poolSize": 10
+  },
+  "features": {
+    "auth": true,
+    "cache": false,
+    "notifications": true
+  },
+  "allowedOrigins": [
+    "http://localhost:3000",
+    "http://localhost:8080"
+  ],
+  "logLevel": "info",
+  "rateLimit": {
+    "max": 1000,
+    "windowMs": 60000
+  },
+  "apiKeys": {
+    "stripe": "default_key",
+    "sendgrid": "default_key"
+  }
+}

@@ -1,0 +1,1099 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-24T12:27:38.706Z",
+    "options": {
+      "arrayMerge": "replace",
+      "caseSensitive": false
+    }
+  },
+  "mergedConfig": {
+    "appName": "Tenant App - ACME Corp",
+    "debug": true,
+    "port": 9000,
+    "database": {
+      "host": "tenant-db.acme.com",
+      "port": 5432,
+      "database": "app_db",
+      "username": "acme_user",
+      "password": null,
+      "poolSize": 20
+    },
+    "features": {
+      "auth": true,
+      "cache": true,
+      "notifications": false,
+      "billing": true
+    },
+    "allowedOrigins": [
+      "https://acme.app.com"
+    ],
+    "logLevel": "warn",
+    "rateLimit": {
+      "max": 500,
+      "windowMs": 60000
+    },
+    "apiKeys": {
+      "stripe": null,
+      "sendgrid": "SG.tenant_abc123"
+    },
+    "tenantId": "acme_001",
+    "customDomain": "app.acme.com"
+  },
+  "traceMap": {
+    "appName": {
+      "path": "appName",
+      "layers": {
+        "default": {
+          "value": "MyApp",
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "appName"
+        },
+        "tenant": {
+          "value": "Tenant App - ACME Corp",
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "appName"
+        }
+      },
+      "finalValue": "Tenant App - ACME Corp",
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "value_override",
+      "overridden": true,
+      "previousValue": "MyApp"
+    },
+    "debug": {
+      "path": "debug",
+      "layers": {
+        "default": {
+          "value": false,
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "debug"
+        },
+        "env": {
+          "value": true,
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "debug"
+        }
+      },
+      "finalValue": true,
+      "finalLayer": "env",
+      "conflict": false,
+      "overrideType": "value_override",
+      "overridden": true,
+      "previousValue": false
+    },
+    "port": {
+      "path": "port",
+      "layers": {
+        "default": {
+          "value": 3000,
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "port"
+        },
+        "env": {
+          "value": 8080,
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "port"
+        },
+        "tenant": {
+          "value": 9000,
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "port"
+        }
+      },
+      "finalValue": 9000,
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "value_override",
+      "overridden": true,
+      "previousValue": 8080
+    },
+    "database.host": {
+      "path": "database.host",
+      "layers": {
+        "default": {
+          "value": "localhost",
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "host"
+        },
+        "env": {
+          "value": "prod-db.example.com",
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "host"
+        },
+        "tenant": {
+          "value": "tenant-db.acme.com",
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "host"
+        }
+      },
+      "finalValue": "tenant-db.acme.com",
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "value_override",
+      "overridden": true,
+      "previousValue": "prod-db.example.com"
+    },
+    "database.port": {
+      "path": "database.port",
+      "layers": {
+        "default": {
+          "value": 5432,
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "port"
+        }
+      },
+      "finalValue": 5432,
+      "finalLayer": "default",
+      "conflict": false,
+      "overrideType": "new_value"
+    },
+    "database.database": {
+      "path": "database.database",
+      "layers": {
+        "default": {
+          "value": "app_db",
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "database"
+        }
+      },
+      "finalValue": "app_db",
+      "finalLayer": "default",
+      "conflict": false,
+      "overrideType": "new_value"
+    },
+    "database.username": {
+      "path": "database.username",
+      "layers": {
+        "default": {
+          "value": "admin",
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "username"
+        },
+        "tenant": {
+          "value": "acme_user",
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "username"
+        }
+      },
+      "finalValue": "acme_user",
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "value_override",
+      "overridden": true,
+      "previousValue": "admin"
+    },
+    "database.password": {
+      "path": "database.password",
+      "layers": {
+        "default": {
+          "value": "default_pass",
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "password"
+        },
+        "env": {
+          "value": "env_secret_123",
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "password"
+        },
+        "tenant": {
+          "value": null,
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "password"
+        }
+      },
+      "finalValue": null,
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "null_override",
+      "overridden": true,
+      "previousValue": "default_pass"
+    },
+    "database.poolSize": {
+      "path": "database.poolSize",
+      "layers": {
+        "default": {
+          "value": 10,
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "poolSize"
+        },
+        "env": {
+          "value": 20,
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "poolSize"
+        }
+      },
+      "finalValue": 20,
+      "finalLayer": "env",
+      "conflict": false,
+      "overrideType": "value_override",
+      "overridden": true,
+      "previousValue": 10
+    },
+    "database": {
+      "path": "database",
+      "layers": {
+        "default": {
+          "value": {
+            "host": "localhost",
+            "port": 5432,
+            "database": "app_db",
+            "username": "admin",
+            "password": "default_pass",
+            "poolSize": 10
+          },
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "database"
+        },
+        "env": {
+          "value": {
+            "host": "prod-db.example.com",
+            "password": "env_secret_123",
+            "poolSize": 20
+          },
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "database"
+        },
+        "tenant": {
+          "value": {
+            "host": "tenant-db.acme.com",
+            "username": "acme_user",
+            "password": null
+          },
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "Database"
+        }
+      },
+      "finalValue": {
+        "host": "tenant-db.acme.com",
+        "port": 5432,
+        "database": "app_db",
+        "username": "acme_user",
+        "password": null,
+        "poolSize": 20
+      },
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "object_merge"
+    },
+    "features.auth": {
+      "path": "features.auth",
+      "layers": {
+        "default": {
+          "value": true,
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "auth"
+        }
+      },
+      "finalValue": true,
+      "finalLayer": "default",
+      "conflict": false,
+      "overrideType": "new_value"
+    },
+    "features.cache": {
+      "path": "features.cache",
+      "layers": {
+        "default": {
+          "value": false,
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "cache"
+        },
+        "env": {
+          "value": true,
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "cache"
+        }
+      },
+      "finalValue": true,
+      "finalLayer": "env",
+      "conflict": false,
+      "overrideType": "value_override",
+      "overridden": true,
+      "previousValue": false
+    },
+    "features.notifications": {
+      "path": "features.notifications",
+      "layers": {
+        "default": {
+          "value": true,
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "notifications"
+        },
+        "tenant": {
+          "value": false,
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "notifications"
+        }
+      },
+      "finalValue": false,
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "value_override",
+      "overridden": true,
+      "previousValue": true
+    },
+    "features": {
+      "path": "features",
+      "layers": {
+        "default": {
+          "value": {
+            "auth": true,
+            "cache": false,
+            "notifications": true
+          },
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "features"
+        },
+        "env": {
+          "value": {
+            "cache": true
+          },
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "features"
+        },
+        "tenant": {
+          "value": {
+            "notifications": false,
+            "billing": true
+          },
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "features"
+        }
+      },
+      "finalValue": {
+        "auth": true,
+        "cache": true,
+        "notifications": false,
+        "billing": true
+      },
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "object_merge"
+    },
+    "allowedOrigins": {
+      "path": "allowedOrigins",
+      "layers": {
+        "default": {
+          "value": [
+            "http://localhost:3000",
+            "http://localhost:8080"
+          ],
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "allowedOrigins"
+        },
+        "env": {
+          "value": [
+            "https://app.example.com",
+            "https://admin.example.com"
+          ],
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "allowedOrigins"
+        },
+        "tenant": {
+          "value": [
+            "https://acme.app.com"
+          ],
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "allowedOrigins"
+        }
+      },
+      "finalValue": [
+        "https://acme.app.com"
+      ],
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "array_replace"
+    },
+    "logLevel": {
+      "path": "logLevel",
+      "layers": {
+        "default": {
+          "value": "info",
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "logLevel"
+        },
+        "env": {
+          "value": "warn",
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "logLevel"
+        }
+      },
+      "finalValue": "warn",
+      "finalLayer": "env",
+      "conflict": false,
+      "overrideType": "value_override",
+      "overridden": true,
+      "previousValue": "info"
+    },
+    "rateLimit.max": {
+      "path": "rateLimit.max",
+      "layers": {
+        "default": {
+          "value": 1000,
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "max"
+        },
+        "tenant": {
+          "value": 500,
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "max"
+        }
+      },
+      "finalValue": 500,
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "value_override",
+      "overridden": true,
+      "previousValue": 1000
+    },
+    "rateLimit.windowMs": {
+      "path": "rateLimit.windowMs",
+      "layers": {
+        "default": {
+          "value": 60000,
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "windowMs"
+        }
+      },
+      "finalValue": 60000,
+      "finalLayer": "default",
+      "conflict": false,
+      "overrideType": "new_value"
+    },
+    "rateLimit": {
+      "path": "rateLimit",
+      "layers": {
+        "default": {
+          "value": {
+            "max": 1000,
+            "windowMs": 60000
+          },
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "rateLimit"
+        },
+        "tenant": {
+          "value": {
+            "max": 500
+          },
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "rateLimit"
+        }
+      },
+      "finalValue": {
+        "max": 500,
+        "windowMs": 60000
+      },
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "object_merge"
+    },
+    "apiKeys.stripe": {
+      "path": "apiKeys.stripe",
+      "layers": {
+        "default": {
+          "value": "default_key",
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "stripe"
+        },
+        "env": {
+          "value": "sk_live_env_12345",
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "stripe"
+        },
+        "tenant": {
+          "value": null,
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "stripe"
+        }
+      },
+      "finalValue": null,
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "null_override",
+      "overridden": true,
+      "previousValue": "default_key"
+    },
+    "apiKeys.sendgrid": {
+      "path": "apiKeys.sendgrid",
+      "layers": {
+        "default": {
+          "value": "default_key",
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "sendgrid"
+        },
+        "tenant": {
+          "value": "SG.tenant_abc123",
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "sendgrid"
+        }
+      },
+      "finalValue": "SG.tenant_abc123",
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "value_override",
+      "overridden": true,
+      "previousValue": "default_key"
+    },
+    "apiKeys": {
+      "path": "apiKeys",
+      "layers": {
+        "default": {
+          "value": {
+            "stripe": "default_key",
+            "sendgrid": "default_key"
+          },
+          "layer": "default",
+          "layerLabel": "默认值",
+          "key": "apiKeys"
+        },
+        "env": {
+          "value": {
+            "stripe": "sk_live_env_12345"
+          },
+          "layer": "env",
+          "layerLabel": "环境配置",
+          "key": "apiKeys"
+        },
+        "tenant": {
+          "value": {
+            "stripe": null,
+            "sendgrid": "SG.tenant_abc123"
+          },
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "apiKeys"
+        }
+      },
+      "finalValue": {
+        "stripe": null,
+        "sendgrid": "SG.tenant_abc123"
+      },
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "object_merge"
+    },
+    "features.billing": {
+      "path": "features.billing",
+      "layers": {
+        "tenant": {
+          "value": true,
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "billing"
+        }
+      },
+      "finalValue": true,
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "new_value"
+    },
+    "tenantId": {
+      "path": "tenantId",
+      "layers": {
+        "tenant": {
+          "value": "acme_001",
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "tenantId"
+        }
+      },
+      "finalValue": "acme_001",
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "new_value"
+    },
+    "customDomain": {
+      "path": "customDomain",
+      "layers": {
+        "tenant": {
+          "value": "app.acme.com",
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "customDomain"
+        }
+      },
+      "finalValue": "app.acme.com",
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "new_value"
+    }
+  },
+  "conflicts": {
+    "conflicts": [
+      {
+        "type": "override",
+        "path": "appName",
+        "finalValue": "Tenant App - ACME Corp",
+        "finalLayer": "tenant",
+        "finalLayerLabel": "租户配置",
+        "overrideType": "value_override",
+        "overrideTypeLabel": "值覆盖",
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": "MyApp",
+            "key": "appName",
+            "isFinal": false
+          },
+          {
+            "layer": "tenant",
+            "layerLabel": "租户配置",
+            "value": "Tenant App - ACME Corp",
+            "key": "appName",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "override",
+        "path": "debug",
+        "finalValue": true,
+        "finalLayer": "env",
+        "finalLayerLabel": "环境配置",
+        "overrideType": "value_override",
+        "overrideTypeLabel": "值覆盖",
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": false,
+            "key": "debug",
+            "isFinal": false
+          },
+          {
+            "layer": "env",
+            "layerLabel": "环境配置",
+            "value": true,
+            "key": "debug",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "override",
+        "path": "port",
+        "finalValue": 9000,
+        "finalLayer": "tenant",
+        "finalLayerLabel": "租户配置",
+        "overrideType": "value_override",
+        "overrideTypeLabel": "值覆盖",
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": 3000,
+            "key": "port",
+            "isFinal": false
+          },
+          {
+            "layer": "env",
+            "layerLabel": "环境配置",
+            "value": 8080,
+            "key": "port",
+            "isFinal": false
+          },
+          {
+            "layer": "tenant",
+            "layerLabel": "租户配置",
+            "value": 9000,
+            "key": "port",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "override",
+        "path": "database.host",
+        "finalValue": "tenant-db.acme.com",
+        "finalLayer": "tenant",
+        "finalLayerLabel": "租户配置",
+        "overrideType": "value_override",
+        "overrideTypeLabel": "值覆盖",
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": "localhost",
+            "key": "host",
+            "isFinal": false
+          },
+          {
+            "layer": "env",
+            "layerLabel": "环境配置",
+            "value": "prod-db.example.com",
+            "key": "host",
+            "isFinal": false
+          },
+          {
+            "layer": "tenant",
+            "layerLabel": "租户配置",
+            "value": "tenant-db.acme.com",
+            "key": "host",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "override",
+        "path": "database.username",
+        "finalValue": "acme_user",
+        "finalLayer": "tenant",
+        "finalLayerLabel": "租户配置",
+        "overrideType": "value_override",
+        "overrideTypeLabel": "值覆盖",
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": "admin",
+            "key": "username",
+            "isFinal": false
+          },
+          {
+            "layer": "tenant",
+            "layerLabel": "租户配置",
+            "value": "acme_user",
+            "key": "username",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "null_override",
+        "path": "database.password",
+        "finalValue": null,
+        "finalLayer": "tenant",
+        "finalLayerLabel": "租户配置",
+        "overrideType": "null_override",
+        "overrideTypeLabel": "NULL覆盖",
+        "overriddenValues": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": "default_pass"
+          },
+          {
+            "layer": "env",
+            "layerLabel": "环境配置",
+            "value": "env_secret_123"
+          }
+        ],
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": "default_pass",
+            "key": "password",
+            "isFinal": false
+          },
+          {
+            "layer": "env",
+            "layerLabel": "环境配置",
+            "value": "env_secret_123",
+            "key": "password",
+            "isFinal": false
+          },
+          {
+            "layer": "tenant",
+            "layerLabel": "租户配置",
+            "value": null,
+            "key": "password",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "override",
+        "path": "database.poolSize",
+        "finalValue": 20,
+        "finalLayer": "env",
+        "finalLayerLabel": "环境配置",
+        "overrideType": "value_override",
+        "overrideTypeLabel": "值覆盖",
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": 10,
+            "key": "poolSize",
+            "isFinal": false
+          },
+          {
+            "layer": "env",
+            "layerLabel": "环境配置",
+            "value": 20,
+            "key": "poolSize",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "override",
+        "path": "features.cache",
+        "finalValue": true,
+        "finalLayer": "env",
+        "finalLayerLabel": "环境配置",
+        "overrideType": "value_override",
+        "overrideTypeLabel": "值覆盖",
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": false,
+            "key": "cache",
+            "isFinal": false
+          },
+          {
+            "layer": "env",
+            "layerLabel": "环境配置",
+            "value": true,
+            "key": "cache",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "override",
+        "path": "features.notifications",
+        "finalValue": false,
+        "finalLayer": "tenant",
+        "finalLayerLabel": "租户配置",
+        "overrideType": "value_override",
+        "overrideTypeLabel": "值覆盖",
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": true,
+            "key": "notifications",
+            "isFinal": false
+          },
+          {
+            "layer": "tenant",
+            "layerLabel": "租户配置",
+            "value": false,
+            "key": "notifications",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "override",
+        "path": "logLevel",
+        "finalValue": "warn",
+        "finalLayer": "env",
+        "finalLayerLabel": "环境配置",
+        "overrideType": "value_override",
+        "overrideTypeLabel": "值覆盖",
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": "info",
+            "key": "logLevel",
+            "isFinal": false
+          },
+          {
+            "layer": "env",
+            "layerLabel": "环境配置",
+            "value": "warn",
+            "key": "logLevel",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "override",
+        "path": "rateLimit.max",
+        "finalValue": 500,
+        "finalLayer": "tenant",
+        "finalLayerLabel": "租户配置",
+        "overrideType": "value_override",
+        "overrideTypeLabel": "值覆盖",
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": 1000,
+            "key": "max",
+            "isFinal": false
+          },
+          {
+            "layer": "tenant",
+            "layerLabel": "租户配置",
+            "value": 500,
+            "key": "max",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "null_override",
+        "path": "apiKeys.stripe",
+        "finalValue": null,
+        "finalLayer": "tenant",
+        "finalLayerLabel": "租户配置",
+        "overrideType": "null_override",
+        "overrideTypeLabel": "NULL覆盖",
+        "overriddenValues": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": "default_key"
+          },
+          {
+            "layer": "env",
+            "layerLabel": "环境配置",
+            "value": "sk_live_env_12345"
+          }
+        ],
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": "default_key",
+            "key": "stripe",
+            "isFinal": false
+          },
+          {
+            "layer": "env",
+            "layerLabel": "环境配置",
+            "value": "sk_live_env_12345",
+            "key": "stripe",
+            "isFinal": false
+          },
+          {
+            "layer": "tenant",
+            "layerLabel": "租户配置",
+            "value": null,
+            "key": "stripe",
+            "isFinal": true
+          }
+        ]
+      },
+      {
+        "type": "override",
+        "path": "apiKeys.sendgrid",
+        "finalValue": "SG.tenant_abc123",
+        "finalLayer": "tenant",
+        "finalLayerLabel": "租户配置",
+        "overrideType": "value_override",
+        "overrideTypeLabel": "值覆盖",
+        "chain": [
+          {
+            "layer": "default",
+            "layerLabel": "默认值",
+            "value": "default_key",
+            "key": "sendgrid",
+            "isFinal": false
+          },
+          {
+            "layer": "tenant",
+            "layerLabel": "租户配置",
+            "value": "SG.tenant_abc123",
+            "key": "sendgrid",
+            "isFinal": true
+          }
+        ]
+      }
+    ],
+    "caseInconsistencies": [
+      {
+        "path": "database",
+        "lowerKey": "database",
+        "usages": [
+          {
+            "layer": "default",
+            "key": "database",
+            "layerLabel": "默认值"
+          },
+          {
+            "layer": "env",
+            "key": "database",
+            "layerLabel": "环境配置"
+          },
+          {
+            "layer": "tenant",
+            "key": "Database",
+            "layerLabel": "租户配置"
+          }
+        ]
+      }
+    ],
+    "hasConflicts": true
+  },
+  "statistics": {
+    "totalKeys": 25,
+    "overriddenKeys": 13,
+    "newKeys": 7,
+    "nullOverrides": 2,
+    "conflictCount": 13,
+    "caseInconsistencyCount": 1,
+    "layerStats": {
+      "default": {
+        "label": "默认值",
+        "totalKeys": 22,
+        "finalKeys": 4,
+        "overriddenKeys": 0
+      },
+      "env": {
+        "label": "环境配置",
+        "totalKeys": 12,
+        "finalKeys": 4,
+        "overriddenKeys": 4
+      },
+      "tenant": {
+        "label": "租户配置",
+        "totalKeys": 17,
+        "finalKeys": 17,
+        "overriddenKeys": 9
+      }
+    }
+  }
+}
