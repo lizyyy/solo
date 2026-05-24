@@ -1,0 +1,9 @@
+server:
+  port: 8080
+  mode: debug
+
+database:
+  path: ./data/print_proof.db
+
+export:
+  output_dir: ./exports
