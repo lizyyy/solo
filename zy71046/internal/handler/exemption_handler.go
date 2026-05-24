@@ -197,3 +197,50 @@ func (h *ExemptionHandler) HealthCheck(c *gin.Context) {
 		"stats":  stats,
 	})
 }
+
+func (h *ExemptionHandler) CreateQualityReport(c *gin.Context) {
+	var req model.QualityReportRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	report, err := h.exemptionService.CreateQualityReport(&req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, report)
+}
+
+func (h *ExemptionHandler) GetQualityReports(c *gin.Context) {
+	exemptionID := c.Param("id")
+	reports, err := h.exemptionService.GetQualityReportsByExemption(exemptionID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, reports)
+}
+
+func (h *ExemptionHandler) UpdateQualityReport(c *gin.Context) {
+	reportID := c.Param("reportId")
+	var req struct {
+		Result   string `json:"result" binding:"required"`
+		Reviewer string `json:"reviewer" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	report, err := h.exemptionService.UpdateQualityReportResult(reportID, req.Result, req.Reviewer)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, report)
+}

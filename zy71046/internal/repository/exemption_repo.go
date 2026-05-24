@@ -115,6 +115,7 @@ func (r *exemptionRepository) GetStatistics() (*model.StatisticsSummary, error) 
 	r.db.Model(&model.Exemption{}).Where("status = ?", model.StatusApproved).Count(&stats.ApprovedCount)
 	r.db.Model(&model.Exemption{}).Where("status = ?", model.StatusRejected).Count(&stats.RejectedCount)
 	r.db.Model(&model.Exemption{}).Where("status = ?", model.StatusExpired).Count(&stats.ExpiredCount)
+	r.db.Model(&model.Exemption{}).Where("status = ?", model.StatusConflict).Count(&stats.ConflictStatusCount)
 
 	r.db.Model(&model.ApprovalLog{}).Where("is_conflict = ?", true).Count(&stats.ConflictCount)
 

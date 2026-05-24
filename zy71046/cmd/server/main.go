@@ -22,12 +22,14 @@ func main() {
 	sampleRepo := repository.NewSampleRepository(db.DB)
 	approvalLogRepo := repository.NewApprovalLogRepository(db.DB)
 	operationLogRepo := repository.NewOperationLogRepository(db.DB)
+	qualityReportRepo := repository.NewQualityReportRepository(db.DB)
 
 	exemptionService := service.NewExemptionService(
 		exemptionRepo,
 		sampleRepo,
 		approvalLogRepo,
 		operationLogRepo,
+		qualityReportRepo,
 		cfg.Storage.UploadPath,
 	)
 
@@ -60,6 +62,13 @@ func main() {
 			exemptions.GET("/:id", exemptionHandler.GetExemption)
 			exemptions.PUT("/:id/approve", exemptionHandler.ApproveExemption)
 			exemptions.POST("/:id/samples", exemptionHandler.UploadSample)
+			exemptions.GET("/:id/reports", exemptionHandler.GetQualityReports)
+		}
+
+		reports := api.Group("/quality-reports")
+		{
+			reports.POST("", exemptionHandler.CreateQualityReport)
+			reports.PUT("/:reportId/result", exemptionHandler.UpdateQualityReport)
 		}
 
 		api.GET("/rules/match", exemptionHandler.CheckRuleMatch)

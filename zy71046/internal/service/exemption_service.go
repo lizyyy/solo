@@ -25,14 +25,18 @@ type ExemptionService interface {
 	CheckExpiredExemptions() ([]model.Exemption, error)
 	GetStatistics() (*model.StatisticsSummary, error)
 	CheckRuleMatch(scriptVersion string, callID string) (*model.Exemption, bool, error)
+	CreateQualityReport(req *model.QualityReportRequest) (*model.QualityReport, error)
+	GetQualityReportsByExemption(exemptionID string) ([]model.QualityReport, error)
+	UpdateQualityReportResult(reportID string, result string, reviewer string) (*model.QualityReport, error)
 }
 
 type exemptionService struct {
-	exemptionRepo  repository.ExemptionRepository
-	sampleRepo     repository.SampleRepository
-	approvalLogRepo repository.ApprovalLogRepository
-	operationLogRepo repository.OperationLogRepository
-	uploadPath     string
+	exemptionRepo     repository.ExemptionRepository
+	sampleRepo        repository.SampleRepository
+	approvalLogRepo   repository.ApprovalLogRepository
+	operationLogRepo  repository.OperationLogRepository
+	qualityReportRepo repository.QualityReportRepository
+	uploadPath        string
 }
 
 func NewExemptionService(
@@ -40,14 +44,16 @@ func NewExemptionService(
 	sampleRepo repository.SampleRepository,
 	approvalLogRepo repository.ApprovalLogRepository,
 	operationLogRepo repository.OperationLogRepository,
+	qualityReportRepo repository.QualityReportRepository,
 	uploadPath string,
 ) ExemptionService {
 	return &exemptionService{
-		exemptionRepo:    exemptionRepo,
-		sampleRepo:       sampleRepo,
-		approvalLogRepo:  approvalLogRepo,
-		operationLogRepo: operationLogRepo,
-		uploadPath:       uploadPath,
+		exemptionRepo:     exemptionRepo,
+		sampleRepo:        sampleRepo,
+		approvalLogRepo:   approvalLogRepo,
+		operationLogRepo:  operationLogRepo,
+		qualityReportRepo: qualityReportRepo,
+		uploadPath:        uploadPath,
 	}
 }
 
@@ -62,7 +68,7 @@ func generateIdempotencyKey(req *model.ExemptionRequest) string {
 
 func (s *exemptionService) CreateExemption(req *model.ExemptionRequest) (*model.Exemption, *model.IdempotentResponse, error) {
 	idempotencyKey := generateIdempotencyKey(req)
-	
+
 	existing, err := s.exemptionRepo.GetByIdempotencyKey(idempotencyKey)
 	if err == nil && existing != nil {
 		return nil, &model.IdempotentResponse{
@@ -108,16 +114,39 @@ func (s *exemptionService) ApproveExemption(id string, req *model.ApprovalReques
 		return nil, errors.New("invalid action")
 	}
 
-	hasApproved, existingLog, err := s.approvalLogRepo.HasSupervisorApproved(id, req.SupervisorID)
+	allApprovals, err := s.approvalLogRepo.GetByExemptionID(id)
 	if err != nil {
 		return nil, err
 	}
 
 	isConflict := false
 	conflictedWith := ""
-	if hasApproved && existingLog.Action != req.Action {
+	conflictingActions := make(map[string]string)
+
+	for _, approval := range allApprovals {
+		conflictingActions[approval.SupervisorID] = string(approval.Action)
+		if approval.Action != req.Action {
+			isConflict = true
+			if conflictedWith == "" {
+				conflictedWith = approval.SupervisorName
+			} else {
+				conflictedWith += ", " + approval.SupervisorName
+			}
+		}
+	}
+
+	selfApproved := false
+	var selfExistingLog *model.ApprovalLog
+	for _, approval := range allApprovals {
+		if approval.SupervisorID == req.SupervisorID {
+			selfApproved = true
+			log := approval
+			selfExistingLog = &log
+			break
+		}
+	}
+	if selfApproved && selfExistingLog.Action != req.Action {
 		isConflict = true
-		conflictedWith = existingLog.SupervisorName
 	}
 
 	approvalLog := &model.ApprovalLog{
@@ -135,20 +164,26 @@ func (s *exemptionService) ApproveExemption(id string, req *model.ApprovalReques
 
 	oldStatus := string(exemption.Status)
 
-	if !isConflict {
+	if isConflict {
+		exemption.Status = model.StatusConflict
+	} else {
 		exemption.Status = req.Action
-		exemption.SupervisorID = req.SupervisorID
-		exemption.SupervisorName = req.SupervisorName
-		exemption.ApprovalComment = req.Comment
-		now := time.Now()
-		exemption.ApprovedAt = &now
+	}
+	exemption.SupervisorID = req.SupervisorID
+	exemption.SupervisorName = req.SupervisorName
+	exemption.ApprovalComment = req.Comment
+	now := time.Now()
+	exemption.ApprovedAt = &now
 
-		if err := s.exemptionRepo.Update(exemption); err != nil {
-			return nil, err
-		}
+	if err := s.exemptionRepo.Update(exemption); err != nil {
+		return nil, err
 	}
 
-	s.logOperation(id, req.SupervisorID, req.SupervisorName, "APPROVE", oldStatus, string(req.Action), req.Comment)
+	operationDetail := req.Comment
+	if isConflict {
+		operationDetail = fmt.Sprintf("[冲突] 与 %s 意见冲突。%s", conflictedWith, req.Comment)
+	}
+	s.logOperation(id, req.SupervisorID, req.SupervisorName, "APPROVE", oldStatus, string(exemption.Status), operationDetail)
 
 	return exemption, nil
 }
@@ -258,6 +293,9 @@ func (s *exemptionService) CheckRuleMatch(scriptVersion string, callID string) (
 			if ex.ExpireAt != nil && ex.ExpireAt.Before(time.Now()) {
 				continue
 			}
+			if callID != "" && ex.CallID != "" && ex.CallID != callID {
+				continue
+			}
 			return &ex, true, nil
 		}
 	}
@@ -276,4 +314,56 @@ func (s *exemptionService) logOperation(exemptionID, operatorID, operatorName, o
 		Detail:       detail,
 	}
 	s.operationLogRepo.Create(log)
+}
+
+func (s *exemptionService) CreateQualityReport(req *model.QualityReportRequest) (*model.QualityReport, error) {
+	exemption, err := s.exemptionRepo.GetByID(req.ExemptionID)
+	if err != nil {
+		return nil, err
+	}
+
+	report := &model.QualityReport{
+		ExemptionID:   req.ExemptionID,
+		ReportNo:      req.ReportNo,
+		Score:         req.Score,
+		InspectorID:   req.InspectorID,
+		InspectorName: req.InspectorName,
+		CheckItems:    req.CheckItems,
+		IssuesFound:   req.IssuesFound,
+		Suggestions:   req.Suggestions,
+	}
+
+	if err := s.qualityReportRepo.Create(report); err != nil {
+		return nil, err
+	}
+
+	exemption.QualityReportID = report.ID
+	if err := s.exemptionRepo.Update(exemption); err != nil {
+		return nil, err
+	}
+
+	s.logOperation(req.ExemptionID, req.InspectorID, req.InspectorName, "CREATE_REPORT", "", "", fmt.Sprintf("创建质检报告: %s, 得分: %.2f", req.ReportNo, req.Score))
+
+	return report, nil
+}
+
+func (s *exemptionService) GetQualityReportsByExemption(exemptionID string) ([]model.QualityReport, error) {
+	return s.qualityReportRepo.GetByExemptionID(exemptionID)
+}
+
+func (s *exemptionService) UpdateQualityReportResult(reportID string, result string, reviewer string) (*model.QualityReport, error) {
+	report, err := s.qualityReportRepo.GetByID(reportID)
+	if err != nil {
+		return nil, err
+	}
+
+	report.Suggestions = fmt.Sprintf("%s\n复核结果: %s, 复核人: %s", report.Suggestions, result, reviewer)
+
+	if err := s.qualityReportRepo.Update(report); err != nil {
+		return nil, err
+	}
+
+	s.logOperation(report.ExemptionID, reviewer, reviewer, "REVIEW_REPORT", "", "", fmt.Sprintf("报告 %s 复核完成: %s", report.ReportNo, result))
+
+	return report, nil
 }
