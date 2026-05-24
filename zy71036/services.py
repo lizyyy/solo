@@ -27,7 +27,8 @@ class StatusMachine:
             ScaffoldStatus.ACTIVE, ScaffoldStatus.DEACTIVATED
         ],
         ScaffoldStatus.AUTO_REJECTED: [
-            ScaffoldStatus.RETURNED, ScaffoldStatus.PENDING_MANUAL
+            ScaffoldStatus.RETURNED, ScaffoldStatus.PENDING_MANUAL,
+            ScaffoldStatus.MANUAL_APPROVED, ScaffoldStatus.MANUAL_REJECTED
         ],
         ScaffoldStatus.PENDING_MANUAL: [
             ScaffoldStatus.MANUAL_APPROVED, ScaffoldStatus.MANUAL_REJECTED,
