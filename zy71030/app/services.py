@@ -379,15 +379,15 @@ def generate_report_data(db: Session, second_read_id: int) -> Optional[dict]:
         "specimen_type": slide.specimen_type or "未指定",
         "first_read_doctor": second_read.first_read_doctor,
         "first_read_opinion": second_read.first_read_opinion,
-        "first_read_date": second_read.first_read_date,
+        "first_read_date": second_read.first_read_date.isoformat() if second_read.first_read_date else None,
         "second_read_doctor": second_read.second_read_doctor,
         "second_read_opinion": second_read.second_read_opinion,
-        "second_read_date": second_read.second_read_date,
+        "second_read_date": second_read.second_read_date.isoformat() if second_read.second_read_date else None,
         "revision_opinion": second_read.revision_opinion,
-        "revision_date": second_read.revision_date,
+        "revision_date": second_read.revision_date.isoformat() if second_read.revision_date else None,
         "borrow_history": borrow_history,
         "opinion_history": opinion_history,
-        "report_date": datetime.now()
+        "report_date": datetime.now().isoformat()
     }
 
 
@@ -403,17 +403,17 @@ def get_second_read_detail(db: Session, second_read_id: int) -> Optional[dict]:
         "patient_id": second_read.slide.patient_id,
         "first_read_doctor": second_read.first_read_doctor,
         "first_read_opinion": second_read.first_read_opinion,
-        "first_read_date": second_read.first_read_date,
+        "first_read_date": second_read.first_read_date.isoformat() if second_read.first_read_date else None,
         "second_read_doctor": second_read.second_read_doctor,
         "second_read_opinion": second_read.second_read_opinion,
-        "second_read_date": second_read.second_read_date,
+        "second_read_date": second_read.second_read_date.isoformat() if second_read.second_read_date else None,
         "revision_opinion": second_read.revision_opinion,
-        "revision_date": second_read.revision_date,
+        "revision_date": second_read.revision_date.isoformat() if second_read.revision_date else None,
         "status": second_read.status,
         "is_report_issued": second_read.is_report_issued,
-        "report_issued_date": second_read.report_issued_date,
-        "deadline": second_read.deadline,
-        "created_at": second_read.created_at,
+        "report_issued_date": second_read.report_issued_date.isoformat() if second_read.report_issued_date else None,
+        "deadline": second_read.deadline.isoformat() if second_read.deadline else None,
+        "created_at": second_read.created_at.isoformat() if second_read.created_at else None,
         "borrow_records": [],
         "opinion_versions": [],
         "review_records": []
@@ -424,9 +424,9 @@ def get_second_read_detail(db: Session, second_read_id: int) -> Optional[dict]:
             "id": borrow.id,
             "borrower": borrow.borrower,
             "department": borrow.borrower_department,
-            "borrow_date": borrow.borrow_date,
-            "due_date": borrow.due_date,
-            "return_date": borrow.return_date,
+            "borrow_date": borrow.borrow_date.isoformat() if borrow.borrow_date else None,
+            "due_date": borrow.due_date.isoformat() if borrow.due_date else None,
+            "return_date": borrow.return_date.isoformat() if borrow.return_date else None,
             "status": borrow.status
         })
 
@@ -436,7 +436,7 @@ def get_second_read_detail(db: Session, second_read_id: int) -> Optional[dict]:
             "doctor": ov.doctor,
             "opinion_type": ov.opinion_type,
             "opinion": ov.opinion,
-            "created_at": ov.created_at
+            "created_at": ov.created_at.isoformat() if ov.created_at else None
         })
 
     for review in second_read.review_records:
@@ -445,7 +445,7 @@ def get_second_read_detail(db: Session, second_read_id: int) -> Optional[dict]:
             "reviewer": review.reviewer,
             "review_opinion": review.review_opinion,
             "is_approved": review.is_approved,
-            "review_date": review.review_date
+            "review_date": review.review_date.isoformat() if review.review_date else None
         })
 
     return result

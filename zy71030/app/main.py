@@ -87,7 +87,7 @@ async def list_second_reads(
             "first_read_doctor": sr.first_read_doctor,
             "second_read_doctor": sr.second_read_doctor,
             "status": sr.status,
-            "deadline": sr.deadline,
+            "deadline": sr.deadline.isoformat() if sr.deadline else None,
             "is_report_issued": sr.is_report_issued
         }
         for sr in records
@@ -198,9 +198,9 @@ async def list_borrow_records(
             "patient_name": br.slide.patient_name,
             "borrower": br.borrower,
             "department": br.borrower_department,
-            "borrow_date": br.borrow_date,
-            "due_date": br.due_date,
-            "return_date": br.return_date,
+            "borrow_date": br.borrow_date.isoformat() if br.borrow_date else None,
+            "due_date": br.due_date.isoformat() if br.due_date else None,
+            "return_date": br.return_date.isoformat() if br.return_date else None,
             "status": br.status
         }
         for br in records
