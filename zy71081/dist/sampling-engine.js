@@ -2,9 +2,35 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SamplingEngine = void 0;
 const types_1 = require("./types");
+class DeterministicRandom {
+    constructor(seed = 42) {
+        this.state = seed >>> 0;
+    }
+    next() {
+        let t = this.state += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+    nextForTrace(traceId) {
+        let hash = 0;
+        for (let i = 0; i < traceId.length; i++) {
+            const char = traceId.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        const savedState = this.state;
+        this.state = (this.state + Math.abs(hash)) >>> 0;
+        const result = this.next();
+        this.state = savedState;
+        return result;
+    }
+}
 class SamplingEngine {
-    constructor(config, overrideBudget) {
+    constructor(config, overrideBudget, seed, deterministic = true) {
         this.config = this.normalizeConfig(config);
+        this.deterministic = deterministic;
+        this.rng = new DeterministicRandom(seed ?? 42);
         this.budgetState = {
             globalUsed: 0,
             ruleUsed: new Map(),
@@ -71,12 +97,14 @@ class SamplingEngine {
             }
         }
         const effectiveRatio = matchedRule?.samplingRatio ?? this.config.defaultSamplingRatio;
-        const randomNumber = Math.random();
+        const randomNumber = this.deterministic
+            ? this.rng.nextForTrace(trace.traceId)
+            : Math.random();
         const ratioPassed = randomNumber < effectiveRatio;
         let droppedDueToBudget = false;
         let budgetExhausted = false;
         if (ratioPassed && matchedRule) {
-            const budgetCheck = this.checkAndConsumeBudget(matchedRule);
+            const budgetCheck = this.checkAndConsumeBudget(matchedRule, trace.startTime);
             droppedDueToBudget = !budgetCheck.allowed;
             budgetExhausted = budgetCheck.exhausted;
         }
@@ -270,9 +298,14 @@ class SamplingEngine {
         }
         return undefined;
     }
-    checkAndConsumeBudget(rule) {
-        const now = Date.now();
-        const currentSecond = Math.floor(now / 1000);
+    checkAndConsumeBudget(rule, traceStartTime) {
+        let currentSecond;
+        if (this.deterministic) {
+            currentSecond = Math.floor(traceStartTime / 1000000000);
+        }
+        else {
+            currentSecond = Math.floor(Date.now() / 1000);
+        }
         if (currentSecond !== this.budgetState.lastResetTime) {
             this.budgetState.globalUsed = 0;
             this.budgetState.ruleUsed.clear();

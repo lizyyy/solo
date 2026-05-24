@@ -55,6 +55,8 @@ program
     .option('-f, --format <format>', '输出格式: json, markdown, both', 'both')
     .option('-v, --verbose', '显示详细信息')
     .option('-q, --quiet', '静默模式，不输出终端摘要')
+    .option('--seed <number>', '随机数种子 (用于可复现的采样结果)', (v) => parseInt(v, 10), 42)
+    .option('--no-deterministic', '禁用确定性模式 (使用真实随机数)')
     .parse(process.argv);
 const options = program.opts();
 function validateOptions(options) {
@@ -144,7 +146,7 @@ async function main() {
         console.log(chalk.green(`  ✓ 涉及 ${traceAnalysis.uniqueServices.length} 个服务`));
         console.log(chalk.cyan('\n⚙️  执行采样规则匹配...'));
     }
-    const samplingEngine = new sampling_engine_1.SamplingEngine(config, options.budget);
+    const samplingEngine = new sampling_engine_1.SamplingEngine(config, options.budget, options.seed, options.deterministic);
     const samplingResults = traceResult.traces.map(trace => samplingEngine.evaluateTrace(trace));
     const budgetStats = samplingEngine.getBudgetStats();
     if (!options.quiet) {

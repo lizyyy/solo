@@ -5,7 +5,9 @@ export declare class SamplingEngine {
     private globalBudgetLimit;
     private ruleBudgetLimits;
     private budgetStats;
-    constructor(config: SamplingConfig, overrideBudget?: number);
+    private rng;
+    private deterministic;
+    constructor(config: SamplingConfig, overrideBudget?: number, seed?: number, deterministic?: boolean);
     private normalizeConfig;
     private initBudgetStats;
     evaluateTrace(trace: Trace): SamplingResult;

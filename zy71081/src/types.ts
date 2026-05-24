@@ -194,6 +194,8 @@ export interface CLIOptions {
   format: 'json' | 'markdown' | 'both';
   verbose: boolean;
   quiet: boolean;
+  seed?: number;
+  deterministic: boolean;
 }
 
 export enum ExitCode {
