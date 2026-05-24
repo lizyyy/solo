@@ -281,19 +281,14 @@ class SchemaComparator:
     ) -> List[SchemaChange]:
         changes: List[SchemaChange] = []
 
-        removed_paths = set(
-            c.field_path
-            for c in changes
-            if c.change_type == SchemaChangeType.FIELD_REMOVED
-        )
-        added_paths = set(
-            c.field_path
-            for c in changes
-            if c.change_type == SchemaChangeType.FIELD_ADDED
-        )
+        old_paths = set(old_fields.keys())
+        new_paths = set(new_fields.keys())
 
-        removed_fields = {p: old_fields[p] for p in removed_paths if p in old_fields}
-        added_fields = {p: new_fields[p] for p in added_paths if p in new_fields}
+        removed_paths = old_paths - new_paths
+        added_paths = new_paths - old_paths
+
+        removed_fields = {p: old_fields[p] for p in removed_paths}
+        added_fields = {p: new_fields[p] for p in added_paths}
 
         potential_renames: List[Tuple[str, str]] = []
 
@@ -366,10 +361,20 @@ class SchemaComparator:
     def _determine_compatibility(
         self, changes: List[SchemaChange]
     ) -> CompatibilityLevel:
-        breaking_changes = [
-            c for c in changes if c.compatibility_impact == "breaking"
+        field_removals = [
+            c for c in changes
+            if c.change_type == SchemaChangeType.FIELD_REMOVED
         ]
-        if breaking_changes and not self.allow_field_removal:
+        other_breaking_changes = [
+            c for c in changes
+            if c.compatibility_impact == "breaking"
+            and c.change_type != SchemaChangeType.FIELD_REMOVED
+        ]
+
+        if other_breaking_changes:
+            return CompatibilityLevel.INCOMPATIBLE
+
+        if field_removals and not self.allow_field_removal:
             return CompatibilityLevel.INCOMPATIBLE
 
         forward_only = [

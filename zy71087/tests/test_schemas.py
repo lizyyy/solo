@@ -239,3 +239,122 @@ def test_compat_emoji():
     reporter = ReportGenerator()
     assert reporter._compat_emoji(CompatibilityLevel.FULLY_COMPATIBLE) == "✅"
     assert reporter._compat_emoji(CompatibilityLevel.INCOMPATIBLE) == "❌"
+
+
+def test_detect_renames_basic():
+    comparator = SchemaComparator()
+
+    old_fields = {
+        "user_name": FieldSchema(
+            name="user_name",
+            path="user_name",
+            data_type="string",
+            nullable=True,
+        )
+    }
+    new_fields = {
+        "username": FieldSchema(
+            name="username",
+            path="username",
+            data_type="string",
+            nullable=True,
+        )
+    }
+
+    changes = comparator._detect_renames(old_fields, new_fields)
+    assert len(changes) == 1
+    assert changes[0].change_type == SchemaChangeType.FIELD_RENAMED
+    assert changes[0].old_value == "user_name"
+    assert changes[0].new_value == "username"
+
+
+def test_detect_renames_nested():
+    comparator = SchemaComparator()
+
+    old_fields = {
+        "user": FieldSchema(
+            name="user", path="user", data_type="struct", nullable=True, is_struct=True,
+        ),
+        "user.first_name": FieldSchema(
+            name="first_name", path="user.first_name", data_type="string", nullable=True,
+        ),
+    }
+    new_fields = {
+        "user": FieldSchema(
+            name="user", path="user", data_type="struct", nullable=True, is_struct=True,
+        ),
+        "user.firstname": FieldSchema(
+            name="firstname", path="user.firstname", data_type="string", nullable=True,
+        ),
+    }
+
+    changes = comparator._detect_renames(old_fields, new_fields)
+    rename_changes = [c for c in changes if c.change_type == SchemaChangeType.FIELD_RENAMED]
+    assert len(rename_changes) == 1
+    assert rename_changes[0].field_path == "user.firstname"
+
+
+def test_determine_compatibility_field_removal_allowed():
+    comparator = SchemaComparator(allow_field_removal=True)
+
+    changes = [
+        SchemaChange(
+            change_type=SchemaChangeType.FIELD_REMOVED,
+            field_path="old_field",
+            description="",
+            compatibility_impact="breaking",
+        )
+    ]
+    compatibility = comparator._determine_compatibility(changes)
+    assert compatibility == CompatibilityLevel.FULLY_COMPATIBLE
+
+
+def test_determine_compatibility_field_removal_not_allowed():
+    comparator = SchemaComparator(allow_field_removal=False)
+
+    changes = [
+        SchemaChange(
+            change_type=SchemaChangeType.FIELD_REMOVED,
+            field_path="old_field",
+            description="",
+            compatibility_impact="breaking",
+        )
+    ]
+    compatibility = comparator._determine_compatibility(changes)
+    assert compatibility == CompatibilityLevel.INCOMPATIBLE
+
+
+def test_determine_compatibility_other_breaking_still_incompatible():
+    comparator = SchemaComparator(allow_field_removal=True)
+
+    changes = [
+        SchemaChange(
+            change_type=SchemaChangeType.TYPE_CHANGED,
+            field_path="value",
+            description="",
+            compatibility_impact="breaking",
+        )
+    ]
+    compatibility = comparator._determine_compatibility(changes)
+    assert compatibility == CompatibilityLevel.INCOMPATIBLE
+
+
+def test_determine_compatibility_mixed_breaking_with_removal_allowed():
+    comparator = SchemaComparator(allow_field_removal=True)
+
+    changes = [
+        SchemaChange(
+            change_type=SchemaChangeType.FIELD_REMOVED,
+            field_path="old_field",
+            description="",
+            compatibility_impact="breaking",
+        ),
+        SchemaChange(
+            change_type=SchemaChangeType.NULLABLE_CHANGED,
+            field_path="value",
+            description="",
+            compatibility_impact="breaking",
+        ),
+    ]
+    compatibility = comparator._determine_compatibility(changes)
+    assert compatibility == CompatibilityLevel.INCOMPATIBLE

@@ -1,0 +1,159 @@
+{
+  "task_name": "rename_test",
+  "created_at": "2026-05-24T23:11:05.726550",
+  "old_schema": {
+    "source": "examples/test_data/rename_test/old.parquet",
+    "created_at": "2026-05-24T23:11:05.720620",
+    "fields": [
+      {
+        "name": "id",
+        "path": "id",
+        "data_type": "int64",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "int64"
+      },
+      {
+        "name": "user_name",
+        "path": "user_name",
+        "data_type": "string",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "string"
+      },
+      {
+        "name": "email_address",
+        "path": "email_address",
+        "data_type": "string",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "string"
+      }
+    ],
+    "partition_info": null,
+    "row_count": 3,
+    "file_count": 1
+  },
+  "new_schema": {
+    "source": "examples/test_data/rename_test/new.parquet",
+    "created_at": "2026-05-24T23:11:05.723970",
+    "fields": [
+      {
+        "name": "id",
+        "path": "id",
+        "data_type": "int64",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "int64"
+      },
+      {
+        "name": "username",
+        "path": "username",
+        "data_type": "string",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "string"
+      },
+      {
+        "name": "email",
+        "path": "email",
+        "data_type": "string",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "string"
+      }
+    ],
+    "partition_info": null,
+    "row_count": 3,
+    "file_count": 1
+  },
+  "changes": [
+    {
+      "change_type": "field_removed",
+      "field_path": "user_name",
+      "description": "字段 'user_name' 已被移除",
+      "old_value": "user_name: string?",
+      "new_value": null,
+      "severity": "high",
+      "compatibility_impact": "breaking"
+    },
+    {
+      "change_type": "field_removed",
+      "field_path": "email_address",
+      "description": "字段 'email_address' 已被移除",
+      "old_value": "email_address: string?",
+      "new_value": null,
+      "severity": "high",
+      "compatibility_impact": "breaking"
+    },
+    {
+      "change_type": "field_added",
+      "field_path": "email",
+      "description": "新增字段 'email'",
+      "old_value": null,
+      "new_value": "email: string?",
+      "severity": "low",
+      "compatibility_impact": "forward_only"
+    },
+    {
+      "change_type": "field_added",
+      "field_path": "username",
+      "description": "新增字段 'username'",
+      "old_value": null,
+      "new_value": "username: string?",
+      "severity": "low",
+      "compatibility_impact": "forward_only"
+    },
+    {
+      "change_type": "field_renamed",
+      "field_path": "username",
+      "description": "字段可能重命名: 'user_name' -> 'username'",
+      "old_value": "user_name",
+      "new_value": "username",
+      "severity": "medium",
+      "compatibility_impact": "potential_issue"
+    },
+    {
+      "change_type": "field_renamed",
+      "field_path": "email",
+      "description": "字段可能重命名: 'email_address' -> 'email'",
+      "old_value": "email_address",
+      "new_value": "email",
+      "severity": "medium",
+      "compatibility_impact": "potential_issue"
+    }
+  ],
+  "compatibility_level": "incompatible",
+  "summary": {
+    "total_changes": 6,
+    "field_added": 2,
+    "field_removed": 2,
+    "field_renamed": 2,
+    "type_changed": 0,
+    "nullable_changed": 0,
+    "decimal_precision_changed": 0,
+    "nested_structure_changed": 0,
+    "breaking_changes": 2,
+    "high_severity": 2,
+    "medium_severity": 2,
+    "low_severity": 2
+  },
+  "recommendations": [
+    "⚠️  存在破坏性变更，建议在发布前进行完整的数据迁移测试",
+    "   - 字段 'user_name' 已被移除",
+    "   - 字段 'email_address' 已被移除",
+    "🔄 检测到可能的字段重命名，请确认是否为有意变更，并更新下游应用的字段引用"
+  ]
+}

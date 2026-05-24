@@ -1,0 +1,123 @@
+{
+  "task_name": "compat_test",
+  "created_at": "2026-05-24T23:11:31.420617",
+  "old_schema": {
+    "source": "examples/test_data/compatibility_test/old.parquet",
+    "created_at": "2026-05-24T23:11:31.389437",
+    "fields": [
+      {
+        "name": "id",
+        "path": "id",
+        "data_type": "int64",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "int64"
+      },
+      {
+        "name": "value",
+        "path": "value",
+        "data_type": "string",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "string"
+      },
+      {
+        "name": "to_remove",
+        "path": "to_remove",
+        "data_type": "int32",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "int32"
+      }
+    ],
+    "partition_info": null,
+    "row_count": 3,
+    "file_count": 1
+  },
+  "new_schema": {
+    "source": "examples/test_data/compatibility_test/new.parquet",
+    "created_at": "2026-05-24T23:11:31.419321",
+    "fields": [
+      {
+        "name": "id",
+        "path": "id",
+        "data_type": "int64",
+        "nullable": false,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "int64"
+      },
+      {
+        "name": "value",
+        "path": "value",
+        "data_type": "int64",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "int64"
+      }
+    ],
+    "partition_info": null,
+    "row_count": 3,
+    "file_count": 1
+  },
+  "changes": [
+    {
+      "change_type": "field_removed",
+      "field_path": "to_remove",
+      "description": "字段 'to_remove' 已被移除",
+      "old_value": "to_remove: int32?",
+      "new_value": null,
+      "severity": "high",
+      "compatibility_impact": "breaking"
+    },
+    {
+      "change_type": "type_changed",
+      "field_path": "value",
+      "description": "类型不兼容变更: string -> int64",
+      "old_value": "string",
+      "new_value": "int64",
+      "severity": "high",
+      "compatibility_impact": "breaking"
+    },
+    {
+      "change_type": "nullable_changed",
+      "field_path": "id",
+      "description": "字段 'id' 从 nullable 变为 non-nullable",
+      "old_value": "nullable",
+      "new_value": "non-nullable",
+      "severity": "high",
+      "compatibility_impact": "breaking"
+    }
+  ],
+  "compatibility_level": "incompatible",
+  "summary": {
+    "total_changes": 3,
+    "field_added": 0,
+    "field_removed": 1,
+    "field_renamed": 0,
+    "type_changed": 1,
+    "nullable_changed": 1,
+    "decimal_precision_changed": 0,
+    "nested_structure_changed": 0,
+    "breaking_changes": 3,
+    "high_severity": 3,
+    "medium_severity": 0,
+    "low_severity": 0
+  },
+  "recommendations": [
+    "⚠️  存在破坏性变更，建议在发布前进行完整的数据迁移测试",
+    "   - 字段 'to_remove' 已被移除",
+    "   - 类型不兼容变更: string -> int64",
+    "   - 字段 'id' 从 nullable 变为 non-nullable",
+    "⚠️  nullable 变为 non-nullable 可能导致旧数据读取失败，建议添加默认值或确保数据中没有 NULL 值"
+  ]
+}
