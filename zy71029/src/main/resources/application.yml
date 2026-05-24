@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: maintenance-quiet-api
+  datasource:
+    url: jdbc:h2:file:./data/maintenance_db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+app:
+  quiet-period:
+    lunch-start: "12:00"
+    lunch-end: "14:00"
+    night-start: "22:00"
+    night-end: "07:00"
+  maintenance:
+    default-max-hours: 4
