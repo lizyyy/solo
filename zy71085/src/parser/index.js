@@ -5,6 +5,7 @@ const {
   parseManifestFile,
   parseModuleManifest,
   parseModulesDirectory,
+  parseManifestBuffer,
   ApkParserError
 } = require('./apk-parser')
 
@@ -17,16 +18,28 @@ const {
   isLikelyObfuscated
 } = require('./manifest-parser')
 
+const {
+  parseBinaryXml,
+  isBinaryXml,
+  AxmlParser,
+  AxmlParserError
+} = require('./axml-parser')
+
 module.exports = {
   parseApk,
   parseManifestFile,
   parseModuleManifest,
   parseModulesDirectory,
+  parseManifestBuffer,
   parseXml,
+  parseBinaryXml,
+  isBinaryXml,
   normalizePermissionName,
   getPermissionGroup,
   parseProtectionLevel,
   extractObfuscatedNames,
   isLikelyObfuscated,
-  ApkParserError
+  AxmlParser,
+  ApkParserError,
+  AxmlParserError
 }

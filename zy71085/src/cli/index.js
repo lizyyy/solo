@@ -18,12 +18,14 @@ const {
 
 async function runCLI (argv) {
   const program = new Command()
+  let exitCode = EXIT_CODES.SUCCESS
 
   program
     .name('apkd')
     .description('Android APK 权限差异分析 CLI 工具')
     .version(require('../../package.json').version, '-v, --version', '显示版本号')
     .helpOption('-h, --help', '显示帮助信息')
+    .exitOverride()
 
   program
     .command('compare')
@@ -36,28 +38,40 @@ async function runCLI (argv) {
     .option('--verbose', '显示详细信息', false)
     .option('--show-all', '显示所有权限（包括未变更的）', false)
     .option('--no-terminal', '不输出终端摘要')
-    .action(handleCompareCommand)
+    .action(async (options) => {
+      exitCode = await handleCompareCommand(options)
+    })
 
   program
     .command('parse <file>')
     .description('解析单个 APK 或 Manifest 文件并显示权限信息')
     .option('-o, --output <dir>', '输出目录')
     .option('-f, --format <format>', `输出格式: terminal|json|all`, 'all')
-    .action(handleParseCommand)
+    .action(async (file, options) => {
+      exitCode = await handleParseCommand(file, options)
+    })
 
   program
     .command('list')
     .description('列出支持的权限组和风险等级')
     .option('--risk', '只显示风险等级说明')
     .option('--groups', '只显示权限组列表')
-    .action(handleListCommand)
+    .action((options) => {
+      exitCode = handleListCommand(options)
+    })
 
   try {
     await program.parseAsync(argv)
-    return EXIT_CODES.SUCCESS
   } catch (err) {
-    return handleError(err)
+    if (err.name === 'CommanderError') {
+      exitCode = EXIT_CODES.ERROR_INVALID_INPUT
+    } else {
+      exitCode = handleError(err)
+    }
   }
+
+  process.exitCode = exitCode
+  return exitCode
 }
 
 async function handleCompareCommand (options) {
@@ -70,8 +84,7 @@ async function handleCompareCommand (options) {
   if (!validation.valid) {
     console.error(chalk.red('❌ 参数错误:'))
     validation.errors.forEach(e => console.error(`   - ${e}`))
-    process.exitCode = EXIT_CODES.ERROR_INVALID_INPUT
-    return
+    return EXIT_CODES.ERROR_INVALID_INPUT
   }
 
   const outputDir = path.resolve(options.output || './output')
@@ -162,9 +175,9 @@ async function handleCompareCommand (options) {
     console.log()
     console.log(chalk.green(`✨ 分析完成! 耗时: ${result.duration}ms`))
 
-    process.exitCode = exitCode
+    return exitCode
   } catch (err) {
-    handleError(err)
+    return handleError(err)
   }
 }
 
@@ -199,9 +212,9 @@ async function handleParseCommand (file, options) {
       console.log(chalk.green(`解析结果已保存到: ${outputPath}`))
     }
 
-    process.exitCode = EXIT_CODES.SUCCESS
+    return EXIT_CODES.SUCCESS
   } catch (err) {
-    handleError(err)
+    return handleError(err)
   }
 }
 
@@ -234,7 +247,7 @@ function handleListCommand (options) {
     }
   }
 
-  process.exitCode = EXIT_CODES.SUCCESS
+  return EXIT_CODES.SUCCESS
 }
 
 function validateCompareOptions (options) {
@@ -306,11 +319,13 @@ function handleError (err) {
     console.error(err.stack)
   }
 
-  if (err.code) {
-    return err.code
+  let exitCode = EXIT_CODES.ERROR_COMPARE_FAILED
+  if (err.code && typeof err.code === 'number') {
+    exitCode = err.code
   }
 
-  return EXIT_CODES.ERROR_COMPARE_FAILED
+  process.exitCode = exitCode
+  return exitCode
 }
 
 module.exports = {

@@ -4,6 +4,7 @@ const fs = require('fs').promises
 const path = require('path')
 const JSZip = require('jszip')
 const { parseXml } = require('./manifest-parser')
+const { parseBinaryXml, isBinaryXml } = require('./axml-parser')
 const { EXIT_CODES } = require('../config/constants')
 
 class ApkParserError extends Error {
@@ -24,8 +25,8 @@ async function parseApk (apkPath) {
       throw new ApkParserError(`APK 文件中未找到 AndroidManifest.xml: ${apkPath}`)
     }
 
-    const manifestXml = await manifestFile.async('string')
-    const manifestData = await parseXml(manifestXml)
+    const manifestBuffer = await manifestFile.async('uint8array')
+    const manifestData = await parseManifestBuffer(Buffer.from(manifestBuffer))
 
     const appInfo = extractAppInfo(manifestData)
     const permissions = extractPermissions(manifestData)
@@ -51,6 +52,24 @@ async function parseApk (apkPath) {
     }
     throw new ApkParserError(`解析 APK 失败: ${apkPath} - ${err.message}`, EXIT_CODES.ERROR_PARSE_FAILED)
   }
+}
+
+async function parseManifestBuffer (buffer) {
+  if (isBinaryXml(buffer)) {
+    const result = parseBinaryXml(buffer)
+    if (result) {
+      return result
+    }
+  }
+
+  let xmlString = buffer.toString('utf-8')
+  xmlString = xmlString.replace(/[^\x20-\x7E\x0A\x0D\x09]/g, '')
+  const xmlMatch = xmlString.match(/<[\s\S]*>/)
+  if (xmlMatch) {
+    xmlString = xmlMatch[0]
+  }
+
+  return parseXml(xmlString)
 }
 
 async function parseManifestFile (manifestPath) {
