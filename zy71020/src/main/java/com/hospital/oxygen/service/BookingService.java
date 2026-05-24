@@ -106,6 +106,23 @@ public class BookingService {
         auditService.logOperation("LOCK", "PORT", portCode, PortStatus.AVAILABLE, PortStatus.OCCUPIED, operator, "预约锁定");
     }
 
+    private void forceLockPort(String portCode, String bookingNumber, String operator) {
+        OxygenPort port = portRepository.findByPortCode(portCode)
+                .orElseThrow(() -> new BusinessException("氧气接口不存在"));
+
+        PortStatus before = port.getStatus();
+        String beforeBookingId = port.getCurrentBookingId();
+
+        port.setStatus(PortStatus.OCCUPIED);
+        port.setCurrentBookingId(bookingNumber);
+        portRepository.save(port);
+
+        auditService.logOperation("FORCE_LOCK", "PORT", portCode,
+                before + "(" + (beforeBookingId != null ? beforeBookingId : "null") + ")",
+                PortStatus.OCCUPIED + "(" + bookingNumber + ")",
+                operator, "人工改判强制占用");
+    }
+
     @Transactional
     public Booking completeBooking(String bookingNumber, String operator) {
         Booking booking = bookingRepository.findByBookingNumber(bookingNumber)
@@ -180,7 +197,7 @@ public class BookingService {
         if (newStatus == BookingStatus.COMPLETED || newStatus == BookingStatus.CANCELLED) {
             releasePort(booking.getOxygenPortCode(), operator);
         } else if (newStatus == BookingStatus.CONFIRMED || newStatus == BookingStatus.ACTIVE) {
-            lockPort(booking.getOxygenPortCode(), bookingNumber, operator);
+            forceLockPort(booking.getOxygenPortCode(), bookingNumber, operator);
         }
 
         booking = bookingRepository.save(booking);

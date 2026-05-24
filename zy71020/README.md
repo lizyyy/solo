@@ -7,7 +7,7 @@
 **技术栈：**
 - Java 17 + Spring Boot 3.2
 - H2 内存数据库
-- JPA + Lombok
+- JPA
 
 ## 核心功能
 

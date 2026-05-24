@@ -67,7 +67,10 @@ public class AuditService {
         if (resourceId != null) {
             return auditLogRepository.findByResourceId(resourceId);
         }
-        return auditLogRepository.findByResourceType(resourceType);
+        if (resourceType != null) {
+            return auditLogRepository.findByResourceType(resourceType);
+        }
+        return auditLogRepository.findAll();
     }
 
     public List<AuditLog> getDuplicateLogs() {
