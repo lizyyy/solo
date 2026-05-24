@@ -1,22 +1,29 @@
 package com.factory.gauge.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.common.Result;
 import com.factory.gauge.dto.request.ReinspectionRequest;
 import com.factory.gauge.entity.ReinspectionRecord;
 import com.factory.gauge.service.ReinspectionService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/reinspections")
-@RequiredArgsConstructor
 public class ReinspectionController {
 
+
+    private static final Logger log = LoggerFactory.getLogger(ReinspectionController.class);
     private final ReinspectionService reinspectionService;
 
+
+    public ReinspectionController(ReinspectionService reinspectionService) {
+        this.reinspectionService = reinspectionService;
+    }
     @PostMapping("/record")
     public Result<ReinspectionRecord> recordReinspection(@Valid @RequestBody ReinspectionRequest request) {
         ReinspectionRecord record = reinspectionService.recordReinspection(request);

@@ -1,12 +1,14 @@
 package com.factory.gauge.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.common.Result;
 import com.factory.gauge.dto.request.GaugeRegisterRequest;
 import com.factory.gauge.entity.MeasuringTool;
 import com.factory.gauge.service.DataValidationService;
 import com.factory.gauge.service.MeasuringToolService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,10 +16,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/gauges")
-@RequiredArgsConstructor
 public class MeasuringToolController {
 
+
+    private static final Logger log = LoggerFactory.getLogger(MeasuringToolController.class);
     private final MeasuringToolService measuringToolService;
+
+    public MeasuringToolController(MeasuringToolService measuringToolService, DataValidationService dataValidationService) {
+        this.measuringToolService = measuringToolService;
+        this.dataValidationService = dataValidationService;
+    }
     private final DataValidationService dataValidationService;
 
     @PostMapping("/register")

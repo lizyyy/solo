@@ -1,22 +1,29 @@
 package com.factory.gauge.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.common.Result;
 import com.factory.gauge.dto.request.DeactivationRequest;
 import com.factory.gauge.entity.DeactivationRecord;
 import com.factory.gauge.service.DeactivationService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/deactivations")
-@RequiredArgsConstructor
 public class DeactivationController {
 
+
+    private static final Logger log = LoggerFactory.getLogger(DeactivationController.class);
     private final DeactivationService deactivationService;
 
+
+    public DeactivationController(DeactivationService deactivationService) {
+        this.deactivationService = deactivationService;
+    }
     @PostMapping("/apply")
     public Result<DeactivationRecord> applyDeactivation(@Valid @RequestBody DeactivationRequest request) {
         DeactivationRecord record = deactivationService.deactivateGauge(request);

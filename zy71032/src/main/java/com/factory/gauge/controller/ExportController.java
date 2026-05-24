@@ -1,7 +1,9 @@
 package com.factory.gauge.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.service.ExportService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +14,16 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/export")
-@RequiredArgsConstructor
 public class ExportController {
 
+
+    private static final Logger log = LoggerFactory.getLogger(ExportController.class);
     private final ExportService exportService;
 
+
+    public ExportController(ExportService exportService) {
+        this.exportService = exportService;
+    }
     @GetMapping("/gauges")
     public ResponseEntity<byte[]> exportGauges() throws IOException {
         byte[] data = exportService.exportGauges();

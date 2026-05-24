@@ -1,19 +1,28 @@
 package com.factory.gauge.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.entity.*;
 import com.factory.gauge.repository.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class DataValidationService {
 
+
+    private static final Logger log = LoggerFactory.getLogger(DataValidationService.class);
     private final MeasuringToolRepository measuringToolRepository;
+
+    public DataValidationService(MeasuringToolRepository measuringToolRepository, ProductBatchRepository productBatchRepository, ReinspectionRecordRepository reinspectionRecordRepository, DeactivationRecordRepository deactivationRecordRepository, CalibrationReportRepository calibrationReportRepository) {
+        this.measuringToolRepository = measuringToolRepository;
+        this.productBatchRepository = productBatchRepository;
+        this.reinspectionRecordRepository = reinspectionRecordRepository;
+        this.deactivationRecordRepository = deactivationRecordRepository;
+        this.calibrationReportRepository = calibrationReportRepository;
+    }
     private final ProductBatchRepository productBatchRepository;
     private final ReinspectionRecordRepository reinspectionRecordRepository;
     private final DeactivationRecordRepository deactivationRecordRepository;

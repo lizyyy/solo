@@ -1,24 +1,30 @@
 package com.factory.gauge.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.dto.request.CalibrationReportRequest;
 import com.factory.gauge.entity.CalibrationReport;
 import com.factory.gauge.entity.MeasuringTool;
 import com.factory.gauge.exception.BusinessException;
 import com.factory.gauge.repository.CalibrationReportRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class CalibrationReportService {
 
+
+    private static final Logger log = LoggerFactory.getLogger(CalibrationReportService.class);
     private final CalibrationReportRepository calibrationReportRepository;
+
+    public CalibrationReportService(CalibrationReportRepository calibrationReportRepository, MeasuringToolService measuringToolService) {
+        this.calibrationReportRepository = calibrationReportRepository;
+        this.measuringToolService = measuringToolService;
+    }
     private final MeasuringToolService measuringToolService;
 
     @Transactional

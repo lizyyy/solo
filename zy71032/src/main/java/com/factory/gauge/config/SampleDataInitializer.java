@@ -1,11 +1,13 @@
 package com.factory.gauge.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.dto.request.*;
 import com.factory.gauge.entity.*;
 import com.factory.gauge.entity.enums.*;
+import com.factory.gauge.repository.MeasuringToolRepository;
 import com.factory.gauge.service.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,19 +15,34 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class SampleDataInitializer implements CommandLineRunner {
 
+
+    private static final Logger log = LoggerFactory.getLogger(SampleDataInitializer.class);
     private final MeasuringToolService measuringToolService;
+
+    public SampleDataInitializer(MeasuringToolService measuringToolService, ProductBatchService productBatchService, ReinspectionService reinspectionService, DeactivationService deactivationService, CalibrationReportService calibrationReportService, MeasuringToolRepository measuringToolRepository) {
+        this.measuringToolService = measuringToolService;
+        this.productBatchService = productBatchService;
+        this.reinspectionService = reinspectionService;
+        this.deactivationService = deactivationService;
+        this.calibrationReportService = calibrationReportService;
+        this.measuringToolRepository = measuringToolRepository;
+    }
     private final ProductBatchService productBatchService;
     private final ReinspectionService reinspectionService;
     private final DeactivationService deactivationService;
     private final CalibrationReportService calibrationReportService;
+    private final MeasuringToolRepository measuringToolRepository;
 
     @Override
     public void run(String... args) {
+        if (measuringToolRepository.existsByToolNo("G-001-NORMAL")) {
+            log.info("样例数据已存在，跳过初始化");
+            return;
+        }
+
         log.info("开始初始化样例数据...");
 
         // ============ 场景1: 正常流程 ============

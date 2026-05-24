@@ -1,8 +1,10 @@
 package com.factory.gauge.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.entity.*;
 import com.factory.gauge.repository.*;
-import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -14,10 +16,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class ExportService {
 
+
+    private static final Logger log = LoggerFactory.getLogger(ExportService.class);
     private final MeasuringToolRepository measuringToolRepository;
+
+    public ExportService(MeasuringToolRepository measuringToolRepository, ProductBatchRepository productBatchRepository, ReinspectionRecordRepository reinspectionRecordRepository, DeactivationRecordRepository deactivationRecordRepository, CalibrationReportRepository calibrationReportRepository) {
+        this.measuringToolRepository = measuringToolRepository;
+        this.productBatchRepository = productBatchRepository;
+        this.reinspectionRecordRepository = reinspectionRecordRepository;
+        this.deactivationRecordRepository = deactivationRecordRepository;
+        this.calibrationReportRepository = calibrationReportRepository;
+    }
     private final ProductBatchRepository productBatchRepository;
     private final ReinspectionRecordRepository reinspectionRecordRepository;
     private final DeactivationRecordRepository deactivationRecordRepository;

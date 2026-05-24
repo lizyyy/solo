@@ -1,22 +1,29 @@
 package com.factory.gauge.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.common.Result;
 import com.factory.gauge.dto.request.BatchRegisterRequest;
 import com.factory.gauge.entity.ProductBatch;
 import com.factory.gauge.service.ProductBatchService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/batches")
-@RequiredArgsConstructor
 public class ProductBatchController {
 
+
+    private static final Logger log = LoggerFactory.getLogger(ProductBatchController.class);
     private final ProductBatchService productBatchService;
 
+
+    public ProductBatchController(ProductBatchService productBatchService) {
+        this.productBatchService = productBatchService;
+    }
     @PostMapping("/register")
     public Result<ProductBatch> registerBatch(@Valid @RequestBody BatchRegisterRequest request) {
         ProductBatch batch = productBatchService.registerBatch(request);

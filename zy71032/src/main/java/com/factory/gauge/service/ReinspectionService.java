@@ -1,5 +1,8 @@
 package com.factory.gauge.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.dto.request.ReinspectionRequest;
 import com.factory.gauge.entity.ProductBatch;
 import com.factory.gauge.entity.ReinspectionRecord;
@@ -7,8 +10,6 @@ import com.factory.gauge.entity.enums.BatchStatus;
 import com.factory.gauge.entity.enums.ReinspectionResult;
 import com.factory.gauge.exception.BusinessException;
 import com.factory.gauge.repository.ReinspectionRecordRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +17,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ReinspectionService {
 
+
+    private static final Logger log = LoggerFactory.getLogger(ReinspectionService.class);
     private final ReinspectionRecordRepository reinspectionRecordRepository;
+
+    public ReinspectionService(ReinspectionRecordRepository reinspectionRecordRepository, ProductBatchService productBatchService, StateMachineService stateMachineService) {
+        this.reinspectionRecordRepository = reinspectionRecordRepository;
+        this.productBatchService = productBatchService;
+        this.stateMachineService = stateMachineService;
+    }
     private final ProductBatchService productBatchService;
     private final StateMachineService stateMachineService;
 

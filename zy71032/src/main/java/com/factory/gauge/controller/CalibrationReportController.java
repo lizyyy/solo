@@ -1,11 +1,13 @@
 package com.factory.gauge.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.common.Result;
 import com.factory.gauge.dto.request.CalibrationReportRequest;
 import com.factory.gauge.entity.CalibrationReport;
 import com.factory.gauge.service.CalibrationReportService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,11 +15,16 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reports")
-@RequiredArgsConstructor
 public class CalibrationReportController {
 
+
+    private static final Logger log = LoggerFactory.getLogger(CalibrationReportController.class);
     private final CalibrationReportService calibrationReportService;
 
+
+    public CalibrationReportController(CalibrationReportService calibrationReportService) {
+        this.calibrationReportService = calibrationReportService;
+    }
     @PostMapping("/add")
     public Result<CalibrationReport> addReport(@Valid @RequestBody CalibrationReportRequest request) {
         CalibrationReport report = calibrationReportService.addReport(request);

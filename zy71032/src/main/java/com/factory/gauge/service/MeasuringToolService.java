@@ -1,5 +1,8 @@
 package com.factory.gauge.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.factory.gauge.dto.request.GaugeRegisterRequest;
 import com.factory.gauge.entity.MeasuringTool;
 import com.factory.gauge.entity.ProductBatch;
@@ -8,20 +11,24 @@ import com.factory.gauge.entity.enums.GaugeStatus;
 import com.factory.gauge.exception.BusinessException;
 import com.factory.gauge.repository.MeasuringToolRepository;
 import com.factory.gauge.repository.ProductBatchRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class MeasuringToolService {
 
+
+    private static final Logger log = LoggerFactory.getLogger(MeasuringToolService.class);
     private final MeasuringToolRepository measuringToolRepository;
+
+    public MeasuringToolService(MeasuringToolRepository measuringToolRepository, ProductBatchRepository productBatchRepository, StateMachineService stateMachineService) {
+        this.measuringToolRepository = measuringToolRepository;
+        this.productBatchRepository = productBatchRepository;
+        this.stateMachineService = stateMachineService;
+    }
     private final ProductBatchRepository productBatchRepository;
     private final StateMachineService stateMachineService;
 

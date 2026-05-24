@@ -2,14 +2,12 @@ package com.factory.gauge.entity;
 
 import com.factory.gauge.entity.enums.GaugeStatus;
 import jakarta.persistence.*;
-import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "measuring_tool", indexes = {
     @Index(name = "idx_tool_no", columnList = "toolNo", unique = true),
@@ -72,4 +70,35 @@ public class MeasuringTool {
     public boolean isUsable() {
         return status == GaugeStatus.NORMAL && !isExpired();
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getToolNo() { return toolNo; }
+    public void setToolNo(String toolNo) { this.toolNo = toolNo; }
+    public String getToolName() { return toolName; }
+    public void setToolName(String toolName) { this.toolName = toolName; }
+    public String getSpecification() { return specification; }
+    public void setSpecification(String specification) { this.specification = specification; }
+    public String getCalibrationCertificateNo() { return calibrationCertificateNo; }
+    public void setCalibrationCertificateNo(String calibrationCertificateNo) { this.calibrationCertificateNo = calibrationCertificateNo; }
+    public Integer getCertificateVersion() { return certificateVersion; }
+    public void setCertificateVersion(Integer certificateVersion) { this.certificateVersion = certificateVersion; }
+    public LocalDate getCalibrationDate() { return calibrationDate; }
+    public void setCalibrationDate(LocalDate calibrationDate) { this.calibrationDate = calibrationDate; }
+    public LocalDate getValidUntilDate() { return validUntilDate; }
+    public void setValidUntilDate(LocalDate validUntilDate) { this.validUntilDate = validUntilDate; }
+    public GaugeStatus getStatus() { return status; }
+    public void setStatus(GaugeStatus status) { this.status = status; }
+    public String getRemarks() { return remarks; }
+    public void setRemarks(String remarks) { this.remarks = remarks; }
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+    public String getUpdatedBy() { return updatedBy; }
+    public void setUpdatedBy(String updatedBy) { this.updatedBy = updatedBy; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public Integer getVersion() { return version; }
+    public void setVersion(Integer version) { this.version = version; }
 }
