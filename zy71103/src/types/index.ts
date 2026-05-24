@@ -18,6 +18,7 @@ export interface BaseElement {
   position: Vector3;
   rotation: Vector3;
   scale: Vector3;
+  visible: boolean;
 }
 
 export interface InstrumentCart extends BaseElement {
@@ -80,6 +81,15 @@ export interface SceneData {
   errors: ErrorItem[];
 }
 
+export interface FilterState {
+  showInstrumentCarts: boolean;
+  showSterileZones: boolean;
+  showRecycleBins: boolean;
+  showStaff: boolean;
+  showPaths: boolean;
+  showErrors: boolean;
+}
+
 export interface AppState {
   sceneData: SceneData;
   selectedElementId: string | null;
@@ -89,12 +99,16 @@ export interface AppState {
   editMode: EditMode;
   cameraView: CameraView;
   hoveredElementId: string | null;
+  filters: FilterState;
+  isDragging: boolean;
 
   setSelectedElement: (id: string | null) => void;
   setHoveredElement: (id: string | null) => void;
   updateElement: (id: string, updates: Partial<BaseElement>) => void;
   addElement: (element: BaseElement) => void;
   removeElement: (id: string) => void;
+  toggleElementVisibility: (id: string) => void;
+  setFilters: (filters: Partial<FilterState>) => void;
   addPathPoint: (staffId: string, point: PathPoint) => void;
   removePathPoint: (staffId: string, pointId: string) => void;
   updatePathPoint: (staffId: string, pointId: string, updates: Partial<PathPoint>) => void;
@@ -102,6 +116,7 @@ export interface AppState {
   setCurrentTime: (time: number) => void;
   setEditMode: (mode: EditMode) => void;
   setCameraView: (view: CameraView) => void;
+  setIsDragging: (dragging: boolean) => void;
   loadSample: (sampleId: string) => void;
   resetScene: () => void;
   exportReport: () => void;

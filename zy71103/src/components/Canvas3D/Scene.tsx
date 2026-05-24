@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, TransformControls } from '@react-three/drei';
 import { useThree, useFrame } from '@react-three/fiber';
 import { useAppStore } from '../../store/useAppStore';
 import { OperatingRoom } from './OperatingRoom';
@@ -10,6 +10,7 @@ import { Staff } from './Staff';
 import { PathLine } from './PathLine';
 import { ErrorMarker } from './ErrorMarker';
 import type { SceneElement } from '../../types';
+import * as THREE from 'three';
 
 interface CameraControllerProps {
   view: 'top' | 'front' | 'side' | 'free';
@@ -52,31 +53,148 @@ const CameraController: React.FC<CameraControllerProps> = ({ view, roomSize }) =
   return <OrbitControls ref={controlsRef} makeDefault enableDamping dampingFactor={0.05} />;
 };
 
+interface TransformableElementProps {
+  element: SceneElement;
+  isSelected: boolean;
+  onTransformEnd: () => void;
+}
+
+const TransformableElement: React.FC<TransformableElementProps> = ({
+  element,
+  isSelected,
+  onTransformEnd,
+}) => {
+  const transformRef = useRef<any>(null);
+  const groupRef = useRef<THREE.Group>(null);
+  const { updateElement } = useAppStore();
+
+  useEffect(() => {
+    if (transformRef.current && groupRef.current) {
+      const controls = transformRef.current;
+      const object = groupRef.current;
+
+      const onChange = () => {
+        updateElement(element.id, {
+          position: {
+            x: object.position.x,
+            y: object.position.y,
+            z: object.position.z,
+          },
+          rotation: {
+            x: object.rotation.x,
+            y: object.rotation.y,
+            z: object.rotation.z,
+          },
+          scale: {
+            x: object.scale.x,
+            y: object.scale.y,
+            z: object.scale.z,
+          },
+        });
+      };
+
+      controls.addEventListener('objectChange', onChange);
+      return () => controls.removeEventListener('objectChange', onChange);
+    }
+  }, [element.id, updateElement]);
+
+  useEffect(() => {
+    if (groupRef.current) {
+      groupRef.current.position.set(
+        element.position.x,
+        element.position.y,
+        element.position.z
+      );
+      groupRef.current.rotation.set(
+        element.rotation.x,
+        element.rotation.y,
+        element.rotation.z
+      );
+      groupRef.current.scale.set(
+        element.scale.x,
+        element.scale.y,
+        element.scale.z
+      );
+    }
+  }, [element.position, element.rotation, element.scale]);
+
+  const renderElement = () => {
+    switch (element.type) {
+      case 'instrumentCart':
+        return (
+          <InstrumentCart
+            data={element}
+            isSelected={isSelected}
+            isHovered={false}
+          />
+        );
+      case 'sterileZone':
+        return (
+          <SterileZone
+            data={element}
+            isSelected={isSelected}
+            isHovered={false}
+          />
+        );
+      case 'recycleBin':
+        return (
+          <RecycleBin
+            data={element}
+            isSelected={isSelected}
+            isHovered={false}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  if (!element.visible) return null;
+
+  return (
+    <>
+      <group ref={groupRef}>{renderElement()}</group>
+      {isSelected && groupRef.current && (
+        <TransformControls
+          ref={transformRef}
+          object={groupRef.current}
+          mode="translate"
+          onMouseUp={onTransformEnd}
+        />
+      )}
+    </>
+  );
+};
+
 export const Scene: React.FC = () => {
   const {
     sceneData,
     selectedElementId,
-    hoveredElementId,
     isPlaying,
     currentTime,
+    totalDuration,
     cameraView,
     setSelectedElement,
-    setHoveredElement,
-    updateElement,
-    setPlayState,
     setCurrentTime,
-    totalDuration,
+    setPlayState,
+    filters,
+    updateElement,
   } = useAppStore();
 
   const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (isPlaying) {
-      const animate = () => {
-        setCurrentTime(currentTime + 0.016);
-        if (currentTime >= totalDuration) {
+      let lastTime = performance.now();
+      const animate = (now: number) => {
+        const delta = (now - lastTime) / 1000;
+        lastTime = now;
+
+        setCurrentTime(currentTime + delta);
+        if (currentTime + delta >= totalDuration) {
           setPlayState(false);
           setCurrentTime(0);
+          return;
         }
         animationRef.current = requestAnimationFrame(animate);
       };
@@ -94,80 +212,34 @@ export const Scene: React.FC = () => {
     };
   }, [isPlaying, currentTime, totalDuration, setCurrentTime, setPlayState]);
 
-  const handleElementDragEnd = (id: string, position: { x: number; y: number; z: number }) => {
-    updateElement(id, { position });
+  const handleCanvasClick = (e: any) => {
+    if (e.target === e.currentTarget) {
+      setSelectedElement(null);
+    }
+  };
+
+  const shouldShowElement = (element: SceneElement): boolean => {
+    if (!element.visible) return false;
+    switch (element.type) {
+      case 'instrumentCart':
+        return filters.showInstrumentCarts;
+      case 'sterileZone':
+        return filters.showSterileZones;
+      case 'recycleBin':
+        return filters.showRecycleBins;
+      case 'staff':
+        return filters.showStaff;
+      default:
+        return true;
+    }
   };
 
   const getStaffErrors = (staffId: string): boolean => {
     return sceneData.errors.some((e) => e.elementIds.includes(staffId));
   };
 
-  const renderElement = (element: SceneElement) => {
-    const isSelected = selectedElementId === element.id;
-    const isHovered = hoveredElementId === element.id;
-
-    switch (element.type) {
-      case 'instrumentCart':
-        return (
-          <InstrumentCart
-            key={element.id}
-            data={element}
-            isSelected={isSelected}
-            isHovered={isHovered}
-            onSelect={() => setSelectedElement(element.id)}
-            onHover={(h) => setHoveredElement(h ? element.id : null)}
-            onDragEnd={(pos) => handleElementDragEnd(element.id, pos)}
-          />
-        );
-      case 'sterileZone':
-        return (
-          <SterileZone
-            key={element.id}
-            data={element}
-            isSelected={isSelected}
-            isHovered={isHovered}
-            onSelect={() => setSelectedElement(element.id)}
-            onHover={(h) => setHoveredElement(h ? element.id : null)}
-            onDragEnd={(pos) => handleElementDragEnd(element.id, pos)}
-          />
-        );
-      case 'recycleBin':
-        return (
-          <RecycleBin
-            key={element.id}
-            data={element}
-            isSelected={isSelected}
-            isHovered={isHovered}
-            onSelect={() => setSelectedElement(element.id)}
-            onHover={(h) => setHoveredElement(h ? element.id : null)}
-            onDragEnd={(pos) => handleElementDragEnd(element.id, pos)}
-          />
-        );
-      case 'staff':
-        return (
-          <React.Fragment key={element.id}>
-            <Staff
-              data={element}
-              isSelected={isSelected}
-              isHovered={isHovered}
-              currentTime={currentTime}
-              isPlaying={isPlaying}
-              onSelect={() => setSelectedElement(element.id)}
-              onHover={(h) => setHoveredElement(h ? element.id : null)}
-              onDragEnd={(pos) => handleElementDragEnd(element.id, pos)}
-            />
-            <PathLine
-              path={element.path}
-              color={element.color}
-              hasError={getStaffErrors(element.id)}
-              currentTime={currentTime}
-              isPlaying={isPlaying}
-            />
-          </React.Fragment>
-        );
-      default:
-        return null;
-    }
+  const getElementById = (id: string): SceneElement | undefined => {
+    return sceneData.elements.find((e) => e.id === id);
   };
 
   return (
@@ -185,22 +257,60 @@ export const Scene: React.FC = () => {
       />
       <directionalLight position={[-5, 5, -5]} intensity={0.3} />
 
-      <OperatingRoom width={sceneData.roomSize.width} depth={sceneData.roomSize.depth} />
-
-      {sceneData.elements.map(renderElement)}
-
-      {sceneData.errors.map((error) => (
-        <ErrorMarker
-          key={error.id}
-          error={error}
-          onClick={() => {
-            if (error.timestamp !== undefined) {
-              setCurrentTime(error.timestamp);
-              setPlayState(false);
-            }
-          }}
+      <group onClick={handleCanvasClick}>
+        <OperatingRoom
+          width={sceneData.roomSize.width}
+          depth={sceneData.roomSize.depth}
         />
-      ))}
+
+        {sceneData.elements
+          .filter((el) => el.type !== 'staff')
+          .filter(shouldShowElement)
+          .map((element) => (
+            <TransformableElement
+              key={element.id}
+              element={element}
+              isSelected={selectedElementId === element.id}
+              onTransformEnd={() => {}}
+            />
+          ))}
+
+        {sceneData.elements
+          .filter((el) => el.type === 'staff')
+          .filter(shouldShowElement)
+          .map((element) => (
+            <React.Fragment key={element.id}>
+              <Staff
+                data={element as any}
+                isSelected={selectedElementId === element.id}
+                isHovered={false}
+                currentTime={currentTime}
+              />
+              {filters.showPaths && (
+                <PathLine
+                  path={(element as any).path}
+                  color={(element as any).color}
+                  hasError={getStaffErrors(element.id)}
+                  currentTime={currentTime}
+                />
+              )}
+            </React.Fragment>
+          ))}
+
+        {filters.showErrors &&
+          sceneData.errors.map((error) => (
+            <ErrorMarker
+              key={error.id}
+              error={error}
+              onClick={() => {
+                if (error.timestamp !== undefined) {
+                  setCurrentTime(error.timestamp);
+                  setPlayState(false);
+                }
+              }}
+            />
+          ))}
+      </group>
     </>
   );
 };

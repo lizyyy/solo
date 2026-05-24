@@ -6,14 +6,24 @@ import type {
   TimelineStep,
   SceneData,
   SceneElement,
+  FilterState,
 } from '../types';
 import { sampleScenes, defaultScene, generateId } from '../data/samples';
 import { detectCollisions } from '../utils/collision';
 import { downloadTextReport, downloadJSON } from '../utils/exportReport';
 
-const initialScene = JSON.parse(JSON.stringify(sampleScenes['standard-or']));
-const initialErrors = detectCollisions(initialScene.elements);
-initialScene.errors = initialErrors;
+const addVisibleProperty = (element: any): any => ({
+  ...element,
+  visible: element.visible !== undefined ? element.visible : true,
+});
+
+const prepareSceneData = (scene: SceneData): SceneData => {
+  const elements = scene.elements.map(addVisibleProperty) as SceneElement[];
+  const errors = detectCollisions(elements);
+  return { ...scene, elements, errors };
+};
+
+const initialScene = prepareSceneData(JSON.parse(JSON.stringify(sampleScenes['standard-or'])));
 
 const calculateTotalDuration = (sceneData: SceneData): number => {
   let maxTime = 0;
@@ -26,6 +36,15 @@ const calculateTotalDuration = (sceneData: SceneData): number => {
   return maxTime;
 };
 
+const defaultFilters: FilterState = {
+  showInstrumentCarts: true,
+  showSterileZones: true,
+  showRecycleBins: true,
+  showStaff: true,
+  showPaths: true,
+  showErrors: true,
+};
+
 export const useAppStore = create<AppState>((set, get) => ({
   sceneData: initialScene,
   selectedElementId: null,
@@ -35,6 +54,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   totalDuration: calculateTotalDuration(initialScene),
   editMode: 'select',
   cameraView: 'free',
+  filters: defaultFilters,
+  isDragging: false,
 
   setSelectedElement: (id: string | null) => {
     set({ selectedElementId: id });
@@ -61,7 +82,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   addElement: (element: BaseElement) => {
     set((state) => {
-      const newElements = [...state.sceneData.elements, element as SceneElement];
+      const newElement = addVisibleProperty(element) as SceneElement;
+      const newElements = [...state.sceneData.elements, newElement];
       const newSceneData: SceneData = { ...state.sceneData, elements: newElements };
       const errors = detectCollisions(newElements);
       newSceneData.errors = errors;
@@ -93,6 +115,23 @@ export const useAppStore = create<AppState>((set, get) => ({
         totalDuration: calculateTotalDuration(newSceneData),
       };
     });
+  },
+
+  toggleElementVisibility: (id: string) => {
+    set((state) => {
+      const newElements = state.sceneData.elements.map((el) =>
+        el.id === id ? { ...el, visible: !el.visible } : el
+      ) as SceneElement[];
+      return {
+        sceneData: { ...state.sceneData, elements: newElements },
+      };
+    });
+  },
+
+  setFilters: (filters: Partial<FilterState>) => {
+    set((state) => ({
+      filters: { ...state.filters, ...filters },
+    }));
   },
 
   addPathPoint: (staffId: string, point: PathPoint) => {
@@ -173,22 +212,25 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ cameraView: view });
   },
 
+  setIsDragging: (dragging: boolean) => {
+    set({ isDragging: dragging });
+  },
+
   loadSample: (sampleId: string) => {
     const sample = sampleScenes[sampleId] || defaultScene;
-    const sceneData = JSON.parse(JSON.stringify(sample));
-    const errors = detectCollisions(sceneData.elements);
-    sceneData.errors = errors;
+    const sceneData = prepareSceneData(JSON.parse(JSON.stringify(sample)));
     set({
       sceneData,
       selectedElementId: null,
       isPlaying: false,
       currentTime: 0,
       totalDuration: calculateTotalDuration(sceneData),
+      filters: defaultFilters,
     });
   },
 
   resetScene: () => {
-    const sceneData = JSON.parse(JSON.stringify(defaultScene));
+    const sceneData = prepareSceneData(JSON.parse(JSON.stringify(defaultScene)));
     set({
       sceneData,
       selectedElementId: null,
@@ -197,6 +239,8 @@ export const useAppStore = create<AppState>((set, get) => ({
       currentTime: 0,
       totalDuration: 0,
       editMode: 'select',
+      filters: defaultFilters,
+      isDragging: false,
     });
   },
 

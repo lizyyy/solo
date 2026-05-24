@@ -16,6 +16,7 @@ export const Toolbar: React.FC = () => {
       width: 1.2,
       depth: 0.6,
       height: 0.9,
+      visible: true,
     } as any);
   };
 
@@ -30,6 +31,7 @@ export const Toolbar: React.FC = () => {
       width: 3,
       depth: 2,
       color: '#00B42A',
+      visible: true,
     } as any);
   };
 
@@ -42,6 +44,7 @@ export const Toolbar: React.FC = () => {
       rotation: { x: 0, y: 0, z: 0 },
       scale: { x: 1, y: 1, z: 1 },
       radius: 0.4,
+      visible: true,
     } as any);
   };
 
@@ -59,6 +62,7 @@ export const Toolbar: React.FC = () => {
       role: roles[randomIndex] as any,
       color: colors[randomIndex],
       path: [],
+      visible: true,
     } as any);
   };
 
@@ -90,24 +94,26 @@ export const Toolbar: React.FC = () => {
   ];
 
   return (
-    <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20">
-      <div className="bg-white rounded-xl shadow-lg p-2 flex flex-col gap-1">
-        <div className="text-xs text-gray-500 text-center py-2 border-b border-gray-100 mb-1">
+    <div className="absolute left-4 bottom-28 z-20">
+      <div className="bg-white rounded-xl shadow-lg p-3">
+        <div className="text-xs text-gray-500 text-center mb-2 pb-2 border-b border-gray-100">
           添加元素
         </div>
-        {toolButtons.map((tool, index) => (
-          <button
-            key={index}
-            onClick={tool.onClick}
-            className="p-3 rounded-lg hover:bg-gray-100 transition-colors group relative"
-            title={tool.label}
-          >
-            <tool.icon className={`w-5 h-5 ${tool.color}`} />
-            <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-              {tool.label}
-            </span>
-          </button>
-        ))}
+        <div className="flex gap-2">
+          {toolButtons.map((tool, index) => (
+            <button
+              key={index}
+              onClick={tool.onClick}
+              className="p-3 rounded-lg hover:bg-gray-100 transition-colors group relative"
+              title={tool.label}
+            >
+              <tool.icon className={`w-5 h-5 ${tool.color}`} />
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                {tool.label}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

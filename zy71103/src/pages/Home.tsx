@@ -1,6 +1,7 @@
 import React from 'react';
 import { Canvas3D } from '@/components/Canvas3D';
 import { Toolbar } from '@/components/Toolbar';
+import { FilterPanel } from '@/components/FilterPanel';
 import { PropertyPanel } from '@/components/PropertyPanel';
 import { Timeline } from '@/components/Timeline';
 import { TopMenu } from '@/components/TopMenu';
@@ -12,6 +13,7 @@ const Home: React.FC = () => {
       <Canvas3D />
       <TopMenu />
       <Toolbar />
+      <FilterPanel />
       <PropertyPanel />
       <Timeline />
       <ErrorToast />

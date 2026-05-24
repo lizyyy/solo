@@ -1,7 +1,7 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import type { Staff as StaffType } from '../../types';
-import { getPositionOnPath, generateSmoothPathPoints } from '../../utils/pathUtils';
+import { getPositionOnPath } from '../../utils/pathUtils';
 import * as THREE from 'three';
 
 interface StaffProps {
@@ -9,10 +9,6 @@ interface StaffProps {
   isSelected: boolean;
   isHovered: boolean;
   currentTime: number;
-  isPlaying: boolean;
-  onSelect: () => void;
-  onHover: (hovered: boolean) => void;
-  onDragEnd: (position: { x: number; y: number; z: number }) => void;
 }
 
 export const Staff: React.FC<StaffProps> = ({
@@ -20,47 +16,44 @@ export const Staff: React.FC<StaffProps> = ({
   isSelected,
   isHovered,
   currentTime,
-  isPlaying,
-  onSelect,
-  onHover,
-  onDragEnd,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const { color, path } = data;
 
-  const animPosition = useMemo(() => {
-    if (path.length === 0) return { pos: data.position, rot: 0 };
-    if (!isPlaying && path.length > 0) return { pos: path[0].position, rot: 0 };
+  const animState = useMemo(() => {
+    if (path.length === 0) {
+      return {
+        position: data.position,
+        rotation: 0,
+      };
+    }
+
     const result = getPositionOnPath(path, currentTime);
-    return result ? { pos: result.position, rot: result.rotation } : { pos: data.position, rot: 0 };
-  }, [path, currentTime, isPlaying, data.position]);
+    if (result) {
+      return result;
+    }
+
+    return {
+      position: path[0]?.position || data.position,
+      rotation: 0,
+    };
+  }, [path, currentTime, data.position]);
 
   useFrame(() => {
     if (groupRef.current) {
-      groupRef.current.position.set(animPosition.pos.x, animPosition.pos.y, animPosition.pos.z);
-      groupRef.current.rotation.y = animPosition.rot;
+      groupRef.current.position.set(
+        animState.position.x,
+        animState.position.y,
+        animState.position.z
+      );
+      groupRef.current.rotation.y = animState.rotation;
     }
   });
 
   const bodyColor = isSelected ? '#4096ff' : isHovered ? '#69b1ff' : color;
 
   return (
-    <group
-      ref={groupRef}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect();
-      }}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        onHover(true);
-        document.body.style.cursor = 'pointer';
-      }}
-      onPointerOut={() => {
-        onHover(false);
-        document.body.style.cursor = 'default';
-      }}
-    >
+    <group ref={groupRef}>
       <mesh position={[0, 0.9, 0]} castShadow>
         <cylinderGeometry args={[0.15, 0.18, 0.8, 16]} />
         <meshStandardMaterial color={bodyColor} />

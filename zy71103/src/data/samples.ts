@@ -19,6 +19,7 @@ export const sampleScenes: Record<string, SceneData> = {
         width: 4,
         depth: 3,
         color: '#00B42A',
+        visible: true,
       },
       {
         id: 'cart-1',
@@ -30,6 +31,7 @@ export const sampleScenes: Record<string, SceneData> = {
         width: 1.2,
         depth: 0.6,
         height: 0.9,
+        visible: true,
       },
       {
         id: 'cart-2',
@@ -41,6 +43,7 @@ export const sampleScenes: Record<string, SceneData> = {
         width: 1.2,
         depth: 0.6,
         height: 0.9,
+        visible: true,
       },
       {
         id: 'recycle-1',
@@ -50,6 +53,7 @@ export const sampleScenes: Record<string, SceneData> = {
         rotation: { x: 0, y: 0, z: 0 },
         scale: { x: 1, y: 1, z: 1 },
         radius: 0.4,
+        visible: true,
       },
       {
         id: 'nurse-1',
@@ -60,6 +64,7 @@ export const sampleScenes: Record<string, SceneData> = {
         scale: { x: 1, y: 1, z: 1 },
         role: 'nurse',
         color: '#165DFF',
+        visible: true,
         path: [
           {
             id: 'p1',
@@ -138,6 +143,7 @@ export const sampleScenes: Record<string, SceneData> = {
         width: 4,
         depth: 3,
         color: '#00B42A',
+        visible: true,
       },
       {
         id: 'cart-1',
@@ -149,6 +155,7 @@ export const sampleScenes: Record<string, SceneData> = {
         width: 1.2,
         depth: 0.6,
         height: 0.9,
+        visible: true,
       },
       {
         id: 'cart-2',
@@ -160,6 +167,7 @@ export const sampleScenes: Record<string, SceneData> = {
         width: 1.2,
         depth: 0.6,
         height: 0.9,
+        visible: true,
       },
       {
         id: 'recycle-1',
@@ -169,6 +177,7 @@ export const sampleScenes: Record<string, SceneData> = {
         rotation: { x: 0, y: 0, z: 0 },
         scale: { x: 1, y: 1, z: 1 },
         radius: 0.4,
+        visible: true,
       },
       {
         id: 'nurse-1',
@@ -179,6 +188,7 @@ export const sampleScenes: Record<string, SceneData> = {
         scale: { x: 1, y: 1, z: 1 },
         role: 'nurse',
         color: '#165DFF',
+        visible: true,
         path: [
           {
             id: 'p1',

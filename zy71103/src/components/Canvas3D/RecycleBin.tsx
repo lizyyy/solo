@@ -1,55 +1,24 @@
-import React, { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import React from 'react';
 import type { RecycleBin as RecycleBinType } from '../../types';
-import * as THREE from 'three';
 
 interface RecycleBinProps {
   data: RecycleBinType;
   isSelected: boolean;
   isHovered: boolean;
-  onSelect: () => void;
-  onHover: (hovered: boolean) => void;
-  onDragEnd: (position: { x: number; y: number; z: number }) => void;
 }
 
 export const RecycleBin: React.FC<RecycleBinProps> = ({
   data,
   isSelected,
   isHovered,
-  onSelect,
-  onHover,
-  onDragEnd,
 }) => {
-  const groupRef = useRef<THREE.Group>(null);
-  const { position, rotation, radius } = data;
+  const { radius } = data;
   const height = 0.8;
-
-  useFrame(() => {
-    if (groupRef.current) {
-      groupRef.current.position.set(position.x, position.y, position.z);
-      groupRef.current.rotation.set(rotation.x, rotation.y, rotation.z);
-    }
-  });
 
   const bodyColor = isSelected ? '#ff7875' : isHovered ? '#ffa39e' : '#ff4d4f';
 
   return (
-    <group
-      ref={groupRef}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect();
-      }}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        onHover(true);
-        document.body.style.cursor = 'pointer';
-      }}
-      onPointerOut={() => {
-        onHover(false);
-        document.body.style.cursor = 'default';
-      }}
-    >
+    <group>
       <mesh position={[0, height / 2, 0]} castShadow>
         <cylinderGeometry args={[radius, radius * 0.9, height, 32]} />
         <meshStandardMaterial color={bodyColor} />

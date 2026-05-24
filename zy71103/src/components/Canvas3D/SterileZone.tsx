@@ -1,54 +1,24 @@
-import React, { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import type { SterileZone as SterileZoneType } from '../../types';
+import React from 'react';
 import * as THREE from 'three';
+import type { SterileZone as SterileZoneType } from '../../types';
 
 interface SterileZoneProps {
   data: SterileZoneType;
   isSelected: boolean;
   isHovered: boolean;
-  onSelect: () => void;
-  onHover: (hovered: boolean) => void;
-  onDragEnd: (position: { x: number; y: number; z: number }) => void;
 }
 
 export const SterileZone: React.FC<SterileZoneProps> = ({
   data,
   isSelected,
   isHovered,
-  onSelect,
-  onHover,
-  onDragEnd,
 }) => {
-  const groupRef = useRef<THREE.Group>(null);
-  const { position, rotation, width, depth, color } = data;
-
-  useFrame(() => {
-    if (groupRef.current) {
-      groupRef.current.position.set(position.x, position.y, position.z);
-      groupRef.current.rotation.set(rotation.x, rotation.y, rotation.z);
-    }
-  });
+  const { width, depth, color } = data;
 
   const borderColor = isSelected ? '#165DFF' : isHovered ? '#4096ff' : color;
 
   return (
-    <group
-      ref={groupRef}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect();
-      }}
-      onPointerOver={(e) => {
-        e.stopPropagation();
-        onHover(true);
-        document.body.style.cursor = 'pointer';
-      }}
-      onPointerOut={() => {
-        onHover(false);
-        document.body.style.cursor = 'default';
-      }}
-    >
+    <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
         <planeGeometry args={[width, depth]} />
         <meshStandardMaterial
