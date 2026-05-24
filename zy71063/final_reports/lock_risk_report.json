@@ -1,0 +1,126 @@
+{
+  "generated_at": "2026-05-24T22:02:29.437968",
+  "summary": {
+    "total_migrations": 4,
+    "total_statements": 4,
+    "transaction_wrapped": 0,
+    "with_rollback_script": 1,
+    "risk_levels": {
+      "safe": 0,
+      "low": 2,
+      "medium": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "lock_levels": {
+      "none": 0,
+      "metadata": 2,
+      "shared": 0,
+      "exclusive": 0,
+      "table": 0
+    },
+    "alter_types": {
+      "add_column": 1,
+      "drop_column": 0,
+      "modify_column": 0,
+      "add_index": 1,
+      "drop_index": 0,
+      "add_constraint": 0,
+      "drop_constraint": 0,
+      "rename_table": 0,
+      "rename_column": 0,
+      "alter_default": 0,
+      "unknown": 0
+    },
+    "order_issues": 2,
+    "tables_with_indexes": {
+      "users": 3,
+      "orders": 3,
+      "products": 2
+    },
+    "exit_code": 1
+  },
+  "exit_code": 1,
+  "findings": [
+    {
+      "risk_level": "low",
+      "lock_level": "metadata",
+      "reason": "操作类型: add_column | 锁级别: 元数据锁 (仅阻塞DDL) | 表行数: 2,500,000 | 表大小: 350.0 MB | 现有索引数: 3",
+      "mitigation": "添加 ALGORITHM=INPLACE LOCK=NONE 减少锁影响",
+      "estimated_duration_seconds": 5,
+      "statement": {
+        "table_name": "users",
+        "alter_type": "add_column",
+        "is_concurrent": false,
+        "is_online": false,
+        "uses_algorithm_inplace": false,
+        "uses_lock_none": false,
+        "column_name": "email",
+        "index_name": null,
+        "raw_sql": "-- 添加用户邮箱字段\nALTER TABLE users ADD COLUMN email VARCHAR(255) NULL;"
+      }
+    },
+    {
+      "risk_level": "low",
+      "lock_level": "metadata",
+      "reason": "操作类型: add_index | 锁级别: 元数据锁 (仅阻塞DDL) | 表行数: 15,000,000 | 表大小: 2800.0 MB | 现有索引数: 3 | ⚠️ 索引已存在 | 使用了 ALGORITHM=INPLACE | 使用了 LOCK=NONE",
+      "mitigation": "建议使用 CREATE INDEX CONCURRENTLY 或 ALTER TABLE ... ADD INDEX ALGORITHM=INPLACE LOCK=NONE",
+      "estimated_duration_seconds": 1500,
+      "statement": {
+        "table_name": "orders",
+        "alter_type": "add_index",
+        "is_concurrent": false,
+        "is_online": false,
+        "uses_algorithm_inplace": true,
+        "uses_lock_none": true,
+        "column_name": "INDEX",
+        "index_name": "idx_user_id",
+        "raw_sql": "-- 为订单表添加用户ID索引\nALTER TABLE orders ADD INDEX idx_user_id (user_id) ALGORITHM=INPLACE LOCK=NONE;"
+      }
+    }
+  ],
+  "order_issues": [
+    {
+      "type": "missing_rollback",
+      "description": "迁移文件包含 DDL 变更但未找到对应的回滚脚本",
+      "migration_file": "examples/migrations/001_add_user_email.sql",
+      "statement_index": 0
+    },
+    {
+      "type": "missing_rollback",
+      "description": "迁移文件包含 DDL 变更但未找到对应的回滚脚本",
+      "migration_file": "examples/migrations/002_add_order_index.sql",
+      "statement_index": 0
+    }
+  ],
+  "migration_files": [
+    {
+      "file_path": "examples/migrations/001_add_user_email.sql",
+      "is_wrapped_in_transaction": false,
+      "has_rollback_script": false,
+      "rollback_path": null,
+      "statement_count": 1
+    },
+    {
+      "file_path": "examples/migrations/002_add_order_index.sql",
+      "is_wrapped_in_transaction": false,
+      "has_rollback_script": false,
+      "rollback_path": null,
+      "statement_count": 1
+    },
+    {
+      "file_path": "examples/migrations/003_modify_product_price.sql",
+      "is_wrapped_in_transaction": false,
+      "has_rollback_script": true,
+      "rollback_path": "examples/migrations/003_modify_product_price_rollback.sql",
+      "statement_count": 1
+    },
+    {
+      "file_path": "examples/migrations/003_modify_product_price_rollback.sql",
+      "is_wrapped_in_transaction": false,
+      "has_rollback_script": false,
+      "rollback_path": null,
+      "statement_count": 1
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+indexes:
+  users:
+    - name: PRIMARY
+      columns: ["id"]
+      is_unique: true
+      is_primary: true
+    - name: idx_username
+      columns: ["username"]
+      is_unique: true
+      is_primary: false
+    - name: idx_created_at
+      columns: ["created_at"]
+      is_unique: false
+      is_primary: false
+  orders:
+    - name: PRIMARY
+      columns: ["id"]
+      is_unique: true
+      is_primary: true
+    - name: idx_user_id
+      columns: ["user_id"]
+      is_unique: false
+      is_primary: false
+    - name: idx_order_date
+      columns: ["order_date"]
+      is_unique: false
+      is_primary: false
+  products:
+    - name: PRIMARY
+      columns: ["id"]
+      is_unique: true
+      is_primary: true
+    - name: idx_sku
+      columns: ["sku"]
+      is_unique: true
+      is_primary: false

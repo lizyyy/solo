@@ -70,6 +70,11 @@ class Reporter:
         table.add_row("有回滚脚本", str(summary.get("with_rollback_script", 0)))
         table.add_row("顺序问题", str(summary.get("order_issues", 0)))
         
+        tables_with_indexes = summary.get("tables_with_indexes", {})
+        if tables_with_indexes:
+            idx_info = ", ".join(f"{tbl}({cnt})" for tbl, cnt in tables_with_indexes.items())
+            table.add_row("表索引数", idx_info)
+        
         self.console.print(table)
         
         risk_table = Table(title="风险等级分布", show_header=True, header_style="bold magenta")

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-24T19:30:37.044052",
+  "generated_at": "2026-05-24T22:01:49.072714",
   "summary": {
     "total_migrations": 1,
     "total_statements": 2,
@@ -33,6 +33,7 @@
       "unknown": 0
     },
     "order_issues": 1,
+    "tables_with_indexes": {},
     "exit_code": 2
   },
   "exit_code": 2,
@@ -78,13 +79,13 @@
     {
       "type": "missing_rollback",
       "description": "迁移文件包含 DDL 变更但未找到对应的回滚脚本",
-      "migration_file": "/var/folders/4f/2_hylcyd3411bpx1k_b1gfgw0000gn/T/tmpi8m1cb9e.sql",
+      "migration_file": "/var/folders/4f/2_hylcyd3411bpx1k_b1gfgw0000gn/T/tmpcie_hf1i.sql",
       "statement_index": 0
     }
   ],
   "migration_files": [
     {
-      "file_path": "/var/folders/4f/2_hylcyd3411bpx1k_b1gfgw0000gn/T/tmpi8m1cb9e.sql",
+      "file_path": "/var/folders/4f/2_hylcyd3411bpx1k_b1gfgw0000gn/T/tmpcie_hf1i.sql",
       "is_wrapped_in_transaction": false,
       "has_rollback_script": false,
       "rollback_path": null,

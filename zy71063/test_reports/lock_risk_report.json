@@ -1,0 +1,55 @@
+{
+  "generated_at": "2026-05-24T21:59:19.040890",
+  "summary": {
+    "total_migrations": 1,
+    "total_statements": 1,
+    "transaction_wrapped": 0,
+    "with_rollback_script": 1,
+    "risk_levels": {
+      "safe": 0,
+      "low": 0,
+      "medium": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "lock_levels": {
+      "none": 0,
+      "metadata": 0,
+      "shared": 0,
+      "exclusive": 0,
+      "table": 0
+    },
+    "alter_types": {
+      "add_column": 0,
+      "drop_column": 0,
+      "modify_column": 0,
+      "add_index": 0,
+      "drop_index": 0,
+      "add_constraint": 0,
+      "drop_constraint": 0,
+      "rename_table": 0,
+      "rename_column": 0,
+      "alter_default": 0,
+      "unknown": 0
+    },
+    "order_issues": 0,
+    "tables_with_indexes": {
+      "users": 3,
+      "orders": 3,
+      "products": 2
+    },
+    "exit_code": 0
+  },
+  "exit_code": 0,
+  "findings": [],
+  "order_issues": [],
+  "migration_files": [
+    {
+      "file_path": "examples/migrations/003_modify_product_price.sql",
+      "is_wrapped_in_transaction": false,
+      "has_rollback_script": true,
+      "rollback_path": "examples/migrations/003_modify_product_price_rollback.sql",
+      "statement_count": 1
+    }
+  ]
+}

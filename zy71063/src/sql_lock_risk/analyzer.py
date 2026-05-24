@@ -71,7 +71,19 @@ class LockRiskAnalyzer:
         
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
-            self.exceptions = [line.strip() for line in content.split('\n') if line.strip()]
+        
+        lines = []
+        for line in content.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith('--'):
+                line = line[2:].strip()
+            if line.startswith('#'):
+                line = line[1:].strip()
+            if line:
+                lines.append(line)
+        self.exceptions = lines
 
     def analyze_files(self, file_paths: List[str], migration_order: Optional[List[str]] = None) -> AnalysisResult:
         migration_files: List[MigrationFile] = []
@@ -236,6 +248,15 @@ class LockRiskAnalyzer:
         if table_stat.size_mb > 0:
             reasons.append(f"表大小: {table_stat.size_mb:.1f} MB")
 
+        table_indexes = self.index_info.get(stmt.table_name, [])
+        if table_indexes:
+            reasons.append(f"现有索引数: {len(table_indexes)}")
+
+        if stmt.alter_type == AlterType.ADD_INDEX and table_indexes:
+            existing_index_names = [idx.index_name for idx in table_indexes]
+            if stmt.index_name in existing_index_names:
+                reasons.append("⚠️ 索引已存在")
+
         if stmt.is_concurrent:
             reasons.append("使用了 CONCURRENT 选项")
         if stmt.is_online:
@@ -381,6 +402,11 @@ class LockRiskAnalyzer:
         transaction_wrapped = sum(1 for m in migrations if m.is_wrapped_in_transaction)
         with_rollback = sum(1 for m in migrations if m.has_rollback_script)
 
+        tables_with_indexes = {
+            table_name: len(indexes)
+            for table_name, indexes in self.index_info.items()
+        }
+
         return {
             "total_migrations": len(migrations),
             "total_statements": total_statements,
@@ -390,5 +416,6 @@ class LockRiskAnalyzer:
             "lock_levels": lock_counts,
             "alter_types": type_counts,
             "order_issues": len(order_issues),
+            "tables_with_indexes": tables_with_indexes,
             "exit_code": self._calculate_exit_code(findings, order_issues)
         }
