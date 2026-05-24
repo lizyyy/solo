@@ -4,17 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"museum-exhibit-condition-api/database"
-	"museum-exhibit-condition-api/models"
-	"museum-exhibit-condition-api/services"
+	"museum-exhibit-condition-api/handlers"
 	"net/http"
-	"strconv"
-	"strings"
-	"time"
 )
-
-type Handler struct {
-	versionSvc *services.VersionService
-}
 
 func main() {
 	if err := database.InitDB("exhibit_condition.db"); err != nil {
@@ -22,151 +14,48 @@ func main() {
 	}
 	defer database.CloseDB()
 
-	h := &Handler{versionSvc: services.NewVersionService()}
+	h := handlers.NewHandler()
 
 	http.HandleFunc("/api/health", h.Health)
 	http.HandleFunc("/api/records", h.RecordsHandler)
 	http.HandleFunc("/api/records/", h.RecordDetailHandler)
+	http.HandleFunc("/api/records/{id}/validate", h.ValidateHandler)
+	http.HandleFunc("/api/records/{id}/process", h.ProcessHandler)
+	http.HandleFunc("/api/records/{id}/dispute", h.DisputeHandler)
+	http.HandleFunc("/api/records/{id}/reject", h.RejectHandler)
+	http.HandleFunc("/api/records/{id}/close", h.CloseHandler)
+	http.HandleFunc("/api/records/{id}/revoke", h.RevokeHandler)
+	http.HandleFunc("/api/records/{id}/versions", h.VersionsHandler)
+	http.HandleFunc("/api/records/{id}/diffs", h.DiffsHandler)
+	http.HandleFunc("/api/records/{id}/logs", h.LogsHandler)
+	http.HandleFunc("/api/records/{id}/confirm-liability", h.ConfirmLiabilityHandler)
+	http.HandleFunc("/api/records/{id}/export/json", h.ExportJSONHandler)
+	http.HandleFunc("/api/records/{id}/export/csv", h.ExportCSVHandler)
+	http.HandleFunc("/api/versions/{versionId}/photos", h.PhotosHandler)
+	http.HandleFunc("/api/conclusions/{id}/review", h.ReviewHandler)
+	http.HandleFunc("/api/statistics", h.StatisticsHandler)
 
 	log.Println("Museum Exhibit Condition API starting on :8080")
+	log.Println("Endpoints:")
+	log.Println("  GET  /api/health - Health check")
+	log.Println("  POST /api/records - Import record")
+	log.Println("  GET  /api/records - List records")
+	log.Println("  GET  /api/records/{id} - Get record")
+	log.Println("  POST /api/records/{id}/validate - Validate")
+	log.Println("  POST /api/records/{id}/process - Process")
+	log.Println("  POST /api/records/{id}/dispute - Dispute")
+	log.Println("  POST /api/records/{id}/reject - Reject")
+	log.Println("  POST /api/records/{id}/close - Close")
+	log.Println("  POST /api/records/{id}/revoke - Revoke")
+	log.Println("  POST /api/records/{id}/versions - New version")
+	log.Println("  GET  /api/records/{id}/diffs - Version diffs")
+	log.Println("  GET  /api/records/{id}/logs - Operation logs")
+	log.Println("  POST /api/records/{id}/confirm-liability - Confirm liability")
+	log.Println("  GET  /api/records/{id}/export/json - Export JSON")
+	log.Println("  GET  /api/records/{id}/export/csv - Export CSV")
+	log.Println("  GET  /api/versions/{versionId}/photos - Get photos")
+	log.Println("  POST /api/conclusions/{id}/review - Review conclusion")
+	log.Println("  GET  /api/statistics - Statistics")
+
 	http.ListenAndServe(":8080", nil)
-}
-
-func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
-}
-
-func (h *Handler) RecordsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Metif r.Metif r.Metif r.Metif r.Metif } else if r.Method == "GET" {
-		h.ListRecords(w, r)
-	} else {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-	}
-}
-
-func (h *Handler) RecordDetailHandler(w http.ResponseWriter, r *http.Request) {
-	path := strings.TrimPrefix(r.URL.Path, "/api/records/")
-	idStr := path
-	if strings.Contains(path, "/") {
-		idStr = strings.Split(path, "/")[0]
-	}
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
-		return
-	}
-	h.GetRecord(w, r, id)
-}
-
-func (h *Handler) ImportRecord(w http.ResponseWriter, r *http.Request) {
-	var req struct {
-		ExhibitNo       string    `json:"exhibit_no"`
-		ContractNo      string    `json:"contract_no"`
-		CheckPoint      string    `json:"check_point"`
-		CheckTime       time.Time `json:"check_time"`
-		ConditionDesc   string    `json:"condition_desc"`
-		HasScratch      bool      `json:"has_scratch"`
-		ScratchLocation string    `json:"scratch_location"`
-		ScratchSize     string    `json:"scratch_size"`
-		InsuranceRemark string    `json:"insurance_remark"`
-		TransportNode   string    `json:"transport_node"`
-		IdempotentKey   string    `json:"idempotent_key"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	operator := r.Header.Get("X-Operator")
-	if operator == "" {
-		operator = "system"
-	}
-
-	if req.IdempotentKey != "" {
-		existing, exists, err := h.versionSvc.CheckIdempotent(req.IdempotentKey)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if exists {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]interface{}{"message": "Record already exists (idempotent)", "record": existing})
-			return
-		}
-	}
-
-	svcReq := &services.ImportRequest{
-		ExhibitNo:       req.ExhibitNo,
-		ContractNo:      req.ContractNo,
-		CheckPoint:      req.CheckPoint,
-		CheckTime:       req.CheckTime,
-		ConditionDesc:   req.ConditionDesc,
-		HasScratch:      req.HasScratch,
-		ScratchLocation: req.ScratchLocation,
-		ScratchSize:     req.ScratchSize,
-		InsuranceRemark: req.InsuranceRemark,
-		TransportNode:   req.TransportNode,
-		IdempotentKey:   req.IdempotentKey,
-	}
-
-	record, err := h.versionSvc.CreateRecord(svcReq, operator)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]interface{}{"message": "Record imported", "record": record})
-}
-
-func (h *Handler) ListRecords(w http.ResponseWriter, r *http.Request) {
-	limit := 20
-	offset := 0
-	if l := r.URL.Query().Get("limit"); l != "" {
-		limit, _ = strconv.Atoi(l)
-	}
-	if o := r.URL.Query().Get("offset"); o != "" {
-		offset, _ = strconv.Atoi(o)
-	}
-
-	rows, err := database.DB.Query(`SELECT id, exhibit_no, contract_no, current_version, liability_status, final_conclusion, created_at, updated_at, created_by, updated_by, idempotent_key FROM exhibit_records ORDER BY created_at DESC LIMIT ? OFFSET ?`, limit, offset)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer rows.Close()
-
-	var records []models.ExhibitRecord
-	for rows.Next() {
-		var r models.ExhibitRecord
-		rows.Scan(&r.ID, &r.ExhibitNo, &r.ContractNo, &r.CurrentVersion, &r.LiabilityStatus, &r.FinalConclusion, &r.CreatedAt, &r.UpdatedAt, &r.CreatedBy, &r.UpdatedBy, &r.IdempotentKey)
-		records = append(records, r)
-	}
-
-	var total int
-	database.DB.QueryRow(`SELECT COUNT(*) FROM exhibit_records`).Scan(&total)
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{"data": records, "total": total, "limit": limit, "offset": offset})
-}
-
-func (h *Handler) GetRecord(w http.ResponseWriter, r *http.Request, id int64) {
-	record, err := h.versionSvc.GetRecordByID(id)
-	if err != nil {
-		http.Error(w, "Record not found", http.StatusNotFound)
-		return
-	}
-
-	versionRows, _ := database.DB.Query(`SELECT id, record_id, version, check_point, check_time, condition_desc, has_scratch, scratch_location, scratch_size, insurance_remark, handler, transport_node, created_at, prev_version_id, change_summary FROM condition_versions WHERE record_id = ? ORDER BY version DESC`, id)
-	var versions []models.ConditionVersion
-	for versionRows.Next() {
-		var v models.ConditionVersion
-		versionRows.Scan(&v.ID, &v.RecordID, &v.Version, &v.CheckPoint, &v.CheckTime, &v.ConditionDesc, &v.HasScratch, &v.ScratchLocation, &v.ScratchSize, &v.InsuranceRemark, &v.Handler, &v.TransportNode, &v.CreatedAt, &v.PrevVersionID, &v.ChangeSummary)
-		versions = append(versions, v)
-	}
-	versionRows.Close()
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{"record": record, "versions": versions})
 }
