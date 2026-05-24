@@ -63,29 +63,44 @@ class DropAnalyzer:
     def _analyze_sensor(
         self, sensor_name: str, frames: List[FrameRecord]
     ) -> SensorAnalysisResult:
-        frames.sort(key=lambda f: f.timestamp)
-
         sensor_type = frames[0].sensor_type
         threshold = self.config.thresholds.get(sensor_type, 0.1)
         expected_fps = self.config.expected_fps.get(sensor_type, 10.0)
 
-        start_time = frames[0].timestamp
-        end_time = frames[-1].timestamp
-        duration = end_time - start_time
-        total_frames = len(frames)
-
-        actual_fps = total_frames / duration if duration > 0 else 0
-
         result = SensorAnalysisResult(
             sensor_name=sensor_name,
             sensor_type=sensor_type,
-            total_frames=total_frames,
-            start_time=start_time,
-            end_time=end_time,
-            duration=duration,
+            total_frames=len(frames),
+            start_time=min(f.timestamp for f in frames),
+            end_time=max(f.timestamp for f in frames),
+            duration=0.0,
             expected_fps=expected_fps,
-            actual_fps=actual_fps,
+            actual_fps=0.0,
         )
+
+        if self.config.detect_timestamp_rollback:
+            for i in range(1, len(frames)):
+                prev_frame = frames[i - 1]
+                curr_frame = frames[i]
+                time_diff = curr_frame.timestamp - prev_frame.timestamp
+
+                if time_diff < 0:
+                    result.timestamp_issues.append({
+                        'type': 'rollback',
+                        'time': curr_frame.timestamp,
+                        'prev_time': prev_frame.timestamp,
+                        'diff': time_diff,
+                        'prev_line': prev_frame.line_number,
+                        'curr_line': curr_frame.line_number,
+                        'description': f'时间戳回退: {time_diff:.6f}s (原始顺序)',
+                    })
+
+        frames_sorted = sorted(frames, key=lambda f: f.timestamp)
+
+        result.start_time = frames_sorted[0].timestamp
+        result.end_time = frames_sorted[-1].timestamp
+        result.duration = result.end_time - result.start_time
+        result.actual_fps = result.total_frames / result.duration if result.duration > 0 else 0
 
         frame_drops = []
         total_drop_duration = 0.0
@@ -94,23 +109,11 @@ class DropAnalyzer:
 
         expected_interval = 1.0 / expected_fps if expected_fps > 0 else 0.1
 
-        for i in range(1, len(frames)):
-            prev_frame = frames[i - 1]
-            curr_frame = frames[i]
+        for i in range(1, len(frames_sorted)):
+            prev_frame = frames_sorted[i - 1]
+            curr_frame = frames_sorted[i]
 
             time_diff = curr_frame.timestamp - prev_frame.timestamp
-
-            if self.config.detect_timestamp_rollback and time_diff < 0:
-                result.timestamp_issues.append({
-                    'type': 'rollback',
-                    'time': curr_frame.timestamp,
-                    'prev_time': prev_frame.timestamp,
-                    'diff': time_diff,
-                    'prev_line': prev_frame.line_number,
-                    'curr_line': curr_frame.line_number,
-                    'description': f'时间戳回退: {time_diff:.6f}s',
-                })
-                continue
 
             if time_diff > threshold:
                 severity = self._get_severity(time_diff, threshold)

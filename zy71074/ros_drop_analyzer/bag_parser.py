@@ -110,6 +110,18 @@ class BagParser:
                             continue
 
                         sensor_data[normalized_name].append(record)
+                    else:
+                        self.invalid_records.append({
+                            'line_number': line_number,
+                            'content': line,
+                            'error': f'无法识别传感器类型: topic={record.topic}',
+                        })
+                else:
+                    self.invalid_records.append({
+                        'line_number': line_number,
+                        'content': line,
+                        'error': '无法匹配时间戳和 topic 格式',
+                    })
             except Exception as e:
                 self.invalid_records.append({
                     'line_number': line_number,
