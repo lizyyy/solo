@@ -1,0 +1,75 @@
+[
+  {
+    "id": "test-samples/bounce-content.eml",
+    "recipient": "recipient@163.com",
+    "smtpCode": "552",
+    "enhancedCode": "5.7.0",
+    "provider": "netease",
+    "rawMessage": "Your message did not reach some or all of the intended recipients.\n\n  Subject:  Promotion\n  Sent:  2024-05-20 14:00:00\n\nThe following recipient(s) cannot be reached:\n\n  recipient@163.com on 2024-05-20 14:00:00\n    552 5.7.0 spam content detected, message rejected. \n    邮件内容包含违禁关键词，已被系统拦截。\n\nFinal-Recipient: rfc822; recipient@163.com\nAction: failed\nStatus: 5.2.0\nDiagnostic-Code: smtp; 552 5.7.0 spam content rejected\n",
+    "subject": "Undeliverable: Your email",
+    "timestamp": 1716184800000,
+    "category": "policy_rejection",
+    "confidence": 0.9,
+    "reason": "安全策略拒绝",
+    "retrySuggestion": {
+      "shouldRetry": false,
+      "maxRetries": 0,
+      "reason": "硬策略拒绝，需先解决发件信誉问题"
+    }
+  },
+  {
+    "id": "test-samples/bounce-mailbox-not-exist.eml",
+    "recipient": "nonexistent-user@qq.com",
+    "smtpCode": "550",
+    "enhancedCode": "5.1.1",
+    "provider": "tencent",
+    "rawMessage": "This message was created automatically by mail delivery software.\n\nA message that you sent could not be delivered to one or more of its\nrecipients. This is a permanent error. The following address(es) failed:\n\n  nonexistent-user@qq.com\n    SMTP error from remote mail server after RCPT TO:<nonexistent-user@qq.com>:\n    550 5.1.1 <nonexistent-user@qq.com>: Recipient address rejected: User unknown\n\nReporting-MTA: dns; mx1.qq.com\nOriginal-Recipient: rfc822;nonexistent-user@qq.com\nFinal-Recipient: rfc822;nonexistent-user@qq.com\nAction: failed\nStatus: 5.1.1\nDiagnostic-Code: smtp; 550 5.1.1 User unknown\n",
+    "subject": "Mail delivery failed: returning message to sender",
+    "timestamp": 1716172200000,
+    "category": "mailbox_not_exist",
+    "confidence": 0.9,
+    "reason": "邮箱不存在",
+    "retrySuggestion": {
+      "shouldRetry": false,
+      "maxRetries": 0,
+      "reason": "邮箱不存在，重试无效"
+    }
+  },
+  {
+    "id": "test-samples/bounce-policy.eml",
+    "recipient": "user@gmail.com",
+    "smtpCode": "550",
+    "enhancedCode": "5.7.1",
+    "provider": "gmail",
+    "rawMessage": "Delivery to the following recipient failed permanently:\n\n  user@gmail.com\n\nTechnical details of permanent failure:\nGoogle tried to deliver your message, but it was rejected by the server for the recipient domain gmail.com.\n\nThe error that the other server returned was:\n550-5.7.1 Our system has detected that this message is likely unsolicited mail.\n550-5.7.1 To reduce the amount of spam sent to Gmail, this message has been\n550-5.7.1 blocked. Please visit\n550 5.7.1 https://support.google.com/mail/?p=UnsolicitedMessageError\n\nReporting-MTA: dns; google.com\nOriginal-Recipient: rfc822;user@gmail.com\nFinal-Recipient: rfc822;user@gmail.com\nAction: failed\nStatus: 5.7.1\nDiagnostic-Code: smtp; 550 5.7.1 Policy rejection\n",
+    "subject": "Delivery Status Notification (Failure)",
+    "timestamp": 1716174000000,
+    "category": "policy_rejection",
+    "confidence": 0.9,
+    "reason": "转发拒绝/权限不足",
+    "retrySuggestion": {
+      "shouldRetry": false,
+      "maxRetries": 0,
+      "reason": "硬策略拒绝，需先解决发件信誉问题"
+    }
+  },
+  {
+    "id": "test-samples/bounce-temporary.eml",
+    "recipient": "temp-user@aliyun.com",
+    "smtpCode": "451",
+    "enhancedCode": "4.7.1",
+    "provider": "alibaba",
+    "rawMessage": " **************************************************************\n **      THIS IS A WARNING MESSAGE ONLY                      **\n **      YOU DO NOT NEED TO RESEND YOUR MESSAGE              **\n **************************************************************\n\nA temporary error occurred while delivering your message.\nThe recipient server is temporarily unavailable.\nThe message will be retried for another 24 hours.\n\nRecipient: temp-user@aliyun.com\nReason: 451 4.7.1 Service temporarily unavailable - try again later\n        系统繁忙，请稍后重试\n\nReporting-MTA: dns; mx1.aliyun.com\nOriginal-Recipient: rfc822;temp-user@aliyun.com\nFinal-Recipient: rfc822;temp-user@aliyun.com\nAction: delayed\nStatus: 4.7.1\nDiagnostic-Code: smtp; 451 4.7.1 Try again later\n",
+    "subject": "Warning: could not send message for past 4 hours",
+    "timestamp": 1716188400000,
+    "category": "temporary_failure",
+    "confidence": 0.8,
+    "reason": "本地处理错误",
+    "retrySuggestion": {
+      "shouldRetry": true,
+      "retryAfterHours": 4,
+      "maxRetries": 3,
+      "reason": "临时性故障，建议等待后重试"
+    }
+  }
+]

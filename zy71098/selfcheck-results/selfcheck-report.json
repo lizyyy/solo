@@ -1,0 +1,54 @@
+{
+  "generatedAt": 1779629266015,
+  "totalRecords": 2,
+  "uniqueRecipients": 2,
+  "batches": {
+    "batch-output": {
+      "batchId": "batch-output",
+      "totalBounces": 2,
+      "categoryBreakdown": {
+        "mailbox_not_exist": 1,
+        "policy_rejection": 1,
+        "content_blocked": 0,
+        "temporary_failure": 0,
+        "unknown": 0
+      },
+      "uniqueRecipients": 2,
+      "repeatedBounces": [],
+      "providerBreakdown": {
+        "unknown": 2
+      },
+      "retryEligibleCount": 0
+    }
+  },
+  "overallBreakdown": {
+    "mailbox_not_exist": 1,
+    "policy_rejection": 1,
+    "content_blocked": 0,
+    "temporary_failure": 0,
+    "unknown": 0
+  },
+  "topReasons": [
+    {
+      "reason": "邮箱不存在或被拒绝",
+      "count": 1,
+      "category": "mailbox_not_exist"
+    },
+    {
+      "reason": "事务失败/策略拒绝",
+      "count": 1,
+      "category": "policy_rejection"
+    }
+  ],
+  "summary": {
+    "hardBounceRate": 0.5,
+    "policyRejectionRate": 0.5,
+    "contentBlockRate": 0,
+    "temporaryFailureRate": 0
+  },
+  "recommendations": [
+    "⚠️  高硬退信率 (50.0%)，建议清洗邮件列表，验证邮箱有效性",
+    "⚠️  高策略拒收率 (50.0%)，请检查：1) SPF/DKIM/DMARC配置 2) 发件IP信誉 3) 发送频率",
+    "🏢 以下供应商退信率超过50%：unknown，建议针对性检查配置"
+  ]
+}

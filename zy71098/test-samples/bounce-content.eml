@@ -1,0 +1,20 @@
+From: System Administrator <postmaster@163.com>
+To: sender@example.com
+Subject: Undeliverable: Your email
+Date: Mon, 20 May 2024 14:00:00 +0800
+
+Your message did not reach some or all of the intended recipients.
+
+  Subject:  Promotion
+  Sent:  2024-05-20 14:00:00
+
+The following recipient(s) cannot be reached:
+
+  recipient@163.com on 2024-05-20 14:00:00
+    552 5.7.0 spam content detected, message rejected. 
+    邮件内容包含违禁关键词，已被系统拦截。
+
+Final-Recipient: rfc822; recipient@163.com
+Action: failed
+Status: 5.2.0
+Diagnostic-Code: smtp; 552 5.7.0 spam content rejected

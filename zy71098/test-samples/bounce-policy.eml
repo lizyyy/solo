@@ -1,0 +1,24 @@
+From: Mail Delivery Subsystem <postmaster@gmail.com>
+To: sender@example.com
+Subject: Delivery Status Notification (Failure)
+Date: Mon, 20 May 2024 11:00:00 +0800
+
+Delivery to the following recipient failed permanently:
+
+  user@gmail.com
+
+Technical details of permanent failure:
+Google tried to deliver your message, but it was rejected by the server for the recipient domain gmail.com.
+
+The error that the other server returned was:
+550-5.7.1 Our system has detected that this message is likely unsolicited mail.
+550-5.7.1 To reduce the amount of spam sent to Gmail, this message has been
+550-5.7.1 blocked. Please visit
+550 5.7.1 https://support.google.com/mail/?p=UnsolicitedMessageError
+
+Reporting-MTA: dns; google.com
+Original-Recipient: rfc822;user@gmail.com
+Final-Recipient: rfc822;user@gmail.com
+Action: failed
+Status: 5.7.1
+Diagnostic-Code: smtp; 550 5.7.1 Policy rejection

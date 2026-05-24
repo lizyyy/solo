@@ -1,0 +1,67 @@
+{
+  "generatedAt": 1779629585964,
+  "totalRecords": 4,
+  "uniqueRecipients": 4,
+  "batches": {
+    "unknown": {
+      "batchId": "unknown",
+      "totalBounces": 4,
+      "categoryBreakdown": {
+        "mailbox_not_exist": 1,
+        "policy_rejection": 2,
+        "content_blocked": 0,
+        "temporary_failure": 1,
+        "unknown": 0
+      },
+      "uniqueRecipients": 4,
+      "repeatedBounces": [],
+      "providerBreakdown": {
+        "netease": 1,
+        "tencent": 1,
+        "gmail": 1,
+        "alibaba": 1
+      },
+      "retryEligibleCount": 1
+    }
+  },
+  "overallBreakdown": {
+    "mailbox_not_exist": 1,
+    "policy_rejection": 2,
+    "content_blocked": 0,
+    "temporary_failure": 1,
+    "unknown": 0
+  },
+  "topReasons": [
+    {
+      "reason": "安全策略拒绝",
+      "count": 1,
+      "category": "policy_rejection"
+    },
+    {
+      "reason": "邮箱不存在",
+      "count": 1,
+      "category": "mailbox_not_exist"
+    },
+    {
+      "reason": "转发拒绝/权限不足",
+      "count": 1,
+      "category": "policy_rejection"
+    },
+    {
+      "reason": "本地处理错误",
+      "count": 1,
+      "category": "temporary_failure"
+    }
+  ],
+  "summary": {
+    "hardBounceRate": 0.25,
+    "policyRejectionRate": 0.5,
+    "contentBlockRate": 0,
+    "temporaryFailureRate": 0.25
+  },
+  "recommendations": [
+    "⚠️  高策略拒收率 (50.0%)，请检查：1) SPF/DKIM/DMARC配置 2) 发件IP信誉 3) 发送频率",
+    "🔄 1 封退信可重试，请参考各条目的重试建议时间",
+    "🏢 以下供应商退信率超过50%：netease、tencent、gmail、alibaba，建议针对性检查配置"
+  ]
+}

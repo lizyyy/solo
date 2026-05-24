@@ -1,0 +1,24 @@
+From: Mail Delivery System <MAILER-DAEMON@aliyun.com>
+To: sender@example.com
+Subject: Warning: could not send message for past 4 hours
+Date: Mon, 20 May 2024 15:00:00 +0800
+
+ **************************************************************
+ **      THIS IS A WARNING MESSAGE ONLY                      **
+ **      YOU DO NOT NEED TO RESEND YOUR MESSAGE              **
+ **************************************************************
+
+A temporary error occurred while delivering your message.
+The recipient server is temporarily unavailable.
+The message will be retried for another 24 hours.
+
+Recipient: temp-user@aliyun.com
+Reason: 451 4.7.1 Service temporarily unavailable - try again later
+        系统繁忙，请稍后重试
+
+Reporting-MTA: dns; mx1.aliyun.com
+Original-Recipient: rfc822;temp-user@aliyun.com
+Final-Recipient: rfc822;temp-user@aliyun.com
+Action: delayed
+Status: 4.7.1
+Diagnostic-Code: smtp; 451 4.7.1 Try again later

@@ -1,0 +1,20 @@
+From: Mail Delivery Subsystem <MAILER-DAEMON@qq.com>
+To: sender@example.com
+Subject: Mail delivery failed: returning message to sender
+Date: Mon, 20 May 2024 10:30:00 +0800
+
+This message was created automatically by mail delivery software.
+
+A message that you sent could not be delivered to one or more of its
+recipients. This is a permanent error. The following address(es) failed:
+
+  nonexistent-user@qq.com
+    SMTP error from remote mail server after RCPT TO:<nonexistent-user@qq.com>:
+    550 5.1.1 <nonexistent-user@qq.com>: Recipient address rejected: User unknown
+
+Reporting-MTA: dns; mx1.qq.com
+Original-Recipient: rfc822;nonexistent-user@qq.com
+Final-Recipient: rfc822;nonexistent-user@qq.com
+Action: failed
+Status: 5.1.1
+Diagnostic-Code: smtp; 550 5.1.1 User unknown
