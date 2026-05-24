@@ -12,10 +12,10 @@ import (
 )
 
 type Handler struct {
-	repo              *repository.Repository
-	transferService   *service.WaterRightService
+	repo             *repository.Repository
+	transferService  *service.WaterRightService
 	irrigationService *service.IrrigationService
-	reportService     *service.ReportService
+	reportService    *service.ReportService
 }
 
 func NewHandler(repo *repository.Repository) *Handler {

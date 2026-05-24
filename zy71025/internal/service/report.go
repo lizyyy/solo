@@ -17,14 +17,14 @@ func NewReportService(repo *repository.Repository) *ReportService {
 }
 
 type BalanceReportResult struct {
-	Success      bool                `json:"success"`
-	Message      string              `json:"message"`
-	ReportNo     string              `json:"report_no,omitempty"`
-	Year         int                 `json:"year"`
-	Week         int                 `json:"week"`
-	GeneratedAt  time.Time           `json:"generated_at"`
-	ReportItems  []BalanceReportItem `json:"report_items,omitempty"`
-	TotalSummary map[string]float64  `json:"total_summary,omitempty"`
+	Success       bool                `json:"success"`
+	Message       string              `json:"message"`
+	ReportBatchNo string              `json:"report_batch_no,omitempty"`
+	Year          int                 `json:"year"`
+	Week          int                 `json:"week"`
+	GeneratedAt   time.Time           `json:"generated_at"`
+	ReportItems   []BalanceReportItem `json:"report_items,omitempty"`
+	TotalSummary  map[string]float64  `json:"total_summary,omitempty"`
 }
 
 type BalanceReportItem struct {
@@ -68,7 +68,7 @@ func (s *ReportService) GenerateWeeklyReport(year, week int, operator string) (*
 		item := BalanceReportItem{
 			FarmerID:       farmer.ID,
 			FarmerName:     farmer.Name,
-			InitialQuota:   wr.TotalQuota - transferIn + transferOut,
+			InitialQuota:   wr.TotalQuota,
 			TransferIn:     transferIn,
 			TransferOut:    transferOut,
 			IrrigationUsed: irrigationUsed,
@@ -82,8 +82,10 @@ func (s *ReportService) GenerateWeeklyReport(year, week int, operator string) (*
 		totalIrrigation += irrigationUsed
 		totalBalance += wr.Balance
 
+		farmerReportNo := fmt.Sprintf("%s-%04d", reportNo, farmer.ID)
 		report := &models.BalanceReport{
-			ReportNo:       reportNo,
+			ReportBatchNo:  reportNo,
+			ReportNo:       farmerReportNo,
 			FarmerID:       farmer.ID,
 			Year:           year,
 			Week:           week,
@@ -94,17 +96,19 @@ func (s *ReportService) GenerateWeeklyReport(year, week int, operator string) (*
 			Balance:        wr.Balance,
 			GeneratedAt:    time.Now(),
 		}
-		s.repo.CreateBalanceReport(report)
+		if err := s.repo.CreateBalanceReport(report); err != nil {
+			fmt.Printf("创建农户%d报告失败: %v\n", farmer.ID, err)
+		}
 	}
 
 	return &BalanceReportResult{
-		Success:     true,
-		Message:     fmt.Sprintf("周度余额报告生成完成，共%d个农户", len(items)),
-		ReportNo:    reportNo,
-		Year:        year,
-		Week:        week,
-		GeneratedAt: time.Now(),
-		ReportItems: items,
+		Success:       true,
+		Message:       fmt.Sprintf("周度余额报告生成完成，共%d个农户", len(items)),
+		ReportBatchNo: reportNo,
+		Year:          year,
+		Week:          week,
+		GeneratedAt:   time.Now(),
+		ReportItems:   items,
 		TotalSummary: map[string]float64{
 			"initial_quota":   totalInitial,
 			"transfer_in":     totalTransferIn,
@@ -186,7 +190,7 @@ func (s *ReportService) GetFarmerBalance(farmerID uint, year, week int) (*Balanc
 	return &BalanceReportItem{
 		FarmerID:       farmer.ID,
 		FarmerName:     farmer.Name,
-		InitialQuota:   wr.TotalQuota - transferIn + transferOut,
+		InitialQuota:   wr.TotalQuota,
 		TransferIn:     transferIn,
 		TransferOut:    transferOut,
 		IrrigationUsed: irrigationUsed,

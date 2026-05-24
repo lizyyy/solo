@@ -168,7 +168,9 @@ curl -X POST http://localhost:8080/api/v1/irrigation/IR2024201234567890/evidence
 
 #### 生成周度余额报告
 ```bash
-curl "http://localhost:8080/api/v1/reports/generate?year=2024&week=20&operator=管理员小王"
+curl -X POST "http://localhost:8080/api/v1/reports/generate?year=2024&week=20&operator=管理员小王" \
+  -H "Content-Type: application/json" \
+  -d '{}'
 ```
 
 #### 系统自检（余额一致性校验）

@@ -94,6 +94,7 @@ type IrrigationRecord struct {
 
 type BalanceReport struct {
 	ID             uint      `gorm:"primaryKey" json:"id"`
+	ReportBatchNo  string    `gorm:"size:50;index" json:"report_batch_no"`
 	ReportNo       string    `gorm:"size:50;uniqueIndex" json:"report_no"`
 	FarmerID       uint      `gorm:"index" json:"farmer_id"`
 	Year           int       `json:"year"`
