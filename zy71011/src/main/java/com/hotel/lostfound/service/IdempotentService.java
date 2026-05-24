@@ -29,17 +29,19 @@ public class IdempotentService {
         Optional<IdempotentRecord> existing = idempotentRecordRepository.findByRequestId(requestId);
         if (existing.isPresent()) {
             IdempotentRecord record = existing.get();
-            if (operationType.equals(record.getOperationType())) {
-                Object data = null;
-                if (record.getResponseData() != null) {
-                    try {
-                        data = objectMapper.readValue(record.getResponseData(), Object.class);
-                    } catch (Exception e) {
-                        log.warn("解析幂等记录响应数据失败", e);
-                    }
+            Object data = null;
+            if (record.getResponseData() != null) {
+                try {
+                    data = objectMapper.readValue(record.getResponseData(), Object.class);
+                } catch (Exception e) {
+                    log.warn("解析幂等记录响应数据失败", e);
                 }
-                throw new DuplicateRequestException(requestId, data);
             }
+            if (!operationType.equals(record.getOperationType())) {
+                log.warn("请求ID {} 已被操作类型 {} 使用，当前操作类型: {}", 
+                        requestId, record.getOperationType(), operationType);
+            }
+            throw new DuplicateRequestException(requestId, data);
         }
     }
 

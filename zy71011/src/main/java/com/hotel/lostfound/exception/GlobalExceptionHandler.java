@@ -3,6 +3,7 @@ package com.hotel.lostfound.exception;
 import com.hotel.lostfound.common.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -46,6 +47,17 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
         log.warn("参数绑定失败: {}", message);
         return ResponseEntity.badRequest().body(ApiResponse.error(400, message));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        String message = e.getMessage();
+        if (message != null && message.contains("IDEMPOTENT_RECORDS.REQUEST_ID")) {
+            log.warn("幂等记录唯一约束冲突（并发场景）: {}", message);
+            return ResponseEntity.status(409).body(ApiResponse.error(409, "请求已处理，请检查原请求结果"));
+        }
+        log.error("数据完整性异常", e);
+        return ResponseEntity.badRequest().body(ApiResponse.error(400, "数据违反唯一约束"));
     }
 
     @ExceptionHandler(Exception.class)
