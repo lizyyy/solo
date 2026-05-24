@@ -1,0 +1,29 @@
+{
+  "name": "md-chapter-owner",
+  "version": "1.0.0",
+  "description": "Markdown 章节归属 CLI 工具 - 管理多人编辑文档的负责人、锚点链接和评审记录",
+  "main": "src/cli.js",
+  "bin": {
+    "md-chapter-owner": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js",
+    "demo": "node src/cli.js --config examples/config.json --output output"
+  },
+  "keywords": [
+    "markdown",
+    "documentation",
+    "review",
+    "ownership",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

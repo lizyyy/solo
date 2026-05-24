@@ -1,0 +1,952 @@
+{
+  "generatedAt": "2026-05-24T11:30:05.269Z",
+  "summary": {
+    "totalFiles": 1,
+    "totalHeadings": 19,
+    "totalChapters": 19,
+    "chaptersWithOwner": 11,
+    "chaptersWithoutOwner": 8,
+    "brokenLinks": 1,
+    "unparsedRecords": 0,
+    "ownerMatchErrors": 1,
+    "exitCode": 1
+  },
+  "headings": [
+    {
+      "text": "产品需求文档",
+      "level": 1,
+      "lineNumber": 1,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "产品需求文档",
+      "baseAnchor": "产品需求文档",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:1"
+    },
+    {
+      "text": "项目概述",
+      "level": 2,
+      "lineNumber": 5,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "项目概述",
+      "baseAnchor": "项目概述",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:5"
+    },
+    {
+      "text": "项目背景",
+      "level": 3,
+      "lineNumber": 13,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "项目背景",
+      "baseAnchor": "项目背景",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:13"
+    },
+    {
+      "text": "项目目标",
+      "level": 3,
+      "lineNumber": 17,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "项目目标",
+      "baseAnchor": "项目目标",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:17"
+    },
+    {
+      "text": "功能设计",
+      "level": 2,
+      "lineNumber": 23,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "功能设计",
+      "baseAnchor": "功能设计",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:23"
+    },
+    {
+      "text": "用户管理模块",
+      "level": 3,
+      "lineNumber": 29,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "用户管理模块",
+      "baseAnchor": "用户管理模块",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:29"
+    },
+    {
+      "text": "文档管理模块",
+      "level": 3,
+      "lineNumber": 40,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "文档管理模块",
+      "baseAnchor": "文档管理模块",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:40"
+    },
+    {
+      "text": "评论系统",
+      "level": 3,
+      "lineNumber": 51,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "评论系统",
+      "baseAnchor": "评论系统",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:51"
+    },
+    {
+      "text": "技术架构",
+      "level": 2,
+      "lineNumber": 56,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "技术架构",
+      "baseAnchor": "技术架构",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:56"
+    },
+    {
+      "text": "前端技术栈",
+      "level": 3,
+      "lineNumber": 61,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "前端技术栈",
+      "baseAnchor": "前端技术栈",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:61"
+    },
+    {
+      "text": "后端技术栈",
+      "level": 3,
+      "lineNumber": 65,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "后端技术栈",
+      "baseAnchor": "后端技术栈",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:65"
+    },
+    {
+      "text": "数据库设计",
+      "level": 3,
+      "lineNumber": 69,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "数据库设计",
+      "baseAnchor": "数据库设计",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:69"
+    },
+    {
+      "text": "使用指南",
+      "level": 2,
+      "lineNumber": 75,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "使用指南",
+      "baseAnchor": "使用指南",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:75"
+    },
+    {
+      "text": "安装指南",
+      "level": 2,
+      "lineNumber": 83,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "安装指南",
+      "baseAnchor": "安装指南",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:83"
+    },
+    {
+      "text": "常见问题解答",
+      "level": 2,
+      "lineNumber": 87,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "常见问题解答",
+      "baseAnchor": "常见问题解答",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:87"
+    },
+    {
+      "text": "如何重置密码？",
+      "level": 3,
+      "lineNumber": 89,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "如何重置密码",
+      "baseAnchor": "如何重置密码",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:89"
+    },
+    {
+      "text": "如何重置密码？",
+      "level": 3,
+      "lineNumber": 93,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "如何重置密码-1",
+      "baseAnchor": "如何重置密码",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:93"
+    },
+    {
+      "text": "附录",
+      "level": 2,
+      "lineNumber": 97,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "附录",
+      "baseAnchor": "附录",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:97"
+    },
+    {
+      "text": "参考资料",
+      "level": 3,
+      "lineNumber": 99,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "anchor": "参考资料",
+      "baseAnchor": "参考资料",
+      "explicitAnchor": false,
+      "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:99"
+    }
+  ],
+  "chapters": [
+    {
+      "heading": {
+        "text": "产品需求文档",
+        "level": 1,
+        "lineNumber": 1,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "产品需求文档",
+        "baseAnchor": "产品需求文档",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:1"
+      },
+      "startLine": 1,
+      "endLine": 4,
+      "owner": null,
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "项目概述",
+        "level": 2,
+        "lineNumber": 5,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "项目概述",
+        "baseAnchor": "项目概述",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:5"
+      },
+      "startLine": 5,
+      "endLine": 12,
+      "owner": {
+        "name": "张三",
+        "source": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+          "lineNumber": 7
+        },
+        "raw": "张三",
+        "matched": "张三",
+        "matchType": "exact"
+      },
+      "reviewers": [
+        {
+          "name": "李四",
+          "source": {
+            "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+            "lineNumber": 8
+          },
+          "raw": "李四",
+          "matched": "李四",
+          "matchType": "exact"
+        },
+        {
+          "name": "王五",
+          "source": {
+            "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+            "lineNumber": 8
+          },
+          "raw": "王五",
+          "matched": "王五",
+          "matchType": "exact"
+        }
+      ],
+      "status": "已完成",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "项目背景",
+        "level": 3,
+        "lineNumber": 13,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "项目背景",
+        "baseAnchor": "项目背景",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:13"
+      },
+      "startLine": 13,
+      "endLine": 16,
+      "owner": {
+        "name": "张三",
+        "source": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+          "lineNumber": 7
+        },
+        "raw": "张三",
+        "inherited": true
+      },
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "项目目标",
+        "level": 3,
+        "lineNumber": 17,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "项目目标",
+        "baseAnchor": "项目目标",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:17"
+      },
+      "startLine": 17,
+      "endLine": 22,
+      "owner": {
+        "name": "张三",
+        "source": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+          "lineNumber": 7
+        },
+        "raw": "张三",
+        "inherited": true
+      },
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "功能设计",
+        "level": 2,
+        "lineNumber": 23,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "功能设计",
+        "baseAnchor": "功能设计",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:23"
+      },
+      "startLine": 23,
+      "endLine": 28,
+      "owner": {
+        "name": "小李",
+        "source": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+          "lineNumber": 25
+        },
+        "raw": "小李",
+        "matched": "李四",
+        "matchType": "alias"
+      },
+      "reviewers": [
+        {
+          "name": "赵六",
+          "source": {
+            "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+            "lineNumber": 26
+          },
+          "raw": "赵六",
+          "matched": "赵六",
+          "matchType": "exact"
+        }
+      ],
+      "status": "进行中",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "用户管理模块",
+        "level": 3,
+        "lineNumber": 29,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "用户管理模块",
+        "baseAnchor": "用户管理模块",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:29"
+      },
+      "startLine": 29,
+      "endLine": 39,
+      "owner": {
+        "name": "ww",
+        "source": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+          "lineNumber": 31
+        },
+        "raw": "ww",
+        "matched": "王五",
+        "matchType": "alias"
+      },
+      "reviewers": [],
+      "status": "待评审",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "文档管理模块",
+        "level": 3,
+        "lineNumber": 40,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "文档管理模块",
+        "baseAnchor": "文档管理模块",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:40"
+      },
+      "startLine": 40,
+      "endLine": 50,
+      "owner": {
+        "name": "陈七",
+        "source": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+          "lineNumber": 42
+        },
+        "raw": "陈七",
+        "matched": "陈七",
+        "matchType": "exact"
+      },
+      "reviewers": [],
+      "status": "未开始",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "评论系统",
+        "level": 3,
+        "lineNumber": 51,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "评论系统",
+        "baseAnchor": "评论系统",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:51"
+      },
+      "startLine": 51,
+      "endLine": 55,
+      "owner": {
+        "name": "unknown_person",
+        "source": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+          "lineNumber": 53
+        },
+        "raw": "unknown_person"
+      },
+      "reviewers": [],
+      "status": "规划中",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "技术架构",
+        "level": 2,
+        "lineNumber": 56,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "技术架构",
+        "baseAnchor": "技术架构",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:56"
+      },
+      "startLine": 56,
+      "endLine": 60,
+      "owner": {
+        "name": "张三",
+        "source": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+          "lineNumber": 58
+        },
+        "raw": "张三",
+        "matched": "张三",
+        "matchType": "exact"
+      },
+      "reviewers": [],
+      "status": "评审中",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "前端技术栈",
+        "level": 3,
+        "lineNumber": 61,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "前端技术栈",
+        "baseAnchor": "前端技术栈",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:61"
+      },
+      "startLine": 61,
+      "endLine": 64,
+      "owner": {
+        "name": "张三",
+        "source": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+          "lineNumber": 58
+        },
+        "raw": "张三",
+        "inherited": true
+      },
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "后端技术栈",
+        "level": 3,
+        "lineNumber": 65,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "后端技术栈",
+        "baseAnchor": "后端技术栈",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:65"
+      },
+      "startLine": 65,
+      "endLine": 68,
+      "owner": {
+        "name": "张三",
+        "source": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+          "lineNumber": 58
+        },
+        "raw": "张三",
+        "inherited": true
+      },
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "数据库设计",
+        "level": 3,
+        "lineNumber": 69,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "数据库设计",
+        "baseAnchor": "数据库设计",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:69"
+      },
+      "startLine": 69,
+      "endLine": 74,
+      "owner": {
+        "name": "李四",
+        "source": {
+          "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+          "lineNumber": 71
+        },
+        "raw": "李四",
+        "matched": "李四",
+        "matchType": "exact"
+      },
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "使用指南",
+        "level": 2,
+        "lineNumber": 75,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "使用指南",
+        "baseAnchor": "使用指南",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:75"
+      },
+      "startLine": 75,
+      "endLine": 82,
+      "owner": null,
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "安装指南",
+        "level": 2,
+        "lineNumber": 83,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "安装指南",
+        "baseAnchor": "安装指南",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:83"
+      },
+      "startLine": 83,
+      "endLine": 86,
+      "owner": null,
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "常见问题解答",
+        "level": 2,
+        "lineNumber": 87,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "常见问题解答",
+        "baseAnchor": "常见问题解答",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:87"
+      },
+      "startLine": 87,
+      "endLine": 88,
+      "owner": null,
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "如何重置密码？",
+        "level": 3,
+        "lineNumber": 89,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "如何重置密码",
+        "baseAnchor": "如何重置密码",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:89"
+      },
+      "startLine": 89,
+      "endLine": 92,
+      "owner": null,
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "如何重置密码？",
+        "level": 3,
+        "lineNumber": 93,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "如何重置密码-1",
+        "baseAnchor": "如何重置密码",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:93"
+      },
+      "startLine": 93,
+      "endLine": 96,
+      "owner": null,
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "附录",
+        "level": 2,
+        "lineNumber": 97,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "附录",
+        "baseAnchor": "附录",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:97"
+      },
+      "startLine": 97,
+      "endLine": 98,
+      "owner": null,
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    },
+    {
+      "heading": {
+        "text": "参考资料",
+        "level": 3,
+        "lineNumber": 99,
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "anchor": "参考资料",
+        "baseAnchor": "参考资料",
+        "explicitAnchor": false,
+        "id": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md:99"
+      },
+      "startLine": 99,
+      "endLine": 102,
+      "owner": null,
+      "reviewers": [],
+      "status": null,
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "metadata": {},
+      "unparsedRecords": []
+    }
+  ],
+  "ownerMatches": [
+    {
+      "matched": true,
+      "input": "张三",
+      "canonicalName": "张三",
+      "owner": {
+        "name": "张三",
+        "email": "zhangsan@example.com",
+        "aliases": [
+          "张三",
+          "小张",
+          "zs"
+        ],
+        "source": null
+      },
+      "matchType": "exact",
+      "source": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "lineNumber": 7
+      },
+      "heading": "项目概述"
+    },
+    {
+      "matched": true,
+      "input": "李四",
+      "canonicalName": "李四",
+      "owner": {
+        "name": "李四",
+        "email": "lisi@example.com",
+        "aliases": [
+          "李四",
+          "小李",
+          "ls"
+        ],
+        "source": null
+      },
+      "matchType": "exact",
+      "source": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "lineNumber": 8
+      },
+      "heading": "项目概述",
+      "isReviewer": true
+    },
+    {
+      "matched": true,
+      "input": "王五",
+      "canonicalName": "王五",
+      "owner": {
+        "name": "王五",
+        "email": "wangwu@example.com",
+        "aliases": [
+          "王五",
+          "老王",
+          "ww"
+        ],
+        "source": null
+      },
+      "matchType": "exact",
+      "source": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "lineNumber": 8
+      },
+      "heading": "项目概述",
+      "isReviewer": true
+    },
+    {
+      "matched": true,
+      "input": "小李",
+      "canonicalName": "李四",
+      "owner": {
+        "name": "李四",
+        "email": "lisi@example.com",
+        "aliases": [
+          "李四",
+          "小李",
+          "ls"
+        ],
+        "source": null
+      },
+      "matchType": "alias",
+      "source": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "lineNumber": 25
+      },
+      "heading": "功能设计"
+    },
+    {
+      "matched": true,
+      "input": "赵六",
+      "canonicalName": "赵六",
+      "owner": {
+        "name": "赵六",
+        "email": "zhaoliu@example.com",
+        "aliases": [
+          "赵六",
+          "老赵",
+          "zl"
+        ],
+        "source": null
+      },
+      "matchType": "exact",
+      "source": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "lineNumber": 26
+      },
+      "heading": "功能设计",
+      "isReviewer": true
+    },
+    {
+      "matched": true,
+      "input": "ww",
+      "canonicalName": "王五",
+      "owner": {
+        "name": "王五",
+        "email": "wangwu@example.com",
+        "aliases": [
+          "王五",
+          "老王",
+          "ww"
+        ],
+        "source": null
+      },
+      "matchType": "alias",
+      "source": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "lineNumber": 31
+      },
+      "heading": "用户管理模块"
+    },
+    {
+      "matched": true,
+      "input": "陈七",
+      "canonicalName": "陈七",
+      "owner": {
+        "name": "陈七",
+        "email": "chenqi@example.com",
+        "aliases": [
+          "陈七",
+          "老陈",
+          "cq"
+        ],
+        "source": null
+      },
+      "matchType": "exact",
+      "source": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "lineNumber": 42
+      },
+      "heading": "文档管理模块"
+    },
+    {
+      "matched": false,
+      "input": "unknown_person",
+      "error": "未找到匹配的负责人",
+      "suggestions": [],
+      "source": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "lineNumber": 53
+      },
+      "heading": "评论系统"
+    },
+    {
+      "matched": true,
+      "input": "张三",
+      "canonicalName": "张三",
+      "owner": {
+        "name": "张三",
+        "email": "zhangsan@example.com",
+        "aliases": [
+          "张三",
+          "小张",
+          "zs"
+        ],
+        "source": null
+      },
+      "matchType": "exact",
+      "source": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "lineNumber": 58
+      },
+      "heading": "技术架构"
+    },
+    {
+      "matched": true,
+      "input": "李四",
+      "canonicalName": "李四",
+      "owner": {
+        "name": "李四",
+        "email": "lisi@example.com",
+        "aliases": [
+          "李四",
+          "小李",
+          "ls"
+        ],
+        "source": null
+      },
+      "matchType": "exact",
+      "source": {
+        "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+        "lineNumber": 71
+      },
+      "heading": "数据库设计"
+    }
+  ],
+  "brokenLinks": [
+    {
+      "text": "常见问题",
+      "target": "#常见问题",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "lineNumber": 79,
+      "column": 9,
+      "type": "anchor",
+      "anchor": "常见问题",
+      "targetFile": "/Users/lzy/pro/solo/workspaces/zy71064/examples/product-docs.md",
+      "status": "error",
+      "error": "锚点不存在",
+      "suggestions": [
+        {
+          "anchor": "常见问题解答",
+          "text": "常见问题解答",
+          "lineNumber": 87,
+          "headingLevel": 2
+        }
+      ]
+    }
+  ],
+  "unparsedRecords": [],
+  "statistics": {
+    "linkStatistics": {
+      "total": 3,
+      "ok": 1,
+      "errors": 1,
+      "warnings": 0,
+      "skipped": 1
+    },
+    "headingCount": 19,
+    "chapterCount": 19
+  }
+}
