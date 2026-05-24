@@ -54,10 +54,10 @@ func (s *AppealService) TransitionStatus(appealNo, newStatus, handlerID, handler
 	}
 
 	updates := map[string]interface{}{
-		"status":        newStatus,
-		"handler_id":    handlerID,
-		"handler_name":  handlerName,
-		"handle_time":   time.Now(),
+		"status":       newStatus,
+		"handler_id":   handlerID,
+		"handler_name": handlerName,
+		"handle_time":  time.Now(),
 	}
 
 	if comment != "" {
@@ -98,31 +98,22 @@ func (s *AppealService) CheckDuplicateAppeal(meterNo, startCycle, endCycle strin
 }
 
 func (s *AppealService) SubmitAppeal(appeal *models.Appeal) (*models.SubmitResult, error) {
+	isDuplicate, existing := s.CheckDuplicateAppeal(appeal.MeterNo, appeal.StartBillCycle, appeal.EndBillCycle, "")
+	if isDuplicate {
+		return &models.SubmitResult{
+			AppealNo: existing.AppealNo,
+			Success:  false,
+			Message:  "重复申诉: 已存在同周期未结案申诉 " + existing.AppealNo,
+			Status:   existing.Status,
+		}, nil
+	}
+
 	if appeal.AppealNo == "" {
 		appeal.AppealNo = utils.GenerateAppealNo()
 	}
 	appeal.Status = models.AppealStatusPending
 	appeal.CreatedAt = time.Now()
 	appeal.UpdatedAt = time.Now()
-
-	isDuplicate, existing := s.CheckDuplicateAppeal(appeal.MeterNo, appeal.StartBillCycle, appeal.EndBillCycle, "")
-	if isDuplicate {
-		appeal.IsDuplicate = true
-		appeal.ParentAppealNo = existing.AppealNo
-		appeal.Status = models.AppealStatusRejected
-
-		err := s.db.Create(appeal).Error
-		if err != nil {
-			return nil, err
-		}
-
-		return &models.SubmitResult{
-			AppealNo: appeal.AppealNo,
-			Success:  false,
-			Message:  "重复申诉: 已存在同周期未结案申诉 " + existing.AppealNo,
-			Status:   appeal.Status,
-		}, nil
-	}
 
 	err := s.db.Create(appeal).Error
 	if err != nil {
@@ -173,6 +164,14 @@ func (s *AppealService) SplitAnomalies(appealNo string) ([]models.AppealAnomaly,
 		return nil, err
 	}
 
+	var existingCount int64
+	s.db.Model(&models.AppealAnomaly{}).Where("appeal_no = ?", appealNo).Count(&existingCount)
+	if existingCount > 0 {
+		var existingAnomalies []models.AppealAnomaly
+		s.db.Where("appeal_no = ?", appealNo).Find(&existingAnomalies)
+		return existingAnomalies, nil
+	}
+
 	readings := make([]models.MeterReading, 0)
 	s.db.Where("meter_no = ? AND bill_cycle >= ? AND bill_cycle <= ?",
 		appeal.MeterNo, appeal.StartBillCycle, appeal.EndBillCycle).
@@ -180,19 +179,31 @@ func (s *AppealService) SplitAnomalies(appealNo string) ([]models.AppealAnomaly,
 		Find(&readings)
 
 	anomalies := make([]models.AppealAnomaly, 0)
+	anomalyKeys := make(map[string]bool)
 
-	validationResult := ValidateReadings(readings)
-	for idx, reverse := range validationResult.ReverseInfo {
+	addAnomaly := func(anomalyType, billCycle, description string) {
+		key := anomalyType + "_" + billCycle
+		if anomalyKeys[key] {
+			return
+		}
+		anomalyKeys[key] = true
+
 		anomaly := models.AppealAnomaly{
 			AppealNo:    appealNo,
-			AnomalyType: "reading_reverse",
-			BillCycle:   utils.GetBillCycle(reverse.Date),
-			Description: fmt.Sprintf("读数倒挂: 前次%.2f, 当前%.2f, 差额%.2f", reverse.PrevReading, reverse.CurrReading, reverse.Difference),
+			AnomalyType: anomalyType,
+			BillCycle:   billCycle,
+			Description: description,
 			IsResolved:  false,
 		}
 		s.db.Create(&anomaly)
 		anomalies = append(anomalies, anomaly)
-		_ = idx
+	}
+
+	validationResult := ValidateReadings(readings)
+	for _, reverse := range validationResult.ReverseInfo {
+		addAnomaly("reading_reverse",
+			utils.GetBillCycle(reverse.Date),
+			fmt.Sprintf("读数倒挂: 前次%.2f, 当前%.2f, 差额%.2f", reverse.PrevReading, reverse.CurrReading, reverse.Difference))
 	}
 
 	var leakRecords []models.LeakRecord
@@ -201,36 +212,22 @@ func (s *AppealService) SplitAnomalies(appealNo string) ([]models.AppealAnomaly,
 		startCycle := utils.GetBillCycle(leak.LeakStartDate)
 		endCycle := utils.GetBillCycle(leak.LeakEndDate)
 		if startCycle >= appeal.StartBillCycle && startCycle <= appeal.EndBillCycle {
-			anomaly := models.AppealAnomaly{
-				AppealNo:    appealNo,
-				AnomalyType: "leak_record",
-				BillCycle:   startCycle,
-				Description: fmt.Sprintf("漏水记录: %s 至 %s, 日漏量%.2f吨", 
-					leak.LeakStartDate.Format("2006-01-02"), 
-					leak.LeakEndDate.Format("2006-01-02"), 
-					leak.DailyLeakAmount),
-				IsResolved:  false,
-			}
-			s.db.Create(&anomaly)
-			anomalies = append(anomalies, anomaly)
-		}
-		if endCycle > startCycle && endCycle >= appeal.StartBillCycle && endCycle <= appeal.EndBillCycle {
-			anomaly := models.AppealAnomaly{
-				AppealNo:    appealNo,
-				AnomalyType: "leak_cross_cycle",
-				BillCycle:   endCycle,
-				Description: fmt.Sprintf("跨周期漏水: %s 至 %s, 涉及账单周期 %s-%s",
+			addAnomaly("leak_record", startCycle,
+				fmt.Sprintf("漏水记录: %s 至 %s, 日漏量%.2f吨",
 					leak.LeakStartDate.Format("2006-01-02"),
 					leak.LeakEndDate.Format("2006-01-02"),
-					startCycle, endCycle),
-				IsResolved:  false,
-			}
-			s.db.Create(&anomaly)
-			anomalies = append(anomalies, anomaly)
+					leak.DailyLeakAmount))
+		}
+		if endCycle > startCycle && endCycle >= appeal.StartBillCycle && endCycle <= appeal.EndBillCycle {
+			addAnomaly("leak_cross_cycle", endCycle,
+				fmt.Sprintf("跨周期漏水: %s 至 %s, 涉及账单周期 %s-%s",
+					leak.LeakStartDate.Format("2006-01-02"),
+					leak.LeakEndDate.Format("2006-01-02"),
+					startCycle, endCycle))
 		}
 	}
 
-	if len(anomalies) > 0 {
+	if len(anomalies) > 0 && appeal.Status == models.AppealStatusPending {
 		s.TransitionStatus(appealNo, models.AppealStatusProcessing, "system", "系统", "异常拆分完成")
 	}
 

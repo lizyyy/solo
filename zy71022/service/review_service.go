@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"time"
 	"watermeter-api/models"
 	"watermeter-api/utils"
@@ -18,18 +19,18 @@ func NewReviewService(db *gorm.DB) *ReviewService {
 }
 
 type ReviewRequest struct {
-	AppealNo        string `json:"appeal_no"`
-	ReviewerID      string `json:"reviewer_id"`
-	ReviewerName    string `json:"reviewer_name"`
-	IsReadingValid  bool   `json:"is_reading_valid"`
-	ReadingAnomaly  string `json:"reading_anomaly"`
-	LeakConfirmed   bool   `json:"leak_confirmed"`
-	LeakDays        int    `json:"leak_days"`
-	LeakAmount      float64 `json:"leak_amount"`
-	ReviewConclusion string `json:"review_conclusion"`
-	ReviewSuggestion string `json:"review_suggestion"`
-	IsManualCorrected bool `json:"is_manual_corrected"`
-	CorrectionReason string `json:"correction_reason"`
+	AppealNo          string  `json:"appeal_no"`
+	ReviewerID        string  `json:"reviewer_id"`
+	ReviewerName      string  `json:"reviewer_name"`
+	IsReadingValid    bool    `json:"is_reading_valid"`
+	ReadingAnomaly    string  `json:"reading_anomaly"`
+	LeakConfirmed     bool    `json:"leak_confirmed"`
+	LeakDays          int     `json:"leak_days"`
+	LeakAmount        float64 `json:"leak_amount"`
+	ReviewConclusion  string  `json:"review_conclusion"`
+	ReviewSuggestion  string  `json:"review_suggestion"`
+	IsManualCorrected bool    `json:"is_manual_corrected"`
+	CorrectionReason  string  `json:"correction_reason"`
 }
 
 func (s *ReviewService) CreateReviewReport(req ReviewRequest) (*models.ReviewReport, error) {
@@ -39,12 +40,31 @@ func (s *ReviewService) CreateReviewReport(req ReviewRequest) (*models.ReviewRep
 		return nil, err
 	}
 
+	var existingReport models.ReviewReport
+	err = s.db.Where("appeal_no = ? AND is_final = ?", req.AppealNo, false).Order("created_at DESC").First(&existingReport).Error
+	if err == nil {
+		return &existingReport, nil
+	}
+
 	billingService := NewBillingService(s.db)
-	readings := billingService.GetReadingsByBillCycle(appeal.MeterNo, appeal.StartBillCycle, appeal.EndBillCycle)
-	
+	recalcResult, err := billingService.RecalculateAppealBills(req.AppealNo)
+	if err != nil {
+		return nil, err
+	}
+
+	originalAmount := recalcResult.OriginalTotal
+	adjustedAmount := recalcResult.AdjustedTotal
+
+	if req.LeakConfirmed {
+		manualAdjusted := originalAmount - (originalAmount * (req.LeakAmount / (recalcResult.BillDetails[len(recalcResult.BillDetails)-1].OriginalUsage + 1)))
+		if manualAdjusted > 0 && req.LeakAmount > 0 {
+			adjustedAmount = originalAmount - (originalAmount * req.LeakAmount / 100)
+		}
+	}
+
 	originalUsage := 0.0
-	if len(readings) >= 2 {
-		originalUsage = readings[len(readings)-1].Reading - readings[0].Reading
+	for _, bd := range recalcResult.BillDetails {
+		originalUsage += bd.OriginalUsage
 	}
 
 	adjustedUsage := originalUsage
@@ -56,36 +76,33 @@ func (s *ReviewService) CreateReviewReport(req ReviewRequest) (*models.ReviewRep
 	}
 
 	billStart, _ := utils.ParseBillCycle(appeal.StartBillCycle)
-	_, originalAmount := billingService.CalculateTieredUsage(originalUsage, billStart)
-	_, adjustedAmount := billingService.CalculateTieredUsage(adjustedUsage, billStart)
-
 	tierAdjustments := s.calculateTierAdjustments(originalUsage, adjustedUsage, billStart)
 	tierAdjustmentsJSON, _ := json.Marshal(tierAdjustments)
 
 	report := &models.ReviewReport{
-		ReportNo:        utils.GenerateReportNo(),
-		AppealNo:        req.AppealNo,
-		MeterNo:         appeal.MeterNo,
-		ReviewerID:      req.ReviewerID,
-		ReviewerName:    req.ReviewerName,
-		ReviewDate:      time.Now(),
-		IsReadingValid:  req.IsReadingValid,
-		ReadingAnomaly:  req.ReadingAnomaly,
-		LeakConfirmed:   req.LeakConfirmed,
-		LeakDays:        req.LeakDays,
-		LeakAmount:      req.LeakAmount,
-		OriginalUsage:   originalUsage,
-		AdjustedUsage:   adjustedUsage,
-		OriginalAmount:  originalAmount,
-		AdjustedAmount:  adjustedAmount,
-		TierAdjustments: string(tierAdjustmentsJSON),
-		ReviewConclusion: req.ReviewConclusion,
-		ReviewSuggestion: req.ReviewSuggestion,
+		ReportNo:          utils.GenerateReportNo(),
+		AppealNo:          req.AppealNo,
+		MeterNo:           appeal.MeterNo,
+		ReviewerID:        req.ReviewerID,
+		ReviewerName:      req.ReviewerName,
+		ReviewDate:        time.Now(),
+		IsReadingValid:    req.IsReadingValid,
+		ReadingAnomaly:    req.ReadingAnomaly,
+		LeakConfirmed:     req.LeakConfirmed,
+		LeakDays:          req.LeakDays,
+		LeakAmount:        req.LeakAmount,
+		OriginalUsage:     originalUsage,
+		AdjustedUsage:     adjustedUsage,
+		OriginalAmount:    utils.RoundToTwoDecimals(originalAmount),
+		AdjustedAmount:    utils.RoundToTwoDecimals(adjustedAmount),
+		TierAdjustments:   string(tierAdjustmentsJSON),
+		ReviewConclusion:  req.ReviewConclusion,
+		ReviewSuggestion:  req.ReviewSuggestion,
 		IsManualCorrected: req.IsManualCorrected,
-		CorrectionReason: req.CorrectionReason,
-		IsFinal:         false,
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+		CorrectionReason:  req.CorrectionReason,
+		IsFinal:           false,
+		CreatedAt:         time.Now(),
+		UpdatedAt:         time.Now(),
 	}
 
 	err = s.db.Create(report).Error
@@ -94,7 +111,9 @@ func (s *ReviewService) CreateReviewReport(req ReviewRequest) (*models.ReviewRep
 	}
 
 	appealService := NewAppealService(s.db)
-	appealService.TransitionStatus(req.AppealNo, models.AppealStatusReviewing, req.ReviewerID, req.ReviewerName, "复核报告已生成")
+	if appeal.Status == models.AppealStatusPending || appeal.Status == models.AppealStatusProcessing {
+		appealService.TransitionStatus(req.AppealNo, models.AppealStatusReviewing, req.ReviewerID, req.ReviewerName, "复核报告已生成")
+	}
 
 	return report, nil
 }
@@ -129,6 +148,10 @@ func (s *ReviewService) FinalizeReview(reportNo string, isApproved bool) error {
 		return err
 	}
 
+	if report.IsFinal {
+		return nil
+	}
+
 	report.IsFinal = true
 	report.UpdatedAt = time.Now()
 	s.db.Save(&report)
@@ -137,15 +160,18 @@ func (s *ReviewService) FinalizeReview(reportNo string, isApproved bool) error {
 	if isApproved {
 		var appeal models.Appeal
 		s.db.Where("appeal_no = ?", report.AppealNo).First(&appeal)
-		
-		refundAmount := report.OriginalAmount - report.AdjustedAmount
+
+		refundAmount := utils.RoundToTwoDecimals(report.OriginalAmount - report.AdjustedAmount)
 		if refundAmount < 0 {
 			refundAmount = 0
 		}
 
+		adjustedBalance := utils.RoundToTwoDecimals(appeal.OriginalBalance + refundAmount)
+
 		s.db.Model(&appeal).Updates(map[string]interface{}{
-			"adjusted_balance": appeal.OriginalBalance + refundAmount,
+			"adjusted_balance": adjustedBalance,
 			"refund_amount":    refundAmount,
+			"updated_at":       time.Now(),
 		})
 
 		appealService.TransitionStatus(report.AppealNo, models.AppealStatusApproved, report.ReviewerID, report.ReviewerName, "复核通过")
@@ -163,7 +189,11 @@ func (s *ReviewService) ManualCorrect(reportNo string, adjustedAmount float64, r
 		return err
 	}
 
-	report.AdjustedAmount = adjustedAmount
+	if report.IsFinal {
+		return errors.New("报告已定稿，无法修改")
+	}
+
+	report.AdjustedAmount = utils.RoundToTwoDecimals(adjustedAmount)
 	report.IsManualCorrected = true
 	report.CorrectionReason = reason
 	report.UpdatedAt = time.Now()
@@ -221,17 +251,17 @@ func (s *ReviewService) ExportAppeals(req models.ExportRequest) ([]models.Export
 	}
 
 	var results []struct {
-		AppealNo       string
-		MeterNo        string
-		UserName       string
-		Address        string
-		AppealType     string
-		AppealDate     time.Time
-		Status         string
-		DisputedAmount float64
-		RefundAmount   float64
+		AppealNo         string
+		MeterNo          string
+		UserName         string
+		Address          string
+		AppealType       string
+		AppealDate       time.Time
+		Status           string
+		DisputedAmount   float64
+		RefundAmount     float64
 		ReviewConclusion string
-		CloseTime      *time.Time
+		CloseTime        *time.Time
 	}
 
 	query.Scan(&results)
