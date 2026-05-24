@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>扶梯检修围挡预演系统</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="app">
+    <div class="toolbar">
+      <div class="toolbar-title">扶梯检修围挡预演系统</div>
+      <div class="toolbar-controls">
+        <button id="btn-import" class="btn btn-primary">导入样例</button>
+        <button id="btn-reset" class="btn">重置状态</button>
+        <button id="btn-export" class="btn btn-success">导出报告</button>
+      </div>
+    </div>
+
+    <div class="main-container">
+      <div class="sidebar">
+        <div class="panel">
+          <div class="panel-title">楼层选择</div>
+          <div class="panel-content">
+            <select id="floor-select" class="select">
+              <option value="all">全部楼层</option>
+              <option value="1F">1F - 一层</option>
+              <option value="2F">2F - 二层</option>
+              <option value="3F">3F - 三层</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">围挡管理</div>
+          <div class="panel-content">
+            <div class="barrier-list" id="barrier-list"></div>
+            <button id="btn-add-barrier" class="btn btn-block">添加围挡</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">元素筛选</div>
+          <div class="panel-content">
+            <label class="checkbox">
+              <input type="checkbox" id="filter-escalator" checked>
+              <span>显示扶梯</span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="filter-fire-door" checked>
+              <span>显示消防门</span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="filter-heatmap" checked>
+              <span>显示动线热力</span>
+            </label>
+            <label class="checkbox">
+              <input type="checkbox" id="filter-direction" checked>
+              <span>显示客流方向</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">校验结果</div>
+          <div class="panel-content">
+            <div id="validation-results" class="validation-results"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="viewport">
+        <canvas id="scene-canvas"></canvas>
+        <div class="viewport-overlay">
+          <div class="info-card" id="info-card"></div>
+        </div>
+      </div>
+
+      <div class="timeline-panel">
+        <div class="timeline-header">
+          <span>时间轴回放</span>
+          <div class="timeline-controls">
+            <button id="btn-play" class="btn btn-small">▶ 播放</button>
+            <button id="btn-pause" class="btn btn-small">⏸ 暂停</button>
+            <button id="btn-speed" class="btn btn-small">1x</button>
+          </div>
+        </div>
+        <div class="timeline-track">
+          <input type="range" id="timeline-slider" min="0" max="100" value="0" class="timeline-slider">
+          <div class="timeline-marks">
+            <span>规划中</span>
+            <span>围挡布置</span>
+            <span>校验中</span>
+            <span>完成</span>
+          </div>
+        </div>
+        <div class="view-presets">
+          <span>视角预设:</span>
+          <button class="btn btn-small" data-view="top">俯视</button>
+          <button class="btn btn-small" data-view="front">正视</button>
+          <button class="btn btn-small" data-view="iso">等角</button>
+          <button class="btn btn-small" data-view="free">自由</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
