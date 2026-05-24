@@ -1,0 +1,13 @@
+thresholds:
+  http_requests_total: 20
+  user_sessions_active: 50
+  request_duration_seconds: 30
+
+ignore_labels:
+  - instance
+  - job
+
+high_risk_labels:
+  - user_id
+  - request_id
+  - trace_id
