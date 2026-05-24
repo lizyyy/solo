@@ -75,21 +75,27 @@ export const useSceneStore = create<SceneStore>((set, get) => ({
   setRightPanelOpen: (open) => set({ rightPanelOpen: open }),
 
   loadSampleScene: (sceneData) =>
-    set({
-      ...sceneData,
-      isPlaying: false,
-      currentTime: 0,
-      selectedView: 'free',
-      showReportModal: false,
+    set(() => {
+      const baseState = {
+        ...sceneData,
+        isPlaying: false,
+        currentTime: 0,
+        selectedView: 'free' as ViewMode,
+        showReportModal: false,
+      } as SceneState;
+      return { ...baseState, risks: detectRisks(baseState) };
     }),
 
   resetScene: () =>
-    set({
-      ...defaultScene,
-      isPlaying: false,
-      currentTime: 0,
-      selectedView: 'free',
-      showReportModal: false,
+    set(() => {
+      const baseState = {
+        ...defaultScene,
+        isPlaying: false,
+        currentTime: 0,
+        selectedView: 'free' as ViewMode,
+        showReportModal: false,
+      } as SceneState;
+      return { ...baseState, risks: detectRisks(baseState) };
     }),
 
   updateRisks: () => {
