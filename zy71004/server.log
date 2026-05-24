@@ -1,0 +1,22 @@
+2026/05/24 12:36:53 Database initialized successfully
+2026/05/24 12:36:53 Museum Exhibit Condition API starting on :8080
+2026/05/24 12:36:53 Endpoints:
+2026/05/24 12:36:53   GET  /api/health - Health check
+2026/05/24 12:36:53   POST /api/records - Import record
+2026/05/24 12:36:53   GET  /api/records - List records
+2026/05/24 12:36:53   GET  /api/records/{id} - Get record
+2026/05/24 12:36:53   POST /api/records/{id}/validate - Validate
+2026/05/24 12:36:53   POST /api/records/{id}/process - Process
+2026/05/24 12:36:53   POST /api/records/{id}/dispute - Dispute
+2026/05/24 12:36:53   POST /api/records/{id}/reject - Reject
+2026/05/24 12:36:53   POST /api/records/{id}/close - Close
+2026/05/24 12:36:53   POST /api/records/{id}/revoke - Revoke
+2026/05/24 12:36:53   POST /api/records/{id}/versions - New version
+2026/05/24 12:36:53   GET  /api/records/{id}/diffs - Version diffs
+2026/05/24 12:36:53   GET  /api/records/{id}/logs - Operation logs
+2026/05/24 12:36:53   POST /api/records/{id}/confirm-liability - Confirm liability
+2026/05/24 12:36:53   GET  /api/records/{id}/export/json - Export JSON
+2026/05/24 12:36:53   GET  /api/records/{id}/export/csv - Export CSV
+2026/05/24 12:36:53   GET  /api/versions/{versionId}/photos - Get photos
+2026/05/24 12:36:53   POST /api/conclusions/{id}/review - Review conclusion
+2026/05/24 12:36:53   GET  /api/statistics - Statistics
