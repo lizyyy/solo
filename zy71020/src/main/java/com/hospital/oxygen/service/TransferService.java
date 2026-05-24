@@ -185,6 +185,17 @@ public class TransferService {
         if (newStatus == TransferStatus.COMPLETED) {
             transfer.setResourcesReleased(true);
             transfer.setReleaseTime(LocalDateTime.now());
+            
+            final String overridePortCode = transfer.getOxygenPortCode();
+            final String overridePatientId = transfer.getPatientId();
+            
+            if (overridePortCode != null) {
+                bookingService.getActiveBookings().stream()
+                        .filter(b -> b.getOxygenPortCode().equals(overridePortCode)
+                                && b.getPatientId().equals(overridePatientId))
+                        .findFirst()
+                        .ifPresent(b -> bookingService.completeBooking(b.getBookingNumber(), operator));
+            }
         }
 
         transfer = transferRepository.save(transfer);
