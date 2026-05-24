@@ -238,6 +238,10 @@ public class ReplacementService {
     @Transactional
     public ParentConfirmation submitConfirmation(Long replacementId, Long studentId,
                                                   String status, String comment, String operator) {
+        if (!Arrays.asList("CONFIRMED", "REJECTED").contains(status)) {
+            throw new BusinessException("回执状态必须是 CONFIRMED 或 REJECTED", "INVALID_CONFIRMATION_STATUS");
+        }
+
         if (confirmationRepository.existsByReplacementIdAndStudentId(replacementId, studentId)) {
             ParentConfirmation existing = confirmationRepository
                 .findByReplacementIdAndStudentId(replacementId, studentId).get();
@@ -265,15 +269,25 @@ public class ReplacementService {
             throw new BusinessException("当前状态不允许完成替换", "INVALID_STATUS");
         }
 
-        long pendingCount = confirmationRepository.countByReplacementIdAndStatus(replacementId, "PENDING");
-        long rejectedCount = confirmationRepository.countByReplacementIdAndStatus(replacementId, "REJECTED");
+        long totalCount = confirmationRepository.countByReplacementId(replacementId);
+        long confirmedCount = confirmationRepository.countByReplacementIdAndStatus(replacementId, "CONFIRMED");
 
-        if (pendingCount > 0) {
-            throw new BusinessException("存在 " + pendingCount + " 份待确认回执，请先完成所有家长确认", "PENDING_CONFIRMATIONS_EXIST");
-        }
+        if (totalCount > 0 && confirmedCount != totalCount) {
+            long pendingCount = confirmationRepository.countByReplacementIdAndStatus(replacementId, "PENDING");
+            long rejectedCount = confirmationRepository.countByReplacementIdAndStatus(replacementId, "REJECTED");
 
-        if (rejectedCount > 0) {
-            throw new BusinessException("存在 " + rejectedCount + " 份已拒绝回执，需人工复核后才能完成", "REJECTED_CONFIRMATIONS_EXIST");
+            if (pendingCount > 0) {
+                throw new BusinessException("存在 " + pendingCount + " 份待确认回执，请先完成所有家长确认", "PENDING_CONFIRMATIONS_EXIST");
+            }
+
+            if (rejectedCount > 0) {
+                throw new BusinessException("存在 " + rejectedCount + " 份已拒绝回执，需人工复核后才能完成", "REJECTED_CONFIRMATIONS_EXIST");
+            }
+
+            long unknownCount = totalCount - confirmedCount - pendingCount - rejectedCount;
+            if (unknownCount > 0) {
+                throw new BusinessException("存在 " + unknownCount + " 份状态异常的回执", "INVALID_CONFIRMATION_STATUS");
+            }
         }
 
         request.setStatus(ReplacementStatus.CONFIRMED);

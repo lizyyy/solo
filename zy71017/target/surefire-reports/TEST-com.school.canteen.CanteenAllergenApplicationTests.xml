@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.school.canteen.CanteenAllergenApplicationTests" time="3.531" tests="8" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.school.canteen.CanteenAllergenApplicationTests" time="2.973" tests="8" errors="0" skipped="0" failures="0">
   <properties>
     <property name="socksProxyHost" value="127.0.0.1"/>
     <property name="http.proxyHost" value="127.0.0.1"/>
@@ -18,7 +18,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="CN"/>
     <property name="sun.boot.library.path" value="/opt/homebrew/Cellar/openjdk/26.0.1/libexec/openjdk.jdk/Contents/Home/lib"/>
-    <property name="sun.java.command" value="/Users/lzy/pro/solo/workspaces/zy71017/target/surefire/surefirebooter-20260524164249118_3.jar /Users/lzy/pro/solo/workspaces/zy71017/target/surefire 2026-05-24T16-42-49_069-jvmRun1 surefire-20260524164249118_1tmp surefire_0-20260524164249118_2tmp"/>
+    <property name="sun.java.command" value="/Users/lzy/pro/solo/workspaces/zy71017/target/surefire/surefirebooter-20260524170403105_3.jar /Users/lzy/pro/solo/workspaces/zy71017/target/surefire 2026-05-24T17-04-03_048-jvmRun1 surefire-20260524170403105_1tmp surefire_0-20260524170403105_2tmp"/>
     <property name="http.nonProxyHosts" value="192.168.0.0/16|*.192.168.0.0/16|10.0.0.0/8|*.10.0.0.0/8|172.16.0.0/12|*.172.16.0.0/12|127.0.0.1|localhost|*.localhost|local|*.local|timestamp.apple.com|*.timestamp.apple.com|sequoia.apple.com|*.sequoia.apple.com|seed-sequoia.siri.apple.com|*.seed-sequoia.siri.apple.com"/>
     <property name="jdk.debug" value="release"/>
     <property name="test" value="CanteenAllergenApplicationTests"/>
@@ -32,14 +32,14 @@
     <property name="file.separator" value="/"/>
     <property name="https.proxyHost" value="127.0.0.1"/>
     <property name="basedir" value="/Users/lzy/pro/solo/workspaces/zy71017"/>
-    <property name="java.vm.compressedOopsMode" value="Non-zero based"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="FILE_LOG_CHARSET" value="UTF-8"/>
     <property name="java.awt.headless" value="true"/>
     <property name="apple.awt.application.name" value="ForkedBooter"/>
-    <property name="surefire.real.class.path" value="/Users/lzy/pro/solo/workspaces/zy71017/target/surefire/surefirebooter-20260524164249118_3.jar"/>
+    <property name="surefire.real.class.path" value="/Users/lzy/pro/solo/workspaces/zy71017/target/surefire/surefirebooter-20260524170403105_3.jar"/>
     <property name="user.script" value="Hans"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="ftp.nonProxyHosts" value="192.168.0.0/16|*.192.168.0.0/16|10.0.0.0/8|*.10.0.0.0/8|172.16.0.0/12|*.172.16.0.0/12|127.0.0.1|localhost|*.localhost|local|*.local|timestamp.apple.com|*.timestamp.apple.com|sequoia.apple.com|*.sequoia.apple.com|seed-sequoia.siri.apple.com|*.seed-sequoia.siri.apple.com"/>
@@ -61,7 +61,7 @@
     <property name="os.arch" value="aarch64"/>
     <property name="socksProxyPort" value="7890"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="PID" value="84415"/>
+    <property name="PID" value="76414"/>
     <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
     <property name="native.encoding" value="UTF-8"/>
     <property name="java.library.path" value="/Users/lzy/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
@@ -76,9 +76,9 @@
     <property name="LOGGED_APPLICATION_NAME" value="[allergen-replacement-api] "/>
     <property name="http.proxyPort" value="7890"/>
   </properties>
-  <testcase name="testLockAndComplete" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.404">
-    <system-out><![CDATA[16:42:49.506 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.school.canteen.CanteenAllergenApplicationTests]: CanteenAllergenApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-16:42:49.609 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.school.canteen.CanteenAllergenApplication for test class com.school.canteen.CanteenAllergenApplicationTests
+  <testcase name="testLockAndComplete" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.342">
+    <system-out><![CDATA[17:04:03.617 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.school.canteen.CanteenAllergenApplicationTests]: CanteenAllergenApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+17:04:03.670 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.school.canteen.CanteenAllergenApplication for test class com.school.canteen.CanteenAllergenApplicationTests
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -89,20 +89,20 @@
 
  :: Spring Boot ::                (v3.4.0)
 
-2026-05-24T16:42:49.899+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.c.CanteenAllergenApplicationTests    : Starting CanteenAllergenApplicationTests using Java 26.0.1 with PID 84415 (started by lzy in /Users/lzy/pro/solo/workspaces/zy71017)
-2026-05-24T16:42:49.901+08:00 DEBUG 84415 --- [allergen-replacement-api] [           main] c.s.c.CanteenAllergenApplicationTests    : Running with Spring Boot v3.4.0, Spring v6.2.0
-2026-05-24T16:42:49.901+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.c.CanteenAllergenApplicationTests    : The following 1 profile is active: "test"
-2026-05-24T16:42:50.307+08:00  INFO 84415 --- [allergen-replacement-api] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-05-24T16:42:50.344+08:00  INFO 84415 --- [allergen-replacement-api] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 31 ms. Found 6 JPA repository interfaces.
-2026-05-24T16:42:50.670+08:00  INFO 84415 --- [allergen-replacement-api] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-05-24T16:42:50.698+08:00  INFO 84415 --- [allergen-replacement-api] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.2.Final
-2026-05-24T16:42:50.712+08:00  INFO 84415 --- [allergen-replacement-api] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2026-05-24T16:42:50.848+08:00  INFO 84415 --- [allergen-replacement-api] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-05-24T16:42:50.861+08:00  INFO 84415 --- [allergen-replacement-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-05-24T16:42:50.938+08:00  INFO 84415 --- [allergen-replacement-api] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:canteen_allergen user=SA
-2026-05-24T16:42:50.938+08:00  INFO 84415 --- [allergen-replacement-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-05-24T16:42:50.950+08:00  WARN 84415 --- [allergen-replacement-api] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-05-24T16:42:50.957+08:00  INFO 84415 --- [allergen-replacement-api] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2026-05-24T17:04:03.896+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.c.CanteenAllergenApplicationTests    : Starting CanteenAllergenApplicationTests using Java 26.0.1 with PID 76414 (started by lzy in /Users/lzy/pro/solo/workspaces/zy71017)
+2026-05-24T17:04:03.898+08:00 DEBUG 76414 --- [allergen-replacement-api] [           main] c.s.c.CanteenAllergenApplicationTests    : Running with Spring Boot v3.4.0, Spring v6.2.0
+2026-05-24T17:04:03.898+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.c.CanteenAllergenApplicationTests    : The following 1 profile is active: "test"
+2026-05-24T17:04:04.233+08:00  INFO 76414 --- [allergen-replacement-api] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-24T17:04:04.262+08:00  INFO 76414 --- [allergen-replacement-api] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 25 ms. Found 6 JPA repository interfaces.
+2026-05-24T17:04:04.553+08:00  INFO 76414 --- [allergen-replacement-api] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-24T17:04:04.586+08:00  INFO 76414 --- [allergen-replacement-api] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.2.Final
+2026-05-24T17:04:04.601+08:00  INFO 76414 --- [allergen-replacement-api] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-24T17:04:04.733+08:00  INFO 76414 --- [allergen-replacement-api] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-24T17:04:04.748+08:00  INFO 76414 --- [allergen-replacement-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-24T17:04:04.830+08:00  INFO 76414 --- [allergen-replacement-api] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:canteen_allergen user=SA
+2026-05-24T17:04:04.831+08:00  INFO 76414 --- [allergen-replacement-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-24T17:04:04.841+08:00  WARN 76414 --- [allergen-replacement-api] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-05-24T17:04:04.848+08:00  INFO 76414 --- [allergen-replacement-api] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
 	Database driver: undefined/unknown
 	Database version: 2.3.232
@@ -110,14 +110,14 @@
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2026-05-24T16:42:51.378+08:00  INFO 84415 --- [allergen-replacement-api] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-05-24T16:42:51.437+08:00  INFO 84415 --- [allergen-replacement-api] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-05-24T16:42:51.603+08:00  INFO 84415 --- [allergen-replacement-api] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-05-24T16:42:52.103+08:00  WARN 84415 --- [allergen-replacement-api] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-05-24T16:42:52.250+08:00  INFO 84415 --- [allergen-replacement-api] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:canteen_allergen'
-2026-05-24T16:42:52.296+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.c.CanteenAllergenApplicationTests    : Started CanteenAllergenApplicationTests in 2.587 seconds (process running for 3.137)
-2026-05-24T16:42:52.627+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@4251b1ed
-2026-05-24T16:42:52.635+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 1
+2026-05-24T17:04:05.271+08:00  INFO 76414 --- [allergen-replacement-api] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-24T17:04:05.322+08:00  INFO 76414 --- [allergen-replacement-api] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-24T17:04:05.485+08:00  INFO 76414 --- [allergen-replacement-api] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-24T17:04:05.899+08:00  WARN 76414 --- [allergen-replacement-api] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-05-24T17:04:06.015+08:00  INFO 76414 --- [allergen-replacement-api] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:canteen_allergen'
+2026-05-24T17:04:06.055+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.c.CanteenAllergenApplicationTests    : Started CanteenAllergenApplicationTests in 2.327 seconds (process running for 2.907)
+2026-05-24T17:04:06.347+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@4251b1ed
+2026-05-24T17:04:06.353+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 1
 ]]></system-out>
     <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build what is described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#0.3
 WARNING: A Java agent has been loaded dynamically (/Users/lzy/.m2/repository/net/bytebuddy/byte-buddy-agent/1.15.10/byte-buddy-agent-1.15.10.jar)
@@ -126,41 +126,41 @@ WARNING: If a serviceability tool is not in use, please run with -Djdk.instrumen
 WARNING: Dynamic loading of agents will be disallowed by default in a future release
 ]]></system-err>
   </testcase>
-  <testcase name="testRevokeReplacement" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.107">
-    <system-out><![CDATA[2026-05-24T16:42:52.739+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@148d7cfa
-2026-05-24T16:42:52.742+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 2
+  <testcase name="testRevokeReplacement" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.025">
+    <system-out><![CDATA[2026-05-24T17:04:06.413+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@4d630ffa
+2026-05-24T17:04:06.414+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 2
 ]]></system-out>
   </testcase>
-  <testcase name="testDuplicateConfirmationPrevention" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.043">
-    <system-out><![CDATA[2026-05-24T16:42:52.829+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@199f2854
-2026-05-24T16:42:52.833+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 3
+  <testcase name="testDuplicateConfirmationPrevention" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.028">
+    <system-out><![CDATA[2026-05-24T17:04:06.435+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@30aeb2b3
+2026-05-24T17:04:06.436+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 3
 ]]></system-out>
   </testcase>
-  <testcase name="testNormalReplacement_NoAllergenConflict" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.012">
-    <system-out><![CDATA[2026-05-24T16:42:52.870+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@26c67726
-2026-05-24T16:42:52.872+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 4
+  <testcase name="testNormalReplacement_NoAllergenConflict" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.007">
+    <system-out><![CDATA[2026-05-24T17:04:06.463+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@81ba0c5
+2026-05-24T17:04:06.464+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 4
 ]]></system-out>
   </testcase>
-  <testcase name="testDuplicateReplacementDetection" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.023">
-    <system-out><![CDATA[2026-05-24T16:42:52.884+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@6129f50e
-2026-05-24T16:42:52.885+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 5
-2026-05-24T16:42:52.890+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@15bb3db9
-2026-05-24T16:42:52.891+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 6
+  <testcase name="testDuplicateReplacementDetection" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.015">
+    <system-out><![CDATA[2026-05-24T17:04:06.471+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@7612a64b
+2026-05-24T17:04:06.471+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 5
+2026-05-24T17:04:06.479+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@1bf6d24a
+2026-05-24T17:04:06.479+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 6
 ]]></system-out>
   </testcase>
-  <testcase name="testReplacementWithAllergenConflict" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.02">
-    <system-out><![CDATA[2026-05-24T16:42:52.908+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@7bd6185a
-2026-05-24T16:42:52.909+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 7
+  <testcase name="testReplacementWithAllergenConflict" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.012">
+    <system-out><![CDATA[2026-05-24T17:04:06.487+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@59de440b
+2026-05-24T17:04:06.488+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 7
 ]]></system-out>
   </testcase>
-  <testcase name="testReplacementWithSameAllergen" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.013">
-    <system-out><![CDATA[2026-05-24T16:42:52.926+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@4613274d
-2026-05-24T16:42:52.927+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 8
+  <testcase name="testReplacementWithSameAllergen" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.008">
+    <system-out><![CDATA[2026-05-24T17:04:06.500+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@6402f6b1
+2026-05-24T17:04:06.500+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 8
 ]]></system-out>
   </testcase>
-  <testcase name="testManualReviewAndConfirmation" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.018">
-    <system-out><![CDATA[2026-05-24T16:42:52.938+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@2438702
-2026-05-24T16:42:52.940+08:00  INFO 84415 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 9
+  <testcase name="testManualReviewAndConfirmation" classname="com.school.canteen.CanteenAllergenApplicationTests" time="0.014">
+    <system-out><![CDATA[2026-05-24T17:04:06.511+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 创建替换请求: com.school.canteen.dto.ReplacementRequestDto@37c55315
+2026-05-24T17:04:06.511+08:00  INFO 76414 --- [allergen-replacement-api] [           main] c.s.canteen.service.ReplacementService   : 校验替换请求: 9
 ]]></system-out>
   </testcase>
 </testsuite>

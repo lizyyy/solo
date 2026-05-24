@@ -15,6 +15,9 @@ public interface ParentConfirmationRepository extends JpaRepository<ParentConfir
 
     List<ParentConfirmation> findByReplacementId(Long replacementId);
 
+    @Query("SELECT COUNT(pc) FROM ParentConfirmation pc WHERE pc.replacement.id = :replacementId")
+    long countByReplacementId(@Param("replacementId") Long replacementId);
+
     @Query("SELECT COUNT(pc) FROM ParentConfirmation pc WHERE pc.replacement.id = :replacementId AND pc.confirmationStatus = :status")
     long countByReplacementIdAndStatus(@Param("replacementId") Long replacementId, @Param("status") String status);
 
