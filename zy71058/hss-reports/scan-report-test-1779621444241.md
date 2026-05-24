@@ -45,7 +45,7 @@
 
 **证据:**
 ```
-第 55 行发现敏感内容: "AKIAIOSFODNN7EXAMPLE"
+第 55 行发现敏感内容: "AWS_ACCESS_KEY_ID_REDACTED"
 ```
 
 
@@ -65,7 +65,7 @@
 
 **证据:**
 ```
-第 55 行发现敏感内容: "password: "AKIAIOSFODNN7EXAMPLE""
+第 55 行发现敏感内容: "password: "AWS_ACCESS_KEY_ID_REDACTED""
 ```
 
 
@@ -85,7 +85,7 @@
 
 **证据:**
 ```
-第 60 行发现敏感内容: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+第 60 行发现敏感内容: "REPORT_TOKEN_REDACTED"
 ```
 
 
@@ -130,7 +130,7 @@
 
 **证据:**
 ```
-路径 aws.access_key_id 中发现匹配: "AKIAIOSFODNN7EXAMPLE"
+路径 aws.access_key_id 中发现匹配: "AWS_ACCESS_KEY_ID_REDACTED"
 ```
 
 
@@ -149,7 +149,7 @@
 
 **证据:**
 ```
-路径 aws.secret_access_key 中发现匹配: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+路径 aws.secret_access_key 中发现匹配: "AWS_SECRET_ACCESS_KEY_REDACTED"
 ```
 
 
@@ -216,7 +216,7 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 
 **证据:**
 ```
-第 67 行发现敏感内容: "eyJhdXRocyI6eyJyZWdpc3RyeS5leGFtcGxlLmNvbSI6eyJ1c2VybmFtZSI6..."
+第 67 行发现敏感内容: "REPORT_TOKEN_REDACTED..."
 ```
 
 
@@ -236,7 +236,7 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 
 **证据:**
 ```
-第 68 行发现敏感内容: "token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+第 68 行发现敏感内容: "token: "REPORT_TOKEN_REDACTED"
 ```
 
 
@@ -256,7 +256,7 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 
 **证据:**
 ```
-第 68 行发现敏感内容: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODk..."
+第 68 行发现敏感内容: "REPORT_TOKEN_REDACTED.REPORT_TOKEN_REDACTED..."
 ```
 
 
@@ -354,7 +354,7 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 
 **证据:**
 ```
-路径 secrets.dockerconfigjson 中发现匹配: "eyJhdXRocyI6eyJyZWdpc3RyeS5leGFtcGxlLmNvbSI6eyJ1c2..."
+路径 secrets.dockerconfigjson 中发现匹配: "REPORT_TOKEN_REDACTED..."
 ```
 
 
@@ -373,7 +373,7 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 
 **证据:**
 ```
-路径 secrets.jwt_token 中发现匹配: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxM..."
+路径 secrets.jwt_token 中发现匹配: "REPORT_TOKEN_REDACTED.eyJzdWIiOiIxM..."
 ```
 
 

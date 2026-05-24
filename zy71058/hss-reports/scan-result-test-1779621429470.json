@@ -62,8 +62,8 @@
         "line": 55,
         "column": 13
       },
-      "matchedValue": "AKIAIOSFODNN7EXAMPLE",
-      "evidence": "第 55 行发现敏感内容: \"AKIAIOSFODNN7EXAMPLE\""
+      "matchedValue": "AWS_ACCESS_KEY_ID_REDACTED",
+      "evidence": "第 55 行发现敏感内容: \"AWS_ACCESS_KEY_ID_REDACTED\""
     },
     {
       "id": "finding_637e09d896ccf161",
@@ -78,8 +78,8 @@
         "line": 55,
         "column": 2
       },
-      "matchedValue": "password: \"AKIAIOSFODNN7EXAMPLE\"",
-      "evidence": "第 55 行发现敏感内容: \"password: \"AKIAIOSFODNN7EXAMPLE\"\""
+      "matchedValue": "password: \"AWS_ACCESS_KEY_ID_REDACTED\"",
+      "evidence": "第 55 行发现敏感内容: \"password: \"AWS_ACCESS_KEY_ID_REDACTED\"\""
     },
     {
       "id": "finding_1c23fb9fd2f02795",
@@ -126,8 +126,8 @@
         "line": 60,
         "column": 22
       },
-      "matchedValue": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-      "evidence": "第 60 行发现敏感内容: \"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\""
+      "matchedValue": "REPORT_TOKEN_REDACTED",
+      "evidence": "第 60 行发现敏感内容: \"REPORT_TOKEN_REDACTED\""
     },
     {
       "id": "finding_cc3a721790994f8a",
@@ -190,7 +190,7 @@
         "line": 67,
         "column": 21
       },
-      "matchedValue": "eyJhdXRocyI6eyJyZWdpc3RyeS5leGFtcGxlLmNvbSI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJzdXBlcnNlY3JldCJ9fX0=",
+      "matchedValue": "REPORT_TOKEN_REDACTED=",
       "evidence": "第 67 行 Base64 解码后发现敏感信息: {\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}...",
       "isBase64Encoded": true,
       "decodedValue": "{\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}"
@@ -208,8 +208,8 @@
         "line": 67,
         "column": 21
       },
-      "matchedValue": "eyJhdXRocyI6eyJyZWdpc3RyeS5leGFtcGxlLmNvbSI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJzdXBlcnNlY3JldCJ9fX0=",
-      "evidence": "第 67 行发现敏感内容: \"eyJhdXRocyI6eyJyZWdpc3RyeS5leGFtcGxlLmNvbSI6eyJ1c2VybmFtZSI6...\""
+      "matchedValue": "REPORT_TOKEN_REDACTED=",
+      "evidence": "第 67 行发现敏感内容: \"REPORT_TOKEN_REDACTED...\""
     },
     {
       "id": "finding_890e678580f5a962",
@@ -224,8 +224,8 @@
         "line": 68,
         "column": 6
       },
-      "matchedValue": "token: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
-      "evidence": "第 68 行发现敏感内容: \"token: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\""
+      "matchedValue": "token: \"REPORT_TOKEN_REDACTED",
+      "evidence": "第 68 行发现敏感内容: \"token: \"REPORT_TOKEN_REDACTED\""
     },
     {
       "id": "finding_6eee247be58f4dc9",
@@ -240,8 +240,8 @@
         "line": 68,
         "column": 14
       },
-      "matchedValue": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-      "evidence": "第 68 行发现敏感内容: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODk...\""
+      "matchedValue": "REPORT_TOKEN_REDACTED.REPORT_TOKEN_REDACTED.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+      "evidence": "第 68 行发现敏感内容: \"REPORT_TOKEN_REDACTED.REPORT_TOKEN_REDACTED...\""
     },
     {
       "id": "finding_d036396f216f5d46",
@@ -336,8 +336,8 @@
         "line": 0,
         "column": 0
       },
-      "matchedValue": "AKIAIOSFODNN7EXAMPLE",
-      "evidence": "路径 database.password 中发现匹配: \"AKIAIOSFODNN7EXAMPLE\""
+      "matchedValue": "AWS_ACCESS_KEY_ID_REDACTED",
+      "evidence": "路径 database.password 中发现匹配: \"AWS_ACCESS_KEY_ID_REDACTED\""
     },
     {
       "id": "finding_5770ea4b8409ce19",
@@ -384,8 +384,8 @@
         "line": 0,
         "column": 0
       },
-      "matchedValue": "AKIAIOSFODNN7EXAMPLE",
-      "evidence": "路径 aws.access_key_id 中发现匹配: \"AKIAIOSFODNN7EXAMPLE\""
+      "matchedValue": "AWS_ACCESS_KEY_ID_REDACTED",
+      "evidence": "路径 aws.access_key_id 中发现匹配: \"AWS_ACCESS_KEY_ID_REDACTED\""
     },
     {
       "id": "finding_ab99059122c6b2a1",
@@ -400,8 +400,8 @@
         "line": 0,
         "column": 0
       },
-      "matchedValue": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-      "evidence": "路径 aws.secret_access_key 中发现匹配: \"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\""
+      "matchedValue": "REPORT_TOKEN_REDACTED",
+      "evidence": "路径 aws.secret_access_key 中发现匹配: \"AWS_SECRET_ACCESS_KEY_REDACTED\""
     },
     {
       "id": "finding_1c52de26960bfc8d",
@@ -448,7 +448,7 @@
         "line": 0,
         "column": 54
       },
-      "matchedValue": "eyJhdXRocyI6eyJyZWdpc3RyeS5leGFtcGxlLmNvbSI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJzdXBlcnNlY3JldCJ9fX0=",
+      "matchedValue": "REPORT_TOKEN_REDACTED=",
       "evidence": "Base64 解码后: {\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}",
       "isBase64Encoded": true,
       "decodedValue": "{\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}"
@@ -466,8 +466,8 @@
         "line": 0,
         "column": 0
       },
-      "matchedValue": "eyJhdXRocyI6eyJyZWdpc3RyeS5leGFtcGxlLmNvbSI6eyJ1c2VybmFtZSI6ImFkbWluIiwicGFzc3dvcmQiOiJzdXBlcnNlY3JldCJ9fX0=",
-      "evidence": "路径 secrets.dockerconfigjson 中发现匹配: \"eyJhdXRocyI6eyJyZWdpc3RyeS5leGFtcGxlLmNvbSI6eyJ1c2...\""
+      "matchedValue": "REPORT_TOKEN_REDACTED=",
+      "evidence": "路径 secrets.dockerconfigjson 中发现匹配: \"REPORT_TOKEN_REDACTED...\""
     },
     {
       "id": "finding_43771bea04aef4c6",
@@ -482,8 +482,8 @@
         "line": 0,
         "column": 0
       },
-      "matchedValue": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-      "evidence": "路径 secrets.jwt_token 中发现匹配: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxM...\""
+      "matchedValue": "REPORT_TOKEN_REDACTED.REPORT_TOKEN_REDACTED.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+      "evidence": "路径 secrets.jwt_token 中发现匹配: \"REPORT_TOKEN_REDACTED.eyJzdWIiOiIxM...\""
     },
     {
       "id": "finding_19aeda024e6c31c6",

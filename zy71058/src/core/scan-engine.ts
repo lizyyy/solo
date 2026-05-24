@@ -17,6 +17,7 @@ export class ScanEngine {
   private errors: string[] = [];
   private warnings: string[] = [];
   private scannedFiles: Set<string> = new Set();
+  private constructorWarnings: string[] = [];
 
   constructor(config: ScanEngineConfig) {
     this.config = config;
@@ -24,7 +25,7 @@ export class ScanEngine {
     for (const ex of config.exceptions) {
       const validationErrors = validateException(ex);
       for (const err of validationErrors) {
-        this.warnings.push(`例外配置警告: ${err}`);
+        this.constructorWarnings.push(`例外配置警告: ${err}`);
       }
     }
   }
@@ -32,7 +33,7 @@ export class ScanEngine {
   async scan(): Promise<ScanResult> {
     this.findings = [];
     this.errors = [];
-    this.warnings = [];
+    this.warnings = [...this.constructorWarnings];
     this.scannedFiles = new Set();
 
     try {

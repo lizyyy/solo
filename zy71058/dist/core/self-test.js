@@ -94,21 +94,32 @@ async function testTemplateRendering() {
         if (resolved !== 'supersecret') {
             return { name: '模板渲染', passed: false, message: `值引用解析失败: ${resolved}` };
         }
-        const handlebarsTemplate = `
+        const goTemplate = `
 apiVersion: v1
 kind: Secret
 data:
-  password: {{ database.password }}
+  password: {{ .Values.database.password }}
 `;
-        const rendered = (0, template_renderer_1.renderTemplate)(handlebarsTemplate, values);
+        const rendered = (0, template_renderer_1.renderTemplate)(goTemplate, values);
         if (!rendered.includes('supersecret')) {
-            return { name: '模板渲染', passed: false, message: 'Handlebars 模板变量未正确渲染' };
+            return { name: '模板渲染', passed: false, message: 'Go 模板变量未正确渲染' };
+        }
+        const b64Template = `
+apiVersion: v1
+kind: Secret
+data:
+  password: {{ .Values.database.password | b64enc }}
+`;
+        const b64Rendered = (0, template_renderer_1.renderTemplate)(b64Template, values);
+        const expectedB64 = Buffer.from('supersecret').toString('base64');
+        if (!b64Rendered.includes(expectedB64)) {
+            return { name: '模板渲染', passed: false, message: 'b64enc pipeline 未正确工作' };
         }
         return {
             name: '模板渲染',
             passed: true,
-            message: '模板变量渲染和引用解析正常',
-            details: { resolvedValue: resolved, hasSecret: rendered.includes('supersecret') }
+            message: 'Go 模板变量、.Values 引用和 b64enc pipeline 正常',
+            details: { resolvedValue: resolved, hasSecret: rendered.includes('supersecret'), hasB64: b64Rendered.includes(expectedB64) }
         };
     }
     catch (e) {

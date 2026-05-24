@@ -1,46 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as Handlebars from 'handlebars';
 
 export interface RenderedTemplate {
   filePath: string;
   originalContent: string;
   renderedContent: string;
 }
-
-Handlebars.registerHelper('tpl', function (template: string, context: unknown) {
-  try {
-    const compiled = Handlebars.compile(template);
-    return compiled(context);
-  } catch {
-    return template;
-  }
-});
-
-Handlebars.registerHelper('default', function (defaultValue: unknown, value: unknown) {
-  return value !== undefined && value !== null ? value : defaultValue;
-});
-
-Handlebars.registerHelper('required', function (message: string, value: unknown) {
-  if (value === undefined || value === null || value === '') {
-    return `[REQUIRED: ${message}]`;
-  }
-  return value;
-});
-
-Handlebars.registerHelper('trimSuffix', function (suffix: string, str: string) {
-  if (str.endsWith(suffix)) {
-    return str.slice(0, -suffix.length);
-  }
-  return str;
-});
-
-Handlebars.registerHelper('trimPrefix', function (prefix: string, str: string) {
-  if (str.startsWith(prefix)) {
-    return str.slice(prefix.length);
-  }
-  return str;
-});
 
 function getObjectByPath(obj: Record<string, unknown>, pathStr: string): unknown {
   const parts = pathStr.split('.');
@@ -56,42 +21,142 @@ function getObjectByPath(obj: Record<string, unknown>, pathStr: string): unknown
   return current;
 }
 
-Handlebars.registerHelper('include', function (name: string, context: unknown) {
-  return `{{ include "${name}" . }}`;
-});
+const templateFunctions: Record<string, (...args: string[]) => string> = {
+  b64enc: (value: string) => Buffer.from(value).toString('base64'),
+  b64dec: (value: string) => Buffer.from(value, 'base64').toString('utf-8'),
+  quote: (value: string) => `"${value}"`,
+  upper: (value: string) => value.toUpperCase(),
+  lower: (value: string) => value.toLowerCase(),
+  trim: (value: string) => value.trim(),
+  toString: (value: string) => String(value),
+  default: (defaultVal: string, value: string) => value !== undefined && value !== null && value !== '' ? value : defaultVal,
+};
 
-Handlebars.registerHelper('toYaml', function (obj: unknown) {
-  if (obj === null || obj === undefined) {
-    return '';
+interface TemplateContext {
+  Values: Record<string, unknown>;
+  Release: {
+    Name: string;
+    Namespace: string;
+  };
+  Chart: {
+    Name: string;
+    Version: string;
+  };
+}
+
+function resolvePathInContext(pathStr: string, context: TemplateContext): unknown {
+  const normalizedPath = pathStr.startsWith('.') ? pathStr.substring(1) : pathStr;
+  const parts = normalizedPath.split('.');
+  
+  if (parts.length === 0) return undefined;
+  
+  const rootKey = parts[0];
+  const restPath = parts.slice(1).join('.');
+  
+  let rootObj: unknown;
+  switch (rootKey) {
+    case 'Values':
+      rootObj = context.Values;
+      break;
+    case 'Release':
+      rootObj = context.Release;
+      break;
+    case 'Chart':
+      rootObj = context.Chart;
+      break;
+    default:
+      rootObj = (context.Values as Record<string, unknown>)[rootKey];
   }
-  return JSON.stringify(obj, null, 2);
-});
+  
+  if (restPath === '') {
+    return rootObj;
+  }
+  
+  if (rootObj === null || rootObj === undefined || typeof rootObj !== 'object') {
+    return undefined;
+  }
+  
+  return getObjectByPath(rootObj as Record<string, unknown>, restPath);
+}
+
+function applyPipeline(value: string, pipeline: string[]): string {
+  let result = value;
+  
+  for (const funcCall of pipeline) {
+    const trimmed = funcCall.trim();
+    if (!trimmed) continue;
+    
+    const funcParts = trimmed.split(/\s+/);
+    const funcName = funcParts[0];
+    const funcArgs = funcParts.slice(1);
+    
+    if (templateFunctions[funcName]) {
+      try {
+        result = templateFunctions[funcName](result, ...funcArgs);
+      } catch {
+      }
+    }
+  }
+  
+  return result;
+}
 
 export function renderTemplate(content: string, values: Record<string, unknown>): string {
-  try {
-    const compiled = Handlebars.compile(content, {
-      strict: false,
-      noEscape: true
-    });
+  const context: TemplateContext = {
+    Values: values,
+    Release: {
+      Name: 'test-release',
+      Namespace: 'default'
+    },
+    Chart: {
+      Name: 'scanned-chart',
+      Version: '1.0.0'
+    }
+  };
+
+  let result = content;
+  
+  const templateRegex = /\{\{([^}]+)\}\}/g;
+  
+  result = result.replace(templateRegex, (match, expression) => {
+    const expr = expression.trim();
     
-    const context = {
-      ...values,
-      Values: values,
-      Chart: {
-        Name: 'scanned-chart',
-        Version: '1.0.0'
-      },
-      Release: {
-        Name: 'test-release',
-        Namespace: 'default'
+    const parts = expr.split(/\s*\|\s*/);
+    const valueExpr = parts[0].trim();
+    const pipeline = parts.slice(1);
+    
+    if (valueExpr.startsWith('.')) {
+      const resolved = resolvePathInContext(valueExpr, context);
+      const stringValue = resolved !== undefined ? String(resolved) : match;
+      
+      if (pipeline.length > 0) {
+        return applyPipeline(stringValue, pipeline);
       }
-    };
+      
+      return stringValue;
+    }
     
-    return compiled(context);
-  } catch (e) {
-    console.warn(`模板渲染警告: ${(e as Error).message}`);
-    return content;
-  }
+    if (templateFunctions[valueExpr]) {
+      const funcArgs = pipeline.map((p: string) => {
+        const trimmed = p.trim();
+        if (trimmed.startsWith('.')) {
+          const resolved = resolvePathInContext(trimmed, context);
+          return resolved !== undefined ? String(resolved) : trimmed;
+        }
+        return trimmed.replace(/^["']|["']$/g, '');
+      });
+      
+      try {
+        return templateFunctions[valueExpr](...funcArgs);
+      } catch {
+        return match;
+      }
+    }
+    
+    return match;
+  });
+  
+  return result;
 }
 
 export function renderTemplateFile(filePath: string, values: Record<string, unknown>): RenderedTemplate {
@@ -129,19 +194,5 @@ export function renderTemplateDir(templateDir: string, values: Record<string, un
 }
 
 export function resolveTemplateReferences(content: string, values: Record<string, unknown>): string {
-  let result = content;
-  
-  const goTemplateRegex = /{{\s*\.Values\.([a-zA-Z0-9_.]+)\s*}}/g;
-  result = result.replace(goTemplateRegex, (match, pathStr) => {
-    const value = getObjectByPath(values, pathStr);
-    return value !== undefined ? String(value) : match;
-  });
-  
-  const simpleVarRegex = /\$\{([a-zA-Z0-9_.]+)\}/g;
-  result = result.replace(simpleVarRegex, (match, varName) => {
-    const value = getObjectByPath(values, varName);
-    return value !== undefined ? String(value) : match;
-  });
-  
-  return result;
+  return renderTemplate(content, values);
 }

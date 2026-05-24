@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "scannedAt": "2026-05-24T13:56:38.482Z",
+    "scannedAt": "2026-05-24T13:44:53.344Z",
     "environment": "test",
     "valuesFile": "examples/values-test.yaml",
-    "exceptionsFile": "examples/bad-exceptions.yaml"
+    "templateDir": "examples/templates"
   },
   "summary": {
-    "totalFiles": 1,
-    "totalFindings": 26,
+    "totalFiles": 2,
+    "totalFindings": 35,
     "bySeverity": {
-      "critical": 7,
-      "high": 10,
-      "medium": 1,
-      "low": 8
+      "critical": 10,
+      "high": 12,
+      "medium": 4,
+      "low": 9
     },
-    "excepted": 4,
+    "excepted": 0,
     "expiredExceptions": 0
   },
   "findings": [
     {
-      "id": "finding_009b878e572bdb94",
+      "id": "finding_88b630c30bf4889f",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -35,7 +35,7 @@
       "evidence": "第 31 行发现敏感内容: \"chart-example.local\""
     },
     {
-      "id": "finding_671ea1050f5f9f41",
+      "id": "finding_0f7d5cdf12331037",
       "ruleId": "intranet-ip",
       "ruleName": "Intranet IP Address",
       "severity": "medium",
@@ -51,7 +51,7 @@
       "evidence": "第 52 行发现敏感内容: \"10.0.0.100\""
     },
     {
-      "id": "finding_bdaf65fa7715779b",
+      "id": "finding_7ed34630f596851f",
       "ruleId": "aws-access-key",
       "ruleName": "AWS Access Key",
       "severity": "critical",
@@ -67,7 +67,7 @@
       "evidence": "第 55 行发现敏感内容: \"AWS_ACCESS_KEY_ID_REDACTED\""
     },
     {
-      "id": "finding_ba4fa449b5831ce1",
+      "id": "finding_77e823b7a88cd647",
       "ruleId": "database-password",
       "ruleName": "Database Password",
       "severity": "critical",
@@ -83,7 +83,7 @@
       "evidence": "第 55 行发现敏感内容: \"password: \"AWS_ACCESS_KEY_ID_REDACTED\"\""
     },
     {
-      "id": "finding_af15936717697943",
+      "id": "finding_58be2c75f0fb9da4",
       "ruleId": "basic-auth",
       "ruleName": "Basic Authentication",
       "severity": "high",
@@ -99,7 +99,7 @@
       "evidence": "第 56 行发现敏感内容: \"https://admin:supersecret123@db.internal.corp\"\""
     },
     {
-      "id": "finding_a07383a4f5bbc3b9",
+      "id": "finding_981cac6a4d613e41",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -115,7 +115,7 @@
       "evidence": "第 56 行发现敏感内容: \"db.internal.corp\""
     },
     {
-      "id": "finding_0ebb9e9b5782c393",
+      "id": "finding_95d5886390f1bf36",
       "ruleId": "aws-secret-key",
       "ruleName": "AWS Secret Key",
       "severity": "critical",
@@ -131,7 +131,7 @@
       "evidence": "第 60 行发现敏感内容: \"REPORT_TOKEN_REDACTED\""
     },
     {
-      "id": "finding_d7fe111e9df78d92",
+      "id": "finding_1532a04bb7042ff0",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -147,7 +147,7 @@
       "evidence": "第 62 行发现敏感内容: \"internal\""
     },
     {
-      "id": "finding_e5ea47457556418a",
+      "id": "finding_e05bbdb7ad648069",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -163,7 +163,7 @@
       "evidence": "第 63 行发现敏感内容: \"api.service.internal\""
     },
     {
-      "id": "finding_753bcb3b8d0b965b",
+      "id": "finding_b8bcb6b8d04089a7",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -179,7 +179,7 @@
       "evidence": "第 64 行发现敏感内容: \"my-app.default.svc.cluster.local\""
     },
     {
-      "id": "finding_31bef6377f36ce14",
+      "id": "finding_4bb1969be9417a78",
       "ruleId": "database-password",
       "ruleName": "Database Password",
       "severity": "critical",
@@ -197,7 +197,7 @@
       "decodedValue": "{\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}"
     },
     {
-      "id": "finding_d3bf2a76d61d9312",
+      "id": "finding_340f7e28de590792",
       "ruleId": "kubernetes-dockerconfigjson",
       "ruleName": "Kubernetes dockerconfigjson",
       "severity": "high",
@@ -213,7 +213,7 @@
       "evidence": "第 67 行发现敏感内容: \"REPORT_TOKEN_REDACTED...\""
     },
     {
-      "id": "finding_37f6af693fa6bb3b",
+      "id": "finding_6a8f33a13a143dc7",
       "ruleId": "generic-api-key",
       "ruleName": "Generic API Key",
       "severity": "high",
@@ -229,7 +229,7 @@
       "evidence": "第 68 行发现敏感内容: \"token: \"REPORT_TOKEN_REDACTED\""
     },
     {
-      "id": "finding_034c9d34e696bbb4",
+      "id": "finding_28eee1a7eb8ae4c9",
       "ruleId": "jwt-token",
       "ruleName": "JWT Token",
       "severity": "high",
@@ -245,7 +245,7 @@
       "evidence": "第 68 行发现敏感内容: \"REPORT_TOKEN_REDACTED.REPORT_TOKEN_REDACTED...\""
     },
     {
-      "id": "finding_556cce0dc068bec3",
+      "id": "finding_dbd806dffd6fab96",
       "ruleId": "basic-auth",
       "ruleName": "Basic Authentication",
       "severity": "high",
@@ -261,7 +261,7 @@
       "evidence": "第 74 行发现敏感内容: \"https://deploy:mysecretpassword@github.com/org/repo.git\"\""
     },
     {
-      "id": "finding_ae719a3676c6b581",
+      "id": "finding_a3f209e1be0e37aa",
       "ruleId": "git-credentials",
       "ruleName": "Git Credentials",
       "severity": "high",
@@ -277,7 +277,7 @@
       "evidence": "第 74 行发现敏感内容: \"https://deploy:mysecretpassword@github.com\""
     },
     {
-      "id": "finding_2f4e301ce6562f61",
+      "id": "finding_40f9e45ca3b029be",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -293,7 +293,7 @@
       "evidence": "路径 ingress.hosts[0].host 中发现匹配: \"chart-example.local\""
     },
     {
-      "id": "finding_08fae46d5d0fd0e1",
+      "id": "finding_4fa57a8b56f96f11",
       "ruleId": "intranet-ip",
       "ruleName": "Intranet IP Address",
       "severity": "medium",
@@ -306,17 +306,10 @@
         "column": 0
       },
       "matchedValue": "10.0.0.100",
-      "evidence": "路径 database.host 中发现匹配: \"10.0.0.100\"",
-      "excepted": true,
-      "exception": {
-        "id": "bad-exception-1",
-        "reason": "缺少必填字段测试 - 没有 createdBy 和 createdAt",
-        "path": "database.*"
-      },
-      "exceptionExpired": false
+      "evidence": "路径 database.host 中发现匹配: \"10.0.0.100\""
     },
     {
-      "id": "finding_776c0845041bff7b",
+      "id": "finding_3ee394a0124ae1aa",
       "ruleId": "aws-access-key",
       "ruleName": "AWS Access Key",
       "severity": "critical",
@@ -329,17 +322,10 @@
         "column": 0
       },
       "matchedValue": "AWS_ACCESS_KEY_ID_REDACTED",
-      "evidence": "路径 database.password 中发现匹配: \"AWS_ACCESS_KEY_ID_REDACTED\"",
-      "excepted": true,
-      "exception": {
-        "id": "bad-exception-1",
-        "reason": "缺少必填字段测试 - 没有 createdBy 和 createdAt",
-        "path": "database.*"
-      },
-      "exceptionExpired": false
+      "evidence": "路径 database.password 中发现匹配: \"AWS_ACCESS_KEY_ID_REDACTED\""
     },
     {
-      "id": "finding_a59453061026d142",
+      "id": "finding_19205c24772a31b9",
       "ruleId": "basic-auth",
       "ruleName": "Basic Authentication",
       "severity": "high",
@@ -352,17 +338,10 @@
         "column": 0
       },
       "matchedValue": "https://admin:supersecret123@db.internal.corp",
-      "evidence": "路径 database.url 中发现匹配: \"https://admin:supersecret123@db.internal.corp\"",
-      "excepted": true,
-      "exception": {
-        "id": "bad-exception-1",
-        "reason": "缺少必填字段测试 - 没有 createdBy 和 createdAt",
-        "path": "database.*"
-      },
-      "exceptionExpired": false
+      "evidence": "路径 database.url 中发现匹配: \"https://admin:supersecret123@db.internal.corp\""
     },
     {
-      "id": "finding_27dae4a112b0fe66",
+      "id": "finding_923b1665d17d769c",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -375,17 +354,10 @@
         "column": 29
       },
       "matchedValue": "db.internal.corp",
-      "evidence": "路径 database.url 中发现匹配: \"db.internal.corp\"",
-      "excepted": true,
-      "exception": {
-        "id": "bad-exception-1",
-        "reason": "缺少必填字段测试 - 没有 createdBy 和 createdAt",
-        "path": "database.*"
-      },
-      "exceptionExpired": false
+      "evidence": "路径 database.url 中发现匹配: \"db.internal.corp\""
     },
     {
-      "id": "finding_1e53004f25e5aea2",
+      "id": "finding_a69e0d6dd18882bf",
       "ruleId": "aws-access-key",
       "ruleName": "AWS Access Key",
       "severity": "critical",
@@ -401,7 +373,7 @@
       "evidence": "路径 aws.access_key_id 中发现匹配: \"AWS_ACCESS_KEY_ID_REDACTED\""
     },
     {
-      "id": "finding_2c6dea5960e2d7a9",
+      "id": "finding_9c75c25d0b24faee",
       "ruleId": "aws-secret-key",
       "ruleName": "AWS Secret Key",
       "severity": "critical",
@@ -417,7 +389,7 @@
       "evidence": "路径 aws.secret_access_key 中发现匹配: \"AWS_SECRET_ACCESS_KEY_REDACTED\""
     },
     {
-      "id": "finding_5fe0c635994043eb",
+      "id": "finding_d167a7591c566f4e",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -433,7 +405,7 @@
       "evidence": "路径 internal.api_url 中发现匹配: \"api.service.internal\""
     },
     {
-      "id": "finding_b1bda57e1d08e4fd",
+      "id": "finding_56315e4ee6dfb6bd",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -449,7 +421,7 @@
       "evidence": "路径 internal.k8s_service 中发现匹配: \"my-app.default.svc.cluster.local\""
     },
     {
-      "id": "finding_bfe2f22e2dabb27b",
+      "id": "finding_0285d13ae225bcf9",
       "ruleId": "database-password",
       "ruleName": "Database Password",
       "severity": "critical",
@@ -467,7 +439,7 @@
       "decodedValue": "{\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}"
     },
     {
-      "id": "finding_3c8cd98f7eba07b4",
+      "id": "finding_f5f3ee7d555c8f5e",
       "ruleId": "kubernetes-dockerconfigjson",
       "ruleName": "Kubernetes dockerconfigjson",
       "severity": "high",
@@ -483,7 +455,7 @@
       "evidence": "路径 secrets.dockerconfigjson 中发现匹配: \"REPORT_TOKEN_REDACTED...\""
     },
     {
-      "id": "finding_7e4a18d5f9471061",
+      "id": "finding_b8a5a7acc7f9fc99",
       "ruleId": "jwt-token",
       "ruleName": "JWT Token",
       "severity": "high",
@@ -499,7 +471,7 @@
       "evidence": "路径 secrets.jwt_token 中发现匹配: \"REPORT_TOKEN_REDACTED.eyJzdWIiOiIxM...\""
     },
     {
-      "id": "finding_7bf9b3cde939749a",
+      "id": "finding_de794ef5a61e174a",
       "ruleId": "basic-auth",
       "ruleName": "Basic Authentication",
       "severity": "high",
@@ -515,7 +487,7 @@
       "evidence": "路径 git.clone_url 中发现匹配: \"https://deploy:mysecretpassword@github.com/org/rep...\""
     },
     {
-      "id": "finding_ec47d7a494bdcc17",
+      "id": "finding_1d7a50afdcbea4de",
       "ruleId": "git-credentials",
       "ruleName": "Git Credentials",
       "severity": "high",
@@ -529,12 +501,92 @@
       },
       "matchedValue": "https://deploy:mysecretpassword@github.com",
       "evidence": "路径 git.clone_url 中发现匹配: \"https://deploy:mysecretpassword@github.com\""
+    },
+    {
+      "id": "finding_28aae36baf87633b",
+      "ruleId": "aws-access-key",
+      "ruleName": "AWS Access Key",
+      "severity": "critical",
+      "category": "credential",
+      "description": "检测 AWS 访问密钥 ID (AKIA 开头)",
+      "location": {
+        "file": "REPORT_TOKEN_REDACTED.yaml",
+        "path": "content",
+        "line": 7,
+        "column": 15
+      },
+      "matchedValue": "REPORT_TOKEN_REDACTED=",
+      "evidence": "[模板渲染后] 第 7 行 Base64 解码后发现敏感信息: AWS_ACCESS_KEY_ID_REDACTED...",
+      "isBase64Encoded": true,
+      "decodedValue": "AWS_ACCESS_KEY_ID_REDACTED"
+    },
+    {
+      "id": "finding_eaf121550849bdbe",
+      "ruleId": "aws-secret-key",
+      "ruleName": "AWS Secret Key",
+      "severity": "critical",
+      "category": "credential",
+      "description": "检测 AWS 秘密访问密钥",
+      "location": {
+        "file": "REPORT_TOKEN_REDACTED.yaml",
+        "path": "content",
+        "line": 8,
+        "column": 11
+      },
+      "matchedValue": "REPORT_TOKEN_REDACTED==",
+      "evidence": "[模板渲染后] 第 8 行 Base64 解码后发现敏感信息: REPORT_TOKEN_REDACTED...",
+      "isBase64Encoded": true,
+      "decodedValue": "REPORT_TOKEN_REDACTED"
+    },
+    {
+      "id": "finding_1a12d2e7e43eb616",
+      "ruleId": "generic-api-key",
+      "ruleName": "Generic API Key",
+      "severity": "high",
+      "category": "credential",
+      "description": "检测通用 API 密钥格式",
+      "location": {
+        "file": "REPORT_TOKEN_REDACTED.yaml",
+        "path": "content",
+        "line": 8,
+        "column": 2
+      },
+      "matchedValue": "API_KEY: REPORT_TOKEN_REDACTED",
+      "evidence": "[模板渲染后] 第 8 行发现敏感内容: \"API_KEY: REPORT_TOKEN_REDACTED...\""
+    },
+    {
+      "id": "finding_19b7c72ee8df00ed",
+      "ruleId": "intranet-ip",
+      "ruleName": "Intranet IP Address",
+      "severity": "medium",
+      "category": "network",
+      "description": "检测内网 IP 地址 (10.x, 172.16-31.x, 192.168.x)",
+      "location": {
+        "file": "REPORT_TOKEN_REDACTED.yaml",
+        "path": "content",
+        "line": 10,
+        "column": 25
+      },
+      "matchedValue": "192.168.1.50",
+      "evidence": "[模板渲染后] 第 10 行发现敏感内容: \"192.168.1.50\""
+    },
+    {
+      "id": "finding_55ce32f97b88399b",
+      "ruleId": "intranet-ip",
+      "ruleName": "Intranet IP Address",
+      "severity": "medium",
+      "category": "network",
+      "description": "检测内网 IP 地址 (10.x, 172.16-31.x, 192.168.x)",
+      "location": {
+        "file": "REPORT_TOKEN_REDACTED.yaml",
+        "path": "content",
+        "line": 11,
+        "column": 52
+      },
+      "matchedValue": "10.0.1.10",
+      "evidence": "[模板渲染后] 第 11 行发现敏感内容: \"10.0.1.10\""
     }
   ],
   "errors": [],
-  "warnings": [
-    "例外配置警告: 例外项 bad-exception-1 缺少 createdBy 字段，必须记录创建人",
-    "例外配置警告: 例外项 bad-exception-1 缺少 createdAt 字段",
-    "例外配置警告: 例外项 bad-exception-2 必须至少指定 path、value 或 ruleId 之一"
-  ]
+  "warnings": []
 }

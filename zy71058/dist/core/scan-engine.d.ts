@@ -10,6 +10,7 @@ export declare class ScanEngine {
     private errors;
     private warnings;
     private scannedFiles;
+    private constructorWarnings;
     constructor(config: ScanEngineConfig);
     scan(): Promise<ScanResult>;
     private scanValuesFile;

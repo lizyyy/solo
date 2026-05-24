@@ -14,6 +14,9 @@ function isExceptionExpired(exception) {
     return expireDate < now;
 }
 function matchesException(finding, exception, environment) {
+    if (!exception.path && !exception.value && !exception.ruleId) {
+        return false;
+    }
     if (exception.environment && exception.environment !== environment) {
         return false;
     }

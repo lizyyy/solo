@@ -1,32 +1,33 @@
 # Helm Values 泄密扫描报告
 
-> 生成时间: 2026-05-24T11:17:09.452Z
+> 生成时间: 2026-05-24T13:55:28.418Z
 > 环境: test
 
 ## 📋 扫描信息
 
 | 项目 | 内容 |
 |------|------|
-| 扫描时间 | 2026-05-24T11:17:09.452Z |
+| 扫描时间 | 2026-05-24T13:55:28.418Z |
 | 环境 | test |
 | Values 文件 | `examples/values-test.yaml` |
+| 例外配置 | `examples/bad-exceptions.yaml` |
 
 ## 📊 扫描摘要
 
 | 统计项 | 数量 |
 |--------|------|
 | 扫描文件数 | 1 |
-| 发现问题数 | 32 |
-| 🔴 严重 | 8 |
-| 🔴 高危 | 13 |
-| 🟡 中危 | 2 |
-| 🔵 低危 | 9 |
-| 📌 已例外 | 0 |
+| 发现问题数 | 26 |
+| 🔴 严重 | 7 |
+| 🔴 高危 | 10 |
+| 🟡 中危 | 1 |
+| 🔵 低危 | 8 |
+| 📌 已例外 | 4 |
 | ⚠️  过期例外 | 0 |
 
 ## 🔍 发现的敏感信息
 
-### 🔴 严重级别 (8 项)
+### 🔴 严重级别 (7 项)
 
 #### AWS Access Key
 
@@ -122,25 +123,6 @@
 | 严重级别 | 🔴 严重 |
 | 分类 | credential |
 | 文件 | `examples/values-test.yaml` |
-| 路径 | `database.password` |
-
-**描述:**
-检测 AWS 访问密钥 ID (AKIA 开头)
-
-**证据:**
-```
-路径 database.password 中发现匹配: "AWS_ACCESS_KEY_ID_REDACTED"
-```
-
-
-#### AWS Access Key
-
-| 属性 | 值 |
-|------|-----|
-| 规则 ID | `aws-access-key` |
-| 严重级别 | 🔴 严重 |
-| 分类 | credential |
-| 文件 | `examples/values-test.yaml` |
 | 路径 | `aws.access_key_id` |
 
 **描述:**
@@ -196,7 +178,7 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 ```
 
 
-### 🔴 高危级别 (13 项)
+### 🔴 高危级别 (10 项)
 
 #### Basic Authentication
 
@@ -278,26 +260,6 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 ```
 
 
-#### Slack Webhook
-
-| 属性 | 值 |
-|------|-----|
-| 规则 ID | `slack-webhook` |
-| 严重级别 | 🔴 高危 |
-| 分类 | credential |
-| 文件 | `examples/values-test.yaml` |
-| 路径 | `content` |
-| 行号 | 71 |
-
-**描述:**
-检测 Slack Webhook URL
-
-**证据:**
-```
-第 71 行发现敏感内容: "https://example.com/redacted-slack-webhook..."
-```
-
-
 #### Basic Authentication
 
 | 属性 | 值 |
@@ -335,25 +297,6 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 **证据:**
 ```
 第 74 行发现敏感内容: "https://deploy:mysecretpassword@github.com"
-```
-
-
-#### Basic Authentication
-
-| 属性 | 值 |
-|------|-----|
-| 规则 ID | `basic-auth` |
-| 严重级别 | 🔴 高危 |
-| 分类 | credential |
-| 文件 | `examples/values-test.yaml` |
-| 路径 | `database.url` |
-
-**描述:**
-检测 HTTP Basic 认证字符串
-
-**证据:**
-```
-路径 database.url 中发现匹配: "https://admin:supersecret123@db.internal.corp"
 ```
 
 
@@ -395,25 +338,6 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 ```
 
 
-#### Slack Webhook
-
-| 属性 | 值 |
-|------|-----|
-| 规则 ID | `slack-webhook` |
-| 严重级别 | 🔴 高危 |
-| 分类 | credential |
-| 文件 | `examples/values-test.yaml` |
-| 路径 | `slack.webhook` |
-
-**描述:**
-检测 Slack Webhook URL
-
-**证据:**
-```
-路径 slack.webhook 中发现匹配: "https://example.com/redacted-slack-webhook..."
-```
-
-
 #### Basic Authentication
 
 | 属性 | 值 |
@@ -452,7 +376,7 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 ```
 
 
-### 🟡 中危级别 (2 项)
+### 🟡 中危级别 (1 项)
 
 #### Intranet IP Address
 
@@ -474,26 +398,7 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 ```
 
 
-#### Intranet IP Address
-
-| 属性 | 值 |
-|------|-----|
-| 规则 ID | `intranet-ip` |
-| 严重级别 | 🟡 中危 |
-| 分类 | network |
-| 文件 | `examples/values-test.yaml` |
-| 路径 | `database.host` |
-
-**描述:**
-检测内网 IP 地址 (10.x, 172.16-31.x, 192.168.x)
-
-**证据:**
-```
-路径 database.host 中发现匹配: "10.0.0.100"
-```
-
-
-### 🔵 低危级别 (9 项)
+### 🔵 低危级别 (8 项)
 
 #### Internal Domain
 
@@ -622,25 +527,6 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 | 严重级别 | 🔵 低危 |
 | 分类 | network |
 | 文件 | `examples/values-test.yaml` |
-| 路径 | `database.url` |
-
-**描述:**
-检测常见内网域名后缀
-
-**证据:**
-```
-路径 database.url 中发现匹配: "db.internal.corp"
-```
-
-
-#### Internal Domain
-
-| 属性 | 值 |
-|------|-----|
-| 规则 ID | `internal-domain` |
-| 严重级别 | 🔵 低危 |
-| 分类 | network |
-| 文件 | `examples/values-test.yaml` |
 | 路径 | `internal.api_url` |
 
 **描述:**
@@ -670,6 +556,26 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 路径 internal.k8s_service 中发现匹配: "my-app.default.svc.cluster.local"
 ```
 
+
+## 📌 已例外的项目
+
+- **[Intranet IP Address]** database.host
+  - 例外原因: 缺少必填字段测试 - 没有 createdBy 和 createdAt
+
+- **[AWS Access Key]** database.password
+  - 例外原因: 缺少必填字段测试 - 没有 createdBy 和 createdAt
+
+- **[Basic Authentication]** database.url
+  - 例外原因: 缺少必填字段测试 - 没有 createdBy 和 createdAt
+
+- **[Internal Domain]** database.url
+  - 例外原因: 缺少必填字段测试 - 没有 createdBy 和 createdAt
+
+## ⚠️  警告
+
+- 例外配置警告: 例外项 bad-exception-1 缺少 createdBy 字段，必须记录创建人
+- 例外配置警告: 例外项 bad-exception-1 缺少 createdAt 字段
+- 例外配置警告: 例外项 bad-exception-2 必须至少指定 path、value 或 ruleId 之一
 
 ## 📖 扫描说明
 

@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "scannedAt": "2026-05-24T13:56:38.482Z",
+    "scannedAt": "2026-05-24T13:46:06.574Z",
     "environment": "test",
     "valuesFile": "examples/values-test.yaml",
     "exceptionsFile": "examples/bad-exceptions.yaml"
   },
   "summary": {
     "totalFiles": 1,
-    "totalFindings": 26,
+    "totalFindings": 0,
     "bySeverity": {
-      "critical": 7,
-      "high": 10,
-      "medium": 1,
-      "low": 8
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
     },
-    "excepted": 4,
+    "excepted": 30,
     "expiredExceptions": 0
   },
   "findings": [
     {
-      "id": "finding_009b878e572bdb94",
+      "id": "finding_f4e6a7644149b1fe",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -32,10 +32,18 @@
         "column": 12
       },
       "matchedValue": "chart-example.local",
-      "evidence": "第 31 行发现敏感内容: \"chart-example.local\""
+      "evidence": "第 31 行发现敏感内容: \"chart-example.local\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_671ea1050f5f9f41",
+      "id": "finding_0ae12ddc75b9ec51",
       "ruleId": "intranet-ip",
       "ruleName": "Intranet IP Address",
       "severity": "medium",
@@ -48,10 +56,18 @@
         "column": 9
       },
       "matchedValue": "10.0.0.100",
-      "evidence": "第 52 行发现敏感内容: \"10.0.0.100\""
+      "evidence": "第 52 行发现敏感内容: \"10.0.0.100\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_bdaf65fa7715779b",
+      "id": "finding_569b784d00b1fcde",
       "ruleId": "aws-access-key",
       "ruleName": "AWS Access Key",
       "severity": "critical",
@@ -64,10 +80,18 @@
         "column": 13
       },
       "matchedValue": "AWS_ACCESS_KEY_ID_REDACTED",
-      "evidence": "第 55 行发现敏感内容: \"AWS_ACCESS_KEY_ID_REDACTED\""
+      "evidence": "第 55 行发现敏感内容: \"AWS_ACCESS_KEY_ID_REDACTED\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_ba4fa449b5831ce1",
+      "id": "finding_c36fdf9d6eac213e",
       "ruleId": "database-password",
       "ruleName": "Database Password",
       "severity": "critical",
@@ -80,10 +104,18 @@
         "column": 2
       },
       "matchedValue": "password: \"AWS_ACCESS_KEY_ID_REDACTED\"",
-      "evidence": "第 55 行发现敏感内容: \"password: \"AWS_ACCESS_KEY_ID_REDACTED\"\""
+      "evidence": "第 55 行发现敏感内容: \"password: \"AWS_ACCESS_KEY_ID_REDACTED\"\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_af15936717697943",
+      "id": "finding_a38e44f59d3fe3ba",
       "ruleId": "basic-auth",
       "ruleName": "Basic Authentication",
       "severity": "high",
@@ -96,10 +128,18 @@
         "column": 8
       },
       "matchedValue": "https://admin:supersecret123@db.internal.corp\"",
-      "evidence": "第 56 行发现敏感内容: \"https://admin:supersecret123@db.internal.corp\"\""
+      "evidence": "第 56 行发现敏感内容: \"https://admin:supersecret123@db.internal.corp\"\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_a07383a4f5bbc3b9",
+      "id": "finding_a9a6690990242769",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -112,10 +152,18 @@
         "column": 37
       },
       "matchedValue": "db.internal.corp",
-      "evidence": "第 56 行发现敏感内容: \"db.internal.corp\""
+      "evidence": "第 56 行发现敏感内容: \"db.internal.corp\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_0ebb9e9b5782c393",
+      "id": "finding_1951168b67f24be6",
       "ruleId": "aws-secret-key",
       "ruleName": "AWS Secret Key",
       "severity": "critical",
@@ -128,10 +176,18 @@
         "column": 22
       },
       "matchedValue": "REPORT_TOKEN_REDACTED",
-      "evidence": "第 60 行发现敏感内容: \"REPORT_TOKEN_REDACTED\""
+      "evidence": "第 60 行发现敏感内容: \"REPORT_TOKEN_REDACTED\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_d7fe111e9df78d92",
+      "id": "finding_e0276701957cb6a3",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -144,10 +200,18 @@
         "column": 0
       },
       "matchedValue": "internal",
-      "evidence": "第 62 行发现敏感内容: \"internal\""
+      "evidence": "第 62 行发现敏感内容: \"internal\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_e5ea47457556418a",
+      "id": "finding_fbacdbe24a6d5e5e",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -160,10 +224,18 @@
         "column": 20
       },
       "matchedValue": "api.service.internal",
-      "evidence": "第 63 行发现敏感内容: \"api.service.internal\""
+      "evidence": "第 63 行发现敏感内容: \"api.service.internal\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_753bcb3b8d0b965b",
+      "id": "finding_b32353e430be7b40",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -176,10 +248,18 @@
         "column": 16
       },
       "matchedValue": "my-app.default.svc.cluster.local",
-      "evidence": "第 64 行发现敏感内容: \"my-app.default.svc.cluster.local\""
+      "evidence": "第 64 行发现敏感内容: \"my-app.default.svc.cluster.local\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_31bef6377f36ce14",
+      "id": "finding_0160cef452cddda3",
       "ruleId": "database-password",
       "ruleName": "Database Password",
       "severity": "critical",
@@ -194,10 +274,18 @@
       "matchedValue": "REPORT_TOKEN_REDACTED=",
       "evidence": "第 67 行 Base64 解码后发现敏感信息: {\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}...",
       "isBase64Encoded": true,
-      "decodedValue": "{\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}"
+      "decodedValue": "{\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_d3bf2a76d61d9312",
+      "id": "finding_f95ac45e28a90e9b",
       "ruleId": "kubernetes-dockerconfigjson",
       "ruleName": "Kubernetes dockerconfigjson",
       "severity": "high",
@@ -210,10 +298,18 @@
         "column": 21
       },
       "matchedValue": "REPORT_TOKEN_REDACTED=",
-      "evidence": "第 67 行发现敏感内容: \"REPORT_TOKEN_REDACTED...\""
+      "evidence": "第 67 行发现敏感内容: \"REPORT_TOKEN_REDACTED...\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_37f6af693fa6bb3b",
+      "id": "finding_9bc4a288f2999c47",
       "ruleId": "generic-api-key",
       "ruleName": "Generic API Key",
       "severity": "high",
@@ -226,10 +322,18 @@
         "column": 6
       },
       "matchedValue": "token: \"REPORT_TOKEN_REDACTED",
-      "evidence": "第 68 行发现敏感内容: \"token: \"REPORT_TOKEN_REDACTED\""
+      "evidence": "第 68 行发现敏感内容: \"token: \"REPORT_TOKEN_REDACTED\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_034c9d34e696bbb4",
+      "id": "finding_31bd3c6a96979d21",
       "ruleId": "jwt-token",
       "ruleName": "JWT Token",
       "severity": "high",
@@ -242,10 +346,18 @@
         "column": 14
       },
       "matchedValue": "REPORT_TOKEN_REDACTED.REPORT_TOKEN_REDACTED.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-      "evidence": "第 68 行发现敏感内容: \"REPORT_TOKEN_REDACTED.REPORT_TOKEN_REDACTED...\""
+      "evidence": "第 68 行发现敏感内容: \"REPORT_TOKEN_REDACTED.REPORT_TOKEN_REDACTED...\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_556cce0dc068bec3",
+      "id": "finding_f39b86647ce1a977",
       "ruleId": "basic-auth",
       "ruleName": "Basic Authentication",
       "severity": "high",
@@ -258,10 +370,18 @@
         "column": 14
       },
       "matchedValue": "https://deploy:mysecretpassword@github.com/org/repo.git\"",
-      "evidence": "第 74 行发现敏感内容: \"https://deploy:mysecretpassword@github.com/org/repo.git\"\""
+      "evidence": "第 74 行发现敏感内容: \"https://deploy:mysecretpassword@github.com/org/repo.git\"\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_ae719a3676c6b581",
+      "id": "finding_85b77e4721814311",
       "ruleId": "git-credentials",
       "ruleName": "Git Credentials",
       "severity": "high",
@@ -274,10 +394,18 @@
         "column": 14
       },
       "matchedValue": "https://deploy:mysecretpassword@github.com",
-      "evidence": "第 74 行发现敏感内容: \"https://deploy:mysecretpassword@github.com\""
+      "evidence": "第 74 行发现敏感内容: \"https://deploy:mysecretpassword@github.com\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_2f4e301ce6562f61",
+      "id": "finding_c0a246497dd3992f",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -290,10 +418,18 @@
         "column": 0
       },
       "matchedValue": "chart-example.local",
-      "evidence": "路径 ingress.hosts[0].host 中发现匹配: \"chart-example.local\""
+      "evidence": "路径 ingress.hosts[0].host 中发现匹配: \"chart-example.local\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_08fae46d5d0fd0e1",
+      "id": "finding_73aa6dcbdab14f08",
       "ruleId": "intranet-ip",
       "ruleName": "Intranet IP Address",
       "severity": "medium",
@@ -316,7 +452,7 @@
       "exceptionExpired": false
     },
     {
-      "id": "finding_776c0845041bff7b",
+      "id": "finding_a099a282eccaac1f",
       "ruleId": "aws-access-key",
       "ruleName": "AWS Access Key",
       "severity": "critical",
@@ -339,7 +475,7 @@
       "exceptionExpired": false
     },
     {
-      "id": "finding_a59453061026d142",
+      "id": "finding_b62f225b53516de6",
       "ruleId": "basic-auth",
       "ruleName": "Basic Authentication",
       "severity": "high",
@@ -362,7 +498,7 @@
       "exceptionExpired": false
     },
     {
-      "id": "finding_27dae4a112b0fe66",
+      "id": "finding_dd8683609173f844",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -385,7 +521,7 @@
       "exceptionExpired": false
     },
     {
-      "id": "finding_1e53004f25e5aea2",
+      "id": "finding_b3d6911ea7e8ed26",
       "ruleId": "aws-access-key",
       "ruleName": "AWS Access Key",
       "severity": "critical",
@@ -398,10 +534,18 @@
         "column": 0
       },
       "matchedValue": "AWS_ACCESS_KEY_ID_REDACTED",
-      "evidence": "路径 aws.access_key_id 中发现匹配: \"AWS_ACCESS_KEY_ID_REDACTED\""
+      "evidence": "路径 aws.access_key_id 中发现匹配: \"AWS_ACCESS_KEY_ID_REDACTED\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_2c6dea5960e2d7a9",
+      "id": "finding_ec25a2ab93ab1368",
       "ruleId": "aws-secret-key",
       "ruleName": "AWS Secret Key",
       "severity": "critical",
@@ -414,10 +558,18 @@
         "column": 0
       },
       "matchedValue": "REPORT_TOKEN_REDACTED",
-      "evidence": "路径 aws.secret_access_key 中发现匹配: \"AWS_SECRET_ACCESS_KEY_REDACTED\""
+      "evidence": "路径 aws.secret_access_key 中发现匹配: \"AWS_SECRET_ACCESS_KEY_REDACTED\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_5fe0c635994043eb",
+      "id": "finding_8e3d2500cc04360b",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -430,10 +582,18 @@
         "column": 8
       },
       "matchedValue": "api.service.internal",
-      "evidence": "路径 internal.api_url 中发现匹配: \"api.service.internal\""
+      "evidence": "路径 internal.api_url 中发现匹配: \"api.service.internal\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_b1bda57e1d08e4fd",
+      "id": "finding_21d5dbe9cdb2a56f",
       "ruleId": "internal-domain",
       "ruleName": "Internal Domain",
       "severity": "low",
@@ -446,10 +606,18 @@
         "column": 0
       },
       "matchedValue": "my-app.default.svc.cluster.local",
-      "evidence": "路径 internal.k8s_service 中发现匹配: \"my-app.default.svc.cluster.local\""
+      "evidence": "路径 internal.k8s_service 中发现匹配: \"my-app.default.svc.cluster.local\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_bfe2f22e2dabb27b",
+      "id": "finding_4a1bd56edcde9f64",
       "ruleId": "database-password",
       "ruleName": "Database Password",
       "severity": "critical",
@@ -464,10 +632,18 @@
       "matchedValue": "REPORT_TOKEN_REDACTED=",
       "evidence": "Base64 解码后: {\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}",
       "isBase64Encoded": true,
-      "decodedValue": "{\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}"
+      "decodedValue": "{\"auths\":{\"registry.example.com\":{\"username\":\"admin\",\"password\":\"supersecret\"}}}",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_3c8cd98f7eba07b4",
+      "id": "finding_975885f29018f21d",
       "ruleId": "kubernetes-dockerconfigjson",
       "ruleName": "Kubernetes dockerconfigjson",
       "severity": "high",
@@ -480,10 +656,18 @@
         "column": 0
       },
       "matchedValue": "REPORT_TOKEN_REDACTED=",
-      "evidence": "路径 secrets.dockerconfigjson 中发现匹配: \"REPORT_TOKEN_REDACTED...\""
+      "evidence": "路径 secrets.dockerconfigjson 中发现匹配: \"REPORT_TOKEN_REDACTED...\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_7e4a18d5f9471061",
+      "id": "finding_18e6790204ed9ab5",
       "ruleId": "jwt-token",
       "ruleName": "JWT Token",
       "severity": "high",
@@ -496,10 +680,18 @@
         "column": 0
       },
       "matchedValue": "REPORT_TOKEN_REDACTED.REPORT_TOKEN_REDACTED.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-      "evidence": "路径 secrets.jwt_token 中发现匹配: \"REPORT_TOKEN_REDACTED.eyJzdWIiOiIxM...\""
+      "evidence": "路径 secrets.jwt_token 中发现匹配: \"REPORT_TOKEN_REDACTED.eyJzdWIiOiIxM...\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_7bf9b3cde939749a",
+      "id": "finding_0d08aa5703836d08",
       "ruleId": "basic-auth",
       "ruleName": "Basic Authentication",
       "severity": "high",
@@ -512,10 +704,18 @@
         "column": 0
       },
       "matchedValue": "https://deploy:mysecretpassword@github.com/org/repo.git",
-      "evidence": "路径 git.clone_url 中发现匹配: \"https://deploy:mysecretpassword@github.com/org/rep...\""
+      "evidence": "路径 git.clone_url 中发现匹配: \"https://deploy:mysecretpassword@github.com/org/rep...\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     },
     {
-      "id": "finding_ec47d7a494bdcc17",
+      "id": "finding_2eed9d30098b4333",
       "ruleId": "git-credentials",
       "ruleName": "Git Credentials",
       "severity": "high",
@@ -528,7 +728,15 @@
         "column": 0
       },
       "matchedValue": "https://deploy:mysecretpassword@github.com",
-      "evidence": "路径 git.clone_url 中发现匹配: \"https://deploy:mysecretpassword@github.com\""
+      "evidence": "路径 git.clone_url 中发现匹配: \"https://deploy:mysecretpassword@github.com\"",
+      "excepted": true,
+      "exception": {
+        "id": "bad-exception-2",
+        "reason": "缺少匹配条件测试 - 没有 path/value/ruleId",
+        "createdAt": "2024-01-01",
+        "createdBy": "test"
+      },
+      "exceptionExpired": false
     }
   ],
   "errors": [],

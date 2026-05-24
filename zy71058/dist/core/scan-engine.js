@@ -11,18 +11,19 @@ class ScanEngine {
         this.errors = [];
         this.warnings = [];
         this.scannedFiles = new Set();
+        this.constructorWarnings = [];
         this.config = config;
         for (const ex of config.exceptions) {
             const validationErrors = (0, exception_manager_1.validateException)(ex);
             for (const err of validationErrors) {
-                this.warnings.push(`例外配置警告: ${err}`);
+                this.constructorWarnings.push(`例外配置警告: ${err}`);
             }
         }
     }
     async scan() {
         this.findings = [];
         this.errors = [];
-        this.warnings = [];
+        this.warnings = [...this.constructorWarnings];
         this.scannedFiles = new Set();
         try {
             await this.scanValuesFile();

@@ -1,32 +1,33 @@
 # Helm Values 泄密扫描报告
 
-> 生成时间: 2026-05-24T11:17:09.452Z
+> 生成时间: 2026-05-24T13:44:53.344Z
 > 环境: test
 
 ## 📋 扫描信息
 
 | 项目 | 内容 |
 |------|------|
-| 扫描时间 | 2026-05-24T11:17:09.452Z |
+| 扫描时间 | 2026-05-24T13:44:53.344Z |
 | 环境 | test |
 | Values 文件 | `examples/values-test.yaml` |
+| 模板目录 | `examples/templates` |
 
 ## 📊 扫描摘要
 
 | 统计项 | 数量 |
 |--------|------|
-| 扫描文件数 | 1 |
-| 发现问题数 | 32 |
-| 🔴 严重 | 8 |
-| 🔴 高危 | 13 |
-| 🟡 中危 | 2 |
+| 扫描文件数 | 2 |
+| 发现问题数 | 35 |
+| 🔴 严重 | 10 |
+| 🔴 高危 | 12 |
+| 🟡 中危 | 4 |
 | 🔵 低危 | 9 |
 | 📌 已例外 | 0 |
 | ⚠️  过期例外 | 0 |
 
 ## 🔍 发现的敏感信息
 
-### 🔴 严重级别 (8 项)
+### 🔴 严重级别 (10 项)
 
 #### AWS Access Key
 
@@ -196,7 +197,59 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 ```
 
 
-### 🔴 高危级别 (13 项)
+#### AWS Access Key
+
+| 属性 | 值 |
+|------|-----|
+| 规则 ID | `aws-access-key` |
+| 严重级别 | 🔴 严重 |
+| 分类 | credential |
+| 文件 | `REPORT_TOKEN_REDACTED.yaml` |
+| 路径 | `content` |
+| 行号 | 7 |
+| 编码方式 | Base64 |
+
+**描述:**
+检测 AWS 访问密钥 ID (AKIA 开头)
+
+**证据:**
+```
+[模板渲染后] 第 7 行 Base64 解码后发现敏感信息: AWS_ACCESS_KEY_ID_REDACTED...
+```
+
+**Base64 解码后 (已脱敏):**
+```
+AKIA************MPLE
+```
+
+
+#### AWS Secret Key
+
+| 属性 | 值 |
+|------|-----|
+| 规则 ID | `aws-secret-key` |
+| 严重级别 | 🔴 严重 |
+| 分类 | credential |
+| 文件 | `REPORT_TOKEN_REDACTED.yaml` |
+| 路径 | `content` |
+| 行号 | 8 |
+| 编码方式 | Base64 |
+
+**描述:**
+检测 AWS 秘密访问密钥
+
+**证据:**
+```
+[模板渲染后] 第 8 行 Base64 解码后发现敏感信息: REPORT_TOKEN_REDACTED...
+```
+
+**Base64 解码后 (已脱敏):**
+```
+wJal********************************EKEY
+```
+
+
+### 🔴 高危级别 (12 项)
 
 #### Basic Authentication
 
@@ -275,26 +328,6 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 **证据:**
 ```
 第 68 行发现敏感内容: "REPORT_TOKEN_REDACTED.REPORT_TOKEN_REDACTED..."
-```
-
-
-#### Slack Webhook
-
-| 属性 | 值 |
-|------|-----|
-| 规则 ID | `slack-webhook` |
-| 严重级别 | 🔴 高危 |
-| 分类 | credential |
-| 文件 | `examples/values-test.yaml` |
-| 路径 | `content` |
-| 行号 | 71 |
-
-**描述:**
-检测 Slack Webhook URL
-
-**证据:**
-```
-第 71 行发现敏感内容: "https://example.com/redacted-slack-webhook..."
 ```
 
 
@@ -395,25 +428,6 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 ```
 
 
-#### Slack Webhook
-
-| 属性 | 值 |
-|------|-----|
-| 规则 ID | `slack-webhook` |
-| 严重级别 | 🔴 高危 |
-| 分类 | credential |
-| 文件 | `examples/values-test.yaml` |
-| 路径 | `slack.webhook` |
-
-**描述:**
-检测 Slack Webhook URL
-
-**证据:**
-```
-路径 slack.webhook 中发现匹配: "https://example.com/redacted-slack-webhook..."
-```
-
-
 #### Basic Authentication
 
 | 属性 | 值 |
@@ -452,7 +466,27 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 ```
 
 
-### 🟡 中危级别 (2 项)
+#### Generic API Key
+
+| 属性 | 值 |
+|------|-----|
+| 规则 ID | `generic-api-key` |
+| 严重级别 | 🔴 高危 |
+| 分类 | credential |
+| 文件 | `REPORT_TOKEN_REDACTED.yaml` |
+| 路径 | `content` |
+| 行号 | 8 |
+
+**描述:**
+检测通用 API 密钥格式
+
+**证据:**
+```
+[模板渲染后] 第 8 行发现敏感内容: "API_KEY: REPORT_TOKEN_REDACTED..."
+```
+
+
+### 🟡 中危级别 (4 项)
 
 #### Intranet IP Address
 
@@ -490,6 +524,46 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 **证据:**
 ```
 路径 database.host 中发现匹配: "10.0.0.100"
+```
+
+
+#### Intranet IP Address
+
+| 属性 | 值 |
+|------|-----|
+| 规则 ID | `intranet-ip` |
+| 严重级别 | 🟡 中危 |
+| 分类 | network |
+| 文件 | `REPORT_TOKEN_REDACTED.yaml` |
+| 路径 | `content` |
+| 行号 | 10 |
+
+**描述:**
+检测内网 IP 地址 (10.x, 172.16-31.x, 192.168.x)
+
+**证据:**
+```
+[模板渲染后] 第 10 行发现敏感内容: "192.168.1.50"
+```
+
+
+#### Intranet IP Address
+
+| 属性 | 值 |
+|------|-----|
+| 规则 ID | `intranet-ip` |
+| 严重级别 | 🟡 中危 |
+| 分类 | network |
+| 文件 | `REPORT_TOKEN_REDACTED.yaml` |
+| 路径 | `content` |
+| 行号 | 11 |
+
+**描述:**
+检测内网 IP 地址 (10.x, 172.16-31.x, 192.168.x)
+
+**证据:**
+```
+[模板渲染后] 第 11 行发现敏感内容: "10.0.1.10"
 ```
 
 

@@ -16,6 +16,10 @@ export function matchesException(
   exception: ExceptionItem,
   environment: string
 ): boolean {
+  if (!exception.path && !exception.value && !exception.ruleId) {
+    return false;
+  }
+
   if (exception.environment && exception.environment !== environment) {
     return false;
   }

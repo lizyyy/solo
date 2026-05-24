@@ -1,0 +1,9 @@
+exceptions:
+  - id: "bad-exception-1"
+    reason: "缺少必填字段测试 - 没有 createdBy 和 createdAt"
+    path: "database.*"
+    
+  - id: "bad-exception-2"
+    reason: "缺少匹配条件测试 - 没有 path/value/ruleId"
+    createdAt: "2024-01-01"
+    createdBy: "test"
