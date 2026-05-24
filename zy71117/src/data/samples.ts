@@ -1,0 +1,271 @@
+import { Sample } from '../types';
+
+export const vehiclePresets = [
+  {
+    id: 'van-4.2m',
+    name: '4.2米厢式货车',
+    length: 4.2,
+    width: 2.1,
+    wheelbase: 2.8,
+    turningRadius: 6.5,
+    height: 2.8,
+    frontOverhang: 0.8,
+    rearOverhang: 0.6,
+  },
+  {
+    id: 'truck-6.8m',
+    name: '6.8米货车',
+    length: 6.8,
+    width: 2.4,
+    wheelbase: 4.5,
+    turningRadius: 8.5,
+    height: 3.2,
+    frontOverhang: 1.2,
+    rearOverhang: 1.1,
+  },
+  {
+    id: 'truck-9.6m',
+    name: '9.6米货车',
+    length: 9.6,
+    width: 2.5,
+    wheelbase: 6.2,
+    turningRadius: 10.5,
+    height: 3.8,
+    frontOverhang: 1.5,
+    rearOverhang: 1.9,
+  },
+  {
+    id: 'trailer-13m',
+    name: '13米半挂车',
+    length: 13.0,
+    width: 2.55,
+    wheelbase: 8.5,
+    turningRadius: 12.5,
+    height: 4.0,
+    frontOverhang: 2.0,
+    rearOverhang: 2.5,
+  },
+  {
+    id: 'trailer-17.5m',
+    name: '17.5米高低板',
+    length: 17.5,
+    width: 2.8,
+    wheelbase: 11.5,
+    turningRadius: 15.0,
+    height: 4.2,
+    frontOverhang: 2.5,
+    rearOverhang: 3.5,
+  },
+];
+
+const standardPlatform = {
+  width: 30,
+  depth: 4,
+  height: 1.2,
+  position: { x: 0, y: 0.6, z: -18 },
+};
+
+const standardBoundaries = {
+  minX: -25,
+  maxX: 25,
+  minZ: -20,
+  maxZ: 20,
+};
+
+export const samples: Sample[] = [
+  {
+    id: 'sample-normal-1',
+    name: '标准货车入库',
+    description: '9.6米货车在标准月台上正常倒车入库，无障碍物',
+    category: 'normal',
+    vehicle: vehiclePresets[2],
+    scene: {
+      platform: standardPlatform,
+      loadingDocks: [
+        { id: 'dock-1', position: { x: 0, y: 1.2, z: -16 }, width: 3.5, height: 3 },
+      ],
+      obstacles: [],
+      boundaries: standardBoundaries,
+      groundSize: { width: 50, depth: 50 },
+    },
+    expectedResult: '正常入库，无碰撞',
+  },
+  {
+    id: 'sample-collision-1',
+    name: '超长挂车转弯碰撞',
+    description: '17.5米挂车在狭窄场地转弯，内轮差导致扫掠碰撞',
+    category: 'collision',
+    vehicle: vehiclePresets[4],
+    scene: {
+      platform: {
+        width: 20,
+        depth: 4,
+        height: 1.2,
+        position: { x: 0, y: 0.6, z: -15 },
+      },
+      loadingDocks: [
+        { id: 'dock-1', position: { x: 0, y: 1.2, z: -13 }, width: 4, height: 3 },
+      ],
+      obstacles: [
+        {
+          id: 'pillar-1',
+          type: 'pillar',
+          position: { x: -10, y: 1.5, z: -5 },
+          size: { x: 0.8, y: 3, z: 0.8 },
+          color: '#8B4513',
+        },
+        {
+          id: 'pillar-2',
+          type: 'pillar',
+          position: { x: 10, y: 1.5, z: -5 },
+          size: { x: 0.8, y: 3, z: 0.8 },
+          color: '#8B4513',
+        },
+      ],
+      boundaries: {
+        minX: -15,
+        maxX: 15,
+        minZ: -18,
+        maxZ: 15,
+      },
+      groundSize: { width: 40, depth: 40 },
+    },
+    expectedResult: '挂车尾部扫掠碰撞立柱',
+  },
+  {
+    id: 'sample-normal-2',
+    name: '小型货车灵活入库',
+    description: '4.2米厢货在复杂障碍物间灵活入库',
+    category: 'normal',
+    vehicle: vehiclePresets[0],
+    scene: {
+      platform: standardPlatform,
+      loadingDocks: [
+        { id: 'dock-1', position: { x: -8, y: 1.2, z: -16 }, width: 3.5, height: 3 },
+        { id: 'dock-2', position: { x: 8, y: 1.2, z: -16 }, width: 3.5, height: 3 },
+      ],
+      obstacles: [
+        {
+          id: 'wall-1',
+          type: 'wall',
+          position: { x: -15, y: 1.5, z: 0 },
+          size: { x: 0.5, y: 3, z: 20 },
+          color: '#696969',
+        },
+        {
+          id: 'wall-2',
+          type: 'wall',
+          position: { x: 15, y: 1.5, z: 0 },
+          size: { x: 0.5, y: 3, z: 20 },
+          color: '#696969',
+        },
+        {
+          id: 'pillar-1',
+          type: 'pillar',
+          position: { x: 0, y: 1.5, z: 5 },
+          size: { x: 0.6, y: 3, z: 0.6 },
+          color: '#8B4513',
+        },
+      ],
+      boundaries: standardBoundaries,
+      groundSize: { width: 50, depth: 50 },
+    },
+    expectedResult: '灵活绕过障碍，正常入库',
+  },
+  {
+    id: 'sample-empty-1',
+    name: '空场地测试',
+    description: '空场地测试车辆转弯半径和扫掠范围',
+    category: 'empty',
+    vehicle: vehiclePresets[3],
+    scene: {
+      platform: {
+        width: 0,
+        depth: 0,
+        height: 0,
+        position: { x: 0, y: 0, z: 0 },
+      },
+      loadingDocks: [],
+      obstacles: [],
+      boundaries: {
+        minX: -40,
+        maxX: 40,
+        minZ: -40,
+        maxZ: 40,
+      },
+      groundSize: { width: 100, depth: 100 },
+    },
+    expectedResult: '空场地完整转弯测试',
+  },
+  {
+    id: 'sample-collision-2',
+    name: '边界越界警告',
+    description: '13米半挂车在有限空间内倒车，超出场地边界',
+    category: 'collision',
+    vehicle: vehiclePresets[3],
+    scene: {
+      platform: {
+        width: 15,
+        depth: 4,
+        height: 1.2,
+        position: { x: 0, y: 0.6, z: -12 },
+      },
+      loadingDocks: [
+        { id: 'dock-1', position: { x: 0, y: 1.2, z: -10 }, width: 4, height: 3 },
+      ],
+      obstacles: [],
+      boundaries: {
+        minX: -10,
+        maxX: 10,
+        minZ: -15,
+        maxZ: 10,
+      },
+      groundSize: { width: 30, depth: 35 },
+    },
+    expectedResult: '车头超出场地边界',
+  },
+  {
+    id: 'sample-normal-3',
+    name: '多装卸口选择',
+    description: '6.8米货车在多月台场景选择合适装卸口',
+    category: 'normal',
+    vehicle: vehiclePresets[1],
+    scene: {
+      platform: {
+        width: 40,
+        depth: 4,
+        height: 1.2,
+        position: { x: 0, y: 0.6, z: -20 },
+      },
+      loadingDocks: [
+        { id: 'dock-1', position: { x: -12, y: 1.2, z: -18 }, width: 3.5, height: 3 },
+        { id: 'dock-2', position: { x: 0, y: 1.2, z: -18 }, width: 3.5, height: 3 },
+        { id: 'dock-3', position: { x: 12, y: 1.2, z: -18 }, width: 3.5, height: 3 },
+      ],
+      obstacles: [
+        {
+          id: 'pillar-1',
+          type: 'pillar',
+          position: { x: -6, y: 1.5, z: -10 },
+          size: { x: 0.6, y: 3, z: 0.6 },
+          color: '#8B4513',
+        },
+        {
+          id: 'pillar-2',
+          type: 'pillar',
+          position: { x: 6, y: 1.5, z: -10 },
+          size: { x: 0.6, y: 3, z: 0.6 },
+          color: '#8B4513',
+        },
+      ],
+      boundaries: {
+        minX: -30,
+        maxX: 30,
+        minZ: -25,
+        maxZ: 25,
+      },
+      groundSize: { width: 70, depth: 60 },
+    },
+    expectedResult: '选择中间装卸口，正常入库',
+  },
+];
