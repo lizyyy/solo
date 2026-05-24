@@ -1,40 +1,191 @@
 const { Parser } = require('json2csv');
 const { allQuery } = require('../models/database');
-const sampleService = require('./sampleService');
-const batchService = require('./batchService');
-const logService = require('./logService');
+
+async function exportSamplesByQuery(queryParams = {}) {
+  const { sampleNo, status, recheckResult, batchId } = queryParams;
+  
+  let sql = `SELECT 
+    s.id,
+    s.sample_no,
+    b.batch_no,
+    s.sample_name,
+    s.sample_type,
+    s.quantity,
+    s.unit,
+    s.package,
+    s.status,
+    CASE s.status
+      WHEN 'pending' THEN 'å¾…å¤„ç†'
+      WHEN 'testing' THEN 'æ£€æµ‹ä¸­'
+      WHEN 'passed' THEN 'å·²é€šè¿‡'
+      WHEN 'failed' THEN 'æœªé€šè¿‡'
+      WHEN 'rechecking' THEN 'å¤æ£€ä¸­'
+      WHEN 'mixed' THEN 'æ··æ‰¹æ ‡è®°'
+      ELSE s.status
+    END as status_desc,
+    s.recheck_count,
+    s.recheck_result,
+    CASE s.recheck_result
+      WHEN 'passed' THEN 'å¤æ£€é€šè¿‡'
+      WHEN 'failed' THEN 'å¤æ£€æœªé€šè¿‡'
+      WHEN 'withdrawn' THEN 'æŠ¥å‘Šæ’¤å›'
+      ELSE s.recheck_result
+    END as recheck_result_desc,
+    s.mixed_note,
+    s.created_at,
+    s.updated_at
+  FROM samples s 
+  LEFT JOIN batches b ON s.batch_id = b.id 
+  WHERE 1=1`;
+  
+  const params = [];
+  
+  if (batchId) {
+    sql += ' AND s.batch_id = ?';
+    params.push(batchId);
+  }
+  if (sampleNo) {
+    sql += ' AND s.sample_no LIKE ?';
+    params.push('%' + sampleNo + '%');
+  }
+  if (status) {
+    sql += ' AND s.status = ?';
+    params.push(status);
+  }
+  if (recheckResult) {
+    sql += ' AND s.recheck_result = ?';
+    params.push(recheckResult);
+  }
+  
+  sql += ' ORDER BY s.created_at DESC';
+  
+  const samples = await allQuery(sql, params);
+  
+  const fields = [
+    { label: 'æ‰¹æ¬¡ç¼–å·', value: 'batch_no' },
+    { label: 'æ ·å“ç¼–å·', value: 'sample_no' },
+    { label: 'æ ·å“åç§°', value: 'sample_name' },
+    { label: 'æ ·å“ç±»å‹', value: 'sample_type' },
+    { label: 'æ•°é‡', value: 'quantity' },
+    { label: 'å•ä½', value: 'unit' },
+    { label: 'åŒ…è£…', value: 'package' },
+    { label: 'çŠ¶æ€', value: 'status_desc' },
+    { label: 'å¤æ£€æ¬¡æ•°', value: 'recheck_count' },
+    { label: 'å¤æ£€ç»“è®º', value: 'recheck_result_desc' },
+    { label: 'æ··æ‰¹è¯´æ˜', value: 'mixed_note' },
+    { label: 'åˆ›å»ºæ—¶é—´', value: 'created_at' },
+    { label: 'æ›´æ–°æ—¶é—´', value: 'updated_at' }
+  ];
+  
+  const json2csvParser = new Parser({ fields });
+  const csv = json2csvParser.parse(samples);
+  
+  return {
+    success: true,
+    count: samples.length,
+    csv: '\uFEFF' + csv,
+    data: samples
+  };
+}
 
 async function exportBatchDetails(batchId) {
-  const batch = await batchService.getBatchById(batchId);
-  if (!batch) {
-    throw new Error('æ‰¹æ¡¤ä¸å¯—');
-  }
+  const [batch, samples, logs] = await Promise.all([
+    allQuery('SELECT * FROM batches WHERE id = ?', [batchId]),
+    allQuery(`
+      SELECT 
+        s.*,
+        CASE s.status
+          WHEN 'pending' THEN 'å¾…å¤„ç†'
+          WHEN 'testing' THEN 'æ£€æµ‹ä¸­'
+          WHEN 'passed' THEN 'å·²é€šè¿‡'
+          WHEN 'failed' THEN 'æœªé€šè¿‡'
+          WHEN 'rechecking' THEN 'å¤æ£€ä¸­'
+          WHEN 'mixed' THEN 'æ··æ‰¹æ ‡è®°'
+          ELSE s.status
+        END as status_desc
+      FROM samples s 
+      WHERE batch_id = ? 
+      ORDER BY created_at DESC`, [batchId]),
+    allQuery(`
+      SELECT 
+        l.*,
+        CASE l.operation_type
+          WHEN 'CREATE_BATCH' THEN 'åˆ›å»ºæ‰¹æ¬¡'
+          WHEN 'PROCESS_BATCH' THEN 'æ ‡è®°å¤„ç†'
+          WHEN 'RETURN_BATCH' THEN 'é€€å›ä¿®æ”¹'
+          WHEN 'WITHDRAW_BATCH' THEN 'æ’¤å›æ‰¹æ¬¡'
+          WHEN 'IMPORT_SAMPLES' THEN 'å¯¼å…¥æ ·å“'
+          WHEN 'MARK_MIXED' THEN 'æ ‡è®°æ··æ‰¹'
+          WHEN 'REQUEST_RECHECK' THEN 'ç”³è¯·å¤æ£€'
+          WHEN 'SET_RECHECK_RESULT' THEN 'è®¾ç½®å¤æ£€ç»“è®º'
+          ELSE l.operation_type
+        END as operation_desc
+      FROM operation_logs l 
+      WHERE batch_id = ? 
+      ORDER BY operation_time DESC`, [batchId])
+  ]);
+  
+  return {
+    success: true,
+    batch: batch[0] || null,
+    samples: samples,
+    sampleCount: samples.length,
+    logs: logs,
+    logCount: logs.length
+  };
+}
 
-  const samples = await sampleService.getSamplesByBatch(batchId);
-  const logs = await logService.getLogsByBatch(batchId);
-
-  const sampleDetails = samples.map(sample => ({
-    æ‰¹æ¡£å–: batch.batch_no,
-    æŸ¥åœ¨æ•°å¼„]: sample.sample_no,
-    æ·µç‹.êNeè¿œ: sample.sample_name,
-    æ·µç‹.ç·“å¿é¡µ: sample.sample_type,
-    æ•°é‡ˆØ[\Kœ]X[]Kˆ9c%ù/cNˆØ[\K[š]ˆ9c!z(áNˆØ[\KœXÚØYÙKˆ9§¡9¡#: jÔ[™ÜÎˆØ[\TÙ\šXÙK™Ù]İ]\Ñ\ØÜš\[ÛŠØ[\Kœİ]\ÊKˆ9i#yªª9«(y¥lˆØ[\Kœ™XÚXÚ×ØÛİ[ˆ9e#yª*9îá:+¨NˆØ[\Kœ™XÚXÚ×Ü™\İ[ˆ9i,z-éWNˆØ[\Kœ™[X\šÂˆJJNÂ‚ˆÛÛœİÙÑ]Z[ÈHÙÜË›X\
-ÙÈOˆ
-Âˆ9¥ay/gù¥éy§&ÈÙË›Ü\˜][Û—İ[YKˆ9¥l9/g9àjùàjó¢Æöu6W'f–6RævWD÷W&F–öäFW67&—F–öâ†Æöræ÷W&F–öå÷G—R’À¢ZJ~zº¾X©niibst: log.handler,
-    åå›¾ç‰‡å log.reason,
-    æ¸±çŠ¶æ€å¤§: log.old_status ? batchService.getStatusDescription(log.old_status) : '',
-    &–B8ièNhHÎˆÙË›™]×Üİ]\ÈÈ˜]ÚÙ\šXÙK™Ù]İ]\Ñ\ØÜš\[ÛŠÙË›™]×Üİ]\ÊHˆ	ÉËˆ:/áùgaNˆÙË™]Z[ˆJJNÂ‚ˆ™]\›ˆÂˆ˜]Ú[™›ÎˆÂˆ9¢ny¨hùcå¨ˆ˜]Ú˜˜]ÚÛ›Ëˆ:` y¨"ù.®ˆ˜]ÚœÙ[™\‹ˆ9¥ayg.ù¥éy§&È[Ûˆˆ˜]Úœ™XÙZ]™WÙ]Kˆ9§¡9¡#: jÕ[Nˆ˜]ÚÙ\šXÙK™Ù]İ]\Ñ\ØÜš\[ÛŠ˜]Úœİ]\ÊKˆ9i#º-¡{ï"Nˆ˜]Úœ™[X\šÂˆKˆØ[\\ÎˆØ[\Q]Z[ËˆÙÜÎˆÙÑ]Z[ËˆØ[\PÛİ[ˆØ[\\Ë›[™İˆÙĞÛİ[ˆÙÜË›[™İˆNÂŸB‚˜\Ş[˜È[˜İ[Ûˆ^ÜØ[\\ÕĞÔÕš[\œÈHßJHÂˆÛÛœİØ[\\ÈH]ØZ]Ø[\TÙ\šXÙKœÙX\˜ÚØ[\\Êš[\œÊNÂˆˆÛÛœİšY[ÈHÂˆ	ù¢ny¨hùcå‰Ë	ù§éyg*9¥l9o!IË	ù­íùdàyd#yb¥‰Ë	ù«^ùã¢ùîäùg¯zhmIËˆ	ù¥l:aãÉË	ùc%ù/cÉË	ùàjùã#	Ë	ù§¡9¡#: h:lines',
-    'å¤æ¨¨æŒ¡æ•°', 'åœºæ §ç»„è­Ú', 'åˆ™/x6_at1'
+async function exportLogs() {
+  const logs = await allQuery(`
+    SELECT 
+      l.id,
+      l.operation_type,
+      CASE l.operation_type
+        WHEN 'CREATE_BATCH' THEN 'åˆ›å»ºæ‰¹æ¬¡'
+        WHEN 'PROCESS_BATCH' THEN 'æ ‡è®°å¤„ç†'
+        WHEN 'RETURN_BATCH' THEN 'é€€å›ä¿®æ”¹'
+        WHEN 'WITHDRAW_BATCH' THEN 'æ’¤å›æ‰¹æ¬¡'
+        WHEN 'IMPORT_SAMPLES' THEN 'å¯¼å…¥æ ·å“'
+        WHEN 'MARK_MIXED' THEN 'æ ‡è®°æ··æ‰¹'
+        WHEN 'REQUEST_RECHECK' THEN 'ç”³è¯·å¤æ£€'
+        WHEN 'SET_RECHECK_RESULT' THEN 'è®¾ç½®å¤æ£€ç»“è®º'
+        ELSE l.operation_type
+      END as operation_desc,
+      b.batch_no,
+      s.sample_no,
+      l.handler,
+      l.reason,
+      l.old_status,
+      l.new_status,
+      l.operation_time
+    FROM operation_logs l 
+    LEFT JOIN batches b ON l.batch_id = b.id
+    LEFT JOIN samples s ON l.sample_id = s.id
+    ORDER BY l.operation_time DESC 
+    LIMIT 1000`);
+  
+  const fields = [
+    { label: 'æ“ä½œç±»å‹', value: 'operation_desc' },
+    { label: 'æ‰¹æ¬¡ç¼–å·', value: 'batch_no' },
+    { label: 'æ ·å“ç¼–å·', value: 'sample_no' },
+    { label: 'å¤„ç†äºº', value: 'handler' },
+    { label: 'åŸå› è¯´æ˜', value: 'reason' },
+    { label: 'æ“ä½œæ—¶é—´', value: 'operation_time' }
   ];
+  
+  const json2csvParser = new Parser({ fields });
+  const csv = json2csvParser.parse(logs);
+  
+  return {
+    success: true,
+    count: logs.length,
+    csv: '\uFEFF' + csv,
+    data: logs
+  };
+}
 
-  const data = samples.map(s => ({
-    'æˆ¹æ¢ƒå–': s.batch_no,
-    'æŸ¥åœ¨æ•°å¼„]': s.sample_no,
-    'æ·µç‹.åŠ–å“: s.sample_name,
-    'æ­{ç‹ç»“å½é¡µ': s.sample_type,
-    'æ•°é‡': s.quantity,
-    'åŒ—ä½': s.unit,
-    'ç«çŒŒ': s.package,
-    'æ„æ„Œè«Tiles': sampleService.getStatusDescription(s.status),
-    'æ”Œæª¨æ¬¡æ•°': s.recheck_count,
-    'åœºæ §ç»„î ê÷ÛˆËœ™XÚXÚ×Ü™\İ[ˆ	ùb&KŞ—Ø]IÎˆË˜Ü™X]YØ]ˆJJNÂ‚ˆÛÛœİœÛÛŒ˜Üİ”\œÙ\ˆH™]È\œÙ\ŠÈšY[ÈJNÂˆÛÛœİÜİˆHœÛÛŒ˜Üİ”\œÙ\‹œ\œÙJ]JNÂ‚ˆ™]\›ˆÂˆÜİ‹ˆÛİ[ˆØ[\\Ë›[™İˆ]BˆNÂŸB‚›[Ù[K™^ÜÈHÂˆ^Ü˜]Ú]Z[Ëˆ^ÜØ[\\ÕĞÔÕ‚ŸNÂ
+module.exports = {
+  exportSamplesByQuery,
+  exportBatchDetails,
+  exportLogs
+};

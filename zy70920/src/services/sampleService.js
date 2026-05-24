@@ -13,12 +13,10 @@ const SAMPLE_STATUS = {
 async function createSample({ sampleNo, batchId, sampleName, sampleType, quantity, unit, package, handler }) {
   const existing = await getQuery('SELECT id FROM samples WHERE sample_no = ?', [sampleNo]);
   if (existing) {
-    throw new Error(`\ç„¸å½¬ç¼šçš„ç®€ ${sampleNo} å·²å¯—]);
+    throw new Error('Sample number ' + sampleNo + ' already exists');
   }
 
-  const sql = `INSERT INTO samples 
-    (sample_no, batch_id, sample_name, sample_type, quantity, unit, package, status
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+  const sql = 'INSERT INTO samples (sample_no, batch_id, sample_name, sample_type, quantity, unit, package, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
   
   return runQuery(sql, [sampleNo, batchId, sampleName, sampleType, quantity, unit, package, SAMPLE_STATUS.PENDING]);
 }
@@ -32,20 +30,16 @@ async function getSamplesByBatch(batchId) {
 }
 
 async function searchSamples({ sampleNo, sampleName, status, recheckResult, itemPackage } = {}) {
-  let sql = `SELECT s.*, b.batch_no, b.sender 
-             FROM samples s 
-            LEFT JOIN batches b on b.id = s.batch_id 
-            WHERE 1=1`;
+  let sql = 'SELECT s.*, b.batch_no, b.sender FROM samples s LEFT JOIN batches b on b.id = s.batch_id WHERE 1=1';
   const params = [];
 
   if (sampleNo) {
     sql += ' AND s.sample_no LIKE ?';
-    params.push(`	Ø[\S›ßIX
-NÂˆBˆYˆ
-Ø[\S˜[YJHÂˆÜ[
-ÏH	ÈS‘ËœØ[\WÛ˜[YHRÑHÉÎÂˆ\˜[\Ëœ\Ú
-	\ŞÜØ[\S˜[Y_IX
-);
+    params.push('%' + sampleNo + '%');
+  }
+  if (sampleName) {
+    sql += ' AND s.sample_name LIKE ?';
+    params.push('%' + sampleName + '%');
   }
   if (status) {
     sql += ' AND s.status = ?';
@@ -56,12 +50,8 @@ NÂˆBˆYˆ
     params.push(recheckResult);
   }
   if (itemPackage) {
-    sql += ` AND EXISTS (
-      SELECT 1 FROM sample_test_items sti
-      JOIN test_items ti on sti.test_item_id = ti.id
-      WHERE sti.sample_id = s.id AND ti.item_package LIKE ? 
-    )`;
-    params.push(`% {itemPackage}%`);
+    sql += ' AND EXISTS (SELECT 1 FROM sample_test_items sti JOIN test_items ti on sti.test_item_id = ti.id WHERE sti.sample_id = s.id AND ti.item_package LIKE ?)';
+    params.push('%' + itemPackage + '%');
   }
 
   sql += ' ORDER BY s.created_at DESC';
@@ -69,25 +59,42 @@ NÂˆBˆYˆ
 }
 
 async function markSampleMixed(sampleId, { reason, handler, relatedSamples }) {
-  await runQuery(
-    'UPDATE samples SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [SAMPLE_STATUS.MIXED, sampleId]
-  );
+  await runQuery('UPDATE samples SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [SAMPLE_STATUS.MIXED, sampleId]);
 
-  const detail = `^¹á( à$ƒ–N¢ş’â7–’œè€‘íÉ•…Í½¹ô»–Ï¢{š–hl: ${relatedSamples || 'æ— ßØ	ßK‚¹g*9å*:+íùg*;ï#:/æy¦+ù.*¹.®¹§iy¥a9.#y/g9fï¹âaùb¨9i!ù¥/ù¥/úaãùæ¡9­bú)èùb¨9i!Â›Šˆ]ØZ]ÙÔÙ\šXÙK˜Ü™X]SÙÊÂˆØ[\RYˆÜ\˜][Û•\NˆÙÔÙ\šXÙK“ÔTUSÓ—ÕTTË”ĞSTWÓRV‘Qˆ™X\ÛÛ‹ˆ[™\‹ˆÛİ]\ÎˆĞSTWÔÕUTË”S‘S‘Ë™]Ôİ]\ÎˆĞSTWÔÕUTË“RVQˆ]Z[ˆJNÂ‚ˆ™]\›ˆÈØ[\RYİ]\ÎˆĞSTWÔÕUTË“RVQNÂŸB‚˜\Ş[˜È[˜İ[Ûˆ™\]Y\İ™XÚXÚÊØ[\RYÈ™X\ÛÛ‹[™\‹[PÛÙHJHÂˆ]ØZ][”]Y\Jˆ	ÕTUHØ[\\ÈÑUİ]\ÈHË\]YØ]HÕT”‘S•ÕSQTÕSTÒT‘HYHÉËˆÔĞSTWÔÕUTË”‘PÒPÒÒS‘ËØ[\RYBˆ
-NÂ‚ˆÛÛœİ]Z[Hédœºæ §çš„ù§¡9c¨·: ${reason}.è§¦å‘è§„åˆ™: ${ruleCode || #šbåŠ¨ç®‚çš„}`,
+  const detail = 'Sample marked as mixed. Related samples: ' + (relatedSamples || 'None');
+  
   await logService.createLog({
     sampleId,
-    operationType: logService.OPERATION_TYPES.RECHDCK_REQUEST,
-    reason,
+    operationType: logService.OPERATION_TYPES.SAMPLE_MIXED,
+    reason: reason || 'Sample mixed status',
     handler,
-    newStatus: SAMPLE_STATUS.RECHECKING,    detail
+    newStatus: SAMPLE_STATUS.MIXED,
+    detail
   });
 
-  await runQuery(
-    'UPDATE samples SET recheck_count = recheck_count + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [sampleId]
-  );
+  return { sampleId, status: SAMPLE_STATUS.MIXED };
+}
+
+async function requestRecheck(sampleId, { reason, handler, ruleCode }) {
+  const sample = await getSampleById(sampleId);
+  if (!sample) {
+    throw new Error('Sample not found');
+  }
+
+  const oldStatus = sample.status;
+  const detail = 'Recheck requested. Reason: ' + reason + '. Trigger rule: ' + (ruleCode || 'Manual request');
+  
+  await logService.createLog({
+    sampleId,
+    operationType: logService.OPERATION_TYPES.RECHECK_REQUEST,
+    reason,
+    handler,
+    oldStatus,
+    newStatus: SAMPLE_STATUS.RECHECKING,
+    detail
+  });
+
+  await runQuery('UPDATE samples SET status = ?, recheck_count = recheck_count + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [SAMPLE_STATUS.RECHECKING, sampleId]);
 
   return { sampleId, status: SAMPLE_STATUS.RECHECKING };
 }
@@ -95,18 +102,17 @@ NÂ‚ˆÛÛœİ]Z[Hédœºæ §çš„ù§¡9c¨·: ${reason}.è§¦å‘è§„åˆ™: ${ruleCode || #
 async function setRecheckResult(sampleId, { result, handler, detail }) {
   const resultStatus = result === 'passed' ? SAMPLE_STATUS.PASSED : SAMPLE_STATUS.FAILED;
   
-  await runQuery(
-    'UPDATE samples SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [resultStatus, sampleId]
-  );
+  await runQuery('UPDATE samples SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [resultStatus, sampleId]);
   
-  await runQuery((
-    'UPDATE samples SET recheck_result = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-    [result, sampleId]
-  );
+  await runQuery('UPDATE samples SET recheck_result = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [result, sampleId]);
 
   await logService.createLog({
-Ø[\RYˆÜ\˜][Û•\NˆÙÔÙ\šXÙK“ÔTUSÓ—ÕTTË”‘PÒÒ×Ô‘TÕSˆ™X\ÛÛˆ	ùc`9¨à9­bùk¤9¢$	Ëˆ[™\‹ˆ™]Ôİ]\Îˆ™\İ[İ]\Ëˆ]Z[ˆédœºæ §çš„ùî£¼: ${result === 'passed' ? 'é€šè¿‡' : 'ä¸‹ç¼œ'}.ÉÙ]Z[	ÉßX
+    sampleId,
+    operationType: logService.OPERATION_TYPES.RECHECK_RESULT,
+    reason: detail || 'Recheck completed',
+    handler,
+    newStatus: resultStatus,
+    detail: detail || ('Recheck result: ' + (result === 'passed' ? 'Passed' : 'Failed'))
   });
 
   return { sampleId, recheckResult: result };
@@ -114,12 +120,12 @@ async function setRecheckResult(sampleId, { result, handler, detail }) {
 
 function getStatusDescription(status) {
   const descriptions = {
-    'pending': 'å›¾ç‰‡æ‘„æ•°',
-    'testing': 'æ•°æœ¬ä¸­é•‡',
-    'passed': &å‘æ —',
-    'failed': 'ä¸‹ç¼œ',
-    'rechecking': 'å¤æª¨ä¸­',
-    'mixed': 'æ¸æœ¬',
+    'pending': 'Pending',
+    'testing': 'Testing',
+    'passed': 'Passed',
+    'failed': 'Failed',
+    'rechecking': 'Rechecking',
+    'mixed': 'Mixed'
   };
   return descriptions[status] || status;
 }
@@ -132,6 +138,27 @@ module.exports = {
   searchSamples,
   markSampleMixed,
   requestRecheck,
-  setRechekResult,
+  setRecheckResult,
+  getStatusDescription
+};
+    'pending': 'Pending',
+    'testing': 'Testing',
+    'passed': 'Passed',
+    'failed': 'Failed',
+    'rechecking': 'Rechecking',
+    'mixed': 'Mixed'
+  };
+  return descriptions[status] || status;
+}
+
+module.exports = {
+  SAMPLE_STATUS,
+  createSample,
+  getSampleById,
+  getSamplesByBatch,
+  searchSamples,
+  markSampleMixed,
+  requestRecheck,
+  setRecheckResult,
   getStatusDescription
 };

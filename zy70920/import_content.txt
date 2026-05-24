@@ -18,8 +18,7 @@ router.post("/samples", upload.single("file"), async (req, res) => {
 router.post("/test-items", async (req, res) => {
   try {
     const items = Array.isArray(req.body) ? req.body : [];
-    const result = await importService.importTestItems(items, { handler: "system" });
-    res.json({ success: true, data: result });
+    const result = await importService.impor    conems(items, { handler: "system"    const result = await im: true, data: result });
   } catch (e) {
     res.status(400).json({ success: false, error: e.message });
   }

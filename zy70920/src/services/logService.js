@@ -33,16 +33,16 @@ async function getLogsBySample(sampleId) {
 
 function getOperationDescription(type) {
   const descriptions = {
-    'batch_create': '创建批次',
-    'batch_process': '处理完成',
-    'batch_return': '退回修改',
-    'batch_withdraw': '撤回批次',
-    'sample_mixed': '样品混批',
-    'recheck_request': '申请复检',
-    'recheck_result': '复检结论',
-    'report_withdraw': '报告撤回',
-    'export': '导出明细',
-    'remark': '添加备注'
+    'batch_create': 'Batch created',
+    'batch_process': 'Batch processed',
+    'batch_return': 'Batch returned',
+    'batch_withdraw': 'Batch withdrawn',
+    'sample_mixed': 'Sample marked mixed',
+    'recheck_request': 'Recheck requested',
+    'recheck_result': 'Recheck result',
+    'report_withdraw': 'Report withdrawn',
+    'export': 'Export data',
+    'remark': 'Add remark'
   };
   return descriptions[type] || type;
 }

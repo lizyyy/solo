@@ -1,4 +1,6 @@
-const { runQuery, getQuery, allQuery } = require('../models/database');
+const fs = require('fs');
+
+const content = `const { runQuery, getQuery, allQuery } = require('../models/database');
 const logService = require('./logService');
 
 const BATCH_STATUS = {
@@ -12,10 +14,11 @@ const BATCH_STATUS = {
 async function createBatch({batchNo, sender, receiveDate, remark, handler}) {
   const existing = await getQuery('SELECT id FROM batches WHERE batch_no = ?', [batchNo]);
   if (existing) {
-    throw new Error('Batch number ' + batchNo + ' already exists');
+    throw new Error(\`Batch number \${batchNo} already exists\`);
   }
 
-  const sql = 'INSERT INTO batches (batch_no, sender, receive_date, remark, status) VALUES (?, ?, ?, ?, ?)';
+  const sql = \`INSERT INTO batches (batch_no, sender, receive_date, remark, status) 
+    VALUES (?, ?, ?, ?, ?)\`;
   
   const result = await runQuery(sql, [batchNo, sender, receiveDate, remark, BATCH_STATUS.PENDING]);
   
@@ -25,7 +28,7 @@ async function createBatch({batchNo, sender, receiveDate, remark, handler}) {
     reason: 'Create new batch',
     handler,
     newStatus: BATCH_STATUS.PENDING,
-    detail: 'Sender: ' + sender + ', Receive date: ' + receiveDate
+    detail: \`Sender: \${sender}, Receive date: \${receiveDate}\`
   });
 
   return { id: result.lastID, batchNo };
@@ -45,7 +48,7 @@ async function getAllBatches({ status, keyword } = {}) {
   }
   if (keyword) {
     sql += ' AND (batch_no LIKE ? OR sender LIKE ?)';
-    params.push(keyword + '%', '%' + keyword + '%');
+    params.push(\`\${keyword}%\`, \`%\${keyword}%\`);
   }
 
   sql += ' ORDER BY created_at DESC';
@@ -136,4 +139,7 @@ module.exports = {
   returnBatchForRevision,
   withdrawBatch,
   getStatusDescription
-};
+};`;
+
+fs.writeFileSync('src/services/batchService.js', content);
+console.log('batchService.js written successfully');

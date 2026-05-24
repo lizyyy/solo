@@ -1,7 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 
-const storage = multer.dis{Storage({
+const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, '../../data/uploads'));
   },
@@ -18,7 +18,7 @@ const fileFilter = (req, file, cb) => {
   } else if (file.mimetype === 'application/json' || ext === '.json') {
     cb(null, true);
   } else {
-    cb(new Error('叧敇个作 CSV 和 JSON 文件'), false);
+    cb(new Error('Only CSV and JSON files are allowed'), false);
   }
 };
 
