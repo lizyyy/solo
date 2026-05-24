@@ -11,6 +11,7 @@ const fs_1 = require("fs");
 const types_1 = require("./types");
 const default_1 = require("./config/default");
 const validator_1 = require("./utils/validator");
+const errors_1 = require("./utils/errors");
 const zoneParser_1 = require("./parsers/zoneParser");
 const ttlAnalyzer_1 = require("./analyzers/ttlAnalyzer");
 const environmentAnalyzer_1 = require("./analyzers/environmentAnalyzer");
@@ -45,7 +46,14 @@ program
             ...options,
             expandCNAME: options.expandCname !== undefined ? options.expandCname : true
         };
-        const validatedOptions = validator_1.cliOptionsSchema.parse(normalizedOptions);
+        let validatedOptions;
+        try {
+            validatedOptions = validator_1.cliOptionsSchema.parse(normalizedOptions);
+        }
+        catch (zodError) {
+            const { ValidationError } = require('./utils/errors');
+            throw new ValidationError(`参数无效: ${zodError.errors?.[0]?.message || zodError.message}`);
+        }
         const outputDir = (0, path_1.resolve)(validatedOptions.outputDir);
         if (!(0, fs_1.existsSync)(outputDir)) {
             (0, fs_1.mkdirSync)(outputDir, { recursive: true });
@@ -241,6 +249,14 @@ function findMissingRecords(environmentAnalysis, environments) {
 }
 function handleError(error, verbose) {
     console.error('');
+    if (error instanceof errors_1.CLIError) {
+        console.error(chalk_1.default.red(`✗ 错误: ${error.message}`));
+        if (verbose && error.stack) {
+            console.error(chalk_1.default.gray(error.stack));
+        }
+        console.error('');
+        process.exit(error.exitCode);
+    }
     if (error instanceof Error) {
         console.error(chalk_1.default.red(`✗ 错误: ${error.message}`));
         if (verbose && error.stack) {

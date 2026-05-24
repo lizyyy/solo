@@ -6,8 +6,18 @@ exports.formatTTL = formatTTL;
 const promises_1 = require("fs/promises");
 const path_1 = require("path");
 const validator_1 = require("../utils/validator");
+const errors_1 = require("../utils/errors");
 async function parseZoneFile(filePath) {
-    const content = await (0, promises_1.readFile)(filePath, 'utf-8');
+    let content;
+    try {
+        content = await (0, promises_1.readFile)(filePath, 'utf-8');
+    }
+    catch (error) {
+        if (error.code === 'ENOENT') {
+            throw new errors_1.FileNotFoundError(filePath);
+        }
+        throw new errors_1.ParseError(`读取文件失败: ${error.message}`);
+    }
     const ext = (0, path_1.extname)(filePath).toLowerCase();
     const zoneName = (0, path_1.basename)(filePath, ext).replace(/\.zone$/, '');
     switch (ext) {

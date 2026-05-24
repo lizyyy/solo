@@ -421,7 +421,7 @@ src/
 
 ```bash
 # 开发模式（使用 ts-node）
-npm run dev -- analyze -z examples/example.zone
+npm run dev -- analyze -z examples/example.com.zone
 
 # 类型检查
 npm run typecheck

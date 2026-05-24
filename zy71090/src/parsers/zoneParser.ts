@@ -2,9 +2,18 @@ import { readFile } from 'fs/promises';
 import { extname, basename } from 'path';
 import { ZoneData, DNSRecord } from '../types';
 import { validateTTL, validateDomainName, validateRecordType } from '../utils/validator';
+import { FileNotFoundError, ParseError } from '../utils/errors';
 
 export async function parseZoneFile(filePath: string): Promise<ZoneData> {
-  const content = await readFile(filePath, 'utf-8');
+  let content: string;
+  try {
+    content = await readFile(filePath, 'utf-8');
+  } catch (error: any) {
+    if (error.code === 'ENOENT') {
+      throw new FileNotFoundError(filePath);
+    }
+    throw new ParseError(`读取文件失败: ${error.message}`);
+  }
   const ext = extname(filePath).toLowerCase();
   const zoneName = basename(filePath, ext).replace(/\.zone$/, '');
   

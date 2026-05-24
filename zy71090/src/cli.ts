@@ -7,6 +7,7 @@ import { existsSync, mkdirSync } from 'fs';
 import { EXIT_CODES, CLIOptions } from './types';
 import { DEFAULT_OUTPUT_DIR, DEFAULT_ENVIRONMENTS, MAX_CNAME_CHAIN_DEPTH, DEFAULT_MIN_TTL_WARN, DEFAULT_MAX_TTL_WARN } from './config/default';
 import { cliOptionsSchema } from './utils/validator';
+import { CLIError } from './utils/errors';
 import { parseZoneFile } from './parsers/zoneParser';
 import { analyzeTTL } from './analyzers/ttlAnalyzer';
 import { analyzeEnvironments } from './analyzers/environmentAnalyzer';
@@ -45,7 +46,14 @@ program
         ...options,
         expandCNAME: options.expandCname !== undefined ? options.expandCname : true
       };
-      const validatedOptions = cliOptionsSchema.parse(normalizedOptions) as CLIOptions;
+      
+      let validatedOptions: CLIOptions;
+      try {
+        validatedOptions = cliOptionsSchema.parse(normalizedOptions) as CLIOptions;
+      } catch (zodError: any) {
+        const { ValidationError } = require('./utils/errors');
+        throw new ValidationError(`参数无效: ${zodError.errors?.[0]?.message || zodError.message}`);
+      }
       
       const outputDir = resolve(validatedOptions.outputDir);
       if (!existsSync(outputDir)) {
@@ -272,6 +280,16 @@ function findMissingRecords(environmentAnalysis: any[], environments: string[]):
 
 function handleError(error: unknown, verbose: boolean) {
   console.error('');
+  
+  if (error instanceof CLIError) {
+    console.error(chalk.red(`✗ 错误: ${error.message}`));
+    if (verbose && error.stack) {
+      console.error(chalk.gray(error.stack));
+    }
+    console.error('');
+    process.exit(error.exitCode);
+  }
+  
   if (error instanceof Error) {
     console.error(chalk.red(`✗ 错误: ${error.message}`));
     if (verbose && error.stack) {
