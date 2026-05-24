@@ -1,0 +1,32 @@
+# HELP http_requests_total HTTP 请求总数
+# TYPE http_requests_total counter
+http_requests_total{method="GET",path="/api/users",status="200",instance="server-01",env="prod"} 1234 1716547200000
+http_requests_total{method="GET",path="/api/users",status="200",instance="server-02",env="prod"} 1567 1716547200000
+http_requests_total{method="GET",path="/api/users",status="200",instance="server-03",env="prod"} 987 1716547200000
+http_requests_total{method="POST",path="/api/users",status="201",instance="server-01",env="prod"} 456 1716547200000
+http_requests_total{method="POST",path="/api/users",status="201",instance="server-02",env="prod"} 789 1716547200000
+http_requests_total{method="GET",path="/api/orders",status="200",instance="server-01",env="prod"} 321 1716547200000
+http_requests_total{method="GET",path="/api/orders",status="200",instance="server-02",env="prod"} 654 1716547200000
+http_requests_total{method="GET",path="/api/orders",status="500",instance="server-01",env="prod"} 12 1716547200000
+http_requests_total{method="GET",path="/health",status="200",instance="server-01",env="prod"} 9999 1716547200000
+http_requests_total{method="GET",path="/health",status="200",instance="server-02",env="prod"} 9999 1716547200000
+
+# HELP request_duration_seconds 请求延迟直方图
+# TYPE request_duration_seconds histogram
+request_duration_seconds_bucket{le="0.1",method="GET",path="/api/users"} 500
+request_duration_seconds_bucket{le="0.5",method="GET",path="/api/users"} 800
+request_duration_seconds_bucket{le="1.0",method="GET",path="/api/users"} 900
+request_duration_seconds_bucket{le="+Inf",method="GET",path="/api/users"} 1000
+request_duration_seconds_sum{method="GET",path="/api/users"} 450.5
+request_duration_seconds_count{method="GET",path="/api/users"} 1000
+
+# HELP user_sessions_active 活跃用户会话数
+# TYPE user_sessions_active gauge
+user_sessions_active{user_id="1001",region="us-east"} 1
+user_sessions_active{user_id="1002",region="us-east"} 1
+user_sessions_active{user_id="1003",region="us-west"} 1
+user_sessions_active{user_id="1004",region="us-west"} 1
+user_sessions_active{user_id="1005",region="eu-west"} 1
+user_sessions_active{user_id="1006",region="eu-west"} 1
+user_sessions_active{user_id="1007",region="ap-south"} 1
+user_sessions_active{user_id="1008",region="ap-south"} 1

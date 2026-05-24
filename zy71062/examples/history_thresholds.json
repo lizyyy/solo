@@ -1,0 +1,20 @@
+{
+  "service_name": "api-gateway",
+  "last_updated": "2024-05-01T00:00:00",
+  "metrics": {
+    "http_requests_total": {
+      "threshold": 50,
+      "label_cardinality": {
+        "method": 2,
+        "path,method": 5,
+        "instance,method,path": 8
+      }
+    },
+    "user_sessions_active": {
+      "threshold": 100,
+      "label_cardinality": {
+        "user_id": 5
+      }
+    }
+  }
+}

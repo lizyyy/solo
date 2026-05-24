@@ -1,0 +1,48 @@
+{
+  "service_name": "api-gateway",
+  "summary": {
+    "total_combinations": 40,
+    "critical_count": 2,
+    "warning_count": 10,
+    "low_count": 28,
+    "base_threshold": 10,
+    "top_n": 20
+  },
+  "combinations": [
+    {
+      "metric_name": "http_requests_total",
+      "labels": ["instance", "path", "status"],
+      "estimated_cardinality": 7
+    },
+    {
+      "metric_name": "http_requests_total",
+      "labels": ["instance", "path"],
+      "estimated_cardinality": 5
+    },
+    {
+      "metric_name": "user_sessions_active",
+      "labels": ["user_id"],
+      "estimated_cardinality": 5
+    },
+    {
+      "metric_name": "old_metric",
+      "labels": ["deprecated_label"],
+      "estimated_cardinality": 15
+    }
+  ],
+  "metrics": {
+    "http_requests_total": {
+      "threshold": 10,
+      "label_cardinality": {
+        "instance,path,status": 7,
+        "instance,path": 5
+      },
+      "combinations": [
+        {
+          "labels": ["instance", "path", "status"],
+          "estimated_cardinality": 7
+        }
+      ]
+    }
+  }
+}
