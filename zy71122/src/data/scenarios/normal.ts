@@ -1,0 +1,58 @@
+import type { Scenario } from '@/types';
+
+export const normalScenario: Scenario = {
+  id: 'normal-001',
+  name: '正常环网隔离场景',
+  type: 'normal',
+  description: '典型的城市供水环网，包含2个水源、多个用户片区。关闭正确阀门后可有效隔离抢修点。',
+  initialNetwork: {
+    nodes: [
+      { id: 'n1', x: -15, y: 0, z: -10, type: 'source', pressure: 4.5 },
+      { id: 'n2', x: 15, y: 0, z: -10, type: 'source', pressure: 4.2 },
+      { id: 'n3', x: -10, y: 0, z: 0, type: 'junction', pressure: 3.8 },
+      { id: 'n4', x: 0, y: 0, z: 0, type: 'junction', pressure: 3.6 },
+      { id: 'n5', x: 10, y: 0, z: 0, type: 'junction', pressure: 3.7 },
+      { id: 'n6', x: -10, y: 0, z: 10, type: 'junction', pressure: 3.5 },
+      { id: 'n7', x: 0, y: 0, z: 10, type: 'junction', pressure: 3.4 },
+      { id: 'n8', x: 10, y: 0, z: 10, type: 'junction', pressure: 3.5 },
+      { id: 'n9', x: -5, y: 0, z: 15, type: 'junction', pressure: 3.2 },
+      { id: 'n10', x: 5, y: 0, z: 15, type: 'junction', pressure: 3.3 },
+    ],
+    pipes: [
+      { id: 'p1', fromNode: 'n1', toNode: 'n3', diameter: 300, length: 500, flowDirection: 'forward' },
+      { id: 'p2', fromNode: 'n2', toNode: 'n5', diameter: 300, length: 450, flowDirection: 'forward' },
+      { id: 'p3', fromNode: 'n3', toNode: 'n4', diameter: 250, length: 400, flowDirection: 'forward' },
+      { id: 'p4', fromNode: 'n4', toNode: 'n5', diameter: 250, length: 400, flowDirection: 'forward' },
+      { id: 'p5', fromNode: 'n3', toNode: 'n6', diameter: 200, length: 350, flowDirection: 'forward' },
+      { id: 'p6', fromNode: 'n4', toNode: 'n7', diameter: 200, length: 350, flowDirection: 'forward' },
+      { id: 'p7', fromNode: 'n5', toNode: 'n8', diameter: 200, length: 350, flowDirection: 'forward' },
+      { id: 'p8', fromNode: 'n6', toNode: 'n7', diameter: 200, length: 400, flowDirection: 'forward' },
+      { id: 'p9', fromNode: 'n7', toNode: 'n8', diameter: 200, length: 400, flowDirection: 'forward' },
+      { id: 'p10', fromNode: 'n6', toNode: 'n9', diameter: 150, length: 300, flowDirection: 'forward' },
+      { id: 'p11', fromNode: 'n7', toNode: 'n9', diameter: 150, length: 250, flowDirection: 'forward' },
+      { id: 'p12', fromNode: 'n7', toNode: 'n10', diameter: 150, length: 250, flowDirection: 'forward' },
+      { id: 'p13', fromNode: 'n8', toNode: 'n10', diameter: 150, length: 300, flowDirection: 'forward' },
+    ],
+    valves: [
+      { id: 'v1', pipeId: 'p3', position: 0.2, status: 'open', type: 'gate' },
+      { id: 'v2', pipeId: 'p4', position: 0.5, status: 'open', type: 'gate' },
+      { id: 'v3', pipeId: 'p5', position: 0.3, status: 'open', type: 'butterfly' },
+      { id: 'v4', pipeId: 'p6', position: 0.3, status: 'open', type: 'butterfly' },
+      { id: 'v5', pipeId: 'p7', position: 0.3, status: 'open', type: 'butterfly' },
+      { id: 'v6', pipeId: 'p8', position: 0.5, status: 'open', type: 'gate' },
+      { id: 'v7', pipeId: 'p9', position: 0.5, status: 'open', type: 'gate' },
+      { id: 'v8', pipeId: 'p10', position: 0.4, status: 'open', type: 'ball' },
+      { id: 'v9', pipeId: 'p13', position: 0.4, status: 'open', type: 'ball' },
+    ],
+    customerZones: [
+      { id: 'z1', name: 'A区-住宅区', nodeIds: ['n6', 'n9'], customerCount: 1250, type: 'residential', color: '#4CAF50' },
+      { id: 'z2', name: 'B区-商业区', nodeIds: ['n7', 'n10'], customerCount: 820, type: 'commercial', color: '#FF9800' },
+      { id: 'z3', name: 'C区-工业区', nodeIds: ['n8'], customerCount: 120, type: 'industrial', color: '#2196F3' },
+      { id: 'z4', name: 'D区-住宅区', nodeIds: ['n3'], customerCount: 980, type: 'residential', color: '#8BC34A' },
+      { id: 'z5', name: 'E区-住宅区', nodeIds: ['n5'], customerCount: 1100, type: 'residential', color: '#CDDC39' },
+    ],
+    repairPoints: [
+      { id: 'r1', pipeId: 'p6', position: 0.7, description: '管段爆裂漏水', priority: 'high' },
+    ],
+  },
+};
