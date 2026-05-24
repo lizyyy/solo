@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-05-24T21:00:49.426060+08:00",
+  "severity": "error",
+  "total_nodes": 7,
+  "ok_count": 3,
+  "warning_count": 1,
+  "critical_count": 2,
+  "error_count": 1,
+  "skipped_count": 0,
+  "missing_count": 0,
+  "late_models": [
+    {
+      "unique_id": "model.staging.stg_orders",
+      "name": "stg_orders",
+      "resource_type": "model",
+      "status": "error",
+      "freshness_status": "unknown",
+      "severity": "error",
+      "issues": [
+        "model_stale",
+        "downstream_impact",
+        "upstream_late"
+      ],
+      "last_success_at": "2026-05-24T12:21:13.286588+00:00",
+      "last_data_at": "2026-05-24T12:21:13.286588+00:00",
+      "minutes_late": null,
+      "expected_frequency_minutes": 60.0,
+      "upstream_dependencies": [
+        "source.raw.orders"
+      ],
+      "downstream_references": [
+        "model.analytics.fct_orders"
+      ],
+      "message": "Model 'model.staging.stg_orders' failed during execution"
+    },
+    {
+      "unique_id": "source.raw.orders",
+      "name": "orders",
+      "resource_type": "source",
+      "status": "skipped",
+      "freshness_status": "error",
+      "severity": "critical",
+      "issues": [
+        "model_stale"
+      ],
+      "last_success_at": null,
+      "last_data_at": "2026-05-24T07:59:13.286588+00:00",
+      "minutes_late": 301.60232453333333,
+      "expected_frequency_minutes": 60.0,
+      "upstream_dependencies": [],
+      "downstream_references": [
+        "model.staging.stg_orders"
+      ],
+      "message": "Source data is stale by 301.6 minutes"
+    },
+    {
+      "unique_id": "model.analytics.fct_orders",
+      "name": "fct_orders",
+      "resource_type": "model",
+      "status": "success",
+      "freshness_status": "unknown",
+      "severity": "critical",
+      "issues": [
+        "model_stale",
+        "downstream_impact",
+        "upstream_late"
+      ],
+      "last_success_at": "2026-05-24T08:59:13.286588+00:00",
+      "last_data_at": "2026-05-24T08:59:13.286588+00:00",
+      "minutes_late": 241.60232453333336,
+      "expected_frequency_minutes": 60.0,
+      "upstream_dependencies": [
+        "model.staging.stg_orders",
+        "model.staging.stg_users"
+      ],
+      "downstream_references": [
+        "model.analytics.report_daily_sales"
+      ],
+      "message": "Model data is stale by 241.6 minutes"
+    },
+    {
+      "unique_id": "model.analytics.report_daily_sales",
+      "name": "report_daily_sales",
+      "resource_type": "model",
+      "status": "skipped",
+      "freshness_status": "unknown",
+      "severity": "warning",
+      "issues": [
+        "model_skipped",
+        "downstream_impact",
+        "upstream_late"
+      ],
+      "last_success_at": null,
+      "last_data_at": null,
+      "minutes_late": null,
+      "expected_frequency_minutes": 60.0,
+      "upstream_dependencies": [
+        "model.analytics.fct_orders"
+      ],
+      "downstream_references": [],
+      "message": "Model 'model.analytics.report_daily_sales' was skipped in the run"
+    }
+  ],
+  "broken_dependencies": [],
+  "report_tables": [
+    {
+      "table_name": "每日销售报表",
+      "unique_id": "model.analytics.report_daily_sales",
+      "status": "critical",
+      "affected_models": [
+        "model.analytics.report_daily_sales",
+        "source.raw.orders",
+        "model.analytics.fct_orders",
+        "model.staging.stg_orders"
+      ],
+      "impacted": true
+    },
+    {
+      "table_name": "订单事实表",
+      "unique_id": "model.analytics.fct_orders",
+      "status": "critical",
+      "affected_models": [
+        "model.analytics.fct_orders",
+        "source.raw.orders",
+        "model.staging.stg_orders"
+      ],
+      "impacted": true
+    },
+    {
+      "table_name": "用户维度表",
+      "unique_id": "model.analytics.dim_users",
+      "status": "ok",
+      "affected_models": [],
+      "impacted": false
+    }
+  ],
+  "issues_summary": {
+    "model_stale": 3,
+    "downstream_impact": 3,
+    "upstream_late": 3,
+    "model_skipped": 1
+  },
+  "execution_warnings": []
+}

@@ -1,0 +1,63 @@
+{
+  "metadata": {
+    "dbt_version": "1.5.0",
+    "generated_at": "2026-05-24T12:59:13.286588+00:00"
+  },
+  "results": [
+    {
+      "unique_id": "model.analytics.dim_users",
+      "status": "success",
+      "execution_time": 12.0,
+      "timing": [
+        {
+          "name": "execute",
+          "started_at": "2026-05-24T12:24:01.286588Z",
+          "completed_at": "2026-05-24T12:24:13.286588Z"
+        }
+      ]
+    },
+    {
+      "unique_id": "model.analytics.fct_orders",
+      "status": "success",
+      "execution_time": 25.0,
+      "timing": [
+        {
+          "name": "execute",
+          "started_at": "2026-05-24T08:58:48.286588Z",
+          "completed_at": "2026-05-24T08:59:13.286588Z"
+        }
+      ]
+    },
+    {
+      "unique_id": "model.analytics.report_daily_sales",
+      "status": "skipped",
+      "execution_time": 0.0,
+      "timing": []
+    },
+    {
+      "unique_id": "model.staging.stg_users",
+      "status": "success",
+      "execution_time": 5.0,
+      "timing": [
+        {
+          "name": "execute",
+          "started_at": "2026-05-24T12:19:08.286588Z",
+          "completed_at": "2026-05-24T12:19:13.286588Z"
+        }
+      ]
+    },
+    {
+      "unique_id": "model.staging.stg_orders",
+      "status": "error",
+      "execution_time": 3.0,
+      "timing": [
+        {
+          "name": "execute",
+          "started_at": "2026-05-24T12:21:10.286588Z",
+          "completed_at": "2026-05-24T12:21:13.286588Z"
+        }
+      ],
+      "message": "Database connection failed"
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "metadata": {
+    "dbt_version": "1.5.0",
+    "generated_at": "2024-01-15T10:00:00Z"
+  },
+  "nodes": {
+    "model.analytics.dim_users": {
+      "resource_type": "model",
+      "depends_on": {
+        "nodes": ["model.staging.stg_users"],
+        "sources": []
+      },
+      "unique_id": "model.analytics.dim_users",
+      "name": "dim_users",
+      "schema": "analytics",
+      "database": "warehouse",
+      "alias": "dim_users",
+      "config": {},
+      "columns": {},
+      "tags": ["dimension", "users"],
+      "package_name": "analytics"
+    },
+    "model.analytics.fct_orders": {
+      "resource_type": "model",
+      "depends_on": {
+        "nodes": ["model.staging.stg_orders", "model.staging.stg_users"],
+        "sources": []
+      },
+      "unique_id": "model.analytics.fct_orders",
+      "name": "fct_orders",
+      "schema": "analytics",
+      "database": "warehouse",
+      "alias": "fct_orders",
+      "config": {},
+      "columns": {},
+      "tags": ["fact", "orders"],
+      "package_name": "analytics"
+    },
+    "model.analytics.report_daily_sales": {
+      "resource_type": "model",
+      "depends_on": {
+        "nodes": ["model.analytics.fct_orders"],
+        "sources": []
+      },
+      "unique_id": "model.analytics.report_daily_sales",
+      "name": "report_daily_sales",
+      "schema": "analytics",
+      "database": "warehouse",
+      "alias": "report_daily_sales",
+      "config": {},
+      "columns": {},
+      "tags": ["report", "sales"],
+      "package_name": "analytics"
+    },
+    "model.staging.stg_users": {
+      "resource_type": "model",
+      "depends_on": {
+        "nodes": [],
+        "sources": ["source.raw.users"]
+      },
+      "unique_id": "model.staging.stg_users",
+      "name": "stg_users",
+      "schema": "staging",
+      "database": "warehouse",
+      "alias": "stg_users",
+      "config": {},
+      "columns": {},
+      "tags": ["staging"],
+      "package_name": "analytics"
+    },
+    "model.staging.stg_orders": {
+      "resource_type": "model",
+      "depends_on": {
+        "nodes": [],
+        "sources": ["source.raw.orders"]
+      },
+      "unique_id": "model.staging.stg_orders",
+      "name": "stg_orders",
+      "schema": "staging",
+      "database": "warehouse",
+      "alias": "stg_orders",
+      "config": {},
+      "columns": {},
+      "tags": ["staging"],
+      "package_name": "analytics"
+    }
+  },
+  "sources": {
+    "source.raw.users": {
+      "resource_type": "source",
+      "unique_id": "source.raw.users",
+      "name": "users",
+      "source_name": "raw",
+      "schema": "raw",
+      "database": "warehouse",
+      "identifier": "users",
+      "loader": "s3",
+      "freshness": {
+        "warn_after": {"period": "hour", "count": 1},
+        "error_after": {"period": "hour", "count": 3}
+      }
+    },
+    "source.raw.orders": {
+      "resource_type": "source",
+      "unique_id": "source.raw.orders",
+      "name": "orders",
+      "source_name": "raw",
+      "schema": "raw",
+      "database": "warehouse",
+      "identifier": "orders",
+      "loader": "s3",
+      "freshness": {
+        "warn_after": {"period": "hour", "count": 1},
+        "error_after": {"period": "hour", "count": 3}
+      }
+    }
+  }
+}

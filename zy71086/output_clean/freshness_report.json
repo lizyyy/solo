@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-05-24T21:00:34.130682+08:00",
+  "severity": "ok",
+  "total_nodes": 7,
+  "ok_count": 7,
+  "warning_count": 0,
+  "critical_count": 0,
+  "error_count": 0,
+  "skipped_count": 0,
+  "missing_count": 0,
+  "late_models": [],
+  "broken_dependencies": [],
+  "report_tables": [
+    {
+      "table_name": "每日销售报表",
+      "unique_id": "model.analytics.report_daily_sales",
+      "status": "ok",
+      "affected_models": [],
+      "impacted": false
+    },
+    {
+      "table_name": "用户维度表",
+      "unique_id": "model.analytics.dim_users",
+      "status": "ok",
+      "affected_models": [],
+      "impacted": false
+    },
+    {
+      "table_name": "订单事实表",
+      "unique_id": "model.analytics.fct_orders",
+      "status": "ok",
+      "affected_models": [],
+      "impacted": false
+    }
+  ],
+  "issues_summary": {},
+  "execution_warnings": []
+}

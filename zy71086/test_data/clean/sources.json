@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "dbt_version": "1.5.0",
+    "generated_at": "2026-05-24T12:59:13.286588+00:00"
+  },
+  "results": [
+    {
+      "unique_id": "source.raw.users",
+      "max_loaded_at": "2026-05-24T12:14:13.286588Z",
+      "snapshotted_at": "2026-05-24T12:59:13.286588Z",
+      "age": 2700.0,
+      "status": "pass",
+      "warn_after": {
+        "period": "hour",
+        "count": 1
+      },
+      "error_after": {
+        "period": "hour",
+        "count": 3
+      }
+    },
+    {
+      "unique_id": "source.raw.orders",
+      "max_loaded_at": "2026-05-24T12:09:13.286588Z",
+      "snapshotted_at": "2026-05-24T12:59:13.286588Z",
+      "age": 3000.0,
+      "status": "pass",
+      "warn_after": {
+        "period": "hour",
+        "count": 1
+      },
+      "error_after": {
+        "period": "hour",
+        "count": 3
+      }
+    }
+  ]
+}

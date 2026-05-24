@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dbt-freshness-cli"
+version = "0.1.0"
+description = "DBT 模型新鲜度诊断工具 - 监控模型延迟、上下游依赖影响分析"
+requires-python = ">=3.9"
+authors = [{ name = "DBT Freshness Team" }]
+dependencies = [
+    "click>=8.0.0",
+    "pydantic>=2.0.0",
+    "networkx>=3.0.0",
+    "rich>=13.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+dbt-freshness = "dbt_freshness_cli.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
