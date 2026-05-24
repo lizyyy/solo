@@ -9,7 +9,7 @@ from colorama import init, Fore, Style
 from .analyzer import CoverageAnalyzer
 from .reporter import Reporter
 from .team_mapping import TeamMapping, TeamMappingLoader
-from .constants import ExitCode, DEFAULT_EXCLUDE_PATTERNS
+from .constants import ExitCode, DEFAULT_EXCLUDE_PATTERNS, DEFAULT_CODEOWNERS_PATHS
 from .__init__ import __version__
 
 init(autoreset=True)
@@ -135,14 +135,34 @@ Examples:
 
         return parser
 
+    def _resolve_codeowners_path(self, codeowners_path: str, repo_root: Path) -> Optional[Path]:
+        path = Path(codeowners_path)
+        if path.is_absolute():
+            return path if path.exists() else None
+
+        repo_relative = repo_root / path
+        if repo_relative.exists():
+            return repo_relative
+
+        cwd_relative = Path.cwd() / path
+        if cwd_relative.exists():
+            return cwd_relative
+
+        return None
+
     def _validate_args(self, args: argparse.Namespace) -> Optional[ExitCode]:
-        if not Path(args.repo_root).exists():
+        repo_root = Path(args.repo_root).resolve()
+        if not repo_root.exists():
             print(f"{Fore.RED}✗ Repository directory not found: {args.repo_root}{Style.RESET_ALL}")
             return ExitCode.FILE_NOT_FOUND
 
-        if args.codeowners_path and not Path(args.codeowners_path).exists():
-            print(f"{Fore.RED}✗ CODEOWNERS file not found: {args.codeowners_path}{Style.RESET_ALL}")
-            return ExitCode.FILE_NOT_FOUND
+        if args.codeowners_path:
+            resolved = self._resolve_codeowners_path(args.codeowners_path, repo_root)
+            if not resolved:
+                print(f"{Fore.RED}✗ CODEOWNERS file not found: {args.codeowners_path}")
+                print(f"{Fore.YELLOW}  (tried relative to repo: {repo_root / args.codeowners_path})")
+                print(f"{Fore.YELLOW}  (tried relative to cwd: {Path.cwd() / args.codeowners_path}){Style.RESET_ALL}")
+                return ExitCode.FILE_NOT_FOUND
 
         if args.team_aliases_path and not Path(args.team_aliases_path).exists():
             print(f"{Fore.RED}✗ Team aliases file not found: {args.team_aliases_path}{Style.RESET_ALL}")

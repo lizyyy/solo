@@ -2,7 +2,7 @@
 
 ## 📊 Overview
 
-- **Generated:** 2026-05-24 21:29:28
+- **Generated:** 2026-05-24 23:28:23
 - **Repository:** `/Users/lzy/pro/solo/workspaces/zy71097/test_repo`
 - **CODEOWNERS:** `/Users/lzy/pro/solo/workspaces/zy71097/test_repo/CODEOWNERS`
 - **Rules:** 26
@@ -40,15 +40,6 @@
 
 dist/bundle.js
 src/generated/code.js
-```
-
-## ⚠️ Invalid Owners
-
-The following owners are not in the valid owners list:
-
-```
-
-@org/devops
 ```
 
 ## 📂 Empty Directories

@@ -28,6 +28,7 @@ class CodeOwnersParser:
 
     def __init__(self, codeowners_path: Optional[str] = None, repo_root: str = "."):
         self.repo_root = Path(repo_root).resolve()
+        self._explicit_path = codeowners_path
         self.codeowners_path = self._find_codeowners(codeowners_path)
         self.rules: List[CodeOwnerRule] = []
 
@@ -36,7 +37,16 @@ class CodeOwnersParser:
             path = Path(explicit_path)
             if path.is_absolute():
                 return path if path.exists() else None
-            return self.repo_root / path if (self.repo_root / path).exists() else None
+
+            repo_relative = self.repo_root / path
+            if repo_relative.exists():
+                return repo_relative
+
+            cwd_relative = Path.cwd() / path
+            if cwd_relative.exists():
+                return cwd_relative
+
+            return None
 
         for rel_path in DEFAULT_CODEOWNERS_PATHS:
             full_path = self.repo_root / rel_path
@@ -47,9 +57,20 @@ class CodeOwnersParser:
 
     def parse(self) -> List[CodeOwnerRule]:
         if not self.codeowners_path or not self.codeowners_path.exists():
-            raise FileNotFoundError(
-                f"CODEOWNERS file not found. Searched: {self.codeowners_path}"
-            )
+            if self._explicit_path:
+                msg = (
+                    f"CODEOWNERS file not found: '{self._explicit_path}'.\n"
+                    f"  - Tried relative to repo: {self.repo_root / self._explicit_path}\n"
+                    f"  - Tried relative to cwd: {Path.cwd() / self._explicit_path}"
+                )
+            else:
+                searched = [str(self.repo_root / p) for p in DEFAULT_CODEOWNERS_PATHS]
+                msg = (
+                    "CODEOWNERS file not found in standard locations.\n"
+                    f"  Searched (relative to repo root '{self.repo_root}'):\n"
+                    f"    - {chr(10)}    - ".join(searched)
+                )
+            raise FileNotFoundError(msg)
 
         self.rules = []
         with open(self.codeowners_path, "r", encoding="utf-8") as f:
