@@ -170,13 +170,32 @@ def first_sign_handover(handover_id: int, sign_data: schemas.HandoverFirstSign, 
     if not handover:
         raise HTTPException(status_code=404, detail="交接单不存在")
     
-    if handover.status != HandoverStatus.SUBMITTED:
+    if handover.status != HandoverStatus.SUBMITTED and handover.status != HandoverStatus.CONFLICT:
         raise HTTPException(status_code=400, detail=f"当前状态[{handover.status}]不能第一签")
     
+    sign_time = datetime.now()
     handover.first_signature = sign_data.signature
-    handover.first_signed_at = datetime.now()
+    handover.first_signed_at = sign_time
+    handover.first_sign_remark = sign_data.sign_remark
     
-    if not services.transition_status(db, handover, HandoverStatus.FIRST_SIGNED, sign_data.signature, "第一签完成"):
+    time_abnormal = services.check_sign_time_abnormal(handover.handover_time, sign_time)
+    if sign_data.is_late_sign or time_abnormal:
+        handover.is_late_sign = True
+        handover.sign_time_abnormal = True
+        services.create_discrepancy_report(
+            db, handover.id,
+            schemas.HandoverItemCreate(
+                drug_name="补签时间异常",
+                batch_no="N/A",
+                handover_quantity=0
+            ),
+            DiscrepancyType.TIME_ABNORMAL,
+            f"第一签时间异常: {sign_data.sign_remark or '补签'}",
+            {}
+        )
+    
+    if not services.transition_status(db, handover, HandoverStatus.FIRST_SIGNED, sign_data.signature, 
+                                      f"第一签完成{' (补签)' if sign_data.is_late_sign else ''}"):
         raise HTTPException(status_code=400, detail="状态流转失败")
     
     return handover
@@ -193,10 +212,45 @@ def second_sign_handover(handover_id: int, sign_data: schemas.HandoverSecondSign
     if sign_data.signature == handover.first_signature:
         raise HTTPException(status_code=400, detail="双人签名不能为同一人")
     
+    sign_time = datetime.now()
     handover.second_signature = sign_data.signature
-    handover.second_signed_at = datetime.now()
+    handover.second_signed_at = sign_time
+    handover.second_sign_remark = sign_data.sign_remark
     
-    if not services.transition_status(db, handover, HandoverStatus.SECOND_SIGNED, sign_data.signature, "第二签完成"):
+    time_abnormal = services.check_sign_time_abnormal(handover.handover_time, sign_time)
+    if sign_data.is_late_sign or time_abnormal:
+        handover.is_late_sign = True
+        handover.sign_time_abnormal = True
+        services.create_discrepancy_report(
+            db, handover.id,
+            schemas.HandoverItemCreate(
+                drug_name="补签时间异常",
+                batch_no="N/A",
+                handover_quantity=0
+            ),
+            DiscrepancyType.TIME_ABNORMAL,
+            f"第二签时间异常: {sign_data.sign_remark or '补签'}",
+            {}
+        )
+    
+    if handover.first_signed_at:
+        time_diff = (sign_time - handover.first_signed_at).total_seconds()
+        if time_diff < 10:
+            handover.sign_time_abnormal = True
+            services.create_discrepancy_report(
+                db, handover.id,
+                schemas.HandoverItemCreate(
+                    drug_name="双签间隔异常",
+                    batch_no="N/A",
+                    handover_quantity=0
+                ),
+                DiscrepancyType.TIME_ABNORMAL,
+                f"双签间隔过短: {time_diff:.1f}秒",
+                {}
+            )
+    
+    if not services.transition_status(db, handover, HandoverStatus.SECOND_SIGNED, sign_data.signature, 
+                                      f"第二签完成{' (补签)' if sign_data.is_late_sign else ''}"):
         raise HTTPException(status_code=400, detail="状态流转失败")
     
     return handover

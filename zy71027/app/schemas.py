@@ -153,9 +153,13 @@ class HandoverSubmit(BaseModel):
 
 class HandoverFirstSign(BaseModel):
     signature: str
+    sign_remark: Optional[str] = None
+    is_late_sign: bool = False
 
 class HandoverSecondSign(BaseModel):
     signature: str
+    sign_remark: Optional[str] = None
+    is_late_sign: bool = False
 
 class HandoverVerify(BaseModel):
     reviewer: str
@@ -191,8 +195,12 @@ class HandoverRecord(HandoverRecordBase):
     status: HandoverStatus
     first_signature: Optional[str] = None
     first_signed_at: Optional[datetime] = None
+    first_sign_remark: Optional[str] = None
     second_signature: Optional[str] = None
     second_signed_at: Optional[datetime] = None
+    second_sign_remark: Optional[str] = None
+    is_late_sign: Optional[bool] = None
+    sign_time_abnormal: Optional[bool] = None
     reviewer: Optional[str] = None
     reviewed_at: Optional[datetime] = None
     reject_reason: Optional[str] = None

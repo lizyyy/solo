@@ -81,7 +81,7 @@ def create_discrepancy_report(db: Session, handover_id: int, item: schemas.Hando
 
 def validate_status_transition(current_status: str, target_status: str) -> bool:
     valid_transitions = {
-        HandoverStatus.DRAFT: [HandoverStatus.SUBMITTED, HandoverStatus.WITHDRAWN, HandoverStatus.MANUAL_FIXED],
+        HandoverStatus.DRAFT: [HandoverStatus.SUBMITTED, HandoverStatus.CONFLICT, HandoverStatus.WITHDRAWN, HandoverStatus.MANUAL_FIXED],
         HandoverStatus.SUBMITTED: [HandoverStatus.FIRST_SIGNED, HandoverStatus.REJECTED, HandoverStatus.WITHDRAWN],
         HandoverStatus.FIRST_SIGNED: [HandoverStatus.SECOND_SIGNED, HandoverStatus.REJECTED, HandoverStatus.WITHDRAWN],
         HandoverStatus.SECOND_SIGNED: [HandoverStatus.VERIFIED, HandoverStatus.CONFLICT, HandoverStatus.REJECTED, HandoverStatus.WITHDRAWN],
@@ -141,3 +141,17 @@ def verify_prescription(db: Session, prescription_id: int, verified_by: str) -> 
     prescription.verified_at = datetime.now()
     db.commit()
     return True
+
+def check_sign_time_abnormal(handover_time: Optional[datetime], sign_time: datetime) -> bool:
+    if not handover_time:
+        return False
+    
+    time_diff = abs((sign_time - handover_time).total_seconds())
+    if time_diff > 3600:
+        return True
+    
+    sign_hour = sign_time.hour
+    if sign_hour < 6 or sign_hour > 22:
+        return False
+    
+    return False
