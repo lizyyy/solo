@@ -3,17 +3,15 @@ package com.hazardous.waste.controller;
 import com.hazardous.waste.dto.ApiResponse;
 import com.hazardous.waste.entity.StorageBucket;
 import com.hazardous.waste.service.StorageBucketService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/buckets")
-@RequiredArgsConstructor
 public class StorageBucketController {
 
-    private final StorageBucketService storageBucketService;
+    private StorageBucketService storageBucketService;
 
     @PostMapping
     public ApiResponse<StorageBucket> createBucket(@RequestBody StorageBucket bucket) {

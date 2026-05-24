@@ -3,7 +3,6 @@ package com.hazardous.waste.controller;
 import com.hazardous.waste.dto.ApiResponse;
 import com.hazardous.waste.entity.TransferForm;
 import com.hazardous.waste.service.TransferFormService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,10 +10,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/transfer-forms")
-@RequiredArgsConstructor
 public class TransferFormController {
 
-    private final TransferFormService transferFormService;
+    private TransferFormService transferFormService;
 
     @PostMapping
     public ApiResponse<TransferForm> createForm(@RequestBody TransferForm form) {

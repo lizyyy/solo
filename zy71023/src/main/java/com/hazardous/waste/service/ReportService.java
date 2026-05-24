@@ -7,7 +7,6 @@ import com.hazardous.waste.enums.WasteStatus;
 import com.hazardous.waste.exception.BusinessException;
 import com.hazardous.waste.repository.DisposalReportRepository;
 import com.hazardous.waste.repository.WasteRecordRepository;
-import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -21,11 +20,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class ReportService {
 
-    private final DisposalReportRepository disposalReportRepository;
-    private final WasteRecordRepository wasteRecordRepository;
+    private DisposalReportRepository disposalReportRepository;
+    private WasteRecordRepository wasteRecordRepository;
 
     @Transactional
     public DisposalReport generateDisposalReport(String transferFormNo, String operator) {

@@ -12,8 +12,8 @@ public enum ErrorCode {
     INVALID_CATEGORY(400, "无效的危废类别"),
     NOT_FOUND(404, "记录不存在");
 
-    private final int code;
-    private final String message;
+    private int code;
+    private String message;
 
     ErrorCode(int code, String message) {
         this.code = code;

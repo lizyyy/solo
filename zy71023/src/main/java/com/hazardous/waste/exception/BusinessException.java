@@ -1,12 +1,10 @@
 package com.hazardous.waste.exception;
 
 import com.hazardous.waste.enums.ErrorCode;
-import lombok.Getter;
 
-@Getter
 public class BusinessException extends RuntimeException {
-    private final ErrorCode errorCode;
-    private final String detail;
+    private ErrorCode errorCode;
+    private String detail;
 
     public BusinessException(ErrorCode errorCode) {
         super(errorCode.getMessage());
@@ -19,4 +17,7 @@ public class BusinessException extends RuntimeException {
         this.errorCode = errorCode;
         this.detail = detail;
     }
+
+    public ErrorCode getErrorCode() { return errorCode; }
+    public String getDetail() { return detail; }
 }

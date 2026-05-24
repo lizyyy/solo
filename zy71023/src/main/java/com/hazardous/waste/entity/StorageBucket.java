@@ -1,10 +1,8 @@
 package com.hazardous.waste.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "storage_bucket")
 public class StorageBucket {
@@ -48,4 +46,25 @@ public class StorageBucket {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getBucketCode() { return bucketCode; }
+    public void setBucketCode(String bucketCode) { this.bucketCode = bucketCode; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+    public Double getMaxCapacity() { return maxCapacity; }
+    public void setMaxCapacity(Double maxCapacity) { this.maxCapacity = maxCapacity; }
+    public Double getCurrentCapacity() { return currentCapacity; }
+    public void setCurrentCapacity(Double currentCapacity) { this.currentCapacity = currentCapacity; }
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+    public String getRemark() { return remark; }
+    public void setRemark(String remark) { this.remark = remark; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

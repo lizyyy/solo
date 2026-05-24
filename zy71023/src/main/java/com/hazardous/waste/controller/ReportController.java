@@ -6,7 +6,6 @@ import com.hazardous.waste.entity.WasteRecord;
 import com.hazardous.waste.enums.WasteStatus;
 import com.hazardous.waste.service.ReportService;
 import com.hazardous.waste.service.WasteRecordService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +19,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reports")
-@RequiredArgsConstructor
 public class ReportController {
 
-    private final ReportService reportService;
-    private final WasteRecordService wasteRecordService;
+    private ReportService reportService;
+    private WasteRecordService wasteRecordService;
 
     @PostMapping("/disposal/generate")
     public ApiResponse<DisposalReport> generateDisposalReport(

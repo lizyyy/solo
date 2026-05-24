@@ -7,7 +7,6 @@ import com.hazardous.waste.entity.WasteRecord;
 import com.hazardous.waste.enums.WasteStatus;
 import com.hazardous.waste.service.WasteRecordService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,10 +14,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/waste-records")
-@RequiredArgsConstructor
 public class WasteRecordController {
 
-    private final WasteRecordService wasteRecordService;
+    private WasteRecordService wasteRecordService;
 
     @PostMapping("/submit")
     public ApiResponse<WasteRecord> submitRecord(@Valid @RequestBody WasteRecordDTO dto) {

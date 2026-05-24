@@ -4,17 +4,15 @@ import com.hazardous.waste.entity.StorageBucket;
 import com.hazardous.waste.enums.ErrorCode;
 import com.hazardous.waste.exception.BusinessException;
 import com.hazardous.waste.repository.StorageBucketRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class StorageBucketService {
 
-    private final StorageBucketRepository storageBucketRepository;
+    private StorageBucketRepository storageBucketRepository;
 
     @Transactional
     public StorageBucket createBucket(StorageBucket bucket) {

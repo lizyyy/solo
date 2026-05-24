@@ -6,7 +6,6 @@ import com.hazardous.waste.entity.WasteRecord;
 import com.hazardous.waste.enums.WasteStatus;
 import com.hazardous.waste.repository.AlertRecordRepository;
 import com.hazardous.waste.repository.WasteRecordRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +14,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class AlertService {
 
-    private final AlertRecordRepository alertRecordRepository;
-    private final WasteRecordRepository wasteRecordRepository;
-    private final WasteStorageConfig storageConfig;
+    private AlertRecordRepository alertRecordRepository;
+    private WasteRecordRepository wasteRecordRepository;
+    private WasteStorageConfig storageConfig;
 
     @Scheduled(cron = "0 0 8 * * ?")
     @Transactional

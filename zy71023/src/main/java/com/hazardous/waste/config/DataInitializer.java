@@ -4,16 +4,14 @@ import com.hazardous.waste.entity.StorageBucket;
 import com.hazardous.waste.entity.TransferForm;
 import com.hazardous.waste.repository.StorageBucketRepository;
 import com.hazardous.waste.repository.TransferFormRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
-    private final StorageBucketRepository bucketRepository;
-    private final TransferFormRepository transferFormRepository;
+    private StorageBucketRepository bucketRepository;
+    private TransferFormRepository transferFormRepository;
 
     @Override
     public void run(String... args) {

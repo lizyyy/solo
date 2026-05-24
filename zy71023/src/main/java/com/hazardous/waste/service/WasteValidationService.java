@@ -11,7 +11,6 @@ import com.hazardous.waste.exception.BusinessException;
 import com.hazardous.waste.repository.StorageBucketRepository;
 import com.hazardous.waste.repository.TransferFormRepository;
 import com.hazardous.waste.repository.WasteRecordRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,13 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class WasteValidationService {
 
-    private final WasteStorageConfig storageConfig;
-    private final WasteRecordRepository wasteRecordRepository;
-    private final StorageBucketRepository storageBucketRepository;
-    private final TransferFormRepository transferFormRepository;
+    private WasteStorageConfig storageConfig;
+    private WasteRecordRepository wasteRecordRepository;
+    private StorageBucketRepository storageBucketRepository;
+    private TransferFormRepository transferFormRepository;
 
     public ValidationResult validateSubmission(WasteRecordDTO dto) {
         ValidationResult result = new ValidationResult();
@@ -121,7 +119,6 @@ public class WasteValidationService {
         }
     }
 
-    @lombok.Data
     public static class ValidationResult {
         private boolean passed = true;
         private boolean needsReview = false;
@@ -145,5 +142,16 @@ public class WasteValidationService {
         public String getErrorSummary() {
             return String.join("; ", errors);
         }
+
+        public boolean isPassed() { return passed; }
+        public void setPassed(boolean passed) { this.passed = passed; }
+        public boolean isNeedsReview() { return needsReview; }
+        public void setNeedsReview(boolean needsReview) { this.needsReview = needsReview; }
+        public List<String> getErrors() { return errors; }
+        public void setErrors(List<String> errors) { this.errors = errors; }
+        public List<String> getWarnings() { return warnings; }
+        public void setWarnings(List<String> warnings) { this.warnings = warnings; }
+        public List<ErrorCode> getErrorCodes() { return errorCodes; }
+        public void setErrorCodes(List<ErrorCode> errorCodes) { this.errorCodes = errorCodes; }
     }
 }

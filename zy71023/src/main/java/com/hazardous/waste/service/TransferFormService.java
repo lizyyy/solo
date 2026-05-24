@@ -5,7 +5,6 @@ import com.hazardous.waste.entity.WasteRecord;
 import com.hazardous.waste.enums.ErrorCode;
 import com.hazardous.waste.exception.BusinessException;
 import com.hazardous.waste.repository.TransferFormRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +12,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class TransferFormService {
 
-    private final TransferFormRepository transferFormRepository;
+    private TransferFormRepository transferFormRepository;
 
     @Transactional
     public TransferForm createForm(TransferForm form) {

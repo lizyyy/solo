@@ -4,13 +4,14 @@ import com.hazardous.waste.config.WasteStorageConfig;
 import com.hazardous.waste.dto.ReviewDTO;
 import com.hazardous.waste.dto.WasteRecordDTO;
 import com.hazardous.waste.entity.StorageBucket;
+import com.hazardous.waste.entity.TransferForm;
 import com.hazardous.waste.entity.WasteRecord;
 import com.hazardous.waste.enums.ErrorCode;
 import com.hazardous.waste.enums.WasteStatus;
 import com.hazardous.waste.exception.BusinessException;
 import com.hazardous.waste.repository.StorageBucketRepository;
+import com.hazardous.waste.repository.TransferFormRepository;
 import com.hazardous.waste.repository.WasteRecordRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,14 +21,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class WasteRecordService {
 
-    private final WasteRecordRepository wasteRecordRepository;
-    private final StorageBucketRepository storageBucketRepository;
-    private final WasteStatusMachine statusMachine;
-    private final WasteValidationService validationService;
-    private final WasteStorageConfig storageConfig;
+    private WasteRecordRepository wasteRecordRepository;
+    private StorageBucketRepository storageBucketRepository;
+    private TransferFormRepository transferFormRepository;
+    private WasteStatusMachine statusMachine;
+    private WasteValidationService validationService;
+    private WasteStorageConfig storageConfig;
 
     @Transactional
     public WasteRecord submitRecord(WasteRecordDTO dto) {
@@ -204,11 +205,18 @@ public class WasteRecordService {
 
         validationService.validateTransferFormUsage(transferFormNo);
 
+        TransferForm transferForm = transferFormRepository.findByFormNo(transferFormNo)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MISSING_MATERIAL, "转运单不存在: " + transferFormNo));
+        transferForm.setIsUsed(true);
+        transferForm.setTransferTime(LocalDateTime.now());
+        transferForm.getWasteRecords().add(record);
+        transferFormRepository.save(transferForm);
+
         record.setTransferFormNo(transferFormNo);
         record.getOperationLogs().add(new WasteRecord.OperationLog(
                 "标记待转运",
                 operator,
-                "转运单号: " + transferFormNo
+                "转运单号: " + transferFormNo + "，转运单已标记为已使用"
         ));
 
         statusMachine.transition(record, WasteStatus.PENDING_TRANSFER, operator, "准备转运");
@@ -265,6 +273,22 @@ public class WasteRecordService {
     public WasteRecord returnRecord(String recordNo, String returnReason, String operator) {
         WasteRecord record = wasteRecordRepository.findByRecordNo(recordNo)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "记录不存在: " + recordNo));
+
+        if (record.getStatus() == WasteStatus.PENDING_TRANSFER && record.getTransferFormNo() != null) {
+            TransferForm transferForm = transferFormRepository.findByFormNo(record.getTransferFormNo())
+                    .orElse(null);
+            if (transferForm != null) {
+                transferForm.setIsUsed(false);
+                transferForm.setTransferTime(null);
+                transferForm.getWasteRecords().remove(record);
+                transferFormRepository.save(transferForm);
+                record.getOperationLogs().add(new WasteRecord.OperationLog(
+                        "释放转运单",
+                        operator,
+                        "因退回释放转运单: " + record.getTransferFormNo()
+                ));
+            }
+        }
 
         record.setReturnReason(returnReason);
         record.setDisposalReason("退回补充: " + returnReason);

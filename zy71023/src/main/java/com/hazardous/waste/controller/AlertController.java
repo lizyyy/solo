@@ -3,7 +3,6 @@ package com.hazardous.waste.controller;
 import com.hazardous.waste.dto.ApiResponse;
 import com.hazardous.waste.entity.AlertRecord;
 import com.hazardous.waste.service.AlertService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,10 +10,9 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/alerts")
-@RequiredArgsConstructor
 public class AlertController {
 
-    private final AlertService alertService;
+    private AlertService alertService;
 
     @GetMapping
     public ApiResponse<List<AlertRecord>> getAllAlerts() {
