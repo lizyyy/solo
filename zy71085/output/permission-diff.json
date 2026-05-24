@@ -1,0 +1,600 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-24T13:01:25.357Z",
+    "tool": "android-permission-diff",
+    "version": "1.0.0"
+  },
+  "versions": {
+    "old": {
+      "source": "/Users/lzy/pro/solo/workspaces/zy71085/examples/old/AndroidManifest.xml",
+      "sourceType": "manifest",
+      "fileName": "AndroidManifest.xml",
+      "appInfo": {
+        "packageName": "com.example.app",
+        "versionCode": "100",
+        "versionName": "1.0.0",
+        "appName": "Example App",
+        "icon": "@mipmap/ic_launcher",
+        "debuggable": false
+      },
+      "sdkInfo": {
+        "minSdkVersion": "21",
+        "targetSdkVersion": "33",
+        "maxSdkVersion": ""
+      }
+    },
+    "new": {
+      "source": "/Users/lzy/pro/solo/workspaces/zy71085/examples/new/AndroidManifest.xml",
+      "sourceType": "manifest",
+      "fileName": "AndroidManifest.xml",
+      "appInfo": {
+        "packageName": "com.example.app",
+        "versionCode": "101",
+        "versionName": "1.1.0",
+        "appName": "Example App",
+        "icon": "@mipmap/ic_launcher",
+        "debuggable": false
+      },
+      "sdkInfo": {
+        "minSdkVersion": "24",
+        "targetSdkVersion": "34",
+        "maxSdkVersion": ""
+      }
+    }
+  },
+  "permissions": {
+    "summary": {
+      "totalOld": 7,
+      "totalNew": 12,
+      "addedCount": 7,
+      "removedCount": 2,
+      "changedCount": 0,
+      "unchangedCount": 5,
+      "risk": {
+        "addedByLevel": {
+          "CRITICAL": 3,
+          "HIGH": 0,
+          "MEDIUM": 1,
+          "LOW": 0,
+          "UNKNOWN": 3
+        },
+        "removedByLevel": {
+          "CRITICAL": 0,
+          "HIGH": 2,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 0
+        },
+        "highestAddedRisk": {
+          "level": 0,
+          "name": "严重",
+          "key": "CRITICAL",
+          "color": "red",
+          "description": "涉及隐私或安全的高危权限，可能导致严重安全事件",
+          "known": true
+        },
+        "hasCriticalAdded": true,
+        "hasHighAdded": true
+      }
+    },
+    "added": [
+      {
+        "name": "android.permission.READ_MEDIA_IMAGES",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": null,
+        "risk": {
+          "level": 4,
+          "name": "未知",
+          "key": "UNKNOWN"
+        },
+        "obfuscated": false,
+        "sources": [
+          {
+            "type": "module",
+            "name": "feature-media",
+            "direct": true,
+            "viaFeature": null
+          }
+        ],
+        "sourceType": "module",
+        "confidence": 0.7
+      },
+      {
+        "name": "android.permission.READ_MEDIA_VIDEO",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": null,
+        "risk": {
+          "level": 4,
+          "name": "未知",
+          "key": "UNKNOWN"
+        },
+        "obfuscated": false,
+        "sources": [
+          {
+            "type": "module",
+            "name": "feature-media",
+            "direct": true,
+            "viaFeature": null
+          }
+        ],
+        "sourceType": "module",
+        "confidence": 0.7
+      },
+      {
+        "name": "android.permission.CAMERA",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": "相机",
+        "risk": {
+          "level": 0,
+          "name": "严重",
+          "key": "CRITICAL"
+        },
+        "obfuscated": false,
+        "sources": [
+          {
+            "type": "module",
+            "name": "feature-camera",
+            "direct": true,
+            "viaFeature": null
+          },
+          {
+            "type": "module",
+            "name": "feature-camera",
+            "direct": false,
+            "viaFeature": "android.hardware.camera"
+          },
+          {
+            "type": "module",
+            "name": "feature-camera",
+            "direct": false,
+            "viaFeature": "android.hardware.camera.autofocus"
+          }
+        ],
+        "sourceType": "module",
+        "confidence": 0.9
+      },
+      {
+        "name": "android.permission.RECORD_AUDIO",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": "麦克风",
+        "risk": {
+          "level": 0,
+          "name": "严重",
+          "key": "CRITICAL"
+        },
+        "obfuscated": false,
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
+      },
+      {
+        "name": "android.permission.ACCESS_FINE_LOCATION",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": "位置信息",
+        "risk": {
+          "level": 0,
+          "name": "严重",
+          "key": "CRITICAL"
+        },
+        "obfuscated": false,
+        "sources": [
+          {
+            "type": "module",
+            "name": "feature-location",
+            "direct": true,
+            "viaFeature": null
+          },
+          {
+            "type": "module",
+            "name": "feature-location",
+            "direct": false,
+            "viaFeature": "android.hardware.location.gps"
+          }
+        ],
+        "sourceType": "module",
+        "confidence": 0.8
+      },
+      {
+        "name": "android.permission.ACCESS_COARSE_LOCATION",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": "位置信息",
+        "risk": {
+          "level": 2,
+          "name": "中",
+          "key": "MEDIUM"
+        },
+        "obfuscated": false,
+        "sources": [
+          {
+            "type": "module",
+            "name": "feature-location",
+            "direct": true,
+            "viaFeature": null
+          }
+        ],
+        "sourceType": "module",
+        "confidence": 0.7
+      },
+      {
+        "name": "android.permission.POST_NOTIFICATIONS",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": null,
+        "risk": {
+          "level": 4,
+          "name": "未知",
+          "key": "UNKNOWN"
+        },
+        "obfuscated": false,
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
+      }
+    ],
+    "removed": [
+      {
+        "name": "android.permission.READ_EXTERNAL_STORAGE",
+        "type": "uses-permission",
+        "maxSdkVersion": "32",
+        "sdk23": false,
+        "group": "存储",
+        "risk": {
+          "level": 1,
+          "name": "高",
+          "key": "HIGH"
+        },
+        "obfuscated": false,
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
+      },
+      {
+        "name": "android.permission.WRITE_EXTERNAL_STORAGE",
+        "type": "uses-permission",
+        "maxSdkVersion": "32",
+        "sdk23": false,
+        "group": "存储",
+        "risk": {
+          "level": 1,
+          "name": "高",
+          "key": "HIGH"
+        },
+        "obfuscated": false,
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
+      }
+    ],
+    "changed": [],
+    "unchanged": [
+      {
+        "name": "android.permission.INTERNET",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": null,
+        "risk": {
+          "level": 3,
+          "name": "低",
+          "key": "LOW"
+        },
+        "obfuscated": false,
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
+      },
+      {
+        "name": "android.permission.ACCESS_NETWORK_STATE",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": null,
+        "risk": {
+          "level": 3,
+          "name": "低",
+          "key": "LOW"
+        },
+        "obfuscated": false,
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
+      },
+      {
+        "name": "android.permission.ACCESS_WIFI_STATE",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": null,
+        "risk": {
+          "level": 3,
+          "name": "低",
+          "key": "LOW"
+        },
+        "obfuscated": false,
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
+      },
+      {
+        "name": "android.permission.VIBRATE",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": null,
+        "risk": {
+          "level": 3,
+          "name": "低",
+          "key": "LOW"
+        },
+        "obfuscated": false,
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
+      },
+      {
+        "name": "android.permission.WAKE_LOCK",
+        "type": "uses-permission",
+        "maxSdkVersion": null,
+        "sdk23": false,
+        "group": null,
+        "risk": {
+          "level": 3,
+          "name": "低",
+          "key": "LOW"
+        },
+        "obfuscated": false,
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
+      }
+    ]
+  },
+  "features": {
+    "summary": {
+      "totalOld": 2,
+      "totalNew": 5,
+      "addedCount": 3,
+      "removedCount": 0,
+      "changedCount": 1
+    },
+    "added": [
+      {
+        "name": "android.hardware.camera.autofocus",
+        "required": true,
+        "glEsVersion": null,
+        "type": "feature",
+        "impliedPermissions": [
+          "android.permission.CAMERA"
+        ]
+      },
+      {
+        "name": "android.hardware.microphone",
+        "required": true,
+        "glEsVersion": null,
+        "type": "feature",
+        "impliedPermissions": [
+          "android.permission.RECORD_AUDIO"
+        ]
+      },
+      {
+        "name": "android.hardware.location.gps",
+        "required": false,
+        "glEsVersion": null,
+        "type": "feature",
+        "impliedPermissions": [
+          "android.permission.ACCESS_FINE_LOCATION"
+        ]
+      }
+    ],
+    "removed": [],
+    "changed": [
+      {
+        "name": "android.hardware.camera",
+        "changes": [
+          {
+            "field": "required",
+            "oldValue": false,
+            "newValue": true
+          }
+        ],
+        "impliedPermissions": [
+          "android.permission.CAMERA"
+        ]
+      }
+    ]
+  },
+  "groups": [
+    {
+      "groupId": "android.permission-group.CAMERA",
+      "groupName": "相机",
+      "added": [
+        "android.permission.CAMERA"
+      ],
+      "removed": [],
+      "totalNew": 1,
+      "totalOld": 0
+    },
+    {
+      "groupId": "android.permission-group.MICROPHONE",
+      "groupName": "麦克风",
+      "added": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "removed": [],
+      "totalNew": 1,
+      "totalOld": 0
+    },
+    {
+      "groupId": "android.permission-group.LOCATION",
+      "groupName": "位置信息",
+      "added": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
+      "removed": [],
+      "totalNew": 2,
+      "totalOld": 0
+    },
+    {
+      "groupId": "android.permission-group.STORAGE",
+      "groupName": "存储",
+      "added": [],
+      "removed": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
+      "totalNew": 0,
+      "totalOld": 2
+    }
+  ],
+  "risk": {
+    "overall": {
+      "hasHighRiskChanges": true,
+      "highestAddedRisk": {
+        "level": 0,
+        "name": "严重",
+        "key": "CRITICAL",
+        "color": "red",
+        "description": "涉及隐私或安全的高危权限，可能导致严重安全事件",
+        "known": true
+      },
+      "needsReview": true
+    },
+    "critical": {
+      "addedCount": 3,
+      "removedCount": 0,
+      "added": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "removed": []
+    },
+    "high": {
+      "addedCount": 0,
+      "removedCount": 2,
+      "added": [],
+      "removed": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "medium": {
+      "addedCount": 1,
+      "removedCount": 0,
+      "added": [
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ],
+      "removed": []
+    },
+    "low": {
+      "addedCount": 0,
+      "removedCount": 0,
+      "added": [],
+      "removed": []
+    },
+    "unknown": {
+      "addedCount": 3,
+      "removedCount": 0,
+      "added": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "removed": []
+    },
+    "recommendations": [
+      {
+        "priority": "critical",
+        "title": "严重权限新增",
+        "description": "新增了 3 个严重权限，需要立即审查这些权限的使用目的和必要性",
+        "permissions": [
+          "android.permission.CAMERA",
+          "android.permission.RECORD_AUDIO",
+          "android.permission.ACCESS_FINE_LOCATION"
+        ]
+      },
+      {
+        "priority": "medium",
+        "title": "未知权限新增",
+        "description": "新增了 3 个未知权限，需要人工确认其来源和用途",
+        "permissions": [
+          "android.permission.READ_MEDIA_IMAGES",
+          "android.permission.READ_MEDIA_VIDEO",
+          "android.permission.POST_NOTIFICATIONS"
+        ]
+      }
+    ]
+  },
+  "sources": {
+    "summary": {
+      "totalOld": 7,
+      "totalNew": 12,
+      "addedCount": 7,
+      "removedCount": 2,
+      "changedCount": 0,
+      "unchangedCount": 5,
+      "risk": {
+        "addedByLevel": {
+          "CRITICAL": 3,
+          "HIGH": 0,
+          "MEDIUM": 1,
+          "LOW": 0,
+          "UNKNOWN": 3
+        },
+        "removedByLevel": {
+          "CRITICAL": 0,
+          "HIGH": 2,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 0
+        },
+        "highestAddedRisk": {
+          "level": 0,
+          "name": "严重",
+          "key": "CRITICAL",
+          "color": "red",
+          "description": "涉及隐私或安全的高危权限，可能导致严重安全事件",
+          "known": true
+        },
+        "hasCriticalAdded": true,
+        "hasHighAdded": true
+      },
+      "withSources": 5,
+      "withoutSources": 2
+    },
+    "injected": {
+      "count": 2,
+      "likelyFromLibraries": 0,
+      "permissions": [
+        {
+          "permission": "android.permission.RECORD_AUDIO",
+          "likelyFromLibrary": false
+        },
+        {
+          "permission": "android.permission.POST_NOTIFICATIONS",
+          "likelyFromLibrary": false
+        }
+      ]
+    }
+  },
+  "obfuscated": {
+    "hasObfuscated": false,
+    "added": [],
+    "removed": []
+  },
+  "exitCode": 11
+}

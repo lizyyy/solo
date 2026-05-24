@@ -1,0 +1,41 @@
+{
+  "name": "android-permission-diff",
+  "version": "1.0.0",
+  "description": "Android APK 权限差异分析 CLI 工具 - 对比不同版本 APK 的权限变化、来源归因与风险评估",
+  "main": "src/cli/index.js",
+  "bin": {
+    "apkd": "./bin/apkd.js",
+    "android-permission-diff": "./bin/apkd.js"
+  },
+  "scripts": {
+    "test": "node --test tests/",
+    "lint": "standard",
+    "lint:fix": "standard --fix",
+    "example:basic": "node bin/apkd.js compare --old ./examples/sample-old.apk --new ./examples/sample-new.apk --output ./output",
+    "example:manifest": "node bin/apkd.js compare --old ./examples/old/AndroidManifest.xml --new ./examples/new/AndroidManifest.xml --modules ./examples/modules --output ./output"
+  },
+  "keywords": [
+    "android",
+    "apk",
+    "permission",
+    "security",
+    "diff",
+    "cli",
+    "audit"
+  ],
+  "author": "Security Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "commander": "^11.1.0",
+    "jszip": "^3.10.1",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "standard": "^17.1.0"
+  }
+}
