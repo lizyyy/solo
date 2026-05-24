@@ -20,17 +20,26 @@ def format_size(size_bytes: int) -> str:
 
 def parse_size(size_str: str) -> int:
     size_str = size_str.strip().upper()
-    units = {
-        "B": 1,
-        "KB": 1024,
-        "MB": 1024 * 1024,
-        "GB": 1024 * 1024 * 1024,
-        "TB": 1024 * 1024 * 1024 * 1024,
-    }
-    for unit, multiplier in units.items():
+    units = [
+        ("TB", 1024 * 1024 * 1024 * 1024),
+        ("GB", 1024 * 1024 * 1024),
+        ("MB", 1024 * 1024),
+        ("KB", 1024),
+        ("B", 1),
+    ]
+    for unit, multiplier in units:
         if size_str.endswith(unit):
-            return int(float(size_str[: -len(unit)]) * multiplier)
-    return int(float(size_str))
+            num_part = size_str[: -len(unit)].strip()
+            if not num_part:
+                raise ValueError(f"无效的尺寸格式: {size_str}")
+            try:
+                return int(float(num_part) * multiplier)
+            except ValueError:
+                raise ValueError(f"无效的尺寸格式: {size_str}")
+    try:
+        return int(float(size_str))
+    except ValueError:
+        raise ValueError(f"无法解析尺寸: {size_str}")
 
 
 def ensure_dir(path: str) -> None:

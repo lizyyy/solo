@@ -1,0 +1,7 @@
+# Layer 清单示例
+768MB sha256:a1b2c3d4 /bin/sh -c #(nop) ADD file:xxx in /
+100MB sha256:d5e6f7a8 /bin/sh -c apt-get update && apt-get install -y build-essential
+600MB sha256:g9h0i1j2 /bin/sh -c pip install torch tensorflow pandas numpy scikit-learn
+1.1GB sha256:k3l4m5n6 /bin/sh -c cp /tmp/model_weights.pt /app/model/
+10MB sha256:o7p8q9r0 /bin/sh -c #(nop) COPY . /app
+512KB sha256:s1t2u3v4 /bin/sh -c #(nop) WORKDIR /app
