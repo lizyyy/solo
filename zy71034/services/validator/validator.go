@@ -55,6 +55,71 @@ func (v *ValidatorService) ValidatePrescription(prescriptionID string) (*models.
 	return result, nil
 }
 
+func (v *ValidatorService) CheckReviewStatus(prescriptionID string) models.CheckResult {
+	prescription, err := database.GetPrescriptionByID(prescriptionID)
+	if err != nil {
+		return models.CheckResult{
+			Passed:  false,
+			Message: "无法查询处方信息",
+			Level:   "error",
+		}
+	}
+
+	if prescription.Status == models.PrescriptionStatusReviewed ||
+		prescription.Status == models.PrescriptionStatusConfirmed ||
+		prescription.Status == models.PrescriptionStatusDispensed ||
+		prescription.Status == models.PrescriptionStatusClosed {
+		return models.CheckResult{
+			Passed:  true,
+			Message: "处方已通过药师审核",
+			Level:   "info",
+		}
+	}
+
+	if prescription.Status == models.PrescriptionStatusRejected {
+		return models.CheckResult{
+			Passed:  false,
+			Message: "处方已被药师驳回，无法继续处理",
+			Level:   "error",
+		}
+	}
+
+	return models.CheckResult{
+		Passed:  false,
+		Message: "处方尚未经过药师审核，请先完成审核流程",
+		Level:   "error",
+	}
+}
+
+func (v *ValidatorService) CanConfirm(prescriptionID string) (bool, string) {
+	prescription, err := database.GetPrescriptionByID(prescriptionID)
+	if err != nil {
+		return false, "无法查询处方信息"
+	}
+
+	if prescription.Status == models.PrescriptionStatusConfirmed {
+		return false, "处方已确认，无需重复确认"
+	}
+
+	if prescription.Status == models.PrescriptionStatusDispensed {
+		return false, "处方已发药，无法再次确认"
+	}
+
+	if prescription.Status == models.PrescriptionStatusClosed {
+		return false, "处方已结案，无法进行确认"
+	}
+
+	if prescription.Status == models.PrescriptionStatusRejected {
+		return false, "处方已被驳回，无法确认"
+	}
+
+	if prescription.Status != models.PrescriptionStatusReviewed {
+		return false, "处方尚未通过药师审核，无法进行患者确认"
+	}
+
+	return true, "可以进行患者确认"
+}
+
 func (v *ValidatorService) checkTimeout(prescription *models.Prescription) models.CheckResult {
 	validityHours := v.cfg.DefaultValidityHours
 	if prescription.ValidityHours > 0 {
@@ -148,6 +213,25 @@ func (v *ValidatorService) checkDuplicateDispensation(prescriptionID string) mod
 }
 
 func (v *ValidatorService) CanDispense(prescriptionID string) (bool, string, error) {
+	reviewCheck := v.CheckReviewStatus(prescriptionID)
+	if !reviewCheck.Passed {
+		return false, reviewCheck.Message, nil
+	}
+
+	prescription, err := database.GetPrescriptionByID(prescriptionID)
+	if err != nil {
+		return false, "无法查询处方信息", err
+	}
+
+	if prescription.Status == models.PrescriptionStatusClosed {
+		return false, "处方已结案，无法发药", nil
+	}
+
+	if prescription.Status != models.PrescriptionStatusConfirmed &&
+		prescription.Status != models.PrescriptionStatusDispensed {
+		return false, "处方尚未经过患者确认，无法发药", nil
+	}
+
 	validation, err := v.ValidatePrescription(prescriptionID)
 	if err != nil {
 		return false, "校验失败", err

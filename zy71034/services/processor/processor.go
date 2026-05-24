@@ -19,11 +19,11 @@ func New(validator *validator.ValidatorService) *ProcessorService {
 }
 
 type CreatePrescriptionRequest struct {
-	Prescription   *models.Prescription
-	Consultation   *models.Consultation
-	Patient        *models.Patient
-	OperatorID     string
-	OperatorName   string
+	Prescription *models.Prescription
+	Consultation *models.Consultation
+	Patient      *models.Patient
+	OperatorID   string
+	OperatorName string
 }
 
 func (p *ProcessorService) CreatePrescription(req *CreatePrescriptionRequest) (*models.Prescription, error) {
@@ -137,6 +137,11 @@ func (p *ProcessorService) ReviewPrescription(prescriptionID, pharmacistID, phar
 }
 
 func (p *ProcessorService) PatientConfirm(prescriptionID, operatorID, operatorName string) error {
+	canConfirm, reason := p.validator.CanConfirm(prescriptionID)
+	if !canConfirm {
+		return fmt.Errorf("无法确认处方: %s", reason)
+	}
+
 	prescription, err := database.GetPrescriptionByID(prescriptionID)
 	if err != nil {
 		return err
