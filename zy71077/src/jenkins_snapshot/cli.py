@@ -55,12 +55,12 @@ def main(ctx, output_dir: str, quiet: bool):
 @click.option(
     '--overwrite',
     is_flag=True,
-    help='覆盖已存在的快照'
+    help='覆盖已存在的快照（包括重跑变体快照）'
 )
 @click.option(
     '--rerun-suffix',
     type=str,
-    help='为重跑创建变体快照，使用指定后缀'
+    help='为重跑创建变体快照，使用指定后缀（相同后缀默认不允许覆盖）'
 )
 @click.option(
     '--copy-artifacts',
@@ -131,15 +131,19 @@ def archive(
         archiver = ParameterArchiver(actual_output_dir)
 
         if rerun_suffix:
-            report, messages = archiver.archive_rerun(
-                record=record,
-                validation=validation,
-                source_file=input_file,
-                suffix=rerun_suffix,
-                copy_artifacts=copy_artifacts,
-                artifact_base_dir=artifact_base_dir,
-            )
-            created = True
+            try:
+                report, created, messages = archiver.archive_rerun(
+                    record=record,
+                    validation=validation,
+                    source_file=input_file,
+                    suffix=rerun_suffix,
+                    overwrite=overwrite,
+                    copy_artifacts=copy_artifacts,
+                    artifact_base_dir=artifact_base_dir,
+                )
+            except FileExistsError as e:
+                console.print(f"[red]错误:[/red] {e}")
+                sys.exit(EXIT_ERROR)
         else:
             try:
                 report, created, messages = archiver.archive_build(
@@ -158,12 +162,18 @@ def archive(
             report.notes = messages
             if not quiet:
                 console.print()
-                console.print(Panel("📋 快照已存在，跳过归档", style="bold yellow"))
+                if rerun_suffix:
+                    console.print(Panel("📋 重跑快照已存在，跳过归档", style="bold yellow"))
+                else:
+                    console.print(Panel("📋 快照已存在，跳过归档", style="bold yellow"))
                 for msg in messages:
                     console.print(f"  {msg}")
                 console.print()
                 console.print(f"[yellow]如需查看现有快照详情，请使用:[/yellow]")
-                console.print(f"  jenkins-snapshot show \"{record.job_name}\" {record.build_number}")
+                if rerun_suffix:
+                    console.print(f"  jenkins-snapshot show \"{record.job_name}\" {record.build_number} --rerun-suffix {rerun_suffix}")
+                else:
+                    console.print(f"  jenkins-snapshot show \"{record.job_name}\" {record.build_number}")
                 console.print()
         else:
             if compare_with:

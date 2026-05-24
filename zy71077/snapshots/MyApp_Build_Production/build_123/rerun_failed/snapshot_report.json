@@ -1,7 +1,7 @@
 {
   "metadata": {
     "snapshot_id": "9c5f63327796fed6",
-    "created_at": "2026-05-24 22:54:24.823874",
+    "created_at": "2026-05-24 23:22:23.373892",
     "tool_version": "1.0.0",
     "input_source": "examples/build_record_123.json",
     "output_format": "json"
@@ -96,6 +96,7 @@
   },
   "diff": null,
   "notes": [
-    "Rerun snapshot, suffix: failed"
+    "Overwriting existing rerun snapshot with suffix: failed",
+    "Original snapshot found, this is a rerun variant"
   ]
 }

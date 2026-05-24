@@ -151,18 +151,35 @@ class ParameterArchiver:
         validation: SnapshotValidationResult,
         source_file: Optional[str] = None,
         suffix: Optional[str] = None,
+        overwrite: bool = False,
         copy_artifacts: bool = False,
         artifact_base_dir: Optional[str] = None,
-    ) -> Tuple[SnapshotReport, List[str]]:
+    ) -> Tuple[SnapshotReport, bool, List[str]]:
         if not suffix:
             suffix = datetime.now().strftime("%Y%m%d_%H%M%S")
         
         build_dir = self._get_build_dir(record.job_name, record.build_number)
         rerun_dir = build_dir / f"rerun_{suffix}"
+        
+        existed = rerun_dir.exists()
+        messages: List[str] = []
+        
+        if existed and not overwrite:
+            messages.append("⚠️  重跑快照已存在，跳过归档操作")
+            messages.append(f"📂 已存在重跑快照目录: {rerun_dir}")
+            messages.append(f"💡 如需覆盖现有重跑快照，请使用: --overwrite")
+            messages.append(f"💡 如需创建新的重跑变体，请使用不同的: --rerun-suffix <新后缀名>")
+            existing_report = self._load_existing_report(rerun_dir)
+            if existing_report:
+                return existing_report, False, messages
+            raise FileExistsError(f"Rerun snapshot with suffix '{suffix}' already exists. Use --overwrite to force update or use a different --rerun-suffix")
+
         rerun_dir.mkdir(parents=True, exist_ok=True)
         
-        messages: List[str] = []
-        messages.append(f"Creating rerun snapshot with suffix: {suffix}")
+        if existed and overwrite:
+            messages.append(f"Overwriting existing rerun snapshot with suffix: {suffix}")
+        else:
+            messages.append(f"Creating rerun snapshot with suffix: {suffix}")
         
         original_report = self._load_existing_report(build_dir)
         if original_report:
@@ -210,7 +227,7 @@ class ParameterArchiver:
             metadata=metadata,
             build=record,
             validation=validation,
-            notes=[f"Rerun snapshot, suffix: {suffix}"],
+            notes=messages.copy(),
         )
 
         report_file = rerun_dir / "snapshot_report.json"
@@ -224,7 +241,8 @@ class ParameterArchiver:
             )
         
         messages.append(f"Rerun snapshot saved: {report_file}")
-        return report, messages
+        report.notes.append(f"Rerun snapshot saved: {report_file}")
+        return report, True, messages
 
     def _load_existing_report(self, build_dir: Path) -> Optional[SnapshotReport]:
         report_file = build_dir / "snapshot_report.json"
