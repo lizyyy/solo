@@ -212,44 +212,91 @@ func (v *ValidatorService) checkDuplicateDispensation(prescriptionID string) mod
 	}
 }
 
+type DispenseCheckResult struct {
+	CanDispense    bool
+	Reason         string
+	InterceptLevel string
+}
+
 func (v *ValidatorService) CanDispense(prescriptionID string) (bool, string, error) {
+	result := v.CheckDispense(prescriptionID)
+	return result.CanDispense, result.Reason, nil
+}
+
+func (v *ValidatorService) CheckDispense(prescriptionID string) DispenseCheckResult {
 	reviewCheck := v.CheckReviewStatus(prescriptionID)
 	if !reviewCheck.Passed {
-		return false, reviewCheck.Message, nil
+		return DispenseCheckResult{
+			CanDispense:    false,
+			Reason:         reviewCheck.Message,
+			InterceptLevel: models.InterceptLevelCritical,
+		}
 	}
 
 	prescription, err := database.GetPrescriptionByID(prescriptionID)
 	if err != nil {
-		return false, "无法查询处方信息", err
+		return DispenseCheckResult{
+			CanDispense:    false,
+			Reason:         "无法查询处方信息",
+			InterceptLevel: models.InterceptLevelCritical,
+		}
 	}
 
 	if prescription.Status == models.PrescriptionStatusClosed {
-		return false, "处方已结案，无法发药", nil
+		return DispenseCheckResult{
+			CanDispense:    false,
+			Reason:         "处方已结案，无法发药",
+			InterceptLevel: models.InterceptLevelCritical,
+		}
 	}
 
 	if prescription.Status != models.PrescriptionStatusConfirmed &&
 		prescription.Status != models.PrescriptionStatusDispensed {
-		return false, "处方尚未经过患者确认，无法发药", nil
+		return DispenseCheckResult{
+			CanDispense:    false,
+			Reason:         "处方尚未经过患者确认，无法发药",
+			InterceptLevel: models.InterceptLevelCritical,
+		}
 	}
 
 	validation, err := v.ValidatePrescription(prescriptionID)
 	if err != nil {
-		return false, "校验失败", err
+		return DispenseCheckResult{
+			CanDispense:    false,
+			Reason:         "校验失败",
+			InterceptLevel: models.InterceptLevelCritical,
+		}
 	}
 
 	if !validation.TimeoutCheck.Passed {
-		return false, validation.TimeoutCheck.Message, nil
+		return DispenseCheckResult{
+			CanDispense:    false,
+			Reason:         validation.TimeoutCheck.Message,
+			InterceptLevel: models.InterceptLevelWarning,
+		}
 	}
 
 	if !validation.PatientConfirmCheck.Passed {
-		return false, validation.PatientConfirmCheck.Message, nil
+		return DispenseCheckResult{
+			CanDispense:    false,
+			Reason:         validation.PatientConfirmCheck.Message,
+			InterceptLevel: models.InterceptLevelWarning,
+		}
 	}
 
 	if !validation.DuplicateCheck.Passed {
-		return false, validation.DuplicateCheck.Message, nil
+		return DispenseCheckResult{
+			CanDispense:    false,
+			Reason:         validation.DuplicateCheck.Message,
+			InterceptLevel: models.InterceptLevelWarning,
+		}
 	}
 
-	return true, "可以发药", nil
+	return DispenseCheckResult{
+		CanDispense:    true,
+		Reason:         "可以发药",
+		InterceptLevel: "",
+	}
 }
 
 func (v *ValidatorService) GetValidityDeadline(prescription *models.Prescription) time.Time {

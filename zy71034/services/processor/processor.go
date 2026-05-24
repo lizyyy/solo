@@ -177,9 +177,16 @@ func (p *ProcessorService) PatientConfirm(prescriptionID, operatorID, operatorNa
 }
 
 func (p *ProcessorService) DispenseDrug(prescriptionID, pharmacistID, pharmacistName, drugItems string, manualOverride bool, overrideReason string) (*models.DrugDispensation, error) {
-	canDispense, reason, err := p.validator.CanDispense(prescriptionID)
-	if err != nil {
-		return nil, err
+	checkResult := p.validator.CheckDispense(prescriptionID)
+	canDispense := checkResult.CanDispense
+	reason := checkResult.Reason
+	interceptLevel := checkResult.InterceptLevel
+
+	isCriticalBlock := !canDispense && interceptLevel == models.InterceptLevelCritical
+
+	if isCriticalBlock && manualOverride {
+		manualOverride = false
+		reason = reason + "（核心风控拦截，不允许人工放行）"
 	}
 
 	dispensation := &models.DrugDispensation{
@@ -192,6 +199,7 @@ func (p *ProcessorService) DispenseDrug(prescriptionID, pharmacistID, pharmacist
 		IsDuplicate:        false,
 		Intercepted:        !canDispense && !manualOverride,
 		InterceptReason:    reason,
+		InterceptLevel:     interceptLevel,
 		ManualOverride:     manualOverride,
 		OverrideOperatorID: pharmacistID,
 		OverrideReason:     overrideReason,
@@ -219,11 +227,15 @@ func (p *ProcessorService) DispenseDrug(prescriptionID, pharmacistID, pharmacist
 				return nil, err
 			}
 		} else {
+			interceptMsg := reason
+			if isCriticalBlock {
+				interceptMsg = reason + "（核心风控拦截）"
+			}
 			if err := p.logAction(&models.ProcessingLog{
 				ID:              uuid.New().String(),
 				PrescriptionID:  prescriptionID,
 				ActionType:      models.ActionTypeIntercept,
-				ActionDetail:    fmt.Sprintf("拦截发药: %s", reason),
+				ActionDetail:    fmt.Sprintf("拦截发药: %s", interceptMsg),
 				OperatorID:      pharmacistID,
 				OperatorName:    pharmacistName,
 				IsManualConfirm: false,
