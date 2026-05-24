@@ -68,7 +68,7 @@ secrets:
   jwt_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
 slack:
-  webhook: "REDACTED_SLACK_WEBHOOK_URL"
+  webhook: "https://example.com/redacted-slack-webhook"
 
 git:
   clone_url: "https://deploy:mysecretpassword@github.com/org/repo.git"
