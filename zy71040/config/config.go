@@ -7,7 +7,7 @@ type Config struct {
 
 func Load() *Config {
 	return &Config{
-		Port:   "8099",
+		Port:   "8080",
 		DBPath: "./warranty.db",
 	}
 }
