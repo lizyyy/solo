@@ -1,0 +1,26 @@
+[
+  {
+    "name": "app.tar.gz",
+    "path": "dist/app.tar.gz",
+    "size": 15420000,
+    "sha256": null,
+    "exists": true,
+    "missing_reason": null
+  },
+  {
+    "name": "build.log",
+    "path": "logs/build.log",
+    "size": 245678,
+    "sha256": null,
+    "exists": true,
+    "missing_reason": null
+  },
+  {
+    "name": "test-report.xml",
+    "path": "reports/test-report.xml",
+    "size": 0,
+    "sha256": null,
+    "exists": false,
+    "missing_reason": "测试未执行"
+  }
+]

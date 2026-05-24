@@ -1,0 +1,98 @@
+{
+  "metadata": {
+    "snapshot_id": "df01c99ff7d51b61",
+    "created_at": "2026-05-24 20:39:00.353450",
+    "tool_version": "1.0.0",
+    "input_source": "examples/build_record_124.json",
+    "output_format": "json"
+  },
+  "build": {
+    "job_name": "MyApp/Build/Production",
+    "build_number": 124,
+    "status": "SUCCESS",
+    "timestamp": "2024-05-27 16:00:00",
+    "duration_ms": 98000,
+    "triggered_by": "李四",
+    "parameters": [
+      {
+        "name": "ENVIRONMENT",
+        "value": "production",
+        "type": "CHOICE",
+        "description": "部署环境"
+      },
+      {
+        "name": "BUILD_VERSION",
+        "value": "v2.3.2",
+        "type": "STRING",
+        "description": "构建版本号"
+      },
+      {
+        "name": "ENABLE_CACHE",
+        "value": "false",
+        "type": "BOOLEAN",
+        "description": "是否启用构建缓存"
+      },
+      {
+        "name": "DEPLOY_TARGETS",
+        "value": "web,api",
+        "type": "STRING",
+        "description": "部署目标服务"
+      },
+      {
+        "name": "NEW_FEATURE_FLAG",
+        "value": "enabled",
+        "type": "STRING",
+        "description": "新功能开关"
+      }
+    ],
+    "artifacts": [
+      {
+        "name": "app.tar.gz",
+        "path": "dist/app.tar.gz",
+        "size": 15680000,
+        "sha256": null,
+        "exists": true,
+        "missing_reason": null
+      },
+      {
+        "name": "build.log",
+        "path": "logs/build.log",
+        "size": 198765,
+        "sha256": null,
+        "exists": true,
+        "missing_reason": null
+      },
+      {
+        "name": "test-report.xml",
+        "path": "reports/test-report.xml",
+        "size": 567890,
+        "sha256": null,
+        "exists": true,
+        "missing_reason": null
+      }
+    ],
+    "git_info": {
+      "commit": "b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1",
+      "branch": "main",
+      "url": "https://git.example.com/myapp.git",
+      "message": "fix: 修复构建缓存问题",
+      "author": "李四 <lisi@example.com>"
+    },
+    "description": "修复缓存问题后重新构建成功",
+    "url": "https://jenkins.example.com/job/MyApp/job/Build/job/Production/124/",
+    "is_rerun": false,
+    "rerun_of": null
+  },
+  "validation": {
+    "valid": true,
+    "errors": [],
+    "warnings": []
+  },
+  "diff": null,
+  "notes": [
+    "Parameters archived: snapshots/MyApp_Build_Production/build_124/parameters.json",
+    "Artifact manifest saved: snapshots/MyApp_Build_Production/build_124/artifacts.json",
+    "Build info saved: snapshots/MyApp_Build_Production/build_124/build_info.json",
+    "Source input preserved: snapshots/MyApp_Build_Production/build_124/source_input.json"
+  ]
+}

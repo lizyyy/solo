@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+src/jenkins_snapshot/__init__.py
+src/jenkins_snapshot/archiver.py
+src/jenkins_snapshot/cli.py
+src/jenkins_snapshot/models.py
+src/jenkins_snapshot/reader.py
+src/jenkins_snapshot/reporter.py
+src/jenkins_snapshot/validator.py
+src/jenkins_snapshot.egg-info/PKG-INFO
+src/jenkins_snapshot.egg-info/SOURCES.txt
+src/jenkins_snapshot.egg-info/dependency_links.txt
+src/jenkins_snapshot.egg-info/entry_points.txt
+src/jenkins_snapshot.egg-info/requires.txt
+src/jenkins_snapshot.egg-info/top_level.txt
+tests/test_models.py
