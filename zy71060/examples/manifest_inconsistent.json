@@ -115,25 +115,6 @@
               }
             }
           ]
-        },
-        {
-          "file_id": "config-archive-20240115",
-          "file_name": "configs.tar.gz",
-          "total_size": 8200,
-          "expected_chunks": 1,
-          "checksums": {
-            "md5": "45999720212fb5e635816ac9b5cf6b6b"
-          },
-          "chunks": [
-            {
-              "chunk_id": "config-chunk-001",
-              "part_number": 1,
-              "size": 8200,
-              "checksums": {
-                "md5": "45999720212fb5e635816ac9b5cf6b6b"
-              }
-            }
-          ]
         }
       ]
     }

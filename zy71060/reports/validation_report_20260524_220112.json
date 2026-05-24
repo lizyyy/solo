@@ -1,0 +1,196 @@
+{
+  "report_id": "f8bf7e75-569f-4c4f-a5e2-d726b5503ba8",
+  "generated_at": "2026-05-24T22:01:12.771186",
+  "manifest_id": "backup-2024-01-15-001",
+  "summary": {},
+  "files_checked": 0,
+  "chunks_checked": 0,
+  "issues": [],
+  "region_comparison": {
+    "regions": [
+      "cn-north-1",
+      "cn-south-1"
+    ],
+    "files_comparison": {
+      "config-archive-20240115": {
+        "file_id": "config-archive-20240115",
+        "present_in": [
+          "cn-north-1",
+          "cn-south-1"
+        ],
+        "missing_in": [],
+        "size_consistent": true,
+        "chunk_count_consistent": true,
+        "has_differences": false,
+        "details": {
+          "cn-north-1": {
+            "file_name": "configs.tar.gz",
+            "total_size": 8200,
+            "chunk_count": 1,
+            "status": "ok"
+          },
+          "cn-south-1": {
+            "file_name": "configs.tar.gz",
+            "total_size": 8200,
+            "chunk_count": 1,
+            "status": "ok"
+          }
+        }
+      },
+      "database-full-20240115": {
+        "file_id": "database-full-20240115",
+        "present_in": [
+          "cn-north-1",
+          "cn-south-1"
+        ],
+        "missing_in": [],
+        "size_consistent": true,
+        "chunk_count_consistent": true,
+        "has_differences": false,
+        "details": {
+          "cn-north-1": {
+            "file_name": "database_dump.sql",
+            "total_size": 144500,
+            "chunk_count": 3,
+            "status": "ok"
+          },
+          "cn-south-1": {
+            "file_name": "database_dump.sql",
+            "total_size": 144500,
+            "chunk_count": 3,
+            "status": "ok"
+          }
+        }
+      }
+    },
+    "chunks_comparison": {
+      "database-full-20240115:2": {
+        "chunk_key": "database-full-20240115:2",
+        "present_in": [
+          "cn-north-1",
+          "cn-south-1"
+        ],
+        "missing_in": [],
+        "size_consistent": true,
+        "checksum_consistent": true,
+        "has_differences": false,
+        "details": {
+          "cn-north-1": {
+            "chunk_id": "chunk-002",
+            "size": 52000,
+            "status": "ok",
+            "checksums": {
+              "md5": "ee8c4379ba68ed0d05e1232a68449e54",
+              "sha256": "15c8b597106462d462282afc4287a87389592bb807fcafd043efadbb46e145f1"
+            }
+          },
+          "cn-south-1": {
+            "chunk_id": "chunk-002",
+            "size": 52000,
+            "status": "ok",
+            "checksums": {
+              "md5": "ee8c4379ba68ed0d05e1232a68449e54"
+            }
+          }
+        }
+      },
+      "database-full-20240115:3": {
+        "chunk_key": "database-full-20240115:3",
+        "present_in": [
+          "cn-north-1",
+          "cn-south-1"
+        ],
+        "missing_in": [],
+        "size_consistent": true,
+        "checksum_consistent": true,
+        "has_differences": false,
+        "details": {
+          "cn-north-1": {
+            "chunk_id": "chunk-003",
+            "size": 25500,
+            "status": "ok",
+            "checksums": {
+              "md5": "62e1808c8df5f5bcc7773ee14e4fac33",
+              "sha256": "04fa07be94f86d6bfdd59333a71e957d00480c6d1454dfc343cd40cb6ccfdb25"
+            }
+          },
+          "cn-south-1": {
+            "chunk_id": "chunk-003",
+            "size": 25500,
+            "status": "ok",
+            "checksums": {
+              "md5": "62e1808c8df5f5bcc7773ee14e4fac33"
+            }
+          }
+        }
+      },
+      "config-archive-20240115:1": {
+        "chunk_key": "config-archive-20240115:1",
+        "present_in": [
+          "cn-north-1",
+          "cn-south-1"
+        ],
+        "missing_in": [],
+        "size_consistent": true,
+        "checksum_consistent": true,
+        "has_differences": false,
+        "details": {
+          "cn-north-1": {
+            "chunk_id": "config-chunk-001",
+            "size": 8200,
+            "status": "ok",
+            "checksums": {
+              "md5": "45999720212fb5e635816ac9b5cf6b6b"
+            }
+          },
+          "cn-south-1": {
+            "chunk_id": "config-chunk-001",
+            "size": 8200,
+            "status": "ok",
+            "checksums": {
+              "md5": "45999720212fb5e635816ac9b5cf6b6b"
+            }
+          }
+        }
+      },
+      "database-full-20240115:1": {
+        "chunk_key": "database-full-20240115:1",
+        "present_in": [
+          "cn-north-1",
+          "cn-south-1"
+        ],
+        "missing_in": [],
+        "size_consistent": true,
+        "checksum_consistent": true,
+        "has_differences": false,
+        "details": {
+          "cn-north-1": {
+            "chunk_id": "chunk-001",
+            "size": 67000,
+            "status": "ok",
+            "checksums": {
+              "md5": "6abe1dd4350c73f603e03be2cb222508",
+              "sha256": "76a0b970bb1e31b3b31c2076825cba03ff66c049f2677df97d3473d3fec3ff7c"
+            }
+          },
+          "cn-south-1": {
+            "chunk_id": "chunk-001",
+            "size": 67000,
+            "status": "ok",
+            "checksums": {
+              "md5": "6abe1dd4350c73f603e03be2cb222508"
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "total_files_checked": 2,
+      "files_with_differences": 0,
+      "total_chunks_checked": 8,
+      "chunks_with_differences": 0,
+      "missing_in_regions": {}
+    }
+  },
+  "duration_seconds": 0.0026619434356689453
+}

@@ -50,7 +50,9 @@ class RegionComparer:
 
             comparison_result["summary"]["total_files_checked"] += 1
 
-        comparison_result["chunks_comparison"] = self._compare_chunks(manifest, regions)
+        chunks_comparison, chunk_issues = self._compare_chunks(manifest, regions)
+        comparison_result["chunks_comparison"] = chunks_comparison
+        issues.extend(chunk_issues)
 
         for region in regions:
             region_copy = manifest.regions[region]
@@ -132,7 +134,7 @@ class RegionComparer:
             file_info["chunk_count_consistent"] = False
             file_info["has_differences"] = True
             issues.append(ValidationIssue(
-                severity="warning",
+                severity="error",
                 code="file_chunk_count_inconsistent",
                 message=f"File chunk count inconsistent across regions",
                 file_id=file_id,
@@ -145,8 +147,9 @@ class RegionComparer:
         self,
         manifest: Manifest,
         regions: List[str]
-    ) -> Dict[str, Any]:
+    ) -> Tuple[Dict[str, Any], List[ValidationIssue]]:
         chunks_comparison = {}
+        issues: List[ValidationIssue] = []
 
         all_chunk_keys = set()
         chunk_locations: Dict[str, List[Tuple[str, str, Chunk]]] = defaultdict(list)
@@ -161,15 +164,19 @@ class RegionComparer:
 
         for chunk_key in all_chunk_keys:
             locations = chunk_locations[chunk_key]
-            chunks_comparison[chunk_key] = self._compare_single_chunk(chunk_key, locations)
+            chunk_result, chunk_issues = self._compare_single_chunk(chunk_key, locations, regions)
+            chunks_comparison[chunk_key] = chunk_result
+            issues.extend(chunk_issues)
 
-        return chunks_comparison
+        return chunks_comparison, issues
 
     def _compare_single_chunk(
         self,
         chunk_key: str,
-        locations: List[Tuple[str, str, Chunk]]
-    ) -> Dict[str, Any]:
+        locations: List[Tuple[str, str, Chunk]],
+        all_regions: List[str]
+    ) -> Tuple[Dict[str, Any], List[ValidationIssue]]:
+        issues: List[ValidationIssue] = []
         result = {
             "chunk_key": chunk_key,
             "present_in": [],
@@ -183,9 +190,11 @@ class RegionComparer:
         present_regions = set()
         sizes = {}
         checksums_by_algo: Dict[ChecksumAlgorithm, Dict[str, str]] = defaultdict(dict)
+        file_id = None
 
-        for region, file_id, chunk in locations:
+        for region, fid, chunk in locations:
             present_regions.add(region)
+            file_id = fid
             sizes[region] = chunk.size
             result["details"][region] = {
                 "chunk_id": chunk.chunk_id,
@@ -197,21 +206,55 @@ class RegionComparer:
             for cs in chunk.checksums:
                 checksums_by_algo[cs.algorithm][region] = cs.value
 
-        all_regions = set(r for r, _, _ in locations)
+        missing_regions = [r for r in all_regions if r not in present_regions]
+        result["present_in"] = list(present_regions)
+        result["missing_in"] = missing_regions
+
+        if missing_regions:
+            result["has_differences"] = True
+            for region in missing_regions:
+                issues.append(ValidationIssue(
+                    severity="error",
+                    code="chunk_missing_in_region",
+                    message=f"Chunk '{chunk_key}' missing in region '{region}'",
+                    file_id=file_id,
+                    chunk_id=chunk_key,
+                    region=region,
+                    details={
+                        "present_in": list(present_regions),
+                        "missing_in": missing_regions
+                    }
+                ))
 
         sizes_set = set(sizes.values())
         if len(sizes_set) > 1:
             result["size_consistent"] = False
             result["has_differences"] = True
+            issues.append(ValidationIssue(
+                severity="error",
+                code="chunk_size_inconsistent",
+                message=f"Chunk size inconsistent across regions: {chunk_key}",
+                file_id=file_id,
+                chunk_id=chunk_key,
+                details={"sizes_by_region": sizes}
+            ))
 
         for algo, region_checksums in checksums_by_algo.items():
             unique_checksums = set(region_checksums.values())
             if len(unique_checksums) > 1:
                 result["checksum_consistent"] = False
                 result["has_differences"] = True
+                issues.append(ValidationIssue(
+                    severity="error",
+                    code="chunk_checksum_inconsistent",
+                    message=f"Chunk checksum inconsistent across regions: {chunk_key}",
+                    file_id=file_id,
+                    chunk_id=chunk_key,
+                    details={
+                        "algorithm": algo.value,
+                        "checksums_by_region": region_checksums
+                    }
+                ))
                 break
 
-        if len(present_regions) < len(all_regions):
-            result["has_differences"] = True
-
-        return result
+        return result, issues
