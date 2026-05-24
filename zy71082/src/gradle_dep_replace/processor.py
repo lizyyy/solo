@@ -27,12 +27,49 @@ class DependencyProcessor:
         self.all_dependencies: List[DependencyCoordinate] = []
         self.all_plugins: List[DependencyCoordinate] = []
         self.conflicts: List[Conflict] = []
+        self.gradle_original_deps: List[DependencyCoordinate] = []
+        self.gradle_replaced_deps: List[DependencyCoordinate] = []
+
+    def _apply_rules_to_dep(self, dep: DependencyCoordinate) -> Tuple[DependencyCoordinate, List[str]]:
+        current = dep
+        applied_rules = []
+        max_iterations = 10
+        iterations = 0
+
+        while iterations < max_iterations:
+            applied = False
+            for rule in self.rules:
+                if rule.id in applied_rules:
+                    continue
+                if rule.matches(current):
+                    new_dep = rule.apply(current)
+                    if new_dep != current:
+                        current = new_dep
+                        applied_rules.append(rule.id)
+                        applied = True
+                        break
+            if not applied:
+                break
+            iterations += 1
+
+        return current, applied_rules
 
     def collect_all_dependencies(self) -> None:
         for gf in self.gradle_files:
-            self.all_dependencies.extend(gf.dependencies)
-            self.all_plugins.extend(gf.plugins)
-            self.all_dependencies.extend(gf.platforms)
+            for dep in gf.dependencies:
+                self.gradle_original_deps.append(dep)
+                replaced_dep, _ = self._apply_rules_to_dep(dep)
+                self.gradle_replaced_deps.append(replaced_dep)
+                self.all_dependencies.append(replaced_dep)
+
+            for plugin in gf.plugins:
+                self.all_plugins.append(plugin)
+
+            for platform in gf.platforms:
+                self.gradle_original_deps.append(platform)
+                replaced_dep, _ = self._apply_rules_to_dep(platform)
+                self.gradle_replaced_deps.append(replaced_dep)
+                self.all_dependencies.append(replaced_dep)
 
         for vc in self.version_catalogs:
             for lib_name, lib in vc.libraries.items():
@@ -122,9 +159,9 @@ class DependencyProcessor:
     def apply_replacements(self, dependencies: List[DependencyCoordinate]) -> ReplacementResult:
         result = ReplacementResult()
 
-        for dep in dependencies:
-            chain = ReplacementChain(original=dep)
-            current = dep
+        for original_dep in self.gradle_original_deps:
+            chain = ReplacementChain(original=original_dep)
+            current = original_dep
 
             max_iterations = 10
             iterations = 0
@@ -154,16 +191,16 @@ class DependencyProcessor:
 
                 if iterations >= max_iterations:
                     result.warnings.append(
-                        f"依赖 {dep.full_coordinate} 可能存在替换循环，已停止继续应用规则"
+                        f"依赖 {original_dep.full_coordinate} 可能存在替换循环，已停止继续应用规则"
                     )
                     self.conflicts.append(
                         Conflict(
-                            id=f"cycle-{hashlib.md5(dep.full_coordinate.encode()).hexdigest()[:8]}",
+                            id=f"cycle-{hashlib.md5(original_dep.full_coordinate.encode()).hexdigest()[:8]}",
                             type=ConflictType.REPLACEMENT_CYCLE,
                             severity=ConflictSeverity.WARNING,
-                            message=f"依赖 {dep.full_coordinate} 可能存在替换循环",
-                            dependencies=[dep],
-                            source_files=[dep.source_file] if dep.source_file else [],
+                            message=f"依赖 {original_dep.full_coordinate} 可能存在替换循环",
+                            dependencies=[original_dep],
+                            source_files=[original_dep.source_file] if original_dep.source_file else [],
                             suggestion="检查替换规则，避免循环依赖",
                         )
                     )

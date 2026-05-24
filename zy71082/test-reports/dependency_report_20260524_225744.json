@@ -1,0 +1,2249 @@
+{
+  "metadata": {
+    "tool_name": "gradle-dep-replace",
+    "tool_version": "0.1.0",
+    "timestamp": "2026-05-24T22:57:44.250745",
+    "input_files": [
+      "examples/build.gradle",
+      "examples/libs.versions.toml",
+      "examples/replacement-rules.yaml"
+    ],
+    "output_directory": "/Users/lzy/pro/solo/workspaces/zy71082/test-reports",
+    "command_line": "/Users/lzy/pro/solo/workspaces/zy71082/src/gradle_dep_replace/cli.py analyze -g examples/build.gradle -c examples/libs.versions.toml -r examples/replacement-rules.yaml -v -o ./test-reports",
+    "duration_ms": 10
+  },
+  "statistics": {
+    "total_dependencies": 41,
+    "total_plugins": 7,
+    "changed_dependencies": 0,
+    "unchanged_dependencies": 23,
+    "dynamic_versions": 0,
+    "conflicts_found": 28,
+    "critical_conflicts": 0,
+    "error_conflicts": 0,
+    "warning_conflicts": 28,
+    "info_conflicts": 0,
+    "rules_applied": 0
+  },
+  "exit_code_info": {
+    "code": 0,
+    "name": "SUCCESS",
+    "description": "执行成功，没有错误或冲突"
+  },
+  "replacement_result": {
+    "timestamp": "2026-05-24T22:57:44.260210",
+    "total_dependencies": 23,
+    "changed_dependencies": 0,
+    "unchanged_dependencies": 23,
+    "success": true,
+    "chains": [
+      {
+        "original": {
+          "group": "androidx.core",
+          "name": "core-ktx",
+          "version": "1.12.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 36,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.core:core-ktx",
+          "full_coordinate": "androidx.core:core-ktx:1.12.0"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.core",
+          "name": "core-ktx",
+          "version": "1.12.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 36,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.core:core-ktx",
+          "full_coordinate": "androidx.core:core-ktx:1.12.0"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "androidx.appcompat",
+          "name": "appcompat",
+          "version": "1.6.1",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 37,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.appcompat:appcompat",
+          "full_coordinate": "androidx.appcompat:appcompat:1.6.1"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.appcompat",
+          "name": "appcompat",
+          "version": "1.6.1",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 37,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.appcompat:appcompat",
+          "full_coordinate": "androidx.appcompat:appcompat:1.6.1"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "com.google.android.material",
+          "name": "material",
+          "version": "1.11.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 38,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.google.android.material:material",
+          "full_coordinate": "com.google.android.material:material:1.11.0"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "com.google.android.material",
+          "name": "material",
+          "version": "1.11.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 38,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.google.android.material:material",
+          "full_coordinate": "com.google.android.material:material:1.11.0"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "androidx.constraintlayout",
+          "name": "constraintlayout",
+          "version": "2.1.4",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 39,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.constraintlayout:constraintlayout",
+          "full_coordinate": "androidx.constraintlayout:constraintlayout:2.1.4"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.constraintlayout",
+          "name": "constraintlayout",
+          "version": "2.1.4",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 39,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.constraintlayout:constraintlayout",
+          "full_coordinate": "androidx.constraintlayout:constraintlayout:2.1.4"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "androidx.recyclerview",
+          "name": "recyclerview",
+          "version": "1.3.2",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 40,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.recyclerview:recyclerview",
+          "full_coordinate": "androidx.recyclerview:recyclerview:1.3.2"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.recyclerview",
+          "name": "recyclerview",
+          "version": "1.3.2",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 40,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.recyclerview:recyclerview",
+          "full_coordinate": "androidx.recyclerview:recyclerview:1.3.2"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "org.jetbrains.kotlin",
+          "name": "kotlin-stdlib-jdk8",
+          "version": "1.9.20",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+          "full_coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.20"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "org.jetbrains.kotlin",
+          "name": "kotlin-stdlib-jdk8",
+          "version": "1.9.20",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+          "full_coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.20"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "org.jetbrains.kotlinx",
+          "name": "kotlinx-coroutines-core",
+          "version": "1.7.3",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 43,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+          "full_coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "org.jetbrains.kotlinx",
+          "name": "kotlinx-coroutines-core",
+          "version": "1.7.3",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 43,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+          "full_coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "org.jetbrains.kotlinx",
+          "name": "kotlinx-coroutines-android",
+          "version": "1.7.3",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 44,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+          "full_coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "org.jetbrains.kotlinx",
+          "name": "kotlinx-coroutines-android",
+          "version": "1.7.3",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 44,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+          "full_coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "com.squareup.retrofit2",
+          "name": "retrofit",
+          "version": "2.9.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 46,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.squareup.retrofit2:retrofit",
+          "full_coordinate": "com.squareup.retrofit2:retrofit:2.9.0"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "com.squareup.retrofit2",
+          "name": "retrofit",
+          "version": "2.9.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 46,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.squareup.retrofit2:retrofit",
+          "full_coordinate": "com.squareup.retrofit2:retrofit:2.9.0"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "com.squareup.retrofit2",
+          "name": "converter-gson",
+          "version": "2.9.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 47,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.squareup.retrofit2:converter-gson",
+          "full_coordinate": "com.squareup.retrofit2:converter-gson:2.9.0"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "com.squareup.retrofit2",
+          "name": "converter-gson",
+          "version": "2.9.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 47,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.squareup.retrofit2:converter-gson",
+          "full_coordinate": "com.squareup.retrofit2:converter-gson:2.9.0"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "com.squareup.okhttp3",
+          "name": "okhttp",
+          "version": "4.12.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.squareup.okhttp3:okhttp",
+          "full_coordinate": "com.squareup.okhttp3:okhttp:4.12.0"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "com.squareup.okhttp3",
+          "name": "okhttp",
+          "version": "4.12.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.squareup.okhttp3:okhttp",
+          "full_coordinate": "com.squareup.okhttp3:okhttp:4.12.0"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "com.squareup.okhttp3",
+          "name": "logging-interceptor",
+          "version": "4.12.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.squareup.okhttp3:logging-interceptor",
+          "full_coordinate": "com.squareup.okhttp3:logging-interceptor:4.12.0"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "com.squareup.okhttp3",
+          "name": "logging-interceptor",
+          "version": "4.12.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.squareup.okhttp3:logging-interceptor",
+          "full_coordinate": "com.squareup.okhttp3:logging-interceptor:4.12.0"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "com.github.bumptech.glide",
+          "name": "glide",
+          "version": "4.16.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.github.bumptech.glide:glide",
+          "full_coordinate": "com.github.bumptech.glide:glide:4.16.0"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "com.github.bumptech.glide",
+          "name": "glide",
+          "version": "4.16.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.github.bumptech.glide:glide",
+          "full_coordinate": "com.github.bumptech.glide:glide:4.16.0"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "androidx.room",
+          "name": "room-runtime",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.room:room-runtime",
+          "full_coordinate": "androidx.room:room-runtime:2.6.1"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.room",
+          "name": "room-runtime",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.room:room-runtime",
+          "full_coordinate": "androidx.room:room-runtime:2.6.1"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "androidx.room",
+          "name": "room-ktx",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.room:room-ktx",
+          "full_coordinate": "androidx.room:room-ktx:2.6.1"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.room",
+          "name": "room-ktx",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.room:room-ktx",
+          "full_coordinate": "androidx.room:room-ktx:2.6.1"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-viewmodel-ktx",
+          "version": "2.6.2",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.lifecycle:lifecycle-viewmodel-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-viewmodel-ktx",
+          "version": "2.6.2",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.lifecycle:lifecycle-viewmodel-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-livedata-ktx",
+          "version": "2.6.2",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.lifecycle:lifecycle-livedata-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-livedata-ktx:2.6.2"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-livedata-ktx",
+          "version": "2.6.2",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.lifecycle:lifecycle-livedata-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-livedata-ktx:2.6.2"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": null,
+          "name": "platform(",
+          "version": null,
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 61,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "platform(",
+          "full_coordinate": "platform("
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": null,
+          "name": "platform(",
+          "version": null,
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 61,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "platform(",
+          "full_coordinate": "platform("
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "junit",
+          "name": "junit",
+          "version": "4.13.2",
+          "type": "library",
+          "configuration": "testImplementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 63,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "junit:junit",
+          "full_coordinate": "junit:junit:4.13.2"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "junit",
+          "name": "junit",
+          "version": "4.13.2",
+          "type": "library",
+          "configuration": "testImplementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 63,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "junit:junit",
+          "full_coordinate": "junit:junit:4.13.2"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "androidx.test.ext",
+          "name": "junit",
+          "version": "1.1.5",
+          "type": "library",
+          "configuration": "androidTestImplementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 64,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.test.ext:junit",
+          "full_coordinate": "androidx.test.ext:junit:1.1.5"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.test.ext",
+          "name": "junit",
+          "version": "1.1.5",
+          "type": "library",
+          "configuration": "androidTestImplementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 64,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.test.ext:junit",
+          "full_coordinate": "androidx.test.ext:junit:1.1.5"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "androidx.test.espresso",
+          "name": "espresso-core",
+          "version": "3.5.1",
+          "type": "library",
+          "configuration": "androidTestImplementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 65,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.test.espresso:espresso-core",
+          "full_coordinate": "androidx.test.espresso:espresso-core:3.5.1"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.test.espresso",
+          "name": "espresso-core",
+          "version": "3.5.1",
+          "type": "library",
+          "configuration": "androidTestImplementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 65,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.test.espresso:espresso-core",
+          "full_coordinate": "androidx.test.espresso:espresso-core:3.5.1"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "androidx.compose",
+          "name": "compose-bom",
+          "version": "2023.10.01",
+          "type": "platform",
+          "configuration": null,
+          "source_file": "examples/build.gradle",
+          "source_line": 61,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.compose:compose-bom",
+          "full_coordinate": "androidx.compose:compose-bom:2023.10.01"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.compose",
+          "name": "compose-bom",
+          "version": "2023.10.01",
+          "type": "platform",
+          "configuration": null,
+          "source_file": "examples/build.gradle",
+          "source_line": 61,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.compose:compose-bom",
+          "full_coordinate": "androidx.compose:compose-bom:2023.10.01"
+        },
+        "has_changes": false,
+        "change_count": 0
+      },
+      {
+        "original": {
+          "group": "androidx.room",
+          "name": "room-compiler",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.room:room-compiler",
+          "full_coordinate": "androidx.room:room-compiler:2.6.1"
+        },
+        "chain": [],
+        "applied_rules": [],
+        "final": {
+          "group": "androidx.room",
+          "name": "room-compiler",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.room:room-compiler",
+          "full_coordinate": "androidx.room:room-compiler:2.6.1"
+        },
+        "has_changes": false,
+        "change_count": 0
+      }
+    ],
+    "warnings": [],
+    "errors": []
+  },
+  "conflicts": [
+    {
+      "id": "conflict-6b412611",
+      "type": "version_conflict",
+      "severity": "warning",
+      "message": "依赖 org.jetbrains.kotlin:kotlin-stdlib-jdk8 存在多个版本: 1.9.0, 1.9.20",
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "name": "kotlin-stdlib-jdk8",
+          "version": "1.9.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 42,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+          "full_coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0"
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "name": "kotlin-stdlib-jdk8",
+          "version": "1.9.20",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+          "full_coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.20"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一使用同一版本，或在 version catalog 中声明管理版本",
+      "resolution": null
+    },
+    {
+      "id": "conflict-23308402",
+      "type": "version_conflict",
+      "severity": "warning",
+      "message": "依赖 com.squareup.okhttp3:okhttp 存在多个版本: 4.11.0, 4.12.0",
+      "dependencies": [
+        {
+          "group": "com.squareup.okhttp3",
+          "name": "okhttp",
+          "version": "4.11.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 48,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.squareup.okhttp3:okhttp",
+          "full_coordinate": "com.squareup.okhttp3:okhttp:4.11.0"
+        },
+        {
+          "group": "com.squareup.okhttp3",
+          "name": "okhttp",
+          "version": "4.12.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.squareup.okhttp3:okhttp",
+          "full_coordinate": "com.squareup.okhttp3:okhttp:4.12.0"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一使用同一版本，或在 version catalog 中声明管理版本",
+      "resolution": null
+    },
+    {
+      "id": "conflict-814b2826",
+      "type": "version_conflict",
+      "severity": "warning",
+      "message": "依赖 com.squareup.okhttp3:logging-interceptor 存在多个版本: 4.11.0, 4.12.0",
+      "dependencies": [
+        {
+          "group": "com.squareup.okhttp3",
+          "name": "logging-interceptor",
+          "version": "4.11.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 49,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.squareup.okhttp3:logging-interceptor",
+          "full_coordinate": "com.squareup.okhttp3:logging-interceptor:4.11.0"
+        },
+        {
+          "group": "com.squareup.okhttp3",
+          "name": "logging-interceptor",
+          "version": "4.12.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.squareup.okhttp3:logging-interceptor",
+          "full_coordinate": "com.squareup.okhttp3:logging-interceptor:4.12.0"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一使用同一版本，或在 version catalog 中声明管理版本",
+      "resolution": null
+    },
+    {
+      "id": "conflict-0d1be4d7",
+      "type": "version_conflict",
+      "severity": "warning",
+      "message": "依赖 com.github.bumptech.glide:glide 存在多个版本: 4.15.1, 4.16.0",
+      "dependencies": [
+        {
+          "group": "com.github.bumptech.glide",
+          "name": "glide",
+          "version": "4.15.1",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 51,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.github.bumptech.glide:glide",
+          "full_coordinate": "com.github.bumptech.glide:glide:4.15.1"
+        },
+        {
+          "group": "com.github.bumptech.glide",
+          "name": "glide",
+          "version": "4.16.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.github.bumptech.glide:glide",
+          "full_coordinate": "com.github.bumptech.glide:glide:4.16.0"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一使用同一版本，或在 version catalog 中声明管理版本",
+      "resolution": null
+    },
+    {
+      "id": "conflict-f9229e4a",
+      "type": "version_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.room:room-runtime 存在多个版本: 2.5.2, 2.6.1",
+      "dependencies": [
+        {
+          "group": "androidx.room",
+          "name": "room-runtime",
+          "version": "2.5.2",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 54,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.room:room-runtime",
+          "full_coordinate": "androidx.room:room-runtime:2.5.2"
+        },
+        {
+          "group": "androidx.room",
+          "name": "room-runtime",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.room:room-runtime",
+          "full_coordinate": "androidx.room:room-runtime:2.6.1"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一使用同一版本，或在 version catalog 中声明管理版本",
+      "resolution": null
+    },
+    {
+      "id": "conflict-566ddbf7",
+      "type": "version_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.room:room-ktx 存在多个版本: 2.5.2, 2.6.1",
+      "dependencies": [
+        {
+          "group": "androidx.room",
+          "name": "room-ktx",
+          "version": "2.5.2",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 56,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.room:room-ktx",
+          "full_coordinate": "androidx.room:room-ktx:2.5.2"
+        },
+        {
+          "group": "androidx.room",
+          "name": "room-ktx",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.room:room-ktx",
+          "full_coordinate": "androidx.room:room-ktx:2.6.1"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一使用同一版本，或在 version catalog 中声明管理版本",
+      "resolution": null
+    },
+    {
+      "id": "conflict-80e143e7",
+      "type": "version_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.lifecycle:lifecycle-viewmodel-ktx 存在多个版本: 2.6.1, 2.6.2",
+      "dependencies": [
+        {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-viewmodel-ktx",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 58,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.lifecycle:lifecycle-viewmodel-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
+        },
+        {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-viewmodel-ktx",
+          "version": "2.6.2",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.lifecycle:lifecycle-viewmodel-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一使用同一版本，或在 version catalog 中声明管理版本",
+      "resolution": null
+    },
+    {
+      "id": "conflict-64d3fd9d",
+      "type": "version_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.lifecycle:lifecycle-livedata-ktx 存在多个版本: 2.6.1, 2.6.2",
+      "dependencies": [
+        {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-livedata-ktx",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 59,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.lifecycle:lifecycle-livedata-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"
+        },
+        {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-livedata-ktx",
+          "version": "2.6.2",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.lifecycle:lifecycle-livedata-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-livedata-ktx:2.6.2"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一使用同一版本，或在 version catalog 中声明管理版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-48ed7b1d",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.appcompat:appcompat 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "androidx.appcompat",
+          "name": "appcompat",
+          "version": "1.6.1",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 37,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.appcompat:appcompat",
+          "full_coordinate": "androidx.appcompat:appcompat:1.6.1"
+        },
+        {
+          "group": "androidx.appcompat",
+          "name": "appcompat",
+          "version": "1.6.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.appcompat:appcompat",
+          "full_coordinate": "androidx.appcompat:appcompat:1.6.1"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-158217bd",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 com.google.android.material:material 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "com.google.android.material",
+          "name": "material",
+          "version": "1.11.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 38,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.google.android.material:material",
+          "full_coordinate": "com.google.android.material:material:1.11.0"
+        },
+        {
+          "group": "com.google.android.material",
+          "name": "material",
+          "version": "1.11.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.google.android.material:material",
+          "full_coordinate": "com.google.android.material:material:1.11.0"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-8e97b141",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.constraintlayout:constraintlayout 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "androidx.constraintlayout",
+          "name": "constraintlayout",
+          "version": "2.1.4",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 39,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.constraintlayout:constraintlayout",
+          "full_coordinate": "androidx.constraintlayout:constraintlayout:2.1.4"
+        },
+        {
+          "group": "androidx.constraintlayout",
+          "name": "constraintlayout",
+          "version": "2.1.4",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.constraintlayout:constraintlayout",
+          "full_coordinate": "androidx.constraintlayout:constraintlayout:2.1.4"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-220d78b9",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.recyclerview:recyclerview 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "androidx.recyclerview",
+          "name": "recyclerview",
+          "version": "1.3.2",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 40,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.recyclerview:recyclerview",
+          "full_coordinate": "androidx.recyclerview:recyclerview:1.3.2"
+        },
+        {
+          "group": "androidx.recyclerview",
+          "name": "recyclerview",
+          "version": "1.3.2",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.recyclerview:recyclerview",
+          "full_coordinate": "androidx.recyclerview:recyclerview:1.3.2"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-6b412611",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 org.jetbrains.kotlin:kotlin-stdlib-jdk8 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "name": "kotlin-stdlib-jdk8",
+          "version": "1.9.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 42,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+          "full_coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0"
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "name": "kotlin-stdlib-jdk8",
+          "version": "1.9.20",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+          "full_coordinate": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.20"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-9eadf022",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 org.jetbrains.kotlinx:kotlinx-coroutines-core 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlinx",
+          "name": "kotlinx-coroutines-core",
+          "version": "1.7.3",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 43,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+          "full_coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "name": "kotlinx-coroutines-core",
+          "version": "1.7.3",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+          "full_coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-f0bf79f3",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 org.jetbrains.kotlinx:kotlinx-coroutines-android 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlinx",
+          "name": "kotlinx-coroutines-android",
+          "version": "1.7.3",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 44,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+          "full_coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "name": "kotlinx-coroutines-android",
+          "version": "1.7.3",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+          "full_coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-eb919dfe",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 com.squareup.retrofit2:retrofit 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "com.squareup.retrofit2",
+          "name": "retrofit",
+          "version": "2.9.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 46,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.squareup.retrofit2:retrofit",
+          "full_coordinate": "com.squareup.retrofit2:retrofit:2.9.0"
+        },
+        {
+          "group": "com.squareup.retrofit2",
+          "name": "retrofit",
+          "version": "2.9.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.squareup.retrofit2:retrofit",
+          "full_coordinate": "com.squareup.retrofit2:retrofit:2.9.0"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-3a118dea",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 com.squareup.retrofit2:converter-gson 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "com.squareup.retrofit2",
+          "name": "converter-gson",
+          "version": "2.9.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 47,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.squareup.retrofit2:converter-gson",
+          "full_coordinate": "com.squareup.retrofit2:converter-gson:2.9.0"
+        },
+        {
+          "group": "com.squareup.retrofit2",
+          "name": "converter-gson",
+          "version": "2.9.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.squareup.retrofit2:converter-gson",
+          "full_coordinate": "com.squareup.retrofit2:converter-gson:2.9.0"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-23308402",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 com.squareup.okhttp3:okhttp 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "com.squareup.okhttp3",
+          "name": "okhttp",
+          "version": "4.11.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 48,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.squareup.okhttp3:okhttp",
+          "full_coordinate": "com.squareup.okhttp3:okhttp:4.11.0"
+        },
+        {
+          "group": "com.squareup.okhttp3",
+          "name": "okhttp",
+          "version": "4.12.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.squareup.okhttp3:okhttp",
+          "full_coordinate": "com.squareup.okhttp3:okhttp:4.12.0"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-814b2826",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 com.squareup.okhttp3:logging-interceptor 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "com.squareup.okhttp3",
+          "name": "logging-interceptor",
+          "version": "4.11.0",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 49,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.squareup.okhttp3:logging-interceptor",
+          "full_coordinate": "com.squareup.okhttp3:logging-interceptor:4.11.0"
+        },
+        {
+          "group": "com.squareup.okhttp3",
+          "name": "logging-interceptor",
+          "version": "4.12.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.squareup.okhttp3:logging-interceptor",
+          "full_coordinate": "com.squareup.okhttp3:logging-interceptor:4.12.0"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-0d1be4d7",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 com.github.bumptech.glide:glide 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "com.github.bumptech.glide",
+          "name": "glide",
+          "version": "4.15.1",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 51,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.github.bumptech.glide:glide",
+          "full_coordinate": "com.github.bumptech.glide:glide:4.15.1"
+        },
+        {
+          "group": "com.github.bumptech.glide",
+          "name": "glide",
+          "version": "4.16.0",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.github.bumptech.glide:glide",
+          "full_coordinate": "com.github.bumptech.glide:glide:4.16.0"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-f9229e4a",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.room:room-runtime 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "androidx.room",
+          "name": "room-runtime",
+          "version": "2.5.2",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 54,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.room:room-runtime",
+          "full_coordinate": "androidx.room:room-runtime:2.5.2"
+        },
+        {
+          "group": "androidx.room",
+          "name": "room-runtime",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.room:room-runtime",
+          "full_coordinate": "androidx.room:room-runtime:2.6.1"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-566ddbf7",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.room:room-ktx 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "androidx.room",
+          "name": "room-ktx",
+          "version": "2.5.2",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 56,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.room:room-ktx",
+          "full_coordinate": "androidx.room:room-ktx:2.5.2"
+        },
+        {
+          "group": "androidx.room",
+          "name": "room-ktx",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.room:room-ktx",
+          "full_coordinate": "androidx.room:room-ktx:2.6.1"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-80e143e7",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.lifecycle:lifecycle-viewmodel-ktx 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-viewmodel-ktx",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 58,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.lifecycle:lifecycle-viewmodel-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
+        },
+        {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-viewmodel-ktx",
+          "version": "2.6.2",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.lifecycle:lifecycle-viewmodel-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-64d3fd9d",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.lifecycle:lifecycle-livedata-ktx 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-livedata-ktx",
+          "version": "2.6.1",
+          "type": "library",
+          "configuration": "implementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 59,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.lifecycle:lifecycle-livedata-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"
+        },
+        {
+          "group": "androidx.lifecycle",
+          "name": "lifecycle-livedata-ktx",
+          "version": "2.6.2",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.lifecycle:lifecycle-livedata-ktx",
+          "full_coordinate": "androidx.lifecycle:lifecycle-livedata-ktx:2.6.2"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-9ef515e6",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 junit:junit 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "junit",
+          "name": "junit",
+          "version": "4.13.2",
+          "type": "library",
+          "configuration": "testImplementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 63,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "junit:junit",
+          "full_coordinate": "junit:junit:4.13.2"
+        },
+        {
+          "group": "junit",
+          "name": "junit",
+          "version": "4.13.2",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "junit:junit",
+          "full_coordinate": "junit:junit:4.13.2"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-91c77381",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 androidx.test.espresso:espresso-core 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": "androidx.test.espresso",
+          "name": "espresso-core",
+          "version": "3.5.1",
+          "type": "library",
+          "configuration": "androidTestImplementation",
+          "source_file": "examples/build.gradle",
+          "source_line": 65,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "androidx.test.espresso:espresso-core",
+          "full_coordinate": "androidx.test.espresso:espresso-core:3.5.1"
+        },
+        {
+          "group": "androidx.test.espresso",
+          "name": "espresso-core",
+          "version": "3.5.1",
+          "type": "library",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "androidx.test.espresso:espresso-core",
+          "full_coordinate": "androidx.test.espresso:espresso-core:3.5.1"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-25503207",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 com.android.application 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": null,
+          "name": "com.android.application",
+          "version": null,
+          "type": "plugin",
+          "configuration": null,
+          "source_file": "examples/build.gradle",
+          "source_line": 2,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "com.android.application",
+          "full_coordinate": "com.android.application"
+        },
+        {
+          "group": null,
+          "name": "com.android.application",
+          "version": "8.1.4",
+          "type": "plugin",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "com.android.application",
+          "full_coordinate": "com.android.application:8.1.4"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    },
+    {
+      "id": "cross-bd0f1f15",
+      "type": "cross_source_conflict",
+      "severity": "warning",
+      "message": "依赖 org.jetbrains.kotlin.android 在多个源中声明: build.gradle, version catalog",
+      "dependencies": [
+        {
+          "group": null,
+          "name": "org.jetbrains.kotlin.android",
+          "version": null,
+          "type": "plugin",
+          "configuration": null,
+          "source_file": "examples/build.gradle",
+          "source_line": 3,
+          "is_dynamic_version": false,
+          "is_managed": false,
+          "canonical_name": "org.jetbrains.kotlin.android",
+          "full_coordinate": "org.jetbrains.kotlin.android"
+        },
+        {
+          "group": null,
+          "name": "org.jetbrains.kotlin.android",
+          "version": "1.9.20",
+          "type": "plugin",
+          "configuration": null,
+          "source_file": "examples/libs.versions.toml",
+          "source_line": null,
+          "is_dynamic_version": false,
+          "is_managed": true,
+          "canonical_name": "org.jetbrains.kotlin.android",
+          "full_coordinate": "org.jetbrains.kotlin.android:1.9.20"
+        }
+      ],
+      "source_files": [
+        "examples/libs.versions.toml",
+        "examples/build.gradle"
+      ],
+      "suggestion": "建议统一在 version catalog 中管理依赖版本",
+      "resolution": null
+    }
+  ],
+  "version_catalogs": [
+    {
+      "name": "libs.versions",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71082/examples/libs.versions.toml",
+      "versions": {
+        "kotlin": {
+          "name": "kotlin",
+          "version": "1.9.20",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "agp": {
+          "name": "agp",
+          "version": "8.1.4",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "retrofit": {
+          "name": "retrofit",
+          "version": "2.9.0",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "okhttp": {
+          "name": "okhttp",
+          "version": "4.12.0",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "coroutines": {
+          "name": "coroutines",
+          "version": "1.7.3",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "glide": {
+          "name": "glide",
+          "version": "4.16.0",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "room": {
+          "name": "room",
+          "version": "2.6.1",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "lifecycle": {
+          "name": "lifecycle",
+          "version": "2.6.2",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "recyclerview": {
+          "name": "recyclerview",
+          "version": "1.3.2",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "appcompat": {
+          "name": "appcompat",
+          "version": "1.6.1",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "material": {
+          "name": "material",
+          "version": "1.11.0",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "constraintlayout": {
+          "name": "constraintlayout",
+          "version": "2.1.4",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "junit": {
+          "name": "junit",
+          "version": "4.13.2",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        },
+        "espresso": {
+          "name": "espresso",
+          "version": "3.5.1",
+          "is_dynamic": false,
+          "source_file": "examples/libs.versions.toml"
+        }
+      },
+      "libraries": {
+        "kotlin-stdlib": {
+          "name": "kotlin-stdlib",
+          "group": "org.jetbrains.kotlin",
+          "artifact": "kotlin-stdlib-jdk8",
+          "version": null,
+          "version_ref": "kotlin",
+          "canonical_name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "retrofit-core": {
+          "name": "retrofit-core",
+          "group": "com.squareup.retrofit2",
+          "artifact": "retrofit",
+          "version": null,
+          "version_ref": "retrofit",
+          "canonical_name": "com.squareup.retrofit2:retrofit",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "retrofit-gson": {
+          "name": "retrofit-gson",
+          "group": "com.squareup.retrofit2",
+          "artifact": "converter-gson",
+          "version": null,
+          "version_ref": "retrofit",
+          "canonical_name": "com.squareup.retrofit2:converter-gson",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "okhttp": {
+          "name": "okhttp",
+          "group": "com.squareup.okhttp3",
+          "artifact": "okhttp",
+          "version": null,
+          "version_ref": "okhttp",
+          "canonical_name": "com.squareup.okhttp3:okhttp",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "okhttp-logging": {
+          "name": "okhttp-logging",
+          "group": "com.squareup.okhttp3",
+          "artifact": "logging-interceptor",
+          "version": null,
+          "version_ref": "okhttp",
+          "canonical_name": "com.squareup.okhttp3:logging-interceptor",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "coroutines-core": {
+          "name": "coroutines-core",
+          "group": "org.jetbrains.kotlinx",
+          "artifact": "kotlinx-coroutines-core",
+          "version": null,
+          "version_ref": "coroutines",
+          "canonical_name": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "coroutines-android": {
+          "name": "coroutines-android",
+          "group": "org.jetbrains.kotlinx",
+          "artifact": "kotlinx-coroutines-android",
+          "version": null,
+          "version_ref": "coroutines",
+          "canonical_name": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "glide": {
+          "name": "glide",
+          "group": "com.github.bumptech.glide",
+          "artifact": "glide",
+          "version": null,
+          "version_ref": "glide",
+          "canonical_name": "com.github.bumptech.glide:glide",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "room-runtime": {
+          "name": "room-runtime",
+          "group": "androidx.room",
+          "artifact": "room-runtime",
+          "version": null,
+          "version_ref": "room",
+          "canonical_name": "androidx.room:room-runtime",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "room-compiler": {
+          "name": "room-compiler",
+          "group": "androidx.room",
+          "artifact": "room-compiler",
+          "version": null,
+          "version_ref": "room",
+          "canonical_name": "androidx.room:room-compiler",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "room-ktx": {
+          "name": "room-ktx",
+          "group": "androidx.room",
+          "artifact": "room-ktx",
+          "version": null,
+          "version_ref": "room",
+          "canonical_name": "androidx.room:room-ktx",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "lifecycle-viewmodel": {
+          "name": "lifecycle-viewmodel",
+          "group": "androidx.lifecycle",
+          "artifact": "lifecycle-viewmodel-ktx",
+          "version": null,
+          "version_ref": "lifecycle",
+          "canonical_name": "androidx.lifecycle:lifecycle-viewmodel-ktx",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "lifecycle-livedata": {
+          "name": "lifecycle-livedata",
+          "group": "androidx.lifecycle",
+          "artifact": "lifecycle-livedata-ktx",
+          "version": null,
+          "version_ref": "lifecycle",
+          "canonical_name": "androidx.lifecycle:lifecycle-livedata-ktx",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "recyclerview": {
+          "name": "recyclerview",
+          "group": "androidx.recyclerview",
+          "artifact": "recyclerview",
+          "version": null,
+          "version_ref": "recyclerview",
+          "canonical_name": "androidx.recyclerview:recyclerview",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "appcompat": {
+          "name": "appcompat",
+          "group": "androidx.appcompat",
+          "artifact": "appcompat",
+          "version": null,
+          "version_ref": "appcompat",
+          "canonical_name": "androidx.appcompat:appcompat",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "material": {
+          "name": "material",
+          "group": "com.google.android.material",
+          "artifact": "material",
+          "version": null,
+          "version_ref": "material",
+          "canonical_name": "com.google.android.material:material",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "constraintlayout": {
+          "name": "constraintlayout",
+          "group": "androidx.constraintlayout",
+          "artifact": "constraintlayout",
+          "version": null,
+          "version_ref": "constraintlayout",
+          "canonical_name": "androidx.constraintlayout:constraintlayout",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "junit": {
+          "name": "junit",
+          "group": "junit",
+          "artifact": "junit",
+          "version": null,
+          "version_ref": "junit",
+          "canonical_name": "junit:junit",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "espresso-core": {
+          "name": "espresso-core",
+          "group": "androidx.test.espresso",
+          "artifact": "espresso-core",
+          "version": null,
+          "version_ref": "espresso",
+          "canonical_name": "androidx.test.espresso:espresso-core",
+          "source_file": "examples/libs.versions.toml"
+        }
+      },
+      "plugins": {
+        "android-application": {
+          "name": "android-application",
+          "id": "com.android.application",
+          "version": null,
+          "version_ref": "agp",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "android-library": {
+          "name": "android-library",
+          "id": "com.android.library",
+          "version": null,
+          "version_ref": "agp",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "kotlin-android": {
+          "name": "kotlin-android",
+          "id": "org.jetbrains.kotlin.android",
+          "version": null,
+          "version_ref": "kotlin",
+          "source_file": "examples/libs.versions.toml"
+        },
+        "kotlin-kapt": {
+          "name": "kotlin-kapt",
+          "id": "org.jetbrains.kotlin.kapt",
+          "version": null,
+          "version_ref": "kotlin",
+          "source_file": "examples/libs.versions.toml"
+        }
+      },
+      "bundles": {
+        "retrofit": {
+          "name": "retrofit",
+          "libraries": [
+            "retrofit-core",
+            "retrofit-gson"
+          ],
+          "source_file": "examples/libs.versions.toml"
+        },
+        "okhttp": {
+          "name": "okhttp",
+          "libraries": [
+            "okhttp",
+            "okhttp-logging"
+          ],
+          "source_file": "examples/libs.versions.toml"
+        },
+        "coroutines": {
+          "name": "coroutines",
+          "libraries": [
+            "coroutines-core",
+            "coroutines-android"
+          ],
+          "source_file": "examples/libs.versions.toml"
+        },
+        "room": {
+          "name": "room",
+          "libraries": [
+            "room-runtime",
+            "room-ktx"
+          ],
+          "source_file": "examples/libs.versions.toml"
+        },
+        "lifecycle": {
+          "name": "lifecycle",
+          "libraries": [
+            "lifecycle-viewmodel",
+            "lifecycle-livedata"
+          ],
+          "source_file": "examples/libs.versions.toml"
+        },
+        "test": {
+          "name": "test",
+          "libraries": [
+            "junit",
+            "espresso-core"
+          ],
+          "source_file": "examples/libs.versions.toml"
+        }
+      }
+    }
+  ],
+  "notes": [],
+  "output_files": []
+}

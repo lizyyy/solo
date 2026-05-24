@@ -38,7 +38,10 @@ class RulesParser:
 
     def _parse_rule(self, rule_data: Dict[str, Any]) -> ReplacementRule:
         strategy_str = rule_data.get("match_strategy", "exact").lower()
-        strategy = MatchStrategy(strategy_str) if strategy_str in MatchStrategy.__members__ else MatchStrategy.EXACT
+        try:
+            strategy = MatchStrategy(strategy_str)
+        except ValueError:
+            strategy = MatchStrategy.EXACT
 
         return ReplacementRule(
             id=rule_data.get("id", rule_data.get("name", "")),
