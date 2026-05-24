@@ -22,6 +22,7 @@ export interface PlaceholderIssue {
     description: string;
 }
 export interface CheckConfig {
+    keyPattern?: string;
     locale: string;
     interfacePosition: string;
     maxWidth: number;

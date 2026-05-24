@@ -1,24 +1,28 @@
 {
   "checks": [
     {
+      "keyPattern": "^button\\.",
       "locale": "zh-CN",
       "interfacePosition": "登录按钮",
       "maxWidth": 20,
       "placeholders": []
     },
     {
+      "keyPattern": "^button\\.",
       "locale": "en",
       "interfacePosition": "登录按钮",
       "maxWidth": 30,
       "placeholders": []
     },
     {
+      "keyPattern": "^button\\.",
       "locale": "ja",
       "interfacePosition": "登录按钮",
       "maxWidth": 25,
       "placeholders": []
     },
     {
+      "keyPattern": "^sms\\.",
       "locale": "*",
       "interfacePosition": "短信验证码",
       "maxWidth": 70,
@@ -26,6 +30,7 @@
       "placeholders": ["{code}", "{username}"]
     },
     {
+      "keyPattern": "^toast\\.",
       "locale": "*",
       "interfacePosition": "Toast提示",
       "maxWidth": 50,

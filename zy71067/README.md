@@ -47,18 +47,21 @@ i18n-length -c ./checks.json ./locales/*.json
 {
   "checks": [
     {
+      "keyPattern": "^button\\.",
       "locale": "zh-CN",
       "interfacePosition": "登录按钮",
       "maxWidth": 20,
       "placeholders": []
     },
     {
+      "keyPattern": "^button\\.",
       "locale": "en",
       "interfacePosition": "登录按钮",
       "maxWidth": 30,
       "placeholders": []
     },
     {
+      "keyPattern": "^sms\\.",
       "locale": "*",
       "interfacePosition": "短信验证码",
       "maxWidth": 70,
@@ -72,6 +75,17 @@ i18n-length -c ./checks.json ./locales/*.json
   }
 }
 ```
+
+### 配置项说明
+
+| 配置项 | 说明 | 示例 |
+|--------|------|------|
+| `keyPattern` | **推荐** - 按 key 模式过滤配置，支持正则表达式。如 `^button\\.` 匹配所有 `button.` 开头的 key | `"^sms\\."` |
+| `locale` | 语言代码，`*` 表示所有语言 | `"en"`, `"zh-CN"`, `"*"` |
+| `interfacePosition` | 界面位置名称，用于报告展示 | `"登录按钮"`, `"短信验证码"` |
+| `maxWidth` | 最大宽度单位（全角字符占 2 单位） | `20` |
+| `maxChars` | 可选 - 最大字符数 | `35` |
+| `placeholders` | 可选 - 预期占位符列表 | `["{code}", "{username}"]` |
 
 ## 命令行参数
 

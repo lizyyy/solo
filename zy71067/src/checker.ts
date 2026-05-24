@@ -40,9 +40,21 @@ export function runChecks(
     : [];
   
   for (const entry of allEntries) {
-    const matchingConfigs = checkConfigs.filter(config => 
-      config.locale === entry.locale || config.locale === '*'
-    );
+    const matchingConfigs = checkConfigs.filter(config => {
+      const localeMatch = config.locale === entry.locale || config.locale === '*';
+      if (!localeMatch) return false;
+      
+      if (config.keyPattern) {
+        try {
+          const regex = new RegExp(config.keyPattern);
+          return regex.test(entry.key);
+        } catch {
+          return entry.key.includes(config.keyPattern);
+        }
+      }
+      
+      return true;
+    });
     
     for (const config of matchingConfigs) {
       const result = checkEntry(entry, config, sourceEntries);
