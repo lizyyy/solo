@@ -160,7 +160,7 @@ function findAffectedFieldsInOperation(
 
   for (const queryField of queryFields) {
     const schemaPath = `${currentTypeName}.${queryField.fieldName}`;
-    const queryPath = [...pathStack, queryField.fieldPath].join('.');
+    const queryPath = [...pathStack, queryField.fieldName].join('.');
 
     if (changedPaths.has(schemaPath)) {
       const change = nullabilityChanges.find((c) => c.fieldPath === schemaPath);

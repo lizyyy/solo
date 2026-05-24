@@ -1,6 +1,6 @@
 # GraphQL 空值漂移检测报告
 
-> 生成时间: 2026-05-24T10:59:42.421Z
+> 生成时间: 2026-05-24T13:24:49.050Z
 
 ## 检测摘要
 
@@ -43,7 +43,7 @@
 | 查询路径 | Schema路径 | 变更类型 | 兜底建议 |
 |----------|------------|----------|----------|
 | `user` | `Query.user` | NON_NULL_TO_NULLABLE | 添加null检查: data?.user || defaultValue |
-| `user.user.name` | `User.name` | NON_NULL_TO_NULLABLE | 添加null检查: data?.name || defaultValue |
+| `user.name` | `User.name` | NON_NULL_TO_NULLABLE | 添加null检查: data?.name || defaultValue |
 
 ## 失败路径导出
 
