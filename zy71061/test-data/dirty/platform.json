@@ -1,0 +1,28 @@
+{
+  "services": [
+    {
+      "name": "user-svc",
+      "log_retention_days": 120
+    },
+    {
+      "name": "order-service",
+      "log_retention": "3 months"
+    },
+    {
+      "name": "payment-service",
+      "log_retention_days": 90
+    },
+    {
+      "name": "api-gateway",
+      "log_retention_days": 7
+    },
+    {
+      "name": "inventory-svc",
+      "log_retention": "30d"
+    },
+    {
+      "name": "notification-service",
+      "log_retention_days": 7
+    }
+  ]
+}

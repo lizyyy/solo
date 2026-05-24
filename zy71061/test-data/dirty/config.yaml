@@ -1,0 +1,26 @@
+defaults:
+  retention: 30d
+
+services:
+  - name: user-service
+    retention: 90d
+    aliases:
+      - user-svc
+      - auth-service
+
+  - name: order-service
+    retention: 60
+    aliases:
+      - order-svc
+
+  - name: payment-service
+    retention: 180d
+
+  - name: api-gateway
+    retention: 30
+
+  - name: inventory-service
+    retention: 45d
+
+  - name: notification-service
+    retention: 14d

@@ -1,0 +1,8 @@
+{
+  "log_retention": {
+    "user-service": "90 days",
+    "order-service": "60d",
+    "payment-service": "6 months",
+    "api-gateway": 30
+  }
+}

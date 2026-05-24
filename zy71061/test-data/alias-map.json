@@ -1,0 +1,7 @@
+{
+  "user-service": ["user-svc", "auth-service", "user-api"],
+  "order-service": ["order-svc", "order-api"],
+  "payment-service": ["payment-svc", "billing-service"],
+  "inventory-service": ["inventory-svc", "stock-service"],
+  "notification-service": ["notification-svc", "notify-service"]
+}

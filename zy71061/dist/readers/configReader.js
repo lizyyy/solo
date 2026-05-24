@@ -1,0 +1,29 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.readConfigFile = readConfigFile;
+const unitConverter_1 = require("../utils/unitConverter");
+const fileReader_1 = require("./fileReader");
+function readConfigFile(filePath) {
+    const content = (0, fileReader_1.readFile)(filePath);
+    const data = (0, fileReader_1.parseJsonOrYaml)(content, filePath);
+    const results = [];
+    const source = 'config';
+    const defaultRetention = data.defaults?.retention ? (0, unitConverter_1.parseRetention)(data.defaults.retention) : null;
+    if (data.services && Array.isArray(data.services)) {
+        for (const service of data.services) {
+            const retention = service.retention !== undefined
+                ? (0, unitConverter_1.parseRetention)(service.retention)
+                : defaultRetention;
+            if (retention) {
+                results.push({
+                    serviceName: service.name,
+                    retentionDays: retention.days,
+                    source,
+                    rawValue: retention.rawValue,
+                    aliases: service.aliases || [],
+                });
+            }
+        }
+    }
+    return results;
+}

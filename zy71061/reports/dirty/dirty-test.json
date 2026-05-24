@@ -1,0 +1,291 @@
+{
+  "generatedAt": "2026-05-24T11:27:57.026Z",
+  "summary": {
+    "totalServices": 6,
+    "consistentServices": 0,
+    "inconsistentServices": 6,
+    "criticalIssues": 9,
+    "warningIssues": 8,
+    "infoIssues": 1,
+    "overallConsistencyScore": 37
+  },
+  "services": [
+    {
+      "canonicalName": "user-service",
+      "aliases": [
+        "user-svc",
+        "auth-service"
+      ],
+      "sources": {
+        "config": 90,
+        "terraform": 60,
+        "platform": 120
+      },
+      "differences": [
+        {
+          "sourceA": "config",
+          "sourceB": "terraform",
+          "valueA": 90,
+          "valueB": 60,
+          "diffDays": 30,
+          "diffPercentage": 33.33,
+          "severity": "critical"
+        },
+        {
+          "sourceA": "config",
+          "sourceB": "platform",
+          "valueA": 90,
+          "valueB": 120,
+          "diffDays": 30,
+          "diffPercentage": 25,
+          "severity": "critical"
+        },
+        {
+          "sourceA": "terraform",
+          "sourceB": "platform",
+          "valueA": 60,
+          "valueB": 120,
+          "diffDays": 60,
+          "diffPercentage": 50,
+          "severity": "critical"
+        }
+      ],
+      "maxDiffDays": 60,
+      "severity": "critical",
+      "consistencyScore": 50
+    },
+    {
+      "canonicalName": "order-service",
+      "aliases": [
+        "order-svc"
+      ],
+      "sources": {
+        "config": 60,
+        "terraform": 90,
+        "platform": 90
+      },
+      "differences": [
+        {
+          "sourceA": "config",
+          "sourceB": "terraform",
+          "valueA": 60,
+          "valueB": 90,
+          "diffDays": 30,
+          "diffPercentage": 33.33,
+          "severity": "critical"
+        },
+        {
+          "sourceA": "config",
+          "sourceB": "platform",
+          "valueA": 60,
+          "valueB": 90,
+          "diffDays": 30,
+          "diffPercentage": 33.33,
+          "severity": "critical"
+        },
+        {
+          "sourceA": "terraform",
+          "sourceB": "platform",
+          "valueA": 90,
+          "valueB": 90,
+          "diffDays": 0,
+          "diffPercentage": 0,
+          "severity": "info"
+        }
+      ],
+      "maxDiffDays": 30,
+      "severity": "critical",
+      "consistencyScore": 67
+    },
+    {
+      "canonicalName": "payment-service",
+      "aliases": [],
+      "sources": {
+        "config": 180,
+        "terraform": 365,
+        "platform": 90
+      },
+      "differences": [
+        {
+          "sourceA": "config",
+          "sourceB": "terraform",
+          "valueA": 180,
+          "valueB": 365,
+          "diffDays": 185,
+          "diffPercentage": 50.68,
+          "severity": "critical"
+        },
+        {
+          "sourceA": "config",
+          "sourceB": "platform",
+          "valueA": 180,
+          "valueB": 90,
+          "diffDays": 90,
+          "diffPercentage": 50,
+          "severity": "critical"
+        },
+        {
+          "sourceA": "terraform",
+          "sourceB": "platform",
+          "valueA": 365,
+          "valueB": 90,
+          "diffDays": 275,
+          "diffPercentage": 75.34,
+          "severity": "critical"
+        }
+      ],
+      "maxDiffDays": 275,
+      "severity": "critical",
+      "consistencyScore": 25
+    },
+    {
+      "canonicalName": "api-gateway",
+      "aliases": [],
+      "sources": {
+        "config": 30,
+        "terraform": 15,
+        "platform": 7
+      },
+      "differences": [
+        {
+          "sourceA": "config",
+          "sourceB": "terraform",
+          "valueA": 30,
+          "valueB": 15,
+          "diffDays": 15,
+          "diffPercentage": 50,
+          "severity": "warning"
+        },
+        {
+          "sourceA": "config",
+          "sourceB": "platform",
+          "valueA": 30,
+          "valueB": 7,
+          "diffDays": 23,
+          "diffPercentage": 76.67,
+          "severity": "warning"
+        },
+        {
+          "sourceA": "terraform",
+          "sourceB": "platform",
+          "valueA": 15,
+          "valueB": 7,
+          "diffDays": 8,
+          "diffPercentage": 53.33,
+          "severity": "warning"
+        }
+      ],
+      "maxDiffDays": 23,
+      "severity": "warning",
+      "consistencyScore": 23
+    },
+    {
+      "canonicalName": "inventory-service",
+      "aliases": [],
+      "sources": {
+        "config": 45,
+        "terraform": 14,
+        "platform": 30
+      },
+      "differences": [
+        {
+          "sourceA": "config",
+          "sourceB": "terraform",
+          "valueA": 45,
+          "valueB": 14,
+          "diffDays": 31,
+          "diffPercentage": 68.89,
+          "severity": "critical"
+        },
+        {
+          "sourceA": "config",
+          "sourceB": "platform",
+          "valueA": 45,
+          "valueB": 30,
+          "diffDays": 15,
+          "diffPercentage": 33.33,
+          "severity": "warning"
+        },
+        {
+          "sourceA": "terraform",
+          "sourceB": "platform",
+          "valueA": 14,
+          "valueB": 30,
+          "diffDays": 16,
+          "diffPercentage": 53.33,
+          "severity": "warning"
+        }
+      ],
+      "maxDiffDays": 31,
+      "severity": "critical",
+      "consistencyScore": 31
+    },
+    {
+      "canonicalName": "notification-service",
+      "aliases": [],
+      "sources": {
+        "config": 14,
+        "terraform": 30,
+        "platform": 7
+      },
+      "differences": [
+        {
+          "sourceA": "config",
+          "sourceB": "terraform",
+          "valueA": 14,
+          "valueB": 30,
+          "diffDays": 16,
+          "diffPercentage": 53.33,
+          "severity": "warning"
+        },
+        {
+          "sourceA": "config",
+          "sourceB": "platform",
+          "valueA": 14,
+          "valueB": 7,
+          "diffDays": 7,
+          "diffPercentage": 50,
+          "severity": "warning"
+        },
+        {
+          "sourceA": "terraform",
+          "sourceB": "platform",
+          "valueA": 30,
+          "valueB": 7,
+          "diffDays": 23,
+          "diffPercentage": 76.67,
+          "severity": "warning"
+        }
+      ],
+      "maxDiffDays": 23,
+      "severity": "warning",
+      "consistencyScore": 23
+    }
+  ],
+  "sources": [
+    {
+      "type": "config",
+      "serviceCount": 6
+    },
+    {
+      "type": "platform",
+      "serviceCount": 6
+    },
+    {
+      "type": "terraform",
+      "serviceCount": 6
+    }
+  ],
+  "config": {
+    "outputDir": "reports/dirty",
+    "sources": [
+      "config: test-data/dirty/config.yaml (6 服务)",
+      "terraform: test-data/dirty/terraform.json (6 服务)",
+      "platform: test-data/dirty/platform.json (6 服务)"
+    ],
+    "severityThresholds": {
+      "critical": 30,
+      "warning": 7
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "services": [
+    {
+      "name": "user-service",
+      "log_retention_days": 90
+    },
+    {
+      "name": "order-service",
+      "log_retention": "60 days"
+    },
+    {
+      "name": "payment-service",
+      "log_retention_days": 180
+    },
+    {
+      "name": "api-gateway",
+      "log_retention_days": 30
+    }
+  ]
+}
