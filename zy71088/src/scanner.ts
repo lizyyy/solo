@@ -97,36 +97,58 @@ export function findAllFlagMatches(
   
   flagNames.forEach(flagName => {
     const escapedFlagName = flagName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const patterns = LANGUAGE_PATTERNS[language].flagChecks;
     
-    patterns.forEach(pattern => {
-      const regex = new RegExp(
-        pattern.source.replace(
-          /\(\[:\^\['"`\]\+\]\)/g, 
-          `(${escapedFlagName})`
-        ).replace(
-          /\(\\w\+\)/g,
-          `(${escapedFlagName})`
-        ),
-        'g'
+    const flagPatterns: RegExp[] = [];
+    
+    if (language === 'typescript' || language === 'javascript') {
+      flagPatterns.push(
+        new RegExp(`isEnabled\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'g'),
+        new RegExp(`isActive\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'g'),
+        new RegExp(`getFlag\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'g'),
+        new RegExp(`featureEnabled\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'g'),
+        new RegExp(`isFeatureEnabled\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'g'),
+        new RegExp(`featureFlags\\s*\\.\\s*${escapedFlagName}\\b`, 'g'),
+        new RegExp(`flags\\s*\\.\\s*${escapedFlagName}\\b`, 'g')
       );
-      
+    } else if (language === 'python') {
+      flagPatterns.push(
+        new RegExp(`is_enabled\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'g'),
+        new RegExp(`is_active\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'g'),
+        new RegExp(`get_flag\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'g'),
+        new RegExp(`feature_enabled\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'g'),
+        new RegExp(`is_feature_enabled\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'g'),
+        new RegExp(`feature_flags\\s*\\[\\s*['"\`]${escapedFlagName}['"\`]\\s*\\]`, 'g'),
+        new RegExp(`flags\\s*\\[\\s*['"\`]${escapedFlagName}['"\`]\\s*\\]`, 'g')
+      );
+    } else {
+      flagPatterns.push(
+        new RegExp(`isEnabled\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'gi'),
+        new RegExp(`IsEnabled\\s*\\(\\s*['"\`]${escapedFlagName}['"\`]\\s*\\)`, 'g')
+      );
+    }
+    
+    flagPatterns.forEach(regex => {
       let match;
       while ((match = regex.exec(content)) !== null) {
         const lineNumber = getLineNumber(content, match.index);
         const column = getColumn(content, match.index);
         const isNegated = isNegatedContext(content, match.index, language);
         
-        matches.push({
-          flagName,
-          filePath,
-          lineNumber,
-          column,
-          matchType: isNegated ? 'negated' : 'direct',
-          context: extractLineContext(content, lineNumber),
-          isNegated,
-          language,
-        });
+        if (!matches.some(m => 
+          m.flagName === flagName && 
+          m.lineNumber === lineNumber
+        )) {
+          matches.push({
+            flagName,
+            filePath,
+            lineNumber,
+            column,
+            matchType: isNegated ? 'negated' : 'direct',
+            context: extractLineContext(content, lineNumber),
+            isNegated,
+            language,
+          });
+        }
       }
     });
 
@@ -134,11 +156,12 @@ export function findAllFlagMatches(
     let directMatch: RegExpExecArray | null;
     while ((directMatch = directRegex.exec(content)) !== null) {
       const matchIndex = directMatch.index;
+      const lineNumber = getLineNumber(content, matchIndex);
+      
       if (!matches.some(m => 
         m.flagName === flagName && 
-        Math.abs(m.lineNumber - getLineNumber(content, matchIndex)) <= 1
+        m.lineNumber === lineNumber
       )) {
-        const lineNumber = getLineNumber(content, matchIndex);
         const column = getColumn(content, matchIndex);
         const isNegated = isNegatedContext(content, matchIndex, language);
         
