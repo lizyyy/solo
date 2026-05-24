@@ -1,47 +1,57 @@
 import { SceneState, Risk, DangerZone } from '../types';
-import { calculateMaxWeightForRadius, getCurrentLiftRadius } from './cranePhysics';
+import { calculateMaxWeightForRadius, calculateLiftPath } from './cranePhysics';
 
 const generateId = () => `risk-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const seenRiskKeys = new Set<string>();
+
+const addUniqueRisk = (risks: Risk[], risk: Risk) => {
+  const key = `${risk.type}-${risk.message}`;
+  if (!seenRiskKeys.has(key)) {
+    seenRiskKeys.add(key);
+    risks.push(risk);
+  }
+};
 
 export const detectRisks = (state: SceneState): Risk[] => {
+  seenRiskKeys.clear();
   const risks: Risk[] = [];
   const { crane, liftObject, environment, dangerZones, buildings } = state;
   
-  const currentRadius = getCurrentLiftRadius(crane, liftObject);
+  const sliderRadius = crane.currentRadius;
   
-  if (currentRadius > crane.maxRadius) {
-    risks.push({
+  if (sliderRadius > crane.maxRadius) {
+    addUniqueRisk(risks, {
       id: generateId(),
       type: 'radius_exceeded',
       severity: 'critical',
-      message: `超半径吊装！当前半径 ${currentRadius.toFixed(1)}m 超出最大半径 ${crane.maxRadius}m`,
+      message: `超半径吊装！设置半径 ${sliderRadius.toFixed(1)}m 超出最大半径 ${crane.maxRadius}m`,
       timestamp: Date.now(),
     });
   }
   
-  if (currentRadius < crane.minRadius) {
-    risks.push({
+  if (sliderRadius < crane.minRadius) {
+    addUniqueRisk(risks, {
       id: generateId(),
       type: 'radius_exceeded',
       severity: 'high',
-      message: `作业半径过小！当前半径 ${currentRadius.toFixed(1)}m 小于最小半径 ${crane.minRadius}m`,
+      message: `作业半径过小！设置半径 ${sliderRadius.toFixed(1)}m 小于最小半径 ${crane.minRadius}m`,
       timestamp: Date.now(),
     });
   }
   
-  const maxAllowedWeight = calculateMaxWeightForRadius(crane, currentRadius);
-  if (liftObject.weight > maxAllowedWeight) {
-    risks.push({
+  const maxAllowedWeightForSlider = calculateMaxWeightForRadius(crane, sliderRadius);
+  if (liftObject.weight > maxAllowedWeightForSlider) {
+    addUniqueRisk(risks, {
       id: generateId(),
       type: 'weight_exceeded',
       severity: 'critical',
-      message: `超重！当前重量 ${liftObject.weight}吨 超过该半径允许最大值 ${maxAllowedWeight.toFixed(1)}吨`,
+      message: `超重！当前重量 ${liftObject.weight}吨 超过设置半径(${sliderRadius.toFixed(1)}m)允许最大值 ${maxAllowedWeightForSlider.toFixed(1)}吨`,
       timestamp: Date.now(),
     });
   }
   
   if (liftObject.weight > crane.maxWeight) {
-    risks.push({
+    addUniqueRisk(risks, {
       id: generateId(),
       type: 'weight_exceeded',
       severity: 'critical',
@@ -51,7 +61,7 @@ export const detectRisks = (state: SceneState): Risk[] => {
   }
   
   if (environment.windSpeed > environment.maxAllowedWindSpeed) {
-    risks.push({
+    addUniqueRisk(risks, {
       id: generateId(),
       type: 'wind_exceeded',
       severity: 'high',
@@ -59,7 +69,7 @@ export const detectRisks = (state: SceneState): Risk[] => {
       timestamp: Date.now(),
     });
   } else if (environment.windSpeed > environment.maxAllowedWindSpeed * 0.8) {
-    risks.push({
+    addUniqueRisk(risks, {
       id: generateId(),
       type: 'wind_exceeded',
       severity: 'medium',
@@ -68,24 +78,32 @@ export const detectRisks = (state: SceneState): Risk[] => {
     });
   }
   
-  const liftProgress = liftObject.currentProgress;
+  const sliderAngleRad = (crane.currentAngle * Math.PI) / 180;
+  const sliderLiftX = crane.position.x + sliderRadius * Math.sin(sliderAngleRad);
+  const sliderLiftZ = crane.position.z + sliderRadius * Math.cos(sliderAngleRad);
+  
+  for (const zone of dangerZones) {
+    if (zone.occupied && zone.type === 'restricted') {
+      if (isPositionInZone({ x: sliderLiftX, z: sliderLiftZ }, zone)) {
+        addUniqueRisk(risks, {
+          id: generateId(),
+          type: 'zone_occupied',
+          severity: 'high',
+          message: `吊臂位置(${sliderRadius.toFixed(1)}m, ${crane.currentAngle.toFixed(1)}°)经过禁区：${zone.name}，请调整`,
+          timestamp: Date.now(),
+        });
+      }
+    }
+  }
+  
   for (let p = 0; p <= 1; p += 0.1) {
-    const testProgress = Math.min(1, liftProgress + p);
-    const testLift = { ...liftObject, currentProgress: testProgress };
-    const testRadius = getCurrentLiftRadius(crane, testLift);
-    
-    const angle = Math.atan2(
-      liftObject.startPosition.x + testProgress * (liftObject.endPosition.x - liftObject.startPosition.x) - crane.position.x,
-      liftObject.startPosition.z + testProgress * (liftObject.endPosition.z - liftObject.startPosition.z) - crane.position.z
-    );
-    
-    const liftX = crane.position.x + testRadius * Math.sin(angle);
-    const liftZ = crane.position.z + testRadius * Math.cos(angle);
+    const testProgress = p;
+    const testPos = calculateLiftPath(liftObject, testProgress);
     
     for (const zone of dangerZones) {
       if (zone.occupied && zone.type === 'restricted') {
-        if (isPositionInZone({ x: liftX, z: liftZ }, zone)) {
-          risks.push({
+        if (isPositionInZone({ x: testPos.x, z: testPos.z }, zone)) {
+          addUniqueRisk(risks, {
             id: generateId(),
             type: 'zone_occupied',
             severity: 'high',
@@ -98,22 +116,19 @@ export const detectRisks = (state: SceneState): Risk[] => {
     }
   }
   
-  const liftX2 = crane.position.x + currentRadius * Math.sin((crane.currentAngle * Math.PI) / 180);
-  const liftZ2 = crane.position.z + currentRadius * Math.cos((crane.currentAngle * Math.PI) / 180);
-  
   for (const building of buildings) {
     const buildingLeft = building.position.x - building.dimensions.width / 2;
     const buildingRight = building.position.x + building.dimensions.width / 2;
     const buildingFront = building.position.z - building.dimensions.depth / 2;
     const buildingBack = building.position.z + building.dimensions.depth / 2;
     
-    if (liftX2 >= buildingLeft && liftX2 <= buildingRight && 
-        liftZ2 >= buildingFront && liftZ2 <= buildingBack) {
-      risks.push({
+    if (sliderLiftX >= buildingLeft && sliderLiftX <= buildingRight && 
+        sliderLiftZ >= buildingFront && sliderLiftZ <= buildingBack) {
+      addUniqueRisk(risks, {
         id: generateId(),
         type: 'collision',
         severity: 'critical',
-        message: `碰撞风险！吊物位置与 ${building.name} 重叠`,
+        message: `碰撞风险！吊臂位置与 ${building.name} 重叠`,
         timestamp: Date.now(),
       });
     }
