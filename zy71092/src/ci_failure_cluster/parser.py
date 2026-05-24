@@ -17,7 +17,7 @@ class LogParser:
             r"(?:job|build|run)[_\s]*name[:\s]+([^\n]+)", re.IGNORECASE
         )
         self.rerun_pattern = re.compile(
-            r"(?:rerun|retry|attempt)[_\s]*(\d+)", re.IGNORECASE
+            r"(?:rerun|retry|attempt)[:\s]*(\d+)", re.IGNORECASE
         )
         self.matrix_pattern = re.compile(
             r"matrix[\s:{]+([^}]+)", re.IGNORECASE | re.DOTALL
@@ -28,6 +28,11 @@ class LogParser:
             re.compile(r"^(Exception|EXCEPTION|exception):", re.MULTILINE),
             re.compile(r"^(AssertionError|FAILED|FAIL):", re.MULTILINE),
             re.compile(r"^\s+File \".+\", line \d+, in", re.MULTILINE),
+            re.compile(r"^.*(ModuleNotFoundError|ImportError):", re.MULTILINE),
+            re.compile(r"^.*(TimeoutError|ConnectionError|NetworkError):", re.MULTILINE),
+            re.compile(r"^.*(ValueError|TypeError|KeyError|IndexError|AttributeError):", re.MULTILINE),
+            re.compile(r"^.*(SyntaxError|RuntimeError|NotImplementedError):", re.MULTILINE),
+            re.compile(r"^.*(ReferenceError|TypeError|SyntaxError):\s", re.MULTILINE | re.IGNORECASE),
         ]
         self.timestamp_patterns = [
             re.compile(r"(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?)"),

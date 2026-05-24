@@ -122,5 +122,20 @@ class ClusterReport:
                 for c in self.clusters
             ],
             "unclustered_count": len(self.unclustered),
+            "unclustered": [
+                {
+                    "id": u.id,
+                    "commit_sha": u.commit_sha,
+                    "job_name": u.job_name,
+                    "matrix_params": u.matrix_params.to_dict(),
+                    "error_message": u.error_message,
+                    "stack_trace": u.stack_trace,
+                    "timestamp": u.timestamp.isoformat() if u.timestamp else None,
+                    "rerun_count": u.rerun_count,
+                    "rerun_success": u.rerun_success,
+                    "raw_source": u.raw_source,
+                }
+                for u in self.unclustered
+            ],
             "analysis_params": self.analysis_params,
         }

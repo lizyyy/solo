@@ -1,0 +1,149 @@
+{
+  "generated_at": "2026-05-24T23:20:18.164297",
+  "total_failures": 6,
+  "total_clusters": 1,
+  "clusters": [
+    {
+      "cluster_id": "508dca96",
+      "size": 3,
+      "jitter_score": 0.833,
+      "unique_commits": 3,
+      "rerun_success_rate": 0.0,
+      "signature": {
+        "normalized_error": "AssertionError: Expected <N> but got <N>",
+        "normalized_stack": "File \"<PATH> line <N>, in test_addition\nassert result == <N>\nFile \"<PATH> line <N>, in setup\nself.load_fixtures()",
+        "signature_hash": "108046c581d28841",
+        "tokens": [
+          "assert",
+          "assertionerror",
+          "but",
+          "expected",
+          "got",
+          "load_fixtures",
+          "path",
+          "result",
+          "self",
+          "setup",
+          "test_addition"
+        ],
+        "error_type": "AssertionError",
+        "error_category": "AssertionError"
+      },
+      "matrix_coverage": {
+        "os": {
+          "values": {
+            "ubuntu-latest": 3
+          },
+          "unique_count": 1,
+          "most_common": "ubuntu-latest",
+          "coverage_percent": 100.0
+        },
+        "python_version": {
+          "values": {
+            "3.9": 2,
+            "\"3.10\"": 1
+          },
+          "unique_count": 2,
+          "most_common": "3.9",
+          "coverage_percent": 100.0
+        }
+      },
+      "members": [
+        {
+          "id": "build_1_0",
+          "commit_sha": "a1b2c3d4e5f6",
+          "job_name": "linux-python-3.9-tests",
+          "matrix_params": {
+            "os": "ubuntu-latest",
+            "python_version": "3.9"
+          },
+          "timestamp": "2024-01-15T10:30:00+00:00",
+          "rerun_count": 0,
+          "rerun_success": false
+        },
+        {
+          "id": "build_2_0",
+          "commit_sha": "b2c3d4e5f6a7",
+          "job_name": "linux-python-3.10-tests",
+          "matrix_params": {
+            "os": "ubuntu-latest",
+            "python_version": "\"3.10\""
+          },
+          "timestamp": "2024-01-15T11:00:00+00:00",
+          "rerun_count": 1,
+          "rerun_success": false
+        },
+        {
+          "id": "build_5_0",
+          "commit_sha": "e5f6a7b8c9d0",
+          "job_name": "linux-python-3.9-tests",
+          "matrix_params": {
+            "os": "ubuntu-latest",
+            "python_version": "3.9"
+          },
+          "timestamp": "2024-01-15T14:00:00+00:00",
+          "rerun_count": 3,
+          "rerun_success": false
+        }
+      ]
+    }
+  ],
+  "unclustered_count": 3,
+  "unclustered": [
+    {
+      "id": "build_3_0",
+      "commit_sha": "c3d4e5f6a7b8",
+      "job_name": "macos-python-3.9-tests",
+      "matrix_params": {
+        "os": "macos-latest",
+        "python_version": "3.9"
+      },
+      "error_message": "ConnectionError: Failed to connect to database server at localhost:5432",
+      "stack_trace": "File \"/Users/runner/work/project/src/db/connection.py\", line 128, in connect\n    raise ConnectionError(msg)\n  File \"/Users/runner/work/project/src/app.py\", line 45, in main\n    db = Database()",
+      "timestamp": "2024-01-15T12:00:00+00:00",
+      "rerun_count": 2,
+      "rerun_success": false,
+      "raw_source": "examples/failure_logs/build_3.txt"
+    },
+    {
+      "id": "build_6_0",
+      "commit_sha": "f6a7b8c9d0e1",
+      "job_name": "linux-node-18-tests",
+      "matrix_params": {
+        "os": "ubuntu-latest",
+        "node_version": "\"18\""
+      },
+      "error_message": "TimeoutError: Test timed out after 30000ms",
+      "stack_trace": "at Timeout._onTimeout (/home/runner/work/project/tests/app.test.js:123:20)\n    at listOnTimeout (node:internal/timers:559:17)",
+      "timestamp": "2024-01-15T15:00:00+00:00",
+      "rerun_count": 1,
+      "rerun_success": false,
+      "raw_source": "examples/failure_logs/build_6.txt"
+    },
+    {
+      "id": "build_4_0",
+      "commit_sha": "d4e5f6a7b8c9",
+      "job_name": "windows-python-3.11-tests",
+      "matrix_params": {
+        "os": "windows-latest",
+        "python_version": "\"3.11\""
+      },
+      "error_message": "ModuleNotFoundError: No module named 'pytest'",
+      "stack_trace": "File \"C:\\runner\\work\\project\\tests\\conftest.py\", line 5, in <module>\n    import pytest",
+      "timestamp": "2024-01-15T13:00:00+00:00",
+      "rerun_count": 0,
+      "rerun_success": false,
+      "raw_source": "examples/failure_logs/build_4.txt"
+    }
+  ],
+  "analysis_params": {
+    "similarity_threshold": 0.85,
+    "min_cluster_size": 2,
+    "rerun_threshold": 0,
+    "normalize_paths": true,
+    "normalize_hex": true,
+    "normalize_numbers": true,
+    "normalize_uuids": true,
+    "normalize_timestamps": true
+  }
+}
