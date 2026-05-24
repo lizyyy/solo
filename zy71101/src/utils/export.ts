@@ -4,7 +4,9 @@ import { Mission, AppState, unitConversion } from '@/types';
 
 export interface ReportData {
   mission: Mission;
-  appState: Pick<AppState, 'currentTime' | 'cameraView' | 'filters' | 'alerts'>;
+  appState: Pick<AppState, 'currentTime' | 'cameraView' | 'filters' | 'alerts'> & {
+    currentBattery: number;
+  };
   cameraPosition: string;
   screenshot?: string;
 }
@@ -60,11 +62,30 @@ export const generateReport = async (data: ReportData): Promise<void> => {
   yPos += 6;
   pdf.text(`当前视角: ${cameraPosition}`, 25, yPos);
   yPos += 6;
-  pdf.text(`视角模式: ${appState.cameraView === 'orbit' ? '环绕视角' : appState.cameraView === 'firstPerson' ? '第一人称' : '俯视视角'}`, 25, yPos);
+  const viewModeText = appState.cameraView === 'orbit' ? '环绕视角' : 
+                       appState.cameraView === 'firstPerson' ? '第一人称' : '俯视视角';
+  pdf.text(`视角模式: ${viewModeText}`, 25, yPos);
+  yPos += 6;
+  pdf.text(`当前电量: ${appState.currentBattery.toFixed(1)}%`, 25, yPos);
+  yPos += 10;
+
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(14);
+  pdf.text('筛选条件', 20, yPos);
+  yPos += 8;
+
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(11);
+  pdf.text(`显示建筑物: ${appState.filters.showBuildings ? '是' : '否'}`, 25, yPos);
+  yPos += 6;
+  pdf.text(`显示禁飞区: ${appState.filters.showNoFlyZones ? '是' : '否'}`, 25, yPos);
+  yPos += 6;
+  pdf.text(`显示航线: ${appState.filters.showFlightPath ? '是' : '否'}`, 25, yPos);
+  yPos += 6;
+  pdf.text(`显示电量曲线: ${appState.filters.showBatteryCurve ? '是' : '否'}`, 25, yPos);
   yPos += 10;
 
   const totalDistance = mission.batteryCurve[mission.batteryCurve.length - 1]?.distance || 0;
-  const finalBattery = mission.batteryCurve[mission.batteryCurve.length - 1]?.percentage || 0;
   
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(14);
@@ -75,9 +96,11 @@ export const generateReport = async (data: ReportData): Promise<void> => {
   pdf.setFontSize(11);
   pdf.text(`总飞行距离: ${totalDistance.toFixed(1)}m`, 25, yPos);
   yPos += 6;
-  pdf.text(`剩余电量: ${finalBattery.toFixed(1)}%`, 25, yPos);
-  yPos += 6;
   pdf.text(`告警数量: ${appState.alerts.length}`, 25, yPos);
+  yPos += 6;
+  pdf.text(`禁飞区数量: ${mission.noFlyZones.length}`, 25, yPos);
+  yPos += 6;
+  pdf.text(`建筑物数量: ${mission.buildings.length}`, 25, yPos);
   yPos += 10;
 
   if (appState.alerts.length > 0) {
@@ -96,7 +119,9 @@ export const generateReport = async (data: ReportData): Promise<void> => {
         yPos = 20;
       }
       const severity = alert.severity === 'danger' ? '[严重]' : '[警告]';
-      pdf.text(`${severity} ${alert.message}`, 25, yPos);
+      const alertType = alert.type === 'collision' ? '[碰撞]' : 
+                       alert.type === 'battery' ? '[电量]' : '[单位]';
+      pdf.text(`${severity}${alertType} ${alert.message}`, 25, yPos);
       yPos += 5;
     });
     yPos += 5;
@@ -116,8 +141,9 @@ export const generateReport = async (data: ReportData): Promise<void> => {
       yPos = 20;
     }
     const heightInMeters = unitConversion.toMeters(wp.position.y, wp.position.unit);
+    const unitText = wp.position.unit === 'meter' ? 'm' : 'ft';
     pdf.text(
-      `航点${index + 1}: (${wp.position.x.toFixed(1)}, ${heightInMeters.toFixed(1)}m, ${wp.position.z.toFixed(1)})`,
+      `航点${index + 1}: (${wp.position.x.toFixed(1)}, ${wp.position.y.toFixed(1)}${unitText} / ${heightInMeters.toFixed(1)}m, ${wp.position.z.toFixed(1)})`,
       25,
       yPos
     );

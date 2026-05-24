@@ -1,0 +1,194 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - img [ref=e8]
+          - heading "无人机航线规划" [level=1] [ref=e10]
+        - paragraph [ref=e11]: 飞城区航线训练系统
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - button "任务管理" [ref=e14] [cursor=pointer]:
+            - generic [ref=e15]:
+              - img [ref=e16]
+              - generic [ref=e21]: 任务管理
+            - img [ref=e22]
+          - generic [ref=e24]:
+            - generic [ref=e25]:
+              - generic [ref=e26]: 选择样例任务
+              - combobox [ref=e27]:
+                - option "-- 请选择任务 --"
+                - option "飞城区航线训练 - 样例1"
+                - option "高度单位混练 - 样例2" [selected]
+            - generic [ref=e28]:
+              - generic [ref=e30] [cursor=pointer]:
+                - img [ref=e31]
+                - text: 导入
+              - button "导出" [ref=e34] [cursor=pointer]:
+                - img [ref=e35]
+                - text: 导出
+            - button "重置状态" [ref=e38] [cursor=pointer]:
+              - img [ref=e39]
+              - text: 重置状态
+            - generic [ref=e42]:
+              - paragraph [ref=e43]: 高度单位混练 - 样例2
+              - paragraph [ref=e44]: 包含英尺和米混用的航点，用于单位转换培训
+        - generic [ref=e45]:
+          - button "图层筛选" [ref=e46] [cursor=pointer]:
+            - generic [ref=e47]:
+              - img [ref=e48]
+              - generic [ref=e52]: 图层筛选
+            - img [ref=e53]
+          - generic [ref=e55]:
+            - generic [ref=e56] [cursor=pointer]:
+              - checkbox "显示建筑物" [checked] [ref=e57]
+              - img [ref=e58]
+              - generic [ref=e62]: 显示建筑物
+            - generic [ref=e63] [cursor=pointer]:
+              - checkbox "显示禁飞区" [checked] [ref=e64]
+              - img [ref=e65]
+              - generic [ref=e68]: 显示禁飞区
+            - generic [ref=e69] [cursor=pointer]:
+              - checkbox "显示航线" [checked] [ref=e70]
+              - img [ref=e71]
+              - generic [ref=e75]: 显示航线
+            - generic [ref=e76] [cursor=pointer]:
+              - checkbox "显示电量曲线" [checked] [ref=e77]
+              - img [ref=e78]
+              - generic [ref=e80]: 显示电量曲线
+        - generic [ref=e81]:
+          - button "航点列表" [ref=e82] [cursor=pointer]:
+            - generic [ref=e83]:
+              - img [ref=e84]
+              - generic [ref=e88]: 航点列表
+            - img [ref=e89]
+          - generic [ref=e92]:
+            - generic [ref=e286] [cursor=pointer]:
+              - generic [ref=e287]:
+                - generic [ref=e288]: 航点 1
+                - generic [ref=e289]: 英尺
+              - generic [ref=e290]: "X: -70.0 | Y: 164.0 | Z: -50.0"
+            - generic [ref=e291] [cursor=pointer]:
+              - generic [ref=e292]:
+                - generic [ref=e293]: 航点 2
+                - generic [ref=e294]: 米
+              - generic [ref=e295]: "X: -60.0 | Y: 60.0 | Z: 0.0"
+            - generic [ref=e296] [cursor=pointer]:
+              - generic [ref=e297]:
+                - generic [ref=e298]: 航点 3
+                - generic [ref=e299]: 英尺
+              - generic [ref=e300]: "X: 60.0 | Y: 197.0 | Z: 0.0"
+            - generic [ref=e301] [cursor=pointer]:
+              - generic [ref=e302]:
+                - generic [ref=e303]: 航点 4
+                - generic [ref=e304]: 米
+              - generic [ref=e305]: "X: 70.0 | Y: 50.0 | Z: 50.0"
+    - generic [ref=e128]:
+      - generic [ref=e132]:
+        - heading "操作提示" [level=2] [ref=e133]
+        - list [ref=e134]:
+          - listitem [ref=e135]: 🖱️ 左键拖动 - 旋转视角
+          - listitem [ref=e136]: 🖱️ 右键拖动 - 平移视角
+          - listitem [ref=e137]: 🖱️ 滚轮 - 缩放
+          - listitem [ref=e138]: 📍 点击航点 - 选中并拖拽编辑
+      - generic [ref=e139]:
+        - heading "高度单位混练 - 样例2" [level=3] [ref=e306]
+        - paragraph [ref=e141]: 包含英尺和米混用的航点，用于单位转换培训
+    - generic [ref=e142]:
+      - generic [ref=e144]:
+        - generic [ref=e147]: 已暂停
+        - generic [ref=e148]: 0.0s
+      - generic [ref=e149]:
+        - generic [ref=e150]:
+          - button "电量状态" [ref=e151] [cursor=pointer]:
+            - generic [ref=e152]:
+              - img [ref=e153]
+              - generic [ref=e155]: 电量状态
+            - img [ref=e156]
+          - generic [ref=e158]:
+            - generic [ref=e159]:
+              - generic [ref=e161]: 100%
+              - generic [ref=e162]: 正常
+            - paragraph [ref=e165]: 电量充足
+            - img [ref=e167]
+        - generic [ref=e168]:
+          - button "告警信息 2" [ref=e307] [cursor=pointer]:
+            - generic [ref=e170]:
+              - img [ref=e171]
+              - generic [ref=e173]: 告警信息
+              - generic [ref=e308]: "2"
+            - img [ref=e175]
+          - generic [ref=e178]:
+            - generic [ref=e310]:
+              - img [ref=e311]
+              - paragraph [ref=e314]: 检测到高度单位混用，请确认所有航点单位一致
+            - generic [ref=e316]:
+              - img [ref=e317]
+              - paragraph [ref=e320]: 航线与建筑物"高楼A"发生碰撞
+        - generic [ref=e203]:
+          - button "任务统计" [ref=e204] [cursor=pointer]:
+            - generic [ref=e205]:
+              - img [ref=e206]
+              - generic [ref=e208]: 任务统计
+            - img [ref=e209]
+          - generic [ref=e212]:
+            - generic [ref=e213]:
+              - paragraph [ref=e214]: 总航点数
+              - paragraph [ref=e215]: "4"
+            - generic [ref=e216]:
+              - paragraph [ref=e217]: 总飞行距离
+              - paragraph [ref=e218]: 600m
+            - generic [ref=e219]:
+              - paragraph [ref=e220]: 禁飞区数量
+              - paragraph [ref=e221]: "1"
+            - generic [ref=e222]:
+              - paragraph [ref=e223]: 建筑物数量
+              - paragraph [ref=e224]: "2"
+        - generic [ref=e225]:
+          - button "报告导出" [ref=e226] [cursor=pointer]:
+            - generic [ref=e227]:
+              - img [ref=e228]
+              - generic [ref=e231]: 报告导出
+            - img [ref=e232]
+          - generic [ref=e235]:
+            - paragraph [ref=e236]: 导出的报告将包含当前视角、筛选条件、时间轴位置和所有相关数据。
+            - button "导出规划报告 (PDF)" [ref=e237] [cursor=pointer]:
+              - img [ref=e238]
+              - text: 导出规划报告 (PDF)
+        - generic [ref=e241]:
+          - heading "相机位置" [level=3] [ref=e242]
+          - generic [ref=e243]:
+            - generic [ref=e244]:
+              - generic [ref=e245]: "Pos:"
+              - generic [ref=e246]: 150.0, 120.0, 150.0
+            - generic [ref=e247]:
+              - generic [ref=e248]: "Tgt:"
+              - generic [ref=e249]: 0.0, 0.0, 0.0
+  - generic [ref=e250]:
+    - generic [ref=e251]:
+      - button "回到开始" [ref=e252] [cursor=pointer]:
+        - img [ref=e253]
+      - button "播放" [ref=e255] [cursor=pointer]:
+        - img [ref=e256]
+      - button "跳到结束" [ref=e258] [cursor=pointer]:
+        - img [ref=e259]
+    - generic [ref=e262]:
+      - generic [ref=e263]: 00:00
+      - generic [ref=e266]: 00:56
+    - generic [ref=e271]:
+      - generic [ref=e272]:
+        - img [ref=e273]
+        - combobox [ref=e276]:
+          - option "0.5x"
+          - option "1x" [selected]
+          - option "2x"
+          - option "4x"
+      - generic [ref=e277]:
+        - img [ref=e278]
+        - combobox [ref=e281]:
+          - option "环绕" [selected]
+          - option "第一人称"
+          - option "俯视"
+      - button "重置" [ref=e282] [cursor=pointer]:
+        - img [ref=e283]
+        - text: 重置

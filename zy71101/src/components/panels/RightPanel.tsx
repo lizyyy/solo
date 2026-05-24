@@ -43,6 +43,7 @@ export const RightPanel = () => {
     currentTime,
     alerts,
     cameraState,
+    cameraView,
     filters,
     isPlaying
   } = useAppStore();
@@ -165,7 +166,8 @@ export const RightPanel = () => {
       mission: currentMission,
       appState: {
         currentTime,
-        cameraView: 'orbit',
+        currentBattery: currentBattery,
+        cameraView,
         filters,
         alerts
       },
