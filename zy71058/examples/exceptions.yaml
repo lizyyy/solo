@@ -1,0 +1,22 @@
+exceptions:
+  - id: "exception-001"
+    reason: "这是测试环境的示例 AWS 密钥，用于演示"
+    path: "database.password"
+    environment: "test"
+    expiresAt: "2099-12-31"
+    createdAt: "2024-01-01"
+    createdBy: "devops-team"
+
+  - id: "exception-002"
+    reason: "内网地址是预期配置"
+    ruleId: "intranet-ip"
+    environment: "staging"
+    createdAt: "2024-01-01"
+    createdBy: "network-team"
+
+  - id: "exception-003"
+    reason: "过期的例外示例"
+    value: "*example*"
+    expiresAt: "2020-01-01"
+    createdAt: "2019-01-01"
+    createdBy: "security-team"

@@ -1,0 +1,39 @@
+{
+  "name": "helm-secret-scanner",
+  "version": "1.0.0",
+  "description": "Helm Values 泄密扫描 CLI - 检查 Helm chart 中的敏感信息",
+  "main": "dist/index.js",
+  "bin": {
+    "hss": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "hss": "node dist/cli.js",
+    "test": "node dist/cli.js self-test",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "helm",
+    "security",
+    "secrets",
+    "scanner",
+    "devops"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1",
+    "handlebars": "^4.7.8",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/lodash": "^4.14.202"
+  }
+}
