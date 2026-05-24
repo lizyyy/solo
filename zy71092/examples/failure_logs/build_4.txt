@@ -1,0 +1,11 @@
+commit: d4e5f6a7b8c9
+job_name: windows-python-3.11-tests
+matrix:
+  os: windows-latest
+  python: "3.11"
+rerun: 0
+2024-01-15T13:00:00Z Starting build...
+
+ModuleNotFoundError: No module named 'pytest'
+  File "C:\runner\work\project\tests\conftest.py", line 5, in <module>
+    import pytest

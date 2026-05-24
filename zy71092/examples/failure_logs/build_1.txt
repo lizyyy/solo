@@ -1,0 +1,15 @@
+commit: a1b2c3d4e5f6
+job_name: linux-python-3.9-tests
+matrix:
+  os: ubuntu-latest
+  python: 3.9
+rerun: 0
+2024-01-15T10:30:00Z Starting build...
+
+Running tests...
+
+AssertionError: Expected 42 but got 56
+  File "/home/runner/work/project/tests/test_calc.py", line 45, in test_addition
+    assert result == 42
+  File "/home/runner/work/project/tests/test_calc.py", line 23, in setup
+    self.load_fixtures()

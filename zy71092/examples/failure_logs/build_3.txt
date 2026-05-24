@@ -1,0 +1,13 @@
+commit: c3d4e5f6a7b8
+job_name: macos-python-3.9-tests
+matrix:
+  os: macos-latest
+  python: 3.9
+rerun: 2
+2024-01-15T12:00:00Z Starting build...
+
+ConnectionError: Failed to connect to database server at localhost:5432
+  File "/Users/runner/work/project/src/db/connection.py", line 128, in connect
+    raise ConnectionError(msg)
+  File "/Users/runner/work/project/src/app.py", line 45, in main
+    db = Database()
