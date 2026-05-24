@@ -1,0 +1,18 @@
+{
+  "name": "airport-ground-vehicle-path",
+  "version": "1.0.0",
+  "description": "机场地勤车辆路径3D可视化系统",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.160.0",
+    "@tweenjs/tween.js": "^23.1.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

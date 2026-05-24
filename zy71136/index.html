@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>机场地勤车辆路径可视化系统</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <div id="app">
+    <div id="canvas-container"></div>
+    
+    <div id="sidebar">
+      <div class="panel-header">
+        <h1>机场地勤车辆路径</h1>
+      </div>
+      
+      <div class="panel-section">
+        <h3>数据导入</h3>
+        <button id="load-sample" class="btn btn-primary">加载样例数据</button>
+        <input type="file" id="import-file" accept=".json" style="display: none;">
+        <button id="import-btn" class="btn btn-secondary">导入JSON</button>
+      </div>
+      
+      <div class="panel-section">
+        <h3>车辆筛选</h3>
+        <div id="vehicle-filters">
+          <label><input type="checkbox" value="ferry" checked> 摆渡车</label>
+          <label><input type="checkbox" value="fuel" checked> 油车</label>
+          <label><input type="checkbox" value="baggage" checked> 行李车</label>
+        </div>
+      </div>
+      
+      <div class="panel-section">
+        <h3>视角切换</h3>
+        <div class="view-buttons">
+          <button class="btn btn-view" data-view="top">俯视</button>
+          <button class="btn btn-view" data-view="perspective">透视</button>
+          <button class="btn btn-view" data-view="follow">跟随</button>
+        </div>
+      </div>
+      
+      <div class="panel-section">
+        <h3>状态</h3>
+        <button id="reset-btn" class="btn btn-danger">重置状态</button>
+        <button id="export-report" class="btn btn-success">导出报告</button>
+      </div>
+      
+      <div id="conflict-panel" class="panel-section conflict-section" style="display: none;">
+        <h3>⚠️ 冲突检测</h3>
+        <div id="conflict-list"></div>
+      </div>
+    </div>
+    
+    <div id="timeline-container">
+      <div class="timeline-header">
+        <span>时间轴控制</span>
+        <span id="current-time">00:00</span>
+      </div>
+      <div class="timeline-controls">
+        <button id="play-btn" class="timeline-btn">▶ 播放</button>
+        <button id="pause-btn" class="timeline-btn">⏸ 暂停</button>
+        <button id="speed-btn" class="timeline-btn">1x</button>
+      </div>
+      <div class="timeline-slider">
+        <input type="range" id="timeline-slider" min="0" max="100" value="0">
+      </div>
+      <div id="flights-timeline"></div>
+    </div>
+    
+    <div id="info-tooltip" style="display: none;"></div>
+  </div>
+  
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
