@@ -5,6 +5,7 @@ com/warehouse/charging/service/ChargingSchedulerService.class
 com/warehouse/charging/ChargingSchedulerApplication.class
 com/warehouse/charging/repository/ScheduleLogRepository.class
 com/warehouse/charging/service/ReportService.class
+com/warehouse/charging/config/DataInitializer.class
 com/warehouse/charging/dto/ChargingRequestDTO.class
 com/warehouse/charging/config/SchedulingRules.class
 com/warehouse/charging/controller/ReportController.class
