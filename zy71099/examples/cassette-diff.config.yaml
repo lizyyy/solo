@@ -1,0 +1,30 @@
+ignoreOrder: true
+ignoreFields:
+  - body.id
+  - body.created_at
+  - body.updated_at
+  - body.timestamp
+  - query.timestamp
+  - query.nonce
+  - header.x-request-id
+  - header.x-trace-id
+maskingRules:
+  - field: authorization
+    type: header
+    pattern: ^Bearer\s+.+$
+    replacement: Bearer ***MASKED***
+  - field: token
+    type: body
+    pattern: .+
+    replacement: '***MASKED***'
+  - field: password
+    type: body
+    pattern: .+
+    replacement: '***MASKED***'
+  - field: secret
+    type: body
+    pattern: .+
+    replacement: '***MASKED***'
+normalizeHeaders: true
+normalizeJsonKeys: true
+tolerance: 0.8

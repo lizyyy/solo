@@ -1,0 +1,51 @@
+version: "2"
+interactions:
+  - request:
+      method: GET
+      uri: https://api.example.com/users/123
+      headers:
+        content-type: application/json
+        authorization: Bearer ***MASKED***
+      body: null
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        content-type: application/json
+      body:
+        id: 123
+        name: John Doe
+        email: john.doe@example.com
+        created_at: "2024-01-15T00:00:00Z"
+  - request:
+      method: POST
+      uri: https://api.example.com/users
+      headers:
+        content-type: application/json
+      body:
+        name: Jane Doe
+        email: jane@example.com
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        content-type: application/json
+      body:
+        id: 789
+        name: Jane Doe
+        email: jane@example.com
+        role: user
+  - request:
+      method: DELETE
+      uri: https://api.example.com/users/999
+      headers:
+        content-type: application/json
+      body: null
+    response:
+      status:
+        code: 204
+        message: No Content
+      headers: {}
+      body: null

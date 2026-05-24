@@ -1,0 +1,47 @@
+{
+  "name": "cassette-diff",
+  "version": "1.0.0",
+  "description": "API Cassette 重放差异 CLI 工具 - 对比 HTTP cassette 文件差异",
+  "main": "dist/index.js",
+  "bin": {
+    "cassette-diff": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "test": "jest",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "cassette",
+    "vcr",
+    "diff",
+    "http",
+    "testing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0",
+    "diff": "^5.1.0",
+    "chalk": "^4.1.2",
+    "json-stable-stringify": "^1.1.1",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/diff": "^5.0.9",
+    "@types/json-stable-stringify": "^1.0.36",
+    "@types/lodash": "^4.14.202",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "@types/jest": "^29.5.11",
+    "eslint": "^8.54.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1"
+  }
+}

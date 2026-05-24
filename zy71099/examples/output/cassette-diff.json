@@ -1,0 +1,161 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-24T13:32:14.855Z",
+    "version": "1.0.0",
+    "expectedFile": "examples/expected.yml",
+    "actualFile": "examples/actual.yml"
+  },
+  "summary": {
+    "totalInteractions": {
+      "expected": 2,
+      "actual": 3
+    },
+    "matched": 2,
+    "added": 1,
+    "removed": 0,
+    "changed": 3,
+    "errors": 3,
+    "warnings": 1
+  },
+  "config": {
+    "ignoreOrder": true,
+    "ignoreFields": [
+      "body.id",
+      "body.created_at",
+      "body.updated_at",
+      "body.timestamp",
+      "query.timestamp",
+      "query.nonce",
+      "header.x-request-id",
+      "header.x-trace-id"
+    ],
+    "maskingRules": [
+      {
+        "field": "authorization",
+        "type": "header",
+        "pattern": "^Bearer\\s+.+$",
+        "replacement": "Bearer ***MASKED***"
+      },
+      {
+        "field": "token",
+        "type": "body",
+        "pattern": ".+",
+        "replacement": "***MASKED***"
+      },
+      {
+        "field": "password",
+        "type": "body",
+        "pattern": ".+",
+        "replacement": "***MASKED***"
+      },
+      {
+        "field": "secret",
+        "type": "body",
+        "pattern": ".+",
+        "replacement": "***MASKED***"
+      }
+    ],
+    "normalizeHeaders": true,
+    "normalizeJsonKeys": true,
+    "tolerance": 0.8
+  },
+  "differences": [
+    {
+      "interactionId": "GET_https___api_example_com_users_123_0",
+      "type": "response_body",
+      "severity": "error",
+      "message": "响应体存在差异",
+      "details": [
+        {
+          "path": "response.body.email",
+          "expected": "john@example.com",
+          "actual": "john.doe@example.com",
+          "type": "changed"
+        },
+        {
+          "path": "response.body.created_at",
+          "expected": "2024-01-01T00:00:00Z",
+          "actual": "2024-01-15T00:00:00Z",
+          "type": "changed"
+        }
+      ],
+      "expectedSource": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/expected.yml",
+        "line": 1
+      },
+      "actualSource": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/actual.yml",
+        "line": 1
+      }
+    },
+    {
+      "interactionId": "POST_https___api_example_com_users_1",
+      "type": "response_status",
+      "severity": "error",
+      "message": "响应状态码不匹配: 期望 201，实际 200",
+      "details": [
+        {
+          "path": "response.status.code",
+          "expected": 201,
+          "actual": 200,
+          "type": "changed"
+        }
+      ],
+      "expectedSource": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/expected.yml",
+        "line": 11
+      },
+      "actualSource": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/actual.yml",
+        "line": 11
+      }
+    },
+    {
+      "interactionId": "POST_https___api_example_com_users_1",
+      "type": "response_body",
+      "severity": "error",
+      "message": "响应体存在差异",
+      "details": [
+        {
+          "path": "response.body.id",
+          "expected": 456,
+          "actual": 789,
+          "type": "changed"
+        },
+        {
+          "path": "response.body.role",
+          "actual": "user",
+          "type": "added"
+        }
+      ],
+      "expectedSource": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/expected.yml",
+        "line": 11
+      },
+      "actualSource": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/actual.yml",
+        "line": 11
+      }
+    },
+    {
+      "interactionId": "DELETE_https___api_example_com_users_999_2",
+      "type": "request_added",
+      "severity": "warning",
+      "message": "新增请求: DELETE https://api.example.com/users/999",
+      "details": [],
+      "actualSource": {
+        "file": "/Users/lzy/pro/solo/workspaces/zy71099/examples/actual.yml",
+        "line": 21
+      }
+    }
+  ],
+  "exitCode": {
+    "code": 1,
+    "explanation": {
+      "code": 1,
+      "name": "DIFFERENCES_FOUND",
+      "description": "发现一个或多个差异",
+      "action": "查看生成的差异报告，确认是接口变更还是脱敏问题"
+    }
+  }
+}
