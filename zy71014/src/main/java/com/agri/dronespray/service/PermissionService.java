@@ -44,6 +44,9 @@ public class PermissionService {
     @Autowired
     private OperationReportRepository operationReportRepository;
 
+    @Autowired
+    private PermissionItemRepository permissionItemRepository;
+
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Transactional
@@ -262,5 +265,112 @@ public class PermissionService {
         String date = LocalDateTime.now().format(DATE_FORMATTER);
         String uuid = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         return "BG-" + date + "-" + uuid;
+    }
+
+    @Transactional
+    public PermissionItem addPermissionItem(Long permissionId, PermissionItem item, String operator) {
+        Permission permission = permissionRepository.findById(permissionId)
+                .orElseThrow(() -> new IllegalArgumentException("许可不存在"));
+
+        if (permission.getStatus() != PermissionStatus.DRAFT && permission.getStatus() != PermissionStatus.SYSTEM_REJECTED) {
+            throw new IllegalStateException("仅草稿或系统驳回状态的许可可以添加明细");
+        }
+
+        Plot plot = plotRepository.findById(item.getPlot().getId())
+                .orElseThrow(() -> new IllegalArgumentException("地块不存在"));
+
+        PesticideBatch batch = pesticideBatchRepository.findById(item.getPesticideBatch().getId())
+                .orElseThrow(() -> new IllegalArgumentException("药剂批次不存在"));
+
+        item.setPlot(plot);
+        item.setPesticideBatch(batch);
+        item.setCreatedBy(operator);
+
+        permission.addItem(item);
+        permission.setUpdatedBy(operator);
+        permissionRepository.save(permission);
+
+        return item;
+    }
+
+    @Transactional
+    public PermissionItem updatePermissionItem(Long permissionId, Long itemId, PermissionItem itemUpdate, String operator) {
+        Permission permission = permissionRepository.findById(permissionId)
+                .orElseThrow(() -> new IllegalArgumentException("许可不存在"));
+
+        if (permission.getStatus() != PermissionStatus.DRAFT && permission.getStatus() != PermissionStatus.SYSTEM_REJECTED) {
+            throw new IllegalStateException("仅草稿或系统驳回状态的许可可以修改明细");
+        }
+
+        PermissionItem existingItem = permissionItemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("明细不存在"));
+
+        if (!existingItem.getPermission().getId().equals(permissionId)) {
+            throw new IllegalArgumentException("该明细不属于当前许可");
+        }
+
+        if (itemUpdate.getPlot() != null && itemUpdate.getPlot().getId() != null) {
+            Plot plot = plotRepository.findById(itemUpdate.getPlot().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("地块不存在"));
+            existingItem.setPlot(plot);
+        }
+
+        if (itemUpdate.getPesticideBatch() != null && itemUpdate.getPesticideBatch().getId() != null) {
+            PesticideBatch batch = pesticideBatchRepository.findById(itemUpdate.getPesticideBatch().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("药剂批次不存在"));
+            existingItem.setPesticideBatch(batch);
+        }
+
+        if (itemUpdate.getDosage() != null) {
+            existingItem.setDosage(itemUpdate.getDosage());
+        }
+        if (itemUpdate.getDosageUnit() != null) {
+            existingItem.setDosageUnit(itemUpdate.getDosageUnit());
+        }
+        if (itemUpdate.getSprayMethod() != null) {
+            existingItem.setSprayMethod(itemUpdate.getSprayMethod());
+        }
+        if (itemUpdate.getRemark() != null) {
+            existingItem.setRemark(itemUpdate.getRemark());
+        }
+
+        existingItem.setUpdatedBy(operator);
+        permission.setUpdatedBy(operator);
+
+        return permissionItemRepository.save(existingItem);
+    }
+
+    @Transactional
+    public void removePermissionItem(Long permissionId, Long itemId, String operator) {
+        Permission permission = permissionRepository.findById(permissionId)
+                .orElseThrow(() -> new IllegalArgumentException("许可不存在"));
+
+        if (permission.getStatus() != PermissionStatus.DRAFT && permission.getStatus() != PermissionStatus.SYSTEM_REJECTED) {
+            throw new IllegalStateException("仅草稿或系统驳回状态的许可可以删除明细");
+        }
+
+        PermissionItem item = permissionItemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("明细不存在"));
+
+        if (!item.getPermission().getId().equals(permissionId)) {
+            throw new IllegalArgumentException("该明细不属于当前许可");
+        }
+
+        permission.getItems().remove(item);
+        permissionItemRepository.delete(item);
+        permission.setUpdatedBy(operator);
+        permissionRepository.save(permission);
+    }
+
+    public List<PermissionItem> getPermissionItems(Long permissionId) {
+        return permissionItemRepository.findByPermissionId(permissionId);
+    }
+
+    public PermissionItem getPermissionItem(Long permissionId, Long itemId) {
+        PermissionItem item = permissionItemRepository.findById(itemId).orElse(null);
+        if (item != null && item.getPermission().getId().equals(permissionId)) {
+            return item;
+        }
+        return null;
     }
 }

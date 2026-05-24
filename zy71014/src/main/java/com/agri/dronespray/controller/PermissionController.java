@@ -188,4 +188,44 @@ public class PermissionController {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(excelData);
     }
+
+    @GetMapping("/{id}/items")
+    public ResponseEntity<List<PermissionItem>> getPermissionItems(@PathVariable Long id) {
+        return ResponseEntity.ok(permissionService.getPermissionItems(id));
+    }
+
+    @GetMapping("/{id}/items/{itemId}")
+    public ResponseEntity<PermissionItem> getPermissionItem(@PathVariable Long id, @PathVariable Long itemId) {
+        PermissionItem item = permissionService.getPermissionItem(id, itemId);
+        return item != null ? ResponseEntity.ok(item) : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/items")
+    public ResponseEntity<?> addPermissionItem(@PathVariable Long id, @RequestBody PermissionItem item) {
+        try {
+            return ResponseEntity.ok(permissionService.addPermissionItem(id, item, DEFAULT_OPERATOR));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/items/{itemId}")
+    public ResponseEntity<?> updatePermissionItem(@PathVariable Long id, @PathVariable Long itemId,
+                                                   @RequestBody PermissionItem item) {
+        try {
+            return ResponseEntity.ok(permissionService.updatePermissionItem(id, itemId, item, DEFAULT_OPERATOR));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}/items/{itemId}")
+    public ResponseEntity<?> removePermissionItem(@PathVariable Long id, @PathVariable Long itemId) {
+        try {
+            permissionService.removePermissionItem(id, itemId, DEFAULT_OPERATOR);
+            return ResponseEntity.ok().body(Map.of("message", "明细删除成功"));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }

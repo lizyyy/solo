@@ -179,7 +179,14 @@ public class Permission {
     }
 
     public void setItems(List<PermissionItem> items) {
-        this.items = items;
+        if (this.items != null) {
+            this.items.clear();
+        }
+        if (items != null) {
+            for (PermissionItem item : items) {
+                addItem(item);
+            }
+        }
     }
 
     public List<CheckRecord> getCheckRecords() {
