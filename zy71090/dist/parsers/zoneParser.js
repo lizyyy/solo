@@ -1,0 +1,264 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.parseZoneFile = parseZoneFile;
+exports.validateZoneRecords = validateZoneRecords;
+exports.formatTTL = formatTTL;
+const promises_1 = require("fs/promises");
+const path_1 = require("path");
+const validator_1 = require("../utils/validator");
+async function parseZoneFile(filePath) {
+    const content = await (0, promises_1.readFile)(filePath, 'utf-8');
+    const ext = (0, path_1.extname)(filePath).toLowerCase();
+    const zoneName = (0, path_1.basename)(filePath, ext).replace(/\.zone$/, '');
+    switch (ext) {
+        case '.json':
+            return parseJSONFormat(content, zoneName);
+        case '.zone':
+        case '.txt':
+            return parseBINDFormat(content, zoneName);
+        default:
+            return parseBINDFormat(content, zoneName);
+    }
+}
+function parseJSONFormat(content, zoneName) {
+    try {
+        const data = JSON.parse(content);
+        if (data.ResourceRecordSets) {
+            return parseAWSFormat(data, zoneName);
+        }
+        if (Array.isArray(data)) {
+            const records = data.map(parseJSONRecord).filter(Boolean);
+            return { name: zoneName, records };
+        }
+        if (data.records && Array.isArray(data.records)) {
+            return {
+                name: data.name || zoneName,
+                records: data.records.map(parseJSONRecord).filter(Boolean)
+            };
+        }
+        throw new Error('无法识别的 JSON 格式');
+    }
+    catch (error) {
+        if (error instanceof SyntaxError) {
+            throw new Error(`JSON 解析失败: ${error.message}`);
+        }
+        throw error;
+    }
+}
+function parseAWSFormat(data, zoneName) {
+    const records = [];
+    for (const rrset of data.ResourceRecordSets) {
+        const ttl = rrset.TTL || 300;
+        const name = rrset.Name.endsWith('.') ? rrset.Name.slice(0, -1) : rrset.Name;
+        if (rrset.ResourceRecords) {
+            for (const rr of rrset.ResourceRecords) {
+                records.push({
+                    name,
+                    type: rrset.Type,
+                    ttl,
+                    value: rr.Value,
+                    setIdentifier: rrset.SetIdentifier,
+                    weight: rrset.Weight
+                });
+            }
+        }
+        if (rrset.AliasTarget) {
+            records.push({
+                name,
+                type: rrset.Type,
+                ttl,
+                value: rrset.AliasTarget.DNSName,
+                comment: 'ALIAS record'
+            });
+        }
+    }
+    return { name: zoneName, records };
+}
+function parseJSONRecord(item) {
+    if (!item.name || !item.type || !item.value) {
+        return null;
+    }
+    return {
+        name: item.name,
+        type: item.type.toUpperCase(),
+        ttl: parseInt(item.ttl, 10) || 300,
+        value: item.value,
+        comment: item.comment,
+        weight: item.weight,
+        priority: item.priority,
+        setIdentifier: item.setIdentifier
+    };
+}
+function parseBINDFormat(content, zoneName) {
+    const lines = content.split('\n');
+    const records = [];
+    let origin = zoneName;
+    let defaultTTL = 3600;
+    let currentName = '';
+    let i = 0;
+    while (i < lines.length) {
+        let line = lines[i].trim();
+        if (!line || line.startsWith(';')) {
+            i++;
+            continue;
+        }
+        while (line.endsWith('(')) {
+            i++;
+            const nextLine = lines[i]?.trim() || '';
+            line = line.slice(0, -1) + ' ' + nextLine.replace(')', '');
+            if (!nextLine.includes(')'))
+                break;
+        }
+        line = line.replace(/\s+/g, ' ');
+        if (line.startsWith('$ORIGIN')) {
+            origin = line.split(' ')[1].replace(/\.$/, '');
+            i++;
+            continue;
+        }
+        if (line.startsWith('$TTL')) {
+            defaultTTL = parseTTL(line.split(' ')[1]);
+            i++;
+            continue;
+        }
+        const record = parseBINDRecordLine(line, origin, defaultTTL, currentName);
+        if (record) {
+            records.push(record);
+            currentName = record.name;
+        }
+        i++;
+    }
+    return {
+        name: zoneName,
+        records,
+        origin,
+        ttl: defaultTTL
+    };
+}
+function parseBINDRecordLine(line, origin, defaultTTL, currentName) {
+    const parts = line.split(' ');
+    if (parts.length < 3)
+        return null;
+    let name = parts[0];
+    let offset = 1;
+    if (name === '') {
+        name = currentName;
+    }
+    else if (name === '@') {
+        name = origin;
+    }
+    else if (!name.endsWith('.') && !name.startsWith('*')) {
+        name = name + '.' + origin;
+    }
+    else if (name.endsWith('.')) {
+        name = name.slice(0, -1);
+    }
+    let ttl = defaultTTL;
+    if (/^\d+$/.test(parts[offset])) {
+        ttl = parseInt(parts[offset], 10);
+        offset++;
+    }
+    let recordClass = 'IN';
+    if (['IN', 'CH', 'HS', 'CS'].includes(parts[offset]?.toUpperCase())) {
+        recordClass = parts[offset].toUpperCase();
+        offset++;
+    }
+    const type = parts[offset]?.toUpperCase();
+    offset++;
+    if (!type || !/^[A-Z]+$/.test(type)) {
+        return null;
+    }
+    const value = parts.slice(offset).join(' ');
+    if (!value)
+        return null;
+    return {
+        name: normalizeDomain(name),
+        type,
+        ttl,
+        value: normalizeRecordValue(type, value)
+    };
+}
+function normalizeDomain(domain) {
+    if (domain.endsWith('.')) {
+        return domain.slice(0, -1);
+    }
+    return domain;
+}
+function normalizeRecordValue(type, value) {
+    type = type.toUpperCase();
+    if (type === 'CNAME' || type === 'NS' || type === 'PTR') {
+        return normalizeDomain(value);
+    }
+    if (type === 'SOA') {
+        return value;
+    }
+    if (type === 'MX') {
+        const parts = value.split(' ');
+        if (parts.length >= 2) {
+            const priority = parts[0];
+            const exchange = normalizeDomain(parts.slice(1).join(' '));
+            return `${priority} ${exchange}`;
+        }
+    }
+    if (type === 'SRV') {
+        const parts = value.split(' ');
+        if (parts.length >= 4) {
+            const [priority, weight, port, target] = parts;
+            return `${priority} ${weight} ${port} ${normalizeDomain(target)}`;
+        }
+    }
+    return value;
+}
+function parseTTL(ttlStr) {
+    const match = ttlStr.match(/^(\d+)([smhdw])?$/i);
+    if (!match)
+        return 3600;
+    const value = parseInt(match[1], 10);
+    const unit = (match[2] || 's').toLowerCase();
+    const multipliers = {
+        s: 1,
+        m: 60,
+        h: 3600,
+        d: 86400,
+        w: 604800
+    };
+    return value * (multipliers[unit] || 1);
+}
+function validateZoneRecords(records, strict = false) {
+    const errors = [];
+    const warnings = [];
+    for (const record of records) {
+        const ttlError = (0, validator_1.validateTTL)(record.ttl);
+        if (ttlError) {
+            if (ttlError.severity === 'error') {
+                errors.push(`[${record.name}] ${ttlError.message}`);
+            }
+            else {
+                warnings.push(`[${record.name}] ${ttlError.message}`);
+            }
+        }
+        const nameError = (0, validator_1.validateDomainName)(record.name);
+        if (nameError) {
+            if (nameError.severity === 'error') {
+                errors.push(`[${record.name}] ${nameError.message}`);
+            }
+            else {
+                warnings.push(`[${record.name}] ${nameError.message}`);
+            }
+        }
+        const typeError = (0, validator_1.validateRecordType)(record.type);
+        if (typeError) {
+            warnings.push(`[${record.name}] ${typeError.message}`);
+        }
+    }
+    return { errors, warnings };
+}
+function formatTTL(seconds) {
+    if (seconds < 60)
+        return `${seconds}s`;
+    if (seconds < 3600)
+        return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+    if (seconds < 86400)
+        return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+    return `${Math.floor(seconds / 86400)}d ${Math.floor((seconds % 86400) / 3600)}h`;
+}
+//# sourceMappingURL=zoneParser.js.map

@@ -1,0 +1,49 @@
+$ORIGIN example.com.
+$TTL 3600
+
+@       IN  SOA  ns1.example.com. admin.example.com. (
+                 2024010101 ; serial
+                 7200       ; refresh (2 hours)
+                 3600       ; retry (1 hour)
+                 1209600    ; expire (2 weeks)
+                 86400      ; minimum TTL (1 day)
+                 )
+
+@       IN  NS   ns1.example.com.
+@       IN  NS   ns2.example.com.
+ns1     IN  A    10.0.0.1
+ns2     IN  A    10.0.0.2
+
+@       IN  A    192.168.1.1
+www     IN  A    192.168.1.1
+api     IN  CNAME www.example.com.
+app     IN  CNAME api.example.com.
+
+prod-www IN A   192.168.1.10
+prod-api IN CNAME prod-www.example.com.
+
+stg-www  IN A   192.168.1.20
+stg-api  IN CNAME stg-www.example.com.
+
+dev-www  IN A   192.168.1.30
+dev-api  IN CNAME dev-www.example.com.
+
+test-www IN A   192.168.1.40
+
+monitor  IN A   192.168.1.100
+metrics  IN CNAME monitor.example.com.
+
+*.app    IN A   192.168.1.200
+*.staging IN CNAME prod-www.example.com.
+
+mail    IN  MX   10 mail.example.com.
+mail    IN  A    192.168.1.50
+
+@       IN  TXT  "v=spf1 include:_spf.google.com ~all"
+_dmarc  IN  TXT  "v=DMARC1; p=none; rua=mailto:dmarc@example.com"
+
+legacy  IN  A    192.168.1.60
+
+cdn     IN  CNAME  example-com.cloudfront.net.
+
+service IN  SRV   10 50 8080 prod-www.example.com.

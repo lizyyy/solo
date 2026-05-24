@@ -1,0 +1,84 @@
+{
+  "ResourceRecordSets": [
+    {
+      "Name": "example.com.",
+      "Type": "A",
+      "TTL": 300,
+      "ResourceRecords": [
+        { "Value": "192.168.1.1" }
+      ]
+    },
+    {
+      "Name": "www.example.com.",
+      "Type": "A",
+      "TTL": 300,
+      "ResourceRecords": [
+        { "Value": "192.168.1.1" }
+      ]
+    },
+    {
+      "Name": "api.example.com.",
+      "Type": "CNAME",
+      "TTL": 1800,
+      "ResourceRecords": [
+        { "Value": "www.example.com." }
+      ]
+    },
+    {
+      "Name": "app.example.com.",
+      "Type": "CNAME",
+      "TTL": 1800,
+      "ResourceRecords": [
+        { "Value": "api.example.com." }
+      ]
+    },
+    {
+      "Name": "prod-www.example.com.",
+      "Type": "A",
+      "TTL": 60,
+      "ResourceRecords": [
+        { "Value": "192.168.1.10" }
+      ]
+    },
+    {
+      "Name": "stg-www.example.com.",
+      "Type": "A",
+      "TTL": 86400,
+      "ResourceRecords": [
+        { "Value": "192.168.1.20" }
+      ]
+    },
+    {
+      "Name": "dev-www.example.com.",
+      "Type": "A",
+      "TTL": 3600,
+      "ResourceRecords": [
+        { "Value": "192.168.1.30" }
+      ]
+    },
+    {
+      "Name": "legacy.example.com.",
+      "Type": "A",
+      "TTL": 172800,
+      "ResourceRecords": [
+        { "Value": "192.168.1.60" }
+      ]
+    },
+    {
+      "Name": "monitor.example.com.",
+      "Type": "A",
+      "TTL": 300,
+      "ResourceRecords": [
+        { "Value": "192.168.1.100" }
+      ]
+    },
+    {
+      "Name": "metrics.example.com.",
+      "Type": "CNAME",
+      "TTL": 300,
+      "ResourceRecords": [
+        { "Value": "monitor.example.com." }
+      ]
+    }
+  ]
+}
