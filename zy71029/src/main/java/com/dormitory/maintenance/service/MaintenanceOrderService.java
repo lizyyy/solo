@@ -101,6 +101,11 @@ public class MaintenanceOrderService {
             throw new IllegalStateException("当前状态不允许提交审批");
         }
 
+        ValidationResult strictValidation = validateOrderStrict(order);
+        if (strictValidation.hasErrors()) {
+            throw new IllegalArgumentException("工单校验未通过：" + strictValidation.getErrorSummary());
+        }
+
         MaintenanceStatus oldStatus = order.getStatus();
         order.setStatus(MaintenanceStatus.PENDING_APPROVAL);
 
@@ -125,33 +130,72 @@ public class MaintenanceOrderService {
             throw new IllegalStateException("当前状态不允许修改");
         }
 
-        String oldValue = String.format("时间:%s至%s, 施工队:%s",
+        String oldBasicInfo = String.format("时间:%s至%s, 施工队:%s",
                 order.getScheduledStartTime(), order.getScheduledEndTime(),
                 order.getTeam() != null ? order.getTeam().getTeamName() : "未分配");
+        String oldValidationInfo = String.format("校验结论: 冲突=%s, 详情=%s",
+                order.getHasConflict(),
+                order.getConflictDetail() != null ? order.getConflictDetail() : "无");
 
         updateOrderFromRequest(order, request);
         validateAndSetConflict(order);
 
         MaintenanceOrder saved = orderRepository.save(order);
 
-        String newValue = String.format("时间:%s至%s, 施工队:%s",
+        String newBasicInfo = String.format("时间:%s至%s, 施工队:%s",
                 saved.getScheduledStartTime(), saved.getScheduledEndTime(),
                 saved.getTeam() != null ? saved.getTeam().getTeamName() : "未分配");
+        String newValidationInfo = String.format("校验结论: 冲突=%s, 详情=%s",
+                saved.getHasConflict(),
+                saved.getConflictDetail() != null ? saved.getConflictDetail() : "无");
+
+        String operator = request.getOperator() != null ? request.getOperator() : "system";
 
         auditLogService.logOrderChange(
                 saved.getId(), saved.getOrderNo(),
-                "UPDATE", oldValue, newValue,
-                "修改工单信息", request.getOperator() != null ? request.getOperator() : "system"
+                "UPDATE_BASIC", oldBasicInfo, newBasicInfo,
+                "修改工单基本信息", operator
         );
+
+        if (!oldValidationInfo.equals(newValidationInfo)) {
+            auditLogService.logOrderChange(
+                    saved.getId(), saved.getOrderNo(),
+                    "CORRECT_CONCLUSION",
+                    oldValidationInfo,
+                    newValidationInfo,
+                    "人工修正校验结论，修正人: " + operator,
+                    operator
+            );
+        }
 
         return saved;
     }
 
     public ValidationResult validateOrder(Long orderId) {
         MaintenanceOrder order = getOrder(orderId);
+        return validateOrder(order);
+    }
 
+    private ValidationResult validateOrder(MaintenanceOrder order) {
         ValidationResult quietResult = quietPeriodValidator.validateOrder(order);
         ValidationResult duplicateResult = duplicateChecker.checkDuplicate(order);
+
+        ValidationResult combined = new ValidationResult();
+        combined.getWarnings().addAll(quietResult.getWarnings());
+        combined.getWarnings().addAll(duplicateResult.getWarnings());
+        combined.getErrors().addAll(quietResult.getErrors());
+        combined.getErrors().addAll(duplicateResult.getErrors());
+
+        if (combined.hasIssues()) {
+            combined.setConflictDetail(combined.getSummary());
+        }
+
+        return combined;
+    }
+
+    private ValidationResult validateOrderStrict(MaintenanceOrder order) {
+        ValidationResult quietResult = quietPeriodValidator.validateOrder(order);
+        ValidationResult duplicateResult = duplicateChecker.checkDuplicateStrict(order);
 
         ValidationResult combined = new ValidationResult();
         combined.getWarnings().addAll(quietResult.getWarnings());
@@ -225,6 +269,13 @@ public class MaintenanceOrderService {
 
         MaintenanceOrder saved = orderRepository.save(order);
 
+        if (duplicateChecker.hasOverTimeRisk(saved)) {
+            String overTimeDetail = duplicateChecker.getOverTimeDetail(saved);
+            saved.setHasConflict(true);
+            saved.setConflictDetail((saved.getConflictDetail() != null ? saved.getConflictDetail() + "; " : "") + overTimeDetail);
+            saved = orderRepository.save(saved);
+        }
+
         auditLogService.logOrderChange(
                 saved.getId(), saved.getOrderNo(),
                 "COMPLETE_WORK", oldStatus.getDescription(), saved.getStatus().getDescription(),
@@ -234,8 +285,103 @@ public class MaintenanceOrderService {
         return saved;
     }
 
+    public Map<String, Object> checkOverTime(Long orderId) {
+        MaintenanceOrder order = getOrder(orderId);
+        boolean hasOverTime = duplicateChecker.hasOverTimeRisk(order);
+        String overTimeDetail = duplicateChecker.getOverTimeDetail(order);
+
+        return Map.of(
+                "orderId", orderId,
+                "orderNo", order.getOrderNo(),
+                "hasOverTimeRisk", hasOverTime,
+                "overTimeDetail", overTimeDetail,
+                "scheduledMinutes", order.getActualStartTime() != null ?
+                        java.time.Duration.between(order.getScheduledStartTime(), order.getScheduledEndTime()).toMinutes() : 0,
+                "actualMinutes", order.getActualStartTime() != null ?
+                        java.time.Duration.between(order.getActualStartTime(),
+                                order.getActualEndTime() != null ? order.getActualEndTime() : LocalDateTime.now()).toMinutes() : 0
+        );
+    }
+
+    public List<Map<String, Object>> getOverTimeOrders() {
+        List<MaintenanceOrder> inProgressOrders = orderRepository.findByStatus(MaintenanceStatus.IN_PROGRESS);
+        List<Map<String, Object>> overTimeOrders = new ArrayList<>();
+
+        for (MaintenanceOrder order : inProgressOrders) {
+            if (duplicateChecker.hasOverTimeRisk(order)) {
+                Map<String, Object> info = new java.util.HashMap<>();
+                info.put("orderId", order.getId());
+                info.put("orderNo", order.getOrderNo());
+                info.put("title", order.getTitle());
+                info.put("overTimeDetail", duplicateChecker.getOverTimeDetail(order));
+                info.put("actualStartTime", order.getActualStartTime());
+                overTimeOrders.add(info);
+            }
+        }
+
+        return overTimeOrders;
+    }
+
     public List<MaintenanceOrder> getOrdersByStatus(MaintenanceStatus status) {
         return orderRepository.findByStatus(status);
+    }
+
+    @Transactional
+    public MaintenanceOrder requestOverTime(Long orderId, String reason, String operator) {
+        MaintenanceOrder order = getOrder(orderId);
+
+        if (order.getStatus() != MaintenanceStatus.IN_PROGRESS) {
+            throw new IllegalStateException("只有施工中的工单才能申请加班");
+        }
+
+        order.setOverTimeRequested(true);
+        order.setOverTimeReason(reason);
+
+        MaintenanceOrder saved = orderRepository.save(order);
+
+        auditLogService.logOrderChange(
+                saved.getId(), saved.getOrderNo(),
+                "OVERTIME_REQUEST",
+                "未申请加班",
+                "申请加班: " + reason,
+                "提交加班申请",
+                operator != null ? operator : "system"
+        );
+
+        return saved;
+    }
+
+    @Transactional
+    public MaintenanceOrder approveOverTime(Long orderId, boolean approved, String remark, String approver) {
+        MaintenanceOrder order = getOrder(orderId);
+
+        if (!Boolean.TRUE.equals(order.getOverTimeRequested())) {
+            throw new IllegalStateException("该工单未申请加班");
+        }
+
+        if (order.getOverTimeApproved() != null) {
+            throw new IllegalStateException("该工单加班申请已审批");
+        }
+
+        String oldValue = "待审批";
+        String newValue = approved ? "已批准" : "已拒绝";
+        order.setOverTimeApproved(approved);
+        order.setOverTimeApprover(approver);
+        order.setOverTimeApproveTime(LocalDateTime.now());
+        order.setOverTimeApproveRemark(remark);
+
+        MaintenanceOrder saved = orderRepository.save(order);
+
+        auditLogService.logOrderChange(
+                saved.getId(), saved.getOrderNo(),
+                "OVERTIME_APPROVE",
+                oldValue,
+                newValue,
+                remark,
+                approver != null ? approver : "system"
+        );
+
+        return saved;
     }
 
     private void updateOrderFromRequest(MaintenanceOrder order, MaintenanceOrderRequest request) {
@@ -272,7 +418,7 @@ public class MaintenanceOrderService {
     }
 
     private void validateAndSetConflict(MaintenanceOrder order) {
-        ValidationResult validation = validateOrder(order.getId());
+        ValidationResult validation = validateOrder(order);
         order.setValidationResult(validation.getSummary());
         order.setHasConflict(validation.hasIssues());
         order.setConflictDetail(validation.getConflictDetail());

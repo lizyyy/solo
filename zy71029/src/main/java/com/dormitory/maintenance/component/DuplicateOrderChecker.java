@@ -52,6 +52,36 @@ public class DuplicateOrderChecker {
         return result;
     }
 
+    public ValidationResult checkDuplicateStrict(MaintenanceOrder order) {
+        ValidationResult result = new ValidationResult();
+
+        List<MaintenanceOrder> overlapping = orderRepository.findOverlappingOrders(
+                order.getBuilding(),
+                order.getScheduledStartTime(),
+                order.getScheduledEndTime(),
+                ACTIVE_STATUSES
+        );
+
+        overlapping = overlapping.stream()
+                .filter(o -> !o.getId().equals(order.getId()))
+                .filter(o -> o.getTeam() != null && order.getTeam() != null && o.getTeam().getId().equals(order.getTeam().getId()))
+                .toList();
+
+        if (!overlapping.isEmpty()) {
+            StringBuilder sb = new StringBuilder("重复派单拦截：同一施工队在相同时段已有派单：");
+            for (MaintenanceOrder o : overlapping) {
+                sb.append(String.format("[%s]%s(%s至%s), ",
+                        o.getOrderNo(),
+                        o.getTitle(),
+                        o.getScheduledStartTime().toLocalTime(),
+                        o.getScheduledEndTime().toLocalTime()));
+            }
+            result.addError(sb.substring(0, sb.length() - 2));
+        }
+
+        return result;
+    }
+
     public boolean hasOverTimeRisk(MaintenanceOrder order) {
         if (order.getActualStartTime() == null) return false;
 

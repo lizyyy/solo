@@ -78,6 +78,20 @@ public class MaintenanceOrder {
     @Column(length = 500)
     private String remark;
 
+    private Boolean overTimeRequested = false;
+
+    @Column(length = 500)
+    private String overTimeReason;
+
+    private Boolean overTimeApproved;
+
+    private String overTimeApprover;
+
+    private LocalDateTime overTimeApproveTime;
+
+    @Column(length = 500)
+    private String overTimeApproveRemark;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -138,6 +152,18 @@ public class MaintenanceOrder {
     public void setConflictDetail(String conflictDetail) { this.conflictDetail = conflictDetail; }
     public String getRemark() { return remark; }
     public void setRemark(String remark) { this.remark = remark; }
+    public Boolean getOverTimeRequested() { return overTimeRequested; }
+    public void setOverTimeRequested(Boolean overTimeRequested) { this.overTimeRequested = overTimeRequested; }
+    public String getOverTimeReason() { return overTimeReason; }
+    public void setOverTimeReason(String overTimeReason) { this.overTimeReason = overTimeReason; }
+    public Boolean getOverTimeApproved() { return overTimeApproved; }
+    public void setOverTimeApproved(Boolean overTimeApproved) { this.overTimeApproved = overTimeApproved; }
+    public String getOverTimeApprover() { return overTimeApprover; }
+    public void setOverTimeApprover(String overTimeApprover) { this.overTimeApprover = overTimeApprover; }
+    public LocalDateTime getOverTimeApproveTime() { return overTimeApproveTime; }
+    public void setOverTimeApproveTime(LocalDateTime overTimeApproveTime) { this.overTimeApproveTime = overTimeApproveTime; }
+    public String getOverTimeApproveRemark() { return overTimeApproveRemark; }
+    public void setOverTimeApproveRemark(String overTimeApproveRemark) { this.overTimeApproveRemark = overTimeApproveRemark; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

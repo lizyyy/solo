@@ -77,6 +77,33 @@ public class MaintenanceOrderController {
         return ResponseEntity.ok(orderService.getAbnormalOrders());
     }
 
+    @GetMapping("/overtime")
+    public ResponseEntity<List<Map<String, Object>>> getOverTimeOrders() {
+        return ResponseEntity.ok(orderService.getOverTimeOrders());
+    }
+
+    @GetMapping("/{orderId}/overtime")
+    public ResponseEntity<Map<String, Object>> checkOverTime(@PathVariable Long orderId) {
+        return ResponseEntity.ok(orderService.checkOverTime(orderId));
+    }
+
+    @PostMapping("/{orderId}/overtime/request")
+    public ResponseEntity<MaintenanceOrder> requestOverTime(
+            @PathVariable Long orderId,
+            @RequestParam String reason,
+            @RequestParam(required = false) String operator) {
+        return ResponseEntity.ok(orderService.requestOverTime(orderId, reason, operator));
+    }
+
+    @PostMapping("/{orderId}/overtime/approve")
+    public ResponseEntity<MaintenanceOrder> approveOverTime(
+            @PathVariable Long orderId,
+            @RequestParam boolean approved,
+            @RequestParam(required = false) String remark,
+            @RequestParam(required = false) String approver) {
+        return ResponseEntity.ok(orderService.approveOverTime(orderId, approved, remark, approver));
+    }
+
     @GetMapping("/batch/{batchNo}")
     public ResponseEntity<List<MaintenanceOrder>> getOrdersByBatch(@PathVariable String batchNo) {
         return ResponseEntity.ok(orderService.getOrdersByBatch(batchNo));

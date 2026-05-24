@@ -34,35 +34,53 @@
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v3.2.0)
 
-2026-05-24T14:48:15.513+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] c.d.m.MaintenanceQuietApiApplication     : Starting MaintenanceQuietApiApplication using Java 26.0.1 with PID 66091 (/Users/lzy/pro/solo/workspaces/zy71029/target/classes started by lzy in /Users/lzy/pro/solo/workspaces/zy71029)
-2026-05-24T14:48:15.514+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] c.d.m.MaintenanceQuietApiApplication     : No active profile set, falling back to 1 default profile: "default"
-2026-05-24T14:48:15.692+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-05-24T14:48:15.714+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 20 ms. Found 7 JPA repository interfaces.
+2026-05-24T16:55:38.382+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] c.d.m.MaintenanceQuietApiApplication     : Starting MaintenanceQuietApiApplication using Java 26.0.1 with PID 40006 (/Users/lzy/pro/solo/workspaces/zy71029/target/classes started by lzy in /Users/lzy/pro/solo/workspaces/zy71029)
+2026-05-24T16:55:38.383+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] c.d.m.MaintenanceQuietApiApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-05-24T16:55:38.594+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-24T16:55:38.621+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 24 ms. Found 7 JPA repository interfaces.
 WARNING: A restricted method in java.lang.System has been called
 WARNING: java.lang.System::load has been called by org.apache.tomcat.jni.Library in an unnamed module (file:/Users/lzy/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.16/tomcat-embed-core-10.1.16.jar)
 WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
 WARNING: Restricted methods will be blocked in a future release unless native access is enabled
 
-2026-05-24T14:48:15.848+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
-2026-05-24T14:48:15.850+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-05-24T14:48:15.850+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
-2026-05-24T14:48:15.865+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-05-24T14:48:15.865+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 338 ms
-2026-05-24T14:48:15.876+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-05-24T14:48:15.946+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:file:./data/maintenance_db user=SA
-2026-05-24T14:48:15.946+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-05-24T14:48:15.950+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:file:./data/maintenance_db'
-2026-05-24T14:48:15.986+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-05-24T14:48:15.998+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.3.1.Final
-2026-05-24T14:48:16.006+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
-2026-05-24T14:48:16.064+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-05-24T14:48:16.074+08:00  WARN 66091 --- [maintenance-quiet-api] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-05-24T14:48:16.337+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-05-24T14:48:16.354+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-05-24T14:48:16.453+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-05-24T14:48:16.728+08:00  WARN 66091 --- [maintenance-quiet-api] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-05-24T14:48:16.830+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
-2026-05-24T14:48:16.833+08:00  INFO 66091 --- [maintenance-quiet-api] [           main] c.d.m.MaintenanceQuietApiApplication     : Started MaintenanceQuietApiApplication in 1.427 seconds (process running for 1.52)
-2026-05-24T14:49:08.840+08:00  INFO 66091 --- [maintenance-quiet-api] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-05-24T14:49:08.840+08:00  INFO 66091 --- [maintenance-quiet-api] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2026-05-24T14:49:08.840+08:00  INFO 66091 --- [maintenance-quiet-api] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-05-24T16:55:38.796+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2026-05-24T16:55:38.800+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-24T16:55:38.800+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.16]
+2026-05-24T16:55:38.818+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-24T16:55:38.819+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 420 ms
+2026-05-24T16:55:38.831+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-24T16:55:38.974+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:file:./data/maintenance_db user=SA
+2026-05-24T16:55:38.974+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-24T16:55:38.981+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:file:./data/maintenance_db'
+2026-05-24T16:55:39.030+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-24T16:55:39.049+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.3.1.Final
+2026-05-24T16:55:39.058+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-24T16:55:39.148+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-24T16:55:39.166+08:00  WARN 40006 --- [maintenance-quiet-api] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-05-24T16:55:39.553+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-24T16:55:39.575+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-24T16:55:39.704+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-24T16:55:40.057+08:00  WARN 40006 --- [maintenance-quiet-api] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-05-24T16:55:40.205+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path ''
+2026-05-24T16:55:40.208+08:00  INFO 40006 --- [maintenance-quiet-api] [           main] c.d.m.MaintenanceQuietApiApplication     : Started MaintenanceQuietApiApplication in 1.984 seconds (process running for 2.122)
+初始化宿舍楼数据完成
+初始化施工队数据完成
+初始化静音时段数据完成
+2026-05-24T16:56:24.475+08:00  INFO 40006 --- [maintenance-quiet-api] [nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-24T16:56:24.475+08:00  INFO 40006 --- [maintenance-quiet-api] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-24T16:56:24.476+08:00  INFO 40006 --- [maintenance-quiet-api] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-05-24T16:58:07.104+08:00  INFO 40006 --- [maintenance-quiet-api] [nio-8081-exec-3] o.apache.coyote.http11.Http11Processor   : Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+
+java.lang.IllegalArgumentException: Invalid character found in the request target [/api/orders/1/overtime/request?reason=0xe50xb70xa50xe70xa80x8b0xe50xa40x8d0xe60x9d0x820xe90x9c0x800xe80xa60x810xe50xbb0xb60xe90x950xbf&operator=worker ]. The valid characters are defined in RFC 7230 and RFC 3986
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:482) ~[tomcat-embed-core-10.1.16.jar:10.1.16]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:264) ~[tomcat-embed-core-10.1.16.jar:10.1.16]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.16.jar:10.1.16]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896) ~[tomcat-embed-core-10.1.16.jar:10.1.16]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1744) ~[tomcat-embed-core-10.1.16.jar:10.1.16]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.16.jar:10.1.16]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191) ~[tomcat-embed-core-10.1.16.jar:10.1.16]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659) ~[tomcat-embed-core-10.1.16.jar:10.1.16]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61) ~[tomcat-embed-core-10.1.16.jar:10.1.16]
+	at java.base/java.lang.Thread.run(Thread.java:1516) ~[na:na]
+

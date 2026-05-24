@@ -34,6 +34,14 @@ public class ValidationResult {
         return sb.toString();
     }
 
+    public boolean hasErrors() {
+        return !errors.isEmpty();
+    }
+
+    public String getErrorSummary() {
+        return String.join("; ", errors);
+    }
+
     public boolean isValid() { return valid; }
     public void setValid(boolean valid) { this.valid = valid; }
     public List<String> getWarnings() { return warnings; }
