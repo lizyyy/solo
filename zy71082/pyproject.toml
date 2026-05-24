@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gradle-dep-replace"
+version = "0.1.0"
+description = "Gradle 依赖替换 CLI 工具 - 统一管理版本目录、build.gradle 和插件替换规则"
+requires-python = ">=3.9"
+authors = [
+    { name = "Gradle Dep Replace Team" }
+]
+dependencies = [
+    "click>=8.0",
+    "toml>=0.10.2",
+    "pyyaml>=6.0",
+    "rich>=13.0",
+    "pydantic>=2.0",
+]
+
+[project.scripts]
+gradle-dep-replace = "gradle_dep_replace.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

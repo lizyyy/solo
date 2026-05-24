@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: gradle-dep-replace
+Version: 0.1.0
+Summary: Gradle 依赖替换 CLI 工具 - 统一管理版本目录、build.gradle 和插件替换规则
+Author: Gradle Dep Replace Team
+Requires-Python: >=3.9
+Requires-Dist: click>=8.0
+Requires-Dist: toml>=0.10.2
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: rich>=13.0
+Requires-Dist: pydantic>=2.0

@@ -1,0 +1,60 @@
+rules:
+  - id: upgrade-okhttp
+    name: 升级 OkHttp 版本
+    description: 将所有 OkHttp 相关依赖升级到 4.12.0
+    match_strategy: group
+    match_pattern: com.squareup.okhttp3
+    target_version: 4.12.0
+    reason: 修复安全漏洞，统一版本
+    priority: 100
+    is_active: true
+
+  - id: upgrade-glide
+    name: 升级 Glide 版本
+    description: 将 Glide 升级到 4.16.0
+    match_strategy: group
+    match_pattern: com.github.bumptech.glide
+    target_version: 4.16.0
+    reason: 新版本性能优化
+    priority: 90
+    is_active: true
+
+  - id: upgrade-room
+    name: 升级 Room 版本
+    description: 将 Room 组件升级到 2.6.1
+    match_strategy: group
+    match_pattern: androidx.room
+    target_version: 2.6.1
+    reason: 统一依赖管理版本
+    priority: 80
+    is_active: true
+
+  - id: upgrade-kotlin-stdlib
+    name: 升级 Kotlin 标准库
+    description: 将 kotlin-stdlib 升级到 1.9.20
+    match_strategy: exact
+    match_pattern: org.jetbrains.kotlin:kotlin-stdlib-jdk8
+    target_version: 1.9.20
+    reason: 与版本目录保持一致
+    priority: 85
+    is_active: true
+
+  - id: upgrade-lifecycle
+    name: 升级 Lifecycle 组件
+    description: 将 Lifecycle 组件升级到 2.6.2
+    match_strategy: pattern
+    match_pattern: androidx\.lifecycle:lifecycle-.*
+    target_version: 2.6.2
+    reason: 统一版本
+    priority: 70
+    is_active: true
+
+  - id: legacy-support-library
+    name: 替换旧版 Support 库
+    description: 将旧版 support 库替换为 AndroidX
+    match_strategy: pattern
+    match_pattern: com\.android\.support:.*
+    target_group: androidx
+    reason: Support 库已废弃，迁移到 AndroidX
+    priority: 200
+    is_active: false
