@@ -85,24 +85,43 @@ public class DuplicateOrderChecker {
     public boolean hasOverTimeRisk(MaintenanceOrder order) {
         if (order.getActualStartTime() == null) return false;
 
-        LocalDateTime expectedEnd = order.getActualStartTime()
-                .plusHours(order.getScheduledEndTime().getHour() - order.getScheduledStartTime().getHour())
-                .plusMinutes(order.getScheduledEndTime().getMinute() - order.getScheduledStartTime().getMinute());
+        LocalDateTime checkTime = order.getActualEndTime() != null ?
+                order.getActualEndTime() : LocalDateTime.now();
 
-        return LocalDateTime.now().isAfter(expectedEnd.plusMinutes(30));
+        return checkOverTimeAtPoint(order, checkTime);
     }
 
     public String getOverTimeDetail(MaintenanceOrder order) {
         if (order.getActualStartTime() == null) return "";
 
+        LocalDateTime checkTime = order.getActualEndTime() != null ?
+                order.getActualEndTime() : LocalDateTime.now();
+
+        return getOverTimeDetailAtPoint(order, checkTime);
+    }
+
+    public boolean checkOverTimeAtPoint(MaintenanceOrder order, LocalDateTime checkTime) {
+        if (order.getActualStartTime() == null) return false;
+
+        long scheduledMinutes = java.time.Duration.between(
+                order.getScheduledStartTime(), order.getScheduledEndTime()).toMinutes();
+
+        LocalDateTime expectedEnd = order.getActualStartTime().plusMinutes(scheduledMinutes);
+
+        return checkTime.isAfter(expectedEnd.plusMinutes(30));
+    }
+
+    public String getOverTimeDetailAtPoint(MaintenanceOrder order, LocalDateTime checkTime) {
+        if (order.getActualStartTime() == null) return "";
+
         long scheduledMinutes = java.time.Duration.between(
                 order.getScheduledStartTime(), order.getScheduledEndTime()).toMinutes();
         long actualMinutes = java.time.Duration.between(
-                order.getActualStartTime(), LocalDateTime.now()).toMinutes();
+                order.getActualStartTime(), checkTime).toMinutes();
         long overMinutes = actualMinutes - scheduledMinutes;
 
         if (overMinutes > 0) {
-            return String.format("超时%d分钟（计划%d分钟，已进行%d分钟）",
+            return String.format("超时%d分钟（计划%d分钟，实际%d分钟）",
                     overMinutes, scheduledMinutes, actualMinutes);
         }
         return "";

@@ -34,8 +34,13 @@ public interface MaintenanceOrderRepository extends JpaRepository<MaintenanceOrd
             @Param("endTime") LocalDateTime endTime,
             @Param("statuses") List<MaintenanceStatus> statuses);
 
-    @Query("SELECT m FROM MaintenanceOrder m WHERE m.hasConflict = true AND m.status != :completedStatus")
-    List<MaintenanceOrder> findOrdersWithConflict(@Param("completedStatus") MaintenanceStatus completedStatus);
+    @Query("SELECT m FROM MaintenanceOrder m WHERE m.hasConflict = true")
+    List<MaintenanceOrder> findAllOrdersWithConflict();
+
+    @Query("SELECT m FROM MaintenanceOrder m WHERE m.status = :status " +
+           "AND m.actualStartTime IS NOT NULL AND m.actualEndTime IS NULL " +
+           "AND m.overTimeRequested = true AND m.overTimeApproved IS NULL")
+    List<MaintenanceOrder> findOrdersWithPendingOverTimeApproval(@Param("status") MaintenanceStatus status);
 
     @Query("SELECT m FROM MaintenanceOrder m WHERE m.batchNo = :batchNo ORDER BY m.createdAt DESC")
     List<MaintenanceOrder> findByBatchNoOrderByCreatedAtDesc(@Param("batchNo") String batchNo);

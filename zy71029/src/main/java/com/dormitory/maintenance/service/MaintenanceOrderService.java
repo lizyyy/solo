@@ -211,7 +211,15 @@ public class MaintenanceOrderService {
     }
 
     public List<MaintenanceOrder> getAbnormalOrders() {
-        return orderRepository.findOrdersWithConflict(MaintenanceStatus.COMPLETED);
+        List<MaintenanceOrder> conflictOrders = orderRepository.findAllOrdersWithConflict();
+        List<MaintenanceOrder> pendingApprovalOrders =
+                orderRepository.findOrdersWithPendingOverTimeApproval(MaintenanceStatus.IN_PROGRESS);
+
+        java.util.Set<MaintenanceOrder> result = new java.util.LinkedHashSet<>();
+        result.addAll(conflictOrders);
+        result.addAll(pendingApprovalOrders);
+
+        return new ArrayList<>(result);
     }
 
     public List<MaintenanceOrder> getOrdersByBatch(String batchNo) {
@@ -263,14 +271,26 @@ public class MaintenanceOrderService {
             throw new IllegalStateException("当前状态不允许完成施工");
         }
 
+        LocalDateTime now = LocalDateTime.now();
+        boolean isOverTime = duplicateChecker.checkOverTimeAtPoint(order, now);
+
+        if (isOverTime) {
+            if (!Boolean.TRUE.equals(order.getOverTimeRequested())) {
+                throw new IllegalStateException("施工已超时，请先申请加班后再完成工单");
+            }
+            if (!Boolean.TRUE.equals(order.getOverTimeApproved())) {
+                throw new IllegalStateException("加班申请尚未审批通过，无法完成工单");
+            }
+        }
+
         MaintenanceStatus oldStatus = order.getStatus();
         order.setStatus(MaintenanceStatus.COMPLETED);
-        order.setActualEndTime(LocalDateTime.now());
+        order.setActualEndTime(now);
 
         MaintenanceOrder saved = orderRepository.save(order);
 
-        if (duplicateChecker.hasOverTimeRisk(saved)) {
-            String overTimeDetail = duplicateChecker.getOverTimeDetail(saved);
+        if (isOverTime) {
+            String overTimeDetail = duplicateChecker.getOverTimeDetailAtPoint(saved, now);
             saved.setHasConflict(true);
             saved.setConflictDetail((saved.getConflictDetail() != null ? saved.getConflictDetail() + "; " : "") + overTimeDetail);
             saved = orderRepository.save(saved);
