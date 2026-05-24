@@ -9,13 +9,14 @@ type EnumValue struct {
 }
 
 type Enum struct {
-	Name         string      `json:"name"`
-	FullName     string      `json:"full_name"`
-	Values       []EnumValue `json:"values"`
-	Reserved     []Reserved  `json:"reserved"`
-	FilePath     string      `json:"file_path"`
-	PackageName  string      `json:"package_name"`
-	MessageNest  []string    `json:"message_nest"`
+	Name        string      `json:"name"`
+	FullName    string      `json:"full_name"`
+	Values      []EnumValue `json:"values"`
+	Reserved    []Reserved  `json:"reserved"`
+	FilePath    string      `json:"file_path"`
+	PackageName string      `json:"package_name"`
+	MessageNest []string    `json:"message_nest"`
+	AllowAlias  bool        `json:"allow_alias"`
 }
 
 type Reserved struct {
@@ -35,9 +36,9 @@ type ProtoFile struct {
 }
 
 type Snapshot struct {
-	Version   string     `json:"version"`
-	Timestamp time.Time  `json:"timestamp"`
-	Service   string     `json:"service"`
+	Version   string      `json:"version"`
+	Timestamp time.Time   `json:"timestamp"`
+	Service   string      `json:"service"`
 	Files     []ProtoFile `json:"files"`
 }
 
@@ -63,43 +64,43 @@ const (
 )
 
 type Issue struct {
-	Type        IssueType     `json:"type"`
-	Severity    IssueSeverity `json:"severity"`
-	Message     string        `json:"message"`
-	FilePath    string        `json:"file_path"`
-	EnumName    string        `json:"enum_name"`
-	ValueName   string        `json:"value_name,omitempty"`
-	Number      int32         `json:"number,omitempty"`
-	Details     string        `json:"details,omitempty"`
-	ExitCode    int           `json:"exit_code"`
+	Type      IssueType     `json:"type"`
+	Severity  IssueSeverity `json:"severity"`
+	Message   string        `json:"message"`
+	FilePath  string        `json:"file_path"`
+	EnumName  string        `json:"enum_name"`
+	ValueName string        `json:"value_name,omitempty"`
+	Number    int32         `json:"number,omitempty"`
+	Details   string        `json:"details,omitempty"`
+	ExitCode  int           `json:"exit_code"`
 }
 
 type Report struct {
-	Service       string        `json:"service"`
-	GeneratedAt   time.Time     `json:"generated_at"`
-	InputFiles    []string      `json:"input_files"`
-	SnapshotFile  string        `json:"snapshot_file,omitempty"`
-	Issues        []Issue       `json:"issues"`
-	TotalErrors   int           `json:"total_errors"`
-	TotalWarnings int           `json:"total_warnings"`
-	ExitCode      int           `json:"exit_code"`
-	ExitCodeDesc  string        `json:"exit_code_desc"`
+	Service       string    `json:"service"`
+	GeneratedAt   time.Time `json:"generated_at"`
+	InputFiles    []string  `json:"input_files"`
+	SnapshotFile  string    `json:"snapshot_file,omitempty"`
+	Issues        []Issue   `json:"issues"`
+	TotalErrors   int       `json:"total_errors"`
+	TotalWarnings int       `json:"total_warnings"`
+	ExitCode      int       `json:"exit_code"`
+	ExitCodeDesc  string    `json:"exit_code_desc"`
 }
 
 const (
-	ExitCodeSuccess          = 0
-	ExitCodeParseError       = 1
-	ExitCodeValidationError  = 2
-	ExitCodeBreakingChange   = 3
-	ExitCodeSnapshotError    = 4
-	ExitCodeIOError          = 5
+	ExitCodeSuccess         = 0
+	ExitCodeParseError      = 1
+	ExitCodeValidationError = 2
+	ExitCodeBreakingChange  = 3
+	ExitCodeSnapshotError   = 4
+	ExitCodeIOError         = 5
 )
 
 var ExitCodeDescriptions = map[int]string{
-	ExitCodeSuccess:          "检查通过，未发现问题",
-	ExitCodeParseError:       "Proto 文件解析错误",
-	ExitCodeValidationError:  "输入参数验证失败",
-	ExitCodeBreakingChange:   "发现破坏性变更或严重问题",
-	ExitCodeSnapshotError:    "快照文件读取或解析错误",
-	ExitCodeIOError:          "文件读写错误",
+	ExitCodeSuccess:         "检查通过，未发现问题",
+	ExitCodeParseError:      "Proto 文件解析错误",
+	ExitCodeValidationError: "输入参数验证失败",
+	ExitCodeBreakingChange:  "发现破坏性变更或严重问题",
+	ExitCodeSnapshotError:   "快照文件读取或解析错误",
+	ExitCodeIOError:         "文件读写错误",
 }

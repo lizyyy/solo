@@ -45,30 +45,20 @@ func (c *Checker) checkDuplicateNumbers(enum types.Enum) []types.Issue {
 	}
 
 	for num, names := range numberMap {
-		if len(names) > 1 {
-			hasAllowAlias := false
-			for _, ev := range enum.Values {
-				if ev.Number == num && ev.IsAlias {
-					hasAllowAlias = true
-					break
-				}
-			}
-
-			if !hasAllowAlias {
-				issues = append(issues, types.Issue{
-					Type:     types.IssueDuplicateNumber,
-					Severity: types.SeverityError,
-					Message: fmt.Sprintf("枚举值编号 %d 被重复使用: %v (未启用 allow_alias)",
-						num, names),
-					FilePath: enum.FilePath,
-					EnumName: enum.FullName,
-					Number:   num,
-					Details: fmt.Sprintf("同一编号被多个枚举值使用: %v。"+
-						"如果这是故意的别名，请在枚举中添加 'option allow_alias = true;'；"+
-						"否则请修改编号以保持唯一性。", names),
-					ExitCode: types.ExitCodeBreakingChange,
-				})
-			}
+		if len(names) > 1 && !enum.AllowAlias {
+			issues = append(issues, types.Issue{
+				Type:     types.IssueDuplicateNumber,
+				Severity: types.SeverityError,
+				Message: fmt.Sprintf("枚举值编号 %d 被重复使用: %v (未启用 allow_alias)",
+					num, names),
+				FilePath: enum.FilePath,
+				EnumName: enum.FullName,
+				Number:   num,
+				Details: fmt.Sprintf("同一编号被多个枚举值使用: %v。"+
+					"如果这是故意的别名，请在枚举中添加 'option allow_alias = true;'；"+
+					"否则请修改编号以保持唯一性。", names),
+				ExitCode: types.ExitCodeBreakingChange,
+			})
 		}
 	}
 
@@ -85,8 +75,8 @@ func (c *Checker) checkReservedViolations(enum types.Enum) []types.Issue {
 				Severity: types.SeverityError,
 				Message: fmt.Sprintf("枚举值 '%s' 使用了保留编号 %d",
 					ev.Name, ev.Number),
-				FilePath: enum.FilePath,
-				EnumName: enum.FullName,
+				FilePath:  enum.FilePath,
+				EnumName:  enum.FullName,
 				ValueName: ev.Name,
 				Number:    ev.Number,
 				Details: fmt.Sprintf("编号 %d 已被声明为 reserved，不能被枚举值 '%s' 使用。"+
@@ -98,11 +88,11 @@ func (c *Checker) checkReservedViolations(enum types.Enum) []types.Issue {
 
 		if isNameReserved(ev.Name, enum.Reserved) {
 			issues = append(issues, types.Issue{
-				Type:     types.IssueReservedViolation,
-				Severity: types.SeverityError,
-				Message: fmt.Sprintf("枚举值名称 '%s' 已被保留", ev.Name),
-				FilePath: enum.FilePath,
-				EnumName: enum.FullName,
+				Type:      types.IssueReservedViolation,
+				Severity:  types.SeverityError,
+				Message:   fmt.Sprintf("枚举值名称 '%s' 已被保留", ev.Name),
+				FilePath:  enum.FilePath,
+				EnumName:  enum.FullName,
 				ValueName: ev.Name,
 				Details: fmt.Sprintf("名称 '%s' 已被声明为 reserved，不能被使用。"+
 					"reserved 名称用于防止未来复用已删除的枚举值名称。",
@@ -150,34 +140,26 @@ func (c *Checker) checkAliasMisuse(enum types.Enum) []types.Issue {
 		numberMap[ev.Number] = append(numberMap[ev.Number], ev)
 	}
 
-	for num, values := range numberMap {
-		if len(values) <= 1 {
-			continue
+	hasDuplicates := false
+	for _, values := range numberMap {
+		if len(values) > 1 {
+			hasDuplicates = true
+			break
 		}
+	}
 
-		allHaveAlias := true
-		for _, ev := range values {
-			if !ev.IsAlias {
-				allHaveAlias = false
-				break
-			}
-		}
-
-		if len(values) > 1 && !allHaveAlias {
-			issues = append(issues, types.Issue{
-				Type:     types.IssueAliasMisuse,
-				Severity: types.SeverityWarning,
-				Message: fmt.Sprintf("枚举编号 %d 有多个值，但部分未正确标记为别名", num),
-				FilePath: enum.FilePath,
-				EnumName: enum.FullName,
-				Number:   num,
-				Details: fmt.Sprintf("编号 %d 有多个枚举值: %v。"+
-					"使用别名时，应在枚举级别添加 'option allow_alias = true;'，"+
-					"并且第一个值（非别名）应作为主要值，后续值作为别名。",
-					num, getValueNames(values)),
-				ExitCode: types.ExitCodeSuccess,
-			})
-		}
+	if enum.AllowAlias && !hasDuplicates {
+		issues = append(issues, types.Issue{
+			Type:     types.IssueAliasMisuse,
+			Severity: types.SeverityInfo,
+			Message:  fmt.Sprintf("枚举启用了 allow_alias 但没有使用别名"),
+			FilePath: enum.FilePath,
+			EnumName: enum.FullName,
+			Details: "枚举声明了 'option allow_alias = true;'，" +
+				"但所有枚举值的编号都是唯一的。如果不需要别名功能，" +
+				"可以移除 allow_alias 选项以获得更严格的检查。",
+			ExitCode: types.ExitCodeSuccess,
+		})
 	}
 
 	return issues
@@ -263,8 +245,8 @@ func FindRemovedEnumValues(oldFiles, newFiles []types.ProtoFile) []types.Issue {
 						Severity: types.SeverityWarning,
 						Message: fmt.Sprintf("枚举值 '%s' (编号 %d) 已被删除，但编号未加入 reserved",
 							oldEv.Name, oldEv.Number),
-						FilePath: newEnum.FilePath,
-						EnumName: name,
+						FilePath:  newEnum.FilePath,
+						EnumName:  name,
 						ValueName: oldEv.Name,
 						Number:    oldEv.Number,
 						Details: fmt.Sprintf("枚举值 '%s' (编号 %d) 已被删除。"+
@@ -340,8 +322,8 @@ func FindNumberReuse(oldFiles, newFiles []types.ProtoFile) []types.Issue {
 						Severity: types.SeverityError,
 						Message: fmt.Sprintf("编号 %d 被复用: 原先是 '%s', 现在是 '%s'",
 							newEv.Number, oldName, newEv.Name),
-						FilePath: newEnum.FilePath,
-						EnumName: name,
+						FilePath:  newEnum.FilePath,
+						EnumName:  name,
 						ValueName: newEv.Name,
 						Number:    newEv.Number,
 						Details: fmt.Sprintf("编号 %d 在历史版本中用于枚举值 '%s'，"+
@@ -367,8 +349,8 @@ func FindNumberReuse(oldFiles, newFiles []types.ProtoFile) []types.Issue {
 					Severity: types.SeverityError,
 					Message: fmt.Sprintf("枚举值 '%s' 的编号从 %d 变为 %d",
 						oldName, oldNum, newNum),
-					FilePath: newEnum.FilePath,
-					EnumName: name,
+					FilePath:  newEnum.FilePath,
+					EnumName:  name,
 					ValueName: oldName,
 					Number:    newNum,
 					Details: fmt.Sprintf("枚举值 '%s' 的编号已更改。"+

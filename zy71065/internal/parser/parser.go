@@ -124,6 +124,11 @@ func (p *Parser) parseFile(filePath string) (types.ProtoFile, error) {
 				continue
 			}
 
+			if isAllowAliasOption(line) {
+				currentEnum.AllowAlias = parseAllowAlias(line)
+				continue
+			}
+
 			if isEnumValueLine(line) {
 				ev := parseEnumValue(line)
 				currentEnum.Values = append(currentEnum.Values, ev)
@@ -221,13 +226,24 @@ func parseEnumValue(line string) types.EnumValue {
 	name := matches[1]
 	num, _ := strconv.ParseInt(matches[2], 10, 32)
 
-	isAlias := strings.Contains(line, "[(allow_alias)") || strings.Contains(line, "allow_alias")
-
 	return types.EnumValue{
-		Name:    name,
-		Number:  int32(num),
-		IsAlias: isAlias,
+		Name:   name,
+		Number: int32(num),
 	}
+}
+
+func isAllowAliasOption(line string) bool {
+	re := regexp.MustCompile(`option\s+allow_alias\s*=`)
+	return re.MatchString(line)
+}
+
+func parseAllowAlias(line string) bool {
+	re := regexp.MustCompile(`option\s+allow_alias\s*=\s*(true|false)`)
+	matches := re.FindStringSubmatch(line)
+	if len(matches) < 2 {
+		return false
+	}
+	return matches[1] == "true"
 }
 
 func parseReserved(line string) []types.Reserved {

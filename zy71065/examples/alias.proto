@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package examples.alias;
+
+enum Status {
+  option allow_alias = true;
+
+  STATUS_UNKNOWN = 0;
+  STATUS_STARTED = 1;
+  STATUS_RUNNING = 1;
+  STATUS_FINISHED = 2;
+  STATUS_COMPLETED = 2;
+  STATUS_DONE = 2;
+}
+
+message Task {
+  string id = 1;
+  Status status = 2;
+}
+
+enum NoAlias {
+  NO_ALIAS_UNKNOWN = 0;
+  NO_ALIAS_ONE = 1;
+  NO_ALIAS_TWO = 2;
+}
+
+enum UnusedAlias {
+  option allow_alias = true;
+
+  UNUSED_UNKNOWN = 0;
+  UNUSED_ONE = 1;
+  UNUSED_TWO = 2;
+}
