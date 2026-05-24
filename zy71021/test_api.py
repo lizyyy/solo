@@ -3,6 +3,7 @@ import json
 from datetime import datetime, timedelta
 
 BASE_URL = "http://localhost:8000/api/v1"
+CLOSED_CASE_VOUCHER = None
 
 
 def test_upload_compensation():
@@ -339,6 +340,165 @@ def test_state_machine_validation():
     print()
 
 
+def test_voucher_use_log_trace():
+    print("\n" + "=" * 60)
+    print("测试16: 核销补偿券后追踪操作日志")
+    print("=" * 60)
+
+    url = f"{BASE_URL}/compensation/CASE20240101003/logs"
+    response = requests.get(url)
+    print(f"状态码: {response.status_code}")
+    result = response.json()
+    print(f"操作记录数: {len(result)}")
+
+    has_use_voucher_log = any(
+        log.get("operation") == "use_voucher"
+        for log in result
+    )
+    if has_use_voucher_log:
+        print("✅ 核销操作已记录到操作日志，可追踪")
+    else:
+        print("❌ 核销操作未记录到操作日志")
+
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+def test_closed_case_voucher_reject():
+    global CLOSED_CASE_VOUCHER
+    print("\n" + "=" * 60)
+    print("测试17: 已结案案件无法核销补偿券")
+    print("=" * 60)
+
+    if not CLOSED_CASE_VOUCHER:
+        print("跳过测试：没有可用的已结案券号")
+        return
+
+    url = f"{BASE_URL}/voucher/{CLOSED_CASE_VOUCHER}/use"
+    data = {
+        "operator": "ADMIN001",
+        "remark": "测试结案后核销"
+    }
+    response = requests.post(url, json=data)
+    print(f"状态码: {response.status_code}")
+    if response.status_code == 400:
+        print("✅ 已结案案件核销被正确拒绝")
+        result = response.json()
+        print(f"错误信息: {result.get('detail')}")
+    else:
+        print("❌ 已结案案件核销未被拒绝，存在问题")
+    print()
+
+
+def test_upload_for_closed_case():
+    print("\n" + "=" * 60)
+    print("准备: 上传新案件并结案用于测试")
+    print("=" * 60)
+
+    url = f"{BASE_URL}/compensation/upload"
+    data = {
+        "batch_no": "BATCH20240101003",
+        "case_no": "CASE20240101003",
+        "user_id": "USER003",
+        "pile_no": "PILE-A03",
+        "order_no": "ORD20240101003",
+        "fault_code": "E003",
+        "fault_description": "支付成功但无法充电",
+        "order": {
+            "order_no": "ORD20240101003",
+            "user_id": "USER003",
+            "pile_no": "PILE-A03",
+            "amount": 25.0,
+            "pay_time": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "pay_status": "paid",
+            "start_time": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "end_time": datetime.now().isoformat()
+        },
+        "electricity": {
+            "record_no": "ELEC20240101003",
+            "order_no": "ORD20240101003",
+            "pile_no": "PILE-A03",
+            "start_energy": 100.0,
+            "end_energy": 100.0,
+            "total_energy": 0.0
+        }
+    }
+    response = requests.post(url, json=data)
+    print(f"上传状态码: {response.status_code}")
+
+    url = f"{BASE_URL}/compensation/CASE20240101003/confirm"
+    data = {
+        "operator": "ADMIN001",
+        "approved": True,
+        "conclusion": "pile_fault",
+        "compensation_amount": 25.0
+    }
+    response = requests.post(url, json=data)
+    print(f"确认状态码: {response.status_code}")
+    result = response.json()
+    voucher_no = result.get("voucher", {}).get("voucher_no")
+    print(f"创建券号: {voucher_no}")
+
+    url = f"{BASE_URL}/voucher/{voucher_no}/use"
+    data = {
+        "operator": "ADMIN001",
+        "remark": "正常核销用于测试"
+    }
+    response = requests.post(url, json=data)
+    print(f"核销状态码: {response.status_code}")
+    if response.status_code == 200:
+        print("✅ 正常核销成功")
+    else:
+        print(f"核销失败: {response.text}")
+
+
+def test_prepare_closed_case():
+    global CLOSED_CASE_VOUCHER
+    print("\n" + "=" * 60)
+    print("准备: 创建已结案案件用于测试")
+    print("=" * 60)
+
+    url = f"{BASE_URL}/compensation/upload"
+    data = {
+        "case_no": "CASECLOSED001",
+        "user_id": "USERCLOSED",
+        "pile_no": "PILE-CLOSED",
+        "order_no": "ORDCLOSED001",
+        "order": {
+            "order_no": "ORDCLOSED001",
+            "user_id": "USERCLOSED",
+            "pile_no": "PILE-CLOSED",
+            "amount": 20.0,
+            "pay_status": "paid"
+        }
+    }
+    response = requests.post(url, json=data)
+    print(f"上传状态码: {response.status_code}")
+
+    url = f"{BASE_URL}/compensation/CASECLOSED001/confirm"
+    data = {
+        "operator": "ADMIN001",
+        "approved": True,
+        "compensation_amount": 20.0
+    }
+    response = requests.post(url, json=data)
+    result = response.json()
+    voucher = result.get("voucher", {})
+    voucher_no = voucher.get("voucher_no")
+    CLOSED_CASE_VOUCHER = voucher_no
+    print(f"创建券号: {voucher_no}")
+
+    url = f"{BASE_URL}/compensation/CASECLOSED001/rejudge"
+    data = {
+        "operator": "MANAGER001",
+        "new_status": "closed",
+        "remark": "测试结案后无法核销"
+    }
+    response = requests.post(url, json=data)
+    print(f"结案状态码: {response.status_code}")
+    if response.status_code == 200:
+        print("✅ 案件已结案")
+
+
 def test_upload_for_voucher():
     print("\n" + "=" * 60)
     print("准备: 上传新的补偿申请用于券测试")
@@ -427,6 +587,11 @@ if __name__ == "__main__":
         test_query_vouchers()
         test_use_voucher()
         test_state_machine_validation()
+
+        test_upload_for_closed_case()
+        test_voucher_use_log_trace()
+        test_prepare_closed_case()
+        test_closed_case_voucher_reject()
 
         print("\n" + "=" * 60)
         print("所有测试完成!")

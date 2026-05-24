@@ -265,7 +265,10 @@ class ExportService:
             "resubmit": "重新提交",
             "confirm": "确认",
             "cancel": "撤回",
-            "rejudge": "改判"
+            "rejudge": "改判",
+            "create_voucher": "创建补偿券",
+            "create_voucher_failed": "创建补偿券失败",
+            "use_voucher": "核销补偿券"
         }
         return operation_map.get(operation, operation or "未知")
 

@@ -99,6 +99,8 @@ class VoucherService:
         operator: Optional[str] = None,
         remark: Optional[str] = None
     ) -> CompensationVoucher:
+        from app.services.compensation_service import CompensationStateMachine
+
         voucher = self.get_voucher(voucher_no)
         if not voucher:
             raise ValueError(f"券号 {voucher_no} 不存在")
@@ -110,17 +112,34 @@ class VoucherService:
         if voucher.valid_to and now > voucher.valid_to:
             raise ValueError(f"券号 {voucher_no} 已过期")
 
-        voucher.status = "used"
-        voucher.used_time = now
-
         record = self.db.query(CompensationRecord).filter(
             CompensationRecord.voucher_id == voucher.id
         ).first()
+
         if record:
+            old_status = record.status
+
+            if old_status == CompensationStatus.CLOSED:
+                raise ValueError(f"案件 {record.case_no} 已结案，无法核销补偿")
+
+            if not CompensationStateMachine.can_transition(old_status, CompensationStatus.COMPENSATED):
+                raise ValueError(f"无效的状态转换: {old_status} -> compensated")
+
             record.status = CompensationStatus.COMPENSATED
-            from app.services.compensation_service import CompensationStateMachine
-            if CompensationStateMachine.can_transition(record.status, CompensationStatus.COMPENSATED):
-                record.status = CompensationStatus.COMPENSATED
+
+            from app.models import OperationLog
+            log = OperationLog(
+                compensation_record_id=record.id,
+                operation="use_voucher",
+                old_status=old_status,
+                new_status=CompensationStatus.COMPENSATED,
+                operator=operator or "system",
+                remark=remark or f"核销补偿券: {voucher_no}"
+            )
+            self.db.add(log)
+
+        voucher.status = "used"
+        voucher.used_time = now
 
         self.db.flush()
         return voucher
