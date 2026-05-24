@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>游乐设施排队视线分析系统</title>
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+  <div id="app">
+    <div id="sidebar">
+      <div class="panel-header">
+        <h1>🎢 排队视线分析</h1>
+      </div>
+      
+      <div class="panel-section">
+        <h3>📁 场景数据</h3>
+        <div class="btn-group">
+          <button id="btnLoadSample" class="btn btn-primary">导入样例场景</button>
+          <button id="btnReset" class="btn btn-secondary">重置场景</button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>🔍 筛选控制</h3>
+        <div class="filter-group">
+          <label><input type="checkbox" id="filterRide" checked> 游乐设施</label>
+          <label><input type="checkbox" id="filterQueue" checked> 排队栏</label>
+          <label><input type="checkbox" id="filterScreen" checked> 提示屏</label>
+          <label><input type="checkbox" id="filterObstacle" checked> 遮挡物</label>
+          <label><input type="checkbox" id="filterViewpoint" checked> 游客视点</label>
+          <label><input type="checkbox" id="filterSightline" checked> 视线</label>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>👁️ 视角切换</h3>
+        <div class="btn-group">
+          <button id="btnTopView" class="btn btn-small">俯视</button>
+          <button id="btnFrontView" class="btn btn-small">正视</button>
+          <button id="btnFreeView" class="btn btn-small">自由</button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>🎬 时间轴回放</h3>
+        <div class="timeline-control">
+          <input type="range" id="timelineSlider" min="0" max="100" value="0">
+          <div class="timeline-info">
+            <span>位置: <span id="currentPosition">0</span>%</span>
+            <span>视点: <span id="currentViewpoint">-</span></span>
+          </div>
+          <div class="btn-group">
+            <button id="btnPlay" class="btn btn-small">▶ 播放</button>
+            <button id="btnPause" class="btn btn-small">⏸ 暂停</button>
+            <button id="btnStep" class="btn btn-small">⏭ 下一个</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>📊 视线状态</h3>
+        <div id="sightStatus" class="status-display">
+          <div class="status-item">
+            <span class="status-label">可见视点:</span>
+            <span id="visibleCount" class="status-value good">0</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">遮挡视点:</span>
+            <span id="blockedCount" class="status-value bad">0</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">可见率:</span>
+            <span id="visibilityRate" class="status-value">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>📄 视线报告</h3>
+        <button id="btnExportReport" class="btn btn-success btn-full">导出视线分析报告</button>
+        <div id="reportPreview" class="report-preview"></div>
+      </div>
+    </div>
+
+    <div id="scene-container"></div>
+    
+    <div id="info-panel">
+      <div id="selected-info">
+        <h4>选中对象信息</h4>
+        <div id="selected-content">点击场景中的对象查看详情</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
