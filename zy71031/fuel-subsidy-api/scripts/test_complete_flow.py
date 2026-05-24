@@ -2,12 +2,16 @@
 import requests
 import json
 import time
+import random
+import sys
+import os
 
 BASE_URL = "http://localhost:8082/api/v1"
 
-def pprint(title, data):
-    print(f"\n=== {title} ===")
-    print(json.dumps(data, ensure_ascii=False, indent=2))
+def generate_unique_id():
+    timestamp = int(time.time())
+    rand = random.randint(1000, 9999)
+    return f"{timestamp}{rand}"
 
 def main():
     print("=" * 60)
@@ -16,11 +20,14 @@ def main():
 
     headers = {"Content-Type": "application/json", "X-Operator": "admin"}
 
+    unique_id = generate_unique_id()
+    print(f"\n测试运行ID: {unique_id}")
+
     print("\n=== 准备测试数据：添加加油票 ===")
     receipt_ids = []
     for i in range(1, 3):
         receipt_data = {
-            "receipt_number": f"RCP2025FULL{i:02d}",
+            "receipt_number": f"RCP{unique_id}{i:02d}",
             "receipt_date": f"2025-03-1{i}T00:00:00Z",
             "gas_station_name": "东海加油站",
             "fuel_type": "柴油",
@@ -36,7 +43,7 @@ def main():
             receipt_ids.append(receipt_data["receipt_number"])
         else:
             print(f"  ✗ 添加加油票失败: {r.text}")
-            return
+            sys.exit(1)
 
     print("\n=== 1. 收件：创建补贴申请 ===")
     print("  说明：所有航次都在3月和4月（非禁渔期）")
@@ -47,16 +54,16 @@ def main():
         "vessel_number": "浙渔00001",
         "receipt_numbers": receipt_ids,
         "voyages": [
-            {"voyage_number": "V202503001", "departure_date": "2025-03-10T08:00:00Z", "return_date": "2025-03-12T18:00:00Z", "fishing_area": "东海189海区", "fuel_consumed": 2500, "catch_weight": 5000},
-            {"voyage_number": "V202503002", "departure_date": "2025-03-20T06:00:00Z", "return_date": "2025-03-23T20:00:00Z", "fishing_area": "东海190海区", "fuel_consumed": 3000, "catch_weight": 6000},
-            {"voyage_number": "V202504001", "departure_date": "2025-04-05T08:00:00Z", "return_date": "2025-04-08T18:00:00Z", "fishing_area": "东海192海区", "fuel_consumed": 2000, "catch_weight": 4000}
+            {"voyage_number": f"V{unique_id}A", "departure_date": "2025-03-10T08:00:00Z", "return_date": "2025-03-12T18:00:00Z", "fishing_area": "东海189海区", "fuel_consumed": 2500, "catch_weight": 5000},
+            {"voyage_number": f"V{unique_id}B", "departure_date": "2025-03-20T06:00:00Z", "return_date": "2025-03-23T20:00:00Z", "fishing_area": "东海190海区", "fuel_consumed": 3000, "catch_weight": 6000},
+            {"voyage_number": f"V{unique_id}C", "departure_date": "2025-04-05T08:00:00Z", "return_date": "2025-04-08T18:00:00Z", "fishing_area": "东海192海区", "fuel_consumed": 2000, "catch_weight": 4000}
         ]
     }
     r = requests.post(f"{BASE_URL}/applications", headers=headers, json=app_data)
     result = r.json()
     if result["code"] != 0:
         print(f"  ✗ 创建申请失败: {r.text}")
-        return
+        sys.exit(1)
     
     app_id = result["data"]["application"]["id"]
     app_no = result["data"]["application"]["application_no"]
@@ -81,7 +88,7 @@ def main():
     result = r.json()
     if result["code"] != 0:
         print(f"  ✗ 核验失败: {r.text}")
-        return
+        sys.exit(1)
     
     app = result["data"]["application"]
     print(f"  ✓ 核验完成!")
@@ -98,7 +105,7 @@ def main():
     result = r.json()
     if result["code"] != 0:
         print(f"  ✗ 处理失败: {r.text}")
-        return
+        sys.exit(1)
     
     app = result["data"]
     print(f"  ✓ 处理完成!")
@@ -119,7 +126,7 @@ def main():
     result = r.json()
     if result["code"] != 0:
         print(f"  ✗ 复查失败: {r.text}")
-        return
+        sys.exit(1)
     
     app = result["data"]
     print(f"  ✓ 复查完成!")
@@ -136,7 +143,7 @@ def main():
     result = r.json()
     if result["code"] != 0:
         print(f"  ✗ 结案失败: {r.text}")
-        return
+        sys.exit(1)
     
     app = result["data"]
     print(f"  ✓ 结案完成!")
@@ -153,12 +160,13 @@ def main():
         print(f"        原因: {log['reason']}")
 
     print("\n=== 7. 验证加油票已被标记为已使用 ===")
-    r = requests.get(f"{BASE_URL}/fuel-receipts", headers=headers)
+    r = requests.get(f"{BASE_URL}/fuel-receipts?vessel_number=浙渔00001", headers=headers)
     result = r.json()
     receipts = result["data"]
-    used = sum(1 for r in receipts if r["is_used"])
-    print(f"  加油票使用情况: {used}/{len(receipts)} 已使用")
-    for receipt in receipts:
+    test_receipts = [r for r in receipts if r["receipt_number"] in receipt_ids]
+    used = sum(1 for r in test_receipts if r["is_used"])
+    print(f"  本次测试加油票使用情况: {used}/{len(test_receipts)} 已使用")
+    for receipt in test_receipts:
         status = "已使用" if receipt["is_used"] else "未使用"
         print(f"    {receipt['receipt_number']}: {status}")
 
@@ -182,6 +190,7 @@ def main():
         print(f"    文件名: {result['data']['file_name']}")
     else:
         print(f"  ✗ 导出失败: {r.text}")
+        sys.exit(1)
 
     print("\n=== 10. 测试重复提交检测（油票去重）===")
     print("  再次提交包含已使用油票的申请...")
@@ -204,6 +213,7 @@ def main():
         print(f"  说明: 油票 {receipt_ids[0]} 已被使用，系统成功拦截重复申报")
     else:
         print(f"  未检测到重复，code={result.get('code')}")
+        sys.exit(1)
 
     print("\n" + "=" * 60)
     print("  ✓ 收件 ✓ 核验 ✓ 处理 ✓ 复查 ✓ 结案 （完整闭环）")

@@ -134,19 +134,39 @@ curl -X POST http://localhost:8082/api/v1/applications/close \
 
 ### 一键验证完整流程
 
-运行 Python 测试脚本验证完整闭环流程：
+#### 快速开始（推荐，可重复运行）
+
+测试脚本使用**动态生成的唯一票号**（时间戳+随机数），可直接重复运行：
 
 ```bash
+# 1. 启动服务
+SERVER_PORT=8082 ./fuel-subsidy-api &
+
+# 2. 等待服务启动后运行测试（可重复运行多次）
 python3 scripts/test_complete_flow.py
 ```
 
-脚本将依次验证：
+#### 如需清理数据库从头测试：
+
+```bash
+# 停止服务并清理数据库
+pkill -f fuel-subsidy-api
+rm -f fuel_subsidy.db
+
+# 重新编译启动
+go build -o fuel-subsidy-api ./cmd/main.go
+SERVER_PORT=8082 ./fuel-subsidy-api &
+sleep 2
+python3 scripts/test_complete_flow.py
+```
+
+#### 测试脚本验证内容：
+
 - ✓ 收件 → 核验 → 处理 → 复查 → 结案（完整闭环）
 - ✓ 禁渔期校验、油票去重、船主信息一致性（边界校验）
 - ✓ 审核日志可追溯
 - ✓ 统计查询、Excel 导出
 - ✓ 重复提交拦截
-- ✓ 服务重启后历史数据不丢失
 
 ## 项目结构
 
