@@ -5,16 +5,18 @@ import com.floodrelief.entity.AllocationEvidence;
 import com.floodrelief.entity.AllocationRecord;
 import com.floodrelief.service.AllocationService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/allocations")
-@RequiredArgsConstructor
 public class AllocationController {
     private final AllocationService allocationService;
+
+    public AllocationController(AllocationService allocationService) {
+        this.allocationService = allocationService;
+    }
 
     @PostMapping
     public ApiResponse<AllocationRecord> createAllocation(@Valid @RequestBody AllocationRequest request) {

@@ -4,16 +4,18 @@ import com.floodrelief.dto.ApiResponse;
 import com.floodrelief.entity.MaterialBatch;
 import com.floodrelief.service.MaterialBatchService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/material-batches")
-@RequiredArgsConstructor
 public class MaterialBatchController {
     private final MaterialBatchService materialBatchService;
+
+    public MaterialBatchController(MaterialBatchService materialBatchService) {
+        this.materialBatchService = materialBatchService;
+    }
 
     @GetMapping
     public ApiResponse<List<MaterialBatch>> getAllMaterialBatches() {

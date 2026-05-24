@@ -8,9 +8,13 @@ import com.floodrelief.entity.AllocationRecord;
 import com.floodrelief.entity.GapReport;
 import com.floodrelief.entity.Shelter;
 import com.floodrelief.entity.TransferRecord;
-import com.floodrelief.repository.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import com.floodrelief.repository.GapReportRepository;
+import com.floodrelief.repository.MaterialBatchRepository;
+import com.floodrelief.repository.ShelterRepository;
+import com.floodrelief.repository.TransferRecordRepository;
+import com.floodrelief.repository.AllocationRecordRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,15 +24,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class GapCalculationService {
+    private static final Logger log = LoggerFactory.getLogger(GapCalculationService.class);
+    
     private final GapReportRepository gapReportRepository;
     private final ShelterRepository shelterRepository;
     private final TransferRecordRepository transferRepository;
     private final AllocationRecordRepository allocationRepository;
     private final MaterialBatchRepository materialRepository;
+
+    public GapCalculationService(GapReportRepository gapReportRepository,
+                                  ShelterRepository shelterRepository,
+                                  TransferRecordRepository transferRepository,
+                                  AllocationRecordRepository allocationRepository,
+                                  MaterialBatchRepository materialRepository) {
+        this.gapReportRepository = gapReportRepository;
+        this.shelterRepository = shelterRepository;
+        this.transferRepository = transferRepository;
+        this.allocationRepository = allocationRepository;
+        this.materialRepository = materialRepository;
+    }
 
     @Transactional
     public ApiResponse<List<GapReportDTO>> calculateGap(GapCalculationRequest request) {

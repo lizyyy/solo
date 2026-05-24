@@ -1,7 +1,6 @@
 package com.floodrelief.controller;
 
 import com.floodrelief.service.ReportService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +12,12 @@ import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/reports")
-@RequiredArgsConstructor
 public class ReportController {
     private final ReportService reportService;
+
+    public ReportController(ReportService reportService) {
+        this.reportService = reportService;
+    }
 
     @GetMapping("/allocation/{shelterId}")
     public ResponseEntity<byte[]> downloadAllocationReport(@PathVariable Long shelterId) throws IOException {

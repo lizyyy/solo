@@ -4,16 +4,18 @@ import com.floodrelief.dto.ApiResponse;
 import com.floodrelief.entity.Shelter;
 import com.floodrelief.service.ShelterService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/shelters")
-@RequiredArgsConstructor
 public class ShelterController {
     private final ShelterService shelterService;
+
+    public ShelterController(ShelterService shelterService) {
+        this.shelterService = shelterService;
+    }
 
     @GetMapping
     public ApiResponse<List<Shelter>> getAllShelters() {

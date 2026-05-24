@@ -1,15 +1,19 @@
 package com.floodrelief.service;
 
 import com.floodrelief.dto.GapReportDTO;
+import com.floodrelief.dto.GapCalculationRequest;
 import com.floodrelief.dto.ShelterAllocationSummary;
 import com.floodrelief.entity.AllocationRecord;
 import com.floodrelief.entity.Shelter;
 import com.floodrelief.entity.TransferRecord;
-import com.floodrelief.repository.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import com.floodrelief.repository.AllocationRecordRepository;
+import com.floodrelief.repository.MaterialBatchRepository;
+import com.floodrelief.repository.ShelterRepository;
+import com.floodrelief.repository.TransferRecordRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -18,15 +22,27 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ReportService {
+    private static final Logger log = LoggerFactory.getLogger(ReportService.class);
+    
     private final ShelterRepository shelterRepository;
     private final TransferRecordRepository transferRepository;
     private final AllocationRecordRepository allocationRepository;
     private final MaterialBatchRepository materialRepository;
     private final GapCalculationService gapCalculationService;
+
+    public ReportService(ShelterRepository shelterRepository,
+                         TransferRecordRepository transferRepository,
+                         AllocationRecordRepository allocationRepository,
+                         MaterialBatchRepository materialRepository,
+                         GapCalculationService gapCalculationService) {
+        this.shelterRepository = shelterRepository;
+        this.transferRepository = transferRepository;
+        this.allocationRepository = allocationRepository;
+        this.materialRepository = materialRepository;
+        this.gapCalculationService = gapCalculationService;
+    }
 
     public byte[] generateAllocationReport(Long shelterId) throws IOException {
         try (Workbook workbook = new XSSFWorkbook()) {
@@ -104,7 +120,7 @@ public class ReportService {
         
         createHeaderRow(workbook, sheet, headers);
         
-        com.floodrelief.dto.GapCalculationRequest request = new com.floodrelief.dto.GapCalculationRequest();
+        GapCalculationRequest request = new GapCalculationRequest();
         request.setShelterId(shelterId);
         List<GapReportDTO> gaps = gapCalculationService.calculateGap(request).getData();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -135,8 +151,6 @@ public class ReportService {
         createHeaderRow(workbook, sheet, headers);
         
         ShelterAllocationSummary summary = gapCalculationService.getShelterSummary(shelterId).getData();
-        
-        String[] statusMap = {"NORMAL", "正常", "WARNING", "预警", "CRITICAL", "紧急"};
         
         int rowNum = 1;
         

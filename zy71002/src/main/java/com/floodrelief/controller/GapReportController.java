@@ -5,16 +5,18 @@ import com.floodrelief.dto.GapCalculationRequest;
 import com.floodrelief.dto.GapReportDTO;
 import com.floodrelief.dto.ShelterAllocationSummary;
 import com.floodrelief.service.GapCalculationService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/gap-reports")
-@RequiredArgsConstructor
 public class GapReportController {
     private final GapCalculationService gapCalculationService;
+
+    public GapReportController(GapCalculationService gapCalculationService) {
+        this.gapCalculationService = gapCalculationService;
+    }
 
     @PostMapping("/calculate")
     public ApiResponse<List<GapReportDTO>> calculateGap(@RequestBody GapCalculationRequest request) {

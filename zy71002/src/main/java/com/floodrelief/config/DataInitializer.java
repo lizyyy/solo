@@ -2,8 +2,8 @@ package com.floodrelief.config;
 
 import com.floodrelief.entity.*;
 import com.floodrelief.repository.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,16 +11,30 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
+    
     private final ShelterRepository shelterRepository;
     private final TransferRecordRepository transferRepository;
     private final MaterialBatchRepository materialRepository;
     private final AllocationRecordRepository allocationRepository;
     private final SpecialNeedRepository specialNeedRepository;
     private final AllocationEvidenceRepository evidenceRepository;
+
+    public DataInitializer(ShelterRepository shelterRepository,
+                           TransferRecordRepository transferRepository,
+                           MaterialBatchRepository materialRepository,
+                           AllocationRecordRepository allocationRepository,
+                           SpecialNeedRepository specialNeedRepository,
+                           AllocationEvidenceRepository evidenceRepository) {
+        this.shelterRepository = shelterRepository;
+        this.transferRepository = transferRepository;
+        this.materialRepository = materialRepository;
+        this.allocationRepository = allocationRepository;
+        this.specialNeedRepository = specialNeedRepository;
+        this.evidenceRepository = evidenceRepository;
+    }
 
     @Override
     @Transactional
@@ -179,8 +193,10 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initNormalFlow() {
+        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        
         AllocationRecord a1 = new AllocationRecord();
-        a1.setAllocationNo("AL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "NORM01");
+        a1.setAllocationNo("AL" + date + "NORM01");
         a1.setShelterId(1L);
         a1.setMaterialBatchId(1L);
         a1.setQuantity(300);
@@ -204,7 +220,7 @@ public class DataInitializer implements CommandLineRunner {
         evidenceRepository.save(e1);
 
         AllocationRecord a2 = new AllocationRecord();
-        a2.setAllocationNo("AL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "NORM02");
+        a2.setAllocationNo("AL" + date + "NORM02");
         a2.setShelterId(1L);
         a2.setMaterialBatchId(2L);
         a2.setQuantity(800);
@@ -223,8 +239,10 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initConflictFlow() {
+        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        
         AllocationRecord pending = new AllocationRecord();
-        pending.setAllocationNo("AL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "CONF01");
+        pending.setAllocationNo("AL" + date + "CONF01");
         pending.setShelterId(2L);
         pending.setMaterialBatchId(1L);
         pending.setQuantity(400);
@@ -234,7 +252,7 @@ public class DataInitializer implements CommandLineRunner {
         allocationRepository.save(pending);
 
         AllocationRecord approved = new AllocationRecord();
-        approved.setAllocationNo("AL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "CONF02");
+        approved.setAllocationNo("AL" + date + "CONF02");
         approved.setShelterId(2L);
         approved.setMaterialBatchId(1L);
         approved.setQuantity(200);
@@ -245,7 +263,7 @@ public class DataInitializer implements CommandLineRunner {
         allocationRepository.save(approved);
 
         AllocationRecord rejected = new AllocationRecord();
-        rejected.setAllocationNo("AL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "CONF03");
+        rejected.setAllocationNo("AL" + date + "CONF03");
         rejected.setShelterId(2L);
         rejected.setMaterialBatchId(3L);
         rejected.setQuantity(100);
@@ -260,8 +278,10 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initWithdrawFlow() {
+        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        
         AllocationRecord withdrawn = new AllocationRecord();
-        withdrawn.setAllocationNo("AL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "WDRW01");
+        withdrawn.setAllocationNo("AL" + date + "WDRW01");
         withdrawn.setShelterId(3L);
         withdrawn.setMaterialBatchId(5L);
         withdrawn.setQuantity(150);
@@ -274,7 +294,7 @@ public class DataInitializer implements CommandLineRunner {
         allocationRepository.save(withdrawn);
 
         AllocationRecord dispatched = new AllocationRecord();
-        dispatched.setAllocationNo("AL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "WDRW02");
+        dispatched.setAllocationNo("AL" + date + "WDRW02");
         dispatched.setShelterId(3L);
         dispatched.setMaterialBatchId(4L);
         dispatched.setQuantity(30);
@@ -290,6 +310,8 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initManualCorrectionFlow() {
+        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        
         TransferRecord original = new TransferRecord();
         original.setShelterId(1L);
         original.setTotalCount(220);
@@ -303,7 +325,7 @@ public class DataInitializer implements CommandLineRunner {
         transferRepository.save(original);
 
         AllocationRecord correctedAlloc = new AllocationRecord();
-        correctedAlloc.setAllocationNo("AL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "MANU01");
+        correctedAlloc.setAllocationNo("AL" + date + "MANU01");
         correctedAlloc.setShelterId(1L);
         correctedAlloc.setMaterialBatchId(3L);
         correctedAlloc.setQuantity(60);
@@ -324,8 +346,10 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void initNightAllocation() {
+        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        
         AllocationRecord nightAlloc = new AllocationRecord();
-        nightAlloc.setAllocationNo("AL" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "NIGHT01");
+        nightAlloc.setAllocationNo("AL" + date + "NIGHT01");
         nightAlloc.setShelterId(2L);
         nightAlloc.setMaterialBatchId(3L);
         nightAlloc.setQuantity(45);

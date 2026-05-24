@@ -3,18 +3,22 @@ package com.floodrelief.service;
 import com.floodrelief.dto.ApiResponse;
 import com.floodrelief.entity.Shelter;
 import com.floodrelief.repository.ShelterRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ShelterService {
+    private static final Logger log = LoggerFactory.getLogger(ShelterService.class);
+    
     private final ShelterRepository shelterRepository;
+
+    public ShelterService(ShelterRepository shelterRepository) {
+        this.shelterRepository = shelterRepository;
+    }
 
     public ApiResponse<List<Shelter>> getAllShelters() {
         List<Shelter> shelters = shelterRepository.findByActiveTrue();

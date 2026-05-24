@@ -1,8 +1,8 @@
 package com.floodrelief.dto;
 
-import lombok.Data;
-
-@Data
 public class AllocationDispatchRequest {
     private String dispatcher;
+
+    public String getDispatcher() { return dispatcher; }
+    public void setDispatcher(String dispatcher) { this.dispatcher = dispatcher; }
 }

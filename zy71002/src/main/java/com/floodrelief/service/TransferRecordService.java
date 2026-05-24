@@ -6,19 +6,25 @@ import com.floodrelief.dto.TransferRecordRequest;
 import com.floodrelief.entity.TransferRecord;
 import com.floodrelief.repository.ShelterRepository;
 import com.floodrelief.repository.TransferRecordRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class TransferRecordService {
+    private static final Logger log = LoggerFactory.getLogger(TransferRecordService.class);
+    
     private final TransferRecordRepository transferRecordRepository;
     private final ShelterRepository shelterRepository;
+
+    public TransferRecordService(TransferRecordRepository transferRecordRepository,
+                                 ShelterRepository shelterRepository) {
+        this.transferRecordRepository = transferRecordRepository;
+        this.shelterRepository = shelterRepository;
+    }
 
     public ApiResponse<List<TransferRecord>> getTransferRecords(Long shelterId) {
         List<TransferRecord> records = transferRecordRepository.findByShelterIdOrderByCreatedAtDesc(shelterId);
@@ -63,7 +69,8 @@ public class TransferRecordService {
         if (request.getNewQuantity() != null) {
             record.setTotalCount(request.getNewQuantity());
         }
-        record.setRemark(record.getRemark() + " | 人工修正原因: " + request.getReason());
+        String currentRemark = record.getRemark() != null ? record.getRemark() : "";
+        record.setRemark(currentRemark + " | 人工修正原因: " + request.getReason());
         record = transferRecordRepository.save(record);
 
         log.info("人工修正转移记录: recordId={}, correctedBy={}", recordId, request.getCorrectedBy());

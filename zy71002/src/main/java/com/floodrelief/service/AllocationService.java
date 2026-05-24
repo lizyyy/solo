@@ -11,8 +11,8 @@ import com.floodrelief.repository.AllocationRecordRepository;
 import com.floodrelief.repository.MaterialBatchRepository;
 import com.floodrelief.repository.ShelterRepository;
 import com.floodrelief.repository.TransferRecordRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,26 +21,36 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class AllocationService {
+    private static final Logger log = LoggerFactory.getLogger(AllocationService.class);
+    
     private final AllocationRecordRepository allocationRepository;
     private final AllocationEvidenceRepository evidenceRepository;
     private final ShelterRepository shelterRepository;
     private final MaterialBatchRepository materialRepository;
     private final TransferRecordRepository transferRepository;
 
+    public AllocationService(AllocationRecordRepository allocationRepository,
+                             AllocationEvidenceRepository evidenceRepository,
+                             ShelterRepository shelterRepository,
+                             MaterialBatchRepository materialRepository,
+                             TransferRecordRepository transferRepository) {
+        this.allocationRepository = allocationRepository;
+        this.evidenceRepository = evidenceRepository;
+        this.shelterRepository = shelterRepository;
+        this.materialRepository = materialRepository;
+        this.transferRepository = transferRepository;
+    }
+
     @Transactional
     public ApiResponse<AllocationRecord> createAllocation(AllocationRequest request) {
-        Shelter shelter = shelterRepository.findById(request.getShelterId())
-                .orElse(null);
+        Shelter shelter = shelterRepository.findById(request.getShelterId()).orElse(null);
         if (shelter == null) {
             return ApiResponse.error("安置点不存在");
         }
 
-        MaterialBatch material = materialRepository.findById(request.getMaterialBatchId())
-                .orElse(null);
+        MaterialBatch material = materialRepository.findById(request.getMaterialBatchId()).orElse(null);
         if (material == null) {
             return ApiResponse.error("物资批次不存在");
         }
@@ -55,8 +65,7 @@ public class AllocationService {
             return ApiResponse.error(duplicateCheck.getCode(), duplicateCheck.getMessage());
         }
 
-        TransferRecord latestTransfer = transferRepository.findLatestByShelterId(request.getShelterId())
-                .orElse(null);
+        TransferRecord latestTransfer = transferRepository.findLatestByShelterId(request.getShelterId()).orElse(null);
         if (latestTransfer != null) {
             ApiResponse<String> ratioCheck = checkAllocationRatio(request.getShelterId(), request.getMaterialBatchId(), request.getQuantity());
             if (ratioCheck.getCode() != 200) {
@@ -83,10 +92,7 @@ public class AllocationService {
         List<AllocationRecord> activeAllocations = allocationRepository.findActiveAllocations(shelterId, materialBatchId);
         
         if (!activeAllocations.isEmpty()) {
-            int totalPending = activeAllocations.stream()
-                    .mapToInt(AllocationRecord::getQuantity)
-                    .sum();
-            
+            int totalPending = activeAllocations.stream().mapToInt(AllocationRecord::getQuantity).sum();
             if (totalPending + quantity > 100) {
                 return ApiResponse.error(409, 
                     String.format("存在未完成的同类型调拨申请，当前待发放数量: %d，请先完成现有调拨或申请人工复核", totalPending));
@@ -156,11 +162,9 @@ public class AllocationService {
         if (allocation == null) {
             return ApiResponse.error("调拨记录不存在");
         }
-
         if (allocation.getStatus() != AllocationRecord.AllocationStatus.APPROVED) {
             return ApiResponse.error("当前状态不允许发货");
         }
-
         allocation.setStatus(AllocationRecord.AllocationStatus.DISPATCHED);
         allocation.setDispatcher(request.getDispatcher());
         allocation.setDispatchedAt(LocalDateTime.now());
@@ -175,11 +179,9 @@ public class AllocationService {
         if (allocation == null) {
             return ApiResponse.error("调拨记录不存在");
         }
-
         if (allocation.getStatus() != AllocationRecord.AllocationStatus.DISPATCHED) {
             return ApiResponse.error("当前状态不允许签收");
         }
-
         allocation.setStatus(AllocationRecord.AllocationStatus.RECEIVED);
         allocation.setReceiver(request.getReceiver());
         allocation.setReceivedAt(LocalDateTime.now());
@@ -195,12 +197,10 @@ public class AllocationService {
         if (allocation == null) {
             return ApiResponse.error("调拨记录不存在");
         }
-
         if (allocation.getStatus() == AllocationRecord.AllocationStatus.RECEIVED ||
             allocation.getStatus() == AllocationRecord.AllocationStatus.CANCELLED) {
             return ApiResponse.error("当前状态不允许撤回");
         }
-
         allocation.setPreviousStatus(allocation.getStatus().name());
         allocation.setStatus(AllocationRecord.AllocationStatus.WITHDRAWN);
         allocation.setWithdrawReason(request.getWithdrawReason());
@@ -215,7 +215,6 @@ public class AllocationService {
         if (allocation == null) {
             return ApiResponse.error("调拨记录不存在");
         }
-
         allocation.setManualCorrection(true);
         allocation.setCorrectedBy(request.getCorrectedBy());
         if (request.getNewQuantity() != null) {
@@ -231,7 +230,6 @@ public class AllocationService {
         if (allocation == null) {
             return ApiResponse.error("调拨记录不存在");
         }
-
         AllocationEvidence evidence = new AllocationEvidence();
         evidence.setAllocationId(request.getAllocationId());
         evidence.setEvidenceType(request.getEvidenceType());
@@ -239,14 +237,11 @@ public class AllocationService {
         evidence.setDescription(request.getDescription());
         evidence.setUploader(request.getUploader());
         evidence = evidenceRepository.save(evidence);
-
-        log.info("添加证据: allocationId={}, evidenceType={}", request.getAllocationId(), request.getEvidenceType());
         return ApiResponse.success("证据添加成功", evidence);
     }
 
     public ApiResponse<List<AllocationRecord>> getAllocationsByShelter(Long shelterId) {
-        List<AllocationRecord> allocations = allocationRepository.findByShelterIdOrderByCreatedAtDesc(shelterId);
-        return ApiResponse.success(allocations);
+        return ApiResponse.success(allocationRepository.findByShelterIdOrderByCreatedAtDesc(shelterId));
     }
 
     public ApiResponse<AllocationRecord> getAllocationById(Long id) {
