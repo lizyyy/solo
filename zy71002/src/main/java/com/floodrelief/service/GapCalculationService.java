@@ -67,8 +67,7 @@ public class GapCalculationService {
             }
 
             List<AllocationRecord> receivedAllocations = allocationRepository
-                    .findByShelterIdAndMaterialBatchIdAndStatusNot(
-                            shelter.getId(), null, AllocationRecord.AllocationStatus.RECEIVED);
+                    .findByShelterIdAndStatus(shelter.getId(), AllocationRecord.AllocationStatus.RECEIVED);
 
             Map<String, Integer> materialTotals = receivedAllocations.stream()
                     .filter(a -> a.getMaterialBatchId() != null)

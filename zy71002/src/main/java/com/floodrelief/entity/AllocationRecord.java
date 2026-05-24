@@ -63,14 +63,14 @@ public class AllocationRecord {
     @Column(length = 1000)
     private String withdrawReason;
 
-    @Column(length = 1000)
-    private String remark;
-
     private Boolean manualCorrection = false;
 
     private String correctedBy;
 
     private String previousStatus;
+
+    @Column(length = 1000)
+    private String remark;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -110,8 +110,6 @@ public class AllocationRecord {
     public void setRejectReason(String rejectReason) { this.rejectReason = rejectReason; }
     public String getWithdrawReason() { return withdrawReason; }
     public void setWithdrawReason(String withdrawReason) { this.withdrawReason = withdrawReason; }
-    public String getRemark() { return remark; }
-    public void setRemark(String remark) { this.remark = remark; }
     public Boolean getManualCorrection() { return manualCorrection; }
     public void setManualCorrection(Boolean manualCorrection) { this.manualCorrection = manualCorrection; }
     public String getCorrectedBy() { return correctedBy; }

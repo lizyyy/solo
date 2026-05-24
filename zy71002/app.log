@@ -1,0 +1,471 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module (file:/Users/lzy/pro/solo/workspaces/zy71002/tools/maven/lib/jansi-2.4.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper (file:/Users/lzy/pro/solo/workspaces/zy71002/tools/maven/lib/guava-32.0.1-jre.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------< com.floodrelief:county-flood-relief-api >---------------
+[INFO] Building county-flood-relief-api 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.0:run (default-cli) > test-compile @ county-flood-relief-api >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ county-flood-relief-api ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ county-flood-relief-api ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ county-flood-relief-api ---
+[INFO] skip non existing resourceDirectory /Users/lzy/pro/solo/workspaces/zy71002/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ county-flood-relief-api ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< spring-boot:3.3.0:run (default-cli) < test-compile @ county-flood-relief-api <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.0:run (default-cli) @ county-flood-relief-api ---
+[INFO] Attaching agents: []
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.0)
+
+2026-05-24T11:41:39.737+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.floodrelief.FloodReliefApplication   : Starting FloodReliefApplication using Java 25.0.3 with PID 49033 (/Users/lzy/pro/solo/workspaces/zy71002/target/classes started by lzy in /Users/lzy/pro/solo/workspaces/zy71002)
+2026-05-24T11:41:39.738+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] com.floodrelief.FloodReliefApplication   : Running with Spring Boot v3.3.0, Spring v6.1.8
+2026-05-24T11:41:39.738+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.floodrelief.FloodReliefApplication   : No active profile set, falling back to 1 default profile: "default"
+2026-05-24T11:41:40.214+08:00  INFO 49033 --- [county-flood-relief-api] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-24T11:41:40.273+08:00  INFO 49033 --- [county-flood-relief-api] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 55 ms. Found 7 JPA repository interfaces.
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.apache.tomcat.jni.Library in an unnamed module (file:/Users/lzy/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.24/tomcat-embed-core-10.1.24.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2026-05-24T11:41:40.542+08:00  INFO 49033 --- [county-flood-relief-api] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-05-24T11:41:40.548+08:00  INFO 49033 --- [county-flood-relief-api] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-24T11:41:40.548+08:00  INFO 49033 --- [county-flood-relief-api] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.24]
+2026-05-24T11:41:40.571+08:00  INFO 49033 --- [county-flood-relief-api] [           main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2026-05-24T11:41:40.572+08:00  INFO 49033 --- [county-flood-relief-api] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 808 ms
+2026-05-24T11:41:40.589+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-24T11:41:40.706+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:file:./data/floodrelief user=ADMIN
+2026-05-24T11:41:40.707+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-24T11:41:40.714+08:00  INFO 49033 --- [county-flood-relief-api] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:file:./data/floodrelief'
+2026-05-24T11:41:40.818+08:00  INFO 49033 --- [county-flood-relief-api] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-24T11:41:40.848+08:00  INFO 49033 --- [county-flood-relief-api] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.2.Final
+2026-05-24T11:41:40.864+08:00  INFO 49033 --- [county-flood-relief-api] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-24T11:41:41.054+08:00  INFO 49033 --- [county-flood-relief-api] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-24T11:41:41.080+08:00  WARN 49033 --- [county-flood-relief-api] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-05-24T11:41:41.548+08:00  INFO 49033 --- [county-flood-relief-api] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-24T11:41:41.571+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    create table allocation_evidence (
+        id bigint generated by default as identity,
+        allocation_id bigint not null,
+        created_at timestamp(6),
+        description varchar(2000),
+        evidence_type varchar(255) not null,
+        evidence_url varchar(1000),
+        uploader varchar(255),
+        primary key (id)
+    )
+2026-05-24T11:41:41.579+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    create table allocation_record (
+        id bigint generated by default as identity,
+        allocation_no varchar(255) not null,
+        applicant varchar(255),
+        approver varchar(255),
+        corrected_by varchar(255),
+        created_at timestamp(6),
+        dispatched_at timestamp(6),
+        dispatcher varchar(255),
+        manual_correction boolean,
+        material_batch_id bigint not null,
+        previous_status varchar(255),
+        quantity integer not null,
+        receipt_evidence varchar(1000),
+        received_at timestamp(6),
+        receiver varchar(255),
+        reject_reason varchar(1000),
+        shelter_id bigint not null,
+        status enum ('APPROVED','CANCELLED','DISPATCHED','PENDING','RECEIVED','REJECTED','WITHDRAWN') not null,
+        unit varchar(255),
+        updated_at timestamp(6),
+        withdraw_reason varchar(1000),
+        primary key (id)
+    )
+2026-05-24T11:41:41.580+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    create table gap_report (
+        id bigint generated by default as identity,
+        created_at timestamp(6),
+        current_quantity integer,
+        gap_quantity integer,
+        material_name varchar(255) not null,
+        material_type varchar(255) not null,
+        priority varchar(255),
+        reason varchar(2000),
+        reported_at timestamp(6),
+        reporter varchar(255),
+        required_quantity integer,
+        shelter_id bigint not null,
+        status varchar(255),
+        unit varchar(255),
+        primary key (id)
+    )
+2026-05-24T11:41:41.581+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    create table material_batch (
+        id bigint generated by default as identity,
+        batch_no varchar(255) not null,
+        created_at timestamp(6),
+        expiry_date timestamp(6),
+        material_name varchar(255) not null,
+        material_type varchar(255) not null,
+        operator varchar(255),
+        production_date timestamp(6),
+        quantity integer not null,
+        remark varchar(1000),
+        source varchar(255),
+        specification varchar(255),
+        storage_location varchar(255),
+        unit varchar(255),
+        primary key (id)
+    )
+2026-05-24T11:41:41.581+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    create table shelter (
+        id bigint generated by default as identity,
+        active boolean,
+        code varchar(255) not null,
+        created_at timestamp(6),
+        location varchar(255) not null,
+        manager varchar(255),
+        manager_phone varchar(255),
+        max_capacity integer,
+        name varchar(255) not null,
+        remark varchar(255),
+        updated_at timestamp(6),
+        primary key (id)
+    )
+2026-05-24T11:41:41.582+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    create table special_need (
+        id bigint generated by default as identity,
+        created_at timestamp(6),
+        description varchar(2000),
+        evidence_url varchar(1000),
+        need_name varchar(255) not null,
+        need_type varchar(255) not null,
+        quantity integer,
+        remark varchar(1000),
+        reporter varchar(255),
+        shelter_id bigint not null,
+        status varchar(255),
+        unit varchar(255),
+        updated_at timestamp(6),
+        primary key (id)
+    )
+2026-05-24T11:41:41.583+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    create table transfer_record (
+        id bigint generated by default as identity,
+        children_count integer,
+        corrected_by varchar(255),
+        created_at timestamp(6),
+        disabled_count integer,
+        elderly_count integer,
+        manual_correction boolean,
+        remark varchar(1000),
+        reporter varchar(255),
+        shelter_id bigint not null,
+        total_count integer not null,
+        primary key (id)
+    )
+2026-05-24T11:41:41.584+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    alter table if exists allocation_record 
+       drop constraint if exists UKgpx77dbs8dyg8jghmr7intwwd
+2026-05-24T11:41:41.584+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    alter table if exists allocation_record 
+       add constraint UKgpx77dbs8dyg8jghmr7intwwd unique (allocation_no)
+2026-05-24T11:41:41.585+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    alter table if exists material_batch 
+       drop constraint if exists UKruc9qr2om6naav19e8bs4kybw
+2026-05-24T11:41:41.585+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    alter table if exists material_batch 
+       add constraint UKruc9qr2om6naav19e8bs4kybw unique (batch_no)
+2026-05-24T11:41:41.585+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    alter table if exists shelter 
+       drop constraint if exists UK7d9pk2yuos1246t82xbbvgati
+2026-05-24T11:41:41.585+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    alter table if exists shelter 
+       add constraint UK7d9pk2yuos1246t82xbbvgati unique (code)
+2026-05-24T11:41:41.587+08:00  INFO 49033 --- [county-flood-relief-api] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-24T11:41:41.860+08:00  INFO 49033 --- [county-flood-relief-api] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-24T11:41:42.153+08:00  WARN 49033 --- [county-flood-relief-api] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-05-24T11:41:42.348+08:00  INFO 49033 --- [county-flood-relief-api] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2026-05-24T11:41:42.352+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.floodrelief.FloodReliefApplication   : Started FloodReliefApplication in 3.072 seconds (process running for 4.515)
+2026-05-24T11:41:42.356+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.floodrelief.config.DataInitializer   : 开始初始化样例数据...
+2026-05-24T11:41:42.369+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        shelter
+        (active, code, created_at, location, manager, manager_phone, max_capacity, name, remark, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.394+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        shelter
+        (active, code, created_at, location, manager, manager_phone, max_capacity, name, remark, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.397+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        shelter
+        (active, code, created_at, location, manager, manager_phone, max_capacity, name, remark, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.398+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.floodrelief.config.DataInitializer   : 创建3个安置点
+2026-05-24T11:41:42.399+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        material_batch
+        (batch_no, created_at, expiry_date, material_name, material_type, operator, production_date, quantity, remark, source, specification, storage_location, unit, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.401+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        material_batch
+        (batch_no, created_at, expiry_date, material_name, material_type, operator, production_date, quantity, remark, source, specification, storage_location, unit, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.402+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        material_batch
+        (batch_no, created_at, expiry_date, material_name, material_type, operator, production_date, quantity, remark, source, specification, storage_location, unit, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.403+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        material_batch
+        (batch_no, created_at, expiry_date, material_name, material_type, operator, production_date, quantity, remark, source, specification, storage_location, unit, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.405+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        material_batch
+        (batch_no, created_at, expiry_date, material_name, material_type, operator, production_date, quantity, remark, source, specification, storage_location, unit, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.406+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.floodrelief.config.DataInitializer   : 创建5个物资批次
+2026-05-24T11:41:42.407+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        transfer_record
+        (children_count, corrected_by, created_at, disabled_count, elderly_count, manual_correction, remark, reporter, shelter_id, total_count, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.411+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        transfer_record
+        (children_count, corrected_by, created_at, disabled_count, elderly_count, manual_correction, remark, reporter, shelter_id, total_count, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.413+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        transfer_record
+        (children_count, corrected_by, created_at, disabled_count, elderly_count, manual_correction, remark, reporter, shelter_id, total_count, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.414+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.floodrelief.config.DataInitializer   : 创建3个转移人数初始记录
+2026-05-24T11:41:42.416+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        allocation_record
+        (allocation_no, applicant, approver, corrected_by, created_at, dispatched_at, dispatcher, manual_correction, material_batch_id, previous_status, quantity, receipt_evidence, received_at, receiver, reject_reason, shelter_id, status, unit, updated_at, withdraw_reason, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.418+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        allocation_evidence
+        (allocation_id, created_at, description, evidence_type, evidence_url, uploader, id) 
+    values
+        (?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.420+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        allocation_record
+        (allocation_no, applicant, approver, corrected_by, created_at, dispatched_at, dispatcher, manual_correction, material_batch_id, previous_status, quantity, receipt_evidence, received_at, receiver, reject_reason, shelter_id, status, unit, updated_at, withdraw_reason, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.420+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.floodrelief.config.DataInitializer   : 【正常流程】创建2条已完成的调拨记录，含签收回执
+2026-05-24T11:41:42.421+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        allocation_record
+        (allocation_no, applicant, approver, corrected_by, created_at, dispatched_at, dispatcher, manual_correction, material_batch_id, previous_status, quantity, receipt_evidence, received_at, receiver, reject_reason, shelter_id, status, unit, updated_at, withdraw_reason, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.423+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        allocation_record
+        (allocation_no, applicant, approver, corrected_by, created_at, dispatched_at, dispatcher, manual_correction, material_batch_id, previous_status, quantity, receipt_evidence, received_at, receiver, reject_reason, shelter_id, status, unit, updated_at, withdraw_reason, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.424+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        allocation_record
+        (allocation_no, applicant, approver, corrected_by, created_at, dispatched_at, dispatcher, manual_correction, material_batch_id, previous_status, quantity, receipt_evidence, received_at, receiver, reject_reason, shelter_id, status, unit, updated_at, withdraw_reason, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.427+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.floodrelief.config.DataInitializer   : 【冲突场景】安置点2存在待审批、已通过、已驳回的记录，模拟重复申领拦截场景
+2026-05-24T11:41:42.429+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        allocation_record
+        (allocation_no, applicant, approver, corrected_by, created_at, dispatched_at, dispatcher, manual_correction, material_batch_id, previous_status, quantity, receipt_evidence, received_at, receiver, reject_reason, shelter_id, status, unit, updated_at, withdraw_reason, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.431+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        allocation_record
+        (allocation_no, applicant, approver, corrected_by, created_at, dispatched_at, dispatcher, manual_correction, material_batch_id, previous_status, quantity, receipt_evidence, received_at, receiver, reject_reason, shelter_id, status, unit, updated_at, withdraw_reason, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.432+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.floodrelief.config.DataInitializer   : 【撤回场景】安置点3：毛毯调拨已撤回（从APPROVED撤回），儿童奶粉运输中可撤回
+2026-05-24T11:41:42.433+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        transfer_record
+        (children_count, corrected_by, created_at, disabled_count, elderly_count, manual_correction, remark, reporter, shelter_id, total_count, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.434+08:00 DEBUG 49033 --- [county-flood-relief-api] [           main] org.hibernate.SQL                        : 
+    insert 
+    into
+        allocation_record
+        (allocation_no, applicant, approver, corrected_by, created_at, dispatched_at, dispatcher, manual_correction, material_batch_id, previous_status, quantity, receipt_evidence, received_at, receiver, reject_reason, shelter_id, status, unit, updated_at, withdraw_reason, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-24T11:41:42.435+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.floodrelief.config.DataInitializer   : 【人工修正】安置点1：人数记录人工修正，药品调拨记录人工复核
+2026-05-24T11:41:42.439+08:00  INFO 49033 --- [county-flood-relief-api] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-05-24T11:41:42.450+08:00 ERROR 49033 --- [county-flood-relief-api] [           main] o.s.boot.SpringApplication               : Application run failed
+
+java.lang.Error: Unresolved compilation problem: 
+	The method setRemark(String) is undefined for the type AllocationRecord
+
+	at com.floodrelief.config.DataInitializer.initNightAllocation(DataInitializer.java:362) ~[classes/:na]
+	at com.floodrelief.config.DataInitializer.run(DataInitializer.java:51) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:354) ~[spring-aop-6.1.8.jar:6.1.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.1.8.jar:6.1.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.1.8.jar:6.1.8]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768) ~[spring-aop-6.1.8.jar:6.1.8]
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123) ~[spring-tx-6.1.8.jar:6.1.8]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392) ~[spring-tx-6.1.8.jar:6.1.8]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.1.8.jar:6.1.8]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.1.8.jar:6.1.8]
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768) ~[spring-aop-6.1.8.jar:6.1.8]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720) ~[spring-aop-6.1.8.jar:6.1.8]
+	at com.floodrelief.config.DataInitializer$$SpringCGLIB$$0.run(<generated>) ~[classes/:na]
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790) ~[spring-boot-3.3.0.jar:3.3.0]
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83) ~[spring-core-6.1.8.jar:6.1.8]
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60) ~[spring-core-6.1.8.jar:6.1.8]
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88) ~[spring-core-6.1.8.jar:6.1.8]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798) ~[spring-boot-3.3.0.jar:3.3.0]
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789) ~[spring-boot-3.3.0.jar:3.3.0]
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774) ~[spring-boot-3.3.0.jar:3.3.0]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:186) ~[na:na]
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:571) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:560) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:153) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:176) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:632) ~[na:na]
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774) ~[spring-boot-3.3.0.jar:3.3.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342) ~[spring-boot-3.3.0.jar:3.3.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363) ~[spring-boot-3.3.0.jar:3.3.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352) ~[spring-boot-3.3.0.jar:3.3.0]
+	at com.floodrelief.FloodReliefApplication.main(FloodReliefApplication.java:9) ~[classes/:na]
+
+2026-05-24T11:41:44.066+08:00  INFO 49033 --- [county-flood-relief-api] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-05-24T11:41:44.067+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-05-24T11:41:44.068+08:00  INFO 49033 --- [county-flood-relief-api] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+Exception in thread "main" java.lang.IllegalStateException: java.lang.Error: Unresolved compilation problem: 
+	The method setRemark(String) is undefined for the type AllocationRecord
+
+	at org.springframework.boot.SpringApplication.handleRunFailure(SpringApplication.java:825)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:345)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.floodrelief.FloodReliefApplication.main(FloodReliefApplication.java:9)
+Caused by: java.lang.Error: Unresolved compilation problem: 
+	The method setRemark(String) is undefined for the type AllocationRecord
+
+	at com.floodrelief.config.DataInitializer.initNightAllocation(DataInitializer.java:362)
+	at com.floodrelief.config.DataInitializer.run(DataInitializer.java:51)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:354)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:123)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:392)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:768)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:720)
+	at com.floodrelief.config.DataInitializer$$SpringCGLIB$$0.run(<generated>)
+	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
+	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
+	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
+	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:186)
+	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:571)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:560)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:153)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:176)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:632)
+	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+	... 3 more
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.788 s
+[INFO] Finished at: 2026-05-24T11:41:44+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.3.0:run (default-cli) on project county-flood-relief-api: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

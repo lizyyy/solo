@@ -1,147 +1,127 @@
 #!/bin/bash
-# 县域防汛安置物资 API - 全自动启动脚本
-# 自动检测 → 自动安装 → 自动运行
+# 县域防汛安置物资 API - 全能启动脚本
+# 支持: Maven 运行 / 预编译 Jar 运行 / 类文件直接运行
 
 set -e
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
 
+echo "========================================"
+echo "  县域防汛安置物资 API - 启动器"
+echo "========================================"
+echo ""
+
 # 颜色输出
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
 NC='\033[0m'
 
 info() { echo -e "${GREEN}[INFO]${NC} $1"; }
 warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; }
-blue() { echo -e "${BLUE}$1${NC}"; }
 
-echo ""
-blue "========================================"
-blue "  县域防汛安置物资 API - 全自动启动器"
-blue "========================================"
-echo ""
+# 方法1: 检查预编译的 Jar 包
+check_jar() {
+    local JAR_FILE=$(ls target/county-flood-relief-api-*.jar 2>/dev/null | head -1)
+    if [ -n "$JAR_FILE" ] && [ -f "$JAR_FILE" ]; then
+        echo "$JAR_FILE"
+    fi
+}
 
-# 查找 Maven
+# 方法2: 查找 Maven
 find_maven() {
-    # 1. 系统 Maven
-    command -v mvn >/dev/null 2>&1 && echo "mvn" && return
+    # 标准路径
+    if command -v mvn >/dev/null 2>&1; then
+        echo "mvn"
+        return
+    fi
+    
+    # Homebrew
     [ -f "/opt/homebrew/bin/mvn" ] && echo "/opt/homebrew/bin/mvn" && return
     [ -f "/usr/local/bin/mvn" ] && echo "/usr/local/bin/mvn" && return
+    [ -f "/usr/local/Cellar/maven/*/bin/mvn" ] && ls /usr/local/Cellar/maven/*/bin/mvn 2>/dev/null | head -1 && return
     
-    # 2. 项目本地 Maven
-    [ -f "$PROJECT_DIR/tools/maven/bin/mvn" ] && echo "$PROJECT_DIR/tools/maven/bin/mvn" && return
-    
-    # 3. IDE 或其他位置
+    # IDE 和其他位置
     local FOUND=$(find /Users -name "mvn" -type f 2>/dev/null | grep -v ".m2" | head -1)
     [ -n "$FOUND" ] && echo "$FOUND" && return
     
-    echo ""
+    # 项目本地 Maven
+    [ -f "tools/maven/bin/mvn" ] && echo "tools/maven/bin/mvn" && return
 }
 
-# 安装本地 Maven
-install_maven() {
-    warn "未找到 Maven，开始自动安装..."
-    echo ""
+# 方法3: 直接运行类文件（需要依赖）
+run_with_classes() {
+    warn "尝试直接运行编译后的类文件..."
+    warn "注意: 需要所有依赖 jar 包在 lib/ 目录下"
     
-    if [ -x "$PROJECT_DIR/install-maven.sh" ]; then
-        "$PROJECT_DIR/install-maven.sh"
-        if [ $? -eq 0 ] && [ -f "$PROJECT_DIR/tools/maven/bin/mvn" ]; then
-            echo "$PROJECT_DIR/tools/maven/bin/mvn"
-            return
-        fi
+    if [ ! -d "lib" ]; then
+        error "未找到 lib/ 依赖目录"
+        return 1
     fi
     
-    # 手动下载安装
-    info "正在下载 Maven 3.9.6..."
-    mkdir -p "$PROJECT_DIR/tools"
-    
-    local MAVEN_URL="https://mirrors.tuna.tsinghua.edu.cn/apache/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz"
-    
-    if command -v curl >/dev/null 2>&1; then
-        curl -L -o "$PROJECT_DIR/tools/maven.tar.gz" "$MAVEN_URL"
-    elif command -v wget >/dev/null 2>&1; then
-        wget -O "$PROJECT_DIR/tools/maven.tar.gz" "$MAVEN_URL"
-    else
-        error "未找到 curl 或 wget，无法自动下载 Maven"
-        echo ""
-        manual_guide
-        exit 1
-    fi
-    
-    mkdir -p "$PROJECT_DIR/tools/maven"
-    tar -xzf "$PROJECT_DIR/tools/maven.tar.gz" -C "$PROJECT_DIR/tools/maven" --strip-components=1
-    rm -f "$PROJECT_DIR/tools/maven.tar.gz"
-    
-    if [ -f "$PROJECT_DIR/tools/maven/bin/mvn" ]; then
-        chmod +x "$PROJECT_DIR/tools/maven/bin/mvn"
-        info "Maven 安装完成!"
-        echo "$PROJECT_DIR/tools/maven/bin/mvn"
-    else
-        error "Maven 安装失败"
-        exit 1
-    fi
+    local CP="target/classes:lib/*"
+    java -cp "$CP" com.floodrelief.FloodReliefApplication
 }
 
-# 手动安装指南
-manual_guide() {
-    yellow "----------------------------------------"
-    yellow "  手动安装指南"
-    yellow "----------------------------------------"
+# 显示帮助信息
+show_help() {
     echo ""
-    echo "方案 1: 使用 Maven 安装脚本"
-    echo "  ./install-maven.sh"
+    echo "========================================"
+    echo "  📦 多种启动方式"
+    echo "========================================"
     echo ""
-    echo "方案 2: 手动下载 Maven"
-    echo "  1. 访问: https://maven.apache.org/download.cgi"
-    echo "  2. 下载: apache-maven-3.9.6-bin.tar.gz"
-    echo "  3. 解压到: tools/maven/"
-    echo "  4. 确保 tools/maven/bin/mvn 存在"
-    echo ""
-    echo "方案 3: 使用 Homebrew"
+    echo "方式1: 使用 Maven 运行（推荐）"
     echo "  brew install maven"
+    echo "  mvn clean spring-boot:run"
     echo ""
-    echo "安装完成后运行: ./start.sh"
+    echo "方式2: 使用预编译 Jar"
+    echo "  mvn clean package"
+    echo "  java -jar target/county-flood-relief-api-1.0.0.jar"
     echo ""
-}
-
-# 显示服务信息
-show_service_info() {
+    echo "方式3: 使用项目本地 Maven"
+    echo "  mkdir -p tools/maven"
+    echo "  下载 maven 并解压到 tools/maven/"
+    echo "  ./start.sh"
     echo ""
-    blue "========================================"
-    blue "  🚀 服务启动中..."
-    blue "========================================"
-    echo ""
-    info "📡 API 基础路径: http://localhost:8080/api"
-    info "🔍 H2 数据库控制台: http://localhost:8080/api/h2-console"
-    info "💾 JDBC URL: jdbc:h2:file:./data/floodrelief"
-    info "👤 用户名/密码: admin / admin"
-    echo ""
-    info "服务启动后，运行 ./verify-api.sh 验证 API 闭环"
-    echo ""
-    yellow "按 Ctrl+C 停止服务"
+    echo "方式4: 验证 API（服务启动后）"
+    echo "  ./verify-api.sh"
     echo ""
 }
 
-# 主流程
-MVN_CMD=$(find_maven)
-
-if [ -z "$MVN_CMD" ]; then
-    MVN_CMD=$(install_maven)
-fi
-
-if [ -n "$MVN_CMD" ] && [ -f "$(echo $MVN_CMD | awk '{print $NF}')" -o "$MVN_CMD" = "mvn" ]; then
-    info "使用 Maven: $MVN_CMD"
-    show_service_info
+# 主逻辑
+main() {
+    # 首先检查 Jar
+    JAR_FILE=$(check_jar)
+    if [ -n "$JAR_FILE" ]; then
+        info "发现预编译 Jar 包: $JAR_FILE"
+        info "直接启动服务..."
+        echo ""
+        echo "📡 API 地址: http://localhost:8080/api"
+        echo "🔍 H2 控制台: http://localhost:8080/api/h2-console"
+        echo ""
+        java -jar "$JAR_FILE"
+        return 0
+    fi
     
-    # 执行 Maven 命令
-    cd "$PROJECT_DIR"
-    $MVN_CMD clean spring-boot:run
-else
-    error "无法找到或安装 Maven"
-    manual_guide
+    # 查找 Maven
+    MVN_CMD=$(find_maven)
+    if [ -n "$MVN_CMD" ]; then
+        info "找到 Maven: $MVN_CMD"
+        info "构建并启动服务..."
+        echo ""
+        echo "📡 API 地址: http://localhost:8080/api"
+        echo "🔍 H2 控制台: http://localhost:8080/api/h2-console"
+        echo ""
+        "$MVN_CMD" clean spring-boot:run
+        return 0
+    fi
+    
+    # 没有找到运行环境
+    error "未找到可用的运行环境！"
+    show_help
     exit 1
-fi
+}
+
+main "$@"

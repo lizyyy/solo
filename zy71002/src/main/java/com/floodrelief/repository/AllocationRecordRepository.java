@@ -19,4 +19,6 @@ public interface AllocationRecordRepository extends JpaRepository<AllocationReco
     List<AllocationRecord> findActiveAllocations(Long shelterId, Long materialBatchId);
     
     List<AllocationRecord> findByStatus(AllocationRecord.AllocationStatus status);
+    
+    List<AllocationRecord> findByShelterIdAndStatus(Long shelterId, AllocationRecord.AllocationStatus status);
 }
