@@ -14,7 +14,11 @@ public class ReworkOrder {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String orderNumber;
+    private String reworkNo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "patient_id")
+    private Patient patient;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "batch_id")
@@ -30,8 +34,26 @@ public class ReworkOrder {
     @Column(length = 2000)
     private String technicianNote;
 
+    private LocalDateTime technicianNoteTime;
+
+    private String technicianName;
+
     @Column(length = 2000)
     private String doctorNote;
+
+    private String doctorConfirmation;
+
+    private LocalDateTime doctorConfirmationTime;
+
+    private String doctorName;
+
+    private LocalDateTime receivedTime;
+
+    private String receivedBy;
+
+    private LocalDateTime inspectionTime;
+
+    private String inspectionResult;
 
     private String inspectionRemark;
 

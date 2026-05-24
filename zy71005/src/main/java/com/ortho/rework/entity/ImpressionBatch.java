@@ -13,11 +13,19 @@ public class ImpressionBatch {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String batchNumber;
+    private String batchNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id")
     private Patient patient;
+
+    private String impressionType;
+
+    private String originalBatchNo;
+
+    private Integer reworkCount = 0;
+
+    private LocalDateTime productionDate;
 
     private String description;
 
