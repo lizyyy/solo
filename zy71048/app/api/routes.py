@@ -3,6 +3,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
+from urllib.parse import quote
 from app.database import get_db
 from app.models import BlastStatus
 from app.schemas import (
@@ -213,11 +214,14 @@ def export_plan(plan_id: int, db: Session = Depends(get_db)):
     excel_file = report_exporter.export_plan_to_excel(db, plan)
 
     filename = f"爆破计划_{plan.business_no}_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx"
+    filename_encoded = quote(filename)
 
     return StreamingResponse(
         excel_file,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
+        headers={
+            "Content-Disposition": f"attachment; filename*=UTF-8''{filename_encoded}"
+        }
     )
 
 
@@ -232,11 +236,14 @@ def export_batch_plans(
 
     excel_file = report_exporter.export_batch_plans_to_excel(db, plans)
     filename = f"爆破计划汇总_{datetime.now().strftime('%Y%m%d%H%M%S')}.xlsx"
+    filename_encoded = quote(filename)
 
     return StreamingResponse(
         excel_file,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
+        headers={
+            "Content-Disposition": f"attachment; filename*=UTF-8''{filename_encoded}"
+        }
     )
 
 

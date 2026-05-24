@@ -3,7 +3,8 @@ import httpx
 import json
 from datetime import datetime, timedelta
 
-BASE_URL = "http://localhost:8000/api/v1"
+BASE_URL = "http://127.0.0.1:8000/api/v1"
+client = httpx.Client(trust_env=False)
 
 
 def test_create_plan():
@@ -49,7 +50,7 @@ def test_create_plan():
     }
 
     try:
-        response = httpx.post(f"{BASE_URL}/plans/", json=plan_data)
+        response = client.post(f"{BASE_URL}/plans/", json=plan_data)
         print(f"状态码: {response.status_code}")
         if response.status_code == 201:
             data = response.json()
@@ -67,7 +68,7 @@ def test_create_plan():
 def test_submit_plan(plan_id):
     print("\n=== 测试提交爆破计划 ===")
     try:
-        response = httpx.post(f"{BASE_URL}/plans/{plan_id}/submit?operator=李四")
+        response = client.post(f"{BASE_URL}/plans/{plan_id}/submit?operator=李四")
         print(f"状态码: {response.status_code}")
         data = response.json()
         print(f"新状态: {data.get('status')}")
@@ -80,7 +81,7 @@ def test_submit_plan(plan_id):
 def test_get_plan(plan_id):
     print("\n=== 测试查询计划详情 ===")
     try:
-        response = httpx.get(f"{BASE_URL}/plans/{plan_id}")
+        response = client.get(f"{BASE_URL}/plans/{plan_id}")
         print(f"状态码: {response.status_code}")
         data = response.json()
         print(f"业务编号: {data['business_no']}")
@@ -97,7 +98,7 @@ def test_get_plan(plan_id):
 def test_add_receipt(plan_id):
     print("\n=== 测试添加回执 ===")
     try:
-        response = httpx.get(f"{BASE_URL}/plans/{plan_id}")
+        response = client.get(f"{BASE_URL}/plans/{plan_id}")
         data = response.json()
         if not data['notices']:
             print("没有通知对象")
@@ -112,7 +113,7 @@ def test_add_receipt(plan_id):
             "remark": "已收到通知，将按时撤离"
         }
 
-        response = httpx.post(f"{BASE_URL}/plans/{plan_id}/receipts", json=receipt_data)
+        response = client.post(f"{BASE_URL}/plans/{plan_id}/receipts", json=receipt_data)
         print(f"状态码: {response.status_code}")
         if response.status_code == 200:
             print("回执添加成功!")
@@ -125,7 +126,7 @@ def test_add_receipt(plan_id):
 def test_exception_split():
     print("\n=== 测试异常拆分 ===")
     try:
-        response = httpx.get(f"{BASE_URL}/exceptions/split")
+        response = client.get(f"{BASE_URL}/exceptions/split")
         print(f"状态码: {response.status_code}")
         data = response.json()
         print(f"风向异常: {len(data['wind_exceptions'])} 个")
@@ -139,7 +140,7 @@ def test_exception_split():
 def test_get_audit_trail(plan_id):
     print("\n=== 测试审计轨迹 ===")
     try:
-        response = httpx.get(f"{BASE_URL}/plans/{plan_id}/audit-trail")
+        response = client.get(f"{BASE_URL}/plans/{plan_id}/audit-trail")
         print(f"状态码: {response.status_code}")
         data = response.json()
         print(f"业务编号: {data['business_no']}")
@@ -147,6 +148,59 @@ def test_get_audit_trail(plan_id):
         print("审计日志:")
         for log in data['audit_logs']:
             print(f"  [{log['created_at']}] {log['action']} - {log['detail']}")
+    except Exception as e:
+        print(f"请求失败: {e}")
+
+
+def test_review_plan(plan_id, approve: bool = True):
+    print("\n=== 测试复核计划 ===")
+    try:
+        review_data = {
+            "operator": "王五",
+            "review_comment": "复核通过，材料齐全",
+            "approve": approve
+        }
+        response = client.post(f"{BASE_URL}/plans/{plan_id}/review", json=review_data)
+        print(f"状态码: {response.status_code}")
+        data = response.json()
+        if response.status_code == 200:
+            print(f"新状态: {data.get('status')}")
+            print(f"操作成功")
+        else:
+            print(f"错误码: {data.get('error_code')}")
+            print(f"消息: {data.get('message')}")
+    except Exception as e:
+        print(f"请求失败: {e}")
+
+
+def test_export_plan(plan_id):
+    print("\n=== 测试导出单条计划 ===")
+    try:
+        response = client.get(f"{BASE_URL}/plans/{plan_id}/export")
+        print(f"状态码: {response.status_code}")
+        if response.status_code == 200:
+            content_disposition = response.headers.get('Content-Disposition', '')
+            print(f"Content-Disposition: {content_disposition}")
+            print(f"文件大小: {len(response.content)} bytes")
+            print("导出成功!")
+        else:
+            print(f"响应: {response.json()}")
+    except Exception as e:
+        print(f"请求失败: {e}")
+
+
+def test_export_batch():
+    print("\n=== 测试批量导出 ===")
+    try:
+        response = client.get(f"{BASE_URL}/export/batch")
+        print(f"状态码: {response.status_code}")
+        if response.status_code == 200:
+            content_disposition = response.headers.get('Content-Disposition', '')
+            print(f"Content-Disposition: {content_disposition}")
+            print(f"文件大小: {len(response.content)} bytes")
+            print("导出成功!")
+        else:
+            print(f"响应: {response.json()}")
     except Exception as e:
         print(f"请求失败: {e}")
 
@@ -174,7 +228,7 @@ def test_duplicate_business_no(business_no):
     }
 
     try:
-        response = httpx.post(f"{BASE_URL}/plans/", json=plan_data)
+        response = client.post(f"{BASE_URL}/plans/", json=plan_data)
         print(f"状态码: {response.status_code}")
         data = response.json()
         print(f"错误码: {data.get('error_code')}")
@@ -199,6 +253,10 @@ def main():
     test_get_plan(plan_id)
     test_add_receipt(plan_id)
     test_get_plan(plan_id)
+    test_review_plan(plan_id, approve=True)
+    test_get_plan(plan_id)
+    test_export_plan(plan_id)
+    test_export_batch()
     test_exception_split()
     test_get_audit_trail(plan_id)
     test_duplicate_business_no(business_no)
