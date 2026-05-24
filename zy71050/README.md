@@ -12,11 +12,10 @@
 
 ## 技术栈
 
-- Java 11
-- Spring Boot 2.7.18
+- Java 17
+- Spring Boot 3.2.5
 - Spring Data JPA
 - H2 Database (内存)
-- Lombok
 
 ## 快速开始
 
@@ -65,7 +64,7 @@ mvn spring-boot:run
 ### 健康检查
 
 ```bash
-curl http://localhost:8080/api/health
+curl http://localhost:8080/api/plugin/health
 ```
 
 ### 一、新建操作
@@ -73,7 +72,7 @@ curl http://localhost:8080/api/health
 #### 1. 插电
 
 ```bash
-curl -X POST http://localhost:8080/api/plugin \
+curl -X POST http://localhost:8080/api/plugin/plugin \
   -H "Content-Type: application/json" \
   -d '{
     "containerNumber": "CBHU1234567",
@@ -87,7 +86,7 @@ curl -X POST http://localhost:8080/api/plugin \
 #### 2. 温度采样
 
 ```bash
-curl -X POST http://localhost:8080/api/temperature \
+curl -X POST http://localhost:8080/api/plugin/temperature \
   -H "Content-Type: application/json" \
   -d '{
     "containerNumber": "CBHU1234567",
@@ -104,19 +103,19 @@ curl -X POST http://localhost:8080/api/temperature \
 #### 1. 校验插座状态
 
 ```bash
-curl http://localhost:8080/api/validation/socket/A-01-01
+curl http://localhost:8080/api/plugin/validate/socket/A-01-01
 ```
 
 #### 2. 校验冷藏箱状态
 
 ```bash
-curl http://localhost:8080/api/validation/container/CBHU1234567
+curl http://localhost:8080/api/plugin/validate/container/CBHU1234567
 ```
 
 #### 3. 预校验插电
 
 ```bash
-curl "http://localhost:8080/api/validation/plugin?containerNumber=CBHU1234567&socketCode=A-01-01"
+curl "http://localhost:8080/api/plugin/validate/plugin?containerNumber=CBHU1234567&socketCode=A-01-01"
 ```
 
 ### 三、处置接口
@@ -124,7 +123,7 @@ curl "http://localhost:8080/api/validation/plugin?containerNumber=CBHU1234567&so
 #### 1. 确认报警
 
 ```bash
-curl -X POST http://localhost:8080/api/alarms/acknowledge \
+curl -X POST http://localhost:8080/api/plugin/alarm/acknowledge \
   -H "Content-Type: application/json" \
   -d '{
     "alarmId": 1,
@@ -136,7 +135,7 @@ curl -X POST http://localhost:8080/api/alarms/acknowledge \
 #### 2. 处置报警
 
 ```bash
-curl -X POST http://localhost:8080/api/alarms/resolve \
+curl -X POST http://localhost:8080/api/plugin/alarm/resolve \
   -H "Content-Type: application/json" \
   -d '{
     "alarmId": 1,
@@ -149,7 +148,7 @@ curl -X POST http://localhost:8080/api/alarms/resolve \
 #### 3. 标记误报
 
 ```bash
-curl -X POST http://localhost:8080/api/alarms/false \
+curl -X POST http://localhost:8080/api/plugin/alarm/false \
   -H "Content-Type: application/json" \
   -d '{
     "alarmId": 1,
@@ -161,7 +160,7 @@ curl -X POST http://localhost:8080/api/alarms/false \
 #### 4. 断电
 
 ```bash
-curl -X POST http://localhost:8080/api/unplug \
+curl -X POST http://localhost:8080/api/plugin/unplug \
   -H "Content-Type: application/json" \
   -d '{
     "socketCode": "A-01-01",
@@ -174,39 +173,39 @@ curl -X POST http://localhost:8080/api/unplug \
 ### 四、补证接口
 
 ```bash
-curl -X POST "http://localhost:8080/api/supplement/1?inspectorBadge=INS001&remarks=补充说明材料"
+curl -X POST "http://localhost:8080/api/plugin/supplement?reportId=1&inspectorBadge=INS001&remarks=补充说明材料"
 ```
 
 ### 五、复盘接口
 
 ```bash
-curl "http://localhost:8080/api/review?start=2024-01-01T00:00:00&end=2024-12-31T23:59:59"
+curl "http://localhost:8080/api/plugin/review?start=2024-01-01T00:00:00&end=2024-12-31T23:59:59"
 ```
 
 ### 六、导出接口
 
 ```bash
 # 导出单份报告
-curl -O http://localhost:8080/api/export/RPT-XXXXXXXX
+curl -O http://localhost:8080/api/plugin/export/RPT-XXXXXXXX
 
 # 查看报告详情
-curl http://localhost:8080/api/reports/RPT-XXXXXXXX
+curl http://localhost:8080/api/plugin/report/RPT-XXXXXXXX
 ```
 
 ### 七、查询接口
 
 ```bash
 # 查询所有插座
-curl http://localhost:8080/api/sockets
+curl http://localhost:8080/api/plugin/sockets
 
-# 查询可用插座
-curl "http://localhost:8080/api/sockets?status=available"
+# 查询所有冷藏箱
+curl http://localhost:8080/api/plugin/containers
 
 # 查询待处理报警
-curl http://localhost:8080/api/alarms/pending
+curl http://localhost:8080/api/plugin/alarm/pending
 
 # 查询审计日志
-curl http://localhost:8080/api/audit/PowerSocket/1
+curl http://localhost:8080/api/plugin/audit/PowerSocket/1
 ```
 
 ## 失败路径示例
@@ -215,12 +214,12 @@ curl http://localhost:8080/api/audit/PowerSocket/1
 
 ```bash
 # 第一次插电
-curl -X POST http://localhost:8080/api/plugin \
+curl -X POST http://localhost:8080/api/plugin/plugin \
   -H "Content-Type: application/json" \
   -d '{"containerNumber":"CBHU1234567","socketCode":"A-01-01","inspectorBadge":"INS001","targetTemperature":-18}'
 
 # 第二次插电（同一个插座）- 会失败
-curl -X POST http://localhost:8080/api/plugin \
+curl -X POST http://localhost:8080/api/plugin/plugin \
   -H "Content-Type: application/json" \
   -d '{"containerNumber":"MSKU7654321","socketCode":"A-01-01","inspectorBadge":"INS002","targetTemperature":-20}'
 ```
@@ -231,12 +230,12 @@ curl -X POST http://localhost:8080/api/plugin \
 
 ```bash
 # 先断电一次
-curl -X POST http://localhost:8080/api/unplug \
+curl -X POST http://localhost:8080/api/plugin/unplug \
   -H "Content-Type: application/json" \
   -d '{"socketCode":"A-01-01","inspectorBadge":"INS001"}'
 
 # 再次断电 - 会失败，但审计日志会记录重复操作
-curl -X POST http://localhost:8080/api/unplug \
+curl -X POST http://localhost:8080/api/plugin/unplug \
   -H "Content-Type: application/json" \
   -d '{"socketCode":"A-01-01","inspectorBadge":"INS001"}'
 ```
@@ -247,12 +246,12 @@ curl -X POST http://localhost:8080/api/unplug \
 
 ```bash
 # 先确认一次
-curl -X POST http://localhost:8080/api/alarms/acknowledge \
+curl -X POST http://localhost:8080/api/plugin/alarm/acknowledge \
   -H "Content-Type: application/json" \
   -d '{"alarmId":1,"inspectorBadge":"INS001"}'
 
 # 再次确认 - 会失败
-curl -X POST http://localhost:8080/api/alarms/acknowledge \
+curl -X POST http://localhost:8080/api/plugin/alarm/acknowledge \
   -H "Content-Type: application/json" \
   -d '{"alarmId":1,"inspectorBadge":"INS001"}'
 ```
@@ -269,40 +268,41 @@ echo "=== 港区冷藏箱插电 API 自检 ==="
 
 # 1. 健康检查
 echo -n "1. 健康检查... "
-curl -s http://localhost:8080/api/health | grep -q "OK" && echo "PASS" || echo "FAIL"
+RESULT=$(curl -s http://localhost:8080/api/plugin/health)
+echo "$RESULT" | grep -q "UP" && echo "PASS" || echo "FAIL"
 
 # 2. 查询插座
 echo -n "2. 查询插座列表... "
-RESULT=$(curl -s http://localhost:8080/api/sockets)
+RESULT=$(curl -s http://localhost:8080/api/plugin/sockets)
 echo "$RESULT" | grep -q "success" && echo "PASS" || echo "FAIL"
 
 # 3. 执行插电
 echo -n "3. 执行插电... "
-RESULT=$(curl -s -X POST http://localhost:8080/api/plugin \
+RESULT=$(curl -s -X POST http://localhost:8080/api/plugin/plugin \
   -H "Content-Type: application/json" \
   -d '{"containerNumber":"CBHU1234567","socketCode":"A-01-01","inspectorBadge":"INS001","targetTemperature":-18}')
 echo "$RESULT" | grep -q "PLUGGED_IN" && echo "PASS" || echo "FAIL"
 
 # 4. 温度采样（触发报警）
 echo -n "4. 温度采样（触发报警）... "
-RESULT=$(curl -s -X POST http://localhost:8080/api/temperature \
+RESULT=$(curl -s -X POST http://localhost:8080/api/plugin/temperature \
   -H "Content-Type: application/json" \
   -d '{"containerNumber":"CBHU1234567","socketCode":"A-01-01","inspectorBadge":"INS001","temperature":-10,"setPoint":-18}')
 echo "$RESULT" | grep -q "success" && echo "PASS" || echo "FAIL"
 
 # 5. 查询待处理报警
 echo -n "5. 查询待处理报警... "
-RESULT=$(curl -s http://localhost:8080/api/alarms/pending)
+RESULT=$(curl -s http://localhost:8080/api/plugin/alarm/pending)
 echo "$RESULT" | grep -q "TEMPERATURE_HIGH" && echo "PASS" || echo "FAIL"
 
 # 6. 校验插座状态
 echo -n "6. 校验插座状态... "
-RESULT=$(curl -s http://localhost:8080/api/validation/socket/A-01-01)
+RESULT=$(curl -s http://localhost:8080/api/plugin/validate/socket/A-01-01)
 echo "$RESULT" | grep -q "OCCUPIED" && echo "PASS" || echo "FAIL"
 
 # 7. 复盘统计
 echo -n "7. 复盘统计... "
-RESULT=$(curl -s "http://localhost:8080/api/review?start=2024-01-01T00:00:00&end=2024-12-31T23:59:59")
+RESULT=$(curl -s "http://localhost:8080/api/plugin/review?start=2024-01-01T00:00:00&end=2030-12-31T23:59:59")
 echo "$RESULT" | grep -q "statistics" && echo "PASS" || echo "FAIL"
 
 echo "=== 自检完成 ==="
@@ -342,7 +342,7 @@ PENDING (待处理) → ACKNOWLEDGED (已确认) → RESOLVED (已解决)
 
 - 所有变更操作记录 `audit_logs` 表
 - 包含操作前后状态快照
-- 可通过 `GET /api/audit/{entityType}/{entityId}` 查询历史
+- 可通过 `GET /api/plugin/audit/{entityType}/{entityId}` 查询历史
 
 ## 项目结构
 
