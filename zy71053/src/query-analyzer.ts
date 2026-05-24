@@ -1,14 +1,21 @@
-import { parse, DocumentNode, OperationDefinitionNode, SelectionSetNode, FieldNode, OperationTypeNode } from 'graphql';
+import { parse, DocumentNode, OperationDefinitionNode, SelectionSetNode, FieldNode, OperationTypeNode, InlineFragmentNode, FragmentDefinitionNode, FragmentSpreadNode } from 'graphql';
 import { QueryDocument, QueryOperation, QueryField, NullabilityDiff, AffectedQuery, AffectedField, SchemaField } from './types';
 import { readFile } from './utils';
 
 export function parseQueryDocument(filePath: string, content: string): QueryDocument {
   const ast = parse(content);
   const operations: QueryOperation[] = [];
+  const fragments = new Map<string, FragmentDefinitionNode>();
+
+  for (const definition of ast.definitions) {
+    if (definition.kind === 'FragmentDefinition') {
+      fragments.set(definition.name.value, definition);
+    }
+  }
 
   for (const definition of ast.definitions) {
     if (definition.kind === 'OperationDefinition') {
-      const op = parseOperation(definition);
+      const op = parseOperation(definition, fragments);
       if (op) {
         operations.push(op);
       }
@@ -21,7 +28,10 @@ export function parseQueryDocument(filePath: string, content: string): QueryDocu
   };
 }
 
-function parseOperation(opDef: OperationDefinitionNode): QueryOperation | null {
+function parseOperation(
+  opDef: OperationDefinitionNode,
+  fragments: Map<string, FragmentDefinitionNode>
+): QueryOperation | null {
   const name = opDef.name?.value || 'Anonymous';
   const type = mapOperationType(opDef.operation);
 
@@ -29,7 +39,7 @@ function parseOperation(opDef: OperationDefinitionNode): QueryOperation | null {
     return null;
   }
 
-  const fields = parseSelectionSet(opDef.selectionSet, [], type);
+  const fields = parseSelectionSet(opDef.selectionSet, [], type, fragments);
 
   return {
     name,
@@ -54,26 +64,59 @@ function mapOperationType(op: OperationTypeNode): 'query' | 'mutation' | 'subscr
 function parseSelectionSet(
   selectionSet: SelectionSetNode,
   pathStack: string[],
-  operationType: 'query' | 'mutation' | 'subscription'
+  operationType: 'query' | 'mutation' | 'subscription',
+  fragments: Map<string, FragmentDefinitionNode>
 ): QueryField[] {
   const fields: QueryField[] = [];
 
   for (const selection of selectionSet.selections) {
     if (selection.kind === 'Field') {
-      const field = parseField(selection, pathStack, operationType);
+      const field = parseField(selection, pathStack, operationType, fragments);
       if (field) {
         fields.push(field);
       }
+    } else if (selection.kind === 'InlineFragment') {
+      const inlineFields = parseInlineFragment(selection, pathStack, operationType, fragments);
+      fields.push(...inlineFields);
+    } else if (selection.kind === 'FragmentSpread') {
+      const spreadFields = parseFragmentSpread(selection, pathStack, operationType, fragments);
+      fields.push(...spreadFields);
     }
   }
 
   return fields;
 }
 
+function parseInlineFragment(
+  fragment: InlineFragmentNode,
+  pathStack: string[],
+  operationType: 'query' | 'mutation' | 'subscription',
+  fragments: Map<string, FragmentDefinitionNode>
+): QueryField[] {
+  if (!fragment.selectionSet) {
+    return [];
+  }
+  return parseSelectionSet(fragment.selectionSet, pathStack, operationType, fragments);
+}
+
+function parseFragmentSpread(
+  spread: FragmentSpreadNode,
+  pathStack: string[],
+  operationType: 'query' | 'mutation' | 'subscription',
+  fragments: Map<string, FragmentDefinitionNode>
+): QueryField[] {
+  const fragment = fragments.get(spread.name.value);
+  if (!fragment || !fragment.selectionSet) {
+    return [];
+  }
+  return parseSelectionSet(fragment.selectionSet, pathStack, operationType, fragments);
+}
+
 function parseField(
   fieldNode: FieldNode,
   pathStack: string[],
-  operationType: 'query' | 'mutation' | 'subscription'
+  operationType: 'query' | 'mutation' | 'subscription',
+  fragments: Map<string, FragmentDefinitionNode>
 ): QueryField | null {
   const fieldName = fieldNode.name.value;
   const alias = fieldNode.alias?.value;
@@ -82,7 +125,7 @@ function parseField(
 
   let subFields: QueryField[] = [];
   if (fieldNode.selectionSet) {
-    subFields = parseSelectionSet(fieldNode.selectionSet, [...pathStack, displayName], operationType);
+    subFields = parseSelectionSet(fieldNode.selectionSet, [...pathStack, displayName], operationType, fragments);
   }
 
   return {
@@ -112,7 +155,8 @@ export function loadQueryDocuments(filePaths: string[]): QueryDocument[] {
 export function analyzeQueryImpact(
   documents: QueryDocument[],
   nullabilityChanges: NullabilityDiff[],
-  schemaFields: SchemaField[]
+  schemaFields: SchemaField[],
+  schemaTypeMap?: Map<string, string[]>
 ): AffectedQuery[] {
   const affectedQueries: AffectedQuery[] = [];
   const changedPaths = new Set(nullabilityChanges.map((c) => c.fieldPath));
@@ -131,7 +175,8 @@ export function analyzeQueryImpact(
         changedPaths,
         schemaFieldMap,
         rootTypeName,
-        []
+        [],
+        schemaTypeMap
       );
 
       if (affectedFields.length > 0) {
@@ -154,7 +199,8 @@ function findAffectedFieldsInOperation(
   changedPaths: Set<string>,
   schemaFieldMap: Map<string, SchemaField>,
   currentTypeName: string,
-  pathStack: string[]
+  pathStack: string[],
+  schemaTypeMap?: Map<string, string[]>
 ): AffectedField[] {
   const affected: AffectedField[] = [];
 
@@ -176,15 +222,22 @@ function findAffectedFieldsInOperation(
 
     const schemaField = schemaFieldMap.get(schemaPath);
     if (schemaField && queryField.subFields.length > 0) {
-      const nestedAffected = findAffectedFieldsInOperation(
-        queryField.subFields,
-        nullabilityChanges,
-        changedPaths,
-        schemaFieldMap,
-        schemaField.typeInfo.innerType,
-        [...pathStack, queryField.fieldName]
-      );
-      affected.push(...nestedAffected);
+      const innerType = schemaField.typeInfo.innerType;
+      
+      const possibleTypes = schemaTypeMap?.get(innerType) || [innerType];
+      
+      for (const possibleType of possibleTypes) {
+        const nestedAffected = findAffectedFieldsInOperation(
+          queryField.subFields,
+          nullabilityChanges,
+          changedPaths,
+          schemaFieldMap,
+          possibleType,
+          [...pathStack, queryField.fieldName],
+          schemaTypeMap
+        );
+        affected.push(...nestedAffected);
+      }
     }
   }
 

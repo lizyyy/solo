@@ -124,7 +124,7 @@ async function runCheck(options) {
     const oldSchema = (0, schema_diff_1.loadSchema)(mergedOptions.oldSchema);
     const newSchema = (0, schema_diff_1.loadSchema)(mergedOptions.newSchema);
     console.log('🔍 对比Schema差异...');
-    const { changes, summary, oldFields, newFields } = (0, schema_diff_1.compareSchemas)(oldSchema, newSchema);
+    const { changes, summary, oldFields, newFields, typeMap } = (0, schema_diff_1.compareSchemas)(oldSchema, newSchema);
     let filteredChanges = changes;
     if (mergedOptions.fieldFilter && mergedOptions.fieldFilter.length > 0) {
         const filterSet = new Set(mergedOptions.fieldFilter);
@@ -139,7 +139,7 @@ async function runCheck(options) {
             queryDocs = (0, query_analyzer_1.loadQueryDocuments)(queryFiles);
             console.log(`   加载了 ${queryDocs.length} 个查询文档`);
             console.log('🔗 分析查询影响...');
-            affectedQueries = (0, query_analyzer_1.analyzeQueryImpact)(queryDocs, filteredChanges, newFields);
+            affectedQueries = (0, query_analyzer_1.analyzeQueryImpact)(queryDocs, filteredChanges, newFields, typeMap);
         }
     }
     console.log('📊 生成失败路径...');
@@ -152,6 +152,9 @@ async function runCheck(options) {
         queriesScanned: queryDocs.length,
         fieldsScanned: summary.totalFieldsChecked,
     });
+    const shouldFail = (0, nullability_rules_1.shouldFailBuild)(filteredChanges, mergedOptions.failOn);
+    const finalExitCode = shouldFail ? report.exitCode : types_1.ExitCode.SUCCESS;
+    report.exitCode = finalExitCode;
     const formats = mergedOptions.format.includes('all')
         ? ['terminal', 'json', 'markdown']
         : mergedOptions.format;
@@ -166,8 +169,7 @@ async function runCheck(options) {
         const mdPath = (0, report_generator_1.writeMarkdownReport)(report, mergedOptions.outputDir);
         console.log(`Markdown报告已保存: ${mdPath}`);
     }
-    const shouldFail = (0, nullability_rules_1.shouldFailBuild)(filteredChanges, mergedOptions.failOn);
-    return shouldFail ? report.exitCode : types_1.ExitCode.SUCCESS;
+    return finalExitCode;
 }
 program.parseAsync(process.argv).catch((error) => {
     console.error('命令执行失败:', error);

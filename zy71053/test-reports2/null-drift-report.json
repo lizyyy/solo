@@ -1,0 +1,512 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-24T13:59:30.757Z",
+    "oldSchemaHash": "fa4d66ba328e1b8c",
+    "newSchemaHash": "0de731bf11f5af94"
+  },
+  "schemaDiff": {
+    "totalFieldsChecked": 21,
+    "fieldsAdded": 0,
+    "fieldsRemoved": 0,
+    "typesAdded": 0,
+    "typesRemoved": 0,
+    "nullabilityChangesCount": 11
+  },
+  "nullabilityChanges": [
+    {
+      "fieldPath": "Query.user",
+      "typeName": "Query",
+      "fieldName": "user",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": false,
+        "innerType": "User",
+        "fullType": "User!",
+        "rawType": "User",
+        "listInnerNonNull": false
+      },
+      "newType": {
+        "isNonNull": false,
+        "isList": false,
+        "innerType": "User",
+        "fullType": "User",
+        "rawType": "User",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "字段从 User! → User，失去了非空保证",
+      "ruleExplanation": "字段从非空(!)变为可空，客户端必须添加null检查或兜底逻辑，否则可能导致运行时崩溃。"
+    },
+    {
+      "fieldPath": "User.name",
+      "typeName": "User",
+      "fieldName": "name",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String!",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "newType": {
+        "isNonNull": false,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "字段从 String! → String，失去了非空保证",
+      "ruleExplanation": "字段从非空(!)变为可空，客户端必须添加null检查或兜底逻辑，否则可能导致运行时崩溃。"
+    },
+    {
+      "fieldPath": "User.profile",
+      "typeName": "User",
+      "fieldName": "profile",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": false,
+        "innerType": "Profile",
+        "fullType": "Profile!",
+        "rawType": "Profile",
+        "listInnerNonNull": false
+      },
+      "newType": {
+        "isNonNull": false,
+        "isList": false,
+        "innerType": "Profile",
+        "fullType": "Profile",
+        "rawType": "Profile",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "字段从 Profile! → Profile，失去了非空保证",
+      "ruleExplanation": "字段从非空(!)变为可空，客户端必须添加null检查或兜底逻辑，否则可能导致运行时崩溃。"
+    },
+    {
+      "fieldPath": "Profile.avatar",
+      "typeName": "Profile",
+      "fieldName": "avatar",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String!",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "newType": {
+        "isNonNull": false,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "字段从 String! → String，失去了非空保证",
+      "ruleExplanation": "字段从非空(!)变为可空，客户端必须添加null检查或兜底逻辑，否则可能导致运行时崩溃。"
+    },
+    {
+      "fieldPath": "Profile.address",
+      "typeName": "Profile",
+      "fieldName": "address",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": false,
+        "innerType": "Address",
+        "fullType": "Address!",
+        "rawType": "Address",
+        "listInnerNonNull": false
+      },
+      "newType": {
+        "isNonNull": false,
+        "isList": false,
+        "innerType": "Address",
+        "fullType": "Address",
+        "rawType": "Address",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "字段从 Address! → Address，失去了非空保证",
+      "ruleExplanation": "字段从非空(!)变为可空，客户端必须添加null检查或兜底逻辑，否则可能导致运行时崩溃。"
+    },
+    {
+      "fieldPath": "Address.street",
+      "typeName": "Address",
+      "fieldName": "street",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String!",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "newType": {
+        "isNonNull": false,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "字段从 String! → String，失去了非空保证",
+      "ruleExplanation": "字段从非空(!)变为可空，客户端必须添加null检查或兜底逻辑，否则可能导致运行时崩溃。"
+    },
+    {
+      "fieldPath": "Query.posts",
+      "typeName": "Query",
+      "fieldName": "posts",
+      "changeType": "LIST_WRAPPER_NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": true,
+        "innerType": "Post",
+        "fullType": "[Post!]!",
+        "rawType": "Post",
+        "listInnerNonNull": true
+      },
+      "newType": {
+        "isNonNull": false,
+        "isList": true,
+        "innerType": "Post",
+        "fullType": "[Post!]",
+        "rawType": "Post",
+        "listInnerNonNull": true
+      },
+      "severity": "HIGH",
+      "description": "列表从 [Post]! → [Post]，列表本身可能为null",
+      "ruleExplanation": "列表外层从非空变为可空，列表本身可能为null，需要先判空后再遍历。"
+    },
+    {
+      "fieldPath": "Post.content",
+      "typeName": "Post",
+      "fieldName": "content",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String!",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "newType": {
+        "isNonNull": false,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "字段从 String! → String，失去了非空保证",
+      "ruleExplanation": "字段从非空(!)变为可空，客户端必须添加null检查或兜底逻辑，否则可能导致运行时崩溃。"
+    },
+    {
+      "fieldPath": "Post.comments",
+      "typeName": "Post",
+      "fieldName": "comments",
+      "changeType": "LIST_INNER_NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": true,
+        "innerType": "Comment",
+        "fullType": "[Comment!]!",
+        "rawType": "Comment",
+        "listInnerNonNull": true
+      },
+      "newType": {
+        "isNonNull": true,
+        "isList": true,
+        "innerType": "Comment",
+        "fullType": "[Comment]!",
+        "rawType": "Comment",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "列表元素从 [Comment!] → [Comment]，元素可能为null",
+      "ruleExplanation": "列表内部元素从非空变为可空，遍历列表时必须检查每个元素是否为null，否则数组访问时崩溃。"
+    },
+    {
+      "fieldPath": "Comment.text",
+      "typeName": "Comment",
+      "fieldName": "text",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String!",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "newType": {
+        "isNonNull": false,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "字段从 String! → String，失去了非空保证",
+      "ruleExplanation": "字段从非空(!)变为可空，客户端必须添加null检查或兜底逻辑，否则可能导致运行时崩溃。"
+    },
+    {
+      "fieldPath": "Query.search",
+      "typeName": "Query",
+      "fieldName": "search",
+      "changeType": "LIST_INNER_NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": true,
+        "innerType": "SearchResult",
+        "fullType": "[SearchResult!]!",
+        "rawType": "SearchResult",
+        "listInnerNonNull": true
+      },
+      "newType": {
+        "isNonNull": true,
+        "isList": true,
+        "innerType": "SearchResult",
+        "fullType": "[SearchResult]!",
+        "rawType": "SearchResult",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "列表元素从 [SearchResult!] → [SearchResult]，元素可能为null",
+      "ruleExplanation": "列表内部元素从非空变为可空，遍历列表时必须检查每个元素是否为null，否则数组访问时崩溃。"
+    }
+  ],
+  "affectedQueries": [
+    {
+      "documentPath": "/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/posts.graphql",
+      "operationName": "GetPosts",
+      "operationType": "query",
+      "affectedFields": [
+        {
+          "queryPath": "posts",
+          "schemaPath": "Query.posts",
+          "changeType": "LIST_WRAPPER_NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "列表判空后遍历: (data?.posts || []).map(...)"
+        },
+        {
+          "queryPath": "posts.content",
+          "schemaPath": "Post.content",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.content || defaultValue"
+        },
+        {
+          "queryPath": "posts.author.name",
+          "schemaPath": "User.name",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.name || defaultValue"
+        },
+        {
+          "queryPath": "posts.comments",
+          "schemaPath": "Post.comments",
+          "changeType": "LIST_INNER_NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "遍历时过滤null: data.comments.filter(Boolean).map(...)"
+        },
+        {
+          "queryPath": "posts.comments.text",
+          "schemaPath": "Comment.text",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.text || defaultValue"
+        },
+        {
+          "queryPath": "posts.comments.author.name",
+          "schemaPath": "User.name",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.name || defaultValue"
+        }
+      ]
+    },
+    {
+      "documentPath": "/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/posts.graphql",
+      "operationName": "Search",
+      "operationType": "query",
+      "affectedFields": [
+        {
+          "queryPath": "search",
+          "schemaPath": "Query.search",
+          "changeType": "LIST_INNER_NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "遍历时过滤null: data.search.filter(Boolean).map(...)"
+        },
+        {
+          "queryPath": "search.name",
+          "schemaPath": "User.name",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.name || defaultValue"
+        }
+      ]
+    },
+    {
+      "documentPath": "/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/user.graphql",
+      "operationName": "GetUser",
+      "operationType": "query",
+      "affectedFields": [
+        {
+          "queryPath": "user",
+          "schemaPath": "Query.user",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.user || defaultValue"
+        },
+        {
+          "queryPath": "user.name",
+          "schemaPath": "User.name",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.name || defaultValue"
+        },
+        {
+          "queryPath": "user.profile",
+          "schemaPath": "User.profile",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.profile || defaultValue"
+        },
+        {
+          "queryPath": "user.profile.avatar",
+          "schemaPath": "Profile.avatar",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.avatar || defaultValue"
+        },
+        {
+          "queryPath": "user.profile.address",
+          "schemaPath": "Profile.address",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.address || defaultValue"
+        },
+        {
+          "queryPath": "user.profile.address.street",
+          "schemaPath": "Address.street",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.street || defaultValue"
+        }
+      ]
+    }
+  ],
+  "failurePaths": [
+    {
+      "path": "Query.posts",
+      "changeType": "LIST_WRAPPER_NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetPosts (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/posts.graphql)"
+      ],
+      "rootCause": "客户端可能直接遍历列表，当列表为null时会导致\"Cannot read property map of null\"",
+      "recommendedAction": "列表判空后遍历: (data?.posts || []).map(...)"
+    },
+    {
+      "path": "Post.content",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetPosts (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/posts.graphql)"
+      ],
+      "rootCause": "客户端代码可能假设该字段永远不会为null，缺少null检查会导致运行时崩溃",
+      "recommendedAction": "添加null检查: data?.content || defaultValue"
+    },
+    {
+      "path": "User.name",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetPosts (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/posts.graphql)",
+        "query Search (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/posts.graphql)",
+        "query GetUser (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/user.graphql)"
+      ],
+      "rootCause": "客户端代码可能假设该字段永远不会为null，缺少null检查会导致运行时崩溃",
+      "recommendedAction": "添加null检查: data?.name || defaultValue"
+    },
+    {
+      "path": "Post.comments",
+      "changeType": "LIST_INNER_NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetPosts (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/posts.graphql)"
+      ],
+      "rootCause": "客户端遍历列表时可能假设元素非空，访问元素属性时会崩溃",
+      "recommendedAction": "遍历时过滤null: data.comments.filter(Boolean).map(...)"
+    },
+    {
+      "path": "Comment.text",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetPosts (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/posts.graphql)"
+      ],
+      "rootCause": "客户端代码可能假设该字段永远不会为null，缺少null检查会导致运行时崩溃",
+      "recommendedAction": "添加null检查: data?.text || defaultValue"
+    },
+    {
+      "path": "Query.search",
+      "changeType": "LIST_INNER_NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query Search (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/posts.graphql)"
+      ],
+      "rootCause": "客户端遍历列表时可能假设元素非空，访问元素属性时会崩溃",
+      "recommendedAction": "遍历时过滤null: data.search.filter(Boolean).map(...)"
+    },
+    {
+      "path": "Query.user",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetUser (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/user.graphql)"
+      ],
+      "rootCause": "客户端代码可能假设该字段永远不会为null，缺少null检查会导致运行时崩溃",
+      "recommendedAction": "添加null检查: data?.user || defaultValue"
+    },
+    {
+      "path": "User.profile",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetUser (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/user.graphql)"
+      ],
+      "rootCause": "客户端代码可能假设该字段永远不会为null，缺少null检查会导致运行时崩溃",
+      "recommendedAction": "添加null检查: data?.profile || defaultValue"
+    },
+    {
+      "path": "Profile.avatar",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetUser (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/user.graphql)"
+      ],
+      "rootCause": "客户端代码可能假设该字段永远不会为null，缺少null检查会导致运行时崩溃",
+      "recommendedAction": "添加null检查: data?.avatar || defaultValue"
+    },
+    {
+      "path": "Profile.address",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetUser (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/user.graphql)"
+      ],
+      "rootCause": "客户端代码可能假设该字段永远不会为null，缺少null检查会导致运行时崩溃",
+      "recommendedAction": "添加null检查: data?.address || defaultValue"
+    },
+    {
+      "path": "Address.street",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetUser (/Users/lzy/pro/solo/workspaces/zy71053/examples/queries/user.graphql)"
+      ],
+      "rootCause": "客户端代码可能假设该字段永远不会为null，缺少null检查会导致运行时崩溃",
+      "recommendedAction": "添加null检查: data?.street || defaultValue"
+    }
+  ],
+  "statistics": {
+    "criticalCount": 0,
+    "highCount": 11,
+    "mediumCount": 0,
+    "lowCount": 0,
+    "queriesScanned": 2,
+    "queriesAffected": 3,
+    "fieldsScanned": 21
+  },
+  "exitCode": 2
+}

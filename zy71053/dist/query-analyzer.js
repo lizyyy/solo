@@ -9,9 +9,15 @@ const utils_1 = require("./utils");
 function parseQueryDocument(filePath, content) {
     const ast = (0, graphql_1.parse)(content);
     const operations = [];
+    const fragments = new Map();
+    for (const definition of ast.definitions) {
+        if (definition.kind === 'FragmentDefinition') {
+            fragments.set(definition.name.value, definition);
+        }
+    }
     for (const definition of ast.definitions) {
         if (definition.kind === 'OperationDefinition') {
-            const op = parseOperation(definition);
+            const op = parseOperation(definition, fragments);
             if (op) {
                 operations.push(op);
             }
@@ -22,13 +28,13 @@ function parseQueryDocument(filePath, content) {
         operations,
     };
 }
-function parseOperation(opDef) {
+function parseOperation(opDef, fragments) {
     const name = opDef.name?.value || 'Anonymous';
     const type = mapOperationType(opDef.operation);
     if (!opDef.selectionSet) {
         return null;
     }
-    const fields = parseSelectionSet(opDef.selectionSet, [], type);
+    const fields = parseSelectionSet(opDef.selectionSet, [], type, fragments);
     return {
         name,
         type,
@@ -47,26 +53,47 @@ function mapOperationType(op) {
             return 'query';
     }
 }
-function parseSelectionSet(selectionSet, pathStack, operationType) {
+function parseSelectionSet(selectionSet, pathStack, operationType, fragments) {
     const fields = [];
     for (const selection of selectionSet.selections) {
         if (selection.kind === 'Field') {
-            const field = parseField(selection, pathStack, operationType);
+            const field = parseField(selection, pathStack, operationType, fragments);
             if (field) {
                 fields.push(field);
             }
         }
+        else if (selection.kind === 'InlineFragment') {
+            const inlineFields = parseInlineFragment(selection, pathStack, operationType, fragments);
+            fields.push(...inlineFields);
+        }
+        else if (selection.kind === 'FragmentSpread') {
+            const spreadFields = parseFragmentSpread(selection, pathStack, operationType, fragments);
+            fields.push(...spreadFields);
+        }
     }
     return fields;
 }
-function parseField(fieldNode, pathStack, operationType) {
+function parseInlineFragment(fragment, pathStack, operationType, fragments) {
+    if (!fragment.selectionSet) {
+        return [];
+    }
+    return parseSelectionSet(fragment.selectionSet, pathStack, operationType, fragments);
+}
+function parseFragmentSpread(spread, pathStack, operationType, fragments) {
+    const fragment = fragments.get(spread.name.value);
+    if (!fragment || !fragment.selectionSet) {
+        return [];
+    }
+    return parseSelectionSet(fragment.selectionSet, pathStack, operationType, fragments);
+}
+function parseField(fieldNode, pathStack, operationType, fragments) {
     const fieldName = fieldNode.name.value;
     const alias = fieldNode.alias?.value;
     const displayName = alias || fieldName;
     const fieldPath = [...pathStack, displayName].join('.');
     let subFields = [];
     if (fieldNode.selectionSet) {
-        subFields = parseSelectionSet(fieldNode.selectionSet, [...pathStack, displayName], operationType);
+        subFields = parseSelectionSet(fieldNode.selectionSet, [...pathStack, displayName], operationType, fragments);
     }
     return {
         fieldName,
@@ -89,7 +116,7 @@ function loadQueryDocuments(filePaths) {
     }
     return documents;
 }
-function analyzeQueryImpact(documents, nullabilityChanges, schemaFields) {
+function analyzeQueryImpact(documents, nullabilityChanges, schemaFields, schemaTypeMap) {
     const affectedQueries = [];
     const changedPaths = new Set(nullabilityChanges.map((c) => c.fieldPath));
     const schemaFieldMap = new Map();
@@ -99,7 +126,7 @@ function analyzeQueryImpact(documents, nullabilityChanges, schemaFields) {
     for (const doc of documents) {
         for (const operation of doc.operations) {
             const rootTypeName = operation.type === 'query' ? 'Query' : operation.type === 'mutation' ? 'Mutation' : 'Subscription';
-            const affectedFields = findAffectedFieldsInOperation(operation.fields, nullabilityChanges, changedPaths, schemaFieldMap, rootTypeName, []);
+            const affectedFields = findAffectedFieldsInOperation(operation.fields, nullabilityChanges, changedPaths, schemaFieldMap, rootTypeName, [], schemaTypeMap);
             if (affectedFields.length > 0) {
                 affectedQueries.push({
                     documentPath: doc.filePath,
@@ -112,7 +139,7 @@ function analyzeQueryImpact(documents, nullabilityChanges, schemaFields) {
     }
     return affectedQueries;
 }
-function findAffectedFieldsInOperation(queryFields, nullabilityChanges, changedPaths, schemaFieldMap, currentTypeName, pathStack) {
+function findAffectedFieldsInOperation(queryFields, nullabilityChanges, changedPaths, schemaFieldMap, currentTypeName, pathStack, schemaTypeMap) {
     const affected = [];
     for (const queryField of queryFields) {
         const schemaPath = `${currentTypeName}.${queryField.fieldName}`;
@@ -130,8 +157,12 @@ function findAffectedFieldsInOperation(queryFields, nullabilityChanges, changedP
         }
         const schemaField = schemaFieldMap.get(schemaPath);
         if (schemaField && queryField.subFields.length > 0) {
-            const nestedAffected = findAffectedFieldsInOperation(queryField.subFields, nullabilityChanges, changedPaths, schemaFieldMap, schemaField.typeInfo.innerType, [...pathStack, queryField.fieldName]);
-            affected.push(...nestedAffected);
+            const innerType = schemaField.typeInfo.innerType;
+            const possibleTypes = schemaTypeMap?.get(innerType) || [innerType];
+            for (const possibleType of possibleTypes) {
+                const nestedAffected = findAffectedFieldsInOperation(queryField.subFields, nullabilityChanges, changedPaths, schemaFieldMap, possibleType, [...pathStack, queryField.fieldName], schemaTypeMap);
+                affected.push(...nestedAffected);
+            }
         }
     }
     return affected;

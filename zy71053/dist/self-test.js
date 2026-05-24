@@ -368,7 +368,7 @@ function createTestCases(testDataDir) {
             name: String
           }
         `);
-                const { changes, newFields } = (0, schema_diff_1.compareSchemas)(oldSchema, newSchema);
+                const { changes, newFields, typeMap } = (0, schema_diff_1.compareSchemas)(oldSchema, newSchema);
                 const query = `
           query GetUser($id: ID!) {
             user(id: $id) {
@@ -378,7 +378,7 @@ function createTestCases(testDataDir) {
           }
         `;
                 const doc = (0, query_analyzer_1.parseQueryDocument)('test.graphql', query);
-                const affected = (0, query_analyzer_1.analyzeQueryImpact)([doc], changes, newFields);
+                const affected = (0, query_analyzer_1.analyzeQueryImpact)([doc], changes, newFields, typeMap);
                 assert(affected.length === 1, '应该有1个受影响的查询');
                 assert(affected[0].affectedFields.length >= 1, '应该至少有1个受影响的字段');
                 return true;
@@ -418,7 +418,7 @@ function createTestCases(testDataDir) {
             name: String
           }
         `);
-                const { changes, newFields } = (0, schema_diff_1.compareSchemas)(oldSchema, newSchema);
+                const { changes, newFields, typeMap } = (0, schema_diff_1.compareSchemas)(oldSchema, newSchema);
                 const query = `
           query GetUser {
             user {
@@ -427,7 +427,7 @@ function createTestCases(testDataDir) {
           }
         `;
                 const doc = (0, query_analyzer_1.parseQueryDocument)('test.graphql', query);
-                const affected = (0, query_analyzer_1.analyzeQueryImpact)([doc], changes, newFields);
+                const affected = (0, query_analyzer_1.analyzeQueryImpact)([doc], changes, newFields, typeMap);
                 const failurePaths = (0, nullability_rules_1.generateFailurePaths)(changes, affected);
                 assert(failurePaths.length > 0, '应该生成失败路径');
                 assert(failurePaths[0].queryOperations.length > 0, '失败路径应该关联查询');
@@ -513,10 +513,10 @@ function createTestCases(testDataDir) {
             name: String
           }
         `);
-                const { changes, newFields, summary } = (0, schema_diff_1.compareSchemas)(oldSchema, newSchema);
+                const { changes, newFields, summary, typeMap } = (0, schema_diff_1.compareSchemas)(oldSchema, newSchema);
                 const query = `query GetUser { user { name } }`;
                 const doc = (0, query_analyzer_1.parseQueryDocument)('test.graphql', query);
-                const affected = (0, query_analyzer_1.analyzeQueryImpact)([doc], changes, newFields);
+                const affected = (0, query_analyzer_1.analyzeQueryImpact)([doc], changes, newFields, typeMap);
                 const failurePaths = (0, nullability_rules_1.generateFailurePaths)(changes, affected);
                 const report = (0, report_generator_1.generateReport)(changes, affected, failurePaths, {
                     oldSchemaHash: (0, utils_1.hashString)('old'),
@@ -554,10 +554,10 @@ function createTestCases(testDataDir) {
             name: String
           }
         `);
-                const { changes, newFields, summary } = (0, schema_diff_1.compareSchemas)(oldSchema, newSchema);
+                const { changes, newFields, summary, typeMap } = (0, schema_diff_1.compareSchemas)(oldSchema, newSchema);
                 const query = `query GetUser { user { name } }`;
                 const doc = (0, query_analyzer_1.parseQueryDocument)('test.graphql', query);
-                const affected = (0, query_analyzer_1.analyzeQueryImpact)([doc], changes, newFields);
+                const affected = (0, query_analyzer_1.analyzeQueryImpact)([doc], changes, newFields, typeMap);
                 const failurePaths = (0, nullability_rules_1.generateFailurePaths)(changes, affected);
                 const report = (0, report_generator_1.generateReport)(changes, affected, failurePaths, {
                     oldSchemaHash: (0, utils_1.hashString)('old'),

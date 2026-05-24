@@ -119,7 +119,7 @@ async function runCheck(options: any): Promise<number> {
   const newSchema = loadSchema(mergedOptions.newSchema);
 
   console.log('🔍 对比Schema差异...');
-  const { changes, summary, oldFields, newFields } = compareSchemas(oldSchema, newSchema);
+  const { changes, summary, oldFields, newFields, typeMap } = compareSchemas(oldSchema, newSchema);
 
   let filteredChanges = changes;
   if (mergedOptions.fieldFilter && mergedOptions.fieldFilter.length > 0) {
@@ -138,7 +138,7 @@ async function runCheck(options: any): Promise<number> {
       console.log(`   加载了 ${queryDocs.length} 个查询文档`);
 
       console.log('🔗 分析查询影响...');
-      affectedQueries = analyzeQueryImpact(queryDocs, filteredChanges, newFields);
+      affectedQueries = analyzeQueryImpact(queryDocs, filteredChanges, newFields, typeMap);
     }
   }
 
@@ -153,6 +153,10 @@ async function runCheck(options: any): Promise<number> {
     queriesScanned: queryDocs.length,
     fieldsScanned: summary.totalFieldsChecked,
   });
+
+  const shouldFail = shouldFailBuild(filteredChanges, mergedOptions.failOn);
+  const finalExitCode = shouldFail ? report.exitCode : ExitCode.SUCCESS;
+  report.exitCode = finalExitCode;
 
   const formats = mergedOptions.format.includes('all')
     ? ['terminal', 'json', 'markdown']
@@ -172,8 +176,7 @@ async function runCheck(options: any): Promise<number> {
     console.log(`Markdown报告已保存: ${mdPath}`);
   }
 
-  const shouldFail = shouldFailBuild(filteredChanges, mergedOptions.failOn);
-  return shouldFail ? report.exitCode : ExitCode.SUCCESS;
+  return finalExitCode;
 }
 
 program.parseAsync(process.argv).catch((error) => {

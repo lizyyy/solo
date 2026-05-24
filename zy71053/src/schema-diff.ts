@@ -77,6 +77,24 @@ export function extractAllFields(schema: GraphQLSchema): SchemaField[] {
   return fields;
 }
 
+export function extractTypeMap(schema: GraphQLSchema): Map<string, string[]> {
+  const typeMap = new Map<string, string[]>();
+  const schemaTypeMap = schema.getTypeMap();
+
+  for (const [typeName, type] of Object.entries(schemaTypeMap)) {
+    if (typeName.startsWith('__')) continue;
+
+    if (isUnionType(type)) {
+      const types = type.getTypes().map((t) => t.name);
+      typeMap.set(typeName, types);
+    } else if (isObjectType(type)) {
+      typeMap.set(typeName, [typeName]);
+    }
+  }
+
+  return typeMap;
+}
+
 function buildFieldsMap(fields: SchemaField[]): Map<string, SchemaField> {
   const map = new Map<string, SchemaField>();
   for (const field of fields) {
@@ -224,7 +242,8 @@ function compareFieldNullability(
 
 export function detectNestedNullDrift(
   oldFields: SchemaField[],
-  newFields: SchemaField[]
+  newFields: SchemaField[],
+  typeMap?: Map<string, string[]>
 ): NullabilityDiff[] {
   const changes: NullabilityDiff[] = [];
   const oldMap = buildFieldsMap(oldFields);
@@ -255,9 +274,14 @@ export function detectNestedNullDrift(
 
     if (newField) {
       const innerType = newField.typeInfo.innerType;
-      const innerTypeFields = newFields.filter((f) => f.typeName === innerType);
-      for (const innerField of innerTypeFields) {
-        checkPath(innerType, innerField.fieldName, [...pathStack, fieldPath]);
+      
+      const possibleTypes = typeMap?.get(innerType) || [innerType];
+      
+      for (const possibleType of possibleTypes) {
+        const innerTypeFields = newFields.filter((f) => f.typeName === possibleType);
+        for (const innerField of innerTypeFields) {
+          checkPath(possibleType, innerField.fieldName, [...pathStack, fieldPath]);
+        }
       }
     }
   }
@@ -289,9 +313,11 @@ export function compareSchemas(
   summary: SchemaDiffSummary;
   oldFields: SchemaField[];
   newFields: SchemaField[];
+  typeMap: Map<string, string[]>;
 } {
   const oldFields = extractAllFields(oldSchema);
   const newFields = extractAllFields(newSchema);
+  const typeMap = extractTypeMap(newSchema);
 
   const oldMap = buildFieldsMap(oldFields);
   const newMap = buildFieldsMap(newFields);
@@ -333,7 +359,7 @@ export function compareSchemas(
     }
   }
 
-  const nullabilityChanges = detectNestedNullDrift(oldFields, newFields);
+  const nullabilityChanges = detectNestedNullDrift(oldFields, newFields, typeMap);
   changes.push(...nullabilityChanges);
 
   const uniqueChanges = Array.from(new Map(changes.map((c) => [c.fieldPath, c])).values());
@@ -350,5 +376,6 @@ export function compareSchemas(
     },
     oldFields,
     newFields,
+    typeMap,
   };
 }
