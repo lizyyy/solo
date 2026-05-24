@@ -41,6 +41,7 @@ func main() {
 		api.GET("/dispatch/items/:id", h.GetDispatchItem)
 		api.POST("/dispatch/items/:id/start", h.StartDispatch)
 		api.POST("/dispatch/items/:id/status", h.UpdateRouteStatus)
+		api.POST("/dispatch/items/:id/cancel", h.CancelDispatchItem)
 		api.POST("/dispatch/items/:id/receipt", h.ConfirmReceipt)
 		api.GET("/dispatch/items/:id/trajectory", h.GetItemTrajectory)
 
@@ -81,12 +82,16 @@ func main() {
 	log.Println("  GET  /api/v1/dispatch/batches - 获取批次列表")
 	log.Println("  GET  /api/v1/dispatch/batches/:id - 获取批次详情")
 	log.Println("  POST /api/v1/dispatch/items/:id/start - 发车")
-	log.Println("  POST /api/v1/dispatch/items/:id/status - 更新路线状态")
-	log.Println("  POST /api/v1/dispatch/items/:id/receipt - 签收")
+	log.Println("  POST /api/v1/dispatch/items/:id/status - 更新路线状态(enroute/arrived/delivering)")
+	log.Println("  POST /api/v1/dispatch/items/:id/cancel - 取消任务")
+	log.Println("  POST /api/v1/dispatch/items/:id/receipt - 签收(唯一可进入completed状态的入口)")
 	log.Println("  GET  /api/v1/anomalies - 获取异常列表")
 	log.Println("  POST /api/v1/anomalies/:id/resolve - 处理异常")
 	log.Println("  GET  /api/v1/stats - 获取统计数据")
 	log.Println("  GET  /api/v1/stats/export - 导出统计CSV")
+	log.Println("")
+	log.Println("路线状态机: pending → dispatched → enroute → arrived → delivering → completed")
+	log.Println("注意: completed 状态只能通过签收回执接口触发")
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("服务启动失败: %v", err)

@@ -87,6 +87,28 @@ func (h *Handler) UpdateRouteStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "状态更新成功"})
 }
 
+func (h *Handler) CancelDispatchItem(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 32)
+	var req struct {
+		Reason string `json:"reason" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	operator := getOperator(c)
+	ip := getClientIP(c)
+
+	err := service.CancelDispatchItem(uint(id), req.Reason, operator, ip)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "任务已取消"})
+}
+
 func (h *Handler) ConfirmReceipt(c *gin.Context) {
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 32)
 	var req struct {
@@ -435,8 +457,8 @@ func (h *Handler) UpdateMaterial(c *gin.Context) {
 func (h *Handler) AddStock(c *gin.Context) {
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 32)
 	var req struct {
-		Amount  float64 `json:"amount" binding:"required"`
-		Remark  string  `json:"remark"`
+		Amount float64 `json:"amount" binding:"required"`
+		Remark string  `json:"remark"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

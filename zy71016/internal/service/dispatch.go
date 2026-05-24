@@ -12,10 +12,10 @@ import (
 )
 
 type DispatchRequest struct {
-	BatchNo        string                   `json:"batch_no" binding:"required"`
-	WeatherLevelID uint                     `json:"weather_level_id"`
-	CreatedBy      string                   `json:"created_by"`
-	Items          []DispatchItemRequest    `json:"items" binding:"required"`
+	BatchNo        string                `json:"batch_no" binding:"required"`
+	WeatherLevelID uint                  `json:"weather_level_id"`
+	CreatedBy      string                `json:"created_by"`
+	Items          []DispatchItemRequest `json:"items" binding:"required"`
 }
 
 type DispatchItemRequest struct {
@@ -26,23 +26,23 @@ type DispatchItemRequest struct {
 }
 
 type DispatchResponse struct {
-	Success      bool                   `json:"success"`
-	Message      string                 `json:"message"`
-	BatchNo      string                 `json:"batch_no"`
-	IsDuplicate  bool                   `json:"is_duplicate"`
-	ProcessedBy  string                 `json:"processed_by,omitempty"`
-	ProcessedAt  *time.Time             `json:"processed_at,omitempty"`
-	Items        []DispatchItemResponse `json:"items,omitempty"`
+	Success     bool                   `json:"success"`
+	Message     string                 `json:"message"`
+	BatchNo     string                 `json:"batch_no"`
+	IsDuplicate bool                   `json:"is_duplicate"`
+	ProcessedBy string                 `json:"processed_by,omitempty"`
+	ProcessedAt *time.Time             `json:"processed_at,omitempty"`
+	Items       []DispatchItemResponse `json:"items,omitempty"`
 }
 
 type DispatchItemResponse struct {
-	ID           uint   `json:"id"`
-	VehicleID    uint   `json:"vehicle_id"`
-	RoadSectionID uint  `json:"road_section_id"`
-	Status       string `json:"status"`
-	HasAnomaly   bool   `json:"has_anomaly"`
-	AnomalyType  string `json:"anomaly_type,omitempty"`
-	AnomalyDesc  string `json:"anomaly_desc,omitempty"`
+	ID            uint   `json:"id"`
+	VehicleID     uint   `json:"vehicle_id"`
+	RoadSectionID uint   `json:"road_section_id"`
+	Status        string `json:"status"`
+	HasAnomaly    bool   `json:"has_anomaly"`
+	AnomalyType   string `json:"anomaly_type,omitempty"`
+	AnomalyDesc   string `json:"anomaly_desc,omitempty"`
 }
 
 type AnomalyInfo struct {
@@ -68,8 +68,21 @@ func CreateDispatchBatch(req DispatchRequest, ip string) (*DispatchResponse, err
 	var anomalies []AnomalyInfo
 	var itemResponses []DispatchItemResponse
 
+	vehicleCount := make(map[uint]int)
 	for _, item := range req.Items {
-		itemAnomalies := validateDispatchItem(item)
+		vehicleCount[item.VehicleID]++
+	}
+	for vehicleID, count := range vehicleCount {
+		if count > 1 {
+			anomalies = append(anomalies, AnomalyInfo{
+				Type:        "duplicate_vehicle",
+				Description: fmt.Sprintf("车辆ID %d 在同一批次请求中被分配了 %d 次任务", vehicleID, count),
+			})
+		}
+	}
+
+	for _, item := range req.Items {
+		itemAnomalies := validateDispatchItem(item, req.BatchNo)
 		anomalies = append(anomalies, itemAnomalies...)
 	}
 
@@ -94,7 +107,7 @@ func CreateDispatchBatch(req DispatchRequest, ip string) (*DispatchResponse, err
 		}
 
 		for _, itemReq := range req.Items {
-			itemAnomalies := validateDispatchItem(itemReq)
+			itemAnomalies := validateDispatchItem(itemReq, req.BatchNo)
 			hasAnomaly := len(itemAnomalies) > 0
 			anomalyType := ""
 			anomalyDesc := ""
@@ -161,7 +174,7 @@ func CreateDispatchBatch(req DispatchRequest, ip string) (*DispatchResponse, err
 	}, nil
 }
 
-func validateDispatchItem(item DispatchItemRequest) []AnomalyInfo {
+func validateDispatchItem(item DispatchItemRequest, batchNo string) []AnomalyInfo {
 	var anomalies []AnomalyInfo
 
 	closed, closure, err := database.IsRoadClosed(item.RoadSectionID)
@@ -177,6 +190,14 @@ func validateDispatchItem(item DispatchItemRequest) []AnomalyInfo {
 		anomalies = append(anomalies, AnomalyInfo{
 			Type:        "vehicle_busy",
 			Description: fmt.Sprintf("车辆有进行中的任务: 任务ID %d", activeItem.ID),
+		})
+	}
+
+	duplicate, dupItem, err := database.CheckVehicleDuplicateDispatch(item.VehicleID, batchNo)
+	if err == nil && duplicate {
+		anomalies = append(anomalies, AnomalyInfo{
+			Type:        "duplicate_vehicle_batch",
+			Description: fmt.Sprintf("车辆已在批次中分配任务: 任务ID %d", dupItem.ID),
 		})
 	}
 
@@ -215,8 +236,8 @@ func StartDispatch(dispatchItemID uint, operator, ip string) error {
 		return err
 	}
 
-	if item.Status != "pending" {
-		return fmt.Errorf("当前状态 %s 无法发车", item.Status)
+	if err := validateStateTransition(item.Status, "dispatched"); err != nil {
+		return fmt.Errorf("无法发车: %v", err)
 	}
 
 	closed, _, err := database.IsRoadClosed(item.RoadSectionID)
@@ -257,21 +278,21 @@ func StartDispatch(dispatchItemID uint, operator, ip string) error {
 }
 
 func UpdateRouteStatus(dispatchItemID uint, status, location, remark, operator, ip string) error {
-	validStatuses := map[string]bool{
-		"pending":    true,
-		"dispatched": true,
+	allowedStatuses := map[string]bool{
 		"enroute":    true,
 		"arrived":    true,
 		"delivering": true,
-		"completed":  true,
-		"cancelled":  true,
 	}
-	if !validStatuses[status] {
-		return fmt.Errorf("无效状态: %s", status)
+	if !allowedStatuses[status] {
+		return fmt.Errorf("状态 %s 不允许通过此接口更新，completed 必须通过签收回执接口，cancelled 需单独处理", status)
 	}
 
 	var item models.DispatchItem
 	if err := database.DB.First(&item, dispatchItemID).Error; err != nil {
+		return err
+	}
+
+	if err := validateStateTransition(item.Status, status); err != nil {
 		return err
 	}
 
@@ -299,6 +320,31 @@ func UpdateRouteStatus(dispatchItemID uint, status, location, remark, operator, 
 
 		return nil
 	})
+}
+
+func validateStateTransition(currentStatus, newStatus string) error {
+	validTransitions := map[string][]string{
+		"pending":    {"dispatched", "cancelled"},
+		"dispatched": {"enroute", "cancelled"},
+		"enroute":    {"arrived", "cancelled"},
+		"arrived":    {"delivering", "cancelled"},
+		"delivering": {"completed", "cancelled"},
+		"completed":  {},
+		"cancelled":  {},
+	}
+
+	allowed, exists := validTransitions[currentStatus]
+	if !exists {
+		return fmt.Errorf("当前状态 %s 无效", currentStatus)
+	}
+
+	for _, s := range allowed {
+		if s == newStatus {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("状态流转不允许: %s → %s，允许的目标状态: %v", currentStatus, newStatus, allowed)
 }
 
 func ConfirmReceipt(dispatchItemID uint, receivedAmount float64, receiverName, receiverSign, remark, operator, ip string) (*models.Receipt, error) {
@@ -425,6 +471,59 @@ func ResolveAnomaly(dispatchItemID uint, resolution, operator, ip string) error 
 	_ = database.LogOperation(operator, "resolve_anomaly", "dispatch_item", "dispatch_item", item.ID, string(beforeData), string(afterData), ip)
 
 	return nil
+}
+
+func CancelDispatchItem(dispatchItemID uint, reason, operator, ip string) error {
+	var item models.DispatchItem
+	if err := database.DB.First(&item, dispatchItemID).Error; err != nil {
+		return err
+	}
+
+	if item.Status == "completed" {
+		return errors.New("已完成的任务无法取消")
+	}
+
+	if item.Status == "cancelled" {
+		return nil
+	}
+
+	if err := validateStateTransition(item.Status, "cancelled"); err != nil {
+		return err
+	}
+
+	return database.DB.Transaction(func(tx *gorm.DB) error {
+		oldStatus := item.Status
+		item.Status = "cancelled"
+		item.UpdatedAt = time.Now()
+
+		if err := tx.Save(&item).Error; err != nil {
+			return err
+		}
+
+		if oldStatus == "dispatched" || oldStatus == "enroute" {
+			if err := database.AddStock(item.SaltDepotID, item.SaltAmount, operator, "cancel", item.ID, "取消任务退回库存"); err != nil {
+				return err
+			}
+		}
+
+		var vehicle models.Vehicle
+		if err := tx.First(&vehicle, item.VehicleID).Error; err == nil {
+			vehicle.Status = "idle"
+			tx.Save(&vehicle)
+		}
+
+		if err := database.AddRouteStatusLog(item.ID, "cancelled", "", reason, operator); err != nil {
+			return err
+		}
+
+		checkBatchCompletion(item.DispatchBatchID, tx)
+
+		beforeData, _ := json.Marshal(map[string]string{"status": oldStatus})
+		afterData, _ := json.Marshal(map[string]string{"status": "cancelled"})
+		_ = database.LogOperation(operator, "cancel_dispatch", "dispatch_item", "dispatch_item", item.ID, string(beforeData), string(afterData), ip)
+
+		return nil
+	})
 }
 
 func convertToItemResponses(items []models.DispatchItem) []DispatchItemResponse {
