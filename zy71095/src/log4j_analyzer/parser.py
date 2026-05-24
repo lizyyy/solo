@@ -116,7 +116,7 @@ class Log4jParser:
                     )
                     self._merge_logger_rule(rule)
                 else:
-                    self.warnings.append(f"PARSE_WARNING: 文件 {file_path} 中包 '{name}' 的日志级别 '{level}' 无效，已忽略")
+                    self.errors.append(f"VALIDATION_ERROR: 文件 {file_path} 中包 '{name}' 的日志级别 '{level}' 无效，有效值: {', '.join(LOG_LEVELS)}")
 
         root_elem = root.find(f'.//{ns}root') or root.find(f'.//{ns}Root')
         if root_elem is not None:
@@ -138,7 +138,7 @@ class Log4jParser:
                         source=source
                     )
                 else:
-                    self.warnings.append(f"PARSE_WARNING: 文件 {file_path} 中 root logger 的日志级别 '{level}' 无效，使用默认 INFO")
+                    self.errors.append(f"VALIDATION_ERROR: 文件 {file_path} 中 root logger 的日志级别 '{level}' 无效，有效值: {', '.join(LOG_LEVELS)}")
 
     def _parse_xml_appenders(self, root: ET.Element, file_path: Path,
                              source_type: str, priority_offset: int) -> None:
@@ -197,7 +197,7 @@ class Log4jParser:
                 if level in LOG_LEVELS:
                     self.root_logger = LoggerRule("root", level, source)
                 else:
-                    self.warnings.append(f"PARSE_WARNING: 文件 {file_path} 中 root logger 的日志级别 '{parts[0].strip()}' 无效，已忽略")
+                    self.errors.append(f"VALIDATION_ERROR: 文件 {file_path} 中 root logger 的日志级别 '{parts[0].strip()}' 无效，有效值: {', '.join(LOG_LEVELS)}")
             
             elif key.lower().startswith('log4j.logger.'):
                 pkg = key[len('log4j.logger.'):]
@@ -212,7 +212,7 @@ class Log4jParser:
                     )
                     self._merge_logger_rule(rule)
                 else:
-                    self.warnings.append(f"PARSE_WARNING: 文件 {file_path} 中包 '{pkg}' 的日志级别 '{parts[0].strip()}' 无效，已忽略")
+                    self.errors.append(f"VALIDATION_ERROR: 文件 {file_path} 中包 '{pkg}' 的日志级别 '{parts[0].strip()}' 无效，有效值: {', '.join(LOG_LEVELS)}")
 
     def _merge_logger_rule(self, new_rule: LoggerRule) -> None:
         existing = self.loggers.get(new_rule.package_pattern)

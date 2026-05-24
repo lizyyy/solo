@@ -50,9 +50,10 @@ class Log4jChainAnalyzer:
         result.env_files = self.env_processor.env_files
         result.environment_vars = self.env_processor.env_vars
 
-        all_rules = self._collect_all_rules()
+        env_rules = self.env_processor.extract_logger_overrides()
+        all_rules = self._collect_all_rules(env_rules)
 
-        result.root_logger = self._get_effective_root_logger(all_rules)
+        result.root_logger = self._get_effective_root_logger(env_rules)
         result.loggers = {r.package_pattern: r for r in all_rules}
         result.appenders = self.parser.appenders
         result.errors = self.parser.errors + self.env_processor.errors
@@ -70,11 +71,14 @@ class Log4jChainAnalyzer:
         if not errors:
             return ExitCode.SUCCESS
 
+        has_validation_error = any(e.startswith("VALIDATION_ERROR:") for e in errors)
         has_env_error = any(e.startswith("ENV_ERROR:") for e in errors)
         has_include_error = any(e.startswith("INCLUDE_ERROR:") for e in errors)
         has_parse_error = any(e.startswith("PARSE_ERROR:") for e in errors)
 
-        if has_env_error:
+        if has_validation_error:
+            return ExitCode.VALIDATION_ERROR
+        elif has_env_error:
             return ExitCode.ENV_ERROR
         elif has_include_error:
             return ExitCode.INCLUDE_ERROR
@@ -83,19 +87,17 @@ class Log4jChainAnalyzer:
         else:
             return ExitCode.UNKNOWN_ERROR
 
-    def _collect_all_rules(self) -> List[LoggerRule]:
+    def _collect_all_rules(self, env_rules: List[LoggerRule]) -> List[LoggerRule]:
         all_rules = list(self.parser.loggers.values())
-        env_rules = self.env_processor.extract_logger_overrides()
         all_rules.extend(env_rules)
         all_rules.extend(self.cli_overrides)
         return all_rules
 
-    def _get_effective_root_logger(self, all_rules: List[LoggerRule]) -> Optional[LoggerRule]:
+    def _get_effective_root_logger(self, env_rules: List[LoggerRule]) -> Optional[LoggerRule]:
         cli_root = next((r for r in self.cli_overrides if r.package_pattern == "root"), None)
         if cli_root:
             return cli_root
         
-        env_rules = self.env_processor.extract_logger_overrides()
         env_root = next((r for r in env_rules if r.package_pattern == "root"), None)
         if env_root:
             return env_root

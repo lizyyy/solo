@@ -59,6 +59,10 @@ class EnvironmentProcessor:
                         source=source,
                         is_wildcard='*' in pkg or '?' in pkg
                     ))
+                else:
+                    self.errors.append(
+                        f"VALIDATION_ERROR: 环境变量 '{key}' 的日志级别值 '{value}' 无效，有效值: {', '.join(LOG_LEVELS)}"
+                    )
 
         root_patterns = ['LOG4J_ROOT_LEVEL', 'ROOT_LOGGER_LEVEL', 'LOG4J_ROOT']
         for key in root_patterns:
@@ -75,5 +79,9 @@ class EnvironmentProcessor:
                         level=level,
                         source=source
                     ))
+                else:
+                    self.errors.append(
+                        f"VALIDATION_ERROR: 环境变量 '{key}' 的日志级别值 '{self.env_vars[key]}' 无效，有效值: {', '.join(LOG_LEVELS)}"
+                    )
 
         return rules
