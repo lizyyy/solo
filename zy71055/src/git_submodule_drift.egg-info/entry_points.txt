@@ -1,0 +1,3 @@
+[console_scripts]
+git-submodule-drift = git_submodule_drift.cli:main
+gsd = git_submodule_drift.cli:main
