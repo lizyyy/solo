@@ -7,7 +7,7 @@ echo "夜市摊位轮换 API 测试脚本"
 echo "=========================================="
 
 echo ""
-echo "场景 1: 正常流程 - 创建轮换周期并分配摊位"
+echo "场景 1: 正常流程 - 创建轮换周期、分配摊位、换位、校验、定稿"
 echo "------------------------------------------"
 
 echo "1.1 创建新的轮换周期"
@@ -24,24 +24,7 @@ CYCLE_ID=$(echo "$CYCLE_RESPONSE" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
 echo "周期ID: $CYCLE_ID"
 
 echo ""
-echo "1.2 查看所有摊主"
-curl -s "$BASE_URL/vendors" | python3 -m json.tool 2>/dev/null | head -50
-
-echo ""
-echo "1.3 查看所有摊位"
-curl -s "$BASE_URL/stalls" | python3 -m json.tool 2>/dev/null | head -50
-
-echo ""
-echo "1.4 验证单个分配（老张烧烤 -> C01摊位）"
-curl -s -X POST "$BASE_URL/validation/assignment" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "vendor_id": "vendor-001",
-    "stall_id": "stall-006"
-  }' | python3 -m json.tool 2>/dev/null
-
-echo ""
-echo "1.5 创建第一个分配（老张烧烤 -> C01）"
+echo "1.2 创建第一个分配（老张烧烤 -> C01）"
 curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/assignments" \
   -H "Content-Type: application/json" \
   -d '{
@@ -52,7 +35,7 @@ curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/assignments" \
   }' | python3 -m json.tool 2>/dev/null
 
 echo ""
-echo "1.6 创建第二个分配（小李奶茶 -> B01）"
+echo "1.3 创建第二个分配（小李奶茶 -> B01）"
 curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/assignments" \
   -H "Content-Type: application/json" \
   -d '{
@@ -63,7 +46,7 @@ curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/assignments" \
   }' | python3 -m json.tool 2>/dev/null
 
 echo ""
-echo "1.7 创建第三个分配（王记炒饭 -> A01）"
+echo "1.4 创建第三个分配（王记炒饭 -> A01）"
 curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/assignments" \
   -H "Content-Type: application/json" \
   -d '{
@@ -74,7 +57,7 @@ curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/assignments" \
   }' | python3 -m json.tool 2>/dev/null
 
 echo ""
-echo "1.8 创建第四个分配（陈记饰品 -> B02）"
+echo "1.5 创建第四个分配（陈记饰品 -> B02）"
 curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/assignments" \
   -H "Content-Type: application/json" \
   -d '{
@@ -85,17 +68,51 @@ curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/assignments" \
   }' | python3 -m json.tool 2>/dev/null
 
 echo ""
-echo "1.9 查看当前分配列表"
+echo "1.6 查看当前分配列表"
 curl -s "$BASE_URL/cycles/$CYCLE_ID/assignments" | python3 -m json.tool 2>/dev/null
 
 echo ""
-echo "1.10 校验整个周期"
+echo "1.7 创建换位申请（小李奶茶 <-> 陈记饰品）"
+SWAP_RESPONSE=$(curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/swaps" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cycle_id": "'$CYCLE_ID'",
+    "requesting_vendor_id": "vendor-002",
+    "target_vendor_id": "vendor-004",
+    "reason": "希望换到更好的位置"
+  }')
+echo "$SWAP_RESPONSE" | python3 -m json.tool 2>/dev/null
+SWAP_ID=$(echo "$SWAP_RESPONSE" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
+echo "换位申请ID: $SWAP_ID"
+
+echo ""
+echo "1.8 查看换位列表"
+curl -s "$BASE_URL/cycles/$CYCLE_ID/swaps" | python3 -m json.tool 2>/dev/null
+
+echo ""
+echo "1.9 批准换位申请"
+curl -s -X POST "$BASE_URL/swaps/$SWAP_ID/approve" \
+  -H "Content-Type: application/json" \
+  -d '{"operator": "管理员"}' | python3 -m json.tool 2>/dev/null
+
+echo ""
+echo "1.10 完成换位（更新实际分配）"
+curl -s -X POST "$BASE_URL/swaps/$SWAP_ID/complete" \
+  -H "Content-Type: application/json" \
+  -d '{"operator": "管理员"}' | python3 -m json.tool 2>/dev/null
+
+echo ""
+echo "1.11 查看换位后的分配"
+curl -s "$BASE_URL/cycles/$CYCLE_ID/assignments" | python3 -m json.tool 2>/dev/null
+
+echo ""
+echo "1.12 校验整个周期"
 curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/validate" \
   -H "Content-Type: application/json" \
   -d '{"operator": "管理员"}' | python3 -m json.tool 2>/dev/null
 
 echo ""
-echo "1.11 定稿轮换周期"
+echo "1.13 定稿轮换周期"
 curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/finalize" \
   -H "Content-Type: application/json" \
   -d '{"operator": "管理员"}' | python3 -m json.tool 2>/dev/null
@@ -225,55 +242,17 @@ curl -s -X POST "$BASE_URL/complaints/$SECOND_COMPLAINT_ID/reject" \
   -d '{"operator": "管理员"}' | python3 -m json.tool 2>/dev/null
 
 echo ""
-echo "4.4 查看摊主分数变化（赵家炸串 vendor-007）"
-curl -s "$BASE_URL/vendors" | python3 -m json.tool 2>/dev/null | grep -A 20 "vendor-007"
-
-echo ""
 echo "=========================================="
-echo "场景 5: 换位状态机流程"
+echo "场景 5: 人工修正和重新打开"
 echo "------------------------------------------"
 
-echo "5.1 在正常周期中创建换位申请（小李奶茶 <-> 陈记饰品）"
-SWAP_RESPONSE=$(curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/swaps" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cycle_id": "'$CYCLE_ID'",
-    "requesting_vendor_id": "vendor-002",
-    "target_vendor_id": "vendor-004",
-    "reason": "希望换到更好的位置"
-  }')
-echo "$SWAP_RESPONSE" | python3 -m json.tool 2>/dev/null
-SWAP_ID=$(echo "$SWAP_RESPONSE" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
-echo "换位申请ID: $SWAP_ID"
-
-echo ""
-echo "5.2 批准换位申请"
-curl -s -X POST "$BASE_URL/swaps/$SWAP_ID/approve" \
-  -H "Content-Type: application/json" \
-  -d '{"operator": "管理员"}' | python3 -m json.tool 2>/dev/null
-
-echo ""
-echo "5.3 完成换位（更新实际分配）"
-curl -s -X POST "$BASE_URL/swaps/$SWAP_ID/complete" \
-  -H "Content-Type: application/json" \
-  -d '{"operator": "管理员"}' | python3 -m json.tool 2>/dev/null
-
-echo ""
-echo "5.4 查看换位后的分配"
-curl -s "$BASE_URL/cycles/$CYCLE_ID/assignments" | python3 -m json.tool 2>/dev/null
-
-echo ""
-echo "=========================================="
-echo "场景 6: 人工修正和重新打开"
-echo "------------------------------------------"
-
-echo "6.1 尝试重新打开已完成的周期"
+echo "5.1 尝试重新打开已完成的周期"
 curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/reopen" \
   -H "Content-Type: application/json" \
   -d '{"operator": "管理员"}' | python3 -m json.tool 2>/dev/null
 
 echo ""
-echo "6.2 添加新的分配（刘姐麻辣烫 -> C02）"
+echo "5.2 添加新的分配（刘姐麻辣烫 -> C02）"
 curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/assignments" \
   -H "Content-Type: application/json" \
   -d '{
@@ -284,7 +263,7 @@ curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/assignments" \
   }' | python3 -m json.tool 2>/dev/null
 
 echo ""
-echo "6.3 重新校验和定稿"
+echo "5.3 重新校验和定稿"
 curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/validate" \
   -H "Content-Type: application/json" \
   -d '{"operator": "管理员"}' | python3 -m json.tool 2>/dev/null
@@ -295,18 +274,18 @@ curl -s -X POST "$BASE_URL/cycles/$CYCLE_ID/finalize" \
 
 echo ""
 echo "=========================================="
-echo "场景 7: 报告生成和导出"
+echo "场景 6: 报告生成和导出"
 echo "------------------------------------------"
 
-echo "7.1 生成轮换报告"
-curl -s "$BASE_URL/cycles/$CYCLE_ID/report" | python3 -m json.tool 2>/dev/null | head -80
+echo "6.1 生成轮换报告"
+curl -s "$BASE_URL/cycles/$CYCLE_ID/report" | python3 -m json.tool 2>/dev/null | head -100
 
 echo ""
-echo "7.2 导出CSV报告"
+echo "6.2 导出CSV报告"
 curl -s "$BASE_URL/cycles/$CYCLE_ID/export" | python3 -m json.tool 2>/dev/null
 
 echo ""
-echo "7.3 查看审计日志"
+echo "6.3 查看审计日志"
 curl -s "$BASE_URL/audit/logs" | python3 -m json.tool 2>/dev/null | head -60
 
 echo ""

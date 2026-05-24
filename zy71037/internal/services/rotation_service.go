@@ -175,13 +175,28 @@ func (s *RotationService) RemoveAssignment(assignmentID, operator string) error 
 
 func (s *RotationService) GetAssignment(id string) (*models.StallAssignment, error) {
 	var a models.StallAssignment
+	var validatedAt sql.NullTime
+	var validationResult sql.NullString
+	var notes sql.NullString
+
 	err := database.DB.QueryRow(
 		`SELECT id, cycle_id, vendor_id, stall_id, status, assigned_at, validated_at, validation_result, notes
 		 FROM stall_assignments WHERE id = ?`, id,
-	).Scan(&a.ID, &a.CycleID, &a.VendorID, &a.StallID, &a.Status, &a.AssignedAt, &a.ValidatedAt, &a.ValidationResult, &a.Notes)
+	).Scan(&a.ID, &a.CycleID, &a.VendorID, &a.StallID, &a.Status, &a.AssignedAt, &validatedAt, &validationResult, &notes)
 	if err != nil {
 		return nil, err
 	}
+
+	if validatedAt.Valid {
+		a.ValidatedAt = &validatedAt.Time
+	}
+	if validationResult.Valid {
+		a.ValidationResult = validationResult.String
+	}
+	if notes.Valid {
+		a.Notes = notes.String
+	}
+
 	return &a, nil
 }
 
@@ -204,14 +219,29 @@ func (s *RotationService) GetCycleAssignments(cycleID string) ([]models.StallAss
 	var assignments []models.StallAssignmentDetail
 	for rows.Next() {
 		var d models.StallAssignmentDetail
+		var validatedAt sql.NullTime
+		var validationResult sql.NullString
+		var notes sql.NullString
+
 		err := rows.Scan(
 			&d.ID, &d.CycleID, &d.VendorID, &d.StallID, &d.Status, &d.AssignedAt,
-			&d.ValidatedAt, &d.ValidationResult, &d.Notes,
+			&validatedAt, &validationResult, &notes,
 			&d.VendorName, &d.VendorCategory, &d.StallCode, &d.StallName, &d.StallZone,
 		)
 		if err != nil {
 			return nil, err
 		}
+
+		if validatedAt.Valid {
+			d.ValidatedAt = &validatedAt.Time
+		}
+		if validationResult.Valid {
+			d.ValidationResult = validationResult.String
+		}
+		if notes.Valid {
+			d.Notes = notes.String
+		}
+
 		assignments = append(assignments, d)
 	}
 	return assignments, nil
@@ -381,13 +411,17 @@ func (s *RotationService) GetCycleComplaints(cycleID string) ([]models.Complaint
 	var complaints []models.ComplaintSummary
 	for rows.Next() {
 		var s models.ComplaintSummary
+		var resolvedAt sql.NullTime
 		err := rows.Scan(
 			&s.ID, &s.VendorID, &s.Type, &s.Description, &s.Severity,
-			&s.PointsDeducted, &s.Status, &s.ReportedBy, &s.ReportedAt, &s.ResolvedAt,
+			&s.PointsDeducted, &s.Status, &s.ReportedBy, &s.ReportedAt, &resolvedAt,
 			&s.VendorName,
 		)
 		if err != nil {
 			return nil, err
+		}
+		if resolvedAt.Valid {
+			s.ResolvedAt = &resolvedAt.Time
 		}
 		complaints = append(complaints, s)
 	}
@@ -416,15 +450,30 @@ func (s *RotationService) GetCycleSwapSummaries(cycleID string) ([]models.SwapRe
 	var swaps []models.SwapRequestSummary
 	for rows.Next() {
 		var s models.SwapRequestSummary
+		var approvedAt sql.NullTime
+		var approvedBy sql.NullString
+		var resolvedAt sql.NullTime
+
 		err := rows.Scan(
 			&s.ID, &s.CycleID, &s.RequestingVendorID, &s.TargetVendorID,
 			&s.RequestingStallID, &s.TargetStallID, &s.Status, &s.Reason,
-			&s.CreatedAt, &s.ApprovedAt, &s.ApprovedBy, &s.ResolvedAt,
+			&s.CreatedAt, &approvedAt, &approvedBy, &resolvedAt,
 			&s.RequestingVendorName, &s.TargetVendorName, &s.RequestingStallCode, &s.TargetStallCode,
 		)
 		if err != nil {
 			return nil, err
 		}
+
+		if approvedAt.Valid {
+			s.ApprovedAt = &approvedAt.Time
+		}
+		if approvedBy.Valid {
+			s.ApprovedBy = approvedBy.String
+		}
+		if resolvedAt.Valid {
+			s.ResolvedAt = &resolvedAt.Time
+		}
+
 		swaps = append(swaps, s)
 	}
 	return swaps, nil

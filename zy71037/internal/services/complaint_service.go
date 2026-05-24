@@ -178,12 +178,16 @@ func (s *ComplaintService) RejectComplaint(complaintID, operator string) (*model
 
 func (s *ComplaintService) GetComplaint(id string) (*models.Complaint, error) {
 	var c models.Complaint
+	var resolvedAt sql.NullTime
 	err := database.DB.QueryRow(
 		`SELECT id, vendor_id, type, description, severity, points_deducted, status, reported_by, reported_at, resolved_at
 		 FROM complaints WHERE id = ?`, id,
-	).Scan(&c.ID, &c.VendorID, &c.Type, &c.Description, &c.Severity, &c.PointsDeducted, &c.Status, &c.ReportedBy, &c.ReportedAt, &c.ResolvedAt)
+	).Scan(&c.ID, &c.VendorID, &c.Type, &c.Description, &c.Severity, &c.PointsDeducted, &c.Status, &c.ReportedBy, &c.ReportedAt, &resolvedAt)
 	if err != nil {
 		return nil, err
+	}
+	if resolvedAt.Valid {
+		c.ResolvedAt = &resolvedAt.Time
 	}
 	return &c, nil
 }
@@ -201,9 +205,13 @@ func (s *ComplaintService) GetVendorComplaints(vendorID string) ([]models.Compla
 	var complaints []models.Complaint
 	for rows.Next() {
 		var c models.Complaint
-		err := rows.Scan(&c.ID, &c.VendorID, &c.Type, &c.Description, &c.Severity, &c.PointsDeducted, &c.Status, &c.ReportedBy, &c.ReportedAt, &c.ResolvedAt)
+		var resolvedAt sql.NullTime
+		err := rows.Scan(&c.ID, &c.VendorID, &c.Type, &c.Description, &c.Severity, &c.PointsDeducted, &c.Status, &c.ReportedBy, &c.ReportedAt, &resolvedAt)
 		if err != nil {
 			return nil, err
+		}
+		if resolvedAt.Valid {
+			c.ResolvedAt = &resolvedAt.Time
 		}
 		complaints = append(complaints, c)
 	}
@@ -223,9 +231,13 @@ func (s *ComplaintService) GetPendingComplaints() ([]models.Complaint, error) {
 	var complaints []models.Complaint
 	for rows.Next() {
 		var c models.Complaint
-		err := rows.Scan(&c.ID, &c.VendorID, &c.Type, &c.Description, &c.Severity, &c.PointsDeducted, &c.Status, &c.ReportedBy, &c.ReportedAt, &c.ResolvedAt)
+		var resolvedAt sql.NullTime
+		err := rows.Scan(&c.ID, &c.VendorID, &c.Type, &c.Description, &c.Severity, &c.PointsDeducted, &c.Status, &c.ReportedBy, &c.ReportedAt, &resolvedAt)
 		if err != nil {
 			return nil, err
+		}
+		if resolvedAt.Valid {
+			c.ResolvedAt = &resolvedAt.Time
 		}
 		complaints = append(complaints, c)
 	}

@@ -57,8 +57,8 @@ func (s *SwapService) CreateSwapRequest(cycleID, requestingVendorID, targetVendo
 	if err != nil {
 		return nil, err
 	}
-	if cycleStatus != "draft" && cycleStatus != "active" {
-		return nil, errors.New("轮换周期状态不允许换位申请")
+	if cycleStatus == "finalized" {
+		return nil, errors.New("轮换周期已最终定稿，不允许创建换位申请")
 	}
 
 	var reqStallID, reqStatus string
@@ -155,19 +155,43 @@ func (s *SwapService) CompleteSwap(swapID, operator string) (*models.SwapRequest
 
 	now := time.Now()
 
+	var reqAssignmentID, targetAssignmentID string
+	var reqAssignedAt, targetAssignedAt time.Time
+
+	err = tx.QueryRow(
+		`SELECT id, assigned_at FROM stall_assignments WHERE cycle_id = ? AND vendor_id = ?`,
+		swap.CycleID, swap.RequestingVendorID,
+	).Scan(&reqAssignmentID, &reqAssignedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.QueryRow(
+		`SELECT id, assigned_at FROM stall_assignments WHERE cycle_id = ? AND vendor_id = ?`,
+		swap.CycleID, swap.TargetVendorID,
+	).Scan(&targetAssignmentID, &targetAssignedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = tx.Exec(`DELETE FROM stall_assignments WHERE id IN (?, ?)`, reqAssignmentID, targetAssignmentID)
+	if err != nil {
+		return nil, err
+	}
+
 	_, err = tx.Exec(
-		`UPDATE stall_assignments SET stall_id = ?, status = 'assigned', validated_at = NULL, validation_result = NULL 
-		 WHERE cycle_id = ? AND vendor_id = ?`,
-		swap.TargetStallID, swap.CycleID, swap.RequestingVendorID,
+		`INSERT INTO stall_assignments (id, cycle_id, vendor_id, stall_id, status, assigned_at)
+		 VALUES (?, ?, ?, ?, 'assigned', ?)`,
+		reqAssignmentID, swap.CycleID, swap.RequestingVendorID, swap.TargetStallID, reqAssignedAt,
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	_, err = tx.Exec(
-		`UPDATE stall_assignments SET stall_id = ?, status = 'assigned', validated_at = NULL, validation_result = NULL 
-		 WHERE cycle_id = ? AND vendor_id = ?`,
-		swap.RequestingStallID, swap.CycleID, swap.TargetVendorID,
+		`INSERT INTO stall_assignments (id, cycle_id, vendor_id, stall_id, status, assigned_at)
+		 VALUES (?, ?, ?, ?, 'assigned', ?)`,
+		targetAssignmentID, swap.CycleID, swap.TargetVendorID, swap.RequestingStallID, targetAssignedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -233,15 +257,30 @@ func (s *SwapService) transitionState(swapID, newState, operator string) (*model
 
 func (s *SwapService) GetSwapRequest(id string) (*models.SwapRequest, error) {
 	var s2 models.SwapRequest
+	var approvedAt sql.NullTime
+	var approvedBy sql.NullString
+	var resolvedAt sql.NullTime
+
 	err := database.DB.QueryRow(
 		`SELECT id, cycle_id, requesting_vendor_id, target_vendor_id, requesting_stall_id, 
 		 target_stall_id, status, reason, created_at, approved_at, approved_by, resolved_at
 		 FROM swap_requests WHERE id = ?`, id,
 	).Scan(&s2.ID, &s2.CycleID, &s2.RequestingVendorID, &s2.TargetVendorID, &s2.RequestingStallID,
-		&s2.TargetStallID, &s2.Status, &s2.Reason, &s2.CreatedAt, &s2.ApprovedAt, &s2.ApprovedBy, &s2.ResolvedAt)
+		&s2.TargetStallID, &s2.Status, &s2.Reason, &s2.CreatedAt, &approvedAt, &approvedBy, &resolvedAt)
 	if err != nil {
 		return nil, err
 	}
+
+	if approvedAt.Valid {
+		s2.ApprovedAt = &approvedAt.Time
+	}
+	if approvedBy.Valid {
+		s2.ApprovedBy = approvedBy.String
+	}
+	if resolvedAt.Valid {
+		s2.ResolvedAt = &resolvedAt.Time
+	}
+
 	return &s2, nil
 }
 
@@ -259,11 +298,26 @@ func (s *SwapService) GetCycleSwaps(cycleID string) ([]models.SwapRequest, error
 	var swaps []models.SwapRequest
 	for rows.Next() {
 		var s2 models.SwapRequest
+		var approvedAt sql.NullTime
+		var approvedBy sql.NullString
+		var resolvedAt sql.NullTime
+
 		err := rows.Scan(&s2.ID, &s2.CycleID, &s2.RequestingVendorID, &s2.TargetVendorID, &s2.RequestingStallID,
-			&s2.TargetStallID, &s2.Status, &s2.Reason, &s2.CreatedAt, &s2.ApprovedAt, &s2.ApprovedBy, &s2.ResolvedAt)
+			&s2.TargetStallID, &s2.Status, &s2.Reason, &s2.CreatedAt, &approvedAt, &approvedBy, &resolvedAt)
 		if err != nil {
 			return nil, err
 		}
+
+		if approvedAt.Valid {
+			s2.ApprovedAt = &approvedAt.Time
+		}
+		if approvedBy.Valid {
+			s2.ApprovedBy = approvedBy.String
+		}
+		if resolvedAt.Valid {
+			s2.ResolvedAt = &resolvedAt.Time
+		}
+
 		swaps = append(swaps, s2)
 	}
 	return swaps, nil
