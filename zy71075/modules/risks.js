@@ -59,13 +59,20 @@ const FAILURE_SAMPLES = [
 ];
 
 function detectVFRRisk(mediaInfo) {
+  const risks = [];
   const analysis = mediaInfo.frameRateAnalysis;
-  if (!analysis) return null;
+  
+  if (!analysis || !analysis.isVFR) {
+    return risks;
+  }
 
-  if (!analysis.isVFR) return null;
-
-  const cv = analysis.avgFrameRate > 0 
-    ? Math.sqrt(analysis.frameRateVariance) / analysis.avgFrameRate 
+  const avgFrameRate = analysis.avgFrameRate || 0;
+  const minFrameRate = analysis.minFrameRate || 0;
+  const maxFrameRate = analysis.maxFrameRate || 0;
+  const variance = analysis.frameRateVariance || 0;
+  
+  const cv = avgFrameRate > 0 
+    ? Math.sqrt(variance) / avgFrameRate 
     : 0;
 
   let level = RISK_LEVELS.LOW;
@@ -79,31 +86,35 @@ function detectVFRRisk(mediaInfo) {
     details.push('帧率有明显波动');
   }
 
-  if (analysis.maxFrameRate > 60) {
+  if (maxFrameRate > 60) {
     level = cv > 0.1 ? RISK_LEVELS.HIGH : RISK_LEVELS.MEDIUM;
-    details.push(`最高帧率 ${analysis.maxFrameRate.toFixed(1)}fps 可能超出编码支持`);
+    details.push(`最高帧率 ${maxFrameRate.toFixed(1)}fps 可能超出编码支持`);
   }
 
-  return {
+  risks.push({
     type: RISK_TYPES.VFR,
     level,
     title: '可变帧率 (VFR)',
     message: '检测到可变帧率视频，转码后可能出现音画不同步',
     details: [
-      `平均帧率: ${analysis.avgFrameRate.toFixed(2)}fps`,
-      `帧率范围: ${analysis.minFrameRate.toFixed(1)} - ${analysis.maxFrameRate.toFixed(1)}fps`,
+      `平均帧率: ${avgFrameRate.toFixed(2)}fps`,
+      `帧率范围: ${minFrameRate.toFixed(1)} - ${maxFrameRate.toFixed(1)}fps`,
       `变异系数: ${(cv * 100).toFixed(1)}%`,
       ...details
     ],
     recommendation: '建议添加 -fpsmax 或 -r 参数强制固定帧率输出',
     relatedSamples: FAILURE_SAMPLES.filter(s => s.riskTypes.includes(RISK_TYPES.VFR))
-  };
+  });
+
+  return risks;
 }
 
 function detectAudioRisks(mediaInfo) {
   const risks = [];
+  const audioTracks = mediaInfo.audio || [];
+  const audioTrackCount = mediaInfo.audioTrackCount || 0;
 
-  if (!mediaInfo.hasAudio || mediaInfo.audioTrackCount === 0) {
+  if (!mediaInfo.hasAudio || audioTrackCount === 0) {
     risks.push({
       type: RISK_TYPES.NO_AUDIO,
       level: RISK_LEVELS.MEDIUM,
@@ -117,23 +128,23 @@ function detectAudioRisks(mediaInfo) {
     });
   }
 
-  if (mediaInfo.audioTrackCount > 1) {
-    const languages = mediaInfo.audio.map(a => `${a.language} (${a.codec})`).join(', ');
+  if (audioTrackCount > 1) {
+    const languages = audioTracks.map(a => `${a.language || 'und'} (${a.codec || 'unknown'})`).join(', ');
     risks.push({
       type: RISK_TYPES.MULTI_AUDIO,
       level: RISK_LEVELS.LOW,
       title: '多音轨文件',
-      message: `检测到 ${mediaInfo.audioTrackCount} 条音轨，可能需要手动选择`,
+      message: `检测到 ${audioTrackCount} 条音轨，可能需要手动选择`,
       details: [
-        `音频轨道数: ${mediaInfo.audioTrackCount}`,
+        `音频轨道数: ${audioTrackCount}`,
         `音轨信息: ${languages}`
       ],
       recommendation: '使用 -map 0:a:<index> 指定要使用的音轨',
       relatedSamples: FAILURE_SAMPLES.filter(s => s.riskTypes.includes(RISK_TYPES.MULTI_AUDIO))
     });
 
-    const hasDefault = mediaInfo.audio.some(a => a.isDefault);
-    if (!hasDefault && mediaInfo.audioTrackCount > 1) {
+    const hasDefault = audioTracks.some(a => a.isDefault);
+    if (!hasDefault && audioTrackCount > 1) {
       risks[risks.length - 1].level = RISK_LEVELS.MEDIUM;
       risks[risks.length - 1].details.push('警告: 没有标记为默认的音轨');
     }

@@ -137,11 +137,15 @@ function mergeWithDefaults(config) {
 }
 
 function matchTargetProfile(mediaInfo, targetSpec, profiles) {
-  const mainVideo = mediaInfo.video[0];
-  if (!mainVideo) return null;
-
+  const videoStreams = mediaInfo.video || [];
+  const mainVideo = videoStreams[0];
+  
   if (targetSpec && profiles[targetSpec]) {
     return profiles[targetSpec];
+  }
+
+  if (!mainVideo) {
+    return profiles['1080p'];
   }
 
   const height = mainVideo.height || 0;
@@ -153,8 +157,10 @@ function matchTargetProfile(mediaInfo, targetSpec, profiles) {
 }
 
 function evaluateCondition(mediaInfo, targetProfile, condition) {
-  const mainVideo = mediaInfo.video[0] || {};
-  const sourceBitrate = mainVideo.bitRate || mediaInfo.format?.bitRate || 0;
+  const videoStreams = mediaInfo.video || [];
+  const mainVideo = videoStreams[0] || {};
+  const format = mediaInfo.format || {};
+  const sourceBitrate = mainVideo.bitRate || format.bitRate || 0;
   const targetBitrate = targetProfile?.defaultBitrate || sourceBitrate;
 
   if (condition.resolutionMin && mainVideo.height < condition.resolutionMin) {
