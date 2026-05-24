@@ -68,19 +68,6 @@ func CreateDispatchBatch(req DispatchRequest, ip string) (*DispatchResponse, err
 	var anomalies []AnomalyInfo
 	var itemResponses []DispatchItemResponse
 
-	vehicleCount := make(map[uint]int)
-	for _, item := range req.Items {
-		vehicleCount[item.VehicleID]++
-	}
-	for vehicleID, count := range vehicleCount {
-		if count > 1 {
-			anomalies = append(anomalies, AnomalyInfo{
-				Type:        "duplicate_vehicle",
-				Description: fmt.Sprintf("车辆ID %d 在同一批次请求中被分配了 %d 次任务", vehicleID, count),
-			})
-		}
-	}
-
 	for _, item := range req.Items {
 		itemAnomalies := validateDispatchItem(item, req.BatchNo)
 		anomalies = append(anomalies, itemAnomalies...)
@@ -106,8 +93,21 @@ func CreateDispatchBatch(req DispatchRequest, ip string) (*DispatchResponse, err
 			return err
 		}
 
+		itemVehicleCount := make(map[uint]int)
+		for _, item := range req.Items {
+			itemVehicleCount[item.VehicleID]++
+		}
+
 		for _, itemReq := range req.Items {
 			itemAnomalies := validateDispatchItem(itemReq, req.BatchNo)
+
+			if itemVehicleCount[itemReq.VehicleID] > 1 {
+				itemAnomalies = append(itemAnomalies, AnomalyInfo{
+					Type:        "duplicate_vehicle",
+					Description: fmt.Sprintf("同一批次内车辆被分配 %d 次任务，存在重复领盐风险", itemVehicleCount[itemReq.VehicleID]),
+				})
+			}
+
 			hasAnomaly := len(itemAnomalies) > 0
 			anomalyType := ""
 			anomalyDesc := ""
