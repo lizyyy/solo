@@ -3,7 +3,14 @@ export interface CheckOptions {
     sourceLocale?: string;
     verbose?: boolean;
 }
-export declare function runChecks(inputFiles: string[], checkConfigs: CheckConfig[], options?: CheckOptions): CheckResult[];
+export interface CheckResultWithErrors {
+    results: CheckResult[];
+    parseErrors: Array<{
+        file: string;
+        error: string;
+    }>;
+}
+export declare function runChecks(inputFiles: string[], checkConfigs: CheckConfig[], options?: CheckOptions): CheckResultWithErrors;
 export declare function loadConfigFile(configPath: string): {
     checks: CheckConfig[];
     outputDir?: string;

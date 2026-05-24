@@ -1,0 +1,6059 @@
+{
+  "summary": {
+    "totalChecks": 42,
+    "criticalCount": 19,
+    "warningCount": 0,
+    "infoCount": 1,
+    "safeCount": 22,
+    "overflowCount": 6,
+    "placeholderIssueCount": 14,
+    "checkedAt": "2026-05-24T14:18:31.329Z",
+    "configHash": "75cee1ae"
+  },
+  "results": [
+    {
+      "key": "sms.verificationCode",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "Your verification code is: {code}, please enter within 5 minutes",
+      "checkedText": "Your verification code is: XXXXXXXXXX, please enter within 5 minutes",
+      "widthResult": {
+        "text": "Your verification code is: XXXXXXXXXX, please enter within 5 minutes",
+        "charWidth": 68,
+        "charCount": 68,
+        "widthDetails": [
+          {
+            "char": "Y",
+            "width": 1,
+            "codePoint": 89
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "v",
+            "width": 1,
+            "codePoint": 118
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": ":",
+            "width": 1,
+            "codePoint": 58
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "h",
+            "width": 1,
+            "codePoint": 104
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "5",
+            "width": 1,
+            "codePoint": 53
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 38,
+      "placeholderIssues": [],
+      "riskLevel": "critical",
+      "riskExplanation": "严重溢出: 超出限制 126.7% (68/30)"
+    },
+    {
+      "key": "sms.verificationCode",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "Your verification code is: {code}, please enter within 5 minutes",
+      "checkedText": "Your verification code is: XXXXXXXXXX, please enter within 5 minutes",
+      "widthResult": {
+        "text": "Your verification code is: XXXXXXXXXX, please enter within 5 minutes",
+        "charWidth": 68,
+        "charCount": 68,
+        "widthDetails": [
+          {
+            "char": "Y",
+            "width": 1,
+            "codePoint": 89
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "v",
+            "width": 1,
+            "codePoint": 118
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": ":",
+            "width": 1,
+            "codePoint": 58
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "h",
+            "width": 1,
+            "codePoint": 104
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "5",
+            "width": 1,
+            "codePoint": 53
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 18,
+      "placeholderIssues": [],
+      "riskLevel": "critical",
+      "riskExplanation": "严重溢出: 超出限制 36.0% (68/50)"
+    },
+    {
+      "key": "sms.welcome",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "Dear {username}, welcome back!",
+      "checkedText": "Dear XXXXXXXXXXXXXXXXXXXX, welcome back!",
+      "widthResult": {
+        "text": "Dear XXXXXXXXXXXXXXXXXXXX, welcome back!",
+        "charWidth": 40,
+        "charCount": 40,
+        "widthDetails": [
+          {
+            "char": "D",
+            "width": 1,
+            "codePoint": 68
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "b",
+            "width": 1,
+            "codePoint": 98
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "k",
+            "width": 1,
+            "codePoint": 107
+          },
+          {
+            "char": "!",
+            "width": 1,
+            "codePoint": 33
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 10,
+      "placeholderIssues": [],
+      "riskLevel": "critical",
+      "riskExplanation": "严重溢出: 超出限制 33.3% (40/30)"
+    },
+    {
+      "key": "toast.error",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "Operation failed, please try again later",
+      "checkedText": "Operation failed, please try again later",
+      "widthResult": {
+        "text": "Operation failed, please try again later",
+        "charWidth": 40,
+        "charCount": 40,
+        "widthDetails": [
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "y",
+            "width": 1,
+            "codePoint": 121
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 10,
+      "placeholderIssues": [],
+      "riskLevel": "critical",
+      "riskExplanation": "严重溢出: 超出限制 33.3% (40/30)"
+    },
+    {
+      "key": "sms.passwordReset",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "Your password reset code is: {code}",
+      "checkedText": "Your password reset code is: XXXXXXXXXX",
+      "widthResult": {
+        "text": "Your password reset code is: XXXXXXXXXX",
+        "charWidth": 39,
+        "charCount": 39,
+        "widthDetails": [
+          {
+            "char": "Y",
+            "width": 1,
+            "codePoint": 89
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": ":",
+            "width": 1,
+            "codePoint": 58
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 9,
+      "placeholderIssues": [],
+      "riskLevel": "critical",
+      "riskExplanation": "严重溢出: 超出限制 30.0% (39/30)"
+    },
+    {
+      "key": "button.login",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "Sign In",
+      "checkedText": "Sign In",
+      "widthResult": {
+        "text": "Sign In",
+        "charWidth": 7,
+        "charCount": 7,
+        "widthDetails": [
+          {
+            "char": "S",
+            "width": 1,
+            "codePoint": 83
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "I",
+            "width": 1,
+            "codePoint": 73
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        },
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 2 个占位符，可能导致运行时错误"
+    },
+    {
+      "key": "button.logout",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "Sign Out",
+      "checkedText": "Sign Out",
+      "widthResult": {
+        "text": "Sign Out",
+        "charWidth": 8,
+        "charCount": 8,
+        "widthDetails": [
+          {
+            "char": "S",
+            "width": 1,
+            "codePoint": 83
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        },
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 2 个占位符，可能导致运行时错误"
+    },
+    {
+      "key": "button.submit",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "Submit Form",
+      "checkedText": "Submit Form",
+      "widthResult": {
+        "text": "Submit Form",
+        "charWidth": 11,
+        "charCount": 11,
+        "widthDetails": [
+          {
+            "char": "S",
+            "width": 1,
+            "codePoint": 83
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "b",
+            "width": 1,
+            "codePoint": 98
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "F",
+            "width": 1,
+            "codePoint": 70
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        },
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 2 个占位符，可能导致运行时错误"
+    },
+    {
+      "key": "button.confirm",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "Confirm and Continue",
+      "checkedText": "Confirm and Continue",
+      "widthResult": {
+        "text": "Confirm and Continue",
+        "charWidth": 20,
+        "charCount": 20,
+        "widthDetails": [
+          {
+            "char": "C",
+            "width": 1,
+            "codePoint": 67
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "C",
+            "width": 1,
+            "codePoint": 67
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        },
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 2 个占位符，可能导致运行时错误"
+    },
+    {
+      "key": "button.cancel",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "Cancel Operation",
+      "checkedText": "Cancel Operation",
+      "widthResult": {
+        "text": "Cancel Operation",
+        "charWidth": 16,
+        "charCount": 16,
+        "widthDetails": [
+          {
+            "char": "C",
+            "width": 1,
+            "codePoint": 67
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        },
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 2 个占位符，可能导致运行时错误"
+    },
+    {
+      "key": "sms.verificationCode",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "Your verification code is: {code}, please enter within 5 minutes",
+      "checkedText": "Your verification code is: XXXXXXXXXX, please enter within 5 minutes",
+      "widthResult": {
+        "text": "Your verification code is: XXXXXXXXXX, please enter within 5 minutes",
+        "charWidth": 68,
+        "charCount": 68,
+        "widthDetails": [
+          {
+            "char": "Y",
+            "width": 1,
+            "codePoint": 89
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "v",
+            "width": 1,
+            "codePoint": 118
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": ":",
+            "width": 1,
+            "codePoint": 58
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "h",
+            "width": 1,
+            "codePoint": 104
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "5",
+            "width": 1,
+            "codePoint": 53
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 1 个占位符，可能导致运行时错误; 字符数超出: 68/35"
+    },
+    {
+      "key": "sms.welcome",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "Dear {username}, welcome back!",
+      "checkedText": "Dear XXXXXXXXXXXXXXXXXXXX, welcome back!",
+      "widthResult": {
+        "text": "Dear XXXXXXXXXXXXXXXXXXXX, welcome back!",
+        "charWidth": 40,
+        "charCount": 40,
+        "widthDetails": [
+          {
+            "char": "D",
+            "width": 1,
+            "codePoint": 68
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "b",
+            "width": 1,
+            "codePoint": 98
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "k",
+            "width": 1,
+            "codePoint": 107
+          },
+          {
+            "char": "!",
+            "width": 1,
+            "codePoint": 33
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 1 个占位符，可能导致运行时错误; 字符数超出: 40/35"
+    },
+    {
+      "key": "sms.passwordReset",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "Your password reset code is: {code}",
+      "checkedText": "Your password reset code is: XXXXXXXXXX",
+      "widthResult": {
+        "text": "Your password reset code is: XXXXXXXXXX",
+        "charWidth": 39,
+        "charCount": 39,
+        "widthDetails": [
+          {
+            "char": "Y",
+            "width": 1,
+            "codePoint": 89
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": ":",
+            "width": 1,
+            "codePoint": 58
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 1 个占位符，可能导致运行时错误; 字符数超出: 39/35"
+    },
+    {
+      "key": "toast.success",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "Operation completed successfully",
+      "checkedText": "Operation completed successfully",
+      "widthResult": {
+        "text": "Operation completed successfully",
+        "charWidth": 32,
+        "charCount": 32,
+        "widthDetails": [
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "y",
+            "width": 1,
+            "codePoint": 121
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        },
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 2 个占位符，可能导致运行时错误"
+    },
+    {
+      "key": "toast.error",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "Operation failed, please try again later",
+      "checkedText": "Operation failed, please try again later",
+      "widthResult": {
+        "text": "Operation failed, please try again later",
+        "charWidth": 40,
+        "charCount": 40,
+        "widthDetails": [
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "y",
+            "width": 1,
+            "codePoint": 121
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        },
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 2 个占位符，可能导致运行时错误; 字符数超出: 40/35"
+    },
+    {
+      "key": "toast.loading",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "Processing, please wait...",
+      "checkedText": "Processing, please wait...",
+      "widthResult": {
+        "text": "Processing, please wait...",
+        "charWidth": 26,
+        "charCount": 26,
+        "widthDetails": [
+          {
+            "char": "P",
+            "width": 1,
+            "codePoint": 80
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": ".",
+            "width": 1,
+            "codePoint": 46
+          },
+          {
+            "char": ".",
+            "width": 1,
+            "codePoint": 46
+          },
+          {
+            "char": ".",
+            "width": 1,
+            "codePoint": 46
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        },
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 2 个占位符，可能导致运行时错误"
+    },
+    {
+      "key": "plural.itemCount",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "No items",
+      "checkedText": "No items",
+      "pluralForm": "zero",
+      "widthResult": {
+        "text": "No items",
+        "charWidth": 8,
+        "charCount": 8,
+        "widthDetails": [
+          {
+            "char": "N",
+            "width": 1,
+            "codePoint": 78
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        },
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 2 个占位符，可能导致运行时错误"
+    },
+    {
+      "key": "plural.itemCount",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "1 item",
+      "checkedText": "1 item",
+      "pluralForm": "one",
+      "widthResult": {
+        "text": "1 item",
+        "charWidth": 6,
+        "charCount": 6,
+        "widthDetails": [
+          {
+            "char": "1",
+            "width": 1,
+            "codePoint": 49
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        },
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 2 个占位符，可能导致运行时错误"
+    },
+    {
+      "key": "plural.itemCount",
+      "locale": "en",
+      "interfacePosition": "短信验证码",
+      "originalText": "{count} items",
+      "checkedText": "XXXXXXXXXX items",
+      "pluralForm": "other",
+      "widthResult": {
+        "text": "XXXXXXXXXX items",
+        "charWidth": 16,
+        "charCount": 16,
+        "widthDetails": [
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          }
+        ]
+      },
+      "maxWidth": 70,
+      "widthOverflow": 0,
+      "placeholderIssues": [
+        {
+          "type": "missing",
+          "placeholder": "{code}",
+          "description": "目标文案中缺少预期的占位符: {code}"
+        },
+        {
+          "type": "missing",
+          "placeholder": "{username}",
+          "description": "目标文案中缺少预期的占位符: {username}"
+        }
+      ],
+      "riskLevel": "critical",
+      "riskExplanation": "缺失 2 个占位符，可能导致运行时错误"
+    },
+    {
+      "key": "toast.success",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "Operation completed successfully",
+      "checkedText": "Operation completed successfully",
+      "widthResult": {
+        "text": "Operation completed successfully",
+        "charWidth": 32,
+        "charCount": 32,
+        "widthDetails": [
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "y",
+            "width": 1,
+            "codePoint": 121
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 2,
+      "placeholderIssues": [],
+      "riskLevel": "info",
+      "riskExplanation": "轻微溢出: 超出限制 6.7%"
+    },
+    {
+      "key": "button.login",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "Sign In",
+      "checkedText": "Sign In",
+      "widthResult": {
+        "text": "Sign In",
+        "charWidth": 7,
+        "charCount": 7,
+        "widthDetails": [
+          {
+            "char": "S",
+            "width": 1,
+            "codePoint": 83
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "I",
+            "width": 1,
+            "codePoint": 73
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 7/30 单位, 字符数: 7"
+    },
+    {
+      "key": "button.login",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "Sign In",
+      "checkedText": "Sign In",
+      "widthResult": {
+        "text": "Sign In",
+        "charWidth": 7,
+        "charCount": 7,
+        "widthDetails": [
+          {
+            "char": "S",
+            "width": 1,
+            "codePoint": 83
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "I",
+            "width": 1,
+            "codePoint": 73
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 7/50 单位, 字符数: 7"
+    },
+    {
+      "key": "button.logout",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "Sign Out",
+      "checkedText": "Sign Out",
+      "widthResult": {
+        "text": "Sign Out",
+        "charWidth": 8,
+        "charCount": 8,
+        "widthDetails": [
+          {
+            "char": "S",
+            "width": 1,
+            "codePoint": 83
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 8/30 单位, 字符数: 8"
+    },
+    {
+      "key": "button.logout",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "Sign Out",
+      "checkedText": "Sign Out",
+      "widthResult": {
+        "text": "Sign Out",
+        "charWidth": 8,
+        "charCount": 8,
+        "widthDetails": [
+          {
+            "char": "S",
+            "width": 1,
+            "codePoint": 83
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 8/50 单位, 字符数: 8"
+    },
+    {
+      "key": "button.submit",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "Submit Form",
+      "checkedText": "Submit Form",
+      "widthResult": {
+        "text": "Submit Form",
+        "charWidth": 11,
+        "charCount": 11,
+        "widthDetails": [
+          {
+            "char": "S",
+            "width": 1,
+            "codePoint": 83
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "b",
+            "width": 1,
+            "codePoint": 98
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "F",
+            "width": 1,
+            "codePoint": 70
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 11/30 单位, 字符数: 11"
+    },
+    {
+      "key": "button.submit",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "Submit Form",
+      "checkedText": "Submit Form",
+      "widthResult": {
+        "text": "Submit Form",
+        "charWidth": 11,
+        "charCount": 11,
+        "widthDetails": [
+          {
+            "char": "S",
+            "width": 1,
+            "codePoint": 83
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "b",
+            "width": 1,
+            "codePoint": 98
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "F",
+            "width": 1,
+            "codePoint": 70
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 11/50 单位, 字符数: 11"
+    },
+    {
+      "key": "button.confirm",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "Confirm and Continue",
+      "checkedText": "Confirm and Continue",
+      "widthResult": {
+        "text": "Confirm and Continue",
+        "charWidth": 20,
+        "charCount": 20,
+        "widthDetails": [
+          {
+            "char": "C",
+            "width": 1,
+            "codePoint": 67
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "C",
+            "width": 1,
+            "codePoint": 67
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 20/30 单位, 字符数: 20"
+    },
+    {
+      "key": "button.confirm",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "Confirm and Continue",
+      "checkedText": "Confirm and Continue",
+      "widthResult": {
+        "text": "Confirm and Continue",
+        "charWidth": 20,
+        "charCount": 20,
+        "widthDetails": [
+          {
+            "char": "C",
+            "width": 1,
+            "codePoint": 67
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "C",
+            "width": 1,
+            "codePoint": 67
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 20/50 单位, 字符数: 20"
+    },
+    {
+      "key": "button.cancel",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "Cancel Operation",
+      "checkedText": "Cancel Operation",
+      "widthResult": {
+        "text": "Cancel Operation",
+        "charWidth": 16,
+        "charCount": 16,
+        "widthDetails": [
+          {
+            "char": "C",
+            "width": 1,
+            "codePoint": 67
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 16/30 单位, 字符数: 16"
+    },
+    {
+      "key": "button.cancel",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "Cancel Operation",
+      "checkedText": "Cancel Operation",
+      "widthResult": {
+        "text": "Cancel Operation",
+        "charWidth": 16,
+        "charCount": 16,
+        "widthDetails": [
+          {
+            "char": "C",
+            "width": 1,
+            "codePoint": 67
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 16/50 单位, 字符数: 16"
+    },
+    {
+      "key": "sms.welcome",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "Dear {username}, welcome back!",
+      "checkedText": "Dear XXXXXXXXXXXXXXXXXXXX, welcome back!",
+      "widthResult": {
+        "text": "Dear XXXXXXXXXXXXXXXXXXXX, welcome back!",
+        "charWidth": 40,
+        "charCount": 40,
+        "widthDetails": [
+          {
+            "char": "D",
+            "width": 1,
+            "codePoint": 68
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "b",
+            "width": 1,
+            "codePoint": 98
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "k",
+            "width": 1,
+            "codePoint": 107
+          },
+          {
+            "char": "!",
+            "width": 1,
+            "codePoint": 33
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 40/50 单位, 字符数: 40"
+    },
+    {
+      "key": "sms.passwordReset",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "Your password reset code is: {code}",
+      "checkedText": "Your password reset code is: XXXXXXXXXX",
+      "widthResult": {
+        "text": "Your password reset code is: XXXXXXXXXX",
+        "charWidth": 39,
+        "charCount": 39,
+        "widthDetails": [
+          {
+            "char": "Y",
+            "width": 1,
+            "codePoint": 89
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": ":",
+            "width": 1,
+            "codePoint": 58
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 39/50 单位, 字符数: 39"
+    },
+    {
+      "key": "toast.success",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "Operation completed successfully",
+      "checkedText": "Operation completed successfully",
+      "widthResult": {
+        "text": "Operation completed successfully",
+        "charWidth": 32,
+        "charCount": 32,
+        "widthDetails": [
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "u",
+            "width": 1,
+            "codePoint": 117
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "y",
+            "width": 1,
+            "codePoint": 121
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 32/50 单位, 字符数: 32"
+    },
+    {
+      "key": "toast.error",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "Operation failed, please try again later",
+      "checkedText": "Operation failed, please try again later",
+      "widthResult": {
+        "text": "Operation failed, please try again later",
+        "charWidth": 40,
+        "charCount": 40,
+        "widthDetails": [
+          {
+            "char": "O",
+            "width": 1,
+            "codePoint": 79
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "f",
+            "width": 1,
+            "codePoint": 102
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "d",
+            "width": 1,
+            "codePoint": 100
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "y",
+            "width": 1,
+            "codePoint": 121
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 40/50 单位, 字符数: 40"
+    },
+    {
+      "key": "toast.loading",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "Processing, please wait...",
+      "checkedText": "Processing, please wait...",
+      "widthResult": {
+        "text": "Processing, please wait...",
+        "charWidth": 26,
+        "charCount": 26,
+        "widthDetails": [
+          {
+            "char": "P",
+            "width": 1,
+            "codePoint": 80
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": ".",
+            "width": 1,
+            "codePoint": 46
+          },
+          {
+            "char": ".",
+            "width": 1,
+            "codePoint": 46
+          },
+          {
+            "char": ".",
+            "width": 1,
+            "codePoint": 46
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 26/30 单位, 字符数: 26"
+    },
+    {
+      "key": "toast.loading",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "Processing, please wait...",
+      "checkedText": "Processing, please wait...",
+      "widthResult": {
+        "text": "Processing, please wait...",
+        "charWidth": 26,
+        "charCount": 26,
+        "widthDetails": [
+          {
+            "char": "P",
+            "width": 1,
+            "codePoint": 80
+          },
+          {
+            "char": "r",
+            "width": 1,
+            "codePoint": 114
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": "c",
+            "width": 1,
+            "codePoint": 99
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "n",
+            "width": 1,
+            "codePoint": 110
+          },
+          {
+            "char": "g",
+            "width": 1,
+            "codePoint": 103
+          },
+          {
+            "char": ",",
+            "width": 1,
+            "codePoint": 44
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "p",
+            "width": 1,
+            "codePoint": 112
+          },
+          {
+            "char": "l",
+            "width": 1,
+            "codePoint": 108
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "w",
+            "width": 1,
+            "codePoint": 119
+          },
+          {
+            "char": "a",
+            "width": 1,
+            "codePoint": 97
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": ".",
+            "width": 1,
+            "codePoint": 46
+          },
+          {
+            "char": ".",
+            "width": 1,
+            "codePoint": 46
+          },
+          {
+            "char": ".",
+            "width": 1,
+            "codePoint": 46
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 26/50 单位, 字符数: 26"
+    },
+    {
+      "key": "plural.itemCount",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "No items",
+      "checkedText": "No items",
+      "pluralForm": "zero",
+      "widthResult": {
+        "text": "No items",
+        "charWidth": 8,
+        "charCount": 8,
+        "widthDetails": [
+          {
+            "char": "N",
+            "width": 1,
+            "codePoint": 78
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 8/30 单位, 字符数: 8"
+    },
+    {
+      "key": "plural.itemCount",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "No items",
+      "checkedText": "No items",
+      "pluralForm": "zero",
+      "widthResult": {
+        "text": "No items",
+        "charWidth": 8,
+        "charCount": 8,
+        "widthDetails": [
+          {
+            "char": "N",
+            "width": 1,
+            "codePoint": 78
+          },
+          {
+            "char": "o",
+            "width": 1,
+            "codePoint": 111
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 8/50 单位, 字符数: 8"
+    },
+    {
+      "key": "plural.itemCount",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "1 item",
+      "checkedText": "1 item",
+      "pluralForm": "one",
+      "widthResult": {
+        "text": "1 item",
+        "charWidth": 6,
+        "charCount": 6,
+        "widthDetails": [
+          {
+            "char": "1",
+            "width": 1,
+            "codePoint": 49
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 6/30 单位, 字符数: 6"
+    },
+    {
+      "key": "plural.itemCount",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "1 item",
+      "checkedText": "1 item",
+      "pluralForm": "one",
+      "widthResult": {
+        "text": "1 item",
+        "charWidth": 6,
+        "charCount": 6,
+        "widthDetails": [
+          {
+            "char": "1",
+            "width": 1,
+            "codePoint": 49
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 6/50 单位, 字符数: 6"
+    },
+    {
+      "key": "plural.itemCount",
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "originalText": "{count} items",
+      "checkedText": "XXXXXXXXXX items",
+      "pluralForm": "other",
+      "widthResult": {
+        "text": "XXXXXXXXXX items",
+        "charWidth": 16,
+        "charCount": 16,
+        "widthDetails": [
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          }
+        ]
+      },
+      "maxWidth": 30,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 16/30 单位, 字符数: 16"
+    },
+    {
+      "key": "plural.itemCount",
+      "locale": "en",
+      "interfacePosition": "Toast提示",
+      "originalText": "{count} items",
+      "checkedText": "XXXXXXXXXX items",
+      "pluralForm": "other",
+      "widthResult": {
+        "text": "XXXXXXXXXX items",
+        "charWidth": 16,
+        "charCount": 16,
+        "widthDetails": [
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": "X",
+            "width": 1,
+            "codePoint": 88
+          },
+          {
+            "char": " ",
+            "width": 1,
+            "codePoint": 32
+          },
+          {
+            "char": "i",
+            "width": 1,
+            "codePoint": 105
+          },
+          {
+            "char": "t",
+            "width": 1,
+            "codePoint": 116
+          },
+          {
+            "char": "e",
+            "width": 1,
+            "codePoint": 101
+          },
+          {
+            "char": "m",
+            "width": 1,
+            "codePoint": 109
+          },
+          {
+            "char": "s",
+            "width": 1,
+            "codePoint": 115
+          }
+        ]
+      },
+      "maxWidth": 50,
+      "widthOverflow": 0,
+      "placeholderIssues": [],
+      "riskLevel": "safe",
+      "riskExplanation": "检测通过 - 宽度: 16/50 单位, 字符数: 16"
+    }
+  ],
+  "config": {
+    "inputFiles": [
+      "/Users/lzy/pro/solo/workspaces/zy71067/examples/locales/en.json"
+    ],
+    "outputDir": "/Users/lzy/pro/solo/workspaces/zy71067/reports",
+    "checkConfigs": [
+      {
+        "locale": "zh-CN",
+        "interfacePosition": "登录按钮",
+        "maxWidth": 20,
+        "placeholders": []
+      },
+      {
+        "locale": "en",
+        "interfacePosition": "登录按钮",
+        "maxWidth": 30,
+        "placeholders": []
+      },
+      {
+        "locale": "ja",
+        "interfacePosition": "登录按钮",
+        "maxWidth": 25,
+        "placeholders": []
+      },
+      {
+        "locale": "*",
+        "interfacePosition": "短信验证码",
+        "maxWidth": 70,
+        "maxChars": 35,
+        "placeholders": [
+          "{code}",
+          "{username}"
+        ]
+      },
+      {
+        "locale": "*",
+        "interfacePosition": "Toast提示",
+        "maxWidth": 50,
+        "placeholders": []
+      }
+    ],
+    "timestamp": "2026-05-24T14:18:31.334Z"
+  }
+}

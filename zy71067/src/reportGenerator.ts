@@ -269,12 +269,16 @@ function printTerminalSummary(report: FullReport): void {
   console.log('');
   
   const barLength = 40;
-  const safeRatio = summary.safeCount / summary.totalChecks;
+  const safeRatio = summary.totalChecks > 0 ? summary.safeCount / summary.totalChecks : 0;
   const safeBar = '█'.repeat(Math.round(barLength * safeRatio));
   const otherBar = '░'.repeat(barLength - safeBar.length);
   
   console.log('整体状况:');
-  console.log(`${chalk.green(safeBar)}${chalk.gray(otherBar)} ${Math.round(safeRatio * 100)}%`);
+  if (summary.totalChecks > 0) {
+    console.log(`${chalk.green(safeBar)}${chalk.gray(otherBar)} ${Math.round(safeRatio * 100)}%`);
+  } else {
+    console.log(chalk.gray('无检测数据'));
+  }
   console.log('');
   
   console.log(chalk.bold('摘要统计:'));

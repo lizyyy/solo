@@ -125,9 +125,22 @@ async function main() {
   }
 
   try {
-    const results = runChecks(resolvedFiles, checkConfigs, {
+    const { results, parseErrors } = runChecks(resolvedFiles, checkConfigs, {
       verbose: opts.verbose,
     });
+
+    if (parseErrors.length > 0) {
+      console.error('');
+      console.error(`错误: 有 ${parseErrors.length} 个文件解析失败`);
+      for (const err of parseErrors) {
+        console.error(`  - ${err.file}: ${err.error}`);
+      }
+    }
+
+    if (results.length === 0) {
+      console.error('错误: 没有可检测的文案条目，请检查输入文件和语言配置');
+      process.exit(4);
+    }
 
     const { summary, files } = generateReports(results, {
       outputDir: resolvedOutputDir,
@@ -144,6 +157,10 @@ async function main() {
       for (const file of files) {
         console.log(`  - ${file}`);
       }
+    }
+
+    if (parseErrors.length > 0) {
+      process.exit(4);
     }
 
     process.exit(getExitCode(summary));

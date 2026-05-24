@@ -43,13 +43,16 @@ const placeholderChecker_1 = require("./placeholderChecker");
 const riskAssessor_1 = require("./riskAssessor");
 function runChecks(inputFiles, checkConfigs, options = {}) {
     const allEntries = [];
+    const parseErrors = [];
     for (const file of inputFiles) {
         try {
             const entries = (0, parser_1.parseI18nFile)(file);
             allEntries.push(...entries);
         }
         catch (error) {
-            console.error(`解析文件失败 ${file}:`, error.message);
+            const errorMessage = error.message;
+            parseErrors.push({ file, error: errorMessage });
+            console.error(`解析文件失败 ${file}:`, errorMessage);
         }
     }
     const results = [];
@@ -63,7 +66,7 @@ function runChecks(inputFiles, checkConfigs, options = {}) {
             results.push(result);
         }
     }
-    return results;
+    return { results, parseErrors };
 }
 function checkEntry(entry, config, sourceEntries) {
     const sourceEntry = sourceEntries.find(s => s.key === entry.key && s.pluralForm === entry.pluralForm);
@@ -127,7 +130,20 @@ function loadConfigFile(configPath) {
 }
 function generateConfigHash(config) {
     const crypto = require('crypto');
-    const configString = JSON.stringify(config, Object.keys(config).sort());
+    function stableStringify(obj) {
+        if (obj === null || obj === undefined) {
+            return String(obj);
+        }
+        if (typeof obj !== 'object') {
+            return JSON.stringify(obj);
+        }
+        if (Array.isArray(obj)) {
+            return '[' + obj.map(item => stableStringify(item)).join(',') + ']';
+        }
+        const keys = Object.keys(obj).sort();
+        return '{' + keys.map(key => JSON.stringify(key) + ':' + stableStringify(obj[key])).join(',') + '}';
+    }
+    const configString = stableStringify(config);
     return crypto.createHash('md5').update(configString).digest('hex').substring(0, 8);
 }
 //# sourceMappingURL=checker.js.map

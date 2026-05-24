@@ -246,11 +246,16 @@ function printTerminalSummary(report) {
     console.log(chalk_1.default.gray(`配置哈希: ${summary.configHash}`));
     console.log('');
     const barLength = 40;
-    const safeRatio = summary.safeCount / summary.totalChecks;
+    const safeRatio = summary.totalChecks > 0 ? summary.safeCount / summary.totalChecks : 0;
     const safeBar = '█'.repeat(Math.round(barLength * safeRatio));
     const otherBar = '░'.repeat(barLength - safeBar.length);
     console.log('整体状况:');
-    console.log(`${chalk_1.default.green(safeBar)}${chalk_1.default.gray(otherBar)} ${Math.round(safeRatio * 100)}%`);
+    if (summary.totalChecks > 0) {
+        console.log(`${chalk_1.default.green(safeBar)}${chalk_1.default.gray(otherBar)} ${Math.round(safeRatio * 100)}%`);
+    }
+    else {
+        console.log(chalk_1.default.gray('无检测数据'));
+    }
     console.log('');
     console.log(chalk_1.default.bold('摘要统计:'));
     console.log(`  总检测数: ${summary.totalChecks}`);
