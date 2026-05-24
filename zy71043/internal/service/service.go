@@ -256,18 +256,6 @@ func (s *Service) CompleteVentilation(req *VentilationCompleteRequest) (*models.
 		return nil, models.ErrInvalidState
 	}
 
-	duration := int(req.EndedAt.Sub(vent.StartedAt).Minutes())
-
-	tx, err := s.repo.DB.Begin()
-	if err != nil {
-		return nil, err
-	}
-	defer tx.Rollback()
-
-	if err := s.repo.CompleteVentilation(tx, vent.ID, req.EndedAt, duration, req.AfterHumidity); err != nil {
-		return nil, err
-	}
-
 	sample, err := s.repo.GetSampleByID(vent.SampleID)
 	if err != nil {
 		return nil, err
@@ -278,9 +266,20 @@ func (s *Service) CompleteVentilation(req *VentilationCompleteRequest) (*models.
 		return nil, err
 	}
 
+	duration := int(req.EndedAt.Sub(vent.StartedAt).Minutes())
 	newStatus := models.SampleStatusResolved
 	if req.AfterHumidity > area.HumidityMax || req.AfterHumidity < area.HumidityMin {
 		newStatus = models.SampleStatusOverLimit
+	}
+
+	tx, err := s.repo.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	if err := s.repo.CompleteVentilation(tx, vent.ID, req.EndedAt, duration, req.AfterHumidity); err != nil {
+		return nil, err
 	}
 
 	if err := s.repo.UpdateSampleStatus(tx, sample.ID, newStatus, nil); err != nil {
@@ -564,12 +563,7 @@ func (s *Service) CreateInspection(req *InspectionRequest) (*models.InspectionRe
 func (s *Service) Review(req *ReviewRequest) error {
 	reviewedAt := time.Now()
 
-	tx, err := s.repo.DB.Begin()
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
+	var err error
 	switch req.ResourceType {
 	case "sample":
 		sample, err := s.repo.GetSampleByID(req.ResourceID)
@@ -579,9 +573,6 @@ func (s *Service) Review(req *ReviewRequest) error {
 		if sample.Status != models.SampleStatusOverLimit && sample.Status != models.SampleStatusResolved {
 			return models.ErrInvalidState
 		}
-		if err := s.repo.ReviewSample(tx, req.ResourceID, req.ReviewedBy, reviewedAt); err != nil {
-			return err
-		}
 	case "ventilation":
 		vent, err := s.repo.GetVentilationByID(req.ResourceID)
 		if err != nil {
@@ -589,9 +580,6 @@ func (s *Service) Review(req *ReviewRequest) error {
 		}
 		if vent.Status != models.VentilationStatusComplete {
 			return models.ErrInvalidState
-		}
-		if err := s.repo.ReviewVentilation(tx, vent.ID, req.ReviewedBy, reviewedAt); err != nil {
-			return err
 		}
 	case "transfer":
 		transfer, err := s.repo.GetTransferByID(req.ResourceID)
@@ -601,9 +589,6 @@ func (s *Service) Review(req *ReviewRequest) error {
 		if transfer.Status != models.TransferStatusComplete || transfer.Undone {
 			return models.ErrInvalidState
 		}
-		if err := s.repo.ReviewTransfer(tx, req.ResourceID, req.ReviewedBy, reviewedAt); err != nil {
-			return err
-		}
 	case "inspection":
 		inspection, err := s.repo.GetInspectionByID(req.ResourceID)
 		if err != nil {
@@ -612,11 +597,36 @@ func (s *Service) Review(req *ReviewRequest) error {
 		if inspection.Status != models.InspectionStatusComplete {
 			return models.ErrInvalidState
 		}
-		if err := s.repo.ReviewInspection(tx, inspection.ID, req.ReviewedBy, reviewedAt); err != nil {
-			return err
-		}
 	default:
 		return models.ErrValidationFailed
+	}
+	if err != nil {
+		return err
+	}
+
+	tx, err := s.repo.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	switch req.ResourceType {
+	case "sample":
+		if err := s.repo.ReviewSample(tx, req.ResourceID, req.ReviewedBy, reviewedAt); err != nil {
+			return err
+		}
+	case "ventilation":
+		if err := s.repo.ReviewVentilation(tx, req.ResourceID, req.ReviewedBy, reviewedAt); err != nil {
+			return err
+		}
+	case "transfer":
+		if err := s.repo.ReviewTransfer(tx, req.ResourceID, req.ReviewedBy, reviewedAt); err != nil {
+			return err
+		}
+	case "inspection":
+		if err := s.repo.ReviewInspection(tx, req.ResourceID, req.ReviewedBy, reviewedAt); err != nil {
+			return err
+		}
 	}
 
 	if err := s.repo.CreateAuditLog(tx, "review", req.ResourceType, req.ResourceID, req.ReviewedBy, nil, "reviewed"); err != nil {

@@ -24,8 +24,8 @@ func NewDB(dataSourceName string) (*DB, error) {
 		return nil, err
 	}
 
-	db.SetMaxOpenConns(1)
-	db.SetMaxIdleConns(1)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(5)
 
 	return &DB{db}, nil
 }
