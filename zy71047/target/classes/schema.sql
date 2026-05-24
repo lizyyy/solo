@@ -82,8 +82,7 @@ CREATE TABLE IF NOT EXISTS transfer_ear_tag (
     duplicate_across_order BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (transfer_id) REFERENCES transfer_order(id),
-    FOREIGN KEY (ear_tag_id) REFERENCES ear_tag(id),
-    UNIQUE(transfer_id, ear_tag_id)
+    FOREIGN KEY (ear_tag_id) REFERENCES ear_tag(id)
 );
 
 CREATE TABLE IF NOT EXISTS transfer_validation (

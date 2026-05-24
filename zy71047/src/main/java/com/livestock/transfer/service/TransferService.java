@@ -29,6 +29,7 @@ public class TransferService {
     private final QuarantineCertificateRepository certificateRepository;
     private final TransportVehicleRepository vehicleRepository;
     private final OperationLogRepository operationLogRepository;
+    private final AcceptanceRecordRepository acceptanceRecordRepository;
     private final TransferNoGenerator noGenerator;
     private final ObjectMapper objectMapper;
 
@@ -40,6 +41,7 @@ public class TransferService {
             QuarantineCertificateRepository certificateRepository,
             TransportVehicleRepository vehicleRepository,
             OperationLogRepository operationLogRepository,
+            AcceptanceRecordRepository acceptanceRecordRepository,
             TransferNoGenerator noGenerator,
             ObjectMapper objectMapper) {
         this.transferOrderRepository = transferOrderRepository;
@@ -50,6 +52,7 @@ public class TransferService {
         this.certificateRepository = certificateRepository;
         this.vehicleRepository = vehicleRepository;
         this.operationLogRepository = operationLogRepository;
+        this.acceptanceRecordRepository = acceptanceRecordRepository;
         this.noGenerator = noGenerator;
         this.objectMapper = objectMapper;
     }
@@ -98,12 +101,11 @@ public class TransferService {
     public void saveEarTags(Long transferId, List<String> tagNos) {
         transferEarTagRepository.deleteByTransferId(transferId);
 
-        Set<String> uniqueTags = new HashSet<>(tagNos);
-        Map<String, Long> earTagIdMap = earTagRepository.findByTagNoIn(new ArrayList<>(uniqueTags))
+        Map<String, Long> earTagIdMap = earTagRepository.findByTagNoIn(new ArrayList<>(new HashSet<>(tagNos)))
                 .stream()
                 .collect(Collectors.toMap(EarTag::getTagNo, EarTag::getId));
 
-        for (String tagNo : uniqueTags) {
+        for (String tagNo : tagNos) {
             TransferEarTag transferEarTag = new TransferEarTag();
             transferEarTag.setTransferId(transferId);
             transferEarTag.setTagNo(tagNo);
@@ -409,7 +411,7 @@ public class TransferService {
 
         vo.setEarTags(transferEarTagRepository.findByTransferId(transferId));
         vo.setValidations(validationRepository.findByTransferId(transferId));
-        vo.setAcceptanceRecords(null);
+        vo.setAcceptanceRecords(acceptanceRecordRepository.findByTransferId(transferId));
         vo.setOperationLogs(operationLogRepository.findByTransferIdOrderByCreatedAtDesc(transferId));
 
         return vo;
