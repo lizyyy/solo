@@ -41,7 +41,7 @@ export const DEFAULT_TTL_TIERS: TTLTierConfig[] = [
 export const DEFAULT_ENVIRONMENTS: EnvironmentConfig[] = [
   {
     name: 'production',
-    patterns: ['prod', 'production', 'www', 'api', ''],
+    patterns: ['prod', 'production', 'www', 'api'],
     color: 'red'
   },
   {

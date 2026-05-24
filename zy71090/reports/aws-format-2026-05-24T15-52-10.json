@@ -18,13 +18,13 @@
         "name": "api.example.com",
         "type": "CNAME",
         "ttl": 1800,
-        "value": "www.example.com."
+        "value": "www.example.com"
       },
       {
         "name": "app.example.com",
         "type": "CNAME",
         "ttl": 1800,
-        "value": "api.example.com."
+        "value": "api.example.com"
       },
       {
         "name": "prod-www.example.com",
@@ -60,7 +60,7 @@
         "name": "metrics.example.com",
         "type": "CNAME",
         "ttl": 300,
-        "value": "monitor.example.com."
+        "value": "monitor.example.com"
       }
     ]
   },
@@ -108,7 +108,7 @@
         "name": "api.example.com",
         "type": "CNAME",
         "ttl": 1800,
-        "value": "www.example.com."
+        "value": "www.example.com"
       },
       "tier": "MEDIUM",
       "tierInfo": {
@@ -127,7 +127,7 @@
         "name": "app.example.com",
         "type": "CNAME",
         "ttl": 1800,
-        "value": "api.example.com."
+        "value": "api.example.com"
       },
       "tier": "MEDIUM",
       "tierInfo": {
@@ -241,7 +241,7 @@
         "name": "metrics.example.com",
         "type": "CNAME",
         "ttl": 300,
-        "value": "monitor.example.com."
+        "value": "monitor.example.com"
       },
       "tier": "HIGH",
       "tierInfo": {
@@ -265,7 +265,7 @@
         "value": "192.168.1.1"
       },
       "environments": [
-        "production"
+        "unknown"
       ],
       "isWildcard": false,
       "hasAlias": false
@@ -288,23 +288,23 @@
         "name": "api.example.com",
         "type": "CNAME",
         "ttl": 1800,
-        "value": "www.example.com."
+        "value": "www.example.com"
       },
       "environments": [
         "production"
       ],
       "isWildcard": false,
-      "hasAlias": false
+      "hasAlias": true
     },
     {
       "record": {
         "name": "app.example.com",
         "type": "CNAME",
         "ttl": 1800,
-        "value": "api.example.com."
+        "value": "api.example.com"
       },
       "environments": [
-        "production"
+        "unknown"
       ],
       "isWildcard": false,
       "hasAlias": false
@@ -330,7 +330,6 @@
         "value": "192.168.1.20"
       },
       "environments": [
-        "production",
         "staging"
       ],
       "isWildcard": false,
@@ -344,7 +343,6 @@
         "value": "192.168.1.30"
       },
       "environments": [
-        "production",
         "development"
       ],
       "isWildcard": false,
@@ -358,7 +356,7 @@
         "value": "192.168.1.60"
       },
       "environments": [
-        "production"
+        "unknown"
       ],
       "isWildcard": false,
       "hasAlias": false
@@ -371,8 +369,7 @@
         "value": "192.168.1.100"
       },
       "environments": [
-        "production",
-        "monitoring"
+        "unknown"
       ],
       "isWildcard": false,
       "hasAlias": false
@@ -382,11 +379,10 @@
         "name": "metrics.example.com",
         "type": "CNAME",
         "ttl": 300,
-        "value": "monitor.example.com."
+        "value": "monitor.example.com"
       },
       "environments": [
-        "production",
-        "monitoring"
+        "unknown"
       ],
       "isWildcard": false,
       "hasAlias": false
@@ -400,7 +396,7 @@
           "name": "api.example.com",
           "type": "CNAME",
           "ttl": 1800,
-          "value": "www.example.com."
+          "value": "www.example.com"
         }
       ],
       "totalTTL": 1800,
@@ -409,9 +405,7 @@
       "averageTTL": 1800,
       "depth": 1,
       "isCircular": false,
-      "unresolved": [
-        "www.example.com."
-      ]
+      "unresolved": []
     },
     {
       "domain": "app.example.com",
@@ -420,18 +414,22 @@
           "name": "app.example.com",
           "type": "CNAME",
           "ttl": 1800,
-          "value": "api.example.com."
+          "value": "api.example.com"
+        },
+        {
+          "name": "api.example.com",
+          "type": "CNAME",
+          "ttl": 1800,
+          "value": "www.example.com"
         }
       ],
-      "totalTTL": 1800,
+      "totalTTL": 3600,
       "maxTTL": 1800,
       "minTTL": 1800,
       "averageTTL": 1800,
-      "depth": 1,
+      "depth": 2,
       "isCircular": false,
-      "unresolved": [
-        "api.example.com."
-      ]
+      "unresolved": []
     },
     {
       "domain": "metrics.example.com",
@@ -440,7 +438,7 @@
           "name": "metrics.example.com",
           "type": "CNAME",
           "ttl": 300,
-          "value": "monitor.example.com."
+          "value": "monitor.example.com"
         }
       ],
       "totalTTL": 300,
@@ -449,397 +447,10 @@
       "averageTTL": 300,
       "depth": 1,
       "isCircular": false,
-      "unresolved": [
-        "monitor.example.com."
-      ]
+      "unresolved": []
     }
   ],
-  "missingRecords": [
-    {
-      "environment": "staging",
-      "recordName": "example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "testing",
-      "recordName": "example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "development",
-      "recordName": "example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "internal",
-      "recordName": "example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "monitoring",
-      "recordName": "example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "staging",
-      "recordName": "www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "testing",
-      "recordName": "www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "development",
-      "recordName": "www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "internal",
-      "recordName": "www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "monitoring",
-      "recordName": "www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "staging",
-      "recordName": "api.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "testing",
-      "recordName": "api.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "development",
-      "recordName": "api.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "internal",
-      "recordName": "api.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "monitoring",
-      "recordName": "api.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "staging",
-      "recordName": "app.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "testing",
-      "recordName": "app.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "development",
-      "recordName": "app.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "internal",
-      "recordName": "app.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "monitoring",
-      "recordName": "app.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "staging",
-      "recordName": "prod-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "testing",
-      "recordName": "prod-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "development",
-      "recordName": "prod-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "internal",
-      "recordName": "prod-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "monitoring",
-      "recordName": "prod-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "testing",
-      "recordName": "stg-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "staging"
-      ]
-    },
-    {
-      "environment": "development",
-      "recordName": "stg-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "staging"
-      ]
-    },
-    {
-      "environment": "internal",
-      "recordName": "stg-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "staging"
-      ]
-    },
-    {
-      "environment": "monitoring",
-      "recordName": "stg-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "staging"
-      ]
-    },
-    {
-      "environment": "staging",
-      "recordName": "dev-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "development"
-      ]
-    },
-    {
-      "environment": "testing",
-      "recordName": "dev-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "development"
-      ]
-    },
-    {
-      "environment": "internal",
-      "recordName": "dev-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "development"
-      ]
-    },
-    {
-      "environment": "monitoring",
-      "recordName": "dev-www.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "development"
-      ]
-    },
-    {
-      "environment": "staging",
-      "recordName": "legacy.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "testing",
-      "recordName": "legacy.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "development",
-      "recordName": "legacy.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "internal",
-      "recordName": "legacy.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "monitoring",
-      "recordName": "legacy.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production"
-      ]
-    },
-    {
-      "environment": "staging",
-      "recordName": "monitor.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "monitoring"
-      ]
-    },
-    {
-      "environment": "testing",
-      "recordName": "monitor.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "monitoring"
-      ]
-    },
-    {
-      "environment": "development",
-      "recordName": "monitor.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "monitoring"
-      ]
-    },
-    {
-      "environment": "internal",
-      "recordName": "monitor.example.com",
-      "type": "A",
-      "foundInEnvironments": [
-        "production",
-        "monitoring"
-      ]
-    },
-    {
-      "environment": "staging",
-      "recordName": "metrics.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production",
-        "monitoring"
-      ]
-    },
-    {
-      "environment": "testing",
-      "recordName": "metrics.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production",
-        "monitoring"
-      ]
-    },
-    {
-      "environment": "development",
-      "recordName": "metrics.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production",
-        "monitoring"
-      ]
-    },
-    {
-      "environment": "internal",
-      "recordName": "metrics.example.com",
-      "type": "CNAME",
-      "foundInEnvironments": [
-        "production",
-        "monitoring"
-      ]
-    }
-  ],
+  "missingRecords": [],
   "summary": {
     "totalRecords": 10,
     "byTier": {
@@ -854,14 +465,14 @@
       "CNAME": 3
     },
     "byEnvironment": {
-      "production": 10,
+      "unknown": 5,
+      "production": 3,
       "staging": 1,
-      "development": 1,
-      "monitoring": 2
+      "development": 1
     },
     "needsAdjustment": 2,
     "cnameChainsCount": 3,
-    "missingRecordsCount": 46,
+    "missingRecordsCount": 0,
     "averageTTL": 26766,
     "maxTTL": 172800,
     "minTTL": 60

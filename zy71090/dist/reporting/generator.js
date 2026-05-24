@@ -203,6 +203,13 @@ function generateTerminalReport(result, verbose) {
         tierData.push([colorFn(tier), count.toString(), percentage]);
     }
     console.log((0, table_1.table)(tierData));
+    console.log(chalk_1.default.white.bold('🌍 环境分布'));
+    console.log(chalk_1.default.gray('────────────────────────────────────────────────────────────'));
+    const envData = [['环境', '记录数']];
+    for (const [env, count] of Object.entries(summary.byEnvironment)) {
+        envData.push([env, count.toString()]);
+    }
+    console.log((0, table_1.table)(envData));
     console.log(chalk_1.default.white.bold('⚠️ 需调整记录'));
     console.log(chalk_1.default.gray('────────────────────────────────────────────────────────────'));
     const needsAdjustment = ttlAnalysis.filter(a => a.needsAdjustment);

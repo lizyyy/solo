@@ -59,7 +59,7 @@ function detectEnvironments(domain, envConfigs) {
 }
 function matchesPattern(domain, pattern) {
     if (!pattern)
-        return true;
+        return false;
     const patternLower = pattern.toLowerCase();
     if (domain === patternLower) {
         return true;

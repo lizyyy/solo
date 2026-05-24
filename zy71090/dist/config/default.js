@@ -41,7 +41,7 @@ exports.DEFAULT_TTL_TIERS = [
 exports.DEFAULT_ENVIRONMENTS = [
     {
         name: 'production',
-        patterns: ['prod', 'production', 'www', 'api', ''],
+        patterns: ['prod', 'production', 'www', 'api'],
         color: 'red'
     },
     {

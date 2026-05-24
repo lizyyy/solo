@@ -191,10 +191,11 @@ function parseBINDRecordLine(line, origin, defaultTTL, currentName) {
     };
 }
 function normalizeDomain(domain) {
-    if (domain.endsWith('.')) {
-        return domain.slice(0, -1);
+    let result = domain;
+    if (result.endsWith('.')) {
+        result = result.slice(0, -1);
     }
-    return domain;
+    return result.toLowerCase();
 }
 function normalizeRecordValue(type, value) {
     type = type.toUpperCase();

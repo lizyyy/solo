@@ -217,6 +217,14 @@ function generateTerminalReport(result: AnalysisResult, verbose: boolean): void 
   }
   console.log(table(tierData));
   
+  console.log(chalk.white.bold('🌍 环境分布'));
+  console.log(chalk.gray('────────────────────────────────────────────────────────────'));
+  const envData = [['环境', '记录数']];
+  for (const [env, count] of Object.entries(summary.byEnvironment)) {
+    envData.push([env, count.toString()]);
+  }
+  console.log(table(envData));
+  
   console.log(chalk.white.bold('⚠️ 需调整记录'));
   console.log(chalk.gray('────────────────────────────────────────────────────────────'));
   const needsAdjustment = ttlAnalysis.filter(a => a.needsAdjustment);

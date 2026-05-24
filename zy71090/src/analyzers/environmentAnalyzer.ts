@@ -64,7 +64,7 @@ function detectEnvironments(domain: string, envConfigs: EnvironmentConfig[]): st
 }
 
 function matchesPattern(domain: string, pattern: string): boolean {
-  if (!pattern) return true;
+  if (!pattern) return false;
   
   const patternLower = pattern.toLowerCase();
   
