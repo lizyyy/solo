@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-05-24T21:08:34.176586",
+  "statistics": {
+    "total": 4,
+    "success": 2,
+    "corrupted": 1,
+    "errors": 0,
+    "no_exif": 1,
+    "gps_found": 1,
+    "thumbnail_issues": 0,
+    "total_removed_fields": 10,
+    "total_preserved_fields": 4,
+    "avg_processing_time": 0.39219731092453003,
+    "camera_models": {
+      "Canon EOS 5D Mark IV": 1,
+      "iPhone iPhone 15 Pro": 1
+    }
+  },
+  "records": [
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71094/test_images/photo_no_exif.png",
+      "line_number": 1,
+      "status": "no_exif",
+      "removed_fields": [],
+      "preserved_fields": [],
+      "gps_found": false,
+      "thumbnail_issue": false,
+      "error_message": "",
+      "camera_model": "",
+      "output_path": "/Users/lzy/pro/solo/workspaces/zy71094/test_output/photo_no_exif.png",
+      "processing_time": 0.006906986236572266
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71094/test_images/corrupted.jpg",
+      "line_number": 2,
+      "status": "corrupted",
+      "removed_fields": [],
+      "preserved_fields": [],
+      "gps_found": false,
+      "thumbnail_issue": false,
+      "error_message": "图片损坏或格式不支持",
+      "camera_model": "",
+      "output_path": "",
+      "processing_time": 1.5587923526763916
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71094/test_images/photo_with_gps.jpg",
+      "line_number": 3,
+      "status": "success",
+      "removed_fields": [
+        "GPS:GPSLatitudeRef",
+        "GPS:GPSLatitude",
+        "GPS:GPSLongitudeRef",
+        "GPS:GPSLongitude",
+        "0th:Make",
+        "0th:Model",
+        "0th:ExifTag",
+        "0th:GPSTag"
+      ],
+      "preserved_fields": [
+        "0th:Orientation",
+        "0th:DateTime",
+        "Exif:DateTimeOriginal",
+        "Exif:DateTimeDigitized"
+      ],
+      "gps_found": true,
+      "thumbnail_issue": false,
+      "error_message": "",
+      "camera_model": "Canon EOS 5D Mark IV",
+      "output_path": "/Users/lzy/pro/solo/workspaces/zy71094/test_output/photo_with_gps.jpg",
+      "processing_time": 0.002203702926635742
+    },
+    {
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71094/test_images/subdir/iphone_photo.jpg",
+      "line_number": 4,
+      "status": "success",
+      "removed_fields": [
+        "0th:Make",
+        "0th:Model"
+      ],
+      "preserved_fields": [],
+      "gps_found": false,
+      "thumbnail_issue": false,
+      "error_message": "",
+      "camera_model": "iPhone iPhone 15 Pro",
+      "output_path": "/Users/lzy/pro/solo/workspaces/zy71094/test_output/subdir/iphone_photo.jpg",
+      "processing_time": 0.0008862018585205078
+    }
+  ]
+}
