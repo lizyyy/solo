@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"museum-exhibit-condition-api/database"
 	"museum-exhibit-condition-api/handlers"
