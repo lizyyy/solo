@@ -19,6 +19,18 @@ EXIT_BUDGET_VIOLATION = 2
 EXIT_RUNTIME_ERROR = 3
 
 
+def _validate_size_param(ctx, param, value):
+    if value is None:
+        return None
+    try:
+        return parse_size(value)
+    except ValueError as e:
+        raise click.BadParameter(
+            f"无效的尺寸格式: '{value}'。\n"
+            f"支持的格式: B, KB, MB, GB, TB (例如: 500MB, 2GB, 1.5TB)"
+        ) from None
+
+
 class CLIContext:
     def __init__(self):
         self.verbose = False
@@ -37,35 +49,52 @@ pass_context = click.make_pass_decorator(CLIContext, ensure=True)
 @click.option("--verbose", "-v", is_flag=True, help="显示详细输出")
 @click.option("--output-dir", "-o", default="./reports", help="报告输出目录", type=click.Path(file_okay=False))
 @click.option("--budget-rules", "-b", type=click.Path(exists=True, dir_okay=False), help="预算规则配置文件 (YAML/JSON)")
-@click.option("--total-max-size", type=str, help="总大小预算上限 (例如: 2GB, 500MB)")
-@click.option("--layer-max-size", type=str, help="单层大小预算上限 (例如: 500MB, 100MB)")
+@click.option(
+    "--total-max-size",
+    type=str,
+    callback=_validate_size_param,
+    help="总大小预算上限 (例如: 2GB, 500MB)",
+)
+@click.option(
+    "--layer-max-size",
+    type=str,
+    callback=_validate_size_param,
+    help="单层大小预算上限 (例如: 500MB, 100MB)",
+)
 @pass_context
 def main(
     ctx: CLIContext,
     verbose: bool,
     output_dir: str,
     budget_rules: Optional[str],
-    total_max_size: Optional[str],
-    layer_max_size: Optional[str],
+    total_max_size: Optional[int],
+    layer_max_size: Optional[int],
 ):
     """Docker 镜像层预算 CLI - 分析镜像层大小并检测预算超限"""
     ctx.verbose = verbose
     ctx.output_dir = output_dir
 
     if budget_rules:
-        with open(budget_rules, "r", encoding="utf-8") as f:
-            if budget_rules.endswith((".yaml", ".yml")):
-                rules_data = yaml.safe_load(f)
-            else:
-                import json
-                rules_data = json.load(f)
-            ctx.budget_rules = BudgetRules.from_dict(rules_data)
+        try:
+            with open(budget_rules, "r", encoding="utf-8") as f:
+                if budget_rules.endswith((".yaml", ".yml")):
+                    rules_data = yaml.safe_load(f)
+                else:
+                    import json
+                    rules_data = json.load(f)
+                ctx.budget_rules = BudgetRules.from_dict(rules_data)
+        except ValueError as e:
+            click.echo(f"❌ 预算规则配置错误: {e}", err=True)
+            sys.exit(EXIT_VALIDATION_ERROR)
+        except Exception as e:
+            click.echo(f"❌ 无法读取预算规则文件: {e}", err=True)
+            sys.exit(EXIT_VALIDATION_ERROR)
 
-    if total_max_size:
-        ctx.budget_rules.total_max_size = parse_size(total_max_size)
+    if total_max_size is not None:
+        ctx.budget_rules.total_max_size = total_max_size
 
-    if layer_max_size:
-        ctx.budget_rules.layer_budget.max_size = parse_size(layer_max_size)
+    if layer_max_size is not None:
+        ctx.budget_rules.layer_budget.max_size = layer_max_size
 
     ctx.engine = BudgetEngine(ctx.budget_rules)
     ctx.generator = ReportGenerator(output_dir)
