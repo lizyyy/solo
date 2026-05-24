@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: sql-lock-risk
+Version: 0.1.0
+Summary: SQL 迁移锁风险分析 CLI 工具
+Author-email: DBA Tooling <dba@example.com>
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: click>=8.0
+Requires-Dist: sqlparse>=0.4.4
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: rich>=13.0

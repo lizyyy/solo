@@ -1,0 +1,16 @@
+tables:
+  users:
+    row_count: 2500000
+    size_mb: 350
+    has_primary_key: true
+    engine: InnoDB
+  orders:
+    row_count: 15000000
+    size_mb: 2800
+    has_primary_key: true
+    engine: InnoDB
+  products:
+    row_count: 50000
+    size_mb: 25
+    has_primary_key: true
+    engine: InnoDB

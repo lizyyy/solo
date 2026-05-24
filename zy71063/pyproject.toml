@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sql-lock-risk"
+version = "0.1.0"
+authors = [
+  { name="DBA Tooling", email="dba@example.com" }
+]
+description = "SQL 迁移锁风险分析 CLI 工具"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "click>=8.0",
+  "sqlparse>=0.4.4",
+  "pyyaml>=6.0",
+  "rich>=13.0",
+]
+
+[project.scripts]
+sql-lock-risk = "sql_lock_risk.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

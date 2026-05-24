@@ -1,0 +1,94 @@
+{
+  "generated_at": "2026-05-24T19:30:37.044052",
+  "summary": {
+    "total_migrations": 1,
+    "total_statements": 2,
+    "transaction_wrapped": 0,
+    "with_rollback_script": 0,
+    "risk_levels": {
+      "safe": 0,
+      "low": 0,
+      "medium": 0,
+      "high": 2,
+      "critical": 0
+    },
+    "lock_levels": {
+      "none": 0,
+      "metadata": 0,
+      "shared": 0,
+      "exclusive": 2,
+      "table": 0
+    },
+    "alter_types": {
+      "add_column": 1,
+      "drop_column": 0,
+      "modify_column": 0,
+      "add_index": 1,
+      "drop_index": 0,
+      "add_constraint": 0,
+      "drop_constraint": 0,
+      "rename_table": 0,
+      "rename_column": 0,
+      "alter_default": 0,
+      "unknown": 0
+    },
+    "order_issues": 1,
+    "exit_code": 2
+  },
+  "exit_code": 2,
+  "findings": [
+    {
+      "risk_level": "high",
+      "lock_level": "exclusive",
+      "reason": "操作类型: add_column | 锁级别: 排他锁 (读写都阻塞)",
+      "mitigation": "建议先允许 NULL,批量回填数据后再设置 NOT NULL | 添加 ALGORITHM=INPLACE LOCK=NONE 减少锁影响 | 必须在业务低峰期执行 | 执行前备份数据 | 建议先在测试环境验证",
+      "estimated_duration_seconds": null,
+      "statement": {
+        "table_name": "users",
+        "alter_type": "add_column",
+        "is_concurrent": false,
+        "is_online": false,
+        "uses_algorithm_inplace": false,
+        "uses_lock_none": false,
+        "column_name": "email",
+        "index_name": null,
+        "raw_sql": "ALTER TABLE users ADD COLUMN email VARCHAR(255) NOT NULL;"
+      }
+    },
+    {
+      "risk_level": "high",
+      "lock_level": "exclusive",
+      "reason": "操作类型: add_index | 锁级别: 排他锁 (读写都阻塞)",
+      "mitigation": "建议使用 CREATE INDEX CONCURRENTLY 或 ALTER TABLE ... ADD INDEX ALGORITHM=INPLACE LOCK=NONE | 必须在业务低峰期执行 | 执行前备份数据 | 建议先在测试环境验证",
+      "estimated_duration_seconds": null,
+      "statement": {
+        "table_name": "orders",
+        "alter_type": "add_index",
+        "is_concurrent": false,
+        "is_online": false,
+        "uses_algorithm_inplace": false,
+        "uses_lock_none": false,
+        "column_name": "INDEX",
+        "index_name": "idx_user_id",
+        "raw_sql": "ALTER TABLE orders ADD INDEX idx_user_id (user_id);"
+      }
+    }
+  ],
+  "order_issues": [
+    {
+      "type": "missing_rollback",
+      "description": "迁移文件包含 DDL 变更但未找到对应的回滚脚本",
+      "migration_file": "/var/folders/4f/2_hylcyd3411bpx1k_b1gfgw0000gn/T/tmpi8m1cb9e.sql",
+      "statement_index": 0
+    }
+  ],
+  "migration_files": [
+    {
+      "file_path": "/var/folders/4f/2_hylcyd3411bpx1k_b1gfgw0000gn/T/tmpi8m1cb9e.sql",
+      "is_wrapped_in_transaction": false,
+      "has_rollback_script": false,
+      "rollback_path": null,
+      "statement_count": 2
+    }
+  ]
+}

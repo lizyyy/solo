@@ -1,0 +1,2 @@
+-- 修改产品价格字段类型
+ALTER TABLE products MODIFY COLUMN price DECIMAL(12, 2) NOT NULL DEFAULT 0.00;

@@ -1,0 +1,2 @@
+-- 以下操作经过DBA确认，可以忽略锁风险警告
+-- ALTER TABLE products MODIFY COLUMN price
