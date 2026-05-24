@@ -39,6 +39,36 @@ function getVCalendar(component) {
   return vcalendar || component;
 }
 
+function parseICalTimeObject(icalTime, timezone, isAllDay = false) {
+  if (!icalTime) return null;
+  
+  if (typeof icalTime === 'string') {
+    return parseICalDate(icalTime, timezone, isAllDay);
+  }
+  
+  if (icalTime.isDate || isAllDay) {
+    return DateTime.fromObject({
+      year: icalTime.year,
+      month: icalTime.month,
+      day: icalTime.day,
+      hour: 0,
+      minute: 0,
+      second: 0
+    }, { zone: 'UTC' }).startOf('day');
+  }
+  
+  const normalizedTz = normalizeTimezone(timezone);
+  
+  return DateTime.fromObject({
+    year: icalTime.year,
+    month: icalTime.month,
+    day: icalTime.day,
+    hour: icalTime.hour || 0,
+    minute: icalTime.minute || 0,
+    second: icalTime.second || 0
+  }, { zone: normalizedTz }).toUTC();
+}
+
 function parseCalendar(component) {
   const vcalendar = getVCalendar(component);
   
@@ -110,19 +140,11 @@ function parseSingleEvent(vevent, defaultTz = 'UTC') {
   
   const isAllDay = dtStartValue.isDate || (dtEndValue && dtEndValue.isDate);
   
-  const startTime = parseICalDate(
-    typeof dtStartValue === 'string' ? dtStartValue : dtStartValue.toJSDate().toISOString(),
-    startTz,
-    isAllDay
-  );
+  const startTime = parseICalTimeObject(dtStartValue, startTz, isAllDay);
   
   let endTime;
   if (dtEndValue) {
-    endTime = parseICalDate(
-      typeof dtEndValue === 'string' ? dtEndValue : dtEndValue.toJSDate().toISOString(),
-      endTz,
-      isAllDay
-    );
+    endTime = parseICalTimeObject(dtEndValue, endTz, isAllDay);
   } else {
     endTime = startTime.plus({ hours: 1 });
   }
@@ -155,8 +177,8 @@ function parseSingleEvent(vevent, defaultTz = 'UTC') {
     hasRecurrence: !!rrule,
     exdates,
     exdatesCount: exdates.length,
-    created: created ? parseICalDate(created.toJSDate ? created.toJSDate().toISOString() : created, defaultTz).toUTC() : null,
-    lastModified: lastModified ? parseICalDate(lastModified.toJSDate ? lastModified.toJSDate().toISOString() : lastModified, defaultTz).toUTC() : null,
+    created: created ? parseICalTimeObject(created, 'UTC', false) : null,
+    lastModified: lastModified ? parseICalTimeObject(lastModified, 'UTC', false) : null,
     recurrenceId: parseRecurrenceId(vevent, startTz),
     raw: {
       dtstart: dtStartProp.toString(),
@@ -246,8 +268,7 @@ function parseExdates(vevent, timezone) {
     }
     
     for (const value of values) {
-      const dateStr = typeof value === 'string' ? value : (value.toJSDate ? value.toJSDate().toISOString() : String(value));
-      const parsed = parseICalDate(dateStr, tzid, true);
+      const parsed = parseICalTimeObject(value, tzid, true);
       if (parsed) {
         exdates.push(parsed.toUTC());
       }
@@ -263,9 +284,8 @@ function parseRecurrenceId(vevent, timezone) {
   
   const tzid = recIdProp.getParameter('tzid') || timezone;
   const value = recIdProp.getFirstValue();
-  const dateStr = typeof value === 'string' ? value : (value.toJSDate ? value.toJSDate().toISOString() : String(value));
   
-  return parseICalDate(dateStr, tzid, false).toUTC();
+  return parseICalTimeObject(value, tzid, false).toUTC();
 }
 
 function expandRecurringEvents(event, startRange, endRange) {

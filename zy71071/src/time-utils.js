@@ -1,4 +1,4 @@
-const { DateTime, Settings, Zone } = require('luxon');
+const { DateTime, Settings, IANAZone } = require('luxon');
 const { TIME_UNITS } = require('./constants');
 
 Settings.defaultZone = 'UTC';
@@ -7,11 +7,14 @@ const COMMON_TIMEZONES = {
   'Asia/Shanghai': ['CST', 'China Standard Time', 'Beijing', 'Shanghai'],
   'Asia/Hong_Kong': ['HKT', 'Hong Kong'],
   'Asia/Tokyo': ['JST', 'Japan'],
-  'America/New_York': ['EST', 'EDT', 'Eastern'],
-  'America/Los_Angeles': ['PST', 'PDT', 'Pacific'],
-  'Europe/London': ['GMT', 'BST', 'London'],
-  'Europe/Paris': ['CET', 'CEST', 'Paris'],
-  'UTC': ['UTC', 'GMT', 'Zulu']
+  'America/New_York': ['EST', 'EDT', 'Eastern', 'New York'],
+  'America/Los_Angeles': ['PST', 'PDT', 'Pacific', 'Los Angeles'],
+  'America/Chicago': ['CST', 'CDT', 'Central', 'Chicago'],
+  'Europe/London': ['GMT', 'BST', 'London', 'British'],
+  'Europe/Paris': ['CET', 'CEST', 'Paris', 'French'],
+  'Europe/Berlin': ['CET', 'CEST', 'Berlin', 'German'],
+  'Australia/Sydney': ['AEST', 'AEDT', 'Sydney', 'Australian Eastern'],
+  'UTC': ['UTC', 'GMT', 'Zulu', 'Coordinated Universal Time']
 };
 
 function normalizeTimezone(tzString) {
@@ -19,15 +22,35 @@ function normalizeTimezone(tzString) {
   
   tzString = tzString.trim();
   
-  try {
-    const zone = new Zone(tzString);
-    if (zone.isValid) return tzString;
-  } catch (e) {}
+  for (const [ianaName, aliases] of Object.entries(COMMON_TIMEZONES)) {
+    if (tzString === ianaName) {
+      return ianaName;
+    }
+    if (aliases.some(alias => tzString.toLowerCase() === alias.toLowerCase())) {
+      return ianaName;
+    }
+  }
+  
+  if (IANAZone.isValidZone(tzString)) {
+    return tzString;
+  }
   
   for (const [ianaName, aliases] of Object.entries(COMMON_TIMEZONES)) {
     if (aliases.some(alias => tzString.toLowerCase().includes(alias.toLowerCase()))) {
       return ianaName;
     }
+  }
+  
+  const offsetMatch = tzString.match(/(?:GMT|UTC)([+-])(\d{1,2})/);
+  if (offsetMatch) {
+    const sign = offsetMatch[1] === '+' ? 1 : -1;
+    const hours = parseInt(offsetMatch[2], 10);
+    const offset = sign * hours;
+    if (offset === 8) return 'Asia/Shanghai';
+    if (offset === -5) return 'America/New_York';
+    if (offset === -8) return 'America/Los_Angeles';
+    if (offset === 0) return 'UTC';
+    if (offset === 9) return 'Asia/Tokyo';
   }
   
   return 'UTC';
