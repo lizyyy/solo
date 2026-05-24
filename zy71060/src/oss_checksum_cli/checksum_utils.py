@@ -22,6 +22,30 @@ class ChecksumConverter:
     def normalize_base64(b64_str: str) -> str:
         return b64_str.strip()
 
+    @staticmethod
+    def detect_format(value: str) -> ChecksumFormat:
+        value = value.strip()
+        
+        common_hex_lengths = {32, 40, 64, 128}
+        if len(value) in common_hex_lengths:
+            hex_chars = set('0123456789abcdefABCDEF')
+            if all(c in hex_chars for c in value):
+                return ChecksumFormat.HEX
+        
+        hex_chars = set('0123456789abcdefABCDEF')
+        if all(c in hex_chars for c in value):
+            return ChecksumFormat.HEX
+        
+        if len(value) % 4 == 0:
+            try:
+                decoded = base64.b64decode(value, validate=True)
+                if len(decoded) in [16, 20, 32, 64]:
+                    return ChecksumFormat.BASE64
+            except Exception:
+                pass
+        
+        return ChecksumFormat.HEX
+
     def convert(
         self,
         value: str,
@@ -44,11 +68,13 @@ class ChecksumConverter:
         self,
         value1: str,
         value2: str,
-        format1: ChecksumFormat,
+        format1: Optional[ChecksumFormat] = None,
         format2: Optional[ChecksumFormat] = None
     ) -> bool:
+        if format1 is None:
+            format1 = self.detect_format(value1)
         if format2 is None:
-            format2 = format1
+            format2 = self.detect_format(value2)
 
         if format1 == format2:
             if format1 == ChecksumFormat.HEX:
@@ -56,10 +82,28 @@ class ChecksumConverter:
             else:
                 return self.normalize_base64(value1) == self.normalize_base64(value2)
 
-        normalized1 = self.convert(value1, format1, ChecksumFormat.HEX)
-        normalized2 = self.convert(value2, format2, ChecksumFormat.HEX)
+        try:
+            normalized1 = self.convert(value1, format1, ChecksumFormat.HEX)
+            normalized2 = self.convert(value2, format2, ChecksumFormat.HEX)
+            return self.normalize_hex(normalized1) == self.normalize_hex(normalized2)
+        except Exception:
+            return value1.strip() == value2.strip()
 
-        return self.normalize_hex(normalized1) == self.normalize_hex(normalized2)
+    def normalize_to_hex(
+        self,
+        value: str,
+        format: Optional[ChecksumFormat] = None
+    ) -> Optional[str]:
+        if format is None:
+            format = self.detect_format(value)
+        
+        try:
+            if format == ChecksumFormat.HEX:
+                return self.normalize_hex(value)
+            else:
+                return self.base64_to_hex(value)
+        except Exception:
+            return None
 
 
 class ChecksumCalculator:

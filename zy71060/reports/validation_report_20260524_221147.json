@@ -1,0 +1,103 @@
+{
+  "report_id": "d4f4acb1-69f0-41cc-82cb-cad31c154c95",
+  "generated_at": "2026-05-24T22:11:47.231214",
+  "manifest_id": "test-format-consistency",
+  "summary": {},
+  "files_checked": 0,
+  "chunks_checked": 0,
+  "issues": [
+    {
+      "severity": "error",
+      "code": "chunk_checksum_inconsistent",
+      "message": "Chunk checksum inconsistent across regions: test-file:1",
+      "file_id": "test-file",
+      "chunk_id": "test-file:1",
+      "region": null,
+      "details": {
+        "algorithm": "md5",
+        "checksums_by_region": {
+          "cn-north-1": {
+            "original": "b10a8db164e0754105e766fc73e02f1e",
+            "normalized_hex": "6f5d1af1d6f5eb87b4ef9e35d397bbeba7dcef77b4d9fd5e"
+          },
+          "cn-south-1": {
+            "original": "sQqNsWTgdUEF52b8c+AvHg==",
+            "normalized_hex": "b10a8db164e0754105e766fc73e02f1e"
+          }
+        }
+      }
+    }
+  ],
+  "region_comparison": {
+    "regions": [
+      "cn-north-1",
+      "cn-south-1"
+    ],
+    "files_comparison": {
+      "test-file": {
+        "file_id": "test-file",
+        "present_in": [
+          "cn-north-1",
+          "cn-south-1"
+        ],
+        "missing_in": [],
+        "size_consistent": true,
+        "chunk_count_consistent": true,
+        "has_differences": false,
+        "details": {
+          "cn-north-1": {
+            "file_name": "test.txt",
+            "total_size": 100,
+            "chunk_count": 1,
+            "status": "ok"
+          },
+          "cn-south-1": {
+            "file_name": "test.txt",
+            "total_size": 100,
+            "chunk_count": 1,
+            "status": "ok"
+          }
+        }
+      }
+    },
+    "chunks_comparison": {
+      "test-file:1": {
+        "chunk_key": "test-file:1",
+        "present_in": [
+          "cn-south-1",
+          "cn-north-1"
+        ],
+        "missing_in": [],
+        "size_consistent": true,
+        "checksum_consistent": false,
+        "has_differences": true,
+        "details": {
+          "cn-north-1": {
+            "chunk_id": "chunk-001",
+            "size": 100,
+            "status": "ok",
+            "checksums": {
+              "md5": "b10a8db164e0754105e766fc73e02f1e"
+            }
+          },
+          "cn-south-1": {
+            "chunk_id": "chunk-001",
+            "size": 100,
+            "status": "ok",
+            "checksums": {
+              "md5": "sQqNsWTgdUEF52b8c+AvHg=="
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "total_files_checked": 1,
+      "files_with_differences": 0,
+      "total_chunks_checked": 2,
+      "chunks_with_differences": 1,
+      "missing_in_regions": {}
+    }
+  },
+  "duration_seconds": 0.004781961441040039
+}

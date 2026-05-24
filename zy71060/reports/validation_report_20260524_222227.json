@@ -1,0 +1,81 @@
+{
+  "report_id": "00cd525e-316d-430a-85b4-753eed7e289f",
+  "generated_at": "2026-05-24T22:22:27.522340",
+  "manifest_id": "test-format-consistency",
+  "summary": {},
+  "files_checked": 0,
+  "chunks_checked": 0,
+  "issues": [],
+  "region_comparison": {
+    "regions": [
+      "cn-north-1",
+      "cn-south-1"
+    ],
+    "files_comparison": {
+      "test-file": {
+        "file_id": "test-file",
+        "present_in": [
+          "cn-north-1",
+          "cn-south-1"
+        ],
+        "missing_in": [],
+        "size_consistent": true,
+        "chunk_count_consistent": true,
+        "has_differences": false,
+        "details": {
+          "cn-north-1": {
+            "file_name": "test.txt",
+            "total_size": 100,
+            "chunk_count": 1,
+            "status": "ok"
+          },
+          "cn-south-1": {
+            "file_name": "test.txt",
+            "total_size": 100,
+            "chunk_count": 1,
+            "status": "ok"
+          }
+        }
+      }
+    },
+    "chunks_comparison": {
+      "test-file:1": {
+        "chunk_key": "test-file:1",
+        "present_in": [
+          "cn-south-1",
+          "cn-north-1"
+        ],
+        "missing_in": [],
+        "size_consistent": true,
+        "checksum_consistent": true,
+        "has_differences": false,
+        "details": {
+          "cn-north-1": {
+            "chunk_id": "chunk-001",
+            "size": 100,
+            "status": "ok",
+            "checksums": {
+              "md5": "b10a8db164e0754105e766fc73e02f1e"
+            }
+          },
+          "cn-south-1": {
+            "chunk_id": "chunk-001",
+            "size": 100,
+            "status": "ok",
+            "checksums": {
+              "md5": "sQqNsWTgdUEF52b8c+AvHg=="
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "total_files_checked": 1,
+      "files_with_differences": 0,
+      "total_chunks_checked": 2,
+      "chunks_with_differences": 0,
+      "missing_in_regions": {}
+    }
+  },
+  "duration_seconds": 0.00020885467529296875
+}

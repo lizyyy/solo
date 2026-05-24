@@ -240,8 +240,22 @@ class RegionComparer:
             ))
 
         for algo, region_checksums in checksums_by_algo.items():
-            unique_checksums = set(region_checksums.values())
-            if len(unique_checksums) > 1:
+            normalized_checksums = {}
+            all_equal = True
+            first_normalized = None
+
+            for region, checksum_value in region_checksums.items():
+                normalized = self.converter.normalize_to_hex(checksum_value)
+                normalized_checksums[region] = {
+                    "original": checksum_value,
+                    "normalized_hex": normalized
+                }
+                if first_normalized is None:
+                    first_normalized = normalized
+                elif normalized != first_normalized:
+                    all_equal = False
+
+            if not all_equal:
                 result["checksum_consistent"] = False
                 result["has_differences"] = True
                 issues.append(ValidationIssue(
@@ -252,7 +266,7 @@ class RegionComparer:
                     chunk_id=chunk_key,
                     details={
                         "algorithm": algo.value,
-                        "checksums_by_region": region_checksums
+                        "checksums_by_region": normalized_checksums
                     }
                 ))
                 break

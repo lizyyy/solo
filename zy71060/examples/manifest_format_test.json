@@ -1,0 +1,51 @@
+{
+  "manifest_id": "test-format-consistency",
+  "version": "1.0",
+  "created_at": "2024-01-15T00:00:00Z",
+  "regions": {
+    "cn-north-1": {
+      "region": "cn-north-1",
+      "bucket": "test-bucket-1",
+      "files": [
+        {
+          "file_id": "test-file",
+          "file_name": "test.txt",
+          "total_size": 100,
+          "expected_chunks": 1,
+          "chunks": [
+            {
+              "chunk_id": "chunk-001",
+              "part_number": 1,
+              "size": 100,
+              "checksums": {
+                "md5": "b10a8db164e0754105e766fc73e02f1e"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "cn-south-1": {
+      "region": "cn-south-1",
+      "bucket": "test-bucket-2",
+      "files": [
+        {
+          "file_id": "test-file",
+          "file_name": "test.txt",
+          "total_size": 100,
+          "expected_chunks": 1,
+          "chunks": [
+            {
+              "chunk_id": "chunk-001",
+              "part_number": 1,
+              "size": 100,
+              "checksums": {
+                "md5": "sQqNsWTgdUEF52b8c+AvHg=="
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
