@@ -71,23 +71,28 @@ export class BounceParser {
     subject?: string;
     timestamp?: number;
   }): BounceRecord {
+    const rawText = data.rawMessage || '';
+    const smtpCode = data.smtpCode || this.extractSmtpCode(rawText);
+    const enhancedCode = data.enhancedCode || this.extractEnhancedCode(rawText);
+    const provider = data.provider || this.detectProvider(data.recipient, rawText);
+
     const { category, confidence, reason } = this.classifyBounce(
-      data.rawMessage || '',
-      data.smtpCode,
-      data.enhancedCode,
-      data.provider
+      rawText,
+      smtpCode,
+      enhancedCode,
+      provider
     );
 
-    const retrySuggestion = this.generateRetrySuggestion(category, data.smtpCode);
+    const retrySuggestion = this.generateRetrySuggestion(category, smtpCode);
 
     return {
       id: `bounce-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       recipient: data.recipient,
-      smtpCode: data.smtpCode,
-      enhancedCode: data.enhancedCode,
-      provider: data.provider || this.detectProvider(data.recipient, data.rawMessage || ''),
+      smtpCode,
+      enhancedCode,
+      provider,
       batchId: data.batchId,
-      rawMessage: data.rawMessage || '',
+      rawMessage: rawText,
       subject: data.subject,
       timestamp: data.timestamp || Date.now(),
       category,
@@ -190,15 +195,24 @@ export class BounceParser {
     if (enhancedCode && smtpCodeMappings[enhancedCode]) {
       const mapping = smtpCodeMappings[enhancedCode];
       category = mapping.category as BounceCategory;
-      confidence = 0.9;
+      confidence = 0.85;
       reason = mapping.reason;
     }
 
-    if (smtpCode && smtpCodeMappings[smtpCode] && confidence < 0.9) {
+    if (smtpCode && smtpCodeMappings[smtpCode] && category === BounceCategory.UNKNOWN) {
       const mapping = smtpCodeMappings[smtpCode];
       category = mapping.category as BounceCategory;
       confidence = 0.8;
       reason = mapping.reason;
+    }
+
+    if (smtpCode && smtpCodeMappings[smtpCode] && confidence < 0.8) {
+      const mapping = smtpCodeMappings[smtpCode];
+      const smtpCategory = mapping.category as BounceCategory;
+      if (smtpCategory === category) {
+        confidence = 0.8;
+        reason = mapping.reason;
+      }
     }
 
     const providerConfig = this.config.providers.find(p => p.name === provider);
@@ -213,13 +227,36 @@ export class BounceParser {
       }
     }
 
-    const { category: generalCategory, confidence: generalConfidence } = 
+    const { category: generalCategory, confidence: generalConfidence, matchedPattern } = 
       this.matchGeneralPatterns(lowerText);
     
-    if (generalConfidence > confidence) {
-      category = generalCategory;
-      confidence = generalConfidence;
-      reason = this.getReasonForCategory(category, '通用规则');
+    if (generalConfidence > 0) {
+      const isHardEvidence = 
+        generalCategory === BounceCategory.MAILBOX_NOT_EXIST ||
+        generalCategory === BounceCategory.CONTENT_BLOCKED;
+      
+      const shouldOverridePolicy = 
+        isHardEvidence && category === BounceCategory.POLICY_REJECTION;
+      
+      const shouldApplyGeneral = 
+        shouldOverridePolicy ||
+        category === BounceCategory.UNKNOWN ||
+        generalConfidence > confidence;
+      
+      if (shouldApplyGeneral) {
+        if (shouldOverridePolicy) {
+          category = generalCategory;
+          confidence = Math.max(generalConfidence, confidence);
+        } else if (category === BounceCategory.UNKNOWN || generalConfidence > confidence) {
+          category = generalCategory;
+          confidence = Math.max(generalConfidence, confidence);
+        }
+        reason = matchedPattern 
+          ? `匹配关键词: "${matchedPattern}"` 
+          : this.getReasonForCategory(category, '通用规则');
+      } else if (generalCategory === category && matchedPattern) {
+        reason = `匹配关键词: "${matchedPattern}"`;
+      }
     }
 
     return { category, confidence, reason };
@@ -231,9 +268,9 @@ export class BounceParser {
   ): { category: BounceCategory; confidence: number } {
     const patterns = [
       { category: BounceCategory.MAILBOX_NOT_EXIST, patterns: provider.mailboxNotExist },
-      { category: BounceCategory.POLICY_REJECTION, patterns: provider.policyRejection },
       { category: BounceCategory.CONTENT_BLOCKED, patterns: provider.contentBlocked },
-      { category: BounceCategory.TEMPORARY_FAILURE, patterns: provider.temporaryFailure }
+      { category: BounceCategory.TEMPORARY_FAILURE, patterns: provider.temporaryFailure },
+      { category: BounceCategory.POLICY_REJECTION, patterns: provider.policyRejection }
     ];
 
     for (const { category, patterns: categoryPatterns } of patterns) {
@@ -252,7 +289,7 @@ export class BounceParser {
     return { category: BounceCategory.UNKNOWN, confidence: 0 };
   }
 
-  private matchGeneralPatterns(text: string): { category: BounceCategory; confidence: number } {
+  private matchGeneralPatterns(text: string): { category: BounceCategory; confidence: number; matchedPattern?: string } {
     const patternMap: Array<{ category: BounceCategory; patterns: string[] }> = [
       {
         category: BounceCategory.MAILBOX_NOT_EXIST,
@@ -264,22 +301,12 @@ export class BounceParser {
         ]
       },
       {
-        category: BounceCategory.POLICY_REJECTION,
-        patterns: [
-          'spf.*fail', 'dmarc', 'dkim.*fail', 'ip.*block',
-          'reputation', '黑名单', 'blocklist', 'policy',
-          'frequency', 'limit', '速率', '频率',
-          '策略拒收', '被拒收', '拒绝接收', 'policy.*reject',
-          'unsolicited', '5\\.7\\.', 'blocked'
-        ]
-      },
-      {
         category: BounceCategory.CONTENT_BLOCKED,
         patterns: [
           'spam', '垃圾邮件', 'virus', '恶意', '违禁',
           'phish', 'malware', 'content.*reject',
           '内容被拦', '内容违规', '敏感词', '垃圾内容',
-          '违规关键词', '内容被拦截', '垃圾内容'
+          '违规关键词', '内容被拦截'
         ]
       },
       {
@@ -289,19 +316,28 @@ export class BounceParser {
           'timeout', 'busy', '临时', '稍后', '4\\d{2}',
           'service.*unavailable', 'system busy', 'try again later'
         ]
+      },
+      {
+        category: BounceCategory.POLICY_REJECTION,
+        patterns: [
+          'spf.*fail', 'dmarc', 'dkim.*fail', 'ip.*block',
+          'reputation', '黑名单', 'blocklist', 'policy',
+          'frequency', 'limit', '速率', '频率',
+          '策略拒收', '被拒收', '拒绝接收', 'policy.*reject',
+          'unsolicited', 'blocked'
+        ]
       }
     ];
 
     for (const { category, patterns } of patternMap) {
-      const matches = patterns.filter(p => 
-        new RegExp(p.toLowerCase()).test(text)
-      ).length;
-      
-      if (matches > 0) {
-        return {
-          category,
-          confidence: Math.min(0.5 + matches * 0.1, 0.75)
-        };
+      for (const pattern of patterns) {
+        if (new RegExp(pattern.toLowerCase()).test(text)) {
+          return {
+            category,
+            confidence: 0.6,
+            matchedPattern: pattern
+          };
+        }
       }
     }
 
