@@ -7,16 +7,17 @@ class VariableValidator {
     const issues = [];
     const templateVariables = templateAnalysis.variables;
     const conditionalVariables = templateAnalysis.conditionalVariables;
+    const blocks = templateAnalysis.blocks || [];
 
     this._checkCaseInconsistencies(templateVariables, issues);
-    this._checkConditionalVariables(templateAnalysis.blocks, issues);
+    this._checkConditionalVariables(blocks, issues);
 
     if (manifest) {
       this._compareWithManifest(templateVariables, manifest, locale, issues);
     }
 
     if (sampleData) {
-      this._compareWithSampleData(templateVariables, sampleData, locale, issues);
+      this._compareWithSampleData(templateVariables, blocks, sampleData, locale, issues);
     }
 
     const missingVariables = issues.filter(i => i.type === 'missing_variable');
@@ -24,6 +25,7 @@ class VariableValidator {
     const caseIssues = issues.filter(i => i.type === 'case_inconsistency');
     const conditionalIssues = issues.filter(i => i.type === 'conditional_issue');
     const defaultIssues = issues.filter(i => i.type === 'default_value_mismatch');
+    const missingConditionalControls = issues.filter(i => i.type === 'missing_conditional_control');
 
     return {
       issues,
@@ -35,7 +37,8 @@ class VariableValidator {
         extraVariables: extraVariables.length,
         caseIssues: caseIssues.length,
         conditionalIssues: conditionalIssues.length,
-        defaultIssues: defaultIssues.length
+        defaultIssues: defaultIssues.length,
+        missingConditionalControls: missingConditionalControls.length
       },
       templateVariables: templateVariables.map(v => ({
         name: v.name,
@@ -155,7 +158,7 @@ class VariableValidator {
     });
   }
 
-  _compareWithSampleData(templateVariables, sampleData, locale, issues) {
+  _compareWithSampleData(templateVariables, blocks, sampleData, locale, issues) {
     const data = locale && sampleData.data[locale]
       ? sampleData.data[locale]
       : sampleData.data;
@@ -177,6 +180,26 @@ class VariableValidator {
           }
         });
       }
+    });
+
+    blocks.forEach(block => {
+      block.variablesInCondition.forEach(varName => {
+        const normalizedName = this._normalizeName(varName);
+        const hasSample = sampleVarMap.has(normalizedName);
+
+        if (!hasSample) {
+          issues.push({
+            type: 'missing_conditional_control',
+            severity: 'error',
+            variable: varName,
+            message: `条件块控制变量 "${varName}" 在样例数据中缺失，将静默走 false 分支`,
+            details: {
+              condition: block.condition,
+              blockId: block.id
+            }
+          });
+        }
+      });
     });
   }
 

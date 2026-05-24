@@ -172,7 +172,7 @@ class CLI {
 
     return templateFiles.map(filePath => {
       const analysis = TemplateParser.parseFile(filePath, { caseSensitive: config.caseSensitive });
-      const locale = this._extractLocaleFromPath(filePath);
+      const locale = config.locale || this._extractLocaleFromPath(filePath);
       const validation = validator.validate(analysis, manifest, sampleData, locale);
 
       return {
@@ -206,17 +206,18 @@ class CLI {
 
     const renderer = new TemplateRenderer({
       caseSensitive: config.caseSensitive,
-      strictMode: false
+      strictMode: true
     });
 
     const results = [];
 
     templateFiles.forEach(filePath => {
       const content = fs.readFileSync(filePath, 'utf-8');
-      const templateLocale = this._extractLocaleFromPath(filePath);
+      const fileLocale = this._extractLocaleFromPath(filePath);
+      const effectiveLocale = config.locale || fileLocale;
 
-      const locales = templateLocale
-        ? [templateLocale]
+      const locales = effectiveLocale
+        ? [effectiveLocale]
         : Object.keys(sampleData.data).filter(k => /^[a-z]{2}(-[A-Z]{2})?$/.test(k));
 
       locales.forEach(locale => {

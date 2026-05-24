@@ -250,6 +250,7 @@ class MarkdownReporter {
     lines.push('| `case_inconsistency` | ⚠️ 警告 | 同一变量在模板中大小写不一致 | 统一变量命名风格 |');
     lines.push('| `i18n_missing_variable` | ❌ 错误 | 某语言版本缺少其他版本有的变量 | 检查翻译版本是否遗漏变量 |');
     lines.push('| `conditional_issue` | ⚠️ 警告 | 条件块可能存在问题 | 检查条件逻辑和内容 |');
+    lines.push('| `missing_conditional_control` | ❌ 错误 | 条件块控制变量在样例数据中缺失 | 补充样例数据中的条件控制变量 |');
     lines.push('| `missing_sample` | ⚠️ 警告 | 样例数据中缺少该变量且无默认值 | 补充样例数据或设置默认值 |');
     lines.push('');
 

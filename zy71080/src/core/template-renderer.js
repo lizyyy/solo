@@ -45,11 +45,21 @@ class TemplateRenderer {
 
     try {
       const vars = this._extractVariablesFromExpression(tokens);
-      const context = {};
 
       vars.forEach(varName => {
         const value = this._getNestedValue(data, varName);
-        context[varName.replace(/\./g, '_')] = value !== undefined;
+        if (value === undefined) {
+          const issue = {
+            type: 'missing_conditional_control',
+            variable: varName,
+            message: `条件控制变量 "${varName}" 缺失，条件块将静默走 false 分支，条件: ${condition}`
+          };
+          if (this.strictMode) {
+            errors.push(issue);
+          } else {
+            warnings.push(issue);
+          }
+        }
       });
 
       const evalExpr = tokens.replace(/\b([a-zA-Z_][a-zA-Z0-9_.]*)\b/g, (match) => {

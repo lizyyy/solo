@@ -180,6 +180,7 @@ project/
 | `case_inconsistency` | ⚠️ 警告 | 变量大小写不一致 | 统一命名风格 |
 | `i18n_missing_variable` | ❌ 错误 | 某语言版本缺少变量 | 检查翻译版本 |
 | `conditional_issue` | ⚠️ 警告 | 条件块可能有问题 | 检查条件逻辑 |
+| `missing_conditional_control` | ❌ 错误 | 条件块控制变量在样例数据中缺失 | 补充样例数据中的条件控制变量 |
 | `missing_sample` | ⚠️ 警告 | 样例数据缺失且无默认值 | 补充样例或设置默认值 |
 
 ## 🚪 退出码说明

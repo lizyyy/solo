@@ -1,7 +1,7 @@
 {
   "meta": {
     "version": "1.0.0",
-    "generatedAt": "2026-05-24T12:49:56.752Z",
+    "generatedAt": "2026-05-24T14:59:03.105Z",
     "tool": "email-template-lint"
   },
   "summary": {
@@ -248,7 +248,8 @@
           "extraVariables": 1,
           "caseIssues": 0,
           "conditionalIssues": 0,
-          "defaultIssues": 2
+          "defaultIssues": 2,
+          "missingConditionalControls": 0
         },
         "issues": [
           {
@@ -582,7 +583,8 @@
           "extraVariables": 0,
           "caseIssues": 0,
           "conditionalIssues": 0,
-          "defaultIssues": 0
+          "defaultIssues": 0,
+          "missingConditionalControls": 0
         },
         "issues": [
           {
