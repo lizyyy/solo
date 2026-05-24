@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-05-24T13:50:03.444746+08:00",
+  "reagents": [
+    {
+      "reagent": {
+        "id": 2,
+        "batch_no": "TRYPSIN-2024-001",
+        "reagent_type": "胰酶",
+        "status": "discarded",
+        "thawed_at": "2026-05-24T13:50:03+08:00",
+        "thawed_by": "zhangsan",
+        "project": "细胞培养A",
+        "expire_at": "2026-05-25T13:50:03+08:00",
+        "discarded_at": "2026-05-24T13:50:03+08:00",
+        "discarded_by": "zhangsan",
+        "discard_reason": "发现污染",
+        "created_at": "2026-05-24T13:50:03+08:00",
+        "updated_at": "2026-05-24T13:50:03+08:00"
+      },
+      "usage_records": null,
+      "shared_projects": []
+    },
+    {
+      "reagent": {
+        "id": 1,
+        "batch_no": "DMSO-2024-001",
+        "reagent_type": "DMSO",
+        "status": "in_use",
+        "thawed_at": "2026-05-24T13:50:02+08:00",
+        "thawed_by": "zhangsan",
+        "project": "细胞培养A",
+        "expire_at": "2026-05-25T13:50:02+08:00",
+        "created_at": "2026-05-24T13:50:02+08:00",
+        "updated_at": "2026-05-24T13:50:02+08:00"
+      },
+      "usage_records": [
+        {
+          "id": 1,
+          "reagent_id": 1,
+          "batch_no": "DMSO-2024-001",
+          "used_by": "lisi",
+          "project": "细胞培养A",
+          "volume": "10ml",
+          "notes": "传代使用",
+          "used_at": "2026-05-24T13:50:02+08:00"
+        },
+        {
+          "id": 2,
+          "reagent_id": 1,
+          "batch_no": "DMSO-2024-001",
+          "used_by": "wangwu",
+          "project": "细胞冻存B",
+          "volume": "5ml",
+          "notes": "冻存细胞使用",
+          "used_at": "2026-05-24T13:50:02+08:00"
+        }
+      ],
+      "shared_projects": [
+        "细胞培养A",
+        "细胞冻存B"
+      ]
+    }
+  ],
+  "processing_orders": [
+    {
+      "id": 1,
+      "order_no": "THAW_EXCEPTION-20260524-0001",
+      "batch_no": "DMSO-2024-001",
+      "type": "THAW_EXCEPTION",
+      "status": "needs_review",
+      "created_by": "zhangsan",
+      "needs_review": true,
+      "created_at": "2026-05-24T13:50:03+08:00"
+    }
+  ],
+  "summary": {
+    "total_reagents": 2,
+    "frozen_count": 0,
+    "thawed_count": 0,
+    "in_use_count": 1,
+    "expired_count": 0,
+    "discarded_count": 1,
+    "total_usage_records": 2,
+    "total_orders": 1
+  }
+}
