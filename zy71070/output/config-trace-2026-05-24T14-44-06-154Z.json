@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "generatedAt": "2026-05-24T14:24:16.723Z",
+    "generatedAt": "2026-05-24T14:44:06.155Z",
     "options": {
-      "arrayMerge": "unique"
+      "arrayMerge": "replace"
     }
   },
   "mergedConfig": {
@@ -24,10 +24,6 @@
       "billing": true
     },
     "allowedOrigins": [
-      "http://localhost:3000",
-      "http://localhost:8080",
-      "https://app.example.com",
-      "https://admin.example.com",
       "https://acme.app.com"
     ],
     "logLevel": "warn",
@@ -434,15 +430,11 @@
         }
       },
       "finalValue": [
-        "http://localhost:3000",
-        "http://localhost:8080",
-        "https://app.example.com",
-        "https://admin.example.com",
         "https://acme.app.com"
       ],
       "finalLayer": "tenant",
       "conflict": false,
-      "overrideType": "array_unique"
+      "overrideType": "array_replace"
     },
     "logLevel": {
       "path": "logLevel",

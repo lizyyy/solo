@@ -52,9 +52,11 @@ results.push(runTest('只输出 JSON', `${baseCmd} ${defaultArgs} -o output --fo
 results.push(runTest('只输出 Markdown', `${baseCmd} ${defaultArgs} -o output --format markdown`));
 results.push(runTest('只输出终端', `${baseCmd} ${defaultArgs} -o output --format terminal`));
 
+results.push(runTest('.env 文件嵌套配置解析', `${baseCmd} -d examples/default.json -e examples/.env -t examples/tenant.json -k database.password --format terminal`));
 results.push(runTest('缺少参数', `${baseCmd}`, 1));
 results.push(runTest('文件不存在', `${baseCmd} -d nonexistent.json -e examples/env.json -t examples/tenant.json`, 2));
 results.push(runTest('无效 JSON', `${baseCmd} -d examples/bad-invalid.json -e examples/env.json -t examples/tenant.json`, 3));
+results.push(runTest('输出路径为已存在文件', `${baseCmd} ${defaultArgs} -o package.json --format json`, 5));
 results.push(runTest('键路径不存在', `${baseCmd} ${defaultArgs} -k non.existent.path`, 6));
 
 console.log('\n═══════════════════════════════════════════════════════════════');

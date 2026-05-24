@@ -138,7 +138,16 @@ function validateKeyPath(traceMap, keyPath) {
 
 function ensureOutputDir(outputDir) {
   try {
-    if (!fs.existsSync(outputDir)) {
+    if (fs.existsSync(outputDir)) {
+      const stats = fs.statSync(outputDir);
+      if (!stats.isDirectory()) {
+        return {
+          valid: false,
+          errors: [`输出路径已存在且不是目录: ${outputDir}`],
+          exitCode: EXIT_CODES.OUTPUT_ERROR
+        };
+      }
+    } else {
       fs.mkdirSync(outputDir, { recursive: true });
     }
     return { valid: true };

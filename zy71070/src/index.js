@@ -5,6 +5,19 @@ const { detectConflicts, getOverrideChain, filterByKeyPath, getStatistics } = re
 const { validateAll, validateKeyPath, EXIT_CODES } = require('./validator');
 const { printTerminalSummary, writeOutputs } = require('./output');
 
+function setNestedValue(obj, keyPath, value) {
+  const keys = keyPath.split('.');
+  let current = obj;
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    if (!current[key] || typeof current[key] !== 'object') {
+      current[key] = {};
+    }
+    current = current[key];
+  }
+  current[keys[keys.length - 1]] = value;
+}
+
 function parseEnvFile(content) {
   const result = {};
   const lines = content.split('\n');
@@ -16,7 +29,7 @@ function parseEnvFile(content) {
     const eqIndex = trimmed.indexOf('=');
     if (eqIndex === -1) continue;
 
-    const key = trimmed.substring(0, eqIndex).trim();
+    let key = trimmed.substring(0, eqIndex).trim();
     let value = trimmed.substring(eqIndex + 1).trim();
 
     if ((value.startsWith('"') && value.endsWith('"')) ||
@@ -29,7 +42,8 @@ function parseEnvFile(content) {
     else if (value === 'null') value = null;
     else if (!isNaN(Number(value)) && value !== '') value = Number(value);
 
-    result[key] = value;
+    const nestedKey = key.toLowerCase().replace(/_/g, '.');
+    setNestedValue(result, nestedKey, value);
   }
 
   return result;
