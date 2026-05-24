@@ -1,8 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 from typing import List
 from datetime import datetime
+import io
 
 import database as models
 import schemas
@@ -187,14 +189,28 @@ async def submit_declaration(declaration_id: int, operator: str, db: Session = D
             details={"missing_fields": missing}
         )
     battery_conflicts = check_battery_conflict(db, declaration)
-    carrier_violations = check_carrier_rules(db, declaration)
-    all_issues = battery_conflicts + carrier_violations
-    if all_issues:
+    carrier_check = check_carrier_rules(db, declaration)
+    all_issues = battery_conflicts + carrier_check["violations"]
+    if not carrier_check["is_valid"] or battery_conflicts:
+        error_code = carrier_check["error_code"] if not carrier_check["is_valid"] else ErrorCode.BATTERY_CONFLICT
+        error_type = ErrorType.RULE_VIOLATION if error_code in [ErrorCode.CARRIER_RULE_EXPIRED, ErrorCode.CARRIER_RULE_VIOLATION] else ErrorType.REVIEW_REQUIRED
+        details = {
+            "battery_conflicts": battery_conflicts,
+            "carrier_violations": carrier_check["violations"],
+            "expired_rules": carrier_check["expired_rules"]
+        }
+        if carrier_check["error_code"] == ErrorCode.CARRIER_RULE_EXPIRED:
+            raise DeclarationStateException(
+                error_code=ErrorCode.CARRIER_RULE_EXPIRED,
+                error_type=ErrorType.RULE_VIOLATION,
+                message="承运限制已过期",
+                details=details
+            )
         raise DeclarationStateException(
             error_code=ErrorCode.NEEDS_REVIEW,
-            error_type=ErrorType.REVIEW_REQUIRED,
+            error_type=error_type,
             message="提交前需要复核",
-            details={"issues": all_issues}
+            details=details
         )
     declaration = transition_declaration_status(
         db=db,
@@ -478,9 +494,61 @@ async def create_report(
         report_type=report_type,
         generated_by=generated_by
     )
+    create_audit_trail(
+        db=db,
+        declaration_id=declaration_id,
+        action="REPORT_GENERATE",
+        from_status=None,
+        to_status=None,
+        operator=generated_by,
+        reason=f"生成{report_type}类型报告",
+        details=f"报告ID: {report.id}"
+    )
     db.commit()
     db.refresh(report)
     return report
+
+
+@app.get("/declarations/{declaration_id}/reports/{report_id}/export")
+async def export_report(
+    declaration_id: int,
+    report_id: int,
+    exported_by: str,
+    format: str = "txt",
+    db: Session = Depends(models.get_db)
+):
+    declaration = db.query(models.Declaration).get(declaration_id)
+    if not declaration:
+        raise HTTPException(status_code=404, detail="申报单不存在")
+    report = db.query(models.DeclarationReport).filter(
+        and_(
+            models.DeclarationReport.id == report_id,
+            models.DeclarationReport.declaration_id == declaration_id
+        )
+    ).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="报告不存在")
+    create_audit_trail(
+        db=db,
+        declaration_id=declaration_id,
+        action="REPORT_EXPORT",
+        from_status=None,
+        to_status=None,
+        operator=exported_by,
+        reason=f"导出报告",
+        details=f"报告ID: {report_id}, 格式: {format}"
+    )
+    db.commit()
+    filename = f"declaration_report_{declaration.business_no}_{report_id}.{format}"
+    content = report.report_content
+    if format == "txt":
+        return PlainTextResponse(
+            content=content,
+            media_type="text/plain; charset=utf-8",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    else:
+        raise HTTPException(status_code=400, detail=f"不支持的导出格式: {format}")
 
 
 @app.get("/declarations/{declaration_id}/validate")
@@ -490,16 +558,18 @@ async def validate_declaration(declaration_id: int, db: Session = Depends(models
         raise HTTPException(status_code=404, detail="申报单不存在")
     missing = validate_declaration_materials(declaration)
     battery_conflicts = check_battery_conflict(db, declaration)
-    carrier_violations = check_carrier_rules(db, declaration)
+    carrier_check = check_carrier_rules(db, declaration)
     return {
         "declaration_id": declaration_id,
         "business_no": declaration.business_no,
         "status": declaration.status,
         "validation": {
-            "is_valid": len(missing) == 0 and len(battery_conflicts) == 0 and len(carrier_violations) == 0,
+            "is_valid": len(missing) == 0 and len(battery_conflicts) == 0 and carrier_check["is_valid"],
             "missing_materials": missing,
             "battery_conflicts": battery_conflicts,
-            "carrier_violations": carrier_violations
+            "carrier_violations": carrier_check["violations"],
+            "has_expired_rules": carrier_check["has_expired_rules"],
+            "expired_rules": carrier_check["expired_rules"]
         }
     }
 

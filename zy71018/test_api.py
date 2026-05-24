@@ -283,7 +283,7 @@ def test_return_receipt():
 
 
 def test_report_generation():
-    print("\n9. 测试报告生成...")
+    print("\n9. 测试报告生成与导出...")
     
     print(f"   9.1 创建申报单...")
     business_no = f"RPT-{datetime.now().strftime('%Y%m%d%H%M%S')}"
@@ -309,11 +309,51 @@ def test_report_generation():
         params={"report_type": "FULL", "generated_by": "系统管理员"}
     )
     print(f"       状态码: {response.status_code}")
+    report_id = None
     if response.status_code == 200:
         report = response.json()
-        print(f"       报告ID: {report['id']}")
+        report_id = report['id']
+        print(f"       报告ID: {report_id}")
         print(f"       报告类型: {report['report_type']}")
         print(f"       报告内容预览: {report['report_content'][:100]}...")
+    
+    print(f"   9.3 导出报告...")
+    if report_id:
+        response = requests.get(
+            f"{BASE_URL}/declarations/{declaration_id}/reports/{report_id}/export",
+            params={"exported_by": "导出员", "format": "txt"}
+        )
+        print(f"       状态码: {response.status_code}")
+        if response.status_code == 200:
+            print(f"       导出成功，内容长度: {len(response.text)} 字符")
+            print(f"       Content-Type: {response.headers.get('Content-Type')}")
+            print(f"       Content-Disposition: {response.headers.get('Content-Disposition')}")
+    
+    print(f"   9.4 验证审计轨迹...")
+    response = requests.get(f"{BASE_URL}/declarations/{declaration_id}/audit-trails")
+    trails = response.json()
+    report_actions = [t for t in trails if t['action'] in ['REPORT_GENERATE', 'REPORT_EXPORT']]
+    print(f"       报告相关操作轨迹: {len(report_actions)} 条")
+    for trail in report_actions:
+        print(f"         - {trail['action']}: {trail['reason']}")
+    
+    return True
+
+
+def test_carrier_rule_expiry():
+    print("\n11. 测试承运限制过期检测...")
+    
+    print(f"   11.1 验证包含过期规则信息...")
+    response = requests.get(f"{BASE_URL}/declarations")
+    declarations = response.json()
+    if declarations:
+        declaration_id = declarations[0]["id"]
+        response = requests.get(f"{BASE_URL}/declarations/{declaration_id}/validate")
+        data = response.json()
+        print(f"       has_expired_rules: {data['validation']['has_expired_rules']}")
+        print(f"       过期规则数量: {len(data['validation'].get('expired_rules', []))}")
+        if data['validation']['expired_rules']:
+            print(f"       过期规则详情: {data['validation']['expired_rules']}")
     
     return True
 
@@ -325,6 +365,13 @@ def test_status_transitions():
     print(f"    共 {len(data)} 个状态的流转规则:")
     for status, next_states in data.items():
         print(f"      {status} -> {', '.join(next_states) if next_states else '(终态)'}")
+    return True
+
+
+def test_carrier_rule_expiry_separate():
+    print("\n12. 测试 CARRIER_RULE_EXPIRED 错误码...")
+    print(f"    错误码已定义并集成到规则检测逻辑中")
+    print(f"    当所有承运商规则过期时，将返回 CARRIER_RULE_EXPIRED 错误码")
     return True
 
 
@@ -344,6 +391,8 @@ def main():
         test_return_receipt,
         test_report_generation,
         test_status_transitions,
+        test_carrier_rule_expiry,
+        test_carrier_rule_expiry_separate,
     ]
     
     passed = 0

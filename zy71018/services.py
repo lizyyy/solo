@@ -134,26 +134,50 @@ def check_battery_conflict(db: Session, declaration: models.Declaration) -> List
     return conflicts
 
 
-def check_carrier_rules(db: Session, declaration: models.Declaration) -> List[str]:
-    violations = []
+def check_carrier_rules(db: Session, declaration: models.Declaration) -> dict:
+    result = {
+        "is_valid": True,
+        "has_expired_rules": False,
+        "violations": [],
+        "expired_rules": [],
+        "error_code": None
+    }
     if not declaration.carrier_id:
-        return violations
+        return result
     carrier = db.query(models.Carrier).get(declaration.carrier_id)
     if not carrier or not carrier.is_active:
-        violations.append("承运商不存在或已停用")
-        return violations
+        result["is_valid"] = False
+        result["violations"].append("承运商不存在或已停用")
+        result["error_code"] = ErrorCode.CARRIER_RULE_VIOLATION
+        return result
     today = date.today()
-    active_rules = db.query(models.CarrierRule).filter(
+    all_rules = db.query(models.CarrierRule).filter(
         and_(
             models.CarrierRule.carrier_id == declaration.carrier_id,
-            models.CarrierRule.is_active == True,
-            models.CarrierRule.effective_date <= today,
-            or_(models.CarrierRule.expiry_date == None, models.CarrierRule.expiry_date >= today)
+            models.CarrierRule.is_active == True
         )
     ).all()
+    if not all_rules:
+        result["is_valid"] = False
+        result["violations"].append(f"承运商 {carrier.name} 无有效规则")
+        result["error_code"] = ErrorCode.CARRIER_RULE_VIOLATION
+        return result
+    expired_rules = [r for r in all_rules if r.expiry_date and r.expiry_date < today]
+    if expired_rules:
+        result["has_expired_rules"] = True
+        result["expired_rules"] = [
+            {"rule_code": r.rule_code, "rule_name": r.rule_name, "expiry_date": r.expiry_date.isoformat()}
+            for r in expired_rules
+        ]
+    active_rules = [
+        r for r in all_rules
+        if r.effective_date <= today and (not r.expiry_date or r.expiry_date >= today)
+    ]
     if not active_rules:
-        violations.append(f"承运商 {carrier.name} 无有效规则")
-        return violations
+        result["is_valid"] = False
+        result["violations"].append(f"承运商 {carrier.name} 所有规则均已过期")
+        result["error_code"] = ErrorCode.CARRIER_RULE_EXPIRED
+        return result
     battery_type = None
     if declaration.battery_type_id:
         battery_type = db.query(models.BatteryType).get(declaration.battery_type_id)
@@ -161,10 +185,12 @@ def check_carrier_rules(db: Session, declaration: models.Declaration) -> List[st
         if battery_type and rule.allowed_battery_types:
             allowed = [bt.strip() for bt in rule.allowed_battery_types.split(",")]
             if battery_type.code not in allowed:
-                violations.append(
+                result["is_valid"] = False
+                result["violations"].append(
                     f"规则 {rule.rule_code}: 电池类型 {battery_type.code} 不在允许列表 {allowed}"
                 )
-    return violations
+                result["error_code"] = ErrorCode.CARRIER_RULE_VIOLATION
+    return result
 
 
 def attribute_return_reason(return_reason: str, reason_code: Optional[str] = None) -> Tuple[str, str]:
