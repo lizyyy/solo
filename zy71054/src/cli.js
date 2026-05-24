@@ -29,6 +29,7 @@ program
   .option('--no-json', '不生成 JSON 报告')
   .option('--no-markdown', '不生成 Markdown 报告')
   .option('--no-csv', '不生成修复后的 CSV')
+  .option('--no-bad-records', '不导出坏记录文件')
   .option('--output-delimiter <delimiter>', '输出 CSV 的分隔符', ',')
   .action(async (file, options) => {
     try {
@@ -65,6 +66,7 @@ program
         json: options.json,
         markdown: options.markdown,
         csv: options.csv,
+        badRecords: options.badRecords,
         outputDelimiter: options.outputDelimiter
       });
 
@@ -141,10 +143,6 @@ program.parse();
 
 function validateOptions(file, options) {
   const errors = [];
-
-  if (!fs.existsSync(file)) {
-    errors.push(`文件不存在: ${file}`);
-  }
 
   if (options.encoding && !COMMON_ENCODINGS.some(e => e.toLowerCase() === options.encoding.toLowerCase())) {
     errors.push(`不支持的编码: ${options.encoding}。使用 'csvfix list-encodings' 查看支持列表`);

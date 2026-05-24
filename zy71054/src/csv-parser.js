@@ -205,8 +205,8 @@ function applyHeaderAliases(headers, aliases = {}) {
   return headers.map(header => {
     const normalized = header.trim().toLowerCase();
     for (const key of Object.keys(aliases)) {
-      if (key.toLowerCase() === normalized || aliases[key].toLowerCase() === normalized) {
-        return key;
+      if (key.toLowerCase() === normalized) {
+        return aliases[key];
       }
     }
     return header.trim();

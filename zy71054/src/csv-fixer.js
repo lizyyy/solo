@@ -130,14 +130,16 @@ async function processCSV(filePath, options = {}) {
       const record = parseResult.records[i];
       
       if (record.isBad) {
+        const badLineInfo = parseResult.badLines.find(b => b.lineNumber === record.lineNumber);
         const badRecord = {
           lineNumber: record.lineNumber,
           lineNumbers: record.lineNumbers,
           columns: record.columns,
+          rawContent: badLineInfo?.content || record.columns.join(','),
           columnCount: record.columns.length,
           expectedColumns: headers.length || parseResult.expectedColumns,
-          type: parseResult.badLines.find(b => b.lineNumber === record.lineNumber)?.type || 'unknown',
-          message: parseResult.badLines.find(b => b.lineNumber === record.lineNumber)?.message || '未知错误'
+          type: badLineInfo?.type || 'unknown',
+          message: badLineInfo?.message || '未知错误'
         };
 
         if (options.keepBadRecords) {
@@ -209,14 +211,20 @@ function makeHeadersUnique(headers) {
 function generateFixedCSV(result, options = {}) {
   const delimiter = options.outputDelimiter || ',';
   const lines = [];
+  const hasHeader = result.headers.length > 0;
 
-  if (result.headers.length > 0) {
+  if (hasHeader) {
     lines.push(result.headers.map(h => escapeCSV(h, delimiter)).join(delimiter));
-  }
-
-  for (const record of result.records) {
-    const values = result.headers.map(h => record[h] || '');
-    lines.push(values.map(v => escapeCSV(String(v), delimiter)).join(delimiter));
+    for (const record of result.records) {
+      const values = result.headers.map(h => record[h] || '');
+      lines.push(values.map(v => escapeCSV(String(v), delimiter)).join(delimiter));
+    }
+  } else {
+    for (const record of result.records) {
+      const colKeys = Object.keys(record).filter(k => k !== '_lineNumber');
+      const values = colKeys.map(k => record[k] || '');
+      lines.push(values.map(v => escapeCSV(String(v), delimiter)).join(delimiter));
+    }
   }
 
   return lines.join('\n');

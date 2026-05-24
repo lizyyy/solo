@@ -311,7 +311,7 @@ function writeReports(result, outputDir, baseName, options = {}) {
     outputs.push({ type: 'csv', path: csvPath });
   }
 
-  if (result.badRecords.length > 0) {
+  if (options.badRecords !== false && result.badRecords.length > 0) {
     const badRecordsPath = path.join(outputDir, `${baseName}.bad-records.csv`);
     const badContent = generateBadRecordsCSV(result);
     fs.writeFileSync(badRecordsPath, badContent, 'utf-8');
@@ -322,10 +322,10 @@ function writeReports(result, outputDir, baseName, options = {}) {
 }
 
 function generateBadRecordsCSV(result) {
-  const lines = ['line_number,type,message,expected_columns,actual_columns,content'];
+  const lines = ['line_number,type,message,expected_columns,actual_columns,raw_content'];
   for (const bad of result.badRecords) {
-    const content = JSON.stringify(bad.columns.join(' | ')).replace(/"/g, '""');
-    lines.push(`${bad.lineNumber},"${bad.type}","${bad.message.replace(/"/g, '""')}",${bad.expectedColumns},${bad.columnCount},"${content}"`);
+    const rawContent = (bad.rawContent || '').replace(/"/g, '""');
+    lines.push(`${bad.lineNumber},"${bad.type}","${bad.message.replace(/"/g, '""')}",${bad.expectedColumns},${bad.columnCount},"${rawContent}"`);
   }
   return lines.join('\n');
 }

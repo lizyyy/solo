@@ -1,3 +1,0 @@
-line_number,type,message,expected_columns,actual_columns,content
-4,"column_count_mismatch","列数不匹配: 期望 4, 实际 3",4,3,"""ORD003 | 广州电子科技公司 | 坏行缺少字段"""
-5,"column_count_mismatch","列数不匹配: 期望 4, 实际 6",4,6,"""ORD004 | 深圳网络公司 | 3200.00 | 2024-01-18 | 多余字段 | 异常"""

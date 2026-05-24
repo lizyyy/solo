@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-05-24T13:41:18.982Z",
+  "summary": {
+    "fileName": "file.csv",
+    "inputFile": "/nonexistent/path/file.csv",
+    "success": false,
+    "exitCode": 1
+  },
+  "detection": {
+    "encodingConfidence": 0,
+    "encodingCandidates": [],
+    "delimiter": null
+  },
+  "statistics": {
+    "totalLines": 0,
+    "goodRecords": 0,
+    "badRecords": 0,
+    "skippedRecords": 0,
+    "headerCount": 0
+  },
+  "headers": {
+    "original": [],
+    "final": []
+  },
+  "warnings": [],
+  "issues": [
+    {
+      "type": "file_not_found",
+      "severity": "critical",
+      "message": "文件不存在: /nonexistent/path/file.csv"
+    }
+  ],
+  "badRecords": [],
+  "preview": []
+}
