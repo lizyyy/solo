@@ -1,0 +1,39 @@
+{
+  "exit_code": 3,
+  "exit_code_description": "配置文件解析错误",
+  "config_files": [
+    "/Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties"
+  ],
+  "env_files": [],
+  "environment_vars": {},
+  "root_logger": null,
+  "loggers": {},
+  "resolutions": {
+    "com.example": {
+      "package_name": "com.example",
+      "final_level": "INFO",
+      "matched_patterns": [],
+      "chain": []
+    },
+    "org.springframework": {
+      "package_name": "org.springframework",
+      "final_level": "INFO",
+      "matched_patterns": [],
+      "chain": []
+    }
+  },
+  "errors": [
+    "Properties 文件解析错误 /Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties: File contains no section headers.\nfile: '<string>', line: 1\n'log4j.rootLogger=INFO, Console\\n'"
+  ],
+  "warnings": [],
+  "exit_code_meanings": {
+    "ExitCode.SUCCESS": "执行成功",
+    "ExitCode.INVALID_ARGS": "命令行参数无效",
+    "ExitCode.CONFIG_NOT_FOUND": "配置文件未找到",
+    "ExitCode.PARSE_ERROR": "配置文件解析错误",
+    "ExitCode.INCLUDE_ERROR": "Include 文件处理错误",
+    "ExitCode.ENV_ERROR": "环境变量处理错误",
+    "ExitCode.VALIDATION_ERROR": "输入数据校验失败",
+    "ExitCode.UNKNOWN_ERROR": "未知错误"
+  }
+}

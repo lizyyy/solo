@@ -1,0 +1,155 @@
+{
+  "exit_code": 0,
+  "exit_code_description": "执行成功",
+  "config_files": [
+    "/Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties"
+  ],
+  "env_files": [],
+  "environment_vars": {},
+  "root_logger": {
+    "package_pattern": "root",
+    "level": "INFO",
+    "source": {
+      "source_type": "file",
+      "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties",
+      "priority": 10,
+      "line_number": null
+    },
+    "additivity": null,
+    "appenders": [],
+    "is_wildcard": false
+  },
+  "loggers": {
+    "com.example": {
+      "package_pattern": "com.example",
+      "level": "INFO",
+      "source": {
+        "source_type": "file",
+        "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties",
+        "priority": 10,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    },
+    "com.example.service": {
+      "package_pattern": "com.example.service",
+      "level": "WARN",
+      "source": {
+        "source_type": "file",
+        "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties",
+        "priority": 10,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    },
+    "com.example.web": {
+      "package_pattern": "com.example.web",
+      "level": "DEBUG",
+      "source": {
+        "source_type": "file",
+        "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties",
+        "priority": 10,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    },
+    "org.springframework": {
+      "package_pattern": "org.springframework",
+      "level": "ERROR",
+      "source": {
+        "source_type": "file",
+        "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties",
+        "priority": 10,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    },
+    "org.hibernate": {
+      "package_pattern": "org.hibernate",
+      "level": "WARN",
+      "source": {
+        "source_type": "file",
+        "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties",
+        "priority": 10,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    }
+  },
+  "resolutions": {
+    "com.example": {
+      "package_name": "com.example",
+      "final_level": "INFO",
+      "matched_patterns": [
+        "com.example"
+      ],
+      "chain": [
+        {
+          "rule": {
+            "package_pattern": "com.example",
+            "level": "INFO",
+            "source": {
+              "source_type": "file",
+              "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties",
+              "priority": 10,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": "INFO",
+          "reason": "优先级 102000 - 来自 配置文件: /Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties"
+        }
+      ]
+    },
+    "org.springframework": {
+      "package_name": "org.springframework",
+      "final_level": "ERROR",
+      "matched_patterns": [
+        "org.springframework"
+      ],
+      "chain": [
+        {
+          "rule": {
+            "package_pattern": "org.springframework",
+            "level": "ERROR",
+            "source": {
+              "source_type": "file",
+              "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties",
+              "priority": 10,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": "INFO",
+          "reason": "优先级 102000 - 来自 配置文件: /Users/lzy/pro/solo/workspaces/zy71095/examples/log4j.properties"
+        }
+      ]
+    }
+  },
+  "errors": [],
+  "warnings": [],
+  "exit_code_meanings": {
+    "ExitCode.SUCCESS": "执行成功",
+    "ExitCode.INVALID_ARGS": "命令行参数无效",
+    "ExitCode.CONFIG_NOT_FOUND": "配置文件未找到",
+    "ExitCode.PARSE_ERROR": "配置文件解析错误",
+    "ExitCode.INCLUDE_ERROR": "Include 文件处理错误",
+    "ExitCode.ENV_ERROR": "环境变量处理错误",
+    "ExitCode.VALIDATION_ERROR": "输入数据校验失败",
+    "ExitCode.UNKNOWN_ERROR": "未知错误"
+  }
+}

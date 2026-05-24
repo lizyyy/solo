@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "log4j-chain-analyzer"
+version = "1.0.0"
+description = "Log4j 配置链分析工具 - 追踪多层配置覆盖，生成完整配置链路报告"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "lxml>=4.9.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+log4j-chain = "log4j_analyzer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

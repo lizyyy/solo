@@ -1,0 +1,251 @@
+{
+  "exit_code": 0,
+  "exit_code_description": "执行成功",
+  "config_files": [
+    "/Users/lzy/pro/solo/workspaces/zy71095/examples/log4j2.xml"
+  ],
+  "env_files": [
+    "/Users/lzy/pro/solo/workspaces/zy71095/examples/.env"
+  ],
+  "environment_vars": {
+    "LOG4J_ROOT_LEVEL": "DEBUG",
+    "LOG4J_LOGGER_COM_EXAMPLE_SERVICE": "DEBUG",
+    "LOG4J_LOGGER_ORG_SPRINGFRAMEWORK": "INFO"
+  },
+  "root_logger": {
+    "package_pattern": "root",
+    "level": "DEBUG",
+    "source": {
+      "source_type": "env_var",
+      "path": "LOG4J_ROOT_LEVEL",
+      "priority": 30,
+      "line_number": null
+    },
+    "additivity": null,
+    "appenders": [],
+    "is_wildcard": false
+  },
+  "loggers": {
+    "COM.EXAMPLE.SERVICE": {
+      "package_pattern": "COM.EXAMPLE.SERVICE",
+      "level": "DEBUG",
+      "source": {
+        "source_type": "env_var",
+        "path": "LOG4J_LOGGER_COM_EXAMPLE_SERVICE",
+        "priority": 30,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    },
+    "ORG.SPRINGFRAMEWORK": {
+      "package_pattern": "ORG.SPRINGFRAMEWORK",
+      "level": "INFO",
+      "source": {
+        "source_type": "env_var",
+        "path": "LOG4J_LOGGER_ORG_SPRINGFRAMEWORK",
+        "priority": 30,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    },
+    "root": {
+      "package_pattern": "root",
+      "level": "DEBUG",
+      "source": {
+        "source_type": "env_var",
+        "path": "LOG4J_ROOT_LEVEL",
+        "priority": 30,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    }
+  },
+  "resolutions": {
+    "com.example": {
+      "package_name": "com.example",
+      "final_level": "DEBUG",
+      "matched_patterns": [],
+      "chain": [
+        {
+          "rule": {
+            "package_pattern": "root",
+            "level": "DEBUG",
+            "source": {
+              "source_type": "env_var",
+              "path": "LOG4J_ROOT_LEVEL",
+              "priority": 30,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": null,
+          "reason": "使用 root logger 配置作为默认值"
+        }
+      ]
+    },
+    "com.example.service": {
+      "package_name": "com.example.service",
+      "final_level": "DEBUG",
+      "matched_patterns": [],
+      "chain": [
+        {
+          "rule": {
+            "package_pattern": "root",
+            "level": "DEBUG",
+            "source": {
+              "source_type": "env_var",
+              "path": "LOG4J_ROOT_LEVEL",
+              "priority": 30,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": null,
+          "reason": "使用 root logger 配置作为默认值"
+        }
+      ]
+    },
+    "com.example.service.order": {
+      "package_name": "com.example.service.order",
+      "final_level": "DEBUG",
+      "matched_patterns": [],
+      "chain": [
+        {
+          "rule": {
+            "package_pattern": "root",
+            "level": "DEBUG",
+            "source": {
+              "source_type": "env_var",
+              "path": "LOG4J_ROOT_LEVEL",
+              "priority": 30,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": null,
+          "reason": "使用 root logger 配置作为默认值"
+        }
+      ]
+    },
+    "com.example.web.controller": {
+      "package_name": "com.example.web.controller",
+      "final_level": "DEBUG",
+      "matched_patterns": [],
+      "chain": [
+        {
+          "rule": {
+            "package_pattern": "root",
+            "level": "DEBUG",
+            "source": {
+              "source_type": "env_var",
+              "path": "LOG4J_ROOT_LEVEL",
+              "priority": 30,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": null,
+          "reason": "使用 root logger 配置作为默认值"
+        }
+      ]
+    },
+    "com.example.user.dao": {
+      "package_name": "com.example.user.dao",
+      "final_level": "DEBUG",
+      "matched_patterns": [],
+      "chain": [
+        {
+          "rule": {
+            "package_pattern": "root",
+            "level": "DEBUG",
+            "source": {
+              "source_type": "env_var",
+              "path": "LOG4J_ROOT_LEVEL",
+              "priority": 30,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": null,
+          "reason": "使用 root logger 配置作为默认值"
+        }
+      ]
+    },
+    "org.springframework": {
+      "package_name": "org.springframework",
+      "final_level": "DEBUG",
+      "matched_patterns": [],
+      "chain": [
+        {
+          "rule": {
+            "package_pattern": "root",
+            "level": "DEBUG",
+            "source": {
+              "source_type": "env_var",
+              "path": "LOG4J_ROOT_LEVEL",
+              "priority": 30,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": null,
+          "reason": "使用 root logger 配置作为默认值"
+        }
+      ]
+    },
+    "org.hibernate": {
+      "package_name": "org.hibernate",
+      "final_level": "DEBUG",
+      "matched_patterns": [],
+      "chain": [
+        {
+          "rule": {
+            "package_pattern": "root",
+            "level": "DEBUG",
+            "source": {
+              "source_type": "env_var",
+              "path": "LOG4J_ROOT_LEVEL",
+              "priority": 30,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": null,
+          "reason": "使用 root logger 配置作为默认值"
+        }
+      ]
+    }
+  },
+  "errors": [],
+  "warnings": [],
+  "exit_code_meanings": {
+    "ExitCode.SUCCESS": "执行成功",
+    "ExitCode.INVALID_ARGS": "命令行参数无效",
+    "ExitCode.CONFIG_NOT_FOUND": "配置文件未找到",
+    "ExitCode.PARSE_ERROR": "配置文件解析错误",
+    "ExitCode.INCLUDE_ERROR": "Include 文件处理错误",
+    "ExitCode.ENV_ERROR": "环境变量处理错误",
+    "ExitCode.VALIDATION_ERROR": "输入数据校验失败",
+    "ExitCode.UNKNOWN_ERROR": "未知错误"
+  }
+}

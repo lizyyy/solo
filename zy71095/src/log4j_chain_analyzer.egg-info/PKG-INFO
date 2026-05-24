@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: log4j-chain-analyzer
+Version: 1.0.0
+Summary: Log4j 配置链分析工具 - 追踪多层配置覆盖，生成完整配置链路报告
+Requires-Python: >=3.9
+Requires-Dist: click>=8.0.0
+Requires-Dist: lxml>=4.9.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: rich>=13.0.0
