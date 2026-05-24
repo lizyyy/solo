@@ -1,0 +1,7 @@
+2024-01-15T10:00:01 GET /api/v1/users user.read client_001 200
+2024-01-15T10:00:02 POST /api/v1/users user.write client_001 201
+2024-01-15T10:00:03 GET /api/v1/orders order.read client_002 200
+2024-01-15T10:00:04 POST /api/v1/orders user.write client_002 403
+2024-01-15T10:00:05 GET /api/v1/users/123 user:read client_003 200
+2024-01-15T10:00:06 PUT /api/v1/users/123 admin.full client_003 200
+2024-01-15T10:00:07 GET /api/v1/orders/456 deprecated_scope client_004 403

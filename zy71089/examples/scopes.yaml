@@ -1,0 +1,43 @@
+scopes:
+  - name: user.read
+    description: 读取用户基本信息
+    aliases:
+      - user:read
+      - profile:read
+    includes: []
+
+  - name: user.write
+    description: 修改用户基本信息
+    aliases:
+      - user:write
+      - profile:write
+    includes:
+      - user.read
+
+  - name: order.read
+    description: 查看订单信息
+    aliases:
+      - order:read
+    includes: []
+
+  - name: order.write
+    description: 创建和修改订单
+    aliases:
+      - order:write
+    includes:
+      - order.read
+
+  - name: admin.full
+    description: 管理员完全权限
+    aliases:
+      - admin:*
+      - root
+    includes:
+      - user.read
+      - user.write
+      - order.read
+      - order.write
+
+  - name: deprecated_scope
+    description: 已弃用的旧scope
+    is_deprecated: true

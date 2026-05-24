@@ -1,0 +1,105 @@
+openapi: "3.0.0"
+info:
+  title: 示例 API
+  version: 1.0.0
+paths:
+  /api/v1/users:
+    get:
+      summary: 获取用户列表
+      operationId: getUsers
+      tags:
+        - users
+      security:
+        - oauth2:
+            - user.read
+      responses:
+        "200":
+          description: 成功
+
+    post:
+      summary: 创建用户
+      operationId: createUser
+      tags:
+        - users
+      security:
+        - oauth2:
+            - user.write
+      responses:
+        "201":
+          description: 成功
+
+  /api/v1/users/{id}:
+    get:
+      summary: 获取用户详情
+      operationId: getUser
+      tags:
+        - users
+      security:
+        - oauth2:
+            - user.read
+      responses:
+        "200":
+          description: 成功
+
+    put:
+      summary: 更新用户
+      operationId: updateUser
+      tags:
+        - users
+      security:
+        - oauth2:
+            - user.write
+      responses:
+        "200":
+          description: 成功
+
+  /api/v1/orders:
+    get:
+      summary: 获取订单列表
+      operationId: getOrders
+      tags:
+        - orders
+      security:
+        - oauth2:
+            - order.read
+      responses:
+        "200":
+          description: 成功
+
+    post:
+      summary: 创建订单
+      operationId: createOrder
+      tags:
+        - orders
+      security:
+        - oauth2:
+            - order.write
+      responses:
+        "201":
+          description: 成功
+
+  /api/v1/orders/{id}:
+    get:
+      summary: 获取订单详情
+      operationId: getOrder
+      tags:
+        - orders
+      security:
+        - oauth2:
+            - order.read
+      responses:
+        "200":
+          description: 成功
+
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes:
+            user.read: Read user info
+            user.write: Write user info
+            order.read: Read order info
+            order.write: Write order info

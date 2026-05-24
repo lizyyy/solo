@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "auth-scope-coverage"
+version = "0.1.0"
+description = "Auth Scope 覆盖检查工具 - 验证SDK示例、文档与真实接口权限一致性"
+requires-python = ">=3.9"
+dependencies = [
+    "typer>=0.9.0",
+    "pydantic>=2.0.0",
+    "pyyaml>=6.0",
+    "rich>=13.0.0",
+    "Jinja2>=3.1.0",
+]
+
+[project.scripts]
+scope-coverage = "scope_coverage.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]

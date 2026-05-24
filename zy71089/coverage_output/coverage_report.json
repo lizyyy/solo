@@ -1,0 +1,798 @@
+{
+  "resolved_scopes": {
+    "user.read": {
+      "name": "user.read",
+      "description": "读取用户基本信息",
+      "aliases": [
+        "user:read",
+        "profile:read"
+      ],
+      "includes": [],
+      "location": {
+        "file_path": "examples/scopes.yaml",
+        "line_number": 1,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    },
+    "user.write": {
+      "name": "user.write",
+      "description": "修改用户基本信息",
+      "aliases": [
+        "user:write",
+        "profile:write"
+      ],
+      "includes": [
+        "user.read"
+      ],
+      "location": {
+        "file_path": "examples/scopes.yaml",
+        "line_number": 2,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    },
+    "order.read": {
+      "name": "order.read",
+      "description": "查看订单信息",
+      "aliases": [
+        "order:read"
+      ],
+      "includes": [],
+      "location": {
+        "file_path": "examples/scopes.yaml",
+        "line_number": 3,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    },
+    "order.write": {
+      "name": "order.write",
+      "description": "创建和修改订单",
+      "aliases": [
+        "order:write"
+      ],
+      "includes": [
+        "order.read"
+      ],
+      "location": {
+        "file_path": "examples/scopes.yaml",
+        "line_number": 4,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    },
+    "admin.full": {
+      "name": "admin.full",
+      "description": "管理员完全权限",
+      "aliases": [
+        "admin:*",
+        "root"
+      ],
+      "includes": [
+        "user.read",
+        "user.write",
+        "order.read",
+        "order.write"
+      ],
+      "location": {
+        "file_path": "examples/scopes.yaml",
+        "line_number": 5,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    },
+    "deprecated_scope": {
+      "name": "deprecated_scope",
+      "description": "已弃用的旧scope",
+      "aliases": [],
+      "includes": [],
+      "location": {
+        "file_path": "examples/scopes.yaml",
+        "line_number": 6,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    }
+  },
+  "apis": [
+    {
+      "method": "GET",
+      "path": "/api/v1/users",
+      "required_scopes": [
+        "user.read"
+      ],
+      "optional_scopes": [],
+      "description": "获取用户列表",
+      "operation_id": "getUsers",
+      "tags": [
+        "users"
+      ],
+      "location": {
+        "file_path": "examples/apis.yaml",
+        "line_number": null,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/users",
+      "required_scopes": [
+        "user.write"
+      ],
+      "optional_scopes": [],
+      "description": "创建用户",
+      "operation_id": "createUser",
+      "tags": [
+        "users"
+      ],
+      "location": {
+        "file_path": "examples/apis.yaml",
+        "line_number": null,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/users/{id}",
+      "required_scopes": [
+        "user.read"
+      ],
+      "optional_scopes": [],
+      "description": "获取用户详情",
+      "operation_id": "getUser",
+      "tags": [
+        "users"
+      ],
+      "location": {
+        "file_path": "examples/apis.yaml",
+        "line_number": null,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/users/{id}",
+      "required_scopes": [
+        "user.write"
+      ],
+      "optional_scopes": [],
+      "description": "更新用户",
+      "operation_id": "updateUser",
+      "tags": [
+        "users"
+      ],
+      "location": {
+        "file_path": "examples/apis.yaml",
+        "line_number": null,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders",
+      "required_scopes": [
+        "order.read"
+      ],
+      "optional_scopes": [],
+      "description": "获取订单列表",
+      "operation_id": "getOrders",
+      "tags": [
+        "orders"
+      ],
+      "location": {
+        "file_path": "examples/apis.yaml",
+        "line_number": null,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "required_scopes": [
+        "order.write"
+      ],
+      "optional_scopes": [],
+      "description": "创建订单",
+      "operation_id": "createOrder",
+      "tags": [
+        "orders"
+      ],
+      "location": {
+        "file_path": "examples/apis.yaml",
+        "line_number": null,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/orders/{id}",
+      "required_scopes": [
+        "order.read"
+      ],
+      "optional_scopes": [],
+      "description": "获取订单详情",
+      "operation_id": "getOrder",
+      "tags": [
+        "orders"
+      ],
+      "location": {
+        "file_path": "examples/apis.yaml",
+        "line_number": null,
+        "column": null,
+        "raw_content": null
+      },
+      "is_deprecated": false
+    }
+  ],
+  "sdk_examples": [
+    {
+      "name": "sdk_examples_1",
+      "language": "python",
+      "api_method": "GET",
+      "api_path": "/api/v1/users",
+      "used_scopes": [
+        "user:read"
+      ],
+      "code": null,
+      "description": null,
+      "location": {
+        "file_path": "examples/sdk_examples.py",
+        "line_number": 2,
+        "column": null,
+        "raw_content": null
+      },
+      "is_verified": false,
+      "notes": []
+    },
+    {
+      "name": "sdk_examples_2",
+      "language": "python",
+      "api_method": "POST",
+      "api_path": "/api/v1/users",
+      "used_scopes": [
+        "user.read"
+      ],
+      "code": null,
+      "description": null,
+      "location": {
+        "file_path": "examples/sdk_examples.py",
+        "line_number": 10,
+        "column": null,
+        "raw_content": null
+      },
+      "is_verified": false,
+      "notes": []
+    },
+    {
+      "name": "sdk_examples_3",
+      "language": "python",
+      "api_method": "POST",
+      "api_path": "/api/v1/users",
+      "used_scopes": [
+        "user:write"
+      ],
+      "code": null,
+      "description": null,
+      "location": {
+        "file_path": "examples/sdk_examples.py",
+        "line_number": 19,
+        "column": null,
+        "raw_content": null
+      },
+      "is_verified": false,
+      "notes": []
+    },
+    {
+      "name": "sdk_examples_4",
+      "language": "python",
+      "api_method": "GET",
+      "api_path": "/api/v1/orders",
+      "used_scopes": [
+        "deprecated_scope"
+      ],
+      "code": null,
+      "description": null,
+      "location": {
+        "file_path": "examples/sdk_examples.py",
+        "line_number": 27,
+        "column": null,
+        "raw_content": null
+      },
+      "is_verified": false,
+      "notes": []
+    },
+    {
+      "name": "sdk_examples_5",
+      "language": "python",
+      "api_method": "POST",
+      "api_path": "/api/v1/orders",
+      "used_scopes": [
+        "admin.full"
+      ],
+      "code": null,
+      "description": null,
+      "location": {
+        "file_path": "examples/sdk_examples.py",
+        "line_number": 35,
+        "column": null,
+        "raw_content": null
+      },
+      "is_verified": false,
+      "notes": []
+    },
+    {
+      "name": "sdk_examples_6",
+      "language": "python",
+      "api_method": "GET",
+      "api_path": "/api/v1/users",
+      "used_scopes": [
+        "user.read",
+        "order.write"
+      ],
+      "code": null,
+      "description": null,
+      "location": {
+        "file_path": "examples/sdk_examples.py",
+        "line_number": 44,
+        "column": null,
+        "raw_content": null
+      },
+      "is_verified": false,
+      "notes": []
+    }
+  ],
+  "doc_fragments": [
+    {
+      "title": "用户 API 文档",
+      "content": "",
+      "mentioned_scopes": [],
+      "mentioned_apis": [],
+      "location": {
+        "file_path": "examples/documentation.md",
+        "line_number": 1,
+        "column": null,
+        "raw_content": null
+      },
+      "section": "用户 API 文档"
+    },
+    {
+      "title": "获取用户列表",
+      "content": "\n使用 `GET /api/v1/users` 接口获取用户列表。\n\n需要的权限：`user.read`\n\n```python",
+      "mentioned_scopes": [
+        "GET",
+        "api",
+        "v1",
+        "users",
+        "user.read",
+        "python"
+      ],
+      "mentioned_apis": [
+        "GET /api/v1/users`"
+      ],
+      "location": {
+        "file_path": "examples/documentation.md",
+        "line_number": 3,
+        "column": null,
+        "raw_content": null
+      },
+      "section": "获取用户列表"
+    },
+    {
+      "title": "使用 user.read 权限调用",
+      "content": "response = client.get(\"/api/v1/users\")\n```\n",
+      "mentioned_scopes": [
+        "response",
+        "client",
+        "get",
+        "api",
+        "v1",
+        "users"
+      ],
+      "mentioned_apis": [],
+      "location": {
+        "file_path": "examples/documentation.md",
+        "line_number": 10,
+        "column": null,
+        "raw_content": null
+      },
+      "section": "使用 user.read 权限调用"
+    },
+    {
+      "title": "创建用户",
+      "content": "\n使用 `POST /api/v1/users` 接口创建新用户。\n\n**注意：此接口需要特殊权限。**\n\n```python\nresponse = client.post(\"/api/v1/users\", json=data)\n```\n",
+      "mentioned_scopes": [
+        "POST",
+        "api",
+        "v1",
+        "users",
+        "python",
+        "response",
+        "client",
+        "post",
+        "json",
+        "data"
+      ],
+      "mentioned_apis": [
+        "POST /api/v1/users`"
+      ],
+      "location": {
+        "file_path": "examples/documentation.md",
+        "line_number": 14,
+        "column": null,
+        "raw_content": null
+      },
+      "section": "创建用户"
+    },
+    {
+      "title": "更新用户",
+      "content": "\n使用 `PUT /api/v1/users/{id}` 接口更新用户信息。\n\n需要的权限：`profile:write`（别名）\n",
+      "mentioned_scopes": [
+        "PUT",
+        "api",
+        "v1",
+        "users",
+        "id",
+        "profile:write"
+      ],
+      "mentioned_apis": [
+        "PUT /api/v1/users/{id}`"
+      ],
+      "location": {
+        "file_path": "examples/documentation.md",
+        "line_number": 24,
+        "column": null,
+        "raw_content": null
+      },
+      "section": "更新用户"
+    },
+    {
+      "title": "订单 API 文档",
+      "content": "",
+      "mentioned_scopes": [],
+      "mentioned_apis": [],
+      "location": {
+        "file_path": "examples/documentation.md",
+        "line_number": 30,
+        "column": null,
+        "raw_content": null
+      },
+      "section": "订单 API 文档"
+    },
+    {
+      "title": "获取订单列表",
+      "content": "\n使用 `GET /api/v1/orders` 接口获取订单列表。\n\n需要的权限：`order.read`\n",
+      "mentioned_scopes": [
+        "GET",
+        "api",
+        "v1",
+        "orders",
+        "order.read"
+      ],
+      "mentioned_apis": [
+        "GET /api/v1/orders`"
+      ],
+      "location": {
+        "file_path": "examples/documentation.md",
+        "line_number": 32,
+        "column": null,
+        "raw_content": null
+      },
+      "section": "获取订单列表"
+    },
+    {
+      "title": "创建订单",
+      "content": "\n使用 `POST /api/v1/orders` 接口创建新订单。\n\n需要的权限：`order.write` 或 `admin.full`",
+      "mentioned_scopes": [
+        "POST",
+        "api",
+        "v1",
+        "orders",
+        "order.write",
+        "admin",
+        "full"
+      ],
+      "mentioned_apis": [
+        "POST /api/v1/orders`"
+      ],
+      "location": {
+        "file_path": "examples/documentation.md",
+        "line_number": 38,
+        "column": null,
+        "raw_content": null
+      },
+      "section": "创建订单"
+    }
+  ],
+  "call_logs": [
+    {
+      "timestamp": "2024-01-15T10:00:01",
+      "method": "GET",
+      "path": "/api/v1/users",
+      "used_scopes": [
+        "user.read",
+        "client_001"
+      ],
+      "success": true,
+      "status_code": null,
+      "client_id": null,
+      "location": {
+        "file_path": "examples/call_logs.txt",
+        "line_number": 1,
+        "column": null,
+        "raw_content": "2024-01-15T10:00:01 GET /api/v1/users user.read client_001 200"
+      }
+    },
+    {
+      "timestamp": "2024-01-15T10:00:02",
+      "method": "POST",
+      "path": "/api/v1/users",
+      "used_scopes": [
+        "user.write",
+        "client_001"
+      ],
+      "success": true,
+      "status_code": null,
+      "client_id": null,
+      "location": {
+        "file_path": "examples/call_logs.txt",
+        "line_number": 2,
+        "column": null,
+        "raw_content": "2024-01-15T10:00:02 POST /api/v1/users user.write client_001 201"
+      }
+    },
+    {
+      "timestamp": "2024-01-15T10:00:03",
+      "method": "GET",
+      "path": "/api/v1/orders",
+      "used_scopes": [
+        "order.read",
+        "client_002"
+      ],
+      "success": true,
+      "status_code": null,
+      "client_id": null,
+      "location": {
+        "file_path": "examples/call_logs.txt",
+        "line_number": 3,
+        "column": null,
+        "raw_content": "2024-01-15T10:00:03 GET /api/v1/orders order.read client_002 200"
+      }
+    },
+    {
+      "timestamp": "2024-01-15T10:00:04",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "used_scopes": [
+        "user.write",
+        "client_002"
+      ],
+      "success": true,
+      "status_code": null,
+      "client_id": null,
+      "location": {
+        "file_path": "examples/call_logs.txt",
+        "line_number": 4,
+        "column": null,
+        "raw_content": "2024-01-15T10:00:04 POST /api/v1/orders user.write client_002 403"
+      }
+    },
+    {
+      "timestamp": "2024-01-15T10:00:05",
+      "method": "GET",
+      "path": "/api/v1/users/123",
+      "used_scopes": [
+        "user:read",
+        "client_003"
+      ],
+      "success": true,
+      "status_code": null,
+      "client_id": null,
+      "location": {
+        "file_path": "examples/call_logs.txt",
+        "line_number": 5,
+        "column": null,
+        "raw_content": "2024-01-15T10:00:05 GET /api/v1/users/123 user:read client_003 200"
+      }
+    },
+    {
+      "timestamp": "2024-01-15T10:00:06",
+      "method": "PUT",
+      "path": "/api/v1/users/123",
+      "used_scopes": [
+        "admin.full",
+        "client_003"
+      ],
+      "success": true,
+      "status_code": null,
+      "client_id": null,
+      "location": {
+        "file_path": "examples/call_logs.txt",
+        "line_number": 6,
+        "column": null,
+        "raw_content": "2024-01-15T10:00:06 PUT /api/v1/users/123 admin.full client_003 200"
+      }
+    },
+    {
+      "timestamp": "2024-01-15T10:00:07",
+      "method": "GET",
+      "path": "/api/v1/orders/456",
+      "used_scopes": [
+        "deprecated_scope",
+        "client_004"
+      ],
+      "success": true,
+      "status_code": null,
+      "client_id": null,
+      "location": {
+        "file_path": "examples/call_logs.txt",
+        "line_number": 7,
+        "column": null,
+        "raw_content": "2024-01-15T10:00:07 GET /api/v1/orders/456 deprecated_scope client_004 403"
+      }
+    }
+  ],
+  "parse_issues": [],
+  "scope_coverage_gaps": [],
+  "sdk_coverage_gaps": [
+    {
+      "gap_type": "sdk_mismatch",
+      "severity": "error",
+      "api_key": "POST /api/v1/users",
+      "expected_scopes": [
+        "user.write"
+      ],
+      "actual_scopes": [
+        "user.read"
+      ],
+      "missing_scopes": [
+        "user.write"
+      ],
+      "extra_scopes": [
+        "user.read"
+      ],
+      "source": "SDK Example: sdk_examples_2 (python)",
+      "source_location": {
+        "file_path": "examples/sdk_examples.py",
+        "line_number": 10,
+        "column": null,
+        "raw_content": null
+      },
+      "explanation": "示例缺少必需权限。API 'POST /api/v1/users' 需要 scope: user.write; 示例仅声明了: user.read; 缺少: user.write 示例声明了多余的权限: user.read。这些权限对调用 API 'POST /api/v1/users' 不是必需的"
+    },
+    {
+      "gap_type": "sdk_mismatch",
+      "severity": "error",
+      "api_key": "GET /api/v1/orders",
+      "expected_scopes": [
+        "order.read"
+      ],
+      "actual_scopes": [
+        "deprecated_scope"
+      ],
+      "missing_scopes": [
+        "order.read"
+      ],
+      "extra_scopes": [
+        "deprecated_scope"
+      ],
+      "source": "SDK Example: sdk_examples_4 (python)",
+      "source_location": {
+        "file_path": "examples/sdk_examples.py",
+        "line_number": 27,
+        "column": null,
+        "raw_content": null
+      },
+      "explanation": "示例缺少必需权限。API 'GET /api/v1/orders' 需要 scope: order.read; 示例仅声明了: deprecated_scope; 缺少: order.read 示例声明了多余的权限: deprecated_scope。这些权限对调用 API 'GET /api/v1/orders' 不是必需的"
+    },
+    {
+      "gap_type": "sdk_mismatch",
+      "severity": "warning",
+      "api_key": "GET /api/v1/users",
+      "expected_scopes": [
+        "user.read"
+      ],
+      "actual_scopes": [
+        "user.read",
+        "order.write"
+      ],
+      "missing_scopes": [],
+      "extra_scopes": [
+        "order.write"
+      ],
+      "source": "SDK Example: sdk_examples_6 (python)",
+      "source_location": {
+        "file_path": "examples/sdk_examples.py",
+        "line_number": 44,
+        "column": null,
+        "raw_content": null
+      },
+      "explanation": "示例声明了多余的权限: order.write。这些权限对调用 API 'GET /api/v1/users' 不是必需的"
+    }
+  ],
+  "doc_coverage_gaps": [],
+  "scope_mappings": {
+    "user.read": {
+      "canonical_name": "user.read",
+      "aliases": [
+        "profile:read",
+        "user:read"
+      ],
+      "included_scopes": []
+    },
+    "user.write": {
+      "canonical_name": "user.write",
+      "aliases": [
+        "profile:write",
+        "user:write"
+      ],
+      "included_scopes": [
+        "user.read"
+      ]
+    },
+    "order.read": {
+      "canonical_name": "order.read",
+      "aliases": [
+        "order:read"
+      ],
+      "included_scopes": []
+    },
+    "order.write": {
+      "canonical_name": "order.write",
+      "aliases": [
+        "order:write"
+      ],
+      "included_scopes": [
+        "order.read"
+      ]
+    },
+    "admin.full": {
+      "canonical_name": "admin.full",
+      "aliases": [
+        "admin:*",
+        "root"
+      ],
+      "included_scopes": [
+        "order.write",
+        "user.read",
+        "user.write",
+        "order.read"
+      ]
+    },
+    "deprecated_scope": {
+      "canonical_name": "deprecated_scope",
+      "aliases": [],
+      "included_scopes": []
+    }
+  },
+  "metadata": {
+    "total_apis": 7,
+    "total_scopes": 6,
+    "total_sdk_examples": 6,
+    "total_doc_fragments": 8,
+    "total_call_logs": 7,
+    "sdk_gaps_count": 3,
+    "doc_gaps_count": 0,
+    "scope_gaps_count": 0,
+    "parse_errors_count": 0,
+    "parse_warnings_count": 0
+  }
+}
