@@ -15,7 +15,7 @@ class ApprovalStatus:
     REJECTED = "rejected"
 
 STATUS_TRANSITIONS = {
-    ApprovalStatus.PENDING: [ApprovalStatus.POINTS_SUBMITTED, ApprovalStatus.REJECTED],
+    ApprovalStatus.PENDING: [ApprovalStatus.POINTS_SUBMITTED, ApprovalStatus.POINTS_VERIFIED, ApprovalStatus.REJECTED],
     ApprovalStatus.POINTS_SUBMITTED: [ApprovalStatus.POINTS_VERIFIED, ApprovalStatus.REJECTED],
     ApprovalStatus.POINTS_VERIFIED: [ApprovalStatus.FIRE_APPROVED, ApprovalStatus.REJECTED],
     ApprovalStatus.FIRE_APPROVED: [ApprovalStatus.TEST_COMPLETED, ApprovalStatus.REJECTED],
@@ -84,12 +84,11 @@ def check_test_records(test_records: List[TestRecord]) -> Tuple[bool, List[str]]
     
     return len(violations) == 0, violations
 
-def check_temporary_performance(performance: Performance) -> Tuple[bool, List[str]]:
+def check_props_confirmed(props: List) -> Tuple[bool, List[str]]:
     violations = []
     
-    if performance.is_temporary:
-        if performance.status != ApprovalStatus.FINAL_APPROVED:
-            violations.append("临时加场必须完成全部审批流程后方可执行")
+    if len(props) == 0:
+        violations.append("缺少道具清单确认")
     
     return len(violations) == 0, violations
 
@@ -97,14 +96,21 @@ def full_approval_check(
     performance: Performance,
     points: List[FireworkPoint],
     approvals: List[FireApproval],
-    test_records: List[TestRecord]
+    test_records: List[TestRecord],
+    props: List = None
 ) -> Tuple[bool, List[str], List[str]]:
     all_violations = []
     all_warnings = []
     
-    points_valid, points_violations, points_warnings = validate_firework_points(points)
-    all_violations.extend(points_violations)
-    all_warnings.extend(points_warnings)
+    verified_points = [p for p in points if p.safety_verified]
+    if len(verified_points) == 0 and len(points) > 0:
+        all_violations.append("没有通过安全校验的烟火点位")
+    elif len(points) == 0:
+        all_violations.append("缺少烟火点位数据")
+    else:
+        points_valid, points_violations, points_warnings = validate_firework_points(verified_points)
+        all_violations.extend(points_violations)
+        all_warnings.extend(points_warnings)
     
     fire_valid, fire_violations = check_fire_approval(approvals)
     all_violations.extend(fire_violations)
@@ -112,8 +118,9 @@ def full_approval_check(
     test_valid, test_violations = check_test_records(test_records)
     all_violations.extend(test_violations)
     
-    temp_valid, temp_violations = check_temporary_performance(performance)
-    all_violations.extend(temp_violations)
+    if props is not None:
+        props_valid, props_violations = check_props_confirmed(props)
+        all_violations.extend(props_violations)
     
     is_approved = len(all_violations) == 0
     return is_approved, all_violations, all_warnings

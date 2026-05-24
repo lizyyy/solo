@@ -32,8 +32,13 @@ app = FastAPI(title="剧场烟火审批 API", version="1.0.0")
 
 os.makedirs("reports", exist_ok=True)
 
+def json_serial(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
 def calculate_hash(data: dict) -> str:
-    data_str = json.dumps(data, sort_keys=True, ensure_ascii=False)
+    data_str = json.dumps(data, sort_keys=True, ensure_ascii=False, default=json_serial)
     return hashlib.sha256(data_str.encode()).hexdigest()
 
 def record_status_history(db: Session, performance_id: int, old_status: str, new_status: str, changed_by: str, reason: str):
@@ -276,8 +281,9 @@ def check_approval(performance_id: int, db: Session = Depends(get_db)):
     points = db.query(FireworkPoint).filter(FireworkPoint.performance_id == performance_id).all()
     approvals = db.query(FireApproval).filter(FireApproval.performance_id == performance_id).all()
     test_records = db.query(TestRecord).filter(TestRecord.performance_id == performance_id).all()
+    props = db.query(PropItem).filter(PropItem.performance_id == performance_id).all()
     
-    is_approved, violations, warnings = full_approval_check(performance, points, approvals, test_records)
+    is_approved, violations, warnings = full_approval_check(performance, points, approvals, test_records, props)
     
     if is_approved and can_transition(performance.status, ApprovalStatus.FINAL_APPROVED):
         old_status = performance.status
@@ -302,10 +308,11 @@ def confirm_responsibility(performance_id: int, request: ReportGenerateRequest, 
     if not performance:
         raise HTTPException(status_code=404, detail="演出场次不存在")
     
-    if performance.is_temporary and performance.status != ApprovalStatus.FINAL_APPROVED:
+    if performance.status != ApprovalStatus.FINAL_APPROVED:
+        temp_msg = "临时加场" if performance.is_temporary else "演出"
         raise HTTPException(
             status_code=403,
-            detail="临时加场未完成全部复核，禁止确认责任"
+            detail=f"{temp_msg}未完成全部审批流程（当前状态: {performance.status}），禁止确认责任"
         )
     
     return {
@@ -331,7 +338,7 @@ def generate_report(performance_id: int, request: ReportGenerateRequest, db: Ses
     test_records = db.query(TestRecord).filter(TestRecord.performance_id == performance_id).all()
     props = db.query(PropItem).filter(PropItem.performance_id == performance_id).all()
     
-    is_approved, violations, warnings = full_approval_check(performance, points, approvals, test_records)
+    is_approved, violations, warnings = full_approval_check(performance, points, approvals, test_records, props)
     
     report_number = f"FR-{datetime.now().strftime('%Y%m%d')}-{performance_id:04d}"
     pdf_path = f"reports/{report_number}.pdf"
