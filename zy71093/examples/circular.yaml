@@ -1,0 +1,18 @@
+simple: &simple
+  name: simple
+  value: 123
+
+self_ref: &self_ref
+  name: self_ref
+  ref: *self_ref
+
+nested:
+  level1: &nested_level1
+    name: level1
+    inner: &nested_level2
+      name: level2
+      back: *nested_level1
+
+valid_merge:
+  <<: *simple
+  extra: value

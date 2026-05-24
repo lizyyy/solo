@@ -24,14 +24,28 @@ function pathJoin(base: string, key: string | number): string {
   return `${base}.${key}`;
 }
 
-function deepClone<T>(obj: T): T {
+function deepClone<T>(obj: T, visited: WeakMap<object, any> = new WeakMap()): T {
   if (obj === null || typeof obj !== 'object') return obj;
   if (obj instanceof Date) return new Date(obj.getTime()) as unknown as T;
-  if (obj instanceof Array) return obj.map(item => deepClone(item)) as unknown as T;
+
+  if (visited.has(obj as object)) {
+    return visited.get(obj as object);
+  }
+
+  if (obj instanceof Array) {
+    const arrClone: any[] = [];
+    visited.set(obj as object, arrClone);
+    for (const item of obj) {
+      arrClone.push(deepClone(item, visited));
+    }
+    return arrClone as unknown as T;
+  }
+
   const cloned = {} as T;
+  visited.set(obj as object, cloned);
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      cloned[key] = deepClone(obj[key]);
+      cloned[key] = deepClone(obj[key], visited);
     }
   }
   return cloned;
@@ -113,6 +127,46 @@ function getValueAtPath(obj: any, path: string): any {
   return current;
 }
 
+function safeIsEqual(a: any, b: any, visited: WeakMap<object, Set<object>> = new WeakMap()): boolean {
+  if (a === b) return true;
+
+  if (a === null || b === null) return a === b;
+  if (typeof a !== typeof b) return false;
+
+  if (typeof a !== 'object') return a === b;
+
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+
+  const aVisited = visited.get(a) || new Set();
+  if (aVisited.has(b)) return true;
+  aVisited.add(b);
+  visited.set(a, aVisited);
+
+  const bVisited = visited.get(b) || new Set();
+  if (bVisited.has(a)) return true;
+  bVisited.add(a);
+  visited.set(b, bVisited);
+
+  if (Array.isArray(a)) {
+    if (a.length !== (b as any[]).length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (!safeIsEqual(a[i], (b as any[])[i], visited)) return false;
+    }
+    return true;
+  }
+
+  const aKeys = Object.keys(a);
+  const bKeys = Object.keys(b);
+  if (aKeys.length !== bKeys.length) return false;
+
+  for (const key of aKeys) {
+    if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
+    if (!safeIsEqual(a[key], b[key], visited)) return false;
+  }
+
+  return true;
+}
+
 function findMergedKeys(
   targetObj: any,
   sourceAnchors: Map<string, any>,
@@ -126,9 +180,7 @@ function findMergedKeys(
     if (sourceValue && typeof sourceValue === 'object') {
       for (const key of Object.keys(sourceValue)) {
         if (Object.prototype.hasOwnProperty.call(targetObj, key)) {
-          const targetVal = JSON.stringify(targetObj[key]);
-          const sourceVal = JSON.stringify(sourceValue[key]);
-          if (targetVal === sourceVal && !mergedKeys.includes(key)) {
+          if (safeIsEqual(targetObj[key], sourceValue[key]) && !mergedKeys.includes(key)) {
             mergedKeys.push(key);
           }
         }
@@ -232,37 +284,47 @@ export function expandYaml(content: string, envOverrides?: string[]): ExpansionR
 
   const expanded = deepClone(original);
 
-  function expandValue(obj: any, path: string, visited: Set<string>): any {
+  function expandValue(
+    obj: any,
+    path: string,
+    visitedObjects: WeakSet<object>,
+    pathStack: string[]
+  ): any {
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }
 
-    const pathKey = path;
-    if (visited.has(pathKey)) {
-      warnings.push(`检测到循环引用: ${path}`);
-      return { __cycle__: path };
+    if (visitedObjects.has(obj)) {
+      const cyclePath = pathStack.join(' → ');
+      warnings.push(`检测到循环引用: ${cyclePath}`);
+      return { __cycle_detected__: cyclePath };
     }
-    visited.add(pathKey);
+
+    visitedObjects.add(obj);
+    pathStack.push(path);
 
     try {
       if (Array.isArray(obj)) {
-        return obj.map((item, i) => expandValue(item, pathJoin(path, i), new Set(visited)));
+        return obj.map((item, i) =>
+          expandValue(item, pathJoin(path, i), visitedObjects, [...pathStack])
+        );
       }
 
       const result: Record<string, any> = {};
 
       for (const [key, value] of Object.entries(obj)) {
         const keyPath = pathJoin(path, key);
-        result[key] = expandValue(value, keyPath, new Set(visited));
+        result[key] = expandValue(value, keyPath, visitedObjects, [...pathStack]);
       }
 
       return result;
     } finally {
-      visited.delete(pathKey);
+      visitedObjects.delete(obj);
+      pathStack.pop();
     }
   }
 
-  const finalExpanded = expandValue(expanded, '', new Set());
+  const finalExpanded = expandValue(expanded, '', new WeakSet(), []);
 
   let overrideOrder = 0;
   if (envOverrides && envOverrides.length > 0) {
@@ -347,8 +409,35 @@ export function getValueByKeyPath(obj: any, keyPath: string): { value: any; foun
   return { value: current, found: true };
 }
 
+function sanitizeForDump(obj: any, visited: WeakSet<object> = new WeakSet()): any {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  if (visited.has(obj)) {
+    return '__cycle_detected__';
+  }
+
+  visited.add(obj);
+
+  try {
+    if (Array.isArray(obj)) {
+      return obj.map(item => sanitizeForDump(item, visited));
+    }
+
+    const result: Record<string, any> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = sanitizeForDump(value, visited);
+    }
+    return result;
+  } finally {
+    visited.delete(obj);
+  }
+}
+
 export function toYamlString(obj: any): string {
-  return yaml.dump(obj, {
+  const sanitized = sanitizeForDump(obj);
+  return yaml.dump(sanitized, {
     indent: 2,
     lineWidth: -1,
     noRefs: true,

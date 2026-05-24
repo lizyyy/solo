@@ -169,6 +169,39 @@ strings:
       );
     },
   },
+  {
+    name: '自引用循环 anchor',
+    yaml: `
+self_ref: &self_ref
+  name: self
+  ref: *self_ref
+`,
+    validate: (result: ExpansionResult): boolean => {
+      return (
+        result.cycleDetected === true &&
+        result.warnings.length >= 1 &&
+        result.expanded?.self_ref?.name === 'self' &&
+        result.expanded?.self_ref?.ref?.__cycle_detected__ !== undefined
+      );
+    },
+  },
+  {
+    name: '嵌套循环引用',
+    yaml: `
+nested:
+  level1: &level1
+    name: level1
+    inner: &level2
+      name: level2
+      back: *level1
+`,
+    validate: (result: ExpansionResult): boolean => {
+      return (
+        result.cycleDetected === true &&
+        result.expanded?.nested?.level1?.inner?.back?.__cycle_detected__ !== undefined
+      );
+    },
+  },
 ];
 
 export function runSelfTests(): SelfTestResult[] {
