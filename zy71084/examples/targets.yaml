@@ -2,7 +2,7 @@ targets:
   - name: App Main
     bundleId: com.example.app
     profileName: Example App Profile
-    certificateName: Apple Distribution: Example Team
+    certificateName: "Apple Distribution: Example Team"
 
   - name: App Dev
     bundleId: com.example.app.dev

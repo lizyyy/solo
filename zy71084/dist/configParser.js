@@ -76,13 +76,21 @@ class ConfigParser {
                 if (keyMatch) {
                     map.set(keyMatch[1].toLowerCase(), i + 1);
                 }
-                const bundleIdMatch = line.match(/["']?(bundleId|bundle_?id)["']?\s*[:=]\s*["']([^"']+)["']/i);
+                const bundleIdMatch = line.match(/["']?(bundleId|bundle_?id)["']?\s*[:=]\s*["']?([^"',\s]+)["']?/i);
                 if (bundleIdMatch) {
                     map.set(`bundleid:${bundleIdMatch[2]}`, i + 1);
                 }
-                const nameMatch = line.match(/["']?(name|target)["']?\s*[:=]\s*["']([^"']+)["']/i);
+                const nameMatch = line.match(/["']?(name|target)["']?\s*[:=]\s*["']?([^"',\s]+(?:\s+[^"',]+)*)["']?/i);
                 if (nameMatch) {
                     map.set(`target:${nameMatch[2]}`, i + 1);
+                }
+                const profileNameMatch = line.match(/["']?(profileName|profile)["']?\s*[:=]\s*["']?([^"',]+(?:\s+[^"',]+)*)["']?/i);
+                if (profileNameMatch) {
+                    map.set(`profile:${profileNameMatch[2]}`, i + 1);
+                }
+                const certNameMatch = line.match(/["']?(certificateName|certificate)["']?\s*[:=]\s*["']?([^"',]+(?:\s+[^"',]+)*)["']?/i);
+                if (certNameMatch) {
+                    map.set(`cert:${certNameMatch[2]}`, i + 1);
                 }
             }
         }
@@ -113,16 +121,22 @@ class ConfigParser {
     static parseTargetItem(item, sourceFile, lineMap, index) {
         const name = item.name || item.target || `target-${index}`;
         const bundleId = item.bundleId || item.bundle_id || item.bundleid || '';
+        const profileName = item.profileName || item.profile || item.profile_name;
+        const certificateName = item.certificateName || item.certificate || item.certificate_name;
         let lineNumber = lineMap.get(`target:${name}`) ||
-            lineMap.get(`bundleid:${bundleId}`) ||
-            lineMap.get('targets') ||
-            lineMap.get('name') ||
-            (index + 1);
+            lineMap.get(`bundleid:${bundleId}`);
+        if (profileName) {
+            lineNumber = lineNumber || lineMap.get(`profile:${profileName}`);
+        }
+        if (certificateName) {
+            lineNumber = lineNumber || lineMap.get(`cert:${certificateName}`);
+        }
+        lineNumber = lineNumber || lineMap.get('targets') || (index + 1);
         return {
             name,
             bundleId,
-            profileName: item.profileName || item.profile || item.profile_name,
-            certificateName: item.certificateName || item.certificate || item.certificate_name,
+            profileName,
+            certificateName,
             source: sourceFile,
             lineNumber
         };

@@ -344,6 +344,37 @@ export class CheckEngine {
       }
     }
 
+    if (target.certificateName && matchedCertificate) {
+      const certName = matchedCertificate.name || matchedCertificate.commonName || '';
+      if (target.certificateName !== certName) {
+        checks.push({
+          checkName: 'Target 指定证书校验',
+          status: CheckStatus.ERROR,
+          message: `指定的证书与实际匹配的不一致`,
+          details: `指定: ${target.certificateName}, 实际匹配: ${certName}`,
+          location: { file: target.source, line: target.lineNumber },
+          severity: 'high'
+        });
+      } else {
+        checks.push({
+          checkName: 'Target 指定证书校验',
+          status: CheckStatus.PASS,
+          message: `指定证书匹配正确`,
+          location: { file: target.source, line: target.lineNumber },
+          severity: 'low'
+        });
+      }
+    } else if (target.certificateName && !matchedCertificate) {
+      checks.push({
+        checkName: 'Target 指定证书校验',
+        status: CheckStatus.ERROR,
+        message: `未找到指定的证书`,
+        details: `指定证书: ${target.certificateName}`,
+        location: { file: target.source, line: target.lineNumber },
+        severity: 'high'
+      });
+    }
+
     const overallStatus = this.getOverallStatus(checks);
 
     return {
