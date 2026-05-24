@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: docker-layer-budget
+Version: 0.1.0
+Summary: Docker 镜像层预算 CLI - 分析镜像层大小并检测预算超限
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0
+Requires-Dist: jinja2>=3.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: docker>=6.0

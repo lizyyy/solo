@@ -1,0 +1,77 @@
+{
+  "image_name": "my-app",
+  "image_tag": "v1.0.0",
+  "total_size": 2684354560,
+  "base_image": "python:3.9-slim",
+  "commit_info": {
+    "hash": "abc123def",
+    "author": "developer@example.com",
+    "message": "feat: add new AI model"
+  },
+  "layers": [
+    {
+      "digest": "sha256:a1b2c3d4",
+      "size": 805306368,
+      "created_by": "/bin/sh -c #(nop) ADD file:xxx in /",
+      "is_base_image": true
+    },
+    {
+      "digest": "sha256:d5e6f7a8",
+      "size": 104857600,
+      "created_by": "/bin/sh -c apt-get update && apt-get install -y build-essential",
+      "is_base_image": true
+    },
+    {
+      "digest": "sha256:g9h0i1j2",
+      "size": 629145600,
+      "created_by": "/bin/sh -c pip install torch tensorflow pandas numpy scikit-learn",
+      "is_base_image": false
+    },
+    {
+      "digest": "sha256:k3l4m5n6",
+      "size": 1153433600,
+      "created_by": "/bin/sh -c cp /tmp/model_weights.pt /app/model/",
+      "is_base_image": false,
+      "files": [
+        {
+          "path": "/app/model/model_weights.pt",
+          "size": 1073741824,
+          "is_directory": false,
+          "is_added": true
+        },
+        {
+          "path": "/app/model/config.json",
+          "size": 1024,
+          "is_directory": false,
+          "is_added": true
+        }
+      ]
+    },
+    {
+      "digest": "sha256:o7p8q9r0",
+      "size": 10485760,
+      "created_by": "/bin/sh -c #(nop) COPY . /app",
+      "is_base_image": false,
+      "files": [
+        {
+          "path": "/root/.cache/pip/http/000001.cache",
+          "size": 5242880,
+          "is_directory": false,
+          "is_added": true
+        },
+        {
+          "path": "/tmp/build_temp.dat",
+          "size": 3145728,
+          "is_directory": false,
+          "is_added": true
+        }
+      ]
+    },
+    {
+      "digest": "sha256:s1t2u3v4",
+      "size": 524288,
+      "created_by": "/bin/sh -c #(nop) WORKDIR /app",
+      "is_base_image": false
+    }
+  ]
+}

@@ -1,0 +1,296 @@
+{
+  "report_id": "764988570e8af3a4",
+  "generated_at": "2026-05-24T19:14:47.321093",
+  "passed": false,
+  "metadata": {
+    "image_name": "my-app",
+    "image_tag": "v1.0.0",
+    "total_size": 2684354560,
+    "total_size_formatted": "2.50 GB",
+    "layers_count": 6,
+    "layers": [
+      {
+        "index": 0,
+        "digest": "sha256:a1b2c3d4",
+        "size": 805306368,
+        "size_formatted": "768.00 MB",
+        "created_by": "/bin/sh -c #(nop) ADD file:xxx in /",
+        "command_summary": "/bin/sh -c #(nop) ADD file:xxx in /",
+        "files_count": 0,
+        "is_base_image": true,
+        "is_cached": false
+      },
+      {
+        "index": 1,
+        "digest": "sha256:d5e6f7a8",
+        "size": 104857600,
+        "size_formatted": "100.00 MB",
+        "created_by": "/bin/sh -c apt-get update && apt-get install -y build-essential",
+        "command_summary": "/bin/sh -c apt-get update && apt-get install -y build-essential",
+        "files_count": 0,
+        "is_base_image": true,
+        "is_cached": false
+      },
+      {
+        "index": 2,
+        "digest": "sha256:g9h0i1j2",
+        "size": 629145600,
+        "size_formatted": "600.00 MB",
+        "created_by": "/bin/sh -c pip install torch tensorflow pandas numpy scikit-learn",
+        "command_summary": "/bin/sh -c pip install torch tensorflow pandas numpy scikit-learn",
+        "files_count": 0,
+        "is_base_image": false,
+        "is_cached": false
+      },
+      {
+        "index": 3,
+        "digest": "sha256:k3l4m5n6",
+        "size": 1153433600,
+        "size_formatted": "1.07 GB",
+        "created_by": "/bin/sh -c cp /tmp/model_weights.pt /app/model/",
+        "command_summary": "/bin/sh -c cp /tmp/model_weights.pt /app/model/",
+        "files_count": 2,
+        "is_base_image": false,
+        "is_cached": false
+      },
+      {
+        "index": 4,
+        "digest": "sha256:o7p8q9r0",
+        "size": 10485760,
+        "size_formatted": "10.00 MB",
+        "created_by": "/bin/sh -c #(nop) COPY . /app",
+        "command_summary": "/bin/sh -c #(nop) COPY . /app",
+        "files_count": 2,
+        "is_base_image": false,
+        "is_cached": false
+      },
+      {
+        "index": 5,
+        "digest": "sha256:s1t2u3v4",
+        "size": 524288,
+        "size_formatted": "512.00 KB",
+        "created_by": "/bin/sh -c #(nop) WORKDIR /app",
+        "command_summary": "/bin/sh -c #(nop) WORKDIR /app",
+        "files_count": 0,
+        "is_base_image": false,
+        "is_cached": false
+      }
+    ],
+    "base_image": "python:3.9-slim",
+    "commit_info": {
+      "hash": "abc123def",
+      "author": "developer@example.com",
+      "message": "feat: add new AI model"
+    }
+  },
+  "budget_result": {
+    "passed": false,
+    "total_size": 2684354560,
+    "total_size_formatted": "2.50 GB",
+    "total_budget": 2147483648,
+    "total_budget_formatted": "2.00 GB",
+    "errors_count": 4,
+    "warnings_count": 0,
+    "violations": [
+      {
+        "type": "total_size_exceeded",
+        "severity": "error",
+        "layer_index": null,
+        "message": "镜像总大小 2.50 GB 超过预算 2.00 GB",
+        "size": 2684354560,
+        "size_formatted": "2.50 GB",
+        "budget": 2147483648,
+        "budget_formatted": "2.00 GB",
+        "excess": 536870912,
+        "excess_formatted": "512.00 MB",
+        "details": {},
+        "explanation": "\n## 问题说明\n镜像总大小超过了预算限制。这会导致：\n- 镜像拉取时间变长\n- 部署速度变慢\n- 存储空间占用增加\n\n## 建议解决方案\n1. 检查是否有不必要的大文件被打包进镜像\n2. 考虑使用多阶段构建（multi-stage build）\n3. 清理构建缓存和临时文件\n4. 评估是否可以使用更小的基础镜像\n"
+      },
+      {
+        "type": "layer_size_exceeded",
+        "severity": "error",
+        "layer_index": 2,
+        "message": "第 2 层大小 600.00 MB 超过单层预算 500.00 MB",
+        "size": 629145600,
+        "size_formatted": "600.00 MB",
+        "budget": 524288000,
+        "budget_formatted": "500.00 MB",
+        "excess": 104857600,
+        "excess_formatted": "100.00 MB",
+        "details": {
+          "command": "/bin/sh -c pip install torch tensorflow pandas numpy scikit-learn",
+          "digest": "sha256:g9h0i1j2"
+        },
+        "explanation": "\n## 问题说明\n单个镜像层大小超过了预算限制。Docker 镜像层是增量叠加的，过大的单层会：\n- 增加镜像重建时的重新下载量\n- 使得层缓存的效果降低\n\n## 建议解决方案\n1. 将大文件的操作拆分到多个 RUN 命令中\n2. 在同一个 RUN 命令中下载和清理文件\n3. 检查是否有模型文件或数据集被误打包\n"
+      },
+      {
+        "type": "layer_size_exceeded",
+        "severity": "error",
+        "layer_index": 3,
+        "message": "第 3 层大小 1.07 GB 超过单层预算 500.00 MB",
+        "size": 1153433600,
+        "size_formatted": "1.07 GB",
+        "budget": 524288000,
+        "budget_formatted": "500.00 MB",
+        "excess": 629145600,
+        "excess_formatted": "600.00 MB",
+        "details": {
+          "command": "/bin/sh -c cp /tmp/model_weights.pt /app/model/",
+          "digest": "sha256:k3l4m5n6"
+        },
+        "explanation": "\n## 问题说明\n单个镜像层大小超过了预算限制。Docker 镜像层是增量叠加的，过大的单层会：\n- 增加镜像重建时的重新下载量\n- 使得层缓存的效果降低\n\n## 建议解决方案\n1. 将大文件的操作拆分到多个 RUN 命令中\n2. 在同一个 RUN 命令中下载和清理文件\n3. 检查是否有模型文件或数据集被误打包\n"
+      },
+      {
+        "type": "cached_dir_found",
+        "severity": "error",
+        "layer_index": 4,
+        "message": "第 4 层发现缓存目录文件，总计 8.00 MB",
+        "size": 8388608,
+        "size_formatted": "8.00 MB",
+        "budget": 0,
+        "budget_formatted": "0 B",
+        "excess": 8388608,
+        "excess_formatted": "8.00 MB",
+        "details": {
+          "cached_dirs": [
+            "/var/cache",
+            "/root/.cache",
+            "/root/.npm",
+            "/root/.pip",
+            "/tmp"
+          ],
+          "files_count": 2,
+          "sample_files": [
+            "/root/.cache/pip/http/000001.cache",
+            "/tmp/build_temp.dat"
+          ]
+        },
+        "explanation": "\n## 问题说明\n在镜像层中发现了缓存目录文件。这些文件：\n- 不属于运行时必需的内容\n- 会无意义地增加镜像大小\n- 通常是构建过程中产生的临时文件\n\n## 建议解决方案\n1. 在 Dockerfile 中清理缓存目录：\n   ```dockerfile\n   RUN apt-get clean &&        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*\n   ```\n2. 使用 .dockerignore 排除不必要的文件\n3. 在构建命令后立即清理下载的包\n"
+      }
+    ],
+    "warnings": [],
+    "layer_analysis": [
+      {
+        "index": 2,
+        "size": 629145600,
+        "size_formatted": "600.00 MB",
+        "budget": 524288000,
+        "budget_formatted": "500.00 MB",
+        "status": "error",
+        "command": "/bin/sh -c pip install torch tensorflow pandas numpy scikit-learn"
+      },
+      {
+        "index": 3,
+        "size": 1153433600,
+        "size_formatted": "1.07 GB",
+        "budget": 524288000,
+        "budget_formatted": "500.00 MB",
+        "status": "error",
+        "command": "/bin/sh -c cp /tmp/model_weights.pt /app/model/"
+      },
+      {
+        "index": 4,
+        "size": 10485760,
+        "size_formatted": "10.00 MB",
+        "budget": 524288000,
+        "budget_formatted": "500.00 MB",
+        "status": "ok",
+        "command": "/bin/sh -c #(nop) COPY . /app"
+      },
+      {
+        "index": 5,
+        "size": 524288,
+        "size_formatted": "512.00 KB",
+        "budget": 524288000,
+        "budget_formatted": "500.00 MB",
+        "status": "ok",
+        "command": "/bin/sh -c #(nop) WORKDIR /app"
+      }
+    ]
+  },
+  "exit_code": 1,
+  "dockerfile_analysis": {
+    "instructions_count": 9,
+    "base_image": "python:3.9-slim",
+    "instructions": [
+      {
+        "line_number": 1,
+        "command": "FROM",
+        "arguments": "python:3.9-slim",
+        "raw": "FROM python:3.9-slim"
+      },
+      {
+        "line_number": 3,
+        "command": "WORKDIR",
+        "arguments": "/app",
+        "raw": "WORKDIR /app"
+      },
+      {
+        "line_number": 5,
+        "command": "RUN",
+        "arguments": "apt-get update &&     apt-get install -y build-essential",
+        "raw": "RUN apt-get update &&     apt-get install -y build-essential"
+      },
+      {
+        "line_number": 8,
+        "command": "RUN",
+        "arguments": "pip install torch tensorflow pandas numpy scikit-learn",
+        "raw": "RUN pip install torch tensorflow pandas numpy scikit-learn"
+      },
+      {
+        "line_number": 10,
+        "command": "COPY",
+        "arguments": "requirements.txt .",
+        "raw": "COPY requirements.txt ."
+      },
+      {
+        "line_number": 11,
+        "command": "RUN",
+        "arguments": "pip install -r requirements.txt",
+        "raw": "RUN pip install -r requirements.txt"
+      },
+      {
+        "line_number": 13,
+        "command": "COPY",
+        "arguments": "model_weights.pt /app/model/",
+        "raw": "COPY model_weights.pt /app/model/"
+      },
+      {
+        "line_number": 14,
+        "command": "COPY",
+        "arguments": ". /app",
+        "raw": "COPY . /app"
+      },
+      {
+        "line_number": 16,
+        "command": "CMD",
+        "arguments": "[\"python\", \"app.py\"]",
+        "raw": "CMD [\"python\", \"app.py\"]"
+      }
+    ],
+    "layer_mapping": {},
+    "issues": [
+      {
+        "type": "missing_cleanup",
+        "severity": "warning",
+        "line_number": 5,
+        "message": "apt-get install 后缺少 apt-get clean 和缓存清理",
+        "suggestion": "在 apt-get install 后添加: && apt-get clean && rm -rf /var/lib/apt/lists/*"
+      },
+      {
+        "type": "pip_cache",
+        "severity": "warning",
+        "line_number": 8,
+        "message": "pip install 未使用 --no-cache-dir 参数",
+        "suggestion": "使用: pip install --no-cache-dir"
+      },
+      {
+        "type": "pip_cache",
+        "severity": "warning",
+        "line_number": 11,
+        "message": "pip install 未使用 --no-cache-dir 参数",
+        "suggestion": "使用: pip install --no-cache-dir"
+      }
+    ]
+  }
+}

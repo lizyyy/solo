@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker 镜像层预算报告 - my-app</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header .meta { opacity: 0.9; font-size: 14px; }
+        .status-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; margin-top: 15px; }
+        .status-pass { background: #10b981; }
+        .status-fail { background: #ef4444; }
+        .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .card h2 { font-size: 20px; margin-bottom: 20px; color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .summary-item { text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px; }
+        .summary-item .label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-item .value { font-size: 24px; font-weight: 700; color: #1f2937; margin-top: 5px; }
+        .summary-item.error .value { color: #ef4444; }
+        .summary-item.warning .value { color: #f59e0b; }
+        .progress-bar { width: 100%; height: 12px; background: #e5e7eb; border-radius: 6px; overflow: hidden; margin-top: 10px; }
+        .progress-fill { height: 100%; transition: width 0.3s; }
+        .progress-ok { background: #10b981; }
+        .progress-warning { background: #f59e0b; }
+        .progress-error { background: #ef4444; }
+        .violation { padding: 16px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid; }
+        .violation.error { background: #fef2f2; border-color: #ef4444; }
+        .violation.warning { background: #fffbeb; border-color: #f59e0b; }
+        .violation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .violation-type { font-weight: 600; font-size: 14px; }
+        .violation-layer { font-size: 12px; color: #6b7280; background: #e5e7eb; padding: 2px 8px; border-radius: 4px; }
+        .violation-message { color: #374151; margin-bottom: 8px; }
+        .violation-details { font-size: 13px; color: #6b7280; background: white; padding: 10px; border-radius: 6px; margin-top: 10px; }
+        .layer-table { width: 100%; border-collapse: collapse; }
+        .layer-table th, .layer-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .layer-table th { background: #f9fafb; font-weight: 600; font-size: 12px; text-transform: uppercase; color: #6b7280; }
+        .layer-table tr:hover { background: #f9fafb; }
+        .status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+        .dot-ok { background: #10b981; }
+        .dot-warning { background: #f59e0b; }
+        .dot-error { background: #ef4444; }
+        .dot-base { background: #9ca3af; }
+        .explanation { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 16px; border-radius: 0 8px 8px 0; margin-top: 15px; }
+        .explanation h4 { color: #1e40af; margin-bottom: 10px; }
+        .explanation ul { margin-left: 20px; color: #374151; }
+        .explanation li { margin-bottom: 5px; }
+        .code-block { background: #1f2937; color: #e5e7eb; padding: 12px; border-radius: 6px; font-family: 'Monaco', monospace; font-size: 13px; overflow-x: auto; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐳 Docker 镜像层预算报告</h1>
+            <div class="meta">
+                镜像: my-app:v1.0.0 | 生成时间: 2026-05-24T19:14:47.327854 | 报告 ID: 818b1578c51ddc3c
+            </div>
+            <span class="status-badge status-fail">
+                ❌ 预算检查未通过
+            </span>
+        </div>
+
+        <div class="card">
+            <h2>📊 概览</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="label">总大小</div>
+                    <div class="value">2.50 GB</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-error" style="width: 100%"></div>
+                    </div>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">预算: 2.00 GB</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">层数</div>
+                    <div class="value">6</div>
+                </div>
+                <div class="summary-item error">
+                    <div class="label">错误</div>
+                    <div class="value">4</div>
+                </div>
+                <div class="summary-item warning">
+                    <div class="label">警告</div>
+                    <div class="value">0</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="card">
+            <h2>⚠️ 问题发现</h2>
+            
+            <div class="violation error">
+                <div class="violation-header">
+                    <span class="violation-type">❌ 错误 - total_size_exceeded</span>
+                    
+                </div>
+                <div class="violation-message">镜像总大小 2.50 GB 超过预算 2.00 GB</div>
+                
+                
+                <div class="explanation">
+                    
+## 问题说明
+镜像总大小超过了预算限制。这会导致：
+- 镜像拉取时间变长
+- 部署速度变慢
+- 存储空间占用增加
+
+## 建议解决方案
+1. 检查是否有不必要的大文件被打包进镜像
+2. 考虑使用多阶段构建（multi-stage build）
+3. 清理构建缓存和临时文件
+4. 评估是否可以使用更小的基础镜像
+
+                </div>
+                
+            </div>
+            
+            <div class="violation error">
+                <div class="violation-header">
+                    <span class="violation-type">❌ 错误 - layer_size_exceeded</span>
+                    
+                    <span class="violation-layer">第 2 层</span>
+                    
+                </div>
+                <div class="violation-message">第 2 层大小 600.00 MB 超过单层预算 500.00 MB</div>
+                
+                <div class="violation-details">
+                    <strong>详情：</strong><br>
+                    
+                    命令: <code>/bin/sh -c pip install torch tensorflow pandas numpy scikit-learn</code><br>
+                    
+                    
+                    
+                </div>
+                
+                
+                <div class="explanation">
+                    
+## 问题说明
+单个镜像层大小超过了预算限制。Docker 镜像层是增量叠加的，过大的单层会：
+- 增加镜像重建时的重新下载量
+- 使得层缓存的效果降低
+
+## 建议解决方案
+1. 将大文件的操作拆分到多个 RUN 命令中
+2. 在同一个 RUN 命令中下载和清理文件
+3. 检查是否有模型文件或数据集被误打包
+
+                </div>
+                
+            </div>
+            
+            <div class="violation error">
+                <div class="violation-header">
+                    <span class="violation-type">❌ 错误 - layer_size_exceeded</span>
+                    
+                    <span class="violation-layer">第 3 层</span>
+                    
+                </div>
+                <div class="violation-message">第 3 层大小 1.07 GB 超过单层预算 500.00 MB</div>
+                
+                <div class="violation-details">
+                    <strong>详情：</strong><br>
+                    
+                    命令: <code>/bin/sh -c cp /tmp/model_weights.pt /app/model/</code><br>
+                    
+                    
+                    
+                </div>
+                
+                
+                <div class="explanation">
+                    
+## 问题说明
+单个镜像层大小超过了预算限制。Docker 镜像层是增量叠加的，过大的单层会：
+- 增加镜像重建时的重新下载量
+- 使得层缓存的效果降低
+
+## 建议解决方案
+1. 将大文件的操作拆分到多个 RUN 命令中
+2. 在同一个 RUN 命令中下载和清理文件
+3. 检查是否有模型文件或数据集被误打包
+
+                </div>
+                
+            </div>
+            
+            <div class="violation error">
+                <div class="violation-header">
+                    <span class="violation-type">❌ 错误 - cached_dir_found</span>
+                    
+                    <span class="violation-layer">第 4 层</span>
+                    
+                </div>
+                <div class="violation-message">第 4 层发现缓存目录文件，总计 8.00 MB</div>
+                
+                <div class="violation-details">
+                    <strong>详情：</strong><br>
+                    
+                    
+                    相关文件数: 2<br>
+                    
+                    
+                    示例文件:
+                    <ul>
+                        
+                        <li>/root/.cache/pip/http/000001.cache</li>
+                        
+                        <li>/tmp/build_temp.dat</li>
+                        
+                    </ul>
+                    
+                </div>
+                
+                
+                <div class="explanation">
+                    
+## 问题说明
+在镜像层中发现了缓存目录文件。这些文件：
+- 不属于运行时必需的内容
+- 会无意义地增加镜像大小
+- 通常是构建过程中产生的临时文件
+
+## 建议解决方案
+1. 在 Dockerfile 中清理缓存目录：
+   ```dockerfile
+   RUN apt-get clean &&        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+   ```
+2. 使用 .dockerignore 排除不必要的文件
+3. 在构建命令后立即清理下载的包
+
+                </div>
+                
+            </div>
+            
+
+            
+        </div>
+        
+
+        <div class="card">
+            <h2>📦 层详细分析</h2>
+            <table class="layer-table">
+                <thead>
+                    <tr>
+                        <th>层索引</th>
+                        <th>状态</th>
+                        <th>大小</th>
+                        <th>创建命令</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td>0</td>
+                        <td>
+                            
+                            <span class="status-dot dot-base"></span>基础镜像
+                            
+                        </td>
+                        <td>768.00 MB</td>
+                        <td><code style="font-size: 12px;"></code></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>1</td>
+                        <td>
+                            
+                            <span class="status-dot dot-base"></span>基础镜像
+                            
+                        </td>
+                        <td>100.00 MB</td>
+                        <td><code style="font-size: 12px;"></code></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>2</td>
+                        <td>
+                            
+                            <span class="status-dot dot-error"></span>超限
+                            
+                        </td>
+                        <td>600.00 MB</td>
+                        <td><code style="font-size: 12px;">/bin/sh -c pip install torch tensorflow pandas numpy scikit-learn</code></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>3</td>
+                        <td>
+                            
+                            <span class="status-dot dot-error"></span>超限
+                            
+                        </td>
+                        <td>1.07 GB</td>
+                        <td><code style="font-size: 12px;">/bin/sh -c cp /tmp/model_weights.pt /app/model/</code></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>4</td>
+                        <td>
+                            
+                            <span class="status-dot dot-ok"></span>正常
+                            
+                        </td>
+                        <td>10.00 MB</td>
+                        <td><code style="font-size: 12px;">/bin/sh -c #(nop) COPY . /app</code></td>
+                    </tr>
+                    
+                    <tr>
+                        <td>5</td>
+                        <td>
+                            
+                            <span class="status-dot dot-ok"></span>正常
+                            
+                        </td>
+                        <td>512.00 KB</td>
+                        <td><code style="font-size: 12px;">/bin/sh -c #(nop) WORKDIR /app</code></td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+
+        
+        <div class="card">
+            <h2>📝 Dockerfile 分析</h2>
+            <p><strong>基础镜像:</strong> <code>python:3.9-slim</code></p>
+            <p><strong>指令数:</strong> 9</p>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px; font-size: 16px;">发现的问题:</h3>
+            
+            <div class="violation warning">
+                <div class="violation-header">
+                    <span class="violation-type">第 5 行</span>
+                </div>
+                <div class="violation-message">apt-get install 后缺少 apt-get clean 和缓存清理</div>
+                <div class="violation-details">
+                    <strong>建议:</strong> 在 apt-get install 后添加: && apt-get clean && rm -rf /var/lib/apt/lists/*
+                </div>
+            </div>
+            
+            <div class="violation warning">
+                <div class="violation-header">
+                    <span class="violation-type">第 8 行</span>
+                </div>
+                <div class="violation-message">pip install 未使用 --no-cache-dir 参数</div>
+                <div class="violation-details">
+                    <strong>建议:</strong> 使用: pip install --no-cache-dir
+                </div>
+            </div>
+            
+            <div class="violation warning">
+                <div class="violation-header">
+                    <span class="violation-type">第 11 行</span>
+                </div>
+                <div class="violation-message">pip install 未使用 --no-cache-dir 参数</div>
+                <div class="violation-details">
+                    <strong>建议:</strong> 使用: pip install --no-cache-dir
+                </div>
+            </div>
+            
+            
+        </div>
+        
+    </div>
+</body>
+</html>

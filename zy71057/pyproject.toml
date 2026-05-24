@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "docker-layer-budget"
+version = "0.1.0"
+description = "Docker 镜像层预算 CLI - 分析镜像层大小并检测预算超限"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+    "jinja2>=3.0",
+    "pyyaml>=6.0",
+    "docker>=6.0",
+]
+
+[project.scripts]
+dlb = "docker_layer_budget.cli:main"
+docker-layer-budget = "docker_layer_budget.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["docker_layer_budget*"]

@@ -1,0 +1,3 @@
+[console_scripts]
+dlb = docker_layer_budget.cli:main
+docker-layer-budget = docker_layer_budget.cli:main
