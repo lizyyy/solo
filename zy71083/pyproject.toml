@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ansible-inventory-drift"
+version = "1.0.0"
+description = "Ansible Inventory 漂移检测 CLI - 检测 Inventory 与 CMDB 的配置差异"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+  { name = "DevOps Team" }
+]
+dependencies = [
+  "click>=8.0",
+  "pyyaml>=6.0",
+  "rich>=13.0",
+]
+
+[project.scripts]
+inventory-drift = "ansible_inventory_drift.cli:main"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ansible_inventory_drift*"]

@@ -1,0 +1,50 @@
+[
+  {
+    "hostname": "web01-prod",
+    "ip_address": "10.0.1.10",
+    "roles": ["web", "nginx"],
+    "environment": "prod",
+    "region": "cn-beijing",
+    "status": "running"
+  },
+  {
+    "hostname": "web02-prod",
+    "ip_address": "10.0.1.11",
+    "roles": ["web"],
+    "environment": "production",
+    "region": "cn-beijing",
+    "status": "running"
+  },
+  {
+    "hostname": "web03-prod",
+    "ip_address": "10.0.1.12",
+    "roles": ["app"],
+    "environment": "staging",
+    "region": "cn-beijing",
+    "status": "running"
+  },
+  {
+    "hostname": "db01-prod",
+    "ip_address": "10.0.2.10",
+    "roles": ["database"],
+    "environment": "production",
+    "region": "cn-beijing",
+    "status": "running"
+  },
+  {
+    "hostname": "db02-prod",
+    "ip_address": "10.0.2.11",
+    "roles": ["db"],
+    "environment": "prod",
+    "region": "cn-beijing",
+    "status": "running"
+  },
+  {
+    "hostname": "new-server-01",
+    "ip_address": "10.0.4.10",
+    "roles": ["monitoring"],
+    "environment": "prod",
+    "region": "cn-beijing",
+    "status": "running"
+  }
+]

@@ -1,0 +1,290 @@
+{
+  "inventory_file": "examples/sample_inventory.ini",
+  "cmdb_file": "examples/sample_cmdb.json",
+  "generated_at": "2026-05-24T20:54:34.053779",
+  "total_hosts_inventory": 8,
+  "total_hosts_cmdb": 6,
+  "drift_items": [
+    {
+      "drift_type": "label_mismatch",
+      "host": "web01-prod",
+      "risk_level": "LOW",
+      "inventory_value": {
+        "ansible_host": "10.0.1.10",
+        "env": "production",
+        "region": "cn-beijing",
+        "vendor": "aliyun",
+        "role": "web",
+        "server_role": "nginx"
+      },
+      "cmdb_value": {
+        "hostname": "web01-prod",
+        "ip_address": "10.0.1.10",
+        "environment": "prod",
+        "region": "cn-beijing",
+        "status": "running"
+      },
+      "description": "存在 4 个标签不一致",
+      "details": {
+        "mismatched_labels": {
+          "ansible_host": {
+            "inventory": "10.0.1.10",
+            "cmdb": null
+          },
+          "status": {
+            "inventory": null,
+            "cmdb": "running"
+          },
+          "server_role": {
+            "inventory": "nginx",
+            "cmdb": null
+          },
+          "vendor": {
+            "inventory": "aliyun",
+            "cmdb": null
+          }
+        }
+      }
+    },
+    {
+      "drift_type": "label_mismatch",
+      "host": "web02-prod",
+      "risk_level": "LOW",
+      "inventory_value": {
+        "ansible_host": "10.0.1.11",
+        "env": "production",
+        "region": "cn-beijing",
+        "vendor": "aliyun",
+        "role": "web",
+        "server_role": "nginx"
+      },
+      "cmdb_value": {
+        "hostname": "web02-prod",
+        "ip_address": "10.0.1.11",
+        "environment": "production",
+        "region": "cn-beijing",
+        "status": "running"
+      },
+      "description": "存在 4 个标签不一致",
+      "details": {
+        "mismatched_labels": {
+          "ansible_host": {
+            "inventory": "10.0.1.11",
+            "cmdb": null
+          },
+          "status": {
+            "inventory": null,
+            "cmdb": "running"
+          },
+          "server_role": {
+            "inventory": "nginx",
+            "cmdb": null
+          },
+          "vendor": {
+            "inventory": "aliyun",
+            "cmdb": null
+          }
+        }
+      }
+    },
+    {
+      "drift_type": "role_mismatch",
+      "host": "web03-prod",
+      "risk_level": "HIGH",
+      "inventory_value": [
+        "web"
+      ],
+      "cmdb_value": [
+        "app"
+      ],
+      "description": "角色标签不一致: Inventory=['web'], CMDB=['app']",
+      "details": {
+        "missing_in_inventory": [
+          "app"
+        ],
+        "missing_in_cmdb": [
+          "web"
+        ]
+      }
+    },
+    {
+      "drift_type": "environment_mismatch",
+      "host": "web03-prod",
+      "risk_level": "CRITICAL",
+      "inventory_value": "production",
+      "cmdb_value": "staging",
+      "description": "环境标签不一致: Inventory='production', CMDB='staging' - 这是高风险问题！",
+      "details": {}
+    },
+    {
+      "drift_type": "label_mismatch",
+      "host": "web03-prod",
+      "risk_level": "LOW",
+      "inventory_value": {
+        "ansible_host": "10.0.1.12",
+        "env": "production",
+        "region": "cn-beijing",
+        "vendor": "aliyun",
+        "role": "web",
+        "server_role": "nginx"
+      },
+      "cmdb_value": {
+        "hostname": "web03-prod",
+        "ip_address": "10.0.1.12",
+        "environment": "staging",
+        "region": "cn-beijing",
+        "status": "running"
+      },
+      "description": "存在 4 个标签不一致",
+      "details": {
+        "mismatched_labels": {
+          "ansible_host": {
+            "inventory": "10.0.1.12",
+            "cmdb": null
+          },
+          "status": {
+            "inventory": null,
+            "cmdb": "running"
+          },
+          "server_role": {
+            "inventory": "nginx",
+            "cmdb": null
+          },
+          "vendor": {
+            "inventory": "aliyun",
+            "cmdb": null
+          }
+        }
+      }
+    },
+    {
+      "drift_type": "label_mismatch",
+      "host": "db01-prod",
+      "risk_level": "LOW",
+      "inventory_value": {
+        "ansible_host": "10.0.2.10",
+        "role": "database",
+        "env": "production",
+        "region": "cn-beijing",
+        "vendor": "aliyun"
+      },
+      "cmdb_value": {
+        "hostname": "db01-prod",
+        "ip_address": "10.0.2.10",
+        "environment": "production",
+        "region": "cn-beijing",
+        "status": "running"
+      },
+      "description": "存在 3 个标签不一致",
+      "details": {
+        "mismatched_labels": {
+          "ansible_host": {
+            "inventory": "10.0.2.10",
+            "cmdb": null
+          },
+          "status": {
+            "inventory": null,
+            "cmdb": "running"
+          },
+          "vendor": {
+            "inventory": "aliyun",
+            "cmdb": null
+          }
+        }
+      }
+    },
+    {
+      "drift_type": "label_mismatch",
+      "host": "db02-prod",
+      "risk_level": "LOW",
+      "inventory_value": {
+        "ansible_host": "10.0.2.11",
+        "role": "database",
+        "env": "production",
+        "region": "cn-beijing",
+        "vendor": "aliyun"
+      },
+      "cmdb_value": {
+        "hostname": "db02-prod",
+        "ip_address": "10.0.2.11",
+        "environment": "prod",
+        "region": "cn-beijing",
+        "status": "running"
+      },
+      "description": "存在 3 个标签不一致",
+      "details": {
+        "mismatched_labels": {
+          "ansible_host": {
+            "inventory": "10.0.2.11",
+            "cmdb": null
+          },
+          "status": {
+            "inventory": null,
+            "cmdb": "running"
+          },
+          "vendor": {
+            "inventory": "aliyun",
+            "cmdb": null
+          }
+        }
+      }
+    },
+    {
+      "drift_type": "missing_in_cmdb",
+      "host": "redis01-prod",
+      "risk_level": "HIGH",
+      "inventory_value": "redis01-prod",
+      "cmdb_value": null,
+      "description": "主机 'redis01-prod' 在 Inventory 中存在，但在 CMDB 中找不到",
+      "details": {}
+    },
+    {
+      "drift_type": "missing_in_cmdb",
+      "host": "app01-stg",
+      "risk_level": "HIGH",
+      "inventory_value": "app01-stg",
+      "cmdb_value": null,
+      "description": "主机 'app01-stg' 在 Inventory 中存在，但在 CMDB 中找不到",
+      "details": {}
+    },
+    {
+      "drift_type": "decommissioned_still_present",
+      "host": "old-web01-deprecated",
+      "risk_level": "MEDIUM",
+      "inventory_value": "old-web01-deprecated",
+      "cmdb_value": null,
+      "description": "主机 'old-web01-deprecated' 已标记为退役，但仍存在于 Inventory 中",
+      "details": {}
+    },
+    {
+      "drift_type": "missing_in_inventory",
+      "host": "new-server-01",
+      "risk_level": "MEDIUM",
+      "inventory_value": null,
+      "cmdb_value": "new-server-01",
+      "description": "主机 'new-server-01' 在 CMDB 中存在，但在 Inventory 中找不到",
+      "details": {}
+    }
+  ],
+  "summary": {
+    "label_mismatch": 5,
+    "role_mismatch": 1,
+    "environment_mismatch": 1,
+    "missing_in_cmdb": 2,
+    "decommissioned_still_present": 1,
+    "missing_in_inventory": 1
+  },
+  "risk_summary": {
+    "LOW": 5,
+    "HIGH": 3,
+    "CRITICAL": 1,
+    "MEDIUM": 2
+  },
+  "recommendations": [
+    "【紧急】存在 1 个严重问题，包括环境不一致或别名冲突，请立即处理！",
+    "环境标签不一致可能导致运维脚本跑错机器，请核对 Inventory 和 CMDB 的环境配置。",
+    "有 2 台主机未录入 CMDB，建议补充 CMDB 记录或从 Inventory 移除退役主机。",
+    "有 1 台已退役主机仍在 Inventory 中，建议清理。",
+    "有 1 台主机角色不一致，这可能影响运维剧本的执行目标。"
+  ]
+}

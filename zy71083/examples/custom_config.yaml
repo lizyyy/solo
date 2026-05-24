@@ -1,0 +1,13 @@
+mappings:
+  roles:
+    "nginx: web
+    "frontend": web
+    "backend": app
+    "postgres": database
+    "pg": database
+  environments:
+    "online": production
+    "offline": staging
+  label_keys:
+    "server_type": role
+    "host_type": role
