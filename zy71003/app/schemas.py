@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, List
 
@@ -182,3 +182,63 @@ class ErrorResponse(BaseModel):
     error_code: str
     message: str
     details: Optional[str] = None
+
+
+class BatchSubmitItem(BaseModel):
+    slot_number: str
+    battery_id: str
+
+
+class BatchSubmitRequest(BaseModel):
+    business_no: str
+    operator: str
+    items: List[BatchSubmitItem]
+
+
+class BatchSubmitResult(BaseModel):
+    slot_number: str
+    battery_id: str
+    status: str
+    reason: Optional[str] = None
+
+
+class BatchSubmitResponse(BaseModel):
+    is_processed: bool
+    message: str
+    business_no: str
+    success_count: int
+    failed_count: int
+    results: List[BatchSubmitResult]
+
+
+class TemperatureSampleItem(BaseModel):
+    temperature: float
+    sample_time: datetime
+    window_id: Optional[str] = None
+    is_anomaly: Optional[bool] = False
+
+
+class RecheckRecordItem(BaseModel):
+    recheck_person: str
+    recheck_time: datetime
+    conclusion: str
+    remarks: Optional[str] = None
+
+
+class OperationLogItem(BaseModel):
+    operation_type: str
+    operator: Optional[str] = None
+    details: str
+    result: str
+    created_at: datetime
+
+
+class AnomalyDetailResponse(BaseModel):
+    battery_id: str
+    slot_number: str
+    temperature_samples: List[TemperatureSampleItem]
+    recheck_records: List[RecheckRecordItem]
+    operation_logs: List[OperationLogItem]
+    current_status: str
+    anomaly_type: Optional[str] = None
+    remarks: Optional[str] = None

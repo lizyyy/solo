@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import and_
-from typing import List, Optional, Tuple
+from sqlalchemy import and_, or_
+from typing import List, Optional, Tuple, Dict
 from datetime import datetime
 import uuid
+import math
 
 from . import models, schemas
 from .models import Slot, TemperatureSample, DisableRecord, RecheckRecord, DisposalReport, OperationLog

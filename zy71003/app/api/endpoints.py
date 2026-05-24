@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from datetime import datetime
 
 from ..database import get_db
 from .. import schemas, services, models
@@ -110,3 +111,59 @@ def create_slot(slot: schemas.SlotCreate, db: Session = Depends(get_db)):
 @router.get("/slots", response_model=List[schemas.Slot])
 def list_slots(db: Session = Depends(get_db)):
     return db.query(models.Slot).all()
+
+
+@router.post("/batch/submit", response_model=dict)
+def submit_batch(request: dict, db: Session = Depends(get_db)):
+    result = services.submit_batch(db, request)
+    if "error_code" in result and result["error_code"] == "DUPLICATE_REQUEST":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=result
+        )
+    return result
+
+
+@router.get("/anomalies", response_model=dict)
+def get_anomalies(
+    status: Optional[str] = None,
+    start_time: Optional[datetime] = None,
+    end_time: Optional[datetime] = None,
+    limit: int = 100,
+    offset: int = 0,
+    db: Session = Depends(get_db)
+):
+    return services.get_anomaly_list(db, status, start_time, end_time, limit, offset)
+
+
+@router.get("/anomalies/{anomaly_id}", response_model=dict)
+def get_anomaly_detail(anomaly_id: int, db: Session = Depends(get_db)):
+    result = services.get_anomaly_detail(db, anomaly_id)
+    if "error_code" in result and result["error_code"] == "MISSING_DATA":
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=result
+        )
+    return result
+
+
+@router.post("/anomalies/correct", response_model=dict)
+def correct_material(request: dict, db: Session = Depends(get_db)):
+    result = services.correct_material(db, request)
+    if "error_code" in result and result["error_code"] == "MISSING_DATA":
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=result
+        )
+    return result
+
+
+@router.post("/anomalies/confirm", response_model=dict)
+def confirm_conclusion(request: dict, db: Session = Depends(get_db)):
+    result = services.confirm_conclusion(db, request)
+    if "error_code" in result and result["error_code"] == "MISSING_DATA":
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=result
+        )
+    return result
