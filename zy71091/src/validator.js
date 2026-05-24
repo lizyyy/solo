@@ -101,10 +101,10 @@ function validateSampleData(data, strictMode = false) {
     }
 
     if (item.ttl !== undefined) {
-      if (typeof item.ttl !== 'number' && item.ttl !== -1) {
-        if (typeof item.ttl === 'number' && item.ttl < -1) {
-          errors.push(`第 ${index} 项的 ttl 必须 >= -1 (-1 表示无 TTL)`);
-        }
+      if (typeof item.ttl !== 'number') {
+        errors.push(`第 ${index} 项的 ttl 必须是数字类型`);
+      } else if (item.ttl < -1) {
+        errors.push(`第 ${index} 项的 ttl 必须 >= -1 (-1 表示无 TTL)`);
       }
     }
 

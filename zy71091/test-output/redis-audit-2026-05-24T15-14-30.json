@@ -1,0 +1,727 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-24T15:14:30.477Z",
+    "version": "1.0.0",
+    "inputFile": "data/clean-sample.json",
+    "previousFile": null,
+    "options": {
+      "prefixDepth": 3,
+      "prefixSeparator": ":",
+      "topN": 20,
+      "sampleRate": 1
+    }
+  },
+  "summary": {
+    "totalKeys": 30,
+    "totalMemory": 2636800,
+    "totalMemoryFormatted": "2.51 MB",
+    "avgMemory": 87893.33333333333,
+    "noTTLCount": 13,
+    "noTTLPercentage": "43.33",
+    "hasTrendAnalysis": false
+  },
+  "basicStats": {
+    "totalKeys": 30,
+    "totalMemory": 2636800,
+    "avgMemory": 87893.33333333333,
+    "medianMemory": 8192,
+    "p95Memory": 524288,
+    "maxMemory": 1048576,
+    "minMemory": 512,
+    "noTTLCount": 13,
+    "noTTLPercentage": "43.33",
+    "typeStats": {
+      "string": 13,
+      "hash": 10,
+      "list": 4,
+      "zset": 3
+    },
+    "topBigKeys": [
+      {
+        "key": "cache:views:homepage",
+        "memory": 1048576,
+        "ttl": 3600,
+        "type": "string"
+      },
+      {
+        "key": "cache:views:product_list",
+        "memory": 524288,
+        "ttl": 1800,
+        "type": "string"
+      },
+      {
+        "key": "log:error:app",
+        "memory": 262144,
+        "ttl": 2592000,
+        "type": "list"
+      },
+      {
+        "key": "stats:daily:20240101",
+        "memory": 131072,
+        "ttl": -1,
+        "type": "zset"
+      },
+      {
+        "key": "stats:daily:20240102",
+        "memory": 131072,
+        "ttl": -1,
+        "type": "zset"
+      },
+      {
+        "key": "stats:daily:20240103",
+        "memory": 131072,
+        "ttl": -1,
+        "type": "zset"
+      },
+      {
+        "key": "log:error:db",
+        "memory": 131072,
+        "ttl": 2592000,
+        "type": "list"
+      },
+      {
+        "key": "order:history:5001",
+        "memory": 65536,
+        "ttl": -1,
+        "type": "list"
+      },
+      {
+        "key": "cart:user:4001",
+        "memory": 32768,
+        "ttl": -1,
+        "type": "hash"
+      },
+      {
+        "key": "cart:user:4002",
+        "memory": 32768,
+        "ttl": -1,
+        "type": "hash"
+      }
+    ]
+  },
+  "prefixAnalysis": {
+    "businessPrefixes": [],
+    "mixedPrefixes": [
+      "product",
+      "user",
+      "stats",
+      "order",
+      "cart",
+      "cache",
+      "log",
+      "config"
+    ],
+    "highRiskPrefixes": [
+      {
+        "prefix": "stats:daily:20240101",
+        "keyCount": 1,
+        "totalMemory": 131072,
+        "noTTLCount": 1,
+        "noTTLPercentage": "100.00",
+        "risk": "high"
+      },
+      {
+        "prefix": "stats:daily:20240102",
+        "keyCount": 1,
+        "totalMemory": 131072,
+        "noTTLCount": 1,
+        "noTTLPercentage": "100.00",
+        "risk": "high"
+      },
+      {
+        "prefix": "stats:daily:20240103",
+        "keyCount": 1,
+        "totalMemory": 131072,
+        "noTTLCount": 1,
+        "noTTLPercentage": "100.00",
+        "risk": "high"
+      },
+      {
+        "prefix": "order:history:5001",
+        "keyCount": 1,
+        "totalMemory": 65536,
+        "noTTLCount": 1,
+        "noTTLPercentage": "100.00",
+        "risk": "high"
+      },
+      {
+        "prefix": "cart:user:4001",
+        "keyCount": 1,
+        "totalMemory": 32768,
+        "noTTLCount": 1,
+        "noTTLPercentage": "100.00",
+        "risk": "high"
+      },
+      {
+        "prefix": "cart:user:4002",
+        "keyCount": 1,
+        "totalMemory": 32768,
+        "noTTLCount": 1,
+        "noTTLPercentage": "100.00",
+        "risk": "high"
+      },
+      {
+        "prefix": "config:app:settings",
+        "keyCount": 1,
+        "totalMemory": 10240,
+        "noTTLCount": 1,
+        "noTTLPercentage": "100.00",
+        "risk": "high"
+      },
+      {
+        "prefix": "user:profile:2001",
+        "keyCount": 1,
+        "totalMemory": 8192,
+        "noTTLCount": 1,
+        "noTTLPercentage": "100.00",
+        "risk": "high"
+      },
+      {
+        "prefix": "user:profile:2002",
+        "keyCount": 1,
+        "totalMemory": 8192,
+        "noTTLCount": 1,
+        "noTTLPercentage": "100.00",
+        "risk": "high"
+      },
+      {
+        "prefix": "user:profile:2003",
+        "keyCount": 1,
+        "totalMemory": 8192,
+        "noTTLCount": 1,
+        "noTTLPercentage": "100.00",
+        "risk": "high"
+      }
+    ],
+    "memoryDistribution": {
+      "depth": 3,
+      "totalPrefixes": 30,
+      "totalMemory": 2611200,
+      "top5Percentage": "80.31",
+      "top10Percentage": "95.37",
+      "cumulativeDistribution": [
+        {
+          "prefix": "cache:views:homepage",
+          "memory": 1048576,
+          "cumulativePercentage": "40.16"
+        },
+        {
+          "prefix": "cache:views:product_list",
+          "memory": 524288,
+          "cumulativePercentage": "60.24"
+        },
+        {
+          "prefix": "log:error:app",
+          "memory": 262144,
+          "cumulativePercentage": "70.27"
+        },
+        {
+          "prefix": "stats:daily:20240101",
+          "memory": 131072,
+          "cumulativePercentage": "75.29"
+        },
+        {
+          "prefix": "stats:daily:20240102",
+          "memory": 131072,
+          "cumulativePercentage": "80.31"
+        },
+        {
+          "prefix": "stats:daily:20240103",
+          "memory": 131072,
+          "cumulativePercentage": "85.33"
+        },
+        {
+          "prefix": "log:error:db",
+          "memory": 131072,
+          "cumulativePercentage": "90.35"
+        },
+        {
+          "prefix": "order:history:5001",
+          "memory": 65536,
+          "cumulativePercentage": "92.86"
+        },
+        {
+          "prefix": "cart:user:4001",
+          "memory": 32768,
+          "cumulativePercentage": "94.12"
+        },
+        {
+          "prefix": "cart:user:4002",
+          "memory": 32768,
+          "cumulativePercentage": "95.37"
+        },
+        {
+          "prefix": "cart:user:4003",
+          "memory": 32768,
+          "cumulativePercentage": "96.63"
+        },
+        {
+          "prefix": "product:detail:3001",
+          "memory": 16384,
+          "cumulativePercentage": "97.25"
+        },
+        {
+          "prefix": "product:detail:3002",
+          "memory": 16384,
+          "cumulativePercentage": "97.88"
+        },
+        {
+          "prefix": "config:app:settings",
+          "memory": 10240,
+          "cumulativePercentage": "98.27"
+        },
+        {
+          "prefix": "user:profile:2001",
+          "memory": 8192,
+          "cumulativePercentage": "98.59"
+        },
+        {
+          "prefix": "user:profile:2002",
+          "memory": 8192,
+          "cumulativePercentage": "98.90"
+        },
+        {
+          "prefix": "user:profile:2003",
+          "memory": 8192,
+          "cumulativePercentage": "99.22"
+        },
+        {
+          "prefix": "user:profile:2004",
+          "memory": 8192,
+          "cumulativePercentage": "99.53"
+        },
+        {
+          "prefix": "queue:jobs:email",
+          "memory": 8192,
+          "cumulativePercentage": "99.84"
+        },
+        {
+          "prefix": "product:cache:3001",
+          "memory": 4096,
+          "cumulativePercentage": "100.00"
+        }
+      ]
+    },
+    "topPrefixes": [
+      {
+        "prefix": "cache:views:homepage",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 1048576,
+        "noTTLCount": 0,
+        "avgMemory": 1048576,
+        "typeBreakdown": {
+          "string": 1
+        },
+        "sampleKeys": [
+          "cache:views:homepage"
+        ],
+        "noTTLPercentage": "0.00"
+      },
+      {
+        "prefix": "cache:views:product_list",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 524288,
+        "noTTLCount": 0,
+        "avgMemory": 524288,
+        "typeBreakdown": {
+          "string": 1
+        },
+        "sampleKeys": [
+          "cache:views:product_list"
+        ],
+        "noTTLPercentage": "0.00"
+      },
+      {
+        "prefix": "log:error:app",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 262144,
+        "noTTLCount": 0,
+        "avgMemory": 262144,
+        "typeBreakdown": {
+          "list": 1
+        },
+        "sampleKeys": [
+          "log:error:app"
+        ],
+        "noTTLPercentage": "0.00"
+      },
+      {
+        "prefix": "stats:daily:20240101",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 131072,
+        "noTTLCount": 1,
+        "avgMemory": 131072,
+        "typeBreakdown": {
+          "zset": 1
+        },
+        "sampleKeys": [
+          "stats:daily:20240101"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "stats:daily:20240102",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 131072,
+        "noTTLCount": 1,
+        "avgMemory": 131072,
+        "typeBreakdown": {
+          "zset": 1
+        },
+        "sampleKeys": [
+          "stats:daily:20240102"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "stats:daily:20240103",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 131072,
+        "noTTLCount": 1,
+        "avgMemory": 131072,
+        "typeBreakdown": {
+          "zset": 1
+        },
+        "sampleKeys": [
+          "stats:daily:20240103"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "log:error:db",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 131072,
+        "noTTLCount": 0,
+        "avgMemory": 131072,
+        "typeBreakdown": {
+          "list": 1
+        },
+        "sampleKeys": [
+          "log:error:db"
+        ],
+        "noTTLPercentage": "0.00"
+      },
+      {
+        "prefix": "order:history:5001",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 65536,
+        "noTTLCount": 1,
+        "avgMemory": 65536,
+        "typeBreakdown": {
+          "list": 1
+        },
+        "sampleKeys": [
+          "order:history:5001"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "cart:user:4001",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 32768,
+        "noTTLCount": 1,
+        "avgMemory": 32768,
+        "typeBreakdown": {
+          "hash": 1
+        },
+        "sampleKeys": [
+          "cart:user:4001"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "cart:user:4002",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 32768,
+        "noTTLCount": 1,
+        "avgMemory": 32768,
+        "typeBreakdown": {
+          "hash": 1
+        },
+        "sampleKeys": [
+          "cart:user:4002"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "cart:user:4003",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 32768,
+        "noTTLCount": 0,
+        "avgMemory": 32768,
+        "typeBreakdown": {
+          "hash": 1
+        },
+        "sampleKeys": [
+          "cart:user:4003"
+        ],
+        "noTTLPercentage": "0.00"
+      },
+      {
+        "prefix": "product:detail:3001",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 16384,
+        "noTTLCount": 0,
+        "avgMemory": 16384,
+        "typeBreakdown": {
+          "hash": 1
+        },
+        "sampleKeys": [
+          "product:detail:3001"
+        ],
+        "noTTLPercentage": "0.00"
+      },
+      {
+        "prefix": "product:detail:3002",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 16384,
+        "noTTLCount": 0,
+        "avgMemory": 16384,
+        "typeBreakdown": {
+          "hash": 1
+        },
+        "sampleKeys": [
+          "product:detail:3002"
+        ],
+        "noTTLPercentage": "0.00"
+      },
+      {
+        "prefix": "config:app:settings",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 10240,
+        "noTTLCount": 1,
+        "avgMemory": 10240,
+        "typeBreakdown": {
+          "hash": 1
+        },
+        "sampleKeys": [
+          "config:app:settings"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "user:profile:2001",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 8192,
+        "noTTLCount": 1,
+        "avgMemory": 8192,
+        "typeBreakdown": {
+          "hash": 1
+        },
+        "sampleKeys": [
+          "user:profile:2001"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "user:profile:2002",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 8192,
+        "noTTLCount": 1,
+        "avgMemory": 8192,
+        "typeBreakdown": {
+          "hash": 1
+        },
+        "sampleKeys": [
+          "user:profile:2002"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "user:profile:2003",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 8192,
+        "noTTLCount": 1,
+        "avgMemory": 8192,
+        "typeBreakdown": {
+          "hash": 1
+        },
+        "sampleKeys": [
+          "user:profile:2003"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "user:profile:2004",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 8192,
+        "noTTLCount": 1,
+        "avgMemory": 8192,
+        "typeBreakdown": {
+          "hash": 1
+        },
+        "sampleKeys": [
+          "user:profile:2004"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "queue:jobs:email",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 8192,
+        "noTTLCount": 1,
+        "avgMemory": 8192,
+        "typeBreakdown": {
+          "list": 1
+        },
+        "sampleKeys": [
+          "queue:jobs:email"
+        ],
+        "noTTLPercentage": "100.00"
+      },
+      {
+        "prefix": "product:cache:3001",
+        "depth": 3,
+        "keyCount": 1,
+        "totalMemory": 4096,
+        "noTTLCount": 0,
+        "avgMemory": 4096,
+        "typeBreakdown": {
+          "string": 1
+        },
+        "sampleKeys": [
+          "product:cache:3001"
+        ],
+        "noTTLPercentage": "0.00"
+      }
+    ]
+  },
+  "ttlAnalysis": {
+    "stats": {
+      "totalKeys": 30,
+      "noTTLCount": 13,
+      "noTTLPercentage": "43.33",
+      "withTTLCount": 17,
+      "withTTLPercentage": "56.67",
+      "minTTL": 600,
+      "maxTTL": 2592000,
+      "avgTTL": 397517.64705882355,
+      "medianTTL": 43200
+    },
+    "buckets": [
+      {
+        "label": "无 TTL (永久)",
+        "minTTL": -1,
+        "maxTTL": -1,
+        "count": 13,
+        "percentage": "43.33",
+        "totalMemory": 576000,
+        "avgMemory": 44307.692307692305,
+        "sampleKeys": [
+          "stats:daily:20240101",
+          "stats:daily:20240102",
+          "stats:daily:20240103",
+          "order:history:5001",
+          "cart:user:4001"
+        ]
+      },
+      {
+        "label": "0秒 - 1分钟",
+        "minTTL": 0,
+        "maxTTL": 60,
+        "count": 0,
+        "percentage": "0.00",
+        "totalMemory": 0,
+        "avgMemory": 0,
+        "sampleKeys": []
+      },
+      {
+        "label": "1分钟 - 1小时",
+        "minTTL": 60,
+        "maxTTL": 3600,
+        "count": 5,
+        "percentage": "16.67",
+        "totalMemory": 562688,
+        "avgMemory": 112537.6,
+        "sampleKeys": [
+          "cache:views:product_list",
+          "cart:user:4003",
+          "order:temp:5001",
+          "order:temp:5002",
+          "user:session:1003"
+        ]
+      },
+      {
+        "label": "1小时 - 1天",
+        "minTTL": 3600,
+        "maxTTL": 86400,
+        "count": 5,
+        "percentage": "16.67",
+        "totalMemory": 1059840,
+        "avgMemory": 211968,
+        "sampleKeys": [
+          "cache:views:homepage",
+          "product:cache:3004",
+          "product:cache:3005",
+          "user:session:1001",
+          "user:session:1002"
+        ]
+      },
+      {
+        "label": "1天 - 1周",
+        "minTTL": 86400,
+        "maxTTL": 604800,
+        "count": 3,
+        "percentage": "10.00",
+        "totalMemory": 12288,
+        "avgMemory": 4096,
+        "sampleKeys": [
+          "product:cache:3001",
+          "product:cache:3002",
+          "product:cache:3003"
+        ]
+      },
+      {
+        "label": "1周 - 1月",
+        "minTTL": 604800,
+        "maxTTL": 2592000,
+        "count": 2,
+        "percentage": "6.67",
+        "totalMemory": 32768,
+        "avgMemory": 16384,
+        "sampleKeys": [
+          "product:detail:3001",
+          "product:detail:3002"
+        ]
+      },
+      {
+        "label": "> 1月",
+        "minTTL": 2592000,
+        "maxTTL": null,
+        "count": 2,
+        "percentage": "6.67",
+        "totalMemory": 393216,
+        "avgMemory": 196608,
+        "sampleKeys": [
+          "log:error:app",
+          "log:error:db"
+        ]
+      }
+    ]
+  },
+  "validation": {
+    "errors": [],
+    "warnings": [
+      "检测到 13 个无 TTL 的 Key"
+    ]
+  }
+}

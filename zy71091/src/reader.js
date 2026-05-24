@@ -52,13 +52,22 @@ function applySampling(data, sampleRate) {
 }
 
 function normalizeData(data) {
-  return data.map(item => ({
-    key: item.key,
-    memory: item.memory,
-    ttl: item.ttl !== undefined ? item.ttl : -1,
-    type: item.type || 'unknown',
-    db: item.db || 0
-  }));
+  return data.map(item => {
+    let ttl = item.ttl;
+    if (ttl === undefined) {
+      ttl = -1;
+    } else if (typeof ttl !== 'number' || ttl < -1) {
+      ttl = -1;
+    }
+    
+    return {
+      key: item.key,
+      memory: item.memory,
+      ttl,
+      type: item.type || 'unknown',
+      db: item.db || 0
+    };
+  });
 }
 
 function calculateBasicStats(data) {

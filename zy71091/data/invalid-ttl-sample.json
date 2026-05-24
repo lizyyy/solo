@@ -1,0 +1,7 @@
+[
+  {"key": "valid:key:001", "memory": 1024, "ttl": "3600", "type": "string"},
+  {"key": "valid:key:002", "memory": 2048, "ttl": -5, "type": "string"},
+  {"key": "valid:key:003", "memory": 3072, "ttl": 3600, "type": "string"},
+  {"key": "valid:key:004", "memory": 4096, "ttl": null, "type": "hash"},
+  {"key": "valid:key:005", "memory": 5120, "ttl": -100, "type": "list"}
+]

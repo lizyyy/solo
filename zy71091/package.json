@@ -8,7 +8,9 @@
   },
   "scripts": {
     "test": "node test/run-tests.js",
-    "lint": "node --check src/**/*.js"
+    "lint": "node --check src/*.js && node --check bin/*.js",
+    "test:clean": "node bin/redis-key-audit.js -i data/clean-sample.json -o test-output --format json > /dev/null && echo 'Clean sample test passed'",
+    "test:dirty": "node bin/redis-key-audit.js -i data/invalid-ttl-sample.json -o test-output --format json 2>&1 || echo 'Dirty sample correctly rejected (exit code '$?')'"
   },
   "keywords": ["redis", "audit", "cli", "memory", "bigkeys"],
   "author": "",
