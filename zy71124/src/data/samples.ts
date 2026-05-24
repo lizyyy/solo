@@ -1,0 +1,66 @@
+import { SampleData } from '../types';
+
+export const sampleData: SampleData[] = [
+  {
+    name: '早高峰常规调度',
+    description: '6辆校车的标准早高峰发车场景，包含典型的车位阻塞问题',
+    buses: [
+      { id: 'bus1', number: 'A-001', route: '1号线-东区', capacity: 45, currentStudents: 0, parkingSpotId: 'spot1', departureTime: 0, status: 'parked', color: '#E74C3C', row: 0, col: 0, exitLane: 0 },
+      { id: 'bus2', number: 'A-002', route: '2号线-西区', capacity: 45, currentStudents: 0, parkingSpotId: 'spot2', departureTime: 30, status: 'parked', color: '#3498DB', row: 0, col: 1, exitLane: 0 },
+      { id: 'bus3', number: 'A-003', route: '3号线-南区', capacity: 45, currentStudents: 0, parkingSpotId: 'spot3', departureTime: 60, status: 'parked', color: '#2ECC71', row: 0, col: 2, exitLane: 0 },
+      { id: 'bus4', number: 'B-001', route: '4号线-北区', capacity: 45, currentStudents: 0, parkingSpotId: 'spot4', departureTime: 15, status: 'parked', color: '#F39C12', row: 1, col: 0, exitLane: 1 },
+      { id: 'bus5', number: 'B-002', route: '5号线-中心区', capacity: 45, currentStudents: 0, parkingSpotId: 'spot5', departureTime: 45, status: 'parked', color: '#9B59B6', row: 1, col: 1, exitLane: 1 },
+      { id: 'bus6', number: 'B-003', route: '6号线-郊区', capacity: 45, currentStudents: 0, parkingSpotId: 'spot6', departureTime: 75, status: 'parked', color: '#1ABC9C', row: 1, col: 2, exitLane: 1 },
+    ],
+    parkingSpots: [
+      { id: 'spot1', position: { x: -12, z: 8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus1', row: 0, col: 0, isExitPath: false },
+      { id: 'spot2', position: { x: 0, z: 8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus2', row: 0, col: 1, isExitPath: false },
+      { id: 'spot3', position: { x: 12, z: 8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus3', row: 0, col: 2, isExitPath: false },
+      { id: 'spot4', position: { x: -12, z: -8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus4', row: 1, col: 0, isExitPath: false },
+      { id: 'spot5', position: { x: 0, z: -8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus5', row: 1, col: 1, isExitPath: false },
+      { id: 'spot6', position: { x: 12, z: -8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus6', row: 1, col: 2, isExitPath: false },
+    ],
+    queues: [
+      { id: 'q1', busId: 'bus1', position: { x: -12, z: 14 }, totalStudents: 40, currentIndex: 0, boardingRate: 2 },
+      { id: 'q2', busId: 'bus2', position: { x: 0, z: 14 }, totalStudents: 35, currentIndex: 0, boardingRate: 2 },
+      { id: 'q3', busId: 'bus3', position: { x: 12, z: 14 }, totalStudents: 45, currentIndex: 0, boardingRate: 2 },
+      { id: 'q4', busId: 'bus4', position: { x: -12, z: -14 }, totalStudents: 38, currentIndex: 0, boardingRate: 2 },
+      { id: 'q5', busId: 'bus5', position: { x: 0, z: -14 }, totalStudents: 42, currentIndex: 0, boardingRate: 2 },
+      { id: 'q6', busId: 'bus6', position: { x: 12, z: -14 }, totalStudents: 30, currentIndex: 0, boardingRate: 2 },
+    ],
+  },
+  {
+    name: '高密度发车场景',
+    description: '8辆校车密集发车，测试发车顺序冲突检测',
+    buses: [
+      { id: 'bus1', number: 'C-001', route: '1号线', capacity: 50, currentStudents: 0, parkingSpotId: 'spot1', departureTime: 0, status: 'parked', color: '#E74C3C', row: 0, col: 0, exitLane: 0 },
+      { id: 'bus2', number: 'C-002', route: '2号线', capacity: 50, currentStudents: 0, parkingSpotId: 'spot2', departureTime: 5, status: 'parked', color: '#3498DB', row: 0, col: 1, exitLane: 0 },
+      { id: 'bus3', number: 'C-003', route: '3号线', capacity: 50, currentStudents: 0, parkingSpotId: 'spot3', departureTime: 10, status: 'parked', color: '#2ECC71', row: 0, col: 2, exitLane: 0 },
+      { id: 'bus4', number: 'C-004', route: '4号线', capacity: 50, currentStudents: 0, parkingSpotId: 'spot4', departureTime: 15, status: 'parked', color: '#F39C12', row: 0, col: 3, exitLane: 0 },
+      { id: 'bus5', number: 'D-001', route: '5号线', capacity: 50, currentStudents: 0, parkingSpotId: 'spot5', departureTime: 8, status: 'parked', color: '#9B59B6', row: 1, col: 0, exitLane: 1 },
+      { id: 'bus6', number: 'D-002', route: '6号线', capacity: 50, currentStudents: 0, parkingSpotId: 'spot6', departureTime: 12, status: 'parked', color: '#1ABC9C', row: 1, col: 1, exitLane: 1 },
+      { id: 'bus7', number: 'D-003', route: '7号线', capacity: 50, currentStudents: 0, parkingSpotId: 'spot7', departureTime: 18, status: 'parked', color: '#E67E22', row: 1, col: 2, exitLane: 1 },
+      { id: 'bus8', number: 'D-004', route: '8号线', capacity: 50, currentStudents: 0, parkingSpotId: 'spot8', departureTime: 25, status: 'parked', color: '#34495E', row: 1, col: 3, exitLane: 1 },
+    ],
+    parkingSpots: [
+      { id: 'spot1', position: { x: -18, z: 8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus1', row: 0, col: 0, isExitPath: false },
+      { id: 'spot2', position: { x: -6, z: 8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus2', row: 0, col: 1, isExitPath: false },
+      { id: 'spot3', position: { x: 6, z: 8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus3', row: 0, col: 2, isExitPath: false },
+      { id: 'spot4', position: { x: 18, z: 8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus4', row: 0, col: 3, isExitPath: false },
+      { id: 'spot5', position: { x: -18, z: -8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus5', row: 1, col: 0, isExitPath: false },
+      { id: 'spot6', position: { x: -6, z: -8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus6', row: 1, col: 1, isExitPath: false },
+      { id: 'spot7', position: { x: 6, z: -8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus7', row: 1, col: 2, isExitPath: false },
+      { id: 'spot8', position: { x: 18, z: -8 }, size: { width: 6, length: 10 }, occupiedBy: 'bus8', row: 1, col: 3, isExitPath: false },
+    ],
+    queues: [
+      { id: 'q1', busId: 'bus1', position: { x: -18, z: 14 }, totalStudents: 45, currentIndex: 0, boardingRate: 3 },
+      { id: 'q2', busId: 'bus2', position: { x: -6, z: 14 }, totalStudents: 45, currentIndex: 0, boardingRate: 3 },
+      { id: 'q3', busId: 'bus3', position: { x: 6, z: 14 }, totalStudents: 45, currentIndex: 0, boardingRate: 3 },
+      { id: 'q4', busId: 'bus4', position: { x: 18, z: 14 }, totalStudents: 45, currentIndex: 0, boardingRate: 3 },
+      { id: 'q5', busId: 'bus5', position: { x: -18, z: -14 }, totalStudents: 45, currentIndex: 0, boardingRate: 3 },
+      { id: 'q6', busId: 'bus6', position: { x: -6, z: -14 }, totalStudents: 45, currentIndex: 0, boardingRate: 3 },
+      { id: 'q7', busId: 'bus7', position: { x: 6, z: -14 }, totalStudents: 45, currentIndex: 0, boardingRate: 3 },
+      { id: 'q8', busId: 'bus8', position: { x: 18, z: -14 }, totalStudents: 45, currentIndex: 0, boardingRate: 3 },
+    ],
+  },
+];
