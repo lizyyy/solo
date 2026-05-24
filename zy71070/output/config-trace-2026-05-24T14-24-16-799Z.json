@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "generatedAt": "2026-05-24T12:27:38.706Z",
+    "generatedAt": "2026-05-24T14:24:16.799Z",
     "options": {
       "arrayMerge": "replace",
-      "caseSensitive": false
+      "caseSensitive": true
     }
   },
   "mergedConfig": {
@@ -11,11 +11,11 @@
     "debug": true,
     "port": 9000,
     "database": {
-      "host": "tenant-db.acme.com",
+      "host": "prod-db.example.com",
       "port": 5432,
       "database": "app_db",
-      "username": "acme_user",
-      "password": null,
+      "username": "admin",
+      "password": "env_secret_123",
       "poolSize": 20
     },
     "features": {
@@ -35,6 +35,11 @@
     "apiKeys": {
       "stripe": null,
       "sendgrid": "SG.tenant_abc123"
+    },
+    "Database": {
+      "host": "tenant-db.acme.com",
+      "username": "acme_user",
+      "password": null
     },
     "tenantId": "acme_001",
     "customDomain": "app.acme.com"
@@ -129,20 +134,14 @@
           "layer": "env",
           "layerLabel": "环境配置",
           "key": "host"
-        },
-        "tenant": {
-          "value": "tenant-db.acme.com",
-          "layer": "tenant",
-          "layerLabel": "租户配置",
-          "key": "host"
         }
       },
-      "finalValue": "tenant-db.acme.com",
-      "finalLayer": "tenant",
+      "finalValue": "prod-db.example.com",
+      "finalLayer": "env",
       "conflict": false,
       "overrideType": "value_override",
       "overridden": true,
-      "previousValue": "prod-db.example.com"
+      "previousValue": "localhost"
     },
     "database.port": {
       "path": "database.port",
@@ -182,20 +181,12 @@
           "layer": "default",
           "layerLabel": "默认值",
           "key": "username"
-        },
-        "tenant": {
-          "value": "acme_user",
-          "layer": "tenant",
-          "layerLabel": "租户配置",
-          "key": "username"
         }
       },
-      "finalValue": "acme_user",
-      "finalLayer": "tenant",
+      "finalValue": "admin",
+      "finalLayer": "default",
       "conflict": false,
-      "overrideType": "value_override",
-      "overridden": true,
-      "previousValue": "admin"
+      "overrideType": "new_value"
     },
     "database.password": {
       "path": "database.password",
@@ -211,18 +202,12 @@
           "layer": "env",
           "layerLabel": "环境配置",
           "key": "password"
-        },
-        "tenant": {
-          "value": null,
-          "layer": "tenant",
-          "layerLabel": "租户配置",
-          "key": "password"
         }
       },
-      "finalValue": null,
-      "finalLayer": "tenant",
+      "finalValue": "env_secret_123",
+      "finalLayer": "env",
       "conflict": false,
-      "overrideType": "null_override",
+      "overrideType": "value_override",
       "overridden": true,
       "previousValue": "default_pass"
     },
@@ -274,27 +259,17 @@
           "layer": "env",
           "layerLabel": "环境配置",
           "key": "database"
-        },
-        "tenant": {
-          "value": {
-            "host": "tenant-db.acme.com",
-            "username": "acme_user",
-            "password": null
-          },
-          "layer": "tenant",
-          "layerLabel": "租户配置",
-          "key": "Database"
         }
       },
       "finalValue": {
-        "host": "tenant-db.acme.com",
+        "host": "prod-db.example.com",
         "port": 5432,
         "database": "app_db",
-        "username": "acme_user",
-        "password": null,
+        "username": "admin",
+        "password": "env_secret_123",
         "poolSize": 20
       },
-      "finalLayer": "tenant",
+      "finalLayer": "env",
       "conflict": false,
       "overrideType": "object_merge"
     },
@@ -617,6 +592,75 @@
       "conflict": false,
       "overrideType": "object_merge"
     },
+    "Database.host": {
+      "path": "Database.host",
+      "layers": {
+        "tenant": {
+          "value": "tenant-db.acme.com",
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "host"
+        }
+      },
+      "finalValue": "tenant-db.acme.com",
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "new_value"
+    },
+    "Database.username": {
+      "path": "Database.username",
+      "layers": {
+        "tenant": {
+          "value": "acme_user",
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "username"
+        }
+      },
+      "finalValue": "acme_user",
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "new_value"
+    },
+    "Database.password": {
+      "path": "Database.password",
+      "layers": {
+        "tenant": {
+          "value": null,
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "password"
+        }
+      },
+      "finalValue": null,
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overridden": true,
+      "overrideType": "null_override"
+    },
+    "Database": {
+      "path": "Database",
+      "layers": {
+        "tenant": {
+          "value": {
+            "host": "tenant-db.acme.com",
+            "username": "acme_user",
+            "password": null
+          },
+          "layer": "tenant",
+          "layerLabel": "租户配置",
+          "key": "Database"
+        }
+      },
+      "finalValue": {
+        "host": "tenant-db.acme.com",
+        "username": "acme_user",
+        "password": null
+      },
+      "finalLayer": "tenant",
+      "conflict": false,
+      "overrideType": "object_merge"
+    },
     "features.billing": {
       "path": "features.billing",
       "layers": {
@@ -750,9 +794,9 @@
       {
         "type": "override",
         "path": "database.host",
-        "finalValue": "tenant-db.acme.com",
-        "finalLayer": "tenant",
-        "finalLayerLabel": "租户配置",
+        "finalValue": "prod-db.example.com",
+        "finalLayer": "env",
+        "finalLayerLabel": "环境配置",
         "overrideType": "value_override",
         "overrideTypeLabel": "值覆盖",
         "chain": [
@@ -768,62 +812,18 @@
             "layerLabel": "环境配置",
             "value": "prod-db.example.com",
             "key": "host",
-            "isFinal": false
-          },
-          {
-            "layer": "tenant",
-            "layerLabel": "租户配置",
-            "value": "tenant-db.acme.com",
-            "key": "host",
             "isFinal": true
           }
         ]
       },
       {
         "type": "override",
-        "path": "database.username",
-        "finalValue": "acme_user",
-        "finalLayer": "tenant",
-        "finalLayerLabel": "租户配置",
+        "path": "database.password",
+        "finalValue": "env_secret_123",
+        "finalLayer": "env",
+        "finalLayerLabel": "环境配置",
         "overrideType": "value_override",
         "overrideTypeLabel": "值覆盖",
-        "chain": [
-          {
-            "layer": "default",
-            "layerLabel": "默认值",
-            "value": "admin",
-            "key": "username",
-            "isFinal": false
-          },
-          {
-            "layer": "tenant",
-            "layerLabel": "租户配置",
-            "value": "acme_user",
-            "key": "username",
-            "isFinal": true
-          }
-        ]
-      },
-      {
-        "type": "null_override",
-        "path": "database.password",
-        "finalValue": null,
-        "finalLayer": "tenant",
-        "finalLayerLabel": "租户配置",
-        "overrideType": "null_override",
-        "overrideTypeLabel": "NULL覆盖",
-        "overriddenValues": [
-          {
-            "layer": "default",
-            "layerLabel": "默认值",
-            "value": "default_pass"
-          },
-          {
-            "layer": "env",
-            "layerLabel": "环境配置",
-            "value": "env_secret_123"
-          }
-        ],
         "chain": [
           {
             "layer": "default",
@@ -836,13 +836,6 @@
             "layer": "env",
             "layerLabel": "环境配置",
             "value": "env_secret_123",
-            "key": "password",
-            "isFinal": false
-          },
-          {
-            "layer": "tenant",
-            "layerLabel": "租户配置",
-            "value": null,
             "key": "password",
             "isFinal": true
           }
@@ -1043,56 +1036,34 @@
         ]
       }
     ],
-    "caseInconsistencies": [
-      {
-        "path": "database",
-        "lowerKey": "database",
-        "usages": [
-          {
-            "layer": "default",
-            "key": "database",
-            "layerLabel": "默认值"
-          },
-          {
-            "layer": "env",
-            "key": "database",
-            "layerLabel": "环境配置"
-          },
-          {
-            "layer": "tenant",
-            "key": "Database",
-            "layerLabel": "租户配置"
-          }
-        ]
-      }
-    ],
+    "caseInconsistencies": [],
     "hasConflicts": true
   },
   "statistics": {
-    "totalKeys": 25,
+    "totalKeys": 29,
     "overriddenKeys": 13,
-    "newKeys": 7,
+    "newKeys": 10,
     "nullOverrides": 2,
-    "conflictCount": 13,
-    "caseInconsistencyCount": 1,
+    "conflictCount": 12,
+    "caseInconsistencyCount": 0,
     "layerStats": {
       "default": {
         "label": "默认值",
         "totalKeys": 22,
-        "finalKeys": 4,
+        "finalKeys": 5,
         "overriddenKeys": 0
       },
       "env": {
         "label": "环境配置",
         "totalKeys": 12,
-        "finalKeys": 4,
-        "overriddenKeys": 4
+        "finalKeys": 7,
+        "overriddenKeys": 6
       },
       "tenant": {
         "label": "租户配置",
         "totalKeys": 17,
         "finalKeys": 17,
-        "overriddenKeys": 9
+        "overriddenKeys": 7
       }
     }
   }

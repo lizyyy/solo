@@ -8,7 +8,10 @@
   },
   "scripts": {
     "test": "node examples/run-example.js",
-    "lint": "node --check src/**/*.js"
+    "test:verify": "node test/verify-functions.js",
+    "lint": "find src -name '*.js' -exec node --check {} \\;",
+    "lint:all": "node --check bin/config-trace.js && find src -name '*.js' -exec node --check {} \\;",
+    "start": "node bin/config-trace.js"
   },
   "keywords": [
     "config",

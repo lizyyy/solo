@@ -16,20 +16,23 @@ function formatValue(value, maxLength = 80) {
   return String(value);
 }
 
+function createNoColorChalk() {
+  const identity = (s) => s;
+  const noColor = new Proxy(identity, {
+    get: (target, prop) => {
+      if (prop === 'level') return 0;
+      return noColor;
+    }
+  });
+  return noColor;
+}
+
 function printTerminalSummary(result, options) {
   const { mergedConfig, traceMap, conflicts, stats, keyPathChain } = result;
   const useColor = options.color !== false && !options.silent;
 
   const log = (msg = '') => !options.silent && console.log(msg);
-  const c = useColor ? chalk : {
-    cyan: s => s,
-    yellow: s => s,
-    green: s => s,
-    red: s => s,
-    gray: s => s,
-    bold: s => s,
-    bgYellow: s => s
-  };
+  const c = useColor ? chalk : createNoColorChalk();
 
   log();
   log(c.bold.cyan('══════════════════════════════════════════════════════════════'));
