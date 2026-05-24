@@ -36,5 +36,5 @@ public interface CompensationOrderRepository extends JpaRepository<CompensationO
            "AND c.baggageArrived = false")
     List<CompensationOrder> findPendingArrivalOrders(@Param("status") CompensationStatus status);
 
-    boolean existsByBaggageIdAndStatusNotIn(Long baggageId, List<CompensationStatus> statuses);
+    boolean existsByBaggageIdAndStatusIn(Long baggageId, List<CompensationStatus> statuses);
 }

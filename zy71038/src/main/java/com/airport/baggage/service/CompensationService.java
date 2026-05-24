@@ -140,6 +140,10 @@ public class CompensationService {
         BaggageTag baggage = baggageTagRepository.findByTagNumber(request.getTagNumber())
                 .orElseThrow(() -> new BusinessException(ErrorCode.BAGGAGE_NOT_FOUND));
 
+        if (!order.getBaggage().getId().equals(baggage.getId())) {
+            throw new BusinessException(ErrorCode.INVALID_PARAMETER, "该行李牌不属于当前补偿单");
+        }
+
         BaggageArrival arrival = new BaggageArrival();
         arrival.setCompensationOrder(order);
         arrival.setBaggage(baggage);
@@ -283,7 +287,7 @@ public class CompensationService {
                 CompensationStatus.DISPUTED
         );
 
-        if (compensationOrderRepository.existsByBaggageIdAndStatusNotIn(baggageId, activeStatuses)) {
+        if (compensationOrderRepository.existsByBaggageIdAndStatusIn(baggageId, activeStatuses)) {
             throw new BusinessException(ErrorCode.DUPLICATE_REQUEST, "该行李牌已有有效补偿单");
         }
     }
