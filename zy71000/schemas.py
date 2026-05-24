@@ -36,6 +36,8 @@ class IsolationOrderResponse(BaseModel):
     is_late_submission: bool
     cross_room_usage: bool
     temp_package_change: bool
+    sterilization_verified: bool
+    sterilization_result: Optional[str]
     status: str
     final_conclusion: Optional[str]
     reviewed_by: Optional[str]
@@ -74,3 +76,28 @@ class ExportResponse(BaseModel):
     total_count: int
     exported_count: int
     csv_content: str
+
+
+class SterilizationRecordCreate(BaseModel):
+    cycle_number: str = Field(..., description="消毒炉次号")
+    batch_number: str = Field(..., description="器械包批号")
+    sterilizer_id: str = Field(..., description="消毒器编号")
+    start_time: datetime = Field(..., description="消毒开始时间")
+    end_time: datetime = Field(..., description="消毒结束时间")
+    result: str = Field(..., description="消毒结果：合格/不合格")
+    operator: str = Field(..., description="操作人")
+    temperature: Optional[str] = Field(None, description="消毒温度")
+    pressure: Optional[str] = Field(None, description="消毒压力")
+
+
+class SterilizationRecordResponse(BaseModel):
+    id: int
+    cycle_number: str
+    batch_number: str
+    sterilizer_id: str
+    result: str
+    operator: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
