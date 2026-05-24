@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>山地步道海拔导览</title>
+  <script type="module" crossorigin src="/assets/index-CL9zuEqZ.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CfMzWr0s.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>🏔️ 山地步道海拔导览</h1>
+      <div class="header-actions">
+        <select id="sampleSelect" class="btn">
+          <option value="">导入样例数据</option>
+          <option value="qingcheng">青城山步道</option>
+          <option value="huangshan">黄山步道</option>
+          <option value="emei">峨眉山步道</option>
+        </select>
+        <button id="resetBtn" class="btn btn-warning">🔄 重置状态</button>
+        <button id="exportBtn" class="btn btn-primary">📤 导出报告</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <aside class="sidebar">
+        <div class="panel">
+          <h3>🌤️ 天气状态</h3>
+          <div id="weatherPanel" class="weather-panel">
+            <div class="weather-icon">☀️</div>
+            <div class="weather-info">
+              <p class="weather-title">晴朗</p>
+              <p class="weather-desc">适合徒步</p>
+            </div>
+          </div>
+          <div class="weather-controls">
+            <button class="weather-btn" data-weather="sunny">☀️ 晴</button>
+            <button class="weather-btn" data-weather="cloudy">⛅ 多云</button>
+            <button class="weather-btn" data-weather="rainy">🌧️ 雨</button>
+            <button class="weather-btn" data-weather="stormy">⛈️ 暴雨</button>
+          </div>
+          <div id="weatherAlert" class="weather-alert hidden">
+            ⚠️ 雨天部分路段已关闭
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>📍 筛选控制</h3>
+          <div class="filter-group">
+            <label><input type="checkbox" id="filterSupply" checked> 补给站</label>
+            <label><input type="checkbox" id="filterRisk" checked> 风险路段</label>
+            <label><input type="checkbox" id="filterElevation" checked> 高程点</label>
+          </div>
+          <div class="filter-group">
+            <label>风险等级筛选</label>
+            <select id="riskLevelFilter" class="filter-select">
+              <option value="all">全部</option>
+              <option value="low">低风险</option>
+              <option value="medium">中风险</option>
+              <option value="high">高风险</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>📊 步道信息</h3>
+          <div id="trailInfo" class="trail-info">
+            <p>总长度: <span id="totalLength">-</span> km</p>
+            <p>最高海拔: <span id="maxElevation">-</span> m</p>
+            <p>最低海拔: <span id="minElevation">-</span> m</p>
+            <p>累计爬升: <span id="totalClimb">-</span> m</p>
+            <p>补给站数量: <span id="supplyCount">-</span></p>
+            <p>风险路段: <span id="riskCount">-</span></p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>🗺️ 视角切换</h3>
+          <div class="view-controls">
+            <button class="view-btn" data-view="overview">🌍 总览</button>
+            <button class="view-btn" data-view="follow">🚶 跟随</button>
+            <button class="view-btn" data-view="top">🔝 俯视</button>
+            <button class="view-btn" data-view="side">📐 侧视</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>⏱️ 行程进度</h3>
+          <div class="timeline">
+            <input type="range" id="timelineSlider" min="0" max="100" value="0">
+            <div class="timeline-labels">
+              <span>起点</span>
+              <span id="currentPosition">0%</span>
+              <span>终点</span>
+            </div>
+          </div>
+          <div class="progress-info">
+            <p>当前位置: <span id="currentPoint">-</span></p>
+            <p>当前海拔: <span id="currentElevation">-</span> m</p>
+          </div>
+        </div>
+      </aside>
+
+      <section class="canvas-container">
+        <canvas id="mainCanvas"></canvas>
+        <div id="elevationProfile" class="elevation-profile">
+          <canvas id="elevationCanvas"></canvas>
+        </div>
+        <div id="tooltip" class="tooltip hidden"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="exportModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📋 导览报告卡片</h2>
+        <button id="closeModal" class="close-btn">&times;</button>
+      </div>
+      <div id="reportCard" class="report-card">
+        <div class="report-header">
+          <h3 id="reportTitle">山地步道导览报告</h3>
+          <p id="reportDate"></p>
+        </div>
+        <div class="report-body">
+          <div class="report-section">
+            <h4>基本信息</h4>
+            <div class="report-grid">
+              <div class="report-item">
+                <span class="label">步道名称</span>
+                <span id="reportTrailName" class="value">-</span>
+              </div>
+              <div class="report-item">
+                <span class="label">总长度</span>
+                <span id="reportLength" class="value">-</span>
+              </div>
+              <div class="report-item">
+                <span class="label">最高海拔</span>
+                <span id="reportMaxElev" class="value">-</span>
+              </div>
+              <div class="report-item">
+                <span class="label">累计爬升</span>
+                <span id="reportClimb" class="value">-</span>
+              </div>
+            </div>
+          </div>
+          <div class="report-section">
+            <h4>天气与安全</h4>
+            <div class="report-grid">
+              <div class="report-item">
+                <span class="label">当前天气</span>
+                <span id="reportWeather" class="value">-</span>
+              </div>
+              <div class="report-item">
+                <span class="label">徒步建议</span>
+                <span id="reportAdvice" class="value">-</span>
+              </div>
+              <div class="report-item">
+                <span class="label">风险路段</span>
+                <span id="reportRisk" class="value">-</span>
+              </div>
+              <div class="report-item">
+                <span class="label">补给站</span>
+                <span id="reportSupply" class="value">-</span>
+              </div>
+            </div>
+          </div>
+          <div class="report-section">
+            <h4>行程进度</h4>
+            <div class="report-progress">
+              <div class="progress-bar">
+                <div id="reportProgressBar" class="progress-fill"></div>
+              </div>
+              <p id="reportProgressText">进度: 0%</p>
+            </div>
+          </div>
+        </div>
+        <div class="report-footer">
+          <p>🏔️ 山地步道海拔导览系统生成</p>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="downloadReport" class="btn btn-primary">📥 下载图片</button>
+        <button id="copyReport" class="btn">📋 复制文本</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

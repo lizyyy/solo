@@ -1,0 +1,18 @@
+{
+  "name": "trail-elevation-guide",
+  "version": "1.0.0",
+  "description": "山地步道海拔导览 - 3D交互式可视化系统",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.160.0",
+    "@tweenjs/tween.js": "^23.1.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.10"
+  }
+}
