@@ -1,5 +1,5 @@
-import { useRef, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useRef, useEffect, useCallback } from 'react';
+import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { useSceneStore } from '../../store/useSceneStore';
@@ -9,6 +9,7 @@ import FallPointMarker from './FallPointMarker';
 import RescueStationMarker from './RescueStationMarker';
 import RiskZone from './RiskZone';
 import RescueRoute from './RescueRoute';
+import PlannedRoute from './PlannedRoute';
 
 function CameraController() {
   const { cameraPreset } = useSceneStore();
@@ -52,13 +53,55 @@ function PlaybackUpdater() {
   return null;
 }
 
+function TerrainClickHandler() {
+  const { planningMode, addRoutePoint, sceneData } = useSceneStore();
+  const { camera, gl } = useThree();
+  const raycaster = useRef(new THREE.Raycaster());
+  const mouse = useRef(new THREE.Vector2());
+
+  const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
+    if (!planningMode || !sceneData) return;
+    
+    const rect = gl.domElement.getBoundingClientRect();
+    mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.current.setFromCamera(mouse.current, camera);
+    
+    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    const intersectPoint = new THREE.Vector3();
+    raycaster.current.ray.intersectPlane(plane, intersectPoint);
+
+    if (intersectPoint) {
+      addRoutePoint({
+        x: Math.max(0, Math.min(sceneData.terrain.width, intersectPoint.x)),
+        y: 0,
+        z: Math.max(0, Math.min(sceneData.terrain.depth, intersectPoint.z))
+      });
+    }
+  }, [planningMode, sceneData, camera, gl, addRoutePoint]);
+
+  return (
+    <mesh
+      position={[sceneData?.terrain.width / 2 || 50, 0, sceneData?.terrain.depth / 2 || 80]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      onClick={handleClick}
+      visible={false}
+    >
+      <planeGeometry args={[sceneData?.terrain.width || 100, sceneData?.terrain.depth || 160]} />
+      <meshBasicMaterial transparent opacity={0} />
+    </mesh>
+  );
+}
+
 function SceneContent() {
   const {
     sceneData,
     layerVisibility,
     playback,
     selectedItemId,
-    selectItem
+    selectItem,
+    plannedRoute
   } = useSceneStore();
 
   if (!sceneData) return null;
@@ -67,6 +110,12 @@ function SceneContent() {
     <>
       {layerVisibility.terrain && (
         <Terrain data={sceneData.terrain} />
+      )}
+      
+      <TerrainClickHandler />
+      
+      {plannedRoute && plannedRoute.length > 0 && (
+        <PlannedRoute points={plannedRoute} />
       )}
 
       {layerVisibility.trajectories && sceneData.trajectories.map(trajectory => (

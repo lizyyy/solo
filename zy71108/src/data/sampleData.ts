@@ -1,5 +1,7 @@
 import { SceneData } from '../types';
 
+type SceneDataWithoutValidation = Omit<SceneData, 'validation'>;
+
 function generateHeightmap(width: number, depth: number): number[][] {
   const heightmap: number[][] = [];
   const centerX = width / 2;
@@ -59,7 +61,7 @@ function generateTrajectory(
   };
 }
 
-export const sampleSceneData: SceneData = {
+const sampleSceneDataWithoutValidation: SceneDataWithoutValidation = {
   terrain: {
     heightmap: generateHeightmap(50, 80),
     width: 100,
@@ -202,25 +204,14 @@ export const sampleSceneData: SceneData = {
     windSpeed: 12,
     visibility: 800,
     timestamp: '2024-01-15 11:30:00'
-  },
+  }
+};
+
+export const sampleSceneData: SceneData = {
+  ...sampleSceneDataWithoutValidation,
   validation: {
-    isValid: false,
-    errors: [
-      {
-        type: 'route_through_closed_zone',
-        severity: 'error',
-        message: '救援路线B穿过关闭区域',
-        location: { x: 45, y: 0, z: 115 },
-        details: '路线B穿越了冰面区域(rz2)，该区域因结冰已关闭，请重新规划路线'
-      },
-      {
-        type: 'elevation_unit',
-        severity: 'warning',
-        message: '部分高程数据异常',
-        location: { x: 42, y: 0, z: 45 },
-        details: '检测到局部区域高程变化超过正常范围，建议确认数据单位是否正确'
-      }
-    ]
+    isValid: true,
+    errors: []
   }
 };
 
