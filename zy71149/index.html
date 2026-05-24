@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>厂区危化路线沙盘</title>
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+  <div id="app" class="app-container">
+    <header class="app-header">
+      <h1 class="app-title">厂区危化路线沙盘</h1>
+      <div class="header-actions">
+        <button id="btn-import" class="btn btn-secondary">导入样例</button>
+        <button id="btn-export" class="btn btn-primary">导出报告</button>
+        <button id="btn-reset" class="btn btn-danger">重置</button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section">
+          <h3 class="section-title">场景元素</h3>
+          <div class="element-list" id="element-list">
+            <div class="element-item" data-type="truck">
+              <span class="element-icon">🚛</span>
+              <span class="element-name">危化车辆</span>
+            </div>
+            <div class="element-item" data-type="speedZone">
+              <span class="element-icon">⏱️</span>
+              <span class="element-name">限速区</span>
+            </div>
+            <div class="element-item" data-type="noStopZone">
+              <span class="element-icon">🚫</span>
+              <span class="element-name">禁停区</span>
+            </div>
+            <div class="element-item" data-type="washPoint">
+              <span class="element-icon">🚿</span>
+              <span class="element-name">洗消点</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3 class="section-title">路线编辑</h3>
+          <div class="route-controls">
+            <button id="btn-add-point" class="btn btn-small btn-secondary">添加路径点</button>
+            <button id="btn-clear-route" class="btn btn-small btn-danger">清除路线</button>
+          </div>
+          <div class="route-points" id="route-points"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3 class="section-title">规则校验</h3>
+          <div class="validation-results" id="validation-results">
+            <p class="empty-text">点击"开始校验"检查路线</p>
+          </div>
+          <button id="btn-validate" class="btn btn-primary btn-full">开始校验</button>
+        </div>
+      </aside>
+
+      <section class="scene-container">
+        <div class="canvas-wrapper">
+          <canvas id="scene-canvas"></canvas>
+          <div class="view-controls">
+            <button class="view-btn" data-view="top" title="俯视图">⬆️</button>
+            <button class="view-btn" data-view="perspective" title="透视图">🔍</button>
+            <button class="view-btn" data-view="front" title="正视图">👁️</button>
+          </div>
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-color legend-speed"></span>
+              <span>限速区</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color legend-nostop"></span>
+              <span>禁停区</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color legend-wash"></span>
+              <span>洗消点</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-container">
+          <div class="timeline-header">
+            <span class="timeline-title">路线回放</span>
+            <div class="timeline-controls">
+              <button id="btn-play" class="timeline-btn">▶️</button>
+              <button id="btn-pause" class="timeline-btn">⏸️</button>
+              <button id="btn-speed-down" class="timeline-btn">⏪</button>
+              <button id="btn-speed-up" class="timeline-btn">⏩</button>
+            </div>
+          </div>
+          <div class="timeline-slider">
+            <input type="range" id="timeline-slider" min="0" max="100" value="0">
+            <span class="timeline-time" id="timeline-time">00:00</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal-overlay" id="report-modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>路线校验报告</h2>
+          <button class="modal-close" id="modal-close">×</button>
+        </div>
+        <div class="modal-body" id="report-content"></div>
+        <div class="modal-footer">
+          <button id="btn-download-report" class="btn btn-primary">下载报告</button>
+          <button id="btn-close-modal" class="btn btn-secondary">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
