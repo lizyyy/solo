@@ -1,0 +1,372 @@
+{
+  "meta": {
+    "generatedAt": "2026-05-24T11:52:20.371Z",
+    "sourceFile": "examples/dirty-changelog.md",
+    "totalEntries": 9,
+    "totalTickets": 0,
+    "entriesWithoutTickets": 9
+  },
+  "statistics": {
+    "tickets": {
+      "total": 0,
+      "withTickets": 0,
+      "withoutTickets": 9
+    },
+    "modules": {
+      "frontend": {
+        "count": 1,
+        "entries": [
+          "entry-6"
+        ],
+        "owner": "陈七 <chenqi@example.com>"
+      }
+    },
+    "risk": {
+      "high": {
+        "count": 0,
+        "entries": []
+      },
+      "medium": {
+        "count": 0,
+        "entries": []
+      },
+      "low": {
+        "count": 0,
+        "entries": []
+      },
+      "none": {
+        "count": 9,
+        "entries": [
+          "entry-1",
+          "entry-2",
+          "entry-3",
+          "entry-4",
+          "entry-5",
+          "entry-6",
+          "entry-7",
+          "entry-8",
+          "entry-9"
+        ]
+      }
+    }
+  },
+  "entries": [
+    {
+      "id": "entry-1",
+      "lineNumber": 8,
+      "version": null,
+      "date": null,
+      "section": null,
+      "content": "登录页有问题，修复了一下",
+      "raw": "* 登录页有问题，修复了一下",
+      "lines": [
+        8,
+        8
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-2",
+      "lineNumber": 9,
+      "version": null,
+      "date": null,
+      "section": null,
+      "content": "rm -rf 命令执行出错，现在已修复",
+      "raw": "* rm -rf 命令执行出错，现在已修复",
+      "lines": [
+        9,
+        9
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-3",
+      "lineNumber": 10,
+      "version": null,
+      "date": null,
+      "section": null,
+      "content": "token 泄露问题已解决",
+      "raw": "* token 泄露问题已解决\n",
+      "lines": [
+        10,
+        10
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-4",
+      "lineNumber": 13,
+      "version": null,
+      "date": null,
+      "section": null,
+      "content": "数据库迁移脚本更新，可能影响性能",
+      "raw": "- 数据库迁移脚本更新，可能影响性能",
+      "lines": [
+        13,
+        13
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-5",
+      "lineNumber": 14,
+      "version": null,
+      "date": null,
+      "section": null,
+      "content": "升级 node 版本到 18，兼容问题待验证",
+      "raw": "- 升级 node 版本到 18，兼容问题待验证",
+      "lines": [
+        14,
+        14
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-6",
+      "lineNumber": 15,
+      "version": null,
+      "date": null,
+      "section": null,
+      "content": "前端页面样式调整，vue 和 react 都改了",
+      "raw": "- 前端页面样式调整，vue 和 react 都改了\n",
+      "lines": [
+        15,
+        15
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [
+          {
+            "name": "frontend",
+            "score": 2,
+            "confidence": 0.6000000000000001,
+            "matches": [
+              {
+                "keyword": "vue",
+                "position": 9,
+                "raw": "vue"
+              },
+              {
+                "keyword": "react",
+                "position": 15,
+                "raw": "react"
+              }
+            ],
+            "owner": "陈七 <chenqi@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "frontend",
+            "score": 2,
+            "confidence": 0.6000000000000001,
+            "matches": [
+              {
+                "keyword": "vue",
+                "position": 9,
+                "raw": "vue"
+              },
+              {
+                "keyword": "react",
+                "position": 15,
+                "raw": "react"
+              }
+            ],
+            "owner": "陈七 <chenqi@example.com>"
+          }
+        ],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-7",
+      "lineNumber": 25,
+      "version": null,
+      "date": null,
+      "section": null,
+      "content": "修复了昨天发现的 bug",
+      "raw": "- 修复了昨天发现的 bug",
+      "lines": [
+        25,
+        25
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-8",
+      "lineNumber": 26,
+      "version": null,
+      "date": null,
+      "section": null,
+      "content": "补充了测试用例",
+      "raw": "- 补充了测试用例",
+      "lines": [
+        26,
+        26
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-9",
+      "lineNumber": 27,
+      "version": null,
+      "date": null,
+      "section": null,
+      "content": "更新了文档",
+      "raw": "- 更新了文档\n",
+      "lines": [
+        27,
+        27
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    }
+  ]
+}

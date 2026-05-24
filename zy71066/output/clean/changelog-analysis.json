@@ -1,0 +1,825 @@
+{
+  "meta": {
+    "generatedAt": "2026-05-24T11:52:20.284Z",
+    "sourceFile": "examples/clean-changelog.md",
+    "totalEntries": 17,
+    "totalTickets": 10,
+    "entriesWithoutTickets": 8
+  },
+  "statistics": {
+    "tickets": {
+      "total": 10,
+      "withTickets": 9,
+      "withoutTickets": 8
+    },
+    "modules": {
+      "mobile": {
+        "count": 1,
+        "entries": [
+          "entry-4"
+        ],
+        "owner": "吴九 <wujiu@example.com>"
+      },
+      "auth": {
+        "count": 1,
+        "entries": [
+          "entry-7"
+        ],
+        "owner": "张三 <zhangsan@example.com>"
+      },
+      "api": {
+        "count": 1,
+        "entries": [
+          "entry-9"
+        ],
+        "owner": "赵六 <zhaoliu@example.com>"
+      }
+    },
+    "risk": {
+      "high": {
+        "count": 0,
+        "entries": []
+      },
+      "medium": {
+        "count": 0,
+        "entries": []
+      },
+      "low": {
+        "count": 0,
+        "entries": []
+      },
+      "none": {
+        "count": 17,
+        "entries": [
+          "entry-1",
+          "entry-2",
+          "entry-3",
+          "entry-4",
+          "entry-5",
+          "entry-6",
+          "entry-7",
+          "entry-8",
+          "entry-9",
+          "entry-10",
+          "entry-11",
+          "entry-12",
+          "entry-13",
+          "entry-14",
+          "entry-15",
+          "entry-16",
+          "entry-17"
+        ]
+      }
+    }
+  },
+  "entries": [
+    {
+      "id": "entry-1",
+      "lineNumber": 7,
+      "version": "# ✨ 新功能",
+      "date": null,
+      "section": null,
+      "content": "新增用户认证模块，支持 OAuth2.0 登录 [AUTH-1001]",
+      "raw": "- 新增用户认证模块，支持 OAuth2.0 登录 [AUTH-1001]",
+      "lines": [
+        7,
+        7
+      ],
+      "tickets": [
+        {
+          "type": "JIRA",
+          "pattern": "/\\b([A-Z]{2,10}-\\d{3,7})\\b/g",
+          "matches": [
+            {
+              "id": "AUTH-1001",
+              "url": "https://jira.example.com/browse/AUTH-1001",
+              "position": 25,
+              "raw": "AUTH-1001"
+            }
+          ]
+        }
+      ],
+      "ticketCount": 1,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-2",
+      "lineNumber": 8,
+      "version": "# ✨ 新功能",
+      "date": null,
+      "section": null,
+      "content": "支付系统支持微信小程序支付 [PAY-2024, GH-567]",
+      "raw": "- 支付系统支持微信小程序支付 [PAY-2024, GH-567]",
+      "lines": [
+        8,
+        8
+      ],
+      "tickets": [
+        {
+          "type": "JIRA",
+          "pattern": "/\\b([A-Z]{2,10}-\\d{3,7})\\b/g",
+          "matches": [
+            {
+              "id": "PAY-2024",
+              "url": "https://jira.example.com/browse/PAY-2024",
+              "position": 15,
+              "raw": "PAY-2024"
+            },
+            {
+              "id": "GH-567",
+              "url": "https://jira.example.com/browse/GH-567",
+              "position": 25,
+              "raw": "GH-567"
+            }
+          ]
+        }
+      ],
+      "ticketCount": 2,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-3",
+      "lineNumber": 9,
+      "version": "# ✨ 新功能",
+      "date": null,
+      "section": null,
+      "content": "个人中心新增积分商城功能 [FEA-8888]",
+      "raw": "- 个人中心新增积分商城功能 [FEA-8888]",
+      "lines": [
+        9,
+        9
+      ],
+      "tickets": [
+        {
+          "type": "JIRA",
+          "pattern": "/\\b([A-Z]{2,10}-\\d{3,7})\\b/g",
+          "matches": [
+            {
+              "id": "FEA-8888",
+              "url": "https://jira.example.com/browse/FEA-8888",
+              "position": 14,
+              "raw": "FEA-8888"
+            }
+          ]
+        }
+      ],
+      "ticketCount": 1,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-4",
+      "lineNumber": 10,
+      "version": "# ✨ 新功能",
+      "date": null,
+      "section": null,
+      "content": "移动端 App 新增深色模式切换 [MOB-555]",
+      "raw": "- 移动端 App 新增深色模式切换 [MOB-555]\n",
+      "lines": [
+        10,
+        10
+      ],
+      "tickets": [
+        {
+          "type": "JIRA",
+          "pattern": "/\\b([A-Z]{2,10}-\\d{3,7})\\b/g",
+          "matches": [
+            {
+              "id": "MOB-555",
+              "url": "https://jira.example.com/browse/MOB-555",
+              "position": 18,
+              "raw": "MOB-555"
+            }
+          ]
+        }
+      ],
+      "ticketCount": 1,
+      "modules": {
+        "all": [
+          {
+            "name": "mobile",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "app",
+                "position": 4,
+                "raw": "App"
+              }
+            ],
+            "owner": "吴九 <wujiu@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "mobile",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "app",
+                "position": 4,
+                "raw": "App"
+              }
+            ],
+            "owner": "吴九 <wujiu@example.com>"
+          }
+        ],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-5",
+      "lineNumber": 14,
+      "version": "# 🐛 Bug 修复",
+      "date": null,
+      "section": null,
+      "content": "修复登录页面验证码不显示问题 #1234",
+      "raw": "- 修复登录页面验证码不显示问题 #1234",
+      "lines": [
+        14,
+        14
+      ],
+      "tickets": [
+        {
+          "type": "GitLab",
+          "pattern": "/#(\\d{1,7})\\b/g",
+          "matches": [
+            {
+              "id": "#1234",
+              "url": "https://gitlab.example.com/issues/1234",
+              "position": 15,
+              "raw": "#1234"
+            }
+          ]
+        }
+      ],
+      "ticketCount": 1,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-6",
+      "lineNumber": 15,
+      "version": "# 🐛 Bug 修复",
+      "date": null,
+      "section": null,
+      "content": "修复订单超时后无法退款的 bug [BUG-777]",
+      "raw": "- 修复订单超时后无法退款的 bug [BUG-777]",
+      "lines": [
+        15,
+        15
+      ],
+      "tickets": [
+        {
+          "type": "JIRA",
+          "pattern": "/\\b([A-Z]{2,10}-\\d{3,7})\\b/g",
+          "matches": [
+            {
+              "id": "BUG-777",
+              "url": "https://jira.example.com/browse/BUG-777",
+              "position": 18,
+              "raw": "BUG-777"
+            }
+          ]
+        }
+      ],
+      "ticketCount": 1,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-7",
+      "lineNumber": 16,
+      "version": "# 🐛 Bug 修复",
+      "date": null,
+      "section": null,
+      "content": "修复 JWT Token 过期后无法刷新问题 AUTH-1002",
+      "raw": "- 修复 JWT Token 过期后无法刷新问题 AUTH-1002\n",
+      "lines": [
+        16,
+        16
+      ],
+      "tickets": [
+        {
+          "type": "JIRA",
+          "pattern": "/\\b([A-Z]{2,10}-\\d{3,7})\\b/g",
+          "matches": [
+            {
+              "id": "AUTH-1002",
+              "url": "https://jira.example.com/browse/AUTH-1002",
+              "position": 23,
+              "raw": "AUTH-1002"
+            }
+          ]
+        }
+      ],
+      "ticketCount": 1,
+      "modules": {
+        "all": [
+          {
+            "name": "auth",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "jwt",
+                "position": 3,
+                "raw": "JWT"
+              }
+            ],
+            "owner": "张三 <zhangsan@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "auth",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "jwt",
+                "position": 3,
+                "raw": "JWT"
+              }
+            ],
+            "owner": "张三 <zhangsan@example.com>"
+          }
+        ],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-8",
+      "lineNumber": 20,
+      "version": "# 🔧 优化改进",
+      "date": null,
+      "section": null,
+      "content": "优化数据库查询性能，响应时间提升 50%",
+      "raw": "- 优化数据库查询性能，响应时间提升 50%",
+      "lines": [
+        20,
+        20
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-9",
+      "lineNumber": 21,
+      "version": "# 🔧 优化改进",
+      "date": null,
+      "section": null,
+      "content": "完善 API 接口文档，补充错误码说明",
+      "raw": "- 完善 API 接口文档，补充错误码说明",
+      "lines": [
+        21,
+        21
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [
+          {
+            "name": "api",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "api",
+                "position": 3,
+                "raw": "API"
+              }
+            ],
+            "owner": "赵六 <zhaoliu@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "api",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "api",
+                "position": 3,
+                "raw": "API"
+              }
+            ],
+            "owner": "赵六 <zhaoliu@example.com>"
+          }
+        ],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-10",
+      "lineNumber": 22,
+      "version": "# 🔧 优化改进",
+      "date": null,
+      "section": null,
+      "content": "前端页面样式优化，提升用户体验",
+      "raw": "- 前端页面样式优化，提升用户体验\n",
+      "lines": [
+        22,
+        22
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-11",
+      "lineNumber": 26,
+      "version": "# 📦 其他",
+      "date": null,
+      "section": null,
+      "content": "更新依赖包版本",
+      "raw": "- 更新依赖包版本",
+      "lines": [
+        26,
+        26
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-12",
+      "lineNumber": 27,
+      "version": "# 📦 其他",
+      "date": null,
+      "section": null,
+      "content": "补充单元测试用例",
+      "raw": "- 补充单元测试用例",
+      "lines": [
+        27,
+        27
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-13",
+      "lineNumber": 28,
+      "version": "# 📦 其他",
+      "date": null,
+      "section": null,
+      "content": "修复代码规范问题",
+      "raw": "- 修复代码规范问题\n",
+      "lines": [
+        28,
+        28
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-14",
+      "lineNumber": 34,
+      "version": "# ✨ 新功能",
+      "date": null,
+      "section": null,
+      "content": "新增订单批量导出功能 [TASK-1234]",
+      "raw": "- 新增订单批量导出功能 [TASK-1234]",
+      "lines": [
+        34,
+        34
+      ],
+      "tickets": [
+        {
+          "type": "JIRA",
+          "pattern": "/\\b([A-Z]{2,10}-\\d{3,7})\\b/g",
+          "matches": [
+            {
+              "id": "TASK-1234",
+              "url": "https://jira.example.com/browse/TASK-1234",
+              "position": 12,
+              "raw": "TASK-1234"
+            }
+          ]
+        }
+      ],
+      "ticketCount": 1,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-15",
+      "lineNumber": 35,
+      "version": "# ✨ 新功能",
+      "date": null,
+      "section": null,
+      "content": "支持用户自定义消息通知设置",
+      "raw": "- 支持用户自定义消息通知设置\n",
+      "lines": [
+        35,
+        35
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-16",
+      "lineNumber": 39,
+      "version": "# 🐛 Bug 修复",
+      "date": null,
+      "section": null,
+      "content": "修复移动端 H5 页面兼容性问题",
+      "raw": "- 修复移动端 H5 页面兼容性问题",
+      "lines": [
+        39,
+        39
+      ],
+      "tickets": [],
+      "ticketCount": 0,
+      "modules": {
+        "all": [
+          {
+            "name": "mobile",
+            "score": 0.5,
+            "confidence": 0.2,
+            "matches": [
+              {
+                "keyword": "h5",
+                "position": 6,
+                "raw": "H5"
+              }
+            ],
+            "owner": "吴九 <wujiu@example.com>"
+          }
+        ],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-17",
+      "lineNumber": 40,
+      "version": "# 🐛 Bug 修复",
+      "date": null,
+      "section": null,
+      "content": "修复优惠券叠加计算错误 #999",
+      "raw": "- 修复优惠券叠加计算错误 #999\n",
+      "lines": [
+        40,
+        40
+      ],
+      "tickets": [
+        {
+          "type": "GitLab",
+          "pattern": "/#(\\d{1,7})\\b/g",
+          "matches": [
+            {
+              "id": "#999",
+              "url": "https://gitlab.example.com/issues/999",
+              "position": 12,
+              "raw": "#999"
+            }
+          ]
+        }
+      ],
+      "ticketCount": 1,
+      "modules": {
+        "all": [],
+        "primary": [],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    }
+  ]
+}

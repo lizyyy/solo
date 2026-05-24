@@ -1,0 +1,29 @@
+{
+  "name": "changelog-ticket-cli",
+  "version": "1.0.0",
+  "description": "变更日志工单链接 CLI 工具 - 解析发布日志、匹配工单、分析模块归属和风险分级",
+  "main": "src/index.js",
+  "bin": {
+    "changelog-ticket": "bin/changelog-ticket.js"
+  },
+  "scripts": {
+    "test": "node test/run-test.js",
+    "test:clean": "node test/run-test.js --clean",
+    "test:dirty": "node test/run-test.js --dirty"
+  },
+  "keywords": [
+    "changelog",
+    "ticket",
+    "release-notes",
+    "cli"
+  ],
+  "author": "Release Manager",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
