@@ -1,0 +1,489 @@
+{
+  "generated_at": "2026-05-24T20:41:46.279804+08:00",
+  "version": "1.0.0",
+  "summary": {
+    "TotalVariables": 11,
+    "DefaultValues": 1,
+    "TFVarsValues": 6,
+    "EnvVarValues": 0,
+    "ModuleInputValues": 4,
+    "SensitiveVariables": 1,
+    "Conflicts": 9,
+    "ModulesCount": 2
+  },
+  "variables": {
+    "api_key": {
+      "active_source": "default",
+      "active_source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+      "conflicts": [],
+      "effective_value": "d***3",
+      "module_path": "root",
+      "name": "api_key",
+      "sensitive": true,
+      "type": "string",
+      "value_sources": [
+        {
+          "Value": "default-key-123",
+          "Source": "default",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "SourceType": "",
+          "Priority": 0
+        }
+      ]
+    },
+    "enable_monitoring": {
+      "active_source": "tfvars",
+      "active_source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+      "conflicts": [],
+      "effective_value": true,
+      "module_path": "root",
+      "name": "enable_monitoring",
+      "sensitive": false,
+      "type": "bool",
+      "value_sources": [
+        {
+          "Value": true,
+          "Source": "tfvars",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "SourceType": "",
+          "Priority": 10
+        },
+        {
+          "Value": true,
+          "Source": "default",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "SourceType": "",
+          "Priority": 0
+        }
+      ]
+    },
+    "environment": {
+      "active_source": "tfvars",
+      "active_source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+      "conflicts": [
+        {
+          "Type": "value_override",
+          "Description": "Variable 'environment' has multiple values, 'tfvars' takes precedence",
+          "Sources": [
+            "tfvars (value: production)",
+            "default (value: development)"
+          ],
+          "Severity": "info"
+        }
+      ],
+      "effective_value": "production",
+      "module_path": "root",
+      "name": "environment",
+      "sensitive": false,
+      "type": "string",
+      "value_sources": [
+        {
+          "Value": "production",
+          "Source": "tfvars",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "SourceType": "",
+          "Priority": 10
+        },
+        {
+          "Value": "development",
+          "Source": "default",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "SourceType": "",
+          "Priority": 0
+        }
+      ]
+    },
+    "instance_count": {
+      "active_source": "tfvars",
+      "active_source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+      "conflicts": [
+        {
+          "Type": "value_override",
+          "Description": "Variable 'instance_count' has multiple values, 'tfvars' takes precedence",
+          "Sources": [
+            "tfvars (value: 3)",
+            "default (value: 1)"
+          ],
+          "Severity": "info"
+        }
+      ],
+      "effective_value": 3,
+      "module_path": "root",
+      "name": "instance_count",
+      "sensitive": false,
+      "type": "number",
+      "value_sources": [
+        {
+          "Value": 3,
+          "Source": "tfvars",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "SourceType": "",
+          "Priority": 10
+        },
+        {
+          "Value": 1,
+          "Source": "default",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "SourceType": "",
+          "Priority": 0
+        }
+      ]
+    },
+    "instance_type": {
+      "active_source": "tfvars",
+      "active_source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+      "conflicts": [
+        {
+          "Type": "value_override",
+          "Description": "Variable 'instance_type' has multiple values, 'tfvars' takes precedence",
+          "Sources": [
+            "tfvars (value: ecs.c6.large)",
+            "default (value: ecs.t5.large)"
+          ],
+          "Severity": "info"
+        }
+      ],
+      "effective_value": "ecs.c6.large",
+      "module_path": "root",
+      "name": "instance_type",
+      "sensitive": false,
+      "type": "string",
+      "value_sources": [
+        {
+          "Value": "ecs.c6.large",
+          "Source": "tfvars",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "SourceType": "",
+          "Priority": 10
+        },
+        {
+          "Value": "ecs.t5.large",
+          "Source": "default",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "SourceType": "",
+          "Priority": 0
+        }
+      ]
+    },
+    "network.enable_nat": {
+      "active_source": "module_input",
+      "active_source_file": "",
+      "conflicts": [
+        {
+          "Type": "value_override",
+          "Description": "Variable 'enable_nat' has multiple values, 'module_input' takes precedence",
+          "Sources": [
+            "module_input (value: true)",
+            "default (value: false)"
+          ],
+          "Severity": "info"
+        }
+      ],
+      "effective_value": true,
+      "module_path": "network.enable_nat",
+      "name": "enable_nat",
+      "sensitive": false,
+      "type": "bool",
+      "value_sources": [
+        {
+          "Value": true,
+          "Source": "module_input",
+          "SourceFile": "",
+          "SourceType": "module",
+          "Priority": 5
+        },
+        {
+          "Value": false,
+          "Source": "default",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
+          "SourceType": "",
+          "Priority": 0
+        }
+      ]
+    },
+    "network.network_tags": {
+      "active_source": "module_input",
+      "active_source_file": "",
+      "conflicts": [
+        {
+          "Type": "value_override",
+          "Description": "Variable 'network_tags' has multiple values, 'module_input' takes precedence",
+          "Sources": [
+            "module_input (value: map[Project:production-app])",
+            "default (value: map[Component:network])"
+          ],
+          "Severity": "info"
+        }
+      ],
+      "effective_value": {
+        "Project": "production-app"
+      },
+      "module_path": "network.network_tags",
+      "name": "network_tags",
+      "sensitive": false,
+      "type": "map",
+      "value_sources": [
+        {
+          "Value": {
+            "Project": "production-app"
+          },
+          "Source": "module_input",
+          "SourceFile": "",
+          "SourceType": "module",
+          "Priority": 5
+        },
+        {
+          "Value": {
+            "Component": "network"
+          },
+          "Source": "default",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
+          "SourceType": "",
+          "Priority": 0
+        }
+      ]
+    },
+    "network.subnet_count": {
+      "active_source": "module_input",
+      "active_source_file": "",
+      "conflicts": [
+        {
+          "Type": "value_override",
+          "Description": "Variable 'subnet_count' has multiple values, 'module_input' takes precedence",
+          "Sources": [
+            "module_input (value: 3)",
+            "default (value: 2)"
+          ],
+          "Severity": "info"
+        }
+      ],
+      "effective_value": 3,
+      "module_path": "network.subnet_count",
+      "name": "subnet_count",
+      "sensitive": false,
+      "type": "number",
+      "value_sources": [
+        {
+          "Value": 3,
+          "Source": "module_input",
+          "SourceFile": "",
+          "SourceType": "module",
+          "Priority": 5
+        },
+        {
+          "Value": 2,
+          "Source": "default",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
+          "SourceType": "",
+          "Priority": 0
+        }
+      ]
+    },
+    "network.vpc_cidr": {
+      "active_source": "module_input",
+      "active_source_file": "",
+      "conflicts": [
+        {
+          "Type": "value_override",
+          "Description": "Variable 'vpc_cidr' has multiple values, 'module_input' takes precedence",
+          "Sources": [
+            "module_input (value: 172.16.0.0/16)",
+            "default (value: 10.0.0.0/16)"
+          ],
+          "Severity": "info"
+        }
+      ],
+      "effective_value": "172.16.0.0/16",
+      "module_path": "network.vpc_cidr",
+      "name": "vpc_cidr",
+      "sensitive": false,
+      "type": "string",
+      "value_sources": [
+        {
+          "Value": "172.16.0.0/16",
+          "Source": "module_input",
+          "SourceFile": "",
+          "SourceType": "module",
+          "Priority": 5
+        },
+        {
+          "Value": "10.0.0.0/16",
+          "Source": "default",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/modules/network/variables.tf",
+          "SourceType": "",
+          "Priority": 0
+        }
+      ]
+    },
+    "region": {
+      "active_source": "tfvars",
+      "active_source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+      "conflicts": [
+        {
+          "Type": "value_override",
+          "Description": "Variable 'region' has multiple values, 'tfvars' takes precedence",
+          "Sources": [
+            "tfvars (value: cn-shanghai)",
+            "default (value: cn-beijing)"
+          ],
+          "Severity": "info"
+        }
+      ],
+      "effective_value": "cn-shanghai",
+      "module_path": "root",
+      "name": "region",
+      "sensitive": false,
+      "type": "string",
+      "value_sources": [
+        {
+          "Value": "cn-shanghai",
+          "Source": "tfvars",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "SourceType": "",
+          "Priority": 10
+        },
+        {
+          "Value": "cn-beijing",
+          "Source": "default",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "SourceType": "",
+          "Priority": 0
+        }
+      ]
+    },
+    "tags": {
+      "active_source": "tfvars",
+      "active_source_file": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+      "conflicts": [
+        {
+          "Type": "value_override",
+          "Description": "Variable 'tags' has multiple values, 'tfvars' takes precedence",
+          "Sources": [
+            "tfvars (value: map[Env:prod Project:production-app Tier:web])",
+            "default (value: map[Owner:devops Project:demo])"
+          ],
+          "Severity": "info"
+        }
+      ],
+      "effective_value": {
+        "Env": "prod",
+        "Project": "production-app",
+        "Tier": "web"
+      },
+      "module_path": "root",
+      "name": "tags",
+      "sensitive": false,
+      "type": "map",
+      "value_sources": [
+        {
+          "Value": {
+            "Env": "prod",
+            "Project": "production-app",
+            "Tier": "web"
+          },
+          "Source": "tfvars",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars",
+          "SourceType": "",
+          "Priority": 10
+        },
+        {
+          "Value": {
+            "Owner": "devops",
+            "Project": "demo"
+          },
+          "Source": "default",
+          "SourceFile": "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/variables.tf",
+          "SourceType": "",
+          "Priority": 0
+        }
+      ]
+    }
+  },
+  "conflicts": [
+    {
+      "Type": "value_override",
+      "Description": "Variable 'tags' has multiple values, 'tfvars' takes precedence",
+      "Sources": [
+        "tfvars (value: map[Env:prod Project:production-app Tier:web])",
+        "default (value: map[Owner:devops Project:demo])"
+      ],
+      "Severity": "info"
+    },
+    {
+      "Type": "value_override",
+      "Description": "Variable 'environment' has multiple values, 'tfvars' takes precedence",
+      "Sources": [
+        "tfvars (value: production)",
+        "default (value: development)"
+      ],
+      "Severity": "info"
+    },
+    {
+      "Type": "value_override",
+      "Description": "Variable 'region' has multiple values, 'tfvars' takes precedence",
+      "Sources": [
+        "tfvars (value: cn-shanghai)",
+        "default (value: cn-beijing)"
+      ],
+      "Severity": "info"
+    },
+    {
+      "Type": "value_override",
+      "Description": "Variable 'instance_count' has multiple values, 'tfvars' takes precedence",
+      "Sources": [
+        "tfvars (value: 3)",
+        "default (value: 1)"
+      ],
+      "Severity": "info"
+    },
+    {
+      "Type": "value_override",
+      "Description": "Variable 'instance_type' has multiple values, 'tfvars' takes precedence",
+      "Sources": [
+        "tfvars (value: ecs.c6.large)",
+        "default (value: ecs.t5.large)"
+      ],
+      "Severity": "info"
+    },
+    {
+      "Type": "value_override",
+      "Description": "Variable 'vpc_cidr' has multiple values, 'module_input' takes precedence",
+      "Sources": [
+        "module_input (value: 172.16.0.0/16)",
+        "default (value: 10.0.0.0/16)"
+      ],
+      "Severity": "info"
+    },
+    {
+      "Type": "value_override",
+      "Description": "Variable 'subnet_count' has multiple values, 'module_input' takes precedence",
+      "Sources": [
+        "module_input (value: 3)",
+        "default (value: 2)"
+      ],
+      "Severity": "info"
+    },
+    {
+      "Type": "value_override",
+      "Description": "Variable 'enable_nat' has multiple values, 'module_input' takes precedence",
+      "Sources": [
+        "module_input (value: true)",
+        "default (value: false)"
+      ],
+      "Severity": "info"
+    },
+    {
+      "Type": "value_override",
+      "Description": "Variable 'network_tags' has multiple values, 'module_input' takes precedence",
+      "Sources": [
+        "module_input (value: map[Project:production-app])",
+        "default (value: map[Component:network])"
+      ],
+      "Severity": "info"
+    }
+  ],
+  "tfvars_files": [
+    "/Users/lzy/pro/solo/workspaces/zy71076/testdata/clean/terraform.tfvars"
+  ],
+  "environment_variables": {}
+}
