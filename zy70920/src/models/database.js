@@ -30,6 +30,7 @@ function initDatabase() {
         status TEXT DEFAULT "pending",
         recheck_count INTEGER DEFAULT 0,
         recheck_result TEXT,
+        mixed_note TEXT,
         remark TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -43,6 +44,17 @@ function initDatabase() {
         item_package TEXT,
         standard TEXT,
         method TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )`);
+
+      db.run(`CREATE TABLE IF NOT EXISTS recheck_rules (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        rule_code TEXT UNIQUE NOT NULL,
+        rule_name TEXT,
+        condition TEXT,
+        action TEXT,
+        window_days INTEGER,
+        description TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
       )`);
 

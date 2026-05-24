@@ -141,24 +141,3 @@ module.exports = {
   setRecheckResult,
   getStatusDescription
 };
-    'pending': 'Pending',
-    'testing': 'Testing',
-    'passed': 'Passed',
-    'failed': 'Failed',
-    'rechecking': 'Rechecking',
-    'mixed': 'Mixed'
-  };
-  return descriptions[status] || status;
-}
-
-module.exports = {
-  SAMPLE_STATUS,
-  createSample,
-  getSampleById,
-  getSamplesByBatch,
-  searchSamples,
-  markSampleMixed,
-  requestRecheck,
-  setRecheckResult,
-  getStatusDescription
-};
