@@ -350,6 +350,22 @@ class MedicineBoxService:
         if not db_box:
             raise ValueError("药盒不存在")
 
+        current_status = schemas.DistributionStatus(db_box.status)
+        
+        if current_status == schemas.DistributionStatus.STOPPED:
+            raise ValueError("该药盒已被停药拦截，无法签收")
+        if current_status == schemas.DistributionStatus.CANCELLED:
+            raise ValueError("该药盒已取消，无法签收")
+        if current_status == schemas.DistributionStatus.SIGNED:
+            raise ValueError("该药盒已签收，请勿重复签收")
+        
+        allowed_sign_statuses = [
+            schemas.DistributionStatus.PREPARED,
+            schemas.DistributionStatus.DISTRIBUTED
+        ]
+        if current_status not in allowed_sign_statuses:
+            raise ValueError(f"药盒状态为 {current_status.value}，无法签收")
+
         db_sig = models.Signature(
             medicine_box_id=box_id,
             nurse_name=signature.nurse_name,

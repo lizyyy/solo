@@ -194,7 +194,11 @@ def sign_medicine_box(
     try:
         return services.MedicineBoxService.sign_box(db, box_id, signature)
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        error_msg = str(e)
+        if "不存在" in error_msg:
+            raise HTTPException(status_code=404, detail=error_msg)
+        else:
+            raise HTTPException(status_code=400, detail=error_msg)
 
 
 @app.put("/medicine-boxes/{box_id}/manual-override", response_model=schemas.MedicineBox, tags=["药盒管理"])
