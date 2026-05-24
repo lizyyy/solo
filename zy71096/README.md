@@ -106,9 +106,9 @@ src/pip_hash_cli/
 ## 测试
 
 ```bash
-# 干净输入测试（应返回退出码 0）
-pip-hash check -r test-fixtures/clean/requirements.txt -c test-fixtures/clean/constraints.txt
+# 干净输入测试 + wheelhouse（应返回退出码 0，所有哈希匹配）
+pip-hash check -r test-fixtures/clean/requirements.txt -c test-fixtures/clean/constraints.txt -w test-fixtures/wheelhouse
 
-# 脏输入测试（应返回非 0 退出码）
-pip-hash check -r test-fixtures/dirty/requirements.txt -c test-fixtures/dirty/constraints.txt
+# 脏输入测试（应返回约束冲突退出码 4）
+pip-hash check -r test-fixtures/dirty/requirements.txt -c test-fixtures/dirty/constraints.txt -w test-fixtures/wheelhouse
 ```
