@@ -93,6 +93,10 @@ func seedInitialData() error {
 }
 
 func LogOperation(operator, action, module, refType string, refID uint, beforeData, afterData, ip string) error {
+	return LogOperationWithTx(DB, operator, action, module, refType, refID, beforeData, afterData, ip)
+}
+
+func LogOperationWithTx(tx *gorm.DB, operator, action, module, refType string, refID uint, beforeData, afterData, ip string) error {
 	log := models.OperationLog{
 		Operator:   operator,
 		Action:     action,
@@ -104,7 +108,7 @@ func LogOperation(operator, action, module, refType string, refID uint, beforeDa
 		IPAddress:  ip,
 		CreatedAt:  time.Now(),
 	}
-	return DB.Create(&log).Error
+	return tx.Create(&log).Error
 }
 
 func IsRoadClosed(roadSectionID uint) (bool, *models.RoadClosure, error) {
@@ -123,7 +127,7 @@ func IsRoadClosed(roadSectionID uint) (bool, *models.RoadClosure, error) {
 func CheckVehicleDuplicateDispatch(vehicleID uint, batchNo string) (bool, *models.DispatchItem, error) {
 	var item models.DispatchItem
 	var batch models.DispatchBatch
-	
+
 	if err := DB.Where("batch_no = ?", batchNo).First(&batch).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil, nil
@@ -157,78 +161,90 @@ func CheckVehicleActiveDispatch(vehicleID uint) (bool, *models.DispatchItem, err
 
 func DeductStock(depotID uint, amount float64, operator string, refType string, refID uint) error {
 	return DB.Transaction(func(tx *gorm.DB) error {
-		var depot models.SaltDepot
-		if err := tx.Set("gorm:query_option", "FOR UPDATE").First(&depot, depotID).Error; err != nil {
-			return err
-		}
-
-		if depot.CurrentStock < amount {
-			return fmt.Errorf("库存不足，当前库存: %.2f，需要: %.2f", depot.CurrentStock, amount)
-		}
-
-		beforeStock := depot.CurrentStock
-		depot.CurrentStock -= amount
-
-		if err := tx.Save(&depot).Error; err != nil {
-			return err
-		}
-
-		stockLog := models.StockLog{
-			SaltDepotID: depotID,
-			ChangeType:  "out",
-			Amount:      amount,
-			BeforeStock: beforeStock,
-			AfterStock:  depot.CurrentStock,
-			RefType:     refType,
-			RefID:       refID,
-			Remark:      "调拨出库",
-			CreatedBy:   operator,
-			CreatedAt:   time.Now(),
-		}
-		if err := tx.Create(&stockLog).Error; err != nil {
-			return err
-		}
-
-		return nil
+		return DeductStockWithTx(tx, depotID, amount, operator, refType, refID)
 	})
+}
+
+func DeductStockWithTx(tx *gorm.DB, depotID uint, amount float64, operator string, refType string, refID uint) error {
+	var depot models.SaltDepot
+	if err := tx.First(&depot, depotID).Error; err != nil {
+		return err
+	}
+
+	if depot.CurrentStock < amount {
+		return fmt.Errorf("库存不足，当前库存: %.2f，需要: %.2f", depot.CurrentStock, amount)
+	}
+
+	beforeStock := depot.CurrentStock
+	depot.CurrentStock -= amount
+
+	if err := tx.Save(&depot).Error; err != nil {
+		return err
+	}
+
+	stockLog := models.StockLog{
+		SaltDepotID: depotID,
+		ChangeType:  "out",
+		Amount:      amount,
+		BeforeStock: beforeStock,
+		AfterStock:  depot.CurrentStock,
+		RefType:     refType,
+		RefID:       refID,
+		Remark:      "调拨出库",
+		CreatedBy:   operator,
+		CreatedAt:   time.Now(),
+	}
+	if err := tx.Create(&stockLog).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func AddStock(depotID uint, amount float64, operator string, refType string, refID uint, remark string) error {
 	return DB.Transaction(func(tx *gorm.DB) error {
-		var depot models.SaltDepot
-		if err := tx.Set("gorm:query_option", "FOR UPDATE").First(&depot, depotID).Error; err != nil {
-			return err
-		}
-
-		beforeStock := depot.CurrentStock
-		depot.CurrentStock += amount
-		depot.WarningSent = false
-
-		if err := tx.Save(&depot).Error; err != nil {
-			return err
-		}
-
-		stockLog := models.StockLog{
-			SaltDepotID: depotID,
-			ChangeType:  "in",
-			Amount:      amount,
-			BeforeStock: beforeStock,
-			AfterStock:  depot.CurrentStock,
-			RefType:     refType,
-			RefID:       refID,
-			Remark:      remark,
-			CreatedBy:   operator,
-			CreatedAt:   time.Now(),
-		}
-		if err := tx.Create(&stockLog).Error; err != nil {
-			return err
-		}
-
-		return nil
+		return AddStockWithTx(tx, depotID, amount, operator, refType, refID, remark)
 	})
 }
 
+func AddStockWithTx(tx *gorm.DB, depotID uint, amount float64, operator string, refType string, refID uint, remark string) error {
+	var depot models.SaltDepot
+	if err := tx.First(&depot, depotID).Error; err != nil {
+		return err
+	}
+
+	beforeStock := depot.CurrentStock
+	depot.CurrentStock += amount
+	depot.WarningSent = false
+
+	if err := tx.Save(&depot).Error; err != nil {
+		return err
+	}
+
+	stockLog := models.StockLog{
+		SaltDepotID: depotID,
+		ChangeType:  "in",
+		Amount:      amount,
+		BeforeStock: beforeStock,
+		AfterStock:  depot.CurrentStock,
+		RefType:     refType,
+		RefID:       refID,
+		Remark:      remark,
+		CreatedBy:   operator,
+		CreatedAt:   time.Now(),
+	}
+	if err := tx.Create(&stockLog).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func AddRouteStatusLog(dispatchItemID uint, status, location, remark, createdBy string) error {
+	return AddRouteStatusLogWithTx(DB, dispatchItemID, status, location, remark, createdBy)
+}
+
+func AddRouteStatusLogWithTx(tx *gorm.DB, dispatchItemID uint, status, location, remark, createdBy string) error {
 	log := models.RouteStatusLog{
 		DispatchItemID: dispatchItemID,
 		Status:         status,
@@ -237,7 +253,7 @@ func AddRouteStatusLog(dispatchItemID uint, status, location, remark, createdBy 
 		CreatedBy:      createdBy,
 		CreatedAt:      time.Now(),
 	}
-	return DB.Create(&log).Error
+	return tx.Create(&log).Error
 }
 
 func GetDispatchItemTrajectory(dispatchItemID uint) ([]models.RouteStatusLog, error) {

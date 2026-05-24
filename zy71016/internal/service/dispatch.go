@@ -145,13 +145,13 @@ func CreateDispatchBatch(req DispatchRequest, ip string) (*DispatchResponse, err
 				AnomalyDesc:   item.AnomalyDesc,
 			})
 
-			if err := database.AddRouteStatusLog(item.ID, "pending", "盐库", "任务创建", req.CreatedBy); err != nil {
+			if err := database.AddRouteStatusLogWithTx(tx, item.ID, "pending", "盐库", "任务创建", req.CreatedBy); err != nil {
 				return err
 			}
 		}
 
 		batchData, _ := json.Marshal(batch)
-		_ = database.LogOperation(req.CreatedBy, "create_batch", "dispatch", "batch", batch.ID, "", string(batchData), ip)
+		_ = database.LogOperationWithTx(tx, req.CreatedBy, "create_batch", "dispatch", "batch", batch.ID, "", string(batchData), ip)
 
 		return nil
 	})
@@ -246,7 +246,7 @@ func StartDispatch(dispatchItemID uint, operator, ip string) error {
 	}
 
 	return database.DB.Transaction(func(tx *gorm.DB) error {
-		if err := database.DeductStock(item.SaltDepotID, item.SaltAmount, operator, "dispatch_item", item.ID); err != nil {
+		if err := database.DeductStockWithTx(tx, item.SaltDepotID, item.SaltAmount, operator, "dispatch_item", item.ID); err != nil {
 			return err
 		}
 
@@ -265,13 +265,13 @@ func StartDispatch(dispatchItemID uint, operator, ip string) error {
 			tx.Save(&vehicle)
 		}
 
-		if err := database.AddRouteStatusLog(item.ID, "dispatched", "盐库出发", "已出库发车", operator); err != nil {
+		if err := database.AddRouteStatusLogWithTx(tx, item.ID, "dispatched", "盐库出发", "已出库发车", operator); err != nil {
 			return err
 		}
 
 		beforeData, _ := json.Marshal(map[string]string{"status": "pending"})
 		afterData, _ := json.Marshal(map[string]string{"status": "dispatched"})
-		_ = database.LogOperation(operator, "start_dispatch", "dispatch_item", "dispatch_item", item.ID, string(beforeData), string(afterData), ip)
+		_ = database.LogOperationWithTx(tx, operator, "start_dispatch", "dispatch_item", "dispatch_item", item.ID, string(beforeData), string(afterData), ip)
 
 		return nil
 	})
@@ -310,13 +310,13 @@ func UpdateRouteStatus(dispatchItemID uint, status, location, remark, operator, 
 			return err
 		}
 
-		if err := database.AddRouteStatusLog(item.ID, status, location, remark, operator); err != nil {
+		if err := database.AddRouteStatusLogWithTx(tx, item.ID, status, location, remark, operator); err != nil {
 			return err
 		}
 
 		beforeData, _ := json.Marshal(map[string]string{"status": oldStatus})
 		afterData, _ := json.Marshal(map[string]string{"status": status})
-		_ = database.LogOperation(operator, "update_status", "dispatch_item", "dispatch_item", item.ID, string(beforeData), string(afterData), ip)
+		_ = database.LogOperationWithTx(tx, operator, "update_status", "dispatch_item", "dispatch_item", item.ID, string(beforeData), string(afterData), ip)
 
 		return nil
 	})
@@ -394,14 +394,14 @@ func ConfirmReceipt(dispatchItemID uint, receivedAmount float64, receiverName, r
 			tx.Save(&vehicle)
 		}
 
-		if err := database.AddRouteStatusLog(item.ID, "completed", "现场", fmt.Sprintf("已签收，签收人: %s", receiverName), operator); err != nil {
+		if err := database.AddRouteStatusLogWithTx(tx, item.ID, "completed", "现场", fmt.Sprintf("已签收，签收人: %s", receiverName), operator); err != nil {
 			return err
 		}
 
 		checkBatchCompletion(item.DispatchBatchID, tx)
 
 		receiptData, _ := json.Marshal(receipt)
-		_ = database.LogOperation(operator, "confirm_receipt", "receipt", "receipt", receipt.ID, "", string(receiptData), ip)
+		_ = database.LogOperationWithTx(tx, operator, "confirm_receipt", "receipt", "receipt", receipt.ID, "", string(receiptData), ip)
 
 		return nil
 	})
@@ -457,20 +457,22 @@ func ResolveAnomaly(dispatchItemID uint, resolution, operator, ip string) error 
 		return err
 	}
 
-	beforeData, _ := json.Marshal(map[string]interface{}{"has_anomaly": item.HasAnomaly, "anomaly_desc": item.AnomalyDesc})
+	return database.DB.Transaction(func(tx *gorm.DB) error {
+		beforeData, _ := json.Marshal(map[string]interface{}{"has_anomaly": item.HasAnomaly, "anomaly_desc": item.AnomalyDesc})
 
-	item.HasAnomaly = false
-	item.AnomalyDesc = item.AnomalyDesc + fmt.Sprintf(" | 已处理: %s", resolution)
-	item.UpdatedAt = time.Now()
+		item.HasAnomaly = false
+		item.AnomalyDesc = item.AnomalyDesc + fmt.Sprintf(" | 已处理: %s", resolution)
+		item.UpdatedAt = time.Now()
 
-	if err := database.DB.Save(&item).Error; err != nil {
-		return err
-	}
+		if err := tx.Save(&item).Error; err != nil {
+			return err
+		}
 
-	afterData, _ := json.Marshal(map[string]interface{}{"has_anomaly": false, "anomaly_desc": item.AnomalyDesc})
-	_ = database.LogOperation(operator, "resolve_anomaly", "dispatch_item", "dispatch_item", item.ID, string(beforeData), string(afterData), ip)
+		afterData, _ := json.Marshal(map[string]interface{}{"has_anomaly": false, "anomaly_desc": item.AnomalyDesc})
+		_ = database.LogOperationWithTx(tx, operator, "resolve_anomaly", "dispatch_item", "dispatch_item", item.ID, string(beforeData), string(afterData), ip)
 
-	return nil
+		return nil
+	})
 }
 
 func CancelDispatchItem(dispatchItemID uint, reason, operator, ip string) error {
@@ -501,7 +503,7 @@ func CancelDispatchItem(dispatchItemID uint, reason, operator, ip string) error 
 		}
 
 		if oldStatus == "dispatched" || oldStatus == "enroute" {
-			if err := database.AddStock(item.SaltDepotID, item.SaltAmount, operator, "cancel", item.ID, "取消任务退回库存"); err != nil {
+			if err := database.AddStockWithTx(tx, item.SaltDepotID, item.SaltAmount, operator, "cancel", item.ID, "取消任务退回库存"); err != nil {
 				return err
 			}
 		}
@@ -512,7 +514,7 @@ func CancelDispatchItem(dispatchItemID uint, reason, operator, ip string) error 
 			tx.Save(&vehicle)
 		}
 
-		if err := database.AddRouteStatusLog(item.ID, "cancelled", "", reason, operator); err != nil {
+		if err := database.AddRouteStatusLogWithTx(tx, item.ID, "cancelled", "", reason, operator); err != nil {
 			return err
 		}
 
@@ -520,7 +522,7 @@ func CancelDispatchItem(dispatchItemID uint, reason, operator, ip string) error 
 
 		beforeData, _ := json.Marshal(map[string]string{"status": oldStatus})
 		afterData, _ := json.Marshal(map[string]string{"status": "cancelled"})
-		_ = database.LogOperation(operator, "cancel_dispatch", "dispatch_item", "dispatch_item", item.ID, string(beforeData), string(afterData), ip)
+		_ = database.LogOperationWithTx(tx, operator, "cancel_dispatch", "dispatch_item", "dispatch_item", item.ID, string(beforeData), string(afterData), ip)
 
 		return nil
 	})
