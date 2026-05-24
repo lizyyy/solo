@@ -1,4 +1,5 @@
 import sys
+import time
 sys.path.insert(0, '.')
 
 from app.services import process_temperature_window, check_temperature_window
@@ -10,6 +11,12 @@ models.Base.metadata.create_all(bind=engine)
 db = SessionLocal()
 
 try:
+    timestamp = int(time.time() * 1000)
+    test_slot = f"TEST-SLOT-{timestamp}"
+    test_bat = f"TEST-BAT-{timestamp}"
+    test_biz = f"TEST-BIZ-{timestamp}"
+    test_win = f"WIN-TEST-{timestamp}"
+
     print("测试1: 检查异常类型检测")
     temps = [25.0, 30.0, 55.0, 45.0]
     stats = check_temperature_window(temps, 50.0)
@@ -21,19 +28,21 @@ try:
     print("\n测试2: 测试 process_temperature_window 创建禁用记录")
     
     from app.services import get_or_create_slot, validate_slot_transition
-    slot = get_or_create_slot(db, "TEST-SLOT-002")
+    slot = get_or_create_slot(db, test_slot)
+    if slot.status != "available":
+        slot.status = "available"
+        db.commit()
     if validate_slot_transition(slot.status, "occupied"):
         slot.status = "occupied"
-        slot.battery_id = "TEST-BAT-002"
+        slot.battery_id = test_bat
         db.commit()
     
-    import time
     request = schemas.TemperatureWindowRequest(
-        business_no=f"TEST-BIZ-{time.time_ns()}",
-        slot_number="TEST-SLOT-002",
-        battery_id="TEST-BAT-002",
+        business_no=test_biz,
+        slot_number=test_slot,
+        battery_id=test_bat,
         temperatures=[25.0, 30.0, 55.0, 45.0],
-        window_id="WIN-TEST-002",
+        window_id=test_win,
         threshold=50.0
     )
     

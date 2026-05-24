@@ -70,7 +70,7 @@ def validate_slot_transition(current_status: str, target_status: str) -> bool:
     return target_status in valid_transitions.get(current_status, [])
 
 
-def check_temperature_window(temperatures: List[float], threshold: float = 50.0) -> Dict[str, Any]:
+def check_temperature_window(temperatures: List[float], threshold: float = 50.0, min_samples: Optional[int] = None) -> Dict[str, Any]:
     sample_count = len(temperatures)
     missing_count = 0
     
@@ -113,6 +113,11 @@ def check_temperature_window(temperatures: List[float], threshold: float = 50.0)
     
     is_anomaly = len(anomaly_types) > 0
     
+    error_code = None
+    if min_samples is not None and sample_count < min_samples:
+        error_code = "MISSING_SEGMENT"
+        missing_count = min_samples - sample_count
+    
     return {
         "is_anomaly": is_anomaly,
         "max_temperature": max_temperature,
@@ -122,8 +127,8 @@ def check_temperature_window(temperatures: List[float], threshold: float = 50.0)
         "max_temp_rise": max_temp_rise,
         "anomaly_types": anomaly_types,
         "sample_count": sample_count,
-        "missing_count": 0,
-        "error_code": None
+        "missing_count": missing_count,
+        "error_code": error_code
     }
 
 
@@ -415,6 +420,34 @@ def submit_batch(db: Session, batch_data: Dict[str, Any]) -> dict:
         
         try:
             slot = get_or_create_slot(db, slot_number)
+            
+            active_disable = db.query(DisableRecord).filter(
+                and_(DisableRecord.battery_id == battery_id, DisableRecord.is_active == True)
+            ).first()
+            if active_disable:
+                failed_count += 1
+                results.append({
+                    "slot_number": slot_number,
+                    "battery_id": battery_id,
+                    "status": "failed",
+                    "reason": "电池有活跃禁用记录",
+                    "error_code": "DUPLICATE_REQUEST"
+                })
+                continue
+            
+            existing_slot = db.query(Slot).filter(
+                and_(Slot.battery_id == battery_id, Slot.slot_number != slot_number)
+            ).first()
+            if existing_slot:
+                failed_count += 1
+                results.append({
+                    "slot_number": slot_number,
+                    "battery_id": battery_id,
+                    "status": "failed",
+                    "reason": "电池已在其他格口",
+                    "error_code": "DUPLICATE_REQUEST"
+                })
+                continue
             
             if validate_slot_transition(slot.status, "occupied"):
                 slot.status = "occupied"
