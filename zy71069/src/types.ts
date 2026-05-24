@@ -58,6 +58,7 @@ export interface ContrastResult {
     foregroundHex: string;
     backgroundHex: string;
     foregroundWithAlphaBlend?: string;
+    backgroundWithAlphaBlend?: string;
     luminanceForeground: number;
     luminanceBackground: number;
   };

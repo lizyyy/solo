@@ -135,6 +135,13 @@ async function main() {
     console.log(chalk.gray('━'.repeat(60)));
     console.log(`  前景色: ${chalk.cyan(options.foreground)}`);
     console.log(`  背景色: ${chalk.cyan(options.background)}`);
+    
+    if (result.notes.length > 0) {
+      for (const note of result.notes) {
+        console.log(`  ${chalk.yellow('ℹ')} ${note}`);
+      }
+    }
+    
     console.log(`  对比度: ${chalk.bold(result.contrastRatio.toFixed(2))}:1`);
     console.log(`  阈值: ${options.threshold}:1`);
     console.log('');

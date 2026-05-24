@@ -58,7 +58,7 @@ export function flattenTokens(
           aliasChain: undefined
         };
         
-        const source = sourceMap[`${currentJsonPath}/value`];
+        const source = sourceMap[currentJsonPath];
         if (source) {
           token.filePath = source.filePath;
           token.line = source.line;

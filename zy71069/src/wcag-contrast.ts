@@ -1,5 +1,5 @@
 import { RGBA, ColorToken, TokenPair, ContrastResult } from './types';
-import { getLuminance, getContrastRatio, blendAlpha, rgbaToHex } from './color-utils';
+import { getLuminance, getContrastRatio, blendAlpha, rgbaToHex, isLightColor } from './color-utils';
 
 export const WCAG_THRESHOLDS = {
   AA_NORMAL: 4.5,
@@ -8,23 +8,45 @@ export const WCAG_THRESHOLDS = {
   AAA_LARGE: 4.5
 };
 
+const WHITE: RGBA = { r: 255, g: 255, b: 255, a: 1 };
+const BLACK: RGBA = { r: 0, g: 0, b: 0, a: 1 };
+
+export function resolveTransparentBackground(background: RGBA, baseColor?: RGBA): {
+  resolvedBackground: RGBA;
+  baseColorUsed: RGBA;
+} {
+  if (background.a >= 1) {
+    return { resolvedBackground: background, baseColorUsed: background };
+  }
+  
+  const base = baseColor || (isLightColor(background) ? WHITE : BLACK);
+  const resolved = blendAlpha(background, base);
+  return { resolvedBackground: { ...resolved, a: 1 }, baseColorUsed: base };
+}
+
 export function calculateContrast(
   foreground: RGBA,
-  background: RGBA
+  background: RGBA,
+  baseBackgroundColor?: RGBA
 ): {
   ratio: number;
   blendedForeground: RGBA;
+  resolvedBackground: RGBA;
+  baseColorForBackground?: RGBA;
   luminanceForeground: number;
   luminanceBackground: number;
 } {
-  const blended = blendAlpha(foreground, background);
-  const luminanceForeground = getLuminance(blended);
-  const luminanceBackground = getLuminance(background);
+  const { resolvedBackground, baseColorUsed } = resolveTransparentBackground(background, baseBackgroundColor);
+  const blendedForeground = blendAlpha(foreground, resolvedBackground);
+  const luminanceForeground = getLuminance(blendedForeground);
+  const luminanceBackground = getLuminance(resolvedBackground);
   const ratio = getContrastRatio(luminanceForeground, luminanceBackground);
   
   return {
     ratio,
-    blendedForeground: blended,
+    blendedForeground,
+    resolvedBackground,
+    baseColorForBackground: background.a < 1 ? baseColorUsed : undefined,
     luminanceForeground,
     luminanceBackground
   };
@@ -46,21 +68,24 @@ export function getWcagLevels(contrastRatio: number): {
 
 export function generateContrastResult(
   pair: TokenPair,
-  threshold: number = WCAG_THRESHOLDS.AA_NORMAL
+  threshold: number = WCAG_THRESHOLDS.AA_NORMAL,
+  baseBackgroundColor?: RGBA
 ): ContrastResult {
   const notes: string[] = [];
   const foreground = pair.foreground.rgba;
   const background = pair.background.rgba;
+  
+  const result = calculateContrast(foreground, background, baseBackgroundColor);
   
   if (foreground.a < 1) {
     notes.push(`前景色有透明度 (alpha: ${foreground.a.toFixed(2)})，已与背景色混合计算对比度`);
   }
   
   if (background.a < 1) {
-    notes.push(`背景色有透明度 (alpha: ${background.a.toFixed(2)})，假设背景在纯白或纯黑取决于明暗模式`);
+    const baseColorName = result.baseColorForBackground?.r === 255 ? '纯白' : '纯黑';
+    notes.push(`背景色有透明度 (alpha: ${background.a.toFixed(2)})，已与${baseColorName}混合后计算对比度，混合后颜色: ${rgbaToHex(result.resolvedBackground)}`);
   }
   
-  const result = calculateContrast(foreground, background);
   const wcagLevels = getWcagLevels(result.ratio);
   
   return {
@@ -73,6 +98,7 @@ export function generateContrastResult(
     calculation: {
       foregroundHex: pair.foreground.hex,
       backgroundHex: pair.background.hex,
+      backgroundWithAlphaBlend: result.baseColorForBackground ? rgbaToHex(result.resolvedBackground) : undefined,
       foregroundWithAlphaBlend: rgbaToHex(result.blendedForeground),
       luminanceForeground: Math.round(result.luminanceForeground * 10000) / 10000,
       luminanceBackground: Math.round(result.luminanceBackground * 10000) / 10000

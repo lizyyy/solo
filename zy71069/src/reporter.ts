@@ -109,8 +109,12 @@ function formatVerboseResult(result: ContrastResult): string {
   
   lines.push(`      ${chalk.gray('原始值:')} ${result.calculation.foregroundHex} (前景), ${result.calculation.backgroundHex} (背景)`);
   
+  if (result.calculation.backgroundWithAlphaBlend && result.calculation.backgroundWithAlphaBlend !== result.calculation.backgroundHex) {
+    lines.push(`      ${chalk.gray('背景混合后:')} ${result.calculation.backgroundWithAlphaBlend}`);
+  }
+  
   if (result.calculation.foregroundWithAlphaBlend && result.calculation.foregroundWithAlphaBlend !== result.calculation.foregroundHex) {
-    lines.push(`      ${chalk.gray('混合后:')} ${result.calculation.foregroundWithAlphaBlend}`);
+    lines.push(`      ${chalk.gray('前景混合后:')} ${result.calculation.foregroundWithAlphaBlend}`);
   }
   
   lines.push(`      ${chalk.gray('亮度:')} ${result.calculation.luminanceForeground} (前景), ${result.calculation.luminanceBackground} (背景)`);
@@ -251,9 +255,15 @@ function generateMarkdownContent(report: AnalysisReport): string {
     }
     lines.push('');
     
-    if (result.calculation.foregroundWithAlphaBlend && result.calculation.foregroundWithAlphaBlend !== result.calculation.foregroundHex) {
+    if ((result.calculation.backgroundWithAlphaBlend && result.calculation.backgroundWithAlphaBlend !== result.calculation.backgroundHex) ||
+        (result.calculation.foregroundWithAlphaBlend && result.calculation.foregroundWithAlphaBlend !== result.calculation.foregroundHex)) {
       lines.push('#### 透明度混合');
-      lines.push(`- 混合后颜色: \`${result.calculation.foregroundWithAlphaBlend}\``);
+      if (result.calculation.backgroundWithAlphaBlend && result.calculation.backgroundWithAlphaBlend !== result.calculation.backgroundHex) {
+        lines.push(`- 背景混合后: \`${result.calculation.backgroundWithAlphaBlend}\``);
+      }
+      if (result.calculation.foregroundWithAlphaBlend && result.calculation.foregroundWithAlphaBlend !== result.calculation.foregroundHex) {
+        lines.push(`- 前景混合后: \`${result.calculation.foregroundWithAlphaBlend}\``);
+      }
       lines.push('');
     }
     

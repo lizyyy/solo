@@ -1,6 +1,6 @@
 # CSS Token 对比度分析报告
 
-生成时间: 2026/5/24 20:02:46
+生成时间: 2026/5/24 22:26:10
 
 ## 摘要
 
@@ -54,6 +54,7 @@
 - HEX: `#ffffff`
 - 亮度: 1
 - 别名链: `color.text-white` → `color.white`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:89
 
 #### 背景色
 - Token: `color.primary`
@@ -61,6 +62,7 @@
 - 解析值: `#0066cc`
 - HEX: `#0066cc`
 - 亮度: 0.1386
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:4
 
 ### color.text-primary-on-color.bg-secondary
 
@@ -75,6 +77,7 @@
 - HEX: `#212529`
 - 亮度: 0.0181
 - 别名链: `color.text-primary` → `color.gray-900`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:77
 
 #### 背景色
 - Token: `color.bg-secondary`
@@ -83,6 +86,7 @@
 - HEX: `#f8f9fa`
 - 亮度: 0.9461
 - 别名链: `color.bg-secondary` → `color.gray-100`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:97
 
 ### color.text-white-on-color.success
 
@@ -97,6 +101,7 @@
 - HEX: `#ffffff`
 - 亮度: 1
 - 别名链: `color.text-white` → `color.white`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:89
 
 #### 背景色
 - Token: `color.success`
@@ -104,6 +109,7 @@
 - 解析值: `#28a745`
 - HEX: `#28a745`
 - 亮度: 0.2852
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:21
 
 ### color.text-primary-on-color.warning
 
@@ -118,6 +124,7 @@
 - HEX: `#212529`
 - 亮度: 0.0181
 - 别名链: `color.text-primary` → `color.gray-900`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:77
 
 #### 背景色
 - Token: `color.warning`
@@ -125,6 +132,7 @@
 - 解析值: `#ffc107`
 - HEX: `#ffc107`
 - 亮度: 0.5942
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:25
 
 ### color.text-white-on-color.danger
 
@@ -139,6 +147,7 @@
 - HEX: `#ffffff`
 - 亮度: 1
 - 别名链: `color.text-white` → `color.white`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:89
 
 #### 背景色
 - Token: `color.danger`
@@ -146,6 +155,7 @@
 - 解析值: `#dc3545`
 - HEX: `#dc3545`
 - 亮度: 0.1819
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:29
 
 ### color.text-primary-on-color.bg-primary
 
@@ -160,6 +170,7 @@
 - HEX: `#212529`
 - 亮度: 0.0181
 - 别名链: `color.text-primary` → `color.gray-900`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:77
 
 #### 背景色
 - Token: `color.bg-primary`
@@ -168,6 +179,7 @@
 - HEX: `#ffffff`
 - 亮度: 1
 - 别名链: `color.bg-primary` → `color.white`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:93
 
 ### color.text-white-on-color.bg-dark
 
@@ -182,6 +194,7 @@
 - HEX: `#ffffff`
 - 亮度: 1
 - 别名链: `color.text-white` → `color.white`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:89
 
 #### 背景色
 - Token: `color.bg-dark`
@@ -190,6 +203,7 @@
 - HEX: `#212529`
 - 亮度: 0.0181
 - 别名链: `color.bg-dark` → `color.gray-900`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:101
 
 ### color.primary-dark-on-color.primary-light
 
@@ -203,6 +217,7 @@
 - 解析值: `#004080`
 - HEX: `#004080`
 - 亮度: 0.0523
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:13
 
 #### 背景色
 - Token: `color.primary-light`
@@ -210,6 +225,7 @@
 - 解析值: `#66b3ff`
 - HEX: `#66b3ff`
 - 亮度: 0.4228
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:9
 
 ### color.text-white-on-color.primary
 
@@ -224,6 +240,7 @@
 - HEX: `#ffffff`
 - 亮度: 1
 - 别名链: `color.text-white` → `color.white`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:89
 
 #### 背景色
 - Token: `color.primary`
@@ -231,6 +248,7 @@
 - 解析值: `#0066cc`
 - HEX: `#0066cc`
 - 亮度: 0.1386
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:4
 
 ### color.text-white-on-color.bg-dark
 
@@ -245,6 +263,7 @@
 - HEX: `#ffffff`
 - 亮度: 1
 - 别名链: `color.text-white` → `color.white`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:89
 
 #### 背景色
 - Token: `color.bg-dark`
@@ -253,6 +272,7 @@
 - HEX: `#212529`
 - 亮度: 0.0181
 - 别名链: `color.bg-dark` → `color.gray-900`
+- 位置: /Users/lzy/pro/solo/workspaces/zy71069/examples/tokens.json:101
 
 ## 命令参数
 
@@ -263,7 +283,6 @@
   "mode": "both",
   "tokens": "examples/tokens.json",
   "pairs": "examples/component-pairs.json",
-  "verbose": true,
   "formats": [
     "terminal",
     "json",
