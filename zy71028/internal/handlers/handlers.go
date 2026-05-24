@@ -10,12 +10,12 @@ import (
 )
 
 type Handler struct {
-	elderlyService      services.ElderlyService
-	volunteerService    services.VolunteerService
-	suspensionService   services.MealSuspensionService
-	routeService        services.DeliveryRouteService
-	visitService        services.SafetyVisitService
-	reportService       services.ReportService
+	elderlyService    services.ElderlyService
+	volunteerService  services.VolunteerService
+	suspensionService services.MealSuspensionService
+	routeService      services.DeliveryRouteService
+	visitService      services.SafetyVisitService
+	reportService     services.ReportService
 }
 
 func NewHandler() *Handler {
@@ -39,6 +39,7 @@ func handleError(c *gin.Context, err error) {
 
 func (h *Handler) CreateElderly(c *gin.Context) {
 	var req struct {
+		ID           string `json:"id"`
 		Name         string `json:"name"`
 		Phone        string `json:"phone"`
 		Address      string `json:"address"`
@@ -52,8 +53,15 @@ func (h *Handler) CreateElderly(c *gin.Context) {
 		return
 	}
 
-	elderly, err := h.elderlyService.Create(req.Name, req.Phone, req.Address, req.HealthNote, req.ContactName, req.ContactPhone)
+	elderly, err := h.elderlyService.Create(req.ID, req.Name, req.Phone, req.Address, req.HealthNote, req.ContactName, req.ContactPhone)
 	if err != nil {
+		if appErr, ok := err.(*appErrors.AppError); ok && appErr.Code == appErrors.ErrDuplicateRequest {
+			c.JSON(http.StatusOK, gin.H{
+				"data":    elderly,
+				"warning": "duplicate request, returning existing record",
+			})
+			return
+		}
 		handleError(c, err)
 		return
 	}
@@ -86,6 +94,7 @@ func (h *Handler) ListElderly(c *gin.Context) {
 
 func (h *Handler) CreateVolunteer(c *gin.Context) {
 	var req struct {
+		ID    string `json:"id"`
 		Name  string `json:"name"`
 		Phone string `json:"phone"`
 		Area  string `json:"area"`
@@ -96,8 +105,15 @@ func (h *Handler) CreateVolunteer(c *gin.Context) {
 		return
 	}
 
-	volunteer, err := h.volunteerService.Create(req.Name, req.Phone, req.Area)
+	volunteer, err := h.volunteerService.Create(req.ID, req.Name, req.Phone, req.Area)
 	if err != nil {
+		if appErr, ok := err.(*appErrors.AppError); ok && appErr.Code == appErrors.ErrDuplicateRequest {
+			c.JSON(http.StatusOK, gin.H{
+				"data":    volunteer,
+				"warning": "duplicate request, returning existing record",
+			})
+			return
+		}
 		handleError(c, err)
 		return
 	}
@@ -370,10 +386,10 @@ func (h *Handler) ListRoutesByVolunteerAndDate(c *gin.Context) {
 
 func (h *Handler) CreateVisit(c *gin.Context) {
 	var req struct {
-		RouteID     string              `json:"route_id"`
+		RouteID     string             `json:"route_id"`
 		Result      models.VisitResult `json:"result"`
-		EvidenceURL string              `json:"evidence_url"`
-		Notes       string              `json:"notes"`
+		EvidenceURL string             `json:"evidence_url"`
+		Notes       string             `json:"notes"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {

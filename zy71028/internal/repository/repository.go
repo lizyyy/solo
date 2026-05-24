@@ -10,12 +10,14 @@ import (
 type ElderlyRepository interface {
 	Create(elderly *models.Elderly) error
 	GetByID(id string) (*models.Elderly, error)
+	GetByPhone(phone string) (*models.Elderly, error)
 	List() ([]*models.Elderly, error)
 }
 
 type VolunteerRepository interface {
 	Create(volunteer *models.Volunteer) error
 	GetByID(id string) (*models.Volunteer, error)
+	GetByPhone(phone string) (*models.Volunteer, error)
 	List() ([]*models.Volunteer, error)
 }
 
@@ -126,6 +128,20 @@ func (r *elderlyRepo) List() ([]*models.Elderly, error) {
 	return list, nil
 }
 
+func (r *elderlyRepo) GetByPhone(phone string) (*models.Elderly, error) {
+	row := database.DB.QueryRow(`
+		SELECT id, name, phone, address, health_note, contact_name, contact_phone, created_at, updated_at
+		FROM elderly WHERE phone = ? LIMIT 1
+	`, phone)
+
+	e := &models.Elderly{}
+	err := row.Scan(&e.ID, &e.Name, &e.Phone, &e.Address, &e.HealthNote, &e.ContactName, &e.ContactPhone, &e.CreatedAt, &e.UpdatedAt)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return e, err
+}
+
 func (r *volunteerRepo) Create(v *models.Volunteer) error {
 	_, err := database.DB.Exec(`
 		INSERT INTO volunteers (id, name, phone, area, created_at, updated_at)
@@ -168,6 +184,20 @@ func (r *volunteerRepo) List() ([]*models.Volunteer, error) {
 		list = append(list, v)
 	}
 	return list, nil
+}
+
+func (r *volunteerRepo) GetByPhone(phone string) (*models.Volunteer, error) {
+	row := database.DB.QueryRow(`
+		SELECT id, name, phone, area, created_at, updated_at
+		FROM volunteers WHERE phone = ? LIMIT 1
+	`, phone)
+
+	v := &models.Volunteer{}
+	err := row.Scan(&v.ID, &v.Name, &v.Phone, &v.Area, &v.CreatedAt, &v.UpdatedAt)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return v, err
 }
 
 func (r *mealSuspensionRepo) Create(s *models.MealSuspension) error {
@@ -433,10 +463,25 @@ func (r *safetyVisitRepo) GetByRouteID(routeID string) (*models.SafetyVisit, err
 
 func (r *safetyVisitRepo) Update(visit *models.SafetyVisit) error {
 	visit.UpdatedAt = time.Now()
+	var evidenceURL interface{} = nil
+	if visit.EvidenceURL != "" {
+		evidenceURL = visit.EvidenceURL
+	}
+	var notes interface{} = nil
+	if visit.Notes != "" {
+		notes = visit.Notes
+	}
+
 	_, err := database.DB.Exec(`
-		UPDATE safety_visits SET follow_up_status = ?, followed_by = ?, followed_at = ?, updated_at = ?
+		UPDATE safety_visits SET 
+			evidence_url = COALESCE(?, evidence_url),
+			notes = COALESCE(?, notes),
+			follow_up_status = ?, 
+			followed_by = ?, 
+			followed_at = ?, 
+			updated_at = ?
 		WHERE id = ?
-	`, visit.FollowUpStatus, visit.FollowedBy, visit.FollowedAt, visit.UpdatedAt, visit.ID)
+	`, evidenceURL, notes, visit.FollowUpStatus, visit.FollowedBy, visit.FollowedAt, visit.UpdatedAt, visit.ID)
 	return err
 }
 

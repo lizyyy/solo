@@ -11,13 +11,13 @@ import (
 )
 
 type ElderlyService interface {
-	Create(name, phone, address, healthNote, contactName, contactPhone string) (*models.Elderly, error)
+	Create(id, name, phone, address, healthNote, contactName, contactPhone string) (*models.Elderly, error)
 	GetByID(id string) (*models.Elderly, error)
 	List() ([]*models.Elderly, error)
 }
 
 type VolunteerService interface {
-	Create(name, phone, area string) (*models.Volunteer, error)
+	Create(id, name, phone, area string) (*models.Volunteer, error)
 	GetByID(id string) (*models.Volunteer, error)
 	List() ([]*models.Volunteer, error)
 }
@@ -70,9 +70,9 @@ type mealSuspensionService struct {
 }
 
 type deliveryRouteService struct {
-	repo              repository.DeliveryRouteRepository
-	suspensionRepo    repository.MealSuspensionRepository
-	elderlyRepo       repository.ElderlyRepository
+	repo           repository.DeliveryRouteRepository
+	suspensionRepo repository.MealSuspensionRepository
+	elderlyRepo    repository.ElderlyRepository
 }
 
 type safetyVisitService struct {
@@ -81,10 +81,10 @@ type safetyVisitService struct {
 }
 
 type reportService struct {
-	routeRepo    repository.DeliveryRouteRepository
-	visitRepo    repository.SafetyVisitRepository
-	reportRepo   repository.ServiceReportRepository
-	elderlyRepo  repository.ElderlyRepository
+	routeRepo     repository.DeliveryRouteRepository
+	visitRepo     repository.SafetyVisitRepository
+	reportRepo    repository.ServiceReportRepository
+	elderlyRepo   repository.ElderlyRepository
 	volunteerRepo repository.VolunteerRepository
 }
 
@@ -117,15 +117,15 @@ func NewSafetyVisitService() SafetyVisitService {
 
 func NewReportService() ReportService {
 	return &reportService{
-		routeRepo:    repository.NewDeliveryRouteRepository(),
-		visitRepo:    repository.NewSafetyVisitRepository(),
-		reportRepo:   repository.NewServiceReportRepository(),
-		elderlyRepo:  repository.NewElderlyRepository(),
+		routeRepo:     repository.NewDeliveryRouteRepository(),
+		visitRepo:     repository.NewSafetyVisitRepository(),
+		reportRepo:    repository.NewServiceReportRepository(),
+		elderlyRepo:   repository.NewElderlyRepository(),
 		volunteerRepo: repository.NewVolunteerRepository(),
 	}
 }
 
-func (s *elderlyService) Create(name, phone, address, healthNote, contactName, contactPhone string) (*models.Elderly, error) {
+func (s *elderlyService) Create(id, name, phone, address, healthNote, contactName, contactPhone string) (*models.Elderly, error) {
 	if name == "" {
 		return nil, appErrors.NewMissingField("name")
 	}
@@ -142,7 +142,28 @@ func (s *elderlyService) Create(name, phone, address, healthNote, contactName, c
 		return nil, appErrors.NewMissingField("contact_phone")
 	}
 
+	if id != "" {
+		existing, err := s.repo.GetByID(id)
+		if err != nil {
+			return nil, err
+		}
+		if existing != nil {
+			return existing, appErrors.NewDuplicateRequest(id)
+		}
+	}
+
+	existingByPhone, err := s.repo.GetByPhone(phone)
+	if err != nil {
+		return nil, err
+	}
+	if existingByPhone != nil {
+		return existingByPhone, appErrors.NewDuplicateRequest(phone)
+	}
+
 	e := models.NewElderly()
+	if id != "" {
+		e.ID = id
+	}
 	e.Name = name
 	e.Phone = phone
 	e.Address = address
@@ -164,7 +185,7 @@ func (s *elderlyService) List() ([]*models.Elderly, error) {
 	return s.repo.List()
 }
 
-func (s *volunteerService) Create(name, phone, area string) (*models.Volunteer, error) {
+func (s *volunteerService) Create(id, name, phone, area string) (*models.Volunteer, error) {
 	if name == "" {
 		return nil, appErrors.NewMissingField("name")
 	}
@@ -175,7 +196,28 @@ func (s *volunteerService) Create(name, phone, area string) (*models.Volunteer, 
 		return nil, appErrors.NewMissingField("area")
 	}
 
+	if id != "" {
+		existing, err := s.repo.GetByID(id)
+		if err != nil {
+			return nil, err
+		}
+		if existing != nil {
+			return existing, appErrors.NewDuplicateRequest(id)
+		}
+	}
+
+	existingByPhone, err := s.repo.GetByPhone(phone)
+	if err != nil {
+		return nil, err
+	}
+	if existingByPhone != nil {
+		return existingByPhone, appErrors.NewDuplicateRequest(phone)
+	}
+
 	v := models.NewVolunteer()
+	if id != "" {
+		v.ID = id
+	}
 	v.Name = name
 	v.Phone = phone
 	v.Area = area
@@ -305,6 +347,14 @@ func (s *deliveryRouteService) Create(requestID, elderlyID, date, notes string) 
 		return nil, appErrors.NewNotFound("elderly")
 	}
 
+	existingByDate, err := s.repo.GetByElderlyAndDate(elderlyID, date)
+	if err != nil {
+		return nil, err
+	}
+	if existingByDate != nil {
+		return existingByDate, appErrors.NewDuplicateRequest(elderlyID + "-" + date)
+	}
+
 	suspension, err := s.suspensionRepo.GetActiveSuspension(elderlyID, date)
 	if err != nil {
 		return nil, err
@@ -319,14 +369,6 @@ func (s *deliveryRouteService) Create(requestID, elderlyID, date, notes string) 
 			return nil, err
 		}
 		return suspendedRoute, appErrors.NewMealSuspended(elderlyID, suspension.Reason)
-	}
-
-	existingByDate, err := s.repo.GetByElderlyAndDate(elderlyID, date)
-	if err != nil {
-		return nil, err
-	}
-	if existingByDate != nil {
-		return existingByDate, appErrors.NewDuplicateRequest(elderlyID + "-" + date)
 	}
 
 	route := models.NewDeliveryRoute(requestID)
