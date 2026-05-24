@@ -91,18 +91,18 @@ func GetStatistics(year int) (*StatisticsResult, error) {
 	var result StatisticsResult
 	result.ApplicationYear = year
 
-	query := dao.DB.Model(&models.SubsidyApplication{}).Where("application_year = ?", year)
+	baseQuery := dao.DB.Model(&models.SubsidyApplication{}).Where("application_year = ?", year)
 
 	var total int64
-	query.Count(&total)
+	baseQuery.Count(&total)
 	result.TotalApps = total
 
-	query.Where("status = ?", models.StatusReceived).Count(&result.ReceivedApps)
-	query.Where("status = ?", models.StatusVerified).Count(&result.VerifiedApps)
-	query.Where("status = ?", models.StatusProcessed).Count(&result.ProcessedApps)
-	query.Where("status = ?", models.StatusReviewPassed).Count(&result.ReviewPassedApps)
-	query.Where("status = ?", models.StatusClosed).Count(&result.ClosedApps)
-	query.Where("status = ?", models.StatusRejected).Count(&result.RejectedApps)
+	dao.DB.Model(&models.SubsidyApplication{}).Where("application_year = ? AND status = ?", year, models.StatusReceived).Count(&result.ReceivedApps)
+	dao.DB.Model(&models.SubsidyApplication{}).Where("application_year = ? AND status = ?", year, models.StatusVerified).Count(&result.VerifiedApps)
+	dao.DB.Model(&models.SubsidyApplication{}).Where("application_year = ? AND status = ?", year, models.StatusProcessed).Count(&result.ProcessedApps)
+	dao.DB.Model(&models.SubsidyApplication{}).Where("application_year = ? AND status = ?", year, models.StatusReviewPassed).Count(&result.ReviewPassedApps)
+	dao.DB.Model(&models.SubsidyApplication{}).Where("application_year = ? AND status = ?", year, models.StatusClosed).Count(&result.ClosedApps)
+	dao.DB.Model(&models.SubsidyApplication{}).Where("application_year = ? AND status = ?", year, models.StatusRejected).Count(&result.RejectedApps)
 
 	var fuelSum struct {
 		TotalFuel float64

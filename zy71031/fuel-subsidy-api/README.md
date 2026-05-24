@@ -132,6 +132,22 @@ curl -X POST http://localhost:8082/api/v1/applications/close \
   -d '{"application_id": "申请ID", "operator": "admin", "reason": "同意结案"}'
 ```
 
+### 一键验证完整流程
+
+运行 Python 测试脚本验证完整闭环流程：
+
+```bash
+python3 scripts/test_complete_flow.py
+```
+
+脚本将依次验证：
+- ✓ 收件 → 核验 → 处理 → 复查 → 结案（完整闭环）
+- ✓ 禁渔期校验、油票去重、船主信息一致性（边界校验）
+- ✓ 审核日志可追溯
+- ✓ 统计查询、Excel 导出
+- ✓ 重复提交拦截
+- ✓ 服务重启后历史数据不丢失
+
 ## 项目结构
 
 ```
