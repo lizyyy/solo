@@ -1,0 +1,94 @@
+{
+  "summary": {
+    "totalPackages": 6,
+    "workspacePackages": 1,
+    "externalPackages": 5,
+    "privatePackages": 0,
+    "packagesWithLicense": 5,
+    "packagesMissingLicense": 1,
+    "dualLicensePackages": 1,
+    "violations": 2,
+    "exceptions": 0
+  },
+  "packages": [
+    {
+      "name": "@dirty/public-pkg",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/packages/public-pkg",
+      "isWorkspace": true,
+      "isPrivate": false,
+      "dependencies": []
+    },
+    {
+      "name": "chalk",
+      "version": "4.1.2",
+      "license": "MIT",
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/node_modules/chalk",
+      "isWorkspace": false,
+      "isPrivate": false,
+      "dependencies": [
+        "ansi-styles"
+      ]
+    },
+    {
+      "name": "ansi-styles",
+      "version": "4.3.0",
+      "license": "MIT",
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/node_modules/ansi-styles",
+      "isWorkspace": false,
+      "isPrivate": false,
+      "dependencies": []
+    },
+    {
+      "name": "some-gpl-lib",
+      "version": "1.0.0",
+      "license": "GPL-3.0",
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/node_modules/some-gpl-lib",
+      "isWorkspace": false,
+      "isPrivate": false,
+      "dependencies": []
+    },
+    {
+      "name": "dual-license-pkg",
+      "version": "2.0.0",
+      "license": "(MIT OR Apache-2.0)",
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/node_modules/dual-license-pkg",
+      "isWorkspace": false,
+      "isPrivate": false,
+      "dependencies": []
+    },
+    {
+      "name": "no-license-pkg",
+      "version": "3.0.0",
+      "license": null,
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/node_modules/no-license-pkg",
+      "isWorkspace": false,
+      "isPrivate": false,
+      "dependencies": []
+    }
+  ],
+  "violations": [
+    {
+      "packageName": "some-gpl-lib",
+      "packageVersion": "1.0.0",
+      "type": "unallowed_license",
+      "license": "GPL-3.0",
+      "severity": "error",
+      "message": "许可证 GPL-3.0 不在允许列表中"
+    },
+    {
+      "packageName": "no-license-pkg",
+      "packageVersion": "3.0.0",
+      "type": "missing_license",
+      "license": null,
+      "severity": "warning",
+      "message": "缺失许可证信息"
+    }
+  ],
+  "exceptions": [],
+  "exitCode": 1,
+  "exitCodeDescription": "发现许可证违规，需审查",
+  "generatedAt": "2026-05-24T11:12:06.197Z",
+  "cliVersion": "1.0.0"
+}

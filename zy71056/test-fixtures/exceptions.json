@@ -1,0 +1,13 @@
+[
+  {
+    "name": "some-gpl-lib",
+    "version": "1.0.0",
+    "reason": "客户指定使用，已签署特殊协议",
+    "approvedBy": "法务部",
+    "approvedAt": "2024-01-15"
+  },
+  {
+    "name": "no-license-pkg",
+    "reason": "内部开发的依赖，后续补许可证"
+  }
+]

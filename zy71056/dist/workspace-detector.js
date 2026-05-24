@@ -1,0 +1,111 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.detectWorkspacePackages = detectWorkspacePackages;
+exports.isWorkspacePackage = isWorkspacePackage;
+exports.findLicenseFile = findLicenseFile;
+exports.readLicenseText = readLicenseText;
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
+const glob_1 = require("glob");
+async function detectWorkspacePackages(cwd) {
+    const rootPkgPath = path.join(cwd, 'package.json');
+    if (!fs.existsSync(rootPkgPath)) {
+        return new Map();
+    }
+    const rootPkg = JSON.parse(fs.readFileSync(rootPkgPath, 'utf-8'));
+    const workspaces = rootPkg.workspaces || [];
+    if (workspaces.length === 0) {
+        return new Map();
+    }
+    const packages = new Map();
+    for (const pattern of workspaces) {
+        const matches = await (0, glob_1.glob)(pattern, {
+            cwd,
+            absolute: true,
+        });
+        for (const pkgPath of matches) {
+            const pkgJsonPath = path.join(pkgPath, 'package.json');
+            if (!fs.existsSync(pkgJsonPath))
+                continue;
+            try {
+                const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
+                if (pkg.name) {
+                    packages.set(pkg.name, {
+                        name: pkg.name,
+                        version: pkg.version || '0.0.0',
+                        path: pkgPath,
+                        isPrivate: !!pkg.private,
+                        license: pkg.license || null,
+                    });
+                }
+            }
+            catch {
+                continue;
+            }
+        }
+    }
+    return packages;
+}
+function isWorkspacePackage(packageName, workspacePackages) {
+    return workspacePackages.get(packageName) || null;
+}
+function findLicenseFile(packagePath) {
+    const licensePatterns = [
+        'LICENSE',
+        'LICENSE.md',
+        'LICENSE.txt',
+        'LICENCE',
+        'LICENCE.md',
+        'LICENCE.txt',
+        'License',
+        'License.md',
+    ];
+    for (const fileName of licensePatterns) {
+        const filePath = path.join(packagePath, fileName);
+        if (fs.existsSync(filePath)) {
+            return filePath;
+        }
+    }
+    return null;
+}
+function readLicenseText(licensePath) {
+    try {
+        return fs.readFileSync(licensePath, 'utf-8');
+    }
+    catch {
+        return null;
+    }
+}

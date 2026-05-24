@@ -1,0 +1,89 @@
+{
+  "summary": {
+    "totalPackages": 6,
+    "workspacePackages": 1,
+    "externalPackages": 5,
+    "privatePackages": 0,
+    "packagesWithLicense": 5,
+    "packagesMissingLicense": 1,
+    "dualLicensePackages": 1,
+    "violations": 0,
+    "exceptions": 2
+  },
+  "packages": [
+    {
+      "name": "@dirty/public-pkg",
+      "version": "1.0.0",
+      "license": "Apache-2.0",
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/packages/public-pkg",
+      "isWorkspace": true,
+      "isPrivate": false,
+      "dependencies": []
+    },
+    {
+      "name": "chalk",
+      "version": "4.1.2",
+      "license": "MIT",
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/node_modules/chalk",
+      "isWorkspace": false,
+      "isPrivate": false,
+      "dependencies": [
+        "ansi-styles"
+      ]
+    },
+    {
+      "name": "ansi-styles",
+      "version": "4.3.0",
+      "license": "MIT",
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/node_modules/ansi-styles",
+      "isWorkspace": false,
+      "isPrivate": false,
+      "dependencies": []
+    },
+    {
+      "name": "some-gpl-lib",
+      "version": "1.0.0",
+      "license": "GPL-3.0",
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/node_modules/some-gpl-lib",
+      "isWorkspace": false,
+      "isPrivate": false,
+      "dependencies": []
+    },
+    {
+      "name": "dual-license-pkg",
+      "version": "2.0.0",
+      "license": "(MIT OR Apache-2.0)",
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/node_modules/dual-license-pkg",
+      "isWorkspace": false,
+      "isPrivate": false,
+      "dependencies": []
+    },
+    {
+      "name": "no-license-pkg",
+      "version": "3.0.0",
+      "license": null,
+      "path": "/Users/lzy/pro/solo/workspaces/zy71056/test-fixtures/dirty-project/node_modules/no-license-pkg",
+      "isWorkspace": false,
+      "isPrivate": false,
+      "dependencies": []
+    }
+  ],
+  "violations": [],
+  "exceptions": [
+    {
+      "name": "some-gpl-lib",
+      "version": "1.0.0",
+      "reason": "客户指定使用，已签署特殊协议",
+      "approvedBy": "法务部",
+      "approvedAt": "2024-01-15"
+    },
+    {
+      "name": "no-license-pkg",
+      "reason": "内部开发的依赖，后续补许可证"
+    }
+  ],
+  "exitCode": 0,
+  "exitCodeDescription": "执行成功，未发现违规项",
+  "generatedAt": "2026-05-24T11:12:24.209Z",
+  "cliVersion": "1.0.0"
+}
