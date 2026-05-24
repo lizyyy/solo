@@ -1,0 +1,26 @@
+{
+  "button": {
+    "login": "登录",
+    "logout": "退出登录",
+    "submit": "提交表单",
+    "confirm": "确认并继续",
+    "cancel": "取消操作"
+  },
+  "sms": {
+    "verificationCode": "您的验证码是：{code}，请在5分钟内输入",
+    "welcome": "尊敬的{username}，欢迎回来！",
+    "passwordReset": "您的密码重置验证码是：{code}"
+  },
+  "toast": {
+    "success": "操作成功完成",
+    "error": "操作失败，请稍后重试",
+    "loading": "正在处理中，请稍候..."
+  },
+  "plural": {
+    "itemCount": {
+      "zero": "没有项目",
+      "one": "1 个项目",
+      "other": "{count} 个项目"
+    }
+  }
+}

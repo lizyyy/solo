@@ -1,0 +1,26 @@
+{
+  "button": {
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "submit": "Submit Form",
+    "confirm": "Confirm and Continue",
+    "cancel": "Cancel Operation"
+  },
+  "sms": {
+    "verificationCode": "Your verification code is: {code}, please enter within 5 minutes",
+    "welcome": "Dear {username}, welcome back!",
+    "passwordReset": "Your password reset code is: {code}"
+  },
+  "toast": {
+    "success": "Operation completed successfully",
+    "error": "Operation failed, please try again later",
+    "loading": "Processing, please wait..."
+  },
+  "plural": {
+    "itemCount": {
+      "zero": "No items",
+      "one": "1 item",
+      "other": "{count} items"
+    }
+  }
+}

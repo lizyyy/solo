@@ -1,0 +1,43 @@
+{
+  "checks": [
+    {
+      "locale": "zh-CN",
+      "interfacePosition": "登录按钮",
+      "maxWidth": 20,
+      "placeholders": []
+    },
+    {
+      "locale": "en",
+      "interfacePosition": "登录按钮",
+      "maxWidth": 30,
+      "placeholders": []
+    },
+    {
+      "locale": "ja",
+      "interfacePosition": "登录按钮",
+      "maxWidth": 25,
+      "placeholders": []
+    },
+    {
+      "locale": "*",
+      "interfacePosition": "短信验证码",
+      "maxWidth": 70,
+      "maxChars": 35,
+      "placeholders": ["{code}", "{username}"]
+    },
+    {
+      "locale": "*",
+      "interfacePosition": "Toast提示",
+      "maxWidth": 50,
+      "placeholders": []
+    }
+  ],
+  "output": {
+    "dir": "./reports",
+    "formats": ["console", "json", "md"]
+  },
+  "defaults": {
+    "maxWidth": 30,
+    "placeholders": []
+  }
+}

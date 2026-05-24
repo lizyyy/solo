@@ -1,0 +1,26 @@
+{
+  "button": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "submit": "フォームを送信",
+    "confirm": "確認して続行",
+    "cancel": "キャンセル"
+  },
+  "sms": {
+    "verificationCode": "認証コード：{code}、5分以内に入力してください",
+    "welcome": "{username}様、おかえりなさい！",
+    "passwordReset": "パスワードリセットコード：{code}"
+  },
+  "toast": {
+    "success": "操作が正常に完了しました",
+    "error": "操作に失敗しました、後でもう一度お試しください",
+    "loading": "処理中です、しばらくお待ちください..."
+  },
+  "plural": {
+    "itemCount": {
+      "zero": "アイテムなし",
+      "one": "1 アイテム",
+      "other": "{count} アイテム"
+    }
+  }
+}
