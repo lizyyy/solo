@@ -1,0 +1,70 @@
+{
+  "fuel_receipts": [
+    {
+      "receipt_number": "RCP202500001",
+      "receipt_date": "2025-03-15T00:00:00Z",
+      "gas_station_name": "东海加油站",
+      "fuel_type": "柴油",
+      "fuel_amount": 5000,
+      "unit_price": 7.5,
+      "total_amount": 37500,
+      "vessel_number": "浙渔00001",
+      "driver_name": "张三"
+    },
+    {
+      "receipt_number": "RCP202500002",
+      "receipt_date": "2025-04-20T00:00:00Z",
+      "gas_station_name": "东海加油站",
+      "fuel_type": "柴油",
+      "fuel_amount": 3000,
+      "unit_price": 7.6,
+      "total_amount": 22800,
+      "vessel_number": "浙渔00001",
+      "driver_name": "张三"
+    },
+    {
+      "receipt_number": "RCP202500003",
+      "receipt_date": "2025-06-10T00:00:00Z",
+      "gas_station_name": "舟山石化",
+      "fuel_type": "柴油",
+      "fuel_amount": 4000,
+      "unit_price": 7.55,
+      "total_amount": 30200,
+      "vessel_number": "浙渔00001",
+      "driver_name": "张三"
+    }
+  ],
+  "application": {
+    "application_year": 2025,
+    "applicant_name": "张三",
+    "applicant_id_card": "330101198001010001",
+    "vessel_number": "浙渔00001",
+    "receipt_numbers": ["RCP202500001", "RCP202500002"],
+    "voyages": [
+      {
+        "voyage_number": "V202503001",
+        "departure_date": "2025-03-10T08:00:00Z",
+        "return_date": "2025-03-12T18:00:00Z",
+        "fishing_area": "东海189海区",
+        "fuel_consumed": 2500,
+        "catch_weight": 5000
+      },
+      {
+        "voyage_number": "V202504001",
+        "departure_date": "2025-04-15T06:00:00Z",
+        "return_date": "2025-04-18T20:00:00Z",
+        "fishing_area": "东海192海区",
+        "fuel_consumed": 3500,
+        "catch_weight": 8000
+      },
+      {
+        "voyage_number": "V202506001",
+        "departure_date": "2025-06-05T08:00:00Z",
+        "return_date": "2025-06-08T18:00:00Z",
+        "fishing_area": "东海195海区",
+        "fuel_consumed": 2000,
+        "catch_weight": 3000
+      }
+    ]
+  }
+}
