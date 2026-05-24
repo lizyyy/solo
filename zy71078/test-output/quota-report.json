@@ -1,0 +1,422 @@
+{
+  "generated_at": "2026-05-24T20:36:45.755528",
+  "input_files": {
+    "topics": "examples/topics.yaml",
+    "teams": "examples/teams.yaml"
+  },
+  "summary": {
+    "total_topics": 14,
+    "assigned_topics": 12,
+    "unassigned_topics": 2,
+    "total_partitions": 258,
+    "anomaly_counts": {
+      "INFO": 16,
+      "WARNING": 2,
+      "ERROR": 3,
+      "CRITICAL": 0
+    },
+    "has_errors": true
+  },
+  "team_summaries": {
+    "数据平台": {
+      "team": {
+        "name": "数据平台",
+        "owners": [
+          "zhangsan@example.com",
+          "lisi@example.com"
+        ],
+        "max_total_partitions": 200,
+        "max_partitions_per_topic": 24,
+        "max_retention": "30d"
+      },
+      "topic_count": 4,
+      "total_partitions": 56,
+      "partition_quota_used_pct": 28.0,
+      "over_partition_quota": false,
+      "anomalies": [],
+      "topics": [
+        "dp.user.click",
+        "dp.user.login",
+        "dp.page.view",
+        "dp.event.stream"
+      ]
+    },
+    "推荐系统": {
+      "team": {
+        "name": "推荐系统",
+        "owners": [
+          "wangwu@example.com"
+        ],
+        "max_total_partitions": 500,
+        "max_partitions_per_topic": 48,
+        "max_retention": "14d"
+      },
+      "topic_count": 3,
+      "total_partitions": 136,
+      "partition_quota_used_pct": 27.2,
+      "over_partition_quota": false,
+      "anomalies": [],
+      "topics": [
+        "rec.item.rank",
+        "rec.user.interest",
+        "rec.realtime.feed"
+      ]
+    },
+    "支付系统": {
+      "team": {
+        "name": "支付系统",
+        "owners": [
+          "zhaoliu@example.com"
+        ],
+        "max_total_partitions": 100,
+        "max_partitions_per_topic": 12,
+        "max_retention": "90d"
+      },
+      "topic_count": 3,
+      "total_partitions": 36,
+      "partition_quota_used_pct": 36.0,
+      "over_partition_quota": false,
+      "anomalies": [],
+      "topics": [
+        "pay.order.created",
+        "pay.transaction.success",
+        "pay.refund.request"
+      ]
+    },
+    "用户中心": {
+      "team": {
+        "name": "用户中心",
+        "owners": [
+          "qianqi@example.com"
+        ],
+        "max_total_partitions": 150,
+        "max_partitions_per_topic": 24,
+        "max_retention": "30d"
+      },
+      "topic_count": 2,
+      "total_partitions": 18,
+      "partition_quota_used_pct": 12.0,
+      "over_partition_quota": false,
+      "anomalies": [],
+      "topics": [
+        "user.profile.updated",
+        "user.activity.log"
+      ]
+    }
+  },
+  "prefix_conflicts": [],
+  "owner_merge_issues": [],
+  "topics": [
+    {
+      "name": "dp.user.click",
+      "partitions": 6,
+      "retention": "7d",
+      "team": "数据平台",
+      "team_hint": null,
+      "anomalies": []
+    },
+    {
+      "name": "dp.user.login",
+      "partitions": 12,
+      "retention": "14d",
+      "team": "数据平台",
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "NON_STANDARD_PARTITIONS",
+          "level": "INFO",
+          "message": "分区数 12 不符合团队默认值 6",
+          "details": {
+            "actual": 12,
+            "standard": 6
+          }
+        },
+        {
+          "rule_name": "NON_STANDARD_RETENTION",
+          "level": "INFO",
+          "message": "保留时间 14d 不符合团队默认值 7d",
+          "details": {
+            "actual_seconds": 1209600.0,
+            "standard_seconds": 604800.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "dp.page.view",
+      "partitions": 6,
+      "retention": "30d",
+      "team": "数据平台",
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "NON_STANDARD_RETENTION",
+          "level": "INFO",
+          "message": "保留时间 30d 不符合团队默认值 7d",
+          "details": {
+            "actual_seconds": 2592000.0,
+            "standard_seconds": 604800.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "dp.event.stream",
+      "partitions": 32,
+      "retention": "3d",
+      "team": "数据平台",
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "PARTITIONS_EXCEED_PER_TOPIC",
+          "level": "ERROR",
+          "message": "分区数 32 超过单Topic限制 24",
+          "details": {
+            "actual": 32,
+            "limit": 24
+          }
+        },
+        {
+          "rule_name": "NON_STANDARD_PARTITIONS",
+          "level": "INFO",
+          "message": "分区数 32 不符合团队默认值 6",
+          "details": {
+            "actual": 32,
+            "standard": 6
+          }
+        },
+        {
+          "rule_name": "NON_STANDARD_RETENTION",
+          "level": "INFO",
+          "message": "保留时间 3d 不符合团队默认值 7d",
+          "details": {
+            "actual_seconds": 259200.0,
+            "standard_seconds": 604800.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "rec.item.rank",
+      "partitions": 24,
+      "retention": "3d",
+      "team": "推荐系统",
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "NON_STANDARD_PARTITIONS",
+          "level": "INFO",
+          "message": "分区数 24 不符合团队默认值 12",
+          "details": {
+            "actual": 24,
+            "standard": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "rec.user.interest",
+      "partitions": 48,
+      "retention": "7d",
+      "team": "推荐系统",
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "NON_STANDARD_PARTITIONS",
+          "level": "INFO",
+          "message": "分区数 48 不符合团队默认值 12",
+          "details": {
+            "actual": 48,
+            "standard": 12
+          }
+        },
+        {
+          "rule_name": "NON_STANDARD_RETENTION",
+          "level": "INFO",
+          "message": "保留时间 7d 不符合团队默认值 3d",
+          "details": {
+            "actual_seconds": 604800.0,
+            "standard_seconds": 259200.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "rec.realtime.feed",
+      "partitions": 64,
+      "retention": "2d",
+      "team": "推荐系统",
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "PARTITIONS_EXCEED_PER_TOPIC",
+          "level": "ERROR",
+          "message": "分区数 64 超过单Topic限制 48",
+          "details": {
+            "actual": 64,
+            "limit": 48
+          }
+        },
+        {
+          "rule_name": "NON_STANDARD_PARTITIONS",
+          "level": "INFO",
+          "message": "分区数 64 不符合团队默认值 12",
+          "details": {
+            "actual": 64,
+            "standard": 12
+          }
+        },
+        {
+          "rule_name": "NON_STANDARD_RETENTION",
+          "level": "INFO",
+          "message": "保留时间 2d 不符合团队默认值 3d",
+          "details": {
+            "actual_seconds": 172800.0,
+            "standard_seconds": 259200.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "pay.order.created",
+      "partitions": 6,
+      "retention": "60d",
+      "team": "支付系统",
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "NON_STANDARD_RETENTION",
+          "level": "INFO",
+          "message": "保留时间 60d 不符合团队默认值 7d",
+          "details": {
+            "actual_seconds": 5184000.0,
+            "standard_seconds": 604800.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "pay.transaction.success",
+      "partitions": 24,
+      "retention": "90d",
+      "team": "支付系统",
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "PARTITIONS_EXCEED_PER_TOPIC",
+          "level": "ERROR",
+          "message": "分区数 24 超过单Topic限制 12",
+          "details": {
+            "actual": 24,
+            "limit": 12
+          }
+        },
+        {
+          "rule_name": "NON_STANDARD_PARTITIONS",
+          "level": "INFO",
+          "message": "分区数 24 不符合团队默认值 6",
+          "details": {
+            "actual": 24,
+            "standard": 6
+          }
+        },
+        {
+          "rule_name": "NON_STANDARD_RETENTION",
+          "level": "INFO",
+          "message": "保留时间 90d 不符合团队默认值 7d",
+          "details": {
+            "actual_seconds": 7776000.0,
+            "standard_seconds": 604800.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "pay.refund.request",
+      "partitions": 6,
+      "retention": "90d",
+      "team": "支付系统",
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "NON_STANDARD_RETENTION",
+          "level": "INFO",
+          "message": "保留时间 90d 不符合团队默认值 7d",
+          "details": {
+            "actual_seconds": 7776000.0,
+            "standard_seconds": 604800.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "user.profile.updated",
+      "partitions": 6,
+      "retention": "7d",
+      "team": "用户中心",
+      "team_hint": null,
+      "anomalies": []
+    },
+    {
+      "name": "user.activity.log",
+      "partitions": 12,
+      "retention": "14d",
+      "team": "用户中心",
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "NON_STANDARD_PARTITIONS",
+          "level": "INFO",
+          "message": "分区数 12 不符合团队默认值 6",
+          "details": {
+            "actual": 12,
+            "standard": 6
+          }
+        },
+        {
+          "rule_name": "NON_STANDARD_RETENTION",
+          "level": "INFO",
+          "message": "保留时间 14d 不符合团队默认值 7d",
+          "details": {
+            "actual_seconds": 1209600.0,
+            "standard_seconds": 604800.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "unknown.mystery.topic",
+      "partitions": 6,
+      "retention": "7d",
+      "team": null,
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "NO_TEAM_ASSIGNED",
+          "level": "WARNING",
+          "message": "无法匹配所属团队",
+          "details": {
+            "topic": "unknown.mystery.topic"
+          }
+        }
+      ]
+    },
+    {
+      "name": "orphan.topic.no.team",
+      "partitions": 6,
+      "retention": "365d",
+      "team": null,
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "NO_TEAM_ASSIGNED",
+          "level": "WARNING",
+          "message": "无法匹配所属团队",
+          "details": {
+            "topic": "orphan.topic.no.team"
+          }
+        }
+      ]
+    }
+  ]
+}

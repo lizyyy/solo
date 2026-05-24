@@ -1,0 +1,31 @@
+
+teams:
+  - name: 数据平台
+    aliases: [dp, data-platform, 数平]
+    owners: [zhangsan, lisi]
+    topic_prefixes: [dp., data.]
+    default_partitions: 6
+    default_retention: 7d
+    max_partitions_per_topic: 24
+    max_total_partitions: 200
+    max_retention: 30d
+
+  - name: 推荐系统
+    aliases: [rec, recommend]
+    owners: [wangwu]
+    topic_prefixes: [rec., recommend.]
+    default_partitions: 12
+    default_retention: 3d
+    max_partitions_per_topic: 48
+    max_total_partitions: 500
+    max_retention: 14d
+
+  - name: 支付系统
+    aliases: [pay, payment]
+    owners: [zhaoliu]
+    topic_prefixes: [pay., payment.]
+    default_partitions: 6
+    default_retention: 7d
+    max_partitions_per_topic: 12
+    max_total_partitions: 100
+    max_retention: 90d

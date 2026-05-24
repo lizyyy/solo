@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-05-24T20:36:27.950828",
+  "input_files": {
+    "test": "data"
+  },
+  "summary": {
+    "total_topics": 2,
+    "assigned_topics": 2,
+    "unassigned_topics": 0,
+    "total_partitions": 18,
+    "anomaly_counts": {
+      "INFO": 2,
+      "WARNING": 0,
+      "ERROR": 0,
+      "CRITICAL": 0
+    },
+    "has_errors": false
+  },
+  "team_summaries": {
+    "TestTeam": {
+      "team": {
+        "name": "TestTeam",
+        "owners": [
+          "test"
+        ],
+        "max_total_partitions": 1000,
+        "max_partitions_per_topic": 24,
+        "max_retention": "30d"
+      },
+      "topic_count": 2,
+      "total_partitions": 18,
+      "partition_quota_used_pct": 1.8,
+      "over_partition_quota": false,
+      "anomalies": [],
+      "topics": [
+        "test.topic1",
+        "test.topic2"
+      ]
+    }
+  },
+  "prefix_conflicts": [],
+  "owner_merge_issues": [],
+  "topics": [
+    {
+      "name": "test.topic1",
+      "partitions": 6,
+      "retention": "7d",
+      "team": "TestTeam",
+      "team_hint": null,
+      "anomalies": []
+    },
+    {
+      "name": "test.topic2",
+      "partitions": 12,
+      "retention": "14d",
+      "team": "TestTeam",
+      "team_hint": null,
+      "anomalies": [
+        {
+          "rule_name": "NON_STANDARD_PARTITIONS",
+          "level": "INFO",
+          "message": "分区数 12 不符合团队默认值 6",
+          "details": {
+            "actual": 12,
+            "standard": 6
+          }
+        },
+        {
+          "rule_name": "NON_STANDARD_RETENTION",
+          "level": "INFO",
+          "message": "保留时间 14d 不符合团队默认值 7d",
+          "details": {
+            "actual_seconds": 1209600.0,
+            "standard_seconds": 604800.0
+          }
+        }
+      ]
+    }
+  ]
+}

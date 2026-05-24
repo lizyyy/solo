@@ -1,0 +1,60 @@
+topics:
+  - name: dp.user.click
+    partitions: 6
+    retention: 7d
+    owner: zhangsan@example.com
+
+  - name: dp.user.login
+    partitions: 12
+    retention: 14d
+    owner: lisi@example.com
+
+  - name: dp.page.view
+    partitions: 6
+    retention: 30d
+
+  - name: dp.event.stream
+    partitions: 32
+    retention: 3d
+
+  - name: rec.item.rank
+    partitions: 24
+    retention: 3d
+    owner: wangwu@example.com
+
+  - name: rec.user.interest
+    partitions: 48
+    retention: 7d
+
+  - name: rec.realtime.feed
+    partitions: 64
+    retention: 2d
+
+  - name: pay.order.created
+    partitions: 6
+    retention: 60d
+    owner: zhaoliu@example.com
+
+  - name: pay.transaction.success
+    partitions: 24
+    retention: 90d
+
+  - name: pay.refund.request
+    partitions: 6
+    retention: 90d
+
+  - name: user.profile.updated
+    partitions: 6
+    retention: 7d
+
+  - name: user.activity.log
+    partitions: 12
+    retention: 14d
+
+  - name: unknown.mystery.topic
+    partitions: 6
+    retention: 7d
+
+  - name: orphan.topic.no.team
+    partitions: 6
+    retention: 365d

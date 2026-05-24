@@ -1,0 +1,4 @@
+name,aliases,owners,topic_prefixes,default_partitions,default_retention,max_partitions_per_topic,max_total_partitions,max_retention
+数据平台,"dp,数平","zhangsan,lisi","dp.,data.",6,7d,24,200,30d
+推荐系统,"rec,recommend",wangwu,"rec.,recommend.",12,3d,48,500,14d
+支付系统,"pay,payment",zhaoliu,"pay.,payment.",6,7d,12,100,90d

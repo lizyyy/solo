@@ -1,0 +1,14 @@
+pyproject.toml
+src/kafka_quota/__init__.py
+src/kafka_quota/cli.py
+src/kafka_quota/engine.py
+src/kafka_quota/models.py
+src/kafka_quota/parser.py
+src/kafka_quota/reporter.py
+src/kafka_quota/selfcheck.py
+src/kafka_quota_cli.egg-info/PKG-INFO
+src/kafka_quota_cli.egg-info/SOURCES.txt
+src/kafka_quota_cli.egg-info/dependency_links.txt
+src/kafka_quota_cli.egg-info/entry_points.txt
+src/kafka_quota_cli.egg-info/requires.txt
+src/kafka_quota_cli.egg-info/top_level.txt

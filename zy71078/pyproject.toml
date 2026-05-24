@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kafka-quota-cli"
+version = "1.0.0"
+description = "Kafka Topic 配额管理命令行工具"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0",
+    "pyyaml>=6.0",
+    "tabulate>=0.9.0",
+    "pydantic>=2.0",
+]
+
+[project.scripts]
+kafka-quota = "kafka_quota.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

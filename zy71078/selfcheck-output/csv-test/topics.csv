@@ -1,0 +1,6 @@
+topic,partitions,retention,team,owner
+dp.order.created,6,7d,数据平台,zhangsan
+dp.order.cancelled,12,30d,数平,lisi
+rec.user.profile,24,2d,recommend,wangwu
+pay.refund.request,6,60d,payment,zhaoliu
+unknown.topic,6,7d,,

@@ -1,0 +1,31 @@
+
+topics:
+  - name: dp.user.click
+    partitions: 6
+    retention: 7d
+    owner: zhangsan
+
+  - name: dp.user.login
+    partitions: 12
+    retention: 14d
+    owner: lisi
+
+  - name: rec.item.rank
+    partitions: 24
+    retention: 3d
+
+  - name: rec.user.interest
+    partitions: 48
+    retention: 7d
+
+  - name: pay.order.created
+    partitions: 6
+    retention: 60d
+
+  - name: pay.transaction.success
+    partitions: 24
+    retention: 90d
+
+  - name: unknown.topic
+    partitions: 6
+    retention: 7d
