@@ -1,0 +1,15 @@
+pyproject.toml
+src/codeowners_coverage/__init__.py
+src/codeowners_coverage/analyzer.py
+src/codeowners_coverage/cli.py
+src/codeowners_coverage/constants.py
+src/codeowners_coverage/file_scanner.py
+src/codeowners_coverage/parser.py
+src/codeowners_coverage/reporter.py
+src/codeowners_coverage/team_mapping.py
+src/codeowners_coverage.egg-info/PKG-INFO
+src/codeowners_coverage.egg-info/SOURCES.txt
+src/codeowners_coverage.egg-info/dependency_links.txt
+src/codeowners_coverage.egg-info/entry_points.txt
+src/codeowners_coverage.egg-info/requires.txt
+src/codeowners_coverage.egg-info/top_level.txt

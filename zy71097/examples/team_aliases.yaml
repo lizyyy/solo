@@ -1,0 +1,21 @@
+aliases:
+  "@org/frontend-team":
+    - "@org/alice"
+    - "@org/bob"
+  "@org/backend-team":
+    - "@org/charlie"
+    - "@org/david"
+  "@org/all-engineers":
+    - "@org/frontend-team"
+    - "@org/backend-team"
+  "@org/owners":
+    - "@org/frontend-team"
+    - "@org/security"
+
+renames:
+  "@org/old-team-name": "@org/new-team-name"
+  "@org/legacy-team": "@org/modern-team"
+
+invalid_owners:
+  - "@some-random-guy"
+  - "invalid-email@example.com"

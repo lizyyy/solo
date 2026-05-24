@@ -1,0 +1,47 @@
+# This is an example CODEOWNERS file
+
+# Default owners for everything in the repo
+* @org/all-engineers
+
+# Frontend files
+*.js @org/frontend-team
+*.ts @org/frontend-team
+*.jsx @org/frontend-team
+*.tsx @org/frontend-team
+*.css @org/frontend-team
+*.vue @org/frontend-team
+
+# Backend files
+*.py @org/backend-team
+*.go @org/backend-team
+*.java @org/backend-team
+*.rb @org/backend-team
+
+# Docs
+/docs/ @org/docs-team
+
+# CI/CD
+/.github/ @org/devops
+*.yml @org/devops
+*.yaml @org/devops
+
+# Security sensitive files
+/src/auth/ @org/security
+/src/crypto/ @org/security
+
+# Build and config files
+/package.json @org/frontend-team
+/pyproject.toml @org/backend-team
+/Makefile @org/devops
+
+# Tests
+/tests/ @org/qa-team
+/spec/ @org/qa-team
+
+# Database
+/src/db/ @org/dba
+*.sql @org/dba
+
+# Negation example - no one owns these, they need manual review
+!/src/generated/
+!/dist/

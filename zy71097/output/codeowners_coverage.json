@@ -1,0 +1,366 @@
+{
+  "metadata": {
+    "generated_at": "2026-05-24T21:29:28.210036",
+    "repo_root": "/Users/lzy/pro/solo/workspaces/zy71097/test_repo",
+    "codeowners_path": "/Users/lzy/pro/solo/workspaces/zy71097/test_repo/CODEOWNERS"
+  },
+  "summary": {
+    "total_files": 14,
+    "covered_files": 12,
+    "uncovered_count": 2,
+    "coverage_rate": 0.8571428571428571,
+    "rules_count": 26,
+    "unique_owners_count": 8
+  },
+  "uncovered_files": [
+    "dist/bundle.js",
+    "src/generated/code.js"
+  ],
+  "empty_dirs": [
+    "empty_dir/"
+  ],
+  "unique_owners": [
+    "@org/alice",
+    "@org/bob",
+    "@org/charlie",
+    "@org/david",
+    "@org/dba",
+    "@org/docs-team",
+    "@org/qa-team",
+    "@org/security"
+  ],
+  "owner_stats": {
+    "@org/alice": {
+      "file_count": 5,
+      "files": [
+        "CODEOWNERS",
+        "package.json",
+        "src/app.js",
+        "src/frontend/component.tsx",
+        "uncovered_file.txt"
+      ]
+    },
+    "@org/bob": {
+      "file_count": 5,
+      "files": [
+        "CODEOWNERS",
+        "package.json",
+        "src/app.js",
+        "src/frontend/component.tsx",
+        "uncovered_file.txt"
+      ]
+    },
+    "@org/charlie": {
+      "file_count": 4,
+      "files": [
+        "CODEOWNERS",
+        "another_uncovered.rb",
+        "src/server.py",
+        "uncovered_file.txt"
+      ]
+    },
+    "@org/david": {
+      "file_count": 4,
+      "files": [
+        "CODEOWNERS",
+        "another_uncovered.rb",
+        "src/server.py",
+        "uncovered_file.txt"
+      ]
+    },
+    "@org/docs-team": {
+      "file_count": 1,
+      "files": [
+        "docs/README.md"
+      ]
+    },
+    "@org/security": {
+      "file_count": 2,
+      "files": [
+        "src/auth/login.js",
+        "src/crypto/encrypt.py"
+      ]
+    },
+    "@org/dba": {
+      "file_count": 1,
+      "files": [
+        "src/db/schema.sql"
+      ]
+    },
+    "@org/qa-team": {
+      "file_count": 1,
+      "files": [
+        "tests/test_main.py"
+      ]
+    }
+  },
+  "file_coverage": [
+    {
+      "file_path": "CODEOWNERS",
+      "owners": [
+        "@org/all-engineers"
+      ],
+      "expanded_owners": [
+        "@org/alice",
+        "@org/bob",
+        "@org/charlie",
+        "@org/david"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "*",
+        "owners": [
+          "@org/all-engineers"
+        ],
+        "line_number": 4
+      }
+    },
+    {
+      "file_path": "another_uncovered.rb",
+      "owners": [
+        "@org/backend-team"
+      ],
+      "expanded_owners": [
+        "@org/charlie",
+        "@org/david"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "*.rb",
+        "owners": [
+          "@org/backend-team"
+        ],
+        "line_number": 18
+      }
+    },
+    {
+      "file_path": "dist/bundle.js",
+      "owners": [],
+      "expanded_owners": [],
+      "is_covered": false,
+      "is_empty_dir": false,
+      "matched_rule": null
+    },
+    {
+      "file_path": "docs/README.md",
+      "owners": [
+        "@org/docs-team"
+      ],
+      "expanded_owners": [
+        "@org/docs-team"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "docs/**",
+        "owners": [
+          "@org/docs-team"
+        ],
+        "line_number": 21
+      }
+    },
+    {
+      "file_path": "package.json",
+      "owners": [
+        "@org/frontend-team"
+      ],
+      "expanded_owners": [
+        "@org/alice",
+        "@org/bob"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "package.json",
+        "owners": [
+          "@org/frontend-team"
+        ],
+        "line_number": 33
+      }
+    },
+    {
+      "file_path": "src/app.js",
+      "owners": [
+        "@org/frontend-team"
+      ],
+      "expanded_owners": [
+        "@org/alice",
+        "@org/bob"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "*.js",
+        "owners": [
+          "@org/frontend-team"
+        ],
+        "line_number": 7
+      }
+    },
+    {
+      "file_path": "src/auth/login.js",
+      "owners": [
+        "@org/security"
+      ],
+      "expanded_owners": [
+        "@org/security"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "src/auth/**",
+        "owners": [
+          "@org/security"
+        ],
+        "line_number": 29
+      }
+    },
+    {
+      "file_path": "src/crypto/encrypt.py",
+      "owners": [
+        "@org/security"
+      ],
+      "expanded_owners": [
+        "@org/security"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "src/crypto/**",
+        "owners": [
+          "@org/security"
+        ],
+        "line_number": 30
+      }
+    },
+    {
+      "file_path": "src/db/schema.sql",
+      "owners": [
+        "@org/dba"
+      ],
+      "expanded_owners": [
+        "@org/dba"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "*.sql",
+        "owners": [
+          "@org/dba"
+        ],
+        "line_number": 43
+      }
+    },
+    {
+      "file_path": "src/frontend/component.tsx",
+      "owners": [
+        "@org/frontend-team"
+      ],
+      "expanded_owners": [
+        "@org/alice",
+        "@org/bob"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "*.tsx",
+        "owners": [
+          "@org/frontend-team"
+        ],
+        "line_number": 10
+      }
+    },
+    {
+      "file_path": "src/generated/code.js",
+      "owners": [],
+      "expanded_owners": [],
+      "is_covered": false,
+      "is_empty_dir": false,
+      "matched_rule": null
+    },
+    {
+      "file_path": "src/server.py",
+      "owners": [
+        "@org/backend-team"
+      ],
+      "expanded_owners": [
+        "@org/charlie",
+        "@org/david"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "*.py",
+        "owners": [
+          "@org/backend-team"
+        ],
+        "line_number": 15
+      }
+    },
+    {
+      "file_path": "tests/test_main.py",
+      "owners": [
+        "@org/qa-team"
+      ],
+      "expanded_owners": [
+        "@org/qa-team"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "tests/**",
+        "owners": [
+          "@org/qa-team"
+        ],
+        "line_number": 38
+      }
+    },
+    {
+      "file_path": "uncovered_file.txt",
+      "owners": [
+        "@org/all-engineers"
+      ],
+      "expanded_owners": [
+        "@org/alice",
+        "@org/bob",
+        "@org/charlie",
+        "@org/david"
+      ],
+      "is_covered": true,
+      "is_empty_dir": false,
+      "matched_rule": {
+        "pattern": "*",
+        "owners": [
+          "@org/all-engineers"
+        ],
+        "line_number": 4
+      }
+    },
+    {
+      "file_path": "empty_dir/",
+      "owners": [
+        "@org/all-engineers"
+      ],
+      "expanded_owners": [
+        "@org/alice",
+        "@org/bob",
+        "@org/charlie",
+        "@org/david"
+      ],
+      "is_covered": true,
+      "is_empty_dir": true,
+      "matched_rule": {
+        "pattern": "*",
+        "owners": [
+          "@org/all-engineers"
+        ],
+        "line_number": 4
+      }
+    }
+  ],
+  "invalid_owners": [
+    "@org/devops"
+  ]
+}
