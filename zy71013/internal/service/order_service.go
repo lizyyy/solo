@@ -9,14 +9,16 @@ import (
 )
 
 type OrderService struct {
-	orderRepo   *database.OrderRepo
-	reagentRepo *database.ReagentRepo
+	orderRepo    *database.OrderRepo
+	judgmentRepo *database.JudgmentRepo
+	reagentRepo  *database.ReagentRepo
 }
 
-func NewOrderService(orderRepo *database.OrderRepo, reagentRepo *database.ReagentRepo) *OrderService {
+func NewOrderService(orderRepo *database.OrderRepo, judgmentRepo *database.JudgmentRepo, reagentRepo *database.ReagentRepo) *OrderService {
 	return &OrderService{
-		orderRepo:   orderRepo,
-		reagentRepo: reagentRepo,
+		orderRepo:    orderRepo,
+		judgmentRepo: judgmentRepo,
+		reagentRepo:  reagentRepo,
 	}
 }
 
@@ -26,6 +28,7 @@ func (s *OrderService) CreateOrder(orderType string, batchNo string, createdBy s
 		orders, _ := s.orderRepo.ListAll()
 		for _, o := range orders {
 			if o.RequestID == requestID {
+				s.loadJudgmentHistory(&o)
 				return &o, nil
 			}
 		}
@@ -84,6 +87,27 @@ func (s *OrderService) CreateOrder(orderType string, batchNo string, createdBy s
 }
 
 func (s *OrderService) ProcessJudgment(req *model.JudgmentRequest) (*model.ProcessingOrder, *model.APIError) {
+	exists, _ := s.judgmentRepo.CheckDuplicateRequest(req.RequestID)
+	if exists {
+		history, _ := s.judgmentRepo.GetByOrderNo(req.OrderNo)
+		if len(history) > 0 {
+			for _, h := range history {
+				if h.RequestID == req.RequestID {
+					order, _ := s.orderRepo.GetByOrderNo(req.OrderNo)
+					if order != nil {
+						s.loadJudgmentHistory(order)
+						return order, nil
+					}
+				}
+			}
+		}
+		return nil, &model.APIError{
+			Code:    model.ErrCodeDuplicate,
+			Message: "重复请求",
+			Details: fmt.Sprintf("请求ID %s 已被处理", req.RequestID),
+		}
+	}
+
 	order, err := s.orderRepo.GetByOrderNo(req.OrderNo)
 	if err != nil {
 		return nil, &model.APIError{
@@ -108,9 +132,39 @@ func (s *OrderService) ProcessJudgment(req *model.JudgmentRequest) (*model.Proce
 		}
 	}
 
+	if req.Judgment == "approve" && order.NeedsReview {
+		s.loadJudgmentHistory(order)
+		return order, &model.APIError{
+			Code:    model.ErrCodeNeedsReview,
+			Message: "需要复核",
+			Details: "该处理单设置为需要复核模式，请先完成复核流程",
+		}
+	}
+
 	now := time.Now()
+	history := &model.JudgmentHistory{
+		OrderID:   order.ID,
+		OrderNo:   req.OrderNo,
+		Judgment:  req.Judgment,
+		JudgedBy:  req.JudgedBy,
+		Notes:     req.Notes,
+		RequestID: req.RequestID,
+	}
+
+	if err := s.judgmentRepo.Create(history); err != nil {
+		return nil, &model.APIError{
+			Code:    model.ErrCodeMissingMaterial,
+			Message: "记录判定历史失败",
+			Details: err.Error(),
+		}
+	}
+
 	order.ReviewedBy = req.JudgedBy
-	order.ReviewNotes = req.Notes
+	if order.ReviewNotes == "" {
+		order.ReviewNotes = req.Notes
+	} else {
+		order.ReviewNotes = fmt.Sprintf("%s\n[%s %s]: %s", order.ReviewNotes, req.Judgment, req.JudgedBy, req.Notes)
+	}
 	order.ReviewedAt = &now
 
 	switch req.Judgment {
@@ -122,6 +176,7 @@ func (s *OrderService) ProcessJudgment(req *model.JudgmentRequest) (*model.Proce
 		order.NeedsReview = false
 	case "supplement":
 		order.Status = "pending_supplement"
+		order.NeedsReview = true
 	default:
 		return nil, &model.APIError{
 			Code:    model.ErrCodeInvalidStatus,
@@ -138,6 +193,7 @@ func (s *OrderService) ProcessJudgment(req *model.JudgmentRequest) (*model.Proce
 		}
 	}
 
+	s.loadJudgmentHistory(order)
 	return order, nil
 }
 
@@ -159,15 +215,20 @@ func (s *OrderService) ProcessSupplement(req *model.SupplementRequest) (*model.P
 	}
 
 	if order.Status != "pending_supplement" {
-		return nil, &model.APIError{
-			Code:    model.ErrCodeInvalidStatus,
+		s.loadJudgmentHistory(order)
+		return order, &model.APIError{
+			Code:    model.ErrCodeNeedsReview,
 			Message: "状态不允许补证",
 			Details: fmt.Sprintf("处理单当前状态为 %s，只有 pending_supplement 状态可以补证", order.Status),
 		}
 	}
 
 	now := time.Now()
-	order.ReviewNotes = fmt.Sprintf("%s\n[补证材料 %s]: %s", order.ReviewNotes, req.SubmittedBy, req.Evidence)
+	if order.ReviewNotes == "" {
+		order.ReviewNotes = fmt.Sprintf("[补证材料 %s]: %s", req.SubmittedBy, req.Evidence)
+	} else {
+		order.ReviewNotes = fmt.Sprintf("%s\n[补证材料 %s]: %s", order.ReviewNotes, req.SubmittedBy, req.Evidence)
+	}
 	order.ReviewedAt = &now
 	order.Status = "needs_review"
 	order.NeedsReview = true
@@ -180,6 +241,7 @@ func (s *OrderService) ProcessSupplement(req *model.SupplementRequest) (*model.P
 		}
 	}
 
+	s.loadJudgmentHistory(order)
 	return order, nil
 }
 
@@ -199,6 +261,17 @@ func (s *OrderService) GetOrder(orderNo string) (*model.ProcessingOrder, *model.
 			Details: fmt.Sprintf("处理单号 %s 未找到", orderNo),
 		}
 	}
+
+	s.loadJudgmentHistory(order)
+
+	if order.NeedsReview && (order.Status == "pending" || order.Status == "needs_review") {
+		return order, &model.APIError{
+			Code:    model.ErrCodeNeedsReview,
+			Message: "需要复核",
+			Details: "该处理单设置为需要复核，请完成复核后再进行操作",
+		}
+	}
+
 	return order, nil
 }
 
@@ -211,5 +284,17 @@ func (s *OrderService) ListOrders() ([]model.ProcessingOrder, *model.APIError) {
 			Details: err.Error(),
 		}
 	}
+
+	for i := range orders {
+		s.loadJudgmentHistory(&orders[i])
+	}
+
 	return orders, nil
+}
+
+func (s *OrderService) loadJudgmentHistory(order *model.ProcessingOrder) {
+	history, err := s.judgmentRepo.GetByOrderID(order.ID)
+	if err == nil {
+		order.JudgmentHistory = history
+	}
 }

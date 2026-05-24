@@ -12,16 +12,18 @@ import (
 )
 
 type ReportService struct {
-	reagentRepo *database.ReagentRepo
-	usageRepo   *database.UsageRepo
-	orderRepo   *database.OrderRepo
+	reagentRepo  *database.ReagentRepo
+	usageRepo    *database.UsageRepo
+	orderRepo    *database.OrderRepo
+	judgmentRepo *database.JudgmentRepo
 }
 
-func NewReportService(reagentRepo *database.ReagentRepo, usageRepo *database.UsageRepo, orderRepo *database.OrderRepo) *ReportService {
+func NewReportService(reagentRepo *database.ReagentRepo, usageRepo *database.UsageRepo, orderRepo *database.OrderRepo, judgmentRepo *database.JudgmentRepo) *ReportService {
 	return &ReportService{
-		reagentRepo: reagentRepo,
-		usageRepo:   usageRepo,
-		orderRepo:   orderRepo,
+		reagentRepo:  reagentRepo,
+		usageRepo:    usageRepo,
+		orderRepo:    orderRepo,
+		judgmentRepo: judgmentRepo,
 	}
 }
 
@@ -74,6 +76,12 @@ func (s *ReportService) GenerateFullReport() (*FullReport, *model.APIError) {
 			Code:    model.ErrCodeMissingMaterial,
 			Message: "查询处理单失败",
 			Details: err.Error(),
+		}
+	}
+
+	for i := range orders {
+		if history, err := s.judgmentRepo.GetByOrderID(orders[i].ID); err == nil {
+			orders[i].JudgmentHistory = history
 		}
 	}
 

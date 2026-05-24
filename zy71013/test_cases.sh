@@ -86,7 +86,7 @@ curl -s -X POST "$BASE_URL/reagents/use" \
 echo ""
 
 echo "=== 测试 8: 创建处理单并判定流程 ==="
-echo "创建解冻异常处理单"
+echo "创建解冻异常处理单（需要复核）"
 curl -s -X POST "$BASE_URL/orders" \
   -H "Content-Type: application/json" \
   -d '{
@@ -96,6 +96,77 @@ curl -s -X POST "$BASE_URL/orders" \
     "created_by": "zhangsan",
     "needs_review": true
   }' | python3 -m json.tool
+echo ""
+
+echo "=== 测试 8a: NEEDS_REVIEW 错误码验证 - 对需要复核的处理单尝试 approve ==="
+ORDER_NO=$(curl -s "$BASE_URL/orders" | python3 -c "import sys,json; print(json.load(sys.stdin)['data'][0]['order_no'])")
+echo "处理单号: $ORDER_NO"
+curl -s -X POST "$BASE_URL/orders/judgment" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"request_id\": \"judgment-001\",
+    \"order_no\": \"$ORDER_NO\",
+    \"judgment\": \"approve\",
+    \"judged_by\": \"lisi\",
+    \"notes\": \"第一次判定，应该返回 NEEDS_REVIEW\"
+  }" | python3 -m json.tool
+echo ""
+
+echo "=== 测试 8b: 第一次判定 - 要求补证（不会触发 NEEDS_REVIEW） ==="
+curl -s -X POST "$BASE_URL/orders/judgment" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"request_id\": \"judgment-002\",
+    \"order_no\": \"$ORDER_NO\",
+    \"judgment\": \"supplement\",
+    \"judged_by\": \"lisi\",
+    \"notes\": \"请提供解冻时间照片\"
+  }" | python3 -m json.tool
+echo ""
+
+echo "=== 测试 8c: 第二次判定 - 驳回 ==="
+curl -s -X POST "$BASE_URL/orders/judgment" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"request_id\": \"judgment-003\",
+    \"order_no\": \"$ORDER_NO\",
+    \"judgment\": \"reject\",
+    \"judged_by\": \"wangwu\",
+    \"notes\": \"材料不符合要求\"
+  }" | python3 -m json.tool
+echo ""
+
+echo "=== 测试 8d: 查看判定历史记录 - 验证记录了每次判定 ==="
+curl -s "$BASE_URL/orders/$ORDER_NO" | python3 -c "import sys,json; data=json.load(sys.stdin); print('判定历史记录数:', len(data['data']['judgment_history'])); [print(f\"  - {h['judged_at'][:19]} {h['judged_by']}: {h['judgment']} - {h['notes']}\") for h in data['data']['judgment_history']]"
+echo ""
+
+echo "=== 测试 8e: NEEDS_REVIEW 错误码验证 - 查询需要复核的处理单 ==="
+echo "创建一个新的需要复核的处理单"
+curl -s -X POST "$BASE_URL/orders" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "request_id": "order-002",
+    "batch_no": "DMSO-2024-001",
+    "type": "USAGE_EXCEPTION",
+    "created_by": "zhangsan",
+    "needs_review": true
+  }' > /dev/null
+NEW_ORDER_NO=$(curl -s "$BASE_URL/orders" | python3 -c "import sys,json; print([o['order_no'] for o in json.load(sys.stdin)['data'] if o['status']=='needs_review'][0])")
+echo "新处理单号: $NEW_ORDER_NO"
+echo "查询该处理单（应返回 NEEDS_REVIEW 错误码）:"
+curl -s "$BASE_URL/orders/$NEW_ORDER_NO" | python3 -m json.tool
+echo ""
+
+echo "=== 测试 8f: 状态不允许补证验证（NEEDS_REVIEW 错误码） ==="
+echo "对正常状态的处理单尝试补证:"
+curl -s -X POST "$BASE_URL/orders/supplement" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"request_id\": \"supplement-001\",
+    \"order_no\": \"$NEW_ORDER_NO\",
+    \"evidence\": \"解冻照片.jpg\",
+    \"submitted_by\": \"zhangsan\"
+  }" | python3 -m json.tool
 echo ""
 
 echo "=== 测试 9: 查看所有试剂状态 ==="

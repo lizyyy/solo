@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-24T13:50:03.444746+08:00",
+  "generated_at": "2026-05-24T15:59:13.794345+08:00",
   "reagents": [
     {
       "reagent": {
@@ -7,15 +7,15 @@
         "batch_no": "TRYPSIN-2024-001",
         "reagent_type": "胰酶",
         "status": "discarded",
-        "thawed_at": "2026-05-24T13:50:03+08:00",
+        "thawed_at": "2026-05-24T15:59:13+08:00",
         "thawed_by": "zhangsan",
         "project": "细胞培养A",
-        "expire_at": "2026-05-25T13:50:03+08:00",
-        "discarded_at": "2026-05-24T13:50:03+08:00",
+        "expire_at": "2026-05-25T15:59:13+08:00",
+        "discarded_at": "2026-05-24T15:59:13+08:00",
         "discarded_by": "zhangsan",
         "discard_reason": "发现污染",
-        "created_at": "2026-05-24T13:50:03+08:00",
-        "updated_at": "2026-05-24T13:50:03+08:00"
+        "created_at": "2026-05-24T15:59:13+08:00",
+        "updated_at": "2026-05-24T15:59:13+08:00"
       },
       "usage_records": null,
       "shared_projects": []
@@ -26,12 +26,12 @@
         "batch_no": "DMSO-2024-001",
         "reagent_type": "DMSO",
         "status": "in_use",
-        "thawed_at": "2026-05-24T13:50:02+08:00",
+        "thawed_at": "2026-05-24T15:59:12+08:00",
         "thawed_by": "zhangsan",
         "project": "细胞培养A",
-        "expire_at": "2026-05-25T13:50:02+08:00",
-        "created_at": "2026-05-24T13:50:02+08:00",
-        "updated_at": "2026-05-24T13:50:02+08:00"
+        "expire_at": "2026-05-25T15:59:12+08:00",
+        "created_at": "2026-05-24T15:59:12+08:00",
+        "updated_at": "2026-05-24T15:59:13+08:00"
       },
       "usage_records": [
         {
@@ -42,7 +42,7 @@
           "project": "细胞培养A",
           "volume": "10ml",
           "notes": "传代使用",
-          "used_at": "2026-05-24T13:50:02+08:00"
+          "used_at": "2026-05-24T15:59:13+08:00"
         },
         {
           "id": 2,
@@ -52,7 +52,7 @@
           "project": "细胞冻存B",
           "volume": "5ml",
           "notes": "冻存细胞使用",
-          "used_at": "2026-05-24T13:50:02+08:00"
+          "used_at": "2026-05-24T15:59:13+08:00"
         }
       ],
       "shared_projects": [
@@ -67,10 +67,43 @@
       "order_no": "THAW_EXCEPTION-20260524-0001",
       "batch_no": "DMSO-2024-001",
       "type": "THAW_EXCEPTION",
+      "status": "rejected",
+      "created_by": "zhangsan",
+      "reviewed_by": "wangwu",
+      "review_notes": "请提供解冻时间照片\n[reject wangwu]: 材料不符合要求",
+      "reviewed_at": "2026-05-24T15:59:13+08:00",
+      "needs_review": false,
+      "created_at": "2026-05-24T15:59:13+08:00",
+      "judgment_history": [
+        {
+          "id": 1,
+          "order_id": 1,
+          "order_no": "THAW_EXCEPTION-20260524-0001",
+          "judgment": "supplement",
+          "judged_by": "lisi",
+          "notes": "请提供解冻时间照片",
+          "judged_at": "2026-05-24T15:59:13+08:00"
+        },
+        {
+          "id": 2,
+          "order_id": 1,
+          "order_no": "THAW_EXCEPTION-20260524-0001",
+          "judgment": "reject",
+          "judged_by": "wangwu",
+          "notes": "材料不符合要求",
+          "judged_at": "2026-05-24T15:59:13+08:00"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "order_no": "USAGE_EXCEPTION-20260524-0001",
+      "batch_no": "DMSO-2024-001",
+      "type": "USAGE_EXCEPTION",
       "status": "needs_review",
       "created_by": "zhangsan",
       "needs_review": true,
-      "created_at": "2026-05-24T13:50:03+08:00"
+      "created_at": "2026-05-24T15:59:13+08:00"
     }
   ],
   "summary": {
@@ -81,6 +114,6 @@
     "expired_count": 0,
     "discarded_count": 1,
     "total_usage_records": 2,
-    "total_orders": 1
+    "total_orders": 2
   }
 }

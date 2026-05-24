@@ -215,8 +215,19 @@ func (h *Handler) ProcessJudgment(c *gin.Context) {
 	order, apiErr := h.orderService.ProcessJudgment(&req)
 	if apiErr != nil {
 		status := http.StatusBadRequest
-		if apiErr.Code == model.ErrCodeInvalidStatus {
+		switch apiErr.Code {
+		case model.ErrCodeInvalidStatus:
 			status = http.StatusConflict
+		case model.ErrCodeNeedsReview:
+			status = http.StatusConflict
+		}
+		if order != nil {
+			c.JSON(status, gin.H{
+				"success": false,
+				"data":    order,
+				"error":   apiErr,
+			})
+			return
 		}
 		c.JSON(status, apiErr)
 		return
@@ -242,8 +253,19 @@ func (h *Handler) ProcessSupplement(c *gin.Context) {
 	order, apiErr := h.orderService.ProcessSupplement(&req)
 	if apiErr != nil {
 		status := http.StatusBadRequest
-		if apiErr.Code == model.ErrCodeInvalidStatus {
+		switch apiErr.Code {
+		case model.ErrCodeInvalidStatus:
 			status = http.StatusConflict
+		case model.ErrCodeNeedsReview:
+			status = http.StatusConflict
+		}
+		if order != nil {
+			c.JSON(status, gin.H{
+				"success": false,
+				"data":    order,
+				"error":   apiErr,
+			})
+			return
 		}
 		c.JSON(status, apiErr)
 		return
@@ -267,6 +289,14 @@ func (h *Handler) GetOrder(c *gin.Context) {
 
 	order, apiErr := h.orderService.GetOrder(orderNo)
 	if apiErr != nil {
+		if apiErr.Code == model.ErrCodeNeedsReview {
+			c.JSON(http.StatusConflict, gin.H{
+				"success": false,
+				"data":    order,
+				"error":   apiErr,
+			})
+			return
+		}
 		c.JSON(http.StatusNotFound, apiErr)
 		return
 	}

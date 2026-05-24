@@ -22,10 +22,11 @@ func main() {
 	reagentRepo := database.NewReagentRepo(db.DB())
 	usageRepo := database.NewUsageRepo(db.DB())
 	orderRepo := database.NewOrderRepo(db.DB())
+	judgmentRepo := database.NewJudgmentRepo(db.DB())
 
 	reagentService := service.NewReagentService(cfg, reagentRepo, usageRepo, orderRepo)
-	orderService := service.NewOrderService(orderRepo, reagentRepo)
-	reportService := service.NewReportService(reagentRepo, usageRepo, orderRepo)
+	orderService := service.NewOrderService(orderRepo, judgmentRepo, reagentRepo)
+	reportService := service.NewReportService(reagentRepo, usageRepo, orderRepo, judgmentRepo)
 
 	h := handler.NewHandler(reagentService, orderService, reportService)
 

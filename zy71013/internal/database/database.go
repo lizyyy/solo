@@ -77,11 +77,25 @@ func (d *Database) initTables() error {
 			created_at DATETIME NOT NULL,
 			request_id TEXT UNIQUE
 		)`,
+		`CREATE TABLE IF NOT EXISTS judgment_history (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			order_id INTEGER NOT NULL,
+			order_no TEXT NOT NULL,
+			judgment TEXT NOT NULL,
+			judged_by TEXT NOT NULL,
+			notes TEXT,
+			judged_at DATETIME NOT NULL,
+			request_id TEXT UNIQUE,
+			FOREIGN KEY (order_id) REFERENCES processing_orders(id)
+		)`,
 		`CREATE INDEX IF NOT EXISTS idx_reagents_batch_no ON reagents(batch_no)`,
 		`CREATE INDEX IF NOT EXISTS idx_reagents_status ON reagents(status)`,
 		`CREATE INDEX IF NOT EXISTS idx_usage_records_batch_no ON usage_records(batch_no)`,
 		`CREATE INDEX IF NOT EXISTS idx_usage_records_request_id ON usage_records(request_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_processing_orders_order_no ON processing_orders(order_no)`,
+		`CREATE INDEX IF NOT EXISTS idx_judgment_history_order_id ON judgment_history(order_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_judgment_history_order_no ON judgment_history(order_no)`,
+		`CREATE INDEX IF NOT EXISTS idx_judgment_history_request_id ON judgment_history(request_id)`,
 	}
 
 	for _, schema := range schemas {
