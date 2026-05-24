@@ -22,9 +22,9 @@ public class AuditService {
         log.setBatchNo(batchNo);
         log.setAction(action);
         log.setOperator(operator);
-        log.setBeforeState(beforeState);
-        log.setAfterState(afterState);
-        log.setNote(note);
+        log.setBeforeState(beforeState != null ? beforeState : "");
+        log.setAfterState(afterState != null ? afterState : "");
+        log.setNote(note != null ? note : "");
         log.setIsDuplicate(isDuplicate);
         auditLogRepository.save(log);
     }

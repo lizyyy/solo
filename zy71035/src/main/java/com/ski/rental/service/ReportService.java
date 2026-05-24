@@ -139,16 +139,18 @@ public class ReportService {
         report.put("orderDetails", orderDetails);
 
         List<AuditLog> auditLogs = auditLogRepository.findByBatchNoOrderByCreatedAtDesc(batchNo);
-        report.put("auditTrail", auditLogs.stream().map(log -> Map.of(
-            "action", log.getAction(),
-            "orderNo", log.getOrderNo(),
-            "operator", log.getOperator(),
-            "beforeState", log.getBeforeState(),
-            "afterState", log.getAfterState(),
-            "note", log.getNote(),
-            "isDuplicate", log.getIsDuplicate(),
-            "createdAt", log.getCreatedAt()
-        )).toList());
+        report.put("auditTrail", auditLogs.stream().map(log -> {
+            Map<String, Object> auditMap = new HashMap<>();
+            auditMap.put("action", log.getAction());
+            auditMap.put("orderNo", log.getOrderNo());
+            auditMap.put("operator", log.getOperator());
+            auditMap.put("beforeState", log.getBeforeState());
+            auditMap.put("afterState", log.getAfterState());
+            auditMap.put("note", log.getNote());
+            auditMap.put("isDuplicate", log.getIsDuplicate());
+            auditMap.put("createdAt", log.getCreatedAt());
+            return auditMap;
+        }).toList());
 
         return ApiResponse.ok("批次报告导出成功", report);
     }
@@ -210,15 +212,17 @@ public class ReportService {
         }
 
         List<AuditLog> auditLogs = auditLogRepository.findByOrderNoOrderByCreatedAtDesc(orderNo);
-        detail.put("auditTrail", auditLogs.stream().map(log -> Map.of(
-            "action", log.getAction(),
-            "operator", log.getOperator(),
-            "beforeState", log.getBeforeState(),
-            "afterState", log.getAfterState(),
-            "note", log.getNote(),
-            "isDuplicate", log.getIsDuplicate(),
-            "createdAt", log.getCreatedAt()
-        )).toList());
+        detail.put("auditTrail", auditLogs.stream().map(log -> {
+            Map<String, Object> auditMap = new HashMap<>();
+            auditMap.put("action", log.getAction());
+            auditMap.put("operator", log.getOperator());
+            auditMap.put("beforeState", log.getBeforeState());
+            auditMap.put("afterState", log.getAfterState());
+            auditMap.put("note", log.getNote());
+            auditMap.put("isDuplicate", log.getIsDuplicate());
+            auditMap.put("createdAt", log.getCreatedAt());
+            return auditMap;
+        }).toList());
 
         return ApiResponse.ok("订单详情导出成功", detail);
     }
