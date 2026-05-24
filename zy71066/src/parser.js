@@ -2,8 +2,8 @@ class ChangelogParser {
   constructor() {
     this.versionRegex = /^##\s*\[?([^\]]+)\]?\s*(?:-\s*(.+))?$/;
     this.dateRegex = /\b(\d{4}[-/]\d{2}[-/]\d{2})\b/;
-    this.entryRegex = /^[-*+]\s+(.+)$/;
-    this.sectionRegex = /^###\s+(.+)$/;
+    this.entryRegex = /^([-*+]|\d+\.)\s+(.+)$/;
+    this.sectionRegex = /^###?\s+(.+)$/;
   }
 
   parse(content) {
@@ -36,7 +36,7 @@ class ChangelogParser {
 
       const entryMatch = line.match(this.entryRegex);
       if (entryMatch) {
-        const fullContent = this.collectFullContent(lines, i);
+        const fullContent = this.collectFullContent(lines, i, entryMatch[1]);
         entryIndex++;
 
         entries.push({
@@ -54,12 +54,17 @@ class ChangelogParser {
       }
     }
 
+    if (entries.length === 0) {
+      return this.parseUnstructured(content);
+    }
+
     return entries;
   }
 
-  collectFullContent(lines, startIndex) {
+  collectFullContent(lines, startIndex, listMarker) {
     const rawLines = [lines[startIndex]];
-    const contentLines = [lines[startIndex].replace(/^[-*+]\s+/, '')];
+    const markerRegex = new RegExp(`^${this.escapeRegex(listMarker)}\\s+`);
+    const contentLines = [lines[startIndex].replace(markerRegex, '')];
     let endIndex = startIndex;
 
     for (let i = startIndex + 1; i < lines.length; i++) {
@@ -74,11 +79,11 @@ class ChangelogParser {
         continue;
       }
 
-      if (/^[-*+]\s+/.test(line) || /^#{1,3}\s+/.test(line)) {
+      if (/^([-*+]|\d+\.)\s+/.test(line) || /^#{1,3}\s+/.test(line)) {
         break;
       }
 
-      if (/^\s{2,}/.test(line) || /^\s*\d+\.\s+/.test(line) || /^\s*[-*+]\s+/.test(line)) {
+      if (/^\s{2,}/.test(line)) {
         rawLines.push(line);
         contentLines.push(line.trim());
         endIndex = i;
@@ -101,6 +106,10 @@ class ChangelogParser {
     };
   }
 
+  escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   parseUnstructured(content) {
     const entries = [];
     const lines = content.split('\n');
@@ -109,22 +118,25 @@ class ChangelogParser {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
 
-      if (!line || /^#/.test(line)) continue;
+      if (!line) continue;
+      if (/^[=~-]+$/.test(line)) continue;
 
-      if (line.length > 5 && (line.length < 200 || /^[-*+]\s+/.test(line) || /^\d+\.\s+/.test(line))) {
-        entryIndex++;
-        const content = line.replace(/^[-*+]\s+/, '').replace(/^\d+\.\s+/, '');
+      if (line.length > 5 && line.length < 500) {
+        if (/^[a-z\u4e00-\u9fa5]/i.test(line) || /^\d+[\.、]/.test(line)) {
+          entryIndex++;
+          const content = line.replace(/^\d+[\.、]\s*/, '');
 
-        entries.push({
-          id: `entry-${entryIndex}`,
-          lineNumber: i + 1,
-          version: null,
-          date: null,
-          section: null,
-          content: content,
-          raw: line,
-          lines: [i + 1, i + 1]
-        });
+          entries.push({
+            id: `entry-${entryIndex}`,
+            lineNumber: i + 1,
+            version: null,
+            date: null,
+            section: null,
+            content: content,
+            raw: line,
+            lines: [i + 1, i + 1]
+          });
+        }
       }
     }
 

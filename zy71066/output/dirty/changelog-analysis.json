@@ -1,22 +1,36 @@
 {
   "meta": {
-    "generatedAt": "2026-05-24T11:52:20.371Z",
+    "generatedAt": "2026-05-24T14:15:30.779Z",
     "sourceFile": "examples/dirty-changelog.md",
-    "totalEntries": 9,
-    "totalTickets": 0,
+    "totalEntries": 11,
+    "totalTickets": 2,
     "entriesWithoutTickets": 9
   },
   "statistics": {
     "tickets": {
-      "total": 0,
-      "withTickets": 0,
+      "total": 2,
+      "withTickets": 2,
       "withoutTickets": 9
     },
     "modules": {
-      "frontend": {
+      "payment": {
+        "count": 1,
+        "entries": [
+          "entry-2"
+        ],
+        "owner": "李四 <lisi@example.com>"
+      },
+      "backend": {
         "count": 1,
         "entries": [
           "entry-6"
+        ],
+        "owner": "周八 <zhouba@example.com>"
+      },
+      "frontend": {
+        "count": 1,
+        "entries": [
+          "entry-8"
         ],
         "owner": "陈七 <chenqi@example.com>"
       }
@@ -27,25 +41,29 @@
         "entries": []
       },
       "medium": {
-        "count": 0,
-        "entries": []
+        "count": 3,
+        "entries": [
+          "entry-2",
+          "entry-6",
+          "entry-7"
+        ]
       },
       "low": {
-        "count": 0,
-        "entries": []
+        "count": 1,
+        "entries": [
+          "entry-8"
+        ]
       },
       "none": {
-        "count": 9,
+        "count": 7,
         "entries": [
           "entry-1",
-          "entry-2",
           "entry-3",
           "entry-4",
           "entry-5",
-          "entry-6",
-          "entry-7",
-          "entry-8",
-          "entry-9"
+          "entry-9",
+          "entry-10",
+          "entry-11"
         ]
       }
     }
@@ -53,6 +71,182 @@
   "entries": [
     {
       "id": "entry-1",
+      "lineNumber": 4,
+      "version": null,
+      "date": null,
+      "section": null,
+      "content": "用户可以用微信登录了 AUTH 2001",
+      "raw": "1. 用户可以用微信登录了 AUTH 2001",
+      "lines": [
+        4,
+        4
+      ],
+      "tickets": [
+        {
+          "type": "Generic",
+          "pattern": "fallback",
+          "matches": [
+            {
+              "id": "AUTH-2001",
+              "url": "https://jira.example.com/browse/AUTH-2001",
+              "position": 11,
+              "raw": "AUTH 2001",
+              "isGeneric": true
+            }
+          ]
+        }
+      ],
+      "ticketCount": 1,
+      "modules": {
+        "all": [
+          {
+            "name": "auth",
+            "score": 0.5,
+            "confidence": 0.2,
+            "matches": [
+              {
+                "keyword": "登录",
+                "position": 7,
+                "raw": "登录"
+              }
+            ],
+            "owner": "张三 <zhangsan@example.com>"
+          },
+          {
+            "name": "user",
+            "score": 0.5,
+            "confidence": 0.2,
+            "matches": [
+              {
+                "keyword": "用户",
+                "position": 0,
+                "raw": "用户"
+              }
+            ],
+            "owner": "王五 <wangwu@example.com>"
+          }
+        ],
+        "primary": [],
+        "isAmbiguous": true
+      },
+      "risk": {
+        "level": "none",
+        "score": 0,
+        "matches": {
+          "high": [],
+          "medium": [],
+          "low": []
+        },
+        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-2",
+      "lineNumber": 5,
+      "version": null,
+      "date": null,
+      "section": null,
+      "content": "支付接口重构，支持支付宝 PAY_3005",
+      "raw": "2. 支付接口重构，支持支付宝  PAY_3005\n",
+      "lines": [
+        5,
+        5
+      ],
+      "tickets": [
+        {
+          "type": "Generic",
+          "pattern": "fallback",
+          "matches": [
+            {
+              "id": "PAY-3005",
+              "url": "https://jira.example.com/browse/PAY-3005",
+              "position": 13,
+              "raw": "PAY_3005",
+              "isGeneric": true
+            }
+          ]
+        }
+      ],
+      "ticketCount": 1,
+      "modules": {
+        "all": [
+          {
+            "name": "payment",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "支付",
+                "position": 0,
+                "raw": "支付"
+              },
+              {
+                "keyword": "支付",
+                "position": 9,
+                "raw": "支付"
+              }
+            ],
+            "owner": "李四 <lisi@example.com>"
+          },
+          {
+            "name": "api",
+            "score": 0.5,
+            "confidence": 0.2,
+            "matches": [
+              {
+                "keyword": "接口",
+                "position": 2,
+                "raw": "接口"
+              }
+            ],
+            "owner": "赵六 <zhaoliu@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "payment",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "支付",
+                "position": 0,
+                "raw": "支付"
+              },
+              {
+                "keyword": "支付",
+                "position": 9,
+                "raw": "支付"
+              }
+            ],
+            "owner": "李四 <lisi@example.com>"
+          }
+        ],
+        "isAmbiguous": false
+      },
+      "risk": {
+        "level": "medium",
+        "score": 50,
+        "matches": {
+          "high": [],
+          "medium": [
+            {
+              "keyword": "重构",
+              "position": 4,
+              "raw": "重构",
+              "context": "支付接口重构，支持支付宝 PAY_3005",
+              "weight": 50
+            }
+          ],
+          "low": []
+        },
+        "explanation": "检测到中危关键词: 重构; 风险评分: 50",
+        "hasFalsePositiveWarning": false
+      }
+    },
+    {
+      "id": "entry-3",
       "lineNumber": 8,
       "version": null,
       "date": null,
@@ -66,7 +260,21 @@
       "tickets": [],
       "ticketCount": 0,
       "modules": {
-        "all": [],
+        "all": [
+          {
+            "name": "auth",
+            "score": 0.5,
+            "confidence": 0.2,
+            "matches": [
+              {
+                "keyword": "登录",
+                "position": 0,
+                "raw": "登录"
+              }
+            ],
+            "owner": "张三 <zhangsan@example.com>"
+          }
+        ],
         "primary": [],
         "isAmbiguous": false
       },
@@ -83,7 +291,7 @@
       }
     },
     {
-      "id": "entry-2",
+      "id": "entry-4",
       "lineNumber": 9,
       "version": null,
       "date": null,
@@ -114,7 +322,7 @@
       }
     },
     {
-      "id": "entry-3",
+      "id": "entry-5",
       "lineNumber": 10,
       "version": null,
       "date": null,
@@ -145,7 +353,7 @@
       }
     },
     {
-      "id": "entry-4",
+      "id": "entry-6",
       "lineNumber": 13,
       "version": null,
       "date": null,
@@ -159,24 +367,67 @@
       "tickets": [],
       "ticketCount": 0,
       "modules": {
-        "all": [],
-        "primary": [],
+        "all": [
+          {
+            "name": "backend",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "数据库",
+                "position": 0,
+                "raw": "数据库"
+              }
+            ],
+            "owner": "周八 <zhouba@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "backend",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "数据库",
+                "position": 0,
+                "raw": "数据库"
+              }
+            ],
+            "owner": "周八 <zhouba@example.com>"
+          }
+        ],
         "isAmbiguous": false
       },
       "risk": {
-        "level": "none",
-        "score": 0,
+        "level": "medium",
+        "score": 100,
         "matches": {
           "high": [],
-          "medium": [],
+          "medium": [
+            {
+              "keyword": "迁移",
+              "position": 3,
+              "raw": "迁移",
+              "context": "数据库迁移脚本更新，可能影响性能",
+              "weight": 50
+            },
+            {
+              "keyword": "性能",
+              "position": 14,
+              "raw": "性能",
+              "context": "数据库迁移脚本更新，可能影响性能",
+              "weight": 50
+            }
+          ],
           "low": []
         },
-        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "explanation": "检测到中危关键词: 迁移, 性能; 风险评分: 100",
         "hasFalsePositiveWarning": false
       }
     },
     {
-      "id": "entry-5",
+      "id": "entry-7",
       "lineNumber": 14,
       "version": null,
       "date": null,
@@ -195,19 +446,34 @@
         "isAmbiguous": false
       },
       "risk": {
-        "level": "none",
-        "score": 0,
+        "level": "medium",
+        "score": 100,
         "matches": {
           "high": [],
-          "medium": [],
+          "medium": [
+            {
+              "keyword": "升级",
+              "position": 0,
+              "raw": "升级",
+              "context": "升级 node 版本到 18，兼容问题待验证",
+              "weight": 50
+            },
+            {
+              "keyword": "兼容",
+              "position": 15,
+              "raw": "兼容",
+              "context": "升级 node 版本到 18，兼容问题待验证",
+              "weight": 50
+            }
+          ],
           "low": []
         },
-        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "explanation": "检测到中危关键词: 升级, 兼容; 风险评分: 100",
         "hasFalsePositiveWarning": false
       }
     },
     {
-      "id": "entry-6",
+      "id": "entry-8",
       "lineNumber": 15,
       "version": null,
       "date": null,
@@ -224,9 +490,24 @@
         "all": [
           {
             "name": "frontend",
-            "score": 2,
-            "confidence": 0.6000000000000001,
+            "score": 3.5,
+            "confidence": 1,
             "matches": [
+              {
+                "keyword": "前端",
+                "position": 0,
+                "raw": "前端"
+              },
+              {
+                "keyword": "页面",
+                "position": 2,
+                "raw": "页面"
+              },
+              {
+                "keyword": "样式",
+                "position": 4,
+                "raw": "样式"
+              },
               {
                 "keyword": "vue",
                 "position": 9,
@@ -244,9 +525,24 @@
         "primary": [
           {
             "name": "frontend",
-            "score": 2,
-            "confidence": 0.6000000000000001,
+            "score": 3.5,
+            "confidence": 1,
             "matches": [
+              {
+                "keyword": "前端",
+                "position": 0,
+                "raw": "前端"
+              },
+              {
+                "keyword": "页面",
+                "position": 2,
+                "raw": "页面"
+              },
+              {
+                "keyword": "样式",
+                "position": 4,
+                "raw": "样式"
+              },
               {
                 "keyword": "vue",
                 "position": 9,
@@ -264,19 +560,27 @@
         "isAmbiguous": false
       },
       "risk": {
-        "level": "none",
-        "score": 0,
+        "level": "low",
+        "score": 10,
         "matches": {
           "high": [],
           "medium": [],
-          "low": []
+          "low": [
+            {
+              "keyword": "调整",
+              "position": 6,
+              "raw": "调整",
+              "context": "前端页面样式调整，vue 和 react 都改了",
+              "weight": 10
+            }
+          ]
         },
-        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "explanation": "检测到低危关键词: 调整; 风险评分: 10",
         "hasFalsePositiveWarning": false
       }
     },
     {
-      "id": "entry-7",
+      "id": "entry-9",
       "lineNumber": 25,
       "version": null,
       "date": null,
@@ -307,7 +611,7 @@
       }
     },
     {
-      "id": "entry-8",
+      "id": "entry-10",
       "lineNumber": 26,
       "version": null,
       "date": null,
@@ -338,7 +642,7 @@
       }
     },
     {
-      "id": "entry-9",
+      "id": "entry-11",
       "lineNumber": 27,
       "version": null,
       "date": null,

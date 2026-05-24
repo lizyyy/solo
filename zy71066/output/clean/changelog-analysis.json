@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2026-05-24T11:52:20.284Z",
+    "generatedAt": "2026-05-24T14:15:30.700Z",
     "sourceFile": "examples/clean-changelog.md",
     "totalEntries": 17,
     "totalTickets": 10,
@@ -13,19 +13,44 @@
       "withoutTickets": 8
     },
     "modules": {
-      "mobile": {
-        "count": 1,
-        "entries": [
-          "entry-4"
-        ],
-        "owner": "吴九 <wujiu@example.com>"
-      },
       "auth": {
-        "count": 1,
+        "count": 2,
         "entries": [
+          "entry-1",
           "entry-7"
         ],
         "owner": "张三 <zhangsan@example.com>"
+      },
+      "payment": {
+        "count": 2,
+        "entries": [
+          "entry-2",
+          "entry-6"
+        ],
+        "owner": "李四 <lisi@example.com>"
+      },
+      "mobile": {
+        "count": 3,
+        "entries": [
+          "entry-2",
+          "entry-4",
+          "entry-16"
+        ],
+        "owner": "吴九 <wujiu@example.com>"
+      },
+      "user": {
+        "count": 1,
+        "entries": [
+          "entry-3"
+        ],
+        "owner": "王五 <wangwu@example.com>"
+      },
+      "backend": {
+        "count": 1,
+        "entries": [
+          "entry-8"
+        ],
+        "owner": "周八 <zhouba@example.com>"
       },
       "api": {
         "count": 1,
@@ -33,6 +58,13 @@
           "entry-9"
         ],
         "owner": "赵六 <zhaoliu@example.com>"
+      },
+      "frontend": {
+        "count": 1,
+        "entries": [
+          "entry-10"
+        ],
+        "owner": "陈七 <chenqi@example.com>"
       }
     },
     "risk": {
@@ -41,15 +73,20 @@
         "entries": []
       },
       "medium": {
-        "count": 0,
-        "entries": []
+        "count": 1,
+        "entries": [
+          "entry-8"
+        ]
       },
       "low": {
-        "count": 0,
-        "entries": []
+        "count": 2,
+        "entries": [
+          "entry-9",
+          "entry-10"
+        ]
       },
       "none": {
-        "count": 17,
+        "count": 14,
         "entries": [
           "entry-1",
           "entry-2",
@@ -58,9 +95,6 @@
           "entry-5",
           "entry-6",
           "entry-7",
-          "entry-8",
-          "entry-9",
-          "entry-10",
           "entry-11",
           "entry-12",
           "entry-13",
@@ -101,8 +135,59 @@
       ],
       "ticketCount": 1,
       "modules": {
-        "all": [],
-        "primary": [],
+        "all": [
+          {
+            "name": "auth",
+            "score": 1,
+            "confidence": 0.4,
+            "matches": [
+              {
+                "keyword": "登录",
+                "position": 21,
+                "raw": "登录"
+              },
+              {
+                "keyword": "认证",
+                "position": 4,
+                "raw": "认证"
+              }
+            ],
+            "owner": "张三 <zhangsan@example.com>"
+          },
+          {
+            "name": "user",
+            "score": 0.5,
+            "confidence": 0.2,
+            "matches": [
+              {
+                "keyword": "用户",
+                "position": 2,
+                "raw": "用户"
+              }
+            ],
+            "owner": "王五 <wangwu@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "auth",
+            "score": 1,
+            "confidence": 0.4,
+            "matches": [
+              {
+                "keyword": "登录",
+                "position": 21,
+                "raw": "登录"
+              },
+              {
+                "keyword": "认证",
+                "position": 4,
+                "raw": "认证"
+              }
+            ],
+            "owner": "张三 <zhangsan@example.com>"
+          }
+        ],
         "isAmbiguous": false
       },
       "risk": {
@@ -151,9 +236,73 @@
       ],
       "ticketCount": 2,
       "modules": {
-        "all": [],
-        "primary": [],
-        "isAmbiguous": false
+        "all": [
+          {
+            "name": "payment",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "支付",
+                "position": 0,
+                "raw": "支付"
+              },
+              {
+                "keyword": "支付",
+                "position": 11,
+                "raw": "支付"
+              }
+            ],
+            "owner": "李四 <lisi@example.com>"
+          },
+          {
+            "name": "mobile",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "小程序",
+                "position": 8,
+                "raw": "小程序"
+              }
+            ],
+            "owner": "吴九 <wujiu@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "payment",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "支付",
+                "position": 0,
+                "raw": "支付"
+              },
+              {
+                "keyword": "支付",
+                "position": 11,
+                "raw": "支付"
+              }
+            ],
+            "owner": "李四 <lisi@example.com>"
+          },
+          {
+            "name": "mobile",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "小程序",
+                "position": 8,
+                "raw": "小程序"
+              }
+            ],
+            "owner": "吴九 <wujiu@example.com>"
+          }
+        ],
+        "isAmbiguous": true
       },
       "risk": {
         "level": "none",
@@ -195,8 +344,36 @@
       ],
       "ticketCount": 1,
       "modules": {
-        "all": [],
-        "primary": [],
+        "all": [
+          {
+            "name": "user",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "个人中心",
+                "position": 0,
+                "raw": "个人中心"
+              }
+            ],
+            "owner": "王五 <wangwu@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "user",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "个人中心",
+                "position": 0,
+                "raw": "个人中心"
+              }
+            ],
+            "owner": "王五 <wangwu@example.com>"
+          }
+        ],
         "isAmbiguous": false
       },
       "risk": {
@@ -242,9 +419,14 @@
         "all": [
           {
             "name": "mobile",
-            "score": 1,
-            "confidence": 0.30000000000000004,
+            "score": 2,
+            "confidence": 0.6000000000000001,
             "matches": [
+              {
+                "keyword": "移动端",
+                "position": 0,
+                "raw": "移动端"
+              },
               {
                 "keyword": "app",
                 "position": 4,
@@ -257,9 +439,14 @@
         "primary": [
           {
             "name": "mobile",
-            "score": 1,
-            "confidence": 0.30000000000000004,
+            "score": 2,
+            "confidence": 0.6000000000000001,
             "matches": [
+              {
+                "keyword": "移动端",
+                "position": 0,
+                "raw": "移动端"
+              },
               {
                 "keyword": "app",
                 "position": 4,
@@ -311,9 +498,36 @@
       ],
       "ticketCount": 1,
       "modules": {
-        "all": [],
+        "all": [
+          {
+            "name": "auth",
+            "score": 0.5,
+            "confidence": 0.2,
+            "matches": [
+              {
+                "keyword": "登录",
+                "position": 2,
+                "raw": "登录"
+              }
+            ],
+            "owner": "张三 <zhangsan@example.com>"
+          },
+          {
+            "name": "frontend",
+            "score": 0.5,
+            "confidence": 0.2,
+            "matches": [
+              {
+                "keyword": "页面",
+                "position": 4,
+                "raw": "页面"
+              }
+            ],
+            "owner": "陈七 <chenqi@example.com>"
+          }
+        ],
         "primary": [],
-        "isAmbiguous": false
+        "isAmbiguous": true
       },
       "risk": {
         "level": "none",
@@ -355,8 +569,46 @@
       ],
       "ticketCount": 1,
       "modules": {
-        "all": [],
-        "primary": [],
+        "all": [
+          {
+            "name": "payment",
+            "score": 1,
+            "confidence": 0.4,
+            "matches": [
+              {
+                "keyword": "订单",
+                "position": 2,
+                "raw": "订单"
+              },
+              {
+                "keyword": "退款",
+                "position": 9,
+                "raw": "退款"
+              }
+            ],
+            "owner": "李四 <lisi@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "payment",
+            "score": 1,
+            "confidence": 0.4,
+            "matches": [
+              {
+                "keyword": "订单",
+                "position": 2,
+                "raw": "订单"
+              },
+              {
+                "keyword": "退款",
+                "position": 9,
+                "raw": "退款"
+              }
+            ],
+            "owner": "李四 <lisi@example.com>"
+          }
+        ],
         "isAmbiguous": false
       },
       "risk": {
@@ -458,19 +710,63 @@
       "tickets": [],
       "ticketCount": 0,
       "modules": {
-        "all": [],
-        "primary": [],
+        "all": [
+          {
+            "name": "backend",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "数据库",
+                "position": 2,
+                "raw": "数据库"
+              }
+            ],
+            "owner": "周八 <zhouba@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "backend",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "数据库",
+                "position": 2,
+                "raw": "数据库"
+              }
+            ],
+            "owner": "周八 <zhouba@example.com>"
+          }
+        ],
         "isAmbiguous": false
       },
       "risk": {
-        "level": "none",
-        "score": 0,
+        "level": "medium",
+        "score": 60,
         "matches": {
           "high": [],
-          "medium": [],
-          "low": []
+          "medium": [
+            {
+              "keyword": "性能",
+              "position": 7,
+              "raw": "性能",
+              "context": "优化数据库查询性能，响应时间提升 50%",
+              "weight": 50
+            }
+          ],
+          "low": [
+            {
+              "keyword": "优化",
+              "position": 0,
+              "raw": "优化",
+              "context": "优化数据库查询性能，响应时间提升 50%",
+              "weight": 10
+            }
+          ]
         },
-        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "explanation": "检测到中危关键词: 性能; 风险评分: 60",
         "hasFalsePositiveWarning": false
       }
     },
@@ -492,13 +788,23 @@
         "all": [
           {
             "name": "api",
-            "score": 1,
-            "confidence": 0.30000000000000004,
+            "score": 2.5,
+            "confidence": 0.8,
             "matches": [
+              {
+                "keyword": "接口",
+                "position": 7,
+                "raw": "接口"
+              },
               {
                 "keyword": "api",
                 "position": 3,
                 "raw": "API"
+              },
+              {
+                "keyword": "接口文档",
+                "position": 7,
+                "raw": "接口文档"
               }
             ],
             "owner": "赵六 <zhaoliu@example.com>"
@@ -507,13 +813,23 @@
         "primary": [
           {
             "name": "api",
-            "score": 1,
-            "confidence": 0.30000000000000004,
+            "score": 2.5,
+            "confidence": 0.8,
             "matches": [
+              {
+                "keyword": "接口",
+                "position": 7,
+                "raw": "接口"
+              },
               {
                 "keyword": "api",
                 "position": 3,
                 "raw": "API"
+              },
+              {
+                "keyword": "接口文档",
+                "position": 7,
+                "raw": "接口文档"
               }
             ],
             "owner": "赵六 <zhaoliu@example.com>"
@@ -522,14 +838,22 @@
         "isAmbiguous": false
       },
       "risk": {
-        "level": "none",
-        "score": 0,
+        "level": "low",
+        "score": 10,
         "matches": {
           "high": [],
           "medium": [],
-          "low": []
+          "low": [
+            {
+              "keyword": "完善",
+              "position": 0,
+              "raw": "完善",
+              "context": "完善 API 接口文档，补充错误码说明",
+              "weight": 10
+            }
+          ]
         },
-        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "explanation": "检测到低危关键词: 完善; 风险评分: 10",
         "hasFalsePositiveWarning": false
       }
     },
@@ -548,19 +872,88 @@
       "tickets": [],
       "ticketCount": 0,
       "modules": {
-        "all": [],
-        "primary": [],
+        "all": [
+          {
+            "name": "frontend",
+            "score": 1.5,
+            "confidence": 0.6000000000000001,
+            "matches": [
+              {
+                "keyword": "前端",
+                "position": 0,
+                "raw": "前端"
+              },
+              {
+                "keyword": "页面",
+                "position": 2,
+                "raw": "页面"
+              },
+              {
+                "keyword": "样式",
+                "position": 4,
+                "raw": "样式"
+              }
+            ],
+            "owner": "陈七 <chenqi@example.com>"
+          },
+          {
+            "name": "user",
+            "score": 0.5,
+            "confidence": 0.2,
+            "matches": [
+              {
+                "keyword": "用户",
+                "position": 11,
+                "raw": "用户"
+              }
+            ],
+            "owner": "王五 <wangwu@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "frontend",
+            "score": 1.5,
+            "confidence": 0.6000000000000001,
+            "matches": [
+              {
+                "keyword": "前端",
+                "position": 0,
+                "raw": "前端"
+              },
+              {
+                "keyword": "页面",
+                "position": 2,
+                "raw": "页面"
+              },
+              {
+                "keyword": "样式",
+                "position": 4,
+                "raw": "样式"
+              }
+            ],
+            "owner": "陈七 <chenqi@example.com>"
+          }
+        ],
         "isAmbiguous": false
       },
       "risk": {
-        "level": "none",
-        "score": 0,
+        "level": "low",
+        "score": 10,
         "matches": {
           "high": [],
           "medium": [],
-          "low": []
+          "low": [
+            {
+              "keyword": "优化",
+              "position": 6,
+              "raw": "优化",
+              "context": "前端页面样式优化，提升用户体验",
+              "weight": 10
+            }
+          ]
         },
-        "explanation": "未检测到风险关键词; 风险评分: 0",
+        "explanation": "检测到低危关键词: 优化; 风险评分: 10",
         "hasFalsePositiveWarning": false
       }
     },
@@ -685,7 +1078,21 @@
       ],
       "ticketCount": 1,
       "modules": {
-        "all": [],
+        "all": [
+          {
+            "name": "payment",
+            "score": 0.5,
+            "confidence": 0.2,
+            "matches": [
+              {
+                "keyword": "订单",
+                "position": 2,
+                "raw": "订单"
+              }
+            ],
+            "owner": "李四 <lisi@example.com>"
+          }
+        ],
         "primary": [],
         "isAmbiguous": false
       },
@@ -716,7 +1123,21 @@
       "tickets": [],
       "ticketCount": 0,
       "modules": {
-        "all": [],
+        "all": [
+          {
+            "name": "user",
+            "score": 0.5,
+            "confidence": 0.2,
+            "matches": [
+              {
+                "keyword": "用户",
+                "position": 2,
+                "raw": "用户"
+              }
+            ],
+            "owner": "王五 <wangwu@example.com>"
+          }
+        ],
         "primary": [],
         "isAmbiguous": false
       },
@@ -750,9 +1171,47 @@
         "all": [
           {
             "name": "mobile",
+            "score": 1.5,
+            "confidence": 0.5,
+            "matches": [
+              {
+                "keyword": "移动端",
+                "position": 2,
+                "raw": "移动端"
+              },
+              {
+                "keyword": "h5",
+                "position": 6,
+                "raw": "H5"
+              }
+            ],
+            "owner": "吴九 <wujiu@example.com>"
+          },
+          {
+            "name": "frontend",
             "score": 0.5,
             "confidence": 0.2,
             "matches": [
+              {
+                "keyword": "页面",
+                "position": 9,
+                "raw": "页面"
+              }
+            ],
+            "owner": "陈七 <chenqi@example.com>"
+          }
+        ],
+        "primary": [
+          {
+            "name": "mobile",
+            "score": 1.5,
+            "confidence": 0.5,
+            "matches": [
+              {
+                "keyword": "移动端",
+                "position": 2,
+                "raw": "移动端"
+              },
               {
                 "keyword": "h5",
                 "position": 6,
@@ -762,7 +1221,6 @@
             "owner": "吴九 <wujiu@example.com>"
           }
         ],
-        "primary": [],
         "isAmbiguous": false
       },
       "risk": {

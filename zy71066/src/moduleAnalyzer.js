@@ -11,11 +11,21 @@ class ModuleAnalyzer {
     for (const [moduleName, keywords] of Object.entries(this.moduleConfig)) {
       patterns[moduleName] = keywords.map(keyword => ({
         keyword,
-        regex: new RegExp(`\\b${this.escapeRegex(keyword)}\\b`, 'gi'),
+        regex: this.createKeywordRegex(keyword),
         weight: keyword.length > 2 ? 1 : 0.5
       }));
     }
     return patterns;
+  }
+
+  createKeywordRegex(keyword) {
+    const escaped = this.escapeRegex(keyword);
+
+    if (/[\u4e00-\u9fa5]/.test(keyword)) {
+      return new RegExp(escaped, 'gi');
+    } else {
+      return new RegExp(`\\b${escaped}\\b`, 'gi');
+    }
   }
 
   escapeRegex(string) {
@@ -124,7 +134,7 @@ class ModuleAnalyzer {
     this.moduleConfig[name] = keywords;
     this.compiledPatterns[name] = keywords.map(keyword => ({
       keyword,
-      regex: new RegExp(`\\b${this.escapeRegex(keyword)}\\b`, 'gi'),
+      regex: this.createKeywordRegex(keyword),
       weight: keyword.length > 2 ? 1 : 0.5
     }));
   }

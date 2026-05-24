@@ -15,12 +15,22 @@ class RiskAnalyzer {
       const keywords = this.riskConfig.keywords?.[level] || [];
       result[level] = keywords.map(keyword => ({
         keyword,
-        regex: new RegExp(`\\b${this.escapeRegex(keyword)}\\b`, 'gi'),
+        regex: this.createKeywordRegex(keyword),
         weight: this.riskConfig.levels?.[level]?.weight || (level === 'high' ? 100 : level === 'medium' ? 50 : 10)
       }));
     }
 
     return result;
+  }
+
+  createKeywordRegex(keyword) {
+    const escaped = this.escapeRegex(keyword);
+
+    if (/[\u4e00-\u9fa5]/.test(keyword)) {
+      return new RegExp(escaped, 'gi');
+    } else {
+      return new RegExp(`\\b${escaped}\\b`, 'gi');
+    }
   }
 
   escapeRegex(string) {
@@ -192,7 +202,7 @@ class RiskAnalyzer {
 
     this.compiledKeywords[level].push({
       keyword,
-      regex: new RegExp(`\\b${this.escapeRegex(keyword)}\\b`, 'gi'),
+      regex: this.createKeywordRegex(keyword),
       weight: weight || defaultWeight
     });
   }
