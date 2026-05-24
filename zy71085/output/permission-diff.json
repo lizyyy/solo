@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generatedAt": "2026-05-24T15:44:48.895Z",
+    "generatedAt": "2026-05-24T15:55:42.364Z",
     "tool": "android-permission-diff",
     "version": "1.0.0"
   },
@@ -90,16 +90,9 @@
           "key": "UNKNOWN"
         },
         "obfuscated": false,
-        "sources": [
-          {
-            "type": "module",
-            "name": "feature-media",
-            "direct": true,
-            "viaFeature": null
-          }
-        ],
-        "sourceType": "module",
-        "confidence": 0.7
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
       },
       {
         "name": "android.permission.READ_MEDIA_VIDEO",
@@ -113,16 +106,9 @@
           "key": "UNKNOWN"
         },
         "obfuscated": false,
-        "sources": [
-          {
-            "type": "module",
-            "name": "feature-media",
-            "direct": true,
-            "viaFeature": null
-          }
-        ],
-        "sourceType": "module",
-        "confidence": 0.7
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
       },
       {
         "name": "android.permission.CAMERA",
@@ -136,28 +122,9 @@
           "key": "CRITICAL"
         },
         "obfuscated": false,
-        "sources": [
-          {
-            "type": "module",
-            "name": "feature-camera",
-            "direct": true,
-            "viaFeature": null
-          },
-          {
-            "type": "module",
-            "name": "feature-camera",
-            "direct": false,
-            "viaFeature": "android.hardware.camera"
-          },
-          {
-            "type": "module",
-            "name": "feature-camera",
-            "direct": false,
-            "viaFeature": "android.hardware.camera.autofocus"
-          }
-        ],
-        "sourceType": "module",
-        "confidence": 0.9
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
       },
       {
         "name": "android.permission.RECORD_AUDIO",
@@ -187,22 +154,9 @@
           "key": "CRITICAL"
         },
         "obfuscated": false,
-        "sources": [
-          {
-            "type": "module",
-            "name": "feature-location",
-            "direct": true,
-            "viaFeature": null
-          },
-          {
-            "type": "module",
-            "name": "feature-location",
-            "direct": false,
-            "viaFeature": "android.hardware.location.gps"
-          }
-        ],
-        "sourceType": "module",
-        "confidence": 0.8
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
       },
       {
         "name": "android.permission.ACCESS_COARSE_LOCATION",
@@ -216,16 +170,9 @@
           "key": "MEDIUM"
         },
         "obfuscated": false,
-        "sources": [
-          {
-            "type": "module",
-            "name": "feature-location",
-            "direct": true,
-            "viaFeature": null
-          }
-        ],
-        "sourceType": "module",
-        "confidence": 0.7
+        "sources": [],
+        "sourceType": "unknown",
+        "confidence": 0
       },
       {
         "name": "android.permission.POST_NOTIFICATIONS",
@@ -539,58 +486,7 @@
       }
     ]
   },
-  "sources": {
-    "summary": {
-      "totalOld": 7,
-      "totalNew": 12,
-      "addedCount": 7,
-      "removedCount": 2,
-      "changedCount": 0,
-      "unchangedCount": 5,
-      "risk": {
-        "addedByLevel": {
-          "CRITICAL": 3,
-          "HIGH": 0,
-          "MEDIUM": 1,
-          "LOW": 0,
-          "UNKNOWN": 3
-        },
-        "removedByLevel": {
-          "CRITICAL": 0,
-          "HIGH": 2,
-          "MEDIUM": 0,
-          "LOW": 0,
-          "UNKNOWN": 0
-        },
-        "highestAddedRisk": {
-          "level": 0,
-          "name": "严重",
-          "key": "CRITICAL",
-          "color": "red",
-          "description": "涉及隐私或安全的高危权限，可能导致严重安全事件",
-          "known": true
-        },
-        "hasCriticalAdded": true,
-        "hasHighAdded": true
-      },
-      "withSources": 5,
-      "withoutSources": 2
-    },
-    "injected": {
-      "count": 2,
-      "likelyFromLibraries": 0,
-      "permissions": [
-        {
-          "permission": "android.permission.RECORD_AUDIO",
-          "likelyFromLibrary": false
-        },
-        {
-          "permission": "android.permission.POST_NOTIFICATIONS",
-          "likelyFromLibrary": false
-        }
-      ]
-    }
-  },
+  "sources": null,
   "obfuscated": {
     "hasObfuscated": false,
     "added": [],

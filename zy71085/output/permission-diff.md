@@ -1,6 +1,6 @@
 # Android 权限差异分析报告
 
-> 生成时间: 2026/5/24 23:44:48
+> 生成时间: 2026/5/24 23:55:42
 > 工具版本: 1.0.0
 
 ## 📱 应用信息
@@ -35,13 +35,13 @@
 
 | 权限名称 | 风险等级 | 权限组 | 来源 | 置信度 | 说明 |
 |----------|----------|--------|------|--------|------|
-| android.permission.ACCESS_COARSE_LOCATION | 🟡 中 | 位置信息 | feature-location | 70% | 普通权限，存在一定安全风险 |
-| android.permission.READ_MEDIA_IMAGES | ⚪ 未知 | - | feature-media | 70% | 未知权限，需要人工评估 |
-| android.permission.READ_MEDIA_VIDEO | ⚪ 未知 | - | feature-media | 70% | 未知权限，需要人工评估 |
-| android.permission.CAMERA | 🔴 严重 | 相机 | feature-camera, feature-camera | 90% | 涉及隐私或安全的高危权限，可能导致严重安全事件 |
-| android.permission.RECORD_AUDIO | 🔴 严重 | 麦克风 | 未知 | 0% | 涉及隐私或安全的高危权限，可能导致严重安全事件 |
-| android.permission.ACCESS_FINE_LOCATION | 🔴 严重 | 位置信息 | feature-location, feature-location | 80% | 涉及隐私或安全的高危权限，可能导致严重安全事件 |
-| android.permission.POST_NOTIFICATIONS | ⚪ 未知 | - | 未知 | 0% | 未知权限，需要人工评估 |
+| android.permission.ACCESS_COARSE_LOCATION | 🟡 中 | 位置信息 | undefined | - | 普通权限，存在一定安全风险 |
+| android.permission.READ_MEDIA_IMAGES | ⚪ 未知 | - | undefined | - | 未知权限，需要人工评估 |
+| android.permission.READ_MEDIA_VIDEO | ⚪ 未知 | - | undefined | - | 未知权限，需要人工评估 |
+| android.permission.CAMERA | 🔴 严重 | 相机 | undefined | - | 涉及隐私或安全的高危权限，可能导致严重安全事件 |
+| android.permission.RECORD_AUDIO | 🔴 严重 | 麦克风 | undefined | - | 涉及隐私或安全的高危权限，可能导致严重安全事件 |
+| android.permission.ACCESS_FINE_LOCATION | 🔴 严重 | 位置信息 | undefined | - | 涉及隐私或安全的高危权限，可能导致严重安全事件 |
+| android.permission.POST_NOTIFICATIONS | ⚪ 未知 | - | undefined | - | 未知权限，需要人工评估 |
 
 ## ➖ 移除权限详情
 
@@ -68,19 +68,6 @@
 | 麦克风 | 0 | 1 | 1 | 0 |
 | 位置信息 | 0 | 2 | 2 | 0 |
 | 存储 | 2 | 0 | 0 | 2 |
-
-## 🔍 权限来源分析
-
-- **可溯源权限**: 5 个
-- **未知来源权限**: 2 个
-- **可能来自第三方库**: 0 个
-
-### 可能由第三方库注入的权限
-
-| 权限名称 | 可能来自库 |
-|----------|------------|
-| android.permission.RECORD_AUDIO | 可能 |
-| android.permission.POST_NOTIFICATIONS | 可能 |
 
 ## 💡 安全建议
 

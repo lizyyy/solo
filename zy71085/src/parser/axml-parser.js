@@ -47,6 +47,7 @@ class AxmlParser {
     this.resourceIds = []
     this.manifest = { $: {} }
     this.elementStack = [this.manifest]
+    this.firstManifestTag = true
   }
 
   readInt32 () {
@@ -67,27 +68,12 @@ class AxmlParser {
     return value
   }
 
-  peekInt32 () {
-    return this.buffer.readUInt32LE(this.offset)
-  }
-
-  parseString (length) {
-    let str = ''
-    for (let i = 0; i < length; i++) {
-      const charCode = this.buffer.readUInt16LE(this.offset + i * 2)
-      if (charCode === 0) break
-      str += String.fromCharCode(charCode)
-    }
-    return str
-  }
-
-  parseStringPool (chunkSize) {
-    const startOffset = this.offset
+  parseStringPool () {
     const stringCount = this.readInt32()
     const styleCount = this.readInt32()
     const flags = this.readInt32()
     const stringsStart = this.readInt32()
-    const stylesStart = this.readInt32()
+    this.readInt32()
 
     const stringOffsets = []
     for (let i = 0; i < stringCount; i++) {
@@ -95,77 +81,69 @@ class AxmlParser {
     }
 
     const isUtf8 = (flags & 0x100) !== 0
-    const stringsBase = startOffset + stringsStart
+    const stringsBase = this.offset - (stringCount * 4 + 20) + stringsStart
 
     for (let i = 0; i < stringCount; i++) {
       const strOffset = stringsBase + stringOffsets[i]
-      let str
+      let str = ''
 
-      if (isUtf8) {
-        let len = this.buffer.readUInt8(strOffset)
-        if (len & 0x80) {
-          len = ((len & 0x7F) << 8) | this.buffer.readUInt8(strOffset + 1)
+      try {
+        if (isUtf8) {
+          let len = this.buffer.readUInt8(strOffset)
+          if (len & 0x80) {
+            len = ((len & 0x7F) << 8) | this.buffer.readUInt8(strOffset + 1)
+          }
+          str = this.buffer.toString('utf8', strOffset + 2, strOffset + 2 + len)
+        } else {
+          let len = this.buffer.readUInt16LE(strOffset)
+          if (len & 0x8000) {
+            len = ((len & 0x7FFF) << 16) | this.buffer.readUInt16LE(strOffset + 2)
+          }
+          for (let j = 0; j < len; j++) {
+            const charCode = this.buffer.readUInt16LE(strOffset + 2 + j * 2)
+            str += String.fromCharCode(charCode)
+          }
         }
-        str = this.buffer.toString('utf8', strOffset + 2, strOffset + 2 + len)
-      } else {
-        let len = this.buffer.readUInt16LE(strOffset)
-        if (len & 0x8000) {
-          len = ((len & 0x7FFF) << 16) | this.buffer.readUInt16LE(strOffset + 2)
-        }
+      } catch (e) {
         str = ''
-        for (let j = 0; j < len; j++) {
-          const charCode = this.buffer.readUInt16LE(strOffset + 2 + j * 2)
-          str += String.fromCharCode(charCode)
-        }
       }
-      this.stringPool.push(str)
+      this.stringPool.push(str || '')
     }
-
-    this.offset = startOffset + chunkSize
   }
 
-  parseResourceMap (chunkSize) {
-    const startOffset = this.offset
-    const resourceCount = (chunkSize - 8) / 4
-
-    for (let i = 0; i < resourceCount; i++) {
+  parseResourceMap (payloadSize) {
+    const count = Math.floor(payloadSize / 4)
+    for (let i = 0; i < count; i++) {
       this.resourceIds.push(this.readInt32())
     }
-
-    this.offset = startOffset + chunkSize
   }
 
-  parseStartNamespace (chunkSize) {
-    const startOffset = this.offset
+  parseStartNamespace () {
     this.readInt32()
     this.readInt32()
-    const prefixIdx = this.readInt32()
-    const uriIdx = this.readInt32()
-
-    this.offset = startOffset + chunkSize
+    this.readInt32()
+    this.readInt32()
   }
 
-  parseEndNamespace (chunkSize) {
-    const startOffset = this.offset
+  parseEndNamespace () {
     this.readInt32()
     this.readInt32()
     this.readInt32()
     this.readInt32()
-
-    this.offset = startOffset + chunkSize
   }
 
-  parseStartTag (chunkSize) {
-    const startOffset = this.offset
+  parseStartTag () {
     this.readInt32()
     this.readInt32()
     const namespaceUri = this.readInt32()
     const nameIdx = this.readInt32()
-    const flags = this.readInt32()
+    this.readInt32()
     const attributeCount = this.readInt32() & 0xFFFF
-    const classAttribute = this.readInt32()
+    this.readInt32()
 
-    const tagName = this.stringPool[nameIdx] || 'unknown'
+    const tagName = (nameIdx >= 0 && nameIdx < this.stringPool.length)
+      ? this.stringPool[nameIdx]
+      : 'unknown'
 
     const element = {
       $: {}
@@ -178,16 +156,18 @@ class AxmlParser {
       const attrType = this.readInt32() >>> 24
       const attrData = this.readInt32()
 
-      let attrName = this.stringPool[attrNameIdx] || `attr_${attrNameIdx}`
+      let attrName = (attrNameIdx >= 0 && attrNameIdx < this.stringPool.length)
+        ? this.stringPool[attrNameIdx]
+        : `attr_${attrNameIdx}`
       let attrValue
 
-      if (attrRawValue !== 0xFFFFFFFF) {
+      if (attrRawValue !== 0xFFFFFFFF && attrRawValue >= 0 && attrRawValue < this.stringPool.length) {
         attrValue = this.stringPool[attrRawValue]
       } else {
         attrValue = this.convertValue(attrType, attrData)
       }
 
-      if (attrNs !== 0xFFFFFFFF) {
+      if (attrNs !== 0xFFFFFFFF && attrNs >= 0 && attrNs < this.stringPool.length) {
         const ns = this.stringPool[attrNs] || ''
         if (ns.includes('android.com') || ns === 'http://schemas.android.com/apk/res/android') {
           attrName = `android:${attrName}`
@@ -197,9 +177,9 @@ class AxmlParser {
       element.$[attrName] = attrValue != null ? String(attrValue) : ''
     }
 
-    if (tagName === 'manifest' && this.elementStack.length === 1) {
+    if (this.firstManifestTag && tagName === 'manifest') {
+      this.firstManifestTag = false
       Object.assign(this.manifest.$, element.$)
-      this.elementStack = [this.manifest]
     } else {
       const parent = this.elementStack[this.elementStack.length - 1]
       if (!parent[tagName]) {
@@ -208,40 +188,34 @@ class AxmlParser {
       parent[tagName].push(element)
       this.elementStack.push(element)
     }
-
-    this.offset = startOffset + chunkSize
   }
 
-  parseEndTag (chunkSize) {
-    const startOffset = this.offset
+  parseEndTag () {
     this.readInt32()
     this.readInt32()
     this.readInt32()
     const nameIdx = this.readInt32()
-    const tagName = this.stringPool[nameIdx] || 'unknown'
+    const tagName = (nameIdx >= 0 && nameIdx < this.stringPool.length)
+      ? this.stringPool[nameIdx]
+      : 'unknown'
 
-    if (tagName === 'manifest' && this.elementStack.length <= 1) {
-    } else {
+    if (!(tagName === 'manifest' && this.elementStack.length <= 1)) {
       this.elementStack.pop()
     }
-    this.offset = startOffset + chunkSize
   }
 
-  parseText (chunkSize) {
-    const startOffset = this.offset
+  parseText () {
     this.readInt32()
     this.readInt32()
-    const textIdx = this.readInt32()
     this.readInt32()
     this.readInt32()
-
-    this.offset = startOffset + chunkSize
+    this.readInt32()
   }
 
   convertValue (type, data) {
     switch (type) {
       case TYPE_STRING:
-        return this.stringPool[data] || ''
+        return (data >= 0 && data < this.stringPool.length) ? this.stringPool[data] : ''
       case TYPE_REFERENCE:
         return `@ref/0x${data.toString(16).padStart(8, '0')}`
       case TYPE_INT_DEC:
@@ -250,10 +224,8 @@ class AxmlParser {
         return `0x${data.toString(16)}`
       case TYPE_INT_BOOLEAN:
         return data !== 0 ? 'true' : 'false'
-      case TYPE_INT_BOOLEAN + 1:
-        return data !== 0
       case TYPE_FLOAT:
-        return new DataView(new ArrayBuffer(4)).setFloat32(0, data)
+        return new DataView(new Uint8Array([data & 0xFF, (data >> 8) & 0xFF, (data >> 16) & 0xFF, (data >> 24) & 0xFF]).buffer).getFloat32(0, true)
       case TYPE_FIRST_COLOR_INT:
       case TYPE_FIRST_COLOR_INT + 1:
       case TYPE_FIRST_COLOR_INT + 2:
@@ -272,39 +244,50 @@ class AxmlParser {
 
     const fileSize = this.readInt32()
 
-    while (this.offset < this.buffer.length) {
-      const chunkType = this.peekInt32()
-      const chunkHeaderSize = this.buffer.readUInt32LE(this.offset + 4)
-      const chunkSize = this.buffer.readUInt32LE(this.offset + 8)
+    while (this.offset < this.buffer.length - 12) {
+      const chunkType = this.readInt32()
+      const chunkHeaderSize = this.readInt32()
+      const chunkSize = this.readInt32()
 
-      if (chunkSize === 0) break
+      if (chunkSize <= 0 || chunkSize > this.buffer.length) break
 
-      this.offset += 8
+      const headerSkip = chunkHeaderSize - 12
+      if (headerSkip > 0 && headerSkip < chunkSize) {
+        this.offset += headerSkip
+      }
+
+      const payloadSize = chunkSize - chunkHeaderSize
 
       switch (chunkType) {
         case CHUNK_STRING_POOL:
-          this.parseStringPool(chunkSize - 8)
+          this.parseStringPool()
+          const stringPoolSkip = payloadSize - (this.stringPool.length * 4 + 20)
+          if (stringPoolSkip > 0) {
+            this.offset += stringPoolSkip
+          }
           break
         case CHUNK_RESOURCE_MAP:
-          this.parseResourceMap(chunkSize - 8)
+          this.parseResourceMap(payloadSize)
           break
         case CHUNK_XML_START_NAMESPACE:
-          this.parseStartNamespace(chunkSize - 8)
+          this.parseStartNamespace()
           break
         case CHUNK_XML_END_NAMESPACE:
-          this.parseEndNamespace(chunkSize - 8)
+          this.parseEndNamespace()
           break
         case CHUNK_XML_START_TAG:
-          this.parseStartTag(chunkSize - 8)
+          this.parseStartTag()
           break
         case CHUNK_XML_END_TAG:
-          this.parseEndTag(chunkSize - 8)
+          this.parseEndTag()
           break
         case CHUNK_XML_TEXT:
-          this.parseText(chunkSize - 8)
+          this.parseText()
           break
         default:
-          this.offset += chunkSize - 8
+          if (payloadSize > 0 && this.offset + payloadSize <= this.buffer.length) {
+            this.offset += payloadSize
+          }
       }
     }
 
