@@ -86,7 +86,7 @@ def validate_status_transition(current_status: str, target_status: str) -> bool:
         HandoverStatus.FIRST_SIGNED: [HandoverStatus.SECOND_SIGNED, HandoverStatus.REJECTED, HandoverStatus.WITHDRAWN],
         HandoverStatus.SECOND_SIGNED: [HandoverStatus.VERIFIED, HandoverStatus.CONFLICT, HandoverStatus.REJECTED, HandoverStatus.WITHDRAWN],
         HandoverStatus.VERIFIED: [HandoverStatus.COMPLETED, HandoverStatus.MANUAL_FIXED],
-        HandoverStatus.CONFLICT: [HandoverStatus.MANUAL_FIXED, HandoverStatus.REJECTED],
+        HandoverStatus.CONFLICT: [HandoverStatus.FIRST_SIGNED, HandoverStatus.MANUAL_FIXED, HandoverStatus.REJECTED, HandoverStatus.WITHDRAWN],
         HandoverStatus.REJECTED: [HandoverStatus.SUBMITTED],
         HandoverStatus.WITHDRAWN: [HandoverStatus.SUBMITTED],
         HandoverStatus.MANUAL_FIXED: [HandoverStatus.VERIFIED, HandoverStatus.COMPLETED],
