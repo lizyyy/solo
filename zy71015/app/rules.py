@@ -102,15 +102,23 @@ def full_approval_check(
     all_violations = []
     all_warnings = []
     
-    verified_points = [p for p in points if p.safety_verified]
-    if len(verified_points) == 0 and len(points) > 0:
-        all_violations.append("没有通过安全校验的烟火点位")
-    elif len(points) == 0:
+    if len(points) == 0:
         all_violations.append("缺少烟火点位数据")
     else:
-        points_valid, points_violations, points_warnings = validate_firework_points(verified_points)
-        all_violations.extend(points_violations)
-        all_warnings.extend(points_warnings)
+        unsafe_points = [p for p in points if not p.safety_verified]
+        if len(unsafe_points) > 0:
+            for p in unsafe_points:
+                all_violations.append(
+                    f"点位 {p.location_code} 未通过安全校验: {p.verification_note or '安全距离不足'}"
+                )
+        
+        safe_points = [p for p in points if p.safety_verified]
+        if len(safe_points) == 0:
+            all_violations.append("没有通过安全校验的烟火点位")
+        else:
+            points_valid, points_violations, points_warnings = validate_firework_points(safe_points)
+            all_violations.extend(points_violations)
+            all_warnings.extend(points_warnings)
     
     fire_valid, fire_violations = check_fire_approval(approvals)
     all_violations.extend(fire_violations)

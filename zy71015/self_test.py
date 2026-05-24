@@ -6,7 +6,7 @@ BASE_URL = "http://localhost:8000"
 
 def run_tests():
     print("=" * 60)
-    print("剧场烟火审批 API - 自检程序 (v2)")
+    print("剧场烟火审批 API - 自检程序 (v3)")
     print("=" * 60)
     
     all_passed = True
@@ -14,12 +14,12 @@ def run_tests():
     try:
         response = requests.get(f"{BASE_URL}/health")
         if response.status_code == 200 and response.json()["status"] == "healthy":
-            print("✓ [1/10] 健康检查通过")
+            print("✓ [1/11] 健康检查通过")
         else:
-            print("✗ [1/10] 健康检查失败")
+            print("✗ [1/11] 健康检查失败")
             all_passed = False
     except Exception as e:
-        print(f"✗ [1/10] 健康检查失败: {e}")
+        print(f"✗ [1/11] 健康检查失败: {e}")
         print("  请确保服务已启动: uvicorn app.main:app --reload")
         return False
     
@@ -34,9 +34,9 @@ def run_tests():
     if response.status_code == 200:
         perf_id = response.json()["id"]
         initial_status = response.json()["status"]
-        print(f"✓ [2/10] 创建演出通过 (ID={perf_id}, 初始状态={initial_status})")
+        print(f"✓ [2/11] 创建演出通过 (ID={perf_id}, 初始状态={initial_status})")
     else:
-        print("✗ [2/10] 创建演出失败")
+        print("✗ [2/11] 创建演出失败")
         all_passed = False
         perf_id = None
     
@@ -57,12 +57,12 @@ def run_tests():
             perf_response = requests.get(f"{BASE_URL}/performances/{perf_id}")
             current_status = perf_response.json()["status"]
             if current_status == "points_verified":
-                print(f"✓ [3/10] 状态机修复验证: pending→points_verified 直接跳转成功 (状态={current_status})")
+                print(f"✓ [3/11] 状态机修复验证: pending→points_verified 直接跳转成功 (状态={current_status})")
             else:
-                print(f"✗ [3/10] 状态机修复验证失败: 期望 points_verified，实际 {current_status}")
+                print(f"✗ [3/11] 状态机修复验证失败: 期望 points_verified，实际 {current_status}")
                 all_passed = False
         else:
-            print("✗ [3/10] 安全距离校验失败")
+            print("✗ [3/11] 安全距离校验失败")
             all_passed = False
     
     if perf_id:
@@ -79,9 +79,9 @@ def run_tests():
         response = requests.post(f"{BASE_URL}/performances/{perf_id}/points", json=invalid_points)
         result = response.json()
         if response.status_code == 200 and not result["is_duplicate"] and "校验失败" in result["message"]:
-            print("✓ [4/10] 违规点位拦截通过 (距离不足5米被拦截)")
+            print("✓ [4/11] 违规点位拦截通过 (距离不足5米被拦截)")
         else:
-            print("✗ [4/10] 违规点位拦截失败")
+            print("✗ [4/11] 违规点位拦截失败")
             all_passed = False
     
     if perf_id:
@@ -98,9 +98,9 @@ def run_tests():
         response1 = requests.post(f"{BASE_URL}/performances/{perf_id}/points", json=points_data)
         response2 = requests.post(f"{BASE_URL}/performances/{perf_id}/points", json=points_data)
         if response2.status_code == 200 and response2.json()["is_duplicate"]:
-            print("✓ [5/10] 重复提交检测通过")
+            print("✓ [5/11] 重复提交检测通过")
         else:
-            print("✗ [5/10] 重复提交检测失败")
+            print("✗ [5/11] 重复提交检测失败")
             all_passed = False
     
     if perf_id:
@@ -114,12 +114,12 @@ def run_tests():
             perf_response = requests.get(f"{BASE_URL}/performances/{perf_id}")
             current_status = perf_response.json()["status"]
             if current_status == "fire_approved":
-                print(f"✓ [6/10] 消防审批状态推进成功 (状态={current_status})")
+                print(f"✓ [6/11] 消防审批状态推进成功 (状态={current_status})")
             else:
-                print(f"✗ [6/10] 消防审批状态推进失败: 期望 fire_approved，实际 {current_status}")
+                print(f"✗ [6/11] 消防审批状态推进失败: 期望 fire_approved，实际 {current_status}")
                 all_passed = False
         else:
-            print("✗ [6/10] 消防审批提交失败")
+            print("✗ [6/11] 消防审批提交失败")
             all_passed = False
     
     if perf_id:
@@ -135,12 +135,12 @@ def run_tests():
             perf_response = requests.get(f"{BASE_URL}/performances/{perf_id}")
             current_status = perf_response.json()["status"]
             if current_status == "test_completed":
-                print(f"✓ [7/10] 试放记录状态推进成功 (状态={current_status})")
+                print(f"✓ [7/11] 试放记录状态推进成功 (状态={current_status})")
             else:
-                print(f"✗ [7/10] 试放记录状态推进失败: 期望 test_completed，实际 {current_status}")
+                print(f"✗ [7/11] 试放记录状态推进失败: 期望 test_completed，实际 {current_status}")
                 all_passed = False
         else:
-            print("✗ [7/10] 试放记录提交失败")
+            print("✗ [7/11] 试放记录提交失败")
             all_passed = False
     
     if perf_id:
@@ -156,27 +156,63 @@ def run_tests():
             perf_response = requests.get(f"{BASE_URL}/performances/{perf_id}")
             current_status = perf_response.json()["status"]
             if current_status == "props_confirmed":
-                print(f"✓ [8/10] 道具清单状态推进成功 (状态={current_status})")
+                print(f"✓ [8/11] 道具清单状态推进成功 (状态={current_status})")
             else:
-                print(f"✗ [8/10] 道具清单状态推进失败: 期望 props_confirmed，实际 {current_status}")
+                print(f"✗ [8/11] 道具清单状态推进失败: 期望 props_confirmed，实际 {current_status}")
                 all_passed = False
         else:
-            print("✗ [8/10] 道具清单提交失败")
+            print("✗ [8/11] 道具清单提交失败")
             all_passed = False
     
     if perf_id:
         response = requests.get(f"{BASE_URL}/performances/{perf_id}/check")
         if response.status_code == 200:
             result = response.json()
-            if result["approved"] and result["current_status"] == "final_approved":
-                print(f"✓ [9/10] 完整审批闭环通过 (状态={result['current_status']})")
+            if not result["approved"] and "TEST-002" in str(result["violations"]):
+                print(f"✓ [9/11] 安全校验绕过修复验证: 违规点位成功阻断审批")
+                print(f"  违规项已检测: {result['violations'][0][:50]}...")
             else:
-                print(f"✗ [9/10] 完整审批闭环失败: approved={result['approved']}, status={result['current_status']}")
-                if result["violations"]:
-                    print(f"  违规项: {result['violations']}")
+                print(f"✗ [9/11] 安全校验绕过修复失败: 违规点位未阻断审批")
+                print(f"  approved={result['approved']}, violations={result['violations']}")
                 all_passed = False
         else:
-            print("✗ [9/10] 规则判定执行失败")
+            print("✗ [9/11] 规则判定执行失败")
+            all_passed = False
+    
+    if perf_id:
+        perf2_data = {
+            "name": "完全合规演出",
+            "date": future_date.isoformat(),
+            "venue": "测试剧场",
+            "is_temporary": False
+        }
+        perf2_response = requests.post(f"{BASE_URL}/performances", json=perf2_data)
+        perf2_id = perf2_response.json()["id"]
+        
+        valid_only_points = [
+            {
+                "location_code": "SAFE-001",
+                "x_coordinate": 0.0,
+                "y_coordinate": 0.0,
+                "distance_to_audience": 10.0,
+                "firework_type": "合规烟花",
+                "quantity": 10
+            }
+        ]
+        requests.post(f"{BASE_URL}/performances/{perf2_id}/points", json=valid_only_points)
+        
+        requests.post(f"{BASE_URL}/performances/{perf2_id}/approvals", json=approval_data)
+        requests.post(f"{BASE_URL}/performances/{perf2_id}/test-records", json=test_data)
+        requests.post(f"{BASE_URL}/performances/{perf2_id}/props", json=props_data)
+        
+        final_check = requests.get(f"{BASE_URL}/performances/{perf2_id}/check")
+        result = final_check.json()
+        if result["approved"] and result["current_status"] == "final_approved":
+            print(f"✓ [10/11] 纯合规点位完整审批闭环通过 (状态={result['current_status']})")
+        else:
+            print(f"✗ [10/11] 纯合规点位审批闭环失败: approved={result['approved']}, status={result['current_status']}")
+            if result["violations"]:
+                print(f"  违规项: {result['violations']}")
             all_passed = False
     
     if perf_id:
@@ -196,19 +232,20 @@ def run_tests():
             }
             confirm_response = requests.post(f"{BASE_URL}/performances/{temp_perf_id}/confirm", json=confirm_data)
             if confirm_response.status_code == 403:
-                print("✓ [10/10] 责任确认拦截通过 (未完成审批被禁止)")
+                print("✓ [11/11] 责任确认拦截通过 (未完成审批被禁止)")
             else:
-                print(f"✗ [10/10] 责任确认拦截失败: 期望 403，实际 {confirm_response.status_code}")
+                print(f"✗ [11/11] 责任确认拦截失败: 期望 403，实际 {confirm_response.status_code}")
                 all_passed = False
         else:
-            print("✗ [10/10] 创建临时演出失败")
+            print("✗ [11/11] 创建临时演出失败")
             all_passed = False
     
     print("=" * 60)
     if all_passed:
         print("✓ 全部自检通过！API 功能正常")
-        print("✓ 核心审批闭环验证: pending → points_verified → fire_approved")
-        print("✓                        → test_completed → props_confirmed → final_approved")
+        print("✓ 核心安全验证: 违规点位会阻断审批，合规点位正常推进")
+        print("✓ 审批闭环: pending → points_verified → fire_approved")
+        print("✓           → test_completed → props_confirmed → final_approved")
     else:
         print("✗ 部分自检失败，请检查相关功能")
     print("=" * 60)
