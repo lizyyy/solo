@@ -24,6 +24,9 @@ public interface NotificationRecordRepository extends JpaRepository<Notification
     @Query("SELECT COUNT(n) > 0 FROM NotificationRecord n WHERE n.routeChange.id = :routeChangeId AND n.recipient = :recipient AND n.channel = :channel AND n.status NOT IN ('FAILED', 'SKIPPED')")
     boolean existsSuccessfulNotification(Long routeChangeId, String recipient, NotificationChannel channel);
     
+    @Query("SELECT COUNT(n) > 0 FROM NotificationRecord n WHERE n.routeChange.id = :routeChangeId AND n.recipient = :recipient AND n.channel = :channel AND n.isRecoveryNotify = :isRecoveryNotify AND n.status NOT IN ('FAILED', 'SKIPPED')")
+    boolean existsSuccessfulNotificationByType(Long routeChangeId, String recipient, NotificationChannel channel, boolean isRecoveryNotify);
+    
     List<NotificationRecord> findByStatusIn(List<NotificationStatus> statuses);
     
     List<NotificationRecord> findByRouteChangeIdAndIsRecoveryNotify(Long routeChangeId, boolean isRecoveryNotify);

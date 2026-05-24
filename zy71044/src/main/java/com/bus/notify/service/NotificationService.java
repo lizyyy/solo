@@ -67,6 +67,11 @@ public class NotificationService {
             records.add(notificationRecordRepository.save(broadcast));
         }
         
+        station.setNotified(true);
+        station.setNotifiedAt(LocalDateTime.now());
+        station.setNotifyDetail("站点广播通知已生成");
+        stationChangeRepository.save(station);
+        
         return records;
     }
     
@@ -141,10 +146,11 @@ public class NotificationService {
             return false;
         }
         
-        return notificationRecordRepository.existsSuccessfulNotification(
+        return notificationRecordRepository.existsSuccessfulNotificationByType(
                 record.getRouteChange().getId(),
                 record.getRecipient(),
-                record.getChannel()
+                record.getChannel(),
+                record.getIsRecoveryNotify()
         );
     }
     

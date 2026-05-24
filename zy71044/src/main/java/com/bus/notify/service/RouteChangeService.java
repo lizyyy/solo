@@ -51,6 +51,7 @@ public class RouteChangeService {
         }
         
         stateMachine.get(RouteChangeStatus.DRAFT).put(RouteChangeEvent.VERIFY_PASS, RouteChangeStatus.VERIFIED);
+        stateMachine.get(RouteChangeStatus.DRAFT).put(RouteChangeEvent.VERIFY_REJECT, RouteChangeStatus.DRAFT);
         stateMachine.get(RouteChangeStatus.DRAFT).put(RouteChangeEvent.CANCEL, RouteChangeStatus.CANCELLED);
         
         stateMachine.get(RouteChangeStatus.VERIFIED).put(RouteChangeEvent.START_PROCESS, RouteChangeStatus.PROCESSING);
