@@ -1,93 +1,39 @@
 class FormulaParser {
   constructor() {
-    this.cellRefPattern = /\$?[A-Za-z]+\$?[0-9]+/;
-    this.rangeRefPattern = /\$?[A-Za-z]+\$?[0-9]+:\$?[A-Za-z]+\$?[0-9]+/;
-    this.namedRefPattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
+    this.cellRefPattern = /\$?[A-Za-z]+\$?[0-9]+/g;
+    this.rangeRefPattern = /\$?[A-Za-z]+\$?[0-9]+:\$?[A-Za-z]+\$?[0-9]+/g;
+    this.crossSheetCellPattern = /'([^']+)'!(\$?[A-Za-z]+\$?[0-9]+)(?::(\$?[A-Za-z]+\$?[0-9]+))?/g;
   }
 
   parseDependencies(formula, currentSheetName, namedRanges = []) {
     if (!formula) return [];
 
     const dependencies = new Set();
-    let remaining = formula;
-
-    const exclamations = [];
-    for (let i = 0; i < formula.length; i++) {
-      if (formula[i] === '!') exclamations.push(i);
-    }
-
-    for (const idx of exclamations) {
-      const afterExcl = formula.substring(idx + 1);
-      const rangeMatch = afterExcl.match(this.rangeRefPattern);
-      const cellMatch = afterExcl.match(this.cellRefPattern);
-
-      let ref = null;
-      let refLength = 0;
-
-      if (rangeMatch && rangeMatch.index === 0) {
-        ref = rangeMatch[0];
-        refLength = ref.length;
-      } else if (cellMatch && cellMatch.index === 0) {
-        ref = cellMatch[0];
-        refLength = ref.length;
-      }
-
-      if (ref) {
-        let sheetName = null;
-        const beforeExcl = formula.substring(0, idx);
-
-        if (beforeExcl.endsWith("'")) {
-          const lastQuote = beforeExcl.lastIndexOf("'", beforeExcl.length - 2);
-          if (lastQuote >= 0) {
-            sheetName = beforeExcl.substring(lastQuote + 1, beforeExcl.length - 1);
-          }
-        } else {
-          const match = beforeExcl.match(/([A-Za-z0-9_\u4e00-\u9fa5]+)$/);
-          if (match) {
-            sheetName = match[1];
-          }
-        }
-
-        if (sheetName) {
-          this._addRangeDependencies(dependencies, sheetName, ref);
-        }
-      }
-    }
+    const crossSheetRefs = this._extractCrossSheetRefs(formula);
 
     let cleanedFormula = formula;
-    exclamations.forEach(idx => {
-      const afterExcl = formula.substring(idx + 1);
-      const rangeMatch = afterExcl.match(this.rangeRefPattern);
-      const cellMatch = afterExcl.match(this.cellRefPattern);
-      if (rangeMatch && rangeMatch.index === 0) {
-        const start = idx - 100 > 0 ? idx - 100 : 0;
-        cleanedFormula = cleanedFormula.substring(0, start) + ' ' + cleanedFormula.substring(idx + 1 + rangeMatch[0].length);
-      } else if (cellMatch && cellMatch.index === 0) {
-        const start = idx - 100 > 0 ? idx - 100 : 0;
-        cleanedFormula = cleanedFormula.substring(0, start) + ' ' + cleanedFormula.substring(idx + 1 + cellMatch[0].length);
-      }
+    crossSheetRefs.sort((a, b) => b.endIndex - a.endIndex);
+    crossSheetRefs.forEach(ref => {
+      this._addRangeDependencies(dependencies, ref.sheetName, ref.cellRef);
+      cleanedFormula = cleanedFormula.substring(0, ref.startIndex) + ' '.repeat(ref.endIndex - ref.startIndex) + cleanedFormula.substring(ref.endIndex);
     });
 
-    const rangeRegex = new RegExp(this.rangeRefPattern.source, 'g');
-    let rangeMatch;
-    while ((rangeMatch = rangeRegex.exec(cleanedFormula)) !== null) {
-      this._addRangeDependencies(dependencies, currentSheetName, rangeMatch[0]);
-      cleanedFormula = cleanedFormula.replace(rangeMatch[0], ' ');
+    const rangeRegex = this.rangeRefPattern;
+    let match;
+    while ((match = rangeRegex.exec(cleanedFormula)) !== null) {
+      this._addRangeDependencies(dependencies, currentSheetName, match[0]);
     }
 
-    const funcRemoved = cleanedFormula.replace(/[A-Za-z0-9_]+\(/g, ' ');
-    const cellRegex = new RegExp(this.cellRefPattern.source, 'g');
-    let cellMatch;
-    const seen = new Set();
-    while ((cellMatch = cellRegex.exec(funcRemoved)) !== null) {
-      const fullRef = `${currentSheetName}!${cellMatch[0].replace(/\$/g, '')}`;
-      if (!seen.has(fullRef)) {
-        dependencies.add(fullRef);
-        seen.add(fullRef);
-      }
+    cleanedFormula = cleanedFormula.replace(this.rangeRefPattern, ' ');
+    const funcRemoved = cleanedFormula.replace(/[A-Za-z0-9_\u4e00-\u9fa5]+\(/g, ' ');
+
+    const cellRegex = this.cellRefPattern;
+    while ((match = cellRegex.exec(funcRemoved)) !== null) {
+      const cleanRef = match[0].replace(/\$/g, '');
+      dependencies.add(`${currentSheetName}!${cleanRef}`);
     }
 
-    if (namedRanges.length > 0) {
+    if (namedRanges && namedRanges.length > 0) {
       const namedRangeMap = new Map();
       namedRanges.forEach(nr => {
         namedRangeMap.set(nr.name, nr);
@@ -109,6 +55,62 @@ class FormulaParser {
     }
 
     return Array.from(dependencies);
+  }
+
+  _extractCrossSheetRefs(formula) {
+    const refs = [];
+    const cellRefPattern = /\$?[A-Za-z]+\$?[0-9]+/;
+    const rangeRefPattern = /\$?[A-Za-z]+\$?[0-9]+:\$?[A-Za-z]+\$?[0-9]+/;
+
+    for (let i = 0; i < formula.length; i++) {
+      if (formula[i] !== '!') continue;
+
+      const afterExcl = formula.substring(i + 1);
+      const rangeMatch = afterExcl.match(rangeRefPattern);
+      const cellMatch = afterExcl.match(cellRefPattern);
+
+      let ref = null;
+      let refLength = 0;
+
+      if (rangeMatch && rangeMatch.index === 0) {
+        ref = rangeMatch[0];
+        refLength = ref.length;
+      } else if (cellMatch && cellMatch.index === 0) {
+        ref = cellMatch[0];
+        refLength = ref.length;
+      }
+
+      if (ref) {
+        let sheetName = null;
+        let beforeExcl = formula.substring(0, i);
+        let sheetStartIndex = -1;
+
+        if (beforeExcl.endsWith("'")) {
+          const lastQuote = beforeExcl.lastIndexOf("'", beforeExcl.length - 2);
+          if (lastQuote >= 0) {
+            sheetName = beforeExcl.substring(lastQuote + 1, beforeExcl.length - 1);
+            sheetStartIndex = lastQuote;
+          }
+        } else {
+          const match = beforeExcl.match(/([^\s+\-*/%^&=<>!(),:]+)$/);
+          if (match) {
+            sheetName = match[1];
+            sheetStartIndex = beforeExcl.length - sheetName.length;
+          }
+        }
+
+        if (sheetName) {
+          refs.push({
+            sheetName,
+            cellRef: ref,
+            startIndex: sheetStartIndex,
+            endIndex: i + 1 + refLength,
+          });
+        }
+      }
+    }
+
+    return refs;
   }
 
   _addRangeDependencies(dependencies, sheetName, rangeRef) {

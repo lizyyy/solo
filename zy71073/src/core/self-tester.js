@@ -119,6 +119,16 @@ class SelfTester {
     } catch (e) {
       this._addTest('公式解析 - 命名区域', false, e.message);
     }
+
+    try {
+      const deps7 = parser.parseDependencies('B4*(1+假设条件!$B$2)', '收入', []);
+      const hasLocal = deps7.includes('收入!B4');
+      const hasCross = deps7.includes('假设条件!B2');
+      this._addTest('公式解析 - 本表+跨表混合引用', hasLocal && hasCross,
+        `期望包含收入!B4和假设条件!B2，实际: ${deps7.join(', ')}`);
+    } catch (e) {
+      this._addTest('公式解析 - 本表+跨表混合引用', false, e.message);
+    }
   }
 
   async _testWithSampleFile() {
