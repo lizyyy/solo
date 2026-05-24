@@ -1,0 +1,127 @@
+#!/bin/sh
+#
+# Maven Wrapper bootstrap script - standard compliant & offline friendly
+#
+# Environment:
+#   MVNW_REPOURL - repo url base for downloading maven distribution
+#   MVNW_USERNAME/MVNW_PASSWORD - user and password for downloading maven
+#   MVNW_VERBOSE - true: enable verbose log; others: silence the output
+
+set -e
+
+# OS specific support
+cygwin=false
+darwin=false
+mingw=false
+case "$(uname)" in
+  CYGWIN*) cygwin=true ;;
+  Darwin*) darwin=true ;;
+  MINGW*) mingw=true ;;
+esac
+
+# Find the project basedir
+PRG="$0"
+while [ -h "$PRG" ]; do
+  ls=$(ls -ld "$PRG")
+  link=$(expr "$ls" : '.*-> \(.*\)$')
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=$(dirname "$PRG")/"$link"
+  fi
+done
+PRGDIR=$(dirname "$PRG")
+BASEDIR=$(cd "$PRGDIR/" && pwd)
+
+# Class to launch
+WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
+
+# Determine the Java command to use
+if [ -n "$JAVA_HOME" ] ; then
+  if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+    JAVACMD="$JAVA_HOME/jre/sh/java"
+  else
+    JAVACMD="$JAVA_HOME/bin/java"
+  fi
+  if [ ! -x "$JAVACMD" ] ; then
+    echo "The JAVA_HOME environment variable is not defined correctly," >&2
+    echo "this environment variable is needed to run this program." >&2
+    exit 1
+  fi
+else
+  JAVACMD="java"
+  command -v java >/dev/null 2>&1 || {
+    echo "The JAVA_HOME environment variable is not defined," >&2
+    echo "and no 'java' command could be found in your PATH." >&2
+    echo "Please set the JAVA_HOME variable in your environment to match the" >&2
+    echo "location of your Java installation." >&2
+    exit 1
+  }
+fi
+
+# Check standard Maven locations first
+MAVEN_BIN=""
+for mvn_path in \
+  "$(command -v mvn 2>/dev/null)" \
+  "/usr/local/bin/mvn" \
+  "/usr/bin/mvn" \
+  "/opt/homebrew/bin/mvn" \
+  "/opt/maven/bin/mvn" \
+  "$HOME/.sdkman/candidates/maven/current/bin/mvn" \
+  "$HOME/.m2/wrapper/dists/apache-maven-3.9.6-bin/apache-maven-3.9.6/bin/mvn"; do
+  if [ -n "$mvn_path" ] && [ -x "$mvn_path" ]; then
+    MAVEN_BIN="$mvn_path"
+    break
+  fi
+done
+
+# If Maven found locally, just exec it
+if [ -n "$MAVEN_BIN" ]; then
+  if [ "$MVNW_VERBOSE" = "true" ]; then
+    echo "Found local Maven at: $MAVEN_BIN"
+  fi
+  exec "$MAVEN_BIN" "$@"
+fi
+
+# Check for wrapper jar
+WRAPPER_JAR="$BASEDIR/.mvn/wrapper/maven-wrapper.jar"
+if [ -r "$WRAPPER_JAR" ]; then
+  if [ "$MVNW_VERBOSE" = "true" ]; then
+    echo "Using Maven Wrapper JAR: $WRAPPER_JAR"
+  fi
+  exec "$JAVACMD" $MAVEN_OPTS $MAVEN_DEBUG_OPTS \
+    -classpath "$WRAPPER_JAR" \
+    "-Dmaven.multiModuleProjectDirectory=$BASEDIR" \
+    $WRAPPER_LAUNCHER "$@"
+fi
+
+# No Maven available - offline friendly error message
+echo ""
+echo "=============================================="
+echo "  Maven Not Found"
+echo "=============================================="
+echo ""
+echo "Could not find Maven in standard locations:"
+echo "  - System PATH (mvn command)"
+echo "  - /usr/local/bin/mvn"
+echo "  - /usr/bin/mvn"
+echo "  - /opt/homebrew/bin/mvn"
+echo "  - SDKMAN! (~/.sdkman/candidates/maven/...)"
+echo "  - Maven wrapper JAR (.mvn/wrapper/maven-wrapper.jar)"
+echo ""
+echo "To install Maven:"
+echo ""
+echo "  macOS (Homebrew):  brew install maven"
+echo "  macOS (SDKMAN!):   sdk install maven 3.9.6"
+echo "  Ubuntu/Debian:     sudo apt install maven"
+echo "  Fedora/RHEL:       sudo dnf install maven"
+echo "  Manual download:   https://maven.apache.org/download.cgi"
+echo ""
+echo "Or in an online environment, this command will"
+echo "bootstrap Maven automatically:"
+echo "  ./mvnw (with maven-wrapper.jar present)"
+echo ""
+echo "Current project can also build with pre-installed Maven:"
+echo "  mvn spring-boot:run"
+echo ""
+exit 1

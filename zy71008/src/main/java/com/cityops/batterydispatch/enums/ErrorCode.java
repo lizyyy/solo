@@ -8,6 +8,7 @@ public enum ErrorCode {
     FORBIDDEN_LOCATION(400, "禁停点无法换电"),
     BATTERY_ALREADY_DISPATCHED(409, "电池已派送"),
     PHOTO_REQUIRED(400, "签收照片缺失"),
+    LOW_BATTERY_SKIP(400, "电量高于阈值"),
     RESOURCE_NOT_FOUND(404, "资源不存在"),
     SYSTEM_ERROR(500, "系统错误");
 
