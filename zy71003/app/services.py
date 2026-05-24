@@ -88,19 +88,6 @@ def check_temperature_window(temperatures: List[float], threshold: float = 50.0)
             "error_code": "MISSING_DATA"
         }
     
-    if sample_count < 5:
-        return {
-            "is_anomaly": False,
-            "max_temperature": 0.0,
-            "min_temperature": 0.0,
-            "avg_temperature": 0.0,
-            "temp_diff": 0.0,
-            "max_temp_rise": 0.0,
-            "anomaly_types": [],
-            "sample_count": sample_count,
-            "missing_count": 5 - sample_count,
-            "error_code": "MISSING_SEGMENT"
-        }
     
     max_temperature = max(temperatures)
     min_temperature = min(temperatures)
@@ -116,13 +103,13 @@ def check_temperature_window(temperatures: List[float], threshold: float = 50.0)
     anomaly_types = []
     
     if max_temperature > threshold:
-        anomaly_types.append("OVER_TEMPERATURE")
+        anomaly_types.append("超温")
     
     if max_temp_rise > 5:
-        anomaly_types.append("RAPID_RISE")
+        anomaly_types.append("快速温升")
     
     if temp_diff > 10:
-        anomaly_types.append("LARGE_TEMP_DIFF")
+        anomaly_types.append("温差过大")
     
     is_anomaly = len(anomaly_types) > 0
     
@@ -155,7 +142,7 @@ def create_disable_record(db: Session, slot: Slot, battery_id: str, reason: str,
     
     evidence_str = json.dumps(evidence_chain, ensure_ascii=False) if evidence_chain else ""
     log_operation(
-        db, "disable_record", slot.slot_number, battery_id,
+        db, "create_disable", slot.slot_number, battery_id,
         operator=operator,
         details=f"生成禁用记录, 原因: {reason}, 证据链: {evidence_str}",
         result="success"
