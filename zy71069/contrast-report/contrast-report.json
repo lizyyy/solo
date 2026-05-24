@@ -1,0 +1,1232 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-24T12:02:46.464Z",
+    "version": "1.0.0",
+    "options": {
+      "outputDir": "./contrast-report",
+      "threshold": 4.5,
+      "mode": "both",
+      "tokens": "examples/tokens.json",
+      "pairs": "examples/component-pairs.json",
+      "verbose": true,
+      "formats": [
+        "terminal",
+        "json",
+        "markdown"
+      ]
+    }
+  },
+  "summary": {
+    "totalPairs": 10,
+    "passed": 9,
+    "failed": 1,
+    "warning": 0,
+    "passRate": 90
+  },
+  "results": [
+    {
+      "pair": {
+        "id": "color.text-white-on-color.primary",
+        "foreground": {
+          "name": "color.text-white",
+          "path": [
+            "color",
+            "text-white"
+          ],
+          "value": "{color.white}",
+          "resolvedValue": "#ffffff",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.text-white",
+            "color.white"
+          ],
+          "rgba": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 1
+          },
+          "hex": "#ffffff"
+        },
+        "background": {
+          "name": "color.primary",
+          "path": [
+            "color",
+            "primary"
+          ],
+          "value": "#0066cc",
+          "resolvedValue": "#0066cc",
+          "type": "color",
+          "description": "主色调",
+          "isAlias": false,
+          "rgba": {
+            "r": 0,
+            "g": 102,
+            "b": 204,
+            "a": 1
+          },
+          "hex": "#0066cc"
+        },
+        "component": "Button",
+        "variant": "primary",
+        "context": "默认按钮"
+      },
+      "contrastRatio": 5.57,
+      "wcagLevel": {
+        "aaNormal": true,
+        "aaLarge": true,
+        "aaaNormal": false,
+        "aaaLarge": true
+      },
+      "passes": true,
+      "threshold": 4.5,
+      "notes": [],
+      "calculation": {
+        "foregroundHex": "#ffffff",
+        "backgroundHex": "#0066cc",
+        "foregroundWithAlphaBlend": "#ffffff",
+        "luminanceForeground": 1,
+        "luminanceBackground": 0.1386
+      }
+    },
+    {
+      "pair": {
+        "id": "color.text-primary-on-color.bg-secondary",
+        "foreground": {
+          "name": "color.text-primary",
+          "path": [
+            "color",
+            "text-primary"
+          ],
+          "value": "{color.gray-900}",
+          "resolvedValue": "#212529",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.text-primary",
+            "color.gray-900"
+          ],
+          "rgba": {
+            "r": 33,
+            "g": 37,
+            "b": 41,
+            "a": 1
+          },
+          "hex": "#212529"
+        },
+        "background": {
+          "name": "color.bg-secondary",
+          "path": [
+            "color",
+            "bg-secondary"
+          ],
+          "value": "{color.gray-100}",
+          "resolvedValue": "#f8f9fa",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.bg-secondary",
+            "color.gray-100"
+          ],
+          "rgba": {
+            "r": 248,
+            "g": 249,
+            "b": 250,
+            "a": 1
+          },
+          "hex": "#f8f9fa"
+        },
+        "component": "Button",
+        "variant": "secondary",
+        "context": "次要按钮"
+      },
+      "contrastRatio": 14.63,
+      "wcagLevel": {
+        "aaNormal": true,
+        "aaLarge": true,
+        "aaaNormal": true,
+        "aaaLarge": true
+      },
+      "passes": true,
+      "threshold": 4.5,
+      "notes": [],
+      "calculation": {
+        "foregroundHex": "#212529",
+        "backgroundHex": "#f8f9fa",
+        "foregroundWithAlphaBlend": "#212529",
+        "luminanceForeground": 0.0181,
+        "luminanceBackground": 0.9461
+      }
+    },
+    {
+      "pair": {
+        "id": "color.text-white-on-color.success",
+        "foreground": {
+          "name": "color.text-white",
+          "path": [
+            "color",
+            "text-white"
+          ],
+          "value": "{color.white}",
+          "resolvedValue": "#ffffff",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.text-white",
+            "color.white"
+          ],
+          "rgba": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 1
+          },
+          "hex": "#ffffff"
+        },
+        "background": {
+          "name": "color.success",
+          "path": [
+            "color",
+            "success"
+          ],
+          "value": "#28a745",
+          "resolvedValue": "#28a745",
+          "type": "color",
+          "isAlias": false,
+          "rgba": {
+            "r": 40,
+            "g": 167,
+            "b": 69,
+            "a": 1
+          },
+          "hex": "#28a745"
+        },
+        "component": "Button",
+        "variant": "success",
+        "context": "成功按钮"
+      },
+      "contrastRatio": 3.13,
+      "wcagLevel": {
+        "aaNormal": false,
+        "aaLarge": true,
+        "aaaNormal": false,
+        "aaaLarge": false
+      },
+      "passes": false,
+      "threshold": 4.5,
+      "notes": [],
+      "calculation": {
+        "foregroundHex": "#ffffff",
+        "backgroundHex": "#28a745",
+        "foregroundWithAlphaBlend": "#ffffff",
+        "luminanceForeground": 1,
+        "luminanceBackground": 0.2852
+      }
+    },
+    {
+      "pair": {
+        "id": "color.text-primary-on-color.warning",
+        "foreground": {
+          "name": "color.text-primary",
+          "path": [
+            "color",
+            "text-primary"
+          ],
+          "value": "{color.gray-900}",
+          "resolvedValue": "#212529",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.text-primary",
+            "color.gray-900"
+          ],
+          "rgba": {
+            "r": 33,
+            "g": 37,
+            "b": 41,
+            "a": 1
+          },
+          "hex": "#212529"
+        },
+        "background": {
+          "name": "color.warning",
+          "path": [
+            "color",
+            "warning"
+          ],
+          "value": "#ffc107",
+          "resolvedValue": "#ffc107",
+          "type": "color",
+          "isAlias": false,
+          "rgba": {
+            "r": 255,
+            "g": 193,
+            "b": 7,
+            "a": 1
+          },
+          "hex": "#ffc107"
+        },
+        "component": "Button",
+        "variant": "warning",
+        "context": "警告按钮"
+      },
+      "contrastRatio": 9.46,
+      "wcagLevel": {
+        "aaNormal": true,
+        "aaLarge": true,
+        "aaaNormal": true,
+        "aaaLarge": true
+      },
+      "passes": true,
+      "threshold": 4.5,
+      "notes": [],
+      "calculation": {
+        "foregroundHex": "#212529",
+        "backgroundHex": "#ffc107",
+        "foregroundWithAlphaBlend": "#212529",
+        "luminanceForeground": 0.0181,
+        "luminanceBackground": 0.5942
+      }
+    },
+    {
+      "pair": {
+        "id": "color.text-white-on-color.danger",
+        "foreground": {
+          "name": "color.text-white",
+          "path": [
+            "color",
+            "text-white"
+          ],
+          "value": "{color.white}",
+          "resolvedValue": "#ffffff",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.text-white",
+            "color.white"
+          ],
+          "rgba": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 1
+          },
+          "hex": "#ffffff"
+        },
+        "background": {
+          "name": "color.danger",
+          "path": [
+            "color",
+            "danger"
+          ],
+          "value": "#dc3545",
+          "resolvedValue": "#dc3545",
+          "type": "color",
+          "isAlias": false,
+          "rgba": {
+            "r": 220,
+            "g": 53,
+            "b": 69,
+            "a": 1
+          },
+          "hex": "#dc3545"
+        },
+        "component": "Button",
+        "variant": "danger",
+        "context": "危险按钮"
+      },
+      "contrastRatio": 4.53,
+      "wcagLevel": {
+        "aaNormal": true,
+        "aaLarge": true,
+        "aaaNormal": false,
+        "aaaLarge": true
+      },
+      "passes": true,
+      "threshold": 4.5,
+      "notes": [],
+      "calculation": {
+        "foregroundHex": "#ffffff",
+        "backgroundHex": "#dc3545",
+        "foregroundWithAlphaBlend": "#ffffff",
+        "luminanceForeground": 1,
+        "luminanceBackground": 0.1819
+      }
+    },
+    {
+      "pair": {
+        "id": "color.text-primary-on-color.bg-primary",
+        "foreground": {
+          "name": "color.text-primary",
+          "path": [
+            "color",
+            "text-primary"
+          ],
+          "value": "{color.gray-900}",
+          "resolvedValue": "#212529",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.text-primary",
+            "color.gray-900"
+          ],
+          "rgba": {
+            "r": 33,
+            "g": 37,
+            "b": 41,
+            "a": 1
+          },
+          "hex": "#212529"
+        },
+        "background": {
+          "name": "color.bg-primary",
+          "path": [
+            "color",
+            "bg-primary"
+          ],
+          "value": "{color.white}",
+          "resolvedValue": "#ffffff",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.bg-primary",
+            "color.white"
+          ],
+          "rgba": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 1
+          },
+          "hex": "#ffffff"
+        },
+        "component": "Card",
+        "variant": "default",
+        "context": "卡片正文"
+      },
+      "contrastRatio": 15.43,
+      "wcagLevel": {
+        "aaNormal": true,
+        "aaLarge": true,
+        "aaaNormal": true,
+        "aaaLarge": true
+      },
+      "passes": true,
+      "threshold": 4.5,
+      "notes": [],
+      "calculation": {
+        "foregroundHex": "#212529",
+        "backgroundHex": "#ffffff",
+        "foregroundWithAlphaBlend": "#212529",
+        "luminanceForeground": 0.0181,
+        "luminanceBackground": 1
+      }
+    },
+    {
+      "pair": {
+        "id": "color.text-white-on-color.bg-dark",
+        "foreground": {
+          "name": "color.text-white",
+          "path": [
+            "color",
+            "text-white"
+          ],
+          "value": "{color.white}",
+          "resolvedValue": "#ffffff",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.text-white",
+            "color.white"
+          ],
+          "rgba": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 1
+          },
+          "hex": "#ffffff"
+        },
+        "background": {
+          "name": "color.bg-dark",
+          "path": [
+            "color",
+            "bg-dark"
+          ],
+          "value": "{color.gray-900}",
+          "resolvedValue": "#212529",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.bg-dark",
+            "color.gray-900"
+          ],
+          "rgba": {
+            "r": 33,
+            "g": 37,
+            "b": 41,
+            "a": 1
+          },
+          "hex": "#212529"
+        },
+        "component": "Card",
+        "variant": "dark",
+        "context": "深色卡片"
+      },
+      "contrastRatio": 15.43,
+      "wcagLevel": {
+        "aaNormal": true,
+        "aaLarge": true,
+        "aaaNormal": true,
+        "aaaLarge": true
+      },
+      "passes": true,
+      "threshold": 4.5,
+      "notes": [],
+      "calculation": {
+        "foregroundHex": "#ffffff",
+        "backgroundHex": "#212529",
+        "foregroundWithAlphaBlend": "#ffffff",
+        "luminanceForeground": 1,
+        "luminanceBackground": 0.0181
+      }
+    },
+    {
+      "pair": {
+        "id": "color.primary-dark-on-color.primary-light",
+        "foreground": {
+          "name": "color.primary-dark",
+          "path": [
+            "color",
+            "primary-dark"
+          ],
+          "value": "#004080",
+          "resolvedValue": "#004080",
+          "type": "color",
+          "isAlias": false,
+          "rgba": {
+            "r": 0,
+            "g": 64,
+            "b": 128,
+            "a": 1
+          },
+          "hex": "#004080"
+        },
+        "background": {
+          "name": "color.primary-light",
+          "path": [
+            "color",
+            "primary-light"
+          ],
+          "value": "#66b3ff",
+          "resolvedValue": "#66b3ff",
+          "type": "color",
+          "isAlias": false,
+          "rgba": {
+            "r": 102,
+            "g": 179,
+            "b": 255,
+            "a": 1
+          },
+          "hex": "#66b3ff"
+        },
+        "component": "Alert",
+        "variant": "info",
+        "context": "信息提示"
+      },
+      "contrastRatio": 4.62,
+      "wcagLevel": {
+        "aaNormal": true,
+        "aaLarge": true,
+        "aaaNormal": false,
+        "aaaLarge": true
+      },
+      "passes": true,
+      "threshold": 4.5,
+      "notes": [],
+      "calculation": {
+        "foregroundHex": "#004080",
+        "backgroundHex": "#66b3ff",
+        "foregroundWithAlphaBlend": "#004080",
+        "luminanceForeground": 0.0523,
+        "luminanceBackground": 0.4228
+      }
+    },
+    {
+      "pair": {
+        "id": "color.text-white-on-color.primary",
+        "foreground": {
+          "name": "color.text-white",
+          "path": [
+            "color",
+            "text-white"
+          ],
+          "value": "{color.white}",
+          "resolvedValue": "#ffffff",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.text-white",
+            "color.white"
+          ],
+          "rgba": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 1
+          },
+          "hex": "#ffffff"
+        },
+        "background": {
+          "name": "color.primary",
+          "path": [
+            "color",
+            "primary"
+          ],
+          "value": "#0066cc",
+          "resolvedValue": "#0066cc",
+          "type": "color",
+          "description": "主色调",
+          "isAlias": false,
+          "rgba": {
+            "r": 0,
+            "g": 102,
+            "b": 204,
+            "a": 1
+          },
+          "hex": "#0066cc"
+        },
+        "component": "Badge",
+        "variant": "new",
+        "context": "新标签"
+      },
+      "contrastRatio": 5.57,
+      "wcagLevel": {
+        "aaNormal": true,
+        "aaLarge": true,
+        "aaaNormal": false,
+        "aaaLarge": true
+      },
+      "passes": true,
+      "threshold": 4.5,
+      "notes": [],
+      "calculation": {
+        "foregroundHex": "#ffffff",
+        "backgroundHex": "#0066cc",
+        "foregroundWithAlphaBlend": "#ffffff",
+        "luminanceForeground": 1,
+        "luminanceBackground": 0.1386
+      }
+    },
+    {
+      "pair": {
+        "id": "color.text-white-on-color.bg-dark",
+        "foreground": {
+          "name": "color.text-white",
+          "path": [
+            "color",
+            "text-white"
+          ],
+          "value": "{color.white}",
+          "resolvedValue": "#ffffff",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.text-white",
+            "color.white"
+          ],
+          "rgba": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 1
+          },
+          "hex": "#ffffff"
+        },
+        "background": {
+          "name": "color.bg-dark",
+          "path": [
+            "color",
+            "bg-dark"
+          ],
+          "value": "{color.gray-900}",
+          "resolvedValue": "#212529",
+          "type": "color",
+          "isAlias": true,
+          "aliasChain": [
+            "color.bg-dark",
+            "color.gray-900"
+          ],
+          "rgba": {
+            "r": 33,
+            "g": 37,
+            "b": 41,
+            "a": 1
+          },
+          "hex": "#212529"
+        },
+        "component": "Navbar",
+        "variant": "dark",
+        "context": "深色导航栏"
+      },
+      "contrastRatio": 15.43,
+      "wcagLevel": {
+        "aaNormal": true,
+        "aaLarge": true,
+        "aaaNormal": true,
+        "aaaLarge": true
+      },
+      "passes": true,
+      "threshold": 4.5,
+      "notes": [],
+      "calculation": {
+        "foregroundHex": "#ffffff",
+        "backgroundHex": "#212529",
+        "foregroundWithAlphaBlend": "#ffffff",
+        "luminanceForeground": 1,
+        "luminanceBackground": 0.0181
+      }
+    }
+  ],
+  "unresolvedTokens": [],
+  "tokenMap": {
+    "color.primary": {
+      "name": "color.primary",
+      "path": [
+        "color",
+        "primary"
+      ],
+      "value": "#0066cc",
+      "resolvedValue": "#0066cc",
+      "type": "color",
+      "description": "主色调",
+      "isAlias": false,
+      "rgba": {
+        "r": 0,
+        "g": 102,
+        "b": 204,
+        "a": 1
+      },
+      "hex": "#0066cc"
+    },
+    "color.primary-light": {
+      "name": "color.primary-light",
+      "path": [
+        "color",
+        "primary-light"
+      ],
+      "value": "#66b3ff",
+      "resolvedValue": "#66b3ff",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 102,
+        "g": 179,
+        "b": 255,
+        "a": 1
+      },
+      "hex": "#66b3ff"
+    },
+    "color.secondary": {
+      "name": "color.secondary",
+      "path": [
+        "color",
+        "secondary"
+      ],
+      "value": "#6c757d",
+      "resolvedValue": "#6c757d",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 108,
+        "g": 117,
+        "b": 125,
+        "a": 1
+      },
+      "hex": "#6c757d"
+    },
+    "color.success": {
+      "name": "color.success",
+      "path": [
+        "color",
+        "success"
+      ],
+      "value": "#28a745",
+      "resolvedValue": "#28a745",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 40,
+        "g": 167,
+        "b": 69,
+        "a": 1
+      },
+      "hex": "#28a745"
+    },
+    "color.warning": {
+      "name": "color.warning",
+      "path": [
+        "color",
+        "warning"
+      ],
+      "value": "#ffc107",
+      "resolvedValue": "#ffc107",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 255,
+        "g": 193,
+        "b": 7,
+        "a": 1
+      },
+      "hex": "#ffc107"
+    },
+    "color.danger": {
+      "name": "color.danger",
+      "path": [
+        "color",
+        "danger"
+      ],
+      "value": "#dc3545",
+      "resolvedValue": "#dc3545",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 220,
+        "g": 53,
+        "b": 69,
+        "a": 1
+      },
+      "hex": "#dc3545"
+    },
+    "color.white": {
+      "name": "color.white",
+      "path": [
+        "color",
+        "white"
+      ],
+      "value": "#ffffff",
+      "resolvedValue": "#ffffff",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 1
+      },
+      "hex": "#ffffff"
+    },
+    "color.black": {
+      "name": "color.black",
+      "path": [
+        "color",
+        "black"
+      ],
+      "value": "#000000",
+      "resolvedValue": "#000000",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 1
+      },
+      "hex": "#000000"
+    },
+    "color.gray-100": {
+      "name": "color.gray-100",
+      "path": [
+        "color",
+        "gray-100"
+      ],
+      "value": "#f8f9fa",
+      "resolvedValue": "#f8f9fa",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 248,
+        "g": 249,
+        "b": 250,
+        "a": 1
+      },
+      "hex": "#f8f9fa"
+    },
+    "color.gray-200": {
+      "name": "color.gray-200",
+      "path": [
+        "color",
+        "gray-200"
+      ],
+      "value": "#e9ecef",
+      "resolvedValue": "#e9ecef",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 233,
+        "g": 236,
+        "b": 239,
+        "a": 1
+      },
+      "hex": "#e9ecef"
+    },
+    "color.gray-300": {
+      "name": "color.gray-300",
+      "path": [
+        "color",
+        "gray-300"
+      ],
+      "value": "#dee2e6",
+      "resolvedValue": "#dee2e6",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 222,
+        "g": 226,
+        "b": 230,
+        "a": 1
+      },
+      "hex": "#dee2e6"
+    },
+    "color.gray-400": {
+      "name": "color.gray-400",
+      "path": [
+        "color",
+        "gray-400"
+      ],
+      "value": "#ced4da",
+      "resolvedValue": "#ced4da",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 206,
+        "g": 212,
+        "b": 218,
+        "a": 1
+      },
+      "hex": "#ced4da"
+    },
+    "color.gray-500": {
+      "name": "color.gray-500",
+      "path": [
+        "color",
+        "gray-500"
+      ],
+      "value": "#adb5bd",
+      "resolvedValue": "#adb5bd",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 173,
+        "g": 181,
+        "b": 189,
+        "a": 1
+      },
+      "hex": "#adb5bd"
+    },
+    "color.gray-600": {
+      "name": "color.gray-600",
+      "path": [
+        "color",
+        "gray-600"
+      ],
+      "value": "#6c757d",
+      "resolvedValue": "#6c757d",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 108,
+        "g": 117,
+        "b": 125,
+        "a": 1
+      },
+      "hex": "#6c757d"
+    },
+    "color.gray-700": {
+      "name": "color.gray-700",
+      "path": [
+        "color",
+        "gray-700"
+      ],
+      "value": "#495057",
+      "resolvedValue": "#495057",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 73,
+        "g": 80,
+        "b": 87,
+        "a": 1
+      },
+      "hex": "#495057"
+    },
+    "color.gray-800": {
+      "name": "color.gray-800",
+      "path": [
+        "color",
+        "gray-800"
+      ],
+      "value": "#343a40",
+      "resolvedValue": "#343a40",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 52,
+        "g": 58,
+        "b": 64,
+        "a": 1
+      },
+      "hex": "#343a40"
+    },
+    "color.gray-900": {
+      "name": "color.gray-900",
+      "path": [
+        "color",
+        "gray-900"
+      ],
+      "value": "#212529",
+      "resolvedValue": "#212529",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 33,
+        "g": 37,
+        "b": 41,
+        "a": 1
+      },
+      "hex": "#212529"
+    },
+    "color.text-primary": {
+      "name": "color.text-primary",
+      "path": [
+        "color",
+        "text-primary"
+      ],
+      "value": "{color.gray-900}",
+      "resolvedValue": "#212529",
+      "type": "color",
+      "isAlias": true,
+      "aliasChain": [
+        "color.text-primary",
+        "color.gray-900"
+      ],
+      "rgba": {
+        "r": 33,
+        "g": 37,
+        "b": 41,
+        "a": 1
+      },
+      "hex": "#212529"
+    },
+    "color.text-secondary": {
+      "name": "color.text-secondary",
+      "path": [
+        "color",
+        "text-secondary"
+      ],
+      "value": "{color.gray-600}",
+      "resolvedValue": "#6c757d",
+      "type": "color",
+      "isAlias": true,
+      "aliasChain": [
+        "color.text-secondary",
+        "color.gray-600"
+      ],
+      "rgba": {
+        "r": 108,
+        "g": 117,
+        "b": 125,
+        "a": 1
+      },
+      "hex": "#6c757d"
+    },
+    "color.text-muted": {
+      "name": "color.text-muted",
+      "path": [
+        "color",
+        "text-muted"
+      ],
+      "value": "{color.gray-500}",
+      "resolvedValue": "#adb5bd",
+      "type": "color",
+      "isAlias": true,
+      "aliasChain": [
+        "color.text-muted",
+        "color.gray-500"
+      ],
+      "rgba": {
+        "r": 173,
+        "g": 181,
+        "b": 189,
+        "a": 1
+      },
+      "hex": "#adb5bd"
+    },
+    "color.text-white": {
+      "name": "color.text-white",
+      "path": [
+        "color",
+        "text-white"
+      ],
+      "value": "{color.white}",
+      "resolvedValue": "#ffffff",
+      "type": "color",
+      "isAlias": true,
+      "aliasChain": [
+        "color.text-white",
+        "color.white"
+      ],
+      "rgba": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 1
+      },
+      "hex": "#ffffff"
+    },
+    "color.bg-primary": {
+      "name": "color.bg-primary",
+      "path": [
+        "color",
+        "bg-primary"
+      ],
+      "value": "{color.white}",
+      "resolvedValue": "#ffffff",
+      "type": "color",
+      "isAlias": true,
+      "aliasChain": [
+        "color.bg-primary",
+        "color.white"
+      ],
+      "rgba": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 1
+      },
+      "hex": "#ffffff"
+    },
+    "color.bg-secondary": {
+      "name": "color.bg-secondary",
+      "path": [
+        "color",
+        "bg-secondary"
+      ],
+      "value": "{color.gray-100}",
+      "resolvedValue": "#f8f9fa",
+      "type": "color",
+      "isAlias": true,
+      "aliasChain": [
+        "color.bg-secondary",
+        "color.gray-100"
+      ],
+      "rgba": {
+        "r": 248,
+        "g": 249,
+        "b": 250,
+        "a": 1
+      },
+      "hex": "#f8f9fa"
+    },
+    "color.bg-primary-brand": {
+      "name": "color.bg-primary-brand",
+      "path": [
+        "color",
+        "bg-primary-brand"
+      ],
+      "value": "{color.primary}",
+      "resolvedValue": "#0066cc",
+      "type": "color",
+      "isAlias": true,
+      "aliasChain": [
+        "color.bg-primary-brand",
+        "color.primary"
+      ],
+      "rgba": {
+        "r": 0,
+        "g": 102,
+        "b": 204,
+        "a": 1
+      },
+      "hex": "#0066cc"
+    },
+    "color.semi-transparent": {
+      "name": "color.semi-transparent",
+      "path": [
+        "color",
+        "semi-transparent"
+      ],
+      "value": "rgba(0, 0, 0, 0.5)",
+      "resolvedValue": "rgba(0, 0, 0, 0.5)",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 0.5
+      },
+      "hex": "#00000080"
+    },
+    "color.overlay": {
+      "name": "color.overlay",
+      "path": [
+        "color",
+        "overlay"
+      ],
+      "value": "rgba(255, 255, 255, 0.8)",
+      "resolvedValue": "rgba(255, 255, 255, 0.8)",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 0.8
+      },
+      "hex": "#ffffffcc"
+    },
+    "color.primary-dark": {
+      "name": "color.primary-dark",
+      "path": [
+        "color",
+        "primary-dark"
+      ],
+      "value": "#004080",
+      "resolvedValue": "#004080",
+      "type": "color",
+      "isAlias": false,
+      "rgba": {
+        "r": 0,
+        "g": 64,
+        "b": 128,
+        "a": 1
+      },
+      "hex": "#004080"
+    },
+    "color.bg-dark": {
+      "name": "color.bg-dark",
+      "path": [
+        "color",
+        "bg-dark"
+      ],
+      "value": "{color.gray-900}",
+      "resolvedValue": "#212529",
+      "type": "color",
+      "isAlias": true,
+      "aliasChain": [
+        "color.bg-dark",
+        "color.gray-900"
+      ],
+      "rgba": {
+        "r": 33,
+        "g": 37,
+        "b": 41,
+        "a": 1
+      },
+      "hex": "#212529"
+    }
+  }
+}

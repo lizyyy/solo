@@ -1,0 +1,72 @@
+[
+  {
+    "component": "Button",
+    "variant": "primary",
+    "foreground": "color.text-white",
+    "background": "color.primary",
+    "context": "默认按钮"
+  },
+  {
+    "component": "Button",
+    "variant": "secondary",
+    "foreground": "color.text-primary",
+    "background": "color.bg-secondary",
+    "context": "次要按钮"
+  },
+  {
+    "component": "Button",
+    "variant": "success",
+    "foreground": "color.text-white",
+    "background": "color.success",
+    "context": "成功按钮"
+  },
+  {
+    "component": "Button",
+    "variant": "warning",
+    "foreground": "color.text-primary",
+    "background": "color.warning",
+    "context": "警告按钮"
+  },
+  {
+    "component": "Button",
+    "variant": "danger",
+    "foreground": "color.text-white",
+    "background": "color.danger",
+    "context": "危险按钮"
+  },
+  {
+    "component": "Card",
+    "variant": "default",
+    "foreground": "color.text-primary",
+    "background": "color.bg-primary",
+    "context": "卡片正文"
+  },
+  {
+    "component": "Card",
+    "variant": "dark",
+    "foreground": "color.text-white",
+    "background": "color.bg-dark",
+    "context": "深色卡片"
+  },
+  {
+    "component": "Alert",
+    "variant": "info",
+    "foreground": "color.primary-dark",
+    "background": "color.primary-light",
+    "context": "信息提示"
+  },
+  {
+    "component": "Badge",
+    "variant": "new",
+    "foreground": "color.text-white",
+    "background": "color.primary",
+    "context": "新标签"
+  },
+  {
+    "component": "Navbar",
+    "variant": "dark",
+    "foreground": "color.text-white",
+    "background": "color.bg-dark",
+    "context": "深色导航栏"
+  }
+]
