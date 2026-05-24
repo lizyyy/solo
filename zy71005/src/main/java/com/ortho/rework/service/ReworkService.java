@@ -269,6 +269,13 @@ public class ReworkService {
             return ApiResponse.success(ReworkDetailDTO.fromEntity(order), "该返工单已完成医生确认，重复操作已记录");
         }
 
+        if (!stateMachine.canTransition(order.getStatus(), ReworkStatus.DOCTOR_CONFIRMED)) {
+            return ApiResponse.badRequest(
+                "状态转换不允许",
+                stateMachine.getTransitionError(order.getStatus(), ReworkStatus.DOCTOR_CONFIRMED)
+            );
+        }
+
         if (order.getProcessingStartTime() != null) {
             long hoursSinceProcessing = ChronoUnit.HOURS.between(order.getProcessingStartTime(), LocalDateTime.now());
             if (hoursSinceProcessing > confirmationWindowHours) {

@@ -1,0 +1,111 @@
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Maven Start Up Batch script
+# ----------------------------------------------------------------------------
+
+if [ -z "$MAVEN_SKIP_RC" ] ; then
+  if [ -f /etc/mavenrc ] ; then
+    . /etc/mavenrc
+  fi
+  if [ -f "$HOME/.mavenrc" ] ; then
+    . "$HOME/.mavenrc"
+  fi
+fi
+
+cygwin=false;
+darwin=false;
+mingw=false
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+  MINGW*) mingw=true;;
+  Darwin*) darwin=true
+    if [ -z "$JAVA_HOME" -a -x /usr/libexec/java_home ]; then
+      JAVA_HOME="`/usr/libexec/java_home`"
+      export JAVA_HOME
+    fi
+    ;;
+esac
+
+if [ -z "$JAVACMD" ] ; then
+  if [ -n "$JAVA_HOME"  ] ; then
+    JAVACMD="$JAVA_HOME/bin/java"
+  else
+    JAVACMD="`command -v java`"
+  fi
+fi
+
+if [ ! -x "$JAVACMD" ] ; then
+  echo "Error: JAVA_HOME is not defined correctly." >&2
+  echo "  We cannot execute $JAVACMD" >&2
+  exit 1
+fi
+
+find_maven_basedir() {
+  if [ -z "$1" ]; then
+    echo "Path not specified to find_maven_basedir"
+    return 1
+  fi
+  basedir="$1"
+  wdir="$1"
+  while [ "$wdir" != '/' ] ; do
+    if [ -d "$wdir"/.mvn ] ; then
+      basedir=$wdir
+      break
+    fi
+    wdir=`dirname "$wdir"`
+  done
+  echo "${basedir}"
+}
+
+concat_lines() {
+  if [ -f "$1" ]; then
+    echo "$(tr -s '\n' ' ' < "$1")"
+  fi
+}
+
+BASE_DIR=`find_maven_basedir "$(pwd)"`
+if [ -z "$BASE_DIR" ]; then
+  exit 1;
+fi
+
+if [ -r "$BASE_DIR/.mvn/wrapper/maven-wrapper.jar" ]; then
+    echo "Found maven-wrapper.jar" >&2
+else
+    echo "Couldn't find maven-wrapper.jar, downloading it ..." >&2
+    wrapperUrl="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
+    wrapperJarPath="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
+    if command -v wget > /dev/null; then
+        wget "$wrapperUrl" -O "$wrapperJarPath" || rm -f "$wrapperJarPath"
+    elif command -v curl > /dev/null; then
+        curl -f -L -o "$wrapperJarPath" "$wrapperUrl" || rm -f "$wrapperJarPath"
+    else
+        echo "Fatal: Unable to download maven-wrapper.jar" >&2
+        exit 1
+    fi
+fi
+
+MAVEN_PROJECTBASEDIR="${BASE_DIR}"
+export MAVEN_PROJECTBASEDIR
+MAVEN_OPTS="$(concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config") $MAVEN_OPTS"
+
+if $cygwin ; then
+  [ -n "$M2_HOME" ] && M2_HOME=`cygpath --unix "$M2_HOME"`
+  [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
+fi
+
+wrapperJarPath="$MAVEN_PROJECTBASEDIR/.mvn/wrapper/maven-wrapper.jar"
+MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $*"
+export MAVEN_CMD_LINE_ARGS
+
+if $cygwin; then
+  [ -n "$M2_HOME" ] && M2_HOME=`cygpath --path --windows "$M2_HOME"`
+  [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
+  [ -n "$MAVEN_PROJECTBASEDIR" ] && MAVEN_PROJECTBASEDIR=`cygpath --path --windows "$MAVEN_PROJECTBASEDIR"`
+fi
+
+exec "$JAVACMD" \
+  $MAVEN_OPTS \
+  -classpath "$wrapperJarPath" \
+  "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
+  org.apache.maven.wrapper.MavenWrapperMain \
+  "$@"

@@ -16,7 +16,7 @@ public class Patient {
     private String name;
 
     @Column(nullable = false, unique = true)
-    private String patientId;
+    private String patientNo;
 
     private String phone;
 

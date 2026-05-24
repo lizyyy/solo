@@ -22,6 +22,19 @@
 
 ### 启动项目
 
+使用 Maven Wrapper（推荐）：
+```bash
+# 编译打包
+./mvnw clean package
+
+# 运行
+java -jar target/rework-api-1.0.0.jar
+
+# 或使用 Maven 直接运行
+./mvnw spring-boot:run
+```
+
+使用系统 Maven：
 ```bash
 # 编译打包
 mvn clean package
@@ -59,63 +72,59 @@ curl http://localhost:8080/health
 
 ```
 ┌─────────────────┐
-│  PENDING_REVIEW │  待审核
+│    CREATED      │  已创建
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│TECHNICIAN_REVIEW│  技师审核中  ◄───────────┐
-└────────┬────────┘                           │
-         │                                    │
-         ▼                                    │
-┌─────────────────┐                           │
-│  DOCTOR_CONFIRM │  医生确认中               │
-└───────┬─────────┘                           │
-        │                                     │
-   ┌────┴────┐                                │
-   │         │                                │
-   ▼         ▼                                │
-┌─────────┐ ┌─────────────────┐               │
-│READY_TO │ │TECHNICIAN_REVIEW│  医生驳回─────┘
-│  SHIP   │ └─────────────────┘
-└────┬────┘  待寄出
-     │
-     ▼
-┌─────────┐
-│ SHIPPED │  已寄出
-└────┬────┘
-     │
-  ┌──┴──┐
-  │     │
-  ▼     ▼
-┌─────┐ ┌──────┐
-│RECEIV│ │ LOST │  快递丢失
-│ ED  │ └──────┘
-└──┬──┘  已收件
-   │
-   ▼
-┌────────┐
-│INSPECT │  核验中
-│  ION   │
-└───┬────┘
-    │
-    ▼
-┌────────┐
-│ CLOSED │  已结案
-└────────┘
+│    RECEIVED     │  已收件
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│    INSPECTED    │  已核验
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   PROCESSING    │  处理中
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ DOCTOR_CONFIRMED│  医生已确认
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│    REVIEWED     │  已复查
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│    SHIPPED      │  已寄出
+└───────┬─────────┘
+        │
+   ┌────┴────┐
+   │         │
+   ▼         ▼
+┌─────────┐ ┌─────────┐
+│ CLOSED  │ │  LOST   │  快递丢失
+└─────────┘ └─────────┘
+  已结案
 ```
 
 状态说明：
 
 | 状态 | 说明 | 可转换至 |
 |------|------|----------|
-| `PENDING_REVIEW` | 待审核 | TECHNICIAN_REVIEW |
-| `TECHNICIAN_REVIEW` | 技师审核中 | DOCTOR_CONFIRM, PENDING_REVIEW |
-| `DOCTOR_CONFIRM` | 医生确认中 | READY_TO_SHIP, TECHNICIAN_REVIEW |
-| `READY_TO_SHIP` | 待寄出 | SHIPPED |
-| `SHIPPED` | 已寄出 | RECEIVED, LOST |
-| `RECEIVED` | 已收件 | INSPECTION |
-| `INSPECTION` | 核验中 | CLOSED |
+| `CREATED` | 已创建 | RECEIVED |
+| `RECEIVED` | 已收件 | INSPECTED |
+| `INSPECTED` | 已核验 | PROCESSING |
+| `PROCESSING` | 处理中 | DOCTOR_CONFIRMED |
+| `DOCTOR_CONFIRMED` | 医生已确认 | REVIEWED, SHIPPED |
+| `REVIEWED` | 已复查 | SHIPPED, CLOSED |
+| `SHIPPED` | 已寄出 | CLOSED, LOST |
 | `CLOSED` | 已结案 | - |
 | `LOST` | 快递丢失 | - |
 
@@ -124,8 +133,8 @@ curl http://localhost:8080/health
 项目启动时 `DataInitializer` 会自动创建以下测试数据：
 
 ### 患者数据
-| 患者ID | 姓名 | 电话 |
-|--------|------|------|
+| 患者编号 | 姓名 | 电话 |
+|----------|------|------|
 | P001 | 张三 | 13800138000 |
 | P002 | 李四 | 13900139000 |
 
@@ -138,182 +147,190 @@ curl http://localhost:8080/health
 ### 返工单数据
 | 工单号 | 批次 | 当前状态 | 返工原因 | 技师备注 |
 |--------|------|----------|----------|----------|
-| RW1001 | BATCH-001 | PENDING_REVIEW | 牙模边缘不清晰 | - |
-| RW1002 | BATCH-002 | TECHNICIAN_REVIEW | 咬合关系不准确 | 正在检查中... |
+| RW1001 | BATCH-001 | CREATED | 牙模边缘不清晰 | - |
+| RW1002 | BATCH-002 | INSPECTED | 咬合关系不准确 | 正在检查中... |
 
 ## 完整 Curl 示例
 
 ### 1. 创建返工单
 
 ```bash
-curl -X POST http://localhost:8080/api/rework \
+curl -X POST http://localhost:8080/api/rework/create \
   -H "Content-Type: application/json" \
   -d '{
-    "batchNumber": "BATCH-003",
-    "patientId": "P003",
+    "patientNo": "P003",
     "patientName": "王五",
     "patientPhone": "13700137000",
-    "reworkReason": "牙模变形"
-  }'
-```
-
-### 2. 技师开始审核
-
-```bash
-curl -X POST http://localhost:8080/api/rework/1/review \
-  -H "Content-Type: application/json" \
-  -d '{
-    "operator": "tech_zhang",
-    "remark": "开始审核"
-  }'
-```
-
-### 3. 添加技师备注
-
-```bash
-curl -X POST http://localhost:8080/api/rework/1/technician-note \
-  -H "Content-Type: application/json" \
-  -d '{
-    "note": "牙模边缘需要重新打磨，建议重新取模",
-    "operator": "tech_zhang"
-  }'
-```
-
-### 4. 医生确认
-
-**确认通过：**
-```bash
-curl -X POST http://localhost:8080/api/rework/1/doctor-confirm \
-  -H "Content-Type: application/json" \
-  -d '{
-    "confirmed": true,
-    "note": "同意返工方案",
-    "operator": "dr_li"
-  }'
-```
-
-**驳回重审：**
-```bash
-curl -X POST http://localhost:8080/api/rework/1/doctor-confirm \
-  -H "Content-Type: application/json" \
-  -d '{
-    "confirmed": false,
-    "note": "方案不完整，请补充",
-    "operator": "dr_li"
-  }'
-```
-
-### 5. 寄出
-
-```bash
-curl -X POST http://localhost:8080/api/rework/1/ship \
-  -H "Content-Type: application/json" \
-  -d '{
-    "trackingNumber": "SF1234567890",
-    "courier": "顺丰速运",
-    "sender": "诊所A",
-    "receiver": "工厂B",
+    "doctorName": "王医生",
+    "batchNo": "BATCH-003",
+    "impressionType": "正畸牙模",
+    "reworkReason": "牙模变形",
     "operator": "admin"
   }'
 ```
 
-### 6. 收件
+### 2. 收件登记
 
 ```bash
-curl -X POST http://localhost:8080/api/rework/1/receive \
+curl -X POST http://localhost:8080/api/rework/receive \
   -H "Content-Type: application/json" \
   -d '{
-    "operator": "factory_receiver",
+    "reworkNo": "RW-XXXXXXXX",
+    "receivedBy": "factory_receiver",
     "remark": "包装完好，已签收"
   }'
 ```
 
-### 7. 核验
+### 3. 到件核验
 
 ```bash
-curl -X POST http://localhost:8080/api/rework/1/inspect \
+curl -X POST http://localhost:8080/api/rework/inspect \
   -H "Content-Type: application/json" \
   -d '{
+    "reworkNo": "RW-XXXXXXXX",
     "inspectionResult": "牙模完整，无破损",
-    "conclusion": "符合返工要求，可进行下一步处理",
-    "reporter": "inspector_wang"
+    "inspectionRemark": "符合返工要求，可进行下一步处理",
+    "inspectionBy": "inspector_wang"
+  }'
+```
+
+### 4. 添加技师备注
+
+```bash
+curl -X POST http://localhost:8080/api/rework/technician-note \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reworkNo": "RW-XXXXXXXX",
+    "technicianNote": "牙模边缘需要重新打磨，建议重新取模",
+    "technicianName": "tech_zhang"
+  }'
+```
+
+### 5. 医生确认
+
+```bash
+curl -X POST http://localhost:8080/api/rework/doctor-confirm \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reworkNo": "RW-XXXXXXXX",
+    "doctorConfirmation": "同意返工方案，请按方案执行",
+    "doctorName": "dr_li"
+  }'
+```
+
+### 6. 复查
+
+```bash
+curl -X POST http://localhost:8080/api/rework/review \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reworkNo": "RW-XXXXXXXX",
+    "reviewResult": "复查通过，符合质量要求",
+    "reviewBy": "reviewer_zhao"
+  }'
+```
+
+### 7. 寄出
+
+```bash
+curl -X POST http://localhost:8080/api/rework/ship \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reworkNo": "RW-XXXXXXXX",
+    "expressNo": "SF1234567890",
+    "expressCompany": "顺丰速运",
+    "shippedBy": "admin",
+    "receiver": "诊所A",
+    "receiverPhone": "13800138000"
   }'
 ```
 
 ### 8. 结案
 
 ```bash
-curl -X POST http://localhost:8080/api/rework/1/close \
+curl -X POST http://localhost:8080/api/rework/close \
   -H "Content-Type: application/json" \
   -d '{
-    "operator": "admin",
-    "remark": "返工完成，流程结束"
+    "reworkNo": "RW-XXXXXXXX",
+    "closeReason": "返工完成，患者已确认收到",
+    "closedBy": "admin"
   }'
 ```
 
 ### 9. 标记丢失
 
 ```bash
-curl -X POST http://localhost:8080/api/rework/1/mark-lost \
+curl -X POST http://localhost:8080/api/rework/mark-lost \
   -H "Content-Type: application/json" \
   -d '{
-    "operator": "admin",
-    "remark": "快递超过7天未更新，确认丢失"
+    "expressNo": "SF1234567890",
+    "lostRemark": "快递超过7天未更新，确认丢失",
+    "operator": "admin"
   }'
 ```
 
 ### 10. 查询详情
 
 ```bash
-curl http://localhost:8080/api/rework/1
+curl http://localhost:8080/api/rework/RW-XXXXXXXX
 ```
 
 **查询所有返工单：**
 ```bash
-curl http://localhost:8080/api/rework
+curl http://localhost:8080/api/rework/list
+```
+
+**按状态查询返工单：**
+```bash
+curl "http://localhost:8080/api/rework/list?status=PROCESSING"
 ```
 
 ## 失败路径演示
 
 ### 场景1：重复操作拦截
 
-**问题：** 在 `DOCTOR_CONFIRM` 状态再次调用审核接口
+**问题：** 在已完成医生确认后再次调用医生确认接口
 
 ```bash
-# 假设工单已处于 DOCTOR_CONFIRM 状态
-curl -X POST http://localhost:8080/api/rework/1/review \
-  -H "Content-Type: application/json" \
-  -d '{"operator": "tech_zhang"}'
-```
-
-**返回：**
-```json
-{
-  "code": 500,
-  "message": "Invalid status transition from DOCTOR_CONFIRM to TECHNICIAN_REVIEW",
-  "data": null
-}
-```
-
-### 场景2：状态非法转换
-
-**问题：** 在 `PENDING_REVIEW` 状态直接尝试寄出
-
-```bash
-curl -X POST http://localhost:8080/api/rework/1/ship \
+curl -X POST http://localhost:8080/api/rework/doctor-confirm \
   -H "Content-Type: application/json" \
   -d '{
-    "trackingNumber": "SF1234567890",
-    "courier": "顺丰速运"
+    "reworkNo": "RW-XXXXXXXX",
+    "doctorConfirmation": "再次确认",
+    "doctorName": "dr_li"
   }'
 ```
 
 **返回：**
 ```json
 {
-  "code": 500,
-  "message": "Invalid status transition from PENDING_REVIEW to SHIPPED",
-  "data": null
+  "code": 200,
+  "message": "该返工单已完成医生确认，重复操作已记录",
+  "data": { ... }
+}
+```
+
+### 场景2：状态非法转换
+
+**问题：** 在 `CREATED` 状态直接尝试寄出
+
+```bash
+curl -X POST http://localhost:8080/api/rework/ship \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reworkNo": "RW-XXXXXXXX",
+    "expressNo": "SF1234567890",
+    "expressCompany": "顺丰速运",
+    "shippedBy": "admin"
+  }'
+```
+
+**返回：**
+```json
+{
+  "code": 400,
+  "message": "状态转换不允许",
+  "data": "Invalid status transition from CREATED to SHIPPED"
 }
 ```
 
@@ -322,17 +339,21 @@ curl -X POST http://localhost:8080/api/rework/1/ship \
 **问题：** `CLOSED` 或 `LOST` 状态后继续操作
 
 ```bash
-curl -X POST http://localhost:8080/api/rework/1/inspect \
+curl -X POST http://localhost:8080/api/rework/inspect \
   -H "Content-Type: application/json" \
-  -d '{"inspectionResult": "test"}'
+  -d '{
+    "reworkNo": "RW-XXXXXXXX",
+    "inspectionResult": "test",
+    "inspectionBy": "inspector_wang"
+  }'
 ```
 
 **返回：**
 ```json
 {
-  "code": 500,
-  "message": "Invalid status transition from CLOSED to INSPECTION",
-  "data": null
+  "code": 400,
+  "message": "状态转换不允许",
+  "data": "Invalid status transition from CLOSED to INSPECTED"
 }
 ```
 
@@ -340,17 +361,18 @@ curl -X POST http://localhost:8080/api/rework/1/inspect \
 
 | 方法 | 路径 | 说明 | 请求体 |
 |------|------|------|--------|
-| POST | `/api/rework` | 创建返工单 | `CreateReworkRequest` |
-| GET | `/api/rework/{id}` | 查询单条返工单 | - |
-| GET | `/api/rework` | 查询所有返工单 | - |
-| POST | `/api/rework/{id}/review` | 技师开始审核 | `ReviewRequest` |
-| POST | `/api/rework/{id}/technician-note` | 添加技师备注 | `TechnicianNoteRequest` |
-| POST | `/api/rework/{id}/doctor-confirm` | 医生确认 | `DoctorConfirmRequest` |
-| POST | `/api/rework/{id}/ship` | 寄出 | `ShipRequest` |
-| POST | `/api/rework/{id}/receive` | 收件 | `ReceiveRequest` |
-| POST | `/api/rework/{id}/inspect` | 核验 | `InspectionRequest` |
-| POST | `/api/rework/{id}/close` | 结案 | `CloseRequest` |
-| POST | `/api/rework/{id}/mark-lost` | 标记丢失 | `MarkLostRequest` |
+| POST | `/api/rework/create` | 创建返工单 | `CreateReworkRequest` |
+| POST | `/api/rework/receive` | 收件登记 | `ReceiveRequest` |
+| POST | `/api/rework/inspect` | 到件核验 | `InspectionRequest` |
+| POST | `/api/rework/technician-note` | 添加技师备注 | `TechnicianNoteRequest` |
+| POST | `/api/rework/doctor-confirm` | 医生确认 | `DoctorConfirmRequest` |
+| POST | `/api/rework/review` | 复查 | `ReviewRequest` |
+| POST | `/api/rework/ship` | 寄出 | `ShipRequest` |
+| POST | `/api/rework/close` | 结案 | `CloseRequest` |
+| POST | `/api/rework/mark-lost` | 标记丢失 | `MarkLostRequest` |
+| GET | `/api/rework/{reworkNo}` | 查询单条返工单 | - |
+| GET | `/api/rework/list` | 查询返工单列表（支持按状态筛选） | - |
+| POST | `/api/rework/export/{reworkNo}` | 导出返工报告 | - |
 | GET | `/health` | 健康检查 | - |
 
 ### 请求体结构
@@ -358,40 +380,90 @@ curl -X POST http://localhost:8080/api/rework/1/inspect \
 **CreateReworkRequest:**
 ```json
 {
-  "batchNumber": "string (必填)",
-  "patientId": "string (必填)",
+  "patientNo": "string (必填)",
   "patientName": "string",
   "patientPhone": "string",
-  "reworkReason": "string"
-}
-```
-
-**DoctorConfirmRequest:**
-```json
-{
-  "confirmed": "boolean",
-  "note": "string",
+  "doctorName": "string",
+  "batchNo": "string (必填)",
+  "impressionType": "string",
+  "reworkReason": "string (必填)",
   "operator": "string"
 }
 ```
 
-**ShipRequest:**
+**ReceiveRequest:**
 ```json
 {
-  "trackingNumber": "string (必填)",
-  "courier": "string",
-  "sender": "string",
-  "receiver": "string",
-  "operator": "string"
+  "reworkNo": "string (必填)",
+  "receivedBy": "string (必填)",
+  "remark": "string"
 }
 ```
 
 **InspectionRequest:**
 ```json
 {
-  "inspectionResult": "string",
-  "conclusion": "string",
-  "reporter": "string"
+  "reworkNo": "string (必填)",
+  "inspectionResult": "string (必填)",
+  "inspectionRemark": "string",
+  "inspectionBy": "string (必填)"
+}
+```
+
+**TechnicianNoteRequest:**
+```json
+{
+  "reworkNo": "string (必填)",
+  "technicianNote": "string (必填)",
+  "technicianName": "string (必填)"
+}
+```
+
+**DoctorConfirmRequest:**
+```json
+{
+  "reworkNo": "string (必填)",
+  "doctorConfirmation": "string (必填)",
+  "doctorName": "string (必填)"
+}
+```
+
+**ReviewRequest:**
+```json
+{
+  "reworkNo": "string (必填)",
+  "reviewResult": "string (必填)",
+  "reviewBy": "string (必填)"
+}
+```
+
+**ShipRequest:**
+```json
+{
+  "reworkNo": "string (必填)",
+  "expressNo": "string (必填)",
+  "expressCompany": "string",
+  "shippedBy": "string (必填)",
+  "receiver": "string",
+  "receiverPhone": "string"
+}
+```
+
+**CloseRequest:**
+```json
+{
+  "reworkNo": "string (必填)",
+  "closeReason": "string (必填)",
+  "closedBy": "string (必填)"
+}
+```
+
+**MarkLostRequest:**
+```json
+{
+  "expressNo": "string (必填)",
+  "lostRemark": "string",
+  "operator": "string (必填)"
 }
 ```
 
@@ -400,7 +472,7 @@ curl -X POST http://localhost:8080/api/rework/1/inspect \
 ### 审计日志
 
 系统内置完整的审计日志功能，每个操作都会记录：
-- 操作类型 (CREATE / STATUS_CHANGE / SHIP 等)
+- 操作类型 (CREATE_REWORK / RECEIVE / INSPECT 等)
 - 状态变更前后
 - 操作人
 - 操作时间
@@ -408,30 +480,33 @@ curl -X POST http://localhost:8080/api/rework/1/inspect \
 
 **查看审计日志：**
 ```bash
-curl http://localhost:8080/api/rework/1
+curl http://localhost:8080/api/rework/RW-XXXXXXXX
 ```
 
 返回中的 `auditLogs` 字段包含完整操作记录：
 ```json
 {
+  "code": 200,
+  "message": "success",
   "data": {
-    "id": 1,
-    "orderNumber": "RW1001",
+    "reworkNo": "RW1001",
     "status": "CLOSED",
     "auditLogs": [
       {
-        "operationType": "CREATE",
+        "operationType": "CREATE_REWORK",
         "fromStatus": null,
-        "toStatus": "PENDING_REVIEW",
+        "toStatus": "CREATED",
         "operator": "system",
-        "createdAt": "2024-01-15T10:00:00"
+        "operationTime": "2024-01-15T10:00:00",
+        "remark": "创建返工单"
       },
       {
-        "operationType": "STATUS_CHANGE",
-        "fromStatus": "PENDING_REVIEW",
-        "toStatus": "TECHNICIAN_REVIEW",
-        "operator": "tech_zhang",
-        "createdAt": "2024-01-15T10:05:00"
+        "operationType": "RECEIVE",
+        "fromStatus": "CREATED",
+        "toStatus": "RECEIVED",
+        "operator": "factory_receiver",
+        "operationTime": "2024-01-15T10:05:00",
+        "remark": "收件登记"
       }
     ]
   }
