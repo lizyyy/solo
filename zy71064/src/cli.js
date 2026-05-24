@@ -105,7 +105,7 @@ async function main() {
 }
 
 async function loadConfig(options) {
-  let config = { ...options };
+  let config = {};
 
   if (options.config) {
     const configPath = path.resolve(options.config);
@@ -116,12 +116,13 @@ async function loadConfig(options) {
     const ext = path.extname(configPath).toLowerCase();
     if (ext === '.json') {
       const content = fs.readFileSync(configPath, 'utf-8');
-      const fileConfig = JSON.parse(content);
-      config = { ...config, ...fileConfig };
+      config = JSON.parse(content);
     } else {
       throw new Error(`不支持的配置文件格式: ${ext}`);
     }
   }
+
+  config = { ...config, ...options };
 
   return config;
 }
