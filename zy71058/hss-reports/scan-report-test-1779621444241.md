@@ -276,7 +276,7 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 
 **证据:**
 ```
-第 71 行发现敏感内容: "SLACK_WEBHOOK_URL_PLACEHOLDER"
+第 71 行发现敏感内容: "REDACTED_SLACK_WEBHOOK_URL"
 ```
 
 
@@ -392,7 +392,7 @@ Base64 解码后: {"auths":{"registry.example.com":{"username":"admin","password
 
 **证据:**
 ```
-路径 slack.webhook 中发现匹配: "SLACK_WEBHOOK_URL_PLACEHOLDER"
+路径 slack.webhook 中发现匹配: "REDACTED_SLACK_WEBHOOK_URL"
 ```
 
 

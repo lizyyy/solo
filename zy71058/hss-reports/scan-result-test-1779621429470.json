@@ -256,8 +256,8 @@
         "line": 71,
         "column": 12
       },
-      "matchedValue": "SLACK_WEBHOOK_URL_PLACEHOLDER",
-      "evidence": "第 71 行发现敏感内容: \"SLACK_WEBHOOK_URL_PLACEHOLDER\""
+      "matchedValue": "REDACTED_SLACK_WEBHOOK_URL",
+      "evidence": "第 71 行发现敏感内容: \"REDACTED_SLACK_WEBHOOK_URL""
     },
     {
       "id": "finding_1cabf1290d36a361",
@@ -498,8 +498,8 @@
         "line": 0,
         "column": 0
       },
-      "matchedValue": "SLACK_WEBHOOK_URL_PLACEHOLDER",
-      "evidence": "路径 slack.webhook 中发现匹配: \"SLACK_WEBHOOK_URL_PLACEHOLDER\""
+      "matchedValue": "REDACTED_SLACK_WEBHOOK_URL",
+      "evidence": "路径 slack.webhook 中发现匹配: \"REDACTED_SLACK_WEBHOOK_URL""
     },
     {
       "id": "finding_3a75b104649c54b8",
