@@ -1,0 +1,100 @@
+{
+  "task_name": "decimal_test",
+  "created_at": "2026-05-24T21:05:37.111663",
+  "old_schema": {
+    "source": "examples/test_data/decimal/v1_decimal.parquet",
+    "created_at": "2026-05-24T21:05:37.098980",
+    "fields": [
+      {
+        "name": "id",
+        "path": "id",
+        "data_type": "int64",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "int64"
+      },
+      {
+        "name": "amount",
+        "path": "amount",
+        "data_type": "decimal(10,2)",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "decimal_info": {
+          "precision": 10,
+          "scale": 2
+        },
+        "original_type": "decimal128(10, 2)"
+      }
+    ],
+    "partition_info": null,
+    "row_count": 3,
+    "file_count": 1
+  },
+  "new_schema": {
+    "source": "examples/test_data/decimal/v2_decimal.parquet",
+    "created_at": "2026-05-24T21:05:37.109945",
+    "fields": [
+      {
+        "name": "id",
+        "path": "id",
+        "data_type": "int64",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "original_type": "int64"
+      },
+      {
+        "name": "amount",
+        "path": "amount",
+        "data_type": "decimal(18,4)",
+        "nullable": true,
+        "is_struct": false,
+        "is_list": false,
+        "is_map": false,
+        "decimal_info": {
+          "precision": 18,
+          "scale": 4
+        },
+        "original_type": "decimal128(18, 4)"
+      }
+    ],
+    "partition_info": null,
+    "row_count": 3,
+    "file_count": 1
+  },
+  "changes": [
+    {
+      "change_type": "decimal_precision_changed",
+      "field_path": "amount",
+      "description": "Decimal 精度从 (10,2) 变为 (18,4)",
+      "old_value": "decimal(10,2)",
+      "new_value": "decimal(18,4)",
+      "severity": "low",
+      "compatibility_impact": "none"
+    }
+  ],
+  "compatibility_level": "fully_compatible",
+  "summary": {
+    "total_changes": 1,
+    "field_added": 0,
+    "field_removed": 0,
+    "field_renamed": 0,
+    "type_changed": 0,
+    "nullable_changed": 0,
+    "decimal_precision_changed": 1,
+    "nested_structure_changed": 0,
+    "breaking_changes": 0,
+    "high_severity": 0,
+    "medium_severity": 0,
+    "low_severity": 1
+  },
+  "recommendations": [
+    "📊 Decimal 精度变更可能影响数值计算，建议验证数据转换后的值是否正确",
+    "✅ Schema 变更完全兼容，可以安全部署"
+  ]
+}

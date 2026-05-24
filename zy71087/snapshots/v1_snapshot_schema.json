@@ -1,0 +1,69 @@
+{
+  "source": "examples/test_data/v1/data.parquet",
+  "created_at": "2026-05-24T21:05:57.130782",
+  "fields": [
+    {
+      "name": "id",
+      "path": "id",
+      "data_type": "int64",
+      "nullable": true,
+      "is_struct": false,
+      "is_list": false,
+      "is_map": false,
+      "original_type": "int64"
+    },
+    {
+      "name": "name",
+      "path": "name",
+      "data_type": "string",
+      "nullable": true,
+      "is_struct": false,
+      "is_list": false,
+      "is_map": false,
+      "original_type": "string"
+    },
+    {
+      "name": "age",
+      "path": "age",
+      "data_type": "int64",
+      "nullable": true,
+      "is_struct": false,
+      "is_list": false,
+      "is_map": false,
+      "original_type": "int64"
+    },
+    {
+      "name": "score",
+      "path": "score",
+      "data_type": "float32",
+      "nullable": true,
+      "is_struct": false,
+      "is_list": false,
+      "is_map": false,
+      "original_type": "float"
+    },
+    {
+      "name": "active",
+      "path": "active",
+      "data_type": "boolean",
+      "nullable": true,
+      "is_struct": false,
+      "is_list": false,
+      "is_map": false,
+      "original_type": "bool"
+    },
+    {
+      "name": "created_at",
+      "path": "created_at",
+      "data_type": "timestamp[ns]",
+      "nullable": true,
+      "is_struct": false,
+      "is_list": false,
+      "is_map": false,
+      "original_type": "timestamp[ns]"
+    }
+  ],
+  "partition_info": null,
+  "row_count": 5,
+  "file_count": 1
+}

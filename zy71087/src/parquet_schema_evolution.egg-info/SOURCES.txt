@@ -1,0 +1,15 @@
+pyproject.toml
+src/parquet_schema_evolution/__init__.py
+src/parquet_schema_evolution/cli.py
+src/parquet_schema_evolution/comparator.py
+src/parquet_schema_evolution/models.py
+src/parquet_schema_evolution/partition_sampler.py
+src/parquet_schema_evolution/reporter.py
+src/parquet_schema_evolution/schema_reader.py
+src/parquet_schema_evolution.egg-info/PKG-INFO
+src/parquet_schema_evolution.egg-info/SOURCES.txt
+src/parquet_schema_evolution.egg-info/dependency_links.txt
+src/parquet_schema_evolution.egg-info/entry_points.txt
+src/parquet_schema_evolution.egg-info/requires.txt
+src/parquet_schema_evolution.egg-info/top_level.txt
+tests/test_schemas.py
