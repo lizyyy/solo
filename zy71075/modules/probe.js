@@ -235,7 +235,7 @@ function loadProbeData(filePath) {
       return item;
     }
     
-    const itemPath = item.path || item.filename || `${fileName}#${idx}`;
+    const itemPath = item.path || item.filename || item.format?.filename || `${fileName}#${idx}`;
     return parseProbeData(item, itemPath);
   };
   

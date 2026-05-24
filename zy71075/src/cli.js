@@ -183,7 +183,12 @@ program
       if (program.opts().verbose) {
         console.error(err.stack);
       }
-      process.exit(EXIT_CODES.IO_ERROR);
+      
+      if (err.message.startsWith('无效的目标规格')) {
+        process.exit(EXIT_CODES.INVALID_INPUT);
+      } else {
+        process.exit(EXIT_CODES.IO_ERROR);
+      }
     }
   });
 
