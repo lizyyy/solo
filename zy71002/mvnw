@@ -1,0 +1,14 @@
+#!/bin/sh
+# Maven Wrapper bootstrap script
+# Attempt to use system maven, or guide user to install
+
+if command -v mvn >/dev/null 2>&1; then
+  exec mvn "$@"
+else
+  echo "Maven 未找到，请先安装 Maven:"
+  echo "  macOS: brew install maven"
+  echo "  或从 https://maven.apache.org/download.cgi 下载"
+  echo ""
+  echo "安装后执行: mvn clean spring-boot:run"
+  exit 1
+fi
