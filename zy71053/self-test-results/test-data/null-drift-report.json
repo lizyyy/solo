@@ -1,0 +1,118 @@
+{
+  "metadata": {
+    "generatedAt": "2026-05-24T10:59:42.420Z",
+    "oldSchemaHash": "cba06b5736faf67e",
+    "newSchemaHash": "11507a0e2f5e69d5"
+  },
+  "schemaDiff": {
+    "totalFieldsChecked": 3,
+    "fieldsAdded": 0,
+    "fieldsRemoved": 0,
+    "typesAdded": 0,
+    "typesRemoved": 0,
+    "nullabilityChangesCount": 2
+  },
+  "nullabilityChanges": [
+    {
+      "fieldPath": "Query.user",
+      "typeName": "Query",
+      "fieldName": "user",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": false,
+        "innerType": "User",
+        "fullType": "User!",
+        "rawType": "User",
+        "listInnerNonNull": false
+      },
+      "newType": {
+        "isNonNull": false,
+        "isList": false,
+        "innerType": "User",
+        "fullType": "User",
+        "rawType": "User",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "字段从 User! → User，失去了非空保证",
+      "ruleExplanation": "字段从非空(!)变为可空，客户端必须添加null检查或兜底逻辑，否则可能导致运行时崩溃。"
+    },
+    {
+      "fieldPath": "User.name",
+      "typeName": "User",
+      "fieldName": "name",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "oldType": {
+        "isNonNull": true,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String!",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "newType": {
+        "isNonNull": false,
+        "isList": false,
+        "innerType": "String",
+        "fullType": "String",
+        "rawType": "String",
+        "listInnerNonNull": false
+      },
+      "severity": "HIGH",
+      "description": "字段从 String! → String，失去了非空保证",
+      "ruleExplanation": "字段从非空(!)变为可空，客户端必须添加null检查或兜底逻辑，否则可能导致运行时崩溃。"
+    }
+  ],
+  "affectedQueries": [
+    {
+      "documentPath": "test.graphql",
+      "operationName": "GetUser",
+      "operationType": "query",
+      "affectedFields": [
+        {
+          "queryPath": "user",
+          "schemaPath": "Query.user",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.user || defaultValue"
+        },
+        {
+          "queryPath": "user.user.name",
+          "schemaPath": "User.name",
+          "changeType": "NON_NULL_TO_NULLABLE",
+          "fallbackRecommendation": "添加null检查: data?.name || defaultValue"
+        }
+      ]
+    }
+  ],
+  "failurePaths": [
+    {
+      "path": "Query.user",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetUser (test.graphql)"
+      ],
+      "rootCause": "客户端代码可能假设该字段永远不会为null，缺少null检查会导致运行时崩溃",
+      "recommendedAction": "添加null检查: data?.user || defaultValue"
+    },
+    {
+      "path": "User.name",
+      "changeType": "NON_NULL_TO_NULLABLE",
+      "queryOperations": [
+        "query GetUser (test.graphql)"
+      ],
+      "rootCause": "客户端代码可能假设该字段永远不会为null，缺少null检查会导致运行时崩溃",
+      "recommendedAction": "添加null检查: data?.name || defaultValue"
+    }
+  ],
+  "statistics": {
+    "criticalCount": 0,
+    "highCount": 2,
+    "mediumCount": 0,
+    "lowCount": 0,
+    "queriesScanned": 1,
+    "queriesAffected": 1,
+    "fieldsScanned": 3
+  },
+  "exitCode": 2
+}

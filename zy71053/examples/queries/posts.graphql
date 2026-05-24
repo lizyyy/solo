@@ -1,0 +1,27 @@
+query GetPosts {
+  posts {
+    id
+    title
+    content
+    author {
+      name
+    }
+    comments {
+      text
+      author {
+        name
+      }
+    }
+  }
+}
+
+query Search($keyword: String!) {
+  search(keyword: $keyword) {
+    ... on User {
+      name
+    }
+    ... on Post {
+      title
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "graphql-null-drift",
+  "version": "1.0.0",
+  "description": "GraphQL空值漂移检测CLI工具 - 检测字段从非空变为可空的变更对客户端的影响",
+  "main": "dist/index.js",
+  "bin": {
+    "gql-null-drift": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node dist/self-test.js",
+    "self-test": "npm run build && node dist/self-test.js"
+  },
+  "keywords": [
+    "graphql",
+    "nullability",
+    "schema",
+    "diff",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "graphql": "^16.8.1",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

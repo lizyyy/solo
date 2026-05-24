@@ -1,0 +1,12 @@
+import { FieldTypeInfo, ConfigFile } from './types';
+export declare function readFile(filePath: string): string;
+export declare function writeFile(filePath: string, content: string): void;
+export declare function fileExists(filePath: string): boolean;
+export declare function ensureDir(dirPath: string): void;
+export declare function hashString(str: string): string;
+export declare function parseFieldType(typeStr: string): FieldTypeInfo;
+export declare function formatTypeInfo(info: FieldTypeInfo): string;
+export declare function loadConfigFile(configPath?: string): ConfigFile | null;
+export declare function validateSchemaPath(filePath: string): void;
+export declare function validateQueryPaths(paths: string[]): void;
+export declare function findQueryFiles(patterns: string[]): string[];

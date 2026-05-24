@@ -1,0 +1,40 @@
+type Query {
+  user(id: ID!): User!
+  posts: [Post!]!
+  search(keyword: String!): [SearchResult!]!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  profile: Profile!
+}
+
+type Profile {
+  avatar: String!
+  bio: String!
+  address: Address!
+}
+
+type Address {
+  city: String!
+  street: String!
+  zipCode: String!
+}
+
+type Post {
+  id: ID!
+  title: String!
+  content: String!
+  author: User!
+  comments: [Comment!]!
+}
+
+type Comment {
+  id: ID!
+  text: String!
+  author: User!
+}
+
+union SearchResult = User | Post
