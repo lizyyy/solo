@@ -12,10 +12,17 @@ class ModuleAnalyzer {
       patterns[moduleName] = keywords.map(keyword => ({
         keyword,
         regex: this.createKeywordRegex(keyword),
-        weight: keyword.length > 2 ? 1 : 0.5
+        weight: this.calculateKeywordWeight(keyword)
       }));
     }
     return patterns;
+  }
+
+  calculateKeywordWeight(keyword) {
+    if (/[\u4e00-\u9fa5]/.test(keyword)) {
+      return 1.0;
+    }
+    return keyword.length > 2 ? 1 : 0.5;
   }
 
   createKeywordRegex(keyword) {
@@ -90,8 +97,8 @@ class ModuleAnalyzer {
       return [];
     }
 
-    const threshold = sortedModules[0].score * 0.5;
-    return sortedModules.filter(m => m.score >= threshold && m.confidence >= 0.3);
+    const threshold = sortedModules[0].score * 0.3;
+    return sortedModules.filter(m => m.score >= threshold && m.confidence >= 0.15);
   }
 
   findOwner(moduleName, owners) {
@@ -135,7 +142,7 @@ class ModuleAnalyzer {
     this.compiledPatterns[name] = keywords.map(keyword => ({
       keyword,
       regex: this.createKeywordRegex(keyword),
-      weight: keyword.length > 2 ? 1 : 0.5
+      weight: this.calculateKeywordWeight(keyword)
     }));
   }
 }

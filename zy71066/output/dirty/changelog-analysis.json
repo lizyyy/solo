@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2026-05-24T14:15:30.779Z",
+    "generatedAt": "2026-05-24T14:29:56.796Z",
     "sourceFile": "examples/dirty-changelog.md",
     "totalEntries": 11,
     "totalTickets": 2,
@@ -13,12 +13,34 @@
       "withoutTickets": 9
     },
     "modules": {
+      "auth": {
+        "count": 2,
+        "entries": [
+          "entry-1",
+          "entry-3"
+        ],
+        "owner": "张三 <zhangsan@example.com>"
+      },
+      "user": {
+        "count": 1,
+        "entries": [
+          "entry-1"
+        ],
+        "owner": "王五 <wangwu@example.com>"
+      },
       "payment": {
         "count": 1,
         "entries": [
           "entry-2"
         ],
         "owner": "李四 <lisi@example.com>"
+      },
+      "api": {
+        "count": 1,
+        "entries": [
+          "entry-2"
+        ],
+        "owner": "赵六 <zhaoliu@example.com>"
       },
       "backend": {
         "count": 1,
@@ -101,8 +123,8 @@
         "all": [
           {
             "name": "auth",
-            "score": 0.5,
-            "confidence": 0.2,
+            "score": 1,
+            "confidence": 0.30000000000000004,
             "matches": [
               {
                 "keyword": "登录",
@@ -114,8 +136,8 @@
           },
           {
             "name": "user",
-            "score": 0.5,
-            "confidence": 0.2,
+            "score": 1,
+            "confidence": 0.30000000000000004,
             "matches": [
               {
                 "keyword": "用户",
@@ -126,7 +148,34 @@
             "owner": "王五 <wangwu@example.com>"
           }
         ],
-        "primary": [],
+        "primary": [
+          {
+            "name": "auth",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "登录",
+                "position": 7,
+                "raw": "登录"
+              }
+            ],
+            "owner": "张三 <zhangsan@example.com>"
+          },
+          {
+            "name": "user",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "用户",
+                "position": 0,
+                "raw": "用户"
+              }
+            ],
+            "owner": "王五 <wangwu@example.com>"
+          }
+        ],
         "isAmbiguous": true
       },
       "risk": {
@@ -173,8 +222,8 @@
         "all": [
           {
             "name": "payment",
-            "score": 1,
-            "confidence": 0.30000000000000004,
+            "score": 2,
+            "confidence": 0.5,
             "matches": [
               {
                 "keyword": "支付",
@@ -191,8 +240,8 @@
           },
           {
             "name": "api",
-            "score": 0.5,
-            "confidence": 0.2,
+            "score": 1,
+            "confidence": 0.30000000000000004,
             "matches": [
               {
                 "keyword": "接口",
@@ -206,8 +255,8 @@
         "primary": [
           {
             "name": "payment",
-            "score": 1,
-            "confidence": 0.30000000000000004,
+            "score": 2,
+            "confidence": 0.5,
             "matches": [
               {
                 "keyword": "支付",
@@ -221,6 +270,19 @@
               }
             ],
             "owner": "李四 <lisi@example.com>"
+          },
+          {
+            "name": "api",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "接口",
+                "position": 2,
+                "raw": "接口"
+              }
+            ],
+            "owner": "赵六 <zhaoliu@example.com>"
           }
         ],
         "isAmbiguous": false
@@ -263,8 +325,8 @@
         "all": [
           {
             "name": "auth",
-            "score": 0.5,
-            "confidence": 0.2,
+            "score": 1,
+            "confidence": 0.30000000000000004,
             "matches": [
               {
                 "keyword": "登录",
@@ -275,7 +337,21 @@
             "owner": "张三 <zhangsan@example.com>"
           }
         ],
-        "primary": [],
+        "primary": [
+          {
+            "name": "auth",
+            "score": 1,
+            "confidence": 0.30000000000000004,
+            "matches": [
+              {
+                "keyword": "登录",
+                "position": 0,
+                "raw": "登录"
+              }
+            ],
+            "owner": "张三 <zhangsan@example.com>"
+          }
+        ],
         "isAmbiguous": false
       },
       "risk": {
@@ -490,7 +566,7 @@
         "all": [
           {
             "name": "frontend",
-            "score": 3.5,
+            "score": 5,
             "confidence": 1,
             "matches": [
               {
@@ -525,7 +601,7 @@
         "primary": [
           {
             "name": "frontend",
-            "score": 3.5,
+            "score": 5,
             "confidence": 1,
             "matches": [
               {
