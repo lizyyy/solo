@@ -148,7 +148,7 @@ func CheckVehicleDuplicateDispatch(vehicleID uint, batchNo string) (bool, *model
 
 func CheckVehicleActiveDispatch(vehicleID uint) (bool, *models.DispatchItem, error) {
 	var item models.DispatchItem
-	err := DB.Where("vehicle_id = ? AND status IN ('pending', 'dispatched', 'enroute')", vehicleID).
+	err := DB.Where("vehicle_id = ? AND status IN ('pending', 'dispatched', 'enroute', 'arrived', 'delivering')", vehicleID).
 		First(&item).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return false, nil, nil

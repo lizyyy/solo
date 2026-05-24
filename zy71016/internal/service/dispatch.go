@@ -245,6 +245,11 @@ func StartDispatch(dispatchItemID uint, operator, ip string) error {
 		return errors.New("目标路段已封路，无法发车")
 	}
 
+	hasActive, activeItem, err := database.CheckVehicleActiveDispatch(item.VehicleID)
+	if err == nil && hasActive && activeItem.ID != item.ID {
+		return fmt.Errorf("车辆有未完成任务 (任务ID: %d, 状态: %s)，无法重复发车", activeItem.ID, activeItem.Status)
+	}
+
 	return database.DB.Transaction(func(tx *gorm.DB) error {
 		if err := database.DeductStockWithTx(tx, item.SaltDepotID, item.SaltAmount, operator, "dispatch_item", item.ID); err != nil {
 			return err
