@@ -1,0 +1,81 @@
+Metadata-Version: 2.4
+Name: ansible-inventory-drift
+Version: 1.0.0
+Summary: Ansible Inventory 漂移检测 CLI - 检测 Inventory 与 CMDB 的配置差异
+Author: DevOps Team
+License: MIT
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: click>=8.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: rich>=13.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0; extra == "dev"
+
+# Ansible Inventory 漂移检测 CLI
+
+检测 Ansible Inventory 与 CMDB 之间的配置差异，包括主机名、角色、环境标签等。
+
+## 功能特性
+
+- **多格式支持**: 支持 INI 和 YAML 格式的 Inventory，支持 JSON/YAML/CSV 格式的 CMDB 导出
+- **智能解析**: 自动识别别名主机、组继承、退役机器
+- **标签归一化**: 内置角色和环境标签映射表，统一不同命名规范
+- **风险分级**: 5 级风险分级（CRITICAL/HIGH/MEDIUM/LOW/INFO）
+- **多种输出**: 终端彩色摘要、机器可读 JSON、给同事看的 Markdown
+- **稳定退出码**: 方便集成到 CI/CD 流水线
+
+## 安装
+
+```bash
+pip install -e .
+```
+
+## 使用方法
+
+### 基本漂移检测
+
+```bash
+inventory-drift detect /path/to/inventory --cmdb /path/to/cmdb.json
+```
+
+### 仅解析 Inventory (调试用)
+
+```bash
+inventory-drift parse-inv /path/to/inventory --detail
+```
+
+### 运行自检测试
+
+```bash
+inventory-drift selftest
+```
+
+### 完整参数
+
+```bash
+inventory-drift detect --help
+```
+
+## 退出码说明
+
+| 退出码 | 含义 |
+|--------|------|
+| 0 | 无漂移或仅低风险问题 |
+| 1 | 发现中等/高风险漂移 |
+| 2 | 发现严重风险漂移（环境不一致、别名冲突等） |
+| 3 | 输入错误 |
+| 4 | 内部错误 |
+| 5 | 自检失败 |
+
+## 漂移类型
+
+- `hostname_mismatch`: 主机名不一致
+- `role_mismatch`: 角色标签不一致
+- `environment_mismatch`: 环境标签不一致
+- `missing_in_cmdb`: CMDB 中缺失
+- `missing_in_inventory`: Inventory 中缺失
+- `label_mismatch`: 标签不一致
+- `alias_conflict`: 别名冲突
+- `decommissioned_still_present`: 退役主机残留

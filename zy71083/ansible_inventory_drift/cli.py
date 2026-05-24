@@ -25,24 +25,29 @@ class ExitCode:
     SELFTEST_FAILED = 5
 
 
-def validate_file_path(ctx, param, value):
-    if value is None:
-        return value
-    path = Path(value)
+class InputValidationError(Exception):
+    """输入验证错误异常"""
+    pass
+
+
+def validate_existing_path(path_str: str, param_name: str, allow_dir: bool = True) -> Path:
+    """验证文件或目录路径存在"""
+    path = Path(path_str)
     if not path.exists():
-        raise click.BadParameter(f"文件不存在: {value}")
-    if not path.is_file() and not path.is_dir():
-        raise click.BadParameter(f"不是有效的文件或目录: {value}")
-    return value
+        raise InputValidationError(f"{param_name} 不存在: {path_str}")
+    if not path.is_file() and not (allow_dir and path.is_dir()):
+        raise InputValidationError(f"{param_name} 不是有效的文件{'或目录' if allow_dir else ''}: {path_str}")
+    return path
 
 
-def validate_output_dir(ctx, param, value):
-    path = Path(value)
+def validate_output_dir_path(path_str: str) -> Path:
+    """验证并创建输出目录"""
+    path = Path(path_str)
     try:
         path.mkdir(parents=True, exist_ok=True)
     except Exception as e:
-        raise click.BadParameter(f"无法创建输出目录: {e}")
-    return value
+        raise InputValidationError(f"无法创建输出目录 {path_str}: {e}")
+    return path
 
 
 @click.group()
@@ -56,11 +61,11 @@ def main():
 
 
 @main.command()
-@click.argument("inventory", type=click.Path(), callback=validate_file_path)
-@click.option("--cmdb", "-c", type=click.Path(), callback=validate_file_path, help="CMDB 导出文件路径 (JSON/YAML/CSV)")
-@click.option("--output", "-o", type=click.Path(), default="./drift_reports", callback=validate_output_dir, help="报告输出目录")
+@click.argument("inventory", type=click.Path())
+@click.option("--cmdb", "-c", type=click.Path(), help="CMDB 导出文件路径 (JSON/YAML/CSV)")
+@click.option("--output", "-o", type=click.Path(), default="./drift_reports", help="报告输出目录")
 @click.option("--format", "-f", "cmdb_format", type=click.Choice(["json", "yaml", "csv"]), help="CMDB 文件格式 (自动检测)")
-@click.option("--config", type=click.Path(), callback=validate_file_path, help="自定义配置文件路径")
+@click.option("--config", type=click.Path(), help="自定义配置文件路径")
 @click.option("--quiet", "-q", is_flag=True, help="安静模式，只输出错误")
 @click.option("--no-markdown", is_flag=True, help="不生成 Markdown 报告")
 @click.option("--no-json", is_flag=True, help="不生成 JSON 报告")
@@ -69,11 +74,17 @@ def detect(inventory, cmdb, output, cmdb_format, config, quiet, no_markdown, no_
 
     INVENTORY: Ansible Inventory 文件或目录路径
     """
+    quiet = quiet
     try:
+        inventory_path = validate_existing_path(inventory, "Inventory 文件", allow_dir=True)
+        cmdb_path = validate_existing_path(cmdb, "CMDB 文件", allow_dir=False) if cmdb else None
+        output_path = validate_output_dir_path(output)
+        config_path = validate_existing_path(config, "配置文件", allow_dir=False) if config else None
+
         custom_mappings = None
-        if config:
+        if config_path:
             import yaml
-            with open(config, "r", encoding="utf-8") as f:
+            with open(config_path, "r", encoding="utf-8") as f:
                 custom_config = yaml.safe_load(f)
             if isinstance(custom_config, dict):
                 custom_mappings = custom_config.get("mappings")
@@ -81,27 +92,27 @@ def detect(inventory, cmdb, output, cmdb_format, config, quiet, no_markdown, no_
         normalizer = LabelNormalizer(custom_mappings)
 
         if not quiet:
-            console.print(f"[cyan]📂 解析 Inventory:[/cyan] {inventory}")
+            console.print(f"[cyan]📂 解析 Inventory:[/cyan] {inventory_path}")
         inventory_parser = InventoryParser()
-        parsed_inventory = inventory_parser.parse(inventory)
+        parsed_inventory = inventory_parser.parse(str(inventory_path))
         if not quiet:
             console.print(f"[green]✓ 解析完成，共 {len(parsed_inventory.hosts)} 台主机[/green]")
 
         cmdb_hosts = {}
-        if cmdb:
+        if cmdb_path:
             if not quiet:
-                console.print(f"[cyan]📂 解析 CMDB:[/cyan] {cmdb}")
+                console.print(f"[cyan]📂 解析 CMDB:[/cyan] {cmdb_path}")
             cmdb_parser = CMDBParser(normalizer)
-            cmdb_hosts = cmdb_parser.parse(cmdb, cmdb_format)
+            cmdb_hosts = cmdb_parser.parse(str(cmdb_path), cmdb_format)
             if not quiet:
                 console.print(f"[green]✓ 解析完成，共 {len(cmdb_hosts)} 台主机[/green]")
 
         if not quiet:
             console.print("[cyan]🔍 检测漂移...[/cyan]")
         detector = DriftDetector(normalizer)
-        report = detector.detect(parsed_inventory, cmdb_hosts, inventory, cmdb)
+        report = detector.detect(parsed_inventory, cmdb_hosts, str(inventory_path), str(cmdb_path) if cmdb_path else None)
 
-        generator = ReportGenerator(output_dir=output)
+        generator = ReportGenerator(output_dir=str(output_path))
 
         if not quiet:
             generator.print_console_summary(report)
@@ -115,6 +126,9 @@ def detect(inventory, cmdb, output, cmdb_format, config, quiet, no_markdown, no_
         exit_code = generator.get_exit_code(report)
         sys.exit(exit_code)
 
+    except InputValidationError as e:
+        console.print(f"[red]✗ 输入错误: {e}[/red]")
+        sys.exit(ExitCode.INPUT_ERROR)
     except FileNotFoundError as e:
         console.print(f"[red]✗ 输入错误: {e}[/red]")
         sys.exit(ExitCode.INPUT_ERROR)
@@ -130,7 +144,7 @@ def detect(inventory, cmdb, output, cmdb_format, config, quiet, no_markdown, no_
 
 
 @main.command()
-@click.option("--output", "-o", type=click.Path(), default="./drift_reports", callback=validate_output_dir, help="测试报告输出目录")
+@click.option("--output", "-o", type=click.Path(), default="./drift_reports", help="测试报告输出目录")
 def selftest(output):
     """运行自检测试
 
@@ -143,6 +157,8 @@ def selftest(output):
     test_total = 0
 
     try:
+        output_path = validate_output_dir_path(output)
+
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir_path = Path(tmpdir)
 
@@ -225,7 +241,7 @@ def selftest(output):
 
             test_total += 1
             console.print(f"[{test_total}/{test_total}] 测试报告生成...", end=" ")
-            generator = ReportGenerator(output_dir=output)
+            generator = ReportGenerator(output_dir=str(output_path))
             json_path = generator.write_json(report, "selftest_report.json")
             md_path = generator.write_markdown(report, "selftest_report.md")
             if json_path.exists() and md_path.exists():
@@ -268,13 +284,14 @@ def selftest(output):
 
 
 @main.command("parse-inv")
-@click.argument("inventory", type=click.Path(), callback=validate_file_path)
+@click.argument("inventory", type=click.Path())
 @click.option("--detail", "-d", is_flag=True, help="显示详细信息")
 def parse_inventory(inventory, detail):
     """仅解析并显示 Inventory 内容（用于调试）"""
     try:
+        inventory_path = validate_existing_path(inventory, "Inventory 文件", allow_dir=True)
         parser = InventoryParser()
-        parsed = parser.parse(inventory)
+        parsed = parser.parse(str(inventory_path))
 
         console.print(f"[cyan]Inventory 解析结果:[/cyan]")
         console.print(f"  主机数量: {len(parsed.hosts)}")
@@ -295,6 +312,9 @@ def parse_inventory(inventory, detail):
                         console.print(f"    {k}: {v}")
             console.print()
 
+    except InputValidationError as e:
+        console.print(f"[red]✗ 输入错误: {e}[/red]")
+        sys.exit(ExitCode.INPUT_ERROR)
     except Exception as e:
         console.print(f"[red]✗ 解析错误: {e}[/red]")
         sys.exit(ExitCode.INPUT_ERROR)
