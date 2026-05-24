@@ -1,0 +1,139 @@
+{
+  "bag_file": "test_data.txt",
+  "analysis_time": "2026-05-24T20:25:25.291564",
+  "start_time": 1717210800.0,
+  "end_time": 1717210801.7,
+  "total_duration": 1.7000000476837158,
+  "overall_drop_rate": 0.2909086298348448,
+  "sensors": {
+    "lidar": {
+      "sensor_type": "lidar",
+      "total_frames": 13,
+      "start_time": 1717210800.0,
+      "end_time": 1717210801.7,
+      "duration": 1.7000000476837158,
+      "expected_fps": 10.0,
+      "actual_fps": 7.647058609035194,
+      "total_missing_frames": 4,
+      "total_drop_duration": 0.7000000476837158,
+      "max_gap_duration": 0.40000009536743164,
+      "drop_rate": 0.3076923076923077,
+      "frame_drops": [
+        {
+          "start_time": 1717210800.3,
+          "end_time": 1717210800.6,
+          "duration": 0.2999999523162842,
+          "expected_frames": 2,
+          "missing_frames": 1,
+          "severity": "low"
+        },
+        {
+          "start_time": 1717210801.1,
+          "end_time": 1717210801.5,
+          "duration": 0.40000009536743164,
+          "expected_frames": 4,
+          "missing_frames": 3,
+          "severity": "medium"
+        }
+      ],
+      "timestamp_issues": [],
+      "topic_changes": [],
+      "invalid_records": []
+    },
+    "camera": {
+      "sensor_type": "camera",
+      "total_frames": 16,
+      "start_time": 1717210800.0,
+      "end_time": 1717210800.666666,
+      "duration": 0.6666660308837891,
+      "expected_fps": 30.0,
+      "actual_fps": 24.00002288820542,
+      "total_missing_frames": 5,
+      "total_drop_duration": 0.23333430290222168,
+      "max_gap_duration": 0.13333415985107422,
+      "drop_rate": 0.3125,
+      "frame_drops": [
+        {
+          "start_time": 1717210800.1,
+          "end_time": 1717210800.2,
+          "duration": 0.10000014305114746,
+          "expected_frames": 3,
+          "missing_frames": 2,
+          "severity": "low"
+        },
+        {
+          "start_time": 1717210800.266666,
+          "end_time": 1717210800.4,
+          "duration": 0.13333415985107422,
+          "expected_frames": 4,
+          "missing_frames": 3,
+          "severity": "low"
+        }
+      ],
+      "timestamp_issues": [],
+      "topic_changes": [
+        {
+          "time": 1717210800.6,
+          "from_topic": "/camera/image_raw",
+          "to_topic": "/camera_0/image_raw",
+          "frame_index": 13,
+          "line_number": 37
+        }
+      ],
+      "invalid_records": []
+    },
+    "imu": {
+      "sensor_type": "imu",
+      "total_frames": 10,
+      "start_time": 1717210800.0,
+      "end_time": 1717210800.09,
+      "duration": 0.08999991416931152,
+      "expected_fps": 200.0,
+      "actual_fps": 111.1112170750251,
+      "total_missing_frames": 7,
+      "total_drop_duration": 0.05499982833862305,
+      "max_gap_duration": 0.039999961853027344,
+      "drop_rate": 0.7,
+      "frame_drops": [
+        {
+          "start_time": 1717210800.015,
+          "end_time": 1717210800.03,
+          "duration": 0.014999866485595703,
+          "expected_frames": 2,
+          "missing_frames": 1,
+          "severity": "low"
+        },
+        {
+          "start_time": 1717210800.04,
+          "end_time": 1717210800.08,
+          "duration": 0.039999961853027344,
+          "expected_frames": 7,
+          "missing_frames": 6,
+          "severity": "medium"
+        }
+      ],
+      "timestamp_issues": [],
+      "topic_changes": [],
+      "invalid_records": []
+    }
+  },
+  "warnings": [
+    "lidar: 掉帧率较高 (30.8%)",
+    "camera: 检测到 1 次 topic 变化",
+    "camera: 掉帧率较高 (31.2%)",
+    "imu: 掉帧率较高 (70.0%)"
+  ],
+  "errors": [],
+  "config": {
+    "thresholds": {
+      "lidar": 0.2,
+      "camera": 0.1,
+      "imu": 0.01
+    },
+    "expected_fps": {
+      "lidar": 10.0,
+      "camera": 30.0,
+      "imu": 200.0
+    }
+  }
+}

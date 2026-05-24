@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: ros-drop-analyzer
+Version: 1.0.0
+Summary: ROS 传感器掉帧分析工具 - 分析 rosbag 中雷达、相机和 IMU 的帧丢失情况
+Author: ROS Team
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Scientific/Engineering :: Robotics
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0
+Requires-Dist: rich>=13.0
+Requires-Dist: numpy>=1.21
+Requires-Dist: pandas>=1.3
+Requires-Dist: python-dateutil>=2.8
+Dynamic: author
+Dynamic: classifier
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

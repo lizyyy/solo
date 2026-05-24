@@ -1,0 +1,26 @@
+output_dir: ./output
+
+thresholds:
+  lidar: 0.2
+  camera: 0.1
+  imu: 0.01
+
+expected_fps:
+  lidar: 10.0
+  camera: 30.0
+  imu: 200.0
+
+topic_patterns:
+  lidar:
+    - r"/lidar\d?/pointcloud\d?"
+    - r"/rslidar_\d+/points"
+    - r"/velodyne_points"
+  camera:
+    - r"/camera\d?/image_raw"
+    - r"/cam\d+/image"
+  imu:
+    - r"/imu\d?/data"
+
+topic_aliases:
+  "/old_lidar_topic": "/new_lidar_topic"
+  "/camera_front": "/camera_0"

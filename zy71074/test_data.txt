@@ -1,0 +1,46 @@
+1717210800.000000 /lidar/pointcloud seq=1
+1717210800.100000 /lidar/pointcloud seq=2
+1717210800.200000 /lidar/pointcloud seq=3
+1717210800.300000 /lidar/pointcloud seq=4
+1717210800.600000 /lidar/pointcloud seq=5
+1717210800.700000 /lidar/pointcloud seq=6
+1717210800.800000 /lidar/pointcloud seq=7
+1717210801.500000 /lidar/pointcloud seq=8
+1717210801.600000 /lidar/pointcloud seq=9
+1717210801.700000 /lidar/pointcloud seq=10
+
+1717210800.000000 /camera/image_raw seq=100
+1717210800.033333 /camera/image_raw seq=101
+1717210800.066666 /camera/image_raw seq=102
+1717210800.100000 /camera/image_raw seq=103
+1717210800.200000 /camera/image_raw seq=104
+1717210800.233333 /camera/image_raw seq=105
+1717210800.266666 /camera/image_raw seq=106
+1717210800.400000 /camera/image_raw seq=107
+1717210800.433333 /camera/image_raw seq=108
+1717210800.466666 /camera/image_raw seq=109
+
+1717210800.000000 /imu/data
+1717210800.005000 /imu/data
+1717210800.010000 /imu/data
+1717210800.015000 /imu/data
+1717210800.030000 /imu/data
+1717210800.035000 /imu/data
+1717210800.040000 /imu/data
+1717210800.080000 /imu/data
+1717210800.085000 /imu/data
+1717210800.090000 /imu/data
+
+1717210800.500000 /camera/image_raw seq=110
+1717210800.533333 /camera/image_raw seq=111
+1717210800.566666 /camera/image_raw seq=112
+1717210800.600000 /camera_0/image_raw seq=113
+1717210800.633333 /camera_0/image_raw seq=114
+1717210800.666666 /camera_0/image_raw seq=115
+
+1717210800.900000 /lidar/pointcloud seq=11
+1717210800.850000 /lidar/pointcloud seq=12
+
+invalid line without proper format
+1717210801.000000 /unknown/topic
+1717210801.100000 /lidar/pointcloud seq=13
