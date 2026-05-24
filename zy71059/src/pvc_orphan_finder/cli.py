@@ -22,6 +22,9 @@ def validate_input_paths(ctx, param, value):
     if not value:
         return value
 
+    if isinstance(value, str):
+        value = (value,)
+
     paths = []
     for path in value:
         p = Path(path)
@@ -90,7 +93,10 @@ def scan(paths, files, directory, output_dir, no_recursive, output_format,
     dir_list = []
 
     if directory:
-        dir_list.append(directory)
+        if isinstance(directory, (list, tuple)):
+            dir_list.extend(directory)
+        else:
+            dir_list.append(directory)
 
     for p in all_paths:
         p_path = Path(p)
@@ -173,7 +179,10 @@ def list_resources(paths, files, directory, no_recursive):
     dir_list = []
 
     if directory:
-        dir_list.append(directory)
+        if isinstance(directory, (list, tuple)):
+            dir_list.extend(directory)
+        else:
+            dir_list.append(directory)
 
     for p in all_paths:
         p_path = Path(p)

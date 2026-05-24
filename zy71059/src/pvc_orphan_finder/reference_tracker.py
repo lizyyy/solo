@@ -62,18 +62,18 @@ class ReferenceTracker:
                         via_field=f"spec.volumes[{i}].persistentVolumeClaim.claimName"
                     )
 
-        ephemeral = volume.get('ephemeral', {}) or {}
-        if ephemeral:
-            vol_claim_tmpl = ephemeral.get('volumeClaimTemplate', {}) or {}
-            metadata = vol_claim_tmpl.get('metadata', {}) or {}
-            tmpl_name = metadata.get('name')
-            if tmpl_name:
-                self._add_reference(
-                    from_resource=pod.key,
-                    to_resource=f"{pod.namespace}/{ResourceType.PVC.value}/{tmpl_name}",
-                    ref_type="ephemeral-template",
-                    via_field=f"spec.volumes[{i}].ephemeral.volumeClaimTemplate.metadata.name"
-                )
+            ephemeral = volume.get('ephemeral', {}) or {}
+            if ephemeral:
+                vol_claim_tmpl = ephemeral.get('volumeClaimTemplate', {}) or {}
+                metadata = vol_claim_tmpl.get('metadata', {}) or {}
+                tmpl_name = metadata.get('name')
+                if tmpl_name:
+                    self._add_reference(
+                        from_resource=pod.key,
+                        to_resource=f"{pod.namespace}/{ResourceType.PVC.value}/{tmpl_name}",
+                        ref_type="ephemeral-template",
+                        via_field=f"spec.volumes[{i}].ephemeral.volumeClaimTemplate.metadata.name"
+                    )
 
     def _track_cronjob_references(self, cronjob: K8sResource) -> None:
         job_tmpl = cronjob.spec.get('jobTemplate', {}) or {}

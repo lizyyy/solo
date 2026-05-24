@@ -1,6 +1,6 @@
 # K8s PVC Orphan Analysis Report
 
-**Generated:** 2026-05-24 19:14:40
+**Generated:** 2026-05-24 21:55:38
 
 ## Executive Summary
 
@@ -9,7 +9,7 @@
 | Total PVCs analyzed | 7 |
 | Orphan PVCs found | **5** |
 | Referenced PVCs | 2 |
-| Total resources scanned | 12 |
+| Total resources scanned | 13 |
 | References tracked | 14 |
 | Errors | 0 |
 | Warnings | 0 |
@@ -71,8 +71,6 @@ The following rules are checked to determine if a PVC should be kept:
 **Labels:**
 
 - `pvc-orphan/retention-policy=retain`
-- `__line__=35`
-- `__end_line__=36`
 
 **Retention Rules:**
 
@@ -92,8 +90,6 @@ The following rules are checked to determine if a PVC should be kept:
 **Labels:**
 
 - `pvc-orphan/expires-at=2020-01-01`
-- `__line__=49`
-- `__end_line__=50`
 
 **Issues:**
 

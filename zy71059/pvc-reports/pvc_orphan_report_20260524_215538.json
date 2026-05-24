@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-05-24T19:14:40.990454",
+  "generated_at": "2026-05-24T21:55:38.140315",
   "summary": {
     "total_pvcs": 7,
     "orphan_pvcs": 5,
     "referenced_pvcs": 2,
-    "total_resources": 12,
+    "total_resources": 13,
     "references_tracked": 14,
     "errors": [],
     "warnings": []
@@ -14,9 +14,7 @@
       "namespace": "default",
       "name": "orphan-with-retention",
       "labels": {
-        "pvc-orphan/retention-policy": "retain",
-        "__line__": "35",
-        "__end_line__": "36"
+        "pvc-orphan/retention-policy": "retain"
       },
       "annotations": {},
       "source": "testdata/pvcs.yaml:29-42",
@@ -44,9 +42,7 @@
       "namespace": "default",
       "name": "orphan-expired",
       "labels": {
-        "pvc-orphan/expires-at": "2020-01-01",
-        "__line__": "49",
-        "__end_line__": "50"
+        "pvc-orphan/expires-at": "2020-01-01"
       },
       "annotations": {},
       "source": "testdata/pvcs.yaml:43-56",
@@ -146,9 +142,7 @@
       "namespace": "default",
       "name": "active-pvc",
       "labels": {
-        "app": "my-app",
-        "__line__": "7",
-        "__end_line__": "8"
+        "app": "my-app"
       },
       "annotations": {},
       "source": "testdata/pvcs.yaml:1-15",
