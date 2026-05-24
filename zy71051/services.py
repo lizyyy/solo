@@ -673,20 +673,21 @@ class ReportService:
         stopped = q.filter(models.MedicineBox.status == "stopped").count()
         cancelled = q.filter(models.MedicineBox.status == "cancelled").count()
 
-        dispute_count = db.query(models.Dispute).join(models.MedicineBox).filter(
-            and_(
-                models.MedicineBox.distribution_date >= query.start_date,
-                models.MedicineBox.distribution_date <= query.end_date
-            )
-        ).count()
+        filtered_box_ids = [box.id for box in q.with_entities(models.MedicineBox.id).all()]
 
-        backfill_count = db.query(models.Signature).join(models.MedicineBox).filter(
-            and_(
-                models.MedicineBox.distribution_date >= query.start_date,
-                models.MedicineBox.distribution_date <= query.end_date,
-                models.Signature.is_backfilled == True
-            )
-        ).count()
+        dispute_count = 0
+        backfill_count = 0
+        if filtered_box_ids:
+            dispute_count = db.query(models.Dispute).filter(
+                models.Dispute.medicine_box_id.in_(filtered_box_ids)
+            ).count()
+
+            backfill_count = db.query(models.Signature).filter(
+                and_(
+                    models.Signature.medicine_box_id.in_(filtered_box_ids),
+                    models.Signature.is_backfilled == True
+                )
+            ).count()
 
         sign_rate = (signed / total * 100) if total > 0 else 0.0
 
