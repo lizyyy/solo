@@ -1,12 +1,10 @@
 package com.school.canteen.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
 @Entity
 @Table(name = "dishes")
 public class Dish {
@@ -33,4 +31,17 @@ public class Dish {
 
     @Column(nullable = false)
     private Boolean active = true;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public Set<Allergen> getAllergens() { return allergens; }
+    public void setAllergens(Set<Allergen> allergens) { this.allergens = allergens; }
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
 }

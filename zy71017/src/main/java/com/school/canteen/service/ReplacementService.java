@@ -5,25 +5,36 @@ import com.school.canteen.dto.ValidationResult;
 import com.school.canteen.entity.*;
 import com.school.canteen.exception.BusinessException;
 import com.school.canteen.repository.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ReplacementService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReplacementService.class);
 
     private final ReplacementRequestRepository replacementRepository;
     private final DishRepository dishRepository;
     private final StudentRepository studentRepository;
     private final ParentConfirmationRepository confirmationRepository;
+
+    @Autowired
+    public ReplacementService(ReplacementRequestRepository replacementRepository,
+                              DishRepository dishRepository,
+                              StudentRepository studentRepository,
+                              ParentConfirmationRepository confirmationRepository) {
+        this.replacementRepository = replacementRepository;
+        this.dishRepository = dishRepository;
+        this.studentRepository = studentRepository;
+        this.confirmationRepository = confirmationRepository;
+    }
 
     @Transactional
     public ReplacementRequest createReplacement(ReplacementRequestDto dto) {
@@ -88,14 +99,15 @@ public class ReplacementService {
         List<ReplacementStatus> excludedStatuses = Arrays.asList(
             ReplacementStatus.REVOKED, ReplacementStatus.REJECTED);
 
-        boolean exists = replacementRepository.existsByMealDateAndMealTypeAndOriginalDishIdAndStatusNotIn(
+        boolean exists = replacementRepository.existsDuplicateReplacement(
             request.getMealDate(),
             request.getMealType(),
             request.getOriginalDish().getId(),
-            excludedStatuses
+            excludedStatuses,
+            request.getId()
         );
 
-        if (exists && request.getStatus() == ReplacementStatus.DRAFT) {
+        if (exists) {
             result.setHasDuplicateReplacement(true);
             result.addError("该餐次的此菜品已有进行中的替换请求");
         }

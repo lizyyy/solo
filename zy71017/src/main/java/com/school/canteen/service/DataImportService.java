@@ -6,8 +6,9 @@ import com.school.canteen.entity.Student;
 import com.school.canteen.repository.AllergenRepository;
 import com.school.canteen.repository.DishRepository;
 import com.school.canteen.repository.StudentRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,14 +16,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class DataImportService {
+
+    private static final Logger log = LoggerFactory.getLogger(DataImportService.class);
 
     private final AllergenRepository allergenRepository;
     private final DishRepository dishRepository;
     private final StudentRepository studentRepository;
+
+    @Autowired
+    public DataImportService(AllergenRepository allergenRepository,
+                             DishRepository dishRepository,
+                             StudentRepository studentRepository) {
+        this.allergenRepository = allergenRepository;
+        this.dishRepository = dishRepository;
+        this.studentRepository = studentRepository;
+    }
 
     @Transactional
     public Allergen importAllergen(Allergen allergen) {

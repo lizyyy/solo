@@ -3,10 +3,11 @@ package com.school.canteen.service;
 import com.school.canteen.entity.*;
 import com.school.canteen.exception.BusinessException;
 import com.school.canteen.repository.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,15 +17,26 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ReportService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReportService.class);
 
     private final MealReportRepository mealReportRepository;
     private final ReplacementRequestRepository replacementRepository;
     private final ParentConfirmationRepository confirmationRepository;
     private final StudentRepository studentRepository;
+
+    @Autowired
+    public ReportService(MealReportRepository mealReportRepository,
+                         ReplacementRequestRepository replacementRepository,
+                         ParentConfirmationRepository confirmationRepository,
+                         StudentRepository studentRepository) {
+        this.mealReportRepository = mealReportRepository;
+        this.replacementRepository = replacementRepository;
+        this.confirmationRepository = confirmationRepository;
+        this.studentRepository = studentRepository;
+    }
 
     @Transactional
     public MealReport generateMealReport(LocalDate mealDate, String mealType, String operator) {

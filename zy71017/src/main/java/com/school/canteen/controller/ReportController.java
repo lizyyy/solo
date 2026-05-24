@@ -3,8 +3,7 @@ package com.school.canteen.controller;
 import com.school.canteen.dto.ApiResponse;
 import com.school.canteen.entity.MealReport;
 import com.school.canteen.service.ReportService;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -16,10 +15,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/reports")
-@RequiredArgsConstructor
 public class ReportController {
 
     private final ReportService reportService;
+
+    @Autowired
+    public ReportController(ReportService reportService) {
+        this.reportService = reportService;
+    }
 
     @PostMapping("/generate")
     public ApiResponse<MealReport> generate(@RequestBody GenerateReportRequest request) {
@@ -61,11 +64,17 @@ public class ReportController {
             .body(excelData);
     }
 
-    @Data
     public static class GenerateReportRequest {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         private LocalDate mealDate;
         private String mealType;
         private String operator;
+
+        public LocalDate getMealDate() { return mealDate; }
+        public void setMealDate(LocalDate mealDate) { this.mealDate = mealDate; }
+        public String getMealType() { return mealType; }
+        public void setMealType(String mealType) { this.mealType = mealType; }
+        public String getOperator() { return operator; }
+        public void setOperator(String operator) { this.operator = operator; }
     }
 }

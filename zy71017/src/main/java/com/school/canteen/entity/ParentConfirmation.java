@@ -1,11 +1,9 @@
 package com.school.canteen.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "parent_confirmations",
     uniqueConstraints = {
@@ -49,4 +47,29 @@ public class ParentConfirmation {
 
     @Version
     private Long version;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public ReplacementRequest getReplacement() { return replacement; }
+    public void setReplacement(ReplacementRequest replacement) { this.replacement = replacement; }
+    public Student getStudent() { return student; }
+    public void setStudent(Student student) { this.student = student; }
+    public String getConfirmationStatus() { return confirmationStatus; }
+    public void setConfirmationStatus(String confirmationStatus) { this.confirmationStatus = confirmationStatus; }
+    public String getParentComment() { return parentComment; }
+    public void setParentComment(String parentComment) { this.parentComment = parentComment; }
+    public String getConfirmedBy() { return confirmedBy; }
+    public void setConfirmedBy(String confirmedBy) { this.confirmedBy = confirmedBy; }
+    public LocalDateTime getConfirmedAt() { return confirmedAt; }
+    public void setConfirmedAt(LocalDateTime confirmedAt) { this.confirmedAt = confirmedAt; }
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getUpdatedBy() { return updatedBy; }
+    public void setUpdatedBy(String updatedBy) { this.updatedBy = updatedBy; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
 }

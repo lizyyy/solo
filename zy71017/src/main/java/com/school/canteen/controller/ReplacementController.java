@@ -7,18 +7,21 @@ import com.school.canteen.entity.ParentConfirmation;
 import com.school.canteen.entity.ReplacementRequest;
 import com.school.canteen.service.ReplacementService;
 import jakarta.validation.Valid;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/replacements")
-@RequiredArgsConstructor
 public class ReplacementController {
 
     private final ReplacementService replacementService;
+
+    @Autowired
+    public ReplacementController(ReplacementService replacementService) {
+        this.replacementService = replacementService;
+    }
 
     @PostMapping
     public ApiResponse<ReplacementRequest> create(@Valid @RequestBody ReplacementRequestDto dto) {
@@ -93,23 +96,39 @@ public class ReplacementController {
         return ApiResponse.success(replacementService.lockReplacement(id, operator));
     }
 
-    @Data
     public static class ReviewRequest {
         private boolean approved;
         private String notes;
         private String reviewer;
+
+        public boolean isApproved() { return approved; }
+        public void setApproved(boolean approved) { this.approved = approved; }
+        public String getNotes() { return notes; }
+        public void setNotes(String notes) { this.notes = notes; }
+        public String getReviewer() { return reviewer; }
+        public void setReviewer(String reviewer) { this.reviewer = reviewer; }
     }
 
-    @Data
     public static class ConfirmationRequest {
         private String status;
         private String comment;
         private String operator;
+
+        public String getStatus() { return status; }
+        public void setStatus(String status) { this.status = status; }
+        public String getComment() { return comment; }
+        public void setComment(String comment) { this.comment = comment; }
+        public String getOperator() { return operator; }
+        public void setOperator(String operator) { this.operator = operator; }
     }
 
-    @Data
     public static class RevokeRequest {
         private String reason;
         private String operator;
+
+        public String getReason() { return reason; }
+        public void setReason(String reason) { this.reason = reason; }
+        public String getOperator() { return operator; }
+        public void setOperator(String operator) { this.operator = operator; }
     }
 }

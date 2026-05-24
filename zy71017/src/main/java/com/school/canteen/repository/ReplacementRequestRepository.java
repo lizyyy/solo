@@ -25,11 +25,13 @@ public interface ReplacementRequestRepository extends JpaRepository<ReplacementR
 
     List<ReplacementRequest> findByStatus(ReplacementStatus status);
 
-    boolean existsByMealDateAndMealTypeAndOriginalDishIdAndStatusNotIn(
-        LocalDate mealDate,
-        String mealType,
-        Long originalDishId,
-        List<ReplacementStatus> excludedStatuses
+    @Query("SELECT COUNT(r) > 0 FROM ReplacementRequest r WHERE r.mealDate = :mealDate AND r.mealType = :mealType AND r.originalDish.id = :originalDishId AND r.status NOT IN :excludedStatuses AND r.id != :excludeId")
+    boolean existsDuplicateReplacement(
+        @Param("mealDate") LocalDate mealDate,
+        @Param("mealType") String mealType,
+        @Param("originalDishId") Long originalDishId,
+        @Param("excludedStatuses") List<ReplacementStatus> excludedStatuses,
+        @Param("excludeId") Long excludeId
     );
 
     @Query("SELECT COUNT(r) FROM ReplacementRequest r WHERE r.mealDate = :mealDate AND r.mealType = :mealType AND r.status = 'COMPLETED'")

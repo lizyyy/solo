@@ -14,12 +14,24 @@
 - ✅ **报告导出**: Excel 格式供餐报告
 
 ## 启动服务
+
+### 方式一：使用 Maven Wrapper（推荐，无需预装 Maven）
+```bash
+./mvnw spring-boot:run
+```
+
+### 方式二：使用系统 Maven
 ```bash
 mvn spring-boot:run
 ```
 
+### 方式三：IDE 运行
+直接运行 `CanteenAllergenApplication.java` 主类
+
 服务地址: `http://localhost:8080`
 H2控制台: `http://localhost:8080/h2-console`
+
+> **注意**: 首次运行 `./mvnw` 会自动下载 Maven Wrapper 依赖，请确保网络连通。
 
 ---
 

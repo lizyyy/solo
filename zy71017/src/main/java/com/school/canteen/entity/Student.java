@@ -1,12 +1,10 @@
 package com.school.canteen.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
 @Entity
 @Table(name = "students")
 public class Student {
@@ -45,4 +43,25 @@ public class Student {
 
     @Column(nullable = false)
     private Boolean active = true;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getStudentNo() { return studentNo; }
+    public void setStudentNo(String studentNo) { this.studentNo = studentNo; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getGrade() { return grade; }
+    public void setGrade(String grade) { this.grade = grade; }
+    public String getClassName() { return className; }
+    public void setClassName(String className) { this.className = className; }
+    public String getParentName() { return parentName; }
+    public void setParentName(String parentName) { this.parentName = parentName; }
+    public String getParentPhone() { return parentPhone; }
+    public void setParentPhone(String parentPhone) { this.parentPhone = parentPhone; }
+    public String getParentEmail() { return parentEmail; }
+    public void setParentEmail(String parentEmail) { this.parentEmail = parentEmail; }
+    public Set<Allergen> getAllergens() { return allergens; }
+    public void setAllergens(Set<Allergen> allergens) { this.allergens = allergens; }
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
 }

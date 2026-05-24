@@ -1,0 +1,33 @@
+#!/bin/sh
+# Maven Wrapper bootstrap script - downloads wrapper if needed
+
+set -e
+
+# Try to use system mvn first
+if command -v mvn >/dev/null 2>&1; then
+  exec mvn "$@"
+fi
+
+# Check for wrapper jar
+WRAPPER_JAR=".mvn/wrapper/maven-wrapper.jar"
+if [ -f "$WRAPPER_JAR" ]; then
+  exec java -classpath "$WRAPPER_JAR" org.apache.maven.wrapper.MavenWrapperMain "$@"
+fi
+
+# Download wrapper jar
+echo "Maven wrapper not found, downloading..."
+mkdir -p .mvn/wrapper
+WRAPPER_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
+
+if command -v curl >/dev/null 2>&1; then
+  curl -sS -o "$WRAPPER_JAR" "$WRAPPER_URL"
+elif command -v wget >/dev/null 2>&1; then
+  wget -q -O "$WRAPPER_JAR" "$WRAPPER_URL"
+else
+  echo "Error: Neither curl nor wget is available to download Maven wrapper"
+  echo "Please install Maven or use an IDE to run the project"
+  exit 1
+fi
+
+echo "Download complete, running Maven..."
+exec java -classpath "$WRAPPER_JAR" org.apache.maven.wrapper.MavenWrapperMain "$@"
