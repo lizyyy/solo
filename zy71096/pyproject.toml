@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pip-hash-cli"
+version = "0.1.0"
+description = "Pip 依赖哈希 CLI 工具 - 验证 Python 包的完整性和来源"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "Pip Hash CLI Team" }
+]
+license = { text = "MIT" }
+dependencies = [
+    "click>=8.0",
+    "packaging>=21.0",
+    "pip-api>=0.0.30",
+    "jinja2>=3.0",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+pip-hash = "pip_hash_cli.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=3.0",
+    "black>=22.0",
+    "flake8>=4.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
