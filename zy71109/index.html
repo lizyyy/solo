@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>应急安置床位排布系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="top-bar">
+            <div class="title-section">
+                <h1>应急安置床位排布系统</h1>
+                <span class="subtitle">Emergency Shelter Layout Planner</span>
+            </div>
+            <div class="header-actions">
+                <select id="sampleSelect" class="btn-secondary">
+                    <option value="">-- 导入样例 --</option>
+                    <option value="gymnasium">体育馆样例</option>
+                    <option value="auditorium">礼堂样例</option>
+                    <option value="classroom">教室样例</option>
+                </select>
+                <button id="resetBtn" class="btn-secondary">重置</button>
+                <button id="exportBtn" class="btn-primary">导出报告</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="left-panel">
+                <div class="panel-section">
+                    <h3>视图控制</h3>
+                    <div class="view-toggle">
+                        <button id="view2D" class="btn-toggle active">2D 平面</button>
+                        <button id="view3D" class="btn-toggle">3D 立体</button>
+                    </div>
+                    <div class="view-presets">
+                        <button class="btn-small" data-view="top">俯视图</button>
+                        <button class="btn-small" data-view="front">正视图</button>
+                        <button class="btn-small" data-view="iso">轴测图</button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>元素库</h3>
+                    <div class="item-list" id="itemList">
+                        <div class="item" draggable="true" data-type="bed">
+                            <div class="item-icon bed-icon"></div>
+                            <div class="item-info">
+                                <span class="item-name">标准床位</span>
+                                <span class="item-desc">2m × 0.9m</span>
+                            </div>
+                        </div>
+                        <div class="item" draggable="true" data-type="bed-double">
+                            <div class="item-icon bed-double-icon"></div>
+                            <div class="item-info">
+                                <span class="item-name">加宽床位</span>
+                                <span class="item-desc">2m × 1.2m</span>
+                            </div>
+                        </div>
+                        <div class="item" draggable="true" data-type="isolation">
+                            <div class="item-icon isolation-icon"></div>
+                            <div class="item-info">
+                                <span class="item-name">隔离区</span>
+                                <span class="item-desc">4m × 4m</span>
+                            </div>
+                        </div>
+                        <div class="item" draggable="true" data-type="volunteer">
+                            <div class="item-icon volunteer-icon"></div>
+                            <div class="item-info">
+                                <span class="item-name">志愿者岗</span>
+                                <span class="item-desc">1.5m × 1.5m</span>
+                            </div>
+                        </div>
+                        <div class="item" draggable="true" data-type="entrance">
+                            <div class="item-icon entrance-icon"></div>
+                            <div class="item-info">
+                                <span class="item-name">出入口</span>
+                                <span class="item-desc">2m 宽</span>
+                            </div>
+                        </div>
+                        <div class="item" draggable="true" data-type="fire-exit">
+                            <div class="item-icon fire-icon"></div>
+                            <div class="item-info">
+                                <span class="item-name">消防出口</span>
+                                <span class="item-desc">1.5m 宽</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>筛选</h3>
+                    <div class="filter-list">
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-filter="bed"> 床位
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-filter="isolation"> 隔离区
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-filter="volunteer"> 志愿者岗
+                        </label>
+                        <label class="filter-item">
+                            <input type="checkbox" checked data-filter="passage"> 通道
+                        </label>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>方案对比</h3>
+                    <div class="scheme-list" id="schemeList">
+                        <div class="scheme-item active" data-scheme="1">
+                            <span class="scheme-name">方案 A</span>
+                            <button class="btn-xsmall save-scheme">保存</button>
+                        </div>
+                        <div class="scheme-item" data-scheme="2">
+                            <span class="scheme-name">方案 B</span>
+                            <button class="btn-xsmall save-scheme">保存</button>
+                        </div>
+                        <div class="scheme-item" data-scheme="3">
+                            <span class="scheme-name">方案 C</span>
+                            <button class="btn-xsmall save-scheme">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="canvas-area">
+                <div id="canvasContainer" class="canvas-container"></div>
+                <div class="canvas-overlay">
+                    <div class="validation-badge" id="validationBadge">
+                        <span class="badge-icon">✓</span>
+                        <span class="badge-text">合规</span>
+                    </div>
+                </div>
+                <div class="zoom-controls">
+                    <button id="zoomIn">+</button>
+                    <button id="zoomOut">−</button>
+                    <button id="zoomReset">⟲</button>
+                </div>
+            </main>
+
+            <aside class="right-panel">
+                <div class="panel-section">
+                    <h3>时间轴</h3>
+                    <div class="timeline">
+                        <div class="timeline-track">
+                            <div class="timeline-progress" id="timelineProgress"></div>
+                        </div>
+                        <div class="timeline-controls">
+                            <button id="prevStep" class="btn-icon">⏮</button>
+                            <button id="playTimeline" class="btn-icon">▶</button>
+                            <button id="nextStep" class="btn-icon">⏭</button>
+                        </div>
+                        <div class="timeline-steps" id="timelineSteps">
+                            <div class="step active" data-step="0">准备</div>
+                            <div class="step" data-step="1">划区</div>
+                            <div class="step" data-step="2">摆床</div>
+                            <div class="step" data-step="3">核验</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>规则校验</h3>
+                    <div class="validation-results" id="validationResults">
+                        <div class="validation-item pass">
+                            <span class="val-icon">✓</span>
+                            <span class="val-text">消防通道畅通</span>
+                        </div>
+                        <div class="validation-item pass">
+                            <span class="val-icon">✓</span>
+                            <span class="val-text">床位间距 ≥ 0.5m</span>
+                        </div>
+                        <div class="validation-item pass">
+                            <span class="val-icon">✓</span>
+                            <span class="val-text">隔离区远离入口</span>
+                        </div>
+                        <div class="validation-item pass">
+                            <span class="val-icon">✓</span>
+                            <span class="val-text">主通道 ≥ 2m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>排布统计</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-value" id="statBeds">0</span>
+                            <span class="stat-label">床位总数</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="statIsolation">0</span>
+                            <span class="stat-label">隔离区域</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="statVolunteers">0</span>
+                            <span class="stat-label">志愿者岗</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="statCapacity">0</span>
+                            <span class="stat-label">容纳人数</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>选中元素</h3>
+                    <div id="selectedInfo" class="selected-info">
+                        <p class="empty-hint">点击场景中的元素查看详情</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>排布报告</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="reportContent">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary close-modal-btn">关闭</button>
+                <button class="btn-primary" id="downloadPDF">下载 PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
