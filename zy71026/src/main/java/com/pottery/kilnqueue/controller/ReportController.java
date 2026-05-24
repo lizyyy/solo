@@ -48,8 +48,10 @@ public class ReportController {
     }
 
     @GetMapping("/batch/{batchNo}/export")
-    public ResponseEntity<String> exportBatchAsCsv(@PathVariable String batchNo) {
-        String csv = reportService.exportBatchAsCsv(batchNo);
+    public ResponseEntity<String> exportBatchAsCsv(
+            @PathVariable String batchNo,
+            @RequestParam(required = false) String operator) {
+        String csv = reportService.exportBatchAsCsv(batchNo, operator);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("text/csv; charset=UTF-8"));
         headers.setContentDispositionFormData("attachment", batchNo + "-reports.csv");

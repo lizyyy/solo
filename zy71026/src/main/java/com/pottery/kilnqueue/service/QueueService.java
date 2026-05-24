@@ -123,10 +123,11 @@ public class QueueService {
             return buildResponse(existingByIdempotent.get(), true);
         }
 
+        QueueStatus originalStatus = originalRecord.getStatus();
         originalRecord.setStatus(QueueStatus.RESCHEDULED);
         queueRecordRepository.save(originalRecord);
 
-        logProcessing(originalRecord, DecisionType.RESCHEDULE_REQUEST, originalRecord.getStatus(), QueueStatus.RESCHEDULED,
+        logProcessing(originalRecord, DecisionType.RESCHEDULE_REQUEST, originalStatus, QueueStatus.RESCHEDULED,
             request.getReason(), null, request.getOperator());
 
         QueueRecord newRecord = new QueueRecord();

@@ -2,12 +2,16 @@ package com.pottery.kilnqueue.service;
 
 import com.pottery.kilnqueue.entity.FiringReport;
 import com.pottery.kilnqueue.entity.KilnBatch;
+import com.pottery.kilnqueue.entity.ProcessingLog;
 import com.pottery.kilnqueue.entity.QueueRecord;
 import com.pottery.kilnqueue.entity.Work;
 import com.pottery.kilnqueue.enums.BatchStatus;
+import com.pottery.kilnqueue.enums.DecisionType;
+import com.pottery.kilnqueue.enums.QueueStatus;
 import com.pottery.kilnqueue.exception.BusinessException;
 import com.pottery.kilnqueue.repository.FiringReportRepository;
 import com.pottery.kilnqueue.repository.KilnBatchRepository;
+import com.pottery.kilnqueue.repository.ProcessingLogRepository;
 import com.pottery.kilnqueue.repository.QueueRecordRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,13 +30,16 @@ public class ReportService {
     private final FiringReportRepository firingReportRepository;
     private final KilnBatchRepository kilnBatchRepository;
     private final QueueRecordRepository queueRecordRepository;
+    private final ProcessingLogRepository processingLogRepository;
 
     public ReportService(FiringReportRepository firingReportRepository,
                          KilnBatchRepository kilnBatchRepository,
-                         QueueRecordRepository queueRecordRepository) {
+                         QueueRecordRepository queueRecordRepository,
+                         ProcessingLogRepository processingLogRepository) {
         this.firingReportRepository = firingReportRepository;
         this.kilnBatchRepository = kilnBatchRepository;
         this.queueRecordRepository = queueRecordRepository;
+        this.processingLogRepository = processingLogRepository;
     }
 
     @Transactional
@@ -126,7 +133,30 @@ public class ReportService {
         return stats;
     }
 
+    @Transactional
     public String exportBatchAsCsv(String batchNo) {
+        return exportBatchAsCsv(batchNo, null);
+    }
+
+    @Transactional
+    public String exportBatchAsCsv(String batchNo, String operator) {
+        KilnBatch batch = kilnBatchRepository.findByBatchNo(batchNo)
+            .orElseThrow(() -> BusinessException.notFound("批次不存在"));
+
+        List<QueueRecord> queueRecords = queueRecordRepository.findByBatchId(batch.getId());
+        for (QueueRecord record : queueRecords) {
+            QueueStatus previousStatus = record.getStatus();
+            ProcessingLog logEntry = new ProcessingLog();
+            logEntry.setQueueRecord(record);
+            logEntry.setDecisionType(DecisionType.REPORT_EXPORTED);
+            logEntry.setPreviousStatus(previousStatus);
+            logEntry.setNewStatus(previousStatus);
+            logEntry.setReason("批次报告已导出");
+            logEntry.setEvidence("批次: " + batchNo + ", 导出CSV格式, 操作人: " + (operator != null ? operator : "系统"));
+            logEntry.setOperator(operator);
+            processingLogRepository.save(logEntry);
+        }
+
         List<FiringReport> reports = getBatchReports(batchNo);
         StringBuilder sb = new StringBuilder();
 
@@ -145,6 +175,7 @@ public class ReportService {
             sb.append(report.getCreatedAt()).append("\n");
         }
 
+        log.info("批次 {} 报告已导出，共 {} 条记录，操作人: {}", batchNo, reports.size(), operator != null ? operator : "系统");
         return sb.toString();
     }
 
