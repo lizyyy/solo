@@ -1,0 +1,36 @@
+{
+  "name": "化学实验室泄漏应急处置演练",
+  "description": "模拟实验室化学品泄漏场景，练习正确的应急处置顺序，重点是先断电再撤离",
+  "steps": [
+    { "id": 1, "name": "发现泄漏，保持冷静", "target": "leak_area", "type": "identify", "points": 10, "hint": "仔细观察实验室，发现化学品泄漏位置" },
+    { "id": 2, "name": "切断电源开关", "target": "e1", "type": "action", "points": 15, "hint": "优先切断电源，防止电气火花引发爆炸 - 这是最关键的一步！" },
+    { "id": 3, "name": "关闭通风设备", "target": "e2", "type": "action", "points": 10, "hint": "关闭通风防止有害气体扩散" },
+    { "id": 4, "name": "穿戴防护装备", "target": "ppe_area", "type": "action", "points": 15, "hint": "在处理泄漏前必须穿戴适当防护装备" },
+    { "id": 5, "name": "使用吸收棉处理泄漏", "target": "leak_area", "type": "action", "points": 20, "hint": "使用专用吸收材料处理泄漏物" },
+    { "id": 6, "name": "沿安全路线撤离", "target": "exit", "type": "move", "points": 20, "hint": "按照指定安全路线撤离到安全区域" }
+  ],
+  "hazards": [
+    { "id": "h1", "name": "化学品泄漏点", "type": "danger", "position": { "x": 2, "z": 2 }, "status": "active" },
+    { "id": "h2", "name": "高压气瓶", "type": "warning", "position": { "x": -3, "z": 1 }, "status": "warning" },
+    { "id": "h3", "name": "易燃溶剂柜", "type": "danger", "position": { "x": -4, "z": -2 }, "status": "active" }
+  ],
+  "equipment": [
+    { "id": "e1", "name": "总电源开关", "position": { "x": 4, "z": -3 }, "status": "on", "action": "toggle" },
+    { "id": "e2", "name": "通风系统开关", "position": { "x": 4, "z": -1 }, "status": "on", "action": "toggle" },
+    { "id": "e3", "name": "紧急冲淋装置", "position": { "x": 0, "z": -4 }, "status": "ready", "action": "use" },
+    { "id": "e4", "name": "消防灭火器", "position": { "x": -4, "z": 3 }, "status": "ready", "action": "use" }
+  ],
+  "safePath": [
+    { "x": 0, "z": 0 },
+    { "x": 2, "z": 0 },
+    { "x": 2, "z": -3 },
+    { "x": 4, "z": -3 },
+    { "x": 4, "z": -5 }
+  ],
+  "forbiddenZones": [
+    { "name": "高压危险区", "x": -3, "z": 1, "radius": 1.5 },
+    { "name": "泄漏扩散区", "x": 2, "z": 2, "radius": 2 }
+  ],
+  "exitPoint": { "x": 4, "z": -5 },
+  "startPoint": { "x": 0, "z": 0 }
+}

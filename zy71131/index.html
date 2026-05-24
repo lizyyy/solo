@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验室安全演练 VR</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>🔬 实验室安全演练 VR</h1>
+            <div class="header-controls">
+                <button id="importBtn" class="btn btn-secondary">📂 导入样例</button>
+                <button id="resetBtn" class="btn btn-warning">🔄 重置场景</button>
+                <button id="reportBtn" class="btn btn-primary">📊 导出报告</button>
+            </div>
+        </header>
+
+        <main class="main-container">
+            <aside class="sidebar left-sidebar">
+                <div class="panel">
+                    <h3>📋 演练步骤</h3>
+                    <div id="stepsList" class="steps-list"></div>
+                </div>
+                <div class="panel">
+                    <h3>🔍 筛选条件</h3>
+                    <div class="filter-group">
+                        <label><input type="checkbox" class="filter" value="hazards" checked> 危险源</label>
+                        <label><input type="checkbox" class="filter" value="equipment" checked> 设备开关</label>
+                        <label><input type="checkbox" class="filter" value="path" checked> 撤离路线</label>
+                        <label><input type="checkbox" class="filter" value="forbidden" checked> 禁区</label>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h3>📊 当前状态</h3>
+                    <div id="statusPanel" class="status-panel">
+                        <div class="status-item">
+                            <span>当前步骤:</span>
+                            <span id="currentStep" class="status-value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span>已用时间:</span>
+                            <span id="elapsedTime" class="status-value">00:00</span>
+                        </div>
+                        <div class="status-item">
+                            <span>错误次数:</span>
+                            <span id="errorCount" class="status-value error">0</span>
+                        </div>
+                        <div class="status-item">
+                            <span>当前得分:</span>
+                            <span id="currentScore" class="status-value success">0</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="scene-container">
+                <div id="scene3d" class="scene-3d"></div>
+                <div class="scene-overlay">
+                    <div id="hintPanel" class="hint-panel hidden">
+                        <p id="hintText"></p>
+                    </div>
+                </div>
+                <div class="camera-controls">
+                    <button class="cam-btn" data-view="overview">🏠 总览</button>
+                    <button class="cam-btn" data-view="entrance">🚪 入口</button>
+                    <button class="cam-btn" data-view="center">🎯 中心</button>
+                    <button class="cam-btn" data-view="exit">🚶 出口</button>
+                </div>
+            </section>
+
+            <aside class="sidebar right-sidebar">
+                <div class="panel">
+                    <h3>⚠️ 危险源</h3>
+                    <div id="hazardsList" class="items-list"></div>
+                </div>
+                <div class="panel">
+                    <h3>🔌 设备开关</h3>
+                    <div id="equipmentList" class="items-list"></div>
+                </div>
+                <div class="panel">
+                    <h3>🚫 违规记录</h3>
+                    <div id="violationsList" class="violations-list">
+                        <p class="empty-text">暂无违规记录</p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <footer class="timeline-container">
+            <div class="timeline-header">
+                <h3>⏱️ 时间轴控制</h3>
+                <div class="timeline-controls">
+                    <button id="playBtn" class="btn btn-small">▶️ 播放</button>
+                    <button id="pauseBtn" class="btn btn-small">⏸️ 暂停</button>
+                    <button id="prevStepBtn" class="btn btn-small">⏮️ 上一步</button>
+                    <button id="nextStepBtn" class="btn btn-small">⏭️ 下一步</button>
+                </div>
+            </div>
+            <div class="timeline-track">
+                <input type="range" id="timelineSlider" min="0" max="100" value="0" class="timeline-slider">
+                <div id="timelineMarkers" class="timeline-markers"></div>
+            </div>
+            <div class="timeline-info">
+                <span id="timelineStart">开始</span>
+                <span id="timelineEnd">结束</span>
+            </div>
+        </footer>
+    </div>
+
+    <div id="reportModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📊 演练报告</h2>
+                <button id="closeModal" class="close-btn">&times;</button>
+            </div>
+            <div id="reportContent" class="report-content"></div>
+            <div class="modal-footer">
+                <button id="downloadPDF" class="btn btn-primary">📥 下载 PDF</button>
+                <button id="downloadJSON" class="btn btn-secondary">📋 导出 JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
