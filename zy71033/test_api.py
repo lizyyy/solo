@@ -167,6 +167,52 @@ def test_full_flow():
     else:
         print(f"  结果: {resp.json()}")
 
+    print("\n[12] 创建发货报告")
+    report_data = {
+        "order_no": "ORDER-001",
+        "ship_date": str(date.today()),
+        "ship_quantity": 500,
+        "logistics_info": "顺丰快递 SF1234567890",
+        "cert_verified": True
+    }
+    resp = requests.post(f"{BASE_URL}/shipping-report/", json=report_data)
+    print(f"  状态码: {resp.status_code}")
+    if resp.status_code == 200:
+        result = resp.json()
+        print(f"  ✓ 发货报告创建成功")
+        print(f"    报告编号: {result['report_no']}")
+        print(f"    关联订单: {result['order_no']}")
+        print(f"    物流信息: {result['logistics_info']}")
+    else:
+        print(f"  错误: {resp.text[:200]}")
+
+    print("\n[13] 验证订单状态已更新为已发货")
+    resp = requests.get(f"{BASE_URL}/orders/ORDER-001/history")
+    print(f"  状态码: {resp.status_code}")
+    if resp.status_code == 200:
+        history = resp.json()
+        print(f"  ✓ 历史记录获取成功")
+        print(f"    订单状态: {history['order']['status']}")
+        print(f"    发货报告编号: {history['shipping_report']['report_no'] if history['shipping_report'] else '无'}")
+
+    print("\n[14] 测试已发货订单重复校验拦截")
+    resp = requests.get(f"{BASE_URL}/orders/ORDER-001/check")
+    print(f"  状态码: {resp.status_code}")
+    if resp.status_code != 200:
+        error = resp.json()['detail']
+        print(f"  ✓ 正确拦截已发货订单")
+        print(f"    错误类型: {error['error_type']}")
+        print(f"    提示信息: {error['message']}")
+
+    print("\n[15] 下载发货报告 Excel")
+    resp = requests.get(f"{BASE_URL}/shipping-report/ORDER-001/download")
+    print(f"  状态码: {resp.status_code}")
+    if resp.status_code == 200:
+        print(f"  ✓ 发货报告下载成功")
+        print(f"    文件大小: {len(resp.content)} 字节")
+    else:
+        print(f"  错误: {resp.text[:200]}")
+
     print("\n" + "=" * 60)
     print("测试完成！请访问 http://localhost:8000/docs 查看完整API文档")
     print("=" * 60)

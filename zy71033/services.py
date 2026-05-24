@@ -298,9 +298,12 @@ def get_order_history(db: Session, order_no: str) -> Optional[schemas.OrderHisto
         models.ReissueApplication.order_id == order.id
     ).order_by(models.ReissueApplication.created_at.desc()).all()
 
+    reissue_schemas = [schemas.ReissueApplication.from_orm(r) for r in reissues]
+    shipping_report = schemas.ShippingReport.from_orm(order.shipping_report) if order.shipping_report else None
+
     return schemas.OrderHistory(
         order=schemas.SalesOrder.from_orm(order),
         traces=traces,
-        reissues=reissues,
-        shipping_report=order.shipping_report
+        reissues=reissue_schemas,
+        shipping_report=shipping_report
     )

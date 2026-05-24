@@ -158,7 +158,7 @@ class ReissueApplicationReview(BaseModel):
 class ReissueApplication(BaseModel):
     id: int
     application_no: str
-    order_id: int
+    order_no: str
     reason: str
     status: models.ReissueStatus
     reviewer: Optional[str]
@@ -169,6 +169,21 @@ class ReissueApplication(BaseModel):
 
     class Config:
         from_attributes = True
+
+    @classmethod
+    def from_orm(cls, obj):
+        return cls(
+            id=obj.id,
+            application_no=obj.application_no,
+            order_no=obj.order.order_no if obj.order else "",
+            reason=obj.reason,
+            status=obj.status,
+            reviewer=obj.reviewer,
+            review_remark=obj.review_remark,
+            submitted_at=obj.submitted_at,
+            reviewed_at=obj.reviewed_at,
+            created_at=obj.created_at
+        )
 
 
 class ShippingReportBase(BaseModel):
@@ -183,13 +198,31 @@ class ShippingReportCreate(ShippingReportBase):
     pass
 
 
-class ShippingReport(ShippingReportBase):
+class ShippingReport(BaseModel):
+    order_no: str
+    ship_date: date
+    ship_quantity: int
+    logistics_info: str
+    cert_verified: bool = True
     id: int
     report_no: str
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+    @classmethod
+    def from_orm(cls, obj):
+        return cls(
+            id=obj.id,
+            report_no=obj.report_no,
+            order_no=obj.order.order_no if obj.order else "",
+            ship_date=obj.ship_date,
+            ship_quantity=obj.ship_quantity,
+            logistics_info=obj.logistics_info,
+            cert_verified=obj.cert_verified,
+            created_at=obj.created_at
+        )
 
 
 class ProcessingTraceBase(BaseModel):

@@ -268,7 +268,8 @@ def get_order_history_endpoint(order_no: str, db: Session = Depends(get_db)):
 @app.post("/api/reissues/", response_model=schemas.ReissueApplication, tags=["补证管理"])
 def create_reissue(data: schemas.ReissueApplicationCreate, db: Session = Depends(get_db)):
     try:
-        return services.create_reissue_application(db, data.order_no, data.reason)
+        reissue = services.create_reissue_application(db, data.order_no, data.reason)
+        return schemas.ReissueApplication.from_orm(reissue)
     except ValueError as e:
         if "待处理的补证申请" in str(e):
             raise create_http_error(
@@ -286,7 +287,8 @@ def create_reissue(data: schemas.ReissueApplicationCreate, db: Session = Depends
 @app.post("/api/reissues/submit", response_model=schemas.ReissueApplication, tags=["补证管理"])
 def submit_reissue_cert(data: schemas.ReissueApplicationSubmit, db: Session = Depends(get_db)):
     try:
-        return services.submit_reissue_cert(db, data.application_no, data.new_cert_no)
+        reissue = services.submit_reissue_cert(db, data.application_no, data.new_cert_no)
+        return schemas.ReissueApplication.from_orm(reissue)
     except ValueError as e:
         if "状态不允许" in str(e):
             raise create_http_error(
@@ -304,9 +306,10 @@ def submit_reissue_cert(data: schemas.ReissueApplicationSubmit, db: Session = De
 @app.post("/api/reissues/review", response_model=schemas.ReissueApplication, tags=["补证管理"])
 def review_reissue(data: schemas.ReissueApplicationReview, db: Session = Depends(get_db)):
     try:
-        return services.review_reissue_application(
+        reissue = services.review_reissue_application(
             db, data.application_no, data.status, data.review_remark, data.reviewer
         )
+        return schemas.ReissueApplication.from_orm(reissue)
     except ValueError as e:
         if "无法审核" in str(e):
             raise create_http_error(
@@ -327,7 +330,8 @@ def list_reissues(status: Optional[models.ReissueStatus] = None,
     query = db.query(models.ReissueApplication)
     if status:
         query = query.filter(models.ReissueApplication.status == status)
-    return query.offset(skip).limit(limit).all()
+    reissues = query.offset(skip).limit(limit).all()
+    return [schemas.ReissueApplication.from_orm(r) for r in reissues]
 
 
 @app.post("/api/shipping-report/", response_model=schemas.ShippingReport, tags=["发货管理"])
@@ -376,7 +380,7 @@ def create_shipping_report(report: schemas.ShippingReportCreate, db: Session = D
         "已发货"
     )
     
-    return db_report
+    return schemas.ShippingReport.from_orm(db_report)
 
 
 @app.get("/api/shipping-report/{order_no}/download", tags=["报告下载"])
