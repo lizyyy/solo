@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.database import engine, Base
+from app.database import engine, Base, init_default_retest_rules
 from app.api.samples import router as samples_router
 
 Base.metadata.create_all(bind=engine)
+init_default_retest_rules()
 
 app = FastAPI(
     title="农产品农残检测送样管理系统",

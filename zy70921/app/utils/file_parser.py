@@ -1,6 +1,7 @@
 import csv
 import json
 from datetime import datetime
+_report_counter = 0
 from typing import List, Dict, Any
 import io
 
@@ -26,5 +27,7 @@ def parse_date(date_str: str) -> datetime:
     return None
 
 def generate_report_no() -> str:
+    global _report_counter
+    _report_counter += 1
     now = datetime.now()
-    return f"RPT{now.strftime('%Y%m%d%H%M%S')}"
+    return f"RPT{now.strftime('%Y%m%d%H%M%S')}{_report_counter:03d}"
