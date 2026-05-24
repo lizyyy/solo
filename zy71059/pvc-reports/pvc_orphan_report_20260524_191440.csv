@@ -1,0 +1,8 @@
+Namespace,PVC Name,Is Orphan,Cleanup Recommendation,References,Reference Count,Has Protection,Protection Rules,Issues,Source File,Start Line,Storage Class,Storage Request
+default,active-pvc,NO,keep,default/Pod/my-app-pod,1,YES,protected-label:PVC has protected label 'app=my-app',,testdata/pvcs.yaml,1,standard,10Gi
+default,orphan-unprotected,NO,keep,default/CronJob/backup-cronjob,1,NO,,,testdata/pvcs.yaml,16,standard,5Gi
+default,orphan-with-retention,YES,keep-protected,,0,YES,retention-label:PVC has retention label 'pvc-orphan/retention-policy=retain',,testdata/pvcs.yaml,29,,20Gi
+default,orphan-expired,YES,delete-expired,,0,NO,,Has expired retention rules,testdata/pvcs.yaml,43,,15Gi
+default,cross-ns-same-name,YES,review-delete,,0,NO,,Cross-namespace PVC with same name exists - verify correct namespace,testdata/pvcs.yaml,57,,8Gi
+other-ns,cross-ns-same-name,YES,review-delete,,0,NO,,Cross-namespace PVC with same name exists - verify correct namespace,testdata/pvcs.yaml,69,,8Gi
+kube-system,kube-db-pvc,YES,keep-protected,,0,YES,namespace-protection:Namespace 'kube-system' matches protected pattern 'kube-system',,testdata/pvcs.yaml,81,,100Gi

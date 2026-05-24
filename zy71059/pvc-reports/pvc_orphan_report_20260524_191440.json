@@ -1,0 +1,199 @@
+{
+  "generated_at": "2026-05-24T19:14:40.990454",
+  "summary": {
+    "total_pvcs": 7,
+    "orphan_pvcs": 5,
+    "referenced_pvcs": 2,
+    "total_resources": 12,
+    "references_tracked": 14,
+    "errors": [],
+    "warnings": []
+  },
+  "orphan_pvcs": [
+    {
+      "namespace": "default",
+      "name": "orphan-with-retention",
+      "labels": {
+        "pvc-orphan/retention-policy": "retain",
+        "__line__": "35",
+        "__end_line__": "36"
+      },
+      "annotations": {},
+      "source": "testdata/pvcs.yaml:29-42",
+      "source_file": "testdata/pvcs.yaml",
+      "source_line": 29,
+      "cleanup_recommendation": "keep-protected",
+      "reason": "No references found from any workload resource",
+      "issues": [],
+      "references": [],
+      "retention_rules": [
+        {
+          "type": "retention-label",
+          "description": "PVC has retention label 'pvc-orphan/retention-policy=retain'",
+          "is_active": true,
+          "expires_at": null
+        }
+      ],
+      "spec": {
+        "storage_class": null,
+        "storage_request": "20Gi",
+        "volume_name": null
+      }
+    },
+    {
+      "namespace": "default",
+      "name": "orphan-expired",
+      "labels": {
+        "pvc-orphan/expires-at": "2020-01-01",
+        "__line__": "49",
+        "__end_line__": "50"
+      },
+      "annotations": {},
+      "source": "testdata/pvcs.yaml:43-56",
+      "source_file": "testdata/pvcs.yaml",
+      "source_line": 43,
+      "cleanup_recommendation": "delete-expired",
+      "reason": "No references found from any workload resource",
+      "issues": [
+        "Has expired retention rules"
+      ],
+      "references": [],
+      "retention_rules": [
+        {
+          "type": "expiry-label",
+          "description": "PVC expiry label 'pvc-orphan/expires-at=2020-01-01'",
+          "is_active": false,
+          "expires_at": "2020-01-01T00:00:00"
+        }
+      ],
+      "spec": {
+        "storage_class": null,
+        "storage_request": "15Gi",
+        "volume_name": null
+      }
+    },
+    {
+      "namespace": "default",
+      "name": "cross-ns-same-name",
+      "labels": {},
+      "annotations": {},
+      "source": "testdata/pvcs.yaml:57-68",
+      "source_file": "testdata/pvcs.yaml",
+      "source_line": 57,
+      "cleanup_recommendation": "review-delete",
+      "reason": "No references found from any workload resource",
+      "issues": [
+        "Cross-namespace PVC with same name exists - verify correct namespace"
+      ],
+      "references": [],
+      "retention_rules": [],
+      "spec": {
+        "storage_class": null,
+        "storage_request": "8Gi",
+        "volume_name": null
+      }
+    },
+    {
+      "namespace": "other-ns",
+      "name": "cross-ns-same-name",
+      "labels": {},
+      "annotations": {},
+      "source": "testdata/pvcs.yaml:69-80",
+      "source_file": "testdata/pvcs.yaml",
+      "source_line": 69,
+      "cleanup_recommendation": "review-delete",
+      "reason": "No references found from any workload resource",
+      "issues": [
+        "Cross-namespace PVC with same name exists - verify correct namespace"
+      ],
+      "references": [],
+      "retention_rules": [],
+      "spec": {
+        "storage_class": null,
+        "storage_request": "8Gi",
+        "volume_name": null
+      }
+    },
+    {
+      "namespace": "kube-system",
+      "name": "kube-db-pvc",
+      "labels": {},
+      "annotations": {},
+      "source": "testdata/pvcs.yaml:81-92",
+      "source_file": "testdata/pvcs.yaml",
+      "source_line": 81,
+      "cleanup_recommendation": "keep-protected",
+      "reason": "No references found from any workload resource",
+      "issues": [],
+      "references": [],
+      "retention_rules": [
+        {
+          "type": "namespace-protection",
+          "description": "Namespace 'kube-system' matches protected pattern 'kube-system'",
+          "is_active": true,
+          "expires_at": null
+        }
+      ],
+      "spec": {
+        "storage_class": null,
+        "storage_request": "100Gi",
+        "volume_name": null
+      }
+    }
+  ],
+  "referenced_pvcs": [
+    {
+      "namespace": "default",
+      "name": "active-pvc",
+      "labels": {
+        "app": "my-app",
+        "__line__": "7",
+        "__end_line__": "8"
+      },
+      "annotations": {},
+      "source": "testdata/pvcs.yaml:1-15",
+      "source_file": "testdata/pvcs.yaml",
+      "source_line": 1,
+      "cleanup_recommendation": "keep",
+      "reason": "Referenced by 1 resource(s)",
+      "issues": [],
+      "references": [
+        "default/Pod/my-app-pod"
+      ],
+      "retention_rules": [
+        {
+          "type": "protected-label",
+          "description": "PVC has protected label 'app=my-app'",
+          "is_active": true,
+          "expires_at": null
+        }
+      ],
+      "spec": {
+        "storage_class": "standard",
+        "storage_request": "10Gi",
+        "volume_name": null
+      }
+    },
+    {
+      "namespace": "default",
+      "name": "orphan-unprotected",
+      "labels": {},
+      "annotations": {},
+      "source": "testdata/pvcs.yaml:16-28",
+      "source_file": "testdata/pvcs.yaml",
+      "source_line": 16,
+      "cleanup_recommendation": "keep",
+      "reason": "Referenced by 1 resource(s)",
+      "issues": [],
+      "references": [
+        "default/CronJob/backup-cronjob"
+      ],
+      "retention_rules": [],
+      "spec": {
+        "storage_class": "standard",
+        "storage_request": "5Gi",
+        "volume_name": null
+      }
+    }
+  ]
+}
