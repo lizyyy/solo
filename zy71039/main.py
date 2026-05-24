@@ -210,16 +210,19 @@ def update_work_order_status(
     status_update: schemas.WorkOrderStatusUpdateRequest,
     db: Session = Depends(get_db)
 ):
-    work_order = services.update_work_order_status(
-        db,
-        work_order_id=status_update.work_order_id,
-        new_status=status_update.new_status,
-        operator=status_update.operator,
-        reason=status_update.reason
-    )
-    if not work_order:
-        raise HTTPException(status_code=404, detail="工单不存在")
-    return work_order
+    try:
+        work_order = services.update_work_order_status(
+            db,
+            work_order_id=status_update.work_order_id,
+            new_status=status_update.new_status,
+            operator=status_update.operator,
+            reason=status_update.reason
+        )
+        if not work_order:
+            raise HTTPException(status_code=404, detail="工单不存在")
+        return work_order
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/work-orders/supplement", tags=["材料补证"])

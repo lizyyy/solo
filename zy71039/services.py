@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
 from datetime import datetime
 import uuid
+import hashlib
 from typing import List, Optional, Tuple
 from database import (
     InspectionPoint, RawMaterial, WorkOrder, WorkOrderMaterial,
@@ -9,6 +10,48 @@ from database import (
     WorkOrderStatusEnum, LeakLevelEnum
 )
 import schemas
+
+
+VALID_STATUS_TRANSITIONS = {
+    None: {WorkOrderStatusEnum.PENDING},
+    WorkOrderStatusEnum.PENDING: {
+        WorkOrderStatusEnum.CONFIRMED,
+        WorkOrderStatusEnum.REJECTED,
+        WorkOrderStatusEnum.CLOSED
+    },
+    WorkOrderStatusEnum.CONFIRMED: {
+        WorkOrderStatusEnum.IN_PROGRESS,
+        WorkOrderStatusEnum.REJECTED,
+        WorkOrderStatusEnum.CLOSED
+    },
+    WorkOrderStatusEnum.IN_PROGRESS: {
+        WorkOrderStatusEnum.PENDING_RETEST,
+        WorkOrderStatusEnum.REJECTED,
+        WorkOrderStatusEnum.CLOSED
+    },
+    WorkOrderStatusEnum.PENDING_RETEST: {
+        WorkOrderStatusEnum.PASSED,
+        WorkOrderStatusEnum.IN_PROGRESS,
+        WorkOrderStatusEnum.REJECTED,
+        WorkOrderStatusEnum.CLOSED
+    },
+    WorkOrderStatusEnum.PASSED: {
+        WorkOrderStatusEnum.CLOSED,
+        WorkOrderStatusEnum.IN_PROGRESS
+    },
+    WorkOrderStatusEnum.REJECTED: {
+        WorkOrderStatusEnum.PENDING,
+        WorkOrderStatusEnum.CONFIRMED,
+        WorkOrderStatusEnum.CLOSED
+    },
+    WorkOrderStatusEnum.CLOSED: set()
+}
+
+
+def is_valid_status_transition(from_status: Optional[WorkOrderStatusEnum], 
+                                to_status: WorkOrderStatusEnum) -> bool:
+    allowed = VALID_STATUS_TRANSITIONS.get(from_status, set())
+    return to_status in allowed
 
 
 def generate_code(prefix: str) -> str:
@@ -23,7 +66,8 @@ def calculate_cluster_key(lat: Optional[float], lng: Optional[float],
         return f"GEO_{roof_area_id or 'UNK'}_{lat_rounded}_{lng_rounded}"
     elif position_desc:
         desc_clean = position_desc.strip().upper()
-        return f"DESC_{roof_area_id or 'UNK'}_{hash(desc_clean) % 1000000}"
+        desc_hash = hashlib.md5(desc_clean.encode('utf-8')).hexdigest()[:8]
+        return f"DESC_{roof_area_id or 'UNK'}_{desc_hash}"
     else:
         return f"TEMP_{uuid.uuid4().hex[:8]}"
 
@@ -229,6 +273,12 @@ def update_work_order_status(db: Session, work_order_id: int, new_status: WorkOr
         return None
     
     old_status = work_order.status
+    
+    if not is_valid_status_transition(old_status, new_status):
+        raise ValueError(
+            f"非法状态流转: {old_status.value if old_status else '初始'} -> {new_status.value}。"
+            f"允许的流转: {[s.value for s in VALID_STATUS_TRANSITIONS.get(old_status, [])]}"
+        )
     
     transition = StatusTransition(
         work_order_id=work_order_id,
