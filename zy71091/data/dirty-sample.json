@@ -1,0 +1,17 @@
+[
+  {"key": "user:session:1001", "memory": 1536, "ttl": 3600, "type": "string"},
+  {"key": "user:session:1001", "memory": 1536, "ttl": 3600, "type": "string"},
+  {"key": "user:profile:2001", "memory": 8192, "ttl": -1},
+  {"key": "product:cache:3001", "memory": 4096, "ttl": 86400, "type": "string"},
+  {"key": "strange_key_without_prefix", "memory": 2048, "ttl": 1800, "type": "string"},
+  {"key": "a:b", "memory": 512, "ttl": -1, "type": "string"},
+  {"key": "very:long:prefix:that:has:many:levels:and:should:be:handled", "memory": 1024, "ttl": 3600, "type": "hash"},
+  {"key": "big:key:001", "memory": 52428800, "ttl": -1, "type": "string"},
+  {"key": "config:app:settings", "memory": 10240, "ttl": -1, "type": "hash"},
+  {"key": "user:cart:4001", "memory": 32768, "ttl": -1, "type": "hash"},
+  {"key": "cache:item:001", "memory": 65536, "ttl": -1, "type": "string"},
+  {"key": "cache:item:002", "memory": 65536, "ttl": -1, "type": "string"},
+  {"key": "temp:data:xyz", "memory": 256, "ttl": 60, "type": "string"},
+  {"key": "log:error:20240101", "memory": 131072, "ttl": 86400, "type": "list"},
+  {"key": "stats:pageview:home", "memory": 4096, "ttl": 3600, "type": "string"}
+]

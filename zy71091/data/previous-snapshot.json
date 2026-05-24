@@ -1,0 +1,17 @@
+[
+  {"key": "user:session:1001", "memory": 1536, "ttl": 3600, "type": "string"},
+  {"key": "user:session:1002", "memory": 1536, "ttl": 3600, "type": "string"},
+  {"key": "user:profile:2001", "memory": 8192, "ttl": -1, "type": "hash"},
+  {"key": "user:profile:2002", "memory": 8192, "ttl": -1, "type": "hash"},
+  {"key": "product:cache:3001", "memory": 4096, "ttl": 86400, "type": "string"},
+  {"key": "product:cache:3002", "memory": 4096, "ttl": 86400, "type": "string"},
+  {"key": "product:detail:3001", "memory": 16384, "ttl": 604800, "type": "hash"},
+  {"key": "cart:user:4001", "memory": 28672, "ttl": -1, "type": "hash"},
+  {"key": "order:temp:5001", "memory": 2048, "ttl": 1800, "type": "string"},
+  {"key": "config:app:settings", "memory": 8192, "ttl": -1, "type": "hash"},
+  {"key": "cache:views:homepage", "memory": 786432, "ttl": 3600, "type": "string"},
+  {"key": "stats:daily:20240101", "memory": 131072, "ttl": -1, "type": "zset"},
+  {"key": "stats:daily:20240102", "memory": 131072, "ttl": -1, "type": "zset"},
+  {"key": "log:error:app", "memory": 196608, "ttl": 2592000, "type": "list"},
+  {"key": "queue:jobs:email", "memory": 8192, "ttl": -1, "type": "list"}
+]

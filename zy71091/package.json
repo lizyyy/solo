@@ -1,0 +1,21 @@
+{
+  "name": "redis-key-audit",
+  "version": "1.0.0",
+  "description": "Redis Key 空间审计 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "redis-key-audit": "./bin/redis-key-audit.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js",
+    "lint": "node --check src/**/*.js"
+  },
+  "keywords": ["redis", "audit", "cli", "memory", "bigkeys"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  }
+}
