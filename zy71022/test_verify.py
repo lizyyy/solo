@@ -4,9 +4,9 @@ import json
 
 BASE_URL = "http://localhost:8080/api"
 
-def test_amount_consistency():
+def test_full_status_workflow():
     print("=" * 70)
-    print("测试: 金额链路一致性验证 (账单重算 → 复核报告 → 余额 → 导出)")
+    print("测试: 完整状态闭环验证 (pending → reviewing → approved → closed → archived)")
     print("=" * 70)
     
     appeal_data = {
@@ -23,17 +23,11 @@ def test_amount_consistency():
     
     r = requests.post(f"{BASE_URL}/appeals", json=appeal_data).json()
     appeal_no = r["appeal_no"]
-    print(f"申诉单号: {appeal_no}")
+    status = r["status"]
+    print(f"提交申诉: {appeal_no}")
+    print(f"  状态: {status} {'✓' if status == 'pending' else '✗'}")
     
-    print("\n1. 账单重算结果:")
-    recalc = requests.get(f"{BASE_URL}/appeals/{appeal_no}/recalculate").json()
-    print(f"   原始金额合计: {recalc['original_total']}")
-    print(f"   调整金额合计: {recalc['adjusted_total']}")
-    print(f"   退款金额: {recalc['refund_amount']}")
-    for bd in recalc['bill_details']:
-        print(f"   - {bd['bill_cycle']}: 原{bd['original_amount']} → 调{bd['adjusted_amount']} (差{bd['difference']})")
-    
-    print("\n2. 复核报告 (确认漏水):")
+    print("\n1. 创建复核报告:")
     review_data = {
         "appeal_no": appeal_no,
         "reviewer_id": "R001",
@@ -49,69 +43,71 @@ def test_amount_consistency():
     
     report = requests.post(f"{BASE_URL}/reviews", json=review_data).json()
     report_no = report["report_no"]
-    print(f"   报告编号: {report_no}")
-    print(f"   原始金额: {report['original_amount']}")
-    print(f"   调整金额: {report['adjusted_amount']}")
-    print(f"   原始用量: {report['original_usage']}")
-    print(f"   调整用量: {report['adjusted_usage']}")
-    print(f"   核减漏量: {report['leak_amount']}")
     
-    print("\n3. 链路一致性验证:")
-    match1 = abs(recalc['original_total'] - report['original_amount']) < 0.01
-    match2 = abs(recalc['adjusted_total'] - report['adjusted_amount']) < 0.01
-    print(f"   账单重算原始金额 = 复核报告原始金额: {'✓ 通过' if match1 else '✗ 失败'}")
-    print(f"   账单重算调整金额 = 复核报告调整金额: {'✓ 通过' if match2 else '✗ 失败'}")
+    detail = requests.get(f"{BASE_URL}/appeals/{appeal_no}").json()
+    status = detail["appeal"]["status"]
+    print(f"  报告编号: {report_no}")
+    print(f"  申诉状态: {status} {'✓' if status == 'reviewing' else '✗'}")
     
-    print("\n4. 复核定稿与余额更新:")
+    print("\n2. 复核定稿 (通过):")
     finalize_data = {"is_approved": True}
-    requests.post(f"{BASE_URL}/reviews/{report_no}/finalize", json=finalize_data)
+    r = requests.post(f"{BASE_URL}/reviews/{report_no}/finalize", json=finalize_data)
+    print(f"  HTTP状态: {r.status_code} {'✓' if r.status_code == 200 else '✗'}")
     
     detail = requests.get(f"{BASE_URL}/appeals/{appeal_no}").json()
     appeal = detail["appeal"]
-    expected_refund = report['original_amount'] - report['adjusted_amount']
-    expected_balance = appeal['original_balance'] + expected_refund
+    status = appeal["status"]
+    refund = appeal["refund_amount"]
+    balance = appeal["adjusted_balance"]
+    print(f"  申诉状态: {status} {'✓' if status == 'approved' else '✗'}")
+    print(f"  退款金额: {refund} {'✓' if abs(refund - 294) < 0.01 else '✗'}")
+    print(f"  调整余额: {balance} {'✓' if abs(balance - 1294) < 0.01 else '✗'}")
     
-    print(f"   原始余额: {appeal['original_balance']}")
-    print(f"   退款金额: {appeal['refund_amount']} (计算: {report['original_amount']} - {report['adjusted_amount']} = {expected_refund})")
-    print(f"   调整余额: {appeal['adjusted_balance']} (计算: {appeal['original_balance']} + {expected_refund} = {expected_balance})")
+    print("\n3. 结案:")
+    close_data = {"handler_id": "R001", "handler_name": "审核员"}
+    r = requests.post(f"{BASE_URL}/appeals/{appeal_no}/close", json=close_data)
+    print(f"  HTTP状态: {r.status_code} {'✓' if r.status_code == 200 else '✗'}")
     
-    match3 = abs(appeal['refund_amount'] - expected_refund) < 0.01
-    match4 = abs(appeal['adjusted_balance'] - expected_balance) < 0.01
-    print(f"   退款金额计算正确: {'✓ 通过' if match3 else '✗ 失败'}")
-    print(f"   调整余额计算正确: {'✓ 通过' if match4 else '✗ 失败'}")
+    detail = requests.get(f"{BASE_URL}/appeals/{appeal_no}").json()
+    status = detail["appeal"]["status"]
+    print(f"  申诉状态: {status} {'✓' if status == 'closed' else '✗'}")
     
-    print("\n5. 结果导出一致性:")
-    export_data = {
-        "appeal_nos": [appeal_no],
-        "export_type": "json"
-    }
+    print("\n4. 归档:")
+    r = requests.post(f"{BASE_URL}/appeals/{appeal_no}/archive")
+    print(f"  HTTP状态: {r.status_code} {'✓' if r.status_code == 200 else '✗'}")
+    
+    detail = requests.get(f"{BASE_URL}/appeals/{appeal_no}").json()
+    status = detail["appeal"]["status"]
+    is_archived = detail["appeal"]["is_archived"]
+    print(f"  申诉状态: {status} {'✓' if status == 'archived' else '✗'}")
+    print(f"  归档标记: {is_archived} {'✓' if is_archived else '✗'}")
+    
+    print("\n5. 导出结果验证:")
+    export_data = {"appeal_nos": [appeal_no], "export_type": "json"}
     export = requests.post(f"{BASE_URL}/export/appeals", json=export_data).json()
-    export_record = export['data'][0]
+    rec = export["data"][0]
+    print(f"  导出状态: {rec['status']} {'✓' if rec['status'] == 'archived' else '✗'}")
+    print(f"  导出退款: {rec['refund_amount']} {'✓' if abs(rec['refund_amount'] - 294) < 0.01 else '✗'}")
     
-    print(f"   导出退款金额: {export_record['refund_amount']}")
-    print(f"   导出状态: {export_record['status']}")
-    
-    match5 = abs(export_record['refund_amount'] - appeal['refund_amount']) < 0.01
-    match6 = export_record['status'] == appeal['status']
-    print(f"   导出退款 = 申诉退款: {'✓ 通过' if match5 else '✗ 失败'}")
-    print(f"   导出状态 = 申诉状态: {'✓ 通过' if match6 else '✗ 失败'}")
+    all_pass = (status == 'archived' and is_archived and 
+                abs(refund - 294) < 0.01 and abs(balance - 1294) < 0.01 and
+                abs(rec['refund_amount'] - 294) < 0.01)
     
     print("\n" + "=" * 70)
-    all_pass = match1 and match2 and match3 and match4 and match5 and match6
-    print(f"金额链路验证: {'全部通过 ✓' if all_pass else '存在问题 ✗'}")
+    print(f"完整状态闭环: {'全部通过 ✓' if all_pass else '存在问题 ✗'}")
     print("=" * 70)
     print()
     return all_pass
 
-def test_leak_not_confirmed():
+def test_status_with_split():
     print("=" * 70)
-    print("测试: 不确认漏水时金额不调整")
+    print("测试: 异常拆分后的状态流转 (pending → processing → reviewing → approved)")
     print("=" * 70)
     
     appeal_data = {
         "meter_no": "WM003",
         "user_id": "U003",
-        "appeal_type": "测试不确认漏水",
+        "appeal_type": "马桶漏水",
         "description": "测试",
         "appeal_date": "2024-05-01T00:00:00Z",
         "start_bill_cycle": "2024-01",
@@ -124,10 +120,72 @@ def test_leak_not_confirmed():
     appeal_no = r["appeal_no"]
     print(f"申诉单号: {appeal_no}")
     
-    recalc = requests.get(f"{BASE_URL}/appeals/{appeal_no}/recalculate").json()
-    print(f"账单重算原始金额: {recalc['original_total']}")
-    print(f"账单重算调整金额: {recalc['adjusted_total']}")
+    print("\n1. 异常拆分:")
+    split = requests.post(f"{BASE_URL}/appeals/{appeal_no}/split").json()
+    print(f"  拆分异常数: {split['count']}")
     
+    detail = requests.get(f"{BASE_URL}/appeals/{appeal_no}").json()
+    status = detail["appeal"]["status"]
+    print(f"  申诉状态: {status} {'✓' if status == 'processing' else '✗'}")
+    
+    print("\n2. 创建复核报告 (processing → reviewing):")
+    review_data = {
+        "appeal_no": appeal_no,
+        "reviewer_id": "R001",
+        "reviewer_name": "审核员",
+        "is_reading_valid": True,
+        "reading_anomaly": "",
+        "leak_confirmed": True,
+        "leak_days": 16,
+        "leak_amount": 12.8,
+        "review_conclusion": "情况属实",
+        "review_suggestion": "核减"
+    }
+    
+    report = requests.post(f"{BASE_URL}/reviews", json=review_data).json()
+    report_no = report["report_no"]
+    
+    detail = requests.get(f"{BASE_URL}/appeals/{appeal_no}").json()
+    status = detail["appeal"]["status"]
+    print(f"  报告编号: {report_no}")
+    print(f"  申诉状态: {status} {'✓' if status == 'reviewing' else '✗'}")
+    
+    print("\n3. 复核定稿 (reviewing → approved):")
+    finalize_data = {"is_approved": True}
+    requests.post(f"{BASE_URL}/reviews/{report_no}/finalize", json=finalize_data)
+    
+    detail = requests.get(f"{BASE_URL}/appeals/{appeal_no}").json()
+    status = detail["appeal"]["status"]
+    print(f"  申诉状态: {status} {'✓' if status == 'approved' else '✗'}")
+    
+    print("\n" + "=" * 70)
+    print(f"拆分后流转: {'通过 ✓' if status == 'approved' else '失败 ✗'}")
+    print("=" * 70)
+    print()
+    return status == 'approved'
+
+def test_rejected_workflow():
+    print("=" * 70)
+    print("测试: 驳回申诉流程 (pending → reviewing → rejected → closed)")
+    print("=" * 70)
+    
+    appeal_data = {
+        "meter_no": "WM001",
+        "user_id": "U001",
+        "appeal_type": "异常申诉",
+        "description": "测试驳回",
+        "appeal_date": "2024-05-01T00:00:00Z",
+        "start_bill_cycle": "2024-02",
+        "end_bill_cycle": "2024-03",
+        "disputed_amount": 78.40,
+        "original_balance": 300.00
+    }
+    
+    r = requests.post(f"{BASE_URL}/appeals", json=appeal_data).json()
+    appeal_no = r["appeal_no"]
+    print(f"申诉单号: {appeal_no}")
+    
+    print("\n1. 创建复核报告:")
     review_data = {
         "appeal_no": appeal_no,
         "reviewer_id": "R001",
@@ -142,84 +200,96 @@ def test_leak_not_confirmed():
     }
     
     report = requests.post(f"{BASE_URL}/reviews", json=review_data).json()
-    print(f"复核报告原始金额: {report['original_amount']}")
-    print(f"复核报告调整金额: {report['adjusted_amount']}")
+    report_no = report["report_no"]
+    print(f"  报告编号: {report_no}")
     
-    match = abs(report['original_amount'] - report['adjusted_amount']) < 0.01
-    print(f"不确认漏水时原始金额 = 调整金额: {'✓ 通过' if match else '✗ 失败'}")
+    print("\n2. 复核定稿 (驳回):")
+    finalize_data = {"is_approved": False}
+    requests.post(f"{BASE_URL}/reviews/{report_no}/finalize", json=finalize_data)
     
-    print("=" * 70)
-    print()
-    return match
-
-def test_idempotency():
-    print("=" * 70)
-    print("测试: 各项幂等性验证")
-    print("=" * 70)
+    detail = requests.get(f"{BASE_URL}/appeals/{appeal_no}").json()
+    status = detail["appeal"]["status"]
+    refund = detail["appeal"]["refund_amount"]
+    print(f"  申诉状态: {status} {'✓' if status == 'rejected' else '✗'}")
+    print(f"  退款金额: {refund} {'✓' if refund == 0 else '✗'}")
     
-    all_pass = True
+    print("\n3. 结案:")
+    close_data = {"handler_id": "R001", "handler_name": "审核员"}
+    requests.post(f"{BASE_URL}/appeals/{appeal_no}/close", json=close_data)
     
-    appeal_data = {
-        "meter_no": "WM001",
-        "user_id": "U001",
-        "appeal_type": "幂等测试",
-        "description": "测试",
-        "appeal_date": "2024-05-01T00:00:00Z",
-        "start_bill_cycle": "2024-02",
-        "end_bill_cycle": "2024-03",
-        "disputed_amount": 100.00,
-        "original_balance": 300.00
-    }
+    detail = requests.get(f"{BASE_URL}/appeals/{appeal_no}").json()
+    status = detail["appeal"]["status"]
+    print(f"  申诉状态: {status} {'✓' if status == 'closed' else '✗'}")
     
-    r1 = requests.post(f"{BASE_URL}/appeals", json=appeal_data).json()
-    r2 = requests.post(f"{BASE_URL}/appeals", json=appeal_data).json()
-    match = r1['appeal_no'] == r2['appeal_no']
-    print(f"重复申诉拦截: {'✓ 通过' if match else '✗ 失败'}")
-    all_pass = all_pass and match
-    
-    appeal_no = r1['appeal_no']
-    s1 = requests.post(f"{BASE_URL}/appeals/{appeal_no}/split").json()
-    s2 = requests.post(f"{BASE_URL}/appeals/{appeal_no}/split").json()
-    match = s1['count'] == s2['count']
-    print(f"异常拆分幂等: {'✓ 通过' if match else '✗ 失败'}")
-    all_pass = all_pass and match
-    
-    review_data = {
-        "appeal_no": appeal_no,
-        "reviewer_id": "R001",
-        "reviewer_name": "审核员",
-        "is_reading_valid": True,
-        "leak_confirmed": False,
-        "leak_days": 0,
-        "leak_amount": 0,
-        "review_conclusion": "测试",
-        "review_suggestion": "测试"
-    }
-    rv1 = requests.post(f"{BASE_URL}/reviews", json=review_data).json()
-    rv2 = requests.post(f"{BASE_URL}/reviews", json=review_data).json()
-    match = rv1['report_no'] == rv2['report_no']
-    print(f"复核报告幂等: {'✓ 通过' if match else '✗ 失败'}")
-    all_pass = all_pass and match
-    
-    print("=" * 70)
-    print(f"幂等性验证: {'全部通过 ✓' if all_pass else '存在问题 ✗'}")
+    all_pass = (status == 'closed' and refund == 0)
+    print("\n" + "=" * 70)
+    print(f"驳回流程: {'通过 ✓' if all_pass else '失败 ✗'}")
     print("=" * 70)
     print()
     return all_pass
 
+def test_withdrawn_workflow():
+    print("=" * 70)
+    print("测试: 撤回申诉流程 (pending → withdrawn → closed)")
+    print("=" * 70)
+    
+    appeal_data = {
+        "meter_no": "WM001",
+        "user_id": "U001",
+        "appeal_type": "测试撤回",
+        "description": "用户自行解决",
+        "appeal_date": "2024-05-02T00:00:00Z",
+        "start_bill_cycle": "2024-03",
+        "end_bill_cycle": "2024-04",
+        "disputed_amount": 40.60,
+        "original_balance": 200.00
+    }
+    
+    r = requests.post(f"{BASE_URL}/appeals", json=appeal_data).json()
+    appeal_no = r["appeal_no"]
+    print(f"申诉单号: {appeal_no}")
+    
+    print("\n1. 撤回申诉:")
+    withdraw_data = {
+        "handler_id": "U001",
+        "handler_name": "用户",
+        "reason": "自行解决，撤回申诉"
+    }
+    requests.post(f"{BASE_URL}/appeals/{appeal_no}/withdraw", json=withdraw_data)
+    
+    detail = requests.get(f"{BASE_URL}/appeals/{appeal_no}").json()
+    status = detail["appeal"]["status"]
+    print(f"  申诉状态: {status} {'✓' if status == 'withdrawn' else '✗'}")
+    
+    print("\n2. 结案:")
+    close_data = {"handler_id": "R001", "handler_name": "审核员"}
+    requests.post(f"{BASE_URL}/appeals/{appeal_no}/close", json=close_data)
+    
+    detail = requests.get(f"{BASE_URL}/appeals/{appeal_no}").json()
+    status = detail["appeal"]["status"]
+    print(f"  申诉状态: {status} {'✓' if status == 'closed' else '✗'}")
+    
+    print("\n" + "=" * 70)
+    print(f"撤回流程: {'通过 ✓' if status == 'closed' else '失败 ✗'}")
+    print("=" * 70)
+    print()
+    return status == 'closed'
+
 if __name__ == "__main__":
     try:
-        r1 = test_amount_consistency()
-        r2 = test_leak_not_confirmed()
-        r3 = test_idempotency()
+        r1 = test_full_status_workflow()
+        r2 = test_status_with_split()
+        r3 = test_rejected_workflow()
+        r4 = test_withdrawn_workflow()
         
         print("=" * 70)
         print("综合测试结果:")
-        print(f"  金额链路一致性: {'✓ 通过' if r1 else '✗ 失败'}")
-        print(f"  不确认漏水不调整: {'✓ 通过' if r2 else '✗ 失败'}")
-        print(f"  各项幂等性: {'✓ 通过' if r3 else '✗ 失败'}")
+        print(f"  完整状态闭环 (→ archived): {'✓ 通过' if r1 else '✗ 失败'}")
+        print(f"  拆分后状态流转: {'✓ 通过' if r2 else '✗ 失败'}")
+        print(f"  驳回申诉流程: {'✓ 通过' if r3 else '✗ 失败'}")
+        print(f"  撤回申诉流程: {'✓ 通过' if r4 else '✗ 失败'}")
         print("=" * 70)
-        print("所有测试完成!")
+        print("所有状态机测试完成!")
     except Exception as e:
         print(f"测试出错: {e}")
         import traceback

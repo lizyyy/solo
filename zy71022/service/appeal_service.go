@@ -19,7 +19,7 @@ func NewAppealService(db *gorm.DB) *AppealService {
 }
 
 var validTransitions = map[string][]string{
-	models.AppealStatusPending:    {models.AppealStatusProcessing, models.AppealStatusWithdrawn, models.AppealStatusRejected},
+	models.AppealStatusPending:    {models.AppealStatusProcessing, models.AppealStatusReviewing, models.AppealStatusWithdrawn, models.AppealStatusRejected},
 	models.AppealStatusProcessing: {models.AppealStatusReviewing, models.AppealStatusWithdrawn, models.AppealStatusRejected},
 	models.AppealStatusReviewing:  {models.AppealStatusApproved, models.AppealStatusRejected, models.AppealStatusWithdrawn},
 	models.AppealStatusApproved:   {models.AppealStatusClosed, models.AppealStatusWithdrawn},

@@ -110,7 +110,10 @@ func (s *ReviewService) CreateReviewReport(req ReviewRequest) (*models.ReviewRep
 
 	appealService := NewAppealService(s.db)
 	if appeal.Status == models.AppealStatusPending || appeal.Status == models.AppealStatusProcessing {
-		appealService.TransitionStatus(req.AppealNo, models.AppealStatusReviewing, req.ReviewerID, req.ReviewerName, "复核报告已生成")
+		err = appealService.TransitionStatus(req.AppealNo, models.AppealStatusReviewing, req.ReviewerID, req.ReviewerName, "复核报告已生成")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return report, nil
@@ -229,12 +232,18 @@ func (s *ReviewService) FinalizeReview(reportNo string, isApproved bool) error {
 
 	report.IsFinal = true
 	report.UpdatedAt = time.Now()
-	s.db.Save(&report)
+	err = s.db.Save(&report).Error
+	if err != nil {
+		return err
+	}
 
 	appealService := NewAppealService(s.db)
 	if isApproved {
 		var appeal models.Appeal
-		s.db.Where("appeal_no = ?", report.AppealNo).First(&appeal)
+		err = s.db.Where("appeal_no = ?", report.AppealNo).First(&appeal).Error
+		if err != nil {
+			return err
+		}
 
 		refundAmount := utils.RoundToTwoDecimals(report.OriginalAmount - report.AdjustedAmount)
 		if refundAmount < 0 {
@@ -243,15 +252,24 @@ func (s *ReviewService) FinalizeReview(reportNo string, isApproved bool) error {
 
 		adjustedBalance := utils.RoundToTwoDecimals(appeal.OriginalBalance + refundAmount)
 
-		s.db.Model(&appeal).Updates(map[string]interface{}{
+		err = s.db.Model(&appeal).Updates(map[string]interface{}{
 			"adjusted_balance": adjustedBalance,
 			"refund_amount":    refundAmount,
 			"updated_at":       time.Now(),
-		})
+		}).Error
+		if err != nil {
+			return err
+		}
 
-		appealService.TransitionStatus(report.AppealNo, models.AppealStatusApproved, report.ReviewerID, report.ReviewerName, "复核通过")
+		err = appealService.TransitionStatus(report.AppealNo, models.AppealStatusApproved, report.ReviewerID, report.ReviewerName, "复核通过")
+		if err != nil {
+			return err
+		}
 	} else {
-		appealService.TransitionStatus(report.AppealNo, models.AppealStatusRejected, report.ReviewerID, report.ReviewerName, "复核驳回")
+		err = appealService.TransitionStatus(report.AppealNo, models.AppealStatusRejected, report.ReviewerID, report.ReviewerName, "复核驳回")
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
