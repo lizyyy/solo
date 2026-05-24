@@ -51,11 +51,17 @@ class ShelterLayoutApp {
 
     initThreeJS() {
         const container = document.getElementById('canvasContainer');
+        if (!container) {
+            console.error('canvasContainer not found, retrying...');
+            setTimeout(() => this.initThreeJS(), 100);
+            return;
+        }
+
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x1a1a2e);
 
-        const width = container.clientWidth;
-        const height = container.clientHeight;
+        const width = container.clientWidth || 800;
+        const height = container.clientHeight || 600;
 
         this.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
         this.setCameraView('top');
@@ -936,50 +942,139 @@ class ShelterLayoutApp {
     async downloadPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 14;
+        let y = margin + 10;
         
+        const addPageIfNeeded = (neededSpace) => {
+            if (y + neededSpace > pageHeight - margin) {
+                doc.addPage();
+                y = margin + 10;
+                return true;
+            }
+            return false;
+        };
+        
+        const addSection = (title, fontSize = 14) => {
+            addPageIfNeeded(15);
+            doc.setFontSize(fontSize);
+            doc.setFont(undefined, 'bold');
+            doc.text(title, margin, y);
+            y += 8;
+            doc.setFont(undefined, 'normal');
+        };
+        
+        const addText = (text, fontSize = 10, indent = 0) => {
+            doc.setFontSize(fontSize);
+            doc.text(text, margin + indent, y);
+            y += 6;
+        };
+        
+        const addRow = (columns, widths, fontSize = 9) => {
+            doc.setFontSize(fontSize);
+            let x = margin;
+            columns.forEach((col, i) => {
+                doc.text(String(col || ''), x, y);
+                x += widths[i];
+            });
+            y += 6;
+        };
+
         doc.setFontSize(20);
-        doc.text('应急安置床位排布报告', 105, 20, { align: 'center' });
-        
-        doc.setFontSize(10);
-        doc.text(`生成时间: ${new Date().toLocaleString('zh-CN')}`, 14, 35);
-        doc.text(`场馆尺寸: ${this.venueConfig.width}m × ${this.venueConfig.depth}m`, 14, 42);
-        
+        doc.setFont(undefined, 'bold');
+        doc.text('应急安置床位排布报告', pageWidth / 2, y, { align: 'center' });
+        doc.setFont(undefined, 'normal');
+        y += 15;
+
+        addSection('基本信息', 12);
+        addText(`生成时间: ${new Date().toLocaleString('zh-CN')}`);
+        addText(`场馆尺寸: ${this.venueConfig.width}m × ${this.venueConfig.depth}m`);
+        addText(`方案: 方案 ${String.fromCharCode(64 + this.activeScheme)}`);
+        y += 4;
+
         const stats = {
             beds: 0,
             isolation: 0,
             volunteers: 0,
-            capacity: 0
+            capacity: 0,
+            entrances: 0,
+            fireExits: 0
         };
 
         this.objects.forEach(obj => {
             const type = obj.userData.type;
+            const config = obj.userData.config;
+            
             if (type === 'bed' || type === 'bed-double') {
                 stats.beds++;
-                stats.capacity += obj.userData.config.capacity;
+                stats.capacity += config.capacity;
             } else if (type === 'isolation') {
                 stats.isolation++;
             } else if (type === 'volunteer') {
                 stats.volunteers++;
+            } else if (type === 'entrance') {
+                stats.entrances++;
+            } else if (type === 'fire-exit') {
+                stats.fireExits++;
             }
         });
 
-        doc.setFontSize(14);
-        doc.text('排布统计', 14, 55);
-        doc.setFontSize(10);
-        doc.text(`床位总数: ${stats.beds}`, 14, 65);
-        doc.text(`容纳人数: ${stats.capacity}`, 14, 72);
-        doc.text(`隔离区域: ${stats.isolation}`, 14, 79);
-        doc.text(`志愿者岗: ${stats.volunteers}`, 14, 86);
+        addSection('排布统计', 12);
+        addText(`床位总数: ${stats.beds}     容纳人数: ${stats.capacity}     隔离区域: ${stats.isolation}     志愿者岗: ${stats.volunteers}`);
+        y += 4;
 
-        doc.setFontSize(14);
-        doc.text('元素清单', 14, 100);
-        
-        let y = 110;
-        this.objects.slice(0, 15).forEach((obj, i) => {
-            doc.setFontSize(9);
-            doc.text(`${i + 1}. ${obj.userData.config.name} - 位置: (${obj.position.x.toFixed(1)}, ${obj.position.z.toFixed(1)})`, 14, y);
-            y += 7;
+        addSection('出入口配置', 12);
+        addText(`主出入口: ${stats.entrances} 个     消防出口: ${stats.fireExits} 个     主通道数: 3 条     通道宽度: 2m`);
+        y += 4;
+
+        addSection('规则校验结果', 12);
+        const validationResults = [];
+        document.querySelectorAll('.validation-item').forEach(item => {
+            validationResults.push({
+                pass: item.classList.contains('pass'),
+                text: item.querySelector('.val-text').textContent
+            });
         });
+        validationResults.forEach(v => {
+            addPageIfNeeded(8);
+            const status = v.pass ? '✓ 通过' : '✗ 不通过';
+            doc.setTextColor(v.pass ? 0 : 200, v.pass ? 150 : 0, v.pass ? 0 : 0);
+            addText(`${status} - ${v.text}`);
+            doc.setTextColor(0, 0, 0);
+        });
+        y += 4;
+
+        addSection('详细排布清单', 12);
+        addPageIfNeeded(10);
+        
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        addRow(['序号', '类型', '尺寸', '位置 (X, Z)'], [12, 40, 35, 50]);
+        doc.setFont(undefined, 'normal');
+        
+        doc.setDrawColor(200);
+        doc.line(margin, y - 2, pageWidth - margin, y - 2);
+        y += 2;
+
+        this.objects.forEach((obj, i) => {
+            addPageIfNeeded(8);
+            addRow([
+                `${i + 1}`,
+                obj.userData.config.name,
+                `${obj.userData.config.width}m × ${obj.userData.config.depth}m`,
+                `(${obj.position.x.toFixed(1)}, ${obj.position.z.toFixed(1)})`
+            ], [12, 40, 35, 50]);
+        });
+
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.text(`第 ${i} / ${totalPages} 页`, pageWidth - margin, pageHeight - 8, { align: 'right' });
+            doc.setTextColor(0, 0, 0);
+        }
 
         doc.save('应急安置床位排布报告.pdf');
     }
@@ -1006,6 +1101,16 @@ class ShelterLayoutApp {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    new ShelterLayoutApp();
-});
+const initApp = () => {
+    if (document.getElementById('canvasContainer')) {
+        new ShelterLayoutApp();
+    } else {
+        setTimeout(initApp, 50);
+    }
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
