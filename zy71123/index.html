@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>室内巡检机器人路线可视化</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>🤖 巡检机器人</h1>
+                <p class="subtitle">路线规划与可视化</p>
+            </div>
+
+            <div class="control-panel">
+                <div class="panel-section">
+                    <h3>📁 数据导入</h3>
+                    <div class="btn-group">
+                        <button id="btn-load-sample" class="btn btn-primary">加载样例数据</button>
+                        <button id="btn-import" class="btn btn-secondary">导入JSON</button>
+                        <input type="file" id="file-import" accept=".json" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🎯 元素管理</h3>
+                    <div class="btn-group">
+                        <button id="btn-add-point" class="btn btn-info">添加巡检点</button>
+                        <button id="btn-add-obstacle" class="btn btn-warning">添加障碍物</button>
+                        <button id="btn-add-charger" class="btn btn-success">设置充电桩</button>
+                    </div>
+                    <div class="filter-group">
+                        <label><input type="checkbox" id="filter-points" checked> 显示巡检点</label>
+                        <label><input type="checkbox" id="filter-obstacles" checked> 显示障碍物</label>
+                        <label><input type="checkbox" id="filter-path" checked> 显示路径</label>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>⚡ 巡检控制</h3>
+                    <div class="btn-group">
+                        <button id="btn-start" class="btn btn-success">开始巡检</button>
+                        <button id="btn-pause" class="btn btn-warning">暂停</button>
+                        <button id="btn-reset" class="btn btn-danger">重置状态</button>
+                    </div>
+                    <div class="slider-group">
+                        <label>回放速度: <span id="speed-value">1.0</span>x</label>
+                        <input type="range" id="speed-slider" min="0.5" max="3" step="0.5" value="1">
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>👁️ 视角切换</h3>
+                    <div class="btn-group">
+                        <button id="btn-view-top" class="btn btn-secondary">俯视图</button>
+                        <button id="btn-view-3d" class="btn btn-secondary">3D视图</button>
+                        <button id="btn-view-follow" class="btn btn-secondary">跟随视角</button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📊 实时状态</h3>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <span class="status-label">电量</span>
+                            <div class="battery-bar">
+                                <div id="battery-fill" class="battery-fill"></div>
+                            </div>
+                            <span id="battery-value" class="status-value">100%</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">当前位置</span>
+                            <span id="position-value" class="status-value">(0, 0)</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">巡检进度</span>
+                            <span id="progress-value" class="status-value">0/0</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">运行时间</span>
+                            <span id="time-value" class="status-value">00:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📈 时间轴</h3>
+                    <div class="timeline-container">
+                        <input type="range" id="timeline-slider" min="0" max="100" value="0" class="timeline-slider">
+                        <div class="timeline-labels">
+                            <span>0s</span>
+                            <span id="timeline-end">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📄 报告导出</h3>
+                    <button id="btn-export" class="btn btn-primary btn-full">导出巡检报告</button>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <p id="status-message">就绪 - 加载样例数据开始</p>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="canvas-container"></div>
+            
+            <div class="info-overlay" id="info-overlay">
+                <div class="info-card">
+                    <h4>选中元素</h4>
+                    <div id="selected-info">
+                        <p>点击场景中的元素查看详情</p>
+                    </div>
+                    <button id="btn-delete" class="btn btn-danger btn-small" style="display: none;">删除选中</button>
+                </div>
+            </div>
+
+            <div class="legend-overlay">
+                <h4>图例</h4>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #4CAF50;"></span>
+                    <span>充电桩</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #2196F3;"></span>
+                    <span>巡检点</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #FF5722;"></span>
+                    <span>障碍物</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #9C27B0;"></span>
+                    <span>规划路径</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #FFC107;"></span>
+                    <span>机器人</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/scene.js"></script>
+    <script src="js/pathfinding.js"></script>
+    <script src="js/robot.js"></script>
+    <script src="js/report.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
