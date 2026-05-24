@@ -1,0 +1,17 @@
+{
+  "name": "railway-crossing-sight-check",
+  "version": "1.0.0",
+  "description": "铁路道口视距检查3D可视化工具",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
