@@ -63,7 +63,7 @@ public class ReportService {
         for (ReplacementRequest rep : replacements) {
             affectedStudentsCount += rep.getAffectedStudents().size();
 
-            if (rep.getStatus() == ReplacementStatus.CONFLICT_DETECTED) {
+            if (rep.getAffectedStudents() != null && !rep.getAffectedStudents().isEmpty()) {
                 allergenConflictCount++;
             }
 

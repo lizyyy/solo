@@ -265,6 +265,17 @@ public class ReplacementService {
             throw new BusinessException("当前状态不允许完成替换", "INVALID_STATUS");
         }
 
+        long pendingCount = confirmationRepository.countByReplacementIdAndStatus(replacementId, "PENDING");
+        long rejectedCount = confirmationRepository.countByReplacementIdAndStatus(replacementId, "REJECTED");
+
+        if (pendingCount > 0) {
+            throw new BusinessException("存在 " + pendingCount + " 份待确认回执，请先完成所有家长确认", "PENDING_CONFIRMATIONS_EXIST");
+        }
+
+        if (rejectedCount > 0) {
+            throw new BusinessException("存在 " + rejectedCount + " 份已拒绝回执，需人工复核后才能完成", "REJECTED_CONFIRMATIONS_EXIST");
+        }
+
         request.setStatus(ReplacementStatus.CONFIRMED);
         request.setUpdatedBy(operator);
         request.setUpdatedAt(LocalDateTime.now());
