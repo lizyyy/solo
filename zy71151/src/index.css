@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Roboto Mono', monospace;
+  background-color: #061539;
+}
+
+/* 工业风滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f3244;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3E5C76;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #829ab1;
+}
+
+/* 状态颜色类 */
+.status-idle { color: #9fb3c8; }
+.status-moving { color: #4d94ff; }
+.status-towing { color: #F77F00; }
+.status-returning { color: #829ab1; }
+.status-danger { color: #ef4444; }
+.status-success { color: #10b981; }
+
+/* 面板玻璃效果 */
+.glass-panel {
+  background: rgba(10, 36, 99, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(79, 148, 255, 0.2);
+}
+
+/* 按钮工业风格 */
+.btn-industrial {
+  @apply px-4 py-2 font-oswald font-semibold uppercase tracking-wider transition-all duration-200;
+  @apply border-2 border-opacity-50;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.btn-industrial:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-industrial:active {
+  transform: translateY(0);
+}
+
+/* 动画关键帧 */
+@keyframes pulse-warning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.animate-pulse-warning {
+  animation: pulse-warning 1s ease-in-out infinite;
+}
+
+/* 分数环动画 */
+@keyframes fill-ring {
+  from { stroke-dashoffset: 314; }
+}
+
+.score-ring {
+  transition: stroke-dashoffset 1s ease-out;
+}
