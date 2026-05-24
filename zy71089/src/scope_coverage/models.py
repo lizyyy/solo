@@ -130,6 +130,15 @@ class ScopeMapping:
 
 
 @dataclass
+class DeprecatedScopeUsage:
+    scope_name: str
+    source: str
+    source_type: str
+    location: Optional[SourceLocation] = None
+    recommendation: Optional[str] = None
+
+
+@dataclass
 class CoverageGap:
     gap_type: str
     severity: Severity
@@ -154,6 +163,7 @@ class AnalysisResult:
     scope_coverage_gaps: List[CoverageGap] = field(default_factory=list)
     sdk_coverage_gaps: List[CoverageGap] = field(default_factory=list)
     doc_coverage_gaps: List[CoverageGap] = field(default_factory=list)
+    deprecated_scope_usages: List[DeprecatedScopeUsage] = field(default_factory=list)
     scope_mappings: Dict[str, ScopeMapping] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
 

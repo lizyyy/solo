@@ -91,7 +91,7 @@ class ScopeTableParser(BaseParser):
                                 description=item.get("description"),
                                 aliases=item.get("aliases", []),
                                 includes=item.get("includes", []),
-                                is_deprecated=item.get("deprecated", False),
+                                is_deprecated=item.get("deprecated", item.get("is_deprecated", False)),
                                 location=self._make_location(idx + 1),
                             )
                         )
@@ -128,7 +128,7 @@ class ScopeTableParser(BaseParser):
                                 description=item.get("description"),
                                 aliases=item.get("aliases", []),
                                 includes=item.get("includes", []),
-                                is_deprecated=item.get("deprecated", False),
+                                is_deprecated=item.get("deprecated", item.get("is_deprecated", False)),
                                 location=self._make_location(),
                             )
                         )

@@ -14,6 +14,7 @@ from rich.text import Text
 from .models import (
     AnalysisResult,
     CoverageGap,
+    DeprecatedScopeUsage,
     ExitCode,
     ParseIssue,
     ReportConfig,
@@ -48,6 +49,7 @@ class ConsoleReporter:
         )
 
         self._print_statistics(result)
+        self._print_deprecated_scope_usages(result)
         self._print_parse_issues(result)
         self._print_coverage_gaps(result)
         self._print_exit_code_explanation(result)
@@ -89,6 +91,7 @@ class ConsoleReporter:
 
         parse_errors = meta.get("parse_errors_count", 0)
         parse_warnings = meta.get("parse_warnings_count", 0)
+        deprecated_count = meta.get("deprecated_scope_count", 0)
         table.add_row(
             "解析错误",
             str(parse_errors),
@@ -99,8 +102,28 @@ class ConsoleReporter:
             str(parse_warnings),
             "⚠️" if parse_warnings > 0 else "✅",
         )
+        table.add_row(
+            "过期 Scope 使用",
+            str(deprecated_count),
+            "⚠️" if deprecated_count > 0 else "✅",
+        )
 
         self.console.print(table)
+
+    def _print_deprecated_scope_usages(self, result: AnalysisResult) -> None:
+        deprecated_usages = result.deprecated_scope_usages
+        if not deprecated_usages:
+            return
+
+        self.console.print("\n[bold yellow]⚠️  过期 Scope 使用检测[/bold yellow]")
+        for usage in deprecated_usages:
+            self.console.print(f"  [yellow]●[/yellow] Scope: [bold yellow]{usage.scope_name}[/bold yellow]")
+            self.console.print(f"     来源: {usage.source}")
+            if usage.location:
+                self.console.print(f"     定位: [dim]{usage.location}[/dim]")
+            if usage.recommendation:
+                self.console.print(f"     建议: {usage.recommendation}")
+            self.console.print()
 
     def _print_parse_issues(self, result: AnalysisResult) -> None:
         if not result.parse_issues:
@@ -235,10 +258,24 @@ class FileReporter:
         lines.append(f"| Scope 总数 | {meta.get('total_scopes', 0)} | ✅ |")
         lines.append(f"| SDK 示例数 | {meta.get('total_sdk_examples', 0)} | ✅ |")
         lines.append(f"| 文档片段数 | {meta.get('total_doc_fragments', 0)} | ✅ |")
+        lines.append(f"| 调用日志数 | {meta.get('total_call_logs', 0)} | ✅ |")
         lines.append(f"| SDK 缺口 | {meta.get('sdk_gaps_count', 0)} | {'❌' if meta.get('sdk_gaps_count') else '✅'} |")
         lines.append(f"| 文档缺口 | {meta.get('doc_gaps_count', 0)} | {'⚠️' if meta.get('doc_gaps_count') else '✅'} |")
         lines.append(f"| 调用缺口 | {meta.get('scope_gaps_count', 0)} | {'ℹ️' if meta.get('scope_gaps_count') else '✅'} |")
+        lines.append(f"| 过期 Scope 使用 | {meta.get('deprecated_scope_count', 0)} | {'⚠️' if meta.get('deprecated_scope_count') else '✅'} |")
         lines.append("")
+
+        if result.deprecated_scope_usages:
+            lines.append("## ⚠️ 过期 Scope 使用检测")
+            lines.append("")
+            lines.append("以下位置使用了已标记为过期的 scope，建议尽快更新：")
+            lines.append("")
+            lines.append("| Scope | 来源 | 类型 | 位置 | 建议 |")
+            lines.append("|-------|------|------|------|------|")
+            for usage in result.deprecated_scope_usages:
+                loc = f"`{usage.location}`" if usage.location else "-"
+                lines.append(f"| `{usage.scope_name}` | {usage.source} | {usage.source_type} | {loc} | {usage.recommendation or '-'} |")
+            lines.append("")
 
         if result.parse_issues:
             lines.append("## 解析问题")

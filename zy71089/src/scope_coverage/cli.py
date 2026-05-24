@@ -19,12 +19,12 @@ app = typer.Typer(
 )
 
 
-def validate_path(path: Path, must_exist: bool = True) -> Path:
-    if must_exist and not path.exists():
-        raise typer.BadParameter(f"文件不存在: {path}")
-    if must_exist and not path.is_file():
-        raise typer.BadParameter(f"不是文件: {path}")
-    return path
+def validate_input_files(files: List[Path], file_type: str) -> None:
+    for path in files:
+        if not path.exists():
+            raise typer.BadParameter(f"{file_type}文件不存在: {path}")
+        if not path.is_file():
+            raise typer.BadParameter(f"{file_type}不是文件: {path}")
 
 
 @app.command("check", help="执行 scope 覆盖检查")
@@ -35,7 +35,6 @@ def check(
             "--scope",
             "-s",
             help="Scope 表文件 (YAML/JSON/TEXT)",
-            callback=lambda x: [validate_path(p) for p in x] if x else [],
         ),
     ] = None,
     apis: Annotated[
@@ -44,7 +43,6 @@ def check(
             "--api",
             "-a",
             help="API 清单文件 (OpenAPI YAML/JSON/TEXT)",
-            callback=lambda x: [validate_path(p) for p in x] if x else [],
         ),
     ] = None,
     sdks: Annotated[
@@ -53,7 +51,6 @@ def check(
             "--sdk",
             "-k",
             help="SDK 示例文件",
-            callback=lambda x: [validate_path(p) for p in x] if x else [],
         ),
     ] = None,
     docs: Annotated[
@@ -62,7 +59,6 @@ def check(
             "--doc",
             "-d",
             help="文档片段文件 (Markdown/文本)",
-            callback=lambda x: [validate_path(p) for p in x] if x else [],
         ),
     ] = None,
     logs: Annotated[
@@ -71,7 +67,6 @@ def check(
             "--log",
             "-l",
             help="调用日志文件",
-            callback=lambda x: [validate_path(p) for p in x] if x else [],
         ),
     ] = None,
     output_dir: Annotated[
@@ -105,26 +100,38 @@ def check(
         ),
     ] = False,
 ) -> None:
-    if not any([scopes, apis, sdks, docs, logs]):
-        typer.echo("错误: 至少需要指定一个输入文件", err=True)
-        raise typer.Exit(code=ExitCode.INPUT_ERROR.value)
-
-    input_config = InputConfig(
-        scope_table_files=scopes or [],
-        api_list_files=apis or [],
-        sdk_example_files=sdks or [],
-        doc_fragment_files=docs or [],
-        call_log_files=logs or [],
-    )
-
-    report_config = ReportConfig(
-        output_dir=output_dir,
-        include_json=not no_json,
-        include_markdown=not no_md,
-        verbose=verbose,
-    )
-
     try:
+        scope_files = scopes or []
+        api_files = apis or []
+        sdk_files = sdks or []
+        doc_files = docs or []
+        log_files = logs or []
+
+        if not any([scope_files, api_files, sdk_files, doc_files, log_files]):
+            typer.echo("错误: 至少需要指定一个输入文件", err=True)
+            raise typer.Exit(code=ExitCode.INPUT_ERROR.value)
+
+        validate_input_files(scope_files, "Scope")
+        validate_input_files(api_files, "API")
+        validate_input_files(sdk_files, "SDK")
+        validate_input_files(doc_files, "文档")
+        validate_input_files(log_files, "日志")
+
+        input_config = InputConfig(
+            scope_table_files=scope_files,
+            api_list_files=api_files,
+            sdk_example_files=sdk_files,
+            doc_fragment_files=doc_files,
+            call_log_files=log_files,
+        )
+
+        report_config = ReportConfig(
+            output_dir=output_dir,
+            include_json=not no_json,
+            include_markdown=not no_md,
+            verbose=verbose,
+        )
+
         analyzer = CoverageAnalyzer()
 
         for file_path in input_config.scope_table_files:
@@ -153,6 +160,9 @@ def check(
         exit_code = determine_exit_code(result)
         raise typer.Exit(code=exit_code.value)
 
+    except typer.BadParameter as e:
+        typer.echo(f"输入错误: {e}", err=True)
+        raise typer.Exit(code=ExitCode.INPUT_ERROR.value)
     except typer.Exit:
         raise
     except Exception as e:

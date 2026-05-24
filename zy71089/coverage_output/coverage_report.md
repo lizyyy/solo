@@ -1,6 +1,6 @@
 # Auth Scope 覆盖检查报告
 
-> 生成时间: 2026-05-24 21:05:58
+> 生成时间: 2026-05-24 23:16:04
 
 ## 执行摘要
 
@@ -10,9 +10,20 @@
 | Scope 总数 | 6 | ✅ |
 | SDK 示例数 | 6 | ✅ |
 | 文档片段数 | 8 | ✅ |
+| 调用日志数 | 7 | ✅ |
 | SDK 缺口 | 3 | ❌ |
 | 文档缺口 | 0 | ✅ |
 | 调用缺口 | 0 | ✅ |
+| 过期 Scope 使用 | 2 | ⚠️ |
+
+## ⚠️ 过期 Scope 使用检测
+
+以下位置使用了已标记为过期的 scope，建议尽快更新：
+
+| Scope | 来源 | 类型 | 位置 | 建议 |
+|-------|------|------|------|------|
+| `deprecated_scope` | SDK Example: sdk_examples_4 (python) | sdk | `examples/sdk_examples.py:27` | Scope 'deprecated_scope' 已弃用，请检查最新的 scope 定义 |
+| `deprecated_scope` | Call Log (client: unknown) | log | `examples/call_logs.txt:7` | Scope 'deprecated_scope' 已弃用，请更新客户端代码 |
 
 ## 覆盖缺口详情
 

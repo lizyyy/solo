@@ -98,7 +98,7 @@
         "column": null,
         "raw_content": null
       },
-      "is_deprecated": false
+      "is_deprecated": true
     }
   },
   "apis": [
@@ -729,6 +729,32 @@
     }
   ],
   "doc_coverage_gaps": [],
+  "deprecated_scope_usages": [
+    {
+      "scope_name": "deprecated_scope",
+      "source": "SDK Example: sdk_examples_4 (python)",
+      "source_type": "sdk",
+      "location": {
+        "file_path": "examples/sdk_examples.py",
+        "line_number": 27,
+        "column": null,
+        "raw_content": null
+      },
+      "recommendation": "Scope 'deprecated_scope' 已弃用，请检查最新的 scope 定义"
+    },
+    {
+      "scope_name": "deprecated_scope",
+      "source": "Call Log (client: unknown)",
+      "source_type": "log",
+      "location": {
+        "file_path": "examples/call_logs.txt",
+        "line_number": 7,
+        "column": null,
+        "raw_content": "2024-01-15T10:00:07 GET /api/v1/orders/456 deprecated_scope client_004 403"
+      },
+      "recommendation": "Scope 'deprecated_scope' 已弃用，请更新客户端代码"
+    }
+  ],
   "scope_mappings": {
     "user.read": {
       "canonical_name": "user.read",
@@ -741,8 +767,8 @@
     "user.write": {
       "canonical_name": "user.write",
       "aliases": [
-        "profile:write",
-        "user:write"
+        "user:write",
+        "profile:write"
       ],
       "included_scopes": [
         "user.read"
@@ -771,10 +797,10 @@
         "root"
       ],
       "included_scopes": [
-        "order.write",
+        "order.read",
         "user.read",
-        "user.write",
-        "order.read"
+        "order.write",
+        "user.write"
       ]
     },
     "deprecated_scope": {
@@ -792,6 +818,7 @@
     "sdk_gaps_count": 3,
     "doc_gaps_count": 0,
     "scope_gaps_count": 0,
+    "deprecated_scope_count": 2,
     "parse_errors_count": 0,
     "parse_warnings_count": 0
   }

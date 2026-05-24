@@ -9,6 +9,7 @@ from .models import (
     AnalysisResult,
     CallLogEntry,
     CoverageGap,
+    DeprecatedScopeUsage,
     DocFragment,
     SDKExample,
     Scope,
@@ -185,9 +186,62 @@ class CoverageAnalyzer:
         self._check_sdk_coverage()
         self._check_doc_coverage()
         self._check_call_log_coverage()
+        self._check_deprecated_scopes()
         self._add_metadata()
 
         return self.result
+
+    def _check_deprecated_scopes(self) -> None:
+        deprecated_scopes = {
+            name: scope
+            for name, scope in self.result.resolved_scopes.items()
+            if scope.is_deprecated
+        }
+
+        if not deprecated_scopes:
+            return
+
+        for example in self.result.sdk_examples:
+            for scope_name in example.used_scopes:
+                canonical = self._resolver.resolve(scope_name)
+                if canonical and canonical in deprecated_scopes:
+                    self.result.deprecated_scope_usages.append(
+                        DeprecatedScopeUsage(
+                            scope_name=scope_name,
+                            source=f"SDK Example: {example.name} ({example.language})",
+                            source_type="sdk",
+                            location=example.location,
+                            recommendation=f"Scope '{scope_name}' 已弃用，请检查最新的 scope 定义",
+                        )
+                    )
+
+        for fragment in self.result.doc_fragments:
+            for scope_name in fragment.mentioned_scopes:
+                canonical = self._resolver.resolve(scope_name)
+                if canonical and canonical in deprecated_scopes:
+                    self.result.deprecated_scope_usages.append(
+                        DeprecatedScopeUsage(
+                            scope_name=scope_name,
+                            source=f"Documentation: {fragment.title}",
+                            source_type="doc",
+                            location=fragment.location,
+                            recommendation=f"Scope '{scope_name}' 已弃用，请更新文档",
+                        )
+                    )
+
+        for log in self.result.call_logs:
+            for scope_name in log.used_scopes:
+                canonical = self._resolver.resolve(scope_name)
+                if canonical and canonical in deprecated_scopes:
+                    self.result.deprecated_scope_usages.append(
+                        DeprecatedScopeUsage(
+                            scope_name=scope_name,
+                            source=f"Call Log (client: {log.client_id or 'unknown'})",
+                            source_type="log",
+                            location=log.location,
+                            recommendation=f"Scope '{scope_name}' 已弃用，请更新客户端代码",
+                        )
+                    )
 
     def _check_scope_integrity(self) -> None:
         all_scopes = set(self.result.resolved_scopes.keys())
@@ -309,6 +363,7 @@ class CoverageAnalyzer:
                 "sdk_gaps_count": len(self.result.sdk_coverage_gaps),
                 "doc_gaps_count": len(self.result.doc_coverage_gaps),
                 "scope_gaps_count": len(self.result.scope_coverage_gaps),
+                "deprecated_scope_count": len(self.result.deprecated_scope_usages),
                 "parse_errors_count": sum(
                     1 for i in self.result.parse_issues if i.severity in (Severity.ERROR, Severity.CRITICAL)
                 ),
