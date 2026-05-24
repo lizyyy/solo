@@ -1,8 +1,5 @@
 package com.hotel.lostfound.exception;
 
-import lombok.Getter;
-
-@Getter
 public class BusinessException extends RuntimeException {
 
     private final int code;
@@ -18,5 +15,13 @@ public class BusinessException extends RuntimeException {
         super(message);
         this.code = code;
         this.message = message;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

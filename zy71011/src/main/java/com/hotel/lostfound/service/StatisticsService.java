@@ -4,8 +4,8 @@ import com.hotel.lostfound.dto.response.StatisticsVO;
 import com.hotel.lostfound.entity.LostItem;
 import com.hotel.lostfound.entity.enums.LostItemStatus;
 import com.hotel.lostfound.repository.LostItemRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,12 +14,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class StatisticsService {
 
+    private static final Logger log = LoggerFactory.getLogger(StatisticsService.class);
+
     private final LostItemRepository lostItemRepository;
+
+    public StatisticsService(LostItemRepository lostItemRepository) {
+        this.lostItemRepository = lostItemRepository;
+    }
 
     @Transactional(readOnly = true)
     public StatisticsVO getStatistics() {

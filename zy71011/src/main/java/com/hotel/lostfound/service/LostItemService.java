@@ -7,8 +7,8 @@ import com.hotel.lostfound.entity.enums.LostItemStatus;
 import com.hotel.lostfound.exception.BusinessException;
 import com.hotel.lostfound.repository.*;
 import jakarta.persistence.criteria.Predicate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -26,10 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class LostItemService {
+
+    private static final Logger log = LoggerFactory.getLogger(LostItemService.class);
 
     private final LostItemRepository lostItemRepository;
     private final ClaimRecordRepository claimRecordRepository;
@@ -38,6 +38,22 @@ public class LostItemService {
     private final SupplementRecordRepository supplementRecordRepository;
     private final StatusMachineService statusMachineService;
     private final IdempotentService idempotentService;
+
+    public LostItemService(LostItemRepository lostItemRepository,
+                          ClaimRecordRepository claimRecordRepository,
+                          MailRecordRepository mailRecordRepository,
+                          DisposalRecordRepository disposalRecordRepository,
+                          SupplementRecordRepository supplementRecordRepository,
+                          StatusMachineService statusMachineService,
+                          IdempotentService idempotentService) {
+        this.lostItemRepository = lostItemRepository;
+        this.claimRecordRepository = claimRecordRepository;
+        this.mailRecordRepository = mailRecordRepository;
+        this.disposalRecordRepository = disposalRecordRepository;
+        this.supplementRecordRepository = supplementRecordRepository;
+        this.statusMachineService = statusMachineService;
+        this.idempotentService = idempotentService;
+    }
 
     @Value("${app.lost-item.expired-days:90}")
     private int expiredDays;

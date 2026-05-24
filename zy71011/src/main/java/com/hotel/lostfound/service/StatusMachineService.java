@@ -3,20 +3,28 @@ package com.hotel.lostfound.service;
 import com.hotel.lostfound.entity.LostItem;
 import com.hotel.lostfound.entity.enums.LostItemStatus;
 import com.hotel.lostfound.exception.BusinessException;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Slf4j
 @Service
 public class StatusMachineService {
 
+    private static final Logger log = LoggerFactory.getLogger(StatusMachineService.class);
+
     public boolean canTransition(LostItemStatus from, LostItemStatus to) {
+        if (to == LostItemStatus.EXPIRED) {
+            return !isTerminated(from);
+        }
+        
         return switch (from) {
             case REGISTERED -> Set.of(
                     LostItemStatus.PENDING_VERIFICATION,
-                    LostItemStatus.PENDING_DISPOSAL
+                    LostItemStatus.VERIFIED,
+                    LostItemStatus.PENDING_DISPOSAL,
+                    LostItemStatus.DISPOSED
             ).contains(to);
             case PENDING_VERIFICATION -> Set.of(
                     LostItemStatus.VERIFIED,
@@ -24,7 +32,10 @@ public class StatusMachineService {
             ).contains(to);
             case VERIFIED -> Set.of(
                     LostItemStatus.PENDING_CLAIM,
-                    LostItemStatus.PENDING_DISPOSAL
+                    LostItemStatus.CLAIMED,
+                    LostItemStatus.MAILED,
+                    LostItemStatus.PENDING_DISPOSAL,
+                    LostItemStatus.DISPOSED
             ).contains(to);
             case PENDING_CLAIM -> Set.of(
                     LostItemStatus.CLAIMED,

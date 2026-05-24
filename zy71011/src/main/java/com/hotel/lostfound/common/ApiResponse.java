@@ -1,8 +1,5 @@
 package com.hotel.lostfound.common;
 
-import lombok.Data;
-
-@Data
 public class ApiResponse<T> {
 
     private int code;
@@ -43,5 +40,37 @@ public class ApiResponse<T> {
         response.setMessage("重复请求，返回原结果");
         response.setData(data);
         return response;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

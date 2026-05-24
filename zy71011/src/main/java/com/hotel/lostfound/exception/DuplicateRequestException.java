@@ -1,8 +1,5 @@
 package com.hotel.lostfound.exception;
 
-import lombok.Getter;
-
-@Getter
 public class DuplicateRequestException extends RuntimeException {
 
     private final String requestId;
@@ -12,5 +9,13 @@ public class DuplicateRequestException extends RuntimeException {
         super("重复请求: " + requestId);
         this.requestId = requestId;
         this.existingData = existingData;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public Object getExistingData() {
+        return existingData;
     }
 }

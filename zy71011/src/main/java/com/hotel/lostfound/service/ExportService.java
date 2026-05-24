@@ -7,8 +7,8 @@ import com.hotel.lostfound.entity.LostItem;
 import com.hotel.lostfound.exception.BusinessException;
 import com.hotel.lostfound.repository.LostItemRepository;
 import jakarta.persistence.criteria.Predicate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,13 +21,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ExportService {
+
+    private static final Logger log = LoggerFactory.getLogger(ExportService.class);
 
     private final LostItemRepository lostItemRepository;
     private final IdempotentService idempotentService;
+
+    public ExportService(LostItemRepository lostItemRepository, IdempotentService idempotentService) {
+        this.lostItemRepository = lostItemRepository;
+        this.idempotentService = idempotentService;
+    }
 
     @Transactional(readOnly = true)
     public byte[] exportLostItems(ExportRequest request) {

@@ -1,12 +1,10 @@
 package com.hotel.lostfound.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "supplement_records")
 public class SupplementRecord {
@@ -43,4 +41,84 @@ public class SupplementRecord {
 
     @Column(nullable = false)
     private String requestId;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LostItem getLostItem() {
+        return lostItem;
+    }
+
+    public void setLostItem(LostItem lostItem) {
+        this.lostItem = lostItem;
+    }
+
+    public String getSupplementType() {
+        return supplementType;
+    }
+
+    public void setSupplementType(String supplementType) {
+        this.supplementType = supplementType;
+    }
+
+    public String getSupplementContent() {
+        return supplementContent;
+    }
+
+    public void setSupplementContent(String supplementContent) {
+        this.supplementContent = supplementContent;
+    }
+
+    public String getEvidenceImageUrls() {
+        return evidenceImageUrls;
+    }
+
+    public void setEvidenceImageUrls(String evidenceImageUrls) {
+        this.evidenceImageUrls = evidenceImageUrls;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    public LocalDateTime getOperateTime() {
+        return operateTime;
+    }
+
+    public void setOperateTime(LocalDateTime operateTime) {
+        this.operateTime = operateTime;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
 }

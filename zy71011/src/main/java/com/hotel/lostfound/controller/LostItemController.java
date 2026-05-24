@@ -7,7 +7,6 @@ import com.hotel.lostfound.service.ExportService;
 import com.hotel.lostfound.service.LostItemService;
 import com.hotel.lostfound.service.StatisticsService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -22,12 +21,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/lost-items")
-@RequiredArgsConstructor
 public class LostItemController {
 
     private final LostItemService lostItemService;
     private final StatisticsService statisticsService;
     private final ExportService exportService;
+
+    public LostItemController(LostItemService lostItemService,
+                             StatisticsService statisticsService,
+                             ExportService exportService) {
+        this.lostItemService = lostItemService;
+        this.statisticsService = statisticsService;
+        this.exportService = exportService;
+    }
 
     @PostMapping
     public ApiResponse<LostItemDetailVO> create(@Valid @RequestBody CreateLostItemRequest request) {

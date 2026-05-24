@@ -3,8 +3,8 @@ package com.hotel.lostfound.service;
 import com.hotel.lostfound.entity.LostItem;
 import com.hotel.lostfound.entity.enums.LostItemStatus;
 import com.hotel.lostfound.repository.LostItemRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,13 +12,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ScheduledTaskService {
+
+    private static final Logger log = LoggerFactory.getLogger(ScheduledTaskService.class);
 
     private final LostItemRepository lostItemRepository;
     private final StatusMachineService statusMachineService;
+
+    public ScheduledTaskService(LostItemRepository lostItemRepository, StatusMachineService statusMachineService) {
+        this.lostItemRepository = lostItemRepository;
+        this.statusMachineService = statusMachineService;
+    }
 
     @Scheduled(cron = "0 0 9 * * ?")
     @Transactional

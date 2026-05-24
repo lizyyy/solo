@@ -70,12 +70,17 @@ src/main/java/com/hotel/lostfound/
 
 ### 1. 构建项目
 ```bash
-mvn clean package -DskipTests
+./mvnw clean package -DskipTests
 ```
 
 ### 2. 启动服务
 ```bash
 java -jar target/lost-and-found-api-1.0.0.jar
+```
+
+注意：如果 8080 端口被占用，可以指定其他端口：
+```bash
+java -jar target/lost-and-found-api-1.0.0.jar --server.port=8081
 ```
 
 ### 3. 访问服务
