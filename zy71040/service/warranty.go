@@ -213,6 +213,32 @@ func (s *WarrantyService) ListFactoryOrders() ([]FactoryOrder, error) {
 }
 
 func (s *WarrantyService) CreateReplacement(rep *Replacement) (*Replacement, error) {
+	var validationErrors []string
+
+	if _, err := s.GetInverter(rep.InverterSN); err != nil {
+		validationErrors = append(validationErrors, fmt.Sprintf("逆变器序列号 %s 不存在", rep.InverterSN))
+	}
+
+	if _, err := s.GetFaultCode(rep.FaultCode); err != nil {
+		validationErrors = append(validationErrors, fmt.Sprintf("故障码 %s 不存在", rep.FaultCode))
+	}
+
+	if rep.SparePartSN != "" {
+		if _, err := s.GetSparePart(rep.SparePartSN); err != nil {
+			validationErrors = append(validationErrors, fmt.Sprintf("备件序列号 %s 不存在", rep.SparePartSN))
+		}
+	}
+
+	if rep.FactoryOrderID != "" {
+		if _, err := s.GetFactoryOrder(rep.FactoryOrderID); err != nil {
+			validationErrors = append(validationErrors, fmt.Sprintf("厂家工单 %s 不存在", rep.FactoryOrderID))
+		}
+	}
+
+	if len(validationErrors) > 0 {
+		return nil, fmt.Errorf("材料预校验失败: %s", strings.Join(validationErrors, "; "))
+	}
+
 	tx, err := s.db.Begin()
 	if err != nil {
 		return nil, err
@@ -220,7 +246,19 @@ func (s *WarrantyService) CreateReplacement(rep *Replacement) (*Replacement, err
 	defer tx.Rollback()
 
 	query := `INSERT INTO replacements (id, inverter_sn, new_inverter_sn, fault_code, spare_part_sn, factory_order_id, old_inverter_photo_url, new_inverter_photo_url, fault_photo_url, warranty_certificate_url, replacement_date, technician, remark, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-	_, err = tx.Exec(query, rep.ID, rep.InverterSN, rep.NewInverterSN, rep.FaultCode, rep.SparePartSN, rep.FactoryOrderID, rep.OldInverterPhotoURL, rep.NewInverterPhotoURL, rep.FaultPhotoURL, rep.WarrantyCertificateURL, rep.ReplacementDate, rep.Technician, rep.Remark, StatusDraft)
+
+	var newInvSN, sparePartSN, factoryOrderID interface{}
+	if rep.NewInverterSN != "" {
+		newInvSN = rep.NewInverterSN
+	}
+	if rep.SparePartSN != "" {
+		sparePartSN = rep.SparePartSN
+	}
+	if rep.FactoryOrderID != "" {
+		factoryOrderID = rep.FactoryOrderID
+	}
+
+	_, err = tx.Exec(query, rep.ID, rep.InverterSN, newInvSN, rep.FaultCode, sparePartSN, factoryOrderID, rep.OldInverterPhotoURL, rep.NewInverterPhotoURL, rep.FaultPhotoURL, rep.WarrantyCertificateURL, rep.ReplacementDate, rep.Technician, rep.Remark, StatusDraft)
 	if err != nil {
 		return nil, err
 	}
@@ -307,17 +345,21 @@ func (s *WarrantyService) VerifyReplacement(id string, req *VerificationRequest)
 	}
 
 	var notes []string
+	var hasCriticalError bool
 
 	fc, err := s.GetFaultCode(rep.FaultCode)
 	if err != nil {
 		notes = append(notes, fmt.Sprintf("故障码 %s 不存在", rep.FaultCode))
+		hasCriticalError = true
 	} else if !fc.IsWarrantyCovered {
 		notes = append(notes, fmt.Sprintf("故障码 %s 不在质保范围内: %s", fc.Code, fc.Description))
 		if err := s.transitionStatus(id, rep.Status, StatusWarrantyFail, req.Operator, req.Remark); err != nil {
 			return "", err
 		}
 		notes = append(notes, "状态已变更为: 质保失败")
-		return strings.Join(notes, "; "), fmt.Errorf("故障码不在质保范围内")
+		result := strings.Join(notes, "; ")
+		s.db.Exec(`UPDATE replacements SET verification_result = ? WHERE id = ?`, result, id)
+		return result, fmt.Errorf("故障码不在质保范围内")
 	} else {
 		notes = append(notes, fmt.Sprintf("故障码 %s 验证通过，在质保范围内", fc.Code))
 	}
@@ -326,11 +368,20 @@ func (s *WarrantyService) VerifyReplacement(id string, req *VerificationRequest)
 		sp, err := s.GetSparePart(rep.SparePartSN)
 		if err != nil {
 			notes = append(notes, fmt.Sprintf("备件序列号 %s 不存在", rep.SparePartSN))
+			hasCriticalError = true
 		} else if sp.Status != "available" {
 			notes = append(notes, fmt.Sprintf("备件 %s 状态为 %s，不可用", sp.SN, sp.Status))
+			hasCriticalError = true
 		} else {
 			notes = append(notes, fmt.Sprintf("备件 %s 验证通过，状态可用", sp.SN))
 		}
+	}
+
+	if hasCriticalError {
+		notes = append(notes, "核对失败，存在关键材料问题，状态保持为 draft")
+		result := strings.Join(notes, "; ")
+		s.db.Exec(`UPDATE replacements SET verification_result = ? WHERE id = ?`, result, id)
+		return result, fmt.Errorf("明细核对未通过: %s", result)
 	}
 
 	notes = append(notes, "证据链完整度检查: 已收集故障码、逆变器序列号、备件信息")
@@ -680,10 +731,10 @@ func (s *WarrantyService) TraceRecord(id string) (*TraceResult, error) {
 	}
 
 	result := &TraceResult{
-		Replacement:        *rep,
-		Inverter:           *inv,
-		FaultCode:          *fc,
-		VerificationNotes:  rep.VerificationResult,
+		Replacement:       *rep,
+		Inverter:          *inv,
+		FaultCode:         *fc,
+		VerificationNotes: rep.VerificationResult,
 	}
 
 	if rep.NewInverterSN != "" {

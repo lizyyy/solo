@@ -15,6 +15,11 @@ func NewSQLiteDB(path string) (*SQLiteDB, error) {
 	if err != nil {
 		return nil, err
 	}
+	_, err = db.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
 	return &SQLiteDB{DB: db}, nil
 }
 
