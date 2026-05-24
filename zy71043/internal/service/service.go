@@ -247,12 +247,9 @@ func (s *Service) StartVentilation(req *VentilationStartRequest) (*models.Ventil
 }
 
 func (s *Service) CompleteVentilation(req *VentilationCompleteRequest) (*models.VentilationAction, error) {
-	vent, err := s.repo.GetVentilationByRequestID(fmt.Sprintf("%d", req.VentilationID))
+	vent, err := s.repo.GetVentilationByID(req.VentilationID)
 	if err != nil {
-		vent, err = s.repo.GetVentilationByRequestID(fmt.Sprintf("vent-%d", req.VentilationID))
-		if err != nil {
-			return nil, models.ErrNotFound
-		}
+		return nil, err
 	}
 
 	if vent.Status != models.VentilationStatusActive {
@@ -358,24 +355,32 @@ func (s *Service) CreateTransfer(req *TransferRequest) (*models.TransferRecord, 
 	transfer.ID = id
 
 	if req.Quantity == batch.Quantity {
-		if err := s.repo.UpdateBatchArea(tx, batch.ID, toArea.ID, toArea.Code, 0); err != nil {
+		if err := s.repo.UpdateBatchAreaAndQuantity(tx, batch.ID, toArea.ID, toArea.Code, batch.Quantity); err != nil {
 			return nil, err
 		}
 	} else {
-		if err := s.repo.UpdateBatchArea(tx, batch.ID, toArea.ID, toArea.Code, -batch.Quantity+req.Quantity); err != nil {
+		if err := s.repo.UpdateBatchQuantity(tx, batch.ID, -req.Quantity); err != nil {
 			return nil, err
 		}
+		newBatchNo := fmt.Sprintf("%s-%s", batch.BatchNo, time.Now().Format("20060102150405"))
 		newBatch := &models.FireworksBatch{
-			BatchNo:        fmt.Sprintf("%s-%d", batch.BatchNo, time.Now().Unix()),
-			ProductName:    batch.ProductName,
-			Quantity:       req.Quantity,
-			CurrentAreaID:  toArea.ID,
+			BatchNo:         newBatchNo,
+			ProductName:     batch.ProductName,
+			Quantity:        req.Quantity,
+			CurrentAreaID:   toArea.ID,
 			CurrentAreaCode: toArea.Code,
-			Status:         models.BatchStatusTransferred,
+			Status:          models.BatchStatusTransferred,
 			ManufactureDate: batch.ManufactureDate,
-			ExpiryDate:     batch.ExpiryDate,
+			ExpiryDate:      batch.ExpiryDate,
 		}
-		_ = newBatch
+		newBatchID, err := s.repo.CreateBatch(tx, newBatch)
+		if err != nil {
+			return nil, err
+		}
+		if err := s.repo.UpdateTransferNewBatchID(tx, id, newBatchID); err != nil {
+			return nil, err
+		}
+		transfer.NewBatchID = newBatchID
 	}
 
 	respJSON, _ := json.Marshal(transfer)
@@ -432,8 +437,17 @@ func (s *Service) UndoTransfer(req *TransferUndoRequest) (*models.TransferRecord
 		return nil, err
 	}
 
-	if err := s.repo.UpdateBatchArea(tx, batch.ID, transfer.FromAreaID, transfer.FromAreaCode, 0); err != nil {
-		return nil, err
+	if transfer.NewBatchID > 0 {
+		if err := s.repo.UpdateBatchQuantity(tx, batch.ID, transfer.Quantity); err != nil {
+			return nil, err
+		}
+		if err := s.repo.DeleteBatch(tx, transfer.NewBatchID); err != nil {
+			return nil, err
+		}
+	} else {
+		if err := s.repo.UpdateBatchAreaAndQuantity(tx, batch.ID, transfer.FromAreaID, transfer.FromAreaCode, batch.Quantity); err != nil {
+			return nil, err
+		}
 	}
 
 	if err := s.repo.CreateAuditLog(tx, "undo_transfer", "transfer_record", transfer.ID, req.Operator, transfer.Status, models.TransferStatusUndone); err != nil {
@@ -569,12 +583,9 @@ func (s *Service) Review(req *ReviewRequest) error {
 			return err
 		}
 	case "ventilation":
-		vent, err := s.repo.GetVentilationByRequestID(fmt.Sprintf("%d", req.ResourceID))
+		vent, err := s.repo.GetVentilationByID(req.ResourceID)
 		if err != nil {
-			vent, err = s.repo.GetVentilationByRequestID(fmt.Sprintf("vent-%d", req.ResourceID))
-			if err != nil {
-				return models.ErrNotFound
-			}
+			return err
 		}
 		if vent.Status != models.VentilationStatusComplete {
 			return models.ErrInvalidState
@@ -594,9 +605,9 @@ func (s *Service) Review(req *ReviewRequest) error {
 			return err
 		}
 	case "inspection":
-		inspection, err := s.repo.GetInspectionByRequestID(fmt.Sprintf("%d", req.ResourceID))
+		inspection, err := s.repo.GetInspectionByID(req.ResourceID)
 		if err != nil {
-			return models.ErrNotFound
+			return err
 		}
 		if inspection.Status != models.InspectionStatusComplete {
 			return models.ErrInvalidState
@@ -661,21 +672,21 @@ func (s *Service) GenerateReport(req *ReportRequest) (*models.RiskReport, error)
 	}
 
 	report := &models.RiskReport{
-		ReportNo:        reportNo,
-		ReportType:      req.ReportType,
-		PeriodStart:     req.PeriodStart,
-		PeriodEnd:       req.PeriodEnd,
-		GeneratedAt:     time.Now(),
-		GeneratedBy:     req.GeneratedBy,
-		TotalSamples:    len(samples),
-		OverLimitCount:  overLimitCount,
-		TransferCount:   transferCount,
-		InspectionCount: inspectionCount,
+		ReportNo:         reportNo,
+		ReportType:       req.ReportType,
+		PeriodStart:      req.PeriodStart,
+		PeriodEnd:        req.PeriodEnd,
+		GeneratedAt:      time.Now(),
+		GeneratedBy:      req.GeneratedBy,
+		TotalSamples:     len(samples),
+		OverLimitCount:   overLimitCount,
+		TransferCount:    transferCount,
+		InspectionCount:  inspectionCount,
 		VentilationCount: ventCount,
-		RiskLevel:       maxRisk,
-		Summary:         summary,
-		Recommendations: recommendations,
-		Status:          models.ReportStatusGenerated,
+		RiskLevel:        maxRisk,
+		Summary:          summary,
+		Recommendations:  recommendations,
+		Status:           models.ReportStatusGenerated,
 	}
 
 	id, err := s.repo.CreateReport(report)

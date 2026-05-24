@@ -129,6 +129,40 @@ func (r *Repository) GetBatchByID(id int64) (*models.FireworksBatch, error) {
 	return &batch, nil
 }
 
+func (r *Repository) CreateBatch(tx *sql.Tx, batch *models.FireworksBatch) (int64, error) {
+	now := FormatTime(time.Now())
+	result, err := tx.Exec(`
+			INSERT INTO fireworks_batches (batch_no, product_name, quantity, current_area_id, current_area_code, status, manufacture_date, expiry_date, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		`, batch.BatchNo, batch.ProductName, batch.Quantity, batch.CurrentAreaID, batch.CurrentAreaCode, batch.Status, FormatTime(batch.ManufactureDate), FormatTime(batch.ExpiryDate), now, now)
+	if err != nil {
+		return 0, err
+	}
+	id, err := result.LastInsertId()
+	return id, err
+}
+
+func (r *Repository) UpdateBatchQuantity(tx *sql.Tx, batchID int64, quantityDelta int) error {
+	_, err := tx.Exec(`
+		UPDATE fireworks_batches SET quantity = quantity + ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+	`, quantityDelta, batchID)
+	return err
+}
+
+func (r *Repository) UpdateBatchAreaAndQuantity(tx *sql.Tx, batchID int64, areaID int64, areaCode string, quantity int) error {
+	_, err := tx.Exec(`
+		UPDATE fireworks_batches SET current_area_id = ?, current_area_code = ?, quantity = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+	`, areaID, areaCode, quantity, batchID)
+	return err
+}
+
+func (r *Repository) DeleteBatch(tx *sql.Tx, batchID int64) error {
+	_, err := tx.Exec(`
+		DELETE FROM fireworks_batches WHERE id = ?
+	`, batchID)
+	return err
+}
+
 func (r *Repository) GetBatchesByArea(areaID int64) ([]models.FireworksBatch, error) {
 	rows, err := r.DB.Query(`
 		SELECT id, batch_no, product_name, quantity, current_area_id, current_area_code, status, manufacture_date, expiry_date, created_at, updated_at
@@ -278,6 +312,39 @@ func (r *Repository) GetVentilationByRequestID(requestID string) (*models.Ventil
 	return &vent, nil
 }
 
+func (r *Repository) GetVentilationByID(id int64) (*models.VentilationAction, error) {
+	var vent models.VentilationAction
+	var startedAt, createdAt string
+	var endedAt *string
+	var reviewedBy *string
+	var reviewedAt *string
+
+	err := r.DB.QueryRow(`
+		SELECT id, request_id, area_id, area_code, sample_id, started_at, ended_at, duration_minutes, operator, before_humidity, after_humidity, status, reviewed_by, reviewed_at, remark, created_at
+		FROM ventilation_actions WHERE id = ?
+	`, id).Scan(&vent.ID, &vent.RequestID, &vent.AreaID, &vent.AreaCode, &vent.SampleID, &startedAt, &endedAt, &vent.Duration, &vent.Operator, &vent.BeforeHumidity, &vent.AfterHumidity, &vent.Status, &reviewedBy, &reviewedAt, &vent.Remark, &createdAt)
+
+	if err == sql.ErrNoRows {
+		return nil, models.ErrNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	vent.StartedAt, _ = ParseTime(startedAt)
+	vent.CreatedAt, _ = ParseTime(createdAt)
+	vent.ReviewedBy = reviewedBy
+	if endedAt != nil {
+		t, _ := ParseTime(*endedAt)
+		vent.EndedAt = &t
+	}
+	if reviewedAt != nil {
+		t, _ := ParseTime(*reviewedAt)
+		vent.ReviewedAt = &t
+	}
+	return &vent, nil
+}
+
 func (r *Repository) CompleteVentilation(tx *sql.Tx, id int64, endedAt time.Time, duration int, afterHumidity float64) error {
 	_, err := tx.Exec(`
 		UPDATE ventilation_actions SET ended_at = ?, duration_minutes = ?, after_humidity = ?, status = 'completed' WHERE id = ?
@@ -287,13 +354,20 @@ func (r *Repository) CompleteVentilation(tx *sql.Tx, id int64, endedAt time.Time
 
 func (r *Repository) CreateTransfer(tx *sql.Tx, transfer *models.TransferRecord) (int64, error) {
 	result, err := tx.Exec(`
-		INSERT INTO transfer_records (request_id, batch_id, batch_no, from_area_id, from_area_code, to_area_id, to_area_code, quantity, operator, transferred_at, status, remark)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?)
-	`, transfer.RequestID, transfer.BatchID, transfer.BatchNo, transfer.FromAreaID, transfer.FromAreaCode, transfer.ToAreaID, transfer.ToAreaCode, transfer.Quantity, transfer.Operator, FormatTime(transfer.TransferredAt), transfer.Remark)
+		INSERT INTO transfer_records (request_id, batch_id, batch_no, new_batch_id, from_area_id, from_area_code, to_area_id, to_area_code, quantity, operator, transferred_at, status, remark)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?)
+	`, transfer.RequestID, transfer.BatchID, transfer.BatchNo, transfer.NewBatchID, transfer.FromAreaID, transfer.FromAreaCode, transfer.ToAreaID, transfer.ToAreaCode, transfer.Quantity, transfer.Operator, FormatTime(transfer.TransferredAt), transfer.Remark)
 	if err != nil {
 		return 0, err
 	}
 	return result.LastInsertId()
+}
+
+func (r *Repository) UpdateTransferNewBatchID(tx *sql.Tx, transferID int64, newBatchID int64) error {
+	_, err := tx.Exec(`
+		UPDATE transfer_records SET new_batch_id = ? WHERE id = ?
+	`, newBatchID, transferID)
+	return err
 }
 
 func (r *Repository) GetTransferByRequestID(requestID string) (*models.TransferRecord, error) {
@@ -305,9 +379,9 @@ func (r *Repository) GetTransferByRequestID(requestID string) (*models.TransferR
 	var undoneAt *string
 
 	err := r.DB.QueryRow(`
-		SELECT id, request_id, batch_id, batch_no, from_area_id, from_area_code, to_area_id, to_area_code, quantity, operator, transferred_at, status, reviewed_by, reviewed_at, remark, undone, undone_by, undone_at, created_at
+		SELECT id, request_id, batch_id, batch_no, new_batch_id, from_area_id, from_area_code, to_area_id, to_area_code, quantity, operator, transferred_at, status, reviewed_by, reviewed_at, remark, undone, undone_by, undone_at, created_at
 		FROM transfer_records WHERE request_id = ?
-	`, requestID).Scan(&transfer.ID, &transfer.RequestID, &transfer.BatchID, &transfer.BatchNo, &transfer.FromAreaID, &transfer.FromAreaCode, &transfer.ToAreaID, &transfer.ToAreaCode, &transfer.Quantity, &transfer.Operator, &transferredAt, &transfer.Status, &reviewedBy, &reviewedAt, &transfer.Remark, &transfer.Undone, &undoneBy, &undoneAt, &createdAt)
+	`, requestID).Scan(&transfer.ID, &transfer.RequestID, &transfer.BatchID, &transfer.BatchNo, &transfer.NewBatchID, &transfer.FromAreaID, &transfer.FromAreaCode, &transfer.ToAreaID, &transfer.ToAreaCode, &transfer.Quantity, &transfer.Operator, &transferredAt, &transfer.Status, &reviewedBy, &reviewedAt, &transfer.Remark, &transfer.Undone, &undoneBy, &undoneAt, &createdAt)
 
 	if err == sql.ErrNoRows {
 		return nil, models.ErrTransferNotFound
@@ -340,9 +414,9 @@ func (r *Repository) GetTransferByID(id int64) (*models.TransferRecord, error) {
 	var undoneAt *string
 
 	err := r.DB.QueryRow(`
-		SELECT id, request_id, batch_id, batch_no, from_area_id, from_area_code, to_area_id, to_area_code, quantity, operator, transferred_at, status, reviewed_by, reviewed_at, remark, undone, undone_by, undone_at, created_at
+		SELECT id, request_id, batch_id, batch_no, new_batch_id, from_area_id, from_area_code, to_area_id, to_area_code, quantity, operator, transferred_at, status, reviewed_by, reviewed_at, remark, undone, undone_by, undone_at, created_at
 		FROM transfer_records WHERE id = ?
-	`, id).Scan(&transfer.ID, &transfer.RequestID, &transfer.BatchID, &transfer.BatchNo, &transfer.FromAreaID, &transfer.FromAreaCode, &transfer.ToAreaID, &transfer.ToAreaCode, &transfer.Quantity, &transfer.Operator, &transferredAt, &transfer.Status, &reviewedBy, &reviewedAt, &transfer.Remark, &transfer.Undone, &undoneBy, &undoneAt, &createdAt)
+	`, id).Scan(&transfer.ID, &transfer.RequestID, &transfer.BatchID, &transfer.BatchNo, &transfer.NewBatchID, &transfer.FromAreaID, &transfer.FromAreaCode, &transfer.ToAreaID, &transfer.ToAreaCode, &transfer.Quantity, &transfer.Operator, &transferredAt, &transfer.Status, &reviewedBy, &reviewedAt, &transfer.Remark, &transfer.Undone, &undoneBy, &undoneAt, &createdAt)
 
 	if err == sql.ErrNoRows {
 		return nil, models.ErrTransferNotFound
@@ -382,9 +456,9 @@ func (r *Repository) UndoTransfer(tx *sql.Tx, transferID int64, undoneBy string,
 
 func (r *Repository) GetBatchTransferHistory(batchID int64) ([]models.TransferRecord, error) {
 	rows, err := r.DB.Query(`
-		SELECT id, request_id, batch_id, batch_no, from_area_id, from_area_code, to_area_id, to_area_code, quantity, operator, transferred_at, status, undone, created_at
-		FROM transfer_records WHERE batch_id = ? ORDER BY transferred_at DESC
-	`, batchID)
+		SELECT id, request_id, batch_id, batch_no, new_batch_id, from_area_id, from_area_code, to_area_id, to_area_code, quantity, operator, transferred_at, status, undone, created_at
+		FROM transfer_records WHERE batch_id = ? OR new_batch_id = ? ORDER BY transferred_at DESC
+	`, batchID, batchID)
 	if err != nil {
 		return nil, err
 	}
@@ -394,7 +468,7 @@ func (r *Repository) GetBatchTransferHistory(batchID int64) ([]models.TransferRe
 	for rows.Next() {
 		var tr models.TransferRecord
 		var transferredAt, createdAt string
-		err := rows.Scan(&tr.ID, &tr.RequestID, &tr.BatchID, &tr.BatchNo, &tr.FromAreaID, &tr.FromAreaCode, &tr.ToAreaID, &tr.ToAreaCode, &tr.Quantity, &tr.Operator, &transferredAt, &tr.Status, &tr.Undone, &createdAt)
+		err := rows.Scan(&tr.ID, &tr.RequestID, &tr.BatchID, &tr.BatchNo, &tr.NewBatchID, &tr.FromAreaID, &tr.FromAreaCode, &tr.ToAreaID, &tr.ToAreaCode, &tr.Quantity, &tr.Operator, &transferredAt, &tr.Status, &tr.Undone, &createdAt)
 		if err != nil {
 			return nil, err
 		}
@@ -427,6 +501,35 @@ func (r *Repository) GetInspectionByRequestID(requestID string) (*models.Inspect
 		SELECT id, request_id, batch_id, batch_no, area_id, area_code, inspected_at, inspector, package_check, humidity_check, quality_status, photos, remark, status, reviewed_by, reviewed_at, created_at
 		FROM inspection_records WHERE request_id = ?
 	`, requestID).Scan(&inspection.ID, &inspection.RequestID, &inspection.BatchID, &inspection.BatchNo, &inspection.AreaID, &inspection.AreaCode, &inspectedAt, &inspection.Inspector, &inspection.PackageCheck, &inspection.HumidityCheck, &inspection.QualityStatus, &photos, &inspection.Remark, &inspection.Status, &reviewedBy, &reviewedAt, &createdAt)
+
+	if err == sql.ErrNoRows {
+		return nil, models.ErrNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	inspection.InspectedAt, _ = ParseTime(inspectedAt)
+	inspection.CreatedAt, _ = ParseTime(createdAt)
+	inspection.Photos = SplitStrings(photos)
+	inspection.ReviewedBy = reviewedBy
+	if reviewedAt != nil {
+		t, _ := ParseTime(*reviewedAt)
+		inspection.ReviewedAt = &t
+	}
+	return &inspection, nil
+}
+
+func (r *Repository) GetInspectionByID(id int64) (*models.InspectionRecord, error) {
+	var inspection models.InspectionRecord
+	var inspectedAt, createdAt, photos string
+	var reviewedBy *string
+	var reviewedAt *string
+
+	err := r.DB.QueryRow(`
+		SELECT id, request_id, batch_id, batch_no, area_id, area_code, inspected_at, inspector, package_check, humidity_check, quality_status, photos, remark, status, reviewed_by, reviewed_at, created_at
+		FROM inspection_records WHERE id = ?
+	`, id).Scan(&inspection.ID, &inspection.RequestID, &inspection.BatchID, &inspection.BatchNo, &inspection.AreaID, &inspection.AreaCode, &inspectedAt, &inspection.Inspector, &inspection.PackageCheck, &inspection.HumidityCheck, &inspection.QualityStatus, &photos, &inspection.Remark, &inspection.Status, &reviewedBy, &reviewedAt, &createdAt)
 
 	if err == sql.ErrNoRows {
 		return nil, models.ErrNotFound

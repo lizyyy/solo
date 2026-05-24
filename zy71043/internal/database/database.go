@@ -105,6 +105,7 @@ func (db *DB) InitSchema() error {
 		request_id TEXT UNIQUE NOT NULL,
 		batch_id INTEGER NOT NULL,
 		batch_no TEXT NOT NULL,
+		new_batch_id INTEGER DEFAULT 0,
 		from_area_id INTEGER NOT NULL,
 		from_area_code TEXT NOT NULL,
 		to_area_id INTEGER NOT NULL,
@@ -121,6 +122,7 @@ func (db *DB) InitSchema() error {
 		undone_at DATETIME,
 		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (batch_id) REFERENCES fireworks_batches(id),
+		FOREIGN KEY (new_batch_id) REFERENCES fireworks_batches(id),
 		FOREIGN KEY (from_area_id) REFERENCES warehouse_areas(id),
 		FOREIGN KEY (to_area_id) REFERENCES warehouse_areas(id)
 	);

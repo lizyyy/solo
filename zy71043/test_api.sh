@@ -1,6 +1,7 @@
 #!/bin/bash
 
-BASE_URL="http://localhost:8080/api/v1"
+CURL_OPTS="--noproxy localhost,127.0.0.1"
+BASE_URL="http://127.0.0.1:8080/api/v1"
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 echo "=========================================="
@@ -9,7 +10,7 @@ echo "=========================================="
 echo ""
 
 echo "【1】基础查询 - 获取库区列表"
-curl -s "$BASE_URL/areas" | python3 -m json.tool
+curl -s $CURL_OPTS "$BASE_URL/areas" | python3 -m json.tool
 echo ""
 
 echo "=========================================="
@@ -207,7 +208,7 @@ echo ""
 echo "=========================================="
 echo "【15】待复核列表"
 echo "=========================================="
-curl -s "$BASE_URL/reviews/pending" | python3 -m json.tool
+curl -s $CURL_OPTS "$BASE_URL/reviews/pending" | python3 -m json.tool
 echo ""
 
 echo "=========================================="
@@ -237,7 +238,7 @@ echo ""
 echo "=========================================="
 echo "【18】批次追踪 - 查询批次全链路"
 echo "=========================================="
-curl -s "$BASE_URL/batches/FH202405001/trace" | python3 -m json.tool
+curl -s $CURL_OPTS "$BASE_URL/batches/FH202405001/trace" | python3 -m json.tool
 echo ""
 
 echo "=========================================="
@@ -261,19 +262,19 @@ REPORT_NO=$(echo "$REPORT_RESPONSE" | python3 -c "import sys,json; print(json.lo
 echo "=========================================="
 echo "【20】报告导出 - JSON格式"
 echo "=========================================="
-curl -s "$BASE_URL/reports/$REPORT_NO/export?format=json" | python3 -m json.tool
+curl -s $CURL_OPTS "$BASE_URL/reports/$REPORT_NO/export?format=json" | python3 -m json.tool
 echo ""
 
 echo "=========================================="
 echo "【21】报告导出 - YAML格式"
 echo "=========================================="
-curl -s "$BASE_URL/reports/$REPORT_NO/export?format=yaml"
+curl -s $CURL_OPTS "$BASE_URL/reports/$REPORT_NO/export?format=yaml"
 echo ""
 
 echo "=========================================="
 echo "【22】报告导出 - CSV格式"
 echo "=========================================="
-curl -s "$BASE_URL/reports/$REPORT_NO/export?format=csv"
+curl -s $CURL_OPTS "$BASE_URL/reports/$REPORT_NO/export?format=csv"
 echo ""
 
 echo "=========================================="
