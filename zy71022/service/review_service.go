@@ -55,29 +55,27 @@ func (s *ReviewService) CreateReviewReport(req ReviewRequest) (*models.ReviewRep
 	originalAmount := recalcResult.OriginalTotal
 	adjustedAmount := recalcResult.AdjustedTotal
 
-	if req.LeakConfirmed {
-		manualAdjusted := originalAmount - (originalAmount * (req.LeakAmount / (recalcResult.BillDetails[len(recalcResult.BillDetails)-1].OriginalUsage + 1)))
-		if manualAdjusted > 0 && req.LeakAmount > 0 {
-			adjustedAmount = originalAmount - (originalAmount * req.LeakAmount / 100)
-		}
-	}
-
 	originalUsage := 0.0
+	adjustedUsage := 0.0
+	totalLeakDeduction := 0.0
 	for _, bd := range recalcResult.BillDetails {
 		originalUsage += bd.OriginalUsage
+		adjustedUsage += bd.AdjustedUsage
+		totalLeakDeduction += bd.LeakDeduction
 	}
 
-	adjustedUsage := originalUsage
-	if req.LeakConfirmed {
-		adjustedUsage = originalUsage - req.LeakAmount
-		if adjustedUsage < 0 {
-			adjustedUsage = 0
-		}
-	}
-
-	billStart, _ := utils.ParseBillCycle(appeal.StartBillCycle)
-	tierAdjustments := s.calculateTierAdjustments(originalUsage, adjustedUsage, billStart)
+	tierAdjustments := s.calculateTierAdjustmentsFromBills(recalcResult.BillDetails)
 	tierAdjustmentsJSON, _ := json.Marshal(tierAdjustments)
+
+	if !req.LeakConfirmed {
+		adjustedAmount = originalAmount
+		adjustedUsage = originalUsage
+		totalLeakDeduction = 0
+	}
+
+	if req.LeakAmount == 0 {
+		req.LeakAmount = totalLeakDeduction
+	}
 
 	report := &models.ReviewReport{
 		ReportNo:          utils.GenerateReportNo(),
@@ -90,9 +88,9 @@ func (s *ReviewService) CreateReviewReport(req ReviewRequest) (*models.ReviewRep
 		ReadingAnomaly:    req.ReadingAnomaly,
 		LeakConfirmed:     req.LeakConfirmed,
 		LeakDays:          req.LeakDays,
-		LeakAmount:        req.LeakAmount,
-		OriginalUsage:     originalUsage,
-		AdjustedUsage:     adjustedUsage,
+		LeakAmount:        utils.RoundToTwoDecimals(req.LeakAmount),
+		OriginalUsage:     utils.RoundToTwoDecimals(originalUsage),
+		AdjustedUsage:     utils.RoundToTwoDecimals(adjustedUsage),
 		OriginalAmount:    utils.RoundToTwoDecimals(originalAmount),
 		AdjustedAmount:    utils.RoundToTwoDecimals(adjustedAmount),
 		TierAdjustments:   string(tierAdjustmentsJSON),
@@ -139,6 +137,83 @@ func (s *ReviewService) calculateTierAdjustments(originalUsage, adjustedUsage fl
 		})
 	}
 	return adjustments
+}
+
+func (s *ReviewService) calculateTierAdjustmentsFromBills(billDetails []models.BillAdjustDetail) []map[string]interface{} {
+	tierSummary := map[int]map[string]float64{
+		1: {"original_usage": 0, "adjusted_usage": 0, "original_amount": 0, "adjusted_amount": 0},
+		2: {"original_usage": 0, "adjusted_usage": 0, "original_amount": 0, "adjusted_amount": 0},
+		3: {"original_usage": 0, "adjusted_usage": 0, "original_amount": 0, "adjusted_amount": 0},
+	}
+
+	tierNames := map[int]string{
+		1: "第一阶梯",
+		2: "第二阶梯",
+		3: "第三阶梯",
+	}
+
+	for _, bd := range billDetails {
+		originalRemaining := bd.OriginalUsage
+		adjustedRemaining := bd.AdjustedUsage
+
+		tier1Limit := 15.0
+		tier2Limit := 15.0
+
+		origTier1 := min(originalRemaining, tier1Limit)
+		originalRemaining -= origTier1
+		origTier2 := min(originalRemaining, tier2Limit)
+		originalRemaining -= origTier2
+		origTier3 := originalRemaining
+
+		adjTier1 := min(adjustedRemaining, tier1Limit)
+		adjustedRemaining -= adjTier1
+		adjTier2 := min(adjustedRemaining, tier2Limit)
+		adjustedRemaining -= adjTier2
+		adjTier3 := adjustedRemaining
+
+		priceTier1 := 2.80
+		priceTier2 := 4.20
+		priceTier3 := 8.40
+
+		tierSummary[1]["original_usage"] += origTier1
+		tierSummary[1]["adjusted_usage"] += adjTier1
+		tierSummary[1]["original_amount"] += origTier1 * priceTier1
+		tierSummary[1]["adjusted_amount"] += adjTier1 * priceTier1
+
+		tierSummary[2]["original_usage"] += origTier2
+		tierSummary[2]["adjusted_usage"] += adjTier2
+		tierSummary[2]["original_amount"] += origTier2 * priceTier2
+		tierSummary[2]["adjusted_amount"] += adjTier2 * priceTier2
+
+		tierSummary[3]["original_usage"] += origTier3
+		tierSummary[3]["adjusted_usage"] += adjTier3
+		tierSummary[3]["original_amount"] += origTier3 * priceTier3
+		tierSummary[3]["adjusted_amount"] += adjTier3 * priceTier3
+	}
+
+	adjustments := make([]map[string]interface{}, 0)
+	for tier := 1; tier <= 3; tier++ {
+		summary := tierSummary[tier]
+		if summary["original_usage"] > 0 || summary["adjusted_usage"] > 0 {
+			adjustments = append(adjustments, map[string]interface{}{
+				"tier_level":      tier,
+				"tier_name":       tierNames[tier],
+				"original_usage":  utils.RoundToTwoDecimals(summary["original_usage"]),
+				"adjusted_usage":  utils.RoundToTwoDecimals(summary["adjusted_usage"]),
+				"original_amount": utils.RoundToTwoDecimals(summary["original_amount"]),
+				"adjusted_amount": utils.RoundToTwoDecimals(summary["adjusted_amount"]),
+				"difference":      utils.RoundToTwoDecimals(summary["original_amount"] - summary["adjusted_amount"]),
+			})
+		}
+	}
+	return adjustments
+}
+
+func min(a, b float64) float64 {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func (s *ReviewService) FinalizeReview(reportNo string, isApproved bool) error {
