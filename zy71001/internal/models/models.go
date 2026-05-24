@@ -104,6 +104,7 @@ type CreateApplicationRequest struct {
 	CrewID            string    `json:"crew_id" binding:"required"`
 	FlightNo          string    `json:"flight_no" binding:"required"`
 	FlightDate        string    `json:"flight_date" binding:"required"`
+	DepartureCity     string    `json:"departure_city"`
 	DepartureTime     time.Time `json:"departure_time" binding:"required"`
 	ArrivalTime       time.Time `json:"arrival_time" binding:"required"`
 	DelayMinutes      int       `json:"delay_minutes"`

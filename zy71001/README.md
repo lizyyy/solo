@@ -1,247 +1,343 @@
-# 航司机组调休补偿 API
+# 机组人员补偿 API
 
-基于 Go + Gin + SQLite 的轻量级后端服务，解决排班组处理机长和乘务调休申请的痛点。
+基于 Go + Gin + SQLite 的航司机组人员补偿申请管理系统，支持补偿申请的提交、两级审批流程、幂等性保障和操作追溯。
 
-## 功能特性
+## 项目简介
 
-- ✅ **材料登记**：基地、机组成员、调休申请管理
-- ✅ **幂等提交**：重复申请自动返回原处理结论
-- ✅ **状态流转**：pending → approved → completed 状态机
-- ✅ **操作追溯**：完整的处理日志链，支持单条追溯
-- ✅ **补偿摘要**：状态完成时自动生成补偿记录
-- ✅ **CSV 导出**：与查询结果一致的汇总下载
-- ✅ **持久化存储**：SQLite 数据库，重启服务数据不丢失
+本系统为航空公司提供机组人员（机长、乘务员等）的加班补偿申请和审批管理功能。主要功能包括：
 
-## 快速开始
+- **基础数据管理**：基地、机组人员、航班段信息管理
+- **补偿申请**：支持提交加班补偿申请，自动进行数据校验
+- **幂等性保障**：通过 Idempotency-Key 头防止重复提交
+- **两级审批流程**：组长审批 → 主管审批 → 最终批准
+- **操作追溯**：完整记录申请的所有状态变更历史
+- **数据导出**：支持 CSV 格式导出申请数据
+- **补偿汇总**：按人员统计补偿时长汇总
 
-### 1. 编译运行
+## 技术栈
 
-```bash
-# 编译
-go build -o crew-api .
+- **后端框架**：Gin Web Framework
+- **数据库**：SQLite3
+- **编程语言**：Go 1.x
+- **数据格式**：JSON
 
-# 启动服务
-./crew-api
-```
+## API 文档
 
-服务启动在 `http://localhost:8080`
+所有 API 前缀：`/api/v1`
 
-### 2. 目录结构
-
-```
-.
-├── main.go          # 完整服务实现（单文件）
-├── go.mod           # 依赖管理
-├── go.sum
-├── crew-api         # 编译后的可执行文件
-├── data/
-│   └── crew.db      # SQLite 数据库（自动创建）
-└── README.md
-```
-
-## API 接口
-
-### 基础信息
+### 健康检查
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| GET | `/api/v1/bases` | 获取基地列表 |
-| GET | `/api/v1/crew` | 获取所有机组人员 |
-| GET | `/api/v1/crew/:base_id` | 按基地获取人员 |
+| GET | `/health` | 服务健康检查 |
 
-### 申请管理
-
-#### 提交调休申请（幂等）
-
-```bash
-POST /api/v1/applications
-Headers: Idempotency-Key: <可选，自定义幂等键>
-Body:
+**响应示例：**
+```json
 {
-  "crew_id": "xxx",
-  "base_id": "xxx",
-  "comp_type": "delay_compensation",
-  "amount": 800,
-  "reason": "航班延误超过4小时"
+  "status": "ok",
+  "time": "2024-01-15T10:30:00Z"
 }
 ```
 
-**响应示例（首次提交）：**
+### 基地管理
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/bases` | 获取基地列表 |
+| POST | `/bases` | 创建新基地 |
+
+**创建基地请求体：**
 ```json
 {
-  "data": { ...申请详情... },
+  "name": "北京基地",
+  "code": "PEK",
+  "city": "北京"
+}
+```
+
+### 机组人员管理
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/crew` | 获取机组人员列表 |
+| POST | `/crew` | 创建新机组人员 |
+
+**创建机组人员请求体：**
+```json
+{
+  "name": "张三",
+  "employee_no": "CA001",
+  "base_id": "base-uuid",
+  "position": "机长",
+  "phone": "13800138000",
+  "email": "zhangsan@airline.com"
+}
+```
+
+### 航班段管理
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/flight-segments` | 获取航班段列表 |
+| POST | `/flight-segments` | 创建新航班段 |
+
+**创建航班段请求体：**
+```json
+{
+  "flight_no": "CA1234",
+  "departure_city": "北京",
+  "arrival_city": "上海",
+  "departure_time": "2024-01-15T08:00:00Z",
+  "arrival_time": "2024-01-15T10:30:00Z",
+  "actual_departure": "2024-01-15T08:30:00Z",
+  "actual_arrival": "2024-01-15T11:00:00Z",
+  "delay_minutes": 30,
+  "flight_date": "2024-01-15",
+  "crew_id": "crew-uuid"
+}
+```
+
+### 补偿申请管理
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/applications` | 获取申请列表 |
+| POST | `/applications` | 提交补偿申请（幂等） |
+| GET | `/applications/:id` | 获取申请详情 |
+| GET | `/applications/:id/trace` | 获取申请追溯日志 |
+| POST | `/applications/:id/generate-compensation` | 生成补偿记录 |
+| POST | `/applications/:id/leader-approve` | 组长审批 |
+| POST | `/applications/:id/supervisor-approve` | 主管审批 |
+| POST | `/applications/:id/final-approve` | 最终批准 |
+| POST | `/applications/:id/reject` | 拒绝申请 |
+| GET | `/applications/export/csv` | 导出 CSV |
+
+**提交补偿申请请求体：**
+```json
+{
+  "crew_id": "crew-uuid",
+  "flight_no": "CA1234",
+  "flight_date": "2024-01-15",
+  "departure_city": "北京",
+  "departure_time": "2024-01-15T08:00:00Z",
+  "arrival_time": "2024-01-15T10:30:00Z",
+  "delay_minutes": 30,
+  "compensation_type": "overtime",
+  "compensation_hours": 2.5,
+  "remarks": "航班延误加班"
+}
+```
+
+**审批请求体：**
+```json
+{
+  "approver_id": "approver-uuid",
+  "approver_name": "李主管",
+  "reject_reason": ""
+}
+```
+
+### 补偿记录管理
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/compensations` | 获取补偿记录列表 |
+| GET | `/compensations/summary` | 获取补偿汇总 |
+
+## 幂等检查说明
+
+### 实现方式
+
+系统通过 HTTP 请求头 `Idempotency-Key` 实现幂等性保障。
+
+### 使用方法
+
+在提交补偿申请时，在请求头中添加 `Idempotency-Key`：
+
+```bash
+curl -X POST http://localhost:8080/api/v1/applications \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: your-unique-key-12345" \
+  -d '{...}'
+```
+
+### 工作原理
+
+1. **客户端生成唯一键**：客户端为每个请求生成一个唯一的幂等键
+2. **服务端校验**：服务端接收请求后，先检查数据库中是否存在该幂等键
+3. **重复请求处理**：
+   - 如果已存在：直接返回原有申请记录，不创建新申请
+   - 如果不存在：创建新申请并记录该幂等键
+
+### 重复响应格式
+
+**首次提交（200 OK）：**
+```json
+{
+  "id": "app-uuid",
+  "crew_id": "crew-uuid",
+  "flight_no": "CA1234",
+  "status": "pending",
   "idempotent": false,
   "message": "Application submitted successfully"
 }
 ```
 
-**响应示例（重复提交）：**
+**重复提交（200 OK）：**
 ```json
 {
-  "data": { ...原有申请详情... },
+  "id": "app-uuid",
+  "crew_id": "crew-uuid",
+  "flight_no": "CA1234",
+  "status": "pending",
   "idempotent": true,
-  "message": "Request already processed"
+  "message": "Request already processed, returning existing application"
 }
 ```
 
-#### 获取申请列表
+### 自动幂等键生成
 
-```bash
-GET /api/v1/applications?status=pending&crew_id=xxx&base_id=xxx
+如果客户端未提供 `Idempotency-Key`，系统会自动基于以下字段生成哈希键：
+- `crew_id`（机组人员ID）
+- `flight_no`（航班号）
+- `flight_date`（航班日期）
+
+确保同一人员同一航班的申请自动具有幂等性。
+
+## 两级审批流程说明
+
+### 状态流转图
+
+```
+pending（待审批）
+    │
+    ├─→ leader_approved（组长已批准）
+    │       │
+    │       ├─→ supervisor_approved（主管已批准）
+    │       │       │
+    │       │       └─→ approved（最终批准）
+    │       │
+    │       └─→ rejected（已拒绝）
+    │
+    └─→ rejected（已拒绝）
 ```
 
-#### 获取申请详情
+### 状态说明
+
+| 状态 | 说明 | 可执行操作 |
+|------|------|------------|
+| `pending` | 待审批，申请已提交等待组长审批 | 组长审批、拒绝 |
+| `leader_approved` | 组长已批准，等待主管审批 | 主管审批、拒绝 |
+| `supervisor_approved` | 主管已批准，等待最终批准 | 最终批准、拒绝 |
+| `approved` | 已批准，补偿申请生效 | 无 |
+| `rejected` | 已拒绝，申请作废 | 无 |
+
+### 审批流程
+
+1. **提交申请**：机组人员提交补偿申请，状态为 `pending`
+2. **组长审批**：组长审核申请，通过后状态变为 `leader_approved`
+3. **主管审批**：主管审核申请，通过后状态变为 `supervisor_approved`
+4. **最终批准**：管理员最终确认，状态变为 `approved`，补偿生效
+
+**任意阶段**都可以拒绝申请，状态变为 `rejected`，流程终止。
+
+### 操作追溯
+
+每个状态变更都会记录到 `processing_logs` 表，包含：
+- 操作类型（status_change）
+- 变更前后状态
+- 操作人ID和姓名
+- 操作详情/备注
+- 操作IP地址
+- 操作时间
+
+通过 `/applications/:id/trace` 接口可以查询完整的审批历史。
+
+## 启动方式
+
+### 环境要求
+
+- Go 1.18+
+- SQLite3（已内嵌驱动）
+
+### 编译运行
 
 ```bash
-GET /api/v1/applications/:id
+# 克隆项目
+cd crew-compensation-api
+
+# 下载依赖
+go mod download
+
+# 编译
+go build -o crew-compensation-api ./cmd/api
+
+# 启动服务
+./crew-compensation-api
 ```
 
-#### 状态流转
+### 直接运行
 
 ```bash
-PUT /api/v1/applications/:id/status
-Body:
-{
-  "status": "approved",
-  "operator": "调度员A",
-  "remark": "情况属实，同意补偿"
-}
+go run ./cmd/api/main.go
 ```
 
-**支持的状态：**
-- `pending` - 待审核
-- `approved` - 已批准
-- `rejected` - 已拒绝
-- `processing` - 处理中
-- `completed` - 已完成（自动生成补偿记录）
+### 服务地址
 
-#### 申请追溯
+服务启动后监听在 `http://localhost:8080`
+
+### 数据库
+
+系统使用 SQLite 数据库，首次启动会自动创建：
+- 数据库文件：`crew_compensation.db`
+- 自动创建所有数据表和索引
+
+## 测试
+
+项目提供 `test_api.sh` 脚本用于快速测试 API 接口：
 
 ```bash
-GET /api/v1/applications/:id/trace
+# 确保服务已启动
+./crew-compensation-api
+
+# 新开终端执行测试
+chmod +x test_api.sh
+./test_api.sh
 ```
 
-返回完整的状态变更日志，包括：操作人、操作时间、前后状态、备注
+## 目录结构
 
-### 导出功能
-
-```bash
-GET /api/v1/applications/export/csv?status=completed
 ```
-
-导出 CSV 文件，包含：申请ID、人员姓名、基地、补偿类型、金额、状态、原因、创建时间
-
-### 补偿记录
-
-```bash
-GET /api/v1/compensations?crew_id=xxx
+crew-compensation-api/
+├── cmd/
+│   └── api/
+│       └── main.go           # 程序入口
+├── internal/
+│   ├── database/
+│   │   └── database.go       # 数据库初始化
+│   ├── handlers/
+│   │   └── handlers.go       # API 处理器
+│   ├── models/
+│   │   └── models.go         # 数据模型
+│   └── services/
+│       ├── status_service.go    # 状态流转服务
+│       └── validation_service.go # 校验和幂等服务
+├── go.mod
+├── go.sum
+├── README.md
+└── test_api.sh              # API 测试脚本
 ```
 
 ## 数据模型
 
-### bases（基地表）
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | TEXT | 主键UUID |
-| name | TEXT | 基地名称 |
-| description | TEXT | 描述 |
-| created_at | DATETIME | 创建时间 |
+### 核心表结构
 
-### crew（机组人员表）
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | TEXT | 主键UUID |
-| name | TEXT | 姓名 |
-| base_id | TEXT | 所属基地ID |
-| role | TEXT | 角色（机长/乘务） |
-| created_at | DATETIME | 创建时间 |
-
-### apps（申请表）
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | TEXT | 主键UUID |
-| idempotency_key | TEXT | 幂等键（唯一索引） |
-| crew_id | TEXT | 人员ID |
-| base_id | TEXT | 基地ID |
-| comp_type | TEXT | 补偿类型 |
-| amount | REAL | 金额 |
-| status | TEXT | 状态 |
-| reason | TEXT | 原因 |
-| created_at | DATETIME | 创建时间 |
-| updated_at | DATETIME | 更新时间 |
-
-### comp（补偿表）
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | TEXT | 主键UUID |
-| application_id | TEXT | 申请ID |
-| crew_id | TEXT | 人员ID |
-| amount | REAL | 金额 |
-| paid_at | DATETIME | 发放时间 |
-| created_at | DATETIME | 创建时间 |
-
-### logs（操作日志表）
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | TEXT | 主键UUID |
-| application_id | TEXT | 申请ID |
-| action | TEXT | 操作类型 |
-| from_status | TEXT | 原状态 |
-| to_status | TEXT | 新状态 |
-| operator | TEXT | 操作人 |
-| remark | TEXT | 备注 |
-| created_at | DATETIME | 操作时间 |
-
-## 核心逻辑说明
-
-### 幂等性实现
-
-通过 HTTP Header `Idempotency-Key` 实现：
-1. 客户端传入自定义幂等键
-2. 服务端检查数据库中是否存在该键
-3. 存在则直接返回原有申请（`idempotent: true`）
-4. 不存在则创建新申请（`idempotent: false`）
-5. 未传入时自动生成 UUID
-
-### 状态机流转
-
-```
-pending → approved  → completed → 自动生成补偿记录
-        ↘ rejected
-        ↘ processing → approved → completed
-```
-
-状态变更时自动记录操作日志，支持完整追溯。
-
-### 数据一致性
-
-- 所有写入操作使用数据库事务
-- CSV 导出直接查询数据库，与列表查询结果一致
-- SQLite ACID 特性保证数据持久化
-
-## 测试示例
-
-```bash
-# 1. 获取基地列表
-curl http://localhost:8080/api/v1/bases
-
-# 2. 获取机组人员
-curl http://localhost:8080/api/v1/crew
-
-# 3. 提交申请（带幂等键）
-curl -X POST http://localhost:8080/api/v1/applications \
-  -H "Content-Type: application/json" \
-  -H "Idempotency-Key: TEST-001" \
-  -d '{"crew_id":"xxx","base_id":"xxx","comp_type":"delay","amount":500,"reason":"测试"}'
-
-# 4. 审核申请
-curl -X PUT http://localhost:8080/api/v1/applications/{id}/status \
-  -H "Content-Type: application/json" \
-  -d '{"status":"approved","operator":"张三","remark":"同意"}'
-
-# 5. 导出CSV
-curl -OJ http://localhost:8080/api/v1/applications/export/csv
-```
+- **bases**：基地表
+- **crew_members**：机组人员表
+- **flight_segments**：航班段表
+- **applications**：补偿申请表
+- **compensation_summaries**：补偿汇总表
+- **processing_logs**：处理日志表
 
 ## License
 

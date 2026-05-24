@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/csv"
 	"net/http"
+	"strconv"
 	"time"
 
 	"crew-compensation-api/internal/models"
@@ -32,18 +34,46 @@ func (h *Handler) CreateApplication(c *gin.Context) {
 		return
 	}
 
-	idempotencyKey := h.validationService.GenerateIdempotencyKey(req.CrewID, req.FlightNo, req.FlightDate)
-	exists, existingID, err := h.validationService.CheckIdempotency(idempotencyKey)
+	idempotencyKey := c.GetHeader("Idempotency-Key")
+	if idempotencyKey == "" {
+		idempotencyKey = h.validationService.GenerateIdempotencyKey(req.CrewID, req.FlightNo, req.FlightDate)
+	}
+
+	exists, existingApp, err := h.validationService.CheckIdempotency(idempotencyKey)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	if exists {
-		c.JSON(http.StatusConflict, gin.H{"error": "application already exists", "application_id": existingID})
+		c.JSON(http.StatusOK, gin.H{
+			"is_duplicate": true,
+			"original_application": gin.H{
+				"id":                     existingApp.ID,
+				"crew_id":                existingApp.CrewID,
+				"flight_no":              existingApp.FlightNo,
+				"flight_date":            existingApp.FlightDate,
+				"status":                 existingApp.Status,
+				"leader_approved_by":     existingApp.LeaderApprovedBy,
+				"leader_approved_at":     existingApp.LeaderApprovedAt,
+				"supervisor_approved_by": existingApp.SupervisorApprovedBy,
+				"supervisor_approved_at": existingApp.SupervisorApprovedAt,
+				"rejected_by":            existingApp.RejectedBy,
+				"rejected_at":            existingApp.RejectedAt,
+				"reject_reason":          existingApp.RejectReason,
+				"created_at":             existingApp.CreatedAt,
+			},
+		})
 		return
 	}
 
 	isCrossBase := false
+	if req.DepartureCity != "" {
+		isCrossBase, _, err = h.validationService.CheckBaseConflict(req.CrewID, req.DepartureCity)
+		if err != nil {
+			isCrossBase = false
+		}
+	}
+
 	restHours, restPassed := h.validationService.CheckRestHours(req.ArrivalTime, time.Now())
 	matchScore := h.validationService.CalculateMatchScore(&req)
 

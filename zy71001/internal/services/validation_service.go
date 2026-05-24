@@ -25,17 +25,32 @@ func (s *ValidationService) GenerateIdempotencyKey(crewID, flightNo, flightDate 
 	return hex.EncodeToString(hash[:])
 }
 
-func (s *ValidationService) CheckIdempotency(idempotencyKey string) (bool, string, error) {
-	var id string
-	query := "SELECT id FROM applications WHERE idempotency_key = ? LIMIT 1"
-	err := s.db.QueryRow(query, idempotencyKey).Scan(&id)
+func (s *ValidationService) CheckIdempotency(idempotencyKey string) (bool, *models.Application, error) {
+	var app models.Application
+	var leaderApprovedAt, supervisorApprovedAt, rejectedAt sql.NullTime
+	query := "SELECT id, crew_id, flight_no, flight_date, status, leader_approved_by, leader_approved_at, supervisor_approved_by, supervisor_approved_at, rejected_by, rejected_at, reject_reason, created_at FROM applications WHERE idempotency_key = ? LIMIT 1"
+	err := s.db.QueryRow(query, idempotencyKey).Scan(
+		&app.ID, &app.CrewID, &app.FlightNo, &app.FlightDate, &app.Status,
+		&app.LeaderApprovedBy, &leaderApprovedAt,
+		&app.SupervisorApprovedBy, &supervisorApprovedAt,
+		&app.RejectedBy, &rejectedAt, &app.RejectReason, &app.CreatedAt,
+	)
 	if err == sql.ErrNoRows {
-		return false, "", nil
+		return false, nil, nil
 	}
 	if err != nil {
-		return false, "", err
+		return false, nil, err
 	}
-	return true, id, nil
+	if leaderApprovedAt.Valid {
+		app.LeaderApprovedAt = leaderApprovedAt.Time
+	}
+	if supervisorApprovedAt.Valid {
+		app.SupervisorApprovedAt = supervisorApprovedAt.Time
+	}
+	if rejectedAt.Valid {
+		app.RejectedAt = rejectedAt.Time
+	}
+	return true, &app, nil
 }
 
 func (s *ValidationService) CheckRestHours(arrivalTime, applicationTime time.Time) (float64, bool) {

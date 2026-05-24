@@ -37,15 +37,43 @@ func Run() {
 	api := r.Group("/api/v1")
 	{
 		api.GET("/health", h.HealthCheck)
+
+		bases := api.Group("/bases")
+		{
+			bases.GET("", h.ListBases)
+			bases.POST("", h.CreateBase)
+		}
+
+		crew := api.Group("/crew")
+		{
+			crew.GET("", h.ListCrew)
+			crew.POST("", h.CreateCrew)
+		}
+
+		flightSegments := api.Group("/flight-segments")
+		{
+			flightSegments.GET("", h.ListFlightSegments)
+			flightSegments.POST("", h.CreateFlightSegment)
+		}
+
 		applications := api.Group("/applications")
 		{
 			applications.POST("", h.CreateApplication)
 			applications.GET("", h.ListApplications)
 			applications.GET("/:id", h.GetApplication)
+			applications.GET("/:id/trace", h.GetApplicationTrace)
+			applications.POST("/:id/generate-compensation", h.GenerateCompensation)
 			applications.POST("/:id/leader-approve", h.LeaderApprove)
 			applications.POST("/:id/supervisor-approve", h.SupervisorApprove)
 			applications.POST("/:id/final-approve", h.FinalApprove)
 			applications.POST("/:id/reject", h.Reject)
+			applications.GET("/export/csv", h.ExportApplicationsCSV)
+		}
+
+		compensations := api.Group("/compensations")
+		{
+			compensations.GET("", h.ListCompensations)
+			compensations.GET("/summary", h.GetCompensationSummary)
 		}
 	}
 
