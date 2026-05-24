@@ -1,0 +1,31 @@
+{
+  "name": "yaml-anchor-expander",
+  "version": "1.0.0",
+  "description": "YAML Anchor 展开 CLI 工具 - 解析 anchor、merge key、环境覆盖，生成详细报告",
+  "main": "dist/index.js",
+  "bin": {
+    "yaml-expand": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/cli.ts",
+    "test": "ts-node src/cli.ts self-test",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": ["yaml", "anchor", "merge", "config", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0",
+    "chalk": "^4.1.2",
+    "diff": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.10.0",
+    "@types/diff": "^5.0.9",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  }
+}

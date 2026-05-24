@@ -1,0 +1,51 @@
+defaults:
+  adapter: postgres
+  host: localhost
+  port: 5432
+  pool:
+    min: 2
+    max: 10
+  timeout: 30000
+logging:
+  level: info
+  format: json
+  timestamp: true
+development:
+  adapter: postgres
+  host: localhost
+  port: 5432
+  pool:
+    min: 2
+    max: 10
+  timeout: 30000
+  database: app_dev
+  logging:
+    level: debug
+    format: json
+    timestamp: true
+test:
+  adapter: postgres
+  host: localhost
+  port: 5432
+  pool:
+    min: 1
+    max: 5
+  timeout: 30000
+  database: app_test
+production:
+  adapter: postgres
+  host: prod-primary.example.com
+  port: 5432
+  pool:
+    min: 10
+    max: 50
+  timeout: 120000
+  database: app_prod
+  logging:
+    level: warn
+    format: json
+    timestamp: true
+features:
+  auth: true
+  caching: true
+  rate_limit: 5000

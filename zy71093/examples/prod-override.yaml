@@ -1,0 +1,10 @@
+production:
+  host: prod-primary.example.com
+  pool:
+    min: 10
+    max: 50
+  timeout: 120000
+
+features:
+  caching: true
+  rate_limit: 5000

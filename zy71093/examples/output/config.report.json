@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "inputFile": "examples/config.yaml",
+    "timestamp": "2026-05-24T13:08:21.318Z",
+    "version": "1.0.0"
+  },
+  "summary": {
+    "totalAnchors": 0,
+    "totalAliases": 0,
+    "totalMergeKeys": 0,
+    "totalOverrides": 6,
+    "warnings": 0,
+    "errors": 0,
+    "hasCycle": false
+  },
+  "anchors": [],
+  "mergeKeys": [],
+  "overrides": [
+    {
+      "path": "production.host",
+      "oldValue": "prod.example.com",
+      "newValue": "prod-primary.example.com",
+      "source": "examples/prod-override.yaml",
+      "order": 0
+    },
+    {
+      "path": "production.pool.min",
+      "oldValue": 2,
+      "newValue": 10,
+      "source": "examples/prod-override.yaml",
+      "order": 0
+    },
+    {
+      "path": "production.pool.max",
+      "oldValue": 10,
+      "newValue": 50,
+      "source": "examples/prod-override.yaml",
+      "order": 0
+    },
+    {
+      "path": "production.timeout",
+      "oldValue": 60000,
+      "newValue": 120000,
+      "source": "examples/prod-override.yaml",
+      "order": 0
+    },
+    {
+      "path": "features.caching",
+      "oldValue": false,
+      "newValue": true,
+      "source": "examples/prod-override.yaml",
+      "order": 0
+    },
+    {
+      "path": "features.rate_limit",
+      "oldValue": 1000,
+      "newValue": 5000,
+      "source": "examples/prod-override.yaml",
+      "order": 0
+    }
+  ],
+  "expandedYaml": "defaults:\n  adapter: postgres\n  host: localhost\n  port: 5432\n  pool:\n    min: 2\n    max: 10\n  timeout: 30000\nlogging:\n  level: info\n  format: json\n  timestamp: true\ndevelopment:\n  adapter: postgres\n  host: localhost\n  port: 5432\n  pool:\n    min: 2\n    max: 10\n  timeout: 30000\n  database: app_dev\n  logging:\n    level: debug\n    format: json\n    timestamp: true\ntest:\n  adapter: postgres\n  host: localhost\n  port: 5432\n  pool:\n    min: 1\n    max: 5\n  timeout: 30000\n  database: app_test\nproduction:\n  adapter: postgres\n  host: prod-primary.example.com\n  port: 5432\n  pool:\n    min: 10\n    max: 50\n  timeout: 120000\n  database: app_prod\n  logging:\n    level: warn\n    format: json\n    timestamp: true\nfeatures:\n  auth: true\n  caching: true\n  rate_limit: 5000\n",
+  "originalYaml": "defaults:\n  adapter: postgres\n  host: localhost\n  port: 5432\n  pool:\n    min: 2\n    max: 10\n  timeout: 30000\nlogging:\n  level: info\n  format: json\n  timestamp: true\ndevelopment:\n  adapter: postgres\n  host: localhost\n  port: 5432\n  pool:\n    min: 2\n    max: 10\n  timeout: 30000\n  database: app_dev\n  logging:\n    level: debug\n    format: json\n    timestamp: true\ntest:\n  adapter: postgres\n  host: localhost\n  port: 5432\n  pool:\n    min: 1\n    max: 5\n  timeout: 30000\n  database: app_test\nproduction:\n  adapter: postgres\n  host: prod.example.com\n  port: 5432\n  pool:\n    min: 2\n    max: 10\n  timeout: 60000\n  database: app_prod\n  logging:\n    level: warn\n    format: json\n    timestamp: true\nfeatures:\n  auth: true\n  caching: false\n  rate_limit: 1000\n",
+  "diff": "Index: yaml\n===================================================================\n--- yaml\toriginal\n+++ yaml\texpanded\n@@ -33,19 +33,19 @@\n   timeout: 30000\n   database: app_test\n production:\n   adapter: postgres\n-  host: prod.example.com\n+  host: prod-primary.example.com\n   port: 5432\n   pool:\n-    min: 2\n-    max: 10\n-  timeout: 60000\n+    min: 10\n+    max: 50\n+  timeout: 120000\n   database: app_prod\n   logging:\n     level: warn\n     format: json\n     timestamp: true\n features:\n   auth: true\n-  caching: false\n-  rate_limit: 1000\n+  caching: true\n+  rate_limit: 5000\n"
+}
