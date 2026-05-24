@@ -104,6 +104,21 @@ class SelfTester {
     } catch (e) {
       this._addTest('公式解析 - 中文工作表名', false, e.message);
     }
+
+    try {
+      const namedRanges = [
+        { name: 'Revenue_Input', reference: 'Sheet1!B1:B3', sheetName: 'Sheet1' },
+        { name: 'GrowthRate', reference: 'Sheet1!B2', sheetName: 'Sheet1' },
+      ];
+      const deps6 = parser.parseDependencies('SUM(Revenue_Input)+GrowthRate', 'Sheet2', namedRanges);
+      const hasB1 = deps6.includes('Sheet1!B1');
+      const hasB2 = deps6.includes('Sheet1!B2');
+      const hasB3 = deps6.includes('Sheet1!B3');
+      this._addTest('公式解析 - 命名区域', hasB1 && hasB2 && hasB3 && deps6.length === 3,
+        `期望包含Sheet1!B1,B2,B3共3个依赖，实际: ${deps6.join(', ')}`);
+    } catch (e) {
+      this._addTest('公式解析 - 命名区域', false, e.message);
+    }
   }
 
   async _testWithSampleFile() {

@@ -9,7 +9,8 @@ async function main() {
     await cli.run(process.argv);
   } catch (error) {
     console.error('\n错误:', error.message);
-    process.exit(exitCodes.RUNTIME_ERROR);
+    const exitCode = error.code || exitCodes.RUNTIME_ERROR;
+    process.exit(exitCode);
   }
 }
 

@@ -110,6 +110,13 @@ class CLI {
     const startTime = Date.now();
     const result = await this._analyzeFile(file, options);
 
+    const cellExists = result.graphInstance.getNode(cell);
+    if (!cellExists) {
+      const error = new Error(`单元格不存在: ${cell}`);
+      error.code = exitCodes.INVALID_ARGUMENTS;
+      throw error;
+    }
+
     const impact = result.graphInstance.getImpactPath(cell);
 
     const terminalReporter = new TerminalReporter();
@@ -168,10 +175,41 @@ class CLI {
     };
 
     const parser = new WorkbookParser(file, parserOptions);
-    const workbookData = parser.parse();
+    let workbookData = parser.parse();
+
+    if (options.sheet) {
+      const sheetExists = workbookData.sheets.some(s => s.name === options.sheet);
+      if (!sheetExists) {
+        const error = new Error(`工作表不存在: ${options.sheet}。可用工作表: ${workbookData.sheets.map(s => s.name).join(', ')}`);
+        error.code = exitCodes.INVALID_ARGUMENTS;
+        throw error;
+      }
+      workbookData = {
+        ...workbookData,
+        sheets: workbookData.sheets.filter(s => s.name === options.sheet),
+      };
+    }
 
     const graph = new DependencyGraph();
     const graphData = graph.build(workbookData);
+
+    if (options.cell) {
+      const cellExists = graph.getNode(options.cell);
+      if (!cellExists) {
+        const error = new Error(`单元格不存在: ${options.cell}`);
+        error.code = exitCodes.INVALID_ARGUMENTS;
+        throw error;
+      }
+    }
+
+    if (options.dependency) {
+      const cellExists = graph.getNode(options.dependency);
+      if (!cellExists) {
+        const error = new Error(`单元格不存在: ${options.dependency}`);
+        error.code = exitCodes.INVALID_ARGUMENTS;
+        throw error;
+      }
+    }
 
     return {
       workbook: workbookData,

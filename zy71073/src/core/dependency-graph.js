@@ -10,7 +10,7 @@ class DependencyGraph {
   }
 
   build(workbookData) {
-    const { sheets } = workbookData;
+    const { sheets, namedRanges } = workbookData;
 
     sheets.forEach(sheet => {
       sheet.cells.forEach(cell => {
@@ -32,7 +32,8 @@ class DependencyGraph {
       sheet.formulas.forEach(cell => {
         const dependencies = this.formulaParser.parseDependencies(
           cell.formula,
-          sheet.name
+          sheet.name,
+          namedRanges || []
         );
 
         const node = this.nodes.get(cell.address);

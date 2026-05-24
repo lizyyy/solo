@@ -2,9 +2,10 @@ class FormulaParser {
   constructor() {
     this.cellRefPattern = /\$?[A-Za-z]+\$?[0-9]+/;
     this.rangeRefPattern = /\$?[A-Za-z]+\$?[0-9]+:\$?[A-Za-z]+\$?[0-9]+/;
+    this.namedRefPattern = /^[A-Za-z_][A-Za-z0-9_]*$/;
   }
 
-  parseDependencies(formula, currentSheetName) {
+  parseDependencies(formula, currentSheetName, namedRanges = []) {
     if (!formula) return [];
 
     const dependencies = new Set();
@@ -84,6 +85,27 @@ class FormulaParser {
         dependencies.add(fullRef);
         seen.add(fullRef);
       }
+    }
+
+    if (namedRanges.length > 0) {
+      const namedRangeMap = new Map();
+      namedRanges.forEach(nr => {
+        namedRangeMap.set(nr.name, nr);
+      });
+
+      const potentialNames = cleanedFormula.match(/[A-Za-z_][A-Za-z0-9_]*/g) || [];
+      potentialNames.forEach(name => {
+        const namedRange = namedRangeMap.get(name);
+        if (namedRange) {
+          const ref = namedRange.reference;
+          const parts = ref.split('!');
+          if (parts.length > 1) {
+            this._addRangeDependencies(dependencies, parts[0].replace(/'/g, ''), parts[1]);
+          } else {
+            this._addRangeDependencies(dependencies, namedRange.sheetName, ref);
+          }
+        }
+      });
     }
 
     return Array.from(dependencies);
