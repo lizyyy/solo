@@ -1,0 +1,117 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-05-24T10:56:53.983Z",
+  "summary": {
+    "fileName": "sample-with-bad-rows.csv",
+    "inputFile": "/Users/lzy/pro/solo/workspaces/zy71054/tests/sample-with-bad-rows.csv",
+    "success": true,
+    "exitCode": 0
+  },
+  "detection": {
+    "encoding": "UTF-8",
+    "hasBOM": false,
+    "encodingConfidence": 1,
+    "encodingCandidates": [
+      {
+        "encoding": "UTF-8",
+        "confidence": 1
+      }
+    ],
+    "delimiter": ","
+  },
+  "statistics": {
+    "totalLines": 9,
+    "goodRecords": 5,
+    "badRecords": 2,
+    "skippedRecords": 0,
+    "headerCount": 4
+  },
+  "headers": {
+    "original": [
+      "订单号",
+      "客户名称",
+      "金额",
+      "日期"
+    ],
+    "final": [
+      "订单号",
+      "客户名称",
+      "金额",
+      "日期"
+    ]
+  },
+  "warnings": [],
+  "issues": [],
+  "badRecords": [
+    {
+      "lineNumber": 4,
+      "lineNumbers": [
+        4
+      ],
+      "type": "column_count_mismatch",
+      "message": "列数不匹配: 期望 4, 实际 3",
+      "columnCount": 3,
+      "expectedColumns": 4,
+      "columns": [
+        "ORD003",
+        "广州电子科技公司",
+        "坏行缺少字段"
+      ]
+    },
+    {
+      "lineNumber": 5,
+      "lineNumbers": [
+        5
+      ],
+      "type": "column_count_mismatch",
+      "message": "列数不匹配: 期望 4, 实际 6",
+      "columnCount": 6,
+      "expectedColumns": 4,
+      "columns": [
+        "ORD004",
+        "深圳网络公司",
+        "3200.00",
+        "2024-01-18",
+        "多余字段",
+        "异常"
+      ]
+    }
+  ],
+  "preview": [
+    {
+      "_lineNumber": 2,
+      "订单号": "ORD001",
+      "客户名称": "北京科技有限公司",
+      "金额": "1500.00",
+      "日期": "2024-01-15"
+    },
+    {
+      "_lineNumber": 3,
+      "订单号": "ORD002",
+      "客户名称": "上海贸易公司",
+      "金额": "2300.50",
+      "日期": "2024-01-16"
+    },
+    {
+      "_lineNumber": 4,
+      "订单号": "ORD003",
+      "客户名称": "广州电子科技公司",
+      "金额": "坏行缺少字段",
+      "日期": ""
+    },
+    {
+      "_lineNumber": 5,
+      "订单号": "ORD004",
+      "客户名称": "深圳网络公司",
+      "金额": "3200.00",
+      "日期": "2024-01-18"
+    },
+    {
+      "_lineNumber": 6,
+      "订单号": "ORD005",
+      "客户名称": "杭州软件开发公司",
+      "金额": "1800.00",
+      "日期": "2024-01-19"
+    }
+  ]
+}

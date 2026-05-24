@@ -1,0 +1,29 @@
+{
+  "name": "csv-fixer-cli",
+  "version": "1.0.0",
+  "description": "CSV 编码嗅探修复 CLI 工具 - 自动检测编码、推断分隔符、修复乱码和坏行",
+  "main": "src/index.js",
+  "bin": {
+    "csvfix": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": [
+    "csv",
+    "encoding",
+    "fixer",
+    "cli",
+    "gbk",
+    "utf-8"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chardet": "^1.6.0",
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "iconv-lite": "^0.6.3"
+  }
+}

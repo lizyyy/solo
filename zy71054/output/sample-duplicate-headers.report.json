@@ -1,0 +1,87 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-05-24T10:57:03.628Z",
+  "summary": {
+    "fileName": "sample-duplicate-headers.csv",
+    "inputFile": "/Users/lzy/pro/solo/workspaces/zy71054/tests/sample-duplicate-headers.csv",
+    "success": true,
+    "exitCode": 0
+  },
+  "detection": {
+    "encoding": "UTF-8",
+    "hasBOM": false,
+    "encodingConfidence": 1,
+    "encodingCandidates": [
+      {
+        "encoding": "UTF-8",
+        "confidence": 1
+      }
+    ],
+    "delimiter": ","
+  },
+  "statistics": {
+    "totalLines": 4,
+    "goodRecords": 2,
+    "badRecords": 0,
+    "skippedRecords": 0,
+    "headerCount": 6
+  },
+  "headers": {
+    "original": [
+      "id",
+      "name",
+      "email",
+      "phone",
+      "name",
+      "email"
+    ],
+    "final": [
+      "id",
+      "name",
+      "email",
+      "phone",
+      "name_1",
+      "email_1"
+    ]
+  },
+  "warnings": [
+    {
+      "type": "duplicate_headers",
+      "message": "发现 2 个重复表头",
+      "duplicates": [
+        {
+          "header": "name",
+          "firstIndex": 1,
+          "secondIndex": 4
+        },
+        {
+          "header": "email",
+          "firstIndex": 2,
+          "secondIndex": 5
+        }
+      ]
+    }
+  ],
+  "issues": [],
+  "badRecords": [],
+  "preview": [
+    {
+      "_lineNumber": 2,
+      "id": "1",
+      "name": "张三",
+      "email": "zhangsan@test.com",
+      "phone": "13800138000",
+      "name_1": "张先生",
+      "email_1": "zhang@example.com"
+    },
+    {
+      "_lineNumber": 3,
+      "id": "2",
+      "name": "李四",
+      "email": "lisi@test.com",
+      "phone": "13900139000",
+      "name_1": "李先生",
+      "email_1": "li@example.com"
+    }
+  ]
+}
