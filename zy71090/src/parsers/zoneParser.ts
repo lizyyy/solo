@@ -53,7 +53,7 @@ function parseAWSFormat(data: any, zoneName: string): ZoneData {
   
   for (const rrset of data.ResourceRecordSets) {
     const ttl = rrset.TTL || 300;
-    const name = rrset.Name.endsWith('.') ? rrset.Name.slice(0, -1) : rrset.Name;
+    const name = normalizeDomain(rrset.Name);
     
     if (rrset.ResourceRecords) {
       for (const rr of rrset.ResourceRecords) {
@@ -61,7 +61,7 @@ function parseAWSFormat(data: any, zoneName: string): ZoneData {
           name,
           type: rrset.Type,
           ttl,
-          value: rr.Value,
+          value: normalizeRecordValue(rrset.Type, rr.Value),
           setIdentifier: rrset.SetIdentifier,
           weight: rrset.Weight
         });
@@ -73,7 +73,7 @@ function parseAWSFormat(data: any, zoneName: string): ZoneData {
         name,
         type: rrset.Type,
         ttl,
-        value: rrset.AliasTarget.DNSName,
+        value: normalizeDomain(rrset.AliasTarget.DNSName),
         comment: 'ALIAS record'
       });
     }

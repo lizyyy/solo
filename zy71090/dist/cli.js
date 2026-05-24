@@ -34,14 +34,18 @@ program
     .option('-f, --format <formats>', '输出格式，逗号分隔: json,markdown,terminal', (val) => val.split(','), ['terminal'])
     .option('-v, --verbose', '显示详细输出', false)
     .option('-s, --strict', '严格模式，遇到警告也返回非零退出码', false)
-    .option('--no-expand-cname', '不展开 CNAME 链路分析', true)
+    .option('--no-expand-cname', '不展开 CNAME 链路分析')
     .option('--max-chain-depth <number>', 'CNAME 链路最大展开深度', (val) => parseInt(val, 10), default_1.MAX_CNAME_CHAIN_DEPTH)
     .option('--min-ttl-warn <seconds>', '最小 TTL 警告阈值', (val) => parseInt(val, 10), default_1.DEFAULT_MIN_TTL_WARN)
     .option('--max-ttl-warn <seconds>', '最大 TTL 警告阈值', (val) => parseInt(val, 10), default_1.DEFAULT_MAX_TTL_WARN)
     .action(async (options) => {
     try {
         const startTime = Date.now();
-        const validatedOptions = validator_1.cliOptionsSchema.parse(options);
+        const normalizedOptions = {
+            ...options,
+            expandCNAME: options.expandCname !== undefined ? options.expandCname : true
+        };
+        const validatedOptions = validator_1.cliOptionsSchema.parse(normalizedOptions);
         const outputDir = (0, path_1.resolve)(validatedOptions.outputDir);
         if (!(0, fs_1.existsSync)(outputDir)) {
             (0, fs_1.mkdirSync)(outputDir, { recursive: true });
@@ -189,25 +193,46 @@ function generateSummary(zoneData, ttlAnalysis, environmentAnalysis, cnameChains
 }
 function findMissingRecords(environmentAnalysis, environments) {
     const missing = [];
-    const recordMap = new Map();
+    const envPrefixes = {
+        production: ['prod-', 'production-'],
+        staging: ['stg-', 'staging-', 'stage-'],
+        testing: ['test-', 'testing-', 'tst-', 'qa-'],
+        development: ['dev-', 'development-', 'local-'],
+        internal: ['int-', 'internal-'],
+        monitoring: ['mon-', 'monitor-']
+    };
+    const baseNameToEnvToRecord = new Map();
     for (const envRecord of environmentAnalysis) {
-        const key = `${envRecord.record.name}:${envRecord.record.type}`;
-        if (!recordMap.has(key)) {
-            recordMap.set(key, new Set());
-        }
-        for (const env of envRecord.environments) {
-            recordMap.get(key).add(env);
+        const record = envRecord.record;
+        const nameLower = record.name.toLowerCase();
+        for (const [env, prefixes] of Object.entries(envPrefixes)) {
+            for (const prefix of prefixes) {
+                if (nameLower.startsWith(prefix)) {
+                    const baseName = nameLower.slice(prefix.length);
+                    const fullKey = `${baseName}:${record.type}`;
+                    if (!baseNameToEnvToRecord.has(fullKey)) {
+                        baseNameToEnvToRecord.set(fullKey, new Map());
+                    }
+                    baseNameToEnvToRecord.get(fullKey).set(env, { name: record.name, type: record.type });
+                    break;
+                }
+            }
         }
     }
-    for (const [key, foundEnvs] of recordMap) {
-        const [recordName, type] = key.split(':');
+    for (const [fullKey, envToRecord] of baseNameToEnvToRecord) {
+        const [baseName, type] = fullKey.split(':');
+        const foundEnvs = Array.from(envToRecord.keys());
         for (const env of environments) {
-            if (!foundEnvs.has(env)) {
+            const prefixes = envPrefixes[env] || [];
+            if (prefixes.length === 0)
+                continue;
+            if (!envToRecord.has(env) && foundEnvs.length > 0) {
+                const sampleRecord = envToRecord.get(foundEnvs[0]);
                 missing.push({
                     environment: env,
-                    recordName,
-                    type,
-                    foundInEnvironments: Array.from(foundEnvs)
+                    recordName: `${prefixes[0]}${baseName}`,
+                    type: sampleRecord?.type || type,
+                    foundInEnvironments: foundEnvs
                 });
             }
         }

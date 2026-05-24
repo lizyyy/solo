@@ -1,0 +1,1283 @@
+{
+  "zone": {
+    "name": "example.com",
+    "records": [
+      {
+        "name": "example.com",
+        "type": "SOA",
+        "ttl": 3600,
+        "value": "ns1.example.com. admin.example.com. 2024010101 ; serial"
+      },
+      {
+        "name": "example.com",
+        "type": "NS",
+        "ttl": 3600,
+        "value": "ns1.example.com"
+      },
+      {
+        "name": "example.com",
+        "type": "NS",
+        "ttl": 3600,
+        "value": "ns2.example.com"
+      },
+      {
+        "name": "ns1.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "10.0.0.1"
+      },
+      {
+        "name": "ns2.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "10.0.0.2"
+      },
+      {
+        "name": "example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.1"
+      },
+      {
+        "name": "www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.1"
+      },
+      {
+        "name": "api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "www.example.com"
+      },
+      {
+        "name": "app.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "api.example.com"
+      },
+      {
+        "name": "prod-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.10"
+      },
+      {
+        "name": "prod-api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "prod-www.example.com"
+      },
+      {
+        "name": "stg-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.20"
+      },
+      {
+        "name": "stg-api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "stg-www.example.com"
+      },
+      {
+        "name": "dev-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.30"
+      },
+      {
+        "name": "dev-api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "dev-www.example.com"
+      },
+      {
+        "name": "test-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.40"
+      },
+      {
+        "name": "monitor.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.100"
+      },
+      {
+        "name": "metrics.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "monitor.example.com"
+      },
+      {
+        "name": "*.app",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.200"
+      },
+      {
+        "name": "*.staging",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "prod-www.example.com"
+      },
+      {
+        "name": "mail.example.com",
+        "type": "MX",
+        "ttl": 3600,
+        "value": "10 mail.example.com"
+      },
+      {
+        "name": "mail.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.50"
+      },
+      {
+        "name": "example.com",
+        "type": "TXT",
+        "ttl": 3600,
+        "value": "\"v=spf1 include:_spf.google.com ~all\""
+      },
+      {
+        "name": "_dmarc.example.com",
+        "type": "TXT",
+        "ttl": 3600,
+        "value": "\"v=DMARC1; p=none; rua=mailto:dmarc@example.com\""
+      },
+      {
+        "name": "legacy.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.60"
+      },
+      {
+        "name": "cdn.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "example-com.cloudfront.net"
+      },
+      {
+        "name": "service.example.com",
+        "type": "SRV",
+        "ttl": 3600,
+        "value": "10 50 8080 prod-www.example.com"
+      }
+    ],
+    "origin": "example.com",
+    "ttl": 3600
+  },
+  "ttlAnalysis": [
+    {
+      "record": {
+        "name": "example.com",
+        "type": "SOA",
+        "ttl": 3600,
+        "value": "ns1.example.com. admin.example.com. 2024010101 ; serial"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 3600,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "example.com",
+        "type": "NS",
+        "ttl": 3600,
+        "value": "ns1.example.com"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 3600,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "example.com",
+        "type": "NS",
+        "ttl": 3600,
+        "value": "ns2.example.com"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 3600,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "ns1.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "10.0.0.1"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "ns2.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "10.0.0.2"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.1"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.1"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "www.example.com"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": true,
+      "recommendedTTL": 300,
+      "reason": "CNAME 记录建议 TTL <= 30 分钟"
+    },
+    {
+      "record": {
+        "name": "app.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "api.example.com"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": true,
+      "recommendedTTL": 300,
+      "reason": "CNAME 记录建议 TTL <= 30 分钟"
+    },
+    {
+      "record": {
+        "name": "prod-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.10"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "prod-api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "prod-www.example.com"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": true,
+      "recommendedTTL": 300,
+      "reason": "CNAME 记录建议 TTL <= 30 分钟"
+    },
+    {
+      "record": {
+        "name": "stg-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.20"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "stg-api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "stg-www.example.com"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": true,
+      "recommendedTTL": 300,
+      "reason": "CNAME 记录建议 TTL <= 30 分钟"
+    },
+    {
+      "record": {
+        "name": "dev-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.30"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "dev-api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "dev-www.example.com"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": true,
+      "recommendedTTL": 300,
+      "reason": "CNAME 记录建议 TTL <= 30 分钟"
+    },
+    {
+      "record": {
+        "name": "test-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.40"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "monitor.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.100"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "metrics.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "monitor.example.com"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": true,
+      "recommendedTTL": 300,
+      "reason": "CNAME 记录建议 TTL <= 30 分钟"
+    },
+    {
+      "record": {
+        "name": "*.app",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.200"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "*.staging",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "prod-www.example.com"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": true,
+      "recommendedTTL": 300,
+      "reason": "CNAME 记录建议 TTL <= 30 分钟"
+    },
+    {
+      "record": {
+        "name": "mail.example.com",
+        "type": "MX",
+        "ttl": 3600,
+        "value": "10 mail.example.com"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 1800,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "mail.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.50"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "example.com",
+        "type": "TXT",
+        "ttl": 3600,
+        "value": "\"v=spf1 include:_spf.google.com ~all\""
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 3600,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "_dmarc.example.com",
+        "type": "TXT",
+        "ttl": 3600,
+        "value": "\"v=DMARC1; p=none; rua=mailto:dmarc@example.com\""
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 3600,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "legacy.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.60"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    },
+    {
+      "record": {
+        "name": "cdn.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "example-com.cloudfront.net"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": true,
+      "recommendedTTL": 300,
+      "reason": "CNAME 记录建议 TTL <= 30 分钟"
+    },
+    {
+      "record": {
+        "name": "service.example.com",
+        "type": "SRV",
+        "ttl": 3600,
+        "value": "10 50 8080 prod-www.example.com"
+      },
+      "tier": "LOW",
+      "tierInfo": {
+        "tier": "LOW",
+        "min": 1801,
+        "max": 86400,
+        "description": "低优先级 - 30分钟-1天",
+        "color": "green"
+      },
+      "needsAdjustment": false,
+      "recommendedTTL": 300,
+      "reason": "TTL 配置合理"
+    }
+  ],
+  "environmentAnalysis": [
+    {
+      "record": {
+        "name": "example.com",
+        "type": "SOA",
+        "ttl": 3600,
+        "value": "ns1.example.com. admin.example.com. 2024010101 ; serial"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "example.com",
+        "type": "NS",
+        "ttl": 3600,
+        "value": "ns1.example.com"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "example.com",
+        "type": "NS",
+        "ttl": 3600,
+        "value": "ns2.example.com"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "ns1.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "10.0.0.1"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "ns2.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "10.0.0.2"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.1"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.1"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "www.example.com"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": true
+    },
+    {
+      "record": {
+        "name": "app.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "api.example.com"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "prod-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.10"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "prod-api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "prod-www.example.com"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "stg-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.20"
+      },
+      "environments": [
+        "production",
+        "staging"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "stg-api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "stg-www.example.com"
+      },
+      "environments": [
+        "production",
+        "staging"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "dev-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.30"
+      },
+      "environments": [
+        "production",
+        "development"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "dev-api.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "dev-www.example.com"
+      },
+      "environments": [
+        "production",
+        "development"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "test-www.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.40"
+      },
+      "environments": [
+        "production",
+        "testing"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "monitor.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.100"
+      },
+      "environments": [
+        "production",
+        "monitoring"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "metrics.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "monitor.example.com"
+      },
+      "environments": [
+        "production",
+        "monitoring"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "*.app",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.200"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": true,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "*.staging",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "prod-www.example.com"
+      },
+      "environments": [
+        "production",
+        "staging"
+      ],
+      "isWildcard": true,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "mail.example.com",
+        "type": "MX",
+        "ttl": 3600,
+        "value": "10 mail.example.com"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "mail.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.50"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "example.com",
+        "type": "TXT",
+        "ttl": 3600,
+        "value": "\"v=spf1 include:_spf.google.com ~all\""
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "_dmarc.example.com",
+        "type": "TXT",
+        "ttl": 3600,
+        "value": "\"v=DMARC1; p=none; rua=mailto:dmarc@example.com\""
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "legacy.example.com",
+        "type": "A",
+        "ttl": 3600,
+        "value": "192.168.1.60"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "cdn.example.com",
+        "type": "CNAME",
+        "ttl": 3600,
+        "value": "example-com.cloudfront.net"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    },
+    {
+      "record": {
+        "name": "service.example.com",
+        "type": "SRV",
+        "ttl": 3600,
+        "value": "10 50 8080 prod-www.example.com"
+      },
+      "environments": [
+        "production"
+      ],
+      "isWildcard": false,
+      "hasAlias": false
+    }
+  ],
+  "cnameChains": [
+    {
+      "domain": "api.example.com",
+      "chain": [
+        {
+          "name": "api.example.com",
+          "type": "CNAME",
+          "ttl": 3600,
+          "value": "www.example.com"
+        }
+      ],
+      "totalTTL": 3600,
+      "maxTTL": 3600,
+      "minTTL": 3600,
+      "averageTTL": 3600,
+      "depth": 1,
+      "isCircular": false,
+      "unresolved": []
+    },
+    {
+      "domain": "app.example.com",
+      "chain": [
+        {
+          "name": "app.example.com",
+          "type": "CNAME",
+          "ttl": 3600,
+          "value": "api.example.com"
+        },
+        {
+          "name": "api.example.com",
+          "type": "CNAME",
+          "ttl": 3600,
+          "value": "www.example.com"
+        }
+      ],
+      "totalTTL": 7200,
+      "maxTTL": 3600,
+      "minTTL": 3600,
+      "averageTTL": 3600,
+      "depth": 2,
+      "isCircular": false,
+      "unresolved": []
+    },
+    {
+      "domain": "prod-api.example.com",
+      "chain": [
+        {
+          "name": "prod-api.example.com",
+          "type": "CNAME",
+          "ttl": 3600,
+          "value": "prod-www.example.com"
+        }
+      ],
+      "totalTTL": 3600,
+      "maxTTL": 3600,
+      "minTTL": 3600,
+      "averageTTL": 3600,
+      "depth": 1,
+      "isCircular": false,
+      "unresolved": []
+    },
+    {
+      "domain": "stg-api.example.com",
+      "chain": [
+        {
+          "name": "stg-api.example.com",
+          "type": "CNAME",
+          "ttl": 3600,
+          "value": "stg-www.example.com"
+        }
+      ],
+      "totalTTL": 3600,
+      "maxTTL": 3600,
+      "minTTL": 3600,
+      "averageTTL": 3600,
+      "depth": 1,
+      "isCircular": false,
+      "unresolved": []
+    },
+    {
+      "domain": "dev-api.example.com",
+      "chain": [
+        {
+          "name": "dev-api.example.com",
+          "type": "CNAME",
+          "ttl": 3600,
+          "value": "dev-www.example.com"
+        }
+      ],
+      "totalTTL": 3600,
+      "maxTTL": 3600,
+      "minTTL": 3600,
+      "averageTTL": 3600,
+      "depth": 1,
+      "isCircular": false,
+      "unresolved": []
+    },
+    {
+      "domain": "metrics.example.com",
+      "chain": [
+        {
+          "name": "metrics.example.com",
+          "type": "CNAME",
+          "ttl": 3600,
+          "value": "monitor.example.com"
+        }
+      ],
+      "totalTTL": 3600,
+      "maxTTL": 3600,
+      "minTTL": 3600,
+      "averageTTL": 3600,
+      "depth": 1,
+      "isCircular": false,
+      "unresolved": []
+    },
+    {
+      "domain": "*.staging",
+      "chain": [
+        {
+          "name": "*.staging",
+          "type": "CNAME",
+          "ttl": 3600,
+          "value": "prod-www.example.com"
+        }
+      ],
+      "totalTTL": 3600,
+      "maxTTL": 3600,
+      "minTTL": 3600,
+      "averageTTL": 3600,
+      "depth": 1,
+      "isCircular": false,
+      "unresolved": []
+    },
+    {
+      "domain": "cdn.example.com",
+      "chain": [
+        {
+          "name": "cdn.example.com",
+          "type": "CNAME",
+          "ttl": 3600,
+          "value": "example-com.cloudfront.net"
+        }
+      ],
+      "totalTTL": 3600,
+      "maxTTL": 3600,
+      "minTTL": 3600,
+      "averageTTL": 3600,
+      "depth": 1,
+      "isCircular": false,
+      "unresolved": [
+        "example-com.cloudfront.net"
+      ]
+    }
+  ],
+  "missingRecords": [
+    {
+      "environment": "internal",
+      "recordName": "int-www.example.com",
+      "type": "A",
+      "foundInEnvironments": [
+        "production",
+        "staging",
+        "development",
+        "testing"
+      ]
+    },
+    {
+      "environment": "monitoring",
+      "recordName": "mon-www.example.com",
+      "type": "A",
+      "foundInEnvironments": [
+        "production",
+        "staging",
+        "development",
+        "testing"
+      ]
+    },
+    {
+      "environment": "testing",
+      "recordName": "test-api.example.com",
+      "type": "CNAME",
+      "foundInEnvironments": [
+        "production",
+        "staging",
+        "development"
+      ]
+    },
+    {
+      "environment": "internal",
+      "recordName": "int-api.example.com",
+      "type": "CNAME",
+      "foundInEnvironments": [
+        "production",
+        "staging",
+        "development"
+      ]
+    },
+    {
+      "environment": "monitoring",
+      "recordName": "mon-api.example.com",
+      "type": "CNAME",
+      "foundInEnvironments": [
+        "production",
+        "staging",
+        "development"
+      ]
+    }
+  ],
+  "summary": {
+    "totalRecords": 27,
+    "byTier": {
+      "LOW": 27
+    },
+    "byType": {
+      "SOA": 1,
+      "NS": 2,
+      "A": 12,
+      "CNAME": 8,
+      "MX": 1,
+      "TXT": 2,
+      "SRV": 1
+    },
+    "byEnvironment": {
+      "production": 27,
+      "staging": 3,
+      "development": 2,
+      "testing": 1,
+      "monitoring": 2
+    },
+    "needsAdjustment": 8,
+    "cnameChainsCount": 8,
+    "missingRecordsCount": 5,
+    "averageTTL": 3600,
+    "maxTTL": 3600,
+    "minTTL": 3600
+  }
+}

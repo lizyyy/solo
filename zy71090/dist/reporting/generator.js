@@ -186,10 +186,20 @@ function generateTerminalReport(result, verbose) {
     console.log(chalk_1.default.white.bold('🎯 TTL 分级分布'));
     console.log(chalk_1.default.gray('────────────────────────────────────────────────────────────'));
     const tierData = [['级别', '数量', '占比']];
+    const colorMap = {
+        red: chalk_1.default.red,
+        orange: chalk_1.default.yellow,
+        yellow: chalk_1.default.yellowBright,
+        green: chalk_1.default.green,
+        blue: chalk_1.default.blue,
+        cyan: chalk_1.default.cyan,
+        magenta: chalk_1.default.magenta,
+        white: chalk_1.default.white
+    };
     for (const [tier, count] of Object.entries(summary.byTier)) {
         const percentage = ((count / summary.totalRecords) * 100).toFixed(1) + '%';
         const tierInfo = ttlAnalysis.find(a => a.tier === tier)?.tierInfo;
-        const colorFn = chalk_1.default[tierInfo?.color || 'white'];
+        const colorFn = colorMap[tierInfo?.color || 'white'] || chalk_1.default.white;
         tierData.push([colorFn(tier), count.toString(), percentage]);
     }
     console.log((0, table_1.table)(tierData));
