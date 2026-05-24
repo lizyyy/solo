@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生产线安全距离检查系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="top-bar">
+            <h1>🏭 生产线安全距离检查系统</h1>
+            <div class="header-actions">
+                <button id="btn-import" class="btn btn-primary">📥 导入样例</button>
+                <button id="btn-reset" class="btn btn-warning">🔄 状态重置</button>
+                <button id="btn-export" class="btn btn-success">📊 导出报告</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="panel">
+                    <h3>📋 设备筛选</h3>
+                    <div class="filter-group">
+                        <label><input type="checkbox" id="filter-robot" checked> 机器人臂</label>
+                        <label><input type="checkbox" id="filter-platform" checked> 操作台</label>
+                        <label><input type="checkbox" id="filter-door" checked> 安全门</label>
+                        <label><input type="checkbox" id="filter-passage" checked> 人员通道</label>
+                        <label><input type="checkbox" id="filter-sweep" checked> 扫掠区域</label>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>📐 安全阈值</h3>
+                    <div class="threshold-group">
+                        <label>机器人与操作台 (m):</label>
+                        <input type="number" id="threshold-robot-platform" value="1.5" min="0.5" step="0.1">
+                    </div>
+                    <div class="threshold-group">
+                        <label>机器人与安全门 (m):</label>
+                        <input type="number" id="threshold-robot-door" value="2.0" min="0.5" step="0.1">
+                    </div>
+                    <div class="threshold-group">
+                        <label>通道宽度 (m):</label>
+                        <input type="number" id="threshold-passage" value="1.2" min="0.5" step="0.1">
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>🎬 扫掠模拟</h3>
+                    <div class="timeline">
+                        <div class="timeline-track">
+                            <input type="range" id="timeline-slider" min="0" max="100" value="0">
+                        </div>
+                        <div class="timeline-controls">
+                            <button id="btn-play" class="btn btn-small">▶ 播放</button>
+                            <button id="btn-pause" class="btn btn-small">⏸ 暂停</button>
+                            <span id="time-display">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>👁 视角切换</h3>
+                    <div class="view-buttons">
+                        <button class="btn btn-small" data-view="top">俯视图</button>
+                        <button class="btn btn-small" data-view="front">正视图</button>
+                        <button class="btn btn-small" data-view="side">侧视图</button>
+                        <button class="btn btn-small" data-view="perspective">透视图</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>⚠️ 风险检测</h3>
+                    <div id="risk-list" class="risk-list">
+                        <p class="no-risk">暂无风险检测数据</p>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="viewport">
+                <canvas id="scene-canvas"></canvas>
+                <div class="info-overlay">
+                    <div class="info-item">
+                        <span class="label">场景状态:</span>
+                        <span id="scene-status" class="status-ok">正常</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">设备数量:</span>
+                        <span id="device-count">0</span>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
