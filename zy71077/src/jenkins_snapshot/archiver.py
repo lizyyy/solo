@@ -45,8 +45,10 @@ class ParameterArchiver:
         messages: List[str] = []
         
         if existed and not overwrite:
-            messages.append(f"Build directory already exists: {build_dir}")
-            messages.append("Use --overwrite to force update or --rerun-suffix to create variant")
+            messages.append("⚠️  输出已存在，跳过归档操作")
+            messages.append(f"📂 已存在快照目录: {build_dir}")
+            messages.append(f"💡 如需覆盖现有快照，请使用: --overwrite")
+            messages.append(f"💡 如需创建重跑变体，请使用: --rerun-suffix <后缀名>")
             existing_report = self._load_existing_report(build_dir)
             if existing_report:
                 return existing_report, False, messages

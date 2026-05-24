@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "snapshot_id": "df01c99ff7d51b61",
-    "created_at": "2026-05-24 22:56:07.387664",
+    "snapshot_id": "daaf6a8d03efe6cf",
+    "created_at": "2026-05-24 22:55:04.028597",
     "tool_version": "1.0.0",
     "input_source": "examples/build_record_124.json",
     "output_format": "json"
@@ -90,10 +90,6 @@
   },
   "diff": null,
   "notes": [
-    "Overwriting existing snapshot for build 124",
-    "Parameters archived: snapshots/MyApp_Build_Production/build_124/parameters.json",
-    "Artifact manifest saved: snapshots/MyApp_Build_Production/build_124/artifacts.json",
-    "Build info saved: snapshots/MyApp_Build_Production/build_124/build_info.json",
-    "Source input preserved: snapshots/MyApp_Build_Production/build_124/source_input.json"
+    "Rerun snapshot, suffix: success"
   ]
 }

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "ENVIRONMENT",
+    "value": "production",
+    "type": "CHOICE",
+    "description": "部署环境"
+  },
+  {
+    "name": "BUILD_VERSION",
+    "value": "v2.3.2",
+    "type": "STRING",
+    "description": "构建版本号"
+  },
+  {
+    "name": "ENABLE_CACHE",
+    "value": "false",
+    "type": "BOOLEAN",
+    "description": "是否启用构建缓存"
+  },
+  {
+    "name": "DEPLOY_TARGETS",
+    "value": "web,api",
+    "type": "STRING",
+    "description": "部署目标服务"
+  },
+  {
+    "name": "NEW_FEATURE_FLAG",
+    "value": "enabled",
+    "type": "STRING",
+    "description": "新功能开关"
+  }
+]

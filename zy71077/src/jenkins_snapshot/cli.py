@@ -6,6 +6,7 @@ from typing import Optional
 
 import click
 from rich.console import Console
+from rich.panel import Panel
 
 from . import __version__
 from .reader import BuildRecordReader, InputValidator
@@ -153,34 +154,56 @@ def archive(
                 console.print(f"[red]错误:[/red] {e}")
                 sys.exit(EXIT_ERROR)
 
-        if compare_with:
-            old_report = archiver.load_snapshot(
-                job_name=record.job_name,
-                build_number=int(compare_with),
-            )
-            if old_report:
-                comparator = DiffComparator()
-                diff = comparator.compare_builds(old_report.build, record)
-                report.diff = diff
-                report.notes.append(f"与构建 #{compare_with} 进行了差异比较")
+        if not created:
+            report.notes = messages
+            if not quiet:
+                console.print()
+                console.print(Panel("📋 快照已存在，跳过归档", style="bold yellow"))
+                for msg in messages:
+                    console.print(f"  {msg}")
+                console.print()
+                console.print(f"[yellow]如需查看现有快照详情，请使用:[/yellow]")
+                console.print(f"  jenkins-snapshot show \"{record.job_name}\" {record.build_number}")
+                console.print()
+        else:
+            if compare_with:
+                old_report = archiver.load_snapshot(
+                    job_name=record.job_name,
+                    build_number=int(compare_with),
+                )
+                if old_report:
+                    comparator = DiffComparator()
+                    diff = comparator.compare_builds(old_report.build, record)
+                    report.diff = diff
+                    report.notes.append(f"与构建 #{compare_with} 进行了差异比较")
 
-        if not quiet:
-            reporter = ReportExporter(actual_output_dir)
-            reporter.print_terminal_summary(report)
+            if not quiet:
+                reporter = ReportExporter(actual_output_dir)
+                reporter.print_terminal_summary(report)
 
         if export_report:
             reporter = ReportExporter(actual_output_dir)
-            results = reporter.export_all(report)
+            if created:
+                results = reporter.export_all(report)
+            else:
+                results = reporter.export_all(report)
             if not quiet:
-                console.print(f"[green]报告已导出:[/green]")
+                console.print(f"[{'green' if created else 'yellow'}]报告已{'重新' if not created else ''}导出:[/{'green' if created else 'yellow'}]")
                 for fmt, path in results.items():
                     console.print(f"  {fmt}: {path}")
 
-        if validation.errors:
-            sys.exit(EXIT_ERROR)
-        if validation.warnings:
-            sys.exit(EXIT_WARNING)
-        sys.exit(EXIT_SUCCESS)
+        if created:
+            if validation.errors:
+                sys.exit(EXIT_ERROR)
+            if validation.warnings:
+                sys.exit(EXIT_WARNING)
+            sys.exit(EXIT_SUCCESS)
+        else:
+            if report.validation.errors:
+                sys.exit(EXIT_ERROR)
+            if report.validation.warnings:
+                sys.exit(EXIT_WARNING)
+            sys.exit(EXIT_SUCCESS)
 
     except Exception as e:
         console.print(f"[red]归档失败:[/red] {e}")
@@ -310,6 +333,16 @@ def show(
 @click.argument('build_old', type=int)
 @click.argument('build_new', type=int)
 @click.option(
+    '--old-rerun-suffix',
+    type=str,
+    help='旧构建的重跑变体后缀（用于比较同一构建号的重跑快照）'
+)
+@click.option(
+    '--new-rerun-suffix',
+    type=str,
+    help='新构建的重跑变体后缀（用于比较同一构建号的重跑快照）'
+)
+@click.option(
     '--output-dir', '-o',
     type=click.Path(file_okay=False),
     help='覆盖全局输出目录'
@@ -325,21 +358,31 @@ def diff(
     job_name: str,
     build_old: int,
     build_new: int,
+    old_rerun_suffix: Optional[str],
+    new_rerun_suffix: Optional[str],
     output_dir: Optional[str],
     export_report: bool,
 ):
-    """比较两个构建快照的差异"""
+    """比较两个构建快照的差异
+    
+    比较同一构建号的重跑变体示例：
+    jenkins-snapshot diff MyJob 123 123 --old-rerun-suffix failed --new-rerun-suffix success
+    """
     actual_output_dir = output_dir or ctx.obj['output_dir']
     archiver = ParameterArchiver(actual_output_dir)
     
-    report_old = archiver.load_snapshot(job_name, build_old)
-    report_new = archiver.load_snapshot(job_name, build_new)
+    old_label = f"#{build_old}" + (f" (rerun: {old_rerun_suffix})" if old_rerun_suffix else "")
+    new_label = f"#{build_new}" + (f" (rerun: {new_rerun_suffix})" if new_rerun_suffix else "")
+    console.print(f"[blue]比较快照:[/blue] {old_label} → {new_label}")
+    
+    report_old = archiver.load_snapshot(job_name, build_old, old_rerun_suffix)
+    report_new = archiver.load_snapshot(job_name, build_new, new_rerun_suffix)
 
     if not report_old:
-        console.print(f"[red]未找到快照:[/red] {job_name} #{build_old}")
+        console.print(f"[red]未找到快照:[/red] {job_name} {old_label}")
         sys.exit(EXIT_ERROR)
     if not report_new:
-        console.print(f"[red]未找到快照:[/red] {job_name} #{build_new}")
+        console.print(f"[red]未找到快照:[/red] {job_name} {new_label}")
         sys.exit(EXIT_ERROR)
 
     comparator = DiffComparator()
@@ -357,7 +400,9 @@ def diff(
             console.print(f"  {key}: {value}")
 
     if export_report:
-        base_filename = f"diff_{job_name.replace('/', '_')}_{build_old}_{build_new}"
+        old_suffix = f"_{old_rerun_suffix}" if old_rerun_suffix else ""
+        new_suffix = f"_{new_rerun_suffix}" if new_rerun_suffix else ""
+        base_filename = f"diff_{job_name.replace('/', '_')}_{build_old}{old_suffix}_{build_new}{new_suffix}"
         results = reporter.export_all(report_new, base_filename)
         console.print(f"[green]差异报告已导出:[/green]")
         for fmt, path in results.items():
