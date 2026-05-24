@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package examples.good;
+
+message User {
+  enum Status {
+    STATUS_UNKNOWN = 0;
+    STATUS_ACTIVE = 1;
+    STATUS_INACTIVE = 2;
+    STATUS_BANNED = 3;
+  }
+
+  string id = 1;
+  Status status = 2;
+}
+
+enum Color {
+  COLOR_UNSPECIFIED = 0;
+  COLOR_RED = 1;
+  COLOR_GREEN = 2;
+  COLOR_BLUE = 3;
+}
