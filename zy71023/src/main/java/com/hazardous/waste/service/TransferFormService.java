@@ -14,7 +14,11 @@ import java.util.List;
 @Service
 public class TransferFormService {
 
-    private TransferFormRepository transferFormRepository;
+    private final TransferFormRepository transferFormRepository;
+
+    public TransferFormService(TransferFormRepository transferFormRepository) {
+        this.transferFormRepository = transferFormRepository;
+    }
 
     @Transactional
     public TransferForm createForm(TransferForm form) {

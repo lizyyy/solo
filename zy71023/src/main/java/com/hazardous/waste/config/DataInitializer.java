@@ -10,8 +10,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataInitializer implements CommandLineRunner {
 
-    private StorageBucketRepository bucketRepository;
-    private TransferFormRepository transferFormRepository;
+    private final StorageBucketRepository bucketRepository;
+    private final TransferFormRepository transferFormRepository;
+
+    public DataInitializer(StorageBucketRepository bucketRepository, TransferFormRepository transferFormRepository) {
+        this.bucketRepository = bucketRepository;
+        this.transferFormRepository = transferFormRepository;
+    }
 
     @Override
     public void run(String... args) {

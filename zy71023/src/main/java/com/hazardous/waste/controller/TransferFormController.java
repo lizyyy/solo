@@ -12,7 +12,11 @@ import java.util.Map;
 @RequestMapping("/api/transfer-forms")
 public class TransferFormController {
 
-    private TransferFormService transferFormService;
+    private final TransferFormService transferFormService;
+
+    public TransferFormController(TransferFormService transferFormService) {
+        this.transferFormService = transferFormService;
+    }
 
     @PostMapping
     public ApiResponse<TransferForm> createForm(@RequestBody TransferForm form) {

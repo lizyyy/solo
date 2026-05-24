@@ -22,8 +22,14 @@ import java.util.UUID;
 @Service
 public class ReportService {
 
-    private DisposalReportRepository disposalReportRepository;
-    private WasteRecordRepository wasteRecordRepository;
+    private final DisposalReportRepository disposalReportRepository;
+    private final WasteRecordRepository wasteRecordRepository;
+
+    public ReportService(DisposalReportRepository disposalReportRepository,
+                         WasteRecordRepository wasteRecordRepository) {
+        this.disposalReportRepository = disposalReportRepository;
+        this.wasteRecordRepository = wasteRecordRepository;
+    }
 
     @Transactional
     public DisposalReport generateDisposalReport(String transferFormNo, String operator) {

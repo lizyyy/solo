@@ -17,18 +17,33 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class WasteRecordService {
 
-    private WasteRecordRepository wasteRecordRepository;
-    private StorageBucketRepository storageBucketRepository;
-    private TransferFormRepository transferFormRepository;
-    private WasteStatusMachine statusMachine;
-    private WasteValidationService validationService;
-    private WasteStorageConfig storageConfig;
+    private final WasteRecordRepository wasteRecordRepository;
+    private final StorageBucketRepository storageBucketRepository;
+    private final TransferFormRepository transferFormRepository;
+    private final WasteStatusMachine statusMachine;
+    private final WasteValidationService validationService;
+    private final WasteStorageConfig storageConfig;
+
+    public WasteRecordService(WasteRecordRepository wasteRecordRepository,
+                              StorageBucketRepository storageBucketRepository,
+                              TransferFormRepository transferFormRepository,
+                              WasteStatusMachine statusMachine,
+                              WasteValidationService validationService,
+                              WasteStorageConfig storageConfig) {
+        this.wasteRecordRepository = wasteRecordRepository;
+        this.storageBucketRepository = storageBucketRepository;
+        this.transferFormRepository = transferFormRepository;
+        this.statusMachine = statusMachine;
+        this.validationService = validationService;
+        this.storageConfig = storageConfig;
+    }
 
     @Transactional
     public WasteRecord submitRecord(WasteRecordDTO dto) {
@@ -49,6 +64,11 @@ public class WasteRecordService {
         record.setSubmitter(dto.getSubmitter());
         record.setDisposalReason("");
         record.setCheckResult("");
+        record.setStatus(WasteStatus.PENDING_SUBMIT);
+        record.setIsOverdue(false);
+        record.setStorageDays(0);
+        record.setResubmitCount(0);
+        record.setOperationLogs(new ArrayList<>());
 
         if (dto.getBucketCode() != null && !dto.getBucketCode().isBlank()) {
             StorageBucket bucket = storageBucketRepository.findByBucketCode(dto.getBucketCode())

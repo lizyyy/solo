@@ -16,9 +16,17 @@ import java.util.List;
 @Service
 public class AlertService {
 
-    private AlertRecordRepository alertRecordRepository;
-    private WasteRecordRepository wasteRecordRepository;
-    private WasteStorageConfig storageConfig;
+    private final AlertRecordRepository alertRecordRepository;
+    private final WasteRecordRepository wasteRecordRepository;
+    private final WasteStorageConfig storageConfig;
+
+    public AlertService(AlertRecordRepository alertRecordRepository,
+                        WasteRecordRepository wasteRecordRepository,
+                        WasteStorageConfig storageConfig) {
+        this.alertRecordRepository = alertRecordRepository;
+        this.wasteRecordRepository = wasteRecordRepository;
+        this.storageConfig = storageConfig;
+    }
 
     @Scheduled(cron = "0 0 8 * * ?")
     @Transactional

@@ -21,8 +21,14 @@ import java.util.Map;
 @RequestMapping("/api/reports")
 public class ReportController {
 
-    private ReportService reportService;
-    private WasteRecordService wasteRecordService;
+    private final ReportService reportService;
+    private final WasteRecordService wasteRecordService;
+
+    public ReportController(ReportService reportService,
+                            WasteRecordService wasteRecordService) {
+        this.reportService = reportService;
+        this.wasteRecordService = wasteRecordService;
+    }
 
     @PostMapping("/disposal/generate")
     public ApiResponse<DisposalReport> generateDisposalReport(

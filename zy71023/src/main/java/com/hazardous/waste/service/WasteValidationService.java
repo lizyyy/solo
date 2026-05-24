@@ -21,10 +21,20 @@ import java.util.List;
 @Service
 public class WasteValidationService {
 
-    private WasteStorageConfig storageConfig;
-    private WasteRecordRepository wasteRecordRepository;
-    private StorageBucketRepository storageBucketRepository;
-    private TransferFormRepository transferFormRepository;
+    private final WasteStorageConfig storageConfig;
+    private final WasteRecordRepository wasteRecordRepository;
+    private final StorageBucketRepository storageBucketRepository;
+    private final TransferFormRepository transferFormRepository;
+
+    public WasteValidationService(WasteStorageConfig storageConfig,
+                                  WasteRecordRepository wasteRecordRepository,
+                                  StorageBucketRepository storageBucketRepository,
+                                  TransferFormRepository transferFormRepository) {
+        this.storageConfig = storageConfig;
+        this.wasteRecordRepository = wasteRecordRepository;
+        this.storageBucketRepository = storageBucketRepository;
+        this.transferFormRepository = transferFormRepository;
+    }
 
     public ValidationResult validateSubmission(WasteRecordDTO dto) {
         ValidationResult result = new ValidationResult();

@@ -12,7 +12,11 @@ import java.util.List;
 @Service
 public class StorageBucketService {
 
-    private StorageBucketRepository storageBucketRepository;
+    private final StorageBucketRepository storageBucketRepository;
+
+    public StorageBucketService(StorageBucketRepository storageBucketRepository) {
+        this.storageBucketRepository = storageBucketRepository;
+    }
 
     @Transactional
     public StorageBucket createBucket(StorageBucket bucket) {

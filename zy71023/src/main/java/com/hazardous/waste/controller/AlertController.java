@@ -12,7 +12,11 @@ import java.util.Map;
 @RequestMapping("/api/alerts")
 public class AlertController {
 
-    private AlertService alertService;
+    private final AlertService alertService;
+
+    public AlertController(AlertService alertService) {
+        this.alertService = alertService;
+    }
 
     @GetMapping
     public ApiResponse<List<AlertRecord>> getAllAlerts() {

@@ -16,7 +16,11 @@ import java.util.Map;
 @RequestMapping("/api/waste-records")
 public class WasteRecordController {
 
-    private WasteRecordService wasteRecordService;
+    private final WasteRecordService wasteRecordService;
+
+    public WasteRecordController(WasteRecordService wasteRecordService) {
+        this.wasteRecordService = wasteRecordService;
+    }
 
     @PostMapping("/submit")
     public ApiResponse<WasteRecord> submitRecord(@Valid @RequestBody WasteRecordDTO dto) {

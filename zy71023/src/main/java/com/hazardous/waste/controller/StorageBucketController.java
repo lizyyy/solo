@@ -11,7 +11,11 @@ import java.util.List;
 @RequestMapping("/api/buckets")
 public class StorageBucketController {
 
-    private StorageBucketService storageBucketService;
+    private final StorageBucketService storageBucketService;
+
+    public StorageBucketController(StorageBucketService storageBucketService) {
+        this.storageBucketService = storageBucketService;
+    }
 
     @PostMapping
     public ApiResponse<StorageBucket> createBucket(@RequestBody StorageBucket bucket) {
