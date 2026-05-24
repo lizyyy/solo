@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a0a0f;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1c1c1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a3a3c;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #48484a;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #2c2c2e;
+  border-radius: 2px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #0066ff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.glass-panel {
+  background: rgba(28, 28, 30, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.toolbar-btn {
+  @apply flex items-center gap-2 px-3 py-2 rounded-md text-sm text-gray-300 transition-all duration-150;
+}
+
+.toolbar-btn:hover {
+  @apply bg-stage-gray-light text-white;
+}
+
+.toolbar-btn.active {
+  @apply bg-stage-blue text-white;
+}
+
+.light-item {
+  @apply flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-150 border border-transparent;
+}
+
+.light-item:hover {
+  @apply bg-stage-gray-light;
+}
+
+.light-item.selected {
+  @apply bg-stage-blue/20 border-stage-blue/50;
+}
+
+.light-item.warning {
+  @apply bg-stage-orange/10 border-stage-orange/30;
+}
+
+.light-item.danger {
+  @apply bg-stage-red/10 border-stage-red/30;
+}
+
+.segment-btn {
+  @apply px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150;
+}
+
+.segment-btn.active {
+  @apply bg-stage-blue text-white;
+}
+
+.segment-btn:not(.active) {
+  @apply bg-stage-gray text-gray-400 hover:bg-stage-gray-light hover:text-white;
+}
+
+.panel-section {
+  @apply mb-4;
+}
+
+.panel-section-title {
+  @apply text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2;
+}
+
+.collapse-btn {
+  @apply absolute top-1/2 -translate-y-1/2 w-5 h-12 flex items-center justify-center bg-stage-gray rounded-r-md text-gray-400 hover:text-white transition-colors z-10;
+}
+
+.warning-card {
+  @apply p-3 rounded-lg mb-2 border-l-4;
+}
+
+.warning-card.warning {
+  @apply bg-stage-orange/10 border-stage-orange;
+}
+
+.warning-card.danger {
+  @apply bg-stage-red/10 border-stage-red;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 102, 255, 0);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
