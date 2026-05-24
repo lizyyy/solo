@@ -1,5 +1,4 @@
-import React, { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import React from 'react';
 import * as THREE from 'three';
 import { Bottleneck } from '../../simulation/types';
 

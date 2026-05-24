@@ -1,57 +1,149 @@
-# React + TypeScript + Vite
+# 🚇 地铁站客流疏散模拟系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+基于 Three.js 的交互式 3D 可视化地铁站客流疏散模拟系统，专为地铁运营演练设计。
 
-Currently, two official plugins are available:
+## ✨ 核心功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🎯 客流疏散模拟
+- **3D/2D 视图切换**：沉浸式 3D 视角与清晰的 2D 平面图
+- **多视角切换**：默认/俯视/斜45°/第一人称视角
+- **客流粒子系统**：实时颜色编码状态显示（移动中/等待中/滞留）
+- **A* 寻路算法**：智能路径规划与动态避障
 
-## Expanding the ESLint configuration
+### ⚙️ 参数配置
+- **场景选择**：内置 3 种典型场景（正常疏散/冲突场景/空结果）
+- **客流批次配置**：自定义人数、到达时间、移动速度
+- **出口控制**：实时开关闸机，模拟出口临时关闭
+- **封闭区域**：添加/删除封闭区域，模拟障碍物
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 📊 数据分析
+- **实时统计**：疏散人数、完成率、平均时间、最长等待
+- **瓶颈检测**：自动识别楼梯/闸机拥堵区域（轻微/中等/严重）
+- **策略对比**：保存多方案结果，柱状图对比分析
+- **趋势图表**：实时疏散曲线展示
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 📄 报告导出
+- **PDF 报告**：包含场景信息、统计数据、瓶颈分析
+- **JSON 数据**：完整原始数据导出，便于二次分析
+
+## 🚀 快速开始
+
+### 环境要求
+- Node.js >= 18
+- npm >= 9
+
+### 安装依赖
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 开发模式
+```bash
+npm run dev
 ```
+
+访问 http://localhost:5173 查看应用
+
+### 类型检查
+```bash
+npm run check
+```
+
+### 代码检查
+```bash
+npm run lint
+```
+
+### 构建生产版本
+```bash
+npm run build
+```
+
+## 🎮 使用指南
+
+### 1. 选择演练场景
+左侧控制面板 → 场景选择 → 选择内置场景：
+- **正常疏散场景**：晚高峰客流有序疏散
+- **冲突场景**：主出口关闭，人流冲突
+- **空结果场景**：非高峰时段，无瓶颈
+
+### 2. 配置疏散参数
+- **客流批次**：调整每批人数、到达时间、移动速度
+- **出口控制**：关闭/开启特定闸机
+- **封闭区域**：添加临时封闭区域
+
+### 3. 运行模拟
+- 点击「播放」按钮开始模拟
+- 调整播放速度（0.5x - 5x）
+- 使用时间轴跳转到任意时间点
+- 切换 2D/3D 视图和摄像机视角
+
+### 4. 查看与对比
+- 右侧「概览」面板查看实时统计
+- 「瓶颈」面板查看拥堵排名
+- 「对比」面板保存多方案并对比
+- 「导出」面板生成报告
+
+## 🏗️ 技术栈
+
+- **前端框架**：React 18 + TypeScript
+- **构建工具**：Vite 5
+- **3D 引擎**：Three.js + @react-three/fiber + drei
+- **状态管理**：Zustand
+- **样式方案**：TailwindCSS 3
+- **数据可视化**：Recharts
+- **报告导出**：jsPDF + html2canvas
+
+## 📁 项目结构
+
+```
+src/
+├── components/
+│   ├── panels/          # 控制面板组件
+│   │   ├── ControlPanel.tsx    # 左侧配置面板
+│   │   ├── StatsPanel.tsx      # 右侧数据面板
+│   │   └── Timeline.tsx        # 底部时间轴
+│   └── viewer/          # 3D 视口组件
+│       ├── SceneViewer.tsx     # 主场景容器
+│       ├── StationModel.tsx    # 地铁站模型
+│       ├── ParticleSystem.tsx  # 客流粒子系统
+│       └── BottleneckMarkers.tsx # 瓶颈标记
+├── simulation/          # 模拟引擎
+│   ├── types.ts               # 类型定义
+│   ├── engine.ts              # 模拟引擎核心
+│   └── pathfinding.ts         # A* 寻路算法
+├── store/               # 状态管理
+│   └── useSimulationStore.ts
+├── data/scenes/         # 内置场景配置
+├── utils/               # 工具函数
+│   └── reportGenerator.ts     # 报告生成器
+└── pages/               # 页面组件
+```
+
+## 🧪 内置场景
+
+| 场景名称 | 特点 | 预期效果 |
+|---------|------|---------|
+| 正常疏散 | 所有出口开放，3批客流 | 有序疏散，轻微瓶颈 |
+| 冲突场景 | 主出口关闭，大客流 | 严重拥堵，滞留明显 |
+| 空结果场景 | 客流稀少，多出口 | 无瓶颈，快速完成 |
+
+## 🔧 核心算法
+
+### A* 寻路算法
+- 网格精度：0.5m × 0.5m
+- 支持对角线移动
+- 路径平滑处理
+
+### 瓶颈检测
+- 密度阈值：低(3人) / 中(6人) / 高(10人)
+- 检测区域：楼梯口、闸机、狭窄通道
+
+### 碰撞避免
+- 粒子半径：0.3m
+- 动态速度调整
+- 随机避让策略
+
+## 📝 License
+
+MIT License

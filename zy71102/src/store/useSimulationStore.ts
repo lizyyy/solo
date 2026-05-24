@@ -2,14 +2,22 @@ import { create } from 'zustand';
 import { SimulationEngine } from '../simulation/engine';
 import {
   StationScene,
-  Passenger,
-  Bottleneck,
+  PassengerBatch,
   Statistics,
   SimulationState
 } from '../simulation/types';
 
+interface StrategyResult {
+  id: string;
+  name: string;
+  scene: StationScene;
+  statistics: Statistics;
+}
+
 interface SimulationStore extends SimulationState {
   engine: SimulationEngine | null;
+  passengerBatches: PassengerBatch[];
+  strategyResults: StrategyResult[];
   setScene: (scene: StationScene) => void;
   setPlaying: (playing: boolean) => void;
   setSpeed: (speed: number) => void;
@@ -22,6 +30,12 @@ interface SimulationStore extends SimulationState {
   openExit: (exitId: string) => void;
   addClosedArea: (x: number, y: number, width: number, height: number, reason: string) => void;
   removeClosedArea: (areaId: string) => void;
+  updatePassengerBatch: (batchId: string, updates: Partial<PassengerBatch>) => void;
+  addPassengerBatch: () => void;
+  removePassengerBatch: (batchId: string) => void;
+  saveStrategyResult: (name: string) => void;
+  removeStrategyResult: (id: string) => void;
+  clearStrategyResults: () => void;
 }
 
 const initialStatistics: Statistics = {
@@ -47,6 +61,8 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
   is2DMode: false,
   cameraView: 'default',
   engine: null,
+  passengerBatches: [],
+  strategyResults: [],
 
   setScene: (scene: StationScene) => {
     const engine = new SimulationEngine(scene);
@@ -57,7 +73,8 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       bottlenecks: [],
       statistics: initialStatistics,
       currentTime: 0,
-      isPlaying: false
+      isPlaying: false,
+      passengerBatches: [...scene.passengerBatches]
     });
   },
 
@@ -220,5 +237,113 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       currentTime: 0,
       isPlaying: false
     });
+  },
+
+  updatePassengerBatch: (batchId: string, updates: Partial<PassengerBatch>) => {
+    const { selectedScene, passengerBatches } = get();
+    if (!selectedScene) return;
+
+    const updatedBatches = passengerBatches.map(batch =>
+      batch.id === batchId ? { ...batch, ...updates } : batch
+    );
+
+    const updatedScene = {
+      ...selectedScene,
+      passengerBatches: updatedBatches
+    };
+
+    const engine = new SimulationEngine(updatedScene);
+    set({
+      selectedScene: updatedScene,
+      passengerBatches: updatedBatches,
+      engine,
+      passengers: [],
+      bottlenecks: [],
+      statistics: initialStatistics,
+      currentTime: 0,
+      isPlaying: false
+    });
+  },
+
+  addPassengerBatch: () => {
+    const { selectedScene, passengerBatches } = get();
+    if (!selectedScene) return;
+
+    const newBatch: PassengerBatch = {
+      id: `batch-${Date.now()}`,
+      startTime: 0,
+      count: 20,
+      spawnX: 20,
+      spawnY: 15,
+      speed: 1.5
+    };
+
+    const updatedBatches = [...passengerBatches, newBatch];
+    const updatedScene = {
+      ...selectedScene,
+      passengerBatches: updatedBatches
+    };
+
+    const engine = new SimulationEngine(updatedScene);
+    set({
+      selectedScene: updatedScene,
+      passengerBatches: updatedBatches,
+      engine,
+      passengers: [],
+      bottlenecks: [],
+      statistics: initialStatistics,
+      currentTime: 0,
+      isPlaying: false
+    });
+  },
+
+  removePassengerBatch: (batchId: string) => {
+    const { selectedScene, passengerBatches } = get();
+    if (!selectedScene || passengerBatches.length <= 1) return;
+
+    const updatedBatches = passengerBatches.filter(b => b.id !== batchId);
+    const updatedScene = {
+      ...selectedScene,
+      passengerBatches: updatedBatches
+    };
+
+    const engine = new SimulationEngine(updatedScene);
+    set({
+      selectedScene: updatedScene,
+      passengerBatches: updatedBatches,
+      engine,
+      passengers: [],
+      bottlenecks: [],
+      statistics: initialStatistics,
+      currentTime: 0,
+      isPlaying: false
+    });
+  },
+
+  saveStrategyResult: (name: string) => {
+    const { selectedScene, statistics, strategyResults } = get();
+    if (!selectedScene) return;
+
+    const result: StrategyResult = {
+      id: `strategy-${Date.now()}`,
+      name,
+      scene: JSON.parse(JSON.stringify(selectedScene)),
+      statistics: JSON.parse(JSON.stringify(statistics))
+    };
+
+    set({
+      strategyResults: [...strategyResults, result]
+    });
+  },
+
+  removeStrategyResult: (id: string) => {
+    const { strategyResults } = get();
+    set({
+      strategyResults: strategyResults.filter(r => r.id !== id)
+    });
+  },
+
+  clearStrategyResults: () => {
+    set({ strategyResults: [] });
   }
 }));

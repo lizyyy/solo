@@ -1,5 +1,5 @@
 import { jsPDF } from 'jspdf';
-import { Statistics, StationScene } from '../simulation/types';
+import { Statistics } from '../simulation/types';
 
 export interface ReportData {
   sceneName: string;

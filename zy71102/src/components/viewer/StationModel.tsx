@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import * as THREE from 'three';
 import { StationLayout, ClosedArea } from '../../simulation/types';
 
 interface StationModelProps {
@@ -9,7 +8,6 @@ interface StationModelProps {
 }
 
 export const StationModel: React.FC<StationModelProps> = ({ layout, closedAreas, is2DMode }) => {
-  const floorHeight = is2DMode ? 0.01 : 0.2;
   const wallHeight = is2DMode ? 0.01 : 2;
 
   const walls = useMemo(() => {

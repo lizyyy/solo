@@ -4,9 +4,7 @@ import {
   Bottleneck,
   Statistics,
   TimePoint,
-  PassengerStatus,
   BottleneckSeverity,
-  Point,
   PASSENGER_RADIUS,
   BOTTLENECK_THRESHOLD
 } from './types';

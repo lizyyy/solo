@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
 import { useSimulationStore } from '../../store/useSimulationStore';
 import { StationModel } from './StationModel';
 import { ParticleSystem } from './ParticleSystem';
@@ -21,7 +20,6 @@ const CameraController: React.FC<CameraControllerProps> = ({
   stationHeight
 }) => {
   const { camera } = useThree();
-  const controlsRef = useRef<any>(null);
 
   useEffect(() => {
     const maxDim = Math.max(stationWidth, stationHeight);
@@ -29,9 +27,6 @@ const CameraController: React.FC<CameraControllerProps> = ({
     if (is2DMode) {
       camera.position.set(0, maxDim, 0.01);
       camera.lookAt(0, 0, 0);
-      if (controlsRef.current) {
-        controlsRef.current.enableRotate = false;
-      }
     } else {
       switch (viewMode) {
         case 'top':
@@ -50,19 +45,16 @@ const CameraController: React.FC<CameraControllerProps> = ({
           camera.position.set(0, maxDim * 0.5, maxDim * 0.6);
           camera.lookAt(0, 0, 0);
       }
-      if (controlsRef.current) {
-        controlsRef.current.enableRotate = true;
-      }
     }
   }, [viewMode, is2DMode, camera, stationWidth, stationHeight]);
 
   return (
     <OrbitControls
-      ref={controlsRef}
       enableDamping
       dampingFactor={0.05}
       minDistance={5}
       maxDistance={100}
+      enableRotate={!is2DMode}
     />
   );
 };

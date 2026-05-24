@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { useSimulationStore } from '../../store/useSimulationStore';
 
