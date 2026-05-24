@@ -1,0 +1,92 @@
+openapi: "3.0.0"
+info:
+  title: 用户服务 API
+  version: "2.0.0"
+  description: 用户相关服务接口
+
+servers:
+  - url: https://api.example.com/v2
+
+paths:
+  /users:
+    get:
+      summary: 获取用户列表
+      description: 分页获取用户列表
+      deprecated: false
+      responses:
+        '200':
+          description: 成功
+    post:
+      summary: 创建用户
+      description: 创建新用户
+      deprecated: false
+      responses:
+        '201':
+          description: 创建成功
+
+  /users/{id}:
+    get:
+      summary: 获取用户详情
+      description: 根据用户ID获取详情
+      deprecated: true
+      x-deprecation:
+        date: "2024-06-30"
+        sunsetDate: "2024-12-31"
+        reason: "使用新的 /v2/users/{id} 接口"
+        replacement: "/v2/users/{id}"
+      x-path-aliases:
+        - "/user/{id}"
+        - "/api/v1/users/{id}"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+
+  /users/{id}/profile:
+    get:
+      summary: 获取用户资料
+      deprecated: true
+      x-deprecation:
+        date: "2024-07-15"
+        replacement: "/v2/users/{id}/profile"
+      responses:
+        '200':
+          description: 成功
+
+  /legacy/orders:
+    x-deprecated: true
+    x-path-aliases:
+      - "/api/orders"
+      - "/old/orders"
+    get:
+      summary: 获取订单列表（旧接口）
+      deprecated: true
+      x-deprecation:
+        date: "2024-05-01"
+        reason: "订单服务已迁移"
+        replacement: "/orders"
+      responses:
+        '200':
+          description: 成功
+    post:
+      summary: 创建订单（旧接口）
+      deprecated: true
+      x-deprecation:
+        date: "2024-05-01"
+        replacement: "/orders"
+      responses:
+        '201':
+          description: 成功
+
+  /health:
+    get:
+      summary: 健康检查
+      deprecated: false
+      responses:
+        '200':
+          description: 健康

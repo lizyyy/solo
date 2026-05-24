@@ -1,0 +1,218 @@
+{
+  "metadata": {
+    "inspectionDate": "2026-05-24T18:57:07.303+08:00",
+    "openapiFile": "examples/openapi.yaml",
+    "logFile": "examples/gateway.log",
+    "clientFile": "examples/clients.json",
+    "ownerFile": "examples/owners.json",
+    "timezone": "Asia/Shanghai",
+    "reportId": "5fb5df73-2fb3-450f-a600-8752fa451d42"
+  },
+  "summary": {
+    "totalDeprecatedRoutes": 4,
+    "activeDeprecatedRoutes": 3,
+    "affectedClients": 4,
+    "totalDeprecatedRequests": 18,
+    "criticalRiskClients": 0,
+    "highRiskClients": 3,
+    "mediumRiskClients": 1,
+    "lowRiskClients": 0
+  },
+  "deprecatedRoutes": [
+    {
+      "path": "/legacy/orders",
+      "method": "GET",
+      "summary": "获取订单列表（旧接口）",
+      "deprecationDate": "2024-05-01",
+      "replacement": "/orders",
+      "xDeprecation": {
+        "date": "2024-05-01",
+        "reason": "订单服务已迁移",
+        "replacement": "/orders"
+      },
+      "pathAliases": [
+        "/api/orders",
+        "/old/orders"
+      ]
+    },
+    {
+      "path": "/legacy/orders",
+      "method": "POST",
+      "summary": "创建订单（旧接口）",
+      "deprecationDate": "2024-05-01",
+      "replacement": "/orders",
+      "xDeprecation": {
+        "date": "2024-05-01",
+        "replacement": "/orders"
+      },
+      "pathAliases": [
+        "/api/orders",
+        "/old/orders"
+      ]
+    },
+    {
+      "path": "/users/{id}",
+      "method": "GET",
+      "summary": "获取用户详情",
+      "description": "根据用户ID获取详情",
+      "deprecationDate": "2024-06-30",
+      "sunsetDate": "2024-12-31",
+      "replacement": "/v2/users/{id}",
+      "xDeprecation": {
+        "date": "2024-06-30",
+        "sunsetDate": "2024-12-31",
+        "reason": "使用新的 /v2/users/{id} 接口",
+        "replacement": "/v2/users/{id}"
+      },
+      "pathAliases": [
+        "/user/{id}",
+        "/api/v1/users/{id}"
+      ]
+    },
+    {
+      "path": "/users/{id}/profile",
+      "method": "GET",
+      "summary": "获取用户资料",
+      "deprecationDate": "2024-07-15",
+      "replacement": "/v2/users/{id}/profile",
+      "xDeprecation": {
+        "date": "2024-07-15",
+        "replacement": "/v2/users/{id}/profile"
+      },
+      "pathAliases": []
+    }
+  ],
+  "clientUsages": [
+    {
+      "clientId": "mobile-app",
+      "clientName": "移动端应用",
+      "versions": {
+        "2.1.0": {
+          "count": 4,
+          "lastUsed": "2024-05-20T08:31:30Z"
+        },
+        "2.0.0": {
+          "count": 2,
+          "lastUsed": "2024-05-20T08:31:10Z"
+        },
+        "1.9.0": {
+          "count": 1,
+          "lastUsed": "2024-05-20T08:30:35Z"
+        }
+      },
+      "routes": [
+        {
+          "path": "/users/{id}",
+          "method": "GET",
+          "count": 7,
+          "lastUsed": "2024-05-20T08:31:30Z"
+        }
+      ],
+      "totalRequests": 7,
+      "owner": {
+        "name": "张三",
+        "email": "zhangsan@example.com",
+        "slack": "@zhangsan",
+        "department": "客户端研发部"
+      },
+      "riskLevel": "high"
+    },
+    {
+      "clientId": "third-party",
+      "clientName": "第三方合作伙伴平台",
+      "versions": {
+        "1.0.0": {
+          "count": 4,
+          "lastUsed": "2024-05-20T08:31:25Z"
+        }
+      },
+      "routes": [
+        {
+          "path": "/legacy/orders",
+          "method": "GET",
+          "count": 4,
+          "lastUsed": "2024-05-20T08:31:25Z"
+        }
+      ],
+      "totalRequests": 4,
+      "owner": {
+        "name": "王五",
+        "email": "wangwu@example.com",
+        "slack": "@wangwu",
+        "department": "开放平台部"
+      },
+      "riskLevel": "high"
+    },
+    {
+      "clientId": "unknown-client",
+      "clientName": "unknown-client",
+      "versions": {
+        "unknown": {
+          "count": 1,
+          "lastUsed": "2024-05-20T08:30:55Z"
+        }
+      },
+      "routes": [
+        {
+          "path": "/users/{id}",
+          "method": "GET",
+          "count": 1,
+          "lastUsed": "2024-05-20T08:30:55Z"
+        }
+      ],
+      "totalRequests": 1,
+      "riskLevel": "high"
+    },
+    {
+      "clientId": "web-admin",
+      "clientName": "后台管理系统",
+      "versions": {
+        "1.5.0": {
+          "count": 5,
+          "lastUsed": "2024-05-20T08:31:35Z"
+        },
+        "1.4.0": {
+          "count": 1,
+          "lastUsed": "2024-05-20T08:30:45Z"
+        }
+      },
+      "routes": [
+        {
+          "path": "/legacy/orders",
+          "method": "GET",
+          "count": 2,
+          "lastUsed": "2024-05-20T08:30:45Z"
+        },
+        {
+          "path": "/users/{id}/profile",
+          "method": "GET",
+          "count": 4,
+          "lastUsed": "2024-05-20T08:31:35Z"
+        }
+      ],
+      "totalRequests": 6,
+      "owner": {
+        "name": "李四",
+        "email": "lisi@example.com",
+        "slack": "@lisi",
+        "department": "前端研发部"
+      },
+      "riskLevel": "medium"
+    }
+  ],
+  "unmatchedRoutes": [
+    {
+      "path": "/users",
+      "method": "GET",
+      "count": 1
+    },
+    {
+      "path": "/health",
+      "method": "GET",
+      "count": 1
+    }
+  ],
+  "unmatchedClients": [
+    "unknown-client"
+  ]
+}

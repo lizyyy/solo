@@ -1,0 +1,34 @@
+[
+  {
+    "clientId": "mobile-app",
+    "name": "移动端应用",
+    "owner": "张三",
+    "department": "客户端研发部",
+    "versions": ["1.9.0", "2.0.0", "2.1.0"],
+    "isInternal": true
+  },
+  {
+    "clientId": "web-admin",
+    "name": "后台管理系统",
+    "owner": "李四",
+    "department": "前端研发部",
+    "versions": ["1.4.0", "1.5.0"],
+    "isInternal": true
+  },
+  {
+    "clientId": "third-party",
+    "name": "第三方合作伙伴平台",
+    "owner": "王五",
+    "department": "开放平台部",
+    "versions": ["1.0.0"],
+    "isInternal": false
+  },
+  {
+    "clientId": "internal-service",
+    "name": "内部微服务",
+    "owner": "赵六",
+    "department": "后端研发部",
+    "versions": ["3.2.0"],
+    "isInternal": true
+  }
+]
