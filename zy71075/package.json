@@ -1,0 +1,34 @@
+{
+  "name": "ffmpeg-transcode-planner",
+  "version": "1.0.0",
+  "description": "FFmpeg 批量转码计划 CLI 工具 - 估算转码体积、检测失败风险、生成转码计划",
+  "main": "src/index.js",
+  "bin": {
+    "transcode-plan": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test tests/",
+    "lint": "eslint src/**/*.js"
+  },
+  "keywords": [
+    "ffmpeg",
+    "transcode",
+    "video",
+    "ffprobe",
+    "batch",
+    "planner"
+  ],
+  "author": "Video Team",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "js-yaml": "^4.1.0",
+    "json5": "^2.2.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
