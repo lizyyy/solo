@@ -1,0 +1,247 @@
+{
+  "exit_code": 0,
+  "exit_code_description": "执行成功",
+  "config_files": [
+    "/Users/lzy/pro/solo/workspaces/zy71095/examples/main-with-include.xml",
+    "/Users/lzy/pro/solo/workspaces/zy71095/examples/include-common.xml"
+  ],
+  "env_files": [
+    "/Users/lzy/pro/solo/workspaces/zy71095/examples/.env"
+  ],
+  "environment_vars": {
+    "LOG4J_ROOT_LEVEL": "DEBUG",
+    "LOG4J_LOGGER_COM_EXAMPLE_SERVICE": "DEBUG",
+    "LOG4J_LOGGER_ORG_SPRINGFRAMEWORK": "INFO"
+  },
+  "root_logger": {
+    "package_pattern": "root",
+    "level": "DEBUG",
+    "source": {
+      "source_type": "env_var",
+      "path": "LOG4J_ROOT_LEVEL",
+      "priority": 30,
+      "line_number": null
+    },
+    "additivity": null,
+    "appenders": [],
+    "is_wildcard": false
+  },
+  "loggers": {
+    "com.example.common": {
+      "package_pattern": "com.example.common",
+      "level": "WARN",
+      "source": {
+        "source_type": "included_file",
+        "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/include-common.xml",
+        "priority": 20,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    },
+    "com.example.util": {
+      "package_pattern": "com.example.util",
+      "level": "ERROR",
+      "source": {
+        "source_type": "included_file",
+        "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/include-common.xml",
+        "priority": 20,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    },
+    "com.example": {
+      "package_pattern": "com.example",
+      "level": "TRACE",
+      "source": {
+        "source_type": "cli_override",
+        "path": "CLI",
+        "priority": 40,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    },
+    "com.example.service": {
+      "package_pattern": "com.example.service",
+      "level": "DEBUG",
+      "source": {
+        "source_type": "env_var",
+        "path": "LOG4J_LOGGER_COM_EXAMPLE_SERVICE",
+        "priority": 30,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    },
+    "org.springframework": {
+      "package_pattern": "org.springframework",
+      "level": "INFO",
+      "source": {
+        "source_type": "env_var",
+        "path": "LOG4J_LOGGER_ORG_SPRINGFRAMEWORK",
+        "priority": 30,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    },
+    "root": {
+      "package_pattern": "root",
+      "level": "DEBUG",
+      "source": {
+        "source_type": "env_var",
+        "path": "LOG4J_ROOT_LEVEL",
+        "priority": 30,
+        "line_number": null
+      },
+      "additivity": null,
+      "appenders": [],
+      "is_wildcard": false
+    }
+  },
+  "resolutions": {
+    "com.example.common": {
+      "package_name": "com.example.common",
+      "final_level": "TRACE",
+      "matched_patterns": [
+        "com.example",
+        "com.example.common",
+        "com.example"
+      ],
+      "chain": [
+        {
+          "rule": {
+            "package_pattern": "com.example",
+            "level": "TRACE",
+            "source": {
+              "source_type": "cli_override",
+              "path": "CLI",
+              "priority": 40,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": "DEBUG",
+          "reason": "优先级 400200 - 来自 命令行参数: CLI"
+        },
+        {
+          "rule": {
+            "package_pattern": "com.example.common",
+            "level": "WARN",
+            "source": {
+              "source_type": "included_file",
+              "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/include-common.xml",
+              "priority": 20,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": "TRACE",
+          "reason": "优先级 203000 - 来自 Include 文件: /Users/lzy/pro/solo/workspaces/zy71095/examples/include-common.xml"
+        },
+        {
+          "rule": {
+            "package_pattern": "com.example",
+            "level": "DEBUG",
+            "source": {
+              "source_type": "file",
+              "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/main-with-include.xml",
+              "priority": 10,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": "WARN",
+          "reason": "优先级 100200 - 来自 配置文件: /Users/lzy/pro/solo/workspaces/zy71095/examples/main-with-include.xml"
+        }
+      ]
+    },
+    "com.example.service": {
+      "package_name": "com.example.service",
+      "final_level": "TRACE",
+      "matched_patterns": [
+        "com.example",
+        "com.example.service",
+        "com.example"
+      ],
+      "chain": [
+        {
+          "rule": {
+            "package_pattern": "com.example",
+            "level": "TRACE",
+            "source": {
+              "source_type": "cli_override",
+              "path": "CLI",
+              "priority": 40,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": "DEBUG",
+          "reason": "优先级 400200 - 来自 命令行参数: CLI"
+        },
+        {
+          "rule": {
+            "package_pattern": "com.example.service",
+            "level": "DEBUG",
+            "source": {
+              "source_type": "env_var",
+              "path": "LOG4J_LOGGER_COM_EXAMPLE_SERVICE",
+              "priority": 30,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": "TRACE",
+          "reason": "优先级 303000 - 来自 系统环境变量: LOG4J_LOGGER_COM_EXAMPLE_SERVICE"
+        },
+        {
+          "rule": {
+            "package_pattern": "com.example",
+            "level": "DEBUG",
+            "source": {
+              "source_type": "file",
+              "path": "/Users/lzy/pro/solo/workspaces/zy71095/examples/main-with-include.xml",
+              "priority": 10,
+              "line_number": null
+            },
+            "additivity": null,
+            "appenders": [],
+            "is_wildcard": false
+          },
+          "previous_level": "DEBUG",
+          "reason": "优先级 100200 - 来自 配置文件: /Users/lzy/pro/solo/workspaces/zy71095/examples/main-with-include.xml"
+        }
+      ]
+    }
+  },
+  "errors": [],
+  "warnings": [],
+  "exit_code_meanings": {
+    "ExitCode.SUCCESS": "执行成功",
+    "ExitCode.INVALID_ARGS": "命令行参数无效",
+    "ExitCode.CONFIG_NOT_FOUND": "配置文件未找到",
+    "ExitCode.PARSE_ERROR": "配置文件解析错误",
+    "ExitCode.INCLUDE_ERROR": "Include 文件处理错误",
+    "ExitCode.ENV_ERROR": "环境变量处理错误",
+    "ExitCode.VALIDATION_ERROR": "输入数据校验失败",
+    "ExitCode.UNKNOWN_ERROR": "未知错误"
+  }
+}

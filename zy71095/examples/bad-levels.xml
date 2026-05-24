@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Loggers>
+        <Root level="INVALID_ROOT_LEVEL"/>
+        <Logger name="com.example.good" level="INFO"/>
+        <Logger name="com.example.bad" level="VERBOSE"/>
+        <Logger name="com.example.ugly" level="SUPER_DEBUG"/>
+    </Loggers>
+</Configuration>

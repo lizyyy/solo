@@ -62,12 +62,26 @@ class Log4jChainAnalyzer:
             resolution = self._resolve_package(package, result.root_logger, all_rules)
             result.resolutions[package] = resolution
 
-        if result.errors:
-            result.exit_code = ExitCode.PARSE_ERROR
-        else:
-            result.exit_code = ExitCode.SUCCESS
+        result.exit_code = self._determine_exit_code(result.errors)
 
         return result
+
+    def _determine_exit_code(self, errors: List[str]) -> ExitCode:
+        if not errors:
+            return ExitCode.SUCCESS
+
+        has_env_error = any(e.startswith("ENV_ERROR:") for e in errors)
+        has_include_error = any(e.startswith("INCLUDE_ERROR:") for e in errors)
+        has_parse_error = any(e.startswith("PARSE_ERROR:") for e in errors)
+
+        if has_env_error:
+            return ExitCode.ENV_ERROR
+        elif has_include_error:
+            return ExitCode.INCLUDE_ERROR
+        elif has_parse_error:
+            return ExitCode.PARSE_ERROR
+        else:
+            return ExitCode.UNKNOWN_ERROR
 
     def _collect_all_rules(self) -> List[LoggerRule]:
         all_rules = list(self.parser.loggers.values())

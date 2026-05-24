@@ -19,7 +19,7 @@ class EnvironmentProcessor:
     def load_env_file(self, file_path: Path) -> None:
         file_path = file_path.resolve()
         if not file_path.exists():
-            self.errors.append(f"环境文件不存在: {file_path}")
+            self.errors.append(f"ENV_ERROR: 环境文件不存在: {file_path}")
             return
         try:
             values = dotenv_values(file_path)
@@ -28,7 +28,7 @@ class EnvironmentProcessor:
                 if value is not None:
                     self.env_vars[key] = value
         except Exception as e:
-            self.errors.append(f"加载环境文件失败 {file_path}: {e}")
+            self.errors.append(f"ENV_ERROR: 加载环境文件失败 {file_path}: {e}")
 
     def load_system_env(self, prefix: str = "LOG4J_") -> None:
         for key, value in os.environ.items():

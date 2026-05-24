@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Include href="include-common.xml"/>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT"/>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+        <Logger name="com.example" level="DEBUG"/>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Loggers>
+        <Logger name="com.example.common" level="WARN"/>
+        <Logger name="com.example.util" level="ERROR"/>
+    </Loggers>
+</Configuration>

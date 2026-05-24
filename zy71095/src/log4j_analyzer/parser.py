@@ -20,7 +20,7 @@ class Log4jParser:
         self.config_files: List[Path] = []
 
     def parse_file(self, file_path: Path, source_type: str = "file",
-                   priority_offset: int = 0) -> None:
+                   priority_offset: int = 0, error_prefix: str = "PARSE_ERROR") -> None:
         file_path = self.base_dir / file_path
         file_path = file_path.resolve()
 
@@ -30,7 +30,7 @@ class Log4jParser:
         self.config_files.append(file_path)
 
         if not file_path.exists():
-            self.errors.append(f"配置文件不存在: {file_path}")
+            self.errors.append(f"{error_prefix}: 配置文件不存在: {file_path}")
             return
 
         suffix = file_path.suffix.lower()
@@ -39,7 +39,7 @@ class Log4jParser:
         elif suffix in ('.properties', '.props'):
             self._parse_properties(file_path, source_type, priority_offset)
         else:
-            self.warnings.append(f"未知的配置文件格式: {file_path.suffix}")
+            self.warnings.append(f"PARSE_WARNING: 未知的配置文件格式: {file_path.suffix}")
 
     def _parse_xml(self, file_path: Path, source_type: str, priority_offset: int) -> None:
         try:
@@ -49,27 +49,42 @@ class Log4jParser:
             self._parse_xml_loggers(root, file_path, source_type, priority_offset)
             self._parse_xml_appenders(root, file_path, source_type, priority_offset)
         except ET.ParseError as e:
-            self.errors.append(f"XML 解析错误 {file_path}: {e}")
+            self.errors.append(f"PARSE_ERROR: XML 解析错误 {file_path}: {e}")
         except Exception as e:
-            self.errors.append(f"处理 XML 文件时出错 {file_path}: {e}")
+            self.errors.append(f"PARSE_ERROR: 处理 XML 文件时出错 {file_path}: {e}")
 
     def _process_includes(self, root: ET.Element, file_path: Path,
                           source_type: str, priority_offset: int) -> None:
-        for include in root.findall('.//{http://jakarta.apache.org/log4j/}include') + \
-                       root.findall('.//include'):
-            href = include.get('href') or include.get('file')
-            if href:
-                include_path = Path(href)
-                if not include_path.is_absolute():
-                    include_path = file_path.parent / include_path
-                try:
-                    self.parse_file(
-                        include_path,
-                        source_type="included_file",
-                        priority_offset=CONFIG_SOURCE_PRIORITY["included_file"] - CONFIG_SOURCE_PRIORITY["file"]
-                    )
-                except Exception as e:
-                    self.errors.append(f"处理 include 文件失败 {include_path}: {e}")
+        ns = ''
+        if root.tag.startswith('{'):
+            ns = root.tag.split('}')[0] + '}'
+
+        include_tags = [
+            f'{ns}include',
+            f'{ns}Include',
+            f'{ns}iNCLUDE',
+            '{http://logging.apache.org/log4j/}include',
+            '{http://logging.apache.org/log4j/}Include',
+            '{http://jakarta.apache.org/log4j/}include',
+            '{http://jakarta.apache.org/log4j/}Include',
+        ]
+
+        for tag in include_tags:
+            for include in root.findall(f'.//{tag}'):
+                href = include.get('href') or include.get('file') or include.get('path')
+                if href:
+                    include_path = Path(href)
+                    if not include_path.is_absolute():
+                        include_path = file_path.parent / include_path
+                    try:
+                        self.parse_file(
+                            include_path,
+                            source_type="included_file",
+                            priority_offset=CONFIG_SOURCE_PRIORITY["included_file"] - CONFIG_SOURCE_PRIORITY["file"],
+                            error_prefix="INCLUDE_ERROR"
+                        )
+                    except Exception as e:
+                        self.errors.append(f"INCLUDE_ERROR: 处理 include 文件失败 {include_path}: {e}")
 
     def _parse_xml_loggers(self, root: ET.Element, file_path: Path,
                            source_type: str, priority_offset: int) -> None:
@@ -85,19 +100,23 @@ class Log4jParser:
             if not level:
                 level_elem = logger_elem.find(f'{ns}level') or logger_elem.find(f'{ns}Level')
                 level = level_elem.get('value') if level_elem is not None else None
-            if level and level.upper() in LOG_LEVELS:
-                source = ConfigSource(
-                    source_type=source_type,
-                    path=str(file_path),
-                    priority=CONFIG_SOURCE_PRIORITY[source_type] + priority_offset
-                )
-                rule = LoggerRule(
-                    package_pattern=name,
-                    level=level.upper(),
-                    source=source,
-                    is_wildcard='*' in name or '?' in name
-                )
-                self._merge_logger_rule(rule)
+            if level:
+                level_upper = level.upper()
+                if level_upper in LOG_LEVELS:
+                    source = ConfigSource(
+                        source_type=source_type,
+                        path=str(file_path),
+                        priority=CONFIG_SOURCE_PRIORITY[source_type] + priority_offset
+                    )
+                    rule = LoggerRule(
+                        package_pattern=name,
+                        level=level_upper,
+                        source=source,
+                        is_wildcard='*' in name or '?' in name
+                    )
+                    self._merge_logger_rule(rule)
+                else:
+                    self.warnings.append(f"PARSE_WARNING: 文件 {file_path} 中包 '{name}' 的日志级别 '{level}' 无效，已忽略")
 
         root_elem = root.find(f'.//{ns}root') or root.find(f'.//{ns}Root')
         if root_elem is not None:
@@ -105,17 +124,21 @@ class Log4jParser:
             if not level:
                 level_elem = root_elem.find(f'{ns}level') or root_elem.find(f'{ns}Level')
                 level = level_elem.get('value') if level_elem is not None else "INFO"
-            if level and level.upper() in LOG_LEVELS:
-                source = ConfigSource(
-                    source_type=source_type,
-                    path=str(file_path),
-                    priority=CONFIG_SOURCE_PRIORITY[source_type] + priority_offset
-                )
-                self.root_logger = LoggerRule(
-                    package_pattern="root",
-                    level=level.upper(),
-                    source=source
-                )
+            if level:
+                level_upper = level.upper()
+                if level_upper in LOG_LEVELS:
+                    source = ConfigSource(
+                        source_type=source_type,
+                        path=str(file_path),
+                        priority=CONFIG_SOURCE_PRIORITY[source_type] + priority_offset
+                    )
+                    self.root_logger = LoggerRule(
+                        package_pattern="root",
+                        level=level_upper,
+                        source=source
+                    )
+                else:
+                    self.warnings.append(f"PARSE_WARNING: 文件 {file_path} 中 root logger 的日志级别 '{level}' 无效，使用默认 INFO")
 
     def _parse_xml_appenders(self, root: ET.Element, file_path: Path,
                              source_type: str, priority_offset: int) -> None:
@@ -147,7 +170,7 @@ class Log4jParser:
             with open(file_path, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
         except Exception as e:
-            self.errors.append(f"Properties 文件读取错误 {file_path}: {e}")
+            self.errors.append(f"PARSE_ERROR: Properties 文件读取错误 {file_path}: {e}")
             return
 
         source = ConfigSource(
@@ -173,6 +196,8 @@ class Log4jParser:
                 level = parts[0].strip().upper()
                 if level in LOG_LEVELS:
                     self.root_logger = LoggerRule("root", level, source)
+                else:
+                    self.warnings.append(f"PARSE_WARNING: 文件 {file_path} 中 root logger 的日志级别 '{parts[0].strip()}' 无效，已忽略")
             
             elif key.lower().startswith('log4j.logger.'):
                 pkg = key[len('log4j.logger.'):]
@@ -186,6 +211,8 @@ class Log4jParser:
                         is_wildcard='*' in pkg or '?' in pkg
                     )
                     self._merge_logger_rule(rule)
+                else:
+                    self.warnings.append(f"PARSE_WARNING: 文件 {file_path} 中包 '{pkg}' 的日志级别 '{parts[0].strip()}' 无效，已忽略")
 
     def _merge_logger_rule(self, new_rule: LoggerRule) -> None:
         existing = self.loggers.get(new_rule.package_pattern)
