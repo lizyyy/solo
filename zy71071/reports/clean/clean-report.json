@@ -1,0 +1,264 @@
+{
+  "input": {
+    "file": "tests/clean-calendar.ics",
+    "timezone": "Asia/Shanghai",
+    "startDate": "2026-06-01",
+    "endDate": "2026-06-07"
+  },
+  "calendar": {
+    "version": "2.0",
+    "prodId": "-//Test Calendar//EN",
+    "name": "Clean Meeting Rooms",
+    "timezone": "Asia/Shanghai"
+  },
+  "summary": {
+    "totalEvents": 5,
+    "activeEvents": 5,
+    "cancelledEvents": 0,
+    "totalConflicts": 0,
+    "cancelNotEffective": 0,
+    "byType": {},
+    "bySeverity": {
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    }
+  },
+  "byRoom": {
+    "会议室A - 3F": {
+      "room": "会议室A - 3F",
+      "eventCount": 2,
+      "conflicts": [],
+      "conflictCount": 0,
+      "hasConflicts": false
+    },
+    "会议室B - 2F": {
+      "room": "会议室B - 2F",
+      "eventCount": 1,
+      "conflicts": [],
+      "conflictCount": 0,
+      "hasConflicts": false
+    },
+    "大会议室 - 5F": {
+      "room": "大会议室 - 5F",
+      "eventCount": 1,
+      "conflicts": [],
+      "conflictCount": 0,
+      "hasConflicts": false
+    },
+    "休闲区 - 1F": {
+      "room": "休闲区 - 1F",
+      "eventCount": 1,
+      "conflicts": [],
+      "conflictCount": 0,
+      "hasConflicts": false
+    }
+  },
+  "cancellations": {
+    "cancelledEvents": [],
+    "cancelNotEffective": [],
+    "processedEvents": [
+      {
+        "uid": "event-clean-001@example.com",
+        "summary": "周例会 - 会议室A",
+        "description": "每周例会讨论项目进度",
+        "location": "会议室A - 3F",
+        "status": "CONFIRMED",
+        "sequence": 0,
+        "organizer": {
+          "email": "zhangsan@example.com",
+          "name": "张三",
+          "raw": "mailto:zhangsan@example.com"
+        },
+        "attendees": [
+          {
+            "email": "lisi@example.com",
+            "name": "李四",
+            "role": "REQ-PARTICIPANT",
+            "status": "NEEDS-ACTION",
+            "rsvp": true,
+            "raw": "mailto:lisi@example.com"
+          },
+          {
+            "email": "wangwu@example.com",
+            "name": "王五",
+            "role": "REQ-PARTICIPANT",
+            "status": "NEEDS-ACTION",
+            "rsvp": true,
+            "raw": "mailto:wangwu@example.com"
+          }
+        ],
+        "startTime": "2026-06-02T01:00:00.000Z",
+        "endTime": "2026-06-02T02:00:00.000Z",
+        "originalStartTz": "Asia/Shanghai",
+        "originalEndTz": "Asia/Shanghai",
+        "isAllDay": false,
+        "isCrossDay": false,
+        "durationMinutes": 60,
+        "rrule": null,
+        "hasRecurrence": false,
+        "exdates": [],
+        "exdatesCount": 0,
+        "created": "2026-05-20T08:00:00.000Z",
+        "lastModified": "2026-05-20T08:00:00.000Z",
+        "recurrenceId": null,
+        "raw": {
+          "dtstart": "[object Object]",
+          "dtend": "[object Object]"
+        }
+      },
+      {
+        "uid": "event-clean-002@example.com",
+        "summary": "客户演示 - 会议室B",
+        "description": "新产品功能演示",
+        "location": "会议室B - 2F",
+        "status": "CONFIRMED",
+        "sequence": 0,
+        "organizer": {
+          "email": "lisi@example.com",
+          "name": "李四",
+          "raw": "mailto:lisi@example.com"
+        },
+        "attendees": [
+          {
+            "email": "client@external.com",
+            "name": "客户A",
+            "role": "REQ-PARTICIPANT",
+            "status": "NEEDS-ACTION",
+            "rsvp": true,
+            "raw": "mailto:client@external.com"
+          }
+        ],
+        "startTime": "2026-06-02T02:30:00.000Z",
+        "endTime": "2026-06-02T03:30:00.000Z",
+        "originalStartTz": "Asia/Shanghai",
+        "originalEndTz": "Asia/Shanghai",
+        "isAllDay": false,
+        "isCrossDay": false,
+        "durationMinutes": 60,
+        "rrule": null,
+        "hasRecurrence": false,
+        "exdates": [],
+        "exdatesCount": 0,
+        "created": "2026-05-20T09:00:00.000Z",
+        "lastModified": "2026-05-20T09:00:00.000Z",
+        "recurrenceId": null,
+        "raw": {
+          "dtstart": "[object Object]",
+          "dtend": "[object Object]"
+        }
+      },
+      {
+        "uid": "event-clean-003@example.com",
+        "summary": "技术评审 - 会议室A",
+        "description": "代码架构评审",
+        "location": "会议室A - 3F",
+        "status": "CONFIRMED",
+        "sequence": 0,
+        "organizer": {
+          "email": "wangwu@example.com",
+          "name": "王五",
+          "raw": "mailto:wangwu@example.com"
+        },
+        "attendees": [],
+        "startTime": "2026-06-02T06:00:00.000Z",
+        "endTime": "2026-06-02T07:00:00.000Z",
+        "originalStartTz": "Asia/Shanghai",
+        "originalEndTz": "Asia/Shanghai",
+        "isAllDay": false,
+        "isCrossDay": false,
+        "durationMinutes": 60,
+        "rrule": null,
+        "hasRecurrence": false,
+        "exdates": [],
+        "exdatesCount": 0,
+        "created": "2026-05-20T10:00:00.000Z",
+        "lastModified": "2026-05-20T10:00:00.000Z",
+        "recurrenceId": null,
+        "raw": {
+          "dtstart": "[object Object]",
+          "dtend": "[object Object]"
+        }
+      },
+      {
+        "uid": "event-clean-004@example.com",
+        "summary": "培训会 - 大会议室",
+        "description": "新员工入职培训",
+        "location": "大会议室 - 5F",
+        "status": "CONFIRMED",
+        "sequence": 0,
+        "organizer": {
+          "email": "hr@example.com",
+          "name": "HR",
+          "raw": "mailto:hr@example.com"
+        },
+        "attendees": [],
+        "startTime": "2026-06-03T01:00:00.000Z",
+        "endTime": "2026-06-03T04:00:00.000Z",
+        "originalStartTz": "Asia/Shanghai",
+        "originalEndTz": "Asia/Shanghai",
+        "isAllDay": false,
+        "isCrossDay": false,
+        "durationMinutes": 180,
+        "rrule": null,
+        "hasRecurrence": false,
+        "exdates": [],
+        "exdatesCount": 0,
+        "created": "2026-05-20T11:00:00.000Z",
+        "lastModified": "2026-05-20T11:00:00.000Z",
+        "recurrenceId": null,
+        "raw": {
+          "dtstart": "[object Object]",
+          "dtend": "[object Object]"
+        }
+      },
+      {
+        "uid": "event-clean-005@example.com",
+        "summary": "午餐会 - 休闲区",
+        "description": "团队建设午餐",
+        "location": "休闲区 - 1F",
+        "status": "CONFIRMED",
+        "sequence": 0,
+        "organizer": {
+          "email": "zhangsan@example.com",
+          "name": "张三",
+          "raw": "mailto:zhangsan@example.com"
+        },
+        "attendees": [],
+        "startTime": "2026-06-03T05:00:00.000Z",
+        "endTime": "2026-06-03T06:00:00.000Z",
+        "originalStartTz": "Asia/Shanghai",
+        "originalEndTz": "Asia/Shanghai",
+        "isAllDay": false,
+        "isCrossDay": false,
+        "durationMinutes": 60,
+        "rrule": null,
+        "hasRecurrence": false,
+        "exdates": [],
+        "exdatesCount": 0,
+        "created": "2026-05-20T12:00:00.000Z",
+        "lastModified": "2026-05-20T12:00:00.000Z",
+        "recurrenceId": null,
+        "raw": {
+          "dtstart": "[object Object]",
+          "dtend": "[object Object]"
+        }
+      }
+    ],
+    "summary": {
+      "totalCancelled": 0,
+      "totalNotEffective": 0
+    }
+  },
+  "inputValidation": {
+    "isValid": true,
+    "errors": [],
+    "warnings": []
+  },
+  "generatedAt": "2026-05-24T12:34:14.127Z",
+  "exitCode": 0,
+  "files": [
+    "reports/clean/clean-report.json",
+    "reports/clean/clean-report.md"
+  ]
+}
