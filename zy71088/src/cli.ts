@@ -43,6 +43,16 @@ program
       const flagDefinitions = loadFlagDefinitions(options.flags);
       console.log(chalk.cyan(`加载了 ${flagDefinitions.length} 个 flag 定义`));
 
+      let defaultAssumedValue: boolean | undefined;
+      const defaultVal = options.default as unknown;
+      if (defaultVal !== undefined && defaultVal !== null) {
+        if (typeof defaultVal === 'boolean') {
+          defaultAssumedValue = defaultVal;
+        } else if (typeof defaultVal === 'string') {
+          defaultAssumedValue = defaultVal.toLowerCase() === 'true';
+        }
+      }
+
       const scanOptions = mergeScanOptions({
         sourceDir: options.source,
         flagDefinitions,
@@ -50,7 +60,7 @@ program
         excludePatterns: parsePatterns(options.exclude),
         includePatterns: parsePatterns(options.include),
         languages: parseLanguages(options.languages),
-        defaultAssumedValue: options.default,
+        defaultAssumedValue,
       });
 
       ensureOutputDir(scanOptions.outputDir);

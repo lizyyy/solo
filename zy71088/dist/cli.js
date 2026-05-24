@@ -38,6 +38,16 @@ program
         }
         const flagDefinitions = (0, config_1.loadFlagDefinitions)(options.flags);
         console.log(chalk.cyan(`加载了 ${flagDefinitions.length} 个 flag 定义`));
+        let defaultAssumedValue;
+        const defaultVal = options.default;
+        if (defaultVal !== undefined && defaultVal !== null) {
+            if (typeof defaultVal === 'boolean') {
+                defaultAssumedValue = defaultVal;
+            }
+            else if (typeof defaultVal === 'string') {
+                defaultAssumedValue = defaultVal.toLowerCase() === 'true';
+            }
+        }
         const scanOptions = (0, config_1.mergeScanOptions)({
             sourceDir: options.source,
             flagDefinitions,
@@ -45,7 +55,7 @@ program
             excludePatterns: (0, config_1.parsePatterns)(options.exclude),
             includePatterns: (0, config_1.parsePatterns)(options.include),
             languages: (0, config_1.parseLanguages)(options.languages),
-            defaultAssumedValue: options.default,
+            defaultAssumedValue,
         });
         (0, config_1.ensureOutputDir)(scanOptions.outputDir);
         console.log(chalk.cyan(`开始扫描目录: ${scanOptions.sourceDir}`));

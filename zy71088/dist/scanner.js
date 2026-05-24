@@ -95,21 +95,26 @@ function getColumn(content, charIndex) {
     return lines[lines.length - 1].length + 1;
 }
 function isNegatedContext(content, matchIndex, language) {
+    const lineStart = content.lastIndexOf('\n', matchIndex) + 1;
+    const lineEnd = content.indexOf('\n', matchIndex);
+    const currentLine = content.substring(lineStart, lineEnd === -1 ? content.length : lineEnd);
+    const posInLine = matchIndex - lineStart;
+    const beforeMatchInLine = currentLine.substring(0, posInLine);
+    const exclamationRegex = /!\s*(?:isEnabled|isActive|getFlag|featureEnabled|isFeatureEnabled|[\w_]+\s*\()?\s*$/;
+    if (exclamationRegex.test(beforeMatchInLine)) {
+        return true;
+    }
+    if (/!\s*[^\s!]*$/.test(beforeMatchInLine)) {
+        return true;
+    }
     const patterns = constants_1.LANGUAGE_PATTERNS[language];
-    const contextStart = Math.max(0, matchIndex - 100);
-    const beforeMatch = content.substring(contextStart, matchIndex);
     for (const word of patterns.negationWords) {
         if (word === '!') {
-            const exclamationRegex = /!\s*(?:isEnabled|isActive|getFlag|featureEnabled|isFeatureEnabled|[\w_]+\s*\(|\w+)/;
-            if (exclamationRegex.test(beforeMatch)) {
-                return true;
-            }
+            continue;
         }
-        else {
-            const wordRegex = new RegExp(`\\b${word}\\b.*$`, 'i');
-            if (wordRegex.test(beforeMatch)) {
-                return true;
-            }
+        const wordRegex = new RegExp(`\\b${word}\\b.*$`, 'i');
+        if (wordRegex.test(beforeMatchInLine)) {
+            return true;
         }
     }
     return false;
@@ -150,26 +155,45 @@ function findAllFlagMatches(filePath, content, flagNames, dynamicPatterns) {
                 }
             }
         });
-        const directRegex = new RegExp(`\\b${escapedFlagName}\\b`, 'g');
-        let directMatch;
-        while ((directMatch = directRegex.exec(content)) !== null) {
-            const matchIndex = directMatch.index;
-            const lineNumber = getLineNumber(content, matchIndex);
-            if (!matches.some(m => m.flagName === flagName &&
+        const lineStartRegex = new RegExp(`^.*?\\b${escapedFlagName}\\b.*$`, 'gm');
+        let lineMatch;
+        while ((lineMatch = lineStartRegex.exec(content)) !== null) {
+            const lineNumber = getLineNumber(content, lineMatch.index);
+            if (matches.some(m => m.flagName === flagName &&
                 m.lineNumber === lineNumber)) {
-                const column = getColumn(content, matchIndex);
-                const isNegated = isNegatedContext(content, matchIndex, language);
-                matches.push({
-                    flagName,
-                    filePath,
-                    lineNumber,
-                    column,
-                    matchType: isNegated ? 'negated' : 'direct',
-                    context: extractLineContext(content, lineNumber),
-                    isNegated,
-                    language,
-                });
+                continue;
             }
+            const lineText = lineMatch[0];
+            if (/^\s*\/\//.test(lineText)) {
+                continue;
+            }
+            if (/^\s*\*/.test(lineText)) {
+                continue;
+            }
+            if (lineText.includes('//') && lineText.indexOf('//') < lineText.indexOf(flagName)) {
+                continue;
+            }
+            const flagInLineIndex = lineText.indexOf(flagName);
+            const beforeFlag = lineText.substring(0, flagInLineIndex);
+            if (!(beforeFlag.includes('if') || beforeFlag.includes('while') ||
+                beforeFlag.includes('return') || beforeFlag.includes('&&') ||
+                beforeFlag.includes('||') || beforeFlag.includes('?') ||
+                beforeFlag.includes('=') || beforeFlag.includes('!'))) {
+                continue;
+            }
+            const matchIndex = lineMatch.index + lineText.indexOf(flagName);
+            const column = getColumn(content, matchIndex);
+            const isNegated = isNegatedContext(content, matchIndex, language);
+            matches.push({
+                flagName,
+                filePath,
+                lineNumber,
+                column,
+                matchType: isNegated ? 'negated' : 'direct',
+                context: extractLineContext(content, lineNumber),
+                isNegated,
+                language,
+            });
         }
     });
     dynamicPatterns.forEach(pattern => {
