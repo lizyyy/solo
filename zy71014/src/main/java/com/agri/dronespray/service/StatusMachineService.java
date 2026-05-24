@@ -19,6 +19,10 @@ public class StatusMachineService {
             PermissionStatus.SUBMITTED
     );
 
+    private static final Set<PermissionStatus> ALLOW_SYSTEM_RESULT = Set.of(
+            PermissionStatus.SYSTEM_CHECKING
+    );
+
     private static final Set<PermissionStatus> ALLOW_MANUAL_REVIEW = Set.of(
             PermissionStatus.SYSTEM_APPROVED
     );
@@ -55,6 +59,8 @@ public class StatusMachineService {
         return switch (targetStatus) {
             case SUBMITTED -> ALLOW_SUBMIT.contains(currentStatus);
             case SYSTEM_CHECKING -> ALLOW_SYSTEM_CHECK.contains(currentStatus);
+            case SYSTEM_APPROVED -> ALLOW_SYSTEM_RESULT.contains(currentStatus);
+            case SYSTEM_REJECTED -> ALLOW_SYSTEM_RESULT.contains(currentStatus);
             case MANUAL_REVIEWING -> ALLOW_MANUAL_REVIEW.contains(currentStatus);
             case APPROVED -> ALLOW_APPROVE.contains(currentStatus);
             case REJECTED -> ALLOW_REJECT.contains(currentStatus);
