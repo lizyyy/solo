@@ -1,0 +1,1463 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "generatedAt": "2026-05-24T12:35:19.544Z",
+    "sourceFile": "test/data/financial-model.xlsx",
+    "options": {
+      "output": "test-output",
+      "markdown": true,
+      "json": true
+    }
+  },
+  "workbook": {
+    "filePath": "test/data/financial-model.xlsx",
+    "sheetCount": 4,
+    "sheets": [
+      {
+        "name": "假设条件",
+        "index": 0,
+        "isHidden": false,
+        "isVeryHidden": false,
+        "cellCount": 32,
+        "formulaCount": 0
+      },
+      {
+        "name": "收入",
+        "index": 1,
+        "isHidden": false,
+        "isVeryHidden": false,
+        "cellCount": 24,
+        "formulaCount": 5
+      },
+      {
+        "name": "利润表",
+        "index": 2,
+        "isHidden": false,
+        "isVeryHidden": false,
+        "cellCount": 40,
+        "formulaCount": 21
+      },
+      {
+        "name": "汇总",
+        "index": 3,
+        "isHidden": false,
+        "isVeryHidden": false,
+        "cellCount": 28,
+        "formulaCount": 11
+      }
+    ],
+    "namedRanges": [],
+    "externalLinks": []
+  },
+  "dependencyGraph": {
+    "nodeCount": 124,
+    "edgeCount": 62,
+    "hasCircularReferences": false,
+    "circularReferences": [],
+    "nodes": [
+      {
+        "address": "假设条件!A1",
+        "sheetName": "假设条件",
+        "cell": "A1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!B1",
+        "sheetName": "假设条件",
+        "cell": "B1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!C1",
+        "sheetName": "假设条件",
+        "cell": "C1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!D1",
+        "sheetName": "假设条件",
+        "cell": "D1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!A2",
+        "sheetName": "假设条件",
+        "cell": "A2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!B2",
+        "sheetName": "假设条件",
+        "cell": "B2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 2
+      },
+      {
+        "address": "假设条件!C2",
+        "sheetName": "假设条件",
+        "cell": "C2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!D2",
+        "sheetName": "假设条件",
+        "cell": "D2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!A3",
+        "sheetName": "假设条件",
+        "cell": "A3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!B3",
+        "sheetName": "假设条件",
+        "cell": "B3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 3
+      },
+      {
+        "address": "假设条件!C3",
+        "sheetName": "假设条件",
+        "cell": "C3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!D3",
+        "sheetName": "假设条件",
+        "cell": "D3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!A4",
+        "sheetName": "假设条件",
+        "cell": "A4",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!B4",
+        "sheetName": "假设条件",
+        "cell": "B4",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 3
+      },
+      {
+        "address": "假设条件!C4",
+        "sheetName": "假设条件",
+        "cell": "C4",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!D4",
+        "sheetName": "假设条件",
+        "cell": "D4",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!A5",
+        "sheetName": "假设条件",
+        "cell": "A5",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!B5",
+        "sheetName": "假设条件",
+        "cell": "B5",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 3
+      },
+      {
+        "address": "假设条件!C5",
+        "sheetName": "假设条件",
+        "cell": "C5",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!D5",
+        "sheetName": "假设条件",
+        "cell": "D5",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!A6",
+        "sheetName": "假设条件",
+        "cell": "A6",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!B6",
+        "sheetName": "假设条件",
+        "cell": "B6",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!C6",
+        "sheetName": "假设条件",
+        "cell": "C6",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!D6",
+        "sheetName": "假设条件",
+        "cell": "D6",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!A7",
+        "sheetName": "假设条件",
+        "cell": "A7",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!B7",
+        "sheetName": "假设条件",
+        "cell": "B7",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!C7",
+        "sheetName": "假设条件",
+        "cell": "C7",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!D7",
+        "sheetName": "假设条件",
+        "cell": "D7",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!A8",
+        "sheetName": "假设条件",
+        "cell": "A8",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!B8",
+        "sheetName": "假设条件",
+        "cell": "B8",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!C8",
+        "sheetName": "假设条件",
+        "cell": "C8",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "假设条件!D8",
+        "sheetName": "假设条件",
+        "cell": "D8",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!A1",
+        "sheetName": "收入",
+        "cell": "A1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!B1",
+        "sheetName": "收入",
+        "cell": "B1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!C1",
+        "sheetName": "收入",
+        "cell": "C1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!D1",
+        "sheetName": "收入",
+        "cell": "D1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!A2",
+        "sheetName": "收入",
+        "cell": "A2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!B2",
+        "sheetName": "收入",
+        "cell": "B2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!C2",
+        "sheetName": "收入",
+        "cell": "C2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!D2",
+        "sheetName": "收入",
+        "cell": "D2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!A3",
+        "sheetName": "收入",
+        "cell": "A3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!B3",
+        "sheetName": "收入",
+        "cell": "B3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!C3",
+        "sheetName": "收入",
+        "cell": "C3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!D3",
+        "sheetName": "收入",
+        "cell": "D3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!A4",
+        "sheetName": "收入",
+        "cell": "A4",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!B4",
+        "sheetName": "收入",
+        "cell": "B4",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 3
+      },
+      {
+        "address": "收入!C4",
+        "sheetName": "收入",
+        "cell": "C4",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 3
+      },
+      {
+        "address": "收入!D4",
+        "sheetName": "收入",
+        "cell": "D4",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 2
+      },
+      {
+        "address": "收入!A5",
+        "sheetName": "收入",
+        "cell": "A5",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!B5",
+        "sheetName": "收入",
+        "cell": "B5",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!C5",
+        "sheetName": "收入",
+        "cell": "C5",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!D5",
+        "sheetName": "收入",
+        "cell": "D5",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!A6",
+        "sheetName": "收入",
+        "cell": "A6",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "收入!B6",
+        "sheetName": "收入",
+        "cell": "B6",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "收入!C6",
+        "sheetName": "收入",
+        "cell": "C6",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "收入!D6",
+        "sheetName": "收入",
+        "cell": "D6",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!A1",
+        "sheetName": "利润表",
+        "cell": "A1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!B1",
+        "sheetName": "利润表",
+        "cell": "B1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!C1",
+        "sheetName": "利润表",
+        "cell": "C1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!D1",
+        "sheetName": "利润表",
+        "cell": "D1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!A2",
+        "sheetName": "利润表",
+        "cell": "A2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!B2",
+        "sheetName": "利润表",
+        "cell": "B2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!C2",
+        "sheetName": "利润表",
+        "cell": "C2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!D2",
+        "sheetName": "利润表",
+        "cell": "D2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!A3",
+        "sheetName": "利润表",
+        "cell": "A3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!B3",
+        "sheetName": "利润表",
+        "cell": "B3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!C3",
+        "sheetName": "利润表",
+        "cell": "C3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!D3",
+        "sheetName": "利润表",
+        "cell": "D3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!A4",
+        "sheetName": "利润表",
+        "cell": "A4",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!B4",
+        "sheetName": "利润表",
+        "cell": "B4",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 3
+      },
+      {
+        "address": "利润表!C4",
+        "sheetName": "利润表",
+        "cell": "C4",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 3
+      },
+      {
+        "address": "利润表!D4",
+        "sheetName": "利润表",
+        "cell": "D4",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 3
+      },
+      {
+        "address": "利润表!A5",
+        "sheetName": "利润表",
+        "cell": "A5",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!B5",
+        "sheetName": "利润表",
+        "cell": "B5",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!C5",
+        "sheetName": "利润表",
+        "cell": "C5",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!D5",
+        "sheetName": "利润表",
+        "cell": "D5",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!A6",
+        "sheetName": "利润表",
+        "cell": "A6",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!B6",
+        "sheetName": "利润表",
+        "cell": "B6",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!C6",
+        "sheetName": "利润表",
+        "cell": "C6",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!D6",
+        "sheetName": "利润表",
+        "cell": "D6",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!A7",
+        "sheetName": "利润表",
+        "cell": "A7",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!B7",
+        "sheetName": "利润表",
+        "cell": "B7",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!C7",
+        "sheetName": "利润表",
+        "cell": "C7",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!D7",
+        "sheetName": "利润表",
+        "cell": "D7",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!A8",
+        "sheetName": "利润表",
+        "cell": "A8",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!B8",
+        "sheetName": "利润表",
+        "cell": "B8",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 2
+      },
+      {
+        "address": "利润表!C8",
+        "sheetName": "利润表",
+        "cell": "C8",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 2
+      },
+      {
+        "address": "利润表!D8",
+        "sheetName": "利润表",
+        "cell": "D8",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 2
+      },
+      {
+        "address": "利润表!A9",
+        "sheetName": "利润表",
+        "cell": "A9",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!B9",
+        "sheetName": "利润表",
+        "cell": "B9",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!C9",
+        "sheetName": "利润表",
+        "cell": "C9",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!D9",
+        "sheetName": "利润表",
+        "cell": "D9",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!A10",
+        "sheetName": "利润表",
+        "cell": "A10",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "利润表!B10",
+        "sheetName": "利润表",
+        "cell": "B10",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!C10",
+        "sheetName": "利润表",
+        "cell": "C10",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "利润表!D10",
+        "sheetName": "利润表",
+        "cell": "D10",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 1
+      },
+      {
+        "address": "汇总!A1",
+        "sheetName": "汇总",
+        "cell": "A1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!B1",
+        "sheetName": "汇总",
+        "cell": "B1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!C1",
+        "sheetName": "汇总",
+        "cell": "C1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!D1",
+        "sheetName": "汇总",
+        "cell": "D1",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!A2",
+        "sheetName": "汇总",
+        "cell": "A2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!B2",
+        "sheetName": "汇总",
+        "cell": "B2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!C2",
+        "sheetName": "汇总",
+        "cell": "C2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!D2",
+        "sheetName": "汇总",
+        "cell": "D2",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!A3",
+        "sheetName": "汇总",
+        "cell": "A3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!B3",
+        "sheetName": "汇总",
+        "cell": "B3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!C3",
+        "sheetName": "汇总",
+        "cell": "C3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!D3",
+        "sheetName": "汇总",
+        "cell": "D3",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!A4",
+        "sheetName": "汇总",
+        "cell": "A4",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!B4",
+        "sheetName": "汇总",
+        "cell": "B4",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 1
+      },
+      {
+        "address": "汇总!C4",
+        "sheetName": "汇总",
+        "cell": "C4",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 1
+      },
+      {
+        "address": "汇总!D4",
+        "sheetName": "汇总",
+        "cell": "D4",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 1
+      },
+      {
+        "address": "汇总!A5",
+        "sheetName": "汇总",
+        "cell": "A5",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!B5",
+        "sheetName": "汇总",
+        "cell": "B5",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 3
+      },
+      {
+        "address": "汇总!C5",
+        "sheetName": "汇总",
+        "cell": "C5",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 2
+      },
+      {
+        "address": "汇总!D5",
+        "sheetName": "汇总",
+        "cell": "D5",
+        "hasFormula": true,
+        "dependencyCount": 1,
+        "dependentCount": 2
+      },
+      {
+        "address": "汇总!A6",
+        "sheetName": "汇总",
+        "cell": "A6",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!B6",
+        "sheetName": "汇总",
+        "cell": "B6",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!C6",
+        "sheetName": "汇总",
+        "cell": "C6",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!D6",
+        "sheetName": "汇总",
+        "cell": "D6",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!A7",
+        "sheetName": "汇总",
+        "cell": "A7",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!B7",
+        "sheetName": "汇总",
+        "cell": "B7",
+        "hasFormula": false,
+        "dependencyCount": 0,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!C7",
+        "sheetName": "汇总",
+        "cell": "C7",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 0
+      },
+      {
+        "address": "汇总!D7",
+        "sheetName": "汇总",
+        "cell": "D7",
+        "hasFormula": true,
+        "dependencyCount": 2,
+        "dependentCount": 0
+      }
+    ],
+    "edges": [
+      {
+        "from": "假设条件!B2",
+        "to": "收入!C4"
+      },
+      {
+        "from": "收入!B4",
+        "to": "收入!C4"
+      },
+      {
+        "from": "假设条件!B2",
+        "to": "收入!D4"
+      },
+      {
+        "from": "收入!C4",
+        "to": "收入!D4"
+      },
+      {
+        "from": "假设条件!B3",
+        "to": "收入!B6"
+      },
+      {
+        "from": "收入!B4",
+        "to": "收入!B6"
+      },
+      {
+        "from": "假设条件!B3",
+        "to": "收入!C6"
+      },
+      {
+        "from": "收入!C4",
+        "to": "收入!C6"
+      },
+      {
+        "from": "假设条件!B3",
+        "to": "收入!D6"
+      },
+      {
+        "from": "收入!D4",
+        "to": "收入!D6"
+      },
+      {
+        "from": "收入!B4",
+        "to": "利润表!B4"
+      },
+      {
+        "from": "收入!C4",
+        "to": "利润表!C4"
+      },
+      {
+        "from": "收入!D4",
+        "to": "利润表!D4"
+      },
+      {
+        "from": "收入!B6",
+        "to": "利润表!B5"
+      },
+      {
+        "from": "收入!C6",
+        "to": "利润表!C5"
+      },
+      {
+        "from": "收入!D6",
+        "to": "利润表!D5"
+      },
+      {
+        "from": "利润表!B4",
+        "to": "利润表!B6"
+      },
+      {
+        "from": "利润表!B5",
+        "to": "利润表!B6"
+      },
+      {
+        "from": "利润表!C4",
+        "to": "利润表!C6"
+      },
+      {
+        "from": "利润表!C5",
+        "to": "利润表!C6"
+      },
+      {
+        "from": "利润表!D4",
+        "to": "利润表!D6"
+      },
+      {
+        "from": "利润表!D5",
+        "to": "利润表!D6"
+      },
+      {
+        "from": "假设条件!B5",
+        "to": "利润表!B7"
+      },
+      {
+        "from": "利润表!B4",
+        "to": "利润表!B7"
+      },
+      {
+        "from": "假设条件!B5",
+        "to": "利润表!C7"
+      },
+      {
+        "from": "利润表!C4",
+        "to": "利润表!C7"
+      },
+      {
+        "from": "假设条件!B5",
+        "to": "利润表!D7"
+      },
+      {
+        "from": "利润表!D4",
+        "to": "利润表!D7"
+      },
+      {
+        "from": "利润表!B6",
+        "to": "利润表!B8"
+      },
+      {
+        "from": "利润表!B7",
+        "to": "利润表!B8"
+      },
+      {
+        "from": "利润表!C6",
+        "to": "利润表!C8"
+      },
+      {
+        "from": "利润表!C7",
+        "to": "利润表!C8"
+      },
+      {
+        "from": "利润表!D6",
+        "to": "利润表!D8"
+      },
+      {
+        "from": "利润表!D7",
+        "to": "利润表!D8"
+      },
+      {
+        "from": "假设条件!B4",
+        "to": "利润表!B9"
+      },
+      {
+        "from": "利润表!B8",
+        "to": "利润表!B9"
+      },
+      {
+        "from": "假设条件!B4",
+        "to": "利润表!C9"
+      },
+      {
+        "from": "利润表!C8",
+        "to": "利润表!C9"
+      },
+      {
+        "from": "假设条件!B4",
+        "to": "利润表!D9"
+      },
+      {
+        "from": "利润表!D8",
+        "to": "利润表!D9"
+      },
+      {
+        "from": "利润表!B8",
+        "to": "利润表!B10"
+      },
+      {
+        "from": "利润表!B9",
+        "to": "利润表!B10"
+      },
+      {
+        "from": "利润表!C8",
+        "to": "利润表!C10"
+      },
+      {
+        "from": "利润表!C9",
+        "to": "利润表!C10"
+      },
+      {
+        "from": "利润表!D8",
+        "to": "利润表!D10"
+      },
+      {
+        "from": "利润表!D9",
+        "to": "利润表!D10"
+      },
+      {
+        "from": "利润表!B4",
+        "to": "汇总!B4"
+      },
+      {
+        "from": "利润表!C4",
+        "to": "汇总!C4"
+      },
+      {
+        "from": "利润表!D4",
+        "to": "汇总!D4"
+      },
+      {
+        "from": "利润表!B10",
+        "to": "汇总!B5"
+      },
+      {
+        "from": "利润表!C10",
+        "to": "汇总!C5"
+      },
+      {
+        "from": "利润表!D10",
+        "to": "汇总!D5"
+      },
+      {
+        "from": "汇总!B5",
+        "to": "汇总!B6"
+      },
+      {
+        "from": "汇总!B4",
+        "to": "汇总!B6"
+      },
+      {
+        "from": "汇总!C5",
+        "to": "汇总!C6"
+      },
+      {
+        "from": "汇总!C4",
+        "to": "汇总!C6"
+      },
+      {
+        "from": "汇总!D5",
+        "to": "汇总!D6"
+      },
+      {
+        "from": "汇总!D4",
+        "to": "汇总!D6"
+      },
+      {
+        "from": "汇总!C5",
+        "to": "汇总!C7"
+      },
+      {
+        "from": "汇总!B5",
+        "to": "汇总!C7"
+      },
+      {
+        "from": "汇总!D5",
+        "to": "汇总!D7"
+      },
+      {
+        "from": "汇总!B5",
+        "to": "汇总!D7"
+      }
+    ]
+  },
+  "statistics": {
+    "totalCells": 124,
+    "formulaCells": 37,
+    "inputCells": 5,
+    "averageDependenciesPerFormula": "1.68",
+    "crossSheetReferences": 23,
+    "sheetStats": {
+      "假设条件": {
+        "cells": 32,
+        "formulas": 0,
+        "totalDependencies": 0,
+        "totalDependents": 11,
+        "isHidden": false
+      },
+      "收入": {
+        "cells": 24,
+        "formulas": 5,
+        "totalDependencies": 10,
+        "totalDependents": 11,
+        "isHidden": false
+      },
+      "利润表": {
+        "cells": 40,
+        "formulas": 21,
+        "totalDependencies": 36,
+        "totalDependents": 30,
+        "isHidden": false
+      },
+      "汇总": {
+        "cells": 28,
+        "formulas": 11,
+        "totalDependencies": 16,
+        "totalDependents": 10,
+        "isHidden": false
+      }
+    },
+    "topDependents": [
+      {
+        "address": "假设条件!B3",
+        "sheetName": "假设条件",
+        "dependentCount": 3,
+        "hasFormula": false
+      },
+      {
+        "address": "假设条件!B4",
+        "sheetName": "假设条件",
+        "dependentCount": 3,
+        "hasFormula": false
+      },
+      {
+        "address": "假设条件!B5",
+        "sheetName": "假设条件",
+        "dependentCount": 3,
+        "hasFormula": false
+      },
+      {
+        "address": "收入!B4",
+        "sheetName": "收入",
+        "dependentCount": 3,
+        "hasFormula": false
+      },
+      {
+        "address": "收入!C4",
+        "sheetName": "收入",
+        "dependentCount": 3,
+        "hasFormula": true
+      },
+      {
+        "address": "利润表!B4",
+        "sheetName": "利润表",
+        "dependentCount": 3,
+        "hasFormula": true
+      },
+      {
+        "address": "利润表!C4",
+        "sheetName": "利润表",
+        "dependentCount": 3,
+        "hasFormula": true
+      },
+      {
+        "address": "利润表!D4",
+        "sheetName": "利润表",
+        "dependentCount": 3,
+        "hasFormula": true
+      },
+      {
+        "address": "汇总!B5",
+        "sheetName": "汇总",
+        "dependentCount": 3,
+        "hasFormula": true
+      },
+      {
+        "address": "假设条件!B2",
+        "sheetName": "假设条件",
+        "dependentCount": 2,
+        "hasFormula": false
+      }
+    ],
+    "topDependencies": [
+      {
+        "address": "收入!C4",
+        "sheetName": "收入",
+        "dependencyCount": 2,
+        "formula": "B4*(1+假设条件!$B$2)"
+      },
+      {
+        "address": "收入!D4",
+        "sheetName": "收入",
+        "dependencyCount": 2,
+        "formula": "C4*(1+假设条件!$B$2)"
+      },
+      {
+        "address": "收入!B6",
+        "sheetName": "收入",
+        "dependencyCount": 2,
+        "formula": "B4*假设条件!$B$3"
+      },
+      {
+        "address": "收入!C6",
+        "sheetName": "收入",
+        "dependencyCount": 2,
+        "formula": "C4*假设条件!$B$3"
+      },
+      {
+        "address": "收入!D6",
+        "sheetName": "收入",
+        "dependencyCount": 2,
+        "formula": "D4*假设条件!$B$3"
+      },
+      {
+        "address": "利润表!B6",
+        "sheetName": "利润表",
+        "dependencyCount": 2,
+        "formula": "B4-B5"
+      },
+      {
+        "address": "利润表!C6",
+        "sheetName": "利润表",
+        "dependencyCount": 2,
+        "formula": "C4-C5"
+      },
+      {
+        "address": "利润表!D6",
+        "sheetName": "利润表",
+        "dependencyCount": 2,
+        "formula": "D4-D5"
+      },
+      {
+        "address": "利润表!B7",
+        "sheetName": "利润表",
+        "dependencyCount": 2,
+        "formula": "B4*假设条件!$B$5"
+      },
+      {
+        "address": "利润表!C7",
+        "sheetName": "利润表",
+        "dependencyCount": 2,
+        "formula": "C4*假设条件!$B$5"
+      }
+    ]
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "generatedAt": "2026-05-24T12:35:37.028Z",
+    "sourceFile": "test/data/financial-model.xlsx",
+    "type": "impact-analysis"
+  },
+  "targetCell": {
+    "address": "假设条件!B2",
+    "node": {
+      "address": "假设条件!B2",
+      "sheetName": "假设条件",
+      "cell": "B2",
+      "hasFormula": false,
+      "formula": null,
+      "value": "",
+      "dependencies": [],
+      "dependents": [
+        "收入!C4",
+        "收入!D4"
+      ]
+    }
+  },
+  "impact": {
+    "totalImpactedCells": 26,
+    "impactedCells": [
+      "假设条件!B2",
+      "收入!C4",
+      "收入!D4",
+      "收入!D6",
+      "利润表!D5",
+      "利润表!D6",
+      "利润表!D8",
+      "利润表!D9",
+      "利润表!D10",
+      "汇总!D5",
+      "汇总!D6",
+      "汇总!D7",
+      "利润表!D4",
+      "利润表!D7",
+      "汇总!D4",
+      "收入!C6",
+      "利润表!C5",
+      "利润表!C6",
+      "利润表!C8",
+      "利润表!C9",
+      "利润表!C10",
+      "汇总!C5",
+      "汇总!C6",
+      "汇总!C7",
+      "利润表!C4",
+      "利润表!C7",
+      "汇总!C4"
+    ],
+    "impactedSheets": [
+      {
+        "sheetName": "利润表",
+        "cellCount": 14,
+        "cells": [
+          "利润表!D5",
+          "利润表!D6",
+          "利润表!D8",
+          "利润表!D9",
+          "利润表!D10",
+          "利润表!D4",
+          "利润表!D7",
+          "利润表!C5",
+          "利润表!C6",
+          "利润表!C8",
+          "利润表!C9",
+          "利润表!C10",
+          "利润表!C4",
+          "利润表!C7"
+        ]
+      },
+      {
+        "sheetName": "汇总",
+        "cellCount": 8,
+        "cells": [
+          "汇总!D5",
+          "汇总!D6",
+          "汇总!D7",
+          "汇总!D4",
+          "汇总!C5",
+          "汇总!C6",
+          "汇总!C7",
+          "汇总!C4"
+        ]
+      },
+      {
+        "sheetName": "收入",
+        "cellCount": 4,
+        "cells": [
+          "收入!C4",
+          "收入!D4",
+          "收入!D6",
+          "收入!C6"
+        ]
+      },
+      {
+        "sheetName": "假设条件",
+        "cellCount": 1,
+        "cells": [
+          "假设条件!B2"
+        ]
+      }
+    ]
+  }
+}

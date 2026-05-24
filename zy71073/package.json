@@ -1,0 +1,24 @@
+{
+  "name": "excel-dep-graph",
+  "version": "1.0.0",
+  "description": "Excel Formula Dependency Graph CLI - 分析Excel公式依赖关系的命令行工具",
+  "main": "src/index.js",
+  "bin": {
+    "excel-dep": "bin/excel-dep.js"
+  },
+  "scripts": {
+    "test": "node bin/excel-dep.js self-test",
+    "lint": "node --check src/**/*.js"
+  },
+  "keywords": ["excel", "dependency", "formula", "graph", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "xlsx": "^0.18.5",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
