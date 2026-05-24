@@ -124,9 +124,16 @@ export function generatePathPatterns(route: DeprecatedRoute): RegExp[] {
 
 export function matchPathToRoute(
   requestPath: string,
+  requestMethod: string,
   routes: DeprecatedRoute[]
 ): { route: DeprecatedRoute; isAlias: boolean } | null {
+  const normalizedMethod = requestMethod.toUpperCase();
+  
   for (const route of routes) {
+    if (route.method !== normalizedMethod) {
+      continue;
+    }
+    
     const directPattern = route.path
       .replace(/\{[^}]+\}/g, '[^/]+')
       .replace(/\*/g, '.*');

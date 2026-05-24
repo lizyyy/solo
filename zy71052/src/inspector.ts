@@ -78,7 +78,7 @@ function analyzeUsage(
   for (const log of logs) {
     allClientIds.add(log.clientId);
 
-    const match = matchPathToRoute(log.path, deprecatedRoutes);
+    const match = matchPathToRoute(log.path, log.method, deprecatedRoutes);
     
     if (match) {
       const routeKey = `${log.method} ${log.path}`;

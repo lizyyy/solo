@@ -1,16 +1,16 @@
 {
   "metadata": {
-    "inspectionDate": "2026-05-24T18:57:07.303+08:00",
+    "inspectionDate": "2026-05-24T21:24:24.633+08:00",
     "openapiFile": "examples/openapi.yaml",
     "logFile": "examples/gateway.log",
     "clientFile": "examples/clients.json",
     "ownerFile": "examples/owners.json",
     "timezone": "Asia/Shanghai",
-    "reportId": "5fb5df73-2fb3-450f-a600-8752fa451d42"
+    "reportId": "63534d32-5016-4c83-81df-acd537995df9"
   },
   "summary": {
     "totalDeprecatedRoutes": 4,
-    "activeDeprecatedRoutes": 3,
+    "activeDeprecatedRoutes": 4,
     "affectedClients": 4,
     "totalDeprecatedRequests": 18,
     "criticalRiskClients": 0,
@@ -129,8 +129,14 @@
       "routes": [
         {
           "path": "/legacy/orders",
+          "method": "POST",
+          "count": 1,
+          "lastUsed": "2024-05-20T08:30:15Z"
+        },
+        {
+          "path": "/legacy/orders",
           "method": "GET",
-          "count": 4,
+          "count": 3,
           "lastUsed": "2024-05-20T08:31:25Z"
         }
       ],
@@ -180,14 +186,20 @@
         {
           "path": "/legacy/orders",
           "method": "GET",
-          "count": 2,
-          "lastUsed": "2024-05-20T08:30:45Z"
+          "count": 1,
+          "lastUsed": "2024-05-20T08:30:05Z"
         },
         {
           "path": "/users/{id}/profile",
           "method": "GET",
           "count": 4,
           "lastUsed": "2024-05-20T08:31:35Z"
+        },
+        {
+          "path": "/legacy/orders",
+          "method": "POST",
+          "count": 1,
+          "lastUsed": "2024-05-20T08:30:45Z"
         }
       ],
       "totalRequests": 6,

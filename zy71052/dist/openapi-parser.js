@@ -99,8 +99,12 @@ function generatePathPatterns(route) {
     }
     return patterns;
 }
-function matchPathToRoute(requestPath, routes) {
+function matchPathToRoute(requestPath, requestMethod, routes) {
+    const normalizedMethod = requestMethod.toUpperCase();
     for (const route of routes) {
+        if (route.method !== normalizedMethod) {
+            continue;
+        }
         const directPattern = route.path
             .replace(/\{[^}]+\}/g, '[^/]+')
             .replace(/\*/g, '.*');

@@ -51,7 +51,7 @@ function analyzeUsage(logs, deprecatedRoutes, clientsMap, ownersMap, timezone) {
     const allClientIds = new Set();
     for (const log of logs) {
         allClientIds.add(log.clientId);
-        const match = (0, openapi_parser_1.matchPathToRoute)(log.path, deprecatedRoutes);
+        const match = (0, openapi_parser_1.matchPathToRoute)(log.path, log.method, deprecatedRoutes);
         if (match) {
             const routeKey = `${log.method} ${log.path}`;
             if (!routeUsageMap.has(routeKey)) {
