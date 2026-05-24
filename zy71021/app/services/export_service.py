@@ -34,6 +34,14 @@ class ExportService:
 
         data = []
         for record in records:
+            voucher_no = ""
+            voucher_amount = ""
+            voucher_status = ""
+            if record.voucher:
+                voucher_no = record.voucher.voucher_no
+                voucher_amount = record.voucher.amount
+                voucher_status = self._translate_voucher_status(record.voucher.status)
+
             data.append({
                 "案件编号": record.case_no,
                 "批次号": record.batch_no or "",
@@ -47,6 +55,9 @@ class ExportService:
                 "处理结论": self._translate_conclusion(record.conclusion),
                 "建议补偿金额": record.compensation_amount,
                 "是否重复": "是" if record.is_duplicate else "否",
+                "补偿券编号": voucher_no,
+                "补偿券金额": voucher_amount,
+                "补偿券状态": voucher_status,
                 "处理人": record.operator or "",
                 "创建时间": record.created_at.strftime("%Y-%m-%d %H:%M:%S") if record.created_at else "",
                 "确认时间": record.confirmed_at.strftime("%Y-%m-%d %H:%M:%S") if record.confirmed_at else "",
@@ -257,3 +268,11 @@ class ExportService:
             "rejudge": "改判"
         }
         return operation_map.get(operation, operation or "未知")
+
+    def _translate_voucher_status(self, status: Optional[str]) -> str:
+        status_map = {
+            "unused": "未使用",
+            "used": "已使用",
+            "expired": "已过期"
+        }
+        return status_map.get(status, status or "未知")

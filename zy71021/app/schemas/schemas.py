@@ -27,6 +27,38 @@ class ElectricityRecordCreate(BaseModel):
     raw_data: Optional[str] = None
 
 
+class VoucherCreate(BaseModel):
+    voucher_no: str
+    user_id: str
+    amount: float
+    valid_days: int = 30
+
+
+class VoucherResponse(BaseModel):
+    id: int
+    voucher_no: str
+    user_id: str
+    amount: float
+    valid_from: Optional[datetime]
+    valid_to: Optional[datetime]
+    status: str
+    used_time: Optional[datetime]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class VoucherBindRequest(BaseModel):
+    voucher_no: str
+    case_no: str
+
+
+class VoucherUseRequest(BaseModel):
+    operator: Optional[str] = None
+    remark: Optional[str] = None
+
+
 class CompensationUploadRequest(BaseModel):
     batch_no: Optional[str] = None
     case_no: str
@@ -73,6 +105,7 @@ class CompensationResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     suggestion_detail: Optional[CompensationSuggestion] = None
+    voucher: Optional[VoucherResponse] = None
 
     class Config:
         from_attributes = True

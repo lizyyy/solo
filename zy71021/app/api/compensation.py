@@ -16,6 +16,23 @@ from app.services import CompensationService
 router = APIRouter()
 
 
+def _build_voucher_response(record):
+    from app.schemas import VoucherResponse
+    if record.voucher:
+        return VoucherResponse(
+            id=record.voucher.id,
+            voucher_no=record.voucher.voucher_no,
+            user_id=record.voucher.user_id,
+            amount=record.voucher.amount,
+            valid_from=record.voucher.valid_from,
+            valid_to=record.voucher.valid_to,
+            status=record.voucher.status,
+            used_time=record.voucher.used_time,
+            created_at=record.voucher.created_at
+        )
+    return None
+
+
 @router.post("/upload", response_model=CompensationResponse)
 def upload_compensation(
     request: CompensationUploadRequest,
@@ -51,7 +68,8 @@ def upload_compensation(
             closed_at=record.closed_at,
             created_at=record.created_at,
             updated_at=record.updated_at,
-            suggestion_detail=suggestion
+            suggestion_detail=suggestion,
+            voucher=_build_voucher_response(record)
         )
         return response
     except Exception as e:
@@ -101,7 +119,8 @@ def get_compensation(
         closed_at=record.closed_at,
         created_at=record.created_at,
         updated_at=record.updated_at,
-        suggestion_detail=suggestion_detail
+        suggestion_detail=suggestion_detail,
+        voucher=_build_voucher_response(record)
     )
 
 
@@ -155,7 +174,8 @@ def query_compensations(
             confirmed_at=record.confirmed_at,
             closed_at=record.closed_at,
             created_at=record.created_at,
-            updated_at=record.updated_at
+            updated_at=record.updated_at,
+            voucher=_build_voucher_response(record)
         ))
 
     return {
@@ -173,42 +193,47 @@ def confirm_compensation(
     db: Session = Depends(get_db)
 ):
     service = CompensationService(db)
-    record = service.confirm_record(
-        case_no=case_no,
-        operator=request.operator,
-        approved=request.approved,
-        conclusion=request.conclusion,
-        compensation_amount=request.compensation_amount,
-        remark=request.remark
-    )
-    if not record:
-        raise HTTPException(status_code=404, detail="记录不存在")
+    try:
+        record = service.confirm_record(
+            case_no=case_no,
+            operator=request.operator,
+            approved=request.approved,
+            conclusion=request.conclusion,
+            compensation_amount=request.compensation_amount,
+            remark=request.remark
+        )
+        if not record:
+            raise HTTPException(status_code=404, detail="记录不存在")
 
-    db.commit()
-    db.refresh(record)
+        db.commit()
+        db.refresh(record)
 
-    return CompensationResponse(
-        id=record.id,
-        batch_no=record.batch_no,
-        case_no=record.case_no,
-        user_id=record.user_id,
-        pile_no=record.pile_no,
-        order_no=record.order_no,
-        fault_code=record.fault_code,
-        fault_category=record.fault_category,
-        description=record.description,
-        status=record.status,
-        conclusion=record.conclusion,
-        suggestion=record.suggestion,
-        compensation_amount=record.compensation_amount,
-        is_duplicate=record.is_duplicate,
-        operator=record.operator,
-        verified_at=record.verified_at,
-        confirmed_at=record.confirmed_at,
-        closed_at=record.closed_at,
-        created_at=record.created_at,
-        updated_at=record.updated_at
-    )
+        return CompensationResponse(
+            id=record.id,
+            batch_no=record.batch_no,
+            case_no=record.case_no,
+            user_id=record.user_id,
+            pile_no=record.pile_no,
+            order_no=record.order_no,
+            fault_code=record.fault_code,
+            fault_category=record.fault_category,
+            description=record.description,
+            status=record.status,
+            conclusion=record.conclusion,
+            suggestion=record.suggestion,
+            compensation_amount=record.compensation_amount,
+            is_duplicate=record.is_duplicate,
+            operator=record.operator,
+            verified_at=record.verified_at,
+            confirmed_at=record.confirmed_at,
+            closed_at=record.closed_at,
+            created_at=record.created_at,
+            updated_at=record.updated_at,
+            voucher=_build_voucher_response(record)
+        )
+    except ValueError as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/{case_no}/cancel", response_model=CompensationResponse)
@@ -219,35 +244,40 @@ def cancel_compensation(
     db: Session = Depends(get_db)
 ):
     service = CompensationService(db)
-    record = service.cancel_record(case_no, operator, remark)
-    if not record:
-        raise HTTPException(status_code=404, detail="记录不存在")
+    try:
+        record = service.cancel_record(case_no, operator, remark)
+        if not record:
+            raise HTTPException(status_code=404, detail="记录不存在")
 
-    db.commit()
-    db.refresh(record)
+        db.commit()
+        db.refresh(record)
 
-    return CompensationResponse(
-        id=record.id,
-        batch_no=record.batch_no,
-        case_no=record.case_no,
-        user_id=record.user_id,
-        pile_no=record.pile_no,
-        order_no=record.order_no,
-        fault_code=record.fault_code,
-        fault_category=record.fault_category,
-        description=record.description,
-        status=record.status,
-        conclusion=record.conclusion,
-        suggestion=record.suggestion,
-        compensation_amount=record.compensation_amount,
-        is_duplicate=record.is_duplicate,
-        operator=record.operator,
-        verified_at=record.verified_at,
-        confirmed_at=record.confirmed_at,
-        closed_at=record.closed_at,
-        created_at=record.created_at,
-        updated_at=record.updated_at
-    )
+        return CompensationResponse(
+            id=record.id,
+            batch_no=record.batch_no,
+            case_no=record.case_no,
+            user_id=record.user_id,
+            pile_no=record.pile_no,
+            order_no=record.order_no,
+            fault_code=record.fault_code,
+            fault_category=record.fault_category,
+            description=record.description,
+            status=record.status,
+            conclusion=record.conclusion,
+            suggestion=record.suggestion,
+            compensation_amount=record.compensation_amount,
+            is_duplicate=record.is_duplicate,
+            operator=record.operator,
+            verified_at=record.verified_at,
+            confirmed_at=record.confirmed_at,
+            closed_at=record.closed_at,
+            created_at=record.created_at,
+            updated_at=record.updated_at,
+            voucher=_build_voucher_response(record)
+        )
+    except ValueError as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/{case_no}/rejudge", response_model=CompensationResponse)
@@ -292,7 +322,8 @@ def rejudge_compensation(
             confirmed_at=record.confirmed_at,
             closed_at=record.closed_at,
             created_at=record.created_at,
-            updated_at=record.updated_at
+            updated_at=record.updated_at,
+            voucher=_build_voucher_response(record)
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

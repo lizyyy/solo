@@ -252,6 +252,157 @@ def test_export_excel():
         print(f"文件已保存: {filename}")
 
 
+def test_check_voucher_after_confirm():
+    print("\n" + "=" * 60)
+    print("测试12: 确认补偿后自动创建补偿券")
+    print("=" * 60)
+
+    url = f"{BASE_URL}/compensation/CASE20240101002"
+    response = requests.get(url)
+    print(f"状态码: {response.status_code}")
+    result = response.json()
+    voucher = result.get('voucher')
+    if voucher:
+        print(f"补偿券编号: {voucher.get('voucher_no')}")
+        print(f"补偿券金额: {voucher.get('amount')}")
+        print(f"补偿券状态: {voucher.get('status')}")
+    else:
+        print("未找到关联的补偿券")
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+def test_query_vouchers():
+    print("\n" + "=" * 60)
+    print("测试13: 查询补偿券列表")
+    print("=" * 60)
+
+    url = f"{BASE_URL}/voucher/"
+    params = {
+        "user_id": "USER001",
+        "page": 1,
+        "page_size": 10
+    }
+    response = requests.get(url, params=params)
+    print(f"状态码: {response.status_code}")
+    result = response.json()
+    print(f"总记录数: {result.get('total')}")
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+def test_use_voucher():
+    print("\n" + "=" * 60)
+    print("测试14: 核销补偿券")
+    print("=" * 60)
+
+    url = f"{BASE_URL}/compensation/CASE20240101002"
+    response = requests.get(url)
+    result = response.json()
+    voucher = result.get('voucher')
+    if not voucher:
+        print("未找到补偿券，跳过核销测试")
+        return
+
+    voucher_no = voucher.get('voucher_no')
+    print(f"核销券号: {voucher_no}")
+
+    url = f"{BASE_URL}/voucher/{voucher_no}/use"
+    data = {
+        "operator": "ADMIN001",
+        "remark": "用户线下核销"
+    }
+    response = requests.post(url, json=data)
+    print(f"状态码: {response.status_code}")
+    result = response.json()
+    print(f"券状态: {result.get('status')}")
+    print(f"使用时间: {result.get('used_time')}")
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+def test_state_machine_validation():
+    print("\n" + "=" * 60)
+    print("测试15: 状态机校验（非法状态转换应被拒绝）")
+    print("=" * 60)
+
+    url = f"{BASE_URL}/compensation/CASE20240101002/cancel"
+    params = {
+        "operator": "ADMIN001",
+        "remark": "测试非法撤回"
+    }
+    response = requests.post(url, params=params)
+    print(f"状态码: {response.status_code}")
+    if response.status_code == 400:
+        print("✅ 状态机校验生效，非法转换被拒绝")
+        result = response.json()
+        print(f"错误信息: {result.get('detail')}")
+    else:
+        print("❌ 状态机校验未生效")
+    print()
+
+
+def test_upload_for_voucher():
+    print("\n" + "=" * 60)
+    print("准备: 上传新的补偿申请用于券测试")
+    print("=" * 60)
+
+    url = f"{BASE_URL}/compensation/upload"
+    data = {
+        "batch_no": "BATCH20240101002",
+        "case_no": "CASE20240101002",
+        "user_id": "USER001",
+        "pile_no": "PILE-A02",
+        "order_no": "ORD20240101002",
+        "fault_code": "E002",
+        "fault_description": "支付成功但无法充电",
+        "description": "测试自动创建补偿券",
+        "order": {
+            "order_no": "ORD20240101002",
+            "user_id": "USER001",
+            "pile_no": "PILE-A02",
+            "amount": 30.0,
+            "pay_time": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "pay_status": "paid",
+            "start_time": (datetime.now() - timedelta(hours=1)).isoformat(),
+            "end_time": datetime.now().isoformat()
+        },
+        "electricity": {
+            "record_no": "ELEC20240101002",
+            "order_no": "ORD20240101002",
+            "pile_no": "PILE-A02",
+            "start_energy": 100.0,
+            "end_energy": 100.0,
+            "total_energy": 0.0
+        }
+    }
+
+    response = requests.post(url, json=data)
+    print(f"状态码: {response.status_code}")
+    result = response.json()
+    print(f"状态: {result.get('status')}")
+
+
+def test_confirm_for_voucher():
+    print("\n" + "=" * 60)
+    print("准备: 确认补偿申请")
+    print("=" * 60)
+
+    url = f"{BASE_URL}/compensation/CASE20240101002/confirm"
+    data = {
+        "operator": "ADMIN001",
+        "approved": True,
+        "conclusion": "pile_fault",
+        "compensation_amount": 30.0,
+        "remark": "测试自动创券"
+    }
+
+    response = requests.post(url, json=data)
+    print(f"状态码: {response.status_code}")
+    result = response.json()
+    print(f"状态: {result.get('status')}")
+    voucher = result.get('voucher')
+    if voucher:
+        print(f"✅ 自动创建补偿券成功: {voucher.get('voucher_no')}")
+
+
 if __name__ == "__main__":
     print("充电桩故障补偿 API 测试脚本")
     print("请先确保服务已启动: python main.py")
@@ -269,6 +420,13 @@ if __name__ == "__main__":
         test_query_list()
         test_get_statistics()
         test_export_excel()
+
+        test_upload_for_voucher()
+        test_confirm_for_voucher()
+        test_check_voucher_after_confirm()
+        test_query_vouchers()
+        test_use_voucher()
+        test_state_machine_validation()
 
         print("\n" + "=" * 60)
         print("所有测试完成!")

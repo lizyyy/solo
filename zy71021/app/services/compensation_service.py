@@ -348,7 +348,8 @@ class CompensationService:
         approved: bool,
         conclusion: Optional[str] = None,
         compensation_amount: Optional[float] = None,
-        remark: Optional[str] = None
+        remark: Optional[str] = None,
+        auto_create_voucher: bool = True
     ) -> Optional[CompensationRecord]:
         record = self.db.query(CompensationRecord).filter(
             CompensationRecord.case_no == case_no
@@ -366,6 +367,9 @@ class CompensationService:
         else:
             new_status = CompensationStatus.REJECTED
 
+        if not CompensationStateMachine.can_transition(old_status, new_status):
+            raise ValueError(f"无效的状态转换: {old_status} -> {new_status}")
+
         if conclusion:
             record.conclusion = conclusion
 
@@ -381,6 +385,32 @@ class CompensationService:
             operator,
             remark or ("批准补偿" if approved else "拒绝补偿")
         )
+
+        if approved and auto_create_voucher and not record.voucher_id and record.compensation_amount > 0:
+            from app.services.voucher_service import VoucherService
+            voucher_service = VoucherService(self.db)
+            try:
+                voucher, _ = voucher_service.create_and_bind_voucher(
+                    case_no=case_no,
+                    amount=record.compensation_amount
+                )
+                self._add_operation_log(
+                    record.id,
+                    "create_voucher",
+                    new_status,
+                    new_status,
+                    operator,
+                    f"自动创建补偿券: {voucher.voucher_no}, 金额: {voucher.amount}"
+                )
+            except Exception as e:
+                self._add_operation_log(
+                    record.id,
+                    "create_voucher_failed",
+                    new_status,
+                    new_status,
+                    operator,
+                    f"创建补偿券失败: {str(e)}"
+                )
 
         self.db.flush()
         return record
@@ -399,13 +429,18 @@ class CompensationService:
             return None
 
         old_status = record.status
-        record.status = CompensationStatus.CANCELLED
+        new_status = CompensationStatus.CANCELLED
+
+        if not CompensationStateMachine.can_transition(old_status, new_status):
+            raise ValueError(f"无效的状态转换: {old_status} -> {new_status}")
+
+        record.status = new_status
 
         self._add_operation_log(
             record.id,
             "cancel",
             old_status,
-            CompensationStatus.CANCELLED,
+            new_status,
             operator,
             remark
         )
