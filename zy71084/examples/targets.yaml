@@ -1,0 +1,15 @@
+targets:
+  - name: App Main
+    bundleId: com.example.app
+    profileName: Example App Profile
+    certificateName: Apple Distribution: Example Team
+
+  - name: App Dev
+    bundleId: com.example.app.dev
+    profileName: Example App Dev Profile
+
+  - name: Share Extension
+    bundleId: com.example.app.share
+
+  - name: Widget Extension
+    bundleId: com.example.app.widget
