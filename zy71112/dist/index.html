@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>水族馆水流展示系统</title>
+  <script type="module" crossorigin src="/assets/index-DMeQ-7Vi.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-BlMUqV0y.css">
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>🌊 水族馆水流展示</h1>
+      </div>
+      
+      <div class="control-section">
+        <h2>📋 样例选择</h2>
+        <select id="exampleSelect" class="control-input">
+          <option value="">-- 选择内置样例 --</option>
+          <option value="normal">正常水流模式</option>
+          <option value="conflict">水流冲突模式</option>
+          <option value="empty">空结果模式</option>
+        </select>
+        <button id="loadExample" class="btn btn-primary">加载样例</button>
+        <div class="file-upload">
+          <label for="fileInput" class="btn btn-secondary">导入配置文件</label>
+          <input type="file" id="fileInput" accept=".json" style="display: none;">
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h2>🔧 阀门控制</h2>
+        <div id="valveControls" class="valve-list"></div>
+      </div>
+
+      <div class="control-section">
+        <h2>⏱️ 时间轴控制</h2>
+        <div class="timeline-control">
+          <input type="range" id="timelineSlider" min="0" max="100" value="0" class="slider">
+          <div class="time-display">
+            <span id="currentTime">00:00</span>
+            <button id="playBtn" class="btn btn-small">▶️ 播放</button>
+            <button id="pauseBtn" class="btn btn-small">⏸️ 暂停</button>
+          </div>
+        </div>
+        <div class="time-slots">
+          <label><input type="checkbox" id="maintenanceMode" value="maintenance"> 维护时段</label>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h2>👁️ 视角切换</h2>
+        <div class="view-buttons">
+          <button class="btn btn-view" data-view="front">正面</button>
+          <button class="btn btn-view" data-view="side">侧面</button>
+          <button class="btn btn-view" data-view="top">俯视</button>
+          <button class="btn btn-view" data-view="free">自由</button>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h2>📸 状态管理</h2>
+        <button id="snapshotBtn" class="btn btn-success">📸 保存快照</button>
+        <button id="exportReport" class="btn btn-info">📄 导出报告</button>
+        <button id="resetBtn" class="btn btn-danger">🔄 重置状态</button>
+      </div>
+
+      <div class="control-section">
+        <h2>📊 状态显示</h2>
+        <div id="statusPanel" class="status-panel">
+          <div class="status-item">
+            <span class="label">水流状态:</span>
+            <span id="flowStatus" class="value normal">正常</span>
+          </div>
+          <div class="status-item">
+            <span class="label">活跃阀门:</span>
+            <span id="activeValves" class="value">0/0</span>
+          </div>
+          <div class="status-item">
+            <span class="label">平均流速:</span>
+            <span id="avgFlowRate" class="value">0.00 m/s</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h2>🗂️ 快照历史</h2>
+        <div id="snapshotList" class="snapshot-list"></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div id="canvasContainer" class="canvas-container"></div>
+      <div class="legend">
+        <div class="legend-item">
+          <span class="legend-color" style="background: #00ff88;"></span>
+          <span>进水方向</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background: #ff6b6b;"></span>
+          <span>出水方向</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background: #ffd93d;"></span>
+          <span>水流冲突</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color" style="background: #6bcfff;"></span>
+          <span>维护隔离区</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>

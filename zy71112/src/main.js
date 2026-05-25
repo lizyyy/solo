@@ -10,6 +10,8 @@ class AquariumFlowApp {
     this.currentTime = 0;
     this.playInterval = null;
     this.currentView = 'free';
+    this.baseConfig = null;
+    this.timelineKeyframes = [];
     
     this.init();
   }
@@ -76,10 +78,73 @@ class AquariumFlowApp {
   loadExample(exampleId) {
     const config = getExampleConfig(exampleId);
     if (config) {
+      this.baseConfig = JSON.parse(JSON.stringify(config));
       this.currentConfig = JSON.parse(JSON.stringify(config));
+      this.generateTimelineKeyframes();
       this.applyConfig(this.currentConfig);
       this.updateStatusPanel();
     }
+  }
+
+  generateTimelineKeyframes() {
+    if (!this.baseConfig) return;
+    
+    this.timelineKeyframes = [];
+    
+    this.baseConfig.valves.forEach((valve, index) => {
+      const offset = index * 15;
+      
+      this.timelineKeyframes.push({
+        time: offset,
+        valveId: valve.id,
+        property: 'active',
+        value: true,
+        easing: 'step'
+      });
+      
+      this.timelineKeyframes.push({
+        time: offset,
+        valveId: valve.id,
+        property: 'openDegree',
+        startValue: 0,
+        endValue: valve.openDegree,
+        easing: 'linear'
+      });
+      
+      this.timelineKeyframes.push({
+        time: 50 + offset,
+        valveId: valve.id,
+        property: 'openDegree',
+        startValue: valve.openDegree,
+        endValue: Math.max(20, valve.openDegree - 30),
+        easing: 'linear'
+      });
+      
+      this.timelineKeyframes.push({
+        time: 80 + offset,
+        valveId: valve.id,
+        property: 'openDegree',
+        startValue: Math.max(20, valve.openDegree - 30),
+        endValue: valve.openDegree,
+        easing: 'linear'
+      });
+    });
+    
+    this.timelineKeyframes.push({
+      time: 60,
+      property: 'maintenance',
+      value: true,
+      easing: 'step'
+    });
+    
+    this.timelineKeyframes.push({
+      time: 70,
+      property: 'maintenance',
+      value: false,
+      easing: 'step'
+    });
+    
+    this.timelineKeyframes.sort((a, b) => a.time - b.time);
   }
 
   applyConfig(config) {
@@ -143,6 +208,8 @@ class AquariumFlowApp {
   }
 
   toggleValve(valveId) {
+    this.pausePlayback();
+    
     const valve = this.currentConfig.valves.find(v => v.id === valveId);
     if (valve) {
       valve.active = !valve.active;
@@ -172,6 +239,8 @@ class AquariumFlowApp {
   }
 
   setValveOpenDegree(valveId, openDegree) {
+    this.pausePlayback();
+    
     const valve = this.currentConfig.valves.find(v => v.id === valveId);
     if (valve) {
       valve.openDegree = openDegree;
@@ -265,31 +334,8 @@ class AquariumFlowApp {
   }
 
   setMaintenanceMode(enabled) {
-    if (!this.currentConfig) return;
-    this.currentConfig.isMaintenance = enabled;
-
-    this.sceneManager.clearZones();
-    
-    this.currentConfig.displayZones.forEach(zone => {
-      this.sceneManager.createDisplayZone(zone);
-    });
-
-    if (enabled) {
-      this.currentConfig.maintenanceZones = [{
-        id: 'maint-auto',
-        name: '自动维护区',
-        x: 0, y: 0, z: 0,
-        width: 10, height: 4, depth: 8,
-        type: 'maintenance'
-      }];
-      
-      this.currentConfig.maintenanceZones.forEach(zone => {
-        this.sceneManager.createDisplayZone(zone);
-      });
-    } else {
-      this.currentConfig.maintenanceZones = [];
-    }
-
+    this.pausePlayback();
+    this.updateMaintenanceZone(enabled);
     this.updateStatusPanel();
   }
 
@@ -307,13 +353,13 @@ class AquariumFlowApp {
     this.isPlaying = true;
     
     this.playInterval = setInterval(() => {
-      this.currentTime += 1;
+      this.currentTime += 0.5;
       if (this.currentTime > 100) {
         this.currentTime = 0;
       }
       document.getElementById('timelineSlider').value = this.currentTime;
-      this.updateTimeDisplay();
-    }, 100);
+      this.setTimeline(this.currentTime);
+    }, 50);
   }
 
   pausePlayback() {
@@ -327,6 +373,119 @@ class AquariumFlowApp {
   setTimeline(value) {
     this.currentTime = value;
     this.updateTimeDisplay();
+    this.applyTimelineState(value);
+  }
+
+  applyTimelineState(time) {
+    if (!this.baseConfig) return;
+
+    const state = {
+      valves: this.baseConfig.valves.map(v => ({
+        ...v,
+        active: false,
+        openDegree: 0,
+        flowRate: 0
+      })),
+      isMaintenance: false
+    };
+
+    this.timelineKeyframes.forEach(keyframe => {
+      if (time >= keyframe.time) {
+        if (keyframe.valveId) {
+          const valve = state.valves.find(v => v.id === keyframe.valveId);
+          if (valve) {
+            if (keyframe.property === 'active') {
+              valve.active = keyframe.value;
+            } else if (keyframe.property === 'openDegree') {
+              const prevKeyframe = this.findPreviousKeyframe(keyframe.valveId, 'openDegree', keyframe.time);
+              const nextKeyframe = this.findNextKeyframe(keyframe.valveId, 'openDegree', keyframe.time);
+              
+              if (prevKeyframe && nextKeyframe) {
+                const segmentDuration = nextKeyframe.time - prevKeyframe.time;
+                const progress = segmentDuration > 0 ? (time - prevKeyframe.time) / segmentDuration : 1;
+                const clampedProgress = Math.min(Math.max(progress, 0), 1);
+                
+                valve.openDegree = Math.round(
+                  prevKeyframe.endValue + (nextKeyframe.endValue - prevKeyframe.endValue) * clampedProgress
+                );
+                valve.flowRate = (valve.openDegree / 100) * 3.5;
+              } else {
+                valve.openDegree = keyframe.endValue || keyframe.startValue || 0;
+                valve.flowRate = (valve.openDegree / 100) * 3.5;
+              }
+            }
+          }
+        } else if (keyframe.property === 'maintenance') {
+          state.isMaintenance = keyframe.value;
+        }
+      }
+    });
+
+    this.currentConfig.valves = state.valves;
+    this.currentConfig.isMaintenance = state.isMaintenance;
+    
+    state.valves.forEach(valve => {
+      this.sceneManager.updateValve(valve.id, {
+        active: valve.active,
+        openDegree: valve.openDegree,
+        flowRate: valve.flowRate
+      });
+      this.updateValveUI(valve.id);
+    });
+
+    this.sceneManager.clearParticleSystems();
+    state.valves.forEach(valve => {
+      if (valve.active && valve.flowRate > 0) {
+        this.sceneManager.createParticleSystem(valve);
+      }
+    });
+
+    this.updateMaintenanceZone(state.isMaintenance);
+
+    this.updateStatusPanel();
+  }
+
+  updateMaintenanceZone(enabled) {
+    if (!this.currentConfig) return;
+    this.currentConfig.isMaintenance = enabled;
+
+    this.sceneManager.clearZones();
+    
+    this.currentConfig.displayZones.forEach(zone => {
+      this.sceneManager.createDisplayZone(zone);
+    });
+
+    if (enabled) {
+      if (!this.currentConfig.maintenanceZones || this.currentConfig.maintenanceZones.length === 0) {
+        this.currentConfig.maintenanceZones = [{
+          id: 'maint-auto',
+          name: '自动维护区',
+          x: 0, y: 0, z: 0,
+          width: 10, height: 4, depth: 8,
+          type: 'maintenance'
+        }];
+      }
+      
+      this.currentConfig.maintenanceZones.forEach(zone => {
+        this.sceneManager.createDisplayZone(zone);
+      });
+    } else {
+      this.currentConfig.maintenanceZones = [];
+    }
+
+    document.getElementById('maintenanceMode').checked = enabled;
+  }
+
+  findPreviousKeyframe(valveId, property, time) {
+    return this.timelineKeyframes
+      .filter(k => k.valveId === valveId && k.property === property && k.time <= time)
+      .sort((a, b) => b.time - a.time)[0];
+  }
+
+  findNextKeyframe(valveId, property, time) {
+    return this.timelineKeyframes
+      .filter(k => k.valveId === valveId && k.property === property && k.time > time)
+      .sort((a, b) => a.time - b.time)[0];
   }
 
   updateTimeDisplay() {
@@ -342,10 +501,14 @@ class AquariumFlowApp {
       timestamp: new Date().toLocaleString(),
       config: JSON.parse(JSON.stringify(this.currentConfig)),
       sceneSnapshot: this.sceneManager.getSnapshot(),
-      currentTime: this.currentTime
+      currentTime: this.currentTime,
+      baseConfig: JSON.parse(JSON.stringify(this.baseConfig)),
+      timelineKeyframes: JSON.parse(JSON.stringify(this.timelineKeyframes)),
+      name: `快照 ${this.snapshots.length + 1} - 时间点 ${this.currentTime.toFixed(0)}`
     };
     
     this.snapshots.push(snapshot);
+    this.snapshots.sort((a, b) => a.currentTime - b.currentTime);
     this.renderSnapshotList();
   }
 
@@ -358,16 +521,24 @@ class AquariumFlowApp {
       item.className = 'snapshot-item';
       item.innerHTML = `
         <div>
-          <div>快照 ${index + 1}</div>
+          <div style="font-weight: 600; font-size: 13px;">⏱️ ${snapshot.currentTime.toFixed(0)}s</div>
           <div class="snapshot-time">${snapshot.timestamp}</div>
         </div>
-        <span class="snapshot-delete" data-id="${snapshot.id}">✕</span>
+        <div style="display: flex; gap: 8px;">
+          <span class="snapshot-play" data-id="${snapshot.id}" style="cursor: pointer; color: #38ef7d; padding: 4px 8px;">▶</span>
+          <span class="snapshot-delete" data-id="${snapshot.id}">✕</span>
+        </div>
       `;
       
       item.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('snapshot-delete')) {
-          this.restoreSnapshot(snapshot);
+        if (!e.target.classList.contains('snapshot-delete') && !e.target.classList.contains('snapshot-play')) {
+          this.jumpToSnapshot(snapshot);
         }
+      });
+
+      item.querySelector('.snapshot-play').addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.playFromSnapshot(snapshot);
       });
 
       item.querySelector('.snapshot-delete').addEventListener('click', (e) => {
@@ -379,7 +550,14 @@ class AquariumFlowApp {
     });
   }
 
-  restoreSnapshot(snapshot) {
+  jumpToSnapshot(snapshot) {
+    this.pausePlayback();
+    
+    if (snapshot.baseConfig) {
+      this.baseConfig = JSON.parse(JSON.stringify(snapshot.baseConfig));
+      this.timelineKeyframes = JSON.parse(JSON.stringify(snapshot.timelineKeyframes));
+    }
+    
     this.currentConfig = JSON.parse(JSON.stringify(snapshot.config));
     this.applyConfig(this.currentConfig);
     this.sceneManager.restoreSnapshot(snapshot.sceneSnapshot);
@@ -387,6 +565,34 @@ class AquariumFlowApp {
     document.getElementById('timelineSlider').value = this.currentTime;
     this.updateTimeDisplay();
     this.updateStatusPanel();
+  }
+
+  playFromSnapshot(snapshot) {
+    this.jumpToSnapshot(snapshot);
+    this.startPlayback();
+  }
+
+  playSnapshotsSequence() {
+    if (this.snapshots.length < 2) {
+      alert('请至少保存2个快照以进行序列回放');
+      return;
+    }
+    
+    this.pausePlayback();
+    let currentIndex = 0;
+    
+    const playNext = () => {
+      if (currentIndex >= this.snapshots.length) {
+        return;
+      }
+      
+      this.jumpToSnapshot(this.snapshots[currentIndex]);
+      currentIndex++;
+      
+      setTimeout(playNext, 2000);
+    };
+    
+    playNext();
   }
 
   deleteSnapshot(id) {
@@ -428,6 +634,7 @@ class AquariumFlowApp {
 
     const status = this.detectFlowStatus();
     const activeValves = this.currentConfig.valves.filter(v => v.active);
+    const maintenanceZones = this.currentConfig.maintenanceZones || [];
 
     const report = {
       title: '水族馆水流系统报告',
@@ -440,7 +647,8 @@ class AquariumFlowApp {
         averageFlowRate: activeValves.length > 0 
           ? (activeValves.reduce((sum, v) => sum + v.flowRate, 0) / activeValves.length).toFixed(2)
           : '0.00',
-        displayZones: this.currentConfig.displayZones.length
+        displayZones: this.currentConfig.displayZones.length,
+        maintenanceZones: maintenanceZones.length
       },
       valves: this.currentConfig.valves.map(v => ({
         name: v.name,
@@ -453,8 +661,20 @@ class AquariumFlowApp {
       displayZones: this.currentConfig.displayZones.map(z => ({
         name: z.name,
         type: z.type,
-        dimensions: `${z.width}x${z.height}x${z.depth}`
+        dimensions: `${z.width}x${z.height}x${z.depth}`,
+        position: `(${z.x}, ${z.y}, ${z.z})`
       })),
+      maintenanceZones: maintenanceZones.map(z => ({
+        name: z.name,
+        type: z.type,
+        dimensions: `${z.width}x${z.height}x${z.depth}`,
+        position: `(${z.x}, ${z.y}, ${z.z})`
+      })),
+      timelineInfo: {
+        currentTime: this.currentTime,
+        isPlaying: this.isPlaying,
+        snapshotCount: this.snapshots.length
+      },
       recommendations: this.generateRecommendations()
     };
 
@@ -502,6 +722,30 @@ class AquariumFlowApp {
   }
 
   formatReport(report) {
+    const maintenanceZonesTable = report.maintenanceZones && report.maintenanceZones.length > 0 ? `
+    <h2>🔒 维护隔离区</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>区域名称</th>
+          <th>类型</th>
+          <th>尺寸 (宽×高×深)</th>
+          <th>位置</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${report.maintenanceZones.map(z => `
+          <tr>
+            <td>${z.name}</td>
+            <td style="color: #6bcfff; font-weight: 600;">维护隔离</td>
+            <td>${z.dimensions}</td>
+            <td>${z.position}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    ` : '<p style="color: #666; font-style: italic;">暂无维护隔离区域</p>';
+
     return `
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -518,16 +762,20 @@ class AquariumFlowApp {
     .status-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
     .status-danger { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); }
     h2 { color: #2a5a8a; margin-top: 30px; border-left: 4px solid #6bcfff; padding-left: 12px; }
-    .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
     .summary-item { background: #f0f7ff; padding: 15px; border-radius: 8px; }
     .summary-label { color: #666; font-size: 12px; margin-bottom: 5px; }
     .summary-value { font-size: 24px; font-weight: 700; color: #1a3a5c; }
+    .summary-item.maintenance { background: #e6f7ff; border: 1px solid #6bcfff; }
     table { width: 100%; border-collapse: collapse; margin: 15px 0; }
     th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
     th { background: #1a3a5c; color: white; }
     tr:hover { background: #f5f7fa; }
     .valve-active { color: #38ef7d; font-weight: 600; }
     .valve-inactive { color: #eb3349; font-weight: 600; }
+    .timeline-info { background: #f0f7ff; padding: 15px; border-radius: 8px; margin: 15px 0; }
+    .timeline-info h3 { margin: 0 0 10px 0; color: #2a5a8a; font-size: 16px; }
+    .timeline-info ul { margin: 0; padding-left: 20px; }
     .recommendations { background: #fff8e6; border-left: 4px solid #ffd93d; padding: 20px; border-radius: 0 8px 8px 0; }
     .recommendations ul { margin: 10px 0 0 20px; }
     .recommendations li { margin: 8px 0; }
@@ -566,6 +814,24 @@ class AquariumFlowApp {
         <div class="summary-label">展示区域</div>
         <div class="summary-value">${report.summary.displayZones}</div>
       </div>
+      <div class="summary-item ${report.maintenanceMode ? 'maintenance' : ''}">
+        <div class="summary-label">维护隔离区</div>
+        <div class="summary-value">${report.summary.maintenanceZones}</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">状态快照</div>
+        <div class="summary-value">${report.timelineInfo.snapshotCount}</div>
+      </div>
+    </div>
+
+    <h2>⏱️ 时间轴信息</h2>
+    <div class="timeline-info">
+      <h3>复盘状态</h3>
+      <ul>
+        <li>当前时间点: ${report.timelineInfo.currentTime.toFixed(0)}</li>
+        <li>播放状态: ${report.timelineInfo.isPlaying ? '播放中' : '已暂停'}</li>
+        <li>已保存快照: ${report.timelineInfo.snapshotCount} 个</li>
+      </ul>
     </div>
 
     <h2>🔧 阀门详情</h2>
@@ -601,6 +867,7 @@ class AquariumFlowApp {
           <th>区域名称</th>
           <th>类型</th>
           <th>尺寸 (宽×高×深)</th>
+          <th>位置</th>
         </tr>
       </thead>
       <tbody>
@@ -609,10 +876,13 @@ class AquariumFlowApp {
             <td>${z.name}</td>
             <td>${z.type === 'display' ? '展示区' : z.type}</td>
             <td>${z.dimensions}</td>
+            <td>${z.position}</td>
           </tr>
         `).join('')}
       </tbody>
     </table>
+
+    ${maintenanceZonesTable}
 
     <h2>💡 运行建议</h2>
     <div class="recommendations">

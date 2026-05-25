@@ -305,6 +305,17 @@ body {
   padding: 4px 8px;
 }
 
+.snapshot-play {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.snapshot-play:hover {
+  background: rgba(56, 239, 125, 0.2);
+}
+
 .main-content {
   flex: 1;
   display: flex;
