@@ -105,16 +105,16 @@ export class GameEngine {
                         const berthIndex = newBerths.findIndex((b) => b.id === berth.id);
                         newBerths[berthIndex] = { ...berth, occupied: true, occupiedShipId: ship.id };
                         const wasOnTime = newTime <= ship.arrivalTime + 60;
+                        const dockObjective = newObjectives.find((o) => o.type === 'dock');
+                        if (dockObjective) {
+                            dockObjective.currentValue++;
+                            if (dockObjective.currentValue >= dockObjective.targetValue) {
+                                dockObjective.completed = true;
+                            }
+                        }
                         if (wasOnTime) {
                             addEvent('success', `${ship.name} 按时完成靠泊！`);
                             newScore = ScoringSystem.addOnTimeCompletion(newScore, ScoringSystem.DOCK_ON_TIME_BONUS);
-                            const dockObjective = newObjectives.find((o) => o.type === 'dock');
-                            if (dockObjective) {
-                                dockObjective.currentValue++;
-                                if (dockObjective.currentValue >= dockObjective.targetValue) {
-                                    dockObjective.completed = true;
-                                }
-                            }
                         }
                         else {
                             addEvent('warning', `${ship.name} 靠泊延误`);
@@ -142,6 +142,13 @@ export class GameEngine {
                         newBerths[berthIndex] = { ...berth, occupied: false, occupiedShipId: undefined };
                         addEvent('success', `${ship.name} 完成离泊！`);
                         newScore = ScoringSystem.addOnTimeCompletion(newScore, ScoringSystem.UNDOCK_ON_TIME_BONUS);
+                        const undockObjective = newObjectives.find((o) => o.type === 'undock');
+                        if (undockObjective) {
+                            undockObjective.currentValue++;
+                            if (undockObjective.currentValue >= undockObjective.targetValue) {
+                                undockObjective.completed = true;
+                            }
+                        }
                     }
                 }
             }
@@ -203,8 +210,12 @@ export class GameEngine {
             addEvent('info', '时间到，游戏结束');
         }
         else {
-            const allDone = newShips.every((s) => s.status === 'departing' || s.status === 'docked');
-            if (allDone && newShips.some((s) => s.status === 'docked')) {
+            const allDeparting = newShips.every((s) => s.status === 'departing');
+            const undockObjective = newObjectives.find((o) => o.type === 'undock');
+            const dockObjective = newObjectives.find((o) => o.type === 'dock');
+            const dockCompleted = !dockObjective || dockObjective.completed;
+            const undockCompleted = !undockObjective || undockObjective.completed;
+            if (allDeparting && dockCompleted && undockCompleted) {
                 newPhase = 'ended';
                 addEvent('success', '所有任务完成！');
             }
