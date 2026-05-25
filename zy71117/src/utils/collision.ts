@@ -1,13 +1,6 @@
 import { PathPoint, VehicleParams, SceneData, CollisionPoint, Vector3 } from '../types';
 import { calculateVehicleCorners } from './pathCalculator';
 
-function pointInAABB(point: Vector3, min: Vector3, max: Vector3): boolean {
-  return (
-    point.x >= min.x && point.x <= max.x &&
-    point.z >= min.z && point.z <= max.z
-  );
-}
-
 function aabbOverlap(
   aMin: Vector3, aMax: Vector3,
   bMin: Vector3, bMax: Vector3
@@ -62,27 +55,6 @@ function checkObstacleCollision(
   }
 
   return { collided: false };
-}
-
-function checkPlatformCollision(
-  corners: Vector3[],
-  platform: SceneData['platform']
-): boolean {
-  if (platform.width === 0 || platform.depth === 0) return false;
-
-  const platformMin = {
-    x: platform.position.x - platform.width / 2,
-    y: 0,
-    z: platform.position.z - platform.depth / 2,
-  };
-  const platformMax = {
-    x: platform.position.x + platform.width / 2,
-    y: platform.height,
-    z: platform.position.z + platform.depth / 2,
-  };
-
-  const vehicleAABB = getVehicleAABB(corners);
-  return aabbOverlap(vehicleAABB.min, vehicleAABB.max, platformMin, platformMax);
 }
 
 export function detectCollisions(

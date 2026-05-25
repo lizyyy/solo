@@ -1,3 +1,4 @@
+import { jsPDF } from 'jspdf';
 import { SimulationReport, VehicleParams, SceneData, CollisionPoint, PathPoint } from '../types';
 import { calculatePathLength } from './pathCalculator';
 import { getCollisionSummary } from './collision';
@@ -137,7 +138,15 @@ export function generateReportHTML(report: SimulationReport): string {
   `;
 }
 
-export function downloadReport(report: SimulationReport): void {
+export function downloadReport(report: SimulationReport, format: 'html' | 'pdf' = 'html'): void {
+  if (format === 'pdf') {
+    downloadReportPDF(report);
+  } else {
+    downloadReportHTML(report);
+  }
+}
+
+export function downloadReportHTML(report: SimulationReport): void {
   const html = generateReportHTML(report);
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
@@ -148,4 +157,140 @@ export function downloadReport(report: SimulationReport): void {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+export function downloadReportPDF(report: SimulationReport): void {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 20;
+  let y = margin;
+
+  doc.setFontSize(20);
+  doc.setTextColor(22, 93, 255);
+  doc.text('Loading Dock Turning Simulation Report', pageWidth / 2, y, { align: 'center' });
+  y += 10;
+
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  doc.text(`Generated: ${new Date(report.timestamp).toLocaleString('en-US')}`, pageWidth / 2, y, { align: 'center' });
+  y += 15;
+
+  const statusColor = report.result.hasCollision ? [245, 63, 63] : [0, 180, 42];
+  doc.setFillColor(statusColor[0], statusColor[1], statusColor[2]);
+  doc.rect(margin, y, pageWidth - 2 * margin, 10, 'F');
+  doc.setTextColor(255);
+  doc.setFontSize(12);
+  doc.text(
+    report.result.hasCollision ? '⚠️  COLLISION RISK DETECTED' : '✓  SIMULATION PASSED - NO COLLISION',
+    pageWidth / 2,
+    y + 7,
+    { align: 'center' }
+  );
+  y += 20;
+
+  doc.setFontSize(14);
+  doc.setTextColor(0);
+  doc.text('Basic Information', margin, y);
+  y += 8;
+  doc.setFontSize(10);
+  doc.setTextColor(80);
+  doc.text(`Scenario: ${report.sampleName}`, margin + 5, y);
+  y += 6;
+  doc.text(`Vehicle: ${report.vehicle.name}`, margin + 5, y);
+  y += 12;
+
+  doc.setFontSize(14);
+  doc.setTextColor(0);
+  doc.text('Vehicle Parameters', margin, y);
+  y += 8;
+  doc.setFontSize(10);
+  doc.setTextColor(80);
+  const vehicleParams = [
+    [`Length: ${report.vehicle.length} m`, `Width: ${report.vehicle.width} m`],
+    [`Wheelbase: ${report.vehicle.wheelbase} m`, `Turning Radius: ${report.vehicle.turningRadius} m`],
+    [`Height: ${report.vehicle.height} m`, ''],
+  ];
+  vehicleParams.forEach((row) => {
+    doc.text(row[0], margin + 5, y);
+    if (row[1]) doc.text(row[1], margin + 80, y);
+    y += 6;
+  });
+  y += 6;
+
+  doc.setFontSize(14);
+  doc.setTextColor(0);
+  doc.text('Simulation Results', margin, y);
+  y += 8;
+  doc.setFontSize(10);
+  doc.setTextColor(80);
+  doc.text(`Collision Count: ${report.result.collisionCount}`, margin + 5, y);
+  y += 6;
+  doc.text(`Path Length: ${report.result.pathLength.toFixed(2)} m`, margin + 5, y);
+  y += 6;
+  doc.text(`Estimated Duration: ${report.result.duration.toFixed(1)} s`, margin + 5, y);
+  y += 12;
+
+  if (report.result.collisionDetails.length > 0) {
+    if (y > 200) {
+      doc.addPage();
+      y = margin;
+    }
+    doc.setFontSize(14);
+    doc.setTextColor(245, 63, 63);
+    doc.text('Collision Details', margin, y);
+    y += 8;
+    doc.setFontSize(9);
+    doc.setTextColor(80);
+    report.result.collisionDetails.slice(0, 8).forEach((c) => {
+      if (y > 270) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.text(`• ${c.description}`, margin + 5, y);
+      y += 5;
+    });
+    if (report.result.collisionDetails.length > 8) {
+      doc.text(`... and ${report.result.collisionDetails.length - 8} more collisions`, margin + 5, y);
+      y += 8;
+    }
+    y += 4;
+  }
+
+  if (y > 220) {
+    doc.addPage();
+    y = margin;
+  }
+  doc.setFontSize(14);
+  doc.setTextColor(0);
+  doc.text('Summary', margin, y);
+  y += 8;
+  doc.setFontSize(10);
+  doc.setTextColor(80);
+  const summaryLines = doc.splitTextToSize(report.summary, pageWidth - 2 * margin - 5);
+  summaryLines.forEach((line: string) => {
+    doc.text(line, margin + 5, y);
+    y += 5;
+  });
+  y += 8;
+
+  if (y > 220) {
+    doc.addPage();
+    y = margin;
+  }
+  doc.setFontSize(14);
+  doc.setTextColor(22, 93, 255);
+  doc.text('Recommendations', margin, y);
+  y += 8;
+  doc.setFontSize(10);
+  doc.setTextColor(80);
+  report.recommendations.forEach((r, i) => {
+    if (y > 270) {
+      doc.addPage();
+      y = margin;
+    }
+    doc.text(`${i + 1}. ${r}`, margin + 5, y);
+    y += 5;
+  });
+
+  doc.save(`模拟报告-${report.sampleName}-${Date.now()}.pdf`);
 }

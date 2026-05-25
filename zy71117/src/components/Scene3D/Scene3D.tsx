@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { Truck } from './Truck';
 import { Platform } from './Platform';
 import { Obstacles } from './Obstacles';
@@ -13,15 +13,14 @@ import { CameraView } from '../../types';
 interface CameraControllerProps {
   view: CameraView;
   vehiclePosition?: [number, number, number];
+  vehicleRotation?: number;
 }
 
-function CameraController({ view, vehiclePosition }: CameraControllerProps) {
+function CameraController({ view, vehiclePosition, vehicleRotation = 0 }: CameraControllerProps) {
   const { camera } = useThree();
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl>(null);
 
   useEffect(() => {
-    const target = new THREE.Vector3(0, 5, 0);
-
     switch (view) {
       case 'top':
         camera.position.set(0, 50, 0.1);
@@ -33,12 +32,22 @@ function CameraController({ view, vehiclePosition }: CameraControllerProps) {
         break;
       case 'driver':
         if (vehiclePosition) {
+          const cos = Math.cos(vehicleRotation);
+          const sin = Math.sin(vehicleRotation);
+          const cameraOffsetX = -sin * 0.5;
+          const cameraOffsetZ = cos * 0.5;
+          const lookOffsetX = -sin * 10;
+          const lookOffsetZ = cos * 10;
           camera.position.set(
-            vehiclePosition[0],
-            vehiclePosition[1] + 2,
-            vehiclePosition[2] + 2
+            vehiclePosition[0] + cameraOffsetX,
+            vehiclePosition[1] + 2.5,
+            vehiclePosition[2] + cameraOffsetZ
           );
-          camera.lookAt(vehiclePosition[0], vehiclePosition[1], vehiclePosition[2] - 5);
+          camera.lookAt(
+            vehiclePosition[0] + lookOffsetX,
+            vehiclePosition[1] + 1,
+            vehiclePosition[2] + lookOffsetZ
+          );
         }
         break;
       case 'follow':
@@ -57,7 +66,7 @@ function CameraController({ view, vehiclePosition }: CameraControllerProps) {
         camera.lookAt(0, 0, 0);
         break;
     }
-  }, [view, vehiclePosition, camera]);
+  }, [view, vehiclePosition, vehicleRotation, camera]);
 
   return <OrbitControls ref={controlsRef} makeDefault enableDamping dampingFactor={0.05} />;
 }
@@ -66,14 +75,19 @@ function SceneContent() {
   const { vehicle, scene, simulation } = useSimulationStore();
   const isAnimating = simulation.status === 'playing';
 
+  const pathIndex = Math.floor(simulation.progress * (simulation.currentPath.length - 1));
   const vehiclePos: [number, number, number] | undefined =
     simulation.currentPath.length > 0
       ? [
-          simulation.currentPath[Math.floor(simulation.progress * (simulation.currentPath.length - 1))]?.position.x || 0,
+          simulation.currentPath[pathIndex]?.position.x || 0,
           vehicle.height / 2,
-          simulation.currentPath[Math.floor(simulation.progress * (simulation.currentPath.length - 1))]?.position.z || 0,
+          simulation.currentPath[pathIndex]?.position.z || 0,
         ]
       : undefined;
+
+  const vehicleRotation = simulation.currentPath.length > 0
+    ? simulation.currentPath[pathIndex]?.rotation || 0
+    : 0;
 
   return (
     <>
@@ -86,7 +100,11 @@ function SceneContent() {
       />
       <directionalLight position={[-10, 10, -10]} intensity={0.3} />
 
-      <CameraController view={simulation.cameraView} vehiclePosition={vehiclePos} />
+      <CameraController
+        view={simulation.cameraView}
+        vehiclePosition={vehiclePos}
+        vehicleRotation={vehicleRotation}
+      />
 
       <Ground
         width={scene.groundSize.width}

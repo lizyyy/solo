@@ -19,7 +19,7 @@ export function calculateReversingPath(
   numPoints: number = 100
 ): PathPoint[] {
   const path: PathPoint[] = [];
-  const { turningRadius, length } = vehicle;
+  const { turningRadius } = vehicle;
 
   const dx = endPosition.x - startPosition.x;
   const dz = endPosition.z - startPosition.z;

@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { Play, Pause, RotateCcw, Eye, Download, FileText, Camera, Grid3X3 } from 'lucide-react';
+import { Play, Pause, RotateCcw, Eye, Download, FileText, Camera, Grid3X3, User, ChevronDown } from 'lucide-react';
 import { useSimulationStore } from '../../store/simulationStore';
 import { generateDefaultPath, calculateSweepArea } from '../../utils/pathCalculator';
 import { detectCollisions } from '../../utils/collision';
 import { generateReport, downloadReport } from '../../utils/reportGenerator';
-import { Sample } from '../../types';
+import { Sample, CameraView } from '../../types';
 
 export function TopToolbar() {
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [exportFormat, setExportFormat] = useState<'html' | 'pdf'>('pdf');
+  const [showExportMenu, setShowExportMenu] = useState(false);
   const {
     samples,
     vehicle,
@@ -62,14 +64,16 @@ export function TopToolbar() {
       simulation.currentPath,
       simulation.collisionPoints
     );
-    downloadReport(report);
+    downloadReport(report, exportFormat);
+    setShowExportMenu(false);
   };
 
-  const cameraViews = [
+  const cameraViews: { id: CameraView; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { id: 'free', label: '自由', icon: Grid3X3 },
     { id: 'top', label: '俯视', icon: Eye },
     { id: 'side', label: '侧视', icon: Camera },
     { id: 'follow', label: '跟随', icon: Eye },
+    { id: 'driver', label: '驾驶舱', icon: User },
   ];
 
   return (
@@ -145,7 +149,7 @@ export function TopToolbar() {
           {cameraViews.map((view) => (
             <button
               key={view.id}
-              onClick={() => setCameraView(view.id as any)}
+              onClick={() => setCameraView(view.id)}
               className={`p-2 rounded-lg transition-colors ${
                 simulation.cameraView === view.id
                   ? 'bg-blue-500 text-white'
@@ -160,15 +164,50 @@ export function TopToolbar() {
 
         <div className="h-6 w-px bg-gray-600" />
 
-        <button
-          onClick={handleExportReport}
-          disabled={simulation.currentPath.length === 0}
-          className="p-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center gap-1"
-          title="导出报告"
-        >
-          <Download className="w-5 h-5" />
-          <FileText className="w-4 h-4" />
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => setShowExportMenu(!showExportMenu)}
+            disabled={simulation.currentPath.length === 0}
+            className="p-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center gap-1"
+            title="导出报告"
+          >
+            <Download className="w-5 h-5" />
+            <FileText className="w-4 h-4" />
+            <ChevronDown className={`w-3 h-3 transition-transform ${showExportMenu ? 'rotate-180' : ''}`} />
+          </button>
+
+          {showExportMenu && (
+            <div className="absolute top-full right-0 mt-2 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden min-w-[140px]">
+              <div className="px-3 py-2 text-xs text-gray-400 border-b border-gray-700">
+                导出格式
+              </div>
+              <button
+                onClick={() => {
+                  setExportFormat('pdf');
+                  handleExportReport();
+                }}
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-700 transition-colors flex items-center gap-2 ${
+                  exportFormat === 'pdf' ? 'bg-blue-500/20 text-blue-400' : 'text-white'
+                }`}
+              >
+                <FileText className="w-4 h-4" />
+                PDF 格式
+              </button>
+              <button
+                onClick={() => {
+                  setExportFormat('html');
+                  handleExportReport();
+                }}
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-700 transition-colors flex items-center gap-2 ${
+                  exportFormat === 'html' ? 'bg-blue-500/20 text-blue-400' : 'text-white'
+                }`}
+              >
+                <FileText className="w-4 h-4" />
+                HTML 格式
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

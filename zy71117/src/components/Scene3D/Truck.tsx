@@ -70,7 +70,7 @@ export function Truck({
       </mesh>
 
       {[-vehicle.width / 2.5, vehicle.width / 2.5].map((x) =>
-        [-vehicle.length / 3, vehicle.length / 3].map((z, i) => (
+        [-vehicle.length / 3, vehicle.length / 3].map((z) => (
           <mesh key={`wheel-${x}-${z}`} position={[x, 0.4, z]} rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.45, 0.45, 0.3, 16]} />
             <meshStandardMaterial color="#1D2129" metalness={0.6} roughness={0.3} />
