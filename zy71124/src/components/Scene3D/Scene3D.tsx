@@ -17,7 +17,7 @@ export default function Scene3D() {
   const animationFrameRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
 
-  const { buses, parkingSpots, queues, currentTime, cameraView, selectedBusId, selectBus, conflicts } = useScheduleStore();
+  const { buses, parkingSpots, queues, currentTime, cameraView, viewMode, selectedBusId, selectBus, conflicts } = useScheduleStore();
 
   const createBus = useCallback((bus: Bus, spot: ParkingSpot | undefined): THREE.Group => {
     const busGroup = new THREE.Group();
@@ -170,31 +170,54 @@ export default function Scene3D() {
     const camera = cameraRef.current;
     const controls = controlsRef.current;
 
-    const views: Record<string, { pos: THREE.Vector3; target: THREE.Vector3 }> = {
-      default: { pos: new THREE.Vector3(30, 30, 30), target: new THREE.Vector3(0, 0, 0) },
-      top: { pos: new THREE.Vector3(0, 60, 0.1), target: new THREE.Vector3(0, 0, 0) },
-      front: { pos: new THREE.Vector3(0, 15, 50), target: new THREE.Vector3(0, 0, 0) },
-      side: { pos: new THREE.Vector3(50, 15, 0), target: new THREE.Vector3(0, 0, 0) },
-    };
-
-    const view = views[cameraView];
-    if (view) {
+    if (viewMode === '2d') {
+      controls.enableRotate = false;
+      controls.enablePan = true;
+      
       gsap.to(camera.position, {
-        x: view.pos.x,
-        y: view.pos.y,
-        z: view.pos.z,
+        x: 0,
+        y: 80,
+        z: 0.1,
         duration: 1,
         ease: 'power2.out',
       });
       gsap.to(controls.target, {
-        x: view.target.x,
-        y: view.target.y,
-        z: view.target.z,
+        x: 0,
+        y: 0,
+        z: 0,
         duration: 1,
         ease: 'power2.out',
       });
+    } else {
+      controls.enableRotate = true;
+      controls.enablePan = true;
+
+      const views: Record<string, { pos: THREE.Vector3; target: THREE.Vector3 }> = {
+        default: { pos: new THREE.Vector3(30, 30, 30), target: new THREE.Vector3(0, 0, 0) },
+        top: { pos: new THREE.Vector3(0, 60, 0.1), target: new THREE.Vector3(0, 0, 0) },
+        front: { pos: new THREE.Vector3(0, 15, 50), target: new THREE.Vector3(0, 0, 0) },
+        side: { pos: new THREE.Vector3(50, 15, 0), target: new THREE.Vector3(0, 0, 0) },
+      };
+
+      const view = views[cameraView];
+      if (view) {
+        gsap.to(camera.position, {
+          x: view.pos.x,
+          y: view.pos.y,
+          z: view.pos.z,
+          duration: 1,
+          ease: 'power2.out',
+        });
+        gsap.to(controls.target, {
+          x: view.target.x,
+          y: view.target.y,
+          z: view.target.z,
+          duration: 1,
+          ease: 'power2.out',
+        });
+      }
     }
-  }, [cameraView]);
+  }, [cameraView, viewMode]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -417,7 +440,7 @@ export default function Scene3D() {
 
   useEffect(() => {
     updateCameraView();
-  }, [cameraView, updateCameraView]);
+  }, [cameraView, viewMode, updateCameraView]);
 
   return (
     <div 

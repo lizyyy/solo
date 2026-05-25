@@ -10,7 +10,9 @@ export default function InfoPanel() {
     conflicts,
     currentTime,
     cameraView,
+    viewMode,
     setCameraView,
+    setViewMode,
     setShowReport,
   } = useScheduleStore();
 
@@ -111,21 +113,45 @@ export default function InfoPanel() {
               <Layers className="w-3 h-3" />
               视角切换
             </div>
-            <div className="grid grid-cols-4 gap-1">
-              {cameraViews.map((view) => (
-                <button
-                  key={view.id}
-                  onClick={() => setCameraView(view.id as any)}
-                  className={`p-2 rounded text-xs transition-colors ${
-                    cameraView === view.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                  }`}
-                >
-                  {view.label}
-                </button>
-              ))}
+            <div className="grid grid-cols-2 gap-1 mb-2">
+              <button
+                onClick={() => setViewMode('3d')}
+                className={`p-2 rounded text-xs transition-colors ${
+                  viewMode === '3d'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                }`}
+              >
+                3D 模式
+              </button>
+              <button
+                onClick={() => setViewMode('2d')}
+                className={`p-2 rounded text-xs transition-colors ${
+                  viewMode === '2d'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                }`}
+              >
+                2D 俯视
+              </button>
             </div>
+            {viewMode === '3d' && (
+              <div className="grid grid-cols-4 gap-1">
+                {cameraViews.map((view) => (
+                  <button
+                    key={view.id}
+                    onClick={() => setCameraView(view.id as any)}
+                    className={`p-2 rounded text-xs transition-colors ${
+                      cameraView === view.id
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                  >
+                    {view.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto p-3">

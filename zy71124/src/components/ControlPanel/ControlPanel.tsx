@@ -14,6 +14,7 @@ export default function ControlPanel() {
     searchQuery,
     setSearchQuery,
     loadSample,
+    importData,
     reset,
     updateBusDepartureTime,
     conflicts,
@@ -142,13 +143,21 @@ export default function ControlPanel() {
                       reader.onload = (event) => {
                         try {
                           const data = JSON.parse(event.target?.result as string);
-                          console.log('Imported:', data);
+                          if (data.buses || data.queues || data.parkingSpots) {
+                            importData(data);
+                          } else if (data.busSchedule) {
+                            alert('请使用调度系统导出的原始数据文件');
+                          } else {
+                            alert('无效的调度数据格式');
+                          }
                         } catch (err) {
                           console.error('Import error:', err);
+                          alert('导入失败，请检查文件格式');
                         }
                       };
                       reader.readAsText(file);
                     }
+                    e.target.value = '';
                   }}
                 />
               </label>

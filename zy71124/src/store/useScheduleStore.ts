@@ -5,6 +5,7 @@ import { sampleData } from '../data/samples';
 
 interface ScheduleActions {
   loadSample: (sampleIndex: number) => void;
+  importData: (data: Partial<SampleData>) => void;
   setCurrentTime: (time: number) => void;
   togglePlay: () => void;
   setPlaySpeed: (speed: number) => void;
@@ -21,10 +22,18 @@ interface ScheduleActions {
 }
 
 const initialSample = sampleData[0];
-const initialConflicts = ConflictDetector.getInstance().detectAllConflicts(initialSample.buses);
+const initialConflicts = ConflictDetector.getInstance().detectAllConflicts(
+  initialSample.buses, 
+  initialSample.queues, 
+  initialSample.parkingSpots
+);
 
 const getInitialState = (sample: SampleData): ScheduleState => {
-  const conflicts = ConflictDetector.getInstance().detectAllConflicts(sample.buses);
+  const conflicts = ConflictDetector.getInstance().detectAllConflicts(
+    sample.buses, 
+    sample.queues, 
+    sample.parkingSpots
+  );
   const maxDepartureTime = Math.max(...sample.buses.map(b => b.departureTime));
   return {
     buses: sample.buses.map(b => ({ ...b })),
@@ -52,6 +61,32 @@ export const useScheduleStore = create<ScheduleState & ScheduleActions>((set, ge
     if (sample) {
       set(getInitialState(sample));
     }
+  },
+
+  importData: (data: Partial<SampleData>) => {
+    set(state => {
+      const newBuses = data.buses || state.buses;
+      const newParkingSpots = data.parkingSpots || state.parkingSpots;
+      const newQueues = data.queues || state.queues;
+      
+      const newConflicts = ConflictDetector.getInstance().detectAllConflicts(
+        newBuses,
+        newQueues,
+        newParkingSpots
+      );
+      
+      const maxDepartureTime = Math.max(...newBuses.map(b => b.departureTime));
+      
+      return {
+        buses: newBuses.map(b => ({ ...b, status: 'parked' as const, currentStudents: 0 })),
+        parkingSpots: newParkingSpots,
+        queues: newQueues.map(q => ({ ...q, currentIndex: 0 })),
+        conflicts: newConflicts,
+        currentTime: 0,
+        totalDuration: maxDepartureTime + 60,
+        isPlaying: false,
+      };
+    });
   },
 
   setCurrentTime: (time: number) => {
@@ -102,7 +137,11 @@ export const useScheduleStore = create<ScheduleState & ScheduleActions>((set, ge
       const updatedBuses = state.buses.map(bus =>
         bus.id === busId ? { ...bus, departureTime: Math.max(0, time) } : bus
       );
-      const newConflicts = ConflictDetector.getInstance().detectAllConflicts(updatedBuses);
+      const newConflicts = ConflictDetector.getInstance().detectAllConflicts(
+        updatedBuses, 
+        state.queues, 
+        state.parkingSpots
+      );
       return { buses: updatedBuses, conflicts: newConflicts };
     });
   },

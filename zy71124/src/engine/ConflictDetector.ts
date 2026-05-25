@@ -1,4 +1,4 @@
-import { Bus, Conflict } from '../types';
+import { Bus, Conflict, StudentQueue, ParkingSpot } from '../types';
 
 export class ConflictDetector {
   private static instance: ConflictDetector;
@@ -12,11 +12,15 @@ export class ConflictDetector {
     return ConflictDetector.instance;
   }
 
-  public detectAllConflicts(buses: Bus[]): Conflict[] {
+  public detectAllConflicts(buses: Bus[], queues?: StudentQueue[], parkingSpots?: ParkingSpot[]): Conflict[] {
     const conflicts: Conflict[] = [];
     
     conflicts.push(...this.detectSpotBlocked(buses));
     conflicts.push(...this.detectDepartureConflict(buses));
+    
+    if (queues && parkingSpots) {
+      conflicts.push(...this.detectLaneOccupied(buses, queues, parkingSpots));
+    }
     
     return conflicts;
   }
@@ -98,6 +102,71 @@ export class ConflictDetector {
       lane_occupied: '通道占用',
     };
     return labels[type];
+  }
+
+  private detectLaneOccupied(buses: Bus[], queues: StudentQueue[], parkingSpots: ParkingSpot[]): Conflict[] {
+    const conflicts: Conflict[] = [];
+    
+    buses.forEach(bus => {
+      const busSpot = parkingSpots.find(s => s.id === bus.parkingSpotId);
+      if (!busSpot) return;
+      
+      const busQueue = queues.find(q => q.busId === bus.id);
+      if (!busQueue) return;
+      
+      const laneXMin = 20;
+      const laneXMax = 40;
+      
+      if (busQueue.position.x >= laneXMin && busQueue.position.x <= laneXMax) {
+        conflicts.push({
+          id: `lane-occupied-${bus.id}`,
+          type: 'lane_occupied',
+          time: bus.departureTime - 10,
+          severity: 'warning',
+          involvedBuses: [bus.id],
+          description: `车辆 ${bus.number} 的学生队列位于发车通道区域内，可能影响其他车辆通行`,
+          resolved: false,
+        });
+      }
+      
+      const nearbyBuses = buses.filter(b => 
+        b.id !== bus.id && 
+        b.exitLane === bus.exitLane &&
+        Math.abs(b.departureTime - bus.departureTime) < 20
+      );
+      
+      nearbyBuses.forEach(nearbyBus => {
+        const nearbyQueue = queues.find(q => q.busId === nearbyBus.id);
+        if (nearbyQueue) {
+          const distance = Math.sqrt(
+            Math.pow(busQueue.position.x - nearbyQueue.position.x, 2) +
+            Math.pow(busQueue.position.z - nearbyQueue.position.z, 2)
+          );
+          
+          if (distance < 8) {
+            const exists = conflicts.some(c => 
+              c.type === 'lane_occupied' && 
+              c.involvedBuses.includes(bus.id) && 
+              c.involvedBuses.includes(nearbyBus.id)
+            );
+            
+            if (!exists) {
+              conflicts.push({
+                id: `lane-occupied-${bus.id}-${nearbyBus.id}`,
+                type: 'lane_occupied',
+                time: Math.min(bus.departureTime, nearbyBus.departureTime) - 10,
+                severity: 'warning',
+                involvedBuses: [bus.id, nearbyBus.id],
+                description: `车辆 ${bus.number} 和 ${nearbyBus.number} 的学生队列距离过近（${Math.round(distance)}米），可能造成通道拥挤`,
+                resolved: false,
+              });
+            }
+          }
+        }
+      });
+    });
+    
+    return conflicts;
   }
 
   public getSeverityLabel(severity: Conflict['severity']): string {
