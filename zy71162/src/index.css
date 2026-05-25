@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", "PingFang SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  background-color: #0E1625;
+  color: #E6EDF7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: radial-gradient(1200px 600px at 20% -10%, rgba(58, 160, 255, 0.12), transparent),
+              radial-gradient(800px 500px at 110% 20%, rgba(226, 169, 59, 0.10), transparent),
+              #0E1625;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Thin scrollbars */
+.scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: #2E4268; border-radius: 3px; }
+.scroll-thin::-webkit-scrollbar-track { background: transparent; }
+
+.btn {
+  @apply inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors;
+}
+.btn-primary {
+  @apply bg-accent text-base-900 hover:bg-accent-600;
+}
+.btn-ghost {
+  @apply bg-base-700 text-white hover:bg-base-500 border border-base-500/50;
+}
+.btn-danger {
+  @apply bg-danger/90 text-white hover:bg-danger;
+}
+.btn-sm {
+  @apply px-2 py-1 text-xs;
+}
+
+.card {
+  @apply bg-base-800/80 border border-base-500/30 rounded-xl backdrop-blur;
+}
+
+.tag {
+  @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+}
