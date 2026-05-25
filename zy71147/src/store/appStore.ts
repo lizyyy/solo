@@ -117,16 +117,23 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
   updateBlockPosition: (blockId: string, position: Vector3) => {
     const { sceneData } = get();
     const updatedBlocks = sceneData.blocks.map((block) =>
-      block.id === blockId ? { ...block, position } : block
+      block.id === blockId ? { ...block, position, startPosition: position } : block
     );
-    const updatedSceneData = { ...sceneData, blocks: updatedBlocks };
+    const updatedPaths = sceneData.liftingPaths.map((path) => {
+      if (path.blockId !== blockId || path.waypoints.length < 2) return path;
+      return {
+        ...path,
+        waypoints: [position, ...path.waypoints.slice(1)],
+      };
+    });
+    const updatedSceneData = { ...sceneData, blocks: updatedBlocks, liftingPaths: updatedPaths };
     set({
       sceneData: updatedSceneData,
       collisions: checkAllCollisions(
         updatedBlocks,
         sceneData.piers,
         sceneData.rails,
-        sceneData.liftingPaths,
+        updatedPaths,
         get().timelineProgress
       ),
     });

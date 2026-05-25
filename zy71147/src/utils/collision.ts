@@ -188,9 +188,9 @@ export function checkAllCollisions(
   const results: CollisionResult[] = [];
   
   blocks.forEach((block) => {
-    const path = liftingPaths.find(p => p.blockId === block.id);
-    const currentPos = path ? interpolatePath(path, timelineProgress) : block.position;
+    const currentPos = getBlockPositionAtProgress(block, liftingPaths, timelineProgress);
     const movingBlock = { ...block, position: currentPos };
+    const path = liftingPaths.find(p => p.blockId === block.id);
     
     piers.forEach((pier) => {
       const collision = checkBlockPierCollision(movingBlock, pier);
@@ -226,10 +226,17 @@ export function getBlockPositionAtProgress(
   liftingPaths: LiftingPath[],
   progress: number
 ): Vector3 {
+  if (progress <= 0) {
+    return block.position;
+  }
   const path = liftingPaths.find(p => p.blockId === block.id);
   if (!path || path.waypoints.length < 2) {
     return block.position;
   }
-  return interpolatePath(path, progress);
+  const adjustedPath = {
+    ...path,
+    waypoints: [block.position, ...path.waypoints.slice(1)],
+  };
+  return interpolatePath(adjustedPath, progress);
 }
 
