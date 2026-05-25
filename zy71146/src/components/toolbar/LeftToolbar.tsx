@@ -20,6 +20,7 @@ import { cn } from '@/utils/cn';
 
 export function LeftToolbar() {
   const resetScene = useSceneStore(state => state.resetScene);
+  const setCameraPreset = useSceneStore(state => state.setCameraPreset);
   const filters = useAnalysisStore(state => state.filters);
   const toggleFilter = useAnalysisStore(state => state.toggleFilter);
   const leftPanelOpen = useUIStore(state => state.leftPanelOpen);
@@ -73,6 +74,7 @@ export function LeftToolbar() {
           <div className="text-xs text-slate-400 font-semibold mb-1 px-2">视角</div>
           
           <button
+            onClick={() => setCameraPreset('top')}
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 transition-all"
             title="俯视"
           >
@@ -81,6 +83,7 @@ export function LeftToolbar() {
           </button>
           
           <button
+            onClick={() => setCameraPreset('front')}
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 transition-all"
             title="正视"
           >

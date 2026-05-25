@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { SceneData, SceneElement, Vector3Tuple, CameraMode, PathData } from '@/types';
 
+export type CameraPreset = 'top' | 'front' | 'default';
+
 interface SceneState {
   currentScene: SceneData | null;
   elements: SceneElement[];
@@ -9,6 +11,8 @@ interface SceneState {
   cameraMode: CameraMode;
   cameraPosition: Vector3Tuple;
   cameraRotation: Vector3Tuple;
+  cameraTarget: Vector3Tuple;
+  cameraPreset: CameraPreset | null;
   isPlaying: boolean;
   playbackSpeed: number;
   currentTime: number;
@@ -21,6 +25,9 @@ interface SceneState {
   setCameraMode: (mode: CameraMode) => void;
   setCameraPosition: (pos: Vector3Tuple) => void;
   setCameraRotation: (rot: Vector3Tuple) => void;
+  setCameraTarget: (target: Vector3Tuple) => void;
+  setCameraPreset: (preset: CameraPreset) => void;
+  clearCameraPreset: () => void;
   setIsPlaying: (playing: boolean) => void;
   setPlaybackSpeed: (speed: number) => void;
   setCurrentTime: (time: number) => void;
@@ -38,6 +45,8 @@ const initialState = {
   cameraMode: 'orbit' as CameraMode,
   cameraPosition: [0, 15, 20] as Vector3Tuple,
   cameraRotation: [0, 0, 0] as Vector3Tuple,
+  cameraTarget: [0, 0, 0] as Vector3Tuple,
+  cameraPreset: null as CameraPreset | null,
   isPlaying: false,
   playbackSpeed: 1,
   currentTime: 0,
@@ -55,6 +64,9 @@ export const useSceneStore = create<SceneState>((set, get) => ({
   setCameraMode: (mode) => set({ cameraMode: mode }),
   setCameraPosition: (pos) => set({ cameraPosition: pos }),
   setCameraRotation: (rot) => set({ cameraRotation: rot }),
+  setCameraTarget: (target) => set({ cameraTarget: target }),
+  setCameraPreset: (preset) => set({ cameraPreset: preset }),
+  clearCameraPreset: () => set({ cameraPreset: null }),
   setIsPlaying: (playing) => set({ isPlaying: playing }),
   setPlaybackSpeed: (speed) => set({ playbackSpeed: speed }),
   setCurrentTime: (time) => set({ currentTime: time }),

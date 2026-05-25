@@ -1,7 +1,6 @@
-import { useEffect, useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Environment, Grid, Stats } from '@react-three/drei';
-import * as THREE from 'three';
+import { useEffect } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { Grid, Stats } from '@react-three/drei';
 import { useSceneStore } from '@/store/sceneStore';
 import { useAnalysisStore } from '@/store/analysisStore';
 import { useUIStore } from '@/store/uiStore';
@@ -11,20 +10,16 @@ import { Store } from './elements/Store';
 import { Barrier } from './elements/Barrier';
 import { PathLine } from './elements/PathLine';
 import { BlindSpotMarker } from './elements/BlindSpotMarker';
+import { CameraController } from './CameraController';
 import { sampleScenes, sampleBlindSpots } from '@/data/sampleScenes';
 import { useVisibilityCheck } from '@/hooks/useVisibilityCheck';
 import { Column as ColumnType, Signage as SignageType, Store as StoreType, Barrier as BarrierType } from '@/types';
 
 export function MallScene() {
-  const { camera } = useThree();
-  const controlsRef = useRef<any>(null);
-  
   const elements = useSceneStore(state => state.elements);
   const paths = useSceneStore(state => state.paths);
   const selectedElement = useSceneStore(state => state.selectedElement);
   const setSelectedElement = useSceneStore(state => state.setSelectedElement);
-  const setCameraPosition = useSceneStore(state => state.setCameraPosition);
-  const setCameraRotation = useSceneStore(state => state.setCameraRotation);
   const isPlaying = useSceneStore(state => state.isPlaying);
   const setCurrentTime = useSceneStore(state => state.setCurrentTime);
   const playbackSpeed = useSceneStore(state => state.playbackSpeed);
@@ -81,9 +76,6 @@ export function MallScene() {
       const newTime = Math.min(currentTime + delta * playbackSpeed * 10, totalDuration);
       setCurrentTime(newTime);
     }
-    
-    setCameraPosition([camera.position.x, camera.position.y, camera.position.z]);
-    setCameraRotation([camera.rotation.x, camera.rotation.y, camera.rotation.z]);
   });
 
   const handleCanvasClick = () => {
@@ -213,14 +205,7 @@ export function MallScene() {
         />
       ))}
 
-      <OrbitControls
-        ref={controlsRef}
-        makeDefault
-        minDistance={5}
-        maxDistance={50}
-        maxPolarAngle={Math.PI / 2.1}
-        target={[0, 0, 0]}
-      />
+      <CameraController />
 
       {showStats && <Stats />}
 

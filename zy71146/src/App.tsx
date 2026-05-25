@@ -10,7 +10,7 @@ import { SampleModal } from '@/components/modal/SampleModal';
 import { useSceneStore } from '@/store/sceneStore';
 import { useAnalysisStore } from '@/store/analysisStore';
 import { useUIStore } from '@/store/uiStore';
-import { generateReportSnapshot, exportPDFReport, exportJSONReport, captureScreenshot } from '@/utils/reportExport';
+import { generateReportSnapshot, exportPDFReport, exportJSONReport, captureScreenshot, calculateVisibleElements } from '@/utils/reportExport';
 
 function App() {
   const cameraPosition = useSceneStore(state => state.cameraPosition);
@@ -33,7 +33,7 @@ function App() {
 
   const handleExportReport = useCallback(async () => {
     const screenshot = await captureScreenshot('#canvas-container');
-    const visibleElements = elements.filter(el => el.visible).map(el => el.id);
+    const visibleElements = calculateVisibleElements(elements, filters);
     
     const snapshot = generateReportSnapshot(
       cameraPosition,
@@ -50,7 +50,7 @@ function App() {
   }, [cameraPosition, cameraRotation, filters, currentTime, blindSpots, elements, currentScene]);
 
   const handleExportJSON = useCallback(() => {
-    const visibleElements = elements.filter(el => el.visible).map(el => el.id);
+    const visibleElements = calculateVisibleElements(elements, filters);
     
     const snapshot = generateReportSnapshot(
       cameraPosition,

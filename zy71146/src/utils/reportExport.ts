@@ -1,6 +1,27 @@
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { ReportSnapshot, BlindSpot, Vector3Tuple, Filters } from '@/types';
+import { ReportSnapshot, BlindSpot, Vector3Tuple, Filters, SceneElement, ElementType } from '@/types';
+
+const elementTypeToFilterKey: Record<ElementType, keyof Filters> = {
+  column: 'columns',
+  signage: 'signages',
+  store: 'stores',
+  barrier: 'barriers',
+  path: 'paths',
+};
+
+export function calculateVisibleElements(
+  elements: SceneElement[],
+  filters: Filters
+): string[] {
+  return elements
+    .filter(el => {
+      const filterKey = elementTypeToFilterKey[el.type];
+      const isFilterVisible = filters[filterKey] ?? true;
+      return el.visible && isFilterVisible;
+    })
+    .map(el => el.id);
+}
 
 export async function captureScreenshot(selector: string = '#canvas-container'): Promise<string> {
   const element = document.querySelector(selector) as HTMLElement;
