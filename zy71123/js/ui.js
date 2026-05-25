@@ -168,6 +168,16 @@ class UIManager {
         
         if (!sceneData.floor) return;
         
+        if (sceneData.chargers.length > 0) {
+            const newChargerPos = sceneData.chargers[0];
+            this.robotController.setChargerPosition(newChargerPos);
+            
+            if (!this.robotController.isRunning && !this.robotController.isPaused) {
+                this.robotController.position = { ...newChargerPos };
+                this.sceneManager.updateRobotPosition(this.robotController.position, 0);
+            }
+        }
+        
         const obstacles = sceneData.obstacles.map(o => ({
             x: o.x,
             z: o.z,
@@ -183,7 +193,9 @@ class UIManager {
         }));
         
         if (inspectionPoints.length > 0 && this.robotController.chargerPosition) {
-            const result = this.robotController.planRoute(inspectionPoints);
+            if (!this.robotController.isRunning && !this.robotController.isPaused) {
+                const result = this.robotController.planRoute(inspectionPoints);
+            }
         }
     }
 
