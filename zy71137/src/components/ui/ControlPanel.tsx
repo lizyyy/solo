@@ -57,7 +57,7 @@ export function ControlPanel() {
           <input
             type="range"
             min="0"
-            max={convertWindSpeedBack(15).toFixed(2)}
+            max="15"
             step="0.1"
             value={params.windSpeed}
             onChange={(e) => setParams({ windSpeed: parseFloat(e.target.value) })}
