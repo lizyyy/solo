@@ -97,6 +97,14 @@ export const updateSmokePhysics = (
     let newZ = particle.position.z + newVelocity.z * deltaTime;
     
     const halfWidth = TUNNEL_WIDTH / 2;
+    if (newX > 60) {
+      newX = 60;
+      newVelocity.x *= -0.3;
+    }
+    if (newX < -60) {
+      newX = -60;
+      newVelocity.x *= -0.3;
+    }
     if (newZ < -halfWidth) {
       newZ = -halfWidth;
       newVelocity.z *= -0.3;

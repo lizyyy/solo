@@ -9,7 +9,7 @@ import { EscapeRoute } from './EscapeRoute';
 import { Vehicle } from './Vehicle';
 import { FireSource } from './FireSource';
 import { useSimulationStore } from '../store/useSimulationStore';
-import { CameraView, Fan as FanType, EscapeRoute as EscapeRouteType, SmokeParticle, SmokeSource, Vehicle as VehicleType } from '../types';
+import { CameraView, Fan as FanType, EscapeRoute as EscapeRouteType, SmokeParticle, SmokeSource, Vehicle as VehicleType, TimeStep, SimulationError } from '../types';
 import { generateSmokeParticles, updateSmokePhysics } from '../utils/smokePhysics';
 import { detectErrors } from '../utils/errorDetector';
 
@@ -20,10 +20,10 @@ interface CameraControllerProps {
 
 const CameraController: React.FC<CameraControllerProps> = ({ view, tunnelLength }) => {
   const { camera } = useThree();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const controlsRef = useRef<any>(null);
 
   useEffect(() => {
-    const halfLength = tunnelLength / 2;
     const positions: Record<CameraView, { pos: THREE.Vector3; target: THREE.Vector3 }> = {
       overview: {
         pos: new THREE.Vector3(0, 30, 40),
@@ -74,9 +74,10 @@ interface SceneContentProps {
   onUpdateSmoke: (particles: SmokeParticle[]) => void;
   onUpdateCoverage: (coverage: number) => void;
   onUpdateEscapeRoute: (id: string, isBlocked: boolean) => void;
-  onAddError: (error: any) => void;
+  onAddError: (error: Omit<SimulationError, 'id'>) => void;
+  onAddTimeStep: (timeStep: TimeStep) => void;
   onIncrementStep: () => void;
-  timeSteps: any[];
+  timeSteps: TimeStep[];
 }
 
 const SceneContent: React.FC<SceneContentProps> = ({
@@ -95,12 +96,14 @@ const SceneContent: React.FC<SceneContentProps> = ({
   onUpdateCoverage,
   onUpdateEscapeRoute,
   onAddError,
+  onAddTimeStep,
   onIncrementStep,
   timeSteps
 }) => {
   const lastUpdateRef = useRef<number>(0);
   const previousFansRef = useRef<FanType[]>([]);
   const previousBlockedRef = useRef<string[]>([]);
+  const lastRecordedStep = useRef<number>(-1);
 
   useFrame((_, delta) => {
     if (!isPlaying) return;
@@ -124,6 +127,18 @@ const SceneContent: React.FC<SceneContentProps> = ({
           onUpdateEscapeRoute(route.id, isBlocked);
         }
       });
+      
+      if (currentStep !== lastRecordedStep.current) {
+        lastRecordedStep.current = currentStep;
+        const timeStepData: TimeStep = {
+          step: currentStep,
+          timestamp: Date.now(),
+          fanStates: JSON.parse(JSON.stringify(fans)),
+          smokeCoverage: result.coverage,
+          escapeRoutesBlocked: [...result.blockedRoutes]
+        };
+        onAddTimeStep(timeStepData);
+      }
       
       const errors = detectErrors({
         fans,
@@ -201,6 +216,7 @@ export const TunnelScene: React.FC = () => {
     setSmokeCoverage,
     updateEscapeRoute,
     addError,
+    addTimeStep,
     incrementStep,
     timeSteps
   } = useSimulationStore();
@@ -236,6 +252,7 @@ export const TunnelScene: React.FC = () => {
         onUpdateCoverage={setSmokeCoverage}
         onUpdateEscapeRoute={updateEscapeRoute}
         onAddError={addError}
+        onAddTimeStep={addTimeStep}
         onIncrementStep={incrementStep}
         timeSteps={timeSteps}
       />

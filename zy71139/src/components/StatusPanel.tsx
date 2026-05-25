@@ -62,7 +62,7 @@ export const StatusPanel: React.FC = () => {
             <div className="space-y-2">
               <p className="text-gray-400 text-xs">最近警报</p>
               <div className="space-y-1 max-h-32 overflow-y-auto">
-                {recentErrors.map((error, index) => (
+                {recentErrors.map((error) => (
                   <div 
                     key={error.id}
                     className={cn(

@@ -1,14 +1,12 @@
 import { create } from 'zustand';
 import {
   SimulationState,
-  Fan,
   SmokeParticle,
   CameraView,
   Scene,
   SimulationError,
   FanOperation,
-  TimeStep,
-  EscapeRoute
+  TimeStep
 } from '../types';
 import { sampleScenes } from '../data/sampleScenes';
 
@@ -51,7 +49,7 @@ const initialState: SimulationState = {
   smokeCoverage: 0
 };
 
-export const useSimulationStore = create<SimulationState & SimulationActions>((set, get) => ({
+export const useSimulationStore = create<SimulationState & SimulationActions>((set) => ({
   ...initialState,
 
   togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),

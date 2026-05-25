@@ -1,4 +1,4 @@
-import { ReportData, SimulationRecord, SimulationError, FanOperation, TimeStep } from '../types';
+import { ReportData, SimulationRecord, SimulationError, FanOperation } from '../types';
 
 export const generateReport = (record: SimulationRecord): ReportData => {
   const errorsByType = groupErrorsByType(record.errors);
@@ -7,7 +7,7 @@ export const generateReport = (record: SimulationRecord): ReportData => {
     return acc + step.escapeRoutesBlocked.length;
   }, 0);
 
-  const score = calculateFinalScore(record.errors.length, blockedTime, record.timeSteps.length);
+  const score = calculateFinalScore(record.errors.length, blockedTime);
 
   return {
     summary: {
@@ -20,7 +20,7 @@ export const generateReport = (record: SimulationRecord): ReportData => {
     timeline: record.timeSteps.slice(0, 50),
     operations: record.fanOperations,
     errors: errorsByType,
-    recommendations: generateRecommendations(errorsByType, record.timeSteps)
+    recommendations: generateRecommendations(errorsByType)
   };
 };
 
@@ -34,8 +34,7 @@ const groupErrorsByType = (errors: SimulationError[]) => {
 
 const calculateFinalScore = (
   errorCount: number,
-  blockedTime: number,
-  totalSteps: number
+  blockedTime: number
 ): number => {
   let score = 100;
   
@@ -50,8 +49,7 @@ const generateRecommendations = (
     fan_wrong_direction: SimulationError[];
     escape_blocked: SimulationError[];
     timestep_error: SimulationError[];
-  },
-  timeSteps: TimeStep[]
+  }
 ): string[] => {
   const recommendations: string[] = [];
 

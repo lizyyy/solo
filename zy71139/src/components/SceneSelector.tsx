@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FolderOpen, X, ChevronRight, Flame } from 'lucide-react';
 import { Scene } from '../types';
 import { sampleScenes } from '../data/sampleScenes';

@@ -1,57 +1,160 @@
-# React + TypeScript + Vite
+# 隧道通风烟气演练系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+基于 Web 的 3D 交互式隧道火灾烟气模拟演练平台，用于培训隧道运维人员掌握风机控制策略，理解烟气扩散规律。
 
-Currently, two official plugins are available:
+## 功能特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 核心功能
 
-## Expanding the ESLint configuration
+- **3D 可视化场景**：完整的隧道模型，包含风机、烟气粒子、逃生通道、车辆和火源
+- **实时烟气模拟**：基于物理引擎的烟气扩散模拟，支持风力影响、浮力和边界碰撞
+- **风机控制**：可独立控制每个风机的开关、风向和功率
+- **错误检测**：自动检测风机方向冲突、逃生通道堵塞等常见错误
+- **时间步记录**：完整记录每一步的风机状态、烟气覆盖范围和逃生通道状态
+- **报告导出**：演练结束后可导出详细报告，包含操作记录、错误统计和改进建议
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 交互功能
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- **多视角切换**：总览、俯视、侧视、逃生通道、自由视角 5 种预设视角
+- **播放控制**：播放/暂停、速度调节（0.5x-4x）、进度跳转
+- **场景选择**：3 个预设演练场景，支持不同火灾位置和风机配置
+- **区域筛选**：按入口区、中段区、出口区筛选风机
+- **状态监控**：实时显示风机运行状态、烟气浓度、逃生通道状态
+
+## 技术栈
+
+- **前端框架**：React 18 + TypeScript
+- **构建工具**：Vite 5
+- **3D 渲染**：Three.js + @react-three/fiber + @react-three/drei
+- **状态管理**：Zustand
+- **样式方案**：TailwindCSS 3
+- **图标库**：lucide-react
+- **代码规范**：ESLint + TypeScript
+
+## 项目结构
+
+```
+src/
+├── components/          # React UI 组件
+│   ├── ControlPanel/   # 风机控制面板
+│   ├── Timeline/       # 时间轴控制
+│   ├── StatusPanel/    # 状态监控面板
+│   ├── ViewControls/   # 视角切换
+│   ├── SceneSelector/  # 场景选择器
+│   └── ReportModal/    # 报告弹窗
+├── three/              # Three.js 3D 组件
+│   ├── Tunnel.tsx      # 隧道模型
+│   ├── Fan.tsx         # 风机组件
+│   ├── SmokeParticles.tsx # 烟气粒子系统
+│   ├── EscapeRoute.tsx # 逃生通道
+│   ├── Vehicle.tsx     # 车辆模型
+│   ├── FireSource.tsx  # 火源特效
+│   └── TunnelScene.tsx # 主场景
+├── store/              # Zustand 状态管理
+│   └── useSimulationStore.ts
+├── utils/              # 工具函数
+│   ├── smokePhysics.ts # 烟气物理模拟
+│   ├── errorDetector.ts # 错误检测引擎
+│   ├── reportGenerator.ts # 报告生成
+│   └── cn.ts           # 样式合并工具
+├── data/               # 预设数据
+│   └── sampleScenes.ts # 演练场景
+├── types/              # TypeScript 类型定义
+│   └── index.ts
+└── pages/              # 页面组件
+    └── Index.tsx       # 主页面
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 快速开始
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 安装依赖
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
 ```
+
+### 开发模式
+
+```bash
+npm run dev
+```
+
+访问 http://localhost:5173 查看应用
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+### 代码检查
+
+```bash
+npm run lint
+```
+
+### 类型检查
+
+```bash
+npm run check
+```
+
+## 使用说明
+
+### 基础操作
+
+1. **选择场景**：点击顶部"场景"按钮，选择合适的演练场景
+2. **开始演练**：点击底部时间轴的播放按钮
+3. **操作风机**：在左侧控制面板点击风机开关，调节方向和功率
+4. **观察效果**：在 3D 场景中观察烟气扩散情况
+5. **切换视角**：使用右下角视角按钮切换不同观察角度
+6. **生成报告**：点击顶部"报告"按钮查看演练结果和改进建议
+
+### 风机控制策略
+
+- **正向吹风**：将烟气向隧道出口方向推送
+- **反向吹风**：将烟气向隧道入口方向推送
+- **功率调节**：高功率风机产生更强的气流效果
+- **区域配合**：注意相邻区域风机方向的一致性，避免产生紊流
+
+### 常见错误
+
+- **风机方向冲突**：相邻风机方向相反会导致烟气在中间区域滞留
+- **逃生通道堵塞**：烟气覆盖逃生通道会影响人员疏散
+- **时间步异常**：过快或过慢的操作节奏可能影响演练效果
+
+## 报告内容
+
+演练报告包含以下信息：
+
+- **综合得分**：基于操作规范和错误情况的评分
+- **演练统计**：时长、时间步数、错误数量
+- **操作记录**：所有风机操作的时间和内容
+- **错误详情**：按类型分类的错误列表
+- **改进建议**：针对本次演练的个性化建议
+
+报告支持导出为 TXT 和 JSON 格式。
+
+## 响应式设计
+
+- **桌面端**：左侧控制面板 + 主 3D 区域 + 底部时间轴
+- **窄屏/移动端**：控制面板折叠为侧边栏，按钮尺寸优化，避免元素重叠
+
+## 核心算法
+
+### 烟气物理模拟
+
+- 气流场计算：基于风机位置、方向和功率计算每个位置的风速
+- 浮力效应：烟气受热产生上升运动
+- 边界碰撞：隧道墙壁、地面、天花板的碰撞检测和反弹
+- 生命周期：粒子从生成到消散的完整生命周期管理
+
+### 错误检测引擎
+
+- 风机方向冲突检测：检查相邻风机方向是否一致
+- 逃生通道堵塞检测：监控逃生通道附近烟气浓度
+- 时间步异常检测：检测操作频率和场景状态的异常变化
+
+## 许可证
+
+MIT License

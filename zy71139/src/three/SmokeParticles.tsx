@@ -11,10 +11,9 @@ export const SmokeParticles: React.FC<SmokeParticlesProps> = ({ particles }) => 
   const pointsRef = useRef<THREE.Points>(null);
   const particleCount = particles.length;
 
-  const { positions, colors, sizes } = useMemo(() => {
+  const { positions, colors } = useMemo(() => {
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
-    const sizes = new Float32Array(particleCount);
 
     particles.forEach((particle, i) => {
       positions[i * 3] = particle.position.x;
@@ -31,12 +30,10 @@ export const SmokeParticles: React.FC<SmokeParticlesProps> = ({ particles }) => 
       colors[i * 3] = r * densityFactor;
       colors[i * 3 + 1] = g * densityFactor;
       colors[i * 3 + 2] = b * densityFactor;
-
-      sizes[i] = 0.3 + lifeFactor * 0.5;
     });
 
-    return { positions, colors, sizes };
-  }, [particles]);
+    return { positions, colors };
+  }, [particles, particleCount]);
 
   useFrame(() => {
     if (pointsRef.current && particleCount > 0) {

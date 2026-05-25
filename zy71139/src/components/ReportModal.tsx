@@ -11,7 +11,7 @@ interface ReportModalProps {
 }
 
 export const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose }) => {
-  const { selectedScene, errors, operations, timeSteps, startTime, currentStep } = useSimulationStore();
+  const { selectedScene, errors, operations, timeSteps, startTime } = useSimulationStore();
   const [report, setReport] = useState<ReportData | null>(null);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose }) => 
         errors: errors,
         finalScore: 0
       };
-      const generatedReport = generateReport(record as any);
+      const generatedReport = generateReport(record);
       setReport(generatedReport);
     }
   }, [isOpen, selectedScene, errors, operations, timeSteps, startTime]);
