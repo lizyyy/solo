@@ -1,4 +1,4 @@
-import { Calendar, Clock, Sun, CloudRain } from 'lucide-react';
+import { Calendar, Clock, Sun, CloudRain, Activity, Timer } from 'lucide-react';
 import { useTimeStore } from '../../store/useTimeStore';
 import { useSceneStore } from '../../store/useSceneStore';
 import { calculateSolarPosition, getDaylightHours } from '../../utils/solarMath';
@@ -9,12 +9,20 @@ const monthNames = [
 ];
 
 export function StatusBar() {
-  const { month, day, hour } = useTimeStore();
-  const { components, trees, filter, getFilteredComponents } = useSceneStore();
+  const { month, day, hour, isPlaying } = useTimeStore();
+  const {
+    components,
+    trees,
+    filter,
+    getFilteredComponents,
+    realTimeShadows,
+    getAverageAccumulatedShadowHours,
+  } = useSceneStore();
 
   const solarPos = calculateSolarPosition(month, day, hour);
   const daylightHours = getDaylightHours(month, day);
   const filteredComponents = getFilteredComponents();
+  const avgAccumulatedHours = getAverageAccumulatedShadowHours();
 
   const formatTime = (h: number) => {
     const hours = Math.floor(h);
@@ -22,7 +30,9 @@ export function StatusBar() {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
 
-  const avgShadowRate = components.length > 0
+  const avgShadowRate = realTimeShadows.length > 0
+    ? realTimeShadows.reduce((sum, s) => sum + s.shadowRate, 0) / realTimeShadows.length
+    : components.length > 0
     ? filteredComponents.reduce((sum, c) => sum + c.shadowStats.shadowRate, 0) / filteredComponents.length
     : 0;
 
@@ -54,6 +64,19 @@ export function StatusBar() {
         <span>日照时长: {daylightHours.toFixed(1)}h</span>
       </div>
 
+      <div className="flex items-center gap-2">
+        <Activity className={`w-3.5 h-3.5 ${isPlaying ? 'text-green-400 animate-pulse' : 'text-gray-500'}`} />
+        <span className="text-gray-400">
+          实时: {realTimeShadows.length > 0 ? '计算中' : '等待'}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Timer className="w-3.5 h-3.5 text-orange-400" />
+        <span className="text-gray-400">累计遮挡:</span>
+        <span className="text-orange-400 font-mono">{avgAccumulatedHours.toFixed(2)}h</span>
+      </div>
+
       <div className="flex-1" />
 
       <div className="flex items-center gap-4 text-gray-400">
@@ -69,7 +92,7 @@ export function StatusBar() {
       <div className="h-4 w-px bg-gray-700" />
 
       <div className="flex items-center gap-2">
-        <span className="text-gray-400">平均遮挡率:</span>
+        <span className="text-gray-400">实时遮挡率:</span>
         <span
           className={`font-mono font-medium ${
             avgShadowRate < 10

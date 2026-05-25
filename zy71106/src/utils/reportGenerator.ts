@@ -24,10 +24,9 @@ function getComponentRealTimeShadowRate(componentId: string): number {
   return component ? component.shadowStats.shadowRate : 0;
 }
 
-function getComponentShadowHours(componentId: string): number {
+function getComponentAccumulatedShadowHours(componentId: string): number {
   const sceneState = useSceneStore.getState();
-  const component = sceneState.components.find((c: any) => c.id === componentId);
-  return component ? component.shadowStats.shadowHours : 0;
+  return sceneState.getComponentAccumulatedShadowHours(componentId);
 }
 
 export function generateStatistics(): ReportStatistics {
@@ -43,12 +42,12 @@ export function generateStatistics(): ReportStatistics {
     name: c.name,
     group: c.group,
     shadowRate: getComponentRealTimeShadowRate(c.id),
-    shadowHours: getComponentShadowHours(c.id),
+    shadowHours: getComponentAccumulatedShadowHours(c.id),
   }));
 
   const shadowRates = targetComponents.map((c) => getComponentRealTimeShadowRate(c.id));
   const totalShadowHours = targetComponents.reduce(
-    (sum, c) => sum + getComponentShadowHours(c.id),
+    (sum, c) => sum + getComponentAccumulatedShadowHours(c.id),
     0
   );
 
@@ -135,10 +134,10 @@ export async function exportPDFReport(
   const stats = snapshot.statistics;
   doc.text(`组件总数: ${stats.totalComponents}`, 15, yPos);
   doc.text(`筛选后组件: ${stats.filteredComponents}`, 80, yPos);
-  doc.text(`平均遮挡率: ${stats.averageShadowRate.toFixed(1)}%`, 15, yPos + 6);
+  doc.text(`实时平均遮挡率: ${stats.averageShadowRate.toFixed(1)}%`, 15, yPos + 6);
   doc.text(`最高遮挡率: ${stats.maxShadowRate.toFixed(1)}%`, 80, yPos + 6);
   doc.text(`最低遮挡率: ${stats.minShadowRate.toFixed(1)}%`, 145, yPos + 6);
-  doc.text(`总遮挡时长: ${stats.totalShadowHours.toFixed(1)} 小时`, 15, yPos + 12);
+  doc.text(`累计遮挡时长: ${stats.totalShadowHours.toFixed(2)} 小时`, 15, yPos + 12);
 
   yPos += 22;
 
@@ -182,8 +181,8 @@ export async function exportPDFReport(
   doc.setTextColor(100, 100, 100);
   doc.text('组件名称', 15, yPos);
   doc.text('分组', 70, yPos);
-  doc.text('遮挡率', 110, yPos);
-  doc.text('遮挡时长', 150, yPos);
+  doc.text('实时遮挡率', 110, yPos);
+  doc.text('累计时长', 150, yPos);
   yPos += 4;
 
   doc.setDrawColor(200, 200, 200);
@@ -205,7 +204,7 @@ export async function exportPDFReport(
     doc.setTextColor(rateColor[0], rateColor[1], rateColor[2]);
     doc.text(`${stat.shadowRate.toFixed(1)}%`, 110, yPos + index * 6);
     doc.setTextColor(60, 60, 60);
-    doc.text(`${stat.shadowHours.toFixed(1)}h`, 150, yPos + index * 6);
+    doc.text(`${stat.shadowHours.toFixed(2)}h`, 150, yPos + index * 6);
   });
 
   if (stats.componentStats.length > 15) {

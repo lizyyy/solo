@@ -17,10 +17,19 @@ export interface RealTimeShadowResult {
   totalPoints: number;
 }
 
+export interface AccumulatedShadowData {
+  componentId: string;
+  accumulatedShadowHours: number;
+  lastProcessedHour: number;
+}
+
 export interface ShadowCalculationState {
   realTimeShadows: RealTimeShadowResult[];
   isCalculating: boolean;
   lastCalculationTime: number;
+  accumulatedShadows: AccumulatedShadowData[];
+  currentTrackingMonth: number;
+  currentTrackingDay: number;
 }
 
 const defaultRoof: Roof = {
@@ -74,6 +83,10 @@ interface SceneActions {
   updateRealTimeShadows: (results: RealTimeShadowResult[]) => void;
   setIsCalculating: (isCalculating: boolean) => void;
   getComponentShadowRate: (componentId: string) => number;
+  accumulateShadowDuration: (month: number, day: number, hour: number, deltaHours: number) => void;
+  getComponentAccumulatedShadowHours: (componentId: string) => number;
+  resetAccumulatedShadows: () => void;
+  getAverageAccumulatedShadowHours: () => number;
 }
 
 export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
@@ -87,6 +100,9 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
   realTimeShadows: [],
   isCalculating: false,
   lastCalculationTime: 0,
+  accumulatedShadows: [],
+  currentTrackingMonth: 6,
+  currentTrackingDay: 15,
 
   setRoof: (roof) => set({ roof }),
 
@@ -159,6 +175,9 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
     realTimeShadows: [],
     isCalculating: false,
     lastCalculationTime: 0,
+    accumulatedShadows: [],
+    currentTrackingMonth: 6,
+    currentTrackingDay: 15,
   }),
 
   getFilteredComponents: () => {
@@ -200,5 +219,78 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
     }
     const component = components.find((c) => c.id === componentId);
     return component ? component.shadowStats.shadowRate : 0;
+  },
+
+  accumulateShadowDuration: (month: number, day: number, hour: number, deltaHours: number) => {
+    const safeDelta = Math.min(deltaHours, 0.1);
+
+    set((state) => {
+      let newAccumulated = [...state.accumulatedShadows];
+
+      if (state.currentTrackingMonth !== month || state.currentTrackingDay !== day) {
+        newAccumulated = state.components.map((c) => ({
+          componentId: c.id,
+          accumulatedShadowHours: 0,
+          lastProcessedHour: hour,
+        }));
+        return {
+          accumulatedShadows: newAccumulated,
+          currentTrackingMonth: month,
+          currentTrackingDay: day,
+        };
+      }
+
+      newAccumulated = state.components.map((comp) => {
+        const existing = state.accumulatedShadows.find((a) => a.componentId === comp.id);
+        const shadowRate = state.getComponentShadowRate(comp.id);
+        const shadowHours = (shadowRate / 100) * safeDelta;
+        return {
+          componentId: comp.id,
+          accumulatedShadowHours: (existing?.accumulatedShadowHours || 0) + shadowHours,
+          lastProcessedHour: hour,
+        };
+      });
+
+      return {
+        accumulatedShadows: newAccumulated,
+        currentTrackingMonth: month,
+        currentTrackingDay: day,
+      };
+    });
+  },
+
+  getComponentAccumulatedShadowHours: (componentId: string) => {
+    const { accumulatedShadows, components } = get();
+    const accumulated = accumulatedShadows.find((a) => a.componentId === componentId);
+    if (accumulated) {
+      return accumulated.accumulatedShadowHours;
+    }
+    const component = components.find((c) => c.id === componentId);
+    return component ? component.shadowStats.shadowHours : 0;
+  },
+
+  resetAccumulatedShadows: () => {
+    const { components } = get();
+    set({
+      accumulatedShadows: components.map((c) => ({
+        componentId: c.id,
+        accumulatedShadowHours: 0,
+        lastProcessedHour: 6,
+      })),
+    });
+  },
+
+  getAverageAccumulatedShadowHours: () => {
+    const { accumulatedShadows, components } = get();
+    if (accumulatedShadows.length > 0) {
+      return (
+        accumulatedShadows.reduce((sum, a) => sum + a.accumulatedShadowHours, 0) /
+        accumulatedShadows.length
+      );
+    }
+    if (components.length === 0) return 0;
+    return (
+      components.reduce((sum, c) => sum + c.shadowStats.shadowHours, 0) / components.length
+    );
   },
 }));

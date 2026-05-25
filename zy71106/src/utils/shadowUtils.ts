@@ -143,15 +143,12 @@ export function calculateComponentShadowRate(
   }
 
   const samplePoints = generateComponentSamplePoints(component, gridSize);
-  const sunDirection = new THREE.Vector3(
-    -sunPosition.x,
-    -sunPosition.y,
-    -sunPosition.z
-  ).normalize();
+  const sunVec = new THREE.Vector3(sunPosition.x, sunPosition.y, sunPosition.z);
 
   let shadowedCount = 0;
 
   samplePoints.forEach((point) => {
+    const sunDirection = sunVec.clone().sub(point).normalize();
     if (calculatePointShadow(point, sunDirection, occluders, raycaster)) {
       shadowedCount++;
     }

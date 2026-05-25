@@ -306,6 +306,7 @@ export function useThreeScene(): UseThreeSceneReturn {
     window.addEventListener('resize', handleResize);
 
     let lastTime = 0;
+    let lastAnimHour = -1;
     const animate = (time: number) => {
       animationIdRef.current = requestAnimationFrame(animate);
 
@@ -315,17 +316,30 @@ export function useThreeScene(): UseThreeSceneReturn {
       if (timeState.isPlaying) {
         const delta = (time - lastTime) / 1000;
         lastTime = time;
+        const deltaHours = delta * timeState.playSpeed * 2;
 
-        const newHour = timeState.hour + delta * timeState.playSpeed * 2;
+        const newHour = timeState.hour + deltaHours;
         if (newHour >= 18) {
           useTimeStore.getState().setHour(6);
+          lastAnimHour = -1;
         } else if (newHour < 6) {
           useTimeStore.getState().setHour(6);
+          lastAnimHour = -1;
         } else {
           useTimeStore.getState().setHour(newHour);
+          if (lastAnimHour > 0) {
+            useSceneStore.getState().accumulateShadowDuration(
+              timeState.month,
+              timeState.day,
+              newHour,
+              deltaHours
+            );
+          }
+          lastAnimHour = newHour;
         }
       } else {
         lastTime = time;
+        lastAnimHour = -1;
       }
 
       const currentTimeState = useTimeStore.getState();
