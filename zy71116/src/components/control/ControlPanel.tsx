@@ -11,7 +11,6 @@ export const ControlPanel = () => {
     selectedStartPoint,
     selectedEndPoint,
     currentRoute,
-    isPlaying,
     setIsPlaying,
     resetState,
     loadSampleData,

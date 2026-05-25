@@ -1,5 +1,5 @@
 import { useAppStore } from '../../store/useAppStore';
-import { TrendingUp, Construction, ArrowUpDown, Eye, EyeOff } from 'lucide-react';
+import { TrendingUp, Construction, ArrowUpDown, Eye } from 'lucide-react';
 
 export const FilterPanel = () => {
   const { filters, setFilters } = useAppStore();

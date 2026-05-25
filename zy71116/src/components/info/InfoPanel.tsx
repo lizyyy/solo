@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Info, AlertTriangle, CheckCircle, XCircle, FileText } from 'lucide-react';
+import { Info, FileText } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 import { RouteInfo } from './RouteInfo';
 import { ValidationInfo } from './ValidationInfo';

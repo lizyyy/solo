@@ -1,5 +1,5 @@
 import { useAppStore } from '../../store/useAppStore';
-import { MapPin, Flag } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 export const PointSelector = () => {
   const {

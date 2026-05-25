@@ -11,6 +11,7 @@ interface ConstructionProps {
 
 export const ConstructionModel = ({ construction, onClick, visible }: ConstructionProps) => {
   const meshRef = useRef<THREE.Group>(null);
+  const warningStripes = useRef<THREE.Texture>(null);
 
   if (!visible || !construction.isActive) return null;
 
@@ -18,8 +19,6 @@ export const ConstructionModel = ({ construction, onClick, visible }: Constructi
     e.stopPropagation();
     onClick?.(construction);
   };
-
-  const warningStripes = useRef<THREE.Texture>(null);
 
   if (!warningStripes.current) {
     const canvas = document.createElement('canvas');

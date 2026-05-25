@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Sky, Environment, Grid, Stars } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 
 import { CampusData, PointOfInterest as POIType } from '../../types';
@@ -18,7 +19,7 @@ interface CameraControllerProps {
 
 const CameraController = ({ onCameraChange }: CameraControllerProps) => {
   const { camera } = useThree();
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl>(null);
 
   useEffect(() => {
     const handleChange = () => {

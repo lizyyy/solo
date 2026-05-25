@@ -11,7 +11,6 @@ interface RouteLineProps {
 }
 
 export const RouteLine = ({ route, timelinePosition, isValid }: RouteLineProps) => {
-  const lineRef = useRef<THREE.Line>(null);
   const progressRef = useRef<THREE.Group>(null);
   const waypointMarkersRef = useRef<THREE.Group>(null);
 
