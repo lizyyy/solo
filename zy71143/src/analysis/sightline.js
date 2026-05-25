@@ -24,9 +24,11 @@ export class SightlineAnalyzer {
     viewpointsGroup.children.forEach(vpGroup => {
       const head = vpGroup.children.find(c => c.geometry?.type === 'SphereGeometry')
       if (head) {
+        const worldPos = new THREE.Vector3()
+        head.getWorldPosition(worldPos)
         viewpointList.push({
           group: vpGroup,
-          position: head.position.clone(),
+          position: worldPos,
           data: vpGroup.userData.viewpointData,
           index: vpGroup.userData.index
         })
@@ -37,9 +39,11 @@ export class SightlineAnalyzer {
     screensGroup.children.forEach(screenGroup => {
       const screen = screenGroup.children.find(c => c.material?.emissive)
       if (screen) {
+        const worldPos = new THREE.Vector3()
+        screen.getWorldPosition(worldPos)
         screenList.push({
           mesh: screen,
-          position: screen.position.clone(),
+          position: worldPos,
           data: screen.userData.screenData,
           screenGroup
         })

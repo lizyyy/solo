@@ -49,20 +49,19 @@ export class DragController {
     if (intersects.length > 0) {
       this.isDragging = true
       this.draggedObject = intersects[0].object
+      this.draggedParent = this.draggedObject.parent
       
       this.app.controls.enabled = false
       
       raycaster.ray.intersectPlane(this.dragPlane, this.dragIntersection)
-      this.dragOffset.copy(this.dragIntersection).sub(this.draggedObject.parent.position)
-      
-      this.inverseMatrix.copy(this.app.camera.matrixWorldInverse)
+      this.dragOffset.copy(this.dragIntersection).sub(this.draggedParent.position)
       
       this.app.selectObject(this.draggedObject)
     }
   }
 
   onMouseMove(event) {
-    if (!this.isDragging || !this.draggedObject) return
+    if (!this.isDragging || !this.draggedObject || !this.draggedParent) return
 
     const container = document.getElementById('scene-container')
     const rect = container.getBoundingClientRect()
@@ -76,25 +75,21 @@ export class DragController {
     if (raycaster.ray.intersectPlane(this.dragPlane, this.dragIntersection)) {
       const newPos = this.dragIntersection.clone().sub(this.dragOffset)
       
-      const parent = this.draggedObject.parent
-      if (parent && parent.userData) {
-        parent.position.x = newPos.x
-        parent.position.z = newPos.z
-        
-        parent.traverse(child => {
-          if (child.userData.viewpointData) {
-            child.userData.viewpointData.position.x = newPos.x
-            child.userData.viewpointData.position.z = newPos.z
-          }
-          if (child.userData.screenData) {
-            child.userData.screenData.position.x = newPos.x
-            child.userData.screenData.position.z = newPos.z
-          }
-          if (child.userData.obstacleData) {
-            child.userData.obstacleData.position.x = newPos.x
-            child.userData.obstacleData.position.z = newPos.z
-          }
-        })
+      this.draggedParent.position.x = newPos.x
+      this.draggedParent.position.z = newPos.z
+      
+      const parentData = this.draggedParent.userData
+      if (parentData.viewpointData) {
+        parentData.viewpointData.position.x = newPos.x
+        parentData.viewpointData.position.z = newPos.z
+      }
+      if (parentData.screenData) {
+        parentData.screenData.position.x = newPos.x
+        parentData.screenData.position.z = newPos.z
+      }
+      if (parentData.obstacleData) {
+        parentData.obstacleData.position.x = newPos.x
+        parentData.obstacleData.position.z = newPos.z
       }
     }
   }
@@ -117,6 +112,7 @@ export class DragController {
         this.app.objects.screens,
         this.app.objects.obstacles
       )
+      this.app.timelineController.setupViewpoints(this.app.objects.viewpoints)
       this.app.uiController.updateStatusDisplay()
       this.app.uiController.updateReportPreview()
     }

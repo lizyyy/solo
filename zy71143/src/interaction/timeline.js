@@ -17,9 +17,11 @@ export class TimelineController {
     viewpointsGroup.children.forEach((vpGroup, index) => {
       const head = vpGroup.children.find(c => c.geometry?.type === 'SphereGeometry')
       if (head) {
+        const worldPos = new THREE.Vector3()
+        head.getWorldPosition(worldPos)
         this.viewpoints.push({
           group: vpGroup,
-          position: head.position.clone(),
+          position: worldPos,
           data: vpGroup.userData.viewpointData,
           index
         })

@@ -166,6 +166,7 @@ function createScreens(screensData) {
   screensData.forEach((screen, index) => {
     const screenGroup = new THREE.Group()
     screenGroup.name = `screen_${index}`
+    screenGroup.userData = { screenData: screen, index }
 
     const standGeometry = new THREE.BoxGeometry(0.5, 3, 0.5)
     const standMaterial = new THREE.MeshStandardMaterial({
@@ -174,7 +175,7 @@ function createScreens(screensData) {
       roughness: 0.2
     })
     const stand = new THREE.Mesh(standGeometry, standMaterial)
-    stand.position.set(screen.position.x, 1.5, screen.position.z)
+    stand.position.set(0, 1.5, 0)
     stand.castShadow = true
     stand.userData = { type: 'screen', name: screen.name, selectable: true, screenData: screen, draggable: true }
     screenGroup.add(stand)
@@ -188,9 +189,9 @@ function createScreens(screensData) {
     })
     const screenMesh = new THREE.Mesh(screenGeometry, screenMaterial)
     screenMesh.position.set(
-      screen.position.x,
+      0,
       screen.height / 2 + 2,
-      screen.position.z
+      0
     )
     screenMesh.rotation.y = screen.rotation || 0
     screenMesh.castShadow = true
@@ -210,6 +211,11 @@ function createScreens(screensData) {
     border.userData = { type: 'screen', name: screen.name, selectable: true, screenData: screen, draggable: true }
     screenGroup.add(border)
 
+    screenGroup.position.set(
+      screen.position.x,
+      0,
+      screen.position.z
+    )
     group.add(screenGroup)
   })
 
@@ -221,6 +227,10 @@ function createObstacles(obstaclesData) {
   group.name = 'obstacles'
 
   obstaclesData.forEach((obstacle, index) => {
+    const obstacleGroup = new THREE.Group()
+    obstacleGroup.name = `obstacle_${index}`
+    obstacleGroup.userData = { obstacleData: obstacle, index }
+    
     let mesh
     
     if (obstacle.shape === 'box') {
@@ -256,9 +266,9 @@ function createObstacles(obstaclesData) {
 
     if (mesh) {
       mesh.position.set(
-        obstacle.position.x,
+        0,
         obstacle.height / 2,
-        obstacle.position.z
+        0
       )
       mesh.castShadow = true
       mesh.receiveShadow = true
@@ -269,7 +279,13 @@ function createObstacles(obstaclesData) {
         obstacleData: obstacle,
         draggable: true
       }
-      group.add(mesh)
+      obstacleGroup.position.set(
+        obstacle.position.x,
+        0,
+        obstacle.position.z
+      )
+      obstacleGroup.add(mesh)
+      group.add(obstacleGroup)
     }
   })
 
@@ -283,6 +299,7 @@ function createViewpoints(viewpointsData) {
   viewpointsData.forEach((vp, index) => {
     const vpGroup = new THREE.Group()
     vpGroup.name = `viewpoint_${index}`
+    vpGroup.userData = { viewpointData: vp, index }
 
     const bodyGeometry = new THREE.CylinderGeometry(0.2, 0.25, 1.2, 12)
     const bodyMaterial = new THREE.MeshStandardMaterial({
@@ -293,7 +310,7 @@ function createViewpoints(viewpointsData) {
     const eyeHeight = vp.eyeHeight || 1.6
     const bodyHeight = eyeHeight - 0.4
     const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
-    body.position.set(vp.position.x, bodyHeight / 2, vp.position.z)
+    body.position.set(0, bodyHeight / 2, 0)
     body.castShadow = true
     body.userData = { type: 'viewpoint', name: vp.name, selectable: true, viewpointData: vp, index, draggable: true }
     vpGroup.add(body)
@@ -305,7 +322,7 @@ function createViewpoints(viewpointsData) {
       roughness: 0.7
     })
     const head = new THREE.Mesh(headGeometry, headMaterial)
-    head.position.set(vp.position.x, eyeHeight, vp.position.z)
+    head.position.set(0, eyeHeight, 0)
     head.castShadow = true
     head.userData = { type: 'viewpoint', name: vp.name, selectable: true, viewpointData: vp, index, draggable: true }
     vpGroup.add(head)
@@ -317,16 +334,16 @@ function createViewpoints(viewpointsData) {
       emissiveIntensity: 0.5
     })
     const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial)
-    leftEye.position.set(vp.position.x - 0.08, eyeHeight + 0.02, vp.position.z + 0.15)
+    leftEye.position.set(-0.08, eyeHeight + 0.02, 0.15)
     leftEye.userData = { type: 'viewpoint', name: vp.name, selectable: false, viewpointData: vp, index }
     vpGroup.add(leftEye)
 
     const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial)
-    rightEye.position.set(vp.position.x + 0.08, eyeHeight + 0.02, vp.position.z + 0.15)
+    rightEye.position.set(0.08, eyeHeight + 0.02, 0.15)
     rightEye.userData = { type: 'viewpoint', name: vp.name, selectable: false, viewpointData: vp, index }
     vpGroup.add(rightEye)
 
-    vpGroup.userData = { viewpointData: vp, index }
+    vpGroup.position.set(vp.position.x, 0, vp.position.z)
     group.add(vpGroup)
   })
 
