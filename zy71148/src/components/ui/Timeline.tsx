@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useAppStore } from '../../store';
 import { formatTime } from '../../utils/statistics';
-import { viewPresets } from '../three/Scene';
+import { viewPresets } from '../../constants/viewPresets';
 
 export const Timeline = () => {
   const data = useAppStore((state) => state.data);

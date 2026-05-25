@@ -6,7 +6,6 @@ import { getThicknessColor, hexToRgb } from '../../utils/colors';
 export const IceSurface = () => {
   const data = useAppStore((state) => state.data);
   const currentTimeIndex = useAppStore((state) => state.currentTimeIndex);
-  const viewMode = useAppStore((state) => state.viewMode);
   const showHeatmap = useAppStore((state) => state.showHeatmap);
   const showThreshold = useAppStore((state) => state.showThreshold);
 
@@ -61,7 +60,7 @@ export const IceSurface = () => {
     }
 
     return { positions: posArray, colors: colorArray };
-  }, [data, currentTimeIndex, viewMode, showHeatmap, geometry]);
+  }, [data, currentTimeIndex, showHeatmap, geometry]);
 
   if (!data || !geometry) return null;
 
