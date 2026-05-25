@@ -5,7 +5,6 @@ import { useSimulationStore } from '@/store/simulationStore';
 const Stair3D: React.FC = () => {
   const selectedPlan = useSimulationStore(state => state.selectedPlan);
   const showLabels = useSimulationStore(state => state.showLabels);
-  const statistics = useSimulationStore(state => state.statistics);
   const simulator = useSimulationStore(state => state.simulator);
   
   if (!selectedPlan) return null;

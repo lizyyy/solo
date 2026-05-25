@@ -4,14 +4,29 @@ import * as THREE from 'three';
 
 const Student3D: React.FC = () => {
   const students = useSimulationStore(state => state.students);
-  const selectedPlan = useSimulationStore(state => state.selectedPlan);
   const showPaths = useSimulationStore(state => state.showPaths);
+  const filteredClassrooms = useSimulationStore(state => state.filteredClassrooms);
+  const studentFilter = useSimulationStore(state => state.studentFilter);
+  
+  const filteredStudents = useMemo(() => {
+    return students.filter(student => {
+      if (filteredClassrooms.length > 0 && !filteredClassrooms.includes(student.classroomId)) {
+        return false;
+      }
+      
+      if (studentFilter !== 'all' && student.status !== studentFilter) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [students, filteredClassrooms, studentFilter]);
   
   const { positions, colors } = useMemo(() => {
     const positions: number[] = [];
     const colors: number[] = [];
     
-    students.forEach(student => {
+    filteredStudents.forEach(student => {
       positions.push(student.position.x, student.position.y + 0.5, student.position.z);
       
       let color = new THREE.Color('#3b82f6');
@@ -27,12 +42,12 @@ const Student3D: React.FC = () => {
       positions: new Float32Array(positions),
       colors: new Float32Array(colors)
     };
-  }, [students]);
+  }, [filteredStudents]);
   
   const pathLines = useMemo(() => {
     if (!showPaths) return [];
     
-    const displayedStudents = students.slice(0, 50);
+    const displayedStudents = filteredStudents.slice(0, 50);
     return displayedStudents.map(student => {
       const points = student.path.map(p => new THREE.Vector3(p.x, p.y + 0.5, p.z));
       const geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -47,7 +62,7 @@ const Student3D: React.FC = () => {
         </line>
       );
     });
-  }, [students, showPaths]);
+  }, [filteredStudents, showPaths]);
   
   return (
     <group>

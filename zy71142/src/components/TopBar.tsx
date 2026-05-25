@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { 
   Play, Pause, RotateCcw, Grid3X3, Layers, MapPin, FileText, 
-  GitCompare, Upload, Download, Settings, Filter, Eye, EyeOff,
+  GitCompare, Upload, Download, Filter,
   X
 } from 'lucide-react';
 import { useSimulationStore } from '@/store/simulationStore';
+import FilterPanel from './FilterPanel';
 
 const TopBar: React.FC = () => {
   const plans = useSimulationStore(state => state.plans);
@@ -20,7 +21,6 @@ const TopBar: React.FC = () => {
   const setShowLabels = useSimulationStore(state => state.setShowLabels);
   const setShowReport = useSimulationStore(state => state.setShowReport);
   const runComparison = useSimulationStore(state => state.runComparison);
-  const setShowCompare = useSimulationStore(state => state.setShowCompare);
   const importPlan = useSimulationStore(state => state.importPlan);
   const exportPlan = useSimulationStore(state => state.exportPlan);
   const [showImport, setShowImport] = useState(false);
@@ -193,7 +193,11 @@ const TopBar: React.FC = () => {
         
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className="p-2 rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white transition-colors"
+          className={`p-2 rounded-lg transition-colors ${
+            showSettings 
+              ? 'bg-purple-600 text-white' 
+              : 'bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white'
+          }`}
           title="筛选设置"
         >
           <Filter className="w-5 h-5" />
@@ -228,6 +232,8 @@ const TopBar: React.FC = () => {
           </div>
         </div>
       )}
+      
+      <FilterPanel show={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   );
 };

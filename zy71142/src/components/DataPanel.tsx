@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
-  Users, Layers, AlertTriangle, CheckCircle, Clock, BarChart3, 
-  ChevronDown, ChevronUp, Filter, GripVertical, Eye, EyeOff,
+  Users, AlertTriangle, CheckCircle, Clock, BarChart3, 
+  ChevronDown, ChevronUp, GripVertical, Eye, EyeOff,
   Layers as LayersIcon, Settings2
 } from 'lucide-react';
 import { useSimulationStore } from '@/store/simulationStore';
@@ -12,9 +12,7 @@ const DataPanel: React.FC = () => {
   const statistics = useSimulationStore(state => state.statistics);
   const conflicts = useSimulationStore(state => state.conflicts);
   const students = useSimulationStore(state => state.students);
-  const simulator = useSimulationStore(state => state.simulator);
   const filteredClassrooms = useSimulationStore(state => state.filteredClassrooms);
-  const setFilteredClassrooms = useSimulationStore(state => state.setFilteredClassrooms);
   const toggleStair = useSimulationStore(state => state.toggleStair);
   const updateClassroomOrder = useSimulationStore(state => state.updateClassroomOrder);
   const updateClassroomStair = useSimulationStore(state => state.updateClassroomStair);
@@ -67,14 +65,6 @@ const DataPanel: React.FC = () => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}分${secs}秒`;
-  };
-  
-  const toggleClassroomFilter = (classroomId: string) => {
-    if (filteredClassrooms.includes(classroomId)) {
-      setFilteredClassrooms(filteredClassrooms.filter(id => id !== classroomId));
-    } else {
-      setFilteredClassrooms([...filteredClassrooms, classroomId]);
-    }
   };
   
   const handleDragStart = (classroomId: string) => {

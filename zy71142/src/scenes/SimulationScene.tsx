@@ -1,18 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Environment, Grid } from '@react-three/drei';
+import { OrbitControls, Grid } from '@react-three/drei';
 import { useSimulationStore } from '@/store/simulationStore';
 import Building3D from './Building3D';
 import Classroom3D from './Classroom3D';
 import Stair3D from './Stair3D';
 import AssemblyPoint3D from './AssemblyPoint3D';
 import Student3D from './Student3D';
-import * as THREE from 'three';
+import { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 const CameraController: React.FC = () => {
   const { camera } = useThree();
   const cameraView = useSimulationStore(state => state.cameraView);
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
   
   useEffect(() => {
     const positions: Record<string, { x: number; y: number; z: number }> = {

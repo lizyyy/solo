@@ -330,6 +330,7 @@ export class EvacuationSimulator {
       for (let i = 0; i < availableSlots && queue.queue.length > 0; i++) {
         const student = queue.queue.shift();
         if (student) {
+          student.status = 'moving';
           queue.processing.push(student);
         }
       }
@@ -442,8 +443,7 @@ export class EvacuationSimulator {
     
     if (stair && student.position.y > 0.5) {
       student.status = 'inStair';
-    } else if (student.status === 'queued') {
-    } else if (student.status !== 'arrived') {
+    } else if (student.status !== 'queued' && student.status !== 'arrived') {
       student.status = 'moving';
     }
   }

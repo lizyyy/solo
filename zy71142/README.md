@@ -1,57 +1,169 @@
-# React + TypeScript + Vite
+# 校园消防疏散楼梯 3D 可视化模拟系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+基于 React + Three.js + TypeScript + Vite 构建的校园消防疏散楼梯 3D 可视化模拟系统，用于比较不同楼梯开放方案，评估低年级班级下楼是否互相堵住的问题。
 
-Currently, two official plugins are available:
+## 核心功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🔍 方案对比
+- 内置 3 套疏散方案：正常方案、冲突方案、空模板
+- 一键运行方案对比，自动计算综合评分和排名
+- 多维度指标对比：疏散时间、冲突次数、最大排队长度、平均排队时间
 
-## Expanding the ESLint configuration
+### 📊 数据可视化
+- 3D 楼层模型，教学楼、班级、楼梯、集合点可视化
+- 学生实时状态显示：等待中、移动中、楼梯中、排队中、已到达
+- 班级流线可视化，支持路径和标签开关
+- 实时统计：人员状态分布、疏散进度、楼梯使用率
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 🎛️ 交互控制
+- **筛选面板**：按学生状态、班级、楼层筛选显示
+- **班级顺序调整**：拖拽调整疏散顺序，分配楼梯
+- **楼梯开关**：实时开启/关闭楼梯，观察影响
+- **播放控制**：播放、暂停、重置疏散模拟
+- **视角切换**：总览、俯视、正视、侧视、自由视角
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 📋 报告导出
+- 生成完整疏散报告，包含统计数据、冲突分析、班级详情
+- 支持 PDF 和 JSON 格式导出
+- 可视化与报告数据保持一致
+
+### 📥 导入导出
+- 方案导出为 JSON 文件
+- 支持导入自定义方案文件
+
+## 内置方案
+
+| 方案名称 | 描述 | 特点 |
+|---------|------|------|
+| 正常方案 | 所有楼梯开放，低年级先出发 | 疏散顺畅，无明显拥堵 |
+| 冲突方案 | 高年级先出发，低年级被堵 | 排队严重，疏散时间长 |
+| 空模板 | 空白方案，无班级无楼梯 | 用于自定义创建 |
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 开发模式
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm run dev
 ```
+
+访问 http://localhost:5173 查看应用
+
+### 类型检查
+
+```bash
+npm run check
+```
+
+### Lint 检查
+
+```bash
+npm run lint
+```
+
+### 生产构建
+
+```bash
+npm run build
+```
+
+### 预览构建结果
+
+```bash
+npm run preview
+```
+
+## 项目结构
+
+```
+src/
+├── components/         # React 组件
+│   ├── TopBar.tsx          # 顶部导航栏（播放、筛选、导入导出）
+│   ├── DataPanel.tsx       # 右侧数据面板（统计、楼梯控制、班级调整）
+│   ├── FilterPanel.tsx     # 筛选设置面板
+│   ├── CompareModal.tsx    # 方案对比弹窗
+│   └── ReportModal.tsx     # 疏散报告弹窗
+├── scenes/             # 3D 场景组件
+│   ├── SimulationScene.tsx  # 主场景
+│   ├── Building3D.tsx       # 教学楼模型
+│   ├── Classroom3D.tsx      # 教室模型
+│   ├── Stair3D.tsx          # 楼梯模型
+│   ├── AssemblyPoint3D.tsx  # 集合点模型
+│   └── Student3D.tsx        # 学生粒子渲染
+├── engine/             # 模拟引擎
+│   └── simulator.ts        # 疏散模拟核心引擎
+├── store/              # 状态管理
+│   └── simulationStore.ts  # Zustand 状态管理
+├── data/               # 样例数据
+│   └── plans.ts            # 内置方案数据
+├── types/              # TypeScript 类型定义
+│   └── index.ts
+└── App.tsx             # 应用入口
+```
+
+## 模拟引擎核心算法
+
+### 排队机制
+- 楼梯容量限制，超过容量触发排队
+- FIFO 队列处理，学生从排队移到处理中时自动恢复移动
+- 低年级优先检测，检测低年级被高年级堵住的情况
+
+### 碰撞检测
+- 学生间保持 0.5 米安全距离
+- 沿路径移动时实时检测前方碰撞
+- 碰撞时减速等待，避免穿透
+
+### 冲突检测
+- 楼梯容量冲突：楼梯使用率超过 80%
+- 顺序冲突：低年级被高年级堵住超过 30 秒
+- 集合点容量冲突：集合点人数超过容量
+
+### 综合评分
+```
+综合评分 = 100 - 时间扣分 - 冲突扣分 - 排队扣分
+时间扣分 = max(0, 疏散时间 - 60) × 0.5
+冲突扣分 = 冲突次数 × 10
+排队扣分 = 最大排队长度 × 2
+```
+
+## 技术栈
+
+- **前端框架**: React 18 + TypeScript
+- **构建工具**: Vite 5
+- **3D 渲染**: Three.js + @react-three/fiber + @react-three/drei
+- **状态管理**: Zustand
+- **样式**: TailwindCSS 3
+- **图表**: ECharts + echarts-for-react
+- **报告导出**: html2canvas + jsPDF
+- **代码质量**: ESLint + TypeScript
+
+## 使用说明
+
+1. **选择方案**：从顶部下拉菜单选择内置方案
+2. **运行模拟**：点击播放按钮开始疏散模拟
+3. **观察过程**：3D 场景中实时显示学生疏散过程
+4. **切换视角**：使用视角按钮从不同角度观察
+5. **筛选显示**：点击筛选按钮，按状态或班级筛选学生
+6. **调整方案**：在右侧面板调整班级顺序或开关楼梯
+7. **对比方案**：点击方案对比按钮，比较不同方案表现
+8. **导出报告**：点击报告按钮，导出 PDF 或 JSON 报告
+9. **导入导出**：使用导入/导出按钮保存和加载方案
+
+## 验收要点
+
+- ✅ 3D 可视化显示教学楼、班级、楼梯、学生
+- ✅ 冲突方案中可观察到低年级排队被堵现象
+- ✅ 正常方案疏散顺畅，无明显排队
+- ✅ 筛选功能可按状态和班级过滤显示
+- ✅ 楼梯开关可实时影响疏散路线
+- ✅ 方案对比可量化不同方案差异
+- ✅ 报告导出数据与可视化一致
+- ✅ 支持自定义方案导入导出
+- ✅ 所有 TypeScript 类型检查通过
+- ✅ 所有 ESLint 检查通过

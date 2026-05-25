@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { X, Download, FileText, CheckCircle, AlertTriangle, Clock, Users, Layers } from 'lucide-react';
+import { X, Download, FileText, CheckCircle, AlertTriangle, Clock, Layers } from 'lucide-react';
 import { useSimulationStore } from '@/store/simulationStore';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';

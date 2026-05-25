@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { EvacuationPlan, Student, Conflict, Statistics, Classroom } from '@/types';
+import { EvacuationPlan, Student, Conflict, Statistics } from '@/types';
 import { EvacuationSimulator } from '@/engine/simulator';
 import { allPlans } from '@/data/plans';
 
