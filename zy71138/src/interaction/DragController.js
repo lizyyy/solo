@@ -15,6 +15,9 @@ export class DragController {
     this.offset = new THREE.Vector3();
     this.intersection = new THREE.Vector3();
     this.barrierCounter = 0;
+    this.onDragEnd = null;
+    this.onBarrierRemove = null;
+    this.dragStartPos = null;
 
     this.setupEventListeners();
   }
@@ -51,6 +54,11 @@ export class DragController {
         this.offset.copy(this.selectedObject.position).sub(this.intersection);
       }
 
+      this.dragStartPos = {
+        x: this.selectedObject.position.x,
+        z: this.selectedObject.position.z
+      };
+
       this.highlightObject(this.selectedObject, true);
       this.updateSelectedBarrierUI();
     }
@@ -84,8 +92,28 @@ export class DragController {
       
       if (this.selectedObject) {
         this.highlightObject(this.selectedObject, false);
+        
+        const endPos = {
+          x: this.selectedObject.position.x,
+          z: this.selectedObject.position.z
+        };
+        
+        const hasMoved = this.dragStartPos && 
+          (Math.abs(endPos.x - this.dragStartPos.x) > 0.1 || 
+           Math.abs(endPos.z - this.dragStartPos.z) > 0.1);
+        
+        if (hasMoved && this.onDragEnd) {
+          this.onDragEnd({
+            barrierId: this.selectedObject.userData.id,
+            from: { ...this.dragStartPos },
+            to: { ...endPos }
+          });
+        }
+        
         this.triggerValidation();
       }
+      
+      this.dragStartPos = null;
     }
   }
 
@@ -108,6 +136,8 @@ export class DragController {
     if (barrierObj) {
       barrierObj.data.x = object.position.x;
       barrierObj.data.z = object.position.z;
+      object.userData.x = object.position.x;
+      object.userData.z = object.position.z;
     }
   }
 
@@ -160,11 +190,23 @@ export class DragController {
     const index = this.sceneManager.barriers.findIndex(b => b.data.id === id);
     if (index > -1) {
       const barrierObj = this.sceneManager.barriers[index];
+      const lastPosition = {
+        x: barrierObj.mesh.position.x,
+        z: barrierObj.mesh.position.z
+      };
+      
       this.scene.remove(barrierObj.mesh);
       this.sceneManager.barriers.splice(index, 1);
       
       if (this.selectedObject && this.selectedObject.userData.id === id) {
         this.selectedObject = null;
+      }
+      
+      if (this.onBarrierRemove) {
+        this.onBarrierRemove({
+          barrierId: id,
+          lastPosition
+        });
       }
       
       this.updateBarrierListUI();

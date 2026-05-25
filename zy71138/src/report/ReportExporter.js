@@ -32,9 +32,12 @@ export class ReportExporter {
       id: b.data.id,
       name: b.data.name,
       floor: b.data.floor,
-      position: { x: b.data.x, z: b.data.z },
+      position: { 
+        x: Math.round(b.mesh.position.x), 
+        z: Math.round(b.mesh.position.z) 
+      },
       size: { width: b.data.width, depth: b.data.depth },
-      rotation: b.data.rotation || 0
+      rotation: b.mesh.rotation.y || 0
     }));
   }
 

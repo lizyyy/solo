@@ -217,7 +217,7 @@ export class MallBuilder {
   buildBarrier(barrierData, floorY) {
     const group = new THREE.Group();
     group.name = `barrier-${barrierData.id}`;
-    group.userData = { type: 'barrier', ...barrierData, isDraggable: true };
+    group.userData = { type: 'barrier', ...barrierData, isDraggable: true, floorY: floorY };
 
     const barrierGeometry = new THREE.BoxGeometry(barrierData.width, 2, barrierData.depth);
     const barrierMaterial = new THREE.MeshStandardMaterial({
@@ -228,8 +228,7 @@ export class MallBuilder {
       opacity: 0.9
     });
     const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
-    barrier.position.set(barrierData.x, floorY + 1, barrierData.z);
-    barrier.rotation.y = barrierData.rotation || 0;
+    barrier.position.set(0, 1, 0);
     barrier.castShadow = true;
     barrier.receiveShadow = true;
     group.add(barrier);
@@ -237,11 +236,13 @@ export class MallBuilder {
     const edgeGeometry = new THREE.EdgesGeometry(barrierGeometry);
     const edgeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
     const edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
-    edges.position.copy(barrier.position);
-    edges.rotation.copy(barrier.rotation);
+    edges.position.set(0, 1, 0);
     group.add(edges);
 
-    this.addWarningStripes(group, barrierData, floorY);
+    this.addWarningStripes(group, barrierData);
+
+    group.position.set(barrierData.x, floorY, barrierData.z);
+    group.rotation.y = barrierData.rotation || 0;
 
     this.scene.add(group);
     
@@ -252,7 +253,7 @@ export class MallBuilder {
     return barrierObj;
   }
 
-  addWarningStripes(group, barrierData, floorY) {
+  addWarningStripes(group, barrierData) {
     const stripeHeight = 0.1;
     const stripeCount = 8;
     
@@ -273,8 +274,7 @@ export class MallBuilder {
       
       const stripeGeometry = new THREE.PlaneGeometry(barrierData.width, stripeHeight);
       const stripe = new THREE.Mesh(stripeGeometry, material);
-      stripe.position.set(barrierData.x, floorY + 0.3 + i * 0.25, barrierData.z + (barrierData.depth / 2) + 0.01);
-      stripe.rotation.y = barrierData.rotation || 0;
+      stripe.position.set(0, 0.3 + i * 0.25, (barrierData.depth / 2) + 0.01);
       group.add(stripe);
     }
   }

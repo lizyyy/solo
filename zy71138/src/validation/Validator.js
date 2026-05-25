@@ -28,14 +28,13 @@ export class Validator {
       let blockingBarrier = null;
 
       barriers.forEach(barrier => {
-        const barrierData = barrier.data;
-        if (barrierData.floor !== doorData.floor) return;
+        if (barrier.data.floor !== doorData.floor) return;
 
-        const barrierBounds = this.getBarrierBounds(barrierData);
+        const barrierBounds = this.getBarrierBounds(barrier);
         
         if (this.checkOverlap(doorBounds, barrierBounds)) {
           blocked = true;
-          blockingBarrier = barrierData;
+          blockingBarrier = barrier.data;
         }
       });
 
@@ -71,16 +70,15 @@ export class Validator {
         const end = pathPoints[i + 1];
         
         barriers.forEach(barrier => {
-          const barrierData = barrier.data;
-          if (barrierData.floor !== floor) return;
+          if (barrier.data.floor !== floor) return;
 
-          if (this.lineIntersectsBarrier(start, end, barrierData)) {
+          if (this.lineIntersectsBarrier(start, end, barrier)) {
             this.results.push({
               type: 'warning',
               category: '导视动线',
-              message: `${path.id} 动线在第 ${i + 1} 段被 ${barrierData.name} 阻断`,
+              message: `${path.id} 动线在第 ${i + 1} 段被 ${barrier.data.name} 阻断`,
               details: `强度: ${(path.intensity * 100).toFixed(0)}%`,
-              data: { path, segment: i, barrier: barrierData }
+              data: { path, segment: i, barrier: barrier.data }
             });
           }
         });
@@ -100,14 +98,13 @@ export class Validator {
       let blockingBarrier = null;
 
       barriers.forEach(barrier => {
-        const barrierData = barrier.data;
-        if (barrierData.floor !== escData.floor) return;
+        if (barrier.data.floor !== escData.floor) return;
 
-        const barrierBounds = this.getBarrierBounds(barrierData);
+        const barrierBounds = this.getBarrierBounds(barrier);
         
         if (this.checkOverlap(escBounds, barrierBounds)) {
           blocked = true;
-          blockingBarrier = barrierData;
+          blockingBarrier = barrier.data;
         }
       });
 
@@ -128,13 +125,15 @@ export class Validator {
 
     barriers.forEach(barrier => {
       const data = barrier.data;
+      const x = barrier.mesh.position.x;
+      const z = barrier.mesh.position.z;
       
-      if (Math.abs(data.x) > 38 || Math.abs(data.z) > 28) {
+      if (Math.abs(x) > 38 || Math.abs(z) > 28) {
         this.results.push({
           type: 'warning',
           category: '围挡位置',
           message: `${data.name} 位于商场边界外`,
-          details: `位置: (${data.x}, ${data.z})`,
+          details: `位置: (${Math.round(x)}, ${Math.round(z)})`,
           data: { barrier: data }
         });
       }
@@ -142,10 +141,10 @@ export class Validator {
 
     for (let i = 0; i < barriers.length; i++) {
       for (let j = i + 1; j < barriers.length; j++) {
-        const b1 = barriers[i].data;
-        const b2 = barriers[j].data;
+        const b1 = barriers[i];
+        const b2 = barriers[j];
         
-        if (b1.floor !== b2.floor) continue;
+        if (b1.data.floor !== b2.data.floor) continue;
 
         const bounds1 = this.getBarrierBounds(b1);
         const bounds2 = this.getBarrierBounds(b2);
@@ -154,8 +153,8 @@ export class Validator {
           this.results.push({
             type: 'warning',
             category: '围挡重叠',
-            message: `${b1.name} 与 ${b2.name} 重叠`,
-            data: { barrier1: b1, barrier2: b2 }
+            message: `${b1.data.name} 与 ${b2.data.name} 重叠`,
+            data: { barrier1: b1.data, barrier2: b2.data }
           });
         }
       }
@@ -182,12 +181,17 @@ export class Validator {
     };
   }
 
-  getBarrierBounds(barrier) {
-    const cos = Math.cos(barrier.rotation || 0);
-    const sin = Math.sin(barrier.rotation || 0);
+  getBarrierBounds(barrierObj) {
+    const data = barrierObj.data;
+    const x = barrierObj.mesh.position.x;
+    const z = barrierObj.mesh.position.z;
+    const rotation = barrierObj.mesh.rotation.y || 0;
     
-    const halfWidth = barrier.width / 2;
-    const halfDepth = barrier.depth / 2;
+    const cos = Math.cos(rotation);
+    const sin = Math.sin(rotation);
+    
+    const halfWidth = data.width / 2;
+    const halfDepth = data.depth / 2;
     
     const corners = [
       { x: halfWidth * cos - halfDepth * sin, z: halfWidth * sin + halfDepth * cos },
@@ -200,10 +204,10 @@ export class Validator {
     let minZ = Infinity, maxZ = -Infinity;
     
     corners.forEach(c => {
-      minX = Math.min(minX, barrier.x + c.x);
-      maxX = Math.max(maxX, barrier.x + c.x);
-      minZ = Math.min(minZ, barrier.z + c.z);
-      maxZ = Math.max(maxZ, barrier.z + c.z);
+      minX = Math.min(minX, x + c.x);
+      maxX = Math.max(maxX, x + c.x);
+      minZ = Math.min(minZ, z + c.z);
+      maxZ = Math.max(maxZ, z + c.z);
     });
 
     return { minX, maxX, minZ, maxZ };

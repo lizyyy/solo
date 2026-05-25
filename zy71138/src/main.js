@@ -116,7 +116,14 @@ class App {
     });
 
     document.getElementById('btn-add-barrier').addEventListener('click', () => {
-      this.dragController.addBarrier('1F');
+      const barrierObj = this.dragController.addBarrier('1F');
+      if (barrierObj) {
+        this.timelineController.recordBarrierAdd(barrierObj.data.id, {
+          x: barrierObj.data.x,
+          z: barrierObj.data.z
+        });
+        this.timelineController.goToEnd();
+      }
     });
 
     document.getElementById('btn-import').addEventListener('click', () => {
@@ -153,6 +160,7 @@ class App {
 
     this.timelineController.onProgressChange = (progress) => {
       document.getElementById('timeline-slider').value = progress;
+      this.validator.validate();
     };
 
     document.querySelectorAll('.view-presets button').forEach(btn => {
@@ -167,6 +175,16 @@ class App {
     });
 
     this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
+
+    this.dragController.onDragEnd = (dragEvent) => {
+      this.timelineController.recordDrag(dragEvent);
+      this.timelineController.goToEnd();
+    };
+
+    this.dragController.onBarrierRemove = (removeEvent) => {
+      this.timelineController.recordBarrierRemove(removeEvent.barrierId, removeEvent.lastPosition);
+      this.timelineController.goToEnd();
+    };
   }
 
   filterByFloor(floorId) {
