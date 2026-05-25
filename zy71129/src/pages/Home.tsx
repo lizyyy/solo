@@ -13,12 +13,21 @@ import { CollisionEngine } from '../three/CollisionEngine';
 import { useModelStore } from '../store/useModelStore';
 import { useFilterStore } from '../store/useFilterStore';
 import { useCollisionStore } from '../store/useCollisionStore';
+import { Point3D } from '../types/model';
+
+interface CameraState {
+  position: Point3D;
+  target: Point3D;
+}
 
 export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [collisionPanelOpen, setCollisionPanelOpen] = useState(true);
   const [sceneManager, setSceneManager] = useState<SceneManager | null>(null);
+  const [leftSceneManager, setLeftSceneManager] = useState<SceneManager | null>(null);
+  const [rightSceneManager, setRightSceneManager] = useState<SceneManager | null>(null);
   const collisionEngineRef = useRef<CollisionEngine | null>(null);
+  const isSyncingRef = useRef(false);
 
   const { 
     getFilteredElements, 
@@ -36,6 +45,47 @@ export default function Home() {
     setSceneManager(manager);
     collisionEngineRef.current = new CollisionEngine();
   }, []);
+
+  const handleLeftSceneReady = useCallback((manager: SceneManager) => {
+    setLeftSceneManager(manager);
+    if (collisionEngineRef.current === null) {
+      collisionEngineRef.current = new CollisionEngine();
+    }
+  }, []);
+
+  const handleRightSceneReady = useCallback((manager: SceneManager) => {
+    setRightSceneManager(manager);
+    if (collisionEngineRef.current === null) {
+      collisionEngineRef.current = new CollisionEngine();
+    }
+  }, []);
+
+  const syncCamera = useCallback((source: SceneManager, target: SceneManager | null) => {
+    if (!target || isSyncingRef.current) return;
+    
+    isSyncingRef.current = true;
+    const cameraState = source.getCameraState();
+    target.setCameraState(cameraState);
+    
+    setTimeout(() => {
+      isSyncingRef.current = false;
+    }, 50);
+  }, []);
+
+  useEffect(() => {
+    if (!compareView.syncViews) return;
+    
+    if (leftSceneManager && rightSceneManager) {
+      const leftHandler = () => syncCamera(leftSceneManager, rightSceneManager);
+      const rightHandler = () => syncCamera(rightSceneManager, leftSceneManager);
+      
+      leftSceneManager.onCameraChange(leftHandler);
+      rightSceneManager.onCameraChange(rightHandler);
+      
+      const initialState = leftSceneManager.getCameraState();
+      rightSceneManager.setCameraState(initialState);
+    }
+  }, [leftSceneManager, rightSceneManager, compareView.syncViews, syncCamera]);
 
   const handleDetectCollisions = useCallback(() => {
     if (!collisionEngineRef.current || !sceneManager || !loaded) return;
@@ -105,7 +155,7 @@ export default function Home() {
                 V{compareVersion} (旧版本)
               </div>
               <SceneCanvas 
-                onSceneReady={handleSceneReady} 
+                onSceneReady={handleLeftSceneReady}
                 key="compare-old"
                 versionNumber={compareVersion}
               />
@@ -115,12 +165,7 @@ export default function Home() {
                 V{currentVersion} (新版本)
               </div>
               <SceneCanvas 
-                onSceneReady={(manager) => {
-                  setSceneManager(manager);
-                  if (collisionEngineRef.current === null) {
-                    collisionEngineRef.current = new CollisionEngine();
-                  }
-                }}
+                onSceneReady={handleRightSceneReady}
                 key="compare-new"
                 versionNumber={currentVersion}
               />
@@ -132,7 +177,7 @@ export default function Home() {
       </div>
 
       <Toolbar
-        sceneManager={sceneManager}
+        sceneManager={sceneManager || rightSceneManager}
         onDetectCollisions={handleDetectCollisions}
       />
 
