@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>月行 · 月球车能量规划模拟器</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">◐</span>
+        <div>
+          <div class="brand-title">月行 LUNAR ROVER</div>
+          <div class="brand-sub">能量规划模拟器 · v1.0</div>
+        </div>
+      </div>
+      <div class="top-stats" id="topStats">
+        <div class="stat"><span class="k">回合</span><span class="v" id="hudTurn">0</span></div>
+        <div class="stat"><span class="k">太阳角</span><span class="v" id="hudSun">0°</span></div>
+        <div class="stat"><span class="k">电量</span><span class="v" id="hudBat">100</span></div>
+        <div class="stat"><span class="k">载荷</span><span class="v" id="hudLoad">0/8</span></div>
+        <div class="stat"><span class="k">已采集</span><span class="v" id="hudSam">0</span></div>
+        <div class="stat"><span class="k">分数</span><span class="v" id="hudScore">0</span></div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="stage">
+        <div class="canvas-wrap">
+          <canvas id="board" width="720" height="720"></canvas>
+          <div class="overlay" id="overlay">
+            <div class="overlay-inner">
+              <div class="badge" id="overlayBadge">暂停</div>
+              <div class="overlay-text" id="overlayText">探索已暂停</div>
+            </div>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="dpad">
+            <button class="btn dpad-up" data-dir="N" aria-label="北">▲</button>
+            <button class="btn dpad-left" data-dir="W" aria-label="西">◀</button>
+            <button class="btn dpad-wait" data-act="wait" aria-label="原地等待">●</button>
+            <button class="btn dpad-right" data-dir="E" aria-label="东">▶</button>
+            <button class="btn dpad-down" data-dir="S" aria-label="南">▼</button>
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="btnSample" data-act="sample">采集样本</button>
+            <button class="btn primary" id="btnTransmit" data-act="transmit">数据回传</button>
+            <button class="btn ghost" id="btnPause" data-act="pause">暂停</button>
+            <button class="btn ghost" id="btnRestart" data-act="restart">重开</button>
+            <button class="btn ghost" id="btnReplay" data-act="replay">历史回放</button>
+            <button class="btn ghost" id="btnExport" data-act="export">导出报告</button>
+          </div>
+        </div>
+        <div class="legend">
+          <div><span class="dot sun"></span>日光 · 充电 +4/回合</div>
+          <div><span class="dot shade"></span>阴影 · 耗电 -2/回合</div>
+          <div><span class="dot night"></span>月夜 · 耗电 -5/回合</div>
+          <div><span class="dot rock"></span>岩石(阻挡)</div>
+          <div><span class="dot sam"></span>样本点</div>
+          <div><span class="dot comm"></span>通讯窗口</div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <div class="panel">
+          <div class="panel-title">当前任务</div>
+          <div id="missionCard" class="mission-card"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">通讯窗口</div>
+          <div id="commCard" class="comm-card"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">日志</div>
+          <div class="log" id="log"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">结算 & 回放</div>
+          <div id="summaryCard" class="summary-card">未完成任务</div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="foot">
+      方向键/WASD 移动 · 空格 等待 · S 采集 · T 回传 · P 暂停 · R 重开
+    </footer>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
