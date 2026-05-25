@@ -29,7 +29,7 @@ export function RightPanel() {
         <div className="space-y-3">
           <div>
             <label className="text-slate-400 text-xs block mb-1">
-              基准面高度 (m)
+              全局基准面高度 (m)
             </label>
             <input
               type="number"
@@ -38,6 +38,9 @@ export function RightPanel() {
               onChange={(e) => setBaseHeight(parseFloat(e.target.value) || 0)}
               className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
             />
+            <p className="text-xs text-slate-500 mt-1">
+              修改此项将更新所有料堆的基准面
+            </p>
           </div>
         </div>
       </div>
@@ -61,8 +64,9 @@ export function RightPanel() {
             </div>
           </div>
         </div>
-        <div className="text-slate-400 text-xs mt-2">
-          料堆数量: {boundaries.length}
+        <div className="text-slate-400 text-xs mt-2 flex justify-between">
+          <span>料堆数量: {boundaries.length}</span>
+          <span>全局基准面: {baseHeight.toFixed(2)} m</span>
         </div>
       </div>
 
@@ -89,6 +93,22 @@ export function RightPanel() {
 
               <div>
                 <label className="text-slate-400 text-xs block mb-1">
+                  基准面高度 (m)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={selectedBoundary.baseHeight}
+                  onChange={(e) => updateBoundary(selectedBoundary.id, { baseHeight: parseFloat(e.target.value) || 0 })}
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                />
+                <p className="text-xs text-slate-500 mt-1">
+                  修改此项仅影响当前料堆
+                </p>
+              </div>
+
+              <div>
+                <label className="text-slate-400 text-xs block mb-1">
                   物料类型
                 </label>
                 <select
@@ -104,7 +124,22 @@ export function RightPanel() {
                 </select>
               </div>
 
+              <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-3">
+                <div className="text-xs text-blue-300 space-y-1">
+                  <p className="font-medium">💡 基准面说明</p>
+                  <p>体积 = Σ (点云高度 - 基准面高度) × 网格面积</p>
+                  <p>基准面升高 → 体积减小</p>
+                  <p>基准面降低 → 体积增大</p>
+                </div>
+              </div>
+
               <div className="bg-slate-700/50 rounded-lg p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400 text-xs">计算基准面</span>
+                  <span className="text-white font-medium">
+                    {selectedBoundary.baseHeight.toFixed(2)} m
+                  </span>
+                </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400 text-xs flex items-center gap-1">
                     <Ruler className="w-3 h-3" /> 体积

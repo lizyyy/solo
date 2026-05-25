@@ -110,7 +110,16 @@ export const useStore = create<StoreState>((set, get) => ({
   },
 
   setBaseHeight: (height: number) => {
-    set({ baseHeight: height });
+    set(state => ({
+      baseHeight: height,
+      boundaries: state.boundaries.map(b => ({
+        ...b,
+        baseHeight: height,
+      })),
+    }));
+    setTimeout(() => {
+      get().calculateVolumes();
+    }, 0);
   },
 
   setIsDrawing: (isDrawing: boolean) => {
