@@ -39,6 +39,10 @@ class AquariumFlowApp {
       }
     });
 
+    document.getElementById('exportConfig').addEventListener('click', () => {
+      this.exportCurrentConfig();
+    });
+
     document.getElementById('snapshotBtn').addEventListener('click', () => {
       this.takeSnapshot();
     });
@@ -619,14 +623,96 @@ class AquariumFlowApp {
     reader.onload = (e) => {
       try {
         const config = JSON.parse(e.target.result);
-        this.currentConfig = config;
-        this.applyConfig(config);
+        
+        this.pausePlayback();
+        
+        this.baseConfig = JSON.parse(JSON.stringify(config));
+        this.currentConfig = JSON.parse(JSON.stringify(config));
+        
+        if (!this.baseConfig.valves) {
+          this.baseConfig.valves = [];
+        }
+        if (!this.baseConfig.displayZones) {
+          this.baseConfig.displayZones = [];
+        }
+        if (!this.baseConfig.maintenanceZones) {
+          this.baseConfig.maintenanceZones = [];
+        }
+        if (this.baseConfig.isMaintenance === undefined) {
+          this.baseConfig.isMaintenance = false;
+        }
+        
+        this.generateTimelineKeyframes();
+        
+        this.currentTime = 0;
+        document.getElementById('timelineSlider').value = 0;
+        this.updateTimeDisplay();
+        
+        this.snapshots = [];
+        this.renderSnapshotList();
+        
+        this.applyConfig(this.currentConfig);
         this.updateStatusPanel();
+        
+        alert('配置导入成功！时间轴已根据新配置重新生成。');
       } catch (err) {
-        alert('配置文件格式错误');
+        alert('配置文件格式错误: ' + err.message);
       }
     };
     reader.readAsText(file);
+  }
+
+  exportCurrentConfig() {
+    if (!this.currentConfig) {
+      alert('没有可导出的配置');
+      return;
+    }
+
+    const config = {
+      name: '自定义配置',
+      description: `导出于 ${new Date().toLocaleString()}`,
+      valves: this.currentConfig.valves.map(v => ({
+        id: v.id,
+        name: v.name,
+        type: v.type,
+        x: v.x,
+        y: v.y,
+        z: v.z,
+        flowRate: v.flowRate,
+        direction: v.direction,
+        active: v.active,
+        openDegree: v.openDegree
+      })),
+      displayZones: this.currentConfig.displayZones.map(z => ({
+        id: z.id,
+        name: z.name,
+        x: z.x,
+        y: z.y,
+        z: z.z,
+        width: z.width,
+        height: z.height,
+        depth: z.depth,
+        type: z.type
+      })),
+      maintenanceZones: (this.currentConfig.maintenanceZones || []).map(z => ({
+        id: z.id,
+        name: z.name,
+        x: z.x,
+        y: z.y,
+        z: z.z,
+        width: z.width,
+        height: z.height,
+        depth: z.depth,
+        type: z.type
+      })),
+      isMaintenance: this.currentConfig.isMaintenance || false,
+      flowStatus: this.detectFlowStatus().text
+    };
+
+    const content = JSON.stringify(config, null, 2);
+    this.downloadFile(content, `aquarium-config-${Date.now()}.json`, 'application/json');
+    
+    alert('配置已导出！可以在其他时间点导入使用。');
   }
 
   exportReport() {
