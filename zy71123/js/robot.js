@@ -25,6 +25,13 @@ class RobotController {
         this.eventLog = [];
         this.timeline = [];
         
+        this.isInspecting = false;
+        this.inspectRemainingTime = 0;
+        this.currentInspectPoint = null;
+        
+        this.isCharging = false;
+        this.chargingRemainingTime = 0;
+        
         this.chargerPosition = null;
         this.lowBatteryThreshold = 20;
         this.returningToCharger = false;
@@ -48,6 +55,11 @@ class RobotController {
         this.eventLog = [];
         this.timeline = [];
         this.returningToCharger = false;
+        this.isInspecting = false;
+        this.inspectRemainingTime = 0;
+        this.currentInspectPoint = null;
+        this.isCharging = false;
+        this.chargingRemainingTime = 0;
         
         this.sceneManager.createRobot(startPosition);
         this.sceneManager.setRobotStatus('idle');
@@ -206,6 +218,11 @@ class RobotController {
         this.currentPathIndex = 0;
         this.inspectedPoints.clear();
         this.returningToCharger = false;
+        this.isInspecting = false;
+        this.inspectRemainingTime = 0;
+        this.currentInspectPoint = null;
+        this.isCharging = false;
+        this.chargingRemainingTime = 0;
         
         if (this.chargerPosition) {
             this.position = { ...this.chargerPosition };
@@ -246,6 +263,18 @@ class RobotController {
         
         this.currentTime += deltaTime;
         
+        if (this.isInspecting) {
+            this.updateInspecting(deltaTime);
+            this.updateUI();
+            return;
+        }
+        
+        if (this.isCharging) {
+            this.updateCharging(deltaTime);
+            this.updateUI();
+            return;
+        }
+        
         const segment = this.segments[this.currentSegmentIndex];
         
         if (this.currentPathIndex < segment.path.length - 1) {
@@ -255,6 +284,27 @@ class RobotController {
         }
         
         this.updateUI();
+    }
+    
+    updateInspecting(deltaTime) {
+        this.inspectRemainingTime -= deltaTime;
+        
+        const batteryConsumption = deltaTime * 0.2;
+        this.battery = Math.max(0, this.battery - batteryConsumption);
+        
+        if (this.inspectRemainingTime <= 0) {
+            this.finishInspecting();
+        }
+    }
+    
+    updateCharging(deltaTime) {
+        this.chargingRemainingTime -= deltaTime;
+        
+        this.battery = Math.min(this.maxBattery, this.battery + deltaTime * 10);
+        
+        if (this.battery >= this.maxBattery || this.chargingRemainingTime <= 0) {
+            this.finishCharging();
+        }
     }
 
     moveAlongPath(segment, deltaTime) {
@@ -290,13 +340,13 @@ class RobotController {
     handleSegmentEnd(segment) {
         if (segment.targetPoint && !segment.isReturn) {
             if (!this.inspectedPoints.has(segment.targetPoint.id)) {
-                this.inspectPoint(segment.targetPoint);
+                this.startInspecting(segment.targetPoint);
                 return;
             }
         }
         
         if (segment.isReturn) {
-            this.charge();
+            this.startCharging();
             return;
         }
         
@@ -309,28 +359,37 @@ class RobotController {
         }
     }
 
-    inspectPoint(point) {
+    startInspecting(point) {
+        this.isInspecting = true;
+        this.inspectRemainingTime = point.duration || 5;
+        this.currentInspectPoint = point;
+        this.inspectedPoints.add(point.id);
+        
         this.status = 'inspecting';
         this.sceneManager.setRobotStatus('inspecting');
-        this.inspectedPoints.add(point.id);
         
         point.mesh.material.color.setHex(0x81C784);
         
-        this.logEvent('巡检', `正在巡检 ${point.name} (${point.x}, ${point.z})，停留 ${point.duration} 秒`);
+        this.logEvent('巡检', `正在巡检 ${point.name} (${point.x}, ${point.z})，停留 ${this.inspectRemainingTime} 秒`);
+    }
+    
+    finishInspecting() {
+        const point = this.currentInspectPoint;
         
-        setTimeout(() => {
-            if (!this.isRunning || this.isPaused) return;
-            
+        this.isInspecting = false;
+        this.inspectRemainingTime = 0;
+        this.currentInspectPoint = null;
+        
+        if (point && point.mesh) {
             point.mesh.material.color.setHex(0x4CAF50);
-            
-            this.logEvent('完成', `${point.name} 巡检完成`);
-            
-            this.currentSegmentIndex++;
-            this.currentPathIndex = 0;
-            this.status = 'moving';
-            this.sceneManager.setRobotStatus('moving');
-            
-        }, (point.duration || 5) * 1000 / this.playbackSpeed);
+        }
+        
+        this.logEvent('完成', `${point?.name || '巡检点'} 巡检完成`);
+        
+        this.currentSegmentIndex++;
+        this.currentPathIndex = 0;
+        this.status = 'moving';
+        this.sceneManager.setRobotStatus('moving');
     }
 
     checkBatteryLevel(currentSegment) {
@@ -380,37 +439,29 @@ class RobotController {
         }
     }
 
-    charge() {
+    startCharging() {
+        this.isCharging = true;
+        this.chargingRemainingTime = 3600;
         this.status = 'charging';
         this.sceneManager.setRobotStatus('charging');
         this.logEvent('充电', '机器人到达充电桩，开始充电');
+    }
+    
+    finishCharging() {
+        this.isCharging = false;
+        this.chargingRemainingTime = 0;
+        this.battery = this.maxBattery;
         
-        const chargeInterval = setInterval(() => {
-            if (!this.isRunning || this.isPaused) {
-                clearInterval(chargeInterval);
-                return;
-            }
-            
-            this.battery = Math.min(this.maxBattery, this.battery + 5);
-            
-            if (this.battery >= this.maxBattery) {
-                clearInterval(chargeInterval);
-                this.battery = this.maxBattery;
-                
-                if (this.returningToCharger && this.currentSegmentIndex < this.segments.length - 1) {
-                    this.logEvent('充电完成', '电量已满，继续执行未完成的巡检任务');
-                    this.returningToCharger = false;
-                    this.currentSegmentIndex++;
-                    this.currentPathIndex = 0;
-                    this.status = 'moving';
-                    this.sceneManager.setRobotStatus('moving');
-                } else {
-                    this.completeMission();
-                }
-            }
-            
-            this.updateUI();
-        }, 500);
+        if (this.returningToCharger && this.currentSegmentIndex < this.segments.length - 1) {
+            this.logEvent('充电完成', '电量已满，继续执行未完成的巡检任务');
+            this.returningToCharger = false;
+            this.currentSegmentIndex++;
+            this.currentPathIndex = 0;
+            this.status = 'moving';
+            this.sceneManager.setRobotStatus('moving');
+        } else {
+            this.completeMission();
+        }
     }
 
     completeMission() {
@@ -448,10 +499,14 @@ class RobotController {
         }
         
         this.currentSegmentIndex = targetSegment;
+        this.isInspecting = false;
+        this.isCharging = false;
         
         const segment = this.segments[targetSegment];
         if (segment) {
             const moveTime = segment.distance / this.speed;
+            const inspectTime = (segment.targetPoint && !segment.isReturn) ? 
+                (segment.targetPoint.duration || 5) : 0;
             
             if (timeInSegment <= moveTime) {
                 const progress = timeInSegment / moveTime;
@@ -468,9 +523,32 @@ class RobotController {
                         );
                     }
                 }
-            } else {
+                
+                this.status = 'moving';
+                this.sceneManager.setRobotStatus('moving');
+            } else if (segment.targetPoint && !segment.isReturn) {
                 this.position = { ...segment.to };
                 this.currentPathIndex = segment.path.length - 1;
+                
+                this.isInspecting = true;
+                this.inspectRemainingTime = inspectTime - (timeInSegment - moveTime);
+                this.currentInspectPoint = segment.targetPoint;
+                
+                this.status = 'inspecting';
+                this.sceneManager.setRobotStatus('inspecting');
+                
+                if (segment.targetPoint.mesh) {
+                    segment.targetPoint.mesh.material.color.setHex(0x81C784);
+                }
+            } else if (segment.isReturn) {
+                this.position = { ...segment.to };
+                this.currentPathIndex = segment.path.length - 1;
+                
+                this.isCharging = true;
+                this.chargingRemainingTime = 3600;
+                
+                this.status = 'charging';
+                this.sceneManager.setRobotStatus('charging');
             }
             
             this.sceneManager.updateRobotPosition(this.position, this.rotation);
