@@ -25,7 +25,7 @@ const LeftPanel = () => {
       animate={{ x: 0 }}
       exit={{ x: -320 }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="absolute left-0 top-14 bottom-20 w-72 z-10 glass-panel m-2 rounded-lg overflow-hidden"
+      className="absolute left-0 top-14 bottom-20 w-72 max-w-[calc(100vw-2rem)] z-10 glass-panel m-2 rounded-lg overflow-hidden"
     >
       <div className="h-full overflow-y-auto">
         <div className="p-4">

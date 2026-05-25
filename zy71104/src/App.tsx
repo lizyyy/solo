@@ -6,10 +6,24 @@ import RightPanel from './components/UI/RightPanel';
 import Timeline from './components/UI/Timeline';
 import ViewSwitcher from './components/UI/ViewSwitcher';
 import { useSceneStore } from './store/useSceneStore';
+import { useResponsive } from './hooks/useResponsive';
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const updateRisks = useSceneStore(state => state.updateRisks);
+  const setLeftPanelOpen = useSceneStore(state => state.setLeftPanelOpen);
+  const setRightPanelOpen = useSceneStore(state => state.setRightPanelOpen);
+  const { isNarrow } = useResponsive();
+  
+  useEffect(() => {
+    if (isNarrow) {
+      setLeftPanelOpen(false);
+      setRightPanelOpen(false);
+    } else {
+      setLeftPanelOpen(true);
+      setRightPanelOpen(true);
+    }
+  }, [isNarrow, setLeftPanelOpen, setRightPanelOpen]);
   
   useEffect(() => {
     updateRisks();

@@ -45,13 +45,13 @@ const ViewSwitcher = () => {
   ];
 
   return (
-    <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-10 hidden sm:block">
+    <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-10">
       <div className="glass-panel rounded-lg p-1.5 flex gap-1">
         {views.map((view) => (
           <button
             key={view.id}
             onClick={() => setSelectedView(view.id)}
-            className={`px-3 py-2 rounded-md transition-all flex items-center gap-2 ${
+            className={`px-2 sm:px-3 py-2 rounded-md transition-all flex items-center gap-1 sm:gap-2 ${
               selectedView === view.id
                 ? 'bg-primary text-white shadow-lg'
                 : 'text-gray-400 hover:text-white hover:bg-dark-300'
@@ -59,7 +59,7 @@ const ViewSwitcher = () => {
             title={view.label}
           >
             {view.icon}
-            <span className="text-xs hidden lg:inline">{view.label}</span>
+            <span className="text-xs hidden md:inline">{view.label}</span>
           </button>
         ))}
       </div>
