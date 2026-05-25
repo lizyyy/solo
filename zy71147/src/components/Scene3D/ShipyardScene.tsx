@@ -1,8 +1,7 @@
 
-import React, { useRef, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import React, { useMemo } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Grid, Sky } from '@react-three/drei';
-import * as THREE from 'three';
 import { useAppStore } from '../../store/appStore';
 import { getBlockPositionAtProgress } from '../../utils/collision';
 import { Block3D } from './Block3D';
@@ -10,31 +9,49 @@ import { Pier3D } from './Pier3D';
 import { Rail3D } from './Rail3D';
 import { LiftingPath3D } from './LiftingPath3D';
 import { CollisionMarker } from './CollisionMarker';
+import { SceneData, VisibilityState, CollisionResult } from '../../types';
+import { checkAllCollisions } from '../../utils/collision';
 
-const SceneContent: React.FC = () => {
-  const {
-    sceneData,
-    visibility,
-    timelineProgress,
-    isPlaying,
-    selectedBlockId,
-    collisions,
-    setTimelineProgress,
-    setSelectedBlockId,
-  } = useAppStore();
+interface SceneContentProps {
+  sceneData: SceneData;
+  visibility: VisibilityState;
+  timelineProgress: number;
+  isPlaying: boolean;
+  selectedBlockId: string | null;
+  collisions: CollisionResult[];
+  onSelectBlock: (id: string | null) => void;
+  onProgressChange: (progress: number) => void;
+  onPlayingChange: (playing: boolean) => void;
+  onBlockDrag?: (blockId: string, position: { x: number; y: number; z: number }) => void;
+}
 
+const SceneContent: React.FC<SceneContentProps> = ({
+  sceneData,
+  visibility,
+  timelineProgress,
+  isPlaying,
+  selectedBlockId,
+  collisions,
+  onSelectBlock,
+  onProgressChange,
+  onPlayingChange,
+  onBlockDrag,
+}) => {
   useFrame((_, delta) => {
     if (isPlaying) {
-      setTimelineProgress(timelineProgress + delta * 0.05);
-      if (timelineProgress >= 1) {
-        useAppStore.getState().setIsPlaying(false);
+      const newProgress = timelineProgress + delta * 0.05;
+      if (newProgress >= 1) {
+        onPlayingChange(false);
+        onProgressChange(1);
+      } else {
+        onProgressChange(newProgress);
       }
     }
   });
 
-  const handleSceneClick = (e: any) => {
+  const handleSceneClick = (e: { object: unknown; eventObject: unknown }) => {
     if (e.object === e.eventObject) {
-      setSelectedBlockId(null);
+      onSelectBlock(null);
     }
   };
 
@@ -105,8 +122,9 @@ const SceneContent: React.FC = () => {
             block={block}
             isSelected={selectedBlockId === block.id}
             currentPosition={currentPos}
-            onSelect={setSelectedBlockId}
+            onSelect={onSelectBlock}
             showLiftingPoints={visibility.liftingPoints}
+            onDrag={onBlockDrag}
           />
         );
       })}
@@ -119,11 +137,66 @@ const SceneContent: React.FC = () => {
 };
 
 interface ShipyardSceneProps {
-  containerRef?: React.RefObject<HTMLDivElement>;
+  customSceneData?: SceneData;
+  readOnly?: boolean;
 }
 
-export const ShipyardScene: React.FC<ShipyardSceneProps> = ({ containerRef }) => {
-  const { cameraView } = useAppStore();
+export const ShipyardScene: React.FC<ShipyardSceneProps> = ({ 
+  customSceneData,
+  readOnly = false 
+}) => {
+  const mainStore = useAppStore();
+  
+  const storeData = useMemo(() => {
+    if (customSceneData) {
+      return {
+        sceneData: customSceneData,
+        visibility: mainStore.visibility,
+        timelineProgress: mainStore.timelineProgress,
+        isPlaying: false,
+        selectedBlockId: null,
+        collisions: checkAllCollisions(
+          customSceneData.blocks,
+          customSceneData.piers,
+          customSceneData.rails,
+          customSceneData.liftingPaths,
+          mainStore.timelineProgress
+        ),
+      };
+    }
+    return {
+      sceneData: mainStore.sceneData,
+      visibility: mainStore.visibility,
+      timelineProgress: mainStore.timelineProgress,
+      isPlaying: mainStore.isPlaying,
+      selectedBlockId: mainStore.selectedBlockId,
+      collisions: mainStore.collisions,
+    };
+  }, [customSceneData, mainStore]);
+
+  const handleSelectBlock = (id: string | null) => {
+    if (!readOnly) {
+      mainStore.setSelectedBlockId(id);
+    }
+  };
+
+  const handleProgressChange = (progress: number) => {
+    if (!readOnly) {
+      mainStore.setTimelineProgress(progress);
+    }
+  };
+
+  const handlePlayingChange = (playing: boolean) => {
+    if (!readOnly) {
+      mainStore.setIsPlaying(playing);
+    }
+  };
+
+  const handleBlockDrag = (blockId: string, position: { x: number; y: number; z: number }) => {
+    if (!readOnly) {
+      mainStore.updateBlockPosition(blockId, position);
+    }
+  };
 
   return (
     <Canvas
@@ -133,21 +206,32 @@ export const ShipyardScene: React.FC<ShipyardSceneProps> = ({ containerRef }) =>
     >
       <PerspectiveCamera
         makeDefault
-        position={[cameraView.position.x, cameraView.position.y, cameraView.position.z]}
+        position={[mainStore.cameraView.position.x, mainStore.cameraView.position.y, mainStore.cameraView.position.z]}
         fov={50}
         near={0.1}
         far={1000}
       />
       <OrbitControls
         makeDefault
-        target={[cameraView.target.x, cameraView.target.y, cameraView.target.z]}
+        target={[mainStore.cameraView.target.x, mainStore.cameraView.target.y, mainStore.cameraView.target.z]}
         enableDamping
         dampingFactor={0.05}
         minDistance={10}
         maxDistance={150}
         maxPolarAngle={Math.PI / 2.1}
       />
-      <SceneContent />
+      <SceneContent
+        sceneData={storeData.sceneData}
+        visibility={storeData.visibility}
+        timelineProgress={storeData.timelineProgress}
+        isPlaying={storeData.isPlaying}
+        selectedBlockId={storeData.selectedBlockId}
+        collisions={storeData.collisions}
+        onSelectBlock={handleSelectBlock}
+        onProgressChange={handleProgressChange}
+        onPlayingChange={handlePlayingChange}
+        onBlockDrag={handleBlockDrag}
+      />
     </Canvas>
   );
 };

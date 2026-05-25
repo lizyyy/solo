@@ -5,7 +5,7 @@ import { useAppStore } from '../../store/appStore';
 import { CollisionResult } from '../../types';
 
 export const StatusBar: React.FC = () => {
-  const { collisions, currentSample, sceneData, timelineProgress } = useAppStore();
+  const { collisions, sceneData } = useAppStore();
 
   const errorCount = collisions.filter((c) => c.severity === 'error').length;
   const warningCount = collisions.filter((c) => c.severity === 'warning').length;

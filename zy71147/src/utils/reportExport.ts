@@ -85,7 +85,7 @@ export async function generateReport(
     doc.setTextColor(0, 180, 42);
     doc.text('✓ 未检测到任何冲突，吊装方案安全', 20, 220);
   } else {
-    let yPos = 220;
+    const yPos = 220;
     reportData.collisions.slice(0, 5).forEach((collision, index) => {
       doc.setFontSize(9);
       const isError = collision.severity === 'error';

@@ -1,16 +1,11 @@
 
 import { Block, Pier, GantryRail, LiftingPath, CollisionResult, Vector3 } from '../types';
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-}
-
 function getAABB(
   position: Vector3,
   dimensions: { width: number; height: number; depth: number }
 ) {
   const halfW = dimensions.width / 2;
-  const halfH = dimensions.height / 2;
   const halfD = dimensions.depth / 2;
   return {
     minX: position.x - halfW,
@@ -27,34 +22,6 @@ function aabbIntersect(a: ReturnType<typeof getAABB>, b: ReturnType<typeof getAA
     a.minX <= b.maxX && a.maxX >= b.minX &&
     a.minY <= b.maxY && a.maxY >= b.minY &&
     a.minZ <= b.maxZ && a.maxZ >= b.minZ
-  );
-}
-
-function distancePointToSegment(point: Vector3, segStart: Vector3, segEnd: Vector3): number {
-  const dx = segEnd.x - segStart.x;
-  const dy = segEnd.y - segStart.y;
-  const dz = segEnd.z - segStart.z;
-  const lengthSq = dx * dx + dy * dy + dz * dz;
-  
-  if (lengthSq === 0) {
-    return Math.sqrt(
-      Math.pow(point.x - segStart.x, 2) +
-      Math.pow(point.y - segStart.y, 2) +
-      Math.pow(point.z - segStart.z, 2)
-    );
-  }
-  
-  let t = ((point.x - segStart.x) * dx + (point.y - segStart.y) * dy + (point.z - segStart.z) * dz) / lengthSq;
-  t = clamp(t, 0, 1);
-  
-  const closestX = segStart.x + t * dx;
-  const closestY = segStart.y + t * dy;
-  const closestZ = segStart.z + t * dz;
-  
-  return Math.sqrt(
-    Math.pow(point.x - closestX, 2) +
-    Math.pow(point.y - closestY, 2) +
-    Math.pow(point.z - closestZ, 2)
   );
 }
 

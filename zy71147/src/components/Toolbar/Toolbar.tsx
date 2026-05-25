@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Camera, RotateCcw, Download, Eye, EyeOff, GitCompare, HelpCircle } from 'lucide-react';
+import { Camera, RotateCcw, Download, GitCompare, HelpCircle } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
 import { SampleType } from '../../types';
 import { sampleNames } from '../../data/samples';

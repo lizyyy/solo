@@ -1,57 +1,128 @@
-# React + TypeScript + Vite
+# 船厂分段吊装预排 3D 交互可视化系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+基于 React + Three.js 的船厂分段吊装预排可视化工具，用于在总装前模拟大型分段吊装过程，提前检测吊点方向、支墩挡路、龙门吊越界等冲突问题。
 
-Currently, two official plugins are available:
+## 功能特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 3D 场景可视化
+- 船体分段模型渲染与选中高亮
+- 临时支墩与龙门吊轨道显示
+- 吊点可视化（绿色=正常，红色=异常）
+- 吊装路径动画回放
 
-## Expanding the ESLint configuration
+### 交互操作
+- **拖拽移动**：在 3D 场景中直接拖拽船体分段调整位置
+- **参数调整**：通过控制面板的滑块精确调整 X/Y/Z 坐标
+- **视角控制**：鼠标拖拽旋转、滚轮缩放、右键平移
+- **元素筛选**：控制各类元素的可见性
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 内置样例
+- **正常吊装样例**：2 个分段，无冲突，吊点正确
+- **冲突吊装样例**：3 个分段，包含吊点错误、支墩挡路、轨道越界
+- **空场景样例**：仅显示轨道，用于自定义创建
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 碰撞检测
+- 实时检测支墩碰撞
+- 吊点方向正确性检查
+- 龙门吊轨道越界检测
+- 吊装路径冲突预警
+- 冲突标记动画显示
+
+### 方案对比
+- 双方案并排显示对比
+- 独立渲染不同样例数据
+
+### 报告导出
+- 导出 PDF 格式预排报告
+- 包含场景截图、统计信息、冲突详情
+
+## 技术栈
+
+- **前端框架**：React 18 + TypeScript
+- **构建工具**：Vite
+- **3D 引擎**：Three.js + @react-three/fiber + @react-three/drei
+- **样式方案**：TailwindCSS 3
+- **状态管理**：Zustand
+- **导出功能**：html2canvas + jsPDF
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 开发模式
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm run dev
 ```
+
+访问 http://localhost:5173 查看应用。
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+### 预览生产版本
+
+```bash
+npm run preview
+```
+
+## 项目结构
+
+```
+src/
+├── components/
+│   ├── Scene3D/              # 3D 场景组件
+│   │   ├── ShipyardScene.tsx # 主场景组件
+│   │   ├── Block3D.tsx       # 船体分段（支持拖拽）
+│   │   ├── Pier3D.tsx        # 临时支墩
+│   │   ├── Rail3D.tsx        # 龙门吊轨道
+│   │   ├── LiftingPath3D.tsx # 吊装路径
+│   │   └── CollisionMarker.tsx # 冲突标记
+│   ├── ControlPanel/         # 左侧控制面板
+│   ├── Timeline/             # 底部时间轴
+│   ├── Toolbar/              # 顶部工具栏
+│   └── StatusBar/            # 右侧状态栏
+├── store/
+│   └── appStore.ts           # Zustand 状态管理
+├── data/
+│   └── samples.ts            # 内置样例数据
+├── types/
+│   └── index.ts              # TypeScript 类型定义
+├── utils/
+│   ├── collision.ts          # 碰撞检测算法
+│   └── reportExport.ts       # 报告导出功能
+└── pages/
+    └── Home.tsx              # 主页面
+```
+
+## 使用说明
+
+1. **选择样例**：在左侧控制面板顶部的下拉菜单中选择内置样例
+2. **调整位置**：
+   - 点击分段选中，在控制面板的"吊装参数调整"中使用滑块调整位置
+   - 或直接在 3D 场景中拖拽分段
+3. **播放动画**：使用底部时间轴播放吊装过程动画
+4. **查看冲突**：右侧状态栏显示实时冲突检测结果
+5. **切换视角**：顶部工具栏提供俯视图、前视图、侧视图、等轴测
+6. **方案对比**：点击"方案对比"按钮，选择对比方案
+7. **导出报告**：点击"导出报告"生成 PDF 预排报告
+
+## 碰撞检测说明
+
+系统会自动检测以下类型的冲突：
+
+- **支墩碰撞**：分段与临时支墩发生空间重叠
+- **轨道越界**：分段超出龙门吊轨道范围
+- **吊点异常**：吊点方向不正确
+- **路径冲突**：吊装路径与支墩相交
+
+## 许可证
+
+MIT
