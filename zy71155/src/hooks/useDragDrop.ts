@@ -1,14 +1,15 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { Commodity, BoxType, PlacedItem } from '../types/game';
+import type { CommodityInstance, BoxType, PlacedItem } from '../types/game';
 import { snapToGrid, checkCollision, isWithinBox, getCommodityAABB } from '../utils/rules/collision';
+import { getCommodityById } from '../data/commodities';
 
 interface UseDragDropProps {
-  selectedCommodity: Commodity | null;
+  selectedCommodity: CommodityInstance | null;
   selectedBoxType: BoxType | null;
   placedItems: PlacedItem[];
-  onPlace: (commodityId: string, x: number, y: number, layer: number, rotation: number) => boolean;
-  onRemove: (commodityId: string) => void;
-  validatePlacement: (commodity: Commodity, x: number, y: number, layer: number, rotation: number) => {
+  onPlace: (instanceId: string, x: number, y: number, layer: number, rotation: number) => boolean;
+  onRemove: (instanceId: string) => void;
+  validatePlacement: (commodity: CommodityInstance, x: number, y: number, layer: number, rotation: number) => {
     isValid: boolean;
     collisionItem?: PlacedItem;
     outOfBounds?: boolean;
@@ -19,7 +20,7 @@ interface UseDragDropProps {
 
 export interface DragState {
   isDragging: boolean;
-  dragCommodity: Commodity | null;
+  dragCommodity: CommodityInstance | null;
   dragX: number;
   dragY: number;
   dragLayer: number;
@@ -122,7 +123,7 @@ export const useDragDrop = ({
     
     if (dragState.isValidPlacement) {
       onPlace(
-        dragState.dragCommodity.id,
+        dragState.dragCommodity.instanceId,
         dragState.dragX,
         dragState.dragY,
         dragState.dragLayer,
@@ -149,14 +150,17 @@ export const useDragDrop = ({
     const { x, y } = pixelToGrid(e.clientX, e.clientY);
     
     for (const item of placedItems) {
-      const aabb = getCommodityAABB(item);
+      const commodity = getCommodityById(item.commodityId);
+      if (!commodity) continue;
+      
+      const aabb = getCommodityAABB(item, commodity);
       if (
         x >= aabb.x &&
         x < aabb.x + aabb.width &&
         y >= aabb.y &&
         y < aabb.y + aabb.height
       ) {
-        onRemove(item.commodityId);
+        onRemove(item.instanceId);
         return;
       }
     }

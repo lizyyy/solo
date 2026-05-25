@@ -50,7 +50,7 @@ export const checkCollision = (
   const newAABB = getCommodityAABB(newItem);
   
   for (const item of placedItems) {
-    if (item.commodityId === newItem.commodityId) continue;
+    if (item.instanceId === newItem.instanceId) continue;
     if (item.layer !== layer) continue;
     
     const itemAABB = getCommodityAABB(item);
@@ -95,7 +95,7 @@ export const findItemsBelow = (
   placedItems: PlacedItem[]
 ): PlacedItem[] => {
   return placedItems.filter(
-    placed => placed.commodityId !== item.commodityId && isItemAbove(item, placed)
+    placed => placed.instanceId !== item.instanceId && isItemAbove(item, placed)
   );
 };
 
@@ -104,7 +104,7 @@ export const findItemsAbove = (
   placedItems: PlacedItem[]
 ): PlacedItem[] => {
   return placedItems.filter(
-    placed => placed.commodityId !== item.commodityId && isItemAbove(placed, item)
+    placed => placed.instanceId !== item.instanceId && isItemAbove(placed, item)
   );
 };
 

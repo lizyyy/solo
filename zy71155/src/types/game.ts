@@ -27,7 +27,12 @@ export interface Commodity {
   icon: string;
 }
 
+export interface CommodityInstance extends Commodity {
+  instanceId: string;
+}
+
 export interface PlacedItem {
+  instanceId: string;
   commodityId: string;
   x: number;
   y: number;
@@ -41,7 +46,9 @@ export interface Violation {
   description: string;
   penalty: number;
   commodityId: string;
+  instanceId?: string;
   relatedCommodityId?: string;
+  relatedInstanceId?: string;
   isFatal: boolean;
 }
 
@@ -85,6 +92,8 @@ export interface HistoryRecord {
   placements: PlacedItem[];
   violations: Violation[];
   settlementResult: SettlementResult;
+  operationStack: Operation[];
+  totalCommodities: number;
 }
 
 export interface ToastMessage {

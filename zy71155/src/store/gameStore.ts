@@ -3,6 +3,7 @@ import type {
   GameStatus,
   BoxType,
   Commodity,
+  CommodityInstance,
   PlacedItem,
   Violation,
   Operation,
@@ -16,6 +17,7 @@ import { getCommodityById } from '../data/commodities';
 import { checkCollision, isWithinBox, snapToGrid } from '../utils/rules/collision';
 import { runAllChecks, checkFatalViolations } from '../utils/rules/rulesEngine';
 import { calculateScore } from '../utils/rules/scoreCalculator';
+import { generateInstanceId, generateId } from '../utils/idGenerator';
 
 interface GameState {
   status: GameStatus;
@@ -24,11 +26,12 @@ interface GameState {
   score: number;
   timeElapsed: number;
   isPaused: boolean;
+  totalCommodities: number;
   
   selectedBoxType: BoxType | null;
   placedItems: PlacedItem[];
-  pendingCommodities: Commodity[];
-  selectedCommodity: Commodity | null;
+  pendingCommodities: CommodityInstance[];
+  selectedCommodity: CommodityInstance | null;
   
   operationStack: Operation[];
   currentStackIndex: number;
@@ -41,9 +44,9 @@ interface GameState {
   levelScores: Record<string, number>;
   
   startLevel: (levelId: string) => void;
-  selectCommodity: (commodity: Commodity | null) => void;
-  placeItem: (commodityId: string, x: number, y: number, layer: number, rotation?: number) => boolean;
-  removeItem: (commodityId: string) => void;
+  selectCommodity: (commodity: CommodityInstance | null) => void;
+  placeItem: (instanceId: string, x: number, y: number, layer: number, rotation?: number) => boolean;
+  removeItem: (instanceId: string) => void;
   rotateSelected: () => void;
   undo: () => void;
   redo: () => void;
@@ -63,7 +66,7 @@ interface GameState {
   canUndo: () => boolean;
   canRedo: () => boolean;
   canSubmit: () => boolean;
-  validatePlacement: (commodity: Commodity, x: number, y: number, layer: number, rotation: number) => {
+  validatePlacement: (commodity: CommodityInstance, x: number, y: number, layer: number, rotation: number) => {
     isValid: boolean;
     collisionItem?: PlacedItem;
     outOfBounds?: boolean;
@@ -72,6 +75,11 @@ interface GameState {
 
 const STORAGE_KEY = 'warehouse_packing_progress';
 
+const createCommodityInstance = (commodity: Commodity): CommodityInstance => ({
+  ...commodity,
+  instanceId: generateInstanceId(),
+});
+
 export const useGameStore = create<GameState>((set, get) => ({
   status: 'idle',
   currentLevelId: null,
@@ -79,6 +87,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   score: 0,
   timeElapsed: 0,
   isPaused: false,
+  totalCommodities: 0,
   
   selectedBoxType: null,
   placedItems: [],
@@ -129,9 +138,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     const boxType = getBoxTypeById(level.boxTypeId);
     if (!boxType) return;
     
-    const commodities = level.commodityIds
+    const commodityInstances = level.commodityIds
       .map(id => getCommodityById(id))
-      .filter(Boolean) as Commodity[];
+      .filter(Boolean)
+      .map(commodity => createCommodityInstance(commodity!)) as CommodityInstance[];
     
     set({
       status: 'playing',
@@ -140,9 +150,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       score: 100,
       timeElapsed: 0,
       isPaused: false,
+      totalCommodities: commodityInstances.length,
       selectedBoxType: boxType,
       placedItems: [],
-      pendingCommodities: commodities,
+      pendingCommodities: commodityInstances,
       selectedCommodity: null,
       operationStack: [],
       currentStackIndex: -1,
@@ -151,12 +162,12 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
   },
   
-  selectCommodity: (commodity: Commodity | null) => {
+  selectCommodity: (commodity: CommodityInstance | null) => {
     set({ selectedCommodity: commodity });
   },
   
   validatePlacement: (
-    commodity: Commodity,
+    commodity: CommodityInstance,
     x: number,
     y: number,
     layer: number,
@@ -171,30 +182,23 @@ export const useGameStore = create<GameState>((set, get) => ({
     
     const snapped = snapToGrid(x, y);
     const testItem: PlacedItem = {
+      instanceId: 'temp',
       commodityId: commodity.id,
       x: snapped.x,
       y: snapped.y,
       layer,
       rotation,
     };
-    testItem.x = snapped.x;
-    testItem.y = snapped.y;
     
     const originalCommodity = { ...commodity, width, height };
     const collisionItem = checkCollision(
-      { ...testItem, x: snapped.x, y: snapped.y },
+      testItem,
       placedItems,
       layer
     );
     
-    const testItemForBounds: PlacedItem = {
-      ...testItem,
-      x: snapped.x,
-      y: snapped.y,
-    };
-    
     const outOfBounds = !isWithinBox(
-      testItemForBounds,
+      testItem,
       selectedBoxType
     );
     
@@ -205,27 +209,27 @@ export const useGameStore = create<GameState>((set, get) => ({
     };
   },
   
-  placeItem: (commodityId: string, x: number, y: number, layer: number, rotation: number = 0) => {
+  placeItem: (instanceId: string, x: number, y: number, layer: number, rotation: number = 0) => {
     const { pendingCommodities, placedItems, selectedBoxType, operationStack, currentStackIndex, status } = get();
     if (status !== 'playing') return false;
     
-    const commodity = pendingCommodities.find(c => c.id === commodityId);
-    if (!commodity || !selectedBoxType) return false;
+    const commodityInstance = pendingCommodities.find(c => c.instanceId === instanceId);
+    if (!commodityInstance || !selectedBoxType) return false;
     
     const snapped = snapToGrid(x, y);
     
     const isRotated = rotation % 180 !== 0;
-    const width = isRotated ? commodity.height : commodity.width;
-    const height = isRotated ? commodity.width : commodity.height;
+    const width = isRotated ? commodityInstance.height : commodityInstance.width;
+    const height = isRotated ? commodityInstance.width : commodityInstance.height;
     const testItem: PlacedItem = {
-      commodityId,
+      instanceId,
+      commodityId: commodityInstance.id,
       x: snapped.x,
       y: snapped.y,
       layer,
       rotation,
     };
     
-    const originalCommodity = { ...commodity, width, height };
     if (checkCollision(testItem, placedItems, layer)) {
       get().addToast({
         type: 'error',
@@ -245,7 +249,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
     
     const newItem: PlacedItem = {
-      commodityId,
+      instanceId,
+      commodityId: commodityInstance.id,
       x: snapped.x,
       y: snapped.y,
       layer,
@@ -253,7 +258,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     };
     
     const newPlacedItems = [...placedItems, newItem];
-    const newPendingCommodities = pendingCommodities.filter(c => c.id !== commodityId);
+    const newPendingCommodities = pendingCommodities.filter(c => c.instanceId !== instanceId);
     
     const violations = runAllChecks(newPlacedItems, selectedBoxType);
     const fatalViolation = checkFatalViolations(violations);
@@ -293,18 +298,23 @@ export const useGameStore = create<GameState>((set, get) => ({
     return true;
   },
   
-  removeItem: (commodityId: string) => {
+  removeItem: (instanceId: string) => {
     const { placedItems, pendingCommodities, selectedBoxType, operationStack, currentStackIndex, status } = get();
     if (status !== 'playing') return;
     
-    const item = placedItems.find(i => i.commodityId === commodityId);
+    const item = placedItems.find(i => i.instanceId === instanceId);
     if (!item) return;
     
-    const commodity = getCommodityById(commodityId);
+    const commodity = getCommodityById(item.commodityId);
     if (!commodity) return;
     
-    const newPlacedItems = placedItems.filter(i => i.commodityId !== commodityId);
-    const newPendingCommodities = [...pendingCommodities, commodity];
+    const commodityInstance: CommodityInstance = {
+      ...commodity,
+      instanceId,
+    };
+    
+    const newPlacedItems = placedItems.filter(i => i.instanceId !== instanceId);
+    const newPendingCommodities = [...pendingCommodities, commodityInstance];
     
     const violations = selectedBoxType ? runAllChecks(newPlacedItems, selectedBoxType) : [];
     
@@ -346,14 +356,18 @@ export const useGameStore = create<GameState>((set, get) => ({
     let newPendingCommodities = [...pendingCommodities];
     
     if (operation.type === 'place') {
-      newPlacedItems = newPlacedItems.filter(i => i.commodityId !== operation.item.commodityId);
+      newPlacedItems = newPlacedItems.filter(i => i.instanceId !== operation.item.instanceId);
       const commodity = getCommodityById(operation.item.commodityId);
       if (commodity) {
-        newPendingCommodities.push(commodity);
+        const commodityInstance: CommodityInstance = {
+          ...commodity,
+          instanceId: operation.item.instanceId,
+        };
+        newPendingCommodities.push(commodityInstance);
       }
     } else if (operation.type === 'remove') {
       newPlacedItems.push(operation.item);
-      newPendingCommodities = newPendingCommodities.filter(c => c.id !== operation.item.commodityId);
+      newPendingCommodities = newPendingCommodities.filter(c => c.instanceId !== operation.item.instanceId);
     }
     
     const { selectedBoxType } = get();
@@ -378,12 +392,16 @@ export const useGameStore = create<GameState>((set, get) => ({
     
     if (operation.type === 'place') {
       newPlacedItems.push(operation.item);
-      newPendingCommodities = newPendingCommodities.filter(c => c.id !== operation.item.commodityId);
+      newPendingCommodities = newPendingCommodities.filter(c => c.instanceId !== operation.item.instanceId);
     } else if (operation.type === 'remove') {
-      newPlacedItems = newPlacedItems.filter(i => i.commodityId !== operation.item.commodityId);
+      newPlacedItems = newPlacedItems.filter(i => i.instanceId !== operation.item.instanceId);
       const commodity = getCommodityById(operation.item.commodityId);
       if (commodity) {
-        newPendingCommodities.push(commodity);
+        const commodityInstance: CommodityInstance = {
+          ...commodity,
+          instanceId: operation.item.instanceId,
+        };
+        newPendingCommodities.push(commodityInstance);
       }
     }
     
@@ -414,8 +432,17 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
   
   submit: () => {
-    const { placedItems, selectedBoxType, timeElapsed, currentLevel, currentLevelId, unlockedLevels, levelScores } = get();
+    const { placedItems, selectedBoxType, timeElapsed, currentLevel, currentLevelId, unlockedLevels, levelScores, totalCommodities, operationStack } = get();
     if (!selectedBoxType || !currentLevel) return;
+    
+    if (placedItems.length !== totalCommodities) {
+      get().addToast({
+        type: 'error',
+        message: `还有 ${totalCommodities - placedItems.length} 件商品未装箱`,
+        duration: 3000,
+      });
+      return;
+    }
     
     const result = calculateScore(
       placedItems,
@@ -464,6 +491,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       score: 0,
       timeElapsed: 0,
       isPaused: false,
+      totalCommodities: 0,
       selectedBoxType: null,
       placedItems: [],
       pendingCommodities: [],
@@ -493,7 +521,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
   
   addToast: (toast) => {
-    const id = Math.random().toString(36).substring(2, 11);
+    const id = generateId();
     const newToast = { ...toast, id };
     set(state => ({ toasts: [...state.toasts, newToast] }));
     
@@ -517,7 +545,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
   
   canSubmit: () => {
-    const { pendingCommodities, status } = get();
-    return status === 'playing' && pendingCommodities.length === 0;
+    const { placedItems, totalCommodities, status } = get();
+    return status === 'playing' && placedItems.length === totalCommodities && totalCommodities > 0;
   },
 }));

@@ -4,6 +4,7 @@ import { ArrowLeft, History as HistoryIcon, Download, Trash2, Play, X, Trophy, C
 import { useHistoryStore } from '../store/historyStore';
 import type { HistoryRecord } from '../types/game';
 import { StarRating } from '../components/StarRating';
+import { ReplayPlayer } from '../components/ReplayPlayer';
 import { exportToText } from '../utils/export/reportExporter';
 
 const gradeColors: Record<string, string> = {
@@ -19,6 +20,7 @@ export const HistoryPage = () => {
   const { records, loadRecords, deleteRecord, clearAll, exportReport } = useHistoryStore();
   const [selectedRecord, setSelectedRecord] = useState<HistoryRecord | null>(null);
   const [showReport, setShowReport] = useState(false);
+  const [showReplay, setShowReplay] = useState(false);
   const [reportContent, setReportContent] = useState('');
   
   useEffect(() => {
@@ -60,7 +62,17 @@ export const HistoryPage = () => {
   };
   
   const handlePlayRecord = (record: HistoryRecord) => {
+    if (!record.operationStack || record.operationStack.length === 0) {
+      alert('该记录没有回放数据，请完成新的游戏后再试');
+      return;
+    }
     setSelectedRecord(record);
+    setShowReplay(true);
+  };
+  
+  const handleCloseReplay = () => {
+    setShowReplay(false);
+    setSelectedRecord(null);
   };
   
   return (
@@ -194,6 +206,14 @@ export const HistoryPage = () => {
                     
                     <div className="flex items-center gap-2">
                       <button
+                        onClick={() => handlePlayRecord(record)}
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                        title="回放"
+                      >
+                        <Play size={16} />
+                        回放
+                      </button>
+                      <button
                         onClick={() => handleViewReport(record)}
                         className="flex items-center gap-1 px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                       >
@@ -263,6 +283,13 @@ export const HistoryPage = () => {
             </div>
           </div>
         </div>
+      )}
+      
+      {showReplay && selectedRecord && (
+        <ReplayPlayer
+          record={selectedRecord}
+          onClose={handleCloseReplay}
+        />
       )}
     </div>
   );

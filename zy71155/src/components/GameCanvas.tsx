@@ -1,16 +1,16 @@
 import { useEffect, useRef, useCallback } from 'react';
-import type { BoxType, PlacedItem, Commodity } from '../types/game';
+import type { BoxType, PlacedItem, CommodityInstance } from '../types/game';
 import { render } from '../utils/canvas/renderer';
 import { useDragDrop, DragState } from '../hooks/useDragDrop';
 
 interface GameCanvasProps {
   boxType: BoxType | null;
   placedItems: PlacedItem[];
-  selectedCommodity: Commodity | null;
+  selectedCommodity: CommodityInstance | null;
   violationCommodityIds: string[];
-  onPlace: (commodityId: string, x: number, y: number, layer: number, rotation: number) => boolean;
-  onRemove: (commodityId: string) => void;
-  validatePlacement: (commodity: Commodity, x: number, y: number, layer: number, rotation: number) => {
+  onPlace: (instanceId: string, x: number, y: number, layer: number, rotation: number) => boolean;
+  onRemove: (instanceId: string) => void;
+  validatePlacement: (commodity: CommodityInstance, x: number, y: number, layer: number, rotation: number) => {
     isValid: boolean;
     collisionItem?: PlacedItem;
     outOfBounds?: boolean;
@@ -39,7 +39,7 @@ export const GameCanvas = ({
     handleContextMenu,
     handleWheel,
   } = useDragDrop({
-    selectedCommodity,
+    selectedCommodity: selectedCommodity as CommodityInstance | null,
     selectedBoxType: boxType,
     placedItems,
     onPlace,

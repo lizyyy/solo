@@ -3,6 +3,7 @@ import { useGameStore } from '../store/gameStore';
 import { useHistoryStore } from '../store/historyStore';
 import { snapToGrid, getCommodityAABB } from '../utils/rules/collision';
 import { getCommodityById } from '../data/commodities';
+import type { CommodityInstance } from '../types/game';
 
 export const useGameEngine = () => {
   const {
@@ -23,6 +24,7 @@ export const useGameEngine = () => {
     toasts,
     unlockedLevels,
     levelScores,
+    totalCommodities,
     startLevel,
     selectCommodity,
     placeItem,
@@ -103,6 +105,8 @@ export const useGameEngine = () => {
           placements: state.placedItems,
           violations: state.settlementResult.violations,
           settlementResult: state.settlementResult,
+          operationStack: state.operationStack,
+          totalCommodities: state.totalCommodities,
         });
       }
     }, 100);
@@ -113,7 +117,7 @@ export const useGameEngine = () => {
     if (!selectedCommodity || !selectedBoxType) return;
     
     const snapped = snapToGrid(gridX, gridY);
-    placeItem(selectedCommodity.id, snapped.x, snapped.y, layer);
+    placeItem(selectedCommodity.instanceId, snapped.x, snapped.y, layer);
   }, [status, isPaused, selectedCommodity, selectedBoxType, placeItem]);
   
   const handleCanvasRightClick = useCallback((gridX: number, gridY: number) => {
@@ -132,7 +136,7 @@ export const useGameEngine = () => {
         gridY >= aabb.y &&
         gridY < aabb.y + aabb.height
       ) {
-        removeItem(item.commodityId);
+        removeItem(item.instanceId);
         return;
       }
     }
@@ -144,7 +148,7 @@ export const useGameEngine = () => {
     currentLevelId,
     placedItems,
     pendingCommodities,
-    selectedCommodity,
+    selectedCommodity: selectedCommodity as CommodityInstance | null,
     selectedBoxType,
     violations,
     settlementResult,
@@ -156,6 +160,7 @@ export const useGameEngine = () => {
     toasts,
     unlockedLevels,
     levelScores,
+    totalCommodities,
     startLevel,
     selectCommodity,
     placeItem,

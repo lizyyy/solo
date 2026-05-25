@@ -11,6 +11,7 @@ import { SettlementPanel } from '../components/SettlementPanel';
 import { getNextLevel } from '../data/levels';
 import { useHistoryStore } from '../store/historyStore';
 import { calculateSpaceUtilization, calculateTotalWeight } from '../utils/rules/rulesEngine';
+import type { CommodityInstance } from '../types/game';
 
 export const GameBoard = () => {
   const { levelId } = useParams<{ levelId: string }>();
@@ -219,7 +220,7 @@ export const GameBoard = () => {
               <GameCanvas
                 boxType={selectedBoxType}
                 placedItems={placedItems}
-                selectedCommodity={selectedCommodity}
+                selectedCommodity={selectedCommodity as CommodityInstance | null}
                 violationCommodityIds={violationCommodityIds}
                 onPlace={placeItem}
                 onRemove={removeItem}
@@ -281,12 +282,12 @@ export const GameBoard = () => {
                 </div>
               ) : (
                 <div className="space-y-2 max-h-[420px] overflow-y-auto pr-2">
-                  {pendingCommodities.map((commodity, index) => (
+                  {pendingCommodities.map((commodity) => (
                     <CommodityCard
-                      key={`${commodity.id}-${index}`}
+                      key={commodity.instanceId}
                       commodity={commodity}
-                      isSelected={selectedCommodity?.id === commodity.id}
-                      onClick={() => selectCommodity(selectedCommodity?.id === commodity.id ? null : commodity)}
+                      isSelected={selectedCommodity?.instanceId === commodity.instanceId}
+                      onClick={() => selectCommodity(selectedCommodity?.instanceId === commodity.instanceId ? null : commodity)}
                     />
                   ))}
                 </div>
