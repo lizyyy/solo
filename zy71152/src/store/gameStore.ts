@@ -55,6 +55,31 @@ const isInMaintenanceWindow = (section: Section, time: number): boolean => {
   return section.maintenance.some(w => time >= w.start && time <= w.end);
 };
 
+const canEnterSection = (
+  train: Train,
+  section: Section | undefined,
+  signals: Signal[],
+  time: number
+): { allowed: boolean; reason?: string } => {
+  if (!section) return { allowed: false, reason: '区间不存在' };
+
+  if (isInMaintenanceWindow(section, time)) {
+    return { allowed: false, reason: '区间处于检修窗口' };
+  }
+
+  const isReverse = train.direction === 'backward';
+  const sectionSignal = signals.find(s => {
+    if (s.sectionId !== section.id) return false;
+    return isReverse ? s.direction === 'backward' : s.direction === 'forward';
+  });
+
+  if (sectionSignal?.aspect === SIGNAL_ASPECTS.RED) {
+    return { allowed: false, reason: '信号机显示红灯' };
+  }
+
+  return { allowed: true };
+};
+
 const checkConflicts = (
   trains: Train[],
   sections: Section[],
@@ -73,12 +98,18 @@ const checkConflicts = (
     }
 
     if (isInMaintenanceWindow(section, time) && occupyingTrains.length > 0) {
-      return {
-        type: CONFLICT_TYPES.MAINTENANCE_CONFLICT,
-        time,
-        message: `区间 ${section.name} 处于检修窗口，列车 ${occupyingTrains[0].name} 违规进入`,
-        trainIds: occupyingTrains.map(t => t.id)
-      };
+      const train = occupyingTrains[0];
+      const isReverse = train.direction === 'backward';
+      const nearEntry = isReverse ? train.progress > 0.85 : train.progress < 0.15;
+      
+      if (!nearEntry) {
+        return {
+          type: CONFLICT_TYPES.MAINTENANCE_CONFLICT,
+          time,
+          message: `区间 ${section.name} 处于检修窗口，列车 ${train.name} 违规进入`,
+          trainIds: [train.id]
+        };
+      }
     }
   }
 
@@ -88,7 +119,7 @@ const checkConflicts = (
 
     const currentSectionId = train.route[train.currentSectionIndex];
     const isReverse = train.direction === 'backward';
-    const isEntering = isReverse ? train.progress > 0.9 : train.progress < 0.1;
+    const isEntering = isReverse ? train.progress > 0.85 : train.progress < 0.15;
     
     if (isEntering) {
       const sectionSignal = signals.find(s => {
@@ -96,7 +127,9 @@ const checkConflicts = (
         return isReverse ? s.direction === 'backward' : s.direction === 'forward';
       });
 
-      if (sectionSignal && sectionSignal.aspect === SIGNAL_ASPECTS.RED) {
+      const midProgress = isReverse ? train.progress < 0.7 : train.progress > 0.3;
+
+      if (sectionSignal && sectionSignal.aspect === SIGNAL_ASPECTS.RED && midProgress) {
         return {
           type: CONFLICT_TYPES.SIGNAL_VIOLATION,
           time,
@@ -211,14 +244,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const newTrain = { ...train };
 
       if (newTrain.status === TRAIN_STATUSES.WAITING && newTime >= newTrain.scheduledDeparture) {
-        newTrain.status = TRAIN_STATUSES.RUNNING;
-        newTrain.currentSectionIndex = 0;
-        newTrain.progress = newTrain.direction === 'forward' ? 0 : 1;
-        newEvents.push({
-          time: newTime,
-          type: 'train_depart',
-          message: `列车 ${newTrain.name} 发车`
-        });
+        const firstSectionId = newTrain.route[0];
+        const firstSection = state.sections.find(s => s.id === firstSectionId);
+        const checkResult = canEnterSection(newTrain, firstSection, state.signals, newTime);
+        
+        if (checkResult.allowed) {
+          newTrain.status = TRAIN_STATUSES.RUNNING;
+          newTrain.currentSectionIndex = 0;
+          newTrain.progress = newTrain.direction === 'forward' ? 0 : 1;
+          newEvents.push({
+            time: newTime,
+            type: 'train_depart',
+            message: `列车 ${newTrain.name} 发车`
+          });
+        } else {
+          newTrain.delay += deltaTime * state.speedMultiplier;
+          if (!newEvents.some(e => e.type === 'delay_warning' && e.details?.trainId === newTrain.id)) {
+            newEvents.push({
+              time: newTime,
+              type: 'delay_warning',
+              message: `列车 ${newTrain.name} 发车延迟：${checkResult.reason}`,
+              details: { trainId: newTrain.id }
+            });
+          }
+        }
       }
 
       if (newTrain.status === TRAIN_STATUSES.RUNNING || newTrain.status === TRAIN_STATUSES.STOPPED) {
@@ -238,15 +287,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           effectiveSpeed = newTrain.maxSpeed * 0.5;
         }
 
-        const stopThreshold = isReverse ? 0.3 : 0.7;
+        const nearEntry = isReverse ? newTrain.progress > 0.9 : newTrain.progress < 0.1;
+        const stopThreshold = isReverse ? 0.15 : 0.85;
         const shouldStop = sectionSignal?.aspect === SIGNAL_ASPECTS.RED && 
           ((isReverse && newTrain.progress < stopThreshold) ||
           (!isReverse && newTrain.progress > stopThreshold));
 
-        if (shouldStop) {
+        const inMaintenance = isInMaintenanceWindow(section, newTime);
+        const shouldStopForMaintenance = inMaintenance && !nearEntry;
+
+        if (shouldStop || shouldStopForMaintenance) {
           newTrain.status = TRAIN_STATUSES.STOPPED;
           newTrain.speed = 0;
           newTrain.delay += deltaTime * state.speedMultiplier;
+          
+          if (shouldStopForMaintenance && !newEvents.some(e => e.type === 'maintenance_stop' && e.details?.trainId === newTrain.id)) {
+            newEvents.push({
+              time: newTime,
+              type: 'maintenance_stop',
+              message: `列车 ${newTrain.name} 因检修停车`,
+              details: { trainId: newTrain.id }
+            });
+          }
         } else {
           newTrain.status = TRAIN_STATUSES.RUNNING;
           newTrain.speed = effectiveSpeed;
@@ -274,7 +336,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 message: `列车 ${newTrain.name} 到达，获得 ${scoreEarned} 分`
               });
             } else {
-              newTrain.progress = isReverse ? 1 : 0;
+              const nextSectionId = newTrain.route[newTrain.currentSectionIndex];
+              const nextSection = state.sections.find(s => s.id === nextSectionId);
+              const nextCheck = canEnterSection(newTrain, nextSection, state.signals, newTime);
+              
+              if (nextCheck.allowed) {
+                newTrain.progress = isReverse ? 1 : 0;
+              } else {
+                newTrain.currentSectionIndex--;
+                newTrain.progress = isReverse ? 0 : 1;
+                newTrain.status = TRAIN_STATUSES.STOPPED;
+                newTrain.speed = 0;
+                newTrain.delay += deltaTime * state.speedMultiplier;
+                
+                if (!newEvents.some(e => e.type === 'section_hold' && e.details?.trainId === newTrain.id)) {
+                  newEvents.push({
+                    time: newTime,
+                    type: 'section_hold',
+                    message: `列车 ${newTrain.name} 在区间外等待：${nextCheck.reason}`,
+                    details: { trainId: newTrain.id }
+                  });
+                }
+              }
             }
           }
         }

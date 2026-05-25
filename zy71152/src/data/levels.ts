@@ -397,8 +397,8 @@ export const levels: Level[] = [
         speed: 0,
         maxSpeed: 55,
         delay: 0,
-        scheduledDeparture: 150,
-        scheduledArrival: 500,
+        scheduledDeparture: 210,
+        scheduledArrival: 560,
         status: TRAIN_STATUSES.WAITING,
         color: '#8b5cf6',
         direction: 'backward'
