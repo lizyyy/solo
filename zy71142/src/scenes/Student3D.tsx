@@ -16,6 +16,7 @@ const Student3D: React.FC = () => {
       
       let color = new THREE.Color('#3b82f6');
       if (student.status === 'waiting') color = new THREE.Color('#64748b');
+      else if (student.status === 'queued') color = new THREE.Color('#ef4444');
       else if (student.status === 'inStair') color = new THREE.Color('#f59e0b');
       else if (student.status === 'arrived') color = new THREE.Color('#22c55e');
       

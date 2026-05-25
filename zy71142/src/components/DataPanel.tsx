@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { Users, Layers, AlertTriangle, CheckCircle, Clock, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
+import { 
+  Users, Layers, AlertTriangle, CheckCircle, Clock, BarChart3, 
+  ChevronDown, ChevronUp, Filter, GripVertical, Eye, EyeOff,
+  Layers as LayersIcon, Settings2
+} from 'lucide-react';
 import { useSimulationStore } from '@/store/simulationStore';
 import ReactECharts from 'echarts-for-react';
 
@@ -8,13 +12,23 @@ const DataPanel: React.FC = () => {
   const statistics = useSimulationStore(state => state.statistics);
   const conflicts = useSimulationStore(state => state.conflicts);
   const students = useSimulationStore(state => state.students);
+  const simulator = useSimulationStore(state => state.simulator);
+  const filteredClassrooms = useSimulationStore(state => state.filteredClassrooms);
+  const setFilteredClassrooms = useSimulationStore(state => state.setFilteredClassrooms);
+  const toggleStair = useSimulationStore(state => state.toggleStair);
+  const updateClassroomOrder = useSimulationStore(state => state.updateClassroomOrder);
+  const updateClassroomStair = useSimulationStore(state => state.updateClassroomStair);
+  const resetSimulation = useSimulationStore(state => state.resetSimulation);
+  
   const [expandedSection, setExpandedSection] = useState<string | null>('statistics');
+  const [draggedClassroom, setDraggedClassroom] = useState<string | null>(null);
   
   if (!selectedPlan) return null;
   
   const waitingCount = students.filter(s => s.status === 'waiting').length;
   const movingCount = students.filter(s => s.status === 'moving').length;
   const inStairCount = students.filter(s => s.status === 'inStair').length;
+  const queuedCount = students.filter(s => s.status === 'queued').length;
   const arrivedCount = students.filter(s => s.status === 'arrived').length;
   
   const statusChartOption = {
@@ -38,6 +52,7 @@ const DataPanel: React.FC = () => {
         { value: waitingCount, name: '等待中', itemStyle: { color: '#64748b' } },
         { value: movingCount, name: '移动中', itemStyle: { color: '#3b82f6' } },
         { value: inStairCount, name: '楼梯中', itemStyle: { color: '#f59e0b' } },
+        { value: queuedCount, name: '排队中', itemStyle: { color: '#ef4444' } },
         { value: arrivedCount, name: '已到达', itemStyle: { color: '#22c55e' } }
       ]
     }]
@@ -54,8 +69,49 @@ const DataPanel: React.FC = () => {
     return `${mins}分${secs}秒`;
   };
   
+  const toggleClassroomFilter = (classroomId: string) => {
+    if (filteredClassrooms.includes(classroomId)) {
+      setFilteredClassrooms(filteredClassrooms.filter(id => id !== classroomId));
+    } else {
+      setFilteredClassrooms([...filteredClassrooms, classroomId]);
+    }
+  };
+  
+  const handleDragStart = (classroomId: string) => {
+    setDraggedClassroom(classroomId);
+  };
+  
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+  
+  const handleDrop = (targetClassroomId: string) => {
+    if (!draggedClassroom || draggedClassroom === targetClassroomId) return;
+    
+    const classrooms = [...selectedPlan.classrooms].sort((a, b) => a.exitOrder - b.exitOrder);
+    const draggedIdx = classrooms.findIndex(c => c.id === draggedClassroom);
+    const targetIdx = classrooms.findIndex(c => c.id === targetClassroomId);
+    
+    if (draggedIdx === -1 || targetIdx === -1) return;
+    
+    const newClassrooms = [...classrooms];
+    const [removed] = newClassrooms.splice(draggedIdx, 1);
+    newClassrooms.splice(targetIdx, 0, removed);
+    
+    newClassrooms.forEach((classroom, idx) => {
+      if (classroom.exitOrder !== idx + 1) {
+        updateClassroomOrder(classroom.id, idx + 1, idx * 3);
+      }
+    });
+    
+    resetSimulation();
+    setDraggedClassroom(null);
+  };
+  
+  const sortedClassrooms = [...selectedPlan.classrooms].sort((a, b) => a.exitOrder - b.exitOrder);
+  
   return (
-    <div className="absolute top-14 right-0 bottom-20 w-80 bg-slate-900/90 backdrop-blur-sm border-l border-slate-700 overflow-y-auto z-10">
+    <div className="absolute top-14 right-0 bottom-20 w-96 bg-slate-900/95 backdrop-blur-sm border-l border-slate-700 overflow-y-auto z-10">
       <div className="p-4 border-b border-slate-700">
         <h2 className="text-white font-semibold text-lg flex items-center gap-2">
           <BarChart3 className="w-5 h-5 text-blue-400" />
@@ -91,12 +147,12 @@ const DataPanel: React.FC = () => {
                 <div className="text-green-400 text-xl font-bold">{statistics.evacuatedStudents}</div>
               </div>
               <div className="bg-slate-800 rounded-lg p-3">
-                <div className="text-slate-400 text-xs">平均用时</div>
-                <div className="text-white text-xl font-bold">{formatTime(statistics.avgEvacuationTime)}</div>
+                <div className="text-slate-400 text-xs">排队中</div>
+                <div className="text-red-400 text-xl font-bold">{statistics.totalQueueLength || 0}</div>
               </div>
               <div className="bg-slate-800 rounded-lg p-3">
-                <div className="text-slate-400 text-xs">最长用时</div>
-                <div className="text-white text-xl font-bold">{formatTime(statistics.maxEvacuationTime)}</div>
+                <div className="text-slate-400 text-xs">平均用时</div>
+                <div className="text-white text-xl font-bold">{formatTime(statistics.avgEvacuationTime)}</div>
               </div>
             </div>
             
@@ -108,7 +164,7 @@ const DataPanel: React.FC = () => {
               />
             </div>
             
-            <div className="flex justify-center gap-4 text-xs">
+            <div className="flex justify-center gap-3 text-xs flex-wrap">
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-slate-500" />
                 <span className="text-slate-400">等待</span>
@@ -120,6 +176,10 @@ const DataPanel: React.FC = () => {
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-amber-500" />
                 <span className="text-slate-400">楼梯</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-red-500" />
+                <span className="text-slate-400">排队</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-green-500" />
@@ -136,8 +196,8 @@ const DataPanel: React.FC = () => {
           className="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 transition-colors"
         >
           <span className="text-white font-medium flex items-center gap-2">
-            <Layers className="w-4 h-4 text-amber-400" />
-            楼梯状态
+            <LayersIcon className="w-4 h-4 text-amber-400" />
+            楼梯控制
           </span>
           {expandedSection === 'stairs' ? 
             <ChevronUp className="w-4 h-4 text-slate-400" /> : 
@@ -159,14 +219,20 @@ const DataPanel: React.FC = () => {
                 <div key={stair.id} className="bg-slate-800 rounded-lg p-3">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-white text-sm font-medium">{stair.name}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded ${
-                      stair.isClosed ? 'bg-slate-600 text-slate-300' : 
-                      usage >= 0.9 ? 'bg-red-500/20 text-red-400' : 
-                      usage >= 0.7 ? 'bg-amber-500/20 text-amber-400' : 
-                      'bg-green-500/20 text-green-400'
-                    }`}>
-                      {stair.isClosed ? '已关闭' : `${usagePercent}%`}
-                    </span>
+                    <button
+                      onClick={() => {
+                        toggleStair(stair.id);
+                        resetSimulation();
+                      }}
+                      className={`text-xs px-2 py-0.5 rounded flex items-center gap-1 ${
+                        stair.isClosed 
+                          ? 'bg-slate-600 text-slate-300' 
+                          : 'bg-green-500/20 text-green-400'
+                      }`}
+                    >
+                      {stair.isClosed ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                      {stair.isClosed ? '已关闭' : '开放'}
+                    </button>
                   </div>
                   <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                     <div 
@@ -174,8 +240,9 @@ const DataPanel: React.FC = () => {
                       style={{ width: `${Math.min(usagePercentValue, 100)}%` }}
                     />
                   </div>
-                  <div className="text-xs text-slate-400 mt-1">
-                    容量: {stair.capacity}人
+                  <div className="text-xs text-slate-400 mt-1 flex justify-between">
+                    <span>使用率: {usagePercent}%</span>
+                    <span>容量: {stair.capacity}人</span>
                   </div>
                 </div>
               );
@@ -229,7 +296,10 @@ const DataPanel: React.FC = () => {
                       <div className={`text-sm font-medium ${
                         conflict.severity === 'critical' ? 'text-red-400' : 'text-amber-400'
                       }`}>
-                        {conflict.location}
+                        {conflict.location} - {
+                          conflict.type === 'stairCapacity' ? '楼梯容量' :
+                          conflict.type === 'order' ? '顺序冲突' : '集合点容量'
+                        }
                       </div>
                       <p className="text-slate-300 text-xs mt-1">{conflict.description}</p>
                       <div className="text-slate-500 text-xs mt-1">
@@ -252,7 +322,7 @@ const DataPanel: React.FC = () => {
         >
           <span className="text-white font-medium flex items-center gap-2">
             <Users className="w-4 h-4 text-blue-400" />
-            班级进度
+            班级顺序 (拖拽调整)
           </span>
           {expandedSection === 'classrooms' ? 
             <ChevronUp className="w-4 h-4 text-slate-400" /> : 
@@ -261,23 +331,60 @@ const DataPanel: React.FC = () => {
         </button>
         
         {expandedSection === 'classrooms' && (
-          <div className="px-4 pb-4 space-y-2 max-h-64 overflow-y-auto">
-            {selectedPlan.classrooms.map(classroom => {
+          <div className="px-4 pb-4 space-y-2 max-h-80 overflow-y-auto">
+            <div className="text-xs text-slate-400 mb-2 flex items-center gap-1">
+              <Settings2 className="w-3 h-3" />
+              拖拽调整疏散顺序，调整后自动重置模拟
+            </div>
+            {sortedClassrooms.map((classroom, idx) => {
               const completion = statistics.classroomCompletion[classroom.id] || 0;
               const completionPercent = (completion * 100).toFixed(0);
+              const avgQueueTime = statistics.classroomQueueTime?.[classroom.id] || 0;
+              const isFiltered = filteredClassrooms.includes(classroom.id);
               
               return (
-                <div key={classroom.id} className="bg-slate-800 rounded-lg p-2">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-white text-xs">{classroom.name}</span>
-                    <span className="text-slate-400 text-xs">{completionPercent}%</span>
+                <div
+                  key={classroom.id}
+                  draggable
+                  onDragStart={() => handleDragStart(classroom.id)}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop(classroom.id)}
+                  className={`bg-slate-800 rounded-lg p-2 cursor-move hover:bg-slate-700 transition-colors ${
+                    draggedClassroom === classroom.id ? 'opacity-50' : ''
+                  } ${isFiltered ? 'ring-2 ring-blue-500' : ''}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <GripVertical className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                    <span className="text-xs text-slate-400 w-5">{idx + 1}</span>
+                    <span className="text-white text-xs flex-1 truncate">{classroom.name}</span>
+                    <select
+                      value={classroom.assignedStairId}
+                      onChange={(e) => {
+                        updateClassroomStair(classroom.id, e.target.value);
+                        resetSimulation();
+                      }}
+                      className="text-xs bg-slate-700 text-slate-300 rounded px-1.5 py-0.5 border-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {selectedPlan.stairs.filter(s => !s.isClosed).map(s => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                      ))}
+                    </select>
                   </div>
-                  <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-blue-500 transition-all duration-300"
-                      style={{ width: `${completionPercent}%` }}
-                    />
+                  <div className="flex items-center gap-2 mt-1 ml-6">
+                    <div className="flex-1 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-blue-500 transition-all duration-300"
+                        style={{ width: `${completionPercent}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-slate-400 w-10 text-right">{completionPercent}%</span>
                   </div>
+                  {avgQueueTime > 0 && (
+                    <div className="text-xs text-amber-400 mt-1 ml-6">
+                      平均排队: {formatTime(avgQueueTime)}
+                    </div>
+                  )}
                 </div>
               );
             })}

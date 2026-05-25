@@ -4,6 +4,7 @@ import TopBar from '@/components/TopBar';
 import Timeline from '@/components/Timeline';
 import DataPanel from '@/components/DataPanel';
 import ReportModal from '@/components/ReportModal';
+import CompareModal from '@/components/CompareModal';
 import { useSimulationStore } from '@/store/simulationStore';
 
 function App() {
@@ -19,8 +20,9 @@ function App() {
       <DataPanel />
       <Timeline />
       <ReportModal />
+      <CompareModal />
       
-      <div className="absolute inset-0 pt-14 pb-20 pr-80">
+      <div className="absolute inset-0 pt-14 pb-20 pr-96">
         <Suspense fallback={
           <div className="w-full h-full flex items-center justify-center">
             <div className="text-white text-xl">加载中...</div>
@@ -44,6 +46,10 @@ function App() {
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-amber-500" />
             <span>楼梯中</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-500" />
+            <span>排队中</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-green-500" />

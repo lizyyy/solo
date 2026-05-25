@@ -40,7 +40,7 @@ export interface AssemblyPoint {
 export interface Student {
   id: string;
   classroomId: string;
-  status: 'waiting' | 'moving' | 'inStair' | 'arrived';
+  status: 'waiting' | 'moving' | 'inStair' | 'queued' | 'arrived';
   position: Position;
   targetPosition: Position;
   path: Position[];
@@ -48,6 +48,8 @@ export interface Student {
   speed: number;
   startTime: number;
   arrivalTime: number | null;
+  queueTime?: number;
+  rerouted?: boolean;
 }
 
 export interface BuildingConfig {
@@ -89,6 +91,9 @@ export interface Statistics {
   conflictCount: number;
   stairUtilization: Record<string, number>;
   classroomCompletion: Record<string, number>;
+  classroomQueueTime?: Record<string, number>;
+  totalQueueLength?: number;
+  blockageCount?: number;
 }
 
 export interface SimulationState {
