@@ -190,7 +190,7 @@ export const generateReportPDF = (session: TrainingSession): jsPDF => {
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
 
-    session.result.warnings.forEach((warning, i) => {
+    session.result.warnings.forEach((warning) => {
       const prefix = warning.severity === 'error' ? '[错误]' : '[警告]';
       const line = `${prefix} ${warning.message}`;
       const lines = doc.splitTextToSize(line, pageWidth - margin * 2);

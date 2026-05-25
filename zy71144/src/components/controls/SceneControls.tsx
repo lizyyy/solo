@@ -1,4 +1,5 @@
 import { Building2, Eye, EyeOff, Grid3X3, Layers, MapPin, RotateCcw, ArrowUpDown } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import type { BuildingModel, SceneSettings, ViewMode } from '../../types';
 
 interface SceneControlsProps {
@@ -22,7 +23,7 @@ export function SceneControls({
   onViewModeChange,
   onReset,
 }: SceneControlsProps) {
-  const viewModes: { value: ViewMode; label: string; icon: any }[] = [
+  const viewModes: { value: ViewMode; label: string; icon: LucideIcon }[] = [
     { value: 'free', label: '自由视角', icon: RotateCcw },
     { value: 'top', label: '俯视视角', icon: Grid3X3 },
     { value: 'firstPerson', label: '第一人称', icon: Eye },

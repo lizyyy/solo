@@ -54,6 +54,8 @@ export const countCorners = (nodes: PathNode[], threshold: number = 30): number 
   if (nodes.length < 3) return 0;
   let count = 0;
   for (let i = 1; i < nodes.length - 1; i++) {
+    if (nodes[i].type === 'stairs') continue;
+
     const angle = calculateAngle(
       nodes[i - 1].position,
       nodes[i].position,
@@ -61,7 +63,6 @@ export const countCorners = (nodes: PathNode[], threshold: number = 30): number 
     );
     if (angle > threshold && angle < 170) {
       count++;
-      nodes[i].type = 'corner';
     }
   }
   return count;

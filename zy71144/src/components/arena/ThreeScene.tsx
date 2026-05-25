@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
-import * as THREE from 'three';
+import { OrbitControls, FirstPersonControls, PerspectiveCamera } from '@react-three/drei';
+import type { OrbitControls as OrbitControlsImpl, FirstPersonControls as FirstPersonControlsImpl } from 'three-stdlib';
 import { BuildingWalls } from './BuildingWalls';
 import { Hydrant } from './Hydrant';
 import { Staircase } from './Staircase';
@@ -15,11 +15,13 @@ import type { BuildingModel, Point3D } from '../../types';
 interface CameraControllerProps {
   viewMode: 'top' | 'firstPerson' | 'free';
   target: Point3D;
+  path: Point3D[];
 }
 
-function CameraController({ viewMode, target }: CameraControllerProps) {
+function CameraController({ viewMode, target, path }: CameraControllerProps) {
   const { camera } = useThree();
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl>(null);
+  const firstPersonRef = useRef<FirstPersonControlsImpl>(null);
 
   useEffect(() => {
     if (viewMode === 'top') {
@@ -28,8 +30,29 @@ function CameraController({ viewMode, target }: CameraControllerProps) {
     } else if (viewMode === 'free') {
       camera.position.set(30, 25, 30);
       camera.lookAt(0, 0, 0);
+    } else if (viewMode === 'firstPerson') {
+      if (path.length > 0) {
+        const lastPoint = path[path.length - 1];
+        camera.position.set(lastPoint.x, lastPoint.y + 1.6, lastPoint.z);
+        camera.lookAt(lastPoint.x + 5, lastPoint.y + 1.6, lastPoint.z);
+      } else {
+        camera.position.set(0, 1.6, 10);
+        camera.lookAt(0, 1.6, 0);
+      }
     }
-  }, [viewMode, camera, target]);
+  }, [viewMode, camera, target, path]);
+
+  if (viewMode === 'firstPerson') {
+    return (
+      <FirstPersonControls
+        ref={firstPersonRef}
+        movementSpeed={50}
+        lookSpeed={0.15}
+        activeLook={true}
+        heightCoef={0.5}
+      />
+    );
+  }
 
   return (
     <OrbitControls
@@ -96,24 +119,28 @@ function SceneContent({ building }: SceneContentProps) {
     updateNodePosition(nodeId, position);
   };
 
-  const handleKeyDown = (e: KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Delete' && selectedNodeId && path.length > 1) {
       removeNode(selectedNodeId);
     }
     if (e.key === 'Escape') {
       selectNode(null);
     }
-  };
+  }, [selectedNodeId, path.length, removeNode, selectNode]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedNodeId, path.length]);
+  }, [handleKeyDown]);
 
   return (
     <>
       <PerspectiveCamera makeDefault position={[30, 25, 30]} fov={50} />
-      <CameraController viewMode={viewMode} target={{ x: 0, y: 0, z: 0 }} />
+      <CameraController
+        viewMode={viewMode}
+        target={{ x: 0, y: 0, z: 0 }}
+        path={path.map(n => n.position)}
+      />
 
       <ambientLight intensity={0.4} />
       <directionalLight

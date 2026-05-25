@@ -124,7 +124,7 @@ export function HosePath({
         </mesh>
       )}
 
-      {visibleNodes.map((node, index) => {
+      {visibleNodes.map((node) => {
         const colors = nodeColors(node.type, selectedNodeId === node.id);
         const scale = selectedNodeId === node.id ? 1.3 : 1;
 

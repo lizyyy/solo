@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import * as THREE from 'three';
 import type { Wall } from '../../types';
 
 interface BuildingWallsProps {
