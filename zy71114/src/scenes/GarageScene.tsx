@@ -99,13 +99,13 @@ function GarageContent({ garage, riskPoints, showRiskMarkers, showMeasurements }
     }
   });
 
-  const handleVehicleDrag = (e: { point: { z: number }; stopPropagation: () => void }) => {
+  const handleVehicleDrag = (e: { point: { x: number; y: number; z: number }; stopPropagation: () => void }) => {
     if (!vehicleDragEnabled) return;
     e.stopPropagation();
     const point = e.point;
     const ramp = garage.ramps[0];
     if (ramp) {
-      const clampedZ = Math.max(ramp.points[0][2], Math.min(ramp.points[ramp.points.length - 1][2], point[2]));
+      const clampedZ = Math.max(ramp.points[0][2], Math.min(ramp.points[ramp.points.length - 1][2], point.z));
       const totalLength = ramp.points[ramp.points.length - 1][2] - ramp.points[0][2];
       const progress = (clampedZ - ramp.points[0][2]) / totalLength;
       setProgress(Math.max(0, Math.min(1, progress)));
