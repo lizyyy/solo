@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useSceneStore } from '../../store/useSceneStore';
 import { getHeatmapData } from '../../utils/dataValidator';
 

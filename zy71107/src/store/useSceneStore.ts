@@ -2,11 +2,6 @@ import { create } from 'zustand';
 import {
   SceneState,
   SceneActions,
-  ExhibitionHall,
-  VisitorTrajectory,
-  BatchData,
-  AnomalyReport,
-  CameraView,
   SampleType,
 } from '../data/types';
 import { validateAllData } from '../utils/dataValidator';
@@ -83,10 +78,10 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
     
     const anomalies = validateAllData(sampleData.trajectories, sampleData.hall.showcases);
     
-    const totalDuration = Math.max(
-      ...sampleData.trajectories.map((t) => t.endTime),
-      ...sampleData.batches.map((b) => b.endTime)
-    );
+    const trajectoryEndTimes = sampleData.trajectories.map((t) => t.endTime);
+    const batchEndTimes = sampleData.batches.map((b) => b.endTime);
+    const allEndTimes = [...trajectoryEndTimes, ...batchEndTimes];
+    const totalDuration = allEndTimes.length > 0 ? Math.max(...allEndTimes) : 0;
     
     set({
       hallData: sampleData.hall,

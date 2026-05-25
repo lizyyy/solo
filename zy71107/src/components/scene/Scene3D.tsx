@@ -2,9 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
-import * as THREE from 'three';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useSceneStore } from '../../store/useSceneStore';
-import { CameraView } from '../../data/types';
 import ExhibitionHall from './ExhibitionHall';
 import Showcases from './Showcase';
 import Trajectories from './TrajectoryLine';
@@ -15,7 +14,7 @@ const CameraController: React.FC = () => {
   const { camera } = useThree();
   const cameraView = useSceneStore((state) => state.cameraView);
   const hallData = useSceneStore((state) => state.hallData);
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl>(null!);
 
   useEffect(() => {
     if (!hallData) return;
@@ -62,7 +61,6 @@ const CameraController: React.FC = () => {
 const SceneContent: React.FC = () => {
   const isPlaying = useSceneStore((state) => state.isPlaying);
   const playbackSpeed = useSceneStore((state) => state.playbackSpeed);
-  const currentTime = useSceneStore((state) => state.currentTime);
   const totalDuration = useSceneStore((state) => state.totalDuration);
   const setCurrentTime = useSceneStore((state) => state.setCurrentTime);
   const setPlaying = useSceneStore((state) => state.setPlaying);

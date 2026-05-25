@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Filter, Layers, MapPin, Users, AlertCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter, Layers, MapPin, Users } from 'lucide-react';
 import { useSceneStore } from '../../store/useSceneStore';
 
 const LeftPanel: React.FC = () => {

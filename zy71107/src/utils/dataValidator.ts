@@ -1,4 +1,4 @@
-import { VisitorTrajectory, Showcase, AnomalyReport, Position3D, StayRecord } from '../data/types';
+import { VisitorTrajectory, Showcase, AnomalyReport, Position3D } from '../data/types';
 
 const BREAK_TIME_THRESHOLD = 5000;
 const BREAK_DISTANCE_THRESHOLD = 3;

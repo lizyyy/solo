@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Info, BarChart3, AlertTriangle, Download, FileText } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Info, BarChart3, AlertTriangle, FileText } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useSceneStore } from '../../store/useSceneStore';
 import { getShowcaseStats } from '../../utils/dataValidator';
