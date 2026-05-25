@@ -56,27 +56,81 @@ export const ReportExport = () => {
 
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const canvas = await html2canvas(reportRef.current, {
+      const element = reportRef.current;
+      const originalStyle = {
+        maxHeight: element.style.maxHeight,
+        overflow: element.style.overflow,
+        height: element.style.height,
+      };
+
+      element.style.maxHeight = 'none';
+      element.style.overflow = 'visible';
+      element.style.height = 'auto';
+
+      const scrollContainer = element.parentElement;
+      const originalContainerStyle = {
+        maxHeight: scrollContainer?.style.maxHeight,
+        overflow: scrollContainer?.style.overflow,
+      };
+      if (scrollContainer) {
+        scrollContainer.style.maxHeight = 'none';
+        scrollContainer.style.overflow = 'visible';
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const canvas = await html2canvas(element, {
         backgroundColor: '#0f172a',
         scale: 2,
         useCORS: true,
         logging: false,
       });
 
+      element.style.maxHeight = originalStyle.maxHeight;
+      element.style.overflow = originalStyle.overflow;
+      element.style.height = originalStyle.height;
+      if (scrollContainer) {
+        scrollContainer.style.maxHeight = originalContainerStyle.maxHeight || '';
+        scrollContainer.style.overflow = originalContainerStyle.overflow || '';
+      }
+
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('l', 'mm', 'a4');
 
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = pageWidth - 20;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const margin = 10;
+      const contentWidth = pageWidth - margin * 2;
+      const contentHeight = pageHeight - margin * 2;
+      const imgHeight = (canvas.height * contentWidth) / canvas.width;
 
-      if (imgHeight <= pageHeight - 20) {
-        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+      if (imgHeight <= contentHeight) {
+        pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, imgHeight);
       } else {
-        const ratio = (pageHeight - 20) / imgHeight;
-        const newWidth = imgWidth * ratio;
-        pdf.addImage(imgData, 'PNG', (pageWidth - newWidth) / 2, 10, newWidth, pageHeight - 20);
+        const totalPages = Math.ceil(imgHeight / contentHeight);
+
+        for (let i = 0; i < totalPages; i++) {
+          if (i > 0) {
+            pdf.addPage();
+          }
+
+          const offsetY = -i * contentHeight;
+          pdf.addImage(
+            imgData,
+            'PNG',
+            margin,
+            margin + offsetY,
+            contentWidth,
+            imgHeight
+          );
+
+          if (i < totalPages - 1) {
+            const clipY = margin + contentHeight;
+            pdf.setDrawColor(15, 23, 42);
+            pdf.setFillColor(15, 23, 42);
+            pdf.rect(0, clipY, pageWidth, pageHeight - clipY, 'F');
+          }
+        }
       }
 
       const snapshot = data.snapshots[currentTimeIndex];
