@@ -271,8 +271,32 @@ class SceneManager {
     
     updateObjectData(obj) {
         const userData = obj.userData;
-        userData.x = Math.round(obj.position.x);
-        userData.z = Math.round(obj.position.z);
+        const newX = Math.round(obj.position.x);
+        const newZ = Math.round(obj.position.z);
+        
+        userData.x = newX;
+        userData.z = newZ;
+        
+        if (userData.type === 'inspectionPoint') {
+            const point = this.inspectionPoints.find(p => p.id === userData.id);
+            if (point) {
+                point.x = newX;
+                point.z = newZ;
+            }
+        } else if (userData.type === 'obstacle') {
+            const obstacle = this.obstacles.find(o => o.id === userData.id);
+            if (obstacle) {
+                obstacle.x = newX;
+                obstacle.z = newZ;
+            }
+        } else if (userData.type === 'charger') {
+            const charger = this.chargers.find(c => c.id === userData.id);
+            if (charger) {
+                charger.x = newX;
+                charger.z = newZ;
+            }
+        }
+        
         this.updateSelectedInfo(obj);
     }
     

@@ -8,6 +8,7 @@ class Pathfinding {
         this.floorData = floorData;
         this.halfWidth = floorData.width / 2;
         this.halfDepth = floorData.depth / 2;
+        this.obstacles = obstacles;
         
         this.grid.clear();
         
@@ -166,7 +167,7 @@ class Pathfinding {
                 if (!this.checkLineCollision(
                     path[i].x, path[i].z,
                     path[j].x, path[j].z,
-                    []
+                    this.obstacles || []
                 )) {
                     break;
                 }
