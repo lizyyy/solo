@@ -24,20 +24,12 @@ export function RightPanel() {
     getFilteredComponents,
     getComponentGroups,
     realTimeShadows,
+    getComponentShadowRate,
   } = useSceneStore();
   const { month } = useTimeStore();
 
   const filteredComponents = getFilteredComponents();
   const groups = getComponentGroups();
-
-  const getComponentShadowRate = useCallback((componentId: string): number => {
-    const shadowResult = realTimeShadows.find((s) => s.componentId === componentId);
-    if (shadowResult) {
-      return shadowResult.shadowRate;
-    }
-    const component = components.find((c) => c.id === componentId);
-    return component ? component.shadowStats.shadowRate : 0;
-  }, [realTimeShadows, components]);
 
   const getShadowRateColor = (rate: number) => {
     if (rate < 10) return 'text-green-400';

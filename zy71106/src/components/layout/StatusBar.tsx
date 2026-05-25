@@ -17,6 +17,7 @@ export function StatusBar() {
     getFilteredComponents,
     realTimeShadows,
     getAverageAccumulatedShadowHours,
+    getComponentShadowRate,
   } = useSceneStore();
 
   const solarPos = calculateSolarPosition(month, day, hour);
@@ -30,10 +31,8 @@ export function StatusBar() {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
 
-  const avgShadowRate = realTimeShadows.length > 0
-    ? realTimeShadows.reduce((sum, s) => sum + s.shadowRate, 0) / realTimeShadows.length
-    : components.length > 0
-    ? filteredComponents.reduce((sum, c) => sum + c.shadowStats.shadowRate, 0) / filteredComponents.length
+  const avgShadowRate = filteredComponents.length > 0
+    ? filteredComponents.reduce((sum, c) => sum + getComponentShadowRate(c.id), 0) / filteredComponents.length
     : 0;
 
   return (
