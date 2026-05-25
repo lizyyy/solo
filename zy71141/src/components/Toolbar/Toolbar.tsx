@@ -12,7 +12,7 @@ import {
 import * as THREE from 'three';
 import { useInspectionStore } from '../../store/inspectionStore';
 import { generateReportPDF } from '../../utils/pdfExport';
-import { ReportData, CrackStatus, STATUS_COLORS } from '../../types';
+import { ReportData, CrackStatus } from '../../types';
 
 interface ToolbarProps {
   glRenderer?: THREE.WebGLRenderer | null;
@@ -25,15 +25,25 @@ const presetViews = [
   { name: '斜视图', position: { x: 10, y: 8, z: 10 }, target: { x: 0, y: 1, z: 0 } },
 ];
 
+const captureScreenshot = (glRenderer: THREE.WebGLRenderer | null | undefined): string | undefined => {
+  if (!glRenderer) return undefined;
+  
+  try {
+    const canvas = glRenderer.domElement;
+    return canvas.toDataURL('image/png');
+  } catch (error) {
+    console.error('截图失败:', error);
+    return undefined;
+  }
+};
+
 export const Toolbar: React.FC<ToolbarProps> = ({ glRenderer }) => {
   const {
     loadSampleData,
     resetState,
     setCameraView,
-    getFilteredCracks,
     getCracksWithBatchStatus,
     getCurrentBatch,
-    cracks,
     filters,
     cameraView,
     sampleDataLoaded,
@@ -95,6 +105,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({ glRenderer }) => {
         return acc;
       }, {} as Record<string, number>);
 
+      const screenshot = captureScreenshot(glRenderer);
+
       const reportData: ReportData = {
         batchName: currentBatch.name,
         batchDate: currentBatch.date,
@@ -109,6 +121,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({ glRenderer }) => {
         totalCracks: cracksWithBatchStatus.length,
         totalPhotos: currentPhotos.length,
         statusCounts: statusCountsWithBatch,
+        screenshot,
         exportTime: new Date().toLocaleString('zh-CN'),
       };
 

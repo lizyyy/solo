@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { ReportData, CrackStatus, STATUS_LABELS, STATUS_COLORS } from '../types';
+import { ReportData, CrackStatus, STATUS_LABELS } from '../types';
 
 export const generateReportPDF = async (reportData: ReportData): Promise<void> => {
   const doc = new jsPDF();
@@ -26,9 +26,36 @@ export const generateReportPDF = async (reportData: ReportData): Promise<void> =
   doc.text(`数据一致性标识: 报告数据与导出时可视化状态完全一致`, margin, yPos);
   yPos += 10;
 
+  if (reportData.screenshot) {
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('一、3D场景截图（当前视角）', margin, yPos);
+    yPos += 10;
+
+    try {
+      const imgWidth = pageWidth - margin * 2;
+      const imgHeight = imgWidth * 0.6;
+      doc.addImage(reportData.screenshot, 'PNG', margin, yPos, imgWidth, imgHeight);
+      yPos += imgHeight + 10;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`截图说明: 此截图为导出时3D场景的实时画面，与报告数据一致`, margin, yPos);
+      doc.setTextColor(0, 0, 0);
+      yPos += 10;
+    } catch (error) {
+      console.error('嵌入截图失败:', error);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.text('(截图嵌入失败)', margin + 5, yPos);
+      yPos += 10;
+    }
+  }
+
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('一、巡检批次信息', margin, yPos);
+  doc.text(reportData.screenshot ? '二、巡检批次信息' : '一、巡检批次信息', margin, yPos);
   yPos += 10;
 
   doc.setFont('helvetica', 'normal');
@@ -46,7 +73,7 @@ export const generateReportPDF = async (reportData: ReportData): Promise<void> =
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.text('二、数据一致性校验', margin, yPos);
+  doc.text(reportData.screenshot ? '三、数据一致性校验' : '二、数据一致性校验', margin, yPos);
   yPos += 10;
 
   doc.setFont('helvetica', 'normal');
@@ -79,7 +106,7 @@ export const generateReportPDF = async (reportData: ReportData): Promise<void> =
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.text('三、统计数据', margin, yPos);
+  doc.text(reportData.screenshot ? '四、统计数据' : '三、统计数据', margin, yPos);
   yPos += 10;
 
   doc.setFont('helvetica', 'normal');
@@ -104,7 +131,7 @@ export const generateReportPDF = async (reportData: ReportData): Promise<void> =
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.text('四、裂缝详情列表', margin, yPos);
+  doc.text(reportData.screenshot ? '五、裂缝详情列表' : '四、裂缝详情列表', margin, yPos);
   yPos += 10;
 
   doc.setFont('helvetica', 'normal');
@@ -169,7 +196,7 @@ export const generateReportPDF = async (reportData: ReportData): Promise<void> =
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
-    doc.text('五、照片点位信息', margin, yPos);
+    doc.text(reportData.screenshot ? '六、照片点位信息' : '五、照片点位信息', margin, yPos);
     yPos += 10;
 
     doc.setFont('helvetica', 'normal');
@@ -218,7 +245,7 @@ export const generateReportPDF = async (reportData: ReportData): Promise<void> =
   yPos = margin;
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
-  doc.text('六、报告签署', margin, yPos);
+  doc.text(reportData.screenshot ? '七、报告签署' : '六、报告签署', margin, yPos);
   yPos += 15;
 
   doc.setFont('helvetica', 'normal');

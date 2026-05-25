@@ -10,7 +10,6 @@ export const FilterPanel: React.FC = () => {
     filters,
     setStatusFilter,
     setSearchQuery,
-    getFilteredCracks,
     getCracksWithBatchStatus,
     selectedCrackId,
     setSelectedCrackId,

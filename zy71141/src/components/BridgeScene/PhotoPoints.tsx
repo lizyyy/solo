@@ -3,7 +3,6 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Photo } from '../../types';
 import { Html } from '@react-three/drei';
-import { Camera } from 'lucide-react';
 
 interface PhotoPointsProps {
   photos: Photo[];
@@ -42,12 +41,12 @@ const PhotoMarker: React.FC<PhotoMarkerProps> = ({ photo, onClick }) => {
     }
   });
 
-  const handleClick = (e: any) => {
+  const handleClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     onClick();
   };
 
-  const handlePointerOver = (e: any) => {
+  const handlePointerOver = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     setHovered(true);
     document.body.style.cursor = 'pointer';

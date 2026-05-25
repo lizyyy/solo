@@ -57,12 +57,12 @@ const CrackMarker: React.FC<CrackMarkerProps> = ({
     }
   });
 
-  const handleClick = (e: any) => {
+  const handleClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     onSelect();
   };
 
-  const handlePointerOver = (e: any) => {
+  const handlePointerOver = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     setHovered(true);
     document.body.style.cursor = 'pointer';

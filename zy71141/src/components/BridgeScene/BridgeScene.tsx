@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { BridgeModel } from './BridgeModel';
 import { CrackPoints } from './CrackPoints';
 import { PhotoPoints } from './PhotoPoints';
-import { CrackPoint, CameraView, Photo } from '../../types';
+import { CameraView } from '../../types';
 import { useInspectionStore } from '../../store/inspectionStore';
 
 interface SceneControllerProps {
@@ -14,6 +14,7 @@ interface SceneControllerProps {
 
 const SceneController: React.FC<SceneControllerProps> = ({ cameraView }) => {
   const { camera } = useThree();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const controlsRef = useRef<any>(null);
 
   useEffect(() => {
@@ -55,7 +56,6 @@ export const BridgeScene: React.FC<BridgeSceneProps> = ({ onSceneReady }) => {
     selectedCrackId,
     setSelectedCrackId,
     updateCrackPosition,
-    getFilteredCracks,
     getCracksWithBatchStatus,
     getPhotosForCurrentBatch,
   } = useInspectionStore();
