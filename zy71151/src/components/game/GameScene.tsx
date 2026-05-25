@@ -25,9 +25,9 @@ export default function GameScene() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
         e.preventDefault();
-        if (state.phase === 'playing') {
+        if (state && state.phase === 'playing') {
           useGameStore.getState().actions.pauseGame();
-        } else if (state.phase === 'paused') {
+        } else if (state && state.phase === 'paused') {
           useGameStore.getState().actions.resumeGame();
         }
       }
@@ -39,10 +39,10 @@ export default function GameScene() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [state.phase, navigate]);
+  }, [state, navigate]);
 
   useEffect(() => {
-    if (state.phase === 'ended') {
+    if (state && state.phase === 'ended') {
       const timer = setTimeout(() => {
         const sessionId = `result-${Date.now()}`;
         (window as any).lastGameState = state;
@@ -50,7 +50,7 @@ export default function GameScene() {
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [state.phase, state, navigate]);
+  }, [state, navigate]);
 
   if (!state) {
     return (
