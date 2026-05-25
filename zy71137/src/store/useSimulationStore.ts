@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { Alert, CameraView, DriftReport, OrchardScene, ParticleData, SimulationParams } from '@/types';
 import { sampleScenes } from '@/data/sampleScenes';
 
+const CUSTOM_SCENES_KEY = 'orchard_drift_custom_scenes';
+
 interface SimulationState {
   currentScene: OrchardScene;
   params: SimulationParams;
@@ -16,7 +18,7 @@ interface SimulationState {
   setScene: (scene: OrchardScene) => void;
   setParams: (params: Partial<SimulationParams>) => void;
   setPlaying: (playing: boolean) => void;
-  setSimulationTime: (time: number) => void;
+  setSimulationTime: (time: number | ((prev: number) => number)) => void;
   addParticles: (particles: ParticleData[]) => void;
   updateParticles: (particles: ParticleData[]) => void;
   clearParticles: () => void;
@@ -27,6 +29,10 @@ interface SimulationState {
   setWindSpeedUnit: (unit: 'm_s' | 'km_h' | 'mph') => void;
   resetSimulation: () => void;
   generateReport: () => DriftReport;
+  saveCustomScene: (name: string, description: string) => boolean;
+  getCustomScenes: () => OrchardScene[];
+  deleteCustomScene: (sceneId: string) => void;
+  importScenes: (scenes: OrchardScene[]) => void;
 }
 
 const defaultScene = sampleScenes[0];
@@ -58,7 +64,9 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
 
   setPlaying: (playing) => set({ isPlaying: playing }),
 
-  setSimulationTime: (time) => set({ simulationTime: time }),
+  setSimulationTime: (time) => set((state) => ({
+    simulationTime: typeof time === 'function' ? time(state.simulationTime) : time,
+  })),
 
   addParticles: (newParticles) => set((state) => ({
     particles: [...state.particles, ...newParticles].slice(-2000),
@@ -141,5 +149,63 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
       recommendations,
       generatedAt: new Date().toLocaleString('zh-CN'),
     };
+  },
+
+  saveCustomScene: (name, description) => {
+    const state = get();
+    const customScenes = state.getCustomScenes();
+    
+    const newScene: OrchardScene = {
+      ...state.currentScene,
+      id: `custom-${Date.now()}`,
+      name,
+      description,
+      type: 'normal',
+      defaultParams: { ...state.params },
+    };
+
+    customScenes.push(newScene);
+    
+    try {
+      localStorage.setItem(CUSTOM_SCENES_KEY, JSON.stringify(customScenes));
+      return true;
+    } catch (e) {
+      console.error('Failed to save custom scene:', e);
+      return false;
+    }
+  },
+
+  getCustomScenes: () => {
+    try {
+      const stored = localStorage.getItem(CUSTOM_SCENES_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      console.error('Failed to load custom scenes:', e);
+      return [];
+    }
+  },
+
+  deleteCustomScene: (sceneId) => {
+    const state = get();
+    const customScenes = state.getCustomScenes().filter((s) => s.id !== sceneId);
+    try {
+      localStorage.setItem(CUSTOM_SCENES_KEY, JSON.stringify(customScenes));
+    } catch (e) {
+      console.error('Failed to delete custom scene:', e);
+    }
+  },
+
+  importScenes: (scenes) => {
+    const state = get();
+    const existingScenes = state.getCustomScenes();
+    const newScenes = scenes.map((s) => ({
+      ...s,
+      id: `imported-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    }));
+    try {
+      localStorage.setItem(CUSTOM_SCENES_KEY, JSON.stringify([...existingScenes, ...newScenes]));
+    } catch (e) {
+      console.error('Failed to import scenes:', e);
+    }
   },
 }));

@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { useSimulationStore } from '@/store/useSimulationStore';
 import { createParticle, updateParticles, checkDriftAlerts } from '@/utils/physics';
 import { COLORS, PESTICIDE_INFO } from '@/data/constants';
+import { ParticleData } from '@/types';
 import * as THREE from 'three';
 
 interface ParticleSystemProps {
@@ -13,16 +14,16 @@ export function ParticleSystem({ sprinklerPositions }: ParticleSystemProps) {
   const pointsRef = useRef<THREE.Points>(null);
   const particleIdRef = useRef(0);
   const lastEmitRef = useRef(0);
+  const localParticlesRef = useRef<ParticleData[]>([]);
 
   const {
     params,
     isPlaying,
     currentScene,
-    particles,
-    updateParticles: updateStoreParticles,
     addAlert,
     setMaxDriftDistance,
     maxDriftDistance,
+    resetSimulation,
   } = useSimulationStore();
 
   const { windSpeed, windDirection, pesticideType, simulationSpeed, bufferThreshold } = params;
@@ -43,7 +44,6 @@ export function ParticleSystem({ sprinklerPositions }: ParticleSystemProps) {
 
   const pesticideColor = useMemo(() => {
     const info = PESTICIDE_INFO[pesticideType];
-    const baseColor = new THREE.Color(COLORS.particle.split('(')[1].split(')')[0].replace(/rgba?/, ''));
     if (info.toxicity === 'high') {
       return new THREE.Color(0.9, 0.5, 0.5);
     } else if (info.toxicity === 'medium') {
@@ -52,8 +52,23 @@ export function ParticleSystem({ sprinklerPositions }: ParticleSystemProps) {
     return new THREE.Color(0.7, 0.9, 0.7);
   }, [pesticideType]);
 
+  useEffect(() => {
+    localParticlesRef.current = [];
+    particleIdRef.current = 0;
+    lastEmitRef.current = 0;
+  }, [resetSimulation, currentScene.id]);
+
   useFrame((_, delta) => {
-    if (!isPlaying || !pointsRef.current) return;
+    if (!pointsRef.current) return;
+
+    if (!isPlaying) {
+      const positions = particleGeometry.attributes.position.array as Float32Array;
+      for (let i = 0; i < 2000; i++) {
+        positions[i * 3 + 1] = -1000;
+      }
+      particleGeometry.attributes.position.needsUpdate = true;
+      return;
+    }
 
     lastEmitRef.current += delta;
     const emitInterval = 0.05 / simulationSpeed;
@@ -72,22 +87,22 @@ export function ParticleSystem({ sprinklerPositions }: ParticleSystemProps) {
           );
         })
       );
-      updateStoreParticles([...particles, ...newParticles]);
+      localParticlesRef.current = [...localParticlesRef.current, ...newParticles];
     }
 
     const { particles: updatedParticles, maxDistance } = updateParticles(
-      particles,
+      localParticlesRef.current,
       windSpeed,
       windDirection,
       delta,
       simulationSpeed
     );
 
+    localParticlesRef.current = updatedParticles;
+
     if (maxDistance > maxDriftDistance) {
       setMaxDriftDistance(maxDistance);
     }
-
-    updateStoreParticles(updatedParticles);
 
     const positions = particleGeometry.attributes.position.array as Float32Array;
     const colors = particleGeometry.attributes.color.array as Float32Array;

@@ -1,11 +1,49 @@
+import { useEffect, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { useSimulationStore } from '@/store/useSimulationStore';
 
 export function Timeline() {
-  const { isPlaying, setPlaying, simulationTime, setSimulationTime, resetSimulation } = useSimulationStore();
+  const { isPlaying, setPlaying, simulationTime, setSimulationTime, resetSimulation, params } = useSimulationStore();
+  const lastTimeRef = useRef<number>(0);
+  const animationFrameRef = useRef<number>(0);
 
   const maxTime = 60;
   const progress = (simulationTime / maxTime) * 100;
+
+  useEffect(() => {
+    if (!isPlaying) {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      return;
+    }
+
+    lastTimeRef.current = performance.now();
+
+    const animate = (currentTime: number) => {
+      const deltaTime = (currentTime - lastTimeRef.current) / 1000;
+      lastTimeRef.current = currentTime;
+
+      setSimulationTime((prev) => {
+        const newTime = prev + deltaTime * params.simulationSpeed;
+        if (newTime >= maxTime) {
+          setPlaying(false);
+          return maxTime;
+        }
+        return newTime;
+      });
+
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isPlaying, params.simulationSpeed, setSimulationTime, setPlaying]);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
