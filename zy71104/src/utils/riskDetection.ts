@@ -79,8 +79,8 @@ export const detectRisks = (state: SceneState): Risk[] => {
   }
   
   const sliderAngleRad = (crane.currentAngle * Math.PI) / 180;
-  const sliderLiftX = crane.position.x + sliderRadius * Math.sin(sliderAngleRad);
-  const sliderLiftZ = crane.position.z + sliderRadius * Math.cos(sliderAngleRad);
+  const sliderLiftX = crane.position.x + sliderRadius * Math.cos(sliderAngleRad);
+  const sliderLiftZ = crane.position.z - sliderRadius * Math.sin(sliderAngleRad);
   
   for (const zone of dangerZones) {
     if (zone.occupied && zone.type === 'restricted') {

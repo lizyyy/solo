@@ -14,16 +14,16 @@ const RadiusIndicator = () => {
   const baseColor = hasRadiusRisk || isOverweight ? '#FF4D4F' : '#165DFF';
   
   const angleRad = (crane.currentAngle * Math.PI) / 180;
-  const endX = crane.position.x + crane.currentRadius * Math.sin(angleRad);
-  const endZ = crane.position.z + crane.currentRadius * Math.cos(angleRad);
+  const endX = crane.position.x + crane.currentRadius * Math.cos(angleRad);
+  const endZ = crane.position.z - crane.currentRadius * Math.sin(angleRad);
   
   const curvePoints = [];
   for (let i = 0; i <= 50; i++) {
     const t = (i / 50) * (crane.currentAngle * Math.PI) / 180;
     curvePoints.push(
-      crane.position.x + crane.currentRadius * Math.sin(t),
+      crane.position.x + crane.currentRadius * Math.cos(t),
       0.1,
-      crane.position.z + crane.currentRadius * Math.cos(t)
+      crane.position.z - crane.currentRadius * Math.sin(t)
     );
   }
   
