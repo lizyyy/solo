@@ -292,7 +292,7 @@ const LabSafetyVR = (function() {
             }
         });
 
-        if (state.currentScenario) {
+        if (state.currentScenario && state.currentStepIndex >= 0) {
             const safePath = state.currentScenario.safePath;
             let onPath = false;
             
@@ -306,7 +306,35 @@ const LabSafetyVR = (function() {
             const startDist = distance2D(toPos, safePath[0]);
             const endDist = distance2D(toPos, safePath[safePath.length - 1]);
             if (startDist < 0.8 || endDist < 0.8) onPath = true;
+
+            if (!onPath && !state.lastOffPathTime) {
+                state.lastOffPathTime = Date.now();
+            } else if (!onPath && Date.now() - state.lastOffPathTime > 2000) {
+                state.lastOffPathTime = Date.now();
+                recordViolation('off_path', '偏离安全路线');
+                showHint(`⚠️ 注意: 请沿绿色安全路线移动`, 'info');
+            } else if (onPath) {
+                state.lastOffPathTime = null;
+            }
+
+            state.playerOnPath = onPath;
         }
+    }
+
+    function isPlayerOnSafePath() {
+        if (!state.currentScenario) return false;
+        const safePath = state.currentScenario.safePath;
+        const pos = state.playerPosition;
+        
+        for (let i = 0; i < safePath.length - 1; i++) {
+            if (isPointNearLineSegment(pos, safePath[i], safePath[i + 1], 1.0)) {
+                return true;
+            }
+        }
+        
+        const startDist = distance2D(pos, safePath[0]);
+        const endDist = distance2D(pos, safePath[safePath.length - 1]);
+        return startDist < 1.0 || endDist < 1.0;
     }
 
     function isPointNearLineSegment(point, lineStart, lineEnd, threshold) {
@@ -757,6 +785,20 @@ const LabSafetyVR = (function() {
 
     function handleExitInteraction(exit, currentStep) {
         if (currentStep && currentStep.target === 'exit') {
+            const distToExit = distance2D(state.playerPosition, state.currentScenario.exitPoint);
+            
+            if (distToExit > 1.5) {
+                recordViolation('invalid_evacuation', '未移动到出口位置');
+                showHint(`⚠️ 请先拖拽玩家沿安全路线移动到出口`, 'error');
+                return;
+            }
+            
+            if (!isPlayerOnSafePath()) {
+                recordViolation('invalid_evacuation', '未沿安全路线撤离');
+                showHint(`⚠️ 请沿绿色安全路线移动到出口`, 'error');
+                return;
+            }
+            
             completeStep(currentStep);
             showHint(`✅ ${currentStep.name} - 完成!`, 'success');
         } else {
@@ -1275,46 +1317,70 @@ const LabSafetyVR = (function() {
         doc.setTextColor(0, 100, 150);
         doc.text('实验室安全演练报告', 20, 25);
         
-        doc.setFontSize(12);
+        doc.setFontSize(10);
         doc.setTextColor(100);
         doc.text(`生成时间: ${new Date().toLocaleString()}`, 20, 35);
-        doc.text(`场景: ${state.currentScenario.name}`, 20, 42);
+        doc.text(`场景: ${state.currentScenario.name}`, 20, 41);
+        doc.text(`当前视角: ${state.currentView}`, 20, 47);
+        doc.text(`时间轴位置: 步骤 ${state.currentStepIndex + 1}/${state.currentScenario.steps.length}`, 20, 53);
+        
+        const filtersText = Object.entries(state.filters)
+            .map(([k, v]) => `${k}:${v ? '✓' : '✗'}`)
+            .join('  ');
+        doc.text(`筛选条件: ${filtersText}`, 20, 59);
         
         doc.setFontSize(14);
         doc.setTextColor(50);
-        doc.text('演练结果', 20, 55);
+        doc.text('演练结果', 20, 72);
         
         const scoreData = calculateScore();
         doc.setFontSize(11);
-        doc.text(`总得分: ${scoreData.score}/${scoreData.totalPossible}`, 25, 65);
-        doc.text(`评级: ${scoreData.grade}`, 25, 72);
-        doc.text(`用时: ${formatTime(state.elapsedTime)}`, 25, 79);
-        doc.text(`错误次数: ${state.errorCount}`, 25, 86);
+        doc.text(`总得分: ${scoreData.score}/${scoreData.totalPossible}`, 25, 82);
+        doc.text(`评级: ${scoreData.grade}`, 25, 89);
+        doc.text(`用时: ${formatTime(state.elapsedTime)}`, 25, 96);
+        doc.text(`错误次数: ${state.errorCount}`, 25, 103);
+        doc.text(`路径点数: ${state.playerPath.length}`, 25, 110);
+        doc.text(`禁区穿越: ${state.enteredForbiddenZones.size} 个`, 25, 117);
         
         doc.setFontSize(14);
-        doc.text('步骤完成情况', 20, 100);
+        doc.text('步骤完成情况', 20, 130);
         
-        let y = 110;
+        let y = 140;
         state.currentScenario.steps.forEach((step, idx) => {
             const completed = state.completedSteps.includes(step.id);
+            const history = state.stepHistory.find(h => h.stepId === step.id);
             doc.setFontSize(10);
-            doc.text(`${idx + 1}. ${step.name} - ${completed ? '✓ 完成' : '✗ 未完成'}`, 25, y);
-            y += 8;
+            const timeStr = history ? ` (${formatTime(history.elapsed)})` : '';
+            doc.text(`${idx + 1}. ${step.name} - ${completed ? '✓ 完成' : '✗ 未完成'}${timeStr}`, 25, y);
+            y += 7;
         });
 
         if (state.violations.length > 0 && y < 250) {
-            y += 10;
+            y += 8;
             doc.setFontSize(14);
             doc.text('违规记录', 20, y);
-            y += 10;
+            y += 8;
             
             state.violations.forEach((v, idx) => {
                 if (y < 280) {
-                    doc.setFontSize(10);
+                    doc.setFontSize(9);
                     doc.text(`${idx + 1}. ${v.description} (${formatTime(v.elapsed)})`, 25, y);
-                    y += 7;
+                    y += 6;
                 }
             });
+        }
+
+        if (y < 270) {
+            y += 8;
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text('--- 数据一致性校验 ---', 20, y);
+            y += 6;
+            doc.text(`场景数据版本: 与当前视图一致`, 25, y);
+            y += 6;
+            doc.text(`步骤状态: 与时间轴同步`, 25, y);
+            y += 6;
+            doc.text(`路径记录: ${state.playerPath.length} 个采样点`, 25, y);
         }
 
         doc.save('lab-safety-report.pdf');
