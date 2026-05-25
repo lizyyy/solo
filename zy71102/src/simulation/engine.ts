@@ -20,7 +20,6 @@ export class SimulationEngine {
   private currentTime: number = 0;
   private spawnedBatches: Set<string> = new Set();
   private passengerCounter: number = 0;
-  private replanInterval: number = 2;
 
   constructor(scene: StationScene) {
     this.scene = scene;
@@ -101,40 +100,30 @@ export class SimulationEngine {
     for (const batch of this.scene.passengerBatches) {
       if (!this.spawnedBatches.has(batch.id) && this.currentTime >= batch.startTime) {
         for (let i = 0; i < batch.count; i++) {
-          const offsetX = (Math.random() - 0.5) * 2;
-          const offsetY = (Math.random() - 0.5) * 2;
+          const offsetX = (Math.random() - 0.5) * 3;
+          const offsetY = (Math.random() - 0.5) * 3;
           
           const spawnX = batch.spawnX + offsetX;
           const spawnY = batch.spawnY + offsetY;
           
-          const exit = this.findNearestReachableExit(spawnX, spawnY);
+          const targetExit = this.findBestExit(spawnX, spawnY);
           
-          let path: Point[] = [];
-          if (exit) {
-            path = this.pathFinder.findPath(spawnX, spawnY, exit.x, exit.y);
-          }
-          
-          if (path.length === 0) {
-            const targetExit = this.findNearestExit(spawnX, spawnY);
-            if (targetExit) {
-              path = this.createDirectPath(spawnX, spawnY, targetExit.x, targetExit.y);
-            }
-          }
+          const path = this.calculatePath(spawnX, spawnY, targetExit.x, targetExit.y);
 
           const passenger: Passenger = {
             id: `p-${this.passengerCounter++}`,
             x: spawnX,
             y: spawnY,
-            targetX: exit?.x ?? (this.findNearestExit(spawnX, spawnY)?.x ?? 35),
-            targetY: exit?.y ?? (this.findNearestExit(spawnX, spawnY)?.y ?? 15),
+            targetX: targetExit.x,
+            targetY: targetExit.y,
             status: 'moving',
-            speed: batch.speed * (0.8 + Math.random() * 0.4),
-            path: path.length > 0 ? path : [],
+            speed: batch.speed * (0.85 + Math.random() * 0.3),
+            path,
             pathIndex: 0,
             waitTime: 0,
             spawnTime: this.currentTime,
             exitTime: null,
-            exitId: exit?.id ?? null
+            exitId: targetExit.id
           };
           this.passengers.push(passenger);
         }
@@ -143,9 +132,43 @@ export class SimulationEngine {
     }
   }
 
-  private createDirectPath(startX: number, startY: number, endX: number, endY: number): Point[] {
+  private findBestExit(x: number, y: number): { x: number; y: number; id: string } {
+    const openGates = this.scene.layout.gates.filter(g => g.status === 'open' && g.type !== 'entry');
+    if (openGates.length === 0) {
+      const nearest = this.scene.layout.exits[0];
+      return { x: nearest.x, y: nearest.y, id: nearest.id };
+    }
+
+    let bestGate = openGates[0];
+    let bestScore = Infinity;
+
+    for (const gate of openGates) {
+      const directDist = Math.sqrt((gate.x - x) ** 2 + (gate.y - y) ** 2);
+      const path = this.pathFinder.findPath(x, y, gate.x, gate.y);
+      const pathLength = path.length > 0 ? path.length * 0.5 : directDist;
+      const score = pathLength * (1 / gate.speed);
+      
+      if (score < bestScore) {
+        bestScore = score;
+        bestGate = gate;
+      }
+    }
+
+    const matchingExit = this.scene.layout.exits.find(e => 
+      Math.abs(e.y - bestGate.y) < 3
+    ) || this.scene.layout.exits[0];
+
+    return { x: matchingExit.x, y: matchingExit.y, id: matchingExit.id };
+  }
+
+  private calculatePath(startX: number, startY: number, endX: number, endY: number): Point[] {
+    const aStarPath = this.pathFinder.findPath(startX, startY, endX, endY);
+    if (aStarPath.length > 0) {
+      return aStarPath;
+    }
+
     const path: Point[] = [];
-    const steps = 10;
+    const steps = 15;
     for (let i = 0; i <= steps; i++) {
       path.push({
         x: startX + (endX - startX) * (i / steps),
@@ -155,136 +178,74 @@ export class SimulationEngine {
     return path;
   }
 
-  private findNearestExit(x: number, y: number): { x: number; y: number; id: string } | null {
-    const exits = this.scene.layout.exits;
-    if (exits.length === 0) return null;
-
-    let nearest = exits[0];
-    let minDist = Infinity;
-
-    for (const exit of exits) {
-      const dist = Math.sqrt((exit.x - x) ** 2 + (exit.y - y) ** 2);
-      if (dist < minDist) {
-        minDist = dist;
-        nearest = exit;
-      }
-    }
-
-    return { x: nearest.x, y: nearest.y, id: nearest.id };
-  }
-
-  private findNearestReachableExit(x: number, y: number): { x: number; y: number; id: string } | null {
-    const openGates = this.scene.layout.gates.filter(g => g.status === 'open' && g.type !== 'entry');
-    if (openGates.length === 0) {
-      return this.findNearestExit(x, y);
-    }
-
-    let nearestGate = openGates[0];
-    let minDist = Infinity;
-
-    for (const gate of openGates) {
-      const path = this.pathFinder.findPath(x, y, gate.x, gate.y);
-      if (path.length > 0) {
-        const dist = path.length;
-        if (dist < minDist) {
-          minDist = dist;
-          nearestGate = gate;
-        }
-      }
-    }
-
-    const nearestExit = this.scene.layout.exits.find(e => 
-      Math.abs(e.y - nearestGate.y) < 5
-    ) || this.scene.layout.exits[0];
-
-    return { x: nearestExit.x, y: nearestExit.y, id: nearestExit.id };
-  }
-
   private updatePassengers(deltaTime: number): void {
     const activePassengers = this.passengers.filter(p => p.status !== 'exited');
 
     for (const passenger of activePassengers) {
-      if (Math.abs(passenger.x - passenger.targetX) < 1.5 && 
-          Math.abs(passenger.y - passenger.targetY) < 1.5) {
+      const distToExit = Math.sqrt(
+        (passenger.x - passenger.targetX) ** 2 + 
+        (passenger.y - passenger.targetY) ** 2
+      );
+
+      if (distToExit < 1.0) {
         passenger.status = 'exited';
         passenger.exitTime = this.currentTime;
         continue;
       }
 
-      if (passenger.pathIndex >= passenger.path.length && passenger.path.length > 0) {
-        const exit = this.findNearestReachableExit(passenger.x, passenger.y);
-        if (exit) {
-          const newPath = this.pathFinder.findPath(passenger.x, passenger.y, exit.x, exit.y);
-          if (newPath.length > 0) {
-            passenger.path = newPath;
-            passenger.pathIndex = 0;
-            passenger.targetX = exit.x;
-            passenger.targetY = exit.y;
-          }
-        }
+      if (passenger.pathIndex >= passenger.path.length) {
+        const newPath = this.calculatePath(passenger.x, passenger.y, passenger.targetX, passenger.targetY);
+        passenger.path = newPath;
+        passenger.pathIndex = 0;
       }
 
-      if (passenger.path.length > 0 && passenger.pathIndex < passenger.path.length) {
-        const target = passenger.path[passenger.pathIndex];
-        const dx = target.x - passenger.x;
-        const dy = target.y - passenger.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+      const target = passenger.path[passenger.pathIndex];
+      const dx = target.x - passenger.x;
+      const dy = target.y - passenger.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < 0.3) {
-          passenger.pathIndex++;
-          continue;
-        }
+      if (dist < 0.4) {
+        passenger.pathIndex++;
+        continue;
+      }
 
-        const collision = this.checkCollision(passenger);
+      const collision = this.checkCollision(passenger);
+      
+      if (collision) {
+        passenger.status = 'waiting';
+        passenger.waitTime += deltaTime;
         
-        if (collision) {
-          passenger.status = 'waiting';
-          passenger.waitTime += deltaTime;
-        } else {
-          passenger.status = 'moving';
-          const moveSpeed = passenger.speed * deltaTime;
-          passenger.x += (dx / dist) * moveSpeed;
-          passenger.y += (dy / dist) * moveSpeed;
+        if (Math.random() < 0.3) {
+          const angle = Math.random() * Math.PI * 2;
+          const sidestep = 0.1;
+          passenger.x += Math.cos(angle) * sidestep;
+          passenger.y += Math.sin(angle) * sidestep;
         }
       } else {
-        const dx = passenger.targetX - passenger.x;
-        const dy = passenger.targetY - passenger.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist > 0.1) {
-          const collision = this.checkCollision(passenger);
-          
-          if (collision) {
-            passenger.status = 'waiting';
-            passenger.waitTime += deltaTime;
-          } else {
-            passenger.status = 'moving';
-            const moveSpeed = passenger.speed * deltaTime;
-            passenger.x += (dx / dist) * moveSpeed;
-            passenger.y += (dy / dist) * moveSpeed;
-          }
-        }
+        passenger.status = 'moving';
+        const moveSpeed = passenger.speed * deltaTime;
+        passenger.x += (dx / dist) * moveSpeed;
+        passenger.y += (dy / dist) * moveSpeed;
       }
 
-      if (passenger.waitTime > 30) {
+      if (passenger.waitTime > 45) {
         passenger.status = 'stuck';
-      } else if (passenger.waitTime > 5) {
-        const exit = this.findNearestReachableExit(passenger.x, passenger.y);
-        if (exit) {
-          const newPath = this.pathFinder.findPath(passenger.x, passenger.y, exit.x, exit.y);
-          if (newPath.length > 0) {
-            passenger.path = newPath;
-            passenger.pathIndex = 0;
-            passenger.targetX = exit.x;
-            passenger.targetY = exit.y;
-          }
+      } else if (passenger.waitTime > 8 && Math.random() < 0.05) {
+        const newExit = this.findBestExit(passenger.x, passenger.y);
+        if (newExit.id !== passenger.exitId) {
+          passenger.targetX = newExit.x;
+          passenger.targetY = newExit.y;
+          passenger.exitId = newExit.id;
+          passenger.path = this.calculatePath(passenger.x, passenger.y, newExit.x, newExit.y);
+          passenger.pathIndex = 0;
         }
       }
     }
   }
 
   private checkCollision(passenger: Passenger): boolean {
-    const checkRadius = PASSENGER_RADIUS * 1.8;
+    const checkRadius = PASSENGER_RADIUS * 1.5;
+    let nearbyCount = 0;
     
     for (const other of this.passengers) {
       if (other.id === passenger.id || other.status === 'exited') continue;
@@ -294,13 +255,15 @@ export class SimulationEngine {
       const dist = Math.sqrt(dx * dx + dy * dy);
       
       if (dist < checkRadius) {
-        if (other.status === 'waiting' || other.status === 'stuck') {
-          return true;
-        }
-        if (Math.random() < 0.2) {
+        nearbyCount++;
+        if (other.status === 'stuck') {
           return true;
         }
       }
+    }
+    
+    if (nearbyCount >= 3) {
+      return Math.random() < 0.4;
     }
     
     return false;
@@ -311,10 +274,10 @@ export class SimulationEngine {
 
     for (const stair of this.scene.layout.stairs) {
       const count = this.countPassengersInArea(
-        stair.x - stair.width / 2 - 2,
-        stair.y - stair.height / 2 - 2,
-        stair.width + 4,
-        stair.height + 4
+        stair.x - stair.width / 2 - 1.5,
+        stair.y - stair.height / 2 - 1.5,
+        stair.width + 3,
+        stair.height + 3
       );
 
       if (count >= BOTTLENECK_THRESHOLD.low) {
@@ -340,10 +303,10 @@ export class SimulationEngine {
       if (gate.status === 'closed') continue;
       
       const count = this.countPassengersInArea(
-        gate.x - 3,
-        gate.y - 3,
-        6,
-        6
+        gate.x - 2.5,
+        gate.y - 2.5,
+        5,
+        5
       );
 
       if (count >= BOTTLENECK_THRESHOLD.low) {
@@ -354,7 +317,7 @@ export class SimulationEngine {
           y: gate.y,
           severity: this.getSeverity(count),
           queueLength: count,
-          avgWaitTime: this.getAvgWaitTimeInArea(gate.x - 3, gate.y - 3, 6, 6),
+          avgWaitTime: this.getAvgWaitTimeInArea(gate.x - 2.5, gate.y - 2.5, 5, 5),
           relatedId: gate.id
         });
       }
