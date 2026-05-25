@@ -1,24 +1,34 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { useThree } from '@react-three/fiber';
 import type { InstrumentCart as InstrumentCartType } from '../../types';
+import * as THREE from 'three';
 
 interface InstrumentCartProps {
   data: InstrumentCartType;
   isSelected: boolean;
   isHovered: boolean;
+  onClick?: () => void;
 }
 
 export const InstrumentCart: React.FC<InstrumentCartProps> = ({
   data,
   isSelected,
   isHovered,
+  onClick,
 }) => {
   const { width, depth, height } = data;
+  const groupRef = useRef<THREE.Group>(null);
 
   const color = isSelected ? '#4096ff' : isHovered ? '#69b1ff' : '#d9d9d9';
   const shelfColor = '#f0f0f0';
 
+  const handleClick = (e: any) => {
+    e.stopPropagation();
+    if (onClick) onClick();
+  };
+
   return (
-    <group>
+    <group ref={groupRef} onClick={handleClick}>
       <mesh position={[0, height / 2, 0]} castShadow>
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial color={color} />

@@ -1,14 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { OrbitControls, PerspectiveCamera, TransformControls } from '@react-three/drei';
-import { useThree, useFrame } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
 import { useAppStore } from '../../store/useAppStore';
 import { OperatingRoom } from './OperatingRoom';
-import { InstrumentCart } from './InstrumentCart';
-import { SterileZone } from './SterileZone';
-import { RecycleBin } from './RecycleBin';
-import { Staff } from './Staff';
-import { PathLine } from './PathLine';
-import { ErrorMarker } from './ErrorMarker';
 import type { SceneElement } from '../../types';
 import * as THREE from 'three';
 
@@ -53,50 +47,23 @@ const CameraController: React.FC<CameraControllerProps> = ({ view, roomSize }) =
   return <OrbitControls ref={controlsRef} makeDefault enableDamping dampingFactor={0.05} />;
 };
 
-interface TransformableElementProps {
+interface DraggableElementProps {
   element: SceneElement;
   isSelected: boolean;
-  onTransformEnd: () => void;
+  onSelect: () => void;
+  onDragEnd: (position: { x: number; y: number; z: number }) => void;
 }
 
-const TransformableElement: React.FC<TransformableElementProps> = ({
+const DraggableInstrumentCart: React.FC<DraggableElementProps> = ({
   element,
   isSelected,
-  onTransformEnd,
+  onSelect,
+  onDragEnd,
 }) => {
-  const transformRef = useRef<any>(null);
   const groupRef = useRef<THREE.Group>(null);
-  const { updateElement } = useAppStore();
-
-  useEffect(() => {
-    if (transformRef.current && groupRef.current) {
-      const controls = transformRef.current;
-      const object = groupRef.current;
-
-      const onChange = () => {
-        updateElement(element.id, {
-          position: {
-            x: object.position.x,
-            y: object.position.y,
-            z: object.position.z,
-          },
-          rotation: {
-            x: object.rotation.x,
-            y: object.rotation.y,
-            z: object.rotation.z,
-          },
-          scale: {
-            x: object.scale.x,
-            y: object.scale.y,
-            z: object.scale.z,
-          },
-        });
-      };
-
-      controls.addEventListener('objectChange', onChange);
-      return () => controls.removeEventListener('objectChange', onChange);
-    }
-  }, [element.id, updateElement]);
+  const transformRef = useRef<any>(null);
+  const data = element as any;
+  const { width, depth, height } = data;
 
   useEffect(() => {
     if (groupRef.current) {
@@ -105,66 +72,213 @@ const TransformableElement: React.FC<TransformableElementProps> = ({
         element.position.y,
         element.position.z
       );
-      groupRef.current.rotation.set(
-        element.rotation.x,
-        element.rotation.y,
-        element.rotation.z
-      );
-      groupRef.current.scale.set(
-        element.scale.x,
-        element.scale.y,
-        element.scale.z
-      );
     }
-  }, [element.position, element.rotation, element.scale]);
+  }, [element.position]);
 
-  const renderElement = () => {
-    switch (element.type) {
-      case 'instrumentCart':
-        return (
-          <InstrumentCart
-            data={element}
-            isSelected={isSelected}
-            isHovered={false}
-          />
-        );
-      case 'sterileZone':
-        return (
-          <SterileZone
-            data={element}
-            isSelected={isSelected}
-            isHovered={false}
-          />
-        );
-      case 'recycleBin':
-        return (
-          <RecycleBin
-            data={element}
-            isSelected={isSelected}
-            isHovered={false}
-          />
-        );
-      default:
-        return null;
+  const color = isSelected ? '#4096ff' : '#d9d9d9';
+
+  const handleClick = (e: any) => {
+    e.stopPropagation();
+    onSelect();
+  };
+
+  const handleTransformChange = () => {
+    if (groupRef.current) {
+      onDragEnd({
+        x: groupRef.current.position.x,
+        y: groupRef.current.position.y,
+        z: groupRef.current.position.z,
+      });
     }
   };
 
   if (!element.visible) return null;
 
   return (
-    <>
-      <group ref={groupRef}>{renderElement()}</group>
+    <group>
+      <group ref={groupRef} onClick={handleClick}>
+        <mesh position={[0, height / 2, 0]} castShadow>
+          <boxGeometry args={[width, height, depth]} />
+          <meshStandardMaterial color={color} />
+        </mesh>
+        <mesh position={[0, height * 0.3, 0]} castShadow>
+          <boxGeometry args={[width - 0.05, 0.05, depth - 0.05]} />
+          <meshStandardMaterial color="#f0f0f0" />
+        </mesh>
+        <mesh position={[0, height * 0.6, 0]} castShadow>
+          <boxGeometry args={[width - 0.05, 0.05, depth - 0.05]} />
+          <meshStandardMaterial color="#f0f0f0" />
+        </mesh>
+        {[-1, 1].map((x) =>
+          [-1, 1].map((z) => (
+            <mesh
+              key={`wheel-${x}-${z}`}
+              position={[(x * width) / 2 - 0.08, 0.08, (z * depth) / 2 - 0.08] as [number, number, number]}
+              castShadow
+            >
+              <cylinderGeometry args={[0.06, 0.06, 0.16, 16]} />
+              <meshStandardMaterial color="#333333" />
+            </mesh>
+          ))
+        )}
+      </group>
       {isSelected && groupRef.current && (
         <TransformControls
           ref={transformRef}
           object={groupRef.current}
           mode="translate"
-          onMouseUp={onTransformEnd}
+          onMouseUp={handleTransformChange}
         />
       )}
-    </>
+    </group>
   );
 };
+
+const DraggableSterileZone: React.FC<DraggableElementProps> = ({
+  element,
+  isSelected,
+  onSelect,
+  onDragEnd,
+}) => {
+  const groupRef = useRef<THREE.Group>(null);
+  const transformRef = useRef<any>(null);
+  const data = element as any;
+  const { width, depth, color } = data;
+
+  useEffect(() => {
+    if (groupRef.current) {
+      groupRef.current.position.set(
+        element.position.x,
+        element.position.y,
+        element.position.z
+      );
+    }
+  }, [element.position]);
+
+  const borderColor = isSelected ? '#165DFF' : color;
+
+  const handleClick = (e: any) => {
+    e.stopPropagation();
+    onSelect();
+  };
+
+  const handleTransformChange = () => {
+    if (groupRef.current) {
+      onDragEnd({
+        x: groupRef.current.position.x,
+        y: groupRef.current.position.y,
+        z: groupRef.current.position.z,
+      });
+    }
+  };
+
+  if (!element.visible) return null;
+
+  return (
+    <group>
+      <group ref={groupRef} onClick={handleClick}>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+          <planeGeometry args={[width, depth]} />
+          <meshStandardMaterial
+            color={color}
+            transparent
+            opacity={0.25}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
+          <ringGeometry args={[Math.min(width, depth) / 2 - 0.1, Math.min(width, depth) / 2, 64]} />
+          <meshBasicMaterial color={borderColor} transparent opacity={0.8} side={THREE.DoubleSide} />
+        </mesh>
+        {[-1, 1].map((x) =>
+          [-1, 1].map((z) => (
+            <mesh key={`corner-${x}-${z}`} position={[(x * width) / 2, 0.05, (z * depth) / 2] as [number, number, number]}>
+              <sphereGeometry args={[0.08, 16, 16]} />
+              <meshBasicMaterial color={borderColor} />
+            </mesh>
+          ))
+        )}
+      </group>
+      {isSelected && groupRef.current && (
+        <TransformControls
+          ref={transformRef}
+          object={groupRef.current}
+          mode="translate"
+          onMouseUp={handleTransformChange}
+        />
+      )}
+    </group>
+  );
+};
+
+const DraggableRecycleBin: React.FC<DraggableElementProps> = ({
+  element,
+  isSelected,
+  onSelect,
+  onDragEnd,
+}) => {
+  const groupRef = useRef<THREE.Group>(null);
+  const transformRef = useRef<any>(null);
+  const data = element as any;
+  const { radius } = data;
+  const height = 0.8;
+
+  useEffect(() => {
+    if (groupRef.current) {
+      groupRef.current.position.set(
+        element.position.x,
+        element.position.y,
+        element.position.z
+      );
+    }
+  }, [element.position]);
+
+  const bodyColor = isSelected ? '#ff7875' : '#ff4d4f';
+
+  const handleClick = (e: any) => {
+    e.stopPropagation();
+    onSelect();
+  };
+
+  const handleTransformChange = () => {
+    if (groupRef.current) {
+      onDragEnd({
+        x: groupRef.current.position.x,
+        y: groupRef.current.position.y,
+        z: groupRef.current.position.z,
+      });
+    }
+  };
+
+  if (!element.visible) return null;
+
+  return (
+    <group>
+      <group ref={groupRef} onClick={handleClick}>
+        <mesh position={[0, height / 2, 0]} castShadow>
+          <cylinderGeometry args={[radius, radius * 0.9, height, 32]} />
+          <meshStandardMaterial color={bodyColor} />
+        </mesh>
+        <mesh position={[0, height + 0.02, 0]}>
+          <torusGeometry args={[radius, 0.04, 16, 32]} />
+          <meshStandardMaterial color="#1a1a1a" />
+        </mesh>
+      </group>
+      {isSelected && groupRef.current && (
+        <TransformControls
+          ref={transformRef}
+          object={groupRef.current}
+          mode="translate"
+          onMouseUp={handleTransformChange}
+        />
+      )}
+    </group>
+  );
+};
+
+import { Staff } from './Staff';
+import { PathLine } from './PathLine';
+import { ErrorMarker } from './ErrorMarker';
 
 export const Scene: React.FC = () => {
   const {
@@ -190,12 +304,13 @@ export const Scene: React.FC = () => {
         const delta = (now - lastTime) / 1000;
         lastTime = now;
 
-        setCurrentTime(currentTime + delta);
-        if (currentTime + delta >= totalDuration) {
+        const newTime = currentTime + delta;
+        if (newTime >= totalDuration) {
           setPlayState(false);
           setCurrentTime(0);
           return;
         }
+        setCurrentTime(newTime);
         animationRef.current = requestAnimationFrame(animate);
       };
       animationRef.current = requestAnimationFrame(animate);
@@ -212,10 +327,16 @@ export const Scene: React.FC = () => {
     };
   }, [isPlaying, currentTime, totalDuration, setCurrentTime, setPlayState]);
 
-  const handleCanvasClick = (e: any) => {
-    if (e.target === e.currentTarget) {
-      setSelectedElement(null);
-    }
+  const handleCanvasClick = () => {
+    setSelectedElement(null);
+  };
+
+  const handleElementSelect = (id: string) => {
+    setSelectedElement(id);
+  };
+
+  const handleTransformChange = (id: string, position: { x: number; y: number; z: number }) => {
+    updateElement(id, { position });
   };
 
   const shouldShowElement = (element: SceneElement): boolean => {
@@ -238,8 +359,25 @@ export const Scene: React.FC = () => {
     return sceneData.errors.some((e) => e.elementIds.includes(staffId));
   };
 
-  const getElementById = (id: string): SceneElement | undefined => {
-    return sceneData.elements.find((e) => e.id === id);
+  const renderDraggableElement = (element: SceneElement) => {
+    const isSelected = selectedElementId === element.id;
+    const props = {
+      element,
+      isSelected,
+      onSelect: () => handleElementSelect(element.id),
+      onDragEnd: (pos: { x: number; y: number; z: number }) => handleTransformChange(element.id, pos),
+    };
+
+    switch (element.type) {
+      case 'instrumentCart':
+        return <DraggableInstrumentCart key={element.id} {...props} />;
+      case 'sterileZone':
+        return <DraggableSterileZone key={element.id} {...props} />;
+      case 'recycleBin':
+        return <DraggableRecycleBin key={element.id} {...props} />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -266,14 +404,7 @@ export const Scene: React.FC = () => {
         {sceneData.elements
           .filter((el) => el.type !== 'staff')
           .filter(shouldShowElement)
-          .map((element) => (
-            <TransformableElement
-              key={element.id}
-              element={element}
-              isSelected={selectedElementId === element.id}
-              onTransformEnd={() => {}}
-            />
-          ))}
+          .map(renderDraggableElement)}
 
         {sceneData.elements
           .filter((el) => el.type === 'staff')
