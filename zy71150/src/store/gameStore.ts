@@ -144,7 +144,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!gameState) return;
 
     const patient = gameState.patients.find(p => p.id === patientId);
-    if (!patient || patient.status !== 'waiting') return;
+    if (!patient || (patient.status !== 'waiting' && patient.status !== 'reassess')) return;
 
     const isCorrect = esiLevel === patient.currentEsi;
     const scoreChange = isCorrect 
@@ -196,7 +196,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const room = gameState.rooms.find(r => r.id === roomId);
     
     if (!patient || !room) return;
-    if (patient.status !== 'waiting' || room.status !== 'idle') return;
+    if ((patient.status !== 'waiting' && patient.status !== 'reassess') || room.status !== 'idle') return;
     if (!room.canHandleEsi.includes(patient.currentEsi)) return;
 
     let scoreBonus = 0;
@@ -340,6 +340,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const triggeredEvent = updatedEvents.find(e => e.triggered && !patient.reassessEvents.find(pe => pe.triggered && pe.triggerTime === e.triggerTime));
       
       if (triggeredEvent) {
+        newState.score += scoringRules.reassessSuccess;
         return {
           ...patient,
           symptoms: [...patient.symptoms, ...triggeredEvent.newSymptoms],
@@ -347,6 +348,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           currentEsi: triggeredEvent.newCorrectEsi,
           correctEsi: triggeredEvent.newCorrectEsi,
           status: 'reassess' as const,
+          triageDecision: undefined,
           reassessEvents: updatedEvents
         };
       }

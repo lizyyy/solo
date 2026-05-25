@@ -18,7 +18,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, patient }) => {
   );
 
   const canAssign = selectedPatient && 
-    selectedPatient.status === 'waiting' && 
+    (selectedPatient.status === 'waiting' || selectedPatient.status === 'reassess') && 
     room.status === 'idle' &&
     room.canHandleEsi.includes(selectedPatient.currentEsi);
 

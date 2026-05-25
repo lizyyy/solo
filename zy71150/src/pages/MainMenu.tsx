@@ -324,6 +324,19 @@ export const MainMenu: React.FC = () => {
                             </div>
                           </div>
                         )}
+
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/replay/${record.id}`);
+                          }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                          <Play size={14} />
+                          回放
+                        </motion.button>
                       </div>
                     </motion.div>
                   ))}

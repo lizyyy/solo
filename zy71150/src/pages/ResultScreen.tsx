@@ -236,6 +236,14 @@ export const ResultScreen: React.FC = () => {
             <Home size={20} />
             返回主菜单
           </button>
+
+          <button
+            onClick={() => navigate(`/replay/${gameId}`)}
+            className="flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-lg font-medium hover:bg-purple-600 transition-colors"
+          >
+            <Play size={20} />
+            查看回放
+          </button>
           
           <button
             onClick={() => navigate(`/game/${record.levelId}`)}
