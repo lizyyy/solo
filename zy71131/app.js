@@ -5,41 +5,16 @@ const LabSafetyVR = (function() {
     let pathLines = [];
     let forbiddenZones = [];
     let playerMarker;
-
-    const state = {
-        currentStepIndex: 0,
-        isPlaying: false,
-        isPaused: false,
-        startTime: null,
-        elapsedTime: 0,
-        timerInterval: null,
-        score: 0,
-        errorCount: 0,
-        violations: [],
-        completedSteps: [],
-        stepHistory: [],
-        playerPosition: { x: 0, z: 0 },
-        filters: {
-            hazards: true,
-            equipment: true,
-            path: true,
-            forbidden: true
-        },
-        currentView: 'overview',
-        sceneObjects: {
-            hazards: [],
-            equipment: [],
-            path: [],
-            forbidden: []
-        }
-    };
+    let isDraggingPlayer = false;
+    let dragPlane;
+    let playerTrail = [];
 
     const sampleScenario = {
         name: "化学实验室泄漏应急处置演练",
         description: "模拟实验室化学品泄漏场景，练习正确的应急处置顺序",
         steps: [
             { id: 1, name: "发现泄漏，保持冷静", target: "leak_area", type: "identify", points: 10, hint: "仔细观察实验室，发现化学品泄漏位置" },
-            { id: 2, name: "切断电源开关", target: "e1", type: "action", points: 15, hint: "优先切断电源，防止电气火花引发爆炸 - 这是关键的第一步！" },
+            { id: 2, name: "切断电源开关", target: "e1", type: "action", points: 15, hint: "优先切断电源，防止电气火花引发爆炸 - 这是最关键的一步！" },
             { id: 3, name: "关闭通风设备", target: "e2", type: "action", points: 10, hint: "关闭通风防止有害气体扩散" },
             { id: 4, name: "穿戴防护装备", target: "ppe_area", type: "action", points: 15, hint: "在处理泄漏前必须穿戴适当防护装备" },
             { id: 5, name: "使用吸收棉处理泄漏", target: "leak_area", type: "action", points: 20, hint: "使用专用吸收材料处理泄漏物" },
@@ -71,10 +46,43 @@ const LabSafetyVR = (function() {
         startPoint: { x: 0, z: 0 }
     };
 
+    const state = {
+        currentScenario: null,
+        currentStepIndex: 0,
+        isPlaying: false,
+        isPaused: false,
+        startTime: null,
+        elapsedTime: 0,
+        timerInterval: null,
+        score: 0,
+        errorCount: 0,
+        violations: [],
+        completedSteps: [],
+        stepHistory: [],
+        playerPosition: { x: 0, z: 0 },
+        playerPath: [],
+        enteredForbiddenZones: new Set(),
+        filters: {
+            hazards: true,
+            equipment: true,
+            path: true,
+            forbidden: true
+        },
+        currentView: 'overview',
+        sceneObjects: {
+            hazards: [],
+            equipment: [],
+            path: [],
+            forbidden: []
+        }
+    };
+
     function init() {
+        state.currentScenario = JSON.parse(JSON.stringify(sampleScenario));
         initScene();
         initControls();
-        loadScenario(sampleScenario);
+        initDragControls();
+        loadScenario(state.currentScenario);
         setupEventListeners();
         updateUI();
         animate();
@@ -114,6 +122,8 @@ const LabSafetyVR = (function() {
         raycaster = new THREE.Raycaster();
         mouse = new THREE.Vector2();
 
+        dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.6);
+
         createLabFloor();
         createLabWalls();
     }
@@ -128,6 +138,7 @@ const LabSafetyVR = (function() {
         const floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.rotation.x = -Math.PI / 2;
         floor.receiveShadow = true;
+        floor.name = 'floor';
         scene.add(floor);
 
         const gridHelper = new THREE.GridHelper(12, 12, 0x1a2744, 0x1a2744);
@@ -197,9 +208,153 @@ const LabSafetyVR = (function() {
         controls.maxPolarAngle = Math.PI / 2.1;
     }
 
+    function initDragControls() {
+        renderer.domElement.addEventListener('mousedown', onDragStart);
+        renderer.domElement.addEventListener('mousemove', onDragMove);
+        renderer.domElement.addEventListener('mouseup', onDragEnd);
+        renderer.domElement.addEventListener('mouseleave', onDragEnd);
+    }
+
+    function onDragStart(event) {
+        if (event.button !== 0) return;
+        
+        const container = document.getElementById('scene3d');
+        const rect = container.getBoundingClientRect();
+        
+        mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        
+        if (playerMarker) {
+            const intersects = raycaster.intersectObject(playerMarker);
+            if (intersects.length > 0) {
+                isDraggingPlayer = true;
+                controls.enabled = false;
+                return;
+            }
+        }
+    }
+
+    function onDragMove(event) {
+        if (!isDraggingPlayer || !playerMarker) return;
+
+        const container = document.getElementById('scene3d');
+        const rect = container.getBoundingClientRect();
+        
+        mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        
+        const intersectPoint = new THREE.Vector3();
+        raycaster.ray.intersectPlane(dragPlane, intersectPoint);
+        
+        if (intersectPoint) {
+            const newX = Math.max(-5.5, Math.min(5.5, intersectPoint.x));
+            const newZ = Math.max(-5.5, Math.min(5.5, intersectPoint.z));
+            
+            playerMarker.position.x = newX;
+            playerMarker.position.z = newZ;
+            
+            const oldPos = { ...state.playerPosition };
+            state.playerPosition = { x: newX, z: newZ };
+            
+            if (Math.abs(oldPos.x - newX) > 0.01 || Math.abs(oldPos.z - newZ) > 0.01) {
+                checkPlayerMovement(oldPos, { x: newX, z: newZ });
+                addPlayerTrailPoint(newX, newZ);
+            }
+        }
+    }
+
+    function onDragEnd(event) {
+        if (isDraggingPlayer) {
+            isDraggingPlayer = false;
+            controls.enabled = true;
+        }
+    }
+
+    function checkPlayerMovement(fromPos, toPos) {
+        if (!state.isPlaying) {
+            startTimer();
+            state.isPlaying = true;
+        }
+
+        forbiddenZones.forEach(zone => {
+            const dx = toPos.x - zone.x;
+            const dz = toPos.z - zone.z;
+            const distance = Math.sqrt(dx * dx + dz * dz);
+            
+            if (distance < zone.radius && !state.enteredForbiddenZones.has(zone.name)) {
+                state.enteredForbiddenZones.add(zone.name);
+                recordViolation('forbidden_zone', `穿越禁区: ${zone.name}`);
+                showHint(`🚫 警告: 进入禁区 ${zone.name}`, 'error');
+            }
+        });
+
+        if (state.currentScenario) {
+            const safePath = state.currentScenario.safePath;
+            let onPath = false;
+            
+            for (let i = 0; i < safePath.length - 1; i++) {
+                if (isPointNearLineSegment(toPos, safePath[i], safePath[i + 1], 0.8)) {
+                    onPath = true;
+                    break;
+                }
+            }
+            
+            const startDist = distance2D(toPos, safePath[0]);
+            const endDist = distance2D(toPos, safePath[safePath.length - 1]);
+            if (startDist < 0.8 || endDist < 0.8) onPath = true;
+        }
+    }
+
+    function isPointNearLineSegment(point, lineStart, lineEnd, threshold) {
+        const lineLen = distance2D(lineStart, lineEnd);
+        if (lineLen === 0) return distance2D(point, lineStart) < threshold;
+
+        const t = Math.max(0, Math.min(1, 
+            ((point.x - lineStart.x) * (lineEnd.x - lineStart.x) + 
+             (point.z - lineStart.z) * (lineEnd.z - lineStart.z)) / (lineLen * lineLen)
+        ));
+
+        const projection = {
+            x: lineStart.x + t * (lineEnd.x - lineStart.x),
+            z: lineStart.z + t * (lineEnd.z - lineStart.z)
+        };
+
+        return distance2D(point, projection) < threshold;
+    }
+
+    function distance2D(p1, p2) {
+        const dx = p1.x - p2.x;
+        const dz = p1.z - p2.z;
+        return Math.sqrt(dx * dx + dz * dz);
+    }
+
+    function addPlayerTrailPoint(x, z) {
+        state.playerPath.push({
+            x, z,
+            timestamp: Date.now(),
+            elapsed: state.elapsedTime
+        });
+
+        const trailGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+        const trailMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x00d4ff,
+            transparent: true,
+            opacity: 0.6
+        });
+        const trail = new THREE.Mesh(trailGeometry, trailMaterial);
+        trail.position.set(x, 0.1, z);
+        scene.add(trail);
+        playerTrail.push(trail);
+    }
+
     function loadScenario(scenario) {
         clearScenarioObjects();
         
+        state.currentScenario = JSON.parse(JSON.stringify(scenario));
         state.currentStepIndex = 0;
         state.score = 0;
         state.errorCount = 0;
@@ -209,18 +364,20 @@ const LabSafetyVR = (function() {
         state.elapsedTime = 0;
         state.isPlaying = false;
         state.isPaused = false;
+        state.playerPath = [];
+        state.enteredForbiddenZones = new Set();
         
-        scenario.hazards.forEach(hazard => createHazard(hazard));
-        scenario.equipment.forEach(equip => createEquipment(equip));
-        createSafePath(scenario.safePath);
-        scenario.forbiddenZones.forEach(zone => createForbiddenZone(zone));
-        createPlayerMarker(scenario.startPoint);
+        state.currentScenario.hazards.forEach(hazard => createHazard(hazard));
+        state.currentScenario.equipment.forEach(equip => createEquipment(equip));
+        createSafePath(state.currentScenario.safePath);
+        state.currentScenario.forbiddenZones.forEach(zone => createForbiddenZone(zone));
+        createPlayerMarker(state.currentScenario.startPoint);
         createFurniture();
         
-        updateStepsList(scenario.steps);
-        updateHazardsList(scenario.hazards);
-        updateEquipmentList(scenario.equipment);
-        updateTimelineMarkers(scenario.steps);
+        updateStepsList(state.currentScenario.steps);
+        updateHazardsList(state.currentScenario.hazards);
+        updateEquipmentList(state.currentScenario.equipment);
+        updateTimelineMarkers(state.currentScenario.steps);
         resetTimer();
         updateUI();
     }
@@ -234,13 +391,20 @@ const LabSafetyVR = (function() {
         pathLines.forEach(line => scene.remove(line));
         pathLines = [];
         
-        forbiddenZones.forEach(zone => scene.remove(zone.mesh));
+        forbiddenZones.forEach(zone => {
+            scene.remove(zone.mesh);
+            scene.remove(zone.border);
+            scene.remove(zone.sign);
+        });
         forbiddenZones = [];
         
         if (playerMarker) {
             scene.remove(playerMarker);
             playerMarker = null;
         }
+
+        playerTrail.forEach(trail => scene.remove(trail));
+        playerTrail = [];
         
         state.sceneObjects = {
             hazards: [],
@@ -522,6 +686,8 @@ const LabSafetyVR = (function() {
     }
 
     function onMouseClick(event) {
+        if (isDraggingPlayer) return;
+
         const container = document.getElementById('scene3d');
         const rect = container.getBoundingClientRect();
         
@@ -544,6 +710,8 @@ const LabSafetyVR = (function() {
     }
 
     function onMouseMove(event) {
+        if (isDraggingPlayer) return;
+
         const container = document.getElementById('scene3d');
         const rect = container.getBoundingClientRect();
         
@@ -564,7 +732,7 @@ const LabSafetyVR = (function() {
             state.isPlaying = true;
         }
 
-        const currentStep = sampleScenario.steps[state.currentStepIndex];
+        const currentStep = state.currentScenario.steps[state.currentStepIndex];
         
         if (obj.type === 'equipment') {
             handleEquipmentInteraction(obj, currentStep);
@@ -643,14 +811,14 @@ const LabSafetyVR = (function() {
             correct: true
         });
 
-        if (state.currentStepIndex < sampleScenario.steps.length - 1) {
+        if (state.currentStepIndex < state.currentScenario.steps.length - 1) {
             state.currentStepIndex++;
         } else {
             finishScenario();
         }
 
         updateUI();
-        updateStepsList(sampleScenario.steps);
+        updateStepsList(state.currentScenario.steps);
         updateTimeline();
     }
 
@@ -661,7 +829,8 @@ const LabSafetyVR = (function() {
             type: type,
             description: description,
             timestamp: Date.now(),
-            elapsed: state.elapsedTime
+            elapsed: state.elapsedTime,
+            playerPosition: { ...state.playerPosition }
         });
 
         const violationsList = document.getElementById('violationsList');
@@ -817,7 +986,7 @@ const LabSafetyVR = (function() {
 
         document.querySelectorAll('.timeline-marker').forEach((marker, index) => {
             marker.classList.remove('completed', 'error');
-            if (state.completedSteps.includes(sampleScenario.steps[index].id)) {
+            if (state.completedSteps.includes(state.currentScenario.steps[index].id)) {
                 marker.classList.add('completed');
             }
         });
@@ -825,8 +994,8 @@ const LabSafetyVR = (function() {
 
     function updateUI() {
         document.getElementById('currentStep').textContent = 
-            state.currentStepIndex < sampleScenario.steps.length 
-                ? sampleScenario.steps[state.currentStepIndex].name 
+            state.currentStepIndex < state.currentScenario.steps.length 
+                ? state.currentScenario.steps[state.currentStepIndex].name 
                 : '已完成';
         document.getElementById('elapsedTime').textContent = formatTime(state.elapsedTime);
         document.getElementById('errorCount').textContent = state.errorCount;
@@ -903,7 +1072,7 @@ const LabSafetyVR = (function() {
         }
         state.isPaused = false;
         
-        const currentStep = sampleScenario.steps[state.currentStepIndex];
+        const currentStep = state.currentScenario.steps[state.currentStepIndex];
         if (currentStep) {
             showHint(`💡 ${currentStep.hint}`, 'info');
         }
@@ -918,29 +1087,42 @@ const LabSafetyVR = (function() {
         if (state.currentStepIndex > 0) {
             state.currentStepIndex--;
             updateUI();
-            updateStepsList(sampleScenario.steps);
+            updateStepsList(state.currentScenario.steps);
             updateTimeline();
+            showHint(`⏮️ 回退到步骤 ${state.currentStepIndex + 1}`, 'info');
         }
     }
 
     function nextStep() {
-        if (state.currentStepIndex < sampleScenario.steps.length - 1) {
+        const maxAccessibleStep = state.completedSteps.length;
+        if (state.currentStepIndex < maxAccessibleStep && state.currentStepIndex < state.currentScenario.steps.length - 1) {
             state.currentStepIndex++;
             updateUI();
-            updateStepsList(sampleScenario.steps);
+            updateStepsList(state.currentScenario.steps);
             updateTimeline();
+            showHint(`⏭️ 前进到步骤 ${state.currentStepIndex + 1}`, 'info');
+        } else if (state.currentStepIndex >= maxAccessibleStep) {
+            showHint(`⚠️ 必须先完成当前步骤才能前进`, 'error');
         }
     }
 
     function onTimelineChange(e) {
-        state.currentStepIndex = parseInt(e.target.value);
-        updateUI();
-        updateStepsList(sampleScenario.steps);
-        updateTimeline();
+        const targetStep = parseInt(e.target.value);
+        const maxAccessibleStep = state.completedSteps.length;
+        
+        if (targetStep <= maxAccessibleStep) {
+            state.currentStepIndex = targetStep;
+            updateUI();
+            updateStepsList(state.currentScenario.steps);
+            updateTimeline();
+        } else {
+            e.target.value = state.currentStepIndex;
+            showHint(`⚠️ 只能跳转到已完成的步骤`, 'error');
+        }
     }
 
     function resetScenario() {
-        loadScenario(sampleScenario);
+        loadScenario(state.currentScenario);
         showHint('🔄 场景已重置', 'success');
     }
 
@@ -977,8 +1159,8 @@ const LabSafetyVR = (function() {
     }
 
     function calculateScore() {
-        const totalPossible = sampleScenario.steps.reduce((sum, s) => sum + s.points, 0);
-        const percentage = Math.round((state.score / totalPossible) * 100);
+        const totalPossible = state.currentScenario.steps.reduce((sum, s) => sum + s.points, 0);
+        const percentage = totalPossible > 0 ? Math.round((state.score / totalPossible) * 100) : 0;
         
         let grade = 'A';
         if (percentage < 60) grade = 'D';
@@ -1027,7 +1209,7 @@ const LabSafetyVR = (function() {
             <div class="report-section">
                 <h3>📋 步骤详情</h3>
                 <div class="report-steps">
-                    ${sampleScenario.steps.map((step, idx) => {
+                    ${state.currentScenario.steps.map((step, idx) => {
                         const completed = state.completedSteps.includes(step.id);
                         const history = state.stepHistory.find(h => h.stepId === step.id);
                         return `
@@ -1072,10 +1254,12 @@ const LabSafetyVR = (function() {
             <div class="report-section">
                 <h3>📝 元数据</h3>
                 <div style="font-size: 12px; color: #888;">
-                    <p>场景名称: ${sampleScenario.name}</p>
+                    <p>场景名称: ${state.currentScenario.name}</p>
                     <p>演练时间: ${new Date().toLocaleString()}</p>
                     <p>当前视角: ${state.currentView}</p>
-                    <p>时间轴位置: 步骤 ${state.currentStepIndex + 1}/${sampleScenario.steps.length}</p>
+                    <p>时间轴位置: 步骤 ${state.currentStepIndex + 1}/${state.currentScenario.steps.length}</p>
+                    <p>移动路径点: ${state.playerPath.length} 个</p>
+                    <p>禁区穿越: ${state.enteredForbiddenZones.size} 个</p>
                 </div>
             </div>
         `;
@@ -1094,7 +1278,7 @@ const LabSafetyVR = (function() {
         doc.setFontSize(12);
         doc.setTextColor(100);
         doc.text(`生成时间: ${new Date().toLocaleString()}`, 20, 35);
-        doc.text(`场景: ${sampleScenario.name}`, 20, 42);
+        doc.text(`场景: ${state.currentScenario.name}`, 20, 42);
         
         doc.setFontSize(14);
         doc.setTextColor(50);
@@ -1111,12 +1295,27 @@ const LabSafetyVR = (function() {
         doc.text('步骤完成情况', 20, 100);
         
         let y = 110;
-        sampleScenario.steps.forEach((step, idx) => {
+        state.currentScenario.steps.forEach((step, idx) => {
             const completed = state.completedSteps.includes(step.id);
             doc.setFontSize(10);
             doc.text(`${idx + 1}. ${step.name} - ${completed ? '✓ 完成' : '✗ 未完成'}`, 25, y);
             y += 8;
         });
+
+        if (state.violations.length > 0 && y < 250) {
+            y += 10;
+            doc.setFontSize(14);
+            doc.text('违规记录', 20, y);
+            y += 10;
+            
+            state.violations.forEach((v, idx) => {
+                if (y < 280) {
+                    doc.setFontSize(10);
+                    doc.text(`${idx + 1}. ${v.description} (${formatTime(v.elapsed)})`, 25, y);
+                    y += 7;
+                }
+            });
+        }
 
         doc.save('lab-safety-report.pdf');
         showHint('✅ PDF报告已下载', 'success');
@@ -1124,7 +1323,8 @@ const LabSafetyVR = (function() {
 
     function downloadJSONReport() {
         const reportData = {
-            scenario: sampleScenario.name,
+            scenario: state.currentScenario.name,
+            scenarioData: state.currentScenario,
             generatedAt: new Date().toISOString(),
             score: calculateScore(),
             elapsedTime: state.elapsedTime,
@@ -1132,6 +1332,8 @@ const LabSafetyVR = (function() {
             completedSteps: state.completedSteps,
             violations: state.violations,
             stepHistory: state.stepHistory,
+            playerPath: state.playerPath,
+            enteredForbiddenZones: Array.from(state.enteredForbiddenZones),
             metadata: {
                 currentView: state.currentView,
                 timelinePosition: state.currentStepIndex,
