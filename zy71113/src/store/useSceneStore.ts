@@ -1,5 +1,8 @@
 import { create } from 'zustand'
-import type { SceneStore, SceneState } from '../types'
+import type { SceneStore, SceneState, SceneData, Conflict } from '../types'
+import { detectConflicts } from '../utils/conflictDetector'
+
+const STORAGE_KEY = 'traffic-intersection-data'
 
 const initialState: SceneState = {
   currentTime: 0,
@@ -18,7 +21,35 @@ const initialState: SceneState = {
   selectedElement: null,
 }
 
-const useSceneStore = create<SceneStore>((set) => ({
+export const saveDataToStorage = (data: SceneData) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+  } catch (e) {
+    console.error('Failed to save data to localStorage:', e)
+  }
+}
+
+export const loadDataFromStorage = (): SceneData | null => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      return JSON.parse(stored) as SceneData
+    }
+  } catch (e) {
+    console.error('Failed to load data from localStorage:', e)
+  }
+  return null
+}
+
+export const clearDataFromStorage = () => {
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+  } catch (e) {
+    console.error('Failed to clear data from localStorage:', e)
+  }
+}
+
+const useSceneStore = create<SceneStore>((set, get) => ({
   ...initialState,
   
   intersection: null,
@@ -43,9 +74,45 @@ const useSceneStore = create<SceneStore>((set) => ({
   setAccidentPoints: (accidentPoints) => set({ accidentPoints }),
   setConflicts: (conflicts) => set({ conflicts }),
   
-  resetScene: () => set({
-    ...initialState,
-  }),
+  loadSceneData: (data: SceneData, persist = true) => {
+    const conflicts: Conflict[] = detectConflicts(data)
+    set({
+      intersection: data.intersection,
+      signalPhases: data.signalPhases,
+      vehicles: data.vehicles,
+      pedestrians: data.pedestrians,
+      accidentPoints: data.accidentPoints,
+      totalDuration: data.totalDuration,
+      conflicts,
+      currentTime: 0,
+      isPlaying: false,
+    })
+    if (persist) {
+      saveDataToStorage(data)
+    }
+  },
+  
+  resetScene: () => {
+    const currentData = {
+      intersection: get().intersection,
+      signalPhases: get().signalPhases,
+      vehicles: get().vehicles,
+      pedestrians: get().pedestrians,
+      accidentPoints: get().accidentPoints,
+      totalDuration: get().totalDuration,
+    }
+    const conflicts = currentData.intersection ? detectConflicts(currentData as SceneData) : []
+    set({
+      ...initialState,
+      intersection: get().intersection,
+      signalPhases: get().signalPhases,
+      vehicles: get().vehicles,
+      pedestrians: get().pedestrians,
+      accidentPoints: get().accidentPoints,
+      totalDuration: get().totalDuration,
+      conflicts,
+    })
+  },
   
   jumpToTime: (time) => set((state) => ({
     currentTime: Math.max(0, Math.min(time, state.totalDuration)),

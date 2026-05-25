@@ -138,6 +138,7 @@ export interface SceneStore extends SceneState {
   setAccidentPoints: (points: AccidentPoint[]) => void
   setConflicts: (conflicts: Conflict[]) => void
   
+  loadSceneData: (data: SceneData, persist?: boolean) => void
   resetScene: () => void
   jumpToTime: (time: number) => void
 }

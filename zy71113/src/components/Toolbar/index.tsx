@@ -1,6 +1,7 @@
 import { Upload, Download, RefreshCw, Eye, Grid3X3 } from 'lucide-react'
 import useSceneStore from '../../store/useSceneStore'
 import { generateReport } from '../../utils/reportGenerator'
+import type { SceneData } from '../../types'
 
 interface ToolbarProps {
   onReset: () => void
@@ -8,7 +9,7 @@ interface ToolbarProps {
 }
 
 function Toolbar({ onReset, canvasRef }: ToolbarProps) {
-  const { viewMode, setViewMode, currentTime, signalPhases, conflicts, accidentPoints, intersection } = useSceneStore()
+  const { viewMode, setViewMode, currentTime, signalPhases, conflicts, accidentPoints, intersection, loadSceneData } = useSceneStore()
 
   const handleExportReport = async () => {
     const reportData = {
@@ -31,11 +32,16 @@ function Toolbar({ onReset, canvasRef }: ToolbarProps) {
         const reader = new FileReader()
         reader.onload = (event) => {
           try {
-            const data = JSON.parse(event.target?.result as string)
-            console.log('Imported data:', data)
-            alert('数据导入成功！请刷新页面重新加载。')
+            const data = JSON.parse(event.target?.result as string) as SceneData
+            if (data.intersection && data.signalPhases && data.vehicles && data.pedestrians) {
+              loadSceneData(data, true)
+              alert(`数据导入成功！已加载路口：${data.intersection.name}`)
+            } else {
+              throw new Error('缺少必要字段')
+            }
           } catch (err) {
-            alert('数据格式错误，请检查JSON文件。')
+            alert('数据格式错误，请检查JSON文件。需要包含 intersection、signalPhases、vehicles、pedestrians 等字段。')
+            console.error('Import error:', err)
           }
         }
         reader.readAsText(file)
