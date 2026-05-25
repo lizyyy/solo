@@ -53,6 +53,21 @@ class UI {
             this.playBtn.classList.remove('btn-primary');
         });
 
+        this.timeSlider.addEventListener('input', (e) => {
+            const targetTime = parseInt(e.target.value);
+            this.timeValue.textContent = targetTime + 's';
+        });
+
+        this.timeSlider.addEventListener('change', (e) => {
+            const targetTime = parseInt(e.target.value);
+            simulation.jumpToTime(targetTime);
+            visualization.clear();
+            visualization.createGates();
+            visualization.createClosedAreas();
+            this.updateGateList();
+            this.updateBatchList();
+        });
+
         this.view3dBtn.addEventListener('click', () => {
             visualization.setView3D();
             this.view3dBtn.classList.add('btn-primary');

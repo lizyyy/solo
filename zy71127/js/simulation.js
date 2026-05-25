@@ -17,10 +17,15 @@ class Simulation {
         this.maxQueueLength = 0;
         this.totalWaitTime = 0;
         this.completedPeople = 0;
+        this.stateHistory = [];
+        this.isReplaying = false;
+        this.initialConfig = null;
+        this.maxHistoryLength = 300;
     }
 
     loadConfig(config) {
         this.reset();
+        this.initialConfig = JSON.parse(JSON.stringify(config));
         
         config.gates.forEach(g => {
             const gate = new Gate(g.id, g.x, g.open, g.scanRate);
@@ -52,6 +57,8 @@ class Simulation {
         this.maxQueueLength = 0;
         this.totalWaitTime = 0;
         this.completedPeople = 0;
+        this.stateHistory = [];
+        this.isReplaying = false;
     }
 
     start() {
@@ -67,7 +74,7 @@ class Simulation {
     }
 
     update(deltaTime) {
-        if (!this.playing) return;
+        if (!this.playing || this.isReplaying) return;
 
         const adjustedDelta = deltaTime * this.speed;
         this.simulationTime += adjustedDelta;
@@ -80,6 +87,66 @@ class Simulation {
         this.checkWarnings();
         this.cleanupPeople();
         this.updateStats();
+        this.recordState();
+    }
+
+    recordState() {
+        if (this.stateHistory.length >= this.maxHistoryLength) {
+            this.stateHistory.shift();
+        }
+
+        const state = {
+            time: this.simulationTime,
+            people: this.people.map(p => ({
+                id: p.id,
+                x: p.x,
+                z: p.z,
+                state: p.state,
+                color: p.color,
+                targetGateId: p.targetGateId,
+                waitTime: p.waitTime
+            })),
+            gates: this.gates.map(g => ({
+                id: g.id,
+                x: g.x,
+                open: g.open,
+                queueLength: g.getQueueLength(),
+                totalProcessed: g.totalProcessed
+            })),
+            heatmapData: JSON.parse(JSON.stringify(this.heatmap.grid)),
+            heatmapMax: this.heatmap.maxValue,
+            stats: this.updateStats()
+        };
+        this.stateHistory.push(state);
+    }
+
+    jumpToTime(targetTime) {
+        if (!this.initialConfig) return;
+
+        const wasPlaying = this.playing;
+        this.playing = false;
+        this.isReplaying = true;
+
+        this.loadConfig(this.initialConfig);
+        
+        while (this.simulationTime < targetTime && this.simulationTime < 300) {
+            const stepDelta = 0.1;
+            this.simulationTime += stepDelta;
+            this.currentTime = Math.floor(this.simulationTime);
+            
+            this.spawnBatches();
+            this.updateGates(stepDelta);
+            this.updatePeople(stepDelta);
+            this.updateHeatmap();
+            this.checkWarnings();
+            this.cleanupPeople();
+            this.updateStats();
+        }
+
+        this.isReplaying = false;
+        if (wasPlaying) {
+            this.playing = true;
+        }
     }
 
     spawnBatches() {
@@ -241,17 +308,56 @@ class Simulation {
             ...stats,
             gates: this.gates.map(g => ({
                 id: g.id,
+                x: g.x,
+                z: g.z,
                 open: g.open,
+                scanRate: g.scanRate,
                 processed: g.totalProcessed,
-                queueLength: g.getQueueLength()
+                queueLength: g.getQueueLength(),
+                maxQueueLength: g.maxQueueLength
             })),
             batches: this.batches.map(b => ({
                 id: b.id,
+                time: b.time,
                 total: b.count,
-                spawned: b.spawned
+                spawned: b.spawned,
+                spread: b.spread,
+                completed: b.completed
             })),
+            closedAreas: this.closedAreas.map(a => ({
+                x: a.x,
+                z: a.z,
+                width: a.width,
+                height: a.height
+            })),
+            heatmap: {
+                grid: this.heatmap.grid,
+                maxValue: this.heatmap.maxValue,
+                cellSize: this.heatmap.cellSize,
+                width: this.heatmap.width,
+                height: this.heatmap.height
+            },
+            people: {
+                total: this.people.length,
+                walking: this.people.filter(p => p.state === 'walking').length,
+                queueing: this.people.filter(p => p.state === 'queueing').length,
+                scanning: this.people.filter(p => p.state === 'scanning').length,
+                entered: this.enteredPeople,
+                details: this.people.slice(0, 100).map(p => ({
+                    id: p.id,
+                    x: p.x,
+                    z: p.z,
+                    state: p.state,
+                    targetGateId: p.targetGateId,
+                    waitTime: p.waitTime,
+                    patience: p.patience
+                }))
+            },
             warnings: this.warnings,
-            simulationTime: this.simulationTime
+            events: this.events.slice(-50),
+            simulationTime: this.simulationTime,
+            realTime: new Date().toISOString(),
+            config: this.initialConfig
         };
     }
 }

@@ -9,6 +9,7 @@ class Visualization {
         this.heatmapMesh = null;
         this.peopleMeshes = [];
         this.gateMeshes = [];
+        this.closedAreaMeshes = [];
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
         this.draggedObject = null;
@@ -166,6 +167,9 @@ class Visualization {
     }
 
     createClosedAreas() {
+        this.closedAreaMeshes.forEach(m => this.scene.remove(m));
+        this.closedAreaMeshes = [];
+
         simulation.closedAreas.forEach(area => {
             const areaMesh = new THREE.Mesh(
                 new THREE.BoxGeometry(area.width, 0.1, area.height),
@@ -177,6 +181,7 @@ class Visualization {
             );
             areaMesh.position.set(area.x, 0.05, area.z);
             this.scene.add(areaMesh);
+            this.closedAreaMeshes.push(areaMesh);
             area.mesh = areaMesh;
         });
     }
@@ -371,6 +376,8 @@ class Visualization {
         this.peopleMeshes = [];
         this.gateMeshes.forEach(m => this.scene.remove(m));
         this.gateMeshes = [];
+        this.closedAreaMeshes.forEach(m => this.scene.remove(m));
+        this.closedAreaMeshes = [];
     }
 
     render() {
