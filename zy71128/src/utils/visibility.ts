@@ -1,4 +1,4 @@
-import { Watchtower, BlindSpot, TerrainData, TreeData, Season, Position3D } from '../types';
+import { Watchtower, BlindSpot, TerrainData, TreeData, Season, Position3D, PatrolRoute } from '../types';
 import { getTerrainHeight } from '../data/terrain';
 
 export interface VisibilityResult {
@@ -217,4 +217,90 @@ export function calculateCoverageStats(
     blindSpotCount: blindSpots.length,
     blindSpotArea
   };
+}
+
+export function calculateRouteCoverageScore(
+  route: PatrolRoute,
+  coverageMap: boolean[][],
+  terrainData: TerrainData,
+  gridSize: number = 5
+): number {
+  let routeCoveredCells = 0;
+  let routeTotalCells = 0;
+  
+  route.points.forEach((point, i) => {
+    if (i < route.points.length - 1) {
+      const nextPoint = route.points[i + 1];
+      const distance = Math.sqrt(
+        Math.pow(nextPoint.x - point.x, 2) +
+        Math.pow(nextPoint.z - point.z, 2)
+      );
+      const steps = Math.ceil(distance / gridSize);
+      
+      for (let s = 0; s <= steps; s++) {
+        const t = s / steps;
+        const sampleX = point.x + (nextPoint.x - point.x) * t;
+        const sampleZ = point.z + (nextPoint.z - point.z) * t;
+        
+        const gridX = Math.floor((sampleX + terrainData.width / 2) / gridSize);
+        const gridZ = Math.floor((sampleZ + terrainData.height / 2) / gridSize);
+        
+        if (gridX >= 0 && gridX < coverageMap[0]?.length && 
+            gridZ >= 0 && gridZ < coverageMap.length) {
+          routeTotalCells++;
+          if (coverageMap[gridZ][gridX]) {
+            routeCoveredCells++;
+          }
+        }
+      }
+    }
+  });
+  
+  return routeTotalCells > 0 ? Math.round((routeCoveredCells / routeTotalCells) * 100) : 0;
+}
+
+export function calculateRouteOverlap(
+  routes: PatrolRoute[],
+  terrainData: TerrainData,
+  gridSize: number = 5
+): Map<string, number> {
+  const coverageCounts: Map<string, number> = new Map();
+  
+  routes.filter(r => r.enabled).forEach(route => {
+    route.points.forEach((point, i) => {
+      if (i < route.points.length - 1) {
+        const nextPoint = route.points[i + 1];
+        const distance = Math.sqrt(
+          Math.pow(nextPoint.x - point.x, 2) +
+          Math.pow(nextPoint.z - point.z, 2)
+        );
+        const steps = Math.ceil(distance / gridSize);
+        
+        for (let s = 0; s <= steps; s++) {
+          const t = s / steps;
+          const sampleX = point.x + (nextPoint.x - point.x) * t;
+          const sampleZ = point.z + (nextPoint.z - point.z) * t;
+          
+          const gridX = Math.floor((sampleX + terrainData.width / 2) / gridSize);
+          const gridZ = Math.floor((sampleZ + terrainData.height / 2) / gridSize);
+          const key = `${gridX},${gridZ}`;
+          
+          coverageCounts.set(key, (coverageCounts.get(key) || 0) + 1);
+        }
+      }
+    });
+  });
+  
+  return coverageCounts;
+}
+
+export function calculateAllRouteScores(
+  routes: PatrolRoute[],
+  coverageMap: boolean[][],
+  terrainData: TerrainData
+): PatrolRoute[] {
+  return routes.map(route => ({
+    ...route,
+    coverageScore: calculateRouteCoverageScore(route, coverageMap, terrainData)
+  }));
 }

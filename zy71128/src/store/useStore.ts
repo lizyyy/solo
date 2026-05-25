@@ -6,7 +6,7 @@ import { FIRE_POINTS } from '../data/firePoints';
 import { SEASONS } from '../data/seasons';
 import { TERRAIN_DATA } from '../data/terrain';
 import { TREES } from '../data/trees';
-import { calculateCoverageMap, detectBlindSpots, calculateCoverageStats } from '../utils/visibility';
+import { calculateCoverageMap, detectBlindSpots, calculateCoverageStats, calculateAllRouteScores } from '../utils/visibility';
 
 interface AppState {
   season: Season;
@@ -50,17 +50,18 @@ interface AppState {
   
   resetState: () => void;
   recalculateCoverage: () => void;
-  importData: (data: any) => void;
+  importData: (data: Record<string, unknown>) => void;
 }
 
 const initialCoverageMap = calculateCoverageMap(WATCHTOWERS, TERRAIN_DATA, TREES, SEASONS[1]);
 const initialBlindSpots = detectBlindSpots(WATCHTOWERS, TERRAIN_DATA, TREES, SEASONS[1], initialCoverageMap);
 const initialCoverageStats = calculateCoverageStats(initialCoverageMap, initialBlindSpots);
+const initialRoutes = calculateAllRouteScores(PATROL_ROUTES, initialCoverageMap, TERRAIN_DATA);
 
 export const useStore = create<AppState>((set, get) => ({
   season: SEASONS[1],
   watchtowers: WATCHTOWERS,
-  routes: PATROL_ROUTES,
+  routes: initialRoutes,
   blindSpots: initialBlindSpots,
   firePoints: FIRE_POINTS,
   coverageMap: initialCoverageMap,
@@ -95,11 +96,13 @@ export const useStore = create<AppState>((set, get) => ({
   },
   
   toggleRoute: (id) => {
-    set((state) => ({
-      routes: state.routes.map(r =>
+    set((state) => {
+      const newRoutes = state.routes.map(r =>
         r.id === id ? { ...r, enabled: !r.enabled } : r
-      )
-    }));
+      );
+      const routesWithScores = calculateAllRouteScores(newRoutes, state.coverageMap, TERRAIN_DATA);
+      return { routes: routesWithScores };
+    });
   },
   
   selectWatchtower: (id) => set({ selectedWatchtower: id }),
@@ -119,7 +122,17 @@ export const useStore = create<AppState>((set, get) => ({
   setCameraPosition: (pos) => set({ cameraPosition: pos }),
   
   importData: (data) => {
-    const { season, watchtowers, routes, firePoints, showCoverage, showBlindSpots, showRoutes, showTrees, showFirePoints } = data;
+    const { season, watchtowers, routes, firePoints, showCoverage, showBlindSpots, showRoutes, showTrees, showFirePoints } = data as {
+      season?: Season;
+      watchtowers?: Watchtower[];
+      routes?: PatrolRoute[];
+      firePoints?: FirePoint[];
+      showCoverage?: boolean;
+      showBlindSpots?: boolean;
+      showRoutes?: boolean;
+      showTrees?: boolean;
+      showFirePoints?: boolean;
+    };
     
     if (season) set({ season });
     if (watchtowers) set({ watchtowers });
@@ -162,11 +175,12 @@ export const useStore = create<AppState>((set, get) => ({
   },
   
   recalculateCoverage: () => {
-    const { watchtowers, season } = get();
+    const { watchtowers, season, routes } = get();
     const coverageMap = calculateCoverageMap(watchtowers, TERRAIN_DATA, TREES, season);
     const blindSpots = detectBlindSpots(watchtowers, TERRAIN_DATA, TREES, season, coverageMap);
     const coverageStats = calculateCoverageStats(coverageMap, blindSpots);
+    const routesWithScores = calculateAllRouteScores(routes, coverageMap, TERRAIN_DATA);
     
-    set({ coverageMap, blindSpots, coverageStats });
+    set({ coverageMap, blindSpots, coverageStats, routes: routesWithScores });
   }
 }));

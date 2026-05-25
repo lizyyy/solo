@@ -17,7 +17,7 @@ export function PatrolRoutes() {
         const points = route.points.map(p => [p.x, p.y + 0.5, p.z] as [number, number, number]);
         const isSelected = selectedRoute === route.id;
         
-        const handleClick = (e: any) => {
+        const handleClick = (e: { stopPropagation: () => void }) => {
           e.stopPropagation();
           selectRoute(isSelected ? null : route.id);
         };

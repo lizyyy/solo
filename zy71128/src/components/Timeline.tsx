@@ -18,11 +18,18 @@ export function Timeline() {
     if (isPlaying) {
       const animate = () => {
         setCurrentTime((prev) => {
-          const next = prev + 0.01;
+          const next = prev + 0.005;
           if (next >= 1) {
             setIsPlaying(false);
             return 0;
           }
+          
+          const prevSeasonIndex = Math.floor(prev * 4) % 4;
+          const nextSeasonIndex = Math.floor(next * 4) % 4;
+          if (prevSeasonIndex !== nextSeasonIndex) {
+            setSeason(SEASONS[nextSeasonIndex]);
+          }
+          
           return next;
         });
         animationRef.current = requestAnimationFrame(animate);
@@ -39,7 +46,7 @@ export function Timeline() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPlaying, setIsPlaying, setCurrentTime]);
+  }, [isPlaying, setIsPlaying, setCurrentTime, setSeason]);
 
   const handleSeasonChange = (index: number) => {
     setSeason(SEASONS[index]);
