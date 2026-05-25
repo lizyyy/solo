@@ -155,10 +155,15 @@ export class GameEngine {
             else if (ship.status === 'departing') {
                 const exitPos = { x: ship.position.x > 0 ? 80 : -80, y: 0, z: -50 };
                 const moveSpeed = ship.speed * deltaTime * state.timeSpeed;
+                const newPos = moveTowards(ship.position, exitPos, moveSpeed);
                 updatedShip = {
                     ...updatedShip,
-                    position: moveTowards(ship.position, exitPos, moveSpeed),
+                    position: newPos,
                 };
+                if (distance(newPos, exitPos) < 2) {
+                    updatedShip.status = 'departed';
+                    addEvent('success', `${ship.name} 已安全离港！`);
+                }
             }
             return updatedShip;
         });
@@ -207,17 +212,18 @@ export class GameEngine {
         }
         else if (newTime >= state.maxTime) {
             newPhase = 'ended';
-            addEvent('info', '时间到，游戏结束');
+            failReason = 'time_out';
+            addEvent('danger', '时间到，任务超时失败！');
         }
         else {
-            const allDeparting = newShips.every((s) => s.status === 'departing');
+            const allDeparted = newShips.every((s) => s.status === 'departed');
             const undockObjective = newObjectives.find((o) => o.type === 'undock');
             const dockObjective = newObjectives.find((o) => o.type === 'dock');
             const dockCompleted = !dockObjective || dockObjective.completed;
             const undockCompleted = !undockObjective || undockObjective.completed;
-            if (allDeparting && dockCompleted && undockCompleted) {
+            if (allDeparted && dockCompleted && undockCompleted) {
                 newPhase = 'ended';
-                addEvent('success', '所有任务完成！');
+                addEvent('success', '所有任务完成！所有船舶已安全离港！');
             }
         }
         const newHistory = [...state.history];

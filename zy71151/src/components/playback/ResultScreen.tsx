@@ -119,7 +119,8 @@ export default function ResultScreen() {
   }
 
   const playbackState = getPlaybackState();
-  const isWin = gameState.failReason === 'none';
+  const allObjectivesCompleted = gameState.objectives.every((o) => o.completed);
+  const isWin = gameState.failReason === 'none' && allObjectivesCompleted;
 
   return (
     <div className="w-full h-full bg-gradient-to-br from-navy-800 via-navy-700 to-navy-900 relative overflow-hidden">

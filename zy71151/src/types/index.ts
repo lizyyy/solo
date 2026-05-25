@@ -5,7 +5,7 @@ export interface Vector3 {
 }
 
 export type ShipType = 'cargo' | 'container' | 'tanker';
-export type ShipStatus = 'approaching' | 'waiting' | 'docking' | 'docked' | 'undocking' | 'departing';
+export type ShipStatus = 'approaching' | 'waiting' | 'docking' | 'docked' | 'undocking' | 'departing' | 'departed';
 export type TugStatus = 'idle' | 'moving' | 'towing' | 'returning';
 export type GamePhase = 'setup' | 'playing' | 'paused' | 'ended';
 export type Grade = 'S' | 'A' | 'B' | 'C' | 'D' | 'F';

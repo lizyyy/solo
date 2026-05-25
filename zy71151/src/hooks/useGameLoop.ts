@@ -19,6 +19,7 @@ export const useGameLoop = () => {
         if (newState.phase === 'ended') {
         (window as any).lastSessionHistory = newState.history;
         (window as any).lastSessionState = newState;
+        (window as any).lastGameState = newState;
       }
         
         useGameStore.setState({ state: newState });

@@ -202,14 +202,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
         none: '正常完成',
       };
 
+      const allObjectivesCompleted = state.objectives.every((o) => o.completed);
+      const isWin = state.failReason === 'none' && allObjectivesCompleted;
+      const resultText = isWin ? '✅ 任务成功' : '❌ 任务失败';
+
+      let endReason = failReasons[state.failReason] || '未知';
+      if (state.failReason === 'none' && !allObjectivesCompleted) {
+        endReason = '目标未完成';
+      }
+
       const report = `
 =========================================
       港口拖轮调度报告
 =========================================
 
 关卡: ${levelName}
+结果: ${resultText}
 总时长: ${Math.floor(state.time / 60)}分${Math.floor(state.time % 60)}秒
-结束原因: ${failReasons[state.failReason] || '未知'}
+结束原因: ${endReason}
 
 =========================================
       评分详情
