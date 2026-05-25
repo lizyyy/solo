@@ -1,5 +1,5 @@
 import { useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import { WindowUnit as WindowType, Orientation } from '../../types';
 import { useAppStore } from '../../store/useAppStore';
@@ -51,7 +51,7 @@ export default function WindowUnit({ window, isShadowed }: WindowProps) {
     }
   });
 
-  const handleClick = (e: any) => {
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
     selectWindow(window.id, true);
   };

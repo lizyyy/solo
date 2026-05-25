@@ -138,6 +138,18 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ shadowRecords: allRecords });
   },
 
-  toggleLeftPanel: () => set(state => ({ leftPanelOpen: !state.leftPanelOpen })),
-  toggleRightPanel: () => set(state => ({ rightPanelOpen: !state.rightPanelOpen })),
+  toggleLeftPanel: () => set(state => {
+    const isNarrowScreen = typeof window !== 'undefined' && window.innerWidth < 1024;
+    return {
+      leftPanelOpen: !state.leftPanelOpen,
+      rightPanelOpen: isNarrowScreen && !state.leftPanelOpen ? false : state.rightPanelOpen,
+    };
+  }),
+  toggleRightPanel: () => set(state => {
+    const isNarrowScreen = typeof window !== 'undefined' && window.innerWidth < 1024;
+    return {
+      rightPanelOpen: !state.rightPanelOpen,
+      leftPanelOpen: isNarrowScreen && !state.rightPanelOpen ? false : state.leftPanelOpen,
+    };
+  }),
 }));

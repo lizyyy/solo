@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo, useState } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -12,12 +12,11 @@ import { checkWindowShadowed } from '../../utils/shadowDetection';
 import { SunPosition } from '../../types';
 
 interface CameraControllerProps {
-  targetPosition: [number, number, number];
   targetLookAt: [number, number, number];
 }
 
-function CameraController({ targetPosition, targetLookAt }: CameraControllerProps) {
-  const { camera } = useThree();
+function CameraController({ targetLookAt }: CameraControllerProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const controlsRef = useRef<any>(null);
 
   useEffect(() => {
@@ -48,7 +47,6 @@ function SceneContent() {
     isPlaying,
     playSpeed,
     setTime,
-    highlightedBuilding,
     shadowRecords,
   } = useAppStore();
 
@@ -140,7 +138,7 @@ export default function ThreeScene() {
       gl={{ antialias: true, preserveDrawingBuffer: true }}
       style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
     >
-      <CameraController targetPosition={cameraPosition} targetLookAt={cameraTarget} />
+      <CameraController targetLookAt={cameraTarget} />
       <SceneContent />
     </Canvas>
   );

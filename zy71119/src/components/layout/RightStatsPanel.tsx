@@ -22,8 +22,6 @@ export default function RightStatsPanel() {
   const [windowsExpanded, setWindowsExpanded] = useState(true);
   const [filterOrientation, setFilterOrientation] = useState<string>('all');
 
-  if (!rightPanelOpen || !isDataLoaded) return null;
-
   const selectedWindowData = useMemo(() => {
     return windows.filter(w => selectedWindows.includes(w.id));
   }, [windows, selectedWindows]);
@@ -67,8 +65,10 @@ export default function RightStatsPanel() {
     );
   }, [shadowRecords, currentTime]);
 
+  if (!rightPanelOpen || !isDataLoaded) return null;
+
   return (
-    <div className="fixed right-4 top-20 bottom-4 w-80 z-40 flex flex-col gap-3 pointer-events-none">
+    <div className="fixed right-2 sm:right-4 top-16 sm:top-20 bottom-2 sm:bottom-4 w-64 sm:w-72 lg:w-80 z-40 flex flex-col gap-3 pointer-events-none max-w-[calc(100vw-1rem)]">
       <div className="glass-panel rounded-xl p-4 pointer-events-auto overflow-y-auto max-h-full">
         <div className="mb-4">
           <button
@@ -198,7 +198,7 @@ export default function RightStatsPanel() {
                       : 'bg-white/10 text-gray-300 hover:bg-white/20'
                   }`}
                 >
-                  {orient === 'all' ? '全部' : getOrientationName(orient as any)}
+                  {orient === 'all' ? '全部' : getOrientationName(orient as 'south' | 'north' | 'east' | 'west')}
                 </button>
               ))}
             </div>

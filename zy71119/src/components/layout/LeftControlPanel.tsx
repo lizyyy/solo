@@ -1,7 +1,11 @@
-import { Calendar, Clock, Sun, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { SOLAR_TERMS, formatTime } from '../../types';
+
+const formatDate = (date: Date): string => {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
 
 export default function LeftControlPanel() {
   const { 
@@ -19,20 +23,16 @@ export default function LeftControlPanel() {
   const [dateExpanded, setDateExpanded] = useState(true);
   const [timeExpanded, setTimeExpanded] = useState(true);
 
-  if (!leftPanelOpen || !isDataLoaded) return null;
-
   const handleSolarTerm = (term: typeof SOLAR_TERMS[0]) => {
     const [month, day] = term.date.split('-').map(Number);
     const newDate = new Date(currentDate.getFullYear(), month - 1, day);
     setDate(newDate);
   };
 
-  const formatDate = (date: Date): string => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  };
+  if (!leftPanelOpen || !isDataLoaded) return null;
 
   return (
-    <div className="fixed left-4 top-20 bottom-4 w-72 z-40 flex flex-col gap-3 pointer-events-none">
+    <div className="fixed left-2 sm:left-4 top-16 sm:top-20 bottom-2 sm:bottom-4 w-64 sm:w-72 z-40 flex flex-col gap-3 pointer-events-none max-w-[calc(100vw-1rem)]">
       <div className="glass-panel rounded-xl p-4 pointer-events-auto overflow-y-auto max-h-full">
         <div className="mb-4">
           <button

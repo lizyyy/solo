@@ -4,10 +4,13 @@ import TopToolbar from '../components/layout/TopToolbar';
 import LeftControlPanel from '../components/layout/LeftControlPanel';
 import RightStatsPanel from '../components/layout/RightStatsPanel';
 import { useAppStore } from '../store/useAppStore';
+import { useResponsivePanels } from '../hooks/useResponsivePanels';
 import { Sun } from 'lucide-react';
 
 export default function Home() {
   const { isDataLoaded, loadSampleData } = useAppStore();
+  
+  useResponsivePanels();
 
   useEffect(() => {
   }, []);
@@ -59,9 +62,10 @@ export default function Home() {
       )}
 
       {isDataLoaded && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30">
-          <div className="glass-panel rounded-lg px-4 py-2 text-xs text-gray-400">
-            鼠标左键：旋转视角 · 鼠标右键：平移 · 滚轮：缩放 · 点击窗户：选择分析
+        <div className="absolute bottom-2 sm:bottom-4 left-2 right-2 sm:left-1/2 sm:transform sm:-translate-x-1/2 z-30 pointer-events-none">
+          <div className="glass-panel rounded-lg px-3 sm:px-4 py-2 text-xs text-gray-400 text-center truncate">
+            <span className="hidden sm:inline">鼠标左键：旋转视角 · 鼠标右键：平移 · 滚轮：缩放 · </span>
+            点击窗户：选择分析
           </div>
         </div>
       )}

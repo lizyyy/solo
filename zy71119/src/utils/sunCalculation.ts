@@ -1,7 +1,6 @@
-import { SunPosition, Vector3Tuple } from '../types';
+import { SunPosition } from '../types';
 
 const LATITUDE = 31.23;
-const LONGITUDE = 121.47;
 const SUN_DISTANCE = 200;
 
 const toRadians = (degrees: number): number => (degrees * Math.PI) / 180;
@@ -9,8 +8,6 @@ const toDegrees = (radians: number): number => (radians * 180) / Math.PI;
 
 export const calculateSunPosition = (date: Date, timeMinutes: number): SunPosition => {
   const year = date.getFullYear();
-  const month = date.getMonth();
-  const day = date.getDate();
   
   const hours = Math.floor(timeMinutes / 60);
   const minutes = timeMinutes % 60;

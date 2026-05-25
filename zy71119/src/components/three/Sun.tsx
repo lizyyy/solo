@@ -16,7 +16,7 @@ export default function Sun({ sunPosition, lightColor }: SunProps) {
   const sunGeometry = useMemo(() => new THREE.SphereGeometry(5, 32, 32), []);
   const glowGeometry = useMemo(() => new THREE.SphereGeometry(8, 32, 32), []);
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (glowRef.current) {
       const material = glowRef.current.material as THREE.MeshBasicMaterial;
       material.opacity = 0.2 + Math.sin(state.clock.elapsedTime * 2) * 0.1;
