@@ -44,7 +44,7 @@ export const viewPresets: ViewPreset[] = [
 const CameraController = () => {
   const { camera } = useThree();
   const controlsRef = useRef<any>(null);
-  const currentPreset = useAppStore((state) => state.data?.rink.id);
+  const selectedViewPreset = useAppStore((state) => state.selectedViewPreset);
 
   useFrame(() => {
     if (controlsRef.current) {
@@ -53,12 +53,15 @@ const CameraController = () => {
   });
 
   useEffect(() => {
-    if (currentPreset && controlsRef.current) {
-      const preset = viewPresets[1];
-      camera.position.set(...preset.position);
-      controlsRef.current.target.set(...preset.target);
+    if (selectedViewPreset && controlsRef.current) {
+      const preset = viewPresets.find((p) => p.id === selectedViewPreset);
+      if (preset) {
+        camera.position.set(...preset.position);
+        controlsRef.current.target.set(...preset.target);
+        useAppStore.getState().setSelectedViewPreset(null);
+      }
     }
-  }, [currentPreset, camera]);
+  }, [selectedViewPreset, camera]);
 
   return (
     <OrbitControls

@@ -74,30 +74,40 @@ export const SelectionTool = () => {
   if (!data) return null;
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 z-5"
-      style={{ cursor: isSelecting ? 'crosshair' : 'default' }}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-    >
-      {selectionBox && (
+    <>
+      {isSelecting && (
         <div
-          className="absolute border-2 border-cyan-400 bg-cyan-400/20 pointer-events-none"
-          style={{
-            left: Math.min(selectionBox.startX, selectionBox.endX),
-            top: Math.min(selectionBox.startY, selectionBox.endY),
-            width: Math.abs(selectionBox.endX - selectionBox.startX),
-            height: Math.abs(selectionBox.endY - selectionBox.startY),
-          }}
-        />
+          ref={containerRef}
+          className="absolute inset-0 z-40 bg-transparent"
+          style={{ cursor: 'crosshair' }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
+          {selectionBox && (
+            <div
+              className="absolute border-2 border-cyan-400 bg-cyan-400/20 pointer-events-none"
+              style={{
+                left: Math.min(selectionBox.startX, selectionBox.endX),
+                top: Math.min(selectionBox.startY, selectionBox.endY),
+                width: Math.abs(selectionBox.endX - selectionBox.startX),
+                height: Math.abs(selectionBox.endY - selectionBox.startY),
+              }}
+            />
+          )}
+        </div>
       )}
 
       <button
-        onClick={() => setIsSelecting(!isSelecting)}
-        className={`absolute top-4 left-80 z-20 px-3 py-2 rounded-lg text-sm transition-colors ${
+        onClick={() => {
+          setIsSelecting(!isSelecting);
+          if (isSelecting) {
+            setStartPos(null);
+            setSelectionBox(null);
+          }
+        }}
+        className={`absolute top-4 left-80 z-50 px-3 py-2 rounded-lg text-sm transition-colors ${
           isSelecting
             ? 'bg-cyan-600 text-white'
             : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
@@ -105,6 +115,6 @@ export const SelectionTool = () => {
       >
         {isSelecting ? '✓ 框选模式' : '⬛ 框选筛选'}
       </button>
-    </div>
+    </>
   );
 };

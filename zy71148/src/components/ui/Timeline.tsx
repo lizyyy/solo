@@ -122,6 +122,7 @@ export const Timeline = () => {
             {viewPresets.map((preset) => (
               <button
                 key={preset.id}
+                onClick={() => useAppStore.getState().setSelectedViewPreset(preset.id)}
                 className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded transition-colors"
                 title={preset.name}
               >

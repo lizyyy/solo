@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AppStore, IceData } from '../types';
+import { AppStore, IceData, GridPointDetail } from '../types';
 
 const initialState = {
   data: null,
@@ -16,6 +16,8 @@ const initialState = {
   showRepairAreas: true,
   showThreshold: true,
   hoveredPoint: null,
+  selectedViewPreset: null,
+  gridPointDetail: null,
 };
 
 export const useAppStore = create<AppStore>((set, get) => ({
@@ -51,6 +53,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
   toggleThreshold: () => set((state) => ({ showThreshold: !state.showThreshold })),
 
   setHoveredPoint: (id) => set({ hoveredPoint: id }),
+
+  setSelectedViewPreset: (id) => set({ selectedViewPreset: id }),
+
+  setGridPointDetail: (detail: GridPointDetail | null) => set({ gridPointDetail: detail }),
 
   resetState: () => set({ ...initialState, data: get().data }),
 

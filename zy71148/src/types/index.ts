@@ -84,6 +84,15 @@ export interface SelectionBox {
   endY: number;
 }
 
+export interface GridPointDetail {
+  gridId: string;
+  x: number;
+  y: number;
+  thickness: number;
+  status: SampleStatus;
+  timestamp: number;
+}
+
 export interface AppState {
   data: IceData | null;
   currentTimeIndex: number;
@@ -99,6 +108,8 @@ export interface AppState {
   showRepairAreas: boolean;
   showThreshold: boolean;
   hoveredPoint: string | null;
+  selectedViewPreset: string | null;
+  gridPointDetail: GridPointDetail | null;
 }
 
 export interface AppActions {
@@ -117,6 +128,8 @@ export interface AppActions {
   toggleRepairAreas: () => void;
   toggleThreshold: () => void;
   setHoveredPoint: (id: string | null) => void;
+  setSelectedViewPreset: (id: string | null) => void;
+  setGridPointDetail: (detail: GridPointDetail | null) => void;
   resetState: () => void;
   nextTimeStep: () => void;
   prevTimeStep: () => void;
