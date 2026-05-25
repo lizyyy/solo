@@ -5,6 +5,7 @@ import { SceneControls } from '../components/controls/SceneControls';
 import { ParamsDisplay } from '../components/controls/ParamsDisplay';
 import { Timeline } from '../components/controls/Timeline';
 import { ReportModal } from '../components/report/ReportModal';
+import { HistoryList } from '../components/controls/HistoryList';
 import { useTrainingStore } from '../store/useTrainingStore';
 import { useSceneStore } from '../store/useSceneStore';
 import { allBuildings } from '../data/buildings';
@@ -30,6 +31,8 @@ export default function Home() {
     resetAll,
     setShowReport,
     saveSession,
+    loadSession,
+    deleteSession,
   } = useTrainingStore();
 
   const {
@@ -51,6 +54,7 @@ export default function Home() {
   }, [setBuildings, setCurrentBuilding]);
 
   const currentSession = sessions.find((s) => s.id === currentSessionId) || null;
+  const isCurrentSessionSaved = !!currentSession && currentSession.id !== 'temp';
 
   const handlePlay = () => {
     if (mode === 'edit') {
@@ -83,20 +87,27 @@ export default function Home() {
     }
   };
 
-  const sessionForReport: TrainingSession | null = currentSession
-    ? currentSession
-    : result && currentBuilding
-      ? {
-          id: 'temp',
-          startTime: path[0]?.timestamp || Date.now(),
-          endTime: Date.now(),
-          buildingId: currentBuilding.id,
-          buildingName: currentBuilding.name,
-          path,
-          params,
-          result,
-        }
-      : null;
+  const handleLoadSession = (sessionId: string) => {
+    loadSession(sessionId);
+    setMobileMenuOpen(false);
+  };
+
+  const handleDeleteSession = (sessionId: string) => {
+    deleteSession(sessionId);
+  };
+
+  const sessionForReport: TrainingSession | null = result && currentBuilding
+    ? {
+        id: currentSession?.id || 'temp',
+        startTime: path[0]?.timestamp || Date.now(),
+        endTime: Date.now(),
+        buildingId: currentBuilding.id,
+        buildingName: currentBuilding.name,
+        path,
+        params,
+        result,
+      }
+    : null;
 
   if (!currentBuilding) {
     return (
@@ -168,6 +179,15 @@ export default function Home() {
           />
 
           <ParamsDisplay result={result} params={params} />
+
+          {sessions.length > 0 && (
+            <HistoryList
+              sessions={sessions}
+              currentSessionId={currentSessionId}
+              onLoad={handleLoadSession}
+              onDelete={handleDeleteSession}
+            />
+          )}
         </aside>
 
         {mobileMenuOpen && (
@@ -228,6 +248,7 @@ export default function Home() {
         params={params}
         buildingName={currentBuilding.name}
         session={sessionForReport}
+        isSessionSaved={isCurrentSessionSaved}
         onSaveSession={handleSaveSession}
       />
     </div>
