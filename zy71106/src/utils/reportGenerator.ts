@@ -15,13 +15,7 @@ const monthNames = [
 ];
 
 function getComponentRealTimeShadowRate(componentId: string): number {
-  const sceneState = useSceneStore.getState();
-  const shadowResult = sceneState.realTimeShadows.find((s: any) => s.componentId === componentId);
-  if (shadowResult) {
-    return shadowResult.shadowRate;
-  }
-  const component = sceneState.components.find((c: any) => c.id === componentId);
-  return component ? component.shadowStats.shadowRate : 0;
+  return useSceneStore.getState().getComponentShadowRate(componentId);
 }
 
 function getComponentAccumulatedShadowHours(componentId: string): number {

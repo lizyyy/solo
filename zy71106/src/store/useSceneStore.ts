@@ -9,6 +9,7 @@ import {
   ViewPreset,
 } from '../types';
 import { sampleScene } from '../data/sampleScenes';
+import { shadowCalculator, DayShadowCalculationResult } from '../utils/shadowCalculator';
 
 export interface RealTimeShadowResult {
   componentId: string;
@@ -30,6 +31,8 @@ export interface ShadowCalculationState {
   accumulatedShadows: AccumulatedShadowData[];
   currentTrackingMonth: number;
   currentTrackingDay: number;
+  dayShadowCache: DayShadowCalculationResult | null;
+  isDayCalculated: boolean;
 }
 
 const defaultRoof: Roof = {
@@ -83,10 +86,12 @@ interface SceneActions {
   updateRealTimeShadows: (results: RealTimeShadowResult[]) => void;
   setIsCalculating: (isCalculating: boolean) => void;
   getComponentShadowRate: (componentId: string) => number;
-  accumulateShadowDuration: (month: number, day: number, hour: number, deltaHours: number) => void;
+  calculateDayShadows: (month: number, day: number) => Promise<void>;
+  updateForTimeChange: (month: number, day: number, hour: number) => void;
   getComponentAccumulatedShadowHours: (componentId: string) => number;
   resetAccumulatedShadows: () => void;
   getAverageAccumulatedShadowHours: () => number;
+  invalidateShadowCache: () => void;
 }
 
 export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
@@ -103,27 +108,42 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
   accumulatedShadows: [],
   currentTrackingMonth: 6,
   currentTrackingDay: 15,
+  dayShadowCache: null,
+  isDayCalculated: false,
 
-  setRoof: (roof) => set({ roof }),
+  setRoof: (roof) => set((state) => {
+    shadowCalculator.updateOccluders(state.trees, roof);
+    return { roof, dayShadowCache: null, isDayCalculated: false };
+  }),
 
-  addTree: (tree) => set((state) => ({ trees: [...state.trees, tree] })),
+  addTree: (tree) => set((state) => {
+    const newTrees = [...state.trees, tree];
+    shadowCalculator.updateOccluders(newTrees, state.roof);
+    return { trees: newTrees, dayShadowCache: null, isDayCalculated: false };
+  }),
 
-  removeTree: (id) => set((state) => ({
-    trees: state.trees.filter((t) => t.id !== id),
-  })),
+  removeTree: (id) => set((state) => {
+    const newTrees = state.trees.filter((t) => t.id !== id);
+    shadowCalculator.updateOccluders(newTrees, state.roof);
+    return { trees: newTrees, dayShadowCache: null, isDayCalculated: false };
+  }),
 
-  updateTree: (id, updates) => set((state) => ({
-    trees: state.trees.map((t) =>
+  updateTree: (id, updates) => set((state) => {
+    const newTrees = state.trees.map((t) =>
       t.id === id ? { ...t, ...updates } : t
-    ),
-  })),
+    );
+    shadowCalculator.updateOccluders(newTrees, state.roof);
+    return { trees: newTrees, dayShadowCache: null, isDayCalculated: false };
+  }),
 
-  setComponents: (components) => set({ components }),
+  setComponents: (components) => set({ components, dayShadowCache: null, isDayCalculated: false }),
 
   updateComponent: (id, updates) => set((state) => ({
     components: state.components.map((c) =>
       c.id === id ? { ...c, ...updates } : c
     ),
+    dayShadowCache: null,
+    isDayCalculated: false,
   })),
 
   setFilter: (filter) => set({ filter }),
@@ -152,33 +172,48 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
 
   setViewPreset: (viewPreset) => set({ viewPreset }),
 
-  loadScene: (scene) => set({
-    roof: scene.roof,
-    trees: scene.trees,
-    components: scene.components,
-  }),
+  loadScene: (scene) => {
+    shadowCalculator.updateOccluders(scene.trees, scene.roof);
+    set({
+      roof: scene.roof,
+      trees: scene.trees,
+      components: scene.components,
+      dayShadowCache: null,
+      isDayCalculated: false,
+    });
+  },
 
-  loadSample: () => set({
-    roof: sampleScene.roof,
-    trees: sampleScene.trees,
-    components: sampleScene.components,
-  }),
+  loadSample: () => {
+    shadowCalculator.updateOccluders(sampleScene.trees, sampleScene.roof);
+    set({
+      roof: sampleScene.roof,
+      trees: sampleScene.trees,
+      components: sampleScene.components,
+      dayShadowCache: null,
+      isDayCalculated: false,
+    });
+  },
 
-  reset: () => set({
-    roof: defaultRoof,
-    trees: [],
-    components: [],
-    filter: defaultFilter,
-    selectedComponents: [],
-    camera: defaultCamera,
-    viewPreset: 'overview',
-    realTimeShadows: [],
-    isCalculating: false,
-    lastCalculationTime: 0,
-    accumulatedShadows: [],
-    currentTrackingMonth: 6,
-    currentTrackingDay: 15,
-  }),
+  reset: () => {
+    shadowCalculator.updateOccluders([], defaultRoof);
+    set({
+      roof: defaultRoof,
+      trees: [],
+      components: [],
+      filter: defaultFilter,
+      selectedComponents: [],
+      camera: defaultCamera,
+      viewPreset: 'overview',
+      realTimeShadows: [],
+      isCalculating: false,
+      lastCalculationTime: 0,
+      accumulatedShadows: [],
+      currentTrackingMonth: 6,
+      currentTrackingDay: 15,
+      dayShadowCache: null,
+      isDayCalculated: false,
+    });
+  },
 
   getFilteredComponents: () => {
     const { components, filter, realTimeShadows } = get();
@@ -187,7 +222,7 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
         return false;
       }
       const shadowResult = realTimeShadows.find((s) => s.componentId === c.id);
-      const shadowRate = shadowResult ? shadowResult.shadowRate : c.shadowStats.shadowRate;
+      const shadowRate = shadowResult ? shadowResult.shadowRate : 0;
       if (shadowRate < filter.shadowRateMin) {
         return false;
       }
@@ -212,61 +247,85 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
   setIsCalculating: (isCalculating: boolean) => set({ isCalculating }),
 
   getComponentShadowRate: (componentId: string) => {
-    const { realTimeShadows, components } = get();
+    const { realTimeShadows } = get();
     const shadowResult = realTimeShadows.find((s) => s.componentId === componentId);
-    if (shadowResult) {
-      return shadowResult.shadowRate;
-    }
-    const component = components.find((c) => c.id === componentId);
-    return component ? component.shadowStats.shadowRate : 0;
+    return shadowResult ? shadowResult.shadowRate : 0;
   },
 
-  accumulateShadowDuration: (month: number, day: number, hour: number, deltaHours: number) => {
-    const safeDelta = Math.min(deltaHours, 0.1);
+  calculateDayShadows: async (month: number, day: number) => {
+    const state = get();
+    
+    if (state.dayShadowCache && 
+        state.dayShadowCache.month === month && 
+        state.dayShadowCache.day === day) {
+      return;
+    }
 
-    set((state) => {
-      let newAccumulated = [...state.accumulatedShadows];
+    if (state.components.length === 0) return;
 
-      if (state.currentTrackingMonth !== month || state.currentTrackingDay !== day) {
-        newAccumulated = state.components.map((c) => ({
-          componentId: c.id,
-          accumulatedShadowHours: 0,
-          lastProcessedHour: hour,
-        }));
-        return {
-          accumulatedShadows: newAccumulated,
-          currentTrackingMonth: month,
-          currentTrackingDay: day,
-        };
-      }
+    set({ isCalculating: true });
 
-      newAccumulated = state.components.map((comp) => {
-        const existing = state.accumulatedShadows.find((a) => a.componentId === comp.id);
-        const shadowRate = state.getComponentShadowRate(comp.id);
-        const shadowHours = (shadowRate / 100) * safeDelta;
-        return {
-          componentId: comp.id,
-          accumulatedShadowHours: (existing?.accumulatedShadowHours || 0) + shadowHours,
-          lastProcessedHour: hour,
-        };
-      });
+    await new Promise(resolve => setTimeout(resolve, 10));
 
-      return {
-        accumulatedShadows: newAccumulated,
-        currentTrackingMonth: month,
-        currentTrackingDay: day,
-      };
+    shadowCalculator.updateOccluders(state.trees, state.roof);
+    const result = shadowCalculator.calculateDayAccumulatedShadows(
+      state.components,
+      month,
+      day,
+      39.9,
+      0.25,
+      3
+    );
+
+    set({
+      dayShadowCache: result,
+      isDayCalculated: true,
+      currentTrackingMonth: month,
+      currentTrackingDay: day,
+      isCalculating: false,
     });
   },
 
-  getComponentAccumulatedShadowHours: (componentId: string) => {
-    const { accumulatedShadows, components } = get();
-    const accumulated = accumulatedShadows.find((a) => a.componentId === componentId);
-    if (accumulated) {
-      return accumulated.accumulatedShadowHours;
+  updateForTimeChange: (month: number, day: number, hour: number) => {
+    const state = get();
+
+    const dayChanged = state.currentTrackingMonth !== month || state.currentTrackingDay !== day;
+    
+    if (dayChanged || !state.dayShadowCache || !state.isDayCalculated) {
+      shadowCalculator.updateOccluders(state.trees, state.roof);
+      const result = shadowCalculator.calculateDayAccumulatedShadows(
+        state.components,
+        month,
+        day,
+        39.9,
+        0.25,
+        3
+      );
+
+      const accumulatedUntilHour = shadowCalculator.calculateAccumulatedUntilHour(result, hour);
+
+      set({
+        dayShadowCache: result,
+        isDayCalculated: true,
+        accumulatedShadows: accumulatedUntilHour,
+        currentTrackingMonth: month,
+        currentTrackingDay: day,
+      });
+    } else if (state.dayShadowCache) {
+      const accumulatedUntilHour = shadowCalculator.calculateAccumulatedUntilHour(
+        state.dayShadowCache,
+        hour
+      );
+      set({
+        accumulatedShadows: accumulatedUntilHour,
+      });
     }
-    const component = components.find((c) => c.id === componentId);
-    return component ? component.shadowStats.shadowHours : 0;
+  },
+
+  getComponentAccumulatedShadowHours: (componentId: string) => {
+    const { accumulatedShadows } = get();
+    const accumulated = accumulatedShadows.find((a) => a.componentId === componentId);
+    return accumulated ? accumulated.accumulatedShadowHours : 0;
   },
 
   resetAccumulatedShadows: () => {
@@ -288,9 +347,11 @@ export const useSceneStore = create<SceneState & SceneActions>((set, get) => ({
         accumulatedShadows.length
       );
     }
-    if (components.length === 0) return 0;
-    return (
-      components.reduce((sum, c) => sum + c.shadowStats.shadowHours, 0) / components.length
-    );
+    return 0;
   },
+
+  invalidateShadowCache: () => set({
+    dayShadowCache: null,
+    isDayCalculated: false,
+  }),
 }));

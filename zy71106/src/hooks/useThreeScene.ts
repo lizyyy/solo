@@ -306,7 +306,9 @@ export function useThreeScene(): UseThreeSceneReturn {
     window.addEventListener('resize', handleResize);
 
     let lastTime = 0;
-    let lastAnimHour = -1;
+    let lastMonth = -1;
+    let lastDay = -1;
+    let lastHour = -1;
     const animate = (time: number) => {
       animationIdRef.current = requestAnimationFrame(animate);
 
@@ -321,28 +323,31 @@ export function useThreeScene(): UseThreeSceneReturn {
         const newHour = timeState.hour + deltaHours;
         if (newHour >= 18) {
           useTimeStore.getState().setHour(6);
-          lastAnimHour = -1;
         } else if (newHour < 6) {
           useTimeStore.getState().setHour(6);
-          lastAnimHour = -1;
         } else {
           useTimeStore.getState().setHour(newHour);
-          if (lastAnimHour > 0) {
-            useSceneStore.getState().accumulateShadowDuration(
-              timeState.month,
-              timeState.day,
-              newHour,
-              deltaHours
-            );
-          }
-          lastAnimHour = newHour;
         }
       } else {
         lastTime = time;
-        lastAnimHour = -1;
       }
 
       const currentTimeState = useTimeStore.getState();
+      const timeChanged = lastMonth !== currentTimeState.month || 
+                         lastDay !== currentTimeState.day || 
+                         Math.abs(lastHour - currentTimeState.hour) > 0.01;
+      
+      if (timeChanged) {
+        useSceneStore.getState().updateForTimeChange(
+          currentTimeState.month,
+          currentTimeState.day,
+          currentTimeState.hour
+        );
+        lastMonth = currentTimeState.month;
+        lastDay = currentTimeState.day;
+        lastHour = currentTimeState.hour;
+      }
+
       const solarPos = calculateSolarPosition(
         currentTimeState.month,
         currentTimeState.day,
