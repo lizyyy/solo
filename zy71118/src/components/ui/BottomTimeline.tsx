@@ -1,6 +1,9 @@
+import { useEffect, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, RotateCcw, Download, Save, Camera } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
 import { cn } from '../../lib/utils';
+
+const PLAYBACK_INTERVAL = 2000;
 
 export function BottomTimeline() {
   const history = useAppStore((state) => state.history);
@@ -12,6 +15,31 @@ export function BottomTimeline() {
   const exportReport = useAppStore((state) => state.exportReport);
   const setIsPlaying = useAppStore((state) => state.setIsPlaying);
   const store = useAppStore((state) => state.store);
+  const playbackTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (isPlaying && history.length > 1) {
+      playbackTimerRef.current = setInterval(() => {
+        const currentIndex = useAppStore.getState().historyIndex;
+        if (currentIndex < history.length - 1) {
+          goToSnapshot(currentIndex + 1);
+        } else {
+          setIsPlaying(false);
+        }
+      }, PLAYBACK_INTERVAL);
+    } else {
+      if (playbackTimerRef.current) {
+        clearInterval(playbackTimerRef.current);
+        playbackTimerRef.current = null;
+      }
+    }
+
+    return () => {
+      if (playbackTimerRef.current) {
+        clearInterval(playbackTimerRef.current);
+      }
+    };
+  }, [isPlaying, history.length, goToSnapshot, setIsPlaying]);
 
   if (!store) {
     return (
@@ -22,6 +50,9 @@ export function BottomTimeline() {
   }
 
   const handlePlayPause = () => {
+    if (!isPlaying && historyIndex >= history.length - 1) {
+      goToSnapshot(0);
+    }
     setIsPlaying(!isPlaying);
   };
 
