@@ -18,6 +18,11 @@ export class SceneManager {
     this.animationId = null;
     this.onObjectClick = null;
     this.onGroundClick = null;
+    this.onObjectDrag = null;
+    this.draggingObject = null;
+    this.dragOffset = { x: 0, z: 0 };
+    this.isDragging = false;
+    this.visibleTypes = new Set(['truck', 'speedZone', 'noStopZone', 'washPoint']);
     
     this.init();
   }
@@ -354,7 +359,15 @@ export class SceneManager {
   }
 
   setupEventListeners() {
-    this.canvas.addEventListener('click', (event) => {
+    let clickStartTime = 0;
+    let clickStartPos = { x: 0, y: 0 };
+
+    this.canvas.addEventListener('mousedown', (event) => {
+      if (event.button !== 0) return;
+      
+      clickStartTime = Date.now();
+      clickStartPos = { x: event.clientX, y: event.clientY };
+      
       const rect = this.canvas.getBoundingClientRect();
       this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -362,7 +375,11 @@ export class SceneManager {
       this.raycaster.setFromCamera(this.mouse, this.camera);
       
       const allObjects = [];
-      this.objects.forEach(obj => allObjects.push(obj));
+      this.objects.forEach(obj => {
+        if (obj.userData.type && obj.userData.type !== 'ground' && obj.visible) {
+          allObjects.push(obj);
+        }
+      });
       
       const intersects = this.raycaster.intersectObjects(allObjects, true);
 
@@ -374,17 +391,109 @@ export class SceneManager {
           targetObject = targetObject.parent;
         }
 
-        if (targetObject.userData.type && this.onObjectClick) {
-          this.onObjectClick(targetObject.userData, intersects[0].point);
-        } else if (clickedObject.name === 'ground' || clickedObject.parent?.name === 'ground') {
-          if (this.onGroundClick) {
-            this.onGroundClick(intersects[0].point);
+        if (targetObject.userData.type && targetObject.userData.type !== 'truck') {
+          this.draggingObject = targetObject;
+          this.isDragging = false;
+          this.controls.enabled = false;
+          
+          const groundIntersect = this.raycaster.intersectObject(this.objects.get('ground'));
+          if (groundIntersect.length > 0) {
+            this.dragOffset = {
+              x: targetObject.position.x - groundIntersect[0].point.x,
+              z: targetObject.position.z - groundIntersect[0].point.z
+            };
           }
         }
-      } else {
+      }
+    });
+
+    this.canvas.addEventListener('mousemove', (event) => {
+      if (!this.draggingObject) return;
+      
+      const moveDistance = Math.sqrt(
+        Math.pow(event.clientX - clickStartPos.x, 2) + 
+        Math.pow(event.clientY - clickStartPos.y, 2)
+      );
+      
+      if (moveDistance > 5) {
+        this.isDragging = true;
+      }
+      
+      if (this.isDragging) {
+        const rect = this.canvas.getBoundingClientRect();
+        this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.mouse, this.camera);
         const groundIntersect = this.raycaster.intersectObject(this.objects.get('ground'));
-        if (groundIntersect.length > 0 && this.onGroundClick) {
-          this.onGroundClick(groundIntersect[0].point);
+        
+        if (groundIntersect.length > 0 && this.draggingObject) {
+          const newX = groundIntersect[0].point.x + this.dragOffset.x;
+          const newZ = groundIntersect[0].point.z + this.dragOffset.z;
+          
+          this.draggingObject.position.x = newX;
+          this.draggingObject.position.z = newZ;
+          
+          if (this.draggingObject.userData.position) {
+            this.draggingObject.userData.position.x = newX;
+            this.draggingObject.userData.position.z = newZ;
+          }
+          
+          if (this.onObjectDrag) {
+            this.onObjectDrag(this.draggingObject.userData, { x: newX, z: newZ });
+          }
+        }
+      }
+    });
+
+    this.canvas.addEventListener('mouseup', (event) => {
+      if (this.draggingObject) {
+        if (!this.isDragging && Date.now() - clickStartTime < 300) {
+          if (this.onObjectClick) {
+            this.onObjectClick(this.draggingObject.userData, this.draggingObject.position);
+          }
+        }
+        
+        this.draggingObject = null;
+        this.isDragging = false;
+        this.controls.enabled = true;
+      } else {
+        const moveDistance = Math.sqrt(
+          Math.pow(event.clientX - clickStartPos.x, 2) + 
+          Math.pow(event.clientY - clickStartPos.y, 2)
+        );
+        
+        if (moveDistance < 5 && Date.now() - clickStartTime < 300) {
+          const rect = this.canvas.getBoundingClientRect();
+          this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+          this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+          this.raycaster.setFromCamera(this.mouse, this.camera);
+          
+          const allObjects = [];
+          this.objects.forEach(obj => allObjects.push(obj));
+          
+          const intersects = this.raycaster.intersectObjects(allObjects, true);
+
+          if (intersects.length > 0) {
+            const clickedObject = intersects[0].object;
+            let targetObject = clickedObject;
+            
+            while (targetObject.parent && !targetObject.userData.type) {
+              targetObject = targetObject.parent;
+            }
+
+            if (targetObject.userData.type && targetObject.userData.type !== 'ground' && this.onObjectClick) {
+              this.onObjectClick(targetObject.userData, intersects[0].point);
+            } else if ((clickedObject.name === 'ground' || clickedObject.parent?.name === 'ground') && this.onGroundClick) {
+              this.onGroundClick(intersects[0].point);
+            }
+          } else {
+            const groundIntersect = this.raycaster.intersectObject(this.objects.get('ground'));
+            if (groundIntersect.length > 0 && this.onGroundClick) {
+              this.onGroundClick(groundIntersect[0].point);
+            }
+          }
         }
       }
     });
@@ -397,6 +506,40 @@ export class SceneManager {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+  }
+
+  toggleTypeVisibility(type) {
+    if (this.visibleTypes.has(type)) {
+      this.visibleTypes.delete(type);
+    } else {
+      this.visibleTypes.add(type);
+    }
+    
+    this.objects.forEach((obj, id) => {
+      if (obj.userData.type === type) {
+        obj.visible = this.visibleTypes.has(type);
+        obj.traverse(child => {
+          if (child.isMesh || child.isSprite) {
+            child.visible = this.visibleTypes.has(type);
+          }
+        });
+      }
+    });
+    
+    return this.visibleTypes.has(type);
+  }
+
+  isTypeVisible(type) {
+    return this.visibleTypes.has(type);
+  }
+
+  updateZonePosition(id, position) {
+    const zone = this.objects.get(id);
+    if (zone) {
+      zone.position.x = position.x;
+      zone.position.z = position.z;
+      zone.userData.position = { ...position };
+    }
   }
 
   animate() {

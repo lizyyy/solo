@@ -24,11 +24,13 @@ export class ValidationEngine {
       }
     });
 
+    const failedResults = results.filter(r => !r.passed);
+
     return {
-      isValid: !results.some(r => r.type === 'error'),
-      totalIssues: results.length,
-      errors: results.filter(r => r.type === 'error').length,
-      warnings: results.filter(r => r.type === 'warning').length,
+      isValid: !failedResults.some(r => r.type === 'error'),
+      totalIssues: failedResults.length,
+      errors: failedResults.filter(r => r.type === 'error').length,
+      warnings: failedResults.filter(r => r.type === 'warning').length,
       details: results
     };
   }

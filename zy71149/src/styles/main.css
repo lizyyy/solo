@@ -146,6 +146,7 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  position: relative;
 }
 
 .element-item:hover {
@@ -159,12 +160,45 @@ body {
   border-color: #7c3aed;
 }
 
+.element-item.hidden-type {
+  opacity: 0.5;
+}
+
 .element-icon {
   font-size: 20px;
 }
 
 .element-name {
   font-size: 14px;
+  flex: 1;
+}
+
+.element-toggle {
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.element-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+
+.element-toggle.disabled {
+  opacity: 0.3;
+}
+
+.hint-text {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgba(124, 58, 237, 0.1);
+  border-radius: 6px;
+  border-left: 2px solid #7c3aed;
 }
 
 .route-controls {

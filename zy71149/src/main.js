@@ -41,6 +41,19 @@ class HazardousRouteSandbox {
     this.sceneManager.onGroundClick = (point) => {
       if (this.selectedElementType === 'truck') {
         this.sceneManager.createVehicle({ x: point.x, z: point.z });
+        this.updateHint('车辆已创建，点击场景添加路径点');
+        this.selectElementType(null);
+      } else if (this.selectedElementType === 'speedZone') {
+        this.createZone('speedZone', point);
+        this.updateHint('限速区已创建，可拖拽移动位置');
+        this.selectElementType(null);
+      } else if (this.selectedElementType === 'noStopZone') {
+        this.createZone('noStopZone', point);
+        this.updateHint('禁停区已创建，可拖拽移动位置');
+        this.selectElementType(null);
+      } else if (this.selectedElementType === 'washPoint') {
+        this.createZone('washPoint', point);
+        this.updateHint('洗消点已创建，可拖拽移动位置');
         this.selectElementType(null);
       } else if (!this.selectedElementType) {
         this.addRoutePoint(point);
@@ -50,6 +63,20 @@ class HazardousRouteSandbox {
     this.sceneManager.onObjectClick = (userData, point) => {
       if (this.selectedElementType) {
         return;
+      }
+      if (userData.type && userData.type !== 'truck' && userData.type !== 'ground') {
+        const zone = this.zones.find(z => z.id === userData.id);
+        if (zone) {
+          this.updateHint(`已选中 ${zone.name || userData.type}，可拖拽移动`);
+        }
+      }
+    };
+
+    this.sceneManager.onObjectDrag = (userData, newPosition) => {
+      const zoneIndex = this.zones.findIndex(z => z.id === userData.id);
+      if (zoneIndex !== -1) {
+        this.zones[zoneIndex].position = { ...newPosition };
+        this.updateHint(`正在移动 ${this.zones[zoneIndex].name || userData.type}`);
       }
     };
 
@@ -131,6 +158,14 @@ class HazardousRouteSandbox {
         this.closeModal();
       }
     });
+
+    document.querySelectorAll('.element-toggle').forEach(toggle => {
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const type = e.currentTarget.dataset.toggle;
+        this.toggleTypeVisibility(type);
+      });
+    });
   }
 
   selectElementType(type) {
@@ -139,6 +174,71 @@ class HazardousRouteSandbox {
     document.querySelectorAll('.element-item').forEach(item => {
       item.classList.toggle('active', item.dataset.type === type);
     });
+
+    const hints = {
+      truck: '点击场景放置危化车辆',
+      speedZone: '点击场景创建限速区',
+      noStopZone: '点击场景创建禁停区',
+      washPoint: '点击场景创建洗消点',
+      null: '点击场景添加路径点'
+    };
+    this.updateHint(hints[type] || hints.null);
+  }
+
+  createZone(type, point) {
+    const id = `${type}_${Date.now()}`;
+    const names = {
+      speedZone: '新建限速区',
+      noStopZone: '新建禁停区',
+      washPoint: '新建洗消点'
+    };
+    const sizes = {
+      speedZone: { width: 10, height: 10 },
+      noStopZone: { width: 12, height: 12 },
+      washPoint: { radius: 4 }
+    };
+
+    const zone = {
+      id,
+      type,
+      name: names[type],
+      position: { x: Math.round(point.x * 10) / 10, z: Math.round(point.z * 10) / 10 },
+      size: sizes[type],
+      speedLimit: type === 'speedZone' ? 30 : undefined
+    };
+
+    this.zones.push(zone);
+    this.sceneManager.createZone(type, zone.position, zone.size, id);
+  }
+
+  updateHint(text) {
+    const hintEl = document.getElementById('action-hint');
+    if (hintEl) {
+      hintEl.textContent = text;
+    }
+  }
+
+  toggleTypeVisibility(type) {
+    const isVisible = this.sceneManager.toggleTypeVisibility(type);
+    const toggleEl = document.querySelector(`[data-toggle="${type}"]`);
+    const itemEl = document.querySelector(`[data-type="${type}"]`);
+    
+    if (toggleEl) {
+      toggleEl.textContent = isVisible ? '👁️' : '👁️‍🗨️';
+      toggleEl.classList.toggle('disabled', !isVisible);
+    }
+    
+    if (itemEl) {
+      itemEl.classList.toggle('hidden-type', !isVisible);
+    }
+
+    const status = isVisible ? '显示' : '隐藏';
+    const names = {
+      speedZone: '限速区',
+      noStopZone: '禁停区',
+      washPoint: '洗消点'
+    };
+    this.updateHint(`${status}${names[type]}`);
   }
 
   addRoutePoint(point) {
