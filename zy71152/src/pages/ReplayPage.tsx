@@ -7,6 +7,21 @@ interface ReplayPageProps {
   onBack: () => void;
 }
 
+const getTrainPosition = (train: Train, sections: Section[]): Point | null => {
+  if (train.currentSectionIndex < 0 || train.currentSectionIndex >= train.route.length) {
+    return null;
+  }
+
+  const sectionId = train.route[train.currentSectionIndex];
+  const section = sections.find(s => s.id === sectionId);
+  if (!section) return null;
+
+  const x = section.fromPos.x + (section.toPos.x - section.fromPos.x) * train.progress;
+  const y = section.fromPos.y + (section.toPos.y - section.fromPos.y) * train.progress;
+
+  return { x, y };
+};
+
 export default function ReplayPage({ onBack }: ReplayPageProps) {
   const [replays, setReplays] = useState<ReplayData[]>([]);
   const [selectedReplay, setSelectedReplay] = useState<ReplayData | null>(null);
@@ -141,7 +156,8 @@ export default function ReplayPage({ onBack }: ReplayPageProps) {
           const firstSectionId = train.route[0];
           const firstSection = level.sections.find(s => s.id === firstSectionId);
           if (firstSection) {
-            const startPos = firstSection.fromPos;
+            const isDirectionForward = train.direction === 'forward';
+            const startPos = isDirectionForward ? firstSection.fromPos : firstSection.toPos;
             
             ctx.fillStyle = train.color + '60';
             ctx.strokeStyle = train.color;
@@ -161,8 +177,16 @@ export default function ReplayPage({ onBack }: ReplayPageProps) {
         continue;
       }
 
+      const angle = Math.atan2(
+        (level.sections.find(s => s.id === train.route[train.currentSectionIndex])?.toPos.y || 0) -
+        (level.sections.find(s => s.id === train.route[train.currentSectionIndex])?.fromPos.y || 0),
+        (level.sections.find(s => s.id === train.route[train.currentSectionIndex])?.toPos.x || 0) -
+        (level.sections.find(s => s.id === train.route[train.currentSectionIndex])?.fromPos.x || 0)
+      );
+
       ctx.save();
       ctx.translate(pos.x, pos.y);
+      ctx.rotate(train.direction === 'backward' ? angle + Math.PI : angle);
 
       ctx.fillStyle = train.color;
       ctx.strokeStyle = '#1e293b';

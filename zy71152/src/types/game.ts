@@ -79,6 +79,7 @@ export interface Train {
   scheduledArrival: number;
   status: TrainStatus;
   color: string;
+  direction: 'forward' | 'backward';
 }
 
 export interface GameEvent {

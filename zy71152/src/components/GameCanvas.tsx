@@ -206,7 +206,7 @@ export default function GameCanvas({ width, height }: GameCanvasProps) {
         const firstSectionId = train.route[0];
         const firstSection = sections.find(s => s.id === firstSectionId);
         if (firstSection) {
-          const isDirectionForward = train.progress < 0.5;
+          const isDirectionForward = train.direction === 'forward';
           const startPos = isDirectionForward ? firstSection.fromPos : firstSection.toPos;
           
           ctx.fillStyle = train.color + '60';
@@ -242,7 +242,7 @@ export default function GameCanvas({ width, height }: GameCanvasProps) {
 
       ctx.save();
       ctx.translate(pos.x, pos.y);
-      ctx.rotate(train.progress > 0.5 ? angle + Math.PI : angle);
+      ctx.rotate(train.direction === 'backward' ? angle + Math.PI : angle);
 
       ctx.fillStyle = train.color;
       ctx.strokeStyle = '#1e293b';

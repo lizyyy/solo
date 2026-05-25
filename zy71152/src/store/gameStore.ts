@@ -87,7 +87,7 @@ const checkConflicts = (
     if (train.currentSectionIndex < 0) continue;
 
     const currentSectionId = train.route[train.currentSectionIndex];
-    const isReverse = train.progress > 0.5;
+    const isReverse = train.direction === 'backward';
     const isEntering = isReverse ? train.progress > 0.9 : train.progress < 0.1;
     
     if (isEntering) {
@@ -213,6 +213,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (newTrain.status === TRAIN_STATUSES.WAITING && newTime >= newTrain.scheduledDeparture) {
         newTrain.status = TRAIN_STATUSES.RUNNING;
         newTrain.currentSectionIndex = 0;
+        newTrain.progress = newTrain.direction === 'forward' ? 0 : 1;
         newEvents.push({
           time: newTime,
           type: 'train_depart',
@@ -225,7 +226,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const section = state.sections.find(s => s.id === currentSectionId);
         if (!section) return newTrain;
 
-        const isReverse = newTrain.progress > 0.5;
+        const isReverse = newTrain.direction === 'backward';
         
         const sectionSignal = state.signals.find(s => {
           if (s.sectionId !== currentSectionId) return false;
@@ -261,10 +262,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           
           if (reachedEnd) {
             newTrain.currentSectionIndex++;
-            newTrain.progress = isReverse ? 1 : 0;
-
+            
             if (newTrain.currentSectionIndex >= newTrain.route.length) {
               newTrain.status = TRAIN_STATUSES.COMPLETED;
+              newTrain.progress = isReverse ? 0 : 1;
               const scoreEarned = calculateScore(newTrain);
               newScore += scoreEarned;
               newEvents.push({
@@ -272,6 +273,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 type: 'train_complete',
                 message: `列车 ${newTrain.name} 到达，获得 ${scoreEarned} 分`
               });
+            } else {
+              newTrain.progress = isReverse ? 1 : 0;
             }
           }
         }

@@ -78,7 +78,8 @@ export const levels: Level[] = [
         scheduledDeparture: 0,
         scheduledArrival: 400,
         status: TRAIN_STATUSES.WAITING,
-        color: '#3b82f6'
+        color: '#3b82f6',
+        direction: 'forward'
       },
       {
         id: 'T2',
@@ -92,7 +93,8 @@ export const levels: Level[] = [
         scheduledDeparture: 100,
         scheduledArrival: 500,
         status: TRAIN_STATUSES.WAITING,
-        color: '#ef4444'
+        color: '#ef4444',
+        direction: 'backward'
       }
     ],
     targetScore: 150,
@@ -177,7 +179,8 @@ export const levels: Level[] = [
         scheduledDeparture: 0,
         scheduledArrival: 300,
         status: TRAIN_STATUSES.WAITING,
-        color: '#3b82f6'
+        color: '#3b82f6',
+        direction: 'forward'
       },
       {
         id: 'T2',
@@ -191,7 +194,8 @@ export const levels: Level[] = [
         scheduledDeparture: 80,
         scheduledArrival: 380,
         status: TRAIN_STATUSES.WAITING,
-        color: '#ef4444'
+        color: '#ef4444',
+        direction: 'backward'
       },
       {
         id: 'T3',
@@ -205,7 +209,8 @@ export const levels: Level[] = [
         scheduledDeparture: 50,
         scheduledArrival: 350,
         status: TRAIN_STATUSES.WAITING,
-        color: '#10b981'
+        color: '#10b981',
+        direction: 'forward'
       },
       {
         id: 'T4',
@@ -219,7 +224,8 @@ export const levels: Level[] = [
         scheduledDeparture: 150,
         scheduledArrival: 450,
         status: TRAIN_STATUSES.WAITING,
-        color: '#f59e0b'
+        color: '#f59e0b',
+        direction: 'backward'
       }
     ],
     targetScore: 300,
@@ -334,7 +340,8 @@ export const levels: Level[] = [
         scheduledDeparture: 0,
         scheduledArrival: 280,
         status: TRAIN_STATUSES.WAITING,
-        color: '#3b82f6'
+        color: '#3b82f6',
+        direction: 'forward'
       },
       {
         id: 'T2',
@@ -348,7 +355,8 @@ export const levels: Level[] = [
         scheduledDeparture: 60,
         scheduledArrival: 340,
         status: TRAIN_STATUSES.WAITING,
-        color: '#ef4444'
+        color: '#ef4444',
+        direction: 'backward'
       },
       {
         id: 'T3',
@@ -362,7 +370,8 @@ export const levels: Level[] = [
         scheduledDeparture: 30,
         scheduledArrival: 380,
         status: TRAIN_STATUSES.WAITING,
-        color: '#10b981'
+        color: '#10b981',
+        direction: 'forward'
       },
       {
         id: 'T4',
@@ -376,7 +385,8 @@ export const levels: Level[] = [
         scheduledDeparture: 100,
         scheduledArrival: 450,
         status: TRAIN_STATUSES.WAITING,
-        color: '#f59e0b'
+        color: '#f59e0b',
+        direction: 'forward'
       },
       {
         id: 'T5',
@@ -390,7 +400,8 @@ export const levels: Level[] = [
         scheduledDeparture: 150,
         scheduledArrival: 500,
         status: TRAIN_STATUSES.WAITING,
-        color: '#8b5cf6'
+        color: '#8b5cf6',
+        direction: 'backward'
       },
       {
         id: 'T6',
@@ -404,7 +415,8 @@ export const levels: Level[] = [
         scheduledDeparture: 200,
         scheduledArrival: 550,
         status: TRAIN_STATUSES.WAITING,
-        color: '#ec4899'
+        color: '#ec4899',
+        direction: 'backward'
       }
     ],
     targetScore: 500,
