@@ -1,4 +1,4 @@
-import { GameState, ScoreDetail, MapNode, Vehicle } from '../types';
+import { GameState, ScoreDetail, MapNode, isLoadPayload } from '../types';
 
 interface ScoreCategory {
   category: string;
@@ -78,7 +78,7 @@ export const calculateScore = (state: GameState): { score: number; details: Scor
   });
   totalScore += noWasteScore;
 
-  const errorPenalty = state.actionHistory.filter((a) => a.type === 'load' && a.payload.isOverload).length * 50;
+  const errorPenalty = state.actionHistory.filter((a) => a.type === 'load' && isLoadPayload(a.payload) && a.payload.isOverload).length * 50;
   if (errorPenalty > 0) {
     details.push({
       category: '错误操作',

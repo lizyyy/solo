@@ -16,7 +16,6 @@ export const GameMap = ({ width = 800, height = 500 }: GameMapProps) => {
     selectedVehicle,
     selectedRoute,
     addToRoute,
-    selectedVehicle: selectedVehicleId,
   } = useGameStore();
 
   const getVehiclePosition = useCallback(
@@ -64,7 +63,7 @@ export const GameMap = ({ width = 800, height = 500 }: GameMapProps) => {
 
   const handleCanvasClick = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!selectedVehicleId) return;
+      if (!selectedVehicle) return;
 
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -82,7 +81,7 @@ export const GameMap = ({ width = 800, height = 500 }: GameMapProps) => {
         addToRoute(clickedNode.id);
       }
     },
-    [selectedVehicleId, nodes, addToRoute]
+    [selectedVehicle, nodes, addToRoute]
   );
 
   useEffect(() => {
@@ -136,8 +135,8 @@ export const GameMap = ({ width = 800, height = 500 }: GameMapProps) => {
       ctx.fillText(`${road.distance}`, midX, midY - 8);
     });
 
-    if (selectedRoute.length > 0 && selectedVehicleId) {
-      const vehicle = vehicles.find((v) => v.id === selectedVehicleId);
+    if (selectedRoute.length > 0 && selectedVehicle) {
+      const vehicle = vehicles.find((v) => v.id === selectedVehicle);
       const startNode = nodes.find((n) => n.id === vehicle?.currentNode);
       if (startNode) {
         let prevX = startNode.x;

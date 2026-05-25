@@ -1,11 +1,11 @@
 import {
-  GameState,
   Vehicle,
   MapNode,
   Road,
   SupplyInventory,
   SupplyType,
   ActionRecord,
+  ActionPayload,
 } from '../types';
 import { SUPPLY_CONFIGS } from '../types';
 
@@ -21,7 +21,8 @@ export const findPath = (
   from: string,
   to: string,
   roads: Road[],
-  nodes: MapNode[]
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _nodes: MapNode[]
 ): string[] | null => {
   const visited = new Set<string>();
   const queue: { node: string; path: string[] }[] = [{ node: from, path: [from] }];
@@ -182,7 +183,7 @@ export const unloadSupplies = (
 export const recordAction = (
   turn: number,
   type: ActionRecord['type'],
-  payload: any
+  payload: ActionPayload
 ): ActionRecord => {
   return {
     turn,

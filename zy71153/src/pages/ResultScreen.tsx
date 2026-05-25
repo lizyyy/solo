@@ -170,7 +170,13 @@ export const ResultScreen = () => {
             onClick={handleExportText}
             className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors"
           >
-            <Download size={18} /> 导出报告
+            <Download size={18} /> 导出TXT
+          </button>
+          <button
+            onClick={handleExportJSON}
+            className="flex items-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-lg transition-colors"
+          >
+            <Download size={18} /> 导出JSON
           </button>
         </div>
       </div>

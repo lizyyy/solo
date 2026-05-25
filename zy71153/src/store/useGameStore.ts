@@ -2,9 +2,7 @@ import { create } from 'zustand';
 import {
   GameState,
   SupplyType,
-  Vehicle,
   ActionRecord,
-  LevelConfig,
   HistoryRecord,
 } from '../types';
 import { getLevelById } from '../game/levels';
@@ -118,7 +116,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let newNodes = state.nodes;
     let newVehicles = state.vehicles;
     let newWeather = state.weather;
-    let newEventLog = [...state.eventLog];
+    const newEventLog = [...state.eventLog];
+    const newActions: ActionRecord[] = [];
 
     if (event) {
       const effect = applyEventEffect(event, state);
@@ -127,6 +126,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       newVehicles = effect.vehicles;
       newWeather = effect.weather;
       newEventLog.push(`【${event.title}】${event.description}`);
+
+      const eventAction: ActionRecord = {
+        turn: newTurn,
+        timestamp: Date.now(),
+        type: 'event',
+        payload: {
+          eventId: event.id,
+          eventType: event.type,
+          title: event.title,
+          description: event.description,
+          affectedRoad: event.affectedRoad,
+          affectedNode: event.affectedNode,
+          effect: {
+            roadsChanged: effect.roads !== state.roads,
+            nodesChanged: effect.nodes !== state.nodes,
+            vehiclesChanged: effect.vehicles !== state.vehicles,
+            weatherChanged: effect.weather !== state.weather,
+          },
+        },
+      };
+      newActions.push(eventAction);
     }
 
     const { lose, reason } = checkLoseCondition({
@@ -136,6 +156,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       nodes: newNodes,
       vehicles: newVehicles,
     });
+
+    const startAction = recordAction(newTurn, 'start', { turn: newTurn });
+    newActions.push(startAction);
 
     if (lose) {
       const scoreResult = calculateScore({
@@ -157,11 +180,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         failReason: reason,
         score: scoreResult.score,
         scoreDetails: scoreResult.details,
+        actionHistory: [...state.actionHistory, ...newActions],
       });
       return;
     }
-
-    const action = recordAction(newTurn, 'start', { turn: newTurn });
 
     set({
       turn: newTurn,
@@ -171,7 +193,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       weather: newWeather,
       events: event ? [...state.events, event] : state.events,
       eventLog: newEventLog,
-      actionHistory: [...state.actionHistory, action],
+      actionHistory: [...state.actionHistory, ...newActions],
     });
   },
 
@@ -456,7 +478,8 @@ export const getHistory = (): HistoryRecord[] => {
   try {
     const existing = localStorage.getItem(STORAGE_KEY);
     return existing ? JSON.parse(existing) : [];
-  } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_e) {
     return [];
   }
 };

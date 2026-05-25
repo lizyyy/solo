@@ -104,12 +104,13 @@ export const applyEventEffect = (
       }
       break;
 
-    case 'weather':
+    case 'weather': {
       const weatherTypes: WeatherType[] = ['rainy', 'stormy'];
       weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
       vehicles = vehicles.map((v) => ({ ...v, speed: v.speed * 0.7 }));
       message = weather === 'stormy' ? '暴风雨来袭，所有车辆减速30%' : '降雨天气，所有车辆减速30%';
       break;
+    }
 
     case 'demand_surge':
       if (event.affectedNode) {

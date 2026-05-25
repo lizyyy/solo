@@ -86,11 +86,64 @@ export interface LevelConfig {
 
 export type ActionType = 'load' | 'unload' | 'route' | 'start' | 'event';
 
+interface LoadPayload {
+  vehicleId: string;
+  type: SupplyType;
+  amount: number;
+  isOverload: boolean;
+}
+
+interface UnloadPayload {
+  vehicleId: string;
+}
+
+interface RoutePayload {
+  vehicleId: string;
+  route: string[];
+}
+
+interface StartPayload {
+  turn: number;
+}
+
+interface EventPayload {
+  eventId: string;
+  eventType: EventType;
+  title: string;
+  description: string;
+  affectedRoad?: string;
+  affectedNode?: string;
+  effect: {
+    roadsChanged: boolean;
+    nodesChanged: boolean;
+    vehiclesChanged: boolean;
+    weatherChanged: boolean;
+  };
+}
+
+export type ActionPayload = LoadPayload | UnloadPayload | RoutePayload | StartPayload | EventPayload;
+
 export interface ActionRecord {
   turn: number;
   timestamp: number;
   type: ActionType;
-  payload: any;
+  payload: ActionPayload;
+}
+
+export function isLoadPayload(payload: ActionPayload): payload is LoadPayload {
+  return 'type' in payload && 'amount' in payload;
+}
+
+export function isRoutePayload(payload: ActionPayload): payload is RoutePayload {
+  return 'route' in payload;
+}
+
+export function isStartPayload(payload: ActionPayload): payload is StartPayload {
+  return 'turn' in payload;
+}
+
+export function isEventPayload(payload: ActionPayload): payload is EventPayload {
+  return 'eventType' in payload;
 }
 
 export interface ScoreDetail {

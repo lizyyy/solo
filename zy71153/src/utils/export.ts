@@ -1,4 +1,4 @@
-import { GameState, ScoreDetail, HistoryRecord, SUPPLY_CONFIGS } from '../types';
+import { GameState, SUPPLY_CONFIGS } from '../types';
 import { formatTime } from '../game/engine';
 
 export const exportToJSON = (state: GameState): string => {

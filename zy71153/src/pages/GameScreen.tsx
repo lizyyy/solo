@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/useGameStore';
 import { TopBar } from '../components/game/TopBar';

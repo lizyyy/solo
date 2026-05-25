@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { getHistory } from '../store/useGameStore';
-import { HistoryRecord } from '../types';
+import {
+  HistoryRecord,
+  isLoadPayload,
+  isRoutePayload,
+  isStartPayload,
+  isEventPayload,
+} from '../types';
 import { Home, Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
 export const ReplayScreen = () => {
@@ -90,18 +96,65 @@ export const ReplayScreen = () => {
 
             <div className="bg-slate-700/50 rounded-lg p-4 mb-4">
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs uppercase">
-                  {currentAction?.type}
+                <span className={`px-2 py-0.5 rounded text-xs uppercase ${
+                  currentAction?.type === 'event' ? 'bg-red-500/20 text-red-400' :
+                  currentAction?.type === 'load' ? 'bg-green-500/20 text-green-400' :
+                  currentAction?.type === 'unload' ? 'bg-yellow-500/20 text-yellow-400' :
+                  currentAction?.type === 'route' ? 'bg-blue-500/20 text-blue-400' :
+                  'bg-slate-500/20 text-slate-400'
+                }`}>
+                  {currentAction?.type === 'event' ? '⚠️ 事件' :
+                   currentAction?.type === 'load' ? '📦 装载' :
+                   currentAction?.type === 'unload' ? '↩️ 卸载' :
+                   currentAction?.type === 'route' ? '🚚 出发' :
+                   '⏱️ 回合'}
                 </span>
               </div>
               <p className="text-white">
-                {currentAction?.type === 'load' && 
+                {currentAction?.type === 'load' && isLoadPayload(currentAction.payload) &&
                   `装载物资: ${currentAction.payload.type} x ${currentAction.payload.amount}`}
                 {currentAction?.type === 'unload' && '卸载所有物资'}
-                {currentAction?.type === 'route' && 
+                {currentAction?.type === 'route' && isRoutePayload(currentAction.payload) &&
                   `派遣车辆: ${currentAction.payload.route.length} 个目的地`}
-                {currentAction?.type === 'start' && `回合 ${currentAction.payload.turn} 开始`}
-                {currentAction?.type === 'event' && `发生事件`}
+                {currentAction?.type === 'start' && isStartPayload(currentAction.payload) &&
+                  `回合 ${currentAction.payload.turn} 开始`}
+                {currentAction?.type === 'event' && isEventPayload(currentAction.payload) && (
+                  <div>
+                    <p className="font-bold text-red-400">{currentAction.payload.title}</p>
+                    <p className="text-slate-300 text-sm mt-1">{currentAction.payload.description}</p>
+                    <div className="mt-2 pt-2 border-t border-slate-600 text-xs text-slate-400">
+                      <p>事件类型: {currentAction.payload.eventType}</p>
+                      {currentAction.payload.affectedRoad && (
+                        <p>影响道路: {currentAction.payload.affectedRoad}</p>
+                      )}
+                      {currentAction.payload.affectedNode && (
+                        <p>影响节点: {currentAction.payload.affectedNode}</p>
+                      )}
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {currentAction.payload.effect.roadsChanged && (
+                          <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-400 rounded">
+                            道路状态变更
+                          </span>
+                        )}
+                        {currentAction.payload.effect.nodesChanged && (
+                          <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-400 rounded">
+                            需求变更
+                          </span>
+                        )}
+                        {currentAction.payload.effect.vehiclesChanged && (
+                          <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-400 rounded">
+                            车辆受影响
+                          </span>
+                        )}
+                        {currentAction.payload.effect.weatherChanged && (
+                          <span className="px-1.5 py-0.5 bg-orange-500/20 text-orange-400 rounded">
+                            天气变化
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </p>
             </div>
 
