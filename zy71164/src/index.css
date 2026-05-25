@@ -1,0 +1,276 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sonar-bg: #0a1a0a;
+  --sonar-dark: #1a2f1a;
+  --sonar-mid: #2a4a2a;
+  --sonar-green: #39ff14;
+  --sonar-amber: #ffb000;
+  --sonar-red: #ff3333;
+  --sonar-cyan: #00ffff;
+  --sonar-grid: #1a3a1a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--sonar-bg);
+  color: var(--sonar-green);
+  font-family: 'JetBrains Mono', monospace;
+  overflow-x: hidden;
+}
+
+.crt-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.crt-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+.crt-effect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 51%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 101;
+}
+
+.scanline-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(57, 255, 20, 0.03) 50%,
+    transparent 100%
+  );
+  animation: scanline 6s linear infinite;
+  pointer-events: none;
+  z-index: 999;
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+.text-glow {
+  text-shadow: 0 0 5px var(--sonar-green), 0 0 10px var(--sonar-green), 0 0 20px var(--sonar-green);
+}
+
+.text-glow-amber {
+  text-shadow: 0 0 5px var(--sonar-amber), 0 0 10px var(--sonar-amber);
+}
+
+.text-glow-red {
+  text-shadow: 0 0 5px var(--sonar-red), 0 0 10px var(--sonar-red);
+}
+
+.border-glow {
+  box-shadow: 0 0 5px var(--sonar-green), inset 0 0 5px rgba(57, 255, 20, 0.1);
+}
+
+.military-btn {
+  position: relative;
+  border: 2px solid var(--sonar-green);
+  background-color: rgba(26, 47, 26, 0.8);
+  color: var(--sonar-green);
+  padding: 8px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.military-btn:hover:not(:disabled) {
+  background-color: rgba(57, 255, 20, 0.2);
+  box-shadow: 0 0 15px var(--sonar-green);
+}
+
+.military-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  background-color: rgba(57, 255, 20, 0.3);
+}
+
+.military-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: var(--sonar-mid);
+  color: var(--sonar-mid);
+}
+
+.military-btn.amber {
+  border-color: var(--sonar-amber);
+  color: var(--sonar-amber);
+}
+
+.military-btn.amber:hover:not(:disabled) {
+  background-color: rgba(255, 176, 0, 0.2);
+  box-shadow: 0 0 15px var(--sonar-amber);
+}
+
+.military-btn.red {
+  border-color: var(--sonar-red);
+  color: var(--sonar-red);
+}
+
+.military-btn.red:hover:not(:disabled) {
+  background-color: rgba(255, 51, 51, 0.2);
+  box-shadow: 0 0 15px var(--sonar-red);
+}
+
+.panel {
+  border: 2px solid var(--sonar-green);
+  background-color: rgba(10, 26, 10, 0.95);
+  padding: 16px;
+  position: relative;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  border: 1px dashed rgba(57, 255, 20, 0.3);
+  pointer-events: none;
+}
+
+.panel-title {
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  color: var(--sonar-green);
+  text-shadow: 0 0 10px var(--sonar-green);
+  letter-spacing: 2px;
+  border-bottom: 1px solid var(--sonar-green);
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+
+.terminal-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.terminal-line {
+  padding: 2px 4px;
+  border-left: 2px solid transparent;
+}
+
+.terminal-line:hover {
+  background-color: rgba(57, 255, 20, 0.1);
+  border-left-color: var(--sonar-green);
+}
+
+.cooldown-bar {
+  height: 4px;
+  background-color: var(--sonar-dark);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.cooldown-fill {
+  height: 100%;
+  background-color: var(--sonar-amber);
+  transition: width 0.3s ease;
+}
+
+.energy-bar {
+  height: 20px;
+  background-color: var(--sonar-dark);
+  border: 1px solid var(--sonar-green);
+  overflow: hidden;
+  position: relative;
+}
+
+.energy-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sonar-red), var(--sonar-amber), var(--sonar-green));
+  transition: width 0.3s ease;
+}
+
+.energy-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  color: white;
+  text-shadow: 1px 1px 2px black;
+}
+
+.grid-cell {
+  transition: all 0.1s ease;
+}
+
+.grid-cell:hover {
+  background-color: rgba(57, 255, 20, 0.2) !important;
+}
+
+.grid-cell.selected {
+  background-color: rgba(57, 255, 20, 0.4) !important;
+  box-shadow: inset 0 0 10px var(--sonar-green);
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor-blink::after {
+  content: '_';
+  animation: blink 1s infinite;
+}
+
+@media (max-width: 768px) {
+  .panel {
+    padding: 12px;
+  }
+  
+  .military-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}
