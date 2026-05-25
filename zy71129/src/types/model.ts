@@ -60,7 +60,7 @@ export interface ViewState {
 }
 
 export interface VersionInfo {
-  version: number;
+  number: number;
   timestamp: number;
   description: string;
   author: string;

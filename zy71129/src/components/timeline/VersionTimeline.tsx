@@ -3,7 +3,17 @@ import { GitCompare, Clock, User } from 'lucide-react';
 import { useModelStore } from '../../store/useModelStore';
 
 export function VersionTimeline() {
-  const { versions, currentVersion, compareVersion, setCurrentVersion, setCompareVersion, loaded } = useModelStore();
+  const { 
+    versions, 
+    currentVersion, 
+    compareVersion, 
+    setCurrentVersion, 
+    setCompareVersion, 
+    loaded,
+    compareView,
+    enableCompareMode,
+    disableCompareMode
+  } = useModelStore();
 
   if (!loaded) return null;
 
@@ -18,27 +28,29 @@ export function VersionTimeline() {
         <div className="flex items-center gap-2">
           {versions.map((v) => (
             <button
-              key={v.version}
+              key={v.number}
               onClick={() => {
-                if (compareVersion === v.version) {
-                  setCompareVersion(null);
-                } else if (currentVersion !== v.version) {
-                  if (compareVersion === null) {
-                    setCompareVersion(v.version);
-                  } else {
-                    setCurrentVersion(v.version);
+                if (compareView.enabled) {
+                  if (compareVersion !== v.number) {
+                    if (compareVersion !== null) {
+                      setCurrentVersion(v.number);
+                    } else {
+                      setCompareVersion(v.number);
+                    }
                   }
+                } else {
+                  setCurrentVersion(v.number);
                 }
               }}
               className={`relative px-3 py-1.5 rounded text-xs font-medium transition-all ${
-                currentVersion === v.version
+                currentVersion === v.number
                   ? 'bg-blue-600 text-white'
-                  : compareVersion === v.version
+                  : compareVersion === v.number
                   ? 'bg-purple-600 text-white'
                   : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
               }`}
             >
-              V{v.version}
+              V{v.number}
               <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 px-2 py-1 rounded text-[10px] whitespace-nowrap opacity-0 hover:opacity-100 transition-opacity pointer-events-none z-20">
                 <div className="flex items-center gap-1">
                   <User className="w-3 h-3" />
@@ -48,23 +60,30 @@ export function VersionTimeline() {
                   <Clock className="w-3 h-3" />
                   {new Date(v.timestamp).toLocaleDateString('zh-CN')}
                 </div>
+                {v.description && (
+                  <div className="text-slate-400 mt-0.5">{v.description}</div>
+                )}
               </div>
             </button>
           ))}
         </div>
 
-        {compareVersion !== null && (
+        {!compareView.enabled && versions.length >= 2 && (
+          <button
+            onClick={enableCompareMode}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-md transition-colors ml-2"
+          >
+            <GitCompare className="w-3.5 h-3.5" />
+            版本对比
+          </button>
+        )}
+
+        {compareView.enabled && compareVersion !== null && (
           <div className="flex items-center gap-2 ml-4 px-3 py-1 bg-purple-500/20 rounded border border-purple-500/30">
             <GitCompare className="w-3.5 h-3.5 text-purple-400" />
             <span className="text-xs text-purple-300">
-              对比模式: V{currentVersion} vs V{compareVersion}
+              V{compareVersion} → V{currentVersion}
             </span>
-            <button
-              onClick={() => setCompareVersion(null)}
-              className="ml-1 text-purple-400 hover:text-purple-300"
-            >
-              ×
-            </button>
           </div>
         )}
       </div>

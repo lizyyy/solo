@@ -18,7 +18,7 @@ import { useModelStore } from '../../store/useModelStore';
 import { useSceneStore } from '../../store/useSceneStore';
 import { useCollisionStore } from '../../store/useCollisionStore';
 import { useFilterStore } from '../../store/useFilterStore';
-import { exportScreenshot, exportCollisionList, downloadCSV } from '../../utils/export';
+import { exportScreenshot, exportCollisionList, downloadCSV, exportToPDF } from '../../utils/export';
 import { SceneManager } from '../../three/SceneManager';
 
 interface ToolbarProps {
@@ -54,6 +54,17 @@ export function Toolbar({ sceneManager, onDetectCollisions }: ToolbarProps) {
   const handleExportCSV = () => {
     const csv = exportCollisionList(collisions, getFilteredElements());
     downloadCSV(csv, `碰撞报告_${new Date().toISOString().split('T')[0]}.csv`);
+    setShowExportMenu(false);
+  };
+
+  const handleExportPDF = async () => {
+    await exportToPDF({
+      projectName: '机电管综碰撞检查',
+      date: new Date().toLocaleDateString('zh-CN'),
+      collisions: collisions,
+      elements: getFilteredElements(),
+      statistics: getStatistics()
+    });
     setShowExportMenu(false);
   };
 
@@ -198,6 +209,14 @@ export function Toolbar({ sceneManager, onDetectCollisions }: ToolbarProps) {
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
                 CSV 报表
+              </button>
+              <button
+                onClick={handleExportPDF}
+                disabled={collisions.length === 0}
+                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                PDF 报告
               </button>
             </div>
           )}

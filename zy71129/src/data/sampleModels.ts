@@ -3,13 +3,13 @@ import { ModelElement, VersionInfo } from '../types/model';
 
 export const versions: VersionInfo[] = [
   {
-    version: 1,
+    number: 1,
     timestamp: Date.now() - 86400000 * 3,
     description: '初始设计版本',
     author: '张工'
   },
   {
-    version: 2,
+    number: 2,
     timestamp: Date.now() - 86400000,
     description: '调整消防管线标高',
     author: '李工'

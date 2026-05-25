@@ -44,17 +44,17 @@ export class CollisionEngine {
         
         if (result) {
           const isHard = result.distance <= 0;
-          const distance = Math.abs(result.distance);
+          const penetrationDepth = Math.abs(result.distance);
           
-          if (isHard || distance <= this.softThreshold) {
+          if (isHard || penetrationDepth <= this.softThreshold) {
             return {
               id: `col-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
               elementA: elA.id,
               elementB: elB.id,
               position: result.point,
               type: isHard ? 'hard' : 'soft',
-              distance: distance,
-              severity: this.calculateSeverity(distance, isHard),
+              distance: penetrationDepth,
+              severity: this.calculateSeverity(result.distance, isHard),
               resolved: false,
               timestamp: Date.now()
             };

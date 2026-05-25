@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ModelElement, CollisionPoint, Point3D } from '../types/model';
+import { ElementChange } from '../types/version';
 import { floorDimensions, elevationMarkers } from '../data/sampleModels';
 
 export class SceneManager {
@@ -469,6 +470,101 @@ export class SceneManager {
     this.camera.position.set(25, 20, 25);
     this.controls.target.set(0, 3, 0);
     this.controls.update();
+  }
+
+  applyDiffHighlight(changes: ElementChange[]) {
+    const changeMap = new Map<string, ElementChange>();
+    changes.forEach(change => {
+      changeMap.set(change.elementId, change);
+    });
+
+    this.elementMeshes.forEach((group, elementId) => {
+      const change = changeMap.get(elementId);
+      if (change) {
+        let color: THREE.Color;
+        switch (change.type) {
+          case 'added':
+            color = new THREE.Color('#00B42A');
+            break;
+          case 'removed':
+            color = new THREE.Color('#F53F3F');
+            break;
+          case 'modified':
+            color = new THREE.Color('#FF7D00');
+            break;
+          default:
+            const element = group.userData.element as ModelElement;
+            color = new THREE.Color(element.color);
+        }
+        
+        group.traverse(child => {
+          if (child instanceof THREE.Mesh) {
+            const material = child.material as THREE.MeshPhongMaterial;
+            if (!material.userData.originalColor) {
+              material.userData.originalColor = material.color.clone();
+            }
+            material.color.copy(color);
+            
+            if (change.type !== 'unchanged') {
+              material.emissive = color.clone();
+              material.emissiveIntensity = 0.2;
+            } else {
+              material.emissive = new THREE.Color(0x000000);
+              material.emissiveIntensity = 0;
+            }
+          }
+          if (child instanceof THREE.LineSegments) {
+            const lineMaterial = child.material as THREE.LineBasicMaterial;
+            lineMaterial.color.copy(color);
+          }
+        });
+      }
+    });
+  }
+
+  clearDiffHighlight() {
+    this.elementMeshes.forEach((group) => {
+      group.traverse(child => {
+        if (child instanceof THREE.Mesh) {
+          const material = child.material as THREE.MeshPhongMaterial;
+          if (material.userData.originalColor) {
+            material.color.copy(material.userData.originalColor);
+          }
+          material.emissive = new THREE.Color(0x000000);
+          material.emissiveIntensity = 0;
+        }
+        const element = group.userData.element as ModelElement;
+        if (element && child instanceof THREE.LineSegments) {
+          const lineMaterial = child.material as THREE.LineBasicMaterial;
+          lineMaterial.color = new THREE.Color(element.color);
+        }
+      });
+    });
+  }
+
+  getCameraState() {
+    return {
+      position: {
+        x: this.camera.position.x,
+        y: this.camera.position.y,
+        z: this.camera.position.z
+      },
+      target: {
+        x: this.controls.target.x,
+        y: this.controls.target.y,
+        z: this.controls.target.z
+      }
+    };
+  }
+
+  setCameraState(state: { position: Point3D; target: Point3D }) {
+    this.camera.position.set(state.position.x, state.position.y, state.position.z);
+    this.controls.target.set(state.target.x, state.target.y, state.target.z);
+    this.controls.update();
+  }
+
+  onCameraChange(callback: () => void) {
+    this.controls.addEventListener('change', callback);
   }
 
   getRenderer(): THREE.WebGLRenderer {

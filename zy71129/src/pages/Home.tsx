@@ -1,11 +1,12 @@
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { SceneCanvas } from '../components/scene/SceneCanvas';
 import { Toolbar } from '../components/toolbar/Toolbar';
 import { Sidebar } from '../components/sidebar/Sidebar';
 import { SidebarContent } from '../components/sidebar/SidebarContent';
 import { CollisionPanel } from '../components/collision/CollisionPanel';
 import { CollisionPanelContent } from '../components/collision/CollisionPanelContent';
+import { ComparePanel } from '../components/compare/ComparePanel';
 import { VersionTimeline } from '../components/timeline/VersionTimeline';
 import { SceneManager } from '../three/SceneManager';
 import { CollisionEngine } from '../three/CollisionEngine';
@@ -19,7 +20,15 @@ export default function Home() {
   const [sceneManager, setSceneManager] = useState<SceneManager | null>(null);
   const collisionEngineRef = useRef<CollisionEngine | null>(null);
 
-  const { getFilteredElements, loaded } = useModelStore();
+  const { 
+    getFilteredElements, 
+    getElementsByVersion,
+    loaded, 
+    compareView, 
+    versionDiff,
+    currentVersion,
+    compareVersion
+  } = useModelStore();
   const { types, elevationRange } = useFilterStore();
   const { setCollisions, setIsDetecting, setSoftCollisionThreshold, isDetecting } = useCollisionStore();
 
@@ -51,16 +60,83 @@ export default function Home() {
     }, 300);
   }, [sceneManager, loaded, getFilteredElements, types, elevationRange, setCollisions, setIsDetecting, collisionPanelOpen]);
 
+  useEffect(() => {
+    if (!sceneManager || !loaded) return;
+
+    if (compareView.enabled && compareView.viewMode === 'overlay') {
+      const elements = getFilteredElements().filter(el => {
+        if (!types.includes(el.type)) return false;
+        if (el.elevation < elevationRange[0] || el.elevation > elevationRange[1]) return false;
+        return true;
+      });
+      sceneManager.loadElements(elements);
+    } else {
+      const elements = getElementsByVersion(currentVersion).filter(el => {
+        if (!types.includes(el.type)) return false;
+        if (el.elevation < elevationRange[0] || el.elevation > elevationRange[1]) return false;
+        return true;
+      });
+      sceneManager.loadElements(elements);
+    }
+  }, [sceneManager, loaded, compareView.enabled, compareView.viewMode, currentVersion, compareVersion, types, elevationRange, getFilteredElements, getElementsByVersion]);
+
+  useEffect(() => {
+    if (!sceneManager || !compareView.enabled || !versionDiff) {
+      if (sceneManager) {
+        sceneManager.clearDiffHighlight();
+      }
+      return;
+    }
+
+    if (compareView.highlightDiff) {
+      sceneManager.applyDiffHighlight(versionDiff.changes);
+    } else {
+      sceneManager.clearDiffHighlight();
+    }
+  }, [sceneManager, compareView.enabled, compareView.highlightDiff, versionDiff]);
+
   return (
     <div className="relative w-full h-screen bg-slate-950 overflow-hidden">
-      <div className="absolute inset-0 pt-14 md:pt-14 pb-16 md:pb-16">
-        <SceneCanvas onSceneReady={handleSceneReady} />
+      <div className={`absolute inset-0 ${compareView.enabled ? 'pt-28' : 'pt-14'} md:pt-14 pb-16 md:pb-16 ${compareView.enabled ? 'md:pt-28' : ''}`}>
+        {compareView.enabled && compareView.viewMode === 'sideBySide' ? (
+          <div className="w-full h-full flex gap-2 p-2">
+            <div className="flex-1 relative rounded-lg overflow-hidden border border-slate-700">
+              <div className="absolute top-2 left-2 z-10 px-2 py-1 bg-slate-800/80 text-xs text-slate-300 rounded">
+                V{compareVersion} (旧版本)
+              </div>
+              <SceneCanvas 
+                onSceneReady={handleSceneReady} 
+                key="compare-old"
+                versionNumber={compareVersion}
+              />
+            </div>
+            <div className="flex-1 relative rounded-lg overflow-hidden border border-slate-700">
+              <div className="absolute top-2 left-2 z-10 px-2 py-1 bg-slate-800/80 text-xs text-blue-400 rounded">
+                V{currentVersion} (新版本)
+              </div>
+              <SceneCanvas 
+                onSceneReady={(manager) => {
+                  setSceneManager(manager);
+                  if (collisionEngineRef.current === null) {
+                    collisionEngineRef.current = new CollisionEngine();
+                  }
+                }}
+                key="compare-new"
+                versionNumber={currentVersion}
+              />
+            </div>
+          </div>
+        ) : (
+          <SceneCanvas onSceneReady={handleSceneReady} />
+        )}
       </div>
 
       <Toolbar
         sceneManager={sceneManager}
         onDetectCollisions={handleDetectCollisions}
       />
+
+      <ComparePanel />
 
       <div className="hidden md:block">
         <Sidebar
