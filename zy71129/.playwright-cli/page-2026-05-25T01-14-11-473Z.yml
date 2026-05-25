@@ -1,0 +1,88 @@
+- generic [ref=e3]:
+  - generic [ref=e7]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - img [ref=e11]
+        - heading "管线碰撞检查系统" [level=1] [ref=e14]
+      - button "导入样例" [ref=e16] [cursor=pointer]:
+        - img [ref=e17]
+        - generic [ref=e20]: 导入样例
+      - button "碰撞检测" [disabled] [ref=e21]:
+        - img [ref=e22]
+        - generic [ref=e24]: 碰撞检测
+      - button "重置" [ref=e25] [cursor=pointer]:
+        - img [ref=e26]
+        - generic [ref=e29]: 重置
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - button "显示网格" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+        - button "显示坐标轴" [ref=e35] [cursor=pointer]:
+          - img [ref=e36]
+        - button "显示标高面" [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+        - button "线框模式" [ref=e42] [cursor=pointer]:
+          - img [ref=e43]
+        - button "自动旋转" [ref=e48] [cursor=pointer]:
+          - img [ref=e49]
+      - button "导出" [ref=e54] [cursor=pointer]:
+        - img [ref=e55]
+        - generic [ref=e58]: 导出
+        - img [ref=e59]
+  - generic:
+    - generic [ref=e62]:
+      - generic [ref=e63]:
+        - button "图层" [ref=e64] [cursor=pointer]:
+          - generic [ref=e65]:
+            - img [ref=e66]
+            - text: 图层
+        - button "筛选" [ref=e70] [cursor=pointer]:
+          - generic [ref=e71]:
+            - img [ref=e72]
+            - text: 筛选
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - heading "专业类型" [level=3] [ref=e77]
+          - generic [ref=e78]:
+            - generic [ref=e79] [cursor=pointer]:
+              - checkbox "线缆桥架" [checked] [ref=e80]
+              - generic [ref=e82]: 线缆桥架
+            - generic [ref=e83] [cursor=pointer]:
+              - checkbox "通风管道" [checked] [ref=e84]
+              - generic [ref=e86]: 通风管道
+            - generic [ref=e87] [cursor=pointer]:
+              - checkbox "消防管线" [checked] [ref=e88]
+              - generic [ref=e90]: 消防管线
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - heading "构件列表" [level=3] [ref=e94]
+            - generic [ref=e95]: 0 个
+          - generic [ref=e96]:
+            - img [ref=e97]
+            - textbox "搜索构件..." [ref=e100]
+    - button [ref=e101] [cursor=pointer]:
+      - img [ref=e102]
+  - generic:
+    - generic [ref=e105]:
+      - generic [ref=e106]:
+        - generic [ref=e107]:
+          - heading "碰撞列表" [level=3] [ref=e108]:
+            - img [ref=e109]
+            - text: 碰撞列表
+          - generic [ref=e111]: 0 项
+        - generic [ref=e112]:
+          - combobox [ref=e113]:
+            - option "全部类型" [selected]
+            - option "硬碰撞"
+            - option "软碰撞"
+          - combobox [ref=e114]:
+            - option "全部严重级" [selected]
+            - option "严重"
+            - option "主要"
+            - option "次要"
+      - generic [ref=e116]:
+        - img [ref=e117]
+        - paragraph [ref=e120]: 暂无碰撞
+    - button [ref=e121] [cursor=pointer]:
+      - img [ref=e122]
+  - paragraph [ref=e127]: 点击"导入样例"加载演示数据
