@@ -1,14 +1,13 @@
-import { EvacuationPlan, Student, Conflict, Statistics, Position, Classroom } from '@/types';
+import { EvacuationPlan, Student, Conflict, Statistics, Position } from '@/types';
 
-const STUDENT_SPEED = 2.5;
-const STAIR_SPEED_FACTOR = 0.7;
-const PERSONAL_SPACE = 0.6;
-const STAIR_ENTRY_RADIUS = 4;
+const STUDENT_SPEED = 3.5;
+const STAIR_SPEED_FACTOR = 0.5;
+const PERSONAL_SPACE = 0.5;
+const STAIR_ENTRY_RADIUS = 6;
 
 interface StairQueue {
   stairId: string;
   queue: Student[];
-  processing: Student[];
 }
 
 interface BlockageEvent {
@@ -30,21 +29,14 @@ function generatePath(
   
   path.push({ ...classroomPos });
   
-  const stairEntrance = {
-    x: stairPos.x,
-    y: classroomPos.y,
-    z: stairPos.z
-  };
-  path.push(stairEntrance);
-  
   path.push({
     x: stairPos.x,
-    y: 0,
+    y: classroomPos.y,
     z: stairPos.z
   });
   
   path.push({
-    x: assemblyPos.x,
+    x: stairPos.x,
     y: 0,
     z: stairPos.z
   });
@@ -52,33 +44,6 @@ function generatePath(
   path.push({ ...assemblyPos });
   
   return path;
-}
-
-function findAlternativeStair(
-  classroom: Classroom,
-  plan: EvacuationPlan,
-  preferredStairId: string
-): string | null {
-  const availableStairs = plan.stairs.filter(s => 
-    !s.isClosed && 
-    s.id !== preferredStairId &&
-    s.floors.includes(classroom.floor)
-  );
-  
-  if (availableStairs.length === 0) return null;
-  
-  let nearestStair = availableStairs[0];
-  let minDist = Infinity;
-  
-  availableStairs.forEach(stair => {
-    const dist = Math.abs(classroom.position.x - stair.position.x);
-    if (dist < minDist) {
-      minDist = dist;
-      nearestStair = stair;
-    }
-  });
-  
-  return nearestStair.id;
 }
 
 function initializeStudents(plan: EvacuationPlan): Student[] {
@@ -107,9 +72,9 @@ function initializeStudents(plan: EvacuationPlan): Student[] {
     
     for (let i = 0; i < classroom.studentCount; i++) {
       const offset = {
-        x: (Math.random() - 0.5) * 4,
+        x: (Math.random() - 0.5) * 2,
         y: 0,
-        z: (Math.random() - 0.5) * 4
+        z: (Math.random() - 0.5) * 2
       };
       
       students.push({
@@ -124,8 +89,8 @@ function initializeStudents(plan: EvacuationPlan): Student[] {
         targetPosition: { ...path[0] },
         path: path.map(p => ({ ...p })),
         currentPathIndex: 0,
-        speed: STUDENT_SPEED * (0.85 + Math.random() * 0.3),
-        startTime: classroom.exitDelay + i * 0.1,
+        speed: STUDENT_SPEED * (0.9 + Math.random() * 0.2),
+        startTime: classroom.exitDelay + i * 0.05,
         arrivalTime: null,
         queueTime: 0,
         rerouted: false
@@ -157,6 +122,7 @@ export class EvacuationSimulator {
   private isRunning: boolean = false;
   private stairQueues: Map<string, StairQueue> = new Map();
   private stairUsage: Map<string, number> = new Map();
+  private maxQueueLength: number = 0;
   private onUpdate: ((state: { students: Student[]; conflicts: Conflict[]; statistics: Statistics }) => void) | null = null;
   
   constructor(plan: EvacuationPlan) {
@@ -170,8 +136,7 @@ export class EvacuationSimulator {
     this.plan.stairs.forEach(stair => {
       this.stairQueues.set(stair.id, {
         stairId: stair.id,
-        queue: [],
-        processing: []
+        queue: []
       });
     });
   }
@@ -181,6 +146,7 @@ export class EvacuationSimulator {
     this.conflicts = [];
     this.blockageEvents = [];
     this.currentTime = 0;
+    this.maxQueueLength = 0;
     this.initializeStairQueues();
     this.stairUsage = new Map();
     this.plan.stairs.forEach(s => {
@@ -234,71 +200,79 @@ export class EvacuationSimulator {
     return this.blockageEvents;
   }
   
-  private getStudentsInStair(stairId: string): number {
+  private getStudentsNearStair(stairId: string): number {
     const stair = this.plan.stairs.find(s => s.id === stairId);
     if (!stair) return 0;
     
     return this.students.filter(student => {
-      if (student.status !== 'inStair') return false;
-      const dist = distance(student.position, {
-        x: stair.position.x,
-        y: student.position.y,
-        z: stair.position.z
-      });
-      return dist < 8;
+      if (student.status === 'arrived') return false;
+      if (student.status === 'waiting') return false;
+      if (student.status === 'queued') return false;
+      
+      const dist = Math.sqrt(
+        Math.pow(student.position.x - stair.position.x, 2) +
+        Math.pow(student.position.z - stair.position.z, 2)
+      );
+      return dist < 12;
+    }).length;
+  }
+  
+  private getStudentsApproachingStair(stairId: string): number {
+    const stair = this.plan.stairs.find(s => s.id === stairId);
+    if (!stair) return 0;
+    
+    return this.students.filter(student => {
+      if (student.status === 'arrived') return false;
+      if (student.status === 'waiting') return false;
+      if (student.status === 'queued') return false;
+      
+      const dist = Math.sqrt(
+        Math.pow(student.position.x - stair.position.x, 2) +
+        Math.pow(student.position.z - stair.position.z, 2)
+      );
+      return dist < 15;
     }).length;
   }
   
   private checkStudentCollision(student: Student, newPos: Position): boolean {
+    let checkCount = 0;
     for (const other of this.students) {
       if (other.id === student.id) continue;
       if (other.status === 'arrived') continue;
       if (other.status === 'waiting') continue;
+      if (other.status === 'queued') continue;
       
       const dist = distance(newPos, other.position);
       if (dist < PERSONAL_SPACE) {
         return true;
       }
+      
+      checkCount++;
+      if (checkCount > 20) break;
     }
     return false;
   }
   
-  private isAtStairEntrance(student: Student, stairId: string): boolean {
+  private isNearStair(student: Student, stairId: string): boolean {
     const stair = this.plan.stairs.find(s => s.id === stairId);
     if (!stair) return false;
     
-    const stairEntrance = {
-      x: stair.position.x,
-      y: student.position.y,
-      z: stair.position.z
-    };
-    
-    return distance(student.position, stairEntrance) < STAIR_ENTRY_RADIUS;
-  }
-  
-  private rerouteStudent(student: Student, currentStairId: string): boolean {
-    const classroom = this.plan.classrooms.find(c => c.id === student.classroomId);
-    if (!classroom) return false;
-    
-    const alternativeStairId = findAlternativeStair(classroom, this.plan, currentStairId);
-    if (!alternativeStairId) return false;
-    
-    const alternativeStair = this.plan.stairs.find(s => s.id === alternativeStairId);
-    if (!alternativeStair) return false;
-    
-    const assemblyPoint = this.plan.assemblyPoints[0];
-    
-    const newPath = generatePath(
-      student.position,
-      alternativeStair.position,
-      assemblyPoint.position
+    const dist = Math.sqrt(
+      Math.pow(student.position.x - stair.position.x, 2) +
+      Math.pow(student.position.z - stair.position.z, 2)
     );
     
-    student.path = newPath;
-    student.currentPathIndex = 0;
-    student.rerouted = true;
-    
-    return true;
+    return dist < STAIR_ENTRY_RADIUS;
+  }
+  
+  private isInStairwell(student: Student): boolean {
+    return this.plan.stairs.some(stair => {
+      const dist = Math.sqrt(
+        Math.pow(student.position.x - stair.position.x, 2) +
+        Math.pow(student.position.z - stair.position.z, 2)
+      );
+      return dist < 8;
+    });
   }
   
   update(deltaTime: number, speedMultiplier: number = 1): void {
@@ -307,28 +281,35 @@ export class EvacuationSimulator {
     const dt = deltaTime * speedMultiplier;
     this.currentTime += dt;
     
+    this.students.forEach(student => {
+      if (this.currentTime < student.startTime) return;
+      if (student.status === 'waiting') {
+        student.status = 'moving';
+      }
+      if (student.status === 'arrived' || student.status === 'queued') return;
+      
+      const inStair = this.isInStairwell(student) && student.position.y > 0.1;
+      if (inStair) {
+        student.status = 'inStair';
+      } else {
+        student.status = 'moving';
+      }
+    });
+    
     this.plan.stairs.forEach(stair => {
       if (stair.isClosed) return;
       
       const queue = this.stairQueues.get(stair.id);
       if (!queue) return;
       
-      queue.processing = queue.processing.filter(student => {
-        if (student.status === 'arrived') return false;
-        if (student.status === 'inStair') return false;
-        return student.status === 'moving' && this.isAtStairEntrance(student, stair.id);
-      });
-      
       const inStairCount = this.getStudentsInStair(stair.id);
-      const availableSlots = Math.max(0, stair.capacity - inStairCount - queue.processing.length);
+      const availableSlots = Math.max(0, stair.capacity - inStairCount);
       
-      const slotsToFill = Math.min(availableSlots, 3);
-      
-      for (let i = 0; i < slotsToFill && queue.queue.length > 0; i++) {
+      const toRelease = Math.min(availableSlots, 15);
+      for (let i = 0; i < toRelease && queue.queue.length > 0; i++) {
         const student = queue.queue.shift();
         if (student) {
           student.status = 'moving';
-          queue.processing.push(student);
         }
       }
     });
@@ -336,10 +317,6 @@ export class EvacuationSimulator {
     this.students.forEach(student => {
       if (this.currentTime < student.startTime) {
         return;
-      }
-      
-      if (student.status === 'waiting') {
-        student.status = 'moving';
       }
       
       if (student.status === 'arrived') {
@@ -361,33 +338,26 @@ export class EvacuationSimulator {
       const classroom = this.plan.classrooms.find(c => c.id === student.classroomId);
       const assignedStairId = classroom?.assignedStairId;
       
-      if (assignedStairId && this.isAtStairEntrance(student, assignedStairId)) {
+      if (assignedStairId && this.isNearStair(student, assignedStairId) && student.position.y > 0.1) {
         const stair = this.plan.stairs.find(s => s.id === assignedStairId);
         if (stair && !stair.isClosed) {
           const queue = this.stairQueues.get(assignedStairId);
           const inStairCount = this.getStudentsInStair(assignedStairId);
-          const processingCount = queue?.processing.length || 0;
           
-          const isInProcessing = queue?.processing.includes(student);
+          const isInQueue = queue?.queue.includes(student);
           
-          if (!isInProcessing && inStairCount + processingCount >= stair.capacity) {
-            if (queue && !queue.queue.includes(student)) {
+          if (!isInQueue && inStairCount >= stair.capacity * 0.95) {
+            if (queue) {
               student.status = 'queued';
               queue.queue.push(student);
             }
             return;
           }
-          
-          if (queue && isInProcessing) {
-            const idx = queue.processing.indexOf(student);
-            if (idx > -1) {
-              queue.processing.splice(idx, 1);
-            }
-          }
         }
       }
       
-      const currentSpeed = student.status === 'inStair' 
+      const inStair = this.isInStairwell(student) && student.position.y > 0.1;
+      const currentSpeed = inStair 
         ? student.speed * STAIR_SPEED_FACTOR 
         : student.speed;
       
@@ -412,15 +382,34 @@ export class EvacuationSimulator {
         
         if (!this.checkStudentCollision(student, newPos)) {
           student.position = newPos;
+        } else {
+          const altPos = {
+            x: newPos.x + (Math.random() - 0.5) * 0.5,
+            y: newPos.y,
+            z: newPos.z + (Math.random() - 0.5) * 0.5
+          };
+          if (!this.checkStudentCollision(student, altPos)) {
+            student.position = altPos;
+          }
         }
       }
       
-      this.updateStudentStatus(student);
+      if (inStair) {
+        student.status = 'inStair';
+      } else if (student.status !== 'arrived') {
+        student.status = 'moving';
+      }
     });
     
     this.updateStairUsage();
     this.detectConflicts();
     this.detectBlockages();
+    
+    const currentQueueLength = Array.from(this.stairQueues.values())
+      .reduce((sum, q) => sum + q.queue.length, 0);
+    if (currentQueueLength > this.maxQueueLength) {
+      this.maxQueueLength = currentQueueLength;
+    }
     
     if (this.onUpdate) {
       this.onUpdate({
@@ -431,21 +420,22 @@ export class EvacuationSimulator {
     }
   }
   
-  private updateStudentStatus(student: Student): void {
-    const stair = this.plan.stairs.find(s => {
-      const dist = distance(student.position, {
-        x: s.position.x,
-        y: student.position.y,
-        z: s.position.z
-      });
-      return dist < 8;
-    });
+  private getStudentsInStair(stairId: string): number {
+    const stair = this.plan.stairs.find(s => s.id === stairId);
+    if (!stair) return 0;
     
-    if (stair && student.position.y > 0.5) {
-      student.status = 'inStair';
-    } else if (student.status !== 'queued' && student.status !== 'arrived') {
-      student.status = 'moving';
-    }
+    return this.students.filter(student => {
+      if (student.status === 'arrived') return false;
+      if (student.status === 'waiting') return false;
+      if (student.status === 'queued') return false;
+      if (student.position.y < 0.1) return false;
+      
+      const dist = Math.sqrt(
+        Math.pow(student.position.x - stair.position.x, 2) +
+        Math.pow(student.position.z - stair.position.z, 2)
+      );
+      return dist < 10;
+    }).length;
   }
   
   private updateStairUsage(): void {
@@ -621,7 +611,7 @@ export class EvacuationSimulator {
         : 0;
     });
     
-    const totalQueueLength = Array.from(this.stairQueues.values())
+    const currentQueueLength = Array.from(this.stairQueues.values())
       .reduce((sum, q) => sum + q.queue.length, 0);
     
     return {
@@ -641,7 +631,8 @@ export class EvacuationSimulator {
       stairUtilization,
       classroomCompletion,
       classroomQueueTime,
-      totalQueueLength,
+      totalQueueLength: this.maxQueueLength,
+      currentQueueLength,
       blockageCount: this.blockageEvents.filter(b => !b.resolved).length
     };
   }

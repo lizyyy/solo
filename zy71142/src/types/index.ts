@@ -93,6 +93,7 @@ export interface Statistics {
   classroomCompletion: Record<string, number>;
   classroomQueueTime?: Record<string, number>;
   totalQueueLength?: number;
+  currentQueueLength?: number;
   blockageCount?: number;
 }
 

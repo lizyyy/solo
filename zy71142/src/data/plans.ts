@@ -30,8 +30,8 @@ export const normalPlan: EvacuationPlan = {
     { id: 'c104', name: '1年级4班', floor: 1, grade: 1, studentCount: 45, position: { x: 15, y: 0, z: 0 }, exitOrder: 16, exitDelay: 45, assignedStairId: 'stair-right' },
   ],
   stairs: [
-    { id: 'stair-left', name: '左侧楼梯', floors: [1, 2, 3, 4], capacity: 60, currentCount: 0, position: { x: -20, y: 0, z: 5 }, isClosed: false, width: 4, depth: 6 },
-    { id: 'stair-right', name: '右侧楼梯', floors: [1, 2, 3, 4], capacity: 60, currentCount: 0, position: { x: 20, y: 0, z: 5 }, isClosed: false, width: 4, depth: 6 },
+    { id: 'stair-left', name: '左侧楼梯', floors: [1, 2, 3, 4], capacity: 80, currentCount: 0, position: { x: -20, y: 0, z: 5 }, isClosed: false, width: 4, depth: 6 },
+    { id: 'stair-right', name: '右侧楼梯', floors: [1, 2, 3, 4], capacity: 80, currentCount: 0, position: { x: 20, y: 0, z: 5 }, isClosed: false, width: 4, depth: 6 },
   ],
   assemblyPoints: [
     { id: 'ap1', name: '操场集合点A', capacity: 500, currentCount: 0, position: { x: 0, y: -2, z: -25 }, radius: 8 },
@@ -70,8 +70,8 @@ export const conflictPlan: EvacuationPlan = {
     { id: 'c404', name: '4年级4班', floor: 4, grade: 4, studentCount: 50, position: { x: 15, y: 12, z: 0 }, exitOrder: 1, exitDelay: 0, assignedStairId: 'stair-main' },
   ],
   stairs: [
-    { id: 'stair-main', name: '主楼梯', floors: [1, 2, 3, 4], capacity: 80, currentCount: 0, position: { x: 0, y: 0, z: 5 }, isClosed: false, width: 6, depth: 6 },
-    { id: 'stair-back', name: '后楼梯', floors: [1, 2, 3, 4], capacity: 50, currentCount: 0, position: { x: 0, y: 0, z: -5 }, isClosed: true, width: 4, depth: 4 },
+    { id: 'stair-main', name: '主楼梯', floors: [1, 2, 3, 4], capacity: 20, currentCount: 0, position: { x: 0, y: 0, z: 5 }, isClosed: false, width: 6, depth: 6 },
+    { id: 'stair-back', name: '后楼梯', floors: [1, 2, 3, 4], capacity: 20, currentCount: 0, position: { x: 0, y: 0, z: -5 }, isClosed: true, width: 4, depth: 4 },
   ],
   assemblyPoints: [
     { id: 'ap1', name: '操场集合点', capacity: 400, currentCount: 0, position: { x: 0, y: -2, z: -25 }, radius: 10 },
