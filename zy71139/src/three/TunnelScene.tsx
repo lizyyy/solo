@@ -121,10 +121,15 @@ const SceneContent: React.FC<SceneContentProps> = ({
       onUpdateSmoke(result.particles);
       onUpdateCoverage(result.coverage);
       
-      escapeRoutes.forEach((route) => {
-        const isBlocked = result.blockedRoutes.includes(route.id);
-        if (route.isBlocked !== isBlocked) {
-          onUpdateEscapeRoute(route.id, isBlocked);
+      const escapeRoutesUpdated = escapeRoutes.map((route) => ({
+        ...route,
+        isBlocked: result.blockedRoutes.includes(route.id)
+      }));
+      
+      escapeRoutesUpdated.forEach((route) => {
+        const originalRoute = escapeRoutes.find((r) => r.id === route.id);
+        if (originalRoute && originalRoute.isBlocked !== route.isBlocked) {
+          onUpdateEscapeRoute(route.id, route.isBlocked);
         }
       });
       
@@ -142,7 +147,7 @@ const SceneContent: React.FC<SceneContentProps> = ({
       
       const errors = detectErrors({
         fans,
-        escapeRoutes,
+        escapeRoutes: escapeRoutesUpdated,
         currentStep,
         previousFans: previousFansRef.current,
         previousBlockedRoutes: previousBlockedRef.current,

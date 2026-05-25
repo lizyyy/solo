@@ -121,7 +121,8 @@ export const useSimulationStore = create<SimulationState & SimulationActions>((s
       fans: JSON.parse(JSON.stringify(state.selectedScene.fans)),
       escapeRoutes: JSON.parse(JSON.stringify(state.selectedScene.escapeRoutes)),
       smokeSources: JSON.parse(JSON.stringify(state.selectedScene.smokeSources)),
-      vehicles: JSON.parse(JSON.stringify(state.selectedScene.vehicles))
+      vehicles: JSON.parse(JSON.stringify(state.selectedScene.vehicles)),
+      startTime: Date.now()
     };
   }),
 
