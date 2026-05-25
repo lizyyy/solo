@@ -9,10 +9,10 @@ const sampleData = {
     speed: 60,
     observerHeight: 3.5,
     obstacles: [
-      { id: 'tree1', type: 'tree', name: '大树1', position: { x: 12, z: 40 }, height: 12, width: 4, visible: true },
-      { id: 'tree2', type: 'tree', name: '大树2', position: { x: -10, z: 35 }, height: 10, width: 3.5, visible: true },
-      { id: 'tree3', type: 'tree', name: '小树1', position: { x: 8, z: 55 }, height: 6, width: 2, visible: true },
-      { id: 'building1', type: 'building', name: '农舍', position: { x: -15, z: 25 }, height: 5, width: 8, depth: 6, visible: true }
+      { id: 'tree1', type: 'tree', name: '右侧大树', position: { x: 25, z: 40 }, height: 12, width: 5, visible: true },
+      { id: 'tree2', type: 'tree', name: '左侧大树', position: { x: -22, z: 45 }, height: 10, width: 4, visible: true },
+      { id: 'tree3', type: 'tree', name: '右侧小树', position: { x: 15, z: 60 }, height: 6, width: 2, visible: true },
+      { id: 'building1', type: 'building', name: '路边农舍', position: { x: -30, z: 30 }, height: 5, width: 10, depth: 8, visible: true }
     ]
   },
   sample2: {
@@ -20,9 +20,9 @@ const sampleData = {
     speed: 70,
     observerHeight: 3.8,
     obstacles: [
-      { id: 'factory1', type: 'building', name: '厂房A', position: { x: 15, z: 30 }, height: 8, width: 12, depth: 15, visible: true },
-      { id: 'factory2', type: 'building', name: '仓库', position: { x: -12, z: 45 }, height: 6, width: 10, depth: 8, visible: true },
-      { id: 'wall1', type: 'wall', name: '围墙', position: { x: 10, z: 50 }, height: 3, width: 15, depth: 0.5, visible: true }
+      { id: 'factory1', type: 'building', name: '右侧厂房', position: { x: 28, z: 35 }, height: 8, width: 15, depth: 15, visible: true },
+      { id: 'factory2', type: 'building', name: '左侧仓库', position: { x: -25, z: 40 }, height: 6, width: 12, depth: 10, visible: true },
+      { id: 'wall1', type: 'wall', name: '厂区围墙', position: { x: 20, z: 55 }, height: 3, width: 20, depth: 0.5, visible: true }
     ]
   },
   sample3: {
@@ -429,7 +429,7 @@ class RailwayCrossingApp {
     this.observerMarker.getWorldPosition(observerPos)
     observerPos.y = this.state.observerHeight
 
-    const sightAngle = 70 * Math.PI / 180
+    const sightAngle = 30 * Math.PI / 180
     const directions = [
       { angle: -sightAngle, name: 'left' },
       { angle: sightAngle, name: 'right' }
@@ -475,7 +475,7 @@ class RailwayCrossingApp {
     const requiredDistance = this.calculateBrakingDistance(this.state.speed)
 
     const observerPos = sightData.observerPos || new THREE.Vector3(0, this.state.observerHeight, 80)
-    const sightAngle = 70 * Math.PI / 180
+    const sightAngle = 30 * Math.PI / 180
 
     const updateLine = (line, angle, distance, color) => {
       const endPoint = new THREE.Vector3(
