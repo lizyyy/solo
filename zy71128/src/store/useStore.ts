@@ -45,11 +45,12 @@ interface AppState {
   setShowFirePoints: (show: boolean) => void;
   
   setIsPlaying: (playing: boolean) => void;
-  setCurrentTime: (time: number) => void;
+  setCurrentTime: (time: number | ((prev: number) => number)) => void;
   setCameraPosition: (pos: Position3D) => void;
   
   resetState: () => void;
   recalculateCoverage: () => void;
+  importData: (data: any) => void;
 }
 
 const initialCoverageMap = calculateCoverageMap(WATCHTOWERS, TERRAIN_DATA, TREES, SEASONS[1]);
@@ -112,8 +113,26 @@ export const useStore = create<AppState>((set, get) => ({
   setShowFirePoints: (show) => set({ showFirePoints: show }),
   
   setIsPlaying: (playing) => set({ isPlaying: playing }),
-  setCurrentTime: (time) => set({ currentTime: time }),
+  setCurrentTime: (time) => set((state) => ({ 
+    currentTime: typeof time === 'function' ? time(state.currentTime) : time 
+  })),
   setCameraPosition: (pos) => set({ cameraPosition: pos }),
+  
+  importData: (data) => {
+    const { season, watchtowers, routes, firePoints, showCoverage, showBlindSpots, showRoutes, showTrees, showFirePoints } = data;
+    
+    if (season) set({ season });
+    if (watchtowers) set({ watchtowers });
+    if (routes) set({ routes });
+    if (firePoints) set({ firePoints });
+    if (typeof showCoverage === 'boolean') set({ showCoverage });
+    if (typeof showBlindSpots === 'boolean') set({ showBlindSpots });
+    if (typeof showRoutes === 'boolean') set({ showRoutes });
+    if (typeof showTrees === 'boolean') set({ showTrees });
+    if (typeof showFirePoints === 'boolean') set({ showFirePoints });
+    
+    get().recalculateCoverage();
+  },
   
   resetState: () => {
     const coverageMap = calculateCoverageMap(WATCHTOWERS, TERRAIN_DATA, TREES, SEASONS[1]);

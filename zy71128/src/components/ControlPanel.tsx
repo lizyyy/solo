@@ -27,6 +27,7 @@ export function ControlPanel() {
   const setShowTrees = useStore(state => state.setShowTrees);
   const setShowFirePoints = useStore(state => state.setShowFirePoints);
   const resetState = useStore(state => state.resetState);
+  const importData = useStore(state => state.importData);
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section);
@@ -43,10 +44,10 @@ export function ControlPanel() {
         reader.onload = (event) => {
           try {
             const data = JSON.parse(event.target?.result as string);
-            console.log('Imported data:', data);
-            alert('数据导入成功！');
+            importData(data);
+            alert('数据导入成功！覆盖分析已重新计算。');
           } catch {
-            alert('数据格式错误！');
+            alert('数据格式错误！请检查JSON文件格式。');
           }
         };
         reader.readAsText(file);

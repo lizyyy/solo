@@ -8,7 +8,6 @@ interface WatchtowerProps {
 export function Watchtower({ tower }: WatchtowerProps) {
   const selectedWatchtower = useStore(state => state.selectedWatchtower);
   const selectWatchtower = useStore(state => state.selectWatchtower);
-  const season = useStore(state => state.season);
   
   const isSelected = selectedWatchtower === tower.id;
   const scale = tower.enabled ? 1 : 0.6;

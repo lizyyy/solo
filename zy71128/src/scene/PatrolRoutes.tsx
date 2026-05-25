@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-import * as THREE from 'three';
+import { Line } from '@react-three/drei';
 import { useStore } from '../store/useStore';
 
 export function PatrolRoutes() {
@@ -15,33 +14,27 @@ export function PatrolRoutes() {
   return (
     <>
       {enabledRoutes.map(route => {
-        const points = route.points.map(p => new THREE.Vector3(p.x, p.y + 0.5, p.z));
-        const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        const points = route.points.map(p => [p.x, p.y + 0.5, p.z] as [number, number, number]);
         const isSelected = selectedRoute === route.id;
         
+        const handleClick = (e: any) => {
+          e.stopPropagation();
+          selectRoute(isSelected ? null : route.id);
+        };
+
         return (
           <group key={route.id}>
-            <line
-              geometry={lineGeometry}
-              onClick={(e) => {
-                e.stopPropagation();
-                selectRoute(isSelected ? null : route.id);
-              }}
-            >
-              <lineBasicMaterial
-                color={isSelected ? '#FFD700' : route.color}
-                linewidth={isSelected ? 4 : 2}
-              />
-            </line>
+            <Line
+              points={points}
+              color={isSelected ? '#FFD700' : route.color}
+              lineWidth={isSelected ? 4 : 2}
+            />
             
             {route.points.map((point, i) => (
               <mesh
                 key={i}
                 position={[point.x, point.y + 0.5, point.z]}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  selectRoute(isSelected ? null : route.id);
-                }}
+                onClick={handleClick}
               >
                 <sphereGeometry args={[isSelected ? 0.8 : 0.5, 16, 16]} />
                 <meshBasicMaterial color={isSelected ? '#FFD700' : route.color} />
