@@ -1,5 +1,5 @@
 import { useNetworkStore } from '@/store/useNetworkStore';
-import { AlertTriangle, Users, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 
 export function ImpactAnalysisPanel() {
   const { network, impactAnalysis } = useNetworkStore();

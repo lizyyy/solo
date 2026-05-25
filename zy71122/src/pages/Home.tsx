@@ -4,6 +4,7 @@ import { ScenarioSelector } from '@/components/ControlPanel/ScenarioSelector';
 import { ViewControls } from '@/components/ControlPanel/ViewControls';
 import { ImpactAnalysisPanel } from '@/components/ControlPanel/ImpactAnalysis';
 import { SolutionManager } from '@/components/ControlPanel/SolutionManager';
+import { SolutionComparison } from '@/components/ControlPanel/SolutionComparison';
 import { Timeline } from '@/components/ControlPanel/Timeline';
 import { useNetworkStore } from '@/store/useNetworkStore';
 import { Layers, Map, AlertTriangle, Save, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -20,7 +21,7 @@ const tabs: { id: PanelTab; label: string; icon: React.ReactNode }[] = [
 export default function Home() {
   const [activeTab, setActiveTab] = useState<PanelTab>('scenario');
   const [panelExpanded, setPanelExpanded] = useState(true);
-  const { currentScenario } = useNetworkStore();
+  const { currentScenario, showComparison } = useNetworkStore();
 
   const renderPanelContent = () => {
     switch (activeTab) {
@@ -146,6 +147,8 @@ export default function Home() {
       </div>
 
       <Timeline />
+
+      {showComparison && <SolutionComparison />}
     </div>
   );
 }

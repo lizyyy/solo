@@ -11,7 +11,6 @@ export function Timeline() {
     setIsPlaying,
     stepForward,
     stepBackward,
-    reset,
   } = useNetworkStore();
 
   const intervalRef = useRef<number | null>(null);

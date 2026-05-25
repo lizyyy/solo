@@ -1,8 +1,8 @@
 import { useMemo, useEffect, useRef } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, Grid, Effects } from '@react-three/drei';
+import { OrbitControls, Grid } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
-import * as THREE from 'three';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useNetworkStore } from '@/store/useNetworkStore';
 import { PipeRenderer } from './PipeRenderer';
 import { ValveRenderer } from './ValveRenderer';
@@ -16,7 +16,7 @@ interface CameraControllerProps {
 
 function CameraController({ viewMode }: CameraControllerProps) {
   const { camera } = useThree();
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl>(null);
 
   useEffect(() => {
     switch (viewMode) {
@@ -59,7 +59,7 @@ function CameraController({ viewMode }: CameraControllerProps) {
 }
 
 function SceneContent() {
-  const { network, impactAnalysis, viewMode } = useNetworkStore();
+  const { network, impactAnalysis } = useNetworkStore();
 
   const isolatedPipeIds = useMemo(() => {
     return new Set(impactAnalysis.isolatedPipes);

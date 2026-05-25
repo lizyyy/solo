@@ -24,7 +24,7 @@ const getValveColor = (status: ValveStatus, isHovered: boolean, isSelected: bool
 };
 
 export function ValveRenderer({ network }: ValveRendererProps) {
-  const { toggleValve, selectedValveId, hoveredValveId, setSelectedValve, setHoveredValve, showValves } = useNetworkStore();
+  const { toggleValve, selectedValveId, hoveredValveId, setHoveredValve, showValves } = useNetworkStore();
 
   const nodeMap = useMemo(() => {
     return new Map(network.nodes.map((n) => [n.id, n]));

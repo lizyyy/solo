@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { Sphere, Text } from '@react-three/drei';
-import * as THREE from 'three';
 import type { Network } from '@/types';
 import { useNetworkStore } from '@/store/useNetworkStore';
 

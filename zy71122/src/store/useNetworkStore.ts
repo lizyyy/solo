@@ -2,11 +2,11 @@ import { create } from 'zustand';
 import { produce } from 'immer';
 import type { Network, Valve, ValveAction, Solution, ImpactAnalysis, Scenario, ViewMode } from '@/types';
 import { performImpactAnalysis } from '@/utils/networkAnalyzer';
-import { validateSolution } from '@/utils/reportGenerator';
 import { normalScenario } from '@/data/scenarios/normal';
 
 interface NetworkState {
   currentScenario: Scenario;
+  customScenarios: Scenario[];
   network: Network;
   initialNetwork: Network;
   valveActions: ValveAction[];
@@ -18,6 +18,8 @@ interface NetworkState {
   timelineStep: number;
   solutions: Solution[];
   selectedSolutionId: string | null;
+  comparisonSolutionIds: string[];
+  showComparison: boolean;
   showZones: boolean;
   showValves: boolean;
   showRepairPoints: boolean;
@@ -25,6 +27,8 @@ interface NetworkState {
 
 interface NetworkActions {
   setScenario: (scenario: Scenario) => void;
+  importScenario: (scenarioData: unknown) => { success: boolean; error?: string };
+  deleteCustomScenario: (scenarioId: string) => void;
   toggleValve: (valveId: string) => void;
   setValveStatus: (valveId: string, status: 'open' | 'closed') => void;
   setSelectedValve: (valveId: string | null) => void;
@@ -35,6 +39,9 @@ interface NetworkActions {
   deleteSolution: (solutionId: string) => void;
   selectSolution: (solutionId: string | null) => void;
   loadSolution: (solutionId: string) => void;
+  toggleComparisonSolution: (solutionId: string) => void;
+  setShowComparison: (show: boolean) => void;
+  clearComparison: () => void;
   setTimelineStep: (step: number) => void;
   setIsPlaying: (playing: boolean) => void;
   stepForward: () => void;
@@ -54,8 +61,22 @@ const createEmptyImpact = (): ImpactAnalysis => ({
   conflictDetails: [],
 });
 
+const validateScenario = (data: unknown): data is Scenario => {
+  if (typeof data !== 'object' || data === null) return false;
+  const obj = data as Record<string, unknown>;
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.name === 'string' &&
+    typeof obj.type === 'string' &&
+    typeof obj.description === 'string' &&
+    typeof obj.initialNetwork === 'object' &&
+    obj.initialNetwork !== null
+  );
+};
+
 export const useNetworkStore = create<NetworkState & NetworkActions>((set, get) => ({
   currentScenario: normalScenario,
+  customScenarios: [],
   network: JSON.parse(JSON.stringify(normalScenario.initialNetwork)),
   initialNetwork: JSON.parse(JSON.stringify(normalScenario.initialNetwork)),
   valveActions: [],
@@ -67,6 +88,8 @@ export const useNetworkStore = create<NetworkState & NetworkActions>((set, get) 
   timelineStep: 0,
   solutions: [],
   selectedSolutionId: null,
+  comparisonSolutionIds: [],
+  showComparison: false,
   showZones: true,
   showValves: true,
   showRepairPoints: true,
@@ -83,6 +106,53 @@ export const useNetworkStore = create<NetworkState & NetworkActions>((set, get) 
       hoveredValveId: null,
       timelineStep: 0,
     });
+  },
+
+  importScenario: (scenarioData: unknown) => {
+    if (!validateScenario(scenarioData)) {
+      return { success: false, error: '场景数据格式不正确，请检查JSON文件' };
+    }
+
+    const newScenario: Scenario = {
+      ...scenarioData,
+      id: `custom-${Date.now()}`,
+    };
+
+    set(
+      produce((state: NetworkState) => {
+        state.customScenarios.push(newScenario);
+      })
+    );
+
+    const network = JSON.parse(JSON.stringify(newScenario.initialNetwork));
+    set({
+      currentScenario: newScenario,
+      network,
+      initialNetwork: JSON.parse(JSON.stringify(newScenario.initialNetwork)),
+      valveActions: [],
+      impactAnalysis: performImpactAnalysis(network),
+      selectedValveId: null,
+      hoveredValveId: null,
+      timelineStep: 0,
+    });
+
+    return { success: true };
+  },
+
+  deleteCustomScenario: (scenarioId: string) => {
+    set(
+      produce((state: NetworkState) => {
+        state.customScenarios = state.customScenarios.filter((s) => s.id !== scenarioId);
+        if (state.currentScenario.id === scenarioId) {
+          state.currentScenario = normalScenario;
+          state.network = JSON.parse(JSON.stringify(normalScenario.initialNetwork));
+          state.initialNetwork = JSON.parse(JSON.stringify(normalScenario.initialNetwork));
+          state.valveActions = [];
+          state.impactAnalysis = performImpactAnalysis(state.network);
+          state.timelineStep = 0;
+        }
+      })
+    );
   },
 
   toggleValve: (valveId: string) => {
@@ -201,6 +271,27 @@ export const useNetworkStore = create<NetworkState & NetworkActions>((set, get) 
         selectedSolutionId: solutionId,
       });
     }
+  },
+
+  toggleComparisonSolution: (solutionId: string) => {
+    set(
+      produce((state: NetworkState) => {
+        const index = state.comparisonSolutionIds.indexOf(solutionId);
+        if (index > -1) {
+          state.comparisonSolutionIds.splice(index, 1);
+        } else if (state.comparisonSolutionIds.length < 3) {
+          state.comparisonSolutionIds.push(solutionId);
+        }
+      })
+    );
+  },
+
+  setShowComparison: (show: boolean) => {
+    set({ showComparison: show });
+  },
+
+  clearComparison: () => {
+    set({ comparisonSolutionIds: [], showComparison: false });
   },
 
   setTimelineStep: (step: number) => {
