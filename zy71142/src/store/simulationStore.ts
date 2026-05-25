@@ -209,8 +209,9 @@ export const useSimulationStore = create<SimulationStore>((set, get) => ({
       const sim = new EvacuationSimulator(plan);
       sim.start();
       
-      for (let i = 0; i < 300; i++) {
-        sim.update(0.5, 4);
+      const maxIterations = 1200;
+      for (let i = 0; i < maxIterations; i++) {
+        sim.update(0.5, 8);
         if (sim.isComplete()) break;
       }
       

@@ -1,9 +1,9 @@
 import { EvacuationPlan, Student, Conflict, Statistics, Position, Classroom } from '@/types';
 
-const STUDENT_SPEED = 1.5;
-const STAIR_SPEED_FACTOR = 0.5;
-const PERSONAL_SPACE = 0.8;
-const STAIR_ENTRY_RADIUS = 3;
+const STUDENT_SPEED = 2.5;
+const STAIR_SPEED_FACTOR = 0.7;
+const PERSONAL_SPACE = 0.6;
+const STAIR_ENTRY_RADIUS = 4;
 
 interface StairQueue {
   stairId: string;
@@ -24,20 +24,11 @@ interface BlockageEvent {
 function generatePath(
   classroomPos: Position,
   stairPos: Position,
-  assemblyPos: Position,
-  floor: number,
-  floorHeight: number
+  assemblyPos: Position
 ): Position[] {
   const path: Position[] = [];
   
   path.push({ ...classroomPos });
-  
-  const hallwayPoint = {
-    x: classroomPos.x,
-    y: classroomPos.y,
-    z: stairPos.z
-  };
-  path.push(hallwayPoint);
   
   const stairEntrance = {
     x: stairPos.x,
@@ -46,24 +37,16 @@ function generatePath(
   };
   path.push(stairEntrance);
   
-  for (let f = floor; f > 1; f--) {
-    path.push({
-      x: stairPos.x,
-      y: (f - 1) * floorHeight - floorHeight / 2,
-      z: stairPos.z
-    });
-  }
-  
   path.push({
     x: stairPos.x,
     y: 0,
-    z: stairPos.z - 5
+    z: stairPos.z
   });
   
   path.push({
     x: assemblyPos.x,
     y: 0,
-    z: stairPos.z - 5
+    z: stairPos.z
   });
   
   path.push({ ...assemblyPos });
@@ -104,7 +87,13 @@ function initializeStudents(plan: EvacuationPlan): Student[] {
   
   plan.classrooms.forEach(classroom => {
     const stair = plan.stairs.find(s => s.id === classroom.assignedStairId);
-    if (!stair) return;
+    if (!stair || stair.isClosed) {
+      const altStair = plan.stairs.find(s => !s.isClosed && s.floors.includes(classroom.floor));
+      if (!altStair) return;
+    }
+    
+    const activeStair = stair && !stair.isClosed ? stair : plan.stairs.find(s => !s.isClosed && s.floors.includes(classroom.floor));
+    if (!activeStair) return;
     
     const assemblyPoint = plan.assemblyPoints[
       Math.floor(Math.random() * plan.assemblyPoints.length)
@@ -112,17 +101,15 @@ function initializeStudents(plan: EvacuationPlan): Student[] {
     
     const path = generatePath(
       classroom.position,
-      stair.position,
-      assemblyPoint.position,
-      classroom.floor,
-      plan.building.floorHeight
+      activeStair.position,
+      assemblyPoint.position
     );
     
     for (let i = 0; i < classroom.studentCount; i++) {
       const offset = {
-        x: (Math.random() - 0.5) * 5,
+        x: (Math.random() - 0.5) * 4,
         y: 0,
-        z: (Math.random() - 0.5) * 5
+        z: (Math.random() - 0.5) * 4
       };
       
       students.push({
@@ -137,8 +124,8 @@ function initializeStudents(plan: EvacuationPlan): Student[] {
         targetPosition: { ...path[0] },
         path: path.map(p => ({ ...p })),
         currentPathIndex: 0,
-        speed: STUDENT_SPEED * (0.8 + Math.random() * 0.4),
-        startTime: classroom.exitDelay + i * 0.15,
+        speed: STUDENT_SPEED * (0.85 + Math.random() * 0.3),
+        startTime: classroom.exitDelay + i * 0.1,
         arrivalTime: null,
         queueTime: 0,
         rerouted: false
@@ -258,7 +245,7 @@ export class EvacuationSimulator {
         y: student.position.y,
         z: stair.position.z
       });
-      return dist < 6;
+      return dist < 8;
     }).length;
   }
   
@@ -297,14 +284,14 @@ export class EvacuationSimulator {
     if (!alternativeStairId) return false;
     
     const alternativeStair = this.plan.stairs.find(s => s.id === alternativeStairId);
+    if (!alternativeStair) return false;
+    
     const assemblyPoint = this.plan.assemblyPoints[0];
     
     const newPath = generatePath(
       student.position,
       alternativeStair.position,
-      assemblyPoint.position,
-      classroom.floor,
-      this.plan.building.floorHeight
+      assemblyPoint.position
     );
     
     student.path = newPath;
@@ -321,13 +308,23 @@ export class EvacuationSimulator {
     this.currentTime += dt;
     
     this.plan.stairs.forEach(stair => {
+      if (stair.isClosed) return;
+      
       const queue = this.stairQueues.get(stair.id);
       if (!queue) return;
       
-      const inStairCount = this.getStudentsInStair(stair.id);
-      const availableSlots = Math.max(0, stair.capacity - inStairCount);
+      queue.processing = queue.processing.filter(student => {
+        if (student.status === 'arrived') return false;
+        if (student.status === 'inStair') return false;
+        return student.status === 'moving' && this.isAtStairEntrance(student, stair.id);
+      });
       
-      for (let i = 0; i < availableSlots && queue.queue.length > 0; i++) {
+      const inStairCount = this.getStudentsInStair(stair.id);
+      const availableSlots = Math.max(0, stair.capacity - inStairCount - queue.processing.length);
+      
+      const slotsToFill = Math.min(availableSlots, 3);
+      
+      for (let i = 0; i < slotsToFill && queue.queue.length > 0; i++) {
         const student = queue.queue.shift();
         if (student) {
           student.status = 'moving';
@@ -366,22 +363,25 @@ export class EvacuationSimulator {
       
       if (assignedStairId && this.isAtStairEntrance(student, assignedStairId)) {
         const stair = this.plan.stairs.find(s => s.id === assignedStairId);
-        if (stair) {
-          const inStairCount = this.getStudentsInStair(assignedStairId);
+        if (stair && !stair.isClosed) {
           const queue = this.stairQueues.get(assignedStairId);
+          const inStairCount = this.getStudentsInStair(assignedStairId);
+          const processingCount = queue?.processing.length || 0;
           
-          if (inStairCount >= stair.capacity) {
-            if (queue && !queue.queue.includes(student) && !queue.processing.includes(student)) {
+          const isInProcessing = queue?.processing.includes(student);
+          
+          if (!isInProcessing && inStairCount + processingCount >= stair.capacity) {
+            if (queue && !queue.queue.includes(student)) {
               student.status = 'queued';
               queue.queue.push(student);
             }
             return;
-          } else {
-            if (queue) {
-              const idx = queue.processing.indexOf(student);
-              if (idx > -1) {
-                queue.processing.splice(idx, 1);
-              }
+          }
+          
+          if (queue && isInProcessing) {
+            const idx = queue.processing.indexOf(student);
+            if (idx > -1) {
+              queue.processing.splice(idx, 1);
             }
           }
         }
@@ -438,7 +438,7 @@ export class EvacuationSimulator {
         y: student.position.y,
         z: s.position.z
       });
-      return dist < 6;
+      return dist < 8;
     });
     
     if (stair && student.position.y > 0.5) {
@@ -457,6 +457,8 @@ export class EvacuationSimulator {
   
   private detectBlockages(): void {
     this.plan.stairs.forEach(stair => {
+      if (stair.isClosed) return;
+      
       const queue = this.stairQueues.get(stair.id);
       if (!queue || queue.queue.length === 0) return;
       
@@ -522,12 +524,14 @@ export class EvacuationSimulator {
   
   private detectConflicts(): void {
     this.plan.stairs.forEach(stair => {
+      if (stair.isClosed) return;
+      
       const usage = this.stairUsage.get(stair.id) || 0;
       const capacityRatio = usage / stair.capacity;
       const queue = this.stairQueues.get(stair.id);
       const queueLength = queue?.queue.length || 0;
       
-      if (capacityRatio >= 0.9 || queueLength > 10) {
+      if (capacityRatio >= 0.9 || queueLength > 15) {
         const existingConflict = this.conflicts.find(
           c => c.type === 'stairCapacity' && c.location === stair.name && !c.resolved
         );
@@ -549,7 +553,7 @@ export class EvacuationSimulator {
     const totalQueueLength = Array.from(this.stairQueues.values())
       .reduce((sum, q) => sum + q.queue.length, 0);
     
-    if (totalQueueLength > 50 && this.currentTime < 60) {
+    if (totalQueueLength > 80 && this.currentTime < 120) {
       const existingConflict = this.conflicts.find(
         c => c.type === 'order' && c.location === '全校' && !c.resolved
       );
