@@ -74,6 +74,12 @@ const LabSafetyVR = (function() {
             equipment: [],
             path: [],
             forbidden: []
+        },
+        pathStats: {
+            totalPoints: 0,
+            onPathPoints: 0,
+            offPathPoints: 0,
+            complianceRate: 100
         }
     };
 
@@ -293,48 +299,69 @@ const LabSafetyVR = (function() {
         });
 
         if (state.currentScenario && state.currentStepIndex >= 0) {
-            const safePath = state.currentScenario.safePath;
-            let onPath = false;
+            const onPath = isPointOnSafePath(toPos);
+            state.playerOnPath = onPath;
             
-            for (let i = 0; i < safePath.length - 1; i++) {
-                if (isPointNearLineSegment(toPos, safePath[i], safePath[i + 1], 0.8)) {
-                    onPath = true;
-                    break;
+            state.pathStats.totalPoints++;
+            if (onPath) {
+                state.pathStats.onPathPoints++;
+            } else {
+                state.pathStats.offPathPoints++;
+                if (state.pathStats.offPathPoints % 50 === 0) {
+                    recordViolation('off_path', `持续偏离安全路线 (${state.pathStats.offPathPoints}点)`);
                 }
             }
+            state.pathStats.complianceRate = Math.round(
+                (state.pathStats.onPathPoints / state.pathStats.totalPoints) * 100
+            );
             
-            const startDist = distance2D(toPos, safePath[0]);
-            const endDist = distance2D(toPos, safePath[safePath.length - 1]);
-            if (startDist < 0.8 || endDist < 0.8) onPath = true;
-
-            if (!onPath && !state.lastOffPathTime) {
-                state.lastOffPathTime = Date.now();
-            } else if (!onPath && Date.now() - state.lastOffPathTime > 2000) {
-                state.lastOffPathTime = Date.now();
-                recordViolation('off_path', '偏离安全路线');
-                showHint(`⚠️ 注意: 请沿绿色安全路线移动`, 'info');
-            } else if (onPath) {
-                state.lastOffPathTime = null;
+            if (state.pathStats.totalPoints % 10 === 0) {
+                updateUI();
             }
-
-            state.playerOnPath = onPath;
         }
     }
 
-    function isPlayerOnSafePath() {
+    function isPointOnSafePath(point, threshold = 1.0) {
         if (!state.currentScenario) return false;
         const safePath = state.currentScenario.safePath;
-        const pos = state.playerPosition;
         
         for (let i = 0; i < safePath.length - 1; i++) {
-            if (isPointNearLineSegment(pos, safePath[i], safePath[i + 1], 1.0)) {
+            if (isPointNearLineSegment(point, safePath[i], safePath[i + 1], threshold)) {
                 return true;
             }
         }
         
-        const startDist = distance2D(pos, safePath[0]);
-        const endDist = distance2D(pos, safePath[safePath.length - 1]);
-        return startDist < 1.0 || endDist < 1.0;
+        const startDist = distance2D(point, safePath[0]);
+        const endDist = distance2D(point, safePath[safePath.length - 1]);
+        return startDist < threshold || endDist < threshold;
+    }
+
+    function calculatePathCompliance() {
+        if (state.playerPath.length === 0) return 100;
+        
+        let onPathCount = 0;
+        state.playerPath.forEach(point => {
+            if (isPointOnSafePath(point, 1.2)) {
+                onPathCount++;
+            }
+        });
+        
+        return Math.round((onPathCount / state.playerPath.length) * 100);
+    }
+
+    function hasPathDeviation() {
+        const compliance = calculatePathCompliance();
+        return compliance < 70;
+    }
+
+    function getPathViolationCount() {
+        let offPathPoints = 0;
+        state.playerPath.forEach(point => {
+            if (!isPointOnSafePath(point, 1.2)) {
+                offPathPoints++;
+            }
+        });
+        return Math.floor(offPathPoints / 30);
     }
 
     function isPointNearLineSegment(point, lineStart, lineEnd, threshold) {
@@ -394,6 +421,12 @@ const LabSafetyVR = (function() {
         state.isPaused = false;
         state.playerPath = [];
         state.enteredForbiddenZones = new Set();
+        state.pathStats = {
+            totalPoints: 0,
+            onPathPoints: 0,
+            offPathPoints: 0,
+            complianceRate: 100
+        };
         
         state.currentScenario.hazards.forEach(hazard => createHazard(hazard));
         state.currentScenario.equipment.forEach(equip => createEquipment(equip));
@@ -793,14 +826,25 @@ const LabSafetyVR = (function() {
                 return;
             }
             
-            if (!isPlayerOnSafePath()) {
-                recordViolation('invalid_evacuation', '未沿安全路线撤离');
-                showHint(`⚠️ 请沿绿色安全路线移动到出口`, 'error');
+            const pathCompliance = calculatePathCompliance();
+            if (pathCompliance < 60) {
+                const pathViolations = getPathViolationCount();
+                for (let i = 0; i < Math.min(pathViolations, 5); i++) {
+                    recordViolation('path_deviation', `撤离路线偏离合规率: ${pathCompliance}%`);
+                }
+                showHint(`⚠️ 撤离路线合规率仅${pathCompliance}%，请沿绿色安全路线移动`, 'error');
+                
+                state.score = Math.max(0, state.score - Math.floor((100 - pathCompliance) / 10));
+                updateUI();
                 return;
             }
             
+            if (pathCompliance < 80) {
+                showHint(`⚠️ 撤离路线合规率${pathCompliance}%，建议尽量沿绿色路线移动`, 'info');
+            }
+            
             completeStep(currentStep);
-            showHint(`✅ ${currentStep.name} - 完成!`, 'success');
+            showHint(`✅ ${currentStep.name} - 完成! (路线合规率: ${pathCompliance}%)`, 'success');
         } else {
             recordViolation('early_evacuation', '过早撤离！请先完成所有处置步骤');
             showHint(`❌ 警告：过早撤离！泄漏未处理完前不能离开`, 'error');
@@ -1042,6 +1086,13 @@ const LabSafetyVR = (function() {
         document.getElementById('elapsedTime').textContent = formatTime(state.elapsedTime);
         document.getElementById('errorCount').textContent = state.errorCount;
         document.getElementById('currentScore').textContent = state.score;
+        
+        const pathCompliance = state.pathStats.totalPoints > 0 ? state.pathStats.complianceRate : 100;
+        const pathEl = document.getElementById('pathCompliance');
+        if (pathEl) {
+            pathEl.textContent = `${pathCompliance}%`;
+            pathEl.className = `status-value ${pathCompliance >= 80 ? 'success' : pathCompliance >= 60 ? '' : 'error'}`;
+        }
     }
 
     function switchCameraView(view) {
@@ -1219,6 +1270,7 @@ const LabSafetyVR = (function() {
 
     function showReport() {
         const scoreData = calculateScore();
+        const pathCompliance = calculatePathCompliance();
         const reportContent = document.getElementById('reportContent');
         
         reportContent.innerHTML = `
@@ -1238,12 +1290,22 @@ const LabSafetyVR = (function() {
                         </div>
                     </div>
                     <div class="report-card">
-                        <div class="label">用时</div>
-                        <div class="value">${formatTime(state.elapsedTime)}</div>
+                        <div class="label">路线合规率</div>
+                        <div class="value ${pathCompliance >= 80 ? 'excellent' : pathCompliance < 60 ? 'bad' : ''}">
+                            ${pathCompliance}%
+                        </div>
                     </div>
                     <div class="report-card">
                         <div class="label">错误次数</div>
                         <div class="value ${state.errorCount > 0 ? 'bad' : 'excellent'}">${state.errorCount}</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="label">用时</div>
+                        <div class="value">${formatTime(state.elapsedTime)}</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="label">路径采样点</div>
+                        <div class="value">${state.playerPath.length}</div>
                     </div>
                 </div>
             </div>
@@ -1334,12 +1396,13 @@ const LabSafetyVR = (function() {
         doc.text('演练结果', 20, 72);
         
         const scoreData = calculateScore();
+        const pathCompliance = calculatePathCompliance();
         doc.setFontSize(11);
         doc.text(`总得分: ${scoreData.score}/${scoreData.totalPossible}`, 25, 82);
         doc.text(`评级: ${scoreData.grade}`, 25, 89);
-        doc.text(`用时: ${formatTime(state.elapsedTime)}`, 25, 96);
+        doc.text(`路线合规率: ${pathCompliance}%`, 25, 96);
         doc.text(`错误次数: ${state.errorCount}`, 25, 103);
-        doc.text(`路径点数: ${state.playerPath.length}`, 25, 110);
+        doc.text(`路径采样点: ${state.playerPath.length}`, 25, 110);
         doc.text(`禁区穿越: ${state.enteredForbiddenZones.size} 个`, 25, 117);
         
         doc.setFontSize(14);
