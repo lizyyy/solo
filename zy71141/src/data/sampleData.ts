@@ -1,4 +1,4 @@
-import { InspectionBatch, CrackPoint } from '../types';
+import { InspectionBatch, CrackPoint, Photo } from '../types';
 
 export const sampleBatches: InspectionBatch[] = [
   {
@@ -191,5 +191,104 @@ export const sampleCracks: CrackPoint[] = [
       { id: 'h8-4', batchId: 'batch-004', date: '2024-10-25', length: 0.5, width: 0.6, status: 'stable', notes: '继续观察' },
     ],
     repairRecords: [],
+  },
+];
+
+export const samplePhotos: Photo[] = [
+  {
+    id: 'photo-001',
+    url: '',
+    position: { x: -3, y: 1.5, z: 0.5 },
+    batchId: 'batch-001',
+    crackId: 'crack-001',
+    annotation: '主梁左侧裂缝特写',
+  },
+  {
+    id: 'photo-002',
+    url: '',
+    position: { x: 0, y: 2.2, z: 2 },
+    batchId: 'batch-001',
+    crackId: 'crack-002',
+    annotation: '桥面板横向裂缝',
+  },
+  {
+    id: 'photo-003',
+    url: '',
+    position: { x: 2.2, y: 1.2, z: -1.5 },
+    batchId: 'batch-001',
+    crackId: 'crack-003',
+    annotation: '桥墩连接处斜向裂缝',
+  },
+  {
+    id: 'photo-004',
+    url: '',
+    position: { x: -3, y: 1.5, z: 0.5 },
+    batchId: 'batch-002',
+    crackId: 'crack-001',
+    annotation: '复查：裂缝有扩展趋势',
+  },
+  {
+    id: 'photo-005',
+    url: '',
+    position: { x: 0, y: 2.2, z: 2 },
+    batchId: 'batch-002',
+    crackId: 'crack-002',
+    annotation: '复查：裂缝宽度增加',
+  },
+  {
+    id: 'photo-006',
+    url: '',
+    position: { x: 2.2, y: 1.2, z: -1.5 },
+    batchId: 'batch-002',
+    crackId: 'crack-003',
+    annotation: '重点关注区域',
+  },
+  {
+    id: 'photo-007',
+    url: '',
+    position: { x: 0, y: 2.2, z: 2 },
+    batchId: 'batch-003',
+    crackId: 'crack-002',
+    annotation: '维修后：环氧树脂修补完成',
+  },
+  {
+    id: 'photo-008',
+    url: '',
+    position: { x: 1, y: 2.4, z: -3 },
+    batchId: 'batch-003',
+    crackId: 'crack-007',
+    annotation: '表面封闭处理效果',
+  },
+  {
+    id: 'photo-009',
+    url: '',
+    position: { x: 2.2, y: 1.2, z: -1.5 },
+    batchId: 'batch-003',
+    crackId: 'crack-003',
+    annotation: '碳纤维加固施工中',
+  },
+  {
+    id: 'photo-010',
+    url: '',
+    position: { x: 4, y: 1.8, z: 1 },
+    batchId: 'batch-004',
+    crackId: 'crack-005',
+    annotation: '新增裂缝：右侧主梁',
+  },
+  {
+    id: 'photo-011',
+    url: '',
+    position: { x: -3, y: 1.5, z: 0.5 },
+    batchId: 'batch-004',
+    crackId: 'crack-001',
+    annotation: '年度总结：持续发展',
+  },
+  {
+    id: 'photo-012',
+    url: '',
+    position: { x: 2.2, y: 1.2, z: -1.5 },
+    batchId: 'batch-004',
+    crackId: 'crack-003',
+    annotation: '维修后待复查',
   },
 ];

@@ -11,12 +11,26 @@ export const FilterPanel: React.FC = () => {
     setStatusFilter,
     setSearchQuery,
     getFilteredCracks,
+    getCracksWithBatchStatus,
     selectedCrackId,
     setSelectedCrackId,
   } = useInspectionStore();
 
   const [expanded, setExpanded] = useState(true);
-  const filteredCracks = getFilteredCracks();
+  
+  const filteredCracks = getCracksWithBatchStatus().filter((crack) => {
+    if (filters.status.length > 0 && !filters.status.includes(crack.status)) {
+      return false;
+    }
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      if (!crack.description.toLowerCase().includes(query) && 
+          !crack.id.toLowerCase().includes(query)) {
+        return false;
+      }
+    }
+    return true;
+  });
 
   const handleStatusToggle = (status: CrackStatus) => {
     const currentStatuses = filters.status;

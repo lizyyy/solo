@@ -5,12 +5,15 @@ import {
   CrackPoint,
   InspectionBatch,
   CameraView,
+  Photo,
 } from '../types';
-import { sampleBatches, sampleCracks } from '../data/sampleData';
+import { sampleBatches, sampleCracks, samplePhotos } from '../data/sampleData';
 
 interface InspectionStore extends AppState {
+  photos: Photo[];
   setBatches: (batches: InspectionBatch[]) => void;
   setCracks: (cracks: CrackPoint[]) => void;
+  setPhotos: (photos: Photo[]) => void;
   setCurrentBatchId: (batchId: string) => void;
   setSelectedCrackId: (crackId: string | null) => void;
   setCameraView: (view: CameraView) => void;
@@ -22,13 +25,16 @@ interface InspectionStore extends AppState {
   loadSampleData: () => void;
   resetState: () => void;
   getFilteredCracks: () => CrackPoint[];
+  getCracksWithBatchStatus: () => CrackPoint[];
   getCurrentBatch: () => InspectionBatch | undefined;
   getCracksForBatch: (batchId: string) => CrackPoint[];
+  getPhotosForCurrentBatch: () => Photo[];
 }
 
-const initialState: AppState = {
+const initialState: AppState & { photos: Photo[] } = {
   batches: [],
   cracks: [],
+  photos: [],
   currentBatchId: '',
   selectedCrackId: null,
   cameraView: {
@@ -49,6 +55,7 @@ export const useInspectionStore = create<InspectionStore>((set, get) => ({
 
   setBatches: (batches) => set({ batches }),
   setCracks: (cracks) => set({ cracks }),
+  setPhotos: (photos) => set({ photos }),
   setCurrentBatchId: (batchId) => set({ currentBatchId: batchId }),
   setSelectedCrackId: (crackId) => set({ selectedCrackId: crackId }),
   setCameraView: (cameraView) => set({ cameraView }),
@@ -68,6 +75,7 @@ export const useInspectionStore = create<InspectionStore>((set, get) => ({
     set({
       batches: sampleBatches,
       cracks: sampleCracks,
+      photos: samplePhotos,
       currentBatchId: sampleBatches[sampleBatches.length - 1]?.id || '',
       sampleDataLoaded: true,
     }),
@@ -75,11 +83,21 @@ export const useInspectionStore = create<InspectionStore>((set, get) => ({
   resetState: () => set(initialState),
 
   getFilteredCracks: () => {
-    const { cracks, filters } = get();
+    const { cracks, filters, currentBatchId } = get();
     let filtered = cracks;
 
+    if (currentBatchId) {
+      filtered = filtered.filter((crack) =>
+        crack.history.some((h) => h.batchId === currentBatchId)
+      );
+    }
+
     if (filters.status.length > 0) {
-      filtered = filtered.filter((crack) => filters.status.includes(crack.status));
+      filtered = filtered.filter((crack) => {
+        const batchRecord = crack.history.find((h) => h.batchId === currentBatchId);
+        const status = batchRecord?.status || crack.status;
+        return filters.status.includes(status);
+      });
     }
 
     if (filters.searchQuery) {
@@ -94,6 +112,23 @@ export const useInspectionStore = create<InspectionStore>((set, get) => ({
     return filtered;
   },
 
+  getCracksWithBatchStatus: () => {
+    const { cracks, currentBatchId } = get();
+    if (!currentBatchId) return cracks;
+
+    return cracks
+      .filter((crack) => crack.history.some((h) => h.batchId === currentBatchId))
+      .map((crack) => {
+        const batchRecord = crack.history.find((h) => h.batchId === currentBatchId);
+        return {
+          ...crack,
+          status: batchRecord?.status || crack.status,
+          length: batchRecord?.length || crack.length,
+          width: batchRecord?.width || crack.width,
+        };
+      });
+  },
+
   getCurrentBatch: () => {
     const { batches, currentBatchId } = get();
     return batches.find((b) => b.id === currentBatchId);
@@ -104,5 +139,10 @@ export const useInspectionStore = create<InspectionStore>((set, get) => ({
     return cracks.filter((crack) =>
       crack.history.some((h) => h.batchId === batchId)
     );
+  },
+
+  getPhotosForCurrentBatch: () => {
+    const { photos, currentBatchId } = get();
+    return photos.filter((p) => p.batchId === currentBatchId);
   },
 }));

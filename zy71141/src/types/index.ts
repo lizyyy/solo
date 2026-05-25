@@ -84,12 +84,18 @@ export interface ReportData {
   batchName: string;
   batchDate: string;
   inspector: string;
+  batchId: string;
+  batchIndex: number;
+  totalBatches: number;
   filters: Filters;
   cameraView: CameraView;
   cracks: CrackPoint[];
+  photos: Photo[];
   totalCracks: number;
+  totalPhotos: number;
   statusCounts: Record<CrackStatus, number>;
   screenshot?: string;
+  exportTime: string;
 }
 
 export const STATUS_COLORS: Record<CrackStatus, string> = {

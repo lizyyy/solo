@@ -31,6 +31,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({ glRenderer }) => {
     resetState,
     setCameraView,
     getFilteredCracks,
+    getCracksWithBatchStatus,
     getCurrentBatch,
     cracks,
     filters,
@@ -42,7 +43,19 @@ export const Toolbar: React.FC<ToolbarProps> = ({ glRenderer }) => {
   const [isExporting, setIsExporting] = useState(false);
   const viewMenuRef = useRef<HTMLDivElement>(null);
 
-  const filteredCracks = getFilteredCracks();
+  const filteredCracks = getCracksWithBatchStatus().filter((crack) => {
+    if (filters.status.length > 0 && !filters.status.includes(crack.status)) {
+      return false;
+    }
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      if (!crack.description.toLowerCase().includes(query) && 
+          !crack.id.toLowerCase().includes(query)) {
+        return false;
+      }
+    }
+    return true;
+  });
   const currentBatch = getCurrentBatch();
 
   const statusCounts = filteredCracks.reduce((acc, crack) => {
@@ -60,15 +73,43 @@ export const Toolbar: React.FC<ToolbarProps> = ({ glRenderer }) => {
 
     setIsExporting(true);
     try {
+      const { batches, getPhotosForCurrentBatch, getCracksWithBatchStatus } = useInspectionStore.getState();
+      const currentPhotos = getPhotosForCurrentBatch();
+      const cracksWithBatchStatus = getCracksWithBatchStatus().filter((crack) => {
+        if (filters.status.length > 0 && !filters.status.includes(crack.status)) {
+          return false;
+        }
+        if (filters.searchQuery) {
+          const query = filters.searchQuery.toLowerCase();
+          if (!crack.description.toLowerCase().includes(query) && 
+              !crack.id.toLowerCase().includes(query)) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+      const batchIndex = batches.findIndex((b) => b.id === currentBatch.id);
+      const statusCountsWithBatch = cracksWithBatchStatus.reduce((acc, crack) => {
+        acc[crack.status] = (acc[crack.status] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
       const reportData: ReportData = {
         batchName: currentBatch.name,
         batchDate: currentBatch.date,
         inspector: currentBatch.inspector,
+        batchId: currentBatch.id,
+        batchIndex: batchIndex,
+        totalBatches: batches.length,
         filters,
         cameraView,
-        cracks: filteredCracks,
-        totalCracks: filteredCracks.length,
-        statusCounts,
+        cracks: cracksWithBatchStatus,
+        photos: currentPhotos,
+        totalCracks: cracksWithBatchStatus.length,
+        totalPhotos: currentPhotos.length,
+        statusCounts: statusCountsWithBatch,
+        exportTime: new Date().toLocaleString('zh-CN'),
       };
 
       await generateReportPDF(reportData);

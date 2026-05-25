@@ -4,7 +4,8 @@ import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { BridgeModel } from './BridgeModel';
 import { CrackPoints } from './CrackPoints';
-import { CrackPoint, CameraView } from '../../types';
+import { PhotoPoints } from './PhotoPoints';
+import { CrackPoint, CameraView, Photo } from '../../types';
 import { useInspectionStore } from '../../store/inspectionStore';
 
 interface SceneControllerProps {
@@ -55,9 +56,26 @@ export const BridgeScene: React.FC<BridgeSceneProps> = ({ onSceneReady }) => {
     setSelectedCrackId,
     updateCrackPosition,
     getFilteredCracks,
+    getCracksWithBatchStatus,
+    getPhotosForCurrentBatch,
   } = useInspectionStore();
 
-  const filteredCracks = getFilteredCracks();
+  const filteredCracks = getCracksWithBatchStatus().filter((crack) => {
+    const { filters } = useInspectionStore.getState();
+    if (filters.status.length > 0 && !filters.status.includes(crack.status)) {
+      return false;
+    }
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      if (!crack.description.toLowerCase().includes(query) && 
+          !crack.id.toLowerCase().includes(query)) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const currentPhotos = getPhotosForCurrentBatch();
   const glRef = useRef<THREE.WebGLRenderer | null>(null);
 
   const handleCreated = ({ gl }: { gl: THREE.WebGLRenderer }) => {
@@ -107,6 +125,7 @@ export const BridgeScene: React.FC<BridgeSceneProps> = ({ onSceneReady }) => {
         onCrackSelect={handleCrackSelect}
         onPositionChange={handlePositionChange}
       />
+      <PhotoPoints photos={currentPhotos} />
     </Canvas>
   );
 };
