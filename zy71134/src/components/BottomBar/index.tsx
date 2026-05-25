@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Upload, RotateCcw, FileText, Download, HelpCircle, X } from 'lucide-react';
+import { Upload, RotateCcw, FileText, Download, HelpCircle, X, Menu, MoreHorizontal } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
+import { useScreenSize } from '@/hooks/useScreenSize';
 
 export const BottomBar: React.FC = () => {
+  const { isMobile, isTablet } = useScreenSize();
   const { resetState, importSampleData, valves, floors, wards, operationLogs } = useAppStore();
   const [showHelp, setShowHelp] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
 
   const generateReport = () => {
     const reportContent = `
@@ -72,74 +75,128 @@ ${operationLogs.slice(0, 10).map(log => `
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    setShowMoreMenu(false);
   };
+
+  const barHeight = isMobile ? 'h-16' : 'h-14';
 
   return (
     <>
-      <div className="absolute bottom-0 left-0 right-0 h-14 bg-white border-t border-gray-200 flex items-center justify-between px-4 z-20">
-        <div className="flex items-center gap-2">
+      <div className={`absolute bottom-0 left-0 right-0 ${barHeight} bg-white border-t border-gray-200 flex items-center justify-between px-3 z-20`}>
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             onClick={importSampleData}
-            className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium"
+            className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-xs sm:text-sm font-medium"
           >
-            <Upload size={16} />
-            导入样例
+            <Upload size={isMobile ? 14 : 16} />
+            <span className="hidden sm:inline">导入样例</span>
           </button>
           <button
             onClick={resetState}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+            className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-xs sm:text-sm font-medium"
           >
-            <RotateCcw size={16} />
-            重置状态
+            <RotateCcw size={isMobile ? 14 : 16} />
+            <span className="hidden sm:inline">重置状态</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-gray-500">
-          <span>
-            阀门: <span className="font-medium text-gray-700">{valves.length}</span>
-          </span>
-          <span className="w-px h-4 bg-gray-300" />
-          <span>
-            开启: <span className="font-medium text-green-600">{valves.filter(v => v.isOpen).length}</span>
-          </span>
-          <span className="w-px h-4 bg-gray-300" />
-          <span>
-            关闭: <span className="font-medium text-red-600">{valves.filter(v => !v.isOpen).length}</span>
-          </span>
-        </div>
+        {!isMobile && (
+          <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500">
+            <span>
+              阀门: <span className="font-medium text-gray-700">{valves.length}</span>
+            </span>
+            <span className="w-px h-3 sm:h-4 bg-gray-300" />
+            <span>
+              开启: <span className="font-medium text-green-600">{valves.filter(v => v.isOpen).length}</span>
+            </span>
+            <span className="w-px h-3 sm:h-4 bg-gray-300" />
+            <span>
+              关闭: <span className="font-medium text-red-600">{valves.filter(v => !v.isOpen).length}</span>
+            </span>
+          </div>
+        )}
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowReport(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors text-sm font-medium"
-          >
-            <FileText size={16} />
-            查看报告
-          </button>
-          <button
-            onClick={handleExportReport}
-            className="flex items-center gap-2 px-3 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors text-sm font-medium"
-          >
-            <Download size={16} />
-            导出报告
-          </button>
-          <button
-            onClick={() => setShowHelp(true)}
-            className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            <HelpCircle size={18} />
-          </button>
-        </div>
+        {isMobile ? (
+          <div className="relative">
+            <button
+              onClick={() => setShowMoreMenu(!showMoreMenu)}
+              className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <MoreHorizontal size={18} />
+            </button>
+            {showMoreMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowMoreMenu(false)}
+                />
+                <div className="absolute bottom-full right-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-100 py-2 min-w-[160px] z-50">
+                  <button
+                    onClick={() => {
+                      setShowReport(true);
+                      setShowMoreMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <FileText size={16} />
+                    查看报告
+                  </button>
+                  <button
+                    onClick={handleExportReport}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <Download size={16} />
+                    导出报告
+                  </button>
+                  <div className="border-t border-gray-100 my-1" />
+                  <button
+                    onClick={() => {
+                      setShowHelp(true);
+                      setShowMoreMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                  >
+                    <HelpCircle size={16} />
+                    使用帮助
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              onClick={() => setShowReport(true)}
+              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors text-xs sm:text-sm font-medium"
+            >
+              <FileText size={isTablet ? 14 : 16} />
+              <span className={isTablet ? 'hidden' : ''}>查看报告</span>
+            </button>
+            <button
+              onClick={handleExportReport}
+              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors text-xs sm:text-sm font-medium"
+            >
+              <Download size={isTablet ? 14 : 16} />
+              <span className={isTablet ? 'hidden' : ''}>导出报告</span>
+            </button>
+            <button
+              onClick={() => setShowHelp(true)}
+              className="p-1.5 sm:p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              <HelpCircle size={isTablet ? 16 : 18} />
+            </button>
+          </div>
+        )}
       </div>
 
       {showHelp && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowHelp(false)}>
-          <div className="bg-white rounded-2xl p-6 max-w-md mx-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowHelp(false)}>
+          <div className="bg-white rounded-2xl p-4 sm:p-6 max-w-md w-full shadow-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-800">使用帮助</h3>
+              <h3 className="text-base sm:text-lg font-bold text-gray-800">使用帮助</h3>
               <button
                 onClick={() => setShowHelp(false)}
-                className="p-1 hover:bg-gray-100 rounded-lg"
+                className="p-1.5 hover:bg-gray-100 rounded-lg"
               >
                 <X size={20} className="text-gray-500" />
               </button>
@@ -171,17 +228,17 @@ ${operationLogs.slice(0, 10).map(log => `
       )}
 
       {showReport && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowReport(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h3 className="text-lg font-bold text-gray-800">管线状态报告</h3>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4" onClick={() => setShowReport(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200">
+              <h3 className="text-base sm:text-lg font-bold text-gray-800">管线状态报告</h3>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleExportReport}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-xs sm:text-sm font-medium"
                 >
                   <Download size={14} />
-                  导出
+                  <span className="hidden sm:inline">导出</span>
                 </button>
                 <button
                   onClick={() => setShowReport(false)}
@@ -191,8 +248,8 @@ ${operationLogs.slice(0, 10).map(log => `
                 </button>
               </div>
             </div>
-            <div className="flex-1 overflow-auto p-4">
-              <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono leading-relaxed">
+            <div className="flex-1 overflow-auto p-3 sm:p-4">
+              <pre className="text-[10px] sm:text-xs text-gray-700 whitespace-pre-wrap font-mono leading-relaxed">
                 {generateReport()}
               </pre>
             </div>

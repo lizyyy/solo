@@ -18,8 +18,8 @@ const getInitialState = () => ({
   },
   operationLogs: [],
   showAffectedArea: true,
-  leftPanelOpen: true,
-  rightPanelOpen: true,
+  leftPanelOpen: undefined as boolean | undefined,
+  rightPanelOpen: undefined as boolean | undefined,
 });
 
 export const useAppStore = create<AppStore>((set, get) => ({
@@ -68,11 +68,21 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   resetState: () => {
-    set(getInitialState());
+    const { leftPanelOpen, rightPanelOpen } = get();
+    set({ ...getInitialState(), leftPanelOpen, rightPanelOpen });
   },
 
   importSampleData: () => {
-    set(getInitialState());
+    const { leftPanelOpen, rightPanelOpen } = get();
+    set({ ...getInitialState(), leftPanelOpen, rightPanelOpen });
+  },
+
+  setLeftPanelOpen: (open: boolean) => {
+    set({ leftPanelOpen: open });
+  },
+
+  setRightPanelOpen: (open: boolean) => {
+    set({ rightPanelOpen: open });
   },
 
   toggleLeftPanel: () => {

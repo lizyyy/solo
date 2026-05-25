@@ -78,8 +78,8 @@ export interface AppState {
   timeline: TimelineState;
   operationLogs: OperationLog[];
   showAffectedArea: boolean;
-  leftPanelOpen: boolean;
-  rightPanelOpen: boolean;
+  leftPanelOpen: boolean | undefined;
+  rightPanelOpen: boolean | undefined;
 }
 
 export interface AppActions {
@@ -92,6 +92,8 @@ export interface AppActions {
   toggleTimelinePlay: () => void;
   resetState: () => void;
   importSampleData: () => void;
+  setLeftPanelOpen: (open: boolean) => void;
+  setRightPanelOpen: (open: boolean) => void;
   toggleLeftPanel: () => void;
   toggleRightPanel: () => void;
   toggleShowAffectedArea: () => void;
