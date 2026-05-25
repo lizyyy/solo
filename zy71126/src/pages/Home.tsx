@@ -4,9 +4,11 @@ import { LeftPanel } from '@/components/ui/LeftPanel';
 import { RightPanel } from '@/components/ui/RightPanel';
 import { Timeline } from '@/components/ui/Timeline';
 import { useReportExporter } from '@/hooks/useReportExporter';
+import { useLineOfSight } from '@/hooks/useLineOfSight';
 
 export default function Home() {
   useReportExporter();
+  useLineOfSight();
 
   return (
     <div className="w-full h-screen bg-slate-900 relative overflow-hidden">

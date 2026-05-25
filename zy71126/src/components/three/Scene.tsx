@@ -6,7 +6,6 @@ import { Classroom, Lighting } from './Classroom';
 import { Seats } from './Seats';
 import { Obstacles } from './Obstacles';
 import { LineOfSightLines } from './LineOfSightLines';
-import { useLineOfSight } from '@/hooks/useLineOfSight';
 import { useAppStore } from '@/store/appStore';
 import { ViewMode } from '@/types';
 
@@ -52,7 +51,6 @@ function CameraController({ viewMode }: CameraControllerProps) {
 
 function SceneContent() {
   const viewMode = useAppStore((state) => state.viewMode);
-  useLineOfSight();
 
   return (
     <>

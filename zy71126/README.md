@@ -1,57 +1,183 @@
-# React + TypeScript + Vite
+# 教室座位视线检查工具
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+基于 Three.js 的交互式3D教室视线遮挡检测工具，帮助培训机构在更换教室布局后，快速验证后排学生视线是否被柱子和投影架遮挡。
 
-Currently, two official plugins are available:
+## 功能特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **3D教室可视化**：可交互的3D教室场景，包含座位、讲台、柱子、投影幕
+- **座位管理**：座位拖拽调整、按排筛选、临时加排功能
+- **实时视线检测**：基于 Three.js Raycaster 的实时视线遮挡检测与射线渲染
+- **多视角切换**：透视/俯视/正视/侧视四种视角快速切换
+- **布局时间轴**：保存多个布局状态，支持一键切换和自动播放
+- **报告导出**：导出HTML格式视线分析报告，包含当前截图和统计数据
+- **样例导入**：4种预设教室布局快速切换验证
 
-## Expanding the ESLint configuration
+## 技术栈
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **前端框架**: React 18 + TypeScript
+- **3D引擎**: Three.js + @react-three/fiber + @react-three/drei
+- **状态管理**: Zustand
+- **样式**: Tailwind CSS
+- **图标**: Lucide React
+- **构建工具**: Vite
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 快速开始
+
+### 环境要求
+
+- Node.js >= 16.0.0
+- npm 或 pnpm
+
+### 安装依赖
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 启动开发服务器
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm run dev
 ```
+
+启动后访问: http://localhost:5173/
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+### TypeScript 检查
+
+```bash
+npm run check
+```
+
+## 验证视线检测功能
+
+### 复现步骤
+
+1. 启动开发服务器 `npm run dev`
+2. 打开浏览器访问 http://localhost:5175/ (或终端显示的端口)
+3. 点击顶部工具栏「导入样例」按钮
+4. 选择「标准教室 - 中间柱子」布局
+
+### 预期结果
+
+在「标准教室 - 中间柱子」布局中，应当检测到以下座位被 `pillar-2`（位于坐标 `(-3, 1.5, 4)` 的柱子）遮挡：
+- `seat-3-2` (第4排第3座)
+- `seat-4-2` (第5排第3座)
+
+验证方法：
+1. 观察3D场景中座位颜色：红色表示遮挡，蓝色表示正常
+2. 查看左侧面板「遮挡座位」统计数
+3. 查看右侧面板「遮挡座位列表」
+4. 视线射线颜色：红色表示遮挡，绿色表示通畅
+
+### 关键技术点
+
+视线检测核心逻辑位于 [src/hooks/useLineOfSight.ts](src/hooks/useLineOfSight.ts)，关键修复：
+
+```typescript
+// 创建障碍物Mesh后必须调用 updateMatrixWorld 更新矩阵
+mesh.position.set(x, y, z);
+mesh.updateMatrixWorld(true);  // 关键：确保Raycaster使用正确位置
+```
+
+**问题原因**：Three.js Raycaster 依赖 `matrixWorld` 进行相交检测，仅设置 `position` 属性而不更新矩阵会导致所有障碍物被认为在原点(0,0,0)，造成遮挡检测失效。
+
+## 操作指南
+
+### 基础操作
+
+- **旋转视角**：鼠标左键拖拽
+- **缩放**：鼠标滚轮
+- **平移**：鼠标右键拖拽
+
+### 座位管理
+
+1. 点击「拖拽座位」按钮启用拖拽模式
+2. 点击并拖拽座位可移动位置
+3. 点击「添加座位排」在最后新增一排座位
+4. 左侧面板可按排筛选座位
+
+### 布局保存与复盘
+
+1. 调整座位布局后点击「保存状态」
+2. 底部时间轴会出现新的状态节点
+3. 点击状态节点可快速切换布局
+4. 点击播放按钮可自动轮播所有状态
+
+### 报告导出
+
+1. 调整到需要导出的视角和筛选条件
+2. 点击「导出报告」按钮
+3. 自动下载HTML格式报告，包含：
+   - 当前3D场景截图
+   - 遮挡统计数据
+   - 当前筛选条件
+   - 时间轴位置信息
+
+## 预设样例布局
+
+| 布局名称 | 座位数 | 障碍物 | 说明 |
+|---------|--------|--------|------|
+| 标准教室 - 无遮挡 | 48 | 无 | 基线对照场景 |
+| 标准教室 - 中间柱子 | 48 | 2根柱子 | 典型遮挡场景 |
+| 大型教室 - 多柱子+投影架 | 80 | 3根柱子 + 投影架 + 幕布 | 复杂场景 |
+| 小型培训室 | 24 | 1根柱子 | 小空间场景 |
+
+## 项目结构
+
+```
+src/
+├── components/
+│   ├── three/          # 3D场景组件
+│   │   ├── Scene.tsx       # 主3D场景
+│   │   ├── Classroom.tsx   # 教室地面与灯光
+│   │   ├── Seats.tsx       # 座位组件与拖拽
+│   │   ├── Obstacles.tsx   # 障碍物组件
+│   │   └── LineOfSightLines.tsx  # 视线射线渲染
+│   └── ui/             # UI组件
+│       ├── Toolbar.tsx     # 顶部工具栏
+│       ├── LeftPanel.tsx   # 左侧控制面板
+│       ├── RightPanel.tsx  # 右侧信息面板
+│       └── Timeline.tsx    # 底部时间轴
+├── hooks/
+│   ├── useLineOfSight.ts   # 视线检测hook
+│   └── useReportExporter.ts # 报告导出hook
+├── store/
+│   └── appStore.ts     # Zustand状态管理
+├── data/
+│   └── sampleLayouts.ts # 预设布局数据
+├── types/
+│   └── index.ts        # TypeScript类型定义
+├── pages/
+│   └── Home.tsx        # 主页面
+└── App.tsx             # 应用入口
+```
+
+## 颜色图例
+
+| 颜色 | 含义 |
+|------|------|
+| 🔵 蓝色 | 正常座位 - 视线通畅 |
+| 🔴 红色 | 遮挡座位 - 视线被阻挡 |
+| 🟡 黄色 | 选中座位 - 正在拖拽或点击选中 |
+| 🟢 绿色射线 | 视线通畅 |
+| 🔴 红色射线 | 视线被遮挡 |
+
+## 常见问题
+
+### Q: 为什么有些座位看起来应该被遮挡但显示为正常？
+
+A: 请检查「视线高度」设置（右侧面板），不同的视线高度会影响检测结果。默认值为1.2米，可在0.8-1.5米之间调整。
+
+### Q: 拖拽座位时不跟随鼠标移动？
+
+A: 请确保已点击「拖拽座位」按钮启用拖拽模式，按钮变蓝表示已启用。
+
+### Q: 导出的报告中截图不显示？
+
+A: 浏览器安全策略可能限制Canvas截图导出，建议使用Chrome或Edge浏览器。
