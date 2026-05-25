@@ -79,7 +79,13 @@ const LabSafetyVR = (function() {
             totalPoints: 0,
             onPathPoints: 0,
             offPathPoints: 0,
-            complianceRate: 100
+            complianceRate: 100,
+            currentSegment: 0,
+            passedWaypoints: [0],
+            segmentProgress: [],
+            averageDistance: 0,
+            maxDistance: 0,
+            totalDistance: 0
         }
     };
 
@@ -299,21 +305,33 @@ const LabSafetyVR = (function() {
         });
 
         if (state.currentScenario && state.currentStepIndex >= 0) {
-            const onPath = isPointOnSafePath(toPos);
-            state.playerOnPath = onPath;
+            const pathCheck = checkPathWithOrder(toPos);
+            state.playerOnPath = pathCheck.onCurrentSegment;
             
             state.pathStats.totalPoints++;
-            if (onPath) {
+            state.pathStats.totalDistance += pathCheck.distanceToPath;
+            
+            if (pathCheck.distanceToPath > state.pathStats.maxDistance) {
+                state.pathStats.maxDistance = pathCheck.distanceToPath;
+            }
+            
+            if (pathCheck.onCurrentSegment) {
                 state.pathStats.onPathPoints++;
             } else {
                 state.pathStats.offPathPoints++;
-                if (state.pathStats.offPathPoints % 50 === 0) {
-                    recordViolation('off_path', `持续偏离安全路线 (${state.pathStats.offPathPoints}点)`);
+                if (state.pathStats.offPathPoints % 30 === 0) {
+                    recordViolation('off_path', `偏离安全路线 ${state.pathStats.offPathPoints} 次，距离: ${pathCheck.distanceToPath.toFixed(2)}m`);
                 }
             }
-            state.pathStats.complianceRate = Math.round(
-                (state.pathStats.onPathPoints / state.pathStats.totalPoints) * 100
-            );
+            
+            const strictCompliance = calculateStrictPathCompliance();
+            state.pathStats.complianceRate = strictCompliance;
+            state.pathStats.averageDistance = state.pathStats.totalDistance / state.pathStats.totalPoints;
+            
+            if (pathCheck.advancedWaypoint !== null) {
+                showHint(`📍 已通过路径拐点 ${pathCheck.advancedWaypoint + 1}/${state.currentScenario.safePath.length}`, 'success');
+                updateWaypointVisual(pathCheck.advancedWaypoint);
+            }
             
             if (state.pathStats.totalPoints % 10 === 0) {
                 updateUI();
@@ -321,47 +339,146 @@ const LabSafetyVR = (function() {
         }
     }
 
-    function isPointOnSafePath(point, threshold = 1.0) {
-        if (!state.currentScenario) return false;
-        const safePath = state.currentScenario.safePath;
+    function checkPathWithOrder(point) {
+        if (!state.currentScenario) return { onCurrentSegment: false, distanceToPath: 0, advancedWaypoint: null };
         
-        for (let i = 0; i < safePath.length - 1; i++) {
-            if (isPointNearLineSegment(point, safePath[i], safePath[i + 1], threshold)) {
-                return true;
+        const safePath = state.currentScenario.safePath;
+        const currentSeg = state.pathStats.currentSegment;
+        const strictThreshold = 0.6;
+        
+        if (currentSeg < safePath.length - 1) {
+            const segStart = safePath[currentSeg];
+            const segEnd = safePath[currentSeg + 1];
+            const distToSegment = distanceToLineSegment(point, segStart, segEnd);
+            
+            const nextWaypoint = safePath[currentSeg + 1];
+            const distToNextWaypoint = distance2D(point, nextWaypoint);
+            
+            if (distToNextWaypoint < 0.5 && !state.pathStats.passedWaypoints.includes(currentSeg + 1)) {
+                state.pathStats.passedWaypoints.push(currentSeg + 1);
+                state.pathStats.currentSegment = currentSeg + 1;
+                return { 
+                    onCurrentSegment: true, 
+                    distanceToPath: distToSegment,
+                    advancedWaypoint: currentSeg + 1
+                };
             }
+            
+            if (distToSegment <= strictThreshold) {
+                return { 
+                    onCurrentSegment: true, 
+                    distanceToPath: distToSegment,
+                    advancedWaypoint: null
+                };
+            }
+            
+            let minDistance = distToSegment;
+            for (let i = 0; i < safePath.length - 1; i++) {
+                const d = distanceToLineSegment(point, safePath[i], safePath[i + 1]);
+                if (d < minDistance) minDistance = d;
+            }
+            
+            return { 
+                onCurrentSegment: false, 
+                distanceToPath: minDistance,
+                advancedWaypoint: null
+            };
         }
         
-        const startDist = distance2D(point, safePath[0]);
-        const endDist = distance2D(point, safePath[safePath.length - 1]);
-        return startDist < threshold || endDist < threshold;
+        const endPoint = safePath[safePath.length - 1];
+        const distToEnd = distance2D(point, endPoint);
+        
+        return {
+            onCurrentSegment: distToEnd < 0.8,
+            distanceToPath: distToEnd,
+            advancedWaypoint: null
+        };
     }
 
-    function calculatePathCompliance() {
-        if (state.playerPath.length === 0) return 100;
+    function distanceToLineSegment(point, lineStart, lineEnd) {
+        const lineLen = distance2D(lineStart, lineEnd);
+        if (lineLen === 0) return distance2D(point, lineStart);
+
+        const t = Math.max(0, Math.min(1, 
+            ((point.x - lineStart.x) * (lineEnd.x - lineStart.x) + 
+             (point.z - lineStart.z) * (lineEnd.z - lineStart.z)) / (lineLen * lineLen)
+        ));
+
+        const projection = {
+            x: lineStart.x + t * (lineEnd.x - lineStart.x),
+            z: lineStart.z + t * (lineEnd.z - lineStart.z)
+        };
+
+        return distance2D(point, projection);
+    }
+
+    function isPointOnSafePath(point, threshold = 0.6) {
+        if (!state.currentScenario) return false;
+        const safePath = state.currentScenario.safePath;
+        const currentSeg = state.pathStats.currentSegment;
         
-        let onPathCount = 0;
-        state.playerPath.forEach(point => {
-            if (isPointOnSafePath(point, 1.2)) {
-                onPathCount++;
+        if (currentSeg < safePath.length - 1) {
+            return distanceToLineSegment(point, safePath[currentSeg], safePath[currentSeg + 1]) <= threshold;
+        }
+        
+        return distance2D(point, safePath[safePath.length - 1]) < 0.8;
+    }
+
+    function calculateStrictPathCompliance() {
+        if (state.playerPath.length < 10) return 100;
+        
+        const safePath = state.currentScenario.safePath;
+        let totalScore = 0;
+        let maxPossibleScore = 0;
+        
+        state.playerPath.forEach((point, idx) => {
+            maxPossibleScore += 100;
+            
+            let bestScore = 0;
+            for (let i = 0; i < safePath.length - 1; i++) {
+                const dist = distanceToLineSegment(point, safePath[i], safePath[i + 1]);
+                const segmentScore = Math.max(0, 100 - (dist * 80));
+                if (segmentScore > bestScore) bestScore = segmentScore;
             }
+            
+            const endDist = distance2D(point, safePath[safePath.length - 1]);
+            const endScore = Math.max(0, 100 - (endDist * 80));
+            bestScore = Math.max(bestScore, endScore);
+            
+            totalScore += bestScore;
         });
         
-        return Math.round((onPathCount / state.playerPath.length) * 100);
+        const waypoints = state.pathStats.passedWaypoints;
+        const expectedWaypoints = safePath.length;
+        const waypointBonus = (waypoints.length / expectedWaypoints) * 30;
+        
+        const baseCompliance = Math.round((totalScore / maxPossibleScore) * 100);
+        return Math.min(100, baseCompliance + waypointBonus);
     }
 
     function hasPathDeviation() {
-        const compliance = calculatePathCompliance();
-        return compliance < 70;
+        const compliance = calculateStrictPathCompliance();
+        return compliance < 60;
     }
 
     function getPathViolationCount() {
-        let offPathPoints = 0;
-        state.playerPath.forEach(point => {
-            if (!isPointOnSafePath(point, 1.2)) {
-                offPathPoints++;
-            }
+        return Math.max(0, Math.floor(state.pathStats.offPathPoints / 20));
+    }
+
+    function updateWaypointVisual(waypointIndex) {
+        const safePath = state.currentScenario.safePath;
+        if (waypointIndex >= safePath.length) return;
+        
+        const wp = safePath[waypointIndex];
+        const markerGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+        const markerMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x00ff88,
+            emissive: 0x00ff88,
+            emissiveIntensity: 0.5
         });
-        return Math.floor(offPathPoints / 30);
+        const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+        marker.position.set(wp.x, 0.2, wp.z);
+        scene.add(marker);
     }
 
     function isPointNearLineSegment(point, lineStart, lineEnd, threshold) {
@@ -425,7 +542,13 @@ const LabSafetyVR = (function() {
             totalPoints: 0,
             onPathPoints: 0,
             offPathPoints: 0,
-            complianceRate: 100
+            complianceRate: 100,
+            currentSegment: 0,
+            passedWaypoints: [0],
+            segmentProgress: [],
+            averageDistance: 0,
+            maxDistance: 0,
+            totalDistance: 0
         };
         
         state.currentScenario.hazards.forEach(hazard => createHazard(hazard));
@@ -818,6 +941,7 @@ const LabSafetyVR = (function() {
 
     function handleExitInteraction(exit, currentStep) {
         if (currentStep && currentStep.target === 'exit') {
+            const safePath = state.currentScenario.safePath;
             const distToExit = distance2D(state.playerPosition, state.currentScenario.exitPoint);
             
             if (distToExit > 1.5) {
@@ -826,25 +950,36 @@ const LabSafetyVR = (function() {
                 return;
             }
             
-            const pathCompliance = calculatePathCompliance();
-            if (pathCompliance < 60) {
+            const passedWaypoints = state.pathStats.passedWaypoints;
+            const totalWaypoints = safePath.length;
+            const waypointProgress = (passedWaypoints.length / totalWaypoints) * 100;
+            
+            if (waypointProgress < 60) {
+                recordViolation('invalid_evacuation', `未按顺序通过路径拐点 (${passedWaypoints.length}/${totalWaypoints})`);
+                showHint(`⚠️ 请按顺序沿绿色路线移动，已通过 ${passedWaypoints.length}/${totalWaypoints} 个拐点`, 'error');
+                state.score = Math.max(0, state.score - Math.floor((100 - waypointProgress) / 10));
+                updateUI();
+                return;
+            }
+            
+            const pathCompliance = calculateStrictPathCompliance();
+            if (pathCompliance < 50) {
                 const pathViolations = getPathViolationCount();
-                for (let i = 0; i < Math.min(pathViolations, 5); i++) {
-                    recordViolation('path_deviation', `撤离路线偏离合规率: ${pathCompliance}%`);
+                for (let i = 0; i < Math.min(pathViolations, 3); i++) {
+                    recordViolation('path_deviation', `撤离路线合规率过低: ${pathCompliance}%`);
                 }
                 showHint(`⚠️ 撤离路线合规率仅${pathCompliance}%，请沿绿色安全路线移动`, 'error');
-                
                 state.score = Math.max(0, state.score - Math.floor((100 - pathCompliance) / 10));
                 updateUI();
                 return;
             }
             
-            if (pathCompliance < 80) {
+            if (pathCompliance < 70) {
                 showHint(`⚠️ 撤离路线合规率${pathCompliance}%，建议尽量沿绿色路线移动`, 'info');
             }
             
             completeStep(currentStep);
-            showHint(`✅ ${currentStep.name} - 完成! (路线合规率: ${pathCompliance}%)`, 'success');
+            showHint(`✅ ${currentStep.name} - 完成! (合规率: ${pathCompliance}%, 拐点: ${passedWaypoints.length}/${totalWaypoints})`, 'success');
         } else {
             recordViolation('early_evacuation', '过早撤离！请先完成所有处置步骤');
             showHint(`❌ 警告：过早撤离！泄漏未处理完前不能离开`, 'error');
@@ -1270,7 +1405,9 @@ const LabSafetyVR = (function() {
 
     function showReport() {
         const scoreData = calculateScore();
-        const pathCompliance = calculatePathCompliance();
+        const pathCompliance = calculateStrictPathCompliance();
+        const safePath = state.currentScenario.safePath;
+        const passedWaypoints = state.pathStats.passedWaypoints;
         const reportContent = document.getElementById('reportContent');
         
         reportContent.innerHTML = `
@@ -1296,6 +1433,12 @@ const LabSafetyVR = (function() {
                         </div>
                     </div>
                     <div class="report-card">
+                        <div class="label">拐点进度</div>
+                        <div class="value ${passedWaypoints.length === safePath.length ? 'excellent' : 'bad'}">
+                            ${passedWaypoints.length}/${safePath.length}
+                        </div>
+                    </div>
+                    <div class="report-card">
                         <div class="label">错误次数</div>
                         <div class="value ${state.errorCount > 0 ? 'bad' : 'excellent'}">${state.errorCount}</div>
                     </div>
@@ -1306,6 +1449,10 @@ const LabSafetyVR = (function() {
                     <div class="report-card">
                         <div class="label">路径采样点</div>
                         <div class="value">${state.playerPath.length}</div>
+                    </div>
+                    <div class="report-card">
+                        <div class="label">平均偏离距离</div>
+                        <div class="value">${state.pathStats.averageDistance.toFixed(2)}m</div>
                     </div>
                 </div>
             </div>
@@ -1396,14 +1543,19 @@ const LabSafetyVR = (function() {
         doc.text('演练结果', 20, 72);
         
         const scoreData = calculateScore();
-        const pathCompliance = calculatePathCompliance();
+        const pathCompliance = calculateStrictPathCompliance();
+        const safePath = state.currentScenario.safePath;
+        const passedWaypoints = state.pathStats.passedWaypoints;
         doc.setFontSize(11);
         doc.text(`总得分: ${scoreData.score}/${scoreData.totalPossible}`, 25, 82);
         doc.text(`评级: ${scoreData.grade}`, 25, 89);
         doc.text(`路线合规率: ${pathCompliance}%`, 25, 96);
-        doc.text(`错误次数: ${state.errorCount}`, 25, 103);
-        doc.text(`路径采样点: ${state.playerPath.length}`, 25, 110);
-        doc.text(`禁区穿越: ${state.enteredForbiddenZones.size} 个`, 25, 117);
+        doc.text(`拐点进度: ${passedWaypoints.length}/${safePath.length}`, 25, 103);
+        doc.text(`平均偏离: ${state.pathStats.averageDistance.toFixed(2)}m`, 25, 110);
+        doc.text(`最大偏离: ${state.pathStats.maxDistance.toFixed(2)}m`, 25, 117);
+        doc.text(`错误次数: ${state.errorCount}`, 25, 124);
+        doc.text(`路径采样点: ${state.playerPath.length}`, 25, 131);
+        doc.text(`禁区穿越: ${state.enteredForbiddenZones.size} 个`, 25, 138);
         
         doc.setFontSize(14);
         doc.text('步骤完成情况', 20, 130);
