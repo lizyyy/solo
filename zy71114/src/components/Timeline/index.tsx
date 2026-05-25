@@ -1,6 +1,5 @@
 import { Play, Pause, SkipBack, SkipForward, RotateCcw, Gauge } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
-import { SIMULATION_CONFIG } from '../../utils/constants';
 
 export function Timeline() {
   const { simulation, togglePlay, setProgress, resetSimulation, setSimulation } = useAppStore();

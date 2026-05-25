@@ -8,14 +8,16 @@ import { InfoPanel } from '../components/InfoPanel';
 export default function Home() {
   const {
     selectedGarage,
-    selectedVehicle,
     riskPoints,
     cameraPreset,
     showRiskMarkers,
     showMeasurements,
     simulation,
     togglePlay,
+    getEffectiveVehicle,
   } = useAppStore();
+
+  const effectiveVehicle = getEffectiveVehicle();
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -37,7 +39,6 @@ export default function Home() {
       >
         <GarageScene
           garage={selectedGarage}
-          vehicle={selectedVehicle}
           riskPoints={riskPoints}
           cameraPreset={cameraPreset}
           showRiskMarkers={showRiskMarkers}
@@ -49,7 +50,9 @@ export default function Home() {
         <div className="bg-black/50 backdrop-blur-sm text-white px-6 py-2 rounded-full text-sm font-medium flex items-center gap-3">
           <span className="text-gray-300">{selectedGarage.name}</span>
           <span className="w-px h-4 bg-gray-600" />
-          <span className="text-gray-300">{selectedVehicle.name}</span>
+          <span className="text-gray-300">{effectiveVehicle.name}</span>
+          <span className="w-px h-4 bg-gray-600" />
+          <span className="text-blue-300">车高: {effectiveVehicle.height}{effectiveVehicle.unit}</span>
           <span
             className={`w-2 h-2 rounded-full ${
               simulation.isPlaying ? 'bg-green-400 animate-pulse' : 'bg-gray-500'

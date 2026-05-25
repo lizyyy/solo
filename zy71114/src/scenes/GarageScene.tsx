@@ -1,14 +1,15 @@
 import { useEffect, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Grid, Environment } from '@react-three/drei';
-import * as THREE from 'three';
-import { Garage, Vehicle as VehicleType, RiskPoint, Vector3 } from '../types';
+import { OrbitControls, Grid } from '@react-three/drei';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import { Garage, RiskPoint, Vector3 } from '../types';
 import { Vehicle } from './Vehicle';
 import { Ramp } from './Ramp';
 import { Beam } from './Beam';
 import { RiskMarker, EntranceSign, HeightIndicator } from './RiskMarker';
 import { useAppStore } from '../store/useAppStore';
 import { cameraPresets } from '../data/mockGarages';
+import { HeightChecker } from '../engine/HeightChecker';
 
 interface SceneControllerProps {
   cameraPreset: string;
@@ -16,7 +17,7 @@ interface SceneControllerProps {
 
 function SceneController({ cameraPreset }: SceneControllerProps) {
   const { camera } = useThree();
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl>(null);
 
   useEffect(() => {
     const preset = cameraPresets.find((p) => p.id === cameraPreset);
@@ -76,14 +77,40 @@ function SimulationController({
 
 interface GarageContentProps {
   garage: Garage;
-  vehicle: VehicleType;
   riskPoints: RiskPoint[];
   showRiskMarkers: boolean;
   showMeasurements: boolean;
 }
 
-function GarageContent({ garage, vehicle, riskPoints, showRiskMarkers, showMeasurements }: GarageContentProps) {
-  const { simulation, setProgress, togglePlay } = useAppStore();
+function GarageContent({ garage, riskPoints, showRiskMarkers, showMeasurements }: GarageContentProps) {
+  const { simulation, setProgress, setRiskPoints, getEffectiveVehicle, vehicleDragEnabled } = useAppStore();
+  const lastCheckRef = useRef(0);
+  const effectiveVehicle = getEffectiveVehicle();
+
+  useFrame(() => {
+    const now = Date.now();
+    if (now - lastCheckRef.current > 200) {
+      lastCheckRef.current = now;
+      const checker = new HeightChecker(garage, effectiveVehicle);
+      const newRiskPoints = checker.checkRamp(0);
+      if (JSON.stringify(newRiskPoints) !== JSON.stringify(riskPoints)) {
+        setRiskPoints(newRiskPoints);
+      }
+    }
+  });
+
+  const handleVehicleDrag = (e: { point: { z: number }; stopPropagation: () => void }) => {
+    if (!vehicleDragEnabled) return;
+    e.stopPropagation();
+    const point = e.point;
+    const ramp = garage.ramps[0];
+    if (ramp) {
+      const clampedZ = Math.max(ramp.points[0][2], Math.min(ramp.points[ramp.points.length - 1][2], point[2]));
+      const totalLength = ramp.points[ramp.points.length - 1][2] - ramp.points[0][2];
+      const progress = (clampedZ - ramp.points[0][2]) / totalLength;
+      setProgress(Math.max(0, Math.min(1, progress)));
+    }
+  };
 
   return (
     <>
@@ -155,7 +182,19 @@ function GarageContent({ garage, vehicle, riskPoints, showRiskMarkers, showMeasu
         </group>
       ))}
 
-      <Vehicle vehicle={vehicle} position={simulation.currentPosition} rotation={[0, 0, 0]} />
+      <group onPointerDown={handleVehicleDrag} onPointerMove={handleVehicleDrag}>
+        <Vehicle
+          vehicle={effectiveVehicle}
+          position={simulation.currentPosition}
+          rotation={[0, 0, 0]}
+        />
+        {vehicleDragEnabled && (
+          <mesh position={[simulation.currentPosition[0], simulation.currentPosition[1] + 0.1, simulation.currentPosition[2]]}>
+            <ringGeometry args={[1.5, 2, 32]} />
+            <meshBasicMaterial color="#8B5CF6" transparent opacity={0.5} side={2} />
+          </mesh>
+        )}
+      </group>
 
       {showRiskMarkers &&
         riskPoints.map((risk) => <RiskMarker key={risk.id} risk={risk} />)}
@@ -176,7 +215,6 @@ function GarageContent({ garage, vehicle, riskPoints, showRiskMarkers, showMeasu
 
 interface GarageSceneProps {
   garage: Garage;
-  vehicle: VehicleType;
   riskPoints: RiskPoint[];
   cameraPreset: string;
   showRiskMarkers: boolean;
@@ -185,7 +223,6 @@ interface GarageSceneProps {
 
 export function GarageScene({
   garage,
-  vehicle,
   riskPoints,
   cameraPreset,
   showRiskMarkers,
@@ -201,7 +238,6 @@ export function GarageScene({
       <SceneController cameraPreset={cameraPreset} />
       <GarageContent
         garage={garage}
-        vehicle={vehicle}
         riskPoints={riskPoints}
         showRiskMarkers={showRiskMarkers}
         showMeasurements={showMeasurements}

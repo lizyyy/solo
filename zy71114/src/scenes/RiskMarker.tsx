@@ -44,10 +44,9 @@ export function RiskMarker({ risk }: RiskMarkerProps) {
 interface HeightIndicatorProps {
   position: [number, number, number];
   height: number;
-  label?: string;
 }
 
-export function HeightIndicator({ position, height, label }: HeightIndicatorProps) {
+export function HeightIndicator({ position, height }: HeightIndicatorProps) {
   return (
     <group position={position}>
       <mesh position={[0, height / 2, 0]}>
@@ -74,10 +73,10 @@ interface EntranceSignProps {
   height: number;
 }
 
-export function EntranceSign({ position, text, height }: EntranceSignProps) {
+export function EntranceSign({ position, height }: EntranceSignProps) {
   return (
     <group position={position}>
-      <mesh position={[0, height / 2, 0]}>
+      <mesh position={[0, height / 2 + 0.4, 0]}>
         <boxGeometry args={[2, 0.8, 0.1]} />
         <meshStandardMaterial color="#F53F3F" />
       </mesh>

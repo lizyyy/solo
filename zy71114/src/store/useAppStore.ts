@@ -1,11 +1,14 @@
 import { create } from 'zustand';
-import { Garage, Vehicle, RiskPoint, HeightReport, SimulationState } from '../types';
+import { Garage, Vehicle, RiskPoint, HeightReport, SimulationState, Unit } from '../types';
 import { defaultGarage, defaultVehicle } from '../data/mockGarages';
 import { SIMULATION_CONFIG } from '../utils/constants';
 
 interface AppStore {
   selectedGarage: Garage;
   selectedVehicle: Vehicle;
+  customVehicleHeight: number;
+  customVehicleUnit: Unit;
+  useCustomHeight: boolean;
   simulation: SimulationState;
   riskPoints: RiskPoint[];
   currentReport: HeightReport | null;
@@ -15,8 +18,13 @@ interface AppStore {
   leftPanelOpen: boolean;
   rightPanelOpen: boolean;
   selectedEntrance: string | null;
+  filteredEntrances: string[];
+  vehicleDragEnabled: boolean;
   setSelectedGarage: (garage: Garage) => void;
   setSelectedVehicle: (vehicle: Vehicle) => void;
+  setCustomVehicleHeight: (height: number) => void;
+  setCustomVehicleUnit: (unit: Unit) => void;
+  setUseCustomHeight: (use: boolean) => void;
   setSimulation: (simulation: Partial<SimulationState>) => void;
   setRiskPoints: (points: RiskPoint[]) => void;
   setCurrentReport: (report: HeightReport | null) => void;
@@ -26,6 +34,9 @@ interface AppStore {
   setLeftPanelOpen: (open: boolean) => void;
   setRightPanelOpen: (open: boolean) => void;
   setSelectedEntrance: (entranceId: string | null) => void;
+  setFilteredEntrances: (entrances: string[]) => void;
+  setVehicleDragEnabled: (enabled: boolean) => void;
+  getEffectiveVehicle: () => Vehicle;
   togglePlay: () => void;
   setProgress: (progress: number) => void;
   resetSimulation: () => void;
@@ -35,6 +46,9 @@ interface AppStore {
 export const useAppStore = create<AppStore>((set, get) => ({
   selectedGarage: defaultGarage,
   selectedVehicle: defaultVehicle,
+  customVehicleHeight: defaultVehicle.height,
+  customVehicleUnit: defaultVehicle.unit,
+  useCustomHeight: false,
   simulation: {
     isPlaying: false,
     progress: 0,
@@ -49,9 +63,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
   leftPanelOpen: true,
   rightPanelOpen: true,
   selectedEntrance: null,
+  filteredEntrances: [],
+  vehicleDragEnabled: false,
 
   setSelectedGarage: (garage) => set({ selectedGarage: garage }),
-  setSelectedVehicle: (vehicle) => set({ selectedVehicle: vehicle }),
+  setSelectedVehicle: (vehicle) => set({ selectedVehicle: vehicle, customVehicleHeight: vehicle.height, customVehicleUnit: vehicle.unit }),
+  setCustomVehicleHeight: (customVehicleHeight) => set({ customVehicleHeight }),
+  setCustomVehicleUnit: (customVehicleUnit) => set({ customVehicleUnit }),
+  setUseCustomHeight: (useCustomHeight) => set({ useCustomHeight }),
   setSimulation: (simulation) =>
     set((state) => ({
       simulation: { ...state.simulation, ...simulation },
@@ -64,6 +83,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
   setLeftPanelOpen: (leftPanelOpen) => set({ leftPanelOpen }),
   setRightPanelOpen: (rightPanelOpen) => set({ rightPanelOpen }),
   setSelectedEntrance: (selectedEntrance) => set({ selectedEntrance }),
+  setFilteredEntrances: (filteredEntrances) => set({ filteredEntrances }),
+  setVehicleDragEnabled: (vehicleDragEnabled) => set({ vehicleDragEnabled }),
+
+  getEffectiveVehicle: () => {
+    const { selectedVehicle, useCustomHeight, customVehicleHeight, customVehicleUnit } = get();
+    if (useCustomHeight) {
+      return { ...selectedVehicle, height: customVehicleHeight, unit: customVehicleUnit };
+    }
+    return selectedVehicle;
+  },
 
   togglePlay: () =>
     set((state) => ({
