@@ -142,6 +142,7 @@ export class SceneManager {
     const group = new THREE.Group();
     group.name = id;
     group.userData = { type, id, position: { ...position }, size: { ...size } };
+    group.position.set(position.x, 0, position.z);
 
     const geometry = type === 'washPoint' 
       ? new THREE.CylinderGeometry(size.radius, size.radius, 0.1, 32)
@@ -155,7 +156,7 @@ export class SceneManager {
     });
 
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(position.x, 0.05, position.z);
+    mesh.position.set(0, 0.05, 0);
     mesh.receiveShadow = true;
     group.add(mesh);
 
@@ -173,7 +174,7 @@ export class SceneManager {
         opacity: 0.8
       }));
       ring.rotation.x = -Math.PI / 2;
-      ring.position.set(position.x, 0.11, position.z);
+      ring.position.set(0, 0.11, 0);
       group.add(ring);
     } else {
       const edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
@@ -181,8 +182,11 @@ export class SceneManager {
       group.add(edges);
     }
 
-    const marker = this.createMarker(type, position);
-    if (marker) group.add(marker);
+    const marker = this.createMarker(type, { x: 0, z: 0 });
+    if (marker) {
+      marker.position.set(0, 3, 0);
+      group.add(marker);
+    }
 
     this.scene.add(group);
     this.objects.set(id, group);
