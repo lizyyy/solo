@@ -21,6 +21,9 @@ export function Toolbar() {
     dataCenter,
     timeSeriesData,
     currentTimeIndex,
+    alertFilters,
+    getFilteredRacks,
+    getFilteredAlerts,
   } = useAppStore();
 
   const [showViews, setShowViews] = useState(false);
@@ -44,24 +47,32 @@ export function Toolbar() {
   };
 
   const handleExportReport = async () => {
+    const filteredRacks = getFilteredRacks();
+    const filteredAlerts = getFilteredAlerts();
+    
     const reportData = {
       exportTime: new Date().toISOString(),
       dataCenterName: dataCenter?.name,
       currentTime: timeSeriesData[currentTimeIndex]?.timestamp,
+      filterApplied: {
+        alertLevels: alertFilters,
+      },
       summary: {
         totalRacks: dataCenter?.racks.length || 0,
-        criticalCount: timeSeriesData[currentTimeIndex]?.racks.filter(
-          (r) => r.status === 'critical'
-        ).length,
-        warningCount: timeSeriesData[currentTimeIndex]?.racks.filter(
-          (r) => r.status === 'warning'
-        ).length,
-        offlineCount: timeSeriesData[currentTimeIndex]?.racks.filter(
-          (r) => r.status === 'offline'
-        ).length,
+        filteredRackCount: filteredRacks.length,
+        criticalCount: filteredRacks.filter((r) => r.status === 'critical').length,
+        warningCount: filteredRacks.filter((r) => r.status === 'warning').length,
+        normalCount: filteredRacks.filter((r) => r.status === 'normal').length,
+        offlineCount: filteredRacks.filter((r) => r.status === 'offline').length,
       },
-      racks: timeSeriesData[currentTimeIndex]?.racks,
-      alerts: timeSeriesData[currentTimeIndex]?.alerts,
+      racks: filteredRacks.map((r) => ({
+        id: r.id,
+        name: r.name,
+        power: r.power,
+        temperature: r.temperature,
+        status: r.status,
+      })),
+      alerts: filteredAlerts,
     };
 
     const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });

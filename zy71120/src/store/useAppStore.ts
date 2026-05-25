@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AppState, AppActions, AlertLevel, DataCenter, TimeSeriesData } from '../types';
+import { AppState, AppActions, AlertLevel, DataCenter, TimeSeriesData, Rack } from '../types';
 import { sampleData } from '../data/sampleData';
 
 const initialState: Omit<AppState, 'dataCenter' | 'timeSeriesData'> = {
@@ -114,6 +114,35 @@ export const useAppStore = create<AppState & AppActions>()(
       getFilteredAlerts: () => {
         const { currentAlerts, alertFilters } = get();
         return currentAlerts.filter((alert) => alertFilters.includes(alert.level));
+      },
+
+      getFilteredRacks: () => {
+        const { dataCenter, timeSeriesData, currentTimeIndex, alertFilters } = get();
+        if (!dataCenter) return [];
+
+        const statusToAlertLevel: Record<string, AlertLevel> = {
+          critical: 'critical',
+          warning: 'warning',
+          normal: 'info',
+          offline: 'critical',
+        };
+
+        return dataCenter.racks
+          .map((rack) => {
+            const timeData = timeSeriesData[currentTimeIndex]?.racks.find(
+              (r) => r.id === rack.id
+            );
+            return {
+              ...rack,
+              power: timeData?.power ?? rack.power,
+              temperature: timeData?.temperature ?? rack.temperature,
+              status: timeData?.status ?? rack.status,
+            } as Rack;
+          })
+          .filter((rack) => {
+            const alertLevel = statusToAlertLevel[rack.status];
+            return alertFilters.includes(alertLevel);
+          });
       },
 
       getCurrentRackData: (rackId: string) => {

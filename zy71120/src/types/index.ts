@@ -121,5 +121,6 @@ export interface AppActions {
   setShowAirFlow: (show: boolean) => void;
   setCurrentCameraView: (viewId: string) => void;
   getFilteredAlerts: () => Alert[];
+  getFilteredRacks: () => Rack[];
   getCurrentRackData: (rackId: string) => Rack | undefined;
 }

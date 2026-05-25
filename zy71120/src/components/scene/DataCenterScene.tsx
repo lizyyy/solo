@@ -45,32 +45,18 @@ function CameraController() {
 function SceneContent() {
   const {
     dataCenter,
-    timeSeriesData,
-    currentTimeIndex,
     selectedRackId,
     setSelectedRackId,
     showHeatLayer,
     showLabels,
     showRacks,
     showAirFlow,
-    getCurrentRackData,
+    getFilteredRacks,
   } = useAppStore();
 
-  const currentRacks = useMemo(() => {
-    if (!dataCenter) return [];
-    
-    return dataCenter.racks.map((rack) => {
-      const timeData = timeSeriesData[currentTimeIndex]?.racks.find(
-        (r) => r.id === rack.id
-      );
-      return {
-        ...rack,
-        power: timeData?.power ?? rack.power,
-        temperature: timeData?.temperature ?? rack.temperature,
-        status: timeData?.status ?? rack.status,
-      } as Rack;
-    });
-  }, [dataCenter, timeSeriesData, currentTimeIndex]);
+  const filteredRacks = useMemo(() => {
+    return getFilteredRacks();
+  }, [getFilteredRacks]);
 
   if (!dataCenter) {
     return (
@@ -86,11 +72,11 @@ function SceneContent() {
       <RoomEnvironment dimensions={dataCenter.dimensions} />
 
       {showHeatLayer && (
-        <HeatLayer racks={currentRacks} dimensions={dataCenter.dimensions} />
+        <HeatLayer racks={filteredRacks} dimensions={dataCenter.dimensions} />
       )}
 
       {showRacks &&
-        currentRacks.map((rack) => (
+        filteredRacks.map((rack) => (
           <Rack3D
             key={rack.id}
             rack={rack}
