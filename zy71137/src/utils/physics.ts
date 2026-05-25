@@ -158,17 +158,21 @@ export function checkDriftAlerts(
     }
   });
 
+  const fieldThreshold = Math.max(3, Math.round(10 * bufferThreshold));
+  const bufferWarningThreshold = Math.max(1, Math.round(5 * bufferThreshold));
+  const canalThreshold = Math.max(3, Math.round(8 * bufferThreshold));
+
   adjacentFields.forEach((field) => {
     const counts = fieldCounts[field.id];
     if (counts) {
-      if (counts.field > 10) {
+      if (counts.field > fieldThreshold) {
         addAlert({
           type: 'concentration',
           severity: 'danger',
           message: `药雾已侵入 ${field.name}，可能造成污染！`,
           fieldName: field.name,
         });
-      } else if (counts.buffer > 5) {
+      } else if (counts.buffer > bufferWarningThreshold) {
         addAlert({
           type: 'buffer',
           severity: 'warning',
@@ -179,7 +183,7 @@ export function checkDriftAlerts(
     }
   });
 
-  if (canalCount > 8) {
+  if (canalCount > canalThreshold) {
     addAlert({
       type: 'canal',
       severity: 'danger',

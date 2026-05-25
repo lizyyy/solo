@@ -23,7 +23,7 @@ export function ParticleSystem({ sprinklerPositions }: ParticleSystemProps) {
     addAlert,
     setMaxDriftDistance,
     maxDriftDistance,
-    resetSimulation,
+    resetCount,
   } = useSimulationStore();
 
   const { windSpeed, windDirection, pesticideType, simulationSpeed, bufferThreshold } = params;
@@ -56,7 +56,7 @@ export function ParticleSystem({ sprinklerPositions }: ParticleSystemProps) {
     localParticlesRef.current = [];
     particleIdRef.current = 0;
     lastEmitRef.current = 0;
-  }, [resetSimulation, currentScene.id]);
+  }, [resetCount, currentScene.id]);
 
   useFrame((_, delta) => {
     if (!pointsRef.current) return;

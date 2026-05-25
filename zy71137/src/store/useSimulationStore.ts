@@ -14,6 +14,7 @@ interface SimulationState {
   maxDriftDistance: number;
   cameraView: CameraView;
   windSpeedUnit: 'm_s' | 'km_h' | 'mph';
+  resetCount: number;
 
   setScene: (scene: OrchardScene) => void;
   setParams: (params: Partial<SimulationParams>) => void;
@@ -47,6 +48,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
   maxDriftDistance: 0,
   cameraView: 'default',
   windSpeedUnit: 'm_s',
+  resetCount: 0,
 
   setScene: (scene) => set({
     currentScene: scene,
@@ -108,6 +110,7 @@ export const useSimulationStore = create<SimulationState>((set, get) => ({
     particles: [],
     alerts: [],
     maxDriftDistance: 0,
+    resetCount: state.resetCount + 1,
   })),
 
   generateReport: () => {
