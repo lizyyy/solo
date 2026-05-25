@@ -85,7 +85,11 @@ export default function ResultsPage() {
     }
   }, [status, isPlaying, replaySpeed]);
 
-  if (status === 'menu' || status === 'playing' || status === 'paused') {
+  if (status === 'menu') {
+    return <Navigate to="/" replace />;
+  }
+
+  if (status === 'playing' || status === 'paused') {
     return <Navigate to="/game" replace />;
   }
 

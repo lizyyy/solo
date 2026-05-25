@@ -2,11 +2,18 @@ import { LEVELS } from '@/config/levels';
 import { useGameStore } from '@/store/gameStore';
 import { Building2, Clock, Users, Wrench, Star, Play, Info } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { LevelConfig } from '@/types/game';
 
 export default function LevelSelect() {
   const startGame = useGameStore((state) => state.startGame);
+  const navigate = useNavigate();
   const [showRules, setShowRules] = useState(false);
+
+  const handleStartGame = (level: LevelConfig) => {
+    startGame(level);
+    navigate('/game');
+  };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -126,7 +133,7 @@ export default function LevelSelect() {
             <div
               key={level.id}
               className="group bg-[#1a2a4a] rounded-xl p-6 border border-[#ff8a00]/20 hover:border-[#ff8a00] hover:shadow-lg hover:shadow-[#ff8a00]/10 transition-all cursor-pointer transform hover:-translate-y-1"
-              onClick={() => startGame(level)}
+              onClick={() => handleStartGame(level)}
             >
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -178,7 +185,7 @@ export default function LevelSelect() {
                 className="w-full mt-4 py-2 bg-[#ff8a00] hover:bg-[#ff9a20] rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
                 onClick={(e) => {
                   e.stopPropagation();
-                  startGame(level);
+                  handleStartGame(level);
                 }}
               >
                 <Play size={18} />
