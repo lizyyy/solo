@@ -156,6 +156,8 @@ class UIManager {
             this.sceneManager.addCharger(c);
         });
         
+        this.sceneManager.updateIdCounters();
+        
         this.updatePathfinding();
         
         if (data.chargers.length > 0) {

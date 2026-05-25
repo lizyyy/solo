@@ -12,6 +12,11 @@ class SceneManager {
         this.obstacles = [];
         this.chargers = [];
         this.pathLines = [];
+        
+        this.nextPointId = 1;
+        this.nextObstacleId = 1;
+        this.nextChargerId = 1;
+        
         this.robot = null;
         this.floor = null;
         this.walls = [];
@@ -302,7 +307,7 @@ class SceneManager {
     
     addNewObject(type, x, z) {
         if (type === 'inspectionPoint') {
-            const id = this.inspectionPoints.length + 1;
+            const id = this.nextPointId++;
             this.addInspectionPoint({
                 id: id,
                 name: `巡检点${id}`,
@@ -313,7 +318,7 @@ class SceneManager {
             });
             this.updateStatus(`已添加巡检点到 (${x}, ${z})`);
         } else if (type === 'obstacle') {
-            const id = this.obstacles.length + 1;
+            const id = this.nextObstacleId++;
             this.addObstacle({
                 id: id,
                 name: `障碍物${id}`,
@@ -327,8 +332,9 @@ class SceneManager {
         } else if (type === 'charger') {
             this.chargers.forEach(c => this.scene.remove(c.mesh));
             this.chargers = [];
+            const id = this.nextChargerId++;
             this.addCharger({
-                id: 1,
+                id: id,
                 x: x,
                 z: z
             });
@@ -556,12 +562,28 @@ class SceneManager {
         this.chargers = [];
         this.pathLines = [];
         
+        this.nextPointId = 1;
+        this.nextObstacleId = 1;
+        this.nextChargerId = 1;
+        
         if (this.robot) {
             this.scene.remove(this.robot);
             this.robot = null;
         }
         
         this.deselectObject();
+    }
+    
+    updateIdCounters() {
+        if (this.inspectionPoints.length > 0) {
+            this.nextPointId = Math.max(...this.inspectionPoints.map(p => p.id)) + 1;
+        }
+        if (this.obstacles.length > 0) {
+            this.nextObstacleId = Math.max(...this.obstacles.map(o => o.id)) + 1;
+        }
+        if (this.chargers.length > 0) {
+            this.nextChargerId = Math.max(...this.chargers.map(c => c.id)) + 1;
+        }
     }
     
     drawPath(path, color = 0x9C27B0) {
