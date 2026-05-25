@@ -18,8 +18,14 @@ class HazardousRouteSandbox {
     this.selectedElementType = null;
     this.validationResult = null;
     this.currentReport = null;
+    this.initialZones = null;
+    this.initialRoute = null;
     
     this.init();
+  }
+
+  deepClone(obj) {
+    return JSON.parse(JSON.stringify(obj));
   }
 
   init() {
@@ -335,8 +341,13 @@ class HazardousRouteSandbox {
   }
 
   loadSampleData() {
-    this.factoryLayout = sampleFactoryLayout;
-    this.zones = [...sampleFactoryLayout.zones];
+    this.sceneManager.removeAllZones();
+    
+    this.factoryLayout = this.deepClone(sampleFactoryLayout);
+    this.zones = this.deepClone(sampleFactoryLayout.zones);
+    
+    this.initialZones = this.deepClone(this.zones);
+    this.initialRoute = this.deepClone(sampleFactoryLayout.recommendedRoute);
     
     this.sceneManager.createRoadNetwork(sampleFactoryLayout.roads);
     
@@ -346,7 +357,7 @@ class HazardousRouteSandbox {
 
     this.sceneManager.createVehicle({ x: -30, z: -20 });
     
-    this.routePoints = [...sampleFactoryLayout.recommendedRoute];
+    this.routePoints = this.deepClone(sampleFactoryLayout.recommendedRoute);
     this.updateRouteDisplay();
     this.updateRoutePointsList();
     
@@ -366,7 +377,22 @@ class HazardousRouteSandbox {
   }
 
   resetAll() {
-    this.routePoints = [];
+    this.sceneManager.removeAllZones();
+    
+    if (this.initialZones && this.initialRoute) {
+      this.zones = this.deepClone(this.initialZones);
+      this.routePoints = this.deepClone(this.initialRoute);
+    } else {
+      this.zones = this.deepClone(sampleFactoryLayout.zones);
+      this.routePoints = this.deepClone(sampleFactoryLayout.recommendedRoute);
+      this.initialZones = this.deepClone(this.zones);
+      this.initialRoute = this.deepClone(this.routePoints);
+    }
+    
+    this.zones.forEach(zone => {
+      this.sceneManager.createZone(zone.type, zone.position, zone.size, zone.id);
+    });
+    
     this.validationResult = null;
     this.currentReport = null;
     this.timelineController.reset();

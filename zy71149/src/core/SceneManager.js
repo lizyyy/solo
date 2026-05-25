@@ -546,7 +546,52 @@ export class SceneManager {
     }
   }
 
-  animate() {
+  removeAllZones() {
+    const zonesToRemove = [];
+    this.objects.forEach((obj, id) => {
+      if (obj.userData.type && obj.userData.type !== 'truck' && obj.userData.type !== 'ground') {
+        zonesToRemove.push(id);
+      }
+    });
+    
+    zonesToRemove.forEach(id => {
+      const obj = this.objects.get(id);
+      if (obj) {
+        this.scene.remove(obj);
+        obj.traverse(child => {
+          if (child.geometry) child.geometry.dispose();
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach(m => m.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        });
+        this.objects.delete(id);
+      }
+    });
+  }
+
+  removeZone(id) {
+    const obj = this.objects.get(id);
+    if (obj) {
+      this.scene.remove(obj);
+      obj.traverse(child => {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach(m => m.dispose());
+          } else {
+            child.material.dispose();
+          }
+        }
+      });
+      this.objects.delete(id);
+    }
+  }
+
+  dispose() {
     this.animationId = requestAnimationFrame(() => this.animate());
     this.controls.update();
 
