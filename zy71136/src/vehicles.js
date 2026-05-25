@@ -143,8 +143,22 @@ export class VehicleManager {
     this.vehicles.forEach(vehicle => {
       const path = vehicle.path
       const schedule = vehicle.schedule
+      const startPoint = path[0]
+      const endPoint = path[path.length - 1]
       
-      if (currentTime < schedule.start || currentTime > schedule.end) {
+      if (currentTime <= schedule.start) {
+        vehicle.mesh.position.x = startPoint.x
+        vehicle.mesh.position.z = startPoint.z
+        vehicle.mesh.rotation.y = 0
+        return
+      }
+      
+      if (currentTime >= schedule.end) {
+        vehicle.mesh.position.x = endPoint.x
+        vehicle.mesh.position.z = endPoint.z
+        const secondLastPoint = path[path.length - 2]
+        const angle = Math.atan2(endPoint.x - secondLastPoint.x, endPoint.z - secondLastPoint.z)
+        vehicle.mesh.rotation.y = angle
         return
       }
       
@@ -163,10 +177,6 @@ export class VehicleManager {
         
         const angle = Math.atan2(end.x - start.x, end.z - start.z)
         vehicle.mesh.rotation.y = angle
-      } else if (currentSegment >= totalSegments) {
-        const lastPoint = path[path.length - 1]
-        vehicle.mesh.position.x = lastPoint.x
-        vehicle.mesh.position.z = lastPoint.z
       }
     })
   }
