@@ -176,7 +176,7 @@ function createScreens(screensData) {
     const stand = new THREE.Mesh(standGeometry, standMaterial)
     stand.position.set(screen.position.x, 1.5, screen.position.z)
     stand.castShadow = true
-    stand.userData = { type: 'screen', name: screen.name, selectable: true, screenData: screen }
+    stand.userData = { type: 'screen', name: screen.name, selectable: true, screenData: screen, draggable: true }
     screenGroup.add(stand)
 
     const screenGeometry = new THREE.PlaneGeometry(screen.width, screen.height)
@@ -194,7 +194,7 @@ function createScreens(screensData) {
     )
     screenMesh.rotation.y = screen.rotation || 0
     screenMesh.castShadow = true
-    screenMesh.userData = { type: 'screen', name: screen.name, selectable: true, screenData: screen }
+    screenMesh.userData = { type: 'screen', name: screen.name, selectable: true, screenData: screen, draggable: true }
     screenGroup.add(screenMesh)
 
     const borderGeometry = new THREE.BoxGeometry(screen.width + 0.2, screen.height + 0.2, 0.1)
@@ -207,7 +207,7 @@ function createScreens(screensData) {
     border.position.copy(screenMesh.position)
     border.position.z += 0.05
     border.rotation.y = screen.rotation || 0
-    border.userData = { type: 'screen', name: screen.name, selectable: true, screenData: screen }
+    border.userData = { type: 'screen', name: screen.name, selectable: true, screenData: screen, draggable: true }
     screenGroup.add(border)
 
     group.add(screenGroup)
@@ -266,7 +266,8 @@ function createObstacles(obstaclesData) {
         type: 'obstacle', 
         name: obstacle.name, 
         selectable: true,
-        obstacleData: obstacle
+        obstacleData: obstacle,
+        draggable: true
       }
       group.add(mesh)
     }
@@ -289,10 +290,12 @@ function createViewpoints(viewpointsData) {
       metalness: 0.4,
       roughness: 0.6
     })
+    const eyeHeight = vp.eyeHeight || 1.6
+    const bodyHeight = eyeHeight - 0.4
     const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
-    body.position.set(vp.position.x, 0.6, vp.position.z)
+    body.position.set(vp.position.x, bodyHeight / 2, vp.position.z)
     body.castShadow = true
-    body.userData = { type: 'viewpoint', name: vp.name, selectable: true, viewpointData: vp, index }
+    body.userData = { type: 'viewpoint', name: vp.name, selectable: true, viewpointData: vp, index, draggable: true }
     vpGroup.add(body)
 
     const headGeometry = new THREE.SphereGeometry(0.2, 16, 16)
@@ -302,9 +305,9 @@ function createViewpoints(viewpointsData) {
       roughness: 0.7
     })
     const head = new THREE.Mesh(headGeometry, headMaterial)
-    head.position.set(vp.position.x, 1.5, vp.position.z)
+    head.position.set(vp.position.x, eyeHeight, vp.position.z)
     head.castShadow = true
-    head.userData = { type: 'viewpoint', name: vp.name, selectable: true, viewpointData: vp, index }
+    head.userData = { type: 'viewpoint', name: vp.name, selectable: true, viewpointData: vp, index, draggable: true }
     vpGroup.add(head)
 
     const eyeGeometry = new THREE.SphereGeometry(0.05, 8, 8)
@@ -314,12 +317,12 @@ function createViewpoints(viewpointsData) {
       emissiveIntensity: 0.5
     })
     const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial)
-    leftEye.position.set(vp.position.x - 0.08, 1.52, vp.position.z + 0.15)
+    leftEye.position.set(vp.position.x - 0.08, eyeHeight + 0.02, vp.position.z + 0.15)
     leftEye.userData = { type: 'viewpoint', name: vp.name, selectable: false, viewpointData: vp, index }
     vpGroup.add(leftEye)
 
     const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial)
-    rightEye.position.set(vp.position.x + 0.08, 1.52, vp.position.z + 0.15)
+    rightEye.position.set(vp.position.x + 0.08, eyeHeight + 0.02, vp.position.z + 0.15)
     rightEye.userData = { type: 'viewpoint', name: vp.name, selectable: false, viewpointData: vp, index }
     vpGroup.add(rightEye)
 

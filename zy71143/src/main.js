@@ -5,6 +5,7 @@ import { SightlineAnalyzer } from './analysis/sightline.js'
 import { TimelineController } from './interaction/timeline.js'
 import { UIController } from './interaction/ui.js'
 import { ReportExporter } from './analysis/report.js'
+import { DragController } from './interaction/dragger.js'
 import { sampleSceneData } from './data/sample.js'
 
 class QueueVisionApp {
@@ -24,6 +25,10 @@ class QueueVisionApp {
     this.timelineController = null
     this.uiController = null
     this.reportExporter = null
+    this.dragController = null
+    
+    this.mouseDownTime = 0
+    this.mouseDownPosition = new THREE.Vector2()
     
     this.init()
   }
@@ -110,11 +115,13 @@ class QueueVisionApp {
     this.timelineController = new TimelineController(this)
     this.uiController = new UIController(this)
     this.reportExporter = new ReportExporter(this)
+    this.dragController = new DragController(this)
   }
 
   setupEventListeners() {
     window.addEventListener('resize', () => this.onWindowResize())
-    this.renderer.domElement.addEventListener('click', (e) => this.onMouseClick(e))
+    this.renderer.domElement.addEventListener('mousedown', (e) => this.onSceneMouseDown(e))
+    this.renderer.domElement.addEventListener('mouseup', (e) => this.onSceneMouseUp(e))
     this.renderer.domElement.addEventListener('mousemove', (e) => this.onMouseMove(e))
   }
 
@@ -125,7 +132,26 @@ class QueueVisionApp {
     this.renderer.setSize(container.clientWidth, container.clientHeight)
   }
 
-  onMouseClick(event) {
+  onSceneMouseDown(event) {
+    this.mouseDownTime = Date.now()
+    const container = document.getElementById('scene-container')
+    const rect = container.getBoundingClientRect()
+    this.mouseDownPosition.set(event.clientX - rect.left, event.clientY - rect.top)
+  }
+
+  onSceneMouseUp(event) {
+    const container = document.getElementById('scene-container')
+    const rect = container.getBoundingClientRect()
+    const mouseUpPosition = new THREE.Vector2(event.clientX - rect.left, event.clientY - rect.top)
+    const moveDistance = this.mouseDownPosition.distanceTo(mouseUpPosition)
+    const timeDiff = Date.now() - this.mouseDownTime
+
+    if (timeDiff < 300 && moveDistance < 5) {
+      this.handleObjectClick(event)
+    }
+  }
+
+  handleObjectClick(event) {
     const container = document.getElementById('scene-container')
     const rect = container.getBoundingClientRect()
     this.mouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1
