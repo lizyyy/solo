@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { useThree } from '@react-three/fiber';
+import { useEffect, useRef, useState } from 'react';
+import { useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { useSceneStore, CameraPreset } from '@/store/sceneStore';
@@ -19,6 +19,15 @@ const PRESET_CONFIGS: Record<CameraPreset, { position: [number, number, number];
   },
 };
 
+interface CameraAnimationState {
+  startPos: THREE.Vector3;
+  endPos: THREE.Vector3;
+  startTarget: THREE.Vector3;
+  endTarget: THREE.Vector3;
+  progress: number;
+  duration: number;
+}
+
 export function CameraController() {
   const { camera } = useThree();
   const controlsRef = useRef<any>(null);
@@ -28,26 +37,68 @@ export function CameraController() {
   const setCameraPosition = useSceneStore(state => state.setCameraPosition);
   const setCameraRotation = useSceneStore(state => state.setCameraRotation);
   const setCameraTarget = useSceneStore(state => state.setCameraTarget);
+  
+  const animationRef = useRef<CameraAnimationState | null>(null);
 
   useEffect(() => {
-    if (cameraPreset && controlsRef.current) {
+    if (cameraPreset) {
       const config = PRESET_CONFIGS[cameraPreset];
       if (config) {
-        controlsRef.current.setLookAt(
-          config.position[0], config.position[1], config.position[2],
-          config.target[0], config.target[1], config.target[2],
-          true
-        );
+        const startPos = camera.position.clone();
+        const endPos = new THREE.Vector3(...config.position);
+        
+        let startTarget = new THREE.Vector3(0, 0, 0);
+        if (controlsRef.current && controlsRef.current.target) {
+          startTarget = controlsRef.current.target.clone();
+        }
+        const endTarget = new THREE.Vector3(...config.target);
+        
+        animationRef.current = {
+          startPos,
+          endPos,
+          startTarget,
+          endTarget,
+          progress: 0,
+          duration: 0.8,
+        };
       }
       clearCameraPreset();
     }
-  }, [cameraPreset, clearCameraPreset]);
+  }, [cameraPreset, clearCameraPreset, camera]);
+
+  useFrame((_, delta) => {
+    if (animationRef.current) {
+      const anim = animationRef.current;
+      anim.progress = Math.min(anim.progress + delta / anim.duration, 1);
+      
+      const t = easeInOutCubic(anim.progress);
+      
+      const newPos = anim.startPos.clone().lerp(anim.endPos, t);
+      const newTarget = anim.startTarget.clone().lerp(anim.endTarget, t);
+      
+      camera.position.copy(newPos);
+      
+      if (controlsRef.current && controlsRef.current.target) {
+        controlsRef.current.target.copy(newTarget);
+      }
+      
+      camera.lookAt(newTarget);
+      
+      setCameraPosition([newPos.x, newPos.y, newPos.z]);
+      setCameraRotation([camera.rotation.x, camera.rotation.y, camera.rotation.z]);
+      setCameraTarget([newTarget.x, newTarget.y, newTarget.z]);
+      
+      if (anim.progress >= 1) {
+        animationRef.current = null;
+      }
+    }
+  });
 
   const handleControlChange = () => {
     setCameraPosition([camera.position.x, camera.position.y, camera.position.z]);
     setCameraRotation([camera.rotation.x, camera.rotation.y, camera.rotation.z]);
     
-    if (controlsRef.current) {
+    if (controlsRef.current && controlsRef.current.target) {
       const target = controlsRef.current.target;
       setCameraTarget([target.x, target.y, target.z]);
     }
@@ -66,4 +117,8 @@ export function CameraController() {
       dampingFactor={0.05}
     />
   );
+}
+
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
