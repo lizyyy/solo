@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,12 +7,13 @@ import { Rack3D } from './Rack3D';
 import { HeatLayer } from './HeatLayer';
 import { ACUnit3D } from './ACUnit3D';
 import { useAppStore } from '../../store/useAppStore';
-import { Rack } from '../../types';
+import { Rack, AlertLevel } from '../../types';
 
 function CameraController() {
   const { camera } = useThree();
   const controlsRef = useRef<any>(null);
-  const { cameraViews, currentCameraView } = useAppStore();
+  const cameraViews = useAppStore((state) => state.cameraViews);
+  const currentCameraView = useAppStore((state) => state.currentCameraView);
 
   const targetView = useMemo(() => {
     return cameraViews.find((v) => v.id === currentCameraView);
@@ -43,20 +44,44 @@ function CameraController() {
 }
 
 function SceneContent() {
-  const {
-    dataCenter,
-    selectedRackId,
-    setSelectedRackId,
-    showHeatLayer,
-    showLabels,
-    showRacks,
-    showAirFlow,
-    getFilteredRacks,
-  } = useAppStore();
+  const dataCenter = useAppStore((state) => state.dataCenter);
+  const timeSeriesData = useAppStore((state) => state.timeSeriesData);
+  const currentTimeIndex = useAppStore((state) => state.currentTimeIndex);
+  const alertFilters = useAppStore((state) => state.alertFilters);
+  const selectedRackId = useAppStore((state) => state.selectedRackId);
+  const setSelectedRackId = useAppStore((state) => state.setSelectedRackId);
+  const showHeatLayer = useAppStore((state) => state.showHeatLayer);
+  const showLabels = useAppStore((state) => state.showLabels);
+  const showRacks = useAppStore((state) => state.showRacks);
+  const showAirFlow = useAppStore((state) => state.showAirFlow);
 
   const filteredRacks = useMemo(() => {
-    return getFilteredRacks();
-  }, [getFilteredRacks]);
+    if (!dataCenter) return [];
+
+    const statusToAlertLevel: Record<string, AlertLevel> = {
+      critical: 'critical',
+      warning: 'warning',
+      normal: 'info',
+      offline: 'critical',
+    };
+
+    return dataCenter.racks
+      .map((rack) => {
+        const timeData = timeSeriesData[currentTimeIndex]?.racks.find(
+          (r) => r.id === rack.id
+        );
+        return {
+          ...rack,
+          power: timeData?.power ?? rack.power,
+          temperature: timeData?.temperature ?? rack.temperature,
+          status: timeData?.status ?? rack.status,
+        } as Rack;
+      })
+      .filter((rack) => {
+        const alertLevel = statusToAlertLevel[rack.status];
+        return alertFilters.includes(alertLevel);
+      });
+  }, [dataCenter, timeSeriesData, currentTimeIndex, alertFilters]);
 
   if (!dataCenter) {
     return (
