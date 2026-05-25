@@ -52,6 +52,7 @@ export interface Patient {
   reassessEvents: ReassessEvent[];
   assignedRoomId?: string;
   triageDecision?: EsiLevel;
+  pendingReassessBonus?: boolean;
 }
 
 export interface Room {

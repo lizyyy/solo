@@ -201,6 +201,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     let scoreBonus = 0;
     let failReasons = [...gameState.failReasons];
+    let reassessBonus = 0;
+
+    if ('pendingReassessBonus' in patient && patient.pendingReassessBonus) {
+      reassessBonus = scoringRules.reassessSuccess;
+    }
     
     if (patient.triageDecision) {
       if (patient.triageDecision !== patient.currentEsi) {
@@ -225,6 +230,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
 
+    const totalScoreChange = scoreBonus + reassessBonus;
+
     const action: GameAction = {
       timestamp: gameState.timeElapsed,
       type: 'assign_room',
@@ -233,16 +240,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         roomId, 
         roomName: room.name,
         patientName: patient.name,
-        scoreChange: scoreBonus
+        scoreChange: totalScoreChange,
+        reassessBonus: reassessBonus > 0 ? reassessBonus : undefined
       }
     };
 
     set({
       gameState: {
         ...gameState,
-        score: gameState.score + scoreBonus,
+        score: gameState.score + totalScoreChange,
         patients: gameState.patients.map(p =>
-          p.id === patientId ? { ...p, status: 'processing', assignedRoomId: roomId } : p
+          p.id === patientId ? { 
+            ...p, 
+            status: 'processing', 
+            assignedRoomId: roomId,
+            pendingReassessBonus: false
+          } : p
         ),
         rooms: gameState.rooms.map(r =>
           r.id === roomId ? { ...r, status: 'occupied', patientId, processingProgress: 0 } : r
@@ -281,7 +294,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     let failReasons = [...newState.failReasons];
     newState.patients = newState.patients.map(patient => {
-      if (patient.status !== 'waiting') return patient;
+      if (patient.status !== 'waiting' && patient.status !== 'reassess') return patient;
 
       const waitTime = newState.timeElapsed - patient.arrivalTime;
       if (waitTime >= patient.maxWaitTime) {
@@ -340,7 +353,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const triggeredEvent = updatedEvents.find(e => e.triggered && !patient.reassessEvents.find(pe => pe.triggered && pe.triggerTime === e.triggerTime));
       
       if (triggeredEvent) {
-        newState.score += scoringRules.reassessSuccess;
         return {
           ...patient,
           symptoms: [...patient.symptoms, ...triggeredEvent.newSymptoms],
@@ -349,7 +361,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           correctEsi: triggeredEvent.newCorrectEsi,
           status: 'reassess' as const,
           triageDecision: undefined,
-          reassessEvents: updatedEvents
+          reassessEvents: updatedEvents,
+          pendingReassessBonus: true,
+          arrivalTime: newState.timeElapsed,
+          maxWaitTime: Math.max(30, Math.floor(patient.maxWaitTime * 0.5))
         };
       }
 
