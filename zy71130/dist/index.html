@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>铁路道口视距检查工具</title>
+  <script type="module" crossorigin src="/assets/index-i5UaBjFY.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-aZbqB6VH.css">
+</head>
+<body>
+  <div id="app">
+    <div class="sidebar">
+      <div class="panel-header">
+        <h1>🚂 铁路道口视距检查</h1>
+      </div>
+      
+      <div class="panel-section">
+        <h3>📊 场景控制</h3>
+        <div class="control-group">
+          <label>导入样例</label>
+          <select id="sampleSelect">
+            <option value="">-- 选择样例 --</option>
+            <option value="sample1">样例1：村庄道口（有树木遮挡）</option>
+            <option value="sample2">样例2：工厂道口（有建筑遮挡）</option>
+            <option value="sample3">样例3：标准道口（无遮挡）</option>
+          </select>
+        </div>
+        <button id="resetBtn" class="btn btn-warning">🔄 重置状态</button>
+      </div>
+
+      <div class="panel-section">
+        <h3>🚄 列车参数</h3>
+        <div class="control-group">
+          <label>运行速度: <span id="speedValue">60</span> km/h</label>
+          <input type="range" id="speedSlider" min="20" max="160" value="60" step="5">
+        </div>
+        <div class="control-group">
+          <label>制动距离: <span id="brakingDistance">83.3</span> m</label>
+        </div>
+        <div class="control-group">
+          <label>观察点高度: <span id="observerHeightValue">3.5</span> m</label>
+          <input type="range" id="observerHeight" min="2" max="6" value="3.5" step="0.1">
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>👁️ 视角切换</h3>
+        <div class="btn-group">
+          <button class="btn view-btn" data-view="top">俯视图</button>
+          <button class="btn view-btn" data-view="driver">司机视角</button>
+          <button class="btn view-btn active" data-view="orbit">自由视角</button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>🌲 遮挡物筛选</h3>
+        <div id="obstacleFilters" class="filter-group">
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>⏱️ 时间轴</h3>
+        <div class="timeline-control">
+          <input type="range" id="timelineSlider" min="0" max="100" value="0">
+          <div class="timeline-labels">
+            <span>远处</span>
+            <span>道口</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button id="playBtn" class="btn">▶️ 播放</button>
+          <button id="stopBtn" class="btn">⏹️ 停止</button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3>📋 视距检查结果</h3>
+        <div id="sightReport" class="report-box">
+          <p class="report-placeholder">移动遮挡物或调整参数查看报告</p>
+        </div>
+        <button id="exportBtn" class="btn btn-primary">📥 导出报告</button>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div id="canvas-container"></div>
+      <div class="info-overlay">
+        <div class="info-item">
+          <span class="label">当前视距:</span>
+          <span id="currentSightDistance" class="value">-- m</span>
+        </div>
+        <div class="info-item">
+          <span class="label">要求视距:</span>
+          <span id="requiredSightDistance" class="value">-- m</span>
+        </div>
+        <div class="info-item">
+          <span class="label">整改区域:</span>
+          <span id="rectificationArea" class="value warning">-- m²</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -9,20 +9,20 @@ const sampleData = {
     speed: 60,
     observerHeight: 3.5,
     obstacles: [
-      { id: 'tree1', type: 'tree', name: '大树1', position: { x: 15, z: -8 }, height: 12, width: 4, visible: true },
-      { id: 'tree2', type: 'tree', name: '大树2', position: { x: -20, z: 6 }, height: 10, width: 3.5, visible: true },
-      { id: 'tree3', type: 'tree', name: '小树1', position: { x: 25, z: 5 }, height: 6, width: 2, visible: true },
-      { id: 'building1', type: 'building', name: '农舍', position: { x: -30, z: -10 }, height: 5, width: 8, depth: 6, visible: true }
+      { id: 'tree1', type: 'tree', name: '大树1', position: { x: 12, z: 40 }, height: 12, width: 4, visible: true },
+      { id: 'tree2', type: 'tree', name: '大树2', position: { x: -10, z: 35 }, height: 10, width: 3.5, visible: true },
+      { id: 'tree3', type: 'tree', name: '小树1', position: { x: 8, z: 55 }, height: 6, width: 2, visible: true },
+      { id: 'building1', type: 'building', name: '农舍', position: { x: -15, z: 25 }, height: 5, width: 8, depth: 6, visible: true }
     ]
   },
   sample2: {
     name: '工厂道口（有建筑遮挡）',
-    speed: 80,
+    speed: 70,
     observerHeight: 3.8,
     obstacles: [
-      { id: 'factory1', type: 'building', name: '厂房A', position: { x: 18, z: -12 }, height: 8, width: 15, depth: 20, visible: true },
-      { id: 'factory2', type: 'building', name: '仓库', position: { x: -25, z: 8 }, height: 6, width: 12, depth: 10, visible: true },
-      { id: 'wall1', type: 'wall', name: '围墙', position: { x: 10, z: -5 }, height: 3, width: 20, depth: 0.5, visible: true }
+      { id: 'factory1', type: 'building', name: '厂房A', position: { x: 15, z: 30 }, height: 8, width: 12, depth: 15, visible: true },
+      { id: 'factory2', type: 'building', name: '仓库', position: { x: -12, z: 45 }, height: 6, width: 10, depth: 8, visible: true },
+      { id: 'wall1', type: 'wall', name: '围墙', position: { x: 10, z: 50 }, height: 3, width: 15, depth: 0.5, visible: true }
     ]
   },
   sample3: {
@@ -429,9 +429,10 @@ class RailwayCrossingApp {
     this.observerMarker.getWorldPosition(observerPos)
     observerPos.y = this.state.observerHeight
 
+    const sightAngle = 70 * Math.PI / 180
     const directions = [
-      { angle: -Math.PI / 4, name: 'left' },
-      { angle: Math.PI / 4, name: 'right' }
+      { angle: -sightAngle, name: 'left' },
+      { angle: sightAngle, name: 'right' }
     ]
 
     const results = {}
@@ -474,6 +475,7 @@ class RailwayCrossingApp {
     const requiredDistance = this.calculateBrakingDistance(this.state.speed)
 
     const observerPos = sightData.observerPos || new THREE.Vector3(0, this.state.observerHeight, 80)
+    const sightAngle = 70 * Math.PI / 180
 
     const updateLine = (line, angle, distance, color) => {
       const endPoint = new THREE.Vector3(
@@ -489,15 +491,15 @@ class RailwayCrossingApp {
     const leftColor = sightData.left < requiredDistance ? 0xff0000 : 0x00ff00
     const rightColor = sightData.right < requiredDistance ? 0xff0000 : 0x00ff00
 
-    updateLine(this.sightLineLeft, -Math.PI / 4, Math.min(sightData.left, requiredDistance + 10), leftColor)
-    updateLine(this.sightLineRight, Math.PI / 4, Math.min(sightData.right, requiredDistance + 10), rightColor)
+    updateLine(this.sightLineLeft, -sightAngle, Math.min(sightData.left, requiredDistance + 10), leftColor)
+    updateLine(this.sightLineRight, sightAngle, Math.min(sightData.right, requiredDistance + 10), rightColor)
 
-    const updateArc = (arc, angle, distance, side) => {
+    const updateArc = (arc, distance, side) => {
       const points = []
-      const startAngle = side === 'left' ? -Math.PI / 2 : 0
-      const endAngle = side === 'left' ? 0 : Math.PI / 2
+      const startAngle = side === 'left' ? -sightAngle : 0
+      const endAngle = side === 'left' ? 0 : sightAngle
       
-      for (let a = startAngle; a <= endAngle; a += 0.1) {
+      for (let a = startAngle; a <= endAngle; a += 0.05) {
         points.push(new THREE.Vector3(
           Math.sin(a) * distance,
           0.1,
@@ -509,8 +511,8 @@ class RailwayCrossingApp {
       arc.computeLineDistances()
     }
 
-    updateArc(this.requiredSightArcLeft, -Math.PI / 4, requiredDistance, 'left')
-    updateArc(this.requiredSightArcRight, Math.PI / 4, requiredDistance, 'right')
+    updateArc(this.requiredSightArcLeft, requiredDistance, 'left')
+    updateArc(this.requiredSightArcRight, requiredDistance, 'right')
 
     const minSight = Math.min(sightData.left, sightData.right)
     const areaNeedRectify = minSight < requiredDistance
@@ -779,6 +781,7 @@ class RailwayCrossingApp {
       }
 
       this.updateFilterUI()
+      this.updateObstacleVisibility()
     } catch (e) {
       console.error('Failed to load saved state:', e)
       this.loadSample('sample1')
