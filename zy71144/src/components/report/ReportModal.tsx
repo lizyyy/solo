@@ -1,7 +1,7 @@
-import { X, Download, CheckCircle, XCircle, AlertTriangle, FileText } from 'lucide-react';
+import { X, Download, CheckCircle, XCircle, AlertTriangle, FileText, FileDown } from 'lucide-react';
 import { PressureChart } from './PressureChart';
 import type { CalculationResult, TrainingParams, TrainingSession } from '../../types';
-import { downloadReport } from '../../utils/reportGenerator';
+import { downloadReport, downloadPDFReport } from '../../utils/reportGenerator';
 
 interface ReportModalProps {
   isOpen: boolean;
@@ -24,9 +24,15 @@ export function ReportModal({
 }: ReportModalProps) {
   if (!isOpen || !result) return null;
 
-  const handleExport = () => {
+  const handleExportJSON = () => {
     if (session) {
       downloadReport(session);
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (session) {
+      downloadPDFReport(session);
     }
   };
 
@@ -187,12 +193,20 @@ export function ReportModal({
             </button>
           )}
           <button
-            onClick={handleExport}
+            onClick={handleExportJSON}
             disabled={!session}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg transition-all"
           >
             <Download className="w-4 h-4" />
             导出JSON
+          </button>
+          <button
+            onClick={handleExportPDF}
+            disabled={!session}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-lg transition-all"
+          >
+            <FileDown className="w-4 h-4" />
+            导出PDF
           </button>
           <button
             onClick={onClose}

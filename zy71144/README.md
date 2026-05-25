@@ -1,57 +1,185 @@
-# React + TypeScript + Vite
+# 🚒 消防水带铺设演练系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+基于 Three.js + React 的交互式3D消防水带铺设训练平台，可在浏览器中直接操作。专为消防站新队员培训设计，通过可视化建筑模型模拟真实火场环境，让学员在3D场景中进行水带铺设操作练习。
 
-Currently, two official plugins are available:
+## ✨ 核心功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🔥 3D交互演练
+- **3个样例建筑场景**：3层办公楼、5层住宅楼、大型仓库
+- **点击铺设水带**：左键点击地面或消火栓添加路径节点
+- **拖拽调整**：选中节点后拖拽调整位置
+- **多视角切换**：自由视角、俯视视角、第一人称视角
+- **元素筛选**：可开关显示墙体、消火栓、楼梯、网格
+- **Delete键删除**：选中节点后按Delete键删除
 
-## Expanding the ESLint configuration
+### 📊 实时参数计算
+- **水带长度**：实时计算总长度并与最大限制对比
+- **转角数量**：自动识别转角，超限预警
+- **垂直高度**：统计爬楼高度
+- **压力损失分析**：
+  - 水带摩擦损失
+  - 转角局部损失
+  - 垂直高度损失
+  - 实时显示剩余压力
+- **错误预警**：水带长度不足、转角过多、压力损失超限
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### ⏱️ 步骤回放
+- 时间轴滑块控制播放进度
+- 播放/暂停/重置功能
+- 水带逐步铺设动画效果
+- 当前位置高亮指示器
+- 节点类型颜色标识（起点/转角/楼梯/终点）
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 📋 评估报告
+- 合格/不合格判定
+- 压力变化曲线图
+- 问题汇总列表
+- **JSON报告导出**
+- **PDF报告导出**
+- 演练记录本地持久化存储
+
+### 📱 响应式设计
+- **桌面端**：左侧控制面板（320px）+ 右侧3D场景
+- **移动端**：抽屉式菜单，3D场景全屏
+- 所有按钮最小48px，支持触控操作
+
+## 🚀 快速开始
+
+### 环境要求
+- Node.js >= 18
+- npm >= 9
+
+### 安装依赖
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 启动开发服务器
+```bash
+npm run dev
 ```
+访问 http://localhost:5173
+
+### 类型检查
+```bash
+npm run check
+```
+
+### 构建生产版本
+```bash
+npm run build
+```
+
+## 🎮 操作指南
+
+| 操作 | 说明 |
+|------|------|
+| 左键点击地面 | 添加路径节点 |
+| 左键点击消火栓 | 从消火栓开始铺设 |
+| 拖拽节点 | 调整节点位置 |
+| Delete键 | 删除选中节点 |
+| 鼠标滚轮 | 缩放场景 |
+| 右键拖拽 | 旋转视角 |
+| Escape键 | 取消选中 |
+
+## 🛠️ 技术栈
+
+| 技术 | 用途 |
+|------|------|
+| React 18 + TypeScript | 前端框架 |
+| Three.js + @react-three/fiber | 3D渲染引擎 |
+| @react-three/drei | Three.js辅助组件库 |
+| Zustand | 状态管理 |
+| Recharts | 压力曲线图 |
+| jsPDF | PDF报告生成 |
+| TailwindCSS 3 | 样式框架 |
+| Vite | 构建工具 |
+
+## 📁 项目结构
+
+```
+src/
+├── components/
+│   ├── arena/              # 3D场景组件
+│   │   ├── ThreeScene.tsx   # 主3D场景容器
+│   │   ├── BuildingWalls.tsx # 建筑墙体
+│   │   ├── HosePath.tsx     # 水带路径
+│   │   ├── Hydrant.tsx      # 消火栓
+│   │   ├── Staircase.tsx    # 楼梯
+│   │   └── GroundPlane.tsx  # 地面交互平面
+│   ├── controls/           # 控制面板组件
+│   │   ├── SceneControls.tsx # 场景控制
+│   │   ├── ParamsDisplay.tsx # 参数显示
+│   │   └── Timeline.tsx     # 时间轴回放
+│   └── report/             # 报告组件
+│       ├── ReportModal.tsx  # 报告弹窗
+│       └── PressureChart.tsx # 压力曲线图
+├── store/
+│   ├── useTrainingStore.ts # 演练状态管理
+│   └── useSceneStore.ts    # 3D场景状态
+├── utils/
+│   ├── pathCalculator.ts   # 路径计算引擎
+│   ├── pressureCalculator.ts # 压力损失计算
+│   └── reportGenerator.ts  # 报告生成器（JSON/PDF）
+├── data/
+│   └── buildings.ts        # 示例建筑数据
+├── types/
+│   └── index.ts            # TypeScript类型定义
+├── pages/
+│   └── Home.tsx            # 主页面
+└── App.tsx                 # 应用入口
+```
+
+## 📐 压力损失算法
+
+基于流体力学公式计算压力损失：
+
+```
+Pf = λ * (L/D) * (v²/(2g)) * ρ
+
+其中:
+- λ: 摩擦系数 (0.025-0.03)
+- L: 水带长度 (m)
+- D: 水带直径 (m)
+- v: 水流速度 (m/s)
+- g: 重力加速度 (9.81 m/s²)
+- ρ: 水的密度 (1000 kg/m³)
+```
+
+简化经验参数：
+- 每10米水带损失约 0.01-0.02 MPa
+- 每个90度转角损失约 0.02-0.03 MPa
+- 每层楼垂直高度损失约 0.01 MPa
+
+## 💾 数据存储
+
+训练记录自动保存到浏览器 LocalStorage，key 为 `fire-hose-training-sessions`，刷新页面后数据不会丢失。
+
+## 📄 报告导出
+
+### JSON格式
+包含完整的演练数据：基本信息、路径节点、参数配置、计算结果、警告信息、压力曲线数据。
+
+### PDF格式
+A4格式正式报告，包含：
+- 报告封面（红色标题栏）
+- 基本信息（建筑名称、时间、时长、评估结果）
+- 演练参数（水带直径、流量、限制值）
+- 测量结果（长度、转角、压力等）
+- 问题汇总（警告和错误）
+- 压力变化数据表
+- 生成时间戳
+
+## 🧪 验收测试
+
+1. **路径铺设测试**：点击场景添加5个以上节点，水带正确显示
+2. **实时参数测试**：查看左侧面板，长度、转角、压力实时更新
+3. **步骤回放测试**：点击播放按钮，水带逐步铺设，进度条同步
+4. **PDF导出测试**：完成演练后点击"导出PDF"，成功下载PDF文件
+5. **JSON导出测试**：点击"导出JSON"，成功下载JSON文件
+6. **持久化测试**：保存记录后刷新页面，记录仍然存在
+7. **响应式测试**：缩小浏览器窗口到768px以下，菜单自动变为抽屉式
+
+## 📝 许可
+
+MIT License

@@ -27,16 +27,19 @@ export function HosePath({
   const mouse = useRef(new THREE.Vector2());
   const { camera, size } = useThree();
 
-  const tubeGeometry = useMemo(() => {
-    if (nodes.length < 2) return null;
+  const visibleNodes =
+    playbackIndex >= 0 ? nodes.slice(0, playbackIndex + 1) : nodes;
 
-    const points = nodes.map(
+  const tubeGeometry = useMemo(() => {
+    if (visibleNodes.length < 2) return null;
+
+    const points = visibleNodes.map(
       (n) => new THREE.Vector3(n.position.x, n.position.y, n.position.z)
     );
     const curve = new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.5);
 
     return new THREE.TubeGeometry(curve, Math.max(64, points.length * 16), 0.08, 12, false);
-  }, [nodes]);
+  }, [visibleNodes]);
 
   const nodeColors = (type: PathNode['type'], isSelected: boolean) => {
     if (isSelected) return { color: '#fbbf24', emissive: '#f59e0b' };
@@ -90,16 +93,13 @@ export function HosePath({
     setDraggingNode(null);
   };
 
-  const visibleNodes =
-    playbackIndex >= 0 ? nodes.slice(0, playbackIndex + 1) : nodes;
-
   return (
     <group
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
     >
-      {tubeGeometry && nodes.length >= 2 && (
+      {tubeGeometry && visibleNodes.length >= 2 && (
         <mesh geometry={tubeGeometry}>
           <meshStandardMaterial
             color={isValid ? '#ef4444' : '#dc2626'}
@@ -108,6 +108,19 @@ export function HosePath({
             metalness={0.2}
             roughness={0.6}
           />
+        </mesh>
+      )}
+
+      {playbackIndex >= 0 && playbackIndex < nodes.length - 1 && (
+        <mesh
+          position={[
+            visibleNodes[visibleNodes.length - 1].position.x,
+            visibleNodes[visibleNodes.length - 1].position.y + 0.5,
+            visibleNodes[visibleNodes.length - 1].position.z,
+          ]}
+        >
+          <sphereGeometry args={[0.3, 16, 16]} />
+          <meshBasicMaterial color="#fbbf24" transparent opacity={0.8} />
         </mesh>
       )}
 

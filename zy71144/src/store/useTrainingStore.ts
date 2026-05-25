@@ -8,12 +8,34 @@ import type {
   Point3D,
 } from '../types';
 
+const STORAGE_KEY = 'fire-hose-training-sessions';
+
 const DEFAULT_PARAMS: TrainingParams = {
   hoseDiameter: 65,
   maxHoseLength: 100,
   maxCorners: 8,
   minPressure: 0.25,
   flowRate: 5,
+};
+
+const loadSessionsFromStorage = (): TrainingSession[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load sessions from localStorage:', e);
+  }
+  return [];
+};
+
+const saveSessionsToStorage = (sessions: TrainingSession[]) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+  } catch (e) {
+    console.error('Failed to save sessions to localStorage:', e);
+  }
 };
 
 interface TrainingState {
@@ -50,6 +72,8 @@ interface TrainingState {
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
+const initialSessions = loadSessionsFromStorage();
+
 export const useTrainingStore = create<TrainingState>((set, get) => ({
   mode: 'edit',
   path: [],
@@ -58,7 +82,7 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
   selectedNodeId: null,
   playbackIndex: 0,
   isPlaying: false,
-  sessions: [],
+  sessions: initialSessions,
   currentSessionId: null,
   showReport: false,
 
@@ -132,10 +156,14 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
       result,
     };
 
-    set((state) => ({
-      sessions: [...state.sessions, session],
-      currentSessionId: session.id,
-    }));
+    set((state) => {
+      const newSessions = [...state.sessions, session];
+      saveSessionsToStorage(newSessions);
+      return {
+        sessions: newSessions,
+        currentSessionId: session.id,
+      };
+    });
   },
 
   loadSession: (sessionId) => {
@@ -153,11 +181,15 @@ export const useTrainingStore = create<TrainingState>((set, get) => ({
   },
 
   deleteSession: (sessionId) => {
-    set((state) => ({
-      sessions: state.sessions.filter((s) => s.id !== sessionId),
-      currentSessionId:
-        state.currentSessionId === sessionId ? null : state.currentSessionId,
-    }));
+    set((state) => {
+      const newSessions = state.sessions.filter((s) => s.id !== sessionId);
+      saveSessionsToStorage(newSessions);
+      return {
+        sessions: newSessions,
+        currentSessionId:
+          state.currentSessionId === sessionId ? null : state.currentSessionId,
+      };
+    });
   },
 
   setShowReport: (show) => set({ showReport: show }),
