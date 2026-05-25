@@ -61,11 +61,10 @@ const createEmptyImpact = (): ImpactAnalysis => ({
   conflictDetails: [],
 });
 
-const validateScenario = (data: unknown): data is Scenario => {
+const validateScenario = (data: unknown): data is Omit<Scenario, 'id'> & { id?: string } => {
   if (typeof data !== 'object' || data === null) return false;
   const obj = data as Record<string, unknown>;
   return (
-    typeof obj.id === 'string' &&
     typeof obj.name === 'string' &&
     typeof obj.type === 'string' &&
     typeof obj.description === 'string' &&
