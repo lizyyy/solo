@@ -62,6 +62,8 @@ export const TriagePanel: React.FC = () => {
     triagePatient(selectedPatientId, level);
   };
 
+  const isCorrectlyTriaged = selectedPatient.triageDecision === selectedPatient.currentEsi;
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-4">
       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
@@ -74,13 +76,15 @@ export const TriagePanel: React.FC = () => {
         {esiLevels.map(({ level, name, desc, color, icon }) => (
           <motion.button
             key={level}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handleTriage(level)}
+            whileHover={!isCorrectlyTriaged ? { scale: 1.05 } : {}}
+            whileTap={!isCorrectlyTriaged ? { scale: 0.95 } : {}}
+            onClick={() => !isCorrectlyTriaged && handleTriage(level)}
+            disabled={isCorrectlyTriaged}
             className={`
               flex flex-col items-center justify-center p-3 rounded-lg text-white
               ${color} transition-colors
               ${selectedPatient.triageDecision === level ? 'ring-2 ring-white ring-offset-2' : ''}
+              ${isCorrectlyTriaged ? 'opacity-70 cursor-not-allowed' : ''}
             `}
           >
             {icon}
@@ -94,11 +98,22 @@ export const TriagePanel: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-4 p-3 bg-blue-50 rounded-lg"
+          className={`mt-4 p-3 rounded-lg ${
+            isCorrectlyTriaged ? 'bg-green-50' : 'bg-yellow-50'
+          }`}
         >
-          <p className="text-sm text-blue-700">
-            <span className="font-medium">已分诊为 ESI {selectedPatient.triageDecision}</span>
-            <span className="text-blue-500 ml-2">点击空闲诊室进行分配</span>
+          <p className={`text-sm ${isCorrectlyTriaged ? 'text-green-700' : 'text-yellow-700'}`}>
+            {isCorrectlyTriaged ? (
+              <>
+                <span className="font-medium">✓ 已正确分诊为 ESI {selectedPatient.triageDecision}</span>
+                <span className="text-green-500 ml-2">点击空闲诊室进行分配</span>
+              </>
+            ) : (
+              <>
+                <span className="font-medium">当前分诊: ESI {selectedPatient.triageDecision}</span>
+                <span className="text-yellow-500 ml-2">可重新分诊或分配到诊室</span>
+              </>
+            )}
           </p>
         </motion.div>
       )}

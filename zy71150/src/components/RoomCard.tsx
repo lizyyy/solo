@@ -20,7 +20,8 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, patient }) => {
   const canAssign = selectedPatient && 
     (selectedPatient.status === 'waiting' || selectedPatient.status === 'reassess') && 
     room.status === 'idle' &&
-    room.canHandleEsi.includes(selectedPatient.currentEsi);
+    room.canHandleEsi.includes(selectedPatient.currentEsi) &&
+    selectedPatient.triageDecision;
 
   const handleClick = () => {
     if (canAssign && selectedPatientId) {

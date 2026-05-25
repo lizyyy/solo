@@ -146,6 +146,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const patient = gameState.patients.find(p => p.id === patientId);
     if (!patient || (patient.status !== 'waiting' && patient.status !== 'reassess')) return;
 
+    if (patient.triageDecision === patient.currentEsi) return;
+
     const isCorrect = esiLevel === patient.currentEsi;
     const scoreChange = isCorrect 
       ? scoringRules.correctTriage[esiLevel] 
@@ -198,25 +200,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!patient || !room) return;
     if ((patient.status !== 'waiting' && patient.status !== 'reassess') || room.status !== 'idle') return;
     if (!room.canHandleEsi.includes(patient.currentEsi)) return;
+    if (!patient.triageDecision) return;
 
     let scoreBonus = 0;
     let failReasons = [...gameState.failReasons];
     let reassessBonus = 0;
 
-    if ('pendingReassessBonus' in patient && patient.pendingReassessBonus) {
+    if ('pendingReassessBonus' in patient && patient.pendingReassessBonus && patient.triageDecision) {
       reassessBonus = scoringRules.reassessSuccess;
     }
     
-    if (patient.triageDecision) {
-      if (patient.triageDecision !== patient.currentEsi) {
-        failReasons.push({
-          timestamp: gameState.timeElapsed,
-          type: 'wrong_triage',
-          patientId,
-          description: `${patient.name} 分诊错误送入诊室`,
-          penalty: Math.abs(scoringRules.wrongTriage)
-        });
-      }
+    if (patient.triageDecision !== patient.currentEsi) {
+      failReasons.push({
+        timestamp: gameState.timeElapsed,
+        type: 'wrong_triage',
+        patientId,
+        description: `${patient.name} 分诊错误送入诊室`,
+        penalty: Math.abs(scoringRules.wrongTriage)
+      });
     }
 
     if (room.canHandleEsi[0] < patient.currentEsi && room.canHandleEsi.length < 3) {
