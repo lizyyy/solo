@@ -1,12 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "@/pages/Home";
+import LevelSelect from "@/pages/LevelSelect";
+import GamePage from "@/pages/GamePage";
+import ResultsPage from "@/pages/ResultsPage";
 
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/other" element={<div className="text-center text-xl">Other Page - Coming Soon</div>} />
+        <Route path="/" element={<LevelSelect />} />
+        <Route path="/game" element={<GamePage />} />
+        <Route path="/results" element={<ResultsPage />} />
       </Routes>
     </Router>
   );
