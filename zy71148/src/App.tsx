@@ -11,7 +11,7 @@ function App() {
       <StatusBar />
       <div className="flex-1 flex overflow-hidden">
         <Sidebar />
-        <div className="flex-1 relative">
+        <div className="flex-1 relative r3f-root">
           <Scene />
           <SelectionTool />
           <ReportExport />
