@@ -32,7 +32,6 @@ function Scene({ onGroundClick }: SceneProps) {
   const controlsRef = useRef<THREE.EventDispatcher | null>(null);
   const raycaster = useRef(new THREE.Raycaster());
   const mouse = useRef(new THREE.Vector2());
-  const groundPlaneRef = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0));
   const isDragging = useRef(false);
 
   useEffect(() => {
@@ -53,34 +52,16 @@ function Scene({ onGroundClick }: SceneProps) {
     }
 
     if (dragState && isDragging.current) {
+      const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -baseHeight);
       const intersect = new THREE.Vector3();
       raycaster.current.setFromCamera(mouse.current, camera);
-      raycaster.current.ray.intersectPlane(groundPlaneRef.current, intersect);
+      raycaster.current.ray.intersectPlane(groundPlane, intersect);
 
       if (intersect) {
         updateVertex(dragState.boundaryId, dragState.vertexIndex, { x: intersect.x, z: intersect.z });
       }
     }
   });
-
-  const handlePointerDown = useCallback((event: { pointerType: string; stopPropagation: () => void; clientX: number; clientY: number; ray: THREE.Ray }) => {
-    if (event.pointerType !== 'mouse') return;
-    event.stopPropagation();
-
-    const rect = gl.domElement.getBoundingClientRect();
-    mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-    if (toolMode === 'draw') {
-      raycaster.current.setFromCamera(mouse.current, camera);
-      const intersect = new THREE.Vector3();
-      raycaster.current.ray.intersectPlane(groundPlaneRef.current, intersect);
-
-      if (intersect && onGroundClick) {
-        onGroundClick({ x: intersect.x, z: intersect.z });
-      }
-    }
-  }, [camera, gl, toolMode, onGroundClick]);
 
   const handlePointerMove = useCallback((event: { clientX: number; clientY: number }) => {
     const rect = gl.domElement.getBoundingClientRect();
@@ -119,13 +100,24 @@ function Scene({ onGroundClick }: SceneProps) {
     }
   }, [toolMode, selectedBoundaryId, setDragState]);
 
+  const handleGroundClick = useCallback((point: { x: number; z: number }) => {
+    if (toolMode === 'draw' && onGroundClick) {
+      onGroundClick(point);
+    }
+  }, [toolMode, onGroundClick]);
+
   return (
     <>
       <ambientLight intensity={0.6} />
       <directionalLight position={[50, 50, 25]} intensity={0.8} castShadow />
       <hemisphereLight args={['#87CEEB', '#362d1f', 0.4]} />
 
-      <GroundPlane size={120} height={baseHeight} showGrid={true} />
+      <GroundPlane
+        size={120}
+        height={baseHeight}
+        showGrid={true}
+        onGroundClick={handleGroundClick}
+      />
 
       {pointCloud && <PointCloud points={pointCloud.points} pointSize={0.4} />}
 
@@ -152,9 +144,8 @@ function Scene({ onGroundClick }: SceneProps) {
         dampingFactor={0.05}
         minDistance={10}
         maxDistance={200}
-        onPointerDown={handlePointerDown}
-        enablePan={!dragState}
-        enableRotate={!dragState}
+        enablePan={!dragState && toolMode !== 'draw'}
+        enableRotate={!dragState && toolMode !== 'draw'}
       />
     </>
   );
