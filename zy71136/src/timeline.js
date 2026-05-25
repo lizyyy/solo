@@ -33,7 +33,7 @@ export class TimelineController {
         this.app.currentTime = (percentage / 100) * this.data.duration
         this.updateTimeDisplay(this.app.currentTime)
         this.app.vehicleManager.updateVehicles(this.app.currentTime)
-        this.app.conflictDetector.update(this.app.currentTime)
+        this.app.conflictDetector.update(this.app.currentTime, this.app.getVisibleVehicleNames())
       }
     })
   }
@@ -63,6 +63,7 @@ export class TimelineController {
         this.updateSlider(flight.schedule.arrival / totalDuration * 100)
         this.updateTimeDisplay(flight.schedule.arrival)
         this.app.vehicleManager.updateVehicles(flight.schedule.arrival)
+        this.app.conflictDetector.update(flight.schedule.arrival, this.app.getVisibleVehicleNames())
       })
       
       container.appendChild(flightBar)

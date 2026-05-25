@@ -147,38 +147,46 @@ export class ConflictDetector {
     return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.z - p2.z, 2))
   }
   
-  update(currentTime) {
+  update(currentTime, visibleVehicleNames = null) {
     this.activeConflicts = this.conflicts.filter(c => 
       Math.abs(c.time - currentTime) < 1
     )
     
-    this.renderConflictList()
+    this.renderConflictList(visibleVehicleNames)
   }
   
-  renderConflictList() {
+  renderConflictList(visibleVehicleNames = null) {
     const panel = document.getElementById('conflict-panel')
     const list = document.getElementById('conflict-list')
     
-    if (this.conflicts.length === 0) {
+    let displayConflicts = this.activeConflicts
+    
+    if (visibleVehicleNames && visibleVehicleNames.length > 0) {
+      displayConflicts = this.getFilteredActiveConflicts(visibleVehicleNames)
+    }
+    
+    if (displayConflicts.length === 0) {
       panel.style.display = 'none'
       return
     }
     
     panel.style.display = 'block'
     
-    const allConflicts = [
-      ...this.activeConflicts.map(c => ({ ...c, active: true })),
-      ...this.conflicts.filter(c => !this.activeConflicts.includes(c)).map(c => ({ ...c, active: false }))
-    ]
+    const filteredNote = visibleVehicleNames ? ' (已筛选)' : ''
     
-    list.innerHTML = allConflicts.map(conflict => `
-      <div class="conflict-item" style="${conflict.active ? 'border-left: 3px solid #e74c3c;' : 'opacity: 0.6;'}">
-        <div><strong>${conflict.message}</strong></div>
-        <div style="margin-top: 4px; color: #aaa;">
-          时间: ${this.formatTime(conflict.time)}
-        </div>
+    list.innerHTML = `
+      <div style="margin-bottom: 10px; font-size: 11px; color: #aaa;">
+        显示当前时间 ±1分钟内的冲突${filteredNote}
       </div>
-    `).join('')
+      ${displayConflicts.map(conflict => `
+        <div class="conflict-item" style="border-left: 3px solid #e74c3c;">
+          <div><strong>${conflict.message}</strong></div>
+          <div style="margin-top: 4px; color: #aaa;">
+            时间: ${this.formatTime(conflict.time)}
+          </div>
+        </div>
+      `).join('')}
+    `
   }
   
   formatTime(time) {
@@ -195,5 +203,33 @@ export class ConflictDetector {
   
   getConflicts() {
     return this.conflicts
+  }
+  
+  getActiveConflicts() {
+    return this.activeConflicts
+  }
+  
+  getFilteredConflicts(visibleVehicleNames) {
+    return this.conflicts.filter(conflict => {
+      if (conflict.vehicle) {
+        return visibleVehicleNames.includes(conflict.vehicle)
+      }
+      if (conflict.vehicle1 && conflict.vehicle2) {
+        return visibleVehicleNames.includes(conflict.vehicle1) || visibleVehicleNames.includes(conflict.vehicle2)
+      }
+      return false
+    })
+  }
+  
+  getFilteredActiveConflicts(visibleVehicleNames) {
+    return this.activeConflicts.filter(conflict => {
+      if (conflict.vehicle) {
+        return visibleVehicleNames.includes(conflict.vehicle)
+      }
+      if (conflict.vehicle1 && conflict.vehicle2) {
+        return visibleVehicleNames.includes(conflict.vehicle1) || visibleVehicleNames.includes(conflict.vehicle2)
+      }
+      return false
+    })
   }
 }

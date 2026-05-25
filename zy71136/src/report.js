@@ -17,11 +17,19 @@ export class ReportExporter {
   collectReportData() {
     const camera = this.app.camera
     const controls = this.app.controls
+    const currentTime = this.app.currentTime
+    const allVehicles = this.app.vehicleManager.getVehicles()
+    const visibleVehicles = allVehicles.filter(v => v.mesh.visible)
+    const visibleVehicleNames = visibleVehicles.map(v => v.name)
+    
+    const allConflicts = this.app.conflictDetector.getConflicts()
+    const filteredConflicts = this.filterConflictsByVehicles(allConflicts, visibleVehicleNames)
+    const currentConflicts = filteredConflicts.filter(c => Math.abs(c.time - currentTime) < 1)
     
     return {
       timestamp: new Date().toISOString(),
-      currentTime: this.app.currentTime,
-      formattedTime: this.formatTime(this.app.currentTime),
+      currentTime: currentTime,
+      formattedTime: this.formatTime(currentTime),
       view: {
         type: this.app.currentView,
         cameraPosition: {
@@ -36,21 +44,38 @@ export class ReportExporter {
         }
       },
       filters: { ...this.app.vehicleFilters },
-      vehicles: this.collectVehicleData(),
-      conflicts: this.app.conflictDetector.getConflicts(),
+      vehicles: this.collectVehicleData(visibleVehicles),
+      conflicts: {
+        current: currentConflicts,
+        allFiltered: filteredConflicts
+      },
       flights: this.app.data.flights || [],
       summary: {
         totalVehicles: this.app.data.vehicles.length,
-        visibleVehicles: this.app.vehicleManager.getVehicles().filter(v => v.mesh.visible).length,
-        totalConflicts: this.app.conflictDetector.getConflicts().length,
-        highSeverityConflicts: this.app.conflictDetector.getConflicts().filter(c => c.severity === 'high').length,
+        visibleVehicles: visibleVehicles.length,
+        totalConflictsAll: allConflicts.length,
+        totalConflictsFiltered: filteredConflicts.length,
+        currentConflicts: currentConflicts.length,
+        highSeverityConflicts: currentConflicts.filter(c => c.severity === 'high').length,
         duration: this.app.data.duration
       }
     }
   }
   
-  collectVehicleData() {
-    return this.app.vehicleManager.getVehicles().map(vehicle => {
+  filterConflictsByVehicles(conflicts, vehicleNames) {
+    return conflicts.filter(conflict => {
+      if (conflict.vehicle) {
+        return vehicleNames.includes(conflict.vehicle)
+      }
+      if (conflict.vehicle1 && conflict.vehicle2) {
+        return vehicleNames.includes(conflict.vehicle1) || vehicleNames.includes(conflict.vehicle2)
+      }
+      return false
+    })
+  }
+  
+  collectVehicleData(vehicles) {
+    return vehicles.map(vehicle => {
       const currentPos = vehicle.mesh.position
       const schedule = vehicle.schedule
       const status = this.getVehicleStatus(vehicle, this.app.currentTime)
@@ -60,7 +85,7 @@ export class ReportExporter {
         name: vehicle.name,
         type: vehicle.type,
         typeName: this.getTypeName(vehicle.type),
-        visible: vehicle.mesh.visible,
+        visible: true,
         position: {
           x: currentPos.x.toFixed(2),
           z: currentPos.z.toFixed(2)
@@ -174,8 +199,8 @@ export class ReportExporter {
             <div class="label">可见车辆</div>
           </div>
           <div class="stat-card">
-            <div class="value" style="color: ${data.summary.totalConflicts > 0 ? '#e53e3e' : '#48bb78'};">${data.summary.totalConflicts}</div>
-            <div class="label">冲突总数</div>
+            <div class="value" style="color: ${data.summary.currentConflicts > 0 ? '#e53e3e' : '#48bb78'};">${data.summary.currentConflicts}</div>
+            <div class="label">当前冲突</div>
           </div>
           <div class="stat-card">
             <div class="value">${this.formatTime(data.currentTime)}</div>
@@ -205,7 +230,7 @@ export class ReportExporter {
       </div>
       
       <div class="section">
-        <h2>车辆状态</h2>
+        <h2>车辆状态 (当前筛选: ${data.summary.visibleVehicles}/${data.summary.totalVehicles} 辆)</h2>
         <table>
           <thead>
             <tr>
@@ -219,8 +244,8 @@ export class ReportExporter {
           </thead>
           <tbody>
             ${data.vehicles.map(v => `
-            <tr style="${!v.visible ? 'opacity: 0.5;' : ''}">
-              <td>${v.name}${!v.visible ? ' (已隐藏)' : ''}</td>
+            <tr>
+              <td>${v.name}</td>
               <td>${v.typeName}</td>
               <td><span class="status-badge ${v.status === '待出发' ? 'status-pending' : v.status === '进行中' ? 'status-active' : 'status-done'}">${v.status}</span></td>
               <td style="width: 120px;">
@@ -238,8 +263,8 @@ export class ReportExporter {
       </div>
       
       <div class="section">
-        <h2>冲突检测 (${data.conflicts.length})</h2>
-        ${data.conflicts.length === 0 ? '<p style="color: #48bb78; padding: 20px; background: #f0fff4; border-radius: 8px;">✓ 未检测到任何冲突</p>' : `
+        <h2>当前时间点冲突 (${data.conflicts.current.length})</h2>
+        ${data.conflicts.current.length === 0 ? '<p style="color: #48bb78; padding: 20px; background: #f0fff4; border-radius: 8px;">✓ 当前时间点无冲突</p>' : `
         <table>
           <thead>
             <tr>
@@ -250,7 +275,7 @@ export class ReportExporter {
             </tr>
           </thead>
           <tbody>
-            ${data.conflicts.map(c => `
+            ${data.conflicts.current.map(c => `
             <tr class="${c.severity === 'high' ? 'conflict-high' : 'conflict-medium'}">
               <td>${conflictTypeNames[c.type] || c.type}</td>
               <td style="color: ${c.severity === 'high' ? '#e53e3e' : '#ed8936'};">${c.severity === 'high' ? '高' : '中'}</td>
@@ -261,6 +286,35 @@ export class ReportExporter {
           </tbody>
         </table>
         `}
+      </div>
+      
+      <div class="section" style="${data.conflicts.allFiltered.length === 0 ? 'display: none;' : ''}">
+        <h2>全时段冲突记录 (筛选后: ${data.conflicts.allFiltered.length}/${data.summary.totalConflictsAll})</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>类型</th>
+              <th>严重程度</th>
+              <th>描述</th>
+              <th>发生时间</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.conflicts.allFiltered.map(c => {
+              const isCurrent = data.conflicts.current.some(cc => cc.message === c.message && Math.abs(cc.time - c.time) < 0.5)
+              return `
+              <tr class="${c.severity === 'high' ? 'conflict-high' : 'conflict-medium'}" style="${isCurrent ? 'background: #fff5f5;' : 'opacity: 0.7;'}">
+                <td>${conflictTypeNames[c.type] || c.type}</td>
+                <td style="color: ${c.severity === 'high' ? '#e53e3e' : '#ed8936'};">${c.severity === 'high' ? '高' : '中'}</td>
+                <td>${c.message}</td>
+                <td>${this.formatTime(c.time)}</td>
+                <td>${isCurrent ? '<span style="color: #e53e3e; font-weight: bold;">当前</span>' : '<span style="color: #718096;">已过/未到</span>'}</td>
+              </tr>
+              `
+            }).join('')}
+          </tbody>
+        </table>
       </div>
       
       <div class="section">

@@ -123,6 +123,7 @@ class App {
       checkbox.addEventListener('change', () => {
         this.vehicleFilters[checkbox.value] = checkbox.checked
         this.updateVehicleVisibility()
+        this.conflictDetector.update(this.currentTime, this.getVisibleVehicleNames())
       })
     })
     
@@ -156,6 +157,13 @@ class App {
     this.vehicleManager.resetVehicles()
     this.conflictDetector.clearConflicts()
     this.conflictDetector.detectAllConflicts()
+    this.conflictDetector.update(0, this.getVisibleVehicleNames())
+  }
+  
+  getVisibleVehicleNames() {
+    return this.vehicleManager.getVehicles()
+      .filter(v => v.mesh.visible)
+      .map(v => v.name)
   }
   
   setView(viewType) {
@@ -259,7 +267,7 @@ class App {
       this.timeline.updateSlider(this.currentTime / this.data.duration * 100)
       this.timeline.updateTimeDisplay(this.currentTime)
       this.vehicleManager.updateVehicles(this.currentTime)
-      this.conflictDetector.update(this.currentTime)
+      this.conflictDetector.update(this.currentTime, this.getVisibleVehicleNames())
       
       if (this.currentTime >= this.data.duration) {
         this.isPlaying = false
