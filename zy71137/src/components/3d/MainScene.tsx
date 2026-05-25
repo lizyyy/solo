@@ -43,7 +43,7 @@ function SceneContent() {
   const sprinklerPositions = sprinklers.map((s) => s.position) as [number, number, number][];
 
   const getFieldAlertStatus = (fieldId: string) => {
-    const fieldAlerts = alerts.filter((a) => a.fieldName && a.fieldName.includes(fieldId));
+    const fieldAlerts = alerts.filter((a) => a.fieldId === fieldId);
     if (fieldAlerts.length > 0) {
       const hasDanger = fieldAlerts.some((a) => a.severity === 'danger');
       return { hasAlert: true, severity: hasDanger ? 'danger' : 'warning' } as const;

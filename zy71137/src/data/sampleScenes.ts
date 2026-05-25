@@ -41,7 +41,7 @@ export const sampleScenes: OrchardScene[] = [
     ],
     defaultParams: {
       windSpeed: 2,
-      windDirection: 180,
+      windDirection: 90,
       pesticideType: 'organic',
       bufferThreshold: 0.1,
       simulationSpeed: 1,

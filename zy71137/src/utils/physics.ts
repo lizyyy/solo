@@ -135,6 +135,7 @@ export function checkDriftAlerts(
     severity: 'warning' | 'danger';
     message: string;
     fieldName?: string;
+    fieldId?: string;
     location?: [number, number, number];
   }) => void
 ): void {
@@ -171,6 +172,7 @@ export function checkDriftAlerts(
           severity: 'danger',
           message: `药雾已侵入 ${field.name}，可能造成污染！`,
           fieldName: field.name,
+          fieldId: field.id,
         });
       } else if (counts.buffer > bufferWarningThreshold) {
         addAlert({
@@ -178,6 +180,7 @@ export function checkDriftAlerts(
           severity: 'warning',
           message: `药雾接近 ${field.name} 缓冲区，请注意控制`,
           fieldName: field.name,
+          fieldId: field.id,
         });
       }
     }

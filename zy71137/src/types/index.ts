@@ -67,6 +67,7 @@ export interface Alert {
   location?: [number, number, number];
   timestamp: number;
   fieldName?: string;
+  fieldId?: string;
 }
 
 export interface ParticleData {
