@@ -8,10 +8,12 @@ interface BoundaryLineProps {
   boundary: Boundary;
   isSelected: boolean;
   baseHeight: number;
+  isEditing: boolean;
   onClick?: (event: { stopPropagation: () => void }) => void;
+  onVertexMouseDown?: (vertexIndex: number, event: { stopPropagation: () => void }) => void;
 }
 
-export function BoundaryLine({ boundary, isSelected, baseHeight, onClick }: BoundaryLineProps) {
+export function BoundaryLine({ boundary, isSelected, baseHeight, isEditing, onClick, onVertexMouseDown }: BoundaryLineProps) {
   const color = getMaterialColor(boundary.materialId);
   const height = baseHeight + 0.05;
 
@@ -44,6 +46,13 @@ export function BoundaryLine({ boundary, isSelected, baseHeight, onClick }: Boun
     return geometry;
   }, [boundary.vertices, height]);
 
+  const handleVertexClick = (index: number) => (event: { stopPropagation: () => void }) => {
+    event.stopPropagation();
+    if (onVertexMouseDown && isEditing) {
+      onVertexMouseDown(index, event);
+    }
+  };
+
   return (
     <group onClick={onClick}>
       {fillGeometry && (
@@ -64,9 +73,10 @@ export function BoundaryLine({ boundary, isSelected, baseHeight, onClick }: Boun
         <mesh
           key={index}
           position={[vertex.x, height + 0.1, vertex.z]}
+          onPointerDown={handleVertexClick(index)}
         >
-          <sphereGeometry args={[isSelected ? 0.4 : 0.25, 8, 8]} />
-          <meshBasicMaterial color={isSelected ? '#FF7D00' : color} />
+          <sphereGeometry args={[isSelected ? 0.5 : 0.3, 12, 12]} />
+          <meshBasicMaterial color={isEditing && isSelected ? '#FF7D00' : color} />
         </mesh>
       ))}
     </group>

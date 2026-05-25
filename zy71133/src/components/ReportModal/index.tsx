@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 import { useStore } from '@/store/useStore';
 import { getMaterialById } from '@/data/materials';
-import { generateReportData, exportToPDF, exportToJSON, captureScreenshot } from '@/utils/export';
+import { generateReportData, exportToPDF, exportToJSON, captureScreenshot, exportToImage } from '@/utils/export';
 import { formatVolume, formatWeight } from '@/utils/volume';
-import { X, FileText, Download, Image, FileJson, Loader2 } from 'lucide-react';
+import { X, FileText, Download, Image as ImageIcon, FileJson, Loader2 } from 'lucide-react';
 
 export function ReportModal() {
   const { showReportModal, setShowReportModal, boundaries, activeBatchId, batches } = useStore();
@@ -55,6 +55,12 @@ export function ReportModal() {
       boundaries
     );
     exportToJSON(report);
+  };
+
+  const handleExportImage = () => {
+    if (screenshot) {
+      exportToImage(screenshot, `盘点截图_${batchName}_${new Date().toISOString().slice(0, 10)}`);
+    }
   };
 
   if (!showReportModal) return null;
@@ -144,14 +150,26 @@ export function ReportModal() {
         </div>
 
         <div className="p-4 border-t border-slate-700 flex items-center justify-between">
-          <button
-            onClick={handleCaptureScreenshot}
-            disabled={isExporting}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors disabled:opacity-50"
-          >
-            <Image className="w-4 h-4" />
-            截取3D视图
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleCaptureScreenshot}
+              disabled={isExporting}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors disabled:opacity-50"
+            >
+              <ImageIcon className="w-4 h-4" />
+              截取3D视图
+            </button>
+            {hasScreenshot && (
+              <button
+                onClick={handleExportImage}
+                disabled={isExporting}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 transition-colors disabled:opacity-50"
+              >
+                <ImageIcon className="w-4 h-4" />
+                导出图片
+              </button>
+            )}
+          </div>
 
           <div className="flex items-center gap-2">
             <button

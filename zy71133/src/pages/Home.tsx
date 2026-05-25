@@ -35,7 +35,7 @@ export default function Home() {
 }
 
 function ViewControls() {
-  const { cameraState, setCameraState } = useStore();
+  const { setCameraState } = useStore();
 
   const views = [
     {

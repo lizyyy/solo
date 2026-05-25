@@ -3,7 +3,9 @@ import {
   AppState,
   AppActions,
   Boundary,
+  BoundaryVertex,
   CameraState,
+  DragState,
   PointCloudData,
   ToolMode,
 } from '@/types';
@@ -28,7 +30,7 @@ function loadBatchesFromStorage() {
         timestamp: new Date((b as { timestamp: string }).timestamp),
       }));
     }
-  } catch (e) {
+  } catch {
     console.warn('Failed to load batches from storage');
   }
   return [];
@@ -37,7 +39,7 @@ function loadBatchesFromStorage() {
 function saveBatchesToStorage(batches: unknown[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(batches));
-  } catch (e) {
+  } catch {
     console.warn('Failed to save batches to storage');
   }
 }
@@ -57,6 +59,8 @@ export const useStore = create<StoreState>((set, get) => ({
   drawingVertices: [],
   cameraState: initialCameraState,
   showReportModal: false,
+  dragState: null,
+  compareBatchIds: [],
 
   setPointCloud: (pointCloud: PointCloudData | null) => {
     set({ pointCloud });
@@ -100,6 +104,7 @@ export const useStore = create<StoreState>((set, get) => ({
     set(state => ({
       toolMode: mode,
       isDrawing: false,
+      dragState: null,
       drawingVertices: mode === 'draw' ? [] : state.drawingVertices,
     }));
   },
@@ -167,6 +172,7 @@ export const useStore = create<StoreState>((set, get) => ({
       return {
         batches: newBatches,
         activeBatchId: state.activeBatchId === id ? null : state.activeBatchId,
+        compareBatchIds: state.compareBatchIds.filter(bid => bid !== id),
       };
     });
   },
@@ -181,6 +187,8 @@ export const useStore = create<StoreState>((set, get) => ({
       drawingVertices: [],
       activeBatchId: null,
       cameraState: initialCameraState,
+      dragState: null,
+      compareBatchIds: [],
     });
   },
 
@@ -225,5 +233,36 @@ export const useStore = create<StoreState>((set, get) => ({
     setTimeout(() => {
       get().calculateVolumes();
     }, 100);
+  },
+
+  setDragState: (dragState: DragState | null) => {
+    set({ dragState });
+  },
+
+  updateVertex: (boundaryId: string, vertexIndex: number, newPos: BoundaryVertex) => {
+    set(state => ({
+      boundaries: state.boundaries.map(b => {
+        if (b.id !== boundaryId) return b;
+        const newVertices = [...b.vertices];
+        newVertices[vertexIndex] = newPos;
+        return { ...b, vertices: newVertices };
+      }),
+    }));
+    get().calculateVolumes();
+  },
+
+  toggleCompareBatch: (batchId: string) => {
+    set(state => {
+      const isComparing = state.compareBatchIds.includes(batchId);
+      return {
+        compareBatchIds: isComparing
+          ? state.compareBatchIds.filter(id => id !== batchId)
+          : [...state.compareBatchIds, batchId],
+      };
+    });
+  },
+
+  clearCompareBatches: () => {
+    set({ compareBatchIds: [] });
   },
 }));

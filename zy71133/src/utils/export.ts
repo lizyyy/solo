@@ -86,7 +86,7 @@ export async function exportToPDF(report: ReportData): Promise<void> {
       const imgHeight = 80;
       doc.addImage(report.screenshot, 'PNG', margin, yPos, imgWidth, imgHeight);
       yPos += imgHeight + 10;
-    } catch (e) {
+    } catch {
       console.warn('Failed to add screenshot to PDF');
     }
   }
@@ -125,7 +125,7 @@ export async function exportToPDF(report: ReportData): Promise<void> {
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  report.boundaries.forEach((b, index) => {
+  report.boundaries.forEach((b) => {
     if (yPos > pageHeight - margin) {
       doc.addPage();
       yPos = margin;
@@ -196,4 +196,13 @@ export function exportBoundaryToGeoJSON(boundary: Boundary): void {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+export function exportToImage(dataUrl: string, fileName: string): void {
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = `${fileName}.png`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }

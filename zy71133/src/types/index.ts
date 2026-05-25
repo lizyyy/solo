@@ -70,6 +70,11 @@ export interface ReportData {
 
 export type ToolMode = 'select' | 'draw' | 'edit';
 
+export interface DragState {
+  boundaryId: string;
+  vertexIndex: number;
+}
+
 export interface AppState {
   pointCloud: PointCloudData | null;
   boundaries: Boundary[];
@@ -83,6 +88,8 @@ export interface AppState {
   drawingVertices: BoundaryVertex[];
   cameraState: CameraState;
   showReportModal: boolean;
+  dragState: DragState | null;
+  compareBatchIds: string[];
 }
 
 export interface AppActions {
@@ -104,4 +111,8 @@ export interface AppActions {
   setShowReportModal: (show: boolean) => void;
   calculateVolumes: () => void;
   loadSampleData: () => void;
+  setDragState: (dragState: DragState | null) => void;
+  updateVertex: (boundaryId: string, vertexIndex: number, newPos: BoundaryVertex) => void;
+  toggleCompareBatch: (batchId: string) => void;
+  clearCompareBatches: () => void;
 }

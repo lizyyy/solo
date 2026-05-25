@@ -1,15 +1,16 @@
 import { useStore } from '@/store/useStore';
 import {
   Upload,
-  Play,
   MousePointer2,
   PenTool,
   RotateCcw,
   Download,
   Save,
   Layers,
+  Edit3,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ToolMode } from '@/types';
 
 export function Toolbar() {
   const {
@@ -18,13 +19,13 @@ export function Toolbar() {
     resetState,
     loadSampleData,
     pointCloud,
-    showReportModal,
     setShowReportModal,
   } = useStore();
 
   const tools = [
     { id: 'select', icon: MousePointer2, label: '选择' },
     { id: 'draw', icon: PenTool, label: '绘制边界' },
+    { id: 'edit', icon: Edit3, label: '编辑顶点' },
   ];
 
   return (
@@ -41,7 +42,7 @@ export function Toolbar() {
           {tools.map(tool => (
             <button
               key={tool.id}
-              onClick={() => setToolMode(tool.id as 'select' | 'draw')}
+              onClick={() => setToolMode(tool.id as ToolMode)}
               className={cn(
                 'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-all',
                 toolMode === tool.id
