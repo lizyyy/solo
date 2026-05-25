@@ -10,7 +10,7 @@ interface BoundaryLineProps {
   baseHeight: number;
   isEditing: boolean;
   onClick?: (event: { stopPropagation: () => void }) => void;
-  onVertexMouseDown?: (vertexIndex: number, event: { stopPropagation: () => void }) => void;
+  onVertexMouseDown?: (vertexIndex: number) => void;
 }
 
 export function BoundaryLine({ boundary, isSelected, baseHeight, isEditing, onClick, onVertexMouseDown }: BoundaryLineProps) {
@@ -46,10 +46,10 @@ export function BoundaryLine({ boundary, isSelected, baseHeight, isEditing, onCl
     return geometry;
   }, [boundary.vertices, height]);
 
-  const handleVertexClick = (index: number) => (event: { stopPropagation: () => void }) => {
-    event.stopPropagation();
+  const handleVertexClick = (index: number) => (_event: { stopPropagation: () => void }) => {
+    _event.stopPropagation();
     if (onVertexMouseDown && isEditing) {
-      onVertexMouseDown(index, event);
+      onVertexMouseDown(index);
     }
   };
 

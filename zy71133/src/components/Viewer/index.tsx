@@ -112,7 +112,7 @@ function Scene({ onGroundClick }: SceneProps) {
     }
   }, [toolMode, selectedBoundaryId, setSelectedBoundaryId]);
 
-  const handleVertexMouseDown = useCallback((boundaryId: string, vertexIndex: number) => () => {
+  const handleVertexMouseDown = useCallback((boundaryId: string, vertexIndex: number) => {
     if (toolMode === 'edit' && selectedBoundaryId === boundaryId) {
       isDragging.current = true;
       setDragState({ boundaryId, vertexIndex });

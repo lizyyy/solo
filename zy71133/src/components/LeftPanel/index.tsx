@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useStore } from '@/store/useStore';
 import { Trash2, Eye, Calendar, Package, GitCompare, X, Play, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -17,10 +17,19 @@ export function LeftPanel() {
 
   const [timelineIndex, setTimelineIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const playbackIntervalRef = useRef<number | null>(null);
 
   const sortedBatches = [...batches].sort(
     (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
   );
+
+  useEffect(() => {
+    return () => {
+      if (playbackIntervalRef.current) {
+        clearInterval(playbackIntervalRef.current);
+      }
+    };
+  }, []);
 
   const handleTimelineChange = (index: number) => {
     setTimelineIndex(index);
@@ -29,23 +38,37 @@ export function LeftPanel() {
     }
   };
 
+  const stopPlayback = () => {
+    if (playbackIntervalRef.current) {
+      clearInterval(playbackIntervalRef.current);
+      playbackIntervalRef.current = null;
+    }
+    setIsPlaying(false);
+  };
+
+  const startPlayback = () => {
+    if (sortedBatches.length < 2) return;
+
+    setIsPlaying(true);
+    let currentIndex = timelineIndex;
+
+    playbackIntervalRef.current = window.setInterval(() => {
+      currentIndex = (currentIndex + 1) % sortedBatches.length;
+      setTimelineIndex(currentIndex);
+      if (sortedBatches[currentIndex]) {
+        loadBatch(sortedBatches[currentIndex].id);
+      }
+      if (currentIndex === sortedBatches.length - 1) {
+        stopPlayback();
+      }
+    }, 1500);
+  };
+
   const togglePlayback = () => {
     if (isPlaying) {
-      setIsPlaying(false);
+      stopPlayback();
     } else {
-      setIsPlaying(true);
-      let currentIndex = timelineIndex;
-      const interval = setInterval(() => {
-        currentIndex = (currentIndex + 1) % sortedBatches.length;
-        setTimelineIndex(currentIndex);
-        if (sortedBatches[currentIndex]) {
-          loadBatch(sortedBatches[currentIndex].id);
-        }
-        if (currentIndex === sortedBatches.length - 1) {
-          clearInterval(interval);
-          setIsPlaying(false);
-        }
-      }, 1500);
+      startPlayback();
     }
   };
 
