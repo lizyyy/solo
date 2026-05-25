@@ -136,6 +136,7 @@ export const TEAM_STATUS_NAMES: Record<string, string> = {
   moving: '前往中',
   working: '救援中',
   conflict: '冲突',
+  comforting: '安抚中',
 };
 
 export const ELEVATOR_STATUS_NAMES: Record<string, string> = {
@@ -143,4 +144,11 @@ export const ELEVATOR_STATUS_NAMES: Record<string, string> = {
   fault: '故障',
   rescuing: '救援中',
   rescued: '已救援',
+  holding: '停靠管制',
 };
+
+export const COMFORT_DURATION = 10;
+export const COMFORT_BONUS = 30;
+export const DIAGNOSIS_MAX_ATTEMPTS = 2;
+export const DIAGNOSIS_BONUS = 100;
+export const DIAGNOSIS_PENALTY = 50;

@@ -12,8 +12,16 @@ import type {
   ScoreBreakdown,
   LoseReason,
   GameResult,
+  DiagnosisResult,
 } from '@/types/game';
-import { FAULT_RESCUE_TIMES } from '@/config/levels';
+import {
+  FAULT_RESCUE_TIMES,
+  COMFORT_DURATION,
+  COMFORT_BONUS,
+  DIAGNOSIS_MAX_ATTEMPTS,
+  DIAGNOSIS_BONUS,
+  DIAGNOSIS_PENALTY,
+} from '@/config/levels';
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
@@ -24,7 +32,7 @@ const createInitialState = (): Omit<GameState, keyof GameActions> => ({
   currentLevel: null,
   elevators: [],
   teams: [],
-  events: [],
+  events: [] as GameEvent[],
   score: 0,
   gameTime: 0,
   result: null,
@@ -51,6 +59,11 @@ const initializeElevators = (level: LevelConfig): Elevator[] => {
     mood: 'calm' as const,
     rescueProgress: 0,
     isMoving: Math.random() > 0.5,
+    holdFloor: null,
+    comfortProgress: 0,
+    diagnosisAttempts: 0,
+    diagnosisResult: null as DiagnosisResult,
+    suspectedFaultType: null,
   }));
 };
 
@@ -86,7 +99,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
       currentLevel: level,
       elevators,
       teams,
-      events: [],
+      events: [] as GameEvent[],
       score: 0,
       gameTime: 0,
       result: null,
@@ -190,7 +203,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
       return e;
     });
 
-    const newEvents = [...state.events];
+    const newEvents = [...state.events] as GameEvent[];
 
     if (conflict) {
       newEvents.push({
@@ -207,7 +220,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
       id: generateId(),
       time: state.gameTime,
       type: 'rescue_start',
-      message: `${team.name} 已派往 ${elevator.name} (${elevator.currentFloor}层)`,
+      message: `${team.name} 已派往 ${elevator.name} (${Math.floor(elevator.currentFloor)}层)`,
       elevatorId,
       teamId,
     });
@@ -259,6 +272,159 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
     });
   },
 
+  comfortPassengers: (teamId: string, elevatorId: string) => {
+    const state = get();
+    const team = state.teams.find((t) => t.id === teamId);
+    const elevator = state.elevators.find((e) => e.id === elevatorId);
+
+    if (!team || !elevator) return;
+    if (team.status !== 'idle') return;
+    if (elevator.status !== 'fault' && elevator.status !== 'rescuing') return;
+    if (elevator.mood === 'calm') return;
+
+    const updatedTeams = state.teams.map((t) => {
+      if (t.id === teamId) {
+        return {
+          ...t,
+          status: 'comforting' as const,
+          assignedElevatorId: elevatorId,
+          targetFloor: elevator.currentFloor,
+          isMoving: true,
+        };
+      }
+      return t;
+    });
+
+    const newEvents = [...state.events] as GameEvent[];
+    newEvents.push({
+      id: generateId(),
+      time: state.gameTime,
+      type: 'comfort',
+      message: `${team.name} 前往 ${elevator.name} 安抚乘客`,
+      elevatorId,
+      teamId,
+    });
+
+    set({
+      teams: updatedTeams,
+      events: newEvents,
+    });
+  },
+
+  holdElevatorAtFloor: (elevatorId: string, floor: number) => {
+    const state = get();
+    const elevator = state.elevators.find((e) => e.id === elevatorId);
+    if (!elevator) return;
+
+    const updatedElevators = state.elevators.map((e) => {
+      if (e.id === elevatorId) {
+        return {
+          ...e,
+          holdFloor: floor,
+          status: e.status === 'normal' ? ('holding' as const) : e.status,
+          isMoving: false,
+          targetFloor: floor,
+        };
+      }
+      return e;
+    });
+
+    const newEvents = [...state.events] as GameEvent[];
+    newEvents.push({
+      id: generateId(),
+      time: state.gameTime,
+      type: 'hold',
+      message: `${elevator.name} 已被管制停靠在 ${floor} 层`,
+      elevatorId,
+    });
+
+    set({
+      elevators: updatedElevators,
+      events: newEvents,
+    });
+  },
+
+  releaseElevatorHold: (elevatorId: string) => {
+    const state = get();
+    const elevator = state.elevators.find((e) => e.id === elevatorId);
+    if (!elevator) return;
+
+    const updatedElevators = state.elevators.map((e) => {
+      if (e.id === elevatorId) {
+        return {
+          ...e,
+          holdFloor: null,
+          status: e.status === 'holding' ? ('normal' as const) : e.status,
+          isMoving: true,
+        };
+      }
+      return e;
+    });
+
+    const newEvents = [...state.events] as GameEvent[];
+    newEvents.push({
+      id: generateId(),
+      time: state.gameTime,
+      type: 'hold',
+      message: `${elevator.name} 已解除停靠管制`,
+      elevatorId,
+    });
+
+    set({
+      elevators: updatedElevators,
+      events: newEvents,
+    });
+  },
+
+  diagnoseFault: (elevatorId: string, suspectedType: FaultType) => {
+    const state = get();
+    const elevator = state.elevators.find((e) => e.id === elevatorId);
+    if (!elevator || elevator.status !== 'fault') return;
+    if (elevator.diagnosisAttempts >= DIAGNOSIS_MAX_ATTEMPTS) return;
+
+    const isCorrect = elevator.faultType === suspectedType;
+    const newAttempts = elevator.diagnosisAttempts + 1;
+
+    const updatedElevators = state.elevators.map((e) => {
+      if (e.id === elevatorId) {
+        return {
+          ...e,
+          diagnosisAttempts: newAttempts,
+          diagnosisResult: isCorrect ? ('correct' as const) : ('wrong' as const),
+          suspectedFaultType: suspectedType,
+        };
+      }
+      return e;
+    });
+
+    const newEvents = [...state.events] as GameEvent[];
+    if (isCorrect) {
+      newEvents.push({
+        id: generateId(),
+        time: state.gameTime,
+        type: 'diagnosis_success',
+        message: `${elevator.name} 故障诊断正确！故障类型：${suspectedType}`,
+        elevatorId,
+      });
+    } else {
+      newEvents.push({
+        id: generateId(),
+        time: state.gameTime,
+        type: 'diagnosis_fail',
+        message: `${elevator.name} 故障诊断错误！怀疑：${suspectedType}，实际：${elevator.faultType}`,
+        elevatorId,
+      });
+    }
+
+    const scoreChange = isCorrect ? DIAGNOSIS_BONUS : -DIAGNOSIS_PENALTY;
+
+    set({
+      elevators: updatedElevators,
+      events: newEvents,
+      score: state.score + scoreChange,
+    });
+  },
+
   tick: (deltaTime: number) => {
     const state = get();
     if (state.status !== 'playing' || !state.currentLevel) return;
@@ -269,20 +435,29 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
     let newScore = state.score;
     let newElevators = [...state.elevators];
     let newTeams = [...state.teams];
-    const newEvents = [...state.events];
+    const newEvents = [...state.events] as GameEvent[];
     let newResult: GameResult = null;
     let newLoseReason: LoseReason = null;
 
     const movingSpeed = 2;
 
     newTeams = newTeams.map((team) => {
-      if (team.status === 'moving' && team.isMoving) {
+      if ((team.status === 'moving' || team.status === 'comforting') && team.isMoving) {
         const floorDiff = team.targetFloor - team.currentFloor;
         const moveAmount = movingSpeed * deltaTime;
         let newFloor = team.currentFloor;
 
         if (Math.abs(floorDiff) <= moveAmount) {
           newFloor = team.targetFloor;
+          if (team.status === 'comforting') {
+            return {
+              ...team,
+              currentFloor: newFloor,
+              status: 'comforting' as const,
+              isMoving: false,
+              progress: 0,
+            };
+          }
           return {
             ...team,
             currentFloor: newFloor,
@@ -297,6 +472,58 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
             currentFloor: newFloor,
           };
         }
+      }
+      return team;
+    });
+
+    newTeams = newTeams.map((team) => {
+      if (team.status === 'comforting' && !team.isMoving) {
+        const elevator = newElevators.find((e) => e.id === team.assignedElevatorId);
+        if (!elevator) return team;
+
+        const newProgress = (elevator.comfortProgress || 0) + deltaTime;
+        if (newProgress >= COMFORT_DURATION) {
+          newElevators = newElevators.map((e) => {
+            if (e.id === team.assignedElevatorId) {
+              return {
+                ...e,
+                mood: 'calm' as const,
+                waitTime: Math.max(0, e.waitTime - 30),
+                comfortProgress: 0,
+              };
+            }
+            return e;
+          });
+
+          newScore += COMFORT_BONUS;
+          newEvents.push({
+            id: generateId(),
+            time: newGameTime,
+            type: 'comfort',
+            message: `${team.name} 成功安抚 ${elevator.name} 乘客，情绪恢复平静`,
+            elevatorId: elevator.id,
+            teamId: team.id,
+          });
+
+          return {
+            ...team,
+            status: 'idle' as const,
+            assignedElevatorId: null,
+            progress: 0,
+          };
+        }
+
+        newElevators = newElevators.map((e) => {
+          if (e.id === team.assignedElevatorId) {
+            return {
+              ...e,
+              comfortProgress: newProgress,
+            };
+          }
+          return e;
+        });
+
+        return team;
       }
       return team;
     });
@@ -362,6 +589,9 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
               rescueProgress: 0,
               mood: 'calm' as const,
               waitTime: 0,
+              diagnosisAttempts: 0,
+              diagnosisResult: null,
+              suspectedFaultType: null,
             };
           }
 
@@ -412,7 +642,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
         };
       }
 
-      if (elevator.status === 'normal' && elevator.isMoving) {
+      if (elevator.status === 'normal' && elevator.isMoving && elevator.holdFloor === null) {
         const floorDiff = elevator.targetFloor - elevator.currentFloor;
         const moveAmount = movingSpeed * deltaTime;
         if (Math.abs(floorDiff) <= moveAmount) {
@@ -430,10 +660,26 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
         }
       }
 
-      if (elevator.status === 'normal' && !elevator.isMoving && Math.random() < 0.02) {
+      if (elevator.status === 'normal' && !elevator.isMoving && elevator.holdFloor === null && Math.random() < 0.02) {
         return {
           ...elevator,
           isMoving: true,
+        };
+      }
+
+      if (elevator.status === 'holding' && elevator.holdFloor !== null) {
+        const floorDiff = elevator.holdFloor - elevator.currentFloor;
+        const moveAmount = movingSpeed * deltaTime;
+        if (Math.abs(floorDiff) > moveAmount) {
+          return {
+            ...elevator,
+            currentFloor: elevator.currentFloor + (floorDiff > 0 ? moveAmount : -moveAmount),
+            isMoving: true,
+          };
+        }
+        return {
+          ...elevator,
+          isMoving: false,
         };
       }
 
@@ -444,19 +690,23 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
           faultType: null,
           passengerCount: Math.floor(Math.random() * (level.passengerRange[1] - level.passengerRange[0] + 1)) + level.passengerRange[0],
           isMoving: true,
+          holdFloor: null,
+          diagnosisAttempts: 0,
+          diagnosisResult: null,
+          suspectedFaultType: null,
         };
       }
 
       return elevator;
     });
 
-    const faultCount = newElevators.filter((e) => e.status === 'fault' || e.status === 'rescuing').length;
+    const activeFaultCount = newElevators.filter((e) => e.status === 'fault' || e.status === 'rescuing').length;
     const lastFaultTime = newEvents
       .filter((e) => e.type === 'fault')
       .slice(-1)[0]?.time ?? 0;
 
     if (
-      faultCount < level.maxConcurrentFaults &&
+      activeFaultCount < level.maxConcurrentFaults &&
       newGameTime - lastFaultTime > level.faultInterval[0] &&
       Math.random() < (deltaTime / level.faultInterval[1])
     ) {
@@ -474,6 +724,9 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
               isMoving: false,
               waitTime: 0,
               mood: 'calm' as const,
+              diagnosisAttempts: 0,
+              diagnosisResult: null,
+              suspectedFaultType: null,
             };
           }
           return e;
@@ -486,6 +739,22 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
           message: `${targetElevator.name} 在 ${Math.floor(targetElevator.currentFloor)} 层发生故障！`,
           elevatorId: targetElevator.id,
         });
+      }
+    }
+
+    if (!newResult) {
+      if (level.winCondition === 'all_rescued') {
+        const hasActiveFaults = newElevators.some((e) => e.status === 'fault' || e.status === 'rescuing');
+        const totalFaults = newEvents.filter((e) => e.type === 'fault').length;
+        if (totalFaults > 0 && !hasActiveFaults && newGameTime > 10) {
+          newResult = 'win';
+          newLoseReason = null;
+        }
+      } else if (level.winCondition === 'score_threshold' && level.winScore) {
+        if (newScore >= level.winScore) {
+          newResult = 'win';
+          newLoseReason = null;
+        }
       }
     }
 
@@ -585,6 +854,9 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
         totalFaults: state.events.filter((e) => e.type === 'fault').length,
         totalConflicts: state.events.filter((e) => e.type === 'conflict').length,
         totalMoodChanges: state.events.filter((e) => e.type === 'mood_change').length,
+        totalComforts: state.events.filter((e) => e.type === 'comfort').length,
+        totalDiagnosis: state.events.filter((e) => e.type === 'diagnosis_success' || e.type === 'diagnosis_fail').length,
+        totalHolds: state.events.filter((e) => e.type === 'hold').length,
       },
       eventLog: state.events,
       exportTime: new Date().toISOString(),
@@ -626,12 +898,15 @@ function calculateScoreBreakdown(state: GameState): ScoreBreakdown {
   const totalPanics = state.events.filter((e) => e.type === 'mood_change' && e.message.includes('恐慌')).length;
   const totalTimeouts = state.events.filter((e) => e.type === 'timeout').length;
   const falseAlarms = state.events.filter((e) => e.type === 'info' && e.message.includes('误报')).length;
+  const totalDiagnosisSuccess = state.events.filter((e) => e.type === 'diagnosis_success').length;
+  const totalDiagnosisFail = state.events.filter((e) => e.type === 'diagnosis_fail').length;
+  const totalComforts = state.events.filter((e) => e.type === 'comfort' && e.message.includes('成功')).length;
 
   return {
     totalRescues,
-    totalRescuePoints: (totalRescues - falseAlarms) * level.rescueBonus,
+    totalRescuePoints: (totalRescues - falseAlarms) * level.rescueBonus + totalDiagnosisSuccess * DIAGNOSIS_BONUS + totalComforts * COMFORT_BONUS,
     totalConflicts,
-    totalConflictPenalty: totalConflicts * level.conflictPenalty,
+    totalConflictPenalty: totalConflicts * level.conflictPenalty + totalDiagnosisFail * DIAGNOSIS_PENALTY + falseAlarms * 50,
     totalPanics,
     totalPanicPenalty: totalPanics * level.panicPenalty,
     totalTimeouts,

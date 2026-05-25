@@ -74,40 +74,49 @@ export default function LevelSelect() {
           <div className="mb-8 p-6 bg-[#1a2a4a] rounded-xl border border-[#ff8a00]/30">
             <h3 className="text-xl font-bold mb-4 text-[#ff8a00]">游戏规则</h3>
             <div className="grid md:grid-cols-2 gap-6 text-sm">
-              <div>
-                <h4 className="font-bold mb-2 text-white">🎯 游戏目标</h4>
-                <ul className="space-y-1 text-gray-300">
-                  <li>• 在规定时间内救援所有故障电梯中的乘客</li>
-                  <li>• 或达到关卡要求的分数阈值</li>
-                  <li>• 合理调度维保队，避免冲突</li>
-                </ul>
+                <div>
+                  <h4 className="font-bold mb-2 text-white">🎯 游戏目标</h4>
+                  <ul className="space-y-1 text-gray-300">
+                    <li>• 在规定时间内救援所有故障电梯中的乘客</li>
+                    <li>• 或达到关卡要求的分数阈值</li>
+                    <li>• 合理调度维保队，避免冲突</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-bold mb-2 text-white">⚡ 核心操作</h4>
+                  <ul className="space-y-1 text-gray-300">
+                    <li>• <span className="text-[#ff8a00]">维保派遣</span>：点击队伍 → 点击故障电梯</li>
+                    <li>• <span className="text-[#4caf50]">安抚乘客</span>：点击"安抚乘客"按钮派遣队伍</li>
+                    <li>• <span className="text-[#2196f3]">停靠管制</span>：将电梯锁定在指定楼层</li>
+                    <li>• <span className="text-[#9c27b0]">故障诊断</span>：判断故障类型获得额外分数</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-bold mb-2 text-white">📊 计分规则</h4>
+                  <ul className="space-y-1 text-gray-300">
+                    <li>• 成功救援：+200~500 分（根据关卡）</li>
+                    <li>• 维保队冲突：-50~200 分</li>
+                    <li>• 乘客恐慌：-100~400 分</li>
+                    <li>• 故障误报：-50 分</li>
+                    <li>• <span className="text-[#4caf50]">成功安抚：+30 分</span></li>
+                    <li>• <span className="text-[#9c27b0]">诊断正确：+100 分，错误：-50 分</span></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-bold mb-2 text-white">⚠️ 失败条件</h4>
+                  <ul className="space-y-1 text-gray-300">
+                    <li>• 乘客等待时间超过 90 秒</li>
+                    <li>• 时间结束仍有未救援故障</li>
+                    <li>• 未达到分数阈值</li>
+                  </ul>
+                  <h4 className="font-bold mb-2 text-white mt-3">🏆 胜利条件</h4>
+                  <ul className="space-y-1 text-gray-300">
+                    <li>• 所有故障电梯救援完成（即时胜利）</li>
+                    <li>• 达到目标分数（即时胜利）</li>
+                    <li>• 时间结束时达成胜利条件</li>
+                  </ul>
+                </div>
               </div>
-              <div>
-                <h4 className="font-bold mb-2 text-white">⚡ 操作说明</h4>
-                <ul className="space-y-1 text-gray-300">
-                  <li>• 点击维保队卡片选中队伍</li>
-                  <li>• 点击闪烁的故障电梯进行派遣</li>
-                  <li>• 也可先选电梯再选队伍</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-bold mb-2 text-white">📊 计分规则</h4>
-                <ul className="space-y-1 text-gray-300">
-                  <li>• 成功救援：+200~500 分（根据关卡）</li>
-                  <li>• 维保队冲突：-50~200 分</li>
-                  <li>• 乘客恐慌：-100~400 分</li>
-                  <li>• 故障误报：-50 分</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-bold mb-2 text-white">⚠️ 失败条件</h4>
-                <ul className="space-y-1 text-gray-300">
-                  <li>• 乘客等待时间超过 90 秒</li>
-                  <li>• 时间结束仍有未救援故障</li>
-                  <li>• 未达到分数阈值</li>
-                </ul>
-              </div>
-            </div>
           </div>
         )}
 

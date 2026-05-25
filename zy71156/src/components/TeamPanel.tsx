@@ -21,6 +21,8 @@ export default function TeamPanel({ teams, elevators }: TeamPanelProps) {
         return 'bg-[#2196f3]';
       case 'conflict':
         return 'bg-[#ff4d4d]';
+      case 'comforting':
+        return 'bg-[#4caf50]';
       default:
         return 'bg-gray-500';
     }
@@ -37,6 +39,8 @@ export default function TeamPanel({ teams, elevators }: TeamPanelProps) {
         return 'bg-[#2196f3]/10 border-[#2196f3]/50';
       case 'conflict':
         return 'bg-[#ff4d4d]/10 border-[#ff4d4d]/50';
+      case 'comforting':
+        return 'bg-[#4caf50]/10 border-[#4caf50]/50';
       default:
         return 'bg-gray-500/10 border-gray-500/50';
     }
@@ -60,6 +64,7 @@ export default function TeamPanel({ teams, elevators }: TeamPanelProps) {
           const isSelected = selectedTeamId === team.id;
           const assignedElevator = elevators.find((e) => e.id === team.assignedElevatorId);
           const canSelect = team.status === 'idle' && status !== 'paused' && status !== 'replaying';
+          const assignedElevatorForComfort = team.status === 'comforting' ? elevators.find((e) => e.id === team.assignedElevatorId) : null;
 
           return (
             <div
@@ -92,10 +97,10 @@ export default function TeamPanel({ teams, elevators }: TeamPanelProps) {
                 )}
               </div>
 
-              {assignedElevator && (
+              {(assignedElevator || assignedElevatorForComfort) && (
                 <div className="mt-2 text-xs text-gray-400 flex items-center justify-between">
                   <span>
-                    处理: {assignedElevator.name} ({Math.floor(assignedElevator.currentFloor + 1)}F)
+                    {team.status === 'comforting' ? '安抚' : '处理'}: {(assignedElevator || assignedElevatorForComfort)?.name} ({Math.floor(((assignedElevator || assignedElevatorForComfort)?.currentFloor || 0) + 1)}F)
                   </span>
                   {team.status === 'conflict' && (
                     <span className="flex items-center gap-1 text-[#ff4d4d]">
@@ -119,7 +124,24 @@ export default function TeamPanel({ teams, elevators }: TeamPanelProps) {
                 </div>
               )}
 
-              {team.status !== 'idle' && status !== 'paused' && status !== 'replaying' && (
+              {team.status === 'comforting' && assignedElevatorForComfort && (
+                <div className="mt-2">
+                  <div className="flex items-center justify-between text-[10px] text-[#4caf50] mb-1">
+                    <span>安抚进度</span>
+                    <span>{Math.floor((assignedElevatorForComfort.comfortProgress / 10) * 100)}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#4caf50] transition-all"
+                      style={{
+                        width: `${(assignedElevatorForComfort.comfortProgress / 10) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {(team.status !== 'idle') && status !== 'paused' && status !== 'replaying' && (
                 <button
                   className="mt-2 w-full py-1 text-xs bg-[#ff4d4d]/20 hover:bg-[#ff4d4d]/40 text-[#ff4d4d] rounded transition-colors flex items-center justify-center gap-1"
                   onClick={(e) => {
@@ -128,7 +150,7 @@ export default function TeamPanel({ teams, elevators }: TeamPanelProps) {
                   }}
                 >
                   <X size={12} />
-                  取消派遣
+                  {team.status === 'comforting' ? '取消安抚' : '取消派遣'}
                 </button>
               )}
             </div>

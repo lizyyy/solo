@@ -22,6 +22,8 @@ export default function BuildingView({ floorCount, elevators, teams }: BuildingV
         return 'bg-[#ffc107]';
       case 'rescued':
         return 'bg-[#2196f3]';
+      case 'holding':
+        return 'bg-[#2196f3]';
       default:
         return 'bg-gray-500';
     }
@@ -86,7 +88,7 @@ export default function BuildingView({ floorCount, elevators, teams }: BuildingV
             const elevatorX = 60 + idx * (elevatorWidth + elevatorGap);
             const elevatorY = getElevatorY(elevator.currentFloor, floorHeight);
             const isSelected = selectedElevatorId === elevator.id;
-            const isTargetable = selectedTeamId !== null && (elevator.status === 'fault');
+            const isTargetable = selectedTeamId !== null && (elevator.status === 'fault' || elevator.status === 'holding');
             const assignedTeam = teams.find((t) => t.assignedElevatorId === elevator.id && t.status !== 'idle');
 
             return (
@@ -105,6 +107,8 @@ export default function BuildingView({ floorCount, elevators, teams }: BuildingV
                       : '#334155',
                     boxShadow: elevator.status === 'fault'
                       ? '0 0 20px rgba(255, 77, 77, 0.5)'
+                      : elevator.status === 'holding'
+                      ? '0 0 15px rgba(33, 150, 243, 0.5)'
                       : isTargetable
                       ? '0 0 15px rgba(255, 77, 77, 0.3)'
                       : isSelected
@@ -114,6 +118,8 @@ export default function BuildingView({ floorCount, elevators, teams }: BuildingV
                       ? 'rgba(255, 77, 77, 0.1)'
                       : elevator.status === 'rescuing'
                       ? 'rgba(255, 193, 7, 0.1)'
+                      : elevator.status === 'holding'
+                      ? 'rgba(33, 150, 243, 0.1)'
                       : 'rgba(26, 42, 74, 0.8)',
                   }}
                   onClick={() => status !== 'paused' && status !== 'replaying' && selectElevator(elevator.id)}
@@ -122,7 +128,7 @@ export default function BuildingView({ floorCount, elevators, teams }: BuildingV
                     <div className="flex items-center justify-between w-full px-1">
                       <span className="text-xs font-bold text-white">{elevator.name}</span>
                       <span className={`text-[10px] px-1.5 py-0.5 rounded ${getElevatorStatusColor(elevator)} text-white`}>
-                        {elevator.status === 'fault' ? '故障' : elevator.status === 'rescuing' ? '救援中' : elevator.status === 'rescued' ? '已救' : '正常'}
+                        {elevator.status === 'fault' ? '故障' : elevator.status === 'rescuing' ? '救援中' : elevator.status === 'rescued' ? '已救' : elevator.status === 'holding' ? '管制' : '正常'}
                       </span>
                     </div>
 
@@ -250,7 +256,7 @@ export default function BuildingView({ floorCount, elevators, teams }: BuildingV
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded bg-[#2196f3]" />
-          <span>已救援</span>
+          <span>已救援/管制</span>
         </div>
       </div>
     </div>

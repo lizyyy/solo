@@ -1,10 +1,11 @@
-export type ElevatorStatus = 'normal' | 'fault' | 'rescuing' | 'rescued';
-export type TeamStatus = 'idle' | 'moving' | 'working' | 'conflict';
+export type ElevatorStatus = 'normal' | 'fault' | 'rescuing' | 'rescued' | 'holding';
+export type TeamStatus = 'idle' | 'moving' | 'working' | 'conflict' | 'comforting';
 export type GameStatus = 'menu' | 'playing' | 'paused' | 'ended' | 'replaying';
 export type FaultType = 'door_jam' | 'power_out' | 'overload' | 'false_alarm' | 'cable_issue';
 export type PassengerMood = 'calm' | 'anxious' | 'panic';
 export type GameResult = 'win' | 'lose' | null;
 export type LoseReason = 'timeout' | 'passenger_panic' | 'too_many_conflicts' | null;
+export type DiagnosisResult = 'correct' | 'wrong' | null;
 
 export interface Elevator {
   id: string;
@@ -19,6 +20,11 @@ export interface Elevator {
   mood: PassengerMood;
   rescueProgress: number;
   isMoving: boolean;
+  holdFloor: number | null;
+  comfortProgress: number;
+  diagnosisAttempts: number;
+  diagnosisResult: DiagnosisResult;
+  suspectedFaultType: FaultType | null;
 }
 
 export interface MaintenanceTeam {
@@ -35,7 +41,7 @@ export interface MaintenanceTeam {
 export interface GameEvent {
   id: string;
   time: number;
-  type: 'fault' | 'rescue_start' | 'rescue_complete' | 'timeout' | 'conflict' | 'mood_change' | 'info';
+  type: 'fault' | 'rescue_start' | 'rescue_complete' | 'timeout' | 'conflict' | 'mood_change' | 'info' | 'comfort' | 'hold' | 'diagnosis' | 'diagnosis_success' | 'diagnosis_fail';
   message: string;
   elevatorId?: string;
   teamId?: string;
@@ -116,4 +122,8 @@ export interface GameActions {
   setReplaySpeed: (speed: number) => void;
   exportReport: () => string;
   loadHistory: (history: HistoryFrame[]) => void;
+  comfortPassengers: (teamId: string, elevatorId: string) => void;
+  holdElevatorAtFloor: (elevatorId: string, floor: number) => void;
+  releaseElevatorHold: (elevatorId: string) => void;
+  diagnoseFault: (elevatorId: string, suspectedType: FaultType) => void;
 }
