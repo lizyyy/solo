@@ -182,6 +182,10 @@ export class GameEngine {
             newWarnings.forEach((w) => {
                 addEvent('warning', `碰撞警告：${w.object1Id} 与 ${w.object2Id} 距离过近`);
                 newScore = ScoringSystem.applyCollisionWarningPenalty(newScore);
+                const safetyObjective = newObjectives.find((o) => o.type === 'safety');
+                if (safetyObjective) {
+                    safetyObjective.currentValue++;
+                }
             });
         }
         for (const ship of newShips) {
@@ -201,6 +205,15 @@ export class GameEngine {
             fuelObjective.currentValue = Math.floor(fuelEfficiency);
             if (fuelEfficiency >= fuelObjective.targetValue) {
                 fuelObjective.completed = true;
+            }
+        }
+        const safetyObjective = newObjectives.find((o) => o.type === 'safety');
+        if (safetyObjective) {
+            if (safetyObjective.targetValue === 0) {
+                safetyObjective.completed = safetyObjective.currentValue === 0;
+            }
+            else {
+                safetyObjective.completed = safetyObjective.currentValue <= safetyObjective.targetValue;
             }
         }
         const objectivesScore = ScoringSystem.calculateObjectivesScore(newObjectives);
