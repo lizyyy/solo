@@ -41,7 +41,7 @@ export const Artifact3D = ({
   const baseColor = hasConflict ? '#FF4444' : typeColors[artifact.type];
   const displayColor = isSelected ? '#FFD700' : hovered ? '#FFFFFF' : baseColor;
 
-  useFrame((state) => {
+  useFrame(() => {
     if (meshRef.current && (hovered || isSelected)) {
       meshRef.current.rotation.y += 0.02;
     }

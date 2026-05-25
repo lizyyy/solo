@@ -1,4 +1,4 @@
-import { ExcavationSquare, Artifact, SoilLayer, ValidationError } from '../types';
+import { ExcavationSquare, Artifact, ValidationError } from '../types';
 import { getTypeLabel } from './filterEngine';
 
 export const generateReportHTML = (

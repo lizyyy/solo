@@ -3,6 +3,7 @@ import { LayerPanel } from '../components/ui/LayerPanel';
 import { FilterPanel } from '../components/ui/FilterPanel';
 import { InfoPanel } from '../components/ui/InfoPanel';
 import { ViewControls } from '../components/ui/ViewControls';
+import { Timeline } from '../components/ui/Timeline';
 import { ExcavationScene } from '../components/three/ExcavationScene';
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
           <ExcavationScene />
           <ViewControls />
           <InfoPanel />
+          <Timeline />
         </div>
 
         <FilterPanel />

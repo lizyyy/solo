@@ -6,17 +6,19 @@ interface SoilLayer3DProps {
   layer: SoilLayer;
   gridSize: { x: number; y: number; z: number };
   visible: boolean;
-  maxDepth: number;
+  animationProgress: number;
 }
 
 export const SoilLayer3D = ({
   layer,
   gridSize,
   visible,
-  maxDepth,
+  animationProgress,
 }: SoilLayer3DProps) => {
-  const height = layer.depthBottom - layer.depthTop;
-  const centerY = (layer.depthTop + layer.depthBottom) / 2;
+  const baseHeight = layer.depthBottom - layer.depthTop;
+  const layerProgress = Math.max(0, Math.min(1, animationProgress));
+  const actualHeight = baseHeight * layerProgress;
+  const actualCenterY = layer.depthTop + actualHeight / 2;
 
   const sideMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -29,11 +31,9 @@ export const SoilLayer3D = ({
 
   const edgeLines = useMemo(() => {
     const points: THREE.Vector3[] = [];
-    const hw = gridSize.x / 2;
-    const hd = gridSize.y / 2;
-
+    const effectiveBottom = layer.depthTop + actualHeight;
     const topY = layer.depthTop;
-    const bottomY = layer.depthBottom;
+    const bottomY = effectiveBottom;
 
     points.push(new THREE.Vector3(0, topY, 0));
     points.push(new THREE.Vector3(gridSize.x, topY, 0));
@@ -61,14 +61,11 @@ export const SoilLayer3D = ({
 
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
     return geometry;
-  }, [layer, gridSize]);
+  }, [layer, gridSize, actualHeight]);
 
   if (!visible) {
     return (
-      <lineSegments
-        geometry={edgeLines}
-        position={[0, 0, 0]}
-      >
+      <lineSegments geometry={edgeLines} position={[0, 0, 0]}>
         <lineBasicMaterial color={layer.color} transparent opacity={0.2} />
       </lineSegments>
     );
@@ -76,8 +73,8 @@ export const SoilLayer3D = ({
 
   return (
     <group>
-      <mesh position={[gridSize.x / 2, centerY, gridSize.y / 2]}>
-        <boxGeometry args={[gridSize.x, height, gridSize.y]} />
+      <mesh position={[gridSize.x / 2, actualCenterY, gridSize.y / 2]}>
+        <boxGeometry args={[gridSize.x, actualHeight, gridSize.y]} />
         <primitive object={sideMaterial} attach="material" />
       </mesh>
 

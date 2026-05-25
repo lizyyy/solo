@@ -1,8 +1,8 @@
-import { useRef, useMemo } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { useRef, useMemo, useState, useEffect } from 'react';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import * as THREE from 'three';
+import { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useStore } from '../../store/useStore';
 import { filterArtifacts } from '../../utils/filterEngine';
 import { getConflictingArtifactIds } from '../../utils/dataValidator';
@@ -18,7 +18,7 @@ interface CameraControllerProps {
 
 const CameraController = ({ view, gridSize }: CameraControllerProps) => {
   const { camera } = useThree();
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<OrbitControlsImpl>(null);
 
   useMemo(() => {
     const centerX = gridSize.x / 2;
@@ -57,19 +57,57 @@ const CameraController = ({ view, gridSize }: CameraControllerProps) => {
   return <OrbitControls ref={controlsRef} makeDefault />;
 };
 
+const AnimationController = ({
+  isPlaying,
+  speed,
+  onProgress,
+}: {
+  isPlaying: boolean;
+  speed: number;
+  onProgress: (progress: number) => void;
+}) => {
+  const progressRef = useRef(0);
+
+  useFrame(() => {
+    if (isPlaying) {
+      progressRef.current += 0.005 * speed;
+      if (progressRef.current >= 1) {
+        progressRef.current = 0;
+      }
+      onProgress(progressRef.current);
+    }
+  });
+
+  return null;
+};
+
 const SceneContent = () => {
   const excavationData = useStore((state) => state.excavationData);
   const filters = useStore((state) => state.filters);
   const visibleLayerIds = useStore((state) => state.visibleLayerIds);
   const cameraView = useStore((state) => state.cameraView);
   const validationErrors = useStore((state) => state.validationErrors);
+  const timeline = useStore((state) => state.timeline);
   const selectArtifact = useStore((state) => state.selectArtifact);
+  const [animationProgress, setAnimationProgress] = useState(1);
+
+  useEffect(() => {
+    if (!timeline.isPlaying) {
+      setAnimationProgress(1);
+    }
+  }, [timeline.isPlaying]);
 
   if (!excavationData) return null;
 
   const filteredArtifacts = filterArtifacts(excavationData.artifacts, filters);
   const filteredArtifactIds = new Set(filteredArtifacts.map((a) => a.id));
   const conflictingArtifactIds = getConflictingArtifactIds(validationErrors);
+
+  const getLayerAnimationProgress = (layerDepthBottom: number) => {
+    const maxDepth = excavationData.gridSize.z;
+    const layerThreshold = layerDepthBottom / maxDepth;
+    return Math.max(0, Math.min(1, animationProgress / layerThreshold));
+  };
 
   return (
     <>
@@ -81,6 +119,12 @@ const SceneContent = () => {
       />
       <pointLight position={[50, 150, 50]} intensity={0.5} color="#D4A574" />
 
+      <AnimationController
+        isPlaying={timeline.isPlaying}
+        speed={timeline.speed}
+        onProgress={setAnimationProgress}
+      />
+
       <CameraController view={cameraView} gridSize={excavationData.gridSize} />
 
       <Grid3D size={excavationData.gridSize} />
@@ -91,7 +135,11 @@ const SceneContent = () => {
           layer={layer}
           gridSize={excavationData.gridSize}
           visible={visibleLayerIds.includes(layer.id)}
-          maxDepth={excavationData.gridSize.z}
+          animationProgress={
+            timeline.isPlaying
+              ? getLayerAnimationProgress(layer.depthBottom)
+              : 1
+          }
         />
       ))}
 

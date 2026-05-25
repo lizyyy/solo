@@ -43,7 +43,7 @@ export const Header = () => {
           setExcavationData(data);
           const errors = validateExcavationData(data);
           setValidationErrors(errors);
-        } catch (error) {
+        } catch {
           alert('JSON 文件格式错误');
         }
       };

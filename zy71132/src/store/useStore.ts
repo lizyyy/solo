@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import {
   ExcavationSquare,
-  SoilLayer,
   Artifact,
   FilterState,
   ValidationError,
