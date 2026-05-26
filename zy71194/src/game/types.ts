@@ -148,6 +148,7 @@ export interface GameActions {
   endGame: () => void;
   endTurn: () => void;
   moveToNode: (nodeId: string) => void;
+  canUseEventChoice: (choiceIndex: number) => { canUse: boolean; missingItems: string[] };
   handleEventChoice: (choiceIndex: number) => void;
   discardItem: (itemId: string, quantity: number) => void;
   supplyItem: (itemId: string) => void;

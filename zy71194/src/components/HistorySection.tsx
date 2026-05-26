@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { History, Play, Trash2, Trophy, XCircle, Calendar } from 'lucide-react';
 import { ReplayData } from '../game/types';
+import { useGameStore } from '../game/state';
 
 export const HistorySection: React.FC = () => {
+  const { startReplay } = useGameStore();
   const [replays, setReplays] = useState<ReplayData[]>([]);
 
   useEffect(() => {
@@ -87,9 +89,8 @@ export const HistorySection: React.FC = () => {
                   </div>
 
                   <button
-                    className="game-btn-secondary flex items-center gap-2 text-sm"
-                    disabled
-                    title="回放功能开发中"
+                    onClick={() => startReplay(replay)}
+                    className="game-btn-primary flex items-center gap-2 text-sm"
                   >
                     <Play className="w-4 h-4" />
                     回放

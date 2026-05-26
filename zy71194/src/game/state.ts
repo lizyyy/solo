@@ -267,12 +267,36 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
     set({ replayData });
   },
 
+  canUseEventChoice: (choiceIndex: number): { canUse: boolean; missingItems: string[] } => {
+    const state = get();
+    if (!state.activeEvent) return { canUse: false, missingItems: [] };
+
+    const choice = state.activeEvent.choices[choiceIndex];
+    if (!choice) return { canUse: false, missingItems: [] };
+
+    const missingItems: string[] = [];
+    if (choice.effect.removeItems) {
+      choice.effect.removeItems.forEach(itemId => {
+        const item = state.inventory.find(i => i.id === itemId && i.quantity > 0 && !i.isExpired);
+        if (!item) {
+          const itemDef = state.currentLevel?.startInventory.find(i => i.id === itemId);
+          missingItems.push(itemDef?.name || itemId);
+        }
+      });
+    }
+
+    return { canUse: missingItems.length === 0, missingItems };
+  },
+
   handleEventChoice: (choiceIndex: number) => {
     const state = get();
     if (!state.activeEvent) return;
 
     const choice = state.activeEvent.choices[choiceIndex];
     if (!choice) return;
+
+    const { canUse } = get().canUseEventChoice(choiceIndex);
+    if (!canUse) return;
 
     let newHealth = state.team.health;
     let newActionPoints = state.team.actionPoints;
@@ -290,7 +314,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
     }
     if (choice.effect.removeItems) {
       choice.effect.removeItems.forEach(itemId => {
-        const idx = newInventory.findIndex(i => i.id === itemId && i.quantity > 0);
+        const idx = newInventory.findIndex(i => i.id === itemId && i.quantity > 0 && !i.isExpired);
         if (idx >= 0) {
           newInventory[idx] = {
             ...newInventory[idx],

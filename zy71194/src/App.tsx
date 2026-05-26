@@ -11,6 +11,7 @@ import { PauseMenu } from './components/PauseMenu';
 import { Settlement } from './components/Settlement';
 import { HistorySection } from './components/HistorySection';
 import { RulesSection } from './components/RulesSection';
+import { ReplayPlayer } from './components/ReplayPlayer';
 
 const GameScreen: React.FC = () => {
   const { currentLevel } = useGameStore();
@@ -64,6 +65,7 @@ const App: React.FC = () => {
     <div className="min-h-screen">
       {status === 'menu' && <MenuScreen />}
       {status === 'levelSelect' && <LevelSelect />}
+      {status === 'replay' && <ReplayPlayer />}
       {(status === 'playing' || status === 'paused' || status === 'settlement') && <GameScreen />}
     </div>
   );

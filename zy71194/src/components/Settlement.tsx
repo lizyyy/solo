@@ -3,7 +3,7 @@ import { Trophy, XCircle, Home, RotateCcw, Download, Play } from 'lucide-react';
 import { useGameStore } from '../game/state';
 
 export const Settlement: React.FC = () => {
-  const { status, isWin, failReason, score, turn, maxTurns, team, exportReport, goToMenu, restartGame, replayData } = useGameStore();
+  const { status, isWin, failReason, score, turn, maxTurns, team, exportReport, goToMenu, restartGame, replayData, startReplay } = useGameStore();
 
   if (status !== 'settlement') return null;
 
@@ -113,11 +113,11 @@ export const Settlement: React.FC = () => {
 
             {replayData && (
               <button
-                onClick={() => {}}
-                className="w-full game-btn-secondary flex items-center justify-center gap-2"
+                onClick={() => startReplay(replayData)}
+                className="w-full game-btn-primary flex items-center justify-center gap-2"
               >
                 <Play className="w-5 h-5" />
-                观看回放 (开发中)
+                观看回放
               </button>
             )}
 
