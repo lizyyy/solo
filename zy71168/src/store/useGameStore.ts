@@ -48,7 +48,8 @@ const initialState: GameState = {
   isPaused: false,
   failureReason: null,
   replayIndex: 0,
-  isReplaying: false
+  isReplaying: false,
+  draggingChemicalId: null
 };
 
 interface GameActions {
@@ -69,6 +70,7 @@ interface GameActions {
   replayNext: () => void;
   replayPrev: () => void;
   reset: () => void;
+  setDraggingChemical: (chemicalId: string | null) => void;
 }
 
 export const useGameStore = create<GameState & GameActions>((set, get) => ({
@@ -421,5 +423,9 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
 
   reset: () => {
     set(initialState);
+  },
+
+  setDraggingChemical: (chemicalId: string | null) => {
+    set({ draggingChemicalId: chemicalId });
   }
 }));

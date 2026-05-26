@@ -22,6 +22,7 @@ export const ChemicalCard: React.FC<ChemicalCardProps> = ({
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', chemical.id);
     onDragStart(chemical.id);
   };
 

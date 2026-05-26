@@ -112,6 +112,7 @@ export interface GameState {
   failureReason: string | null;
   replayIndex: number;
   isReplaying: boolean;
+  draggingChemicalId: string | null;
 }
 
 export interface ScoreDetail {
