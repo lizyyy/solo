@@ -1,9 +1,20 @@
 import { useState } from 'react';
-import type { InspectionReport, ReplayFrame } from '../game/types';
+import type { InspectionReport } from '../game/types';
+
+interface ReplayInfo {
+  id: string;
+  levelId: number;
+  timestamp: number;
+  frames: any[];
+  map: any;
+  hazards: any[];
+  totalTime: number;
+  levelName: string;
+}
 
 interface HistoryModalProps {
   reports: InspectionReport[];
-  replays: Array<{ id: string; levelId: number; timestamp: number; frames: ReplayFrame[] }>;
+  replays: ReplayInfo[];
   onClose: () => void;
   onViewReport: (report: InspectionReport) => void;
   onStartReplay: (replayId: string) => void;
@@ -26,7 +37,7 @@ export function HistoryModal({ reports, replays, onClose, onViewReport, onStartR
   const findReplayForReport = (report: InspectionReport) => {
     return replays.find(r => 
       r.levelId === report.levelId && 
-      Math.abs(r.timestamp - report.timestamp) < 5000
+      Math.abs(r.timestamp - report.timestamp) < 10000
     );
   };
 
@@ -107,6 +118,14 @@ export function HistoryModal({ reports, replays, onClose, onViewReport, onStartR
                             <p className="text-xs text-gray-400">重复</p>
                           </div>
                         </div>
+
+                        {report.timeOverrun > 0 && (
+                          <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 mb-4">
+                            <p className="text-red-400 text-sm">
+                              ⏱️ 超时: {report.timeOverrun.toFixed(1)}秒 (-{Math.round(report.timeOverrun * 10)}分)
+                            </p>
+                          </div>
+                        )}
 
                         {report.failReasons.length > 0 && (
                           <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 mb-4">

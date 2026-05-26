@@ -14,8 +14,10 @@ export function StatusPanel({ gameState, levelName }: StatusPanelProps) {
     );
   }
 
-  const timePercentage = (gameState.timeRemaining / gameState.totalTime) * 100;
-  const isLowTime = gameState.timeRemaining <= 10;
+  const isOvertime = gameState.timeRemaining < 0;
+  const displayTime = isOvertime ? Math.abs(gameState.timeRemaining) : gameState.timeRemaining;
+  const timePercentage = isOvertime ? 0 : (gameState.timeRemaining / gameState.totalTime) * 100;
+  const isLowTime = gameState.timeRemaining <= 10 && gameState.timeRemaining >= 0;
   const realHazards = gameState.hazards.filter(h => h.isHazard);
   const foundHazards = realHazards.filter(h => h.marked && h.markCorrect).length;
   const wrongMarks = gameState.hazards.filter(h => h.marked && !h.markCorrect).length;
@@ -30,19 +32,26 @@ export function StatusPanel({ gameState, levelName }: StatusPanelProps) {
 
       <div className="space-y-2">
         <div className="flex justify-between items-center">
-          <span className="text-gray-400 text-sm">剩余时间</span>
-          <span className={`font-mono font-bold text-lg ${isLowTime ? 'text-red-500 animate-pulse' : 'text-white'}`}>
-            {Math.ceil(gameState.timeRemaining)}秒
+          <span className="text-gray-400 text-sm">
+            {isOvertime ? '超时时间' : '剩余时间'}
+          </span>
+          <span className={`font-mono font-bold text-lg ${
+            isOvertime ? 'text-red-500 animate-pulse' : isLowTime ? 'text-red-500 animate-pulse' : 'text-white'
+          }`}>
+            {Math.ceil(displayTime)}秒
           </span>
         </div>
         <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
           <div
             className={`h-full transition-all duration-300 ${
-              isLowTime ? 'bg-red-500' : timePercentage > 50 ? 'bg-green-500' : 'bg-yellow-500'
+              isOvertime ? 'bg-red-500' : isLowTime ? 'bg-red-500' : timePercentage > 50 ? 'bg-green-500' : 'bg-yellow-500'
             }`}
-            style={{ width: `${timePercentage}%` }}
+            style={{ width: `${isOvertime ? '100%' : `${timePercentage}%`}` }}
           />
         </div>
+        {isOvertime && (
+          <p className="text-red-400 text-xs text-center">超时中，每秒扣10分！</p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -72,7 +81,7 @@ export function StatusPanel({ gameState, levelName }: StatusPanelProps) {
       <div className="space-y-3">
         <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">隐患进度</h3>
         <div className="space-y-2">
-          {gameState.hazards.slice(0, 6).map((hazard, index) => (
+          {gameState.hazards.slice(0, 6).map((hazard) => (
             <div key={hazard.id} className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-full ${
                 hazard.marked

@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
-import type { GameState, InspectionReport, LevelConfig, ReplayFrame } from '../game/types';
+import { useState, useCallback, useEffect } from 'react';
+import type { GameState, InspectionReport, LevelConfig, ReplayFrame, GameMap, Hazard } from '../game/types';
 import { GameCanvas } from '../components/GameCanvas';
 import { StatusPanel } from '../components/StatusPanel';
 import { ControlPanel } from '../components/ControlPanel';
@@ -12,9 +12,10 @@ interface ReplayData {
   levelId: number;
   timestamp: number;
   frames: ReplayFrame[];
-  map: any;
-  hazards: any[];
+  map: GameMap | null;
+  hazards: Hazard[];
   totalTime: number;
+  levelName: string;
 }
 
 export default function Home() {
@@ -53,20 +54,20 @@ export default function Home() {
       setHistoryReports(reports);
       
       const replaySystem = engine.getReplaySystem();
-      const replayList = replaySystem.getReplayList();
+      const allReplays = replaySystem.loadAllFromStorage();
       
-      const loadedReplays: ReplayData[] = replayList.map(r => {
-        const frames = replaySystem.loadFromStorage(r.id);
-        if (frames && frames.length > 0) {
-          const lastFrame = frames[frames.length - 1];
+      const loadedReplays: ReplayData[] = allReplays.map((snapshot: any) => {
+        if (snapshot.frames && snapshot.frames.length > 0) {
+          const lastFrame = snapshot.frames[snapshot.frames.length - 1];
           return {
-            id: r.id,
-            levelId: r.levelId,
-            timestamp: r.timestamp,
-            frames,
-            map: gameState?.map || null,
-            hazards: gameState?.hazards || [],
-            totalTime: lastFrame.timestamp / 1000
+            id: snapshot.id,
+            levelId: snapshot.levelId,
+            timestamp: snapshot.timestamp,
+            frames: snapshot.frames,
+            map: snapshot.map || null,
+            hazards: snapshot.hazards || [],
+            totalTime: lastFrame.timestamp / 1000,
+            levelName: snapshot.levelConfig?.name || `关卡 ${snapshot.levelId}`
           };
         }
         return null;
@@ -74,7 +75,7 @@ export default function Home() {
       
       setReplays(loadedReplays);
     }
-  }, [engine, gameState]);
+  }, [engine]);
 
   useEffect(() => {
     refreshHistory();
@@ -114,16 +115,12 @@ export default function Home() {
 
   const handleStartReplay = useCallback((replayId: string) => {
     const replay = replays.find(r => r.id === replayId);
-    if (replay && gameState) {
-      setCurrentReplay({
-        ...replay,
-        map: gameState.map,
-        hazards: gameState.hazards
-      });
+    if (replay && replay.map) {
+      setCurrentReplay(replay);
       setShowHistory(false);
       setShowReplay(true);
     }
-  }, [replays, gameState]);
+  }, [replays]);
 
   const currentLevelName = gameState 
     ? levels.find(l => l.id === gameState.currentLevel)?.name || ''
@@ -180,6 +177,15 @@ export default function Home() {
               <div className="mt-4 bg-yellow-900/30 border border-yellow-700 rounded-xl p-4 text-center">
                 <p className="text-yellow-400 font-semibold">游戏已暂停</p>
                 <p className="text-yellow-300 text-sm mt-1">点击"继续"按钮恢复游戏</p>
+              </div>
+            )}
+
+            {gameState && gameState.timeRemaining < 0 && (
+              <div className="mt-4 bg-red-900/30 border border-red-700 rounded-xl p-4 text-center">
+                <p className="text-red-400 font-semibold">
+                  超时中... 已超时 {Math.abs(gameState.timeRemaining).toFixed(1)} 秒
+                </p>
+                <p className="text-red-300 text-sm mt-1">超时每秒扣10分，请尽快完成！</p>
               </div>
             )}
           </div>

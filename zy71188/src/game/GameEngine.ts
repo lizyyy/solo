@@ -290,9 +290,9 @@ export class GameEngine {
   }
 
   private updateTime(deltaTime: number): void {
-    this.state.timeRemaining = Math.max(0, this.state.timeRemaining - deltaTime);
+    this.state.timeRemaining = this.state.timeRemaining - deltaTime;
 
-    if (this.state.timeRemaining <= 0) {
+    if (this.state.timeRemaining <= -30) {
       this.endGame();
     }
   }
@@ -335,7 +335,12 @@ export class GameEngine {
     );
 
     this.reportSystem.saveReport(report);
-    this.replaySystem.saveToStorage(this.state.currentLevel);
+    this.replaySystem.saveToStorage(
+      this.state.currentLevel,
+      this.state.map,
+      this.state.hazards,
+      config
+    );
 
     if (this.onGameEnd) {
       this.onGameEnd(report);

@@ -1,4 +1,14 @@
-import type { Player, MarkRecord, ReplayFrame } from '../types';
+import type { Player, MarkRecord, ReplayFrame, GameMap, Hazard, LevelConfig } from '../types';
+
+interface ReplaySnapshot {
+  id: string;
+  levelId: number;
+  timestamp: number;
+  frames: ReplayFrame[];
+  map: GameMap;
+  hazards: Hazard[];
+  levelConfig: LevelConfig;
+}
 
 export class ReplaySystem {
   private frames: ReplayFrame[] = [];
@@ -41,26 +51,30 @@ export class ReplaySystem {
     return this.frames[this.frames.length - 1].timestamp;
   }
 
-  saveToStorage(levelId: number): string {
+  saveToStorage(levelId: number, map: GameMap, hazards: Hazard[], levelConfig: LevelConfig): string {
     const replayId = `replay_${levelId}_${Date.now()}`;
-    const replayData = {
+    const replayData: ReplaySnapshot = {
       id: replayId,
       levelId,
       timestamp: Date.now(),
-      frames: this.frames
+      frames: this.frames,
+      map,
+      hazards,
+      levelConfig
     };
 
     try {
       const existing = this.loadAllFromStorage();
       existing.push(replayData);
-      localStorage.setItem(this.storageKey, JSON.stringify(existing.slice(-20)));
+      const toSave = existing.slice(-20);
+      localStorage.setItem(this.storageKey, JSON.stringify(toSave));
       return replayId;
     } catch {
       return '';
     }
   }
 
-  loadAllFromStorage(): Array<{ id: string; levelId: number; timestamp: number; frames: ReplayFrame[] }> {
+  loadAllFromStorage(): ReplaySnapshot[] {
     try {
       const data = localStorage.getItem(this.storageKey);
       return data ? JSON.parse(data) : [];
@@ -69,22 +83,22 @@ export class ReplaySystem {
     }
   }
 
-  loadFromStorage(replayId: string): ReplayFrame[] | null {
+  loadFromStorage(replayId: string): ReplaySnapshot | null {
     const replays = this.loadAllFromStorage();
-    const replay = replays.find(r => r.id === replayId);
-    return replay ? replay.frames : null;
+    return replays.find(r => r.id === replayId) || null;
   }
 
   clear(): void {
     this.frames = [];
   }
 
-  getReplayList(): Array<{ id: string; levelId: number; timestamp: number; frameCount: number }> {
+  getReplayList(): Array<{ id: string; levelId: number; timestamp: number; frameCount: number; levelName: string }> {
     return this.loadAllFromStorage().map(r => ({
       id: r.id,
       levelId: r.levelId,
       timestamp: r.timestamp,
-      frameCount: r.frames.length
+      frameCount: r.frames.length,
+      levelName: r.levelConfig?.name || `关卡 ${r.levelId}`
     }));
   }
 }
