@@ -1,0 +1,38 @@
+[
+  {
+    "id": "pest_001",
+    "name": "敌敌畏乳油",
+    "stock_quantity": 500,
+    "max_dosage_per_hectare": 2.5,
+    "safety_interval_days": 15,
+    "max_wind_speed": 5.0,
+    "unit": "L"
+  },
+  {
+    "id": "pest_002",
+    "name": "吡虫啉可湿性粉剂",
+    "stock_quantity": 200,
+    "max_dosage_per_hectare": 0.8,
+    "safety_interval_days": 7,
+    "max_wind_speed": 6.0,
+    "unit": "kg"
+  },
+  {
+    "id": "pest_003",
+    "name": "毒死蜱颗粒剂",
+    "stock_quantity": 800,
+    "max_dosage_per_hectare": 15.0,
+    "safety_interval_days": 21,
+    "max_wind_speed": 4.0,
+    "unit": "kg"
+  },
+  {
+    "id": "pest_004",
+    "name": "多菌灵悬浮剂",
+    "stock_quantity": 350,
+    "max_dosage_per_hectare": 3.0,
+    "safety_interval_days": 10,
+    "max_wind_speed": 5.5,
+    "unit": "L"
+  }
+]
