@@ -167,22 +167,25 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
 
     if (!team || !elevator) return;
     if (team.status !== 'idle') return;
-    if (elevator.status !== 'fault') return;
+    if (elevator.status !== 'fault' && elevator.status !== 'rescuing') return;
 
-    let conflict = false;
+    const existingTeam = state.teams.find(
+      (t) => t.assignedElevatorId === elevatorId && t.status !== 'idle'
+    );
+    const conflict = !!existingTeam;
+
     const updatedTeams = state.teams.map((t) => {
       if (t.id === teamId) {
         return {
           ...t,
-          status: 'moving' as const,
+          status: conflict ? 'conflict' as const : 'moving' as const,
           assignedElevatorId: elevatorId,
           progress: 0,
           targetFloor: elevator.currentFloor,
           isMoving: true,
         };
       }
-      if (t.assignedElevatorId === elevatorId && t.status !== 'idle') {
-        conflict = true;
+      if (conflict && t.id === existingTeam?.id) {
         return {
           ...t,
           status: 'conflict' as const,
@@ -193,11 +196,12 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
 
     const updatedElevators = state.elevators.map((e) => {
       if (e.id === elevatorId) {
+        const newStatus = elevator.status === 'fault' ? 'rescuing' as ElevatorStatus : elevator.status;
         return {
           ...e,
-          assignedTeamId: teamId,
-          status: 'rescuing' as const,
-          rescueProgress: 0,
+          assignedTeamId: conflict ? e.assignedTeamId : teamId,
+          status: newStatus,
+          rescueProgress: conflict ? e.rescueProgress : 0,
         };
       }
       return e;
@@ -210,7 +214,7 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
         id: generateId(),
         time: state.gameTime,
         type: 'conflict',
-        message: `维保队冲突！多部维保队同时前往 ${elevator.name}`,
+        message: `维保队冲突！${team.name} 与 ${existingTeam?.name} 同时前往 ${elevator.name}`,
         elevatorId,
         teamId,
       });
@@ -524,6 +528,21 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
         });
 
         return team;
+      }
+      if (team.status === 'conflict') {
+        const newProgress = (team.progress || 0) + deltaTime;
+        if (newProgress >= 3) {
+          return {
+            ...team,
+            status: 'idle' as const,
+            assignedElevatorId: null,
+            progress: 0,
+          };
+        }
+        return {
+          ...team,
+          progress: newProgress,
+        };
       }
       return team;
     });
