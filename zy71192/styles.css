@@ -311,6 +311,13 @@ body {
 .queue-item .status {
     font-size: 0.8rem;
     color: #718096;
+    text-align: right;
+}
+
+.queue-item .status small {
+    display: block;
+    font-size: 0.7rem;
+    color: #a0aec0;
 }
 
 .queue-item .late-badge {

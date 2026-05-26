@@ -209,8 +209,8 @@ class Game {
         const nameIndex = this.arrivedCount % PATIENT_NAMES.length;
         const number = this.arrivedCount + 1;
         
-        const vaccineTypes = [...new Set(config.vaccineBatches.map(v => v.type))];
-        const requiredVaccine = vaccineTypes[Math.floor(Math.random() * vaccineTypes.length)];
+        const availableBatches = config.vaccineBatches;
+        const selectedBatch = availableBatches[Math.floor(Math.random() * availableBatches.length)];
         
         const patient = {
             id: number,
@@ -219,8 +219,10 @@ class Game {
             status: 'waiting',
             isLate: isLate,
             lateHandled: !isLate,
-            requiredVaccine: requiredVaccine,
+            requiredVaccine: selectedBatch.type,
+            requiredBatch: selectedBatch.batch,
             actualVaccine: null,
+            actualBatch: null,
             arrivalTime: this.time
         };
         
@@ -228,10 +230,10 @@ class Game {
         this.arrivedCount++;
         
         if (isLate) {
-            this.addLog('warning', `${patient.name} (#${patient.number}) 迟到了！`);
+            this.addLog('warning', `${patient.name} (#${patient.number}) 迟到了！需接种${selectedBatch.type}(${selectedBatch.batch})`);
             this.recordReplay('PATIENT_LATE', { patientId: patient.id, time: this.time });
         } else {
-            this.addLog('info', `${patient.name} (#${patient.number}) 到达，需接种${requiredVaccine}`);
+            this.addLog('info', `${patient.name} (#${patient.number}) 到达，需接种${selectedBatch.type}(${selectedBatch.batch})`);
             this.recordReplay('PATIENT_ARRIVED', { patientId: patient.id, time: this.time });
         }
         
@@ -358,10 +360,20 @@ class Game {
         const patient = calledPatients[0];
         
         if (patient.requiredVaccine !== vaccine.type) {
-            this.addLog('error', `疫苗类型不匹配！患者需要${patient.requiredVaccine}，选择了${vaccine.type}`);
+            this.addLog('error', `疫苗类型不匹配！患者需要${patient.requiredVaccine}(${patient.requiredBatch})，选择了${vaccine.type}(${vaccine.batch})`);
             this.errors++;
             this.score -= 20;
-            this.recordReplay('ERROR', { type: 'VACCINE_MISMATCH', time: this.time });
+            this.recordReplay('ERROR', { type: 'VACCINE_TYPE_MISMATCH', time: this.time });
+            this.checkLoseCondition();
+            this.render();
+            return;
+        }
+        
+        if (patient.requiredBatch !== vaccine.batch) {
+            this.addLog('error', `疫苗批号不匹配！患者需要${patient.requiredVaccine}(${patient.requiredBatch})，选择了${vaccine.type}(${vaccine.batch})`);
+            this.errors++;
+            this.score -= 15;
+            this.recordReplay('ERROR', { type: 'BATCH_MISMATCH', time: this.time });
             this.checkLoseCondition();
             this.render();
             return;
@@ -372,7 +384,8 @@ class Game {
         station.vaccine = vaccine;
         station.progress = 0;
         patient.status = 'vaccinating';
-        patient.actualVaccine = vaccine.batch;
+        patient.actualVaccine = vaccine.type;
+        patient.actualBatch = vaccine.batch;
         vaccine.count--;
 
         this.addLog('info', `${patient.name} 开始在${station.name}接种${vaccine.type}(${vaccine.batch})`);
@@ -402,9 +415,8 @@ class Game {
         const config = LEVELS[this.currentLevel];
         
         if (this.observation.length >= config.observationCapacity) {
-            this.addLog('error', '留观区已满！无法进入留观');
-            this.errors++;
-            this.checkLoseCondition();
+            this.addLog('error', '留观区已满！患者无法进入留观，游戏失败');
+            this.endGame(false, '留观区已满，患者无法进入留观');
             return;
         }
 
@@ -598,7 +610,15 @@ class Game {
                     actionText = `留观完成：患者 #${step.data.patientId}`;
                     break;
                 case 'ERROR':
-                    actionText = `错误：${step.data.type}`;
+                    if (step.data.type === 'VACCINE_TYPE_MISMATCH') {
+                        actionText = '错误：疫苗类型不匹配';
+                    } else if (step.data.type === 'BATCH_MISMATCH') {
+                        actionText = '错误：疫苗批号不匹配';
+                    } else if (step.data.type === 'INVALID_INSERT') {
+                        actionText = '错误：插队位置无效';
+                    } else {
+                        actionText = `错误：${step.data.type}`;
+                    }
                     break;
                 case 'GAME_END':
                     actionText = step.data.isWin ? '游戏胜利！' : `游戏失败：${step.data.reason}`;
@@ -813,7 +833,7 @@ ${report.eventLog.slice(0, 15).map(e => `║  [${e.time}] ${e.message.substring(
                         <span class="name">${p.name}</span>
                         ${lateBadge}
                     </div>
-                    <div class="status">${p.requiredVaccine} | ${statusText}</div>
+                    <div class="status">${p.requiredVaccine}<br><small>${p.requiredBatch}</small> | ${statusText}</div>
                 </div>
             `;
         }).join('');
