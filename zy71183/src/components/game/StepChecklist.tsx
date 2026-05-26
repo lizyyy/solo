@@ -43,7 +43,7 @@ export function StepChecklist({
     }
   };
 
-  const getStepIcon = (status: StepStatus, index: number) => {
+  const getStepIcon = (status: StepStatus) => {
     switch (status) {
       case 'completed':
         return <CheckCircle2 className="w-5 h-5 text-green-500" />;
@@ -83,7 +83,7 @@ export function StepChecklist({
                 {index + 1}
               </span>
               
-              {getStepIcon(status, index)}
+              {getStepIcon(status)}
               
               <div className="flex-1">
                 <p className={`font-medium ${

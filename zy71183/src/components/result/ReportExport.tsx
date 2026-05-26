@@ -1,4 +1,4 @@
-import { FileText, Download, Copy, RefreshCw, Home } from 'lucide-react';
+import { Download, Copy, RefreshCw, Home } from 'lucide-react';
 import { useState } from 'react';
 import type { InspectionReport } from '../../utils/reportGenerator';
 import { formatReportAsText } from '../../utils/reportGenerator';

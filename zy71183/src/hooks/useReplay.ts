@@ -8,7 +8,7 @@ interface ReplayState {
   speed: number;
 }
 
-export function useReplay(operations: OperationRecord[], levelConfig: LevelConfig | null) {
+export function useReplay(operations: OperationRecord[], _levelConfig: LevelConfig | null = null) {
   const [replayState, setReplayState] = useState<ReplayState>({
     isPlaying: false,
     currentIndex: -1,

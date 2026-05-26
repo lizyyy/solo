@@ -9,7 +9,7 @@ export function useGameEngine(levelConfig: LevelConfig | null) {
   const validateStep = useCallback((pointId: string): { isCorrect: boolean; isDuplicate: boolean } => {
     if (!levelConfig) return { isCorrect: false, isDuplicate: false };
 
-    const { completedSteps, currentStep, duplicateSteps } = gameState;
+    const { completedSteps, currentStep } = gameState;
 
     if (completedSteps.includes(pointId)) {
       return { isCorrect: false, isDuplicate: true };
@@ -45,8 +45,14 @@ export function useGameEngine(levelConfig: LevelConfig | null) {
       gameState.addScoreDetail(createScoreDetail('duplicate', `重复巡检：${point.name}`));
       operation.details = `重复巡检：${point.name}`;
     } else if (isCorrect) {
+      const isLastStep = gameState.currentStep === levelConfig.requiredOrder.length - 1;
+      
       gameState.completeStep(pointId, true, false);
       gameState.addScoreDetail(createScoreDetail('correct', `正确巡检：${point.name}`));
+      
+      if (isLastStep) {
+        gameState.addScoreDetail(createScoreDetail('full_completion', '完成全部巡检流程'));
+      }
     } else {
       gameState.addWrongStep(pointId);
       gameState.addScoreDetail(createScoreDetail('wrong_order', `顺序错误：${point.name}`));
@@ -60,10 +66,6 @@ export function useGameEngine(levelConfig: LevelConfig | null) {
     );
     if (relatedAnomaly) {
       gameState.handleAnomaly(relatedAnomaly.configId);
-    }
-
-    if (gameState.completedSteps.length === levelConfig.requiredOrder.length && !isDuplicate) {
-      gameState.addScoreDetail(createScoreDetail('full_completion', '完成全部巡检流程'));
     }
   }, [levelConfig, gameState, validateStep]);
 

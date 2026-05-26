@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import levelsData from '../data/levels.json';
-import type { LevelConfig, InspectionReport } from '../types';
+import type { LevelConfig } from '../types';
+import type { InspectionReport } from '../utils/reportGenerator';
 import { useGameStore } from '../store/gameStore';
 import { useGameEngine } from '../hooks/useGameEngine';
 import { useTimer } from '../hooks/useTimer';
@@ -11,7 +12,7 @@ import { InspectionMap } from '../components/game/InspectionMap';
 import { StepChecklist } from '../components/game/StepChecklist';
 import { AnomalyAlert } from '../components/game/AnomalyAlert';
 import { ReportForm } from '../components/game/ReportForm';
-import { generateReport, formatReportAsText } from '../utils/reportGenerator';
+import { generateReport } from '../utils/reportGenerator';
 import { saveGameRecord } from '../utils/storage';
 
 export function GamePage() {
@@ -128,10 +129,6 @@ export function GamePage() {
   const handleGenerateReportClick = useCallback(() => {
     handleGenerateReport();
   }, [handleGenerateReport]);
-
-  const handleShowReport = useCallback(() => {
-    setShowReport(true);
-  }, []);
 
   const handleCloseReport = useCallback(() => {
     setShowReport(false);
