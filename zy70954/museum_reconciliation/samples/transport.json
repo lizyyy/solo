@@ -1,0 +1,196 @@
+{
+  "transports": [
+    {
+      "transport_id": "TR-001",
+      "artifact_id": "ART-001",
+      "start_location": "北京故宫博物院",
+      "end_location": "上海展览中心",
+      "planned_start_date": "2024-11-01",
+      "planned_end_date": "2024-11-03",
+      "actual_start_date": "2024-11-01",
+      "actual_end_date": "2024-11-03",
+      "transport_method": "公路运输",
+      "carrier": "中博物流",
+      "overall_status": "正常",
+      "nodes": [
+        {
+          "node_name": "北京装车点",
+          "planned_arrival": "2024-11-01",
+          "actual_arrival": "2024-11-01",
+          "temperature": 20.5,
+          "humidity": 48,
+          "status": "已到达",
+          "notes": "装车顺利"
+        },
+        {
+          "node_name": "济南中转站",
+          "planned_arrival": "2024-11-02",
+          "actual_arrival": "2024-11-02",
+          "temperature": 21.0,
+          "humidity": 50,
+          "status": "已到达",
+          "notes": "中转正常"
+        },
+        {
+          "node_name": "上海卸货点",
+          "planned_arrival": "2024-11-03",
+          "actual_arrival": "2024-11-03",
+          "temperature": 20.8,
+          "humidity": 49,
+          "status": "已到达",
+          "notes": "卸货完成"
+        }
+      ]
+    },
+    {
+      "transport_id": "TR-002",
+      "artifact_id": "ART-002",
+      "start_location": "西安陕西历史博物馆",
+      "end_location": "上海展览中心",
+      "planned_start_date": "2024-11-02",
+      "planned_end_date": "2024-11-04",
+      "actual_start_date": "2024-11-02",
+      "actual_end_date": "2024-11-05",
+      "transport_method": "航空运输",
+      "carrier": "东航货运",
+      "overall_status": "延误",
+      "nodes": [
+        {
+          "node_name": "西安装机点",
+          "planned_arrival": "2024-11-02",
+          "actual_arrival": "2024-11-02",
+          "temperature": 21.0,
+          "humidity": 47,
+          "status": "已到达",
+          "notes": "装机完成"
+        },
+        {
+          "node_name": "上海中转站",
+          "planned_arrival": "2024-11-03",
+          "actual_arrival": "2024-11-04",
+          "temperature": 18.0,
+          "humidity": 52,
+          "status": "延误到达",
+          "notes": "因天气原因航班延误"
+        },
+        {
+          "node_name": "上海卸货点",
+          "planned_arrival": "2024-11-04",
+          "actual_arrival": "2024-11-05",
+          "temperature": 19.5,
+          "humidity": 51,
+          "status": "已到达",
+          "notes": "延误1天"
+        }
+      ]
+    },
+    {
+      "transport_id": "TR-003",
+      "artifact_id": "ART-003",
+      "start_location": "上海博物馆",
+      "end_location": "上海展览中心",
+      "planned_start_date": "2024-11-03",
+      "planned_end_date": "2024-11-03",
+      "actual_start_date": "2024-11-03",
+      "actual_end_date": "2024-11-03",
+      "transport_method": "公路运输",
+      "carrier": "中博物流",
+      "overall_status": "温湿度异常",
+      "nodes": [
+        {
+          "node_name": "上海博物馆装车点",
+          "planned_arrival": "2024-11-03",
+          "actual_arrival": "2024-11-03",
+          "temperature": 15.0,
+          "humidity": 42,
+          "status": "已到达",
+          "notes": "装车时温度偏低"
+        },
+        {
+          "node_name": "上海展览中心",
+          "planned_arrival": "2024-11-03",
+          "actual_arrival": "2024-11-03",
+          "temperature": 16.5,
+          "humidity": 60,
+          "status": "已到达",
+          "notes": "温湿度偏离正常范围"
+        }
+      ]
+    },
+    {
+      "transport_id": "TR-004",
+      "artifact_id": "ART-004",
+      "start_location": "南京博物院",
+      "end_location": "上海展览中心",
+      "planned_start_date": "2024-11-01",
+      "planned_end_date": "2024-11-02",
+      "actual_start_date": "2024-11-01",
+      "actual_end_date": "2024-11-02",
+      "transport_method": "公路运输",
+      "carrier": "中博物流",
+      "overall_status": "正常",
+      "nodes": [
+        {
+          "node_name": "南京装车点",
+          "planned_arrival": "2024-11-01",
+          "actual_arrival": "2024-11-01",
+          "temperature": 20.0,
+          "humidity": 50,
+          "status": "已到达",
+          "notes": "装车顺利"
+        },
+        {
+          "node_name": "上海展览中心",
+          "planned_arrival": "2024-11-02",
+          "actual_arrival": "2024-11-02",
+          "temperature": 21.0,
+          "humidity": 48,
+          "status": "已到达",
+          "notes": "到达正常"
+        }
+      ]
+    },
+    {
+      "transport_id": "TR-005",
+      "artifact_id": "ART-005",
+      "start_location": "郑州河南博物院",
+      "end_location": "上海展览中心",
+      "planned_start_date": "2024-10-30",
+      "planned_end_date": "2024-11-01",
+      "actual_start_date": "2024-10-30",
+      "actual_end_date": "2024-11-01",
+      "transport_method": "铁路运输",
+      "carrier": "中铁快运",
+      "overall_status": "正常",
+      "nodes": [
+        {
+          "node_name": "郑州装车点",
+          "planned_arrival": "2024-10-30",
+          "actual_arrival": "2024-10-30",
+          "temperature": 22.0,
+          "humidity": 46,
+          "status": "已到达",
+          "notes": "装车完成"
+        },
+        {
+          "node_name": "徐州中转站",
+          "planned_arrival": "2024-10-31",
+          "actual_arrival": "2024-10-31",
+          "temperature": 21.5,
+          "humidity": 48,
+          "status": "已到达",
+          "notes": "中转正常"
+        },
+        {
+          "node_name": "上海卸货点",
+          "planned_arrival": "2024-11-01",
+          "actual_arrival": "2024-11-01",
+          "temperature": 20.0,
+          "humidity": 49,
+          "status": "已到达",
+          "notes": "卸货完成"
+        }
+      ]
+    }
+  ]
+}

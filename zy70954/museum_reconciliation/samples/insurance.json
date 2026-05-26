@@ -1,0 +1,64 @@
+{
+  "policies": [
+    {
+      "policy_id": "INS-001",
+      "artifact_id": "ART-001",
+      "insurer": "中国人保",
+      "insured_amount": 5000000,
+      "coverage_start": "2024-10-25",
+      "coverage_end": "2024-12-10",
+      "policy_type": "一切险",
+      "premium": 50000,
+      "exclusions": "战争、核辐射",
+      "special_clauses": "展览期间额外保障"
+    },
+    {
+      "policy_id": "INS-002",
+      "artifact_id": "ART-002",
+      "insurer": "平安保险",
+      "insured_amount": 800000,
+      "coverage_start": "2024-10-28",
+      "coverage_end": "2024-12-05",
+      "policy_type": "一切险",
+      "premium": 8000,
+      "exclusions": "自然损耗",
+      "special_clauses": "航空运输特别约定"
+    },
+    {
+      "policy_id": "INS-003",
+      "artifact_id": "ART-003",
+      "insurer": "太平洋保险",
+      "insured_amount": 350000,
+      "coverage_start": "2024-11-01",
+      "coverage_end": "2024-12-01",
+      "policy_type": "一切险",
+      "premium": 3500,
+      "exclusions": "原有瑕疵",
+      "special_clauses": "温湿度异常特别约定"
+    },
+    {
+      "policy_id": "INS-004",
+      "artifact_id": "ART-004",
+      "insurer": "中国人保",
+      "insured_amount": 120000,
+      "coverage_start": "2024-10-20",
+      "coverage_end": "2024-11-15",
+      "policy_type": "一切险",
+      "premium": 1200,
+      "exclusions": "",
+      "special_clauses": ""
+    },
+    {
+      "policy_id": "INS-005",
+      "artifact_id": "ART-005",
+      "insurer": "平安保险",
+      "insured_amount": 280000,
+      "coverage_start": "2024-10-25",
+      "coverage_end": "2024-11-20",
+      "policy_type": "一切险",
+      "premium": 2800,
+      "exclusions": "",
+      "special_clauses": "铁路运输特别约定"
+    }
+  ]
+}

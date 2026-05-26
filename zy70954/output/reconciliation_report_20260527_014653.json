@@ -1,0 +1,586 @@
+{
+  "report_title": "博物馆展陈部文物借展对账报告",
+  "generated_at": "2026-05-27 01:46:53",
+  "reconciliation_batch": "20260527_014653",
+  "summary": {
+    "generated_at": "2026-05-27 01:46:53",
+    "total_records": 5,
+    "by_status": {
+      "完全一致": 3,
+      "待复核": 1,
+      "已处理": 0,
+      "异常": 1
+    },
+    "by_review_decision": {
+      "已放行": 0,
+      "已退回": 0,
+      "需补材料": 1
+    },
+    "total_discrepancies": 8,
+    "critical_discrepancies": 1,
+    "discrepancies_by_type": {
+      "估值变更": 1,
+      "运输延误": 3,
+      "温度异常": 2,
+      "温湿度异常": 2
+    },
+    "records_by_grade": {
+      "一级文物": 1,
+      "二级文物": 1,
+      "三级文物": 2,
+      "一般文物": 1
+    },
+    "records_with_issues_by_grade": {
+      "二级文物": 1,
+      "三级文物": 1
+    },
+    "total_valuation": 6700000.0,
+    "total_valuation_formatted": "¥6,700,000.00",
+    "total_insured": 6700000.0,
+    "total_insured_formatted": "¥6,700,000.00",
+    "insurance_valuation_diff": 0.0,
+    "insurance_valuation_diff_formatted": "¥0.00"
+  },
+  "details": [
+    {
+      "record_id": "6e295ba7-ea57-4298-9798-64a65d37edd5",
+      "artifact_id": "ART-001",
+      "artifact_name": "战国青铜鼎",
+      "artifact_grade": "一级文物",
+      "status": "完全一致",
+      "generated_at": "2026-05-27 01:46:53",
+      "import_batch": "20260527_014653",
+      "artifact_info": {
+        "artifact_id": "ART-001",
+        "name": "战国青铜鼎",
+        "grade": "一级文物",
+        "category": "青铜器",
+        "origin_museum": "故宫博物院",
+        "current_valuation": 5000000.0,
+        "current_valuation_formatted": "¥5,000,000.00",
+        "previous_valuation": 5000000.0,
+        "previous_valuation_formatted": "¥5,000,000.00",
+        "condition": "完好",
+        "last_condition_check": "2024-10-15",
+        "remarks": "保存完好无异常"
+      },
+      "transport_info": {
+        "transport_id": "TR-001",
+        "start_location": "北京故宫博物院",
+        "end_location": "上海展览中心",
+        "planned_start_date": "2024-11-01",
+        "planned_end_date": "2024-11-03",
+        "actual_start_date": "2024-11-01",
+        "actual_end_date": "2024-11-03",
+        "transport_method": "公路运输",
+        "carrier": "中博物流",
+        "overall_status": "正常",
+        "nodes": [
+          {
+            "node_name": "北京装车点",
+            "planned_arrival": "2024-11-01",
+            "actual_arrival": "2024-11-01",
+            "temperature": 20.5,
+            "humidity": 48.0,
+            "status": "已到达",
+            "notes": "装车顺利"
+          },
+          {
+            "node_name": "济南中转站",
+            "planned_arrival": "2024-11-02",
+            "actual_arrival": "2024-11-02",
+            "temperature": 21.0,
+            "humidity": 50.0,
+            "status": "已到达",
+            "notes": "中转正常"
+          },
+          {
+            "node_name": "上海卸货点",
+            "planned_arrival": "2024-11-03",
+            "actual_arrival": "2024-11-03",
+            "temperature": 20.8,
+            "humidity": 49.0,
+            "status": "已到达",
+            "notes": "卸货完成"
+          }
+        ]
+      },
+      "insurance_info": {
+        "policy_id": "INS-001",
+        "insurer": "中国人保",
+        "insured_amount": 5000000.0,
+        "insured_amount_formatted": "¥5,000,000.00",
+        "coverage_start": "2024-10-25",
+        "coverage_end": "2024-12-10",
+        "policy_type": "一切险",
+        "premium": 50000.0,
+        "exclusions": "战争、核辐射",
+        "special_clauses": "展览期间额外保障"
+      },
+      "discrepancies": [],
+      "discrepancy_count": 0,
+      "critical_discrepancy_count": 0,
+      "matched_fields": [
+        "估值",
+        "运输节点完整",
+        "温度合规",
+        "湿度合规",
+        "保险金额",
+        "保险覆盖期",
+        "运输时间"
+      ],
+      "unmatched_fields": []
+    },
+    {
+      "record_id": "eaf9cf8f-8589-4fcd-b4b0-2a48e086bea5",
+      "artifact_id": "ART-002",
+      "artifact_name": "唐代三彩骆驼",
+      "artifact_grade": "二级文物",
+      "status": "待复核",
+      "generated_at": "2026-05-27 01:46:53",
+      "import_batch": "20260527_014653",
+      "artifact_info": {
+        "artifact_id": "ART-002",
+        "name": "唐代三彩骆驼",
+        "grade": "二级文物",
+        "category": "陶瓷器",
+        "origin_museum": "陕西历史博物馆",
+        "current_valuation": 950000.0,
+        "current_valuation_formatted": "¥950,000.00",
+        "previous_valuation": 800000.0,
+        "previous_valuation_formatted": "¥800,000.00",
+        "condition": "完好",
+        "last_condition_check": "2024-09-20",
+        "remarks": "估值调整需确认"
+      },
+      "transport_info": {
+        "transport_id": "TR-002",
+        "start_location": "西安陕西历史博物馆",
+        "end_location": "上海展览中心",
+        "planned_start_date": "2024-11-02",
+        "planned_end_date": "2024-11-04",
+        "actual_start_date": "2024-11-02",
+        "actual_end_date": "2024-11-05",
+        "transport_method": "航空运输",
+        "carrier": "东航货运",
+        "overall_status": "延误",
+        "nodes": [
+          {
+            "node_name": "西安装机点",
+            "planned_arrival": "2024-11-02",
+            "actual_arrival": "2024-11-02",
+            "temperature": 21.0,
+            "humidity": 47.0,
+            "status": "已到达",
+            "notes": "装机完成"
+          },
+          {
+            "node_name": "上海中转站",
+            "planned_arrival": "2024-11-03",
+            "actual_arrival": "2024-11-04",
+            "temperature": 18.0,
+            "humidity": 52.0,
+            "status": "延误到达",
+            "notes": "因天气原因航班延误"
+          },
+          {
+            "node_name": "上海卸货点",
+            "planned_arrival": "2024-11-04",
+            "actual_arrival": "2024-11-05",
+            "temperature": 19.5,
+            "humidity": 51.0,
+            "status": "已到达",
+            "notes": "延误1天"
+          }
+        ]
+      },
+      "insurance_info": {
+        "policy_id": "INS-002",
+        "insurer": "平安保险",
+        "insured_amount": 950000.0,
+        "insured_amount_formatted": "¥950,000.00",
+        "coverage_start": "2024-10-28",
+        "coverage_end": "2024-12-05",
+        "policy_type": "一切险",
+        "premium": 8000.0,
+        "exclusions": "自然损耗",
+        "special_clauses": "航空运输特别约定"
+      },
+      "discrepancies": [
+        {
+          "discrepancy_id": "8981eba0-8ee6-405f-8b64-14dcbd54b4c3",
+          "type": "估值变更",
+          "field": "估值",
+          "expected_value": "¥800,000.00",
+          "actual_value": "¥950,000.00",
+          "description": "估值发生变更",
+          "explanation": "估值从¥800,000.00上涨至¥950,000.00，变动幅度为+18.75%。根据二级文物管理规定，涨幅在允许范围内（上限30%）。该等级文物估值变更需经部门主任审批。",
+          "severity": "normal",
+          "resolved": false,
+          "resolution_note": ""
+        },
+        {
+          "discrepancy_id": "519914d9-0de3-4d95-9e4b-b194a53a62d6",
+          "type": "运输延误",
+          "field": "到达日期",
+          "expected_value": "2024-11-04",
+          "actual_value": "2024-11-05",
+          "description": "运输延误1天",
+          "explanation": "轻微延误：运输比计划晚到1天。航空运输通常对时间要求较高，延误可能影响后续展览安排。影响评估：对整体进度影响有限。建议核查延误原因（天气/交通/承运方调度等），评估是否需要调整后续安排或向承运方索赔。",
+          "severity": "normal",
+          "resolved": false,
+          "resolution_note": ""
+        },
+        {
+          "discrepancy_id": "7ad857c9-f55c-46d9-9c19-6b6d7bc86890",
+          "type": "运输延误",
+          "field": "运输节点-上海中转站",
+          "expected_value": "2024-11-03",
+          "actual_value": "2024-11-04",
+          "description": "节点上海中转站延误1天",
+          "explanation": "运输节点【上海中转站】延误1天。节点备注：因天气原因航班延误。延误时间较短，对整体运输计划影响有限。",
+          "severity": "normal",
+          "resolved": false,
+          "resolution_note": ""
+        },
+        {
+          "discrepancy_id": "2ab84b99-894c-4b40-954d-282c34434eaa",
+          "type": "运输延误",
+          "field": "运输节点-上海卸货点",
+          "expected_value": "2024-11-04",
+          "actual_value": "2024-11-05",
+          "description": "节点上海卸货点延误1天",
+          "explanation": "运输节点【上海卸货点】延误1天。节点备注：延误1天。延误时间较短，对整体运输计划影响有限。",
+          "severity": "normal",
+          "resolved": false,
+          "resolution_note": ""
+        }
+      ],
+      "discrepancy_count": 4,
+      "critical_discrepancy_count": 0,
+      "review_decision": {
+        "review_id": "07442861-df9c-48f8-a581-2b4e94112494",
+        "decision": "需补材料",
+        "reviewer": "张三（展陈部主任）",
+        "review_time": "2026-05-27 01:46:53",
+        "comments": "估值涨幅达18.75%，已超过二级文物规定的30%上限，但保险金额未同步调整，存在不足额投保风险。",
+        "required_actions": "1. 补充估值变更的专家评估报告；2. 联系保险公司调整保险金额至95万元；3. 提交审批流程。",
+        "requires_manual_fix": true,
+        "manual_fix_fields": [
+          "估值",
+          "保险金额"
+        ]
+      },
+      "matched_fields": [
+        "温度合规",
+        "湿度合规",
+        "保险覆盖期"
+      ],
+      "unmatched_fields": [
+        "估值",
+        "运输节点完整",
+        "保险金额",
+        "运输时间"
+      ]
+    },
+    {
+      "record_id": "f5fe105b-ec6d-441b-8fdd-8083f597165b",
+      "artifact_id": "ART-003",
+      "artifact_name": "宋代山水画",
+      "artifact_grade": "三级文物",
+      "status": "异常",
+      "generated_at": "2026-05-27 01:46:53",
+      "import_batch": "20260527_014653",
+      "artifact_info": {
+        "artifact_id": "ART-003",
+        "name": "宋代山水画",
+        "grade": "三级文物",
+        "category": "书画",
+        "origin_museum": "上海博物馆",
+        "current_valuation": 350000.0,
+        "current_valuation_formatted": "¥350,000.00",
+        "previous_valuation": 350000.0,
+        "previous_valuation_formatted": "¥350,000.00",
+        "condition": "轻微折痕",
+        "last_condition_check": "2024-10-01",
+        "remarks": "运输需注意温湿度"
+      },
+      "transport_info": {
+        "transport_id": "TR-003",
+        "start_location": "上海博物馆",
+        "end_location": "上海展览中心",
+        "planned_start_date": "2024-11-03",
+        "planned_end_date": "2024-11-03",
+        "actual_start_date": "2024-11-03",
+        "actual_end_date": "2024-11-03",
+        "transport_method": "公路运输",
+        "carrier": "中博物流",
+        "overall_status": "温湿度异常",
+        "nodes": [
+          {
+            "node_name": "上海博物馆装车点",
+            "planned_arrival": "2024-11-03",
+            "actual_arrival": "2024-11-03",
+            "temperature": 15.0,
+            "humidity": 42.0,
+            "status": "已到达",
+            "notes": "装车时温度偏低"
+          },
+          {
+            "node_name": "上海展览中心",
+            "planned_arrival": "2024-11-03",
+            "actual_arrival": "2024-11-03",
+            "temperature": 16.5,
+            "humidity": 60.0,
+            "status": "已到达",
+            "notes": "温湿度偏离正常范围"
+          }
+        ]
+      },
+      "insurance_info": {
+        "policy_id": "INS-003",
+        "insurer": "太平洋保险",
+        "insured_amount": 350000.0,
+        "insured_amount_formatted": "¥350,000.00",
+        "coverage_start": "2024-11-01",
+        "coverage_end": "2024-12-01",
+        "policy_type": "一切险",
+        "premium": 3500.0,
+        "exclusions": "原有瑕疵",
+        "special_clauses": "温湿度异常特别约定"
+      },
+      "discrepancies": [
+        {
+          "discrepancy_id": "914765d8-d1f5-4118-9afc-8e4e111d2ef9",
+          "type": "温度异常",
+          "field": "温度-上海博物馆装车点",
+          "expected_value": "18.0°C~24.0°C",
+          "actual_value": "15.0°C",
+          "description": "节点上海博物馆装车点温度超出正常范围",
+          "explanation": "运输节点【上海博物馆装车点】温度过低：实测15.0°C，正常范围18.0°C~24.0°C，偏差3.0°C。中等偏差，需关注文物状态变化。建议关注后续节点温度情况，到达后对文物进行常规检查。",
+          "severity": "critical",
+          "resolved": false,
+          "resolution_note": ""
+        },
+        {
+          "discrepancy_id": "ed17355d-e535-4703-97b8-711480c11b61",
+          "type": "温湿度异常",
+          "field": "湿度-上海博物馆装车点",
+          "expected_value": "45.0%~55.0%",
+          "actual_value": "42.0%",
+          "description": "节点上海博物馆装车点湿度超出正常范围",
+          "explanation": "运输节点【上海博物馆装车点】湿度过低：实测42.0%，正常范围45.0%~55.0%，偏差3.0%。中等偏差，需关注防霉防潮措施。建议关注后续节点湿度情况，做好到达后的环境适应处理。",
+          "severity": "normal",
+          "resolved": false,
+          "resolution_note": ""
+        },
+        {
+          "discrepancy_id": "83096029-6ef8-4433-aa85-81134a8c2185",
+          "type": "温度异常",
+          "field": "温度-上海展览中心",
+          "expected_value": "18.0°C~24.0°C",
+          "actual_value": "16.5°C",
+          "description": "节点上海展览中心温度超出正常范围",
+          "explanation": "运输节点【上海展览中心】温度过低：实测16.5°C，正常范围18.0°C~24.0°C，偏差1.5°C。中等偏差，需关注文物状态变化。建议关注后续节点温度情况，到达后对文物进行常规检查。",
+          "severity": "normal",
+          "resolved": false,
+          "resolution_note": ""
+        },
+        {
+          "discrepancy_id": "aa91f39e-e475-439c-8e02-a73209fc1df7",
+          "type": "温湿度异常",
+          "field": "湿度-上海展览中心",
+          "expected_value": "45.0%~55.0%",
+          "actual_value": "60.0%",
+          "description": "节点上海展览中心湿度超出正常范围",
+          "explanation": "运输节点【上海展览中心】湿度过高：实测60.0%，正常范围45.0%~55.0%，偏差5.0%。中等偏差，需关注防霉防潮措施。建议关注后续节点湿度情况，做好到达后的环境适应处理。",
+          "severity": "normal",
+          "resolved": false,
+          "resolution_note": ""
+        }
+      ],
+      "discrepancy_count": 4,
+      "critical_discrepancy_count": 1,
+      "matched_fields": [
+        "估值",
+        "运输节点完整",
+        "保险金额",
+        "保险覆盖期",
+        "运输时间"
+      ],
+      "unmatched_fields": [
+        "温度合规",
+        "湿度合规"
+      ]
+    },
+    {
+      "record_id": "f977fd00-d4fb-47fa-b6cf-c5247d293d67",
+      "artifact_id": "ART-004",
+      "artifact_name": "清代玉佩",
+      "artifact_grade": "一般文物",
+      "status": "完全一致",
+      "generated_at": "2026-05-27 01:46:53",
+      "import_batch": "20260527_014653",
+      "artifact_info": {
+        "artifact_id": "ART-004",
+        "name": "清代玉佩",
+        "grade": "一般文物",
+        "category": "玉器",
+        "origin_museum": "南京博物院",
+        "current_valuation": 120000.0,
+        "current_valuation_formatted": "¥120,000.00",
+        "previous_valuation": 120000.0,
+        "previous_valuation_formatted": "¥120,000.00",
+        "condition": "完好",
+        "last_condition_check": "2024-10-10",
+        "remarks": "无特殊备注"
+      },
+      "transport_info": {
+        "transport_id": "TR-004",
+        "start_location": "南京博物院",
+        "end_location": "上海展览中心",
+        "planned_start_date": "2024-11-01",
+        "planned_end_date": "2024-11-02",
+        "actual_start_date": "2024-11-01",
+        "actual_end_date": "2024-11-02",
+        "transport_method": "公路运输",
+        "carrier": "中博物流",
+        "overall_status": "正常",
+        "nodes": [
+          {
+            "node_name": "南京装车点",
+            "planned_arrival": "2024-11-01",
+            "actual_arrival": "2024-11-01",
+            "temperature": 20.0,
+            "humidity": 50.0,
+            "status": "已到达",
+            "notes": "装车顺利"
+          },
+          {
+            "node_name": "上海展览中心",
+            "planned_arrival": "2024-11-02",
+            "actual_arrival": "2024-11-02",
+            "temperature": 21.0,
+            "humidity": 48.0,
+            "status": "已到达",
+            "notes": "到达正常"
+          }
+        ]
+      },
+      "insurance_info": {
+        "policy_id": "INS-004",
+        "insurer": "中国人保",
+        "insured_amount": 120000.0,
+        "insured_amount_formatted": "¥120,000.00",
+        "coverage_start": "2024-10-20",
+        "coverage_end": "2024-11-15",
+        "policy_type": "一切险",
+        "premium": 1200.0,
+        "exclusions": "",
+        "special_clauses": ""
+      },
+      "discrepancies": [],
+      "discrepancy_count": 0,
+      "critical_discrepancy_count": 0,
+      "matched_fields": [
+        "估值",
+        "运输节点完整",
+        "温度合规",
+        "湿度合规",
+        "保险金额",
+        "保险覆盖期",
+        "运输时间"
+      ],
+      "unmatched_fields": []
+    },
+    {
+      "record_id": "e31a2d7e-0159-463b-92cb-572422e4e0a2",
+      "artifact_id": "ART-005",
+      "artifact_name": "汉代陶俑",
+      "artifact_grade": "三级文物",
+      "status": "完全一致",
+      "generated_at": "2026-05-27 01:46:53",
+      "import_batch": "20260527_014653",
+      "artifact_info": {
+        "artifact_id": "ART-005",
+        "name": "汉代陶俑",
+        "grade": "三级文物",
+        "category": "陶瓷器",
+        "origin_museum": "河南博物院",
+        "current_valuation": 280000.0,
+        "current_valuation_formatted": "¥280,000.00",
+        "previous_valuation": 280000.0,
+        "previous_valuation_formatted": "¥280,000.00",
+        "condition": "完好",
+        "last_condition_check": "2024-08-15",
+        "remarks": "运输已确认"
+      },
+      "transport_info": {
+        "transport_id": "TR-005",
+        "start_location": "郑州河南博物院",
+        "end_location": "上海展览中心",
+        "planned_start_date": "2024-10-30",
+        "planned_end_date": "2024-11-01",
+        "actual_start_date": "2024-10-30",
+        "actual_end_date": "2024-11-01",
+        "transport_method": "铁路运输",
+        "carrier": "中铁快运",
+        "overall_status": "正常",
+        "nodes": [
+          {
+            "node_name": "郑州装车点",
+            "planned_arrival": "2024-10-30",
+            "actual_arrival": "2024-10-30",
+            "temperature": 22.0,
+            "humidity": 46.0,
+            "status": "已到达",
+            "notes": "装车完成"
+          },
+          {
+            "node_name": "徐州中转站",
+            "planned_arrival": "2024-10-31",
+            "actual_arrival": "2024-10-31",
+            "temperature": 21.5,
+            "humidity": 48.0,
+            "status": "已到达",
+            "notes": "中转正常"
+          },
+          {
+            "node_name": "上海卸货点",
+            "planned_arrival": "2024-11-01",
+            "actual_arrival": "2024-11-01",
+            "temperature": 20.0,
+            "humidity": 49.0,
+            "status": "已到达",
+            "notes": "卸货完成"
+          }
+        ]
+      },
+      "insurance_info": {
+        "policy_id": "INS-005",
+        "insurer": "平安保险",
+        "insured_amount": 280000.0,
+        "insured_amount_formatted": "¥280,000.00",
+        "coverage_start": "2024-10-25",
+        "coverage_end": "2024-11-20",
+        "policy_type": "一切险",
+        "premium": 2800.0,
+        "exclusions": "",
+        "special_clauses": "铁路运输特别约定"
+      },
+      "discrepancies": [],
+      "discrepancy_count": 0,
+      "critical_discrepancy_count": 0,
+      "matched_fields": [
+        "估值",
+        "运输节点完整",
+        "温度合规",
+        "湿度合规",
+        "保险金额",
+        "保险覆盖期",
+        "运输时间"
+      ],
+      "unmatched_fields": []
+    }
+  ]
+}
