@@ -519,6 +519,24 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    case 'REPLAY_GOTO': {
+      if (state.status !== 'replaying') return state;
+      
+      const { index } = action.payload;
+      const newIndex = Math.max(0, Math.min(index, state.history.length - 1));
+      const snapshot = state.history[newIndex];
+      if (!snapshot) return state;
+
+      return {
+        ...state,
+        replayIndex: newIndex,
+        board: JSON.parse(JSON.stringify(snapshot.board)),
+        score: snapshot.score,
+        waterUsed: snapshot.waterUsed,
+        currentWeather: snapshot.weather,
+      };
+    }
+
     case 'EXIT_REPLAY': {
       const restoredStatus = state.statusBeforeReplay || 'playing';
       const savedState = state.stateBeforeReplay;

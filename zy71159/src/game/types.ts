@@ -141,6 +141,7 @@ export type GameAction =
   | { type: 'LOAD_LEVEL'; payload: { levelId: number } }
   | { type: 'START_REPLAY' }
   | { type: 'REPLAY_STEP'; payload: { direction: 'forward' | 'backward' } }
+  | { type: 'REPLAY_GOTO'; payload: { index: number } }
   | { type: 'EXIT_REPLAY' };
 
 export const CROP_INFO: Record<CropType, { name: string; emoji: string; baseWater: number }> = {

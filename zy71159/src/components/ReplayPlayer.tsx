@@ -32,15 +32,11 @@ export function ReplayPlayer({ onClose }: ReplayPlayerProps) {
   };
 
   const handleFirst = () => {
-    while (state.replayIndex > 0) {
-      dispatch({ type: 'REPLAY_STEP', payload: { direction: 'backward' } });
-    }
+    dispatch({ type: 'REPLAY_GOTO', payload: { index: 0 } });
   };
 
   const handleLast = () => {
-    while (state.replayIndex < state.history.length - 1) {
-      dispatch({ type: 'REPLAY_STEP', payload: { direction: 'forward' } });
-    }
+    dispatch({ type: 'REPLAY_GOTO', payload: { index: state.history.length - 1 } });
   };
 
   const toggleAutoPlay = () => {
