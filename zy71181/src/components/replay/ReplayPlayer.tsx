@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
 import { Game2DMap } from '../game/Game2DMap';
+import { getLevelById } from '../../game/data/levels';
+import { GameState, GameStatus } from '../../game/types';
 
 const formatTime = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
@@ -9,52 +11,81 @@ const formatTime = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
+const findSnapshotForTime = (
+  snapshots: Array<{ time: number; state: Partial<GameState> }>,
+  time: number
+) => {
+  if (snapshots.length === 0) return null;
+  if (time <= snapshots[0].time) return snapshots[0];
+  if (time >= snapshots[snapshots.length - 1].time) return snapshots[snapshots.length - 1];
+  
+  for (let i = 1; i < snapshots.length; i++) {
+    if (snapshots[i].time >= time) {
+      const prev = snapshots[i - 1];
+      const next = snapshots[i];
+      const ratio = (time - prev.time) / (next.time - prev.time);
+      return {
+        time,
+        state: {
+          timeElapsed: time,
+          score: Math.round(prev.state.score! + (next.state.score! - prev.state.score!) * ratio),
+          weather: prev.state.weather,
+          victims: prev.state.victims,
+          patrollers: prev.state.patrollers,
+        },
+      };
+    }
+  }
+  return snapshots[snapshots.length - 1];
+};
+
 export function ReplayPlayer() {
   const { replayId } = useParams<{ replayId: string }>();
   const navigate = useNavigate();
-  const { getReplayList, gameState } = useGameStore();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [replayState, setReplayState] = useState<GameState | null>(null);
   const animationRef = useRef<number>();
   const lastTimeRef = useRef<number>(0);
-
-  const replays = getReplayList();
+  const getReplayList = useGameStore((state) => state.getReplayList);
+  const replays = useMemo(() => getReplayList(), [getReplayList]);
   const replay = replays.find((r) => r.id === replayId);
 
-  if (!replay) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-white text-xl mb-4">未找到该回放记录</p>
-          <button
-            onClick={() => navigate('/')}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg"
-          >
-            返回主菜单
-          </button>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!replay) return;
+    
+    const level = getLevelById(replay.levelId);
+    if (!level) return;
 
-  const totalDuration = replay.endTime - replay.startTime;
-  const level = useGameStore.getState().gameState;
-
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentTime(Number(e.target.value));
-  };
+    const initialState: GameState = {
+      status: 'playing' as GameStatus,
+      currentLevelId: replay.levelId,
+      timeElapsed: 0,
+      timeLimit: level.timeLimit,
+      score: 0,
+      weather: level.initialWeather,
+      weatherEndTime: 0,
+      slopes: JSON.parse(JSON.stringify(level.slopes)),
+      victims: JSON.parse(JSON.stringify(level.victims)),
+      patrollers: JSON.parse(JSON.stringify(level.patrollers)),
+      selectedEquipment: [],
+      dispatchHistory: [],
+      keyEvents: replay.events,
+    };
+    setReplayState(initialState);
+    setCurrentTime(0);
+    setIsPlaying(false);
+  }, [replay]);
 
   useEffect(() => {
-    if (!isPlaying) {
+    if (!replay || !replayState || !isPlaying) {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
       return;
     }
+
+    const totalDuration = (replay.endTime - replay.startTime) / 1000;
 
     const animate = (timestamp: number) => {
       if (lastTimeRef.current === 0) {
@@ -66,9 +97,9 @@ export function ReplayPlayer() {
 
       setCurrentTime((prev) => {
         const newTime = prev + delta;
-        if (newTime >= totalDuration / 1000) {
+        if (newTime >= totalDuration) {
           setIsPlaying(false);
-          return totalDuration / 1000;
+          return totalDuration;
         }
         return newTime;
       });
@@ -84,7 +115,57 @@ export function ReplayPlayer() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPlaying, totalDuration]);
+  }, [isPlaying, replay, replayState]);
+
+  useEffect(() => {
+    if (!replay || !replayState) return;
+
+    const snapshot = findSnapshotForTime(replay.stateSnapshots || [], currentTime);
+    if (snapshot) {
+      setReplayState((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          timeElapsed: snapshot.state.timeElapsed ?? prev.timeElapsed,
+          score: snapshot.state.score ?? prev.score,
+          weather: snapshot.state.weather ?? prev.weather,
+          victims: snapshot.state.victims ?? prev.victims,
+          patrollers: snapshot.state.patrollers ?? prev.patrollers,
+        };
+      });
+    }
+  }, [currentTime, replay, replayState]);
+
+  const togglePlay = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentTime(Number(e.target.value));
+  };
+
+  const handleReset = () => {
+    setCurrentTime(0);
+    setIsPlaying(false);
+  };
+
+  if (!replay || !replayState) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-xl mb-4">未找到该回放记录</p>
+          <button
+            onClick={() => navigate('/')}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg"
+          >
+            返回主菜单
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const totalDuration = (replay.endTime - replay.startTime) / 1000;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900 p-8">
@@ -105,8 +186,16 @@ export function ReplayPlayer() {
         <div className="bg-slate-800/80 rounded-2xl p-6 mb-6">
           <div className="grid grid-cols-4 gap-4 mb-6">
             <div className="text-center">
-              <p className="text-slate-400 text-sm">得分</p>
+              <p className="text-slate-400 text-sm">当前得分</p>
+              <p className="text-2xl font-bold text-yellow-400">{replayState.score}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-slate-400 text-sm">最终得分</p>
               <p className="text-2xl font-bold text-yellow-400">{replay.finalScore}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-slate-400 text-sm">当前天气</p>
+              <p className="text-xl font-bold text-blue-400">{replayState.weather}</p>
             </div>
             <div className="text-center">
               <p className="text-slate-400 text-sm">结果</p>
@@ -114,20 +203,10 @@ export function ReplayPlayer() {
                 {replay.result === 'victory' ? '胜利' : '失败'}
               </p>
             </div>
-            <div className="text-center">
-              <p className="text-slate-400 text-sm">事件数</p>
-              <p className="text-2xl font-bold text-white">{replay.events.length}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-slate-400 text-sm">时长</p>
-              <p className="text-2xl font-bold text-white">
-                {formatTime((replay.endTime - replay.startTime) / 1000)}
-              </p>
-            </div>
           </div>
 
           <div className="bg-slate-900 rounded-xl p-4 mb-6 h-64">
-            <Game2DMap />
+            <ReplayMapWrapper gameState={replayState} />
           </div>
 
           <div className="mb-6">
@@ -136,13 +215,13 @@ export function ReplayPlayer() {
                 {formatTime(currentTime)}
               </span>
               <span className="text-slate-400 text-sm">
-                {formatTime(totalDuration / 1000)}
+                {formatTime(totalDuration)}
               </span>
             </div>
             <input
               type="range"
               min="0"
-              max={totalDuration / 1000}
+              max={totalDuration}
               step="0.1"
               value={currentTime}
               onChange={handleSeek}
@@ -152,7 +231,7 @@ export function ReplayPlayer() {
 
           <div className="flex justify-center gap-4">
             <button
-              onClick={() => setCurrentTime(0)}
+              onClick={handleReset}
               className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg"
             >
               ⏮️ 重置
@@ -172,7 +251,11 @@ export function ReplayPlayer() {
             {replay.events.map((event, index) => (
               <div
                 key={index}
-                className="flex items-center gap-4 p-3 bg-slate-700/50 rounded-lg"
+                className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
+                  currentTime >= event.timestamp
+                    ? 'bg-slate-700/50 opacity-100'
+                    : 'bg-slate-700/20 opacity-50'
+                }`}
               >
                 <span className="text-slate-400 text-sm font-mono w-20">
                   {formatTime(event.timestamp)}
@@ -189,6 +272,8 @@ export function ReplayPlayer() {
                       ? 'bg-purple-600 text-white'
                       : event.type === 'victory'
                       ? 'bg-yellow-600 text-white'
+                      : event.type === 'warning'
+                      ? 'bg-amber-600 text-white'
                       : 'bg-red-600 text-white'
                   }`}
                 >
@@ -202,6 +287,8 @@ export function ReplayPlayer() {
                     ? '天气变化'
                     : event.type === 'victory'
                     ? '胜利'
+                    : event.type === 'warning'
+                    ? '警告'
                     : '失败'}
                 </span>
                 <span className="text-slate-300 text-sm">
@@ -211,6 +298,7 @@ export function ReplayPlayer() {
                   {event.type === 'weather_change' && `天气变为${event.data.weather}`}
                   {event.type === 'victory' && `最终得分: ${event.data.score}`}
                   {event.type === 'defeat' && `${event.data.reason}`}
+                  {event.type === 'warning' && `${event.data.message}`}
                 </span>
               </div>
             ))}
@@ -219,4 +307,20 @@ export function ReplayPlayer() {
       </div>
     </div>
   );
+}
+
+function ReplayMapWrapper({ gameState }: { gameState: GameState }) {
+  const originalGameState = useGameStore((state) => state.gameState);
+  
+  useEffect(() => {
+    return () => {
+      useGameStore.setState({ gameState: originalGameState });
+    };
+  }, [originalGameState]);
+
+  useEffect(() => {
+    useGameStore.setState({ gameState });
+  }, [gameState]);
+
+  return <Game2DMap />;
 }

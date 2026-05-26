@@ -1,5 +1,5 @@
 import { useRef, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Sky, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { useGameStore } from '../../store/useGameStore';
@@ -178,7 +178,7 @@ function Mountain() {
 }
 
 function SceneContent() {
-  const { gameState, selectVictim, selectPatroller } = useGameStore();
+  const { gameState, selectVictim } = useGameStore();
 
   return (
     <>

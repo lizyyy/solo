@@ -2,8 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../../store/useGameStore';
 import { ScoreCalculator } from '../../game/engine/ScoreCalculator';
 import { getLevelById } from '../../game/data/levels';
-import { WEATHER_NAMES, INJURY_NAMES } from '../../game/data/constants';
+import { WEATHER_NAMES } from '../../game/data/constants';
 import { EQUIPMENT_LIST } from '../../game/data/equipment';
+import { jsPDF } from 'jspdf';
 
 const formatTime = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
@@ -37,6 +38,61 @@ export function ReportView() {
     URL.revokeObjectURL(url);
   };
 
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    
+    doc.setFontSize(20);
+    doc.text('Ski Rescue Report', 20, 25);
+    
+    doc.setFontSize(12);
+    doc.text(`Game ID: ${currentGameId}`, 20, 40);
+    doc.text(`Level: ${level?.name || 'Unknown'}`, 20, 50);
+    doc.text(`Result: ${report.result === 'victory' ? 'Victory' : 'Defeat'}`, 20, 60);
+    doc.text(`Final Score: ${report.finalScore}`, 20, 70);
+    doc.text(`Rating: ${rating}`, 20, 80);
+    doc.text(`Total Time: ${formatTime(report.totalTime)}`, 20, 90);
+    doc.text(`Victims Rescued: ${report.victimsRescued}/${report.totalVictims}`, 20, 100);
+    doc.text(`Dispatch Count: ${report.dispatchCount}`, 20, 110);
+    doc.text(`Average Response Time: ${report.averageResponseTime.toFixed(1)}s`, 20, 120);
+    
+    doc.text('Score Breakdown:', 20, 140);
+    doc.text(`  Base Rescue: +${report.scoreBreakdown.baseRescue}`, 20, 150);
+    doc.text(`  Speed Bonus: +${report.scoreBreakdown.speedBonus}`, 20, 160);
+    doc.text(`  Equipment Bonus: +${report.scoreBreakdown.equipmentBonus}`, 20, 170);
+    doc.text(`  Deterioration Penalty: -${report.scoreBreakdown.deteriorationPenalty}`, 20, 180);
+    
+    if (report.defeatReason) {
+      doc.text(`Defeat Reason: ${report.defeatReason}`, 20, 200);
+    }
+    
+    doc.text('Events Timeline:', 20, 220);
+    let yPos = 230;
+    report.events.slice(0, 15).forEach((event) => {
+      const eventText = `${formatTime(event.timestamp)} - ${event.type}`;
+      doc.text(eventText, 20, yPos);
+      yPos += 8;
+    });
+    
+    doc.save(`rescue-report-${currentGameId}.pdf`);
+  };
+
+  const handleExportFull = () => {
+    const fullReport = {
+      ...report,
+      gameState: gameState,
+      exportTime: new Date().toISOString(),
+      version: '1.0',
+    };
+    const json = JSON.stringify(fullReport, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rescue-report-full-${currentGameId}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900 p-8">
       <div className="max-w-3xl mx-auto">
@@ -48,12 +104,26 @@ export function ReportView() {
             ← 返回结果
           </button>
           <h1 className="text-2xl font-bold text-white">救援任务报告</h1>
-          <button
-            onClick={handleExportJSON}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm"
-          >
-            💾 导出JSON
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleExportJSON}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm"
+            >
+              💾 JSON
+            </button>
+            <button
+              onClick={handleExportPDF}
+              className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm"
+            >
+              📄 PDF
+            </button>
+            <button
+              onClick={handleExportFull}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm"
+            >
+              📦 完整
+            </button>
+          </div>
         </div>
 
         <div className="bg-slate-800/80 rounded-2xl p-6 mb-6">

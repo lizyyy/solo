@@ -4,7 +4,7 @@ export type WeatherType = 'clear' | 'light_snow' | 'heavy_snow' | 'blizzard';
 export type EquipmentType = 'skis' | 'snowmobile' | 'stretcher' | 'medkit' | 'aed' | 'oxygen';
 export type GameStatus = 'menu' | 'playing' | 'paused' | 'victory' | 'defeat';
 export type PatrollerStatus = 'idle' | 'dispatched' | 'returning';
-export type EventType = 'dispatch' | 'rescue' | 'deterioration' | 'weather_change' | 'slope_close' | 'victory' | 'defeat';
+export type EventType = 'dispatch' | 'rescue' | 'deterioration' | 'weather_change' | 'slope_close' | 'victory' | 'defeat' | 'warning';
 
 export interface Position {
   x: number;
@@ -122,7 +122,7 @@ export interface ReplayData {
   finalScore: number;
   result: 'victory' | 'defeat';
   events: GameEvent[];
-  stateSnapshots: { timestamp: number; state: Partial<GameState> }[];
+  stateSnapshots: { time: number; state: Partial<GameState> }[];
 }
 
 export interface ReportData {

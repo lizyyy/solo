@@ -5,7 +5,7 @@ import { getLevelById } from '../../game/data/levels';
 
 export function ResultScreen() {
   const navigate = useNavigate();
-  const { gameState, generateReport, exportReportJSON, restartGame, currentGameId } = useGameStore();
+  const { gameState, exportReportJSON, restartGame, currentGameId } = useGameStore();
   const level = getLevelById(gameState.currentLevelId);
 
   const isVictory = gameState.status === 'victory';

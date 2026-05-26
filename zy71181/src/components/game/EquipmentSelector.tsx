@@ -15,8 +15,7 @@ export function EquipmentSelector() {
   const canDispatch = selectedPatroller && selectedVictim;
 
   const handleDispatch = () => {
-    if (confirmDispatch()) {
-    }
+    confirmDispatch();
   };
 
   return (

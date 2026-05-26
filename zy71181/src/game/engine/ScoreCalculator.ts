@@ -62,7 +62,7 @@ export class ScoreCalculator {
     let baseRescue = 0;
     let speedBonus = 0;
     let equipmentBonus = 0;
-    let deteriorationPenalty = 0;
+    const deteriorationPenalty = 0;
     let failurePenalty = 0;
 
     records.forEach(record => {

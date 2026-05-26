@@ -3,17 +3,15 @@ import {
   GameState,
   GameStatus,
   EquipmentType,
-  Patroller,
-  Victim,
   DispatchRecord,
   GameEvent,
   ReplayData,
   ReportData,
 } from '../game/types';
-import { getLevelById, LEVELS } from '../game/data/levels';
+import { getLevelById } from '../game/data/levels';
 import { ScoreCalculator } from '../game/engine/ScoreCalculator';
 import { PathFinder } from '../game/engine/PathFinder';
-import { SNAPSHOT_INTERVAL, REPLAY_MAX_STORAGE } from '../game/data/constants';
+import { REPLAY_MAX_STORAGE } from '../game/data/constants';
 import { getRequiredEquipment } from '../game/data/equipment';
 
 const STORAGE_KEY = 'ski-rescue-replays';
@@ -24,6 +22,8 @@ interface GameStore {
   replayData?: ReplayData;
   replayTime: number;
   currentGameId: string;
+  gameStartTime: number;
+  stateSnapshots: Array<{ time: number; state: Partial<GameState> }>;
   pathFinder: PathFinder | null;
 
   startGame: (levelId: string) => void;
@@ -91,16 +91,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
   replayMode: false,
   replayTime: 0,
   currentGameId: '',
+  gameStartTime: 0,
+  stateSnapshots: [],
   pathFinder: null,
 
   startGame: (levelId: string) => {
     const gameId = `game-${Date.now()}`;
     const state = createInitialState(levelId);
     const pathFinder = new PathFinder(state.slopes);
+    const startTime = Date.now();
 
     set({
       gameState: state,
       currentGameId: gameId,
+      gameStartTime: startTime,
+      stateSnapshots: [],
       pathFinder,
       replayMode: false,
       replayData: undefined,
@@ -121,15 +126,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   restartGame: () => {
-    const { currentGameId, gameState } = get();
+    const { gameState } = get();
     const levelId = gameState.currentLevelId;
     const state = createInitialState(levelId);
     const pathFinder = new PathFinder(state.slopes);
     const newGameId = `game-${Date.now()}`;
+    const startTime = Date.now();
 
     set({
       gameState: state,
       currentGameId: newGameId,
+      gameStartTime: startTime,
+      stateSnapshots: [],
       pathFinder,
       replayMode: false,
       replayData: undefined,
@@ -138,8 +146,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   endGame: (victory: boolean, reason?: string) => {
-    const { gameState, currentGameId } = get();
-    const level = getLevelById(gameState.currentLevelId);
+    const { gameState, currentGameId, gameStartTime, stateSnapshots } = get();
+    const endTime = Date.now();
 
     set(state => ({
       gameState: {
@@ -152,12 +160,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const replay: ReplayData = {
       id: currentGameId,
       levelId: gameState.currentLevelId,
-      startTime: Date.now(),
-      endTime: Date.now(),
+      startTime: gameStartTime,
+      endTime: endTime,
       finalScore: gameState.score,
       result: victory ? 'victory' : 'defeat',
       events: gameState.keyEvents,
-      stateSnapshots: [],
+      stateSnapshots: stateSnapshots,
     };
     saveReplayToStorage(replay);
   },
@@ -228,6 +236,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       selectedEquipment.some(used => used === req.type)
     );
 
+    if (!hasAllRequired) {
+      const missingEquipment = requiredEquipment
+        .filter(req => !selectedEquipment.some(used => used === req.type))
+        .map(req => req.type);
+      const event: GameEvent = {
+        timestamp: gameState.timeElapsed,
+        type: 'warning',
+        data: {
+          message: `缺少必需装备: ${missingEquipment.join(', ')}`,
+        },
+      };
+      set(state => ({
+        gameState: {
+          ...state.gameState,
+          keyEvents: [...state.gameState.keyEvents, event],
+        },
+      }));
+      return false;
+    }
+
     const path = pathFinder?.findPath(
       patroller.position,
       victim.position,
@@ -235,7 +263,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       gameState.weather
     );
 
-    if (!path) return false;
+    if (!path) {
+      const event: GameEvent = {
+        timestamp: gameState.timeElapsed,
+        type: 'warning',
+        data: {
+          message: '无法找到有效救援路线',
+        },
+      };
+      set(state => ({
+        gameState: {
+          ...state.gameState,
+          keyEvents: [...state.gameState.keyEvents, event],
+        },
+      }));
+      return false;
+    }
 
     const dispatchRecord: DispatchRecord = {
       id: `dispatch-${Date.now()}`,
@@ -293,8 +336,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let newScore = state.score;
     let newVictims = [...state.victims];
     let newPatrollers = [...state.patrollers];
-    let newKeyEvents = [...state.keyEvents];
-    let newDispatchHistory = [...state.dispatchHistory];
+    const newKeyEvents = [...state.keyEvents];
+    const newDispatchHistory = [...state.dispatchHistory];
     let defeatReason: string | undefined;
     let gameEnded = false;
 
@@ -438,6 +481,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    const snapshotInterval = 0.5;
+    const currentSnapshots = get().stateSnapshots;
+    const lastSnapshotTime = currentSnapshots.length > 0 
+      ? currentSnapshots[currentSnapshots.length - 1].time 
+      : -snapshotInterval;
+    
+    if (newTimeElapsed - lastSnapshotTime >= snapshotInterval) {
+      const newSnapshot = {
+        time: newTimeElapsed,
+        state: {
+          timeElapsed: newTimeElapsed,
+          score: newScore,
+          weather: newWeather,
+          victims: newVictims,
+          patrollers: newPatrollers,
+        },
+      };
+      set(state => ({
+        stateSnapshots: [...state.stateSnapshots, newSnapshot],
+      }));
+    }
+
     set(state => ({
       gameState: {
         ...state.gameState,
@@ -476,7 +541,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     try {
       const existing = localStorage.getItem(STORAGE_KEY);
       return existing ? JSON.parse(existing) : [];
-    } catch (e) {
+    } catch {
       return [];
     }
   },
