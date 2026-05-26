@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Activity {
+  id            String     @id @default(uuid())
+  name          String
+  description   String?
+  activityDate  DateTime
+  totalQuota    Int
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  batches       Batch[]
+  registrations Registration[]
+  waitlist      WaitlistEntry[]
+  attendances   Attendance[]
+  blacklist     BlacklistEntry[]
+}
+
+model Batch {
+  id           String     @id @default(uuid())
+  activityId   String
+  activity     Activity   @relation(fields: [activityId], references: [id])
+  batchType    String
+  fileName     String
+  status       String     @default("PENDING")
+  processedBy  String?
+  processedAt  DateTime?
+  remark       String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  registrations Registration[]
+  waitlist     WaitlistEntry[]
+  attendances  Attendance[]
+  auditLogs    AuditLog[]
+}
+
+model Registration {
+  id            String              @id @default(uuid())
+  batchId       String
+  batch         Batch               @relation(fields: [batchId], references: [id])
+  activityId    String
+  activity      Activity            @relation(fields: [activityId], references: [id])
+  idCard        String
+  name          String
+  phone         String
+  address       String?
+  community     String?
+  source        String
+  originalOrder Int
+  finalStatus   String              @default("PENDING")
+  waitlistOrder Int?
+  isDuplicate   Boolean             @default(false)
+  isBlacklisted Boolean             @default(false)
+  isPromoted    Boolean             @default(false)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  attendances   Attendance[]
+  processingRecords ProcessingRecord[]
+}
+
+model WaitlistEntry {
+  id           String     @id @default(uuid())
+  batchId      String
+  batch        Batch      @relation(fields: [batchId], references: [id])
+  activityId   String
+  activity     Activity   @relation(fields: [activityId], references: [id])
+  idCard       String
+  name         String
+  phone        String
+  address      String?
+  community    String?
+  waitlistOrder Int
+  priority     Int
+  reason       String?
+  isPromoted   Boolean    @default(false)
+  promotedAt   DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  processingRecords ProcessingRecord[]
+}
+
+model Attendance {
+  id             String   @id @default(uuid())
+  batchId        String
+  batch          Batch    @relation(fields: [batchId], references: [id])
+  activityId     String
+  activity       Activity @relation(fields: [activityId], references: [id])
+  registrationId String?
+  registration   Registration? @relation(fields: [registrationId], references: [id])
+  idCard         String
+  name           String
+  signInTime     DateTime?
+  signOutTime    DateTime?
+  status         String   @default("NOT_SIGNED")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model BlacklistEntry {
+  id         String   @id @default(uuid())
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id])
+  idCard     String
+  name       String
+  reason     String
+  addedBy    String
+  addedAt    DateTime @default(now())
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ProcessingRecord {
+  id              String               @id @default(uuid())
+  registrationId  String?
+  registration    Registration?        @relation(fields: [registrationId], references: [id])
+  waitlistEntryId String?
+  waitlistEntry   WaitlistEntry?       @relation(fields: [waitlistEntryId], references: [id])
+  action          String
+  statusBefore    String?
+  statusAfter     String?
+  reason          String
+  processedBy     String
+  processedAt     DateTime             @default(now())
+  createdAt       DateTime             @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  batchId    String?
+  batch      Batch?   @relation(fields: [batchId], references: [id])
+  action     String
+  operator   String
+  details    String?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}
