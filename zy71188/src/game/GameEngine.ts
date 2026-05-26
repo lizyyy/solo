@@ -44,8 +44,11 @@ export class GameEngine {
         baseScore: 1000,
         correctMarks: 0,
         wrongMarks: 0,
+        duplicateMarks: 0,
+        overtimePenalty: 0,
         timeBonus: 0,
         missedHazards: 0,
+        resourceWaste: 0,
         totalScore: 1000
       },
       player: {
@@ -133,8 +136,11 @@ export class GameEngine {
       baseScore: 1000,
       correctMarks: 0,
       wrongMarks: 0,
+      duplicateMarks: 0,
+      overtimePenalty: 0,
       timeBonus: 0,
       missedHazards: 0,
+      resourceWaste: 0,
       totalScore: 1000
     };
     this.state.nearHazard = null;
@@ -170,6 +176,21 @@ export class GameEngine {
     if (this.state.status !== 'playing' || !this.state.nearHazard) return;
 
     const hazard = this.state.nearHazard;
+    
+    if (hazard.marked) {
+      const record: MarkRecord = {
+        hazardId: hazard.id,
+        timestamp: Date.now() - this.startTime,
+        isCorrect: false,
+        isDuplicate: true,
+        position: { x: this.state.player.x, y: this.state.player.y }
+      };
+      this.state.markedRecords.push(record);
+      this.updateScore();
+      this.notifyStateChange();
+      return;
+    }
+
     const result = this.hazardSystem.markHazard(hazard);
 
     hazard.marked = true;
@@ -179,6 +200,7 @@ export class GameEngine {
       hazardId: hazard.id,
       timestamp: Date.now() - this.startTime,
       isCorrect: result.isCorrect,
+      isDuplicate: false,
       position: { x: this.state.player.x, y: this.state.player.y }
     };
 
@@ -191,6 +213,7 @@ export class GameEngine {
     const config = LEVELS.find(l => l.id === this.state.currentLevel) || LEVELS[0];
     const breakdown = this.scoreSystem.calculateFinalScore(
       this.state.hazards,
+      this.state.markedRecords,
       this.state.timeRemaining,
       this.state.totalTime
     );
@@ -295,12 +318,20 @@ export class GameEngine {
     this.updateScore();
 
     const config = LEVELS.find(l => l.id === this.state.currentLevel) || LEVELS[0];
+    const failReasons = this.scoreSystem.getFailReasons(
+      this.state.scoreBreakdown,
+      this.state.hazards,
+      this.state.timeRemaining
+    );
+    
     const report = this.reportSystem.generateReport(
       config,
       this.state.hazards,
+      this.state.markedRecords,
       this.state.timeRemaining,
       this.state.totalTime,
-      this.state.scoreBreakdown
+      this.state.scoreBreakdown,
+      failReasons
     );
 
     this.reportSystem.saveReport(report);

@@ -19,6 +19,7 @@ export function StatusPanel({ gameState, levelName }: StatusPanelProps) {
   const realHazards = gameState.hazards.filter(h => h.isHazard);
   const foundHazards = realHazards.filter(h => h.marked && h.markCorrect).length;
   const wrongMarks = gameState.hazards.filter(h => h.marked && !h.markCorrect).length;
+  const duplicateMarks = gameState.markedRecords.filter(r => r.isDuplicate).length;
 
   return (
     <div className="bg-gray-800 rounded-xl p-6 shadow-lg space-y-6">
@@ -57,6 +58,17 @@ export function StatusPanel({ gameState, levelName }: StatusPanelProps) {
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-gray-700 rounded-lg p-3 text-center">
+          <p className="text-xl font-bold text-red-400">{wrongMarks}</p>
+          <p className="text-xs text-gray-400">误报</p>
+        </div>
+        <div className="bg-gray-700 rounded-lg p-3 text-center">
+          <p className="text-xl font-bold text-orange-400">{duplicateMarks}</p>
+          <p className="text-xs text-gray-400">重复标记</p>
+        </div>
+      </div>
+
       <div className="space-y-3">
         <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">隐患进度</h3>
         <div className="space-y-2">
@@ -89,7 +101,15 @@ export function StatusPanel({ gameState, levelName }: StatusPanelProps) {
       {wrongMarks > 0 && (
         <div className="bg-red-900/30 border border-red-700 rounded-lg p-3">
           <p className="text-red-400 text-sm">
-            ⚠️ 误报次数: {wrongMarks}
+            ⚠️ 误报次数: {wrongMarks} (每次-50分)
+          </p>
+        </div>
+      )}
+
+      {duplicateMarks > 0 && (
+        <div className="bg-orange-900/30 border border-orange-700 rounded-lg p-3">
+          <p className="text-orange-400 text-sm">
+            ⚠️ 重复标记: {duplicateMarks}次 (每次-30分)
           </p>
         </div>
       )}

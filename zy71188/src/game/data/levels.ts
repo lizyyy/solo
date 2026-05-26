@@ -40,9 +40,11 @@ export const SCORE_RULES: ScoreRule = {
   baseScore: 1000,
   correctMark: 100,
   wrongMark: -50,
+  duplicateMark: -30,
+  overtimePerSecond: -10,
   timeBonusPerSecond: 2,
   missedHazard: -100,
-  duplicateMark: -30
+  resourceWaste: -30
 };
 
 export const HAZARD_DESCRIPTIONS: Record<string, { name: string; hazard: boolean }> = {

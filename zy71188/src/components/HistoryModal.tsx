@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import type { InspectionReport } from '../game/types';
+import type { InspectionReport, ReplayFrame } from '../game/types';
 
 interface HistoryModalProps {
   reports: InspectionReport[];
+  replays: Array<{ id: string; levelId: number; timestamp: number; frames: ReplayFrame[] }>;
   onClose: () => void;
   onViewReport: (report: InspectionReport) => void;
+  onStartReplay: (replayId: string) => void;
 }
 
-export function HistoryModal({ reports, onClose, onViewReport }: HistoryModalProps) {
+export function HistoryModal({ reports, replays, onClose, onViewReport, onStartReplay }: HistoryModalProps) {
   const [selectedReport, setSelectedReport] = useState<InspectionReport | null>(null);
 
   const gradeColors: Record<string, string> = {
@@ -20,6 +22,13 @@ export function HistoryModal({ reports, onClose, onViewReport }: HistoryModalPro
   };
 
   const sortedReports = [...reports].sort((a, b) => b.timestamp - a.timestamp);
+
+  const findReplayForReport = (report: InspectionReport) => {
+    return replays.find(r => 
+      r.levelId === report.levelId && 
+      Math.abs(r.timestamp - report.timestamp) < 5000
+    );
+  };
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
@@ -44,82 +53,113 @@ export function HistoryModal({ reports, onClose, onViewReport }: HistoryModalPro
             </div>
           ) : (
             <div className="space-y-3">
-              {sortedReports.map((report, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-colors cursor-pointer"
-                  onClick={() => setSelectedReport(report)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-full ${gradeColors[report.grade]} flex items-center justify-center`}>
-                        <span className="text-xl font-bold text-white">{report.grade}</span>
+              {sortedReports.map((report, index) => {
+                const replay = findReplayForReport(report);
+                return (
+                  <div
+                    key={index}
+                    className="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-colors"
+                  >
+                    <div 
+                      className="flex items-center justify-between cursor-pointer"
+                      onClick={() => setSelectedReport(selectedReport === report ? null : report)}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-full ${gradeColors[report.grade]} flex items-center justify-center`}>
+                          <span className="text-xl font-bold text-white">{report.grade}</span>
+                        </div>
+                        <div>
+                          <h3 className="text-white font-semibold">{report.levelName}</h3>
+                          <p className="text-gray-400 text-sm">
+                            {new Date(report.timestamp).toLocaleString('zh-CN')}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-white font-semibold">{report.levelName}</h3>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-amber-400">{report.score}</p>
                         <p className="text-gray-400 text-sm">
-                          {new Date(report.timestamp).toLocaleString('zh-CN')}
+                          发现 {report.foundHazards}/{report.totalHazards}
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-amber-400">{report.score}</p>
-                      <p className="text-gray-400 text-sm">
-                        发现 {report.foundHazards}/{report.totalHazards}
-                      </p>
-                    </div>
+
+                    {selectedReport === report && (
+                      <div className="mt-4 pt-4 border-t border-gray-600">
+                        <div className="grid grid-cols-5 gap-4 mb-4">
+                          <div className="text-center">
+                            <p className="text-lg font-bold text-white">{report.duration.toFixed(0)}s</p>
+                            <p className="text-xs text-gray-400">用时</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-lg font-bold text-green-400">{report.foundHazards}</p>
+                            <p className="text-xs text-gray-400">已发现</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-lg font-bold text-red-400">{report.missedHazards}</p>
+                            <p className="text-xs text-gray-400">未发现</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-lg font-bold text-yellow-400">{report.wrongMarks}</p>
+                            <p className="text-xs text-gray-400">误报</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-lg font-bold text-orange-400">{report.duplicateMarks}</p>
+                            <p className="text-xs text-gray-400">重复</p>
+                          </div>
+                        </div>
+
+                        {report.failReasons.length > 0 && (
+                          <div className="bg-red-900/30 border border-red-700 rounded-lg p-3 mb-4">
+                            <h4 className="text-red-400 text-sm font-semibold mb-2">失败原因</h4>
+                            <ul className="text-red-300 text-xs space-y-1">
+                              {report.failReasons.slice(0, 3).map((reason, idx) => (
+                                <li key={idx}>• {reason}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        <div className="bg-gray-800 rounded-lg p-3 mb-4">
+                          <h4 className="text-gray-300 text-sm mb-2">详细发现</h4>
+                          <div className="space-y-1 max-h-24 overflow-y-auto">
+                            {report.findings.map((finding, idx) => (
+                              <div key={idx} className="flex items-center gap-2 text-sm">
+                                <span>{finding.found ? '✅' : '❌'}</span>
+                                <span className={finding.found ? 'text-green-400' : 'text-red-400'}>
+                                  {finding.description}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 justify-center">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onViewReport(report);
+                            }}
+                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm"
+                          >
+                            查看报告
+                          </button>
+                          {replay && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onStartReplay(replay.id);
+                              }}
+                              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors text-sm"
+                            >
+                              回放录像
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
-
-                  {selectedReport === report && (
-                    <div className="mt-4 pt-4 border-t border-gray-600">
-                      <div className="grid grid-cols-4 gap-4 mb-4">
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-white">{report.duration}s</p>
-                          <p className="text-xs text-gray-400">用时</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-green-400">{report.foundHazards}</p>
-                          <p className="text-xs text-gray-400">已发现</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-red-400">{report.missedHazards}</p>
-                          <p className="text-xs text-gray-400">未发现</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-yellow-400">{report.wrongMarks}</p>
-                          <p className="text-xs text-gray-400">误报</p>
-                        </div>
-                      </div>
-
-                      <div className="bg-gray-800 rounded-lg p-3 mb-4">
-                        <h4 className="text-gray-300 text-sm mb-2">详细发现</h4>
-                        <div className="space-y-1 max-h-32 overflow-y-auto">
-                          {report.findings.map((finding, idx) => (
-                            <div key={idx} className="flex items-center gap-2 text-sm">
-                              <span>{finding.found ? '✅' : '❌'}</span>
-                              <span className={finding.found ? 'text-green-400' : 'text-red-400'}>
-                                {finding.description}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="text-center">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onViewReport(report);
-                          }}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm"
-                        >
-                          查看完整报告
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

@@ -61,6 +61,7 @@ export interface MarkRecord {
   hazardId: string;
   timestamp: number;
   isCorrect: boolean;
+  isDuplicate: boolean;
   position: Position;
 }
 
@@ -74,8 +75,11 @@ export interface ScoreBreakdown {
   baseScore: number;
   correctMarks: number;
   wrongMarks: number;
+  duplicateMarks: number;
+  overtimePenalty: number;
   timeBonus: number;
   missedHazards: number;
+  resourceWaste: number;
   totalScore: number;
 }
 
@@ -96,10 +100,12 @@ export interface InspectionReport {
   levelName: string;
   timestamp: number;
   duration: number;
+  timeOverrun: number;
   totalHazards: number;
   foundHazards: number;
   missedHazards: number;
   wrongMarks: number;
+  duplicateMarks: number;
   score: number;
   scoreBreakdown: ScoreBreakdown;
   findings: {
@@ -108,6 +114,7 @@ export interface InspectionReport {
     found: boolean;
   }[];
   grade: 'S' | 'A' | 'B' | 'C' | 'D' | 'F';
+  failReasons: string[];
 }
 
 export interface GameState {
@@ -129,7 +136,9 @@ export interface ScoreRule {
   baseScore: number;
   correctMark: number;
   wrongMark: number;
+  duplicateMark: number;
+  overtimePerSecond: number;
   timeBonusPerSecond: number;
   missedHazard: number;
-  duplicateMark: number;
+  resourceWaste: number;
 }

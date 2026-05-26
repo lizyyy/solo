@@ -1,4 +1,4 @@
-import type { Hazard, InspectionReport, ScoreBreakdown, LevelConfig } from '../types';
+import type { Hazard, InspectionReport, ScoreBreakdown, LevelConfig, MarkRecord } from '../types';
 import { ScoreSystem } from './ScoreSystem';
 
 export class ReportSystem {
@@ -12,9 +12,11 @@ export class ReportSystem {
   generateReport(
     config: LevelConfig,
     hazards: Hazard[],
+    markedRecords: MarkRecord[],
     timeRemaining: number,
     totalTime: number,
-    scoreBreakdown: ScoreBreakdown
+    scoreBreakdown: ScoreBreakdown,
+    failReasons: string[]
   ): InspectionReport {
     const findings = hazards.map(h => ({
       type: h.type,
@@ -26,20 +28,25 @@ export class ReportSystem {
     const foundHazards = hazards.filter(h => h.isHazard && h.marked && h.markCorrect).length;
     const missedHazards = totalHazards - foundHazards;
     const wrongMarks = hazards.filter(h => h.marked && !h.markCorrect).length;
+    const duplicateMarks = markedRecords.filter(r => r.isDuplicate).length;
+    const timeOverrun = Math.max(0, -timeRemaining);
 
     return {
       levelId: config.id,
       levelName: config.name,
       timestamp: Date.now(),
-      duration: totalTime - timeRemaining,
+      duration: Math.max(totalTime, totalTime - timeRemaining),
+      timeOverrun,
       totalHazards,
       foundHazards,
       missedHazards,
       wrongMarks,
+      duplicateMarks,
       score: scoreBreakdown.totalScore,
       scoreBreakdown,
       findings,
-      grade: this.scoreSystem.getGrade(scoreBreakdown.totalScore)
+      grade: this.scoreSystem.getGrade(scoreBreakdown.totalScore),
+      failReasons
     };
   }
 
@@ -56,6 +63,7 @@ export class ReportSystem {
       `巡检区域: ${report.levelName}`,
       `巡检时间: ${new Date(report.timestamp).toLocaleString('zh-CN')}`,
       `巡检时长: ${Math.floor(report.duration)}秒`,
+      report.timeOverrun > 0 ? `超时时间: ${report.timeOverrun.toFixed(1)}秒` : '',
       '',
       '----------------------------------------',
       '           巡检结果摘要',
@@ -65,6 +73,7 @@ export class ReportSystem {
       `已发现: ${report.foundHazards}`,
       `未发现: ${report.missedHazards}`,
       `误报次数: ${report.wrongMarks}`,
+      `重复标记: ${report.duplicateMarks}`,
       '',
       '----------------------------------------',
       '           详细发现记录',
@@ -81,16 +90,24 @@ export class ReportSystem {
       `基础分数: ${report.scoreBreakdown.baseScore}`,
       `正确标记: +${report.scoreBreakdown.correctMarks}`,
       `错误标记: ${report.scoreBreakdown.wrongMarks}`,
+      `重复标记: ${report.scoreBreakdown.duplicateMarks}`,
+      report.scoreBreakdown.overtimePenalty < 0 ? `超时扣分: ${report.scoreBreakdown.overtimePenalty}` : '',
       `未发现扣分: ${report.scoreBreakdown.missedHazards}`,
+      report.scoreBreakdown.resourceWaste < 0 ? `资源浪费: ${report.scoreBreakdown.resourceWaste}` : '',
       `时间奖励: +${report.scoreBreakdown.timeBonus}`,
       `最终得分: ${report.scoreBreakdown.totalScore}`,
       '',
       `评级: ${report.grade}`,
       '',
+      report.failReasons.length > 0 ? '----------------------------------------' : '',
+      report.failReasons.length > 0 ? '           失败原因分析' : '',
+      report.failReasons.length > 0 ? '----------------------------------------' : '',
+      ...report.failReasons.map(reason => `• ${reason}`),
+      '',
       '========================================',
       '           报告生成完毕',
       '========================================'
-    ];
+    ].filter(line => line !== '');
 
     return lines.join('\n');
   }

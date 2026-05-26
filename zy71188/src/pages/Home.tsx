@@ -1,18 +1,32 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import type { GameState, InspectionReport, LevelConfig } from '../game/types';
+import type { GameState, InspectionReport, LevelConfig, ReplayFrame } from '../game/types';
 import { GameCanvas } from '../components/GameCanvas';
 import { StatusPanel } from '../components/StatusPanel';
 import { ControlPanel } from '../components/ControlPanel';
 import { ResultModal } from '../components/ResultModal';
 import { HistoryModal } from '../components/HistoryModal';
+import { ReplayPlayer } from '../components/ReplayPlayer';
+
+interface ReplayData {
+  id: string;
+  levelId: number;
+  timestamp: number;
+  frames: ReplayFrame[];
+  map: any;
+  hazards: any[];
+  totalTime: number;
+}
 
 export default function Home() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [engine, setEngine] = useState<any>(null);
   const [showResult, setShowResult] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showReplay, setShowReplay] = useState(false);
   const [currentReport, setCurrentReport] = useState<InspectionReport | null>(null);
+  const [currentReplay, setCurrentReplay] = useState<ReplayData | null>(null);
   const [historyReports, setHistoryReports] = useState<InspectionReport[]>([]);
+  const [replays, setReplays] = useState<ReplayData[]>([]);
   const [levels, setLevels] = useState<LevelConfig[]>([]);
 
   const canvasWidth = 800;
@@ -37,8 +51,30 @@ export default function Home() {
     if (engine) {
       const reports = engine.getReportSystem().loadAllReports();
       setHistoryReports(reports);
+      
+      const replaySystem = engine.getReplaySystem();
+      const replayList = replaySystem.getReplayList();
+      
+      const loadedReplays: ReplayData[] = replayList.map(r => {
+        const frames = replaySystem.loadFromStorage(r.id);
+        if (frames && frames.length > 0) {
+          const lastFrame = frames[frames.length - 1];
+          return {
+            id: r.id,
+            levelId: r.levelId,
+            timestamp: r.timestamp,
+            frames,
+            map: gameState?.map || null,
+            hazards: gameState?.hazards || [],
+            totalTime: lastFrame.timestamp / 1000
+          };
+        }
+        return null;
+      }).filter(Boolean) as ReplayData[];
+      
+      setReplays(loadedReplays);
     }
-  }, [engine]);
+  }, [engine, gameState]);
 
   useEffect(() => {
     refreshHistory();
@@ -75,6 +111,19 @@ export default function Home() {
     setShowHistory(false);
     setShowResult(true);
   }, []);
+
+  const handleStartReplay = useCallback((replayId: string) => {
+    const replay = replays.find(r => r.id === replayId);
+    if (replay && gameState) {
+      setCurrentReplay({
+        ...replay,
+        map: gameState.map,
+        hazards: gameState.hazards
+      });
+      setShowHistory(false);
+      setShowReplay(true);
+    }
+  }, [replays, gameState]);
 
   const currentLevelName = gameState 
     ? levels.find(l => l.id === gameState.currentLevel)?.name || ''
@@ -173,8 +222,11 @@ export default function Home() {
                 <p>• 基础分: 1000</p>
                 <p>• 正确标记: +100</p>
                 <p>• 错误标记: -50</p>
+                <p>• 重复标记: -30</p>
                 <p>• 未发现隐患: -100</p>
-                <p>• 时间奖励: 每秒+2</p>
+                <p>• 超时: -10/秒</p>
+                <p>• 资源浪费: -30</p>
+                <p>• 时间奖励: +2/秒</p>
               </div>
             </div>
           </div>
@@ -193,8 +245,23 @@ export default function Home() {
       {showHistory && (
         <HistoryModal
           reports={historyReports}
+          replays={replays}
           onClose={() => setShowHistory(false)}
           onViewReport={handleViewHistoryReport}
+          onStartReplay={handleStartReplay}
+        />
+      )}
+
+      {showReplay && currentReplay && currentReplay.map && (
+        <ReplayPlayer
+          frames={currentReplay.frames}
+          hazards={currentReplay.hazards}
+          map={currentReplay.map}
+          totalTime={currentReplay.totalTime}
+          onClose={() => {
+            setShowReplay(false);
+            setCurrentReplay(null);
+          }}
         />
       )}
     </div>
