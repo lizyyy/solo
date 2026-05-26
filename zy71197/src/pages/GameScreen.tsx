@@ -43,6 +43,13 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack, onShowReport }) 
           ...result,
           finalCost: gameState.costs.total
         });
+        
+        const history = HistoryRecorder.createHistoryFromGameState(
+          gameState,
+          currentLevel,
+          result
+        );
+        HistoryRecorder.saveHistory(history);
       }
     }
   }, [gameState.status]);

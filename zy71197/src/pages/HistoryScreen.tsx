@@ -94,7 +94,10 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ onBack }) => {
               
               return (
                 <Card key={item.id}>
-                  <div className="flex items-center justify-between">
+                  <div 
+                    className="flex items-center justify-between cursor-pointer hover:bg-gray-700/50 -m-5 p-5 rounded-lg transition-colors"
+                    onClick={() => setSelectedHistory(selectedHistory?.id === item.id ? null : item)}
+                  >
                     <div className="flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
                         item.isWin ? 'bg-green-900/50' : 'bg-red-900/50'
@@ -141,7 +144,10 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ onBack }) => {
                       </Badge>
                       
                       <button
-                        onClick={() => handleDelete(item.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.id);
+                        }}
                         className="p-2 text-gray-400 hover:text-red-400 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />

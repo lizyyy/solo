@@ -75,8 +75,10 @@ export class GameEngine {
       return;
     }
     
+    const savedSchedule = [...this.state.scheduledOrders];
+    
     this.state = this.createInitialState();
-    this.state.scheduledOrders = [...this.state.scheduledOrders];
+    this.state.scheduledOrders = savedSchedule;
     this.state.status = 'running';
     this.state.currentPhase = 'idle';
     this.notify();
