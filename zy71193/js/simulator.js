@@ -72,18 +72,13 @@ export class Simulator {
 
       if (evap.status === 'defrosting') {
         if (evap.defrostEnd !== null && now >= evap.defrostEnd) {
+          if (!evap._timeoutScored) {
+            this.state.scoreBreakdown.defrostTimeout += SCORE.DEFROST_TIMEOUT;
+            evap._timeoutScored = true;
+            this.state.addEvent('error', `蒸发器${evap.id}除霜超时（计划${(now - evap.defrostEnd).toFixed(0)}分钟前完成）`);
+          }
           evap.completeDefrost(now);
           this.state.addEvent('success', `蒸发器${evap.id}除霜完成`);
-        } else if (evap.defrostEnd !== null) {
-          const overrun = now - evap.defrostEnd;
-          if (overrun > 0 && overrun < 60) {
-            const overdue = now - evap.defrostEnd;
-            if (!evap._timeoutScored) {
-              this.state.scoreBreakdown.defrostTimeout += SCORE.DEFROST_TIMEOUT;
-              evap._timeoutScored = true;
-              this.state.addEvent('error', `蒸发器${evap.id}除霜超时`);
-            }
-          }
         }
       }
     }
@@ -150,6 +145,13 @@ export class Simulator {
         task.startedAt = now;
         if (zone) zone.doorOpen = true;
         this.state.addEvent('info', `任务开始: ${task.name}`);
+
+        const evap = this.state.getEvaporatorForZone(task.zone);
+        if (evap && evap.isDefrosting(now) && !task._energyWasteScored) {
+          this.state.scoreBreakdown.energyWaste += SCORE.ENERGY_WASTE;
+          task._energyWasteScored = true;
+          this.state.addEvent('warning', `任务"${task.name}"与除霜冲突，能源浪费`);
+        }
       }
 
       if (task.status === 'active' || task.status === 'delayed') {
@@ -281,15 +283,17 @@ export class Simulator {
       this.state.addEvent('warning', `添加除霜计划: 蒸发器${evaporatorId}，建议更频繁除霜`);
     }
 
-    const activeTask = this.state.tasks.find(
-      t => t.zone === evap.zone && t.status === 'active'
+    const conflictingTasks = this.state.tasks.filter(
+      t => t.zone === evap.zone && t.status !== 'completed'
     );
-    if (activeTask) {
-      const taskEnd = (activeTask.startedAt || 0) + activeTask.duration;
-      if (start < taskEnd && start + duration > activeTask.windowStart) {
+    for (const task of conflictingTasks) {
+      const taskStart = task.startedAt !== null ? task.startedAt : task.windowStart;
+      const taskEnd = taskStart + task.duration;
+      if (start < taskEnd && start + duration > task.windowStart) {
         schedule.conflict = true;
         this.state.scoreBreakdown.energyWaste += SCORE.ENERGY_WASTE;
-        this.state.addEvent('warning', `除霜与"${activeTask.name}"冲突，造成能源浪费`);
+        this.state.addEvent('warning', `除霜与"${task.name}"冲突，造成能源浪费`);
+        break;
       }
     }
 
