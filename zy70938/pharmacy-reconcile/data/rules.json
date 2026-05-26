@@ -1,0 +1,13 @@
+{
+  "followUpIntervalDays": 30,
+  "intervalToleranceDays": 3,
+  "forbiddenMedicines": {
+    "hypertension": ["布洛芬", "伪麻黄碱"],
+    "diabetes": ["糖皮质激素", "噻嗪类利尿剂"]
+  },
+  "allergyKeywords": ["青霉素", "头孢"],
+  "maskingRules": {
+    "name": "lastTwoChars",
+    "phone": "middle4Digits"
+  }
+}
