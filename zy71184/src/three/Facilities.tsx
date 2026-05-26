@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import * as THREE from 'three';
 import { CONFIG } from '../engine/config';
 import { Drain, Lowland, Pump } from '../engine/types';
 

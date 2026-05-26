@@ -1,57 +1,131 @@
-# React + TypeScript + Vite
+# 🌧️ 城市排水防涝模拟器
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一款基于 WebGL 的 3D 城市排水防涝策略游戏，帮助学生理解雨水口、泵站和低洼点的联动机制。
 
-Currently, two official plugins are available:
+## ✨ 核心功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🎮 游戏玩法
+- **10x10 城市网格**: 可交互的 3D 城市地图，包含道路、建筑、排水设施
+- **回合制系统**: 15 个回合，每回合自动推进或手动控制
+- **降雨事件**: 从小雨到暴雨 4 种强度，提前 2 回合预报
+- **胜负条件**: 完成所有回合为胜，积水超标/泵站全毁/分数过低为失败
 
-## Expanding the ESLint configuration
+### 🏗️ 设施管理
+- **雨水口 (6个)**: 收集周边积水，随时间会堵塞，可手动清理 (+50分)
+- **泵站 (2个)**: 可调节抽水功率，超载运行 3 次会永久损坏
+- **低洼点 (2个)**: 天然易积水区域，支持预警阈值设置和临时排水 (-100分)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 📊 数据分析
+- **实时监控**: 设施状态、积水深度、负载情况一目了然
+- **历史回放**: 游戏结束后可拖拽时间轴回看任意回合
+- **结算报告**: 详细得分明细、设施统计、得分走势图、关键事件时间线
+- **导出功能**: 支持 PDF 和 JSON 格式导出完整对局数据
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 🚀 快速开始
+
+### 环境要求
+- Node.js >= 18.0.0
+- pnpm >= 8.0.0
+
+### 安装依赖
+```bash
+pnpm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 开发模式
+```bash
+pnpm run dev
 ```
+访问 http://localhost:5175 开始游戏
+
+### 构建生产版本
+```bash
+pnpm run build
+```
+
+### 代码检查
+```bash
+pnpm run lint
+```
+
+## 🎯 操作指南
+
+### 视角控制
+- **鼠标拖拽**: 旋转视角
+- **滚轮**: 缩放视图
+- **触屏手势**: 支持双指缩放和拖拽旋转
+
+### 设施操作
+1. **点击设施**: 查看详细信息
+2. **雨水口**: 点击"清理堵塞"按钮清理（需堵塞度 > 0）
+3. **泵站**: 拖动滑块调节抽水功率（0.1-1.0）
+4. **低洼点**: 设置预警阈值，或启动临时排水
+
+### 游戏控制
+- **开始/暂停**: 点击播放按钮
+- **下一回合**: 手动推进一个回合
+- **速度调节**: 1x / 2x / 4x 游戏速度
+- **重新开始**: 重置游戏进度
+
+## 📁 项目结构
+
+```
+src/
+├── components/          # React UI 组件
+│   ├── GameCanvas.tsx   # 3D 画布容器
+│   ├── ControlPanel.tsx # 游戏控制面板
+│   ├── StatusPanel.tsx  # 状态监控面板
+│   ├── FacilityPanel.tsx# 设施详情面板
+│   ├── Timeline.tsx     # 历史回放时间轴
+│   └── ReportModal.tsx  # 结算报告弹窗
+├── engine/              # 游戏核心引擎
+│   ├── types.ts         # TypeScript 类型定义
+│   ├── config.ts        # 游戏配置参数
+│   ├── levelData.ts     # 关卡数据初始化
+│   └── simulator.ts     # 排水模拟核心
+├── store/               # 状态管理
+│   └── useGameStore.ts  # Zustand 状态 store
+├── three/               # Three.js 3D 组件
+│   ├── CityGrid.tsx     # 城市网格渲染
+│   ├── Facilities.tsx   # 设施模型渲染
+│   ├── WaterEffect.tsx  # 积水效果
+│   ├── RainEffect.tsx   # 降雨粒子效果
+│   └── CameraControls.tsx # 相机控制
+└── App.tsx              # 主应用入口
+```
+
+## 🎨 技术栈
+
+| 技术 | 用途 |
+|------|------|
+| **React 18** | UI 框架 |
+| **TypeScript** | 类型安全 |
+| **Three.js** | 3D 渲染引擎 |
+| **@react-three/fiber** | React Three.js 绑定 |
+| **Zustand** | 状态管理 |
+| **TailwindCSS** | 样式框架 |
+| **Framer Motion** | 动画库 |
+| **Recharts** | 图表组件 |
+| **jsPDF + html2canvas** | PDF 导出 |
+| **Vite** | 构建工具 |
+
+## 📜 游戏规则
+
+### 计分规则
+- 每回合基础分: +100
+- 清理雨水口堵塞: +50
+- 泵站高效运行: +30
+- 区域积水 (>2): -50/格
+- 设施损坏: -200/个
+- 启动临时排水: -100
+- 胜利奖励: +500
+
+### 失败条件
+1. 低洼点持续积水 3 回合
+2. 所有泵站均已损坏
+3. 城市 50% 以上区域积水 (>3)
+4. 总分低于 -500 分
+
+## 📄 许可证
+
+MIT License

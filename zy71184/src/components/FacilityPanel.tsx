@@ -80,7 +80,7 @@ export function FacilityPanel() {
             )}
 
             {facility && facility.type === 'lowland' && (
-              <LowlandInfo lowland={facility as Lowland} />
+              <LowlandInfo lowland={facility as Lowland} isReplayMode={state.isReplayMode} />
             )}
           </div>
         </div>
@@ -217,8 +217,16 @@ function PumpControls({ pump, onAdjustPower, isReplayMode }: { pump: Pump; onAdj
   );
 }
 
-function LowlandInfo({ lowland }: { lowland: Lowland }) {
+function LowlandInfo({ lowland, isReplayMode }: { lowland: Lowland; isReplayMode: boolean }) {
+  const { setLowlandWarningThreshold, activateTemporaryDrain } = useGameStore();
   const dangerPercent = (lowland.waterLevel / lowland.maxSafeLevel) * 100;
+  const warningPercent = (lowland.warningThreshold / lowland.maxSafeLevel) * 100;
+
+  const handleActivateDrain = () => {
+    if (!isReplayMode) {
+      activateTemporaryDrain(lowland.id);
+    }
+  };
 
   return (
     <div className="bg-purple-900/30 rounded-lg p-4 border border-purple-700/50">
@@ -231,18 +239,59 @@ function LowlandInfo({ lowland }: { lowland: Lowland }) {
         <div>
           <div className="flex justify-between text-sm mb-1">
             <span className="text-gray-400">当前水位</span>
-            <span className={`font-medium ${dangerPercent > 100 ? 'text-red-400' : dangerPercent > 60 ? 'text-yellow-400' : 'text-green-400'}`}>
+            <span className={`font-medium ${dangerPercent > 100 ? 'text-red-400' : dangerPercent > warningPercent ? 'text-yellow-400' : 'text-green-400'}`}>
               {lowland.waterLevel.toFixed(1)}
             </span>
           </div>
-          <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-700 rounded-full overflow-hidden relative">
             <div
-              className={`h-full transition-all ${dangerPercent > 100 ? 'bg-red-500' : dangerPercent > 60 ? 'bg-yellow-500' : 'bg-blue-500'}`}
+              className="absolute h-full bg-yellow-500/30 transition-all"
+              style={{ width: `${warningPercent}%` }}
+            />
+            <div
+              className={`relative h-full transition-all ${dangerPercent > 100 ? 'bg-red-500' : dangerPercent > warningPercent ? 'bg-yellow-500' : 'bg-blue-500'}`}
               style={{ width: `${Math.min(dangerPercent, 150)}%` }}
             />
           </div>
-          <div className="text-xs text-gray-500 mt-1">安全阈值: {lowland.maxSafeLevel}</div>
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>预警线: {lowland.warningThreshold}</span>
+            <span>安全阈值: {lowland.maxSafeLevel}</span>
+          </div>
         </div>
+
+        <div>
+          <div className="flex justify-between text-sm mb-1">
+            <span className="text-gray-400">预警阈值</span>
+            <span className="text-yellow-400 font-medium">{lowland.warningThreshold.toFixed(1)}</span>
+          </div>
+          <input
+            type="range"
+            min="1"
+            max={lowland.maxSafeLevel}
+            step="0.5"
+            value={lowland.warningThreshold}
+            onChange={(e) => setLowlandWarningThreshold(lowland.id, parseFloat(e.target.value))}
+            disabled={isReplayMode}
+            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-yellow-500 disabled:opacity-50"
+          />
+        </div>
+
+        {lowland.temporaryDrainRemaining > 0 && (
+          <div className="text-green-400 text-sm bg-green-900/30 p-2 rounded">
+            💧 临时排水中, 剩余 {lowland.temporaryDrainRemaining} 回合
+          </div>
+        )}
+
+        {lowland.temporaryDrainRemaining === 0 && (
+          <button
+            onClick={handleActivateDrain}
+            disabled={isReplayMode}
+            className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+          >
+            <Droplets size={16} />
+            启动临时排水 (-100分)
+          </button>
+        )}
 
         {lowland.dangerCount > 0 && (
           <div className="text-red-400 text-sm">

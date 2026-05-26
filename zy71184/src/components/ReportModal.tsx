@@ -1,19 +1,16 @@
-import { useEffect, useRef } from 'react';
-import { X, Trophy, Frown, Download, FileJson, FileText } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { X, Trophy, Frown, FileJson, FileText, FileSpreadsheet, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import { useGameStore } from '../store/useGameStore';
-import { DrainageSimulator } from '../engine/simulator';
 import { Drain, Lowland, Pump } from '../engine/types';
 
 export function ReportModal() {
   const { state, history, simulator, resetGame } = useGameStore();
   const reportRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (state.isGameOver && !state.isReplayMode) {
-    }
-  }, [state.isGameOver, state.isReplayMode]);
+  const [exporting, setExporting] = useState<'pdf' | 'json' | null>(null);
 
   if (!state.isGameOver || state.isReplayMode) return null;
 
@@ -69,25 +66,60 @@ export function ReportModal() {
   const { scoreBreakdown, scoreHistory, facilityStats, keyEvents } = generateReportData();
 
   const exportJSON = () => {
-    const reportData = {
-      finalScore: state.score,
-      isVictory: state.isVictory,
-      failReason: state.failReason,
-      totalTurns: state.turn,
-      scoreBreakdown,
-      keyEvents,
-      facilityStats,
-      timeline: history,
-      exportedAt: new Date().toISOString(),
-    };
+    setExporting('json');
+    setTimeout(() => {
+      const reportData = {
+        finalScore: state.score,
+        isVictory: state.isVictory,
+        failReason: state.failReason,
+        totalTurns: state.turn,
+        scoreBreakdown,
+        keyEvents,
+        facilityStats,
+        timeline: history.map(h => ({
+          turn: h.turn,
+          score: h.state.score,
+          events: h.events,
+        })),
+        exportedAt: new Date().toISOString(),
+      };
 
-    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `drainage-report-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+      const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `drainage-report-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setExporting(null);
+    }, 300);
+  };
+
+  const exportPDF = async () => {
+    if (!reportRef.current) return;
+    setExporting('pdf');
+
+    try {
+      const input = reportRef.current;
+      const canvas = await html2canvas(input, {
+        backgroundColor: '#111827',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`drainage-report-${Date.now()}.pdf`);
+    } catch (error) {
+      console.error('PDF export failed:', error);
+    } finally {
+      setExporting(null);
+    }
   };
 
   const handleClose = () => {
@@ -122,11 +154,20 @@ export function ReportModal() {
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={exportJSON}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors"
+                  onClick={exportPDF}
+                  disabled={exporting !== null}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
                 >
-                  <FileJson size={18} />
-                  导出JSON
+                  {exporting === 'pdf' ? <Loader2 size={18} className="animate-spin" /> : <FileSpreadsheet size={18} />}
+                  {exporting === 'pdf' ? '导出中...' : '导出PDF'}
+                </button>
+                <button
+                  onClick={exportJSON}
+                  disabled={exporting !== null}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                >
+                  {exporting === 'json' ? <Loader2 size={18} className="animate-spin" /> : <FileJson size={18} />}
+                  {exporting === 'json' ? '导出中...' : '导出JSON'}
                 </button>
                 <button
                   onClick={handleClose}

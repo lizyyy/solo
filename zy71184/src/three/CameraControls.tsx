@@ -1,9 +1,11 @@
 import { useRef } from 'react';
 import { OrbitControls } from '@react-three/drei';
-import * as THREE from 'three';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyType = any;
 
 export function CameraControls() {
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<AnyType>(null);
 
   return (
     <OrbitControls

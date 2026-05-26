@@ -1,5 +1,5 @@
 import { CONFIG } from './config';
-import { Drain, GameState, GridCell, Lowland, Pump, RainEvent, ScoreBreakdown } from './types';
+import type { Drain, GameState, Lowland, Pump, ScoreBreakdown } from './types';
 
 export class DrainageSimulator {
   private state: GameState;
@@ -15,9 +15,9 @@ export class DrainageSimulator {
     this.applyRainfall(events);
     this.calculateWaterFlow();
     this.calculateDrainCollection(events);
-    this.calculatePumpOperation(events, scoreDelta);
+    this.calculatePumpOperation(events);
     this.updateLowlandWaterLevels(events);
-    this.updateFacilityStatus(events, scoreDelta);
+    this.updateFacilityStatus();
 
     scoreDelta += this.calculateScore(events);
     this.checkGameOver(events);
@@ -152,7 +152,7 @@ export class DrainageSimulator {
     });
   }
 
-  private calculatePumpOperation(events: string[], scoreDelta: number): void {
+  private calculatePumpOperation(events: string[]): void {
     const { facilities } = this.state;
     const pumps = facilities.filter(f => f.type === 'pump') as Pump[];
     const drains = facilities.filter(f => f.type === 'drain') as Drain[];
@@ -188,9 +188,6 @@ export class DrainageSimulator {
       } else {
         pump.status = 'normal';
         pump.overloadCount = Math.max(0, pump.overloadCount - 1);
-        if (pump.currentLoad > 0) {
-          scoreDelta += CONFIG.SCORE_PUMP_EFFICIENT;
-        }
       }
 
       const overflow = totalInflow - pumped;
@@ -213,13 +210,23 @@ export class DrainageSimulator {
 
     lowlands.forEach(lowland => {
       const cell = grid[lowland.y][lowland.x];
+
+      if (lowland.temporaryDrainRemaining > 0) {
+        const drained = Math.min(cell.waterDepth, 3);
+        cell.waterDepth -= drained;
+        lowland.temporaryDrainRemaining--;
+        if (drained > 0) {
+          events.push(`低洼点 ${lowland.id} 临时排水生效, 排出 ${drained.toFixed(1)} 水量`);
+        }
+      }
+
       lowland.waterLevel = cell.waterDepth;
 
       if (cell.waterDepth > lowland.maxSafeLevel) {
         lowland.dangerCount++;
         lowland.status = 'danger';
         events.push(`低洼点 ${lowland.id} 水位超标! 水位: ${cell.waterDepth.toFixed(1)}`);
-      } else if (cell.waterDepth > lowland.maxSafeLevel * 0.6) {
+      } else if (cell.waterDepth > lowland.warningThreshold) {
         lowland.status = 'warning';
         lowland.dangerCount = Math.max(0, lowland.dangerCount - 1);
       } else {
@@ -229,7 +236,7 @@ export class DrainageSimulator {
     });
   }
 
-  private updateFacilityStatus(events: string[], scoreDelta: number): void {
+  private updateFacilityStatus(): void {
     const { facilities } = this.state;
     
     facilities.forEach(facility => {
@@ -340,6 +347,31 @@ export class DrainageSimulator {
 
     if (pump && pump.status !== 'broken') {
       pump.power = Math.max(0.1, Math.min(1, power));
+      return true;
+    }
+    return false;
+  }
+
+  setLowlandWarningThreshold(lowlandId: string, threshold: number): boolean {
+    const lowland = this.state.facilities.find(
+      f => f.id === lowlandId && f.type === 'lowland'
+    ) as Lowland | undefined;
+
+    if (lowland) {
+      lowland.warningThreshold = Math.max(1, Math.min(lowland.maxSafeLevel, threshold));
+      return true;
+    }
+    return false;
+  }
+
+  activateTemporaryDrain(lowlandId: string): boolean {
+    const lowland = this.state.facilities.find(
+      f => f.id === lowlandId && f.type === 'lowland'
+    ) as Lowland | undefined;
+
+    if (lowland && lowland.temporaryDrainRemaining === 0 && this.state.score >= 100) {
+      lowland.temporaryDrainRemaining = 2;
+      this.state.score -= 100;
       return true;
     }
     return false;

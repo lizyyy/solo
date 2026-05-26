@@ -34,7 +34,10 @@ export interface Lowland extends Facility {
   type: 'lowland';
   waterLevel: number;
   maxSafeLevel: number;
+  warningThreshold: number;
   dangerCount: number;
+  temporaryDrainRemaining: number;
+  hasActivePump: boolean;
 }
 
 export interface GridCell {

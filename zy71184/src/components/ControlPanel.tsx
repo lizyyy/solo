@@ -1,6 +1,5 @@
-import { Play, Pause, RotateCcw, FastForward, History, SkipForward } from 'lucide-react';
+import { Play, Pause, RotateCcw, History, SkipForward } from 'lucide-react';
 import { useGameStore } from '../store/useGameStore';
-import { CONFIG } from '../engine/config';
 
 export function ControlPanel() {
   const { state, togglePause, resetGame, setSpeed, nextTurn, setReplayMode } = useGameStore();

@@ -16,6 +16,8 @@ interface GameStore {
   selectCell: (x: number, y: number) => void;
   clearDrain: (drainId: string) => void;
   adjustPumpPower: (pumpId: string, power: number) => void;
+  setLowlandWarningThreshold: (lowlandId: string, threshold: number) => void;
+  activateTemporaryDrain: (lowlandId: string) => void;
   setReplayMode: (enabled: boolean) => void;
   setReplayTurn: (turn: number) => void;
 }
@@ -117,6 +119,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { simulator } = get();
     if (!simulator) return;
     simulator.adjustPumpPower(pumpId, power);
+    set(prev => ({ state: { ...prev.state } }));
+  },
+
+  setLowlandWarningThreshold: (lowlandId: string, threshold: number) => {
+    const { simulator } = get();
+    if (!simulator) return;
+    simulator.setLowlandWarningThreshold(lowlandId, threshold);
+    set(prev => ({ state: { ...prev.state } }));
+  },
+
+  activateTemporaryDrain: (lowlandId: string) => {
+    const { simulator } = get();
+    if (!simulator) return;
+    simulator.activateTemporaryDrain(lowlandId);
     set(prev => ({ state: { ...prev.state } }));
   },
 

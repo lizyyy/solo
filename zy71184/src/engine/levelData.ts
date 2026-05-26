@@ -56,8 +56,8 @@ export const createFacilities = (): (Drain | Pump | Lowland)[] => {
   ];
 
   const lowlands: Lowland[] = [
-    { id: 'lowland-1', type: 'lowland', x: 5, y: 2, status: 'normal', efficiency: 1, waterLevel: 0, maxSafeLevel: CONFIG.LOWLAND_DANGER_THRESHOLD, dangerCount: 0 },
-    { id: 'lowland-2', type: 'lowland', x: 5, y: 8, status: 'normal', efficiency: 1, waterLevel: 0, maxSafeLevel: CONFIG.LOWLAND_DANGER_THRESHOLD, dangerCount: 0 },
+    { id: 'lowland-1', type: 'lowland', x: 5, y: 2, status: 'normal', efficiency: 1, waterLevel: 0, maxSafeLevel: CONFIG.LOWLAND_DANGER_THRESHOLD, warningThreshold: CONFIG.LOWLAND_DANGER_THRESHOLD * 0.6, dangerCount: 0, temporaryDrainRemaining: 0, hasActivePump: false },
+    { id: 'lowland-2', type: 'lowland', x: 5, y: 8, status: 'normal', efficiency: 1, waterLevel: 0, maxSafeLevel: CONFIG.LOWLAND_DANGER_THRESHOLD, warningThreshold: CONFIG.LOWLAND_DANGER_THRESHOLD * 0.6, dangerCount: 0, temporaryDrainRemaining: 0, hasActivePump: false },
   ];
 
   return [...drains, ...pumps, ...lowlands];
