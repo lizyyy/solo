@@ -231,15 +231,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     if (!patroller || !victim || patroller.status !== 'idle') return false;
 
-    const requiredEquipment = getRequiredEquipment(victim.injury);
-    const hasAllRequired = requiredEquipment.every(req =>
-      selectedEquipment.some(used => used === req.type)
+    const injuryRequiredEquipment = getRequiredEquipment(victim.injury);
+    const levelRequiredEquipment = victim.requiredEquipment || [];
+    
+    const allRequiredEquipment = [
+      ...injuryRequiredEquipment.map(req => req.type),
+      ...levelRequiredEquipment,
+    ];
+    
+    const uniqueRequiredEquipment = [...new Set(allRequiredEquipment)];
+    const hasAllRequired = uniqueRequiredEquipment.every(req =>
+      selectedEquipment.some(used => used === req)
     );
 
     if (!hasAllRequired) {
-      const missingEquipment = requiredEquipment
-        .filter(req => !selectedEquipment.some(used => used === req.type))
-        .map(req => req.type);
+      const missingEquipment = uniqueRequiredEquipment
+        .filter(req => !selectedEquipment.some(used => used === req));
       const event: GameEvent = {
         timestamp: gameState.timeElapsed,
         type: 'warning',
