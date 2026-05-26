@@ -251,7 +251,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           b.targetGate,
           newSegments,
           state.switches,
-          switchStates
+          switchStates,
+          state.gates
         );
         return {
           ...b,

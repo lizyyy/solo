@@ -17,48 +17,64 @@ export const calculatePath = (
   targetGate: string,
   segments: ConveyorSegment[],
   switches: Array<{ id: string; options: string[] }>,
-  switchStates: Record<string, string>
+  switchStates: Record<string, string>,
+  gates: LevelConfig['gates']
 ): string[] => {
-  const path: string[] = [startSegmentId];
-  let currentId = startSegmentId;
-  const visited = new Set<string>();
-
-  while (currentId) {
-    if (visited.has(currentId)) break;
-    visited.add(currentId);
-
-    const current = segments.find(s => s.id === currentId);
-    if (!current) break;
+  const getNextSegments = (segmentId: string): string[] => {
+    const current = segments.find(s => s.id === segmentId);
+    if (!current) return [];
 
     if (current.isSwitch && current.switchOptions) {
-      const switchConfig = switches.find(s => s.id === currentId);
-      const selectedOption = switchStates[currentId];
-      
-      if (selectedOption && current.switchOptions.includes(selectedOption)) {
-        currentId = selectedOption;
-      } else {
-        currentId = current.switchOptions[0];
+      const selected = switchStates[segmentId];
+      if (selected && current.switchOptions.includes(selected)) {
+        return [selected];
       }
-    } else {
-      const nextSegment = segments.find(s => 
-        s.id !== currentId && 
-        Math.abs(s.start.x - current.end.x) < 0.1 && 
-        Math.abs(s.start.z - current.end.z) < 0.1
-      );
-      
-      if (nextSegment) {
-        currentId = nextSegment.id;
-      } else {
-        break;
+      return [current.switchOptions[0]];
+    }
+
+    const connected = segments.filter(s => 
+      s.id !== segmentId && 
+      Math.abs(s.start.x - current.end.x) < 0.1 && 
+      Math.abs(s.start.z - current.end.z) < 0.1
+    );
+    return connected.map(s => s.id);
+  };
+
+  const reachesGate = (segmentId: string, gateId: string): boolean => {
+    const segment = segments.find(s => s.id === segmentId);
+    if (!segment) return false;
+    
+    const gate = gates.find(g => g.id === gateId);
+    if (!gate) return false;
+
+    const dist = Math.sqrt(
+      Math.pow(segment.end.x - gate.position.x, 2) +
+      Math.pow(segment.end.z - gate.position.z, 2)
+    );
+    return dist < 2.5;
+  };
+
+  const findPath = (currentId: string, visited: Set<string>): string[] | null => {
+    if (visited.has(currentId)) return null;
+    visited.add(currentId);
+
+    if (reachesGate(currentId, targetGate)) {
+      return [currentId];
+    }
+
+    const nextSegments = getNextSegments(currentId);
+    for (const nextId of nextSegments) {
+      const path = findPath(nextId, new Set(visited));
+      if (path) {
+        return [currentId, ...path];
       }
     }
 
-    if (currentId && !visited.has(currentId)) {
-      path.push(currentId);
-    }
-  }
+    return null;
+  };
 
-  return path;
+  const path = findPath(startSegmentId, new Set());
+  return path || [startSegmentId];
 };
 
 export const getSegmentEndGate = (
@@ -130,7 +146,7 @@ export const createBaggage = (
     position: { ...level.spawnPoint },
     progress: 0,
     currentSegmentId: firstSegment.id,
-    path: calculatePath(firstSegment.id, targetGate, segments, level.switches, switchStates),
+    path: calculatePath(firstSegment.id, targetGate, segments, level.switches, switchStates, level.gates),
     pathIndex: 0,
     createdAt: Date.now(),
     color: BAGGAGE_COLORS[type] || BAGGAGE_COLORS.normal,
