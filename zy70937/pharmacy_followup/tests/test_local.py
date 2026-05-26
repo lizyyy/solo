@@ -54,6 +54,29 @@ def upload_customers():
     if result.get("is_duplicate"):
         print(f"   ⚠  {result['message']}")
 
+    if result["normal"]:
+        sample = result["normal"][0]
+        raw_data = sample.get("raw_data", {})
+        print(f"\n   隐私脱敏验证:")
+        if "phone" in raw_data:
+            phone_val = raw_data["phone"]
+            if "****" in str(phone_val) or phone_val == "":
+                print(f"   ✓ 手机号已脱敏: {phone_val}")
+            else:
+                print(f"   ✗ 手机号未脱敏: {phone_val}")
+        if "id_card" in raw_data:
+            id_card_val = raw_data["id_card"]
+            if "****" in str(id_card_val) or "********" in str(id_card_val):
+                print(f"   ✓ 身份证已脱敏: {id_card_val}")
+            else:
+                print(f"   ✗ 身份证未脱敏: {id_card_val}")
+        if "address" in raw_data:
+            address_val = raw_data["address"]
+            if "***" in str(address_val):
+                print(f"   ✓ 地址已脱敏: {address_val}")
+            else:
+                print(f"   ✗ 地址未脱敏: {address_val}")
+
     if result["failed"]:
         print("\n   失败记录详情:")
         for item in result["failed"][:3]:
@@ -132,7 +155,9 @@ def test_trace(reminders):
         return
 
     sample_trace_id = reminders[0]["trace_id"]
+    sample_report_id = reminders[0]["report_id"]
     print(f"   使用追踪ID: {sample_trace_id}")
+    print(f"   关联报告ID: {sample_report_id}")
 
     resp = requests.get(f"{BASE_URL}/api/v1/trace/{sample_trace_id}")
     assert resp.status_code == 200, f"追踪查询失败: {resp.text}"
@@ -145,6 +170,13 @@ def test_trace(reminders):
         print(f"     - 药品: {result['reminder']['drug_name']}")
         print(f"     - 报告: {result['reminder']['report_id']}")
 
+    if result.get("processed_record"):
+        print(f"   ✓ 处理记录: 批次{result['processed_record']['batch_id']}")
+        print(f"     - 类型: {result['processed_record']['record_type']}")
+        print(f"     - 状态: {result['processed_record']['status']}")
+    else:
+        print(f"   ⚠ 未找到直接关联的处理记录（可能通过购药记录关联）")
+
     if result.get("purchase_record"):
         print(f"   ✓ 购药记录: {result['purchase_record']['record_id']}")
         print(f"     - 日期: {result['purchase_record']['purchase_date']}")
@@ -154,9 +186,23 @@ def test_trace(reminders):
         print(f"     - 脱敏手机号: {result['customer']['phone_masked']}")
         print(f"     - 病种: {result['customer']['disease_type']}")
 
-    if result.get("processed_record"):
-        print(f"   ✓ 处理记录: 批次{result['processed_record']['batch_id']}")
-        print(f"     - 状态: {result['processed_record']['status']}")
+    if result.get("report"):
+        print(f"   ✓ 最终报告: {result['report']['report_id']}")
+        print(f"     - 提醒总数: {result['report']['summary']['total_reminders']}")
+        print(f"     - 逾期: {result['report']['summary']['overdue_count']}")
+    else:
+        print(f"   ⚠ 追踪结果中未包含报告详情")
+
+    print(f"\n   6. 验证报告查询接口...")
+    resp_report = requests.get(f"{BASE_URL}/api/v1/report/{sample_report_id}")
+    if resp_report.status_code == 200:
+        report_data = resp_report.json()
+        print(f"   ✓ 报告查询成功: {report_data['report_id']}")
+        print(f"     - 提醒总数: {report_data['summary']['total_reminders']}")
+        print(f"     - 逾期: {report_data['summary']['overdue_count']}")
+        print(f"     - 即将到期: {report_data['summary']['upcoming_count']}")
+    else:
+        print(f"   ✗ 报告查询失败: {resp_report.status_code}")
 
 
 def test_duplicate_upload():
@@ -212,6 +258,7 @@ def main():
         print(f"  - 批次列表: {BASE_URL}/api/v1/batches")
         print(f"  - 规则列表: {BASE_URL}/api/v1/rules")
         print(f"  - 提醒列表: {BASE_URL}/api/v1/reminders")
+        print(f"  - 报告查询: {BASE_URL}/api/v1/report/{{report_id}}")
 
     except Exception as e:
         print(f"\n❌ 测试失败: {e}")

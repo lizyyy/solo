@@ -170,13 +170,35 @@ class DataProcessor:
                 "address_masked": mask_address(normalized.get("address", "")),
             }
 
+            masked_raw = dict(normalized["_raw"])
+            if "phone" in masked_raw and masked_raw["phone"]:
+                masked_raw["phone"] = mask_phone(str(masked_raw["phone"]))
+            if "id_card" in masked_raw and masked_raw["id_card"]:
+                masked_raw["id_card"] = mask_id_card(str(masked_raw["id_card"]))
+            if "idCard" in masked_raw and masked_raw["idCard"]:
+                masked_raw["idCard"] = mask_id_card(str(masked_raw["idCard"]))
+            if "address" in masked_raw and masked_raw["address"]:
+                masked_raw["address"] = mask_address(str(masked_raw["address"]))
+            if "手机号" in masked_raw and masked_raw["手机号"]:
+                masked_raw["手机号"] = mask_phone(str(masked_raw["手机号"]))
+            if "电话" in masked_raw and masked_raw["电话"]:
+                masked_raw["电话"] = mask_phone(str(masked_raw["电话"]))
+            if "身份证号" in masked_raw and masked_raw["身份证号"]:
+                masked_raw["身份证号"] = mask_id_card(str(masked_raw["身份证号"]))
+            if "身份证" in masked_raw and masked_raw["身份证"]:
+                masked_raw["身份证"] = mask_id_card(str(masked_raw["身份证"]))
+            if "地址" in masked_raw and masked_raw["地址"]:
+                masked_raw["地址"] = mask_address(str(masked_raw["地址"]))
+            if "居住地址" in masked_raw and masked_raw["居住地址"]:
+                masked_raw["居住地址"] = mask_address(str(masked_raw["居住地址"]))
+
             processed = ProcessedRecord(
                 batch_id=batch.id,
                 record_type="customer",
                 source_id=normalized.get("customer_id"),
                 status=status,
                 result_category=status,
-                raw_data=normalized["_raw"],
+                raw_data=masked_raw,
                 processed_data=masked_data,
                 error_message=error_msg if error_msg else None,
                 suggestion=suggestion if suggestion else None,
@@ -193,7 +215,7 @@ class DataProcessor:
                 "source_id": normalized.get("customer_id"),
                 "status": status,
                 "result_category": status,
-                "raw_data": normalized["_raw"],
+                "raw_data": masked_raw,
                 "processed_data": masked_data,
                 "error_message": error_msg if error_msg else None,
                 "suggestion": suggestion if suggestion else None,
@@ -419,6 +441,31 @@ class DataProcessor:
         failed = []
 
         for r in records:
+            raw_data = r.raw_data
+            if r.record_type == "customer" and raw_data:
+                masked_raw = dict(raw_data)
+                if "phone" in masked_raw and masked_raw["phone"]:
+                    masked_raw["phone"] = mask_phone(str(masked_raw["phone"]))
+                if "id_card" in masked_raw and masked_raw["id_card"]:
+                    masked_raw["id_card"] = mask_id_card(str(masked_raw["id_card"]))
+                if "idCard" in masked_raw and masked_raw["idCard"]:
+                    masked_raw["idCard"] = mask_id_card(str(masked_raw["idCard"]))
+                if "address" in masked_raw and masked_raw["address"]:
+                    masked_raw["address"] = mask_address(str(masked_raw["address"]))
+                if "手机号" in masked_raw and masked_raw["手机号"]:
+                    masked_raw["手机号"] = mask_phone(str(masked_raw["手机号"]))
+                if "电话" in masked_raw and masked_raw["电话"]:
+                    masked_raw["电话"] = mask_phone(str(masked_raw["电话"]))
+                if "身份证号" in masked_raw and masked_raw["身份证号"]:
+                    masked_raw["身份证号"] = mask_id_card(str(masked_raw["身份证号"]))
+                if "身份证" in masked_raw and masked_raw["身份证"]:
+                    masked_raw["身份证"] = mask_id_card(str(masked_raw["身份证"]))
+                if "地址" in masked_raw and masked_raw["地址"]:
+                    masked_raw["地址"] = mask_address(str(masked_raw["地址"]))
+                if "居住地址" in masked_raw and masked_raw["居住地址"]:
+                    masked_raw["居住地址"] = mask_address(str(masked_raw["居住地址"]))
+                raw_data = masked_raw
+
             data = {
                 "id": r.id,
                 "batch_id": r.batch_id,
@@ -426,7 +473,7 @@ class DataProcessor:
                 "source_id": r.source_id,
                 "status": r.status,
                 "result_category": r.result_category,
-                "raw_data": r.raw_data,
+                "raw_data": raw_data,
                 "processed_data": r.processed_data,
                 "error_message": r.error_message,
                 "suggestion": r.suggestion,
@@ -559,6 +606,29 @@ class DataProcessor:
                 .first()
             )
 
+            if not processed and purchase:
+                processed = (
+                    self.db.query(ProcessedRecord)
+                    .filter(
+                        ProcessedRecord.record_type == "purchase",
+                        ProcessedRecord.source_id == purchase.record_id,
+                    )
+                    .first()
+                )
+                if not processed and customer:
+                    purchase_date_str = purchase.purchase_date.strftime("%Y-%m-%d") if hasattr(purchase.purchase_date, 'strftime') else str(purchase.purchase_date)
+                    alt_trace_id = generate_trace_id(
+                        purchase.record_id,
+                        customer.customer_id,
+                        purchase.drug_name,
+                        purchase_date_str,
+                    )
+                    processed = (
+                        self.db.query(ProcessedRecord)
+                        .filter(ProcessedRecord.trace_id == alt_trace_id)
+                        .first()
+                    )
+
         if processed and processed.source_id:
             if processed.record_type == "purchase":
                 purchase = (
@@ -566,12 +636,22 @@ class DataProcessor:
                     .filter(PurchaseRecord.record_id == processed.source_id)
                     .first()
                 )
+                if not customer and purchase:
+                    customer = (
+                        self.db.query(Customer)
+                        .filter(Customer.customer_id == purchase.customer_id)
+                        .first()
+                    )
             if processed.record_type == "customer":
                 customer = (
                     self.db.query(Customer)
                     .filter(Customer.customer_id == processed.source_id)
                     .first()
                 )
+
+        report_detail = None
+        if reminder and reminder.report_id:
+            report_detail = self.get_report_detail(reminder.report_id)
 
         result = {
             "trace_id": trace_id,
@@ -633,8 +713,51 @@ class DataProcessor:
             }
             if customer
             else None,
+            "report": report_detail,
         }
         return clean_for_json(result)
+
+    def get_report_detail(self, report_id: str) -> Dict[str, Any]:
+        reminders = (
+            self.db.query(FollowupReminder)
+            .filter(FollowupReminder.report_id == report_id)
+            .order_by(FollowupReminder.created_at.desc())
+            .all()
+        )
+
+        if not reminders:
+            return None
+
+        reminder_list = []
+        for rem in reminders:
+            reminder_list.append({
+                "reminder_id": rem.reminder_id,
+                "customer_id": rem.customer_id,
+                "customer_name": rem.customer_name,
+                "drug_name": rem.drug_name,
+                "last_purchase_date": rem.last_purchase_date,
+                "next_followup_date": rem.next_followup_date,
+                "reminder_type": rem.reminder_type,
+                "content": rem.content,
+                "status": rem.status,
+                "trace_id": rem.trace_id,
+                "report_id": rem.report_id,
+                "created_at": rem.created_at,
+            })
+
+        overdue_count = len([r for r in reminder_list if r["reminder_type"] == "overdue"])
+        upcoming_count = len([r for r in reminder_list if r["reminder_type"] == "upcoming"])
+
+        return {
+            "report_id": report_id,
+            "generated_at": reminders[0].created_at,
+            "summary": {
+                "total_reminders": len(reminder_list),
+                "overdue_count": overdue_count,
+                "upcoming_count": upcoming_count,
+            },
+            "reminders": reminder_list,
+        }
 
 
 import pandas as pd

@@ -7,6 +7,7 @@ from database import get_db
 from models import (
     UploadResponse,
     ReportResponse,
+    ReportDetailResponse,
     TraceDetailResponse,
     BatchResponse,
     FollowupReminderResponse,
@@ -99,6 +100,15 @@ def generate_report(
 ):
     processor = DataProcessor(db)
     report = processor.generate_followup_report(batch_no)
+    return report
+
+
+@router.get("/report/{report_id}", response_model=ReportDetailResponse)
+def get_report(report_id: str, db: Session = Depends(get_db)):
+    processor = DataProcessor(db)
+    report = processor.get_report_detail(report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="未找到该报告")
     return report
 
 

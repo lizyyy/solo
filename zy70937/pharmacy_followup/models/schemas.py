@@ -156,9 +156,21 @@ class ReportResponse(BaseModel):
     reminders: List[FollowupReminderResponse] = []
 
 
+class ReportDetailResponse(BaseModel):
+    report_id: str
+    generated_at: Optional[datetime] = None
+    summary: Dict[str, Any]
+    reminders: List[FollowupReminderResponse] = []
+
+    model_config = {"extra": "allow"}
+
+
 class TraceDetailResponse(BaseModel):
     trace_id: str
     reminder: Optional[FollowupReminderResponse] = None
     processed_record: Optional[ProcessedRecordResponse] = None
     purchase_record: Optional[PurchaseRecordResponse] = None
     customer: Optional[CustomerResponse] = None
+    report: Optional[ReportDetailResponse] = None
+
+    model_config = {"extra": "allow"}

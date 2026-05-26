@@ -18,6 +18,7 @@ from .schemas import (
     UploadResponse,
     FollowupReminderResponse,
     ReportResponse,
+    ReportDetailResponse,
     TraceDetailResponse,
 )
 
@@ -39,5 +40,6 @@ __all__ = [
     "UploadResponse",
     "FollowupReminderResponse",
     "ReportResponse",
+    "ReportDetailResponse",
     "TraceDetailResponse",
 ]
