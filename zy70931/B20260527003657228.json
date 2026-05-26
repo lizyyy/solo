@@ -1,5 +1,5 @@
 {
-  "batch_no": "B20260526234333969",
+  "batch_no": "B20260527003657228",
   "items": [
     {
       "item_id": 1,
@@ -7,7 +7,7 @@
       "category": "normal",
       "reason": "核心字段齐全且格式校验通过",
       "follow_up": "自动推送至结算系统，权益包次日到账，客户短信通知已触发",
-      "processed_at": "2026-05-26T23:43:34",
+      "processed_at": "2026-05-27T00:36:57",
       "payload": {
         "package_code": "B10035",
         "plate": "沪A12345",
@@ -27,7 +27,7 @@
       "category": "normal",
       "reason": "核心字段齐全且格式校验通过",
       "follow_up": "自动推送至结算系统，权益包次日到账，客户短信通知已触发",
-      "processed_at": "2026-05-26T23:43:34",
+      "processed_at": "2026-05-27T00:36:57",
       "payload": {
         "package_code": "M20001",
         "plate": "沪B88888",
@@ -47,7 +47,7 @@
       "category": "normal",
       "reason": "核心字段齐全且格式校验通过",
       "follow_up": "自动推送至结算系统，权益包次日到账，客户短信通知已触发",
-      "processed_at": "2026-05-26T23:43:34",
+      "processed_at": "2026-05-27T00:36:57",
       "payload": {
         "package_code": "T30002",
         "plate": "沪C99999",
@@ -67,7 +67,7 @@
       "category": "blocked",
       "reason": "VIN 长度异常(10)，标准长度为 17 位",
       "follow_up": "驳回门店原始单，要求重新扫描 VIN 并上传行驶证照片",
-      "processed_at": "2026-05-26T23:43:34",
+      "processed_at": "2026-05-27T00:36:57",
       "payload": {
         "package_code": "B10099",
         "plate": "沪D11111",
@@ -87,7 +87,7 @@
       "category": "blocked",
       "reason": "套餐前缀非法(X)，不在备案范围 B/M/T 内",
       "follow_up": "冻结本单并提交风控复核，门店店长需在 24h 内补正套餐协议",
-      "processed_at": "2026-05-26T23:43:34",
+      "processed_at": "2026-05-27T00:36:57",
       "payload": {
         "package_code": "X99999",
         "plate": "沪E22222",
@@ -107,7 +107,7 @@
       "category": "pending",
       "reason": "可填字段留空: mileage, phone, technician",
       "follow_up": "系统自动发送提醒短信给门店前台，72h 内补充即可；不影响当前核销结算",
-      "processed_at": "2026-05-26T23:43:34",
+      "processed_at": "2026-05-27T00:36:57",
       "payload": {
         "package_code": "B10088",
         "plate": "沪F33333",
@@ -127,7 +127,7 @@
       "category": "pending",
       "reason": "可填字段留空: phone, customer_name",
       "follow_up": "系统自动发送提醒短信给门店前台，72h 内补充即可；不影响当前核销结算",
-      "processed_at": "2026-05-26T23:43:34",
+      "processed_at": "2026-05-27T00:36:57",
       "payload": {
         "package_code": "M20077",
         "plate": "沪G44444",
@@ -139,6 +139,86 @@
         "customer_name": null,
         "technician": "冯师傅",
         "note": "缺失客户手机号"
+      }
+    },
+    {
+      "item_id": 8,
+      "seq": 8,
+      "category": "pending",
+      "reason": "缺失必填字段: package_code, vin",
+      "follow_up": "指派门店店长补齐 package_code, vin 后回流，超 48h 未补充则转拦截",
+      "processed_at": "2026-05-27T00:36:57",
+      "payload": {
+        "package_code": null,
+        "plate": "沪H66666",
+        "vin": null,
+        "service_date": "2026-05-26",
+        "store_id": "S001",
+        "mileage": 30000,
+        "phone": "13900139001",
+        "customer_name": "韩先生",
+        "technician": "朱师傅",
+        "note": "缺失套餐编号和VIN（必填缺失）"
+      }
+    },
+    {
+      "item_id": 9,
+      "seq": 9,
+      "category": "pending",
+      "reason": "缺失必填字段: service_date, store_id",
+      "follow_up": "指派门店店长补齐 service_date, store_id 后回流，超 48h 未补充则转拦截",
+      "processed_at": "2026-05-27T00:36:57",
+      "payload": {
+        "package_code": "B10150",
+        "plate": "沪I77777",
+        "vin": "LSGPC54U8KD987654",
+        "service_date": null,
+        "store_id": null,
+        "mileage": 18000,
+        "phone": "13900139002",
+        "customer_name": "秦先生",
+        "technician": "尤师傅",
+        "note": "缺失服务日期和门店编号（必填缺失）"
+      }
+    },
+    {
+      "item_id": 10,
+      "seq": 10,
+      "category": "pending",
+      "reason": "缺失必填字段: package_code, vin",
+      "follow_up": "指派门店店长补齐 package_code, vin 后回流，超 48h 未补充则转拦截",
+      "processed_at": "2026-05-27T00:36:57",
+      "payload": {
+        "package_code": null,
+        "plate": "沪J88888",
+        "vin": null,
+        "service_date": "2026-05-27",
+        "store_id": "S001",
+        "mileage": null,
+        "phone": null,
+        "customer_name": "何先生",
+        "technician": null,
+        "note": null
+      }
+    },
+    {
+      "item_id": 11,
+      "seq": 11,
+      "category": "pending",
+      "reason": "缺失必填字段: plate, service_date",
+      "follow_up": "指派门店店长补齐 plate, service_date 后回流，超 48h 未补充则转拦截",
+      "processed_at": "2026-05-27T00:36:57",
+      "payload": {
+        "package_code": "B10188",
+        "plate": null,
+        "vin": "LSGPC54U8KD112233",
+        "service_date": null,
+        "store_id": "S001",
+        "mileage": null,
+        "phone": null,
+        "customer_name": null,
+        "technician": null,
+        "note": "缺失车牌和服务日期"
       }
     }
   ]

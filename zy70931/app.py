@@ -28,11 +28,11 @@ KNOWN_PACKAGE_PREFIX = {"B", "M", "T"}
 
 # ----------------------------- 数据模型 ---------------------------------
 class RawRecord(BaseModel):
-    package_code: str = Field(..., description="保养套餐编号，如 B10035")
-    plate: str = Field(..., description="车牌号，如 沪A12345")
-    vin: str = Field(..., description="车架号 VIN，17 位")
-    service_date: str = Field(..., description="服务日期 YYYY-MM-DD")
-    store_id: str = Field(..., description="门店编号")
+    package_code: Optional[str] = Field(None, description="保养套餐编号，如 B10035")
+    plate: Optional[str] = Field(None, description="车牌号，如 沪A12345")
+    vin: Optional[str] = Field(None, description="车架号 VIN，17 位")
+    service_date: Optional[str] = Field(None, description="服务日期 YYYY-MM-DD")
+    store_id: Optional[str] = Field(None, description="门店编号")
     mileage: Optional[int] = Field(None, description="里程数 km")
     phone: Optional[str] = Field(None, description="客户手机号")
     customer_name: Optional[str] = Field(None, description="客户姓名")

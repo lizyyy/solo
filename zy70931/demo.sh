@@ -21,6 +21,16 @@ echo "==> 3. 上传 sample.csv"
 curl -s -X POST "$BASE/batches/$BATCH/upload" \
   -F 'file=@sample.csv;type=text/csv'; echo
 
+echo "==> 3b. JSON 登记一条缺失必填字段的记录（验证进入 pending，不再触发 400/422）"
+curl -s -X POST "$BASE/batches/$BATCH/register" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "records":[
+      {"plate":"沪J88888","service_date":"2026-05-27","store_id":"S001","customer_name":"何先生"},
+      {"package_code":"B10188","vin":"LSGPC54U8KD112233","store_id":"S001","note":"缺失车牌和服务日期"}
+    ]
+  }'; echo
+
 echo "==> 4. 触发拆分"
 curl -s -X POST "$BASE/batches/$BATCH/split"; echo
 
@@ -29,6 +39,9 @@ curl -s "$BASE/batches/$BATCH"; echo
 
 echo "==> 6. 已拦截明细"
 curl -s "$BASE/batches/$BATCH/items?category=blocked" | python3 -m json.tool | head -60
+
+echo "==> 6b. 待补充明细（验证必填缺失进入 pending）"
+curl -s "$BASE/batches/$BATCH/items?category=pending" | python3 -m json.tool
 
 echo "==> 7. 读取第一条明细的处理轨迹"
 FIRST_ID=$(curl -s "$BASE/batches/$BATCH/items" | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['item_id'])")
