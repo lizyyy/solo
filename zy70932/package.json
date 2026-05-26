@@ -1,0 +1,16 @@
+{
+  "name": "supervision-backend",
+  "version": "1.0.0",
+  "description": "装修监理后端服务 - 节点追踪与整改追溯",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^11.3.0",
+    "multer": "^1.4.5-lts.1",
+    "csv-parse": "^5.5.3"
+  }
+}
