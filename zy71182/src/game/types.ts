@@ -57,6 +57,7 @@ export interface Sheet {
   placed: PlacedOrder[];
   ink: ColorSet | null;
   used: boolean;
+  settled: boolean;
 }
 
 export type LogKind =
@@ -102,7 +103,7 @@ export const LEVELS: LevelConfig[] = [
     allowedColors: ["K"],
     inkSwitchCost: 0,
     missDeadlinePenalty: 80,
-    wastePenaltyPer: 0.02,
+    wastePenaltyPer: 1.5,
     paperCost: { FULL: 8, HALF: 5, QUARTER: 3 },
     minQuality: 70,
     targetScore: 600,
@@ -117,7 +118,7 @@ export const LEVELS: LevelConfig[] = [
     allowedColors: ["K", "CM", "MY", "CY"],
     inkSwitchCost: 60,
     missDeadlinePenalty: 120,
-    wastePenaltyPer: 0.03,
+    wastePenaltyPer: 2.0,
     paperCost: { FULL: 10, HALF: 6, QUARTER: 4 },
     minQuality: 75,
     targetScore: 1200,
@@ -132,7 +133,7 @@ export const LEVELS: LevelConfig[] = [
     allowedColors: ["K", "CMYK", "PANTONE"],
     inkSwitchCost: 120,
     missDeadlinePenalty: 180,
-    wastePenaltyPer: 0.04,
+    wastePenaltyPer: 2.5,
     paperCost: { FULL: 12, HALF: 8, QUARTER: 5 },
     minQuality: 80,
     targetScore: 2000,

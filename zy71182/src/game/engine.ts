@@ -95,6 +95,7 @@ export function makeSheet(format: SheetFormat): Sheet {
     placed: [],
     ink: null,
     used: false,
+    settled: false,
   };
 }
 
@@ -265,23 +266,24 @@ export function endDay(state: GameState) {
     }
   }
 
-  // waste & paper cost
+  // waste & paper cost — only on newly printed sheets (not yet settled)
   for (const sheet of state.sheets) {
-    if (sheet.used) {
+    if (sheet.used && !sheet.settled) {
       const size = SHEET_SIZES[sheet.format];
       const used = sheet.placed.reduce((s, p) => s + p.w * p.h, 0);
       const area = size.w * size.h;
-      const wasteRatio = Math.max(0, 1 - used / area);
-      const wastePenalty = Math.round(area * level.wastePenaltyPer * wasteRatio);
-      state.cash -= level.paperCost[sheet.format] + wastePenalty;
-      state.score -= level.paperCost[sheet.format] + wastePenalty;
+      const wastedArea = Math.max(0, area - used);
+      const wastePenalty = Math.round((wastedArea / 10000) * level.wastePenaltyPer);
+      const totalCost = level.paperCost[sheet.format] + wastePenalty;
+      state.cash -= totalCost;
+      state.score -= totalCost;
+      const wastePct = area > 0 ? Math.round((wastedArea / area) * 100) : 0;
       log(
         state,
         "day_end",
-        `${sheet.id} ${SHEET_SIZES[sheet.format].label} 浪费 ${Math.round(
-          wasteRatio * 100,
-        )}%，-${level.paperCost[sheet.format] + wastePenalty}`,
+        `${sheet.id} ${SHEET_SIZES[sheet.format].label} 浪费 ${wastePct}%，-${totalCost}`,
       );
+      sheet.settled = true;
     }
   }
 
