@@ -165,6 +165,8 @@ export class GameEngine {
       }
     }
 
+    const isWin = this.turnManager.checkVictory(this.restaurants);
+
     const overflowing = this.turnManager.incrementOil(this.restaurants);
     const overflowCount = overflowing.length;
 
@@ -204,7 +206,6 @@ export class GameEngine {
 
     this.turnHistory.push(turnAction);
 
-    const isWin = this.turnManager.checkVictory(this.restaurants);
     const isGameOver = isWin
       ? false
       : this.turnManager.checkGameOver(this.currentTurn, this.level);

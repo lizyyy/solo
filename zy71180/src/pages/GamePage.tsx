@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store/useGameStore';
-import { RouteNode, Restaurant, Position } from '@/types/game';
+import { RouteNode, Position } from '@/types/game';
 import { RoutePlanner } from '@/engine/RoutePlanner';
 import GameMap from '@/components/GameMap';
 import InfoPanel from '@/components/InfoPanel';
@@ -30,7 +30,6 @@ export default function GamePage() {
     autoPlanRoute,
     checkEvent,
     applyEvent,
-    dismissEvent,
     executeTurn,
     pauseGame,
     resumeGame,
@@ -121,11 +120,7 @@ export default function GamePage() {
     setPendingEvent(null);
   }, [applyEvent, currentEvent]);
 
-  const handleEventDismiss = useCallback(() => {
-    dismissEvent();
-    setShowEventModal(false);
-    setPendingEvent(null);
-  }, [dismissEvent]);
+
 
   const totalDistance = plannedRoute.length > 0 && truck
     ? RoutePlanner.calculateRouteDistance(
