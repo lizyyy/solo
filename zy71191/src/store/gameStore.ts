@@ -133,7 +133,7 @@ export const useGameStore = create<GameState & {
   endTurn: () => {
     const state = get();
     if (state.phase !== 'playing') return;
-    if (state.currentTurn >= state.maxTurns) return;
+    if (state.currentTurn > state.maxTurns) return;
 
     const action: PlayerAction = {
       type: 'end_turn',

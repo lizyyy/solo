@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '@/store/gameStore';
 import { LEVELS } from '@/data/levels';
@@ -8,6 +8,21 @@ export default function MainMenu() {
   const state = useGameStore();
   const navigate = useNavigate();
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
+  const [hasReplayData, setHasReplayData] = useState<Record<number, boolean>>({});
+
+  useEffect(() => {
+    const checkReplayData = () => {
+      const result: Record<number, boolean> = {};
+      for (const level of LEVELS) {
+        const data = localStorage.getItem(`exhibition-history-${level.id}`);
+        result[level.id] = !!data;
+      }
+      setHasReplayData(result);
+    };
+    checkReplayData();
+    window.addEventListener('storage', checkReplayData);
+    return () => window.removeEventListener('storage', checkReplayData);
+  }, []);
 
   const handleStartGame = (levelId: number) => {
     state.startGame(levelId);
@@ -60,9 +75,18 @@ export default function MainMenu() {
           {LEVELS.map((level) => (
             <div
               key={level.id}
-              className="bg-slate-800 rounded-xl border border-slate-700 p-6 hover:border-sky-500 transition-all cursor-pointer"
+              className={`bg-slate-800 rounded-xl border p-6 hover:border-sky-500 transition-all cursor-pointer relative ${
+                selectedLevel === level.id ? 'border-sky-500' : 'border-slate-700'
+              }`}
               onClick={() => setSelectedLevel(level.id)}
             >
+              {hasReplayData[level.id] && (
+                <div className="absolute top-2 right-2">
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-emerald-900/50 text-emerald-400">
+                    已完成
+                  </span>
+                </div>
+              )}
               <div className="flex items-center justify-between mb-4">
                 <span className="text-3xl font-bold text-white">{level.id}</span>
                 <span className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(level.difficulty)}`}>
@@ -110,11 +134,15 @@ export default function MainMenu() {
               </button>
               <button
                 onClick={() => handleReplay(selectedLevel)}
-                className="flex-1 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-all"
-                disabled
+                className={`flex-1 px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-all ${
+                  hasReplayData[selectedLevel]
+                    ? 'bg-slate-700 hover:bg-slate-600 text-white'
+                    : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                }`}
+                disabled={!hasReplayData[selectedLevel]}
               >
                 <FileText size={18} />
-                历史回放（需要完成记录）
+                {hasReplayData[selectedLevel] ? '查看历史回放' : '历史回放（需要完成记录）'}
               </button>
             </div>
           </div>
