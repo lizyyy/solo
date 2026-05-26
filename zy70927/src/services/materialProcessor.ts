@@ -91,11 +91,11 @@ export async function processMaterials(
           batchId,
           i,
           j,
-          attendance.employeeId,
-          attendance.employeeName,
-          attendance.department,
-          attendance.signInTime,
-          attendance.signOutTime,
+          attendance.employeeId || null,
+          attendance.employeeName || null,
+          attendance.department || null,
+          attendance.signInTime || null,
+          attendance.signOutTime || null,
           createdAt
         );
 

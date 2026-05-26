@@ -252,4 +252,90 @@ describe('验证服务', () => {
     expect(timeErrors[0].attendanceIndex).toBe(0);
     expect(timeErrors[0].materialIndex).toBe(0);
   });
+
+  test('trainingId和trainingName真正缺失undefined时不崩溃', () => {
+    const materialWithUndefined: any = {
+      trainingId: undefined,
+      trainingName: undefined,
+      trainer: '张老师',
+      trainingDate: '2024-01-15',
+      startTime: '09:00:00',
+      endTime: '17:00:00',
+      location: '会议室A',
+      attendance: [
+        {
+          employeeId: 'EMP-001',
+          employeeName: '张三',
+          department: '技术部',
+          signInTime: '09:00:00',
+          signOutTime: '17:00:00',
+        },
+      ],
+    };
+    const existingIds = new Set<string>();
+    const errors = validateTrainingMaterial(materialWithUndefined, 0, existingIds);
+    expect(errors.length).toBeGreaterThanOrEqual(2);
+    const fieldErrors = errors.map(e => e.field);
+    expect(fieldErrors).toContain('trainingId');
+    expect(fieldErrors).toContain('trainingName');
+    errors.forEach(e => {
+      expect(e.materialIndex).toBe(0);
+    });
+  });
+
+  test('签到记录字段真正缺失undefined时错误位置正确', () => {
+    const materialWithUndefinedAttendance: any = {
+      trainingId: 'TRAIN-010',
+      trainingName: '测试培训',
+      trainer: '张老师',
+      trainingDate: '2024-01-15',
+      startTime: '09:00:00',
+      endTime: '17:00:00',
+      location: '会议室A',
+      attendance: [
+        {
+          employeeId: undefined,
+          employeeName: undefined,
+          department: '技术部',
+          signInTime: '09:00:00',
+          signOutTime: '17:00:00',
+        },
+        {
+          employeeId: 'EMP-002',
+          employeeName: '李四',
+          department: undefined,
+          signInTime: '09:00:00',
+          signOutTime: '17:00:00',
+        },
+      ],
+    };
+    const existingIds = new Set<string>();
+    const errors = validateTrainingMaterial(materialWithUndefinedAttendance, 3, existingIds);
+    expect(errors.length).toBeGreaterThanOrEqual(3);
+    const index0Errors = errors.filter(e => e.attendanceIndex === 0);
+    const index1Errors = errors.filter(e => e.attendanceIndex === 1);
+    expect(index0Errors.length).toBeGreaterThanOrEqual(2);
+    expect(index1Errors.length).toBeGreaterThanOrEqual(1);
+    index0Errors.forEach(e => expect(e.materialIndex).toBe(3));
+    index1Errors.forEach(e => expect(e.materialIndex).toBe(3));
+  });
+
+  test('全部字段缺失时返回完整错误列表不崩溃', () => {
+    const fullyInvalidMaterial: any = {};
+    const existingIds = new Set<string>();
+    const errors = validateTrainingMaterial(fullyInvalidMaterial, 5, existingIds);
+    expect(errors.length).toBeGreaterThanOrEqual(7);
+    const fieldErrors = new Set(errors.map(e => e.field));
+    expect(fieldErrors).toContain('trainingId');
+    expect(fieldErrors).toContain('trainingName');
+    expect(fieldErrors).toContain('trainer');
+    expect(fieldErrors).toContain('trainingDate');
+    expect(fieldErrors).toContain('startTime');
+    expect(fieldErrors).toContain('endTime');
+    expect(fieldErrors).toContain('location');
+    expect(fieldErrors).toContain('attendance');
+    errors.forEach(e => {
+      expect(e.materialIndex).toBe(5);
+    });
+  });
 });
