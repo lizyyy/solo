@@ -63,22 +63,19 @@ function logException(recordId, type, handler, reason) {
   return { success: true, recordId, exceptionType: type };
 }
 
-function addRectification(recordId, handler, rectificationNo, rectFormData) {
+function addRectification(recordId, handler, rectificationNo, rectFormData, sourceRecordId) {
   const record = RecordModel.findById(recordId);
   if (!record) {
     throw new Error(`记录不存在: ${recordId}`);
   }
 
   const tx = db.transaction(() => {
-    RecordModel.incrementRectificationCount(recordId);
-    const updatedRecord = RecordModel.findById(recordId);
-    const newCount = updatedRecord.rectification_count;
+    const existingRects = RectificationModel.findByRecord(recordId);
+    const newCount = existingRects.length + 1;
 
-    let sourceRecordId = null;
-    const previousRects = RectificationModel.findByRecord(recordId);
-    if (previousRects.length > 0) {
-      const lastRect = previousRects[previousRects.length - 1];
-      sourceRecordId = recordId;
+    let sourceRectificationId = null;
+    if (existingRects.length > 0) {
+      sourceRectificationId = existingRects[existingRects.length - 1].id;
     }
 
     RectificationModel.create(
@@ -86,16 +83,19 @@ function addRectification(recordId, handler, rectificationNo, rectFormData) {
       rectificationNo,
       newCount,
       rectFormData,
-      sourceRecordId,
+      sourceRectificationId,
+      sourceRecordId || null,
       handler
     );
 
+    RecordModel.setRectificationCount(recordId, newCount);
     RecordModel.updateStatus(recordId, 'returned', `第${newCount}次整改`);
 
     AuditLogModel.create(recordId, 'rectification_added', `第${newCount}次整改`, handler, {
       rectification_count: newCount,
       rectification_no: rectificationNo,
-      source_record_id: sourceRecordId,
+      source_rectification_id: sourceRectificationId,
+      source_record_id: sourceRecordId || null,
       previous_status: record.status
     });
   });
@@ -111,7 +111,7 @@ function getRecordDetail(recordId) {
   const auditLogs = AuditLogModel.findByRecord(recordId);
   const exceptions = ExceptionModel.findByRecord(recordId);
   const rectifications = RectificationModel.findByRecord(recordId);
-  const traceChain = RectificationModel.getTraceChain(recordId);
+  const traceChain = RectificationModel.getFullTraceChain(recordId);
 
   return {
     ...record,

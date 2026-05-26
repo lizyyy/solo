@@ -62,6 +62,12 @@ const RecordModel = {
     `).run(id);
   },
 
+  setRectificationCount(id, count) {
+    return db.prepare(`
+      UPDATE records SET rectification_count = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+    `).run(count, id);
+  },
+
   query(filters) {
     let sql = 'SELECT * FROM records WHERE 1=1';
     const params = [];
@@ -138,16 +144,17 @@ const ExceptionModel = {
 };
 
 const RectificationModel = {
-  create(recordId, rectificationNo, rectificationCount, rectFormData, sourceRecordId, handler) {
+  create(recordId, rectificationNo, rectificationCount, rectFormData, sourceRectificationId, sourceRecordId, handler) {
     const stmt = db.prepare(`
-      INSERT INTO rectifications (record_id, rectification_no, rectification_count, rectification_form_data, source_record_id, handler)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO rectifications (record_id, rectification_no, rectification_count, rectification_form_data, source_rectification_id, source_record_id, handler)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
     return stmt.run(
       recordId,
       rectificationNo || null,
       rectificationCount,
       rectFormData ? JSON.stringify(rectFormData) : null,
+      sourceRectificationId || null,
       sourceRecordId || null,
       handler || null
     ).lastInsertRowid;
@@ -161,27 +168,29 @@ const RectificationModel = {
     return db.prepare('SELECT * FROM rectifications WHERE source_record_id = ? ORDER BY rectification_count ASC').all(sourceRecordId);
   },
 
-  getTraceChain(recordId) {
-    const chain = [];
-    const visited = new Set();
-    let current = recordId;
+  findBySourceRectification(sourceRectificationId) {
+    return db.prepare('SELECT * FROM rectifications WHERE source_rectification_id = ? ORDER BY rectification_count ASC').all(sourceRectificationId);
+  },
 
-    while (current && !visited.has(current)) {
-      visited.add(current);
-      const rects = db.prepare('SELECT * FROM rectifications WHERE record_id = ? ORDER BY rectification_count ASC').all(current);
-      if (rects.length > 0) {
-        chain.push(...rects);
-        const firstRect = rects[0];
-        if (firstRect.source_record_id) {
-          current = firstRect.source_record_id;
-        } else {
-          break;
-        }
-      } else {
-        break;
+  getTraceChain(recordId) {
+    const rects = db.prepare('SELECT * FROM rectifications WHERE record_id = ? ORDER BY rectification_count ASC').all(recordId);
+    return rects;
+  },
+
+  getFullTraceChain(recordId) {
+    const rects = db.prepare('SELECT * FROM rectifications WHERE record_id = ? ORDER BY rectification_count ASC').all(recordId);
+    const visitedRecords = new Set([recordId]);
+    const result = rects.slice();
+
+    for (const rect of rects) {
+      if (rect.source_record_id && !visitedRecords.has(rect.source_record_id)) {
+        visitedRecords.add(rect.source_record_id);
+        const crossRects = db.prepare('SELECT * FROM rectifications WHERE record_id = ? ORDER BY rectification_count ASC').all(rect.source_record_id);
+        result.push(...crossRects);
       }
     }
-    return chain;
+
+    return result;
   }
 };
 

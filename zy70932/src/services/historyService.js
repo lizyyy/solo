@@ -73,18 +73,15 @@ function getRectificationTrace(recordId) {
     throw new Error(`记录不存在: ${recordId}`);
   }
 
-  const traceChain = RectificationModel.getTraceChain(recordId);
   const rectifications = RectificationModel.findByRecord(recordId);
 
+  const visitedRecords = new Set([recordId]);
   const sourceRecords = [];
-  const visitedSources = new Set();
-  let currentSource = null;
 
-  if (traceChain.length > 0) {
-    currentSource = traceChain[0].source_record_id;
-    while (currentSource && !visitedSources.has(currentSource)) {
-      visitedSources.add(currentSource);
-      const srcRec = RecordModel.findById(currentSource);
+  for (const rect of rectifications) {
+    if (rect.source_record_id && !visitedRecords.has(rect.source_record_id)) {
+      visitedRecords.add(rect.source_record_id);
+      const srcRec = RecordModel.findById(rect.source_record_id);
       if (srcRec) {
         sourceRecords.push({
           id: srcRec.id,
@@ -92,16 +89,29 @@ function getRectificationTrace(recordId) {
           supervisor_signature: srcRec.supervisor_signature,
           rectification_count: srcRec.rectification_count,
           status: srcRec.status,
-          created_at: srcRec.created_at
+          created_at: srcRec.created_at,
+          linked_by_rectification_id: rect.id
         });
       }
-      const srcRects = RectificationModel.findByRecord(currentSource);
-      if (srcRects.length > 0 && srcRects[0].source_record_id) {
-        currentSource = srcRects[0].source_record_id;
-      } else {
-        break;
-      }
     }
+  }
+
+  const sourceChains = [];
+  for (const srcRec of sourceRecords) {
+    const srcRects = RectificationModel.findByRecord(srcRec.id);
+    sourceChains.push({
+      source_record: srcRec,
+      rectifications: srcRects.map(r => ({
+        id: r.id,
+        rectification_no: r.rectification_no,
+        rectification_count: r.rectification_count,
+        handler: r.handler,
+        created_at: r.created_at,
+        rectification_form_data: r.rectification_form_data ? JSON.parse(r.rectification_form_data) : null,
+        source_rectification_id: r.source_rectification_id,
+        source_record_id: r.source_record_id
+      }))
+    });
   }
 
   return {
@@ -110,7 +120,8 @@ function getRectificationTrace(recordId) {
       site_node: record.site_node,
       supervisor_signature: record.supervisor_signature,
       rectification_count: record.rectification_count,
-      status: record.status
+      status: record.status,
+      current_remark: record.current_remark
     },
     rectifications: rectifications.map(r => ({
       id: r.id,
@@ -119,17 +130,11 @@ function getRectificationTrace(recordId) {
       handler: r.handler,
       created_at: r.created_at,
       rectification_form_data: r.rectification_form_data ? JSON.parse(r.rectification_form_data) : null,
+      source_rectification_id: r.source_rectification_id,
       source_record_id: r.source_record_id
     })),
-    trace_chain: traceChain.map(r => ({
-      id: r.id,
-      rectification_no: r.rectification_no,
-      rectification_count: r.rectification_count,
-      handler: r.handler,
-      created_at: r.created_at,
-      source_record_id: r.source_record_id
-    })),
-    source_records: sourceRecords
+    source_records: sourceRecords,
+    source_chains: sourceChains
   };
 }
 

@@ -83,16 +83,30 @@ function init() {
       rectification_no TEXT,
       rectification_count INTEGER DEFAULT 1,
       rectification_form_data TEXT,
+      source_rectification_id INTEGER,
       source_record_id INTEGER,
       handler TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (record_id) REFERENCES records(id),
+      FOREIGN KEY (source_rectification_id) REFERENCES rectifications(id),
       FOREIGN KEY (source_record_id) REFERENCES records(id)
     );
 
     CREATE INDEX IF NOT EXISTS idx_rectifications_record ON rectifications(record_id);
-    CREATE INDEX IF NOT EXISTS idx_rectifications_source ON rectifications(source_record_id);
+    CREATE INDEX IF NOT EXISTS idx_rectifications_source_rect ON rectifications(source_rectification_id);
+    CREATE INDEX IF NOT EXISTS idx_rectifications_source_rec ON rectifications(source_record_id);
   `);
+
+  // Migration: add source_rectification_id if not exists
+  try {
+    const cols = db.prepare("PRAGMA table_info(rectifications)").all();
+    const hasSourceRectId = cols.some(c => c.name === 'source_rectification_id');
+    if (!hasSourceRectId) {
+      db.prepare("ALTER TABLE rectifications ADD COLUMN source_rectification_id INTEGER").run();
+    }
+  } catch (e) {
+    // ignore
+  }
 }
 
 function getDb() {

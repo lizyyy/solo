@@ -52,7 +52,7 @@ router.post('/:id/exception', (req, res) => {
 
 router.post('/:id/rectification', (req, res) => {
   try {
-    const { handler, rectification_no, rectification_form_data } = req.body;
+    const { handler, rectification_no, rectification_form_data, source_record_id } = req.body;
     if (!handler) {
       return res.status(400).json({ error: '缺少必要参数: handler' });
     }
@@ -60,7 +60,8 @@ router.post('/:id/rectification', (req, res) => {
       req.params.id,
       handler,
       rectification_no,
-      rectification_form_data
+      rectification_form_data,
+      source_record_id
     );
     res.json(result);
   } catch (err) {

@@ -1,0 +1,29 @@
+[
+  {
+    "node": "墙面处理节点",
+    "rectifications": [
+      {
+        "rectification_no": "ZG-2026-001",
+        "rectification_count": 1,
+        "handler": "李监理",
+        "content": "墙面空鼓3处，铲除后重新批刮腻子",
+        "form_data": {
+          "整改内容": "墙面空鼓3处，铲除后重新批刮腻子",
+          "整改期限": "3天",
+          "验收标准": "墙面平整度≤2mm"
+        }
+      },
+      {
+        "rectification_no": "ZG-2026-002",
+        "rectification_count": 2,
+        "handler": "李监理",
+        "content": "第一次整改后仍有空鼓，扩大整改范围",
+        "form_data": {
+          "整改内容": "第一次整改后仍有空鼓，扩大整改范围",
+          "整改期限": "2天",
+          "验收标准": "整面墙无空鼓"
+        }
+      }
+    ]
+  }
+]
