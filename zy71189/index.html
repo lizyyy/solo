@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+<title>地铁站务应急模拟器 · Metro Incident Trainer</title>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#121833; --panel2:#0f1530; --line:#25306b;
+    --text:#e6ecff; --muted:#8a94c8; --accent:#4cc9f0; --ok:#57e389;
+    --warn:#ffd166; --bad:#ff6b6b; --ink:#0b0f1e;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:-apple-system,Segoe UI,Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+    color:var(--text); background:radial-gradient(1200px 800px at 20% -10%, #1a2560 0%, #0a0e22 55%, #070a1a 100%);
+    overflow:hidden; -webkit-tap-highlight-color:transparent;
+  }
+  .app{
+    height:100%; display:grid;
+    grid-template-columns: 1fr 380px;
+    grid-template-rows: 56px 1fr;
+    grid-template-areas:
+      "top top"
+      "stage side";
+    gap:10px; padding:10px;
+  }
+  .topbar{
+    grid-area:top; display:flex; align-items:center; gap:10px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    border:1px solid var(--line); border-radius:10px; padding:8px 12px;
+  }
+  .title{font-weight:700; letter-spacing:1px}
+  .title small{color:var(--muted); font-weight:400; margin-left:6px}
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--panel2); border:1px solid var(--line); color:var(--muted);
+    padding:4px 10px; border-radius:999px; font-size:12px;
+  }
+  .pill b{color:var(--text)}
+  .spacer{flex:1}
+  .btn{
+    appearance:none; border:1px solid var(--line); background:var(--panel2);
+    color:var(--text); padding:7px 12px; border-radius:8px; cursor:pointer; font-size:13px;
+    transition:transform .05s ease, background .15s ease, border-color .15s ease;
+  }
+  .btn:hover{background:#17204a}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:linear-gradient(180deg,#2a78ff,#1e58d8); border-color:#2a78ff}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.danger{background:linear-gradient(180deg,#ff6b6b,#c93a3a); border-color:#ff6b6b}
+  .btn.ok{background:linear-gradient(180deg,#3ac46a,#1e8f47); border-color:#3ac46a}
+  .btn.ghost{background:transparent}
+  .btn.small{padding:4px 8px; font-size:12px}
+  .btn[disabled]{opacity:.45; cursor:not-allowed}
+
+  .stage{grid-area:stage; position:relative; border:1px solid var(--line); border-radius:10px; background:#0b1230; overflow:hidden}
+  #canvas{display:block; width:100%; height:100%}
+  .hud{
+    position:absolute; top:10px; left:10px; display:flex; gap:8px; flex-wrap:wrap; pointer-events:none;
+  }
+  .hud .pill{pointer-events:auto}
+  .legend{
+    position:absolute; bottom:10px; left:10px; display:flex; gap:8px; flex-wrap:wrap;
+    background:rgba(10,16,40,0.6); border:1px solid var(--line); border-radius:8px; padding:6px 8px;
+    font-size:11px; color:var(--muted);
+  }
+  .legend span i{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:middle;margin-right:4px}
+
+  .side{
+    grid-area:side; display:grid;
+    grid-template-rows: auto 1fr auto auto;
+    gap:10px; min-height:0;
+  }
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px;
+    display:flex; flex-direction:column; min-height:0;
+  }
+  .card h3{margin:0 0 8px 0; font-size:13px; color:var(--muted); font-weight:600; letter-spacing:1px}
+  .row{display:flex; gap:6px; align-items:center}
+  .row + .row{margin-top:6px}
+  .grow{flex:1}
+
+  .queue{overflow:auto; flex:1; min-height:0}
+  .ev{
+    display:flex; align-items:flex-start; gap:8px;
+    border:1px solid var(--line); background:var(--panel2); border-radius:8px; padding:8px;
+    margin-bottom:6px; font-size:12px;
+  }
+  .ev .t{color:var(--accent); font-variant-numeric:tabular-nums; min-width:52px}
+  .ev .b{flex:1}
+  .ev .b .title{font-weight:600; margin-bottom:2px}
+  .ev .b .desc{color:var(--muted)}
+  .ev .tag{
+    font-size:10px; padding:1px 6px; border-radius:999px; border:1px solid var(--line); color:var(--muted)
+  }
+  .ev .tag.hot{border-color:var(--bad); color:var(--bad)}
+  .ev .tag.warn{border-color:var(--warn); color:var(--warn)}
+  .ev .tag.ok{border-color:var(--ok); color:var(--ok)}
+
+  .broadcast{
+    display:grid; grid-template-columns: 1fr 1fr; gap:6px;
+  }
+  .bc{
+    border:1px solid var(--line); background:var(--panel2); border-radius:8px;
+    padding:8px; font-size:12px; cursor:pointer; user-select:none;
+  }
+  .bc:hover{background:#17204a; border-color:#2a78ff}
+  .bc b{display:block; font-size:12px; margin-bottom:2px}
+  .bc span{color:var(--muted); font-size:11px}
+
+  .zones{display:flex; gap:6px; flex-wrap:wrap}
+  .zone{
+    font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid var(--line);
+    background:var(--panel2); color:var(--muted); cursor:pointer;
+  }
+  .zone.active{color:var(--warn); border-color:var(--warn)}
+
+  .score{font-size:20px; font-weight:800; letter-spacing:1px; font-variant-numeric:tabular-nums}
+  .stats{display:grid; grid-template-columns: repeat(2,1fr); gap:6px; font-size:12px}
+  .stat{background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:6px 8px}
+  .stat b{display:block; font-size:15px}
+  .stat span{color:var(--muted); font-size:11px}
+
+  textarea.report{
+    width:100%; min-height:140px; resize:vertical; font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:11px; background:#070a1a; color:#cdd5ff; border:1px solid var(--line); border-radius:8px;
+    padding:8px;
+  }
+
+  /* Modal */
+  .modal{
+    position:fixed; inset:0; background:rgba(5,8,20,0.72); display:none;
+    align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .modal.on{display:flex}
+  .modal .box{
+    background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    max-width:640px; width:100%; padding:18px;
+  }
+  .modal h2{margin:0 0 6px 0}
+  .modal p{margin:6px 0; color:var(--muted)}
+  .modal .kbd{
+    display:inline-block; font-family:ui-monospace,Menlo,monospace; font-size:11px;
+    padding:1px 6px; border:1px solid var(--line); border-radius:4px; background:var(--panel2);
+  }
+
+  /* Replay bar */
+  .replaybar{
+    display:flex; gap:6px; align-items:center;
+    background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:6px 8px;
+    font-size:12px;
+  }
+  input[type=range]{flex:1}
+
+  @media (max-width: 900px){
+    .app{grid-template-columns:1fr; grid-template-areas:"top" "stage" "side"; grid-template-rows:56px 1fr auto}
+    .side{max-height:48vh}
+  }
+  .scroll::-webkit-scrollbar{width:8px;height:8px}
+  .scroll::-webkit-scrollbar-thumb{background:#22306b;border-radius:4px}
+  .scroll::-webkit-scrollbar-track{background:transparent}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="title">🚇 地铁站务应急模拟器 <small>Metro Incident Trainer</small></div>
+    <div class="pill">关卡 <b id="levelName">-</b></div>
+    <div class="pill">回合 <b id="roundIdx">0</b>/<b id="roundMax">0</b></div>
+    <div class="pill">状态 <b id="stateLabel">待命</b></div>
+    <div class="pill">时间 <b id="clock">00:00</b></div>
+    <div class="spacer"></div>
+    <button class="btn primary" id="btnStart">开始</button>
+    <button class="btn" id="btnPause" disabled>暂停</button>
+    <button class="btn" id="btnRestart">重开</button>
+    <button class="btn ghost" id="btnHelp">帮助</button>
+  </div>
+
+  <div class="stage">
+    <canvas id="canvas"></canvas>
+    <div class="hud" id="hud"></div>
+    <div class="legend">
+      <span><i style="background:#4cc9f0"></i>正常闸机</span>
+      <span><i style="background:#ff6b6b"></i>故障闸机</span>
+      <span><i style="background:#ffd166"></i>拥堵/警告</span>
+      <span><i style="background:#57e389"></i>已疏散</span>
+      <span><i style="background:#7a5cff"></i>员工</span>
+      <span><i style="background:#e6ecff"></i>乘客</span>
+      <span><i style="background:#ff8a3d"></i>封闭区</span>
+    </div>
+  </div>
+
+  <div class="side">
+    <div class="card">
+      <h3>事件队列</h3>
+      <div class="queue scroll" id="eventList"></div>
+    </div>
+
+    <div class="card">
+      <h3>广播选择</h3>
+      <div class="broadcast" id="broadcastList"></div>
+    </div>
+
+    <div class="card">
+      <h3>封闭区域 / 处置</h3>
+      <div class="row">
+        <div class="zones" id="zoneList"></div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn small" id="btnDispatch">派员工到场</button>
+        <button class="btn small" id="btnFix">紧急修复闸机</button>
+        <button class="btn small" id="btnClear">疏导拥堵</button>
+        <div class="spacer"></div>
+        <button class="btn small ghost" id="btnReplay">历史回放</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>计分 / 结算报告</h3>
+      <div class="row">
+        <div class="score" id="score">0</div>
+        <div class="spacer"></div>
+        <button class="btn small" id="btnExport">导出报告</button>
+      </div>
+      <div class="stats" style="margin-top:6px">
+        <div class="stat"><b id="sDisorder">0</b><span>秩序值</span></div>
+        <div class="stat"><b id="sPatience">0</b><span>乘客耐心</span></div>
+        <div class="stat"><b id="sEvac">0</b><span>已疏散</span></div>
+        <div class="stat"><b id="sFixed">0</b><span>已修复</span></div>
+      </div>
+      <textarea class="report scroll" id="report" readonly placeholder="结算将在此显示，可复制导出…"></textarea>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="help">
+  <div class="box">
+    <h2>玩法说明</h2>
+    <p>你是地铁站值班站务。目标：在每个回合内处理事件，保持<strong>秩序</strong>与<strong>乘客耐心</strong>，完成疏散与修复。</p>
+    <p><b>操作</b>：<span class="kbd">点击</span> 闸机切换开闭；<span class="kbd">点击</span> 区域切换封闭；右侧面板选择广播、派员工、修复、疏导。</p>
+    <p><b>事件</b>：闸机故障、乘客迷路、临时封站、闸机拥堵、广播漏发、封站路线错误。</p>
+    <p><b>失败</b>：秩序值 ≤ 0 或 乘客耐心 ≤ 0。<b>胜利</b>：完成该回合所有处置目标。</p>
+    <p><b>结算</b>：每回合结束自动生成报告，可导出为 JSON 文本；“历史回放”可查看时间轴。</p>
+    <div style="text-align:right;margin-top:8px">
+      <button class="btn primary" id="btnCloseHelp">明白了</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="replay">
+  <div class="box">
+    <h2>历史回放</h2>
+    <p>拖动滑块查看关键事件。蓝点：操作；红点：扣分；绿点：得分。</p>
+    <div class="replaybar">
+      <span id="rpTime">00:00</span>
+      <input type="range" id="rpRange" min="0" max="100" value="0" />
+      <button class="btn small" id="rpPrev">◀</button>
+      <button class="btn small" id="rpNext">▶</button>
+    </div>
+    <textarea class="report scroll" id="rpText" readonly style="margin-top:8px;min-height:180px"></textarea>
+    <div style="text-align:right;margin-top:8px">
+      <button class="btn" id="rpClose">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===========================================================
+ *  地铁站务应急模拟器  — 单文件，无依赖
+ *  作者: 站务培训命题
+ * =========================================================== */
+(() => {
+  "use strict";
+
+  // ---------- 工具 ----------
+  const $ = (id) => document.getElementById(id);
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const randi = (a, b) => Math.floor(rand(a, b + 1));
+  const pick = (arr) => arr[randi(0, arr.length - 1)];
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const fmt = (t) => {
+    const m = Math.floor(t / 60).toString().padStart(2, "0");
+    const s = Math.floor(t % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
+  // ---------- 关卡配置 ----------
+  const LEVELS = [
+    {
+      name: "新手·早高峰入门",
+      duration: 90,
+      gates: 4,
+      spawnRate: 1.2,
+      goals: { evacuate: 20, fixGates: 1 },
+      eventMix: { gateFault: 1, lostPassenger: 1, congestion: 1, closeStation: 0, routeError: 0, missedBc: 1 }
+    },
+    {
+      name: "进阶·双闸故障",
+      duration: 120,
+      gates: 6,
+      spawnRate: 1.6,
+      goals: { evacuate: 35, fixGates: 2 },
+      eventMix: { gateFault: 2, lostPassenger: 1, congestion: 2, closeStation: 1, routeError: 1, missedBc: 2 }
+    },
+    {
+      name: "困难·临时封站",
+      duration: 150,
+      gates: 6,
+      spawnRate: 2.0,
+      goals: { evacuate: 50, fixGates: 3 },
+      eventMix: { gateFault: 2, lostPassenger: 2, congestion: 2, closeStation: 2, routeError: 2, missedBc: 3 }
+    }
+  ];
+
+  // ---------- 广播模板 ----------
+  const BROADCASTS = [
+    { id: "calm",       title: "请保持冷静",   desc: "常规安抚，适用于一般拥堵",  tags: ["calm","congestion"] },
+    { id: "route",      title: "请改走 B 通道", desc: "指引替代路线，适用于封站",  tags: ["route","close","lost"] },
+    { id: "evacuate",   title: "请有序疏散",   desc: "适用于封站/紧急情况",      tags: ["evac","close"] },
+    { id: "fault",      title: "闸机维护中",   desc: "适用于闸机故障通告",        tags: ["fault"] },
+    { id: "lost",       title: "请到服务台",   desc: "适用于乘客迷路",            tags: ["lost"] },
+    { id: "clear",      title: "请快速通过",   desc: "适用于严重拥堵",            tags: ["congestion"] },
+    { id: "routefix",   title: "路线已更正",   desc: "纠正错误封站路线",          tags: ["route"] },
+    { id: "thanks",     title: "感谢配合",     desc: "收尾广播，加分有限",        tags: ["calm"] }
+  ];
+
+  // ---------- 站点区域 ----------
+  const ZONES = ["A入口","B入口","C站台","D换乘","E服务台"];
+
+  // ---------- 游戏状态 ----------
+  const G = {
+    running: false,
+    paused: false,
+    t: 0,             // 秒
+    last: 0,
+    level: 0,
+    round: 0,
+    score: 0,
+    order: 100,       // 秩序
+    patience: 100,    // 耐心
+    evac: 0,
+    fixed: 0,
+    gates: [],
+    passengers: [],
+    staff: [],
+    events: [],       // 当前事件队列 (已触发，用于 UI)
+    scheduled: [],    // 已排期事件 (at/type/done)
+    log: [],          // 历史记录
+    closed: new Set(),
+    selectedTool: null,
+    canvas: null, ctx: null, W: 0, H: 0, dpr: 1,
+    flash: 0,
+    endReason: null
+  };
+
+  // ---------- 初始化 ----------
+  function init(){
+    const c = $("canvas");
+    G.canvas = c; G.ctx = c.getContext("2d");
+    resize();
+    window.addEventListener("resize", resize);
+
+    // UI 绑定
+    $("btnStart").onclick = () => startRun();
+    $("btnPause").onclick = () => togglePause();
+    $("btnRestart").onclick = () => resetRun();
+    $("btnHelp").onclick = () => $("help").classList.add("on");
+    $("btnCloseHelp").onclick = () => $("help").classList.remove("on");
+
+    $("btnDispatch").onclick = () => dispatchStaff();
+    $("btnFix").onclick = () => fixGate();
+    $("btnClear").onclick = () => clearCongestion();
+    $("btnExport").onclick = () => exportReport();
+    $("btnReplay").onclick = () => openReplay();
+
+    $("rpClose").onclick = () => $("replay").classList.remove("on");
+    $("rpRange").oninput = () => renderReplay();
+    $("rpPrev").onclick = () => stepReplay(-1);
+    $("rpNext").onclick = () => stepReplay(1);
+
+    // 键盘快捷键
+    window.addEventListener("keydown", (e) => {
+      if (e.key === " ") { e.preventDefault(); togglePause(); }
+      if (e.key === "r" || e.key === "R") resetRun();
+      if (e.key >= "1" && e.key <= "8") {
+        const i = parseInt(e.key, 10) - 1;
+        if (BROADCASTS[i]) playBroadcast(BROADCASTS[i]);
+      }
+    });
+
+    // 渲染广播按钮
+    renderBroadcasts();
+    renderZones();
+
+    // 画布交互
+    c.addEventListener("pointerdown", onPointer);
+
+    // 启动渲染循环
+    requestAnimationFrame(loop);
+
+    pushLog({ type: "info", text: "系统就绪，点击“开始”进入关卡。" });
+  }
+
+  function resize(){
+    const c = G.canvas, parent = c.parentElement;
+    const dpr = window.devicePixelRatio || 1;
+    G.dpr = dpr;
+    G.W = parent.clientWidth;
+    G.H = parent.clientHeight;
+    c.width = G.W * dpr;
+    c.height = G.H * dpr;
+    c.style.width = G.W + "px";
+    c.style.height = G.H + "px";
+    G.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  // ---------- 启动 / 暂停 ----------
+  function startRun(){
+    if (G.running) return;
+    G.running = true; G.paused = false;
+    G.t = 0; G.last = performance.now();
+    G.score = 0; G.order = 100; G.patience = 100;
+    G.evac = 0; G.fixed = 0; G.events = []; G.log = []; G.scheduled = [];
+    G.closed.clear(); G.endReason = null;
+    setupLevel(G.level);
+    $("btnPause").disabled = false;
+    $("btnPause").textContent = "暂停";
+    $("stateLabel").textContent = "运行中";
+    pushLog({ type: "info", text: `关卡「${LEVELS[G.level].name}」开始。` });
+    updateHUD();
+  }
+
+  function resetRun(){
+    G.running = false; G.paused = false; G.t = 0;
+    G.score = 0; G.order = 100; G.patience = 100;
+    G.evac = 0; G.fixed = 0; G.events = []; G.log = []; G.scheduled = [];
+    G.closed.clear(); G.endReason = null;
+    G.gates = []; G.passengers = []; G.staff = [];
+    $("btnPause").disabled = true;
+    $("stateLabel").textContent = "待命";
+    pushLog({ type: "info", text: "已重置，点击“开始”重新运行。" });
+    updateHUD(); renderEvents();
+  }
+
+  function togglePause(){
+    if (!G.running) return;
+    G.paused = !G.paused;
+    $("btnPause").textContent = G.paused ? "继续" : "暂停";
+    $("stateLabel").textContent = G.paused ? "暂停" : "运行中";
+    if (!G.paused) G.last = performance.now();
+  }
+
+  // ---------- 关卡设置 ----------
+  function setupLevel(idx){
+    const L = LEVELS[idx];
+    G.gates = [];
+    const n = L.gates;
+    for (let i = 0; i < n; i++){
+      const gap = (G.W - 240) / Math.max(1, n);
+      G.gates.push({
+        id: i,
+        x: 120 + gap * (i + 0.5),
+        y: G.H * 0.55,
+        w: 70, h: 36,
+        open: true,
+        faulty: false,
+        congest: 0, // 0..1
+        flow: 0
+      });
+    }
+    G.passengers = [];
+    G.staff = [];
+    G.events = [];
+    // 初始事件
+    scheduleEvent(4, "gateFault");
+    scheduleEvent(10, "lostPassenger");
+    scheduleEvent(16, "congestion");
+    if (idx >= 1) scheduleEvent(22, "closeStation");
+    if (idx >= 2) scheduleEvent(28, "routeError");
+    scheduleEvent(34, "missedBc");
+
+    $("levelName").textContent = L.name;
+    $("roundMax").textContent = LEVELS.length;
+    $("roundIdx").textContent = (idx + 1);
+    renderZones();
+  }
+
+  // ---------- 事件系统 ----------
+  function scheduleEvent(at, type){
+    G.scheduled.push({ at, type, done: false, id: Math.random().toString(36).slice(2,8) });
+  }
+
+  function spawnEvents(dt){
+    const L = LEVELS[G.level];
+    // 周期事件
+    if (!G._nextAuto) G._nextAuto = 6;
+    G._nextAuto -= dt;
+    if (G._nextAuto <= 0){
+      G._nextAuto = rand(7, 14) / L.spawnRate;
+      // 按权重抽一个事件类型
+      const mix = L.eventMix;
+      const pool = [];
+      for (const k in mix) for (let i = 0; i < mix[k]; i++) pool.push(k);
+      const type = pick(pool);
+      triggerEvent(type);
+    }
+    // 调度事件触发
+    for (const ev of G.scheduled){
+      if (!ev.done && G.t >= ev.at){
+        ev.done = true;
+        triggerEvent(ev.type, ev);
+      }
+    }
+  }
+
+  function pushEvent(rec){
+    G.events.push(rec);
+    if (G.events.length > 80) G.events.shift();
+  }
+
+  function triggerEvent(type, meta){
+    const L = LEVELS[G.level];
+    switch (type){
+      case "gateFault": {
+        const g = pick(G.gates.filter(x => !x.faulty));
+        if (!g) return;
+        g.faulty = true; g.open = false;
+        pushEvent({ t: G.t, title: "闸机故障", desc: `#${g.id+1} 号闸机停止工作，乘客滞留。`, tag: "hot", key:`fault-${g.id}` });
+        pushLog({ type:"bad", text:`闸机 #${g.id+1} 故障` });
+        break;
+      }
+      case "lostPassenger": {
+        const z = pick(ZONES);
+        pushEvent({ t: G.t, title: "乘客迷路", desc: `在 ${z} 区域，乘客求助找不到出口。`, tag: "warn", key:`lost-${z}` });
+        pushLog({ type:"warn", text:`${z} 有乘客迷路` });
+        G.patience -= 4;
+        break;
+      }
+      case "congestion": {
+        const g = pick(G.gates.filter(x => x.open));
+        if (!g) return;
+        g.congest = clamp((g.congest || 0) + 0.45, 0, 1);
+        pushEvent({ t: G.t, title: "闸机拥堵", desc: `#${g.id+1} 号闸机通过速度骤降。`, tag: "warn", key:`cong-${g.id}` });
+        pushLog({ type:"warn", text:`闸机 #${g.id+1} 拥堵` });
+        G.order -= 3;
+        break;
+      }
+      case "closeStation": {
+        pushEvent({ t: G.t, title: "临时封站", desc: `接到通知，需在 20 秒内引导乘客疏散。`, tag: "hot", key:`close-${G.t|0}` });
+        pushLog({ type:"bad", text:"临时封站指令" });
+        G._closeAt = G.t;
+        break;
+      }
+      case "routeError": {
+        pushEvent({ t: G.t, title: "封站路线错误", desc: `引导路线与实际出口不符，乘客将原地滞留。`, tag: "hot", key:`re-${G.t|0}` });
+        pushLog({ type:"bad", text:"封站路线错误" });
+        G.order -= 8; G.patience -= 6;
+        break;
+      }
+      case "missedBc": {
+        pushEvent({ t: G.t, title: "广播漏发", desc: `关键时段未及时广播，乘客不满。`, tag: "warn", key:`mb-${G.t|0}` });
+        pushLog({ type:"warn", text:"广播漏发" });
+        G.patience -= 5;
+        break;
+      }
+    }
+    renderEvents();
+    shake(4);
+  }
+
+  // ---------- 主循环 ----------
+  function loop(now){
+    const dt = Math.min(0.05, (now - (G.last || now)) / 1000);
+    G.last = now;
+    if (G.running && !G.paused){
+      G.t += dt;
+      update(dt);
+    }
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  function update(dt){
+    const L = LEVELS[G.level];
+    spawnEvents(dt);
+
+    // 乘客：从左入，经闸机，向右出
+    if (Math.random() < dt * L.spawnRate){
+      G.passengers.push({
+        x: -20, y: rand(G.H*0.55-10, G.H*0.55+30),
+        tx: 0, ty: 0,
+        state: "walk", // walk | wait | evac | lost
+        zone: null,
+        v: rand(30, 55),
+        patience: 100,
+        target: null
+      });
+    }
+
+    // 乘客 AI
+    for (const p of G.passengers){
+      // 选目标闸机
+      if (!p.target){
+        const open = G.gates.filter(g => g.open && !g.faulty);
+        if (open.length){
+          p.target = pick(open);
+        } else {
+          p.target = pick(G.gates);
+        }
+      }
+      const g = p.target;
+      if (G.closed.size && G.closed.has("A入口") && p.x < 100){
+        // 封站
+        p.state = "evac";
+      }
+      if (g && (g.faulty || !g.open)){
+        p.state = "wait";
+        p.patience -= dt * 12;
+        // 拥堵累积
+        g.congest = clamp((g.congest||0) + dt * 0.3, 0, 1);
+      } else if (g){
+        p.state = "walk";
+        const dx = g.x - p.x, dy = g.y - p.y;
+        const d = Math.hypot(dx, dy);
+        const speed = p.v * (1 - (g.congest||0) * 0.6);
+        if (d > 4){
+          p.x += dx/d * speed * dt;
+          p.y += dy/d * speed * dt;
+        } else {
+          // 过闸机
+          p.x = G.W + 30;
+          G.evac++;
+          G.score += 2;
+        }
+      }
+
+      if (p.patience <= 0){
+        G.patience -= 2; G.order -= 2;
+        pushLog({ type:"bad", text:"一名乘客失去耐心离开" });
+        p.x = -999; // 移除
+      }
+    }
+    G.passengers = G.passengers.filter(p => p.x < G.W + 50 && p.x > -100);
+
+    // 闸机通行/拥堵自衰减
+    for (const g of G.gates){
+      if (g.open && !g.faulty){
+        g.congest = clamp((g.congest||0) - dt * 0.08, 0, 1);
+      }
+    }
+
+    // 员工
+    for (const s of G.staff){
+      if (s.target){
+        const dx = s.target.x - s.x, dy = s.target.y - s.y;
+        const d = Math.hypot(dx, dy);
+        const sp = 90;
+        if (d > 4){
+          s.x += dx/d * sp * dt;
+          s.y += dy/d * sp * dt;
+        } else {
+          // 到达：自动协助
+          if (s.task === "fix" && s.target && s.target.faulty){
+            s.target.faulty = false; s.target.open = true; s.target.congest = 0;
+            G.fixed++; G.score += 12; G.order += 4;
+            pushLog({ type:"ok", text:`员工修复了闸机 #${s.target.id+1}` });
+            s.target = null;
+          } else if (s.task === "clear" && s.target){
+            s.target.congest = Math.max(0, (s.target.congest||0) - 0.8);
+            G.score += 6; G.order += 3;
+            pushLog({ type:"ok", text:`员工疏导了闸机 #${s.target.id+1}` });
+            s.target = null;
+          }
+        }
+      }
+    }
+
+    // 秩序/耐心 缓慢恢复
+    G.order = clamp(G.order + dt * 0.5, 0, 100);
+    G.patience = clamp(G.patience + dt * 0.4, 0, 100);
+
+    // 封站检测
+    if (G._closeAt){
+      if (G.t - G._closeAt > 20 && G.passengers.length > 0){
+        G.order -= 6; G.patience -= 6;
+        pushLog({ type:"bad", text:"封站超时未完成疏散" });
+        G._closeAt = null;
+      }
+    }
+
+    // 失败条件
+    if (G.order <= 0){ endRun("秩序崩溃，乘客失控。"); return; }
+    if (G.patience <= 0){ endRun("乘客耐心耗尽，投诉率飙升。"); return; }
+
+    // 胜利条件
+    const L2 = LEVELS[G.level];
+    if (G.evac >= L2.goals.evacuate && G.fixed >= L2.goals.fixGates && G.t > 20){
+      nextLevel();
+      return;
+    }
+
+    // 时间上限
+    if (G.t >= L2.duration){
+      endRun("回合时间到，未达成目标。");
+      return;
+    }
+
+    updateHUD();
+  }
+
+  function nextLevel(){
+    pushLog({ type:"ok", text:`回合「${LEVELS[G.level].name}」达成目标` });
+    G.score += 40;
+    if (G.level >= LEVELS.length - 1){
+      endRun("全部关卡通关！", true);
+    } else {
+      G.level++;
+      setupLevel(G.level);
+      pushLog({ type:"info", text:"进入下一回合…" });
+    }
+  }
+
+  function endRun(reason, win=false){
+    G.running = false; G.paused = false;
+    G.endReason = reason;
+    $("stateLabel").textContent = win ? "通关" : "失败";
+    $("btnPause").disabled = true;
+    pushLog({ type: win?"ok":"bad", text: reason });
+    finalizeReport(win);
+  }
+
+  // ---------- 操作 ----------
+  function playBroadcast(bc){
+    if (!G.running || G.paused) return;
+    pushLog({ type:"info", text:`广播: ${bc.title}` });
+    // 根据事件队列匹配
+    let matched = 0;
+    for (const ev of recentEvents(8)){
+      if (ev.tag === "ok") continue;
+      if ((bc.tags.includes("fault") && ev.title.includes("闸机故障")) ||
+          (bc.tags.includes("lost")  && ev.title.includes("乘客迷路")) ||
+          (bc.tags.includes("congestion") && ev.title.includes("闸机拥堵")) ||
+          (bc.tags.includes("route") && ev.title.includes("路线")) ||
+          (bc.tags.includes("evac")  && ev.title.includes("封站")) ||
+          (bc.tags.includes("calm")  && (ev.title.includes("拥堵")||ev.title.includes("迷路")))
+      ){
+        ev.tag = "ok";
+        matched++;
+      }
+    }
+    if (matched){
+      G.score += 5 * matched;
+      G.order += 2 * matched;
+      G.patience += 2 * matched;
+      G.flash = 0.3;
+    } else {
+      G.score -= 2;
+      pushLog({ type:"warn", text:"广播内容与当前事件不匹配" });
+    }
+    renderEvents();
+  }
+
+  function dispatchStaff(){
+    if (!G.running || G.paused) return;
+    // 找一个故障闸机或拥堵闸机
+    const target = G.gates.find(g => g.faulty) || G.gates.find(g => (g.congest||0) > 0.4);
+    if (!target){ pushLog({ type:"info", text:"暂无需处理的目标" }); return; }
+    G.staff.push({
+      x: 40, y: G.H*0.8,
+      target, task: target.faulty ? "fix" : "clear",
+      color:"#7a5cff"
+    });
+    G.score -= 1; // 派工消耗
+    pushLog({ type:"info", text:"派遣员工前往处置" });
+  }
+
+  function fixGate(){
+    if (!G.running || G.paused) return;
+    const g = G.gates.find(x => x.faulty);
+    if (!g){ pushLog({type:"warn",text:"无故障闸机"}); return; }
+    g.faulty = false; g.open = true; g.congest = 0;
+    G.fixed++; G.score += 8; G.order += 2;
+    pushLog({ type:"ok", text:`手动修复闸机 #${g.id+1}` });
+  }
+
+  function clearCongestion(){
+    if (!G.running || G.paused) return;
+    let did = false;
+    for (const g of G.gates){
+      if ((g.congest||0) > 0.2){ g.congest = Math.max(0, g.congest - 0.6); did = true; }
+    }
+    if (did){ G.score += 4; G.order += 2; pushLog({type:"ok",text:"疏导指令已下达"}); }
+    else pushLog({type:"info",text:"当前无明显拥堵"});
+  }
+
+  // ---------- 画布交互 ----------
+  function onPointer(e){
+    const rect = G.canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    // 闸机点击切换
+    for (const g of G.gates){
+      if (x >= g.x - g.w/2 && x <= g.x + g.w/2 && y >= g.y - g.h/2 && y <= g.y + g.h/2){
+        if (!G.running || G.paused) return;
+        if (g.faulty){
+          pushLog({type:"warn",text:"闸机故障，需先修复才能开闭"});
+          return;
+        }
+        g.open = !g.open;
+        pushLog({type:"info",text:`闸机 #${g.id+1} ${g.open?"打开":"关闭"}`});
+        return;
+      }
+    }
+  }
+
+  // ---------- 渲染 ----------
+  function draw(){
+    const ctx = G.ctx, W = G.W, H = G.H;
+    // 背景
+    ctx.fillStyle = "#0b1230";
+    ctx.fillRect(0,0,W,H);
+    // 地板格子
+    ctx.strokeStyle = "rgba(255,255,255,0.04)";
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 32){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 32){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    // 区域标签
+    ctx.font = "11px -apple-system,Segoe UI,sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    const zoneW = W / ZONES.length;
+    ZONES.forEach((z,i)=>{
+      const x = i * zoneW + zoneW/2;
+      const closed = G.closed.has(z);
+      ctx.fillStyle = closed ? "rgba(255,138,61,0.2)" : "rgba(76,201,240,0.08)";
+      ctx.fillRect(i*zoneW+4, 20, zoneW-8, 40);
+      ctx.strokeStyle = closed ? "#ff8a3d" : "rgba(76,201,240,0.5)";
+      ctx.strokeRect(i*zoneW+4, 20, zoneW-8, 40);
+      ctx.fillStyle = closed ? "#ff8a3d" : "#a9c0ff";
+      ctx.textAlign = "center";
+      ctx.fillText(z + (closed?" (已封闭)":""), x, 45);
+    });
+
+    // 乘客
+    for (const p of G.passengers){
+      ctx.fillStyle = p.state==="wait" ? "#ffd166" : "#e6ecff";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3.2, 0, Math.PI*2);
+      ctx.fill();
+      // 耐心指示
+      if (p.state === "wait"){
+        ctx.strokeStyle = p.patience > 40 ? "#57e389" : "#ff6b6b";
+        ctx.beginPath(); ctx.arc(p.x, p.y-6, 3, -Math.PI/2, -Math.PI/2 + Math.PI*2 * (p.patience/100)); ctx.stroke();
+      }
+    }
+
+    // 员工
+    for (const s of G.staff){
+      ctx.fillStyle = "#7a5cff";
+      ctx.beginPath(); ctx.arc(s.x, s.y, 4, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = "rgba(122,92,255,0.4)";
+      ctx.beginPath(); ctx.arc(s.x, s.y, 7, 0, Math.PI*2); ctx.stroke();
+    }
+
+    // 闸机
+    for (const g of G.gates){
+      const x = g.x - g.w/2, y = g.y - g.h/2;
+      let col = "#4cc9f0";
+      if (g.faulty) col = "#ff6b6b";
+      else if (!g.open) col = "#5a6aa8";
+      ctx.fillStyle = col;
+      ctx.fillRect(x, y, g.w, g.h);
+      ctx.strokeStyle = "rgba(255,255,255,0.25)";
+      ctx.strokeRect(x, y, g.w, g.h);
+      // 拥堵条
+      if ((g.congest||0) > 0.05){
+        ctx.fillStyle = "#ffd166";
+        ctx.fillRect(x, y + g.h + 3, g.w * (g.congest||0), 3);
+      }
+      ctx.fillStyle = "#0b1230";
+      ctx.textAlign = "center";
+      ctx.fillText(`#${g.id+1} ${g.faulty?"故障":g.open?"开":"关"}`, g.x, g.y+4);
+    }
+
+    // 出口箭头
+    ctx.fillStyle = "rgba(87,227,137,0.5)";
+    ctx.fillRect(W-24, H*0.55-30, 18, 60);
+    ctx.fillStyle = "#0b1230";
+    ctx.textAlign = "center";
+    ctx.fillText("出口", W-15, H*0.55+4);
+
+    // 闪烁
+    if (G.flash > 0){
+      ctx.fillStyle = `rgba(87,227,137,${G.flash*0.2})`;
+      ctx.fillRect(0,0,W,H);
+      G.flash = Math.max(0, G.flash - 0.03);
+    }
+
+    // 震屏
+    if (G.shake){
+      ctx.translate(rand(-G.shake,G.shake), rand(-G.shake,G.shake));
+      G.shake *= 0.85;
+      if (G.shake < 0.2) G.shake = 0;
+    }
+  }
+  function shake(v){ G.shake = v; }
+
+  // ---------- UI 更新 ----------
+  function updateHUD(){
+    $("clock").textContent = fmt(G.t);
+    $("score").textContent = G.score;
+    $("sDisorder").textContent = Math.round(G.order);
+    $("sPatience").textContent = Math.round(G.patience);
+    $("sEvac").textContent = G.evac;
+    $("sFixed").textContent = G.fixed;
+
+    const hud = $("hud");
+    if (!G.running && !G.endReason){
+      hud.innerHTML = `<div class="pill">点击“开始”进入关卡</div>`;
+      return;
+    }
+    const L = LEVELS[G.level];
+    hud.innerHTML = `
+      <div class="pill">目标 疏散 <b>${G.evac}/${L.goals.evacuate}</b></div>
+      <div class="pill">目标 修复 <b>${G.fixed}/${L.goals.fixGates}</b></div>
+      <div class="pill">剩余 <b>${fmt(Math.max(0,L.duration-G.t))}</b></div>
+    `;
+  }
+
+  function renderBroadcasts(){
+    const el = $("broadcastList");
+    el.innerHTML = "";
+    BROADCASTS.forEach((b,i)=>{
+      const d = document.createElement("div");
+      d.className = "bc";
+      d.innerHTML = `<b>${i+1}. ${b.title}</b><span>${b.desc}</span>`;
+      d.onclick = () => playBroadcast(b);
+      el.appendChild(d);
+    });
+  }
+
+  function renderZones(){
+    const el = $("zoneList");
+    el.innerHTML = "";
+    ZONES.forEach(z=>{
+      const b = document.createElement("div");
+      b.className = "zone" + (G.closed.has(z)?" active":"");
+      b.textContent = z + (G.closed.has(z)?" ✓":"");
+      b.onclick = () => {
+        if (!G.running || G.paused) return;
+        if (G.closed.has(z)) G.closed.delete(z);
+        else G.closed.add(z);
+        pushLog({type:"info",text:`区域 ${z} ${G.closed.has(z)?"已封闭":"已开放"}`});
+        renderZones();
+      };
+      el.appendChild(b);
+    });
+  }
+
+  function renderEvents(){
+    const el = $("eventList");
+    // 保留最近 30 条
+    const list = recentEvents(30);
+    el.innerHTML = "";
+    list.forEach(ev=>{
+      const d = document.createElement("div");
+      d.className = "ev";
+      d.innerHTML = `
+        <div class="t">${fmt(ev.t)}</div>
+        <div class="b">
+          <div class="title">${ev.title}</div>
+          <div class="desc">${ev.desc}</div>
+        </div>
+        <div class="tag ${ev.tag}">${ev.tag==="ok"?"已处置":ev.tag==="hot"?"紧急":"警告"}</div>
+      `;
+      el.appendChild(d);
+    });
+  }
+
+  function recentEvents(n){
+    return G.events.slice(-n);
+  }
+
+  // ---------- 日志 / 回放 ----------
+  function pushLog(rec){
+    rec.t = G.t;
+    G.log.push(rec);
+    if (G.log.length > 400) G.log.shift();
+  }
+
+  function finalizeReport(win){
+    const L = LEVELS[G.level];
+    const r = {
+      result: win ? "WIN" : "FAIL",
+      level: L.name,
+      reason: G.endReason,
+      time: fmt(G.t),
+      score: G.score,
+      order: Math.round(G.order),
+      patience: Math.round(G.patience),
+      evacuate: G.evac,
+      fixed: G.fixed,
+      events: G.events.map(e => ({ t: fmt(e.t), title: e.title, desc: e.desc, tag: e.tag })),
+      log: G.log.slice(-80).map(e => ({ t: fmt(e.t), type: e.type, text: e.text }))
+    };
+    $("report").value = JSON.stringify(r, null, 2);
+  }
+
+  function exportReport(){
+    const txt = $("report").value || JSON.stringify({ score: G.score, log: G.log }, null, 2);
+    const blob = new Blob([txt], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `station-report-${Date.now()}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function openReplay(){
+    $("replay").classList.add("on");
+    $("rpRange").max = Math.max(1, G.log.length - 1);
+    $("rpRange").value = 0;
+    renderReplay();
+  }
+  function renderReplay(){
+    const i = parseInt($("rpRange").value, 10);
+    const head = G.log.slice(0, i+1);
+    const tail = G.log.slice(i, i+20);
+    $("rpTime").textContent = G.log[i] ? fmt(G.log[i].t) : "--:--";
+    $("rpText").value = tail.map(e => `[${fmt(e.t)}] ${e.type.toUpperCase()} ${e.text}`).join("\n");
+  }
+  function stepReplay(d){
+    const r = $("rpRange");
+    r.value = clamp(parseInt(r.value,10)+d, 0, parseInt(r.max,10));
+    renderReplay();
+  }
+
+  // 启动
+  init();
+})();
+</script>
+</body>
+</html>
