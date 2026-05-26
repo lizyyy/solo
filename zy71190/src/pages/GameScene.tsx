@@ -42,6 +42,11 @@ export default function GameScene() {
   useEffect(() => {
     if (status === "failed" || status === "success") {
       if (levelId && session) {
+        try {
+          localStorage.setItem(`last_session_${levelId}`, JSON.stringify(session));
+        } catch {
+          // ignore
+        }
         const timer = setTimeout(() => {
           navigate(`/result/${levelId}`, { replace: false });
         }, 1500);

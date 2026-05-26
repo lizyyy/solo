@@ -72,6 +72,7 @@ interface GameStore {
   loadBestScores: () => void;
   setReplayIndex: (i: number) => void;
   setReplayPlaying: (p: boolean) => void;
+  ensureLevel: (id: string) => void;
 }
 
 const LS_KEY = "coil_game_best";
@@ -122,6 +123,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       session: null,
       status: "idle",
       phase: "idle",
+      timeRemaining: level.timeLimit,
+    });
+  },
+
+  ensureLevel: (id) => {
+    const s = get();
+    if (s.currentLevelId === id && s.currentLevel) {
+      return;
+    }
+    const level = getLevel(id);
+    if (!level) return;
+    set({
+      currentLevelId: id,
+      currentLevel: level,
       timeRemaining: level.timeLimit,
     });
   },

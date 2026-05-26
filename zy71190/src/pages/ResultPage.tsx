@@ -4,14 +4,15 @@ import { ArrowLeft, Download, Play, Pause, RotateCcw, SkipBack, SkipForward } fr
 import { useGameStore } from "@/store/gameStore";
 import { getLevel } from "@/levels";
 import { buildReport, downloadJSON, downloadText, reportToText } from "@/utils/report";
-import type { GameEvent, Snapshot } from "@/types/game";
+import type { GameEvent, GameSession, Snapshot } from "@/types/game";
 
 export default function ResultPage() {
   const { levelId } = useParams<{ levelId: string }>();
   const navigate = useNavigate();
   const session = useGameStore((s) => s.session);
   const currentLevel = useGameStore((s) => s.currentLevel);
-  const setLevel = useGameStore((s) => s.setLevel);
+  const currentLevelId = useGameStore((s) => s.currentLevelId);
+  const ensureLevel = useGameStore((s) => s.ensureLevel);
   const loadBestScores = useGameStore((s) => s.loadBestScores);
 
   const [replayIndex, setReplayIndex] = useState(0);
@@ -23,14 +24,26 @@ export default function ResultPage() {
     if (levelId) {
       const lvl = getLevel(levelId);
       if (lvl) {
-        setLevel(levelId);
+        ensureLevel(levelId);
+        const s = useGameStore.getState();
+        if (!s.session) {
+          try {
+            const cached = localStorage.getItem(`last_session_${levelId}`);
+            if (cached) {
+              const restored = JSON.parse(cached) as GameSession;
+              useGameStore.setState({ session: restored, status: restored.status });
+            }
+          } catch {
+            // ignore
+          }
+        }
       } else {
         navigate("/");
         return;
       }
     }
     loadBestScores();
-  }, [levelId, setLevel, loadBestScores, navigate]);
+  }, [levelId, currentLevelId, ensureLevel, loadBestScores, navigate]);
 
   useEffect(() => {
     if (!replayPlaying || !session || session.snapshots.length === 0) {

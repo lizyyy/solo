@@ -1,57 +1,219 @@
-# React + TypeScript + Vite
+# 钢卷吊运平衡游戏 · COIL LIFTING SIMULATOR
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+钢厂新员工安全培训用轻 3D 浏览器游戏/模拟器，通过可操作的规则反馈，帮助理解钢卷吊运重心偏移、路线避让、轨道冲突等真实工业安全问题。
 
-Currently, two official plugins are available:
+## 🚀 快速启动
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```bash
+# 安装依赖
+npm install
 
-## Expanding the ESLint configuration
+# 启动开发服务器
+npm run dev
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# 构建生产版本
+npm run build
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# 类型检查
+npm run check
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+开发服务器启动后，浏览器打开 `http://localhost:5173` 即可开始游戏。
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🎮 玩法说明
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 核心流程
+
+1. **选择关卡** → 在主菜单选择要训练的关卡
+2. **选择钢卷** → 在 3D 场景中点击钢卷（灰色圆柱）
+3. **指定目标** → 点击绿色放卷区作为目的地
+4. **开始吊运** → 点击"开始吊运"按钮执行自动路径
+5. **监控状态** → 观察左侧 HUD 的重心倾斜警告
+6. **查看结算** → 完成或失败后查看回放、导出报告
+
+### 失败规则
+
+| 失败类型 | 触发条件 | 说明 |
+|---------|---------|------|
+| **重心偏移** | 钢卷倾斜角度超过阈值 | 偏心钢卷会倾斜，超过安全值导致失败 |
+| **人员穿越** | 吊运路径穿越黄色人行通道 | 人员活动区禁止吊运物从上方经过 |
+| **区域碰撞** | 吊运路径进入红色禁入区 | 危险区域禁止吊运物进入 |
+| **轨道冲突** | 多台行车距离过近（< 2.5m） | 行车之间需要保持安全间距 |
+| **时间耗尽** | 超过关卡时间限制 | 需要在规定时间内完成所有吊运 |
+
+### 警告规则
+
+| 警告类型 | 触发条件 | 扣分 |
+|---------|---------|-----|
+| **放错目标区** | 钢卷未放在指定的目标放卷区 | -40 分 |
+| **重心警告** | 倾斜接近阈值但未超限 | -40 分 |
+
+## 🎯 关卡说明
+
+| 关卡 | 名称 | 难度 | 核心难点 |
+|------|------|------|---------|
+| **L1** | 基础吊运 | ★ | 单钢卷、无障碍、熟悉重心与吊具 |
+| **L2** | 偏移警觉 | ★★ | 钢卷偏心装载，必须注意倾斜警告 |
+| **L3** | 双线轨道 | ★★ | 两条并行轨道，规划避让防碰撞 |
+| **L4** | 人员穿越 | ★★★ | 下方有人行通道，绕行吊运 |
+| **L5** | 综合作业 | ★★★★ | 多钢卷、多作业区、多障碍综合考验 |
+
+### 记分规则
+
+- **基础分**：1000 分
+- **严重事件**：每次 -200 分
+- **警告事件**：每次 -40 分
+- **移动次数**：每次 -5 分
+- 最低得分为 0 分
+
+## ⏯️ 历史回放
+
+结算页提供完整操作回放功能：
+
+- **时间轴**：可视化显示每帧状态，红色标记失败点
+- **播放控制**：播放 / 暂停 / 上一帧 / 下一帧 / 重置
+- **进度条**：直接拖动定位到任意帧
+- **帧信息**：显示当前阶段、状态、正在吊运的钢卷
+
+## 📄 报告导出
+
+结算页支持导出吊运报告，两种格式可选：
+
+### JSON 格式
+
+```json
+{
+  "sessionId": "level1-1716710400000",
+  "levelName": "基础吊运",
+  "status": "success" | "failed",
+  "score": 850,
+  "movesUsed": 3,
+  "failureReason": "重心偏移超限...",
+  "criticalCount": 1,
+  "warningCount": 2,
+  "entries": [
+    { "type": "center_of_mass", "severity": "critical", "detail": "...", "time": "..." }
+  ]
+}
 ```
+
+### 文本格式
+
+```
+========================================================
+  钢卷吊运作业报告 / COIL LIFTING OPERATION REPORT
+========================================================
+关卡 Level     : 基础吊运 (level1)
+会话 Session   : level1-1716710400000
+状态 Status    : success
+得分 Score     : 850
+移动次数 Moves : 3
+事件统计       : 严重 1 / 警告 2 / 合计 3
+--------------------------------------------------------
+  事件日志 / EVENT LOG
+--------------------------------------------------------
+  1 [CRITICAL] center_of_mass     重心偏移超限：倾斜 13.5°
+  2 [WARNING ] info               开始吊运：coil-1 → 放卷区 B
+========================================================
+```
+
+## 🧪 边界案例
+
+### 临界倾斜判定
+
+- **倾斜 11.8° / 阈值 12°** → 警告但未失败（黄色提示）
+- **倾斜 12.1° / 阈值 12°** → 重心超限失败（红色闪烁）
+
+### 路径判定
+
+- **吊运路径擦边人行通道** → 判定为穿越，立即失败
+- **吊运路径完全绕开人行通道** → 安全通过
+
+### 轨道间距判定
+
+- **多台行车 2.4m 间距 / 安全 2.5m** → 冲突失败
+- **多台行车 2.6m 间距** → 安全通过
+
+### 时间判定
+
+- **剩余 0.1s 完成吊运** → 判定成功
+- **时间 0s 时正在吊运** → 判定失败
+
+## 🏗️ 技术栈
+
+| 模块 | 技术 | 说明 |
+|------|------|------|
+| **前端框架** | React 18 + TypeScript | 组件化开发 |
+| **构建工具** | Vite 6 | 快速开发构建 |
+| **3D 渲染** | Three.js + @react-three/fiber + drei | 轻量 3D 场景 |
+| **状态管理** | Zustand | 全局游戏状态 |
+| **样式** | TailwindCSS 3 | 工业风 UI |
+| **字体** | Bebas Neue / Orbitron / JetBrains Mono | 工业风格字体 |
+
+## 📁 项目结构
+
+```
+src/
+├── components/          # 游戏组件
+│   ├── GameCanvas.tsx       # 3D 画布入口
+│   ├── Crane3D.tsx          # 行车 3D 模型
+│   ├── Coil3D.tsx           # 钢卷 3D 模型
+│   ├── Zone3D.tsx           # 作业区 3D 模型
+│   ├── Rail3D.tsx           # 轨道 3D 模型
+│   ├── Ground3D.tsx         # 地面
+│   ├── PlannedPath.tsx      # 规划路径可视化
+│   ├── CenterOfMassHUD.tsx  # 重心监控面板
+│   └── EventLog.tsx         # 事件日志
+├── pages/               # 页面
+│   ├── MainMenu.tsx         # 主菜单 / 关卡选择
+│   ├── GameScene.tsx        # 游戏主场景
+│   └── ResultPage.tsx       # 结算 / 回放 / 导出
+├── store/               # 状态管理
+│   └── gameStore.ts         # Zustand 游戏状态
+├── levels/              # 关卡配置
+│   └── index.ts             # 5 个内置关卡
+├── hooks/               # 自定义 Hooks
+│   └── useGameEngine.ts     # 游戏引擎逻辑
+├── utils/               # 工具函数
+│   ├── physics.ts           # 物理判定（重心、碰撞）
+│   ├── replay.ts            # 回放记录
+│   └── report.ts            # 报告生成与导出
+└── types/               # 类型定义
+    └── game.ts              # 游戏核心类型
+```
+
+## 🔧 开发说明
+
+### 添加新关卡
+
+在 `src/levels/index.ts` 中添加新的 `LevelConfig` 配置：
+
+```typescript
+{
+  id: "level-custom",
+  name: "自定义关卡",
+  description: "关卡说明",
+  difficulty: 2,
+  maxTiltDegrees: 12,
+  maxMoves: 5,
+  timeLimit: 120,
+  boundary: { minX: -12, maxX: 12, minZ: -8, maxZ: 8 },
+  coils: [...],
+  zones: [...],
+  rails: [...],
+  cranes: [...],
+}
+```
+
+### 调整失败阈值
+
+- **重心倾斜阈值**：修改 `LevelConfig.maxTiltDegrees`
+- **安全间距**：修改 `src/hooks/useGameEngine.ts` 中 `checkCraneCollision` 的 `minDistance` 参数
+- **路径判定精度**：修改 `src/utils/physics.ts` 中 `segmentIntersectsZone` 的 `steps` 采样数
+
+## ⚠️ 注意事项
+
+1. 游戏数据存在浏览器 `localStorage` 中，清除缓存会丢失最佳成绩
+2. 建议使用 Chrome / Edge / Safari 现代浏览器以获得最佳 3D 性能
+3. 画面卡顿可尝试降低浏览器窗口大小，或关闭其他占用 GPU 的程序
+4. 本游戏仅作培训演示用途，真实钢厂操作请遵循现场安全规程
