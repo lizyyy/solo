@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>航食装车检查游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow: hidden;
+        }
+        #gameContainer {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        #topBar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .info-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #aaa;
+        }
+        .info-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin: 0 5px;
+        }
+        .btn-primary {
+            background: #4ecdc4;
+            color: #1a1a2e;
+        }
+        .btn-primary:hover {
+            background: #45b7aa;
+            transform: translateY(-2px);
+        }
+        .btn-warning {
+            background: #ff6b6b;
+            color: #fff;
+        }
+        .btn-warning:hover {
+            background: #ee5a5a;
+        }
+        .btn-secondary {
+            background: #667eea;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #5568d3;
+        }
+        #mainArea {
+            display: flex;
+            flex: 1;
+            gap: 10px;
+            min-height: 0;
+        }
+        #leftPanel {
+            width: 280px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        #gameCanvas {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            cursor: default;
+        }
+        #rightPanel {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .panel-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4ecdc4;
+        }
+        .cart-item {
+            background: rgba(78, 205, 196, 0.2);
+            border: 2px solid #4ecdc4;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: grab;
+            transition: all 0.3s;
+        }
+        .cart-item:hover {
+            background: rgba(78, 205, 196, 0.3);
+            transform: translateX(5px);
+        }
+        .cart-item.cold {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+        }
+        .cart-item.frozen {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.2);
+        }
+        .cart-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .cart-detail {
+            font-size: 12px;
+            color: #aaa;
+            margin: 3px 0;
+        }
+        .temp-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .temp-normal {
+            background: #4ecdc4;
+            color: #1a1a2e;
+        }
+        .temp-cold {
+            background: #667eea;
+            color: #fff;
+        }
+        .temp-frozen {
+            background: #ff6b6b;
+            color: #fff;
+        }
+        .flight-info {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .flight-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd93d;
+        }
+        .flight-detail {
+            font-size: 12px;
+            color: #aaa;
+            margin: 5px 0;
+        }
+        .gate-info {
+            display: inline-block;
+            background: #ff6b6b;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .error-log {
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 3px solid #ff6b6b;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 0 5px 5px 0;
+            font-size: 12px;
+        }
+        .error-time {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        .error-desc {
+            color: #ddd;
+            margin-top: 3px;
+        }
+        #levelSelect, #gameOver, #replayModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #4ecdc4;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        .modal h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #4ecdc4;
+        }
+        .modal h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .level-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(78, 205, 196, 0.2);
+            border: 2px solid #4ecdc4;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .level-btn:hover {
+            background: rgba(78, 205, 196, 0.4);
+            transform: scale(1.02);
+        }
+        .level-btn.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .score-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffd93d;
+            margin: 20px 0;
+        }
+        .result-stats {
+            text-align: left;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        .error-list {
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+            margin: 15px 0;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .timer-warning {
+            color: #ff6b6b !important;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .replay-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .replay-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .replay-progress-bar {
+            height: 100%;
+            background: #4ecdc4;
+            transition: width 0.1s linear;
+        }
+        .export-btn {
+            background: #ffd93d;
+            color: #1a1a2e;
+        }
+        .export-btn:hover {
+            background: #e6c236;
+        }
+    </style>
+</head>
+<body>
+    <div id="levelSelect">
+        <div class="modal">
+            <h1>✈️ 航食装车检查游戏</h1>
+            <p style="margin-bottom: 30px; color: #aaa;">将餐车正确装入对应航班，注意舱位、温层和装车口！</p>
+            <button class="level-btn" onclick="startLevel(1)">
+                🟢 关卡 1：新手入门 (2个航班，4个餐车)
+            </button>
+            <button class="level-btn" onclick="startLevel(2)">
+                🟡 关卡 2：渐入佳境 (3个航班，6个餐车)
+            </button>
+            <button class="level-btn" onclick="startLevel(3)">
+                🔴 关卡 3：繁忙时段 (4个航班，8个餐车)
+            </button>
+            <button class="level-btn" onclick="startLevel(4)">
+                ⚫ 关卡 4：极限挑战 (5个航班，10个餐车)
+            </button>
+            <div style="margin-top: 20px; font-size: 12px; color: #888;">
+                <p>💡 提示：拖拽左侧餐车到Canvas中的对应航班和舱位</p>
+                <p>⚠️ 冷藏餐车有时间限制，超时会扣分！</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameContainer" class="hidden">
+        <div id="topBar">
+            <div class="info-group">
+                <div class="info-item">
+                    <span class="info-label">关卡</span>
+                    <span class="info-value" id="levelDisplay">1</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">得分</span>
+                    <span class="info-value" id="scoreDisplay">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">剩余时间</span>
+                    <span class="info-value" id="timeDisplay">120</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">错误</span>
+                    <span class="info-value" id="errorDisplay">0</span>
+                </div>
+            </div>
+            <div class="info-group">
+                <button class="btn btn-primary" id="pauseBtn" onclick="togglePause()">⏸️ 暂停</button>
+                <button class="btn btn-warning" onclick="restartLevel()">🔄 重开</button>
+                <button class="btn btn-secondary" onclick="backToMenu()">🏠 菜单</button>
+            </div>
+        </div>
+
+        <div id="mainArea">
+            <div id="leftPanel">
+                <div class="panel-title">📦 待装车餐车</div>
+                <div id="cartList"></div>
+            </div>
+
+            <canvas id="gameCanvas"></canvas>
+
+            <div id="rightPanel">
+                <div class="panel-title">📋 航班信息</div>
+                <div id="flightInfo"></div>
+                <div class="panel-title" style="margin-top: 20px;">❌ 错误记录</div>
+                <div id="errorLog"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameOver" class="hidden">
+        <div class="modal">
+            <h2 id="resultTitle">游戏结束</h2>
+            <div class="score-display" id="finalScore">0</div>
+            <div class="result-stats">
+                <div class="stat-row">
+                    <span>正确装车</span>
+                    <span id="correctCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>错误次数</span>
+                    <span id="errorCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>冷藏超时</span>
+                    <span id="timeoutCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>准确率</span>
+                    <span id="accuracy">0%</span>
+                </div>
+            </div>
+            <div class="error-list" id="errorList"></div>
+            <div class="replay-controls">
+                <button class="btn btn-primary" onclick="restartLevel()">🔄 再来一次</button>
+                <button class="btn btn-secondary" onclick="showReplay()">🎬 错误回放</button>
+                <button class="btn export-btn" onclick="exportReport()">📄 导出报告</button>
+                <button class="btn btn-secondary" onclick="backToMenu()">🏠 返回菜单</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="replayModal" class="hidden">
+        <div class="modal">
+            <h2>🎬 错误回放</h2>
+            <div class="replay-progress">
+                <div class="replay-progress-bar" id="replayProgressBar"></div>
+            </div>
+            <div id="replayContent" style="text-align: left; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 20px; min-height: 150px;">
+                正在加载回放...
+            </div>
+            <div class="replay-controls">
+                <button class="btn btn-primary" id="replayPlayBtn" onclick="toggleReplayPlay()">▶️ 播放</button>
+                <button class="btn btn-secondary" onclick="replayPrev()">⏮️ 上一个</button>
+                <button class="btn btn-secondary" onclick="replayNext()">⏭️ 下一个</button>
+                <button class="btn btn-warning" onclick="closeReplay()">✖️ 关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GameState = {
+            level: 1,
+            score: 0,
+            timeLeft: 120,
+            isPaused: false,
+            isGameOver: false,
+            carts: [],
+            flights: [],
+            errors: [],
+            loadedCarts: 0,
+            totalCarts: 0,
+            coldTimeouts: 0,
+            gameStartTime: 0,
+            actionHistory: []
+        };
+
+        const LevelConfig = {
+            1: { flights: 2, carts: 4, time: 120, gates: ['A1', 'A2'] },
+            2: { flights: 3, carts: 6, time: 150, gates: ['A1', 'A2', 'B1'] },
+            3: { flights: 4, carts: 8, time: 180, gates: ['A1', 'A2', 'B1', 'B2'] },
+            4: { flights: 5, carts: 10, time: 200, gates: ['A1', 'A2', 'B1', 'B2', 'C1'] }
+        };
+
+        const Airlines = ['CA', 'MU', 'CZ', 'HU', '3U'];
+        const Destinations = ['北京', '上海', '广州', '深圳', '成都', '杭州', '西安', '重庆'];
+        const CartTypes = ['经济舱餐食', '头等舱餐食', '点心盒', '饮料车'];
+        const TempLayers = [
+            { id: 'normal', name: '常温', badge: 'temp-normal', timeLimit: 0 },
+            { id: 'cold', name: '冷藏', badge: 'temp-cold', timeLimit: 45 },
+            { id: 'frozen', name: '冷冻', badge: 'temp-frozen', timeLimit: 30 }
+        ];
+        const Cabins = ['经济舱', '商务舱', '头等舱'];
+
+        let canvas, ctx;
+        let draggedCart = null;
+        let mouseX = 0, mouseY = 0;
+        let gameTimer = null;
+        let coldTimers = {};
+
+        function initCanvas() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('mouseleave', handleMouseUp);
+        }
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            if (!GameState.isGameOver) render();
+        }
+
+        function startLevel(level) {
+            GameState.level = level;
+            GameState.score = 0;
+            GameState.isPaused = false;
+            GameState.isGameOver = false;
+            GameState.errors = [];
+            GameState.loadedCarts = 0;
+            GameState.coldTimeouts = 0;
+            GameState.actionHistory = [];
+            GameState.gameStartTime = Date.now();
+
+            const config = LevelConfig[level];
+            GameState.timeLeft = config.time;
+            GameState.totalCarts = config.carts;
+
+            generateFlights(config);
+            generateCarts(config);
+
+            document.getElementById('levelSelect').classList.add('hidden');
+            document.getElementById('gameOver').classList.add('hidden');
+            document.getElementById('gameContainer').classList.remove('hidden');
+
+            updateUI();
+            renderCartList();
+            renderFlightInfo();
+            initCanvas();
+            startTimers();
+        }
+
+        function generateFlights(config) {
+            GameState.flights = [];
+            for (let i = 0; i < config.flights; i++) {
+                GameState.flights.push({
+                    id: i,
+                    flightNo: Airlines[Math.floor(Math.random() * Airlines.length)] + 
+                             Math.floor(1000 + Math.random() * 9000),
+                    destination: Destinations[Math.floor(Math.random() * Destinations.length)],
+                    gate: config.gates[i],
+                    cabins: Cabins.slice(0, Math.floor(Math.random() * 2) + 2),
+                    carts: [],
+                    x: 100 + i * 220,
+                    y: 80
+                });
+            }
+        }
+
+        function generateCarts(config) {
+            GameState.carts = [];
+            for (let i = 0; i < config.carts; i++) {
+                const flight = GameState.flights[Math.floor(Math.random() * config.flights)];
+                const cabin = flight.cabins[Math.floor(Math.random() * flight.cabins.length)];
+                const tempLayer = TempLayers[Math.floor(Math.random() * TempLayers.length)];
+                
+                const cart = {
+                    id: i,
+                    type: CartTypes[Math.floor(Math.random() * CartTypes.length)],
+                    flightId: flight.id,
+                    flightNo: flight.flightNo,
+                    cabin: cabin,
+                    tempLayer: tempLayer,
+                    gate: flight.gate,
+                    loaded: false,
+                    coldStartTime: Date.now(),
+                    expired: false
+                };
+                GameState.carts.push(cart);
+
+                if (tempLayer.timeLimit > 0) {
+                    coldTimers[i] = tempLayer.timeLimit;
+                }
+            }
+        }
+
+        function startTimers() {
+            if (gameTimer) clearInterval(gameTimer);
+            
+            gameTimer = setInterval(() => {
+                if (GameState.isPaused || GameState.isGameOver) return;
+                
+                GameState.timeLeft--;
+                updateColdTimers();
+                updateUI();
+                render();
+
+                if (GameState.timeLeft <= 0) {
+                    endGame(false);
+                }
+            }, 1000);
+        }
+
+        function updateColdTimers() {
+            for (let i = 0; i < GameState.carts.length; i++) {
+                const cart = GameState.carts[i];
+                if (cart.loaded || cart.expired || cart.tempLayer.timeLimit === 0) continue;
+                
+                if (coldTimers[i] !== undefined) {
+                    coldTimers[i]--;
+                    if (coldTimers[i] <= 0) {
+                        cart.expired = true;
+                        GameState.coldTimeouts++;
+                        addError(`⏰ 冷藏超时: ${cart.type} (${cart.tempLayer.name}) - ${cart.flightNo} ${cart.cabin}`);
+                        GameState.score -= 50;
+                    }
+                }
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('levelDisplay').textContent = GameState.level;
+            document.getElementById('scoreDisplay').textContent = GameState.score;
+            document.getElementById('timeDisplay').textContent = GameState.timeLeft;
+            document.getElementById('errorDisplay').textContent = GameState.errors.length;
+
+            const timeEl = document.getElementById('timeDisplay');
+            if (GameState.timeLeft <= 30) {
+                timeEl.classList.add('timer-warning');
+            } else {
+                timeEl.classList.remove('timer-warning');
+            }
+        }
+
+        function renderCartList() {
+            const cartList = document.getElementById('cartList');
+            cartList.innerHTML = '';
+
+            GameState.carts.forEach(cart => {
+                if (cart.loaded) return;
+
+                const div = document.createElement('div');
+                div.className = `cart-item ${cart.tempLayer.id}`;
+                div.dataset.cartId = cart.id;
+                div.innerHTML = `
+                    <div class="cart-title">${cart.type}</div>
+                    <div class="cart-detail">✈️ ${cart.flightNo} - ${cart.cabin}</div>
+                    <div class="cart-detail">📍 装车口: ${cart.gate}</div>
+                    <span class="temp-badge ${cart.tempLayer.badge}">${cart.tempLayer.name}</span>
+                    ${cart.tempLayer.timeLimit > 0 ? `
+                        <span style="margin-left: 10px; font-size: 11px; color: ${cart.expired ? '#ff6b6b' : '#aaa'};">
+                            ⏱️ ${cart.expired ? '已超时' : (coldTimers[cart.id] || cart.tempLayer.timeLimit) + 's'}
+                        </span>
+                    ` : ''}
+                `;
+
+                div.addEventListener('mousedown', (e) => startDrag(e, cart.id));
+                cartList.appendChild(div);
+            });
+        }
+
+        function renderFlightInfo() {
+            const flightInfo = document.getElementById('flightInfo');
+            flightInfo.innerHTML = '';
+
+            GameState.flights.forEach(flight => {
+                const div = document.createElement('div');
+                div.className = 'flight-info';
+                div.innerHTML = `
+                    <div class="flight-number">${flight.flightNo}</div>
+                    <div class="flight-detail">🛫 目的地: ${flight.destination}</div>
+                    <div class="flight-detail">💺 舱位: ${flight.cabins.join(' / ')}</div>
+                    <div class="flight-detail">📦 已装车: ${flight.carts.length} 个餐车</div>
+                    <div class="gate-info">📍 装车口 ${flight.gate}</div>
+                `;
+                flightInfo.appendChild(div);
+            });
+        }
+
+        function renderErrorLog() {
+            const errorLog = document.getElementById('errorLog');
+            errorLog.innerHTML = '';
+
+            GameState.errors.slice(-5).reverse().forEach(error => {
+                const div = document.createElement('div');
+                div.className = 'error-log';
+                div.innerHTML = `
+                    <div class="error-time">${error.time}</div>
+                    <div class="error-desc">${error.message}</div>
+                `;
+                errorLog.appendChild(div);
+            });
+        }
+
+        function addError(message) {
+            GameState.errors.push({
+                time: new Date().toLocaleTimeString(),
+                message: message,
+                timestamp: Date.now()
+            });
+            renderErrorLog();
+        }
+
+        function startDrag(e, cartId) {
+            if (GameState.isPaused || GameState.isGameOver) return;
+            
+            draggedCart = GameState.carts.find(c => c.id === cartId);
+            if (!draggedCart || draggedCart.loaded || draggedCart.expired) {
+                draggedCart = null;
+                return;
+            }
+
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+            
+            canvas.style.cursor = 'grabbing';
+            render();
+        }
+
+        function handleMouseMove(e) {
+            if (!draggedCart) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+            render();
+        }
+
+        function handleMouseUp(e) {
+            if (!draggedCart) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            checkPlacement(x, y);
+            
+            draggedCart = null;
+            canvas.style.cursor = 'default';
+            render();
+        }
+
+        function checkPlacement(x, y) {
+            for (const flight of GameState.flights) {
+                const flightRect = {
+                    x: flight.x,
+                    y: flight.y,
+                    width: 200,
+                    height: 200
+                };
+
+                if (x >= flightRect.x && x <= flightRect.x + flightRect.width &&
+                    y >= flightRect.y && y <= flightRect.y + flightRect.height) {
+                    
+                    const cabinHeight = flightRect.height / 3;
+                    const cabinIndex = Math.floor((y - flightRect.y) / cabinHeight);
+                    const targetCabin = Cabins[cabinIndex];
+
+                    validatePlacement(draggedCart, flight, targetCabin);
+                    return;
+                }
+            }
+        }
+
+        function validatePlacement(cart, targetFlight, targetCabin) {
+            let success = true;
+            let errorMsg = '';
+
+            GameState.actionHistory.push({
+                time: new Date().toLocaleTimeString(),
+                cart: cart.type,
+                cartFlight: cart.flightNo,
+                cartCabin: cart.cabin,
+                cartTemp: cart.tempLayer.name,
+                targetFlight: targetFlight.flightNo,
+                targetCabin: targetCabin,
+                targetGate: targetFlight.gate
+            });
+
+            if (cart.flightId !== targetFlight.id) {
+                success = false;
+                errorMsg = `❌ 航班错配: ${cart.type} 属于 ${cart.flightNo}，不能装入 ${targetFlight.flightNo}`;
+                GameState.score -= 30;
+            }
+
+            if (!targetFlight.cabins.includes(cart.cabin)) {
+                success = false;
+                errorMsg = `❌ 舱位错配: ${cart.type} 是 ${cart.cabin}，${targetFlight.flightNo} 没有该舱位`;
+                GameState.score -= 25;
+            }
+
+            if (cart.gate !== targetFlight.gate) {
+                success = false;
+                errorMsg = `❌ 装车口错误: ${cart.type} 应在 ${cart.gate} 口，当前是 ${targetFlight.gate} 口`;
+                GameState.score -= 20;
+            }
+
+            if (success) {
+                cart.loaded = true;
+                targetFlight.carts.push(cart);
+                GameState.loadedCarts++;
+                GameState.score += 100;
+
+                if (cart.tempLayer.timeLimit > 0 && coldTimers[cart.id] > cart.tempLayer.timeLimit * 0.5) {
+                    GameState.score += 25;
+                }
+
+                renderCartList();
+                renderFlightInfo();
+
+                if (GameState.loadedCarts >= GameState.totalCarts) {
+                    endGame(true);
+                }
+            } else {
+                addError(errorMsg);
+            }
+
+            updateUI();
+        }
+
+        function render() {
+            if (!ctx) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            GameState.flights.forEach(flight => {
+                drawFlight(flight);
+            });
+
+            if (draggedCart) {
+                drawDraggedCart();
+            }
+        }
+
+        function drawFlight(flight) {
+            const x = flight.x;
+            const y = flight.y;
+            const width = 200;
+            const height = 200;
+
+            ctx.fillStyle = 'rgba(78, 205, 196, 0.1)';
+            ctx.strokeStyle = '#4ecdc4';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.roundRect(x, y, width, height, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffd93d';
+            ctx.font = 'bold 16px Microsoft YaHei';
+            ctx.textAlign = 'center';
+            ctx.fillText(`✈️ ${flight.flightNo}`, x + width/2, y + 25);
+
+            ctx.fillStyle = '#aaa';
+            ctx.font = '12px Microsoft YaHei';
+            ctx.fillText(`📍 ${flight.gate}口 | ${flight.destination}`, x + width/2, y + 45);
+
+            const cabinHeight = (height - 55) / 3;
+            Cabins.forEach((cabin, index) => {
+                const cabinY = y + 55 + index * cabinHeight;
+                const hasCabin = flight.cabins.includes(cabin);
+
+                ctx.fillStyle = hasCabin ? 'rgba(102, 126, 234, 0.2)' : 'rgba(100, 100, 100, 0.1)';
+                ctx.strokeStyle = hasCabin ? '#667eea' : '#555';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(x + 10, cabinY, width - 20, cabinHeight - 5, 5);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = hasCabin ? '#fff' : '#666';
+                ctx.font = '12px Microsoft YaHei';
+                ctx.textAlign = 'left';
+                ctx.fillText(cabin, x + 20, cabinY + cabinHeight/2 + 4);
+
+                const cartCount = flight.carts.filter(c => c.cabin === cabin).length;
+                ctx.textAlign = 'right';
+                ctx.fillText(`📦 ${cartCount}`, x + width - 20, cabinY + cabinHeight/2 + 4);
+            });
+        }
+
+        function drawDraggedCart() {
+            const width = 120;
+            const height = 60;
+            const x = mouseX - width/2;
+            const y = mouseY - height/2;
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.roundRect(x + 5, y + 5, width, height, 8);
+            ctx.fill();
+
+            const colors = {
+                normal: 'rgba(78, 205, 196, 0.9)',
+                cold: 'rgba(102, 126, 234, 0.9)',
+                frozen: 'rgba(255, 107, 107, 0.9)'
+            };
+            
+            ctx.fillStyle = colors[draggedCart.tempLayer.id];
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(x, y, width, height, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px Microsoft YaHei';
+            ctx.textAlign = 'center';
+            ctx.fillText(draggedCart.type, x + width/2, y + 20);
+
+            ctx.font = '10px Microsoft YaHei';
+            ctx.fillText(`${draggedCart.flightNo} - ${draggedCart.cabin}`, x + width/2, y + 38);
+            ctx.fillText(`📍 ${draggedCart.gate}口 | ${draggedCart.tempLayer.name}`, x + width/2, y + 52);
+        }
+
+        function togglePause() {
+            GameState.isPaused = !GameState.isPaused;
+            document.getElementById('pauseBtn').textContent = 
+                GameState.isPaused ? '▶️ 继续' : '⏸️ 暂停';
+        }
+
+        function restartLevel() {
+            document.getElementById('gameOver').classList.add('hidden');
+            startLevel(GameState.level);
+        }
+
+        function backToMenu() {
+            if (gameTimer) clearInterval(gameTimer);
+            document.getElementById('gameContainer').classList.add('hidden');
+            document.getElementById('gameOver').classList.add('hidden');
+            document.getElementById('levelSelect').classList.remove('hidden');
+        }
+
+        function endGame(success) {
+            GameState.isGameOver = true;
+            if (gameTimer) clearInterval(gameTimer);
+
+            const accuracy = GameState.totalCarts > 0 
+                ? Math.round((GameState.loadedCarts / (GameState.loadedCarts + GameState.errors.length)) * 100)
+                : 0;
+
+            document.getElementById('resultTitle').textContent = 
+                success ? '🎉 装车完成！' : '⏰ 时间到！';
+            document.getElementById('finalScore').textContent = GameState.score;
+            document.getElementById('correctCount').textContent = GameState.loadedCarts;
+            document.getElementById('errorCount').textContent = GameState.errors.length;
+            document.getElementById('timeoutCount').textContent = GameState.coldTimeouts;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+
+            const errorList = document.getElementById('errorList');
+            errorList.innerHTML = '<h4 style="margin-bottom: 10px;">详细错误记录：</h4>';
+            if (GameState.errors.length === 0) {
+                errorList.innerHTML += '<p style="color: #4ecdc4;">完美！没有任何错误！</p>';
+            } else {
+                GameState.errors.forEach((error, index) => {
+                    errorList.innerHTML += `
+                        <div class="error-log">
+                            <span class="error-time">#${index + 1} ${error.time}</span>
+                            <div class="error-desc">${error.message}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('gameContainer').classList.add('hidden');
+            document.getElementById('gameOver').classList.remove('hidden');
+        }
+
+        let replayIndex = 0;
+        let isReplaying = false;
+        let replayInterval = null;
+
+        function showReplay() {
+            if (GameState.actionHistory.length === 0 && GameState.errors.length === 0) {
+                alert('没有可回放的记录');
+                return;
+            }
+            replayIndex = 0;
+            isReplaying = false;
+            document.getElementById('replayModal').classList.remove('hidden');
+            updateReplayDisplay();
+        }
+
+        function closeReplay() {
+            if (replayInterval) clearInterval(replayInterval);
+            document.getElementById('replayModal').classList.add('hidden');
+        }
+
+        function updateReplayDisplay() {
+            const content = document.getElementById('replayContent');
+            const progressBar = document.getElementById('replayProgressBar');
+            const total = Math.max(GameState.actionHistory.length, GameState.errors.length);
+
+            if (total === 0) {
+                content.innerHTML = '<p>没有操作记录</p>';
+                return;
+            }
+
+            progressBar.style.width = ((replayIndex + 1) / total * 100) + '%';
+
+            if (replayIndex < GameState.actionHistory.length) {
+                const action = GameState.actionHistory[replayIndex];
+                content.innerHTML = `
+                    <h3 style="color: #4ecdc4; margin-bottom: 15px;">📍 操作 #${replayIndex + 1}</h3>
+                    <p><strong>时间：</strong>${action.time}</p>
+                    <p><strong>餐车：</strong>${action.cart}</p>
+                    <p><strong>归属：</strong>${action.cartFlight} ${action.cartCabin} (${action.cartTemp})</p>
+                    <p><strong>目标：</strong>${action.targetFlight} ${action.targetCabin}</p>
+                    <p><strong>装车口：</strong>${action.targetGate}</p>
+                    <hr style="margin: 15px 0; border-color: #333;">
+                    ${replayIndex < GameState.errors.length ? 
+                        `<p style="color: #ff6b6b;"><strong>结果：</strong>${GameState.errors[replayIndex]?.message || '装车成功 ✓'}</p>` :
+                        '<p style="color: #4ecdc4;"><strong>结果：</strong>装车成功 ✓</p>'
+                    }
+                `;
+            }
+        }
+
+        function toggleReplayPlay() {
+            isReplaying = !isReplaying;
+            const btn = document.getElementById('replayPlayBtn');
+            btn.textContent = isReplaying ? '⏸️ 暂停' : '▶️ 播放';
+
+            if (isReplaying) {
+                replayInterval = setInterval(() => {
+                    const total = Math.max(GameState.actionHistory.length, GameState.errors.length);
+                    if (replayIndex < total - 1) {
+                        replayIndex++;
+                        updateReplayDisplay();
+                    } else {
+                        isReplaying = false;
+                        btn.textContent = '▶️ 播放';
+                        clearInterval(replayInterval);
+                    }
+                }, 2000);
+            } else {
+                if (replayInterval) clearInterval(replayInterval);
+            }
+        }
+
+        function replayPrev() {
+            if (replayIndex > 0) {
+                replayIndex--;
+                updateReplayDisplay();
+            }
+        }
+
+        function replayNext() {
+            const total = Math.max(GameState.actionHistory.length, GameState.errors.length);
+            if (replayIndex < total - 1) {
+                replayIndex++;
+                updateReplayDisplay();
+            }
+        }
+
+        function exportReport() {
+            const accuracy = GameState.totalCarts > 0 
+                ? Math.round((GameState.loadedCarts / (GameState.loadedCarts + GameState.errors.length)) * 100)
+                : 0;
+
+            const report = `
+═══════════════════════════════════════════
+           航食装车检查报告
+═══════════════════════════════════════════
+
+📋 基本信息
+───────────────────────────────────────────
+关卡：Level ${GameState.level}
+完成时间：${new Date().toLocaleString()}
+总得分：${GameState.score} 分
+
+📊 统计数据
+───────────────────────────────────────────
+正确装车：${GameState.loadedCarts} 个
+错误次数：${GameState.errors.length} 次
+冷藏超时：${GameState.coldTimeouts} 次
+准确率：${accuracy}%
+
+❌ 错误记录
+───────────────────────────────────────────
+${GameState.errors.length === 0 ? '无错误记录' : 
+  GameState.errors.map((e, i) => `#${i + 1} [${e.time}] ${e.message}`).join('\n')}
+
+📝 操作日志
+───────────────────────────────────────────
+${GameState.actionHistory.map((a, i) => 
+  `#${i + 1} [${a.time}] ${a.cart} → ${a.targetFlight} ${a.targetCabin} (${a.targetGate}口)`
+).join('\n')}
+
+💡 改进建议
+───────────────────────────────────────────
+${GameState.errors.length === 0 ? '🌟 表现优秀！继续保持！' : 
+  GameState.errors.length <= 3 ? '💪 表现不错，注意细节！' :
+  '📚 需要加强练习，注意航班匹配和舱位对应！'}
+
+═══════════════════════════════════════════
+            报告生成完毕
+═══════════════════════════════════════════
+            `;
+
+            const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `航食装车报告_${new Date().toISOString().slice(0, 10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
