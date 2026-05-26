@@ -117,6 +117,19 @@ function createTables() {
       created_by TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS privacy_audit_logs (
+      id TEXT PRIMARY KEY,
+      customer_id TEXT NOT NULL,
+      field_name TEXT NOT NULL,
+      original_value TEXT NOT NULL,
+      masked_value TEXT NOT NULL,
+      reason TEXT NOT NULL,
+      operator TEXT NOT NULL,
+      timestamp INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_privacy_customer ON privacy_audit_logs(customer_id);
+
     CREATE INDEX IF NOT EXISTS idx_purchase_customer ON purchase_records(customer_id);
     CREATE INDEX IF NOT EXISTS idx_purchase_medicine ON purchase_records(medicine_id);
     CREATE INDEX IF NOT EXISTS idx_purchase_status ON purchase_records(status);

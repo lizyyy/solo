@@ -114,6 +114,24 @@ function queryRecords(filter) {
         query += ` AND m.category IN (${placeholders})`;
         params.push(...filter.medicineCategories);
     }
+    if (filter.followUpPlan) {
+        switch (filter.followUpPlan) {
+            case 'has_plan':
+                query += ' AND pr.follow_up_date IS NOT NULL';
+                break;
+            case 'no_plan':
+                query += ' AND pr.follow_up_date IS NULL';
+                break;
+            case 'upcoming':
+                query += ' AND pr.follow_up_date IS NOT NULL AND pr.follow_up_date >= ?';
+                params.push(Date.now());
+                break;
+            case 'overdue':
+                query += ' AND pr.follow_up_date IS NOT NULL AND pr.follow_up_date < ?';
+                params.push(Date.now());
+                break;
+        }
+    }
     query += ' ORDER BY pr.purchase_date DESC';
     let rows = db.prepare(query).all(...params);
     if (filter.customerTags && filter.customerTags.length > 0) {

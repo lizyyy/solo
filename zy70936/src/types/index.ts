@@ -76,10 +76,12 @@ export interface ValidationResult {
   warnings: string[];
 }
 
+export type FollowUpPlanFilter = 'upcoming' | 'overdue' | 'no_plan' | 'has_plan';
+
 export interface QueryFilter {
   customerTags?: string[];
   medicineCategories?: string[];
-  followUpPlan?: string;
+  followUpPlan?: FollowUpPlanFilter;
   status?: RecordStatus;
   startDate?: number;
   endDate?: number;

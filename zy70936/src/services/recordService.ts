@@ -1,7 +1,7 @@
 import { getDb } from '../database';
 import { createAuditLog } from './auditService';
 import { validatePurchaseRecord } from './validationService';
-import { addDays } from 'date-fns';
+import { addDays, differenceInDays } from 'date-fns';
 import { PurchaseRecord, RecordStatus, QueryFilter } from '../types';
 
 export function getPendingRecords(batchId?: string): PurchaseRecord[] {
@@ -137,6 +137,25 @@ export function queryRecords(filter: QueryFilter): PurchaseRecord[] {
     const placeholders = filter.medicineCategories.map(() => '?').join(',');
     query += ` AND m.category IN (${placeholders})`;
     params.push(...filter.medicineCategories);
+  }
+
+  if (filter.followUpPlan) {
+    switch (filter.followUpPlan) {
+      case 'has_plan':
+        query += ' AND pr.follow_up_date IS NOT NULL';
+        break;
+      case 'no_plan':
+        query += ' AND pr.follow_up_date IS NULL';
+        break;
+      case 'upcoming':
+        query += ' AND pr.follow_up_date IS NOT NULL AND pr.follow_up_date >= ?';
+        params.push(Date.now());
+        break;
+      case 'overdue':
+        query += ' AND pr.follow_up_date IS NOT NULL AND pr.follow_up_date < ?';
+        params.push(Date.now());
+        break;
+    }
   }
 
   query += ' ORDER BY pr.purchase_date DESC';

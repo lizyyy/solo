@@ -135,14 +135,13 @@ router.post('/records/export', (req, res) => {
 router.get('/customers', (req, res) => {
   try {
     const db = require('../database').getDb();
+    const { operator = 'api_user' } = req.query;
     const customers = db.prepare('SELECT * FROM customers ORDER BY created_at DESC').all() as any[];
-    const maskedCustomers = customers.map(c => ({
+    const maskedCustomers = customers.map(c => privacyService.maskCustomerData({
       ...c,
       tags: JSON.parse(c.tags || '[]'),
-      idCard: privacyService.maskIdCard(c.id_card),
-      phone: privacyService.maskPhone(c.phone),
-      address: privacyService.maskAddress(c.address)
-    }));
+      idCard: c.id_card
+    }, '顾客列表查询隐私保护', operator as string));
     res.json({ total: maskedCustomers.length, customers: maskedCustomers });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
@@ -189,6 +188,19 @@ router.get('/batches', (req, res) => {
     const db = require('../database').getDb();
     const batches = db.prepare('SELECT * FROM batches ORDER BY created_at DESC').all();
     res.json({ total: batches.length, batches });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/privacy/logs', (req, res) => {
+  try {
+    const { customerId, limit } = req.query;
+    const logs = privacyService.getPrivacyAuditLogs(
+      customerId as string,
+      limit ? parseInt(limit as string, 10) : 100
+    );
+    res.json({ total: logs.length, logs });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
