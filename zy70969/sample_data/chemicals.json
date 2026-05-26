@@ -1,0 +1,38 @@
+[
+  {
+    "chemical_code": "CHEM-001",
+    "name": "除草剂-A型",
+    "max_dosage_per_100m2": 50.0,
+    "min_interval_days": 14,
+    "wind_speed_limit": 3.0,
+    "hazard_level": "中",
+    "notes": "适用于阔叶杂草防治"
+  },
+  {
+    "chemical_code": "CHEM-002",
+    "name": "杀虫剂-B型",
+    "max_dosage_per_100m2": 30.0,
+    "min_interval_days": 7,
+    "wind_speed_limit": 5.0,
+    "hazard_level": "低",
+    "notes": "对蚜虫、飞虱有效"
+  },
+  {
+    "chemical_code": "CHEM-003",
+    "name": "杀菌剂-C型",
+    "max_dosage_per_100m2": 80.0,
+    "min_interval_days": 10,
+    "wind_speed_limit": 4.0,
+    "hazard_level": "低",
+    "notes": "广谱杀菌剂，防治叶斑病"
+  },
+  {
+    "chemical_code": "CHEM-004",
+    "name": "叶面肥-D型",
+    "max_dosage_per_100m2": 100.0,
+    "min_interval_days": 5,
+    "wind_speed_limit": 6.0,
+    "hazard_level": "无",
+    "notes": "补充氮磷钾，促进生长"
+  }
+]
