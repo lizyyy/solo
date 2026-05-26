@@ -39,7 +39,6 @@ export function ResultPage() {
 
   const level = levels.find(l => l.id === record.levelId);
   const isPassed = record.score >= (level?.targetScore || 0);
-  const totalAttempts = record.correctCount + record.wrongCount;
 
   const handleExport = () => {
     const report = exportReport(record);

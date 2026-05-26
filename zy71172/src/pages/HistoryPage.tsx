@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Trash2, Download, Play, Calendar, Trophy, Target, Clock } from 'lucide-react';
+import { ArrowLeft, Trash2, Download, Play, Calendar, Trophy, Target } from 'lucide-react';
 import { useHistoryStore } from '@/store/useHistoryStore';
 import { levels } from '@/data/levels';
 
@@ -161,6 +161,13 @@ export function HistoryPage() {
 
                     {/* Actions */}
                     <div className="flex flex-col gap-2 ml-4">
+                      <button
+                        onClick={() => navigate(`/replay/${record.id}`)}
+                        className="flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        <Play size={16} />
+                        回放
+                      </button>
                       <button
                         onClick={() => navigate(`/result/${record.id}`)}
                         className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-colors"

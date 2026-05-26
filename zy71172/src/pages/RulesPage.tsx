@@ -1,7 +1,7 @@
 
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Recycle, Droplets, AlertTriangle, Calendar, Scissors, Sparkles } from 'lucide-react';
+import { ArrowLeft, Recycle, AlertTriangle, Calendar, Scissors, Sparkles } from 'lucide-react';
 import { CATEGORY_COLORS, CATEGORY_NAMES, CATEGORY_EMOJIS } from '@/types';
 
 export function RulesPage() {

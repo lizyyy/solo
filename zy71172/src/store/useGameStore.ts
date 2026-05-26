@@ -89,12 +89,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       levelConfig.availableCategories.includes(item.category)
     );
 
-    let wetItems = eligibleItems.filter(item => item.category === 'wet' && item.requiresBagBreak);
-    let wetWithoutBag = eligibleItems.filter(item => item.category === 'wet' && !item.requiresBagBreak);
-    let contaminatedItems = eligibleItems.filter(item => item.category === 'recyclable' && item.isContaminated);
-    let cleanRecyclable = eligibleItems.filter(item => item.category === 'recyclable' && !item.isContaminated);
-    let bulkyItems = eligibleItems.filter(item => item.category === 'bulky');
-    let otherItems = eligibleItems.filter(item =>
+    const wetItems = eligibleItems.filter(item => item.category === 'wet' && item.requiresBagBreak);
+    const wetWithoutBag = eligibleItems.filter(item => item.category === 'wet' && !item.requiresBagBreak);
+    const contaminatedItems = eligibleItems.filter(item => item.category === 'recyclable' && item.isContaminated);
+    const cleanRecyclable = eligibleItems.filter(item => item.category === 'recyclable' && !item.isContaminated);
+    const bulkyItems = eligibleItems.filter(item => item.category === 'bulky');
+    const otherItems = eligibleItems.filter(item =>
       !['wet', 'recyclable', 'bulky'].includes(item.category)
     );
 
