@@ -44,7 +44,7 @@ function analyzeViolations(applyNo) {
       };
     }
 
-    if (insp.detail && (insp.detail.includes('已整改') || insp.detail.includes('整改完成') || insp.detail.includes('复验通过'))) {
+    if (insp.detail && (insp.detail.includes('已整改') || insp.detail.includes('整改完成'))) {
       ruleStatus[key].fixed = true;
       ruleStatus[key].fixed_date = insp.inspect_date;
     }
@@ -53,6 +53,8 @@ function analyzeViolations(applyNo) {
       ruleStatus[key].review_count++;
       if (insp.detail.includes('复查通过') || insp.detail.includes('复验通过')) {
         ruleStatus[key].review_pass = true;
+        ruleStatus[key].fixed = true;
+        ruleStatus[key].fixed_date = insp.inspect_date;
       }
     }
   }
