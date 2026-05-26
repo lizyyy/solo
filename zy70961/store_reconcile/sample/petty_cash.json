@@ -1,0 +1,66 @@
+[
+  {
+    "txn_date": "2026-05-01",
+    "txn_type": "replenish",
+    "amount": 5000.00,
+    "balance_after": 5000.00,
+    "reference": "INIT202605",
+    "description": "月初备用金充值"
+  },
+  {
+    "txn_date": "2026-05-10",
+    "txn_type": "expense",
+    "amount": 800.00,
+    "balance_after": 4200.00,
+    "reference": "EXP0510",
+    "description": "办公用品采购"
+  },
+  {
+    "txn_date": "2026-05-15",
+    "txn_type": "expense",
+    "amount": 500.00,
+    "balance_after": 3700.00,
+    "reference": "EXP0515",
+    "description": "快递费用"
+  },
+  {
+    "txn_date": "2026-05-20",
+    "txn_type": "income",
+    "amount": 200.00,
+    "balance_after": 3900.00,
+    "reference": "INC0520",
+    "description": "废品回收"
+  },
+  {
+    "txn_date": "2026-05-21",
+    "txn_type": "expense",
+    "amount": 1500.00,
+    "balance_after": 2400.00,
+    "reference": "EXP0521",
+    "description": "设备维修"
+  },
+  {
+    "txn_date": "2026-05-22",
+    "txn_type": "replenish",
+    "amount": 3000.00,
+    "balance_after": 5400.00,
+    "reference": "REP0522",
+    "description": "备用金补充"
+  },
+  {
+    "txn_date": "2026-05-23",
+    "txn_type": "expense",
+    "amount": 100.00,
+    "balance_after": 5300.00,
+    "reference": "EXP0523",
+    "description": "打印耗材"
+  },
+  {
+    "txn_date": "2026-05-24",
+    "txn_type": "expense",
+    "amount": 300.00,
+    "balance_after": 5000.00,
+    "reference": "EXP0524",
+    "description": "水电杂费"
+  }
+]
