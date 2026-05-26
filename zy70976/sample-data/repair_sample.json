@@ -1,0 +1,34 @@
+{
+  "repairs": [
+    {
+      "device_serial": "EQ-2024-002",
+      "repair_type": "机械故障",
+      "repair_description": "液压油管破裂，更换新油管",
+      "repair_cost": 1500.00,
+      "is_customer_fault": true,
+      "fault_reason": "客户操作不当，超负荷作业导致",
+      "report_date": "2024-05-16",
+      "repair_date": "2024-05-17"
+    },
+    {
+      "device_serial": "EQ-2024-005",
+      "repair_type": "电气故障",
+      "repair_description": "控制线路短路，更换线束",
+      "repair_cost": 800.00,
+      "is_customer_fault": false,
+      "fault_reason": "设备老化自然损坏",
+      "report_date": "2024-05-20",
+      "repair_date": "2024-05-21"
+    },
+    {
+      "device_serial": "EQ-2024-006",
+      "repair_type": "外观损坏",
+      "repair_description": "车身刮擦，重新喷漆",
+      "repair_cost": 600.00,
+      "is_customer_fault": true,
+      "fault_reason": "客户停放时被其他车辆剐蹭",
+      "report_date": "2024-05-29",
+      "repair_date": "2024-05-30"
+    }
+  ]
+}

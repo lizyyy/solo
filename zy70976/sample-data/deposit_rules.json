@@ -1,0 +1,58 @@
+{
+  "rules": [
+    {
+      "device_type": "高空作业车",
+      "device_model": "20米",
+      "deposit_amount": 5000.00,
+      "overdue_rate": 0.1
+    },
+    {
+      "device_type": "高空作业车",
+      "device_model": "30米",
+      "deposit_amount": 6000.00,
+      "overdue_rate": 0.1
+    },
+    {
+      "device_type": "挖掘机",
+      "device_model": "PC200",
+      "deposit_amount": 8000.00,
+      "overdue_rate": 0.15
+    },
+    {
+      "device_type": "挖掘机",
+      "device_model": "PC300",
+      "deposit_amount": 10000.00,
+      "overdue_rate": 0.15
+    },
+    {
+      "device_type": "压路机",
+      "device_model": "20吨",
+      "deposit_amount": 6000.00,
+      "overdue_rate": 0.1
+    },
+    {
+      "device_type": "叉车",
+      "device_model": "5吨",
+      "deposit_amount": 3000.00,
+      "overdue_rate": 0.1
+    },
+    {
+      "device_type": "起重机",
+      "device_model": "50吨",
+      "deposit_amount": 12000.00,
+      "overdue_rate": 0.2
+    },
+    {
+      "device_type": "装载机",
+      "device_model": "5吨",
+      "deposit_amount": 7000.00,
+      "overdue_rate": 0.1
+    },
+    {
+      "device_type": "推土机",
+      "device_model": "D6",
+      "deposit_amount": 10000.00,
+      "overdue_rate": 0.15
+    }
+  ]
+}
