@@ -87,3 +87,10 @@ class BatchStatusResponse(BaseModel):
     status: str
     created_at: Optional[datetime]
     message: str
+
+
+class LocalProcessRequest(BaseModel):
+    batch_id: Optional[str] = None
+    waybill_path: str = "./samples/waybills.csv"
+    track_path: str = "./samples/tracks.json"
+    rules_path: str = "./samples/rules.json"

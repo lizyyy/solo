@@ -15,12 +15,28 @@ import hashlib
 class ReconciliationService:
     def __init__(self):
         self.processed_batches: Dict[str, Dict[str, Any]] = {}
+        self.content_hash_to_batch: Dict[str, str] = {}
 
     def is_batch_processed(self, batch_id: str) -> bool:
         return batch_id in self.processed_batches
 
     def get_batch_status(self, batch_id: str) -> Optional[Dict[str, Any]]:
         return self.processed_batches.get(batch_id)
+
+    def generate_content_hash(
+        self,
+        waybill_content: str,
+        track_content: str,
+        rules_content: str,
+    ) -> str:
+        content = f"{waybill_content.strip()}|{track_content.strip()}|{rules_content.strip()}"
+        return hashlib.md5(content.encode("utf-8")).hexdigest()
+
+    def get_batch_by_content_hash(self, content_hash: str) -> Optional[str]:
+        return self.content_hash_to_batch.get(content_hash)
+
+    def register_content_hash(self, content_hash: str, batch_id: str) -> None:
+        self.content_hash_to_batch[content_hash] = batch_id
 
     def _check_weather_exemption(self, waybill: Waybill, tracks: List[TrackEvent]) -> bool:
         if waybill.is_weather_issue and waybill.is_weather_issue.lower() in ["yes", "y", "true", "1"]:
