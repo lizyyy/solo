@@ -20,6 +20,9 @@ export function GamePage() {
   const robots = useGameStore((state) => state.robots);
   const orders = useGameStore((state) => state.orders);
   const selectedRobotId = useGameStore((state) => state.selectedRobotId);
+  const selectedRobot = useGameStore((state) => 
+    state.robots.find((r) => r.id === state.selectedRobotId) || null
+  );
   const isPaused = useGameStore((state) => state.isPaused);
   const isGameOver = useGameStore((state) => state.isGameOver);
   const gameSpeed = useGameStore((state) => state.gameSpeed);
@@ -121,7 +124,7 @@ export function GamePage() {
             </div>
           </div>
 
-          <OrderList orders={orders} currentTime={gameTime} />
+          <OrderList orders={orders} currentTime={gameTime} selectedRobot={selectedRobot} />
         </div>
       </div>
 

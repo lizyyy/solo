@@ -1,10 +1,12 @@
-import { Order } from '../../types/game';
+import { Order, Robot } from '../../types/game';
 import { formatTime } from '../../game/engine';
-import { Package, Clock, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { useGameStore } from '../../store/gameStore';
+import { Package, Clock, CheckCircle, AlertCircle, Loader, Send } from 'lucide-react';
 
 interface OrderListProps {
   orders: Order[];
   currentTime: number;
+  selectedRobot: Robot | null;
 }
 
 const statusLabels: Record<Order['status'], string> = {
@@ -21,12 +23,19 @@ const statusColors: Record<Order['status'], string> = {
   timeout: 'text-red-400',
 };
 
-export function OrderList({ orders, currentTime }: OrderListProps) {
+export function OrderList({ orders, currentTime, selectedRobot }: OrderListProps) {
+  const assignOrder = useGameStore((state) => state.assignOrder);
+
   return (
     <div className="space-y-2">
       <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
         <Package className="w-4 h-4" />
         订单列表
+        {selectedRobot && (
+          <span className="text-xs text-blue-400 ml-2">
+            (已选机器人: {selectedRobot.name})
+          </span>
+        )}
       </h3>
       
       {orders.length === 0 ? (
@@ -38,6 +47,9 @@ export function OrderList({ orders, currentTime }: OrderListProps) {
           const timeRemaining = order.deadline - currentTime;
           const isUrgent = timeRemaining < 30 && order.status === 'pending';
           const pickedCount = order.items.filter((item) => item.picked).length;
+          const canAssign = selectedRobot && 
+                           selectedRobot.status !== 'dead' && 
+                           order.status === 'pending';
           
           return (
             <div
@@ -67,9 +79,23 @@ export function OrderList({ orders, currentTime }: OrderListProps) {
                     {order.id.toUpperCase()}
                   </span>
                 </div>
-                <span className={`text-xs ${statusColors[order.status]}`}>
-                  {statusLabels[order.status]}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs ${statusColors[order.status]}`}>
+                    {statusLabels[order.status]}
+                  </span>
+                  {canAssign && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        assignOrder(selectedRobot!.id, order.id);
+                      }}
+                      className="p-1 rounded bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+                      title="分配此订单给选中的机器人"
+                    >
+                      <Send className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-1 text-xs">
@@ -101,6 +127,12 @@ export function OrderList({ orders, currentTime }: OrderListProps) {
                     {pickedCount}/{order.items.length}
                   </span>
                 </div>
+
+                {order.status === 'in_progress' && order.assignedRobotId && (
+                  <div className="text-xs text-blue-400">
+                    执行机器人: {order.assignedRobotId.toUpperCase()}
+                  </div>
+                )}
               </div>
             </div>
           );

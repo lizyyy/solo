@@ -304,6 +304,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (allPicked && currentOrder.status !== 'completed') {
               const orderIdx = newOrders.findIndex((o) => o.id === currentOrder.id);
               newOrders[orderIdx] = { ...currentOrder, status: 'completed' };
+              newRobots[i] = { ...newRobots[i], currentOrderId: undefined };
               newEvents.push(createEvent('order_complete', { 
                 orderId: currentOrder.id,
                 robotId: robot.id

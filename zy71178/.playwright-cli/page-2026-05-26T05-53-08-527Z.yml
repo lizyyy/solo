@@ -1,0 +1,73 @@
+- generic [ref=e7]:
+  - generic [ref=e8]:
+    - img [ref=e11]
+    - heading "仓储机器人避障游戏" [level=1] [ref=e14]
+    - paragraph [ref=e15]: 指挥机器人完成订单拣货任务，避免碰撞，管理电量，挑战你的调度能力！
+  - generic [ref=e16]:
+    - generic [ref=e17]:
+      - img [ref=e19]
+      - heading "路径规划" [level=3] [ref=e21]
+      - paragraph [ref=e22]: 点击机器人后选择目标位置，系统自动规划最优路径
+    - generic [ref=e23]:
+      - img [ref=e25]
+      - heading "碰撞检测" [level=3] [ref=e27]
+      - paragraph [ref=e28]: 机器人相撞会导致故障，合理安排路径避免事故
+    - generic [ref=e29]:
+      - img [ref=e31]
+      - heading "时间管理" [level=3] [ref=e34]
+      - paragraph [ref=e35]: 订单有时间限制，超时会扣分，注意机器人电量消耗
+  - generic [ref=e36]:
+    - heading "选择关卡" [level=2] [ref=e37]:
+      - img [ref=e38]
+      - text: 选择关卡
+    - generic [ref=e44]:
+      - generic [ref=e45] [cursor=pointer]:
+        - generic [ref=e46]:
+          - generic [ref=e47]: 简单
+          - img [ref=e49]
+        - heading "新手训练" [level=3] [ref=e51]
+        - paragraph [ref=e52]: 单机器人，简单路径规划练习
+        - generic [ref=e53]:
+          - generic [ref=e54]: 1 台机器人
+          - generic [ref=e55]: 1 个订单
+          - generic [ref=e56]: 8×8
+      - generic [ref=e57] [cursor=pointer]:
+        - generic [ref=e58]:
+          - generic [ref=e59]: 中等
+          - img [ref=e61]
+        - heading "双机协作" [level=3] [ref=e63]
+        - paragraph [ref=e64]: 两台机器人，避障协作
+        - generic [ref=e65]:
+          - generic [ref=e66]: 2 台机器人
+          - generic [ref=e67]: 2 个订单
+          - generic [ref=e68]: 10×10
+      - generic [ref=e69] [cursor=pointer]:
+        - generic [ref=e70]:
+          - generic [ref=e71]: 困难
+          - img [ref=e73]
+        - heading "繁忙仓库" [level=3] [ref=e75]
+        - paragraph [ref=e76]: 三台机器人，多订单并发
+        - generic [ref=e77]:
+          - generic [ref=e78]: 3 台机器人
+          - generic [ref=e79]: 3 个订单
+          - generic [ref=e80]: 12×12
+  - generic [ref=e81]:
+    - heading "游戏规则" [level=2] [ref=e82]:
+      - img [ref=e83]
+      - text: 游戏规则
+    - generic [ref=e86]:
+      - generic [ref=e87]:
+        - heading "基础操作" [level=4] [ref=e88]
+        - list [ref=e89]:
+          - listitem [ref=e90]: • 点击机器人进行选中
+          - listitem [ref=e91]: • 点击地图空白处指定目标位置
+          - listitem [ref=e92]: • 鼠标拖拽旋转视角，滚轮缩放
+          - listitem [ref=e93]: • 使用控制面板暂停/加速游戏
+      - generic [ref=e94]:
+        - heading "计分规则" [level=4] [ref=e95]
+        - list [ref=e96]:
+          - listitem [ref=e97]: "• 完成订单: +100分"
+          - listitem [ref=e98]: "• 效率奖励: +50分/分钟"
+          - listitem [ref=e99]: "• 机器人碰撞: -200分"
+          - listitem [ref=e100]: "• 订单超时: -100分/分钟"
+          - listitem [ref=e101]: "• 电量耗尽: -150分"
