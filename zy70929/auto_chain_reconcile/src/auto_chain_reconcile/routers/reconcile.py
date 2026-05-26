@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from auto_chain_reconcile.db import get_db
 from auto_chain_reconcile.models import (
     InventoryBatch,
+    InventoryConsumption,
     Package,
     ReconcileBatch,
     ReconcileResult,
@@ -36,12 +37,27 @@ def _build_response(batch: ReconcileBatch, db: Session) -> ReconcileResponse:
     )
     normal, pending, failed = [], [], []
     for r in rows:
+        consumptions = (
+            db.query(InventoryConsumption)
+            .filter(InventoryConsumption.result_id == r.id)
+            .all()
+        )
+        consumed_batches = [
+            {
+                "part_code": c.part_code,
+                "batch_no": c.batch_no,
+                "qty": c.qty,
+                "inventory_batch_id": c.inventory_batch_id,
+            }
+            for c in consumptions
+        ]
         out = ReconcileOrderOut(
             order_id=r.order_id,
             status=r.status,
             reason=r.reason,
             suggestion=r.suggestion,
             matched_package_id=r.package_id or None,
+            consumed_batches=consumed_batches,
             raw=json.loads(r.raw or "{}"),
             rules=json.loads(r.rules or "[]"),
         )
@@ -65,9 +81,9 @@ def _build_response(batch: ReconcileBatch, db: Session) -> ReconcileResponse:
 async def reconcile_multipart(
     batch_key: str = Form(...),
     store_id: str = Form(...),
-    packages_file: UploadFile | None = File(default=None, description="套餐 CSV"),
-    work_orders_file: UploadFile | None = File(default=None, description="工单 JSON"),
-    inventory_file: UploadFile | None = File(default=None, description="配件库存 CSV"),
+    packages_file: Optional[UploadFile] = File(default=None, description="套餐 CSV"),
+    work_orders_file: Optional[UploadFile] = File(default=None, description="工单 JSON"),
+    inventory_file: Optional[UploadFile] = File(default=None, description="配件库存 CSV"),
     db: Session = Depends(get_db),
 ) -> ReconcileResponse:
     pkg_rows: list[dict[str, Any]] = []
@@ -193,6 +209,20 @@ def _run_reconcile(
                 if invb is not None:
                     invb.remaining_qty += delta
         db.add(row)
+        db.flush()  # 拿到 row.id 后写消耗记录
+
+        # 保存实际 FIFO 消耗批次——追溯配件来源的唯一依据
+        if decision.status != "failed":
+            for cb in decision.consumed_batches:
+                consumption = InventoryConsumption(
+                    result_id=row.id,
+                    order_id=decision.order.get("order_id", ""),
+                    inventory_batch_id=cb["inventory_batch_id"],
+                    part_code=cb["part_code"],
+                    batch_no=cb["batch_no"],
+                    qty=cb["qty"],
+                )
+                db.add(consumption)
 
     batch.status = "done"
     db.commit()

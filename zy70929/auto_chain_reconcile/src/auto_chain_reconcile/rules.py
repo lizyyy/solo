@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Optional
 
 from auto_chain_reconcile.models import (
     InventoryBatch,
@@ -29,10 +29,10 @@ class OrderDecision:
     reason: str = ""
     suggestion: str = ""
     rules: list[str] = field(default_factory=list)
-    matched_package_id: str | None = None
+    matched_package_id: Optional[str] = None
     consumed_batches: list[dict[str, Any]] = field(default_factory=list)
     package_used_qty_delta: int = 0
-    package_to_consume: Package | None = None
+    package_to_consume: Optional["Package"] = None
     inventory_delta: dict[int, int] = field(default_factory=dict)  # inventory_batch.id -> delta
 
     def to_result_row(self, batch_id: int) -> ReconcileResult:
@@ -97,7 +97,7 @@ def evaluate_order(
     exact = [p for p in candidates if p.item_code == order_item]
     replaceable = [p for p in candidates if p.item_code in substitutes]
 
-    chosen: Package | None = None
+    chosen: Optional[Package] = None
     if exact:
         chosen = exact[0]
     elif replaceable:
@@ -135,7 +135,8 @@ def evaluate_order(
         decision.rules.append("PACKAGE_QTY_SHORT")
         return decision
 
-    # 库存扣减（先进先出）
+    # 库存扣减（先进先出）—— 只计算 delta 和批次明细，不直接修改 remaining_qty，
+    # 由 reconcile.py 统一应用，避免重复扣减。
     inventory_delta: dict[int, int] = {}
     consumed_batches: list[dict[str, Any]] = []
     for part in parts:
@@ -144,16 +145,16 @@ def evaluate_order(
         if not part_code:
             continue
         batches = sorted(
-            [b for b in inventory if b.part_code == part_code and b.remaining_qty > 0],
+            [b for b in inventory if b.part_code == part_code and b.remaining_qty + inventory_delta.get(b.id, 0) > 0],
             key=lambda b: (b.inbound_date or "", b.id),
         )
         remaining_need = need
         for b in batches:
-            take = min(b.remaining_qty, remaining_need)
+            effective_remaining = b.remaining_qty + inventory_delta.get(b.id, 0)
+            take = min(effective_remaining, remaining_need)
             if take <= 0:
                 continue
             inventory_delta[b.id] = inventory_delta.get(b.id, 0) - take
-            b.remaining_qty -= take
             remaining_need -= take
             consumed_batches.append(
                 {
@@ -163,6 +164,7 @@ def evaluate_order(
                     "inbound_date": b.inbound_date,
                     "qty": take,
                     "store_id": b.store_id,
+                    "inventory_batch_id": b.id,
                 }
             )
             if remaining_need == 0:
@@ -172,12 +174,6 @@ def evaluate_order(
             decision.reason = f"配件 {part_code} 库存不足，缺口 {remaining_need}"
             decision.suggestion = "紧急调拨或先欠料登记，到货后补扣"
             decision.rules.append("INVENTORY_SHORT")
-            # 回滚库存扣减
-            for b_id, delta in list(inventory_delta.items()):
-                invb = next((x for x in inventory if x.id == b_id), None)
-                if invb is not None:
-                    invb.remaining_qty -= delta
-                    inventory_delta[b_id] = 0
             return decision
 
     # 正常

@@ -1,10 +1,10 @@
-from __future__ import annotations
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from auto_chain_reconcile.db import get_db
-from auto_chain_reconcile.models import InventoryBatch, ReconcileResult, WorkOrder
+from auto_chain_reconcile.models import InventoryBatch, InventoryConsumption, ReconcileResult, WorkOrder
 from auto_chain_reconcile.schemas import TracePartOut
 
 router = APIRouter()
@@ -13,8 +13,8 @@ router = APIRouter()
 @router.get("/part/{part_code}", response_model=list[TracePartOut])
 def trace_part(
     part_code: str,
-    store_id: str | None = None,
-    order_id: str | None = None,
+    store_id: Optional[str] = None,
+    order_id: Optional[str] = None,
     db: Session = Depends(get_db),
 ) -> list[TracePartOut]:
     q = db.query(InventoryBatch).filter(InventoryBatch.part_code == part_code)
@@ -24,28 +24,21 @@ def trace_part(
     if not batches:
         raise HTTPException(status_code=404, detail="未找到该配件批次记录")
 
-    consumed_by: dict[str, list[str]] = {}
+    # 从实际消耗记录追溯，而非从工单原始 parts 推断
+    batch_ids = {b.id for b in batches}
+    cons_q = db.query(InventoryConsumption).filter(
+        InventoryConsumption.inventory_batch_id.in_(batch_ids)
+    )
     if order_id:
-        work = db.query(WorkOrder).filter(WorkOrder.order_id == order_id).first()
-        if work is None:
-            raise HTTPException(status_code=404, detail="未找到该工单")
-        results = (
-            db.query(ReconcileResult)
-            .filter(ReconcileResult.order_id == order_id, ReconcileResult.status == "normal")
-            .all()
-        )
-        for r in results:
-            import json
-            raw = json.loads(r.raw or "{}")
-            for p in raw.get("parts") or []:
-                if p.get("part_code") == part_code:
-                    for b in batches:
-                        key = f"{b.part_code}|{b.batch_no}|{b.store_id}"
-                        consumed_by.setdefault(key, []).append(order_id)
+        cons_q = cons_q.filter(InventoryConsumption.order_id == order_id)
+    consumptions = cons_q.all()
+
+    consumed_by: dict[int, list[str]] = {}
+    for c in consumptions:
+        consumed_by.setdefault(c.inventory_batch_id, []).append(c.order_id)
 
     out: list[TracePartOut] = []
     for b in batches:
-        key = f"{b.part_code}|{b.batch_no}|{b.store_id}"
         out.append(
             TracePartOut(
                 part_code=b.part_code,
@@ -56,7 +49,7 @@ def trace_part(
                 store_id=b.store_id,
                 initial_qty=b.initial_qty,
                 remaining_qty=b.remaining_qty,
-                consumed_by_orders=consumed_by.get(key, []),
+                consumed_by_orders=consumed_by.get(b.id, []),
             )
         )
     return out
@@ -69,15 +62,31 @@ def trace_order(order_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="未找到该工单")
     results = db.query(ReconcileResult).filter(ReconcileResult.order_id == order_id).all()
     import json
-    return {
-        "order": json.loads(work.raw or "{}"),
-        "results": [
+    result_data = []
+    for r in results:
+        consumptions = (
+            db.query(InventoryConsumption)
+            .filter(InventoryConsumption.result_id == r.id)
+            .all()
+        )
+        result_data.append(
             {
                 "status": r.status,
                 "reason": r.reason,
                 "suggestion": r.suggestion,
                 "rules": json.loads(r.rules or "[]"),
+                "consumed_batches": [
+                    {
+                        "part_code": c.part_code,
+                        "batch_no": c.batch_no,
+                        "qty": c.qty,
+                        "inventory_batch_id": c.inventory_batch_id,
+                    }
+                    for c in consumptions
+                ],
             }
-            for r in results
-        ],
+        )
+    return {
+        "order": json.loads(work.raw or "{}"),
+        "results": result_data,
     }

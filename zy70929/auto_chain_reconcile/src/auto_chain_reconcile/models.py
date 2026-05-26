@@ -118,7 +118,28 @@ class ReconcileResult(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     batch: Mapped[ReconcileBatch] = relationship(back_populates="results")
+    consumptions: Mapped[list["InventoryConsumption"]] = relationship(back_populates="result")
 
     __table_args__ = (
         Index("ix_result_batch_status", "batch_id", "status"),
     )
+
+
+class InventoryConsumption(Base):
+    """实际 FIFO 消耗记录——追溯配件批次的唯一依据。"""
+
+    __tablename__ = "inventory_consumption"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    result_id: Mapped[int] = mapped_column(Integer, ForeignKey("reconcile_result.id"), index=True)
+    order_id: Mapped[str] = mapped_column(String(64), index=True)
+    inventory_batch_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("inventory_batch.id"), index=True
+    )
+    part_code: Mapped[str] = mapped_column(String(64), index=True)
+    batch_no: Mapped[str] = mapped_column(String(64))
+    qty: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    result: Mapped[ReconcileResult] = relationship(back_populates="consumptions")
+    inventory_batch: Mapped[InventoryBatch] = relationship()

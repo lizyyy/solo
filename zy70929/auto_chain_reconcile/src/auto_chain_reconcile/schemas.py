@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -18,7 +18,7 @@ class ReconcileOrderOut(BaseModel):
     status: str
     reason: str
     suggestion: str
-    matched_package_id: str | None = None
+    matched_package_id: Optional[str] = None
     consumed_batches: list[dict[str, Any]] = Field(default_factory=list)
     raw: dict[str, Any] = Field(default_factory=dict)
     rules: list[str] = Field(default_factory=list)
@@ -35,8 +35,8 @@ class ReconcileResponse(BaseModel):
 
 class TracePartIn(BaseModel):
     part_code: str
-    store_id: str | None = None
-    order_id: str | None = None
+    store_id: Optional[str] = None
+    order_id: Optional[str] = None
 
 
 class TracePartOut(BaseModel):

@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: auto_chain_reconcile
+Version: 0.1.0
+Summary: 汽修连锁套餐/工单/配件核销一致性 API
+Requires-Python: >=3.9
+Requires-Dist: fastapi>=0.110
+Requires-Dist: uvicorn[standard]>=0.29
+Requires-Dist: sqlalchemy>=2.0
+Requires-Dist: pydantic>=2.6
+Requires-Dist: pydantic-settings>=2.2
+Requires-Dist: python-multipart>=0.0.9

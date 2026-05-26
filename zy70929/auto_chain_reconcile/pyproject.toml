@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "auto_chain_reconcile"
 version = "0.1.0"
 description = "汽修连锁套餐/工单/配件核销一致性 API"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 dependencies = [
   "fastapi>=0.110",
   "uvicorn[standard]>=0.29",
