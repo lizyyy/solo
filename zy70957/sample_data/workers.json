@@ -1,0 +1,42 @@
+[
+  {
+    "worker_id": "W001",
+    "worker_name": "李师傅",
+    "phone": "13800138001",
+    "skills": ["水电", "门窗"],
+    "rating": 4.8,
+    "total_orders": 156
+  },
+  {
+    "worker_id": "W002",
+    "worker_name": "王师傅",
+    "phone": "13800138002",
+    "skills": ["家具", "土木"],
+    "rating": 4.6,
+    "total_orders": 142
+  },
+  {
+    "worker_id": "W003",
+    "worker_name": "张师傅",
+    "phone": "13800138003",
+    "skills": ["电器", "空调"],
+    "rating": 4.9,
+    "total_orders": 178
+  },
+  {
+    "worker_id": "W004",
+    "worker_name": "赵师傅",
+    "phone": "13800",
+    "skills": ["水电"],
+    "rating": 4.5,
+    "total_orders": 89
+  },
+  {
+    "worker_id": "W001",
+    "worker_name": "李师傅",
+    "phone": "13800138001",
+    "skills": ["水电", "门窗", "电器"],
+    "rating": 4.8,
+    "total_orders": 156
+  }
+]
