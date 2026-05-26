@@ -1,7 +1,6 @@
 import React from 'react';
 import { useGameStore } from '@/store/gameStore';
-import { Power, Wind, Zap, AlertTriangle } from 'lucide-react';
-import { getCapacityWarningLevel, getSmokeWarningLevel } from '@/utils/simulation';
+import { Wind, Zap, AlertTriangle } from 'lucide-react';
 
 interface ProgressBarProps {
   value: number;

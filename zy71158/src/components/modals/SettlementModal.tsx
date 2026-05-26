@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { getScoreGrade, explainScore } from '@/utils/scoring';
-import { downloadReport, formatReportSummary } from '@/utils/report';
+import { downloadReport } from '@/utils/report';
 import { X, Download, RotateCcw, Home, History } from 'lucide-react';
 
 export default function SettlementModal() {

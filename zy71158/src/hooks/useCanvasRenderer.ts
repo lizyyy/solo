@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback } from 'react';
-import { Stall, Customer, HistoryFrame } from '@/types/game';
+import { Stall, Customer } from '@/types/game';
 import { calculateStallSmoke } from '@/utils/simulation';
 
 interface CanvasRendererOptions {
@@ -30,7 +30,6 @@ export function useCanvasRenderer(
 ) {
   const particlesRef = useRef<Particle[]>([]);
   const animationRef = useRef<number>(0);
-  const customerPositionsRef = useRef<Map<string, { x: number; y: number; targetX: number; targetY: number }>>(new Map());
 
   const spawnParticles = useCallback((stall: Stall, count: number) => {
     const smoke = calculateStallSmoke(stall);
@@ -242,7 +241,7 @@ export function useCanvasRenderer(
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const { width, height, stalls, customers, totalElectricity, maxElectricity, totalSmoke, maxSmoke } = options;
+    const { width, height, stalls, customers, totalElectricity, maxElectricity } = options;
 
     drawBackground(ctx, width, height);
 

@@ -190,7 +190,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   toggleStall: (stallId: string) => {
-    const { stalls, phase, round } = get();
+    const { stalls, phase } = get();
     if (phase !== 'playing' && phase !== 'paused') return;
 
     const stall = stalls.find((s) => s.id === stallId);
@@ -273,7 +273,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   tick: (deltaTime: number) => {
-    const { phase, timeRemaining, round } = get();
+    const { phase, timeRemaining } = get();
     if (phase !== 'playing') return;
 
     if (Math.random() < 0.02) {
@@ -366,7 +366,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       round,
       maxRounds,
       stalls,
-      totalElectricity,
       maxElectricity,
       totalSmoke,
       maxSmoke,
@@ -389,7 +388,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let failureReason: FailureReason | null = null;
 
     const extraLoad = state.extraElectricityLoad;
-    const effectiveElectricity = totalElectricity + extraLoad;
+    const effectiveElectricity = calculateTotalElectricity(stalls) + extraLoad;
 
     if (effectiveElectricity > maxElectricity) {
       newConsecutiveOver++;

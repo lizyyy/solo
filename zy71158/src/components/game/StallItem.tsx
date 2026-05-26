@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGameStore } from '@/store/gameStore';
-import { Power, Wind, Trash2 } from 'lucide-react';
+import { Power, Wind } from 'lucide-react';
 
 export default function StallItem({ stall }: { stall: {
   id: string;

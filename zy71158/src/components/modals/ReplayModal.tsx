@@ -3,7 +3,7 @@ import { useGameStore } from '@/store/gameStore';
 import { X, Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
 export default function ReplayModal() {
-  const { history, level, setPhase } = useGameStore();
+  const { history, setPhase } = useGameStore();
   const [currentIndex, setCurrentIndex] = useState(history.length - 1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(1);
