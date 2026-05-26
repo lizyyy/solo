@@ -1,0 +1,73 @@
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Rajdhani", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+  background-color: #0b1220;
+  color: #cbd5e1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(14, 165, 233, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(101, 163, 13, 0.18), transparent 60%),
+    radial-gradient(800px 500px at 50% 120%, rgba(249, 115, 22, 0.12), transparent 60%),
+    #0b1220;
+}
+
+.panel {
+  @apply bg-cold-panel/80 border border-cold-line rounded-lg backdrop-blur-sm;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold
+         border border-cold-line bg-cold-panel hover:bg-white/5 transition
+         active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply bg-sky-500/90 hover:bg-sky-400 border-sky-400/60 text-white shadow-glow;
+}
+
+.btn-danger {
+  @apply bg-rose-500/90 hover:bg-rose-400 border-rose-400/60 text-white;
+}
+
+.chip {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold border;
+}
+
+.zone-frozen {
+  @apply bg-sky-500/15 border-sky-400/60 text-sky-200;
+}
+.zone-chilled {
+  @apply bg-lime-500/15 border-lime-400/60 text-lime-200;
+}
+.zone-ambient {
+  @apply bg-orange-500/15 border-orange-400/60 text-orange-200;
+}
+
+.scroll-y {
+  @apply overflow-y-auto;
+}
+
+.scroll-y::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-y::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 4px;
+}
