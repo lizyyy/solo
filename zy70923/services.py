@@ -80,7 +80,21 @@ class ClassificationEngine:
 
     @classmethod
     def _check_missing_fields(cls, data):
-        return [f for f in cls.REQUIRED_FIELDS if not data.get(f)]
+        missing = []
+        for f in cls.REQUIRED_FIELDS:
+            val = data.get(f)
+            if not val:
+                missing.append(f)
+                continue
+            # 检测项目特殊处理：空列表视为缺失
+            if f == "testing_items":
+                try:
+                    parsed = json.loads(val)
+                    if isinstance(parsed, list) and not parsed:
+                        missing.append(f)
+                except (json.JSONDecodeError, TypeError):
+                    pass
+        return missing
 
 
 # ── 任务编排服务 ────────────────────────────────────────────

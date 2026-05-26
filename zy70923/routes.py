@@ -234,18 +234,22 @@ def export_csv():
     if ids_param:
         sample_ids = [int(x.strip()) for x in ids_param.split(",") if x.strip()]
 
+    query = Sample.query
+    if sample_ids:
+        query = query.filter(Sample.id.in_(sample_ids))
+    samples = query.all()
+
+    # 先把所有要导出的任务标记为 exported
+    operator = request.args.get("operator", "system")
+    for s in samples:
+        task = Task.query.filter_by(sample_id=s.id).first()
+        if task and task.status != Task.STATUS_EXPORTED:
+            TaskService.mark_exported(task.id, operator=operator)
+    db.session.commit()
+
+    # 再生成 CSV（此时任务状态已是 exported）
     rows = ExportService.build_export_rows(sample_ids)
     csv_text = ExportService.to_csv(rows)
-
-    # 将涉及的任务标记为已导出
-    for row in rows:
-        batch = row.get("送样批次")
-        s = Sample.query.filter_by(sample_batch=batch).first()
-        if s:
-            task = Task.query.filter_by(sample_id=s.id).first()
-            if task and task.status != Task.STATUS_EXPORTED:
-                TaskService.mark_exported(task.id, operator=request.args.get("operator", "system"))
-    db.session.commit()
 
     return Response(
         csv_text,

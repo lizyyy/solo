@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """集成测试脚本"""
+import csv
+import io
 import json
 import sys
 from app import create_app
@@ -59,15 +61,25 @@ results.append(check("提交已拦截样本", client.post("/api/samples", json={
     "operator": "赵接样",
 }), 201, condition=lambda d: d["classification"]["category"] == "blocked"))
 
-# 5. 全局统计
+# 5. 待补充样本（testing_items 为空列表）
+results.append(check("提交空检测项目样本", client.post("/api/samples", json={
+    "sample_batch": "BATCH-004",
+    "cooperative": "红星合作社",
+    "product_name": "萝卜",
+    "testing_items": [],
+    "receiver": "周接样",
+}), 201, condition=lambda d: d["classification"]["category"] == "supplement"))
+
+# 6. 全局统计
 results.append(check("全局统计", client.get("/api/stats"),
-                     condition=lambda d: d["total_samples"] == 3))
+                     condition=lambda d: d["total_samples"] == 4 and
+                     d["by_category"].get("supplement") == 2))
 
-# 6. 列表查询
+# 7. 列表查询
 results.append(check("列表查询", client.get("/api/samples"),
-                     condition=lambda d: len(d["samples"]) == 3))
+                     condition=lambda d: len(d["samples"]) == 4))
 
-# 7. 新增复检记录
+# 8. 新增复检记录
 results.append(check("新增复检记录", client.post("/api/samples/1/rechecks", json={
     "item": "敌敌畏",
     "original_result": "0.05 mg/kg",
@@ -76,28 +88,35 @@ results.append(check("新增复检记录", client.post("/api/samples/1/rechecks"
     "operator": "张检测",
 }), 201))
 
-# 8. 人工确认任务
+# 9. 人工确认任务
 results.append(check("人工确认任务", client.post("/api/tasks/1/confirm", json={
     "new_status": "processing",
     "operator": "主管-陈",
     "detail": "材料审核通过",
 }), condition=lambda d: d["task"]["last_handler"] == "主管-陈"))
 
-# 9. 导出预览
+# 10. 导出预览
 results.append(check("导出预览", client.get("/api/export/preview"),
-                     condition=lambda d: len(d["rows"]) == 3))
+                     condition=lambda d: len(d["rows"]) == 4))
 
-# 10. 导出CSV
+# 11. 导出 CSV —— 验证 CSV 内"任务状态"列为 exported，与导出后统计一致
 r = client.get("/api/export")
 csv_text = r.data.decode("utf-8-sig")
-results.append(check("导出CSV", r,
-                     condition=lambda d: "送样批次" in csv_text and "BATCH-001" in csv_text))
+reader = csv.DictReader(io.StringIO(csv_text))
+csv_rows = list(reader)
+csv_statuses = [row.get("任务状态") for row in csv_rows]
+csv_ok = ("送样批次" in csv_text and "BATCH-001" in csv_text and
+          all(s == "exported" for s in csv_statuses))
+results.append(check("导出CSV（含状态一致性）", r,
+                     condition=lambda d: csv_ok))
+if not csv_ok:
+    print(f"     CSV 任务状态列: {csv_statuses}")
 
-# 11. 导出后状态核对
+# 12. 导出后统计核对
 results.append(check("导出后统计一致", client.get("/api/stats"),
-                     condition=lambda d: d["by_task_status"].get("exported") == 3))
+                     condition=lambda d: d["by_task_status"].get("exported") == 4))
 
-# 12. 单条详情
+# 13. 单条详情
 results.append(check("单条详情", client.get("/api/samples/1"),
                      condition=lambda d: d.get("sample") is not None and d.get("rechecks")))
 
