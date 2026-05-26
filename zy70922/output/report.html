@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>检测对账报告 - 38cf6839-4d99-4421-882b-a2761e01b114</title>
+  <style>
+    body { font-family: 'Microsoft YaHei', Arial, sans-serif; margin: 40px; }
+    h1 { color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px; }
+    h2 { color: #0066cc; margin-top: 30px; }
+    .summary-box { background: #f5f7fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
+    .summary-item { text-align: center; padding: 15px; background: white; border-radius: 6px; }
+    .summary-item .number { font-size: 28px; font-weight: bold; color: #0066cc; }
+    .summary-item .label { font-size: 14px; color: #666; margin-top: 5px; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+    .status-approved { background: #d4edda; color: #155724; }
+    .status-matched { background: #d1ecf1; color: #0c5460; }
+    .status-rejected { background: #f8d7da; color: #721c24; }
+    .status-supplement { background: #fff3cd; color: #856404; }
+    .status-mismatch { background: #ffeeba; color: #856404; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { padding: 10px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #0066cc; color: white; }
+    tr:hover { background: #f5f7fa; }
+    .discrepancy { padding: 8px; margin: 5px 0; border-radius: 4px; font-size: 12px; }
+    .discrepancy-high { background: #fdecea; border-left: 3px solid #e74c3c; }
+    .discrepancy-medium { background: #fff4e5; border-left: 3px solid #f39c12; }
+    .discrepancy-low { background: #e8f4fd; border-left: 3px solid #3498db; }
+    .resolved { opacity: 0.6; text-decoration: line-through; }
+    .review-history { margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 4px; }
+    .review-entry { margin: 8px 0; padding: 8px; border-left: 3px solid #0066cc; background: white; }
+    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #999; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h1>检测站对账报告</h1>
+  <p><strong>对账ID:</strong> 38cf6839-4d99-4421-882b-a2761e01b114</p>
+  <p><strong>生成时间:</strong> 2026/5/26 23:31:00</p>
+
+  <div class="summary-box">
+    <h2>汇总统计</h2>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="number">8</div>
+        <div class="label">样品总数</div>
+      </div>
+      <div class="summary-item">
+        <div class="number">75%</div>
+        <div class="label">合格率</div>
+      </div>
+      <div class="summary-item">
+        <div class="number">3</div>
+        <div class="label">差异总数</div>
+      </div>
+      <div class="summary-item">
+        <div class="number">2</div>
+        <div class="label">已解决差异</div>
+      </div>
+      <div class="summary-item">
+        <div class="number">1</div>
+        <div class="label">待复核</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>样品详情</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>样品编号</th>
+        <th>状态</th>
+        <th>检测项目</th>
+        <th>差异记录</th>
+        <th>复核历史</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+      <tr>
+        <td><strong>S202405001</strong></td>
+        <td>
+          <span class="status-badge status-approved">
+            已放行
+          </span>
+        </td>
+        <td>
+          
+            <div style="margin: 4px 0;">
+              重金属-铅: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+            <div style="margin: 4px 0;">
+              农药残留-有机磷: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+            <div style="margin: 4px 0;">
+              农药残留-氨基甲酸酯: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+        </td>
+        <td>
+          <span style="color: #28a745;">无差异</span>
+        </td>
+        <td>
+          
+            <div class="review-history">
+              
+                <div class="review-entry">
+                  <strong>放行</strong> - 接样员张三
+                  <div style="font-size: 11px; color: #999;">2026/5/26 23:31:00</div>
+                  <div style="margin-top: 4px; font-size: 12px;">所有检测项目合格，无差异，予以放行</div>
+                </div>
+              
+            </div>
+          
+        </td>
+      </tr>
+      
+      <tr>
+        <td><strong>S202405002</strong></td>
+        <td>
+          <span class="status-badge status-supplement">
+            需补材料
+          </span>
+        </td>
+        <td>
+          
+            <div style="margin: 4px 0;">
+              农药残留-有机磷: 
+              <span style="color: #dc3545; font-weight: bold;">不合格</span>
+              
+            </div>
+          
+            <div style="margin: 4px 0;">
+              农药残留-氨基甲酸酯: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+        </td>
+        <td>
+          
+              <div class="discrepancy discrepancy-high resolved">
+                <strong>检测值超标:</strong> 样品 S202405002 的 农药残留-有机磷 检测值超出标准范围
+                 <span style="color: #28a745;">(已解决)</span>
+              </div>
+            
+        </td>
+        <td>
+          
+            <div class="review-history">
+              
+                <div class="review-entry">
+                  <strong>要求补材料</strong> - 接样员张三
+                  <div style="font-size: 11px; color: #999;">2026/5/26 23:31:00</div>
+                  <div style="margin-top: 4px; font-size: 12px;">有机磷农药残留超标（0.08mg/kg > 标准0.05mg/kg），需合作社提供农药使用记录并安排复检</div>
+                </div>
+              
+            </div>
+          
+        </td>
+      </tr>
+      
+      <tr>
+        <td><strong>S202405003</strong></td>
+        <td>
+          <span class="status-badge status-approved">
+            已放行
+          </span>
+        </td>
+        <td>
+          
+            <div style="margin: 4px 0;">
+              重金属-铅: 
+              <span style="color: #dc3545; font-weight: bold;">不合格</span>
+              <span style="background: #fff3cd; padding: 2px 6px; border-radius: 3px; font-size: 10px;">复检</span>
+            </div>
+          
+            <div style="margin: 4px 0;">
+              农药残留-有机磷: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+        </td>
+        <td>
+          
+              <div class="discrepancy discrepancy-high resolved">
+                <strong>检测值超标:</strong> 样品 S202405003 的 重金属-铅 检测值超出标准范围
+                 <span style="color: #28a745;">(已解决)</span>
+              </div>
+            
+        </td>
+        <td>
+          
+            <div class="review-history">
+              
+                <div class="review-entry">
+                  <strong>放行</strong> - 接样员张三
+                  <div style="font-size: 11px; color: #999;">2026/5/26 23:31:00</div>
+                  <div style="margin-top: 4px; font-size: 12px;">复检超窗口原因为仪器故障维修，经质量负责人批准后予以放行，复检结果合格（0.15mg/kg为初检结果，复检0.08mg/kg合格）</div>
+                </div>
+              
+            </div>
+          
+        </td>
+      </tr>
+      
+      <tr>
+        <td><strong>S202405004</strong></td>
+        <td>
+          <span class="status-badge status-matched">
+            比对通过
+          </span>
+        </td>
+        <td>
+          
+            <div style="margin: 4px 0;">
+              重金属-镉: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+            <div style="margin: 4px 0;">
+              农药残留-有机磷: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+        </td>
+        <td>
+          <span style="color: #28a745;">无差异</span>
+        </td>
+        <td>
+          无复核记录
+        </td>
+      </tr>
+      
+      <tr>
+        <td><strong>S202405005</strong></td>
+        <td>
+          <span class="status-badge status-matched">
+            比对通过
+          </span>
+        </td>
+        <td>
+          
+            <div style="margin: 4px 0;">
+              重金属-铅: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+            <div style="margin: 4px 0;">
+              农药残留-拟除虫菊酯: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+        </td>
+        <td>
+          <span style="color: #28a745;">无差异</span>
+        </td>
+        <td>
+          无复核记录
+        </td>
+      </tr>
+      
+      <tr>
+        <td><strong>S202405006</strong></td>
+        <td>
+          <span class="status-badge status-mismatch">
+            比对不通过
+          </span>
+        </td>
+        <td>
+          
+            <div style="margin: 4px 0;">
+              农药残留-有机磷: 
+              <span style="color: #dc3545; font-weight: bold;">不合格</span>
+              
+            </div>
+          
+        </td>
+        <td>
+          
+              <div class="discrepancy discrepancy-high ">
+                <strong>检测值超标:</strong> 样品 S202405006 的 农药残留-有机磷 检测值超出标准范围
+                
+              </div>
+            
+        </td>
+        <td>
+          无复核记录
+        </td>
+      </tr>
+      
+      <tr>
+        <td><strong>S202405007</strong></td>
+        <td>
+          <span class="status-badge status-matched">
+            比对通过
+          </span>
+        </td>
+        <td>
+          
+            <div style="margin: 4px 0;">
+              农药残留-拟除虫菊酯: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+        </td>
+        <td>
+          <span style="color: #28a745;">无差异</span>
+        </td>
+        <td>
+          无复核记录
+        </td>
+      </tr>
+      
+      <tr>
+        <td><strong>S202405008</strong></td>
+        <td>
+          <span class="status-badge status-matched">
+            比对通过
+          </span>
+        </td>
+        <td>
+          
+            <div style="margin: 4px 0;">
+              重金属-铅: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+            <div style="margin: 4px 0;">
+              重金属-镉: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+            <div style="margin: 4px 0;">
+              农药残留-有机磷: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+            <div style="margin: 4px 0;">
+              农药残留-氨基甲酸酯: 
+              <span style="color: #28a745; font-weight: bold;">合格</span>
+              
+            </div>
+          
+        </td>
+        <td>
+          <span style="color: #28a745;">无差异</span>
+        </td>
+        <td>
+          无复核记录
+        </td>
+      </tr>
+      
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <p>本报告由检测站对账系统自动生成 | 生成时间: 2026/5/26 23:31:00</p>
+  </div>
+</body>
+</html>
+  

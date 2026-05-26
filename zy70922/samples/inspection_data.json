@@ -1,0 +1,217 @@
+{
+  "batch_id": "BATCH20240501",
+  "samples": [
+    {
+      "sample_no": "S202405001",
+      "items": [
+        {
+          "item_code": "P001",
+          "item_name": "农药残留-有机磷",
+          "standard_value": "≤0.05",
+          "actual_value": "0.03",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 14:30:00",
+          "inspector": "李检测员"
+        },
+        {
+          "item_code": "P002",
+          "item_name": "农药残留-氨基甲酸酯",
+          "standard_value": "≤0.02",
+          "actual_value": "0.01",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 14:30:00",
+          "inspector": "李检测员"
+        },
+        {
+          "item_code": "H001",
+          "item_name": "重金属-铅",
+          "standard_value": "≤0.1",
+          "actual_value": "0.08",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 15:00:00",
+          "inspector": "王检测员"
+        }
+      ]
+    },
+    {
+      "sample_no": "S202405002",
+      "items": [
+        {
+          "item_code": "P001",
+          "item_name": "农药残留-有机磷",
+          "standard_value": "≤0.05",
+          "actual_value": "0.08",
+          "unit": "mg/kg",
+          "result": "fail",
+          "inspection_date": "2024-05-16 14:30:00",
+          "inspector": "李检测员"
+        },
+        {
+          "item_code": "P002",
+          "item_name": "农药残留-氨基甲酸酯",
+          "standard_value": "≤0.02",
+          "actual_value": "0.01",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 14:30:00",
+          "inspector": "李检测员"
+        }
+      ]
+    },
+    {
+      "sample_no": "S202405003",
+      "items": [
+        {
+          "item_code": "P001",
+          "item_name": "农药残留-有机磷",
+          "standard_value": "≤0.05",
+          "actual_value": "0.04",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 16:00:00",
+          "inspector": "张检测员"
+        },
+        {
+          "item_code": "H001",
+          "item_name": "重金属-铅",
+          "standard_value": "≤0.1",
+          "actual_value": "0.15",
+          "unit": "mg/kg",
+          "result": "fail",
+          "is_retest": true,
+          "retest_of": "original-id-placeholder",
+          "inspection_date": "2024-05-18 10:00:00",
+          "inspector": "王检测员"
+        }
+      ]
+    },
+    {
+      "sample_no": "S202405004",
+      "items": [
+        {
+          "item_code": "P001",
+          "item_name": "农药残留-有机磷",
+          "standard_value": "≤0.05",
+          "actual_value": "0.02",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 14:30:00",
+          "inspector": "李检测员"
+        },
+        {
+          "item_code": "H002",
+          "item_name": "重金属-镉",
+          "standard_value": "≤0.05",
+          "actual_value": "0.03",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 15:00:00",
+          "inspector": "王检测员"
+        }
+      ]
+    },
+    {
+      "sample_no": "S202405005",
+      "items": [
+        {
+          "item_code": "P003",
+          "item_name": "农药残留-拟除虫菊酯",
+          "standard_value": "≤0.1",
+          "actual_value": "0.06",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 16:30:00",
+          "inspector": "张检测员"
+        },
+        {
+          "item_code": "H001",
+          "item_name": "重金属-铅",
+          "standard_value": "≤0.1",
+          "actual_value": "0.07",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 15:00:00",
+          "inspector": "王检测员"
+        }
+      ]
+    },
+    {
+      "sample_no": "S202405006",
+      "items": [
+        {
+          "item_code": "P001",
+          "item_name": "农药残留-有机磷",
+          "standard_value": "≤0.05",
+          "actual_value": "0.09",
+          "unit": "mg/kg",
+          "result": "fail",
+          "inspection_date": "2024-05-16 14:30:00",
+          "inspector": "李检测员"
+        }
+      ]
+    },
+    {
+      "sample_no": "S202405007",
+      "items": [
+        {
+          "item_code": "P003",
+          "item_name": "农药残留-拟除虫菊酯",
+          "standard_value": "≤0.1",
+          "actual_value": "0.05",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 16:30:00",
+          "inspector": "张检测员"
+        }
+      ]
+    },
+    {
+      "sample_no": "S202405008",
+      "items": [
+        {
+          "item_code": "P001",
+          "item_name": "农药残留-有机磷",
+          "standard_value": "≤0.05",
+          "actual_value": "0.04",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 14:30:00",
+          "inspector": "李检测员"
+        },
+        {
+          "item_code": "P002",
+          "item_name": "农药残留-氨基甲酸酯",
+          "standard_value": "≤0.02",
+          "actual_value": "0.005",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 14:30:00",
+          "inspector": "李检测员"
+        },
+        {
+          "item_code": "H001",
+          "item_name": "重金属-铅",
+          "standard_value": "≤0.1",
+          "actual_value": "0.09",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 15:00:00",
+          "inspector": "王检测员"
+        },
+        {
+          "item_code": "H002",
+          "item_name": "重金属-镉",
+          "standard_value": "≤0.05",
+          "actual_value": "0.02",
+          "unit": "mg/kg",
+          "result": "pass",
+          "inspection_date": "2024-05-16 15:00:00",
+          "inspector": "王检测员"
+        }
+      ]
+    }
+  ]
+}
