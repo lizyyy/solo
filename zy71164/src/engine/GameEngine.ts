@@ -28,6 +28,7 @@ const PLAYER_POSITION: Position = { x: 0, y: 0 };
 
 export class GameEngine {
   private state: GameState;
+  private cachedScoreResult: ScoreResult | null = null;
 
   constructor(level: LevelConfig) {
     this.state = this.initializeGame(level);
@@ -478,11 +479,9 @@ export class GameEngine {
     }
 
     const attackCost = this.state.level.scanConfigs.attack.energyCost;
-    const minScanCost = Math.min(
-      this.state.level.scanConfigs.active.energyCost,
-      this.state.level.scanConfigs.passive.energyCost
-    );
-    const minRequired = Math.min(attackCost, minScanCost);
+    const activeCost = this.state.level.scanConfigs.active.energyCost;
+    const fanCost = this.state.level.scanConfigs.fan.energyCost;
+    const minRequired = Math.min(attackCost, activeCost, fanCost);
 
     if (this.state.energy < minRequired) {
       this.state.gameStatus = 'defeat';
@@ -493,6 +492,10 @@ export class GameEngine {
   }
 
   private calculateFinalScore(): ScoreResult {
+    if (this.cachedScoreResult) {
+      return this.cachedScoreResult;
+    }
+
     const state = this.state;
     const level = state.level;
 
@@ -540,6 +543,7 @@ export class GameEngine {
     };
 
     state.score = totalScore;
+    this.cachedScoreResult = result;
 
     return result;
   }
@@ -562,6 +566,7 @@ export class GameEngine {
 
   restart(): GameState {
     this.state = this.initializeGame(this.state.level);
+    this.cachedScoreResult = null;
     return this.state;
   }
 

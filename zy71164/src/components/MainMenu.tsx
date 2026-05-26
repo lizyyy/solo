@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { levels, getDifficultyColor, getDifficultyText } from '@/config/levels';
 import { formatDate, formatDuration } from '@/utils/export';
-import { HelpCircle, Trophy, Play, ChevronDown, ChevronUp } from 'lucide-react';
+import { HelpCircle, Trophy, Play, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 
 export default function MainMenu() {
-  const { startGame, loadHistory, historyRecords } = useGameStore();
+  const { startGame, loadHistory, historyRecords, startReplay } = useGameStore();
   const [showInstructions, setShowInstructions] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -232,6 +232,7 @@ export default function MainMenu() {
                           <th className="text-right py-2 px-2">得分</th>
                           <th className="text-right py-2 px-2">回合</th>
                           <th className="text-right py-2 px-2">用时</th>
+                          <th className="text-center py-2 px-2">操作</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -266,6 +267,16 @@ export default function MainMenu() {
                             </td>
                             <td className="py-2 px-2 text-right text-sonar-green/80">
                               {formatDuration(record.duration)}
+                            </td>
+                            <td className="py-2 px-2 text-center">
+                              <button
+                                onClick={() => startReplay(record)}
+                                className="inline-flex items-center gap-1 px-2 py-1 text-xs text-sonar-cyan border border-sonar-cyan/50 rounded hover:bg-sonar-cyan/10 transition-colors"
+                                title="回放这场对局"
+                              >
+                                <RotateCcw className="w-3 h-3" />
+                                回放
+                              </button>
                             </td>
                           </tr>
                         ))}
