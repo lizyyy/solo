@@ -1,0 +1,23 @@
+[
+  {
+    "packageCode": "PKG_A",
+    "packageName": "标准体检套餐",
+    "basePrice": 1580,
+    "includedItems": ["ITEM_B1", "ITEM_B2", "ITEM_B3"],
+    "addableItems": ["ITEM_C1", "ITEM_C2", "ITEM_C3", "ITEM_C4", "ITEM_C5", "ITEM_C6", "ITEM_C7", "ITEM_C9"]
+  },
+  {
+    "packageCode": "PKG_B",
+    "packageName": "基础体检套餐",
+    "basePrice": 680,
+    "includedItems": ["ITEM_B1", "ITEM_B2"],
+    "addableItems": ["ITEM_C1", "ITEM_C2", "ITEM_C3"]
+  },
+  {
+    "packageCode": "PKG_C",
+    "packageName": "女性专属套餐",
+    "basePrice": 880,
+    "includedItems": ["ITEM_B1", "ITEM_B4", "ITEM_B5"],
+    "addableItems": ["ITEM_C1", "ITEM_C5", "ITEM_C9"]
+  }
+]

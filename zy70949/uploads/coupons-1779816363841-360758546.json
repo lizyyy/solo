@@ -1,0 +1,39 @@
+[
+  {
+    "couponCode": "COUPON_10",
+    "couponType": "cash",
+    "value": 10,
+    "maxStackCount": 10,
+    "validFrom": "2026-01-01",
+    "validTo": "2026-12-31",
+    "applicableItems": []
+  },
+  {
+    "couponCode": "COUPON_5",
+    "couponType": "cash",
+    "value": 5,
+    "maxStackCount": 5,
+    "validFrom": "2026-01-01",
+    "validTo": "2026-12-31",
+    "applicableItems": []
+  },
+  {
+    "couponCode": "COUPON_STACK",
+    "couponType": "cash",
+    "value": 50,
+    "maxStackCount": 2,
+    "validFrom": "2026-01-01",
+    "validTo": "2026-12-31",
+    "applicableItems": [],
+    "minConsumption": 500
+  },
+  {
+    "couponCode": "COUPON_EXPIRED",
+    "couponType": "cash",
+    "value": 10,
+    "maxStackCount": 5,
+    "validFrom": "2025-01-01",
+    "validTo": "2025-12-31",
+    "applicableItems": []
+  }
+]

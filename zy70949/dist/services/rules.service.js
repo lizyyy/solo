@@ -432,7 +432,8 @@ class RulesEngine {
     generateRuleViolations(results) {
         const violations = new Map();
         results.forEach(result => {
-            result.appliedRules.forEach(rule => {
+            const violationRules = result.appliedRules.filter(rule => !RulesEngine.SUCCESS_RULES.has(rule));
+            violationRules.forEach(rule => {
                 if (result.status === 'failed') {
                     if (!violations.has(rule)) {
                         violations.set(rule, {
@@ -487,3 +488,19 @@ class RulesEngine {
     }
 }
 exports.RulesEngine = RulesEngine;
+RulesEngine.SUCCESS_RULES = new Set([
+    'PACKAGE_FOUND',
+    'ITEM_ADDABLE',
+    'COUPON_FOUND',
+    'COUPON_VALID_DATE',
+    'COUPON_APPLICABLE',
+    'COUPON_MIN_MET',
+    'COUPON_STACK_VALID',
+    'COUPON_INVALID_VALUE',
+    'UNIT_FOUND',
+    'UNIT_AGREEMENT_VALID',
+    'EMPLOYEE_ELIGIBLE',
+    'PACKAGE_ALLOWED',
+    'UNIT_QUOTA_SUFFICIENT',
+    'REFUND_VALID',
+]);

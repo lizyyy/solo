@@ -1,0 +1,50 @@
+[
+  {
+    "unitCode": "UNIT_A",
+    "unitName": "阿里巴巴集团",
+    "contractNumber": "HT-2026-001",
+    "totalQuota": 200000,
+    "usedQuota": 199500,
+    "validFrom": "2026-01-01",
+    "validTo": "2026-12-31",
+    "eligibleEmployees": ["110101199001011234", "110101199008088901"],
+    "allowedPackages": ["PKG_A", "PKG_B"],
+    "settlementType": "monthly"
+  },
+  {
+    "unitCode": "UNIT_B",
+    "unitName": "腾讯科技有限公司",
+    "contractNumber": "HT-2026-002",
+    "totalQuota": 500000,
+    "usedQuota": 150000,
+    "validFrom": "2026-01-01",
+    "validTo": "2026-12-31",
+    "eligibleEmployees": ["110101199003033456", "110101199009099012", "110101199101010123", "110101199111112134"],
+    "allowedPackages": ["PKG_A", "PKG_B", "PKG_C"],
+    "settlementType": "quarterly"
+  },
+  {
+    "unitCode": "UNIT_C",
+    "unitName": "字节跳动",
+    "contractNumber": "HT-2026-003",
+    "totalQuota": 300000,
+    "usedQuota": 80000,
+    "validFrom": "2026-01-01",
+    "validTo": "2026-12-31",
+    "eligibleEmployees": ["110101199005055678"],
+    "allowedPackages": ["PKG_A"],
+    "settlementType": "monthly"
+  },
+  {
+    "unitCode": "UNIT_D",
+    "unitName": "已过期单位",
+    "contractNumber": "HT-2025-099",
+    "totalQuota": 100000,
+    "usedQuota": 50000,
+    "validFrom": "2025-01-01",
+    "validTo": "2025-12-31",
+    "eligibleEmployees": ["110101199333334356"],
+    "allowedPackages": ["PKG_A"],
+    "settlementType": "yearly"
+  }
+]

@@ -10,14 +10,20 @@ class ProcessingService {
         this.idempotencyService = new idempotency_service_1.IdempotencyService();
     }
     async processBatch(parsedData, filePaths) {
-        const batchId = (0, uuid_1.v4)();
         const warnings = [];
+        let fileHashes = [];
+        let batchId;
         if (filePaths && filePaths.length > 0) {
-            const duplicateCheck = this.idempotencyService.checkFilesAlreadyProcessed(filePaths);
-            if (duplicateCheck.isDuplicate) {
-                warnings.push(`检测到重复提交：本批文件已于 ${duplicateCheck.existingBatch?.processedAt} 处理（批次ID: ${duplicateCheck.existingBatch?.batchId}），共 ${duplicateCheck.existingBatch?.recordCount} 条记录。本次处理将跳过以避免重复生效。`);
+            fileHashes = filePaths.map(fp => this.idempotencyService.generateFileHash(fp));
+            batchId = this.idempotencyService.generateBatchId(fileHashes);
+            if (this.idempotencyService.isBatchProcessed(batchId)) {
+                const existingBatch = this.idempotencyService.getExistingBatch(batchId);
+                warnings.push(`检测到重复提交：本批文件已于 ${existingBatch?.processedAt} 处理（批次ID: ${batchId}），共 ${existingBatch?.recordCount} 条记录。本次处理将跳过以避免重复生效。`);
                 return this.buildEmptyResponse(batchId, warnings);
             }
+        }
+        else {
+            batchId = (0, uuid_1.v4)();
         }
         this.rulesEngine.reset();
         const context = {
@@ -62,8 +68,7 @@ class ProcessingService {
                     break;
             }
         });
-        if (filePaths && filePaths.length > 0) {
-            const fileHashes = filePaths.map(fp => this.idempotencyService.generateFileHash(fp));
+        if (filePaths && filePaths.length > 0 && fileHashes.length > 0) {
             this.idempotencyService.markBatchAsProcessed(batchId, fileHashes, parsedData.addItems.length);
         }
         const allResults = [...normalItems, ...pendingItems, ...failedItems];
