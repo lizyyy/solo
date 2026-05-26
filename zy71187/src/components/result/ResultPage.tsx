@@ -112,10 +112,12 @@ export default function ResultPage({
           className="bg-gray-800/50 backdrop-blur rounded-xl p-6 mb-8"
         >
           <h3 className="text-lg font-bold mb-4">得分明细</h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-7 gap-4">
             <ScoreItem label="配件匹配" value={breakdown.accessoryScore} />
             <ScoreItem label="损伤标记" value={breakdown.damageScore} />
             <ScoreItem label="押金计算" value={breakdown.depositScore} />
+            <ScoreItem label="正常磨损" value={breakdown.normalWearScore} />
+            <ScoreItem label="干扰识别" value={breakdown.redHerringScore} />
             <ScoreItem label="时间奖励" value={breakdown.timeBonus} />
             <ScoreItem label="速度奖励" value={breakdown.speedBonus} highlight />
           </div>

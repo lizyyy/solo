@@ -94,6 +94,8 @@ export interface ScoreBreakdown {
   accessoryScore: number
   damageScore: number
   depositScore: number
+  normalWearScore: number
+  redHerringScore: number
   timeBonus: number
   speedBonus: number
   total: number
@@ -111,6 +113,8 @@ export interface ScoreResult {
   correctAccessoryMatches: Record<string, string>
   markedDamages: Record<string, string>
   correctDamages: Record<string, string>
+  markedNormalWears: string[]
+  identifiedRedHerrings: string[]
 }
 
 export interface GameHistory {

@@ -85,6 +85,8 @@ export default function GamePage() {
       matchedAccessories,
       markedDamages,
       depositCalculations,
+      markedNormalWears,
+      identifiedRedHerrings,
       timeRemaining,
       totalTime,
     )
