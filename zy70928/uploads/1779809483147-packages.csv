@@ -1,0 +1,6 @@
+package_code,package_name,package_type,original_price,sale_price,validity_start,validity_end,description,items
+PKG001,小保养套餐,maintenance,599,399,2026-01-01,2026-12-31,包含机油更换、机滤、空滤检查,"[{""part_code"":""OIL001"",""quantity"":1},{""part_code"":""FIL001"",""quantity"":1},{""part_code"":""FIL002"",""quantity"":1}]"
+PKG002,大保养套餐,maintenance,1299,999,2026-01-01,2026-12-31,包含小保养+变速箱油+刹车油,"[{""part_code"":""OIL001"",""quantity"":1},{""part_code"":""FIL001"",""quantity"":1},{""part_code"":""FIL002"",""quantity"":1},{""part_code"":""OIL002"",""quantity"":1},{""part_code"":""OIL003"",""quantity"":1}]"
+PKG003,空调清洗套餐,cleaning,399,299,2026-01-01,2026-12-31,空调系统深度清洁,"[{""part_code"":""CLN001"",""quantity"":1},{""part_code"":""CLN002"",""quantity"":1}]"
+PKG004,刹车系统检查,inspection,199,149,2026-01-01,2026-12-31,刹车片磨损检测+刹车油检测,"[]"
+PKG005,轮胎更换套餐,tyre,1999,1699,2026-01-01,2026-12-31,四条轮胎更换+动平衡,"[{""part_code"":""TYR001"",""quantity"":4}]"

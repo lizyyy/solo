@@ -1,0 +1,86 @@
+[
+  {
+    "order_no": "WO20260520001",
+    "store_code": "ST001",
+    "customer_name": "张三",
+    "customer_phone": "13800138001",
+    "plate_number": "京A12345",
+    "vehicle_model": "大众帕萨特 2023款",
+    "package_code": "PKG001",
+    "order_amount": 399,
+    "actual_amount": 399,
+    "order_status": "completed",
+    "order_date": "2026-05-20",
+    "items": [
+      {"part_code": "OIL001", "part_name": "全合成机油 5W-30", "quantity": 1, "unit_price": 280},
+      {"part_code": "FIL001", "part_name": "机油滤清器", "quantity": 1, "unit_price": 50},
+      {"part_code": "FIL002", "part_name": "空气滤清器", "quantity": 1, "unit_price": 69}
+    ],
+    "remarks": "客户自带机油，仅收取工时费",
+    "is_cross_store": false
+  },
+  {
+    "order_no": "WO20260520002",
+    "store_code": "ST002",
+    "customer_name": "李四",
+    "customer_phone": "13800138002",
+    "plate_number": "沪B67890",
+    "vehicle_model": "丰田凯美瑞 2022款",
+    "package_code": "PKG002",
+    "order_amount": 999,
+    "actual_amount": 999,
+    "order_status": "processing",
+    "order_date": "2026-05-20",
+    "items": [
+      {"part_code": "OIL001", "part_name": "全合成机油 5W-30", "quantity": 1, "unit_price": 280},
+      {"part_code": "FIL001", "part_name": "机油滤清器", "quantity": 1, "unit_price": 50},
+      {"part_code": "FIL002", "part_name": "空气滤清器", "quantity": 1, "unit_price": 69},
+      {"part_code": "OIL002", "part_name": "变速箱油", "quantity": 1, "unit_price": 300},
+      {"part_code": "OIL003", "part_name": "刹车油", "quantity": 1, "unit_price": 300}
+    ],
+    "remarks": "跨店核销：客户在ST001购买的套餐，在ST002使用",
+    "is_cross_store": true,
+    "original_store": "ST001"
+  },
+  {
+    "order_no": "WO20260520003",
+    "store_code": "ST001",
+    "customer_name": "王五",
+    "customer_phone": "13800138003",
+    "plate_number": "粤C11111",
+    "vehicle_model": "本田雅阁 2024款",
+    "package_code": "PKG001",
+    "order_amount": 450,
+    "actual_amount": 450,
+    "order_status": "pending",
+    "order_date": "2026-05-20",
+    "items": [
+      {"part_code": "OIL001", "part_name": "全合成机油 5W-30", "quantity": 1, "unit_price": 280},
+      {"part_code": "FIL001", "part_name": "机油滤清器", "quantity": 1, "unit_price": 50},
+      {"part_code": "FIL002", "part_name": "空气滤清器", "quantity": 1, "unit_price": 69},
+      {"part_code": "ADD001", "part_name": "发动机清洗剂", "quantity": 1, "unit_price": 51}
+    ],
+    "remarks": "项目替换：客户要求增加发动机清洗项目，原套餐外收费",
+    "is_cross_store": false,
+    "item_replacement": true,
+    "replacement_reason": "客户车辆行驶6万公里，建议深度清洗"
+  },
+  {
+    "order_no": "WO20260520004",
+    "store_code": "ST001",
+    "customer_name": "",
+    "customer_phone": "13800138004",
+    "plate_number": "",
+    "vehicle_model": "奔驰E300L",
+    "package_code": "PKG999",
+    "order_amount": 1200,
+    "actual_amount": 0,
+    "order_status": "pending",
+    "order_date": "2026-05-20",
+    "items": [],
+    "remarks": "",
+    "is_cross_store": false,
+    "needs_review": true,
+    "review_reason": "客户姓名为空、车牌号为空、套餐编码不存在，需要人工核实补充"
+  }
+]
