@@ -1,0 +1,145 @@
+{
+  "batch_no": "B20260526234333969",
+  "items": [
+    {
+      "item_id": 1,
+      "seq": 1,
+      "category": "normal",
+      "reason": "核心字段齐全且格式校验通过",
+      "follow_up": "自动推送至结算系统，权益包次日到账，客户短信通知已触发",
+      "processed_at": "2026-05-26T23:43:34",
+      "payload": {
+        "package_code": "B10035",
+        "plate": "沪A12345",
+        "vin": "LSGPC54U8KD123456",
+        "service_date": "2026-05-20",
+        "store_id": "S001",
+        "mileage": 35820,
+        "phone": "13800138000",
+        "customer_name": "张先生",
+        "technician": "李师傅",
+        "note": "常规小保养"
+      }
+    },
+    {
+      "item_id": 2,
+      "seq": 2,
+      "category": "normal",
+      "reason": "核心字段齐全且格式校验通过",
+      "follow_up": "自动推送至结算系统，权益包次日到账，客户短信通知已触发",
+      "processed_at": "2026-05-26T23:43:34",
+      "payload": {
+        "package_code": "M20001",
+        "plate": "沪B88888",
+        "vin": "LSVAU2180N2123456",
+        "service_date": "2026-05-21",
+        "store_id": "S001",
+        "mileage": 12000,
+        "phone": "13900139000",
+        "customer_name": "王女士",
+        "technician": "赵师傅",
+        "note": "中保养-空滤更换"
+      }
+    },
+    {
+      "item_id": 3,
+      "seq": 3,
+      "category": "normal",
+      "reason": "核心字段齐全且格式校验通过",
+      "follow_up": "自动推送至结算系统，权益包次日到账，客户短信通知已触发",
+      "processed_at": "2026-05-26T23:43:34",
+      "payload": {
+        "package_code": "T30002",
+        "plate": "沪C99999",
+        "vin": "LBV5D6604KM123456",
+        "service_date": "2026-05-22",
+        "store_id": "S001",
+        "mileage": 88000,
+        "phone": "13700137000",
+        "customer_name": "刘师傅",
+        "technician": "孙师傅",
+        "note": "大保养-正时皮带"
+      }
+    },
+    {
+      "item_id": 4,
+      "seq": 4,
+      "category": "blocked",
+      "reason": "VIN 长度异常(10)，标准长度为 17 位",
+      "follow_up": "驳回门店原始单，要求重新扫描 VIN 并上传行驶证照片",
+      "processed_at": "2026-05-26T23:43:34",
+      "payload": {
+        "package_code": "B10099",
+        "plate": "沪D11111",
+        "vin": "INVALIDVIN",
+        "service_date": "2026-05-22",
+        "store_id": "S001",
+        "mileage": 5000,
+        "phone": "13600136000",
+        "customer_name": "周先生",
+        "technician": "吴师傅",
+        "note": "VIN 长度异常"
+      }
+    },
+    {
+      "item_id": 5,
+      "seq": 5,
+      "category": "blocked",
+      "reason": "套餐前缀非法(X)，不在备案范围 B/M/T 内",
+      "follow_up": "冻结本单并提交风控复核，门店店长需在 24h 内补正套餐协议",
+      "processed_at": "2026-05-26T23:43:34",
+      "payload": {
+        "package_code": "X99999",
+        "plate": "沪E22222",
+        "vin": "LFV2A21K8D3123456",
+        "service_date": "2026-05-23",
+        "store_id": "S001",
+        "mileage": 15000,
+        "phone": "13500135000",
+        "customer_name": "郑女士",
+        "technician": "钱师傅",
+        "note": "套餐前缀不在备案"
+      }
+    },
+    {
+      "item_id": 6,
+      "seq": 6,
+      "category": "pending",
+      "reason": "可填字段留空: mileage, phone, technician",
+      "follow_up": "系统自动发送提醒短信给门店前台，72h 内补充即可；不影响当前核销结算",
+      "processed_at": "2026-05-26T23:43:34",
+      "payload": {
+        "package_code": "B10088",
+        "plate": "沪F33333",
+        "vin": "LGBH12E09MZ123456",
+        "service_date": "2026-05-24",
+        "store_id": "S001",
+        "mileage": null,
+        "phone": null,
+        "customer_name": "陈先生",
+        "technician": null,
+        "note": "缺失里程和手机号"
+      }
+    },
+    {
+      "item_id": 7,
+      "seq": 7,
+      "category": "pending",
+      "reason": "可填字段留空: phone, customer_name",
+      "follow_up": "系统自动发送提醒短信给门店前台，72h 内补充即可；不影响当前核销结算",
+      "processed_at": "2026-05-26T23:43:34",
+      "payload": {
+        "package_code": "M20077",
+        "plate": "沪G44444",
+        "vin": "LVHRH2841NE123456",
+        "service_date": "2026-05-25",
+        "store_id": "S001",
+        "mileage": 22000,
+        "phone": null,
+        "customer_name": null,
+        "technician": "冯师傅",
+        "note": "缺失客户手机号"
+      }
+    }
+  ]
+}
