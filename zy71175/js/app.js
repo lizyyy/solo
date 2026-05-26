@@ -233,6 +233,17 @@ class App {
                 const bookEl = this.createBookElement(book);
                 bookEl.style.width = '100%';
                 bookEl.dataset.fromSlot = index;
+                
+                bookEl.addEventListener('dblclick', () => {
+                    if (book.isReserved) {
+                        const result = this.game.processReservation(book.id);
+                        this.showToast(result.message, result.success ? 'success' : 'error');
+                    } else if (book.isDamaged) {
+                        const result = this.game.processDamage(book.id);
+                        this.showToast(result.message, result.success ? 'success' : 'error');
+                    }
+                });
+                
                 slot.appendChild(bookEl);
             }
             

@@ -158,19 +158,40 @@ export class Game {
             const reserved = unprocessedSpecialBooks.filter(b => b.isReserved);
             const damaged = unprocessedSpecialBooks.filter(b => b.isDamaged);
             
+            reserved.forEach(book => {
+                const index = this.sortingSlots.indexOf(book);
+                if (index !== -1) {
+                    this.sortingSlots[index] = null;
+                    this.pendingBooks.push(book);
+                }
+            });
+            damaged.forEach(book => {
+                const index = this.sortingSlots.indexOf(book);
+                if (index !== -1) {
+                    this.sortingSlots[index] = null;
+                    this.pendingBooks.push(book);
+                }
+            });
+            
             let message = '';
             if (reserved.length > 0) {
-                message += `预约图书(${reserved.map(b => b.callNumber).join(', ')})需要先处理；`;
-                this.addError('RESERVED_NOT_PROCESSED', reserved, '预约图书未处理就上架');
+                message += `预约图书(${reserved.map(b => b.callNumber).join(', ')})已移回待处理区，请双击处理；`;
+                this.addError('RESERVED_NOT_PROCESSED', reserved, '预约图书未处理就上架，已自动移回待处理区');
                 this.score -= 100 * reserved.length;
             }
             if (damaged.length > 0) {
-                message += `破损图书(${damaged.map(b => b.callNumber).join(', ')})需要先登记；`;
-                this.addError('DAMAGED_NOT_PROCESSED', damaged, '破损图书未登记就上架');
+                message += `破损图书(${damaged.map(b => b.callNumber).join(', ')})已移回待处理区，请双击登记；`;
+                this.addError('DAMAGED_NOT_PROCESSED', damaged, '破损图书未登记就上架，已自动移回待处理区');
                 this.score -= 100 * damaged.length;
             }
             
             this.emit('scoreUpdated', this.score);
+            this.emit('sortingUpdated', {
+                pendingBooks: this.pendingBooks,
+                sortingSlots: this.sortingSlots
+            });
+            this.addHistory(message, false);
+            
             return { success: false, message };
         }
 
@@ -223,8 +244,21 @@ export class Game {
         return { success: true, message: `上架成功！+${points}分`, books: normalBooks };
     }
 
+    findBookById(bookId) {
+        let book = this.pendingBooks.find(b => b.id === bookId);
+        if (book) return { book, source: 'pending' };
+        
+        const slotIndex = this.sortingSlots.findIndex(b => b && b.id === bookId);
+        if (slotIndex !== -1) {
+            return { book: this.sortingSlots[slotIndex], source: 'slot', slotIndex };
+        }
+        
+        return { book: null, source: null };
+    }
+
     processReservation(bookId) {
-        const book = this.pendingBooks.find(b => b.id === bookId);
+        const { book, source, slotIndex } = this.findBookById(bookId);
+        
         if (!book || !book.isReserved) {
             return { success: false, message: '该图书没有预约' };
         }
@@ -237,9 +271,13 @@ export class Game {
         this.score += 50;
         this.correctCount++;
         
-        const index = this.pendingBooks.indexOf(book);
-        if (index > -1) {
-            this.pendingBooks.splice(index, 1);
+        if (source === 'pending') {
+            const index = this.pendingBooks.indexOf(book);
+            if (index > -1) {
+                this.pendingBooks.splice(index, 1);
+            }
+        } else if (source === 'slot') {
+            this.sortingSlots[slotIndex] = null;
         }
 
         this.addHistory(`正确处理预约: ${book.callNumber}，+50分`, true);
@@ -253,7 +291,8 @@ export class Game {
     }
 
     processDamage(bookId) {
-        const book = this.pendingBooks.find(b => b.id === bookId);
+        const { book, source, slotIndex } = this.findBookById(bookId);
+        
         if (!book || !book.isDamaged) {
             return { success: false, message: '该图书没有破损' };
         }
@@ -266,9 +305,13 @@ export class Game {
         this.score += 50;
         this.correctCount++;
         
-        const index = this.pendingBooks.indexOf(book);
-        if (index > -1) {
-            this.pendingBooks.splice(index, 1);
+        if (source === 'pending') {
+            const index = this.pendingBooks.indexOf(book);
+            if (index > -1) {
+                this.pendingBooks.splice(index, 1);
+            }
+        } else if (source === 'slot') {
+            this.sortingSlots[slotIndex] = null;
         }
 
         this.addHistory(`正确登记破损: ${book.callNumber}，+50分`, true);
