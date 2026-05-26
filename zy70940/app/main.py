@@ -3,8 +3,15 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
+from urllib.parse import quote
 from .database import engine, get_db, Base
 from . import models, schemas, services, data_import, export
+
+
+def make_content_disposition(filename: str) -> str:
+    ascii_filename = filename.encode("ascii", errors="replace").decode("ascii")
+    utf8_filename = quote(filename, safe="")
+    return f"attachment; filename=\"{ascii_filename}\"; filename*=UTF-8''{utf8_filename}"
 
 Base.metadata.create_all(bind=engine)
 
@@ -208,7 +215,7 @@ def export_penalty_records(
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={
-            "Content-Disposition": f"attachment; filename={filename}",
+            "Content-Disposition": make_content_disposition(filename),
             "X-Total-Count": str(total),
         },
     )
@@ -230,7 +237,7 @@ def export_batch_report(batch_id: int, db: Session = Depends(get_db)):
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={
-            "Content-Disposition": f"attachment; filename={filename}",
+            "Content-Disposition": make_content_disposition(filename),
             "X-Total-Count": str(total),
         },
     )
@@ -249,7 +256,7 @@ def export_record_traceability(record_id: int, db: Session = Depends(get_db)):
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={
-            "Content-Disposition": f"attachment; filename={filename}",
+            "Content-Disposition": make_content_disposition(filename),
         },
     )
 

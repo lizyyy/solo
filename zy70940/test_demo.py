@@ -146,6 +146,9 @@ def demo_workflow():
 
     print("\n11. 导出批次报告")
     export_response = requests.get(f"{BASE_URL}/batches/{batch_id}/export")
+    if export_response.status_code != 200:
+        print(f"    ✗ 导出失败: HTTP {export_response.status_code} - {export_response.text}")
+        raise Exception(f"批次报告导出失败")
     filename = f"batch_report_{batch_id}.xlsx"
     with open(filename, "wb") as f:
         f.write(export_response.content)
@@ -153,6 +156,9 @@ def demo_workflow():
 
     print("\n12. 导出单条记录追溯报告")
     export2_response = requests.get(f"{BASE_URL}/penalty-records/{penalty_ids[0]}/export")
+    if export2_response.status_code != 200:
+        print(f"    ✗ 导出失败: HTTP {export2_response.status_code} - {export2_response.text}")
+        raise Exception(f"追溯报告导出失败")
     filename2 = f"traceability_{penalty_ids[0]}.xlsx"
     with open(filename2, "wb") as f:
         f.write(export2_response.content)
