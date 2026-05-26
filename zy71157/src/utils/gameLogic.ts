@@ -14,67 +14,37 @@ export const resetBaggageIdCounter = (): void => {
 
 export const calculatePath = (
   startSegmentId: string,
-  targetGate: string,
+  _targetGate: string,
   segments: ConveyorSegment[],
-  switches: Array<{ id: string; options: string[] }>,
+  _switches: Array<{ id: string; options: string[] }>,
   switchStates: Record<string, string>,
-  gates: LevelConfig['gates']
+  _gates: LevelConfig['gates']
 ): string[] => {
-  const getNextSegments = (segmentId: string): string[] => {
-    const current = segments.find(s => s.id === segmentId);
-    if (!current) return [];
+  const path: string[] = [];
+  let currentId = startSegmentId;
+  const visited = new Set<string>();
+
+  while (currentId && !visited.has(currentId)) {
+    visited.add(currentId);
+    path.push(currentId);
+
+    const current = segments.find(s => s.id === currentId);
+    if (!current) break;
 
     if (current.isSwitch && current.switchOptions) {
-      const selected = switchStates[segmentId];
-      if (selected && current.switchOptions.includes(selected)) {
-        return [selected];
-      }
-      return [current.switchOptions[0]];
+      const selected = switchStates[currentId] || current.switchOptions[0];
+      currentId = selected;
+    } else {
+      const next = segments.find(s =>
+        s.id !== currentId &&
+        Math.abs(s.start.x - current.end.x) < 0.1 &&
+        Math.abs(s.start.z - current.end.z) < 0.1
+      );
+      currentId = next?.id || '';
     }
+  }
 
-    const connected = segments.filter(s => 
-      s.id !== segmentId && 
-      Math.abs(s.start.x - current.end.x) < 0.1 && 
-      Math.abs(s.start.z - current.end.z) < 0.1
-    );
-    return connected.map(s => s.id);
-  };
-
-  const reachesGate = (segmentId: string, gateId: string): boolean => {
-    const segment = segments.find(s => s.id === segmentId);
-    if (!segment) return false;
-    
-    const gate = gates.find(g => g.id === gateId);
-    if (!gate) return false;
-
-    const dist = Math.sqrt(
-      Math.pow(segment.end.x - gate.position.x, 2) +
-      Math.pow(segment.end.z - gate.position.z, 2)
-    );
-    return dist < 2.5;
-  };
-
-  const findPath = (currentId: string, visited: Set<string>): string[] | null => {
-    if (visited.has(currentId)) return null;
-    visited.add(currentId);
-
-    if (reachesGate(currentId, targetGate)) {
-      return [currentId];
-    }
-
-    const nextSegments = getNextSegments(currentId);
-    for (const nextId of nextSegments) {
-      const path = findPath(nextId, new Set(visited));
-      if (path) {
-        return [currentId, ...path];
-      }
-    }
-
-    return null;
-  };
-
-  const path = findPath(startSegmentId, new Set());
-  return path || [startSegmentId];
+  return path.length > 0 ? path : [startSegmentId];
 };
 
 export const getSegmentEndGate = (

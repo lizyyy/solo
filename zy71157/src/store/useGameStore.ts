@@ -365,7 +365,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
         baggageToRemove.push(updatedBaggage.id);
         newBaggages.push({ ...updatedBaggage, status: updatedBaggage.status === 'delivered' ? 'delivered' : 'error' });
       } else if (reachedEnd) {
+        newErrorCount++;
+        updatedBaggage.status = 'error';
+        updatedBaggage.errorType = 'missed_flight';
+        updatedBaggage.errorDescription = `行李${updatedBaggage.flightNumber}未送达${updatedBaggage.targetGate}，传送带末端无对应航班口，请切换开关`;
+
+        const error = createBaggageError(
+          updatedBaggage,
+          'missed_flight',
+          updatedBaggage.errorDescription,
+          newElapsedTime
+        );
+        newErrors.push(error);
+
+        const event = createGameEvent('baggage_error', {
+          baggage: updatedBaggage,
+          error: 'missed_flight',
+          description: updatedBaggage.errorDescription,
+          gate: updatedBaggage.targetGate,
+          score: -50,
+        }, newElapsedTime);
+        newEvents.push(event);
+
+        newScore -= 50;
+
         baggageToRemove.push(updatedBaggage.id);
+        newBaggages.push({ ...updatedBaggage, status: 'error' });
       } else {
         newBaggages.push(updatedBaggage);
       }
