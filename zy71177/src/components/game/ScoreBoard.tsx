@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Coins, Target, RotateCcw, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Trophy, Coins, RotateCcw, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface ScoreBoardProps {
   round: number;

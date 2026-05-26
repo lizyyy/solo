@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BookOpen, History, Droplets } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { levels } from '../data/levels';
@@ -6,14 +6,19 @@ import { LevelCard } from '../components/menu/LevelCard';
 import { GameGuide } from '../components/menu/GameGuide';
 import { useGameStore } from '../store/useGameStore';
 import { Level } from '../types';
-import { getGameRecords } from '../utils/scoring';
+import { getGameRecords, getUnlockedLevels } from '../utils/scoring';
 
 export const Menu: React.FC = () => {
   const navigate = useNavigate();
   const { startGame } = useGameStore();
   const [showGuide, setShowGuide] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [unlockedLevels, setUnlockedLevels] = useState<Set<string>>(new Set(['level-1']));
+  const [unlockedLevels, setUnlockedLevels] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const unlocked = getUnlockedLevels();
+    setUnlockedLevels(new Set(unlocked));
+  }, []);
 
   const handleSelectLevel = (level: Level) => {
     startGame(level);

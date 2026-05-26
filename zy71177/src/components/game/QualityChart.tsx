@@ -8,7 +8,8 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  TooltipItem
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { WaterQuality, Level } from '../../types';
@@ -93,7 +94,7 @@ export const QualityChart: React.FC<QualityChartProps> = ({ qualityHistory, leve
         borderWidth: 1,
         padding: 12,
         callbacks: {
-          label: function(context: any) {
+          label: function(context: TooltipItem<'line'>) {
             let label = context.dataset.label || '';
             if (label) {
               label += ': ';
@@ -142,8 +143,8 @@ export const QualityChart: React.FC<QualityChartProps> = ({ qualityHistory, leve
         },
         ticks: {
           color: '#64748b',
-          callback: function(value: any) {
-            return (value / 10).toFixed(1);
+          callback: function(value: string | number) {
+            return (Number(value) / 10).toFixed(1);
           }
         },
         title: {

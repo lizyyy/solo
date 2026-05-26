@@ -1,6 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { WaterQuality, Level } from '../../types';
 import { getWaterQualityColor } from '../../utils/simulation';
+
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+}
 
 interface TankSimulationProps {
   waterQuality: WaterQuality;
@@ -16,20 +24,20 @@ export const TankSimulation: React.FC<TankSimulationProps> = ({
   isStirring
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [particles, setParticles] = useState<Array<{ x: number; y: number; vx: number; vy: number; life: number }>>([]);
+  const particlesRef = useRef<Particle[]>([]);
 
   const waterColor = getWaterQualityColor(waterQuality, level.targetThresholds);
 
   useEffect(() => {
     if (isProcessing) {
-      const newParticles = Array.from({ length: 20 }, () => ({
+      const newParticles: Particle[] = Array.from({ length: 20 }, () => ({
         x: 200 + Math.random() * 100 - 50,
         y: 50,
         vx: (Math.random() - 0.5) * 2,
         vy: Math.random() * 2 + 1,
         life: 1
       }));
-      setParticles(prev => [...prev, ...newParticles]);
+      particlesRef.current = [...particlesRef.current, ...newParticles];
     }
   }, [isProcessing]);
 
@@ -98,25 +106,23 @@ export const TankSimulation: React.FC<TankSimulationProps> = ({
         }
       }
 
-      setParticles(prev => {
-        const updated = prev
-          .map(p => ({
-            ...p,
-            x: p.x + p.vx,
-            y: p.y + p.vy,
-            life: p.life - 0.02
-          }))
-          .filter(p => p.life > 0 && p.y < tankY + waterLevel);
+      const updated = particlesRef.current
+        .map(p => ({
+          ...p,
+          x: p.x + p.vx,
+          y: p.y + p.vy,
+          life: p.life - 0.02
+        }))
+        .filter(p => p.life > 0 && p.y < tankY + waterLevel);
 
-        updated.forEach(p => {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, 4 * p.life, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(147, 197, 253, ${p.life})`;
-          ctx.fill();
-        });
-
-        return updated;
+      updated.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4 * p.life, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(147, 197, 253, ${p.life})`;
+        ctx.fill();
       });
+
+      particlesRef.current = updated;
 
       ctx.fillStyle = '#334155';
       ctx.fillRect(20, tankY + waterLevel - 15, 35, 8);

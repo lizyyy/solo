@@ -8,7 +8,8 @@ import {
   applyIncomingWaterVariation,
   checkThresholds
 } from '../utils/simulation';
-import { calculateScore, generateRecordId, saveGameRecord } from '../utils/scoring';
+import { calculateScore, generateRecordId, saveGameRecord, unlockNextLevel } from '../utils/scoring';
+import { levels } from '../data/levels';
 
 interface GameStore extends GameState {
   selectedChemicalAmount: number;
@@ -28,9 +29,9 @@ interface GameStore extends GameState {
   resetToMenu: () => void;
 }
 
-const initialState: Omit<GameStore, keyof ReturnType<typeof createGameActions>> = {
+const initialState = {
   currentLevel: null,
-  phase: 'menu',
+  phase: 'menu' as const,
   round: 0,
   maxRounds: 0,
   score: 0,
@@ -62,7 +63,8 @@ const initialState: Omit<GameStore, keyof ReturnType<typeof createGameActions>> 
   currentGameId: null
 };
 
-const createGameActions = (set: any, get: any) => ({
+export const useGameStore = create<GameStore>((set, get) => ({
+  ...initialState,
   startGame: (level: Level) => {
     const initialQuality: WaterQuality = {
       ...level.initialWaterQuality,
@@ -169,14 +171,14 @@ const createGameActions = (set: any, get: any) => ({
     };
 
     setTimeout(() => {
-      set((s: any) => ({
+      set((state) => ({
         waterQuality: afterStirring,
-        qualityHistory: [...s.qualityHistory, afterStirring],
-        actions: [...s.actions, action],
-        totalCost: s.totalCost + totalCost,
-        successCount: isSuccess ? s.successCount + 1 : s.successCount,
-        insufficientStirringCount: isInsufficientStirring ? s.insufficientStirringCount + 1 : s.insufficientStirringCount,
-        overdoseCount: isOverdose ? s.overdoseCount + 1 : s.overdoseCount,
+        qualityHistory: [...state.qualityHistory, afterStirring],
+        actions: [...state.actions, action],
+        totalCost: state.totalCost + totalCost,
+        successCount: isSuccess ? state.successCount + 1 : state.successCount,
+        insufficientStirringCount: isInsufficientStirring ? state.insufficientStirringCount + 1 : state.insufficientStirringCount,
+        overdoseCount: isOverdose ? state.overdoseCount + 1 : state.overdoseCount,
         isProcessing: false
       }));
 
@@ -189,9 +191,9 @@ const createGameActions = (set: any, get: any) => ({
             optimalDose,
             level.parameters
           );
-          set((s: any) => ({
+          set((state) => ({
             waterQuality: reboundQuality,
-            qualityHistory: [...s.qualityHistory, reboundQuality]
+            qualityHistory: [...state.qualityHistory, reboundQuality]
           }));
 
           const reboundCheck = checkThresholds(reboundQuality, level.targetThresholds);
@@ -221,10 +223,10 @@ const createGameActions = (set: any, get: any) => ({
 
     const newQuality = applyIncomingWaterVariation(state.waterQuality, level.parameters);
 
-    set((s: any) => ({
-      round: s.round + 1,
+    set((state) => ({
+      round: state.round + 1,
       waterQuality: newQuality,
-      qualityHistory: [...s.qualityHistory, newQuality]
+      qualityHistory: [...state.qualityHistory, newQuality]
     }));
 
     const newCheck = checkThresholds(newQuality, level.targetThresholds);
@@ -278,6 +280,11 @@ const createGameActions = (set: any, get: any) => ({
 
     saveGameRecord(record);
 
+    if (!failReason) {
+      const allLevelIds = levels.map(l => l.id);
+      unlockNextLevel(level.id, allLevelIds);
+    }
+
     set({
       phase: 'ended',
       endTime,
@@ -288,11 +295,38 @@ const createGameActions = (set: any, get: any) => ({
   },
 
   resetToMenu: () => {
-    set(initialState);
+    set({
+      currentLevel: null,
+      phase: 'menu',
+      round: 0,
+      maxRounds: 0,
+      score: 0,
+      totalCost: 0,
+      tankState: {
+        volume: 1000,
+        chemicalAmount: 0,
+        stirringTime: 0,
+        isStirring: false
+      },
+      waterQuality: {
+        cod: 0,
+        nh3n: 0,
+        tp: 0,
+        ph: 7,
+        timestamp: 0
+      },
+      qualityHistory: [],
+      actions: [],
+      startTime: 0,
+      endTime: null,
+      failReason: null,
+      insufficientStirringCount: 0,
+      overdoseCount: 0,
+      successCount: 0,
+      selectedChemicalAmount: 50,
+      selectedStirringTime: 5,
+      isProcessing: false,
+      currentGameId: null
+    });
   }
-});
-
-export const useGameStore = create<GameStore>((set, get) => ({
-  ...initialState,
-  ...createGameActions(set, get)
 }));

@@ -29,7 +29,7 @@ export const calculateScore = (
 
 export const calculateOptimalCost = (level: Level): number => {
   let totalOptimalDose = 0;
-  let currentQuality = { ...level.initialWaterQuality };
+  const currentQuality = { ...level.initialWaterQuality };
 
   for (let i = 0; i < level.maxRounds; i++) {
     const codReduction = Math.max(0, currentQuality.cod - level.targetThresholds.cod);
@@ -126,4 +126,42 @@ export const getHighScore = (levelId: string): number => {
 
 export const generateRecordId = (): string => {
   return `game_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+};
+
+const UNLOCKED_LEVELS_KEY = 'wastewater_unlocked_levels';
+
+export const getUnlockedLevels = (): string[] => {
+  try {
+    const data = localStorage.getItem(UNLOCKED_LEVELS_KEY);
+    return data ? JSON.parse(data) : ['level-1'];
+  } catch (e) {
+    console.error('Failed to get unlocked levels:', e);
+    return ['level-1'];
+  }
+};
+
+export const unlockLevel = (levelId: string): void => {
+  try {
+    const unlocked = getUnlockedLevels();
+    if (!unlocked.includes(levelId)) {
+      unlocked.push(levelId);
+      localStorage.setItem(UNLOCKED_LEVELS_KEY, JSON.stringify(unlocked));
+    }
+  } catch (e) {
+    console.error('Failed to unlock level:', e);
+  }
+};
+
+export const isLevelUnlocked = (levelId: string): boolean => {
+  return getUnlockedLevels().includes(levelId);
+};
+
+export const unlockNextLevel = (currentLevelId: string, allLevelIds: string[]): string | null => {
+  const currentIndex = allLevelIds.indexOf(currentLevelId);
+  if (currentIndex >= 0 && currentIndex < allLevelIds.length - 1) {
+    const nextLevelId = allLevelIds[currentIndex + 1];
+    unlockLevel(nextLevelId);
+    return nextLevelId;
+  }
+  return null;
 };

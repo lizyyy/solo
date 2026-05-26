@@ -1,57 +1,121 @@
-# React + TypeScript + Vite
+# 污水处理厂药剂投加模拟游戏
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一款面向环保培训新人的模拟经营类网页游戏，通过真实的污水处理药剂投加规则，让玩家理解药剂投加量与水质指标的关系，掌握成本控制的重要性。
 
-Currently, two official plugins are available:
+## 游戏特色
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🎮 **真实模拟**：基于真实污水处理药剂反应原理设计
+- 📊 **三个难度关卡**：新手训练营、反弹挑战、波动工况
+- ⚗️ **真实水质指标**：COD、氨氮、总磷、pH值四项核心指标
+- 💰 **成本控制**：超量投加会增加成本，甚至导致指标反弹
+- ⏱️ **历史回放**：完整记录操作过程，支持逐帧回放复盘
+- 📋 **报告导出**：支持TXT和JSON格式导出运行报告
 
-## Expanding the ESLint configuration
+## 游戏规则
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 核心玩法
+1. 观察进水水质指标
+2. 调整药剂投加量和搅拌时间
+3. 执行处理操作，观察出水指标变化
+4. 达标后进入下一回合，在限定回合内完成所有处理
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 常见难点
+- **投加过量**：药剂超量会大幅增加成本，在中高难度还会导致指标反弹
+- **指标反弹**：过量投加的药剂会使污染物暂时被包裹，随后重新释放
+- **搅拌不足**：搅拌时间不够会降低药剂反应效率，影响处理效果
+
+### 评分规则
+- 基础分：每个达标回合 +100分
+- 成本扣分：(实际成本/最优成本) × 50分
+- 搅拌不足扣分：每次 -20分
+- 超量投加扣分：每次 -30分
+
+## 技术栈
+
+- **前端框架**：React 18 + TypeScript
+- **构建工具**：Vite 5
+- **样式方案**：TailwindCSS 3
+- **状态管理**：Zustand 4
+- **图表库**：Chart.js 4 + react-chartjs-2
+- **图标库**：Lucide React
+- **数据持久化**：LocalStorage
+
+## 快速开始
+
+### 安装依赖
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 开发模式
+```bash
+npm run dev
 ```
+游戏将在 http://localhost:5173/ 启动
+
+### 类型检查
+```bash
+npm run check
+```
+
+### 代码规范检查
+```bash
+npm run lint
+```
+
+### 构建生产版本
+```bash
+npm run build
+```
+
+### 预览生产版本
+```bash
+npm run preview
+```
+
+## 关卡说明
+
+### 第一关：新手训练营（简单）
+- 水质稳定，无反弹效应
+- 适合新手熟悉基本操作
+- 目标：学习药剂投加和搅拌的基本操作
+
+### 第二关：反弹挑战（中等）
+- 超量投加会导致指标反弹
+- 需要精确控制投加量
+- 目标：理解超量投加的危害
+
+### 第三关：波动工况（困难）
+- 进水水质波动大
+- 反弹效应明显
+- 搅拌时间要求严格
+- 目标：应对复杂工况的综合能力
+
+## 项目结构
+
+```
+src/
+├── components/          # UI组件
+│   ├── game/           # 游戏界面组件
+│   ├── menu/           # 主菜单组件
+│   ├── result/         # 结算页面组件
+│   └── replay/         # 历史回放组件
+├── store/              # 状态管理
+├── utils/              # 工具函数
+├── data/               # 关卡配置数据
+├── types/              # TypeScript类型定义
+├── pages/              # 页面组件
+└── App.tsx             # 应用入口
+```
+
+## 游戏截图
+
+游戏包含以下主要界面：
+- 主菜单：关卡选择、游戏说明、历史记录
+- 游戏界面：2D处理池模拟、参数控制面板、实时指标曲线
+- 结算界面：评分展示、失败分析、报告导出
+- 历史回放：操作记录回放、指标变化复盘
+
+## 开源协议
+
+本项目仅供学习和培训使用。

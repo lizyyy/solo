@@ -1,4 +1,4 @@
-import { WaterQuality, Level, LevelParameters } from '../types';
+import { WaterQuality, LevelParameters } from '../types';
 
 export const calculateOptimalDose = (
   currentQuality: Omit<WaterQuality, 'timestamp'>,

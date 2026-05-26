@@ -3,14 +3,12 @@ import { Trophy, Star } from 'lucide-react';
 import { ScoreBreakdown } from '../../types';
 
 interface ScoreDisplayProps {
-  score: number;
   scoreBreakdown: ScoreBreakdown;
   success: boolean;
   levelName: string;
 }
 
 export const ScoreDisplay: React.FC<ScoreDisplayProps> = ({
-  score,
   scoreBreakdown,
   success,
   levelName

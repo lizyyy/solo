@@ -11,7 +11,7 @@ import { useGameStore } from '../store/useGameStore';
 export const Result: React.FC = () => {
   const navigate = useNavigate();
   const { gameId } = useParams<{ gameId: string }>();
-  const { currentLevel, startGame } = useGameStore();
+  const { startGame } = useGameStore();
   
   const [record, setRecord] = useState<GameRecord | null>(null);
   const [scoreBreakdown, setScoreBreakdown] = useState<ScoreBreakdown | null>(null);
@@ -79,7 +79,6 @@ export const Result: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1">
             <ScoreDisplay
-              score={record.score}
               scoreBreakdown={scoreBreakdown}
               success={record.success}
               levelName={record.levelName}

@@ -1,4 +1,4 @@
-import { GameRecord, ScoreBreakdown, WaterQuality } from '../types';
+import { GameRecord, ScoreBreakdown } from '../types';
 import { getFailReasonDescription } from './scoring';
 
 export const generateReportText = (record: GameRecord, scoreBreakdown: ScoreBreakdown): string => {
