@@ -7,6 +7,7 @@ export interface Stall {
   position: { x: number; y: number };
   power: number;
   maxPower: number;
+  smokeCoefficient: number;
   exhaustLevel: number;
   isOn: boolean;
   smokeOutput: number;

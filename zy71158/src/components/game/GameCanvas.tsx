@@ -1,13 +1,10 @@
 import React, { useRef } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { useCanvasRenderer } from '@/hooks/useCanvasRenderer';
-import { Customer } from '@/types/game';
 
 export default function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { stalls, totalElectricity, maxElectricity, totalSmoke, maxSmoke, phase } = useGameStore();
-
-  const customers: Customer[] = [];
+  const { stalls, customers, totalElectricity, maxElectricity, totalSmoke, maxSmoke, phase } = useGameStore();
 
   useCanvasRenderer(canvasRef, {
     width: 800,

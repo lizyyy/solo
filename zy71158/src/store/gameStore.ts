@@ -8,6 +8,7 @@ import {
   FailureReason,
   LevelConfig,
   GameReport,
+  Customer,
 } from '@/types/game';
 import {
   createStallsFromConfig,
@@ -17,7 +18,7 @@ import {
   shouldTriggerComplaint,
 } from '@/utils/simulation';
 import { getLevelById } from '@/utils/levels';
-import { triggerRandomEvent, applyEventEffects, createInfoEvent, createWarningEvent, createPenaltyEvent } from '@/utils/events';
+import { triggerRandomEvent, applyEventEffects, createInfoEvent, createWarningEvent, createPenaltyEvent, createRewardEvent } from '@/utils/events';
 import { calculateTotalScore, ScoringContext } from '@/utils/scoring';
 import { generateReport } from '@/utils/report';
 
@@ -40,6 +41,7 @@ interface GameStore {
   money: number;
   targetMoney: number;
   stalls: Stall[];
+  customers: Customer[];
   events: GameEvent[];
   history: HistoryFrame[];
   failureReason: FailureReason | null;
@@ -66,6 +68,8 @@ interface GameStore {
 
   tick: (deltaTime: number) => void;
   endRound: () => void;
+  spawnCustomer: () => void;
+  updateCustomers: () => void;
 
   recordHistory: (action: string) => void;
   showSettlement: () => void;
@@ -93,6 +97,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   money: 0,
   targetMoney: 0,
   stalls: [],
+  customers: [],
   events: [],
   history: [],
   failureReason: null,
@@ -112,7 +117,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!level) return;
 
     const stalls = createStallsFromConfig(level);
-    const initialElectricity = calculateTotalElectricity(stalls);
+    const extraLoad = 0;
+    const initialElectricity = calculateTotalElectricity(stalls) + extraLoad;
     const initialSmoke = calculateTotalSmoke(stalls);
 
     set({
@@ -134,6 +140,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       money: 0,
       targetMoney: level.targetMoney,
       stalls,
+      customers: [],
       events: [createInfoEvent(`🎪 ${level.name} 开始！合理经营你的摊位吧`, 1)],
       history: [],
       failureReason: null,
@@ -174,6 +181,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       phase: 'menu',
       level: null,
       stalls: [],
+      customers: [],
       events: [],
       history: [],
       failureReason: null,
@@ -192,7 +200,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       s.id === stallId ? { ...s, isOn: !s.isOn } : s
     );
 
-    const newElectricity = calculateTotalElectricity(newStalls);
+    const extraLoad = get().extraElectricityLoad;
+    const newElectricity = calculateTotalElectricity(newStalls) + extraLoad;
     const newSmoke = calculateTotalSmoke(newStalls);
 
     set({
@@ -216,7 +225,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       s.id === stallId ? { ...s, power: clampedPower } : s
     );
 
-    const newElectricity = calculateTotalElectricity(newStalls);
+    const extraLoad = get().extraElectricityLoad;
+    const newElectricity = calculateTotalElectricity(newStalls) + extraLoad;
     const newSmoke = calculateTotalSmoke(newStalls);
 
     let newErrorCount = errorCount;
@@ -266,6 +276,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { phase, timeRemaining, round } = get();
     if (phase !== 'playing') return;
 
+    if (Math.random() < 0.02) {
+      get().spawnCustomer();
+    }
+
+    get().updateCustomers();
+
     const newTime = timeRemaining - deltaTime;
 
     if (newTime <= 0) {
@@ -273,6 +289,75 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       set({ timeRemaining: newTime });
     }
+  },
+
+  spawnCustomer: () => {
+    const { stalls, customers, level } = get();
+    if (!level) return;
+
+    const activeStalls = stalls.filter((s) => s.isOn);
+    if (activeStalls.length === 0) return;
+
+    const targetStall = activeStalls[Math.floor(Math.random() * activeStalls.length)];
+    const side = Math.floor(Math.random() * 4);
+    let startX: number, startY: number;
+
+    switch (side) {
+      case 0:
+        startX = Math.random() * 800;
+        startY = 480;
+        break;
+      case 1:
+        startX = Math.random() * 800;
+        startY = 20;
+        break;
+      case 2:
+        startX = 20;
+        startY = Math.random() * 460 + 40;
+        break;
+      default:
+        startX = 780;
+        startY = Math.random() * 460 + 40;
+    }
+
+    const newCustomer: Customer = {
+      id: `customer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      x: startX,
+      y: startY,
+      targetStallId: targetStall.id,
+      speed: 0.5 + Math.random() * 1,
+    };
+
+    set({ customers: [...customers, newCustomer].slice(-50) });
+  },
+
+  updateCustomers: () => {
+    const { customers, stalls } = get();
+
+    const updatedCustomers = customers
+      .map((customer) => {
+        const targetStall = stalls.find((s) => s.id === customer.targetStallId);
+        if (!targetStall || !targetStall.isOn) {
+          return { ...customer, targetStallId: null };
+        }
+
+        const dx = targetStall.position.x - customer.x;
+        const dy = targetStall.position.y - customer.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 10) {
+          return null;
+        }
+
+        return {
+          ...customer,
+          x: customer.x + (dx / dist) * customer.speed,
+          y: customer.y + (dy / dist) * customer.speed,
+        };
+      })
+      .filter(Boolean) as Customer[];
+
+    set({ customers: updatedCustomers });
   },
 
   endRound: () => {
@@ -303,7 +388,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let newTimeoutCount = timeoutCount;
     let failureReason: FailureReason | null = null;
 
-    if (totalElectricity > maxElectricity) {
+    const extraLoad = state.extraElectricityLoad;
+    const effectiveElectricity = totalElectricity + extraLoad;
+
+    if (effectiveElectricity > maxElectricity) {
       newConsecutiveOver++;
       newEvents.unshift(
         createWarningEvent(`⚡ 用电超限！已连续 ${newConsecutiveOver} 回合`, round)
@@ -346,11 +434,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     const randomEvent = triggerRandomEvent(level.randomEvents, round);
+    let eventMoneyDelta = 0;
+    let eventElectricityDelta = 0;
+    
     if (randomEvent) {
       newEvents.unshift(randomEvent);
       const effects = applyEventEffects(randomEvent, level.randomEvents);
-      if (effects.complaintDelta > 0) {
-        newComplaints += effects.complaintDelta;
+      
+      if (effects.complaintDelta !== 0) {
+        newComplaints = Math.max(0, newComplaints + effects.complaintDelta);
         if (newComplaints >= maxComplaints && !failureReason) {
           failureReason = {
             type: 'complaints',
@@ -359,10 +451,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
           };
         }
       }
+      
+      if (effects.electricityDelta !== 0) {
+        eventElectricityDelta = effects.electricityDelta;
+        if (effects.electricityDelta > 0) {
+          newEvents.unshift(
+            createWarningEvent(`⚡ 额外用电负载 +${effects.electricityDelta}，容量压力增大`, round)
+          );
+        } else {
+          newEvents.unshift(
+            createInfoEvent(`⚡ 额外用电负载 ${effects.electricityDelta}，容量压力缓解`, round)
+          );
+        }
+      }
+      
+      if (effects.moneyDelta !== 0) {
+        eventMoneyDelta = effects.moneyDelta;
+        if (effects.moneyDelta > 0) {
+          newEvents.unshift(
+            createRewardEvent(`💰 额外收益 +¥${effects.moneyDelta}`, round)
+          );
+        } else {
+          newEvents.unshift(
+            createPenaltyEvent(`💰 收益损失 ¥${Math.abs(effects.moneyDelta)}`, round)
+          );
+        }
+      }
     }
 
     const roundMoney = calculateRoundMoney(stalls, 50, state.bonusMultiplier);
-    const newMoney = state.money + roundMoney;
+    const newMoney = Math.max(0, state.money + roundMoney + eventMoneyDelta);
+    const newExtraLoad = state.extraElectricityLoad + eventElectricityDelta;
 
     newEvents.unshift(
       createInfoEvent(`💰 第 ${round} 回合收益：+${roundMoney} 元`, round)
@@ -407,6 +526,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({
         phase: 'settlement',
         round,
+        totalElectricity: calculateTotalElectricity(stalls) + newExtraLoad,
         complaints: newComplaints,
         money: newMoney,
         score: scoreBreakdown.total,
@@ -415,17 +535,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         history: [...state.history],
         failureReason,
         report,
+        extraElectricityLoad: newExtraLoad,
       });
     } else {
       set({
         round: round + 1,
         timeRemaining: state.roundDuration,
+        totalElectricity: calculateTotalElectricity(stalls) + newExtraLoad,
         complaints: newComplaints,
         money: newMoney,
         consecutiveOverCapacity: newConsecutiveOver,
         consecutiveHighSmoke: newConsecutiveSmoke,
         timeoutCount: newTimeoutCount,
         events: newEvents.slice(0, 50),
+        extraElectricityLoad: newExtraLoad,
       });
     }
   },

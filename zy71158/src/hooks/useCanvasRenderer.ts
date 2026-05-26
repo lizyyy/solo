@@ -141,32 +141,15 @@ export function useCanvasRenderer(
   }, []);
 
   const drawCustomers = useCallback(
-    (ctx: CanvasRenderingContext2D, customers: Customer[], stalls: Stall[]) => {
+    (ctx: CanvasRenderingContext2D, customers: Customer[]) => {
       customers.forEach((customer) => {
-        const stored = customerPositionsRef.current.get(customer.id);
-        let cx = stored?.x ?? customer.x;
-        let cy = stored?.y ?? customer.y;
+        const cx = customer.x;
+        const cy = customer.y;
 
-        if (customer.targetStallId) {
-          const targetStall = stalls.find((s) => s.id === customer.targetStallId);
-          if (targetStall && targetStall.isOn) {
-            const dx = targetStall.position.x - cx;
-            const dy = targetStall.position.y - cy;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist > 5) {
-              cx += (dx / dist) * customer.speed;
-              cy += (dy / dist) * customer.speed;
-            }
-          }
-        }
-
-        customerPositionsRef.current.set(customer.id, {
-          x: cx,
-          y: cy,
-          targetX: customer.x,
-          targetY: customer.y,
-        });
+        ctx.fillStyle = 'rgba(255, 210, 63, 0.3)';
+        ctx.beginPath();
+        ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+        ctx.fill();
 
         ctx.fillStyle = '#FFD23F';
         ctx.beginPath();
@@ -273,7 +256,7 @@ export function useCanvasRenderer(
     });
 
     drawParticles(ctx);
-    drawCustomers(ctx, customers, stalls);
+    drawCustomers(ctx, customers);
     drawCapacityBar(ctx, width, totalElectricity, maxElectricity);
 
     if (options.phase === 'paused') {

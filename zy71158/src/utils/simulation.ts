@@ -10,12 +10,18 @@ export function calculateTotalElectricity(stalls: Stall[]): number {
 export function calculateStallSmoke(stall: Stall): number {
   if (!stall.isOn) return 0;
   const exhaustEfficiency = stall.exhaustLevel * 0.2;
-  const baseSmoke = (stall.power / 100) * stall.maxPower * 0.6 * (1 - exhaustEfficiency);
+  const baseSmoke = (stall.power / 100) * stall.maxPower * stall.smokeCoefficient * (1 - exhaustEfficiency);
   return Math.max(0, baseSmoke);
 }
 
 export function calculateTotalSmoke(stalls: Stall[]): number {
-  return stalls.reduce((sum, stall) => sum + calculateStallSmoke(stall), 0);
+  let total = 0;
+  stalls.forEach((stall) => {
+    const ownSmoke = calculateStallSmoke(stall);
+    const neighborImpact = calculateNeighborSmokeImpact(stalls, stall);
+    total += ownSmoke + neighborImpact;
+  });
+  return total;
 }
 
 export function calculateDistance(a: { x: number; y: number }, b: { x: number; y: number }): number {
@@ -94,6 +100,7 @@ export function createStallsFromConfig(level: LevelConfig): Stall[] {
     position: { ...config.position },
     power: 50,
     maxPower: config.maxPower,
+    smokeCoefficient: config.smokeCoefficient,
     exhaustLevel: 1,
     isOn: true,
     smokeOutput: 0,
