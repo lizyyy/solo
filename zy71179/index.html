@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>剧场换景节奏游戏</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header id="topbar">
+            <div class="title">🎭 剧场换景节奏游戏</div>
+            <div class="game-info">
+                <span class="level-name">关卡: <span id="levelName">--</span></span>
+                <span class="score">得分: <span id="scoreValue">0</span></span>
+                <span class="time">时间: <span id="timeValue">00:00</span></span>
+            </div>
+            <div class="controls">
+                <button id="btnPause" class="btn" title="暂停 (Space)">⏸ 暂停</button>
+                <button id="btnRestart" class="btn" title="重新开始 (R)">🔄 重开</button>
+                <button id="btnPlay" class="btn btn-primary" title="开始演出 (Enter)">▶ 开始演出</button>
+            </div>
+        </header>
+
+        <main id="main">
+            <aside id="sidebar">
+                <div class="panel">
+                    <h3>关卡选择</h3>
+                    <div id="levelList" class="level-list"></div>
+                </div>
+                <div class="panel">
+                    <h3>可用事件</h3>
+                    <div id="eventPool" class="event-pool"></div>
+                </div>
+                <div class="panel">
+                    <h3>状态提示</h3>
+                    <div id="statusPanel" class="status-panel">
+                        <div class="status-item"><span class="label">排程阶段</span><span id="phaseStatus" class="value">准备中</span></div>
+                        <div class="status-item"><span class="label">冲突数</span><span id="conflictCount" class="value">0</span></div>
+                        <div class="status-item"><span class="label">换景超时</span><span id="timeoutCount" class="value">0</span></div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h3>操作说明</h3>
+                    <div class="help-text">
+                        <p>• 拖拽左侧事件到时间轴</p>
+                        <p>• 避免道具占用演员入口</p>
+                        <p>• 灯光段落必须按顺序排列</p>
+                        <p>• 换景时间不能超过限制</p>
+                        <p>• 点击开始演出自动检测</p>
+                    </div>
+                </div>
+            </aside>
+
+            <section id="canvasArea">
+                <canvas id="timelineCanvas"></canvas>
+                <div id="conflictOverlay" class="conflict-overlay hidden"></div>
+            </section>
+
+            <aside id="rightbar">
+                <div class="panel">
+                    <h3>冲突详情</h3>
+                    <div id="conflictList" class="conflict-list">
+                        <p class="empty">暂无冲突</p>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h3>演出日志</h3>
+                    <div id="playLog" class="play-log">
+                        <p class="empty">开始演出后显示日志</p>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h3>历史记录</h3>
+                    <div id="historyList" class="history-list">
+                        <p class="empty">暂无历史记录</p>
+                    </div>
+                    <button id="btnReplay" class="btn btn-secondary" disabled>回放选中记录</button>
+                </div>
+                <div class="panel">
+                    <h3>导出报告</h3>
+                    <button id="btnExport" class="btn btn-secondary" disabled>导出结算报告</button>
+                </div>
+            </aside>
+        </main>
+
+        <div id="resultModal" class="modal hidden">
+            <div class="modal-content">
+                <h2 id="resultTitle">演出结算</h2>
+                <div id="resultBody" class="result-body"></div>
+                <div class="modal-actions">
+                    <button id="btnCloseResult" class="btn">关闭</button>
+                    <button id="btnReplayResult" class="btn btn-secondary">回放本次</button>
+                    <button id="btnExportResult" class="btn btn-primary">导出报告</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/models.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/rules.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/interaction.js"></script>
+    <script src="js/replay.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
