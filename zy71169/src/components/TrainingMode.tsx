@@ -106,7 +106,7 @@ export default function TrainingMode() {
     }
 
     startGame(trainingLevelId);
-    navigate(`/level/${trainingLevelId}`);
+    navigate(`/game/${trainingLevelId}`);
   };
 
   return (

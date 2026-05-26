@@ -1,10 +1,15 @@
 import React from 'react';
-import { AlertTriangle, Clock, User, UtensilsCrossed, ArrowRightToLine, Send } from 'lucide-react';
+import { AlertTriangle, Clock, User, UtensilsCrossed, ArrowRightToLine, Send, CheckCircle } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { GRADE_COLORS, GRADE_NAMES } from '../game/levels';
 import { getAllergenLabel } from '../game/meals';
 
-export default function OrderQueue() {
+interface OrderQueueProps {
+  onDragStart?: (e: React.DragEvent, orderId: string) => void;
+  onDragEnd?: () => void;
+}
+
+export default function OrderQueue({ onDragStart, onDragEnd }: OrderQueueProps) {
   const { ordersForPrep, ordersForPickup, gameTime, setDraggedMeal, assignPickup, pickupWindows } = useGameStore();
   const [isExpanded, setIsExpanded] = React.useState(true);
   const [activeTab, setActiveTab] = React.useState<'prep' | 'pickup'>('prep');
@@ -25,11 +30,18 @@ export default function OrderQueue() {
 
   const handleDragStart = (e: React.DragEvent, orderId: string) => {
     e.dataTransfer.setData('orderId', orderId);
+    e.dataTransfer.effectAllowed = 'move';
     setDraggedMeal(orderId);
+    if (onDragStart) {
+      onDragStart(e, orderId);
+    }
   };
 
   const handleDragEnd = () => {
     setDraggedMeal(null);
+    if (onDragEnd) {
+      onDragEnd();
+    }
   };
 
   const handleAssignPickup = (orderId: string) => {
@@ -234,25 +246,5 @@ export default function OrderQueue() {
         )}
       </div>
     </div>
-  );
-}
-
-function CheckCircle(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-      <polyline points="22 4 12 14.01 9 11.01" />
-    </svg>
   );
 }

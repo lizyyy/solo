@@ -106,7 +106,7 @@ export default function ResultReport() {
     const levelId = session?.levelId ?? currentLevel?.id;
     if (levelId) {
       startGame(levelId);
-      navigate(`/level/${levelId}`);
+      navigate(`/game/${levelId}`);
     }
   };
 
