@@ -88,6 +88,29 @@ def test_submit_contraindication_blocked():
     assert "配伍禁忌" in data["category_result"]["reason"]
 
 
+def test_contraindication_blocked_regardless_of_follow_up_type():
+    clear_storage()
+    payload = {
+        "batch_no": "BATCH003B",
+        "patient_name": "王五B",
+        "phone": "13755556667",
+        "age": 72,
+        "gender": "男",
+        "diagnosis": "冠心病",
+        "drugs": ["硝酸甘油", "西地那非"],
+        "follow_up_type": "post_purchase",
+        "pharmacy_name": "仁爱药房",
+        "clerk_id": "CLERK003",
+        "clerk_name": "赵药师"
+    }
+    resp = client.post("/api/materials/submit", json=payload)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["category"] == "blocked"
+    assert data["follow_up_type"] == "contraindication_block"
+    assert "配伍禁忌" in data["category_result"]["reason"]
+
+
 def test_duplicate_submission():
     clear_storage()
     payload = {

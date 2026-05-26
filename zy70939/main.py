@@ -88,8 +88,12 @@ async def submit_material(request: MaterialSubmitRequest):
     material_id = storage.generate_id()
     category_result = classify_material(request, processed_by="system")
 
+    record_data = request.model_dump()
+    if category_result.category == MaterialCategory.BLOCKED:
+        record_data["follow_up_type"] = category_result.follow_up_type
+
     record = MaterialRecord(
-        **request.model_dump(),
+        **record_data,
         material_id=material_id,
         status=MaterialStatus.PROCESSED,
         submit_time=datetime.now(),

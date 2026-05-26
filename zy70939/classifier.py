@@ -53,17 +53,16 @@ def classify_material(
     request: MaterialSubmitRequest,
     processed_by: str
 ) -> CategoryResult:
-    if request.follow_up_type == FollowUpType.CONTRAINDICATION_BLOCK:
-        has_conflict, conflict_reason = check_contraindication(request.drugs)
-        if has_conflict:
-            return CategoryResult(
-                category=MaterialCategory.BLOCKED,
-                reason=conflict_reason,
-                follow_up_type=FollowUpType.CONTRAINDICATION_BLOCK,
-                suggested_action="立即拦截，联系医师调整用药方案",
-                processed_at=datetime.now(),
-                processed_by=processed_by
-            )
+    has_conflict, conflict_reason = check_contraindication(request.drugs)
+    if has_conflict:
+        return CategoryResult(
+            category=MaterialCategory.BLOCKED,
+            reason=conflict_reason,
+            follow_up_type=FollowUpType.CONTRAINDICATION_BLOCK,
+            suggested_action="立即拦截，联系医师调整用药方案",
+            processed_at=datetime.now(),
+            processed_by=processed_by
+        )
 
     fields_ok, fields_reason = check_required_fields(request)
     if not fields_ok:
