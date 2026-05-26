@@ -247,7 +247,7 @@ const CraneGame = (function() {
         const levelFactor = gameState.level;
         
         gameState.load.weight = Math.floor(3000 + Math.random() * 6000 * levelFactor);
-        gameState.load.x = 200 + Math.random() * 200;
+        gameState.load.x = 280 + Math.random() * 120;
         gameState.load.y = 420;
         gameState.load.isLifted = false;
         gameState.load.targetX = 600 + Math.random() * 150;
@@ -272,9 +272,9 @@ const CraneGame = (function() {
         gameState.dangerZone.centerX = gameState.load.x;
         gameState.dangerZone.centerY = 400;
 
-        gameState.crane.armAngle = -30;
-        gameState.crane.trolleyPosition = 0.3;
-        gameState.crane.hookHeight = 0.9;
+        gameState.crane.armAngle = -45;
+        gameState.crane.trolleyPosition = 0.5;
+        gameState.crane.hookHeight = 0.95;
         gameState.crane.rotationSpeed = 0;
         gameState.crane.trolleySpeed = 0;
         gameState.crane.liftSpeed = 0;
@@ -324,10 +324,13 @@ const CraneGame = (function() {
         const crane = gameState.crane;
         const load = gameState.load;
 
-        const armLength = 250 * crane.trolleyPosition;
         const armRad = (crane.armAngle * Math.PI) / 180;
-        const hookX = crane.x + Math.sin(armRad) * armLength;
-        const hookY = crane.y - 50 - (1 - crane.hookHeight) * 200;
+        const trolleyDist = 250 * crane.trolleyPosition;
+        const trolleyX = crane.x + Math.sin(armRad) * trolleyDist;
+        const trolleyY = (crane.y - 100) + Math.cos(armRad) * trolleyDist;
+        const cableLength = (1 - crane.hookHeight) * 200;
+        const hookX = trolleyX;
+        const hookY = trolleyY + cableLength;
 
         if (load.isLifted) {
             load.x = hookX;
@@ -340,7 +343,7 @@ const CraneGame = (function() {
             }
         } else if (crane.liftSpeed < 0) {
             const dist = Math.sqrt((hookX - load.x) ** 2 + (hookY - load.y) ** 2);
-            if (dist < 40 && crane.hookHeight > 0.6) {
+            if (dist < 60) {
                 load.isLifted = true;
                 gameState.dangerZone.centerX = load.x;
                 addLog('吊物已挂接，开始起吊', 'info');
@@ -439,7 +442,7 @@ const CraneGame = (function() {
             (load.y - load.targetY) ** 2
         );
 
-        if (distToTarget < 30 && load.y > 400 && gameState.crane.liftSpeed >= 0) {
+        if (distToTarget < 30 && load.y > 400 && gameState.crane.liftSpeed <= 0) {
             load.isLifted = false;
             const roundTime = (Date.now() - gameState.roundStartTime) / 1000;
             const timeBonus = Math.max(0, Math.floor(50 - roundTime * 2));
@@ -477,11 +480,11 @@ const CraneGame = (function() {
 
         switch (cmd) {
             case 'lift_up':
-                crane.liftSpeed = -0.015;
+                crane.liftSpeed = 0.015;
                 addLog('指挥：起升', 'info');
                 break;
             case 'lower':
-                crane.liftSpeed = 0.015;
+                crane.liftSpeed = -0.015;
                 addLog('指挥：下落', 'info');
                 break;
             case 'swing_left':
@@ -737,8 +740,6 @@ const CraneGame = (function() {
 
         const armLength = 250;
         const armRad = (armAngle * Math.PI) / 180;
-        const armEndX = x + Math.sin(armRad) * armLength;
-        const armEndY = y - 100 - Math.cos(armRad) * 30;
 
         ctx.fillStyle = '#F39C12';
         ctx.save();
@@ -746,24 +747,27 @@ const CraneGame = (function() {
         ctx.rotate(armRad);
         ctx.fillRect(-10, 0, 20, armLength);
         
-        const trolleyX = 0 + armLength * trolleyPos;
+        const trolleyLocalX = armLength * trolleyPos;
         ctx.fillStyle = '#E74C3C';
-        ctx.fillRect(trolleyX - 15, -8, 30, 16);
-        
+        ctx.fillRect(trolleyLocalX - 15, -8, 30, 16);
+        ctx.restore();
+
+        const trolleyDist = armLength * trolleyPos;
+        const trolleyWorldX = x + Math.sin(armRad) * trolleyDist;
+        const trolleyWorldY = (y - 100) + Math.cos(armRad) * trolleyDist;
         const cableLength = (1 - crane.hookHeight) * 200;
+        
         ctx.strokeStyle = '#333';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.moveTo(trolleyX, 8);
-        ctx.lineTo(trolleyX, 8 + cableLength);
+        ctx.moveTo(trolleyWorldX, trolleyWorldY);
+        ctx.lineTo(trolleyWorldX, trolleyWorldY + cableLength);
         ctx.stroke();
 
         ctx.fillStyle = '#333';
         ctx.beginPath();
-        ctx.arc(trolleyX, 8 + cableLength + 10, 8, 0, Math.PI * 2);
+        ctx.arc(trolleyWorldX, trolleyWorldY + cableLength + 10, 8, 0, Math.PI * 2);
         ctx.fill();
-        
-        ctx.restore();
 
         ctx.fillStyle = '#3498DB';
         ctx.beginPath();
@@ -984,18 +988,22 @@ const CraneGame = (function() {
         replayCtx.rotate(armRad);
         replayCtx.fillRect(-8, 0, 16, armLength);
 
-        const trolleyX = armLength * crane.trolleyPosition;
+        const trolleyLocalX = armLength * crane.trolleyPosition;
         replayCtx.fillStyle = '#E74C3C';
-        replayCtx.fillRect(trolleyX - 12, -6, 24, 12);
+        replayCtx.fillRect(trolleyLocalX - 12, -6, 24, 12);
+        replayCtx.restore();
 
+        const trolleyDist = armLength * crane.trolleyPosition;
+        const trolleyWorldX = x + Math.sin(armRad) * trolleyDist;
+        const trolleyWorldY = (y - 70) + Math.cos(armRad) * trolleyDist;
         const cableLength = (1 - crane.hookHeight) * 160;
+        
         replayCtx.strokeStyle = '#333';
         replayCtx.lineWidth = 2;
         replayCtx.beginPath();
-        replayCtx.moveTo(trolleyX, 6);
-        replayCtx.lineTo(trolleyX, 6 + cableLength);
+        replayCtx.moveTo(trolleyWorldX, trolleyWorldY);
+        replayCtx.lineTo(trolleyWorldX, trolleyWorldY + cableLength);
         replayCtx.stroke();
-        replayCtx.restore();
 
         const load = frame.load;
         replayCtx.fillStyle = load.isLifted ? '#E74C3C' : '#95A5A6';
