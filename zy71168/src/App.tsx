@@ -9,7 +9,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<StartPage />} />
         <Route path="/game/:levelId" element={<GamePage />} />
-        <Route path="/result" element={<ResultPage />} />
+        <Route path="/result/:levelId" element={<ResultPage />} />
       </Routes>
     </Router>
   );
