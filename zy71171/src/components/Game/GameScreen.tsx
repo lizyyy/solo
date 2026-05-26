@@ -6,7 +6,7 @@ import TruckGrid from "@/components/Game/TruckGrid";
 import CargoPallet from "@/components/Game/CargoPallet";
 import ResultModal from "@/components/Game/ResultModal";
 import { useGameStore } from "@/store/useGameStore";
-import { checkPlacement, finalize, PENALTIES } from "@/rules/engine";
+import { checkPlacement, checkTempRise, finalize, PENALTIES } from "@/rules/engine";
 import { ZONE_META, type Zone } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -56,7 +56,7 @@ export default function GameScreen() {
 
   const handleSubmit = (timeout = false) => {
     if (!level) return;
-    const result = finalize(level, placed, violations, timeLeft, timeout, Date.now());
+    const result = finalize(level, placed, violations, timeLeft, timeout, Date.now(), doorOpen, elapsedSec);
     submit(result.won, result.reason, result.score, result.violations, {
       baseScore: result.baseScore,
       timeBonus: result.timeBonus,
@@ -111,13 +111,27 @@ export default function GameScreen() {
   useEffect(() => {
     if (status !== "playing" || !level || !doorOpen) return;
     if (elapsedSec > 0 && elapsedSec % 30 === 0) {
-      const hasSensitive = placed.some((p) => {
-        const c = level.cargos.find((x) => x.id === p.cargoId);
-        return c && (c.zone === "frozen" || c.zone === "chilled");
+      const tempV = checkTempRise(level, placed, elapsedSec, doorOpen, Date.now());
+      const existingCargoIds = new Set(violations.filter((v) => v.type === "temp_rise").map((v) => v.cargoId));
+      let addedCount = 0;
+      tempV.forEach((v) => {
+        if (v.cargoId && !existingCargoIds.has(v.cargoId)) {
+          addViolation(v);
+          existingCargoIds.add(v.cargoId);
+          addedCount++;
+        }
       });
-      if (hasSensitive) showNotice("车门持续开启，敏感货物有升温风险");
+      if (addedCount > 0) {
+        showNotice(`升温判损 ${addedCount} 件，请尽快关门或提交`);
+      } else if (tempV.length === 0) {
+        const hasSensitive = placed.some((p) => {
+          const c = level.cargos.find((x) => x.id === p.cargoId);
+          return c && (c.zone === "frozen" || c.zone === "chilled");
+        });
+        if (hasSensitive) showNotice("车门持续开启，敏感货物有升温风险");
+      }
     }
-  }, [elapsedSec, status, level, doorOpen, placed]);
+  }, [elapsedSec, status, level, doorOpen, placed, violations, addViolation]);
 
   if (!level) {
     return (

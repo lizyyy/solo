@@ -212,10 +212,13 @@ export function finalize(
   runtimeViolations: Violation[],
   timeLeftSec: number,
   timedOut: boolean,
-  nowMs: number
+  nowMs: number,
+  doorOpen: boolean,
+  elapsedSec: number
 ): FinalResult {
   const unloadV = checkUnloadBlocked(level, placed, nowMs);
-  const allV = [...runtimeViolations, ...unloadV];
+  const tempV = checkTempRise(level, placed, elapsedSec, doorOpen, nowMs);
+  const allV = [...runtimeViolations, ...unloadV, ...tempV];
   const placedCount = placed.length;
   const totalCount = level.cargos.length;
   const baseScore = placedCount === totalCount ? 100 : Math.round((placedCount / totalCount) * 80);
@@ -247,7 +250,8 @@ export function finalize(
     };
   }
 
-  const criticalCount = allV.filter((v) => v.type === "unload_blocked" || v.type === "zone_mismatch").length;
+  const criticalTypes: Violation["type"][] = ["unload_blocked", "zone_mismatch", "temp_rise"];
+  const criticalCount = allV.filter((v) => criticalTypes.includes(v.type)).length;
   if (criticalCount >= MAX_VIOLATIONS_TO_FAIL) {
     return {
       won: false,
@@ -258,6 +262,24 @@ export function finalize(
       timeBonus,
       penaltyTotal,
     };
+  }
+
+  if (tempV.length > 0) {
+    const frozenDamaged = tempV.filter((v) => {
+      const c = getCargoById(level, v.cargoId ?? "");
+      return c?.zone === "frozen";
+    }).length;
+    if (frozenDamaged >= 2) {
+      return {
+        won: false,
+        reason: `冻品升温判损 ${frozenDamaged} 件，判定失败`,
+        violations: allV,
+        score,
+        baseScore,
+        timeBonus,
+        penaltyTotal,
+      };
+    }
   }
 
   return { won: true, violations: allV, score, baseScore, timeBonus, penaltyTotal };
