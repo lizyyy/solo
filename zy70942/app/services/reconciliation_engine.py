@@ -68,6 +68,7 @@ class ReconciliationEngine:
         result.duplicate_source = duplicate_check['source']
 
         penalty_details = []
+        all_penalties = []
         total_delay_penalty = 0
         total_damage_penalty = 0
         total_transfer_penalty = 0
@@ -77,21 +78,21 @@ class ReconciliationEngine:
             for penalty in delay_penalties:
                 total_delay_penalty += penalty['amount']
                 penalty_details.append(penalty)
-                self._create_penalty_history(result, penalty)
+                all_penalties.append(penalty)
 
         if result.is_damaged:
             damage_penalties = self._calculate_damage_penalty(waybill, damage_result)
             for penalty in damage_penalties:
                 total_damage_penalty += penalty['amount']
                 penalty_details.append(penalty)
-                self._create_penalty_history(result, penalty)
+                all_penalties.append(penalty)
 
         if result.is_transfer_issue:
             transfer_penalties = self._calculate_transfer_penalty(waybill, transfer_result)
             for penalty in transfer_penalties:
                 total_transfer_penalty += penalty['amount']
                 penalty_details.append(penalty)
-                self._create_penalty_history(result, penalty)
+                all_penalties.append(penalty)
 
         result.delay_penalty = total_delay_penalty
         result.damage_penalty = total_damage_penalty
@@ -115,6 +116,11 @@ class ReconciliationEngine:
             result = existing
         else:
             self.db.add(result)
+
+        self.db.flush()
+
+        for penalty in all_penalties:
+            self._create_penalty_history(result, penalty)
 
         self.db.flush()
         return result
@@ -545,6 +551,7 @@ class ReconciliationEngine:
         }
 
         return {
+            'batch_id': batch_id,
             'total_waybills': len(waybills),
             'processed_count': len(results),
             'pending_count': len(waybills) - len(results),
