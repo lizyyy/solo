@@ -377,8 +377,37 @@ export async function performReconciliation(
   for (const sample of samples) {
     const result = await matchSampleWithInspection(sample, allItems, context);
     allDiscrepancies.push(...result.discrepancies);
+  }
 
-    if (result.discrepancies.length === 0) {
+  const preservedDiscrepancies: Discrepancy[] = [];
+  for (const d of allDiscrepancies) {
+    const key = `${d.sample_no}:${d.type}:${d.source_field || ''}`;
+    if (resolvedKeySet.has(key)) {
+      const existing = existingResolved.find(
+        ed => ed.sample_no === d.sample_no && ed.type === d.type && ed.source_field === d.source_field
+      );
+      if (existing) {
+        preservedDiscrepancies.push({ ...d, ...existing, id: existing.id });
+        continue;
+      }
+    }
+    preservedDiscrepancies.push(d);
+  }
+
+  const sampleUnresolvedDiscrepancies = new Map<string, Discrepancy[]>();
+  for (const d of preservedDiscrepancies) {
+    if (!d.resolved) {
+      if (!sampleUnresolvedDiscrepancies.has(d.sample_no)) {
+        sampleUnresolvedDiscrepancies.set(d.sample_no, []);
+      }
+      sampleUnresolvedDiscrepancies.get(d.sample_no)!.push(d);
+    }
+  }
+
+  for (const sample of samples) {
+    const unresolved = sampleUnresolvedDiscrepancies.get(sample.sample_no) || [];
+    
+    if (unresolved.length === 0) {
       matchedCount++;
       await runQuery(
         `UPDATE sample_records SET status = 'matched', updated_at = ? WHERE id = ?`,
@@ -391,21 +420,6 @@ export async function performReconciliation(
         [new Date().toISOString(), sample.id]
       );
     }
-  }
-
-  const preservedDiscrepancies: Discrepancy[] = [];
-  for (const d of allDiscrepancies) {
-    const key = `${d.sample_no}:${d.type}:${d.source_field || ''}`;
-    if (resolvedKeySet.has(key)) {
-      const existing = existingResolved.find(
-        ed => ed.sample_no === d.sample_no && ed.type === d.type && ed.source_field === d.source_field
-      );
-      if (existing) {
-        preservedDiscrepancies.push(existing);
-        continue;
-      }
-    }
-    preservedDiscrepancies.push(d);
   }
 
   for (const d of preservedDiscrepancies) {
