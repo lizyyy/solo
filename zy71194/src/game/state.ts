@@ -188,11 +188,14 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
     }
 
     if (failReason) {
+      const finalScore = get().calculateFinalScore();
       set({
         status: 'settlement',
         isWin: false,
         failReason,
+        score: finalScore,
       });
+      get().saveReplayData();
     } else {
       const finalScore = get().calculateFinalScore();
       set({
@@ -371,11 +374,14 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
 
     if (newHealth <= 0) {
       setTimeout(() => {
+        const finalScore = get().calculateFinalScore();
         set({
           status: 'settlement',
           isWin: false,
           failReason: '队伍生命值归零',
+          score: finalScore,
         });
+        get().saveReplayData();
       }, 100);
     }
   },
@@ -454,11 +460,14 @@ export const useGameStore = create<GameState & GameActions>((set, get) => ({
     const newTurn = state.turn + 1;
 
     if (newTurn > state.maxTurns) {
+      const finalScore = get().calculateFinalScore();
       set({
         status: 'settlement',
         isWin: false,
         failReason: '超时未到达终点',
+        score: finalScore,
       });
+      get().saveReplayData();
       return;
     }
 
