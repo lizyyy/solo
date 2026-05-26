@@ -153,10 +153,12 @@ def validate_and_classify(data, source_file, source_row):
         _add_error(errors, suuid, None, "invalid_date", f"日期解析失败: {e}",
                    _source_loc(source_file, source_row))
 
+    amount_conflicts = []
     try:
         amt = float(data.get("deposit_amount") or 0)
         deduct = float(data.get("violation_deduction") or 0)
         if deduct > amt:
+            amount_conflicts.append("违规扣款金额超过押金本金")
             _add_error(errors, suuid, "violation_deduction", "amount_conflict",
                        "违规扣款金额超过押金本金",
                        _source_loc(source_file, source_row, "violation_deduction"))
@@ -167,6 +169,8 @@ def validate_and_classify(data, source_file, source_row):
     blocked_reasons = []
     if time_conflicts:
         blocked_reasons.extend(time_conflicts)
+    if amount_conflicts:
+        blocked_reasons.extend(amount_conflicts)
 
     # Normal: no missing, no time_conflict, no duplicate (duplicate checked outside)
     if missing:
