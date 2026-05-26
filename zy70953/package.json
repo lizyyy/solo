@@ -1,0 +1,19 @@
+{
+  "name": "exhibit-import-api",
+  "version": "0.1.0",
+  "description": "博物馆展陈部文物借展导入与留痕 API",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "seed": "node examples/seed.js",
+    "demo": "node examples/demo.js"
+  },
+  "dependencies": {
+    "@fastify/multipart": "^7.7.3",
+    "better-sqlite3": "^11.3.0",
+    "csv-parse": "^5.5.6",
+    "fastify": "^4.28.1"
+  }
+}
