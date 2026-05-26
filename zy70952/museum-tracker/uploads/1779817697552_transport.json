@@ -1,0 +1,52 @@
+{
+  "batchNo": "BATCH-2026-001",
+  "transports": [
+    {
+      "transportNo": "TR-2026-0527-001",
+      "carrier": "故宫物流",
+      "departureTime": "2026-05-20T08:00:00",
+      "arrivalTime": "2026-05-22T16:00:00",
+      "status": "已到达",
+      "boxes": [
+        {
+          "boxNo": "BOX-A01",
+          "artifactNo": "WH-001",
+          "temperature": 22.5,
+          "humidity": 55,
+          "tempAnomaly": false,
+          "humidityAnomaly": false,
+          "anomalyDetail": ""
+        },
+        {
+          "boxNo": "BOX-A02",
+          "artifactNo": "WH-003",
+          "temperature": 23.0,
+          "humidity": 58,
+          "tempAnomaly": false,
+          "humidityAnomaly": false,
+          "anomalyDetail": ""
+        }
+      ]
+    },
+    {
+      "transportNo": "TR-2026-0527-002",
+      "carrier": "中博物流",
+      "departureTime": "2026-05-15T10:00:00",
+      "arrivalTime": "2026-05-18T14:00:00",
+      "status": "已到达",
+      "delayReason": "途经地区暴雨，道路中断",
+      "delayDurationHours": 24,
+      "boxes": [
+        {
+          "boxNo": "BOX-B01",
+          "artifactNo": "WH-006",
+          "temperature": 21.0,
+          "humidity": 62,
+          "tempAnomaly": false,
+          "humidityAnomaly": true,
+          "anomalyDetail": "运输途中湿度偏高，已采取除湿措施"
+        }
+      ]
+    }
+  ]
+}
