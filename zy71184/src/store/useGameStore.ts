@@ -72,6 +72,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { simulator, state, history } = get();
     if (!simulator || state.isGameOver || state.isPaused || state.isReplayMode) return;
 
+    simulator.state = state;
     state.turn++;
     const { events, scoreDelta } = simulator.simulateTurn();
     state.score += scoreDelta;
@@ -85,55 +86,62 @@ export const useGameStore = create<GameStore>((set, get) => ({
     };
 
     set({
-      state: { ...state },
+      state,
       history: [...history, newRecord],
     });
   },
 
   togglePause: () => {
-    set(prev => ({
-      state: { ...prev.state, isPaused: !prev.state.isPaused },
-    }));
+    const { state, simulator } = get();
+    state.isPaused = !state.isPaused;
+    if (simulator) simulator.state = state;
+    set({ state });
   },
 
   setSpeed: (speed: 1 | 2 | 4) => {
-    set(prev => ({
-      state: { ...prev.state, speed },
-    }));
+    const { state, simulator } = get();
+    state.speed = speed;
+    if (simulator) simulator.state = state;
+    set({ state });
   },
 
   selectCell: (x: number, y: number) => {
-    set(prev => ({
-      state: { ...prev.state, selectedCell: { x, y } },
-    }));
+    const { state, simulator } = get();
+    state.selectedCell = { x, y };
+    if (simulator) simulator.state = state;
+    set({ state });
   },
 
   clearDrain: (drainId: string) => {
-    const { simulator } = get();
+    const { simulator, state } = get();
     if (!simulator) return;
+    simulator.state = state;
     simulator.clearDrainBlockage(drainId);
-    set(prev => ({ state: { ...prev.state } }));
+    set({ state });
   },
 
   adjustPumpPower: (pumpId: string, power: number) => {
-    const { simulator } = get();
+    const { simulator, state } = get();
     if (!simulator) return;
+    simulator.state = state;
     simulator.adjustPumpPower(pumpId, power);
-    set(prev => ({ state: { ...prev.state } }));
+    set({ state });
   },
 
   setLowlandWarningThreshold: (lowlandId: string, threshold: number) => {
-    const { simulator } = get();
+    const { simulator, state } = get();
     if (!simulator) return;
+    simulator.state = state;
     simulator.setLowlandWarningThreshold(lowlandId, threshold);
-    set(prev => ({ state: { ...prev.state } }));
+    set({ state });
   },
 
   activateTemporaryDrain: (lowlandId: string) => {
-    const { simulator } = get();
+    const { simulator, state } = get();
     if (!simulator) return;
+    simulator.state = state;
     simulator.activateTemporaryDrain(lowlandId);
-    set(prev => ({ state: { ...prev.state } }));
+    set({ state });
   },
 
   setReplayMode: (enabled: boolean) => {

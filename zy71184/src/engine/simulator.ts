@@ -2,7 +2,7 @@ import { CONFIG } from './config';
 import type { Drain, GameState, Lowland, Pump, ScoreBreakdown } from './types';
 
 export class DrainageSimulator {
-  private state: GameState;
+  state: GameState;
 
   constructor(state: GameState) {
     this.state = state;
