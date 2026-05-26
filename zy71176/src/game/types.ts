@@ -27,6 +27,7 @@ export interface Guest {
   actualArrivalTime?: number;
   status: GuestStatus;
   satisfaction: number;
+  willExtend: boolean;
   hasExtendRequest: boolean;
   extendNights?: number;
   specialRequest?: string;

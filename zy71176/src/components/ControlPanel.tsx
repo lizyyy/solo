@@ -1,9 +1,14 @@
 import { useGameStore } from '../game/state';
-import { pauseGame, resumeGame, restartGame, returnToMenu } from '../game/engine';
-import { Play, Pause, RotateCcw, Home } from 'lucide-react';
+import { pauseGame, resumeGame, restartGame, returnToMenu, markMaintenance, resolveMaintenance } from '../game/engine';
+import { Play, Pause, RotateCcw, Home, Wrench, CheckCircle } from 'lucide-react';
 
 export function ControlPanel() {
   const status = useGameStore((state) => state.status);
+  const rooms = useGameStore((state) => state.rooms);
+  const selectedRoomId = useGameStore((state) => state.selectedRoomId);
+  const setSelectedRoom = useGameStore((state) => state.setSelectedRoom);
+
+  const selectedRoom = rooms.find((r) => r.id === selectedRoomId);
 
   const handlePauseResume = () => {
     if (status === 'playing') {
@@ -26,6 +31,20 @@ export function ControlPanel() {
       }
     }
     returnToMenu();
+  };
+
+  const handleMarkMaintenance = () => {
+    if (selectedRoomId !== null && selectedRoom && selectedRoom.status !== 'occupied') {
+      markMaintenance(selectedRoomId);
+      setSelectedRoom(null);
+    }
+  };
+
+  const handleResolveMaintenance = () => {
+    if (selectedRoomId !== null) {
+      resolveMaintenance(selectedRoomId);
+      setSelectedRoom(null);
+    }
   };
 
   return (
@@ -83,6 +102,46 @@ export function ControlPanel() {
         </button>
       </div>
 
+      <div className="mt-4 p-3 bg-orange-900/20 border border-orange-700/30 rounded-lg">
+        <div className="text-xs text-orange-400 mb-2 font-medium">🔧 房间维修管理</div>
+        {selectedRoom ? (
+          <div className="space-y-2">
+            <div className="text-xs text-gray-300">
+              已选中房间: <span className="font-bold text-white">{selectedRoom.number}</span>
+              <span className="ml-2 text-gray-400">({selectedRoom.status === 'empty' ? '空房' : selectedRoom.status === 'dirty' ? '脏房' : selectedRoom.status === 'maintenance' ? '维修中' : '已入住'})</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={handleMarkMaintenance}
+                disabled={status !== 'playing' || selectedRoom.status === 'occupied' || selectedRoom.status === 'maintenance'}
+                className={`
+                  flex items-center justify-center gap-1 py-2 px-3 rounded text-xs font-medium transition-colors
+                  ${status === 'playing' && selectedRoom.status !== 'occupied' && selectedRoom.status !== 'maintenance'
+                    ? 'bg-orange-600 hover:bg-orange-500 text-white'
+                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'}
+                `}
+              >
+                <Wrench className="w-3 h-3" /> 标记维修
+              </button>
+              <button
+                onClick={handleResolveMaintenance}
+                disabled={status !== 'playing' || selectedRoom.status !== 'maintenance'}
+                className={`
+                  flex items-center justify-center gap-1 py-2 px-3 rounded text-xs font-medium transition-colors
+                  ${status === 'playing' && selectedRoom.status === 'maintenance'
+                    ? 'bg-green-600 hover:bg-green-500 text-white'
+                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'}
+                `}
+              >
+                <CheckCircle className="w-3 h-3" /> 完成维修
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-xs text-gray-400">点击房间选中后可进行维修操作</div>
+        )}
+      </div>
+
       <div className="mt-4 p-3 bg-gray-700/30 rounded-lg">
         <div className="text-xs text-gray-400 mb-2">操作提示</div>
         <ul className="text-xs text-gray-300 space-y-1">
@@ -90,6 +149,7 @@ export function ControlPanel() {
           <li>• 点击空房为选中的客人分配房间</li>
           <li>• 点击脏房自动派遣保洁</li>
           <li>• 及时处理续住申请避免客诉</li>
+          <li>• 选中房间后可标记/解除维修状态</li>
         </ul>
       </div>
     </div>

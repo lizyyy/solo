@@ -87,7 +87,8 @@ function generateInitialGuests(level: LevelConfig): Guest[] {
     departureTime: preset.arrivalTime + preset.stayDuration,
     status: 'waiting' as const,
     satisfaction: 100,
-    hasExtendRequest: preset.willExtend || false,
+    willExtend: preset.willExtend || false,
+    hasExtendRequest: false,
     extendNights: preset.extendNights,
     specialRequest: preset.specialRequest,
   }));
@@ -251,8 +252,8 @@ function processExtendRequests(currentTime: number): void {
     .filter(
       (g: Guest) =>
         g.status === 'checked-in' &&
-        g.hasExtendRequest &&
-        !g.extendNights &&
+        g.willExtend &&
+        !g.hasExtendRequest &&
         g.departureTime - currentTime === 10
     )
     .forEach((guest: Guest) => {
@@ -320,6 +321,18 @@ export function assignRoom(guestId: string, roomId: number): void {
   const room = state.rooms.find((r: Room) => r.id === roomId);
 
   if (!guest || !room) return;
+
+  if (guest.arrivalTime > state.currentTime) {
+    const event: GameEvent = {
+      id: generateId(),
+      type: 'complaint',
+      time: state.currentTime,
+      data: { guestId, roomId, violation: '客人尚未到达' },
+      message: `${guest.name} 尚未到达，无法分配房间`,
+    };
+    useGameStore.getState().addEvent(event);
+    return;
+  }
 
   const check = canAssignRoom(room);
 

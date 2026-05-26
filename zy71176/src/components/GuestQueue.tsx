@@ -10,7 +10,8 @@ export function GuestQueue() {
   const setSelectedGuest = useGameStore((state) => state.setSelectedGuest);
   const status = useGameStore((state) => state.status);
 
-  const waitingGuests = guests.filter((g) => g.status === 'waiting');
+  const waitingGuests = guests.filter((g) => g.status === 'waiting' && g.arrivalTime <= currentTime);
+  const upcomingGuests = guests.filter((g) => g.status === 'waiting' && g.arrivalTime > currentTime);
   const checkedInGuests = guests.filter((g) => g.status === 'checked-in');
 
   const handleGuestClick = (guestId: string) => {
@@ -98,6 +99,34 @@ export function GuestQueue() {
           </div>
         )}
       </div>
+
+      {upcomingGuests.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Clock className="w-4 h-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-500">即将到达 ({upcomingGuests.length})</span>
+          </div>
+          <div className="space-y-2 max-h-32 overflow-y-auto">
+            {upcomingGuests.map((guest) => (
+              <div
+                key={guest.id}
+                className="p-3 rounded-lg bg-gray-700/30 border border-gray-600/50 opacity-60"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{guest.avatar}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-gray-400 truncate">{guest.name}</div>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <Clock className="w-3 h-3" />
+                      {formatTime(guest.arrivalTime)} 到达
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div>
         <div className="flex items-center gap-2 mb-3">
