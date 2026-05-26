@@ -17,6 +17,8 @@ export function calculateWaterFlow(board: Tile[][]): Tile[][] {
         visited[r][c] = true;
       } else if (tile?.type === 'canal') {
         (tile as CanalTile).hasWater = false;
+      } else if (tile?.type === 'valve') {
+        (tile as ValveTile).hasWater = false;
       }
     }
   }
@@ -70,6 +72,9 @@ export function calculateWaterFlow(board: Tile[][]): Tile[][] {
       } else if (nextTile.type === 'valve') {
         const valve = nextTile as ValveTile;
         canFlow = valve.connections.includes(oppositeDir);
+        if (canFlow && valve.state === 'open') {
+          valve.hasWater = true;
+        }
       } else if (nextTile.type === 'plot') {
         canFlow = true;
       }
@@ -102,7 +107,19 @@ export function getIrrigatedPlots(board: Tile[][]): PlotTile[] {
           const nc = c + dc;
           if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
             const neighbor = board[nr][nc];
-            if (neighbor?.type === 'canal' && (neighbor as CanalTile).hasWater) {
+            if (!neighbor) continue;
+            
+            let hasIrrigatingNeighbor = false;
+            if (neighbor.type === 'canal' && (neighbor as CanalTile).hasWater) {
+              hasIrrigatingNeighbor = true;
+            } else if (neighbor.type === 'valve') {
+              const valve = neighbor as ValveTile;
+              if (valve.state === 'open' && valve.hasWater) {
+                hasIrrigatingNeighbor = true;
+              }
+            }
+            
+            if (hasIrrigatingNeighbor) {
               irrigatedPlots.push(tile as PlotTile);
               break;
             }
@@ -182,8 +199,15 @@ function checkNearWateredCanal(board: Tile[][], r: number, c: number): boolean {
     const nc = c + dc;
     if (nr >= 0 && nr < board.length && nc >= 0 && nc < board[0].length) {
       const neighbor = board[nr][nc];
-      if (neighbor?.type === 'canal' && (neighbor as CanalTile).hasWater) {
+      if (!neighbor) continue;
+      
+      if (neighbor.type === 'canal' && (neighbor as CanalTile).hasWater) {
         return true;
+      } else if (neighbor.type === 'valve') {
+        const valve = neighbor as ValveTile;
+        if (valve.state === 'open' && valve.hasWater) {
+          return true;
+        }
       }
     }
   }

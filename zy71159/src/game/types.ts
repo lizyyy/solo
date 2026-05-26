@@ -29,6 +29,7 @@ export interface ValveTile {
   state: ValveState;
   direction: 'horizontal' | 'vertical';
   connections: Direction[];
+  hasWater: boolean;
 }
 
 export interface PlotTile {

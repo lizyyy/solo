@@ -81,6 +81,7 @@ function ValveTileComponent({
 }: { tile: ValveTile; cellSize: number; row: number; col: number }) {
   const { dispatch, state } = useGame();
   const isOpen = tile.state === 'open';
+  const hasWater = tile.hasWater;
   const isClickable = state.status === 'playing';
   const connections = tile.connections;
   
@@ -95,10 +96,24 @@ function ValveTileComponent({
     }
   };
 
-  const baseColor = isOpen ? 'bg-green-500' : 'bg-red-500';
-  const innerColor = isOpen ? 'bg-green-300' : 'bg-red-300';
-  const labelBg = isOpen ? 'bg-green-600' : 'bg-red-600';
-  const shadow = isOpen ? 'shadow-lg shadow-green-400/50' : 'shadow-lg shadow-red-400/50';
+  let baseColor = 'bg-red-500';
+  let innerColor = 'bg-red-300';
+  let labelBg = 'bg-red-600';
+  let shadow = 'shadow-lg shadow-red-400/50';
+  
+  if (isOpen) {
+    if (hasWater) {
+      baseColor = 'bg-blue-500';
+      innerColor = 'bg-blue-300';
+      labelBg = 'bg-blue-600';
+      shadow = 'shadow-lg shadow-blue-400/50';
+    } else {
+      baseColor = 'bg-green-500';
+      innerColor = 'bg-green-300';
+      labelBg = 'bg-green-600';
+      shadow = 'shadow-lg shadow-green-400/50';
+    }
+  }
 
   return (
     <div
@@ -110,7 +125,7 @@ function ValveTileComponent({
     >
       {hasLeft && (
         <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-3 rounded-l-full ${baseColor} ${shadow} transition-all duration-500`}>
-          {isOpen && (
+          {isOpen && hasWater && (
             <div className={`w-full h-full ${innerColor} rounded-l-full animate-pulse opacity-50`} />
           )}
         </div>
@@ -118,7 +133,7 @@ function ValveTileComponent({
       
       {hasRight && (
         <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-3 rounded-r-full ${baseColor} ${shadow} transition-all duration-500`}>
-          {isOpen && (
+          {isOpen && hasWater && (
             <div className={`w-full h-full ${innerColor} rounded-r-full animate-pulse opacity-50`} />
           )}
         </div>
@@ -126,7 +141,7 @@ function ValveTileComponent({
       
       {hasTop && (
         <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-3 h-1/2 rounded-t-full ${baseColor} ${shadow} transition-all duration-500`}>
-          {isOpen && (
+          {isOpen && hasWater && (
             <div className={`w-full h-full ${innerColor} rounded-t-full animate-pulse opacity-50`} />
           )}
         </div>
@@ -134,7 +149,7 @@ function ValveTileComponent({
       
       {hasBottom && (
         <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-1/2 rounded-b-full ${baseColor} ${shadow} transition-all duration-500`}>
-          {isOpen && (
+          {isOpen && hasWater && (
             <div className={`w-full h-full ${innerColor} rounded-b-full animate-pulse opacity-50`} />
           )}
         </div>

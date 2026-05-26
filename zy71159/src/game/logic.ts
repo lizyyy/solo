@@ -121,7 +121,8 @@ function parseTileConfig(config: string, row: number, col: number): Tile | null 
         state: 'closed',
         direction,
         connections,
-      } as ValveTile & { connections: Direction[] };
+        hasWater: false,
+      } as ValveTile;
     }
 
     case 'plot': {
