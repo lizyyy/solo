@@ -1,0 +1,44 @@
+[
+  {
+    "name": "承重墙违规拆除",
+    "type": "violation_recheck",
+    "condition": { "item": "wall_type", "value": "bearing", "check": "equals" },
+    "penalty": { "amount": 5000, "freezeDeposit": true, "description": "禁止拆除或改动承重墙，属于严重违规" },
+    "priority": 1
+  },
+  {
+    "name": "水电改造未报备",
+    "type": "violation_recheck",
+    "condition": { "item": "hasWaterElectricityReport", "value": false, "check": "equals" },
+    "penalty": { "amount": 2000, "freezeDeposit": true, "description": "水电改造需提前向物业报备" },
+    "priority": 2
+  },
+  {
+    "name": "擅自改动外立面",
+    "type": "violation_recheck",
+    "condition": { "item": "hasFacadeChange", "value": true, "check": "equals" },
+    "penalty": { "amount": 3000, "freezeDeposit": true, "description": "禁止改动建筑外立面，影响整体外观" },
+    "priority": 1
+  },
+  {
+    "name": "消防设施遮挡",
+    "type": "violation_recheck",
+    "condition": { "item": "fireFacilityBlocked", "value": true, "check": "equals" },
+    "penalty": { "amount": 8000, "freezeDeposit": true, "description": "严禁遮挡消防设施，存在安全隐患" },
+    "priority": 1
+  },
+  {
+    "name": "押金余额不足",
+    "type": "deposit_check",
+    "condition": { "item": "depositBalance", "value": 0, "check": "lte" },
+    "penalty": { "rejectRefund": true, "description": "押金余额不足，无法办理退款" },
+    "priority": 1
+  },
+  {
+    "name": "装修未通过验收",
+    "type": "deposit_check",
+    "condition": { "item": "acceptanceStatus", "value": "pending", "check": "equals" },
+    "penalty": { "rejectRefund": true, "freezeDeposit": true, "description": "装修尚未通过验收，押金暂时冻结" },
+    "priority": 1
+  }
+]

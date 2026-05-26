@@ -1,0 +1,70 @@
+[
+  {
+    "application_id": "APP-001",
+    "inspector": "李巡检",
+    "date": "2024-03-16",
+    "result": "passed",
+    "findings": [
+      { "item": "水电", "status": "normal", "description": "水电改造符合规范" },
+      { "item": "墙体", "status": "normal", "description": "无违规拆改" }
+    ],
+    "photos": [],
+    "remarks": "整体符合要求"
+  },
+  {
+    "application_id": "APP-002",
+    "inspector": "王巡检",
+    "date": "2024-04-02",
+    "result": "passed",
+    "findings": [
+      { "item": "整体验收", "status": "normal", "description": "装修合格" }
+    ],
+    "photos": [],
+    "remarks": "建议退款"
+  },
+  {
+    "application_id": "APP-003",
+    "inspector": "张巡检",
+    "date": "2024-04-11",
+    "result": "failed",
+    "findings": [
+      { "item": "水电报备", "status": "violation", "description": "水电改造未报备" }
+    ],
+    "photos": [],
+    "remarks": "需整改后复查"
+  },
+  {
+    "application_id": "APP-004",
+    "inspector": "刘巡检",
+    "date": "2024-03-21",
+    "result": "failed",
+    "findings": [
+      { "item": "外立面", "status": "violation", "description": "擅自改动外立面" }
+    ],
+    "photos": [],
+    "remarks": "严重违规"
+  },
+  {
+    "application_id": "APP-005",
+    "inspector": "陈巡检",
+    "date": "2024-05-02",
+    "result": "failed",
+    "findings": [
+      { "item": "承重墙", "status": "violation", "description": "拆除承重墙，严重违规" },
+      { "item": "消防设施", "status": "violation", "description": "遮挡消防设施" }
+    ],
+    "photos": [],
+    "remarks": "多项严重违规，需严肃处理"
+  },
+  {
+    "application_id": "APP-007",
+    "inspector": "李巡检",
+    "date": "2024-03-26",
+    "result": "passed",
+    "findings": [
+      { "item": "整体验收", "status": "normal", "description": "装修合格" }
+    ],
+    "photos": [],
+    "remarks": "建议退款"
+  }
+]

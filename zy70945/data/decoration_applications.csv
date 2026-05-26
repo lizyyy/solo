@@ -1,0 +1,9 @@
+application_id,owner_id,owner_name,address,area,start_date,end_date,deposit_amount,acceptance_status,has_water_electricity_report,has_facade_change,fire_facility_blocked,wall_type,remarks
+APP-001,O001,张三,1号楼1单元101,89.5,2024-01-15,2024-03-15,5000,approved,true,false,false,normal,正常装修已验收
+APP-002,O002,李四,1号楼2单元202,105,2024-02-01,2024-04-01,8000,approved,true,false,false,normal,验收通过可退款
+APP-003,O003,王五,2号楼1单元303,78,2024-02-10,2024-04-10,6000,pending,false,false,false,normal,水电未报备
+APP-004,O004,赵六,3号楼1单元404,120,2024-01-20,2024-03-20,10000,pending,true,true,false,normal,外立面改动
+APP-005,O005,钱七,5号楼2单元505,95,2024-03-01,2024-05-01,7000,rejected,true,false,true,bearing,承重墙违规
+APP-006,O006,孙八,6号楼1单元606,88,2024-02-15,2024-04-15,5500,approved,true,false,false,normal,消防设施遮挡
+APP-007,O007,周九,8号楼2单元707,110,2024-01-25,2024-03-25,9000,approved,true,false,false,normal,正常待退款
+APP-008,O008,吴十,9号楼1单元808,82,2024-03-10,2024-05-10,6500,pending,true,false,false,normal,资料齐全待验收
