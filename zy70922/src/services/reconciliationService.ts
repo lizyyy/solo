@@ -404,10 +404,31 @@ export async function performReconciliation(
     }
   }
 
+  const reviewedSamples = await getAll<{ sample_no: string; new_status: string }>(
+    `SELECT sample_no, MAX(new_status) as new_status FROM review_records 
+     WHERE reconciliation_id = ? GROUP BY sample_no`,
+    [reconciliationId]
+  );
+  const reviewedStatusMap = new Map<string, string>();
+  for (const r of reviewedSamples) {
+    reviewedStatusMap.set(r.sample_no, r.new_status);
+  }
+
   for (const sample of samples) {
+    const reviewedStatus = reviewedStatusMap.get(sample.sample_no);
     const unresolved = sampleUnresolvedDiscrepancies.get(sample.sample_no) || [];
     
-    if (unresolved.length === 0) {
+    if (reviewedStatus && (reviewedStatus === 'approved' || reviewedStatus === 'supplement' || reviewedStatus === 'rejected')) {
+      if (reviewedStatus === 'approved') {
+        matchedCount++;
+      } else {
+        mismatchedCount++;
+      }
+      await runQuery(
+        `UPDATE sample_records SET status = ?, updated_at = ? WHERE id = ?`,
+        [reviewedStatus, new Date().toISOString(), sample.id]
+      );
+    } else if (unresolved.length === 0) {
       matchedCount++;
       await runQuery(
         `UPDATE sample_records SET status = 'matched', updated_at = ? WHERE id = ?`,
