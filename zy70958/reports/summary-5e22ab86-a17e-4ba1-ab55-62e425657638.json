@@ -1,0 +1,417 @@
+{
+  "batchId": "5e22ab86-a17e-4ba1-ab55-62e425657638",
+  "generatedAt": "2026-05-26T22:46:26.852Z",
+  "summary": {
+    "totalRepairs": 8,
+    "totalWorkers": 5,
+    "totalRatings": 8,
+    "matchedRepairs": 6,
+    "unmatchedRepairs": 2,
+    "discrepancies": 16,
+    "discrepanciesByType": {
+      "duplicate_repair": 1,
+      "timeout_penalty": 0,
+      "malicious_rating": 1,
+      "mismatch": 14,
+      "missing_data": 0
+    },
+    "pendingReviews": 13,
+    "completedReviews": 3,
+    "averageScore": 52.5,
+    "totalScoreDeductions": 0
+  },
+  "discrepancies": [
+    {
+      "type": "duplicate_repair",
+      "severity": "medium",
+      "repairNo": "BX20240101002",
+      "description": "疑似重复报修：与报修单 BX20240101001 在 1 小时内提交，内容相似",
+      "evidence": [
+        "原始报修: BX20240101001 (2024-01-01T09:00:00)",
+        "重复报修: BX20240101002 (2024-01-01T10:00:00)",
+        "时间差: 1 小时",
+        "地点: 宿舍楼1号楼101",
+        "类别: 家电维修"
+      ],
+      "relatedRecordIds": [
+        "5bfe2bc4-b0cf-4ace-9b0f-010bb1188bcf",
+        "12658514-ee94-4519-a2ee-61d6bccc1413"
+      ],
+      "autoDetected": true,
+      "id": "8fbc01af-e063-4c59-8f22-6caa10fe078e",
+      "detectedAt": "2026-05-26T22:46:26.849Z"
+    },
+    {
+      "type": "malicious_rating",
+      "severity": "high",
+      "repairNo": "BX20240107001",
+      "workerId": "W005",
+      "ratingId": "ea37b396-fb5f-47da-a637-e15dac98c516",
+      "description": "疑似恶意评分：该报修单有 3 条低分评价（≤30分）",
+      "evidence": [
+        "评分: 5/100, 评分人: 2021006, 时间: 2024-01-09T12:08:00, 原因: 非常不满意",
+        "评分: 10/100, 评分人: 2021006, 时间: 2024-01-09T12:05:00, 原因: 技术太差",
+        "评分: 15/100, 评分人: 2021006, 时间: 2024-01-09T12:00:00, 原因: 修了两天才好，耽误事"
+      ],
+      "relatedRecordIds": [
+        "ea37b396-fb5f-47da-a637-e15dac98c516",
+        "57479046-cfe8-468b-aabe-a75212673ff7",
+        "daf91aaf-7320-45a2-9fa3-2625e2e705ea"
+      ],
+      "autoDetected": true,
+      "id": "9cd90569-4d48-4c4c-8a72-da3838eb1ffd",
+      "detectedAt": "2026-05-26T22:46:26.849Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "low",
+      "ratingId": "526a9b27-bcdd-42bb-82d9-7ae63980b267",
+      "workerId": "W001",
+      "repairNo": "BX20240101001",
+      "description": "评分记录中的维修工ID W001 在维修工数据中不存在",
+      "evidence": [
+        "评分记录: 526a9b27-bcdd-42bb-82d9-7ae63980b267",
+        "维修工ID: W001",
+        "报修单号: BX20240101001"
+      ],
+      "relatedRecordIds": [
+        "526a9b27-bcdd-42bb-82d9-7ae63980b267"
+      ],
+      "autoDetected": true,
+      "id": "029a8a9f-57e2-4bd1-bddd-f9a457e08443",
+      "detectedAt": "2026-05-26T22:46:26.849Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "low",
+      "ratingId": "0d40aadc-c527-442c-93da-546fef3d788d",
+      "workerId": "W002",
+      "repairNo": "BX20240102001",
+      "description": "评分记录中的维修工ID W002 在维修工数据中不存在",
+      "evidence": [
+        "评分记录: 0d40aadc-c527-442c-93da-546fef3d788d",
+        "维修工ID: W002",
+        "报修单号: BX20240102001"
+      ],
+      "relatedRecordIds": [
+        "0d40aadc-c527-442c-93da-546fef3d788d"
+      ],
+      "autoDetected": true,
+      "id": "122a550c-8db1-4c2d-aec3-a99be6fc4421",
+      "detectedAt": "2026-05-26T22:46:26.849Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "low",
+      "ratingId": "6a045b26-875b-46f7-862f-4c09f7b63cb0",
+      "workerId": "W002",
+      "repairNo": "BX20240103001",
+      "description": "评分记录中的维修工ID W002 在维修工数据中不存在",
+      "evidence": [
+        "评分记录: 6a045b26-875b-46f7-862f-4c09f7b63cb0",
+        "维修工ID: W002",
+        "报修单号: BX20240103001"
+      ],
+      "relatedRecordIds": [
+        "6a045b26-875b-46f7-862f-4c09f7b63cb0"
+      ],
+      "autoDetected": true,
+      "id": "72da22bf-1598-4ffa-ab2d-60a95d578883",
+      "detectedAt": "2026-05-26T22:46:26.849Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "low",
+      "ratingId": "11359c01-352a-4e8a-ba2e-9fd6266eca06",
+      "workerId": "W003",
+      "repairNo": "BX20240104001",
+      "description": "评分记录中的维修工ID W003 在维修工数据中不存在",
+      "evidence": [
+        "评分记录: 11359c01-352a-4e8a-ba2e-9fd6266eca06",
+        "维修工ID: W003",
+        "报修单号: BX20240104001"
+      ],
+      "relatedRecordIds": [
+        "11359c01-352a-4e8a-ba2e-9fd6266eca06"
+      ],
+      "autoDetected": true,
+      "id": "88da9288-88c3-4b0b-a277-b30d8a39e536",
+      "detectedAt": "2026-05-26T22:46:26.849Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "low",
+      "ratingId": "d306f03b-788e-4d05-931f-367082b5309a",
+      "workerId": "W004",
+      "repairNo": "BX20240105001",
+      "description": "评分记录中的维修工ID W004 在维修工数据中不存在",
+      "evidence": [
+        "评分记录: d306f03b-788e-4d05-931f-367082b5309a",
+        "维修工ID: W004",
+        "报修单号: BX20240105001"
+      ],
+      "relatedRecordIds": [
+        "d306f03b-788e-4d05-931f-367082b5309a"
+      ],
+      "autoDetected": true,
+      "id": "76d00163-76d6-441b-a77e-6a52bf0e6e98",
+      "detectedAt": "2026-05-26T22:46:26.849Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "low",
+      "ratingId": "daf91aaf-7320-45a2-9fa3-2625e2e705ea",
+      "workerId": "W005",
+      "repairNo": "BX20240107001",
+      "description": "评分记录中的维修工ID W005 在维修工数据中不存在",
+      "evidence": [
+        "评分记录: daf91aaf-7320-45a2-9fa3-2625e2e705ea",
+        "维修工ID: W005",
+        "报修单号: BX20240107001"
+      ],
+      "relatedRecordIds": [
+        "daf91aaf-7320-45a2-9fa3-2625e2e705ea"
+      ],
+      "autoDetected": true,
+      "id": "08ae670a-cbc9-4263-b5a8-ba114f16ef5e",
+      "detectedAt": "2026-05-26T22:46:26.850Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "low",
+      "ratingId": "57479046-cfe8-468b-aabe-a75212673ff7",
+      "workerId": "W005",
+      "repairNo": "BX20240107001",
+      "description": "评分记录中的维修工ID W005 在维修工数据中不存在",
+      "evidence": [
+        "评分记录: 57479046-cfe8-468b-aabe-a75212673ff7",
+        "维修工ID: W005",
+        "报修单号: BX20240107001"
+      ],
+      "relatedRecordIds": [
+        "57479046-cfe8-468b-aabe-a75212673ff7"
+      ],
+      "autoDetected": true,
+      "id": "39fbff2f-af0e-44ba-9102-930eb0572a15",
+      "detectedAt": "2026-05-26T22:46:26.850Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "low",
+      "ratingId": "ea37b396-fb5f-47da-a637-e15dac98c516",
+      "workerId": "W005",
+      "repairNo": "BX20240107001",
+      "description": "评分记录中的维修工ID W005 在维修工数据中不存在",
+      "evidence": [
+        "评分记录: ea37b396-fb5f-47da-a637-e15dac98c516",
+        "维修工ID: W005",
+        "报修单号: BX20240107001"
+      ],
+      "relatedRecordIds": [
+        "ea37b396-fb5f-47da-a637-e15dac98c516"
+      ],
+      "autoDetected": true,
+      "id": "ab62da08-d61b-4f66-bbb8-5b14d079fc1d",
+      "detectedAt": "2026-05-26T22:46:26.850Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "medium",
+      "repairNo": "BX20240101001",
+      "workerId": "W001",
+      "description": "报修单 BX20240101001 分配的维修工ID W001 在维修工数据中不存在",
+      "evidence": [
+        "报修单: BX20240101001",
+        "维修工ID: W001"
+      ],
+      "relatedRecordIds": [
+        "5bfe2bc4-b0cf-4ace-9b0f-010bb1188bcf"
+      ],
+      "autoDetected": true,
+      "id": "4c5dd72f-4f45-439e-b5bc-f32fe32c1c45",
+      "detectedAt": "2026-05-26T22:46:26.850Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "medium",
+      "repairNo": "BX20240102001",
+      "workerId": "W002",
+      "description": "报修单 BX20240102001 分配的维修工ID W002 在维修工数据中不存在",
+      "evidence": [
+        "报修单: BX20240102001",
+        "维修工ID: W002"
+      ],
+      "relatedRecordIds": [
+        "a134eb2b-01e4-4324-9066-dc7d96f0d75d"
+      ],
+      "autoDetected": true,
+      "id": "fa623b7b-8216-439a-a5d0-56becdf45533",
+      "detectedAt": "2026-05-26T22:46:26.850Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "medium",
+      "repairNo": "BX20240103001",
+      "workerId": "W002",
+      "description": "报修单 BX20240103001 分配的维修工ID W002 在维修工数据中不存在",
+      "evidence": [
+        "报修单: BX20240103001",
+        "维修工ID: W002"
+      ],
+      "relatedRecordIds": [
+        "1cb81b53-6dc1-407a-ba78-14c9e6406ee7"
+      ],
+      "autoDetected": true,
+      "id": "610d25c9-28b9-4260-978c-1f491563ec80",
+      "detectedAt": "2026-05-26T22:46:26.850Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "medium",
+      "repairNo": "BX20240104001",
+      "workerId": "W003",
+      "description": "报修单 BX20240104001 分配的维修工ID W003 在维修工数据中不存在",
+      "evidence": [
+        "报修单: BX20240104001",
+        "维修工ID: W003"
+      ],
+      "relatedRecordIds": [
+        "54efa608-3315-46a8-8d49-de115253f7db"
+      ],
+      "autoDetected": true,
+      "id": "5ea97fe0-9a8d-4ebe-b354-b1fd1d688bb0",
+      "detectedAt": "2026-05-26T22:46:26.850Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "medium",
+      "repairNo": "BX20240105001",
+      "workerId": "W004",
+      "description": "报修单 BX20240105001 分配的维修工ID W004 在维修工数据中不存在",
+      "evidence": [
+        "报修单: BX20240105001",
+        "维修工ID: W004"
+      ],
+      "relatedRecordIds": [
+        "01aa3205-00ac-477d-8e28-ec4183ed3bac"
+      ],
+      "autoDetected": true,
+      "id": "5df2ae0c-ad40-4441-b607-0d97661f462d",
+      "detectedAt": "2026-05-26T22:46:26.850Z"
+    },
+    {
+      "type": "mismatch",
+      "severity": "medium",
+      "repairNo": "BX20240107001",
+      "workerId": "W005",
+      "description": "报修单 BX20240107001 分配的维修工ID W005 在维修工数据中不存在",
+      "evidence": [
+        "报修单: BX20240107001",
+        "维修工ID: W005"
+      ],
+      "relatedRecordIds": [
+        "97c3a1db-3eec-4aab-92ed-a4566fa9449a"
+      ],
+      "autoDetected": true,
+      "id": "ea5b9dbf-723f-4e27-942e-5529a0571df8",
+      "detectedAt": "2026-05-26T22:46:26.850Z"
+    }
+  ],
+  "reviews": [
+    {
+      "discrepancyId": "8fbc01af-e063-4c59-8f22-6caa10fe078e",
+      "decision": "approved",
+      "reviewer": "审核员张三",
+      "comment": "情况属实，按规则处理",
+      "reviewedAt": "2026-05-26T22:46:26.851Z",
+      "scoreAdjustment": 0,
+      "adjustmentReason": "重复报修合并处理",
+      "id": "1b91c759-7824-4865-b4d8-7773c150c8a4"
+    },
+    {
+      "discrepancyId": "9cd90569-4d48-4c4c-8a72-da3838eb1ffd",
+      "decision": "rejected",
+      "reviewer": "审核员张三",
+      "comment": "经核实不属于恶意评分，学生确有不满",
+      "reviewedAt": "2026-05-26T22:46:26.851Z",
+      "id": "e2e30af2-a15e-4905-ab8a-86fde76fceea"
+    },
+    {
+      "discrepancyId": "029a8a9f-57e2-4bd1-bddd-f9a457e08443",
+      "decision": "supplement_required",
+      "reviewer": "审核员张三",
+      "comment": "需要补充维修记录证明",
+      "reviewedAt": "2026-05-26T22:46:26.851Z",
+      "id": "da30c717-5ee6-40d3-b370-72f9860777d7"
+    }
+  ],
+  "appeals": [
+    {
+      "ratingId": "ea37b396-fb5f-47da-a637-e15dac98c516",
+      "repairNo": "BX20240107001",
+      "workerId": "W005",
+      "originalScore": 5,
+      "finalScore": 80,
+      "appellant": "陈师傅",
+      "appellantRole": "worker",
+      "appealReason": "维修过程遇到特殊情况，配件缺货导致延迟，非个人原因",
+      "evidence": [
+        "配件缺货证明照片",
+        "与学生沟通记录截图"
+      ],
+      "status": "upheld",
+      "createdAt": "2026-05-26T22:46:26.851Z",
+      "relatedDiscrepancyIds": [
+        "9cd90569-4d48-4c4c-8a72-da3838eb1ffd",
+        "ab62da08-d61b-4f66-bbb8-5b14d079fc1d"
+      ],
+      "id": "ed483438-c2d8-4566-95fa-a21b65bd369e",
+      "reviewer": "管理员李四",
+      "reviewComment": "情况属实，配件缺货为不可抗力因素，调整评分",
+      "reviewedAt": "2026-05-26T22:46:26.851Z",
+      "appealedScore": 5
+    }
+  ],
+  "workerScores": [
+    {
+      "workerId": "3c718b4e-c305-4212-84f4-7b8be05924aa",
+      "workerName": "陈师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "089cc9d6-4446-46ab-aee1-9d35488d71fb",
+      "workerName": "李师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "2ff90e8b-f24c-4337-b318-72f685e6f24a",
+      "workerName": "王师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "28db2af3-687b-461e-9fe7-6a24d1cc8dea",
+      "workerName": "张师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "069d004f-3b53-47e3-8911-98836a5d80f9",
+      "workerName": "刘师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    }
+  ]
+}
