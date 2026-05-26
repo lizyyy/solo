@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #e5e7eb;
+  background-color: #0d1624;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #0d1624;
+  color: #e5e7eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0d1624;
+}
+::-webkit-scrollbar-thumb {
+  background: #243048;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b4a6b;
+}
+
+@layer components {
+  .panel {
+    @apply bg-industrial-panel border border-industrial-border rounded-md p-4;
+  }
+  .panel-title {
+    @apply font-display tracking-widest text-sm text-industrial-accent uppercase mb-2;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-mono text-sm
+           bg-industrial-blue text-white border border-industrial-blueLight
+           hover:bg-industrial-blueLight hover:border-industrial-accent
+           transition-all active:translate-y-px disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-accent {
+    @apply bg-industrial-accent border-industrial-accentDark text-black font-bold
+           hover:bg-industrial-accentDark hover:text-white;
+  }
+  .btn-warn {
+    @apply bg-industrial-warn border-industrial-warn text-white font-bold hover:opacity-90;
+  }
+  .btn-ghost {
+    @apply bg-transparent border-industrial-border text-industrial-dim
+           hover:text-white hover:border-industrial-accent;
+  }
+  .stat-chip {
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded-sm bg-industrial-blue/40 border border-industrial-border text-xs font-mono;
+  }
+}
+
+@keyframes pulse-warn {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 54, 62, 0.7); }
+  50% { box-shadow: 0 0 0 8px rgba(217, 54, 62, 0); }
+}
+.warn-pulse {
+  animation: pulse-warn 1.2s infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-2px, 1px); }
+  50% { transform: translate(2px, -1px); }
+  75% { transform: translate(-1px, 2px); }
+}
+.shake {
+  animation: shake 0.35s;
+}
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.font-display {
+  font-family: "Bebas Neue", "Orbitron", system-ui, sans-serif;
+}
+.font-mono {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
