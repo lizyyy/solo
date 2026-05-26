@@ -106,6 +106,7 @@ export function gameTick(): void {
 
   processGuestArrivals(newTime);
   processGuestDepartures(newTime);
+  processGuestWaiting(newTime);
   processCleaningProgress(newTime);
   processMaintenanceProgress(newTime);
   processExtendRequests(newTime);
@@ -114,6 +115,59 @@ export function gameTick(): void {
   checkGameEndConditions(level, newTime);
 
   recordHistory();
+}
+
+function processGuestWaiting(currentTime: number): void {
+  const state = useGameStore.getState();
+
+  const waitingGuests = state.guests.filter(
+    (g: Guest) => g.status === 'waiting' && g.arrivalTime <= currentTime
+  );
+
+  waitingGuests.forEach((guest: Guest) => {
+    const waitTime = currentTime - guest.arrivalTime;
+
+    if (waitTime > 0 && waitTime % 5 === 0) {
+      useGameStore.getState().updateGuest(guest.id, {
+        satisfaction: Math.max(0, guest.satisfaction - 5),
+      });
+    }
+
+    if (waitTime >= 20 && !guest.hasComplained) {
+      useGameStore.getState().updateGuest(guest.id, {
+        hasComplained: true,
+      });
+      useGameStore.getState().addComplaint();
+      useGameStore.getState().addScore(-20);
+
+      const event: GameEvent = {
+        id: generateId(),
+        type: 'complaint',
+        time: currentTime,
+        data: { guestId: guest.id, guestName: guest.name, waitTime },
+        message: `${guest.name} 等待超时(${waitTime}分钟)，产生客诉！`,
+      };
+      useGameStore.getState().addEvent(event);
+    }
+
+    if (waitTime >= 30) {
+      useGameStore.getState().updateGuest(guest.id, {
+        status: 'left',
+      });
+
+      const event: GameEvent = {
+        id: generateId(),
+        type: 'guest_left',
+        time: currentTime,
+        data: { guestId: guest.id, guestName: guest.name, waitTime },
+        message: `${guest.name} 因等待时间过长离开了酒店`,
+      };
+      useGameStore.getState().addEvent(event);
+
+      useGameStore.getState().addScore(-30);
+      useGameStore.getState().addSatisfaction(-20);
+    }
+  });
 }
 
 function processGuestArrivals(currentTime: number): void {

@@ -32,6 +32,7 @@ export interface Guest {
   extendNights?: number;
   specialRequest?: string;
   roomId?: number;
+  hasComplained?: boolean;
 }
 
 export interface Cleaner {

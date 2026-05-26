@@ -55,7 +55,8 @@ export function GuestQueue() {
             {waitingGuests.map((guest) => {
               const waitTime = getWaitTime(guest);
               const isSelected = selectedGuestId === guest.id;
-              const isUrgent = waitTime > 5;
+              const isUrgent = waitTime > 15;
+              const isWarning = waitTime > 10;
 
               return (
                 <div
@@ -64,7 +65,7 @@ export function GuestQueue() {
                   className={`
                     p-3 rounded-lg cursor-pointer transition-all duration-200
                     ${isSelected ? 'bg-blue-600/30 border-2 border-blue-500' : 'bg-gray-700/50 hover:bg-gray-700'}
-                    ${isUrgent ? 'border-l-4 border-red-500' : ''}
+                    ${isUrgent ? 'border-l-4 border-red-500 animate-pulse' : isWarning ? 'border-l-4 border-yellow-500' : ''}
                     ${status !== 'playing' ? 'cursor-not-allowed opacity-70' : ''}
                   `}
                 >
@@ -77,6 +78,11 @@ export function GuestQueue() {
                         预计 {formatTime(guest.arrivalTime)} 到达
                       </div>
                     </div>
+                    <div className="text-right">
+                      <div className={`text-xs font-medium ${guest.satisfaction <= 30 ? 'text-red-400' : guest.satisfaction <= 60 ? 'text-yellow-400' : 'text-green-400'}`}>
+                        {guest.satisfaction}%
+                      </div>
+                    </div>
                     {isSelected && (
                       <div className="text-xs bg-blue-500 text-white px-2 py-1 rounded">已选中</div>
                     )}
@@ -84,9 +90,12 @@ export function GuestQueue() {
 
                   {waitTime > 0 && (
                     <div className="mt-2 flex items-center gap-2">
-                      <span className={`text-xs ${isUrgent ? 'text-red-400' : 'text-yellow-400'}`}>
+                      <span className={`text-xs ${isUrgent ? 'text-red-400' : isWarning ? 'text-yellow-400' : 'text-gray-400'}`}>
                         已等待 {waitTime} 分钟
                       </span>
+                      {guest.hasComplained && (
+                        <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded">已投诉</span>
+                      )}
                     </div>
                   )}
 

@@ -43,7 +43,7 @@ export function RoomGrid() {
       if (idleCleaner) {
         dispatchCleaner(idleCleaner.id, roomId);
       }
-    } else if (room.status === 'empty') {
+    } else if (room.status === 'empty' || room.status === 'maintenance') {
       setSelectedRoom(selectedRoomId === roomId ? null : roomId);
     }
   };
