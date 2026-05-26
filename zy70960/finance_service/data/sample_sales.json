@@ -1,0 +1,60 @@
+{
+  "records": [
+    {
+      "store_code": "SH001",
+      "sale_date": "2024-01-15T09:30:00",
+      "sale_amount": 5000.00,
+      "payment_method": "cash",
+      "transaction_no": "TX20240115001",
+      "cashier": "张三"
+    },
+    {
+      "store_code": "SH001",
+      "sale_date": "2024-01-15T10:15:00",
+      "sale_amount": 3500.50,
+      "payment_method": "cash",
+      "transaction_no": "TX20240115002",
+      "cashier": "张三"
+    },
+    {
+      "store_code": "SH001",
+      "sale_date": "2024-01-15T14:20:00",
+      "sale_amount": 4000.00,
+      "payment_method": "alipay",
+      "transaction_no": "TX20240115003",
+      "cashier": "张三"
+    },
+    {
+      "store_code": "SH001",
+      "sale_date": "2024-01-16T09:00:00",
+      "sale_amount": 6000.00,
+      "payment_method": "cash",
+      "transaction_no": "TX20240116001",
+      "cashier": "张三"
+    },
+    {
+      "store_code": "SH001",
+      "sale_date": "2024-01-16T15:30:00",
+      "sale_amount": 7200.50,
+      "payment_method": "cash",
+      "transaction_no": "TX20240116002",
+      "cashier": "张三"
+    },
+    {
+      "store_code": "BJ001",
+      "sale_date": "2024-01-15T10:00:00",
+      "sale_amount": 15000.00,
+      "payment_method": "cash",
+      "transaction_no": "TX20240115004",
+      "cashier": "赵六"
+    },
+    {
+      "store_code": "BJ001",
+      "sale_date": "2024-01-15T16:00:00",
+      "sale_amount": 13000.00,
+      "payment_method": "cash",
+      "transaction_no": "TX20240115005",
+      "cashier": "赵六"
+    }
+  ]
+}
