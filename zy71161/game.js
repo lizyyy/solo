@@ -453,10 +453,6 @@ function toggleResume() {
   state.status = "playing";
   hideOverlay();
 }
-function togglePauseOrResume() {
-  if (state.status === "playing") togglePause();
-  else if (state.status === "paused") toggleResume();
-}
 
 function startReplay() {
   if (state.history.length < 2) {
@@ -505,7 +501,13 @@ function exitReplay() {
   replay = null;
   state.replayView = null;
   state.status = prev;
-  if (state.status === "playing") hideOverlay();
+  if (state.status === "playing") {
+    hideOverlay();
+  } else if (state.status === "paused") {
+    showOverlay("暂停", "探索已暂停");
+  } else if (state.status === "failed" || state.status === "finished") {
+    finalize();
+  }
   render();
 }
 
@@ -697,13 +699,21 @@ function handleAction(act) {
     if (act === "replay") exitReplay();
     return;
   }
-  if (act === "replay") { startReplay(); return; }
-  if (act === "export") { exportReport(); return; }
+
   if (act === "restart") { resetGame(); return; }
-  if (act === "pause") { togglePauseOrResume(); return; }
+  if (act === "export") { exportReport(); return; }
+  if (act === "replay") { startReplay(); return; }
+
+  if (act === "pause") {
+    if (state.status === "playing") togglePause();
+    else if (state.status === "paused") toggleResume();
+    return;
+  }
+
   if (state.status !== "playing") {
     return;
   }
+
   if (act === "sample") doTurn({ type: "sample" });
   else if (act === "transmit") doTurn({ type: "transmit" });
   else if (act === "wait") doTurn({ type: "wait" });
