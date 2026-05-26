@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>书店退货整理游戏</title>
+  <link rel="stylesheet" href="./styles/main.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">帋</span>
+        <div class="brand-text">
+          <h1>书店退货整理</h1>
+          <p>月底少出错 · 训练模拟器</p>
+        </div>
+      </div>
+      <div class="hud">
+        <div class="hud-item"><span class="hud-label">关卡</span><span id="hud-level">—</span></div>
+        <div class="hud-item"><span class="hud-label">回合</span><span id="hud-turn">0 / 0</span></div>
+        <div class="hud-item"><span class="hud-label">倒计时</span><span id="hud-time">—</span></div>
+        <div class="hud-item"><span class="hud-label">得分</span><span id="hud-score">0</span></div>
+        <div class="hud-item"><span class="hud-label">失误</span><span id="hud-mistakes">0 / 0</span></div>
+        <div class="hud-item hud-actions">
+          <button id="btn-pause" class="btn btn-ghost">暂停</button>
+          <button id="btn-restart" class="btn btn-ghost">重开</button>
+          <button id="btn-replay" class="btn btn-ghost" disabled>错误回放</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="stage">
+      <div class="stage-left">
+        <div class="panel panel-rules">
+          <h2>本关规则</h2>
+          <div id="rules-list" class="rules-list"></div>
+          <div class="rules-footnote">拖放书到右侧处理区。点"提交本轮"结算本回合。</div>
+        </div>
+
+        <div class="panel panel-replay" id="panel-replay" hidden>
+          <h2>错误回放</h2>
+          <div class="replay-toolbar">
+            <button id="replay-prev" class="btn btn-xs">◀</button>
+            <span id="replay-index">0 / 0</span>
+            <button id="replay-next" class="btn btn-xs">▶</button>
+          </div>
+          <div id="replay-text" class="replay-text">—</div>
+        </div>
+      </div>
+
+      <div class="stage-center">
+        <canvas id="game" width="980" height="640"></canvas>
+        <div class="stage-controls">
+          <button id="btn-submit" class="btn btn-primary">提交本轮</button>
+          <button id="btn-report" class="btn btn-ghost">导出报告</button>
+        </div>
+      </div>
+
+      <aside class="stage-right">
+        <div class="panel panel-log">
+          <h2>操作日志</h2>
+          <ul id="log-list" class="log-list"></ul>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <div class="legend">
+        <span><i class="dot dot-return"></i>退货</span>
+        <span><i class="dot dot-damaged"></i>破损</span>
+        <span><i class="dot dot-reserved"></i>预订</span>
+        <span><i class="dot dot-shelf"></i>可售回架</span>
+      </div>
+      <div class="meta">v1.0 · 策略训练 · 不联网 · 数据仅保存在本地</div>
+    </footer>
+
+    <div id="overlay" class="overlay" hidden>
+      <div class="overlay-card">
+        <h2 id="overlay-title">提示</h2>
+        <p id="overlay-text">—</p>
+        <div id="overlay-stats" class="overlay-stats"></div>
+        <div class="overlay-actions">
+          <button id="overlay-retry" class="btn btn-primary">再来一次</button>
+          <button id="overlay-next" class="btn btn-ghost">下一关</button>
+          <button id="overlay-close" class="btn btn-ghost">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="level-picker" class="overlay">
+      <div class="overlay-card wide">
+        <h2>选择关卡</h2>
+        <p class="muted">三关的差异不在速度，而在规则维度。请从第一关开始熟悉操作。</p>
+        <div class="level-grid">
+          <button class="level-card" data-level="0">
+            <h3>第一关 · 入门班</h3>
+            <p>三件套：退货 / 破损 / 预订。只看书脊标签。</p>
+            <ul><li>5 回合</li><li>每回合 60 秒</li><li>最多失误 3 次</li></ul>
+          </button>
+          <button class="level-card" data-level="1">
+            <h3>第二关 · 盘点周</h3>
+            <p>新增「可售回架」：退回但品相完好的书按 ISBN 段回到 A/B/C/D 四个货架。</p>
+            <ul><li>5 回合</li><li>每回合 75 秒</li><li>最多失误 4 次</li></ul>
+          </button>
+          <button class="level-card" data-level="2">
+            <h3>第三关 · 月末对账</h3>
+            <p>每张退货单必须与实物一一对应；保留破损登记、预订留位、可售回架。</p>
+            <ul><li>6 回合</li><li>每回合 90 秒</li><li>最多失误 5 次</li></ul>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
