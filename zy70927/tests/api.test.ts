@@ -137,4 +137,119 @@ describe('验证服务', () => {
     expect(errors[0].error).toContain('员工编号在同一培训中重复');
     expect(errors[0].attendanceIndex).toBe(1);
   });
+
+  test('培训字段缺失返回错误并保留位置', () => {
+    const invalidMaterial: any = {
+      trainingId: 'TRAIN-006',
+      trainingName: undefined,
+      trainer: null,
+      trainingDate: '',
+      startTime: '09:00:00',
+      endTime: '17:00:00',
+      location: '会议室A',
+      attendance: [],
+    };
+    const existingIds = new Set<string>();
+    const errors = validateTrainingMaterial(invalidMaterial, 2, existingIds);
+    expect(errors.length).toBeGreaterThanOrEqual(3);
+    const fieldErrors = errors.map(e => e.field);
+    expect(fieldErrors).toContain('trainingName');
+    expect(fieldErrors).toContain('trainer');
+    expect(fieldErrors).toContain('trainingDate');
+    errors.forEach(e => {
+      expect(e.materialIndex).toBe(2);
+    });
+  });
+
+  test('第0条签到记录字段缺失时attendanceIndex应为0', () => {
+    const invalidMaterial: any = {
+      trainingId: 'TRAIN-007',
+      trainingName: '测试培训',
+      trainer: '张老师',
+      trainingDate: '2024-01-15',
+      startTime: '09:00:00',
+      endTime: '17:00:00',
+      location: '会议室A',
+      attendance: [
+        {
+          employeeId: '',
+          employeeName: undefined,
+          department: null,
+          signInTime: '09:00:00',
+          signOutTime: '17:00:00',
+        },
+      ],
+    };
+    const existingIds = new Set<string>();
+    const errors = validateTrainingMaterial(invalidMaterial, 0, existingIds);
+    expect(errors.length).toBeGreaterThanOrEqual(3);
+    const attendanceErrors = errors.filter(e => e.attendanceIndex !== undefined);
+    attendanceErrors.forEach(e => {
+      expect(e.attendanceIndex).toBe(0);
+    });
+  });
+
+  test('多个签到记录错误时位置正确映射', () => {
+    const invalidMaterial: any = {
+      trainingId: 'TRAIN-008',
+      trainingName: '测试培训',
+      trainer: '张老师',
+      trainingDate: '2024-01-15',
+      startTime: '09:00:00',
+      endTime: '17:00:00',
+      location: '会议室A',
+      attendance: [
+        {
+          employeeId: 'EMP-001',
+          employeeName: '张三',
+          department: '技术部',
+          signInTime: '08:00:00',
+          signOutTime: '18:00:00',
+        },
+        {
+          employeeId: 'EMP-002',
+          employeeName: '',
+          department: null,
+          signInTime: '09:00:00',
+          signOutTime: '17:00:00',
+        },
+      ],
+    };
+    const existingIds = new Set<string>();
+    const errors = validateTrainingMaterial(invalidMaterial, 1, existingIds);
+    expect(errors.length).toBeGreaterThanOrEqual(4);
+    const index0Errors = errors.filter(e => e.attendanceIndex === 0);
+    const index1Errors = errors.filter(e => e.attendanceIndex === 1);
+    expect(index0Errors.length).toBeGreaterThan(0);
+    expect(index1Errors.length).toBeGreaterThan(0);
+    index0Errors.forEach(e => expect(e.materialIndex).toBe(1));
+    index1Errors.forEach(e => expect(e.materialIndex).toBe(1));
+  });
+
+  test('时间矛盾错误位置正确', () => {
+    const invalidMaterial: any = {
+      trainingId: 'TRAIN-009',
+      trainingName: '测试培训',
+      trainer: '张老师',
+      trainingDate: '2024-01-15',
+      startTime: '09:00:00',
+      endTime: '17:00:00',
+      location: '会议室A',
+      attendance: [
+        {
+          employeeId: 'EMP-001',
+          employeeName: '张三',
+          department: '技术部',
+          signInTime: '17:00:00',
+          signOutTime: '09:00:00',
+        },
+      ],
+    };
+    const existingIds = new Set<string>();
+    const errors = validateTrainingMaterial(invalidMaterial, 0, existingIds);
+    const timeErrors = errors.filter(e => e.error.includes('签退时间必须晚于签到时间'));
+    expect(timeErrors.length).toBe(1);
+    expect(timeErrors[0].attendanceIndex).toBe(0);
+    expect(timeErrors[0].materialIndex).toBe(0);
+  });
 });

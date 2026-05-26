@@ -1,0 +1,21 @@
+{
+  "submittedBy": "admin@company.com",
+  "materials": [
+    {
+      "trainingId": "TRAIN-MISSING-001",
+      "trainingName": "",
+      "trainingDate": "",
+      "startTime": "09:00:00",
+      "endTime": "17:00:00",
+      "location": "会议室A",
+      "attendance": [
+        {
+          "employeeId": "",
+          "department": "",
+          "signInTime": "09:00:00",
+          "signOutTime": "17:00:00"
+        }
+      ]
+    }
+  ]
+}
