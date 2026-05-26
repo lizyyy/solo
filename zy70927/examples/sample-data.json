@@ -1,0 +1,62 @@
+{
+  "submittedBy": "admin@company.com",
+  "materials": [
+    {
+      "trainingId": "TRAIN-2024-001",
+      "trainingName": "企业信息安全基础培训",
+      "trainer": "王安全",
+      "trainingDate": "2024-01-20",
+      "startTime": "09:00:00",
+      "endTime": "17:00:00",
+      "location": "总部会议室A",
+      "attendance": [
+        {
+          "employeeId": "EMP-1001",
+          "employeeName": "张三",
+          "department": "技术研发部",
+          "signInTime": "08:55:00",
+          "signOutTime": "17:05:00"
+        },
+        {
+          "employeeId": "EMP-1002",
+          "employeeName": "李四",
+          "department": "产品部",
+          "signInTime": "09:00:00",
+          "signOutTime": "17:00:00"
+        },
+        {
+          "employeeId": "EMP-1003",
+          "employeeName": "王五",
+          "department": "运营部",
+          "signInTime": "08:58:00",
+          "signOutTime": "17:02:00"
+        }
+      ]
+    },
+    {
+      "trainingId": "TRAIN-2024-002",
+      "trainingName": "新员工入职培训",
+      "trainer": "李人事",
+      "trainingDate": "2024-01-21",
+      "startTime": "09:00:00",
+      "endTime": "18:00:00",
+      "location": "培训中心1号厅",
+      "attendance": [
+        {
+          "employeeId": "EMP-2001",
+          "employeeName": "赵六",
+          "department": "市场部",
+          "signInTime": "08:50:00",
+          "signOutTime": "18:10:00"
+        },
+        {
+          "employeeId": "EMP-2002",
+          "employeeName": "钱七",
+          "department": "财务部",
+          "signInTime": "09:05:00",
+          "signOutTime": "17:55:00"
+        }
+      ]
+    }
+  ]
+}

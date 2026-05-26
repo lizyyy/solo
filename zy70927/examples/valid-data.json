@@ -1,0 +1,30 @@
+{
+  "submittedBy": "admin@company.com",
+  "materials": [
+    {
+      "trainingId": "TRAIN-TEST-001",
+      "trainingName": "企业信息安全基础培训",
+      "trainer": "王安全",
+      "trainingDate": "2024-01-20",
+      "startTime": "09:00:00",
+      "endTime": "17:00:00",
+      "location": "总部会议室A",
+      "attendance": [
+        {
+          "employeeId": "EMP-TEST-001",
+          "employeeName": "张三",
+          "department": "技术研发部",
+          "signInTime": "09:00:00",
+          "signOutTime": "17:00:00"
+        },
+        {
+          "employeeId": "EMP-TEST-002",
+          "employeeName": "李四",
+          "department": "产品部",
+          "signInTime": "09:00:00",
+          "signOutTime": "17:00:00"
+        }
+      ]
+    }
+  ]
+}
