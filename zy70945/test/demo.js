@@ -34,6 +34,18 @@ async function main() {
     console.log(`    - ${r.name} [${r.type}] 优先级:${r.priority}`);
   });
 
+  // ========== 步骤1b: 规则文件重复导入验证 ==========
+  printSeparator('步骤1b: 规则 JSON 重复导入验证');
+  const rulesBefore = Array.from(store.deductionRules.values()).length;
+  const rulesResult2 = await approvalService.processDeductionRulesFile(rulesPath);
+  const rulesAfter = Array.from(store.deductionRules.values()).length;
+  if (rulesResult2.duplicate) {
+    console.log(`  ✓ 规则重复导入拦截成功`);
+    console.log(`    处理前规则数: ${rulesBefore}, 处理后: ${rulesAfter}`);
+  } else {
+    console.log(`  ✗ 规则去重失败！处理前: ${rulesBefore}, 处理后: ${rulesAfter}`);
+  }
+
   // ========== 步骤2: 导入装修申请 CSV ==========
   printSeparator('步骤2: 导入装修申请 CSV');
   const csvPath = path.join(__dirname, '..', 'data', 'decoration_applications.csv');
@@ -116,6 +128,18 @@ async function main() {
     const icon = r.result === 'passed' ? '✓' : '✗';
     console.log(`    ${icon} ${r.applicationId} - ${r.result}${r.impact ? ' - 需要复查' : ''}`);
   });
+
+  // ========== 步骤4b: 巡检 JSON 重复导入验证 ==========
+  printSeparator('步骤4b: 巡检 JSON 重复导入验证');
+  const inspectionBefore = Array.from(store.inspectionRecords.values()).length;
+  const inspectionResult2 = await approvalService.processInspectionFile(inspectionPath);
+  const inspectionAfter = Array.from(store.inspectionRecords.values()).length;
+  if (inspectionResult2.duplicate) {
+    console.log(`  ✓ 巡检重复导入拦截成功`);
+    console.log(`    处理前记录数: ${inspectionBefore}, 处理后: ${inspectionAfter}`);
+  } else {
+    console.log(`  ✗ 巡检去重失败！处理前: ${inspectionBefore}, 处理后: ${inspectionAfter}`);
+  }
 
   // ========== 步骤5: 对 APP-002 创建退款审批 ==========
   printSeparator('步骤5: 创建退款审批 - APP-002 (李四)');

@@ -97,9 +97,12 @@ async function processInspectionFile(filePath) {
     };
   });
 
+  store.markBatchProcessed(batchFingerprint, `INSP-BATCH-${uuidv4().split('-')[0].toUpperCase()}`, inspections.length);
+
   return {
     success: true,
     batchId: `INSP-BATCH-${uuidv4().split('-')[0].toUpperCase()}`,
+    batchFingerprint,
     count: inspections.length,
     parseErrors: parsed.errors,
     results: inspectionResults
@@ -134,9 +137,12 @@ async function processDeductionRulesFile(filePath) {
 
   const rules = parsed.success.map(rule => store.addDeductionRule(rule));
 
+  store.markBatchProcessed(batchFingerprint, `RULE-BATCH-${uuidv4().split('-')[0].toUpperCase()}`, rules.length);
+
   return {
     success: true,
     batchId: `RULE-BATCH-${uuidv4().split('-')[0].toUpperCase()}`,
+    batchFingerprint,
     count: rules.length,
     parseErrors: parsed.errors,
     rules: rules.map(r => ({
