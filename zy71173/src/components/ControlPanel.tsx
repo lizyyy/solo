@@ -1,7 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '@/store/useGameStore';
 import { validatePath, getPathLength } from '@/game/pathfinding';
+import { generateReport, exportToJSON } from '@/game/report';
+import { downloadJSON, generateReportFilename } from '@/utils/export';
 import type { Card } from '@/game/types';
 import {
   Undo2,
@@ -17,18 +19,23 @@ import {
   XCircle,
   Route,
   ShieldCheck,
+  Download,
+  FastForward,
 } from 'lucide-react';
 
 export default function ControlPanel() {
   const navigate = useNavigate();
+  const autoPlayRef = useRef<number | null>(null);
 
   const {
     phase,
     currentLevel,
     plannedPath,
+    executedPath,
     availableCards,
     desiccantCount,
     isDesiccantActive,
+    savedRecord,
     undoPath,
     clearPath,
     startExecution,
@@ -63,13 +70,51 @@ export default function ControlPanel() {
   const canUseDesiccant = phase === 'executing' && desiccantCount > 0 && !isDesiccantActive;
   const canRestart = phase !== 'planning';
   const isFinished = phase === 'completed' || phase === 'failed';
+  const canAutoPlay = phase === 'executing';
+
+  const handleAutoPlay = () => {
+    if (!canAutoPlay) return;
+
+    const playStep = () => {
+      const result = executeStep();
+      if (!result.finished && phase === 'executing') {
+        autoPlayRef.current = window.setTimeout(playStep, 500);
+      }
+    };
+
+    playStep();
+  };
 
   const handleViewReport = () => {
-    console.log('查看报告');
+    if (savedRecord && currentLevel) {
+      const report = generateReport(savedRecord, currentLevel);
+      const jsonStr = exportToJSON(report);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  const handleExportReport = () => {
+    if (savedRecord && currentLevel) {
+      const report = generateReport(savedRecord, currentLevel);
+      const filename = generateReportFilename(currentLevel.name, savedRecord.timestamp);
+      downloadJSON(report, filename);
+    }
   };
 
   const handleBackToMenu = () => {
+    if (autoPlayRef.current) {
+      clearTimeout(autoPlayRef.current);
+      autoPlayRef.current = null;
+    }
     navigate('/');
+  };
+
+  const handleStep = () => {
+    if (!canStep) return;
+    executeStep();
   };
 
   return (
@@ -116,12 +161,20 @@ export default function ControlPanel() {
                 暂停
               </button>
               <button
-                onClick={executeStep}
+                onClick={handleStep}
                 disabled={!canStep}
                 className="btn-primary flex items-center gap-2"
               >
                 <StepForward className="w-4 h-4" />
                 单步执行
+              </button>
+              <button
+                onClick={handleAutoPlay}
+                disabled={!canAutoPlay}
+                className="btn-primary flex items-center gap-2"
+              >
+                <FastForward className="w-4 h-4" />
+                自动执行
               </button>
               <button
                 onClick={restart}
@@ -166,10 +219,19 @@ export default function ControlPanel() {
               </button>
               <button
                 onClick={handleViewReport}
+                disabled={!savedRecord}
                 className="btn-secondary flex items-center gap-2"
               >
                 <FileText className="w-4 h-4" />
                 查看报告
+              </button>
+              <button
+                onClick={handleExportReport}
+                disabled={!savedRecord}
+                className="btn-secondary flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                导出报告
               </button>
               <button
                 onClick={handleBackToMenu}
