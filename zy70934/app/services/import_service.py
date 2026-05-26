@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from app.models.models import ConstructionNode, PhotoRecord, RectificationOrder, Project
-from app.utils.helpers import parse_date, parse_float, parse_int
+from app.utils.helpers import parse_date, parse_float, parse_int, parse_bool
 from app.schemas.schemas import ImportResult
 
 
@@ -203,7 +203,7 @@ class DataImportService:
                         existing.required_completion_date = parse_date(row_data.get("要求完成日期") or row_data.get("required_completion_date"))
                         existing.actual_completion_date = parse_date(row_data.get("实际完成日期") or row_data.get("actual_completion_date"))
                         existing.rectification_status = str(row_data.get("整改状态") or row_data.get("rectification_status") or existing.rectification_status)
-                        existing.is_rework = bool(row_data.get("是否返工") or row_data.get("is_rework") or existing.is_rework)
+                        existing.is_rework = parse_bool(row_data.get("是否返工") or row_data.get("is_rework") or existing.is_rework)
                         existing.rework_count = parse_int(row_data.get("返工次数") or row_data.get("rework_count") or existing.rework_count)
                         existing.fine_amount = parse_float(row_data.get("扣款金额") or row_data.get("fine_amount") or existing.fine_amount)
                         existing.source_file = filename
@@ -217,7 +217,7 @@ class DataImportService:
                             required_completion_date=parse_date(row_data.get("要求完成日期") or row_data.get("required_completion_date")),
                             actual_completion_date=parse_date(row_data.get("实际完成日期") or row_data.get("actual_completion_date")),
                             rectification_status=str(row_data.get("整改状态") or row_data.get("rectification_status") or "pending"),
-                            is_rework=bool(row_data.get("是否返工") or row_data.get("is_rework") or False),
+                            is_rework=parse_bool(row_data.get("是否返工") or row_data.get("is_rework") or False),
                             rework_count=parse_int(row_data.get("返工次数") or row_data.get("rework_count") or 0),
                             fine_amount=parse_float(row_data.get("扣款金额") or row_data.get("fine_amount") or 0),
                             source_file=filename,

@@ -66,6 +66,22 @@ def parse_int(value: Any) -> int:
     return 0
 
 
+def parse_bool(value: Any) -> bool:
+    if value is None or value == "":
+        return False
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    if isinstance(value, str):
+        value = value.strip().lower()
+        if value in ("true", "1", "yes", "是", "y", "t"):
+            return True
+        if value in ("false", "0", "no", "否", "n", "f"):
+            return False
+    return False
+
+
 def calculate_overdue_days(planned_date: Optional[datetime], actual_date: Optional[datetime]) -> int:
     if not planned_date or not actual_date:
         return 0
