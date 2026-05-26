@@ -164,27 +164,8 @@ function startGame(levelId) {
     },
   });
 
-  layoutReturnSlips(level);
   game.start();
   startTimer(timeLeft);
-}
-
-function layoutReturnSlips(level) {
-  if (!level.matchReturnSlip) return;
-  setTimeout(() => {
-    const turn = game?.getTurn();
-    if (!turn) return;
-    const slipW = 170, slipH = 70, gap = 10;
-    const maxPerCol = 4;
-    turn.returnSlips.forEach((s, i) => {
-      const col = Math.floor(i / maxPerCol);
-      const row = i % maxPerCol;
-      s.x = 20 + col * (slipW + 12);
-      s.y = 40 + row * (slipH + gap);
-      s.width = slipW;
-      s.height = slipH;
-    });
-  }, 50);
 }
 
 function startTimer(seconds) {

@@ -67,8 +67,23 @@ export function createGame(canvas, level, options = {}) {
   function startTurn() {
     turn = generateTurn(level, currentTurnIndex);
     layoutBooks(turn.books);
+    layoutReturnSlips(turn.returnSlips);
     mistakesThisTurn = [];
     onLog('info', `—— 第 ${currentTurnIndex + 1} 回合开始 ——`);
+  }
+
+  function layoutReturnSlips(slips) {
+    if (!level.matchReturnSlip || !slips || slips.length === 0) return;
+    const slipW = 170, slipH = 70, gap = 10;
+    const maxPerCol = 4;
+    slips.forEach((s, i) => {
+      const col = Math.floor(i / maxPerCol);
+      const row = i % maxPerCol;
+      s.x = 20 + col * (slipW + 12);
+      s.y = 40 + row * (slipH + gap);
+      s.width = slipW;
+      s.height = slipH;
+    });
   }
 
   function layoutBooks(books) {
