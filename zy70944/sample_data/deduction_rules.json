@@ -1,0 +1,58 @@
+[
+  {
+    "rule_code": "DR-001",
+    "rule_name": "私自改动承重墙",
+    "violation_type": "结构安全",
+    "deduction_amount": 2000,
+    "description": "未经审批私自改动房屋承重墙，严重影响结构安全"
+  },
+  {
+    "rule_code": "DR-002",
+    "rule_name": "消防通道堆放杂物",
+    "violation_type": "消防安全",
+    "deduction_amount": 500,
+    "description": "在消防通道堆放装修材料或杂物"
+  },
+  {
+    "rule_code": "DR-003",
+    "rule_name": "施工时间违规",
+    "violation_type": "噪音扰民",
+    "deduction_amount": 300,
+    "description": "在规定休息时段进行施工作业"
+  },
+  {
+    "rule_code": "DR-004",
+    "rule_name": "未安装油烟净化设备",
+    "violation_type": "环保要求",
+    "deduction_amount": 1000,
+    "description": "餐饮装修未按规定安装油烟净化设备"
+  },
+  {
+    "rule_code": "DR-005",
+    "rule_name": "私自改动燃气管道",
+    "violation_type": "安全隐患",
+    "deduction_amount": 1500,
+    "description": "未经燃气公司同意私自改动燃气管道"
+  },
+  {
+    "rule_code": "DR-006",
+    "rule_name": "违规搭建阳光房",
+    "violation_type": "违建",
+    "deduction_amount": 3000,
+    "description": "未经审批违规搭建阳光房或其他构筑物"
+  },
+  {
+    "rule_code": "DR-007",
+    "rule_name": "拆除阳台配重墙",
+    "violation_type": "结构安全",
+    "deduction_amount": 2500,
+    "description": "私自拆除阳台配重墙，影响阳台结构安全"
+  },
+  {
+    "rule_code": "DR-008",
+    "rule_name": "占用公共区域",
+    "violation_type": "公共管理",
+    "deduction_amount": 800,
+    "description": "装修期间占用公共走廊、电梯间等公共区域"
+  }
+]

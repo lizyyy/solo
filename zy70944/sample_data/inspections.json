@@ -1,0 +1,92 @@
+[
+  {
+    "room_number": "A栋1001",
+    "inspector": "李巡检",
+    "inspect_date": "2026-02-01",
+    "inspect_result": "合格",
+    "violations": [],
+    "rectification_required": false,
+    "remark": "初次巡检通过"
+  },
+  {
+    "room_number": "A栋1002",
+    "inspector": "李巡检",
+    "inspect_date": "2026-02-02",
+    "inspect_result": "不合格",
+    "violations": ["私自改动承重墙", "消防通道堆放杂物"],
+    "rectification_required": true,
+    "remark": "需要整改后复查"
+  },
+  {
+    "room_number": "A栋1003",
+    "inspector": "王工",
+    "inspect_date": "2026-02-03",
+    "inspect_result": "合格",
+    "violations": [],
+    "rectification_required": false,
+    "remark": ""
+  },
+  {
+    "room_number": "A栋1005",
+    "inspector": "王工",
+    "inspect_date": "2026-02-04",
+    "inspect_result": "需复查",
+    "violations": ["施工时间超出规定时段", "噪音投诉"],
+    "rectification_required": true,
+    "remark": "需业主书面承诺并缴纳保证金"
+  },
+  {
+    "room_number": "A栋1006",
+    "inspector": "张主管",
+    "inspect_date": "2026-02-05",
+    "inspect_result": "不合格",
+    "violations": ["未安装油烟净化设备", "私自改动燃气管道", "占用消防通道"],
+    "rectification_required": true,
+    "remark": "严重违规，需立即停工整改"
+  },
+  {
+    "room_number": "A栋1008",
+    "inspector": "张主管",
+    "inspect_date": "2026-02-06",
+    "inspect_result": "合格",
+    "violations": [],
+    "rectification_required": false,
+    "remark": "水电改造验收通过"
+  },
+  {
+    "room_number": "B栋2001",
+    "inspector": "李巡检",
+    "inspect_date": "2026-02-08",
+    "inspect_result": "不合格",
+    "violations": ["私自拆除阳台配重墙", "违规搭建阳光房"],
+    "rectification_required": true,
+    "remark": "需恢复原状，押金暂时冻结"
+  },
+  {
+    "room_number": "B栋2005",
+    "inspector": "王工",
+    "inspect_date": "2026-02-10",
+    "inspect_result": "合格",
+    "violations": [],
+    "rectification_required": false,
+    "remark": "无违规"
+  },
+  {
+    "room_number": "A栋1002",
+    "inspector": "张主管",
+    "inspect_date": "2026-02-15",
+    "inspect_result": "合格",
+    "violations": [],
+    "rectification_required": false,
+    "remark": "复查通过，整改到位"
+  },
+  {
+    "room_number": "A栋1005",
+    "inspector": "李巡检",
+    "inspect_date": "2026-02-16",
+    "inspect_result": "合格",
+    "violations": [],
+    "rectification_required": false,
+    "remark": "复查通过"
+  }
+]
