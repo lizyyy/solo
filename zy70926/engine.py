@@ -256,6 +256,11 @@ def apply_review(
     diff.reviewer = reviewer
     diff.review_note = note
 
+    # Find existing cert for this student+course (if any)
+    chain = certs.get(diff.student_id, [])
+    matching = [c for c in chain if c.course_id == diff.course_id]
+    existing_cert = matching[-1] if matching else None
+
     if action == ReviewAction.RECALC:
         # Re-run a scoped re-evaluation for this student/course
         rule_by_course = {r.course_id: r for r in rules}
@@ -266,7 +271,10 @@ def apply_review(
             homework=[h for h in homework if h.student_id == diff.student_id],
             rules=[rule_by_course[diff.course_id]],
         )
-        # Merge in
+        # Merge in new diffs
+        diffs.extend(sub_diffs)
+
+        # Update EvalResult in-place
         for r in sub_results:
             for i, ex in enumerate(results):
                 if ex.student_id == r.student_id and ex.course_id == r.course_id:
@@ -274,33 +282,39 @@ def apply_review(
                     break
             else:
                 results.append(r)
-        diffs.extend(sub_diffs)
-        for sid, lst in sub_certs.items():
-            certs.setdefault(sid, []).extend(lst)
-        # extend history of latest cert with recalc note
-        chain = certs.get(diff.student_id, [])
-        if chain:
-            latest = chain[-1]
-            latest.history.append(
+
+        # Update the EXISTING cert in-place (do NOT create duplicate)
+        if existing_cert and sub_certs:
+            new_cert_data = sub_certs[diff.student_id][0]
+            existing_cert.score = new_cert_data.score
+            existing_cert.attendance_pct = new_cert_data.attendance_pct
+            existing_cert.issued = new_cert_data.issued
+            existing_cert.reasons = new_cert_data.reasons + [f"重算：{note}"]
+            # Merge source_diff_ids: keep old review diffs + add new diffs
+            new_diff_ids = new_cert_data.source_diff_ids
+            for did in new_diff_ids:
+                if did not in existing_cert.source_diff_ids:
+                    existing_cert.source_diff_ids.append(did)
+            existing_cert.history.append(
                 {
-                    "seq": len(latest.history),
+                    "seq": len(existing_cert.history),
                     "action": "recalc",
                     "reviewer": reviewer,
                     "note": note,
-                    "score": latest.score,
-                    "attendance_pct": latest.attendance_pct,
-                    "issued": latest.issued,
+                    "score": existing_cert.score,
+                    "attendance_pct": existing_cert.attendance_pct,
+                    "issued": existing_cert.issued,
+                    "source_diff_ids": list(existing_cert.source_diff_ids),
                 }
             )
         return
 
     # APPROVE / REJECT: mutate the latest cert of this student-course chain
-    chain = certs.get(diff.student_id, [])
-    # pick the cert matching the course
-    matching = [c for c in chain if c.course_id == diff.course_id]
     if not matching:
         return
     cert = matching[-1]
+
+    # Update the cert state
     if action == ReviewAction.APPROVE:
         cert.issued = True
         cert.reasons = [f"人工放行：{note}"] + cert.reasons
@@ -308,6 +322,12 @@ def apply_review(
         cert.issued = False
         cert.revoked = True
         cert.reasons = [f"人工驳回：{note}"] + cert.reasons
+
+    # Also update the EvalResult to stay in sync
+    for r in results:
+        if r.student_id == cert.student_id and r.course_id == cert.course_id:
+            r.passed = cert.issued
+            break
 
     cert.history.append(
         {

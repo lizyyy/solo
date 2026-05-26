@@ -121,14 +121,16 @@ def trace_cert(
 
     Walks: cert_id -> history chain -> diffs -> original records.
     """
-    target: Certificate | None = None
+    matches: List[Certificate] = []
     for chain in certs.values():
         for c in chain:
             if c.cert_id == cert_id:
-                target = c
-                break
-    if target is None:
+                matches.append(c)
+    if not matches:
         return {"error": "cert_id not found"}
+
+    # Pick the cert with the longest history (most recent state)
+    target = max(matches, key=lambda c: len(c.history))
 
     diff_by_id = {d.id: d for d in diffs}
     used_diffs = [diff_by_id[d_id] for d_id in target.source_diff_ids if d_id in diff_by_id]
