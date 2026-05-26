@@ -59,6 +59,7 @@ export interface ReplayAction {
   timestamp: number;
   isCorrect: boolean;
   scoreChange: number;
+  trashItem?: TrashItem;
 }
 
 export interface GameRecord {

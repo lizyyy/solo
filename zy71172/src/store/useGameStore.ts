@@ -145,6 +145,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       timestamp: elapsedTime,
       isCorrect: result.isCorrect,
       scoreChange: result.scoreChange,
+      trashItem: { ...trash },
     };
 
     if (!result.isCorrect && result.explanation) {
@@ -205,6 +206,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         timestamp: elapsedTime,
         isCorrect: true,
         scoreChange: 0,
+        trashItem: { ...trash, isBagBroken: true },
       };
 
       set({
@@ -237,6 +239,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         timestamp: elapsedTime,
         isCorrect: true,
         scoreChange: 0,
+        trashItem: { ...trash, isCleaned: true },
       };
 
       set({

@@ -38,7 +38,9 @@ export function ReplayPage() {
   const [currentActionIndex, setCurrentActionIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [isDraggingTimeline, setIsDraggingTimeline] = useState(false);
   const playbackIntervalRef = useRef<number | null>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadRecords();
@@ -55,15 +57,14 @@ export function ReplayPage() {
   }, [recordId, getRecordById]);
 
   const getTrashFromAction = useCallback((action: ReplayAction): TrashItem | undefined => {
+    if (action.trashItem) {
+      return action.trashItem;
+    }
     if (!record) return undefined;
     const error = record.errors.find(e => e.trashItem.id === action.trashId);
     if (error) {
       return error.trashItem;
     }
-    const firstAction = record.replayActions
-      .filter(a => a.trashId === action.trashId)
-      .sort((a, b) => a.timestamp - b.timestamp)[0];
-    if (firstAction && firstAction.timestamp !== action.timestamp) return undefined;
     return undefined;
   }, [record]);
 
@@ -156,20 +157,78 @@ export function ReplayPage() {
     };
   }, [isPlaying, playbackSpeed, playNext]);
 
-  const handleTimelineClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!record) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+  const getIndexFromPosition = useCallback((clientX: number): number => {
+    if (!timelineRef.current || !record) return -1;
+    const rect = timelineRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const percentage = x / rect.width;
     const clickedTime = percentage * totalDuration;
 
     const nearestIndex = displayItems.findIndex(item => item.action.timestamp >= clickedTime);
     if (nearestIndex >= 0) {
-      setCurrentActionIndex(nearestIndex);
-    } else if (displayItems.length > 0) {
-      setCurrentActionIndex(displayItems.length - 1);
+      return nearestIndex;
+    }
+    if (displayItems.length > 0) {
+      return displayItems.length - 1;
+    }
+    return -1;
+  }, [displayItems, totalDuration, record]);
+
+  const handleTimelineMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDraggingTimeline(true);
+    const newIndex = getIndexFromPosition(e.clientX);
+    if (newIndex >= 0) {
+      setCurrentActionIndex(newIndex);
     }
   };
+
+  const handleTimelineMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDraggingTimeline) return;
+    const newIndex = getIndexFromPosition(e.clientX);
+    if (newIndex >= 0) {
+      setCurrentActionIndex(newIndex);
+    }
+  }, [isDraggingTimeline, getIndexFromPosition]);
+
+  const handleTimelineMouseUp = useCallback(() => {
+    setIsDraggingTimeline(false);
+  }, []);
+
+  const handleTimelineTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    setIsDraggingTimeline(true);
+    const newIndex = getIndexFromPosition(e.touches[0].clientX);
+    if (newIndex >= 0) {
+      setCurrentActionIndex(newIndex);
+    }
+  };
+
+  const handleTimelineTouchMove = useCallback((e: TouchEvent) => {
+    if (!isDraggingTimeline) return;
+    const newIndex = getIndexFromPosition(e.touches[0].clientX);
+    if (newIndex >= 0) {
+      setCurrentActionIndex(newIndex);
+    }
+  }, [isDraggingTimeline, getIndexFromPosition]);
+
+  const handleTimelineTouchEnd = useCallback(() => {
+    setIsDraggingTimeline(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDraggingTimeline) {
+      window.addEventListener('mousemove', handleTimelineMouseMove);
+      window.addEventListener('mouseup', handleTimelineMouseUp);
+      window.addEventListener('touchmove', handleTimelineTouchMove);
+      window.addEventListener('touchend', handleTimelineTouchEnd);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleTimelineMouseMove);
+      window.removeEventListener('mouseup', handleTimelineMouseUp);
+      window.removeEventListener('touchmove', handleTimelineTouchMove);
+      window.removeEventListener('touchend', handleTimelineTouchEnd);
+    };
+  }, [isDraggingTimeline, handleTimelineMouseMove, handleTimelineMouseUp, handleTimelineTouchMove, handleTimelineTouchEnd]);
 
   const handleExport = () => {
     if (record) {
@@ -280,8 +339,13 @@ export function ReplayPage() {
               <span>{formatTime(totalDuration)}</span>
             </div>
             <div
-              className="relative h-4 bg-gray-200 rounded-full cursor-pointer overflow-hidden"
-              onClick={handleTimelineClick}
+              ref={timelineRef}
+              className={cn(
+                "relative h-4 bg-gray-200 rounded-full overflow-hidden select-none",
+                isDraggingTimeline ? "cursor-grabbing" : "cursor-grab"
+              )}
+              onMouseDown={handleTimelineMouseDown}
+              onTouchStart={handleTimelineTouchStart}
             >
               {/* Progress Fill */}
               <motion.div
