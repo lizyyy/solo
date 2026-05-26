@@ -46,7 +46,7 @@ export type GameActionType =
   | 'error'
   | 'correct';
 
-export type CheckType = 'dosage' | 'contraindication' | 'batch';
+export type CheckType = 'dosage' | 'contraindication' | 'batch' | 'dosage_correction' | 'batch_replacement' | 'contraindication_marked';
 
 export interface GameAction {
   timestamp: number;

@@ -17,6 +17,18 @@ import { getPointsByErrorType, getErrorDescription, calculateStarRating, getBonu
 import { getMedicineById } from '@/data/medicines';
 import { saveGameRecord, saveHighScore, getHighScore } from '@/utils/storage';
 
+type MedicineIssue = {
+  medicineId: string;
+  issues: {
+    dosage: 'correct' | 'incorrect' | 'pending';
+    contraindication: 'correct' | 'incorrect' | 'pending';
+    batch: 'correct' | 'incorrect' | 'pending';
+  };
+  resolved: boolean;
+  issueType?: 'dosage' | 'contraindication' | 'batch' | 'batch_expired' | null;
+  issueResolved: boolean;
+};
+
 interface GameStore extends GameState {
   currentPrescriptions: Prescription[];
   toasts: any[];
@@ -26,6 +38,7 @@ interface GameStore extends GameState {
   actionCount: Record<string, number>;
   prescriptionHasError: boolean;
   playerDecision: 'confirm' | 'reject' | null;
+  medicineIssues: Record<string, MedicineIssue>;
   
   initGame: (levelId: string) => void;
   startReading: () => void;
@@ -45,6 +58,10 @@ interface GameStore extends GameState {
   checkContraindication: (medicineId: string) => void;
   checkBatch: (medicineId: string) => void;
   
+  correctDosage: (medicineId: string) => void;
+  replaceBatch: (medicineId: string) => void;
+  markContraindication: (medicineId: string) => void;
+  
   updateCheckResult: (medicineId: string, checkType: CheckType, result: 'correct' | 'incorrect') => void;
   
   confirmPrescription: () => void;
@@ -61,6 +78,9 @@ interface GameStore extends GameState {
   isAllChecked: () => boolean;
   getAvailableMedicines: () => string[];
   checkPrescriptionHasError: () => boolean;
+  canConfirm: () => boolean;
+  hasUnresolvedContraindication: () => boolean;
+  getMedicineIssue: (medicineId: string) => MedicineIssue | undefined;
 }
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
@@ -86,6 +106,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   actionCount: {},
   prescriptionHasError: false,
   playerDecision: null,
+  medicineIssues: {},
 
   initGame: (levelId: string) => {
     const level = getLevelById(levelId);
@@ -113,7 +134,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       actionCount: {},
       toasts: [],
       prescriptionHasError: false,
-      playerDecision: null
+      playerDecision: null,
+      medicineIssues: {}
     });
   },
 
@@ -131,7 +153,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       status: 'reading',
       readingTimeRemaining: level.readingTimeLimit,
       prescriptionHasError: hasError,
-      playerDecision: null
+      playerDecision: null,
+      medicineIssues: {}
     });
     get().addAction('drag_start', { details: '开始阅读处方' });
   },
@@ -351,6 +374,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           batch: 'pending'
         }
       ],
+      medicineIssues: {
+        ...state.medicineIssues,
+        [medicineId]: {
+          medicineId,
+          issues: {
+            dosage: 'pending',
+            contraindication: 'pending',
+            batch: 'pending'
+          },
+          resolved: false,
+          issueType: null,
+          issueResolved: false
+        }
+      },
       lastActionMedicineId: medicineId,
       actionCount: {
         ...state.actionCount,
@@ -365,9 +402,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     if (state.status !== 'playing') return;
     
+    const newMedicineIssues = { ...state.medicineIssues };
+    delete newMedicineIssues[medicineId];
+    
     set({
       placedMedicines: state.placedMedicines.filter(id => id !== medicineId),
       checkResults: state.checkResults.filter(cr => cr.medicineId !== medicineId),
+      medicineIssues: newMedicineIssues,
       lastActionMedicineId: medicineId
     });
     
@@ -398,10 +439,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().addToast({
         type: 'warning',
         title: '发现剂量问题！',
-        message: `处方剂量${prescriptionItem.dosage}${prescriptionItem.unit}存在问题，请在下方选择"拒绝配药"`,
+        message: `处方剂量${prescriptionItem.dosage}${prescriptionItem.unit}存在问题，请点击"修正剂量"按钮进行修正`,
         duration: 3000
       });
       get().updateCheckResult(medicineId, 'dosage', 'incorrect');
+      
+      set(state => ({
+        medicineIssues: {
+          ...state.medicineIssues,
+          [medicineId]: {
+            ...state.medicineIssues[medicineId],
+            issues: {
+              ...state.medicineIssues[medicineId].issues,
+              dosage: 'incorrect'
+            },
+            issueType: 'dosage',
+            resolved: false
+          }
+        }
+      }));
     } else {
       get().addToast({
         type: 'success',
@@ -411,6 +467,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
       get().updateCheckResult(medicineId, 'dosage', 'correct');
       set({ score: state.score + getBonusPoints('dosage_check_correct') });
+      
+      set(state => ({
+        medicineIssues: {
+          ...state.medicineIssues,
+          [medicineId]: {
+            ...state.medicineIssues[medicineId],
+            issues: {
+              ...state.medicineIssues[medicineId].issues,
+              dosage: 'correct'
+            }
+          }
+        }
+      }));
     }
     
     get().addAction('check', { medicineId, checkType: 'dosage', isCorrect: !hasDosageError });
@@ -434,10 +503,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().addToast({
         type: 'warning',
         title: '发现禁忌问题！',
-        message: `${medicine.name}存在配伍禁忌或与患者情况冲突，请在下方选择"拒绝配药"`,
+        message: `${medicine.name}存在配伍禁忌或与患者情况冲突，请点击"标记禁忌"按钮进行标记`,
         duration: 3000
       });
       get().updateCheckResult(medicineId, 'contraindication', 'incorrect');
+      
+      set(state => ({
+        medicineIssues: {
+          ...state.medicineIssues,
+          [medicineId]: {
+            ...state.medicineIssues[medicineId],
+            issues: {
+              ...state.medicineIssues[medicineId].issues,
+              contraindication: 'incorrect'
+            },
+            issueType: 'contraindication',
+            resolved: false
+          }
+        }
+      }));
     } else {
       get().addToast({
         type: 'success',
@@ -447,6 +531,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
       get().updateCheckResult(medicineId, 'contraindication', 'correct');
       set({ score: state.score + getBonusPoints('contraindication_check_correct') });
+      
+      set(state => ({
+        medicineIssues: {
+          ...state.medicineIssues,
+          [medicineId]: {
+            ...state.medicineIssues[medicineId],
+            issues: {
+              ...state.medicineIssues[medicineId].issues,
+              contraindication: 'correct'
+            }
+          }
+        }
+      }));
     }
     
     get().addAction('check', { medicineId, checkType: 'contraindication', isCorrect: !hasContraindication });
@@ -469,10 +566,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().addToast({
         type: 'warning',
         title: '发现批号问题！',
-        message: `${medicine.name} 批号 ${medicine.batchNumber} 有效期至 ${medicine.expiryDate}，已过期或存在问题，请在下方选择"拒绝配药"`,
+        message: `${medicine.name} 批号 ${medicine.batchNumber} 有效期至 ${medicine.expiryDate}，已过期或存在问题，请点击"替换批号"按钮进行替换`,
         duration: 3000
       });
       get().updateCheckResult(medicineId, 'batch', 'incorrect');
+      
+      set(state => ({
+        medicineIssues: {
+          ...state.medicineIssues,
+          [medicineId]: {
+            ...state.medicineIssues[medicineId],
+            issues: {
+              ...state.medicineIssues[medicineId].issues,
+              batch: 'incorrect'
+            },
+            issueType: 'batch',
+            resolved: false
+          }
+        }
+      }));
     } else {
       get().addToast({
         type: 'success',
@@ -482,9 +594,112 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
       get().updateCheckResult(medicineId, 'batch', 'correct');
       set({ score: state.score + getBonusPoints('batch_check_correct') });
+      
+      set(state => ({
+        medicineIssues: {
+          ...state.medicineIssues,
+          [medicineId]: {
+            ...state.medicineIssues[medicineId],
+            issues: {
+              ...state.medicineIssues[medicineId].issues,
+              batch: 'correct'
+            }
+          }
+        }
+      }));
     }
     
     get().addAction('check', { medicineId, checkType: 'batch', isCorrect: !isExpired });
+  },
+
+  correctDosage: (medicineId: string) => {
+    const state = get();
+    const medicine = getMedicineById(medicineId);
+    if (!medicine) return;
+    
+    get().addToast({
+      type: 'success',
+      title: '剂量已修正！',
+      message: `${medicine.name} 剂量已联系医生修正完成`,
+      duration: 2000
+    });
+    
+    set({
+      score: state.score + 30
+    });
+    
+    set(state => ({
+      medicineIssues: {
+        ...state.medicineIssues,
+        [medicineId]: {
+          ...state.medicineIssues[medicineId],
+          issueResolved: true,
+          resolved: true
+        }
+      }
+    }));
+    
+    get().addAction('check', { medicineId, checkType: 'dosage_correction', isCorrect: true });
+  },
+
+  replaceBatch: (medicineId: string) => {
+    const state = get();
+    const medicine = getMedicineById(medicineId);
+    if (!medicine) return;
+    
+    get().addToast({
+      type: 'success',
+      title: '批号已替换！',
+      message: `${medicine.name} 已替换为有效期内的批次`,
+      duration: 2000
+    });
+    
+    set({
+      score: state.score + 25
+    });
+    
+    set(state => ({
+      medicineIssues: {
+        ...state.medicineIssues,
+        [medicineId]: {
+          ...state.medicineIssues[medicineId],
+          issueResolved: true,
+          resolved: true
+        }
+      }
+    }));
+    
+    get().addAction('check', { medicineId, checkType: 'batch_replacement', isCorrect: true });
+  },
+
+  markContraindication: (medicineId: string) => {
+    const state = get();
+    const medicine = getMedicineById(medicineId);
+    if (!medicine) return;
+    
+    get().addToast({
+      type: 'success',
+      title: '禁忌已标记！',
+      message: `${medicine.name} 禁忌问题已标记，需联系医生确认`,
+      duration: 2000
+    });
+    
+    set({
+      score: state.score + 20
+    });
+    
+    set(state => ({
+      medicineIssues: {
+        ...state.medicineIssues,
+        [medicineId]: {
+          ...state.medicineIssues[medicineId],
+          issueResolved: true,
+          resolved: true
+        }
+      }
+    }));
+    
+    get().addAction('check', { medicineId, checkType: 'contraindication_marked', isCorrect: true });
   },
 
   updateCheckResult: (medicineId: string, checkType: CheckType, result: 'correct' | 'incorrect') => {
@@ -505,7 +720,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().addToast({
         type: 'warning',
         title: '请完成所有核对',
-        message: '请完成剂量、禁忌、批号三项核对后再决策',
+        message: '请完成剂量、禁忌、批号三项核对并处理所有问题',
+        duration: 3000
+      });
+      return;
+    }
+    
+    if (state.placedMedicines.length < get().getCurrentPrescription()?.items.length) {
+      get().addToast({
+        type: 'warning',
+        title: '请放置所有处方药品',
+        message: '请将处方中的所有药品都放置到配药台',
+        duration: 3000
+      });
+      return;
+    }
+    
+    const hasUnresolved = get().hasUnresolvedContraindication();
+    if (hasUnresolved) {
+      get().addToast({
+        type: 'error',
+        title: '存在未处理的禁忌问题',
+        message: '存在禁忌问题的处方不能配药，请选择"拒绝配药"',
         duration: 3000
       });
       return;
@@ -513,6 +749,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     
     const hasError = state.prescriptionHasError;
     const currentPrescription = get().getCurrentPrescription();
+    
+    if (hasError && !get().canConfirm()) {
+      get().addToast({
+        type: 'error',
+        title: '存在未处理的问题',
+        message: '请先修正或标记所有问题后再确认配药',
+        duration: 3000
+      });
+      return;
+    }
     
     if (hasError) {
       get().addError('contraindication',
@@ -562,6 +808,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         type: 'warning',
         title: '请完成所有核对',
         message: '请完成剂量、禁忌、批号三项核对后再决策',
+        duration: 3000
+      });
+      return;
+    }
+    
+    const prescription = get().getCurrentPrescription();
+    
+    if (state.placedMedicines.length < get().getCurrentPrescription()?.items.length) {
+      get().addToast({
+        type: 'warning',
+        title: '请放置所有处方药品',
+        message: '请将处方中的所有药品都放置到配药台',
         duration: 3000
       });
       return;
@@ -635,6 +893,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       prescriptionTimeRemaining: level.prescriptionTimeLimit,
       placedMedicines: [],
       checkResults: [],
+      medicineIssues: {},
       prescriptionStartTime: Date.now(),
       lastActionMedicineId: null,
       prescriptionHasError: hasError,
@@ -720,7 +979,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   isAllChecked: () => {
     const state = get();
-    if (state.checkResults.length === 0) return false;
+    const prescription = get().getCurrentPrescription();
+    if (!prescription || state.checkResults.length === 0) return false;
+    
+    const allPlaced = prescription.items.every(item => 
+      state.placedMedicines.includes(item.medicineId)
+    );
+    
+    if (!allPlaced) return false;
     
     return state.checkResults.every(cr =>
       cr.dosage !== 'pending' &&
@@ -747,5 +1013,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   checkPrescriptionHasError: () => {
     return get().prescriptionHasError;
+  },
+
+  canConfirm: () => {
+    const issues = Object.values(get().medicineIssues);
+    return issues.every(issue => issue.resolved || issue.issueType !== 'contraindication');
+  },
+
+  hasUnresolvedContraindication: () => {
+    const issues = Object.values(get().medicineIssues);
+    return issues.some(issue => 
+      issue.issues.contraindication === 'incorrect' && !issue.resolved);
+  },
+
+  getMedicineIssue: (medicineId: string) => {
+    return get().medicineIssues[medicineId];
   }
 }));

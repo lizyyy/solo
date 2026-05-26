@@ -389,11 +389,15 @@ const Replay = () => {
                   <DispensingTable
                     placedMedicineIds={currentAction.placedMedicines}
                     checkResults={currentAction.checkResults}
+                    medicineIssues={{}}
                     onDrop={() => {}}
                     onRemove={() => {}}
                     onCheckDosage={() => {}}
                     onCheckContraindication={() => {}}
                     onCheckBatch={() => {}}
+                    onCorrectDosage={() => {}}
+                    onReplaceBatch={() => {}}
+                    onMarkContraindication={() => {}}
                     disabled={true}
                     prescriptionMedicineIds={prescriptionMedicineIds}
                   />

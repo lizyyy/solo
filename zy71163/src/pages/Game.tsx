@@ -29,6 +29,7 @@ const Game = () => {
     errors,
     placedMedicines,
     checkResults,
+    medicineIssues,
     toasts,
     currentGameId,
     initGame,
@@ -44,7 +45,11 @@ const Game = () => {
     checkDosage,
     checkContraindication,
     checkBatch,
+    correctDosage,
+    replaceBatch,
+    markContraindication,
     confirmPrescription,
+    rejectPrescription,
     nextPrescription,
     removeToast,
     isAllChecked,
@@ -200,11 +205,15 @@ const Game = () => {
                 <DispensingTable
                   placedMedicineIds={placedMedicines}
                   checkResults={checkResults}
+                  medicineIssues={medicineIssues}
                   onDrop={placeMedicine}
                   onRemove={removeMedicine}
                   onCheckDosage={checkDosage}
                   onCheckContraindication={checkContraindication}
                   onCheckBatch={checkBatch}
+                  onCorrectDosage={correctDosage}
+                  onReplaceBatch={replaceBatch}
+                  onMarkContraindication={markContraindication}
                   disabled={status !== 'playing'}
                   prescriptionMedicineIds={prescriptionMedicineIds}
                 />

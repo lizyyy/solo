@@ -1,19 +1,35 @@
 import { memo, useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, X, Check, AlertTriangle, Scale, Ban, Calendar, Clock, Trash2 } from 'lucide-react';
+import { Plus, X, Check, AlertTriangle, Scale, Ban, Calendar, Clock, Trash2, Pill, RefreshCw, AlertCircle } from 'lucide-react';
 import type { Medicine, MedicineCheckResult } from '@/types';
 import { getMedicineById } from '@/data/medicines';
 import { cn } from '@/lib/utils';
 import { MedicineCard } from './MedicineCard';
 
+type MedicineIssue = {
+  medicineId: string;
+  issues: {
+    dosage: 'correct' | 'incorrect' | 'pending';
+    contraindication: 'correct' | 'incorrect' | 'pending';
+    batch: 'correct' | 'incorrect' | 'pending';
+  };
+  resolved: boolean;
+  issueType?: 'dosage' | 'contraindication' | 'batch' | 'batch_expired' | null;
+  issueResolved: boolean;
+};
+
 interface DispensingTableProps {
   placedMedicineIds: string[];
   checkResults: MedicineCheckResult[];
+  medicineIssues: Record<string, MedicineIssue>;
   onDrop: (medicineId: string) => void;
   onRemove: (medicineId: string) => void;
   onCheckDosage: (medicineId: string) => void;
   onCheckContraindication: (medicineId: string) => void;
   onCheckBatch: (medicineId: string) => void;
+  onCorrectDosage: (medicineId: string) => void;
+  onReplaceBatch: (medicineId: string) => void;
+  onMarkContraindication: (medicineId: string) => void;
   disabled?: boolean;
   prescriptionMedicineIds: string[];
 }
@@ -68,23 +84,70 @@ const CheckButton = memo(function CheckButton({
   );
 });
 
+interface CorrectButtonProps {
+  label: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  color: string;
+}
+
+const CorrectButton = memo(function CorrectButton({
+  label,
+  icon,
+  onClick,
+  disabled = false,
+  color
+}: CorrectButtonProps) {
+  const colorClasses: Record<string, string> = {
+    blue: 'bg-blue-100 text-blue-700 border-blue-400 hover:bg-blue-200',
+    green: 'bg-green-100 text-green-700 border-green-400 hover:bg-green-200',
+    orange: 'bg-orange-100 text-orange-700 border-orange-400 hover:bg-orange-200',
+    red: 'bg-red-100 text-red-700 border-red-400 hover:bg-red-200'
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        'flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all',
+        colorClasses[color],
+        disabled && 'opacity-50 cursor-not-allowed',
+        !disabled && 'cursor-pointer hover:shadow-md'
+      )}
+    >
+      {icon}
+      <span>{label}</span>
+    </button>
+  );
+});
+
 interface PlacedMedicineCardProps {
   medicine: Medicine;
   checkResult: MedicineCheckResult | undefined;
+  medicineIssue: MedicineIssue | undefined;
   onRemove: () => void;
   onCheckDosage: () => void;
   onCheckContraindication: () => void;
   onCheckBatch: () => void;
+  onCorrectDosage: () => void;
+  onReplaceBatch: () => void;
+  onMarkContraindication: () => void;
   disabled?: boolean;
 }
 
 const PlacedMedicineCard = memo(function PlacedMedicineCard({
   medicine,
   checkResult,
+  medicineIssue,
   onRemove,
   onCheckDosage,
   onCheckContraindication,
   onCheckBatch,
+  onCorrectDosage,
+  onReplaceBatch,
+  onMarkContraindication,
   disabled = false
 }: PlacedMedicineCardProps) {
   const allChecked = checkResult && 
@@ -97,6 +160,11 @@ const PlacedMedicineCard = memo(function PlacedMedicineCard({
     checkResult.contraindication === 'correct' && 
     checkResult.batch === 'correct';
 
+  const hasIssue = medicineIssue && !medicineIssue.resolved && medicineIssue.issueType;
+  const hasDosageIssue = medicineIssue?.issues.dosage === 'incorrect' && !medicineIssue?.resolved;
+  const hasContraindicationIssue = medicineIssue?.issues.contraindication === 'incorrect' && !medicineIssue?.resolved;
+  const hasBatchIssue = medicineIssue?.issues.batch === 'incorrect' && !medicineIssue?.resolved;
+
   return (
     <motion.div
       layout
@@ -105,16 +173,22 @@ const PlacedMedicineCard = memo(function PlacedMedicineCard({
       exit={{ opacity: 0, scale: 0.9 }}
       className={cn(
         'p-4 rounded-2xl border-2 bg-white shadow-lg transition-all',
-        allCorrect ? 'border-green-400 bg-green-50/50' : 'border-gray-200'
+        allCorrect ? 'border-green-400 bg-green-50/50' : 
+        hasIssue ? 'border-yellow-400 bg-yellow-50/30' : 
+        'border-gray-200'
       )}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className={cn(
             'w-12 h-12 rounded-xl flex items-center justify-center shadow',
-            allCorrect ? 'bg-green-500' : 'bg-gradient-to-br from-blue-500 to-blue-600'
+            allCorrect ? 'bg-green-500' : 
+            hasIssue ? 'bg-yellow-500' : 
+            'bg-gradient-to-br from-blue-500 to-blue-600'
           )}>
-            {allCorrect ? <Check className="text-white" size={24} /> : <Plus className="text-white" size={24} />}
+            {allCorrect ? <Check className="text-white" size={24} /> : 
+             hasIssue ? <AlertTriangle className="text-white" size={24} /> : 
+             <Plus className="text-white" size={24} />}
           </div>
           <div>
             <h3 className="font-bold text-gray-900">{medicine.name}</h3>
@@ -133,7 +207,7 @@ const PlacedMedicineCard = memo(function PlacedMedicineCard({
         )}
       </div>
       
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-2 mb-3">
         <CheckButton
           label="剂量"
           icon={<Scale size={14} />}
@@ -159,6 +233,17 @@ const PlacedMedicineCard = memo(function PlacedMedicineCard({
           color="yellow"
         />
       </div>
+
+      {allChecked && !allCorrect && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-3 p-2 bg-yellow-100 rounded-lg flex items-center gap-2 text-yellow-700 text-sm"
+        >
+          <AlertCircle size={16} />
+          <span className="font-medium">发现问题，请选择相应的修正操作</span>
+        </motion.div>
+      )}
       
       {allCorrect && (
         <motion.div
@@ -170,15 +255,55 @@ const PlacedMedicineCard = memo(function PlacedMedicineCard({
           <span className="font-medium">该药品核对完成，全部正确</span>
         </motion.div>
       )}
-      
-      {allChecked && !allCorrect && (
+
+      {hasDosageIssue && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-3 p-2 bg-yellow-100 rounded-lg flex items-center gap-2 text-yellow-700 text-sm"
+          className="mt-2 flex items-center gap-2"
         >
-          <AlertTriangle size={16} />
-          <span className="font-medium">发现处方存在问题，请在下方选择"拒绝配药"</span>
+          <CorrectButton
+            label="修正剂量"
+            icon={<RefreshCw size={14} />}
+            onClick={onCorrectDosage}
+            disabled={disabled}
+            color="blue"
+          />
+          <span className="text-xs text-gray-500">联系医生确认正确剂量</span>
+        </motion.div>
+      )}
+
+      {hasContraindicationIssue && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-2 flex items-center gap-2"
+        >
+          <CorrectButton
+            label="标记禁忌"
+            icon={<AlertTriangle size={14} />}
+            onClick={onMarkContraindication}
+            disabled={disabled}
+            color="red"
+          />
+          <span className="text-xs text-gray-500">标记后需拒绝配药并联系医生</span>
+        </motion.div>
+      )}
+
+      {hasBatchIssue && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-2 flex items-center gap-2"
+        >
+          <CorrectButton
+            label="替换批号"
+            icon={<Pill size={14} />}
+            onClick={onReplaceBatch}
+            disabled={disabled}
+            color="orange"
+          />
+          <span className="text-xs text-gray-500">从库存中选择有效批次</span>
         </motion.div>
       )}
     </motion.div>
@@ -188,11 +313,15 @@ const PlacedMedicineCard = memo(function PlacedMedicineCard({
 export const DispensingTable = memo(function DispensingTable({
   placedMedicineIds,
   checkResults,
+  medicineIssues,
   onDrop,
   onRemove,
   onCheckDosage,
   onCheckContraindication,
   onCheckBatch,
+  onCorrectDosage,
+  onReplaceBatch,
+  onMarkContraindication,
   disabled = false,
   prescriptionMedicineIds
 }: DispensingTableProps) {
@@ -269,6 +398,7 @@ export const DispensingTable = memo(function DispensingTable({
             {placedMedicineIds.map((medicineId, index) => {
               const medicine = getMedicineById(medicineId);
               const checkResult = checkResults.find(cr => cr.medicineId === medicineId);
+              const medicineIssue = medicineIssues[medicineId];
               
               if (!medicine) return null;
               
@@ -277,10 +407,14 @@ export const DispensingTable = memo(function DispensingTable({
                   key={medicineId}
                   medicine={medicine}
                   checkResult={checkResult}
+                  medicineIssue={medicineIssue}
                   onRemove={() => onRemove(medicineId)}
                   onCheckDosage={() => onCheckDosage(medicineId)}
                   onCheckContraindication={() => onCheckContraindication(medicineId)}
                   onCheckBatch={() => onCheckBatch(medicineId)}
+                  onCorrectDosage={() => onCorrectDosage(medicineId)}
+                  onReplaceBatch={() => onReplaceBatch(medicineId)}
+                  onMarkContraindication={() => onMarkContraindication(medicineId)}
                   disabled={disabled}
                 />
               );
