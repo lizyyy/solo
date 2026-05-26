@@ -110,8 +110,13 @@ export const useGameStore = create<GameState>((set, get) => ({
       isWrongOperation = true;
       errorMsg = '无法穿越墙壁';
     } else if (lastPos && !isAdjacent(lastPos, position)) {
-      isWrongOperation = true;
-      errorMsg = '只能点击相邻格子';
+      if (plannedPath.length === 0 && playerPosition &&
+          position.x === playerPosition.x && position.y === playerPosition.y) {
+        // 点击起点，允许
+      } else {
+        isWrongOperation = true;
+        errorMsg = '只能点击相邻格子';
+      }
     } else if (plannedPath.some(p => p.x === position.x && p.y === position.y)) {
       isWrongOperation = true;
       errorMsg = '路径不能重复经过同一位置';
@@ -132,7 +137,15 @@ export const useGameStore = create<GameState>((set, get) => ({
       return;
     }
 
-    set({ plannedPath: [...plannedPath, position] });
+    if (plannedPath.length === 0 && playerPosition) {
+      if (position.x === playerPosition.x && position.y === playerPosition.y) {
+        set({ plannedPath: [position] });
+      } else {
+        set({ plannedPath: [playerPosition, position] });
+      }
+    } else {
+      set({ plannedPath: [...plannedPath, position] });
+    }
   },
 
   undoPath: () => {
