@@ -2,7 +2,7 @@ export type GameStatus = 'menu' | 'playing' | 'paused' | 'ended';
 export type VehicleStatus = 'idle' | 'moving' | 'repairing' | 'returning';
 export type LampStatus = 'normal' | 'broken' | 'assigned' | 'repairing' | 'repaired' | 'timeout';
 export type Priority = 'low' | 'normal' | 'high' | 'critical';
-export type ActionType = 'dispatch' | 'cancel' | 'repair' | 'timeout' | 'waste' | 'bonus' | 'base';
+export type ActionType = 'dispatch' | 'cancel' | 'repair' | 'timeout' | 'waste' | 'bonus' | 'base' | 'route';
 
 export interface Point {
   x: number;
@@ -40,6 +40,8 @@ export interface Vehicle {
   targetLampId: string | null;
   repairProgress: number;
   emptyTime: number;
+  routeCost: number;
+  routeDistance: number;
 }
 
 export interface StreetLamp {
@@ -70,6 +72,17 @@ export interface ScoreBreakdown {
   errorPenalty: number;
   timeoutPenalty: number;
   wastePenalty: number;
+  routeCostPenalty: number;
+}
+
+export interface RouteDetail {
+  vehicleId: string;
+  vehicleName: string;
+  lampId: string;
+  path: string[];
+  distance: number;
+  cost: number;
+  costPenalty: number;
 }
 
 export interface ActionRecord {
@@ -98,6 +111,7 @@ export interface GameState {
   spareParts: SpareParts;
   scoreBreakdown: ScoreBreakdown;
   actions: ActionRecord[];
+  routeDetails: RouteDetail[];
   selectedVehicleId: string | null;
   selectedLampId: string | null;
   hoveredLampId: string | null;
@@ -114,5 +128,6 @@ export interface HistoryRecord {
   scoreBreakdown: ScoreBreakdown;
   failureReason?: string;
   actions: ActionRecord[];
+  routeDetails: RouteDetail[];
   totalTime: number;
 }

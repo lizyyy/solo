@@ -1,34 +1,6 @@
 import { Clock, Wrench, AlertTriangle, CheckCircle, Truck } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
-import { Vehicle, Priority } from '@/types/game';
-
-function getPriorityLabel(priority: Priority): string {
-  switch (priority) {
-    case 'critical':
-      return '紧急';
-    case 'high':
-      return '高';
-    case 'normal':
-      return '中';
-    case 'low':
-    default:
-      return '低';
-  }
-}
-
-function getPriorityColor(priority: Priority): string {
-  switch (priority) {
-    case 'critical':
-      return 'bg-red-500/20 text-red-400 border-red-500/50';
-    case 'high':
-      return 'bg-orange-500/20 text-orange-400 border-orange-500/50';
-    case 'normal':
-      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
-    case 'low':
-    default:
-      return 'bg-slate-500/20 text-slate-400 border-slate-500/50';
-  }
-}
+import { Vehicle } from '@/types/game';
 
 function getVehicleStatusLabel(status: Vehicle['status']): string {
   switch (status) {

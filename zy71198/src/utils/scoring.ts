@@ -1,4 +1,4 @@
-import { ScoreBreakdown, ActionRecord, StreetLamp, Vehicle, Priority } from '@/types/game';
+import { ScoreBreakdown, ActionRecord, StreetLamp, Priority } from '@/types/game';
 
 export function getInitialScoreBreakdown(): ScoreBreakdown {
   return {
@@ -8,6 +8,7 @@ export function getInitialScoreBreakdown(): ScoreBreakdown {
     errorPenalty: 0,
     timeoutPenalty: 0,
     wastePenalty: 0,
+    routeCostPenalty: 0,
   };
 }
 
@@ -18,7 +19,8 @@ export function calculateTotalScore(breakdown: ScoreBreakdown): number {
     breakdown.timeBonus -
     breakdown.errorPenalty -
     breakdown.timeoutPenalty -
-    breakdown.wastePenalty
+    breakdown.wastePenalty -
+    breakdown.routeCostPenalty
   );
 }
 
@@ -48,7 +50,18 @@ export function calculateRepairScore(lamp: StreetLamp, timeRemaining: number): {
   return { baseScore, priorityBonus, timeBonus };
 }
 
-export function getGrade(score: number, breakdown: ScoreBreakdown, totalLamps: number): string {
+export function calculateRouteCostPenalty(
+  routeCost: number,
+  optimalCost: number
+): number {
+  if (optimalCost <= 0) return 0;
+  const overRatio = (routeCost - optimalCost) / optimalCost;
+  if (overRatio <= 0.5) return 0;
+  const excess = overRatio - 0.5;
+  return Math.round(excess * 10 * 5);
+}
+
+export function getGrade(score: number, breakdown: ScoreBreakdown, _totalLamps: number): string {
   if (score >= 900 && breakdown.timeoutPenalty === 0) return 'S';
   if (score >= 750) return 'A';
   if (score >= 600) return 'B';
@@ -59,7 +72,7 @@ export function getGrade(score: number, breakdown: ScoreBreakdown, totalLamps: n
 export function getFailureReason(
   breakdown: ScoreBreakdown,
   lamps: StreetLamp[],
-  vehicles: Vehicle[]
+  _vehicles: unknown
 ): string | null {
   const timedOut = lamps.filter((l) => l.status === 'timeout');
   const unrepaired = lamps.filter((l) => l.status === 'broken' || l.status === 'assigned');
@@ -78,6 +91,10 @@ export function getFailureReason(
 
   if (breakdown.wastePenalty > breakdown.baseScore * 0.25) {
     return '资源浪费严重，路线规划不合理。';
+  }
+
+  if (breakdown.routeCostPenalty > breakdown.baseScore * 0.3) {
+    return '路线成本过高，建议选择更短路径。';
   }
 
   return null;
@@ -110,6 +127,7 @@ export function getScoreItemLabel(type: string): string {
     errorPenalty: '错误操作扣分',
     timeoutPenalty: '超时扣分',
     wastePenalty: '资源浪费扣分',
+    routeCostPenalty: '路线成本扣分',
   };
   return labels[type] || type;
 }
@@ -123,6 +141,7 @@ export function getScoreItemColor(type: string, isPositive: boolean): string {
     if (type === 'errorPenalty') return 'text-orange-400';
     if (type === 'timeoutPenalty') return 'text-red-400';
     if (type === 'wastePenalty') return 'text-yellow-400';
+    if (type === 'routeCostPenalty') return 'text-purple-400';
   }
   return 'text-gray-400';
 }

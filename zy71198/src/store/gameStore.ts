@@ -1,11 +1,8 @@
 import { create } from 'zustand';
 import {
   GameState,
-  Vehicle,
-  StreetLamp,
-  ActionRecord,
-  ScoreBreakdown,
   HistoryRecord,
+  RouteDetail,
 } from '@/types/game';
 import { generateMap, getTotalSpareParts } from '@/utils/mapGenerator';
 import { findPath } from '@/utils/pathfinding';
@@ -13,6 +10,7 @@ import {
   getInitialScoreBreakdown,
   calculateTotalScore,
   calculateRepairScore,
+  calculateRouteCostPenalty,
   getGrade,
   getFailureReason,
   createActionRecord,
@@ -23,13 +21,19 @@ function createInitialState(level: number = 1): Partial<GameState> {
   const map = generateMap(level);
   const sparePartsTotal = Math.ceil(getTotalSpareParts(map.lamps) * 1.2);
 
+  const vehicles = map.vehicles.map((v) => ({
+    ...v,
+    routeCost: 0,
+    routeDistance: 0,
+  }));
+
   return {
     level,
     score: 0,
     timeRemaining: 180 + level * 30,
     gameSpeed: 1,
     isPaused: false,
-    vehicles: map.vehicles,
+    vehicles,
     lamps: map.lamps,
     nodes: map.nodes,
     edges: map.edges,
@@ -41,6 +45,7 @@ function createInitialState(level: number = 1): Partial<GameState> {
     },
     scoreBreakdown: getInitialScoreBreakdown(),
     actions: [],
+    routeDetails: [],
     selectedVehicleId: null,
     selectedLampId: null,
     hoveredLampId: null,
@@ -81,6 +86,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   spareParts: { total: 0, used: 0, wasted: 0 },
   scoreBreakdown: getInitialScoreBreakdown(),
   actions: [],
+  routeDetails: [],
   selectedVehicleId: null,
   selectedLampId: null,
   hoveredLampId: null,
@@ -110,7 +116,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   resetGame: () => {
-    set({ status: 'menu', score: 0, actions: [] });
+    set({ status: 'menu', score: 0, actions: [], routeDetails: [] });
   },
 
   setGameSpeed: (speed: number) => {
@@ -139,31 +145,49 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (lamp.status !== 'broken') return;
 
     if (vehicle.spareParts < lamp.repairCost) {
-      const newActions = [
-        ...state.actions,
-        createActionRecord(
-          'waste',
-          `派遣${vehicle.name}维修${lampId}失败：备件不足`,
-          -30,
-          state.timeRemaining,
-          vehicleId,
-          lampId
-        ),
-      ];
       const newBreakdown = {
         ...state.scoreBreakdown,
         errorPenalty: state.scoreBreakdown.errorPenalty + 30,
       };
       set({
-        actions: newActions,
+        actions: [
+          ...state.actions,
+          createActionRecord(
+            'waste',
+            `派遣${vehicle.name}维修${lampId}失败：备件不足`,
+            -30,
+            state.timeRemaining,
+            vehicleId,
+            lampId
+          ),
+        ],
         scoreBreakdown: newBreakdown,
         score: calculateTotalScore(newBreakdown),
       });
       return;
     }
 
-    const pathResult = findPath(state.nodes, state.edges, vehicle.currentNodeId, lamp.nodeId);
-    if (!pathResult) return;
+    const pathByDistance = findPath(state.nodes, state.edges, vehicle.currentNodeId, lamp.nodeId, 'distance');
+    const pathByCost = findPath(state.nodes, state.edges, vehicle.currentNodeId, lamp.nodeId, 'cost');
+
+    if (!pathByDistance || !pathByCost) return;
+
+    const routeCostPenalty = calculateRouteCostPenalty(pathByCost.totalCost, pathByDistance.totalCost);
+
+    const routeDetail: RouteDetail = {
+      vehicleId,
+      vehicleName: vehicle.name,
+      lampId,
+      path: pathByCost.path,
+      distance: pathByCost.totalDistance,
+      cost: pathByCost.totalCost,
+      costPenalty: routeCostPenalty,
+    };
+
+    const newBreakdown = {
+      ...state.scoreBreakdown,
+      routeCostPenalty: state.scoreBreakdown.routeCostPenalty + routeCostPenalty,
+    };
 
     const newVehicles = state.vehicles.map((v) =>
       v.id === vehicleId
@@ -172,9 +196,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             status: 'moving' as const,
             targetNodeId: lamp.nodeId,
             targetLampId: lampId,
-            path: pathResult.path,
+            path: pathByCost.path,
             pathIndex: 0,
             progress: 0,
+            routeCost: pathByCost.totalCost,
+            routeDistance: pathByCost.totalDistance,
           }
         : v
     );
@@ -185,22 +211,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : l
     );
 
+    const routePenaltyText = routeCostPenalty > 0
+      ? `，路线成本扣分 -${routeCostPenalty}`
+      : '';
+
     const newActions = [
       ...state.actions,
       createActionRecord(
         'dispatch',
-        `派遣${vehicle.name}前往维修${lampId}`,
-        0,
+        `派遣${vehicle.name}前往维修${lampId}，路径成本${pathByCost.totalCost}${routePenaltyText}`,
+        -routeCostPenalty,
         state.timeRemaining,
         vehicleId,
         lampId
       ),
     ];
 
+    if (routeCostPenalty > 0) {
+      newActions.push(
+        createActionRecord(
+          'route',
+          `${vehicle.name}路线成本超出最优${Math.round(((pathByCost.totalCost - pathByDistance.totalCost) / pathByDistance.totalCost) * 100)}%`,
+          -routeCostPenalty,
+          state.timeRemaining,
+          vehicleId,
+          lampId
+        )
+      );
+    }
+
     set({
       vehicles: newVehicles,
       lamps: newLamps,
       actions: newActions,
+      routeDetails: [...state.routeDetails, routeDetail],
+      scoreBreakdown: newBreakdown,
+      score: calculateTotalScore(newBreakdown),
     });
   },
 
@@ -224,6 +270,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             pathIndex: 0,
             progress: 0,
             repairProgress: 0,
+            routeCost: 0,
+            routeDistance: 0,
           }
         : v
     );
@@ -236,18 +284,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         )
       : state.lamps;
 
-    const newActions = [
-      ...state.actions,
-      createActionRecord(
-        'cancel',
-        `取消${vehicle.name}的维修任务`,
-        -15,
-        state.timeRemaining,
-        vehicleId,
-        targetLamp?.id
-      ),
-    ];
-
     const newBreakdown = {
       ...state.scoreBreakdown,
       errorPenalty: state.scoreBreakdown.errorPenalty + 15,
@@ -256,7 +292,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({
       vehicles: newVehicles,
       lamps: newLamps,
-      actions: newActions,
+      actions: [
+        ...state.actions,
+        createActionRecord(
+          'cancel',
+          `取消${vehicle.name}的维修任务`,
+          -15,
+          state.timeRemaining,
+          vehicleId,
+          targetLamp?.id
+        ),
+      ],
       scoreBreakdown: newBreakdown,
       score: calculateTotalScore(newBreakdown),
     });
@@ -267,12 +313,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (state.status !== 'playing' || state.isPaused) return;
 
     const scaledDelta = deltaTime * state.gameSpeed;
-    let newTimeRemaining = Math.max(0, state.timeRemaining - scaledDelta);
+    const newTimeRemaining = Math.max(0, state.timeRemaining - scaledDelta);
     let newVehicles = [...state.vehicles];
     let newLamps = [...state.lamps];
-    let newBreakdown = { ...state.scoreBreakdown };
-    let newActions = [...state.actions];
-    let newSpareParts = { ...state.spareParts };
+    const newBreakdown = { ...state.scoreBreakdown };
+    const newActions = [...state.actions];
+    const newSpareParts = { ...state.spareParts };
 
     newLamps = newLamps.map((lamp) => {
       if (lamp.status === 'broken' || lamp.status === 'assigned') {
@@ -373,7 +419,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               state.nodes,
               state.edges,
               vehicle.currentNodeId,
-              state.depotNodeId
+              state.depotNodeId,
+              'cost'
             );
 
             if (pathToDepot) {
@@ -417,6 +464,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 path: [],
                 pathIndex: 0,
                 progress: 0,
+                routeCost: 0,
+                routeDistance: 0,
               };
             }
             return {
@@ -460,6 +509,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         scoreBreakdown: newBreakdown,
         failureReason: reason || undefined,
         actions: newActions,
+        routeDetails: state.routeDetails,
         totalTime: state.timeRemaining - newTimeRemaining,
       };
       saveHistory(historyRecord);
@@ -505,6 +555,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       scoreBreakdown: state.scoreBreakdown,
       failureReason: reason || undefined,
       actions: state.actions,
+      routeDetails: state.routeDetails,
       totalTime: 180 + state.level * 30 - state.timeRemaining,
     };
     saveHistory(historyRecord);
@@ -524,6 +575,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       totalLamps: state.lamps.length,
       repairedLamps: state.lamps.filter((l) => l.status === 'repaired').length,
       timeoutLamps: state.lamps.filter((l) => l.status === 'timeout').length,
+      routeDetails: state.routeDetails.map((rd) => ({
+        vehicle: rd.vehicleName,
+        lampId: rd.lampId,
+        path: rd.path,
+        distance: rd.distance,
+        cost: rd.cost,
+        costPenalty: rd.costPenalty,
+      })),
+      totalRouteCost: state.routeDetails.reduce((sum, rd) => sum + rd.cost, 0),
+      totalRoutePenalty: state.routeDetails.reduce((sum, rd) => sum + rd.costPenalty, 0),
       actions: state.actions,
       timestamp: state.gameStartTime,
     };

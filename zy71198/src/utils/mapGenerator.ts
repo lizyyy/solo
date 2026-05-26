@@ -204,6 +204,8 @@ export function generateMap(level: number): GeneratedMap {
       targetLampId: null,
       repairProgress: 0,
       emptyTime: 0,
+      routeCost: 0,
+      routeDistance: 0,
     });
   }
 

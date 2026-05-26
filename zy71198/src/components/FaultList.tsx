@@ -1,4 +1,4 @@
-import { AlertTriangle, Clock, Wrench, MapPin } from 'lucide-react';
+import { AlertTriangle, Wrench, MapPin } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
 import { Priority } from '@/types/game';
 

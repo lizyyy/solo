@@ -1,9 +1,9 @@
-import { Trophy, XCircle, Download, RotateCcw, Clock } from 'lucide-react';
+import { Trophy, XCircle, Download, RotateCcw } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
-import { getScoreItemLabel, getScoreItemColor } from '@/utils/scoring';
+import { getScoreItemColor } from '@/utils/scoring';
 
 export default function GameOver() {
-  const { score, scoreBreakdown, lamps, failureReason, level, resetGame, startGame, exportReport } =
+  const { score, scoreBreakdown, lamps, routeDetails, failureReason, level, resetGame, startGame, exportReport } =
     useGameStore();
 
   const repaired = lamps.filter((l) => l.status === 'repaired').length;
@@ -27,7 +27,10 @@ export default function GameOver() {
     { key: 'errorPenalty', label: '错误操作扣分', value: scoreBreakdown.errorPenalty, positive: false },
     { key: 'timeoutPenalty', label: '超时扣分', value: scoreBreakdown.timeoutPenalty, positive: false },
     { key: 'wastePenalty', label: '资源浪费扣分', value: scoreBreakdown.wastePenalty, positive: false },
+    { key: 'routeCostPenalty', label: '路线成本扣分', value: scoreBreakdown.routeCostPenalty, positive: false },
   ];
+
+  const totalRouteCost = routeDetails.reduce((sum, rd) => sum + rd.cost, 0);
 
   const handleExport = () => {
     const report = exportReport();
@@ -42,7 +45,7 @@ export default function GameOver() {
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 rounded-xl border border-slate-700 max-w-md w-full p-6 shadow-2xl">
+      <div className="bg-slate-800 rounded-xl border border-slate-700 max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="text-center mb-6">
           <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${gradeInfo.bgColor} mb-4`}>
             <Trophy className={`w-10 h-10 ${gradeInfo.color}`} />
@@ -75,6 +78,31 @@ export default function GameOver() {
             </div>
           </div>
         </div>
+
+        {routeDetails.length > 0 && (
+          <div className="bg-slate-700/50 rounded-lg p-4 mb-4">
+            <h3 className="text-sm font-medium text-slate-400 mb-3">
+              路线明细 <span className="text-purple-400">(总成本 {totalRouteCost})</span>
+            </h3>
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {routeDetails.map((rd, idx) => (
+                <div key={idx} className="flex items-center justify-between text-xs bg-slate-800/50 rounded p-2">
+                  <div className="flex-1">
+                    <span className="text-slate-300">{rd.vehicleName}</span>
+                    <span className="text-slate-500"> → </span>
+                    <span className="text-slate-300">{rd.lampId}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-slate-400">成本 {rd.cost}</span>
+                    {rd.costPenalty > 0 && (
+                      <span className="text-purple-400 ml-2">扣{rd.costPenalty}</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-3 mb-4">
           <div className="bg-slate-700/50 rounded-lg p-3 text-center">

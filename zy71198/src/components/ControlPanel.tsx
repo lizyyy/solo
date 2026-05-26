@@ -1,4 +1,4 @@
-import { Play, Pause, RotateCcw, FastForward, Download } from 'lucide-react';
+import { Play, Pause, RotateCcw, Download } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
 
 export default function ControlPanel() {

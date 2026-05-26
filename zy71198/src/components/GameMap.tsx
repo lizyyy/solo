@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { useGameStore } from '@/store/gameStore';
-import { Node, Edge, Vehicle, StreetLamp } from '@/types/game';
+import { Vehicle, StreetLamp } from '@/types/game';
 import { findPath } from '@/utils/pathfinding';
 
 const CANVAS_WIDTH = 600;

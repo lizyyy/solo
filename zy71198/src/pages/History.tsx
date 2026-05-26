@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { HistoryRecord, ActionRecord } from '@/types/game';
 import { loadHistory, clearHistory } from '@/utils/history';
-import { getScoreItemLabel } from '@/utils/scoring';
 
 export default function HistoryPage() {
   const navigate = useNavigate();
@@ -166,7 +165,7 @@ export default function HistoryPage() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2 text-sm">
+                    <div className="grid grid-cols-3 md:grid-cols-4 gap-2 text-sm">
                       <div className="bg-slate-700/50 rounded p-2 text-center">
                         <div className="text-emerald-400 font-bold">+{selectedRecord.scoreBreakdown.baseScore}</div>
                         <div className="text-xs text-slate-500">基础分</div>
@@ -190,6 +189,10 @@ export default function HistoryPage() {
                       <div className="bg-slate-700/50 rounded p-2 text-center">
                         <div className="text-yellow-400 font-bold">-{selectedRecord.scoreBreakdown.wastePenalty}</div>
                         <div className="text-xs text-slate-500">浪费</div>
+                      </div>
+                      <div className="bg-slate-700/50 rounded p-2 text-center">
+                        <div className="text-cyan-400 font-bold">-{selectedRecord.scoreBreakdown.routeCostPenalty ?? 0}</div>
+                        <div className="text-xs text-slate-500">路线成本</div>
                       </div>
                     </div>
                   </div>

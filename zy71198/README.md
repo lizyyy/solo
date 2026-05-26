@@ -1,57 +1,104 @@
-# React + TypeScript + Vite
+# 城市路灯检修 - 夜间调度模拟器
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一款 2D 浏览器策略模拟游戏，玩家扮演市政维修调度员，在夜间城市地图中派遣维修车辆处理路灯故障。核心玩法在于平衡维修效率、路线成本和备件管理。
 
-Currently, two official plugins are available:
+## 快速开始
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+pnpm install
+pnpm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+打开浏览器访问 http://localhost:5173/
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 游戏规则
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 基本操作
+1. 点击维修车辆（绿色三角）选中
+2. 点击故障路灯（红色圆点）派遣维修
+3. 游戏会自动按成本最优路径规划路线
+4. 维修完成后车辆自动返回车库
+
+### 计分规则
+
+| 项目 | 说明 | 分值 |
+|------|------|------|
+| 基础得分 | 每维修一盏路灯 | +100 |
+| 优先级奖励 | 紧急+50 / 高+20 / 中+0 / 低-20 | 浮动 |
+| 提前完成 | 每提前10秒 | +5 |
+| 错误操作 | 备件不足派遣 / 取消任务 | -30 / -15 |
+| 超时扣分 | 紧急/高优先级 / 中/低优先级 | -100 / -50 |
+| 资源浪费 | 车辆空驶每30秒 | -5 |
+| 路线成本 | 路线成本超出最优路径50%以上 | 按比例扣分 |
+
+### 评级标准
+- **S级**：900分以上，无超时
+- **A级**：750-899分
+- **B级**：600-749分
+- **C级**：450-599分
+- **D级**：450分以下（失败）
+
+### 路线成本机制
+- 每次派车同时计算距离最优路径和成本最优路径
+- 若成本最优路径比距离最优路径贵50%以上，会产生路线成本扣分
+- 结算报告中包含每次派遣的路线明细（路径、距离、成本、扣分）
+
+## 关卡难度
+
+| 关卡 | 故障路灯 | 维修车辆 | 时限 |
+|------|----------|----------|------|
+| 初级 | 6 | 1 | 210秒 |
+| 中级 | 8 | 1 | 240秒 |
+| 高级 | 10 | 2 | 270秒 |
+| 专家 | 12 | 2 | 300秒 |
+| 噩梦 | 14 | 3 | 330秒 |
+
+## 功能特性
+
+- **2D Canvas 地图**：实时渲染道路网络、路灯节点、维修车辆
+- **A* 路径规划**：支持按距离或成本优化寻路
+- **备件管理**：每盏路灯需要不同数量备件
+- **暂停/继续**：随时暂停思考策略
+- **速度调节**：1x / 2x / 4x 游戏速度
+- **结算报告**：详细计分明细、失败原因分析
+- **历史回放**：记录并回放历史对局
+- **JSON导出**：导出完整检修报告
+
+## 技术栈
+
+- React 18 + TypeScript
+- Vite 6
+- Zustand（状态管理）
+- TailwindCSS 3（样式）
+- Canvas API（2D渲染）
+- Lucide React（图标）
+
+## 项目结构
+
+```
+src/
+├── types/game.ts          # 核心类型定义
+├── store/gameStore.ts     # 游戏状态管理
+├── utils/
+│   ├── pathfinding.ts     # A* 路径规划
+│   ├── mapGenerator.ts    # 地图数据生成
+│   ├── scoring.ts         # 计分系统
+│   └── history.ts         # 历史记录管理
+├── components/
+│   ├── GameMap.tsx        # Canvas 2D 地图
+│   ├── ControlPanel.tsx   # 控制面板
+│   ├── StatusPanel.tsx    # 状态面板
+│   ├── FaultList.tsx      # 故障列表
+│   ├── StartMenu.tsx      # 开始菜单
+│   └── GameOver.tsx       # 结算界面
+└── pages/
+    ├── Home.tsx           # 游戏主页面
+    └── History.tsx        # 历史记录页面
+```
+
+## 验证命令
+
+```bash
+pnpm exec tsc --noEmit    # TypeScript 类型检查
+pnpm exec eslint .        # ESLint 检查
 ```
