@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Tile, ValveTile, CanalTile, PlotTile, SourceTile, CROP_INFO } from '../game/types';
+import { Tile, ValveTile, CanalTile, PlotTile, CROP_INFO } from '../game/types';
 import { useGame } from '../hooks/useGameState';
 
 interface TileProps {
@@ -9,7 +9,7 @@ interface TileProps {
   cellSize: number;
 }
 
-function SourceTileComponent({ tile, cellSize }: { tile: SourceTile; cellSize: number }) {
+function SourceTileComponent({ cellSize }: { cellSize: number }) {
   return (
     <div
       className="flex items-center justify-center bg-blue-600 rounded-lg shadow-inner"
@@ -21,30 +21,54 @@ function SourceTileComponent({ tile, cellSize }: { tile: SourceTile; cellSize: n
 }
 
 function CanalTileComponent({ tile, cellSize }: { tile: CanalTile; cellSize: number }) {
-  const isHorizontal = tile.connections.includes('left') && tile.connections.includes('right');
-  
+  const connections = tile.connections;
+  const hasLeft = connections.includes('left');
+  const hasRight = connections.includes('right');
+  const hasTop = connections.includes('top');
+  const hasBottom = connections.includes('bottom');
+
+  const baseColor = tile.hasWater ? 'bg-blue-500' : 'bg-gray-400';
+  const shadowColor = tile.hasWater ? 'shadow-blue-400/50' : '';
+  const shadow = tile.hasWater ? `shadow-lg ${shadowColor}` : '';
+
   return (
     <div
       className="relative flex items-center justify-center"
       style={{ width: cellSize, height: cellSize }}
     >
-      {isHorizontal ? (
-        <div className={`w-full h-3 rounded-full transition-all duration-500 ${
-          tile.hasWater ? 'bg-blue-500 shadow-lg shadow-blue-400/50' : 'bg-gray-400'
-        }`}>
+      {hasLeft && (
+        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-3 rounded-l-full ${baseColor} ${shadow} transition-all duration-500`}>
           {tile.hasWater && (
-            <div className="w-full h-full bg-blue-300 rounded-full animate-pulse opacity-50" />
-          )}
-        </div>
-      ) : (
-        <div className={`w-3 h-full rounded-full transition-all duration-500 ${
-          tile.hasWater ? 'bg-blue-500 shadow-lg shadow-blue-400/50' : 'bg-gray-400'
-        }`}>
-          {tile.hasWater && (
-            <div className="w-full h-full bg-blue-300 rounded-full animate-pulse opacity-50" />
+            <div className="w-full h-full bg-blue-300 rounded-l-full animate-pulse opacity-50" />
           )}
         </div>
       )}
+      
+      {hasRight && (
+        <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-3 rounded-r-full ${baseColor} ${shadow} transition-all duration-500`}>
+          {tile.hasWater && (
+            <div className="w-full h-full bg-blue-300 rounded-r-full animate-pulse opacity-50" />
+          )}
+        </div>
+      )}
+      
+      {hasTop && (
+        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-3 h-1/2 rounded-t-full ${baseColor} ${shadow} transition-all duration-500`}>
+          {tile.hasWater && (
+            <div className="w-full h-full bg-blue-300 rounded-t-full animate-pulse opacity-50" />
+          )}
+        </div>
+      )}
+      
+      {hasBottom && (
+        <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-1/2 rounded-b-full ${baseColor} ${shadow} transition-all duration-500`}>
+          {tile.hasWater && (
+            <div className="w-full h-full bg-blue-300 rounded-b-full animate-pulse opacity-50" />
+          )}
+        </div>
+      )}
+
+      <div className={`absolute w-3 h-3 rounded-full ${baseColor} ${shadow} transition-all duration-500`} />
     </div>
   );
 }
@@ -57,14 +81,24 @@ function ValveTileComponent({
 }: { tile: ValveTile; cellSize: number; row: number; col: number }) {
   const { dispatch, state } = useGame();
   const isOpen = tile.state === 'open';
-  const isHorizontal = tile.direction === 'horizontal';
   const isClickable = state.status === 'playing';
+  const connections = tile.connections;
+  
+  const hasLeft = connections.includes('left');
+  const hasRight = connections.includes('right');
+  const hasTop = connections.includes('top');
+  const hasBottom = connections.includes('bottom');
 
   const handleClick = () => {
     if (isClickable) {
       dispatch({ type: 'TOGGLE_VALVE', payload: { row, col } });
     }
   };
+
+  const baseColor = isOpen ? 'bg-green-500' : 'bg-red-500';
+  const innerColor = isOpen ? 'bg-green-300' : 'bg-red-300';
+  const labelBg = isOpen ? 'bg-green-600' : 'bg-red-600';
+  const shadow = isOpen ? 'shadow-lg shadow-green-400/50' : 'shadow-lg shadow-red-400/50';
 
   return (
     <div
@@ -74,22 +108,45 @@ function ValveTileComponent({
       style={{ width: cellSize, height: cellSize }}
       onClick={handleClick}
     >
-      <div className={`absolute rounded-full transition-all duration-300 ${
-        isOpen ? 'bg-green-500 w-8 h-8' : 'bg-red-500 w-10 h-10'
-      } shadow-lg flex items-center justify-center`}>
-        {isHorizontal ? (
-          <div className={`w-10 h-2 rounded-full transition-all ${
-            isOpen ? 'bg-green-300' : 'bg-red-300'
-          }`} />
-        ) : (
-          <div className={`w-2 h-10 rounded-full transition-all ${
-            isOpen ? 'bg-green-300' : 'bg-red-300'
-          }`} />
-        )}
+      {hasLeft && (
+        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-3 rounded-l-full ${baseColor} ${shadow} transition-all duration-500`}>
+          {isOpen && (
+            <div className={`w-full h-full ${innerColor} rounded-l-full animate-pulse opacity-50`} />
+          )}
+        </div>
+      )}
+      
+      {hasRight && (
+        <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-3 rounded-r-full ${baseColor} ${shadow} transition-all duration-500`}>
+          {isOpen && (
+            <div className={`w-full h-full ${innerColor} rounded-r-full animate-pulse opacity-50`} />
+          )}
+        </div>
+      )}
+      
+      {hasTop && (
+        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-3 h-1/2 rounded-t-full ${baseColor} ${shadow} transition-all duration-500`}>
+          {isOpen && (
+            <div className={`w-full h-full ${innerColor} rounded-t-full animate-pulse opacity-50`} />
+          )}
+        </div>
+      )}
+      
+      {hasBottom && (
+        <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-1/2 rounded-b-full ${baseColor} ${shadow} transition-all duration-500`}>
+          {isOpen && (
+            <div className={`w-full h-full ${innerColor} rounded-b-full animate-pulse opacity-50`} />
+          )}
+        </div>
+      )}
+
+      <div className={`absolute rounded-full transition-all duration-300 ${baseColor} ${shadow} ${
+        isOpen ? 'w-8 h-8' : 'w-10 h-10'
+      } flex items-center justify-center z-10`}>
+        <div className={`w-4 h-4 rounded-full ${innerColor}`} />
       </div>
-      <div className={`absolute -top-1 -right-1 text-xs px-1.5 py-0.5 rounded-full font-bold ${
-        isOpen ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-      }`}>
+      
+      <div className={`absolute -top-1 -right-1 text-xs px-1.5 py-0.5 rounded-full font-bold text-white z-20 ${labelBg}`}>
         {isOpen ? '开' : '关'}
       </div>
     </div>
@@ -153,7 +210,7 @@ function GameTile({ tile, row, col, cellSize }: TileProps) {
 
   switch (tile.type) {
     case 'source':
-      return <SourceTileComponent tile={tile as SourceTile} cellSize={cellSize} />;
+      return <SourceTileComponent cellSize={cellSize} />;
     case 'canal':
       return <CanalTileComponent tile={tile as CanalTile} cellSize={cellSize} />;
     case 'valve':

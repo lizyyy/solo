@@ -28,6 +28,7 @@ export interface ValveTile {
   type: 'valve';
   state: ValveState;
   direction: 'horizontal' | 'vertical';
+  connections: Direction[];
 }
 
 export interface PlotTile {
@@ -107,6 +108,7 @@ export interface GameState {
   round: number;
   maxRounds: number;
   status: GameStatus;
+  statusBeforeReplay: GameStatus | null;
   score: number;
   totalWater: number;
   waterUsed: number;

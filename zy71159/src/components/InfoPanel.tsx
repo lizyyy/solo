@@ -123,7 +123,7 @@ export function InfoPanel() {
       <div className="bg-white rounded-xl shadow-lg p-4">
         <h3 className="text-lg font-bold text-amber-800 mb-3">地块状态</h3>
         <div className="space-y-2 max-h-48 overflow-y-auto">
-          {plots.map((plot, index) => {
+          {plots.map((plot) => {
             const cropInfo = CROP_INFO[plot.crop];
             const percentage = Math.min(100, (plot.currentWater / plot.waterNeeded) * 100);
             

@@ -39,10 +39,35 @@ function parseTileConfig(config: string, row: number, col: number): Tile | null 
       } as SourceTile;
 
     case 'canal': {
-      const direction = parts[1] as 'h' | 'v';
-      const connections: Direction[] = direction === 'h' 
-        ? ['left', 'right'] 
-        : ['top', 'bottom'];
+      const direction = parts[1];
+      let connections: Direction[] = [];
+      
+      switch (direction) {
+        case 'h':
+          connections = ['left', 'right'];
+          break;
+        case 'v':
+          connections = ['top', 'bottom'];
+          break;
+        case 't':
+          connections = ['left', 'right', 'bottom'];
+          break;
+        case 'tu':
+          connections = ['left', 'right', 'top'];
+          break;
+        case 'tl':
+          connections = ['top', 'bottom', 'left'];
+          break;
+        case 'tr':
+          connections = ['top', 'bottom', 'right'];
+          break;
+        case 'x':
+          connections = ['top', 'bottom', 'left', 'right'];
+          break;
+        default:
+          connections = ['left', 'right'];
+      }
+      
       return {
         id: generateTileId('canal', row, col),
         type: 'canal',
@@ -52,13 +77,51 @@ function parseTileConfig(config: string, row: number, col: number): Tile | null 
     }
 
     case 'valve': {
-      const direction = parts[1] === 'h' ? 'horizontal' : 'vertical';
+      const valveType = parts[1];
+      let connections: Direction[] = [];
+      let direction: 'horizontal' | 'vertical' = 'horizontal';
+      
+      switch (valveType) {
+        case 'h':
+          connections = ['left', 'right'];
+          direction = 'horizontal';
+          break;
+        case 'v':
+          connections = ['top', 'bottom'];
+          direction = 'vertical';
+          break;
+        case 't':
+          connections = ['left', 'right', 'bottom'];
+          direction = 'horizontal';
+          break;
+        case 'tu':
+          connections = ['left', 'right', 'top'];
+          direction = 'horizontal';
+          break;
+        case 'tl':
+          connections = ['top', 'bottom', 'left'];
+          direction = 'vertical';
+          break;
+        case 'tr':
+          connections = ['top', 'bottom', 'right'];
+          direction = 'vertical';
+          break;
+        case 'x':
+          connections = ['top', 'bottom', 'left', 'right'];
+          direction = 'horizontal';
+          break;
+        default:
+          connections = ['left', 'right'];
+          direction = 'horizontal';
+      }
+      
       return {
         id: generateTileId('valve', row, col),
         type: 'valve',
         state: 'closed',
         direction,
-      } as ValveTile;
+        connections,
+      } as ValveTile & { connections: Direction[] };
     }
 
     case 'plot': {
@@ -103,6 +166,7 @@ export function createInitialState(levelId: number): GameState {
     round: 1,
     maxRounds: level.maxRounds,
     status: 'playing',
+    statusBeforeReplay: null,
     score: 0,
     totalWater: level.initialWater,
     waterUsed: 0,
@@ -415,6 +479,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         status: 'replaying',
+        statusBeforeReplay: state.status,
         replayIndex: 0,
       };
 
@@ -445,9 +510,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'EXIT_REPLAY': {
       const lastSnapshot = state.history[state.history.length - 1];
+      const restoredStatus = state.statusBeforeReplay || 'playing';
       return {
         ...state,
-        status: state.status === 'won' || state.status === 'lost' ? state.status : 'playing',
+        status: restoredStatus,
+        statusBeforeReplay: null,
         replayIndex: 0,
         board: lastSnapshot ? JSON.parse(JSON.stringify(lastSnapshot.board)) : state.board,
         score: lastSnapshot?.score || state.score,

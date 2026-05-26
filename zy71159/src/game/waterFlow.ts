@@ -42,9 +42,7 @@ export function calculateWaterFlow(board: Tile[][]): Tile[][] {
     } else if (currentTile.type === 'valve') {
       const valve = currentTile as ValveTile;
       if (valve.state === 'open') {
-        currentConnections = valve.direction === 'horizontal' 
-          ? ['left', 'right'] 
-          : ['top', 'bottom'];
+        currentConnections = valve.connections;
       } else {
         continue;
       }
@@ -71,10 +69,7 @@ export function calculateWaterFlow(board: Tile[][]): Tile[][] {
         }
       } else if (nextTile.type === 'valve') {
         const valve = nextTile as ValveTile;
-        const valveConnections = valve.direction === 'horizontal' 
-          ? ['left', 'right'] 
-          : ['top', 'bottom'];
-        canFlow = valveConnections.includes(oppositeDir);
+        canFlow = valve.connections.includes(oppositeDir);
       } else if (nextTile.type === 'plot') {
         canFlow = true;
       }

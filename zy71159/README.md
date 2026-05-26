@@ -1,57 +1,130 @@
-# React + TypeScript + Vite
+# 🌾 农田灌溉棋盘游戏
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一款教育类2D策略游戏，帮助学生理解农田灌溉系统的运作原理。通过操作水渠阀门来满足不同地块的作物需水需求，学习水资源管理的知识。
 
-Currently, two official plugins are available:
+## ✨ 核心特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🎮 游戏玩法
+- **5个递进关卡**：从入门到专家级难度，逐步挑战复杂水网
+- **回合制策略**：每回合操作阀门后执行灌溉计算
+- **真实水流传播**：BFS算法模拟水流，阀门开关影响下游
+- **天气系统**：晴天/多云/雨天/干旱四种天气影响蒸发和水量
 
-## Expanding the ESLint configuration
+### 🎯 游戏元素
+- **水渠网络**：支持水平、垂直、T型、十字型等多种连接方式
+- **阀门控制**：点击切换开关状态，绿色=开启，红色=关闭
+- **四种作物**：水稻🌾、小麦🌿、玉米🌽、蔬菜🥬，各有不同需水量
+- **水源**：从水源出发的水流传播
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 📊 信息与控制
+- **控制面板**：回合进度、暂停/继续、重新开始、关卡选择
+- **信息面板**：天气卡、得分、用水量、各地块灌溉状态
+- **地块状态**：显示每个地块的水量进度条和状态
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 🎬 结算与回放
+- **胜负判定**：所有地块灌溉达标即获胜
+- **失败原因分析**：下游断水、灌溉不足、过度灌溉等智能诊断
+- **历史回放**：逐帧回放游戏过程，支持自动播放和手动控制
+- **报告导出**：生成详细的灌溉结算报告，支持文本导出和复制
+
+## 🚀 快速开始
+
+### 安装依赖
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 开发模式
+```bash
+npm run dev
 ```
+
+### 构建生产版本
+```bash
+npm run build
+```
+
+### 代码检查
+```bash
+npm run lint
+```
+
+### 类型检查
+```bash
+npx tsc --noEmit
+```
+
+## 🎯 游戏玩法说明
+
+### 基本操作
+1. 点击红色阀门（关闭状态）将其切换为绿色（开启状态）
+2. 观察水流传播到哪些水渠
+3. 确保所有农田地块旁边的水渠都有水
+4. 点击"下一回合"执行灌溉
+
+### 灌溉原理
+- 水流从水源出发，通过开启的阀门沿水渠传播
+- 每块农田需要接收到足够的水量才能达标
+- 相邻有水的水渠会为农田提供灌溉
+
+### 天气影响
+| 天气 | 蒸发量 | 水量加成 |
+|------|--------|----------|
+| ☀️ 晴天 | +1 | 0 |
+| ⛅ 多云 | 0 | 0 |
+| 🌧️ 雨天 | -2 | +2 |
+| 🏜️ 干旱 | +2 | 0 |
+
+### 计分规则
+- 每块达标农田：+50分
+- 精准灌溉（未过量）：额外+25分
+- 过度灌溉农田：-30分
+
+### 水渠类型说明
+- `canal-h`：水平水渠（左右连接）
+- `canal-v`：垂直水渠（上下连接）
+- `canal-t`：T型水渠（左右下连接）
+- `canal-tu`：上T型水渠（左右上连接）
+- `canal-tl`：左T型水渠（上下左连接）
+- `canal-tr`：右T型水渠（上下右连接）
+- `canal-x`：十字型水渠（四向连接）
+
+## 📁 项目结构
+
+```
+src/
+├── components/          # UI组件
+│   ├── GameBoard.tsx    # 2D棋盘
+│   ├── ControlPanel.tsx # 控制面板
+│   ├── InfoPanel.tsx    # 信息面板
+│   ├── ResultModal.tsx  # 结算弹窗
+│   └── ReplayPlayer.tsx # 历史回放
+├── game/                # 游戏逻辑
+│   ├── types.ts         # 类型定义
+│   ├── levels.ts        # 关卡数据
+│   ├── waterFlow.ts     # 水流算法
+│   └── logic.ts         # 游戏核心逻辑
+└── hooks/
+    └── useGameState.tsx # 状态管理Context
+```
+
+## 🛠️ 技术栈
+
+- **React 18** + **TypeScript**
+- **Vite** 构建工具
+- **TailwindCSS** 样式框架
+- **Lucide React** 图标库
+- **useReducer + Context** 状态管理
+
+## 🎓 教育意义
+
+本游戏帮助学生理解以下农业灌溉概念：
+1. **下游影响**：关闭上游阀门会导致下游断水
+2. **重复灌溉**：水资源有限，需要合理分配
+3. **天气蒸发**：不同天气对水分蒸发的影响
+4. **精准灌溉**：过度灌溉和灌溉不足都不好
+5. **系统思维**：整体规划水渠网络的重要性
+
+## 📝 License
+
+MIT
