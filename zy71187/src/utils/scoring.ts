@@ -44,12 +44,16 @@ export function calculateScore(
   playerMatched: Record<string, string>,
   playerMarkedDamages: Record<string, string>,
   playerDeposits: Record<string, number>,
+  markedNormalWears: string[],
+  identifiedRedHerrings: string[],
   timeRemaining: number,
   totalTime: number,
 ): ScoreResult {
   let accessoryScore = 0
   let damageScore = 0
   let depositScore = 0
+  let normalWearScore = 0
+  let redHerringScore = 0
   const failures: string[] = []
 
   const correctMatches: Record<string, string> = {}
@@ -95,14 +99,26 @@ export function calculateScore(
       if (playerMarked) {
         damageScore -= 10
         failures.push(`误记正常使用痕迹为损伤：${dmg.description}`)
+      } else if (markedNormalWears.includes(dmg.id)) {
+        normalWearScore += 5
+      } else {
+        normalWearScore -= 5
       }
     } else {
-      if (playerMarked === dmg.id) {
+      if (playerMarked) {
         damageScore += dmg.severity === 'fatal' ? 25 : dmg.severity === 'major' ? 20 : 15
       } else {
         damageScore -= dmg.severity === 'fatal' ? 25 : 20
         failures.push(`漏记损伤：${dmg.description}`)
       }
+    }
+  }
+
+  for (const rh of level.redHerrings) {
+    if (identifiedRedHerrings.includes(rh.id)) {
+      redHerringScore += 10
+    } else {
+      redHerringScore -= 5
     }
   }
 
@@ -124,7 +140,7 @@ export function calculateScore(
   const timeUsed = totalTime - timeRemaining
   const speedBonus = timeUsed <= 30 && failures.length === 0 ? 50 : 0
 
-  const total = accessoryScore + damageScore + depositScore + timeBonus + speedBonus
+  const total = accessoryScore + damageScore + depositScore + normalWearScore + redHerringScore + timeBonus + speedBonus
 
   let passed = total >= 80
   let needsTraining = total >= 60 && total < 80
@@ -142,6 +158,8 @@ export function calculateScore(
     accessoryScore,
     damageScore,
     depositScore,
+    normalWearScore,
+    redHerringScore,
     timeBonus,
     speedBonus,
     total,
@@ -159,5 +177,7 @@ export function calculateScore(
     correctAccessoryMatches: correctMatches,
     markedDamages: playerMarkedDamages,
     correctDamages,
+    markedNormalWears,
+    identifiedRedHerrings,
   }
 }
