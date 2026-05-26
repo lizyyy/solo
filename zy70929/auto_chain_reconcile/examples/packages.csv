@@ -1,0 +1,5 @@
+package_id,customer_id,customer_name,item_code,item_name,allowed_store,total_qty
+PKG001,C001,张三,OIL_0W20,全合成机油0W20,*,4
+PKG002,C001,张三,FILTER_OIL,机油滤芯,*,4
+PKG003,C002,李四,BRAKE_PAD_FR,前刹车片,ST02,2
+PKG004,C003,王五,OIL_5W30,半合成机油5W30,*,1

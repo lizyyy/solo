@@ -1,0 +1,47 @@
+[
+  {
+    "order_id": "WO1001",
+    "customer_id": "C001",
+    "store_id": "ST01",
+    "item_code": "OIL_0W20",
+    "item_name": "全合成机油0W20",
+    "qty": 1,
+    "parts": [
+      { "part_code": "OIL_0W20", "qty": 1 },
+      { "part_code": "FILTER_OIL", "qty": 1 }
+    ]
+  },
+  {
+    "order_id": "WO1002",
+    "customer_id": "C003",
+    "store_id": "ST01",
+    "item_code": "OIL_0W20",
+    "item_name": "全合成机油0W20（替换）",
+    "qty": 1,
+    "parts": [
+      { "part_code": "OIL_0W20", "qty": 1 }
+    ]
+  },
+  {
+    "order_id": "WO1003",
+    "customer_id": "C002",
+    "store_id": "ST01",
+    "item_code": "BRAKE_PAD_FR",
+    "item_name": "前刹车片",
+    "qty": 1,
+    "parts": [
+      { "part_code": "BRAKE_PAD_FR", "qty": 1 }
+    ]
+  },
+  {
+    "order_id": "WO1004",
+    "customer_id": "C001",
+    "store_id": "ST01",
+    "item_code": "OIL_0W20",
+    "item_name": "全合成机油0W20",
+    "qty": 1,
+    "parts": [
+      { "part_code": "OIL_0W20", "qty": 999 }
+    ]
+  }
+]
