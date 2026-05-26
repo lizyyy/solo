@@ -1,0 +1,79 @@
+[
+  {
+    "waybill_no": "WB2026050001",
+    "timestamp": "2026-05-20T08:00:00",
+    "location": "北京分拨中心",
+    "city": "北京",
+    "status": "已揽收",
+    "status_code": "PICKUP",
+    "description": "快件已揽收"
+  },
+  {
+    "waybill_no": "WB2026050001",
+    "timestamp": "2026-05-20T12:00:00",
+    "location": "北京中转站",
+    "city": "北京",
+    "status": "中转",
+    "status_code": "TRANSFER",
+    "description": "到达北京中转站",
+    "transfer_station": "北京中转站",
+    "is_transfer_point": true
+  },
+  {
+    "waybill_no": "WB2026050001",
+    "timestamp": "2026-05-21T06:00:00",
+    "location": "上海中转站",
+    "city": "上海",
+    "status": "中转",
+    "status_code": "TRANSFER",
+    "description": "到达上海中转站",
+    "transfer_station": "上海中转站",
+    "is_transfer_point": true
+  },
+  {
+    "waybill_no": "WB2026050001",
+    "timestamp": "2026-05-21T20:00:00",
+    "location": "上海派送点",
+    "city": "上海",
+    "status": "已签收",
+    "status_code": "DELIVERED",
+    "description": "快件已签收"
+  },
+  {
+    "waybill_no": "WB2026050003",
+    "timestamp": "2026-05-22T06:00:00",
+    "location": "上海分拨中心",
+    "city": "上海",
+    "status": "已揽收",
+    "status_code": "PICKUP"
+  },
+  {
+    "waybill_no": "WB2026050003",
+    "timestamp": "2026-05-22T10:00:00",
+    "location": "上海中转站",
+    "city": "上海",
+    "status": "中转",
+    "status_code": "TRANSFER",
+    "transfer_station": "上海中转站",
+    "is_transfer_point": true
+  },
+  {
+    "waybill_no": "WB2026050003",
+    "timestamp": "2026-05-23T08:00:00",
+    "location": "杭州中转站",
+    "city": "杭州",
+    "status": "中转",
+    "status_code": "TRANSFER",
+    "transfer_station": "杭州中转站",
+    "is_transfer_point": true
+  },
+  {
+    "waybill_no": "WB2026050003",
+    "timestamp": "2026-05-23T10:00:00",
+    "location": "杭州派送点",
+    "city": "杭州",
+    "status": "已签收",
+    "status_code": "DELIVERED",
+    "description": "外包装轻微破损，内物完好"
+  }
+]
