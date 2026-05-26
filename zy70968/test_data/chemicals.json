@@ -1,0 +1,46 @@
+[
+  {
+    "name": "吡虫啉",
+    "batch_no": "CHEM-2024-A001",
+    "manufacturer": "江苏辉丰",
+    "active_ingredient": "吡虫啉",
+    "concentration": 10.0,
+    "max_dosage_per_ha": 0.5,
+    "safety_interval_hours": 48,
+    "min_wind_speed": 1.0,
+    "max_wind_speed": 5.0
+  },
+  {
+    "name": "噻虫嗪",
+    "batch_no": "CHEM-2024-A002",
+    "manufacturer": "先正达",
+    "active_ingredient": "噻虫嗪",
+    "concentration": 21.0,
+    "max_dosage_per_ha": 0.3,
+    "safety_interval_hours": 72,
+    "min_wind_speed": 1.0,
+    "max_wind_speed": 4.0
+  },
+  {
+    "name": "戊唑醇",
+    "batch_no": "CHEM-2024-B001",
+    "manufacturer": "拜耳",
+    "active_ingredient": "戊唑醇",
+    "concentration": 43.0,
+    "max_dosage_per_ha": 0.8,
+    "safety_interval_hours": 24,
+    "min_wind_speed": 0.5,
+    "max_wind_speed": 6.0
+  },
+  {
+    "name": "高效氯氰菊酯",
+    "batch_no": "CHEM-2024-C001",
+    "manufacturer": "巴斯夫",
+    "active_ingredient": "高效氯氰菊酯",
+    "concentration": 5.0,
+    "max_dosage_per_ha": 1.2,
+    "safety_interval_hours": 36,
+    "min_wind_speed": 1.0,
+    "max_wind_speed": 5.0
+  }
+]
