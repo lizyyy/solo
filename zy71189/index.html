@@ -344,8 +344,9 @@
   // 封站时应按此顺序从外到内封闭
   const CLOSE_SEQUENCE = ["A入口","B入口","C站台"];
 
-  // BFS 寻路：考虑封闭区域
+  // BFS 寻路：考虑封闭区域，终点封闭则彻底不可达
   function findPath(from, to, closed){
+    if (closed.has(to)) return null;
     if (from === to) return [from];
     const visited = new Set([from]);
     const queue = [[from]];
@@ -354,13 +355,13 @@
       const cur = path[path.length - 1];
       for (const nb of ZONE_GRAPH[cur].neighbors){
         if (visited.has(nb)) continue;
-        if (closed.has(nb) && nb !== to) continue; // 终点也不可通行则彻底封死
+        if (closed.has(nb)) continue;
         if (nb === to) return [...path, nb];
         visited.add(nb);
         queue.push([...path, nb]);
       }
     }
-    return null; // 无路径
+    return null;
   }
 
   function zoneCenter(z){
@@ -661,8 +662,8 @@
       }
     }
 
-    // 迷路乘客：从 E服务台 出发，目标随机
-    if (Math.random() < dt * 0.3 && G.level >= 1){
+    // 迷路乘客：从 E服务台 出发，目标随机（E服务台未封闭时才生成）
+    if (Math.random() < dt * 0.3 && G.level >= 1 && !G.closed.has("E服务台")){
       const oc = zoneCenter("E服务台");
       G.passengers.push({
         x: oc.x + rand(-15, 15),
@@ -684,6 +685,30 @@
 
     // 乘客 AI：基于区域图的路径寻路
     for (const p of G.passengers){
+      // 如果乘客当前所在区域已封闭，直接标记滞留
+      if (G.closed.has(p.currentZone)){
+        if (!p.stranded){
+          p.stranded = true;
+          p.state = "wait";
+          p.patience -= dt * 10;
+          G.order -= dt * 2;
+        }
+        p.patience -= dt * 12;
+        continue;
+      }
+
+      // 如果终点已封闭，直接标记滞留
+      if (G.closed.has(p.dest)){
+        if (!p.stranded){
+          p.stranded = true;
+          p.state = "wait";
+          p.patience -= dt * 8;
+          G.order -= dt * 1.5;
+        }
+        p.patience -= dt * 10;
+        continue;
+      }
+
       // 路径计算或重算
       if (!p.path || p.pathIdx >= p.path.length){
         const target = p.dest;
@@ -1252,7 +1277,9 @@
       closeStation: {
         active: G.closeActive,
         step: G.closeStep,
+        totalSteps: CLOSE_SEQUENCE.length,
         completed: G.closeStep >= CLOSE_SEQUENCE.length,
+        status: !G.closeActive ? "idle" : (G.closeStep >= CLOSE_SEQUENCE.length ? "success" : "in_progress"),
         sequence: CLOSE_SEQUENCE
       },
       strandedPassengers: G.passengers.filter(p => p.stranded).length,
