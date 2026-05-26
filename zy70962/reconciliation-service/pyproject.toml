@@ -1,0 +1,22 @@
+[project]
+name = "reconciliation-service"
+version = "0.1.0"
+description = "区域财务对账服务：缴存/销售/备用金三表自动比对、人工复核与报告导出"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+    "pydantic>=2.6",
+    "python-dateutil>=2.8",
+    "openpyxl>=3.1",
+]
+
+[project.scripts]
+recon-svc = "recon_service.main:run"
+
+[tool.uvicorn]
+factory = true
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
