@@ -168,6 +168,7 @@ export function createInitialState(levelId: number): GameState {
     maxRounds: level.maxRounds,
     status: 'playing',
     statusBeforeReplay: null,
+    stateBeforeReplay: null,
     score: 0,
     totalWater: level.initialWater,
     waterUsed: 0,
@@ -481,6 +482,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         status: 'replaying',
         statusBeforeReplay: state.status,
+        stateBeforeReplay: {
+          score: state.score,
+          waterUsed: state.waterUsed,
+          board: JSON.parse(JSON.stringify(state.board)),
+          currentWeather: state.currentWeather,
+          round: state.round,
+          failureReasons: [...state.failureReasons],
+          waterUsedPerRound: [...state.waterUsedPerRound],
+        },
         replayIndex: 0,
       };
 
@@ -510,17 +520,21 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'EXIT_REPLAY': {
-      const lastSnapshot = state.history[state.history.length - 1];
       const restoredStatus = state.statusBeforeReplay || 'playing';
+      const savedState = state.stateBeforeReplay;
       return {
         ...state,
         status: restoredStatus,
         statusBeforeReplay: null,
+        stateBeforeReplay: null,
         replayIndex: 0,
-        board: lastSnapshot ? JSON.parse(JSON.stringify(lastSnapshot.board)) : state.board,
-        score: lastSnapshot?.score || state.score,
-        waterUsed: lastSnapshot?.waterUsed || state.waterUsed,
-        currentWeather: lastSnapshot?.weather || state.currentWeather,
+        board: savedState ? JSON.parse(JSON.stringify(savedState.board)) : state.board,
+        score: savedState?.score ?? state.score,
+        waterUsed: savedState?.waterUsed ?? state.waterUsed,
+        currentWeather: savedState?.currentWeather ?? state.currentWeather,
+        round: savedState?.round ?? state.round,
+        failureReasons: savedState?.failureReasons ?? state.failureReasons,
+        waterUsedPerRound: savedState?.waterUsedPerRound ?? state.waterUsedPerRound,
       };
     }
 

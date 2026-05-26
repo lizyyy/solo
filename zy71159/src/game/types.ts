@@ -110,6 +110,15 @@ export interface GameState {
   maxRounds: number;
   status: GameStatus;
   statusBeforeReplay: GameStatus | null;
+  stateBeforeReplay: {
+    score: number;
+    waterUsed: number;
+    board: Tile[][];
+    currentWeather: WeatherType;
+    round: number;
+    failureReasons: string[];
+    waterUsedPerRound: number[];
+  } | null;
   score: number;
   totalWater: number;
   waterUsed: number;
