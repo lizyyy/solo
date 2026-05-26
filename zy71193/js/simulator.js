@@ -72,11 +72,6 @@ export class Simulator {
 
       if (evap.status === 'defrosting') {
         if (evap.defrostEnd !== null && now >= evap.defrostEnd) {
-          if (!evap._timeoutScored) {
-            this.state.scoreBreakdown.defrostTimeout += SCORE.DEFROST_TIMEOUT;
-            evap._timeoutScored = true;
-            this.state.addEvent('error', `蒸发器${evap.id}除霜超时（计划${(now - evap.defrostEnd).toFixed(0)}分钟前完成）`);
-          }
           evap.completeDefrost(now);
           this.state.addEvent('success', `蒸发器${evap.id}除霜完成`);
         }
@@ -90,11 +85,17 @@ export class Simulator {
       if (now >= schedule.start && now < schedule.end && evap.status !== 'defrosting') {
         if (now >= evap.cooldownUntil) {
           evap.startDefrost(now, schedule.end - now);
-          evap._timeoutScored = false;
+          schedule._started = true;
           this.state.addEvent('info', `蒸发器${evap.id}开始除霜`);
         } else {
           this.state.addEvent('warning', `蒸发器${evap.id}除霜跳过（冷却中）`);
         }
+      }
+
+      if (!schedule._started && !schedule._timeoutScored && now >= schedule.end) {
+        this.state.scoreBreakdown.defrostTimeout += SCORE.DEFROST_TIMEOUT;
+        schedule._timeoutScored = true;
+        this.state.addEvent('error', `蒸发器${evap.id}除霜计划超时（未在计划时段内执行）`);
       }
 
       if (!schedule._conflictChecked) {
@@ -291,8 +292,11 @@ export class Simulator {
       const taskEnd = taskStart + task.duration;
       if (start < taskEnd && start + duration > task.windowStart) {
         schedule.conflict = true;
-        this.state.scoreBreakdown.energyWaste += SCORE.ENERGY_WASTE;
-        this.state.addEvent('warning', `除霜与"${task.name}"冲突，造成能源浪费`);
+        if (!task._energyWasteScored) {
+          this.state.scoreBreakdown.energyWaste += SCORE.ENERGY_WASTE;
+          task._energyWasteScored = true;
+          this.state.addEvent('warning', `除霜与"${task.name}"冲突，造成能源浪费`);
+        }
         break;
       }
     }
