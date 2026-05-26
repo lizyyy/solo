@@ -149,7 +149,13 @@ function initDatabase() {
   });
 }
 
-function runQuery(sql, params = []) {
+function runQuery(sql, ...args) {
+  let params;
+  if (args.length === 1 && Array.isArray(args[0])) {
+    params = args[0];
+  } else {
+    params = args;
+  }
   return new Promise((resolve, reject) => {
     db.run(sql, params, function(err) {
       if (err) reject(err);
@@ -158,7 +164,13 @@ function runQuery(sql, params = []) {
   });
 }
 
-function getOne(sql, params = []) {
+function getOne(sql, ...args) {
+  let params;
+  if (args.length === 1 && Array.isArray(args[0])) {
+    params = args[0];
+  } else {
+    params = args;
+  }
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err, row) => {
       if (err) reject(err);
@@ -167,7 +179,13 @@ function getOne(sql, params = []) {
   });
 }
 
-function getAll(sql, params = []) {
+function getAll(sql, ...args) {
+  let params;
+  if (args.length === 1 && Array.isArray(args[0])) {
+    params = args[0];
+  } else {
+    params = args;
+  }
   return new Promise((resolve, reject) => {
     db.all(sql, params, (err, rows) => {
       if (err) reject(err);
