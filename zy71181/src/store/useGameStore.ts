@@ -467,6 +467,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
         type: 'victory',
         data: { score: newScore },
       });
+      
+      const finalSnapshot = {
+        time: newTimeElapsed,
+        state: {
+          timeElapsed: newTimeElapsed,
+          score: newScore,
+          weather: newWeather,
+          victims: newVictims,
+          patrollers: newPatrollers,
+        },
+      };
+
+      set(state => ({
+        gameState: {
+          ...state.gameState,
+          timeElapsed: newTimeElapsed,
+          score: newScore,
+          weather: newWeather,
+          weatherEndTime: newWeatherEndTime,
+          victims: newVictims,
+          patrollers: newPatrollers,
+          keyEvents: newKeyEvents,
+          dispatchHistory: newDispatchHistory,
+        },
+        stateSnapshots: [...state.stateSnapshots, finalSnapshot],
+      }));
+      
       get().endGame(true);
       return;
     }
@@ -477,6 +504,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
         type: 'defeat',
         data: { reason: defeatReason },
       });
+
+      const finalSnapshot = {
+        time: newTimeElapsed,
+        state: {
+          timeElapsed: newTimeElapsed,
+          score: newScore,
+          weather: newWeather,
+          victims: newVictims,
+          patrollers: newPatrollers,
+        },
+      };
+
+      set(state => ({
+        gameState: {
+          ...state.gameState,
+          timeElapsed: newTimeElapsed,
+          score: newScore,
+          weather: newWeather,
+          weatherEndTime: newWeatherEndTime,
+          victims: newVictims,
+          patrollers: newPatrollers,
+          keyEvents: newKeyEvents,
+          dispatchHistory: newDispatchHistory,
+          defeatReason: defeatReason,
+        },
+        stateSnapshots: [...state.stateSnapshots, finalSnapshot],
+      }));
+      
       get().endGame(false, defeatReason);
       return;
     }
