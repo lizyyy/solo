@@ -30,7 +30,7 @@ export function createGame(canvas, level, options = {}) {
   let hoverZone = null;
   let hoverShelf = null;
   let hoverSlip = null;
-  let bookPos0 = { x: 40, y: 40, gapX: 18, gapY: 22, cols: 7 };
+  let bookPos0 = { x: 400, y: 40, gapX: 18, gapY: 22, cols: 5 };
   let rafId = null;
 
   const dropzones = buildDropzones(level);
@@ -203,9 +203,9 @@ export function createGame(canvas, level, options = {}) {
     const { x, y } = getCanvasPos(e);
     dragState.book.x = x - dragState.offsetX;
     dragState.book.y = y - dragState.offsetY;
-    hoverZone = dropzones.find(z => pointInRect(x, y, z)) || null;
-    hoverShelf = shelves.find(s => pointInRect(x, y, s)) || null;
-    hoverSlip = turn.returnSlips.find(s => pointInRect(x, y, s)) || null;
+    hoverSlip = level.matchReturnSlip ? (turn.returnSlips.find(s => pointInRect(x, y, s)) || null) : null;
+    hoverZone = !hoverSlip ? (dropzones.find(z => pointInRect(x, y, z)) || null) : null;
+    hoverShelf = !hoverSlip && !hoverZone ? (shelves.find(s => pointInRect(x, y, s)) || null) : null;
   }
 
   function onPointerUp(e) {
@@ -214,11 +214,15 @@ export function createGame(canvas, level, options = {}) {
     const { x, y } = getCanvasPos(e);
     dragState = null;
 
+    const hitSlip = level.matchReturnSlip ? turn.returnSlips.find(s => pointInRect(x, y, s)) : null;
     const hitZone = dropzones.find(z => pointInRect(x, y, z));
     const hitShelf = shelves.find(s => pointInRect(x, y, s));
-    const hitSlip = turn.returnSlips.find(s => pointInRect(x, y, s));
 
-    if (hitZone) {
+    if (hitSlip && level.matchReturnSlip && book.kind === 'return') {
+      book.placed = { type: 'returnSlip', id: hitSlip.id };
+      snapToSlip(book, hitSlip);
+      onLog('info', `匹配退货单 ${hitSlip.id}：${book.title}`);
+    } else if (hitZone) {
       if (hitZone.kind === 'return' && level.matchReturnSlip && book.kind === 'return') {
         book.x = originX; book.y = originY; book.placed = originPlaced;
         onLog('info', '💡 本关退货书需要放到「对应退货单」，不是退货区');
@@ -231,10 +235,6 @@ export function createGame(canvas, level, options = {}) {
       book.placed = { type: 'shelf', label: hitShelf.label };
       snapToShelf(book, hitShelf);
       onLog('info', `放到货架 ${hitShelf.label}：${book.title}`);
-    } else if (hitSlip && level.matchReturnSlip) {
-      book.placed = { type: 'returnSlip', id: hitSlip.id };
-      snapToSlip(book, hitSlip);
-      onLog('info', `匹配退货单 ${hitSlip.id}：${book.title}`);
     } else {
       book.x = originX;
       book.y = originY;

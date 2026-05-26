@@ -174,10 +174,13 @@ function layoutReturnSlips(level) {
   setTimeout(() => {
     const turn = game?.getTurn();
     if (!turn) return;
-    const slipW = 160, slipH = 72, gap = 10;
+    const slipW = 170, slipH = 70, gap = 10;
+    const maxPerCol = 4;
     turn.returnSlips.forEach((s, i) => {
-      s.x = 30;
-      s.y = 420 + i * (slipH + gap);
+      const col = Math.floor(i / maxPerCol);
+      const row = i % maxPerCol;
+      s.x = 20 + col * (slipW + 12);
+      s.y = 40 + row * (slipH + gap);
       s.width = slipW;
       s.height = slipH;
     });

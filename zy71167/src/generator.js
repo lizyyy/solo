@@ -97,10 +97,9 @@ export function generateTurn(level, turnIndex) {
   const books = generateBooks(level, bookCount);
 
   let returnSlips = [];
-  if (level.matchReturnSlip && level.returnSlipsPerTurn) {
-    const [sMin, sMax] = level.returnSlipsPerTurn;
-    const slipCount = Math.min(randInt(sMin, sMax), books.filter(b => b.kind === 'return').length);
-    returnSlips = generateReturnSlips(level, slipCount, books);
+  if (level.matchReturnSlip) {
+    const returnBooks = books.filter(b => b.kind === 'return');
+    returnSlips = generateReturnSlips(level, returnBooks.length, books);
   }
 
   return {
