@@ -1,0 +1,17 @@
+{
+  "courseBatch": "2024-Q1-TRAIN01",
+  "courseName": "企业数字化转型培训",
+  "lateThresholdMinutes": 15,
+  "latePenaltyPoints": 2,
+  "maxLateAllowed": 2,
+  "allowMakeup": true,
+  "makeupDeadlineDays": 7,
+  "requiredAttendanceRate": 0.8,
+  "certificateRevokeConditions": {
+    "tooManyLates": true,
+    "lowAttendance": true,
+    "assignmentFailed": true,
+    "cheatingDetected": true
+  },
+  "appealWindowDays": 3
+}
