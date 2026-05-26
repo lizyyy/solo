@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f7ee 0%, #e8f5e9 50%, #dcedd7 100%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@layer components {
+  .game-card {
+    @apply bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden;
+  }
+  
+  .game-btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 
+           active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .game-btn-primary {
+    @apply game-btn bg-primary-600 text-white hover:bg-primary-700 shadow-md;
+  }
+  
+  .game-btn-danger {
+    @apply game-btn bg-emergency-600 text-white hover:bg-emergency-700 shadow-md;
+  }
+  
+  .game-btn-secondary {
+    @apply game-btn bg-gray-100 text-gray-700 hover:bg-gray-200;
+  }
+  
+  .progress-bar {
+    @apply h-2 rounded-full overflow-hidden bg-gray-200;
+  }
+  
+  .progress-fill {
+    @apply h-full transition-all duration-300 rounded-full;
+  }
+}
