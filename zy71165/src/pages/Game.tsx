@@ -39,13 +39,15 @@ export const Game: React.FC = () => {
       resetTime();
     }
     return () => {
-      resetStore();
+      if (gameStatus !== 'settled') {
+        resetStore();
+      }
     };
-  }, [levelId, loadLevel, resetTime, resetStore]);
+  }, [levelId, loadLevel, resetTime, resetStore, gameStatus]);
 
   useEffect(() => {
     if (gameStatus === 'settled' && settlementResult) {
-      navigate('/settlement', { state: { levelId } });
+      navigate('/settlement', { state: { levelId, settlementResult } });
     }
   }, [gameStatus, settlementResult, navigate, levelId]);
 

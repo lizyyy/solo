@@ -16,16 +16,19 @@ import {
 import { useGameStore } from '../store/useGameStore';
 import { getLevelById } from '../data/levels';
 import { downloadReport, downloadReplayData, getFailureTypeLabel } from '../utils/report';
+import type { SettlementResult } from '../engine/types';
 
 export const Settlement: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { levelId } = (location.state as { levelId?: string }) || {};
+  const locationState = location.state as { levelId?: string; settlementResult?: SettlementResult } || {};
+  const { levelId, settlementResult: settlementResultFromRoute } = locationState;
 
-  const { settlementResult, currentLevel, gameRecords } = useGameStore();
+  const { settlementResult: settlementResultFromStore, currentLevel, gameRecords } = useGameStore();
   const [showBreakdown, setShowBreakdown] = useState(true);
   const [showReport, setShowReport] = useState(false);
 
+  const settlementResult = settlementResultFromRoute || settlementResultFromStore;
   const level = levelId ? getLevelById(levelId) : currentLevel;
 
   if (!settlementResult || !level) {
