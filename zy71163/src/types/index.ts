@@ -71,7 +71,9 @@ export type GameErrorType =
   | 'unchecked_confirm'
   | 'repeated_operation'
   | 'dosage'
-  | 'batch';
+  | 'batch'
+  | 'correct_reject'
+  | 'wrong_reject';
 
 export type ErrorSeverity = 'minor' | 'major' | 'critical';
 

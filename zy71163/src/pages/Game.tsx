@@ -25,11 +25,11 @@ const Game = () => {
     prescriptionTimeRemaining,
     readingTimeRemaining,
     currentPrescriptionIndex,
+    currentPrescriptions,
     errors,
     placedMedicines,
     checkResults,
     toasts,
-    currentPrescriptions,
     currentGameId,
     initGame,
     startReading,
@@ -47,14 +47,25 @@ const Game = () => {
     confirmPrescription,
     nextPrescription,
     removeToast,
-    getCurrentPrescription,
     isAllChecked,
     getAvailableMedicines
   } = useGameStore();
 
   const level = useMemo(() => getLevelById(levelId || ''), [levelId]);
-  const currentPrescription = useMemo(() => getCurrentPrescription(), [getCurrentPrescription]);
-  const availableMedicineIds = useMemo(() => getAvailableMedicines(), [getAvailableMedicines]);
+  const currentPrescription = useMemo(() => {
+    return currentPrescriptions[currentPrescriptionIndex] || null;
+  }, [currentPrescriptions, currentPrescriptionIndex]);
+  const availableMedicineIds = useMemo(() => {
+    if (!currentPrescription) return [];
+    const prescriptionMedicineIds = currentPrescription.items.map(item => item.medicineId);
+    const allMedicineIds = currentPrescriptions.flatMap(p => p.items.map(i => i.medicineId));
+    const uniqueMedicineIds = [...new Set(allMedicineIds)];
+    const extraMedicines = uniqueMedicineIds
+      .filter(id => !prescriptionMedicineIds.includes(id))
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 5);
+    return [...prescriptionMedicineIds, ...extraMedicines].sort(() => Math.random() - 0.5);
+  }, [currentPrescription, currentPrescriptions]);
 
   useEffect(() => {
     if (levelId) {
@@ -101,13 +112,8 @@ const Game = () => {
   }, [startReading]);
 
   const handleConfirm = useCallback(() => {
-    const success = confirmPrescription();
-    if (success) {
-      setTimeout(() => {
-        nextPrescription();
-      }, 1000);
-    }
-  }, [confirmPrescription, nextPrescription]);
+    confirmPrescription();
+  }, [confirmPrescription]);
 
   const handleHome = useCallback(() => {
     navigate('/');
@@ -216,16 +222,7 @@ const Game = () => {
             </div>
 
             <GameControls
-              status={status}
-              isAllChecked={isAllChecked()}
-              hasAnyIncorrect={hasAnyIncorrect}
-              onStart={handleStart}
-              onPause={pauseGame}
-              onResume={resumeGame}
-              onRestart={restartGame}
-              onConfirm={handleConfirm}
               onHome={handleHome}
-              readingTimeRemaining={readingTimeRemaining}
             />
           </div>
         </div>

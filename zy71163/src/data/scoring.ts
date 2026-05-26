@@ -90,13 +90,31 @@ export const scoreRules: ScoreRule[] = [
     points: -50,
     description: '未核对就确认',
     type: 'penalty'
+  },
+  {
+    action: 'correct_reject_bonus',
+    points: 80,
+    description: '正确拦截问题处方',
+    type: 'bonus'
+  },
+  {
+    action: 'wrong_reject_penalty',
+    points: -30,
+    description: '误判正常处方为问题处方',
+    type: 'penalty'
+  },
+  {
+    action: 'unintercepted_error',
+    points: -40,
+    description: '未拦截问题处方',
+    type: 'penalty'
   }
 ];
 
 export const errorTypeToRule: Record<GameErrorType, string> = {
   dosage_unit: 'dosage_unit_error',
   dosage_amount: 'dosage_amount_error',
-  contraindication: 'contraindication_missed',
+  contraindication: 'unintercepted_error',
   drug_interaction: 'drug_interaction_missed',
   batch_expired: 'batch_expired_missed',
   wrong_medicine: 'wrong_medicine',
@@ -104,7 +122,9 @@ export const errorTypeToRule: Record<GameErrorType, string> = {
   unchecked_confirm: 'unchecked_confirm',
   repeated_operation: 'repeated_operation',
   dosage: 'dosage_amount_error',
-  batch: 'batch_expired_missed'
+  batch: 'batch_expired_missed',
+  correct_reject: 'correct_reject_bonus',
+  wrong_reject: 'wrong_reject_penalty'
 };
 
 export const getPointsByErrorType = (errorType: GameErrorType): number => {

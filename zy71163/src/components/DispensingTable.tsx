@@ -175,10 +175,10 @@ const PlacedMedicineCard = memo(function PlacedMedicineCard({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-3 p-2 bg-red-100 rounded-lg flex items-center gap-2 text-red-700 text-sm"
+          className="mt-3 p-2 bg-yellow-100 rounded-lg flex items-center gap-2 text-yellow-700 text-sm"
         >
           <AlertTriangle size={16} />
-          <span className="font-medium">该药品存在错误，请重新核对或更换药品</span>
+          <span className="font-medium">发现处方存在问题，请在下方选择"拒绝配药"</span>
         </motion.div>
       )}
     </motion.div>
