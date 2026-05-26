@@ -1,12 +1,13 @@
 import React from 'react';
-import { AlertTriangle, Clock, User, UtensilsCrossed } from 'lucide-react';
+import { AlertTriangle, Clock, User, UtensilsCrossed, ArrowRightToLine, Send } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { GRADE_COLORS, GRADE_NAMES } from '../game/levels';
 import { getAllergenLabel } from '../game/meals';
 
 export default function OrderQueue() {
-  const { ordersForPrep, gameTime, setDraggedMeal } = useGameStore();
+  const { ordersForPrep, ordersForPickup, gameTime, setDraggedMeal, assignPickup, pickupWindows } = useGameStore();
   const [isExpanded, setIsExpanded] = React.useState(true);
+  const [activeTab, setActiveTab] = React.useState<'prep' | 'pickup'>('prep');
 
   const getUrgencyColor = (order: typeof ordersForPrep[number]) => {
     const timeLeft = order.pickupTime - gameTime;
@@ -22,22 +23,33 @@ export default function OrderQueue() {
     return 'bg-green-500';
   };
 
-  const handleDragStart = (e: React.DragEvent, orderId: string, mealId: string) => {
+  const handleDragStart = (e: React.DragEvent, orderId: string) => {
     e.dataTransfer.setData('orderId', orderId);
-    e.dataTransfer.setData('mealId', mealId);
-    setDraggedMeal(mealId);
+    setDraggedMeal(orderId);
   };
 
   const handleDragEnd = () => {
     setDraggedMeal(null);
   };
 
-  const sortedOrders = [...ordersForPrep].sort((a, b) => a.pickupTime - b.pickupTime);
+  const handleAssignPickup = (orderId: string) => {
+    assignPickup(orderId);
+  };
+
+  const getWindowName = (windowId: string) => {
+    const window = pickupWindows.find(w => w.id === windowId);
+    return window?.name || '未知窗口';
+  };
+
+  const sortedPrepOrders = [...ordersForPrep].sort((a, b) => a.pickupTime - b.pickupTime);
+  const sortedPickupOrders = [...ordersForPickup].sort((a, b) => a.pickupTime - b.pickupTime);
+
+  const currentOrders = activeTab === 'prep' ? sortedPrepOrders : sortedPickupOrders;
 
   return (
     <div
       className={`fixed left-0 top-20 bottom-20 z-40 transition-all duration-300 ${
-        isExpanded ? 'w-72' : 'w-12'
+        isExpanded ? 'w-80' : 'w-12'
       }`}
     >
       <div className="h-full flex">
@@ -46,42 +58,66 @@ export default function OrderQueue() {
           className="w-12 bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-center rounded-r-lg shadow-lg transition-colors"
           title={isExpanded ? '收起面板' : '展开面板'}
         >
-          <span className="writing-mode-vertical text-lg font-bold">
+          <span className="text-lg font-bold">
             {isExpanded ? '◀' : '▶'}
           </span>
         </button>
 
         {isExpanded && (
           <div className="flex-1 bg-white/95 backdrop-blur-sm border-l-2 border-amber-500 shadow-xl overflow-hidden flex flex-col">
-            <div className="bg-amber-500 text-white px-4 py-3 flex items-center gap-2">
-              <UtensilsCrossed className="w-5 h-5" />
-              <span className="font-bold">待处理订单</span>
-              <span className="ml-auto bg-amber-400 px-2 py-0.5 rounded-full text-sm font-medium">
-                {ordersForPrep.length}
-              </span>
+            <div className="bg-amber-500 text-white px-4 py-3">
+              <div className="flex items-center gap-2 mb-2">
+                <UtensilsCrossed className="w-5 h-5" />
+                <span className="font-bold">订单管理</span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActiveTab('prep')}
+                  className={`flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'prep'
+                      ? 'bg-white text-amber-600'
+                      : 'bg-amber-400 text-white hover:bg-amber-300'
+                  }`}
+                >
+                  待备餐 ({ordersForPrep.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('pickup')}
+                  className={`flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'pickup'
+                      ? 'bg-white text-amber-600'
+                      : 'bg-amber-400 text-white hover:bg-amber-300'
+                  }`}
+                >
+                  待取餐 ({ordersForPickup.length})
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 space-y-3">
-              {sortedOrders.length === 0 ? (
+              {currentOrders.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
                   <Clock className="w-12 h-12 mb-2 opacity-50" />
-                  <p className="text-sm">暂无待处理订单</p>
+                  <p className="text-sm">
+                    {activeTab === 'prep' ? '暂无待备餐订单' : '暂无待取餐订单'}
+                  </p>
                 </div>
               ) : (
-                sortedOrders.map((order) => {
+                currentOrders.map((order) => {
                   const timeLeft = Math.max(0, Math.ceil(order.pickupTime - gameTime));
                   const isUrgent = timeLeft <= 5;
                   const isWarning = timeLeft <= 15;
+                  const isInQueue = order.status === 'picking';
 
                   return (
                     <div
                       key={order.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, order.id, order.meal.id)}
+                      draggable={activeTab === 'prep'}
+                      onDragStart={(e) => activeTab === 'prep' && handleDragStart(e, order.id)}
                       onDragEnd={handleDragEnd}
-                      className={`border-l-4 rounded-lg p-3 cursor-grab active:cursor-grabbing transition-all hover:shadow-md ${getUrgencyColor(
+                      className={`border-l-4 rounded-lg p-3 transition-all hover:shadow-md ${getUrgencyColor(
                         order
-                      )}`}
+                      )} ${activeTab === 'prep' ? 'cursor-grab active:cursor-grabbing' : ''}`}
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
@@ -117,8 +153,20 @@ export default function OrderQueue() {
                         </div>
                       </div>
 
+                      <div className="mb-2">
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <ArrowRightToLine className="w-3 h-3" />
+                          <span>分配到: {getWindowName(order.pickupWindowId)}</span>
+                          {isInQueue && (
+                            <span className="ml-auto px-2 py-0.5 bg-blue-100 text-blue-600 rounded-full text-xs font-medium">
+                              排队中
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
                       {order.student.allergens.length > 0 && (
-                        <div className="flex items-center gap-1 flex-wrap">
+                        <div className="flex items-center gap-1 flex-wrap mb-1">
                           <span className="text-xs text-gray-500">过敏原:</span>
                           {order.student.allergens.map((allergen) => (
                             <span
@@ -133,8 +181,8 @@ export default function OrderQueue() {
                       )}
 
                       {order.meal.containsAllergens.length > 0 && (
-                        <div className="mt-1 flex items-center gap-1 flex-wrap">
-                          <span className="text-xs text-gray-500">含:</span>
+                        <div className="flex items-center gap-1 flex-wrap mb-2">
+                          <span className="text-xs text-gray-500">餐品含:</span>
                           {order.meal.containsAllergens.map((allergen) => (
                             <span
                               key={allergen}
@@ -145,6 +193,26 @@ export default function OrderQueue() {
                             </span>
                           ))}
                         </div>
+                      )}
+
+                      {activeTab === 'pickup' && !isInQueue && (
+                        <button
+                          onClick={() => handleAssignPickup(order.id)}
+                          className="w-full mt-2 flex items-center justify-center gap-1 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-colors"
+                        >
+                          <Send className="w-4 h-4" />
+                          发送到取餐窗口
+                        </button>
+                      )}
+
+                      {activeTab === 'pickup' && isInQueue && (
+                        <button
+                          onClick={() => handleAssignPickup(order.id)}
+                          className="w-full mt-2 flex items-center justify-center gap-1 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-colors"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                          确认取餐完成
+                        </button>
                       )}
 
                       <div className="mt-2 h-1 bg-gray-200 rounded-full overflow-hidden">
@@ -166,5 +234,25 @@ export default function OrderQueue() {
         )}
       </div>
     </div>
+  );
+}
+
+function CheckCircle(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
   );
 }

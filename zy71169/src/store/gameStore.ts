@@ -472,9 +472,23 @@ export const useGameStore = create<GameState>((set, get) => ({
       return { prepAccuracy: 0, pickupTimeliness: 0, allergenAvoidance: 0, wasteRatio: 0 };
     }
     return calculateScoreBreakdown({
-      ...state,
+      id: state.currentSessionId || '',
+      levelId: state.currentLevel?.id || '',
+      levelName: state.currentLevel?.name || '',
+      startTime: Date.now(),
+      endTime: null,
       totalScore: state.score,
-    } as GameSession);
+      result: 'win',
+      correctCount: state.correctCount,
+      errorCount: state.errorCount,
+      allergenMismatches: state.errors.filter(e => e.errorType === 'allergen_mismatch').length,
+      pickupTimeouts: state.errors.filter(e => e.errorType === 'pickup_timeout').length,
+      congestions: state.errors.filter(e => e.errorType === 'window_congestion').length,
+      wastes: state.errors.filter(e => e.errorType === 'food_waste').length,
+      maxCombo: state.maxCombo,
+      actions: state.actions,
+      errors: state.errors,
+    });
   },
 
   playSuccessSound: () => {
