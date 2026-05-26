@@ -29,7 +29,10 @@ export default function Game() {
     }
 
     return () => {
-      reset();
+      const currentState = useGameStore.getState().gameState;
+      if (currentState.status !== 'finished') {
+        reset();
+      }
     };
   }, [levelId, startGame, navigate, reset]);
 

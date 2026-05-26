@@ -19,6 +19,7 @@ interface GameStore {
   passVehicle: () => void;
   interceptVehicle: () => void;
   handleTimeout: () => void;
+  processNextVehicle: (record: InspectionRecord, scoreChange: number, isCorrect: boolean) => void;
   
   reset: () => void;
 }
