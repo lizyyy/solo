@@ -17,6 +17,7 @@ function Level() {
     if (id && (!state.level || state.level.id !== id)) {
       state.loadLevel(id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (!state.level) {

@@ -1,7 +1,6 @@
 import type { GameState, LevelDef, Vehicle, EventLog, RouteDef } from './types';
 
 const SEGMENT_BASE_MIN = 1.2;
-const STOP_WAIT_MIN = 0.4;
 const ALT_DETOUR_MIN = 0.8;
 const WAIT_COMPLAINT_THRESHOLD = 10;
 
@@ -102,10 +101,7 @@ export function tick(state: GameState, dtMin: number): GameState {
   });
 
   state.closures.forEach((c) => {
-    if (
-      c.startMinute >= state.currentMinute &&
-      c.startMinute < newMinute
-    ) {
+    if (c.startMinute >= state.currentMinute && c.startMinute < newMinute) {
       pushLog(state, {
         minute: newMinute,
         level: 'warn',
@@ -140,8 +136,75 @@ export function tick(state: GameState, dtMin: number): GameState {
       return;
     }
 
+    if (v.status === 'finished') {
+      if (!v.nextDispatchMin) {
+        const headway = route.headwayMin;
+        v.nextDispatchMin = newMinute + headway;
+        v.load = 0;
+        v.skippedStops = new Set();
+        v.totalDelayMin = 0;
+        v.useAltPath = false;
+        pushLog(state, {
+          minute: newMinute,
+          level: 'info',
+          message: `${v.id} 将在 T+${v.nextDispatchMin.toFixed(1)} 按发车间隔 ${headway} min 重新发车。`,
+        });
+      } else if (newMinute >= v.nextDispatchMin) {
+        v.status = 'idle';
+        v.stopIndex = 0;
+        v.progress = 0;
+        v.nextDispatchMin = newMinute;
+        pushLog(state, {
+          minute: newMinute,
+          level: 'info',
+          message: `${v.id} 已就位等待调度（自动发车）。`,
+        });
+      }
+      return;
+    }
+
     if (v.status === 'stopped') {
       const stopId = path[v.stopIndex];
+
+      if (v.skippedStops.has(stopId)) {
+        pushLog(state, {
+          minute: newMinute,
+          level: 'warn',
+          message: `${v.id} 跳过 ${stopId}，不停靠不上客。`,
+        });
+        if (v.stopIndex >= path.length - 1) {
+          v.status = 'finished';
+          pushLog(state, {
+            minute: newMinute,
+            level: 'info',
+            message: `${v.id} 完成线路 ${route.name} 全程运营。`,
+          });
+          return;
+        }
+        const nextStopId = path[v.stopIndex + 1];
+        if (isSegmentClosed(state, route.id, stopId, nextStopId)) {
+          if (route.altStops && !v.useAltPath) {
+            v.useAltPath = true;
+            v.totalDelayMin += ALT_DETOUR_MIN;
+            pushLog(state, {
+              minute: newMinute,
+              level: 'warn',
+              message: `${v.id} 遇封路，切换至备用线路，预计延误 ${ALT_DETOUR_MIN} 分钟。`,
+            });
+          } else {
+            v.totalDelayMin += 0.5;
+            pushLog(state, {
+              minute: newMinute,
+              level: 'error',
+              message: `${v.id} 在 ${stopId} → ${nextStopId} 遇封路且无备用线路，严重延误。`,
+            });
+          }
+          return;
+        }
+        v.status = 'moving';
+        return;
+      }
+
       const boarding = Math.min(v.capacity - v.load, state.waitingPassengers[stopId] || 0);
       v.load += boarding;
       state.waitingPassengers[stopId] = (state.waitingPassengers[stopId] || 0) - boarding;
@@ -207,11 +270,19 @@ export function tick(state: GameState, dtMin: number): GameState {
         v.progress = 0;
         v.stopIndex += 1;
         v.status = 'stopped';
+        const arrivedStop = path[v.stopIndex];
         state.actions.push({
           minute: newMinute,
           type: 'arrive',
-          payload: { stopId: path[v.stopIndex], routeId: route.id, minute: newMinute },
+          payload: { stopId: arrivedStop, routeId: route.id, minute: newMinute },
         });
+        if (v.skippedStops.has(arrivedStop)) {
+          pushLog(state, {
+            minute: newMinute,
+            level: 'warn',
+            message: `${v.id} 抵达 ${arrivedStop}（已标记跳站），直接通过。`,
+          });
+        }
       }
       return;
     }
@@ -227,7 +298,8 @@ export function tick(state: GameState, dtMin: number): GameState {
         return path.includes(stopId) && !v.skippedStops.has(stopId);
       })
       .map((v) => {
-        const route = state.routes.find((r) => r.id === v.routeId)!;
+        const route = state.routes.find((r) => r.id === v.routeId);
+        if (!route) return 999;
         const path = currentStopIds(v, route);
         const idx = path.indexOf(stopId);
         if (idx <= v.stopIndex) return 999;
@@ -259,6 +331,7 @@ export function dispatchVehicle(state: GameState, vehicleId: string, routeId: st
   v.progress = 0;
   v.useAltPath = false;
   v.skippedStops = new Set();
+  v.load = 0;
   v.nextDispatchMin = state.currentMinute;
   const route = state.routes.find((r) => r.id === routeId);
   pushLog(state, {
@@ -277,6 +350,11 @@ export function dispatchVehicle(state: GameState, vehicleId: string, routeId: st
 export function skipStop(state: GameState, vehicleId: string, stopId: string): GameState {
   const v = state.vehicles.find((x) => x.id === vehicleId);
   if (!v) return state;
+  const route = state.routes.find((r) => r.id === v.routeId);
+  if (!route) return state;
+  const path = currentStopIds(v, route);
+  if (!path.includes(stopId)) return state;
+
   v.skippedStops.add(stopId);
   state.stats.complaints += 1;
   pushLog(state, {
@@ -289,6 +367,12 @@ export function skipStop(state: GameState, vehicleId: string, stopId: string): G
     type: 'skip',
     payload: { vehicleId, stopId },
   });
+
+  const stopIdx = path.indexOf(stopId);
+  if (v.status === 'stopped' && v.stopIndex === stopIdx) {
+    v.status = 'moving';
+    v.progress = 0;
+  }
   return state;
 }
 
@@ -314,11 +398,39 @@ export function toggleAltPath(state: GameState, routeId: string, enable: boolean
 
 export function setHeadway(state: GameState, routeId: string, headwayMin: number): GameState {
   const route = state.routes.find((r) => r.id === routeId);
-  if (route) route.headwayMin = Math.max(1, Math.round(headwayMin));
+  if (!route) return state;
+
+  const oldHeadway = route.headwayMin;
+  route.headwayMin = Math.max(1, Math.round(headwayMin));
+
+  const runningSameRoute = state.vehicles.filter(
+    (v) => v.routeId === routeId && (v.status === 'moving' || v.status === 'stopped')
+  );
+  if (runningSameRoute.length === 0) {
+    const idle = state.vehicles.find((v) => v.routeId === routeId && v.status === 'idle');
+    if (idle) {
+      idle.nextDispatchMin = state.currentMinute;
+    }
+  }
+
   pushLog(state, {
     minute: state.currentMinute,
     level: 'info',
-    message: `线路 ${route?.name || routeId} 发车间隔调整为 ${route?.headwayMin} 分钟。`,
+    message: `线路 ${route.name} 发车间隔从 ${oldHeadway} 调整为 ${route.headwayMin} 分钟。`,
   });
+
+  state.vehicles.forEach((v) => {
+    if (v.routeId === routeId && v.status === 'idle') {
+      if (v.nextDispatchMin > state.currentMinute + route.headwayMin) {
+        v.nextDispatchMin = state.currentMinute + route.headwayMin;
+        pushLog(state, {
+          minute: state.currentMinute,
+          level: 'info',
+          message: `${v.id} 发车时间提前至 T+${v.nextDispatchMin.toFixed(1)} 以匹配新间隔。`,
+        });
+      }
+    }
+  });
+
   return state;
 }

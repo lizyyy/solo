@@ -98,7 +98,7 @@ export interface GameState {
   score: number;
   history: GameState[];
   historyIndex: number;
-  actions: Array<{ minute: number; type: string; payload?: any }>;
+  actions: Array<{ minute: number; type: string; payload?: Record<string, unknown> }>;
 }
 
 export interface ReplayEntry {
@@ -111,5 +111,5 @@ export interface ReplayEntry {
   stats: Stats;
   durationMin: number;
   snapshots: GameState[];
-  actions: Array<{ minute: number; type: string; payload?: any }>;
+  actions: Array<{ minute: number; type: string; payload?: Record<string, unknown> }>;
 }

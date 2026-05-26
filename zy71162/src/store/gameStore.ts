@@ -12,12 +12,13 @@ function cloneState(s: GameState): GameState {
   );
 }
 
-function reviveState(s: any): GameState {
-  s.vehicles = (s.vehicles || []).map((v: any) => ({
+function reviveState(s: unknown): GameState {
+  const state = s as Record<string, unknown>;
+  const vehicles = (state.vehicles as Array<Record<string, unknown>> || []).map((v) => ({
     ...v,
-    skippedStops: new Set(v.skippedStops || []),
+    skippedStops: new Set((v.skippedStops as string[]) || []),
   }));
-  return s as GameState;
+  return { ...state, vehicles } as GameState;
 }
 
 function loadReplays(): ReplayEntry[] {
@@ -34,7 +35,9 @@ function loadReplays(): ReplayEntry[] {
 function saveReplays(list: ReplayEntry[]) {
   try {
     localStorage.setItem(REPLAY_KEY, JSON.stringify(list));
-  } catch {}
+  } catch (e) {
+    void e;
+  }
 }
 
 interface Store extends GameState {

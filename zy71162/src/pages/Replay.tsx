@@ -16,6 +16,7 @@ function Replay() {
     if (id && (!state.history.length || state.levelId !== state.replays.find((r) => r.id === id)?.levelId)) {
       state.loadReplay(id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {

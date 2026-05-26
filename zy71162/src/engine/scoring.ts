@@ -29,7 +29,9 @@ export function computeStats(state: GameState, level: LevelDef): Stats {
   const arrivals: Record<string, number[]> = {};
   state.actions.forEach((a) => {
     if (a.type === 'arrive' && a.payload) {
-      const { stopId, routeId, minute } = a.payload;
+      const stopId = a.payload.stopId as string;
+      const routeId = a.payload.routeId as string;
+      const minute = a.payload.minute as number;
       const key = `${routeId}:${stopId}`;
       if (!arrivals[key]) arrivals[key] = [];
       arrivals[key].push(minute);

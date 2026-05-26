@@ -116,10 +116,25 @@ function DispatchPanel() {
                     className="btn btn-sm btn-danger"
                     onClick={() => {
                       const path = v.useAltPath && r?.altStops ? r.altStops : r?.stops || [];
-                      const next = path[v.stopIndex + 1];
-                      if (next) state.doSkipStop(v.id, next);
+                      const target = v.status === 'stopped' ? path[v.stopIndex] : path[v.stopIndex + 1];
+                      if (target && !v.skippedStops.has(target)) {
+                        state.doSkipStop(v.id, target);
+                      }
                     }}
-                    title="跳站（下一站）"
+                    title={
+                      (() => {
+                        const path = v.useAltPath && r?.altStops ? r.altStops : r?.stops || [];
+                        const target = v.status === 'stopped' ? path[v.stopIndex] : path[v.stopIndex + 1];
+                        return target ? `跳站：${target}（立即 +1 投诉）` : '无站点可跳';
+                      })()
+                    }
+                    disabled={
+                      (() => {
+                        const path = v.useAltPath && r?.altStops ? r.altStops : r?.stops || [];
+                        const target = v.status === 'stopped' ? path[v.stopIndex] : path[v.stopIndex + 1];
+                        return !target || v.skippedStops.has(target);
+                      })()
+                    }
                   >
                     <AlertTriangle size={12} /> 跳站
                   </button>
