@@ -39,6 +39,7 @@ interface GameStore extends GameState {
   prescriptionHasError: boolean;
   playerDecision: 'confirm' | 'reject' | null;
   medicineIssues: Record<string, MedicineIssue>;
+  prescriptionOutcomes: PrescriptionResult[];
   
   initGame: (levelId: string) => void;
   startReading: () => void;
@@ -107,6 +108,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   prescriptionHasError: false,
   playerDecision: null,
   medicineIssues: {},
+  prescriptionOutcomes: [],
 
   initGame: (levelId: string) => {
     const level = getLevelById(levelId);
@@ -135,7 +137,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       toasts: [],
       prescriptionHasError: false,
       playerDecision: null,
-      medicineIssues: {}
+      medicineIssues: {},
+      prescriptionOutcomes: []
     });
   },
 
@@ -204,18 +207,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const accuracy = totalChecks > 0 ? Math.round((correctChecks / totalChecks) * 100) : 0;
     
     const prescriptionResults: PrescriptionResult[] = state.currentPrescriptions.map(prescription => {
+      const savedOutcome = state.prescriptionOutcomes.find(o => o.prescriptionId === prescription.id);
+      if (savedOutcome) {
+        return savedOutcome;
+      }
+      
       const prescriptionErrors = state.errors.filter(e => e.prescriptionId === prescription.id);
-      const hasError = prescription.items.some(item => 
-        item.hasDosageError || item.hasContraindication || item.hasBatchError
-      );
       const hasCorrectReject = prescriptionErrors.some(e => e.type === 'correct_reject');
       const hasWrongReject = prescriptionErrors.some(e => e.type === 'wrong_reject');
       const hasUnintercepted = prescriptionErrors.some(e => e.type === 'contraindication');
       
       let isCorrect = false;
-      if (hasError && hasCorrectReject) {
+      if (hasCorrectReject) {
         isCorrect = true;
-      } else if (!hasError && !hasWrongReject && !hasUnintercepted) {
+      } else if (!hasWrongReject && !hasUnintercepted) {
         isCorrect = true;
       }
       
@@ -920,6 +925,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const state = get();
     const level = getLevelById(state.levelId);
     if (!level) return;
+    
+    const currentPrescription = state.currentPrescriptions[state.currentPrescriptionIndex];
+    if (currentPrescription && state.playerDecision) {
+      const prescriptionErrors = state.errors.filter(e => e.prescriptionId === currentPrescription.id);
+      
+      const allResultsCorrect = state.checkResults.length > 0 && state.checkResults.every(cr =>
+        cr.dosage === 'correct' &&
+        cr.contraindication === 'correct' &&
+        cr.batch === 'correct'
+      );
+      
+      const hasCorrectReject = prescriptionErrors.some(e => e.type === 'correct_reject');
+      const hasWrongReject = prescriptionErrors.some(e => e.type === 'wrong_reject');
+      const hasUnintercepted = prescriptionErrors.some(e => e.type === 'contraindication');
+      
+      let isCorrect = false;
+      if (state.playerDecision === 'reject' && hasCorrectReject) {
+        isCorrect = true;
+      } else if (state.playerDecision === 'confirm' && allResultsCorrect && !hasUnintercepted) {
+        isCorrect = true;
+      } else if (state.playerDecision === 'confirm' && !state.prescriptionHasError && !hasWrongReject && !hasUnintercepted) {
+        isCorrect = true;
+      }
+      
+      const outcome: PrescriptionResult = {
+        prescriptionId: currentPrescription.id,
+        score: isCorrect ? 100 : 50,
+        isCorrect,
+        errors: prescriptionErrors
+      };
+      
+      set(state => ({
+        prescriptionOutcomes: [...state.prescriptionOutcomes, outcome]
+      }));
+    }
     
     if (state.currentPrescriptionIndex >= state.currentPrescriptions.length - 1) {
       get().finishGame();
