@@ -169,13 +169,55 @@ async function testFlow() {
 
   console.log('\n� 步骤9: 复核后重新计算对账统计（验证已解决差异不被重置）');
   const beforeRecalc = await getReconciliation(reconciliation.id);
+  const samplesBeforeRecalc = await getSamplesWithStatus(reconciliation.id);
   console.log(`   重新计算前: 已解决差异 ${beforeRecalc?.resolved_discrepancies} / ${beforeRecalc?.discrepancies_count}`);
+  console.log(`   重新计算前样品状态: S202405001=${samplesBeforeRecalc.find(s=>s.sample_no==='S202405001')?.status}, S202405002=${samplesBeforeRecalc.find(s=>s.sample_no==='S202405002')?.status}, S202405003=${samplesBeforeRecalc.find(s=>s.sample_no==='S202405003')?.status}`);
   
   const recalculated = await recalculateReconciliation(reconciliation.id);
+  const samplesAfterRecalc = await getSamplesWithStatus(reconciliation.id);
   if (recalculated) {
     console.log(`   重新计算后: 已解决差异 ${recalculated.resolved_discrepancies} / ${recalculated.discrepancies_count}`);
+    console.log(`   重新计算后样品状态: S202405001=${samplesAfterRecalc.find(s=>s.sample_no==='S202405001')?.status}, S202405002=${samplesAfterRecalc.find(s=>s.sample_no==='S202405002')?.status}, S202405003=${samplesAfterRecalc.find(s=>s.sample_no==='S202405003')?.status}`);
     console.log(`   ${recalculated.resolved_discrepancies === beforeRecalc?.resolved_discrepancies ? '✓ 已解决差异保留成功' : '✗ 已解决差异被错误重置'}`);
+    
+    const s1StatusMatch = samplesBeforeRecalc.find(s=>s.sample_no==='S202405001')?.status === samplesAfterRecalc.find(s=>s.sample_no==='S202405001')?.status;
+    const s2StatusMatch = samplesBeforeRecalc.find(s=>s.sample_no==='S202405002')?.status === samplesAfterRecalc.find(s=>s.sample_no==='S202405002')?.status;
+    const s3StatusMatch = samplesBeforeRecalc.find(s=>s.sample_no==='S202405003')?.status === samplesAfterRecalc.find(s=>s.sample_no==='S202405003')?.status;
+    console.log(`   ${s1StatusMatch && s2StatusMatch && s3StatusMatch ? '✓ 样品复核状态保留成功' : '✗ 样品复核状态被错误覆盖'}`);
   }
+
+  console.log('\n🔄 步骤9b: 多次复核场景验证（先补材料后放行）');
+  const sample6Discs = await getSampleDiscrepanciesWithExplanation(reconciliation.id, 'S202405006');
+  const sample6DiscIds = sample6Discs.map(d => d.discrepancyId);
+  const review4Supplement = await reviewSample(
+    reconciliation.id,
+    'S202405006',
+    'supplement',
+    '接样员张三',
+    '农药残留超标，先要求合作社提供农药使用记录',
+    sample6DiscIds
+  );
+  if (review4Supplement) {
+    console.log(`   ✓ 第一次复核: supplement - ${review4Supplement.comment}`);
+  }
+  
+  const review4Approve = await reviewSample(
+    reconciliation.id,
+    'S202405006',
+    'approve',
+    '质量负责人李四',
+    '合作社提供完整农药使用记录，复检结果0.03mg/kg合格，予以放行',
+    sample6DiscIds
+  );
+  if (review4Approve) {
+    console.log(`   ✓ 第二次复核: approve - ${review4Approve.comment}`);
+  }
+
+  const recalculated2 = await recalculateReconciliation(reconciliation.id);
+  const samplesAfterRecalc2 = await getSamplesWithStatus(reconciliation.id);
+  const s6Status = samplesAfterRecalc2.find(s=>s.sample_no==='S202405006')?.status;
+  console.log(`   重新计算后 S202405006 状态: ${s6Status}`);
+  console.log(`   ${s6Status === 'approved' ? '✓ 多次复核后状态正确（取最新approved）' : '✗ 多次复核后状态错误'}`);
 
   console.log('\n📄 步骤10: 查看复核历史');
   const reviews = await getReviewRecords(reconciliation.id);

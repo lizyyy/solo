@@ -405,9 +405,14 @@ export async function performReconciliation(
   }
 
   const reviewedSamples = await getAll<{ sample_no: string; new_status: string }>(
-    `SELECT sample_no, MAX(new_status) as new_status FROM review_records 
-     WHERE reconciliation_id = ? GROUP BY sample_no`,
-    [reconciliationId]
+    `SELECT r.sample_no, r.new_status FROM review_records r
+     INNER JOIN (
+       SELECT sample_no, MAX(created_at) as max_created_at
+       FROM review_records WHERE reconciliation_id = ?
+       GROUP BY sample_no
+     ) latest ON r.sample_no = latest.sample_no AND r.created_at = latest.max_created_at
+     WHERE r.reconciliation_id = ?`,
+    [reconciliationId, reconciliationId]
   );
   const reviewedStatusMap = new Map<string, string>();
   for (const r of reviewedSamples) {
