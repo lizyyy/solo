@@ -1,0 +1,83 @@
+import { Level } from '../types';
+
+export const LEVELS: Level[] = [
+  {
+    id: 1,
+    name: '新手入门',
+    description: '熟悉基本操作，学习识别箱号和预约单匹配',
+    vehicleCount: 10,
+    timePerVehicle: 15,
+    dangerousRate: 0.1,
+    mismatchRate: 0.2,
+    maxQueueSize: 5,
+    passScore: 500,
+    difficulty: 1,
+  },
+  {
+    id: 2,
+    name: '节奏加快',
+    description: '提升反应速度，适应更快的验放节奏',
+    vehicleCount: 15,
+    timePerVehicle: 12,
+    dangerousRate: 0.15,
+    mismatchRate: 0.25,
+    maxQueueSize: 6,
+    passScore: 800,
+    difficulty: 2,
+  },
+  {
+    id: 3,
+    name: '危品专项',
+    description: '重点训练危品识别能力，提高安全意识',
+    vehicleCount: 12,
+    timePerVehicle: 10,
+    dangerousRate: 0.3,
+    mismatchRate: 0.2,
+    maxQueueSize: 5,
+    passScore: 700,
+    difficulty: 3,
+  },
+  {
+    id: 4,
+    name: '预约陷阱',
+    description: '识别各种预约信息不匹配的情况',
+    vehicleCount: 15,
+    timePerVehicle: 10,
+    dangerousRate: 0.2,
+    mismatchRate: 0.4,
+    maxQueueSize: 6,
+    passScore: 800,
+    difficulty: 4,
+  },
+  {
+    id: 5,
+    name: '综合考验',
+    description: '高压环境下的综合能力测试',
+    vehicleCount: 20,
+    timePerVehicle: 8,
+    dangerousRate: 0.25,
+    mismatchRate: 0.35,
+    maxQueueSize: 7,
+    passScore: 1000,
+    difficulty: 5,
+  },
+];
+
+export const SCORE_RULES = {
+  CORRECT_PASS: 100,
+  CORRECT_INTERCEPT: 150,
+  DANGEROUS_INTERCEPT_BONUS: 50,
+  WRONG_PASS: -200,
+  WRONG_INTERCEPT: -100,
+  TIMEOUT: -150,
+  QUEUE_PENALTY_PER_VEHICLE: -50,
+};
+
+export const ERROR_TYPES = {
+  CONTAINER_MISMATCH: '箱号不匹配',
+  LICENSE_MISMATCH: '车牌不匹配',
+  DANGEROUS_NOT_BLOCKED: '危品未拦截',
+  INVALID_RESERVATION: '预约无效',
+  WRONG_BLOCK: '错误拦截正常车辆',
+  TIMEOUT: '处理超时',
+};
