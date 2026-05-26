@@ -1,0 +1,139 @@
+[
+  {
+    "waybill_no": "SF202405010001",
+    "timestamp": "2024-05-01 10:00:00",
+    "node": "北京朝阳区揽收点",
+    "node_type": "揽收",
+    "status": "已揽收",
+    "operator": "张师傅",
+    "location": "北京市朝阳区建国路88号"
+  },
+  {
+    "waybill_no": "SF202405010001",
+    "timestamp": "2024-05-01 14:30:00",
+    "node": "北京中转中心",
+    "node_type": "中转",
+    "status": "已发往上海",
+    "operator": "李操作员",
+    "location": "北京市大兴区航空物流园"
+  },
+  {
+    "waybill_no": "SF202405010001",
+    "timestamp": "2024-05-02 08:00:00",
+    "node": "上海虹桥中转中心",
+    "node_type": "中转",
+    "status": "到达上海",
+    "operator": "王操作员",
+    "location": "上海市闵行区虹桥物流园"
+  },
+  {
+    "waybill_no": "SF202405010001",
+    "timestamp": "2024-05-03 09:00:00",
+    "node": "上海徐汇区派送点",
+    "node_type": "派送",
+    "status": "派送中",
+    "operator": "赵师傅",
+    "location": "上海市徐汇区肇嘉浜路100号"
+  },
+  {
+    "waybill_no": "SF202405010001",
+    "timestamp": "2024-05-03 16:30:00",
+    "node": "收件人处",
+    "node_type": "签收",
+    "status": "已签收",
+    "operator": "赵师傅",
+    "location": "上海市浦东新区张江高科技园区"
+  },
+  {
+    "waybill_no": "SF202405010002",
+    "timestamp": "2024-05-01 11:00:00",
+    "node": "上海浦东新区揽收点",
+    "node_type": "揽收",
+    "status": "已揽收",
+    "operator": "钱师傅",
+    "location": "上海市浦东新区陆家嘴环路1000号"
+  },
+  {
+    "waybill_no": "SF202405010002",
+    "timestamp": "2024-05-01 16:00:00",
+    "node": "上海虹桥中转中心",
+    "node_type": "中转",
+    "status": "已发往深圳",
+    "operator": "孙操作员",
+    "location": "上海市闵行区虹桥物流园"
+  },
+  {
+    "waybill_no": "SF202405010002",
+    "timestamp": "2024-05-03 14:00:00",
+    "node": "深圳宝安中转中心",
+    "node_type": "中转",
+    "status": "到达深圳，因暴雨天气延误",
+    "operator": "周操作员",
+    "location": "深圳市宝安区机场物流园",
+    "remark": "暴雨天气导致航班延误48小时"
+  },
+  {
+    "waybill_no": "SF202405010002",
+    "timestamp": "2024-05-04 09:00:00",
+    "node": "深圳南山区派送点",
+    "node_type": "派送",
+    "status": "派送中",
+    "operator": "吴师傅",
+    "location": "深圳市南山区科技园"
+  },
+  {
+    "waybill_no": "SF202405010002",
+    "timestamp": "2024-05-04 10:00:00",
+    "node": "收件人处",
+    "node_type": "签收",
+    "status": "已签收，外包装轻微破损",
+    "operator": "吴师傅",
+    "location": "深圳市南山区科技园南区",
+    "remark": "外包装轻微破损，内物完好"
+  },
+  {
+    "waybill_no": "SF202405010003",
+    "timestamp": "2024-05-01 09:30:00",
+    "node": "广州白云区揽收点",
+    "node_type": "揽收",
+    "status": "已揽收",
+    "operator": "郑师傅",
+    "location": "广州市白云区机场路100号"
+  },
+  {
+    "waybill_no": "SF202405010003",
+    "timestamp": "2024-05-01 15:00:00",
+    "node": "广州白云中转中心",
+    "node_type": "中转",
+    "status": "已发往杭州",
+    "operator": "冯操作员",
+    "location": "广州市白云区机场物流园"
+  },
+  {
+    "waybill_no": "SF202405010003",
+    "timestamp": "2024-05-02 08:00:00",
+    "node": "杭州萧山中转中心",
+    "node_type": "中转",
+    "status": "到达杭州",
+    "operator": "陈操作员",
+    "location": "杭州市萧山区机场物流园"
+  },
+  {
+    "waybill_no": "SF202405010003",
+    "timestamp": "2024-05-02 18:00:00",
+    "node": "杭州西湖区派送点",
+    "node_type": "派送",
+    "status": "派送中",
+    "operator": "褚师傅",
+    "location": "杭州市西湖区文三路100号"
+  },
+  {
+    "waybill_no": "SF202405010003",
+    "timestamp": "2024-05-02 19:00:00",
+    "node": "收件人处",
+    "node_type": "签收",
+    "status": "已签收",
+    "operator": "褚师傅",
+    "location": "杭州市西湖区文三路200号"
+  }
+]

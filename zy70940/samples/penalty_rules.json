@@ -1,0 +1,44 @@
+[
+  {
+    "rule_code": "RULE-001",
+    "rule_name": "超时送达扣罚",
+    "penalty_type": "delivery_delay",
+    "penalty_ratio": 0.1,
+    "conditions": "送达时间晚于预计时间24小时以上"
+  },
+  {
+    "rule_code": "RULE-002",
+    "rule_name": "货物破损扣罚",
+    "penalty_type": "damage",
+    "penalty_ratio": 0.3,
+    "conditions": "外包装或内物破损"
+  },
+  {
+    "rule_code": "RULE-003",
+    "rule_name": "货物丢失扣罚",
+    "penalty_type": "loss",
+    "penalty_ratio": 1.0,
+    "conditions": "货物完全丢失"
+  },
+  {
+    "rule_code": "RULE-004",
+    "rule_name": "中转延误扣罚",
+    "penalty_type": "transfer_delay",
+    "penalty_ratio": 0.2,
+    "conditions": "中转节点停留超过24小时"
+  },
+  {
+    "rule_code": "RULE-005",
+    "rule_name": "轨迹缺失扣罚",
+    "penalty_type": "missing_track",
+    "penalty_ratio": 0.1,
+    "conditions": "缺少关键节点轨迹记录"
+  },
+  {
+    "rule_code": "RULE-006",
+    "rule_name": "异常滞留扣罚",
+    "penalty_type": "stagnation",
+    "penalty_ratio": 0.15,
+    "conditions": "节点间运输时间超过48小时"
+  }
+]
