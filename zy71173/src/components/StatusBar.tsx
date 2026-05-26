@@ -5,7 +5,6 @@ import {
   Trophy,
   KeyRound,
   Droplets,
-  Clock,
   Play,
   Pause,
   CheckCircle2,

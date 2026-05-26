@@ -1,5 +1,5 @@
 import type { GameRecord, Level, GameEvent, ScoreResult, EventType } from './types';
-import { calculateScore, PENALTIES } from './scoring';
+import { calculateScore } from './scoring';
 
 export function generateReport(record: GameRecord, level: Level): object {
   const scoreResult = calculateScore(record.events, level.maxRounds, record.totalRounds);

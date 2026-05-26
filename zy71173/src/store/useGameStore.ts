@@ -10,11 +10,11 @@ import type {
 } from '../game/types';
 import {
   checkHumidityRisk,
-  checkCongestionRisk,
   checkDoorPermission,
 } from '../game/riskSystem';
 import { calculateScore } from '../game/scoring';
 import { saveRecord } from '../game/replay';
+import { isAdjacent } from '../game/map';
 
 interface GameState {
   phase: GamePhase;
@@ -91,7 +91,47 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   addToPath: (position: Position) => {
-    const { plannedPath } = get();
+    const { plannedPath, currentLevel, events, playerPosition } = get();
+    if (!currentLevel) return;
+
+    const newEvents: GameEvent[] = [...events];
+    const lastPos = plannedPath.length > 0
+      ? plannedPath[plannedPath.length - 1]
+      : playerPosition;
+
+    let isWrongOperation = false;
+    let errorMsg = '';
+
+    if (position.x < 0 || position.x >= currentLevel.gridSize.width ||
+        position.y < 0 || position.y >= currentLevel.gridSize.height) {
+      isWrongOperation = true;
+      errorMsg = '点击位置超出地图边界';
+    } else if (currentLevel.map[position.y]?.[position.x] === 'wall') {
+      isWrongOperation = true;
+      errorMsg = '无法穿越墙壁';
+    } else if (lastPos && !isAdjacent(lastPos, position)) {
+      isWrongOperation = true;
+      errorMsg = '只能点击相邻格子';
+    } else if (plannedPath.some(p => p.x === position.x && p.y === position.y)) {
+      isWrongOperation = true;
+      errorMsg = '路径不能重复经过同一位置';
+    }
+
+    if (isWrongOperation) {
+      newEvents.push({
+        round: 0,
+        type: 'wrong_operation',
+        position,
+        description: `操作错误：${errorMsg}`,
+        scoreChange: -100,
+      });
+      set({
+        events: newEvents,
+        score: newEvents.reduce((sum, e) => sum + e.scoreChange, 0),
+      });
+      return;
+    }
+
     set({ plannedPath: [...plannedPath, position] });
   },
 
@@ -204,17 +244,19 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (!gameFailed) {
       const congested = currentLevel.congestionZones.some(
         (z) => z.activeRounds.includes(newRound) &&
-               Math.abs(z.position.x - nextPosition.x) +
-               Math.abs(z.position.y - nextPosition.y) <= 1
+               z.position.x === nextPosition.x &&
+               z.position.y === nextPosition.y
       );
       if (congested) {
         newEvents.push({
           round: newRound,
           type: 'congestion',
           position: nextPosition,
-          description: '通道拥堵，无法通行',
+          description: '通道拥堵，展品被困！任务失败',
           scoreChange: -50,
         });
+        failReason = '通道拥堵导致展品被困';
+        gameFailed = true;
       }
     }
 
@@ -319,11 +361,44 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   useDesiccant: () => {
-    const { desiccantCount, phase } = get();
-    if (desiccantCount > 0 && phase === 'executing') {
+    const { desiccantCount, phase, playerPosition, currentLevel, events, currentRound } = get();
+    if (desiccantCount > 0 && phase === 'executing' && playerPosition && currentLevel) {
+      const newEvents: GameEvent[] = [...events];
+
+      const currentHumidity = currentLevel.humidityZones.reduce((max, z) => {
+        const dist = Math.abs(z.position.x - playerPosition.x) +
+                     Math.abs(z.position.y - playerPosition.y);
+        if (dist <= z.radius) {
+          return Math.max(max, z.humidity);
+        }
+        return max;
+      }, 0);
+
+      const isWaste = currentHumidity < 50;
+
+      if (isWaste) {
+        newEvents.push({
+          round: currentRound,
+          type: 'resource_waste',
+          position: playerPosition,
+          description: `干燥剂使用不当！当前湿度仅 ${currentHumidity}%，浪费资源`,
+          scoreChange: -150,
+        });
+      }
+
+      newEvents.push({
+        round: currentRound,
+        type: 'item_used',
+        position: playerPosition,
+        description: isWaste ? '使用干燥剂（资源浪费）' : '使用干燥剂抵御湿度',
+        scoreChange: 0,
+      });
+
       set({
         desiccantCount: desiccantCount - 1,
         isDesiccantActive: true,
+        events: newEvents,
+        score: newEvents.reduce((sum, e) => sum + e.scoreChange, 0),
       });
     }
   },

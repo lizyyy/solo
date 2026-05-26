@@ -24,7 +24,7 @@ const exhibitTypeLabels: Record<string, string> = {
 };
 
 export function InfoPanel() {
-  const { currentLevel, events, phase } = useGameStore();
+  const { currentLevel, events } = useGameStore();
 
   const recentEvents = events.slice(-5).reverse();
 
@@ -116,6 +116,70 @@ export function InfoPanel() {
             <span className="text-museum-accent shrink-0">•</span>
             <span className="text-gray-300">
               执行阶段：观察风险，使用道具
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-museum-accent uppercase tracking-wider">
+          扣分规则
+        </h3>
+        <div className="bg-museum-bg/50 rounded-lg p-3 space-y-1.5 text-xs">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400">错误操作</span>
+            <span className="text-red-400 font-medium">-100</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400">超时</span>
+            <span className="text-red-400 font-medium">-200</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400">资源浪费</span>
+            <span className="text-yellow-500 font-medium">-150</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400">未授权开门</span>
+            <span className="text-red-400 font-medium">-300</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400">湿度损坏</span>
+            <span className="text-red-400 font-medium">-100</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400">被安保发现</span>
+            <span className="text-red-400 font-medium">-500</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold text-museum-accent uppercase tracking-wider">
+          失败条件
+        </h3>
+        <div className="bg-museum-bg/50 rounded-lg p-3 space-y-1.5 text-xs">
+          <div className="flex items-start gap-2">
+            <span className="text-red-400 shrink-0">✕</span>
+            <span className="text-gray-300">
+              未授权开门触发警报
+            </span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-red-400 shrink-0">✕</span>
+            <span className="text-gray-300">
+              进入安保人员视野范围
+            </span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-red-400 shrink-0">✕</span>
+            <span className="text-gray-300">
+              在拥堵回合进入拥堵区
+            </span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-red-400 shrink-0">✕</span>
+            <span className="text-gray-300">
+              超出最大回合数
             </span>
           </div>
         </div>

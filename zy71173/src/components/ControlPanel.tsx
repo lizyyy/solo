@@ -31,7 +31,6 @@ export default function ControlPanel() {
     phase,
     currentLevel,
     plannedPath,
-    executedPath,
     availableCards,
     desiccantCount,
     isDesiccantActive,

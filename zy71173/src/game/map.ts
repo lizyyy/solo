@@ -1,7 +1,5 @@
 import type { Level, Position, Door } from './types';
 
-const posKey = (x: number, y: number): string => `${x},${y}`;
-
 export function isWalkable(level: Level, x: number, y: number): boolean {
   if (x < 0 || x >= level.gridSize.width || y < 0 || y >= level.gridSize.height) {
     return false;

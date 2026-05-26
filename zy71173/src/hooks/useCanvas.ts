@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { Level, Position, Guard, GameEvent } from '../game/types';
-import { getHumidityAt, isCongestedAt, getDoorAt } from '../game/map';
+import { getHumidityAt } from '../game/map';
 
 interface UseCanvasOptions {
   level: Level | null;

@@ -1,4 +1,4 @@
-import type { Level, CellType, Position, CardType } from './types';
+import type { Level, CellType, Position } from './types';
 
 const createEmptyMap = (width: number, height: number): CellType[][] => {
   return Array(height).fill(null).map(() => Array(width).fill('wall' as CellType));
