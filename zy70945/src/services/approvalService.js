@@ -21,9 +21,19 @@ async function processDecorationFile(filePath, fileType = 'csv') {
     };
   }
 
-  const applications = parsed.success.map(app => store.addDecorationApplication(app));
+  const batchFingerprint = fileReader.generateBatchFingerprint(parsed.success);
 
-  const batchFingerprint = fileReader.generateBatchFingerprint(applications);
+  if (store.isBatchProcessed(batchFingerprint)) {
+    const batchInfo = store.getBatchInfo(batchFingerprint);
+    return {
+      duplicate: true,
+      message: '该批次数据已处理过，不会重复生效',
+      batchFingerprint,
+      batchInfo
+    };
+  }
+
+  const applications = parsed.success.map(app => store.addDecorationApplication(app));
 
   const result = rulesEngine.processApplications(applications, batchFingerprint);
 
@@ -47,6 +57,18 @@ async function processInspectionFile(filePath) {
       success: false,
       error: '巡检文件解析失败',
       parseErrors: parsed.errors
+    };
+  }
+
+  const batchFingerprint = fileReader.generateBatchFingerprint(parsed.success);
+
+  if (store.isBatchProcessed(batchFingerprint)) {
+    const batchInfo = store.getBatchInfo(batchFingerprint);
+    return {
+      duplicate: true,
+      message: '该批次巡检数据已处理过，不会重复生效',
+      batchFingerprint,
+      batchInfo
     };
   }
 
@@ -95,6 +117,18 @@ async function processDeductionRulesFile(filePath) {
       success: false,
       error: '规则文件解析失败',
       parseErrors: parsed.errors
+    };
+  }
+
+  const batchFingerprint = fileReader.generateBatchFingerprint(parsed.success);
+
+  if (store.isBatchProcessed(batchFingerprint)) {
+    const batchInfo = store.getBatchInfo(batchFingerprint);
+    return {
+      duplicate: true,
+      message: '该批次规则已处理过，不会重复生效',
+      batchFingerprint,
+      batchInfo
     };
   }
 

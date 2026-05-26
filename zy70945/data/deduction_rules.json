@@ -2,7 +2,7 @@
   {
     "name": "承重墙违规拆除",
     "type": "violation_recheck",
-    "condition": { "item": "wall_type", "value": "bearing", "check": "equals" },
+    "condition": { "item": "wallType", "value": "bearing", "check": "equals" },
     "penalty": { "amount": 5000, "freezeDeposit": true, "description": "禁止拆除或改动承重墙，属于严重违规" },
     "priority": 1
   },

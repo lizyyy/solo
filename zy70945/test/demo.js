@@ -52,6 +52,44 @@ async function main() {
     console.log(`    ✗ 失败项: ${decorationResult.summary.failed} 条`);
   }
 
+  // ========== 步骤2b: CSV 重复导入验证 ==========
+  printSeparator('步骤2b: CSV 重复导入验证（同一批材料不会重复生效）');
+  const decorationResult2 = await approvalService.processDecorationFile(csvPath, 'csv');
+
+  if (decorationResult2.duplicate) {
+    console.log(`  ✓ 重复导入拦截成功`);
+    console.log(`    批次指纹: ${decorationResult2.batchFingerprint}`);
+    console.log(`    首次处理时间: ${decorationResult2.batchInfo.processedAt}`);
+    console.log(`    处理记录数: ${decorationResult2.batchInfo.recordCount}`);
+    console.log(`    说明: 同一批 CSV 数据再次提交不会重复入库`);
+  } else {
+    console.log(`  ✗ 去重失败！第二次导入仍返回 duplicate:false`);
+    console.log(`    批次指纹1: ${decorationResult.batchFingerprint}`);
+    console.log(`    批次指纹2: ${decorationResult2.batchFingerprint}`);
+  }
+
+  // ========== 步骤2c: 规则命中验证 ==========
+  printSeparator('步骤2c: 违规规则命中验证');
+  const app005 = store.getDecorationApplication('APP-005');
+  if (app005) {
+    const violations = rulesEngine.checkViolations(app005);
+    const hitRules = violations.map(v => v.ruleName);
+    console.log(`  业主: ${app005.ownerName} (${app005.address})`);
+    console.log(`  字段 wallType: ${app005.wallType}`);
+    console.log(`  字段 fireFacilityBlocked: ${app005.fireFacilityBlocked}`);
+    console.log(`  命中规则: [${hitRules.join(', ')}]`);
+    if (hitRules.includes('承重墙违规') || hitRules.includes('承重墙违规拆除')) {
+      console.log(`  ✓ 承重墙违规规则命中成功`);
+    } else {
+      console.log(`  ✗ 承重墙违规规则未命中！检查字段名`);
+    }
+    if (hitRules.includes('消防设施遮挡')) {
+      console.log(`  ✓ 消防设施遮挡规则命中成功`);
+    } else {
+      console.log(`  ✗ 消防设施遮挡规则未命中！检查字段名`);
+    }
+  }
+
   // ========== 步骤3: 查看失败项详情 ==========
   printSeparator('步骤3: 失败项详情（保留原始字段和建议处理方式）');
   if (decorationResult.failed && decorationResult.failed.length > 0) {
