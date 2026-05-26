@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { X, Trophy, Frown, FileJson, FileText, FileSpreadsheet, Loader2 } from 'lucide-react';
+import { X, Trophy, Frown, FileJson, FileText, FileSpreadsheet, Loader2, History } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import jsPDF from 'jspdf';
@@ -8,7 +8,7 @@ import { useGameStore } from '../store/useGameStore';
 import { Drain, Lowland, Pump } from '../engine/types';
 
 export function ReportModal() {
-  const { state, history, simulator, resetGame } = useGameStore();
+  const { state, history, simulator, resetGame, setReplayMode } = useGameStore();
   const reportRef = useRef<HTMLDivElement>(null);
   const [exporting, setExporting] = useState<'pdf' | 'json' | null>(null);
 
@@ -126,6 +126,10 @@ export function ReportModal() {
     resetGame();
   };
 
+  const handleEnterReplay = () => {
+    setReplayMode(true);
+  };
+
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -154,6 +158,14 @@ export function ReportModal() {
               </div>
               <div className="flex items-center gap-2">
                 <button
+                  onClick={handleEnterReplay}
+                  disabled={exporting !== null}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                >
+                  <History size={18} />
+                  历史回放
+                </button>
+                <button
                   onClick={exportPDF}
                   disabled={exporting !== null}
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
@@ -172,6 +184,7 @@ export function ReportModal() {
                 <button
                   onClick={handleClose}
                   className="p-2 rounded-lg hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
+                  title="重新开始"
                 >
                   <X size={20} />
                 </button>

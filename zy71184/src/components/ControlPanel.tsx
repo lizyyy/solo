@@ -1,4 +1,4 @@
-import { Play, Pause, RotateCcw, History, SkipForward } from 'lucide-react';
+import { Play, Pause, RotateCcw, SkipForward } from 'lucide-react';
 import { useGameStore } from '../store/useGameStore';
 
 export function ControlPanel() {
@@ -48,6 +48,16 @@ export function ControlPanel() {
               </>
             )}
 
+            {state.isReplayMode && (
+              <button
+                onClick={() => setReplayMode(false)}
+                className="px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-colors"
+                title="退出回放，返回结算"
+              >
+                返回结算
+              </button>
+            )}
+
             <button
               onClick={resetGame}
               className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white transition-colors"
@@ -55,16 +65,6 @@ export function ControlPanel() {
             >
               <RotateCcw size={20} />
             </button>
-
-            {state.isGameOver && (
-              <button
-                onClick={() => setReplayMode(true)}
-                className="p-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white transition-colors"
-                title="历史回放"
-              >
-                <History size={20} />
-              </button>
-            )}
           </div>
 
           <div className="w-px h-8 bg-gray-700" />
