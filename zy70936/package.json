@@ -1,0 +1,29 @@
+{
+  "name": "pharmacy-tracking-system",
+  "version": "1.0.0",
+  "description": "药店购药追踪与随访管理系统",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "test": "node --test dist/tests/"
+  },
+  "keywords": ["pharmacy", "tracking", "follow-up"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "csv-parser": "^3.0.0",
+    "date-fns": "^3.6.0",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
+}

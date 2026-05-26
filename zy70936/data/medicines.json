@@ -1,0 +1,47 @@
+[
+  {
+    "id": "med_001",
+    "name": "硝苯地平缓释片",
+    "category": "心血管",
+    "isControlled": false,
+    "contraindications": [],
+    "minIntervalDays": 30,
+    "maxDosage": 10
+  },
+  {
+    "id": "med_002",
+    "name": "盐酸二甲双胍片",
+    "category": "内分泌",
+    "isControlled": false,
+    "contraindications": [],
+    "minIntervalDays": 30,
+    "maxDosage": 15
+  },
+  {
+    "id": "med_003",
+    "name": "氯雷他定片",
+    "category": "抗过敏",
+    "isControlled": false,
+    "contraindications": ["过敏体质"],
+    "minIntervalDays": 0,
+    "maxDosage": 5
+  },
+  {
+    "id": "med_004",
+    "name": "氨酚羟考酮片",
+    "category": "镇痛",
+    "isControlled": true,
+    "contraindications": [],
+    "minIntervalDays": 7,
+    "maxDosage": 2
+  },
+  {
+    "id": "med_005",
+    "name": "阿司匹林肠溶片",
+    "category": "心血管",
+    "isControlled": false,
+    "contraindications": [],
+    "minIntervalDays": 30,
+    "maxDosage": 30
+  }
+]

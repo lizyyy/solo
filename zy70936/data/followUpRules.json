@@ -1,0 +1,23 @@
+[
+  {
+    "id": "rule_001",
+    "medicineCategory": "心血管",
+    "daysAfterPurchase": 7,
+    "requiredChecks": ["血压监测", "心率检查"],
+    "description": "心血管类药物需在购药后7天内随访"
+  },
+  {
+    "id": "rule_002",
+    "medicineCategory": "内分泌",
+    "daysAfterPurchase": 14,
+    "requiredChecks": ["血糖监测", "肝肾功能检查"],
+    "description": "内分泌类药物需在购药后14天内随访"
+  },
+  {
+    "id": "rule_003",
+    "medicineCategory": "镇痛",
+    "daysAfterPurchase": 3,
+    "requiredChecks": ["疼痛评估", "用药依从性检查"],
+    "description": "镇痛类药物需在购药后3天内随访"
+  }
+]
