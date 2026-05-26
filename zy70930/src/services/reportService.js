@@ -140,8 +140,13 @@ async function generatePdfReport(batchId, userId, userName) {
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
   }
 
+  const fontPath = path.join(__dirname, '../../fonts/NotoSansSC-Regular.otf');
+
   const doc = new PDFDocument({ size: 'A4', margin: 50 });
   doc.pipe(fs.createWriteStream(filePath));
+
+  doc.registerFont('chinese', fontPath);
+  doc.font('chinese');
 
   doc.fontSize(20).text('汽修连锁对账报告', { align: 'center' });
   doc.moveDown();
