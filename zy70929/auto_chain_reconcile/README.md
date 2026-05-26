@@ -29,12 +29,18 @@ python3 -m uvicorn auto_chain_reconcile.main:app --reload
 | GET  | `/api/v1/trace/part/{part_code}` | 追溯配件批次来源 |
 | GET  | `/api/v1/trace/order/{order_id}` | 查询单工单结果 |
 
+## 幂等与复跑
+
+- **同 `batch_key` 再提交**：直接返回历史结果，不重复扣库存、不重复更新套餐次数。
+- **不同 `batch_key` 但相同数据**（模拟真实入口复跑）：已存在的套餐、工单、库存批次会被复用（按唯一键匹配），已处理过的工单跳过评估，不会撞唯一约束，也不会重复扣减。
+- 唯一键：`work_order.order_id`、`inventory_batch(part_code, batch_no, store_id)`、`package.package_id`。
+
 ## 本地复跑（一条命令）
 ```bash
 bash examples/run_demo.sh
 ```
 
-脚本会：启动服务 → 上传 `examples/` 下的示例数据 → 打印三段结果 → 追溯 `OIL_0W20` 历史批次 → 再次用同一批次号提交验证幂等。
+脚本会：启动服务 → 上传示例数据 → 打印三段结果 → 追溯 `OIL_0W20` 历史批次 → 同批次号再提交验证幂等 → 新 `batch_key` 复跑相同数据验证无冲突、无重复扣减。
 
 ## 示例数据要点
 - `WO1001` 正常命中套餐与库存（normal）。

@@ -147,8 +147,13 @@ def _run_reconcile(
 
     packages: list[Package] = []
     for p in pkg_rows:
+        pid = str(p.get("package_id") or "")
+        existing_pkg = db.query(Package).filter(Package.package_id == pid).first()
+        if existing_pkg is not None:
+            packages.append(existing_pkg)
+            continue
         pkg = Package(
-            package_id=str(p.get("package_id") or ""),
+            package_id=pid,
             customer_id=str(p.get("customer_id") or ""),
             customer_name=str(p.get("customer_name") or ""),
             item_code=str(p.get("item_code") or ""),
@@ -164,8 +169,13 @@ def _run_reconcile(
 
     work_orders: list[WorkOrder] = []
     for o in wo_rows:
+        oid = str(o.get("order_id") or "")
+        existing_wo = db.query(WorkOrder).filter(WorkOrder.order_id == oid).first()
+        if existing_wo is not None:
+            work_orders.append(existing_wo)
+            continue
         w = WorkOrder(
-            order_id=str(o.get("order_id") or ""),
+            order_id=oid,
             customer_id=str(o.get("customer_id") or ""),
             store_id=str(o.get("store_id") or store_id),
             item_code=str(o.get("item_code") or ""),
@@ -180,13 +190,28 @@ def _run_reconcile(
 
     inventory: list[InventoryBatch] = []
     for inv in inv_rows:
+        part_code = str(inv.get("part_code") or "")
+        batch_no = str(inv.get("batch_no") or "")
+        inv_store_id = str(inv.get("store_id") or store_id)
+        existing_ib = (
+            db.query(InventoryBatch)
+            .filter(
+                InventoryBatch.part_code == part_code,
+                InventoryBatch.batch_no == batch_no,
+                InventoryBatch.store_id == inv_store_id,
+            )
+            .first()
+        )
+        if existing_ib is not None:
+            inventory.append(existing_ib)
+            continue
         ib = InventoryBatch(
-            part_code=str(inv.get("part_code") or ""),
+            part_code=part_code,
             part_name=str(inv.get("part_name") or ""),
-            batch_no=str(inv.get("batch_no") or ""),
+            batch_no=batch_no,
             supplier=str(inv.get("supplier") or ""),
             inbound_date=str(inv.get("inbound_date") or ""),
-            store_id=str(inv.get("store_id") or store_id),
+            store_id=inv_store_id,
             initial_qty=int(inv.get("initial_qty") or 0),
             remaining_qty=int(inv.get("remaining_qty") or inv.get("initial_qty") or 0),
             batch_id=batch.id,
@@ -196,8 +221,16 @@ def _run_reconcile(
         inventory.append(ib)
     db.flush()
 
-    # 按工单逐条评估
+    # 按工单逐条评估（已存在且有结果的工单跳过，避免重复扣减）
     for order in work_orders:
+        existing_result = (
+            db.query(ReconcileResult)
+            .filter(ReconcileResult.order_id == order.order_id)
+            .first()
+        )
+        if existing_result is not None:
+            continue
+
         order_dict = json.loads(order.raw or "{}")
         decision = evaluate_order(order_dict, store_id, packages, inventory)
         row = decision.to_result_row(batch.id)
