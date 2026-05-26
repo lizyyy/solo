@@ -18,9 +18,27 @@ import { saveGameRecord } from '../utils/storage';
 export function GamePage() {
   const { levelId } = useParams<{ levelId: string }>();
   const navigate = useNavigate();
-  const gameState = useGameStore();
   
-  const [showAnomalyAlert, setShowAnomalyAlert] = useState(false);
+  const initializeGame = useGameStore(state => state.initializeGame);
+  const resetGame = useGameStore(state => state.resetGame);
+  const startGame = useGameStore(state => state.startGame);
+  const setPaused = useGameStore(state => state.setPaused);
+  
+  const isStarted = useGameStore(state => state.isStarted);
+  const isPaused = useGameStore(state => state.isPaused);
+  const isCompleted = useGameStore(state => state.isCompleted);
+  const reportGenerated = useGameStore(state => state.reportGenerated);
+  const score = useGameStore(state => state.score);
+  const timeRemaining = useGameStore(state => state.timeRemaining);
+  const activeAnomalies = useGameStore(state => state.activeAnomalies);
+  const levelIdFromState = useGameStore(state => state.levelId);
+  const wrongSteps = useGameStore(state => state.wrongSteps);
+  const skippedSteps = useGameStore(state => state.skippedSteps);
+  const operationHistory = useGameStore(state => state.operationHistory);
+  const completedSteps = useGameStore(state => state.completedSteps);
+  const currentStep = useGameStore(state => state.currentStep);
+  const scoreDetails = useGameStore(state => state.scoreDetails);
+  
   const [showReport, setShowReport] = useState(false);
   const anomalyCheckRef = useRef<number | null>(null);
 
@@ -39,15 +57,15 @@ export function GamePage() {
 
   useEffect(() => {
     if (levelConfig) {
-      gameState.initializeGame(levelConfig.id, levelConfig.timeLimit);
+      initializeGame(levelConfig.id, levelConfig.timeLimit);
     }
     return () => {
-      gameState.resetGame();
+      resetGame();
     };
-  }, [levelConfig, gameState]);
+  }, [levelConfig, initializeGame, resetGame]);
 
   useEffect(() => {
-    if (!gameState.isStarted || gameState.isPaused || gameState.isCompleted) {
+    if (!isStarted || isPaused || isCompleted) {
       if (anomalyCheckRef.current) {
         clearInterval(anomalyCheckRef.current);
         anomalyCheckRef.current = null;
@@ -64,63 +82,55 @@ export function GamePage() {
         clearInterval(anomalyCheckRef.current);
       }
     };
-  }, [gameState.isStarted, gameState.isPaused, gameState.isCompleted, checkAndTriggerAnomalies]);
+  }, [isStarted, isPaused, isCompleted, checkAndTriggerAnomalies]);
+
+  const handleDismissAnomaly = useCallback((_configId: string) => {
+  }, []);
 
   useEffect(() => {
-    const unhandledAnomalies = gameState.activeAnomalies.filter(a => !a.isHandled);
-    if (unhandledAnomalies.length > 0 && !showAnomalyAlert) {
-      setShowAnomalyAlert(true);
-    }
-  }, [gameState.activeAnomalies, showAnomalyAlert]);
-
-  useEffect(() => {
-    if (gameState.isCompleted && gameState.reportGenerated) {
+    if (isCompleted && reportGenerated) {
       const record = {
-        levelId: gameState.levelId,
-        score: gameState.score,
+        levelId: levelIdFromState,
+        score,
         completedAt: Date.now(),
-        timeTaken: (levelConfig?.timeLimit || 0) - gameState.timeRemaining,
+        timeTaken: (levelConfig?.timeLimit || 0) - timeRemaining,
         errors: [
-          ...gameState.wrongSteps.map(id => `顺序错误: ${id}`),
-          ...gameState.skippedSteps.map(id => `漏检: ${id}`),
-          ...gameState.activeAnomalies.filter(a => !a.isHandled).map(a => `未处理: ${a.description}`),
+          ...wrongSteps.map(id => `顺序错误: ${id}`),
+          ...skippedSteps.map(id => `漏检: ${id}`),
+          ...activeAnomalies.filter(a => !a.isHandled).map(a => `未处理: ${a.description}`),
         ],
-        replayData: gameState.operationHistory,
+        replayData: operationHistory,
       };
       saveGameRecord(record);
-      navigate(`/result/${gameState.levelId}`);
+      navigate(`/result/${levelIdFromState}`);
     }
-  }, [gameState.isCompleted, gameState.reportGenerated, gameState, levelConfig, navigate]);
+  }, [isCompleted, reportGenerated, levelIdFromState, score, timeRemaining, wrongSteps, skippedSteps, activeAnomalies, operationHistory, levelConfig, navigate]);
 
   const handleStart = useCallback(() => {
-    gameState.startGame();
-  }, [gameState]);
+    startGame();
+  }, [startGame]);
 
   const handlePause = useCallback(() => {
-    gameState.setPaused(true);
-  }, [gameState]);
+    setPaused(true);
+  }, [setPaused]);
 
   const handleResume = useCallback(() => {
-    gameState.setPaused(false);
-  }, [gameState]);
+    setPaused(false);
+  }, [setPaused]);
 
   const handleRestart = useCallback(() => {
     if (levelConfig) {
-      gameState.initializeGame(levelConfig.id, levelConfig.timeLimit);
-      gameState.startGame();
+      initializeGame(levelConfig.id, levelConfig.timeLimit);
+      startGame();
     }
-  }, [gameState, levelConfig]);
+  }, [levelConfig, initializeGame, startGame]);
 
   const handlePointClick = useCallback((pointId: string) => {
-    if (!gameState.isStarted) {
+    if (!isStarted) {
       handleStart();
     }
     handleInspectionPoint(pointId);
-  }, [gameState.isStarted, handleStart, handleInspectionPoint]);
-
-  const handleCloseAnomalyAlert = useCallback(() => {
-    setShowAnomalyAlert(false);
-  }, []);
+  }, [isStarted, handleStart, handleInspectionPoint]);
 
   const handleUpgradeAnomalyClick = useCallback((configId: string) => {
     handleUpgradeAnomaly(configId);
@@ -142,18 +152,37 @@ export function GamePage() {
     );
   }
 
-  const unhandledAnomalyCount = gameState.activeAnomalies.filter(a => !a.isHandled).length;
+  const unhandledAnomalyCount = activeAnomalies.filter(a => !a.isHandled).length;
 
-  const report: InspectionReport | null = gameState.isCompleted && gameState.reportGenerated
-    ? generateReport(gameState, levelConfig)
+  const gameStateForReport = {
+    levelId: levelIdFromState,
+    currentStep,
+    completedSteps,
+    skippedSteps,
+    wrongSteps: useGameStore.getState().wrongSteps,
+    duplicateSteps: useGameStore.getState().duplicateSteps,
+    activeAnomalies,
+    score,
+    scoreDetails,
+    timeRemaining,
+    isPaused,
+    isCompleted,
+    isStarted,
+    operationHistory,
+    reportGenerated,
+    startTime: useGameStore.getState().startTime,
+  };
+
+  const report: InspectionReport | null = isCompleted && reportGenerated
+    ? generateReport(gameStateForReport, levelConfig)
     : null;
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col">
       <Header
         levelName={levelConfig.name}
-        score={gameState.score}
-        timeRemaining={gameState.timeRemaining}
+        score={score}
+        timeRemaining={timeRemaining}
         anomalyCount={unhandledAnomalyCount}
         formatTime={formatTime}
       />
@@ -163,10 +192,10 @@ export function GamePage() {
           <StepChecklist
             points={levelConfig.inspectionPoints}
             requiredOrder={levelConfig.requiredOrder}
-            currentStep={gameState.currentStep}
-            completedSteps={gameState.completedSteps}
-            wrongSteps={gameState.wrongSteps}
-            skippedSteps={gameState.skippedSteps}
+            currentStep={currentStep}
+            completedSteps={completedSteps}
+            wrongSteps={wrongSteps}
+            skippedSteps={skippedSteps}
           />
         </div>
 
@@ -174,27 +203,27 @@ export function GamePage() {
           <InspectionMap
             points={levelConfig.inspectionPoints}
             requiredOrder={levelConfig.requiredOrder}
-            currentStep={gameState.currentStep}
-            completedSteps={gameState.completedSteps}
-            wrongSteps={gameState.wrongSteps}
-            skippedSteps={gameState.skippedSteps}
-            activeAnomalies={gameState.activeAnomalies}
+            currentStep={currentStep}
+            completedSteps={completedSteps}
+            wrongSteps={wrongSteps}
+            skippedSteps={skippedSteps}
+            activeAnomalies={activeAnomalies}
             onPointClick={handlePointClick}
           />
         </div>
       </div>
 
       <Footer
-        isPaused={gameState.isPaused}
-        isCompleted={gameState.isCompleted}
+        isPaused={isPaused}
+        isCompleted={isCompleted}
         onPause={handlePause}
         onResume={handleResume}
         onRestart={handleRestart}
         onGenerateReport={handleGenerateReportClick}
-        canGenerateReport={gameState.isStarted && !gameState.isCompleted}
+        canGenerateReport={isStarted && !isCompleted}
       />
 
-      {gameState.isPaused && !gameState.isCompleted && (
+      {isPaused && !isCompleted && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-40">
           <div className="bg-slate-800 rounded-xl p-8 text-center border border-slate-700">
             <h2 className="text-2xl font-bold text-white mb-4">游戏暂停</h2>
@@ -209,7 +238,7 @@ export function GamePage() {
         </div>
       )}
 
-      {!gameState.isStarted && (
+      {!isStarted && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-40">
           <div className="bg-slate-800 rounded-xl p-8 text-center max-w-lg border border-slate-700">
             <h2 className="text-2xl font-bold text-white mb-4">{levelConfig.name}</h2>
@@ -245,9 +274,9 @@ export function GamePage() {
       )}
 
       <AnomalyAlert
-        anomalies={gameState.activeAnomalies}
-        onClose={handleCloseAnomalyAlert}
+        anomalies={activeAnomalies}
         onUpgrade={handleUpgradeAnomalyClick}
+        onDismiss={handleDismissAnomaly}
       />
 
       {showReport && report && (
