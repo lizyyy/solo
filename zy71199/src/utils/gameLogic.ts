@@ -45,8 +45,9 @@ export function calculateScore(correctCount: number, wrongCount: number): number
   return correctCount * 10 - wrongCount * 5;
 }
 
-export function getGrade(score: number, total: number): 'S' | 'A' | 'B' | 'C' | 'D' | 'F' {
-  const percentage = total > 0 ? (score / (total * 10)) * 100 : 0;
+export function getGrade(score: number, fileCount: number): 'S' | 'A' | 'B' | 'C' | 'D' | 'F' {
+  const maxScore = fileCount * 10;
+  const percentage = Math.min(maxScore > 0 ? (score / maxScore) * 100 : 0, 100);
   if (percentage >= 95) return 'S';
   if (percentage >= 85) return 'A';
   if (percentage >= 75) return 'B';

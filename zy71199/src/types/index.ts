@@ -70,6 +70,8 @@ export interface SettlementReport {
   grade: 'S' | 'A' | 'B' | 'C' | 'D' | 'F';
   correctCount: number;
   wrongCount: number;
+  borrowCorrectCount: number;
+  borrowWrongCount: number;
   accuracy: number;
   duration: number;
   actionHistory: ActionRecord[];

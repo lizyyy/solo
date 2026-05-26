@@ -1,5 +1,6 @@
 import { Pause, Play, RotateCcw, Home, Clock, Star, Zap } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
+import { getLevel } from '@/data/levels';
 import { cn } from '@/lib/utils';
 
 export default function HUD() {
@@ -11,14 +12,18 @@ export default function HUD() {
     score,
     correctCount,
     wrongCount,
+    borrowCorrectCount,
+    borrowWrongCount,
     pause,
     resume,
     restart,
     quit,
   } = useGameStore();
 
-  const level = currentLevelId ? { fileCount: 5 } : null;
-  const totalFiles = 5;
+  const level = currentLevelId ? getLevel(currentLevelId) : null;
+  const totalFiles = level?.fileCount ?? 0;
+  const totalCorrect = correctCount + borrowCorrectCount;
+  const totalWrong = wrongCount + borrowWrongCount;
   const progress = totalFiles > 0 ? (currentFileIndex / totalFiles) * 100 : 0;
 
   const formatTime = (s: number) => {
@@ -62,12 +67,12 @@ export default function HUD() {
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-green-400" />
-              <span className="text-green-400 font-bold">{correctCount}</span>
+              <span className="text-green-400 font-bold">{totalCorrect}</span>
               <span className="text-white/60">正确</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-red-400" />
-              <span className="text-red-400 font-bold">{wrongCount}</span>
+              <span className="text-red-400 font-bold">{totalWrong}</span>
               <span className="text-white/60">错误</span>
             </div>
           </div>

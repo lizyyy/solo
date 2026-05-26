@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { GamePhase, FileCard, ActionRecord, SettlementReport, Level, ConfidentialityLevel, RetentionPeriod } from '@/types';
-import { levels, getLevel } from '@/data/levels';
+import { getLevel } from '@/data/levels';
 import { calculateScore, getGrade } from '@/utils/gameLogic';
 
 interface GameState {
@@ -12,6 +12,8 @@ interface GameState {
   score: number;
   correctCount: number;
   wrongCount: number;
+  borrowCorrectCount: number;
+  borrowWrongCount: number;
   actionHistory: ActionRecord[];
   selectedConfidentiality: ConfidentialityLevel | null;
   selectedRetention: RetentionPeriod | null;
@@ -28,7 +30,6 @@ interface GameState {
   selectRetention: (period: RetentionPeriod) => void;
   selectBox: (boxId: string) => void;
   submitFile: () => void;
-  nextFile: () => void;
   pause: () => void;
   resume: () => void;
   restart: () => void;
@@ -50,6 +51,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   score: 0,
   correctCount: 0,
   wrongCount: 0,
+  borrowCorrectCount: 0,
+  borrowWrongCount: 0,
   actionHistory: [],
   selectedConfidentiality: null,
   selectedRetention: null,
@@ -67,6 +70,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     const borrowQueue = level.borrowRequests
       ? level.borrowRequests.map(br => ({ requestId: br.id, fileId: br.fileId }))
       : [];
+    const firstBorrow = borrowQueue.find(b => b.fileId === level.files[0].id);
     set({
       phase: 'playing',
       currentLevelId: levelId,
@@ -76,12 +80,14 @@ export const useGameStore = create<GameState>((set, get) => ({
       score: 0,
       correctCount: 0,
       wrongCount: 0,
+      borrowCorrectCount: 0,
+      borrowWrongCount: 0,
       actionHistory: [],
       selectedConfidentiality: null,
       selectedRetention: null,
       selectedBoxId: null,
       borrowQueue,
-      currentBorrowRequest: null,
+      currentBorrowRequest: firstBorrow || null,
     });
   },
 
@@ -141,12 +147,14 @@ export const useGameStore = create<GameState>((set, get) => ({
     const allCorrect = isConfCorrect && isRetCorrect && isBoxCorrect;
     const newCorrect = state.correctCount + (allCorrect ? 1 : 0);
     const newWrong = state.wrongCount + (allCorrect ? 0 : 1);
+    const totalCorrect = newCorrect + state.borrowCorrectCount;
+    const totalWrong = newWrong + state.borrowWrongCount;
 
     set({
       actionHistory: [...state.actionHistory, ...newActions],
       correctCount: newCorrect,
       wrongCount: newWrong,
-      score: calculateScore(newCorrect, newWrong),
+      score: calculateScore(totalCorrect, totalWrong),
       selectedConfidentiality: null,
       selectedRetention: null,
       selectedBoxId: null,
@@ -169,24 +177,6 @@ export const useGameStore = create<GameState>((set, get) => ({
           currentBorrowRequest: nextBorrow || null,
         });
       }
-    }
-  },
-
-  nextFile: () => {
-    const state = get();
-    const level = getLevel(state.currentLevelId!);
-    if (!level) return;
-    const nextIndex = state.currentFileIndex + 1;
-    if (nextIndex >= level.files.length) {
-      get().finishLevel();
-    } else {
-      set({
-        currentFileIndex: nextIndex,
-        currentFile: { ...level.files[nextIndex] },
-        selectedConfidentiality: null,
-        selectedRetention: null,
-        selectedBoxId: null,
-      });
     }
   },
 
@@ -213,6 +203,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       score: 0,
       correctCount: 0,
       wrongCount: 0,
+      borrowCorrectCount: 0,
+      borrowWrongCount: 0,
       actionHistory: [],
       selectedConfidentiality: null,
       selectedRetention: null,
@@ -243,17 +235,24 @@ export const useGameStore = create<GameState>((set, get) => ({
     const level = getLevel(state.currentLevelId!);
     if (!level) return;
 
-    const totalActions = level.fileCount * 3;
-    const grade = getGrade(state.score, totalActions);
+    const totalCorrect = state.correctCount + state.borrowCorrectCount;
+    const totalWrong = state.wrongCount + state.borrowWrongCount;
+    const finalScore = calculateScore(totalCorrect, totalWrong);
+
+    const grade = getGrade(finalScore, level.fileCount);
+    const accuracy = level.fileCount > 0 ? (state.correctCount / level.fileCount) * 100 : 0;
+
     const report: SettlementReport = {
       sessionId: `session-${Date.now()}`,
       levelId: level.id,
       levelName: level.name,
-      totalScore: state.score,
+      totalScore: finalScore,
       grade,
       correctCount: state.correctCount,
       wrongCount: state.wrongCount,
-      accuracy: totalActions > 0 ? (state.correctCount / level.fileCount) * 100 : 0,
+      borrowCorrectCount: state.borrowCorrectCount,
+      borrowWrongCount: state.borrowWrongCount,
+      accuracy: Math.min(accuracy, 100),
       duration: level.timeLimit - state.timeRemaining,
       actionHistory: state.actionHistory,
       wrongActions: state.actionHistory.filter(a => !a.isCorrect),
@@ -266,7 +265,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     const levelScores = {
       ...state.levelScores,
-      [level.id]: Math.max(state.levelScores[level.id] || 0, state.score),
+      [level.id]: Math.max(state.levelScores[level.id] || 0, finalScore),
     };
 
     set({
@@ -274,6 +273,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       lastReport: report,
       completedLevels,
       levelScores,
+      score: finalScore,
     });
 
     try {
@@ -305,14 +305,16 @@ export const useGameStore = create<GameState>((set, get) => ({
       errorReason: allCorrect ? undefined : `借阅处理有误，请检查登记和审批流程`,
     };
 
-    const newCorrect = state.correctCount + (allCorrect ? 1 : 0);
-    const newWrong = state.wrongCount + (allCorrect ? 0 : 1);
+    const newBorrowCorrect = state.borrowCorrectCount + (allCorrect ? 1 : 0);
+    const newBorrowWrong = state.borrowWrongCount + (allCorrect ? 0 : 1);
+    const totalCorrect = state.correctCount + newBorrowCorrect;
+    const totalWrong = state.wrongCount + newBorrowWrong;
 
     set({
       actionHistory: [...state.actionHistory, action],
-      correctCount: newCorrect,
-      wrongCount: newWrong,
-      score: calculateScore(newCorrect, newWrong),
+      borrowCorrectCount: newBorrowCorrect,
+      borrowWrongCount: newBorrowWrong,
+      score: calculateScore(totalCorrect, totalWrong),
       borrowQueue: state.borrowQueue.filter(b => b.requestId !== br.id),
       currentBorrowRequest: null,
     });

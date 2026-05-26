@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, Star, RotateCcw, Home, FileDown, Clock, CheckCircle, XCircle, AlertTriangle, Play } from 'lucide-react';
+import { Trophy, Star, RotateCcw, Home, FileDown, Clock, CheckCircle, XCircle, AlertTriangle, FileCheck } from 'lucide-react';
 import { useGameStore } from '@/store/gameStore';
-import { getLevel } from '@/data/levels';
 import { cn } from '@/lib/utils';
-import { CONFIDENTIALITY_LABELS, RETENTION_LABELS, FILE_CATEGORY_LABELS, ARCHIVE_BOX_LABELS } from '@/types';
+import { CONFIDENTIALITY_LABELS, RETENTION_LABELS, ARCHIVE_BOX_LABELS } from '@/types';
 import type { ActionRecord } from '@/types';
 
 export default function Report() {
@@ -31,7 +30,7 @@ export default function Report() {
   }
 
   const wrongActions = lastReport.wrongActions;
-  const totalFiles = lastReport.correctCount + lastReport.wrongCount;
+  const totalBorrowCount = lastReport.borrowCorrectCount + lastReport.borrowWrongCount;
 
   const formatAction = (action: ActionRecord): string => {
     switch (action.action) {
@@ -75,8 +74,10 @@ export default function Report() {
     lines.push(`  评级: ${'★'.repeat(lastReport.grade === 'S' ? 5 : lastReport.grade === 'A' ? 4 : lastReport.grade === 'B' ? 3 : lastReport.grade === 'C' ? 2 : 1)} ${lastReport.grade}`);
     lines.push(`  总得分: ${lastReport.totalScore} 分`);
     lines.push(`  正确率: ${lastReport.accuracy.toFixed(1)}%`);
-    lines.push(`  正确: ${lastReport.correctCount} 个`);
-    lines.push(`  错误: ${lastReport.wrongCount} 个`);
+    lines.push(`  文件正确: ${lastReport.correctCount} 个`);
+    lines.push(`  文件错误: ${lastReport.wrongCount} 个`);
+    lines.push(`  借阅正确: ${lastReport.borrowCorrectCount} 个`);
+    lines.push(`  借阅错误: ${lastReport.borrowWrongCount} 个`);
     lines.push(`  用时: ${lastReport.duration} 秒`);
     lines.push('');
 
@@ -139,7 +140,7 @@ export default function Report() {
           <p className="text-white/60">{lastReport.levelName}</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
             <Trophy size={24} className="text-[#d4a017] mx-auto mb-2" />
             <div className="text-3xl font-bold text-white">{lastReport.totalScore}</div>
@@ -148,12 +149,22 @@ export default function Report() {
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
             <CheckCircle size={24} className="text-green-400 mx-auto mb-2" />
             <div className="text-3xl font-bold text-green-400">{lastReport.correctCount}</div>
-            <div className="text-white/60 text-sm">正确</div>
+            <div className="text-white/60 text-sm">文件正确</div>
           </div>
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
             <XCircle size={24} className="text-red-400 mx-auto mb-2" />
             <div className="text-3xl font-bold text-red-400">{lastReport.wrongCount}</div>
-            <div className="text-white/60 text-sm">错误</div>
+            <div className="text-white/60 text-sm">文件错误</div>
+          </div>
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+            <FileCheck size={24} className="text-emerald-400 mx-auto mb-2" />
+            <div className="text-3xl font-bold text-emerald-400">{lastReport.borrowCorrectCount}</div>
+            <div className="text-white/60 text-sm">借阅正确</div>
+          </div>
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
+            <XCircle size={24} className="text-orange-400 mx-auto mb-2" />
+            <div className="text-3xl font-bold text-orange-400">{lastReport.borrowWrongCount}</div>
+            <div className="text-white/60 text-sm">借阅错误</div>
           </div>
           <div className="bg-white/5 rounded-xl p-4 border border-white/10 text-center">
             <Clock size={24} className="text-[#3498db] mx-auto mb-2" />
@@ -201,6 +212,19 @@ export default function Report() {
                     ))}
                   </div>
                 </div>
+                {totalBorrowCount > 0 && (
+                  <div className="p-4 bg-white/5 rounded-xl">
+                    <div className="text-white/60 text-sm mb-2">借阅处理统计</div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/80">借阅正确</span>
+                      <span className="text-emerald-400 font-bold">{lastReport.borrowCorrectCount}</span>
+                    </div>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-white/80">借阅错误</span>
+                      <span className="text-orange-400 font-bold">{lastReport.borrowWrongCount}</span>
+                    </div>
+                  </div>
+                )}
                 {wrongActions.length > 0 && (
                   <div className="p-4 bg-red-500/10 rounded-xl border border-red-500/30">
                     <div className="flex items-start gap-3">
