@@ -1,0 +1,259 @@
+[
+  {
+    "id": "level-1",
+    "name": "入门巡检",
+    "difficulty": "easy",
+    "timeLimit": 180,
+    "targetScore": 100,
+    "inspectionPoints": [
+      {
+        "id": "door",
+        "name": "门禁系统",
+        "type": "door",
+        "position": { "x": 1, "y": 1 },
+        "icon": "Door",
+        "description": "检查门禁是否正常工作"
+      },
+      {
+        "id": "cabinet-a",
+        "name": "配电柜A",
+        "type": "cabinet",
+        "position": { "x": 2, "y": 1 },
+        "icon": "Box",
+        "description": "检查配电柜A运行状态"
+      },
+      {
+        "id": "temp-1",
+        "name": "温度监测点1",
+        "type": "temperature",
+        "position": { "x": 3, "y": 1 },
+        "icon": "Thermometer",
+        "description": "检查温度是否正常"
+      },
+      {
+        "id": "cabinet-b",
+        "name": "配电柜B",
+        "type": "cabinet",
+        "position": { "x": 4, "y": 1 },
+        "icon": "Box",
+        "description": "检查配电柜B运行状态"
+      },
+      {
+        "id": "form",
+        "name": "巡检表",
+        "type": "form",
+        "position": { "x": 5, "y": 1 },
+        "icon": "ClipboardList",
+        "description": "填写巡检记录"
+      }
+    ],
+    "requiredOrder": ["door", "cabinet-a", "temp-1", "cabinet-b", "form"],
+    "possibleAnomalies": []
+  },
+  {
+    "id": "level-2",
+    "name": "标准巡检",
+    "difficulty": "medium",
+    "timeLimit": 240,
+    "targetScore": 150,
+    "inspectionPoints": [
+      {
+        "id": "door",
+        "name": "门禁系统",
+        "type": "door",
+        "position": { "x": 1, "y": 1 },
+        "icon": "Door",
+        "description": "检查门禁是否正常工作"
+      },
+      {
+        "id": "cabinet-a",
+        "name": "配电柜A",
+        "type": "cabinet",
+        "position": { "x": 2, "y": 1 },
+        "icon": "Box",
+        "description": "检查配电柜A运行状态"
+      },
+      {
+        "id": "temp-1",
+        "name": "温度监测点1",
+        "type": "temperature",
+        "position": { "x": 3, "y": 1 },
+        "icon": "Thermometer",
+        "description": "检查温度是否正常"
+      },
+      {
+        "id": "cabinet-b",
+        "name": "配电柜B",
+        "type": "cabinet",
+        "position": { "x": 4, "y": 1 },
+        "icon": "Box",
+        "description": "检查配电柜B运行状态"
+      },
+      {
+        "id": "temp-2",
+        "name": "温度监测点2",
+        "type": "temperature",
+        "position": { "x": 5, "y": 1 },
+        "icon": "Thermometer",
+        "description": "检查温度是否正常"
+      },
+      {
+        "id": "ventilation",
+        "name": "通风系统",
+        "type": "ventilation",
+        "position": { "x": 6, "y": 1 },
+        "icon": "Fan",
+        "description": "检查通风系统运行状态"
+      },
+      {
+        "id": "form",
+        "name": "巡检表",
+        "type": "form",
+        "position": { "x": 7, "y": 1 },
+        "icon": "ClipboardList",
+        "description": "填写巡检记录"
+      }
+    ],
+    "requiredOrder": ["door", "cabinet-a", "temp-1", "cabinet-b", "temp-2", "ventilation", "form"],
+    "possibleAnomalies": [
+      {
+        "id": "anomaly-temp-high",
+        "type": "temperature",
+        "severity": "warning",
+        "triggerProbability": 0.6,
+        "requiresUpgrade": false,
+        "description": "温度监测点1温度过高，已达到38°C",
+        "relatedPointId": "temp-1"
+      },
+      {
+        "id": "anomaly-door-fail",
+        "type": "door",
+        "severity": "critical",
+        "triggerProbability": 0.3,
+        "requiresUpgrade": true,
+        "description": "门禁系统故障，无法正常开关",
+        "relatedPointId": "door"
+      }
+    ]
+  },
+  {
+    "id": "level-3",
+    "name": "严格巡检",
+    "difficulty": "hard",
+    "timeLimit": 300,
+    "targetScore": 200,
+    "inspectionPoints": [
+      {
+        "id": "door",
+        "name": "门禁系统",
+        "type": "door",
+        "position": { "x": 1, "y": 1 },
+        "icon": "Door",
+        "description": "检查门禁是否正常工作"
+      },
+      {
+        "id": "cabinet-a",
+        "name": "配电柜A",
+        "type": "cabinet",
+        "position": { "x": 2, "y": 1 },
+        "icon": "Box",
+        "description": "检查配电柜A运行状态"
+      },
+      {
+        "id": "temp-1",
+        "name": "温度监测点1",
+        "type": "temperature",
+        "position": { "x": 3, "y": 1 },
+        "icon": "Thermometer",
+        "description": "检查温度是否正常"
+      },
+      {
+        "id": "cabinet-b",
+        "name": "配电柜B",
+        "type": "cabinet",
+        "position": { "x": 2, "y": 2 },
+        "icon": "Box",
+        "description": "检查配电柜B运行状态"
+      },
+      {
+        "id": "temp-2",
+        "name": "温度监测点2",
+        "type": "temperature",
+        "position": { "x": 3, "y": 2 },
+        "icon": "Thermometer",
+        "description": "检查温度是否正常"
+      },
+      {
+        "id": "cabinet-c",
+        "name": "配电柜C",
+        "type": "cabinet",
+        "position": { "x": 4, "y": 2 },
+        "icon": "Box",
+        "description": "检查配电柜C运行状态"
+      },
+      {
+        "id": "temp-3",
+        "name": "温度监测点3",
+        "type": "temperature",
+        "position": { "x": 5, "y": 2 },
+        "icon": "Thermometer",
+        "description": "检查温度是否正常"
+      },
+      {
+        "id": "ventilation",
+        "name": "通风系统",
+        "type": "ventilation",
+        "position": { "x": 6, "y": 2 },
+        "icon": "Fan",
+        "description": "检查通风系统运行状态"
+      },
+      {
+        "id": "form",
+        "name": "巡检表",
+        "type": "form",
+        "position": { "x": 7, "y": 2 },
+        "icon": "ClipboardList",
+        "description": "填写巡检记录"
+      }
+    ],
+    "requiredOrder": ["door", "cabinet-a", "temp-1", "cabinet-b", "temp-2", "cabinet-c", "temp-3", "ventilation", "form"],
+    "possibleAnomalies": [
+      {
+        "id": "anomaly-temp-high-1",
+        "type": "temperature",
+        "severity": "warning",
+        "triggerProbability": 0.7,
+        "requiresUpgrade": false,
+        "description": "温度监测点1温度过高，已达到42°C",
+        "relatedPointId": "temp-1"
+      },
+      {
+        "id": "anomaly-temp-high-2",
+        "type": "temperature",
+        "severity": "critical",
+        "triggerProbability": 0.5,
+        "requiresUpgrade": true,
+        "description": "温度监测点2温度异常，已达到55°C",
+        "relatedPointId": "temp-2"
+      },
+      {
+        "id": "anomaly-equipment-fail",
+        "type": "equipment",
+        "severity": "critical",
+        "triggerProbability": 0.4,
+        "requiresUpgrade": true,
+        "description": "配电柜B异常振动，有异响",
+        "relatedPointId": "cabinet-b"
+      },
+      {
+        "id": "anomaly-ventilation-fail",
+        "type": "equipment",
+        "severity": "warning",
+        "triggerProbability": 0.3,
+        "requiresUpgrade": false,
+        "description": "通风系统风量不足",
+        "relatedPointId": "ventilation"
+      }
+    ]
+  }
+]
