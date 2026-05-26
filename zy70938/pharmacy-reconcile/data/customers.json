@@ -1,0 +1,46 @@
+[
+  {
+    "id": "C001",
+    "name": "张***",
+    "phone": "138****1234",
+    "tags": ["高血压", "糖尿病", "随访中"],
+    "conditions": ["hypertension", "diabetes"],
+    "lastFollowUp": "2026-04-20",
+    "nextFollowUp": "2026-05-20",
+    "allergies": ["青霉素"],
+    "note": "需控制血压，最近一次血压 145/92"
+  },
+  {
+    "id": "C002",
+    "name": "李***",
+    "phone": "139****5678",
+    "tags": ["高血压", "新客"],
+    "conditions": ["hypertension"],
+    "lastFollowUp": "2026-03-10",
+    "nextFollowUp": "2026-04-10",
+    "allergies": [],
+    "note": "建档不足 30 天"
+  },
+  {
+    "id": "C003",
+    "name": "王***",
+    "phone": "137****9999",
+    "tags": ["糖尿病", "随访中"],
+    "conditions": ["diabetes"],
+    "lastFollowUp": "2026-05-01",
+    "nextFollowUp": "2026-06-01",
+    "allergies": [],
+    "note": ""
+  },
+  {
+    "id": "C004",
+    "name": "赵***",
+    "phone": "136****4321",
+    "tags": ["随访中"],
+    "conditions": [],
+    "lastFollowUp": null,
+    "nextFollowUp": null,
+    "allergies": [],
+    "note": "慢病标签缺失，需补录"
+  }
+]
