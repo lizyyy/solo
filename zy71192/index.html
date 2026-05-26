@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区疫苗排队游戏</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <div id="start-screen" class="screen active">
+            <h1>💉 社区疫苗排队游戏</h1>
+            <p class="subtitle">模拟社区卫生站疫苗接种全流程</p>
+            <div class="level-select">
+                <h2>选择关卡</h2>
+                <div class="level-buttons">
+                    <button class="level-btn" data-level="1">
+                        <span class="level-num">关卡 1</span>
+                        <span class="level-name">新手入门</span>
+                        <span class="level-desc">基础流程，无迟到</span>
+                    </button>
+                    <button class="level-btn" data-level="2">
+                        <span class="level-num">关卡 2</span>
+                        <span class="level-name">迟到挑战</span>
+                        <span class="level-desc">处理迟到插队</span>
+                    </button>
+                    <button class="level-btn" data-level="3">
+                        <span class="level-num">关卡 3</span>
+                        <span class="level-name">批号危机</span>
+                        <span class="level-desc">多批号管理+留观饱和</span>
+                    </button>
+                </div>
+            </div>
+            <div class="rules">
+                <h3>📋 游戏规则</h3>
+                <ul>
+                    <li>✅ 按预约顺序叫号接种</li>
+                    <li>✅ 疫苗批号必须匹配</li>
+                    <li>✅ 接种后需留观30分钟</li>
+                    <li>⚠️ 迟到者可在原序号±2位内插队</li>
+                    <li>❌ 留观区满则游戏失败</li>
+                    <li>❌ 批号错配扣分并可能失败</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div class="top-bar">
+                <div class="game-info">
+                    <span class="level-display">关卡 <span id="current-level">1</span></span>
+                    <span class="time-display">时间: <span id="game-time">00:00</span></span>
+                    <span class="score-display">分数: <span id="game-score">0</span></span>
+                </div>
+                <div class="game-controls">
+                    <button id="btn-pause" class="control-btn">⏸️ 暂停</button>
+                    <button id="btn-restart" class="control-btn">🔄 重开</button>
+                    <button id="btn-menu" class="control-btn">🏠 菜单</button>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <div class="left-panel">
+                    <div class="panel-section">
+                        <h3>📦 疫苗库存</h3>
+                        <div id="vaccine-stock" class="vaccine-list"></div>
+                    </div>
+                    <div class="panel-section">
+                        <h3>📋 预约队列</h3>
+                        <div id="appointment-queue" class="queue-list"></div>
+                    </div>
+                </div>
+
+                <div class="center-panel">
+                    <div class="station-area">
+                        <h3>💉 接种台</h3>
+                        <div id="vaccination-stations" class="stations-grid"></div>
+                    </div>
+                    <div class="action-area">
+                        <h3>🎮 操作区</h3>
+                        <div class="action-buttons">
+                            <button id="btn-call-next" class="action-btn primary">📢 叫下一位</button>
+                            <button id="btn-vaccinate" class="action-btn success" disabled>💉 开始接种</button>
+                            <button id="btn-finish-vaccine" class="action-btn info" disabled>✅ 完成接种</button>
+                        </div>
+                        <div id="selected-info" class="selected-info">
+                            <p>选择接种台和疫苗后开始接种</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <div class="panel-section">
+                        <h3>⏳ 留观区 (<span id="observation-count">0</span>/<span id="observation-max">10</span>)</h3>
+                        <div id="observation-area" class="observation-list"></div>
+                    </div>
+                    <div class="panel-section">
+                        <h3>📊 实时统计</h3>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <span class="stat-label">已完成接种:</span>
+                                <span class="stat-value" id="stat-completed">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">留观完成:</span>
+                                <span class="stat-value" id="stat-observed">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">迟到处理:</span>
+                                <span class="stat-value" id="stat-late">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">错误次数:</span>
+                                <span class="stat-value error" id="stat-errors">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-section">
+                        <h3>📝 事件日志</h3>
+                        <div id="event-log" class="event-log"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pause-screen" class="screen overlay">
+            <div class="overlay-content">
+                <h2>⏸️ 游戏暂停</h2>
+                <button id="btn-resume" class="overlay-btn">▶️ 继续游戏</button>
+                <button id="btn-restart-pause" class="overlay-btn">🔄 重新开始</button>
+                <button id="btn-menu-pause" class="overlay-btn">🏠 返回菜单</button>
+            </div>
+        </div>
+
+        <div id="result-screen" class="screen overlay">
+            <div class="overlay-content">
+                <h2 id="result-title">🎉 关卡完成!</h2>
+                <div id="result-stats" class="result-stats"></div>
+                <div class="result-actions">
+                    <button id="btn-replay" class="overlay-btn">🎬 查看回放</button>
+                    <button id="btn-export" class="overlay-btn">📄 导出报告</button>
+                    <button id="btn-next-level" class="overlay-btn primary">➡️ 下一关</button>
+                    <button id="btn-menu-result" class="overlay-btn">🏠 返回菜单</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="replay-screen" class="screen overlay">
+            <div class="overlay-content wide">
+                <h2>🎬 历史回放</h2>
+                <div class="replay-controls">
+                    <button id="btn-replay-play" class="control-btn">▶️ 播放</button>
+                    <button id="btn-replay-pause" class="control-btn">⏸️ 暂停</button>
+                    <button id="btn-replay-reset" class="control-btn">⏮️ 重置</button>
+                    <span class="replay-progress">进度: <span id="replay-progress">0</span>%</span>
+                </div>
+                <div id="replay-view" class="replay-view"></div>
+                <button id="btn-close-replay" class="overlay-btn">关闭回放</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
