@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>冷库除霜调度游戏</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+</head>
+<body>
+  <div id="game-root">
+    <header id="top-bar">
+      <div class="brand">
+        <span class="logo">❄️</span>
+        <span class="title">冷库除霜调度游戏</span>
+      </div>
+      <div class="level-info">
+        <span id="level-name">关卡 1</span>
+        <span class="divider">|</span>
+        <span id="game-clock">00:00</span>
+        <span class="divider">|</span>
+        <span id="score-display">得分: 0</span>
+      </div>
+      <div class="controls">
+        <button id="btn-pause" class="btn btn-primary">⏸ 暂停</button>
+        <button id="btn-restart" class="btn btn-secondary">🔄 重开</button>
+        <button id="btn-speed" class="btn btn-secondary">⏩ 1x</button>
+      </div>
+    </header>
+
+    <main id="main-area">
+      <section id="scene3d-container">
+        <canvas id="scene3d"></canvas>
+        <div id="scene3d-overlay">
+          <div class="zone-indicator" data-zone="A">A区</div>
+          <div class="zone-indicator" data-zone="B">B区</div>
+          <div class="zone-indicator" data-zone="C">C区</div>
+          <div id="temp-overlay"></div>
+        </div>
+      </section>
+
+      <aside id="side-panel">
+        <div class="panel-tabs">
+          <button class="tab-btn active" data-tab="tasks">任务</button>
+          <button class="tab-btn" data-tab="schedule">调度</button>
+          <button class="tab-btn" data-tab="chart">温度曲线</button>
+          <button class="tab-btn" data-tab="report">报告</button>
+          <button class="tab-btn" data-tab="replay">回放</button>
+        </div>
+
+        <div class="tab-content" id="tab-tasks">
+          <h3>出入库任务</h3>
+          <div id="task-list"></div>
+        </div>
+
+        <div class="tab-content hidden" id="tab-schedule">
+          <h3>除霜调度 (Gantt)</h3>
+          <div id="gantt-container">
+            <div id="gantt-timeline"></div>
+            <div id="gantt-bars"></div>
+          </div>
+          <div class="schedule-controls">
+            <button id="btn-add-defrost" class="btn btn-primary">+ 添加除霜</button>
+          </div>
+        </div>
+
+        <div class="tab-content hidden" id="tab-chart">
+          <h3>温度曲线</h3>
+          <canvas id="temp-chart" width="500" height="250"></canvas>
+          <div id="temp-legend"></div>
+        </div>
+
+        <div class="tab-content hidden" id="tab-report">
+          <h3>运行报告</h3>
+          <div id="report-content">
+            <div class="report-section">
+              <h4>评分明细</h4>
+              <div id="score-breakdown"></div>
+            </div>
+            <div class="report-section">
+              <h4>事件日志</h4>
+              <div id="event-log"></div>
+            </div>
+            <button id="btn-export-report" class="btn btn-primary">导出报告</button>
+          </div>
+        </div>
+
+        <div class="tab-content hidden" id="tab-replay">
+          <h3>历史回放</h3>
+          <div id="replay-controls">
+            <button id="btn-replay-play" class="btn btn-primary">▶ 播放</button>
+            <button id="btn-replay-reset" class="btn btn-secondary">⟲ 重置</button>
+            <input type="range" id="replay-slider" min="0" max="100" value="0" />
+            <span id="replay-time">00:00</span>
+          </div>
+          <canvas id="replay-chart" width="500" height="200"></canvas>
+        </div>
+      </aside>
+    </main>
+
+    <div id="modal-overlay" class="hidden">
+      <div id="modal">
+        <h2 id="modal-title">游戏结束</h2>
+        <div id="modal-body"></div>
+        <div id="modal-actions">
+          <button id="btn-modal-restart" class="btn btn-primary">重新开始</button>
+          <button id="btn-modal-next" class="btn btn-secondary hidden">下一关</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="defrost-modal" class="hidden">
+      <div class="defrost-dialog">
+        <h3>安排除霜</h3>
+        <label>选择蒸发器:
+          <select id="defrost-evaporator"></select>
+        </label>
+        <label>开始时间 (分钟):
+          <input type="number" id="defrost-start" min="0" max="1440" value="30" />
+        </label>
+        <label>持续时间 (分钟):
+          <input type="number" id="defrost-duration" min="5" max="60" value="20" />
+        </label>
+        <div class="defrost-actions">
+          <button id="btn-defrost-confirm" class="btn btn-primary">确认</button>
+          <button id="btn-defrost-cancel" class="btn btn-secondary">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="start-screen">
+      <div class="start-content">
+        <h1>❄️ 冷库除霜调度游戏</h1>
+        <p class="subtitle">合理安排除霜时段，控制温度，保证出入库顺畅</p>
+        <div class="level-select">
+          <h3>选择关卡</h3>
+          <div id="level-buttons"></div>
+        </div>
+        <div class="game-info">
+          <h3>游戏规则</h3>
+          <ul>
+            <li>🕐 每关持续 24 游戏小时 (实时约 4-8 分钟)</li>
+            <li>🌡️ 各温区温度需保持在设定范围内</li>
+            <li>❄️ 蒸发器需定期除霜，否则制冷效率下降</li>
+            <li>📦 出入库任务需在时间窗内完成</li>
+            <li>⚠️ 除霜期间对应区域温度会升高</li>
+          </ul>
+        </div>
+        <div class="scoring-info">
+          <h3>评分规则</h3>
+          <ul>
+            <li>✅ 温度达标: +2/分钟·温区</li>
+            <li>✅ 任务准时完成: +100/任务</li>
+            <li>✅ 除霜及时: +50/次</li>
+            <li>❌ 温度超标: -3/度·分钟</li>
+            <li>❌ 任务延误: -50/次·分钟</li>
+            <li>❌ 除霜超时: -100/次</li>
+            <li>❌ 能源浪费: -20/次</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>
