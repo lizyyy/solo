@@ -775,7 +775,11 @@
                 GameState.score -= 30;
             }
 
-            if (!targetFlight.cabins.includes(cart.cabin)) {
+            if (cart.cabin !== targetCabin) {
+                success = false;
+                errorMsg = `❌ 舱位错配: ${cart.type} 是 ${cart.cabin}，投放到了 ${targetCabin} 区域`;
+                GameState.score -= 25;
+            } else if (!targetFlight.cabins.includes(cart.cabin)) {
                 success = false;
                 errorMsg = `❌ 舱位错配: ${cart.type} 是 ${cart.cabin}，${targetFlight.flightNo} 没有该舱位`;
                 GameState.score -= 25;
