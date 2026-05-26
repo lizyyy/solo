@@ -1,0 +1,22 @@
+{
+  "name": "equipment-rental-service",
+  "version": "1.0.0",
+  "description": "设备租赁客服系统 - 租赁/维修/押金跨订单追踪",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node scripts/run-test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "better-sqlite3": "^9.2.2",
+    "moment": "^2.29.4",
+    "crypto": "^1.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

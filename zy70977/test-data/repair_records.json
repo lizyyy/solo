@@ -1,0 +1,35 @@
+[
+  {
+    "repair_no": "REP2024001",
+    "device_id": "DEV001",
+    "rental_order_no": "ORD2024001",
+    "repair_date": "2024-01-18",
+    "repair_type": "屏幕损坏",
+    "repair_cost": 500,
+    "liability": "customer",
+    "description": "客户使用不当导致屏幕碎裂",
+    "status": "pending"
+  },
+  {
+    "repair_no": "REP2024002",
+    "device_id": "DEV002",
+    "rental_order_no": "ORD2024002",
+    "repair_date": "2024-01-22",
+    "repair_type": "正常保养",
+    "repair_cost": 100,
+    "liability": "company",
+    "description": "设备例行保养，属正常损耗",
+    "status": "pending"
+  },
+  {
+    "repair_no": "REP2024003",
+    "device_id": "DEV003",
+    "rental_order_no": "ORD2024003",
+    "repair_date": "2024-02-15",
+    "repair_type": "配件丢失",
+    "repair_cost": 800,
+    "liability": "customer",
+    "description": "归还时发现原装充电器丢失",
+    "status": "pending"
+  }
+]

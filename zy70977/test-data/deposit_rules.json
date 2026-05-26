@@ -1,0 +1,57 @@
+[
+  {
+    "rule_code": "OVERDUE_001",
+    "rule_name": "逾期7天以内扣减日租金1.5倍",
+    "rule_type": "overdue_rent",
+    "condition_expr": "overdueDays <= 7",
+    "deduction_amount": 0,
+    "deduction_percent": 0,
+    "priority": 1,
+    "description": "逾期7天以内，按日租金1.5倍乘以逾期天数从押金扣减",
+    "is_active": true
+  },
+  {
+    "rule_code": "OVERDUE_002",
+    "rule_name": "逾期8-30天扣减押金10%",
+    "rule_type": "overdue_rent",
+    "condition_expr": "overdueDays > 7 && overdueDays <= 30",
+    "deduction_amount": 0,
+    "deduction_percent": 10,
+    "priority": 2,
+    "description": "逾期8-30天，扣减押金总额的10%",
+    "is_active": true
+  },
+  {
+    "rule_code": "OVERDUE_003",
+    "rule_name": "逾期30天以上扣减全部押金",
+    "rule_type": "overdue_rent",
+    "condition_expr": "overdueDays > 30",
+    "deduction_amount": 0,
+    "deduction_percent": 100,
+    "priority": 3,
+    "description": "逾期超过30天，扣减全部押金",
+    "is_active": true
+  },
+  {
+    "rule_code": "REPAIR_001",
+    "rule_name": "客户责任损坏全额扣减",
+    "rule_type": "repair_liability",
+    "condition_expr": "liability === 'customer'",
+    "deduction_amount": 0,
+    "deduction_percent": 100,
+    "priority": 1,
+    "description": "维修责任为客户时，从押金全额扣减维修费用",
+    "is_active": true
+  },
+  {
+    "rule_code": "REPAIR_002",
+    "rule_name": "公司责任不扣减",
+    "rule_type": "repair_liability",
+    "condition_expr": "liability === 'company'",
+    "deduction_amount": 0,
+    "deduction_percent": 0,
+    "priority": 2,
+    "description": "维修责任为公司时，不扣减客户押金",
+    "is_active": true
+  }
+]
