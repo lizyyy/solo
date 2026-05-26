@@ -1,0 +1,230 @@
+[
+  {
+    "order_no": "WO20240301001",
+    "customer_name": "张三",
+    "customer_phone": "13800138001",
+    "store_id": "s001",
+    "service_advisor": "刘服务顾问",
+    "order_date": "2024-03-15",
+    "finish_date": "2024-03-15",
+    "total_amount": 0,
+    "paid_amount": 0,
+    "status": "completed",
+    "payment_method": "package",
+    "remarks": "使用套餐PKG2024001",
+    "items": [
+      {
+        "type": "service",
+        "code": "SV001",
+        "name": "机油更换",
+        "quantity": 1,
+        "unit_price": 100,
+        "total_price": 100,
+        "is_package_item": true,
+        "related_package_id": "PKG2024001"
+      },
+      {
+        "type": "service",
+        "code": "SV002",
+        "name": "机滤更换",
+        "quantity": 1,
+        "unit_price": 50,
+        "total_price": 50,
+        "is_package_item": true,
+        "related_package_id": "PKG2024001"
+      },
+      {
+        "type": "part",
+        "code": "P001",
+        "name": "全合成机油 5W-40",
+        "quantity": 1,
+        "unit_price": 149,
+        "total_price": 149,
+        "is_package_item": true,
+        "related_package_id": "PKG2024001"
+      }
+    ]
+  },
+  {
+    "order_no": "WO20240310001",
+    "customer_name": "李四",
+    "customer_phone": "13800138002",
+    "store_id": "s002",
+    "service_advisor": "陈服务顾问",
+    "order_date": "2024-03-20",
+    "finish_date": "2024-03-20",
+    "total_amount": 0,
+    "paid_amount": 0,
+    "status": "completed",
+    "payment_method": "package",
+    "remarks": "跨店使用套餐PKG2024002，客户住在海淀，就近消费",
+    "items": [
+      {
+        "type": "service",
+        "code": "SV003",
+        "name": "刹车片检查",
+        "quantity": 1,
+        "unit_price": 80,
+        "total_price": 80,
+        "is_package_item": true,
+        "related_package_id": "PKG2024002"
+      },
+      {
+        "type": "part",
+        "code": "P002",
+        "name": "前刹车片",
+        "quantity": 1,
+        "unit_price": 519,
+        "total_price": 519,
+        "is_package_item": true,
+        "related_package_id": "PKG2024002"
+      }
+    ]
+  },
+  {
+    "order_no": "WO20240401001",
+    "customer_name": "赵六",
+    "customer_phone": "13800138004",
+    "store_id": "s001",
+    "service_advisor": "刘服务顾问",
+    "order_date": "2024-04-05",
+    "finish_date": "2024-04-05",
+    "total_amount": 899,
+    "paid_amount": 899,
+    "status": "completed",
+    "payment_method": "cash",
+    "remarks": "大保养，项目有替换",
+    "items": [
+      {
+        "type": "service",
+        "code": "SV001",
+        "name": "机油更换",
+        "quantity": 1,
+        "unit_price": 100,
+        "total_price": 100,
+        "is_package_item": true,
+        "related_package_id": "PKG2024004"
+      },
+      {
+        "type": "service",
+        "code": "SV008",
+        "name": "空调滤芯更换",
+        "quantity": 1,
+        "unit_price": 35,
+        "total_price": 35,
+        "is_package_item": true,
+        "related_package_id": "PKG2024004",
+        "replaced_from": "SV005",
+        "replacement_reason": "客户要求换成空调滤芯，空气滤芯上次刚换过"
+      },
+      {
+        "type": "part",
+        "code": "P001",
+        "name": "全合成机油 5W-40",
+        "quantity": 1,
+        "unit_price": 149,
+        "total_price": 149,
+        "is_package_item": true,
+        "related_package_id": "PKG2024004"
+      },
+      {
+        "type": "part",
+        "code": "P005",
+        "name": "空调滤芯",
+        "quantity": 1,
+        "unit_price": 45,
+        "total_price": 45,
+        "is_package_item": true,
+        "related_package_id": "PKG2024004",
+        "replaced_from": "P003",
+        "replacement_reason": "客户要求换成空调滤芯"
+      },
+      {
+        "type": "service",
+        "code": "SV006",
+        "name": "全车检查",
+        "quantity": 1,
+        "unit_price": 570,
+        "total_price": 570,
+        "is_package_item": true,
+        "related_package_id": "PKG2024004"
+      }
+    ]
+  },
+  {
+    "order_no": "WO20240415001",
+    "customer_name": "孙七",
+    "customer_phone": "13800138005",
+    "store_id": "s001",
+    "service_advisor": "周服务顾问",
+    "order_date": "2024-04-20",
+    "finish_date": "2024-04-20",
+    "total_amount": 1599,
+    "paid_amount": 1599,
+    "status": "completed",
+    "payment_method": "wechat",
+    "remarks": "更换轮胎",
+    "items": [
+      {
+        "type": "service",
+        "code": "SV007",
+        "name": "轮胎更换服务",
+        "quantity": 1,
+        "unit_price": 200,
+        "total_price": 200,
+        "is_package_item": true,
+        "related_package_id": "PKG2024005"
+      },
+      {
+        "type": "part",
+        "code": "P004",
+        "name": "米其林轮胎 205/55R16",
+        "quantity": 4,
+        "unit_price": 349.75,
+        "total_price": 1399,
+        "is_package_item": true,
+        "related_package_id": "PKG2024005"
+      }
+    ]
+  },
+  {
+    "order_no": "WO20240420001",
+    "customer_name": "钱八",
+    "customer_phone": "13800138006",
+    "store_id": "s001",
+    "service_advisor": "刘服务顾问",
+    "order_date": "2024-04-25",
+    "finish_date": "2024-04-25",
+    "total_amount": 350,
+    "paid_amount": 350,
+    "status": "completed",
+    "payment_method": "alipay",
+    "remarks": "单独维修，未使用套餐",
+    "items": [
+      {
+        "type": "service",
+        "code": "SV009",
+        "name": "补胎服务",
+        "quantity": 2,
+        "unit_price": 50,
+        "total_price": 100
+      },
+      {
+        "type": "part",
+        "code": "P001",
+        "name": "全合成机油 5W-40",
+        "quantity": 1,
+        "unit_price": 155,
+        "total_price": 155
+      },
+      {
+        "type": "service",
+        "code": "SV001",
+        "name": "机油更换",
+        "quantity": 1,
+        "unit_price": 95,
+        "total_price": 95
+      }
+    ]
+  }
+]
