@@ -1,0 +1,17 @@
+{
+  "name": "decoration-reconcile",
+  "version": "1.0.0",
+  "description": "物业装修对账服务：导入 CSV/JSON，自动比对 + 人工复核 + 重新计算 + 报告下载",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "csv-parse": "^5.5.6",
+    "express": "^4.19.2",
+    "json-2-csv": "^5.5.6",
+    "multer": "^1.4.5-lts.1"
+  }
+}
