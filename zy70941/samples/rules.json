@@ -1,0 +1,74 @@
+[
+  {
+    "rule_id": "RULE_DELAY_MAINLINE",
+    "rule_name": "干线晚点扣罚",
+    "rule_type": "delay",
+    "penalty_amount": 500.0,
+    "conditions": {
+      "delay_hours": 2,
+      "apply_to": "mainline"
+    },
+    "description": "干线运输晚点超过2小时，扣罚500元/次"
+  },
+  {
+    "rule_id": "RULE_CROSS_TRANSIT",
+    "rule_name": "跨中转超时扣罚",
+    "rule_type": "cross_transit",
+    "penalty_amount": 300.0,
+    "conditions": {
+      "transit_hours": 24,
+      "apply_to": "all_transits"
+    },
+    "description": "跨中转运输超过24小时，扣罚300元/次"
+  },
+  {
+    "rule_id": "RULE_DAMAGE",
+    "rule_name": "中转破损扣罚",
+    "rule_type": "damage",
+    "penalty_amount": 800.0,
+    "conditions": {
+      "apply_to": "all_nodes"
+ },
+    "description": "中转节点发生货物破损，扣罚800元/次，保险公司承担70%"
+  },
+  {
+    "rule_id": "RULE_DAMAGE_UNKNOWN",
+    "rule_name": "不明破损扣罚",
+    "rule_type": "damage",
+    "penalty_amount": 200.0,
+    "conditions": {
+      "apply_to": "unknown"
+    },
+    "description": "无法确定破损节点的，扣罚200元待确认"
+  },
+  {
+    "rule_id": "RULE_TRANSIT_STATUS",
+    "rule_name": "中转状态异常扣罚",
+    "rule_type": "transit_status",
+    "penalty_amount": 150.0,
+    "conditions": {
+      "apply_to": "all_nodes"
+    },
+    "description": "中转节点状态异常（非'正常'），扣罚150元/次"
+  },
+  {
+    "rule_id": "RULE_WEATHER_EXEMPTION",
+    "rule_name": "天气豁免规则",
+    "rule_type": "exemption",
+    "penalty_amount": 0.0,
+    "conditions": {
+      "weather_types": ["暴雨", "暴雪", "大雾", "地震", "台风"]
+    },
+    "description": "因不可抗力天气原因导致的延误或破损，免于扣罚"
+  },
+  {
+    "rule_id": "RULE_DUPLICATE_PENALTY",
+    "rule_name": "重复扣罚检测",
+    "rule_type": "duplicate",
+    "penalty_amount": 0.0,
+    "conditions": {
+      "check_window_hours": 72
+    },
+    "description": "同一运单72小时内不重复扣罚，转人工确认"
+  }
+]

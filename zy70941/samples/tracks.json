@@ -1,0 +1,162 @@
+[
+  {
+    "waybill_no": "WB001",
+    "event_time": "2026-05-19T08:00:00",
+    "event_type": "入库",
+    "location": "北京分拨中心",
+    "operator": "张三",
+    "remark": "正常入库"
+  },
+  {
+    "waybill_no": "WB001",
+    "event_time": "2026-05-19T10:00:00",
+    "event_type": "出库",
+    "location": "北京分拨中心",
+    "operator": "李四",
+    "remark": "发往济南"
+  },
+  {
+    "waybill_no": "WB001",
+    "event_time": "2026-05-19T18:00:00",
+    "event_type": "中转",
+    "location": "济南中转站",
+    "operator": "王五",
+    "remark": "中转正常"
+  },
+  {
+    "waybill_no": "WB001",
+    "event_time": "2026-05-20T17:30:00",
+    "event_type": "签收",
+    "location": "上海",
+    "operator": "赵六",
+    "remark": "本人签收"
+  },
+  {
+    "waybill_no": "WB002",
+    "event_time": "2026-05-20T09:00:00",
+    "event_type": "入库",
+    "location": "广州分拨中心",
+    "operator": "陈七",
+    "remark": "正常入库"
+  },
+  {
+    "waybill_no": "WB002",
+    "event_time": "2026-05-20T15:00:00",
+    "event_type": "中转",
+    "location": "DG",
+    "operator": "周八",
+    "remark": "货物异常，待处理"
+  },
+  {
+    "waybill_no": "WB002",
+    "event_time": "2026-05-21T15:30:00",
+    "event_type": "签收",
+    "location": "深圳",
+    "operator": "吴九",
+    "remark": "本人签收"
+  },
+  {
+    "waybill_no": "WB003",
+    "event_time": "2026-05-21T08:00:00",
+    "event_type": "入库",
+    "location": "成都分拨中心",
+    "operator": "郑十",
+    "remark": "正常入库"
+  },
+  {
+    "waybill_no": "WB003",
+    "event_time": "2026-05-22T18:00:00",
+    "event_type": "货物破损",
+    "location": "南充中转站",
+    "operator": "孙十一",
+    "remark": "卸货时发现外包装挤压"
+  },
+  {
+    "waybill_no": "WB003",
+    "event_time": "2026-05-24T10:00:00",
+    "event_type": "签收",
+    "location": "重庆",
+    "operator": "钱十二",
+    "remark": "破损签收"
+  },
+  {
+    "waybill_no": "WB004",
+    "event_time": "2026-05-22T08:00:00",
+    "event_type": "入库",
+    "location": "武汉分拨中心",
+    "operator": "李十三",
+    "remark": "正常入库"
+  },
+  {
+    "waybill_no": "WB004",
+    "event_time": "2026-05-22T18:00:00",
+    "event_type": "天气原因延误",
+    "location": "长沙",
+    "operator": "王十四",
+    "remark": "暴雨天气，高速封闭"
+  },
+  {
+    "waybill_no": "WB004",
+    "event_time": "2026-05-23T11:45:00",
+    "event_type": "签收",
+    "location": "长沙",
+    "operator": "张十五",
+    "remark": "本人签收"
+  },
+  {
+    "waybill_no": "WB005",
+    "event_time": "2026-05-23T08:00:00",
+    "event_type": "入库",
+    "location": "南京分拨中心",
+    "operator": "刘十六",
+    "remark": "正常入库"
+  },
+  {
+    "waybill_no": "WB005",
+    "event_time": "2026-05-25T12:00:00",
+    "event_type": "货物破损",
+    "location": "合肥中转站",
+    "operator": "陈十七",
+    "remark": "发现屏幕碎裂，已拍照留存"
+  },
+  {
+    "waybill_no": "WB005",
+    "event_time": "2026-05-26T20:00:00",
+    "event_type": "签收",
+    "location": "西安",
+    "operator": "杨十八",
+    "remark": "破损拒收，退回"
+  },
+  {
+    "waybill_no": "WB006",
+    "event_time": "2026-05-24T09:00:00",
+    "event_type": "入库",
+    "location": "杭州分拨中心",
+    "operator": "黄十九",
+    "remark": "正常入库"
+  },
+  {
+    "waybill_no": "WB006",
+    "event_time": "2026-05-25T14:30:00",
+    "event_type": "签收",
+    "location": "宁波",
+    "operator": "周二十",
+    "remark": "本人签收"
+  },
+  {
+    "waybill_no": "WB007",
+    "event_time": "2026-05-25T08:00:00",
+    "event_type": "入库",
+    "location": "天津分拨中心",
+    "operator": "吴二十一",
+    "remark": "正常入库"
+  },
+  {
+    "waybill_no": "WB007",
+    "event_time": "2026-05-26T11:00:00",
+    "event_type": "签收",
+    "location": "石家庄",
+    "operator": "郑二十二",
+    "remark": "本人签收"
+  }
+]
