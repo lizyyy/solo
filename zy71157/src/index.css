@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: #030712;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #1f2937;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #4b5563;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
+}
+
+.glow-text {
+  text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor;
+}
+
+.glow-box {
+  box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.8;
+    filter: brightness(1.2);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+@keyframes baggage-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.animate-baggage-bounce {
+  animation: baggage-bounce 0.5s ease-in-out infinite;
+}
+
+@keyframes warning-flash {
+  0%, 100% {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    background-color: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.6);
+  }
+}
+
+.animate-warning-flash {
+  animation: warning-flash 1s ease-in-out infinite;
+}
+
+@keyframes score-popup {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(1);
+  }
+}
+
+.animate-score-popup {
+  animation: score-popup 1.2s ease-out forwards;
+}
