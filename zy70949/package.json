@@ -1,0 +1,26 @@
+{
+  "name": "health-check-finance-api",
+  "version": "1.0.0",
+  "description": "体检中心财务对账 API - 解决加项、优惠券和单位结算账单导入问题",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn src/index.ts",
+    "test": "node test-api.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "ts-node-dev": "^2.0.0",
+    "@types/express": "^4.17.17",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0"
+  }
+}
