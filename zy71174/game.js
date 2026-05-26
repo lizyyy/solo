@@ -247,10 +247,10 @@ const CraneGame = (function() {
         const levelFactor = gameState.level;
         
         gameState.load.weight = Math.floor(3000 + Math.random() * 6000 * levelFactor);
-        gameState.load.x = 280 + Math.random() * 120;
+        gameState.load.x = 250 + Math.random() * 150;
         gameState.load.y = 420;
         gameState.load.isLifted = false;
-        gameState.load.targetX = 600 + Math.random() * 150;
+        gameState.load.targetX = 230 + Math.random() * 440;
         gameState.load.targetY = 420;
 
         gameState.wind.speed = Math.random() * 8 + gameState.level * 1.5;
