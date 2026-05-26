@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书馆排架修复游戏</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div id="start-screen" class="screen active">
+            <div class="start-content">
+                <h1>📚 图书馆排架修复游戏</h1>
+                <p class="subtitle">学习索书号排序，成为专业图书管理员</p>
+                <div class="level-select">
+                    <h3>选择关卡</h3>
+                    <div id="level-buttons"></div>
+                </div>
+                <button id="start-btn" class="btn btn-primary">开始游戏</button>
+                <div class="rules-preview">
+                    <h4>🎯 游戏目标</h4>
+                    <p>在规定时间内将图书按照索书号正确排序上架，处理预约单和破损图书</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="game-info">
+                    <span class="level">关卡 <span id="current-level">1</span></span>
+                    <span class="timer">⏱️ <span id="timer">60</span>s</span>
+                    <span class="score">得分: <span id="score">0</span></span>
+                </div>
+                <div class="game-controls">
+                    <button id="pause-btn" class="btn btn-small">⏸️ 暂停</button>
+                    <button id="restart-btn" class="btn btn-small">🔄 重开</button>
+                    <button id="rules-btn" class="btn btn-small">📖 规则</button>
+                </div>
+            </div>
+
+            <div class="game-main">
+                <div class="sidebar">
+                    <div class="panel pending-books">
+                        <h3>📦 待上架图书</h3>
+                        <div id="pending-books-list" class="books-list"></div>
+                    </div>
+                    <div class="panel reservation-list">
+                        <h3>📋 预约单</h3>
+                        <div id="reservation-list"></div>
+                    </div>
+                    <div class="panel damage-report">
+                        <h3>🔧 破损登记</h3>
+                        <div id="damage-list"></div>
+                    </div>
+                </div>
+
+                <div class="main-area">
+                    <div id="bookshelf-3d" class="bookshelf-3d"></div>
+                    <div class="sorting-area">
+                        <h3>拖放排序区 - 按索书号从小到大排列</h3>
+                        <div id="sorting-slots" class="sorting-slots"></div>
+                        <button id="confirm-sort" class="btn btn-success">确认上架</button>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <div class="panel rules-hint">
+                        <h3>💡 规则提示</h3>
+                        <div id="rules-content">
+                            <p><strong>索书号排序规则：</strong></p>
+                            <ol>
+                                <li>先按分类号字母顺序(A-Z)</li>
+                                <li>再按数字大小排序</li>
+                                <li>同一分类号按著者号排序</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="panel history">
+                        <h3>📜 操作历史</h3>
+                        <div id="history-list" class="history-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pause-screen" class="screen overlay">
+            <div class="modal">
+                <h2>⏸️ 游戏暂停</h2>
+                <button id="resume-btn" class="btn btn-primary">继续游戏</button>
+                <button id="pause-restart-btn" class="btn btn-secondary">重新开始</button>
+                <button id="quit-btn" class="btn btn-danger">返回主菜单</button>
+            </div>
+        </div>
+
+        <div id="result-screen" class="screen overlay">
+            <div class="modal result-modal">
+                <h2 id="result-title">🎉 关卡完成！</h2>
+                <div class="result-stats">
+                    <div class="stat">
+                        <span class="label">最终得分</span>
+                        <span class="value" id="final-score">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">正确排序</span>
+                        <span class="value" id="correct-count">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">错误次数</span>
+                        <span class="value" id="error-count">0</span>
+                    </div>
+                </div>
+                <div class="failure-reasons">
+                    <h3>❌ 错误记录</h3>
+                    <div id="failure-reasons-list"></div>
+                </div>
+                <div class="result-buttons">
+                    <button id="replay-errors-btn" class="btn btn-secondary">错误回放</button>
+                    <button id="export-report-btn" class="btn btn-primary">导出报告</button>
+                    <button id="next-level-btn" class="btn btn-success">下一关</button>
+                    <button id="result-restart-btn" class="btn btn-secondary">重玩本关</button>
+                    <button id="result-quit-btn" class="btn btn-danger">返回主菜单</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="rules-modal" class="screen overlay">
+            <div class="modal rules-modal">
+                <h2>📖 游戏规则</h2>
+                <div class="rules-content-full">
+                    <div class="rule-section">
+                        <h3>🎯 基本玩法</h3>
+                        <p>从待上架区拖拽图书到排序区，按索书号从小到大排列后确认上架</p>
+                    </div>
+                    <div class="rule-section">
+                        <h3>📐 索书号排序规则</h3>
+                        <ul>
+                            <li><strong>分类号：</strong>按字母顺序(A-Z)，如 A &lt; B &lt; C</li>
+                            <li><strong>数字部分：</strong>按数值大小，如 A10 &lt; A20 &lt; A100</li>
+                            <li><strong>著者号：</strong>分类号相同时按著者号排序</li>
+                        </ul>
+                    </div>
+                    <div class="rule-section">
+                        <h3>📋 预约单处理</h3>
+                        <p>带有预约标记的图书需要先放到预约台，不能直接上架</p>
+                    </div>
+                    <div class="rule-section">
+                        <h3>🔧 破损图书</h3>
+                        <p>破损图书需要先登记，不能直接上架</p>
+                    </div>
+                    <div class="rule-section">
+                        <h3>⏱️ 计分规则</h3>
+                        <ul>
+                            <li>正确排序上架：+100分</li>
+                            <li>正确处理预约：+50分</li>
+                            <li>正确登记破损：+50分</li>
+                            <li>排序错误：-50分</li>
+                            <li>预约书误上架：-100分</li>
+                            <li>破损书未登记：-100分</li>
+                        </ul>
+                    </div>
+                </div>
+                <button id="close-rules-btn" class="btn btn-primary">知道了</button>
+            </div>
+        </div>
+
+        <div id="replay-screen" class="screen overlay">
+            <div class="modal replay-modal">
+                <h2>🎬 错误回放</h2>
+                <div id="replay-content"></div>
+                <div class="replay-controls">
+                    <button id="prev-error-btn" class="btn btn-small">上一个</button>
+                    <span id="replay-progress">1/1</span>
+                    <button id="next-error-btn" class="btn btn-small">下一个</button>
+                </div>
+                <button id="close-replay-btn" class="btn btn-primary">关闭回放</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
