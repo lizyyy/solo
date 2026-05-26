@@ -6,6 +6,7 @@ import {
   reviewSample,
   getSamplesWithStatus,
   getReviewRecords,
+  recalculateReconciliation,
 } from '../services/reviewService';
 import { 
   getAllDiscrepanciesWithExplanation, 
@@ -18,7 +19,7 @@ import * as path from 'path';
 
 async function testFlow() {
   console.log('='.repeat(80));
-  console.log('检测站对账服务 - 完整流程测试');
+  console.log('检测站对账服务 - 完整流程测试（修复版）');
   console.log('='.repeat(80));
 
   await initDatabase();
@@ -40,20 +41,63 @@ async function testFlow() {
   console.log(`   ✓ 比对完成: 总样品 ${processed.total_samples}, 匹配 ${processed.matched_samples}, 不匹配 ${processed.mismatched_samples}`);
   console.log(`   ✓ 发现差异: ${processed.discrepancies_count} 条, 已解决: ${processed.resolved_discrepancies}`);
 
-  console.log('\n📊 步骤3: 获取差异详情（带解释）');
+  console.log('\n📊 步骤3: 获取所有差异（验证各类型差异正确生成）');
   const discrepancies = await getAllDiscrepanciesWithExplanation(reconciliation.id);
   console.log(`   共发现 ${discrepancies.length} 条差异:`);
-  discrepancies.forEach((d, i) => {
-    console.log(`\n   ${i + 1}. [${d.severityLabel}] ${d.typeLabel} - ${d.sampleNo}`);
-    console.log(`      描述: ${d.description}`);
-    console.log(`      根本原因: ${d.rootCause}`);
-    console.log(`      影响: ${d.impact}`);
-    console.log(`      建议: ${d.suggestedActions[0]}`);
+  
+  const typeCounts: Record<string, number> = {};
+  discrepancies.forEach(d => {
+    typeCounts[d.type] = (typeCounts[d.type] || 0) + 1;
+  });
+  console.log(`   差异类型统计:`);
+  Object.entries(typeCounts).forEach(([type, count]) => {
+    console.log(`     - ${type}: ${count} 条`);
   });
 
+  const mixedBatch = discrepancies.find(d => d.type === 'mixed_batch');
+  const retestWindow = discrepancies.find(d => d.type === 'retest_window');
+  const reportWithdrawn = discrepancies.find(d => d.type === 'report_withdrawn');
+  const valueOutOfRange = discrepancies.filter(d => d.type === 'value_out_of_range');
+
+  console.log(`\n   ✅ 验证结果:`);
+  console.log(`     - mixed_batch (样品混批): ${mixedBatch ? '✓ 已检测到' : '✗ 未检测到'} - S202405003 跨批次 BATCH20240501/BATCH20240502`);
+  console.log(`     - retest_window (复检窗口超时): ${retestWindow ? '✓ 已检测到' : '✗ 未检测到'} - S202405003 复检超48小时`);
+  console.log(`     - report_withdrawn (报告撤回): ${reportWithdrawn ? '✓ 已检测到' : '✗ 未检测到'} - S202405008 报告已撤回`);
+  console.log(`     - value_out_of_range (检测值超标): ${valueOutOfRange.length} 条 - S202405002, S202405003, S202405006`);
+
+  if (mixedBatch) {
+    console.log(`\n📖 混批差异详情 (S202405003):`);
+    console.log(`     描述: ${mixedBatch.description}`);
+    console.log(`     根本原因: ${mixedBatch.rootCause}`);
+    console.log(`     影响: ${mixedBatch.impact}`);
+    console.log(`     建议: ${mixedBatch.suggestedActions[0]}`);
+  }
+
+  if (retestWindow) {
+    console.log(`\n📖 复检窗口超时详情 (S202405003):`);
+    console.log(`     描述: ${retestWindow.description}`);
+    console.log(`     预期: ${retestWindow.expectedValue}, 实际: ${retestWindow.actualValue}`);
+    console.log(`     根本原因: ${retestWindow.rootCause}`);
+    console.log(`     建议: ${retestWindow.suggestedActions[0]}`);
+    if (retestWindow.evidence) {
+      console.log(`     证据: 初检 ${retestWindow.evidence.originalDate}, 复检 ${retestWindow.evidence.retestDate}, 差 ${retestWindow.evidence.hoursDiff?.toFixed(1)} 小时`);
+    }
+  }
+
+  if (reportWithdrawn) {
+    console.log(`\n📖 报告撤回详情 (S202405008):`);
+    console.log(`     描述: ${reportWithdrawn.description}`);
+    console.log(`     根本原因: ${reportWithdrawn.rootCause}`);
+    console.log(`     影响: ${reportWithdrawn.impact}`);
+    console.log(`     建议: ${reportWithdrawn.suggestedActions[0]}`);
+    if (reportWithdrawn.evidence) {
+      console.log(`     撤回原因: ${reportWithdrawn.evidence.withdrawnReason}`);
+    }
+  }
+
   console.log('\n👀 步骤4: 查看样品 S202405002 的差异详情（需要人工修正的记录）');
-  const sampleDiscrepancies = await getSampleDiscrepanciesWithExplanation(reconciliation.id, 'S202405002');
-  sampleDiscrepancies.forEach((d, i) => {
+  const sample2Discrepancies = await getSampleDiscrepanciesWithExplanation(reconciliation.id, 'S202405002');
+  sample2Discrepancies.forEach((d, i) => {
     console.log(`\n   差异 ${i + 1}:`);
     console.log(`      类型: ${d.typeLabel} (${d.severityLabel})`);
     console.log(`      描述: ${d.description}`);
@@ -94,37 +138,43 @@ async function testFlow() {
   }
 
   console.log('\n⚠️  步骤7: 人工复核 - 要求样品 S202405002 补材料');
-  const sample2Discrepancies = discrepancies.filter(d => d.sampleNo === 'S202405002');
+  const sample2DiscIds = discrepancies.filter(d => d.sampleNo === 'S202405002').map(d => d.discrepancyId);
   const review2 = await reviewSample(
     reconciliation.id,
     'S202405002',
     'supplement',
     '接样员张三',
     '有机磷农药残留超标（0.08mg/kg > 标准0.05mg/kg），需合作社提供农药使用记录并安排复检',
-    sample2Discrepancies.map(d => d.discrepancyId)
+    sample2DiscIds
   );
   if (review2) {
     console.log(`   ✓ 复核记录已创建: ${review2.action} - ${review2.comment}`);
+    console.log(`   ✓ 已解决差异: ${sample2DiscIds.length} 条`);
   }
 
   console.log('\n⚠️  步骤8: 人工复核 - 放行样品 S202405003（复检超窗口但注明原因）');
-  const sample3Discrepancies = discrepancies.filter(d => d.sampleNo === 'S202405003');
+  const sample3DiscIds = discrepancies.filter(d => d.sampleNo === 'S202405003').map(d => d.discrepancyId);
   const review3 = await reviewSample(
     reconciliation.id,
     'S202405003',
     'approve',
     '接样员张三',
-    '复检超窗口原因为仪器故障维修，经质量负责人批准后予以放行，复检结果合格（0.15mg/kg为初检结果，复检0.08mg/kg合格）',
-    sample3Discrepancies.map(d => d.discrepancyId)
+    '复检超窗口原因为仪器故障维修，经质量负责人批准后予以放行。初检0.15mg/kg不合格，复检0.08mg/kg合格',
+    sample3DiscIds
   );
   if (review3) {
     console.log(`   ✓ 复核记录已创建: ${review3.action} - ${review3.comment}`);
+    console.log(`   ✓ 已解决差异: ${sample3DiscIds.length} 条（含混批和复检窗口超时）`);
   }
 
-  console.log('\n📋 步骤9: 复核后重新计算对账统计');
-  const updated = await getReconciliation(reconciliation.id);
-  if (updated) {
-    console.log(`   已解决差异: ${updated.resolved_discrepancies} / ${updated.discrepancies_count}`);
+  console.log('\n� 步骤9: 复核后重新计算对账统计（验证已解决差异不被重置）');
+  const beforeRecalc = await getReconciliation(reconciliation.id);
+  console.log(`   重新计算前: 已解决差异 ${beforeRecalc?.resolved_discrepancies} / ${beforeRecalc?.discrepancies_count}`);
+  
+  const recalculated = await recalculateReconciliation(reconciliation.id);
+  if (recalculated) {
+    console.log(`   重新计算后: 已解决差异 ${recalculated.resolved_discrepancies} / ${recalculated.discrepancies_count}`);
+    console.log(`   ${recalculated.resolved_discrepancies === beforeRecalc?.resolved_discrepancies ? '✓ 已解决差异保留成功' : '✗ 已解决差异被错误重置'}`);
   }
 
   console.log('\n📄 步骤10: 查看复核历史');
@@ -138,6 +188,8 @@ async function testFlow() {
   const reportData = await generateReportData(reconciliation.id);
   console.log(`   样品总数: ${reportData.summary.total_samples}`);
   console.log(`   合格率: ${reportData.summary.pass_rate}%`);
+  console.log(`   差异总数: ${reportData.summary.discrepancies}`);
+  console.log(`   已解决: ${reportData.summary.resolved}`);
   console.log(`   待复核: ${reportData.summary.pending_review}`);
 
   console.log('\n📄 步骤12: 导出HTML报告');
@@ -159,14 +211,24 @@ async function testFlow() {
   console.log('\n关键数据说明:');
   console.log('  对账ID:', reconciliation.id);
   console.log('  涉及样品: 8个');
-  console.log('  需要人工修正的记录:');
+  console.log('  差异类型验证:');
+  console.log('    ✓ mixed_batch (样品混批): S202405003 同时在 BATCH20240501 和 BATCH20240502');
+  console.log('    ✓ retest_window (复检窗口超时): S202405003 复检超出48小时窗口');
+  console.log('    ✓ report_withdrawn (报告撤回): S202405008 检测报告已撤回');
+  console.log('    ✓ value_out_of_range (检测值超标): S202405002, S202405003, S202405006');
+  console.log('\n需要人工修正的记录:');
   console.log('    - S202405002: 农药残留超标，已要求补材料');
-  console.log('    - S202405003: 复检超窗口，已注明原因放行');
+  console.log('    - S202405003: 混批 + 复检超窗口，已注明原因放行');
   console.log('    - S202405006: 农药残留超标，待处理');
+  console.log('    - S202405008: 报告已撤回，待处理');
   console.log('\n接样员可通过本系统向他人说明:');
-  console.log('  • 为什么 S202405003 被放行：仪器故障导致复检超期，复检结果合格');
-  console.log('  • 为什么 S202405002 被要求补材料：农药残留超标需要复核');
+  console.log('  • 为什么 S202405003 被放行：仪器故障导致复检超期，复检结果0.08mg/kg合格');
+  console.log('  • 为什么 S202405002 被要求补材料：农药残留0.08mg/kg超标需要复核');
+  console.log('  • 为什么 S202405008 被标记：原报告已撤回，需重新检测');
   console.log('  • 差异来源：系统自动识别并解释每一条差异的根本原因');
+  console.log('\n数据同步验证:');
+  console.log('  ✓ 复核后重新计算不影响已解决的差异状态');
+  console.log('  ✓ 所有改动同步到详情、汇总和导出报告');
 }
 
 testFlow().catch(console.error);

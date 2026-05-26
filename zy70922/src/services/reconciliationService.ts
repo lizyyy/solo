@@ -77,16 +77,23 @@ export async function detectMixedBatch(
   context: ReconciliationContext
 ): Promise<Discrepancy[]> {
   const discrepancies: Discrepancy[] = [];
+  
+  const allSamples = await getAll<SampleRecord>(`SELECT * FROM sample_records`);
+  
   const sampleNoMap = new Map<string, SampleRecord[]>();
 
-  for (const sample of samples) {
+  for (const sample of allSamples) {
     if (!sampleNoMap.has(sample.sample_no)) {
       sampleNoMap.set(sample.sample_no, []);
     }
     sampleNoMap.get(sample.sample_no)!.push(sample);
   }
 
+  const currentBatchSampleNos = new Set(samples.map(s => s.sample_no));
+
   for (const [sampleNo, records] of sampleNoMap) {
+    if (!currentBatchSampleNos.has(sampleNo)) continue;
+    
     if (records.length > 1) {
       const batches = records.map(r => r.batch_id).filter((v, i, a) => a.indexOf(v) === i);
       if (batches.length > 1) {
@@ -120,8 +127,10 @@ export async function checkRetestWindow(
   const discrepancies: Discrepancy[] = [];
   const retestItems = items.filter(item => item.is_retest && item.retest_of);
 
+  const allItems = await getAll<InspectionItem>(`SELECT * FROM inspection_items`);
+
   for (const retestItem of retestItems) {
-    const originalItem = items.find(i => i.id === retestItem.retest_of);
+    const originalItem = allItems.find(i => i.id === retestItem.retest_of);
     if (!originalItem) continue;
 
     const rules = await getRetestRulesForItem(retestItem.item_code);
@@ -154,6 +163,78 @@ export async function checkRetestWindow(
           created_at: new Date().toISOString(),
         });
       }
+    }
+  }
+
+  return discrepancies;
+}
+
+export async function detectReportWithdrawn(
+  samples: SampleRecord[],
+  items: InspectionItem[],
+  context: ReconciliationContext
+): Promise<Discrepancy[]> {
+  const discrepancies: Discrepancy[] = [];
+
+  for (const sample of samples) {
+    try {
+      const rawData = sample.raw_data ? JSON.parse(sample.raw_data) : {};
+      
+      if (rawData.withdrawn || rawData.report_withdrawn || rawData.status === 'withdrawn') {
+        discrepancies.push({
+          id: uuidv4(),
+          reconciliation_id: context.reconciliationId,
+          sample_no: sample.sample_no,
+          batch_id: context.batchId,
+          type: 'report_withdrawn',
+          severity: 'high',
+          description: `样品 ${sample.sample_no} 的原报告已被撤回，需重新检测或补充材料`,
+          source_field: 'raw_data',
+          expected_value: '报告有效',
+          actual_value: '报告已撤回',
+          evidence: JSON.stringify({
+            sampleId: sample.id,
+            withdrawnReason: rawData.withdrawn_reason || rawData.reason || '未提供原因',
+            withdrawnAt: rawData.withdrawn_at || sample.updated_at,
+          }),
+          requires_manual_review: true,
+          resolved: false,
+          created_at: new Date().toISOString(),
+        });
+      }
+
+      const sampleItems = items.filter(i => i.sample_no === sample.sample_no);
+      for (const item of sampleItems) {
+        try {
+          const itemRawData = item.raw_data ? JSON.parse(item.raw_data) : {};
+          if (itemRawData.withdrawn || itemRawData.report_withdrawn) {
+            discrepancies.push({
+              id: uuidv4(),
+              reconciliation_id: context.reconciliationId,
+              sample_no: sample.sample_no,
+              batch_id: context.batchId,
+              type: 'report_withdrawn',
+              severity: 'high',
+              description: `样品 ${sample.sample_no} 的 ${item.item_name} 检测报告已被撤回`,
+              source_field: 'raw_data',
+              expected_value: '报告有效',
+              actual_value: '报告已撤回',
+              evidence: JSON.stringify({
+                itemId: item.id,
+                itemName: item.item_name,
+                withdrawnReason: itemRawData.withdrawn_reason || '未提供原因',
+              }),
+              requires_manual_review: true,
+              resolved: false,
+              created_at: new Date().toISOString(),
+            });
+          }
+        } catch {
+          // 忽略解析错误
+        }
+      }
+    } catch {
+      // 忽略解析错误
     }
   }
 
@@ -269,17 +350,29 @@ export async function performReconciliation(
   const samples = await getSamplesByBatch(batchId);
   const allItems = await getInspectionItemsByBatch(batchId);
 
+  const existingResolved = await getAll<Discrepancy>(
+    `SELECT * FROM discrepancies WHERE reconciliation_id = ? AND resolved = 1`,
+    [reconciliationId]
+  );
+
+  const resolvedKeySet = new Set(
+    existingResolved.map(d => `${d.sample_no}:${d.type}:${d.source_field || ''}`)
+  );
+
   const allDiscrepancies: Discrepancy[] = [];
   let matchedCount = 0;
   let mismatchedCount = 0;
 
-  await runQuery(`DELETE FROM discrepancies WHERE reconciliation_id = ?`, [reconciliationId]);
+  await runQuery(`DELETE FROM discrepancies WHERE reconciliation_id = ? AND resolved = 0`, [reconciliationId]);
 
   const mixedBatchDiscrepancies = await detectMixedBatch(samples, context);
   allDiscrepancies.push(...mixedBatchDiscrepancies);
 
   const retestWindowDiscrepancies = await checkRetestWindow(allItems, context);
   allDiscrepancies.push(...retestWindowDiscrepancies);
+
+  const reportWithdrawnDiscrepancies = await detectReportWithdrawn(samples, allItems, context);
+  allDiscrepancies.push(...reportWithdrawnDiscrepancies);
 
   for (const sample of samples) {
     const result = await matchSampleWithInspection(sample, allItems, context);
@@ -300,18 +393,47 @@ export async function performReconciliation(
     }
   }
 
+  const preservedDiscrepancies: Discrepancy[] = [];
   for (const d of allDiscrepancies) {
-    await runQuery(
-      `INSERT INTO discrepancies 
-       (id, reconciliation_id, sample_no, batch_id, type, severity, description,
-        source_field, expected_value, actual_value, evidence, requires_manual_review,
-        resolved, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [d.id, d.reconciliation_id, d.sample_no, d.batch_id, d.type, d.severity,
-       d.description, d.source_field, d.expected_value, d.actual_value, d.evidence,
-       d.requires_manual_review ? 1 : 0, d.resolved ? 1 : 0, d.created_at]
-    );
+    const key = `${d.sample_no}:${d.type}:${d.source_field || ''}`;
+    if (resolvedKeySet.has(key)) {
+      const existing = existingResolved.find(
+        ed => ed.sample_no === d.sample_no && ed.type === d.type && ed.source_field === d.source_field
+      );
+      if (existing) {
+        preservedDiscrepancies.push(existing);
+        continue;
+      }
+    }
+    preservedDiscrepancies.push(d);
   }
+
+  for (const d of preservedDiscrepancies) {
+    const existing = existingResolved.find(ed => ed.id === d.id);
+    if (existing) {
+      await runQuery(
+        `UPDATE discrepancies SET 
+         description = ?, severity = ?, expected_value = ?, actual_value = ?, evidence = ?
+         WHERE id = ?`,
+        [d.description, d.severity, d.expected_value, d.actual_value, d.evidence, d.id]
+      );
+    } else {
+      await runQuery(
+        `INSERT INTO discrepancies 
+         (id, reconciliation_id, sample_no, batch_id, type, severity, description,
+          source_field, expected_value, actual_value, evidence, requires_manual_review,
+          resolved, resolved_by, resolved_at, resolution_note, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [d.id, d.reconciliation_id, d.sample_no, d.batch_id, d.type, d.severity,
+         d.description, d.source_field, d.expected_value, d.actual_value, d.evidence,
+         d.requires_manual_review ? 1 : 0, d.resolved ? 1 : 0,
+         d.resolved_by || null, d.resolved_at || null, d.resolution_note || null,
+         d.created_at]
+      );
+    }
+  }
+
+  const resolvedCount = preservedDiscrepancies.filter(d => d.resolved).length;
 
   await runQuery(
     `UPDATE reconciliations SET 
@@ -321,18 +443,18 @@ export async function performReconciliation(
      mismatched_samples = ?,
      pending_samples = 0,
      discrepancies_count = ?,
-     resolved_discrepancies = 0,
+     resolved_discrepancies = ?,
      updated_at = ?
      WHERE id = ?`,
-    [samples.length, matchedCount, mismatchedCount, allDiscrepancies.length,
-     new Date().toISOString(), reconciliationId]
+    [samples.length, matchedCount, mismatchedCount, preservedDiscrepancies.length,
+     resolvedCount, new Date().toISOString(), reconciliationId]
   );
 
   return {
     totalSamples: samples.length,
     matchedSamples: matchedCount,
     mismatchedSamples: mismatchedCount,
-    discrepancies: allDiscrepancies,
+    discrepancies: preservedDiscrepancies,
   };
 }
 

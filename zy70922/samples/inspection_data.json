@@ -81,10 +81,22 @@
           "actual_value": "0.15",
           "unit": "mg/kg",
           "result": "fail",
+          "inspection_date": "2024-05-16 15:00:00",
+          "inspector": "王检测员",
+          "note": "初检不合格"
+        },
+        {
+          "item_code": "H001",
+          "item_name": "重金属-铅",
+          "standard_value": "≤0.1",
+          "actual_value": "0.08",
+          "unit": "mg/kg",
+          "result": "pass",
           "is_retest": true,
-          "retest_of": "original-id-placeholder",
-          "inspection_date": "2024-05-18 10:00:00",
-          "inspector": "王检测员"
+          "retest_of": "@previous",
+          "inspection_date": "2024-05-20 10:00:00",
+          "inspector": "王检测员",
+          "note": "复检，超出48小时窗口（仪器故障维修）"
         }
       ]
     },
@@ -179,7 +191,10 @@
           "unit": "mg/kg",
           "result": "pass",
           "inspection_date": "2024-05-16 14:30:00",
-          "inspector": "李检测员"
+          "inspector": "李检测员",
+          "withdrawn": true,
+          "withdrawn_reason": "客户申诉检测结果存疑，已撤回原报告",
+          "withdrawn_at": "2024-05-18 09:00:00"
         },
         {
           "item_code": "P002",

@@ -220,9 +220,16 @@ export async function importInspectionJson(
       continue;
     }
 
+    let previousItemId: string | null = null;
+
     for (const item of sample.items) {
       recordCount++;
       try {
+        let retestOf = item.retest_of;
+        if (retestOf === '@previous' && previousItemId) {
+          retestOf = previousItemId;
+        }
+
         const inspectionItem: InspectionItem = {
           id: uuidv4(),
           sample_no: sample.sample_no,
@@ -234,7 +241,7 @@ export async function importInspectionJson(
           unit: item.unit || '',
           result: item.result || 'pending',
           is_retest: item.is_retest || false,
-          retest_of: item.retest_of,
+          retest_of: retestOf,
           inspection_date: item.inspection_date || now,
           inspector: item.inspector || '',
           raw_data: JSON.stringify(item),
@@ -255,6 +262,7 @@ export async function importInspectionJson(
         );
 
         items.push(inspectionItem);
+        previousItemId = inspectionItem.id;
       } catch (e) {
         errors.push(`样品 ${sample.sample_no} 项目 ${item.item_code}: 保存失败 - ${(e as Error).message}`);
       }
