@@ -374,9 +374,17 @@ function validateInventoryRow(row, lineNum) {
 
 function parseItemsString(str) {
   try {
-    if (str.startsWith('[') || str.startsWith('{')) {
-      return JSON.parse(str);
+    if (!str) return [];
+    
+    let cleaned = str.trim();
+    
+    if (cleaned.startsWith('[') || cleaned.startsWith('{')) {
+      if (cleaned.includes('\\"')) {
+        cleaned = cleaned.replace(/\\"/g, '"');
+      }
+      return JSON.parse(cleaned);
     }
+    
     const items = str.split(';').map(itemStr => {
       const parts = itemStr.split(',');
       const item = {};
