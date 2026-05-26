@@ -1,7 +1,7 @@
-import { useState, useRef, useCallback, DragEvent } from 'react'
+import { useState, useCallback, DragEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Check, AlertTriangle, Clock, Pause, Play, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react'
-import type { Level, EquipmentItem, Accessory, Damage } from '@/types'
+import type { Level, EquipmentItem, Accessory } from '@/types'
 import { getEquipmentTypeLabel } from '@/data/levels'
 
 interface InspectionPanelProps {

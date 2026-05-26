@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { Level, PlayerAction, ScoreResult, GameHistory } from '@/types'
-import { levels, getLevelById } from '@/data/levels'
+import { getLevelById } from '@/data/levels'
 
 interface GameState {
   currentLevel: Level | null

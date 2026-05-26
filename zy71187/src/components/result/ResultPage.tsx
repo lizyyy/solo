@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Check, AlertTriangle, Clock, Trophy, Download, RotateCcw, Home } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { X, Check, AlertTriangle, Trophy, Download, RotateCcw, Home } from 'lucide-react'
 import type { ScoreResult, Level, PlayerAction } from '@/types'
 import { generateReplayEvents } from '@/utils/replay'
 import { exportCSVReport, downloadCSV } from '@/utils/reportExport'

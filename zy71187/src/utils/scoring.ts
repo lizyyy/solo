@@ -63,7 +63,6 @@ export function calculateScore(
 
   for (const acc of level.accessories) {
     const playerMatch = playerMatched[acc.id]
-    const correctMatch = correctMatches[acc.id]
 
     if (acc.isMissing) {
       if (playerMatch === '__missing__') {
@@ -143,7 +142,7 @@ export function calculateScore(
   const total = accessoryScore + damageScore + depositScore + normalWearScore + redHerringScore + timeBonus + speedBonus
 
   let passed = total >= 80
-  let needsTraining = total >= 60 && total < 80
+  const needsTraining = total >= 60 && total < 80
 
   if (failures.some((f) => f.includes('漏记损伤') && f.includes('严重'))) {
     passed = false

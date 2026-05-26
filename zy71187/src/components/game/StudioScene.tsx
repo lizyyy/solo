@@ -1,7 +1,5 @@
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Html, ContactShadows } from '@react-three/drei'
-import { useRef } from 'react'
-import * as THREE from 'three'
 import type { EquipmentItem, Level, RedHerring } from '@/types'
 
 function ReturnTable() {

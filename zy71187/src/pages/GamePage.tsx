@@ -71,12 +71,6 @@ export default function GamePage() {
     }
   }, [phase, tick])
 
-  useEffect(() => {
-    if (phase === 'playing' && timeRemaining <= 0 && currentLevel) {
-      handleSubmit()
-    }
-  }, [timeRemaining, phase, currentLevel])
-
   const handleSubmit = useCallback(() => {
     if (!currentLevel) return
 
@@ -108,12 +102,20 @@ export default function GamePage() {
     matchedAccessories,
     markedDamages,
     depositCalculations,
+    markedNormalWears,
+    identifiedRedHerrings,
     timeRemaining,
     totalTime,
     setScoreResult,
     submit,
     saveHistory,
   ])
+
+  useEffect(() => {
+    if (phase === 'playing' && timeRemaining <= 0 && currentLevel) {
+      handleSubmit()
+    }
+  }, [timeRemaining, phase, currentLevel, handleSubmit])
 
   const handlePause = useCallback(() => {
     pause()
