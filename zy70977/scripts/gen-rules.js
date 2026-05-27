@@ -1,4 +1,9 @@
-const moment = require("moment");
+const fs = require('fs');
+const path = require('path');
+
+const filePath = path.join(__dirname, '..', 'src', 'rulesEngine.js');
+
+const code = `const moment = require("moment");
 const { get, all } = require("./database");
 
 function evaluateCondition(condition, context) {
@@ -19,14 +24,17 @@ function calculateOverdueRent(rentalOrder, rules) {
   }
   var overdueDays = moment(today).diff(moment(endDate), "days");
   if (overdueDays <= 0) return { hasOverdue: false };
+
   var overdueRules = rules.filter(function(r) {
     return r.rule_type === "overdue_rent" && r.is_active === 1;
   });
   var totalDeduction = 0;
   var appliedRules = [];
+
   var sortedRules = overdueRules.sort(function(a, b) {
     return a.priority - b.priority;
   });
+
   for (var i = 0; i < sortedRules.length; i++) {
     var rule = sortedRules[i];
     var ctx = {
@@ -47,6 +55,7 @@ function calculateOverdueRent(rentalOrder, rules) {
       });
     }
   }
+
   return {
     hasOverdue: true,
     overdueDays: overdueDays,
@@ -62,9 +71,11 @@ function evaluateRepairLiability(repairRecord, rules) {
   var shouldDeduct = false;
   var deductionAmount = 0;
   var appliedRule = null;
+
   var sortedRules = liabilityRules.sort(function(a, b) {
     return a.priority - b.priority;
   });
+
   for (var i = 0; i < sortedRules.length; i++) {
     var rule = sortedRules[i];
     var ctx = {
@@ -83,6 +94,7 @@ function evaluateRepairLiability(repairRecord, rules) {
       break;
     }
   }
+
   return {
     shouldDeduct: shouldDeduct,
     deductionAmount: deductionAmount,
@@ -90,46 +102,26 @@ function evaluateRepairLiability(repairRecord, rules) {
   };
 }
 
-async function checkDuplicateDeduction(rentalOrderNo, repairNo, deviceId, sourceType) {
-  var conditions = [];
-  var params = [];
-  if (sourceType === 'repair_record') {
-    if (repairNo) {
-      conditions.push("repair_no = ?");
-      params.push(repairNo);
-    }
-  } else if (sourceType === 'rental_order') {
-    if (rentalOrderNo) {
-      conditions.push("rental_order_no = ? AND source_type = 'rental_order'");
-      params.push(rentalOrderNo);
-    }
-  } else {
-    if (rentalOrderNo) {
-      conditions.push("rental_order_no = ?");
-      params.push(rentalOrderNo);
-    }
-    if (repairNo) {
-      conditions.push("repair_no = ?");
-      params.push(repairNo);
-    }
-    if (deviceId) {
-      conditions.push("device_id = ?");
-      params.push(deviceId);
-    }
-  }
-  if (conditions.length === 0) {
-    return false;
-  }
-  params.push("deduction");
-  var sql = "SELECT COUNT(*) AS cnt FROM deposit_transactions WHERE (" + conditions.join(" OR ") + ") AND transaction_type = ?";
-  var existing = await get(sql, params);
+async function checkDuplicateDeduction(rentalOrderNo, repairNo, deviceId) {
+  var existing = await get(
+    "SELECT COUNT(*) AS cnt FROM deposit_transactions WHERE (rental_order_no = ? OR repair_no = ? OR device_id = ?) AND transaction_type = ?",
+    [rentalOrderNo || "", repairNo || "", deviceId || "", "deduction"]
+  );
   return existing && existing.cnt > 0;
 }
 
 async function getDepositBalance(rentalOrderNo) {
-  var order = await get("SELECT deposit_amount FROM rental_orders WHERE order_no = ?", [rentalOrderNo]);
+  var order = await get(
+    "SELECT deposit_amount FROM rental_orders WHERE order_no = ?",
+    [rentalOrderNo]
+  );
   if (!order) return { totalDeposit: 0, usedAmount: 0, balance: 0 };
-  var used = await get("SELECT COALESCE(SUM(CASE WHEN transaction_type = ? THEN amount WHEN transaction_type = ? THEN -amount ELSE 0 END), 0) AS used FROM deposit_transactions WHERE rental_order_no = ? AND status = ?", ["deduction", "refund", rentalOrderNo, "confirmed"]);
+
+  var used = await get(
+    "SELECT COALESCE(SUM(CASE WHEN transaction_type = ? THEN amount WHEN transaction_type = ? THEN -amount ELSE 0 END) AS used FROM deposit_transactions WHERE rental_order_no = ? AND status = ?",
+    ["deduction", "refund", rentalOrderNo, "confirmed"]
+  );
+
   var usedAmount = (used && used.used) || 0;
   return {
     totalDeposit: order.deposit_amount,
@@ -139,7 +131,9 @@ async function getDepositBalance(rentalOrderNo) {
 }
 
 async function getActiveRules() {
-  return await all("SELECT * FROM deposit_rules WHERE is_active = 1 ORDER BY priority ASC");
+  return await all(
+    "SELECT * FROM deposit_rules WHERE is_active = 1 ORDER BY priority ASC"
+  );
 }
 
 module.exports = {
@@ -150,3 +144,10 @@ module.exports = {
   getDepositBalance: getDepositBalance,
   getActiveRules: getActiveRules
 };
+`;
+
+fs.writeFileSync(filePath, code);
+console.log('File created: ' + filePath);
+
+require(filePath);
+console.log('Syntax check passed!');

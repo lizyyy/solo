@@ -1,4 +1,7 @@
-const moment = require("moment");
+#!/usr/bin/env python3
+import os
+
+code = '''const moment = require("moment");
 const { get, all } = require("./database");
 
 function evaluateCondition(condition, context) {
@@ -90,32 +93,20 @@ function evaluateRepairLiability(repairRecord, rules) {
   };
 }
 
-async function checkDuplicateDeduction(rentalOrderNo, repairNo, deviceId, sourceType) {
+async function checkDuplicateDeduction(rentalOrderNo, repairNo, deviceId) {
   var conditions = [];
   var params = [];
-  if (sourceType === 'repair_record') {
-    if (repairNo) {
-      conditions.push("repair_no = ?");
-      params.push(repairNo);
-    }
-  } else if (sourceType === 'rental_order') {
-    if (rentalOrderNo) {
-      conditions.push("rental_order_no = ? AND source_type = 'rental_order'");
-      params.push(rentalOrderNo);
-    }
-  } else {
-    if (rentalOrderNo) {
-      conditions.push("rental_order_no = ?");
-      params.push(rentalOrderNo);
-    }
-    if (repairNo) {
-      conditions.push("repair_no = ?");
-      params.push(repairNo);
-    }
-    if (deviceId) {
-      conditions.push("device_id = ?");
-      params.push(deviceId);
-    }
+  if (rentalOrderNo) {
+    conditions.push("rental_order_no = ?");
+    params.push(rentalOrderNo);
+  }
+  if (repairNo) {
+    conditions.push("repair_no = ?");
+    params.push(repairNo);
+  }
+  if (deviceId) {
+    conditions.push("device_id = ?");
+    params.push(deviceId);
   }
   if (conditions.length === 0) {
     return false;
@@ -150,3 +141,10 @@ module.exports = {
   getDepositBalance: getDepositBalance,
   getActiveRules: getActiveRules
 };
+'''
+
+file_path = "/Users/lzy/pro/solo/workspaces/zy70977/src/rulesEngine.js"
+with open(file_path, "w") as f:
+    f.write(code)
+
+print(f"File written: {file_path}")

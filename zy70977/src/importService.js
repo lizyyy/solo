@@ -13,7 +13,7 @@ function generateTransactionNo() {
 async function checkBatchExists(fileType, contentHash) {
   const hash = crypto.createHash('md5').update(contentHash).digest('hex');
   const existing = await get(`
-    SELECT ib.*, (SELECT COUNT(*) FROM import_results ir WHERE ir.batch_id = ib.batch_id) as record_count
+    SELECT ib.*, (SELECT COUNT(*) FROM import_results ir WHERE ir.batch_id = ib.batch_id) AS record_count
     FROM import_batches ib
     WHERE ib.file_type = ? AND ib.batch_id LIKE ?
     ORDER BY ib.created_at DESC
@@ -35,7 +35,7 @@ async function updateBatchCounts(batchId) {
   const counts = await all(`
     SELECT
       result_status,
-      COUNT(*) as cnt
+      COUNT(*) AS cnt
     FROM import_results
     WHERE batch_id = ?
     GROUP BY result_status
@@ -214,15 +214,15 @@ async function processRepairRecords(batchId, repairs) {
       }
     }
 
-    const isDuplicate = await checkDuplicateDeduction(repair.rental_order_no, repair.repair_no, repair.device_id);
-    if (isDuplicate) {
+    const isDuplicateDeduction = await checkDuplicateDeduction(null, repair.repair_no, null);
+    if (isDuplicateDeduction) {
       results.pending.push({
         record: repair.raw,
-        reason: '该设备/订单已有维修扣款记录，可能重复',
+        reason: '该维修单号已有扣款记录，可能重复',
         suggestion: '请核实是否为重复维修记录，避免重复扣款'
       });
       await saveImportResult(batchId, 'repair', 'pending', repair.repair_no, repair.raw,
-        '可能存在重复扣款', '请核实是否为重复维修记录，避免重复扣款');
+        '该维修单号已有扣款记录', '请核实是否为重复维修记录，避免重复扣款');
       continue;
     }
 
