@@ -79,6 +79,32 @@ def _match_coupon(db: Session, coupon_code: str, emp_no: str) -> Dict:
     }
 
 
+def _detect_duplicate_coupon(db: Session, req: RequisitionRecord) -> Dict:
+    if not req.coupon_code:
+        return {"is_duplicate": False, "duplicate_with": None, "detail": None}
+
+    duplicates = (
+        db.query(RequisitionRecord)
+        .filter(
+            RequisitionRecord.coupon_code == req.coupon_code,
+            RequisitionRecord.id != req.id,
+        )
+        .all()
+    )
+    if not duplicates:
+        return {"is_duplicate": False, "duplicate_with": None, "detail": None}
+
+    dup_desc = "; ".join(
+        [f"{d.emp_no}-{d.emp_name}(领用ID:{d.id})" for d in duplicates]
+    )
+    detail = f"券码 {req.coupon_code} 被以下记录重复领取：{dup_desc}"
+    return {
+        "is_duplicate": True,
+        "duplicate_with": dup_desc,
+        "detail": detail,
+    }
+
+
 def run_reconciliation(db: Session, requisition_batch_no: str = None) -> Dict:
     if requisition_batch_no:
         batch = db.query(ImportBatch).filter_by(batch_no=requisition_batch_no).first()
@@ -107,6 +133,7 @@ def run_reconciliation(db: Session, requisition_batch_no: str = None) -> Dict:
 
         emp_result = _match_employee(db, req.emp_no, req.emp_name)
         cp_result = _match_coupon(db, req.coupon_code, req.emp_no) if req.coupon_code else {"match": "no_code", "reason": None, "coupon": None}
+        dup_result = _detect_duplicate_coupon(db, req)
 
         batch_no = (
             db.query(ImportBatch.batch_no)
@@ -120,8 +147,8 @@ def run_reconciliation(db: Session, requisition_batch_no: str = None) -> Dict:
         resigned_detail = None
         is_proxy = bool(req.proxy_emp_no and req.proxy_name)
         proxy_detail = None
-        is_duplicate = False
-        duplicate_with = None
+        is_duplicate = dup_result["is_duplicate"]
+        duplicate_with = dup_result["duplicate_with"]
 
         if emp_result["match"] == "resigned":
             is_resigned = True
@@ -155,21 +182,6 @@ def run_reconciliation(db: Session, requisition_batch_no: str = None) -> Dict:
         if cp_result["match"] == "already_used":
             flags.append("券码已使用")
             anomaly_detail["coupon_used"] = cp_result["reason"]
-            duplicates = (
-                db.query(RequisitionRecord)
-                .filter(
-                    RequisitionRecord.coupon_code == req.coupon_code,
-                    RequisitionRecord.id != req.id,
-                )
-                .all()
-            )
-            if duplicates:
-                is_duplicate = True
-                duplicate_with = "; ".join(
-                    [f"{d.emp_no}-{d.emp_name}({d.id})" for d in duplicates]
-                )
-                flags.append("重复领取")
-                anomaly_detail["duplicate"] = f"券码 {req.coupon_code} 已被 {duplicate_with} 领取"
 
         if cp_result["match"] == "cross_used":
             flags.append("券码交叉使用")
@@ -182,6 +194,10 @@ def run_reconciliation(db: Session, requisition_batch_no: str = None) -> Dict:
         if cp_result["match"] == "mismatch_holder":
             flags.append("券码持有人不符")
             anomaly_detail["coupon_holder"] = cp_result["reason"]
+
+        if is_duplicate:
+            flags.append("重复领取")
+            anomaly_detail["duplicate"] = dup_result["detail"]
 
         if existing:
             existing.employee_match = emp_result["match"]
@@ -221,9 +237,43 @@ def run_reconciliation(db: Session, requisition_batch_no: str = None) -> Dict:
 
     db.commit()
 
+    _backfill_duplicate_flags(db, requisitions)
+
     return {
         "success": True,
         "processed": processed,
         "created": created,
         "updated": updated,
     }
+
+
+def _backfill_duplicate_flags(db: Session, requisitions: List[RequisitionRecord]):
+    coupon_code_map = {}
+    for req in requisitions:
+        if not req.coupon_code:
+            continue
+        coupon_code_map.setdefault(req.coupon_code, []).append(req)
+
+    for coupon_code, reqs in coupon_code_map.items():
+        if len(reqs) < 2:
+            continue
+        dup_desc = "; ".join(
+            [f"{r.emp_no}-{r.emp_name}(领用ID:{r.id})" for r in reqs]
+        )
+        for req in reqs:
+            rec = db.query(ReconciliationRecord).filter_by(requisition_id=req.id).first()
+            if not rec:
+                continue
+            if rec.is_duplicate and "重复领取" in (rec.anomaly_flags or ""):
+                continue
+            rec.is_duplicate = True
+            flags = json.loads(rec.anomaly_flags) if rec.anomaly_flags else []
+            if "重复领取" not in flags:
+                flags.append("重复领取")
+            rec.anomaly_flags = json.dumps(flags, ensure_ascii=False)
+            other_desc = "; ".join(
+                [f"{r.emp_no}-{r.emp_name}(领用ID:{r.id})" for r in reqs if r.id != req.id]
+            )
+            if not rec.duplicate_with or rec.duplicate_with != other_desc:
+                rec.duplicate_with = other_desc
+    db.commit()

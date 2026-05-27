@@ -1,0 +1,10 @@
+{
+  "employees": [
+    {"emp_no": "E001", "name": "张三", "department": "生产部", "status": "active", "phone": "13800000001", "id_card": "110101199001010001"},
+    {"emp_no": "E002", "name": "李四", "department": "销售部", "status": "active", "phone": "13800000002", "id_card": "110101199001020002"},
+    {"emp_no": "E003", "name": "王五", "department": "技术部", "status": "resigned", "phone": "13800000003", "id_card": "110101199001030003", "remark": "2025年12月离职"},
+    {"emp_no": "E004", "name": "赵六", "department": "行政部", "status": "active", "phone": "13800000004", "id_card": "110101199001040004"},
+    {"emp_no": "E005", "name": "钱七", "department": "财务部", "status": "active", "phone": "13800000005", "id_card": "110101199001050005"},
+    {"emp_no": "E006", "name": "孙八", "department": "市场部", "status": "active", "phone": "13800000006", "id_card": "110101199001060006"}
+  ]
+}
