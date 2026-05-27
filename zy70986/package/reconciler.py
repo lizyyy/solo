@@ -163,14 +163,31 @@ class Reconciler:
 
     def recalculate(self, packages: List[Package], sms_records: List[SmsRecord],
                    return_rules: List[ReturnRule]) -> List[DisposalRecord]:
-        reviewed_ids = [pid for pid, d in self.disposals.items()
-                       if d.status == ReconciliationStatus.REVIEWED]
+        reviewed_backup = {}
+        for pid, d in self.disposals.items():
+            if d.status == ReconciliationStatus.REVIEWED:
+                reviewed_backup[pid] = {
+                    "disposal_type": d.disposal_type,
+                    "review_note": d.review_note,
+                    "reviewed_by": d.reviewed_by,
+                    "reviewed_at": d.reviewed_at,
+                    "status": d.status
+                }
 
-        new_disposals = self.reconcile(packages, sms_records, return_rules)
+        self.reconcile(packages, sms_records, return_rules)
 
-        for pid in reviewed_ids:
+        for pid, backup in reviewed_backup.items():
             if pid in self.disposals:
-                self.disposals[pid].status = ReconciliationStatus.REVIEWED
+                d = self.disposals[pid]
+                d.disposal_type = backup["disposal_type"]
+                d.review_note = backup["review_note"]
+                d.reviewed_by = backup["reviewed_by"]
+                d.reviewed_at = backup["reviewed_at"]
+                d.status = backup["status"]
+                self._add_audit_log(pid, "recalculate_preserve",
+                                   old_value={"preserved": True},
+                                   operator="system",
+                                   note="重新计算后保留人工复核结果")
 
         return list(self.disposals.values())
 

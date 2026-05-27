@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from datetime import date
+from datetime import date, datetime
 import pytest
 
 from package.importer import DataImporter
@@ -56,12 +56,23 @@ class TestReconciler:
         assert pkg005.disposal_type == DisposalType.RETURN
 
     def test_reconcile_detects_duplicate_reminders(self):
+        from package.models import SmsRecord, SmsType, Package
+        pkg001_original = next(p for p in self.packages if p.package_id == "PKG001")
+        extra_sms_list = [
+            SmsRecord(sms_id="SMS_EXTRA1", package_id="PKG001", sms_type=SmsType.REMINDER,
+                     send_time=datetime(2026, 5, 21, 10, 0, 0), content="催1", recipient_phone="138****8001"),
+            SmsRecord(sms_id="SMS_EXTRA2", package_id="PKG001", sms_type=SmsType.REMINDER,
+                     send_time=datetime(2026, 5, 22, 10, 0, 0), content="催2", recipient_phone="138****8001"),
+            SmsRecord(sms_id="SMS_EXTRA3", package_id="PKG001", sms_type=SmsType.REMINDER,
+                     send_time=datetime(2026, 5, 23, 10, 0, 0), content="催3", recipient_phone="138****8001"),
+        ]
+        sms_with_extra = self.sms + extra_sms_list
         disposals = self.reconciler.reconcile(
-            self.packages, self.sms, self.rules, reference_date=date(2026, 5, 27)
+            self.packages, sms_with_extra, self.rules, reference_date=date(2026, 5, 27)
         )
-        pkg004 = next(d for d in disposals if d.package_id == "PKG004")
-        assert DifferenceType.DUPLICATE_REMINDER in pkg004.difference_types
-        assert pkg004.disposal_type == DisposalType.SUPPLEMENT
+        pkg001 = next(d for d in disposals if d.package_id == "PKG001")
+        assert DifferenceType.DUPLICATE_REMINDER in pkg001.difference_types
+        assert pkg001.disposal_type == DisposalType.SUPPLEMENT
 
     def test_reconcile_normal_package(self):
         disposals = self.reconciler.reconcile(
@@ -92,6 +103,9 @@ class TestReconciler:
         pkg004 = next(d for d in updated if d.package_id == "PKG004")
         assert pkg004.status.value == "reviewed"
         assert pkg004.disposal_type == DisposalType.RELEASE
+        assert pkg004.review_note == "测试备注"
+        assert pkg004.reviewed_by == "测试员"
+        assert pkg004.reviewed_at is not None
 
     def test_explain_disposal(self):
         self.reconciler.reconcile(
