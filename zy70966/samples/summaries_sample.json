@@ -1,0 +1,30 @@
+[
+  {
+    "call_id": "CALL001",
+    "summary": "用户咨询退款，坐席解答有误，用户表示不满",
+    "emotion": "negative",
+    "keywords": ["退款", "不满", "打断"],
+    "duration_sec": 320
+  },
+  {
+    "call_id": "CALL002",
+    "summary": "用户查询订单，坐席快速解答，用户满意",
+    "emotion": "positive",
+    "keywords": ["查询", "满意"],
+    "duration_sec": 180
+  },
+  {
+    "call_id": "CALL003",
+    "summary": "用户投诉，坐席语气生硬，用户愤怒挂断",
+    "emotion": "angry",
+    "keywords": ["投诉", "语气生硬", "愤怒"],
+    "duration_sec": 210
+  },
+  {
+    "call_id": "CALL004",
+    "summary": "用户实名认证，坐席规范解答，用户确认",
+    "emotion": "neutral",
+    "keywords": ["实名认证", "规范"],
+    "duration_sec": 240
+  }
+]
