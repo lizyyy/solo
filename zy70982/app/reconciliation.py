@@ -33,6 +33,30 @@ def create_reconciliation_batch(
     return batch
 
 
+def _group_by_pole(alarms, inspections, work_orders):
+    """按灯杆分组数据，用于识别同杆多灯场景"""
+    pole_map: Dict[str, Dict] = defaultdict(lambda: {
+        "light_ids": set(),
+        "alarms": [],
+        "inspections": [],
+        "work_orders": []
+    })
+    
+    for alarm in alarms:
+        pole_map[alarm.pole_id]["light_ids"].add(alarm.light_id)
+        pole_map[alarm.pole_id]["alarms"].append(alarm)
+    
+    for inspection in inspections:
+        pole_map[inspection.pole_id]["light_ids"].add(inspection.light_id)
+        pole_map[inspection.pole_id]["inspections"].append(inspection)
+    
+    for wo in work_orders:
+        pole_map[wo.pole_id]["light_ids"].add(wo.light_id)
+        pole_map[wo.pole_id]["work_orders"].append(wo)
+    
+    return pole_map
+
+
 def _group_by_pole_and_light(alarms, inspections, work_orders):
     """按灯杆和灯具分组数据"""
     pole_light_map: Dict[str, Dict] = defaultdict(lambda: {
@@ -42,15 +66,15 @@ def _group_by_pole_and_light(alarms, inspections, work_orders):
     })
     
     for alarm in alarms:
-        key = f"{alarm.pole_id}_{alarm.light_id}"
+        key = f"{alarm.pole_id}||{alarm.light_id}"
         pole_light_map[key]["alarms"].append(alarm)
     
     for inspection in inspections:
-        key = f"{inspection.pole_id}_{inspection.light_id}"
+        key = f"{inspection.pole_id}||{inspection.light_id}"
         pole_light_map[key]["inspections"].append(inspection)
     
     for wo in work_orders:
-        key = f"{wo.pole_id}_{wo.light_id}"
+        key = f"{wo.pole_id}||{wo.light_id}"
         pole_light_map[key]["work_orders"].append(wo)
     
     return pole_light_map
@@ -121,7 +145,7 @@ def run_reconciliation(db: Session, batch_id: str) -> schemas.ReconciliationResu
         raise ValueError(f"对账批次不存在: {batch_id}")
     
     db.query(ReconciliationRecord).filter(
-        ReconciliationRecord.reconciliation_id == batch_id
+        ReconciliationRecord.batch_id == batch_id
     ).delete()
     db.commit()
     
@@ -129,13 +153,16 @@ def run_reconciliation(db: Session, batch_id: str) -> schemas.ReconciliationResu
     inspections = db.query(Inspection).all()
     work_orders = db.query(WorkOrder).all()
     
+    pole_map = _group_by_pole(alarms, inspections, work_orders)
     pole_light_map = _group_by_pole_and_light(alarms, inspections, work_orders)
+    
+    pole_light_count = {pid: len(data["light_ids"]) for pid, data in pole_map.items()}
     
     matched_count = 0
     discrepancy_count = 0
     
     for key, data in pole_light_map.items():
-        pole_id, light_id = key.split('_', 1)
+        pole_id, light_id = key.split('||', 1)
         
         record_alarms = data["alarms"]
         record_inspections = data["inspections"]
@@ -144,71 +171,52 @@ def run_reconciliation(db: Session, batch_id: str) -> schemas.ReconciliationResu
         if not record_alarms and not record_inspections and not record_work_orders:
             continue
         
-        if len(record_alarms) > 1 or len(record_inspections) > 1 or len(record_work_orders) > 1:
-            main_alarm = record_alarms[0] if record_alarms else None
-            main_inspection = record_inspections[0] if record_inspections else None
-            main_work_order = record_work_orders[0] if record_work_orders else None
-            
-            reconciliation_id = f"{batch_id}_{key}"
-            rec_record = ReconciliationRecord(
-                reconciliation_id=reconciliation_id,
-                pole_id=pole_id,
-                light_id=light_id,
-                alarm_id=main_alarm.id if main_alarm else None,
-                inspection_id=main_inspection.id if main_inspection else None,
-                work_order_id=main_work_order.id if main_work_order else None,
-                status=ReconciliationStatus.DISCREPANCY,
-                review_status=ReviewStatus.PENDING
-            )
-            db.add(rec_record)
-            db.flush()
-            
-            if len(record_alarms) > 1:
-                _create_discrepancy(
-                    db, rec_record.id,
-                    DiscrepancyType.MULTI_LIGHT_SAME_POLE,
-                    f"同杆多灯情况: 发现 {len(record_alarms)} 条告警记录关联此灯杆灯具",
-                    DataSource.ALARM
-                )
-            
-            is_matched, discrepancies = _match_single_record(
-                db, rec_record, main_alarm, main_inspection, main_work_order, batch_id
-            )
-            
-            if is_matched and len(discrepancies) == 0:
-                rec_record.status = ReconciliationStatus.MATCHED
-                matched_count += 1
-            else:
-                discrepancy_count += 1
+        is_multi_light_pole = pole_light_count.get(pole_id, 1) > 1
         
+        main_alarm = record_alarms[0] if record_alarms else None
+        main_inspection = record_inspections[0] if record_inspections else None
+        main_work_order = record_work_orders[0] if record_work_orders else None
+        
+        reconciliation_id = f"{batch_id}||{key}"
+        rec_record = ReconciliationRecord(
+            batch_id=batch_id,
+            reconciliation_id=reconciliation_id,
+            pole_id=pole_id,
+            light_id=light_id,
+            alarm_id=main_alarm.id if main_alarm else None,
+            inspection_id=main_inspection.id if main_inspection else None,
+            work_order_id=main_work_order.id if main_work_order else None,
+            status=ReconciliationStatus.DISCREPANCY,
+            review_status=ReviewStatus.PENDING
+        )
+        db.add(rec_record)
+        db.flush()
+        
+        if is_multi_light_pole:
+            _create_discrepancy(
+                db, rec_record.id,
+                DiscrepancyType.MULTI_LIGHT_SAME_POLE,
+                f"同杆多灯场景: 灯杆 {pole_id} 下共有 {pole_light_count[pole_id]} 个灯具需要对账，本记录为 {light_id}，请结合同杆其他灯具记录综合判断",
+                DataSource.ALARM
+            )
+        
+        if len(record_alarms) > 1:
+            _create_discrepancy(
+                db, rec_record.id,
+                DiscrepancyType.MULTI_LIGHT_SAME_POLE,
+                f"同一灯具多条告警: 发现 {len(record_alarms)} 条告警记录关联此灯杆灯具",
+                DataSource.ALARM
+            )
+        
+        is_matched, discrepancies = _match_single_record(
+            db, rec_record, main_alarm, main_inspection, main_work_order, batch_id
+        )
+        
+        if is_matched and len(discrepancies) == 0:
+            rec_record.status = ReconciliationStatus.MATCHED
+            matched_count += 1
         else:
-            alarm = record_alarms[0] if record_alarms else None
-            inspection = record_inspections[0] if record_inspections else None
-            work_order = record_work_orders[0] if record_work_orders else None
-            
-            reconciliation_id = f"{batch_id}_{key}"
-            rec_record = ReconciliationRecord(
-                reconciliation_id=reconciliation_id,
-                pole_id=pole_id,
-                light_id=light_id,
-                alarm_id=alarm.id if alarm else None,
-                inspection_id=inspection.id if inspection else None,
-                work_order_id=work_order.id if work_order else None,
-                status=ReconciliationStatus.DISCREPANCY,
-                review_status=ReviewStatus.PENDING
-            )
-            db.add(rec_record)
-            db.flush()
-            
-            is_matched, discrepancies = _match_single_record(
-                db, rec_record, alarm, inspection, work_order, batch_id
-            )
-            
-            if is_matched and len(discrepancies) == 0:
-                rec_record.status = ReconciliationStatus.MATCHED
-                matched_count += 1
-            else:
-                discrepancy_count += 1
+            discrepancy_count += 1
     
     total_records = matched_count + discrepancy_count
     batch.status = "completed"
@@ -221,7 +229,7 @@ def run_reconciliation(db: Session, batch_id: str) -> schemas.ReconciliationResu
     db.commit()
     
     records = db.query(ReconciliationRecord).filter(
-        ReconciliationRecord.reconciliation_id.like(f"{batch_id}_%")
+        ReconciliationRecord.batch_id == batch_id
     ).all()
     
     pending_review = discrepancy_count
@@ -334,7 +342,7 @@ def get_reconciliation_summary(db: Session, batch_id: str) -> dict:
         return None
     
     records = db.query(ReconciliationRecord).filter(
-        ReconciliationRecord.reconciliation_id.like(f"{batch_id}_%")
+        ReconciliationRecord.batch_id == batch_id
     ).all()
     
     summary = {
@@ -382,7 +390,7 @@ def get_reconciliation_records(
 ) -> List[ReconciliationRecord]:
     """获取对账记录列表"""
     query = db.query(ReconciliationRecord).filter(
-        ReconciliationRecord.reconciliation_id.like(f"{batch_id}_%")
+        ReconciliationRecord.batch_id == batch_id
     )
     
     if status:
@@ -430,7 +438,7 @@ def review_record(db: Session, review_request: schemas.ReviewRequest) -> Optiona
             discrepancy.is_resolved = True
             discrepancy.resolved_reason = review_request.explanation
     
-    _update_batch_counts(db, record.reconciliation_id.split('_')[0])
+    _update_batch_counts(db, record.batch_id)
     
     db.commit()
     db.refresh(record)
@@ -448,7 +456,7 @@ def _update_batch_counts(db: Session, batch_id: str):
         return
     
     records = db.query(ReconciliationRecord).filter(
-        ReconciliationRecord.reconciliation_id.like(f"{batch_id}_%")
+        ReconciliationRecord.batch_id == batch_id
     ).all()
     
     reviewed = sum(1 for r in records if r.review_status != ReviewStatus.PENDING)

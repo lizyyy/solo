@@ -128,6 +128,7 @@ class ReviewHistory(ReviewHistoryBase):
 
 class ReconciliationRecordBase(BaseModel):
     reconciliation_id: str
+    batch_id: str
     pole_id: str
     light_id: str
     status: ReconciliationStatus = ReconciliationStatus.DISCREPANCY
@@ -200,6 +201,7 @@ class ReconciliationResult(BaseModel):
 class TraceDetail(BaseModel):
     record_id: int
     reconciliation_id: str
+    batch_id: str
     pole_id: str
     light_id: str
     status: ReconciliationStatus

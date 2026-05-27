@@ -102,6 +102,7 @@ class ReconciliationRecord(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     reconciliation_id = Column(String, index=True)
+    batch_id = Column(String, index=True)
     pole_id = Column(String, index=True)
     light_id = Column(String, index=True)
 
