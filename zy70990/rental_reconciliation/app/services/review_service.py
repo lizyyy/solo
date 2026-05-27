@@ -290,7 +290,9 @@ class ReviewService:
         for record in deposit_records:
             if record.transaction_type == "charge":
                 balance += record.amount
-            elif record.transaction_type in ["refund", "deduct", "correction"]:
+            elif record.transaction_type == "correction":
+                balance += record.amount
+            elif record.transaction_type in ["refund", "deduct"]:
                 balance -= record.amount
 
         return balance

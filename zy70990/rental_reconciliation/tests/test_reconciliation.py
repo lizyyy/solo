@@ -417,6 +417,7 @@ class TestReview:
         recon_before = client.post(f"/api/reconciliation/{order_id}")
         result_before = recon_before.json()
         balance_before = result_before["cost_summary"]["final_deposit_balance"]
+        differences_before = result_before["differences"]
 
         action_data = {
             "action": "refund_correction",
@@ -682,4 +683,146 @@ class TestEndToEnd:
         trace_result = history_response.json()
         assert len(trace_result["audit_trail"]) >= 2
 
+        assert recon_result2["cost_summary"]["deposit_refund"] >= 0
+
+
+class TestVerifyFix:
+    """验证退款冲正后的余额同步 - 四个条件"""
+    
+    def test_verify_four_conditions(self, db_session):
+        """验证退款冲正后的余额同步 - 四个条件"""
+        import tempfile
+        
+        print()
+        print("=" * 60)
+        print("VERIFICATION RESULTS")
+        print("=" * 60)
+        print()
+        
+        # Step 1: Create order
+        print("Step 1: Creating order (deposit=2000)...")
+        order_data = {
+            "order_no": "VERIFY-FIX-001",
+            "tenant_name": "Test",
+            "tenant_phone": "13800138000",
+            "room_no": "101",
+            "check_in_date": "2024-01-01T00:00:00",
+            "check_out_date": "2024-01-05T00:00:00",
+            "rental_amount": 1500.0,
+            "deposit_amount": 2000.0
+        }
+        r = client.post("/api/orders", json=order_data)
+        order_id = r.json()["id"]
+        print(f"  order_id={order_id}")
+        
+        # Step 2: Import meter data (50 kWh)
+        print("Step 2: Importing 50 kWh meter data...")
+        meter_csv = "order_no,meter_type,initial_reading,final_reading,unit\nVERIFY-FIX-001,electricity,100,150,kWh"
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
+            f.write(meter_csv)
+            meter_file = f.name
+        with open(meter_file, "rb") as f:
+            r = client.post("/api/orders/import/meter-csv", files={"file": ("meter.csv", f, "text/csv")})
+        os.unlink(meter_file)
+        imported = r.json().get("imported_count", 0)
+        print(f"  imported={imported}")
+        
+        # Step 3: First reconciliation
+        print("Step 3: Running first reconciliation...")
+        r = client.post(f"/api/reconciliation/{order_id}")
+        balance_before = r.json()["cost_summary"]["final_deposit_balance"]
+        print(f"  balance_before = {balance_before}")
+        
+        # Step 4: Refund correction +100
+        print("Step 4: Executing refund_correction +100...")
+        action_data = {
+            "action": "refund_correction",
+            "target_type": "deposit",
+            "new_value": {"order_id": order_id, "correction_amount": 100.0},
+            "reason": "Verify fix",
+            "reviewer": "Admin"
+        }
+        r = client.post("/api/review/action", json=action_data)
+        success = r.json().get("success", False)
+        print(f"  success={success}")
+        
+        # Step 5: Deposit history
+        print("Step 5: Querying deposit history...")
+        r = client.get(f"/api/reports/deposit/{order_id}/history")
+        h = r.json()
+        records = h.get("history", [])
+        if records:
+            history_balance = records[-1].get("balance")
+        else:
+            history_balance = h.get("current_balance")
+        print(f"  history_balance = {history_balance}")
+        
+        # Step 6: Second reconciliation
+        print("Step 6: Running second reconciliation...")
+        r = client.post(f"/api/reconciliation/{order_id}")
+        res = r.json()
+        recon_balance = res["cost_summary"]["final_deposit_balance"]
+        recon_diff = res["differences"]
+        print(f"  recon_balance = {recon_balance}")
+        print(f"  len(recon_diff) = {len(recon_diff)}")
+        
+        # Step 7: Generate report
+        print("Step 7: Generating report...")
+        r = client.post(f"/api/reports/{order_id}/generate")
+        rep = r.json()
+        rd = rep.get("report_data", {})
+        cb = rd.get("cost_breakdown", {})
+        report_balance = cb.get("final_balance", rd.get("final_balance"))
+        print(f"  report_balance = {report_balance}")
+        
+        print()
+        print("Data Summary:")
+        print(f"  balance_before  = {balance_before}")
+        print(f"  history_balance = {history_balance}")
+        print(f"  recon_balance   = {recon_balance}")
+        print(f"  report_balance  = {report_balance}")
+        print(f"  len(recon_diff) = {len(recon_diff)}")
+        print()
+        
+        # Verify conditions
+        c1 = abs(recon_balance - (balance_before + 100)) < 0.01
+        c2 = abs(recon_balance - history_balance) < 0.01
+        c3 = len(recon_diff) == 0
+        c4 = abs(report_balance - recon_balance) < 0.01
+        all_pass = c1 and c2 and c3 and c4
+        
+        pt1 = "PASS" if c1 else "FAIL"
+        pt2 = "PASS" if c2 else "FAIL"
+        pt3 = "PASS" if c3 else "FAIL"
+        pt4 = "PASS" if c4 else "FAIL"
+        apt = "PASSED" if all_pass else "FAILED"
+        
+        print("Conditions:")
+        print(f"  1. recon_balance == balance_before + 100")
+        print(f"     Expected: {balance_before + 100}, Actual: {recon_balance}")
+        print(f"     Result: {pt1}")
+        print()
+        print(f"  2. recon_balance == history_balance")
+        print(f"     Expected: {history_balance}, Actual: {recon_balance}")
+        print(f"     Result: {pt2}")
+        print()
+        print(f"  3. len(recon_diff) == 0")
+        print(f"     Expected: 0, Actual: {len(recon_diff)}")
+        print(f"     Result: {pt3}")
+        print()
+        print(f"  4. report_balance == recon_balance")
+        print(f"     Expected: {recon_balance}, Actual: {report_balance}")
+        print(f"     Result: {pt4}")
+        print()
+        
+        print("=" * 60)
+        print(f"ALL CONDITIONS: {apt}")
+        print("=" * 60)
+        print()
+        
+        assert c1, f"Condition 1 failed: recon_balance({recon_balance}) != balance_before + 100({balance_before + 100})"
+        assert c2, f"Condition 2 failed: recon_balance({recon_balance}) != history_balance({history_balance})"
+        assert c3, f"Condition 3 failed: len(recon_diff) = {len(recon_diff)}"
+        assert c4, f"Condition 4 failed: report_balance({report_balance}) != recon_balance({recon_balance})"
+        assert recon_result2["cost_summary"]["deposit_refund"] >= 0
         assert recon_result2["cost_summary"]["deposit_refund"] >= 0
