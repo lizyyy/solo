@@ -20,7 +20,7 @@ function calculateOverdueRent(rentalOrder, rules) {
   var overdueDays = moment(today).diff(moment(endDate), "days");
   if (overdueDays <= 0) return { hasOverdue: false };
   var overdueRules = rules.filter(function(r) {
-    return r.rule_type === "overdue_rent" && r.is_active === 1;
+    return r.rule_type === "overdue_rent" && r.is_active;
   });
   var totalDeduction = 0;
   var appliedRules = [];
@@ -38,13 +38,17 @@ function calculateOverdueRent(rentalOrder, rules) {
       var amount = rule.deduction_amount || 0;
       if (rule.deduction_percent > 0) {
         amount = rentalOrder.deposit_amount * (rule.deduction_percent / 100);
+      } else if (rule.rule_code === 'OVERDUE_001') {
+        amount = rentalOrder.daily_rent * 1.5 * overdueDays;
       }
-      totalDeduction += amount;
-      appliedRules.push({
-        rule_code: rule.rule_code,
-        rule_name: rule.rule_name,
-        amount: amount
-      });
+      if (amount > 0) {
+        totalDeduction += amount;
+        appliedRules.push({
+          rule_code: rule.rule_code,
+          rule_name: rule.rule_name,
+          amount: amount
+        });
+      }
     }
   }
   return {
@@ -73,11 +77,16 @@ function evaluateRepairLiability(repairRecord, rules) {
       liability: repairRecord.liability
     };
     if (evaluateCondition(rule.condition_expr, ctx)) {
-      shouldDeduct = true;
-      if (rule.deduction_amount > 0) {
-        deductionAmount = rule.deduction_amount;
+      if (rule.deduction_amount === 0 && rule.deduction_percent === 0) {
+        shouldDeduct = false;
+        deductionAmount = 0;
       } else {
-        deductionAmount = repairRecord.repair_cost * (rule.deduction_percent / 100);
+        shouldDeduct = true;
+        if (rule.deduction_amount > 0) {
+          deductionAmount = rule.deduction_amount;
+        } else {
+          deductionAmount = repairRecord.repair_cost * (rule.deduction_percent / 100);
+        }
       }
       appliedRule = rule;
       break;

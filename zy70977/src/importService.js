@@ -236,7 +236,7 @@ async function processRepairRecords(batchId, repairs) {
         repair.status, JSON.stringify(repair.raw)]);
 
       const liabilityResult = evaluateRepairLiability(repair, rules);
-      if (liabilityResult.shouldDeduct && repair.rental_order_no) {
+      if (liabilityResult.shouldDeduct && liabilityResult.deductionAmount > 0 && repair.rental_order_no) {
         const balanceInfo = await getDepositBalance(repair.rental_order_no);
         if (liabilityResult.deductionAmount <= balanceInfo.balance) {
           const deductTxnNo = generateTransactionNo();
@@ -264,6 +264,13 @@ async function processRepairRecords(batchId, repairs) {
             `维修扣款金额超过押金余额`, '请联系客户补缴押金或协商处理方案');
           continue;
         }
+      } else {
+        results.success.push({
+          record: repair.raw,
+          message: liabilityResult.shouldDeduct ? '维修记录导入成功' : `维修记录导入成功，按规则${liabilityResult.appliedRule?.rule_name || ''}不扣减押金`,
+          deductionAmount: 0
+        });
+      }
       } else {
         results.success.push({
           record: repair.raw,
