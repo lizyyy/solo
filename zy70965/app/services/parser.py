@@ -1,7 +1,18 @@
 import pandas as pd
 import json
+import math
 from typing import List, Dict, Any, Optional
 from io import BytesIO, StringIO
+
+
+def _is_empty(value: Any) -> bool:
+    if value is None:
+        return True
+    if isinstance(value, float) and math.isnan(value):
+        return True
+    if isinstance(value, str) and value.strip() == "":
+        return True
+    return False
 
 
 def parse_quality_csv(content: bytes) -> List[Dict[str, Any]]:
@@ -49,10 +60,10 @@ def _normalize_quality_record(record: Dict[str, Any]) -> Dict[str, Any]:
     }
     for target_key, possible_keys in key_mapping.items():
         for k in possible_keys:
-            if k in record and record[k] is not None and str(record[k]).strip():
+            if k in record and not _is_empty(record[k]):
                 normalized[target_key] = record[k]
                 break
-    normalized["_raw"] = json.dumps(record, ensure_ascii=False)
+    normalized["_raw"] = json.dumps(record, ensure_ascii=False, default=str)
     return normalized
 
 
@@ -69,8 +80,8 @@ def _normalize_appeal_record(record: Dict[str, Any]) -> Dict[str, Any]:
     }
     for target_key, possible_keys in key_mapping.items():
         for k in possible_keys:
-            if k in record and record[k] is not None and str(record[k]).strip():
+            if k in record and not _is_empty(record[k]):
                 normalized[target_key] = record[k]
                 break
-    normalized["_raw"] = json.dumps(record, ensure_ascii=False)
+    normalized["_raw"] = json.dumps(record, ensure_ascii=False, default=str)
     return normalized

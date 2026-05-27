@@ -98,6 +98,7 @@ def _build_quality_record(batch_id: str, record_type: str, data: dict) -> Qualit
     return QualityRecord(
         batch_id=batch_id,
         record_type=record_type,
+        error_type=data.get("error_type"),
         agent_id=str(data.get("agent_id", "")),
         agent_name=str(data.get("agent_name", "")),
         call_id=str(data.get("call_id", "")),
@@ -111,7 +112,8 @@ def _build_quality_record(batch_id: str, record_type: str, data: dict) -> Qualit
         needs_second_review=data.get("needs_second_review", False),
         raw_data=data.get("raw_data", ""),
         suggestion=str(data.get("suggestion", "")),
-        error_message=str(data.get("error_message", ""))
+        error_message=str(data.get("error_message", "")),
+        data_source=data.get("source", "quality")
     )
 
 

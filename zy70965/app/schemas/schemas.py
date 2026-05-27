@@ -15,6 +15,7 @@ class QualityRecordItem(BaseModel):
 
     id: int
     record_type: str
+    error_type: Optional[str]
     agent_id: Optional[str]
     agent_name: Optional[str]
     call_id: Optional[str]
@@ -29,6 +30,7 @@ class QualityRecordItem(BaseModel):
     suggestion: Optional[str]
     error_message: Optional[str]
     raw_data: Optional[str]
+    data_source: Optional[str]
     created_at: datetime
 
 

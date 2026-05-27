@@ -28,6 +28,7 @@ class QualityRecord(Base):
     id = Column(Integer, primary_key=True, index=True)
     batch_id = Column(String(64), ForeignKey("batch_submissions.batch_id"))
     record_type = Column(String(20), nullable=False)
+    error_type = Column(String(50))
     agent_id = Column(String(50))
     agent_name = Column(String(100))
     call_id = Column(String(100))
@@ -42,6 +43,7 @@ class QualityRecord(Base):
     raw_data = Column(Text)
     suggestion = Column(Text)
     error_message = Column(Text)
+    data_source = Column(String(20), default="quality")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
