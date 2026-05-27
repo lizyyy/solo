@@ -1,4 +1,7 @@
-import uuid
+#!/usr/bin/env python3
+import os
+
+content = """import uuid
 from datetime import datetime
 from typing import List, Dict, Tuple
 from app.models import (
@@ -51,14 +54,14 @@ def process_meter_reading(
     reading: MeterReading,
     order: Order,
     property_cfg: Property
-) -> List[ReconcileItem]:
+) -> Tuple[List[ReconcileItem], float]:
     items = []
     item_id = str(uuid.uuid4())[:8]
-    
+
     elec_valid, elec_reason = validate_meter_reading(reading.electricity_start, reading.electricity_end)
     elec_usage = reading.electricity_end - reading.electricity_start
     elec_cost, elec_rule = calculate_electricity_cost(elec_usage, property_cfg.electricity_tiers)
-    
+
     if elec_valid:
         items.append(ReconcileItem(
             item_id=f"elec-{item_id}",
@@ -95,11 +98,11 @@ def process_meter_reading(
             evidence_status="抄表数据异常",
             rule_applied="电表读数校验规则"
         ))
-    
+
     water_valid, water_reason = validate_meter_reading(reading.water_start, reading.water_end)
     water_usage = reading.water_end - reading.water_start
     water_cost = round(water_usage * property_cfg.water_price_per_ton, 2)
-    
+
     if water_valid:
         items.append(ReconcileItem(
             item_id=f"water-{item_id}",
@@ -114,7 +117,7 @@ def process_meter_reading(
             difference=0.0,
             raw_fields=reading.raw_data,
             suggested_action=SuggestedAction.APPROVE,
-            reason=f"用水{water_usage:.2f}吨 × {property_cfg.water_price_per_ton:.2f}元/吨 = {water_cost:.2f}元",
+            reason=f"用水{water_usage:.2f}吨 \\u00d7 {property_cfg.water_price_per_ton:.2f}元/吨 = {water_cost:.2f}元",
             evidence_status="抄表数据完整",
             rule_applied="水费计价规则"
         ))
@@ -136,7 +139,7 @@ def process_meter_reading(
             evidence_status="抄表数据异常",
             rule_applied="水表读数校验规则"
         ))
-    
+
     return items, elec_cost + water_cost
 
 
@@ -147,7 +150,7 @@ def process_damage_claim(
 ) -> Tuple[ReconcileItem, float]:
     item_id = str(uuid.uuid4())[:8]
     status, action, reason = validate_damage_claim(claim, deposit_amount=property_cfg.deposit_amount)
-    
+
     item = ReconcileItem(
         item_id=f"damage-{item_id}",
         order_id=order.order_id,
@@ -165,7 +168,7 @@ def process_damage_claim(
         evidence_status="已提供照片" if claim.has_photo else "缺少照片",
         rule_applied="损坏扣款校验规则"
     )
-    
+
     actual_cost = claim.claimed_amount if status == ItemStatus.NORMAL else 0.0
     return item, actual_cost
 
@@ -180,7 +183,7 @@ def process_deposit_refund(
     status, action, reason, expected_refund, actual_refund = reconcile_deposit_refund(
         order, total_utility_cost, total_damage_cost
     )
-    
+
     return ReconcileItem(
         item_id=f"refund-{item_id}",
         order_id=order.order_id,
@@ -208,7 +211,7 @@ def reconcile_batch(
 ) -> ReconcileResult:
     all_items: List[ReconcileItem] = []
     order_map = {o.order_id: o for o in orders}
-    
+
     for reading in meter_readings:
         order = order_map.get(reading.order_id)
         if not order:
@@ -230,25 +233,25 @@ def reconcile_batch(
                 rule_applied="数据关联校验"
             ))
             continue
-        
+
         property_cfg = get_property_config(reading.property_id)
         utility_items, total_utility = process_meter_reading(reading, order, property_cfg)
         all_items.extend(utility_items)
-        
+
         claim_total = 0.0
         for claim in damage_claims:
             if claim.order_id == order.order_id:
                 claim_item, actual_claim = process_damage_claim(claim, order, property_cfg)
                 all_items.append(claim_item)
                 claim_total += actual_claim
-        
+
         refund_item = process_deposit_refund(order, total_utility, claim_total, {
             "order": order.model_dump(),
             "utility_cost": total_utility,
             "damage_cost": claim_total
         })
         all_items.append(refund_item)
-    
+
     for claim in damage_claims:
         if claim.order_id not in order_map:
             all_items.append(ReconcileItem(
@@ -286,11 +289,11 @@ def reconcile_batch(
                 evidence_status="缺失抄表数据",
                 rule_applied="完整性校验"
             ))
-    
+
     normal_items = [i for i in all_items if i.status == ItemStatus.NORMAL]
     pending_items = [i for i in all_items if i.status == ItemStatus.PENDING]
     failed_items = [i for i in all_items if i.status == ItemStatus.FAILED]
-    
+
     return ReconcileResult(
         batch_id=batch_id,
         processed_at=datetime.now(),
@@ -302,3 +305,10 @@ def reconcile_batch(
         pending_items=pending_items,
         failed_items=failed_items
     )
+"""
+
+filepath = os.path.join(os.path.dirname(__file__), 'app/services/reconcile.py')
+with open(filepath, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print(f"✅ 文件已写入: {filepath}")
