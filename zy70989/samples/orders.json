@@ -1,0 +1,70 @@
+[
+  {
+    "order_id": "ORD202405001",
+    "property_id": "PROP-BJ-001",
+    "guest_name": "张三",
+    "checkin_date": "2024-05-01",
+    "checkout_date": "2024-05-05",
+    "daily_rate": 399.0,
+    "total_amount": 1596.0,
+    "deposit_amount": 500.0,
+    "actual_deposit_refund": 450.0,
+    "deductions": [
+      {"type": "cleaning", "amount": 50.0, "description": "清洁费"}
+    ]
+  },
+  {
+    "order_id": "ORD202405002",
+    "property_id": "PROP-BJ-001",
+    "guest_name": "李四",
+    "checkin_date": "2024-05-06",
+    "checkout_date": "2024-05-10",
+    "daily_rate": 399.0,
+    "total_amount": 1596.0,
+    "deposit_amount": 500.0,
+    "actual_deposit_refund": 500.0,
+    "deductions": []
+  },
+  {
+    "order_id": "ORD202405003",
+    "property_id": "PROP-BJ-002",
+    "guest_name": "王五",
+    "checkin_date": "2024-05-02",
+    "checkout_date": "2024-05-08",
+    "daily_rate": 599.0,
+    "total_amount": 3594.0,
+    "deposit_amount": 800.0,
+    "actual_deposit_refund": 600.0,
+    "deductions": [
+      {"type": "damage", "amount": 200.0, "description": "墙面污渍"}
+    ]
+  },
+  {
+    "order_id": "ORD202405004",
+    "property_id": "PROP-SH-001",
+    "guest_name": "赵六",
+    "checkin_date": "2024-05-03",
+    "checkout_date": "2024-05-07",
+    "daily_rate": 499.0,
+    "total_amount": 1996.0,
+    "deposit_amount": 600.0,
+    "actual_deposit_refund": 500.0,
+    "deductions": [
+      {"type": "utility", "amount": 100.0, "description": "水电预估"}
+    ]
+  },
+  {
+    "order_id": "ORD202405005",
+    "property_id": "PROP-BJ-002",
+    "guest_name": "孙七",
+    "checkin_date": "2024-05-08",
+    "checkout_date": "2024-05-12",
+    "daily_rate": 599.0,
+    "total_amount": 2396.0,
+    "deposit_amount": 800.0,
+    "actual_deposit_refund": 750.0,
+    "deductions": [
+      {"type": "other", "amount": 50.0, "description": "钥匙赔偿"}
+    ]
+  }
+]

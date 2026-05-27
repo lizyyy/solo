@@ -1,0 +1,29 @@
+[
+  {
+    "order_id": "ORD202405003",
+    "property_id": "PROP-BJ-002",
+    "damage_type": "墙面污渍",
+    "description": "客厅墙面有咖啡渍，约2平米需要重新粉刷",
+    "claimed_amount": 200.0,
+    "has_photo": true,
+    "photo_filename": "ORD202405003.jpg"
+  },
+  {
+    "order_id": "ORD202405004",
+    "property_id": "PROP-SH-001",
+    "damage_type": "餐具破损",
+    "description": "厨房有3个盘子碎裂",
+    "claimed_amount": 150.0,
+    "has_photo": false,
+    "photo_filename": null
+  },
+  {
+    "order_id": "ORD202405001",
+    "property_id": "PROP-BJ-001",
+    "damage_type": "门锁损坏",
+    "description": "房门锁芯损坏，需要更换",
+    "claimed_amount": 1200.0,
+    "has_photo": true,
+    "photo_filename": "ORD202405001.jpg"
+  }
+]
