@@ -38,4 +38,5 @@ const newCode = `  var OPERATOR = "审核员-王老师";
 
 content = content.replace(oldCode, newCode);
 fs.writeFileSync("src/seed.js", content, "utf8");
-console.log("修改完成，位置:", content.indexOf(newCode));
+console.log("修改完成");
+console.log("新代码位置:", content.indexOf(newCode));

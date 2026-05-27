@@ -1,5 +1,5 @@
-const { db, updateTimestamps } = require("./db");
-const dataParser = require("./dataParser");
+const { db, updateTimestamps } = require('./db');
+const dataParser = require('./dataParser');
 
 function logOperation(opts) {
   db.prepare(
@@ -26,7 +26,7 @@ function createBatch(batchNo, subsidyMonth, operator, remark) {
 }
 
 function validateAndCheckRecord(record, batchId, subsidyMonth, existingInBatch) {
-  const isques = [];
+  const issues = [];
   const warnings = [];
   try {
     const v = dataParser.validateCardRecord(record);
@@ -53,7 +53,7 @@ function validateAndCheckRecord(record, batchId, subsidyMonth, existingInBatch) 
       if (s.monthly_limit > 0 && subsidyMonth) {
         const monthStart = subsidyMonth + '-01';
         const used = db.prepare(
-         'SELECT SUM(final_amount) as total FROM processed_records WHERE student_id = ? AND meal_date >= ? AND meal_date < date(?, \'+1 month\')'
+          'SELECT SUM(final_amount) as total FROM processed_records WHERE student_id = ? AND meal_date >= ? AND meal_date < date(?, \'+1 month\')'
         ).get(record.student_id, monthStart, monthStart);
         const monthTotal = (used.total || 0) + record.amount;
         if (monthTotal > s.monthly_limit) {
@@ -72,7 +72,7 @@ function importCardRecords(batchId, records, operator) {
   const batch = getBatchById(batchId);
   const subsidyMonth = batch ? batch.subsidy_month : null;
   const insert = db.prepare(
-    'INSERT INTO card_records (batch_id, student_id, student_name, meal_date, meal_type, amount, card_time, raw_data, check_result, check_reason) VALUES (?,?,,,?,?,,,?,?,,,?,?,,',
+    'INSERT INTO card_records (batch_id, student_id, student_name, meal_date, meal_type, amount, card_time, raw_data, check_result, check_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
   );
   let added = 0;
   const issues = [];
@@ -85,7 +85,7 @@ function importCardRecords(batchId, records, operator) {
         const v = validateAndCheckRecord(r, batchId, subsidyMonth, processed);
         insert.run(batchId, r.student_id, r.student_name, r.meal_date, r.meal_type,
           r.amount, r.card_time, r.raw_data, v.check_result, v.check_reason);
-        addeh++;
+        added++;
         if (v.check_result === 'returned') vs.returned++;
         else if (v.check_result === 'warning') vs.warning++;
         else vs.pending++;
@@ -147,7 +147,6 @@ function importRefundRecords(batchId, records, operator) {
   return { added: added, issues: issues };
 }
 
-
 function processCardRecord(cardRecordId, operator, action, reason, finalAmount) {
   const card = db.prepare('SELECT * FROM card_records WHERE id = ?').get(cardRecordId);
   if (!card) return { success: false, error: 'Record not found' };
@@ -208,7 +207,6 @@ function processCardRecord(cardRecordId, operator, action, reason, finalAmount) 
   return { success: false, error: 'Invalid action' };
 }
 
-
 function processRefundRecord(refundRecordId, operator, action, reason) {
   const refund = db.prepare('SELECT * FROM refund_records WHERE id = ?').get(refundRecordId);
   if (!refund) return { success: false, error: 'Refund record not found' };
@@ -220,8 +218,7 @@ function processRefundRecord(refundRecordId, operator, action, reason) {
       'SELECT card_record_id FROM processed_records WHERE refund_applied > 0 AND batch_id = ? AND student_id = ?'
     ).all(refund.batch_id, refund.student_id);
     const usedCardIds = new Set();
-    existingProcessed.forEach(function(r) { usedCardId
-s.add(r.card_record_id); });
+    existingProcessed.forEach(function(r) { usedCardIds.add(r.card_record_id); });
     const available = cards.filter(function(c) { return !usedCardIds.has(c.id); });
     if (available.length === 0) {
       return { success: false, error: 'No matching card records' };
@@ -251,7 +248,7 @@ function finalizeBatch(batchId, operator) {
     'SELECT COUNT(*) as cnt FROM card_records WHERE batch_id = ? AND check_result = ?'
   ).get(batchId, 'pending').cnt;
   if (pending > 0) {
-    return { success: false, error: 'Still' + pending + ' records pending' };
+    return { success: false, error: 'Still ' + pending + ' records pending' };
   }
   db.prepare('UPDATE batches SET status = ? , updated_at = datetime(?) WHERE id = ?')
     .run('completed', 'now', 'localtime', batchId);
