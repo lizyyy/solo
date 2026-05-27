@@ -154,10 +154,19 @@ class ReviewService {
                 status: record.checkInStatus,
             });
         }
+        let checkInSource = '无签到记录';
+        if (record.checkInId && record.checkInRowNumber !== undefined) {
+            checkInSource = `签到表第 ${record.checkInRowNumber} 行导入`;
+        }
+        else if (record.checkInId) {
+            checkInSource = '签到表导入';
+        }
         return {
             hasCheckIn: record.checkInId !== undefined,
-            checkInTime: record.checkInId ? record.updatedAt : undefined,
-            checkInSource: record.checkInId ? '签到表导入' : '无签到记录',
+            checkInTime: record.checkInTime,
+            checkInRowNumber: record.checkInRowNumber,
+            checkInSource,
+            checkInOriginalData: record.checkInOriginalData,
             relatedRecords,
         };
     }

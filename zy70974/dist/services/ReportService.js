@@ -94,6 +94,21 @@ class ReportService {
             lines.push(`  活动名称: ${record.activityName}`);
             lines.push(`  报名状态: ${this.translateRegistrationStatus(record.registrationStatus)}`);
             lines.push(`  签到状态: ${this.translateCheckInStatus(record.checkInStatus)}`);
+            if (record.checkInTime) {
+                lines.push(`  签到时间: ${record.checkInTime.toLocaleString()}`);
+            }
+            if (record.checkInRowNumber !== undefined) {
+                lines.push(`  签到来源: 签到表第 ${record.checkInRowNumber} 行`);
+            }
+            if (record.checkInOriginalData) {
+                const originalFields = Object.entries(record.checkInOriginalData)
+                    .filter(([key]) => !['rowNumber', '_row'].includes(key))
+                    .map(([key, value]) => `${key}=${value}`)
+                    .join(', ');
+                if (originalFields) {
+                    lines.push(`  签到原始数据: ${originalFields}`);
+                }
+            }
             lines.push(`  复核状态: ${this.translateReviewStatus(record.reviewStatus)}`);
             lines.push(`  最终状态: ${this.translateFinalStatus(record.finalStatus)}`);
             if (record.finalReason) {
@@ -157,6 +172,8 @@ class ReportService {
             活动名称: record.activityName,
             报名状态: this.translateRegistrationStatus(record.registrationStatus),
             签到状态: this.translateCheckInStatus(record.checkInStatus),
+            签到时间: record.checkInTime ? record.checkInTime.toLocaleString() : '',
+            签到来源: record.checkInRowNumber !== undefined ? `签到表第${record.checkInRowNumber}行` : (record.checkInId ? '签到表导入' : ''),
             复核状态: this.translateReviewStatus(record.reviewStatus),
             最终状态: this.translateFinalStatus(record.finalStatus),
             最终原因: record.finalReason || '',

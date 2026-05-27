@@ -283,6 +283,9 @@ export class ReconciliationEngine {
         checkInId: checkIn?.id,
         registrationStatus: registration?.status,
         checkInStatus: checkIn?.status || CheckInStatus.NOT_CHECKED_IN,
+        checkInTime: checkIn?.checkInTime,
+        checkInRowNumber: checkIn?.originalData?.rowNumber,
+        checkInOriginalData: checkIn?.originalData,
         reviewStatus: hasHighSeverity ? ReviewStatus.PENDING_REVIEW : 
                       hasMediumSeverity ? ReviewStatus.PENDING_REVIEW : ReviewStatus.APPROVED,
         discrepancies,

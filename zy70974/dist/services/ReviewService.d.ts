@@ -13,7 +13,9 @@ export declare class ReviewService {
     traceCheckInSource(record: ReconciliationRecord): {
         hasCheckIn: boolean;
         checkInTime?: Date;
+        checkInRowNumber?: number;
         checkInSource: string;
+        checkInOriginalData?: Record<string, any>;
         relatedRecords: {
             type: string;
             id: string;

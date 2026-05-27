@@ -132,6 +132,9 @@ export interface ReconciliationRecord {
   checkInId?: string;
   registrationStatus?: RegistrationStatus;
   checkInStatus: CheckInStatus;
+  checkInTime?: Date;
+  checkInRowNumber?: number;
+  checkInOriginalData?: Record<string, any>;
   reviewStatus: ReviewStatus;
   discrepancies: Discrepancy[];
   finalStatus: 'allowed' | 'rejected' | 'pending';
