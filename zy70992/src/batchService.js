@@ -1,5 +1,5 @@
-const { db, updateTimestamps } = require('./db');
-const dataParser = require('./dataParser');
+const { db, updateTimestamps } = require("./db");
+const dataParser = require("./dataParser");
 
 function logOperation(opts) {
   db.prepare(
@@ -20,28 +20,46 @@ function createBatch(batchNo, subsidyMonth, operator, remark) {
   ).run(batchNo, subsidyMonth, operator, remark || '');
   logOperation({
     batch_id: result.lastInsertRowid, action: 'create_batch', operator,
-    reason: '创建批次 ' + batchNo, detail: '补贴月份: ' + subsidyMonth
+    reason: 'Create batch ' + batchNo, detail: 'Subsidy month: ' + subsidyMonth
   });
   return result.lastInsertRowid;
 }
 
 function validateAndCheckRecord(record, batchId, subsidyMonth, existingInBatch) {
-  const issues = [];
+  const isques = [];
   const warnings = [];
   try {
     const v = dataParser.validateCardRecord(record);
     if (v.length > 0) issues.push.apply(issues, v);
   } catch(e) {}
-  if (record.amount <= 0) warnings.push('金额小于等于0');
-  const dup = existingInBatch.filter(function(r) {
+  if (record.amount <= 0) warnings.push('Amount <= 0');
+  const dupInBatch = existingInBatch.filter(function(r) {
     return r.student_id === record.student_id && r.meal_date === record.meal_date && r.meal_type === record.meal_type;
   });
-  if (dup.length > 0) issues.push('同批次内重复领取');
+  if (dupInBatch.length > 0) issues.push('Duplicate in batch');
+  if (record.student_id) {
+    const dupInDb = db.prepare(
+      'SELECT id FROM card_records WHERE batch_id = ? AND student_id = ? AND meal_date = ? AND meal_type = ?'
+    ).get(batchId, record.student_id, record.meal_date, record.meal_type);
+    if (dupInDb) issues.push('Duplicate in database');
+  }
   if (record.student_id) {
     const s = db.prepare('SELECT * FROM subsidy_lists WHERE student_id = ?').get(record.student_id);
-    if (!s) warnings.push('学生不在补贴名单中');
-    else if (s.daily_limit > 0 && record.amount > s.daily_limit) {
-      issues.push('超出单日补贴上限' + s.daily_limit + '元');
+    if (!s) warnings.push('Student not in subsidy list');
+    else {
+      if (s.daily_limit > 0 && record.amount > s.daily_limit) {
+        issues.push('Exceed daily limit ' + s.daily_limit);
+      }
+      if (s.monthly_limit > 0 && subsidyMonth) {
+        const monthStart = subsidyMonth + '-01';
+        const used = db.prepare(
+         'SELECT SUM(final_amount) as total FROM processed_records WHERE student_id = ? AND meal_date >= ? AND meal_date < date(?, \'+1 month\')'
+        ).get(record.student_id, monthStart, monthStart);
+        const monthTotal = (used.total || 0) + record.amount;
+        if (monthTotal > s.monthly_limit) {
+          issues.push('Exceed monthly limit ' + s.monthly_limit + ' (used ' + (used.total || 0) + ')');
+        }
+      }
     }
   }
   let cr = 'pending', reason = null;
@@ -54,7 +72,7 @@ function importCardRecords(batchId, records, operator) {
   const batch = getBatchById(batchId);
   const subsidyMonth = batch ? batch.subsidy_month : null;
   const insert = db.prepare(
-    'INSERT INTO card_records (batch_id, student_id, student_name, meal_date, meal_type, amount, card_time, raw_data, check_result, check_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    'INSERT INTO card_records (batch_id, student_id, student_name, meal_date, meal_type, amount, card_time, raw_data, check_result, check_reason) VALUES (?,?,,,?,?,,,?,?,,,?,?,,',
   );
   let added = 0;
   const issues = [];
@@ -67,7 +85,7 @@ function importCardRecords(batchId, records, operator) {
         const v = validateAndCheckRecord(r, batchId, subsidyMonth, processed);
         insert.run(batchId, r.student_id, r.student_name, r.meal_date, r.meal_type,
           r.amount, r.card_time, r.raw_data, v.check_result, v.check_reason);
-        added++;
+        addeh++;
         if (v.check_result === 'returned') vs.returned++;
         else if (v.check_result === 'warning') vs.warning++;
         else vs.pending++;
@@ -79,7 +97,7 @@ function importCardRecords(batchId, records, operator) {
   db.prepare('UPDATE batches SET total_records = total_records + ? WHERE id = ?').run(added, batchId);
   logOperation({
     batch_id: batchId, action: 'import_cards', operator,
-    reason: '导入刷卡记录 ' + added + ' 条', detail: '校验结果: ' + JSON.stringify(vs)
+    reason: 'Import ' + added + ' records', detail: 'Validation: ' + JSON.stringify(vs)
   });
   return { added: added, updated: 0, total: added, issues: issues, validation_summary: vs };
 }
@@ -100,7 +118,7 @@ function importSubsidyList(batchId, records, operator) {
   tx(records);
   logOperation({
     batch_id: batchId, action: 'import_subsidy', operator,
-    reason: '导入补贴名单 ' + added + ' 条'
+    reason: 'Import subsidy list ' + added + ' records'
   });
   return { added: added, updated: 0, total: added };
 }
@@ -124,86 +142,89 @@ function importRefundRecords(batchId, records, operator) {
   tx(records);
   logOperation({
     batch_id: batchId, action: 'import_refunds', operator,
-    reason: '导入退款记录 ' + added + ' 条'
+    reason: 'Import refund records ' + added + ' records'
   });
   return { added: added, issues: issues };
 }
 
+
 function processCardRecord(cardRecordId, operator, action, reason, finalAmount) {
   const card = db.prepare('SELECT * FROM card_records WHERE id = ?').get(cardRecordId);
-  if (!card) return { success: false, error: '记录不存在' };
+  if (!card) return { success: false, error: 'Record not found' };
   const batch = getBatchById(card.batch_id);
-  if (!batch) return { success: false, error: '批次不存在' };
+  if (!batch) return { success: false, error: 'Batch not found' };
 
   if (action === 'approve') {
     const subsidy = db.prepare('SELECT * FROM subsidy_lists WHERE student_id = ?').get(card.student_id);
-    const subsidyType = subsidy ? subsidy.subsidy_type : '无';
+    const subsidyType = subsidy ? subsidy.subsidy_type : 'none';
     const subsidyUsed = subsidy ? (finalAmount || card.amount) : 0;
     db.prepare(
       'INSERT INTO processed_records (batch_id, student_id, student_name, meal_date, meal_type, original_amount, final_amount, status, reject_reason, subsidy_type, subsidy_used, refund_applied, operator, remark, card_record_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     ).run(card.batch_id, card.student_id, card.student_name, card.meal_date, card.meal_type,
       card.amount, finalAmount || card.amount, 'approved', null, subsidyType, subsidyUsed, 0,
       operator, reason || '', cardRecordId);
-    db.prepare("UPDATE card_records SET check_result = 'approved', check_reason = ? WHERE id = ?")
-      .run(reason || '审核通过', cardRecordId);
+    db.prepare('UPDATE card_records SET check_result = ? , check_reason = ? WHERE id = ?')
+      .run('approved', reason || 'Approved', cardRecordId);
     db.prepare('UPDATE batches SET processed_count = processed_count + 1 WHERE id = ?')
       .run(card.batch_id);
     logOperation({
       batch_id: card.batch_id, card_record_id: cardRecordId, action: 'approve', operator,
-      reason: reason || '审核通过',
-      detail: '学生' + card.student_id + ' ' + card.meal_date + ' ' + card.meal_type + ' ' + card.amount + '元'
+      reason: reason || 'Approved',
+      detail: 'Student ' + card.student_id + ' ' + card.meal_date + ' ' + card.meal_type + ' ' + card.amount + ' yuan'
     });
     return { success: true, status: 'approved', cardRecordId };
   } else if (action === 'reject') {
     db.prepare(
       'INSERT INTO processed_records (batch_id, student_id, student_name, meal_date, meal_type, original_amount, final_amount, status, reject_reason, subsidy_type, subsidy_used, refund_applied, operator, remark, card_record_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     ).run(card.batch_id, card.student_id, card.student_name, card.meal_date, card.meal_type,
-      card.amount, 0, 'rejected', reason || '', '无', 0, 0, operator, '审核拒绝', cardRecordId);
-    db.prepare("UPDATE card_records SET check_result = 'rejected', check_reason = ? WHERE id = ?")
-      .run(reason || '审核拒绝', cardRecordId);
+      card.amount, 0, 'rejected', reason || '', 'none', 0, 0, operator, 'Rejected', cardRecordId);
+    db.prepare('UPDATE card_records SET check_result = ? , check_reason = ? WHERE id = ?')
+      .run('rejected', reason || 'Rejected', cardRecordId);
     logOperation({
       batch_id: card.batch_id, card_record_id: cardRecordId, action: 'reject', operator,
-      reason: reason || '审核拒绝',
-      detail: '学生' + card.student_id + ' ' + card.meal_date + ' ' + card.meal_type + ' ' + card.amount + '元'
+      reason: reason || 'Rejected',
+      detail: 'Student ' + card.student_id + ' ' + card.meal_date + ' ' + card.meal_type + ' ' + card.amount + ' yuan'
     });
     return { success: true, status: 'rejected', cardRecordId };
   } else if (action === 'return') {
-    db.prepare("UPDATE card_records SET check_result = 'returned', check_reason = ? WHERE id = ?")
-      .run(reason || '退回修改', cardRecordId);
+    db.prepare('UPDATE card_records SET check_result = ? , check_reason = ? WHERE id = ?')
+      .run('returned', reason || 'Returned', cardRecordId);
     logOperation({
       batch_id: card.batch_id, card_record_id: cardRecordId, action: 'return', operator,
-      reason: reason || '退回修改',
-      detail: '学生' + card.student_id + ' ' + card.meal_date + ' ' + card.meal_type
+      reason: reason || 'Returned',
+      detail: 'Student ' + card.student_id + ' ' + card.meal_date + ' ' + card.meal_type
     });
     return { success: true, status: 'returned', cardRecordId };
   } else if (action === 'pending') {
-    db.prepare("UPDATE card_records SET check_result = 'pending', check_reason = ? WHERE id = ?")
-      .run(reason || null, cardRecordId);
+    db.prepare('UPDATE card_records SET check_result = ? , check_reason = ? WHERE id = ?')
+      .run('pending', reason || null, cardRecordId);
     db.prepare('DELETE FROM processed_records WHERE card_record_id = ?').run(cardRecordId);
     logOperation({
       batch_id: card.batch_id, card_record_id: cardRecordId, action: 'reset', operator,
-      reason: reason || '重置状态', detail: '学生' + card.student_id
+      reason: reason || 'Reset status', detail: 'Student ' + card.student_id
     });
     return { success: true, status: 'pending', cardRecordId };
   }
-  return { success: false, error: '无效操作' };
+  return { success: false, error: 'Invalid action' };
 }
+
 
 function processRefundRecord(refundRecordId, operator, action, reason) {
   const refund = db.prepare('SELECT * FROM refund_records WHERE id = ?').get(refundRecordId);
-  if (!refund) return { success: false, error: '退款记录不存在' };
+  if (!refund) return { success: false, error: 'Refund record not found' };
   if (action === 'match') {
     const cards = db.prepare(
-      "SELECT * FROM card_records WHERE student_id = ? AND meal_date = ? AND check_result != 'rejected' ORDER BY id ASC"
-    ).all(refund.student_id, refund.refund_date);
+      'SELECT * FROM card_records WHERE student_id = ? AND meal_date = ? AND check_result != ? ORDER BY id ASC'
+    ).all(refund.student_id, refund.refund_date, 'rejected');
     const existingProcessed = db.prepare(
       'SELECT card_record_id FROM processed_records WHERE refund_applied > 0 AND batch_id = ? AND student_id = ?'
     ).all(refund.batch_id, refund.student_id);
     const usedCardIds = new Set();
-    existingProcessed.forEach(function(r) { usedCardIds.add(r.card_record_id); });
+    existingProcessed.forEach(function(r) { usedCardId
+s.add(r.card_record_id); });
     const available = cards.filter(function(c) { return !usedCardIds.has(c.id); });
     if (available.length === 0) {
-      return { success: false, error: '没有可匹配的刷卡记录' };
+      return { success: false, error: 'No matching card records' };
     }
     const matched = available[0];
     db.prepare('UPDATE refund_records SET card_record_id = ?, matched = 1 WHERE id = ?')
@@ -215,28 +236,28 @@ function processRefundRecord(refundRecordId, operator, action, reason) {
     }
     logOperation({
       batch_id: refund.batch_id, refund_record_id: refundRecordId, card_record_id: matched.id,
-      action: 'match_refund', operator, reason: reason || '匹配退款',
-      detail: '退款' + refund.refund_amount + '元 匹配刷卡记录ID:' + matched.id
+      action: 'match_refund', operator, reason: reason || 'Match refund',
+      detail: 'Refund ' + refund.refund_amount + ' yuan matched to card record ID: ' + matched.id
     });
     return { success: true, matchedCardId: matched.id, refundAmount: refund.refund_amount };
   }
-  return { success: false, error: '无效操作' };
+  return { success: false, error: 'Invalid action' };
 }
 
 function finalizeBatch(batchId, operator) {
   const batch = getBatchById(batchId);
-  if (!batch) return { success: false, error: '批次不存在' };
+  if (!batch) return { success: false, error: 'Batch not found' };
   const pending = db.prepare(
-    "SELECT COUNT(*) as cnt FROM card_records WHERE batch_id = ? AND check_result = 'pending'"
-  ).get(batchId).cnt;
+    'SELECT COUNT(*) as cnt FROM card_records WHERE batch_id = ? AND check_result = ?'
+  ).get(batchId, 'pending').cnt;
   if (pending > 0) {
-    return { success: false, error: '还有 ' + pending + ' 条记录待处理' };
+    return { success: false, error: 'Still' + pending + ' records pending' };
   }
-  db.prepare("UPDATE batches SET status = 'completed', updated_at = datetime('now', 'localtime') WHERE id = ?")
-    .run(batchId);
+  db.prepare('UPDATE batches SET status = ? , updated_at = datetime(?) WHERE id = ?')
+    .run('completed', 'now', 'localtime', batchId);
   logOperation({
     batch_id: batchId, action: 'finalize_batch', operator,
-    reason: '批次 ' + batch.batch_no + ' 处理完成'
+    reason: 'Batch ' + batch.batch_no + ' completed'
   });
   return { success: true, batchId: batchId };
 }
