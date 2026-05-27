@@ -53,9 +53,25 @@ db.serialize(() => {
   db.run(`CREATE INDEX IF NOT EXISTS idx_audit_applications ON audit_logs(application_id)`);
 });
 
+function sortObjectKeys(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(sortObjectKeys);
+  }
+  const sortedKeys = Object.keys(obj).sort();
+  const sorted = {};
+  for (const key of sortedKeys) {
+    sorted[key] = sortObjectKeys(obj[key]);
+  }
+  return sorted;
+}
+
 function generateContentHash(data) {
-  const sorted = JSON.stringify(data, Object.keys(data).sort());
-  return crypto.createHash('sha256').update(sorted).digest('hex');
+  const sorted = sortObjectKeys(data);
+  const serialized = JSON.stringify(sorted);
+  return crypto.createHash('sha256').update(serialized).digest('hex');
 }
 
 module.exports = { db, generateContentHash };
