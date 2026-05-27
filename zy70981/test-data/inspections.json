@@ -1,0 +1,37 @@
+[
+  {
+    "inspectionId": "INSP001",
+    "poleId": "P001",
+    "lampId": "L001",
+    "inspector": "张三",
+    "inspectionTime": "2026-05-27T10:00:00+08:00",
+    "status": "abnormal",
+    "issues": ["灯罩破损", "线路老化"],
+    "photos": ["photo1.jpg"],
+    "location": "人民路1号",
+    "remarks": "需尽快处理"
+  },
+  {
+    "inspectionId": "INSP002",
+    "poleId": "P002",
+    "lampId": "L001",
+    "inspector": "李四",
+    "inspectionTime": "2026-05-27T10:30:00+08:00",
+    "status": "normal",
+    "issues": [],
+    "photos": ["photo2.jpg"],
+    "location": "人民路2号",
+    "remarks": "设备正常"
+  },
+  {
+    "inspectionId": "INSP003",
+    "poleId": "P003",
+    "inspector": "王五",
+    "inspectionTime": "2026-05-27T11:00:00+08:00",
+    "status": "damaged",
+    "issues": ["灯杆倾斜"],
+    "photos": [],
+    "location": "人民路3号",
+    "remarks": "存在安全隐患"
+  }
+]

@@ -1,0 +1,61 @@
+[
+  {
+    "orderId": "ORD001",
+    "poleId": "P001",
+    "lampId": "L001",
+    "repairType": "更换灯泡",
+    "reporter": "系统自动",
+    "reportTime": "2026-05-27T09:00:00+08:00",
+    "repairTime": "2026-05-27T11:00:00+08:00",
+    "repairer": "赵师傅",
+    "status": "completed",
+    "beforePhotos": ["before1.jpg"],
+    "afterPhotos": ["after1.jpg"],
+    "materials": ["LED灯泡×1"],
+    "cost": 80,
+    "location": "人民路1号",
+    "remarks": "已修复"
+  },
+  {
+    "orderId": "ORD002",
+    "poleId": "P002",
+    "lampId": "L001",
+    "repairType": "线路检修",
+    "reporter": "巡查员",
+    "reportTime": "2026-05-27T09:30:00+08:00",
+    "status": "completed",
+    "beforePhotos": [],
+    "afterPhotos": [],
+    "materials": [],
+    "cost": 0,
+    "location": "人民路2号",
+    "remarks": "维修完成但未上传照片"
+  },
+  {
+    "orderId": "ORD003",
+    "poleId": "P003",
+    "lampId": "L001",
+    "repairType": "灯罩更换",
+    "reporter": "市民报修",
+    "reportTime": "2026-05-27T10:00:00+08:00",
+    "repairTime": "2026-05-27T14:00:00+08:00",
+    "repairer": "钱师傅",
+    "status": "completed",
+    "beforePhotos": ["before3.jpg"],
+    "afterPhotos": ["after3.jpg"],
+    "materials": [],
+    "cost": 150,
+    "location": "人民路3号",
+    "remarks": "有费用但无材料记录"
+  },
+  {
+    "orderId": "ORD004",
+    "poleId": "P004",
+    "repairType": "灯杆校正",
+    "reporter": "系统告警",
+    "reportTime": "2026-05-27T10:30:00+08:00",
+    "status": "processing",
+    "location": "人民路4号",
+    "remarks": "处理中"
+  }
+]
