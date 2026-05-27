@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import * as multer from 'multer';
+import multer from 'multer';
 import importService from '../services/importService';
 import reconciliationService from '../services/reconciliationService';
 import reportService, { ReportFormat } from '../services/reportService';

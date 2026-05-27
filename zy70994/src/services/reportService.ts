@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as ExcelJS from 'exceljs';
-import * as PDFDocument from 'pdfkit';
+import ExcelJS from 'exceljs';
+import PDFDocument from 'pdfkit';
 import { v4 as uuidv4 } from 'uuid';
 import {
   ReconciliationBatch,
