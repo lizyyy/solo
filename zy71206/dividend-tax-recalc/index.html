@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分红税费重算</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <h1>分红税费重算</h1>
+    <span class="version">v1.0</span>
+  </div>
+  <div class="header-right">
+    <button id="btnLoadMock" class="btn btn-secondary">加载模拟数据</button>
+    <button id="btnProcess" class="btn btn-primary">执行处理</button>
+    <button id="btnExport" class="btn btn-secondary">导出明细 CSV</button>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="input">数据录入</button>
+  <button class="tab-btn" data-tab="validation">数据校验</button>
+  <button class="tab-btn" data-tab="positions">持仓归并</button>
+  <button class="tab-btn" data-tab="tax">税费重算</button>
+  <button class="tab-btn" data-tab="deduction">补扣检查</button>
+  <button class="tab-btn" data-tab="charts">图表</button>
+  <button class="tab-btn" data-tab="explanation">解释单</button>
+  <button class="tab-btn" data-tab="anomaly">异常汇总</button>
+</div>
+
+<div class="main-content">
+
+  <div id="panel-input" class="tab-panel active">
+    <div class="data-input-grid">
+      <div class="input-block">
+        <h3>证券账户</h3>
+        <textarea id="dataAccount" rows="8" placeholder='[{"accountId":"A001","accountName":"张三","custodian":"中国结算上海","idType":"身份证","idNumber":"310***1234"}]'></textarea>
+      </div>
+      <div class="input-block">
+        <h3>交易记录（买入/卖出）</h3>
+        <textarea id="dataTrades" rows="12" placeholder='[{"row":1,"tradeId":"T001","accountId":"A001","stockCode":"600000","stockName":"浦发银行","tradeType":"buy","tradeDate":"2024-03-15","shares":2000,"price":7.50,"custodian":"中国结算上海"}]'></textarea>
+      </div>
+      <div class="input-block">
+        <h3>分红记录</h3>
+        <textarea id="dataDividends" rows="8" placeholder='[{"row":1,"dividendId":"D001","stockCode":"600000","stockName":"浦发银行","exDate":"2025-06-20","payDate":"2025-07-15","dividendPerShare":0.35,"totalShares":4500}]'></textarea>
+      </div>
+      <div class="input-block">
+        <h3>补扣流水</h3>
+        <textarea id="dataDeductions" rows="8" placeholder='[{"row":1,"deductionId":"DD001","accountId":"A001","stockCode":"600000","deductionDate":"2025-07-15","amount":157.50,"withheldRate":0.10,"source":"系统预扣","status":"completed"}]'></textarea>
+      </div>
+    </div>
+    <div class="input-hint">
+      <p>点击"加载模拟数据"可填入含跨托管、税率错、补扣重复的完整测试数据；也可直接粘贴 JSON。</p>
+      <p>线下材料字段：备注(remark)和回执(receipt)可后续补录，不影响核心计算。</p>
+    </div>
+  </div>
+
+  <div id="panel-validation" class="tab-panel">
+    <h2>数据校验结果</h2>
+    <div id="validationList"></div>
+    <div id="validationOk" class="no-anomaly" style="display:none;">✅ 数据校验通过，无格式错误</div>
+  </div>
+
+  <div id="panel-positions" class="tab-panel">
+    <h2>持仓归并结果</h2>
+    <p class="panel-desc">点击高亮行可查看原始买入/卖出记录</p>
+    <div id="positionsTable"></div>
+  </div>
+
+  <div id="panel-tax" class="tab-panel">
+    <h2>税费重算结果</h2>
+    <div id="taxResultsTable"></div>
+  </div>
+
+  <div id="panel-deduction" class="tab-panel">
+    <h2>补扣检查结果</h2>
+    <div id="deductionTable"></div>
+  </div>
+
+  <div id="panel-charts" class="tab-panel">
+    <h2>图表分析</h2>
+    <div class="chart-grid">
+      <div class="chart-container">
+        <canvas id="taxDistChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="holdingChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-explanation" class="tab-panel">
+    <h2>解释单</h2>
+    <div id="explanationContent"></div>
+  </div>
+
+  <div id="panel-anomaly" class="tab-panel">
+    <h2>异常汇总</h2>
+    <div id="anomalySummary"></div>
+  </div>
+
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-body">
+    <div class="modal-header">
+      <h3>原始记录</h3>
+      <button id="modalClose" class="modal-close">&times;</button>
+    </div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
