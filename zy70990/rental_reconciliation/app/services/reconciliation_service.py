@@ -116,9 +116,7 @@ class ReconciliationService:
         for record in deposit_records:
             if record.transaction_type == "charge":
                 current_balance += record.amount
-            elif record.transaction_type == "refund":
-                current_balance -= record.amount
-            elif record.transaction_type == "deduct":
+            elif record.transaction_type in ["refund", "deduct", "correction"]:
                 current_balance -= record.amount
 
         final_balance = current_balance - utility_total - deduction_total
