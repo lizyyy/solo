@@ -1,0 +1,143 @@
+[
+  {
+    "tracking_no": "SF1001000001",
+    "batch_id": "BATCH-TEST-001",
+    "original": {
+      "tracking_no": "SF1001000001",
+      "recipient_phone": "138****8001",
+      "recipient_name": "张*",
+      "inbound_at": "2026-04-20 10:00:00",
+      "status": "in_storage",
+      "station_id": "S001"
+    },
+    "classification": "pending",
+    "reason_codes": [
+      "overdue_overstay"
+    ],
+    "suggestions": [
+      {
+        "code": "suggest_return_or_compensate",
+        "text": "已滞留 37.3 天(阈值 7 天)，建议发起退回或赔付流程"
+      }
+    ],
+    "report_ref": "reports/BATCH-TEST-001.json"
+  },
+  {
+    "tracking_no": "SF1001000002",
+    "batch_id": "BATCH-TEST-001",
+    "original": {
+      "tracking_no": "SF1001000002",
+      "recipient_phone": "138****8002",
+      "recipient_name": "李*",
+      "inbound_at": "2026-05-20 09:00:00",
+      "status": "in_storage",
+      "station_id": "S001"
+    },
+    "classification": "pending",
+    "reason_codes": [
+      "overdue_overstay"
+    ],
+    "suggestions": [
+      {
+        "code": "suggest_return_or_compensate",
+        "text": "已滞留 7.4 天(阈值 7 天)，建议发起退回或赔付流程"
+      }
+    ],
+    "report_ref": "reports/BATCH-TEST-001.json"
+  },
+  {
+    "tracking_no": "SF1001000003",
+    "batch_id": "BATCH-TEST-001",
+    "original": {
+      "tracking_no": "SF1001000003",
+      "recipient_phone": "138****8003",
+      "recipient_name": "王*",
+      "inbound_at": "2026-04-10 08:30:00",
+      "status": "in_storage",
+      "station_id": "S001"
+    },
+    "classification": "pending",
+    "reason_codes": [
+      "overdue_overstay",
+      "excessive_reminders"
+    ],
+    "suggestions": [
+      {
+        "code": "suggest_return_or_compensate",
+        "text": "已滞留 47.4 天(阈值 7 天)，建议发起退回或赔付流程"
+      },
+      {
+        "code": "suggest_contact_station",
+        "text": "累计催取 4 次(阈值 3)，建议驿站站长人工确认，避免骚扰"
+      }
+    ],
+    "report_ref": "reports/BATCH-TEST-001.json"
+  },
+  {
+    "tracking_no": "SF1001000004",
+    "batch_id": "BATCH-TEST-001",
+    "original": {
+      "tracking_no": "SF1001000004",
+      "recipient_phone": "138****8004",
+      "recipient_name": "赵*",
+      "inbound_at": "2026-05-25 14:00:00",
+      "status": "in_storage",
+      "station_id": "S001"
+    },
+    "classification": "normal",
+    "reason_codes": [],
+    "suggestions": [],
+    "report_ref": "reports/BATCH-TEST-001.json"
+  },
+  {
+    "tracking_no": "SF1001000005",
+    "batch_id": "BATCH-TEST-001",
+    "original": {
+      "tracking_no": "SF1001000005",
+      "recipient_phone": "138****8005",
+      "recipient_name": "钱*",
+      "inbound_at": "2026-04-01 10:00:00",
+      "status": "in_storage",
+      "station_id": "S001"
+    },
+    "classification": "pending",
+    "reason_codes": [
+      "overdue_overstay"
+    ],
+    "suggestions": [
+      {
+        "code": "suggest_return_or_compensate",
+        "text": "已滞留 56.3 天(阈值 7 天)，建议发起退回或赔付流程"
+      }
+    ],
+    "report_ref": "reports/BATCH-TEST-001.json"
+  },
+  {
+    "tracking_no": "SF1001000006",
+    "batch_id": "BATCH-TEST-001",
+    "original": {
+      "tracking_no": "SF1001000006",
+      "recipient_phone": "",
+      "recipient_name": "孙*",
+      "inbound_at": "2026-05-01 10:00:00",
+      "status": "in_storage",
+      "station_id": "S001"
+    },
+    "classification": "failed",
+    "reason_codes": [
+      "overdue_overstay",
+      "missing_key_fields"
+    ],
+    "suggestions": [
+      {
+        "code": "suggest_return_or_compensate",
+        "text": "已滞留 26.3 天(阈值 7 天)，建议发起退回或赔付流程"
+      },
+      {
+        "code": "suggest_fill_fields",
+        "text": "运单号或手机号缺失，建议补录原始材料"
+      }
+    ],
+    "report_ref": "reports/BATCH-TEST-001.json"
+  }
+]

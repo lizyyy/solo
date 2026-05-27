@@ -24,7 +24,7 @@ class BatchStore:
 
     def save_ingest(self, req: BatchIngestRequest) -> BatchMeta:
         payload = req.model_dump(mode="json")
-        (self.batches_dir / f"{batch_id}.json").write_text(
+        (self.batches_dir / f"{req.batch_id}.json").write_text(
             json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         meta = BatchMeta(
@@ -34,7 +34,7 @@ class BatchStore:
             sms_count=len(req.sms_records),
             rule_count=len(req.rules),
         )
-        (self.meta_dir / f"{batch_id}.json").write_text(
+        (self.meta_dir / f"{req.batch_id}.json").write_text(
             json.dumps(meta.model_dump(mode="json"), ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
