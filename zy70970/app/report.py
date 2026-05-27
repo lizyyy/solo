@@ -16,29 +16,27 @@ from .review import ReviewManager
 class ReportGenerator:
     @staticmethod
     def generate_summary() -> ReconciliationSummary:
-        jobs = store.get_all_spray_jobs()
-        validations = store.get_all_validation_results()
-        reviews = store.get_all_review_records()
+        jobs_with_reviews = ReviewManager.get_all_jobs_with_reviews()
+        total_jobs = len(jobs_with_reviews)
 
-        total_jobs = len(jobs)
-        valid_jobs = sum(1 for v in validations if v.is_valid)
+        valid_jobs = sum(1 for j in jobs_with_reviews if j.get("is_effectively_valid", False))
         invalid_jobs = total_jobs - valid_jobs
 
         status_counts = defaultdict(int)
-        for job in jobs:
-            status = store.get_job_review_status(job.id)
-            status_counts[status.value] += 1
+        for job in jobs_with_reviews:
+            status = job.get("review_status", ReviewStatus.PENDING.value)
+            status_counts[status] += 1
 
-        total_dosage_used = sum(job.dosage_used for job in jobs)
+        total_dosage_used = sum(j.get("dosage_used", 0) for j in jobs_with_reviews)
 
         pesticides = store.get_all_pesticides()
         total_stock = sum(p.stock_quantity for p in pesticides)
         total_stock_remaining = total_stock - total_dosage_used
 
         violation_counts = defaultdict(int)
-        for result in validations:
-            for violation in result.violations:
-                violation_counts[violation.type.value] += 1
+        for job in jobs_with_reviews:
+            for violation in job.get("effective_violations", []):
+                violation_counts[violation.get("type", "")] += 1
 
         return ReconciliationSummary(
             total_jobs=total_jobs,

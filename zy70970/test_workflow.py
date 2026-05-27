@@ -83,7 +83,7 @@ def test_full_workflow():
         print(f"  ✓ 复核后状态: {job_detail['review_status']}")
         print(f"  ✓ 有效违规数: {len(job_detail['effective_violations'])}")
 
-    print("\n[5/6] 生成报告...")
+    print("\n[5/6] 生成报告并验证一致性...")
     summary = ReportGenerator.generate_summary()
     print(f"  ✓ 总记录数: {summary.total_jobs}")
     print(f"  ✓ 合规记录: {summary.valid_jobs}")
@@ -91,6 +91,38 @@ def test_full_workflow():
     print(f"  ✓ 待复核: {summary.pending_review}")
     print(f"  ✓ 已通过: {summary.approved}")
     print(f"  ✓ 总用量: {summary.total_dosage_used}")
+
+    all_jobs = ReviewManager.get_all_jobs_with_reviews()
+    detail_valid_count = sum(1 for j in all_jobs if j.get("is_effectively_valid"))
+    detail_invalid_count = len(all_jobs) - detail_valid_count
+    detail_approved_count = sum(
+        1 for j in all_jobs if j.get("review_status") == ReviewStatus.APPROVED.value
+    )
+
+    print(f"\n  🔍 一致性验证:")
+    print(f"    汇总合规数({summary.valid_jobs}) == 详情合规数({detail_valid_count}): {summary.valid_jobs == detail_valid_count}")
+    print(f"    汇总违规数({summary.invalid_jobs}) == 详情违规数({detail_invalid_count}): {summary.invalid_jobs == detail_invalid_count}")
+    print(f"    汇总已通过({summary.approved}) == 详情已通过({detail_approved_count}): {summary.approved == detail_approved_count}")
+
+    assert summary.valid_jobs == detail_valid_count, "汇总合规数与详情不一致！"
+    assert summary.invalid_jobs == detail_invalid_count, "汇总违规数与详情不一致！"
+    assert summary.approved == detail_approved_count, "汇总已通过数与详情不一致！"
+    print(f"  ✓ 汇总与详情数据完全一致！")
+
+    csv_export = ReportGenerator.export_report_csv()
+    csv_lines = csv_export.split('\n')
+    csv_valid_count = None
+    csv_invalid_count = None
+    for line in csv_lines:
+        if '合规记录' in line:
+            csv_valid_count = int(line.split(',')[1].strip())
+        elif '违规记录' in line:
+            csv_invalid_count = int(line.split(',')[1].strip())
+    
+    print(f"\n  ✓ CSV导出验证: 合规={csv_valid_count}, 违规={csv_invalid_count}")
+    assert csv_valid_count == summary.valid_jobs, "CSV导出合规数与汇总不一致！"
+    assert csv_invalid_count == summary.invalid_jobs, "CSV导出违规数与汇总不一致！"
+    print(f"  ✓ CSV导出数据与汇总完全一致！")
 
     print("\n[6/6] 生成决策说明...")
     if problematic_job:
