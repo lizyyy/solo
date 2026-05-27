@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>托管估值差异单</title>
+<style>
+:root {
+  --primary: #1a73e8;
+  --primary-light: #e8f0fe;
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --text: #202124;
+  --text-secondary: #5f6368;
+  --border: #dadce0;
+  --success: #34a853;
+  --warning: #f9ab00;
+  --error: #ea4335;
+  --tag-mixed: #f9ab00;
+  --tag-mixed-bg: #fef7e0;
+  --tag-fx: #ea4335;
+  --tag-fx-bg: #fce8e6;
+  --tag-duplicate: #e91e90;
+  --tag-duplicate-bg: #fce4ec;
+  --tag-missing: #3f51b5;
+  --tag-missing-bg: #e8eaf6;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+.app { max-width: 1200px; margin: 0 auto; padding: 20px; }
+h1 { text-align: center; font-size: 1.6rem; font-weight: 600; color: var(--text); margin-bottom: 20px; }
+
+/* Stepper */
+.stepper { display: flex; justify-content: space-between; margin-bottom: 24px; position: relative; }
+.stepper::before { content: ''; position: absolute; top: 20px; left: 40px; right: 40px; height: 2px; background: var(--border); z-index: 0; }
+.step-item { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; cursor: pointer; flex: 1; }
+.step-circle { width: 40px; height: 40px; border-radius: 50%; background: var(--surface); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .875rem; color: var(--text-secondary); transition: all .2s; }
+.step-item.active .step-circle { background: var(--primary); border-color: var(--primary); color: #fff; }
+.step-item.completed .step-circle { background: var(--success); border-color: var(--success); color: #fff; }
+.step-label { font-size: .75rem; margin-top: 6px; color: var(--text-secondary); white-space: nowrap; }
+.step-item.active .step-label { color: var(--primary); font-weight: 600; }
+.step-item.completed .step-label { color: var(--success); }
+
+/* Cards */
+.card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; }
+.card-title { font-size: 1rem; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; text-align: center; }
+.stat-value { font-size: 1.8rem; font-weight: 700; }
+.stat-label { font-size: .75rem; color: var(--text-secondary); margin-top: 4px; }
+.stat-card.primary .stat-value { color: var(--primary); }
+.stat-card.success .stat-value { color: var(--success); }
+.stat-card.warning .stat-value { color: var(--warning); }
+.stat-card.error .stat-value { color: var(--error); }
+.stat-card.missing .stat-value { color: var(--tag-missing); }
+.stat-card.duplicate .stat-value { color: var(--tag-duplicate); }
+
+/* Tags */
+.tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 4px; font-size: .7rem; font-weight: 600; }
+.tag-mixed { background: var(--tag-mixed-bg); color: var(--tag-mixed); }
+.tag-fx { background: var(--tag-fx-bg); color: var(--tag-fx); }
+.tag-duplicate { background: var(--tag-duplicate-bg); color: var(--tag-duplicate); }
+.tag-missing { background: var(--tag-missing-bg); color: var(--tag-missing); }
+
+/* Alert */
+.alert { padding: 12px 16px; border-radius: var(--radius); margin-bottom: 16px; font-size: .875rem; display: flex; align-items: center; gap: 8px; }
+.alert-error { background: #fce8e6; color: #c5221f; border-left: 4px solid var(--error); }
+.alert-warning { background: #fef7e0; color: #b06000; border-left: 4px solid var(--warning); }
+.alert-info { background: var(--primary-light); color: var(--primary); border-left: 4px solid var(--primary); }
+
+/* Tables */
+.table-wrap { overflow-x: auto; margin-top: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { background: var(--bg); font-weight: 600; color: var(--text-secondary); font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; position: sticky; top: 0; }
+tr:hover td { background: var(--primary-light); }
+.diff-positive { color: var(--error); font-weight: 600; }
+.diff-negative { color: var(--success); font-weight: 600; }
+
+/* Import */
+.import-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 16px; }
+.import-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+.import-card h3 { font-size: .9rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.import-card .status { font-size: .75rem; padding: 2px 8px; border-radius: 10px; }
+.status-loaded { background: #e6f4ea; color: var(--success); }
+.status-empty { background: #fce8e6; color: var(--error); }
+textarea { width: 100%; height: 120px; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; font-family: monospace; font-size: .8rem; resize: vertical; }
+.file-input-wrap { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+.file-input-wrap label { display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; background: var(--primary-light); color: var(--primary); border-radius: var(--radius); cursor: pointer; font-size: .8rem; font-weight: 500; transition: background .2s; }
+.file-input-wrap label:hover { background: #d2e3fc; }
+.file-input-wrap input[type="file"] { display: none; }
+.file-input-wrap span { font-size: .75rem; color: var(--text-secondary); }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 20px; border: none; border-radius: var(--radius); font-size: .875rem; font-weight: 500; cursor: pointer; transition: all .2s; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: #1557b0; }
+.btn-outline { background: var(--surface); color: var(--primary); border: 1px solid var(--primary); }
+.btn-outline:hover { background: var(--primary-light); }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: #2d9249; }
+.btn-sm { padding: 4px 12px; font-size: .75rem; }
+.btn-danger { background: var(--error); color: #fff; }
+.btn-demo { background: var(--warning); color: #fff; }
+.btn-demo:hover { background: #e09900; }
+
+/* Nav footer */
+.nav-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+/* Confirm actions */
+.confirm-actions { display: flex; gap: 6px; }
+.btn-confirm { padding: 3px 10px; font-size: .7rem; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; }
+.btn-confirmed { background: #e6f4ea; color: var(--success); }
+.btn-rejected { background: #fce8e6; color: var(--error); }
+.btn-pending { background: #f1f3f4; color: var(--text-secondary); }
+
+/* Step panels */
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
+.empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: .4; }
+
+/* Print */
+@media print {
+  .stepper, .nav-footer, .btn, .alert, .file-input-wrap, textarea, .import-grid { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #000; }
+  .step-panel { display: block !important; page-break-after: always; }
+  .app { padding: 0; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .import-grid { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .step-label { font-size: .65rem; }
+  .step-circle { width: 32px; height: 32px; font-size: .75rem; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>托管估值差异单</h1>
+
+  <div class="stepper" id="stepper"></div>
+
+  <div id="step-1" class="step-panel active">
+    <div class="stats" id="import-stats"></div>
+    <div id="import-alerts"></div>
+    <div style="margin-bottom:12px; display:flex; gap:8px;">
+      <button class="btn btn-demo" onclick="loadDemoData()">加载示例数据</button>
+      <button class="btn btn-outline" onclick="clearAllData()">清除所有数据</button>
+    </div>
+    <div class="import-grid" id="import-grid"></div>
+  </div>
+
+  <div id="step-2" class="step-panel">
+    <div class="stats" id="attribution-stats"></div>
+    <div id="attribution-alerts"></div>
+    <div class="card">
+      <div class="card-title">差异归因明细</div>
+      <div class="table-wrap"><table id="attribution-table"><thead></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+  <div id="step-3" class="step-panel">
+    <div class="stats" id="price-stats"></div>
+    <div id="price-alerts"></div>
+    <div class="card">
+      <div class="card-title">价格版本检查</div>
+      <div class="table-wrap"><table id="price-table"><thead></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+  <div id="step-4" class="step-panel">
+    <div class="stats" id="expense-stats"></div>
+    <div id="expense-alerts"></div>
+    <div class="card">
+      <div class="card-title">费用重算结果</div>
+      <div class="table-wrap"><table id="expense-table"><thead></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+  <div id="step-5" class="step-panel">
+    <div class="stats" id="confirm-stats"></div>
+    <div id="confirm-content"></div>
+  </div>
+
+  <div id="step-6" class="step-panel">
+    <div class="stats" id="export-stats"></div>
+    <div style="margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="exportCSV()">导出 CSV</button>
+      <button class="btn btn-primary" onclick="exportJSON()">导出 JSON</button>
+      <button class="btn btn-outline" onclick="window.print()">打印</button>
+    </div>
+    <div class="card">
+      <div class="card-title">差异汇总报告</div>
+      <div class="table-wrap"><table id="export-table"><thead></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="nav-footer">
+    <button class="btn btn-outline" id="btn-prev" onclick="prevStep()">上一步</button>
+    <button class="btn btn-primary" id="btn-next" onclick="nextStep()">下一步</button>
+  </div>
+</div>
+
+<script>
+const STEPS = [
+  { id: 1, label: '数据导入', icon: '1' },
+  { id: 2, label: '差异归因', icon: '2' },
+  { id: 3, label: '价格版本', icon: '3' },
+  { id: 4, label: '费用重算', icon: '4' },
+  { id: 5, label: '人工确认', icon: '5' },
+  { id: 6, label: '差异导出', icon: '6' }
+];
+
+const IMPORT_TYPES = [
+  { key: 'valuation', label: '估值表', icon: '📊', placeholder: '证券代码,证券名称,持仓数量,成本,市值\n600000,浦发银行,10000,120000.00,125000.00' },
+  { key: 'custodian', label: '托管回表', icon: '🏦', placeholder: '证券代码,证券名称,持仓数量,成本,市值\n600000,浦发银行,10000,120000.00,124800.00' },
+  { key: 'price', label: '价格源', icon: '💰', placeholder: '证券代码,价格源,价格,价格日期,价格时点\n600000,Wind,12.50,2025-05-27,收盘' },
+  { key: 'fx', label: '汇率', icon: '💱', placeholder: '货币对,汇率,汇率日期,汇率时点\nUSD/CNY,7.1100,2025-05-27,16:30' },
+  { key: 'expense', label: '费用计提', icon: '📋', placeholder: '费用科目,计提金额,计提日期,备注\n管理费,5000.00,2025-05-27,按1.5%年费率' }
+];
+
+const DEMO_DATA = {
+  valuation: `证券代码,证券名称,持仓数量,成本,市值
+600000,浦发银行,10000,120000.00,125000.00
+000001,平安银行,8000,96000.00,97600.00
+600036,招商银行,5000,185000.00,187500.00
+000858,五粮液,2000,160000.00,162000.00
+601318,中国平安,3000,138000.00,135000.00
+BABA,阿里巴巴,1000,85000.00,86200.00
+AAPL,苹果公司,500,88000.00,88500.00
+110025,兴业转债,5000,525000.00,527500.00
+123045,隆利转债,3000,294000.00,295800.00
+SH600519,贵州茅台,100,185000.00,186000.00`,
+  custodian: `证券代码,证券名称,持仓数量,成本,市值
+600000,浦发银行,10000,120000.00,124800.00
+000001,平安银行,8000,96000.00,97200.00
+600036,招商银行,5000,185000.00,187500.00
+000858,五粮液,2000,160000.00,162000.00
+601318,中国平安,3000,138000.00,136500.00
+BABA,阿里巴巴,1000,85000.00,85800.00
+AAPL,苹果公司,500,88000.00,88200.00
+110025,兴业转债,5000,525000.00,527500.00
+123045,隆利转债,3000,294000.00,296700.00`,
+  price: `证券代码,价格源,价格,价格日期,价格时点
+600000,Wind,12.50,2025-05-27,收盘
+000001,Wind,12.20,2025-05-27,收盘
+600036,Bloomberg,37.50,2025-05-27,收盘
+000858,Bloomberg,81.00,2025-05-27,收盘
+601318,Wind,45.00,2025-05-27,收盘
+BABA,Bloomberg,86.20,2025-05-27,收盘
+AAPL,Bloomberg,177.00,2025-05-27,收盘
+110025,Wind,105.50,2025-05-27,收盘
+123045,Wind,98.60,2025-05-27,收盘
+SH600519,Wind,1860.00,2025-05-27,收盘`,
+  fx: `货币对,汇率,汇率日期,汇率时点
+USD/CNY,7.1100,2025-05-27,16:30
+HKD/CNY,0.9080,2025-05-27,16:30
+EUR/CNY,7.7500,2025-05-27,16:30
+USD/CNY,7.0950,2025-05-27,09:30`,
+  expense: `费用科目,计提金额,计提日期,备注
+管理费,5000.00,2025-05-27,按1.5%年费率
+托管费,1666.67,2025-05-27,按0.5%年费率
+管理费,5000.00,2025-05-27,按1.5%年费率(重复)
+销售服务费,833.33,2025-05-27,按0.25%年费率
+利息支出,1200.00,2025-05-27,银行存款利息`
+};
+
+let currentStep = 1;
+let appData = {
+  valuation: [],
+  custodian: [],
+  price: [],
+  fx: [],
+  expense: []
+};
+let differences = [];
+let confirmStates = {};
+
+function init() {
+  renderStepper();
+  renderImportGrid();
+  updateImportStats();
+}
+
+function renderStepper() {
+  const el = document.getElementById('stepper');
+  el.innerHTML = STEPS.map(s => {
+    const cls = s.id < currentStep ? 'completed' : s.id === currentStep ? 'active' : '';
+    const circle = s.id < currentStep ? '✓' : s.icon;
+    return `<div class="step-item ${cls}" onclick="goToStep(${s.id})"><div class="step-circle">${circle}</div><div class="step-label">${s.label}</div></div>`;
+  }).join('');
+}
+
+function renderImportGrid() {
+  const grid = document.getElementById('import-grid');
+  grid.innerHTML = IMPORT_TYPES.map(t => `
+    <div class="import-card" id="import-card-${t.key}">
+      <h3>${t.icon} ${t.label} <span class="status status-empty" id="status-${t.key}">未加载</span></h3>
+      <div class="file-input-wrap">
+        <label>📁 上传CSV <input type="file" accept=".csv,.txt" onchange="handleFileUpload('${t.key}', this)"></label>
+        <span id="file-name-${t.key}">未选择文件</span>
+      </div>
+      <textarea id="textarea-${t.key}" placeholder="${t.placeholder}" oninput="handleTextareaInput('${t.key}')"></textarea>
+    </div>
+  `).join('');
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n').map(l => l.trim()).filter(l => l);
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim());
+  return lines.slice(1).map(line => {
+    const vals = line.split(',').map(v => v.trim());
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = vals[i] || ''; });
+    return obj;
+  });
+}
+
+function handleFileUpload(key, input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('file-name-' + key).textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('textarea-' + key).value = e.target.result;
+    loadImportData(key, e.target.result);
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function handleTextareaInput(key) {
+  const text = document.getElementById('textarea-' + key).value;
+  if (text.trim()) {
+    loadImportData(key, text);
+  } else {
+    appData[key] = [];
+    updateImportStatus(key);
+    updateImportStats();
+  }
+}
+
+function loadImportData(key, text) {
+  appData[key] = parseCSV(text);
+  updateImportStatus(key);
+  updateImportStats();
+}
+
+function updateImportStatus(key) {
+  const statusEl = document.getElementById('status-' + key);
+  if (appData[key].length > 0) {
+    statusEl.textContent = '已加载 (' + appData[key].length + '条)';
+    statusEl.className = 'status status-loaded';
+  } else {
+    statusEl.textContent = '未加载';
+    statusEl.className = 'status status-empty';
+  }
+}
+
+function updateImportStats() {
+  const el = document.getElementById('import-stats');
+  const items = IMPORT_TYPES.map(t => {
+    const count = appData[t.key].length;
+    return `<div class="stat-card ${count > 0 ? 'success' : 'error'}"><div class="stat-value">${count}</div><div class="stat-label">${t.label}记录数</div></div>`;
+  });
+  el.innerHTML = items.join('');
+}
+
+function loadDemoData() {
+  IMPORT_TYPES.forEach(t => {
+    document.getElementById('textarea-' + t.key).value = DEMO_DATA[t.key];
+    loadImportData(t.key, DEMO_DATA[t.key]);
+  });
+}
+
+function clearAllData() {
+  IMPORT_TYPES.forEach(t => {
+    document.getElementById('textarea-' + t.key).value = '';
+    appData[t.key] = [];
+    updateImportStatus(t.key);
+    document.getElementById('file-name-' + t.key).textContent = '未选择文件';
+  });
+  updateImportStats();
+  differences = [];
+  confirmStates = {};
+}
+
+function validateStep1() {
+  const alerts = [];
+  const required = ['valuation', 'custodian'];
+  required.forEach(k => {
+    if (appData[k].length === 0) {
+      const label = IMPORT_TYPES.find(t => t.key === k).label;
+      alerts.push({ type: 'error', msg: `缺少必需数据：${label}，请先导入后再继续` });
+    }
+  });
+  if (appData.price.length === 0) {
+    alerts.push({ type: 'warning', msg: '建议导入价格源数据以进行价格版本检查' });
+  }
+  if (appData.fx.length === 0) {
+    alerts.push({ type: 'warning', msg: '建议导入汇率数据以进行汇率时点检查' });
+  }
+  if (appData.expense.length === 0) {
+    alerts.push({ type: 'warning', msg: '建议导入费用计提数据以进行费用重算检查' });
+  }
+  return alerts;
+}
+
+function computeDifferences() {
+  differences = [];
+  const valMap = {};
+  appData.valuation.forEach(r => { valMap[r['证券代码']] = r; });
+  const cusMap = {};
+  appData.custodian.forEach(r => { cusMap[r['证券代码']] = r; });
+  const allCodes = new Set([...Object.keys(valMap), ...Object.keys(cusMap)]);
+
+  allCodes.forEach(code => {
+    const v = valMap[code];
+    const c = cusMap[code];
+    if (v && !c) {
+      differences.push({
+        id: 'missing-' + code,
+        code: code,
+        name: v['证券名称'] || '',
+        category: 'missing',
+        categoryLabel: '缺失数据',
+        field: '整体',
+        valuationValue: '全部字段',
+        custodianValue: '托管方无此证券',
+        diff: '-',
+        tags: ['missing']
+      });
+    } else if (!v && c) {
+      differences.push({
+        id: 'extra-' + code,
+        code: code,
+        name: c['证券名称'] || '',
+        category: 'missing',
+        categoryLabel: '缺失数据',
+        field: '整体',
+        valuationValue: '估值表无此证券',
+        custodianValue: '全部字段',
+        diff: '-',
+        tags: ['missing']
+      });
+    } else if (v && c) {
+      const mvDiff = parseFloat(v['市值'] || 0) - parseFloat(c['市值'] || 0);
+      if (Math.abs(mvDiff) > 0.001) {
+        differences.push({
+          id: 'mvdiff-' + code,
+          code: code,
+          name: v['证券名称'] || '',
+          category: 'price',
+          categoryLabel: '价格差异',
+          field: '市值',
+          valuationValue: parseFloat(v['市值'] || 0).toFixed(2),
+          custodianValue: parseFloat(c['市值'] || 0).toFixed(2),
+          diff: mvDiff.toFixed(2),
+          tags: ['price']
+        });
+      }
+      const qtyDiff = parseFloat(v['持仓数量'] || 0) - parseFloat(c['持仓数量'] || 0);
+      if (Math.abs(qtyDiff) > 0.001) {
+        differences.push({
+          id: 'qtydiff-' + code,
+          code: code,
+          name: v['证券名称'] || '',
+          category: 'quantity',
+          categoryLabel: '数量差异',
+          field: '持仓数量',
+          valuationValue: parseFloat(v['持仓数量'] || 0).toFixed(0),
+          custodianValue: parseFloat(c['持仓数量'] || 0).toFixed(0),
+          diff: qtyDiff.toFixed(0),
+          tags: ['quantity']
+        });
+      }
+      const costDiff = parseFloat(v['成本'] || 0) - parseFloat(c['成本'] || 0);
+      if (Math.abs(costDiff) > 0.001) {
+        differences.push({
+          id: 'costdiff-' + code,
+          code: code,
+          name: v['证券名称'] || '',
+          category: 'cost',
+          categoryLabel: '成本差异',
+          field: '成本',
+          valuationValue: parseFloat(v['成本'] || 0).toFixed(2),
+          custodianValue: parseFloat(c['成本'] || 0).toFixed(2),
+          diff: costDiff.toFixed(2),
+          tags: ['cost']
+        });
+      }
+    }
+  });
+
+  const sourceByCode = {};
+  appData.price.forEach(r => { sourceByCode[r['证券代码']] = r['价格源']; });
+  const allSources = new Set(Object.values(sourceByCode));
+  if (allSources.size > 1) {
+    differences.push({
+      id: 'mixed-portfolio',
+      code: '组合级别',
+      name: '组合价格源混用',
+      category: 'price',
+      categoryLabel: '价格差异',
+      field: '价格源',
+      valuationValue: [...allSources].join(' / '),
+      custodianValue: '混用',
+      diff: '-',
+      tags: ['mixed']
+    });
+  }
+  const valCodes = new Set(appData.valuation.map(r => r['证券代码']));
+  Object.keys(sourceByCode).forEach(code => {
+    if (valCodes.has(code)) {
+      const existing = differences.find(d => d.code === code && d.category === 'price');
+      if (existing) {
+        existing.tags = [...new Set([...existing.tags, 'mixed'])];
+      }
+    }
+  });
+
+  const fxMap = {};
+  appData.fx.forEach(r => {
+    const pair = r['货币对'];
+    if (!fxMap[pair]) fxMap[pair] = [];
+    fxMap[pair].push(r);
+  });
+  Object.keys(fxMap).forEach(pair => {
+    if (fxMap[pair].length > 1) {
+      const times = new Set(fxMap[pair].map(r => r['汇率时点']));
+      if (times.size > 1) {
+        differences.push({
+          id: 'fx-' + pair,
+          code: pair,
+          name: pair,
+          category: 'fx',
+          categoryLabel: '汇率差异',
+          field: '汇率',
+          valuationValue: fxMap[pair].map(r => r['汇率'] + '(' + r['汇率时点'] + ')').join(' / '),
+          custodianValue: '多时点',
+          diff: (parseFloat(fxMap[pair][0]['汇率']) - parseFloat(fxMap[pair][1]['汇率'])).toFixed(4),
+          tags: ['fx']
+        });
+      }
+    }
+  });
+
+  const expMap = {};
+  appData.expense.forEach(r => {
+    const key = r['费用科目'];
+    if (!expMap[key]) expMap[key] = [];
+    expMap[key].push(r);
+  });
+  Object.keys(expMap).forEach(key => {
+    if (expMap[key].length > 1) {
+      differences.push({
+        id: 'dup-' + key,
+        code: key,
+        name: key,
+        category: 'expense',
+        categoryLabel: '费用差异',
+        field: '费用计提',
+        valuationValue: expMap[key].map(r => r['计提金额']).join(' / '),
+        custodianValue: '重复计提',
+        diff: expMap[key].reduce((s, r) => s + parseFloat(r['计提金额'] || 0), 0).toFixed(2),
+        tags: ['duplicate']
+      });
+    }
+  });
+
+  differences.forEach(d => {
+    if (!confirmStates[d.id]) confirmStates[d.id] = 'pending';
+  });
+}
+
+function renderStep2() {
+  computeDifferences();
+  const el = document.getElementById('attribution-stats');
+  const cats = {};
+  differences.forEach(d => { cats[d.category] = (cats[d.category] || 0) + 1; });
+  const catNames = { price: '价格差异', fx: '汇率差异', expense: '费用差异', quantity: '数量差异', missing: '缺失数据', cost: '成本差异' };
+  const catColors = { price: 'warning', fx: 'error', expense: 'duplicate', quantity: 'primary', missing: 'missing', cost: 'primary' };
+  el.innerHTML = `<div class="stat-card error"><div class="stat-value">${differences.length}</div><div class="stat-label">差异总数</div></div>` +
+    Object.keys(cats).map(c => `<div class="stat-card ${catColors[c] || 'primary'}"><div class="stat-value">${cats[c]}</div><div class="stat-label">${catNames[c] || c}</div></div>`).join('');
+
+  const alertsEl = document.getElementById('attribution-alerts');
+  let alertHTML = '';
+  if (differences.length === 0) {
+    alertHTML = '<div class="alert alert-info">暂无差异，估值与托管数据一致。</div>';
+  } else {
+    const missingCount = differences.filter(d => d.category === 'missing').length;
+    const fxCount = differences.filter(d => d.category === 'fx').length;
+    if (missingCount > 0) alertHTML += '<div class="alert alert-error">发现 ' + missingCount + ' 条缺失数据差异，请重点关注！</div>';
+    if (fxCount > 0) alertHTML += '<div class="alert alert-warning">发现 ' + fxCount + ' 条汇率时点差异，请核实汇率取值时点。</div>';
+  }
+  alertsEl.innerHTML = alertHTML;
+
+  const table = document.getElementById('attribution-table');
+  table.querySelector('thead').innerHTML = '<tr><th>证券代码</th><th>证券名称</th><th>差异类型</th><th>字段</th><th>估值表值</th><th>托管回表值</th><th>差异金额</th><th>标签</th></tr>';
+  const catTagMap = { price: 'tag-mixed', fx: 'tag-fx', expense: 'tag-duplicate', missing: 'tag-missing', quantity: 'tag-mixed', cost: 'tag-mixed' };
+  const tagLabelMap = { mixed: '混用价格源', fx: '汇率时点', duplicate: '重复计提', missing: '缺失数据', price: '价格差异', quantity: '数量差异', cost: '成本差异' };
+  table.querySelector('tbody').innerHTML = differences.map(d => {
+    const diffCls = parseFloat(d.diff) > 0 ? 'diff-positive' : parseFloat(d.diff) < 0 ? 'diff-negative' : '';
+    const tags = d.tags.map(t => `<span class="tag ${catTagMap[d.category] || 'tag-mixed'}">${tagLabelMap[t] || t}</span>`).join(' ');
+    return `<tr><td>${d.code}</td><td>${d.name}</td><td>${d.categoryLabel}</td><td>${d.field}</td><td>${d.valuationValue}</td><td>${d.custodianValue}</td><td class="${diffCls}">${d.diff}</td><td>${tags}</td></tr>`;
+  }).join('');
+}
+
+function renderStep3() {
+  computeDifferences();
+  const priceIssues = differences.filter(d => d.category === 'price');
+  const fxIssues = differences.filter(d => d.category === 'fx');
+  const mixedCount = differences.filter(d => d.tags.includes('mixed')).length;
+  const fxCodingCount = fxIssues.length;
+
+  const sourceByCode = {};
+  appData.price.forEach(r => { sourceByCode[r['证券代码']] = { source: r['价格源'], price: r['价格'], date: r['价格日期'], time: r['价格时点'] }; });
+
+  const el = document.getElementById('price-stats');
+  el.innerHTML = `
+    <div class="stat-card warning"><div class="stat-value">${priceIssues.length}</div><div class="stat-label">价格差异项</div></div>
+    <div class="stat-card warning"><div class="stat-value">${mixedCount}</div><div class="stat-label">混用价格源</div></div>
+    <div class="stat-card error"><div class="stat-value">${fxCodingCount}</div><div class="stat-label">汇率时点异常</div></div>
+    <div class="stat-card primary"><div class="stat-value">${Object.keys(sourceByCode).length}</div><div class="stat-label">价格源记录</div></div>
+  `;
+
+  const alertsEl = document.getElementById('price-alerts');
+  let alertHTML = '';
+  if (mixedCount > 0) alertHTML += '<div class="alert alert-warning">⚠ 检测到混用价格源：本组合中部分证券使用Wind，部分使用Bloomberg，混用价格源可能引起估值偏差。</div>';
+  if (fxCodingCount > 0) alertHTML += '<div class="alert alert-error">⚠ 检测到汇率时点异常：同一货币对存在多个时点汇率，请确认使用哪个时点的汇率。</div>';
+  alertsEl.innerHTML = alertHTML;
+
+  const table = document.getElementById('price-table');
+  table.querySelector('thead').innerHTML = '<tr><th>证券代码</th><th>价格源</th><th>价格</th><th>价格日期</th><th>价格时点</th><th>标签</th></tr>';
+  const allSources = new Set(Object.values(sourceByCode).map(s => s.source));
+  let rows = Object.keys(sourceByCode).map(code => {
+    const s = sourceByCode[code];
+    const tagHTML = allSources.size > 1 ? '<span class="tag tag-mixed">混用价格源</span>' : '';
+    return `<tr><td>${code}</td><td>${s.source}</td><td>${s.price}</td><td>${s.date}</td><td>${s.time}</td><td>${tagHTML}</td></tr>`;
+  }).join('');
+
+  if (fxCodingCount > 0) {
+    const fxMap = {};
+    appData.fx.forEach(r => {
+      const pair = r['货币对'];
+      if (!fxMap[pair]) fxMap[pair] = [];
+      fxMap[pair].push(r);
+    });
+    Object.keys(fxMap).forEach(pair => {
+      if (fxMap[pair].length > 1) {
+        const times = new Set(fxMap[pair].map(r => r['汇率时点']));
+        if (times.size > 1) {
+          fxMap[pair].forEach(r => {
+            rows += `<tr style="background:#fce8e6"><td>${pair}</td><td>汇率</td><td>${r['汇率']}</td><td>${r['汇率日期']}</td><td>${r['汇率时点']}</td><td><span class="tag tag-fx">汇率时点异常</span></td></tr>`;
+          });
+        }
+      }
+    });
+  }
+
+  table.querySelector('tbody').innerHTML = rows || '<tr><td colspan="6" style="text-align:center;color:var(--text-secondary)">无价格版本数据</td></tr>';
+}
+
+function renderStep4() {
+  computeDifferences();
+  const expIssues = differences.filter(d => d.category === 'expense');
+  const dupCount = expIssues.filter(d => d.tags.includes('duplicate')).length;
+
+  const el = document.getElementById('expense-stats');
+  const normalCount = appData.expense.length - expIssues.reduce((s, d) => {
+    const cnt = appData.expense.filter(r => r['费用科目'] === d.code).length;
+    return s + (cnt > 1 ? cnt - 1 : 0);
+  }, 0);
+  el.innerHTML = `
+    <div class="stat-card duplicate"><div class="stat-value">${appData.expense.length}</div><div class="stat-label">费用记录总数</div></div>
+    <div class="stat-card duplicate"><div class="stat-value">${dupCount}</div><div class="stat-label">重复计提项</div></div>
+    <div class="stat-card success"><div class="stat-value">${normalCount}</div><div class="stat-label">正常费用项</div></div>
+  `;
+
+  const alertsEl = document.getElementById('expense-alerts');
+  let alertHTML = '';
+  if (dupCount > 0) alertHTML += '<div class="alert alert-warning" style="background:var(--tag-duplicate-bg);color:var(--tag-duplicate);border-left-color:var(--tag-duplicate)">⚠ 检测到重复费用计提：部分费用科目在同日出现多次计提，请核实是否为误操作。</div>';
+  alertsEl.innerHTML = alertHTML;
+
+  const expMap = {};
+  appData.expense.forEach(r => {
+    const key = r['费用科目'];
+    if (!expMap[key]) expMap[key] = [];
+    expMap[key].push(r);
+  });
+
+  const table = document.getElementById('expense-table');
+  table.querySelector('thead').innerHTML = '<tr><th>费用科目</th><th>计提金额</th><th>计提日期</th><th>备注</th><th>状态</th><th>标签</th></tr>';
+  let rows = '';
+  Object.keys(expMap).forEach(key => {
+    const isDup = expMap[key].length > 1;
+    expMap[key].forEach((r, idx) => {
+      const status = isDup ? (idx === 0 ? '保留（首次计提）' : '重复计提') : '正常';
+      const tagHTML = isDup ? (idx === 0 ? '<span class="tag tag-mixed">首次计提</span>' : '<span class="tag tag-duplicate">重复计提</span>') : '<span class="tag" style="background:#e6f4ea;color:var(--success)">正常</span>';
+      rows += `<tr><td>${r['费用科目']}</td><td>${parseFloat(r['计提金额']).toFixed(2)}</td><td>${r['计提日期']}</td><td>${r['备注']}</td><td>${status}</td><td>${tagHTML}</td></tr>`;
+    });
+  });
+  table.querySelector('tbody').innerHTML = rows || '<tr><td colspan="6" style="text-align:center;color:var(--text-secondary)">无费用数据</td></tr>';
+}
+
+function renderStep5() {
+  computeDifferences();
+  const confirmed = Object.values(confirmStates).filter(s => s === 'confirmed').length;
+  const rejected = Object.values(confirmStates).filter(s => s === 'rejected').length;
+  const pending = Object.values(confirmStates).filter(s => s === 'pending').length;
+
+  const el = document.getElementById('confirm-stats');
+  el.innerHTML = `
+    <div class="stat-card primary"><div class="stat-value">${differences.length}</div><div class="stat-label">差异总数</div></div>
+    <div class="stat-card success"><div class="stat-value">${confirmed}</div><div class="stat-label">已确认</div></div>
+    <div class="stat-card error"><div class="stat-value">${rejected}</div><div class="stat-label">已驳回</div></div>
+    <div class="stat-card warning"><div class="stat-value">${pending}</div><div class="stat-label">待处理</div></div>
+  `;
+
+  const content = document.getElementById('confirm-content');
+  let html = '';
+  const catTagMap = { price: 'tag-mixed', fx: 'tag-fx', expense: 'tag-duplicate', missing: 'tag-missing', quantity: 'tag-mixed', cost: 'tag-mixed' };
+  const tagLabelMap = { mixed: '混用价格源', fx: '汇率时点', duplicate: '重复计提', missing: '缺失数据', price: '价格差异', quantity: '数量差异', cost: '成本差异' };
+
+  differences.forEach(d => {
+    const state = confirmStates[d.id] || 'pending';
+    const tags = d.tags.map(t => `<span class="tag ${catTagMap[d.category] || 'tag-mixed'}">${tagLabelMap[t] || t}</span>`).join(' ');
+    const diffCls = parseFloat(d.diff) > 0 ? 'diff-positive' : parseFloat(d.diff) < 0 ? 'diff-negative' : '';
+    const confirmedCls = state === 'confirmed' ? 'btn-confirmed' : state === 'rejected' ? 'btn-rejected' : 'btn-pending';
+    html += `
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div>
+            <strong>${d.code}</strong> - ${d.name} &nbsp; ${tags}
+          </div>
+          <div class="confirm-actions">
+            <button class="btn-confirm ${state === 'confirmed' ? 'btn-confirmed' : 'btn-pending'}" onclick="setConfirm('${d.id}','confirmed')">确认</button>
+            <button class="btn-confirm ${state === 'rejected' ? 'btn-rejected' : 'btn-pending'}" onclick="setConfirm('${d.id}','rejected')">驳回</button>
+            <button class="btn-confirm btn-pending" onclick="setConfirm('${d.id}','pending')">重置</button>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:.85rem;color:var(--text-secondary)">
+          类型：${d.categoryLabel} | 字段：${d.field} | 估值方：${d.valuationValue} | 托管方：${d.custodianValue} | 差异：<span class="${diffCls}">${d.diff}</span>
+          &nbsp; 状态：<span class="tag ${state === 'confirmed' ? 'tag-mixed' : state === 'rejected' ? 'tag-fx' : ''}" style="${state === 'pending' ? 'background:#f1f3f4;color:var(--text-secondary)' : ''}">${state === 'confirmed' ? '已确认' : state === 'rejected' ? '已驳回' : '待处理'}</span>
+        </div>
+      </div>
+    `;
+  });
+
+  if (differences.length === 0) {
+    html = '<div class="empty-state"><p>无差异需要确认</p></div>';
+  }
+
+  html += `<div style="margin-top:16px;display:flex;gap:8px">
+    <button class="btn btn-success btn-sm" onclick="confirmAll('confirmed')">全部确认</button>
+    <button class="btn btn-danger btn-sm" onclick="confirmAll('rejected')">全部驳回</button>
+    <button class="btn btn-outline btn-sm" onclick="confirmAll('pending')">全部重置</button>
+  </div>`;
+  content.innerHTML = html;
+}
+
+function setConfirm(id, state) {
+  confirmStates[id] = state;
+  renderStep5();
+}
+
+function confirmAll(state) {
+  differences.forEach(d => { confirmStates[d.id] = state; });
+  renderStep5();
+}
+
+function renderStep6() {
+  computeDifferences();
+  const confirmed = Object.values(confirmStates).filter(s => s === 'confirmed').length;
+  const rejected = Object.values(confirmStates).filter(s => s === 'rejected').length;
+  const pending = Object.values(confirmStates).filter(s => s === 'pending').length;
+
+  const el = document.getElementById('export-stats');
+  el.innerHTML = `
+    <div class="stat-card primary"><div class="stat-value">${differences.length}</div><div class="stat-label">差异总数</div></div>
+    <div class="stat-card success"><div class="stat-value">${confirmed}</div><div class="stat-label">已确认</div></div>
+    <div class="stat-card error"><div class="stat-value">${rejected}</div><div class="stat-label">已驳回</div></div>
+    <div class="stat-card warning"><div class="stat-value">${pending}</div><div class="stat-label">待处理</div></div>
+  `;
+
+  const table = document.getElementById('export-table');
+  table.querySelector('thead').innerHTML = '<tr><th>序号</th><th>证券代码</th><th>名称</th><th>差异类型</th><th>字段</th><th>估值方</th><th>托管方</th><th>差异</th><th>确认状态</th></tr>';
+  const stateLabels = { confirmed: '已确认', rejected: '已驳回', pending: '待处理' };
+  table.querySelector('tbody').innerHTML = differences.map((d, i) => {
+    const state = confirmStates[d.id] || 'pending';
+    const diffCls = parseFloat(d.diff) > 0 ? 'diff-positive' : parseFloat(d.diff) < 0 ? 'diff-negative' : '';
+    return `<tr><td>${i + 1}</td><td>${d.code}</td><td>${d.name}</td><td>${d.categoryLabel}</td><td>${d.field}</td><td>${d.valuationValue}</td><td>${d.custodianValue}</td><td class="${diffCls}">${d.diff}</td><td>${stateLabels[state]}</td></tr>`;
+  }).join('');
+}
+
+function goToStep(step) {
+  if (step < 1 || step > 6) return;
+  if (step > 1 && appData.valuation.length === 0 && appData.custodian.length === 0) return;
+
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('step-' + step).classList.add('active');
+  currentStep = step;
+  renderStepper();
+
+  if (step === 1) { updateImportStats(); }
+  else if (step === 2) { renderStep2(); }
+  else if (step === 3) { renderStep3(); }
+  else if (step === 4) { renderStep4(); }
+  else if (step === 5) { renderStep5(); }
+  else if (step === 6) { renderStep6(); }
+
+  document.getElementById('btn-prev').style.visibility = step === 1 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').textContent = step === 6 ? '完成' : '下一步';
+  document.getElementById('btn-next').style.display = step === 6 ? 'none' : 'inline-flex';
+}
+
+function nextStep() {
+  if (currentStep === 1) {
+    const alerts = validateStep1();
+    const hasError = alerts.some(a => a.type === 'error');
+    if (hasError) {
+      const el = document.getElementById('import-alerts');
+      el.innerHTML = alerts.map(a => `<div class="alert alert-${a.type === 'error' ? 'error' : 'warning'}">${a.type === 'error' ? '❌' : '⚠'} ${a.msg}</div>`).join('');
+      return;
+    }
+    document.getElementById('import-alerts').innerHTML = '';
+  }
+  if (currentStep < 6) goToStep(currentStep + 1);
+}
+
+function prevStep() {
+  if (currentStep > 1) goToStep(currentStep - 1);
+}
+
+function getExportData() {
+  computeDifferences();
+  const stateLabels = { confirmed: '已确认', rejected: '已驳回', pending: '待处理' };
+  return differences.map((d, i) => ({
+    序号: i + 1,
+    证券代码: d.code,
+    名称: d.name,
+    差异类型: d.categoryLabel,
+    字段: d.field,
+    估值方: d.valuationValue,
+    托管方: d.custodianValue,
+    差异: d.diff,
+    确认状态: stateLabels[confirmStates[d.id]] || '待处理'
+  }));
+}
+
+function exportCSV() {
+  const data = getExportData();
+  if (data.length === 0) { alert('无数据可导出'); return; }
+  const headers = Object.keys(data[0]);
+  const BOM = '\uFEFF';
+  let csv = BOM + headers.join(',') + '\n';
+  data.forEach(row => {
+    csv += headers.map(h => '"' + String(row[h]).replace(/"/g, '""') + '"').join(',') + '\n';
+  });
+  downloadFile(csv, '托管估值差异单_' + getDateStr() + '.csv', 'text/csv;charset=utf-8');
+}
+
+function exportJSON() {
+  const data = getExportData();
+  if (data.length === 0) { alert('无数据可导出'); return; }
+  const json = JSON.stringify({ exportDate: new Date().toISOString(), totalDifferences: data.length, differences: data }, null, 2);
+  downloadFile(json, '托管估值差异单_' + getDateStr() + '.json', 'application/json');
+}
+
+function downloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function getDateStr() {
+  const d = new Date();
+  return d.getFullYear() + '' + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+}
+
+init();
+</script>
+</body>
+</html>
