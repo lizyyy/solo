@@ -22,10 +22,6 @@ router.post('/import/rental-csv', upload.single('file'), RentalController.import
 router.post('/import/repair-json', RentalController.importRepairJSON);
 router.post('/import/deposit-rules', RentalController.importDepositRules);
 
-router.post('/:id/process', RentalController.processRental);
-router.post('/:id/return', RentalController.returnForModification);
-router.get('/:id/details', RentalController.getRentalDetails);
-
 router.get('/search', RentalController.searchRentals);
 router.get('/export', RentalController.exportRentals);
 
@@ -38,5 +34,9 @@ router.post('/exceptions/:id/resolve', RentalController.resolveException);
 router.get('/deposit-rules', RentalController.getDepositRules);
 router.get('/repairs', RentalController.getRepairRecords);
 router.get('/operation-logs', RentalController.getOperationLogs);
+
+router.post('/:id/process', RentalController.processRental);
+router.post('/:id/return', RentalController.returnForModification);
+router.get('/:id/details', RentalController.getRentalDetails);
 
 module.exports = router;

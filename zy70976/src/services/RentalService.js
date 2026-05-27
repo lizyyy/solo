@@ -26,6 +26,7 @@ class RentalService {
                 customer_phone: row.customer_phone,
                 rental_start_date: row.rental_start_date,
                 rental_end_date: row.rental_end_date,
+                actual_return_date: row.actual_return_date || null,
                 daily_rate: parseFloat(row.daily_rate) || 0,
                 deposit_amount: parseFloat(row.deposit_amount) || 0,
                 deposit_flow_id: row.deposit_flow_id,
@@ -50,8 +51,17 @@ class RentalService {
   static async importRepairJSON(data) {
     const createdIds = [];
     for (const repair of data.repairs) {
+      let rentalId = repair.rental_id || null;
+
+      if (!rentalId && repair.device_serial) {
+        const rentals = await RentalModel.findByDeviceSerial(repair.device_serial);
+        if (rentals && rentals.length > 0) {
+          rentalId = rentals[0].id;
+        }
+      }
+
       const id = await RepairModel.create({
-        rental_id: repair.rental_id || null,
+        rental_id: rentalId,
         device_serial: repair.device_serial,
         repair_type: repair.repair_type,
         repair_description: repair.repair_description,
@@ -63,15 +73,15 @@ class RentalService {
       });
       createdIds.push(id);
 
-      if (repair.rental_id && repair.is_customer_fault) {
-        const rental = await RentalModel.findById(repair.rental_id);
+      if (rentalId && repair.is_customer_fault) {
+        const rental = await RentalModel.findById(rentalId);
         if (rental) {
-          await RentalModel.update(repair.rental_id, {
+          await RentalModel.update(rentalId, {
             repair_fee: (rental.repair_fee || 0) + parseFloat(repair.repair_cost),
             has_repair: 1
           });
           await ExceptionModel.create({
-            rental_id: repair.rental_id,
+            rental_id: rentalId,
             exception_type: 'repair_liability',
             description: `客户责任维修: ${repair.repair_description}`,
             amount: parseFloat(repair.repair_cost)

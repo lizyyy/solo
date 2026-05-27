@@ -6,14 +6,16 @@ class RentalModel {
       const sql = `
         INSERT INTO rental_records 
         (batch_id, device_serial, device_name, customer_name, customer_phone, 
-         rental_start_date, rental_end_date, daily_rate, deposit_amount, 
-         deposit_flow_id, total_rental_fee, actual_payment, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         rental_start_date, rental_end_date, actual_return_date, 
+         daily_rate, deposit_amount, deposit_flow_id, total_rental_fee, 
+         actual_payment, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
       const params = [
         data.batch_id, data.device_serial, data.device_name, 
         data.customer_name, data.customer_phone,
         data.rental_start_date, data.rental_end_date, 
+        data.actual_return_date || null,
         data.daily_rate, data.deposit_amount,
         data.deposit_flow_id, data.total_rental_fee, 
         data.actual_payment, data.status || 'pending'
