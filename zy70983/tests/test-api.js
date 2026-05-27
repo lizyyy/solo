@@ -1,7 +1,7 @@
 const http = require('http');
 
 const BASE_URL = 'localhost';
-const PORT = 3000;
+const PORT = 8080;
 
 function makeRequest(method, path, data = null) {
   return new Promise((resolve, reject) => {

@@ -1,17 +1,33 @@
 const crypto = require('crypto');
-const { getDb } = require('./database');
+const { prepare } = require('./database');
 
 const REQUIRED_FIELDS = ['record_no', 'streetlight_id'];
 const TASK_STATUSES = ['processing', 'failed', 'manual_confirm', 'exported'];
 
+function deepSort(obj) {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) {
+    return obj.map(deepSort);
+  }
+  if (typeof obj === 'object') {
+    const sorted = {};
+    const keys = Object.keys(obj).sort();
+    for (const key of keys) {
+      sorted[key] = deepSort(obj[key]);
+    }
+    return sorted;
+  }
+  return obj;
+}
+
 function calculateMaterialHash(material) {
-  const sortedData = JSON.stringify(material, Object.keys(material).sort());
+  const sortedMaterial = deepSort(material);
+  const sortedData = JSON.stringify(sortedMaterial);
   return crypto.createHash('sha256').update(sortedData).digest('hex');
 }
 
 function findDuplicateTask(hash) {
-  const db = getDb();
-  return db.prepare('SELECT * FROM tasks WHERE material_hash = ?').get(hash);
+  return prepare('SELECT * FROM tasks WHERE material_hash = ?').get(hash);
 }
 
 function generateTaskId() {
@@ -83,7 +99,6 @@ function checkMapLocations(record) {
 }
 
 function processMaterial(taskId, material) {
-  const db = getDb();
   const records = material.records || [];
   const allErrors = [];
   const validRecords = [];
@@ -102,7 +117,7 @@ function processMaterial(taskId, material) {
     }
   });
 
-  const insertRecord = db.prepare(`
+  const insertRecord = prepare(`
     INSERT INTO records (
       task_id, record_no, streetlight_id, alarm_time, alarm_level, alarm_type,
       patrol_time, patrol_person, patrol_issue, repair_time, repair_person, repair_result,
@@ -110,37 +125,33 @@ function processMaterial(taskId, material) {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  const insertError = db.prepare(`
+  const insertError = prepare(`
     INSERT INTO errors (task_id, record_index, error_type, error_field, error_message, raw_data, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
 
   const now = Date.now();
 
-  const insertMany = db.transaction(() => {
-    for (const rec of validRecords) {
-      insertRecord.run(
-        taskId, rec.record_no, rec.streetlight_id,
-        rec.alarm_time || null, rec.alarm_level || null, rec.alarm_type || null,
-        rec.patrol_time || null, rec.patrol_person || null, rec.patrol_issue || null,
-        rec.repair_time || null, rec.repair_person || null, rec.repair_result || null,
-        rec.alarm_on_map, rec.patrol_on_map, rec.repair_on_map, 1, now
-      );
-    }
+  for (const rec of validRecords) {
+    insertRecord.run(
+      taskId, rec.record_no, rec.streetlight_id,
+      rec.alarm_time || null, rec.alarm_level || null, rec.alarm_type || null,
+      rec.patrol_time || null, rec.patrol_person || null, rec.patrol_issue || null,
+      rec.repair_time || null, rec.repair_person || null, rec.repair_result || null,
+      rec.alarm_on_map, rec.patrol_on_map, rec.repair_on_map, 1, now
+    );
+  }
 
-    for (const err of allErrors) {
-      insertError.run(
-        taskId, err.record_index, err.error_type,
-        err.error_field, err.error_message, err.raw_data, now
-      );
-    }
-  });
-
-  insertMany();
+  for (const err of allErrors) {
+    insertError.run(
+      taskId, err.record_index, err.error_type,
+      err.error_field, err.error_message, err.raw_data, now
+    );
+  }
 
   const status = allErrors.length > 0 ? 'manual_confirm' : 'processing';
   
-  db.prepare(`
+  prepare(`
     UPDATE tasks 
     SET status = ?, total_records = ?, valid_records = ?, error_records = ?
     WHERE id = ?
@@ -156,7 +167,6 @@ function processMaterial(taskId, material) {
 }
 
 function createTask(material, handlerId = 'h001') {
-  const db = getDb();
   const hash = calculateMaterialHash(material);
   
   const existingTask = findDuplicateTask(hash);
@@ -170,7 +180,7 @@ function createTask(material, handlerId = 'h001') {
   const taskId = generateTaskId();
   const now = Date.now();
 
-  db.prepare(`
+  prepare(`
     INSERT INTO tasks (id, material_hash, status, submit_time, last_handler, raw_material)
     VALUES (?, ?, 'processing', ?, ?, ?)
   `).run(taskId, hash, now, handlerId, JSON.stringify(material));
@@ -187,14 +197,13 @@ function createTask(material, handlerId = 'h001') {
 }
 
 function getTaskById(taskId) {
-  const db = getDb();
-  const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId);
+  const task = prepare('SELECT * FROM tasks WHERE id = ?').get(taskId);
   if (!task) return null;
 
-  const records = db.prepare('SELECT * FROM records WHERE task_id = ?').all(taskId);
-  const errors = db.prepare('SELECT * FROM errors WHERE task_id = ?').all(taskId);
+  const records = prepare('SELECT * FROM records WHERE task_id = ?').all(taskId);
+  const errors = prepare('SELECT * FROM errors WHERE task_id = ?').all(taskId);
   const handler = task.last_handler 
-    ? db.prepare('SELECT name, department FROM handlers WHERE id = ?').get(task.last_handler)
+    ? prepare('SELECT name, department FROM handlers WHERE id = ?').get(task.last_handler)
     : null;
 
   return {
@@ -206,7 +215,6 @@ function getTaskById(taskId) {
 }
 
 function getTaskList(status = null, limit = 50, offset = 0) {
-  const db = getDb();
   let query = 'SELECT * FROM tasks';
   let params = [];
 
@@ -218,7 +226,7 @@ function getTaskList(status = null, limit = 50, offset = 0) {
   query += ' ORDER BY submit_time DESC LIMIT ? OFFSET ?';
   params.push(limit, offset);
 
-  const tasks = db.prepare(query).all(...params);
+  const tasks = prepare(query).all(...params);
   
   return tasks.map(task => ({
     id: task.id,
@@ -232,8 +240,7 @@ function getTaskList(status = null, limit = 50, offset = 0) {
 }
 
 function getStatistics() {
-  const db = getDb();
-  const result = db.prepare(`
+  const result = prepare(`
     SELECT 
       COUNT(*) as total_tasks,
       SUM(CASE WHEN status = 'processing' THEN 1 ELSE 0 END) as processing,
@@ -250,14 +257,13 @@ function getStatistics() {
 }
 
 function exportTask(taskId, handlerId = 'h001') {
-  const db = getDb();
-  const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId);
+  const task = prepare('SELECT * FROM tasks WHERE id = ?').get(taskId);
   
   if (!task) {
     throw new Error('任务不存在');
   }
 
-  const records = db.prepare(`
+  const records = prepare(`
     SELECT 
       r.*,
       h.name as handler_name,
@@ -297,7 +303,7 @@ function exportTask(taskId, handlerId = 'h001') {
   }));
 
   const now = Date.now();
-  db.prepare(`
+  prepare(`
     UPDATE tasks SET status = 'exported', export_time = ?, last_handler = ? WHERE id = ?
   `).run(now, handlerId, taskId);
 
@@ -310,13 +316,11 @@ function exportTask(taskId, handlerId = 'h001') {
 }
 
 function updateTaskStatus(taskId, status, handlerId = 'h001') {
-  const db = getDb();
-  
   if (!TASK_STATUSES.includes(status)) {
     throw new Error('无效的状态值');
   }
 
-  const result = db.prepare(`
+  const result = prepare(`
     UPDATE tasks SET status = ?, last_handler = ? WHERE id = ?
   `).run(status, handlerId, taskId);
 

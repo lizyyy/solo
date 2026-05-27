@@ -12,7 +12,7 @@ const {
 } = require('./processor');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -250,12 +250,20 @@ app.use((req, res) => {
   });
 });
 
-initDatabase();
+async function startServer() {
+  try {
+    await initDatabase();
+    app.listen(PORT, () => {
+      console.log(`智慧路灯故障派修 API 服务已启动`);
+      console.log(`服务地址: http://localhost:${PORT}`);
+      console.log(`健康检查: http://localhost:${PORT}/health`);
+    });
+  } catch (error) {
+    console.error('启动服务失败:', error);
+    process.exit(1);
+  }
+}
 
-app.listen(PORT, () => {
-  console.log(`智慧路灯故障派修 API 服务已启动`);
-  console.log(`服务地址: http://localhost:${PORT}`);
-  console.log(`健康检查: http://localhost:${PORT}/health`);
-});
+startServer();
 
 module.exports = app;

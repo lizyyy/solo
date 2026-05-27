@@ -1,13 +1,25 @@
-const Database = require('better-sqlite3');
+const initSqlJs = require('sql.js');
+const fs = require('fs');
 const path = require('path');
 
+let db = null;
+let SQL = null;
 const dbPath = path.join(__dirname, '..', 'streetlight_repair.db');
-const db = new Database(dbPath);
 
-db.pragma('journal_mode = WAL');
+async function initDatabase() {
+  if (db) return db;
 
-function initDatabase() {
-  db.exec(`
+  SQL = await initSqlJs();
+
+  let dbData = null;
+  if (fs.existsSync(dbPath)) {
+    dbData = fs.readFileSync(dbPath);
+    db = new SQL.Database(dbData);
+  } else {
+    db = new SQL.Database();
+  }
+
+  db.run(`
     CREATE TABLE IF NOT EXISTS tasks (
       id TEXT PRIMARY KEY,
       material_hash TEXT UNIQUE NOT NULL,
@@ -21,7 +33,9 @@ function initDatabase() {
       export_time INTEGER,
       FOREIGN KEY (last_handler) REFERENCES handlers(id)
     );
+  `);
 
+  db.run(`
     CREATE TABLE IF NOT EXISTS records (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       task_id TEXT NOT NULL,
@@ -43,7 +57,9 @@ function initDatabase() {
       created_at INTEGER NOT NULL,
       FOREIGN KEY (task_id) REFERENCES tasks(id)
     );
+  `);
 
+  db.run(`
     CREATE TABLE IF NOT EXISTS errors (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       task_id TEXT NOT NULL,
@@ -55,27 +71,39 @@ function initDatabase() {
       created_at INTEGER NOT NULL,
       FOREIGN KEY (task_id) REFERENCES tasks(id)
     );
+  `);
 
+  db.run(`
     CREATE TABLE IF NOT EXISTS handlers (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       department TEXT,
       created_at INTEGER NOT NULL
     );
-
-    CREATE INDEX IF NOT EXISTS idx_tasks_hash ON tasks(material_hash);
-    CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
-    CREATE INDEX IF NOT EXISTS idx_records_task ON records(task_id);
-    CREATE INDEX IF NOT EXISTS idx_errors_task ON errors(task_id);
   `);
 
-  const handlerCount = db.prepare('SELECT COUNT(*) as count FROM handlers').get().count;
+  db.run('CREATE INDEX IF NOT EXISTS idx_tasks_hash ON tasks(material_hash)');
+  db.run('CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status)');
+  db.run('CREATE INDEX IF NOT EXISTS idx_records_task ON records(task_id)');
+  db.run('CREATE INDEX IF NOT EXISTS idx_errors_task ON errors(task_id)');
+
+  const handlerCount = db.exec('SELECT COUNT(*) as count FROM handlers')[0].values[0][0];
   if (handlerCount === 0) {
-    const insertHandler = db.prepare('INSERT INTO handlers (id, name, department, created_at) VALUES (?, ?, ?, ?)');
     const now = Date.now();
-    insertHandler.run('h001', '张工', '市政运维一部', now);
-    insertHandler.run('h002', '李工', '市政运维二部', now);
-    insertHandler.run('h003', '王工', '市政运维三部', now);
+    db.run('INSERT INTO handlers (id, name, department, created_at) VALUES (?, ?, ?, ?)', ['h001', '张工', '市政运维一部', now]);
+    db.run('INSERT INTO handlers (id, name, department, created_at) VALUES (?, ?, ?, ?)', ['h002', '李工', '市政运维二部', now]);
+    db.run('INSERT INTO handlers (id, name, department, created_at) VALUES (?, ?, ?, ?)', ['h003', '王工', '市政运维三部', now]);
+    saveDatabase();
+  }
+
+  return db;
+}
+
+function saveDatabase() {
+  if (db) {
+    const data = db.export();
+    const buffer = Buffer.from(data);
+    fs.writeFileSync(dbPath, buffer);
   }
 }
 
@@ -83,4 +111,47 @@ function getDb() {
   return db;
 }
 
-module.exports = { initDatabase, getDb };
+function prepare(sql) {
+  return {
+    run: function(...params) {
+      db.run(sql, params);
+      saveDatabase();
+      const changes = db.getRowsModified();
+      const lastId = db.exec('SELECT last_insert_rowid() as id')[0].values[0][0];
+      return { changes, lastInsertRowid: lastId };
+    },
+    get: function(...params) {
+      const results = db.exec(sql, params);
+      if (results.length === 0 || results[0].values.length === 0) return undefined;
+      const columns = results[0].columns;
+      const values = results[0].values[0];
+      const row = {};
+      columns.forEach((col, i) => row[col] = values[i]);
+      return row;
+    },
+    all: function(...params) {
+      const results = db.exec(sql, params);
+      if (results.length === 0) return [];
+      const columns = results[0].columns;
+      return results[0].values.map(values => {
+        const row = {};
+        columns.forEach((col, i) => row[col] = values[i]);
+        return row;
+      });
+    }
+  };
+}
+
+function transaction(fn) {
+  db.run('BEGIN TRANSACTION');
+  try {
+    fn();
+    db.run('COMMIT');
+    saveDatabase();
+  } catch (e) {
+    db.run('ROLLBACK');
+    throw e;
+  }
+}
+
+module.exports = { initDatabase, getDb, prepare, transaction, saveDatabase };
