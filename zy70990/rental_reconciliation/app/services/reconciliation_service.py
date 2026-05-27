@@ -116,7 +116,9 @@ class ReconciliationService:
         for record in deposit_records:
             if record.transaction_type == "charge":
                 current_balance += record.amount
-            elif record.transaction_type in ["refund", "deduct", "correction"]:
+            elif record.transaction_type == "correction":
+                current_balance += record.amount
+            elif record.transaction_type in ["refund", "deduct"]:
                 current_balance -= record.amount
 
         final_balance = current_balance - utility_total - deduction_total
@@ -162,9 +164,10 @@ class ReconciliationService:
                                    deduction_amount: float, deposit_records: list) -> float:
         total_deduct = sum(r.amount for r in deposit_records if r.transaction_type == "deduct")
         total_refund = sum(r.amount for r in deposit_records if r.transaction_type == "refund")
+        total_correction = sum(r.amount for r in deposit_records if r.transaction_type == "correction")
 
         expected_deduct = utility_cost + deduction_amount
-        refund = initial_deposit - expected_deduct - total_refund
+        refund = initial_deposit - expected_deduct - total_refund + total_correction
 
         return max(0, refund)
 
@@ -201,12 +204,13 @@ class ReconciliationService:
         for record in deposit_records:
             if record.transaction_type == "charge":
                 current_balance += record.amount
-            elif record.transaction_type == "refund":
-                current_balance -= record.amount
-            elif record.transaction_type == "deduct":
+            elif record.transaction_type == "correction":
+                current_balance += record.amount
+            elif record.transaction_type in ["refund", "deduct"]:
                 current_balance -= record.amount
 
-        expected_final_balance = order.deposit_amount - cost_summary.utility_total - total_verified_deductions
+        total_correction = sum(r.amount for r in deposit_records if r.transaction_type == "correction")
+        expected_final_balance = order.deposit_amount - cost_summary.utility_total - total_verified_deductions + total_correction
 
         if abs(current_balance - expected_final_balance) > 0.01:
             differences.append(DifferenceItem(

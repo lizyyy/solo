@@ -388,6 +388,71 @@ class TestReview:
         result = response.json()
         assert result["success"] is True
 
+    def test_deposit_correction_sync_with_reconciliation(self, db_session):
+        """测试退款冲正后对账结果同步更新"""
+        order_data = {
+            "order_no": "CORR-SYNC-001",
+            "tenant_name": "冲正同步测试",
+            "room_no": "SYNC-001",
+            "check_in_date": "2024-01-01T00:00:00",
+            "check_out_date": "2024-01-05T00:00:00",
+            "rental_amount": 1500.0,
+            "deposit_amount": 2000.0
+        }
+        create_response = client.post("/api/orders", json=order_data)
+        order_id = create_response.json()["id"]
+
+        meter_csv_data = "order_no,meter_type,initial_reading,final_reading,unit\nCORR-SYNC-001,electricity,100,150,kWh"
+        meter_file = "/tmp/test_corr_sync.csv"
+        with open(meter_file, "w", encoding="utf-8") as f:
+            f.write(meter_csv_data)
+
+        with open(meter_file, "rb") as f:
+            client.post(
+                "/api/orders/import/meter-csv",
+                files={"file": ("corr_sync.csv", f, "text/csv")}
+            )
+        os.remove(meter_file)
+
+        recon_before = client.post(f"/api/reconciliation/{order_id}")
+        result_before = recon_before.json()
+        balance_before = result_before["cost_summary"]["final_deposit_balance"]
+
+        action_data = {
+            "action": "refund_correction",
+            "target_type": "deposit",
+            "new_value": {
+                "order_id": order_id,
+                "correction_amount": 100.0
+            },
+            "reason": "测试冲正同步",
+            "reviewer": "测试员"
+        }
+        response = client.post("/api/review/action", json=action_data)
+        assert response.status_code == 200
+        result = response.json()
+        assert result["success"] is True
+
+        recon_after = client.post(f"/api/reconciliation/{order_id}")
+        result_after = recon_after.json()
+        balance_after = result_after["cost_summary"]["final_deposit_balance"]
+
+        assert abs(balance_after - (balance_before + 100.0)) < 0.01, \
+            f"冲正后余额未同步更新: before={balance_before}, after={balance_after}"
+
+        history_response = client.get(f"/api/reports/deposit/{order_id}/history")
+        history = history_response.json()
+        assert history["success"] is True
+
+        report_response = client.post(f"/api/reports/{order_id}/generate")
+        assert report_response.status_code == 200
+        report = report_response.json()
+        assert report["success"] is True
+
+        report_balance = report["report_data"]["cost_breakdown"]["final_balance"]
+        assert abs(report_balance - balance_after) < 0.01, \
+            f"报告余额与对账结果不一致: report={report_balance}, reconciliation={balance_after}"
+
 
 class TestDepositHistory:
     def test_deposit_history(self, db_session):
