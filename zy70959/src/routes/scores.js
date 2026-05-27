@@ -35,6 +35,10 @@ router.post('/:recordId/review', async (req, res) => {
       return res.status(400).json({ error: '缺少必要参数' });
     }
 
+    if (is_malicious_low_score && !malicious_reason) {
+      return res.status(400).json({ error: '标记为恶意低分时必须提供复核理由' });
+    }
+
     const record = await scoreService.reviewScore(
       req.params.recordId,
       batch_id,

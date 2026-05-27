@@ -32,6 +32,10 @@ async function submitAppeal(recordId, batchId, modifiedBy, appealScore, appealRe
 }
 
 async function reviewScore(recordId, batchId, modifiedBy, reviewScore, reviewReason, isMaliciousLowScore = false, maliciousReason = '') {
+  if (isMaliciousLowScore && !maliciousReason) {
+    throw new Error('标记为恶意低分时必须提供复核理由');
+  }
+
   let record = await updateFieldWithAudit(recordId, batchId, modifiedBy, 'review_score', reviewScore, '后勤复核评分');
   record = await updateFieldWithAudit(recordId, batchId, modifiedBy, 'review_reason', reviewReason, '后勤复核原因');
   
