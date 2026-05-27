@@ -1,0 +1,32 @@
+[
+  {
+    "order_no": "ORDER-001",
+    "tenant_name": "李小明",
+    "tenant_phone": "13800138001",
+    "room_no": "A101",
+    "check_in_date": "2024-01-01T14:00:00",
+    "check_out_date": "2024-01-05T12:00:00",
+    "rental_amount": 1500.0,
+    "deposit_amount": 2000.0
+  },
+  {
+    "order_no": "ORDER-002",
+    "tenant_name": "王小华",
+    "tenant_phone": "13900139002",
+    "room_no": "A102",
+    "check_in_date": "2024-01-03T14:00:00",
+    "check_out_date": "2024-01-07T12:00:00",
+    "rental_amount": 1800.0,
+    "deposit_amount": 2000.0
+  },
+  {
+    "order_no": "ORDER-003",
+    "tenant_name": "赵大勇",
+    "tenant_phone": "13700137003",
+    "room_no": "B201",
+    "check_in_date": "2024-01-05T14:00:00",
+    "check_out_date": "2024-01-10T12:00:00",
+    "rental_amount": 2500.0,
+    "deposit_amount": 3000.0
+  }
+]

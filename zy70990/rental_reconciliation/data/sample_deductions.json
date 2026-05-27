@@ -1,0 +1,30 @@
+[
+  {
+    "order_no": "ORDER-001",
+    "deduction_type": "cleaning",
+    "amount": 100.0,
+    "description": "房间清洁费",
+    "evidence_url": ""
+  },
+  {
+    "order_no": "ORDER-002",
+    "deduction_type": "damage",
+    "amount": 200.0,
+    "description": "墙面有划痕，需要重新粉刷",
+    "evidence_url": "/uploads/damage_photo_001.jpg"
+  },
+  {
+    "order_no": "ORDER-003",
+    "deduction_type": "equipment",
+    "amount": 500.0,
+    "description": "空调遥控器损坏，需要更换",
+    "evidence_url": "/uploads/damage_photo_002.jpg"
+  },
+  {
+    "order_no": "ORDER-003",
+    "deduction_type": "damage",
+    "amount": 300.0,
+    "description": "床垫有污渍",
+    "evidence_url": "/uploads/damage_photo_003.jpg"
+  }
+]
