@@ -455,7 +455,6 @@ export class BatchService {
         { priority: 'desc' },
         { waitlistOrder: 'asc' },
       ],
-      take: availableSlots,
     });
 
     if (waitlistEntries.length === 0) {
@@ -470,6 +469,9 @@ export class BatchService {
     const skipped: any[] = [];
 
     for (const entry of waitlistEntries) {
+      if (promoted.length >= availableSlots) {
+        break;
+      }
       const isBlacklisted = await rulesService.checkBlacklist(entry.idCard, activityId);
       if (isBlacklisted) {
         const blacklistEntry = await rulesService.getBlacklistEntry(entry.idCard, activityId);

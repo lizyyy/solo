@@ -1,157 +1,161 @@
-import { PrismaClient, Registration } from '@prisma/client';
-import { RegistrationStatus, ProcessingAction } from '../types/enums';
+import { PrismaClient, Registration } from "@prisma/client";
+import { RegistrationStatus, ProcessingAction } from "../types/enums";
+import { BusinessRulesService } from "./businessRules.service";
 
 const prisma = new PrismaClient();
+const rulesService = new BusinessRulesService();
 
 export class ProcessingService {
-  async requestMaterials(registrationId: string, reason: string, operator: string): Promise<Registration> {
-    const registration = await prisma.registration.findUnique({ where: { id: registrationId } });
+  async requestMaterials(id: string, reason: string, operator: string) {
+    const registration = await prisma.registration.findUnique({ where: { id } });
     if (!registration) {
-      throw new Error('报名记录不存在');
+      throw new Error("报名记录不存在");
     }
 
-    if (registration.finalStatus === RegistrationStatus.REJECTED ||
-        registration.finalStatus === RegistrationStatus.CANCELLED) {
-      throw new Error(`当前状态 ${registration.finalStatus} 不允许请求补材料`);
+    if (registration.finalStatus !== RegistrationStatus.PENDING) {
+      throw new Error("只有待审核状态的记录可以要求补充材料");
     }
 
     const updated = await prisma.registration.update({
-      where: { id: registrationId },
-      data: {
-        finalStatus: RegistrationStatus.NEEDS_MATERIALS,
-      },
+      where: { id },
+      data: { finalStatus: RegistrationStatus.NEEDS_MATERIALS },
     });
 
-    await prisma.processingRecord.create({
-      data: {
-        registrationId,
-        action: ProcessingAction.REQUEST_MATERIALS,
-        statusBefore: registration.finalStatus,
-        statusAfter: RegistrationStatus.NEEDS_MATERIALS,
-        reason,
-        processedBy: operator,
-      },
-    });
+    await rulesService.createProcessingRecord(
+      id,
+      null,
+      ProcessingAction.REQUEST_MATERIALS,
+      RegistrationStatus.PENDING,
+      RegistrationStatus.NEEDS_MATERIALS,
+      reason,
+      operator
+    );
 
     return updated;
   }
 
-  async approveRegistration(registrationId: string, reason: string, operator: string): Promise<Registration> {
-    const registration = await prisma.registration.findUnique({ where: { id: registrationId } });
+  async approveRegistration(id: string, reason: string, operator: string) {
+    const registration = await prisma.registration.findUnique({ where: { id } });
     if (!registration) {
-      throw new Error('报名记录不存在');
+      throw new Error("报名记录不存在");
     }
 
-    if (registration.finalStatus === RegistrationStatus.APPROVED) {
-      throw new Error('该记录已通过，无需重复操作');
+    if (registration.finalStatus !== RegistrationStatus.PENDING && 
+        registration.finalStatus !== RegistrationStatus.NEEDS_MATERIALS) {
+      throw new Error("只有待审核或待补充材料状态的记录可以审核通过");
+    }
+
+    const activity = await prisma.activity.findUnique({
+      where: { id: registration.activityId },
+    });
+    if (!activity) {
+      throw new Error("活动不存在");
+    }
+
+    const approvedCount = await rulesService.getApprovedCount(registration.activityId);
+    if (approvedCount >= activity.totalQuota) {
+      throw new Error(`活动名额已满，当前已通过 ${approvedCount} 人，总名额 ${activity.totalQuota} 人`);
     }
 
     const updated = await prisma.registration.update({
-      where: { id: registrationId },
-      data: {
-        finalStatus: RegistrationStatus.APPROVED,
-      },
+      where: { id },
+      data: { finalStatus: RegistrationStatus.APPROVED },
     });
 
-    await prisma.processingRecord.create({
-      data: {
-        registrationId,
-        action: ProcessingAction.APPROVE,
-        statusBefore: registration.finalStatus,
-        statusAfter: RegistrationStatus.APPROVED,
-        reason,
-        processedBy: operator,
-      },
-    });
+    await rulesService.createProcessingRecord(
+      id,
+      null,
+      ProcessingAction.APPROVE,
+      registration.finalStatus,
+      RegistrationStatus.APPROVED,
+      reason,
+      operator
+    );
 
     return updated;
   }
 
-  async rejectRegistration(registrationId: string, reason: string, operator: string): Promise<Registration> {
-    const registration = await prisma.registration.findUnique({ where: { id: registrationId } });
+  async rejectRegistration(id: string, reason: string, operator: string) {
+    const registration = await prisma.registration.findUnique({ where: { id } });
     if (!registration) {
-      throw new Error('报名记录不存在');
+      throw new Error("报名记录不存在");
     }
 
-    if (registration.finalStatus === RegistrationStatus.REJECTED) {
-      throw new Error('该记录已拒绝，无需重复操作');
+    if (registration.finalStatus !== RegistrationStatus.PENDING && 
+        registration.finalStatus !== RegistrationStatus.NEEDS_MATERIALS) {
+      throw new Error("只有待审核或待补充材料状态的记录可以拒绝");
     }
 
     const updated = await prisma.registration.update({
-      where: { id: registrationId },
-      data: {
-        finalStatus: RegistrationStatus.REJECTED,
-      },
+      where: { id },
+      data: { finalStatus: RegistrationStatus.REJECTED },
     });
 
-    await prisma.processingRecord.create({
-      data: {
-        registrationId,
-        action: ProcessingAction.REJECT,
-        statusBefore: registration.finalStatus,
-        statusAfter: RegistrationStatus.REJECTED,
-        reason,
-        processedBy: operator,
-      },
-    });
+    await rulesService.createProcessingRecord(
+      id,
+      null,
+      ProcessingAction.REJECT,
+      registration.finalStatus,
+      RegistrationStatus.REJECTED,
+      reason,
+      operator
+    );
 
     return updated;
   }
 
-  async cancelRegistration(registrationId: string, reason: string, operator: string): Promise<Registration> {
-    const registration = await prisma.registration.findUnique({ where: { id: registrationId } });
+  async cancelRegistration(id: string, reason: string, operator: string) {
+    const registration = await prisma.registration.findUnique({ where: { id } });
     if (!registration) {
-      throw new Error('报名记录不存在');
+      throw new Error("报名记录不存在");
     }
 
     if (registration.finalStatus === RegistrationStatus.CANCELLED) {
-      throw new Error('该记录已取消，无需重复操作');
+      throw new Error("该记录已取消");
     }
 
     const updated = await prisma.registration.update({
-      where: { id: registrationId },
-      data: {
-        finalStatus: RegistrationStatus.CANCELLED,
-      },
+      where: { id },
+      data: { finalStatus: RegistrationStatus.CANCELLED },
     });
 
-    await prisma.processingRecord.create({
-      data: {
-        registrationId,
-        action: ProcessingAction.CANCEL,
-        statusBefore: registration.finalStatus,
-        statusAfter: RegistrationStatus.CANCELLED,
-        reason,
-        processedBy: operator,
-      },
-    });
+    await rulesService.createProcessingRecord(
+      id,
+      null,
+      ProcessingAction.CANCEL,
+      registration.finalStatus,
+      RegistrationStatus.CANCELLED,
+      reason,
+      operator
+    );
 
     return updated;
   }
 
-  async reviewRegistration(registrationId: string, reason: string, operator: string): Promise<Registration> {
-    const registration = await prisma.registration.findUnique({ where: { id: registrationId } });
+  async reviewRegistration(id: string, reason: string, operator: string) {
+    const registration = await prisma.registration.findUnique({ where: { id } });
     if (!registration) {
-      throw new Error('报名记录不存在');
+      throw new Error("报名记录不存在");
+    }
+
+    if (registration.finalStatus !== RegistrationStatus.NEEDS_MATERIALS) {
+      throw new Error("只有待补充材料状态的记录可以提交审核");
     }
 
     const updated = await prisma.registration.update({
-      where: { id: registrationId },
-      data: {
-        finalStatus: RegistrationStatus.PENDING,
-      },
+      where: { id },
+      data: { finalStatus: RegistrationStatus.PENDING },
     });
 
-    await prisma.processingRecord.create({
-      data: {
-        registrationId,
-        action: ProcessingAction.REVIEW,
-        statusBefore: registration.finalStatus,
-        statusAfter: RegistrationStatus.PENDING,
-        reason,
-        processedBy: operator,
-      },
-    });
+    await rulesService.createProcessingRecord(
+      id,
+      null,
+      ProcessingAction.REVIEW,
+      RegistrationStatus.NEEDS_MATERIALS,
+      RegistrationStatus.PENDING,
+      reason,
+      operator
+    );
 
     return updated;
   }
@@ -163,7 +167,7 @@ export class ProcessingService {
 
     return prisma.processingRecord.findMany({
       where,
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 }
