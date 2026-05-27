@@ -185,7 +185,7 @@ async def reconcile_upload(
         if existing_batch:
             existing_items = db.get_reconcile_items(existing_batch)
             result = _build_result_from_items(existing_batch, batch_date, existing_items)
-            result["summary"]["note"] = "该批次数据已处理，返回历史结果"
+            result.summary["note"] = "该批次数据已处理，返回历史结果"
             return result
 
         batch_id = db.create_batch(
