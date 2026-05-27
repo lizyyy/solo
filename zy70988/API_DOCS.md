@@ -6,7 +6,7 @@
 
 ## 基础信息
 
-- 基础URL: `http://localhost:5000/api`
+- 基础URL: `http://localhost:5001/api`
 - 数据格式: JSON
 - 编码: UTF-8
 

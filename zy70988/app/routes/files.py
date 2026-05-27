@@ -33,28 +33,29 @@ def upload_csv():
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
-        records = []
+        count = 0
         with open(filepath, 'r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 record = parse_csv_row(row, batch_id, operator)
                 if record:
-                    records.append(record)
+                    db.session.add(record)
+                    count += 1
         
-        db.session.bulk_save_objects(records)
+        
         db.session.commit()
         
         log_operation(
             operation='导入CSV抄表数据',
             operator=operator,
-            reason=f'文件: {file.filename}, 导入{len(records)}条记录',
+            reason=f'文件: {file.filename}, 导入{count}条记录',
             batch_id=batch_id
         )
         
         return jsonify({
             'code': 0,
-            'message': f'成功导入{len(records)}条记录',
-            'data': {'count': len(records)}
+            'message': f'成功导入{count}条记录',
+            'data': {'count': count}
         })
     
     return jsonify({'code': 400, 'message': '不支持的文件类型'}), 400
@@ -213,6 +214,14 @@ def parse_csv_row(row, batch_id, operator):
             refund_amount=refund_amount,
             actual_refund=refund_amount
         )
+        for detail in tier_result["details"]:
+            tier_detail = ElectricityTierDetail(
+                tier_name=detail["tier_name"],
+                usage=detail["usage"],
+                unit_price=detail["unit_price"],
+                amount=detail["amount"]
+            )
+            record.tier_details.append(tier_detail)
         
         return record
     except Exception as e:

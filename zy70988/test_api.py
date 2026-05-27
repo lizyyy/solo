@@ -2,7 +2,7 @@ import requests
 import json
 import os
 
-BASE_URL = 'http://localhost:5000/api'
+BASE_URL = 'http://localhost:5001/api'
 
 def test_create_batch():
     print("=== 测试创建批次 ===")

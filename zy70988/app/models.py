@@ -51,7 +51,7 @@ class SettlementRecord(db.Model):
     
     evidences = db.relationship('Evidence', backref='record', lazy=True)
     operation_logs = db.relationship('OperationLog', backref='record', lazy=True)
-    tier_details = db.relationship('ElectricityTierDetail', backref='record', lazy=True)
+    tier_details = db.relationship('ElectricityTierDetail', backref='record', lazy=True, cascade='all, delete-orphan')
 
 class Evidence(db.Model):
     id = db.Column(db.Integer, primary_key=True)
