@@ -20,6 +20,11 @@ const batchSchema = new mongoose.Schema({
     field: String,
     message: String
   }],
+  rawContent: { type: String, required: true },
+  parsedData: [{
+    row: Number,
+    data: mongoose.Schema.Types.Mixed
+  }],
   confirmedAt: Date,
   confirmedBy: String,
   createdAt: { type: Date, default: Date.now },

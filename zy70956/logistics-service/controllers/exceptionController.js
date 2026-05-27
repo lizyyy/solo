@@ -262,12 +262,3 @@ function calcSimilarity(s1, s2) {
   }
   return matches / maxLen;
 }
-
-module.exports = {
-  markDuplicate,
-  unmarkDuplicate,
-  scanDuplicates,
-  penalizeOvertime,
-  scanOvertime,
-  getExceptionSummary
-};

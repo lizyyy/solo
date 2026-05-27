@@ -1,4 +1,5 @@
-const { RepairRequest, Rating, ProcessLog } = require('../models');
+const { v4: uuidv4 } = require('uuid');
+const { RepairRequest, Rating, ProcessLog, Batch } = require('../models');
 const config = require('../config');
 
 async function runScheduledScans() {
@@ -22,7 +23,7 @@ async function scanOvertimeRepairs() {
   for (const record of processingRecords) {
     const overtimeHours = ((now - record.assignedAt) / 3600000).toFixed(1);
     const log = new ProcessLog({
-      logId: require('uuid').v4(),
+      logId: uuidv4(),
       targetType: 'RepairRequest',
       targetId: record.requestId,
       action: '超时罚分',
@@ -58,7 +59,7 @@ async function scanMaliciousRatings() {
     if (ratings.length > config.MALICIOUS_RATING.MAX_RATINGS_PER_HOUR) {
       for (const r of ratings) {
         const log = new ProcessLog({
-          logId: require('uuid').v4(),
+          logId: uuidv4(),
           targetType: 'Rating',
           targetId: r.ratingId,
           action: '标记恶意评分',
@@ -82,7 +83,7 @@ async function scanMaliciousRatings() {
 async function recoverOnStartup() {
   console.log('[Recovery] 检查未完成的批次和处理中记录...');
 
-  const pendingBatches = await require('../models/Batch').find({
+  const pendingBatches = await Batch.find({
     importStatus: '待确认'
   }).lean();
 

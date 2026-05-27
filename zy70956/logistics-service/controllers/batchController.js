@@ -67,7 +67,9 @@ exports.createBatch = async (req, res) => {
     recordCount: parsedRecords.length,
     importedBy,
     importStatus: errors.length > 0 ? '待确认' : '待确认',
-    errors
+    errors,
+    rawContent: content,
+    parsedData: parsedRecords
   });
 
   await batch.save();
@@ -107,19 +109,14 @@ exports.confirmBatch = async (req, res) => {
     return res.status(400).json({ success: false, error: '批次已确认过' });
   }
 
-  let parsedRecords = [];
-  const db = req.app.get('db') || { parsedCache: {} };
-  const cacheKey = `batch_${batchId}`;
-
-  if (db.parsedCache && db.parsedCache[cacheKey]) {
-    parsedRecords = db.parsedCache[cacheKey];
-  } else {
+  if (!batch.parsedData || batch.parsedData.length === 0) {
     return res.status(400).json({
       success: false,
-      error: '无法获取批次原始数据，请重新创建批次'
+      error: '批次无解析数据，请重新创建批次'
     });
   }
 
+  const parsedRecords = batch.parsedData;
   let successCount = 0;
   let failCount = 0;
   const importErrors = [...batch.errors];
@@ -218,8 +215,6 @@ exports.confirmBatch = async (req, res) => {
     reason: `确认批次导入，成功 ${successCount} 条，失败 ${failCount} 条`,
     operator
   });
-
-  if (db.parsedCache) delete db.parsedCache[cacheKey];
 
   res.json({
     success: true,
