@@ -1,0 +1,19 @@
+{
+  "name": "parcel-station-detention-api",
+  "version": "1.0.0",
+  "description": "快递驿站滞留件处理API服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^9.2.2",
+    "csv-writer": "^1.6.0",
+    "crypto": "^1.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
