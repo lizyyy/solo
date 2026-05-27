@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Employee {
+  id                     String             @id
+  name                   String
+  department             String
+  position               String
+  status                 String             @default("ACTIVE")
+  phone                  String?
+  email                  String?
+  joinDate               DateTime?
+  leaveDate              DateTime?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  collectionRecords      CollectionRecord[]
+  proxyCollectionRecords CollectionRecord[] @relation("ProxyRelation")
+  coupons                Coupon[]
+}
+
+model BenefitBatch {
+  id              String             @id
+  name            String
+  description     String?
+  benefitType     String
+  startTime       DateTime?
+  endTime         DateTime?
+  totalQuantity   Int                @default(0)
+  status          String             @default("ACTIVE")
+  createdAt       DateTime           @default(now())
+  createdBy       String
+  collectionRecords CollectionRecord[]
+  coupons         Coupon[]
+}
+
+model Coupon {
+  id                 String             @id
+  code               String             @unique
+  batchId            String
+  batch              BenefitBatch       @relation(fields: [batchId], references: [id])
+  employeeId         String?
+  employee           Employee?          @relation(fields: [employeeId], references: [id])
+  status             String             @default("AVAILABLE")
+  usedAt             DateTime?
+  createdAt          DateTime           @default(now())
+  collectionRecordId String?  @unique
+  collectionRecord   CollectionRecord?  @relation(fields: [collectionRecordId], references: [id])
+}
+
+model CollectionRecord {
+  id              String     @id
+  employeeId      String
+  employee        Employee   @relation(fields: [employeeId], references: [id])
+  batchId         String
+  batch           BenefitBatch @relation(fields: [batchId], references: [id])
+  method          String
+  status          String     @default("PENDING")
+  proxyEmployeeId String?
+  proxyEmployee   Employee?  @relation("ProxyRelation", fields: [proxyEmployeeId], references: [id])
+  couponId        String?
+  coupon          Coupon?
+  reason          String?
+  rejectionReason String?
+  handledBy       String?
+  handledAt       DateTime?
+  sourceType      String
+  sourceId        String
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  auditLogs       AuditLog[]
+}
+
+model AuditLog {
+  id        String   @id
+  recordId  String
+  record    CollectionRecord @relation(fields: [recordId], references: [id])
+  action    String
+  oldStatus String?
+  newStatus String?
+  reason    String?
+  operator  String
+  createdAt DateTime @default(now())
+  details   String?
+}
+
+model ImportHistory {
+  id            String   @id
+  type          String
+  fileName      String
+  recordCount   Int      @default(0)
+  successCount  Int      @default(0)
+  failCount     Int      @default(0)
+  operator      String
+  createdAt     DateTime @default(now())
+  batchId       String?
+}
