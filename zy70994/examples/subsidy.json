@@ -1,0 +1,57 @@
+[
+  {
+    "studentId": "2024001",
+    "name": "张三",
+    "grade": "高一",
+    "class": "1班",
+    "subsidyType": "特困生补贴",
+    "monthlyLimit": 400,
+    "effectiveMonth": "2024-05",
+    "status": "active",
+    "remarks": "家庭经济困难学生"
+  },
+  {
+    "studentId": "2024002",
+    "name": "李四",
+    "grade": "高一",
+    "class": "2班",
+    "subsidyType": "特困生补贴",
+    "monthlyLimit": 400,
+    "effectiveMonth": "2024-05",
+    "status": "active",
+    "remarks": "低保家庭"
+  },
+  {
+    "studentId": "2024003",
+    "name": "王五",
+    "grade": "高二",
+    "class": "1班",
+    "subsidyType": "一般困难补贴",
+    "monthlyLimit": 200,
+    "effectiveMonth": "2024-05",
+    "status": "active",
+    "remarks": ""
+  },
+  {
+    "studentId": "2024004",
+    "name": "赵六",
+    "grade": "高二",
+    "class": "3班",
+    "subsidyType": "特困生补贴",
+    "monthlyLimit": 400,
+    "effectiveMonth": "2024-05",
+    "status": "active",
+    "remarks": "孤儿"
+  },
+  {
+    "studentId": "2024005",
+    "name": "孙七",
+    "grade": "高三",
+    "class": "2班",
+    "subsidyType": "一般困难补贴",
+    "monthlyLimit": 200,
+    "effectiveMonth": "2024-05",
+    "status": "active",
+    "remarks": ""
+  }
+]
