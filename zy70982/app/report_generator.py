@@ -21,7 +21,7 @@ def generate_report_summary(db: Session, batch_id: str) -> Optional[schemas.Repo
         return None
     
     records = db.query(ReconciliationRecord).filter(
-        ReconciliationRecord.reconciliation_id.like(f"{batch_id}_%")
+        ReconciliationRecord.batch_id == batch_id
     ).all()
     
     approved_count = 0
@@ -72,7 +72,7 @@ def generate_report_details(db: Session, batch_id: str) -> Optional[dict]:
         return None
     
     records = db.query(ReconciliationRecord).filter(
-        ReconciliationRecord.reconciliation_id.like(f"{batch_id}_%")
+        ReconciliationRecord.batch_id == batch_id
     ).all()
     
     details = []

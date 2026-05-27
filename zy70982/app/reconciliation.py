@@ -489,6 +489,7 @@ def trace_by_work_order(db: Session, order_id: str) -> Optional[schemas.TraceDet
     return schemas.TraceDetail(
         record_id=record.id,
         reconciliation_id=record.reconciliation_id,
+        batch_id=record.batch_id,
         pole_id=record.pole_id,
         light_id=record.light_id,
         status=record.status,
@@ -520,6 +521,7 @@ def trace_by_alarm(db: Session, alarm_id: str) -> Optional[schemas.TraceDetail]:
     return schemas.TraceDetail(
         record_id=record.id,
         reconciliation_id=record.reconciliation_id,
+        batch_id=record.batch_id,
         pole_id=record.pole_id,
         light_id=record.light_id,
         status=record.status,
