@@ -271,12 +271,6 @@ async function processRepairRecords(batchId, repairs) {
           deductionAmount: 0
         });
       }
-      } else {
-        results.success.push({
-          record: repair.raw,
-          message: '维修记录导入成功'
-        });
-      }
 
       await saveImportResult(batchId, 'repair', 'success', repair.repair_no, repair.raw, null, null);
     } catch (e) {
