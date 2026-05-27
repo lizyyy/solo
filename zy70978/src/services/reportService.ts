@@ -364,7 +364,7 @@ export class ReportService {
       totalDeduction: report.summary.totalDeductions,
       depositPaid: report.orderInfo.actualDepositPaid,
       refundAmount: report.summary.depositRefund,
-      deductions: report.deductionBreakdown.map((d) => ({
+      deductions: report.deductionBreakdown.map((d: any) => ({
         type: d.type === 'overdue' ? '逾期租金' : d.type === 'repair' ? '维修费用' : '其他',
         amount: d.amount,
         source: d.source,

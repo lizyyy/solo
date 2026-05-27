@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as csv from 'csv-parser';
+import csv from 'csv-parser';
 import { Readable } from 'stream';
 import dayjs from 'dayjs';
 import {
@@ -14,7 +14,7 @@ import { dataStore } from '../store/dataStore';
 
 export class ImportService {
   async importRentalOrdersFromCSV(filePath: string): Promise<ImportSummary> {
-    const results: RentalOrder[] = [];
+    const results: Omit<RentalOrder, 'id'>[] = [];
     const errors: { row: number; message: string }[] = [];
     let rowCount = 0;
 
@@ -52,7 +52,7 @@ export class ImportService {
   }
 
   async importRentalOrdersFromCSVBuffer(buffer: Buffer): Promise<ImportSummary> {
-    const results: RentalOrder[] = [];
+    const results: Omit<RentalOrder, 'id'>[] = [];
     const errors: { row: number; message: string }[] = [];
     let rowCount = 0;
 
