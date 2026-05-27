@@ -78,11 +78,30 @@ def auto_detect_and_parse(
 
     keys = {k.lower() for k in records[0].keys()} if records else set()
 
-    if any(k in keys for k in ["employee_id", "工号"]) and any(k in keys for k in ["name", "姓名"]):
-        if "is_active" in keys or "在职状态" in keys or len(keys) <= 5:
+    has_employee_id = any(k in keys for k in ["employee_id", "工号"])
+    has_employee_name = any(k in keys for k in ["name", "姓名", "employee_name"])
+    has_coupon_code = any(k in keys for k in ["coupon_code", "券码"])
+    has_claim_specific = any(k in keys for k in [
+        "claim_type", "福利类型",
+        "is_proxy", "是否代领",
+        "proxy_employee_id", "代领人工号",
+        "proxy_employee_name", "代领人姓名",
+        "delivery_method", "领取方式",
+        "address", "收货地址",
+        "contact_phone", "联系电话"
+    ])
+    has_employee_specific = any(k in keys for k in ["is_active", "在职状态", "department", "部门"])
+    has_coupon_specific = any(k in keys for k in ["value", "面值"])
+
+    if has_claim_specific:
+        return "claim", records, parse_claim_records(records)
+
+    if has_employee_id and has_employee_name and not has_coupon_code:
+        if has_employee_specific or len(keys) <= 5:
             return "employee", records, parse_employees(records)
 
-    if any(k in keys for k in ["coupon_code", "券码"]):
-        return "coupon", records, parse_coupons(records)
+    if has_coupon_code and not has_employee_id and not has_employee_name:
+        if has_coupon_specific or len(keys) <= 3:
+            return "coupon", records, parse_coupons(records)
 
     return "claim", records, parse_claim_records(records)

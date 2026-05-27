@@ -21,6 +21,7 @@ class ClaimProcessor:
         self.success_items: List[ProcessedItem] = []
         self.pending_items: List[ProcessedItem] = []
         self.failed_items: List[ProcessedItem] = []
+        self._processed_claims: set = set()
 
     def check_employee_active(self, employee_id: str) -> Tuple[bool, str]:
         employee = self.db.query(Employee).filter(
@@ -34,6 +35,9 @@ class ClaimProcessor:
         return True, ""
 
     def check_duplicate_claim(self, employee_id: str, claim_type: str) -> Tuple[bool, str]:
+        key = (employee_id, claim_type)
+        if key in self._processed_claims:
+            return True, f"员工 {employee_id} 在本次名单中已申请过 {claim_type} 福利，请检查是否重复录入"
         existing = self.db.query(ClaimRecord).filter(
             ClaimRecord.employee_id == employee_id,
             ClaimRecord.claim_type == claim_type
@@ -153,6 +157,7 @@ class ClaimProcessor:
             ))
             return "pending"
 
+        self._processed_claims.add((item.employee_id, item.claim_type))
         self.success_items.append(ProcessedItem(
             original_data=original,
             status="success",
