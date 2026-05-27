@@ -37,6 +37,33 @@ export async function registerMaterial(
     request.equipmentModel
   );
 
+  const existingOrder = await db.get(
+    'SELECT * FROM rental_orders WHERE order_no = ?',
+    request.orderNo
+  );
+
+  if (!existingOrder && request.orderNo && request.equipmentSerial && request.customerName) {
+    const orderId = uuidv4();
+    const now = new Date().toISOString();
+    
+    await db.run(
+      `INSERT INTO rental_orders (
+        id, order_no, equipment_serial, customer_name, start_date, end_date, 
+        actual_return_date, deposit_amount, status, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      orderId,
+      request.orderNo,
+      request.equipmentSerial,
+      request.customerName,
+      request.rentalStartDate,
+      request.rentalEndDate,
+      request.actualReturnDate || null,
+      request.depositAmount,
+      request.actualReturnDate ? 'returned' : 'active',
+      now
+    );
+  }
+
   const duplicateCheck = await checkDuplicateDeduction(
     db,
     request.orderNo,
