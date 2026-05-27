@@ -78,6 +78,16 @@ fastify.post('/batches', async (req, reply) => {
   }
 
   const details = getBatchDetails(result.batchId);
+  const enriched = details.map((d) => ({
+    id: d.id,
+    kind: d.kind,
+    item_key: d.item_key,
+    status: d.status,
+    rule_code: d.rule_code,
+    message: d.message,
+    suggestion: d.suggestion,
+    raw_fields: JSON.parse(d.raw_fields),
+  }));
   return reply.code(201).send({
     duplicate: false,
     batch_id: result.batchId,
@@ -88,16 +98,12 @@ fastify.post('/batches', async (req, reply) => {
       pending: result.pending,
       failed: result.failed,
     },
-    items: details.map((d) => ({
-      id: d.id,
-      kind: d.kind,
-      item_key: d.item_key,
-      status: d.status,
-      rule_code: d.rule_code,
-      message: d.message,
-      suggestion: d.suggestion,
-      raw_fields: JSON.parse(d.raw_fields),
-    })),
+    groups: {
+      normal:  enriched.filter((x) => x.status === 'normal'),
+      pending: enriched.filter((x) => x.status === 'pending'),
+      failed:  enriched.filter((x) => x.status === 'failed'),
+    },
+    items: enriched,
   });
 });
 

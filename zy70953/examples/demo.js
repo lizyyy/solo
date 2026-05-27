@@ -8,7 +8,7 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 const HOST = new URL(BASE_URL).hostname;
 const PORT = new URL(BASE_URL).port;
 
-const BOUNDARY = '----exhibit-demo-' + Date.now();
+let BOUNDARY = '----exhibit-demo-' + Date.now();
 
 function multipartBody(fields) {
   const buf = [];
@@ -69,28 +69,47 @@ function get(path) {
   });
 }
 
-async function upload() {
-  const pairs = [
-    ['artifacts.csv',  path.join(__dirname, 'artifacts.csv')],
-    ['shipping.json', path.join(__dirname, 'shipping.json')],
-    ['insurance.json',path.join(__dirname, 'insurance.json')],
-  ];
+async function upload(files, label) {
+  BOUNDARY = '----exhibit-demo-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
   const fields = [];
-  for (const [name, p] of pairs) {
-    fields.push(['file', fs.readFileSync(p), name]);
+  for (const p of files) {
+    fields.push(['file', fs.readFileSync(p), path.basename(p)]);
   }
   const body = multipartBody(fields);
   const r = await post('/batches?submitted_by=demo', body);
+  console.log(`\n== ${label} ==`);
   console.log('status:', r.status);
-  console.log(JSON.stringify(r.json, null, 2));
+  if (r.json.duplicate) {
+    console.log('duplicate:', r.json.duplicate, '| message:', r.json.message);
+  } else {
+    const s = r.json.summary;
+    console.log('summary:', s);
+    console.log('groups.normal.length:', r.json.groups.normal.length);
+    console.log('groups.pending.length:', r.json.groups.pending.length);
+    console.log('groups.failed.length:', r.json.groups.failed.length);
+    if (r.json.groups.failed.length) {
+      console.log('groups.failed[0]:', JSON.stringify(r.json.groups.failed[0], null, 2).slice(0, 300), '...');
+    }
+  }
   return r.json;
 }
 
 async function main() {
-  console.log('== 第一次提交 ==');
-  const first = await upload();
-  console.log('\n== 第二次提交（应判重复，不重复生效）==');
-  const second = await upload();
+  const csv  = path.join(__dirname, 'artifacts.csv');
+  const ship = path.join(__dirname, 'shipping.json');
+  const ins  = path.join(__dirname, 'insurance.json');
+
+  const first = await upload([csv, ship, ins], '第一次：正序 CSV→shipping→insurance');
+  if (first.duplicate) {
+    console.log('\n[WARN] 第一次就判重，说明 data.db 有残留，请先 rm data.db* 后重试。');
+  }
+
+  const second = await upload([ins, ship, csv], '第二次：倒序 insurance→shipping→CSV');
+  if (!second.duplicate) {
+    console.log('\n[FAIL] 倒序上传未判重，去重逻辑仍然有问题！');
+    process.exit(1);
+  }
+  console.log('\n[PASS] 同批文件倒序上传被正确识别为重复，未重复生效。');
 
   if (!first.duplicate && first.batch_id) {
     const rep = await get(`/batches/${first.batch_id}/report`);
@@ -102,7 +121,8 @@ async function main() {
     if (d) {
       console.log(`\n== 单条明细追踪: GET /details/${d.id} ==`);
       const detail = await get(`/details/${d.id}`);
-      console.log(JSON.stringify(detail.json, null, 2));
+      console.log('linked_report:', detail.json.linked_report ? 'OK' : 'MISSING');
+      console.log('audit_trail.length:', detail.json.audit_trail.length);
     }
   }
 }

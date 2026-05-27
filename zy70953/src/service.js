@@ -6,8 +6,9 @@ const { uuid, now, inferParser } = require('./parsers');
 const { evaluate } = require('./rules');
 
 const hashBatch = (manifest) => {
+  const sorted = [...manifest].sort((a, b) => (a.filename || '').localeCompare(b.filename || ''));
   const h = crypto.createHash('sha1');
-  for (const m of manifest) h.update(m.filename || '').update(m.sha256);
+  for (const m of sorted) h.update(m.filename || '').update(m.sha256);
   return h.digest('hex');
 };
 
