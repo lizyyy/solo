@@ -1,0 +1,246 @@
+{
+  "batchId": "f2093101-d46c-48ab-a062-f4924b132797",
+  "generatedAt": "2026-05-27T01:13:46.010Z",
+  "summary": {
+    "totalRepairs": 8,
+    "totalWorkers": 5,
+    "totalRatings": 8,
+    "matchedRepairs": 6,
+    "unmatchedRepairs": 2,
+    "discrepancies": 6,
+    "discrepanciesByType": {
+      "duplicate_repair": 1,
+      "timeout_penalty": 4,
+      "malicious_rating": 1,
+      "mismatch": 0,
+      "missing_data": 0
+    },
+    "pendingReviews": 3,
+    "completedReviews": 3,
+    "averageScore": 52.5,
+    "totalScoreDeductions": 0
+  },
+  "discrepancies": [
+    {
+      "type": "duplicate_repair",
+      "severity": "medium",
+      "repairNo": "BX20240101002",
+      "description": "疑似重复报修：与报修单 BX20240101001 在 1 小时内提交，内容相似",
+      "evidence": [
+        "原始报修: BX20240101001 (2024-01-01T09:00:00)",
+        "重复报修: BX20240101002 (2024-01-01T10:00:00)",
+        "时间差: 1 小时",
+        "地点: 宿舍楼1号楼101",
+        "类别: 家电维修"
+      ],
+      "relatedRecordIds": [
+        "85fd97cf-740b-4589-8ae6-3246ea364c8b",
+        "1fa926b7-abc7-4a5d-aedd-786b2803a916"
+      ],
+      "autoDetected": true,
+      "id": "98468dfe-c391-49d3-ab43-463fed4cd4bd",
+      "detectedAt": "2026-05-27T01:13:46.004Z"
+    },
+    {
+      "type": "timeout_penalty",
+      "severity": "medium",
+      "repairNo": "BX20240101001",
+      "workerId": "W001",
+      "description": "维修超时：预计 24 小时，实际 52 小时，超时 28 小时，建议扣 5 分",
+      "evidence": [
+        "接单时间: 2024-01-01T09:30:00",
+        "完成时间: 2024-01-03T14:00:00",
+        "预计时长: 24 小时",
+        "实际时长: 52 小时",
+        "超时: 28 小时",
+        "建议扣分: 5 分"
+      ],
+      "relatedRecordIds": [
+        "85fd97cf-740b-4589-8ae6-3246ea364c8b"
+      ],
+      "autoDetected": true,
+      "id": "deefb055-b72e-4620-b53a-1cf539f8ddf8",
+      "detectedAt": "2026-05-27T01:13:46.004Z"
+    },
+    {
+      "type": "timeout_penalty",
+      "severity": "medium",
+      "repairNo": "BX20240103001",
+      "workerId": "W002",
+      "description": "维修超时：预计 24 小时，实际 49 小时，超时 25 小时，建议扣 5 分",
+      "evidence": [
+        "接单时间: 2024-01-03T14:30:00",
+        "完成时间: 2024-01-05T16:00:00",
+        "预计时长: 24 小时",
+        "实际时长: 49 小时",
+        "超时: 25 小时",
+        "建议扣分: 5 分"
+      ],
+      "relatedRecordIds": [
+        "e4c6c472-aed3-407f-af33-4b78cab8a80c"
+      ],
+      "autoDetected": true,
+      "id": "bcf353c8-b114-4c98-b508-d4e91b916dd9",
+      "detectedAt": "2026-05-27T01:13:46.004Z"
+    },
+    {
+      "type": "timeout_penalty",
+      "severity": "medium",
+      "repairNo": "BX20240105001",
+      "workerId": "W004",
+      "description": "维修超时：预计 12 小时，实际 17 小时，超时 5 小时，建议扣 0 分",
+      "evidence": [
+        "接单时间: 2024-01-05T16:30:00",
+        "完成时间: 2024-01-06T10:00:00",
+        "预计时长: 12 小时",
+        "实际时长: 17 小时",
+        "超时: 5 小时",
+        "建议扣分: 0 分"
+      ],
+      "relatedRecordIds": [
+        "9f031204-6fbf-405b-a026-9a8dfa6cb6d6"
+      ],
+      "autoDetected": true,
+      "id": "c2eddb7e-1a2f-441b-b56d-1aeaae45a826",
+      "detectedAt": "2026-05-27T01:13:46.004Z"
+    },
+    {
+      "type": "timeout_penalty",
+      "severity": "medium",
+      "repairNo": "BX20240107001",
+      "workerId": "W005",
+      "description": "维修超时：预计 24 小时，实际 49 小时，超时 25 小时，建议扣 5 分",
+      "evidence": [
+        "接单时间: 2024-01-07T09:30:00",
+        "完成时间: 2024-01-09T11:00:00",
+        "预计时长: 24 小时",
+        "实际时长: 49 小时",
+        "超时: 25 小时",
+        "建议扣分: 5 分"
+      ],
+      "relatedRecordIds": [
+        "a89e1853-5707-495c-ab32-ceed9250605f"
+      ],
+      "autoDetected": true,
+      "id": "155cf4fc-afcc-4f0d-9f20-e3fbfb14d902",
+      "detectedAt": "2026-05-27T01:13:46.004Z"
+    },
+    {
+      "type": "malicious_rating",
+      "severity": "high",
+      "repairNo": "BX20240107001",
+      "workerId": "W005",
+      "ratingId": "68d79086-a500-4aa8-b580-c41690487dae",
+      "description": "疑似恶意评分：该报修单有 3 条低分评价（≤30分）",
+      "evidence": [
+        "评分: 5/100, 评分人: 2021006, 时间: 2024-01-09T12:08:00, 原因: 非常不满意",
+        "评分: 10/100, 评分人: 2021006, 时间: 2024-01-09T12:05:00, 原因: 技术太差",
+        "评分: 15/100, 评分人: 2021006, 时间: 2024-01-09T12:00:00, 原因: 修了两天才好，耽误事"
+      ],
+      "relatedRecordIds": [
+        "68d79086-a500-4aa8-b580-c41690487dae",
+        "625932e9-eb00-45f6-b0d8-650bf3c8b6df",
+        "ec356f45-9e82-4382-bbbb-a07f2afc2757"
+      ],
+      "autoDetected": true,
+      "id": "01abc319-add5-4439-9530-6bcc2d668bef",
+      "detectedAt": "2026-05-27T01:13:46.004Z"
+    }
+  ],
+  "reviews": [
+    {
+      "discrepancyId": "98468dfe-c391-49d3-ab43-463fed4cd4bd",
+      "decision": "approved",
+      "reviewer": "审核员张三",
+      "comment": "情况属实，按规则处理",
+      "reviewedAt": "2026-05-27T01:13:46.007Z",
+      "scoreAdjustment": 0,
+      "adjustmentReason": "重复报修合并处理",
+      "id": "ad786095-15a4-43b2-9672-0296f49e50dd"
+    },
+    {
+      "discrepancyId": "deefb055-b72e-4620-b53a-1cf539f8ddf8",
+      "decision": "rejected",
+      "reviewer": "审核员张三",
+      "comment": "经核实不属于恶意评分，学生确有不满",
+      "reviewedAt": "2026-05-27T01:13:46.007Z",
+      "id": "6d6520f9-974e-4207-8833-57f3755095b5"
+    },
+    {
+      "discrepancyId": "bcf353c8-b114-4c98-b508-d4e91b916dd9",
+      "decision": "supplement_required",
+      "reviewer": "审核员张三",
+      "comment": "需要补充维修记录证明",
+      "reviewedAt": "2026-05-27T01:13:46.007Z",
+      "id": "92c61b46-9e19-4ba2-90ae-434b8a12c45f"
+    }
+  ],
+  "appeals": [
+    {
+      "ratingId": "68d79086-a500-4aa8-b580-c41690487dae",
+      "repairNo": "BX20240107001",
+      "workerId": "W005",
+      "originalScore": 5,
+      "finalScore": 80,
+      "appellant": "陈师傅",
+      "appellantRole": "worker",
+      "appealReason": "维修过程遇到特殊情况，配件缺货导致延迟，非个人原因",
+      "evidence": [
+        "配件缺货证明照片",
+        "与学生沟通记录截图"
+      ],
+      "status": "upheld",
+      "createdAt": "2026-05-27T01:13:46.007Z",
+      "relatedDiscrepancyIds": [
+        "01abc319-add5-4439-9530-6bcc2d668bef"
+      ],
+      "id": "3f497759-a594-4796-88fb-3ff673f037df",
+      "reviewer": "管理员李四",
+      "reviewComment": "情况属实，配件缺货为不可抗力因素，调整评分",
+      "reviewedAt": "2026-05-27T01:13:46.010Z",
+      "appealedScore": 5
+    }
+  ],
+  "workerScores": [
+    {
+      "workerId": "W001",
+      "workerName": "陈师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "W002",
+      "workerName": "李师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "W003",
+      "workerName": "王师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "W004",
+      "workerName": "张师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "W005",
+      "workerName": "刘师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    }
+  ]
+}

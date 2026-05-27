@@ -38,47 +38,50 @@ async function main() {
   const pending = service.getPendingDiscrepancies(importResult.batchId);
   console.log(`待处理差异: ${pending.length} 条`);
 
-  if (pending.length > 0) {
-    const d1 = pending[0];
-    console.log(`\n处理差异 ${d1.id} (${d1.type}):`);
-    console.log('描述:', d1.description);
-    console.log('证据:', d1.evidence);
+  const timeoutDiscrepancies = pending.filter(d => d.type === 'timeout_penalty');
+  timeoutDiscrepancies.forEach((d, i) => {
+    const match = d.description.match(/建议扣 (\d+) 分/);
+    const suggestedPoints = match ? parseInt(match[1]) : 0;
+    const adjustment = -suggestedPoints;
 
-    const adjustment = d1.type === 'timeout_penalty' ? -10 : 0;
+    console.log(`\n处理超时差异 ${i + 1}: ${d.repairNo} (维修工: ${d.workerId})`);
+    console.log('描述:', d.description);
+
     const review = service.reviewDiscrepancy(
-      d1.id,
+      d.id,
       'approved',
       '审核员张三',
-      '情况属实，按规则处理',
+      '超时情况属实，按规则扣分',
       adjustment,
-      d1.type === 'timeout_penalty' ? '超时48小时以上' : '重复报修合并处理'
+      `超时${d.evidence[d.evidence.length - 2]?.split(': ')[1] || ''}，扣${Math.abs(adjustment)}分`
     );
-    console.log('审核结果:', JSON.stringify(review, null, 2));
-  }
+    console.log('审核结果: 扣', Math.abs(adjustment), '分，理由:', review.adjustmentReason);
+  });
 
-  if (pending.length > 1) {
-    const d2 = pending[1];
-    console.log(`\n处理差异 ${d2.id} (${d2.type}):`);
-    const review2 = service.reviewDiscrepancy(
-      d2.id,
-      'rejected',
-      '审核员张三',
-      '经核实不属于恶意评分，学生确有不满'
-    );
-    console.log('审核结果:', JSON.stringify(review2, null, 2));
-  }
-
-  if (pending.length > 2) {
-    const d3 = pending[2];
-    console.log(`\n处理差异 ${d3.id} (${d3.type}):`);
-    const review3 = service.reviewDiscrepancy(
-      d3.id,
-      'supplement_required',
-      '审核员张三',
-      '需要补充维修记录证明'
-    );
-    console.log('审核结果:', JSON.stringify(review3, null, 2));
-  }
+  const otherDiscrepancies = pending.filter(d => d.type !== 'timeout_penalty');
+  otherDiscrepancies.forEach((d, i) => {
+    if (i === 0) {
+      console.log(`\n处理差异 ${d.id} (${d.type}):`);
+      const review = service.reviewDiscrepancy(
+        d.id,
+        'approved',
+        '审核员张三',
+        '情况属实，合并处理',
+        0,
+        '重复报修合并处理，不单独扣分'
+      );
+      console.log('审核结果:', JSON.stringify(review, null, 2));
+    } else if (i === 1) {
+      console.log(`\n处理差异 ${d.id} (${d.type}):`);
+      const review2 = service.reviewDiscrepancy(
+        d.id,
+        'rejected',
+        '审核员张三',
+        '经核实不属于恶意评分，学生确有不满'
+      );
+      console.log('审核结果:', JSON.stringify(review2, null, 2));
+    }
+  });
   console.log();
 
   console.log('【步骤5】评分申诉流程');

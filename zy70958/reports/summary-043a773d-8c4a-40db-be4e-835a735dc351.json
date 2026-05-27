@@ -1,0 +1,154 @@
+{
+  "batchId": "043a773d-8c4a-40db-be4e-835a735dc351",
+  "generatedAt": "2026-05-27T01:10:43.582Z",
+  "summary": {
+    "totalRepairs": 8,
+    "totalWorkers": 5,
+    "totalRatings": 8,
+    "matchedRepairs": 6,
+    "unmatchedRepairs": 2,
+    "discrepancies": 2,
+    "discrepanciesByType": {
+      "duplicate_repair": 1,
+      "timeout_penalty": 0,
+      "malicious_rating": 1,
+      "mismatch": 0,
+      "missing_data": 0
+    },
+    "pendingReviews": 0,
+    "completedReviews": 2,
+    "averageScore": 52.5,
+    "totalScoreDeductions": 0
+  },
+  "discrepancies": [
+    {
+      "type": "duplicate_repair",
+      "severity": "medium",
+      "repairNo": "BX20240101002",
+      "description": "疑似重复报修：与报修单 BX20240101001 在 1 小时内提交，内容相似",
+      "evidence": [
+        "原始报修: BX20240101001 (2024-01-01T09:00:00)",
+        "重复报修: BX20240101002 (2024-01-01T10:00:00)",
+        "时间差: 1 小时",
+        "地点: 宿舍楼1号楼101",
+        "类别: 家电维修"
+      ],
+      "relatedRecordIds": [
+        "aeff7f65-f0f7-40dc-ba1c-10349be934e4",
+        "f8682c7d-f6dd-4be6-95cb-97066dca21ee"
+      ],
+      "autoDetected": true,
+      "id": "7a5c15eb-c574-4b2b-ac70-f0028533bfd8",
+      "detectedAt": "2026-05-27T01:10:43.578Z"
+    },
+    {
+      "type": "malicious_rating",
+      "severity": "high",
+      "repairNo": "BX20240107001",
+      "workerId": "W005",
+      "ratingId": "d630c507-6ece-4e57-b852-33dd4b6c740b",
+      "description": "疑似恶意评分：该报修单有 3 条低分评价（≤30分）",
+      "evidence": [
+        "评分: 5/100, 评分人: 2021006, 时间: 2024-01-09T12:08:00, 原因: 非常不满意",
+        "评分: 10/100, 评分人: 2021006, 时间: 2024-01-09T12:05:00, 原因: 技术太差",
+        "评分: 15/100, 评分人: 2021006, 时间: 2024-01-09T12:00:00, 原因: 修了两天才好，耽误事"
+      ],
+      "relatedRecordIds": [
+        "d630c507-6ece-4e57-b852-33dd4b6c740b",
+        "2c023b7d-bad6-42c1-997a-3308425f5d1f",
+        "b6248156-5af1-40af-a934-07db113660d9"
+      ],
+      "autoDetected": true,
+      "id": "e86c2035-72d0-4554-a382-e97582f32b76",
+      "detectedAt": "2026-05-27T01:10:43.578Z"
+    }
+  ],
+  "reviews": [
+    {
+      "discrepancyId": "7a5c15eb-c574-4b2b-ac70-f0028533bfd8",
+      "decision": "approved",
+      "reviewer": "审核员张三",
+      "comment": "情况属实，按规则处理",
+      "reviewedAt": "2026-05-27T01:10:43.580Z",
+      "scoreAdjustment": 0,
+      "adjustmentReason": "重复报修合并处理",
+      "id": "04fa8be2-b2c8-43c2-a64e-dedc3beb6e40"
+    },
+    {
+      "discrepancyId": "e86c2035-72d0-4554-a382-e97582f32b76",
+      "decision": "rejected",
+      "reviewer": "审核员张三",
+      "comment": "经核实不属于恶意评分，学生确有不满",
+      "reviewedAt": "2026-05-27T01:10:43.580Z",
+      "id": "108266c1-f6db-44c2-a591-8704d6465fa7"
+    }
+  ],
+  "appeals": [
+    {
+      "ratingId": "d630c507-6ece-4e57-b852-33dd4b6c740b",
+      "repairNo": "BX20240107001",
+      "workerId": "W005",
+      "originalScore": 5,
+      "finalScore": 80,
+      "appellant": "陈师傅",
+      "appellantRole": "worker",
+      "appealReason": "维修过程遇到特殊情况，配件缺货导致延迟，非个人原因",
+      "evidence": [
+        "配件缺货证明照片",
+        "与学生沟通记录截图"
+      ],
+      "status": "upheld",
+      "createdAt": "2026-05-27T01:10:43.580Z",
+      "relatedDiscrepancyIds": [
+        "e86c2035-72d0-4554-a382-e97582f32b76"
+      ],
+      "id": "cbc3865b-4b12-43e4-b40a-0a319664c731",
+      "reviewer": "管理员李四",
+      "reviewComment": "情况属实，配件缺货为不可抗力因素，调整评分",
+      "reviewedAt": "2026-05-27T01:10:43.581Z",
+      "appealedScore": 5
+    }
+  ],
+  "workerScores": [
+    {
+      "workerId": "W001",
+      "workerName": "陈师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "W002",
+      "workerName": "李师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "W003",
+      "workerName": "王师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "W004",
+      "workerName": "张师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "W005",
+      "workerName": "刘师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    }
+  ]
+}

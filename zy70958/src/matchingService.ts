@@ -20,7 +20,7 @@ export interface MatchingConfig {
 
 const DEFAULT_CONFIG: MatchingConfig = {
   duplicateTimeWindowHours: 24,
-  timeoutThresholdHours: 48,
+  timeoutThresholdHours: 2,
   lowScoreThreshold: 30,
   highFrequencyRatingCount: 5,
   highFrequencyTimeWindowHours: 1,

@@ -1,0 +1,293 @@
+{
+  "batchId": "040c92e2-549a-41e1-ada8-db95d91e8440",
+  "generatedAt": "2026-05-27T01:17:05.800Z",
+  "summary": {
+    "totalRepairs": 8,
+    "totalWorkers": 5,
+    "totalRatings": 8,
+    "matchedRepairs": 6,
+    "unmatchedRepairs": 2,
+    "discrepancies": 6,
+    "discrepanciesByType": {
+      "duplicate_repair": 1,
+      "timeout_penalty": 4,
+      "malicious_rating": 1,
+      "mismatch": 0,
+      "missing_data": 0
+    },
+    "pendingReviews": 0,
+    "completedReviews": 6,
+    "averageScore": 52.5,
+    "totalScoreDeductions": 15
+  },
+  "discrepancies": [
+    {
+      "type": "duplicate_repair",
+      "severity": "medium",
+      "repairNo": "BX20240101002",
+      "description": "疑似重复报修：与报修单 BX20240101001 在 1 小时内提交，内容相似",
+      "evidence": [
+        "原始报修: BX20240101001 (2024-01-01T09:00:00)",
+        "重复报修: BX20240101002 (2024-01-01T10:00:00)",
+        "时间差: 1 小时",
+        "地点: 宿舍楼1号楼101",
+        "类别: 家电维修"
+      ],
+      "relatedRecordIds": [
+        "9d190d85-e0a2-436e-bba0-9b6dfd926596",
+        "c9be9aca-5a75-4d10-807b-6c50a82d2167"
+      ],
+      "autoDetected": true,
+      "id": "f5ee4873-35d8-47e0-b6f4-f0ea8df91964",
+      "detectedAt": "2026-05-27T01:17:05.798Z"
+    },
+    {
+      "type": "timeout_penalty",
+      "severity": "medium",
+      "repairNo": "BX20240101001",
+      "workerId": "W001",
+      "description": "维修超时：预计 24 小时，实际 52 小时，超时 28 小时，建议扣 5 分",
+      "evidence": [
+        "接单时间: 2024-01-01T09:30:00",
+        "完成时间: 2024-01-03T14:00:00",
+        "预计时长: 24 小时",
+        "实际时长: 52 小时",
+        "超时: 28 小时",
+        "建议扣分: 5 分"
+      ],
+      "relatedRecordIds": [
+        "9d190d85-e0a2-436e-bba0-9b6dfd926596"
+      ],
+      "autoDetected": true,
+      "id": "6e16a0ae-6989-46e1-9adc-b5cbe99243fd",
+      "detectedAt": "2026-05-27T01:17:05.798Z"
+    },
+    {
+      "type": "timeout_penalty",
+      "severity": "medium",
+      "repairNo": "BX20240103001",
+      "workerId": "W002",
+      "description": "维修超时：预计 24 小时，实际 49 小时，超时 25 小时，建议扣 5 分",
+      "evidence": [
+        "接单时间: 2024-01-03T14:30:00",
+        "完成时间: 2024-01-05T16:00:00",
+        "预计时长: 24 小时",
+        "实际时长: 49 小时",
+        "超时: 25 小时",
+        "建议扣分: 5 分"
+      ],
+      "relatedRecordIds": [
+        "05928aad-09bc-4f19-8e27-1b96f9abb74f"
+      ],
+      "autoDetected": true,
+      "id": "98413a8f-5b0f-4e1c-b8ea-b9480551d04e",
+      "detectedAt": "2026-05-27T01:17:05.798Z"
+    },
+    {
+      "type": "timeout_penalty",
+      "severity": "medium",
+      "repairNo": "BX20240105001",
+      "workerId": "W004",
+      "description": "维修超时：预计 12 小时，实际 17 小时，超时 5 小时，建议扣 0 分",
+      "evidence": [
+        "接单时间: 2024-01-05T16:30:00",
+        "完成时间: 2024-01-06T10:00:00",
+        "预计时长: 12 小时",
+        "实际时长: 17 小时",
+        "超时: 5 小时",
+        "建议扣分: 0 分"
+      ],
+      "relatedRecordIds": [
+        "b8544b87-4273-4d59-8913-f34d4ca7660a"
+      ],
+      "autoDetected": true,
+      "id": "9b86d96b-6d61-4af3-88c4-6e163f8a624a",
+      "detectedAt": "2026-05-27T01:17:05.798Z"
+    },
+    {
+      "type": "timeout_penalty",
+      "severity": "medium",
+      "repairNo": "BX20240107001",
+      "workerId": "W005",
+      "description": "维修超时：预计 24 小时，实际 49 小时，超时 25 小时，建议扣 5 分",
+      "evidence": [
+        "接单时间: 2024-01-07T09:30:00",
+        "完成时间: 2024-01-09T11:00:00",
+        "预计时长: 24 小时",
+        "实际时长: 49 小时",
+        "超时: 25 小时",
+        "建议扣分: 5 分"
+      ],
+      "relatedRecordIds": [
+        "226caf18-f947-4a12-9889-3f08f31faa5d"
+      ],
+      "autoDetected": true,
+      "id": "d4d13144-9927-4606-976e-201e423ebc8a",
+      "detectedAt": "2026-05-27T01:17:05.798Z"
+    },
+    {
+      "type": "malicious_rating",
+      "severity": "high",
+      "repairNo": "BX20240107001",
+      "workerId": "W005",
+      "ratingId": "42d9b1cc-265a-4ed7-84b7-20879f2b8d90",
+      "description": "疑似恶意评分：该报修单有 3 条低分评价（≤30分）",
+      "evidence": [
+        "评分: 5/100, 评分人: 2021006, 时间: 2024-01-09T12:08:00, 原因: 非常不满意",
+        "评分: 10/100, 评分人: 2021006, 时间: 2024-01-09T12:05:00, 原因: 技术太差",
+        "评分: 15/100, 评分人: 2021006, 时间: 2024-01-09T12:00:00, 原因: 修了两天才好，耽误事"
+      ],
+      "relatedRecordIds": [
+        "42d9b1cc-265a-4ed7-84b7-20879f2b8d90",
+        "cf341dc1-ac52-4213-a66a-f4ba98565503",
+        "29fb9ceb-a160-4c8c-9f9a-dd3df72c8a59"
+      ],
+      "autoDetected": true,
+      "id": "7b770256-ede2-4cfd-8601-899a3e200dea",
+      "detectedAt": "2026-05-27T01:17:05.798Z"
+    }
+  ],
+  "reviews": [
+    {
+      "discrepancyId": "6e16a0ae-6989-46e1-9adc-b5cbe99243fd",
+      "decision": "approved",
+      "reviewer": "审核员张三",
+      "comment": "超时情况属实，按规则扣分",
+      "reviewedAt": "2026-05-27T01:17:05.798Z",
+      "scoreAdjustment": -5,
+      "adjustmentReason": "超时28 小时，扣5分",
+      "id": "febea70a-473e-4755-bf58-a819fd8f1f80"
+    },
+    {
+      "discrepancyId": "98413a8f-5b0f-4e1c-b8ea-b9480551d04e",
+      "decision": "approved",
+      "reviewer": "审核员张三",
+      "comment": "超时情况属实，按规则扣分",
+      "reviewedAt": "2026-05-27T01:17:05.799Z",
+      "scoreAdjustment": -5,
+      "adjustmentReason": "超时25 小时，扣5分",
+      "id": "f0e95791-1170-48fb-9b3a-df4b4485d5f4"
+    },
+    {
+      "discrepancyId": "9b86d96b-6d61-4af3-88c4-6e163f8a624a",
+      "decision": "approved",
+      "reviewer": "审核员张三",
+      "comment": "超时情况属实，按规则扣分",
+      "reviewedAt": "2026-05-27T01:17:05.799Z",
+      "scoreAdjustment": 0,
+      "adjustmentReason": "超时5 小时，扣0分",
+      "id": "dcbfb138-866d-4044-9331-c58f2dc28643"
+    },
+    {
+      "discrepancyId": "d4d13144-9927-4606-976e-201e423ebc8a",
+      "decision": "approved",
+      "reviewer": "审核员张三",
+      "comment": "超时情况属实，按规则扣分",
+      "reviewedAt": "2026-05-27T01:17:05.799Z",
+      "scoreAdjustment": -5,
+      "adjustmentReason": "超时25 小时，扣5分",
+      "id": "1cda87d8-41ba-4c3d-ac69-48896db1661a"
+    },
+    {
+      "discrepancyId": "f5ee4873-35d8-47e0-b6f4-f0ea8df91964",
+      "decision": "approved",
+      "reviewer": "审核员张三",
+      "comment": "情况属实，合并处理",
+      "reviewedAt": "2026-05-27T01:17:05.799Z",
+      "scoreAdjustment": 0,
+      "adjustmentReason": "重复报修合并处理，不单独扣分",
+      "id": "c35b61fb-dc66-4bee-b9c8-4b717b485738"
+    },
+    {
+      "discrepancyId": "7b770256-ede2-4cfd-8601-899a3e200dea",
+      "decision": "rejected",
+      "reviewer": "审核员张三",
+      "comment": "经核实不属于恶意评分，学生确有不满",
+      "reviewedAt": "2026-05-27T01:17:05.799Z",
+      "id": "6b051267-dd00-4af1-801a-9188c45e28fb"
+    }
+  ],
+  "appeals": [
+    {
+      "ratingId": "42d9b1cc-265a-4ed7-84b7-20879f2b8d90",
+      "repairNo": "BX20240107001",
+      "workerId": "W005",
+      "originalScore": 5,
+      "finalScore": 80,
+      "appellant": "陈师傅",
+      "appellantRole": "worker",
+      "appealReason": "维修过程遇到特殊情况，配件缺货导致延迟，非个人原因",
+      "evidence": [
+        "配件缺货证明照片",
+        "与学生沟通记录截图"
+      ],
+      "status": "upheld",
+      "createdAt": "2026-05-27T01:17:05.799Z",
+      "relatedDiscrepancyIds": [
+        "7b770256-ede2-4cfd-8601-899a3e200dea"
+      ],
+      "id": "34f60c67-fe00-467d-8904-89fa9b11a654",
+      "reviewer": "管理员李四",
+      "reviewComment": "情况属实，配件缺货为不可抗力因素，调整评分",
+      "reviewedAt": "2026-05-27T01:17:05.799Z",
+      "appealedScore": 5
+    }
+  ],
+  "workerScores": [
+    {
+      "workerId": "W001",
+      "workerName": "陈师傅",
+      "originalScore": 100,
+      "adjustedScore": 95,
+      "totalDeductions": 5,
+      "deductionDetails": [
+        {
+          "reason": "超时罚分 (BX20240101001)",
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "workerId": "W002",
+      "workerName": "李师傅",
+      "originalScore": 100,
+      "adjustedScore": 95,
+      "totalDeductions": 5,
+      "deductionDetails": [
+        {
+          "reason": "超时罚分 (BX20240103001)",
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "workerId": "W003",
+      "workerName": "王师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "W004",
+      "workerName": "张师傅",
+      "originalScore": 100,
+      "adjustedScore": 100,
+      "totalDeductions": 0,
+      "deductionDetails": []
+    },
+    {
+      "workerId": "W005",
+      "workerName": "刘师傅",
+      "originalScore": 100,
+      "adjustedScore": 95,
+      "totalDeductions": 5,
+      "deductionDetails": [
+        {
+          "reason": "超时罚分 (BX20240107001)",
+          "amount": 5
+        }
+      ]
+    }
+  ]
+}

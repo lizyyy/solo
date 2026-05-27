@@ -69,16 +69,19 @@ export class DataStore {
   async importWorkersFromJSON(filePath: string, batchId: string): Promise<Worker[]> {
     const content = fs.readFileSync(filePath, 'utf-8');
     const data = JSON.parse(content);
-    const workers: Worker[] = data.map((item: any) => ({
-      id: createId(),
-      workerNo: item.workerNo || item.工号 || '',
-      name: item.name || item.姓名 || '',
-      phone: item.phone || item.电话 || '',
-      specialty: item.specialty || item.专长 || [],
-      baseScore: item.baseScore || item.基础分 || 100,
-      currentScore: item.currentScore || item.当前分 || 100,
-      importBatchId: batchId,
-    }));
+    const workers: Worker[] = data.map((item: any) => {
+      const workerNo = item.workerNo || item.工号 || '';
+      return {
+        id: workerNo,
+        workerNo: workerNo,
+        name: item.name || item.姓名 || '',
+        phone: item.phone || item.电话 || '',
+        specialty: item.specialty || item.专长 || [],
+        baseScore: item.baseScore || item.基础分 || 100,
+        currentScore: item.currentScore || item.当前分 || 100,
+        importBatchId: batchId,
+      };
+    });
     this.workers.push(...workers);
     return workers;
   }
