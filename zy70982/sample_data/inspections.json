@@ -1,0 +1,52 @@
+[
+  {
+    "inspection_id": "INS001",
+    "pole_id": "P001",
+    "light_id": "L001",
+    "inspector": "张三",
+    "inspection_time": "2024-01-15 09:00:00",
+    "status": "发现问题",
+    "issues_found": ["灯具损坏", "需要更换"],
+    "photos": ["photo_001.jpg", "photo_002.jpg"]
+  },
+  {
+    "inspection_id": "INS002",
+    "pole_id": "P001",
+    "light_id": "L002",
+    "inspector": "张三",
+    "inspection_time": "2024-01-15 09:30:00",
+    "status": "发现问题",
+    "issues_found": ["电源故障", "同杆两盏灯均不亮"],
+    "photos": ["photo_003.jpg"]
+  },
+  {
+    "inspection_id": "INS003",
+    "pole_id": "P002",
+    "light_id": "L001",
+    "inspector": "李四",
+    "inspection_time": "2024-01-15 14:00:00",
+    "status": "已恢复",
+    "issues_found": ["通信已恢复正常"],
+    "photos": []
+  },
+  {
+    "inspection_id": "INS004",
+    "pole_id": "P003",
+    "light_id": "L001",
+    "inspector": "李四",
+    "inspection_time": "2024-01-16 15:00:00",
+    "status": "发现问题",
+    "issues_found": ["灯泡烧坏", "需要更换"],
+    "photos": ["photo_004.jpg"]
+  },
+  {
+    "inspection_id": "INS005",
+    "pole_id": "P006",
+    "light_id": "L001",
+    "inspector": "王五",
+    "inspection_time": "2024-01-19 10:00:00",
+    "status": "正常",
+    "issues_found": [],
+    "photos": []
+  }
+]

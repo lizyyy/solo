@@ -1,0 +1,7 @@
+alarm_id,pole_id,light_id,alarm_type,alarm_level,alarm_time,description,status,is_false_alarm,false_alarm_reason
+ALM001,P001,L001,灯具故障,高,2024-01-15 08:30:00,路灯不亮,已修复,False,
+ALM002,P001,L002,电源故障,高,2024-01-15 09:15:00,同杆多灯故障,已修复,False,
+ALM003,P002,L001,通信异常,中,2024-01-15 10:00:00,设备重启恢复正常,已恢复,True,临时通信干扰
+ALM004,P003,L001,灯具故障,高,2024-01-16 14:20:00,灯泡烧坏,已修复,False,
+ALM005,P004,L001,控制器故障,高,2024-01-17 11:00:00,路灯闪烁,维修中,False,
+ALM006,P005,L001,电源故障,高,2024-01-18 16:45:00,电缆损坏,已修复,False,
