@@ -1,0 +1,91 @@
+{
+  "etf_code": "510300",
+  "trade_date": "2024-01-15",
+  "analysis_time": "2026-05-28T07:39:19.186288",
+  "broker_name": "中信证券",
+  "source_files": {
+    "申赎清单": "sample_data/redemption_list.csv",
+    "券商回执": "sample_data/broker_receipt.csv",
+    "停牌日历": "sample_data/suspended.csv",
+    "替代现金清单": "sample_data/cash_substitution.csv"
+  },
+  "differences": [
+    {
+      "code": "600036",
+      "name": "招商银行",
+      "difference_type": "数量差异",
+      "expected": "15000",
+      "actual": "14800",
+      "severity": "error",
+      "explanation": "预期数量 15000，实际数量 14800"
+    },
+    {
+      "code": "601398",
+      "name": "工商银行",
+      "difference_type": "额外成分券",
+      "expected": "无",
+      "actual": "数量 1000",
+      "severity": "warning",
+      "explanation": "券商回执包含申赎清单外的证券"
+    },
+    {
+      "code": "CASH_TOTAL",
+      "name": "现金替代总额",
+      "difference_type": "替代现金重复计入",
+      "expected": "256000.00",
+      "actual": "245000.00",
+      "severity": "error",
+      "explanation": "按替代现金清单重算应为 256000.00，回执金额不符，可能存在重复计入"
+    },
+    {
+      "code": "CASH",
+      "name": "现金总额",
+      "difference_type": "现金差异",
+      "expected": "161230.50",
+      "actual": "250230.50",
+      "severity": "error",
+      "explanation": "现金总额差异 89000.00 元"
+    }
+  ],
+  "anomalies": [
+    {
+      "code": "000001",
+      "name": "平安银行",
+      "difference_type": "停牌券实物交收",
+      "expected": "现金替代",
+      "actual": "实物交收 18000",
+      "severity": "critical",
+      "explanation": "该证券当日停牌，应使用现金替代而非实物交收"
+    }
+  ],
+  "component_match_count": 6,
+  "component_total_count": 7,
+  "cash_match": false,
+  "expected_cash_total": 161230.5,
+  "actual_cash_total": 250230.5,
+  "processing_steps": [
+    "步骤1: 加载数据源文件",
+    "  - 申赎清单: 7 只成分券",
+    "  - 券商回执: 8 只成分券",
+    "  - 停牌日历: 2 只停牌证券",
+    "  - 替代现金清单: 3 条记录",
+    "步骤2: 成分券数量核对",
+    "  - 数量差异: 600036 预期15000 实际14800",
+    "  - 发现额外成分券: 601398",
+    "  - 核对完成: 匹配 6/7 只",
+    "步骤3: 替代现金重算校验",
+    "  - 现金替代重算差异: 重算256000.00 回执245000.00",
+    "  - 现金总额差异: 89000.00 元",
+    "步骤4: 异常检测",
+    "  - 异常: 停牌券 000001 仍按实物处理",
+    "步骤5: 回执版本校验",
+    "  - 回执状态: 版本 1 - 最终回执",
+    "步骤6: 生成最终结论",
+    "  - 成分券匹配率: 6/7",
+    "  - 现金核对: 不通过",
+    "  - 差异数量: 4",
+    "  - 异常数量: 1",
+    "  - 最终结论: 不通过"
+  ],
+  "is_pass": false
+}

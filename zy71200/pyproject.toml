@@ -1,0 +1,17 @@
+[project]
+name = "etf-recon"
+version = "0.1.0"
+description = "ETF申赎成分券差异校验工具"
+requires-python = ">=3.9"
+dependencies = [
+    "pandas>=2.0.0",
+    "openpyxl>=3.1.0",
+    "rich>=13.0.0",
+    "click>=8.0.0",
+]
+
+[project.scripts]
+etf-recon = "etf_recon.cli:main"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.0"

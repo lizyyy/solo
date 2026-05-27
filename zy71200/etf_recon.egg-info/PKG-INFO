@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: etf-recon
+Version: 0.1.0
+Summary: ETF申赎成分券差异校验工具
+Requires-Python: >=3.9
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: openpyxl>=3.1.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: click>=8.0.0
