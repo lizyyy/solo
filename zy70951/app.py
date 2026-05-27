@@ -96,7 +96,12 @@ def now_iso():
 
 
 def compute_content_hash(payload):
-    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    material = {
+        "addons": payload.get("addons", []),
+        "coupons": payload.get("coupons", []),
+        "unit_bills": payload.get("unit_bills", []),
+    }
+    canonical = json.dumps(material, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
