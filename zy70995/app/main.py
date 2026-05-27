@@ -1,19 +1,132 @@
 from datetime import datetime
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
+from pydantic import BaseModel, Field
+from typing import Optional, Any
 
 from .database import init_db, get_db
 from .models import (
     User, Submission, Task, Classification, ChangeLog, FieldChange, ExportReport,
     CATEGORY_NORMAL, CATEGORY_PENDING, CATEGORY_INTERCEPTED
 )
-from .schemas import (
-    SubsidySubmission, SubmissionResponse, TaskResponse,
-    ReviewRequest, ChangeLogResponse, FieldTraceResponse, ExportReportResponse
-)
-from .services import (
-    classify_submission, log_category_change, log_state_change, log_field_changes
-)
+
+
+class SubsidySubmission(BaseModel):
+    batch_no: str = Field(description="批次号")
+    student_name: str = Field(description="学生姓名")
+    student_id: str = Field(description="学号")
+    class_name: str = Field(description="班级")
+    meal_days: int = Field(description="用餐天数")
+    subsidy_amount: int = Field(description="补贴金额（分）")
+
+
+class SubmissionResponse(BaseModel):
+    submission_id: int
+    task_id: int
+    batch_no: str
+    state: str
+    message: str
+
+
+class TaskResponse(BaseModel):
+    task_id: int
+    submission_id: int
+    state: str
+    classification: Optional[dict[str, Any]]
+    created_at: datetime
+    updated_at: datetime
+
+
+class ReviewRequest(BaseModel):
+    actor_id: int = Field(description="操作人ID")
+    new_category: Optional[str] = Field(None, description="新分类")
+    new_state: Optional[str] = Field(None, description="新状态")
+    field_updates: Optional[dict[str, Any]] = Field(None, description="字段更新")
+    reason: str = Field(description="修改原因")
+
+
+class ChangeLogResponse(BaseModel):
+    id: int
+    task_id: int
+    actor_id: int
+    change_type: str
+    reason: str
+    before_value: dict[str, Any]
+    after_value: dict[str, Any]
+    created_at: datetime
+
+
+class FieldTraceResponse(BaseModel):
+    field_name: str
+    original_value: Any
+    current_value: Any
+    change_history: list[dict[str, Any]]
+
+
+class ExportReportResponse(BaseModel):
+    report_id: int
+    submission_id: int
+    report_payload: dict[str, Any]
+    exported_by: int
+    exported_at: datetime
+
+
+def classify_submission(db, submission, task):
+    avg_per_day = submission.subsidy_amount / submission.meal_days if submission.meal_days > 0 else 0
+    if not submission.student_id or not submission.class_name:
+        return (CATEGORY_PENDING, "学号或班级信息缺失", "请补充学生学号和班级信息")
+    if len(submission.student_id) < 6:
+        return (CATEGORY_PENDING, "学号格式不规范", "请检查学号格式，长度应不少于6位")
+    if submission.meal_days > 31:
+        return (CATEGORY_INTERCEPTED, "用餐天数异常", "用餐天数不能超过31天，请核实后重新提交")
+    if avg_per_day < 300:
+        return (CATEGORY_INTERCEPTED, "日均补贴金额过低", "日均补贴低于3元，请核实学生用餐情况")
+    if avg_per_day > 5000:
+        return (CATEGORY_INTERCEPTED, "日均补贴金额过高", "日均补贴超过50元，请核实补贴标准是否正确")
+    return (CATEGORY_NORMAL, "信息完整，符合标准", "补贴材料审核通过，进入后续流程")
+
+
+def log_category_change(db, task, submission, actor_id, reason, old_category, new_category):
+    log = ChangeLog(
+        task_id=task.id, submission_id=submission.id, actor_id=actor_id,
+        change_type="category", reason=reason,
+        before_value={"category": old_category}, after_value={"category": new_category},
+    )
+    db.add(log)
+    db.flush()
+    return log
+
+
+def log_state_change(db, task, submission, actor_id, reason, old_state, new_state):
+    log = ChangeLog(
+        task_id=task.id, submission_id=submission.id, actor_id=actor_id,
+        change_type="state", reason=reason,
+        before_value={"state": old_state}, after_value={"state": new_state},
+    )
+    db.add(log)
+    db.flush()
+    return log
+
+
+def log_field_changes(db, submission, task, actor_id, reason, field_updates):
+    log = ChangeLog(
+        task_id=task.id, submission_id=submission.id, actor_id=actor_id,
+        change_type="field", reason=reason,
+        before_value={k: getattr(submission, k) for k in field_updates.keys()},
+        after_value=field_updates,
+    )
+    db.add(log)
+    db.flush()
+    for field_name, new_value in field_updates.items():
+        old_value = str(getattr(submission, field_name))
+        fc = FieldChange(
+            submission_id=submission.id, change_log_id=log.id,
+            field_name=field_name, before_value=old_value, after_value=str(new_value),
+        )
+        db.add(fc)
+    db.flush()
+    return log
+
 
 init_db()
 
