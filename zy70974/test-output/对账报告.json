@@ -1,0 +1,720 @@
+{
+  "batch": {
+    "id": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+    "name": "2024年1月街道活动对账",
+    "activityType": "parent_child",
+    "activityName": "周末亲子手工课 & 老年书法班",
+    "createdAt": "2026-05-26T23:20:53.001Z",
+    "createdBy": "测试操作员",
+    "status": "ready_for_review",
+    "statistics": {
+      "totalRegistrations": 12,
+      "totalWaitlist": 4,
+      "totalCheckIns": 10,
+      "matchedRecords": 15,
+      "discrepancies": 7,
+      "pendingReview": 4,
+      "approved": 9,
+      "rejected": 1
+    },
+    "recordIds": [
+      "4758008c-de14-4c9c-b29d-c34e9d117bf5",
+      "11df23f2-e3fc-433c-a14c-487f10589948",
+      "8d4336f2-46e9-46de-8d09-b4ca7bbfb830",
+      "55e3c88f-21d8-4d2b-a123-5f820f251380",
+      "f2da80dc-4069-4cd3-850c-ff1b6c8270a3",
+      "4b5f9eb5-513f-4b0d-9891-5be19de5522e",
+      "48707949-5d84-4de8-91e3-c857e7a08abd",
+      "adad8362-ff39-4b5c-ac8e-98c0ba457fc2",
+      "ab05ad2f-2dbc-4e68-a5d1-d3dd8b7fd651",
+      "0fc1bf3d-f48e-4b65-b73b-8b56cfc03c0d",
+      "fcff0194-e7b7-4099-9239-0a18bd713802",
+      "9cc98935-0995-434a-93ab-fc2258be85ef",
+      "83aefb1b-4a78-48fc-80ca-5a54418c88e5",
+      "488fffce-77ba-404d-9138-e56b7645949b",
+      "fcf75b96-2bad-474e-9491-a522a17766c8"
+    ]
+  },
+  "records": [
+    {
+      "id": "4758008c-de14-4c9c-b29d-c34e9d117bf5",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "周末亲子手工课",
+      "name": "张三",
+      "phone": "13800138001",
+      "registrationId": "ad19d434-c995-4d5e-82ac-c8ac08f2bebf",
+      "checkInId": "c7364dac-9360-40ec-8614-25633a7408fd",
+      "registrationStatus": "confirmed",
+      "checkInStatus": "checked_in",
+      "reviewStatus": "pending_review",
+      "discrepancies": [
+        {
+          "id": "f35b62e7-9556-47ba-9829-44079ee1d178",
+          "type": "duplicate_registration",
+          "description": "检测到重复报名：该用户共有 2 条报名记录",
+          "severity": "high",
+          "relatedRecordIds": [
+            "ad19d434-c995-4d5e-82ac-c8ac08f2bebf",
+            "a67dce0b-7423-4f9c-aadd-164903b7803c"
+          ],
+          "sourceEvidence": [
+            {
+              "source": "registration_csv",
+              "field": "phone",
+              "actualValue": "13800138001"
+            },
+            {
+              "source": "registration_csv",
+              "field": "phone",
+              "actualValue": "138-0013-8001"
+            }
+          ]
+        }
+      ],
+      "finalStatus": "pending",
+      "auditTrail": [
+        {
+          "id": "10b4237f-1bf2-4258-a029-54e9e9e192a6",
+          "reconciliationId": "4758008c-de14-4c9c-b29d-c34e9d117bf5",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 1
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "11df23f2-e3fc-433c-a14c-487f10589948",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "周末亲子手工课",
+      "name": "李四",
+      "phone": "13800138002",
+      "registrationId": "60ae0ce2-566e-4a26-bcd4-13235a14c80b",
+      "checkInId": "01e5c752-f971-43af-bf3f-9f4e4da2d892",
+      "registrationStatus": "confirmed",
+      "checkInStatus": "checked_in",
+      "reviewStatus": "approved",
+      "discrepancies": [],
+      "finalStatus": "allowed",
+      "auditTrail": [
+        {
+          "id": "2cbe1c6b-e48f-4468-bb1a-746d6d6b1365",
+          "reconciliationId": "11df23f2-e3fc-433c-a14c-487f10589948",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 0
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "8d4336f2-46e9-46de-8d09-b4ca7bbfb830",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "周末亲子手工课",
+      "name": "王五",
+      "phone": "13800138003",
+      "registrationId": "36dd2719-05ea-4cf7-ab49-6f4219470e58",
+      "checkInId": "1e8e8adc-6efd-44a9-9657-1273038b3386",
+      "registrationStatus": "cancelled",
+      "checkInStatus": "checked_in",
+      "reviewStatus": "approved",
+      "discrepancies": [
+        {
+          "id": "5c9af721-5ebd-43e1-bcde-61cfe14f5e80",
+          "type": "cancelled_but_checked_in",
+          "description": "该用户已取消报名但实际签到，需要人工复核",
+          "severity": "high",
+          "relatedRecordIds": [
+            "36dd2719-05ea-4cf7-ab49-6f4219470e58",
+            "1e8e8adc-6efd-44a9-9657-1273038b3386"
+          ],
+          "sourceEvidence": [
+            {
+              "source": "registration_csv",
+              "field": "status",
+              "expectedValue": "cancelled",
+              "actualValue": "cancelled"
+            },
+            {
+              "source": "checkin_csv",
+              "field": "status",
+              "expectedValue": "not_checked_in",
+              "actualValue": "checked_in"
+            }
+          ]
+        }
+      ],
+      "finalStatus": "allowed",
+      "auditTrail": [
+        {
+          "id": "44c326c3-0e22-4dad-b445-3220b4fe0388",
+          "reconciliationId": "8d4336f2-46e9-46de-8d09-b4ca7bbfb830",
+          "action": "review_approve",
+          "previousValue": "pending_review",
+          "newValue": "approve",
+          "operator": "张主任",
+          "timestamp": "2026-05-26T23:20:53.002Z",
+          "reason": "现场核实为家属代签，情况属实"
+        },
+        {
+          "id": "60c8a5d7-36da-4a79-bf3f-9230880a5c12",
+          "reconciliationId": "8d4336f2-46e9-46de-8d09-b4ca7bbfb830",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 1
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.002Z",
+      "finalReason": "现场核实为家属代签，情况属实"
+    },
+    {
+      "id": "55e3c88f-21d8-4d2b-a123-5f820f251380",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "周末亲子手工课",
+      "name": "赵六",
+      "phone": "13800138004",
+      "registrationId": "2fcdaedb-d53b-4f84-9e09-345424c9e4ff",
+      "waitlistId": "02355e33-7d62-4b5b-92b3-7abbefbceb57",
+      "registrationStatus": "confirmed",
+      "checkInStatus": "not_checked_in",
+      "reviewStatus": "pending_review",
+      "discrepancies": [
+        {
+          "id": "f6bf2ef6-5cb5-45db-bcce-f336218a549b",
+          "type": "waitlist_promoted",
+          "description": "该用户从候补第 3 位递补至正式名单",
+          "severity": "medium",
+          "relatedRecordIds": [
+            "2fcdaedb-d53b-4f84-9e09-345424c9e4ff",
+            "02355e33-7d62-4b5b-92b3-7abbefbceb57"
+          ],
+          "sourceEvidence": [
+            {
+              "source": "waitlist_json",
+              "field": "waitlistPosition",
+              "actualValue": "3"
+            },
+            {
+              "source": "waitlist_json",
+              "field": "promotedToMain",
+              "actualValue": "true"
+            }
+          ]
+        },
+        {
+          "id": "2cb5661e-e2fc-4de5-9db0-0db0efe2d0bd",
+          "type": "registered_but_not_checked_in",
+          "description": "该用户已报名但无签到记录",
+          "severity": "low",
+          "relatedRecordIds": [
+            "2fcdaedb-d53b-4f84-9e09-345424c9e4ff"
+          ],
+          "sourceEvidence": [
+            {
+              "source": "registration_csv",
+              "field": "status",
+              "actualValue": "confirmed"
+            }
+          ]
+        },
+        {
+          "id": "50e887ed-fc9a-4ce8-a000-8cc2ba461a9f",
+          "type": "info_mismatch",
+          "description": "报名活动与候补活动名称不一致：报名\"周末亲子手工课\" vs 候补\"周末亲子手工课-候补\"",
+          "severity": "medium",
+          "relatedRecordIds": [
+            "2fcdaedb-d53b-4f84-9e09-345424c9e4ff",
+            "02355e33-7d62-4b5b-92b3-7abbefbceb57"
+          ],
+          "sourceEvidence": [
+            {
+              "source": "registration_csv",
+              "field": "activityName",
+              "expectedValue": "周末亲子手工课-候补",
+              "actualValue": "周末亲子手工课"
+            }
+          ]
+        }
+      ],
+      "finalStatus": "pending",
+      "auditTrail": [
+        {
+          "id": "007def44-a92e-44f3-941a-1eea642bf3a9",
+          "reconciliationId": "55e3c88f-21d8-4d2b-a123-5f820f251380",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 3
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "f2da80dc-4069-4cd3-850c-ff1b6c8270a3",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "老年书法班",
+      "name": "钱七",
+      "phone": "13800138005",
+      "registrationId": "15ec3fa3-e534-4a84-817a-d5cfe660cf68",
+      "checkInId": "699e19fb-c8fd-4fce-b544-4c718e26dbf5",
+      "registrationStatus": "confirmed",
+      "checkInStatus": "checked_in",
+      "reviewStatus": "approved",
+      "discrepancies": [],
+      "finalStatus": "allowed",
+      "auditTrail": [
+        {
+          "id": "27e15db4-e4ba-4257-9d4d-26f331983f2d",
+          "reconciliationId": "f2da80dc-4069-4cd3-850c-ff1b6c8270a3",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 0
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "4b5f9eb5-513f-4b0d-9891-5be19de5522e",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "老年书法班",
+      "name": "孙八",
+      "phone": "13800138006",
+      "registrationId": "0ac8cb2b-bb79-4b08-aeff-f510f479b486",
+      "checkInId": "30a0cac1-1738-483c-afac-3259238bb1ec",
+      "registrationStatus": "confirmed",
+      "checkInStatus": "checked_in",
+      "reviewStatus": "approved",
+      "discrepancies": [],
+      "finalStatus": "allowed",
+      "auditTrail": [
+        {
+          "id": "891f364d-f721-4b24-a55c-64e9e91ba376",
+          "reconciliationId": "4b5f9eb5-513f-4b0d-9891-5be19de5522e",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 0
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "48707949-5d84-4de8-91e3-c857e7a08abd",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "老年书法班",
+      "name": "周九",
+      "phone": "13800138007",
+      "registrationId": "2b9b68ee-e306-4478-b38a-f19c9ca99fda",
+      "checkInId": "8afc79ff-3c56-4e5e-899b-a99dab3f6600",
+      "registrationStatus": "confirmed",
+      "checkInStatus": "checked_in",
+      "reviewStatus": "approved",
+      "discrepancies": [],
+      "finalStatus": "allowed",
+      "auditTrail": [
+        {
+          "id": "943ec17e-c7d7-4ef5-8516-dd39699cc552",
+          "reconciliationId": "48707949-5d84-4de8-91e3-c857e7a08abd",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 0
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "adad8362-ff39-4b5c-ac8e-98c0ba457fc2",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "老年书法班",
+      "name": "吴十",
+      "phone": "13800138008",
+      "registrationId": "5371e549-62a0-407e-9db5-3f64e120a985",
+      "checkInId": "7ccfc5e4-27ee-4705-b851-5e461036c143",
+      "registrationStatus": "confirmed",
+      "checkInStatus": "not_checked_in",
+      "reviewStatus": "approved",
+      "discrepancies": [],
+      "finalStatus": "allowed",
+      "auditTrail": [
+        {
+          "id": "cccc963b-eb0a-4554-8562-c33111e40bb1",
+          "reconciliationId": "adad8362-ff39-4b5c-ac8e-98c0ba457fc2",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 0
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "ab05ad2f-2dbc-4e68-a5d1-d3dd8b7fd651",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "周末亲子手工课",
+      "name": "郑十一",
+      "phone": "13800138009",
+      "registrationId": "4f1fb67b-5ec1-4e3e-a739-e582af6a1843",
+      "registrationStatus": "confirmed",
+      "checkInStatus": "not_checked_in",
+      "reviewStatus": "rejected",
+      "discrepancies": [
+        {
+          "id": "e6c93539-1c76-4cfc-a280-76614abb0fa0",
+          "type": "blacklisted",
+          "description": "该用户在黑名单中：多次报名未参加且未取消，占用公共资源",
+          "severity": "high",
+          "relatedRecordIds": [
+            "6c00fd23-d743-48fd-ba43-d068b06bd415"
+          ],
+          "sourceEvidence": [
+            {
+              "source": "blacklist_json",
+              "field": "reason",
+              "actualValue": "多次报名未参加且未取消，占用公共资源"
+            }
+          ]
+        },
+        {
+          "id": "08b9272a-0a68-46dd-83be-c2d0935f38b0",
+          "type": "registered_but_not_checked_in",
+          "description": "该用户已报名但无签到记录",
+          "severity": "low",
+          "relatedRecordIds": [
+            "4f1fb67b-5ec1-4e3e-a739-e582af6a1843"
+          ],
+          "sourceEvidence": [
+            {
+              "source": "registration_csv",
+              "field": "status",
+              "actualValue": "confirmed"
+            }
+          ]
+        }
+      ],
+      "finalStatus": "rejected",
+      "auditTrail": [
+        {
+          "id": "1ac6b7c3-3ff8-4ef1-bbe0-bd3efd577468",
+          "reconciliationId": "ab05ad2f-2dbc-4e68-a5d1-d3dd8b7fd651",
+          "action": "review_reject",
+          "previousValue": "pending_review",
+          "newValue": "reject",
+          "operator": "张主任",
+          "timestamp": "2026-05-26T23:20:53.002Z",
+          "reason": "黑名单人员，按规定不予放行"
+        },
+        {
+          "id": "e9cc1f34-0d24-401c-89c0-b6d1f2bbd33d",
+          "reconciliationId": "ab05ad2f-2dbc-4e68-a5d1-d3dd8b7fd651",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 2
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.002Z",
+      "finalReason": "黑名单人员，按规定不予放行"
+    },
+    {
+      "id": "0fc1bf3d-f48e-4b65-b73b-8b56cfc03c0d",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "周末亲子手工课",
+      "name": "王小明",
+      "phone": "13800138010",
+      "registrationId": "b6e59a73-6ab7-4b1b-8ae9-00cc3cde9e2a",
+      "registrationStatus": "confirmed",
+      "checkInStatus": "not_checked_in",
+      "reviewStatus": "pending_review",
+      "discrepancies": [
+        {
+          "id": "5e0e8d36-82ec-495e-803d-21d9546601e5",
+          "type": "blacklisted",
+          "description": "该用户在黑名单中：活动现场扰乱秩序",
+          "severity": "high",
+          "relatedRecordIds": [
+            "0ccd2bea-acda-4639-b6d7-c620dbf55125"
+          ],
+          "sourceEvidence": [
+            {
+              "source": "blacklist_json",
+              "field": "reason",
+              "actualValue": "活动现场扰乱秩序"
+            }
+          ]
+        },
+        {
+          "id": "628d5a28-a61b-466b-817b-b53f05ea98f5",
+          "type": "registered_but_not_checked_in",
+          "description": "该用户已报名但无签到记录",
+          "severity": "low",
+          "relatedRecordIds": [
+            "b6e59a73-6ab7-4b1b-8ae9-00cc3cde9e2a"
+          ],
+          "sourceEvidence": [
+            {
+              "source": "registration_csv",
+              "field": "status",
+              "actualValue": "confirmed"
+            }
+          ]
+        }
+      ],
+      "finalStatus": "pending",
+      "auditTrail": [
+        {
+          "id": "28f91a8d-4fc7-4540-b25d-6c8a34cda84f",
+          "reconciliationId": "0fc1bf3d-f48e-4b65-b73b-8b56cfc03c0d",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 2
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "fcff0194-e7b7-4099-9239-0a18bd713802",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "老年书法班",
+      "name": "陈老",
+      "phone": "13800138011",
+      "registrationId": "72d77f2e-46d3-4b22-b51a-532c6f7965bc",
+      "checkInId": "b1814c08-884c-402d-91ec-8ec46826f1cd",
+      "registrationStatus": "confirmed",
+      "checkInStatus": "checked_in",
+      "reviewStatus": "approved",
+      "discrepancies": [],
+      "finalStatus": "allowed",
+      "auditTrail": [
+        {
+          "id": "61f65f26-b32f-441a-8861-53340f6e4f9c",
+          "reconciliationId": "fcff0194-e7b7-4099-9239-0a18bd713802",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 0
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "9cc98935-0995-434a-93ab-fc2258be85ef",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "周末亲子手工课",
+      "name": "刘候补",
+      "phone": "13800138020",
+      "waitlistId": "010cde01-6d51-4b63-9be5-db1ec979e5d2",
+      "checkInId": "917c4795-ecf4-4b53-9ca7-892c7a2c5a54",
+      "checkInStatus": "checked_in",
+      "reviewStatus": "pending_review",
+      "discrepancies": [
+        {
+          "id": "a134d0be-ab71-4305-bb22-a0c79b217672",
+          "type": "not_registered_but_checked_in",
+          "description": "该用户无报名记录但实际签到，需要人工确认",
+          "severity": "high",
+          "relatedRecordIds": [
+            "917c4795-ecf4-4b53-9ca7-892c7a2c5a54"
+          ],
+          "sourceEvidence": [
+            {
+              "source": "checkin_csv",
+              "field": "status",
+              "actualValue": "checked_in"
+            }
+          ]
+        }
+      ],
+      "finalStatus": "pending",
+      "auditTrail": [
+        {
+          "id": "4ffb1bc4-30ef-425d-9c42-f7b5394cea29",
+          "reconciliationId": "9cc98935-0995-434a-93ab-fc2258be85ef",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 1
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "83aefb1b-4a78-48fc-80ca-5a54418c88e5",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "周末亲子手工课",
+      "name": "陈候补",
+      "phone": "13800138021",
+      "waitlistId": "a0701365-5a60-4608-9cad-581d152a61ba",
+      "checkInStatus": "not_checked_in",
+      "reviewStatus": "approved",
+      "discrepancies": [],
+      "finalStatus": "allowed",
+      "auditTrail": [
+        {
+          "id": "a15cd2cc-154a-4beb-b631-69aebe58dfd4",
+          "reconciliationId": "83aefb1b-4a78-48fc-80ca-5a54418c88e5",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 0
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "488fffce-77ba-404d-9138-e56b7645949b",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "老年书法班",
+      "name": "杨候补",
+      "phone": "13800138022",
+      "waitlistId": "d525a5c0-a68b-4e2e-b4e7-bc9968139051",
+      "checkInStatus": "not_checked_in",
+      "reviewStatus": "approved",
+      "discrepancies": [],
+      "finalStatus": "allowed",
+      "auditTrail": [
+        {
+          "id": "e77e8d28-e059-48ac-bdcd-6a73a57c15be",
+          "reconciliationId": "488fffce-77ba-404d-9138-e56b7645949b",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 0
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.001Z"
+    },
+    {
+      "id": "fcf75b96-2bad-474e-9491-a522a17766c8",
+      "reconciliationBatchId": "9ce4c81d-ba65-4528-9882-ec4ec1b4e9db",
+      "activityType": "parent_child",
+      "activityName": "周末亲子手工课",
+      "name": "马现场",
+      "phone": "13800138099",
+      "checkInId": "df04dc46-7fe2-4254-b83c-8e2a9087c7fe",
+      "checkInStatus": "checked_in",
+      "reviewStatus": "needs_more_info",
+      "discrepancies": [
+        {
+          "id": "50d1e2f8-89cd-4d7a-a72c-a2ccd8ed8313",
+          "type": "not_registered_but_checked_in",
+          "description": "该用户无报名记录但实际签到，需要人工确认",
+          "severity": "high",
+          "relatedRecordIds": [
+            "df04dc46-7fe2-4254-b83c-8e2a9087c7fe"
+          ],
+          "sourceEvidence": [
+            {
+              "source": "checkin_csv",
+              "field": "status",
+              "actualValue": "checked_in"
+            }
+          ]
+        }
+      ],
+      "finalStatus": "pending",
+      "auditTrail": [
+        {
+          "id": "d819768e-92f9-459b-bcb5-806a24564378",
+          "reconciliationId": "fcf75b96-2bad-474e-9491-a522a17766c8",
+          "action": "review_request_info",
+          "previousValue": "pending_review",
+          "newValue": "request_info",
+          "operator": "张主任",
+          "timestamp": "2026-05-26T23:20:53.002Z",
+          "reason": "现场报名需补充身份证信息"
+        },
+        {
+          "id": "8234c2b1-0b28-4e32-be83-436bbe656252",
+          "reconciliationId": "fcf75b96-2bad-474e-9491-a522a17766c8",
+          "action": "auto_reconciliation",
+          "newValue": {
+            "discrepancies": 1
+          },
+          "operator": "system",
+          "timestamp": "2026-05-26T23:20:53.001Z",
+          "reason": "系统自动比对完成"
+        }
+      ],
+      "createdAt": "2026-05-26T23:20:53.001Z",
+      "updatedAt": "2026-05-26T23:20:53.002Z",
+      "finalReason": "现场报名需补充身份证信息"
+    }
+  ],
+  "generatedAt": "2026-05-26T23:20:53.017Z"
+}

@@ -1,0 +1,34 @@
+import { RegistrationRecord, WaitlistRecord, CheckInRecord, BlacklistRecord, ReconciliationRecord, ReconciliationBatch } from '../types';
+export declare class DataStore {
+    private static instance;
+    private registrations;
+    private waitlist;
+    private checkIns;
+    private blacklist;
+    private reconciliationBatches;
+    private reconciliationRecords;
+    private constructor();
+    static getInstance(): DataStore;
+    saveRegistrations(records: RegistrationRecord[]): void;
+    getRegistration(id: string): RegistrationRecord | undefined;
+    getAllRegistrations(): RegistrationRecord[];
+    saveWaitlist(records: WaitlistRecord[]): void;
+    getWaitlistRecord(id: string): WaitlistRecord | undefined;
+    getAllWaitlist(): WaitlistRecord[];
+    saveCheckIns(records: CheckInRecord[]): void;
+    getCheckIn(id: string): CheckInRecord | undefined;
+    getAllCheckIns(): CheckInRecord[];
+    saveBlacklist(records: BlacklistRecord[]): void;
+    getBlacklistRecord(id: string): BlacklistRecord | undefined;
+    getAllBlacklist(): BlacklistRecord[];
+    saveReconciliationBatch(batch: ReconciliationBatch): void;
+    getReconciliationBatch(id: string): ReconciliationBatch | undefined;
+    getAllReconciliationBatches(): ReconciliationBatch[];
+    saveReconciliationRecords(records: ReconciliationRecord[]): void;
+    updateReconciliationRecord(record: ReconciliationRecord): void;
+    getReconciliationRecord(id: string): ReconciliationRecord | undefined;
+    getReconciliationRecordsByBatch(batchId: string): ReconciliationRecord[];
+    getAllReconciliationRecords(): ReconciliationRecord[];
+    clearAll(): void;
+    clearImportedData(): void;
+}
