@@ -7,14 +7,14 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('开始创建测试数据...');
 
-  await prisma.activity.deleteMany({});
-  await prisma.batch.deleteMany({});
+  await prisma.processingRecord.deleteMany({});
+  await prisma.attendance.deleteMany({});
+  await prisma.auditLog.deleteMany({});
   await prisma.registration.deleteMany({});
   await prisma.waitlistEntry.deleteMany({});
-  await prisma.attendance.deleteMany({});
   await prisma.blacklistEntry.deleteMany({});
-  await prisma.processingRecord.deleteMany({});
-  await prisma.auditLog.deleteMany({});
+  await prisma.batch.deleteMany({});
+  await prisma.activity.deleteMany({});
 
   const activity = await prisma.activity.create({
     data: {
@@ -161,6 +161,32 @@ async function main() {
     }
   }
 
+  const needsMaterialsReg = await prisma.registration.create({
+    data: {
+      batchId: regBatch.id,
+      activityId: activity.id,
+      idCard: '110101199001010011',
+      name: '王十二',
+      phone: '13800138010',
+      community: '幸福社区',
+      source: 'DIRECT',
+      originalOrder: 8,
+      finalStatus: 'NEEDS_MATERIALS',
+    },
+  });
+
+  await prisma.processingRecord.create({
+    data: {
+      registrationId: needsMaterialsReg.id,
+      action: 'REQUEST_MATERIALS',
+      statusBefore: 'PENDING',
+      statusAfter: 'NEEDS_MATERIALS',
+      reason: '身份证复印件缺失，请补充身份证扫描件',
+      processedBy: '李主任',
+    },
+  });
+  console.log(`  第8条: 王十二 - 需补材料（身份证复印件缺失）`);
+
   const waitlistBatch = await prisma.batch.create({
     data: {
       activityId: activity.id,
@@ -203,6 +229,13 @@ async function main() {
   console.log(`  GET  http://localhost:3000/api/query/registrations?activityId=${activity.id} - 查询所有报名记录`);
   console.log(`  GET  http://localhost:3000/api/query/waitlist?activityId=${activity.id} - 查询候补记录`);
   console.log(`  GET  http://localhost:3000/api/export/registrations?activityId=${activity.id} - 导出报名记录`);
+  console.log(`\n处理链路测试:`);
+  console.log(`  POST http://localhost:3000/api/processing/registrations/{id}/request-materials - 标记需补材料`);
+  console.log(`  POST http://localhost:3000/api/processing/registrations/{id}/approve - 审批通过`);
+  console.log(`  POST http://localhost:3000/api/processing/registrations/{id}/reject - 审批拒绝`);
+  console.log(`  POST http://localhost:3000/api/processing/registrations/{id}/cancel - 取消报名`);
+  console.log(`  POST http://localhost:3000/api/processing/waitlist/promote - 触发候补递补`);
+  console.log(`  GET  http://localhost:3000/api/processing/history?registrationId={id} - 查询单条处理历史`);
 
   await prisma.$disconnect();
 }
