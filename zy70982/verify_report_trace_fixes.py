@@ -2,6 +2,7 @@
 """验证报告生成和追踪功能的修复"""
 import sys
 import os
+from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -45,9 +46,10 @@ try:
         light_id="L001",
         alarm_type="灯具故障",
         alarm_level="高",
-        alarm_time="2024-01-15 08:30:00",
+        alarm_time=datetime(2024, 1, 15, 8, 30, 0),
         description="路灯不亮",
-        status="已修复"
+        status="已修复",
+        source_file="test.csv"
     )
     alarm_b10 = models.Alarm(
         alarm_id="ALM002",
@@ -55,9 +57,10 @@ try:
         light_id="L001",
         alarm_type="电源故障",
         alarm_level="高",
-        alarm_time="2024-01-15 09:15:00",
+        alarm_time=datetime(2024, 1, 15, 9, 15, 0),
         description="电源跳闸",
-        status="已修复"
+        status="已修复",
+        source_file="test.csv"
     )
     db.add(alarm_b1)
     db.add(alarm_b10)
@@ -127,9 +130,10 @@ try:
         light_id="L001",
         alarm_type="灯泡故障",
         alarm_level="中",
-        alarm_time="2024-01-16 10:00:00",
+        alarm_time=datetime(2024, 1, 16, 10, 0, 0),
         description="灯泡烧坏",
-        status="待修复"
+        status="待修复",
+        source_file="test.csv"
     )
     db.add(alarm_under)
     db.commit()
