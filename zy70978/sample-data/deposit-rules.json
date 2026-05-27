@@ -1,0 +1,24 @@
+{
+  "rules": [
+    {
+      "ruleName": "工程机械设备通用规则",
+      "equipmentType": "通用",
+      "depositRate": 0.3,
+      "minDeposit": 500,
+      "maxDeposit": 20000,
+      "isActive": true,
+      "overduePenaltyRate": 0.005,
+      "overdueGraceDays": 3
+    },
+    {
+      "ruleName": "高空作业设备规则",
+      "equipmentType": "高空",
+      "depositRate": 0.4,
+      "minDeposit": 1000,
+      "maxDeposit": 15000,
+      "isActive": true,
+      "overduePenaltyRate": 0.01,
+      "overdueGraceDays": 2
+    }
+  ]
+}

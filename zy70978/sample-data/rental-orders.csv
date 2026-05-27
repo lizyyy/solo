@@ -1,0 +1,6 @@
+orderNo,tenantName,tenantId,equipmentSerialNo,equipmentName,startDate,endDate,actualReturnDate,monthlyRent,depositAmount,actualDepositPaid,status,notes
+RENT001,张三,T001,EQ2024001,高空作业车,2024-01-15,2024-03-15,2024-03-20,5000,1500,1500,pending,逾期5天归还
+RENT002,李四,T002,EQ2024002,挖掘机,2024-02-01,2024-05-01,,8000,2400,2400,pending,
+RENT003,王五,T003,EQ2024003,叉车,2024-01-01,2024-06-01,2024-06-05,3000,900,900,pending,租期内有维修
+RENT004,赵六,T004,EQ2024004,压路机,2024-03-01,2024-04-01,2024-04-01,6000,1800,1500,pending,押金不足
+RENT005,钱七,T005,EQ2024005,起重机,2024-02-15,2024-05-15,2024-06-01,12000,3600,3600,pending,逾期严重

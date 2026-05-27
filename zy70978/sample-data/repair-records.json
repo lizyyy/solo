@@ -1,0 +1,62 @@
+[
+  {
+    "repairNo": "REP001",
+    "equipmentSerialNo": "EQ2024001",
+    "reportDate": "2024-03-21",
+    "repairDate": "2024-03-22",
+    "repairContent": "更换液压油，检修升降系统",
+    "repairCost": 800,
+    "liability": "natural_wear",
+    "reporter": "维修部-李工",
+    "boundOrderNo": "RENT001",
+    "notes": "正常损耗"
+  },
+  {
+    "repairNo": "REP002",
+    "equipmentSerialNo": "EQ2024003",
+    "reportDate": "2024-03-10",
+    "repairDate": "2024-03-11",
+    "repairContent": "门架变形修复，更换前轮",
+    "repairCost": 1500,
+    "liability": "tenant",
+    "reporter": "维修部-王工",
+    "boundOrderNo": "RENT003",
+    "notes": "租客操作不当导致碰撞"
+  },
+  {
+    "repairNo": "REP003",
+    "equipmentSerialNo": "EQ2024003",
+    "reportDate": "2024-05-15",
+    "repairDate": "2024-05-16",
+    "repairContent": "发动机故障检修",
+    "repairCost": 2000,
+    "liability": "pending",
+    "reporter": "维修部-张工",
+    "boundOrderNo": "RENT003",
+    "notes": "待核实故障原因"
+  },
+  {
+    "repairNo": "REP004",
+    "equipmentSerialNo": "EQ2024005",
+    "reportDate": "2024-06-02",
+    "repairDate": "2024-06-03",
+    "repairContent": "更换钢丝绳，检查制动系统",
+    "repairCost": 3500,
+    "liability": "tenant",
+    "reporter": "维修部-刘工",
+    "boundOrderNo": "RENT005",
+    "notes": "超载使用导致磨损严重"
+  },
+  {
+    "repairNo": "REP005",
+    "equipmentSerialNo": "EQ2024005",
+    "reportDate": "2024-06-02",
+    "repairDate": "2024-06-03",
+    "repairContent": "更换钢丝绳，检查制动系统",
+    "repairCost": 3500,
+    "liability": "tenant",
+    "reporter": "维修部-刘工",
+    "boundOrderNo": "RENT005",
+    "notes": "重复录入测试"
+  }
+]
