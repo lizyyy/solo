@@ -1,0 +1,19 @@
+{
+  "name": "station-package-tracker",
+  "version": "1.0.0",
+  "description": "驿站包裹追踪服务：CSV/短信/退回规则接入 + 审计日志 + 查询导出",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "better-sqlite3": "^11.3.0",
+    "multer": "^1.4.5-lts.1",
+    "csv-parse": "^5.5.6",
+    "json2csv": "^6.0.0-alpha.2",
+    "dayjs": "^1.11.13"
+  }
+}
