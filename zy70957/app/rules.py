@@ -1,5 +1,6 @@
 from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime, timedelta
+import pandas as pd
 from .models import RecordStatus
 
 
@@ -60,8 +61,8 @@ class BusinessRuleEngine:
                 "请补充详细的故障描述，至少5个字符，以便维修师傅提前准备"
             )
 
-        room = record.get("room", "")
-        if not isinstance(room, str) or not room:
+        room = record.get("room")
+        if room is None or (isinstance(room, str) and not room) or (isinstance(room, float) and pd.isna(room)):
             return (
                 RecordStatus.PENDING_CONFIRM,
                 "房间号缺失",
@@ -165,6 +166,14 @@ class BusinessRuleEngine:
         comment = record.get("comment", "")
         if not isinstance(comment, str):
             comment = ""
+
+        if self._is_malicious_rating(record):
+            return (
+                RecordStatus.FAILED,
+                "疑似恶意评分",
+                "检测到该评价存在异常模式，已标记为待人工审核"
+            )
+
         if score == 1 and len(comment.strip()) < 10:
             return (
                 RecordStatus.PENDING_CONFIRM,
@@ -187,13 +196,6 @@ class BusinessRuleEngine:
             except ValueError:
                 pass
 
-        if self._is_malicious_rating(record):
-            return (
-                RecordStatus.FAILED,
-                "疑似恶意评分",
-                "检测到该评价存在异常模式，已标记为待人工审核"
-            )
-
         self.processed_rating_ids.add(rating_id)
         return RecordStatus.NORMAL, None, None
 
@@ -213,3 +215,37 @@ class BusinessRuleEngine:
             return True
 
         return False
+
+    def check_timeout_penalty(self, repair_record: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        submit_time = repair_record.get("submit_time")
+        complete_time = repair_record.get("complete_time")
+        status = repair_record.get("status")
+
+        if status != "completed" or not submit_time or not complete_time:
+            return None
+
+        try:
+            submit_dt = datetime.fromisoformat(str(submit_time).replace("Z", "+00:00"))
+            complete_dt = datetime.fromisoformat(str(complete_time).replace("Z", "+00:00"))
+
+            time_diff_hours = (complete_dt - submit_dt).total_seconds() / 3600
+
+            SLA_HOURS = 24
+            if time_diff_hours > SLA_HOURS:
+                overtime_hours = time_diff_hours - SLA_HOURS
+                penalty_per_hour = 0.1
+                penalty_points = min(round(overtime_hours * penalty_per_hour, 2), 5.0)
+
+                return {
+                    "repair_id": repair_record.get("repair_id"),
+                    "submit_time": submit_time,
+                    "complete_time": complete_time,
+                    "total_hours": round(time_diff_hours, 2),
+                    "overtime_hours": round(overtime_hours, 2),
+                    "penalty_points": penalty_points,
+                    "reason": f"维修超时{round(overtime_hours, 1)}小时，超过24小时服务承诺"
+                }
+        except (ValueError, TypeError):
+            pass
+
+        return None

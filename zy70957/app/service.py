@@ -62,6 +62,22 @@ class DataProcessorService:
                 record, self.existing_repairs
             )
 
+            penalty_info = self.rule_engine.check_timeout_penalty(record)
+            if penalty_info and status != RecordStatus.FAILED:
+                worker_id = record.get("worker_id")
+                if worker_id and worker_id in self.existing_workers:
+                    worker = self.existing_workers[worker_id]
+                    worker["timeout_count"] = worker.get("timeout_count", 0) + 1
+                    worker["penalty_points"] = worker.get("penalty_points", 0.0) + penalty_info["penalty_points"]
+                    if "penalty_records" not in worker:
+                        worker["penalty_records"] = []
+                    worker["penalty_records"].append(penalty_info)
+                    if reason:
+                        reason = reason + f"；{penalty_info['reason']}，扣{penalty_info['penalty_points']}分"
+                    else:
+                        reason = f"{penalty_info['reason']}，扣{penalty_info['penalty_points']}分"
+                    suggestion = "请关注维修时效，避免再次超时影响评分"
+
             processed = ProcessedRecord(
                 original_data=record,
                 status=status,
@@ -168,16 +184,16 @@ class DataProcessorService:
         all_pending = []
         all_failed = []
 
-        if repair_csv:
-            repair_records = self.parse_csv(repair_csv)
-            n, p, f = self.process_repairs(repair_records, batch_id)
+        if worker_json:
+            worker_records = self.parse_json(worker_json)
+            n, p, f = self.process_workers(worker_records, batch_id)
             all_normal.extend(n)
             all_pending.extend(p)
             all_failed.extend(f)
 
-        if worker_json:
-            worker_records = self.parse_json(worker_json)
-            n, p, f = self.process_workers(worker_records, batch_id)
+        if repair_csv:
+            repair_records = self.parse_csv(repair_csv)
+            n, p, f = self.process_repairs(repair_records, batch_id)
             all_normal.extend(n)
             all_pending.extend(p)
             all_failed.extend(f)

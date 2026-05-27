@@ -39,6 +39,9 @@ class WorkerRecord(BaseModel):
     skills: List[str]
     rating: float = 5.0
     total_orders: int = 0
+    timeout_count: int = 0
+    penalty_points: float = 0.0
+    penalty_records: List[Dict[str, Any]] = []
 
 
 class RatingRecord(BaseModel):
