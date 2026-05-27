@@ -39,7 +39,7 @@ def test_structured_idempotency():
         "petty_cash": petty_cash,
     }
 
-    conn = http.client.HTTPConnection("localhost", 8001)
+    conn = http.client.HTTPConnection("localhost", 8000)
     headers = {"Content-Type": "application/json"}
 
     print("=" * 60)
@@ -126,7 +126,7 @@ def test_upload_idempotency():
     body += add_field("petty_cash_file", petty_cash_json, True, "petty_cash.json", "application/json")
     body += f"--{boundary}--\r\n".encode()
 
-    conn = http.client.HTTPConnection("localhost", 8001)
+    conn = http.client.HTTPConnection("localhost", 8000)
     headers = {"Content-Type": f"multipart/form-data; boundary={boundary}"}
 
     print("\n" + "=" * 60)

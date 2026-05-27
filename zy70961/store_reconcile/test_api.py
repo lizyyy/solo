@@ -36,7 +36,7 @@ def test_upload_api():
     body += add_field("petty_cash_file", petty_cash_json, True, "petty_cash.json", "application/json")
     body += f"--{boundary}--\r\n".encode()
 
-    conn = http.client.HTTPConnection("localhost", 8001)
+    conn = http.client.HTTPConnection("localhost", 8000)
     headers = {"Content-Type": f"multipart/form-data; boundary={boundary}"}
     conn.request("POST", "/api/v1/reconcile/upload", body, headers)
     response = conn.getresponse()
