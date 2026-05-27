@@ -26,6 +26,11 @@ def test_structured_idempotency():
             "reference_no": parts[4] if len(parts) > 4 else None,
         })
 
+    for s in sales:
+        s["store_id"] = "STORE001"
+    for p in petty_cash:
+        p["store_id"] = "STORE001"
+
     payload = {
         "store_id": "STORE001",
         "batch_date": "2026-05-24",

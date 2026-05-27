@@ -192,6 +192,19 @@ python3 -m store_reconcile.main
 python3 -m store_reconcile.test_api
 ```
 
+### 方式三：双接口幂等性验证
+
+同时验证结构化接口 `/api/v1/reconcile` 和文件上传接口 `/api/v1/reconcile/upload` 的幂等性：
+
+```bash
+# 1. 启动服务（另开终端）
+cd /Users/lzy/pro/solo/workspaces/zy70961
+python3 -m store_reconcile.main
+
+# 2. 运行双接口幂等测试
+python3 -m store_reconcile.test_full_idempotency
+```
+
 ## 常见问题
 
 ### Q: 端口 8000 被占用怎么办？
@@ -217,6 +230,7 @@ zy70961/                              # 项目根目录
     ├── main.py                       # FastAPI 入口
     ├── test_local.py                 # 本地测试脚本
     ├── test_api.py                   # API 测试脚本
+    ├── test_full_idempotency.py      # 双接口幂等测试脚本
     ├── README.md                     # 本文件
     ├── models/
     │   ├── __init__.py
