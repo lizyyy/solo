@@ -128,7 +128,3 @@ function seed() {
 }
 
 seed();
-  console.log('  GET http://localhost:3000/api/operation-logs?batch_id=' + batchId + '  - 操作日志');
-}
-
-seed();

@@ -250,8 +250,8 @@ function finalizeBatch(batchId, operator) {
   if (pending > 0) {
     return { success: false, error: 'Still ' + pending + ' records pending' };
   }
-  db.prepare('UPDATE batches SET status = ? , updated_at = datetime(?) WHERE id = ?')
-    .run('completed', 'now', 'localtime', batchId);
+  db.prepare('UPDATE batches SET status = ? , updated_at = datetime(\'now\', \'localtime\') WHERE id = ?')
+    .run('completed', batchId);
   logOperation({
     batch_id: batchId, action: 'finalize_batch', operator,
     reason: 'Batch ' + batch.batch_no + ' completed'
