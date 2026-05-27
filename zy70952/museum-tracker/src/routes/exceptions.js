@@ -5,7 +5,7 @@ const { success, fail, paginate } = require('../utils/response');
 
 router.post('/', async (req, res) => {
   try {
-    const operator = req.headers['x-operator'] || 'system';
+    const operator = req.operator;
     const id = await exceptionService.createException(req.body, operator);
     success(res, { id }, '异常记录已创建');
   } catch (e) {
@@ -34,7 +34,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/:id/resolve', async (req, res) => {
   try {
-    const operator = req.headers['x-operator'] || 'system';
+    const operator = req.operator;
     await exceptionService.resolveException(req.params.id, operator, req.body.resolutionNote);
     success(res, {}, '异常已处理');
   } catch (e) {

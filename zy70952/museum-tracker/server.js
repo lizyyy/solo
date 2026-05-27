@@ -2,18 +2,13 @@ const express = require('express');
 const config = require('./config');
 const { getDb } = require('./src/db/connection');
 const { initSchema } = require('./src/db/schema');
+const { extractOperator } = require('./src/middleware/operator');
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.use((req, res, next) => {
-  if (!req.headers['x-operator']) {
-    req.headers['x-operator'] = 'system';
-  }
-  next();
-});
+app.use(extractOperator);
 
 app.use('/api/batches', require('./src/routes/batches'));
 app.use('/api/artifacts', require('./src/routes/artifacts'));

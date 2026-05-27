@@ -35,7 +35,7 @@ const upload = multer({
 router.post('/artifacts/csv', upload.single('csv'), async (req, res) => {
   try {
     if (!req.file) return fail(res, '请上传 CSV 文件', 400);
-    const operator = req.headers['x-operator'] || 'system';
+    const operator = req.operator;
     const result = await importService.importArtifactsFromCsv(req.file.path, operator);
     success(res, result, `CSV 导入完成: 新增 ${result.imported} 件, 更新 ${result.updated} 件`);
   } catch (e) {
@@ -46,7 +46,7 @@ router.post('/artifacts/csv', upload.single('csv'), async (req, res) => {
 router.post('/transport/json', upload.single('json'), async (req, res) => {
   try {
     if (!req.file) return fail(res, '请上传 JSON 文件', 400);
-    const operator = req.headers['x-operator'] || 'system';
+    const operator = req.operator;
     const result = await importService.importTransportFromJson(req.file.path, operator);
     success(res, result, `运输 JSON 导入完成: ${result.imported} 条`);
   } catch (e) {
@@ -57,7 +57,7 @@ router.post('/transport/json', upload.single('json'), async (req, res) => {
 router.post('/insurance/json', upload.single('json'), async (req, res) => {
   try {
     if (!req.file) return fail(res, '请上传 JSON 文件', 400);
-    const operator = req.headers['x-operator'] || 'system';
+    const operator = req.operator;
     const result = await importService.importInsuranceFromJson(req.file.path, operator);
     success(res, result, `保险 JSON 导入完成: ${result.imported} 条`);
   } catch (e) {

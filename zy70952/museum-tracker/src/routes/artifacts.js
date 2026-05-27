@@ -8,7 +8,7 @@ router.post('/', async (req, res) => {
   try {
     const error = validateRequired(['artifactNo', 'name', 'level', 'valuation'], req.body);
     if (error) return fail(res, error.message, 400);
-    const operator = req.headers['x-operator'] || 'system';
+    const operator = req.operator;
     const id = await artifactService.createArtifact(req.body, operator);
     success(res, { id }, '文物创建成功');
   } catch (e) {
@@ -36,7 +36,7 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const operator = req.headers['x-operator'] || 'system';
+    const operator = req.operator;
     await artifactService.updateArtifact(req.params.id, req.body, operator);
     success(res, {}, '文物信息已更新');
   } catch (e) {
@@ -48,7 +48,7 @@ router.post('/:id/valuation', async (req, res) => {
   try {
     const error = validateRequired(['newValue', 'reason'], req.body);
     if (error) return fail(res, error.message, 400);
-    const operator = req.headers['x-operator'] || 'system';
+    const operator = req.operator;
     await artifactService.updateValuation(req.params.id, req.body.newValue, req.body.reason, operator);
     success(res, {}, '估值已更新');
   } catch (e) {
