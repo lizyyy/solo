@@ -121,7 +121,7 @@ def register_routes(app):
 
             material_hash = generate_material_hash(raw_content)
 
-            existing_raw = find_duplicate(material_hash, exclude_batch_id=batch_id)
+            existing_raw = find_duplicate(material_hash)
 
             if existing_raw:
                 duplicate_count += 1
@@ -329,7 +329,7 @@ def register_routes(app):
         for record in valid_records:
             try:
                 success_count += 1
-                ProcessLog(
+                process_log = ProcessLog(
                     record_id=record.id,
                     action_type='writeback',
                     field_name=None,
@@ -338,6 +338,7 @@ def register_routes(app):
                     operator=triggered_by,
                     reason=f'回写到系统: {target_system}',
                 )
+                db.session.add(process_log)
             except Exception as e:
                 failed_count += 1
                 error_details.append({
