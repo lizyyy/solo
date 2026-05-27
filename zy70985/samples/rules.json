@@ -1,0 +1,7 @@
+{
+  "rules": [
+    {"rule_id": "r1", "rule_name": "超期退回", "rule_type": "overdue_return", "overstay_days": 7, "enabled": true},
+    {"rule_id": "r2", "rule_name": "重复催取", "rule_type": "repeat_remind", "overstay_days": 7, "enabled": true, "params": {"threshold": 3}},
+    {"rule_id": "r3", "rule_name": "隐私遮蔽", "rule_type": "privacy_mask", "overstay_days": 7, "enabled": true, "params": {"mask_phone": true, "mask_name": true}}
+  ]
+}
