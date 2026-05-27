@@ -78,4 +78,3 @@ def list_pending_reviews(
             for d in pending_deductions
         ]
     }
-}

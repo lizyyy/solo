@@ -195,6 +195,10 @@ class ReportService:
             "generated_at": datetime.now().isoformat()
         }
 
+        # 序列化 datetime 对象以确保 JSON 兼容
+        report_data = json.loads(json.dumps(report_data, default=str))
+        summary = json.loads(json.dumps(summary, default=str))
+
         report_no = f"RPT-{order.order_no}-{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
         report = ReconciliationReport(

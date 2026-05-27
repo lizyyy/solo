@@ -22,28 +22,6 @@ def generate_report(
     return result
 
 
-@router.get("/{report_no}")
-def get_report(report_no: str, db: Session = Depends(get_db)):
-    service = ReportService(db)
-    report = service.get_report(report_no)
-    if not report:
-        raise HTTPException(status_code=404, detail=f"报告 {report_no} 不存在")
-    return report
-
-
-@router.post("/{report_no}/export")
-def export_report(
-    report_no: str,
-    format: str = Query("json", description="导出格式: json/text"),
-    db: Session = Depends(get_db)
-):
-    service = ReportService(db)
-    result = service.export_report(report_no, format)
-    if not result.get("success"):
-        raise HTTPException(status_code=400, detail=result.get("message", "导出失败"))
-    return result
-
-
 @router.get("/list")
 def list_reports(
     order_id: str = None,
@@ -76,6 +54,29 @@ def list_reports(
             for r in reports
         ]
     }
+
+
+
+@router.get("/{report_no}")
+def get_report(report_no: str, db: Session = Depends(get_db)):
+    service = ReportService(db)
+    report = service.get_report(report_no)
+    if not report:
+        raise HTTPException(status_code=404, detail=f"报告 {report_no} 不存在")
+    return report
+
+
+@router.post("/{report_no}/export")
+def export_report(
+    report_no: str,
+    format: str = Query("json", description="导出格式: json/text"),
+    db: Session = Depends(get_db)
+):
+    service = ReportService(db)
+    result = service.export_report(report_no, format)
+    if not result.get("success"):
+        raise HTTPException(status_code=400, detail=result.get("message", "导出失败"))
+    return result
 
 
 @router.get("/deposit/{order_id}/history")

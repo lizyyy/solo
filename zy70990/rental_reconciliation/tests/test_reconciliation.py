@@ -121,7 +121,7 @@ class TestOrderManagement:
         with open(import_file, "rb") as f:
             response = client.post(
                 "/api/orders/import/json",
-                files={"file": ("test.json", f, "application/json"}
+                files={"file": ("test.json", f, "application/json")}
             )
 
         assert response.status_code == 200
@@ -155,7 +155,7 @@ class TestReconciliation:
         with open(meter_file, "rb") as f:
             meter_response = client.post(
                 "/api/orders/import/meter-csv",
-                files={"file": ("meter.csv", f, "text/csv"}
+                files={"file": ("meter.csv", f, "text/csv")}
             )
         assert meter_response.status_code == 200
 
@@ -192,7 +192,7 @@ class TestReconciliation:
         with open(meter_file, "rb") as f:
             meter_response = client.post(
                 "/api/orders/import/meter-csv",
-                files={"file": ("tier.csv", f, "text/csv"}
+                files={"file": ("tier.csv", f, "text/csv")}
             )
 
         os.remove(meter_file)
@@ -240,7 +240,7 @@ class TestReconciliation:
         with open(meter_file, "rb") as f:
             client.post(
                 "/api/orders/import/meter-csv",
-                files={"file": ("diff.csv", f, "text/csv"}
+                files={"file": ("diff.csv", f, "text/csv")}
             )
 
         os.remove(meter_file)
@@ -280,7 +280,7 @@ class TestReview:
         with open(ded_file, "rb") as f:
             ded_response = client.post(
                 "/api/orders/import/deduction-batch",
-                files={"file": ("ded.json", f, "application/json"}
+                files={"file": ("ded.json", f, "application/json")}
             )
 
         assert ded_response.status_code == 200
@@ -334,7 +334,7 @@ class TestReview:
         with open(ded_file, "rb") as f:
             client.post(
                 "/api/orders/import/deduction-batch",
-                files={"file": ("reject.json", f, "application/json"}
+                files={"file": ("reject.json", f, "application/json")}
             )
 
         os.remove(ded_file)
@@ -412,7 +412,7 @@ class TestDepositHistory:
         with open(meter_file, "rb") as f:
             client.post(
                 "/api/orders/import/meter-csv",
-                files={"file": ("history.csv", f, "text/csv"}
+                files={"file": ("history.csv", f, "text/csv")}
             )
 
         os.remove(meter_file)
@@ -467,7 +467,7 @@ class TestReport:
         with open(meter_file, "rb") as f:
             client.post(
                 "/api/orders/import/meter-csv",
-                files={"file": ("report.csv", f, "text/csv"}
+                files={"file": ("report.csv", f, "text/csv")}
             )
 
         os.remove(meter_file)
@@ -546,7 +546,7 @@ class TestEndToEnd:
         with open(meter_file, "rb") as f:
             client.post(
                 "/api/orders/import/meter-csv",
-                files={"file": ("e2e.csv", f, "text/csv"}
+                files={"file": ("e2e.csv", f, "text/csv")}
             )
 
         os.remove(meter_file)
@@ -573,7 +573,7 @@ class TestEndToEnd:
         with open(ded_file, "rb") as f:
             client.post(
                 "/api/orders/import/deduction-batch",
-                files={"file": ("e2e_ded.json", f, "application/json"}
+                files={"file": ("e2e_ded.json", f, "application/json")}
             )
 
         os.remove(ded_file)
