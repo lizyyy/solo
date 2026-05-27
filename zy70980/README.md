@@ -34,6 +34,11 @@ npm start
 
 服务将在 `http://localhost:3000` 启动
 
+**自定义端口**:
+```bash
+PORT=3001 npm start
+```
+
 ### 开发模式
 
 ```bash
@@ -42,24 +47,66 @@ npm run dev
 
 ### 验证测试
 
-项目包含完整的功能验证脚本：
+项目包含完整的功能验证脚本，**不依赖已有数据**，从空库开始完整验证所有核心流程：
+
+#### 方式1: Node.js验证脚本
 
 ```bash
-# 先启动服务
+# 1. 启动服务（默认端口3000）
 npm start
 
-# 另开终端运行验证脚本
+# 2. 另开终端运行验证脚本
 node test_all.js
+
+# 如需自定义端口（服务和测试脚本需保持一致）
+PORT=3001 npm start                 # 启动服务时指定端口
+TEST_PORT=3001 node test_all.js     # 运行测试时指定相同端口
 ```
 
-验证脚本会测试所有核心功能：
-- 健康检查
-- 数据导入（告警CSV、巡查JSON、维修单）
-- 标记处理、退回修改
-- 修复复测
-- 多维查询（灯杆编号、维修队、复测结果）
-- 完整追溯链路
-- 数据导出及数量一致性验证
+#### 方式2: curl快速验证
+
+```bash
+# 健康检查
+curl -s http://localhost:3000/api/health
+
+# 导入告警CSV
+curl -s -X POST http://localhost:3000/api/import/alarm-csv \
+  -F "file=@examples/test_alarm.csv;filename=a.csv" \
+  -F "created_by=测试" \
+  -F "source_name=验证"
+
+# 导入巡查JSON
+curl -s -X POST http://localhost:3000/api/import/inspection-json \
+  -H "Content-Type: application/json" \
+  -d '{"data":[{"pole_no":"V001","light_no":"LD001","issue_type":"灯杆倾斜","level":"严重","location":"验证路","description":"验证","maintenance_team":"验证队","inspector":"验证","inspection_time":"2024-05-21 14:00:00"}],"created_by":"测试","source_name":"验证"}'
+
+# 导入维修单
+curl -s -X POST http://localhost:3000/api/import/work-order \
+  -H "Content-Type: application/json" \
+  -d '{"order_data":{"order_no":"WXV001","pole_no":"V002","light_no":"LD001","repair_type":"灯泡更换","location":"验证路","description":"验证","maintenance_team":"验证队","worker":"验证","repair_time":"2024-05-22 10:00:00"},"created_by":"测试"}'
+
+# 查询记录
+curl -s http://localhost:3000/api/records | python3 -c "import sys,json; print('总记录数:', json.load(sys.stdin)['total'])"
+
+# 导出并验证数量一致性
+TEAM=$(python3 -c "import urllib.parse; print(urllib.parse.quote('维修一队'))")
+QC=$(curl -s "http://localhost:3000/api/records?maintenance_team=$TEAM" | python3 -c "import sys,json; print(json.load(sys.stdin)['total'])")
+EC=$(curl -s "http://localhost:3000/api/export/records?maintenance_team=$TEAM" | grep -v '^$' | tail -n +2 | wc -l | tr -d ' ')
+echo "查询结果数: $QC, 导出行数: $EC"
+```
+
+验证脚本会完整测试所有核心流程（**从数据导入到导出追溯的完整链路**）：
+- ✅ 健康检查
+- ✅ 告警CSV文件导入（完整流程）
+- ✅ 巡查JSON数据导入（完整流程）
+- ✅ 维修单导入（完整流程）
+- ✅ 标记处理（记录原因、处理人、时间）
+- ✅ 退回修改（记录退回原因）
+- ✅ 修复复测（记录复测结果和原因）
+- ✅ 多维查询（灯杆编号、维修队、复测结果）
+- ✅ 完整追溯链路（每步操作都可向领导解释）
+- ✅ 数据导出及数量一致性验证
+- ✅ 复测结果追溯来源
 
 ## API 接口文档
 
@@ -387,5 +434,6 @@ GET /api/export/recheck-trace?recheck_result=pass
 │       └── generator.js       # 工具函数
 ├── data/                      # 数据库文件目录
 ├── uploads/                   # 上传文件临时目录
+├── test_all.js                # 完整功能验证脚本
 └── package.json
 ```
