@@ -1,4 +1,7 @@
-const db = require('./database');
+const fs = require('fs');
+const path = require('path');
+
+const code = `const db = require('./database');
 
 const CATEGORIES = {
   NORMAL: '正常',
@@ -43,7 +46,7 @@ function validateItem(item, rowIndex) {
     });
   }
 
-  if (item.receiver_phone && !/^1[3-9]\d{9}$/.test(item.receiver_phone)) {
+  if (item.receiver_phone && !/^1[3-9]\\d{9}$/.test(item.receiver_phone)) {
     errors.push({
       row_index: rowIndex,
       field_name: 'receiver_phone',
@@ -216,3 +219,10 @@ module.exports = {
   classifyItem: classifyItem,
   processBatch: processBatch
 };
+`;
+
+const targetPath = path.join(__dirname, 'src', 'classifier.js');
+fs.writeFileSync(targetPath, code, 'utf8');
+console.log('Written to:', targetPath);
+console.log('Size:', fs.statSync(targetPath).size, 'bytes');
+console.log('Lines:', code.split('\\n').length);

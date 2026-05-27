@@ -14,10 +14,10 @@ function generateBatchId() {
 }
 
 function calculateContentHash(items) {
-  const sorted = JSON.stringify(items.sort((a, b) => 
+  const sortedItems = [...items].sort((a, b) =>
     (a.waybill_no || '').localeCompare(b.waybill_no || '')
-  ));
-  return crypto.createHash('sha256').update(sorted).digest('hex');
+  );
+  return crypto.createHash('sha256').update(JSON.stringify(sortedItems)).digest('hex');
 }
 
 function getBatchResults(batchId) {

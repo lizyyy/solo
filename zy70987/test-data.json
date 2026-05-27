@@ -1,0 +1,46 @@
+{
+  "station_id": "STATION_TEST",
+  "batch_no": "TEST_ORDER_001",
+  "items": [
+    {
+      "waybill_no": "ZZZZ00000000004",
+      "receiver_name": "李四",
+      "receiver_phone": "13900139002",
+      "detained_at": "2026-05-20T10:00:00Z",
+      "expected_pickup_at": "2026-05-25T18:00:00Z",
+      "parcel_type": "普通",
+      "storage_location": "A-02",
+      "remark": ""
+    },
+    {
+      "waybill_no": "AAAA00000000001",
+      "receiver_name": "",
+      "receiver_phone": "13800138001",
+      "detained_at": "2026-05-22T09:00:00Z",
+      "expected_pickup_at": "2026-05-28T18:00:00Z",
+      "parcel_type": "生鲜",
+      "storage_location": "B-01",
+      "remark": ""
+    },
+    {
+      "waybill_no": "ZZZZ00000000003",
+      "receiver_name": "王五",
+      "receiver_phone": "13800138003",
+      "detained_at": "2026-05-26T09:00:00Z",
+      "expected_pickup_at": "2026-05-24T18:00:00Z",
+      "parcel_type": "贵重",
+      "storage_location": "C-01",
+      "remark": "用户要求拦截"
+    },
+    {
+      "waybill_no": "ZZZZ00000000002",
+      "receiver_name": "赵六",
+      "receiver_phone": "13800138004",
+      "detained_at": "2026-05-21T09:00:00Z",
+      "expected_pickup_at": "2026-05-27T18:00:00Z",
+      "parcel_type": "普通",
+      "storage_location": "A-03",
+      "remark": ""
+    }
+  ]
+}
