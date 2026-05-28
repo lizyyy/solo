@@ -15,15 +15,15 @@ export default function DetailTable() {
   const [showRawId, setShowRawId] = useState<string | null>(null)
 
   const filtered = selectedNodeId
-    ? selectedNodeId.startsWith('cur-')
+    ? selectedNodeId.startsWith('cur|')
       ? (() => {
-          const parts = selectedNodeId.replace('cur-', '').split('-')
-          const subCode = parts[0]
-          const curCode = parts.slice(1).join('-')
+          const parts = selectedNodeId.split('|')
+          const subCode = parts[1]
+          const curCode = parts[2]
           return exposures.filter((e) => e.subsidiaryCode === subCode && e.currencyCode === curCode)
         })()
-      : selectedNodeId.startsWith('sub-')
-        ? exposures.filter((e) => e.subsidiaryCode === selectedNodeId.replace('sub-', ''))
+      : selectedNodeId.startsWith('sub|')
+        ? exposures.filter((e) => e.subsidiaryCode === selectedNodeId.split('|')[1])
         : exposures
     : exposures
 
@@ -44,7 +44,7 @@ export default function DetailTable() {
   }
 
   const handleRowClick = (exp: Exposure) => {
-    const nodeId = `cur-${exp.subsidiaryCode}-${exp.currencyCode}`
+    const nodeId = `cur|${exp.subsidiaryCode}|${exp.currencyCode}`
     setSelectedNodeId(selectedNodeId === nodeId ? null : nodeId)
   }
 
@@ -85,7 +85,7 @@ export default function DetailTable() {
         <tbody>
           {filtered.map((exp) => {
             const sub = subsidiaries.find((s) => s.code === exp.subsidiaryCode)
-            const isSelected = selectedNodeId === `cur-${exp.subsidiaryCode}-${exp.currencyCode}`
+            const isSelected = selectedNodeId === `cur|${exp.subsidiaryCode}|${exp.currencyCode}`
             return (
               <>
                 <tr

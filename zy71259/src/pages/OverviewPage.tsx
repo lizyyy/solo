@@ -16,6 +16,7 @@ export default function OverviewPage() {
   const selectedDirections = useExposureStore((s) => s.selectedDirections)
   const dataLoaded = useExposureStore((s) => s.dataLoaded)
   const selectedNodeId = useExposureStore((s) => s.selectedNodeId)
+  const setSelectedNodeId = useExposureStore((s) => s.setSelectedNodeId)
 
   const treeData = useMemo(
     () => buildTreeData(subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaryCodes, selectedDirections),
@@ -24,17 +25,30 @@ export default function OverviewPage() {
 
   const summary = useMemo(() => calcSummary(exposures, hedgeContracts), [exposures, hedgeContracts])
 
+  const previewExposures = useMemo(() => {
+    if (!selectedNodeId) return exposures.slice(0, 8)
+    if (selectedNodeId.startsWith('cur|')) {
+      const parts = selectedNodeId.split('|')
+      return exposures.filter((e) => e.subsidiaryCode === parts[1] && e.currencyCode === parts[2])
+    }
+    if (selectedNodeId.startsWith('sub|')) {
+      const subCode = selectedNodeId.split('|')[1]
+      return exposures.filter((e) => e.subsidiaryCode === subCode)
+    }
+    return exposures.slice(0, 8)
+  }, [selectedNodeId, exposures])
+
   const selectedInfo = useMemo(() => {
     if (!selectedNodeId) return null
-    if (selectedNodeId.startsWith('cur-')) {
-      const parts = selectedNodeId.replace('cur-', '').split('-')
-      const subCode = parts[0]
-      const curCode = parts.slice(1).join('-')
+    if (selectedNodeId.startsWith('cur|')) {
+      const parts = selectedNodeId.split('|')
+      const subCode = parts[1]
+      const curCode = parts[2]
       const sub = subsidiaries.find((s) => s.code === subCode)
       return { type: 'currency' as const, label: `${sub?.name || subCode} - ${curCode}` }
     }
-    if (selectedNodeId.startsWith('sub-')) {
-      const subCode = selectedNodeId.replace('sub-', '')
+    if (selectedNodeId.startsWith('sub|')) {
+      const subCode = selectedNodeId.split('|')[1]
       const sub = subsidiaries.find((s) => s.code === subCode)
       return { type: 'subsidiary' as const, label: sub?.name || subCode }
     }
@@ -86,11 +100,18 @@ export default function OverviewPage() {
           <CurrencyFilter />
         </div>
         <div className="p-4 flex-1 overflow-auto">
-          <div className="text-xs text-txt-secondary mb-2 font-medium">敞口明细预览</div>
-          {exposures.slice(0, 8).map((exp) => {
+          <div className="text-xs text-txt-secondary mb-2 font-medium">
+            {selectedInfo ? `${selectedInfo.label} 敞口明细` : '敞口明细预览'}
+          </div>
+          {previewExposures.length > 0 ? previewExposures.map((exp) => {
             const sub = subsidiaries.find((s) => s.code === exp.subsidiaryCode)
+            const isRowSelected = selectedNodeId === `cur|${exp.subsidiaryCode}|${exp.currencyCode}`
             return (
-              <div key={exp.id} className="flex items-center justify-between py-1.5 border-b border-border/30 text-xs">
+              <div
+                key={exp.id}
+                className={`flex items-center justify-between py-1.5 border-b border-border/30 text-xs cursor-pointer transition-colors ${isRowSelected ? 'bg-accent-green/5' : 'hover:bg-card'}`}
+                onClick={() => setSelectedNodeId(isRowSelected ? null : `cur|${exp.subsidiaryCode}|${exp.currencyCode}`)}
+              >
                 <span className="text-txt-secondary">{sub?.name || exp.subsidiaryCode}</span>
                 <span className="font-mono">{exp.currencyCode}</span>
                 <span className={`font-mono ${exp.direction === 'LONG' ? 'text-accent-green' : 'text-accent-red'}`}>
@@ -98,8 +119,10 @@ export default function OverviewPage() {
                 </span>
               </div>
             )
-          })}
-          {exposures.length > 8 && (
+          }) : (
+            <div className="text-xs text-txt-muted text-center py-4">该节点下暂无敞口数据</div>
+          )}
+          {!selectedNodeId && exposures.length > 8 && (
             <div className="text-xs text-txt-muted mt-2 text-center">还有 {exposures.length - 8} 条，请至明细页查看</div>
           )}
         </div>

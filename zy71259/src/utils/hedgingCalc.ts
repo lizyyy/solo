@@ -50,7 +50,7 @@ export function buildTreeData(
     }
 
     const subNode: TreeNodeData = {
-      id: `sub-${sub.code}`,
+      id: `sub|${sub.code}`,
       label: sub.name,
       type: 'subsidiary',
       position: [Math.cos(angle) * subRadius, 0, Math.sin(angle) * subRadius],
@@ -75,7 +75,7 @@ export function buildTreeData(
       const sz = subNode.position[2] + Math.sin(cAngle) * curRadius
 
       subNode.children.push({
-        id: `cur-${sub.code}-${curCode}`,
+        id: `cur|${sub.code}|${curCode}`,
         label: curCode,
         type: 'currency',
         position: [sx, 0, sz],
