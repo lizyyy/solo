@@ -20,6 +20,14 @@ class VisitStatus(str, Enum):
     VISIT_FAILED = "回访失败"
 
 
+class RefundStatus(str, Enum):
+    PENDING = "待支付"
+    PROCESSING = "处理中"
+    COMPLETED = "已支付"
+    FAILED = "支付失败"
+    REJECTED = "已拒绝"
+
+
 class DataVersion(BaseModel):
     version: int
     import_time: datetime
@@ -112,7 +120,7 @@ class RefundRecord(BaseModel):
     deduction_amount: float = Field(..., description="扣除金额")
     deduction_detail: Dict[str, float] = Field(..., description="扣费明细")
     refund_channel: str = Field(..., description="退费渠道")
-    refund_status: str = Field(..., description="退费状态")
+    refund_status: RefundStatus = Field(..., description="退费状态")
     
     class Config:
         orm_mode = True

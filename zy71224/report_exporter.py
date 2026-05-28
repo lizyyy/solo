@@ -167,7 +167,7 @@ class ReportExporter:
                     "扣除金额": p.refund.deduction_amount,
                     "扣费明细": str(p.refund.deduction_detail),
                     "退费渠道": p.refund.refund_channel,
-                    "退费状态": p.refund.refund_status,
+                    "退费状态": p.refund.refund_status.value,
                     "退费日期": p.refund.refund_date.strftime("%Y-%m-%d")
                 }
                 data.append(row)

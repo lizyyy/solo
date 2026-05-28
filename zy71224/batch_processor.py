@@ -6,7 +6,8 @@ from config import Config
 from data_loader import DataLoader
 from models import (
     SurrenderProcess, SurrenderStatus, SurrenderReview, RefundRecord,
-    Policy, SignRecord, VisitRecord, FeeRecord, SurrenderApplication
+    Policy, SignRecord, VisitRecord, FeeRecord, SurrenderApplication,
+    RefundStatus
 )
 from calculator import CoolingOffCalculator, RefundCalculator, IdempotencyChecker
 from exception_detector import ExceptionDetector, ExceptionLevel
@@ -163,7 +164,7 @@ class BatchProcessor:
                 deduction_amount=refund_info["deduction_amount"],
                 deduction_detail=refund_info["deduction_detail"],
                 refund_channel="原路返回",
-                refund_status="待支付"
+                refund_status=RefundStatus.PENDING
             )
         
         if process.is_within_cooling_off:

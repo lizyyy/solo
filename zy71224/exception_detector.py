@@ -3,7 +3,8 @@ from typing import List, Dict, Tuple, Optional
 from collections import defaultdict
 from models import (
     SignRecord, VisitRecord, FeeRecord, SurrenderApplication,
-    SurrenderException, SurrenderProcess, SurrenderStatus, VisitStatus
+    SurrenderException, SurrenderProcess, SurrenderStatus, VisitStatus,
+    RefundStatus
 )
 
 
@@ -194,15 +195,23 @@ class ExceptionDetector:
 
         if process.status not in [SurrenderStatus.REFUNDED, SurrenderStatus.REJECTED]:
             total_fees = sum(r.fee_amount for r in process.fee_records)
-            if total_fees > 0 and not process.refund:
-                self._add_exception(
-                    policy_no=policy_no,
-                    apply_no=apply_no,
-                    exception_type=ExceptionType.FEE_NOT_REFUNDED,
-                    exception_level=ExceptionLevel.CRITICAL,
-                    exception_desc=f"已扣费{total_fees}元但尚未完成退费，存在资金风险",
-                    suggested_action="优先处理该单退费流程，确保资金及时返还客户"
+            if total_fees > 0:
+                is_refund_completed = (
+                    process.refund is not None and
+                    process.refund.refund_status == RefundStatus.COMPLETED
                 )
+                if not is_refund_completed:
+                    status_desc = "未生成退费计划"
+                    if process.refund is not None:
+                        status_desc = f"退费状态为【{process.refund.refund_status.value}】"
+                    self._add_exception(
+                        policy_no=policy_no,
+                        apply_no=apply_no,
+                        exception_type=ExceptionType.FEE_NOT_REFUNDED,
+                        exception_level=ExceptionLevel.CRITICAL,
+                        exception_desc=f"已扣费{total_fees}元但{status_desc}，存在资金风险",
+                        suggested_action="优先处理该单退费流程，完成实际支付后将状态更新为【已支付】，确保资金及时返还客户"
+                    )
 
     def _detect_surrender_app_exceptions(self, process: SurrenderProcess):
         policy_no = process.policy_no
