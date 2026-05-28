@@ -1,0 +1,20 @@
+{
+  "id": "params_demo_01",
+  "version": 1,
+  "num_particles": 300,
+  "motion_noise": {
+    "dx": 0.3,
+    "dy": 0.3,
+    "dtheta": 0.08
+  },
+  "sensor_noise": {
+    "range": 0.8,
+    "bearing": 0.06
+  },
+  "resample_threshold": 0.5,
+  "initial_position": {
+    "x": 5,
+    "y": 5,
+    "theta": 0
+  }
+}

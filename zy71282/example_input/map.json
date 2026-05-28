@@ -1,0 +1,18 @@
+{
+  "id": "map_demo_01",
+  "version": 1,
+  "width": 50,
+  "height": 50,
+  "obstacles": [
+    {"id": "obs_wall_1", "type": "rectangle", "x": 15, "y": 10, "width": 2, "height": 20},
+    {"id": "obs_wall_2", "type": "rectangle", "x": 30, "y": 20, "width": 2, "height": 20},
+    {"id": "obs_pillar", "type": "circle", "x": 25, "y": 15, "radius": 3}
+  ],
+  "landmarks": [
+    {"id": "lm_A", "x": 5, "y": 5},
+    {"id": "lm_B", "x": 45, "y": 5},
+    {"id": "lm_C", "x": 45, "y": 45},
+    {"id": "lm_D", "x": 5, "y": 45},
+    {"id": "lm_E", "x": 25, "y": 25}
+  ]
+}
