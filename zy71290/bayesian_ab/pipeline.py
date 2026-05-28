@@ -265,7 +265,15 @@ def _generate_recommendations(
     bayesian_result: BayesianResult,
     risk_assessment: RiskAssessment,
 ) -> List[str]:
-    """生成行动建议"""
+    """生成行动建议
+    
+    核心决策优先级（高→低）：
+    1. 多指标冲突 → 谨慎决策，不轻易上线
+    2. 先验过强 → 先进行敏感性分析
+    3. 提前停测 → 继续收集数据
+    4. 可信区间包含零 → 效应方向不明确
+    5. 基于概率的常规决策
+    """
     recommendations: List[str] = []
 
     prob_better = bayesian_result.probability_treatment_better
@@ -273,17 +281,29 @@ def _generate_recommendations(
         bayesian_result.lift_ci_lower < 0 < bayesian_result.lift_ci_upper
     )
 
-    if risk_assessment.has_early_stop:
+    has_major_risk = (
+        risk_assessment.has_metric_conflict
+        or risk_assessment.has_strong_prior
+        or risk_assessment.has_early_stop
+    )
+
+    if risk_assessment.has_metric_conflict:
         recommendations.append(
-            "建议继续收集数据直至达到计划样本量或观察窗口结束"
+            "⚠️ 存在多指标方向冲突，禁止直接上线或停测"
+        )
+        recommendations.append(
+            "建议组织跨部门评审，综合考虑各指标的业务权重和影响"
+        )
+        recommendations.append(
+            "建议进行多重比较校正（如使用贝叶斯多重检验）"
         )
     elif risk_assessment.has_strong_prior:
         recommendations.append(
             "建议使用无信息先验（如Beta(1,1)）进行敏感性分析，验证结论稳健性"
         )
-    elif risk_assessment.has_metric_conflict:
+    elif risk_assessment.has_early_stop:
         recommendations.append(
-            "建议组织跨部门评审，综合考虑各指标的业务权重和影响"
+            "建议继续收集数据直至达到计划样本量或观察窗口结束"
         )
 
     if ci_includes_zero:
@@ -291,18 +311,32 @@ def _generate_recommendations(
             "建议继续收集数据以缩小可信区间，获得更明确的效应方向判断"
         )
 
-    if prob_better >= 0.95 and not risk_assessment.has_early_stop:
-        recommendations.append(
-            "建议上线实验组方案，并持续监控核心指标表现"
-        )
-    elif prob_better <= 0.05 and not risk_assessment.has_early_stop:
-        recommendations.append(
-            "建议停止实验组，保留对照组或设计新的试验方案"
-        )
-    elif not risk_assessment.has_early_stop:
-        recommendations.append(
-            "建议继续运行试验或进行迭代优化，当前证据不足以支持决策"
-        )
+    if not has_major_risk:
+        if prob_better >= 0.95:
+            recommendations.append(
+                "建议上线实验组方案，并持续监控核心指标表现"
+            )
+        elif prob_better <= 0.05:
+            recommendations.append(
+                "建议停止实验组，保留对照组或设计新的试验方案"
+            )
+        else:
+            recommendations.append(
+                "建议继续运行试验或进行迭代优化，当前证据不足以支持决策"
+            )
+    else:
+        if risk_assessment.has_metric_conflict:
+            recommendations.append(
+                "在指标冲突问题解决前，暂不做上线或停测决策"
+            )
+        elif risk_assessment.has_strong_prior:
+            recommendations.append(
+                "在先验敏感性分析完成前，暂不做上线或停测决策"
+            )
+        elif risk_assessment.has_early_stop:
+            recommendations.append(
+                "在达到计划样本量或观察窗口前，暂不做最终决策"
+            )
 
     if validation.missing_fields:
         recommendations.append(
