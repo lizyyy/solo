@@ -224,8 +224,10 @@ def show(ctx, record_id, version, format, output):
                 to_expr=sr['to_expr'],
                 status=StepStatus(sr['status']),
                 is_equivalent=sr['is_equivalent'],
+                is_fully_equivalent=sr.get('is_fully_equivalent', sr['is_equivalent']),
                 equivalence_reason=sr['equivalence_reason'],
                 domain_violations=sr['domain_violations'],
+                domain_loss=sr.get('domain_loss', []),
                 constraint_violations=sr['constraint_violations'],
                 error_messages=sr['error_messages'],
                 details=sr['details']

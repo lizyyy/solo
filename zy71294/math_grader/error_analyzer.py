@@ -14,6 +14,7 @@ class ErrorType(Enum):
     ALGEBRAIC_MISTAKE = "algebraic_mistake"
     DIVISION_BY_ZERO = "division_by_zero"
     DOMAIN_VIOLATION = "domain_violation"
+    DOMAIN_LOSS = "domain_loss"
     CONSTRAINT_VIOLATION = "constraint_violation"
     VARIABLE_MISMATCH = "variable_mismatch"
     UNKNOWN = "unknown"
@@ -91,6 +92,15 @@ class ErrorAnalyzer:
                     location=f"第{step_result.step_index}步"
                 ))
         
+        for lost in step_result.domain_loss:
+            errors.append(ErrorAnalysis(
+                error_type=ErrorType.DOMAIN_LOSS,
+                severity="warning",
+                description=f"定义域约束丢失: {lost}",
+                suggestion="分式化简时必须注明定义域约束条件（如分母不为零），否则不等价",
+                location=f"第{step_result.step_index}步: {step_result.from_expr} → {step_result.to_expr}"
+            ))
+        
         for constraint in step_result.constraint_violations:
             errors.append(ErrorAnalysis(
                 error_type=ErrorType.CONSTRAINT_VIOLATION,
@@ -166,24 +176,34 @@ class ReportGenerator:
         
         critical_errors = [e for e in all_errors if e.severity == "error"]
         warnings = [e for e in all_errors if e.severity == "warning"]
+        domain_loss_errors = [e for e in all_errors if e.error_type == ErrorType.DOMAIN_LOSS]
         
         total_steps = len(step_results)
-        correct_steps = sum(1 for sr in step_results if sr.status == StepStatus.CORRECT)
-        is_correct = len(critical_errors) == 0
+        fully_correct_steps = sum(1 for sr in step_results if sr.is_fully_equivalent)
+        equivalent_steps = sum(1 for sr in step_results if sr.is_equivalent)
+        
+        has_domain_loss = len(domain_loss_errors) > 0
+        is_algebraically_correct = len(critical_errors) == 0 and equivalent_steps == total_steps
+        is_fully_correct = is_algebraically_correct and not has_domain_loss
+        
+        is_correct = is_fully_correct
         
         if total_steps > 0:
-            base_score = (correct_steps / total_steps) * 80
-            warning_penalty = len(warnings) * 2
-            overall_score = max(0, min(100, base_score - warning_penalty))
+            base_score = (fully_correct_steps / total_steps) * 80
+            partial_credit = ((equivalent_steps - fully_correct_steps) / total_steps) * 40
+            warning_penalty = len(warnings) * 5
+            overall_score = max(0, min(100, base_score + partial_credit - warning_penalty))
         else:
-            overall_score = 100 if is_correct else 0
+            overall_score = 100 if is_fully_correct else 0
         
         summary_parts = []
-        if is_correct:
-            summary_parts.append("答案正确")
-        else:
-            summary_parts.append(f"存在{len(critical_errors)}处错误")
-        if warnings:
+        if is_fully_correct:
+            summary_parts.append("答案完全正确")
+        elif is_algebraically_correct and has_domain_loss:
+            summary_parts.append(f"代数正确，但存在{len(domain_loss_errors)}处定义域约束丢失")
+        elif not is_algebraically_correct:
+            summary_parts.append(f"存在{len(critical_errors)}处代数错误")
+        if warnings and not has_domain_loss:
             summary_parts.append(f"有{len(warnings)}个需要注意的问题")
         
         summary = "，".join(summary_parts) if summary_parts else "批改完成"
@@ -198,13 +218,17 @@ class ReportGenerator:
             step_results=step_results,
             errors=all_errors,
             overall_score=round(overall_score, 1),
-            is_correct=is_correct,
+            is_correct=is_fully_correct,
             summary=summary,
             details={
-                "correct_steps": correct_steps,
+                "fully_correct_steps": fully_correct_steps,
+                "algebraically_correct_steps": equivalent_steps,
                 "total_steps": total_steps,
                 "warning_count": len(warnings),
-                "error_count": len(critical_errors)
+                "error_count": len(critical_errors),
+                "domain_loss_count": len(domain_loss_errors),
+                "has_domain_loss": has_domain_loss,
+                "is_algebraically_correct": is_algebraically_correct
             }
         )
         
@@ -235,6 +259,9 @@ class ReportGenerator:
                 status_icon = "✓" if sr.status == StepStatus.CORRECT else "✗" if sr.status == StepStatus.INCORRECT else "⚠"
                 lines.append(f"  [{status_icon}] 步骤{i+1}: {sr.from_expr} → {sr.to_expr}")
                 lines.append(f"       {sr.equivalence_reason}")
+                if sr.domain_loss:
+                    for lost in sr.domain_loss:
+                        lines.append(f"       ⚠ 定义域丢失: {lost}")
                 if sr.domain_violations:
                     for v in sr.domain_violations:
                         lines.append(f"       ⚠ {v}")
@@ -289,6 +316,10 @@ class ReportGenerator:
                 lines.append(f"{sr.from_expr} → {sr.to_expr}")
                 lines.append(f"```")
                 lines.append(f"- 等价性: {sr.equivalence_reason}")
+                if sr.domain_loss:
+                    lines.append("- **定义域约束丢失**:")
+                    for lost in sr.domain_loss:
+                        lines.append(f"  - ⚠️ {lost}")
                 if sr.domain_violations:
                     lines.append("- **定义域问题**:")
                     for v in sr.domain_violations:

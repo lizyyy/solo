@@ -25,8 +25,10 @@ class StepCheckResult:
     to_expr: str
     status: StepStatus
     is_equivalent: bool
+    is_fully_equivalent: bool
     equivalence_reason: str
     domain_violations: List[str] = field(default_factory=list)
+    domain_loss: List[str] = field(default_factory=list)
     constraint_violations: List[str] = field(default_factory=list)
     error_messages: List[str] = field(default_factory=list)
     details: Dict[str, Any] = field(default_factory=dict)
@@ -38,8 +40,10 @@ class StepCheckResult:
             "to_expr": self.to_expr,
             "status": self.status.value,
             "is_equivalent": self.is_equivalent,
+            "is_fully_equivalent": self.is_fully_equivalent,
             "equivalence_reason": self.equivalence_reason,
             "domain_violations": self.domain_violations,
+            "domain_loss": self.domain_loss,
             "constraint_violations": self.constraint_violations,
             "error_messages": self.error_messages,
             "details": self.details
@@ -80,6 +84,7 @@ class StepChecker:
             to_expr=to_expr_str,
             status=StepStatus.SKIPPED,
             is_equivalent=False,
+            is_fully_equivalent=False,
             equivalence_reason="未检查"
         )
         
@@ -96,6 +101,9 @@ class StepChecker:
         domain_violations = ConstraintChecker.find_domain_violations(to_expr)
         result.domain_violations = domain_violations
         
+        domain_loss = ConstraintChecker.detect_domain_loss(from_expr, to_expr)
+        result.domain_loss = domain_loss
+        
         is_equiv, reason, violated_constraints = EquivalenceChecker.check_equivalence_with_constraints(
             from_expr, to_expr, constraints
         )
@@ -103,10 +111,16 @@ class StepChecker:
         result.equivalence_reason = reason
         result.constraint_violations = violated_constraints
         
+        result.is_fully_equivalent = is_equiv and len(domain_loss) == 0
+        
         if not is_equiv:
             result.status = StepStatus.INCORRECT
-        elif domain_violations or violated_constraints:
+            if domain_loss:
+                result.equivalence_reason += f" (定义域丢失: {', '.join(domain_loss)})"
+        elif domain_loss or domain_violations or violated_constraints:
             result.status = StepStatus.WARNING
+            if domain_loss:
+                result.equivalence_reason += f" (定义域丢失，需注明: {', '.join(domain_loss)})"
         else:
             result.status = StepStatus.CORRECT
         
@@ -114,6 +128,8 @@ class StepChecker:
         result.details["to_simplified"] = str(to_expr.simplify())
         result.details["free_symbols_from"] = list(from_expr.get_free_symbols())
         result.details["free_symbols_to"] = list(to_expr.get_free_symbols())
+        result.details["from_domain_constraints"] = [str(c) for c in ConstraintChecker.get_domain_constraints(from_expr)]
+        result.details["to_domain_constraints"] = [str(c) for c in ConstraintChecker.get_domain_constraints(to_expr)]
         
         return result
     

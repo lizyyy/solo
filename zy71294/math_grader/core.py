@@ -148,6 +148,25 @@ class EquivalenceChecker:
         return final_result, final_reason, violated
 
 
+class DomainConstraint:
+    """定义域约束"""
+    
+    def __init__(self, constraint_type: str, expression: str, condition: str):
+        self.constraint_type = constraint_type
+        self.expression = expression
+        self.condition = condition
+    
+    def __str__(self) -> str:
+        return self.condition
+    
+    def to_dict(self) -> Dict:
+        return {
+            "type": self.constraint_type,
+            "expression": self.expression,
+            "condition": self.condition
+        }
+
+
 class ConstraintChecker:
     """约束检查器"""
     
@@ -172,6 +191,46 @@ class ConstraintChecker:
         return True
     
     @staticmethod
+    def get_domain_constraints(expr: SymbolicExpression) -> List[DomainConstraint]:
+        """
+        获取表达式的所有定义域约束条件
+        
+        返回: 约束列表，每个约束包含类型、表达式、条件字符串
+        """
+        constraints = []
+        if not expr.is_valid():
+            return constraints
+        
+        e = expr.expr
+        
+        denominators = ConstraintChecker._find_denominators(e)
+        for denom in denominators:
+            if denom != 1:
+                constraints.append(DomainConstraint(
+                    "division",
+                    str(denom),
+                    f"{denom} != 0"
+                ))
+        
+        radicals = ConstraintChecker._find_radicals(e)
+        for rad in radicals:
+            constraints.append(DomainConstraint(
+                "radical",
+                str(rad),
+                f"{rad} >= 0"
+            ))
+        
+        logs = ConstraintChecker._find_log_arguments(e)
+        for arg in logs:
+            constraints.append(DomainConstraint(
+                "logarithm",
+                str(arg),
+                f"{arg} > 0"
+            ))
+        
+        return constraints
+    
+    @staticmethod
     def find_domain_violations(expr: SymbolicExpression) -> List[str]:
         """
         查找定义域违规情况（除零、根号负等）
@@ -180,22 +239,39 @@ class ConstraintChecker:
         if not expr.is_valid():
             return violations
         
-        e = expr.expr
-        
-        denominators = ConstraintChecker._find_denominators(e)
-        for denom in denominators:
-            if denom != 1:
-                violations.append(f"分母可能为零: {denom}")
-        
-        radicals = ConstraintChecker._find_radicals(e)
-        for rad in radicals:
-            violations.append(f"根号内可能为负: {rad}")
-        
-        logs = ConstraintChecker._find_log_arguments(e)
-        for arg in logs:
-            violations.append(f"对数参数可能非正: {arg}")
+        constraints = ConstraintChecker.get_domain_constraints(expr)
+        for c in constraints:
+            if c.constraint_type == "division":
+                violations.append(f"分母可能为零，需满足: {c.condition}")
+            elif c.constraint_type == "radical":
+                violations.append(f"根号内可能为负，需满足: {c.condition}")
+            elif c.constraint_type == "logarithm":
+                violations.append(f"对数参数可能非正，需满足: {c.condition}")
         
         return violations
+    
+    @staticmethod
+    def detect_domain_loss(
+        from_expr: SymbolicExpression,
+        to_expr: SymbolicExpression
+    ) -> List[str]:
+        """
+        检测从 from_expr 到 to_expr 变形中丢失的定义域约束
+        
+        返回: 丢失的约束列表
+        """
+        if not from_expr.is_valid() or not to_expr.is_valid():
+            return []
+        
+        from_constraints = ConstraintChecker.get_domain_constraints(from_expr)
+        to_constraints = ConstraintChecker.get_domain_constraints(to_expr)
+        
+        from_conditions = {str(c) for c in from_constraints}
+        to_conditions = {str(c) for c in to_constraints}
+        
+        lost_conditions = from_conditions - to_conditions
+        
+        return list(lost_conditions)
     
     @staticmethod
     def _find_denominators(expr) -> List:
