@@ -126,6 +126,7 @@ const FREQ_BANDS=[
 const ROOM_DEFAULT={width:6,depth:5,height:3};
 const SPHERE_RADIUS=2;
 const SPEAKER_RADIUS=0.12;
+const ROOM_VIS_SCALE=0.6;
 
 const state={
   speakers:[
@@ -150,6 +151,17 @@ function azElToVec3(az,el,target){
   const x=SPHERE_RADIUS*Math.cos(elR)*Math.sin(azR);
   const y=SPHERE_RADIUS*Math.sin(elR);
   const z=SPHERE_RADIUS*Math.cos(elR)*Math.cos(azR);
+  if(target){
+    target.set(x,y,z);
+    return target;
+  }
+  return new THREE.Vector3(x,y,z);
+}
+
+function roomToScene(roomX,roomY,roomZ,target){
+  const x=roomX*ROOM_VIS_SCALE;
+  const y=roomZ*ROOM_VIS_SCALE;
+  const z=-roomY*ROOM_VIS_SCALE;
   if(target){
     target.set(x,y,z);
     return target;
@@ -216,7 +228,7 @@ function runJudgments(){
 
 let scene,camera,renderer,controls,sphereMesh,sphereMaterial;
 let speakerMeshes=[],speakerLines=[];
-let roomGroup,listeningPointMesh;
+let roomGroup,listeningPointMesh,lpOffsetLine,lpCenterMarker;
 let raycaster,mouse,dragTarget=null,dragPlane;
 let isDragging=false;
 let uniformsDirty=true;
@@ -283,7 +295,8 @@ function createSphere(){
       uSpeakerHasData:{value:[0,0,0,0,0]},
       uSpeakerColor:{value:[new THREE.Color(),new THREE.Color(),new THREE.Color(),new THREE.Color(),new THREE.Color()]},
       uActiveBand:{value:2},
-      uTime:{value:0}
+      uTime:{value:0},
+      uListeningPoint:{value:new THREE.Vector3()}
     },
     vertexShader:`
       varying vec3 vPos;
@@ -303,6 +316,7 @@ function createSphere(){
       uniform vec3 uSpeakerColor[5];
       uniform int uActiveBand;
       uniform float uTime;
+      uniform vec3 uListeningPoint;
       varying vec3 vPos;
       varying vec3 vNorm;
       varying vec2 vUv;
@@ -314,12 +328,15 @@ function createSphere(){
       }
 
       void main(){
+        vec3 fieldCenter=uListeningPoint;
         float totalIntensity=0.0;
         vec3 weightedColor=vec3(0.0);
         float anyData=0.0;
 
         for(int i=0;i<5;i++){
-          float dist=distance(vPos,uSpeakerPos[i]);
+          vec3 relSpeaker=uSpeakerPos[i]-fieldCenter;
+          vec3 relPos=vPos-fieldCenter;
+          float dist=distance(relPos,relSpeaker);
           float falloff=exp(-dist*dist*0.8);
           float intensity=uSpeakerIntensity[i]*falloff*uSpeakerHasData[i];
           totalIntensity+=intensity;
@@ -383,6 +400,7 @@ function updateSphereUniforms(){
     }
   }
   u.uActiveBand.value=bandIdx;
+  roomToScene(state.listeningPoint.x,state.listeningPoint.y,state.listeningPoint.z,u.uListeningPoint.value);
 }
 
 function createSpeakers(){
@@ -437,20 +455,22 @@ function createRoom(){
   roomGroup=new THREE.Group();
   const rm=state.room;
   const hw=rm.width/2,hd=rm.depth/2,hh=rm.height/2;
-  const geo=new THREE.BoxGeometry(rm.width,rm.height,rm.depth);
+  const geo=new THREE.BoxGeometry(rm.width*ROOM_VIS_SCALE,rm.height*ROOM_VIS_SCALE,rm.depth*ROOM_VIS_SCALE);
   const edges=new THREE.EdgesGeometry(geo);
-  const mat=new THREE.LineBasicMaterial({color:0x2a3f5b,transparent:true,opacity:0.4});
+  const mat=new THREE.LineBasicMaterial({color:0x2a3f5b,transparent:true,opacity:0.5});
   roomGroup.add(new THREE.LineSegments(edges,mat));
 
-  const floorGeo=new THREE.PlaneGeometry(rm.width,rm.depth);
-  const floorMat=new THREE.MeshBasicMaterial({color:0x1a2040,transparent:true,opacity:0.15,side:THREE.DoubleSide});
+  const floorGeo=new THREE.PlaneGeometry(rm.width*ROOM_VIS_SCALE,rm.depth*ROOM_VIS_SCALE);
+  const floorMat=new THREE.MeshBasicMaterial({color:0x1a2040,transparent:true,opacity:0.2,side:THREE.DoubleSide});
   const floor=new THREE.Mesh(floorGeo,floorMat);
   floor.rotation.x=-Math.PI/2;
-  floor.position.y=-hh;
+  floor.position.y=-hh*ROOM_VIS_SCALE;
   roomGroup.add(floor);
 
-  const scale=SPHERE_RADIUS/Math.min(hw,hd,hh)*0.8;
-  roomGroup.scale.setScalar(scale);
+  const lpScene=new THREE.Vector3();
+  roomToScene(state.listeningPoint.x,state.listeningPoint.y,state.listeningPoint.z,lpScene);
+  roomGroup.position.copy(lpScene.clone().negate());
+
   scene.add(roomGroup);
 }
 
@@ -464,8 +484,58 @@ function createListeningPoint(){
   const geo=new THREE.OctahedronGeometry(0.06,0);
   const mat=new THREE.MeshStandardMaterial({color:0xf5c55b,emissive:0xf5c55b,emissiveIntensity:0.6});
   listeningPointMesh=new THREE.Mesh(geo,mat);
-  listeningPointMesh.position.set(0,0,0);
+  const lpScene=new THREE.Vector3();
+  roomToScene(state.listeningPoint.x,state.listeningPoint.y,state.listeningPoint.z,lpScene);
+  listeningPointMesh.position.copy(lpScene);
   scene.add(listeningPointMesh);
+
+  const centerGeo=new THREE.SphereGeometry(0.03,12,12);
+  const centerMat=new THREE.MeshBasicMaterial({color:0x2a3f5b,transparent:true,opacity:0.6});
+  lpCenterMarker=new THREE.Mesh(centerGeo,centerMat);
+  lpCenterMarker.position.set(0,0,0);
+  scene.add(lpCenterMarker);
+
+  const lineGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),lpScene]);
+  const lineMat=new THREE.LineDashedMaterial({color:0xf5c55b,dashSize:0.08,gapSize:0.05,transparent:true,opacity:0.5});
+  lpOffsetLine=new THREE.Line(lineGeo,lineMat);
+  lpOffsetLine.computeLineDistances();
+  scene.add(lpOffsetLine);
+}
+
+function updateListeningPoint(){
+  const lpScene=new THREE.Vector3();
+  roomToScene(state.listeningPoint.x,state.listeningPoint.y,state.listeningPoint.z,lpScene);
+  listeningPointMesh.position.copy(lpScene);
+
+  const outOfBounds=isLPOutOfBounds();
+  const mat=listeningPointMesh.material;
+  if(outOfBounds){
+    mat.color.setHex(0xf55b5b);
+    mat.emissive.setHex(0xf55b5b);
+    lpOffsetLine.material.color.setHex(0xf55b5b);
+  }else{
+    mat.color.setHex(0xf5c55b);
+    mat.emissive.setHex(0xf5c55b);
+    lpOffsetLine.material.color.setHex(0xf5c55b);
+  }
+
+  const rm=state.room;
+  const hw=rm.width/2,hd=rm.depth/2,hh=rm.height/2;
+  const nearEdge=Math.abs(state.listeningPoint.x)>hw-0.3||Math.abs(state.listeningPoint.y)>hd-0.3||Math.abs(state.listeningPoint.z)>hh-0.3;
+  if(nearEdge&&!outOfBounds){
+    mat.color.setHex(0xf5c55b);
+    mat.emissive.setHex(0xf5c55b);
+    lpOffsetLine.material.color.setHex(0xf5c55b);
+  }
+
+  const lineGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),lpScene]);
+  lpOffsetLine.geometry.dispose();
+  lpOffsetLine.geometry=lineGeo;
+  lpOffsetLine.computeLineDistances();
+
+  roomGroup.position.copy(lpScene.clone().negate());
+
+  uniformsDirty=true;
 }
 
 function createGrid(){
@@ -707,6 +777,7 @@ window._setRoom=function(dim,val){
   if(isNaN(v)||v<=0)return;
   state.room[dim]=v;
   updateRoom();
+  updateListeningPoint();
   runJudgments();
   updateJudgmentsUI();
   updateLPStatusUI();
@@ -717,6 +788,7 @@ window._setLP=function(axis,val){
   if(isNaN(v))return;
   state.listeningPoint[axis]=v;
   runJudgments();
+  updateListeningPoint();
   updateJudgmentsUI();
   updateLPStatusUI();
 };
