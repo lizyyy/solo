@@ -371,6 +371,19 @@ function getFieldGapSummary(typeKey) {
   };
 }
 
+function hasFieldGap(typeKey, identifier, field) {
+  const gaps = fieldGaps[typeKey] || [];
+  return gaps.some(g => g.identifier === identifier && g.field === field);
+}
+
+function parseNumberOrNull(val) {
+  if (val === undefined || val === null || val.toString().trim() === '') {
+    return null;
+  }
+  const num = parseFloat(val);
+  return isNaN(num) ? null : num;
+}
+
 function handleFileUpload(key, input) {
   const file = input.files[0];
   if (!file) return;
@@ -535,50 +548,72 @@ function computeDifferences() {
         tags: ['missing']
       });
     } else if (v && c) {
-      const mvDiff = parseFloat(v['市值'] || 0) - parseFloat(c['市值'] || 0);
-      if (Math.abs(mvDiff) > 0.001) {
-        differences.push({
-          id: 'mvdiff-' + code,
-          code: code,
-          name: v['证券名称'] || '',
-          category: 'price',
-          categoryLabel: '价格差异',
-          field: '市值',
-          valuationValue: parseFloat(v['市值'] || 0).toFixed(2),
-          custodianValue: parseFloat(c['市值'] || 0).toFixed(2),
-          diff: mvDiff.toFixed(2),
-          tags: ['price']
-        });
+      const name = v['证券名称'] || c['证券名称'];
+
+      const valMv = parseNumberOrNull(v['市值']);
+      const cusMv = parseNumberOrNull(c['市值']);
+      const hasValMvGap = hasFieldGap('valuation', code, '市值');
+      const hasCusMvGap = hasFieldGap('custodian', code, '市值');
+      if (valMv !== null && cusMv !== null && !hasValMvGap && !hasCusMvGap) {
+        const mvDiff = valMv - cusMv;
+        if (Math.abs(mvDiff) > 0.001) {
+          differences.push({
+            id: 'mvdiff-' + code,
+            code: code,
+            name: name,
+            category: 'price',
+            categoryLabel: '价格差异',
+            field: '市值',
+            valuationValue: valMv.toFixed(2),
+            custodianValue: cusMv.toFixed(2),
+            diff: mvDiff.toFixed(2),
+            tags: ['price']
+          });
+        }
       }
-      const qtyDiff = parseFloat(v['持仓数量'] || 0) - parseFloat(c['持仓数量'] || 0);
-      if (Math.abs(qtyDiff) > 0.001) {
-        differences.push({
-          id: 'qtydiff-' + code,
-          code: code,
-          name: v['证券名称'] || '',
-          category: 'quantity',
-          categoryLabel: '数量差异',
-          field: '持仓数量',
-          valuationValue: parseFloat(v['持仓数量'] || 0).toFixed(0),
-          custodianValue: parseFloat(c['持仓数量'] || 0).toFixed(0),
-          diff: qtyDiff.toFixed(0),
-          tags: ['quantity']
-        });
+
+      const valQty = parseNumberOrNull(v['持仓数量']);
+      const cusQty = parseNumberOrNull(c['持仓数量']);
+      const hasValQtyGap = hasFieldGap('valuation', code, '持仓数量');
+      const hasCusQtyGap = hasFieldGap('custodian', code, '持仓数量');
+      if (valQty !== null && cusQty !== null && !hasValQtyGap && !hasCusQtyGap) {
+        const qtyDiff = valQty - cusQty;
+        if (Math.abs(qtyDiff) > 0.001) {
+          differences.push({
+            id: 'qtydiff-' + code,
+            code: code,
+            name: name,
+            category: 'quantity',
+            categoryLabel: '数量差异',
+            field: '持仓数量',
+            valuationValue: valQty.toFixed(0),
+            custodianValue: cusQty.toFixed(0),
+            diff: qtyDiff.toFixed(0),
+            tags: ['quantity']
+          });
+        }
       }
-      const costDiff = parseFloat(v['成本'] || 0) - parseFloat(c['成本'] || 0);
-      if (Math.abs(costDiff) > 0.001) {
-        differences.push({
-          id: 'costdiff-' + code,
-          code: code,
-          name: v['证券名称'] || '',
-          category: 'cost',
-          categoryLabel: '成本差异',
-          field: '成本',
-          valuationValue: parseFloat(v['成本'] || 0).toFixed(2),
-          custodianValue: parseFloat(c['成本'] || 0).toFixed(2),
-          diff: costDiff.toFixed(2),
-          tags: ['cost']
-        });
+
+      const valCost = parseNumberOrNull(v['成本']);
+      const cusCost = parseNumberOrNull(c['成本']);
+      const hasValCostGap = hasFieldGap('valuation', code, '成本');
+      const hasCusCostGap = hasFieldGap('custodian', code, '成本');
+      if (valCost !== null && cusCost !== null && !hasValCostGap && !hasCusCostGap) {
+        const costDiff = valCost - cusCost;
+        if (Math.abs(costDiff) > 0.001) {
+          differences.push({
+            id: 'costdiff-' + code,
+            code: code,
+            name: name,
+            category: 'cost',
+            categoryLabel: '成本差异',
+            field: '成本',
+            valuationValue: valCost.toFixed(2),
+            custodianValue: cusCost.toFixed(2),
+            diff: costDiff.toFixed(2),
+            tags: ['cost']
+          });
+        }
       }
     }
   });
