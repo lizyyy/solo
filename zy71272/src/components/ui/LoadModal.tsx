@@ -5,7 +5,6 @@ import {
   Trash2,
   Calendar,
   Music,
-  MapPin,
   AlertCircle,
   CheckCircle,
   Loader2,

@@ -13,7 +13,6 @@ import {
 import { useStore } from '../../store/useStore';
 import {
   INSTRUMENT_LABELS,
-  INSTRUMENT_COLORS,
   INSTRUMENT_ICONS,
   WALL_MATERIALS,
 } from '../../utils/constants';
@@ -25,7 +24,7 @@ import {
   calculateMonitorVolumeRatios,
   roundTo,
 } from '../../utils/helpers';
-import { InstrumentType } from '../../types';
+import { InstrumentType, MicType } from '../../types';
 
 const TABS = [
   { id: 'musicians', label: '乐手', icon: Users },
@@ -358,7 +357,7 @@ export default function Sidebar() {
               <label className="block text-xs text-[#8899aa] mb-1">类型</label>
               <select
                 value={selectedMic.type}
-                onChange={(e) => updateMicrophone(selectedMic.id, { type: e.target.value as any })}
+                onChange={(e) => updateMicrophone(selectedMic.id, { type: e.target.value as MicType })}
                 className="w-full bg-[#0a0e17] border border-[#3a4a6b] rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-[#00f0ff]"
               >
                 <option value="dynamic">动圈麦克风</option>

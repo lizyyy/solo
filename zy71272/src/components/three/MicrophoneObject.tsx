@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, ThreeEvent } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Microphone } from '../../types';
 import { useStore } from '../../store/useStore';
@@ -14,30 +14,24 @@ export default function MicrophoneObject({ microphone }: MicrophoneObjectProps) 
   const [hovered, setHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  const {
-    selectedObjectId,
-    selectObject,
-    updateMicrophone,
-    roomConfig,
-  } = useStore(state => ({
-    selectedObjectId: state.selectedObjectId,
-    selectObject: state.selectObject,
-    updateMicrophone: state.updateMicrophone,
-    roomConfig: state.roomConfig,
-  }));
+  const selectedObjectId = useStore(state => state.selectedObjectId);
+  const selectObject = useStore(state => state.selectObject);
+  const updateMicrophone = useStore(state => state.updateMicrophone);
+  const roomConfig = useStore(state => state.roomConfig);
 
   const isSelected = selectedObjectId === microphone.id;
 
   useFrame(() => {
+    // Empty frame handler
   });
 
-  const handlePointerDown = (e: any) => {
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     setIsDragging(true);
     selectObject(microphone.id, 'microphone');
   };
 
-  const handlePointerMove = (e: any) => {
+  const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
     if (!isDragging || !roomConfig) return;
     e.stopPropagation();
 

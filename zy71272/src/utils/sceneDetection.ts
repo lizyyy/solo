@@ -1,4 +1,4 @@
-import { Musician, MonitorPoint, SceneIssue, Vector3 } from '../types';
+import { Musician, MonitorPoint, SceneIssue } from '../types';
 import {
   SOUND_OVERLAP_THRESHOLD,
   MIN_MONITOR_SOUND_LEVEL,

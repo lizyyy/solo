@@ -1,8 +1,8 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, ThreeEvent } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import { Musician, SceneIssue } from '../../types';
+import { Musician } from '../../types';
 import { useStore } from '../../store/useStore';
 import { isObjectInvolvedInIssue } from '../../utils/sceneDetection';
 import { INSTRUMENT_ICONS } from '../../utils/constants';
@@ -42,13 +42,13 @@ export default function MusicianObject({ musician }: MusicianObjectProps) {
     }
   });
 
-  const handlePointerDown = (e: any) => {
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     setIsDragging(true);
     selectObject(musician.id, 'musician');
   };
 
-  const handlePointerMove = (e: any) => {
+  const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
     if (!isDragging || !roomConfig) return;
     e.stopPropagation();
 

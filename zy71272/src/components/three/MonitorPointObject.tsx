@@ -1,6 +1,6 @@
 import { useRef, useState, useMemo } from 'react';
 import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, ThreeEvent } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { MonitorPoint } from '../../types';
 import { useStore } from '../../store/useStore';
@@ -43,13 +43,13 @@ export default function MonitorPointObject({ monitor }: MonitorPointObjectProps)
     setRotation(prev => prev + delta * 2);
   });
 
-  const handlePointerDown = (e: any) => {
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     setIsDragging(true);
     selectObject(monitor.id, 'monitor');
   };
 
-  const handlePointerMove = (e: any) => {
+  const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
     if (!isDragging || !roomConfig) return;
     e.stopPropagation();
 

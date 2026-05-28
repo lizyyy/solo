@@ -12,7 +12,6 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
-import { generateId } from '../../utils/helpers';
 
 export default function Toolbar() {
   const [saveAsOpen, setSaveAsOpen] = useState(false);

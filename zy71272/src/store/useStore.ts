@@ -490,7 +490,7 @@ export const useStore = create<AppState & AppActions>((set, get) => {
         state.sceneIssues.forEach(issue => {
           if (issue.suggestion) {
             suggestions.push(issue.suggestion);
-          } else if (issue.details.suggestion) {
+          } else if (typeof issue.details.suggestion === 'string') {
             suggestions.push(issue.details.suggestion);
           }
         });
@@ -546,7 +546,6 @@ export const useStore = create<AppState & AppActions>((set, get) => {
       if (state.monitorPoints.length === 0 || state.musicians.length < 2) return;
 
       const idealRatio = 1 / state.musicians.length;
-      const targetLevel = 85;
 
       const adjustedMusicians = state.musicians.map(musician => {
         const avgRatio = state.monitorPoints.reduce((sum, mp) => {

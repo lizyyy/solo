@@ -1,6 +1,6 @@
-import { useRef, useEffect } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, Environment } from '@react-three/drei';
+import { useEffect } from 'react';
+import { Canvas, useThree, ThreeEvent } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { useStore } from '../../store/useStore';
@@ -61,8 +61,8 @@ function SceneContent() {
   const selectObject = useStore(state => state.selectObject);
   const roomConfig = useStore(state => state.roomConfig);
 
-  const handleSceneClick = (e: any) => {
-    if (e.object === e.delimiterObject || e.eventObject === undefined) {
+  const handleSceneClick = (e: ThreeEvent<MouseEvent>) => {
+    if (e.eventObject === undefined) {
       selectObject(null, null);
     }
   };

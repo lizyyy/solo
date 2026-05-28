@@ -305,7 +305,7 @@ export default function ReportModal() {
                   检测到的问题 ({sceneIssues.length})
                 </h4>
                 <div className="space-y-2">
-                  {sceneIssues.map((issue, index) => (
+                  {sceneIssues.map((issue) => (
                     <div
                       key={issue.id}
                       className="flex items-start gap-3 p-3 bg-[#121a29] rounded-lg"

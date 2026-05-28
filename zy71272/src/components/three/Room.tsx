@@ -9,7 +9,7 @@ export default function Room() {
   const floorGeometry = useMemo(() => {
     if (!roomConfig) return null;
     return new THREE.PlaneGeometry(roomConfig.width, roomConfig.length);
-  }, [roomConfig?.width, roomConfig?.length]);
+  }, [roomConfig]);
 
   const wallMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     color: '#1a1f2e',

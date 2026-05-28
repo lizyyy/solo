@@ -53,7 +53,10 @@ const calculateCombinedSoundPressure = (
   return 20 * Math.log10(Math.max(0.0001, totalLinear));
 };
 
-const runAllSceneValidations = (musicians: any[], monitorPoints: any[]): SceneIssue[] => {
+const runAllSceneValidations = (
+  musicians: { position: { x: number; y: number; z: number }; planId: string; sourceLevel: number; directivity: number; rotation: number }[],
+  monitorPoints: { position: { x: number; y: number; z: number }; planId: string }[]
+): SceneIssue[] => {
   const issues: SceneIssue[] = [];
 
   for (let i = 0; i < musicians.length; i++) {
@@ -241,6 +244,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
       plans = plans.filter(p => p.id !== id);
       await fs.writeFile(indexPath, JSON.stringify(plans, null, 2));
     } catch {
+      // Index file might not exist yet, that's fine
     }
 
     res.json({ success: true });

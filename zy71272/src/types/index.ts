@@ -56,6 +56,16 @@ export interface SoundPressureSample {
   level: number;
 }
 
+export interface SceneIssueDetails {
+  suggestion?: string;
+  distance?: number;
+  threshold?: number;
+  ratio?: number;
+  musician1?: { id: string; name: string };
+  musician2?: { id: string; name: string };
+  [key: string]: unknown;
+}
+
 export interface SceneIssue {
   id: string;
   planId: string;
@@ -63,7 +73,7 @@ export interface SceneIssue {
   severity: IssueSeverity;
   message: string;
   suggestion?: string;
-  details: Record<string, any>;
+  details: SceneIssueDetails;
   detectedAt: Date;
   relatedObjectIds: string[];
 }
