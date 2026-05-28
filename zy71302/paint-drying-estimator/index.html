@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>颜料干燥时间估算</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <div class="app-title">颜料干燥时间估算</div>
+      <div class="app-subtitle">基于一维扩散近似的干燥模型 · 参数校验 · 情景对比</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-sm" onclick="exportReport()">导出报告</button>
+      <button class="btn btn-sm" onclick="exportCSV()">导出CSV</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <div class="left-col">
+      <div class="panel">
+        <div class="panel-header" onclick="toggleFormula()">
+          <h2>公式与模型说明</h2>
+          <span class="panel-toggle">展开/收起</span>
+        </div>
+        <div id="formula-panel" class="panel-body collapsed">
+          <div class="formula-content">
+            <p><strong>核心公式（一维扩散近似）：</strong></p>
+            <div class="formula-block">t = h² / (π² × D_eff)</div>
+            <p>其中 <code>h</code> 为涂层厚度(m)，<code>D_eff</code> 为有效扩散系数(m²/s)。</p>
+
+            <p><strong>有效扩散系数：</strong></p>
+            <div class="formula-block">D_eff = D₀ × f(T) × f(RH) × f(V)</div>
+
+            <p><strong>温度修正（Arrhenius）：</strong></p>
+            <div class="formula-block">f(T) = exp(Eₐ/R × (1/T_ref - 1/T))</div>
+            <p><code>T_ref = 293.15 K (20°C)</code>，<code>R = 8.314 J/(mol·K)</code></p>
+
+            <p><strong>湿度修正：</strong></p>
+            <div class="formula-block">f(RH) = (1 - RH)^α</div>
+            <p><code>RH</code> 为相对湿度(0-1)，<code>α</code> 因颜料类型而异（水基≈0.8，油基≈0.3）。</p>
+            <p>⚠️ RH=1 时 f(RH)→0，干燥时间趋于无穷，符合物理实际。</p>
+
+            <p><strong>通风修正：</strong></p>
+            <div class="formula-block">f(V) = 1 + β × v &nbsp;(β≈0.15)</div>
+            <p><code>v</code>: 0=静止, 1=轻微, 2=中等, 3=强通风</p>
+
+            <p><strong>各颜料基础参数：</strong></p>
+            <table>
+              <tr><th>颜料</th><th>D₀ (m²/s)</th><th>Eₐ (kJ/mol)</th><th>α</th><th>典型厚度(μm)</th></tr>
+              <tr><td>水彩</td><td>5.0×10⁻¹³</td><td>35</td><td>0.80</td><td>5–200</td></tr>
+              <tr><td>丙烯</td><td>7.0×10⁻¹³</td><td>42</td><td>0.70</td><td>50–3000</td></tr>
+              <tr><td>油画</td><td>6.5×10⁻¹⁴</td><td>50</td><td>0.30</td><td>100–5000</td></tr>
+              <tr><td>水粉</td><td>6.0×10⁻¹³</td><td>37</td><td>0.80</td><td>50–500</td></tr>
+              <tr><td>蛋彩</td><td>5.5×10⁻¹³</td><td>39</td><td>0.75</td><td>30–400</td></tr>
+              <tr><td>墨汁</td><td>8.0×10⁻¹³</td><td>35</td><td>0.85</td><td>2–50</td></tr>
+            </table>
+
+            <p><strong>厚度单位换算：</strong></p>
+            <table>
+              <tr><th>单位</th><th>换算</th></tr>
+              <tr><td>μm (微米)</td><td>1 μm = 1 μm</td></tr>
+              <tr><td>mm (毫米)</td><td>1 mm = 1000 μm</td></tr>
+              <tr><td>mil (密耳)</td><td>1 mil = 25.4 μm</td></tr>
+            </table>
+
+            <p><strong>边界与校验规则：</strong></p>
+            <ul>
+              <li>温度 &lt; 0°C → 🔴 冰点以下，水基颜料可能冻结</li>
+              <li>温度 &lt; 5°C → 🟡 低温警告，干燥显著变慢</li>
+              <li>温度 &gt; 40°C → 🟡 高温警告，可能表皮结膜或龟裂</li>
+              <li>温度 &gt; 60°C → 🔴 超出模型适用范围</li>
+              <li>湿度缺失 → 🔴 不可跳过，必须输入</li>
+              <li>湿度 &gt; 85% → 🟡 干燥非常缓慢</li>
+              <li>湿度 &gt; 95% → 🔴 水基颜料几乎无法干燥</li>
+              <li>厚度 &gt; 3000 μm → 🟡 扩散模型精度下降</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-body">
+          <div id="scenarios-container"></div>
+          <div class="actions-bar" style="margin-top:12px;">
+            <button class="btn btn-primary" onclick="addScenario()">+ 添加情景</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header" onclick="toggleSchemes()">
+          <h2>保存的方案</h2>
+          <span class="panel-toggle">展开/收起</span>
+        </div>
+        <div id="schemes-panel" class="panel-body">
+          <div class="save-row">
+            <input type="text" id="scheme-name" placeholder="方案名称" />
+            <button class="btn btn-primary btn-sm" onclick="saveCurrentScheme()">保存</button>
+          </div>
+          <div id="schemes-list"></div>
+          <div class="actions-bar" style="margin-top:10px;">
+            <button class="btn btn-sm" onclick="exportAllSchemes()">导出方案(JSON)</button>
+            <button class="btn btn-sm" onclick="importSchemes()">导入方案(JSON)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-col">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>估算结果</h2>
+        </div>
+        <div class="panel-body">
+          <div id="results-container">
+            <p class="empty-hint">请输入参数后查看结果</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
