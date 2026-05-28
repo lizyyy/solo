@@ -10,7 +10,7 @@ export function detectSplitMismatch(
     return {
       id: `issue-split-${Date.now()}`,
       type: 'split_mismatch',
-      severity: totalSplit < 90 || totalSplit > 110 ? 'critical' : 'major',
+      severity: totalSplit < 95 || totalSplit > 105 ? 'critical' : 'major',
       description: `分成比例总和异常：${totalSplit.toFixed(1)}%`,
       source: 'split_calculation',
       rawData: `原始分成总和: ${totalSplit.toFixed(1)}%`,
