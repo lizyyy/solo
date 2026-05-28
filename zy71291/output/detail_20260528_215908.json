@@ -1,0 +1,322 @@
+{
+  "run_id": "20260528_215908",
+  "machine_schedule": {
+    "MCH-03": [
+      {
+        "order_id": "ORD-001",
+        "shift_id": "S11",
+        "mold_id": "MOLD-A",
+        "start_time": 0.0,
+        "end_time": 5.0,
+        "changeover_before": 0.0,
+        "prev_order_id": null
+      }
+    ],
+    "MCH-01": [
+      {
+        "order_id": "ORD-004",
+        "shift_id": "S01",
+        "mold_id": "MOLD-A",
+        "start_time": 0.0,
+        "end_time": 3.0,
+        "changeover_before": 0.0,
+        "prev_order_id": null
+      },
+      {
+        "order_id": "ORD-002",
+        "shift_id": "S02",
+        "mold_id": "MOLD-B",
+        "start_time": 8.0,
+        "end_time": 11.2,
+        "changeover_before": 0.0,
+        "prev_order_id": null
+      }
+    ],
+    "MCH-02": [
+      {
+        "order_id": "ORD-006",
+        "shift_id": "S06",
+        "mold_id": "MOLD-C",
+        "start_time": 0.0,
+        "end_time": 1.5,
+        "changeover_before": 0.0,
+        "prev_order_id": null
+      },
+      {
+        "order_id": "ORD-003",
+        "shift_id": "S09",
+        "mold_id": "MOLD-C",
+        "start_time": 24.0,
+        "end_time": 28.5,
+        "changeover_before": 0.0,
+        "prev_order_id": null
+      }
+    ]
+  },
+  "order_status": [
+    {
+      "order_id": "ORD-001",
+      "product": "外壳A",
+      "quantity": 100,
+      "mold_id": "MOLD-A",
+      "processing_time": 5.0,
+      "deadline": "2026-06-03",
+      "priority": 2,
+      "material_arrival": "2026-05-28",
+      "assigned_machine": "MCH-03",
+      "assigned_shift": "S11",
+      "start_time": 0.0,
+      "end_time": 5.0,
+      "changeover_before": 0.0,
+      "status": "ASSIGNED"
+    },
+    {
+      "order_id": "ORD-002",
+      "product": "外壳B",
+      "quantity": 80,
+      "mold_id": "MOLD-B",
+      "processing_time": 3.2,
+      "deadline": "2026-06-02",
+      "priority": 1,
+      "material_arrival": "2026-05-28",
+      "assigned_machine": "MCH-01",
+      "assigned_shift": "S02",
+      "start_time": 8.0,
+      "end_time": 11.2,
+      "changeover_before": 0.0,
+      "status": "ASSIGNED"
+    },
+    {
+      "order_id": "ORD-003",
+      "product": "盖板C",
+      "quantity": 150,
+      "mold_id": "MOLD-C",
+      "processing_time": 4.5,
+      "deadline": "2026-06-04",
+      "priority": 1,
+      "material_arrival": "2026-05-29",
+      "assigned_machine": "MCH-02",
+      "assigned_shift": "S09",
+      "start_time": 24.0,
+      "end_time": 28.5,
+      "changeover_before": 0.0,
+      "status": "ASSIGNED"
+    },
+    {
+      "order_id": "ORD-004",
+      "product": "外壳A",
+      "quantity": 60,
+      "mold_id": "MOLD-A",
+      "processing_time": 3.0,
+      "deadline": "2026-06-01",
+      "priority": 3,
+      "material_arrival": "2026-05-28",
+      "assigned_machine": "MCH-01",
+      "assigned_shift": "S01",
+      "start_time": 0.0,
+      "end_time": 3.0,
+      "changeover_before": 0.0,
+      "status": "ASSIGNED"
+    },
+    {
+      "order_id": "ORD-005",
+      "product": "底座D",
+      "quantity": 200,
+      "mold_id": "MOLD-D",
+      "processing_time": 4.0,
+      "deadline": "2026-06-05",
+      "priority": 1,
+      "material_arrival": "2026-05-30",
+      "assigned_machine": null,
+      "assigned_shift": null,
+      "start_time": null,
+      "end_time": null,
+      "changeover_before": null,
+      "status": "UNASSIGNED"
+    },
+    {
+      "order_id": "ORD-006",
+      "product": "盖板C",
+      "quantity": 50,
+      "mold_id": "MOLD-C",
+      "processing_time": 1.5,
+      "deadline": "2026-06-02",
+      "priority": 2,
+      "material_arrival": null,
+      "assigned_machine": "MCH-02",
+      "assigned_shift": "S06",
+      "start_time": 0.0,
+      "end_time": 1.5,
+      "changeover_before": 0.0,
+      "status": "ASSIGNED"
+    }
+  ],
+  "shift_utilization": [
+    {
+      "shift_id": "S01",
+      "machine_id": "MCH-01",
+      "date": "2026-05-28",
+      "hours": "0-8",
+      "capacity_hours": 8,
+      "load_hours": 3.0,
+      "changeover_hours": 0.0,
+      "utilization_pct": 37.5,
+      "order_count": 1
+    },
+    {
+      "shift_id": "S02",
+      "machine_id": "MCH-01",
+      "date": "2026-05-28",
+      "hours": "8-16",
+      "capacity_hours": 8,
+      "load_hours": 3.2,
+      "changeover_hours": 0.0,
+      "utilization_pct": 40.0,
+      "order_count": 1
+    },
+    {
+      "shift_id": "S03",
+      "machine_id": "MCH-01",
+      "date": "2026-05-28",
+      "hours": "16-24",
+      "capacity_hours": 8,
+      "load_hours": 0,
+      "changeover_hours": 0,
+      "utilization_pct": 0.0,
+      "order_count": 0
+    },
+    {
+      "shift_id": "S04",
+      "machine_id": "MCH-01",
+      "date": "2026-05-29",
+      "hours": "0-8",
+      "capacity_hours": 8,
+      "load_hours": 0,
+      "changeover_hours": 0,
+      "utilization_pct": 0.0,
+      "order_count": 0
+    },
+    {
+      "shift_id": "S05",
+      "machine_id": "MCH-01",
+      "date": "2026-05-29",
+      "hours": "8-16",
+      "capacity_hours": 8,
+      "load_hours": 0,
+      "changeover_hours": 0,
+      "utilization_pct": 0.0,
+      "order_count": 0
+    },
+    {
+      "shift_id": "S06",
+      "machine_id": "MCH-02",
+      "date": "2026-05-28",
+      "hours": "0-8",
+      "capacity_hours": 8,
+      "load_hours": 1.5,
+      "changeover_hours": 0.0,
+      "utilization_pct": 18.75,
+      "order_count": 1
+    },
+    {
+      "shift_id": "S07",
+      "machine_id": "MCH-02",
+      "date": "2026-05-28",
+      "hours": "8-16",
+      "capacity_hours": 8,
+      "load_hours": 0,
+      "changeover_hours": 0,
+      "utilization_pct": 0.0,
+      "order_count": 0
+    },
+    {
+      "shift_id": "S08",
+      "machine_id": "MCH-02",
+      "date": "2026-05-28",
+      "hours": "16-24",
+      "capacity_hours": 8,
+      "load_hours": 0,
+      "changeover_hours": 0,
+      "utilization_pct": 0.0,
+      "order_count": 0
+    },
+    {
+      "shift_id": "S09",
+      "machine_id": "MCH-02",
+      "date": "2026-05-29",
+      "hours": "0-8",
+      "capacity_hours": 8,
+      "load_hours": 4.5,
+      "changeover_hours": 0.0,
+      "utilization_pct": 56.25,
+      "order_count": 1
+    },
+    {
+      "shift_id": "S10",
+      "machine_id": "MCH-02",
+      "date": "2026-05-29",
+      "hours": "8-16",
+      "capacity_hours": 8,
+      "load_hours": 0,
+      "changeover_hours": 0,
+      "utilization_pct": 0.0,
+      "order_count": 0
+    },
+    {
+      "shift_id": "S11",
+      "machine_id": "MCH-03",
+      "date": "2026-05-28",
+      "hours": "0-8",
+      "capacity_hours": 6.0,
+      "load_hours": 5.0,
+      "changeover_hours": 0.0,
+      "utilization_pct": 83.33,
+      "order_count": 1
+    },
+    {
+      "shift_id": "S12",
+      "machine_id": "MCH-03",
+      "date": "2026-05-28",
+      "hours": "8-16",
+      "capacity_hours": 6.0,
+      "load_hours": 0,
+      "changeover_hours": 0,
+      "utilization_pct": 0.0,
+      "order_count": 0
+    },
+    {
+      "shift_id": "S13",
+      "machine_id": "MCH-03",
+      "date": "2026-05-29",
+      "hours": "0-8",
+      "capacity_hours": 6.0,
+      "load_hours": 0,
+      "changeover_hours": 0,
+      "utilization_pct": 0.0,
+      "order_count": 0
+    },
+    {
+      "shift_id": "S14",
+      "machine_id": "MCH-03",
+      "date": "2026-05-29",
+      "hours": "8-16",
+      "capacity_hours": 6.0,
+      "load_hours": 0,
+      "changeover_hours": 0,
+      "utilization_pct": 0.0,
+      "order_count": 0
+    },
+    {
+      "shift_id": "S15",
+      "machine_id": "MCH-03",
+      "date": "2026-05-30",
+      "hours": "0-8",
+      "capacity_hours": 6.0,
+      "load_hours": 0,
+      "changeover_hours": 0,
+      "utilization_pct": 0.0,
+      "order_count": 0
+    }
+  ],
+  "all_violations": []
+}

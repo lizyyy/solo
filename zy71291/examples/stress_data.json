@@ -1,0 +1,16 @@
+{
+  "orders": [
+    {"id": "ORD-H01", "product": "紧急件", "quantity": 500, "time_per_unit": 0.05, "mold_id": "MOLD-X", "deadline": "2026-05-28", "priority": 3, "material_arrival": "2026-05-28"},
+    {"id": "ORD-H02", "product": "加急件", "quantity": 300, "time_per_unit": 0.04, "mold_id": "MOLD-Y", "deadline": "2026-05-28", "priority": 2, "material_arrival": "2026-05-28"}
+  ],
+  "machines": [
+    {"id": "MC-1", "name": "仅一台机", "compatible_molds": ["MOLD-X", "MOLD-Y"], "capacity_per_shift": 8.0}
+  ],
+  "molds": [
+    {"id": "MOLD-X", "name": "模具X", "changeover_to": {"MOLD-Y": 2.0}},
+    {"id": "MOLD-Y", "name": "模具Y", "changeover_to": {"MOLD-X": 2.0}}
+  ],
+  "shifts": [
+    {"id": "SH-1", "machine_id": "MC-1", "date": "2026-05-28", "start_hour": 0, "end_hour": 8, "available": true}
+  ]
+}

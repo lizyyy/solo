@@ -1,0 +1,51 @@
+{
+  "run_id": "20260528_220243",
+  "timestamp": "2026-05-28T22:02:43.969488",
+  "feasible": true,
+  "solver_status": "Optimal",
+  "objective_value": 33243.4,
+  "input_hash": "627b6dbc36f7faad",
+  "statistics": {
+    "total_orders": 3,
+    "assigned_orders": 3,
+    "unassigned_orders": 0,
+    "total_machines": 1,
+    "machines_used": 1,
+    "total_shifts": 3,
+    "available_shifts": 3,
+    "total_changeover_hours": 0.0
+  },
+  "violations_summary": {
+    "total_violations": 2,
+    "critical": 2,
+    "warnings": 0,
+    "machine_overload": 0,
+    "deadline_inversion": 2,
+    "changeover_missing": 0
+  },
+  "critical_violations": [
+    {
+      "kind": "DEADLINE_INVERSION",
+      "severity": "CRITICAL",
+      "description": "订单 T-01 交期倒挂: 完工 13.00h > 交期 0.00h, 延迟 13.00h",
+      "details": {
+        "order_id": "T-01",
+        "end_time": 13.0,
+        "deadline": 0.0,
+        "lateness": 13.0
+      }
+    },
+    {
+      "kind": "DEADLINE_INVERSION",
+      "severity": "CRITICAL",
+      "description": "订单 T-02 交期倒挂: 完工 2.40h > 交期 0.00h, 延迟 2.40h",
+      "details": {
+        "order_id": "T-02",
+        "end_time": 2.4,
+        "deadline": 0.0,
+        "lateness": 2.4
+      }
+    }
+  ],
+  "infeasibility_reasons": []
+}

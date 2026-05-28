@@ -1,0 +1,19 @@
+{
+  "orders": [
+    {"id": "T-01", "product": "产品A", "quantity": 100, "time_per_unit": 0.05, "mold_id": "MA", "deadline": "2026-05-28", "priority": 2, "material_arrival": null},
+    {"id": "T-02", "product": "产品B", "quantity": 60, "time_per_unit": 0.04, "mold_id": "MB", "deadline": "2026-05-28", "priority": 3, "material_arrival": null},
+    {"id": "T-03", "product": "产品A", "quantity": 80, "time_per_unit": 0.05, "mold_id": "MA", "deadline": "2026-05-30", "priority": 1, "material_arrival": null}
+  ],
+  "machines": [
+    {"id": "M1", "name": "唯一机器", "compatible_molds": ["MA", "MB"], "capacity_per_shift": 8.0}
+  ],
+  "molds": [
+    {"id": "MA", "name": "模具A", "changeover_to": {"MB": 1.5}},
+    {"id": "MB", "name": "模具B", "changeover_to": {"MA": 1.5}}
+  ],
+  "shifts": [
+    {"id": "SH1", "machine_id": "M1", "date": "2026-05-28", "start_hour": 0, "end_hour": 8, "available": true},
+    {"id": "SH2", "machine_id": "M1", "date": "2026-05-28", "start_hour": 8, "end_hour": 16, "available": true},
+    {"id": "SH3", "machine_id": "M1", "date": "2026-05-29", "start_hour": 0, "end_hour": 8, "available": true}
+  ]
+}

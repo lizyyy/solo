@@ -1,0 +1,30 @@
+{
+  "run_id": "20260528_220159",
+  "timestamp": "2026-05-28T22:01:59.819136",
+  "feasible": false,
+  "solver_status": "Infeasible",
+  "objective_value": null,
+  "input_hash": "79f31afbbc574c22",
+  "statistics": {
+    "total_orders": 3,
+    "assigned_orders": 0,
+    "unassigned_orders": 3,
+    "total_machines": 1,
+    "machines_used": 0,
+    "total_shifts": 3,
+    "available_shifts": 3,
+    "total_changeover_hours": 0
+  },
+  "violations_summary": {
+    "total_violations": 0,
+    "critical": 0,
+    "warnings": 0,
+    "machine_overload": 0,
+    "deadline_inversion": 0,
+    "changeover_missing": 0
+  },
+  "critical_violations": [],
+  "infeasibility_reasons": [
+    "订单 T-02 交期过紧: 加工需 4.00h 但交期仅 0.00h"
+  ]
+}

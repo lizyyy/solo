@@ -1,0 +1,143 @@
+{
+  "run_id": "20260528_220243",
+  "machine_schedule": {
+    "M1": [
+      {
+        "order_id": "T-02",
+        "shift_id": "SH1",
+        "mold_id": "MB",
+        "start_time": 0.0,
+        "end_time": 2.4,
+        "changeover_before": 0.0,
+        "prev_order_id": null
+      },
+      {
+        "order_id": "T-01",
+        "shift_id": "SH2",
+        "mold_id": "MA",
+        "start_time": 8.0,
+        "end_time": 13.0,
+        "changeover_before": 0.0,
+        "prev_order_id": null
+      },
+      {
+        "order_id": "T-03",
+        "shift_id": "SH3",
+        "mold_id": "MA",
+        "start_time": 24.0,
+        "end_time": 28.0,
+        "changeover_before": 0.0,
+        "prev_order_id": null
+      }
+    ]
+  },
+  "order_status": [
+    {
+      "order_id": "T-01",
+      "product": "产品A",
+      "quantity": 100,
+      "mold_id": "MA",
+      "processing_time": 5.0,
+      "deadline": "2026-05-28",
+      "priority": 2,
+      "material_arrival": null,
+      "assigned_machine": "M1",
+      "assigned_shift": "SH2",
+      "start_time": 8.0,
+      "end_time": 13.0,
+      "changeover_before": 0.0,
+      "status": "ASSIGNED"
+    },
+    {
+      "order_id": "T-02",
+      "product": "产品B",
+      "quantity": 60,
+      "mold_id": "MB",
+      "processing_time": 2.4,
+      "deadline": "2026-05-28",
+      "priority": 3,
+      "material_arrival": null,
+      "assigned_machine": "M1",
+      "assigned_shift": "SH1",
+      "start_time": 0.0,
+      "end_time": 2.4,
+      "changeover_before": 0.0,
+      "status": "ASSIGNED"
+    },
+    {
+      "order_id": "T-03",
+      "product": "产品A",
+      "quantity": 80,
+      "mold_id": "MA",
+      "processing_time": 4.0,
+      "deadline": "2026-05-30",
+      "priority": 1,
+      "material_arrival": null,
+      "assigned_machine": "M1",
+      "assigned_shift": "SH3",
+      "start_time": 24.0,
+      "end_time": 28.0,
+      "changeover_before": 0.0,
+      "status": "ASSIGNED"
+    }
+  ],
+  "shift_utilization": [
+    {
+      "shift_id": "SH1",
+      "machine_id": "M1",
+      "date": "2026-05-28",
+      "hours": "0-8",
+      "capacity_hours": 8,
+      "load_hours": 2.4,
+      "changeover_hours": 0.0,
+      "utilization_pct": 30.0,
+      "order_count": 1
+    },
+    {
+      "shift_id": "SH2",
+      "machine_id": "M1",
+      "date": "2026-05-28",
+      "hours": "8-16",
+      "capacity_hours": 8,
+      "load_hours": 5.0,
+      "changeover_hours": 0.0,
+      "utilization_pct": 62.5,
+      "order_count": 1
+    },
+    {
+      "shift_id": "SH3",
+      "machine_id": "M1",
+      "date": "2026-05-29",
+      "hours": "0-8",
+      "capacity_hours": 8,
+      "load_hours": 4.0,
+      "changeover_hours": 0.0,
+      "utilization_pct": 50.0,
+      "order_count": 1
+    }
+  ],
+  "all_violations": [
+    {
+      "kind": "DEADLINE_INVERSION",
+      "severity": "CRITICAL",
+      "description": "订单 T-01 交期倒挂: 完工 13.00h > 交期 0.00h, 延迟 13.00h",
+      "details": {
+        "order_id": "T-01",
+        "end_time": 13.0,
+        "deadline": 0.0,
+        "lateness": 13.0
+      }
+    },
+    {
+      "kind": "DEADLINE_INVERSION",
+      "severity": "CRITICAL",
+      "description": "订单 T-02 交期倒挂: 完工 2.40h > 交期 0.00h, 延迟 2.40h",
+      "details": {
+        "order_id": "T-02",
+        "end_time": 2.4,
+        "deadline": 0.0,
+        "lateness": 2.4
+      }
+    }
+  ]
+}

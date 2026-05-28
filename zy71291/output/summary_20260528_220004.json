@@ -1,0 +1,28 @@
+{
+  "run_id": "20260528_220004",
+  "timestamp": "2026-05-28T22:00:04.470218",
+  "feasible": true,
+  "solver_status": "Optimal",
+  "objective_value": 101.2,
+  "input_hash": "ad3da5150c241077",
+  "statistics": {
+    "total_orders": 6,
+    "assigned_orders": 6,
+    "unassigned_orders": 0,
+    "total_machines": 3,
+    "machines_used": 3,
+    "total_shifts": 17,
+    "available_shifts": 17,
+    "total_changeover_hours": 0.0
+  },
+  "violations_summary": {
+    "total_violations": 0,
+    "critical": 0,
+    "warnings": 0,
+    "machine_overload": 0,
+    "deadline_inversion": 0,
+    "changeover_missing": 0
+  },
+  "critical_violations": [],
+  "infeasibility_reasons": []
+}
