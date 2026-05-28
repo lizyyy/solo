@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import dayjs from 'dayjs'
+import { useRedemptionStore } from './redemption'
+import { useInvoiceStore } from './invoice'
 
 export const useCreditStore = defineStore('credit', () => {
   const creditRecords = ref([])
@@ -95,6 +97,3 @@ export const useCreditStore = defineStore('credit', () => {
     setUsedCredit
   }
 })
-
-import { useRedemptionStore } from './redemption'
-import { useInvoiceStore } from './invoice'

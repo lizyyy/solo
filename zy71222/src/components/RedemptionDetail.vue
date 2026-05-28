@@ -97,7 +97,7 @@
 <script setup>
 import { computed } from 'vue'
 import { usePaymentStore } from '@/stores/payment'
-import { REDEMPTION_STATUS_LABEL, ANOMALY_LABELS } from '@/stores/redemption'
+import { useRedemptionStore, REDEMPTION_STATUS_LABEL, ANOMALY_LABELS } from '@/stores/redemption'
 import dayjs from 'dayjs'
 
 const props = defineProps({
@@ -108,10 +108,18 @@ const props = defineProps({
 })
 
 const paymentStore = usePaymentStore()
+const redemptionStore = useRedemptionStore()
 
 const sortedHistory = computed(() => {
-  const history = props.redemption.statusHistory || []
-  return [...history].sort((a, b) => new Date(a.operateTime) - new Date(b.operateTime))
+  const localHistory = props.redemption.statusHistory || []
+  const globalHistory = redemptionStore.getHistoryByRedemptionId(props.redemption.id)
+  const merged = [...localHistory]
+  globalHistory.forEach(h => {
+    if (!merged.some(m => m.id === h.id)) {
+      merged.push(h)
+    }
+  })
+  return merged.sort((a, b) => new Date(a.operateTime) - new Date(b.operateTime))
 })
 
 const relatedPayments = computed(() => {

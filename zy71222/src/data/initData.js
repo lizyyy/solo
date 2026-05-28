@@ -11,8 +11,14 @@ export function initMockData() {
   const paymentStore = usePaymentStore()
 
   invoiceStore.initInvoices(mockInvoices)
-  redemptionStore.initRedemptions(mockRedemptions)
+
+  const enrichedRedemptions = mockRedemptions.map(r => ({
+    ...r,
+    statusHistory: mockStatusHistory.filter(h => h.redemptionId === r.id)
+  }))
+  redemptionStore.initRedemptions(enrichedRedemptions)
   redemptionStore.initHistory(mockStatusHistory)
+
   creditStore.initCreditHistory(mockCreditHistory)
   paymentStore.initPayments(mockPayments)
 

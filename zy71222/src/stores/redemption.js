@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import dayjs from 'dayjs'
+import { useCreditStore } from './credit'
 
 export const REDEMPTION_STATUS = {
   DRAFT: 'draft',
@@ -178,11 +179,22 @@ export const useRedemptionStore = defineStore('redemption', () => {
 
   function completeRedemption(redemptionId, operator, creditReleaseTime = null) {
     const redemption = redemptions.value.find(r => r.id === redemptionId)
-    if (redemption) {
-      redemption.creditReleaseTime = creditReleaseTime || new Date().toISOString()
-      redemption.completedTime = new Date().toISOString()
+    if (!redemption) return { success: false, message: '红冲申请不存在' }
+
+    const result = transitionStatus(redemptionId, REDEMPTION_STATUS.COMPLETED, operator, '红冲完成，额度已回补')
+    if (!result.success) return result
+
+    if (creditReleaseTime) {
+      redemption.creditReleaseTime = creditReleaseTime
+    } else {
+      redemption.creditReleaseTime = new Date().toISOString()
     }
-    return transitionStatus(redemptionId, REDEMPTION_STATUS.COMPLETED, operator, '红冲完成，额度已回补')
+    redemption.completedTime = new Date().toISOString()
+
+    const creditStore = useCreditStore()
+    creditStore.releaseCredit(redemptionId, redemption.amount, operator)
+
+    return result
   }
 
   function rejectRedemption(redemptionId, operator, reason) {

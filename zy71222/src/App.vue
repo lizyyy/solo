@@ -3,7 +3,7 @@
     <el-container class="main-container">
       <el-header class="header">
         <div class="header-left">
-          <el-icon class="logo-icon"><Receipt /></el-icon>
+          <el-icon class="logo-icon"><Tickets /></el-icon>
           <h1 class="title">发票红冲额度回补系统</h1>
         </div>
         <div class="header-right">
