@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import useStore from '../../store/useStore';
 
 export default function StatusBar() {
-  const { tasks, operationLogs, locations, detectTemperatureAlerts, detectHumidityAlerts } = useStore();
+  const { tasks, operationLogs, locations, detectTemperatureAlerts, detectHumidityAlerts, checkForbiddenCrossing } = useStore();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -90,29 +90,32 @@ export default function StatusBar() {
         <div className="border-t border-slate-700/50 px-4 py-2 bg-slate-800/50">
           <div className="flex items-center gap-4 overflow-x-auto">
             <span className="text-xs text-slate-400 whitespace-nowrap">进行中任务:</span>
-            {activeTasks.map(task => (
-              <div 
-                key={task.id}
-                className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs whitespace-nowrap ${
-                  task.hasForbiddenCrossing 
-                    ? 'bg-red-900/50 text-red-300 border border-red-700/50' 
-                    : task.priority === 'urgent'
-                    ? 'bg-amber-900/50 text-amber-300 border border-amber-700/50'
-                    : 'bg-blue-900/50 text-blue-300 border border-blue-700/50'
-                }`}
-              >
-                {task.status === 'in_progress' ? (
-                  <Activity size={12} className="animate-spin" />
-                ) : (
-                  <Clock size={12} />
-                )}
-                <span>{task.type === 'inbound' ? '入库' : task.type === 'outbound' ? '出库' : '移库'}</span>
-                <span className="font-mono">{task.boxId}</span>
-                {task.hasForbiddenCrossing && (
-                  <AlertTriangle size={12} className="text-red-400" />
-                )}
-              </div>
-            ))}
+            {activeTasks.map(task => {
+              const hasCrossing = checkForbiddenCrossing(task.route);
+              return (
+                <div 
+                  key={task.id}
+                  className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs whitespace-nowrap ${
+                    hasCrossing 
+                      ? 'bg-red-900/50 text-red-300 border border-red-700/50' 
+                      : task.priority === 'urgent'
+                      ? 'bg-amber-900/50 text-amber-300 border border-amber-700/50'
+                      : 'bg-blue-900/50 text-blue-300 border border-blue-700/50'
+                  }`}
+                >
+                  {task.status === 'in_progress' ? (
+                    <Activity size={12} className="animate-spin" />
+                  ) : (
+                    <Clock size={12} />
+                  )}
+                  <span>{task.type === 'inbound' ? '入库' : task.type === 'outbound' ? '出库' : '移库'}</span>
+                  <span className="font-mono">{task.boxId}</span>
+                  {hasCrossing && (
+                    <AlertTriangle size={12} className="text-red-400" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

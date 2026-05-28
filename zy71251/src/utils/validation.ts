@@ -87,7 +87,9 @@ export const validateStatusFlow = () => {
   let passed = true;
   let details: string[] = [];
   
-  if (task2?.hasForbiddenCrossing && task2.status === 'pending') {
+  const task2Crossing = task2 && state.checkForbiddenCrossing(task2.route);
+  
+  if (task2Crossing && task2?.status === 'pending') {
     details.push('TASK-2024-002 正确保持 pending 状态（因路线告警）');
   } else if (task2?.status === 'cancelled') {
     details.push('TASK-2024-002 已被撤回（cancelled）');
@@ -95,7 +97,7 @@ export const validateStatusFlow = () => {
     details.push('TASK-2024-002 已通过补录完成');
   } else {
     passed = false;
-    details.push(`TASK-2024-002 状态异常: ${task2?.status}`);
+    details.push(`TASK-2024-002 状态异常: ${task2?.status}, 路线穿越: ${task2Crossing}`);
   }
   
   if (task1?.status === 'in_progress') {

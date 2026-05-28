@@ -332,7 +332,8 @@ function SceneContent({ onLocationClick }: SceneContentProps) {
     showHeatmap, 
     showRoutes, 
     tasks,
-    getFilteredLocations 
+    getFilteredLocations,
+    checkForbiddenCrossing
   } = useStore();
   
   const filteredLocations = getFilteredLocations();
@@ -392,7 +393,7 @@ function SceneContent({ onLocationClick }: SceneContentProps) {
           key={task.id}
           route={task.route}
           color={task.priority === 'urgent' ? '#EF4444' : '#3B82F6'}
-          hasWarning={task.hasForbiddenCrossing}
+          hasWarning={checkForbiddenCrossing(task.route)}
         />
       ))}
 

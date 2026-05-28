@@ -247,13 +247,13 @@ export const tasks: Task[] = [
     type: 'transfer',
     boxId: 'BX-DUP-2024-00001',
     fromLocation: 'S-A02-L2-P03',
-    toLocation: 'S-D01-L1-P01',
+    toLocation: 'S-D02-L1-P03',
     status: 'pending',
     route: [
       { x: -15, y: 0, z: 0 },
-      { x: -5, y: 0, z: 0 },
-      { x: 5, y: 0, z: 0 },
-      { x: 15, y: 0, z: -10 }
+      { x: 0, y: 0, z: 0 },
+      { x: 19, y: 0, z: 0 },
+      { x: 15, y: 0, z: 0 }
     ],
     hasForbiddenCrossing: true,
     createTime: new Date(Date.now() - 7200000).toISOString(),

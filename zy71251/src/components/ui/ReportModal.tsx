@@ -17,7 +17,8 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
     detectTemperatureAlerts, 
     detectHumidityAlerts,
     detectDuplicateLocations,
-    operationLogs
+    operationLogs,
+    checkForbiddenCrossing
   } = useStore();
   
   const [isGenerating, setIsGenerating] = useState(false);
@@ -42,7 +43,7 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
       
       doc.setFontSize(10);
       doc.setTextColor(100, 116, 139);
-      doc.text(`生成时间: ${new Date().toLocaleString('zh-CN')}`, 20, 35);
+      doc.text('生成时间: ' + new Date().toLocaleString('zh-CN'), 20, 35);
       
       doc.setDrawColor(59, 130, 246);
       doc.setLineWidth(0.5);
@@ -54,10 +55,10 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
       
       doc.setFontSize(10);
       doc.setTextColor(51, 65, 85);
-      doc.text(`总库位数: ${locations.length}`, 25, 68);
-      doc.text(`已占用: ${occupiedCount} (${Math.round(occupiedCount / locations.length * 100)}%)`, 25, 78);
-      doc.text(`空置: ${emptyCount} (${Math.round(emptyCount / locations.length * 100)}%)`, 25, 88);
-      doc.text(`当前筛选结果: ${filteredLocations.length} 个库位`, 25, 98);
+      doc.text('总库位数: ' + locations.length, 25, 68);
+      doc.text('已占用: ' + occupiedCount + ' (' + Math.round(occupiedCount / locations.length * 100) + '%)', 25, 78);
+      doc.text('空置: ' + emptyCount + ' (' + Math.round(emptyCount / locations.length * 100) + '%)', 25, 88);
+      doc.text('当前筛选结果: ' + filteredLocations.length + ' 个库位', 25, 98);
       
       doc.setFontSize(14);
       doc.setTextColor(30, 41, 59);
@@ -66,9 +67,9 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
       doc.setFontSize(10);
       if (tempAlerts.length > 0) {
         doc.setTextColor(239, 68, 68);
-        doc.text(`温度告警: ${tempAlerts.length} 个库位`, 25, 128);
+        doc.text('温度告警: ' + tempAlerts.length + ' 个库位', 25, 128);
         tempAlerts.slice(0, 5).forEach((loc, i) => {
-          doc.text(`  - ${loc.code}: ${loc.sensor?.temperature}°C`, 25, 136 + i * 8);
+          doc.text('  - ' + loc.code + ': ' + loc.sensor?.temperature + '°C', 25, 136 + i * 8);
         });
       } else {
         doc.setTextColor(16, 185, 129);
@@ -77,7 +78,7 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
       
       if (humidAlerts.length > 0) {
         doc.setTextColor(245, 158, 11);
-        doc.text(`湿度告警: ${humidAlerts.length} 个库位`, 25, 175);
+        doc.text('湿度告警: ' + humidAlerts.length + ' 个库位', 25, 175);
       } else {
         doc.setTextColor(16, 185, 129);
         doc.text('湿度告警: 无', 25, 175);
@@ -85,9 +86,9 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
       
       if (duplicates.length > 0) {
         doc.setTextColor(239, 68, 68);
-        doc.text(`库位异常: ${duplicates.length} 项`, 25, 185);
+        doc.text('库位异常: ' + duplicates.length + ' 项', 25, 185);
         duplicates.slice(0, 3).forEach((d, i) => {
-          doc.text(`  - ${d}`, 25, 193 + i * 8);
+          doc.text('  - ' + d, 25, 193 + i * 8);
         });
       } else {
         doc.setTextColor(16, 185, 129);
@@ -105,12 +106,12 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
       if (activeTasks.length > 0) {
         activeTasks.forEach((task, i) => {
           const y = 38 + i * 20;
-          doc.text(`任务 ${task.id}:`, 25, y);
-          doc.text(`  类型: ${task.type === 'inbound' ? '入库' : task.type === 'outbound' ? '出库' : '移库'}`, 25, y + 6);
-          doc.text(`  状态: ${task.status === 'pending' ? '待处理' : '进行中'}`, 25, y + 12);
-          if (task.hasForbiddenCrossing) {
+          doc.text('任务 ' + task.id + ':', 25, y);
+          doc.text('  类型: ' + (task.type === 'inbound' ? '入库' : task.type === 'outbound' ? '出库' : '移库'), 25, y + 6);
+          doc.text('  状态: ' + (task.status === 'pending' ? '待处理' : '进行中'), 25, y + 12);
+          if (checkForbiddenCrossing(task.route)) {
             doc.setTextColor(239, 68, 68);
-            doc.text(`  警告: 路线穿越禁区`, 25, y + 18);
+            doc.text('  警告: 路线穿越禁区', 25, y + 18);
             doc.setTextColor(51, 65, 85);
           }
         });
@@ -129,7 +130,11 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
       doc.setTextColor(51, 65, 85);
       operationLogs.slice(0, 15).forEach((log, i) => {
         const time = new Date(log.time).toLocaleString('zh-CN');
-        doc.text(`${time} - ${log.operator}: ${log.action}${log.remark ? ` - ${log.remark}` : ''}`, 25, 38 + i * 10);
+        let text = time + ' - ' + log.operator + ': ' + log.action;
+        if (log.remark) {
+          text = text + ' - ' + log.remark;
+        }
+        doc.text(text, 25, 38 + i * 10);
       });
       
       if (screenshotData) {
@@ -140,7 +145,7 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
         doc.addImage(screenshotData, 'PNG', 20, 35, 170, 100);
       }
       
-      doc.save(`仓储报告_${new Date().toISOString().split('T')[0]}.pdf`);
+      doc.save('仓储报告_' + new Date().toISOString().split('T')[0] + '.pdf');
     } catch (error) {
       console.error('PDF生成失败:', error);
     } finally {
@@ -217,7 +222,7 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
                     <div className="text-red-400 text-sm font-medium mb-1">温度异常 ({tempAlerts.length})</div>
                     <div className="text-xs text-red-300/70">
                       {tempAlerts.slice(0, 5).map(l => l.code).join(', ')}
-                      {tempAlerts.length > 5 && ` 等 ${tempAlerts.length} 个库位`}
+                      {tempAlerts.length > 5 && ' 等 ' + tempAlerts.length + ' 个库位'}
                     </div>
                   </div>
                 )}
@@ -226,7 +231,7 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
                     <div className="text-amber-400 text-sm font-medium mb-1">湿度异常 ({humidAlerts.length})</div>
                     <div className="text-xs text-amber-300/70">
                       {humidAlerts.slice(0, 5).map(l => l.code).join(', ')}
-                      {humidAlerts.length > 5 && ` 等 ${humidAlerts.length} 个库位`}
+                      {humidAlerts.length > 5 && ' 等 ' + humidAlerts.length + ' 个库位'}
                     </div>
                   </div>
                 )}
@@ -263,29 +268,29 @@ export default function ReportModal({ isOpen, onClose, screenshotData }: ReportM
                     <tr key={loc.id} className="border-t border-slate-700/50 hover:bg-slate-700/30">
                       <td className="p-2 text-white font-mono text-xs">{loc.code}</td>
                       <td className="p-2">
-                        <span className={`text-xs px-1.5 py-0.5 rounded ${
+                        <span className={'text-xs px-1.5 py-0.5 rounded ' + (
                           loc.status === 'occupied' ? 'bg-green-900/50 text-green-400' :
                           loc.status === 'empty' ? 'bg-slate-700 text-slate-400' :
                           'bg-yellow-900/50 text-yellow-400'
-                        }`}>
+                        )}>
                           {loc.status === 'occupied' ? '已占用' : loc.status === 'empty' ? '空置' : '维护中'}
                         </span>
                       </td>
                       <td className="p-2 text-slate-400 text-xs">
                         {loc.zone === 'valuables' ? '贵重品' : loc.zone === 'constant_temp' ? '恒温' : '普通'}
                       </td>
-                      <td className={`p-2 font-mono text-xs ${
+                      <td className={'p-2 font-mono text-xs ' + (
                         loc.sensor?.temperature && loc.sensor.temperature > 25 ? 'text-red-400' :
                         loc.sensor?.temperature && loc.sensor.temperature < 18 ? 'text-blue-400' :
                         'text-green-400'
-                      }`}>
+                      )}>
                         {loc.sensor?.temperature}°C
                       </td>
-                      <td className={`p-2 font-mono text-xs ${
+                      <td className={'p-2 font-mono text-xs ' + (
                         loc.sensor?.humidity && loc.sensor.humidity > 60 ? 'text-amber-400' :
                         loc.sensor?.humidity && loc.sensor.humidity < 40 ? 'text-blue-400' :
                         'text-green-400'
-                      }`}>
+                      )}>
                         {loc.sensor?.humidity}%
                       </td>
                     </tr>
