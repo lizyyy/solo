@@ -1,12 +1,36 @@
+import { useMemo } from 'react';
 import { Layers, AlertTriangle, Tag, Eye, EyeOff } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 
 export const SliceFilter = () => {
   const {
-    slices, filterErrorsOnly, filterAnnotatedOnly, setFilterErrorsOnly, setFilterAnnotatedOnly, toggleSliceVisibility, selectedSliceId, selectSlice } = useAppStore();
+    slices,
+    annotations,
+    filterErrorsOnly,
+    filterAnnotatedOnly,
+    setFilterErrorsOnly,
+    setFilterAnnotatedOnly,
+    toggleSliceVisibility,
+    selectedSliceId,
+    selectSlice,
+  } = useAppStore();
 
-  const errorCount = slices.filter((s) => s.hasError).length;
-  const annotatedCount = slices.filter((s) => s.id).length;
+  const errorCount = useMemo(
+    () => slices.filter((s) => s.hasError).length,
+    [slices]
+  );
+
+  const annotatedCount = useMemo(
+    () => slices.filter((s) => annotations.some((a) => a.sliceId === s.id)).length,
+    [slices, annotations]
+  );
+
+  const slicesWithAnnotationInfo = useMemo(() => {
+    return slices.map((slice) => ({
+      ...slice,
+      hasAnnotations: annotations.some((a) => a.sliceId === slice.id),
+    }));
+  }, [slices, annotations]);
 
   return (
     <div className="bg-slate-800/90 backdrop-blur-sm rounded-xl p-4 border border-slate-700">
@@ -48,8 +72,8 @@ export const SliceFilter = () => {
       <div className="border-t border-slate-700 pt-4">
         <div className="text-slate-400 text-xs mb-2">切片列表</div>
         <div className="max-h-48 overflow-y-auto space-y-1 pr-2">
-          {slices.map((slice) => {
-            const hasAnnotations = useAppStore.getState().annotations.filter((a) => a.sliceId === slice.id).length > 0;
+          {slicesWithAnnotationInfo.map((slice) => {
+            const hasAnnotations = slice.hasAnnotations;
             return (
               <div
                 key={slice.id}

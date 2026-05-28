@@ -22,8 +22,15 @@ const SliceStack = ({
   windowCenter,
 }: SliceStackProps) => {
   const groupRef = useRef<THREE.Group>(null);
-  const { rotation, setRotation, selectSlice, highlightSlice, selectedSliceId } =
-    useAppStore();
+  const {
+    rotation,
+    setRotation,
+    selectSlice,
+    highlightSlice,
+    selectedSliceId,
+    filterErrorsOnly,
+    filterAnnotatedOnly,
+  } = useAppStore();
 
   useFrame(() => {
     if (groupRef.current) {
@@ -34,14 +41,13 @@ const SliceStack = ({
   });
 
   const filteredSlices = useMemo(() => {
-    const { filterErrorsOnly, filterAnnotatedOnly } = useAppStore.getState();
     return slices.filter((slice) => {
       if (filterErrorsOnly && !slice.hasError) return false;
       if (filterAnnotatedOnly && !annotations.some((a) => a.sliceId === slice.id))
         return false;
       return true;
     });
-  }, [slices, annotations]);
+  }, [slices, annotations, filterErrorsOnly, filterAnnotatedOnly]);
 
   const totalHeight = (filteredSlices.length - 1) * sliceSpacing;
 
