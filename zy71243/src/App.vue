@@ -5,7 +5,7 @@
         <div class="logo">⚡ 太空电网配平局</div>
         <div class="flex gap-4 items-center">
           <span v-if="gameStarted && !isGameOver" class="text-muted">
-            回合 {{ currentTurn }} / {{ maxTurns }}
+            {{ isReplayMode ? '📽️ 回放模式' : '回合 ' + currentTurn + ' / ' + maxTurns }}
           </span>
           <span 
             v-if="gameStarted" 
@@ -17,6 +17,13 @@
           <span v-if="gameStarted && !crewAlive" class="status-badge status-critical">
             ⚠️ 乘员失活
           </span>
+          <button 
+            v-if="isReplayMode"
+            class="btn text-xs py-1 px-3 btn-warning"
+            @click="exitReplayMode"
+          >
+            退出回放
+          </button>
         </div>
       </div>
     </header>
@@ -33,15 +40,38 @@
       <div v-else class="grid grid-3">
         <div class="grid-item span-2">
           <PowerOverview 
+            v-if="!isReplayMode"
             :station="station"
             :sun-angle="sunAngle"
             :power-balance="powerBalance"
           />
           
+          <div v-if="isReplayMode" class="card">
+            <h2 class="card-title">📽️ 回放视图 - 回合 {{ replayCurrentTurn }}</h2>
+            <div v-if="replayState" class="stat-grid">
+              <div class="stat-box">
+                <div class="stat-value text-success">{{ replaySolarOutput.toFixed(1) }}</div>
+                <div class="stat-label">太阳能输出 (kW)</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value text-warning">{{ replayLoadDemand.toFixed(1) }}</div>
+                <div class="stat-label">负载需求 (kW)</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value">{{ replayBatteryPercent.toFixed(0) }}%</div>
+                <div class="stat-label">电池电量</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value">{{ replayState.sunAngle.toFixed(0) }}°</div>
+                <div class="stat-label">太阳角度</div>
+              </div>
+            </div>
+          </div>
+          
           <div class="mt-4">
             <div class="tabs">
               <div 
-                v-for="tab in tabs" 
+                v-for="tab in displayTabs" 
                 :key="tab.id"
                 class="tab"
                 :class="{ active: activeTab === tab.id }"
@@ -52,10 +82,40 @@
             </div>
             
             <ModuleView 
-              v-if="activeTab === 'modules'"
+              v-if="activeTab === 'modules' && !isReplayMode"
               :modules="station.modules"
+              :current-turn="currentTurn"
               @toggle-load="toggleLoad"
+              @transfer-device="handleTransferDevice"
+              @archive-note="handleArchiveNote"
             />
+            
+            <div v-if="activeTab === 'modules' && isReplayMode" class="card">
+              <h3 class="font-semibold mb-3">回放模式 - 模块状态快照</h3>
+              <div v-if="replayState?.modules" class="space-y-3">
+                <div 
+                  v-for="module in replayState.modules" 
+                  :key="module.id"
+                  class="p-3 bg-secondary rounded"
+                >
+                  <h4 class="font-medium mb-2">{{ module.name }}</h4>
+                  <div class="grid grid-3 gap-2 text-xs">
+                    <div>
+                      <div class="text-muted">太阳能板</div>
+                      <div>{{ module.solarPanels?.length || 0 }} 块</div>
+                    </div>
+                    <div>
+                      <div class="text-muted">电池组</div>
+                      <div>{{ module.batteries?.length || 0 }} 组</div>
+                    </div>
+                    <div>
+                      <div class="text-muted">负载</div>
+                      <div>{{ module.loads?.length || 0 }} 台</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             
             <EnergyLedgerView 
               v-if="activeTab === 'ledger'"
@@ -66,21 +126,53 @@
               v-if="activeTab === 'events'"
               :events="events"
             />
+            
+            <ReplayView 
+              v-if="activeTab === 'replay'"
+              :history="gameHistory"
+              :failure-points="failurePoints"
+              @replay-step="handleReplayStep"
+              @replay-complete="handleReplayComplete"
+            />
           </div>
         </div>
 
         <div class="grid-item">
           <ControlPanel 
+            v-if="!isReplayMode"
             :is-game-over="isGameOver"
             :can-advance="canAdvanceTurn"
             @advance="advanceTurn"
             @reset="resetGame"
             @show-report="showReport = true"
-            @start-replay="startReplay"
+            @start-replay="enterReplayMode"
           />
           
+          <div v-if="isReplayMode" class="card">
+            <h2 class="card-title">📽️ 回放控制</h2>
+            <p class="text-sm text-muted mb-4">
+              正在查看回合 {{ replayCurrentTurn }} 的历史状态
+            </p>
+            <div class="space-y-2">
+              <button 
+                class="btn w-full justify-center"
+                style="background: var(--bg-secondary);"
+                @click="exitReplayMode"
+              >
+                ← 返回游戏
+              </button>
+              <button 
+                class="btn w-full justify-center"
+                style="background: var(--bg-secondary);"
+                @click="activeTab = 'replay'"
+              >
+                🎬 打开回放控制台
+              </button>
+            </div>
+          </div>
+          
           <div class="mt-4">
-            <BatteryStatus :batteries="station.getAllBatteries()" />
+            <BatteryStatus :batteries="isReplayMode ? replayBatteries : station.getAllBatteries()" />
           </div>
         </div>
       </div>
@@ -110,6 +202,7 @@ import EventLogView from './components/EventLogView.vue'
 import ControlPanel from './components/ControlPanel.vue'
 import BatteryStatus from './components/BatteryStatus.vue'
 import ReportModal from './components/ReportModal.vue'
+import ReplayView from './components/ReplayView.vue'
 
 const scenarios = ScenarioData.getScenarios()
 const selectedScenario = ref('basic')
@@ -130,14 +223,85 @@ const activeTab = ref('modules')
 const showReport = ref(false)
 const report = ref(null)
 const maxTurns = 24
+const archiveNotes = ref([])
 
-const tabs = [
-  { id: 'modules', name: '舱段管理' },
-  { id: 'ledger', name: '能源账本' },
-  { id: 'events', name: '事件日志' }
-]
+const isReplayMode = ref(false)
+const replayCurrentTurn = ref(0)
+const replayState = ref(null)
 
-const canAdvanceTurn = computed(() => !isGameOver.value)
+const displayTabs = computed(() => {
+  const tabs = [
+    { id: 'modules', name: '舱段管理' },
+    { id: 'ledger', name: '能源账本' },
+    { id: 'events', name: '事件日志' }
+  ]
+  if (gameHistory.value.length > 0) {
+    tabs.push({ id: 'replay', name: '🎬 回放分析' })
+  }
+  return tabs
+})
+
+const gameHistory = computed(() => {
+  return turnManager.value?.history || []
+})
+
+const failurePoints = computed(() => {
+  return replaySystem.value?.findFailurePoint() || []
+})
+
+const replaySolarOutput = computed(() => {
+  if (!replayState.value?.modules) return 0
+  let total = 0
+  for (const module of replayState.value.modules) {
+    for (const panel of module.solarPanels || []) {
+      const angleDiff = Math.abs((replayState.value.sunAngle || 90) - panel.tiltAngle)
+      const sunFactor = Math.cos(angleDiff * Math.PI / 180)
+      const healthFactor = 1 - (panel.damageLevel * 0.3)
+      total += panel.maxOutput * panel.efficiency * sunFactor * healthFactor
+    }
+  }
+  return total
+})
+
+const replayLoadDemand = computed(() => {
+  if (!replayState.value?.modules) return 0
+  let total = 0
+  for (const module of replayState.value.modules) {
+    for (const load of module.loads || []) {
+      if (load.isPowered) {
+        total += load.powerDemand
+      }
+    }
+  }
+  return total
+})
+
+const replayBatteryPercent = computed(() => {
+  if (!replayState.value?.modules) return 0
+  let totalCharge = 0
+  let totalCapacity = 0
+  for (const module of replayState.value.modules) {
+    for (const battery of module.batteries || []) {
+      totalCharge += battery.currentCharge
+      const healthFactor = 1 - (battery.damageLevel * 0.4)
+      totalCapacity += battery.capacity * healthFactor
+    }
+  }
+  return totalCapacity > 0 ? (totalCharge / totalCapacity) * 100 : 0
+})
+
+const replayBatteries = computed(() => {
+  if (!replayState.value?.modules) return []
+  const batteries = []
+  for (const module of replayState.value.modules) {
+    for (const battery of module.batteries || []) {
+      batteries.push(battery)
+    }
+  }
+  return batteries
+})
+
+const canAdvanceTurn = computed(() => !isGameOver.value && !isReplayMode.value)
 
 function selectScenario(id) {
   selectedScenario.value = id
@@ -155,6 +319,10 @@ function startGame() {
   updateState(state)
   
   gameStarted.value = true
+  isReplayMode.value = false
+  replayCurrentTurn.value = 0
+  replayState.value = null
+  archiveNotes.value = []
 }
 
 function advanceTurn() {
@@ -196,6 +364,37 @@ function toggleLoad(loadId) {
   }
 }
 
+function handleTransferDevice({ device, type, from, to }) {
+  if (!station.value) return
+  
+  const sourceModule = station.value.getModule(from)
+  const targetModule = station.value.getModule(to)
+  
+  if (!sourceModule || !targetModule) return
+  
+  if (type === 'solar') {
+    sourceModule.removeSolarPanel(device.id)
+    const actualPanel = sourceModule.solarPanels.find(p => p.id === device.id) || device
+    targetModule.addSolarPanel(actualPanel)
+  } else if (type === 'battery') {
+    sourceModule.removeBattery(device.id)
+    const actualBattery = sourceModule.batteries.find(b => b.id === device.id) || device
+    targetModule.addBattery(actualBattery)
+  } else if (type === 'load') {
+    sourceModule.removeLoad(device.id)
+    const actualLoad = sourceModule.loads.find(l => l.id === device.id) || device
+    actualLoad.moduleId = to
+    targetModule.addLoad(actualLoad)
+  }
+  
+  station.value = { ...station.value }
+}
+
+function handleArchiveNote(note) {
+  archiveNotes.value.push(note)
+  console.log('归档笔记已保存:', note)
+}
+
 function resetGame() {
   if (!turnManager.value) return
   
@@ -208,6 +407,10 @@ function resetGame() {
   ledgerEntries.value = []
   activeTab.value = 'modules'
   showReport.value = false
+  isReplayMode.value = false
+  replayCurrentTurn.value = 0
+  replayState.value = null
+  archiveNotes.value = []
 }
 
 function generateReport() {
@@ -240,14 +443,28 @@ function downloadReport(format) {
   URL.revokeObjectURL(url)
 }
 
-function startReplay() {
-  if (!replaySystem.value) return
-  
-  replaySystem.value.onReplayStep = (state, turn) => {
-    console.log('Replay turn:', turn, state)
-  }
-  
-  replaySystem.value.startReplay()
+function enterReplayMode() {
+  if (gameHistory.value.length === 0) return
+  isReplayMode.value = true
+  activeTab.value = 'replay'
+  replayCurrentTurn.value = gameHistory.value.length - 1
+  replayState.value = gameHistory.value[replayCurrentTurn.value]
+}
+
+function exitReplayMode() {
+  isReplayMode.value = false
+  replayCurrentTurn.value = 0
+  replayState.value = null
+  updateState(turnManager.value.getCurrentState())
+}
+
+function handleReplayStep(state, turn) {
+  replayCurrentTurn.value = turn
+  replayState.value = state
+}
+
+function handleReplayComplete() {
+  console.log('回放完成')
 }
 
 function getStatusText(status) {
