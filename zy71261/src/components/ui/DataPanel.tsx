@@ -21,30 +21,46 @@ function DetailCard() {
   if (block.fieldFlags.directionMissing) missingFields.push("方向");
   if (block.fieldFlags.marginMissing) missingFields.push("保证金");
 
+  const displayMonth = block.contractMonth === "__MISSING__" ? "未标注" : block.contractMonth;
+  const displayDir = block.direction === "long" ? "多头" : block.direction === "short" ? "空头" : "方向缺失";
+  const dirColor = block.direction === "long" ? "text-[#ff6b35]" : block.direction === "short" ? "text-[#00d4aa]" : "text-slate-500";
+
   return (
     <div className="bg-[#0f1623] rounded-lg p-3 border border-[#1e293b] space-y-1.5">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium text-slate-300">选中明细</span>
-        {block.hasMissingFields && (
-          <span className="flex items-center gap-1 text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded">
-            <AlertTriangle size={10} />
-            含缺失字段
-          </span>
-        )}
+        <div className="flex items-center gap-1.5">
+          {block.duplicateCount > 0 && (
+            <span className="flex items-center gap-1 text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded">
+              <AlertTriangle size={10} />
+              重复×{block.duplicateCount}
+            </span>
+          )}
+          {block.hasMissingFields && (
+            <span className="flex items-center gap-1 text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded">
+              <AlertTriangle size={10} />
+              含缺失字段
+            </span>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
         <span className="text-slate-500">品种</span>
-        <span className="text-slate-200">{block.varietyName}</span>
+        <span className="text-slate-200">{block.varietyName || block.varietyCode}</span>
         <span className="text-slate-500">合约月份</span>
-        <span className="text-slate-200">{block.contractMonth}</span>
+        <span className={block.fieldFlags.contractMonthMissing ? "text-amber-400" : "text-slate-200"}>{displayMonth}</span>
         <span className="text-slate-500">方向</span>
-        <span className={block.direction === "long" ? "text-[#ff6b35]" : "text-[#00d4aa]"}>
-          {block.direction === "long" ? "多头" : "空头"}
-        </span>
+        <span className={dirColor}>{displayDir}</span>
         <span className="text-slate-500">客户</span>
-        <span className="text-slate-200">{block.clientName} ({block.clientId})</span>
+        <span className="text-slate-200">{block.clientName || block.clientId}</span>
         <span className="text-slate-500">保证金</span>
         <span className="text-slate-200">{block.totalMargin.toLocaleString()}</span>
+        {block.duplicateMargin > 0 && (
+          <>
+            <span className="text-red-400">重复保证金</span>
+            <span className="text-red-400">{block.duplicateMargin.toLocaleString()}</span>
+          </>
+        )}
         <span className="text-slate-500">数量</span>
         <span className="text-slate-200">{block.totalQuantity.toLocaleString()}</span>
       </div>
@@ -93,17 +109,17 @@ function VarietySummaryTable() {
 }
 
 function MissingFieldsWarning() {
-  const aggregatedBlocks = useTermWallStore((s) => s.aggregatedBlocks);
+  const positions = useTermWallStore((s) => s.positions);
   const counts = useMemo(() => {
     let clientId = 0, contractMonth = 0, direction = 0, margin = 0;
-    for (const b of aggregatedBlocks) {
-      if (b.fieldFlags.clientIdMissing) clientId++;
-      if (b.fieldFlags.contractMonthMissing) contractMonth++;
-      if (b.fieldFlags.directionMissing) direction++;
-      if (b.fieldFlags.marginMissing) margin++;
+    for (const r of positions) {
+      if (r.fieldFlags.clientIdMissing) clientId++;
+      if (r.fieldFlags.contractMonthMissing) contractMonth++;
+      if (r.fieldFlags.directionMissing) direction++;
+      if (r.fieldFlags.marginMissing) margin++;
     }
     return { clientId, contractMonth, direction, margin };
-  }, [aggregatedBlocks]);
+  }, [positions]);
 
   const total = counts.clientId + counts.contractMonth + counts.direction + counts.margin;
   if (total === 0) return null;
@@ -112,13 +128,43 @@ function MissingFieldsWarning() {
     <div className="bg-amber-500/10 rounded-lg p-3 border border-amber-500/20">
       <div className="flex items-center gap-1.5 text-xs font-medium text-amber-400 mb-1.5">
         <AlertTriangle size={12} />
-        缺失字段警示
+        缺失字段警示（原始记录）
       </div>
       <div className="text-[10px] text-amber-300/70 space-y-0.5">
-        {counts.clientId > 0 && <div>客户ID缺失: {counts.clientId} 个方块</div>}
-        {counts.contractMonth > 0 && <div>合约月份缺失: {counts.contractMonth} 个方块</div>}
-        {counts.direction > 0 && <div>方向缺失: {counts.direction} 个方块</div>}
-        {counts.margin > 0 && <div>保证金缺失: {counts.margin} 个方块</div>}
+        {counts.clientId > 0 && <div>客户ID缺失: {counts.clientId} 条记录</div>}
+        {counts.contractMonth > 0 && <div>合约月份缺失: {counts.contractMonth} 条记录</div>}
+        {counts.direction > 0 && <div>方向缺失: {counts.direction} 条记录</div>}
+        {counts.margin > 0 && <div>保证金缺失: {counts.margin} 条记录</div>}
+      </div>
+    </div>
+  );
+}
+
+function DuplicateMarginSummary() {
+  const aggregatedBlocks = useTermWallStore((s) => s.aggregatedBlocks);
+  const { blockCount, totalDuplicateMargin } = useMemo(() => {
+    let blockCount = 0;
+    let totalDuplicateMargin = 0;
+    for (const b of aggregatedBlocks) {
+      if (b.duplicateCount > 0) {
+        blockCount++;
+        totalDuplicateMargin += b.duplicateMargin;
+      }
+    }
+    return { blockCount, totalDuplicateMargin };
+  }, [aggregatedBlocks]);
+
+  if (blockCount === 0) return null;
+
+  return (
+    <div className="bg-red-500/10 rounded-lg p-3 border border-red-500/20">
+      <div className="flex items-center gap-1.5 text-xs font-medium text-red-400 mb-1">
+        <AlertTriangle size={12} />
+        保证金重复（已排除出汇总）
+      </div>
+      <div className="text-[10px] text-red-300/80 space-y-0.5">
+        <div>涉及方块: {blockCount} 个</div>
+        <div>重复金额合计: {totalDuplicateMargin.toLocaleString()}</div>
       </div>
     </div>
   );
@@ -196,6 +242,7 @@ export default function DataPanel() {
       <div className="px-3 py-3 space-y-3 flex-1">
         <DetailCard />
         <VarietySummaryTable />
+        <DuplicateMarginSummary />
         <MissingFieldsWarning />
         <ProcessInfo />
         <ExportList />

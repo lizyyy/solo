@@ -6,7 +6,9 @@ import type { AggregatedBlock } from "@/types/index"
 
 const LONG_COLOR = new THREE.Color("#ff6b35")
 const SHORT_COLOR = new THREE.Color("#00d4aa")
+const MISSING_DIR_COLOR = new THREE.Color("#6b7280")
 const MISSING_EDGE_COLOR = new THREE.Color("#fbbf24")
+const DUPLICATE_EDGE_COLOR = new THREE.Color("#ef4444")
 
 const VARIETY_GAP = 3
 const MONTH_GAP = 2.5
@@ -39,7 +41,8 @@ function Block({
 
   const baseColor = useMemo(() => {
     if (block.direction === "long") return LONG_COLOR.clone()
-    return SHORT_COLOR.clone()
+    if (block.direction === "short") return SHORT_COLOR.clone()
+    return MISSING_DIR_COLOR.clone()
   }, [block.direction])
 
   useFrame((_, delta) => {
@@ -65,6 +68,11 @@ function Block({
     }
   })
 
+  const edgeColor = useMemo(() => {
+    if (block.duplicateCount > 0) return DUPLICATE_EDGE_COLOR
+    return MISSING_EDGE_COLOR
+  }, [block.duplicateCount])
+
   return (
     <group position={position}>
       <mesh
@@ -82,10 +90,10 @@ function Block({
           opacity={0.92}
         />
       </mesh>
-      {block.hasMissingFields && (
+      {(block.hasMissingFields || block.duplicateCount > 0) && (
         <lineSegments ref={edgeRef}>
           <edgesGeometry args={[new THREE.BoxGeometry(1, 1, 1)]} />
-          <lineBasicMaterial color={MISSING_EDGE_COLOR} />
+          <lineBasicMaterial color={edgeColor} />
         </lineSegments>
       )}
     </group>
@@ -106,7 +114,12 @@ export default function TermWall() {
     for (const b of aggregatedBlocks) {
       varieties.add(b.varietyCode)
       months.add(b.contractMonth)
-      if (b.totalMargin > max) max = b.totalMargin
+      if (b.contractMonth !== "__MISSING__" && b.totalMargin > max) max = b.totalMargin
+    }
+    if (max === 0) {
+      for (const b of aggregatedBlocks) {
+        if (b.totalMargin > max) max = b.totalMargin
+      }
     }
     return {
       varietyOrder: Array.from(varieties).sort(),

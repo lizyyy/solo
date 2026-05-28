@@ -82,9 +82,14 @@ function ConcentrationIndicator() {
     <div className="bg-[#0f1623] rounded-lg p-3 border border-[#2d3548]">
       <div className="text-xs font-medium text-slate-300 mb-1.5">集中度指标</div>
       <div className="text-xs text-slate-400">
-        占品种总保证金:{" "}
+        占品种总保证金（已去重）:{" "}
         <span className="text-white font-medium">{pct}%</span>
       </div>
+      {selectedBlock.duplicateMargin > 0 && (
+        <div className="text-[10px] text-red-400 mt-1">
+          已排除重复保证金 {selectedBlock.duplicateMargin.toLocaleString()}（{selectedBlock.duplicateCount}笔）
+        </div>
+      )}
       <div className="mt-1.5 h-1.5 bg-[#1e293b] rounded-full overflow-hidden">
         <div
           className="h-full bg-blue-500 rounded-full"
@@ -173,7 +178,7 @@ export default function DrillDownModal() {
         <div className="flex items-center justify-between px-5 py-3 border-b border-[#2d3548]">
           <span className="text-sm font-medium text-slate-200">
             风险钻取 - {selectedBlock.clientName} {selectedBlock.varietyName}{" "}
-            {selectedBlock.contractMonth}
+            {selectedBlock.contractMonth === "__MISSING__" ? "未标注月份" : selectedBlock.contractMonth}
           </span>
           <button onClick={closeDrillDown} className="text-slate-400 hover:text-white">
             <X size={16} />

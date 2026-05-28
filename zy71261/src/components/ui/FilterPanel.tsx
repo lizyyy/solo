@@ -54,7 +54,7 @@ export default function FilterPanel() {
     setFilter({ months: next });
   };
 
-  const toggleDirection = (d: "long" | "short") => {
+  const toggleDirection = (d: "long" | "short" | "missing") => {
     const next = filter.directions.includes(d)
       ? filter.directions.filter((x) => x !== d)
       : [...filter.directions, d];
@@ -137,6 +137,16 @@ export default function FilterPanel() {
               }`}
             >
               空头
+            </button>
+            <button
+              onClick={() => toggleDirection("missing")}
+              className={`flex-1 py-1.5 rounded text-xs font-medium transition-colors ${
+                filter.directions.includes("missing")
+                  ? "bg-slate-500 text-white"
+                  : "bg-[#1e293b] text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              缺失
             </button>
           </div>
         </div>

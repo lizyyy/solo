@@ -3,7 +3,11 @@ import { X } from "lucide-react";
 import { useTermWallStore } from "@/store/useTermWallStore";
 import { getMonthSlice } from "@/utils/aggregate";
 
-function cellColor(direction: "long" | "short", intensity: number): string {
+function cellColor(direction: "long" | "short" | "missing", intensity: number): string {
+  if (direction === "missing") {
+    const v = Math.round(107 + (1 - intensity) * 80);
+    return `rgb(${v}, ${v}, ${v})`;
+  }
   if (direction === "long") {
     const r = 255;
     const g = Math.round(107 + (1 - intensity) * 100);
@@ -45,7 +49,7 @@ export default function MonthSliceView() {
 
     const matrix: {
       variety: string;
-      cells: { margin: number; direction: "long" | "short"; intensity: number }[];
+      cells: { margin: number; direction: "long" | "short" | "missing"; intensity: number }[];
     }[] = [];
 
     for (const v of varieties) {

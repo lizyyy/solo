@@ -94,10 +94,10 @@ export const useTermWallStore = create<TermWallState>((set, get) => ({
   sliceMonth: null,
 
   initializeData: async () => {
-    const hasClearedOldDB = localStorage.getItem("termwall_db_cleared_v1");
+    const hasClearedOldDB = localStorage.getItem("termwall_db_cleared_v2");
     if (!hasClearedOldDB) {
       await clearDatabase();
-      localStorage.setItem("termwall_db_cleared_v1", "1");
+      localStorage.setItem("termwall_db_cleared_v2", "1");
     }
 
     let positions: PositionRecord[];
@@ -195,12 +195,18 @@ export const useTermWallStore = create<TermWallState>((set, get) => ({
 
   exportCSV: async () => {
     const state = get();
-    const { filteredPositions, filter, dataHash } = state;
+    const { filteredPositions, aggregatedBlocks, filter, dataHash } = state;
+    const duplicateIds = new Set<string>();
+    for (const b of aggregatedBlocks) {
+      if (b.duplicateCount > 0) {
+        for (const id of b.recordIds) duplicateIds.add(id);
+      }
+    }
     const header =
-      "ID,客户ID,客户名称,品种代码,品种名称,合约月份,方向,保证金,数量,风险报告";
+      "ID,客户ID,客户名称,品种代码,品种名称,合约月份,方向,保证金,数量,风险报告,是否重复";
     const rows = filteredPositions.map(
       (r) =>
-        `${r.id},${r.clientId},${r.clientName ?? ""},${r.varietyCode},${r.varietyName ?? ""},${r.contractMonth ?? ""},${r.direction ?? ""},${r.margin ?? ""},${r.quantity ?? ""},${r.riskReport ?? ""}`
+        `${r.id},${r.clientId},${r.clientName ?? ""},${r.varietyCode},${r.varietyName ?? ""},${r.contractMonth ?? ""},${r.direction ?? ""},${r.margin ?? ""},${r.quantity ?? ""},${r.riskReport ?? ""},${duplicateIds.has(r.id) ? "是" : "否"}`
     );
     const csv = [header, ...rows].join("\n");
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });

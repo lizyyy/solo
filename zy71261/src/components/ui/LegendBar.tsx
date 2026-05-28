@@ -34,6 +34,11 @@ export default function LegendBar() {
         缺失字段标记
       </div>
 
+      <div className="flex items-center gap-1.5 text-xs text-slate-400">
+        <span className="w-2.5 h-2.5 rounded-sm bg-red-500/60 border border-red-400" />
+        保证金重复
+      </div>
+
       <div className="h-3 w-px bg-[#1e293b]" />
 
       <div className="text-xs text-slate-500">

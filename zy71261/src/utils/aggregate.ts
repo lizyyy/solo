@@ -5,40 +5,63 @@ import type {
   FieldFlags,
 } from "@/types/index";
 
+const MISSING_MONTH = "__MISSING__";
+
+interface BuildBlock extends Omit<AggregatedBlock, "duplicateMargin" | "duplicateCount"> {
+  duplicateMargin: number;
+  duplicateCount: number;
+  recordMargins: Set<number>;
+}
+
 export function aggregatePositions(records: PositionRecord[]): AggregatedBlock[] {
-  const groups = new Map<string, AggregatedBlock>();
+  const groups = new Map<string, BuildBlock>();
 
   for (const r of records) {
-    if (!r.contractMonth || !r.direction) continue;
-
-    const key = `${r.varietyCode}::${r.contractMonth}::${r.direction}::${r.clientId}`;
+    const month = r.contractMonth ?? MISSING_MONTH;
+    const dir = r.direction ?? "missing";
+    const key = `${r.varietyCode}::${month}::${dir}::${r.clientId}`;
     const existing = groups.get(key);
 
     if (existing) {
-      existing.totalMargin += r.margin ?? 0;
+      const marginVal = r.margin ?? 0;
+      const isDuplicate = existing.recordMargins.has(marginVal);
+      if (isDuplicate) {
+        existing.duplicateCount++;
+        existing.duplicateMargin += marginVal;
+      } else {
+        existing.totalMargin += marginVal;
+        existing.recordMargins.add(marginVal);
+      }
       existing.totalQuantity += r.quantity ?? 0;
       existing.recordIds.push(r.id);
       existing.hasMissingFields =
         existing.hasMissingFields || hasAnyMissing(r.fieldFlags);
       existing.fieldFlags = mergeFieldFlags(existing.fieldFlags, r.fieldFlags);
     } else {
+      const marginVal = r.margin ?? 0;
       groups.set(key, {
         varietyCode: r.varietyCode,
-        varietyName: r.varietyName ?? "",
-        contractMonth: r.contractMonth,
-        direction: r.direction,
+        varietyName: r.varietyName ?? (r.varietyCode ? "" : "未知品种"),
+        contractMonth: month,
+        direction: dir,
         clientId: r.clientId,
         clientName: r.clientName ?? "",
-        totalMargin: r.margin ?? 0,
+        totalMargin: marginVal,
         totalQuantity: r.quantity ?? 0,
         recordIds: [r.id],
         hasMissingFields: hasAnyMissing(r.fieldFlags),
         fieldFlags: { ...r.fieldFlags },
+        duplicateMargin: 0,
+        duplicateCount: 0,
+        recordMargins: new Set([marginVal]),
       });
     }
   }
 
-  return Array.from(groups.values());
+  return Array.from(groups.values()).map((b) => {
+    const { recordMargins, ...rest } = b;
+    return { ...rest };
+  });
 }
 
 function hasAnyMissing(flags: FieldFlags): boolean {
@@ -73,16 +96,14 @@ export function filterPositions(
       !filter.varieties.includes(r.varietyCode)
     )
       return false;
-    if (
-      filter.months.length > 0 &&
-      (r.contractMonth == null || !filter.months.includes(r.contractMonth))
-    )
-      return false;
-    if (
-      filter.directions.length > 0 &&
-      (r.direction == null || !filter.directions.includes(r.direction))
-    )
-      return false;
+    if (filter.months.length > 0) {
+      if (r.contractMonth == null) return true;
+      if (!filter.months.includes(r.contractMonth)) return false;
+    }
+    if (filter.directions.length > 0) {
+      if (r.direction == null) return true;
+      if (!filter.directions.includes(r.direction)) return false;
+    }
     if (
       filter.clientSearch &&
       r.clientName &&
@@ -113,6 +134,7 @@ export function getVarietySummary(
   >();
 
   for (const b of blocks) {
+    if (b.direction === "missing") continue;
     const existing = map.get(b.varietyCode);
     if (existing) {
       if (b.direction === "long") existing.longMargin += b.totalMargin;

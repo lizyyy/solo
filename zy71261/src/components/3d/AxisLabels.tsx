@@ -28,7 +28,8 @@ export default function AxisLabels() {
         position: [offsetX + i * VARIETY_GAP, -0.5, offsetZ - 2.5] as [number, number, number],
       })),
       monthLabels: months.map((m, i) => ({
-        text: m,
+        text: m === "__MISSING__" ? "未标注" : m,
+        color: m === "__MISSING__" ? "#fbbf24" : "#94a3b8",
         position: [offsetX - 3, -0.3, offsetZ + i * MONTH_GAP] as [number, number, number],
       })),
     }
@@ -54,7 +55,7 @@ export default function AxisLabels() {
           key={`month-${i}`}
           position={m.position}
           fontSize={0.4}
-          color="#94a3b8"
+          color={m.color}
           anchorX="right"
           anchorY="middle"
         >

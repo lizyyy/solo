@@ -56,7 +56,7 @@ export interface AggregatedBlock {
   varietyCode: string;
   varietyName: string;
   contractMonth: string;
-  direction: "long" | "short";
+  direction: "long" | "short" | "missing";
   clientId: string;
   clientName: string;
   totalMargin: number;
@@ -64,12 +64,14 @@ export interface AggregatedBlock {
   recordIds: string[];
   hasMissingFields: boolean;
   fieldFlags: FieldFlags;
+  duplicateMargin: number;
+  duplicateCount: number;
 }
 
 export interface FilterState {
   varieties: string[];
   months: string[];
-  directions: ("long" | "short")[];
+  directions: ("long" | "short" | "missing")[];
   clientSearch: string;
 }
 
