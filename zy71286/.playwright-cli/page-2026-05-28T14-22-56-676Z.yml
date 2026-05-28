@@ -1,0 +1,129 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e8]
+      - generic [ref=e10]:
+        - heading "库存马尔可夫" [level=1] [ref=e11]
+        - paragraph [ref=e12]: 周转状态分析系统
+    - navigation [ref=e13]:
+      - link "转移矩阵 状态转移概率热力图" [active] [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - generic [ref=e17]:
+          - generic [ref=e18]: 转移矩阵
+          - generic [ref=e19]: 状态转移概率热力图
+      - link "状态预测 多步预测与吸收分析" [ref=e20] [cursor=pointer]:
+        - /url: /forecast
+        - img [ref=e21]
+        - generic [ref=e24]:
+          - generic [ref=e25]: 状态预测
+          - generic [ref=e26]: 多步预测与吸收分析
+      - link "促销切片 促销干扰因子分析" [ref=e27] [cursor=pointer]:
+        - /url: /promo
+        - img [ref=e28]
+        - generic [ref=e31]:
+          - generic [ref=e32]: 促销切片
+          - generic [ref=e33]: 促销干扰因子分析
+      - link "异常诊断 缺样/干扰/误设检测" [ref=e34] [cursor=pointer]:
+        - /url: /anomaly
+        - img [ref=e35]
+        - generic [ref=e37]:
+          - generic [ref=e38]: 异常诊断
+          - generic [ref=e39]: 缺样/干扰/误设检测
+      - link "报告导出 批次化报告管理" [ref=e40] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e41]
+        - generic [ref=e44]:
+          - generic [ref=e45]: 报告导出
+          - generic [ref=e46]: 批次化报告管理
+    - generic [ref=e48]:
+      - generic [ref=e49]: 当前数据周期
+      - generic [ref=e50]: 2026年 第1-24周
+      - generic [ref=e51]: 50个SKU · 1,200条记录
+  - main [ref=e52]:
+    - generic [ref=e1046]:
+      - generic [ref=e1047]:
+        - generic [ref=e1048]:
+          - heading "转移概率矩阵" [level=2] [ref=e1049]
+          - paragraph [ref=e1050]: 基于历史周度数据计算商品状态间的转移概率，点击单元格可钻取原始记录
+        - button "重新计算" [ref=e1051] [cursor=pointer]:
+          - img [ref=e1052]
+          - text: 重新计算
+      - generic [ref=e1057]:
+        - generic [ref=e1058]:
+          - generic [ref=e1059]: 1,150
+          - generic [ref=e1060]: 总状态转移数
+        - generic [ref=e1061]:
+          - generic [ref=e1062]: "5"
+          - generic [ref=e1063]: 商品状态数
+        - generic [ref=e1064]:
+          - generic [ref=e1065]: "1"
+          - generic [ref=e1066]: 滑动窗口 (周)
+        - generic [ref=e1067]:
+          - generic [ref=e1068]: "20"
+          - generic [ref=e1069]: 待处理异常
+      - generic [ref=e1070]:
+        - generic [ref=e1071]:
+          - generic [ref=e1072]:
+            - img [ref=e1073]
+            - generic [ref=e1075]: 数据筛选：
+            - generic [ref=e1076]:
+              - button "全部" [ref=e1077] [cursor=pointer]
+              - button "已确认" [ref=e1078] [cursor=pointer]
+              - button "临时备注" [ref=e1079] [cursor=pointer]
+          - generic [ref=e1081]:
+            - generic [ref=e1082]: 时间窗口：
+            - combobox [ref=e1083]:
+              - option "1 周" [selected]
+              - option "2 周"
+              - option "4 周"
+              - option "8 周"
+        - generic [ref=e1084]:
+          - generic [ref=e1085]:
+            - generic [ref=e1087]: 新品
+            - generic: 上市≤4周，周销量环比增长≥20%
+          - generic [ref=e1088]:
+            - generic [ref=e1090]: 畅销
+            - generic: 周销量≥品类均值×1.5，库存周转天数≤14
+          - generic [ref=e1091]:
+            - generic [ref=e1093]: 正常
+            - generic: 介于畅销与滞销之间，销量稳定
+          - generic [ref=e1094]:
+            - generic [ref=e1096]: 滞销
+            - generic: 周销量≤品类均值×0.3，库存周转天数≥60
+          - generic [ref=e1097]:
+            - generic [ref=e1099]: 清仓
+            - generic: 已标记清仓，价格≤成本×0.7
+      - generic [ref=e1100]:
+        - generic [ref=e1101]:
+          - generic [ref=e1102]:
+            - heading "状态转移概率热力图" [level=3] [ref=e1103]
+            - paragraph [ref=e1104]: 单元格显示：转移概率% (样本量n)，⚠️ 表示存在异常
+          - generic [ref=e1105]:
+            - generic [ref=e1106]:
+              - img [ref=e1107]
+              - text: 已确认
+            - generic [ref=e1109]: +
+            - generic [ref=e1110]:
+              - img [ref=e1111]
+              - text: 临时备注
+            - generic [ref=e1114]: 数据
+        - generic [ref=e1116]:
+          - generic [ref=e1117]:
+            - generic [ref=e1119]:
+              - generic [ref=e1120]: 置信度评分：
+              - generic [ref=e1121]: "46"
+              - generic [ref=e1122]: /100
+            - generic [ref=e1123]:
+              - generic [ref=e1124]:
+                - generic [ref=e1125]: "28"
+                - generic [ref=e1126]: 数据质量
+              - generic [ref=e1127]:
+                - generic [ref=e1128]: "100"
+                - generic [ref=e1129]: 模型有效性
+              - generic [ref=e1130]:
+                - generic [ref=e1131]: "0"
+                - generic [ref=e1132]: 场景鲁棒性
+          - generic [ref=e1136]:
+            - generic [ref=e1137]: ← 行表示源状态 | 列表示目标状态 →
+            - generic [ref=e1138]: 点击单元格查看原始记录

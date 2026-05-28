@@ -1,0 +1,177 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e8]
+      - generic [ref=e10]:
+        - heading "库存马尔可夫" [level=1] [ref=e11]
+        - paragraph [ref=e12]: 周转状态分析系统
+    - navigation [ref=e13]:
+      - link "转移矩阵 状态转移概率热力图" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - generic [ref=e17]:
+          - generic [ref=e18]: 转移矩阵
+          - generic [ref=e19]: 状态转移概率热力图
+      - link "状态预测 多步预测与吸收分析" [active] [ref=e20] [cursor=pointer]:
+        - /url: /forecast
+        - img [ref=e21]
+        - generic [ref=e24]:
+          - generic [ref=e25]: 状态预测
+          - generic [ref=e26]: 多步预测与吸收分析
+      - link "促销切片 促销干扰因子分析" [ref=e27] [cursor=pointer]:
+        - /url: /promo
+        - img [ref=e28]
+        - generic [ref=e31]:
+          - generic [ref=e32]: 促销切片
+          - generic [ref=e33]: 促销干扰因子分析
+      - link "异常诊断 缺样/干扰/误设检测" [ref=e34] [cursor=pointer]:
+        - /url: /anomaly
+        - img [ref=e35]
+        - generic [ref=e37]:
+          - generic [ref=e38]: 异常诊断
+          - generic [ref=e39]: 缺样/干扰/误设检测
+      - link "报告导出 批次化报告管理" [ref=e40] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e41]
+        - generic [ref=e44]:
+          - generic [ref=e45]: 报告导出
+          - generic [ref=e46]: 批次化报告管理
+    - generic [ref=e48]:
+      - generic [ref=e49]: 当前数据周期
+      - generic [ref=e50]: 2026年 第1-24周
+      - generic [ref=e51]: 50个SKU · 1,200条记录
+  - main [ref=e52]:
+    - generic [ref=e147]:
+      - generic [ref=e148]:
+        - generic [ref=e149]:
+          - heading "状态预测中心" [level=2] [ref=e150]
+          - paragraph [ref=e151]: 基于马尔可夫链的多步预测，分析商品状态分布的长期演变趋势
+        - generic [ref=e153]:
+          - generic [ref=e154]: 预测周期：
+          - slider [ref=e155]: "8"
+          - generic [ref=e156]: 8 周
+      - generic [ref=e157]:
+        - generic [ref=e158]:
+          - generic [ref=e159]:
+            - generic [ref=e160]: 新品
+            - generic [ref=e162]: 当前
+          - generic [ref=e163]: 0.0%
+          - generic [ref=e164]:
+            - generic [ref=e165]: → 第8周预测
+            - generic [ref=e166]: 2.3%
+        - generic [ref=e167]:
+          - generic [ref=e168]:
+            - generic [ref=e169]: 畅销
+            - generic [ref=e171]: 当前
+          - generic [ref=e172]: 24.0%
+          - generic [ref=e173]:
+            - generic [ref=e174]: → 第8周预测
+            - generic [ref=e175]: 36.1%
+        - generic [ref=e176]:
+          - generic [ref=e177]:
+            - generic [ref=e178]: 正常
+            - generic [ref=e180]: 当前
+          - generic [ref=e181]: 32.0%
+          - generic [ref=e182]:
+            - generic [ref=e183]: → 第8周预测
+            - generic [ref=e184]: 24.9%
+        - generic [ref=e185]:
+          - generic [ref=e186]:
+            - generic [ref=e187]: 滞销
+            - generic [ref=e189]: 当前
+          - generic [ref=e190]: 32.0%
+          - generic [ref=e191]:
+            - generic [ref=e192]: → 第8周预测
+            - generic [ref=e193]: 31.4%
+        - generic [ref=e194]:
+          - generic [ref=e195]:
+            - generic [ref=e196]: 清仓
+            - generic [ref=e198]: 当前
+          - generic [ref=e199]: 12.0%
+          - generic [ref=e200]:
+            - generic [ref=e201]: → 第8周预测
+            - generic [ref=e202]: 5.3%
+      - generic [ref=e203]:
+        - generic [ref=e205]:
+          - heading "状态分布演变曲线" [level=3] [ref=e206]
+          - paragraph [ref=e207]: 未来 8 周各状态概率变化趋势，带95%置信区间
+        - heading "第8周预测分布" [level=3] [ref=e214]
+      - generic [ref=e219]:
+        - generic [ref=e220]:
+          - img [ref=e221]
+          - generic [ref=e225]:
+            - heading "吸收态分析" [level=3] [ref=e226]
+            - paragraph [ref=e227]: 分析商品最终进入滞销/清仓状态的概率及期望时间
+        - generic [ref=e228]:
+          - generic [ref=e229]:
+            - generic [ref=e230]:
+              - generic [ref=e231]:
+                - generic [ref=e232]: 新品
+                - generic [ref=e234]: 状态
+              - generic [ref=e235]:
+                - generic [ref=e236]:
+                  - generic [ref=e237]:
+                    - img [ref=e238]
+                    - generic [ref=e241]: 最终滞销概率
+                  - generic [ref=e242]: 80.6%
+                - generic [ref=e245]:
+                  - generic [ref=e246]:
+                    - img [ref=e247]
+                    - generic [ref=e249]: 最终清仓概率
+                  - generic [ref=e250]: 19.4%
+                - generic [ref=e253]:
+                  - generic [ref=e254]:
+                    - img [ref=e255]
+                    - generic [ref=e258]: 期望吸收时间
+                  - generic [ref=e259]: 27.3 周
+            - generic [ref=e260]:
+              - generic [ref=e261]:
+                - generic [ref=e262]: 畅销
+                - generic [ref=e264]: 状态
+              - generic [ref=e265]:
+                - generic [ref=e266]:
+                  - generic [ref=e267]:
+                    - img [ref=e268]
+                    - generic [ref=e271]: 最终滞销概率
+                  - generic [ref=e272]: 81.7%
+                - generic [ref=e275]:
+                  - generic [ref=e276]:
+                    - img [ref=e277]
+                    - generic [ref=e279]: 最终清仓概率
+                  - generic [ref=e280]: 18.3%
+                - generic [ref=e283]:
+                  - generic [ref=e284]:
+                    - img [ref=e285]
+                    - generic [ref=e288]: 期望吸收时间
+                  - generic [ref=e289]: 24.9 周
+            - generic [ref=e290]:
+              - generic [ref=e291]:
+                - generic [ref=e292]: 正常
+                - generic [ref=e294]: 状态
+              - generic [ref=e295]:
+                - generic [ref=e296]:
+                  - generic [ref=e297]:
+                    - img [ref=e298]
+                    - generic [ref=e301]: 最终滞销概率
+                  - generic [ref=e302]: 81.9%
+                - generic [ref=e305]:
+                  - generic [ref=e306]:
+                    - img [ref=e307]
+                    - generic [ref=e309]: 最终清仓概率
+                  - generic [ref=e310]: 18.1%
+                - generic [ref=e313]:
+                  - generic [ref=e314]:
+                    - img [ref=e315]
+                    - generic [ref=e318]: 期望吸收时间
+                  - generic [ref=e319]: 22.6 周
+          - generic [ref=e320]:
+            - heading "📊 分析结论" [level=4] [ref=e321]
+            - generic [ref=e322]:
+              - paragraph [ref=e323]:
+                - text: • 当前畅销品最终进入滞销状态的平均概率为
+                - generic [ref=e324]: 81.74889903964419%
+                - text: ，期望时间24.9周
+              - paragraph [ref=e325]:
+                - text: • 正常品最终被清仓的平均概率为
+                - generic [ref=e326]: 18.09047892378411%
+              - paragraph [ref=e327]: "* 吸收态定义：滞销(SLOW)、清仓(CLEAR)，即一旦进入则难以转出的状态"

@@ -2,11 +2,21 @@ import { useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle, XCircle, Filter, RefreshCw } from 'lucide-react';
 import { useAppStore } from '@/store';
 import AnomalyCard from '@/components/AnomalyCard';
+import DrillDownDrawer from '@/components/DrillDownDrawer';
 import { ANOMALY_LABELS } from '@/types';
 import type { AnomalyType, Severity } from '@/types';
 
 export default function AnomalyPage() {
-  const { anomalies, isLoading, resolveAnomaly, setSelectedCell, recalculateMatrix } = useAppStore();
+  const {
+    anomalies,
+    isLoading,
+    selectedCell,
+    drillDownRecords,
+    resolveAnomaly,
+    setSelectedCell,
+    updateRecordConfirmation,
+    recalculateMatrix,
+  } = useAppStore();
   
   const [typeFilter, setTypeFilter] = useState<AnomalyType | 'ALL'>('ALL');
   const [severityFilter, setSeverityFilter] = useState<Severity | 'ALL'>('ALL');
@@ -55,6 +65,7 @@ export default function AnomalyPage() {
   }
 
   return (
+    <>
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-start justify-between">
         <div>
@@ -246,5 +257,15 @@ export default function AnomalyPage() {
         </div>
       )}
     </div>
+
+    <DrillDownDrawer
+      isOpen={!!selectedCell}
+      onClose={() => setSelectedCell(null)}
+      fromStatus={selectedCell?.from || 'NEW'}
+      toStatus={selectedCell?.to || 'NEW'}
+      records={drillDownRecords}
+      onUpdateConfirmation={updateRecordConfirmation}
+    />
+    </>
   );
 }

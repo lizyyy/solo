@@ -1,0 +1,487 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e8]
+      - generic [ref=e10]:
+        - heading "库存马尔可夫" [level=1] [ref=e11]
+        - paragraph [ref=e12]: 周转状态分析系统
+    - navigation [ref=e13]:
+      - link "转移矩阵 状态转移概率热力图" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - generic [ref=e17]:
+          - generic [ref=e18]: 转移矩阵
+          - generic [ref=e19]: 状态转移概率热力图
+      - link "状态预测 多步预测与吸收分析" [ref=e20] [cursor=pointer]:
+        - /url: /forecast
+        - img [ref=e21]
+        - generic [ref=e24]:
+          - generic [ref=e25]: 状态预测
+          - generic [ref=e26]: 多步预测与吸收分析
+      - link "促销切片 促销干扰因子分析" [ref=e27] [cursor=pointer]:
+        - /url: /promo
+        - img [ref=e28]
+        - generic [ref=e31]:
+          - generic [ref=e32]: 促销切片
+          - generic [ref=e33]: 促销干扰因子分析
+      - link "异常诊断 缺样/干扰/误设检测" [active] [ref=e34] [cursor=pointer]:
+        - /url: /anomaly
+        - img [ref=e35]
+        - generic [ref=e37]:
+          - generic [ref=e38]: 异常诊断
+          - generic [ref=e39]: 缺样/干扰/误设检测
+      - link "报告导出 批次化报告管理" [ref=e40] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e41]
+        - generic [ref=e44]:
+          - generic [ref=e45]: 报告导出
+          - generic [ref=e46]: 批次化报告管理
+    - generic [ref=e48]:
+      - generic [ref=e49]: 当前数据周期
+      - generic [ref=e50]: 2026年 第1-24周
+      - generic [ref=e51]: 50个SKU · 1,200条记录
+  - main [ref=e52]:
+    - generic [ref=e435]:
+      - generic [ref=e436]:
+        - generic [ref=e437]:
+          - heading "异常诊断台" [level=2] [ref=e438]
+          - paragraph [ref=e439]: 自动检测状态跳转缺样、促销干扰、吸收态误设三类异常，点击查看原始记录并标记处理
+        - button "重新检测" [ref=e440] [cursor=pointer]:
+          - img [ref=e441]
+          - text: 重新检测
+      - generic [ref=e446]:
+        - generic [ref=e448]:
+          - img [ref=e450]
+          - generic [ref=e454]:
+            - generic [ref=e455]: "15"
+            - generic [ref=e456]: 高风险异常
+        - generic [ref=e458]:
+          - img [ref=e460]
+          - generic [ref=e462]:
+            - generic [ref=e463]: "4"
+            - generic [ref=e464]: 中风险异常
+        - generic [ref=e466]:
+          - img [ref=e468]
+          - generic [ref=e471]:
+            - generic [ref=e472]: "1"
+            - generic [ref=e473]: 低风险异常
+        - generic [ref=e475]:
+          - img [ref=e477]
+          - generic [ref=e479]:
+            - generic [ref=e480]: "20"
+            - generic [ref=e481]: 待处理总计
+      - generic [ref=e482]:
+        - generic [ref=e483]:
+          - generic [ref=e484]: 状态跳转缺样
+          - generic [ref=e485]:
+            - generic [ref=e486]: "13"
+            - generic [ref=e487]: 项
+        - generic [ref=e490]:
+          - generic [ref=e491]: 促销干扰
+          - generic [ref=e492]:
+            - generic [ref=e493]: "6"
+            - generic [ref=e494]: 项
+        - generic [ref=e497]:
+          - generic [ref=e498]: 吸收态误设
+          - generic [ref=e499]:
+            - generic [ref=e500]: "1"
+            - generic [ref=e501]: 项
+      - generic [ref=e504]:
+        - generic [ref=e505]:
+          - generic [ref=e506]:
+            - img [ref=e507]
+            - generic [ref=e509]: 异常类型：
+            - generic [ref=e510]:
+              - button "全部" [ref=e511] [cursor=pointer]
+              - button "状态跳转缺样" [ref=e512] [cursor=pointer]
+              - button "促销干扰" [ref=e513] [cursor=pointer]
+              - button "吸收态误设" [ref=e514] [cursor=pointer]
+          - generic [ref=e516]:
+            - generic [ref=e517]: 严重程度：
+            - generic [ref=e518]:
+              - button "全部" [ref=e519] [cursor=pointer]
+              - button "高风险" [ref=e520] [cursor=pointer]
+              - button "中风险" [ref=e521] [cursor=pointer]
+              - button "低风险" [ref=e522] [cursor=pointer]
+        - generic [ref=e523] [cursor=pointer]:
+          - checkbox "显示已处理" [ref=e524]
+          - generic [ref=e525]: 显示已处理
+      - generic [ref=e526]:
+        - generic [ref=e527]:
+          - generic [ref=e529]:
+            - img [ref=e530]
+            - generic [ref=e532]:
+              - heading "促销干扰" [level=4] [ref=e533]
+              - generic [ref=e534]:
+                - generic [ref=e535]: 高风险
+                - generic [ref=e536]: 新品 → 新品
+          - paragraph [ref=e537]: 促销活动显著影响「新品」→「新品」转移路径：促销期概率 22.7%，非促销期 78.2%，差异达 71%。
+          - paragraph [ref=e539]: 💡 建议：强烈建议在预测时采用分层模型，分别预测促销期和非促销期的状态演变，避免平均化导致偏差。
+          - generic [ref=e540]:
+            - generic [ref=e542]: "差异度: 70.9%"
+            - generic [ref=e543]:
+              - button "查看数据" [ref=e544] [cursor=pointer]:
+                - img [ref=e545]
+                - text: 查看数据
+              - button "标记已处理" [ref=e549] [cursor=pointer]:
+                - img [ref=e550]
+                - text: 标记已处理
+        - generic [ref=e553]:
+          - generic [ref=e555]:
+            - img [ref=e556]
+            - generic [ref=e558]:
+              - heading "促销干扰" [level=4] [ref=e559]
+              - generic [ref=e560]:
+                - generic [ref=e561]: 高风险
+                - generic [ref=e562]: 新品 → 畅销
+          - paragraph [ref=e563]: 促销活动显著影响「新品」→「畅销」转移路径：促销期概率 59.1%，非促销期 15.4%，差异达 283%。
+          - paragraph [ref=e565]: 💡 建议：强烈建议在预测时采用分层模型，分别预测促销期和非促销期的状态演变，避免平均化导致偏差。
+          - generic [ref=e566]:
+            - generic [ref=e568]: "差异度: 283.1%"
+            - generic [ref=e569]:
+              - button "查看数据" [ref=e570] [cursor=pointer]:
+                - img [ref=e571]
+                - text: 查看数据
+              - button "标记已处理" [ref=e575] [cursor=pointer]:
+                - img [ref=e576]
+                - text: 标记已处理
+        - generic [ref=e579]:
+          - generic [ref=e581]:
+            - img [ref=e582]
+            - generic [ref=e584]:
+              - heading "促销干扰" [level=4] [ref=e585]
+              - generic [ref=e586]:
+                - generic [ref=e587]: 高风险
+                - generic [ref=e588]: 正常 → 畅销
+          - paragraph [ref=e589]: 促销活动显著影响「正常」→「畅销」转移路径：促销期概率 66.1%，非促销期 21.3%，差异达 211%。
+          - paragraph [ref=e591]: 💡 建议：强烈建议在预测时采用分层模型，分别预测促销期和非促销期的状态演变，避免平均化导致偏差。
+          - generic [ref=e592]:
+            - generic [ref=e594]: "差异度: 210.9%"
+            - generic [ref=e595]:
+              - button "查看数据" [ref=e596] [cursor=pointer]:
+                - img [ref=e597]
+                - text: 查看数据
+              - button "标记已处理" [ref=e601] [cursor=pointer]:
+                - img [ref=e602]
+                - text: 标记已处理
+        - generic [ref=e605]:
+          - generic [ref=e607]:
+            - img [ref=e608]
+            - generic [ref=e610]:
+              - heading "促销干扰" [level=4] [ref=e611]
+              - generic [ref=e612]:
+                - generic [ref=e613]: 高风险
+                - generic [ref=e614]: 正常 → 正常
+          - paragraph [ref=e615]: 促销活动显著影响「正常」→「正常」转移路径：促销期概率 23.7%，非促销期 70.5%，差异达 66%。
+          - paragraph [ref=e617]: 💡 建议：强烈建议在预测时采用分层模型，分别预测促销期和非促销期的状态演变，避免平均化导致偏差。
+          - generic [ref=e618]:
+            - generic [ref=e620]: "差异度: 66.3%"
+            - generic [ref=e621]:
+              - button "查看数据" [ref=e622] [cursor=pointer]:
+                - img [ref=e623]
+                - text: 查看数据
+              - button "标记已处理" [ref=e627] [cursor=pointer]:
+                - img [ref=e628]
+                - text: 标记已处理
+        - generic [ref=e631]:
+          - generic [ref=e633]:
+            - img [ref=e634]
+            - generic [ref=e636]:
+              - heading "促销干扰" [level=4] [ref=e637]
+              - generic [ref=e638]:
+                - generic [ref=e639]: 高风险
+                - generic [ref=e640]: 滞销 → 清仓
+          - paragraph [ref=e641]: 促销活动显著影响「滞销」→「清仓」转移路径：促销期概率 6.7%，非促销期 13.9%，差异达 52%。
+          - paragraph [ref=e643]: 💡 建议：强烈建议在预测时采用分层模型，分别预测促销期和非促销期的状态演变，避免平均化导致偏差。
+          - generic [ref=e644]:
+            - generic [ref=e646]: "差异度: 52.0%"
+            - generic [ref=e647]:
+              - button "查看数据" [ref=e648] [cursor=pointer]:
+                - img [ref=e649]
+                - text: 查看数据
+              - button "标记已处理" [ref=e653] [cursor=pointer]:
+                - img [ref=e654]
+                - text: 标记已处理
+        - generic [ref=e657]:
+          - generic [ref=e659]:
+            - img [ref=e660]
+            - generic [ref=e662]:
+              - heading "促销干扰" [level=4] [ref=e663]
+              - generic [ref=e665]: 高风险
+          - paragraph [ref=e666]: 促销活动对整体转移模式存在系统性影响，共 5 条路径差异超过30%，平均差异度 136.7%。
+          - paragraph [ref=e668]: 💡 建议：建议建立促销-常规双模型体系，在大促前后切换预测模型，或引入促销强度作为协变量。
+          - generic [ref=e669]:
+            - generic [ref=e671]: "差异度: 136.7%"
+            - generic [ref=e672]:
+              - button "查看数据" [ref=e673] [cursor=pointer]:
+                - img [ref=e674]
+                - text: 查看数据
+              - button "标记已处理" [ref=e678] [cursor=pointer]:
+                - img [ref=e679]
+                - text: 标记已处理
+        - generic [ref=e682]:
+          - generic [ref=e684]:
+            - img [ref=e685]
+            - generic [ref=e687]:
+              - heading "状态跳转缺样" [level=4] [ref=e688]
+              - generic [ref=e689]:
+                - generic [ref=e690]: 高风险
+                - generic [ref=e691]: 新品 → 滞销
+          - paragraph [ref=e692]: 从「新品」到「滞销」无历史跳转记录，转移概率使用拉普拉斯平滑估算，可能与实际情况存在偏差。
+          - paragraph [ref=e694]: 💡 建议：建议采用贝叶斯先验或专家经验调整该转移概率，或扩大数据时间窗口。
+          - generic [ref=e695]:
+            - generic [ref=e697]: "样本量: 0"
+            - generic [ref=e698]:
+              - button "查看数据" [ref=e699] [cursor=pointer]:
+                - img [ref=e700]
+                - text: 查看数据
+              - button "标记已处理" [ref=e704] [cursor=pointer]:
+                - img [ref=e705]
+                - text: 标记已处理
+        - generic [ref=e708]:
+          - generic [ref=e710]:
+            - img [ref=e711]
+            - generic [ref=e713]:
+              - heading "状态跳转缺样" [level=4] [ref=e714]
+              - generic [ref=e715]:
+                - generic [ref=e716]: 高风险
+                - generic [ref=e717]: 新品 → 清仓
+          - paragraph [ref=e718]: 从「新品」到「清仓」无历史跳转记录，转移概率使用拉普拉斯平滑估算，可能与实际情况存在偏差。
+          - paragraph [ref=e720]: 💡 建议：建议采用贝叶斯先验或专家经验调整该转移概率，或扩大数据时间窗口。
+          - generic [ref=e721]:
+            - generic [ref=e723]: "样本量: 0"
+            - generic [ref=e724]:
+              - button "查看数据" [ref=e725] [cursor=pointer]:
+                - img [ref=e726]
+                - text: 查看数据
+              - button "标记已处理" [ref=e730] [cursor=pointer]:
+                - img [ref=e731]
+                - text: 标记已处理
+        - generic [ref=e734]:
+          - generic [ref=e736]:
+            - img [ref=e737]
+            - generic [ref=e739]:
+              - heading "状态跳转缺样" [level=4] [ref=e740]
+              - generic [ref=e741]:
+                - generic [ref=e742]: 高风险
+                - generic [ref=e743]: 畅销 → 新品
+          - paragraph [ref=e744]: 从「畅销」到「新品」无历史跳转记录，转移概率使用拉普拉斯平滑估算，可能与实际情况存在偏差。
+          - paragraph [ref=e746]: 💡 建议：建议采用贝叶斯先验或专家经验调整该转移概率，或扩大数据时间窗口。
+          - generic [ref=e747]:
+            - generic [ref=e749]: "样本量: 0"
+            - generic [ref=e750]:
+              - button "查看数据" [ref=e751] [cursor=pointer]:
+                - img [ref=e752]
+                - text: 查看数据
+              - button "标记已处理" [ref=e756] [cursor=pointer]:
+                - img [ref=e757]
+                - text: 标记已处理
+        - generic [ref=e760]:
+          - generic [ref=e762]:
+            - img [ref=e763]
+            - generic [ref=e765]:
+              - heading "状态跳转缺样" [level=4] [ref=e766]
+              - generic [ref=e767]:
+                - generic [ref=e768]: 高风险
+                - generic [ref=e769]: 畅销 → 清仓
+          - paragraph [ref=e770]: 从「畅销」到「清仓」的状态跳转样本量不足，仅 1 条记录，统计结果可信度较低。
+          - paragraph [ref=e772]: 💡 建议：建议补充至少3个月的历史数据，或合并相邻状态后重新计算。
+          - generic [ref=e773]:
+            - generic [ref=e775]: "样本量: 1"
+            - generic [ref=e776]:
+              - button "查看数据" [ref=e777] [cursor=pointer]:
+                - img [ref=e778]
+                - text: 查看数据
+              - button "标记已处理" [ref=e782] [cursor=pointer]:
+                - img [ref=e783]
+                - text: 标记已处理
+        - generic [ref=e786]:
+          - generic [ref=e788]:
+            - img [ref=e789]
+            - generic [ref=e791]:
+              - heading "状态跳转缺样" [level=4] [ref=e792]
+              - generic [ref=e793]:
+                - generic [ref=e794]: 高风险
+                - generic [ref=e795]: 正常 → 新品
+          - paragraph [ref=e796]: 从「正常」到「新品」无历史跳转记录，转移概率使用拉普拉斯平滑估算，可能与实际情况存在偏差。
+          - paragraph [ref=e798]: 💡 建议：建议采用贝叶斯先验或专家经验调整该转移概率，或扩大数据时间窗口。
+          - generic [ref=e799]:
+            - generic [ref=e801]: "样本量: 0"
+            - generic [ref=e802]:
+              - button "查看数据" [ref=e803] [cursor=pointer]:
+                - img [ref=e804]
+                - text: 查看数据
+              - button "标记已处理" [ref=e808] [cursor=pointer]:
+                - img [ref=e809]
+                - text: 标记已处理
+        - generic [ref=e812]:
+          - generic [ref=e814]:
+            - img [ref=e815]
+            - generic [ref=e817]:
+              - heading "状态跳转缺样" [level=4] [ref=e818]
+              - generic [ref=e819]:
+                - generic [ref=e820]: 高风险
+                - generic [ref=e821]: 滞销 → 新品
+          - paragraph [ref=e822]: 从「滞销」到「新品」无历史跳转记录，转移概率使用拉普拉斯平滑估算，可能与实际情况存在偏差。
+          - paragraph [ref=e824]: 💡 建议：建议采用贝叶斯先验或专家经验调整该转移概率，或扩大数据时间窗口。
+          - generic [ref=e825]:
+            - generic [ref=e827]: "样本量: 0"
+            - generic [ref=e828]:
+              - button "查看数据" [ref=e829] [cursor=pointer]:
+                - img [ref=e830]
+                - text: 查看数据
+              - button "标记已处理" [ref=e834] [cursor=pointer]:
+                - img [ref=e835]
+                - text: 标记已处理
+        - generic [ref=e838]:
+          - generic [ref=e840]:
+            - img [ref=e841]
+            - generic [ref=e843]:
+              - heading "状态跳转缺样" [level=4] [ref=e844]
+              - generic [ref=e845]:
+                - generic [ref=e846]: 高风险
+                - generic [ref=e847]: 清仓 → 新品
+          - paragraph [ref=e848]: 从「清仓」到「新品」无历史跳转记录，转移概率使用拉普拉斯平滑估算，可能与实际情况存在偏差。
+          - paragraph [ref=e850]: 💡 建议：建议采用贝叶斯先验或专家经验调整该转移概率，或扩大数据时间窗口。
+          - generic [ref=e851]:
+            - generic [ref=e853]: "样本量: 0"
+            - generic [ref=e854]:
+              - button "查看数据" [ref=e855] [cursor=pointer]:
+                - img [ref=e856]
+                - text: 查看数据
+              - button "标记已处理" [ref=e860] [cursor=pointer]:
+                - img [ref=e861]
+                - text: 标记已处理
+        - generic [ref=e864]:
+          - generic [ref=e866]:
+            - img [ref=e867]
+            - generic [ref=e869]:
+              - heading "状态跳转缺样" [level=4] [ref=e870]
+              - generic [ref=e871]:
+                - generic [ref=e872]: 高风险
+                - generic [ref=e873]: 清仓 → 畅销
+          - paragraph [ref=e874]: 从「清仓」到「畅销」无历史跳转记录，转移概率使用拉普拉斯平滑估算，可能与实际情况存在偏差。
+          - paragraph [ref=e876]: 💡 建议：建议采用贝叶斯先验或专家经验调整该转移概率，或扩大数据时间窗口。
+          - generic [ref=e877]:
+            - generic [ref=e879]: "样本量: 0"
+            - generic [ref=e880]:
+              - button "查看数据" [ref=e881] [cursor=pointer]:
+                - img [ref=e882]
+                - text: 查看数据
+              - button "标记已处理" [ref=e886] [cursor=pointer]:
+                - img [ref=e887]
+                - text: 标记已处理
+        - generic [ref=e890]:
+          - generic [ref=e892]:
+            - img [ref=e893]
+            - generic [ref=e895]:
+              - heading "状态跳转缺样" [level=4] [ref=e896]
+              - generic [ref=e897]:
+                - generic [ref=e898]: 高风险
+                - generic [ref=e899]: 清仓 → 正常
+          - paragraph [ref=e900]: 从「清仓」到「正常」无历史跳转记录，转移概率使用拉普拉斯平滑估算，可能与实际情况存在偏差。
+          - paragraph [ref=e902]: 💡 建议：建议采用贝叶斯先验或专家经验调整该转移概率，或扩大数据时间窗口。
+          - generic [ref=e903]:
+            - generic [ref=e905]: "样本量: 0"
+            - generic [ref=e906]:
+              - button "查看数据" [ref=e907] [cursor=pointer]:
+                - img [ref=e908]
+                - text: 查看数据
+              - button "标记已处理" [ref=e912] [cursor=pointer]:
+                - img [ref=e913]
+                - text: 标记已处理
+        - generic [ref=e916]:
+          - generic [ref=e918]:
+            - img [ref=e919]
+            - generic [ref=e921]:
+              - heading "状态跳转缺样" [level=4] [ref=e922]
+              - generic [ref=e923]:
+                - generic [ref=e924]: 中风险
+                - generic [ref=e925]: 正常 → 清仓
+          - paragraph [ref=e926]: 从「正常」到「清仓」的状态跳转样本量不足，仅 3 条记录，统计结果可信度较低。
+          - paragraph [ref=e928]: 💡 建议：建议确认数据完整性，或在报告中标注该路径的置信度。
+          - generic [ref=e929]:
+            - generic [ref=e931]: "样本量: 3"
+            - generic [ref=e932]:
+              - button "查看数据" [ref=e933] [cursor=pointer]:
+                - img [ref=e934]
+                - text: 查看数据
+              - button "标记已处理" [ref=e938] [cursor=pointer]:
+                - img [ref=e939]
+                - text: 标记已处理
+        - generic [ref=e942]:
+          - generic [ref=e944]:
+            - img [ref=e945]
+            - generic [ref=e947]:
+              - heading "状态跳转缺样" [level=4] [ref=e948]
+              - generic [ref=e949]:
+                - generic [ref=e950]: 中风险
+                - generic [ref=e951]: 滞销 → 畅销
+          - paragraph [ref=e952]: 从「滞销」到「畅销」的状态跳转样本量不足，仅 4 条记录，统计结果可信度较低。
+          - paragraph [ref=e954]: 💡 建议：建议确认数据完整性，或在报告中标注该路径的置信度。
+          - generic [ref=e955]:
+            - generic [ref=e957]: "样本量: 4"
+            - generic [ref=e958]:
+              - button "查看数据" [ref=e959] [cursor=pointer]:
+                - img [ref=e960]
+                - text: 查看数据
+              - button "标记已处理" [ref=e964] [cursor=pointer]:
+                - img [ref=e965]
+                - text: 标记已处理
+        - generic [ref=e968]:
+          - generic [ref=e970]:
+            - img [ref=e971]
+            - generic [ref=e973]:
+              - heading "状态跳转缺样" [level=4] [ref=e974]
+              - generic [ref=e975]:
+                - generic [ref=e976]: 中风险
+                - generic [ref=e977]: 滞销 → 正常
+          - paragraph [ref=e978]: 从「滞销」到「正常」的状态跳转样本量不足，仅 3 条记录，统计结果可信度较低。
+          - paragraph [ref=e980]: 💡 建议：建议确认数据完整性，或在报告中标注该路径的置信度。
+          - generic [ref=e981]:
+            - generic [ref=e983]: "样本量: 3"
+            - generic [ref=e984]:
+              - button "查看数据" [ref=e985] [cursor=pointer]:
+                - img [ref=e986]
+                - text: 查看数据
+              - button "标记已处理" [ref=e990] [cursor=pointer]:
+                - img [ref=e991]
+                - text: 标记已处理
+        - generic [ref=e994]:
+          - generic [ref=e996]:
+            - img [ref=e997]
+            - generic [ref=e999]:
+              - heading "状态跳转缺样" [level=4] [ref=e1000]
+              - generic [ref=e1001]:
+                - generic [ref=e1002]: 中风险
+                - generic [ref=e1003]: 清仓 → 清仓
+          - paragraph [ref=e1004]: 从「清仓」到「清仓」的状态跳转样本量不足，仅 3 条记录，统计结果可信度较低。
+          - paragraph [ref=e1006]: 💡 建议：建议确认数据完整性，或在报告中标注该路径的置信度。
+          - generic [ref=e1007]:
+            - generic [ref=e1009]: "样本量: 3"
+            - generic [ref=e1010]:
+              - button "查看数据" [ref=e1011] [cursor=pointer]:
+                - img [ref=e1012]
+                - text: 查看数据
+              - button "标记已处理" [ref=e1016] [cursor=pointer]:
+                - img [ref=e1017]
+                - text: 标记已处理
+        - generic [ref=e1020]:
+          - generic [ref=e1022]:
+            - img [ref=e1023]
+            - generic [ref=e1025]:
+              - heading "吸收态误设" [level=4] [ref=e1026]
+              - generic [ref=e1027]:
+                - generic [ref=e1028]: 低风险
+                - generic [ref=e1029]: 滞销 → 畅销
+          - paragraph [ref=e1030]: 「滞销」被假设为吸收态，但实际观测到 7/128 (5.5%) 的样本转出到其他状态，主要流向「畅销」。统计检验p值 = 0.8077，表明吸收态假设可能不成立。
+          - paragraph [ref=e1032]: 💡 建议：建议检查滞销品的运营策略，是否存在清仓后重新上架的情况，必要时调整状态机设计。
+          - generic [ref=e1033]:
+            - generic [ref=e1035]: "样本量: 7"
+            - generic [ref=e1036]:
+              - button "查看数据" [ref=e1037] [cursor=pointer]:
+                - img [ref=e1038]
+                - text: 查看数据
+              - button "标记已处理" [ref=e1042] [cursor=pointer]:
+                - img [ref=e1043]
+                - text: 标记已处理

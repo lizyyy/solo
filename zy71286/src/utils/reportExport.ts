@@ -45,14 +45,20 @@ const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
   ANOMALY_ONLY: '异常诊断报告',
 };
 
+const FORMAT_EXTENSIONS: Record<ReportFormat, string> = {
+  EXCEL: 'xlsx',
+  PDF: 'pdf',
+  JSON: 'json',
+};
+
 export function generateReportName(
   contentType: ContentType,
   format: ReportFormat,
-  date: Date = new Date()
+  batchId: string
 ): string {
-  const batchId = generateBatchId(date);
   const typeLabel = CONTENT_TYPE_LABELS[contentType];
-  return `${batchId}_${typeLabel}.${format.toLowerCase()}`;
+  const ext = FORMAT_EXTENSIONS[format];
+  return `${batchId}_${typeLabel}.${ext}`;
 }
 
 export function exportToExcel(
@@ -66,7 +72,7 @@ export function exportToExcel(
 
   const wb = XLSX.utils.book_new();
   const batchId = generateBatchId();
-  const fileName = generateReportName(contentType, 'EXCEL');
+  const fileName = generateReportName(contentType, 'EXCEL', batchId);
 
   if (contentType === 'FULL_REPORT' || contentType === 'MATRIX_ONLY') {
     const matrixData: (string | number)[][] = [
@@ -185,7 +191,7 @@ export function exportToJSON(
   if (!matrix) return null;
 
   const batchId = generateBatchId();
-  const fileName = generateReportName(contentType, 'JSON');
+  const fileName = generateReportName(contentType, 'JSON', batchId);
 
   const data: Record<string, unknown> = {
     batchId,
@@ -244,7 +250,7 @@ export function exportToPDF(
   if (!matrix) return null;
 
   const batchId = generateBatchId();
-  const fileName = generateReportName(contentType, 'PDF');
+  const fileName = generateReportName(contentType, 'PDF', batchId);
   const rowHeight = 12;
 
   const doc = new jsPDF();

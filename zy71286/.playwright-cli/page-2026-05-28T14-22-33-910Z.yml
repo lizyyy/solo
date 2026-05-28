@@ -1,0 +1,127 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e6]:
+      - img [ref=e8]
+      - generic [ref=e10]:
+        - heading "库存马尔可夫" [level=1] [ref=e11]
+        - paragraph [ref=e12]: 周转状态分析系统
+    - navigation [ref=e13]:
+      - link "转移矩阵 状态转移概率热力图" [ref=e14] [cursor=pointer]:
+        - /url: /
+        - img [ref=e15]
+        - generic [ref=e17]:
+          - generic [ref=e18]: 转移矩阵
+          - generic [ref=e19]: 状态转移概率热力图
+      - link "状态预测 多步预测与吸收分析" [ref=e20] [cursor=pointer]:
+        - /url: /forecast
+        - img [ref=e21]
+        - generic [ref=e24]:
+          - generic [ref=e25]: 状态预测
+          - generic [ref=e26]: 多步预测与吸收分析
+      - link "促销切片 促销干扰因子分析" [ref=e27] [cursor=pointer]:
+        - /url: /promo
+        - img [ref=e28]
+        - generic [ref=e31]:
+          - generic [ref=e32]: 促销切片
+          - generic [ref=e33]: 促销干扰因子分析
+      - link "异常诊断 缺样/干扰/误设检测" [ref=e34] [cursor=pointer]:
+        - /url: /anomaly
+        - img [ref=e35]
+        - generic [ref=e37]:
+          - generic [ref=e38]: 异常诊断
+          - generic [ref=e39]: 缺样/干扰/误设检测
+      - link "报告导出 批次化报告管理" [active] [ref=e40] [cursor=pointer]:
+        - /url: /reports
+        - img [ref=e41]
+        - generic [ref=e44]:
+          - generic [ref=e45]: 报告导出
+          - generic [ref=e46]: 批次化报告管理
+    - generic [ref=e48]:
+      - generic [ref=e49]: 当前数据周期
+      - generic [ref=e50]: 2026年 第1-24周
+      - generic [ref=e51]: 50个SKU · 1,200条记录
+  - main [ref=e52]:
+    - generic [ref=e328]:
+      - generic [ref=e329]:
+        - heading "报告导出中心" [level=2] [ref=e330]
+        - paragraph [ref=e331]: 按批次导出分析报告，自动生成批次号避免文件混淆，支持多种格式和内容类型
+      - generic [ref=e333]:
+        - img [ref=e334]
+        - generic [ref=e336]:
+          - heading "文件命名规则" [level=4] [ref=e337]
+          - paragraph [ref=e338]: 批次号_内容类型.后缀 例如：2026-W22-BATCH-003_完整分析报告.xlsx
+      - generic [ref=e339]:
+        - generic [ref=e340]:
+          - generic [ref=e341]:
+            - heading "选择导出格式" [level=3] [ref=e342]
+            - paragraph [ref=e343]: 根据使用场景选择合适的文件格式
+          - generic [ref=e345]:
+            - button "Excel" [ref=e346] [cursor=pointer]:
+              - img [ref=e347]
+              - generic [ref=e350]: Excel
+            - button "PDF" [ref=e351] [cursor=pointer]:
+              - img [ref=e352]
+              - generic [ref=e355]: PDF
+            - button "JSON" [ref=e356] [cursor=pointer]:
+              - img [ref=e357]
+              - generic [ref=e362]: JSON
+        - generic [ref=e363]:
+          - generic [ref=e364]:
+            - heading "选择内容类型" [level=3] [ref=e365]
+            - paragraph [ref=e366]: 选择需要导出的分析内容模块
+          - generic [ref=e367]:
+            - button "完整分析报告 包含转移矩阵、状态预测、异常诊断和原始数据" [ref=e368] [cursor=pointer]:
+              - img [ref=e369]
+              - generic [ref=e372]:
+                - generic [ref=e373]: 完整分析报告
+                - generic [ref=e374]: 包含转移矩阵、状态预测、异常诊断和原始数据
+            - button "转移矩阵数据 仅包含转移概率矩阵和样本量数据" [ref=e375] [cursor=pointer]:
+              - img [ref=e376]
+              - generic [ref=e378]:
+                - generic [ref=e379]: 转移矩阵数据
+                - generic [ref=e380]: 仅包含转移概率矩阵和样本量数据
+            - button "状态预测结果 仅包含多步状态预测和置信区间" [ref=e381] [cursor=pointer]:
+              - img [ref=e382]
+              - generic [ref=e385]:
+                - generic [ref=e386]: 状态预测结果
+                - generic [ref=e387]: 仅包含多步状态预测和置信区间
+            - button "异常诊断报告 仅包含异常检测结果和处理建议" [ref=e388] [cursor=pointer]:
+              - img [ref=e389]
+              - generic [ref=e391]:
+                - generic [ref=e392]: 异常诊断报告
+                - generic [ref=e393]: 仅包含异常检测结果和处理建议
+      - generic [ref=e394]:
+        - generic [ref=e395]:
+          - generic [ref=e396]:
+            - heading "导出预览" [level=3] [ref=e397]
+            - paragraph [ref=e398]: 确认导出设置后点击生成报告
+          - button "生成并下载" [ref=e399] [cursor=pointer]:
+            - img [ref=e400]
+            - text: 生成并下载
+        - generic [ref=e404]:
+          - generic [ref=e405]:
+            - img [ref=e407]
+            - generic [ref=e410]:
+              - generic [ref=e411]: 2026-WXX-BATCH-XXX_完整分析报告.excel
+              - generic [ref=e412]: 格式：EXCEL · 内容：完整分析报告
+          - generic [ref=e413]:
+            - generic [ref=e414]:
+              - generic [ref=e415]: 转移矩阵
+              - generic [ref=e416]: ✓
+            - generic [ref=e417]:
+              - generic [ref=e418]: 状态预测
+              - generic [ref=e419]: ✓
+            - generic [ref=e420]:
+              - generic [ref=e421]: 异常诊断
+              - generic [ref=e422]: ✓
+            - generic [ref=e423]:
+              - generic [ref=e424]: 原始数据
+              - generic [ref=e425]: ✓
+      - generic [ref=e426]:
+        - generic [ref=e427]:
+          - heading "历史导出批次" [level=3] [ref=e428]
+          - paragraph [ref=e429]: 查看和重新下载已生成的报告
+        - generic [ref=e431]:
+          - generic [ref=e432]: 📂
+          - heading "暂无导出记录" [level=4] [ref=e433]
+          - paragraph [ref=e434]: 生成的报告将显示在这里，按生成时间倒序排列
