@@ -27,14 +27,27 @@ export class AppDatabase extends Dexie {
     const codeCheck = DuplicateChecker.checkMaterialCodeDuplicate(material.code, existing);
 
     if (codeCheck.isDuplicate) {
-      const existingMaterial = codeCheck.duplicates[0];
-      return {
-        ...existingMaterial,
+      const newMaterial: Material = {
         ...material,
-        id: existingMaterial.id,
+        id: generateUUID(),
+        createdAt: new Date(),
         updatedAt: new Date(),
         isDuplicateWarning: true
       };
+
+      await this.materials.add(newMaterial);
+
+      const updatePromises = codeCheck.duplicates.map(async (dup) => {
+        if (!dup.isDuplicateWarning) {
+          await this.materials.update(dup.id, {
+            isDuplicateWarning: true,
+            updatedAt: new Date()
+          });
+        }
+      });
+      await Promise.all(updatePromises);
+
+      return newMaterial;
     }
 
     const duplicateCheck = DuplicateChecker.checkMaterialDuplicate(material, existing);
@@ -74,13 +87,39 @@ export class AppDatabase extends Dexie {
 
   async getAllMaterials(): Promise<Material[]> {
     const materials = await this.materials.orderBy('createdAt').reverse().toArray();
-    const { merged, warnings } = DuplicateChecker.mergeDuplicateMaterials(materials);
+    const { warnings } = DuplicateChecker.mergeDuplicateMaterials(materials);
 
     for (const warning of warnings) {
-      console.warn(`材料编号 "${warning.code}" 存在 ${warning.count} 条重复记录，已合并`);
+      console.warn(`材料编号 "${warning.code}" 存在 ${warning.count} 条重复记录`);
     }
 
-    return merged;
+    const codeGroups = new Map<string, Material[]>();
+    for (const m of materials) {
+      const code = m.code.trim().toLowerCase();
+      if (!codeGroups.has(code)) codeGroups.set(code, []);
+      codeGroups.get(code)!.push(m);
+    }
+
+    const updatePromises: Promise<void>[] = [];
+    for (const [, group] of codeGroups) {
+      if (group.length > 1) {
+        for (const mat of group) {
+          if (!mat.isDuplicateWarning) {
+            updatePromises.push(
+              this.materials.update(mat.id, {
+                isDuplicateWarning: true,
+                updatedAt: new Date()
+              }).then(() => {
+                mat.isDuplicateWarning = true;
+              })
+            );
+          }
+        }
+      }
+    }
+
+    await Promise.all(updatePromises);
+    return materials;
   }
 
   async getMaterialById(id: string): Promise<Material | undefined> {
@@ -270,6 +309,16 @@ export class AppDatabase extends Dexie {
         costPerGram: 0.05,
         printSpeed: 60,
         nozzleTemp: 200,
+        bedTemp: 60
+      },
+      {
+        code: 'PLA-001',
+        name: '普通PLA-重复测试',
+        type: 'PLA',
+        density: 1.25,
+        costPerGram: 0.06,
+        printSpeed: 55,
+        nozzleTemp: 205,
         bedTemp: 60
       },
       {

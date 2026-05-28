@@ -1,5 +1,6 @@
 import type { MeshData, ErrorSample, Vec3, ErrorAnalysis, DetailedError } from '@/types';
-import { vec3, pointToTriangleDistance, computeMean, computeStandardDeviation, computeHistogram, generateUUID } from './math';
+import { SimplificationAlgorithm } from '@/types';
+import { vec3, pointToTriangleDistance, computeMean, computeStandardDeviation, computeHistogram, generateUUID, computeTriangleArea } from './math';
 
 export class ErrorEstimator {
   private originalMesh: MeshData;
@@ -394,29 +395,100 @@ export class ErrorEstimator {
   }
 }
 
-export function simulateMeshSimplification(
-  mesh: MeshData,
-  targetFaceCount: number,
-  algorithm: string
-): MeshData {
-  const ratio = Math.min(1, targetFaceCount / mesh.faceCount);
+function computeFaceCurvature(mesh: MeshData, faceIndex: number): number {
+  const { vertices, faces, faceCount } = mesh;
+  const i0 = faces[faceIndex * 3] * 3;
+  const i1 = faces[faceIndex * 3 + 1] * 3;
+  const i2 = faces[faceIndex * 3 + 2] * 3;
 
-  if (ratio >= 0.99) {
-    return { ...mesh };
+  const v0: Vec3 = [vertices[i0], vertices[i0 + 1], vertices[i0 + 2]];
+  const v1: Vec3 = [vertices[i1], vertices[i1 + 1], vertices[i1 + 2]];
+  const v2: Vec3 = [vertices[i2], vertices[i2 + 1], vertices[i2 + 2]];
+
+  const e0 = vec3.sub(v1, v0);
+  const e1 = vec3.sub(v2, v0);
+  const normal = vec3.normalize(vec3.cross(e0, e1));
+  const area = vec3.length(vec3.cross(e0, e1)) * 0.5;
+
+  const center: Vec3 = [
+    (v0[0] + v1[0] + v2[0]) / 3,
+    (v0[1] + v1[1] + v2[1]) / 3,
+    (v0[2] + v1[2] + v2[2]) / 3
+  ];
+
+  const { min, max } = mesh.boundingBox;
+  const diagonal = vec3.distance(min, max);
+  const sampleRadius = diagonal * 0.05;
+
+  let curvatureSum = 0;
+  let neighborCount = 0;
+
+  for (let i = 0; i < faceCount; i++) {
+    if (i === faceIndex) continue;
+
+    const j0 = faces[i * 3] * 3;
+    const j1 = faces[i * 3 + 1] * 3;
+    const j2 = faces[i * 3 + 2] * 3;
+
+    const c: Vec3 = [
+      (vertices[j0] + vertices[j1] + vertices[j2]) / 3,
+      (vertices[j0 + 1] + vertices[j1 + 1] + vertices[j2 + 1]) / 3,
+      (vertices[j0 + 2] + vertices[j1 + 2] + vertices[j2 + 2]) / 3
+    ];
+
+    if (vec3.distance(center, c) < sampleRadius) {
+      const n0 = vec3.normalize(vec3.cross(
+        vec3.sub([vertices[j1], vertices[j1 + 1], vertices[j1 + 2]], [vertices[j0], vertices[j0 + 1], vertices[j0 + 2]]),
+        vec3.sub([vertices[j2], vertices[j2 + 1], vertices[j2 + 2]], [vertices[j0], vertices[j0 + 1], vertices[j0 + 2]])
+      ));
+      const dot = Math.abs(vec3.dot(normal, n0));
+      curvatureSum += 1 - dot;
+      neighborCount++;
+    }
   }
 
-  const targetFaces = Math.max(4, Math.floor(mesh.faceCount * ratio));
+  const curvature = neighborCount > 0 ? curvatureSum / neighborCount : 0;
+  return curvature * (1 + area * 100);
+}
 
+function isFaceOnBorder(mesh: MeshData, faceIndex: number): boolean {
+  const { faces, faceCount } = mesh;
+  const edgeCount = new Map<string, number>();
+
+  for (let i = 0; i < faceCount; i++) {
+    for (let j = 0; j < 3; j++) {
+      const a = faces[i * 3 + j];
+      const b = faces[i * 3 + (j + 1) % 3];
+      const key = a < b ? `${a}-${b}` : `${b}-${a}`;
+      edgeCount.set(key, (edgeCount.get(key) || 0) + 1);
+    }
+  }
+
+  for (let j = 0; j < 3; j++) {
+    const a = faces[faceIndex * 3 + j];
+    const b = faces[faceIndex * 3 + (j + 1) % 3];
+    const key = a < b ? `${a}-${b}` : `${b}-${a}`;
+    if (edgeCount.get(key) === 1) return true;
+  }
+
+  return false;
+}
+
+function buildSimplifiedMesh(
+  mesh: MeshData,
+  sortedFaceIndices: number[],
+  targetFaceCount: number,
+  algorithmName: string
+): MeshData {
   const vertices: number[] = [];
   const faces: number[] = [];
   const normals: number[] = [];
   const vertexMap = new Map<number, number>();
 
-  const step = Math.ceil(mesh.faceCount / targetFaces);
   let newVertexIndex = 0;
 
-  for (let i = 0; i < mesh.faceCount; i += step) {
-    const faceIdx = i * 3;
+  for (let i = 0; i < targetFaceCount && i < sortedFaceIndices.length; i++) {
+    const faceIdx = sortedFaceIndices[i] * 3;
 
     for (let j = 0; j < 3; j++) {
       const oldVertexIdx = mesh.faces[faceIdx + j];
@@ -438,6 +510,140 @@ export function simulateMeshSimplification(
     faceCount: faces.length / 3,
     vertexCount: vertices.length / 3,
     boundingBox: mesh.boundingBox,
-    name: `${mesh.name}_simplified_${targetFaces}`
+    name: `${mesh.name}_${algorithmName}_${faces.length / 3}`
   };
+}
+
+export function simulateMeshSimplification(
+  mesh: MeshData,
+  targetFaceCount: number,
+  algorithm: string
+): MeshData {
+  const ratio = Math.min(1, targetFaceCount / mesh.faceCount);
+
+  if (ratio >= 0.99) {
+    return { ...mesh };
+  }
+
+  const targetFaces = Math.max(4, Math.floor(mesh.faceCount * ratio));
+  const { vertices, faces, faceCount } = mesh;
+
+  switch (algorithm) {
+    case SimplificationAlgorithm.QUADRIC_EDGE_COLLAPSE: {
+      const faceImportance: { index: number; importance: number }[] = [];
+
+      for (let i = 0; i < faceCount; i++) {
+        const curvature = computeFaceCurvature(mesh, i);
+        const isBorder = isFaceOnBorder(mesh, i);
+        const importance = curvature * (isBorder ? 2 : 1) + Math.random() * 0.001;
+        faceImportance.push({ index: i, importance });
+      }
+
+      faceImportance.sort((a, b) => b.importance - a.importance);
+      return buildSimplifiedMesh(mesh, faceImportance.map(f => f.index), targetFaces, 'qem');
+    }
+
+    case SimplificationAlgorithm.CLUSTERING: {
+      const { min, max } = mesh.boundingBox;
+      const gridSize = Math.ceil(Math.pow(targetFaces, 1/3)) * 2;
+      const cellSize = [
+        (max[0] - min[0]) / gridSize,
+        (max[1] - min[1]) / gridSize,
+        (max[2] - min[2]) / gridSize
+      ];
+
+      const gridMap = new Map<string, number[]>();
+
+      for (let i = 0; i < faceCount; i++) {
+        const i0 = faces[i * 3] * 3;
+        const i1 = faces[i * 3 + 1] * 3;
+        const i2 = faces[i * 3 + 2] * 3;
+
+        const cx = (vertices[i0] + vertices[i1] + vertices[i2]) / 3;
+        const cy = (vertices[i0 + 1] + vertices[i1 + 1] + vertices[i2 + 1]) / 3;
+        const cz = (vertices[i0 + 2] + vertices[i1 + 2] + vertices[i2 + 2]) / 3;
+
+        const gx = Math.min(gridSize - 1, Math.floor((cx - min[0]) / cellSize[0]));
+        const gy = Math.min(gridSize - 1, Math.floor((cy - min[1]) / cellSize[1]));
+        const gz = Math.min(gridSize - 1, Math.floor((cz - min[2]) / cellSize[2]));
+
+        const key = `${gx},${gy},${gz}`;
+        if (!gridMap.has(key)) gridMap.set(key, []);
+        gridMap.get(key)!.push(i);
+      }
+
+      const selectedFaces: number[] = [];
+      const cells = Array.from(gridMap.values());
+      const facesPerCell = Math.ceil(targetFaces / cells.length);
+
+      for (const cellFaces of cells) {
+        const shuffled = [...cellFaces].sort(() => Math.random() - 0.5);
+        selectedFaces.push(...shuffled.slice(0, facesPerCell));
+      }
+
+      return buildSimplifiedMesh(mesh, selectedFaces, targetFaces, 'cluster');
+    }
+
+    case SimplificationAlgorithm.VERTEX_CLUSTERING: {
+      const vertexValence = new Map<number, number>();
+      for (let i = 0; i < faceCount * 3; i++) {
+        const v = faces[i];
+        vertexValence.set(v, (vertexValence.get(v) || 0) + 1);
+      }
+
+      const faceImportance: { index: number; importance: number }[] = [];
+      for (let i = 0; i < faceCount; i++) {
+        const v0 = faces[i * 3];
+        const v1 = faces[i * 3 + 1];
+        const v2 = faces[i * 3 + 2];
+
+        const avgValence = (
+          (vertexValence.get(v0) || 0) +
+          (vertexValence.get(v1) || 0) +
+          (vertexValence.get(v2) || 0)
+        ) / 3;
+
+        const i0 = v0 * 3;
+        const i1 = v1 * 3;
+        const i2 = v2 * 3;
+        const area = computeTriangleArea(
+          [vertices[i0], vertices[i0 + 1], vertices[i0 + 2]],
+          [vertices[i1], vertices[i1 + 1], vertices[i1 + 2]],
+          [vertices[i2], vertices[i2 + 1], vertices[i2 + 2]]
+        );
+
+        const isBorder = isFaceOnBorder(mesh, i);
+        const importance = (1 / avgValence) * (1 + area * 50) * (isBorder ? 1.5 : 1);
+        faceImportance.push({ index: i, importance });
+      }
+
+      faceImportance.sort((a, b) => b.importance - a.importance);
+      return buildSimplifiedMesh(mesh, faceImportance.map(f => f.index), targetFaces, 'vcluster');
+    }
+
+    case SimplificationAlgorithm.MESHDECIMATOR:
+    default: {
+      const faceScores: { index: number; score: number }[] = [];
+
+      for (let i = 0; i < faceCount; i++) {
+        const curvature = computeFaceCurvature(mesh, i);
+        const i0 = faces[i * 3] * 3;
+        const i1 = faces[i * 3 + 1] * 3;
+        const i2 = faces[i * 3 + 2] * 3;
+
+        const area = computeTriangleArea(
+          [vertices[i0], vertices[i0 + 1], vertices[i0 + 2]],
+          [vertices[i1], vertices[i1 + 1], vertices[i1 + 2]],
+          [vertices[i2], vertices[i2 + 1], vertices[i2 + 2]]
+        );
+
+        const isBorder = isFaceOnBorder(mesh, i);
+        const score = curvature * 0.4 + (1 / (1 + area)) * 0.4 + (isBorder ? 0.2 : 0);
+        faceScores.push({ index: i, score: score + Math.random() * 0.001 });
+      }
+
+      faceScores.sort((a, b) => b.score - a.score);
+      return buildSimplifiedMesh(mesh, faceScores.map(f => f.index), targetFaces, 'decimator');
+    }
+  }
 }
