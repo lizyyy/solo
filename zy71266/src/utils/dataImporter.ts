@@ -91,6 +91,29 @@ function parseJsonData(content: string, fileName: string): ParsedData {
   return result
 }
 
+function normalizeSection(section: string): string {
+  const s = section.toLowerCase()
+  if (s === 'lights') return 'light'
+  if (s === 'actors') return 'actor'
+  if (s === 'props') return 'prop'
+  if (s === 'trajectories') return 'trajectory'
+  return s
+}
+
+function saveCurrentTrajectory(
+  trajectory: Partial<Trajectory> | null,
+  fileName: string,
+  result: ParsedData
+) {
+  if (trajectory && trajectory.waypoints && trajectory.waypoints.length > 0) {
+    const validated = validateTrajectory(trajectory, fileName, trajectory.sourceLine || 1)
+    if (validated.data) {
+      result.trajectories.push(validated.data)
+    }
+    result.validations.push(...validated.validations)
+  }
+}
+
 function parseTextData(lines: string[], fileName: string): ParsedData {
   const result: ParsedData = {
     lights: [],
@@ -112,8 +135,10 @@ function parseTextData(lines: string[], fileName: string): ParsedData {
     if (trimmed.startsWith('[')) {
       const sectionMatch = trimmed.match(/\[(\w+)\]/)
       if (sectionMatch) {
-        currentSection = sectionMatch[1].toLowerCase()
+        const rawSection = sectionMatch[1]
+        currentSection = normalizeSection(rawSection)
         if (currentSection === 'trajectory') {
+          saveCurrentTrajectory(currentTrajectory, fileName, result)
           currentTrajectory = {
             id: crypto.randomUUID(),
             name: `Trajectory_${lineNum}`,
@@ -142,13 +167,15 @@ function parseTextData(lines: string[], fileName: string): ParsedData {
         }
         break
       default:
-        if (trimmed.includes('light') || trimmed.includes('LIGHT')) {
+        const lowerTrimmed = trimmed.toLowerCase()
+        if (lowerTrimmed.includes('light')) {
           currentSection = 'light'
-        } else if (trimmed.includes('actor') || trimmed.includes('ACTOR')) {
+        } else if (lowerTrimmed.includes('actor')) {
           currentSection = 'actor'
-        } else if (trimmed.includes('prop') || trimmed.includes('PROP')) {
+        } else if (lowerTrimmed.includes('prop')) {
           currentSection = 'prop'
-        } else if (trimmed.includes('trajectory') || trimmed.includes('TRAJECTORY')) {
+        } else if (lowerTrimmed.includes('trajectory')) {
+          saveCurrentTrajectory(currentTrajectory, fileName, result)
           currentSection = 'trajectory'
           currentTrajectory = {
             id: crypto.randomUUID(),
@@ -161,13 +188,7 @@ function parseTextData(lines: string[], fileName: string): ParsedData {
     }
   })
 
-  if (currentTrajectory && currentTrajectory.waypoints && currentTrajectory.waypoints.length > 0) {
-    const validated = validateTrajectory(currentTrajectory, fileName, currentTrajectory.sourceLine || 1)
-    if (validated.data) {
-      result.trajectories.push(validated.data)
-    }
-    result.validations.push(...validated.validations)
-  }
+  saveCurrentTrajectory(currentTrajectory, fileName, result)
 
   return result
 }
@@ -324,7 +345,7 @@ function validateLight(
   lineNum: number
 ): { data: Light | null; validations: ValidationResult[] } {
   const validations: ValidationResult[] = []
-  let isValid = true
+  let canUse = true
 
   if (light.positionX === undefined || light.positionY === undefined || light.positionZ === undefined) {
     validations.push({
@@ -336,7 +357,7 @@ function validateLight(
       sourceLine: lineNum,
       relatedElementId: light.id,
     })
-    isValid = false
+    canUse = false
   }
 
   if (light.colorTemp !== undefined) {
@@ -345,12 +366,12 @@ function validateLight(
         id: crypto.randomUUID(),
         severity: 'error',
         type: 'LIGHT_INVALID_COLORTEMP',
-        message: `灯光色温 ${light.colorTemp}K 超出有效范围 (2000K-10000K)`,
+        message: `灯光色温 ${light.colorTemp}K 超出有效范围 (2000K-10000K)，已钳制到最近有效值`,
         sourceFile: fileName,
         sourceLine: lineNum,
         relatedElementId: light.id,
       })
-      isValid = false
+      light.colorTemp = Math.max(2000, Math.min(10000, light.colorTemp))
     }
   } else {
     validations.push({
@@ -400,7 +421,7 @@ function validateLight(
   }
 
   return {
-    data: isValid
+    data: canUse
       ? ({
           ...defaults,
           ...light,
@@ -458,19 +479,19 @@ function validateProp(
   lineNum: number
 ): { data: Prop | null; validations: ValidationResult[] } {
   const validations: ValidationResult[] = []
-  let isValid = true
+  const MIN_SCALE = 0.01
 
   if (prop.scaleX !== undefined && prop.scaleX <= 0) {
     validations.push({
       id: crypto.randomUUID(),
       severity: 'error',
       type: 'PROP_INVALID_SCALE',
-      message: `道具 "${prop.name || '未知'}" X轴缩放无效`,
+      message: `道具 "${prop.name || '未知'}" X轴缩放 ${prop.scaleX} 无效，已钳制到 ${MIN_SCALE}`,
       sourceFile: fileName,
       sourceLine: lineNum,
       relatedElementId: prop.id,
     })
-    isValid = false
+    prop.scaleX = MIN_SCALE
   }
 
   if (prop.scaleY !== undefined && prop.scaleY <= 0) {
@@ -478,12 +499,12 @@ function validateProp(
       id: crypto.randomUUID(),
       severity: 'error',
       type: 'PROP_INVALID_SCALE',
-      message: `道具 "${prop.name || '未知'}" Y轴缩放无效`,
+      message: `道具 "${prop.name || '未知'}" Y轴缩放 ${prop.scaleY} 无效，已钳制到 ${MIN_SCALE}`,
       sourceFile: fileName,
       sourceLine: lineNum,
       relatedElementId: prop.id,
     })
-    isValid = false
+    prop.scaleY = MIN_SCALE
   }
 
   if (prop.scaleZ !== undefined && prop.scaleZ <= 0) {
@@ -491,12 +512,12 @@ function validateProp(
       id: crypto.randomUUID(),
       severity: 'error',
       type: 'PROP_INVALID_SCALE',
-      message: `道具 "${prop.name || '未知'}" Z轴缩放无效`,
+      message: `道具 "${prop.name || '未知'}" Z轴缩放 ${prop.scaleZ} 无效，已钳制到 ${MIN_SCALE}`,
       sourceFile: fileName,
       sourceLine: lineNum,
       relatedElementId: prop.id,
     })
-    isValid = false
+    prop.scaleZ = MIN_SCALE
   }
 
   if (!prop.name) {
@@ -512,7 +533,7 @@ function validateProp(
   }
 
   return {
-    data: isValid ? (prop as Prop) : null,
+    data: prop as Prop,
     validations,
   }
 }

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Upload, AlertTriangle, AlertCircle, Info, ChevronDown, ChevronRight, Lightbulb, User, Box, Route } from 'lucide-react'
+import { Upload, Play, AlertTriangle, AlertCircle, Info, ChevronDown, ChevronRight, Lightbulb, User, Box, Route } from 'lucide-react'
 import { useProjectStore } from '@/store'
 import { parseDataFile } from '@/utils/dataImporter'
 import type { ValidationResult, ValidationSeverity } from '@/types'
@@ -68,6 +68,24 @@ export function LeftPanel() {
     handleFileUpload(e.dataTransfer.files)
   }
 
+  const loadDemoData = async () => {
+    try {
+      const response = await fetch('/demo-data.txt')
+      const content = await response.text()
+      const parsed = parseDataFile(content, 'demo-data.txt')
+
+      if (parsed.lights.length > 0) addLights(parsed.lights)
+      if (parsed.actors.length > 0) addActors(parsed.actors)
+      if (parsed.props.length > 0) addProps(parsed.props)
+      if (parsed.trajectories.length > 0) addTrajectories(parsed.trajectories)
+
+      setValidationResults([...validationResults, ...parsed.validations])
+      addImportedFile('demo-data.txt')
+    } catch (e) {
+      console.error('Failed to load demo data:', e)
+    }
+  }
+
   const getSeverityIcon = (severity: ValidationSeverity) => {
     switch (severity) {
       case 'error':
@@ -123,6 +141,13 @@ export function LeftPanel() {
             onChange={(e) => handleFileUpload(e.target.files)}
           />
         </div>
+        <button
+          onClick={loadDemoData}
+          className="w-full mt-3 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-sm rounded-lg flex items-center justify-center gap-2 transition-colors"
+        >
+          <Play className="w-4 h-4" />
+          加载演示数据
+        </button>
         {importedFiles.length > 0 && (
           <div className="mt-3 text-xs text-gray-400">
             已导入: {importedFiles.join(', ')}
