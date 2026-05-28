@@ -13,7 +13,7 @@ export default function ReviewPage() {
   const exposures = useExposureStore((s) => s.exposures)
   const hedgeContracts = useExposureStore((s) => s.hedgeContracts)
   const selectedCurrencies = useExposureStore((s) => s.selectedCurrencies)
-  const selectedSubsidiaries = useExposureStore((s) => s.selectedSubsidiaries)
+  const selectedSubsidiaryCodes = useExposureStore((s) => s.selectedSubsidiaryCodes)
   const selectedDirections = useExposureStore((s) => s.selectedDirections)
   const dataLoaded = useExposureStore((s) => s.dataLoaded)
   const loadSnapshots = useSnapshotStore((s) => s.loadSnapshots)
@@ -23,8 +23,8 @@ export default function ReviewPage() {
   }, [loadSnapshots])
 
   const treeData = useMemo(
-    () => buildTreeData(subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaries, selectedDirections),
-    [subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaries, selectedDirections]
+    () => buildTreeData(subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaryCodes, selectedDirections),
+    [subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaryCodes, selectedDirections]
   )
 
   const summary = useMemo(() => calcSummary(exposures, hedgeContracts), [exposures, hedgeContracts])

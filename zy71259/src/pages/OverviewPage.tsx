@@ -12,14 +12,14 @@ export default function OverviewPage() {
   const exposures = useExposureStore((s) => s.exposures)
   const hedgeContracts = useExposureStore((s) => s.hedgeContracts)
   const selectedCurrencies = useExposureStore((s) => s.selectedCurrencies)
-  const selectedSubsidiaries = useExposureStore((s) => s.selectedSubsidiaries)
+  const selectedSubsidiaryCodes = useExposureStore((s) => s.selectedSubsidiaryCodes)
   const selectedDirections = useExposureStore((s) => s.selectedDirections)
   const dataLoaded = useExposureStore((s) => s.dataLoaded)
   const selectedNodeId = useExposureStore((s) => s.selectedNodeId)
 
   const treeData = useMemo(
-    () => buildTreeData(subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaries, selectedDirections),
-    [subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaries, selectedDirections]
+    () => buildTreeData(subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaryCodes, selectedDirections),
+    [subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaryCodes, selectedDirections]
   )
 
   const summary = useMemo(() => calcSummary(exposures, hedgeContracts), [exposures, hedgeContracts])
@@ -28,15 +28,15 @@ export default function OverviewPage() {
     if (!selectedNodeId) return null
     if (selectedNodeId.startsWith('cur-')) {
       const parts = selectedNodeId.replace('cur-', '').split('-')
-      const subId = parts[0]
+      const subCode = parts[0]
       const curCode = parts.slice(1).join('-')
-      const sub = subsidiaries.find((s) => s.id === subId)
-      return { type: 'currency' as const, label: `${sub?.name || subId} - ${curCode}` }
+      const sub = subsidiaries.find((s) => s.code === subCode)
+      return { type: 'currency' as const, label: `${sub?.name || subCode} - ${curCode}` }
     }
     if (selectedNodeId.startsWith('sub-')) {
-      const subId = selectedNodeId.replace('sub-', '')
-      const sub = subsidiaries.find((s) => s.id === subId)
-      return { type: 'subsidiary' as const, label: sub?.name || subId }
+      const subCode = selectedNodeId.replace('sub-', '')
+      const sub = subsidiaries.find((s) => s.code === subCode)
+      return { type: 'subsidiary' as const, label: sub?.name || subCode }
     }
     return { type: 'root' as const, label: '集团总部' }
   }, [selectedNodeId, subsidiaries])
@@ -88,10 +88,10 @@ export default function OverviewPage() {
         <div className="p-4 flex-1 overflow-auto">
           <div className="text-xs text-txt-secondary mb-2 font-medium">敞口明细预览</div>
           {exposures.slice(0, 8).map((exp) => {
-            const sub = subsidiaries.find((s) => s.id === exp.subsidiaryId)
+            const sub = subsidiaries.find((s) => s.code === exp.subsidiaryCode)
             return (
               <div key={exp.id} className="flex items-center justify-between py-1.5 border-b border-border/30 text-xs">
-                <span className="text-txt-secondary">{sub?.name || exp.subsidiaryId}</span>
+                <span className="text-txt-secondary">{sub?.name || exp.subsidiaryCode}</span>
                 <span className="font-mono">{exp.currencyCode}</span>
                 <span className={`font-mono ${exp.direction === 'LONG' ? 'text-accent-green' : 'text-accent-red'}`}>
                   {exp.direction === 'LONG' ? '+' : '-'}{(exp.amount / 1e6).toFixed(1)}M

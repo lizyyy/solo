@@ -68,9 +68,11 @@ function transformRows(
         const dir = (r['方向'] || r['direction'] || '').toUpperCase()
         const direction = dir === '收' || dir === 'RECEIVE' || dir === 'LONG' ? 'LONG' : 'SHORT'
         if (isNaN(amt)) warnings.push(`金额解析失败: ${r['金额'] || r['amount']}`)
+        const subCode = r['子公司编码'] || r['subsidiaryCode'] || r['subsidiaryId'] || ''
         return {
           id: genId(),
-          subsidiaryId: r['子公司编码'] || r['subsidiaryId'] || '',
+          subsidiaryCode: subCode,
+          subsidiaryId: subCode,
           currencyCode: r['币种'] || r['currencyCode'] || '',
           amount: amt,
           direction,
@@ -90,10 +92,12 @@ function transformRows(
         const amt = parseFloat(r['名义金额'] || r['notionalAmount'] || '0')
         const dir = (r['方向'] || r['direction'] || '').toUpperCase()
         const direction = dir === '买' || dir === 'LONG' || dir === 'BUY' ? 'LONG' : 'SHORT'
+        const subCode = r['子公司编码'] || r['subsidiaryCode'] || r['subsidiaryId'] || ''
         return {
           id: genId(),
           contractNo: r['合约编号'] || r['contractNo'] || '',
-          subsidiaryId: r['子公司编码'] || r['subsidiaryId'] || '',
+          subsidiaryCode: subCode,
+          subsidiaryId: subCode,
           currencyCode: r['币种'] || r['currencyCode'] || '',
           notionalAmount: amt,
           direction,

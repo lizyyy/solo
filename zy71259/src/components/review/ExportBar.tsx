@@ -36,7 +36,6 @@ export default function ExportBar() {
 
   const handleSaveSnapshot = async () => {
     const state = useExposureStore.getState()
-    const summary = calcSummary(state.exposures, state.hedgeContracts)
     const snap: Snapshot = {
       id: Date.now().toString(36) + Math.random().toString(36).substring(2, 8),
       createdAt: new Date().toISOString(),
@@ -45,7 +44,7 @@ export default function ExportBar() {
       cameraState: { position: [0, 10, 14], target: [0, 0, 0] },
       filterState: {
         currencies: state.selectedCurrencies,
-        subsidiaries: state.selectedSubsidiaries,
+        subsidiaryCodes: state.selectedSubsidiaryCodes,
         directions: state.selectedDirections,
       },
       subsidiaries: state.subsidiaries,

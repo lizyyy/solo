@@ -9,7 +9,7 @@ interface ExposureState {
   exchangeRates: ExchangeRate[]
   anomalies: Anomaly[]
   selectedCurrencies: string[]
-  selectedSubsidiaries: string[]
+  selectedSubsidiaryCodes: string[]
   selectedDirections: string[]
   selectedNodeId: string | null
   dataLoaded: boolean
@@ -21,7 +21,7 @@ interface ExposureState {
   setExchangeRates: (d: ExchangeRate[]) => void
   setAnomalies: (d: Anomaly[]) => void
   setSelectedCurrencies: (c: string[]) => void
-  setSelectedSubsidiaries: (s: string[]) => void
+  setSelectedSubsidiaryCodes: (s: string[]) => void
   setSelectedDirections: (d: string[]) => void
   setSelectedNodeId: (id: string | null) => void
   setDataLoaded: (v: boolean) => void
@@ -41,7 +41,7 @@ export const useExposureStore = create<ExposureState>((set) => ({
   exchangeRates: [],
   anomalies: [],
   selectedCurrencies: [],
-  selectedSubsidiaries: [],
+  selectedSubsidiaryCodes: [],
   selectedDirections: [],
   selectedNodeId: null,
   dataLoaded: false,
@@ -53,7 +53,7 @@ export const useExposureStore = create<ExposureState>((set) => ({
   setExchangeRates: (d) => set({ exchangeRates: d }),
   setAnomalies: (d) => set({ anomalies: d }),
   setSelectedCurrencies: (c) => set({ selectedCurrencies: c }),
-  setSelectedSubsidiaries: (s) => set({ selectedSubsidiaries: s }),
+  setSelectedSubsidiaryCodes: (s) => set({ selectedSubsidiaryCodes: s }),
   setSelectedDirections: (d) => set({ selectedDirections: d }),
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
   setDataLoaded: (v) => set({ dataLoaded: v }),
@@ -85,7 +85,7 @@ export const useExposureStore = create<ExposureState>((set) => ({
       anomalies: s.anomalies,
       dataLoaded: true,
       selectedCurrencies: [],
-      selectedSubsidiaries: [],
+      selectedSubsidiaryCodes: [],
       selectedDirections: [],
       selectedNodeId: null,
     }),
@@ -99,7 +99,7 @@ export const useExposureStore = create<ExposureState>((set) => ({
       anomalies: [],
       dataLoaded: false,
       selectedCurrencies: [],
-      selectedSubsidiaries: [],
+      selectedSubsidiaryCodes: [],
       selectedDirections: [],
       selectedNodeId: null,
     }),

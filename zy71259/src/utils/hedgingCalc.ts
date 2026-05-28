@@ -6,12 +6,12 @@ export function buildTreeData(
   exposures: Exposure[],
   hedgeContracts: HedgeContract[],
   selectedCurrencies: string[],
-  selectedSubsidiaries: string[],
+  selectedSubsidiaryCodes: string[],
   selectedDirections: string[]
 ): TreeNodeData {
   const filteredExposures = exposures.filter((e) => {
     if (selectedCurrencies.length > 0 && !selectedCurrencies.includes(e.currencyCode)) return false
-    if (selectedSubsidiaries.length > 0 && !selectedSubsidiaries.includes(e.subsidiaryId)) return false
+    if (selectedSubsidiaryCodes.length > 0 && !selectedSubsidiaryCodes.includes(e.subsidiaryCode)) return false
     if (selectedDirections.length > 0 && !selectedDirections.includes(e.direction)) return false
     return true
   })
@@ -26,8 +26,8 @@ export function buildTreeData(
     children: [],
   }
 
-  const filteredSubs = selectedSubsidiaries.length > 0
-    ? subsidiaries.filter((s) => selectedSubsidiaries.includes(s.id))
+  const filteredSubs = selectedSubsidiaryCodes.length > 0
+    ? subsidiaries.filter((s) => selectedSubsidiaryCodes.includes(s.code))
     : subsidiaries
 
   const subAngle = (2 * Math.PI) / Math.max(filteredSubs.length, 1)
@@ -35,7 +35,7 @@ export function buildTreeData(
 
   filteredSubs.forEach((sub, i) => {
     const angle = subAngle * i - Math.PI / 2
-    const subExposures = filteredExposures.filter((e) => e.subsidiaryId === sub.id)
+    const subExposures = filteredExposures.filter((e) => e.subsidiaryCode === sub.code)
 
     const curMap = new Map<string, Exposure[]>()
     subExposures.forEach((e) => {
@@ -50,13 +50,13 @@ export function buildTreeData(
     }
 
     const subNode: TreeNodeData = {
-      id: `sub-${sub.id}`,
+      id: `sub-${sub.code}`,
       label: sub.name,
       type: 'subsidiary',
       position: [Math.cos(angle) * subRadius, 0, Math.sin(angle) * subRadius],
       size: 0.8,
       color: '#5B9BD5',
-      subsidiaryId: sub.id,
+      subsidiaryId: sub.code,
       children: [],
     }
 
@@ -69,21 +69,20 @@ export function buildTreeData(
       const longAmt = curExps.filter((e) => e.direction === 'LONG').reduce((s, e) => s + e.amount, 0)
       const shortAmt = curExps.filter((e) => e.direction === 'SHORT').reduce((s, e) => s + e.amount, 0)
       const net = longAmt - shortAmt
-      const hasHedge = curExps.some((e) => e.hedged) || hedgeContracts.some((h) => h.subsidiaryId === sub.id && h.currencyCode === curCode)
-      const curInfo = currencies.find((c) => c.code === curCode)
+      const hasHedge = curExps.some((e) => e.hedged) || hedgeContracts.some((h) => h.subsidiaryCode === sub.code && h.currencyCode === curCode)
       const cAngle = baseAngle + curAngle * j
       const sx = subNode.position[0] + Math.cos(cAngle) * curRadius
       const sz = subNode.position[2] + Math.sin(cAngle) * curRadius
 
       subNode.children.push({
-        id: `cur-${sub.id}-${curCode}`,
+        id: `cur-${sub.code}-${curCode}`,
         label: curCode,
         type: 'currency',
         position: [sx, 0, sz],
         size: Math.max(0.3, Math.min(1.2, Math.log10(Math.abs(net) + 1) * 0.3)),
         color: net >= 0 ? '#00E5A0' : '#FF6B6B',
         direction: net >= 0 ? 'LONG' : 'SHORT',
-        subsidiaryId: sub.id,
+        subsidiaryId: sub.code,
         currencyCode: curCode,
         netExposure: net,
         hedged: hasHedge,
@@ -98,6 +97,8 @@ export function buildTreeData(
 }
 
 export function calcSummary(exposures: Exposure[], hedgeContracts: HedgeContract[]): ExposureSummary {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  void hedgeContracts
   const totalLong = exposures.filter((e) => e.direction === 'LONG').reduce((s, e) => s + e.amount, 0)
   const totalShort = exposures.filter((e) => e.direction === 'SHORT').reduce((s, e) => s + e.amount, 0)
   const netExposure = totalLong - totalShort
@@ -123,7 +124,7 @@ export function detectAnomalies(
   exchangeRates.forEach((r) => curPairs.set(r.pair, r.spotRate))
 
   exposures.forEach((exp) => {
-    const sub = subsidiaries.find((s) => s.id === exp.subsidiaryId)
+    const sub = subsidiaries.find((s) => s.code === exp.subsidiaryCode)
     if (!sub) return
     const pair = exp.currencyCode + sub.functionalCurrency
     const rate = curPairs.get(pair) || curPairs.get(sub.functionalCurrency + exp.currencyCode)
@@ -165,7 +166,7 @@ export function detectAnomalies(
 
   const subCurrencyPairs = new Map<string, HedgeContract[]>()
   hedgeContracts.forEach((h) => {
-    const key = `${h.subsidiaryId}-${h.currencyCode}-${h.dueDate}`
+    const key = `${h.subsidiaryCode}-${h.currencyCode}-${h.dueDate}`
     const arr = subCurrencyPairs.get(key) || []
     arr.push(h)
     subCurrencyPairs.set(key, arr)
@@ -188,12 +189,12 @@ export function detectAnomalies(
   })
 
   subsidiaries.forEach((sub) => {
-    const hasExposure = exposures.some((e) => e.subsidiaryId === sub.id)
+    const hasExposure = exposures.some((e) => e.subsidiaryCode === sub.code)
     if (!hasExposure && subsidiaries.length > 1) {
       anomalies.push({
         id: `anomaly-${idx++}`,
         type: 'CONSOLIDATION_OMISSION',
-        relatedEntityId: sub.id,
+        relatedEntityId: sub.code,
         description: `子公司${sub.name}(${sub.code})无敞口数据，可能存在合并遗漏`,
         severity: 'MEDIUM',
         resolution: 'UNRESOLVED',
@@ -231,26 +232,26 @@ export function generateDemoData(): {
   ]
 
   const exposures: Exposure[] = [
-    { id: 'e1', subsidiaryId: 's1', currencyCode: 'USD', amount: 5000000, direction: 'LONG', dueDate: '2026-06-30', contractNo: '', originalRaw: '5000000', manualNote: 'Q2对美出口应收', source: 'demo', hedged: true, hedgeContractNo: 'HC-001' },
-    { id: 'e2', subsidiaryId: 's1', currencyCode: 'EUR', amount: 3000000, direction: 'LONG', dueDate: '2026-07-15', contractNo: '', originalRaw: '3000000', manualNote: '', source: 'demo', hedged: false, hedgeContractNo: '' },
-    { id: 'e3', subsidiaryId: 's1', currencyCode: 'USD', amount: 2000000, direction: 'SHORT', dueDate: '2026-06-30', contractNo: '', originalRaw: '2000000', manualNote: '设备采购应付', source: 'demo', hedged: false, hedgeContractNo: '' },
-    { id: 'e4', subsidiaryId: 's2', currencyCode: 'EUR', amount: 8000000, direction: 'LONG', dueDate: '2026-06-15', contractNo: '', originalRaw: '8000000', manualNote: '', source: 'demo', hedged: true, hedgeContractNo: 'HC-002' },
-    { id: 'e5', subsidiaryId: 's2', currencyCode: 'CNY', amount: 4000000, direction: 'SHORT', dueDate: '2026-07-01', contractNo: '', originalRaw: '4000000', manualNote: '中国供应商付款', source: 'demo', hedged: false, hedgeContractNo: '' },
-    { id: 'e6', subsidiaryId: 's2', currencyCode: 'JPY', amount: 600000000, direction: 'LONG', dueDate: '2026-08-01', contractNo: '', originalRaw: '600000000', manualNote: '', source: 'demo', hedged: false, hedgeContractNo: '' },
-    { id: 'e7', subsidiaryId: 's3', currencyCode: 'USD', amount: 12000000, direction: 'SHORT', dueDate: '2026-06-30', contractNo: '', originalRaw: '12000000', manualNote: '对美进口应付', source: 'demo', hedged: true, hedgeContractNo: 'HC-003' },
-    { id: 'e8', subsidiaryId: 's3', currencyCode: 'GBP', amount: 5000000, direction: 'LONG', dueDate: '2026-07-15', contractNo: '', originalRaw: '5000000', manualNote: '', source: 'demo', hedged: false, hedgeContractNo: '' },
-    { id: 'e9', subsidiaryId: 's4', currencyCode: 'USD', amount: 3000000, direction: 'SHORT', dueDate: '2026-06-30', contractNo: '', originalRaw: '3000000', manualNote: '', source: 'demo', hedged: false, hedgeContractNo: '' },
-    { id: 'e10', subsidiaryId: 's4', currencyCode: 'CNY', amount: 2000000, direction: 'LONG', dueDate: '2026-07-01', contractNo: '', originalRaw: '2000000', manualNote: '对华出口', source: 'demo', hedged: false, hedgeContractNo: '' },
-    { id: 'e11', subsidiaryId: 's5', currencyCode: 'EUR', amount: 7000000, direction: 'SHORT', dueDate: '2026-06-30', contractNo: '', originalRaw: '7000000', manualNote: '', source: 'demo', hedged: true, hedgeContractNo: 'HC-004' },
-    { id: 'e12', subsidiaryId: 's5', currencyCode: 'USD', amount: 4000000, direction: 'LONG', dueDate: '2026-07-15', contractNo: '', originalRaw: '4000000', manualNote: '', source: 'demo', hedged: false, hedgeContractNo: '' },
+    { id: 'e1', subsidiaryCode: 'CN-BJ', subsidiaryId: 'CN-BJ', currencyCode: 'USD', amount: 5000000, direction: 'LONG', dueDate: '2026-06-30', contractNo: '', originalRaw: '5000000', manualNote: 'Q2对美出口应收', source: 'demo', hedged: true, hedgeContractNo: 'HC-001' },
+    { id: 'e2', subsidiaryCode: 'CN-BJ', subsidiaryId: 'CN-BJ', currencyCode: 'EUR', amount: 3000000, direction: 'LONG', dueDate: '2026-07-15', contractNo: '', originalRaw: '3000000', manualNote: '', source: 'demo', hedged: false, hedgeContractNo: '' },
+    { id: 'e3', subsidiaryCode: 'CN-BJ', subsidiaryId: 'CN-BJ', currencyCode: 'USD', amount: 2000000, direction: 'SHORT', dueDate: '2026-06-30', contractNo: '', originalRaw: '2000000', manualNote: '设备采购应付', source: 'demo', hedged: false, hedgeContractNo: '' },
+    { id: 'e4', subsidiaryCode: 'US-NY', subsidiaryId: 'US-NY', currencyCode: 'EUR', amount: 8000000, direction: 'LONG', dueDate: '2026-06-15', contractNo: '', originalRaw: '8000000', manualNote: '', source: 'demo', hedged: true, hedgeContractNo: 'HC-002' },
+    { id: 'e5', subsidiaryCode: 'US-NY', subsidiaryId: 'US-NY', currencyCode: 'CNY', amount: 4000000, direction: 'SHORT', dueDate: '2026-07-01', contractNo: '', originalRaw: '4000000', manualNote: '中国供应商付款', source: 'demo', hedged: false, hedgeContractNo: '' },
+    { id: 'e6', subsidiaryCode: 'US-NY', subsidiaryId: 'US-NY', currencyCode: 'JPY', amount: 600000000, direction: 'LONG', dueDate: '2026-08-01', contractNo: '', originalRaw: '600000000', manualNote: '', source: 'demo', hedged: false, hedgeContractNo: '' },
+    { id: 'e7', subsidiaryCode: 'EU-FR', subsidiaryId: 'EU-FR', currencyCode: 'USD', amount: 12000000, direction: 'SHORT', dueDate: '2026-06-30', contractNo: '', originalRaw: '12000000', manualNote: '对美进口应付', source: 'demo', hedged: true, hedgeContractNo: 'HC-003' },
+    { id: 'e8', subsidiaryCode: 'EU-FR', subsidiaryId: 'EU-FR', currencyCode: 'GBP', amount: 5000000, direction: 'LONG', dueDate: '2026-07-15', contractNo: '', originalRaw: '5000000', manualNote: '', source: 'demo', hedged: false, hedgeContractNo: '' },
+    { id: 'e9', subsidiaryCode: 'JP-TK', subsidiaryId: 'JP-TK', currencyCode: 'USD', amount: 3000000, direction: 'SHORT', dueDate: '2026-06-30', contractNo: '', originalRaw: '3000000', manualNote: '', source: 'demo', hedged: false, hedgeContractNo: '' },
+    { id: 'e10', subsidiaryCode: 'JP-TK', subsidiaryId: 'JP-TK', currencyCode: 'CNY', amount: 2000000, direction: 'LONG', dueDate: '2026-07-01', contractNo: '', originalRaw: '2000000', manualNote: '对华出口', source: 'demo', hedged: false, hedgeContractNo: '' },
+    { id: 'e11', subsidiaryCode: 'UK-LD', subsidiaryId: 'UK-LD', currencyCode: 'EUR', amount: 7000000, direction: 'SHORT', dueDate: '2026-06-30', contractNo: '', originalRaw: '7000000', manualNote: '', source: 'demo', hedged: true, hedgeContractNo: 'HC-004' },
+    { id: 'e12', subsidiaryCode: 'UK-LD', subsidiaryId: 'UK-LD', currencyCode: 'USD', amount: 4000000, direction: 'LONG', dueDate: '2026-07-15', contractNo: '', originalRaw: '4000000', manualNote: '', source: 'demo', hedged: false, hedgeContractNo: '' },
   ]
 
   const hedgeContracts: HedgeContract[] = [
-    { id: 'h1', contractNo: 'HC-001', subsidiaryId: 's1', currencyCode: 'USD', notionalAmount: 5000000, direction: 'SHORT', dueDate: '2026-06-30', hedgeType: '远期', counterparty: '中行', originalRaw: 'HC-001', manualNote: '' },
-    { id: 'h2', contractNo: 'HC-002', subsidiaryId: 's2', currencyCode: 'EUR', notionalAmount: 8000000, direction: 'SHORT', dueDate: '2026-06-15', hedgeType: '期权', counterparty: '花旗', originalRaw: 'HC-002', manualNote: '' },
-    { id: 'h3', contractNo: 'HC-003', subsidiaryId: 's3', currencyCode: 'USD', notionalAmount: 12000000, direction: 'LONG', dueDate: '2026-06-30', hedgeType: '远期', counterparty: '德银', originalRaw: 'HC-003', manualNote: '' },
-    { id: 'h4', contractNo: 'HC-004', subsidiaryId: 's5', currencyCode: 'EUR', notionalAmount: 7000000, direction: 'LONG', dueDate: '2026-06-30', hedgeType: '互换', counterparty: '巴克莱', originalRaw: 'HC-004', manualNote: '' },
-    { id: 'h5', contractNo: 'HC-002', subsidiaryId: 's2', currencyCode: 'EUR', notionalAmount: 4000000, direction: 'SHORT', dueDate: '2026-06-15', hedgeType: '远期', counterparty: '汇丰', originalRaw: 'HC-002-duplicate', manualNote: '疑似重复录入，待核实' },
+    { id: 'h1', contractNo: 'HC-001', subsidiaryCode: 'CN-BJ', subsidiaryId: 'CN-BJ', currencyCode: 'USD', notionalAmount: 5000000, direction: 'SHORT', dueDate: '2026-06-30', hedgeType: '远期', counterparty: '中行', originalRaw: 'HC-001', manualNote: '' },
+    { id: 'h2', contractNo: 'HC-002', subsidiaryCode: 'US-NY', subsidiaryId: 'US-NY', currencyCode: 'EUR', notionalAmount: 8000000, direction: 'SHORT', dueDate: '2026-06-15', hedgeType: '期权', counterparty: '花旗', originalRaw: 'HC-002', manualNote: '' },
+    { id: 'h3', contractNo: 'HC-003', subsidiaryCode: 'EU-FR', subsidiaryId: 'EU-FR', currencyCode: 'USD', notionalAmount: 12000000, direction: 'LONG', dueDate: '2026-06-30', hedgeType: '远期', counterparty: '德银', originalRaw: 'HC-003', manualNote: '' },
+    { id: 'h4', contractNo: 'HC-004', subsidiaryCode: 'UK-LD', subsidiaryId: 'UK-LD', currencyCode: 'EUR', notionalAmount: 7000000, direction: 'LONG', dueDate: '2026-06-30', hedgeType: '互换', counterparty: '巴克莱', originalRaw: 'HC-004', manualNote: '' },
+    { id: 'h5', contractNo: 'HC-002', subsidiaryCode: 'US-NY', subsidiaryId: 'US-NY', currencyCode: 'EUR', notionalAmount: 4000000, direction: 'SHORT', dueDate: '2026-06-15', hedgeType: '远期', counterparty: '汇丰', originalRaw: 'HC-002-duplicate', manualNote: '疑似重复录入，待核实' },
   ]
 
   const exchangeRates: ExchangeRate[] = [

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useExposureStore } from '@/store/exposureStore'
-import { AlertTriangle, ChevronDown, ChevronUp, Check, X } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronUp, Check } from 'lucide-react'
 import type { Anomaly } from '@/types'
 
 const typeLabels: Record<Anomaly['type'], string> = {

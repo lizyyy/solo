@@ -14,6 +14,7 @@ export interface Currency {
 
 export interface Exposure {
   id: string
+  subsidiaryCode: string
   subsidiaryId: string
   currencyCode: string
   amount: number
@@ -30,6 +31,7 @@ export interface Exposure {
 export interface HedgeContract {
   id: string
   contractNo: string
+  subsidiaryCode: string
   subsidiaryId: string
   currencyCode: string
   notionalAmount: number
@@ -65,7 +67,7 @@ export interface Snapshot {
   createdBy: string
   summary: string
   cameraState: { position: [number, number, number]; target: [number, number, number] }
-  filterState: { currencies: string[]; subsidiaries: string[]; directions: string[] }
+  filterState: { currencies: string[]; subsidiaryCodes: string[]; directions: string[] }
   subsidiaries: Subsidiary[]
   currencies: Currency[]
   exposures: Exposure[]

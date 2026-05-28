@@ -12,14 +12,14 @@ export default function DetailPage() {
   const exposures = useExposureStore((s) => s.exposures)
   const hedgeContracts = useExposureStore((s) => s.hedgeContracts)
   const selectedCurrencies = useExposureStore((s) => s.selectedCurrencies)
-  const selectedSubsidiaries = useExposureStore((s) => s.selectedSubsidiaries)
+  const selectedSubsidiaryCodes = useExposureStore((s) => s.selectedSubsidiaryCodes)
   const selectedDirections = useExposureStore((s) => s.selectedDirections)
   const dataLoaded = useExposureStore((s) => s.dataLoaded)
   const [tab, setTab] = useState(0)
 
   const treeData = useMemo(
-    () => buildTreeData(subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaries, selectedDirections),
-    [subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaries, selectedDirections]
+    () => buildTreeData(subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaryCodes, selectedDirections),
+    [subsidiaries, currencies, exposures, hedgeContracts, selectedCurrencies, selectedSubsidiaryCodes, selectedDirections]
   )
 
   const summary = useMemo(() => calcSummary(exposures, hedgeContracts), [exposures, hedgeContracts])

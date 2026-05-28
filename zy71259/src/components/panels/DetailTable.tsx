@@ -15,12 +15,12 @@ export default function DetailTable() {
     ? selectedNodeId.startsWith('cur-')
       ? (() => {
           const parts = selectedNodeId.replace('cur-', '').split('-')
-          const subId = parts[0]
+          const subCode = parts[0]
           const curCode = parts.slice(1).join('-')
-          return exposures.filter((e) => e.subsidiaryId === subId && e.currencyCode === curCode)
+          return exposures.filter((e) => e.subsidiaryCode === subCode && e.currencyCode === curCode)
         })()
       : selectedNodeId.startsWith('sub-')
-        ? exposures.filter((e) => e.subsidiaryId === selectedNodeId.replace('sub-', ''))
+        ? exposures.filter((e) => e.subsidiaryCode === selectedNodeId.replace('sub-', ''))
         : exposures
     : exposures
 
@@ -64,14 +64,14 @@ export default function DetailTable() {
         </thead>
         <tbody>
           {filtered.map((exp) => {
-            const sub = subsidiaries.find((s) => s.id === exp.subsidiaryId)
-            const isSelected = selectedNodeId === `cur-${exp.subsidiaryId}-${exp.currencyCode}`
+            const sub = subsidiaries.find((s) => s.code === exp.subsidiaryCode)
+            const isSelected = selectedNodeId === `cur-${exp.subsidiaryCode}-${exp.currencyCode}`
             return (
               <tr
                 key={exp.id}
                 className={`border-b border-border/50 transition-colors ${isSelected ? 'bg-accent-green/5' : 'hover:bg-card'}`}
               >
-                <td className="py-2 px-2">{sub?.name || exp.subsidiaryId}</td>
+                <td className="py-2 px-2">{sub?.name || exp.subsidiaryCode}</td>
                 <td className="py-2 px-2 font-mono">{exp.currencyCode}</td>
                 <td className="py-2 px-2 text-right font-mono">
                   {exp.amount.toLocaleString()}

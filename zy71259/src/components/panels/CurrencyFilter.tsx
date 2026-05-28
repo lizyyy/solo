@@ -4,10 +4,10 @@ export default function CurrencyFilter() {
   const currencies = useExposureStore((s) => s.currencies)
   const subsidiaries = useExposureStore((s) => s.subsidiaries)
   const selectedCurrencies = useExposureStore((s) => s.selectedCurrencies)
-  const selectedSubsidiaries = useExposureStore((s) => s.selectedSubsidiaries)
+  const selectedSubsidiaryCodes = useExposureStore((s) => s.selectedSubsidiaryCodes)
   const selectedDirections = useExposureStore((s) => s.selectedDirections)
   const setSelectedCurrencies = useExposureStore((s) => s.setSelectedCurrencies)
-  const setSelectedSubsidiaries = useExposureStore((s) => s.setSelectedSubsidiaries)
+  const setSelectedSubsidiaryCodes = useExposureStore((s) => s.setSelectedSubsidiaryCodes)
   const setSelectedDirections = useExposureStore((s) => s.setSelectedDirections)
 
   const toggleCurrency = (code: string) => {
@@ -18,11 +18,11 @@ export default function CurrencyFilter() {
     }
   }
 
-  const toggleSubsidiary = (id: string) => {
-    if (selectedSubsidiaries.includes(id)) {
-      setSelectedSubsidiaries(selectedSubsidiaries.filter((s) => s !== id))
+  const toggleSubsidiary = (code: string) => {
+    if (selectedSubsidiaryCodes.includes(code)) {
+      setSelectedSubsidiaryCodes(selectedSubsidiaryCodes.filter((s) => s !== code))
     } else {
-      setSelectedSubsidiaries([...selectedSubsidiaries, id])
+      setSelectedSubsidiaryCodes([...selectedSubsidiaryCodes, code])
     }
   }
 
@@ -55,9 +55,9 @@ export default function CurrencyFilter() {
         <div className="flex flex-wrap gap-2">
           {subsidiaries.map((s) => (
             <span
-              key={s.id}
-              className={`tag ${selectedSubsidiaries.includes(s.id) ? 'tag-active' : 'tag-inactive'}`}
-              onClick={() => toggleSubsidiary(s.id)}
+              key={s.code}
+              className={`tag ${selectedSubsidiaryCodes.includes(s.code) ? 'tag-active' : 'tag-inactive'}`}
+              onClick={() => toggleSubsidiary(s.code)}
             >
               {s.name}
             </span>
@@ -82,7 +82,7 @@ export default function CurrencyFilter() {
         className="btn-secondary text-xs"
         onClick={() => {
           setSelectedCurrencies([])
-          setSelectedSubsidiaries([])
+          setSelectedSubsidiaryCodes([])
           setSelectedDirections([])
         }}
       >
