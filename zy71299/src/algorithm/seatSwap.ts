@@ -3,9 +3,11 @@ import {
   Seat,
   PaidSeat,
   CompanionGroup,
+  RebookingRecord,
   WeightConfig,
   SwapAction,
   ConflictEntry,
+  ConflictType,
   SwapScheme,
 } from '@/types';
 
@@ -193,15 +195,61 @@ export function generateSwapActions(
   return actions;
 }
 
+export function detectPreSwapOverbooking(
+  passengers: Passenger[],
+  rebookingRecords: RebookingRecord[]
+): ConflictEntry[] {
+  const conflicts: ConflictEntry[] = [];
+  let conflictId = 0;
+
+  const seatPassengerMap = new Map<string, Passenger[]>();
+  passengers.forEach((p) => {
+    if (!seatPassengerMap.has(p.currentSeat)) {
+      seatPassengerMap.set(p.currentSeat, []);
+    }
+    seatPassengerMap.get(p.currentSeat)!.push(p);
+  });
+
+  seatPassengerMap.forEach((paxList, seat) => {
+    if (paxList.length > 1) {
+      const rebookedIds = new Set(rebookingRecords.map((r) => r.passengerId));
+      paxList.forEach((p) => {
+        const isRebooked = rebookedIds.has(p.id);
+        const rebooking = rebookingRecords.find((r) => r.passengerId === p.id);
+        conflicts.push({
+          entryId: `conflict-preswap-${++conflictId}`,
+          conflictType: 'overbooked_duplicate',
+          affectedPassengerId: p.id,
+          description: `座位 ${seat} 被 ${paxList.length} 名乘客（${paxList.map((x) => x.name).join('、')}）重复占用`,
+          reason: isRebooked
+            ? `乘客 ${p.name} 已改签至航班 ${rebooking!.targetFlight}，但原座位 ${seat} 尚未释放，与 ${paxList.filter((x) => x.id !== p.id).map((x) => x.name).join('、')} 冲突`
+            : `航班超售，座位 ${seat} 同时分配给 ${paxList.length} 名乘客，需调座解决`,
+        });
+      });
+    }
+  });
+
+  return conflicts;
+}
+
 export function detectConflicts(
   passengers: Passenger[],
   seats: Seat[],
   actions: SwapAction[],
   paidSeats: PaidSeat[],
-  companionGroups: CompanionGroup[]
+  companionGroups: CompanionGroup[],
+  rebookingRecords: RebookingRecord[]
 ): ConflictEntry[] {
   const conflicts: ConflictEntry[] = [];
   let conflictId = 0;
+
+  const preSwapOverbooking = detectPreSwapOverbooking(passengers, rebookingRecords);
+  preSwapOverbooking.forEach((c) => {
+    conflicts.push({
+      ...c,
+      entryId: `conflict-${++conflictId}`,
+    });
+  });
 
   const newSeatAssignment = new Map<string, string>();
   passengers.forEach((p) => newSeatAssignment.set(p.id, p.currentSeat));
@@ -211,12 +259,18 @@ export function detectConflicts(
   actions.forEach((action) => {
     const paidSeat = paidSeatMap.get(action.passengerId);
     if (paidSeat) {
+      const originalSeat = action.fromSeat;
+      const isOverbookedSeat = preSwapOverbooking.some(
+        (c) => c.affectedPassengerId === action.passengerId
+      );
       conflicts.push({
         entryId: `conflict-${++conflictId}`,
         conflictType: 'paid_displaced',
         affectedPassengerId: action.passengerId,
-        description: `付费座位 ${action.fromSeat} 被更换为 ${action.toSeat}`,
-        reason: `超售或同行优化需要，乘客原付费座位 ${action.fromSeat}（费用 ¥${paidSeat.fee}）需调整`,
+        description: `付费座位 ${originalSeat} 被更换为 ${action.toSeat}，乘客已支付 ¥${paidSeat.fee}`,
+        reason: isOverbookedSeat
+          ? `超售导致座位 ${originalSeat} 需重新分配，乘客原付费座位（费用 ¥${paidSeat.fee}）被调整`
+          : `同行优化或调座需要，乘客原付费座位 ${originalSeat}（费用 ¥${paidSeat.fee}）被调整至 ${action.toSeat}`,
       });
     }
   });
@@ -231,17 +285,26 @@ export function detectConflicts(
       const cols = memberSeats.map((s) => s.match(/[A-Z]/)?.[0] || 'A');
 
       const allSameRow = rows.every((r) => r === rows[0]);
-      if (!allSameRow) {
+      const allAdjacent = allSameRow && cols.every((c, i) => i === 0 || Math.abs(c.charCodeAt(0) - cols[i - 1].charCodeAt(0)) <= 1);
+      if (!allSameRow || !allAdjacent) {
         group.passengerIds.forEach((pid) => {
           const passenger = passengers.find((p) => p.id === pid);
           if (passenger) {
+            const seat = newSeatAssignment.get(pid);
+            const otherMembers = group.passengerIds
+              .filter((id) => id !== pid)
+              .map((id) => {
+                const otherP = passengers.find((p) => p.id === id);
+                const otherSeat = newSeatAssignment.get(id);
+                return otherP ? `${otherP.name}(${otherSeat})` : id;
+              });
             conflicts.push({
               entryId: `conflict-${++conflictId}`,
               conflictType: 'companion_split',
               affectedPassengerId: pid,
               affectedGroupId: group.groupId,
-              description: `同行组 ${group.groupId} 成员 ${passenger.name} 座位 ${newSeatAssignment.get(pid)} 与其他成员分开`,
-              reason: `同行组 ${group.groupId} 共有 ${group.passengerIds.length} 人，当前座位无法全部相邻，需要分开安排`,
+              description: `同行组 ${group.groupId} 成员 ${passenger.name} 座位 ${seat} 与其他成员 ${otherMembers.join('、')} 分开`,
+              reason: `同行组 ${group.groupId} 共 ${group.passengerIds.length} 人，当前可用座位无法全部相邻，需分开安排`,
             });
           }
         });
@@ -249,32 +312,46 @@ export function detectConflicts(
     }
   });
 
-  const seatPassengerMap = new Map<string, string[]>();
+  const postSwapSeatMap = new Map<string, string[]>();
   newSeatAssignment.forEach((seat, pid) => {
-    if (!seatPassengerMap.has(seat)) {
-      seatPassengerMap.set(seat, []);
+    if (!postSwapSeatMap.has(seat)) {
+      postSwapSeatMap.set(seat, []);
     }
-    seatPassengerMap.get(seat)!.push(pid);
+    postSwapSeatMap.get(seat)!.push(pid);
   });
 
-  seatPassengerMap.forEach((pids, seat) => {
+  postSwapSeatMap.forEach((pids, seat) => {
     if (pids.length > 1) {
-      pids.forEach((pid) => {
-        const passenger = passengers.find((p) => p.id === pid);
-        if (passenger) {
-          conflicts.push({
-            entryId: `conflict-${++conflictId}`,
-            conflictType: 'overbooked_duplicate',
-            affectedPassengerId: pid,
-            description: `座位 ${seat} 被 ${pids.length} 名乘客重复分配`,
-            reason: `航班超售，座位 ${seat} 同时分配给 ${pids.length} 名乘客，需进一步调整`,
-          });
-        }
-      });
+      const alreadyListed = preSwapOverbooking.some((c) =>
+        c.description.includes(`座位 ${seat} 被`) && pids.includes(c.affectedPassengerId)
+      );
+      if (!alreadyListed) {
+        pids.forEach((pid) => {
+          const passenger = passengers.find((p) => p.id === pid);
+          if (passenger) {
+            conflicts.push({
+              entryId: `conflict-${++conflictId}`,
+              conflictType: 'overbooked_duplicate',
+              affectedPassengerId: pid,
+              description: `调座后座位 ${seat} 仍被 ${pids.length} 名乘客重复分配`,
+              reason: `调座方案未能完全消除超售冲突，座位 ${seat} 仍同时分配给 ${paxList_names(passengers, pids)}，需进一步调整`,
+            });
+          }
+        });
+      }
     }
   });
 
   return conflicts;
+}
+
+function paxList_names(passengers: Passenger[], pids: string[]): string {
+  return pids
+    .map((pid) => {
+      const p = passengers.find((x) => x.id === pid);
+      return p ? p.name : pid;
+    })
+    .join('、');
 }
 
 export function calculateTotalScore(
@@ -304,6 +381,7 @@ export function generateSwapSchemes(
   seats: Seat[],
   paidSeats: PaidSeat[],
   companionGroups: CompanionGroup[],
+  rebookingRecords: RebookingRecord[],
   weightConfig: WeightConfig,
   numSchemes: number = 3
 ): SwapScheme[] {
@@ -323,7 +401,7 @@ export function generateSwapSchemes(
 
   const assignments = hungarianAlgorithm(costMatrix);
   const actions = generateSwapActions(passengers, seats, assignments);
-  const conflicts = detectConflicts(passengers, seats, actions, paidSeats, companionGroups);
+  const conflicts = detectConflicts(passengers, seats, actions, paidSeats, companionGroups, rebookingRecords);
   const score = calculateTotalScore(actions, conflicts, weightConfig);
 
   schemes.push({
@@ -350,7 +428,7 @@ export function generateSwapSchemes(
 
     const altAssignments = hungarianAlgorithm(altCostMatrix);
     const altActions = generateSwapActions(passengers, seats, altAssignments);
-    const altConflicts = detectConflicts(passengers, seats, altActions, paidSeats, companionGroups);
+    const altConflicts = detectConflicts(passengers, seats, altActions, paidSeats, companionGroups, rebookingRecords);
     const altScore = calculateTotalScore(altActions, altConflicts, weightConfig);
 
     schemes.push({

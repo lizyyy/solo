@@ -12,6 +12,7 @@ export default function ComputePage() {
     seatMap,
     paidSeats,
     companionGroups,
+    rebookingRecords,
     weightConfig,
     setWeightConfig,
     swapSchemes,
@@ -37,6 +38,7 @@ export default function ComputePage() {
       seatMap.seats.filter((s) => s.status !== 'blocked'),
       paidSeats,
       companionGroups,
+      rebookingRecords,
       weightConfig,
       3
     );

@@ -30,7 +30,7 @@ export function generateSampleData(): {
   const companionGroups: CompanionGroup[] = [];
   const rebookingRecords: RebookingRecord[] = [];
 
-  for (let i = 0; i < 85; i++) {
+  for (let i = 0; i < 84; i++) {
     const row = Math.floor(i / 6) + 1;
     const col = cols[i % 6];
     const cabinClass = row <= 3 ? '商务舱' : row <= 6 ? '超级经济舱' : '经济舱';
@@ -42,6 +42,13 @@ export function generateSampleData(): {
       cabinClass,
     });
   }
+
+  passengers.push({
+    id: 'P085',
+    name: '周杰',
+    currentSeat: '1A',
+    cabinClass: '商务舱',
+  });
 
   const paidPassengerIndices = [0, 5, 10, 15, 20, 25, 30];
   paidPassengerIndices.forEach((idx, i) => {
@@ -82,6 +89,13 @@ export function generateSampleData(): {
     passengerId: passengers[25].id,
     originalSeat: passengers[25].currentSeat,
     targetFlight: 'CA5678',
+  });
+
+  rebookingRecords.push({
+    id: 'R003',
+    passengerId: 'P085',
+    originalSeat: '1A',
+    targetFlight: 'CA9999',
   });
 
   const seats = [];
