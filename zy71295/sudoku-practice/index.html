@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数独练习工具</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="panel board-panel">
+            <div class="panel-title">数独练习</div>
+
+            <div id="gapAlert" class="gap-alert" style="display: none;">
+                <div class="gap-alert-title">数据不完整</div>
+                <ul id="gapList" class="gap-list"></ul>
+            </div>
+
+            <div class="sudoku-board" id="sudokuBoard"></div>
+
+            <div class="control-panel">
+                <div class="num-pad" id="numPad">
+                    <button class="num-btn" data-value="1">1</button>
+                    <button class="num-btn" data-value="2">2</button>
+                    <button class="num-btn" data-value="3">3</button>
+                    <button class="num-btn" data-value="4">4</button>
+                    <button class="num-btn" data-value="5">5</button>
+                    <button class="num-btn" data-value="6">6</button>
+                    <button class="num-btn" data-value="7">7</button>
+                    <button class="num-btn" data-value="8">8</button>
+                    <button class="num-btn" data-value="9">9</button>
+                    <button class="num-btn clear" data-value="0">清除</button>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn undo" id="undoBtn" disabled>撤销</button>
+                    <button class="action-btn redo" id="redoBtn" disabled>重做</button>
+                    <button class="action-btn" id="checkBtn">检查</button>
+                    <button class="action-btn" id="resetBtn">重置</button>
+                </div>
+
+                <div class="hint-buttons">
+                    <button class="hint-btn level1" id="hint1Btn">一级提示<br><small>方向</small></button>
+                    <button class="hint-btn level2" id="hint2Btn">二级提示<br><small>技巧</small></button>
+                    <button class="hint-btn level3" id="hint3Btn">三级提示<br><small>答案</small></button>
+                </div>
+
+                <div class="hint-display" id="hintDisplay">
+                    <div class="hint-text">点击提示按钮获取提示</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">导入 / 导出</div>
+            <div class="import-export">
+                <textarea id="importText" placeholder="粘贴数独字符串、网格或JSON数据..."></textarea>
+                <div class="import-buttons">
+                    <button class="import-btn" id="importBtn">导入</button>
+                    <button class="export-btn" id="exportBoardBtn">导出棋盘</button>
+                    <button class="export-btn" id="exportReportBtn">导出报告</button>
+                </div>
+            </div>
+
+            <div class="status-bar" id="statusBar">
+                <div class="status-item">已填: <strong id="filledCount">0</strong>/81</div>
+                <div class="status-item">提示: <strong id="hintCount">0</strong></div>
+                <div class="status-item" id="conflictStatus" style="display: none;">⚠️ 存在冲突</div>
+                <div class="status-item" id="hintWarning" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">操作历史</div>
+            <div class="history-panel" id="historyPanel">
+                <div style="color: #718096; text-align: center; padding: 20px;">暂无操作记录</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">练习报告</div>
+            <div id="reportPanel">
+                <button class="import-btn" id="generateReportBtn" style="width: 100%; margin-bottom: 12px;">生成报告</button>
+                <div class="report-display" id="reportDisplay" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="duplicate-modal" id="duplicateModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-title">检测到重复导入</div>
+            <div class="modal-message" id="duplicateMessage">这个数独盘面之前已经导入过了，请选择处理方式：</div>
+            <div class="modal-buttons">
+                <button class="modal-btn skip" id="skipBtn">跳过</button>
+                <button class="modal-btn overwrite" id="overwriteBtn">覆盖</button>
+                <button class="modal-btn append" id="appendBtn">追加</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/sudoku-engine.js"></script>
+    <script src="js/solver.js"></script>
+    <script src="js/hint-system.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/io-manager.js"></script>
+    <script src="js/report.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
