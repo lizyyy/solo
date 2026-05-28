@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>唱片声场球面图 - 交互可视化</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d0f14;--panel:#13161d;--card:#1a1e27;--border:#2a2f3a;
+  --fg:#e8eaed;--muted:#8b8fa3;--accent:#5b8af5;--accent2:#f57b5b;
+  --warn:#f5c55b;--error:#f55b5b;--success:#5bf58b;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--fg);overflow:hidden;height:100vh;display:flex}
+#viewport{flex:1;position:relative;overflow:hidden}
+#viewport canvas{display:block}
+#sidebar{width:380px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.side-header{padding:20px;border-bottom:1px solid var(--border)}
+.side-header h1{font-size:18px;font-weight:700;letter-spacing:1px}
+.side-header p{font-size:12px;color:var(--muted);margin-top:4px}
+.side-body{flex:1;overflow-y:auto;padding:16px}
+.side-body::-webkit-scrollbar{width:4px}
+.side-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.section{margin-bottom:20px}
+.section-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.section-title .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.card-header .label{font-size:13px;font-weight:600}
+.badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600}
+.badge-l{background:rgba(91,138,245,.15);color:#5b8af5}
+.badge-r{background:rgba(245,123,91,.15);color:#f57b5b}
+.badge-warn{background:rgba(245,197,91,.15);color:#f5c55b}
+.badge-error{background:rgba(245,91,91,.15);color:#f55b5b}
+.badge-ok{background:rgba(91,245,139,.15);color:#5bf58b}
+.freq-bar-group{display:flex;align-items:flex-end;gap:3px;height:50px}
+.freq-bar{flex:1;border-radius:2px 2px 0 0;min-height:4px;transition:height .3s,background .3s;cursor:pointer;position:relative}
+.freq-bar:hover{opacity:.85}
+.freq-bar.missing{opacity:.3;background:var(--error)!important}
+.freq-labels{display:flex;gap:3px;margin-top:4px}
+.freq-labels span{flex:1;text-align:center;font-size:8px;color:var(--muted)}
+.param-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px}
+.param-row .k{color:var(--muted)}
+.param-row .v{font-weight:600;font-variant-numeric:tabular-nums}
+.input-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.input-row label{font-size:11px;color:var(--muted);width:40px;flex-shrink:0}
+.input-row input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--fg);font-size:12px;outline:none;transition:border-color .2s}
+.input-row input:focus{border-color:var(--accent)}
+.freq-tabs{display:flex;gap:4px;flex-wrap:wrap}
+.freq-tab{padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;background:var(--bg);border:1px solid var(--border);color:var(--muted);transition:all .2s}
+.freq-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.judgment-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;line-height:1.6}
+.judgment-box .icon{margin-right:4px}
+.judgment-box.warn{border-color:var(--warn)}
+.judgment-box.error{border-color:var(--error)}
+.judgment-box.ok{border-color:var(--success)}
+.btn-row{display:flex;gap:8px;padding:16px;border-top:1px solid var(--border)}
+.btn{flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#4a7ae0}
+.btn-secondary{background:var(--card);color:var(--fg);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--border)}
+#toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;animation:toastIn .3s ease;pointer-events:auto;max-width:500px}
+.toast.info{background:rgba(91,138,245,.9);color:#fff}
+.toast.warn{background:rgba(245,197,91,.9);color:#000}
+.toast.error{background:rgba(245,91,91,.9);color:#fff}
+.toast.success{background:rgba(91,245,139,.9);color:#000}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.overlay-hint{position:absolute;bottom:20px;left:20px;font-size:11px;color:var(--muted);pointer-events:none}
+.speaker-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.speaker-detail-grid .item{background:var(--bg);border-radius:6px;padding:8px;text-align:center}
+.speaker-detail-grid .item .val{font-size:16px;font-weight:700}
+.speaker-detail-grid .item .lbl{font-size:9px;color:var(--muted);margin-top:2px}
+.report-entry{background:var(--bg);border-radius:6px;padding:8px;margin-bottom:6px;font-size:11px}
+.report-entry .time{color:var(--muted);font-size:9px}
+.report-entry .desc{margin-top:2px}
+.listening-point-indicator{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.listening-point-indicator.ok{background:var(--success)}
+.listening-point-indicator.out{background:var(--error)}
+.legend{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.legend-item .swatch{width:12px;height:12px;border-radius:2px}
+</style>
+</head>
+<body>
+
+<div id="viewport">
+  <div class="overlay-hint">拖拽音箱标记移动摆位 · 滚轮缩放 · 左键旋转视角</div>
+</div>
+
+<div id="sidebar">
+  <div class="side-header">
+    <h1>唱片声场球面图</h1>
+    <p>音响店摆位预览 · 拖拽交互 · 实时同步</p>
+  </div>
+  <div class="side-body" id="sideBody"></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="window.exportScreenshot()">截图导出</button>
+    <button class="btn btn-primary" onclick="window.saveReport()">保存报告</button>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="importmap">
+{
+  "imports":{
+    "three":"https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+const FREQ_BANDS=[
+  {key:'sub',label:'超低',min:20,max:60,color:'#6b3fa0'},
+  {key:'bass',label:'低频',min:60,max:250,color:'#3f7fa0'},
+  {key:'mid',label:'中频',min:250,max:2000,color:'#5bf58b'},
+  {key:'upper',label:'中高',min:2000,max:6000,color:'#f5c55b'},
+  {key:'treble',label:'高频',min:6000,max:20000,color:'#f55b5b'}
+];
+
+const ROOM_DEFAULT={width:6,depth:5,height:3};
+const SPHERE_RADIUS=2;
+const SPEAKER_RADIUS=0.12;
+
+const state={
+  speakers:[
+    {id:0,label:'左声道',channel:'L',azimuth:-30,elevation:0,freqData:{sub:75,bass:82,mid:90,upper:88,treble:72}},
+    {id:1,label:'右声道',channel:'R',azimuth:30,elevation:0,freqData:{sub:73,bass:80,mid:91,upper:87,treble:70}},
+    {id:2,label:'中置',channel:'C',azimuth:0,elevation:0,freqData:{sub:65,bass:78,mid:92,upper:85,treble:68}},
+    {id:3,label:'左环绕',channel:'Ls',azimuth:-110,elevation:15,freqData:{sub:55,bass:65,mid:null,upper:60,treble:50}},
+    {id:4,label:'右环绕',channel:'Rs',azimuth:110,elevation:15,freqData:{sub:57,bass:63,mid:70,upper:null,treble:52}}
+  ],
+  room:{...ROOM_DEFAULT},
+  listeningPoint:{x:0,y:0,z:0},
+  activeBand:'mid',
+  selectedSpeaker:null,
+  reports:[],
+  judgments:[]
+};
+
+function azElToVec3(az,el,target){
+  const azR=THREE.MathUtils.degToRad(az);
+  const elR=THREE.MathUtils.degToRad(el);
+  const r=target?0:SPHERE_RADIUS;
+  const x=SPHERE_RADIUS*Math.cos(elR)*Math.sin(azR);
+  const y=SPHERE_RADIUS*Math.sin(elR);
+  const z=SPHERE_RADIUS*Math.cos(elR)*Math.cos(azR);
+  if(target){
+    target.set(x,y,z);
+    return target;
+  }
+  return new THREE.Vector3(x,y,z);
+}
+
+function vec3ToAzEl(v){
+  const r=v.length();
+  const el=Math.asin(THREE.MathUtils.clamp(v.y/r,-1,1));
+  const az=Math.atan2(v.x,v.z);
+  return{azimuth:THREE.MathUtils.radToDeg(az),elevation:THREE.MathUtils.radToDeg(el)};
+}
+
+function showToast(msg,type='info'){
+  const c=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.textContent=msg;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+function runJudgments(){
+  state.judgments=[];
+  const spks=state.speakers;
+
+  const left=spks.find(s=>s.channel==='L');
+  const right=spks.find(s=>s.channel==='R');
+  if(left&&right){
+    if(left.azimuth>0&&right.azimuth<0){
+      state.judgments.push({level:'error',msg:`左右声道反转：左声道方位角 ${left.azimuth.toFixed(1)}° 为正值，右声道 ${right.azimuth.toFixed(1)}° 为负值，极性可能接反`});
+    }else if(left.azimuth>=0){
+      state.judgments.push({level:'warn',msg:`左声道方位角 ${left.azimuth.toFixed(1)}° 非负，通常左声道应在听者左侧（负角度）`});
+    }else if(right.azimuth<=0){
+      state.judgments.push({level:'warn',msg:`右声道方位角 ${right.azimuth.toFixed(1)}° 非正，通常右声道应在听者右侧（正角度）`});
+    }else{
+      state.judgments.push({level:'ok',msg:'左右声道方位正常，左负右正'});
+    }
+  }
+
+  spks.forEach(s=>{
+    const missing=FREQ_BANDS.filter(b=>s.freqData[b.key]===null||s.freqData[b.key]===undefined);
+    if(missing.length>0){
+      state.judgments.push({level:'warn',msg:`${s.label}（${s.channel}）缺失数据：${missing.map(b=>b.label+'('+b.min+'-'+b.max+'Hz)').join('、')}，球面对应区域将显示为空缺`});
+    }
+  });
+
+  const lp=state.listeningPoint;
+  const rm=state.room;
+  const hw=rm.width/2,hd=rm.depth/2,hh=rm.height/2;
+  if(Math.abs(lp.x)>hw||Math.abs(lp.y)>hd||Math.abs(lp.z)>hh){
+    state.judgments.push({level:'error',msg:`试听点 (${lp.x.toFixed(1)}, ${lp.y.toFixed(1)}, ${lp.z.toFixed(1)}) 超出房间范围 (±${hw}, ±${hd}, ±${hh})`});
+  }else{
+    const margin=0.3;
+    const nearEdge=Math.abs(lp.x)>hw-margin||Math.abs(lp.y)>hd-margin||Math.abs(lp.z)>hh-margin;
+    if(nearEdge){
+      state.judgments.push({level:'warn',msg:`试听点接近房间边界（距墙<0.3m），低频驻波影响可能增大`});
+    }else{
+      state.judgments.push({level:'ok',msg:'试听点在房间有效区域内'});
+    }
+  }
+}
+
+let scene,camera,renderer,controls,sphereMesh,sphereMaterial;
+let speakerMeshes=[],speakerLines=[];
+let roomGroup,listeningPointMesh;
+let raycaster,mouse,dragTarget=null,dragPlane;
+let isDragging=false;
+let uniformsDirty=true;
+let lastDragRender=0;
+
+function init(){
+  const vp=document.getElementById('viewport');
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0d0f14);
+  scene.fog=new THREE.FogExp2(0x0d0f14,0.06);
+
+  camera=new THREE.PerspectiveCamera(55,vp.clientWidth/vp.clientHeight,0.1,100);
+  camera.position.set(3.5,2,4);
+
+  renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(vp.clientWidth,vp.clientHeight);
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.2;
+  vp.appendChild(renderer.domElement);
+
+  controls=new OrbitControls(camera,renderer.domElement);
+  controls.enableDamping=true;
+  controls.dampingFactor=0.08;
+  controls.minDistance=2;
+  controls.maxDistance=10;
+
+  const ambient=new THREE.AmbientLight(0x404060,0.5);
+  scene.add(ambient);
+  const dir=new THREE.DirectionalLight(0xffffff,1);
+  dir.position.set(5,8,5);
+  scene.add(dir);
+  const point=new THREE.PointLight(0x5b8af5,0.8,15);
+  point.position.set(0,3,0);
+  scene.add(point);
+
+  createSphere();
+  createSpeakers();
+  createRoom();
+  createListeningPoint();
+  createGrid();
+
+  raycaster=new THREE.Raycaster();
+  mouse=new THREE.Vector2();
+  dragPlane=new THREE.Plane();
+
+  renderer.domElement.addEventListener('pointerdown',onPointerDown);
+  renderer.domElement.addEventListener('pointermove',onPointerMove);
+  renderer.domElement.addEventListener('pointerup',onPointerUp);
+  window.addEventListener('resize',onResize);
+
+  runJudgments();
+  renderSidebar();
+
+  animate();
+}
+
+function createSphere(){
+  const geo=new THREE.SphereGeometry(SPHERE_RADIUS,96,64);
+  sphereMaterial=new THREE.ShaderMaterial({
+    uniforms:{
+      uSpeakerPos:{value:[new THREE.Vector3(),new THREE.Vector3(),new THREE.Vector3(),new THREE.Vector3(),new THREE.Vector3()]},
+      uSpeakerIntensity:{value:[0,0,0,0,0]},
+      uSpeakerHasData:{value:[0,0,0,0,0]},
+      uSpeakerColor:{value:[new THREE.Color(),new THREE.Color(),new THREE.Color(),new THREE.Color(),new THREE.Color()]},
+      uActiveBand:{value:2},
+      uTime:{value:0}
+    },
+    vertexShader:`
+      varying vec3 vPos;
+      varying vec3 vNorm;
+      varying vec2 vUv;
+      void main(){
+        vPos=position;
+        vNorm=normalize(normalMatrix*normal);
+        vUv=uv;
+        gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);
+      }
+    `,
+    fragmentShader:`
+      uniform vec3 uSpeakerPos[5];
+      uniform float uSpeakerIntensity[5];
+      uniform float uSpeakerHasData[5];
+      uniform vec3 uSpeakerColor[5];
+      uniform int uActiveBand;
+      uniform float uTime;
+      varying vec3 vPos;
+      varying vec3 vNorm;
+      varying vec2 vUv;
+
+      vec3 hsv2rgb(vec3 c){
+        vec4 K=vec4(1.0,2.0/3.0,1.0/3.0,3.0);
+        vec3 p=abs(fract(c.xxx+K.xyz)*6.0-K.www);
+        return c.z*mix(K.xxx,clamp(p-K.xxx,0.0,1.0),c.y);
+      }
+
+      void main(){
+        float totalIntensity=0.0;
+        vec3 weightedColor=vec3(0.0);
+        float anyData=0.0;
+
+        for(int i=0;i<5;i++){
+          float dist=distance(vPos,uSpeakerPos[i]);
+          float falloff=exp(-dist*dist*0.8);
+          float intensity=uSpeakerIntensity[i]*falloff*uSpeakerHasData[i];
+          totalIntensity+=intensity;
+          weightedColor+=uSpeakerColor[i]*intensity;
+          anyData+=uSpeakerHasData[i]*falloff;
+        }
+
+        vec3 baseColor=vec3(0.04,0.05,0.07);
+
+        if(totalIntensity>0.001){
+          vec3 avgColor=weightedColor/totalIntensity;
+          float hue=0.6-totalIntensity*0.005;
+          float sat=0.7+totalIntensity*0.002;
+          float val=clamp(totalIntensity*0.012,0.05,0.9);
+          vec3 fieldColor=hsv2rgb(vec3(hue,sat,val));
+          baseColor=mix(baseColor,fieldColor,clamp(totalIntensity*0.01,0.0,0.95));
+        }
+
+        if(anyData<0.01){
+          baseColor=vec3(0.08,0.03,0.03);
+        }
+
+        float rim=1.0-max(0.0,dot(vNorm,vec3(0.0,0.0,1.0)));
+        baseColor+=vec3(0.05,0.08,0.15)*rim*rim;
+
+        float pulse=0.95+0.05*sin(uTime*2.0+vPos.y*3.0);
+        baseColor*=pulse;
+
+        gl_FragColor=vec4(baseColor,0.88);
+      }
+    `,
+    transparent:true,
+    side:THREE.DoubleSide,
+    depthWrite:false
+  });
+  sphereMesh=new THREE.Mesh(geo,sphereMaterial);
+  scene.add(sphereMesh);
+
+  const wireGeo=new THREE.SphereGeometry(SPHERE_RADIUS*1.001,24,16);
+  const wireMat=new THREE.MeshBasicMaterial({color:0x2a2f3a,wireframe:true,transparent:true,opacity:0.15});
+  scene.add(new THREE.Mesh(wireGeo,wireMat));
+}
+
+function updateSphereUniforms(){
+  const band=state.activeBand;
+  const bandIdx=FREQ_BANDS.findIndex(b=>b.key===band);
+  const u=sphereMaterial.uniforms;
+  for(let i=0;i<5;i++){
+    if(i<state.speakers.length){
+      const s=state.speakers[i];
+      azElToVec3(s.azimuth,s.elevation,u.uSpeakerPos.value[i]);
+      const val=s.freqData[band];
+      u.uSpeakerHasData.value[i]=val!==null&&val!==undefined?1.0:0.0;
+      u.uSpeakerIntensity.value[i]=val||0;
+      u.uSpeakerColor.value[i].set(FREQ_BANDS[Math.max(0,bandIdx)].color);
+    }else{
+      u.uSpeakerPos.value[i].set(0,0,0);
+      u.uSpeakerIntensity.value[i]=0;
+      u.uSpeakerHasData.value[i]=0;
+      u.uSpeakerColor.value[i].set(0,0,0);
+    }
+  }
+  u.uActiveBand.value=bandIdx;
+}
+
+function createSpeakers(){
+  state.speakers.forEach((s,i)=>{
+    const geo=new THREE.SphereGeometry(SPEAKER_RADIUS,24,24);
+    const mat=new THREE.MeshStandardMaterial({
+      color:s.channel==='L'?0x5b8af5:s.channel==='R'?0xf57b5b:s.channel==='C'?0x5bf58b:0xf5c55b,
+      emissive:s.channel==='L'?0x2a4a9a:s.channel==='R'?0x9a3a2a:s.channel==='C'?0x2a9a4a:0x9a8a2a,
+      emissiveIntensity:0.4,
+      roughness:0.3,
+      metalness:0.6
+    });
+    const mesh=new THREE.Mesh(geo,mat);
+    const pos=azElToVec3(s.azimuth,s.elevation);
+    mesh.position.copy(pos);
+    mesh.userData={speakerId:i};
+    scene.add(mesh);
+    speakerMeshes.push(mesh);
+
+    const lineGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),pos]);
+    const lineMat=new THREE.LineBasicMaterial({color:mat.color,transparent:true,opacity:0.3});
+    const line=new THREE.Line(lineGeo,lineMat);
+    scene.add(line);
+    speakerLines.push(line);
+
+    const spriteMat=new THREE.SpriteMaterial({color:mat.color});
+    const sprite=new THREE.Sprite(spriteMat);
+    sprite.scale.set(0.08,0.08,1);
+    sprite.position.copy(pos.clone().normalize().multiplyScalar(SPHERE_RADIUS+0.25));
+    sprite.userData={speakerId:i};
+    scene.add(sprite);
+    speakerMeshes.push(sprite);
+  });
+}
+
+function updateSpeakerPositions(){
+  state.speakers.forEach((s,i)=>{
+    const pos=azElToVec3(s.azimuth,s.elevation);
+    const meshIdx=i*2;
+    speakerMeshes[meshIdx].position.copy(pos);
+
+    const lineGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),pos]);
+    speakerLines[i].geometry.dispose();
+    speakerLines[i].geometry=lineGeo;
+
+    const labelIdx=i*2+1;
+    speakerMeshes[labelIdx].position.copy(pos.clone().normalize().multiplyScalar(SPHERE_RADIUS+0.25));
+  });
+}
+
+function createRoom(){
+  roomGroup=new THREE.Group();
+  const rm=state.room;
+  const hw=rm.width/2,hd=rm.depth/2,hh=rm.height/2;
+  const geo=new THREE.BoxGeometry(rm.width,rm.height,rm.depth);
+  const edges=new THREE.EdgesGeometry(geo);
+  const mat=new THREE.LineBasicMaterial({color:0x2a3f5b,transparent:true,opacity:0.4});
+  roomGroup.add(new THREE.LineSegments(edges,mat));
+
+  const floorGeo=new THREE.PlaneGeometry(rm.width,rm.depth);
+  const floorMat=new THREE.MeshBasicMaterial({color:0x1a2040,transparent:true,opacity:0.15,side:THREE.DoubleSide});
+  const floor=new THREE.Mesh(floorGeo,floorMat);
+  floor.rotation.x=-Math.PI/2;
+  floor.position.y=-hh;
+  roomGroup.add(floor);
+
+  const scale=SPHERE_RADIUS/Math.min(hw,hd,hh)*0.8;
+  roomGroup.scale.setScalar(scale);
+  scene.add(roomGroup);
+}
+
+function updateRoom(){
+  scene.remove(roomGroup);
+  roomGroup.traverse(c=>{if(c.geometry)c.geometry.dispose();if(c.material)c.material.dispose()});
+  createRoom();
+}
+
+function createListeningPoint(){
+  const geo=new THREE.OctahedronGeometry(0.06,0);
+  const mat=new THREE.MeshStandardMaterial({color:0xf5c55b,emissive:0xf5c55b,emissiveIntensity:0.6});
+  listeningPointMesh=new THREE.Mesh(geo,mat);
+  listeningPointMesh.position.set(0,0,0);
+  scene.add(listeningPointMesh);
+}
+
+function createGrid(){
+  const gridHelper=new THREE.GridHelper(8,20,0x1a2040,0x111525);
+  gridHelper.position.y=-2.2;
+  scene.add(gridHelper);
+
+  const axes=new THREE.AxesHelper(0.5);
+  axes.position.set(-3.5,-2.2,-3.5);
+  scene.add(axes);
+}
+
+function onPointerDown(e){
+  const rect=renderer.domElement.getBoundingClientRect();
+  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+
+  const realMeshes=speakerMeshes.filter((_,i)=>i%2===0);
+  const hits=raycaster.intersectObjects(realMeshes);
+  if(hits.length>0){
+    dragTarget=hits[0].object;
+    const sId=dragTarget.userData.speakerId;
+    state.selectedSpeaker=sId;
+    isDragging=true;
+    controls.enabled=false;
+
+    const normal=dragTarget.position.clone().normalize();
+    dragPlane.setFromNormalAndCoplanarPoint(normal,new THREE.Vector3(0,0,0));
+
+    renderSidebar();
+  }
+}
+
+function onPointerMove(e){
+  if(!isDragging||!dragTarget)return;
+  const rect=renderer.domElement.getBoundingClientRect();
+  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+
+  const intersection=new THREE.Vector3();
+  raycaster.ray.intersectPlane(dragPlane,intersection);
+  if(intersection.length()>0.1){
+    intersection.normalize().multiplyScalar(SPHERE_RADIUS);
+    dragTarget.position.copy(intersection);
+    const ae=vec3ToAzEl(intersection);
+    const sId=dragTarget.userData.speakerId;
+    state.speakers[sId].azimuth=ae.azimuth;
+    state.speakers[sId].elevation=ae.elevation;
+
+    const lineIdx=sId;
+    const lineGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),intersection]);
+    speakerLines[lineIdx].geometry.dispose();
+    speakerLines[lineIdx].geometry=lineGeo;
+
+    const labelIdx=sId*2+1;
+    speakerMeshes[labelIdx].position.copy(intersection.clone().normalize().multiplyScalar(SPHERE_RADIUS+0.25));
+
+    dragPlane.setFromNormalAndCoplanarPoint(intersection.clone().normalize(),new THREE.Vector3(0,0,0));
+
+    runJudgments();
+    uniformsDirty=true;
+    const now=performance.now();
+    if(now-lastDragRender>100){
+      lastDragRender=now;
+      renderSidebar();
+    }
+  }
+}
+
+function onPointerUp(){
+  if(isDragging){
+    isDragging=false;
+    dragTarget=null;
+    controls.enabled=true;
+    renderSidebar();
+  }
+}
+
+function onResize(){
+  const vp=document.getElementById('viewport');
+  camera.aspect=vp.clientWidth/vp.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(vp.clientWidth,vp.clientHeight);
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  sphereMaterial.uniforms.uTime.value=performance.now()*0.001;
+  if(uniformsDirty){
+    updateSphereUniforms();
+    uniformsDirty=false;
+  }
+
+  listeningPointMesh.rotation.y+=0.01;
+  listeningPointMesh.rotation.x+=0.005;
+
+  renderer.render(scene,camera);
+}
+
+function renderSidebar(){
+  const body=document.getElementById('sideBody');
+  const band=state.activeBand;
+  const sel=state.selectedSpeaker!==null?state.speakers[state.selectedSpeaker]:null;
+
+  let html='';
+
+  html+=`<div class="section">
+    <div class="section-title"><span class="dot"></span>频段选择</div>
+    <div class="freq-tabs">
+      ${FREQ_BANDS.map(b=>`<div class="freq-tab ${b.key===band?'active':''}" onclick="window._setBand('${b.key}')">${b.label}<br><span style="font-size:8px;opacity:.6">${b.min}-${b.max}Hz</span></div>`).join('')}
+    </div>
+    <div class="legend">
+      ${FREQ_BANDS.map(b=>`<div class="legend-item"><div class="swatch" style="background:${b.color}"></div>${b.label}</div>`).join('')}
+    </div>
+  </div>`;
+
+  html+=`<div class="section">
+    <div class="section-title"><span class="dot"></span>音箱摆位</div>`;
+  state.speakers.forEach(s=>{
+    const missing=FREQ_BANDS.filter(b=>s.freqData[b.key]===null||s.freqData[b.key]===undefined);
+    const isSelected=state.selectedSpeaker===s.id;
+    html+=`<div class="card" style="${isSelected?'border-color:var(--accent)':''};cursor:pointer" onclick="window._selectSpeaker(${s.id})">
+      <div class="card-header">
+        <span class="label">${s.label}</span>
+        <span class="badge badge-${s.channel==='L'?'l':s.channel==='R'?'r':'warn'}">${s.channel}</span>
+      </div>
+      <div class="speaker-detail-grid">
+        <div class="item"><div class="val">${s.azimuth.toFixed(1)}°</div><div class="lbl">方位角</div></div>
+        <div class="item"><div class="val">${s.elevation.toFixed(1)}°</div><div class="lbl">仰角</div></div>
+      </div>
+      <div style="margin-top:8px">
+        <div style="font-size:9px;color:var(--muted);margin-bottom:4px">频响概览 · ${FREQ_BANDS.find(b=>b.key===band).label}频段</div>
+        <div class="freq-bar-group">
+          ${FREQ_BANDS.map(b=>{
+            const v=s.freqData[b.key];
+            const h=v!==null&&v!==undefined?v:0;
+            const missing_=v===null||v===undefined;
+            const active=b.key===band;
+            return`<div class="freq-bar ${missing_?'missing':''}" style="height:${h*0.5}px;background:${active?b.color:'var(--border)'}" title="${b.label}: ${missing_?'无数据':v+'dB'}"></div>`;
+          }).join('')}
+        </div>
+        <div class="freq-labels">${FREQ_BANDS.map(b=>`<span>${b.label.slice(0,1)}</span>`).join('')}</div>
+      </div>
+      ${missing.length>0?`<div style="margin-top:6px;font-size:10px;color:var(--error)">⚠ 缺失: ${missing.map(b=>b.label).join(', ')}</div>`:''}
+    </div>`;
+  });
+  html+=`</div>`;
+
+  html+=`<div class="section">
+    <div class="section-title"><span class="dot"></span>房间尺寸 (m)</div>
+    <div class="card">
+      <div class="input-row"><label>宽</label><input type="number" step="0.1" value="${state.room.width}" oninput="window._setRoom('width',this.value)"></div>
+      <div class="input-row"><label>深</label><input type="number" step="0.1" value="${state.room.depth}" oninput="window._setRoom('depth',this.value)"></div>
+      <div class="input-row"><label>高</label><input type="number" step="0.1" value="${state.room.height}" oninput="window._setRoom('height',this.value)"></div>
+    </div>
+  </div>`;
+
+  html+=`<div class="section">
+    <div class="section-title"><span class="dot"></span>试听点位置 (m)</div>
+    <div class="card">
+      <div class="input-row"><label>X</label><input type="number" step="0.1" value="${state.listeningPoint.x}" oninput="window._setLP('x',this.value)"></div>
+      <div class="input-row"><label>Y</label><input type="number" step="0.1" value="${state.listeningPoint.y}" oninput="window._setLP('y',this.value)"></div>
+      <div class="input-row"><label>Z</label><input type="number" step="0.1" value="${state.listeningPoint.z}" oninput="window._setLP('z',this.value)"></div>
+      <div class="param-row" id="lp-status">
+        <span class="k">状态</span>
+        <span class="v"><span class="listening-point-indicator ${isLPOutOfBounds()?'out':'ok'}"></span>${isLPOutOfBounds()?'越界':'有效'}</span>
+      </div>
+    </div>
+  </div>`;
+
+  html+=`<div class="section" id="judgments-section">
+    <div class="section-title"><span class="dot"></span>自动判断</div>`;
+  state.judgments.forEach(j=>{
+    html+=`<div class="judgment-box ${j.level}" style="margin-bottom:8px">
+      <span class="icon">${j.level==='ok'?'✓':j.level==='warn'?'⚠':'✕'}</span>
+      ${j.msg}
+    </div>`;
+  });
+  html+=`</div>`;
+
+  if(state.reports.length>0){
+    html+=`<div class="section">
+      <div class="section-title"><span class="dot"></span>声场报告</div>`;
+    state.reports.slice().reverse().forEach(r=>{
+      html+=`<div class="report-entry">
+        <div class="time">${r.time}</div>
+        <div class="desc">${r.desc}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  body.innerHTML=html;
+}
+
+function isLPOutOfBounds(){
+  const lp=state.listeningPoint;
+  const rm=state.room;
+  return Math.abs(lp.x)>rm.width/2||Math.abs(lp.y)>rm.depth/2||Math.abs(lp.z)>rm.height/2;
+}
+
+function updateJudgmentsUI(){
+  const sec=document.getElementById('judgments-section');
+  if(!sec)return;
+  let html='<div class="section-title"><span class="dot"></span>自动判断</div>';
+  state.judgments.forEach(j=>{
+    html+=`<div class="judgment-box ${j.level}" style="margin-bottom:8px">
+      <span class="icon">${j.level==='ok'?'✓':j.level==='warn'?'⚠':'✕'}</span>
+      ${j.msg}
+    </div>`;
+  });
+  sec.innerHTML=html;
+}
+
+function updateLPStatusUI(){
+  const el=document.getElementById('lp-status');
+  if(!el)return;
+  const out=isLPOutOfBounds();
+  el.innerHTML=`<span class="k">状态</span><span class="v"><span class="listening-point-indicator ${out?'out':'ok'}"></span>${out?'越界':'有效'}</span>`;
+}
+
+window._setBand=function(key){
+  state.activeBand=key;
+  uniformsDirty=true;
+  runJudgments();
+  renderSidebar();
+};
+
+window._selectSpeaker=function(id){
+  state.selectedSpeaker=id;
+  renderSidebar();
+};
+
+window._setRoom=function(dim,val){
+  const v=parseFloat(val);
+  if(isNaN(v)||v<=0)return;
+  state.room[dim]=v;
+  updateRoom();
+  runJudgments();
+  updateJudgmentsUI();
+  updateLPStatusUI();
+};
+
+window._setLP=function(axis,val){
+  const v=parseFloat(val);
+  if(isNaN(v))return;
+  state.listeningPoint[axis]=v;
+  runJudgments();
+  updateJudgmentsUI();
+  updateLPStatusUI();
+};
+
+window.exportScreenshot=function(){
+  renderer.render(scene,camera);
+  const data=renderer.domElement.toDataURL('image/png');
+  const a=document.createElement('a');
+  a.href=data;
+  a.download=`声场球面图_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.png`;
+  a.click();
+  showToast('截图已导出，包含当前频段与摆位信息','success');
+  state.reports.push({
+    time:new Date().toLocaleString('zh-CN'),
+    desc:`截图导出 · 频段=${state.activeBand} · 房间=${state.room.width}×${state.room.depth}×${state.room.height}m`,
+    snapshot:true
+  });
+  renderSidebar();
+};
+
+window.saveReport=function(){
+  const report={
+    version:'1.0',
+    timestamp:new Date().toISOString(),
+    room:{...state.room},
+    listeningPoint:{...state.listeningPoint},
+    activeBand:state.activeBand,
+    speakers:state.speakers.map(s=>({
+      id:s.id,
+      label:s.label,
+      channel:s.channel,
+      azimuth:Math.round(s.azimuth*10)/10,
+      elevation:Math.round(s.elevation*10)/10,
+      freqData:{...s.freqData}
+    })),
+    judgments:state.judgments.map(j=>({...j})),
+    _trace:{
+      source:'唱片声场球面图交互可视化',
+      exportType:'report',
+      schemaVersion:'1.0'
+    }
+  };
+
+  const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`声场报告_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showToast('报告已保存，所有参数可反查来源','success');
+  state.reports.push({
+    time:new Date().toLocaleString('zh-CN'),
+    desc:`报告保存 · 含${state.speakers.length}个音箱 · ${state.judgments.length}条判断`,
+    report:true
+  });
+  renderSidebar();
+};
+
+init();
+</script>
+</body>
+</html>
