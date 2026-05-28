@@ -50,12 +50,16 @@ function SystemInfoCard() {
         <div className="text-xs text-[#667788]">特征值</div>
         {eigen && (
           <div className="text-xs text-[#aabbcc] pl-2 space-y-0.5">
-            <div>λ₁ = {formatComplex(eigen.eigenvalues[0], eigen.eigenvalues[1] || 0)}</div>
-            {disc < -1e-8 && (
-              <div>λ₂ = {formatComplex(eigen.eigenvalues[0], -eigen.eigenvalues[1])}</div>
-            )}
-            {disc >= -1e-8 && eigen.eigenvalues.length >= 2 && (
-              <div>λ₂ = {eigen.eigenvalues[1].toFixed(3)}</div>
+            {disc >= -1e-8 ? (
+              <>
+                <div>λ₁ = {eigen.eigenvalues[0].toFixed(3)}</div>
+                <div>λ₂ = {eigen.eigenvalues[1].toFixed(3)}</div>
+              </>
+            ) : (
+              <>
+                <div>λ₁ = {formatComplex(eigen.eigenvalues[0], eigen.eigenvalues[1])}</div>
+                <div>λ₂ = {formatComplex(eigen.eigenvalues[0], -eigen.eigenvalues[1])}</div>
+              </>
             )}
           </div>
         )}
