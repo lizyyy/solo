@@ -237,7 +237,6 @@ export const useGameStore = create<GameState>()(
         })
 
         const totalTrapPoints = trapResults.reduce((sum, t) => sum + t.pointsEarned, 0)
-        const maxTrapPoints = trapResults.reduce((sum, t) => sum + t.pointsPossible, 0)
 
         let valuationScore = 0
         if (progress.valuation) {

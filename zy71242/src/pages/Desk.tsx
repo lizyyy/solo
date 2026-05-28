@@ -41,19 +41,8 @@ export default function Desk() {
   const lot = lots.find(l => l.id === lotId)
   const progress = getLotProgress(lotId || '')
 
-  useEffect(() => {
-    if (!activeProfileId || !lot) {
-      navigate('/')
-    }
-  }, [activeProfileId, lot, navigate])
-
-  if (!lot) return null
-
-  const readCount = progress?.readDocuments.length || 0
-  const collectedCount = progress?.collectedClues.length || 0
-  const totalClues = lot.traps.length
-
   const allClues = useMemo(() => {
+    if (!lot) return []
     return lot.documents.flatMap(doc =>
       doc.content.details
         .filter(s => s.isKeyClue && s.clueType)
@@ -71,6 +60,18 @@ export default function Desk() {
     if (activeTab === 'all') return allClues
     return allClues.filter(c => c.clueType === activeTab)
   }, [allClues, activeTab])
+
+  useEffect(() => {
+    if (!activeProfileId || !lot) {
+      navigate('/')
+    }
+  }, [activeProfileId, lot, navigate])
+
+  if (!lot) return null
+
+  const readCount = progress?.readDocuments.length || 0
+  const collectedCount = progress?.collectedClues.length || 0
+  const totalClues = lot.traps.length
 
   const handleDocClick = (docId: string) => {
     setSelectedDocId(docId)

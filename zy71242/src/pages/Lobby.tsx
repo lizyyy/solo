@@ -1,6 +1,9 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Star, Lock, Download, Upload, Trophy, ScrollText, Gavel } from 'lucide-react'
+import {
+  Star, Lock, Download, Upload, Trophy, ScrollText, Gavel,
+  HardDrive, Cloud, AlertTriangle, CheckCircle, Info
+} from 'lucide-react'
 import { useGameStore } from '@/store'
 import lots from '@/data/lots'
 import type { LotProgress } from '@/types'
@@ -47,11 +50,15 @@ export default function Lobby() {
   const navigate = useNavigate()
   const { activeProfileId, profiles, getLotProgress, exportAllData, importData } = useGameStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [showStorageInfo, setShowStorageInfo] = useState(false)
+  const [exportSuccess, setExportSuccess] = useState(false)
 
   const activeProfile = profiles.find(p => p.profileId === activeProfileId)
   const hasActiveProfile = !!activeProfileId && !!activeProfile
 
   const totalScore = activeProfile?.totalScore ?? 0
+  const completedCount = Object.values(activeProfile?.lotProgress || {})
+    .filter(p => p.completedAt).length
 
   const handleExport = () => {
     const json = exportAllData()
@@ -59,9 +66,12 @@ export default function Lobby() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `auction-challenge-${new Date().toISOString().slice(0, 10)}.json`
+    a.download = `拍卖行估价闯关-备份-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(url)
+
+    setExportSuccess(true)
+    setTimeout(() => setExportSuccess(false), 2000)
   }
 
   const handleImport = () => {
@@ -76,7 +86,9 @@ export default function Lobby() {
       const text = ev.target?.result as string
       const success = importData(text)
       if (!success) {
-        alert('导入失败，请检查文件格式')
+        alert('导入失败，请检查文件格式是否正确')
+      } else {
+        alert('数据导入成功！')
       }
     }
     reader.readAsText(file)
@@ -100,8 +112,52 @@ export default function Lobby() {
               <Gavel className="w-6 h-6 text-gold" />
               <span className="font-serif text-gold-light tracking-widest text-sm">AUCTION HOUSE</span>
             </div>
-            <ProfileManager />
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowStorageInfo(!showStorageInfo)}
+                className="flex items-center gap-1.5 text-parchment-dark hover:text-gold transition-colors"
+                title="数据存储说明"
+              >
+                <HardDrive className="w-4 h-4" />
+                <span className="font-body text-xs">数据存储</span>
+              </button>
+              <ProfileManager />
+            </div>
           </header>
+
+          {showStorageInfo && (
+            <div className="px-6 py-4 bg-wood-800/80 border-b border-gold/10">
+              <div className="max-w-3xl mx-auto parchment-card relative rounded-sm p-4">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-seal flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-serif text-ink font-semibold mb-2">数据存储说明</h4>
+                    <div className="font-body text-sm text-ink/70 space-y-2">
+                      <p>
+                        <HardDrive className="w-4 h-4 inline mr-1.5 text-gold" />
+                        <strong>本地存储：</strong>您的所有进度数据（鉴定师档案、关卡进度、估价记录等）
+                        自动保存在浏览器的本地存储（localStorage）中。
+                        刷新页面、关闭浏览器、重启服务后，数据仍然保留。
+                      </p>
+                      <p>
+                        <AlertTriangle className="w-4 h-4 inline mr-1.5 text-seal" />
+                        <strong>跨浏览器使用：</strong>由于浏览器安全限制，
+                        本地存储的数据无法在不同浏览器间自动共享。
+                        如需在其他浏览器或设备上继续，
+                        请使用下方「备份数据」和「恢复数据」功能。
+                      </p>
+                      <p>
+                        <Cloud className="w-4 h-4 inline mr-1.5 text-jade" />
+                        <strong>备份建议：</strong>完成重要进度后，
+                        建议定期导出备份文件保存。
+                        备份文件可在任何浏览器中导入恢复。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <section className="py-16 px-6 text-center">
             <div className="max-w-2xl mx-auto">
@@ -136,7 +192,7 @@ export default function Lobby() {
 
           {hasActiveProfile && (
             <section className="px-6 pb-8">
-              <div className="max-w-3xl mx-auto flex items-center justify-center gap-6">
+              <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-4">
                 <div className="flex items-center gap-2 px-4 py-2 gold-border rounded-sm bg-wood-800/30">
                   <Trophy className="w-5 h-5 text-gold" />
                   <div>
@@ -149,6 +205,13 @@ export default function Lobby() {
                   <div>
                     <p className="text-parchment-dark text-xs font-body">总分</p>
                     <p className="text-gold-light font-serif tracking-wide">{totalScore}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 gold-border rounded-sm bg-wood-800/30">
+                  <CheckCircle className="w-5 h-5 text-jade" />
+                  <div>
+                    <p className="text-parchment-dark text-xs font-body">已完成</p>
+                    <p className="text-jade-light font-serif tracking-wide">{completedCount}/3 关卡</p>
                   </div>
                 </div>
               </div>
@@ -211,18 +274,18 @@ export default function Lobby() {
                           {lot.subtitle}
                         </p>
 
-                        {status === '进行中' && (
+                        {status === '进行中' && progress && (
                           <div className="mt-3 pt-3 border-t border-ink/10">
                             <div className="flex items-center justify-between text-xs font-body text-ink/50">
-                              <span>已读 {progress!.readDocuments.length}/{lot.documents.length} 份文档</span>
-                              <span>已收集 {progress!.collectedClues.length} 条线索</span>
+                              <span>已读 {progress.readDocuments.length}/{lot.documents.length} 份文档</span>
+                              <span>已收集 {progress.collectedClues.length} 条线索</span>
                             </div>
                             <div className="mt-2 h-1 bg-ink/10 rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-gradient-to-r from-gold-dark to-gold rounded-full transition-all duration-500"
                                 style={{
                                   width: `${Math.round(
-                                    (progress!.readDocuments.length / lot.documents.length) * 100
+                                    (progress.readDocuments.length / lot.documents.length) * 100
                                   )}%`
                                 }}
                               />
@@ -249,26 +312,64 @@ export default function Lobby() {
             <div className="max-w-5xl mx-auto">
               <div className="flex items-center gap-3 mb-6">
                 <div className="h-px flex-1 bg-gradient-to-r from-gold/20 to-transparent" />
-                <h2 className="font-serif text-base text-gold/60 tracking-widest">数据管理</h2>
+                <h2 className="font-serif text-base text-gold/60 tracking-widest">数据备份与恢复</h2>
                 <div className="h-px flex-1 bg-gradient-to-l from-gold/20 to-transparent" />
               </div>
 
-              <div className="flex items-center justify-center gap-4">
-                <button onClick={handleExport} className="btn-gold text-sm flex items-center gap-2">
-                  <Download className="w-4 h-4" />
-                  导出数据
-                </button>
-                <button onClick={handleImport} className="btn-gold text-sm flex items-center gap-2">
-                  <Upload className="w-4 h-4" />
-                  导入数据
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".json"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
+              <div className="parchment-card relative rounded-sm p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gold/10 flex items-center justify-center">
+                      <Download className="w-6 h-6 text-gold" />
+                    </div>
+                    <h3 className="font-serif text-ink font-semibold mb-2">备份数据</h3>
+                    <p className="font-body text-sm text-ink/60 mb-4">
+                      将所有进度导出为备份文件，可在其他浏览器或设备上恢复
+                    </p>
+                    <button
+                      onClick={handleExport}
+                      className={`btn-gold text-sm flex items-center gap-2 mx-auto
+                                  ${exportSuccess ? 'animate-pulse-gold' : ''}`}
+                    >
+                      {exportSuccess ? (
+                        <>
+                          <CheckCircle className="w-4 h-4" />
+                          已导出
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-4 h-4" />
+                          导出备份文件
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-jade/10 flex items-center justify-center">
+                      <Upload className="w-6 h-6 text-jade" />
+                    </div>
+                    <h3 className="font-serif text-ink font-semibold mb-2">恢复数据</h3>
+                    <p className="font-body text-sm text-ink/60 mb-4">
+                      从备份文件恢复之前保存的进度数据
+                    </p>
+                    <button onClick={handleImport} className="btn-gold text-sm flex items-center gap-2 mx-auto">
+                      <Upload className="w-4 h-4" />
+                      导入备份文件
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".json"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+                <div className="mt-6 pt-4 border-t border-ink/10 text-center">
+                  <p className="font-body text-xs text-ink/50">
+                    💡 提示：建议定期备份数据。备份文件包含所有鉴定师档案和关卡进度。
+                  </p>
+                </div>
               </div>
             </div>
           </section>
