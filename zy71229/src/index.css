@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  body {
+    @apply bg-night-700 text-gray-100 font-sans;
+  }
+  
+  * {
+    @apply border-gray-700;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-night-600 border border-gray-700 rounded-sm;
+  }
+  
+  .panel-header {
+    @apply px-3 py-2 border-b border-gray-700 flex items-center justify-between;
+  }
+  
+  .panel-title {
+    @apply font-mono text-sm font-semibold text-gray-300;
+  }
+  
+  .source-badge {
+    @apply px-1.5 py-0.5 text-xs font-mono rounded-sm border;
+  }
+  
+  .glow-btn {
+    @apply px-4 py-2 border border-gray-600 bg-night-700 text-gray-200 
+           hover:border-gray-400 hover:bg-night-600 transition-all duration-200
+           active:scale-95 font-mono text-sm tracking-wide;
+  }
+  
+  .glow-btn-primary {
+    @apply glow-btn border-alert-green text-alert-green 
+           hover:border-alert-green hover:bg-alert-green/10;
+  }
+  
+  .glow-btn-danger {
+    @apply glow-btn border-alert-red text-alert-red 
+           hover:border-alert-red hover:bg-alert-red/10;
+  }
+  
+  .glow-btn-warning {
+    @apply glow-btn border-alert-yellow text-alert-yellow 
+           hover:border-alert-yellow hover:bg-alert-yellow/10;
+  }
+  
+  .status-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+  
+  .status-online {
+    @apply bg-alert-green;
+  }
+  
+  .status-warning {
+    @apply bg-alert-yellow animate-blink;
+  }
+  
+  .status-danger {
+    @apply bg-alert-red animate-glow;
+  }
+  
+  .anomaly-card {
+    @apply border-l-4 border-alert-red bg-night-600 p-3 mb-2 
+           animate-slide-in cursor-pointer hover:bg-night-500 transition-colors;
+  }
+  
+  .timeline-node {
+    @apply relative pl-8 pb-6 border-l border-gray-600;
+  }
+  
+  .timeline-node::before {
+    content: '';
+    @apply absolute left-[-5px] top-0 w-2.5 h-2.5 rounded-full bg-gray-500;
+  }
+  
+  .timeline-node.correct::before {
+    @apply bg-alert-green;
+  }
+  
+  .timeline-node.incorrect::before {
+    @apply bg-alert-red;
+  }
+  
+  .timeline-node.pending::before {
+    @apply bg-alert-yellow animate-blink;
+  }
+  
+  .map-hall {
+    @apply fill-night-600 stroke-gray-600 stroke-1 transition-all duration-200 
+           hover:fill-night-500 hover:stroke-gray-400 cursor-pointer;
+  }
+  
+  .map-hall.patrolled {
+    @apply fill-alert-green/20 stroke-alert-green/50;
+  }
+  
+  .map-hall.current {
+    @apply fill-night-400 stroke-alert-blue;
+  }
+  
+  .map-corner {
+    @apply fill-transparent stroke-transparent;
+  }
+  
+  .map-corner.unpatrolled {
+    @apply fill-alert-red/30 stroke-alert-red animate-blink;
+  }
+  
+  .map-corner.patrolled {
+    @apply fill-alert-green/30 stroke-alert-green;
+  }
+  
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #374151 #1e293b;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #1e293b;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #4b5563;
+  }
+}

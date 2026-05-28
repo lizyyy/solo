@@ -1,0 +1,130 @@
+import { Door, DataSource } from '../game/types';
+
+export const MOCK_DOORS: Door[] = [
+  {
+    id: 'door_1',
+    name: '一号厅正门',
+    hallId: 'hall_1',
+    position: { x: 150, y: 200 },
+    status: 'closed',
+    lastAccess: null,
+    accessLog: [
+      {
+        id: 'log_1',
+        timestamp: 0,
+        type: 'close',
+        source: DataSource.DOOR,
+        details: '系统自动关闭',
+      },
+    ],
+    falseAlarmCount: 0,
+  },
+  {
+    id: 'door_2',
+    name: '一号厅侧门',
+    hallId: 'hall_1',
+    position: { x: 50, y: 125 },
+    status: 'locked',
+    lastAccess: null,
+    accessLog: [
+      {
+        id: 'log_2',
+        timestamp: 0,
+        type: 'lock',
+        source: DataSource.DOOR,
+        details: '闭馆后上锁',
+      },
+    ],
+    falseAlarmCount: 0,
+  },
+  {
+    id: 'door_3',
+    name: '二号厅正门',
+    hallId: 'hall_2',
+    position: { x: 370, y: 200 },
+    status: 'closed',
+    lastAccess: null,
+    accessLog: [
+      {
+        id: 'log_3',
+        timestamp: 0,
+        type: 'close',
+        source: DataSource.DOOR,
+        details: '系统自动关闭',
+      },
+    ],
+    falseAlarmCount: 0,
+  },
+  {
+    id: 'door_4',
+    name: '三号厅正门',
+    hallId: 'hall_3',
+    position: { x: 140, y: 230 },
+    status: 'closed',
+    lastAccess: null,
+    accessLog: [
+      {
+        id: 'log_4',
+        timestamp: 0,
+        type: 'close',
+        source: DataSource.DOOR,
+        details: '系统自动关闭',
+      },
+    ],
+    falseAlarmCount: 0,
+  },
+  {
+    id: 'door_5',
+    name: '四号厅正门',
+    hallId: 'hall_4',
+    position: { x: 360, y: 230 },
+    status: 'closed',
+    lastAccess: null,
+    accessLog: [
+      {
+        id: 'log_5',
+        timestamp: 0,
+        type: 'close',
+        source: DataSource.DOOR,
+        details: '系统自动关闭',
+      },
+    ],
+    falseAlarmCount: 0,
+  },
+  {
+    id: 'door_6',
+    name: '五号厅正门',
+    hallId: 'hall_5',
+    position: { x: 490, y: 210 },
+    status: 'closed',
+    lastAccess: null,
+    accessLog: [
+      {
+        id: 'log_6',
+        timestamp: 0,
+        type: 'close',
+        source: DataSource.DOOR,
+        details: '系统自动关闭',
+      },
+    ],
+    falseAlarmCount: 0,
+  },
+  {
+    id: 'door_main',
+    name: '主入口',
+    hallId: '',
+    position: { x: 350, y: 400 },
+    status: 'locked',
+    lastAccess: null,
+    accessLog: [
+      {
+        id: 'log_main',
+        timestamp: 0,
+        type: 'lock',
+        source: DataSource.DOOR,
+        details: '安保人员锁闭',
+      },
+    ],
+    falseAlarmCount: 0,
+  },
+];
