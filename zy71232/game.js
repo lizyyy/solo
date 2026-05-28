@@ -394,8 +394,10 @@ const GameState = {
     checkIncompleteFields(report) {
         const missing = [];
         GameData.requiredFields.forEach(field => {
-            if (report[field] === undefined || report[field] === null || 
-                (Array.isArray(report[field]) && report[field].length === 0)) {
+            const value = report[field];
+            if (value === undefined || value === null) {
+                missing.push(field);
+            } else if (field === 'items' && Array.isArray(value) && value.length === 0) {
                 missing.push(field);
             }
         });

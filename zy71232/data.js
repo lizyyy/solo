@@ -213,7 +213,6 @@ const GameData = {
         'budget',
         'totalSpent',
         'items',
-        'score',
-        'issues'
+        'score'
     ]
 };
