@@ -1,6 +1,7 @@
 import { GateType, NoiseType } from '@/types';
 import { getGateInfo, getNoiseInfo } from '@/utils/quantum/quantumEngine';
 import { cn } from '@/lib/utils';
+import { useDraggable, useDroppable } from '@dnd-kit/core';
 
 interface QuantumGateProps {
   type: GateType;
@@ -164,6 +165,77 @@ export const GateSlot = ({
       onClick={onClick}
     >
       {children}
+    </div>
+  );
+};
+
+interface DraggableGateProps {
+  gateType: GateType;
+  id: string;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+export const DraggableGate = ({ gateType, id, size = 'sm' }: DraggableGateProps) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id,
+    data: { gateType },
+  });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        zIndex: isDragging ? 999 : 'auto',
+      }
+    : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className={cn(isDragging && 'opacity-50')}
+    >
+      <QuantumGate type={gateType} size={size} showLabel={false} isDragging={isDragging} />
+    </div>
+  );
+};
+
+interface DroppableSlotProps {
+  id: string;
+  qubit: number;
+  slot: number;
+  isOccupied?: boolean;
+  isError?: boolean;
+  onClick?: () => void;
+  children?: React.ReactNode;
+}
+
+export const DroppableSlot = ({
+  id,
+  isOccupied = false,
+  isError = false,
+  onClick,
+  children,
+}: DroppableSlotProps) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id,
+    disabled: isOccupied,
+  });
+
+  return (
+    <div ref={setNodeRef} className="relative">
+      <GateSlot
+        isOccupied={isOccupied}
+        isHighlighted={isOver && !isOccupied}
+        isError={isError}
+        onClick={onClick}
+      >
+        {children}
+      </GateSlot>
+      {isOver && !isOccupied && (
+        <div className="absolute inset-0 bg-cyan-400/20 rounded-lg pointer-events-none animate-pulse" />
+      )}
     </div>
   );
 };

@@ -11,7 +11,7 @@ export const levels: Level[] = [
     availableGates: ['H', 'X', 'CNOT'],
     targetGateSequence: [
       { qubit: 0, slot: 0, type: 'H' },
-      { qubit: 0, slot: 1, type: 'CNOT' },
+      { qubit: 1, slot: 1, type: 'CNOT' },
     ],
     targetProbabilities: {
       '00': 0.5,
