@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #2C1810;
+  color: #F5E6D3;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-museum-bronze text-museum-paper rounded-lg font-medium
+           transition-all duration-300 shadow-vintage-sm
+           hover:bg-museum-bronzeLight hover:shadow-vintage
+           active:scale-95
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-museum-bronze;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-transparent border-2 border-museum-bronze text-museum-bronze rounded-lg font-medium
+           transition-all duration-300
+           hover:bg-museum-bronze hover:text-museum-paper
+           active:scale-95
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-museum-cinnabar text-museum-paper rounded-lg font-medium
+           transition-all duration-300 shadow-vintage-sm
+           hover:bg-red-700 hover:shadow-vintage
+           active:scale-95;
+  }
+
+  .card {
+    @apply bg-museum-bgLight rounded-xl border border-museum-bronze/30 p-5 shadow-vintage;
+  }
+
+  .card-paper {
+    @apply bg-parchment text-museum-ink rounded-xl border border-museum-bronze/50 p-5 shadow-vintage;
+  }
+
+  .gauge-track {
+    stroke: #3D2317;
+    stroke-width: 12;
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  .gauge-progress {
+    stroke-width: 12;
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease-out;
+  }
+
+  .timeline-line {
+    @apply absolute left-4 top-0 bottom-0 w-0.5 bg-museum-bronze/30;
+  }
+
+  .timeline-dot {
+    @apply absolute left-4 w-3 h-3 rounded-full -translate-x-1/2 border-2;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #CD7F32 #3D2317;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #3D2317;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #CD7F32;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #DAA066;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .bg-noise {
+    position: relative;
+  }
+
+  .bg-noise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+  }
+}
