@@ -51,6 +51,8 @@ interface DataStore extends DataState {
   getDataSourceStatus: () => DataSourceStatus[];
   getDataQualityIssues: () => DataQualityIssue[];
   updateShelf: (shelfId: string, updates: Partial<Shelf>) => void;
+  updateRobot: (robotId: string, updates: Partial<Robot>) => void;
+  updateStation: (stationId: string, updates: Partial<ChargingStation>) => void;
   updateCongestionReport: (reportId: string, updates: Partial<CongestionReport>) => void;
 }
 
@@ -286,6 +288,31 @@ export const useDataStore = create<DataStore>((set, get) => ({
             ...floor,
             shelves: floor.shelves.map((shelf) =>
               shelf.id === shelfId ? { ...shelf, ...updates } : shelf
+            ),
+          })),
+        },
+      };
+    });
+  },
+
+  updateRobot: (robotId, updates) => {
+    set((state) => ({
+      robots: state.robots.map((robot) =>
+        robot.id === robotId ? { ...robot, ...updates } : robot
+      ),
+    }));
+  },
+
+  updateStation: (stationId, updates) => {
+    set((state) => {
+      if (!state.warehouse) return state;
+      return {
+        warehouse: {
+          ...state.warehouse,
+          floors: state.warehouse.floors.map((floor) => ({
+            ...floor,
+            chargingStations: floor.chargingStations.map((station) =>
+              station.id === stationId ? { ...station, ...updates } : station
             ),
           })),
         },

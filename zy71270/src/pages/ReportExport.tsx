@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
   FileText,
   Table,
@@ -13,8 +13,10 @@ import GlassPanel from '../components/common/GlassPanel';
 import Badge from '../components/common/Badge';
 import { useDataStore } from '../store/dataStore';
 import { useFilterStore } from '../store/filterStore';
+import { useModificationStore } from '../store/modificationStore';
 import { exportToPDF, exportToExcel, captureScene } from '../utils/exporters';
 import { formatTimestamp } from '../utils/format';
+import type { Shelf } from '../types';
 
 type ExportFormat = 'pdf' | 'excel' | 'image';
 type ReportType = 'density' | 'congestion' | 'charging' | 'full';
@@ -39,6 +41,7 @@ export default function ReportExport({ }: ReportExportProps) {
   const pathSegments = useDataStore((s) => s.pathSegments);
   const congestionReports = useDataStore((s) => s.congestionReports);
   const timeRange = useFilterStore((s) => s.timeRange);
+  const modifications = useModificationStore((s) => s.modifications);
 
   const [config, setConfig] = useState<ExportConfig>({
     format: 'pdf',
@@ -52,23 +55,60 @@ export default function ReportExport({ }: ReportExportProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
 
+  const topCongestedShelves = useMemo(() => {
+    if (!warehouse) return [];
+    const allShelves: Shelf[] = [];
+    for (const floor of warehouse.floors) {
+      allShelves.push(...floor.shelves);
+    }
+    return allShelves
+      .filter((s) => s.congestionLevel !== undefined && s.congestionLevel > 0)
+      .sort((a, b) => (b.congestionLevel ?? 0) - (a.congestionLevel ?? 0))
+      .slice(0, 10)
+      .map((s) => ({ id: s.id, level: s.congestionLevel ?? 0 }));
+  }, [warehouse]);
+
+  const chargingQueueCount = useMemo(() => {
+    if (!warehouse) return 0;
+    let count = 0;
+    for (const floor of warehouse.floors) {
+      for (const station of floor.chargingStations) {
+        count += station.queue.length;
+      }
+    }
+    return count;
+  }, [warehouse]);
+
   const handleExport = useCallback(async () => {
     setIsExporting(true);
     setExportSuccess(false);
     try {
-      const data = {
+      const baseConfig = {
         warehouseName: warehouse?.name ?? '未知仓库',
         robotCount: robots.length,
         segmentCount: pathSegments.length,
         congestionCount: congestionReports.length,
         timeRange: config.timeRange,
+        reportType: config.reportType,
+        includeHeatmap: config.includeHeatmap,
+        includePaths: config.includePaths,
+        includeQueue: config.includeQueue,
+        includeModificationHistory: config.includeModificationHistory,
+        topCongestedShelves,
+        chargingQueueCount,
+        modifications: config.includeModificationHistory ? modifications : undefined,
       };
 
       if (config.format === 'pdf') {
-        await exportToPDF(data, `仓储路径云图报告_${formatTimestamp(Date.now())}`);
+        await exportToPDF(baseConfig, `仓储路径云图报告_${formatTimestamp(Date.now())}`);
       } else if (config.format === 'excel') {
         await exportToExcel(
-          { pathSegments, congestionReports, robots },
+          {
+            ...baseConfig,
+            pathSegments,
+            congestionReports,
+            robots,
+          },
           `仓储数据_${formatTimestamp(Date.now())}`
         );
       } else {
@@ -80,7 +120,7 @@ export default function ReportExport({ }: ReportExportProps) {
     } finally {
       setIsExporting(false);
     }
-  }, [config, warehouse, robots, pathSegments, congestionReports]);
+  }, [config, warehouse, robots, pathSegments, congestionReports, topCongestedShelves, chargingQueueCount, modifications]);
 
   const formatOptions: { value: ExportFormat; label: string; icon: React.ElementType }[] = [
     { value: 'pdf', label: 'PDF 报告', icon: FileText },

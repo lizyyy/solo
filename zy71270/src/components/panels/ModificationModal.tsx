@@ -44,6 +44,8 @@ export default function ModificationModal({
   const getRobotById = useDataStore((s) => s.getRobotById);
   const getStationById = useDataStore((s) => s.getStationById);
   const updateShelf = useDataStore((s) => s.updateShelf);
+  const updateRobot = useDataStore((s) => s.updateRobot);
+  const updateStation = useDataStore((s) => s.updateStation);
 
   const recordModification = useModificationStore((s) => s.recordModification);
   const validateModificationReason = useModificationStore(
@@ -125,13 +127,28 @@ export default function ModificationModal({
       reason: reason.trim(),
     });
 
+    const numericShelfFields = ['capacity', 'currentStock', 'congestionLevel'];
+    const numericRobotFields = ['batteryLevel', 'currentFloor'];
+    const numericStationFields = ['power'];
+
     if (selectedElementType === 'shelf') {
-      const numericFields = ['capacity', 'currentStock', 'congestionLevel'];
       const updates: Record<string, unknown> = {};
-      updates[selectedField] = numericFields.includes(selectedField)
+      updates[selectedField] = numericShelfFields.includes(selectedField)
         ? Number(newValue)
         : newValue;
       updateShelf(selectedElementId, updates);
+    } else if (selectedElementType === 'robot') {
+      const updates: Record<string, unknown> = {};
+      updates[selectedField] = numericRobotFields.includes(selectedField)
+        ? Number(newValue)
+        : newValue;
+      updateRobot(selectedElementId, updates);
+    } else if (selectedElementType === 'station') {
+      const updates: Record<string, unknown> = {};
+      updates[selectedField] = numericStationFields.includes(selectedField)
+        ? Number(newValue)
+        : newValue;
+      updateStation(selectedElementId, updates);
     }
 
     setNewValue('');

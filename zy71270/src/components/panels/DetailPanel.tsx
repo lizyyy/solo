@@ -1,16 +1,19 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   Info,
   GitCompare,
   History,
   Edit3,
   X,
+  Plus,
+  Check,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useDataStore, useViewStore, useModificationStore } from '../../store';
 import type { Shelf, Robot, ChargingStation } from '../../types';
 import Badge from '../common/Badge';
 import GlassPanel from '../common/GlassPanel';
+import ModificationModal from './ModificationModal';
 import dayjs from 'dayjs';
 
 type DetailTab = 'detail' | 'compare' | 'history';
@@ -21,9 +24,16 @@ interface FieldRow {
   fieldName: string;
 }
 
+type CompareElement = {
+  id: string;
+  type: 'shelf' | 'robot' | 'station';
+  name: string;
+};
+
 export default function DetailPanel() {
   const [activeTab, setActiveTab] = useState<DetailTab>('detail');
   const [showModifyModal, setShowModifyModal] = useState(false);
+  const [compareList, setCompareList] = useState<CompareElement[]>([]);
 
   const selectedElementId = useViewStore((s) => s.selectedElementId);
   const selectedElementType = useViewStore((s) => s.selectedElementType);
@@ -63,6 +73,45 @@ export default function DetailPanel() {
     const entityType = selectedElementType === 'station' ? 'charging' : selectedElementType;
     return getModificationsByEntity(entityType as 'shelf' | 'trajectory' | 'congestion' | 'charging', selectedElementId);
   }, [selectedElementId, selectedElementType, getModificationsByEntity]);
+
+  const isInCompareList = useMemo(() => {
+    if (!selectedElementId || !selectedElementType || selectedElementType === 'path') return false;
+    return compareList.some((c) => c.id === selectedElementId);
+  }, [selectedElementId, selectedElementType, compareList]);
+
+  const toggleCompare = useCallback(() => {
+    if (!selectedElementId || !selectedElementType || selectedElementType === 'path') return;
+    if (isInCompareList) {
+      setCompareList((prev) => prev.filter((c) => c.id !== selectedElementId));
+    } else if (compareList.length < 2) {
+      const type = selectedElementType === 'station' ? 'charging' : selectedElementType;
+      let name = selectedElementId;
+      if (selectedElementType === 'shelf') {
+        const shelf = getShelfById(selectedElementId);
+        name = shelf ? `货架 ${shelf.id.slice(-4)}` : name;
+      } else if (selectedElementType === 'robot') {
+        const robot = getRobotById(selectedElementId);
+        name = robot?.name ?? name;
+      } else if (selectedElementType === 'station') {
+        const station = getStationById(selectedElementId);
+        name = station ? `充电站 ${station.id.slice(-4)}` : name;
+      }
+      setCompareList((prev) => [
+        ...prev,
+        { id: selectedElementId, type: selectedElementType as 'shelf' | 'robot' | 'station', name },
+      ]);
+    }
+  }, [selectedElementId, selectedElementType, compareList.length, isInCompareList, getShelfById, getRobotById, getStationById]);
+
+  const getEntityForCompare = useCallback(
+    (item: CompareElement) => {
+      if (item.type === 'shelf') return getShelfById(item.id);
+      if (item.type === 'robot') return getRobotById(item.id);
+      if (item.type === 'station') return getStationById(item.id);
+      return null;
+    },
+    [getShelfById, getRobotById, getStationById]
+  );
 
   const fields: FieldRow[] = useMemo(() => {
     if (!entity) return [];
@@ -117,18 +166,19 @@ export default function DetailPanel() {
   }
 
   return (
-    <GlassPanel
-      title="详情面板"
-      className="w-72"
-      actions={
-        <button
-          onClick={clearSelection}
-          className="p-1 rounded hover:bg-white/5 text-slate-400 hover:text-slate-200 transition-colors"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      }
-    >
+    <>
+      <GlassPanel
+        title="详情面板"
+        className="w-72"
+        actions={
+          <button
+            onClick={clearSelection}
+            className="p-1 rounded hover:bg-white/5 text-slate-400 hover:text-slate-200 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        }
+      >
       <div className="space-y-3">
         <div className="flex gap-1 border-b border-warehouse-border/30 pb-2">
           {tabs.map((tab) => (
@@ -158,15 +208,36 @@ export default function DetailPanel() {
                       ? '充电站'
                       : '路径'}
               </span>
-              {selectedElementType !== 'path' && (
-                <button
-                  onClick={() => setShowModifyModal(true)}
-                  className="btn btn-secondary text-xs py-1 px-2 gap-1"
-                >
-                  <Edit3 className="w-3 h-3" />
-                  修正
-                </button>
-              )}
+              <div className="flex gap-1">
+                {selectedElementType !== 'path' && (
+                  <>
+                    <button
+                      onClick={toggleCompare}
+                      disabled={!isInCompareList && compareList.length >= 2}
+                      className={cn(
+                        'btn text-xs py-1 px-2 gap-1',
+                        isInCompareList
+                          ? 'btn-primary'
+                          : 'btn-secondary',
+                        !isInCompareList && compareList.length >= 2 && 'opacity-50 cursor-not-allowed'
+                      )}
+                    >
+                      {isInCompareList ? (
+                        <><Check className="w-3 h-3" />已添加</>
+                      ) : (
+                        <><Plus className="w-3 h-3" />对比</>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setShowModifyModal(true)}
+                      className="btn btn-secondary text-xs py-1 px-2 gap-1"
+                    >
+                      <Edit3 className="w-3 h-3" />
+                      修正
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
             <table className="data-table">
               <tbody>
@@ -186,8 +257,113 @@ export default function DetailPanel() {
         )}
 
         {activeTab === 'compare' && (
-          <div className="text-center text-sm text-slate-500 py-4">
-            选择两个元素进行对比
+          <div className="space-y-3">
+            <div className="text-xs text-slate-400 mb-2">
+              已选择 {compareList.length}/2 个元素进行对比
+            </div>
+            {compareList.length === 0 ? (
+              <div className="text-center text-sm text-slate-500 py-4">
+                点击详情页的「对比」按钮添加元素
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {compareList.map((item, idx) => (
+                  <div key={item.id} className="card p-2 flex items-center justify-between">
+                    <div>
+                      <Badge variant={idx === 0 ? 'info' : 'warning'}>元素{idx + 1}</Badge>
+                      <span className="ml-2 text-sm text-slate-200">{item.name}</span>
+                    </div>
+                    <button
+                      onClick={() => setCompareList((prev) => prev.filter((c) => c.id !== item.id))}
+                      className="text-slate-500 hover:text-status-red transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                {compareList.length === 2 && compareList[0].type === compareList[1].type && (
+                  <div className="mt-4 border-t border-warehouse-border/30 pt-4">
+                    <div className="text-xs text-slate-400 mb-3">属性对比</div>
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th className="text-slate-500">属性</th>
+                          <th>元素1</th>
+                          <th>元素2</th>
+                          <th>差异</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(() => {
+                          const e1 = getEntityForCompare(compareList[0]);
+                          const e2 = getEntityForCompare(compareList[1]);
+                          if (!e1 || !e2) return null;
+                          const getFieldValue = (
+                            obj: unknown,
+                            field: string
+                          ): string => {
+                            const val = (obj as Record<string, unknown>)[field];
+                            if (val === undefined || val === null) return '--';
+                            if (Array.isArray(val)) return String(val.length);
+                            return String(val);
+                          };
+                          const fieldsToCompare =
+                            compareList[0].type === 'shelf'
+                              ? [
+                                  { label: '容量', field: 'capacity' },
+                                  { label: '库存', field: 'currentStock' },
+                                  { label: '区域', field: 'zone' },
+                                  { label: '拥堵等级', field: 'congestionLevel' },
+                                ]
+                              : compareList[0].type === 'robot'
+                                ? [
+                                    { label: '名称', field: 'name' },
+                                    { label: '型号', field: 'model' },
+                                    { label: '状态', field: 'status' },
+                                    { label: '电量', field: 'batteryLevel' },
+                                  ]
+                                : [
+                                    { label: '状态', field: 'status' },
+                                    { label: '功率', field: 'power' },
+                                    { label: '排队数', field: 'queue' },
+                                  ];
+                          return fieldsToCompare.map((f) => {
+                            const v1 = getFieldValue(e1, f.field);
+                            const v2 = getFieldValue(e2, f.field);
+                            const isDifferent = v1 !== v2;
+                            return (
+                              <tr key={f.field}>
+                                <td className="text-slate-400 text-xs">{f.label}</td>
+                                <td className="font-mono text-xs">{v1}</td>
+                                <td className="font-mono text-xs">{v2}</td>
+                                <td>
+                                  {isDifferent ? (
+                                    <Badge variant="warning">不同</Badge>
+                                  ) : (
+                                    <Badge variant="success">相同</Badge>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          });
+                        })()}
+                      </tbody>
+                    </table>
+                    <button
+                      onClick={() => setCompareList([])}
+                      className="btn btn-secondary w-full mt-4 text-xs"
+                    >
+                      清空对比
+                    </button>
+                  </div>
+                )}
+                {compareList.length === 2 && compareList[0].type !== compareList[1].type && (
+                  <div className="text-center text-sm text-status-amber py-2">
+                    类型不同的元素无法对比
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -225,6 +401,11 @@ export default function DetailPanel() {
           </div>
         )}
       </div>
-    </GlassPanel>
+      </GlassPanel>
+      <ModificationModal
+        isOpen={showModifyModal}
+        onClose={() => setShowModifyModal(false)}
+      />
+    </>
   );
 }
