@@ -122,7 +122,11 @@ export function generateDefaultParamSet(): ParamSet {
   return {
     id: 'default',
     name: '默认配置',
+    version: 1,
+    notes: '',
+    receipt: '',
     timestamp: Date.now(),
+    versionHistory: [],
     racks,
     cracUnits,
     aisleGap: AISLE_BASE_GAP,

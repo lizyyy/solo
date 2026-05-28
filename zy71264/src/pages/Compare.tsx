@@ -168,7 +168,8 @@ function ScoreCard({
       <div className="flex items-center justify-between">
         <div>
           <div className="text-dc-muted text-xs mb-1">{side === 'left' ? '方案 A' : '方案 B'}</div>
-          <div className="text-dc-text font-medium">{paramSet.name}</div>
+          <div className="text-dc-text font-medium">{paramSet.name} <span className="text-dc-muted text-xs">v{paramSet.version}</span></div>
+          {paramSet.notes && <div className="text-dc-muted text-xs mt-0.5 truncate max-w-[160px]">{paramSet.notes}</div>}
         </div>
         <div
           onClick={onMetricClick}
@@ -346,7 +347,7 @@ export default function Compare() {
               >
                 <option value="">选择方案 A...</option>
                 {savedParamSets.map((ps) => (
-                  <option key={ps.id} value={ps.id}>{ps.name}</option>
+                  <option key={ps.id} value={ps.id}>{ps.name} v{ps.version}</option>
                 ))}
               </select>
             </div>
@@ -381,7 +382,7 @@ export default function Compare() {
               >
                 <option value="">选择方案 B...</option>
                 {savedParamSets.map((ps) => (
-                  <option key={ps.id} value={ps.id}>{ps.name}</option>
+                  <option key={ps.id} value={ps.id}>{ps.name} v{ps.version}</option>
                 ))}
               </select>
             </div>

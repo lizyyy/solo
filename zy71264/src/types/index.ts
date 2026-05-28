@@ -38,10 +38,28 @@ export interface AnomalyItem {
   explanation: string
 }
 
+export interface VersionRecord {
+  version: number
+  timestamp: number
+  name: string
+  notes: string
+  receipt: string
+  snapshot: {
+    globalPowerKw: number
+    globalAirflowCfm: number
+    aisleGap: number
+    floorPerforation: number
+  }
+}
+
 export interface ParamSet {
   id: string
   name: string
+  version: number
+  notes: string
+  receipt: string
   timestamp: number
+  versionHistory: VersionRecord[]
   racks: RackConfig[]
   cracUnits: CRACUnit[]
   aisleGap: number

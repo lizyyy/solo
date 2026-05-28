@@ -145,6 +145,9 @@ export default function Report() {
   const handleCopySnapshot = () => {
     const snapshot = {
       name: paramSet.name,
+      version: paramSet.version,
+      notes: paramSet.notes,
+      receipt: paramSet.receipt,
       globalPowerKw: paramSet.globalPowerKw,
       globalAirflowCfm: paramSet.globalAirflowCfm,
       floorPerforation: paramSet.floorPerforation,
@@ -247,12 +250,28 @@ export default function Report() {
                 </div>
                 <div className="text-right">
                   <div className="text-sm text-gray-500">{formatDate(paramSet.timestamp)}</div>
-                  <div className="text-sm font-medium text-gray-700">{paramSet.name}</div>
+                  <div className="text-sm font-medium text-gray-700">{paramSet.name} <span className="text-gray-400 text-xs">v{paramSet.version}</span></div>
                 </div>
               </div>
 
               <div className="mb-8">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">概览</h2>
+                {(paramSet.notes || paramSet.receipt) && (
+                  <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                    {paramSet.notes && (
+                      <div className="mb-2">
+                        <span className="text-xs font-medium text-blue-700">备注：</span>
+                        <span className="text-sm text-blue-900">{paramSet.notes}</span>
+                      </div>
+                    )}
+                    {paramSet.receipt && (
+                      <div>
+                        <span className="text-xs font-medium text-blue-700">回执：</span>
+                        <span className="text-sm text-blue-900">{paramSet.receipt}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="flex items-start justify-between gap-6">
                   <div className={cn(
                     'px-6 py-4 rounded-lg border',
