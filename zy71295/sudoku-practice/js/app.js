@@ -24,6 +24,7 @@ var SudokuApp = (function() {
 
     function loadSamplePuzzle() {
         var sample = '..1.5....58.2.7....31...9..45....7..7...1..8....926..3...26....9.8.73....6.8..';
+        var oldBoardSnapshot = board.toJSON();
         board.loadFromString(sample);
         board.detectConflicts();
         renderBoard();
@@ -39,7 +40,7 @@ var SudokuApp = (function() {
             wasGiven: false,
             isGiven: false,
             description: '加载示例盘面'
-        });
+        }, oldBoardSnapshot);
         updateHistoryDisplay();
     }
 
@@ -330,7 +331,7 @@ var SudokuApp = (function() {
         } else {
             result = SudokuIO.parseString(text);
             if (result.ok) {
-                importData.board = result;
+                importData = result.data;
             }
         }
 
@@ -392,6 +393,8 @@ var SudokuApp = (function() {
             return;
         }
 
+        var oldBoardSnapshot = board.toJSON();
+
         if (mode !== 'append') {
             board = importData.board;
             hintHistory = importData.hintHistory || [];
@@ -413,7 +416,7 @@ var SudokuApp = (function() {
             wasGiven: false,
             isGiven: false,
             description: mode === 'append' ? '追加新盘面' : '导入盘面'
-        });
+        }, oldBoardSnapshot);
 
         currentHint = null;
         selectedCell = -1;

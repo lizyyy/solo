@@ -6,25 +6,31 @@ var SudokuIO = (function() {
         content = content.trim();
         var board = new SudokuEngine.Board();
         var raw = content.replace(/[^0-9.]/g, '');
+        var loadResult;
         if (raw.length === 81) {
-            return board.loadFromString(content);
-        }
-
-        var lines = content.split(/[\r\n]+/).filter(function(l) { return l.trim().length > 0; });
-        var values = [];
-        for (var i = 0; i < lines.length; i++) {
-            var line = lines[i].replace(/[|+-\s]/g, '');
-            for (var j = 0; j < line.length; j++) {
-                var ch = line[j];
-                if (/[0-9.]/.test(ch)) {
-                    values.push(ch === '.' ? 0 : parseInt(ch));
+            loadResult = board.loadFromString(raw);
+        } else {
+            var lines = content.split(/[\r\n]+/).filter(function(l) { return l.trim().length > 0; });
+            var values = [];
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].replace(/[|+-\s]/g, '');
+                for (var j = 0; j < line.length; j++) {
+                    var ch = line[j];
+                    if (/[0-9.]/.test(ch)) {
+                        values.push(ch === '.' ? 0 : parseInt(ch));
+                    }
                 }
             }
+            if (values.length === 81) {
+                loadResult = board.loadFromString(values.map(function(v) { return v === 0 ? '.' : v.toString(); }).join(''));
+            } else {
+                return { ok: false, error: '无法解析盘面格式，需要81个数字或点号，实际为' + values.length + '个' };
+            }
         }
-        if (values.length === 81) {
-            return board.loadFromString(values.map(function(v) { return v === 0 ? '.' : v.toString(); }).join(''));
+        if (!loadResult.ok) {
+            return loadResult;
         }
-        return { ok: false, error: '无法解析盘面格式，需要81个数字或点号' };
+        return { ok: true, data: { board: board } };
     }
 
     function parseJSON(content) {

@@ -4,13 +4,17 @@ var HistoryManager = (function() {
         return {
             undoStack: [],
             redoStack: [],
-            log: []
+            log: [],
+            snapshots: []
         };
     }
 
-    function pushAction(history, action) {
+    function pushAction(history, action, boardSnapshot) {
         action.timestamp = action.timestamp || Date.now();
         action.id = action.id || Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        if (boardSnapshot) {
+            action.snapshot = boardSnapshot;
+        }
         history.undoStack.push(action);
         history.redoStack = [];
         history.log.push({
@@ -45,10 +49,19 @@ var HistoryManager = (function() {
         if (history.undoStack.length === 0) return null;
         var action = history.undoStack.pop();
 
-        board.cells[action.index].value = action.oldValue;
-        board.cells[action.index].candidates = new Set(action.oldCandidates);
-        board.cells[action.index].given = action.wasGiven;
-        board.propagateAll();
+        if (action.index === -1 || action.type === 'import') {
+            if (action.snapshot) {
+                board.fromJSON(action.snapshot);
+                board.propagateAll();
+                board.detectConflicts();
+            }
+        } else if (action.index >= 0 && action.index < 81) {
+            board.cells[action.index].value = action.oldValue;
+            board.cells[action.index].candidates = new Set(action.oldCandidates);
+            board.cells[action.index].given = action.wasGiven;
+            board.propagateAll();
+            board.detectConflicts();
+        }
 
         history.redoStack.push(action);
         history.log.push({
@@ -65,10 +78,19 @@ var HistoryManager = (function() {
         if (history.redoStack.length === 0) return null;
         var action = history.redoStack.pop();
 
-        board.cells[action.index].value = action.newValue;
-        board.cells[action.index].candidates = new Set(action.newCandidates);
-        board.cells[action.index].given = action.isGiven;
-        board.propagateAll();
+        if (action.index === -1 || action.type === 'import') {
+            if (action.snapshot) {
+                board.fromJSON(action.snapshot);
+                board.propagateAll();
+                board.detectConflicts();
+            }
+        } else if (action.index >= 0 && action.index < 81) {
+            board.cells[action.index].value = action.newValue;
+            board.cells[action.index].candidates = new Set(action.newCandidates);
+            board.cells[action.index].given = action.isGiven;
+            board.propagateAll();
+            board.detectConflicts();
+        }
 
         history.undoStack.push(action);
         history.log.push({
