@@ -119,34 +119,58 @@ export const detectExceptions = (bill: Bill, allBills: Bill[]): ExceptionItem[] 
 export const checkAllBillsForExceptions = (bills: Bill[]): Bill[] => {
   return bills.map(bill => {
     const newExceptions = detectExceptions(bill, bills);
-    if (newExceptions.length > 0) {
-      const updatedBill = {
-        ...bill,
-        exceptions: [
-          ...bill.exceptions.filter(e => e.confirmed || !newExceptions.find(ne => ne.type === e.type)),
-          ...newExceptions
-        ],
-        updatedAt: new Date().toISOString(),
-      };
-
-      const hasHighSeverity = newExceptions.some(e => e.severity === 'high');
-      if (hasHighSeverity && bill.status !== 'to_confirm' && bill.status !== 'closed') {
-        updatedBill.status = 'to_confirm';
-        updatedBill.statusHistory = [
-          ...bill.statusHistory,
-          {
-            id: `hist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            status: 'to_confirm' as const,
-            timestamp: new Date().toISOString(),
-            operator: 'SYSTEM',
-            reason: '检测到高优先级异常，标记待确认',
-          }
-        ];
+    const updatedExistingExceptions = bill.exceptions.map(e => {
+      if (e.confirmed) return e;
+      const rule = rules.find(r => r.type === e.type);
+      if (rule && !rule.check(bill, bills)) {
+        return {
+          ...e,
+          confirmed: true,
+          confirmedBy: 'SYSTEM',
+          confirmedAt: new Date().toISOString(),
+          explanation: `${e.explanation}（条件已解除，系统自动确认）`,
+        };
       }
+      return e;
+    });
 
-      return updatedBill;
+    const existingUnconfirmedTypes = new Set(
+      updatedExistingExceptions.filter(e => !e.confirmed).map(e => e.type)
+    );
+    const exceptionsToAdd = newExceptions.filter(e => !existingUnconfirmedTypes.has(e.type));
+
+    const allExceptions = [...updatedExistingExceptions, ...exceptionsToAdd];
+
+    const exceptionsChanged =
+      allExceptions.length !== bill.exceptions.length ||
+      updatedExistingExceptions.some((e, i) => e.confirmed !== bill.exceptions[i]?.confirmed) ||
+      exceptionsToAdd.length > 0;
+
+    if (!exceptionsChanged) return bill;
+
+    const updatedBill: Bill = {
+      ...bill,
+      exceptions: allExceptions,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const hasNewHighSeverity = exceptionsToAdd.some(e => e.severity === 'high');
+    const hasUnconfirmedHigh = allExceptions.some(e => !e.confirmed && e.severity === 'high');
+    if (hasNewHighSeverity && hasUnconfirmedHigh && bill.status !== 'to_confirm' && bill.status !== 'closed') {
+      updatedBill.status = 'to_confirm';
+      updatedBill.statusHistory = [
+        ...bill.statusHistory,
+        {
+          id: `hist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          status: 'to_confirm' as const,
+          timestamp: new Date().toISOString(),
+          operator: 'SYSTEM',
+          reason: '检测到高优先级异常，标记待确认',
+        },
+      ];
     }
-    return bill;
+
+    return updatedBill;
   });
 };
 

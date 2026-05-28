@@ -264,63 +264,97 @@ export const parseFile = async (file: File): Promise<ImportResult> => {
   }
 };
 
-export const validateAndMergeBills = (existingBills: Bill[], newBills: Bill[]): Bill[] => {
+export interface MergeResult {
+  bills: Bill[];
+  affectedIds: Set<string>;
+}
+
+const isPledged = (s: string) => s === '已质押' || s === '质押中';
+
+const mergeSupplementaryInto = (
+  target: Bill,
+  source: Bill,
+  affectedIds: Set<string>
+): Bill => {
+  let updated = { ...target };
+  let changed = false;
+
+  if (source.releaseApplication && !target.releaseApplication) {
+    updated = {
+      ...updated,
+      releaseApplication: source.releaseApplication,
+      updatedAt: new Date().toISOString(),
+      statusHistory: [
+        ...updated.statusHistory,
+        {
+          id: `hist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          status: target.status,
+          timestamp: new Date().toISOString(),
+          operator: 'SYSTEM',
+          reason: `补传释放申请: ${source.releaseApplication}`,
+        },
+      ],
+    };
+    changed = true;
+  }
+
+  if (source.occupancyReport && !target.occupancyReport) {
+    updated = {
+      ...updated,
+      occupancyReport: source.occupancyReport,
+      updatedAt: new Date().toISOString(),
+    };
+    changed = true;
+  }
+
+  if (source.maturityDate !== target.maturityDate && !target.originalMaturityDate) {
+    updated = {
+      ...updated,
+      originalMaturityDate: target.maturityDate,
+      maturityDate: source.maturityDate,
+      updatedAt: new Date().toISOString(),
+      statusHistory: [
+        ...updated.statusHistory,
+        {
+          id: `hist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          status: updated.status,
+          timestamp: new Date().toISOString(),
+          operator: 'SYSTEM',
+          reason: `到期日变更: ${target.maturityDate} → ${source.maturityDate}`,
+        },
+      ],
+    };
+    changed = true;
+  }
+
+  if (changed) affectedIds.add(target.id);
+  return updated;
+};
+
+export const validateAndMergeBills = (existingBills: Bill[], newBills: Bill[]): MergeResult => {
   const merged = [...existingBills];
-  
+  const affectedIds = new Set<string>();
+
   for (const newBill of newBills) {
     const existingIndex = merged.findIndex(b => b.billNo === newBill.billNo && !b.isDirty);
-    
-    if (existingIndex >= 0) {
-      const existing = merged[existingIndex];
-      
-      if (newBill.releaseApplication && !existing.releaseApplication) {
-        merged[existingIndex] = {
-          ...existing,
-          releaseApplication: newBill.releaseApplication,
-          updatedAt: new Date().toISOString(),
-          statusHistory: [
-            ...existing.statusHistory,
-            {
-              id: `hist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-              status: existing.status,
-              timestamp: new Date().toISOString(),
-              operator: 'SYSTEM',
-              reason: `补传释放申请: ${newBill.releaseApplication}`,
-            }
-          ],
-        };
-      }
-      
-      if (newBill.occupancyReport && !existing.occupancyReport) {
-        merged[existingIndex] = {
-          ...merged[existingIndex],
-          occupancyReport: newBill.occupancyReport,
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      
-      if (newBill.maturityDate !== existing.maturityDate && !existing.originalMaturityDate) {
-        merged[existingIndex] = {
-          ...merged[existingIndex],
-          originalMaturityDate: existing.maturityDate,
-          maturityDate: newBill.maturityDate,
-          updatedAt: new Date().toISOString(),
-          statusHistory: [
-            ...merged[existingIndex].statusHistory,
-            {
-              id: `hist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-              status: merged[existingIndex].status,
-              timestamp: new Date().toISOString(),
-              operator: 'SYSTEM',
-              reason: `到期日变更: ${existing.maturityDate} → ${newBill.maturityDate}`,
-            }
-          ],
-        };
-      }
-    } else {
+
+    if (existingIndex < 0) {
       merged.push(newBill);
+      continue;
     }
+
+    const existing = merged[existingIndex];
+    const newPledged = isPledged(newBill.pledgeStatus);
+    const existingPledged = isPledged(existing.pledgeStatus);
+
+    if (newPledged && existingPledged) {
+      merged[existingIndex] = mergeSupplementaryInto(existing, newBill, affectedIds);
+      merged.push(newBill);
+      continue;
+    }
+
+    merged[existingIndex] = mergeSupplementaryInto(existing, newBill, affectedIds);
   }
-  
-  return merged;
+
+  return { bills: merged, affectedIds };
 };

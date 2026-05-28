@@ -115,17 +115,26 @@ const useBillStore = create<BillStore>()(
             autoTransition(bill, 'SYSTEM')
           );
 
-          const mergedBills = validateAndMergeBills(bills, processedBills);
-          
-          set({ bills: mergedBills });
-          
+          const { bills: mergedBills, affectedIds } = validateAndMergeBills(bills, processedBills);
+
+          const reprocessedBills = mergedBills.map(bill =>
+            affectedIds.has(bill.id) ? autoTransition(bill, 'SYSTEM') : bill
+          );
+
+          set({ bills: reprocessedBills });
+
           checkExceptions();
+
+          const afterCheck = get().bills;
+          const finalBills = afterCheck.map(bill => autoTransition(bill, 'SYSTEM'));
+          set({ bills: finalBills });
+
           recalculateOccupancy();
 
           addAuditLog({
             action: '批量导入',
             operator: 'User',
-            details: `导入文件 ${sourceFile}：共 ${result.total} 条，成功 ${result.validCount} 条，脏数据 ${result.dirtyCount} 条`,
+            details: `导入文件 ${sourceFile}：共 ${result.total} 条，成功 ${result.validCount} 条，脏数据 ${result.dirtyCount} 条，补传影响 ${affectedIds.size} 条已有票据`,
           });
 
           set({ isLoading: false });
