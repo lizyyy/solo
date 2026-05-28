@@ -1,0 +1,79 @@
+{
+  "报告基本信息": {
+    "report_id": "e58cb30cf836",
+    "generate_time": "2026-05-28 09:00:53",
+    "operator": "test_operator",
+    "include_items": [
+      "打款流水信息",
+      "警告信息",
+      "材料明细",
+      "回访明细",
+      "冷静期明细",
+      "错误详情"
+    ]
+  },
+  "认购单信息": {
+    "subscription_id": "e2bcff0825c3",
+    "order_no": "TEST001",
+    "investor_id": "INV001",
+    "investor_name": "张三",
+    "product_code": "PROD001",
+    "product_name": "私募产品A",
+    "subscription_amount": 1000000,
+    "submit_time": "2026-05-25 09:00:53",
+    "status": "已锁住"
+  },
+  "材料信息": {
+    "material_count": 3,
+    "materials": [
+      {
+        "material_id": "a837cf1a1585",
+        "material_type": "身份证",
+        "status": "有效",
+        "upload_date": "2026-05-28",
+        "expire_date": "2027-05-28",
+        "file_path": "/data/id/INV001_id.jpg"
+      },
+      {
+        "material_id": "cdc82c37c204",
+        "material_type": "合格投资者认定",
+        "status": "有效",
+        "upload_date": "2026-05-28",
+        "expire_date": "2026-11-24",
+        "file_path": "/data/qual/INV001_qual.pdf"
+      },
+      {
+        "material_id": "2e4b7494da85",
+        "material_type": "风险测评",
+        "status": "有效",
+        "upload_date": "2026-05-28",
+        "expire_date": "2026-08-26",
+        "file_path": "/data/risk/INV001_risk.pdf"
+      }
+    ]
+  },
+  "冷静期信息": {
+    "cool_off_id": "a69ff8e0537c",
+    "status": "冷静期完成",
+    "is_locked": true,
+    "lock_reason": "操作员[test_operator]于2026-05-28 09:00:53锁住：材料、冷静期、回访三者关联",
+    "start_time": "2026-05-26 09:00:53",
+    "end_time": "2026-05-27 09:00:53"
+  },
+  "回访信息": {
+    "visit_id": "097beb7fa503",
+    "status": "已确认",
+    "record_file": "/data/visit/TEST001.mp3",
+    "visit_time": "2026-05-26 10:00:53",
+    "operator": "test_op",
+    "confirm_result": true,
+    "confirm_time": "2026-05-28 09:00:53"
+  },
+  "打款流水": {
+    "flow_id": "46217778a729",
+    "amount": 1000000,
+    "pay_time": "2026-05-26 07:00:53",
+    "pay_account": "6222****1234",
+    "is_matched": false
+  }
+}

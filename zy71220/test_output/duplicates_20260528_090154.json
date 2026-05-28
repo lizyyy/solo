@@ -1,0 +1,32 @@
+[
+  {
+    "investor_id": "INV001",
+    "investor_name": "张三",
+    "product_code": "PROD001",
+    "count": 2,
+    "orders": [
+      {
+        "subscription_id": "d525b14108b0",
+        "order_no": "TEST001",
+        "subscription_amount": 1000000.0,
+        "submit_time": "2026-05-25 09:01:54",
+        "status": "草稿",
+        "cool_off_status": "冷静期中",
+        "errors": [
+          "重复认购: 张三在PROD001下有2单"
+        ]
+      },
+      {
+        "subscription_id": "8d5ad47fef36",
+        "order_no": "TEST004",
+        "subscription_amount": 2000000.0,
+        "submit_time": "2026-05-27 09:01:54",
+        "status": "草稿",
+        "cool_off_status": "冷静期中",
+        "errors": [
+          "重复认购: 张三在PROD001下有2单"
+        ]
+      }
+    ]
+  }
+]
