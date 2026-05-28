@@ -66,6 +66,7 @@ h1 { text-align: center; font-size: 1.6rem; font-weight: 600; color: var(--text)
 .tag-fx { background: var(--tag-fx-bg); color: var(--tag-fx); }
 .tag-duplicate { background: var(--tag-duplicate-bg); color: var(--tag-duplicate); }
 .tag-missing { background: var(--tag-missing-bg); color: var(--tag-missing); }
+.tag-field-gap { background: #fff3e0; color: #e65100; }
 
 /* Alert */
 .alert { padding: 12px 16px; border-radius: var(--radius); margin-bottom: 16px; font-size: .875rem; display: flex; align-items: center; gap: 8px; }
@@ -222,11 +223,11 @@ const STEPS = [
 ];
 
 const IMPORT_TYPES = [
-  { key: 'valuation', label: '估值表', icon: '📊', placeholder: '证券代码,证券名称,持仓数量,成本,市值\n600000,浦发银行,10000,120000.00,125000.00' },
-  { key: 'custodian', label: '托管回表', icon: '🏦', placeholder: '证券代码,证券名称,持仓数量,成本,市值\n600000,浦发银行,10000,120000.00,124800.00' },
-  { key: 'price', label: '价格源', icon: '💰', placeholder: '证券代码,价格源,价格,价格日期,价格时点\n600000,Wind,12.50,2025-05-27,收盘' },
-  { key: 'fx', label: '汇率', icon: '💱', placeholder: '货币对,汇率,汇率日期,汇率时点\nUSD/CNY,7.1100,2025-05-27,16:30' },
-  { key: 'expense', label: '费用计提', icon: '📋', placeholder: '费用科目,计提金额,计提日期,备注\n管理费,5000.00,2025-05-27,按1.5%年费率' }
+  { key: 'valuation', label: '估值表', icon: '📊', placeholder: '证券代码,证券名称,持仓数量,成本,市值\n600000,浦发银行,10000,120000.00,125000.00', requiredFields: ['证券代码', '证券名称', '持仓数量', '成本', '市值'] },
+  { key: 'custodian', label: '托管回表', icon: '🏦', placeholder: '证券代码,证券名称,持仓数量,成本,市值\n600000,浦发银行,10000,120000.00,124800.00', requiredFields: ['证券代码', '证券名称', '持仓数量', '成本', '市值'] },
+  { key: 'price', label: '价格源', icon: '💰', placeholder: '证券代码,价格源,价格,价格日期,价格时点\n600000,Wind,12.50,2025-05-27,收盘', requiredFields: ['证券代码', '价格源', '价格', '价格日期', '价格时点'] },
+  { key: 'fx', label: '汇率', icon: '💱', placeholder: '货币对,汇率,汇率日期,汇率时点\nUSD/CNY,7.1100,2025-05-27,16:30', requiredFields: ['货币对', '汇率', '汇率日期', '汇率时点'] },
+  { key: 'expense', label: '费用计提', icon: '📋', placeholder: '费用科目,计提金额,计提日期,备注\n管理费,5000.00,2025-05-27,按1.5%年费率', requiredFields: ['费用科目', '计提金额', '计提日期'] }
 ];
 
 const DEMO_DATA = {
@@ -234,11 +235,11 @@ const DEMO_DATA = {
 600000,浦发银行,10000,120000.00,125000.00
 000001,平安银行,8000,96000.00,97600.00
 600036,招商银行,5000,185000.00,187500.00
-000858,五粮液,2000,160000.00,162000.00
+000858,五粮液,2000,160000.00,
 601318,中国平安,3000,138000.00,135000.00
 BABA,阿里巴巴,1000,85000.00,86200.00
 AAPL,苹果公司,500,88000.00,88500.00
-110025,兴业转债,5000,525000.00,527500.00
+110025,兴业转债,5000,,527500.00
 123045,隆利转债,3000,294000.00,295800.00
 SH600519,贵州茅台,100,185000.00,186000.00`,
   custodian: `证券代码,证券名称,持仓数量,成本,市值
@@ -246,7 +247,7 @@ SH600519,贵州茅台,100,185000.00,186000.00`,
 000001,平安银行,8000,96000.00,97200.00
 600036,招商银行,5000,185000.00,187500.00
 000858,五粮液,2000,160000.00,162000.00
-601318,中国平安,3000,138000.00,136500.00
+601318,中国平安,3000,,136500.00
 BABA,阿里巴巴,1000,85000.00,85800.00
 AAPL,苹果公司,500,88000.00,88200.00
 110025,兴业转债,5000,525000.00,527500.00
@@ -254,22 +255,22 @@ AAPL,苹果公司,500,88000.00,88200.00
   price: `证券代码,价格源,价格,价格日期,价格时点
 600000,Wind,12.50,2025-05-27,收盘
 000001,Wind,12.20,2025-05-27,收盘
-600036,Bloomberg,37.50,2025-05-27,收盘
+600036,Bloomberg,37.50,2025-05-27,
 000858,Bloomberg,81.00,2025-05-27,收盘
 601318,Wind,45.00,2025-05-27,收盘
 BABA,Bloomberg,86.20,2025-05-27,收盘
 AAPL,Bloomberg,177.00,2025-05-27,收盘
 110025,Wind,105.50,2025-05-27,收盘
-123045,Wind,98.60,2025-05-27,收盘
+123045,Wind,98.60,,收盘
 SH600519,Wind,1860.00,2025-05-27,收盘`,
   fx: `货币对,汇率,汇率日期,汇率时点
 USD/CNY,7.1100,2025-05-27,16:30
 HKD/CNY,0.9080,2025-05-27,16:30
-EUR/CNY,7.7500,2025-05-27,16:30
+EUR/CNY,,2025-05-27,16:30
 USD/CNY,7.0950,2025-05-27,09:30`,
   expense: `费用科目,计提金额,计提日期,备注
 管理费,5000.00,2025-05-27,按1.5%年费率
-托管费,1666.67,2025-05-27,按0.5%年费率
+托管费,1666.67,,按0.5%年费率
 管理费,5000.00,2025-05-27,按1.5%年费率(重复)
 销售服务费,833.33,2025-05-27,按0.25%年费率
 利息支出,1200.00,2025-05-27,银行存款利息`
@@ -277,6 +278,13 @@ USD/CNY,7.0950,2025-05-27,09:30`,
 
 let currentStep = 1;
 let appData = {
+  valuation: [],
+  custodian: [],
+  price: [],
+  fx: [],
+  expense: []
+};
+let fieldGaps = {
   valuation: [],
   custodian: [],
   price: [],
@@ -327,6 +335,42 @@ function parseCSV(text) {
   });
 }
 
+function validateFieldGaps(typeKey, data) {
+  const typeConfig = IMPORT_TYPES.find(t => t.key === typeKey);
+  if (!typeConfig || !typeConfig.requiredFields) return [];
+
+  const gaps = [];
+  data.forEach((row, idx) => {
+    typeConfig.requiredFields.forEach(field => {
+      if (!row[field] || row[field].toString().trim() === '') {
+        gaps.push({
+          rowIndex: idx + 2,
+          identifier: row['证券代码'] || row['货币对'] || row['费用科目'] || ('第' + (idx + 2) + '行'),
+          field: field,
+          rawRow: row
+        });
+      }
+    });
+  });
+  return gaps;
+}
+
+function getFieldGapSummary(typeKey) {
+  const gaps = fieldGaps[typeKey] || [];
+  if (gaps.length === 0) return null;
+
+  const byField = {};
+  gaps.forEach(g => {
+    if (!byField[g.field]) byField[g.field] = [];
+    byField[g.field].push(g.identifier);
+  });
+
+  return {
+    totalGaps: gaps.length,
+    byField: byField
+  };
+}
+
 function handleFileUpload(key, input) {
   const file = input.files[0];
   if (!file) return;
@@ -352,6 +396,7 @@ function handleTextareaInput(key) {
 
 function loadImportData(key, text) {
   appData[key] = parseCSV(text);
+  fieldGaps[key] = validateFieldGaps(key, appData[key]);
   updateImportStatus(key);
   updateImportStats();
 }
@@ -359,11 +404,23 @@ function loadImportData(key, text) {
 function updateImportStatus(key) {
   const statusEl = document.getElementById('status-' + key);
   if (appData[key].length > 0) {
-    statusEl.textContent = '已加载 (' + appData[key].length + '条)';
-    statusEl.className = 'status status-loaded';
+    const gapCount = (fieldGaps[key] || []).length;
+    if (gapCount > 0) {
+      statusEl.textContent = '已加载 (' + appData[key].length + '条) · 字段缺口 ' + gapCount + ' 处';
+      statusEl.className = 'status status-empty';
+      statusEl.style.background = '#fff3e0';
+      statusEl.style.color = '#e65100';
+    } else {
+      statusEl.textContent = '已加载 (' + appData[key].length + '条)';
+      statusEl.className = 'status status-loaded';
+      statusEl.style.background = '';
+      statusEl.style.color = '';
+    }
   } else {
     statusEl.textContent = '未加载';
     statusEl.className = 'status status-empty';
+    statusEl.style.background = '';
+    statusEl.style.color = '';
   }
 }
 
@@ -371,7 +428,14 @@ function updateImportStats() {
   const el = document.getElementById('import-stats');
   const items = IMPORT_TYPES.map(t => {
     const count = appData[t.key].length;
-    return `<div class="stat-card ${count > 0 ? 'success' : 'error'}"><div class="stat-value">${count}</div><div class="stat-label">${t.label}记录数</div></div>`;
+    const gapCount = (fieldGaps[t.key] || []).length;
+    let colorClass = count > 0 ? 'success' : 'error';
+    if (gapCount > 0) colorClass = 'warning';
+    let extra = '';
+    if (gapCount > 0) {
+      extra = '<div style="color:var(--warning);font-size:.7rem;margin-top:2px">⚠ ' + gapCount + '处字段缺口</div>';
+    }
+    return `<div class="stat-card ${colorClass}"><div class="stat-value">${count}</div><div class="stat-label">${t.label}记录数</div>${extra}</div>`;
   });
   el.innerHTML = items.join('');
 }
@@ -387,6 +451,7 @@ function clearAllData() {
   IMPORT_TYPES.forEach(t => {
     document.getElementById('textarea-' + t.key).value = '';
     appData[t.key] = [];
+    fieldGaps[t.key] = [];
     updateImportStatus(t.key);
     document.getElementById('file-name-' + t.key).textContent = '未选择文件';
   });
@@ -404,6 +469,22 @@ function validateStep1() {
       alerts.push({ type: 'error', msg: `缺少必需数据：${label}，请先导入后再继续` });
     }
   });
+
+  const allFieldGaps = [];
+  IMPORT_TYPES.forEach(t => {
+    const gaps = fieldGaps[t.key] || [];
+    if (gaps.length > 0) {
+      const summary = getFieldGapSummary(t.key);
+      const fields = Object.keys(summary.byField).map(f => f + '(' + summary.byField[f].length + ')').join(', ');
+      allFieldGaps.push({ type: t.label, count: summary.totalGaps, fields: fields });
+    }
+  });
+
+  if (allFieldGaps.length > 0) {
+    const details = allFieldGaps.map(g => `${g.type}: ${g.count}处(${g.fields})`).join('；');
+    alerts.push({ type: 'warning', msg: `检测到字段级缺口：${details}。缺口已在差异归因中列出，不会被静默忽略。建议补全后再进行估值。` });
+  }
+
   if (appData.price.length === 0) {
     alerts.push({ type: 'warning', msg: '建议导入价格源数据以进行价格版本检查' });
   }
@@ -578,6 +659,31 @@ function computeDifferences() {
     }
   });
 
+  IMPORT_TYPES.forEach(type => {
+    const gaps = fieldGaps[type.key] || [];
+    const summary = getFieldGapSummary(type.key);
+    if (summary && summary.totalGaps > 0) {
+      Object.keys(summary.byField).forEach(field => {
+        const identifiers = summary.byField[field];
+        identifiers.forEach(identifier => {
+          differences.push({
+            id: 'fg-' + type.key + '-' + field + '-' + identifier,
+            code: identifier,
+            name: type.label + '字段缺失',
+            category: 'field-gap',
+            categoryLabel: '字段缺口',
+            field: field,
+            valuationValue: '缺失',
+            custodianValue: '-',
+            diff: '-',
+            tags: ['field-gap'],
+            fieldGapType: type.label
+          });
+        });
+      });
+    }
+  });
+
   differences.forEach(d => {
     if (!confirmStates[d.id]) confirmStates[d.id] = 'pending';
   });
@@ -588,8 +694,8 @@ function renderStep2() {
   const el = document.getElementById('attribution-stats');
   const cats = {};
   differences.forEach(d => { cats[d.category] = (cats[d.category] || 0) + 1; });
-  const catNames = { price: '价格差异', fx: '汇率差异', expense: '费用差异', quantity: '数量差异', missing: '缺失数据', cost: '成本差异' };
-  const catColors = { price: 'warning', fx: 'error', expense: 'duplicate', quantity: 'primary', missing: 'missing', cost: 'primary' };
+  const catNames = { price: '价格差异', fx: '汇率差异', expense: '费用差异', quantity: '数量差异', missing: '缺失数据', cost: '成本差异', 'field-gap': '字段缺口' };
+  const catColors = { price: 'warning', fx: 'error', expense: 'duplicate', quantity: 'primary', missing: 'missing', cost: 'primary', 'field-gap': 'warning' };
   el.innerHTML = `<div class="stat-card error"><div class="stat-value">${differences.length}</div><div class="stat-label">差异总数</div></div>` +
     Object.keys(cats).map(c => `<div class="stat-card ${catColors[c] || 'primary'}"><div class="stat-value">${cats[c]}</div><div class="stat-label">${catNames[c] || c}</div></div>`).join('');
 
@@ -600,6 +706,8 @@ function renderStep2() {
   } else {
     const missingCount = differences.filter(d => d.category === 'missing').length;
     const fxCount = differences.filter(d => d.category === 'fx').length;
+    const fieldGapCount = differences.filter(d => d.category === 'field-gap').length;
+    if (fieldGapCount > 0) alertHTML += '<div class="alert alert-error">发现 ' + fieldGapCount + ' 处字段级缺口，请补全数据后再做估值！缺口已全部列出，不会静默忽略。</div>';
     if (missingCount > 0) alertHTML += '<div class="alert alert-error">发现 ' + missingCount + ' 条缺失数据差异，请重点关注！</div>';
     if (fxCount > 0) alertHTML += '<div class="alert alert-warning">发现 ' + fxCount + ' 条汇率时点差异，请核实汇率取值时点。</div>';
   }
@@ -607,8 +715,8 @@ function renderStep2() {
 
   const table = document.getElementById('attribution-table');
   table.querySelector('thead').innerHTML = '<tr><th>证券代码</th><th>证券名称</th><th>差异类型</th><th>字段</th><th>估值表值</th><th>托管回表值</th><th>差异金额</th><th>标签</th></tr>';
-  const catTagMap = { price: 'tag-mixed', fx: 'tag-fx', expense: 'tag-duplicate', missing: 'tag-missing', quantity: 'tag-mixed', cost: 'tag-mixed' };
-  const tagLabelMap = { mixed: '混用价格源', fx: '汇率时点', duplicate: '重复计提', missing: '缺失数据', price: '价格差异', quantity: '数量差异', cost: '成本差异' };
+  const catTagMap = { price: 'tag-mixed', fx: 'tag-fx', expense: 'tag-duplicate', missing: 'tag-missing', quantity: 'tag-mixed', cost: 'tag-mixed', 'field-gap': 'tag-field-gap' };
+  const tagLabelMap = { mixed: '混用价格源', fx: '汇率时点', duplicate: '重复计提', missing: '缺失数据', price: '价格差异', quantity: '数量差异', cost: '成本差异', 'field-gap': '字段缺口' };
   table.querySelector('tbody').innerHTML = differences.map(d => {
     const diffCls = parseFloat(d.diff) > 0 ? 'diff-positive' : parseFloat(d.diff) < 0 ? 'diff-negative' : '';
     const tags = d.tags.map(t => `<span class="tag ${catTagMap[d.category] || 'tag-mixed'}">${tagLabelMap[t] || t}</span>`).join(' ');
@@ -729,8 +837,8 @@ function renderStep5() {
 
   const content = document.getElementById('confirm-content');
   let html = '';
-  const catTagMap = { price: 'tag-mixed', fx: 'tag-fx', expense: 'tag-duplicate', missing: 'tag-missing', quantity: 'tag-mixed', cost: 'tag-mixed' };
-  const tagLabelMap = { mixed: '混用价格源', fx: '汇率时点', duplicate: '重复计提', missing: '缺失数据', price: '价格差异', quantity: '数量差异', cost: '成本差异' };
+  const catTagMap = { price: 'tag-mixed', fx: 'tag-fx', expense: 'tag-duplicate', missing: 'tag-missing', quantity: 'tag-mixed', cost: 'tag-mixed', 'field-gap': 'tag-field-gap' };
+  const tagLabelMap = { mixed: '混用价格源', fx: '汇率时点', duplicate: '重复计提', missing: '缺失数据', price: '价格差异', quantity: '数量差异', cost: '成本差异', 'field-gap': '字段缺口' };
 
   differences.forEach(d => {
     const state = confirmStates[d.id] || 'pending';
