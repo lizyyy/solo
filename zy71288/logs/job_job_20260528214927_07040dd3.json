@@ -1,0 +1,22 @@
+{
+  "job_id": "job_20260528214927_07040dd3",
+  "status": "error",
+  "start_time": "2026-05-28 21:49:27.888111",
+  "end_time": "2026-05-28 21:49:27.965911",
+  "data_sources": [
+    "historical",
+    "weather"
+  ],
+  "anomalies": [
+    {
+      "anomaly_type": "no_reservation_data",
+      "severity": "warning",
+      "message": "未检测到预约数据，预测将仅基于历史趋势和天气",
+      "timestamp": "2026-05-28 21:49:27.900936",
+      "related_data": {},
+      "suggestion": "导入预约数据可大幅提高近期预测的准确性"
+    }
+  ],
+  "results_summary": {},
+  "error_message": "'temperature'"
+}

@@ -1,0 +1,22 @@
+{
+  "job_id": "job_20260528214851_d5ff58e1",
+  "status": "error",
+  "start_time": "2026-05-28 21:48:51.211398",
+  "end_time": "2026-05-28 21:48:51.247738",
+  "data_sources": [
+    "historical",
+    "weather"
+  ],
+  "anomalies": [
+    {
+      "anomaly_type": "no_reservation_data",
+      "severity": "warning",
+      "message": "未检测到预约数据，预测将仅基于历史趋势和天气",
+      "timestamp": "2026-05-28 21:48:51.226364",
+      "related_data": {},
+      "suggestion": "导入预约数据可大幅提高近期预测的准确性"
+    }
+  ],
+  "results_summary": {},
+  "error_message": "Input X contains NaN.\nRandomForestRegressor does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values"
+}

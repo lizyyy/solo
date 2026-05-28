@@ -1,0 +1,241 @@
+import unittest
+import tempfile
+import shutil
+from pathlib import Path
+import pandas as pd
+from datetime import datetime
+
+from batch_processor import BatchProcessor
+from data_import import DataImportManager
+from data_models import ProcessingStatus
+from config import config
+
+
+class TestBatchProcessor(unittest.TestCase):
+    
+    def setUp(self):
+        self.test_dir = tempfile.mkdtemp()
+        self.test_data_dir = Path(self.test_dir) / 'raw'
+        self.test_data_dir.mkdir(parents=True)
+        self.hash_file = config.LOG_DIR / "last_submission_hash.txt"
+        if self.hash_file.exists():
+            self.hash_file.unlink()
+    
+    def tearDown(self):
+        shutil.rmtree(self.test_dir)
+        if self.hash_file.exists():
+            self.hash_file.unlink()
+    
+    def _create_test_historical_data(self):
+        historical_data = []
+        base_date = datetime(2026, 5, 1)
+        for day in range(7):
+            for hour in range(24):
+                date = base_date + pd.Timedelta(days=day)
+                historical_data.append({
+                    'date': date.strftime('%Y-%m-%d'),
+                    'hour': hour,
+                    'actual_visitors': 30 + hour * 2
+                })
+        
+        df = pd.DataFrame(historical_data)
+        df.to_csv(self.test_data_dir / 'historical.csv', index=False)
+    
+    def test_duplicate_submission_detection(self):
+        print("\n测试1: 重复提交检测...")
+        
+        self._create_test_historical_data()
+        
+        processor = BatchProcessor()
+        
+        is_duplicate = processor.check_duplicate_submission(self.test_data_dir)
+        self.assertFalse(is_duplicate, "首次提交不应检测为重复")
+        
+        is_duplicate = processor.check_duplicate_submission(self.test_data_dir)
+        self.assertTrue(is_duplicate, "相同数据再次提交应检测为重复")
+        
+        print("  ✓ 重复提交检测功能正常")
+    
+    def test_missing_fields_handling(self):
+        print("\n测试2: 缺失字段处理...")
+        
+        invalid_reservations = pd.DataFrame([
+            {'booking_id': 'TEST001', 'date': '2026-06-01', 'people_count': 10},
+        ])
+        invalid_reservations.to_csv(self.test_data_dir / 'reservations.csv', index=False)
+        
+        self._create_test_historical_data()
+        
+        import_manager = DataImportManager()
+        records, anomalies = import_manager.import_reservations(self.test_data_dir / 'reservations.csv')
+        
+        self.assertEqual(len(records), 0, "缺失必填字段时不应导入记录")
+        self.assertTrue(any(a.anomaly_type == 'missing_fields' for a in anomalies), 
+                       "应检测到缺失字段异常")
+        
+        print("  ✓ 缺失字段异常检测正常")
+    
+    def test_invalid_status_handling(self):
+        print("\n测试3: 无效状态处理...")
+        
+        invalid_reservations = pd.DataFrame([
+            {'booking_id': 'TEST001', 'date': '2026-06-01', 'hour': 10, 
+             'people_count': 10, 'status': 'invalid_status'},
+            {'booking_id': 'TEST002', 'date': '2026-06-01', 'hour': 11, 
+             'people_count': 5, 'status': 'confirmed'},
+        ])
+        invalid_reservations.to_csv(self.test_data_dir / 'reservations.csv', index=False)
+        
+        import_manager = DataImportManager()
+        records, anomalies = import_manager.import_reservations(self.test_data_dir / 'reservations.csv')
+        
+        invalid_count = sum(1 for a in anomalies if a.anomaly_type == 'invalid_record')
+        self.assertTrue(invalid_count > 0, "应检测到无效记录")
+        
+        print("  ✓ 无效状态异常检测正常")
+    
+    def test_duplicate_records_detection(self):
+        print("\n测试4: 重复记录检测...")
+        
+        dup_reservations = pd.DataFrame([
+            {'booking_id': 'DUP001', 'date': '2026-06-01', 'hour': 10, 
+             'people_count': 10, 'status': 'confirmed'},
+            {'booking_id': 'DUP001', 'date': '2026-06-01', 'hour': 10, 
+             'people_count': 10, 'status': 'confirmed'},
+            {'booking_id': 'DUP002', 'date': '2026-06-01', 'hour': 11, 
+             'people_count': 5, 'status': 'confirmed'},
+        ])
+        dup_reservations.to_csv(self.test_data_dir / 'reservations.csv', index=False)
+        
+        import_manager = DataImportManager()
+        records, anomalies = import_manager.import_reservations(self.test_data_dir / 'reservations.csv')
+        
+        self.assertEqual(len(records), 2, "应去重后得到2条记录")
+        
+        dup_anomalies = [a for a in anomalies if a.anomaly_type == 'duplicate_record']
+        self.assertEqual(len(dup_anomalies), 1, "应检测到1条重复记录")
+        
+        print("  ✓ 重复记录检测正常")
+    
+    def test_full_batch_processing(self):
+        print("\n测试5: 完整批处理流程...")
+        
+        self._create_test_historical_data()
+        
+        weather_data = []
+        forecast_date = datetime(2026, 5, 8)
+        for day in range(2):
+            for hour in range(24):
+                date = forecast_date + pd.Timedelta(days=day)
+                weather_data.append({
+                    'date': date.strftime('%Y-%m-%d'),
+                    'hour': hour,
+                    'temperature': 20.0,
+                    'rain_probability': 0.3,
+                    'weather_condition': 'sunny'
+                })
+        pd.DataFrame(weather_data).to_csv(self.test_data_dir / 'weather.csv', index=False)
+        
+        processor = BatchProcessor()
+        result = processor.run_batch(
+            data_dir=self.test_data_dir,
+            forecast_hours=24,
+            run_scenarios=False
+        )
+        
+        self.assertIn(result.status, [ProcessingStatus.SUCCESS, ProcessingStatus.WARNING],
+                     f"批处理状态应为成功或警告，实际为: {result.status}")
+        self.assertEqual(result.forecast_generated, 24, "应生成24条预测记录")
+        self.assertGreater(result.records_imported, 0, "应导入至少1条记录")
+        
+        print(f"  ✓ 批处理完成，状态: {result.status}")
+        print(f"  ✓ 导入记录: {result.records_imported}")
+        print(f"  ✓ 生成预测: {result.forecast_generated}")
+        print(f"  ✓ 检测异常: {result.anomalies_detected}")
+    
+    def test_capacity_warning_detection(self):
+        print("\n测试6: 容量预警检测...")
+        
+        from anomaly_detector import AnomalyDetector
+        from data_models import ForecastResult
+        
+        detector = AnomalyDetector()
+        
+        forecast_results = [
+            ForecastResult(
+                date='2026-06-01',
+                hour=14,
+                predicted_visitors=450,
+                lower_bound=400,
+                upper_bound=500,
+                confidence_level=0.85
+            ),
+            ForecastResult(
+                date='2026-06-01',
+                hour=15,
+                predicted_visitors=600,
+                lower_bound=550,
+                upper_bound=650,
+                confidence_level=0.85
+            )
+        ]
+        
+        capacity_data = [
+            {'area_id': 'A1', 'area_name': '主展厅', 'max_capacity': 500}
+        ]
+        
+        anomalies = detector.detect_capacity_warnings(forecast_results, capacity_data)
+        
+        warning_count = sum(1 for a in anomalies if a.anomaly_type == 'capacity_warning')
+        exceed_count = sum(1 for a in anomalies if a.anomaly_type == 'capacity_exceeded')
+        
+        self.assertGreater(warning_count, 0, "应检测到容量警告")
+        self.assertGreater(exceed_count, 0, "应检测到容量超限")
+        
+        print(f"  ✓ 检测到 {warning_count} 个容量警告")
+        print(f"  ✓ 检测到 {exceed_count} 个容量超限")
+    
+    def test_raw_data_preservation(self):
+        print("\n测试7: 原始数据和手工备注保留...")
+        
+        reservations = pd.DataFrame([
+            {'booking_id': 'TEST001', 'date': '2026-06-01', 'hour': 10,
+             'people_count': 10, 'status': 'confirmed',
+             'extra_field': '自定义数据', '备注': 'VIP客人预约'},
+        ])
+        reservations.to_csv(self.test_data_dir / 'reservations.csv', index=False)
+        
+        import_manager = DataImportManager()
+        records, _ = import_manager.import_reservations(self.test_data_dir / 'reservations.csv')
+        
+        self.assertEqual(len(records), 1)
+        self.assertIn('extra_field', records[0].raw_data, "原始字段应被保留")
+        self.assertIsNotNone(records[0].manual_notes, "手工备注应被保留")
+        
+        print("  ✓ 原始数据保留正常")
+        print("  ✓ 手工备注保留正常")
+
+
+def run_tests():
+    print("="*60)
+    print("艺术展人流预测系统 - 测试套件")
+    print("="*60)
+    
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromTestCase(TestBatchProcessor)
+    
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    
+    print("\n" + "="*60)
+    if result.wasSuccessful():
+        print("所有测试通过! ✓")
+    else:
+        print(f"测试失败: {len(result.failures)} 个失败, {len(result.errors)} 个错误")
+    print("="*60)
+    
+    return result.wasSuccessful()
+
+
+if __name__ == '__main__':
+    run_tests()
