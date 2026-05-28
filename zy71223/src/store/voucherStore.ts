@@ -150,7 +150,7 @@ export const useVoucherStore = create<VoucherState>((set, get) => ({
       const res = await fetch(`${API_BASE}/balance/check?period=${period}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '获取余额预警失败');
-      set({ warnings: data });
+      set({ warnings: data.warnings || [] });
     } catch (e: any) {
       set({ error: e.message });
     } finally {

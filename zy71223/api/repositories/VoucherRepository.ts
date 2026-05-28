@@ -213,6 +213,34 @@ export class VoucherRepository {
     }
   }
 
+  static updateMapping(mappingId: string, data: {
+    subjectId?: string;
+    adjustedBy?: string;
+    adjustmentReason?: string;
+  }): SubjectMapping | null {
+    const index = db.subjectMapping.findIndex(m => m.id === mappingId);
+    if (index === -1) return null;
+
+    const now = new Date().toISOString();
+    const mapping = db.subjectMapping[index];
+
+    if (data.subjectId) {
+      mapping.subjectId = data.subjectId;
+      mapping.isSuggested = false;
+    }
+    if (data.adjustedBy) {
+      mapping.adjustedBy = data.adjustedBy;
+      mapping.adjustedAt = now;
+    }
+    if (data.adjustmentReason) {
+      mapping.adjustmentReason = data.adjustmentReason;
+    }
+
+    saveDatabase();
+    const voucherId = mapping.voucherId;
+    return this.findMappingsByVoucherId(voucherId).find(m => m.id === mappingId) || null;
+  }
+
   static deleteMappingsByVoucherId(voucherId: string): void {
     db.subjectMapping = db.subjectMapping.filter(m => m.voucherId !== voucherId);
     saveDatabase();

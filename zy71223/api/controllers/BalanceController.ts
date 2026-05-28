@@ -27,8 +27,8 @@ export class BalanceController {
 
   static async verifyBalances(req: Request, res: Response) {
     try {
-      const { period } = req.body;
-      const currentPeriod = period || `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+      const { period } = req.query;
+      const currentPeriod = period as string || `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
       BalanceService.calculateBalances(currentPeriod);
       const warnings = BalanceService.verifyBalances(currentPeriod);
       res.json({ warnings });

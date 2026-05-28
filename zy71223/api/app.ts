@@ -27,19 +27,19 @@ app.get('/api/health', (req, res) => {
 app.get('/api/vouchers', VoucherController.getVouchers);
 app.get('/api/vouchers/summary', VoucherController.getSummary);
 app.get('/api/vouchers/generate-no', VoucherController.generateVoucherNo);
-app.get('/api/vouchers/suggestions', VoucherController.getSubjectSuggestions);
 app.get('/api/vouchers/:id', VoucherController.getVoucher);
+app.get('/api/vouchers/:id/suggestions', VoucherController.getSubjectSuggestions);
+app.get('/api/vouchers/:id/history', VoucherController.getRevisionHistory);
 app.post('/api/vouchers', upload.single('image'), VoucherController.createVoucher);
 app.put('/api/vouchers/:id', VoucherController.updateVoucher);
 app.post('/api/vouchers/:id/parse', VoucherController.parseVoucher);
-app.post('/api/vouchers/:id/subject', VoucherController.updateSubjectMapping);
-app.post('/api/vouchers/:id/note', VoucherController.addNote);
-app.post('/api/vouch/:id/complete', VoucherController.completeVoucher);
-app.get('/api/vouchers/:id/history', VoucherController.getRevisionHistory);
+app.put('/api/vouchers/:id/mappings/:mappingId', VoucherController.updateSubjectMappingItem);
+app.post('/api/vouchers/:id/notes', VoucherController.addNote);
+app.post('/api/vouchers/:id/complete', VoucherController.completeVoucher);
 
 app.get('/api/balance', BalanceController.getBalances);
+app.get('/api/balance/check', BalanceController.verifyBalances);
 app.post('/api/balance/calculate', BalanceController.calculateBalances);
-app.post('/api/balance/verify', BalanceController.verifyBalances);
 app.get('/api/balance/periods', BalanceController.getPeriods);
 
 app.get('/api/subjects', SubjectController.getSubjects);
@@ -48,8 +48,8 @@ app.post('/api/subjects/validate', SubjectController.validateMapping);
 
 app.get('/api/reports', ReportController.getReports);
 app.get('/api/reports/:id', ReportController.getReport);
-app.post('/api/reports/generate', ReportController.generateReport);
-app.get('/api/reports/:id/export', ReportController.exportReport);
+app.post('/api/reports', ReportController.generateReport);
+app.post('/api/reports/:id/export', ReportController.exportReport);
 app.get('/api/exports/history', ReportController.getExportHistory);
 app.get('/api/exports/:exportId/trace', ReportController.traceExport);
 

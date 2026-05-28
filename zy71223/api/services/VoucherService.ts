@@ -169,6 +169,45 @@ export class VoucherService {
     return VoucherRepository.findById(voucherId);
   }
 
+  static updateSingleMapping(voucherId: string, mappingId: string, subjectId: string, adjustmentReason: string, operator: string): CashVoucher | null {
+    const voucher = VoucherRepository.findById(voucherId);
+    if (!voucher) return null;
+
+    const mapping = voucher.mappings.find(m => m.id === mappingId);
+    if (!mapping) {
+      throw new Error('科目映射不存在');
+    }
+
+    const oldSubject = `${mapping.subjectCode} ${mapping.subjectName}`;
+    const newSubject = mapping.subjectName;
+
+    const validation = SubjectService.validateMapping(
+      subjectId,
+      mapping.direction,
+      mapping.amount,
+      voucher.description || ''
+    );
+
+    VoucherRepository.updateMapping(mappingId, {
+      subjectId,
+      adjustedBy: operator,
+      adjustmentReason: adjustmentReason + (validation.warnings.length > 0 ? ` | 系统提示：${validation.warnings.join('; ')}` : ''),
+    });
+
+    VoucherRepository.update(voucherId, { status: 'revised' });
+
+    VoucherRepository.addRevision({
+      voucherId,
+      fieldName: 'subject_mapping',
+      oldValue: oldSubject,
+      newValue: newSubject,
+      reason: adjustmentReason || '人工调整科目',
+      revisedBy: operator,
+    });
+
+    return VoucherRepository.findById(voucherId);
+  }
+
   static completeVoucher(voucherId: string, operator: string): CashVoucher | null {
     const voucher = VoucherRepository.findById(voucherId);
     if (!voucher) return null;

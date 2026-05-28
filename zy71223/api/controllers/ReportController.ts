@@ -42,7 +42,7 @@ export class ReportController {
   static async exportReport(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { format } = req.query;
+      const { format } = req.body;
       const operator = req.headers['x-operator'] as string || '系统管理员';
 
       const exportFormat = (format as string) === 'xlsx' ? 'xlsx' : 'csv';

@@ -139,6 +139,22 @@ export class VoucherController {
     }
   }
 
+  static async updateSubjectMappingItem(req: Request, res: Response) {
+    try {
+      const { id, mappingId } = req.params;
+      const { subjectId, adjustmentReason, operator } = req.body;
+
+      const voucher = VoucherService.updateSingleMapping(id, mappingId, subjectId, adjustmentReason, operator || '系统管理员');
+      if (!voucher) {
+        return res.status(404).json({ error: '凭证不存在' });
+      }
+
+      res.json(voucher);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  }
+
   static async addNote(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -193,7 +209,22 @@ export class VoucherController {
 
   static async getSubjectSuggestions(req: Request, res: Response) {
     try {
-      const { description, amount, isIncome } = req.query;
+      const { id } = req.params;
+      let { description, amount, isIncome } = req.query;
+
+      if (id && (!description || !amount)) {
+        const voucher = VoucherRepository.findById(id);
+        if (voucher) {
+          description = voucher.description || '';
+          amount = voucher.amount.toString();
+          isIncome = 'false';
+        }
+      }
+
+      if (!description || !amount) {
+        return res.status(400).json({ error: '缺少必要参数：description或amount' });
+      }
+
       const suggestions = VoucherService.getSubjectSuggestions(
         description as string,
         parseFloat(amount as string),
