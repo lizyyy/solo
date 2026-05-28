@@ -1,13 +1,17 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { 
   LayoutGrid, Database, FileText, Camera, Download, 
   ThermometerSun, Lightbulb, Eye, AlertTriangle,
-  ChevronLeft, ChevronRight, Settings, RotateCcw, Move3D
+  ChevronLeft, ChevronRight, Settings, RotateCcw, Move3D,
+  Check, X, Info
 } from 'lucide-react';
 import { useMainStore } from '@/store/mainStore';
 import { captureScene, downloadScreenshot } from '@/utils/exporters/screenshot';
+import { generateReport, exportToPDF } from '@/utils/exporters/report';
 import type { ScreenshotResult } from '@/utils/exporters/screenshot';
-import { SEVERITY_COLORS } from '@/types';
+import { SEVERITY_COLORS, LIGHT_RESISTANCE_THRESHOLDS } from '@/types';
+import GalleryScene from '@/components/three/GalleryScene';
+import { calculateTotalIllumination } from '@/hooks/useLightCalculation';
 
 const SEV = { critical: '严重', high: '高', medium: '中', low: '低' };
 const RISK = { over_illumination: '照度超标', cumulative_leak: '累积曝光泄漏', light_penetration: '光线穿透' };
@@ -15,13 +19,23 @@ const ST = { detected: '已检测', acknowledged: '已确认', resolved: '已解
 
 export default function Workbench() {
   const s = useMainStore();
-  const { gallery, artworks, lightSources, risks, selectedArtworkId, selectedRiskId } = s;
+  const { 
+    gallery, artworks, lightSources, risks, selectedArtworkId, selectedRiskId,
+    isRelayoutMode, relayoutPreview, loadDemoData, isRelayoutConfirmMode
+  } = s;
   
   const [leftCollapsed, setLeftCollapsed] = useState(false);
   const [rightCollapsed, setRightCollapsed] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [shots, setShots] = useState<ScreenshotResult[]>([]);
   const sceneRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!gallery) {
+      loadDemoData();
+    }
+  }, [gallery, loadDemoData]);
 
   const selectedArtwork = artworks.find(a => a.id === selectedArtworkId);
   const selectedRisk = risks.find(r => r.id === selectedRiskId);
@@ -46,6 +60,47 @@ export default function Workbench() {
     if (!selectedRiskId) return;
     const res = prompt('请输入解决方案:');
     if (res) s.resolveRisk(selectedRiskId, res, '当前用户');
+  };
+
+  const handleExportReport = useCallback(async () => {
+    setIsExporting(true);
+    try {
+      const report = generateReport(
+        risks,
+        artworks,
+        lightSources,
+        gallery,
+        s.currentExhibition,
+        shots,
+        { includeScreenshots: true, includeDataTrace: true, includeRecommendations: true }
+      );
+      s.addReport(report);
+      await exportToPDF(report);
+    } catch (e) {
+      console.error('导出报告失败:', e);
+      alert('导出报告失败，请重试');
+    } finally {
+      setIsExporting(false);
+    }
+  }, [risks, artworks, lightSources, gallery, s.currentExhibition, shots, s]);
+
+  const handleConfirmRelayout = () => {
+    if (relayoutPreview) {
+      s.confirmRelayout();
+    }
+  };
+
+  const handleCancelRelayout = () => {
+    s.cancelRelayout();
+  };
+
+  const getCurrentIllumination = (artwork: typeof selectedArtwork) => {
+    if (!artwork || !gallery) return 0;
+    return calculateTotalIllumination(
+      lightSources,
+      { x: artwork.posX, y: artwork.posY, z: artwork.posZ },
+      gallery.walls
+    );
   };
 
   const sevBadge = (sv: string) => `badge badge-${sv}`;
@@ -88,7 +143,9 @@ export default function Workbench() {
           <button className="btn btn-secondary" onClick={handleCapture} disabled={isCapturing}>
             <Camera className="w-4 h-4" /> {isCapturing ? '截图中...' : '截图'}
           </button>
-          <button className="btn btn-secondary"><Download className="w-4 h-4" /> 导出报告</button>
+          <button className="btn btn-secondary" onClick={handleExportReport} disabled={isExporting}>
+            <Download className="w-4 h-4" /> {isExporting ? '导出中...' : '导出报告'}
+          </button>
           <button className="btn btn-ghost"><Settings className="w-4 h-4" /></button>
         </div>
       </header>
@@ -142,22 +199,86 @@ export default function Workbench() {
 
         {/* Center - 3D Scene */}
         <main className="flex-1 flex flex-col relative overflow-hidden">
-          <div ref={sceneRef} className="flex-1 relative bg-gradient-to-b from-[#1a1a25] to-[#0a0a0f]">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
-                  <RotateCcw className="w-12 h-12 text-blue-400 animate-spin" style={{ animationDuration: '3s' }} />
-                </div>
-                <div className="text-lg font-medium text-[var(--color-text-secondary)]">3D场景渲染区域</div>
-                <div className="text-sm text-[var(--color-text-muted)] mt-2">
-                  展厅: {gallery?.name || '未加载'} · 作品: {artworks.length} · 光源: {lightSources.length}
+          <div ref={sceneRef} className="flex-1 relative">
+            {gallery ? (
+              <GalleryScene />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-[#1a1a25] to-[#0a0a0f]">
+                <div className="text-center">
+                  <div className="w-32 h-32 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+                    <RotateCcw className="w-12 h-12 text-blue-400 animate-spin" style={{ animationDuration: '3s' }} />
+                  </div>
+                  <div className="text-lg font-medium text-[var(--color-text-secondary)]">正在加载3D场景...</div>
                 </div>
               </div>
-            </div>
+            )}
+            
             {shots.length > 0 && (
-              <div className="absolute top-4 right-4 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg p-2">
+              <div className="absolute top-4 right-4 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg p-2 z-10">
                 <div className="text-xs text-[var(--color-text-tertiary)] mb-1">已捕获截图</div>
                 <div className="text-sm font-medium">{shots.length} 张</div>
+              </div>
+            )}
+
+            {/* Relayout Preview Banner */}
+            {isRelayoutMode && relayoutPreview && (
+              <div className="absolute top-4 left-4 right-4 bg-[var(--color-bg-card)] border border-[#C9A962] rounded-lg p-4 z-10">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Info className="w-5 h-5 text-[#C9A962]" />
+                      <span className="font-medium text-[#C9A962]">换位预览</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <div className="text-[var(--color-text-tertiary)]">原位置照度</div>
+                        <div className="font-mono">{relayoutPreview.originalIllumination.toFixed(1)} lux</div>
+                      </div>
+                      <div>
+                        <div className="text-[var(--color-text-tertiary)]">新位置照度</div>
+                        <div className="font-mono">{relayoutPreview.newIllumination.toFixed(1)} lux</div>
+                      </div>
+                      <div>
+                        <div className="text-[var(--color-text-tertiary)]">原风险等级</div>
+                        <div className="font-medium" style={{ color: SEVERITY_COLORS[relayoutPreview.originalRiskLevel] }}>{SEV[relayoutPreview.originalRiskLevel as keyof typeof SEV]}</div>
+                      </div>
+                      <div>
+                        <div className="text-[var(--color-text-tertiary)]">新风险等级</div>
+                        <div className="font-medium" style={{ color: SEVERITY_COLORS[relayoutPreview.newRiskLevel] }}>{SEV[relayoutPreview.newRiskLevel as keyof typeof SEV]}</div>
+                      </div>
+                    </div>
+                    <div className="mt-2 text-sm">
+                      <div className="text-[var(--color-text-tertiary)]">改善程度</div>
+                      <div className="font-mono">{relayoutPreview.improvement > 0 ? '+' : ''}{(relayoutPreview.improvement * 100).toFixed(1)}%</div>
+                    </div>
+                    <div className="mt-1 text-xs text-[var(--color-text-tertiary)]">
+                      {relayoutPreview.recommendation}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-2">
+                    <button className="btn btn-primary" onClick={handleConfirmRelayout}>
+                      <Check className="w-4 h-4" /> 确认换位
+                    </button>
+                    <button className="btn btn-secondary" onClick={handleCancelRelayout}>
+                      <X className="w-4 h-4" /> 取消
+                    </button>
+                  </div>
+                  {relayoutPreview.warnings.length > 0 && (
+                    <div className="mt-2 text-xs text-orange-400">
+                      {relayoutPreview.warnings.map((w, i) => (
+                      <div key={i}>⚠️ {w}</div>
+                    ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Relayout Mode Indicator */}
+            {isRelayoutMode && !relayoutPreview && (
+              <div className="absolute bottom-4 left-4 bg-[#C9A962]/90 text-black px-4 py-2 rounded-lg text-sm z-10">
+                <Move3D className="w-4 h-4 inline mr-2" />
+                布展模式：拖拽作品可调整位置
               </div>
             )}
           </div>

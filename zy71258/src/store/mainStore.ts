@@ -2,12 +2,14 @@ import { create } from 'zustand';
 import type { 
   Gallery, LightSource, Artwork, SamplingData, 
   Exhibition, Risk, ProtectionReport, Point3D,
-  RelayoutPreviewResponse
+  RelayoutPreviewResponse, RiskSeverity
 } from '@/types';
 import { 
   demoGallery, demoLightSources, demoArtworks, 
   demoSamplingData, demoExhibition, demoRisks 
 } from '@/mock/demoData';
+import { calculateTotalIllumination } from '@/hooks/useLightCalculation';
+import { LIGHT_RESISTANCE_THRESHOLDS } from '@/types';
 
 interface AppState {
   gallery: Gallery | null;
@@ -26,6 +28,8 @@ interface AppState {
   isRelayoutMode: boolean;
   relayoutPreview: RelayoutPreviewResponse | null;
   draggingArtworkId: string | null;
+  originalPosition: Point3D | null;
+  isRelayoutConfirmMode: boolean;
   
   showHeatmap: boolean;
   showLightRays: boolean;
@@ -49,6 +53,9 @@ interface AppState {
   setRelayoutMode: (enabled: boolean) => void;
   setRelayoutPreview: (preview: RelayoutPreviewResponse | null) => void;
   setDraggingArtworkId: (id: string | null) => void;
+  setOriginalPosition: (pos: Point3D | null) => void;
+  confirmRelayout: () => void;
+  cancelRelayout: () => void;
   
   setShowHeatmap: (show: boolean) => void;
   setShowLightRays: (show: boolean) => void;
@@ -97,6 +104,8 @@ export const useMainStore = create<AppState>((set, get) => ({
   isRelayoutMode: false,
   relayoutPreview: null,
   draggingArtworkId: null,
+  originalPosition: null,
+  isRelayoutConfirmMode: false,
   
   showHeatmap: true,
   showLightRays: true,
@@ -128,10 +137,57 @@ export const useMainStore = create<AppState>((set, get) => ({
   setRelayoutMode: (isRelayoutMode) => set({ 
     isRelayoutMode, 
     relayoutPreview: null,
-    draggingArtworkId: null
+    draggingArtworkId: null,
+    originalPosition: null,
+    isRelayoutConfirmMode: false
   }),
-  setRelayoutPreview: (relayoutPreview) => set({ relayoutPreview }),
+  setRelayoutPreview: (relayoutPreview) => set({ 
+    relayoutPreview,
+    isRelayoutConfirmMode: relayoutPreview !== null
+  }),
   setDraggingArtworkId: (draggingArtworkId) => set({ draggingArtworkId }),
+  setOriginalPosition: (originalPosition) => set({ originalPosition }),
+  
+  confirmRelayout: () => {
+    const state = get();
+    if (!state.relayoutPreview || !state.draggingArtworkId) return;
+    
+    const artwork = state.artworks.find(a => a.id === state.draggingArtworkId);
+    if (artwork) {
+      state.updateArtworkPosition(
+        state.draggingArtworkId,
+        {
+          x: artwork.posX,
+          y: artwork.posY,
+          z: artwork.posZ
+        }
+      );
+    }
+    
+    set({
+      relayoutPreview: null,
+      originalPosition: null,
+      draggingArtworkId: null,
+      isRelayoutConfirmMode: false
+    });
+  },
+  
+  cancelRelayout: () => {
+    const state = get();
+    if (state.originalPosition && state.draggingArtworkId) {
+      state.updateArtworkPosition(
+        state.draggingArtworkId,
+        state.originalPosition
+      );
+    }
+    
+    set({
+      relayoutPreview: null,
+      originalPosition: null,
+      draggingArtworkId: null,
+      isRelayoutConfirmMode: false
+    });
+  },
   
   setShowHeatmap: (showHeatmap) => set({ showHeatmap }),
   setShowLightRays: (showLightRays) => set({ showLightRays }),
@@ -359,6 +415,8 @@ export const useMainStore = create<AppState>((set, get) => ({
       isRelayoutMode: false,
       relayoutPreview: null,
       draggingArtworkId: null,
+      originalPosition: null,
+      isRelayoutConfirmMode: false,
       idempotencyKeys: new Set()
     });
   }
