@@ -166,7 +166,7 @@ export const detectConflicts = (
       );
       if (originalTxn) {
         const originalUsed = allMatches.some(m => 
-          m.id !== '' && m.transactionIds.includes(originalTxn.id)
+          m.transactionIds.includes(originalTxn.id)
         );
         if (originalUsed) {
           conflicts.push({
@@ -185,7 +185,7 @@ export const detectConflicts = (
       );
       if (originalVch) {
         const originalUsed = allMatches.some(m => 
-          m.id !== '' && m.voucherIds.includes(originalVch.id)
+          m.voucherIds.includes(originalVch.id)
         );
         if (originalUsed) {
           conflicts.push({
@@ -313,6 +313,8 @@ export const performMatching = async (batchId: string): Promise<MatchRecord[]> =
       continue;
     }
 
+    const allMatches = [...existingMatches, ...newMatches];
+
     const match = createMatchRecord(
       batchId,
       [candidate.transaction.id],
@@ -321,7 +323,7 @@ export const performMatching = async (batchId: string): Promise<MatchRecord[]> =
       candidate.score,
       [candidate.transaction],
       [candidate.voucher],
-      existingMatches,
+      allMatches,
       transactions,
       vouchers
     );

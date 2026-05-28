@@ -109,7 +109,20 @@ export const parseBankTransaction = (
 
   const now = Date.now();
   const summary = getValue(['摘要', '交易摘要', '备注', 'description', 'summary']);
-  const isRedFlush = summary.includes('红冲') || summary.includes('冲销') || summary.includes('负数');
+  const originalTransactionNo = getValue([
+    '原流水号', '原交易流水号', '原交易号', 'originalTransactionNo',
+    '红冲原流水号', '被红冲流水号', '对应原流水号'
+  ]);
+  const explicitRedFlag = getValue(['红冲标志', '红冲标识', '是否红冲', 'isRedFlush', '冲销标志']);
+  const isRedFlush = 
+    explicitRedFlag === '是' || 
+    explicitRedFlag === 'Y' || 
+    explicitRedFlag === '1' || 
+    explicitRedFlag === 'true' ||
+    summary.includes('红冲') || 
+    summary.includes('冲销') || 
+    summary.includes('负数') ||
+    !!originalTransactionNo;
 
   return {
     id: generateId(),
@@ -125,6 +138,7 @@ export const parseBankTransaction = (
     counterpartyAccount: getValue(['对方账号', '对方账户', 'counterpartyAccount']),
     remark: getValue(['备注', '附言', 'remark', 'notes']),
     isRedFlush,
+    originalTransactionNo: originalTransactionNo || undefined,
     matched: false,
     createdAt: now,
     updatedAt: now,
@@ -154,9 +168,24 @@ export const parseVoucher = (
 
   const now = Date.now();
   const summary = getValue(['摘要', '摘要信息', 'description', 'summary']);
-  const isRedFlush = summary.includes('红冲') || summary.includes('冲销') ||
-                     getValue(['方向', 'direction']).includes('红') ||
-                     getNumber(['借方金额', '贷方金额']) < 0;
+  const originalVoucherNo = getValue([
+    '原凭证号', '原凭证编号', 'originalVoucherNo',
+    '红冲原凭证号', '被红冲凭证号', '对应原凭证号', '被冲销凭证号'
+  ]);
+  const explicitRedFlag = getValue(['红冲标志', '红冲标识', '是否红冲', 'isRedFlush', '冲销标志', '红字标志']);
+  const rawDebit = getNumber(['借方金额', 'debit', 'debitAmount']);
+  const rawCredit = getNumber(['贷方金额', 'credit', 'creditAmount']);
+  const isRedFlush = 
+    explicitRedFlag === '是' || 
+    explicitRedFlag === 'Y' || 
+    explicitRedFlag === '1' || 
+    explicitRedFlag === 'true' ||
+    summary.includes('红冲') || 
+    summary.includes('冲销') ||
+    getValue(['方向', 'direction']).includes('红') ||
+    rawDebit < 0 ||
+    rawCredit < 0 ||
+    !!originalVoucherNo;
 
   return {
     id: generateId(),
@@ -165,11 +194,12 @@ export const parseVoucher = (
     voucherNo: getValue(['凭证号', '凭证编号', 'voucherNo', 'voucherNumber']),
     voucherDate: getValue(['凭证日期', '日期', '记账日期', 'voucherDate', 'date']),
     summary,
-    debitAmount: Math.abs(getNumber(['借方金额', 'debit', 'debitAmount'])),
-    creditAmount: Math.abs(getNumber(['贷方金额', 'credit', 'creditAmount'])),
+    debitAmount: Math.abs(rawDebit),
+    creditAmount: Math.abs(rawCredit),
     accountCode: getValue(['科目代码', '科目编码', 'accountCode']),
     accountName: getValue(['科目名称', 'accountName', '科目']),
     isRedFlush,
+    originalVoucherNo: originalVoucherNo || undefined,
     matched: false,
     createdAt: now,
     updatedAt: now,

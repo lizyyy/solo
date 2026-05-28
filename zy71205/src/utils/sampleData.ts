@@ -213,7 +213,7 @@ export const generateSampleData = (
       debitAmount: 1200,
       creditAmount: 0,
       accountCode: '660203',
-      accountName: '管理费用-办公费',
+      accountName: '得力文具销售有限公司',
       isRedFlush: false,
       matched: false,
       createdAt: now,
