@@ -41,6 +41,9 @@ export const ActionModal = ({ businessId, action, currentStatus, onClose, onSucc
         updatePurposeCode(businessId, purposeCode, purposeName);
       } else if (action === 'upload_supplement' && supplementType !== 'purpose') {
         const latestApp = business.applications[business.applications.length - 1];
+        const originalDocumentId = coversOriginal && documentData.originalId
+          ? documentData.originalId as string
+          : undefined;
         uploadSupplement(
           businessId,
           supplementType,
@@ -50,7 +53,8 @@ export const ActionModal = ({ businessId, action, currentStatus, onClose, onSucc
             currency: documentData.currency || latestApp.currency,
           },
           remark,
-          coversOriginal
+          coversOriginal,
+          originalDocumentId
         );
       } else if (isAddIssue && manualIssueDesc) {
         addManualIssue(businessId, manualIssueDesc, manualIssueSeverity);
@@ -172,6 +176,50 @@ export const ActionModal = ({ businessId, action, currentStatus, onClose, onSucc
             <div className="mb-4 space-y-3">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
+                  选择被覆盖的{supplementType === 'contract' ? '合同' : '发票'}
+                </label>
+                <select
+                  value={coversOriginal ? (documentData.originalId || '') : ''}
+                  onChange={(e) => {
+                    const selectedId = e.target.value;
+                    if (selectedId) {
+                      setCoversOriginal(true);
+                      setDocumentData({ ...documentData, originalId: selectedId });
+                    } else {
+                      setCoversOriginal(false);
+                      setDocumentData({ ...documentData, originalId: '' });
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">不覆盖（新增）</option>
+                  {(supplementType === 'contract' ? business.contracts : business.invoices)
+                    .filter((doc) => !doc.isSupplement)
+                    .map((doc) => (
+                      <option key={doc.id} value={doc.id}>
+                        {supplementType === 'contract'
+                          ? (doc as any).contractNo
+                          : (doc as any).invoiceNo}
+                        {' '}(v{doc.version})
+                      </option>
+                    ))}
+                  {(supplementType === 'contract' ? business.contracts : business.invoices)
+                    .filter((doc) => doc.isSupplement)
+                    .map((doc) => (
+                      <option key={doc.id} value={doc.id}>
+                        {supplementType === 'contract'
+                          ? (doc as any).contractNo
+                          : (doc as any).invoiceNo}
+                        {' '}(v{doc.version} - 补件)
+                      </option>
+                    ))}
+                </select>
+                <p className="mt-1 text-xs text-slate-500">
+                  选择要覆盖的原始文档，系统将自动记录补件关系并进行风险检测
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
                   {supplementType === 'contract' ? '合同编号' : '发票编号'}
                 </label>
                 <input
@@ -245,15 +293,6 @@ export const ActionModal = ({ businessId, action, currentStatus, onClose, onSucc
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={coversOriginal}
-                  onChange={(e) => setCoversOriginal(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded"
-                />
-                <span className="text-sm text-slate-700">此补件覆盖原有{supplementType === 'contract' ? '合同' : '发票'}</span>
-              </label>
             </div>
           )}
 

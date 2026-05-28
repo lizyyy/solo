@@ -387,7 +387,7 @@ export const runFullValidation = (
       app.purposeDescription
     );
 
-    if (!purposeResult.matched === false) {
+    if (!purposeResult.matched) {
       allIssues.push({
         id: `issue-purpose-${business.id}`,
         businessNo: business.businessNo,
