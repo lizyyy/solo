@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Play, Download, AlertTriangle } from 'lucide-react';
 import { useGameStore } from '@/store/useGameStore';
 import { useMaterialStore } from '@/store/useMaterialStore';
@@ -14,11 +14,15 @@ import type { Position } from '@/types';
 export const GamePage: React.FC = () => {
   const navigate = useNavigate();
   const { materialId } = useParams();
+  const location = useLocation();
   const { currentGame, materials, reviewReport, startGame, loadMarketEvent, executeAction, nextRound, endGame, exportReview, clearCurrentGame } = useGameStore();
-  const { materials: allMaterials, loadDefaultMaterials } = useMaterialStore();
+  const { materials: allMaterials, loadDefaultMaterials, setComparisonResult } = useMaterialStore();
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
   const [showBankruptOverlay, setShowBankruptOverlay] = useState(false);
   const [screenShake, setScreenShake] = useState(false);
+
+  const searchParams = new URLSearchParams(location.search);
+  const comparisonMode = searchParams.get('compare') as 'old' | 'new' | null;
 
   useEffect(() => {
     loadDefaultMaterials();
@@ -53,9 +57,12 @@ export const GamePage: React.FC = () => {
 
   useEffect(() => {
     if (currentGame?.status === 'ended' && reviewReport) {
+      if (comparisonMode) {
+        setComparisonResult(comparisonMode, reviewReport);
+      }
       navigate(`/review/${currentGame.id}`);
     }
-  }, [currentGame?.status, reviewReport, navigate, currentGame?.id]);
+  }, [currentGame?.status, reviewReport, navigate, currentGame?.id, comparisonMode, setComparisonResult]);
 
   useEffect(() => {
     if (currentGame?.currentMarket?.isShock) {

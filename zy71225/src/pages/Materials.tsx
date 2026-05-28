@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useMaterialStore } from '@/store/useMaterialStore';
 import { useGameStore } from '@/store/useGameStore';
-import type { GameMaterials, Position, MarketEvent, ParameterDiff, ReviewReport } from '@/types';
+import type { GameMaterials, Position, MarketEvent, ParameterDiff } from '@/types';
 import { formatCurrency, formatNumber, getCategoryLabel, getCategoryColor, getRatingLabel, getPnLColor } from '@/utils/format';
 import { generateId, cloneMaterials } from '@/data/defaultMaterials';
 
@@ -128,11 +128,7 @@ export const MaterialsPage: React.FC = () => {
     const material = type === 'old' ? versionComparison.oldMaterials : versionComparison.newMaterials;
     clearCurrentGame();
     
-    const handleGameEnd = (report: ReviewReport) => {
-      setComparisonResult(type, report);
-    };
-    
-    navigate(`/game/${material.id}`);
+    navigate(`/game/${material.id}?compare=${type}`);
   };
 
   const renderDiffValue = (value: unknown) => {
