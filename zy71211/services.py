@@ -150,21 +150,26 @@ class CancellationService:
     def cancel_application(
         db: Session, application: LoanApplication,
         reason: str, reason_detail: str, operator: str
-    ) -> Tuple[bool, str, List[str]]:
+    ) -> Tuple[bool, str, List[str], Optional[CancellationRecord]]:
+        idempotent_key = generate_idempotent_key(application.application_no, reason)
+        existing = CancellationService.check_idempotent(db, idempotent_key)
+        if existing:
+            return True, "撤件成功（幂等命中）", ["该撤件已存在（幂等校验）"], existing
+
         if application.status == ApplicationStatus.CANCELLED:
-            return False, "申请已撤件", []
+            return False, "申请已撤件，如需添加其他原因请使用不同的撤件类型", [], None
 
         cancellation, warnings = CancellationService.create_cancellation(
-            db, application, reason, reason_detail, operator
+            db, application, reason, reason_detail, operator, check_duplicate=False
         )
 
         if not cancellation:
-            return False, warnings[0] if warnings else "撤件失败", []
+            return False, warnings[0] if warnings else "撤件失败", [], None
 
         success, msg = ApplicationStateMachine.transition(
             db, application, ApplicationStatus.CANCELLED, operator, f"撤件原因：{reason}")
 
-        return success, msg, warnings
+        return success, msg, warnings, cancellation
 
 
 class SpecialCaseDetector:

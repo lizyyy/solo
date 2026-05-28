@@ -208,7 +208,7 @@ def create_cancellation(cancel: CancellationCreate, db: Session = Depends(get_db
             code="INVALID_REASON"
         )
 
-    success, message, warnings = CancellationService.cancel_application(
+    success, message, warnings, cancellation = CancellationService.cancel_application(
         db, application, cancel.reason, cancel.reason_detail, cancel.operator
     )
 
@@ -218,10 +218,6 @@ def create_cancellation(cancel: CancellationCreate, db: Session = Depends(get_db
             message=message,
             warnings=warnings
         )
-
-    cancellation = CancellationService.check_duplicate_cancellation(
-        db, cancel.application_id, cancel.reason
-    )
 
     return CancellationResult(
         success=True,
