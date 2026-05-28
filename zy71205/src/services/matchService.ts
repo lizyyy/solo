@@ -91,7 +91,9 @@ export const calculateMatchScore = (
 export const detectConflicts = (
   transaction: BankTransaction,
   voucher: Voucher,
-  allMatches: MatchRecord[]
+  allMatches: MatchRecord[],
+  allTransactions: BankTransaction[],
+  allVouchers: Voucher[]
 ): ConflictInfo[] => {
   const conflicts: ConflictInfo[] = [];
 
@@ -101,28 +103,98 @@ export const detectConflicts = (
   const voucherAmount = voucher.debitAmount > 0 
     ? voucher.debitAmount 
     : -voucher.creditAmount;
+  const absTransactionAmount = Math.abs(transactionAmount);
+  const absVoucherAmount = Math.abs(voucherAmount);
 
-  if (!amountEquals(Math.abs(transactionAmount), Math.abs(voucherAmount))) {
+  if (!amountEquals(absTransactionAmount, absVoucherAmount)) {
     conflicts.push({
       type: 'amount_mismatch',
       severity: 'high',
-      description: `金额不匹配：流水 ${Math.abs(transactionAmount)} vs 凭证 ${Math.abs(voucherAmount)}，差额 ${roundTo(Math.abs(Math.abs(transactionAmount) - Math.abs(voucherAmount)))} 元`,
+      description: `金额不匹配：流水 ${absTransactionAmount} vs 凭证 ${absVoucherAmount}，差额 ${roundTo(Math.abs(absTransactionAmount - absVoucherAmount))} 元`,
       resolved: false,
     });
   }
 
-  if (transaction.isRedFlush || voucher.isRedFlush) {
-    const originalNo = transaction.originalTransactionNo || voucher.originalVoucherNo;
-    if (originalNo) {
-      const originalUsed = allMatches.some(m => 
-      m.transactionIds.includes(transaction.id) || m.voucherIds.includes(voucher.id));
-      if (originalUsed) {
+  const txnSummaryNorm = normalizeString(transaction.summary);
+  const otherSameSummaryTxns = allTransactions.filter(t => 
+    t.id !== transaction.id && 
+    normalizeString(t.summary) === txnSummaryNorm
+  );
+
+  if (otherSameSummaryTxns.length > 0) {
+    for (const otherTxn of otherSameSummaryTxns) {
+      const otherTxnAmount = otherTxn.debitAmount > 0 ? otherTxn.debitAmount : -otherTxn.creditAmount;
+      if (!amountEquals(absTransactionAmount, Math.abs(otherTxnAmount)) ||
+          normalizeString(transaction.counterparty) !== normalizeString(otherTxn.counterparty)) {
         conflicts.push({
-          type: 'red_flush_occupied',
+          type: 'same_summary',
           severity: 'high',
-          description: `红冲记录的原凭证已被其他匹配占用`,
+          description: `摘要同名误配：存在 ${otherSameSummaryTxns.length} 条同摘要流水（${otherSameSummaryTxns.map(t => t.transactionNo).join(', ')}），金额或对方户名不一致，当前匹配可能错误`,
           resolved: false,
         });
+        break;
+      }
+    }
+  }
+
+  const vchSummaryNorm = normalizeString(voucher.summary);
+  const otherSameSummaryVch = allVouchers.filter(v => 
+    v.id !== voucher.id && 
+    normalizeString(v.summary) === vchSummaryNorm
+  );
+
+  if (otherSameSummaryVch.length > 0 && !conflicts.some(c => c.type === 'same_summary')) {
+    for (const otherVch of otherSameSummaryVch) {
+      const otherVchAmount = otherVch.debitAmount > 0 ? otherVch.debitAmount : -otherVch.creditAmount;
+      if (!amountEquals(absVoucherAmount, Math.abs(otherVchAmount)) ||
+          normalizeString(voucher.accountName) !== normalizeString(otherVch.accountName)) {
+        conflicts.push({
+          type: 'same_summary',
+          severity: 'high',
+          description: `摘要同名误配：存在 ${otherSameSummaryVch.length} 条同摘要凭证（${otherSameSummaryVch.map(v => v.voucherNo).join(', ')}），金额或科目不一致，当前匹配可能错误`,
+          resolved: false,
+        });
+        break;
+      }
+    }
+  }
+
+  if (transaction.isRedFlush || voucher.isRedFlush) {
+    if (transaction.isRedFlush && transaction.originalTransactionNo) {
+      const originalTxn = allTransactions.find(t => 
+        normalizeString(t.transactionNo) === normalizeString(transaction.originalTransactionNo!)
+      );
+      if (originalTxn) {
+        const originalUsed = allMatches.some(m => 
+          m.id !== '' && m.transactionIds.includes(originalTxn.id)
+        );
+        if (originalUsed) {
+          conflicts.push({
+            type: 'red_flush_occupied',
+            severity: 'high',
+            description: `红冲流水的原流水（${originalTxn.transactionNo}）已被其他匹配占用，红冲与原流水可能对应不上`,
+            resolved: false,
+          });
+        }
+      }
+    }
+
+    if (voucher.isRedFlush && voucher.originalVoucherNo) {
+      const originalVch = allVouchers.find(v => 
+        normalizeString(v.voucherNo) === normalizeString(voucher.originalVoucherNo!)
+      );
+      if (originalVch) {
+        const originalUsed = allMatches.some(m => 
+          m.id !== '' && m.voucherIds.includes(originalVch.id)
+        );
+        if (originalUsed) {
+          conflicts.push({
+            type: 'red_flush_occupied',
+            severity: 'high',
+            description: `红冲凭证的原凭证（${originalVch.voucherNo}）已被其他匹配占用，红冲与原凭证可能对应不上`,
+            resolved: false,
+          });
+        }
       }
     }
   }
@@ -165,7 +237,9 @@ export const createMatchRecord = (
   score: number,
   transactions: BankTransaction[],
   vouchers: Voucher[],
-  existingMatches: MatchRecord[]
+  existingMatches: MatchRecord[],
+  allTransactions: BankTransaction[],
+  allVouchers: Voucher[]
 ): MatchRecord => {
   const totalDebit = transactions.reduce((sum, t) => sum + t.debitAmount, 0);
   const totalCredit = transactions.reduce((sum, t) => sum + t.creditAmount, 0);
@@ -181,7 +255,7 @@ export const createMatchRecord = (
   const conflicts: ConflictInfo[] = [];
 
   transactions.forEach(t => {
-    const tConflicts = detectConflicts(t, vouchers[0], existingMatches);
+    const tConflicts = detectConflicts(t, vouchers[0], existingMatches, allTransactions, allVouchers);
     conflicts.push(...tConflicts);
   });
 
@@ -247,7 +321,9 @@ export const performMatching = async (batchId: string): Promise<MatchRecord[]> =
       candidate.score,
       [candidate.transaction],
       [candidate.voucher],
-      existingMatches
+      existingMatches,
+      transactions,
+      vouchers
     );
 
     newMatches.push(match);
@@ -399,7 +475,9 @@ export const manualMatch = async (
     100,
     matchedTransactions,
     matchedVouchers,
-    existingMatches
+    existingMatches,
+    transactions,
+    vouchers
   );
 
   await dbOperations.matchRecords.addMany([match]);
