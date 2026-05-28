@@ -249,6 +249,21 @@ export const determineDataQuality = (validation: ValidationResult): 'normal' | '
   return 'normal';
 };
 
+const mergeValidation = (
+  base: ValidationResult,
+  extra: ValidationResult
+): ValidationResult => ({
+  isValid: base.isValid && extra.isValid,
+  checks: {
+    enharmonicConfusion: base.checks.enharmonicConfusion || extra.checks.enharmonicConfusion,
+    audioMismatch: base.checks.audioMismatch || extra.checks.audioMismatch,
+    brokenPath: base.checks.brokenPath || extra.checks.brokenPath,
+    invalidInterval: base.checks.invalidInterval || extra.checks.invalidInterval,
+  },
+  warnings: [...base.warnings, ...extra.warnings],
+  errors: [...base.errors, ...extra.errors],
+});
+
 export const validateAllData = (data: {
   modes: Mode[];
   chords: Chord[];
@@ -296,9 +311,54 @@ export const validateAllData = (data: {
     };
   });
 
+  const audioValidationsByTarget = new Map<string, ValidationResult>();
+  for (const sample of validatedSamples) {
+    if (sample.isMismatched || sample.quality !== 'normal') {
+      const existing = audioValidationsByTarget.get(sample.targetId);
+      const sampleValidation: ValidationResult = {
+        isValid: sample.quality === 'normal',
+        checks: {
+          enharmonicConfusion: false,
+          audioMismatch: sample.isMismatched,
+          brokenPath: false,
+          invalidInterval: false,
+        },
+        warnings: sample.isMismatched ? ['关联音频示例存在错配'] : [],
+        errors: sample.quality === 'error' ? ['关联音频示例校验失败'] : [],
+      };
+      if (existing) {
+        audioValidationsByTarget.set(sample.targetId, mergeValidation(existing, sampleValidation));
+      } else {
+        audioValidationsByTarget.set(sample.targetId, sampleValidation);
+      }
+    }
+  }
+
+  const finalModes = validatedModes.map((mode) => {
+    const audioVal = audioValidationsByTarget.get(mode.id);
+    if (!audioVal) return mode;
+    const merged = mergeValidation(mode.validation, audioVal);
+    return {
+      ...mode,
+      validation: merged,
+      quality: determineDataQuality(merged),
+    };
+  });
+
+  const finalChords = validatedChords.map((chord) => {
+    const audioVal = audioValidationsByTarget.get(chord.id);
+    if (!audioVal) return chord;
+    const merged = mergeValidation(chord.validation, audioVal);
+    return {
+      ...chord,
+      validation: merged,
+      quality: determineDataQuality(merged),
+    };
+  });
+
   return {
-    modes: validatedModes,
-    chords: validatedChords,
+    modes: finalModes,
+    chords: finalChords,
     modulationPaths: validatedPaths,
     audioSamples: validatedSamples,
   };
