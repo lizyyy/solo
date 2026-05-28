@@ -1,0 +1,26 @@
+{
+  "name": "insurance-grace-period-manager",
+  "version": "1.0.0",
+  "description": "保险保费续缴宽限期管理系统 - 处理宽限期计算、催缴去重、垫交状态管理、回访历史和报告导出",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "init": "node scripts/init-data.js",
+    "test": "node test/run-tests.js",
+    "setup": "npm install && node scripts/init-data.js",
+    "full": "npm run init && npm start"
+  },
+  "keywords": ["insurance", "grace-period", "premium", "续缴", "宽限期"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5",
+    "xlsx": "^0.18.5",
+    "moment": "^2.29.4",
+    "moment-holiday": "^1.5.1",
+    "chinese-holidays": "^1.0.0"
+  }
+}

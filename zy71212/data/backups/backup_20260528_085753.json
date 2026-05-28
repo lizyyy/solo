@@ -1,0 +1,58 @@
+{
+  "policies": [
+    {
+      "testData": {
+        "test": "data",
+        "timestamp": 1779929736138
+      }
+    }
+  ],
+  "paymentPlans": [],
+  "advancePayments": [],
+  "visitRecords": [],
+  "reminderRecords": [],
+  "reports": [
+    {
+      "reportId": "RPT_1779929736147",
+      "reportDate": "2026-05-28",
+      "reportPeriod": "2025年6月",
+      "generatedBy": "测试系统",
+      "summary": {
+        "totalPolicies": 0,
+        "duePolicies": 0,
+        "overduePolicies": 0,
+        "inGracePolicies": 0,
+        "graceExpiredPolicies": 0,
+        "paidPolicies": 0,
+        "advancePaymentPolicies": 0,
+        "stopIntentPolicies": 0,
+        "pendingFollowUp": 0,
+        "totalPremiumDue": 0,
+        "totalPremiumPaid": 0,
+        "totalPremiumOverdue": 0
+      },
+      "details": [],
+      "recommendations": [],
+      "status": "草稿",
+      "createdAt": "2026-05-28 08:55:36",
+      "updatedAt": "2026-05-28 08:55:36",
+      "missingFields": []
+    }
+  ],
+  "config": {
+    "gracePeriodDays": 60,
+    "defaultInterestRate": 0.05,
+    "reminderIntervals": [
+      3,
+      7,
+      15,
+      30
+    ],
+    "autoAdvanceEnabled": false,
+    "lastUpdated": null
+  },
+  "version": {
+    "version": 3,
+    "lastUpdated": "2026-05-28 08:55:36"
+  }
+}

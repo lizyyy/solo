@@ -1,0 +1,24 @@
+{
+  "policies": [],
+  "paymentPlans": [],
+  "advancePayments": [],
+  "visitRecords": [],
+  "reminderRecords": [],
+  "reports": [],
+  "config": {
+    "gracePeriodDays": 60,
+    "defaultInterestRate": 0.05,
+    "reminderIntervals": [
+      3,
+      7,
+      15,
+      30
+    ],
+    "autoAdvanceEnabled": false,
+    "lastUpdated": null
+  },
+  "version": {
+    "version": 1,
+    "lastUpdated": null
+  }
+}

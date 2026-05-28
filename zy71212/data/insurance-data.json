@@ -1,0 +1,304 @@
+{
+  "version": "1.0.0",
+  "createdAt": "2026-05-28T00:55:25.518Z",
+  "policies": [
+    {
+      "policyNumber": "POL20250001",
+      "policyHolder": "张三",
+      "phone": "13800138001",
+      "productName": "平安福终身寿险",
+      "premiumAmount": 5000,
+      "paymentMethod": "年交",
+      "effectiveDate": "2020-01-15",
+      "graceDays": 60,
+      "autoAdvanceEnabled": true,
+      "cashValue": 25000
+    },
+    {
+      "policyNumber": "POL20250002",
+      "policyHolder": "李四",
+      "phone": "13800138002",
+      "productName": "平安鑫盛终身寿险",
+      "premiumAmount": 3000,
+      "paymentMethod": "年交",
+      "effectiveDate": "2019-06-20",
+      "graceDays": 60,
+      "autoAdvanceEnabled": true,
+      "cashValue": 18000
+    },
+    {
+      "policyNumber": "POL20250003",
+      "policyHolder": "王五",
+      "phone": "13800138003",
+      "productName": "平安智盈人生终身寿险",
+      "premiumAmount": 8000,
+      "paymentMethod": "年交",
+      "effectiveDate": "2018-03-10",
+      "graceDays": 60,
+      "autoAdvanceEnabled": false,
+      "cashValue": 45000
+    },
+    {
+      "policyNumber": "POL20250004",
+      "policyHolder": "赵六",
+      "phone": "13800138004",
+      "productName": "平安鸿盛终身寿险",
+      "premiumAmount": 4500,
+      "paymentMethod": "年交",
+      "effectiveDate": "2021-09-01",
+      "graceDays": 60,
+      "autoAdvanceEnabled": true,
+      "cashValue": 12000
+    },
+    {
+      "policyNumber": "POL20250005",
+      "policyHolder": "钱七",
+      "phone": "13800138005",
+      "productName": "平安康泰终身保险",
+      "premiumAmount": 6000,
+      "paymentMethod": "年交",
+      "effectiveDate": "2017-11-15",
+      "graceDays": 60,
+      "autoAdvanceEnabled": true,
+      "cashValue": 38000
+    },
+    {
+      "policyNumber": "POL20250006",
+      "policyHolder": "孙八",
+      "phone": "13800138006",
+      "productName": "平安永利两全保险",
+      "premiumAmount": 2500,
+      "paymentMethod": "年交",
+      "effectiveDate": "2022-02-28",
+      "graceDays": 60,
+      "autoAdvanceEnabled": false,
+      "cashValue": 5000
+    },
+    {
+      "policyNumber": "POL20250007",
+      "policyHolder": "周九",
+      "phone": "13800138007",
+      "productName": "平安世纪彩虹少儿两全保险",
+      "premiumAmount": 3500,
+      "paymentMethod": "年交",
+      "effectiveDate": "2016-05-20",
+      "graceDays": 60,
+      "autoAdvanceEnabled": true,
+      "cashValue": 28000
+    },
+    {
+      "policyNumber": "POL20250008",
+      "policyHolder": "吴十",
+      "phone": "13800138008",
+      "productName": "平安钟爱一生养老年金保险",
+      "premiumAmount": 10000,
+      "paymentMethod": "年交",
+      "effectiveDate": "2015-08-10",
+      "graceDays": 60,
+      "autoAdvanceEnabled": true,
+      "cashValue": 65000
+    }
+  ],
+  "paymentPlans": [
+    {
+      "policyNumber": "POL20250001",
+      "period": "2025年度",
+      "dueDate": "2025-06-15",
+      "amount": 5000,
+      "status": "pending"
+    },
+    {
+      "policyNumber": "POL20250002",
+      "period": "2025年度",
+      "dueDate": "2025-06-20",
+      "amount": 3000,
+      "status": "pending"
+    },
+    {
+      "policyNumber": "POL20250003",
+      "period": "2025年度",
+      "dueDate": "2025-05-15",
+      "amount": 8000,
+      "status": "pending"
+    },
+    {
+      "policyNumber": "POL20250004",
+      "period": "2025年度",
+      "dueDate": "2025-07-01",
+      "amount": 4500,
+      "status": "pending"
+    },
+    {
+      "policyNumber": "POL20250005",
+      "period": "2025年度",
+      "dueDate": "2025-04-20",
+      "amount": 6000,
+      "status": "pending"
+    },
+    {
+      "policyNumber": "POL20250006",
+      "period": "2025年度",
+      "dueDate": "2025-06-05",
+      "amount": 2500,
+      "status": "pending"
+    },
+    {
+      "policyNumber": "POL20250007",
+      "period": "2025年度",
+      "dueDate": "2025-05-20",
+      "amount": 3500,
+      "status": "pending"
+    },
+    {
+      "policyNumber": "POL20250008",
+      "period": "2025年度",
+      "dueDate": "2025-06-25",
+      "amount": 10000,
+      "status": "pending"
+    }
+  ],
+  "advancePaymentRecords": [],
+  "visitRecords": [
+    {
+      "policyNumber": "POL20250001",
+      "visitDate": "2025-06-01",
+      "visitMethod": "电话",
+      "visitor": "代理人A",
+      "intent": "renew",
+      "notes": "客户表示资金周转正常，确认续保"
+    },
+    {
+      "policyNumber": "POL20250002",
+      "visitDate": "2025-06-05",
+      "visitMethod": "微信",
+      "visitor": "代理人B",
+      "intent": "delay",
+      "notes": "客户近期资金紧张，希望缓交一段时间"
+    },
+    {
+      "policyNumber": "POL20250003",
+      "visitDate": "2025-05-20",
+      "visitMethod": "上门",
+      "visitor": "代理人A",
+      "intent": "stop",
+      "notes": "客户明确表示不再续保，已了解相关权益损失"
+    },
+    {
+      "policyNumber": "POL20250005",
+      "visitDate": "2025-05-10",
+      "visitMethod": "电话",
+      "visitor": "代理人C",
+      "intent": "unknown",
+      "notes": "客户未明确表态，需要再次回访"
+    },
+    {
+      "policyNumber": "POL20250007",
+      "visitDate": "2025-06-02",
+      "visitMethod": "短信",
+      "visitor": "代理人B",
+      "intent": "renew",
+      "notes": "客户回复确认续保"
+    }
+  ],
+  "reminderRecords": [],
+  "reports": [],
+  "config": {
+    "graceDays": 60,
+    "interestRate": 5,
+    "reminderIntervals": [
+      3,
+      7,
+      15,
+      30
+    ],
+    "autoAdvanceEnabled": true
+  },
+  "holidays": [
+    {
+      "date": "2025-01-01",
+      "name": "元旦",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-01-28",
+      "name": "春节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-01-29",
+      "name": "春节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-01-30",
+      "name": "春节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-01-31",
+      "name": "春节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-02-01",
+      "name": "春节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-02-02",
+      "name": "春节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-04-04",
+      "name": "清明节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-05-01",
+      "name": "劳动节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-06-01",
+      "name": "端午节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-10-01",
+      "name": "国庆节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-10-02",
+      "name": "国庆节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-10-03",
+      "name": "国庆节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-10-04",
+      "name": "国庆节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-10-05",
+      "name": "国庆节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-10-06",
+      "name": "国庆节",
+      "type": "holiday"
+    },
+    {
+      "date": "2025-10-07",
+      "name": "国庆节",
+      "type": "holiday"
+    }
+  ],
+  "backups": []
+}

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保费续缴宽限期管理系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <span class="logo">🛡️</span>
+                    保费续缴宽限期管理系统
+                </h1>
+                <nav class="main-nav">
+                    <button class="nav-btn active" data-tab="dashboard">
+                        <span class="nav-icon">📊</span> 总览
+                    </button>
+                    <button class="nav-btn" data-tab="grace">
+                        <span class="nav-icon">⏰</span> 宽限期
+                    </button>
+                    <button class="nav-btn" data-tab="reminder">
+                        <span class="nav-icon">📱</span> 催缴管理
+                    </button>
+                    <button class="nav-btn" data-tab="advance">
+                        <span class="nav-icon">💰</span> 垫交管理
+                    </button>
+                    <button class="nav-btn" data-tab="policies">
+                        <span class="nav-icon">📋</span> 保单管理
+                    </button>
+                    <button class="nav-btn" data-tab="reports">
+                        <span class="nav-icon">📄</span> 报告中心
+                    </button>
+                    <button class="nav-btn" data-tab="settings">
+                        <span class="nav-icon">⚙️</span> 系统设置
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <div id="tab-dashboard" class="tab-content active">
+                <div class="section-header">
+                    <h2>数据总览</h2>
+                    <button class="btn btn-primary" id="refreshDashboard">
+                        <span>🔄</span> 刷新数据
+                    </button>
+                </div>
+                
+                <div class="stats-grid" id="statsGrid">
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>待办事项</h3>
+                            <span class="badge badge-warning" id="nextStepsCount">0</span>
+                        </div>
+                        <div class="card-body">
+                            <div id="nextStepsList" class="next-steps-list">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>宽限期分布</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="graceDistribution" class="grace-distribution">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>数据一致性检查</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="consistencyStatus">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>财务概览</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="financialOverview" class="financial-overview">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-grace" class="tab-content">
+                <div class="section-header">
+                    <h2>宽限期管理</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="runGraceAnalysis">
+                            <span>🔍</span> 运行分析
+                        </button>
+                        <button class="btn btn-secondary" id="updateGraceDates">
+                            <span>📅</span> 更新宽限日期
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>批量处理</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>目录路径</label>
+                                <input type="text" id="dirPath" placeholder="输入要处理的目录绝对路径" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <div class="btn-group">
+                                    <button class="btn btn-primary" id="processDirectory">
+                                        <span>📂</span> 处理目录
+                                    </button>
+                                    <label class="btn btn-secondary">
+                                        <span>📁</span> 上传文件
+                                        <input type="file" id="fileUpload" accept=".json,.csv,.xlsx,.xls,.txt" style="display: none;">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="processingResult" class="processing-result">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>宽限期分析结果</h3>
+                        <div class="filter-group">
+                            <select id="urgencyFilter" class="form-control">
+                                <option value="">全部紧急程度</option>
+                                <option value="紧急">紧急</option>
+                                <option value="高">高</option>
+                                <option value="中">中</option>
+                                <option value="低">低</option>
+                                <option value="已过期">已过期</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table" id="graceTable">
+                                <thead>
+                                    <tr>
+                                        <th>保单号</th>
+                                        <th>投保人</th>
+                                        <th>缴费期次</th>
+                                        <th>应缴保费</th>
+                                        <th>应缴日期</th>
+                                        <th>宽限结束日</th>
+                                        <th>宽限天数</th>
+                                        <th>逾期天数</th>
+                                        <th>剩余天数</th>
+                                        <th>紧急程度</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-reminder" class="tab-content">
+                <div class="section-header">
+                    <h2>催缴管理</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="generateReminderList">
+                            <span>📝</span> 生成催缴清单
+                        </button>
+                        <button class="btn btn-success" id="executeReminders">
+                            <span>✅</span> 批量执行催缴
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>催缴统计</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="reminderStats" class="stats-row">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>催缴清单</h3>
+                        <div class="filter-group">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="includeStopIntent"> 包含停保意愿
+                            </label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table" id="reminderTable">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAllReminders"></th>
+                                        <th>保单号</th>
+                                        <th>投保人</th>
+                                        <th>联系电话</th>
+                                        <th>应缴保费</th>
+                                        <th>剩余天数</th>
+                                        <th>紧急程度</th>
+                                        <th>建议方式</th>
+                                        <th>催缴内容</th>
+                                        <th>上次催缴</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>催缴历史</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table" id="reminderHistoryTable">
+                                <thead>
+                                    <tr>
+                                        <th>保单号</th>
+                                        <th>缴费期次</th>
+                                        <th>催缴日期</th>
+                                        <th>催缴类型</th>
+                                        <th>紧急程度</th>
+                                        <th>状态</th>
+                                        <th>客户响应</th>
+                                        <th>响应日期</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-advance" class="tab-content">
+                <div class="section-header">
+                    <h2>垫交管理</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="processAdvances">
+                            <span>⚡</span> 自动处理垫交
+                        </button>
+                        <button class="btn btn-secondary" id="refreshAdvances">
+                            <span>🔄</span> 刷新
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>垫交统计</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="advanceStats" class="stats-row">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>待垫交保单</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table" id="eligibleAdvanceTable">
+                                <thead>
+                                    <tr>
+                                        <th>保单号</th>
+                                        <th>投保人</th>
+                                        <th>缴费期次</th>
+                                        <th>应缴保费</th>
+                                        <th>剩余天数</th>
+                                        <th>现金价值</th>
+                                        <th>自动垫交</th>
+                                        <th>可垫交</th>
+                                        <th>原因</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>未偿还垫交记录</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table" id="unrepaidAdvanceTable">
+                                <thead>
+                                    <tr>
+                                        <th>保单号</th>
+                                        <th>缴费期次</th>
+                                        <th>垫交日期</th>
+                                        <th>垫交金额</th>
+                                        <th>利率</th>
+                                        <th>当前利息</th>
+                                        <th>应还总额</th>
+                                        <th>垫交天数</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-policies" class="tab-content">
+                <div class="section-header">
+                    <h2>保单管理</h2>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <input type="text" id="policySearch" placeholder="搜索保单号..." class="form-control">
+                        </div>
+                        <button class="btn btn-primary" id="addVisitRecord">
+                            <span>📝</span> 新增回访
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>保单列表</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table" id="policiesTable">
+                                <thead>
+                                    <tr>
+                                        <th>保单号</th>
+                                        <th>投保人</th>
+                                        <th>产品名称</th>
+                                        <th>保费</th>
+                                        <th>缴费方式</th>
+                                        <th>生效日期</th>
+                                        <th>宽限天数</th>
+                                        <th>自动垫交</th>
+                                        <th>现金价值</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" id="policyDetailCard" style="display: none;">
+                    <div class="card-header">
+                        <h3 id="policyDetailTitle">保单详情</h3>
+                        <button class="btn btn-secondary" id="closePolicyDetail">关闭</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="policyDetailContent">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-reports" class="tab-content">
+                <div class="section-header">
+                    <h2>报告中心</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="generateNewReport">
+                            <span>📊</span> 生成新报告
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>历史报告</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table" id="reportsTable">
+                                <thead>
+                                    <tr>
+                                        <th>报告ID</th>
+                                        <th>报告日期</th>
+                                        <th>报告期</th>
+                                        <th>保单总数</th>
+                                        <th>待缴费</th>
+                                        <th>宽限期内</th>
+                                        <th>已过期</th>
+                                        <th>已缴费</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" id="reportDetailCard" style="display: none;">
+                    <div class="card-header">
+                        <h3 id="reportDetailTitle">报告详情</h3>
+                        <div class="header-actions">
+                            <button class="btn btn-secondary" id="exportReportJson">导出JSON</button>
+                            <button class="btn btn-success" id="exportReportCsv">导出CSV</button>
+                            <button class="btn btn-secondary" id="closeReportDetail">关闭</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="reportDetailContent">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-settings" class="tab-content">
+                <div class="section-header">
+                    <h2>系统设置</h2>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>业务参数</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="configForm">
+                                <div class="form-group">
+                                    <label>默认宽限期天数</label>
+                                    <input type="number" id="configGraceDays" class="form-control" value="60">
+                                </div>
+                                <div class="form-group">
+                                    <label>垫交利率 (%)</label>
+                                    <input type="number" id="configInterestRate" class="form-control" step="0.01" value="5">
+                                </div>
+                                <div class="form-group">
+                                    <label>催缴间隔天数</label>
+                                    <input type="text" id="configReminderIntervals" class="form-control" value="3,7,15,30">
+                                </div>
+                                <div class="form-group checkbox-inline">
+                                    <label>
+                                        <input type="checkbox" id="configAutoAdvance"> 启用自动垫交
+                                    </label>
+                                </div>
+                                <button type="button" class="btn btn-primary" id="saveConfig">保存设置</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>节假日管理</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="holidayForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>日期</label>
+                                        <input type="date" id="holidayDate" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>名称</label>
+                                        <input type="text" id="holidayName" class="form-control" placeholder="节假日名称">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>&nbsp;</label>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-primary" id="addHoliday">添加假期</button>
+                                            <button type="button" class="btn btn-secondary" id="addWorkday">设为工作日</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div id="holidaysList" class="holidays-list">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>数据备份</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="btn-group">
+                                <button class="btn btn-primary" id="createBackup">
+                                    <span>💾</span> 创建备份
+                                </button>
+                                <button class="btn btn-secondary" id="exportAllData">
+                                    <span>📤</span> 导出全部数据
+                                </button>
+                            </div>
+                            <h4>备份列表</h4>
+                            <div id="backupsList" class="backups-list">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>数据导入</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">支持导入 JSON、CSV、Excel 格式的数据文件</p>
+                            <label class="btn btn-secondary">
+                                <span>📥</span> 选择导入文件
+                                <input type="file" id="importFile" accept=".json,.csv,.xlsx,.xls" style="display: none;">
+                            </label>
+                            <div id="importResult" class="import-result">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p id="loadingText">处理中...</p>
+            </div>
+        </div>
+
+        <div id="messageToast" class="message-toast" style="display: none;">
+            <span id="messageText"></span>
+        </div>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">标题</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+            <div class="modal-footer" id="modalFooter">
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
