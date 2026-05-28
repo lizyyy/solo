@@ -74,9 +74,11 @@ class PrivateFundService:
         return self.clue_linker.get_investor_clues(orders, investor_id)
 
     def export_report(self, order: SubscriptionOrder, operator: str,
+                      all_orders: Optional[List[SubscriptionOrder]] = None,
                       **options) -> Tuple[Optional[Any], List[str]]:
-        """导出确认报告 - 带取舍逻辑，校验不通过的不导出"""
-        return self.report_exporter.generate_report(order, operator, self.report_dir, **options)
+        """导出确认报告 - 带取舍逻辑，校验不通过的不导出，重复认购不导出"""
+        return self.report_exporter.generate_report(order, operator, self.report_dir,
+                                                     all_orders=all_orders, **options)
 
     def batch_export_reports(self, orders: List[SubscriptionOrder],
                              operator: str, **options) -> Dict[str, Any]:

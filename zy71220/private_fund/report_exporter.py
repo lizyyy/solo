@@ -9,6 +9,7 @@ from .models import (
     SubscriptionOrder, ConfirmReport, SubscriptionStatus,
     CoolOffStatus, MaterialStatus
 )
+from .duplicate_guard import DuplicateSubscriptionGuard
 
 
 class ReportExporter:
@@ -24,15 +25,29 @@ class ReportExporter:
     }
 
     @classmethod
-    def should_export(cls, order: SubscriptionOrder) -> Tuple[bool, List[str]]:
+    def should_export(cls, order: SubscriptionOrder,
+                      all_orders: Optional[List[SubscriptionOrder]] = None) -> Tuple[bool, List[str]]:
         """
         判断是否应该导出报告
         取舍逻辑：校验不通过的不导出，冷静期未满的不导出，重复认购的不导出
+        all_orders: 同批订单列表，用于标记重复认购（非首单标记错误）
         """
         reasons: List[str] = []
 
+        if all_orders:
+            dup_guard = DuplicateSubscriptionGuard()
+            dup_result = dup_guard.batch_check(all_orders)
+            dup_order_ids = set()
+            for group in dup_result["duplicate_groups"]:
+                for idx, o_summary in enumerate(group["orders"]):
+                    if idx > 0:
+                        dup_order_ids.add(o_summary["subscription_id"])
+
+            if order.subscription_id in dup_order_ids:
+                reasons.append("存在重复认购（非首单），不予导出")
+
         dup_errors = [e for e in order.error_details if "重复认购" in e]
-        if dup_errors:
+        if dup_errors and "存在重复认购（非首单），不予导出" not in reasons:
             reasons.append(f"存在重复认购，不予导出：{'; '.join(dup_errors)}")
 
         if order.status == SubscriptionStatus.REJECTED:
@@ -57,14 +72,16 @@ class ReportExporter:
     @classmethod
     def generate_report(cls, order: SubscriptionOrder, operator: str,
                         export_dir: str = "./reports",
+                        all_orders: Optional[List[SubscriptionOrder]] = None,
                         **options) -> Tuple[Optional[ConfirmReport], List[str]]:
         """
         生成确认报告
         可以通过options控制包含哪些内容
+        all_orders: 同批订单列表，用于实时重复认购检查
         """
         messages: List[str] = []
 
-        should_do, skip_reasons = cls.should_export(order)
+        should_do, skip_reasons = cls.should_export(order, all_orders)
         if not should_do:
             messages.extend(skip_reasons)
             return None, messages
@@ -181,7 +198,7 @@ class ReportExporter:
     def batch_export(cls, orders: List[SubscriptionOrder], operator: str,
                      export_dir: str = "./reports",
                      **options) -> Dict[str, Any]:
-        """批量导出报告，按结果分组便于复查"""
+        """批量导出报告，按结果分组便于复查，自动检测重复认购"""
         result = {
             "exported": [],
             "skipped": [],
@@ -189,7 +206,8 @@ class ReportExporter:
         }
 
         for order in orders:
-            report, messages = cls.generate_report(order, operator, export_dir, **options)
+            report, messages = cls.generate_report(order, operator, export_dir,
+                                                   all_orders=orders, **options)
             if report:
                 result["exported"].append({
                     "order_no": order.order_no,

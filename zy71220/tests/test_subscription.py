@@ -322,14 +322,18 @@ def run_all_tests():
     print(f"  材料数: {investor_clues['material_count']}")
     print(f"  冷静期数: {investor_clues['cool_off_count']}")
 
-    print(f"\n【测试4】报告导出 - 取舍逻辑验证")
+    print(f"\n【测试4】报告导出 - 取舍逻辑验证（含重复认购拦截）")
     export_result = service.batch_export_reports(test_orders, "test_operator")
     print(f"  成功导出: {len(export_result['exported'])} 份")
-    for item in export_result['exported']:
+    exported_nos_test4 = [item["order_no"] for item in export_result["exported"]]
+    for item in export_result["exported"]:
         print(f"    ✓ {item['order_no']} -> {item['report_file']}")
     print(f"  跳过: {len(export_result['skipped'])} 份")
-    for item in export_result['skipped']:
-        print(f"    ✗ {item['order_no']}: {'; '.join(item['reasons'])}")
+    for item in export_result["skipped"]:
+        print(f"    ✗ {item['order_no']}: {'; '.join(item['reasons'])[:120]}")
+
+    assert "TEST004" not in exported_nos_test4, "TEST004 是重复认购，不应导出报告"
+    print("  ✓ 验证通过：重复认购订单 TEST004 未导出报告")
 
     print(f"\n【测试5】批量文件处理")
     test_file = create_test_excel("./test_subscriptions.xlsx")
