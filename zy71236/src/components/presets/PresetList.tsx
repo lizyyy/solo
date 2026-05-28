@@ -186,7 +186,7 @@ export function PresetList() {
         <label className="flex-1">
           <input
             type="file"
-            accept=".json,.synthconfig,.synthsession"
+            accept=".json,.synthconfig,.synthsession,.synthlab"
             onChange={handleImport}
             className="hidden"
           />

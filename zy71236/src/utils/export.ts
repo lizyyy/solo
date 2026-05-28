@@ -166,7 +166,7 @@ export function downloadConfig(params: SynthParams): void {
 export function downloadSession(session: Session): void {
   const json = exportSessionAsJson(session);
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  downloadFile(json, `synth-session-${timestamp}.synthlab`, 'application/json');
+  downloadFile(json, `synth-session-${timestamp}.synthsession.json`, 'application/json');
 }
 
 export function downloadReport(report: ReportData, format: 'txt' | 'json'): void {

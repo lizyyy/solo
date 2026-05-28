@@ -16,7 +16,8 @@ import {
 import { ReportData } from '../../types/synth';
 import { Button } from '../ui/Button';
 import { LedDisplay } from '../ui/LedDisplay';
-import { downloadReport, downloadSession } from '../../utils/export';
+import { downloadReport } from '../../utils/export';
+import { useSynthStore } from '../../store/useSynthStore';
 import {
   Download,
   FileText,
@@ -285,6 +286,7 @@ interface ReportPageProps {
 export function ReportPage({ report, onBack }: ReportPageProps) {
   const [showTotal, setShowTotal] = useState(0);
   const [exportFormat, setExportFormat] = useState<'txt' | 'json'>('txt');
+  const { exportSessionFile } = useSynthStore();
 
   useEffect(() => {
     const duration = 2000;
@@ -310,15 +312,14 @@ export function ReportPage({ report, onBack }: ReportPageProps) {
   };
 
   const handleDownloadSession = () => {
-    downloadSession({
-      id: report.sessionId,
-      createdAt: report.createdAt,
-      updatedAt: Date.now(),
-      params: report.finalParams,
-      history: report.history,
-      presets: [],
-      currentScore: report.score,
-    });
+    const json = exportSessionFile();
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `synth-session-${Date.now()}.synthsession.json`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const gradeLabels = [
