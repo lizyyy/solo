@@ -37,7 +37,7 @@ router.get(
 )
 
 router.put(
-  '/:id/resolve',
+  '/:analysisId/errors/:id/resolve',
   (req: Request, res: Response): void => {
     const { id } = req.params
     const { action, resolution } = req.body

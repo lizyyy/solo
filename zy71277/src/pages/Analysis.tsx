@@ -37,17 +37,27 @@ export default function Analysis() {
         setLoading(true);
         setError(null);
 
-        const [analysisRes, resultRes, waveformRes] = await Promise.all([
-          fetch(`/api/analysis/${id}`).then((r) => r.json() as Promise<ApiResponse<DriftAnalysis>>),
-          fetch(`/api/analysis/${id}/result`).then((r) => r.json() as Promise<ApiResponse<DriftResult>>),
-          fetch(`/api/audio/${id}/waveform`).then((r) => r.json() as Promise<ApiResponse<{ waveform: number[]; audioFile: AudioFile }>>),
-        ]);
+        const analysisRes = await fetch(`/api/analysis/${id}`).then(
+          (r) => r.json() as Promise<ApiResponse<DriftAnalysis>>
+        );
 
         if (!analysisRes.success) throw new Error(analysisRes.error || 'Failed to fetch analysis');
+        setAnalysis(analysisRes.data);
+
+        const audioId = analysisRes.data.audioId;
+
+        const [resultRes, waveformRes] = await Promise.all([
+          fetch(`/api/analysis/${id}/result`).then(
+            (r) => r.json() as Promise<ApiResponse<DriftResult>>
+          ),
+          fetch(`/api/audio/${audioId}/waveform`).then(
+            (r) => r.json() as Promise<ApiResponse<{ waveform: number[]; audioFile: AudioFile }>>
+          ),
+        ]);
+
         if (!resultRes.success) throw new Error(resultRes.error || 'Failed to fetch result');
         if (!waveformRes.success) throw new Error(waveformRes.error || 'Failed to fetch waveform');
 
-        setAnalysis(analysisRes.data);
         setResult(resultRes.data);
         setWaveform(waveformRes.data.waveform);
         setAudioFile(waveformRes.data.audioFile);

@@ -182,7 +182,7 @@ export default function Home() {
       const response = await fetch(`/api/audio/${audioId}/waveform`);
       const result = await response.json();
       if (result.success) {
-        setWaveform(result.data);
+        setWaveform(result.data.waveform);
       }
     } catch (e) {
       console.error('Failed to fetch waveform:', e);

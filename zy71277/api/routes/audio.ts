@@ -116,8 +116,8 @@ router.get(
   (req: Request, res: Response): void => {
     const { id } = req.params
     const row = db
-      .prepare(`SELECT duration FROM audio_files WHERE id = ?`)
-      .get(id) as { duration: number } | undefined
+      .prepare(`SELECT duration, filename, sample_rate, channels, uploaded_at FROM audio_files WHERE id = ?`)
+      .get(id) as { duration: number; filename: string; sample_rate: number; channels: number; uploaded_at: string } | undefined
 
     if (!row) {
       res.status(404).json({ success: false, error: 'Audio file not found' })
@@ -134,7 +134,7 @@ router.get(
       waveform.push(Math.round((base * envelope + noise) * 1000) / 1000)
     }
 
-    res.json({ success: true, data: waveform })
+    res.json({ success: true, data: { waveform, audioFile: { id, filename: row.filename, duration: row.duration, sampleRate: row.sample_rate, channels: row.channels, uploadedAt: row.uploaded_at } } })
   }
 )
 

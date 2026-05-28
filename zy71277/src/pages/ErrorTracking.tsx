@@ -174,13 +174,18 @@ export default function ErrorTracking() {
     const fetchData = async () => {
       try {
         setLoading(true);
+
+        const analysisRes = await fetch(`/api/analysis/${id}`);
+        const analysisData = await analysisRes.json();
+        const audioId = analysisData.success ? analysisData.data.audioId : null;
+
         const [errorsRes, waveformRes] = await Promise.all([
           fetch(`/api/analysis/${id}/errors`),
-          fetch(`/api/audio/${id}/waveform`),
+          audioId ? fetch(`/api/audio/${audioId}/waveform`) : Promise.resolve(null),
         ]);
 
         const errorsData = await errorsRes.json();
-        const waveformData = await waveformRes.json();
+        const waveformData = waveformRes ? await waveformRes.json() : null;
 
         if (errorsData.success) {
           setErrors(errorsData.data);
@@ -188,9 +193,9 @@ export default function ErrorTracking() {
             setSelectedType(errorsData.data[0].type);
           }
         }
-        if (waveformData.success) {
+        if (waveformData?.success) {
           setWaveform(waveformData.data.waveform);
-          setDuration(waveformData.data.duration);
+          setDuration(waveformData.data.audioFile.duration);
         }
       } catch (error) {
         console.error('Failed to fetch data:', error);
@@ -258,7 +263,7 @@ export default function ErrorTracking() {
     if (!modalState.error) return;
 
     try {
-      const response = await fetch(`/api/errors/${modalState.error.id}/resolve`, {
+      const response = await fetch(`/api/analysis/${id}/errors/${modalState.error.id}/resolve`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
