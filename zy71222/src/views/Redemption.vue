@@ -63,6 +63,24 @@
             <span v-else style="color: #909399;">-</span>
           </template>
         </el-table-column>
+        <el-table-column label="历史一致" width="100">
+          <template #default="{ row }">
+            <el-tooltip 
+              v-if="row.statusHistoryValid === false" 
+              :content="row.statusHistoryErrors?.join('；') || '状态历史不一致'" 
+              placement="top"
+            >
+              <el-tag type="danger" size="small" style="cursor: pointer;">
+                <el-icon><Warning /></el-icon>
+                不一致
+              </el-tag>
+            </el-tooltip>
+            <el-tag v-else type="success" size="small">
+              <el-icon><CircleCheck /></el-icon>
+              一致
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="applicant" label="申请人" width="120" />
         <el-table-column prop="createTime" label="申请时间" width="160">
           <template #default="{ row }">{{ formatTime(row.createTime) }}</template>

@@ -86,6 +86,57 @@ export const useRedemptionStore = defineStore('redemption', () => {
     return dayjs(redemption.creditReleaseTime).isBefore(dayjs(redemption.buyerConfirmTime))
   }
 
+  function validateStatusHistory(redemption, history) {
+    const validTransitions = {
+      [REDEMPTION_STATUS.DRAFT]: [REDEMPTION_STATUS.SUBMITTED, REDEMPTION_STATUS.REJECTED],
+      [REDEMPTION_STATUS.SUBMITTED]: [REDEMPTION_STATUS.BUYER_CONFIRMED, REDEMPTION_STATUS.REJECTED],
+      [REDEMPTION_STATUS.BUYER_CONFIRMED]: [REDEMPTION_STATUS.PROCESSING, REDEMPTION_STATUS.REJECTED],
+      [REDEMPTION_STATUS.PROCESSING]: [REDEMPTION_STATUS.COMPLETED, REDEMPTION_STATUS.REJECTED],
+      [REDEMPTION_STATUS.COMPLETED]: [],
+      [REDEMPTION_STATUS.REJECTED]: []
+    }
+
+    const sortedHistory = [...history].sort((a, b) => {
+      if (a.id && b.id) {
+        return a.id.localeCompare(b.id)
+      }
+      return new Date(a.operateTime) - new Date(b.operateTime)
+    })
+
+    if (sortedHistory.length === 0) {
+      return { valid: redemption.status === REDEMPTION_STATUS.DRAFT, errors: [] }
+    }
+
+    const errors = []
+    let expectedStatus = REDEMPTION_STATUS.DRAFT
+
+    for (let i = 0; i < sortedHistory.length; i++) {
+      const record = sortedHistory[i]
+
+      if (record.fromStatus !== expectedStatus) {
+        errors.push(
+          `第 ${i + 1} 条历史记录起点错误：期望从「${REDEMPTION_STATUS_LABEL[expectedStatus]}」出发，实际从「${REDEMPTION_STATUS_LABEL[record.fromStatus]}」出发`
+        )
+      }
+
+      if (!validTransitions[record.fromStatus]?.includes(record.toStatus)) {
+        errors.push(
+          `第 ${i + 1} 条历史记录非法跳转：「${REDEMPTION_STATUS_LABEL[record.fromStatus]}」→「${REDEMPTION_STATUS_LABEL[record.toStatus]}」不被允许`
+        )
+      }
+
+      expectedStatus = record.toStatus
+    }
+
+    if (expectedStatus !== redemption.status) {
+      errors.push(
+        `历史记录终点与当前状态不一致：历史最终应为「${REDEMPTION_STATUS_LABEL[expectedStatus]}」，实际当前状态为「${REDEMPTION_STATUS_LABEL[redemption.status]}」`
+      )
+    }
+
+    return { valid: errors.length === 0, errors }
+  }
+
   function detectAnomalies(redemption) {
     const anomalies = []
     
@@ -216,10 +267,21 @@ export const useRedemptionStore = defineStore('redemption', () => {
   }
 
   function initRedemptions(data) {
-    redemptions.value = data.map(r => ({
-      ...r,
-      anomalies: detectAnomalies(r)
-    }))
+    redemptions.value = data.map(r => {
+      const history = r.statusHistory || []
+      const validation = validateStatusHistory(r, history)
+      
+      if (!validation.valid && validation.errors.length > 0) {
+        console.warn(`[红冲数据校验警告] ${r.redemptionNo}:`, validation.errors)
+      }
+
+      return {
+        ...r,
+        anomalies: detectAnomalies(r),
+        statusHistoryValid: validation.valid,
+        statusHistoryErrors: validation.valid ? [] : validation.errors
+      }
+    })
   }
 
   function initHistory(data) {
@@ -240,6 +302,7 @@ export const useRedemptionStore = defineStore('redemption', () => {
     checkBuyerConfirmation,
     checkEarlyRelease,
     detectAnomalies,
+    validateStatusHistory,
     transitionStatus,
     submitRedemption,
     confirmByBuyer,

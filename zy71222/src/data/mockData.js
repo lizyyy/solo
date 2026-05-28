@@ -682,28 +682,28 @@ export const mockStatusHistory = [
     id: 'HIS014',
     redemptionId: 'RED005',
     fromStatus: 'submitted',
+    toStatus: 'buyer_confirmed',
+    operator: '买方-采购部王主管',
+    operateTime: '2024-03-20T15:00:00Z',
+    remark: '买方确认红冲'
+  },
+  {
+    id: 'HIS015',
+    redemptionId: 'RED005',
+    fromStatus: 'buyer_confirmed',
     toStatus: 'processing',
     operator: '财务部-张会计',
     operateTime: '2024-03-19T09:00:00Z',
     remark: '开始处理红冲'
   },
   {
-    id: 'HIS015',
+    id: 'HIS016',
     redemptionId: 'RED005',
     fromStatus: 'processing',
     toStatus: 'completed',
     operator: '财务部-张会计',
     operateTime: '2024-03-19T10:00:00Z',
     remark: '红冲完成，额度已回补'
-  },
-  {
-    id: 'HIS016',
-    redemptionId: 'RED005',
-    fromStatus: 'completed',
-    toStatus: 'buyer_confirmed',
-    operator: '买方-采购部王主管',
-    operateTime: '2024-03-20T15:00:00Z',
-    remark: '买方确认红冲（补确认）'
   },
   {
     id: 'HIS017',

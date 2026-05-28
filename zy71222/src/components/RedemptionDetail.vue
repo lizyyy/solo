@@ -50,9 +50,36 @@
       </div>
     </div>
 
+    <div class="consistency-section">
+      <div class="section-title">
+        <el-icon><DataLine /></el-icon>
+        <span>状态历史一致性校验</span>
+        <el-tag 
+          :type="historyConsistency.valid ? 'success' : 'danger'" 
+          size="small" 
+          style="margin-left: 10px;"
+        >
+          {{ historyConsistency.valid ? '一致' : '不一致' }}
+        </el-tag>
+      </div>
+      <div v-if="historyConsistency.valid" class="consistency-valid">
+        <el-icon color="#67c23a"><CircleCheck /></el-icon>
+        <span>状态流转历史完整、连贯，与当前状态一致</span>
+      </div>
+      <div v-else class="consistency-invalid">
+        <el-icon color="#f56c6c"><Warning /></el-icon>
+        <span>状态历史存在以下不一致问题：</span>
+        <ul class="error-list">
+          <li v-for="(error, index) in historyConsistency.errors" :key="index">
+            {{ error }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <div class="timeline-section">
       <div class="section-title">
-        <el-icon><Time /></el-icon>
+        <el-icon><Clock /></el-icon>
         <span>状态流转历史</span>
       </div>
       <el-timeline>
@@ -122,6 +149,10 @@ const sortedHistory = computed(() => {
   return merged.sort((a, b) => new Date(a.operateTime) - new Date(b.operateTime))
 })
 
+const historyConsistency = computed(() => {
+  return redemptionStore.validateStatusHistory(props.redemption, sortedHistory.value)
+})
+
 const relatedPayments = computed(() => {
   return paymentStore.getPaymentsByRedemptionId(props.redemption.id)
 })
@@ -175,9 +206,49 @@ function getTimelineType(index) {
 <style lang="scss" scoped>
 .redemption-detail {
   .anomaly-section,
+  .consistency-section,
   .timeline-section,
   .payment-section {
     margin-top: 24px;
+  }
+
+  .consistency-valid {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    background: #f0f9eb;
+    border: 1px solid #e1f3d8;
+    border-radius: 8px;
+    color: #67c23a;
+    font-size: 14px;
+  }
+
+  .consistency-invalid {
+    padding: 16px;
+    background: #fef0f0;
+    border: 1px solid #fde2e2;
+    border-radius: 8px;
+    color: #f56c6c;
+
+    > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .error-list {
+      margin: 12px 0 0 0;
+      padding-left: 24px;
+
+      li {
+        font-size: 13px;
+        color: #606266;
+        line-height: 1.8;
+      }
+    }
   }
 
   .section-title {

@@ -264,6 +264,8 @@ function collectExportData() {
       额度释放时间: red.creditReleaseTime ? dayjs(red.creditReleaseTime).format('YYYY-MM-DD HH:mm:ss') : '-',
       完成时间: red.completedTime ? dayjs(red.completedTime).format('YYYY-MM-DD HH:mm:ss') : '-',
       异常类型: red.anomalies?.map(a => getAnomalyLabel(a.type)).join('、') || '-',
+      历史一致性: red.statusHistoryValid === false ? '不一致' : '一致',
+      历史一致错误: red.statusHistoryErrors?.join('；') || '-',
       备注: red.remark
     }))
   }
