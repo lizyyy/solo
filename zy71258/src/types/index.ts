@@ -194,6 +194,7 @@ export interface RelayoutPreviewRequest {
 }
 
 export interface RelayoutPreviewResponse {
+  artworkId: string;
   originalPosition: Point3D;
   newPosition: Point3D;
   originalIllumination: number;

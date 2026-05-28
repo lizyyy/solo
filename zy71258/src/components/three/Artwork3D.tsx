@@ -144,6 +144,7 @@ export default function Artwork3D({ artwork, isSelected }: Artwork3DProps) {
       updateArtworkPosition(artwork.id, newPos);
 
       setRelayoutPreview({
+        artworkId: artwork.id,
         originalPosition: originalPos,
         newPosition: newPos,
         originalIllumination,

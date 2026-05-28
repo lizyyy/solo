@@ -162,15 +162,17 @@ export const useMainStore = create<AppState>((set, get) => ({
   
   cancelRelayout: () => {
     const state = get();
-    if (state.originalPosition && state.draggingArtworkId) {
+    if (state.relayoutPreview && state.relayoutPreview.artworkId) {
+      const artworkId = state.relayoutPreview.artworkId;
+      const originalPos = state.relayoutPreview.originalPosition;
       set(state => ({
         artworks: state.artworks.map(a =>
-          a.id === get().draggingArtworkId
+          a.id === artworkId
             ? {
                 ...a,
-                posX: get().originalPosition!.x,
-                posY: get().originalPosition!.y,
-                posZ: get().originalPosition!.z,
+                posX: originalPos.x,
+                posY: originalPos.y,
+                posZ: originalPos.z,
                 lastModifiedBy: '当前用户',
                 lastModifiedAt: new Date().toISOString()
               }

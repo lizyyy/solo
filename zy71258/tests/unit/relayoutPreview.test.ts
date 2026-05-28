@@ -18,7 +18,8 @@ const makeArtwork = (id: string, x: number, y: number, z: number): Artwork => ({
   createdAt: new Date().toISOString()
 });
 
-const makePreview = (orig: Point3D, next: Point3D): RelayoutPreviewResponse => ({
+const makePreview = (artworkId: string, orig: Point3D, next: Point3D): RelayoutPreviewResponse => ({
+  artworkId,
   originalPosition: orig,
   newPosition: next,
   originalIllumination: 100,
@@ -45,7 +46,7 @@ describe('换位预览闭环 store 测试', () => {
     store.setDraggingArtworkId('a1');
     store.setOriginalPosition(origPos);
     store.updateArtworkPosition('a1', newPos);
-    store.setRelayoutPreview(makePreview(origPos, newPos));
+    store.setRelayoutPreview(makePreview('a1', origPos, newPos));
 
     const beforeConfirm = useMainStore.getState();
     expect(beforeConfirm.relayoutPreview).not.toBeNull();
@@ -74,7 +75,7 @@ describe('换位预览闭环 store 测试', () => {
     store.setDraggingArtworkId('a2');
     store.setOriginalPosition(origPos);
     store.updateArtworkPosition('a2', newPos);
-    store.setRelayoutPreview(makePreview(origPos, newPos));
+    store.setRelayoutPreview(makePreview('a2', origPos, newPos));
 
     expect(useMainStore.getState().artworks[0].posX).toBe(3);
 
@@ -102,12 +103,12 @@ describe('换位预览闭环 store 测试', () => {
     expect(after.relayoutPreview).toBeNull();
   });
 
-  it('cancelRelayout 无 originalPosition 时只清状态不崩溃', () => {
+  it('cancelRelayout 无预览时只清状态不崩溃', () => {
     const store = useMainStore.getState();
     const artwork = makeArtwork('a4', 5, 6, 7);
     store.addArtwork(artwork, 'key-4');
     store.setDraggingArtworkId('a4');
-    store.setRelayoutPreview(makePreview({ x: 0, y: 0, z: 0 }, { x: 1, y: 1, z: 1 }));
+    store.setOriginalPosition({ x: 5, y: 6, z: 7 });
 
     useMainStore.getState().cancelRelayout();
 
@@ -124,7 +125,7 @@ describe('换位预览闭环 store 测试', () => {
     store.setRelayoutMode(true);
     store.setDraggingArtworkId('a5');
     store.setOriginalPosition({ x: 1, y: 1, z: 1 });
-    store.setRelayoutPreview(makePreview({ x: 1, y: 1, z: 1 }, { x: 2, y: 2, z: 2 }));
+    store.setRelayoutPreview(makePreview('a5', { x: 1, y: 1, z: 1 }, { x: 2, y: 2, z: 2 }));
 
     expect(useMainStore.getState().isRelayoutMode).toBe(true);
     expect(useMainStore.getState().relayoutPreview).not.toBeNull();
@@ -149,7 +150,7 @@ describe('换位预览闭环 store 测试', () => {
     store.setDraggingArtworkId('a6');
     store.setOriginalPosition(orig1);
     store.updateArtworkPosition('a6', next1);
-    store.setRelayoutPreview(makePreview(orig1, next1));
+    store.setRelayoutPreview(makePreview('a6', orig1, next1));
     useMainStore.getState().confirmRelayout();
 
     expect(useMainStore.getState().artworks[0].posX).toBe(2);
@@ -161,7 +162,7 @@ describe('换位预览闭环 store 测试', () => {
     store2.setDraggingArtworkId('a6');
     store2.setOriginalPosition(orig2);
     store2.updateArtworkPosition('a6', next2);
-    store2.setRelayoutPreview(makePreview(orig2, next2));
+    store2.setRelayoutPreview(makePreview('a6', orig2, next2));
 
     expect(useMainStore.getState().artworks[0].posX).toBe(-1);
 
@@ -179,7 +180,7 @@ describe('换位预览闭环 store 测试', () => {
     store.setDraggingArtworkId('a7');
     store.setOriginalPosition(confirmed);
     store.updateArtworkPosition('a7', { x: 10, y: 1.5, z: 10 });
-    store.setRelayoutPreview(makePreview(confirmed, { x: 10, y: 1.5, z: 10 }));
+    store.setRelayoutPreview(makePreview('a7', confirmed, { x: 10, y: 1.5, z: 10 }));
 
     expect(useMainStore.getState().artworks[0].posX).toBe(10);
 
