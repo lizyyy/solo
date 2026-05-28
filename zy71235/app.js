@@ -673,7 +673,7 @@ const TradingGame = (function() {
                     };
                 }
             } else {
-                const position = this.game.positions.get(order.stockCode);
+                const position = this.game.account.positions.get(order.stockCode);
                 const availableQty = position ? position.availableQuantity : 0;
                 if (availableQty < quantity) {
                     return { 

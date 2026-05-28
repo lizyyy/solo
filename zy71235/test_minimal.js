@@ -71,7 +71,15 @@ if (validateImportOrderMatch) {
     failed++;
 }
 
-console.log('\n📋 验证5: 订单正确挂入stock.bidOrders/askOrders');
+console.log('\n📋 验证5: validateImportOrder使用account.positions而非game.positions');
+const hasCorrectPositionPath = validateImportOrderMatch[0].includes('this.game.account.positions');
+const hasWrongPositionPath = validateImportOrderMatch[0].includes('this.game.positions') && 
+                            !validateImportOrderMatch[0].includes('this.game.account.positions');
+console.log(`  使用account.positions: ${hasCorrectPositionPath ? '✅' : '❌'}`);
+console.log(`  不使用错误的game.positions: ${!hasWrongPositionPath ? '✅' : '❌'}`);
+if (hasCorrectPositionPath && !hasWrongPositionPath) passed++; else failed++;
+
+console.log('\n📋 验证6: 订单正确挂入stock.bidOrders/askOrders');
 if (importOrdersMatch) {
     const hasBidOrdersPush = importOrdersMatch[0].includes('stock.bidOrders.push(order)');
     const hasAskOrdersPush = importOrdersMatch[0].includes('stock.askOrders.push(order)');
@@ -87,7 +95,7 @@ if (importOrdersMatch) {
     failed++;
 }
 
-console.log('\n📋 验证6: 违规订单标记为REJECTED，不进入买卖盘');
+console.log('\n📋 验证7: 违规订单标记为REJECTED，不进入买卖盘');
 if (importOrdersMatch) {
     const hasRejectOrder = importOrdersMatch[0].includes('order.status = OrderStatus.REJECTED');
     const hasRejectReturn = importOrdersMatch[0].includes('if (validation.rejectOrder)');
@@ -99,7 +107,7 @@ if (importOrdersMatch) {
     failed++;
 }
 
-console.log('\n📋 验证7: 违规严重程度分级正确');
+console.log('\n📋 验证8: 违规严重程度分级正确');
 if (validateImportOrderMatch) {
     const priceLimitSeverity = validateImportOrderMatch[0].includes('severity: ViolationSeverity.MEDIUM') && 
                               validateImportOrderMatch[0].includes('PRICE_LIMIT_VIOLATION');
@@ -116,7 +124,7 @@ if (validateImportOrderMatch) {
     failed++;
 }
 
-console.log('\n📋 验证8: 股票卡片UI显示remark和receipt');
+console.log('\n📋 验证9: 股票卡片UI显示remark和receipt');
 const renderStockPoolMatch = appCode.match(/renderStockPool\(\) \{[\s\S]*?\n        \}/);
 if (renderStockPoolMatch) {
     const hasRemarkDisplay = renderStockPoolMatch[0].includes('stock.remark');
@@ -129,7 +137,7 @@ if (renderStockPoolMatch) {
     failed++;
 }
 
-console.log('\n📋 验证9: CSS样式包含stock-remark和stock-receipt');
+console.log('\n📋 验证10: CSS样式包含stock-remark和stock-receipt');
 const cssCode = fs.readFileSync(path.join(__dirname, 'styles.css'), 'utf8');
 const hasRemarkCss = cssCode.includes('.stock-remark');
 const hasReceiptCss = cssCode.includes('.stock-receipt');
@@ -148,11 +156,12 @@ if (failed === 0) {
     console.log('  2. ✅ importStocks版本更新时保留原有remark和receipt');
     console.log('  3. ✅ importOrders使用validateImportOrder，跳过交易时段检查');
     console.log('  4. ✅ validateImportOrder正确识别涨跌停、资金不足、持仓不足等违规');
-    console.log('  5. ✅ 有效订单正确进入stock.bidOrders/askOrders');
-    console.log('  6. ✅ 违规订单按严重程度分级（中等/严重）');
-    console.log('  7. ✅ 违规订单标记为REJECTED，不进入买卖盘');
-    console.log('  8. ✅ 股票卡片UI显示remark和receipt');
-    console.log('  9. ✅ CSS样式支持remark和receipt显示');
+    console.log('  5. ✅ validateImportOrder使用正确的account.positions路径');
+    console.log('  6. ✅ 有效订单正确进入stock.bidOrders/askOrders');
+    console.log('  7. ✅ 违规订单按严重程度分级（中等/严重）');
+    console.log('  8. ✅ 违规订单标记为REJECTED，不进入买卖盘');
+    console.log('  9. ✅ 股票卡片UI显示remark和receipt');
+    console.log('  10. ✅ CSS样式支持remark和receipt显示');
     process.exit(0);
 } else {
     console.log('\n❌ 部分验证失败，请检查修复');
