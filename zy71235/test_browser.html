@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修复验证测试</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-result { padding: 20px; margin: 20px; background: rgba(0,0,0,0.8); border-radius: 8px; }
+        .test-pass { color: #00ff88; }
+        .test-fail { color: #ff4444; }
+        .test-item { margin: 10px 0; padding: 10px; border-left: 3px solid #666; }
+        .test-item.pass { border-left-color: #00ff88; }
+        .test-item.fail { border-left-color: #ff4444; }
+        #test-output { font-family: 'Courier New', monospace; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="test-result">
+        <h1>🧪 浏览器端修复验证测试</h1>
+        <div id="test-output">正在初始化测试...</div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            const output = document.getElementById('test-output');
+            let results = [];
+            let allPassed = true;
+
+            function test(name, condition) {
+                const passed = condition();
+                results.push({ name, passed });
+                if (!passed) allPassed = false;
+                return passed;
+            }
+
+            function runTests() {
+                output.textContent = '开始运行测试...\n\n';
+                
+                // 测试1: Stock类包含remark和receipt字段
+                const stock = new window.TradingGame.Stock({
+                    code: '600001', name: '测试股票', basePrice: 100,
+                    remark: '测试备注', receipt: 'TEST001'
+                });
+                test('Stock类包含remark字段', () => stock.remark === '测试备注');
+                test('Stock类包含receipt字段', () => stock.receipt === 'TEST001');
+
+                // 测试2: 创建Game实例
+                const game = new window.TradingGame.Game();
+                test('Game实例创建成功', () => game !== null);
+
+                // 测试3: 准备阶段导入股票
+                game.phase = window.TradingGame.GamePhase.PREPARE;
+                game.dataImportManager.importStocks({
+                    stocks: [
+                        { code: '600519', name: '贵州茅台', basePrice: 1688, remark: '白酒龙头' },
+                        { code: '000858', name: '五粮液', basePrice: 156.5, remark: '白酒板块' }
+                    ]
+                }, 1);
+                
+                const maotai = game.stocks.get('600519');
+                test('股票导入成功', () => maotai !== undefined);
+                test('股票remark保存成功', () => maotai.remark === '白酒龙头');
+
+                // 测试4: 版本更新时保留remark，新增receipt
+                game.dataImportManager.importStocks({
+                    stocks: [
+                        { code: '600519', name: '贵州茅台', basePrice: 1688, receipt: 'RCPT001' }
+                    ]
+                }, 2);
+                
+                const maotaiV2 = game.stocks.get('600519');
+                test('版本更新remark保留', () => maotaiV2.remark === '白酒龙头');
+                test('版本更新receipt新增', () => maotaiV2.receipt === 'RCPT001');
+                test('版本号更新', () => maotaiV2.version === 2);
+
+                // 测试5: 准备阶段导入订单
+                game.account = new window.TradingGame.Account(1000000);
+                game.positions = new Map();
+                
+                const violationsBefore = game.violations.length;
+                game.dataImportManager.importOrders({
+                    orders: [
+                        { stockCode: '600519', side: 'buy', type: 'limit', price: 1680, quantity: 10 },
+                        { stockCode: '600519', side: 'sell', type: 'limit', price: 1695, quantity: 8 }
+                    ]
+                }, 1);
+                
+                const violationsAfter = game.violations.length;
+                test('准备阶段导入订单无"不在交易时段"违规', () => violationsAfter === violationsBefore);
+                test('订单进入bidOrders', () => maotaiV2.bidOrders.length === 1);
+                test('订单进入askOrders', () => maotaiV2.askOrders.length === 1);
+                test('买盘排序正确（价格降序）', () => maotaiV2.bidOrders[0].price === 1680);
+                test('卖盘排序正确（价格升序）', () => maotaiV2.askOrders[0].price === 1695);
+
+                // 测试6: 违规订单检测
+                const violationsBefore2 = game.violations.length;
+                game.dataImportManager.importOrders({
+                    orders: [
+                        { stockCode: '600519', side: 'buy', type: 'limit', price: 1860, quantity: 10, remark: '超涨停价' }
+                    ]
+                }, 1);
+                
+                const violationsAfter2 = game.violations.length;
+                const priceLimitViolation = game.violations.find(v => v.type === 'PRICE_LIMIT_VIOLATION');
+                test('涨跌停违规被检测', () => violationsAfter2 > violationsBefore2);
+                test('违规类型正确', () => priceLimitViolation !== undefined);
+                test('违规严重程度正确（中等）', () => 
+                    priceLimitViolation && priceLimitViolation.severity === window.TradingGame.ViolationSeverity.MEDIUM);
+                test('违规订单不进入买卖盘', () => maotaiV2.bidOrders.length === 1);
+                test('违规订单标记为REJECTED', () => {
+                    const rejected = game.pendingOrders.find(o => o.status === window.TradingGame.OrderStatus.REJECTED);
+                    return rejected !== undefined;
+                });
+
+                // 测试7: 资金不足违规检测
+                const violationsBefore3 = game.violations.length;
+                game.dataImportManager.importOrders({
+                    orders: [
+                        { stockCode: '600519', side: 'buy', type: 'limit', price: 1680, quantity: 5000, remark: '资金超用' }
+                    ]
+                }, 1);
+                
+                const cashViolation = game.violations.find(v => v.type === 'INSUFFICIENT_CASH');
+                test('资金不足违规被检测', () => cashViolation !== undefined);
+                test('资金不足违规严重程度（严重）', () => 
+                    cashViolation && cashViolation.severity === window.TradingGame.ViolationSeverity.HIGH);
+
+                // 输出结果
+                output.textContent += '测试结果：\n';
+                output.textContent += '='.repeat(60) + '\n\n';
+                
+                results.forEach((r, i) => {
+                    const status = r.passed ? '✅ PASS' : '❌ FAIL';
+                    output.textContent += `${String(i+1).padStart(2, '0')}. ${status} - ${r.name}\n`;
+                });
+
+                output.textContent += '\n' + '='.repeat(60) + '\n';
+                output.textContent += allPassed 
+                    ? '\n✅ 所有测试通过！修复验证成功！\n' 
+                    : '\n❌ 部分测试失败，请检查修复。\n';
+                
+                output.textContent += '\n📊 统计：' + results.filter(r => r.passed).length + '/' + results.length + ' 项通过';
+            }
+
+            // 等待app.js完全初始化
+            setTimeout(runTests, 500);
+        });
+    </script>
+</body>
+</html>

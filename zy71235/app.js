@@ -61,6 +61,8 @@ const TradingGame = (function() {
             this.priceHistory = [{ time: Date.now(), price: this.basePrice }];
             this.volume = 0;
             this.turnover = 0;
+            this.remark = data.remark || '';
+            this.receipt = data.receipt || '';
         }
 
         getPriceChange() {
@@ -516,6 +518,8 @@ const TradingGame = (function() {
             stocks.forEach(stockData => {
                 if (!stockData.code) return;
                 
+                const existingStock = this.game.stocks.get(stockData.code);
+                
                 const stock = new Stock({
                     code: stockData.code,
                     name: stockData.name || stockData.code,
@@ -524,11 +528,21 @@ const TradingGame = (function() {
                         level1: parseFloat(stockData.level1) || 0.05,
                         level2: parseFloat(stockData.level2) || 0.07,
                         cooldown: parseInt(stockData.cooldown) || 300
-                    }
+                    },
+                    remark: stockData.remark || (existingStock ? existingStock.remark : ''),
+                    receipt: stockData.receipt || (existingStock ? existingStock.receipt : '')
                 });
                 
-                if (stockData.remark) {
+                if (stockData.remark !== undefined && stockData.remark !== '') {
                     stock.remark = stockData.remark;
+                } else if (existingStock && existingStock.remark) {
+                    stock.remark = existingStock.remark;
+                }
+                
+                if (stockData.receipt !== undefined && stockData.receipt !== '') {
+                    stock.receipt = stockData.receipt;
+                } else if (existingStock && existingStock.receipt) {
+                    stock.receipt = existingStock.receipt;
                 }
                 
                 stock.version = version;
@@ -544,6 +558,9 @@ const TradingGame = (function() {
 
         importOrders(data, version) {
             const orders = Array.isArray(data) ? data : (data.orders || []);
+            let validCount = 0;
+            let violationCount = 0;
+            
             orders.forEach(orderData => {
                 if (!orderData.stockCode) return;
                 
@@ -561,22 +578,116 @@ const TradingGame = (function() {
                     order.receipt = orderData.receipt;
                 }
                 
-                const validation = this.game.validateOrder(order);
+                const validation = this.validateImportOrder(order);
                 if (!validation.valid) {
+                    violationCount++;
                     this.game.addViolation({
-                        type: 'IMPORT_ORDER_VIOLATION',
-                        severity: ViolationSeverity.MEDIUM,
+                        type: validation.violationType || 'IMPORT_ORDER_VIOLATION',
+                        severity: validation.severity || ViolationSeverity.MEDIUM,
                         description: `导入订单违规: ${validation.message}`,
-                        penalty: 2,
+                        penalty: validation.penalty || 2,
                         orderId: order.id,
                         stockCode: order.stockCode
                     });
+                    
+                    if (validation.rejectOrder) {
+                        order.status = OrderStatus.REJECTED;
+                        this.game.pendingOrders.push(order);
+                        return;
+                    }
+                }
+                
+                const stock = this.game.stocks.get(order.stockCode);
+                if (order.side === OrderSide.BUY) {
+                    stock.bidOrders.push(order);
+                    stock.bidOrders.sort((a, b) => b.price - a.price);
+                } else {
+                    stock.askOrders.push(order);
+                    stock.askOrders.sort((a, b) => a.price - b.price);
                 }
                 
                 this.game.pendingOrders.push(order);
+                validCount++;
             });
             
-            this.game.logEvent('system', { count: orders.length, version }, `导入了 ${orders.length} 条订单（版本${version}）`);
+            this.game.logEvent('system', { 
+                count: orders.length, 
+                validCount, 
+                violationCount, 
+                version 
+            }, `导入了 ${orders.length} 条订单（${validCount}条有效，${violationCount}条违规，版本${version}）`);
+        }
+
+        validateImportOrder(order) {
+            const stock = this.game.stocks.get(order.stockCode);
+            if (!stock) {
+                return { 
+                    valid: false, 
+                    message: `股票 ${order.stockCode} 不存在`,
+                    violationType: 'INVALID_STOCK',
+                    severity: ViolationSeverity.HIGH,
+                    penalty: 5,
+                    rejectOrder: true
+                };
+            }
+
+            if (stock.halted) {
+                return { 
+                    valid: false, 
+                    message: `${stock.name} 已停牌`,
+                    violationType: 'TRADING_DURING_HALT',
+                    severity: ViolationSeverity.HIGH,
+                    penalty: 10,
+                    rejectOrder: true
+                };
+            }
+
+            if (order.type === OrderType.LIMIT) {
+                if (order.price < stock.lowerLimit || order.price > stock.upperLimit) {
+                    return { 
+                        valid: false, 
+                        message: `订单价格 ${order.price} 超出涨跌停限制 [${stock.lowerLimit.toFixed(2)}, ${stock.upperLimit.toFixed(2)}]`,
+                        violationType: 'PRICE_LIMIT_VIOLATION',
+                        severity: ViolationSeverity.MEDIUM,
+                        penalty: 5,
+                        rejectOrder: true
+                    };
+                }
+            }
+
+            const quantity = order.quantity * 100;
+
+            if (order.side === OrderSide.BUY) {
+                const amount = order.type === OrderType.MARKET 
+                    ? stock.currentPrice * quantity * 1.1 
+                    : order.price * quantity;
+                
+                if (this.game.account.availableCash < amount) {
+                    return { 
+                        valid: false, 
+                        message: `资金不足，需要 ¥${amount.toLocaleString(undefined, {minimumFractionDigits: 2})}，可用 ¥${this.game.account.availableCash.toLocaleString(undefined, {minimumFractionDigits: 2})}`,
+                        violationType: 'INSUFFICIENT_CASH',
+                        severity: ViolationSeverity.HIGH,
+                        penalty: 8,
+                        rejectOrder: true
+                    };
+                }
+            } else {
+                const position = this.game.positions.get(order.stockCode);
+                const availableQty = position ? position.availableQuantity : 0;
+                if (availableQty < quantity) {
+                    return { 
+                        valid: false, 
+                        message: `持仓不足，需要 ${quantity} 股，可用 ${availableQty} 股`,
+                        violationType: 'INSUFFICIENT_POSITION',
+                        severity: ViolationSeverity.HIGH,
+                        penalty: 8,
+                        rejectOrder: true
+                    };
+                }
+            }
+
+            return { valid: true };
         }
 
         importRules(data) {
@@ -2341,6 +2452,8 @@ const TradingGame = (function() {
                         <span class="change-value ${priceClass}">${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%</span>
                     </div>
                     ${stock.halted ? `<span class="stock-halt-badge">${stock.haltReason}</span>` : ''}
+                    ${stock.remark ? `<div class="stock-remark">📝 ${stock.remark}</div>` : ''}
+                    ${stock.receipt ? `<div class="stock-receipt">📎 ${stock.receipt}</div>` : ''}
                 `;
                 
                 container.appendChild(card);
@@ -2858,6 +2971,11 @@ const TradingGame = (function() {
         OrderType,
         OrderStatus,
         ViolationSeverity,
-        CircuitBreakerLevel
+        CircuitBreakerLevel,
+        Stock,
+        Order,
+        Account,
+        Violation,
+        DataImportManager
     };
 })();

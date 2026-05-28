@@ -498,6 +498,26 @@ body {
     margin-top: 4px;
 }
 
+.stock-remark {
+    font-size: 10px;
+    color: #aaa;
+    margin-top: 6px;
+    padding: 4px 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    line-height: 1.4;
+}
+
+.stock-receipt {
+    font-size: 10px;
+    color: #00d4ff;
+    margin-top: 4px;
+    padding: 4px 6px;
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+}
+
 .middle-section {
     flex: 1;
     display: grid;
