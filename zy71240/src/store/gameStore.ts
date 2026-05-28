@@ -135,7 +135,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   runSettlementPhase: () => {
-    const { currentCaseId, selectedClues, judgments, riskLevel } = get()
+    const { currentCaseId, selectedClues, judgments, riskLevel, session } = get()
     if (!currentCaseId || !riskLevel) return
     const { settlement, errorImpacts } = runSettlement(
       currentCaseId,
@@ -143,7 +143,16 @@ export const useGameStore = create<GameState>((set, get) => ({
       judgments,
       riskLevel
     )
-    set({ settlement, errorImpacts, phase: "settle" })
+    const report: DamageReport = {
+      id: `report-${Date.now()}`,
+      sessionId: session?.id || "",
+      judgments: [...judgments],
+      settlement,
+      errorImpacts: [...errorImpacts],
+      createdAt: Date.now(),
+      status: "已提交",
+    }
+    set({ settlement, errorImpacts, report, phase: "settle" })
   },
 
   goToPhase: (phase) => {
@@ -151,17 +160,31 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   addAmendment: (fieldName, oldValue, newValue, reason) => {
-    const { report, amendments } = get()
-    if (!report) return
+    const { report, amendments, session, judgments, settlement, errorImpacts } = get()
+    let currentReport = report
+    if (!currentReport) {
+      currentReport = {
+        id: `report-${Date.now()}`,
+        sessionId: session?.id || "",
+        judgments: [...judgments],
+        settlement,
+        errorImpacts: [...errorImpacts],
+        createdAt: Date.now(),
+        status: "草稿",
+      }
+    }
     const amendment = createAmendment(
-      report.id,
+      currentReport.id,
       fieldName,
       oldValue,
       newValue,
       reason,
       "讲师"
     )
-    set({ amendments: [...amendments, amendment] })
+    set({
+      report: { ...currentReport, status: "已修正" as const },
+      amendments: [...amendments, amendment],
+    })
   },
 
   setReport: (report) => {

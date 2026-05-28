@@ -102,8 +102,7 @@ function AmendmentRow({ record }: { record: AmendmentRecord }) {
 
 export default function Review() {
   const navigate = useNavigate()
-  const getAllAmendments = useGameStore((s) => s.getAllAmendments)
-  const amendments = getAllAmendments()
+  const amendments = useGameStore((s) => s.amendments)
 
   const caseStats = useMemo(
     () =>

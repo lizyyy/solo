@@ -68,6 +68,7 @@ export default function Report() {
   const amendments = useGameStore((s) => s.amendments)
   const addAmendment = useGameStore((s) => s.addAmendment)
   const session = useGameStore((s) => s.session)
+  const report = useGameStore((s) => s.report)
 
   const [showAmendmentForm, setShowAmendmentForm] = useState(false)
   const [fieldName, setFieldName] = useState("")
@@ -88,9 +89,32 @@ export default function Report() {
   const diffDisplay = applyAmendmentValue(diffStr, amendments, "payoutDifference")
   const riskDisplay = applyAmendmentValue(riskStr, amendments, "riskLevel")
 
+  function getCurrentFieldValue(fname: string): string {
+    const judgmentMatch = fname.match(/^(.+)-(grade|payout)$/)
+    if (judgmentMatch) {
+      const [, partName, field] = judgmentMatch
+      const j = judgments.find((jg) => jg.partName === partName)
+      if (!j) return ""
+      if (field === "grade") return j.repairGrade
+      return `¥${j.estimatedPayout.toLocaleString()}`
+    }
+    if (fname === "totalPayout") return totalPayoutStr
+    if (fname === "correctPayout") return correctPayoutStr
+    if (fname === "payoutDifference") return diffStr
+    if (fname === "riskLevel") return riskStr
+    return ""
+  }
+
+  function handleFieldChange(f: string) {
+    setFieldName(f)
+    const current = getCurrentFieldValue(f)
+    setOldValue(current)
+  }
+
   function handleSubmitAmendment() {
-    if (!fieldName || !oldValue || !newValue || !reason) return
-    addAmendment(fieldName, oldValue, newValue, reason)
+    if (!fieldName || !newValue || !reason) return
+    const effectiveOldValue = oldValue || getCurrentFieldValue(fieldName)
+    addAmendment(fieldName, effectiveOldValue, newValue, reason)
     setFieldName("")
     setOldValue("")
     setNewValue("")
@@ -137,7 +161,18 @@ export default function Report() {
       </div>
 
       <div className="card mb-6">
-        <div className="card-header">报告基本信息</div>
+        <div className="card-header flex items-center justify-between">
+          <span>报告基本信息</span>
+          {report && (
+            <span className={`text-xs px-2 py-0.5 rounded ${
+              report.status === "已修正" ? "bg-amber-light/20 text-amber-light" :
+              report.status === "已提交" ? "bg-jade/20 text-jade" :
+              "bg-steel-200 text-steel-600"
+            }`}>
+              {report.status}
+            </span>
+          )}
+        </div>
         <div className="card-body">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
@@ -330,7 +365,7 @@ export default function Report() {
                 <label className="block text-sm text-cool mb-1">修正字段</label>
                 <select
                   value={fieldName}
-                  onChange={(e) => setFieldName(e.target.value)}
+                  onChange={(e) => handleFieldChange(e.target.value)}
                   className="w-full border border-steel-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber/50"
                 >
                   <option value="">请选择字段</option>
@@ -341,13 +376,13 @@ export default function Report() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm text-cool mb-1">原值</label>
+                  <label className="block text-sm text-cool mb-1">原值（自动填充）</label>
                   <input
                     type="text"
                     value={oldValue}
                     onChange={(e) => setOldValue(e.target.value)}
-                    className="w-full border border-steel-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber/50"
-                    placeholder="输入原值"
+                    className="w-full border border-steel-100 rounded-md px-3 py-2 text-sm bg-steel-50 focus:outline-none focus:ring-2 focus:ring-amber/50"
+                    placeholder="选择字段后自动填充"
                   />
                 </div>
                 <div>
@@ -373,7 +408,7 @@ export default function Report() {
               </div>
               <button
                 onClick={handleSubmitAmendment}
-                disabled={!fieldName || !oldValue || !newValue || !reason}
+                disabled={!fieldName || !newValue || !reason}
                 className="btn-amber inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Plus size={16} />
