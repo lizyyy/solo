@@ -257,9 +257,9 @@ const replaySolarOutput = computed(() => {
   for (const module of replayState.value.modules) {
     for (const panel of module.solarPanels || []) {
       const angleDiff = Math.abs((replayState.value.sunAngle || 90) - panel.tiltAngle)
-      const sunFactor = Math.cos(angleDiff * Math.PI / 180)
-      const healthFactor = 1 - (panel.damageLevel * 0.3)
-      total += panel.maxOutput * panel.efficiency * sunFactor * healthFactor
+      const sunFactor = Math.max(0, Math.cos(angleDiff * Math.PI / 180))
+      const healthFactor = Math.max(0, 1 - (panel.damageLevel * 0.3))
+      total += Math.max(0, panel.maxOutput * panel.efficiency * sunFactor * healthFactor)
     }
   }
   return total
