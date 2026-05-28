@@ -10,6 +10,8 @@ import {
   CreateBankReceiptSchema,
   DiscountCalculateSchema,
   validateRequiredFields,
+  validatePaymentRequiredFields,
+  validateBankReceiptRequiredFields,
   validateExchangeRateDate,
   validateDateOrder,
   type CreateInvoiceDiscountInput,
@@ -72,6 +74,17 @@ router.post('/calculate', (req: Request, res: Response) => {
 router.post('/invoices', (req: Request, res: Response) => {
   try {
     const missingFields = validateRequiredFields(req.body);
+
+    if (missingFields.length > 0) {
+      res.status(400).json(
+        errorResponse(
+          `缺少必填字段: ${missingFields.join(', ')}`,
+          [],
+          missingFields
+        )
+      );
+      return;
+    }
 
     const validated = CreateInvoiceDiscountSchema.parse(req.body) as CreateInvoiceDiscountInput;
 
@@ -386,6 +399,19 @@ router.post('/invoices/:id/export', (req: Request, res: Response) => {
 
 router.post('/payments', (req: Request, res: Response) => {
   try {
+    const missingFields = validatePaymentRequiredFields(req.body);
+
+    if (missingFields.length > 0) {
+      res.status(400).json(
+        errorResponse(
+          `缺少必填字段: ${missingFields.join(', ')}`,
+          [],
+          missingFields
+        )
+      );
+      return;
+    }
+
     const validated = CreatePaymentSchema.parse(req.body) as CreatePaymentInput;
 
     const invoice = storage.getInvoice(validated.invoiceDiscountId);
@@ -465,6 +491,19 @@ router.post('/payments/:id/match', (req: Request, res: Response) => {
 
 router.post('/bank-receipts', (req: Request, res: Response) => {
   try {
+    const missingFields = validateBankReceiptRequiredFields(req.body);
+
+    if (missingFields.length > 0) {
+      res.status(400).json(
+        errorResponse(
+          `缺少必填字段: ${missingFields.join(', ')}`,
+          [],
+          missingFields
+        )
+      );
+      return;
+    }
+
     const validated = CreateBankReceiptSchema.parse(req.body) as CreateBankReceiptInput;
 
     const warnings: string[] = [];

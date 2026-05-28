@@ -107,6 +107,42 @@ export function validateRequiredFields(input: Record<string, unknown>): string[]
   return missing;
 }
 
+export function validatePaymentRequiredFields(input: Record<string, unknown>): string[] {
+  const requiredFields = [
+    'invoiceDiscountId',
+    'paymentAmount',
+    'paymentCurrency',
+    'paymentDate',
+  ];
+
+  const missing: string[] = [];
+  for (const field of requiredFields) {
+    if (input[field] === undefined || input[field] === null || input[field] === '') {
+      missing.push(field);
+    }
+  }
+
+  return missing;
+}
+
+export function validateBankReceiptRequiredFields(input: Record<string, unknown>): string[] {
+  const requiredFields = [
+    'receiptNumber',
+    'receiptDate',
+    'amount',
+    'currency',
+  ];
+
+  const missing: string[] = [];
+  for (const field of requiredFields) {
+    if (input[field] === undefined || input[field] === null || input[field] === '') {
+      missing.push(field);
+    }
+  }
+
+  return missing;
+}
+
 export function validateExchangeRateDate(
   rateDate: string,
   referenceDate: string,

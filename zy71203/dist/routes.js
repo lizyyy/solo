@@ -55,6 +55,10 @@ router.post('/calculate', (req, res) => {
 router.post('/invoices', (req, res) => {
     try {
         const missingFields = (0, validation_1.validateRequiredFields)(req.body);
+        if (missingFields.length > 0) {
+            res.status(400).json(errorResponse(`缺少必填字段: ${missingFields.join(', ')}`, [], missingFields));
+            return;
+        }
         const validated = validation_1.CreateInvoiceDiscountSchema.parse(req.body);
         const warnings = [];
         const dateOrderResult = (0, validation_1.validateDateOrder)(validated.invoiceDate, validated.discountDate, '发票日期', '贴现日期');
@@ -297,6 +301,11 @@ router.post('/invoices/:id/export', (req, res) => {
 });
 router.post('/payments', (req, res) => {
     try {
+        const missingFields = (0, validation_1.validatePaymentRequiredFields)(req.body);
+        if (missingFields.length > 0) {
+            res.status(400).json(errorResponse(`缺少必填字段: ${missingFields.join(', ')}`, [], missingFields));
+            return;
+        }
         const validated = validation_1.CreatePaymentSchema.parse(req.body);
         const invoice = storage_1.storage.getInvoice(validated.invoiceDiscountId);
         if (!invoice) {
@@ -363,6 +372,11 @@ router.post('/payments/:id/match', (req, res) => {
 });
 router.post('/bank-receipts', (req, res) => {
     try {
+        const missingFields = (0, validation_1.validateBankReceiptRequiredFields)(req.body);
+        if (missingFields.length > 0) {
+            res.status(400).json(errorResponse(`缺少必填字段: ${missingFields.join(', ')}`, [], missingFields));
+            return;
+        }
         const validated = validation_1.CreateBankReceiptSchema.parse(req.body);
         const warnings = [];
         if (validated.invoiceDiscountId) {

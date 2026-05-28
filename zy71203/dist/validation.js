@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiscountCalculateSchema = exports.CreateBankReceiptSchema = exports.CreatePaymentSchema = exports.AdvanceStatusSchema = exports.UpdateInvoiceDiscountSchema = exports.CreateInvoiceDiscountSchema = exports.ExchangeRateSchema = exports.DiscountStatusSchema = exports.CurrencySchema = void 0;
 exports.validateRequiredFields = validateRequiredFields;
+exports.validatePaymentRequiredFields = validatePaymentRequiredFields;
+exports.validateBankReceiptRequiredFields = validateBankReceiptRequiredFields;
 exports.validateExchangeRateDate = validateExchangeRateDate;
 exports.validateDateOrder = validateDateOrder;
 const zod_1 = require("zod");
@@ -83,6 +85,36 @@ function validateRequiredFields(input) {
         'discountRate',
         'discountDate',
         'discountDays',
+    ];
+    const missing = [];
+    for (const field of requiredFields) {
+        if (input[field] === undefined || input[field] === null || input[field] === '') {
+            missing.push(field);
+        }
+    }
+    return missing;
+}
+function validatePaymentRequiredFields(input) {
+    const requiredFields = [
+        'invoiceDiscountId',
+        'paymentAmount',
+        'paymentCurrency',
+        'paymentDate',
+    ];
+    const missing = [];
+    for (const field of requiredFields) {
+        if (input[field] === undefined || input[field] === null || input[field] === '') {
+            missing.push(field);
+        }
+    }
+    return missing;
+}
+function validateBankReceiptRequiredFields(input) {
+    const requiredFields = [
+        'receiptNumber',
+        'receiptDate',
+        'amount',
+        'currency',
     ];
     const missing = [];
     for (const field of requiredFields) {
