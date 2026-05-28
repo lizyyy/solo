@@ -222,54 +222,50 @@ export default function Workbench() {
 
             {/* Relayout Preview Banner */}
             {isRelayoutMode && relayoutPreview && (
-              <div className="absolute top-4 left-4 right-4 bg-[var(--color-bg-card)] border border-[#C9A962] rounded-lg p-4 z-10">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Info className="w-5 h-5 text-[#C9A962]" />
-                      <span className="font-medium text-[#C9A962]">换位预览</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <div className="text-[var(--color-text-tertiary)]">原位置照度</div>
-                        <div className="font-mono">{relayoutPreview.originalIllumination.toFixed(1)} lux</div>
-                      </div>
-                      <div>
-                        <div className="text-[var(--color-text-tertiary)]">新位置照度</div>
-                        <div className="font-mono">{relayoutPreview.newIllumination.toFixed(1)} lux</div>
-                      </div>
-                      <div>
-                        <div className="text-[var(--color-text-tertiary)]">原风险等级</div>
-                        <div className="font-medium" style={{ color: SEVERITY_COLORS[relayoutPreview.originalRiskLevel] }}>{SEV[relayoutPreview.originalRiskLevel as keyof typeof SEV]}</div>
-                      </div>
-                      <div>
-                        <div className="text-[var(--color-text-tertiary)]">新风险等级</div>
-                        <div className="font-medium" style={{ color: SEVERITY_COLORS[relayoutPreview.newRiskLevel] }}>{SEV[relayoutPreview.newRiskLevel as keyof typeof SEV]}</div>
-                      </div>
-                    </div>
-                    <div className="mt-2 text-sm">
-                      <div className="text-[var(--color-text-tertiary)]">改善程度</div>
-                      <div className="font-mono">{relayoutPreview.improvement > 0 ? '+' : ''}{(relayoutPreview.improvement * 100).toFixed(1)}%</div>
-                    </div>
-                    <div className="mt-1 text-xs text-[var(--color-text-tertiary)]">
-                      {relayoutPreview.recommendation}
-                    </div>
+              <div className="absolute top-4 left-4 right-4 bg-[var(--color-bg-card)] border border-[#C9A962] rounded-lg p-4 z-10 shadow-lg">
+                <div className="flex items-center gap-2 mb-3">
+                  <Info className="w-5 h-5 text-[#C9A962] flex-shrink-0" />
+                  <span className="font-medium text-[#C9A962]">换位预览</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-sm mb-3">
+                  <div>
+                    <div className="text-[var(--color-text-tertiary)]">原位置照度</div>
+                    <div className="font-mono">{relayoutPreview.originalIllumination.toFixed(1)} lux</div>
                   </div>
-                  <div className="flex gap-2 mt-2">
-                    <button className="btn btn-primary" onClick={handleConfirmRelayout}>
-                      <Check className="w-4 h-4" /> 确认换位
-                    </button>
-                    <button className="btn btn-secondary" onClick={handleCancelRelayout}>
-                      <X className="w-4 h-4" /> 取消
-                    </button>
+                  <div>
+                    <div className="text-[var(--color-text-tertiary)]">新位置照度</div>
+                    <div className="font-mono">{relayoutPreview.newIllumination.toFixed(1)} lux</div>
                   </div>
-                  {relayoutPreview.warnings.length > 0 && (
-                    <div className="mt-2 text-xs text-orange-400">
-                      {relayoutPreview.warnings.map((w, i) => (
+                  <div>
+                    <div className="text-[var(--color-text-tertiary)]">原风险等级</div>
+                    <div className="font-medium" style={{ color: SEVERITY_COLORS[relayoutPreview.originalRiskLevel] }}>{SEV[relayoutPreview.originalRiskLevel as keyof typeof SEV]}</div>
+                  </div>
+                  <div>
+                    <div className="text-[var(--color-text-tertiary)]">新风险等级</div>
+                    <div className="font-medium" style={{ color: SEVERITY_COLORS[relayoutPreview.newRiskLevel] }}>{SEV[relayoutPreview.newRiskLevel as keyof typeof SEV]}</div>
+                  </div>
+                </div>
+                <div className="text-sm mb-2">
+                  <span className="text-[var(--color-text-tertiary)]">改善程度: </span>
+                  <span className="font-mono">{relayoutPreview.improvement > 0 ? '+' : ''}{(relayoutPreview.improvement * 100).toFixed(1)}%</span>
+                </div>
+                <div className="text-xs text-[var(--color-text-tertiary)] mb-3">
+                  {relayoutPreview.recommendation}
+                </div>
+                {relayoutPreview.warnings.length > 0 && (
+                  <div className="text-xs text-orange-400 mb-3">
+                    {relayoutPreview.warnings.map((w, i) => (
                       <div key={i}>⚠️ {w}</div>
                     ))}
-                    </div>
-                  )}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <button className="btn btn-primary flex-1" onClick={handleConfirmRelayout}>
+                    <Check className="w-4 h-4" /> 确认换位
+                  </button>
+                  <button className="btn btn-secondary flex-1" onClick={handleCancelRelayout}>
+                    <X className="w-4 h-4" /> 取消
+                  </button>
                 </div>
               </div>
             )}

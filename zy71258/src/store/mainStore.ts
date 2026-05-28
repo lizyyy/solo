@@ -150,19 +150,7 @@ export const useMainStore = create<AppState>((set, get) => ({
   
   confirmRelayout: () => {
     const state = get();
-    if (!state.relayoutPreview || !state.draggingArtworkId) return;
-    
-    const artwork = state.artworks.find(a => a.id === state.draggingArtworkId);
-    if (artwork) {
-      state.updateArtworkPosition(
-        state.draggingArtworkId,
-        {
-          x: artwork.posX,
-          y: artwork.posY,
-          z: artwork.posZ
-        }
-      );
-    }
+    if (!state.relayoutPreview || !state.originalPosition) return;
     
     set({
       relayoutPreview: null,
@@ -175,18 +163,32 @@ export const useMainStore = create<AppState>((set, get) => ({
   cancelRelayout: () => {
     const state = get();
     if (state.originalPosition && state.draggingArtworkId) {
-      state.updateArtworkPosition(
-        state.draggingArtworkId,
-        state.originalPosition
-      );
+      set(state => ({
+        artworks: state.artworks.map(a =>
+          a.id === get().draggingArtworkId
+            ? {
+                ...a,
+                posX: get().originalPosition!.x,
+                posY: get().originalPosition!.y,
+                posZ: get().originalPosition!.z,
+                lastModifiedBy: '当前用户',
+                lastModifiedAt: new Date().toISOString()
+              }
+            : a
+        ),
+        relayoutPreview: null as RelayoutPreviewResponse | null,
+        originalPosition: null as Point3D | null,
+        draggingArtworkId: null as string | null,
+        isRelayoutConfirmMode: false
+      }));
+    } else {
+      set({
+        relayoutPreview: null,
+        originalPosition: null,
+        draggingArtworkId: null,
+        isRelayoutConfirmMode: false
+      });
     }
-    
-    set({
-      relayoutPreview: null,
-      originalPosition: null,
-      draggingArtworkId: null,
-      isRelayoutConfirmMode: false
-    });
   },
   
   setShowHeatmap: (showHeatmap) => set({ showHeatmap }),
