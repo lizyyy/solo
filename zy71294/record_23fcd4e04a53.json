@@ -1,0 +1,110 @@
+{
+  "record_id": "23fcd4e04a53",
+  "problem_id": "A1",
+  "student_name": "李四",
+  "created_at": "2026-05-29T06:14:20.843138",
+  "updated_at": "2026-05-29T06:14:20.843142",
+  "reports": [
+    {
+      "problem_id": "A1",
+      "student_name": "李四",
+      "timestamp": "2026-05-29T06:14:20.843114",
+      "steps": [
+        "x**2 + 1"
+      ],
+      "standard_expression": "(x+1)**2",
+      "student_answer": "x**2 + x + 1",
+      "constraints": [],
+      "step_results": [
+        {
+          "step_index": 0,
+          "from_expr": "(x+1)**2",
+          "to_expr": "x**2 + 1",
+          "status": "incorrect",
+          "is_equivalent": false,
+          "is_fully_equivalent": false,
+          "equivalence_reason": "多种方法验证均不等价",
+          "domain_violations": [],
+          "domain_loss": [],
+          "constraint_violations": [],
+          "error_messages": [],
+          "details": {
+            "from_simplified": "(x + 1)**2",
+            "to_simplified": "x**2 + 1",
+            "free_symbols_from": [
+              "x"
+            ],
+            "free_symbols_to": [
+              "x"
+            ],
+            "from_domain_constraints": [],
+            "to_domain_constraints": [],
+            "declared_constraints": [],
+            "normalized_declared_constraints": []
+          }
+        },
+        {
+          "step_index": 1,
+          "from_expr": "x**2 + 1",
+          "to_expr": "x**2 + x + 1",
+          "status": "incorrect",
+          "is_equivalent": false,
+          "is_fully_equivalent": false,
+          "equivalence_reason": "多种方法验证均不等价",
+          "domain_violations": [],
+          "domain_loss": [],
+          "constraint_violations": [],
+          "error_messages": [],
+          "details": {
+            "from_simplified": "x**2 + 1",
+            "to_simplified": "x**2 + x + 1",
+            "free_symbols_from": [
+              "x"
+            ],
+            "free_symbols_to": [
+              "x"
+            ],
+            "from_domain_constraints": [],
+            "to_domain_constraints": [],
+            "declared_constraints": [],
+            "normalized_declared_constraints": []
+          }
+        }
+      ],
+      "errors": [
+        {
+          "error_type": "algebraic_mistake",
+          "severity": "error",
+          "description": "代数变形错误: 多种方法验证均不等价",
+          "suggestion": "建议检查符号变化、分配律、合并同类项等基本运算规则",
+          "location": "第0步: (x+1)**2 → x**2 + 1"
+        },
+        {
+          "error_type": "algebraic_mistake",
+          "severity": "error",
+          "description": "代数变形错误: 多种方法验证均不等价",
+          "suggestion": "建议检查符号变化、分配律、合并同类项等基本运算规则",
+          "location": "第1步: x**2 + 1 → x**2 + x + 1"
+        }
+      ],
+      "overall_score": 0,
+      "is_correct": false,
+      "summary": "存在2处代数错误",
+      "details": {
+        "fully_correct_steps": 0,
+        "algebraically_correct_steps": 0,
+        "total_steps": 2,
+        "warning_count": 0,
+        "error_count": 2,
+        "domain_loss_count": 0,
+        "has_domain_loss": false,
+        "is_algebraically_correct": false
+      },
+      "version": 0,
+      "version_note": "计算错误",
+      "graded_at": "2026-05-29T06:14:20.843141"
+    }
+  ],
+  "current_report_index": 0,
+  "metadata": {}
+}

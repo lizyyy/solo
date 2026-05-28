@@ -125,27 +125,34 @@ class EquivalenceChecker:
     def check_equivalence_with_constraints(
         expr1: SymbolicExpression,
         expr2: SymbolicExpression,
-        constraints: List[str]
+        constraints: List[str],
+        check_domain_consistency: bool = True
     ) -> Tuple[bool, str, List[str]]:
         """
         带约束检查的等价性判断
         
-        返回: (是否等价, 说明, 违反的约束列表)
+        Args:
+            expr1: 起始表达式
+            expr2: 目标表达式
+            constraints: 用户给定的约束条件（题目要求）
+            check_domain_consistency: 是否检查定义域一致性
+        
+        返回: (是否等价, 说明, 与题目约束冲突的列表)
         """
         base_result, reason = EquivalenceChecker.are_equivalent(expr1, expr2)
         
-        violated = []
+        constraint_conflicts = []
         if constraints:
             for constraint in constraints:
-                if not ConstraintChecker.validate_constraint(expr1, constraint):
-                    violated.append(constraint)
+                if not ConstraintChecker.validate_constraint(expr2, constraint):
+                    constraint_conflicts.append(constraint)
         
-        final_result = base_result and len(violated) == 0
+        final_result = base_result and len(constraint_conflicts) == 0
         final_reason = reason
-        if violated:
-            final_reason += f" (违反约束: {', '.join(violated)})"
+        if constraint_conflicts:
+            final_reason += f" (与题目约束冲突: {', '.join(constraint_conflicts)})"
         
-        return final_result, final_reason, violated
+        return final_result, final_reason, constraint_conflicts
 
 
 class DomainConstraint:
@@ -174,13 +181,70 @@ class ConstraintChecker:
     def parse_constraint(constraint_str: str):
         """解析约束字符串"""
         try:
-            return sympify(constraint_str)
+            from sympy import parse_expr
+            return parse_expr(constraint_str, evaluate=False)
         except:
-            return None
+            try:
+                return sympify(constraint_str)
+            except:
+                return None
+    
+    @staticmethod
+    def normalize_constraint(constraint_str: str) -> str:
+        """标准化约束字符串，便于比较
+        
+        将约束转换为标准形式：expr op 0
+        例如：x != 1 → x-1 != 0
+              x > 0 → x > 0
+        """
+        s = constraint_str.strip()
+        s = s.replace(" ", "")
+        s = s.replace("！=", "!=")
+        s = s.replace("＞=", ">=")
+        s = s.replace("＜=", "<=")
+        s = s.replace("＞", ">")
+        s = s.replace("＜", "<")
+        
+        try:
+            from sympy import parse_expr, Unequality, GreaterThan, LessThan, StrictGreaterThan, StrictLessThan, Equality, simplify
+            
+            parsed = parse_expr(s, evaluate=False)
+            
+            if isinstance(parsed, (bool, bool)):
+                return s
+            
+            if isinstance(parsed, (Unequality, GreaterThan, LessThan, StrictGreaterThan, StrictLessThan, Equality)):
+                lhs = parsed.lhs
+                rhs = parsed.rhs
+                
+                if isinstance(parsed, Unequality):
+                    op = "!="
+                elif isinstance(parsed, GreaterThan):
+                    op = ">="
+                elif isinstance(parsed, LessThan):
+                    op = "<="
+                elif isinstance(parsed, StrictGreaterThan):
+                    op = ">"
+                elif isinstance(parsed, StrictLessThan):
+                    op = "<"
+                elif isinstance(parsed, Equality):
+                    op = "=="
+                else:
+                    return s
+                
+                expr = simplify(lhs - rhs)
+                return f"{expr}{op}0"
+        except:
+            pass
+        return s
     
     @staticmethod
     def validate_constraint(expr: SymbolicExpression, constraint_str: str) -> bool:
-        """验证约束是否满足"""
+        """
+        验证约束是否与表达式兼容
+        
+        检查表达式在给定约束下是否有意义（约束不会使表达式无定义）
+        """
         if not expr.is_valid():
             return False
         
@@ -191,6 +255,18 @@ class ConstraintChecker:
         return True
     
     @staticmethod
+    def _factor_expression(expr):
+        """尝试因式分解表达式"""
+        try:
+            from sympy import factor
+            factored = factor(expr)
+            if factored.is_Mul:
+                return list(factored.args)
+            return [factored]
+        except:
+            return [expr]
+    
+    @staticmethod
     def get_domain_constraints(expr: SymbolicExpression) -> List[DomainConstraint]:
         """
         获取表达式的所有定义域约束条件
@@ -198,6 +274,7 @@ class ConstraintChecker:
         返回: 约束列表，每个约束包含类型、表达式、条件字符串
         """
         constraints = []
+        seen = set()
         if not expr.is_valid():
             return constraints
         
@@ -206,41 +283,76 @@ class ConstraintChecker:
         denominators = ConstraintChecker._find_denominators(e)
         for denom in denominators:
             if denom != 1:
-                constraints.append(DomainConstraint(
-                    "division",
-                    str(denom),
-                    f"{denom} != 0"
-                ))
+                factors = ConstraintChecker._factor_expression(denom)
+                for factor in factors:
+                    if factor != 1:
+                        condition = f"{factor} != 0"
+                        norm_key = ConstraintChecker.normalize_constraint(condition)
+                        if norm_key not in seen:
+                            seen.add(norm_key)
+                            constraints.append(DomainConstraint(
+                                "division",
+                                str(factor),
+                                condition
+                            ))
         
         radicals = ConstraintChecker._find_radicals(e)
         for rad in radicals:
-            constraints.append(DomainConstraint(
-                "radical",
-                str(rad),
-                f"{rad} >= 0"
-            ))
+            condition = f"{rad} >= 0"
+            norm_key = ConstraintChecker.normalize_constraint(condition)
+            if norm_key not in seen:
+                seen.add(norm_key)
+                constraints.append(DomainConstraint(
+                    "radical",
+                    str(rad),
+                    condition
+                ))
         
         logs = ConstraintChecker._find_log_arguments(e)
         for arg in logs:
-            constraints.append(DomainConstraint(
-                "logarithm",
-                str(arg),
-                f"{arg} > 0"
-            ))
+            condition = f"{arg} > 0"
+            norm_key = ConstraintChecker.normalize_constraint(condition)
+            if norm_key not in seen:
+                seen.add(norm_key)
+                constraints.append(DomainConstraint(
+                    "logarithm",
+                    str(arg),
+                    condition
+                ))
         
         return constraints
     
     @staticmethod
-    def find_domain_violations(expr: SymbolicExpression) -> List[str]:
+    def find_domain_violations(
+        expr: SymbolicExpression,
+        declared_constraints: Optional[List[str]] = None
+    ) -> List[str]:
         """
         查找定义域违规情况（除零、根号负等）
+        
+        Args:
+            expr: 表达式
+            declared_constraints: 用户已显式声明的约束列表
+        
+        返回: 未被声明的定义域约束列表
         """
         violations = []
         if not expr.is_valid():
             return violations
         
+        declared_normalized = set()
+        if declared_constraints:
+            declared_normalized = {
+                ConstraintChecker.normalize_constraint(c) 
+                for c in declared_constraints
+            }
+        
         constraints = ConstraintChecker.get_domain_constraints(expr)
         for c in constraints:
+            normalized_condition = ConstraintChecker.normalize_constraint(c.condition)
+            if normalized_condition in declared_normalized:
+                continue
+            
             if c.constraint_type == "division":
                 violations.append(f"分母可能为零，需满足: {c.condition}")
             elif c.constraint_type == "radical":
@@ -253,12 +365,18 @@ class ConstraintChecker:
     @staticmethod
     def detect_domain_loss(
         from_expr: SymbolicExpression,
-        to_expr: SymbolicExpression
+        to_expr: SymbolicExpression,
+        declared_constraints: Optional[List[str]] = None
     ) -> List[str]:
         """
         检测从 from_expr 到 to_expr 变形中丢失的定义域约束
         
-        返回: 丢失的约束列表
+        Args:
+            from_expr: 起始表达式
+            to_expr: 目标表达式
+            declared_constraints: 用户已显式声明的约束列表
+        
+        返回: 丢失且未被声明的约束列表
         """
         if not from_expr.is_valid() or not to_expr.is_valid():
             return []
@@ -266,12 +384,25 @@ class ConstraintChecker:
         from_constraints = ConstraintChecker.get_domain_constraints(from_expr)
         to_constraints = ConstraintChecker.get_domain_constraints(to_expr)
         
-        from_conditions = {str(c) for c in from_constraints}
-        to_conditions = {str(c) for c in to_constraints}
+        from_conditions = {ConstraintChecker.normalize_constraint(str(c)): str(c) for c in from_constraints}
+        to_conditions = {ConstraintChecker.normalize_constraint(str(c)) for c in to_constraints}
         
-        lost_conditions = from_conditions - to_conditions
+        declared_normalized = set()
+        if declared_constraints:
+            declared_normalized = {
+                ConstraintChecker.normalize_constraint(c) 
+                for c in declared_constraints
+            }
         
-        return list(lost_conditions)
+        lost_conditions = []
+        for norm_key, original_condition in from_conditions.items():
+            if norm_key in to_conditions:
+                continue
+            if norm_key in declared_normalized:
+                continue
+            lost_conditions.append(original_condition)
+        
+        return lost_conditions
     
     @staticmethod
     def _find_denominators(expr) -> List:

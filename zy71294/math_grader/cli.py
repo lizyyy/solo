@@ -18,18 +18,27 @@ from .storage import RecordStorage
 console = Console()
 
 
-def parse_steps(steps_str: str) -> List[str]:
-    """解析步骤字符串"""
-    if not steps_str:
+def _split_by_separators(text: str, separators: List[str]) -> List[str]:
+    """按多个分隔符分割字符串"""
+    if not text:
         return []
-    return [s.strip() for s in steps_str.split(";") if s.strip()]
+    result = [text]
+    for sep in separators:
+        temp = []
+        for item in result:
+            temp.extend(item.split(sep))
+        result = temp
+    return [s.strip() for s in result if s.strip()]
+
+
+def parse_steps(steps_str: str) -> List[str]:
+    """解析步骤字符串，支持中英文分号分隔"""
+    return _split_by_separators(steps_str, [";", "；"])
 
 
 def parse_constraints(constraints_str: str) -> List[str]:
-    """解析约束字符串"""
-    if not constraints_str:
-        return []
-    return [c.strip() for c in constraints_str.split(";") if c.strip()]
+    """解析约束字符串，支持中英文分号分隔"""
+    return _split_by_separators(constraints_str, [";", "；"])
 
 
 @click.group()

@@ -237,19 +237,36 @@ class RecordStorage:
         return True
     
     def import_record_from_json(self, input_path: str) -> Optional[GradingRecord]:
-        """从JSON导入记录"""
+        """从JSON导入记录
+        
+        如果记录已存在，则去重追加新版本；如果不存在，则直接导入。
+        """
         if not os.path.exists(input_path):
             return None
         
         with open(input_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
-        record = GradingRecord.from_dict(data)
-        existing = self.load_record(record.record_id)
+        imported_record = GradingRecord.from_dict(data)
+        existing = self.load_record(imported_record.record_id)
         
-        if existing:
-            record.created_at = existing.created_at
-            record.reports = existing.reports + record.reports
+        if not existing:
+            record = imported_record
+        else:
+            existing_keys = set()
+            for r in existing.reports:
+                key = (r.get("graded_at", ""), r.get("overall_score", 0), r.get("is_correct", False))
+                existing_keys.add(key)
+            
+            new_reports = []
+            for r in imported_record.reports:
+                key = (r.get("graded_at", ""), r.get("overall_score", 0), r.get("is_correct", False))
+                if key not in existing_keys:
+                    r["version"] = len(existing.reports) + len(new_reports)
+                    new_reports.append(r)
+            
+            record = existing
+            record.reports.extend(new_reports)
             record.current_report_index = len(record.reports) - 1
             record.updated_at = datetime.now().isoformat()
         

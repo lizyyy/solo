@@ -98,10 +98,10 @@ class StepChecker:
             result.status = StepStatus.INCORRECT
             return result
         
-        domain_violations = ConstraintChecker.find_domain_violations(to_expr)
+        domain_violations = ConstraintChecker.find_domain_violations(to_expr, constraints)
         result.domain_violations = domain_violations
         
-        domain_loss = ConstraintChecker.detect_domain_loss(from_expr, to_expr)
+        domain_loss = ConstraintChecker.detect_domain_loss(from_expr, to_expr, constraints)
         result.domain_loss = domain_loss
         
         is_equiv, reason, violated_constraints = EquivalenceChecker.check_equivalence_with_constraints(
@@ -130,6 +130,10 @@ class StepChecker:
         result.details["free_symbols_to"] = list(to_expr.get_free_symbols())
         result.details["from_domain_constraints"] = [str(c) for c in ConstraintChecker.get_domain_constraints(from_expr)]
         result.details["to_domain_constraints"] = [str(c) for c in ConstraintChecker.get_domain_constraints(to_expr)]
+        result.details["declared_constraints"] = constraints
+        result.details["normalized_declared_constraints"] = [
+            ConstraintChecker.normalize_constraint(c) for c in constraints
+        ]
         
         return result
     

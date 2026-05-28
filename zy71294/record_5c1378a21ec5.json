@@ -1,0 +1,123 @@
+{
+  "record_id": "5c1378a21ec5",
+  "problem_id": "A1",
+  "student_name": "张三",
+  "created_at": "2026-05-29T06:14:20.816442",
+  "updated_at": "2026-05-29T06:14:20.816446",
+  "reports": [
+    {
+      "problem_id": "A1",
+      "student_name": "张三",
+      "timestamp": "2026-05-29T06:14:20.816418",
+      "steps": [
+        "(x+1)*(x+1)",
+        "x*x + x*1 + 1*x + 1*1"
+      ],
+      "standard_expression": "(x+1)**2",
+      "student_answer": "x**2 + 2*x + 1",
+      "constraints": [],
+      "step_results": [
+        {
+          "step_index": 0,
+          "from_expr": "(x+1)**2",
+          "to_expr": "(x+1)*(x+1)",
+          "status": "correct",
+          "is_equivalent": true,
+          "is_fully_equivalent": true,
+          "equivalence_reason": "化简后差值为0",
+          "domain_violations": [],
+          "domain_loss": [],
+          "constraint_violations": [],
+          "error_messages": [],
+          "details": {
+            "from_simplified": "(x + 1)**2",
+            "to_simplified": "(x + 1)**2",
+            "free_symbols_from": [
+              "x"
+            ],
+            "free_symbols_to": [
+              "x"
+            ],
+            "from_domain_constraints": [],
+            "to_domain_constraints": [],
+            "declared_constraints": [],
+            "normalized_declared_constraints": []
+          }
+        },
+        {
+          "step_index": 1,
+          "from_expr": "(x+1)*(x+1)",
+          "to_expr": "x*x + x*1 + 1*x + 1*1",
+          "status": "correct",
+          "is_equivalent": true,
+          "is_fully_equivalent": true,
+          "equivalence_reason": "化简后差值为0",
+          "domain_violations": [],
+          "domain_loss": [],
+          "constraint_violations": [],
+          "error_messages": [],
+          "details": {
+            "from_simplified": "(x + 1)**2",
+            "to_simplified": "x**2 + 2*x + 1",
+            "free_symbols_from": [
+              "x"
+            ],
+            "free_symbols_to": [
+              "x"
+            ],
+            "from_domain_constraints": [],
+            "to_domain_constraints": [],
+            "declared_constraints": [],
+            "normalized_declared_constraints": []
+          }
+        },
+        {
+          "step_index": 2,
+          "from_expr": "x*x + x*1 + 1*x + 1*1",
+          "to_expr": "x**2 + 2*x + 1",
+          "status": "correct",
+          "is_equivalent": true,
+          "is_fully_equivalent": true,
+          "equivalence_reason": "化简后差值为0",
+          "domain_violations": [],
+          "domain_loss": [],
+          "constraint_violations": [],
+          "error_messages": [],
+          "details": {
+            "from_simplified": "x**2 + 2*x + 1",
+            "to_simplified": "x**2 + 2*x + 1",
+            "free_symbols_from": [
+              "x"
+            ],
+            "free_symbols_to": [
+              "x"
+            ],
+            "from_domain_constraints": [],
+            "to_domain_constraints": [],
+            "declared_constraints": [],
+            "normalized_declared_constraints": []
+          }
+        }
+      ],
+      "errors": [],
+      "overall_score": 80.0,
+      "is_correct": true,
+      "summary": "答案完全正确",
+      "details": {
+        "fully_correct_steps": 3,
+        "algebraically_correct_steps": 3,
+        "total_steps": 3,
+        "warning_count": 0,
+        "error_count": 0,
+        "domain_loss_count": 0,
+        "has_domain_loss": false,
+        "is_algebraically_correct": true
+      },
+      "version": 0,
+      "version_note": "第一次作业",
+      "graded_at": "2026-05-29T06:14:20.816445"
+    }
+  ],
+  "current_report_index": 0,
+  "metadata": {}
+}
