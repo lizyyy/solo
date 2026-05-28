@@ -18,7 +18,6 @@ import {
 } from 'antd';
 import {
   PlusOutlined,
-  SearchOutlined,
   ExportOutlined,
   EyeOutlined,
   EditOutlined,
@@ -34,7 +33,7 @@ import { useAppStore } from '../store';
 import { detectAnomalies, generateProcessingConclusion } from '../services/validationService';
 import { exportToExcel, exportToCSV } from '../services/exportService';
 import { getStatusColor, getStatusText, formatCurrency } from '../utils/helpers';
-import { Redemption, RedemptionStatus } from '../types';
+import { Redemption, RedemptionStatus, ValidationWarning } from '../types';
 import ProcessingConclusion from '../components/ProcessingConclusion';
 
 const { Search } = Input;
@@ -190,7 +189,7 @@ const RedemptionList: React.FC = () => {
       key: 'currentBalance',
       width: 120,
       align: 'right' as const,
-      render: (val: number, record: Redemption) => {
+      render: (val: number) => {
         const isNegative = val < 0;
         return (
           <span className={`font-mono font-semibold ${isNegative ? 'text-red-600' : 'text-green-600'}`}>
@@ -236,10 +235,7 @@ const RedemptionList: React.FC = () => {
       key: 'actions',
       width: 200,
       fixed: 'right' as const,
-      render: (_: any, record: Redemption) => {
-        const validation = detectAnomalies(record, redemptions);
-        const hasIssues = !validation.isValid || validation.warnings.length > 0;
-
+      render: (_: unknown, record: Redemption) => {
         return (
           <Space size="small">
             <Button
@@ -301,7 +297,7 @@ const RedemptionList: React.FC = () => {
     return generateProcessingConclusion({
       isValid: allIssues.filter(i => i.severity === 'error').length === 0,
       errors: allIssues.filter(i => i.severity === 'error'),
-      warnings: allIssues.filter(i => i.severity === 'warning') as any
+      warnings: allIssues.filter(i => i.severity === 'warning') as ValidationWarning[]
     });
   }, [redemptions]);
 

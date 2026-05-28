@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Tag, Button, Collapse } from 'antd';
+import { Card, Tag, Collapse } from 'antd';
 import {
   CheckCircleOutlined,
   WarningOutlined,

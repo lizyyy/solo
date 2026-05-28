@@ -96,6 +96,9 @@ export interface ValidationWarning {
   message: string;
   severity: 'warning' | 'info';
   suggestion?: string;
+  field?: string;
+  ruleExplanation?: string;
+  calculationProcess?: string;
 }
 
 export interface ValidationResult {

@@ -1,11 +1,11 @@
-import { Redemption, ValidationResult, ValidationError, ProcessingConclusion } from '../types';
+import { Redemption, ValidationResult, ValidationError, ValidationWarning, ProcessingConclusion } from '../types';
 
 export function detectAnomalies(
   redemption: Redemption,
   allRedemptions: Redemption[]
 ): ValidationResult {
   const errors: ValidationError[] = [];
-  const warnings: ValidationError[] = [];
+  const warnings: ValidationWarning[] = [];
 
   if (redemption.currentBalance < 0) {
     errors.push({

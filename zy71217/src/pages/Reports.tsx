@@ -9,8 +9,16 @@ import {
 } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { useAppStore } from '../store';
-import { detectAnomalies } from '../services/validationService';
-import { formatCurrency, getStatusText, getStatusColor } from '../utils/helpers';
+import { getStatusText } from '../utils/helpers';
+import { RedemptionStatus } from '../types';
+
+interface AnomalyRecord {
+  key: string;
+  type: string;
+  count: number;
+  severity: string;
+  description: string;
+}
 
 const Reports: React.FC = () => {
   const { redemptions, batches } = useAppStore();
@@ -59,7 +67,7 @@ const Reports: React.FC = () => {
         label: { show: true, fontSize: 16, fontWeight: 'bold' }
       },
       data: Object.entries(statusStats).map(([key, value]) => ({
-        name: getStatusText(key as any),
+        name: getStatusText(key as RedemptionStatus),
         value,
         itemStyle: {
           color: {
@@ -104,7 +112,7 @@ const Reports: React.FC = () => {
       dataIndex: 'type',
       key: 'type',
       width: 150,
-      render: (text: string, record: any) => (
+      render: (text: string, record: AnomalyRecord) => (
         <Tag color={record.severity === 'error' ? 'red' : 'orange'}>{text}</Tag>
       )
     },

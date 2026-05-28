@@ -3,7 +3,6 @@ import { Layout, Menu, Button, Dropdown, Avatar, Badge } from 'antd';
 import {
   CreditCardOutlined,
   UnorderedListOutlined,
-  FileTextOutlined,
   BarChartOutlined,
   UserOutlined,
   WarningOutlined,
@@ -29,7 +28,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       resetToMockData();
       setInitialized();
     }
-  }, []);
+  }, [isInitialized, redemptions.length, resetToMockData, setInitialized]);
 
   const errorCount = redemptions.filter(r => r.currentBalance < 0).length;
   const disputeCount = redemptions.filter(r => r.hasDispute && !r.isFrozen).length;

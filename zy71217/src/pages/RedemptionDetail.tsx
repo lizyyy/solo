@@ -6,7 +6,6 @@ import {
   Tag,
   Button,
   Space,
-  Divider,
   List,
   Avatar,
   Tooltip,
@@ -18,7 +17,6 @@ import {
   ArrowLeftOutlined,
   EditOutlined,
   CreditCardOutlined,
-  UserOutlined,
   ShopOutlined,
   FileTextOutlined,
   HistoryOutlined,
@@ -27,6 +25,7 @@ import {
   IdcardOutlined,
   CalculatorOutlined
 } from '@ant-design/icons';
+import { ConsumptionRecord } from '../types';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { detectAnomalies, generateProcessingConclusion } from '../services/validationService';
@@ -128,7 +127,7 @@ const RedemptionDetail: React.FC = () => {
       key: 'amount',
       width: 120,
       align: 'right' as const,
-      render: (val: number, record: any) => (
+      render: (val: number, record: ConsumptionRecord) => (
         <span className={`font-mono ${record.type === 'consume' ? 'text-red-600' : 'text-green-600'}`}>
           {record.type === 'consume' ? '-' : '+'}¥{formatCurrency(val)}
         </span>

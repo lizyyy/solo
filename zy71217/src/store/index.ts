@@ -21,6 +21,7 @@ interface AppState {
   updateConsumptionRecord: (id: string, data: Partial<ConsumptionRecord>) => void;
   deleteConsumptionRecord: (id: string) => void;
   addIdentification: (identification: Identification) => void;
+  updateIdentification: (id: string, data: Partial<Identification>) => void;
   addDisputeNote: (note: DisputeNote) => void;
   updateDisputeNote: (id: string, data: Partial<DisputeNote>) => void;
   addBatch: (batch: Batch) => void;
@@ -79,6 +80,12 @@ export const useAppStore = create<AppState>()(
 
       addIdentification: (identification) => set((state) => ({
         identifications: [...state.identifications, identification]
+      })),
+
+      updateIdentification: (id, data) => set((state) => ({
+        identifications: state.identifications.map(i =>
+          i.id === id ? { ...i, ...data } : i
+        )
       })),
 
       addDisputeNote: (note) => set((state) => ({

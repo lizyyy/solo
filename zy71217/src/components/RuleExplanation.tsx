@@ -5,6 +5,16 @@ import { BALANCE_CALCULATION_RULES } from '../services/balanceService';
 import { VALIDATION_RULES } from '../services/validationService';
 import { EXPORT_RULES } from '../services/exportService';
 
+interface ValidationRule {
+  name: string;
+  threshold?: number;
+  condition?: string;
+  severity?: string;
+  action?: string;
+  description?: string;
+  matchFields?: string[];
+}
+
 const RuleExplanation: React.FC = () => {
   const items = [
     {
@@ -48,7 +58,7 @@ const RuleExplanation: React.FC = () => {
       ),
       children: (
         <div className="space-y-4">
-          {Object.entries(VALIDATION_RULES).map(([key, rule]: [string, any]) => (
+          {Object.entries(VALIDATION_RULES).map(([key, rule]: [string, ValidationRule]) => (
             <div key={key} className="bg-gray-50 rounded-lg p-4">
               <h4 className="font-medium text-gray-800 mb-2">{rule.name}</h4>
               <Descriptions column={1} size="small">

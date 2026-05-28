@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store';
 import { getBatchStatusColor, getBatchStatusText, formatCurrency } from '../utils/helpers';
 import { exportBatchReport } from '../services/exportService';
+import { Batch, BatchStatus } from '../types';
 
 const BatchList: React.FC = () => {
   const navigate = useNavigate();
@@ -42,9 +43,9 @@ const BatchList: React.FC = () => {
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status: string) => (
-        <Tag color={getBatchStatusColor(status as any)}>
-          {getBatchStatusText(status as any)}
+      render: (status: BatchStatus) => (
+        <Tag color={getBatchStatusColor(status)}>
+          {getBatchStatusText(status)}
         </Tag>
       )
     },
@@ -72,7 +73,7 @@ const BatchList: React.FC = () => {
       title: '执行进度',
       key: 'progress',
       width: 200,
-      render: (_: any, record: any) => {
+      render: (_: unknown, record: Batch) => {
         const completedCount = redemptions.filter(
           r => r.batchId === record.id && r.status === 'completed'
         ).length;
@@ -106,7 +107,7 @@ const BatchList: React.FC = () => {
       key: 'actions',
       width: 150,
       fixed: 'right' as const,
-      render: (_: any, record: any) => (
+      render: (_: unknown, record: Batch) => (
         <Space size="small">
           <Button
             type="link"
