@@ -1,0 +1,52 @@
+[
+  {
+    "policyNo": "POL20250001",
+    "visitDate": "2025-06-01",
+    "visitType": "电话",
+    "visitor": "代理人A",
+    "contactResult": "已联系",
+    "customerIntent": "续保",
+    "intentConfirmed": true,
+    "remark": "客户表示资金周转正常，确认续保"
+  },
+  {
+    "policyNo": "POL20250002",
+    "visitDate": "2025-06-05",
+    "visitType": "微信",
+    "visitor": "代理人B",
+    "contactResult": "已联系",
+    "customerIntent": "缓交",
+    "intentConfirmed": true,
+    "remark": "客户近期资金紧张，希望缓交一段时间"
+  },
+  {
+    "policyNo": "POL20250003",
+    "visitDate": "2025-05-20",
+    "visitType": "上门",
+    "visitor": "代理人A",
+    "contactResult": "已联系",
+    "customerIntent": "停保",
+    "intentConfirmed": true,
+    "remark": "客户明确表示不再续保，已了解相关权益损失"
+  },
+  {
+    "policyNo": "POL20250005",
+    "visitDate": "2025-05-10",
+    "visitType": "电话",
+    "visitor": "代理人C",
+    "contactResult": "已联系",
+    "customerIntent": "",
+    "intentConfirmed": false,
+    "remark": "客户未明确表态，需要再次回访"
+  },
+  {
+    "policyNo": "POL20250007",
+    "visitDate": "2025-06-02",
+    "visitType": "短信",
+    "visitor": "代理人B",
+    "contactResult": "已联系",
+    "customerIntent": "续保",
+    "intentConfirmed": true,
+    "remark": "客户回复确认续保"
+  }
+]

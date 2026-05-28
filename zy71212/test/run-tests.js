@@ -302,6 +302,105 @@ async function runTests() {
     });
 
     console.log();
+    console.log('🌐 测试6: API上传接口');
+    console.log('-'.repeat(60));
+
+    const fs = require('fs');
+    const ApiController = require('../controllers/ApiController');
+    const apiController = new ApiController();
+
+    function createMockReq(files) {
+        return { files };
+    }
+
+    function createMockRes() {
+        let responseData = null;
+        let statusCode = 200;
+        return {
+            status: function(code) { statusCode = code; return this; },
+            json: function(data) { responseData = data; return this; },
+            getResponse: () => ({ statusCode, data: responseData })
+        };
+    }
+
+    await test('上传接口字段名 file（单文件）', async () => {
+        const testFile = path.join(TEST_DATA_DIR, 'policies.json');
+        const mockReq = createMockReq({
+            file: [{ path: testFile, originalname: 'policies.json' }]
+        });
+        const mockRes = createMockRes();
+        
+        await apiController.uploadAndProcess(mockReq, mockRes);
+        const result = mockRes.getResponse();
+        
+        if (result.statusCode !== 200) {
+            throw new Error('状态码应为200，实际为' + result.statusCode);
+        }
+        if (!result.data?.success) {
+            throw new Error('上传失败: ' + (result.data?.error || '未知错误'));
+        }
+        console.log(` [成功${result.data?.data?.successCount || 0}个文件, 记录${result.data?.data?.records?.length || 0}条]`);
+    });
+
+    await test('上传接口字段名 files（单文件）', async () => {
+        const testFile = path.join(TEST_DATA_DIR, 'payment-plans.json');
+        const mockReq = createMockReq({
+            files: [{ path: testFile, originalname: 'payment-plans.json' }]
+        });
+        const mockRes = createMockRes();
+        
+        await apiController.uploadAndProcess(mockReq, mockRes);
+        const result = mockRes.getResponse();
+        
+        if (result.statusCode !== 200) {
+            throw new Error('状态码应为200，实际为' + result.statusCode);
+        }
+        if (!result.data?.success) {
+            throw new Error('上传失败: ' + (result.data?.error || '未知错误'));
+        }
+        console.log(` [成功${result.data?.data?.successCount || 0}个文件, 记录${result.data?.data?.records?.length || 0}条]`);
+    });
+
+    await test('上传接口多文件上传', async () => {
+        const testFile1 = path.join(TEST_DATA_DIR, 'policies.json');
+        const testFile2 = path.join(TEST_DATA_DIR, 'visit-records.json');
+        const mockReq = createMockReq({
+            files: [
+                { path: testFile1, originalname: 'policies.json' },
+                { path: testFile2, originalname: 'visit-records.json' }
+            ]
+        });
+        const mockRes = createMockRes();
+        
+        await apiController.uploadAndProcess(mockReq, mockRes);
+        const result = mockRes.getResponse();
+        
+        if (result.statusCode !== 200) {
+            throw new Error('状态码应为200，实际为' + result.statusCode);
+        }
+        if (!result.data?.success) {
+            throw new Error('上传失败: ' + (result.data?.error || '未知错误'));
+        }
+        if (result.data?.data?.totalFiles !== 2) {
+            throw new Error('应该处理2个文件，实际处理' + result.data?.data?.totalFiles + '个');
+        }
+        console.log(` [总共${result.data?.data?.totalFiles}个文件, 成功${result.data?.data?.successCount || 0}个, 记录${result.data?.data?.records?.length || 0}条]`);
+    });
+
+    await test('上传接口无文件上传应返回400', async () => {
+        const mockReq = createMockReq({});
+        const mockRes = createMockRes();
+        
+        await apiController.uploadAndProcess(mockReq, mockRes);
+        const result = mockRes.getResponse();
+        
+        if (result.statusCode !== 400) {
+            throw new Error('状态码应为400，实际为' + result.statusCode);
+        }
+        console.log(` [正确返回错误: ${result.data?.error}]`);
+    });
+
+    console.log();
     console.log('='.repeat(60));
     console.log('📝 测试结果汇总');
     console.log('='.repeat(60));

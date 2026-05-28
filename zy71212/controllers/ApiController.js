@@ -641,9 +641,18 @@ class ApiController {
     }
   }
 
-  uploadAndProcess(req, res) {
+  async uploadAndProcess(req, res) {
     try {
-      if (!req.file) {
+      const uploadedFiles = [];
+      if (req.files) {
+        if (req.files.file) {
+          uploadedFiles.push(...req.files.file);
+        }
+        if (req.files.files) {
+          uploadedFiles.push(...req.files.files);
+        }
+      }
+      if (uploadedFiles.length === 0) {
         return res.status(400).json({
           success: false,
           error: '请上传文件'
@@ -651,18 +660,50 @@ class ApiController {
       }
 
       const { FileProcessor } = require('../services');
-      const fileProcessor = new FileProcessor();
+      const fileProcessor = new FileProcessor({ stopOnError: false });
       
-      fileProcessor.processFile(req.file.path).then(result => {
-        res.json({
-          success: result.success,
-          data: result
-        });
-      }).catch(error => {
-        res.status(500).json({
-          success: false,
-          error: error.message
-        });
+      const allResults = {
+        success: true,
+        totalFiles: uploadedFiles.length,
+        successCount: 0,
+        failedCount: 0,
+        records: [],
+        results: [],
+        failed: [],
+        summary: {}
+      };
+
+      for (const file of uploadedFiles) {
+        try {
+          const result = await fileProcessor.processFile(file.path);
+          if (result.success) {
+            allResults.successCount++;
+            allResults.results.push(result);
+            allResults.records.push(...(result.records || []));
+          } else {
+            allResults.failedCount++;
+            allResults.failed.push(result);
+          }
+        } catch (error) {
+          allResults.failedCount++;
+          allResults.failed.push({
+            file: file.originalname,
+            success: false,
+            error: error.message
+          });
+        }
+      }
+
+      allResults.summary = {
+        total: uploadedFiles.length,
+        success: allResults.successCount,
+        failed: allResults.failedCount,
+        records: allResults.records.length
+      };
+
+      res.json({
+        success: true,
+        data: allResults
       });
     } catch (error) {
       res.status(500).json({

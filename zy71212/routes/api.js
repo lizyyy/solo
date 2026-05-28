@@ -16,6 +16,10 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+const uploadFields = upload.fields([
+  { name: 'file', maxCount: 1 },
+  { name: 'files', maxCount: 20 }
+]);
 
 router.get('/dashboard', (req, res) => apiController.getDashboard(req, res));
 router.get('/next-steps', (req, res) => apiController.getNextSteps(req, res));
@@ -23,7 +27,8 @@ router.get('/consistency', (req, res) => apiController.getConsistencyCheck(req, 
 router.get('/input-types', (req, res) => apiController.getInputTypes(req, res));
 
 router.post('/process-directory', (req, res) => apiController.processDirectory(req, res));
-router.post('/upload', upload.single('file'), (req, res) => apiController.uploadAndProcess(req, res));
+router.post('/upload', uploadFields, (req, res) => apiController.uploadAndProcess(req, res));
+router.post('/files/upload', uploadFields, (req, res) => apiController.uploadAndProcess(req, res));
 
 router.get('/grace-analysis', (req, res) => apiController.runGraceAnalysis(req, res));
 router.post('/grace-analysis', (req, res) => apiController.runGraceAnalysis(req, res));
