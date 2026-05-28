@@ -189,7 +189,10 @@ export type ImportConflict = {
   sourceType: SourceType;
   existingRecordId: string;
   newRecord: BankTransaction | Voucher | Invoice | Contract;
+  recordKey: string;
   resolution: 'skip' | 'overwrite' | 'append' | null;
+  isSameFile: boolean;
+  existingSourceId?: string;
   createdAt: number;
 };
 

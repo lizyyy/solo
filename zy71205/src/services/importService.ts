@@ -16,14 +16,23 @@ type ParsedData = {
   vouchers: Voucher[];
   invoices: Invoice[];
   contracts: Contract[];
+};
+
+export type ImportResult = {
+  source: DataSource;
+  data: ParsedData;
   conflicts: ImportConflict[];
+  sameFileDetected: boolean;
+  existingSource?: DataSource;
+  cleanCount: number;
+  conflictCount: number;
 };
 
 export const detectSourceType = (fileName: string, headers: string[]): SourceType => {
   const lowerName = fileName.toLowerCase();
   const lowerHeaders = headers.map(h => h.toLowerCase());
 
-  if (lowerName.includes('流水') || lowerName.includes('bank') || 
+  if (lowerName.includes('流水') || lowerName.includes('bank') ||
       lowerHeaders.some(h => h.includes('交易') || h.includes('流水') || h.includes('借方') || h.includes('贷方'))) {
     return 'bank';
   }
@@ -53,12 +62,12 @@ export const parseExcel = async (file: File): Promise<{
 }> => {
   const arrayBuffer = await file.arrayBuffer();
   const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-  
+
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
-  
+
   const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as unknown[][];
-  
+
   if (jsonData.length === 0) {
     return { headers: [], rows: [], sheetNames: workbook.SheetNames };
   }
@@ -145,7 +154,7 @@ export const parseVoucher = (
 
   const now = Date.now();
   const summary = getValue(['摘要', '摘要信息', 'description', 'summary']);
-  const isRedFlush = summary.includes('红冲') || summary.includes('冲销') || 
+  const isRedFlush = summary.includes('红冲') || summary.includes('冲销') ||
                      getValue(['方向', 'direction']).includes('红') ||
                      getNumber(['借方金额', '贷方金额']) < 0;
 
@@ -249,30 +258,46 @@ export const parseContract = (
 export const checkDuplicates = async (
   batchId: string,
   transactions: BankTransaction[],
-  vouchers: Voucher[]
+  vouchers: Voucher[],
+  invoices: Invoice[],
+  contracts: Contract[],
+  sourceId: string
 ): Promise<ImportConflict[]> => {
   const conflicts: ImportConflict[] = [];
 
   const existingTransactions = await dbOperations.transactions.getByBatch(batchId);
   const existingVouchers = await dbOperations.vouchers.getByBatch(batchId);
+  const existingInvoices = await dbOperations.invoices.getByBatch(batchId);
+  const existingContracts = await dbOperations.contracts.getByBatch(batchId);
 
   const existingTransactionNos = new Map(
-    existingTransactions.map(t => [normalizeString(t.transactionNo), t.id])
+    existingTransactions.map(t => [normalizeString(t.transactionNo), t])
   );
   const existingVoucherNos = new Map(
-    existingVouchers.map(v => [normalizeString(v.voucherNo), v.id])
+    existingVouchers.map(v => [normalizeString(v.voucherNo), v])
+  );
+  const existingInvoiceNos = new Map(
+    existingInvoices.map(i => [normalizeString(i.invoiceNo), i])
+  );
+  const existingContractNos = new Map(
+    existingContracts.map(c => [normalizeString(c.contractNo), c])
   );
 
   for (const transaction of transactions) {
     const key = normalizeString(transaction.transactionNo);
-    if (existingTransactionNos.has(key)) {
+    const existing = existingTransactionNos.get(key);
+    if (existing) {
+      const isSameFile = existing.sourceId === sourceId;
       conflicts.push({
         id: generateId(),
         batchId,
         sourceType: 'bank',
-        existingRecordId: existingTransactionNos.get(key)!,
+        existingRecordId: existing.id,
         newRecord: transaction,
+        recordKey: transaction.transactionNo,
         resolution: null,
+        isSameFile,
+        existingSourceId: existing.sourceId,
         createdAt: Date.now(),
       });
     }
@@ -280,14 +305,59 @@ export const checkDuplicates = async (
 
   for (const voucher of vouchers) {
     const key = normalizeString(voucher.voucherNo);
-    if (existingVoucherNos.has(key)) {
+    const existing = existingVoucherNos.get(key);
+    if (existing) {
+      const isSameFile = existing.sourceId === sourceId;
       conflicts.push({
         id: generateId(),
         batchId,
         sourceType: 'voucher',
-        existingRecordId: existingVoucherNos.get(key)!,
+        existingRecordId: existing.id,
         newRecord: voucher,
+        recordKey: voucher.voucherNo,
         resolution: null,
+        isSameFile,
+        existingSourceId: existing.sourceId,
+        createdAt: Date.now(),
+      });
+    }
+  }
+
+  for (const invoice of invoices) {
+    const key = normalizeString(invoice.invoiceNo);
+    const existing = existingInvoiceNos.get(key);
+    if (existing) {
+      const isSameFile = existing.sourceId === sourceId;
+      conflicts.push({
+        id: generateId(),
+        batchId,
+        sourceType: 'invoice',
+        existingRecordId: existing.id,
+        newRecord: invoice,
+        recordKey: invoice.invoiceNo,
+        resolution: null,
+        isSameFile,
+        existingSourceId: existing.sourceId,
+        createdAt: Date.now(),
+      });
+    }
+  }
+
+  for (const contract of contracts) {
+    const key = normalizeString(contract.contractNo);
+    const existing = existingContractNos.get(key);
+    if (existing) {
+      const isSameFile = existing.sourceId === sourceId;
+      conflicts.push({
+        id: generateId(),
+        batchId,
+        sourceType: 'contract',
+        existingRecordId: existing.id,
+        newRecord: contract,
+        recordKey: contract.contractNo,
+        resolution: null,
+        isSameFile,
+        existingSourceId: existing.sourceId,
         createdAt: Date.now(),
       });
     }
@@ -299,17 +369,11 @@ export const checkDuplicates = async (
 export const importFile = async (
   file: File,
   batchId: string
-): Promise<{
-  source: DataSource;
-  data: ParsedData;
-  duplicateCount: number;
-}> => {
+): Promise<ImportResult> => {
   const fileHash = await calculateFileHash(file);
-  
+
   const existingSource = await dbOperations.sources.getByHash(fileHash);
-  if (existingSource) {
-    throw new Error(`该文件已在批次"${existingSource.batchId}"中导入过`);
-  }
+  const sameFileDetected = !!existingSource;
 
   const { headers, rows } = await parseExcel(file);
   const sourceType = detectSourceType(file.name, headers);
@@ -330,7 +394,6 @@ export const importFile = async (
     vouchers: [],
     invoices: [],
     contracts: [],
-    conflicts: [],
   };
 
   switch (sourceType) {
@@ -356,47 +419,150 @@ export const importFile = async (
       break;
   }
 
-  data.conflicts = await checkDuplicates(batchId, data.transactions, data.vouchers);
+  const conflicts = await checkDuplicates(
+    batchId,
+    data.transactions,
+    data.vouchers,
+    data.invoices,
+    data.contracts,
+    sourceId
+  );
+
+  const conflictIds = new Set(conflicts.map(c => c.newRecord.id));
+
+  let cleanCount = 0;
+  const cleanTransactions = data.transactions.filter(t => !conflictIds.has(t.id));
+  const cleanVouchers = data.vouchers.filter(v => !conflictIds.has(v.id));
+  const cleanInvoices = data.invoices.filter(i => !conflictIds.has(i.id));
+  const cleanContracts = data.contracts.filter(c => !conflictIds.has(c.id));
+
+  cleanCount = cleanTransactions.length + cleanVouchers.length + cleanInvoices.length + cleanContracts.length;
+
+  await dbOperations.sources.add(source);
+
+  if (cleanTransactions.length > 0) {
+    await dbOperations.transactions.addMany(cleanTransactions);
+  }
+  if (cleanVouchers.length > 0) {
+    await dbOperations.vouchers.addMany(cleanVouchers);
+  }
+  if (cleanInvoices.length > 0) {
+    await dbOperations.invoices.addMany(cleanInvoices);
+  }
+  if (cleanContracts.length > 0) {
+    await dbOperations.contracts.addMany(cleanContracts);
+  }
+
+  if (conflicts.length > 0) {
+    await dbOperations.importConflicts.addMany(conflicts);
+  }
 
   return {
     source,
     data,
-    duplicateCount: data.conflicts.length,
+    conflicts,
+    sameFileDetected,
+    existingSource: existingSource || undefined,
+    cleanCount,
+    conflictCount: conflicts.length,
   };
 };
 
 export const resolveImportConflict = async (
   conflictId: string,
-  resolution: 'skip' | 'overwrite' | 'append'
+  resolution: 'skip' | 'overwrite' | 'append',
+  batchId: string
 ): Promise<void> => {
-  const batch = await dbOperations.batches.getAll().then(b => b[0]);
-  if (!batch) return;
-
-  const conflicts = await dbOperations.importConflicts.getByBatch(batch.id);
+  const conflicts = await dbOperations.importConflicts.getByBatch(batchId);
   const conflict = conflicts.find(c => c.id === conflictId);
   if (!conflict) return;
 
+  if (resolution === 'skip') {
+    await dbOperations.importConflicts.delete(conflictId);
+    return;
+  }
+
   if (resolution === 'overwrite') {
+    await deleteRecordById(conflict.existingRecordId, conflict.sourceType);
+    await addRecord(conflict.newRecord, conflict.sourceType);
+    await dbOperations.importConflicts.delete(conflictId);
+    return;
+  }
+
+  if (resolution === 'append') {
     if (conflict.sourceType === 'bank') {
-      const transactions = await dbOperations.transactions.getByBatch(batch.id);
-      const updatedTransactions = transactions.filter(t => t.id !== conflict.existingRecordId);
-      await dbOperations.transactions.updateMany(updatedTransactions);
-      await dbOperations.transactions.addMany([conflict.newRecord as BankTransaction]);
+      const txn = conflict.newRecord as BankTransaction;
+      txn.transactionNo = `${txn.transactionNo}-副本`;
     } else if (conflict.sourceType === 'voucher') {
-      const vouchers = await dbOperations.vouchers.getByBatch(batch.id);
-      const updatedVouchers = vouchers.filter(v => v.id !== conflict.existingRecordId);
-      await dbOperations.vouchers.updateMany(updatedVouchers);
-      await dbOperations.vouchers.addMany([conflict.newRecord as Voucher]);
+      const vch = conflict.newRecord as Voucher;
+      vch.voucherNo = `${vch.voucherNo}-副本`;
+    } else if (conflict.sourceType === 'invoice') {
+      const inv = conflict.newRecord as Invoice;
+      inv.invoiceNo = `${inv.invoiceNo}-副本`;
+    } else if (conflict.sourceType === 'contract') {
+      const ctt = conflict.newRecord as Contract;
+      ctt.contractNo = `${ctt.contractNo}-副本`;
     }
-  } else if (resolution === 'append') {
-    if (conflict.sourceType === 'bank') {
-      await dbOperations.transactions.addMany([conflict.newRecord as BankTransaction]);
-    } else if (conflict.sourceType === 'voucher') {
-      await dbOperations.vouchers.addMany([conflict.newRecord as Voucher]);
+    await addRecord(conflict.newRecord, conflict.sourceType);
+    await dbOperations.importConflicts.delete(conflictId);
+    return;
+  }
+};
+
+const deleteRecordById = async (id: string, sourceType: SourceType): Promise<void> => {
+  switch (sourceType) {
+    case 'bank':
+      await dbOperations.transactions.deleteById(id);
+      break;
+    case 'voucher':
+      await dbOperations.vouchers.deleteById(id);
+      break;
+    case 'invoice':
+      await dbOperations.invoices.deleteById(id);
+      break;
+    case 'contract':
+      await dbOperations.contracts.deleteById(id);
+      break;
+  }
+};
+
+const addRecord = async (
+  record: BankTransaction | Voucher | Invoice | Contract,
+  sourceType: SourceType
+): Promise<void> => {
+  switch (sourceType) {
+    case 'bank':
+      await dbOperations.transactions.addMany([record as BankTransaction]);
+      break;
+    case 'voucher':
+      await dbOperations.vouchers.addMany([record as Voucher]);
+      break;
+    case 'invoice':
+      await dbOperations.invoices.addMany([record as Invoice]);
+      break;
+    case 'contract':
+      await dbOperations.contracts.addMany([record as Contract]);
+      break;
+  }
+};
+
+export const resolveAllConflicts = async (
+  batchId: string,
+  resolution: 'skip' | 'overwrite' | 'append'
+): Promise<number> => {
+  const conflicts = await dbOperations.importConflicts.getByBatch(batchId);
+  let resolved = 0;
+
+  for (const conflict of conflicts) {
+    try {
+      await resolveImportConflict(conflict.id, resolution, batchId);
+      resolved++;
+    } catch {
+      // continue resolving others
     }
   }
 
-  await dbOperations.importConflicts.delete(conflictId);
+  return resolved;
 };
 
 export const saveImportedData = async (
@@ -416,8 +582,5 @@ export const saveImportedData = async (
   }
   if (data.contracts.length > 0) {
     await dbOperations.contracts.addMany(data.contracts);
-  }
-  if (data.conflicts.length > 0) {
-    await dbOperations.importConflicts.addMany(data.conflicts);
   }
 };

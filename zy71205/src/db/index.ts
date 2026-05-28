@@ -225,6 +225,11 @@ export const dbOperations = {
       const db = await initDB();
       return db.getAllFromIndex('sources', 'by-batchId', batchId);
     },
+
+    async deleteById(id: string): Promise<void> {
+      const db = await initDB();
+      await db.delete('sources', id);
+    },
   },
 
   transactions: {
@@ -254,6 +259,11 @@ export const dbOperations = {
         return tx.store.put(t);
       }));
       await tx.done;
+    },
+
+    async deleteById(id: string): Promise<void> {
+      const db = await initDB();
+      await db.delete('transactions', id);
     },
   },
 
@@ -285,6 +295,11 @@ export const dbOperations = {
       }));
       await tx.done;
     },
+
+    async deleteById(id: string): Promise<void> {
+      const db = await initDB();
+      await db.delete('vouchers', id);
+    },
   },
 
   invoices: {
@@ -299,6 +314,11 @@ export const dbOperations = {
       const db = await initDB();
       return db.getAllFromIndex('invoices', 'by-batchId', batchId);
     },
+
+    async deleteById(id: string): Promise<void> {
+      const db = await initDB();
+      await db.delete('invoices', id);
+    },
   },
 
   contracts: {
@@ -312,6 +332,11 @@ export const dbOperations = {
     async getByBatch(batchId: string): Promise<Contract[]> {
       const db = await initDB();
       return db.getAllFromIndex('contracts', 'by-batchId', batchId);
+    },
+
+    async deleteById(id: string): Promise<void> {
+      const db = await initDB();
+      await db.delete('contracts', id);
     },
   },
 
