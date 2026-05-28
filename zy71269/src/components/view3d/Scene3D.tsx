@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Grid } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import * as THREE from 'three';
 import { ChipPackageMesh } from './ChipPackageMesh';
 import { HeatSinkMesh } from './HeatSinkMesh';
 import { AirFlowArrows } from './AirFlowArrows';
@@ -112,7 +111,6 @@ export const Scene3D = () => {
       
       <SceneContent />
       
-      <Environment preset="city" />
       <EffectComposer>
         <Bloom 
           luminanceThreshold={0.2} 
