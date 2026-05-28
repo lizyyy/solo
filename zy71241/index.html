@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D打印农场调度 - 培训小游戏</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { color: white; text-align: center; margin-bottom: 10px; }
+    .subtitle { color: rgba(255,255,255,0.8); text-align: center; margin-bottom: 20px; }
+    
+    .tabs { 
+      display: flex; 
+      gap: 5px; 
+      margin-bottom: 20px; 
+      background: rgba(255,255,255,0.1);
+      padding: 5px;
+      border-radius: 10px;
+    }
+    .tab { 
+      flex: 1;
+      padding: 12px 20px; 
+      background: rgba(255,255,255,0.2); 
+      color: white; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    .tab:hover { background: rgba(255,255,255,0.3); }
+    .tab.active { 
+      background: white; 
+      color: #667eea; 
+      font-weight: 600;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .tab-content { 
+      display: none; 
+      background: white; 
+      border-radius: 12px; 
+      padding: 24px; 
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    .tab-content.active { display: block; }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .card { 
+      background: #f8fafc; 
+      border-radius: 10px; 
+      padding: 16px; 
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s;
+    }
+    .card:hover { border-color: #667eea; transform: translateY(-2px); }
+    .card h3 { color: #334155; margin-bottom: 12px; font-size: 16px; }
+    .card p { color: #64748b; font-size: 13px; margin: 4px 0; }
+    .card .value { color: #1e40af; font-weight: 600; }
+    
+    .form-group { margin-bottom: 12px; }
+    label { display: block; color: #334155; font-size: 13px; margin-bottom: 4px; font-weight: 500; }
+    input, select { 
+      width: 100%; 
+      padding: 8px 12px; 
+      border: 1px solid #cbd5e1; 
+      border-radius: 6px; 
+      font-size: 13px;
+    }
+    input:focus, select:focus { outline: none; border-color: #667eea; }
+    
+    .btn { 
+      padding: 10px 20px; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 14px; 
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .btn-primary { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      color: white; 
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .btn-success { background: #22c55e; color: white; }
+    .btn-success:hover { background: #16a34a; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-warning:hover { background: #d97706; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    
+    .status-badge { 
+      display: inline-block; 
+      padding: 3px 10px; 
+      border-radius: 12px; 
+      font-size: 12px; 
+      font-weight: 500; 
+    }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-scheduled { background: #dbeafe; color: #1e40af; }
+    .status-printing { background: #dcfce7; color: #166534; animation: pulse 2s infinite; }
+    .status-paused { background: #fee2e2; color: #991b1b; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-failed { background: #fecaca; color: #7f1d1d; }
+    
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    
+    .issue { 
+      padding: 12px; 
+      margin: 8px 0; 
+      border-radius: 8px; 
+      border-left: 4px solid; 
+      font-size: 13px;
+    }
+    .issue.error { background: #fef2f2; border-color: #ef4444; }
+    .issue.warning { background: #fffbeb; border-color: #f59e0b; }
+    .issue.success { background: #f0fdf4; border-color: #22c55e; }
+    
+    .review-item { 
+      padding: 12px; 
+      margin: 8px 0; 
+      background: #fef3c7; 
+      border-radius: 8px; 
+      border-left: 4px solid #f59e0b;
+    }
+    
+    .progress-bar { 
+      width: 100%; 
+      height: 8px; 
+      background: #e2e8f0; 
+      border-radius: 4px; 
+      overflow: hidden;
+      margin: 8px 0;
+    }
+    .progress-fill { 
+      height: 100%; 
+      background: linear-gradient(90deg, #667eea, #764ba2); 
+      transition: width 0.3s;
+    }
+    
+    .score-display { 
+      text-align: center; 
+      padding: 30px; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      border-radius: 12px; 
+      color: white;
+      margin-bottom: 20px;
+    }
+    .score-number { font-size: 56px; font-weight: bold; }
+    .score-label { font-size: 18px; opacity: 0.9; }
+    
+    .timeline { 
+      display: flex; 
+      gap: 4px; 
+      overflow-x: auto; 
+      padding: 10px 0;
+      margin: 10px 0;
+    }
+    .timeline-point { 
+      width: 30px; 
+      height: 30px; 
+      border-radius: 50%; 
+      background: #e2e8f0; 
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+    .timeline-point:hover { transform: scale(1.2); }
+    .timeline-point.active { 
+      background: linear-gradient(135deg, #667eea, #764ba2); 
+      color: white; 
+    }
+    .timeline-point.has-issue { background: #fca5a5; }
+    
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    th, td { 
+      padding: 10px; 
+      text-align: left; 
+      border-bottom: 1px solid #e2e8f0; 
+      font-size: 13px;
+    }
+    th { background: #f1f5f9; font-weight: 600; color: #334155; }
+    
+    .hidden { display: none; }
+    
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    .alert-info { background: #dbeafe; color: #1e40af; border-left: 4px solid #3b82f6; }
+    .alert-success { background: #dcfce7; color: #166534; border-left: 4px solid #22c55e; }
+    .alert-warning { background: #fef3c7; color: #92400e; border-left: 4px solid #f59e0b; }
+    .alert-error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+    
+    .lesson {
+      padding: 12px;
+      margin: 8px 0;
+      background: #ecfdf5;
+      border-radius: 8px;
+      border-left: 4px solid #10b981;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 500;
+      margin-left: 6px;
+    }
+    .badge-high { background: #fee2e2; color: #991b1b; }
+    .badge-medium { background: #fef3c7; color: #92400e; }
+    .badge-low { background: #d1fae5; color: #065f46; }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #334155;
+      margin: 20px 0 10px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .time-display {
+      background: #1e293b;
+      color: #fbbf24;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 16px;
+      display: inline-block;
+      margin-bottom: 15px;
+    }
+    
+    .missing-field {
+      color: #ef4444;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 3D打印农场调度</h1>
+    <p class="subtitle">创客空间培训小游戏 - 安排喷嘴、材料和订单交期</p>
+    
+    <div class="time-display" id="currentTime">当前时间: --</div>
+    
+    <div class="tabs">
+      <button class="tab active" data-tab="dashboard">📊 控制台</button>
+      <button class="tab" data-tab="setup">⚙️ 设备配置</button>
+      <button class="tab" data-tab="orders">📦 订单管理</button>
+      <button class="tab" data-tab="schedule">📅 调度安排</button>
+      <button class="tab" data-tab="execute">▶️ 执行打印</button>
+      <button class="tab" data-tab="report">📈 评分报告</button>
+      <button class="tab" data-tab="replay">⏮️ 评分回放</button>
+    </div>
+    
+    <!-- 控制台 -->
+    <div id="dashboard" class="tab-content active">
+      <h2 class="section-title">农场状态概览</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>🖨️ 打印机</h3>
+          <p>总数: <span class="value" id="printerCount">0</span></p>
+          <p>空闲: <span class="value" id="printerIdle">0</span></p>
+          <p>忙碌: <span class="value" id="printerBusy">0</span></p>
+        </div>
+        <div class="card">
+          <h3>🧵 材料卷</h3>
+          <p>总数: <span class="value" id="materialCount">0</span></p>
+          <p>已安装: <span class="value" id="materialInstalled">0</span></p>
+          <p>低库存: <span class="value" id="materialLow">0</span></p>
+        </div>
+        <div class="card">
+          <h3>🔧 喷嘴</h3>
+          <p>总数: <span class="value" id="nozzleCount">0</span></p>
+          <p>已安装: <span class="value" id="nozzleInstalled">0</span></p>
+          <p>需更换: <span class="value" id="nozzleReplace">0</span></p>
+        </div>
+        <div class="card">
+          <h3>📦 订单</h3>
+          <p>总数: <span class="value" id="orderCount">0</span></p>
+          <p>已完成: <span class="value" id="orderDone">0</span></p>
+          <p>进行中: <span class="value" id="orderDoing">0</span></p>
+        </div>
+      </div>
+      
+      <h2 class="section-title">⚠️ 问题记录</h2>
+      <div id="issuesList">
+        <p style="color: #94a3b8; text-align: center; padding: 20px;">暂无问题记录</p>
+      </div>
+      
+      <h2 class="section-title">🔍 待复核项目</h2>
+      <div id="reviewList">
+        <p style="color: #94a3b8; text-align: center; padding: 20px;">暂无待复核项目</p>
+      </div>
+      
+      <h2 class="section-title">📜 事件日志</h2>
+      <div id="eventLog" style="max-height: 300px; overflow-y: auto;">
+        <p style="color: #94a3b8; text-align: center; padding: 20px;">暂无事件记录</p>
+      </div>
+    </div>
+    
+    <!-- 设备配置 -->
+    <div id="setup" class="tab-content">
+      <h2 class="section-title">添加打印机</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="form-group">
+            <label>打印机ID</label>
+            <input type="text" id="printerId" placeholder="PRT-001">
+          </div>
+          <div class="form-group">
+            <label>打印机名称</label>
+            <input type="text" id="printerName" placeholder="创想三维 K1">
+          </div>
+          <div class="form-group">
+            <label>支持的材料 (逗号分隔)</label>
+            <input type="text" id="printerMaterials" placeholder="PLA,ABS,PETG">
+          </div>
+          <div class="form-group">
+            <label>最大喷嘴尺寸</label>
+            <select id="printerNozzleMax">
+              <option value="0.2mm">0.2mm</option>
+              <option value="0.4mm" selected>0.4mm</option>
+              <option value="0.6mm">0.6mm</option>
+              <option value="0.8mm">0.8mm</option>
+              <option value="1.0mm">1.0mm</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="addPrinter()">添加打印机</button>
+          <div id="printerValidation"></div>
+        </div>
+        <div class="card">
+          <h3>已添加打印机</h3>
+          <div id="printersList">
+            <p style="color: #94a3b8; text-align: center;">暂无打印机</p>
+          </div>
+        </div>
+      </div>
+      
+      <h2 class="section-title">添加材料卷</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="form-group">
+            <label>材料ID</label>
+            <input type="text" id="materialId" placeholder="MAT-001">
+          </div>
+          <div class="form-group">
+            <label>材料类型</label>
+            <select id="materialType">
+              <option value="PLA">PLA</option>
+              <option value="ABS">ABS</option>
+              <option value="PETG">PETG</option>
+              <option value="TPU">TPU</option>
+              <option value="NYLON">NYLON</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>颜色</label>
+            <input type="text" id="materialColor" placeholder="白色">
+          </div>
+          <div class="form-group">
+            <label>总长度 (mm)</label>
+            <input type="number" id="materialLength" placeholder="10000">
+          </div>
+          <button class="btn btn-primary" onclick="addMaterial()">添加材料</button>
+          <div id="materialValidation"></div>
+        </div>
+        <div class="card">
+          <h3>已添加材料</h3>
+          <div id="materialsList">
+            <p style="color: #94a3b8; text-align: center;">暂无材料</p>
+          </div>
+        </div>
+      </div>
+      
+      <h2 class="section-title">添加喷嘴</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="form-group">
+            <label>喷嘴ID</label>
+            <input type="text" id="nozzleId" placeholder="NOZ-001">
+          </div>
+          <div class="form-group">
+            <label>喷嘴尺寸</label>
+            <select id="nozzleSize">
+              <option value="0.2mm">0.2mm</option>
+              <option value="0.4mm" selected>0.4mm</option>
+              <option value="0.6mm">0.6mm</option>
+              <option value="0.8mm">0.8mm</option>
+              <option value="1.0mm">1.0mm</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>喷嘴材质</label>
+            <select id="nozzleMaterial">
+              <option value="brass">黄铜</option>
+              <option value="steel">钢</option>
+              <option value="hardened_steel">硬化钢</option>
+              <option value="ruby">红宝石</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="addNozzle()">添加喷嘴</button>
+          <div id="nozzleValidation"></div>
+        </div>
+        <div class="card">
+          <h3>已添加喷嘴</h3>
+          <div id="nozzlesList">
+            <p style="color: #94a3b8; text-align: center;">暂无喷嘴</p>
+          </div>
+        </div>
+      </div>
+      
+      <h2 class="section-title">安装配置</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>安装材料到打印机</h3>
+          <div class="form-group">
+            <label>选择打印机</label>
+            <select id="installPrinterForMaterial">
+              <option value="">请选择打印机</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>选择材料卷</label>
+            <select id="installMaterial">
+              <option value="">请选择材料</option>
+            </select>
+          </div>
+          <button class="btn btn-success" onclick="installMaterial()">安装材料</button>
+        </div>
+        <div class="card">
+          <h3>安装喷嘴到打印机</h3>
+          <div class="form-group">
+            <label>选择打印机</label>
+            <select id="installPrinterForNozzle">
+              <option value="">请选择打印机</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>选择喷嘴</label>
+            <select id="installNozzle">
+              <option value="">请选择喷嘴</option>
+            </select>
+          </div>
+          <button class="btn btn-success" onclick="installNozzle()">安装喷嘴</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 订单管理 -->
+    <div id="orders" class="tab-content">
+      <h2 class="section-title">添加订单</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="form-group">
+            <label>订单ID</label>
+            <input type="text" id="orderId" placeholder="ORD-001">
+          </div>
+          <div class="form-group">
+            <label>订单名称</label>
+            <input type="text" id="orderName" placeholder="外壳打印">
+          </div>
+          <div class="form-group">
+            <label>所需材料</label>
+            <select id="orderMaterial">
+              <option value="PLA">PLA</option>
+              <option value="ABS">ABS</option>
+              <option value="PETG">PETG</option>
+              <option value="TPU">TPU</option>
+              <option value="NYLON">NYLON</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>所需喷嘴尺寸</label>
+            <select id="orderNozzle">
+              <option value="0.2mm">0.2mm</option>
+              <option value="0.4mm" selected>0.4mm</option>
+              <option value="0.6mm">0.6mm</option>
+              <option value="0.8mm">0.8mm</option>
+              <option value="1.0mm">1.0mm</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>打印长度 (mm)</label>
+            <input type="number" id="orderLength" placeholder="500">
+          </div>
+          <div class="form-group">
+            <label>预计打印时间 (小时)</label>
+            <input type="number" step="0.1" id="orderHours" placeholder="2.5">
+          </div>
+          <div class="form-group">
+            <label>截止日期</label>
+            <input type="datetime-local" id="orderDeadline">
+          </div>
+          <div class="form-group">
+            <label>优先级 (1-5)</label>
+            <select id="orderPriority">
+              <option value="1">1 - 低</option>
+              <option value="2">2</option>
+              <option value="3" selected>3 - 中</option>
+              <option value="4">4</option>
+              <option value="5">5 - 高</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="addOrder()">添加订单</button>
+          <div id="orderValidation"></div>
+        </div>
+        <div class="card">
+          <h3>订单列表</h3>
+          <div id="ordersList">
+            <p style="color: #94a3b8; text-align: center;">暂无订单</p>
+          </div>
+        </div>
+      </div>
+      
+      <h2 class="section-title">添加故障事件</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="form-group">
+            <label>故障ID</label>
+            <input type="text" id="faultId" placeholder="FAULT-001">
+          </div>
+          <div class="form-group">
+            <label>故障类型</label>
+            <select id="faultType">
+              <option value="nozzle_clog">喷嘴堵塞</option>
+              <option value="material_runout">材料用尽</option>
+              <option value="mechanical_failure">机械故障</option>
+              <option value="power_outage">断电</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>受影响打印机</label>
+            <select id="faultPrinter">
+              <option value="">请选择打印机</option>
+            </select>
+          </div>
+          <button class="btn btn-danger" onclick="addFault()">记录故障</button>
+          <div id="faultValidation"></div>
+        </div>
+        <div class="card">
+          <h3>故障记录</h3>
+          <div id="faultsList">
+            <p style="color: #94a3b8; text-align: center;">暂无故障记录</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 调度安排 -->
+    <div id="schedule" class="tab-content">
+      <h2 class="section-title">订单调度</h2>
+      <div class="alert alert-info">
+        <strong>💡 调度提示：</strong>选择订单和可用的打印机进行调度。系统会自动检查材料、喷嘴兼容性和交期。
+      </div>
+      
+      <div class="card">
+        <div class="form-group">
+          <label>选择订单</label>
+          <select id="scheduleOrder">
+            <option value="">请选择订单</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>选择打印机</label>
+          <select id="schedulePrinter">
+            <option value="">请选择打印机</option>
+          </select>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="checkFeasibility()">检查可行性</button>
+          <button class="btn btn-primary" onclick="scheduleOrder()">调度订单</button>
+        </div>
+        <div id="feasibilityResult"></div>
+      </div>
+      
+      <h2 class="section-title">已调度任务</h2>
+      <div id="scheduledTasks">
+        <p style="color: #94a3b8; text-align: center; padding: 20px;">暂无已调度任务</p>
+      </div>
+    </div>
+    
+    <!-- 执行打印 -->
+    <div id="execute" class="tab-content">
+      <h2 class="section-title">打印执行控制</h2>
+      
+      <div class="card">
+        <h3>时间控制</h3>
+        <div class="form-group">
+          <label>推进时间 (小时)</label>
+          <input type="number" step="0.5" id="advanceHours" value="1" placeholder="1">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="advanceTime()">⏩ 推进时间</button>
+          <button class="btn btn-secondary" onclick="resetTime()">🔄 重置时间</button>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>开始打印</h3>
+        <div class="form-group">
+          <label>选择已调度订单</label>
+          <select id="printOrder">
+            <option value="">请选择订单</option>
+          </select>
+        </div>
+        <button class="btn btn-success" onclick="startPrinting()">▶️ 开始打印</button>
+      </div>
+      
+      <h2 class="section-title">打印进度</h2>
+      <div id="printingProgress">
+        <p style="color: #94a3b8; text-align: center; padding: 20px;">暂无进行中的打印任务</p>
+      </div>
+      
+      <h2 class="section-title">故障处理</h2>
+      <div id="pendingFaults">
+        <p style="color: #94a3b8; text-align: center; padding: 20px;">暂无待处理故障</p>
+      </div>
+    </div>
+    
+    <!-- 评分报告 -->
+    <div id="report" class="tab-content">
+      <div class="score-display" id="scoreDisplay">
+        <div class="score-label">综合评分</div>
+        <div class="score-number" id="scoreValue">-- / --</div>
+        <div id="scorePercent">--% 完成度</div>
+      </div>
+      
+      <div class="btn-group" style="margin-bottom: 20px;">
+        <button class="btn btn-primary" onclick="generateReport()">📊 生成报告</button>
+        <button class="btn btn-secondary" onclick="exportReport('json')">📥 导出 JSON</button>
+        <button class="btn btn-secondary" onclick="exportReport('text')">📥 导出 Text</button>
+        <button class="btn btn-secondary" onclick="exportReport('csv')">📥 导出 CSV</button>
+        <button class="btn btn-secondary" onclick="exportReport('html')">📥 导出 HTML</button>
+      </div>
+      
+      <h2 class="section-title">📈 评分明细</h2>
+      <div id="scoreBreakdown"></div>
+      
+      <h2 class="section-title">⚠️ 问题记录</h2>
+      <div id="reportIssues"></div>
+      
+      <h2 class="section-title">🔍 待复核项目</h2>
+      <div id="reportReview"></div>
+      
+      <h2 class="section-title">💡 经验教训</h2>
+      <div id="reportLessons"></div>
+      
+      <h2 class="section-title">🧵 材料使用情况</h2>
+      <div id="reportMaterials"></div>
+      
+      <h2 class="section-title">🖨️ 打印机使用情况</h2>
+      <div id="reportPrinters"></div>
+    </div>
+    
+    <!-- 评分回放 -->
+    <div id="replay" class="tab-content">
+      <h2 class="section-title">⏮️ 调度回放</h2>
+      <div class="alert alert-info">
+        <strong>💡 回放功能：</strong>可以回顾整个调度过程的关键节点，分析每一步的决策和问题。
+      </div>
+      
+      <div class="btn-group" style="margin-bottom: 15px;">
+        <button class="btn btn-secondary" onclick="recordState()">📸 记录当前状态</button>
+        <button class="btn btn-danger" onclick="resetReplay()">🗑️ 清空回放记录</button>
+      </div>
+      
+      <h3>时间线</h3>
+      <div class="timeline" id="replayTimeline">
+        <p style="color: #94a3b8; text-align: center; width: 100%; padding: 20px;">暂无回放记录，点击"记录当前状态"开始</p>
+      </div>
+      
+      <div class="btn-group" style="margin-bottom: 15px;">
+        <button class="btn btn-secondary" onclick="prevReplay()">⬅️ 上一步</button>
+        <button class="btn btn-secondary" onclick="nextReplay()">➡️ 下一步</button>
+      </div>
+      
+      <div id="replayContent">
+        <p style="color: #94a3b8; text-align: center; padding: 40px;">选择时间点查看详细状态</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="./models.js?v=3"></script>
+  <script src="./scheduler.js?v=3"></script>
+  <script src="./scoring.js?v=3"></script>
+  <script src="./app.js?v=3"></script>
+</body>
+</html>
