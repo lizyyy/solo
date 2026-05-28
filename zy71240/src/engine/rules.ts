@@ -8,7 +8,7 @@ import type {
   AmendmentRecord,
   ClueItem,
 } from "@/types"
-import { PART_CARDS, REPAIR_PRICES, POLICY_RULES, CUSTOMER_MOODS, STANDARD_ANSWERS } from "@/data/mockData"
+import { PART_CARDS, REPAIR_PRICES, POLICY_RULES, STANDARD_ANSWERS } from "@/data/mockData"
 
 export function getPriceForGrade(caseId: string, partName: string, grade: RepairGrade): number {
   const prices = REPAIR_PRICES[caseId] || []

@@ -46,6 +46,34 @@ interface GameState {
 
 const INITIAL_TIME = 180
 
+const STORAGE_KEY = "insurance-game-amendments"
+
+function loadAmendments(): AmendmentRecord[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return []
+    return JSON.parse(raw) as AmendmentRecord[]
+  } catch {
+    return []
+  }
+}
+
+function persistAmendments(amendments: AmendmentRecord[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(amendments))
+  } catch {
+    // storage full or unavailable — silently ignore
+  }
+}
+
+function clearPersistedAmendments() {
+  try {
+    localStorage.removeItem(STORAGE_KEY)
+  } catch {
+    // silently ignore
+  }
+}
+
 export const useGameStore = create<GameState>((set, get) => ({
   currentCaseId: null,
   session: null,
@@ -57,7 +85,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   settlement: null,
   errorImpacts: [],
   report: null,
-  amendments: [],
+  amendments: loadAmendments(),
   timeRemaining: INITIAL_TIME,
 
   startGame: (caseId, playerName) => {
@@ -181,9 +209,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       reason,
       "讲师"
     )
+    const nextAmendments = [...amendments, amendment]
+    persistAmendments(nextAmendments)
     set({
       report: { ...currentReport, status: "已修正" as const },
-      amendments: [...amendments, amendment],
+      amendments: nextAmendments,
     })
   },
 
@@ -192,6 +222,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   resetGame: () => {
+    clearPersistedAmendments()
     set({
       currentCaseId: null,
       session: null,
