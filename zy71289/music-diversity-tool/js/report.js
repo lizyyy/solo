@@ -1,4 +1,4 @@
-export function buildFullReport(data, diversityMetrics, preferenceMetrics, exposureResult, explanations, explanationSummary, pipelineTrace) {
+export function buildFullReport(data, enrichedItems, diversityMetrics, preferenceMetrics, exposureResult, explanations, explanationSummary, pipelineTrace) {
   const diversityScore = diversityMetrics.normalized_entropy * 0.4 + diversityMetrics.coverage * 0.3 + diversityMetrics.freshness.score * 0.3;
   const preferenceScore = preferenceMetrics.match.cosine_similarity;
   const exposureScore = exposureResult.summary.overall_score;
@@ -18,6 +18,14 @@ export function buildFullReport(data, diversityMetrics, preferenceMetrics, expos
     exposure_result: exposureResult,
     explanation_summary: explanationSummary,
     pipeline_trace: pipelineTrace,
+    _raw_data: {
+      songs: data.songs,
+      user_listening: data.userListening,
+      rec_list: data.recList,
+      skip_records: data.skipRecords,
+      enriched_items: enrichedItems,
+      explanations: explanations
+    },
     _meta: data._meta
   };
 }

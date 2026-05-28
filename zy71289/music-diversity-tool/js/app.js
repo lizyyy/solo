@@ -661,7 +661,7 @@ function renderReportPanel() {
     return;
   }
   if (!state.report) {
-    state.report = buildFullReport(state.data, state.diversityMetrics, state.preferenceMetrics, state.exposureResult, state.explanations, state.explanationSummary, state.pipelineTrace);
+    state.report = buildFullReport(state.data, state.enrichedItems, state.diversityMetrics, state.preferenceMetrics, state.exposureResult, state.explanations, state.explanationSummary, state.pipelineTrace);
     const trace = buildReportTrace(state.report);
     state.pipelineTrace.push(trace);
     saveReport(state.report);
@@ -776,11 +776,22 @@ function loadReview(reportId) {
   state.report = report;
   state.reviewMode = true;
   state.pipelineTrace = report.pipeline_trace || [];
-  if (report.diversity_metrics) state.diversityMetrics = report.diversity_metrics;
-  if (report.preference_metrics) state.preferenceMetrics = report.preference_metrics;
-  if (report.exposure_result) state.exposureResult = report.exposure_result;
-  if (report.explanation_summary) state.explanationSummary = report.explanation_summary;
-  if (report._meta) {
+  state.diversityMetrics = report.diversity_metrics || null;
+  state.preferenceMetrics = report.preference_metrics || null;
+  state.exposureResult = report.exposure_result || null;
+  state.explanationSummary = report.explanation_summary || null;
+  if (report._raw_data) {
+    state.enrichedItems = report._raw_data.enriched_items || null;
+    state.explanations = report._raw_data.explanations || null;
+    state.data = {
+      songs: report._raw_data.songs || [],
+      userListening: report._raw_data.user_listening || { user_id: 'review', listens: [] },
+      recList: report._raw_data.rec_list || { list_id: 'review', items: [] },
+      skipRecords: report._raw_data.skip_records || { user_id: 'review', skips: [] },
+      timeWindow: report.window || {},
+      _meta: report._meta || {}
+    };
+  } else if (report._meta) {
     state.data = {
       songs: [],
       userListening: { user_id: 'review', listens: [] },
