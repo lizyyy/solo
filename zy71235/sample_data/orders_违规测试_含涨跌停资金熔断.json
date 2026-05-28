@@ -1,0 +1,56 @@
+{
+  "orders": [
+    {
+      "stockCode": "600519",
+      "side": "buy",
+      "type": "limit",
+      "price": 1860.00,
+      "quantity": 100,
+      "remark": "【违规测试】价格超出涨停板(1688*1.1=1856.80)"
+    },
+    {
+      "stockCode": "300750",
+      "side": "buy",
+      "type": "limit",
+      "price": 218.60,
+      "quantity": 5000,
+      "remark": "【违规测试】资金超用：218.6*5000=1,093,000 > 可用资金1,000,000"
+    },
+    {
+      "stockCode": "002594",
+      "side": "sell",
+      "type": "limit",
+      "price": 230.00,
+      "quantity": 100,
+      "remark": "【违规测试】无持仓却卖出"
+    },
+    {
+      "stockCode": "600519",
+      "side": "sell",
+      "type": "limit",
+      "price": 1500.00,
+      "quantity": 10,
+      "remark": "【合规测试】正常限价卖出"
+    },
+    {
+      "stockCode": "000858",
+      "side": "buy",
+      "type": "limit",
+      "price": 156.50,
+      "quantity": 50,
+      "remark": "【合规测试】正常限价买入"
+    },
+    {
+      "stockCode": "601318",
+      "side": "buy",
+      "type": "limit",
+      "price": 42.00,
+      "quantity": 100,
+      "remark": "【合规测试】低于当前价格挂单"
+    }
+  ],
+  "version": 1,
+  "importTime": "2024-01-15T09:30:00",
+  "testMode": "violation",
+  "remark": "违规测试用例：涨跌停超价、资金超用、无持仓卖出"
+}

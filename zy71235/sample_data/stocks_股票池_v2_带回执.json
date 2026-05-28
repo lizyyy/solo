@@ -1,0 +1,87 @@
+{
+  "stocks": [
+    {
+      "code": "600519",
+      "name": "贵州茅台",
+      "basePrice": 1688.00,
+      "level1": 0.05,
+      "level2": 0.07,
+      "cooldown": 60,
+      "remark": "白酒龙头，高波动率",
+      "receipt": "RCPT202401002"
+    },
+    {
+      "code": "000858",
+      "name": "五粮液",
+      "basePrice": 156.50,
+      "level1": 0.05,
+      "level2": 0.07,
+      "cooldown": 60,
+      "remark": "白酒板块",
+      "receipt": "RCPT202401003"
+    },
+    {
+      "code": "601318",
+      "name": "中国平安",
+      "basePrice": 45.20,
+      "level1": 0.05,
+      "level2": 0.07,
+      "cooldown": 60,
+      "remark": "保险板块",
+      "receipt": "RCPT202401004"
+    },
+    {
+      "code": "000001",
+      "name": "平安银行",
+      "basePrice": 12.35,
+      "level1": 0.05,
+      "level2": 0.07,
+      "cooldown": 60,
+      "remark": "银行板块",
+      "receipt": "RCPT202401005"
+    },
+    {
+      "code": "300750",
+      "name": "宁德时代",
+      "basePrice": 218.60,
+      "level1": 0.05,
+      "level2": 0.07,
+      "cooldown": 60,
+      "remark": "新能源龙头，高风险高收益",
+      "receipt": "RCPT202401006"
+    },
+    {
+      "code": "002594",
+      "name": "比亚迪",
+      "basePrice": 258.90,
+      "level1": 0.05,
+      "level2": 0.07,
+      "cooldown": 60,
+      "remark": "新能源汽车",
+      "receipt": "RCPT202401001"
+    },
+    {
+      "code": "600036",
+      "name": "招商银行",
+      "basePrice": 32.80,
+      "level1": 0.05,
+      "level2": 0.07,
+      "cooldown": 60,
+      "remark": "股份制银行龙头",
+      "receipt": "RCPT202401007"
+    },
+    {
+      "code": "600900",
+      "name": "长江电力",
+      "basePrice": 28.50,
+      "level1": 0.05,
+      "level2": 0.07,
+      "cooldown": 60,
+      "remark": "公用事业，防御性板块",
+      "receipt": "RCPT202401008"
+    }
+  ],
+  "version": 2,
+  "importTime": "2024-01-15T09:35:00",
+  "remark": "补充了所有股票的回执编号"
+}

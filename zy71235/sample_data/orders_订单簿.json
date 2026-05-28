@@ -1,0 +1,70 @@
+{
+  "orders": [
+    {
+      "stockCode": "600519",
+      "side": "buy",
+      "type": "limit",
+      "price": 1680.00,
+      "quantity": 10,
+      "remark": "建仓买入"
+    },
+    {
+      "stockCode": "600519",
+      "side": "buy",
+      "type": "limit",
+      "price": 1675.50,
+      "quantity": 5,
+      "remark": "低吸"
+    },
+    {
+      "stockCode": "600519",
+      "side": "sell",
+      "type": "limit",
+      "price": 1695.00,
+      "quantity": 8,
+      "remark": "高位卖出"
+    },
+    {
+      "stockCode": "300750",
+      "side": "buy",
+      "type": "limit",
+      "price": 215.00,
+      "quantity": 20,
+      "remark": "看多新能源"
+    },
+    {
+      "stockCode": "300750",
+      "side": "sell",
+      "type": "limit",
+      "price": 225.00,
+      "quantity": 15,
+      "remark": "止盈"
+    },
+    {
+      "stockCode": "002594",
+      "side": "buy",
+      "type": "market",
+      "price": 258.90,
+      "quantity": 12,
+      "remark": "追涨，注意风险"
+    },
+    {
+      "stockCode": "601318",
+      "side": "buy",
+      "type": "limit",
+      "price": 44.50,
+      "quantity": 50,
+      "remark": "价值投资"
+    },
+    {
+      "stockCode": "000001",
+      "side": "sell",
+      "type": "limit",
+      "price": 12.80,
+      "quantity": 100,
+      "remark": "减持银行股"
+    }
+  ],
+  "version": 1,
+  "importTime": "2024-01-15T09:30:00"
+}

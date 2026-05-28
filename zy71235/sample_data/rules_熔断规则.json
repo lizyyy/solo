@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "name": "A股标准熔断规则2024",
+    "version": "1.0",
+    "priceLimit": 0.1,
+    "level1Threshold": 0.05,
+    "level2Threshold": 0.07,
+    "cooldownPeriod": 60,
+    "marketWideThreshold": 0.7,
+    "liquidityThreshold": 0.5,
+    "maxDailyTriggers": 2,
+    "remarks": "沪深交易所标准熔断机制，涨跌停±10%，熔断5%/7%"
+  },
+  "version": 1,
+  "importTime": "2024-01-15T09:30:00"
+}

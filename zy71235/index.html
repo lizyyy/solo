@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>股票熔断交易日 - 交易员模拟训练</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header class="main-header">
+            <div class="header-left">
+                <h1>📈 股票熔断交易日</h1>
+                <span class="subtitle">交易员模拟训练系统</span>
+            </div>
+            <div class="header-center">
+                <div class="game-status">
+                    <span id="phaseIndicator" class="phase-badge phase-prepare">准备阶段</span>
+                    <span id="timeDisplay" class="time-display">--:--:--</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="score-display">
+                    <span class="score-label">当前得分</span>
+                    <span id="scoreValue" class="score-value">0</span>
+                </div>
+                <button id="helpBtn" class="btn btn-secondary">帮助</button>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="sidebar left-sidebar">
+                <div class="panel">
+                    <h3>📂 材料导入</h3>
+                    <div class="import-section">
+                        <label class="file-input-wrapper">
+                            <input type="file" id="fileInput" multiple accept=".json,.csv,.txt">
+                            <span class="btn btn-primary">选择文件</span>
+                        </label>
+                        <div id="fileList" class="file-list"></div>
+                    </div>
+                    <div class="import-options" id="importOptions" style="display: none;">
+                        <h4>重复文件处理方式</h4>
+                        <div class="radio-group">
+                            <label><input type="radio" name="duplicateMode" value="skip" checked> 跳过重复</label>
+                            <label><input type="radio" name="duplicateMode" value="overwrite"> 覆盖原有</label>
+                            <label><input type="radio" name="duplicateMode" value="append"> 追加数据</label>
+                        </div>
+                        <button id="confirmImportBtn" class="btn btn-success">确认导入</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>📊 资金账户</h3>
+                    <div class="account-info">
+                        <div class="account-item">
+                            <span class="label">可用资金</span>
+                            <span id="availableCash" class="value positive">¥0.00</span>
+                        </div>
+                        <div class="account-item">
+                            <span class="label">冻结资金</span>
+                            <span id="frozenCash" class="value warning">¥0.00</span>
+                        </div>
+                        <div class="account-item">
+                            <span class="label">持仓市值</span>
+                            <span id="positionValue" class="value">¥0.00</span>
+                        </div>
+                        <div class="account-item total">
+                            <span class="label">总资产</span>
+                            <span id="totalAssets" class="value">¥0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>⚡ 熔断状态</h3>
+                    <div id="circuitBreakerStatus" class="circuit-status">
+                        <div class="status-item">
+                            <span class="label">一级熔断 (5%)</span>
+                            <span id="cbLevel1" class="status-badge status-normal">未触发</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">二级熔断 (7%)</span>
+                            <span id="cbLevel2" class="status-badge status-normal">未触发</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">全市场熔断</span>
+                            <span id="cbMarket" class="status-badge status-normal">未触发</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">流动性状态</span>
+                            <span id="liquidityStatus" class="status-badge status-normal">正常</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>🎮 游戏控制</h3>
+                    <div class="game-controls">
+                        <button id="startBtn" class="btn btn-success btn-block">开始交易</button>
+                        <button id="pauseBtn" class="btn btn-warning btn-block" disabled>暂停</button>
+                        <button id="resumeBtn" class="btn btn-primary btn-block" disabled>恢复</button>
+                        <button id="settleBtn" class="btn btn-danger btn-block" disabled>结算</button>
+                        <button id="resetBtn" class="btn btn-secondary btn-block">重置游戏</button>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="top-section">
+                    <div class="panel stock-pool-panel">
+                        <h3>📋 股票池</h3>
+                        <div id="stockPool" class="stock-pool"></div>
+                    </div>
+                </div>
+
+                <div class="middle-section">
+                    <div class="panel orderbook-panel">
+                        <h3>📖 订单簿</h3>
+                        <div class="orderbook-header">
+                            <select id="orderbookStock" class="form-control">
+                                <option value="">选择股票</option>
+                            </select>
+                        </div>
+                        <div class="orderbook-content">
+                            <div class="orderbook-side">
+                                <h4>卖盘</h4>
+                                <div id="askOrders" class="order-list ask-list"></div>
+                            </div>
+                            <div class="orderbook-divider"></div>
+                            <div class="orderbook-side">
+                                <h4>买盘</h4>
+                                <div id="bidOrders" class="order-list bid-list"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel trading-panel">
+                        <h3>💹 下单交易</h3>
+                        <form id="orderForm" class="order-form">
+                            <div class="form-group">
+                                <label>股票代码</label>
+                                <select id="orderStock" class="form-control" required>
+                                    <option value="">选择股票</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>方向</label>
+                                <div class="radio-group">
+                                    <label><input type="radio" name="orderSide" value="buy" checked> 买入</label>
+                                    <label><input type="radio" name="orderSide" value="sell"> 卖出</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>价格</label>
+                                <input type="number" id="orderPrice" class="form-control" step="0.01" min="0" required>
+                                <div class="price-limits">
+                                    <span>涨停: <span id="priceUpLimit">--</span></span>
+                                    <span>跌停: <span id="priceDownLimit">--</span></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>数量 (手)</label>
+                                <input type="number" id="orderQuantity" class="form-control" min="1" value="1" required>
+                                <small class="form-text">1手 = 100股</small>
+                            </div>
+                            <div class="form-group">
+                                <label>订单类型</label>
+                                <select id="orderType" class="form-control">
+                                    <option value="limit">限价单</option>
+                                    <option value="market">市价单</option>
+                                </select>
+                            </div>
+                            <button type="submit" id="submitOrderBtn" class="btn btn-primary btn-block">提交订单</button>
+                        </form>
+                        <div id="orderError" class="error-message" style="display: none;"></div>
+                    </div>
+
+                    <div class="panel news-panel">
+                        <h3>📰 新闻事件</h3>
+                        <div id="newsFeed" class="news-feed"></div>
+                    </div>
+                </div>
+
+                <div class="bottom-section">
+                    <div class="panel tabs-panel">
+                        <div class="tabs">
+                            <button class="tab-btn active" data-tab="positions">持仓</button>
+                            <button class="tab-btn" data-tab="orders">委托</button>
+                            <button class="tab-btn" data-tab="trades">成交</button>
+                            <button class="tab-btn" data-tab="violations">违规记录</button>
+                            <button class="tab-btn" data-tab="replay">事件回放</button>
+                        </div>
+                        <div class="tab-content">
+                            <div id="positionsTab" class="tab-pane active">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>股票代码</th>
+                                            <th>股票名称</th>
+                                            <th>持仓数量</th>
+                                            <th>可用数量</th>
+                                            <th>成本价</th>
+                                            <th>现价</th>
+                                            <th>盈亏</th>
+                                            <th>盈亏比例</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="positionsTable"></tbody>
+                                </table>
+                            </div>
+                            <div id="ordersTab" class="tab-pane">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>订单ID</th>
+                                            <th>时间</th>
+                                            <th>股票</th>
+                                            <th>方向</th>
+                                            <th>价格</th>
+                                            <th>数量</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ordersTable"></tbody>
+                                </table>
+                            </div>
+                            <div id="tradesTab" class="tab-pane">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>成交ID</th>
+                                            <th>时间</th>
+                                            <th>股票</th>
+                                            <th>方向</th>
+                                            <th>价格</th>
+                                            <th>数量</th>
+                                            <th>成交金额</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tradesTable"></tbody>
+                                </table>
+                            </div>
+                            <div id="violationsTab" class="tab-pane">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>时间</th>
+                                            <th>违规类型</th>
+                                            <th>严重程度</th>
+                                            <th>描述</th>
+                                            <th>扣分</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="violationsTable"></tbody>
+                                </table>
+                            </div>
+                            <div id="replayTab" class="tab-pane">
+                                <div class="replay-controls">
+                                    <button id="replayPrevBtn" class="btn btn-secondary">上一条</button>
+                                    <span id="replayProgress" class="replay-progress">0 / 0</span>
+                                    <button id="replayNextBtn" class="btn btn-secondary">下一条</button>
+                                    <button id="replayAutoBtn" class="btn btn-primary">自动播放</button>
+                                </div>
+                                <div id="replayContent" class="replay-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <aside class="sidebar right-sidebar">
+                <div class="panel">
+                    <h3>📈 实时行情</h3>
+                    <div id="priceChart" class="price-chart">
+                        <canvas id="chartCanvas"></canvas>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>⚡ 快买快卖</h3>
+                    <div class="quick-trade">
+                        <div class="form-group">
+                            <label>股票</label>
+                            <select id="quickStock" class="form-control">
+                                <option value="">选择</option>
+                            </select>
+                        </div>
+                        <div class="quick-buttons">
+                            <button class="btn btn-buy" data-quick="buy1">买一价</button>
+                            <button class="btn btn-buy" data-quick="buyMarket">市价买</button>
+                            <button class="btn btn-sell" data-quick="sell1">卖一价</button>
+                            <button class="btn btn-sell" data-quick="sellMarket">市价卖</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>📊 评分详情</h3>
+                    <div id="scoreBreakdown" class="score-breakdown">
+                        <div class="score-item">
+                            <span class="label">基础分</span>
+                            <span id="baseScore" class="value">100</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="label">盈利加分</span>
+                            <span id="profitScore" class="value positive">+0</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="label">合规加分</span>
+                            <span id="complianceScore" class="value positive">+0</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="label">违规扣分</span>
+                            <span id="violationScore" class="value negative">-0</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="label">熔断应对</span>
+                            <span id="circuitScore" class="value">+0</span>
+                        </div>
+                        <div class="score-item total">
+                            <span class="label">最终得分</span>
+                            <span id="finalScore" class="value">100</span>
+                        </div>
+                    </div>
+                    <button id="exportReportBtn" class="btn btn-secondary btn-block" disabled>导出交易报告</button>
+                </div>
+            </aside>
+        </div>
+
+        <div id="modalOverlay" class="modal-overlay" style="display: none;">
+            <div id="modalContent" class="modal-content"></div>
+        </div>
+
+        <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
