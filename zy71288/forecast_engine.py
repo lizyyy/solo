@@ -383,7 +383,9 @@ class TimeSeriesForecaster:
         merged = hist_df.merge(pred_df, on=['date', 'hour'], how='inner')
         
         if len(merged) == 0:
-            return {"mae": 0, "rmse": 0, "mape": 0, "sample_count": 0}
+            logger.info("预测日期与历史日期无重叠，执行滚动回测...")
+            backtest_results = self._walk_forward_backtest(historical_data)
+            return backtest_results
         
         actual = merged['actual_visitors']
         predicted = merged['predicted_visitors']
@@ -396,5 +398,84 @@ class TimeSeriesForecaster:
             "mae": float(mae),
             "rmse": float(rmse),
             "mape": float(mape),
-            "sample_count": len(merged)
+            "sample_count": len(merged),
+            "method": "direct_match"
         }
+    
+    def _walk_forward_backtest(self, historical_data: List[Dict[str, Any]],
+                                test_size: int = 24) -> Dict[str, float]:
+        logger.info(f"执行滚动回测，测试集大小: {test_size}小时")
+        
+        if len(historical_data) < test_size * 2:
+            logger.warning(f"历史数据不足，无法进行完整回测")
+            return {"mae": 0, "rmse": 0, "mape": 0, "sample_count": 0, "method": "insufficient_data"}
+        
+        sorted_data = sorted(historical_data, key=lambda x: (x['date'], x['hour']))
+        train_size = len(sorted_data) - test_size
+        
+        train_data = sorted_data[:train_size]
+        test_data = sorted_data[train_size:]
+        
+        temp_forecaster = TimeSeriesForecaster()
+        temp_forecaster.train(train_data)
+        
+        test_dates = set((d['date'], d['hour']) for d in test_data)
+        if not test_dates:
+            return {"mae": 0, "rmse": 0, "mape": 0, "sample_count": 0, "method": "no_test_data"}
+        
+        min_date = min(d[0] for d in test_dates)
+        max_date = max(d[0] for d in test_dates)
+        
+        backtest_predictions = temp_forecaster.predict(
+            start_date=min_date,
+            forecast_hours=test_size,
+            scenario="backtest"
+        )
+        
+        actual_values = []
+        predicted_values = []
+        
+        test_dict = {(d['date'], d['hour']): d['actual_visitors'] for d in test_data}
+        pred_dict = {(p.date, p.hour): p.predicted_visitors for p in backtest_predictions}
+        
+        for (date, hour), actual in test_dict.items():
+            if (date, hour) in pred_dict:
+                actual_values.append(actual)
+                predicted_values.append(pred_dict[(date, hour)])
+        
+        if len(actual_values) == 0:
+            return {"mae": 0, "rmse": 0, "mape": 0, "sample_count": 0, "method": "no_matching_predictions"}
+        
+        mae = np.mean(np.abs(np.array(actual_values) - np.array(predicted_values)))
+        rmse = np.sqrt(np.mean((np.array(actual_values) - np.array(predicted_values)) ** 2))
+        mape = np.mean(np.abs((np.array(actual_values) - np.array(predicted_values)) / np.array(actual_values))) * 100
+        
+        self._backtest_actual = actual_values
+        self._backtest_predicted = predicted_values
+        self._backtest_dates = [(d['date'], d['hour']) for d in test_data]
+        
+        logger.info(f"回测完成，样本数: {len(actual_values)}, MAE: {mae:.2f}, MAPE: {mape:.2f}%")
+        
+        return {
+            "mae": float(mae),
+            "rmse": float(rmse),
+            "mape": float(mape),
+            "sample_count": len(actual_values),
+            "method": "walk_forward"
+        }
+    
+    def get_backtest_data(self) -> Optional[List[Dict[str, Any]]]:
+        if not hasattr(self, '_backtest_actual') or not hasattr(self, '_backtest_dates'):
+            return None
+        
+        result = []
+        for i, ((date, hour), actual, predicted) in enumerate(zip(
+            self._backtest_dates, self._backtest_actual, self._backtest_predicted
+        )):
+            result.append({
+                'date': date,
+                'hour': hour,
+                'actual_visitors': actual,
+                'predicted_visitors': predicted
+            })
+        return result

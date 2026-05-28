@@ -368,6 +368,50 @@ class TestBatchProcessor(unittest.TestCase):
             print("  ✓ 三情景预测值存在显著差异")
         else:
             print("  跳过情景差异验证（数据通过图表导出验证）")
+    
+    def test_error_backtest_functionality(self):
+        print("\n测试11: 误差回看（滚动回测）功能...")
+        
+        historical_data = []
+        base_date = datetime(2026, 5, 1)
+        for day in range(14):
+            for hour in range(24):
+                date = base_date + timedelta(days=day)
+                visitors = 30 + hour * 2
+                historical_data.append({
+                    'date': date.strftime('%Y-%m-%d'),
+                    'hour': hour,
+                    'actual_visitors': visitors,
+                })
+        pd.DataFrame(historical_data).to_csv(self.test_data_dir / 'historical.csv', index=False)
+        
+        processor = BatchProcessor()
+        result = processor.run_batch(
+            data_dir=self.test_data_dir,
+            forecast_start_date='2026-05-15',
+            forecast_hours=24,
+            run_scenarios=True
+        )
+        
+        error_metrics = result.summary.get('error_metrics', {})
+        
+        print(f"  误差样本数: {error_metrics.get('sample_count', 0)}")
+        print(f"  计算方法: {error_metrics.get('method', 'unknown')}")
+        print(f"  MAE: {error_metrics.get('mae', 0):.2f}")
+        print(f"  MAPE: {error_metrics.get('mape', 0):.2f}%")
+        
+        self.assertGreater(error_metrics.get('sample_count', 0), 0, 
+                          "误差回看应有样本数")
+        self.assertEqual(error_metrics.get('method'), 'walk_forward',
+                        "预测日期与历史不重叠时应使用滚动回测")
+        
+        report_summary = result.summary.get('report_summary', {})
+        charts = report_summary.get('charts', {})
+        self.assertIn('error', charts, "误差分析图表应已生成")
+        self.assertIsNotNone(charts.get('error'), "误差分析图表路径不应为空")
+        
+        print("  ✓ 滚动回测功能正常")
+        print("  ✓ 误差分析图表已生成")
 
 
 def run_tests():

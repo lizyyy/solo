@@ -1,0 +1,35 @@
+{
+  "timestamp": "20260529_062151",
+  "charts": {
+    "forecast": "/Users/lzy/pro/solo/workspaces/zy71288/output/charts/forecast_chart_20260529_062151.png",
+    "scenario": "/Users/lzy/pro/solo/workspaces/zy71288/output/charts/scenario_comparison_20260529_062151.png",
+    "hourly": "/Users/lzy/pro/solo/workspaces/zy71288/output/charts/hourly_distribution_20260529_062151.png",
+    "error": "/Users/lzy/pro/solo/workspaces/zy71288/output/charts/error_analysis_20260529_062151.png",
+    "anomaly": "/Users/lzy/pro/solo/workspaces/zy71288/output/charts/anomaly_summary_20260529_062151.png"
+  },
+  "report_file": "/Users/lzy/pro/solo/workspaces/zy71288/output/reports/forecast_report_20260529_062151.csv",
+  "forecast_count": 24,
+  "error_metrics": {
+    "mae": 7.952874999999995,
+    "rmse": 8.219774477340193,
+    "mape": 15.005629509359844,
+    "sample_count": 24,
+    "method": "walk_forward"
+  },
+  "anomaly_count": 1,
+  "model_info": {
+    "training_samples": 168,
+    "feature_importance": {
+      "hour": 0.9899122510005514,
+      "day_of_week": 1.207378642158243e-05,
+      "is_weekend": 9.795718454723474e-07,
+      "is_peak_hour": 0.010074695641181656,
+      "temperature": 0.0,
+      "rain_probability": 0.0,
+      "has_event": 0.0,
+      "event_attendance": 0.0,
+      "reservation_count": 0.0
+    },
+    "model_type": "RandomForest"
+  }
+}

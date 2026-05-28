@@ -1,0 +1,636 @@
+{
+  "job_id": "job_20260529062354_e0c26c93",
+  "status": "warning",
+  "start_time": "2026-05-29 06:23:54.585278",
+  "end_time": "2026-05-29 06:23:55.560562",
+  "data_sources": [
+    "historical",
+    "weather"
+  ],
+  "anomalies": [
+    {
+      "anomaly_type": "no_reservation_data",
+      "severity": "warning",
+      "message": "未检测到预约数据，预测将仅基于历史趋势和天气",
+      "timestamp": "2026-05-29 06:23:54.591396",
+      "related_data": {},
+      "suggestion": "导入预约数据可大幅提高近期预测的准确性"
+    }
+  ],
+  "results_summary": {
+    "imported_records": 216,
+    "anomalies_detected": 1,
+    "forecast_hours": 24,
+    "error_metrics": {
+      "mae": 7.952874999999995,
+      "rmse": 8.219774477340193,
+      "mape": 15.005629509359844,
+      "sample_count": 24,
+      "method": "walk_forward"
+    },
+    "model_info": {
+      "training_samples": 168,
+      "feature_importance": {
+        "hour": 0.9899122510005514,
+        "day_of_week": 1.207378642158243e-05,
+        "is_weekend": 9.795718454723474e-07,
+        "is_peak_hour": 0.010074695641181656,
+        "temperature": 0.0,
+        "rain_probability": 0.0,
+        "has_event": 0.0,
+        "event_attendance": 0.0,
+        "reservation_count": 0.0
+      },
+      "model_type": "RandomForest"
+    },
+    "report_summary": {
+      "timestamp": "20260529_062354",
+      "charts": {
+        "forecast": "/Users/lzy/pro/solo/workspaces/zy71288/output/charts/forecast_chart_20260529_062354.png",
+        "scenario": "/Users/lzy/pro/solo/workspaces/zy71288/output/charts/scenario_comparison_20260529_062354.png",
+        "hourly": "/Users/lzy/pro/solo/workspaces/zy71288/output/charts/hourly_distribution_20260529_062354.png",
+        "error": "/Users/lzy/pro/solo/workspaces/zy71288/output/charts/error_analysis_20260529_062354.png",
+        "anomaly": "/Users/lzy/pro/solo/workspaces/zy71288/output/charts/anomaly_summary_20260529_062354.png"
+      },
+      "report_file": "/Users/lzy/pro/solo/workspaces/zy71288/output/reports/forecast_report_20260529_062354.csv",
+      "forecast_count": 24,
+      "error_metrics": {
+        "mae": 7.952874999999995,
+        "rmse": 8.219774477340193,
+        "mape": 15.005629509359844,
+        "sample_count": 24,
+        "method": "walk_forward"
+      },
+      "anomaly_count": 1,
+      "model_info": {
+        "training_samples": 168,
+        "feature_importance": {
+          "hour": 0.9899122510005514,
+          "day_of_week": 1.207378642158243e-05,
+          "is_weekend": 9.795718454723474e-07,
+          "is_peak_hour": 0.010074695641181656,
+          "temperature": 0.0,
+          "rain_probability": 0.0,
+          "has_event": 0.0,
+          "event_attendance": 0.0,
+          "reservation_count": 0.0
+        },
+        "model_type": "RandomForest"
+      }
+    },
+    "anomaly_summary": {
+      "total": 1,
+      "by_severity": {
+        "warning": 1
+      },
+      "by_type": {
+        "no_reservation_data": 1
+      },
+      "details": [
+        {
+          "anomaly_type": "no_reservation_data",
+          "severity": "warning",
+          "message": "未检测到预约数据，预测将仅基于历史趋势和天气",
+          "timestamp": "2026-05-29 06:23:54.591396",
+          "related_data": {},
+          "suggestion": "导入预约数据可大幅提高近期预测的准确性"
+        }
+      ]
+    },
+    "scenario_predictions": {
+      "base": [
+        {
+          "date": "2026-05-29",
+          "hour": 6,
+          "predicted_visitors": 41.98,
+          "lower_bound": 31.485,
+          "upper_bound": 52.474999999999994,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642280"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 7,
+          "predicted_visitors": 44.02,
+          "lower_bound": 33.015,
+          "upper_bound": 55.025000000000006,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642305"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 8,
+          "predicted_visitors": 46.0,
+          "lower_bound": 34.5,
+          "upper_bound": 57.5,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642324"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 9,
+          "predicted_visitors": 48.04,
+          "lower_bound": 36.03,
+          "upper_bound": 60.05,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642341"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 10,
+          "predicted_visitors": 50.0,
+          "lower_bound": 37.5,
+          "upper_bound": 62.5,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642360"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 11,
+          "predicted_visitors": 52.0,
+          "lower_bound": 39.0,
+          "upper_bound": 65.0,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642378"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 12,
+          "predicted_visitors": 54.02,
+          "lower_bound": 40.515,
+          "upper_bound": 67.525,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642394"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 13,
+          "predicted_visitors": 56.0,
+          "lower_bound": 42.0,
+          "upper_bound": 70.0,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642413"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 14,
+          "predicted_visitors": 58.0,
+          "lower_bound": 43.5,
+          "upper_bound": 72.5,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642430"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 15,
+          "predicted_visitors": 60.0,
+          "lower_bound": 45.0,
+          "upper_bound": 75.0,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642446"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 16,
+          "predicted_visitors": 62.0,
+          "lower_bound": 46.5,
+          "upper_bound": 77.5,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642462"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 17,
+          "predicted_visitors": 64.0,
+          "lower_bound": 48.0,
+          "upper_bound": 80.0,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642478"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 18,
+          "predicted_visitors": 66.0,
+          "lower_bound": 49.5,
+          "upper_bound": 82.5,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642494"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 19,
+          "predicted_visitors": 68.0,
+          "lower_bound": 51.0,
+          "upper_bound": 85.0,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642510"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 20,
+          "predicted_visitors": 70.0,
+          "lower_bound": 52.5,
+          "upper_bound": 87.5,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642526"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 21,
+          "predicted_visitors": 72.0,
+          "lower_bound": 54.0,
+          "upper_bound": 90.0,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642542"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 22,
+          "predicted_visitors": 74.0,
+          "lower_bound": 55.5,
+          "upper_bound": 92.5,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642558"
+        },
+        {
+          "date": "2026-05-29",
+          "hour": 23,
+          "predicted_visitors": 75.98,
+          "lower_bound": 56.985,
+          "upper_bound": 94.97500000000001,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642579"
+        },
+        {
+          "date": "2026-05-30",
+          "hour": 0,
+          "predicted_visitors": 30.0,
+          "lower_bound": 22.5,
+          "upper_bound": 37.5,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642595"
+        },
+        {
+          "date": "2026-05-30",
+          "hour": 1,
+          "predicted_visitors": 32.0,
+          "lower_bound": 24.0,
+          "upper_bound": 40.0,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642613"
+        },
+        {
+          "date": "2026-05-30",
+          "hour": 2,
+          "predicted_visitors": 34.0,
+          "lower_bound": 25.5,
+          "upper_bound": 42.5,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642629"
+        },
+        {
+          "date": "2026-05-30",
+          "hour": 3,
+          "predicted_visitors": 36.0,
+          "lower_bound": 27.0,
+          "upper_bound": 45.0,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642645"
+        },
+        {
+          "date": "2026-05-30",
+          "hour": 4,
+          "predicted_visitors": 38.0,
+          "lower_bound": 28.5,
+          "upper_bound": 47.5,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642661"
+        },
+        {
+          "date": "2026-05-30",
+          "hour": 5,
+          "predicted_visitors": 40.02,
+          "lower_bound": 30.015,
+          "upper_bound": 50.025000000000006,
+          "confidence_level": 0.85,
+          "scenario": "base",
+          "model_version": "v1.0",
+          "timestamp": "2026-05-29 06:23:54.642677"
+        }
+      ]
+    },
+    "base_predictions": [
+      {
+        "date": "2026-05-29",
+        "hour": 6,
+        "predicted_visitors": 41.98,
+        "lower_bound": 31.485,
+        "upper_bound": 52.474999999999994,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642280"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 7,
+        "predicted_visitors": 44.02,
+        "lower_bound": 33.015,
+        "upper_bound": 55.025000000000006,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642305"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 8,
+        "predicted_visitors": 46.0,
+        "lower_bound": 34.5,
+        "upper_bound": 57.5,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642324"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 9,
+        "predicted_visitors": 48.04,
+        "lower_bound": 36.03,
+        "upper_bound": 60.05,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642341"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 10,
+        "predicted_visitors": 50.0,
+        "lower_bound": 37.5,
+        "upper_bound": 62.5,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642360"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 11,
+        "predicted_visitors": 52.0,
+        "lower_bound": 39.0,
+        "upper_bound": 65.0,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642378"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 12,
+        "predicted_visitors": 54.02,
+        "lower_bound": 40.515,
+        "upper_bound": 67.525,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642394"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 13,
+        "predicted_visitors": 56.0,
+        "lower_bound": 42.0,
+        "upper_bound": 70.0,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642413"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 14,
+        "predicted_visitors": 58.0,
+        "lower_bound": 43.5,
+        "upper_bound": 72.5,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642430"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 15,
+        "predicted_visitors": 60.0,
+        "lower_bound": 45.0,
+        "upper_bound": 75.0,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642446"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 16,
+        "predicted_visitors": 62.0,
+        "lower_bound": 46.5,
+        "upper_bound": 77.5,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642462"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 17,
+        "predicted_visitors": 64.0,
+        "lower_bound": 48.0,
+        "upper_bound": 80.0,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642478"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 18,
+        "predicted_visitors": 66.0,
+        "lower_bound": 49.5,
+        "upper_bound": 82.5,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642494"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 19,
+        "predicted_visitors": 68.0,
+        "lower_bound": 51.0,
+        "upper_bound": 85.0,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642510"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 20,
+        "predicted_visitors": 70.0,
+        "lower_bound": 52.5,
+        "upper_bound": 87.5,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642526"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 21,
+        "predicted_visitors": 72.0,
+        "lower_bound": 54.0,
+        "upper_bound": 90.0,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642542"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 22,
+        "predicted_visitors": 74.0,
+        "lower_bound": 55.5,
+        "upper_bound": 92.5,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642558"
+      },
+      {
+        "date": "2026-05-29",
+        "hour": 23,
+        "predicted_visitors": 75.98,
+        "lower_bound": 56.985,
+        "upper_bound": 94.97500000000001,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642579"
+      },
+      {
+        "date": "2026-05-30",
+        "hour": 0,
+        "predicted_visitors": 30.0,
+        "lower_bound": 22.5,
+        "upper_bound": 37.5,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642595"
+      },
+      {
+        "date": "2026-05-30",
+        "hour": 1,
+        "predicted_visitors": 32.0,
+        "lower_bound": 24.0,
+        "upper_bound": 40.0,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642613"
+      },
+      {
+        "date": "2026-05-30",
+        "hour": 2,
+        "predicted_visitors": 34.0,
+        "lower_bound": 25.5,
+        "upper_bound": 42.5,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642629"
+      },
+      {
+        "date": "2026-05-30",
+        "hour": 3,
+        "predicted_visitors": 36.0,
+        "lower_bound": 27.0,
+        "upper_bound": 45.0,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642645"
+      },
+      {
+        "date": "2026-05-30",
+        "hour": 4,
+        "predicted_visitors": 38.0,
+        "lower_bound": 28.5,
+        "upper_bound": 47.5,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642661"
+      },
+      {
+        "date": "2026-05-30",
+        "hour": 5,
+        "predicted_visitors": 40.02,
+        "lower_bound": 30.015,
+        "upper_bound": 50.025000000000006,
+        "confidence_level": 0.85,
+        "scenario": "base",
+        "model_version": "v1.0",
+        "timestamp": "2026-05-29 06:23:54.642677"
+      }
+    ]
+  },
+  "error_message": null
+}

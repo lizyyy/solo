@@ -149,24 +149,35 @@ class ReportGenerator:
         logger.info(f"图表已保存: {output_path}")
         return str(output_path)
     
-    def create_error_analysis_chart(self, historical_data: List[Dict[str, Any]],
-                                     predictions: List[ForecastResult],
-                                     error_metrics: Dict[str, float],
+    def create_error_analysis_chart(self, historical_data: List[Dict[str, Any]] = None,
+                                     predictions: List[ForecastResult] = None,
+                                     error_metrics: Dict[str, float] = None,
+                                     backtest_data: List[Dict[str, Any]] = None,
                                      filename: str = "error_analysis.png") -> str:
         logger.info("生成误差分析图表...")
         
-        hist_df = pd.DataFrame(historical_data)
-        pred_df = pd.DataFrame([p.model_dump() for p in predictions])
-        
-        merged = hist_df.merge(pred_df, on=['date', 'hour'], how='inner')
-        
-        if len(merged) == 0:
-            logger.warning("没有可对比的数据，跳过误差分析图表")
+        if backtest_data and len(backtest_data) > 0:
+            logger.info("使用回测数据生成误差分析图表")
+            merged = pd.DataFrame(backtest_data)
+            merged['datetime'] = pd.to_datetime(merged['date'] + ' ' + merged['hour'].astype(str) + ':00')
+            chart_title_prefix = '回测'
+        elif historical_data and predictions:
+            hist_df = pd.DataFrame(historical_data)
+            pred_df = pd.DataFrame([p.model_dump() for p in predictions])
+            merged = hist_df.merge(pred_df, on=['date', 'hour'], how='inner')
+            
+            if len(merged) == 0:
+                logger.warning("没有可对比的数据，跳过误差分析图表")
+                return ""
+            
+            merged['datetime'] = pd.to_datetime(merged['date'] + ' ' + merged['hour'].astype(str) + ':00')
+            chart_title_prefix = '实际'
+        else:
+            logger.warning("没有足够的数据生成误差分析图表")
             return ""
         
         merged['error'] = merged['predicted_visitors'] - merged['actual_visitors']
         merged['error_pct'] = merged['error'] / merged['actual_visitors'] * 100
-        merged['datetime'] = pd.to_datetime(merged['date'] + ' ' + merged['hour'].astype(str) + ':00')
         
         fig, axes = plt.subplots(2, 1, figsize=(14, 10))
         
@@ -175,7 +186,7 @@ class ReportGenerator:
                  label='实际值', color='green', marker='o')
         ax1.plot(merged['datetime'], merged['predicted_visitors'], 
                  label='预测值', color='blue', marker='x')
-        ax1.set_title('实际值 vs 预测值对比', fontsize=12, fontweight='bold')
+        ax1.set_title(f'{chart_title_prefix}值 vs 预测值对比', fontsize=12, fontweight='bold')
         ax1.set_ylabel('客流人数')
         ax1.legend()
         ax1.grid(True, alpha=0.3)
@@ -186,7 +197,11 @@ class ReportGenerator:
                   for e in merged['error']]
         ax2.bar(merged['datetime'], merged['error'], color=colors, alpha=0.7)
         ax2.axhline(y=0, color='black', linestyle='-', linewidth=0.5)
-        ax2.set_title(f'预测误差 (MAE: {error_metrics.get("mae", 0):.1f}, MAPE: {error_metrics.get("mape", 0):.1f}%)', 
+        mae = error_metrics.get('mae', 0) if error_metrics else 0
+        mape = error_metrics.get('mape', 0) if error_metrics else 0
+        method = error_metrics.get('method', '') if error_metrics else ''
+        method_label = f' ({method})' if method else ''
+        ax2.set_title(f'预测误差{method_label} (MAE: {mae:.1f}, MAPE: {mape:.1f}%)', 
                       fontsize=12, fontweight='bold')
         ax2.set_ylabel('误差值')
         ax2.grid(True, alpha=0.3, axis='y')
@@ -265,7 +280,8 @@ class ReportGenerator:
                               historical_data: Optional[List[Dict[str, Any]]] = None,
                               error_metrics: Optional[Dict[str, float]] = None,
                               anomalies: Optional[List[AnomalyRecord]] = None,
-                              model_info: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+                              model_info: Optional[Dict[str, Any]] = None,
+                              backtest_data: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
         logger.info("生成完整报告包...")
         
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -286,10 +302,13 @@ class ReportGenerator:
             f"hourly_distribution_{timestamp}.png"
         )
         
-        if historical_data and error_metrics:
+        if error_metrics:
             charts['error'] = self.create_error_analysis_chart(
-                historical_data, forecast_results, error_metrics,
-                f"error_analysis_{timestamp}.png"
+                historical_data=historical_data,
+                predictions=forecast_results,
+                error_metrics=error_metrics,
+                backtest_data=backtest_data,
+                filename=f"error_analysis_{timestamp}.png"
             )
         
         if anomalies:

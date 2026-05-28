@@ -165,6 +165,8 @@ class BatchProcessor:
                 base_predictions
             )
             
+            backtest_data = self.forecaster.get_backtest_data()
+            
             logger.info("步骤7: 生成报告和图表...")
             report_summary = self.report_generator.generate_full_report(
                 forecast_results=base_predictions,
@@ -172,7 +174,8 @@ class BatchProcessor:
                 historical_data=imported_data.get('historical'),
                 error_metrics=error_metrics,
                 anomalies=job.anomalies,
-                model_info=model_info
+                model_info=model_info,
+                backtest_data=backtest_data
             )
             
             logger.info("步骤8: 保存处理后数据...")
