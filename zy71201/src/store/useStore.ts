@@ -526,8 +526,8 @@ export const useStore = create<AppState>()(
           if (productIndex >= 0) {
             const product = newProductsList[productIndex];
             const valuationDate = valuations[0]?.valuationDate;
-            const netValues = state.netValues[productId] || [];
-            const latestNetValue = netValues[netValues.length - 1];
+            const currentNetValues = get().getNetValues(productId);
+            const latestNetValue = currentNetValues[currentNetValues.length - 1];
             const netValueDate = latestNetValue?.valueDate;
 
             if (valuationDate && netValueDate && valuationDate !== netValueDate) {

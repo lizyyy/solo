@@ -56,6 +56,7 @@ export default function ProductDetail() {
   const getProductLatestVersion = useStore((state) => state.getProductLatestVersion);
   const getProductHistory = useStore((state) => state.getProductHistory);
   const redemptions = useStore((state) => state.redemptions);
+  const setSelectedProducts = useStore((state) => state.setSelectedProducts);
 
   const [activeTab, setActiveTab] = useState<ScriptType>('normal');
   const [scriptContent, setScriptContent] = useState('');
@@ -428,7 +429,15 @@ export default function ProductDetail() {
                 <History className="w-5 h-5 text-navy-600" />
                 <span className="text-gray-700">查看历史版本</span>
               </Link>
-              <button className="flex items-center gap-3 w-full px-4 py-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <button
+                onClick={() => {
+                  if (id) {
+                    setSelectedProducts([id]);
+                    navigate('/export');
+                  }
+                }}
+                className="flex items-center gap-3 w-full px-4 py-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              >
                 <FileText className="w-5 h-5 text-navy-600" />
                 <span className="text-gray-700">导出周报</span>
               </button>
