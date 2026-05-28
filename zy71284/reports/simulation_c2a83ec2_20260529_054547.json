@@ -1,0 +1,127 @@
+{
+  "simulation_info": {
+    "simulation_id": "c2a83ec2",
+    "simulation_name": "客户等级测试_正确配置",
+    "start_time": "2026-05-29T05:45:47.441705",
+    "end_time": "2026-05-29T05:45:47.441732",
+    "total_applications": 4,
+    "confirmed_count": 4,
+    "partial_confirmed_count": 0,
+    "rejected_count": 0,
+    "queued_count": 0
+  },
+  "applications": [
+    {
+      "app_id": "APPE67E3128",
+      "customer_id": "L001",
+      "customer_name": "机构客户早提交",
+      "customer_level": "INSTITUTION",
+      "app_type": "REDEEM",
+      "amount": 500000.0,
+      "shares": null,
+      "app_time": "2026-06-15T09:15:00",
+      "trading_day": "2026-06-15",
+      "status": "CONFIRMED",
+      "confirmed_amount": 500000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 1.0,
+      "queue_position": 1,
+      "reject_reason": null,
+      "explanation": [
+        "正常确认: 全额确认500000.00"
+      ],
+      "metadata": {}
+    },
+    {
+      "app_id": "APP2CE31747",
+      "customer_id": "L002",
+      "customer_name": "SVIP客户晚提交",
+      "customer_level": "SVIP",
+      "app_type": "REDEEM",
+      "amount": 500000.0,
+      "shares": null,
+      "app_time": "2026-06-15T09:10:00",
+      "trading_day": "2026-06-15",
+      "status": "CONFIRMED",
+      "confirmed_amount": 500000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 1.0,
+      "queue_position": 2,
+      "reject_reason": null,
+      "explanation": [
+        "正常确认: 全额确认500000.00"
+      ],
+      "metadata": {}
+    },
+    {
+      "app_id": "APP02178062",
+      "customer_id": "L003",
+      "customer_name": "VIP客户晚提交",
+      "customer_level": "VIP",
+      "app_type": "REDEEM",
+      "amount": 500000.0,
+      "shares": null,
+      "app_time": "2026-06-15T09:05:00",
+      "trading_day": "2026-06-15",
+      "status": "CONFIRMED",
+      "confirmed_amount": 500000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 1.0,
+      "queue_position": 3,
+      "reject_reason": null,
+      "explanation": [
+        "正常确认: 全额确认500000.00"
+      ],
+      "metadata": {}
+    },
+    {
+      "app_id": "APPC944B1B9",
+      "customer_id": "L004",
+      "customer_name": "普通客户晚提交",
+      "customer_level": "NORMAL",
+      "app_type": "REDEEM",
+      "amount": 500000.0,
+      "shares": null,
+      "app_time": "2026-06-15T09:00:00",
+      "trading_day": "2026-06-15",
+      "status": "CONFIRMED",
+      "confirmed_amount": 500000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 1.0,
+      "queue_position": 4,
+      "reject_reason": null,
+      "explanation": [
+        "正常确认: 全额确认500000.00"
+      ],
+      "metadata": {}
+    }
+  ],
+  "fund_pool_snapshots": [
+    {
+      "timestamp": "2026-05-29T05:45:47.441715",
+      "fund_pool": {
+        "fund_id": "F004",
+        "fund_name": "客户等级测试基金",
+        "total_shares": 2000000,
+        "available_cash": 3000000,
+        "total_asset": 30000000,
+        "daily_redeem_limit": 5000000,
+        "mass_redemption_ratio": 0.1,
+        "current_redeemed_amount": 0.0,
+        "last_update": "2026-05-29T05:45:47.441657"
+      }
+    }
+  ],
+  "exceptions": [],
+  "warnings": [
+    {
+      "timestamp": "2026-05-29T05:45:47.441724",
+      "step": "processing_mode",
+      "message": "使用普通赎回模式处理 4 笔申请",
+      "details": {
+        "total_request": 2000000.0
+      }
+    }
+  ],
+  "export_time": "2026-05-29T05:45:47.441744"
+}

@@ -145,7 +145,7 @@ class ScenarioSimulator:
             fund_id="F001",
             fund_name="稳健成长混合",
             total_shares=10_000_000,
-            available_cash=15_000_000,
+            available_cash=8_000_000,
             total_asset=100_000_000,
             daily_redeem_limit=20_000_000,
             mass_redemption_ratio=0.10
@@ -165,26 +165,26 @@ class ScenarioSimulator:
 
         applications.append(simulator.create_application(
             "C001", "机构客户A", CustomerLevel.INSTITUTION,
-            ApplicationType.REDEEM, 5_000_000.0,
+            ApplicationType.REDEEM, 6_000_000.0,
             now
         ))
 
         applications.append(simulator.create_application(
             "C002", "高净值客户B", CustomerLevel.SVIP,
-            ApplicationType.REDEEM, 800_000.0,
+            ApplicationType.REDEEM, 2_500_000.0,
             now + timedelta(minutes=5)
         ))
 
         applications.append(simulator.create_application(
             "C003", "VIP客户C", CustomerLevel.VIP,
-            ApplicationType.REDEEM, 500_000.0,
+            ApplicationType.REDEEM, 1_500_000.0,
             now + timedelta(minutes=10)
         ))
 
         for i in range(1, 11):
             applications.append(simulator.create_application(
                 f"C{100+i}", f"普通客户{i}", CustomerLevel.NORMAL,
-                ApplicationType.REDEEM, 100_000.0,
+                ApplicationType.REDEEM, 500_000.0,
                 now + timedelta(minutes=15 + i)
             ))
 
@@ -374,18 +374,45 @@ class ScenarioSimulator:
             "description": "客户等级越权场景：普通客户先提交 vs 正确优先级对比"
         }
 
+    def _deepcopy_applications(self, apps: List[Application]) -> List[Application]:
+        copied = []
+        for app in apps:
+            new_app = Application(
+                app_id=app.app_id,
+                customer_id=app.customer_id,
+                customer_name=app.customer_name,
+                customer_level=app.customer_level,
+                app_type=app.app_type,
+                amount=app.amount,
+                shares=app.shares,
+                app_time=app.app_time,
+                trading_day=app.trading_day,
+                status=ApplicationStatus.PENDING,
+                confirmed_amount=0.0,
+                confirmed_shares=0.0,
+                confirm_ratio=0.0,
+                queue_position=0,
+                reject_reason=None,
+                explanation=[],
+                metadata=deepcopy(app.metadata)
+            )
+            copied.append(new_app)
+        return copied
+
     def run_scenario_comparison(self, scenario_creator, scenario_name: str) -> Dict[str, Any]:
         scenario = scenario_creator()
         simulator = scenario["simulator"]
 
-        result1 = simulator.run_simulation(f"{scenario_name}_正确配置", scenario["applications"])
+        apps_correct = self._deepcopy_applications(scenario["applications"])
+        result1 = simulator.run_simulation(f"{scenario_name}_正确配置", apps_correct)
         reports1 = simulator.export_reports(result1)
 
         if "wrong_calendar" in scenario:
             wrong_simulator = FundRedemptionSimulator(
-                simulator.fund_pool, simulator.rule, scenario["wrong_calendar"]
+                deepcopy(simulator.fund_pool), deepcopy(simulator.rule), scenario["wrong_calendar"]
             )
-            result2 = wrong_simulator.run_simulation(f"{scenario_name}_错误配置", scenario["applications"])
+            apps_wrong = self._deepcopy_applications(scenario["applications"])
+            result2 = wrong_simulator.run_simulation(f"{scenario_name}_错误配置", apps_wrong)
             reports2 = wrong_simulator.export_reports(result2)
             
             return {
@@ -399,9 +426,10 @@ class ScenarioSimulator:
 
         if "wrong_rule" in scenario:
             wrong_simulator = FundRedemptionSimulator(
-                simulator.fund_pool, scenario["wrong_rule"], simulator.calendar
+                deepcopy(simulator.fund_pool), scenario["wrong_rule"], deepcopy(simulator.calendar)
             )
-            result2 = wrong_simulator.run_simulation(f"{scenario_name}_错误配置", scenario["applications"])
+            apps_wrong = self._deepcopy_applications(scenario["applications"])
+            result2 = wrong_simulator.run_simulation(f"{scenario_name}_错误配置", apps_wrong)
             reports2 = wrong_simulator.export_reports(result2)
             
             return {
@@ -422,26 +450,67 @@ class ScenarioSimulator:
     def _compare_results(self, result1: SimulationResult, result2: SimulationResult) -> Dict[str, Any]:
         differences = []
         
-        for app1, app2 in zip(result1.applications, result2.applications):
-            if app1.customer_name == app2.customer_name:
-                if app1.confirm_ratio != app2.confirm_ratio:
-                    differences.append({
-                        "customer": app1.customer_name,
-                        "correct_ratio": f"{app1.confirm_ratio*100:.2f}%",
-                        "wrong_ratio": f"{app2.confirm_ratio*100:.2f}%",
-                        "correct_queue": app1.queue_position,
-                        "wrong_queue": app2.queue_position,
-                        "correct_explanation": app1.explanation,
-                        "wrong_explanation": app2.explanation
-                    })
+        app_map1 = {app.customer_name: app for app in result1.applications}
+        app_map2 = {app.customer_name: app for app in result2.applications}
+        
+        all_customers = set(app_map1.keys()) | set(app_map2.keys())
+        
+        for customer in sorted(all_customers):
+            app1 = app_map1.get(customer)
+            app2 = app_map2.get(customer)
+            
+            if not app1 or not app2:
+                continue
+                
+            has_diff = False
+            diff_item = {
+                "customer": customer,
+                "correct_ratio": f"{app1.confirm_ratio*100:.2f}%",
+                "wrong_ratio": f"{app2.confirm_ratio*100:.2f}%",
+                "correct_queue": app1.queue_position,
+                "wrong_queue": app2.queue_position,
+                "correct_status": app1.status.value,
+                "wrong_status": app2.status.value,
+                "correct_explanation": app1.explanation,
+                "wrong_explanation": app2.explanation,
+                "diff_types": []
+            }
+            
+            if app1.confirm_ratio != app2.confirm_ratio:
+                has_diff = True
+                diff_item["diff_types"].append("确认比例")
+            
+            if app1.queue_position != app2.queue_position:
+                has_diff = True
+                diff_item["diff_types"].append("队列顺序")
+            
+            if app1.status != app2.status:
+                has_diff = True
+                diff_item["diff_types"].append("处理状态")
+            
+            if app1.explanation != app2.explanation:
+                has_diff = True
+                diff_item["diff_types"].append("解释明细")
+            
+            if has_diff:
+                differences.append(diff_item)
+
+        warning_diff = {
+            "correct_count": len(result1.warnings),
+            "wrong_count": len(result2.warnings),
+            "correct_warnings": [w["message"] for w in result1.warnings],
+            "wrong_warnings": [w["message"] for w in result2.warnings]
+        }
 
         return {
             "total_differences": len(differences),
             "details": differences,
+            "warning_differences": warning_diff,
             "replay_steps": [
                 "1. 对比每笔申请的确认比例差异",
                 "2. 检查队列排序差异",
                 "3. 分析解释说明差异",
-                "4. 总结异常原因并修正配置"
+                "4. 检查系统警告信息差异",
+                "5. 总结异常原因并修正配置"
             ]
         }

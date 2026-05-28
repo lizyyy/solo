@@ -1,0 +1,168 @@
+{
+  "simulation_info": {
+    "simulation_id": "ac230033",
+    "simulation_name": "节假日漏算测试_错误配置",
+    "start_time": "2026-05-29T05:45:47.440058",
+    "end_time": "2026-05-29T05:45:47.440097",
+    "total_applications": 5,
+    "confirmed_count": 5,
+    "partial_confirmed_count": 0,
+    "rejected_count": 0,
+    "queued_count": 0
+  },
+  "applications": [
+    {
+      "app_id": "APPDCAA67DD",
+      "customer_id": "H101",
+      "customer_name": "节假日测试客户1",
+      "customer_level": "NORMAL",
+      "app_type": "REDEEM",
+      "amount": 200000.0,
+      "shares": null,
+      "app_time": "2026-05-01T10:00:00",
+      "trading_day": "2026-05-01",
+      "status": "CONFIRMED",
+      "confirmed_amount": 200000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 1.0,
+      "queue_position": 1,
+      "reject_reason": null,
+      "explanation": [
+        "正常确认: 全额确认200000.00"
+      ],
+      "metadata": {}
+    },
+    {
+      "app_id": "APP0B77243D",
+      "customer_id": "H102",
+      "customer_name": "节假日测试客户2",
+      "customer_level": "NORMAL",
+      "app_type": "REDEEM",
+      "amount": 200000.0,
+      "shares": null,
+      "app_time": "2026-05-02T10:00:00",
+      "trading_day": "2026-05-04",
+      "status": "CONFIRMED",
+      "confirmed_amount": 200000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 1.0,
+      "queue_position": 2,
+      "reject_reason": null,
+      "explanation": [
+        "申请日期2026-05-02是周末，将顺延至下一交易日2026-05-04",
+        "正常确认: 全额确认200000.00"
+      ],
+      "metadata": {}
+    },
+    {
+      "app_id": "APP0853026D",
+      "customer_id": "H103",
+      "customer_name": "节假日测试客户3",
+      "customer_level": "NORMAL",
+      "app_type": "REDEEM",
+      "amount": 200000.0,
+      "shares": null,
+      "app_time": "2026-05-03T10:00:00",
+      "trading_day": "2026-05-04",
+      "status": "CONFIRMED",
+      "confirmed_amount": 200000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 1.0,
+      "queue_position": 3,
+      "reject_reason": null,
+      "explanation": [
+        "申请日期2026-05-03是周末，将顺延至下一交易日2026-05-04",
+        "正常确认: 全额确认200000.00"
+      ],
+      "metadata": {}
+    },
+    {
+      "app_id": "APPF3037BAC",
+      "customer_id": "H104",
+      "customer_name": "节假日测试客户4",
+      "customer_level": "NORMAL",
+      "app_type": "REDEEM",
+      "amount": 200000.0,
+      "shares": null,
+      "app_time": "2026-05-04T10:00:00",
+      "trading_day": "2026-05-04",
+      "status": "CONFIRMED",
+      "confirmed_amount": 200000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 1.0,
+      "queue_position": 4,
+      "reject_reason": null,
+      "explanation": [
+        "正常确认: 全额确认200000.00"
+      ],
+      "metadata": {}
+    },
+    {
+      "app_id": "APPC67EC684",
+      "customer_id": "H105",
+      "customer_name": "节假日测试客户5",
+      "customer_level": "NORMAL",
+      "app_type": "REDEEM",
+      "amount": 200000.0,
+      "shares": null,
+      "app_time": "2026-05-05T10:00:00",
+      "trading_day": "2026-05-05",
+      "status": "CONFIRMED",
+      "confirmed_amount": 200000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 1.0,
+      "queue_position": 5,
+      "reject_reason": null,
+      "explanation": [
+        "正常确认: 全额确认200000.00"
+      ],
+      "metadata": {}
+    }
+  ],
+  "fund_pool_snapshots": [
+    {
+      "timestamp": "2026-05-29T05:45:47.440068",
+      "fund_pool": {
+        "fund_id": "F002",
+        "fund_name": "节假日测试基金",
+        "total_shares": 1000000,
+        "available_cash": 5000000,
+        "total_asset": 50000000,
+        "daily_redeem_limit": 10000000,
+        "mass_redemption_ratio": 0.1,
+        "current_redeemed_amount": 0.0,
+        "last_update": "2026-05-29T05:45:47.438638"
+      }
+    }
+  ],
+  "exceptions": [],
+  "warnings": [
+    {
+      "timestamp": "2026-05-29T05:45:47.440075",
+      "step": "date_validation",
+      "message": "申请日期2026-05-02是周末，将顺延至下一交易日2026-05-04",
+      "details": {
+        "app_id": "APP0B77243D",
+        "original_date": "2026-05-04"
+      }
+    },
+    {
+      "timestamp": "2026-05-29T05:45:47.440078",
+      "step": "date_validation",
+      "message": "申请日期2026-05-03是周末，将顺延至下一交易日2026-05-04",
+      "details": {
+        "app_id": "APP0853026D",
+        "original_date": "2026-05-04"
+      }
+    },
+    {
+      "timestamp": "2026-05-29T05:45:47.440088",
+      "step": "processing_mode",
+      "message": "使用普通赎回模式处理 5 笔申请",
+      "details": {
+        "total_request": 1000000.0
+      }
+    }
+  ],
+  "export_time": "2026-05-29T05:45:47.440111"
+}

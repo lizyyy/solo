@@ -1,0 +1,144 @@
+{
+  "simulation_info": {
+    "simulation_id": "8722d9bd",
+    "simulation_name": "比例确认测试_错误配置",
+    "start_time": "2026-05-29T05:45:47.441172",
+    "end_time": "2026-05-29T05:45:47.441207",
+    "total_applications": 4,
+    "confirmed_count": 0,
+    "partial_confirmed_count": 4,
+    "rejected_count": 0,
+    "queued_count": 0
+  },
+  "applications": [
+    {
+      "app_id": "APP28724685",
+      "customer_id": "R001",
+      "customer_name": "比例测试机构",
+      "customer_level": "INSTITUTION",
+      "app_type": "REDEEM",
+      "amount": 4000000.0,
+      "shares": null,
+      "app_time": "2026-06-01T09:00:00",
+      "trading_day": "2026-06-01",
+      "status": "PARTIAL_CONFIRMED",
+      "confirmed_amount": 2600000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 0.65,
+      "queue_position": 1,
+      "reject_reason": null,
+      "explanation": [
+        "巨额赎回按比例确认: 基础比例=50.00%, INSTITUTION等级加成=15.00%, 实际比例=65.00%, 确认金额=2600000.00",
+        "未确认部分1400000.00将顺延至下一交易日或退回"
+      ],
+      "metadata": {}
+    },
+    {
+      "app_id": "APPE6AAA86B",
+      "customer_id": "R002",
+      "customer_name": "比例测试SVIP",
+      "customer_level": "SVIP",
+      "app_type": "REDEEM",
+      "amount": 2000000.0,
+      "shares": null,
+      "app_time": "2026-06-01T09:10:00",
+      "trading_day": "2026-06-01",
+      "status": "PARTIAL_CONFIRMED",
+      "confirmed_amount": 1200000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 0.6,
+      "queue_position": 2,
+      "reject_reason": null,
+      "explanation": [
+        "巨额赎回按比例确认: 基础比例=50.00%, SVIP等级加成=10.00%, 实际比例=60.00%, 确认金额=1200000.00",
+        "未确认部分800000.00将顺延至下一交易日或退回"
+      ],
+      "metadata": {}
+    },
+    {
+      "app_id": "APP5648F13F",
+      "customer_id": "R003",
+      "customer_name": "比例测试VIP",
+      "customer_level": "VIP",
+      "app_type": "REDEEM",
+      "amount": 1000000.0,
+      "shares": null,
+      "app_time": "2026-06-01T09:20:00",
+      "trading_day": "2026-06-01",
+      "status": "PARTIAL_CONFIRMED",
+      "confirmed_amount": 550000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 0.55,
+      "queue_position": 3,
+      "reject_reason": null,
+      "explanation": [
+        "巨额赎回按比例确认: 基础比例=50.00%, VIP等级加成=5.00%, 实际比例=55.00%, 确认金额=550000.00",
+        "未确认部分450000.00将顺延至下一交易日或退回"
+      ],
+      "metadata": {}
+    },
+    {
+      "app_id": "APP8719B0BA",
+      "customer_id": "R004",
+      "customer_name": "比例测试普通",
+      "customer_level": "NORMAL",
+      "app_type": "REDEEM",
+      "amount": 1000000.0,
+      "shares": null,
+      "app_time": "2026-06-01T09:30:00",
+      "trading_day": "2026-06-01",
+      "status": "PARTIAL_CONFIRMED",
+      "confirmed_amount": 500000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 0.5,
+      "queue_position": 4,
+      "reject_reason": null,
+      "explanation": [
+        "巨额赎回按比例确认: 基础比例=50.00%, NORMAL等级加成=0.00%, 实际比例=50.00%, 确认金额=500000.00",
+        "未确认部分500000.00将顺延至下一交易日或退回"
+      ],
+      "metadata": {}
+    }
+  ],
+  "fund_pool_snapshots": [
+    {
+      "timestamp": "2026-05-29T05:45:47.441180",
+      "fund_pool": {
+        "fund_id": "F003",
+        "fund_name": "比例确认测试基金",
+        "total_shares": 5000000,
+        "available_cash": 8000000,
+        "total_asset": 80000000,
+        "daily_redeem_limit": 15000000,
+        "mass_redemption_ratio": 0.1,
+        "current_redeemed_amount": 0.0,
+        "last_update": "2026-05-29T05:45:47.440616"
+      }
+    }
+  ],
+  "exceptions": [],
+  "warnings": [
+    {
+      "timestamp": "2026-05-29T05:45:47.441190",
+      "step": "processing_mode",
+      "message": "使用巨额赎回模式处理 4 笔申请",
+      "details": {
+        "total_request": 8000000.0,
+        "fund_asset": 80000000
+      }
+    },
+    {
+      "timestamp": "2026-05-29T05:45:47.441192",
+      "step": "mass_redemption_check",
+      "message": "巨额赎回检测: 总申请=8000000.00, 阈值=8000000.00, 触发=True",
+      "details": {}
+    },
+    {
+      "timestamp": "2026-05-29T05:45:47.441194",
+      "step": "mass_redemption_allocation",
+      "message": "触发巨额赎回比例确认: 可用资金=8000000.00, 总申请=8000000.00, 理论比例=100.00%",
+      "details": {}
+    }
+  ],
+  "export_time": "2026-05-29T05:45:47.441219"
+}
