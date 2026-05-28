@@ -1,0 +1,54 @@
+system:
+  name: "保险犹豫期退保批处理系统"
+  version: "1.0.0"
+  log_level: "INFO"
+
+paths:
+  input_dir: "./data/input"
+  output_dir: "./data/output"
+  archive_dir: "./data/archive"
+  log_dir: "./logs"
+  db_path: "./data/insurance_surrender.db"
+
+surrender:
+  cooling_off_days: 15
+  fee_deduction_rates:
+    initial_fee: 0.10
+    management_fee: 0.05
+  allow_partial_refund: false
+
+validation:
+  require_sign_date: true
+  require_visit_record: true
+  require_fee_record: true
+  max_days_after_sign: 30
+
+data_sources:
+  policy:
+    filename_pattern: "policy_*.xlsx"
+    sheet_name: "Sheet1"
+    key_columns: ["policy_no"]
+  
+  sign_record:
+    filename_pattern: "sign_*.xlsx"
+    sheet_name: "Sheet1"
+    key_columns: ["policy_no", "sign_date"]
+  
+  visit_record:
+    filename_pattern: "visit_*.xlsx"
+    sheet_name: "Sheet1"
+    key_columns: ["policy_no", "visit_date"]
+  
+  fee_record:
+    filename_pattern: "fee_*.xlsx"
+    sheet_name: "Sheet1"
+    key_columns: ["policy_no", "fee_date"]
+  
+  surrender_app:
+    filename_pattern: "surrender_*.xlsx"
+    sheet_name: "Sheet1"
+    key_columns: ["policy_no", "apply_date"]
+
+export:
+  formats: ["xlsx", "csv"]
+  include_timestamps: true
