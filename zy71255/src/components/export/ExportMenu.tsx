@@ -2,8 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, FileSpreadsheet, FileJson, Camera, ChevronDown } from 'lucide-react';
 import { useDataStore } from '@/store/useDataStore';
-import { exportToPDF, exportToExcel, exportToJSON, captureScreenshot } from '@/utils/exportUtils';
-import type { ReportData } from '@/utils/types';
+import { exportToPDF, exportToExcel, exportToJSON, captureScreenshot, type ExportData } from '@/utils/exportUtils';
 import Button from '@/components/ui/Button';
 
 interface ExportOption {
@@ -32,61 +31,12 @@ export default function ExportMenu() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const buildReportData = (): ReportData => {
-    const gapsWithNames = gaps.map((g) => {
-      const enterprise = enterprises.find((e) => e.id === g.enterpriseId);
-      return {
-        enterpriseId: g.enterpriseId,
-        enterpriseName: enterprise?.name || '未知企业',
-        gapAmount: g.gap,
-        quota: g.required,
-        usedQuota: g.actual,
-      };
-    });
-
-    const totalAmount = transactions.reduce((sum, tx) => sum + tx.amount, 0);
-
+  const buildReportData = (): ExportData => {
     return {
-      enterprises: enterprises.map((e) => ({
-        id: e.id,
-        name: e.name,
-        industry: e.industry,
-        quota: e.totalQuota,
-        usedQuota: e.usedQuota,
-      })),
-      transactions: transactions.map((tx) => {
-        const fromEnterprise = enterprises.find((e) => e.id === tx.fromId);
-        const toEnterprise = enterprises.find((e) => e.id === tx.toId);
-        return {
-          id: tx.id,
-          date: tx.date,
-          amount: tx.amount,
-          enterpriseId: tx.fromId,
-          enterpriseName: fromEnterprise?.name || '未知企业',
-          fromEnterpriseId: tx.fromId,
-          toEnterpriseId: tx.toId,
-          periodId: tx.periodId,
-          description: `从 ${fromEnterprise?.name || '未知'} 到 ${toEnterprise?.name || '未知'}`,
-        };
-      }),
-      gaps: gapsWithNames,
-      anomalies: issues.map((issue) => ({
-        type: issue.type as 'duplicate_deduction' | 'period_misalignment' | 'flow_occlusion',
-        severity: issue.severity,
-        description: issue.description,
-        relatedIds: [issue.enterpriseId, issue.transactionId].filter(Boolean) as string[],
-        details: {
-          enterpriseId: issue.enterpriseId,
-          transactionId: issue.transactionId,
-          status: issue.status,
-        },
-      })),
-      summary: {
-        totalEnterprises: enterprises.length,
-        totalTransactions: transactions.length,
-        totalAmount,
-        totalAnomalies: issues.length,
-      },
+      enterprises,
+      transactions,
+      gaps,
+      issues,
     };
   };
 

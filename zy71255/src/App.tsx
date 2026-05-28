@@ -1,10 +1,11 @@
-import { useEffect, useRef, useMemo, useCallback } from 'react';
+import { useEffect, useRef, useMemo, useCallback, useState } from 'react';
 import { useDataStore } from '@/store/useDataStore';
 import { useFilterStore } from '@/store/useFilterStore';
 import { useSelectionStore } from '@/store/useSelectionStore';
 import { useUIStore } from '@/store/useUIStore';
 import { generateInitialData } from '@/data/dataGenerator';
 import { detectAllAnomalies } from '@/utils/anomalyDetection';
+import { exportToPDF, exportToExcel, exportToJSON, captureScreenshot, type ExportData } from '@/utils/exportUtils';
 import Scene from '@/components/three/Scene';
 import TopBar from '@/components/panels/TopBar';
 import FilterPanel from '@/components/panels/FilterPanel';
@@ -60,6 +61,7 @@ export default function App() {
 
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
+  const [isExporting, setIsExporting] = useState(false);
 
   const {
     CreateSnapshotDialog,
@@ -258,11 +260,51 @@ export default function App() {
     [selectTransaction]
   );
 
+  const currentPeriodName = useMemo(() => {
+    if (!selectedPeriod) return undefined;
+    const period = periods.find(p => p.id === selectedPeriod);
+    return period?.name;
+  }, [selectedPeriod, periods]);
+
   const handleExport = useCallback(
-    (type: 'pdf' | 'excel' | 'json' | 'screenshot') => {
-      console.log('Export:', type);
+    async (type: 'pdf' | 'excel' | 'json' | 'screenshot') => {
+      if (isExporting) return;
+
+      try {
+        setIsExporting(true);
+
+        const exportData: ExportData = {
+          enterprises: filteredEnterprises,
+          transactions: filteredTransactions,
+          gaps: gaps.filter(g => !selectedPeriod || g.periodId === selectedPeriod),
+          issues: issues,
+          periodName: currentPeriodName,
+        };
+
+        const timestamp = new Date().toISOString().slice(0, 10);
+
+        switch (type) {
+          case 'pdf':
+            await exportToPDF(exportData, `碳交易流向报告_${timestamp}`);
+            break;
+          case 'excel':
+            exportToExcel(exportData, `碳交易流向数据_${timestamp}`);
+            break;
+          case 'json':
+            exportToJSON(exportData, `碳交易流向数据_${timestamp}`);
+            break;
+          case 'screenshot':
+            await captureScreenshot('scene-container', `碳交易流向截图_${timestamp}`);
+            break;
+        }
+      } catch (error) {
+        console.error('导出失败:', error);
+        alert(`导出失败: ${error instanceof Error ? error.message : '未知错误'}`);
+      } finally {
+        setIsExporting(false);
+      }
     },
-    []
+    [isExporting, filteredEnterprises, filteredTransactions, gaps, issues, selectedPeriod, currentPeriodName]
   );
 
   const handleCreateSnapshot = useCallback(
@@ -303,6 +345,7 @@ export default function App() {
           enterprises={enterprises}
           periods={periods}
           snapshots={snapshots}
+          isExporting={isExporting}
           onCreateSnapshot={handleCreateSnapshot}
           onExport={handleExport}
         />

@@ -12,6 +12,7 @@ import {
   Eye,
   Maximize2,
   Focus,
+  Loader2,
 } from 'lucide-react';
 import type { Enterprise, Period, Snapshot } from '@/types';
 import { useDataStore } from '@/store/useDataStore';
@@ -35,6 +36,7 @@ interface TopBarProps {
   enterprises: Enterprise[];
   periods: Period[];
   snapshots: Snapshot[];
+  isExporting?: boolean;
   onCreateSnapshot: (description: string) => Snapshot | Promise<Snapshot>;
   onExport: (type: 'pdf' | 'excel' | 'json' | 'screenshot') => void;
 }
@@ -43,6 +45,7 @@ export default function TopBar({
   enterprises,
   periods,
   snapshots,
+  isExporting = false,
   onCreateSnapshot,
   onExport,
 }: TopBarProps) {
@@ -301,20 +304,21 @@ export default function TopBar({
             <Button
               variant="secondary"
               size="sm"
-              icon={<Download className="w-4 h-4" />}
+              icon={isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               iconPosition="left"
-              onClick={() => setShowExportDropdown(!showExportDropdown)}
+              onClick={() => !isExporting && setShowExportDropdown(!showExportDropdown)}
+              disabled={isExporting}
             >
-              导出
-              <ChevronDown className="w-3 h-3 ml-1" />
+              {isExporting ? '导出中...' : '导出'}
+              {!isExporting && <ChevronDown className="w-3 h-3 ml-1" />}
             </Button>
             <AnimatePresence>
-              {showExportDropdown && (
+              {showExportDropdown && !isExporting && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-full right-0 mt-2 w-40 z-50"
+                  className="absolute top-full right-0 mt-2 w-44 z-50"
                   style={{
                     backgroundColor: 'rgba(10, 22, 40, 0.95)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -324,10 +328,10 @@ export default function TopBar({
                 >
                   <div className="py-2">
                     {[
-                      { id: 'pdf', label: '导出 PDF' },
-                      { id: 'excel', label: '导出 Excel' },
-                      { id: 'json', label: '导出 JSON' },
-                      { id: 'screenshot', label: '导出截图' },
+                      { id: 'pdf', label: '导出 PDF 报告', desc: '完整报告含图表' },
+                      { id: 'excel', label: '导出 Excel', desc: '多工作表数据' },
+                      { id: 'json', label: '导出 JSON', desc: '原始数据格式' },
+                      { id: 'screenshot', label: '导出截图', desc: '当前场景画面' },
                     ].map((item) => (
                       <button
                         key={item.id}
@@ -335,9 +339,10 @@ export default function TopBar({
                           onExport(item.id as 'pdf' | 'excel' | 'json' | 'screenshot');
                           setShowExportDropdown(false);
                         }}
-                        className="w-full px-4 py-2 text-left text-sm text-white/70 hover:bg-white/5 hover:text-white transition-colors"
+                        className="w-full px-4 py-2.5 text-left hover:bg-white/5 transition-colors"
                       >
-                        {item.label}
+                        <div className="text-sm text-white/90">{item.label}</div>
+                        <div className="text-xs text-white/40">{item.desc}</div>
                       </button>
                     ))}
                   </div>

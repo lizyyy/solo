@@ -86,8 +86,8 @@ export default function DetailPanel({
     if (!selectedEnterpriseId) return [];
     return transactions.filter(
       (tx) =>
-        (tx as unknown as { fromEnterpriseId: string; toEnterpriseId: string }).fromEnterpriseId === selectedEnterpriseId ||
-        (tx as unknown as { fromEnterpriseId: string; toEnterpriseId: string }).toEnterpriseId === selectedEnterpriseId
+        tx.fromId === selectedEnterpriseId ||
+        tx.toId === selectedEnterpriseId
     );
   }, [transactions, selectedEnterpriseId]);
 
