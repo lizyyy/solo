@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
 import dayjs from 'dayjs';
 import {
   PurchaseContract,
@@ -147,6 +148,44 @@ const parseBoolean = (value: any): boolean => {
   return false;
 };
 
+const isValidUtf8 = (buffer: ArrayBuffer): boolean => {
+  const uint8 = new Uint8Array(buffer);
+  let i = 0;
+  while (i < uint8.length) {
+    if (uint8[i] <= 0x7f) {
+      i++;
+    } else if ((uint8[i] & 0xe0) === 0xc0) {
+      if (i + 1 >= uint8.length || (uint8[i + 1] & 0xc0) !== 0x80) return false;
+      i += 2;
+    } else if ((uint8[i] & 0xf0) === 0xe0) {
+      if (i + 2 >= uint8.length || (uint8[i + 1] & 0xc0) !== 0x80 || (uint8[i + 2] & 0xc0) !== 0x80) return false;
+      i += 3;
+    } else if ((uint8[i] & 0xf8) === 0xf0) {
+      if (i + 3 >= uint8.length || (uint8[i + 1] & 0xc0) !== 0x80 || (uint8[i + 2] & 0xc0) !== 0x80 || (uint8[i + 3] & 0xc0) !== 0x80) return false;
+      i += 4;
+    } else {
+      return false;
+    }
+  }
+  return true;
+};
+
+const containsChineseChars = (text: string): boolean => {
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    if (
+      (code >= 0x4e00 && code <= 0x9fff) ||
+      (code >= 0x3400 && code <= 0x4dbf) ||
+      (code >= 0xf900 && code <= 0xfaff) ||
+      (code >= 0x3000 && code <= 0x303f) ||
+      (code >= 0xff00 && code <= 0xffef)
+    ) {
+      return true;
+    }
+  }
+  return false;
+};
+
 const detectEncoding = (buffer: ArrayBuffer): string => {
   const uint8 = new Uint8Array(buffer);
 
@@ -154,24 +193,46 @@ const detectEncoding = (buffer: ArrayBuffer): string => {
     return 'utf-8';
   }
 
-  let hasHighByte = false;
-  for (let i = 0; i < Math.min(uint8.length, 1000); i++) {
-    if (uint8[i] > 127) {
-      hasHighByte = true;
-      break;
+  if (isValidUtf8(buffer)) {
+    const utf8Text = new TextDecoder('utf-8').decode(buffer);
+    if (containsChineseChars(utf8Text)) {
+      return 'utf-8';
     }
   }
 
-  return hasHighByte ? 'gbk' : 'utf-8';
+  try {
+    const gbkText = new TextDecoder('gbk').decode(buffer);
+    if (containsChineseChars(gbkText)) {
+      const gbkReEncoded = new TextEncoder().encode(gbkText);
+      const reDecoded = new TextDecoder('utf-8').decode(gbkReEncoded);
+      if (reDecoded === gbkText) {
+        return 'gbk';
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  if (isValidUtf8(buffer)) {
+    return 'utf-8';
+  }
+
+  return 'gbk';
 };
 
 const decodeText = (buffer: ArrayBuffer, encoding: string): string => {
   try {
-    const decoder = new TextDecoder(encoding);
+    const decoder = new TextDecoder(encoding, { fatal: true });
     return decoder.decode(buffer);
   } catch (e) {
-    const decoder = new TextDecoder('utf-8');
-    return decoder.decode(buffer);
+    try {
+      const fallback = encoding === 'gbk' ? 'utf-8' : 'gbk';
+      const decoder = new TextDecoder(fallback);
+      return decoder.decode(buffer);
+    } catch (e2) {
+      const decoder = new TextDecoder('utf-8');
+      return decoder.decode(buffer);
+    }
   }
 };
 
@@ -418,7 +479,7 @@ export function generateIdForImport(): string {
 }
 
 export interface ExportOptions {
-  format: 'xlsx' | 'csv';
+  format: 'xlsx' | 'csv' | 'pdf';
   include: {
     summary?: boolean;
     monthly?: boolean;
@@ -588,7 +649,9 @@ export function exportToFile(
 
   const fileName = `套保敞口复核报告_${dayjs().format('YYYYMMDD_HHmmss')}`;
 
-  if (format === 'xlsx') {
+  if (format === 'pdf') {
+    exportToPdf(result, config, lots, positions, basisRecords, rollovers, auditLogs, include, fileName);
+  } else if (format === 'xlsx') {
     XLSX.writeFile(wb, `${fileName}.xlsx`);
   } else {
     const firstSheetName = wb.SheetNames[0];
@@ -680,4 +743,236 @@ export function downloadTemplate(dataType: DataType): void {
   };
 
   XLSX.writeFile(wb, `${typeNames[dataType]}_导入模板.xlsx`);
+}
+
+function exportToPdf(
+  result: ExposureResult,
+  config: ExposureConfig,
+  lots: InventoryLot[],
+  positions: FuturesPosition[],
+  basisRecords: BasisRecord[],
+  rollovers: RolloverRecord[],
+  auditLogs: AuditLog[],
+  include: ExportOptions['include'],
+  fileName: string
+): void {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 15;
+  const contentWidth = pageWidth - margin * 2;
+  let y = margin;
+
+  const addPageIfNeeded = (neededHeight: number) => {
+    if (y + neededHeight > doc.internal.pageSize.getHeight() - margin) {
+      doc.addPage();
+      y = margin;
+    }
+  };
+
+  const addTitle = (text: string, size: number = 16) => {
+    addPageIfNeeded(size + 6);
+    doc.setFontSize(size);
+    doc.text(text, margin, y);
+    y += size * 0.5 + 4;
+  };
+
+  const addSubtitle = (text: string) => {
+    addPageIfNeeded(10);
+    doc.setFontSize(12);
+    doc.text(text, margin, y);
+    y += 8;
+  };
+
+  const addLine = (text: string, indent: number = 0) => {
+    addPageIfNeeded(8);
+    doc.setFontSize(10);
+    const lines = doc.splitTextToSize(text, contentWidth - indent);
+    doc.text(lines, margin + indent, y);
+    y += lines.length * 5 + 2;
+  };
+
+  const addSeparator = () => {
+    addPageIfNeeded(6);
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 4;
+  };
+
+  const addTable = (headers: string[], rows: string[][], colWidths?: number[]) => {
+    const rowHeight = 7;
+    const totalCols = headers.length;
+    const defaultColWidth = contentWidth / totalCols;
+    const widths = colWidths || headers.map(() => defaultColWidth);
+
+    addPageIfNeeded(rowHeight * 3);
+
+    doc.setFillColor(66, 133, 244);
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+
+    let x = margin;
+    for (let i = 0; i < headers.length; i++) {
+      doc.rect(x, y, widths[i], rowHeight, 'F');
+      doc.text(headers[i], x + 2, y + 5);
+      x += widths[i];
+    }
+    y += rowHeight;
+
+    doc.setTextColor(0, 0, 0);
+    for (const row of rows) {
+      addPageIfNeeded(rowHeight);
+      x = margin;
+      for (let i = 0; i < row.length; i++) {
+        doc.rect(x, y, widths[i], rowHeight, 'S');
+        const cellText = doc.splitTextToSize(row[i] || '', widths[i] - 4);
+        doc.text(cellText[0] || '', x + 2, y + 5);
+        x += widths[i];
+      }
+      y += rowHeight;
+    }
+    y += 4;
+  };
+
+  doc.setFont('helvetica', 'bold');
+  addTitle('Exposure Review Report', 18);
+
+  doc.setFont('helvetica', 'normal');
+  addLine(`Date: ${new Date().toLocaleString('zh-CN')}`);
+  addLine(`Method: ${config.calculationMethod === 'gross' ? 'Gross' : config.calculationMethod === 'net' ? 'Net' : 'Weighted'}`);
+  addLine(`Range: ${config.dateRange.start} - ${config.dateRange.end}`);
+  addLine(`Hedge Ratio: ${(config.hedgingRatio * 100).toFixed(0)}%`);
+
+  addSeparator();
+
+  if (include.summary) {
+    addSubtitle('1. Exposure Summary');
+    addTable(
+      ['Item', 'Value (tons)', 'Amount (CNY)'],
+      [
+        ['Spot Exposure', String(formatQuantity(result.totalSpotExposure)), ''],
+        ['Futures Hedge', String(formatQuantity(result.totalFuturesHedge)), ''],
+        ['Net Exposure', String(formatQuantity(result.netExposure)), ''],
+        ['Basis Risk', '', String(formatCurrency(result.basisRisk))],
+      ],
+      [60, 40, 40]
+    );
+  }
+
+  if (include.monthly && result.byDeliveryMonth) {
+    addSubtitle('2. Monthly Breakdown');
+    const monthlyRows = Object.entries(result.byDeliveryMonth).map(([month, data]) => [
+      month,
+      String(data.spot),
+      String(data.futures),
+      String(data.net),
+    ]);
+    monthlyRows.push([
+      'Total',
+      String(Object.values(result.byDeliveryMonth).reduce((s, d) => s + d.spot, 0)),
+      String(Object.values(result.byDeliveryMonth).reduce((s, d) => s + d.futures, 0)),
+      String(Object.values(result.byDeliveryMonth).reduce((s, d) => s + d.net, 0)),
+    ]);
+    addTable(
+      ['Month', 'Spot (t)', 'Futures (t)', 'Net (t)'],
+      monthlyRows,
+      [30, 30, 30, 30]
+    );
+  }
+
+  if (include.lots && lots.length > 0) {
+    addSubtitle('3. Inventory Lots');
+    const lotRows = lots.slice(0, 50).map((lot) => [
+      lot.lotNo,
+      String(lot.quantity),
+      lot.warehouse,
+      lot.receiptDate,
+      lot.matchStatus === 'matched' ? 'Matched' : lot.matchStatus === 'mismatch' ? 'Mismatch' : 'Unmatched',
+    ]);
+    addTable(
+      ['Lot No.', 'Qty (t)', 'Warehouse', 'Date', 'Status'],
+      lotRows,
+      [30, 20, 35, 25, 20]
+    );
+    if (lots.length > 50) {
+      addLine(`... and ${lots.length - 50} more lots`);
+    }
+  }
+
+  if (include.positions && positions.length > 0) {
+    addSubtitle('4. Futures Positions');
+    const posRows = positions.slice(0, 50).map((pos) => [
+      pos.contractMonth,
+      pos.direction === 'short' ? 'Sell' : 'Buy',
+      String(pos.quantity),
+      String(pos.openPrice),
+      String(pos.currentPrice),
+      pos.openDate,
+    ]);
+    addTable(
+      ['Contract', 'Dir', 'Qty (t)', 'Open', 'Current', 'Date'],
+      posRows,
+      [22, 14, 18, 22, 22, 25]
+    );
+    if (positions.length > 50) {
+      addLine(`... and ${positions.length - 50} more positions`);
+    }
+  }
+
+  if (include.warnings && result.warnings.length > 0) {
+    addSubtitle('5. Risk Warnings');
+    result.warnings.forEach((w) => {
+      addPageIfNeeded(16);
+      const severity = w.severity === 'high' ? '[HIGH]' : w.severity === 'medium' ? '[MED]' : '[LOW]';
+      const typeText = getWarningTypeText(w.type);
+      addLine(`${severity} ${typeText}: ${w.title}`, 0);
+      addLine(`  ${w.description}`, 5);
+      addLine(`  Suggestion: ${w.suggestion}`, 5);
+    });
+  }
+
+  if (include.basis && basisRecords.length > 0) {
+    addSubtitle('6. Basis Records');
+    const basisRows = basisRecords.slice(0, 30).map((b) => [
+      b.basisDate,
+      String(b.spotPrice),
+      String(b.futuresPrice),
+      String(b.basisValue),
+      b.isLocked ? 'Yes' : 'No',
+    ]);
+    addTable(
+      ['Date', 'Spot', 'Futures', 'Basis', 'Locked'],
+      basisRows,
+      [30, 30, 30, 25, 20]
+    );
+  }
+
+  if (include.rollovers && rollovers.length > 0) {
+    addSubtitle('7. Rollover Records');
+    const rollRows = rollovers.map((r) => [
+      r.rolloverDate,
+      String(r.quantity),
+      String(r.closePrice),
+      String(r.openPrice),
+      String(r.rolloverCost),
+      r.isComplete ? 'Yes' : 'No',
+    ]);
+    addTable(
+      ['Date', 'Qty (t)', 'Close', 'Open', 'Cost', 'Done'],
+      rollRows,
+      [25, 20, 25, 25, 25, 15]
+    );
+  }
+
+  if (include.audit && auditLogs.length > 0) {
+    addSubtitle('8. Audit Log');
+    auditLogs.slice(0, 30).forEach((log) => {
+      addPageIfNeeded(14);
+      addLine(`[${new Date(log.timestamp).toLocaleString('zh-CN')}] ${getEntityTypeText(log.entityType)} - ${getFieldNameText(log.fieldName)}: ${JSON.stringify(log.oldValue)} -> ${JSON.stringify(log.newValue)} (${log.reason})`);
+    });
+    if (auditLogs.length > 30) {
+      addLine(`... and ${auditLogs.length - 30} more entries`);
+    }
+  }
+
+  doc.save(`${fileName}.pdf`);
 }

@@ -98,13 +98,9 @@ const Export: React.FC = () => {
       });
 
       const options: ExportOptions = {
-        format: values.format === 'pdf' ? 'xlsx' : values.format,
+        format: values.format,
         include: includeMap,
       };
-
-      if (values.format === 'pdf') {
-        message.info('PDF格式暂不支持，已自动转换为Excel格式导出');
-      }
 
       exportToFile(
         result,
@@ -117,7 +113,7 @@ const Export: React.FC = () => {
         options
       );
 
-      const formatName = values.format === 'xlsx' || values.format === 'pdf' ? 'Excel' : 'CSV';
+      const formatName = values.format === 'xlsx' ? 'Excel' : values.format === 'pdf' ? 'PDF' : 'CSV';
       message.success(`报告已成功导出为${formatName}文件`);
     } catch (error) {
       message.error(`导出失败: ${(error as Error).message}`);
