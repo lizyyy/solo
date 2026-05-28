@@ -1,0 +1,162 @@
+import type { VinylRecord } from '../types/game';
+
+export const vinylCatalog: VinylRecord[] = [
+  {
+    id: 'vinyl-001',
+    title: 'Kind of Blue',
+    artist: 'Miles Davis',
+    genre: 'Jazz',
+    purchasePrice: 25,
+    suggestedPrice: 45,
+    popularity: 85,
+    rarity: 'common',
+    description: '爵士乐史上最经典的专辑之一，每个收藏家的必备品。',
+    source: 'Blue Note Records 1959年原始录音版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=classic%20jazz%20vinyl%20record%20cover%20blue%20color&image_size=square'
+  },
+  {
+    id: 'vinyl-002',
+    title: 'Abbey Road',
+    artist: 'The Beatles',
+    genre: 'Rock',
+    purchasePrice: 35,
+    suggestedPrice: 65,
+    popularity: 95,
+    rarity: 'uncommon',
+    description: '披头士最后一张录音室专辑，包含多首经典曲目。',
+    source: 'Apple Records 1969年英国原版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beatles%20abbey%20road%20vinyl%20cover%20crosswalk&image_size=square'
+  },
+  {
+    id: 'vinyl-003',
+    title: 'The Dark Side of the Moon',
+    artist: 'Pink Floyd',
+    genre: 'Progressive Rock',
+    purchasePrice: 45,
+    suggestedPrice: 85,
+    popularity: 90,
+    rarity: 'rare',
+    description: '迷幻摇滚的巅峰之作，封面设计极具标志性。',
+    source: 'Harvest Records 1973年首发版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=pink%20floyd%20dark%20side%20moon%20prism%20vinyl&image_size=square'
+  },
+  {
+    id: 'vinyl-004',
+    title: 'Thriller',
+    artist: 'Michael Jackson',
+    genre: 'Pop',
+    purchasePrice: 40,
+    suggestedPrice: 75,
+    popularity: 98,
+    rarity: 'common',
+    description: '史上最畅销专辑，流行音乐的里程碑。',
+    source: 'Epic Records 1982年美国原版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=michael%20jackson%20thriller%20album%20cover%20vinyl&image_size=square'
+  },
+  {
+    id: 'vinyl-005',
+    title: 'Nevermind',
+    artist: 'Nirvana',
+    genre: 'Grunge',
+    purchasePrice: 38,
+    suggestedPrice: 70,
+    popularity: 88,
+    rarity: 'uncommon',
+    description: '改变90年代摇滚格局的另类摇滚经典。',
+    source: 'DGC Records 1991年首发版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=nirvana%20nevermind%20baby%20swimming%20vinyl&image_size=square'
+  },
+  {
+    id: 'vinyl-006',
+    title: 'Blue Train',
+    artist: 'John Coltrane',
+    genre: 'Jazz',
+    purchasePrice: 55,
+    suggestedPrice: 100,
+    popularity: 70,
+    rarity: 'rare',
+    description: '柯川最具代表性的硬波普专辑，爵士迷的收藏佳品。',
+    source: 'Blue Note Records 1958年 mono 版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=john%20coltrane%20blue%20train%20jazz%20vinyl&image_size=square'
+  },
+  {
+    id: 'vinyl-007',
+    title: 'Random Access Memories',
+    artist: 'Daft Punk',
+    genre: 'Electronic',
+    purchasePrice: 42,
+    suggestedPrice: 78,
+    popularity: 82,
+    rarity: 'uncommon',
+    description: '法国电子音乐组合的获奖专辑，复古未来主义风格。',
+    source: 'Columbia Records 2013年 180g 重制版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=daft%20punk%20random%20access%20memories%20helmet%20vinyl&image_size=square'
+  },
+  {
+    id: 'vinyl-008',
+    title: 'The Rise and Fall of Ziggy Stardust',
+    artist: 'David Bowie',
+    genre: 'Glam Rock',
+    purchasePrice: 48,
+    suggestedPrice: 88,
+    popularity: 75,
+    rarity: 'rare',
+    description: '鲍伊最具标志性的概念专辑，华丽摇滚的巅峰。',
+    source: 'RCA Records 1972年英国原版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=david%20bowie%20ziggy%20stardust%20glam%20rock%20vinyl&image_size=square'
+  },
+  {
+    id: 'vinyl-009',
+    title: 'Atrocity Exhibition',
+    artist: 'Joy Division',
+    genre: 'Post-Punk',
+    purchasePrice: 60,
+    suggestedPrice: 110,
+    popularity: 55,
+    rarity: 'legendary',
+    description: '后朋克运动的开创性专辑，极具收藏价值。',
+    source: 'Factory Records 1980年原始压制版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=joy%20division%20post%20punk%20dark%20album%20vinyl&image_size=square'
+  },
+  {
+    id: 'vinyl-010',
+    title: 'Super Ape',
+    artist: 'The Upsetters',
+    genre: 'Reggae',
+    purchasePrice: 32,
+    suggestedPrice: 58,
+    popularity: 60,
+    rarity: 'uncommon',
+    description: 'Lee "Scratch" Perry的Dub雷鬼经典之作。',
+    source: 'Island Records 1976年牙买加原版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=reggae%20dub%20ape%20album%20cover%20vinyl&image_size=square'
+  },
+  {
+    id: 'vinyl-011',
+    title: 'A Love Supreme',
+    artist: 'John Coltrane',
+    genre: 'Jazz',
+    purchasePrice: 65,
+    suggestedPrice: 120,
+    popularity: 72,
+    rarity: 'rare',
+    description: '爵士乐史上最具灵性的专辑之一。',
+    source: 'Impulse! Records 1965年 stereo 首发版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=john%20coltrane%20love%20supreme%20spiritual%20jazz%20vinyl&image_size=square'
+  },
+  {
+    id: 'vinyl-012',
+    title: 'The Velvet Underground & Nico',
+    artist: 'The Velvet Underground',
+    genre: 'Art Rock',
+    purchasePrice: 70,
+    suggestedPrice: 130,
+    popularity: 65,
+    rarity: 'legendary',
+    description: '安迪·沃霍尔设计封面，地下音乐的圣经。',
+    source: 'Verve Records 1967年未切香蕉封面版',
+    imageUrl: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=velvet%20underground%20banana%20andy%20warhol%20vinyl&image_size=square'
+  }
+];
+
+export const genres = ['Jazz', 'Rock', 'Progressive Rock', 'Pop', 'Grunge', 'Electronic', 'Glam Rock', 'Post-Punk', 'Reggae', 'Art Rock'];
