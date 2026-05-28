@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #F5F3EF;
+  color: #1B2A4A;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-steel-50 overflow-hidden;
+  }
+  .card-header {
+    @apply bg-steel-500 text-white px-4 py-3 font-serif font-semibold;
+  }
+  .card-body {
+    @apply p-4;
+  }
+  .btn-primary {
+    @apply bg-steel-500 text-white px-5 py-2.5 rounded-md font-medium hover:bg-steel-600 transition-colors;
+  }
+  .btn-amber {
+    @apply bg-amber text-white px-5 py-2.5 rounded-md font-medium hover:bg-amber-dark transition-colors;
+  }
+  .btn-jade {
+    @apply bg-jade text-white px-5 py-2.5 rounded-md font-medium hover:bg-jade-dark transition-colors;
+  }
+  .btn-outline {
+    @apply border border-steel-500 text-steel-500 px-5 py-2.5 rounded-md font-medium hover:bg-steel-50 transition-colors;
+  }
+  .amendment-old {
+    @apply line-through text-cool text-sm;
+  }
+  .amendment-new {
+    @apply text-jade font-medium;
+  }
+  .amendment-reason {
+    @apply text-cool text-xs italic ml-2;
+  }
+  .error-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+  }
+  .error-old-damage {
+    @apply error-badge bg-amber/10 text-amber-dark;
+  }
+  .error-price-limit {
+    @apply error-badge bg-red-100 text-red-700;
+  }
+  .error-exemption {
+    @apply error-badge bg-purple-100 text-purple-700;
+  }
+  .clue-card {
+    @apply card cursor-pointer transition-all duration-200 hover:shadow-md;
+  }
+  .clue-card-selected {
+    @apply ring-2 ring-amber shadow-md;
+  }
+  .clue-card-disabled {
+    @apply opacity-50 cursor-not-allowed hover:shadow-sm;
+  }
+  .section-title {
+    @apply font-serif text-xl font-bold text-steel-500 mb-3;
+  }
+}
