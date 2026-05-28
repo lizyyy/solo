@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Star, Lock, Download, Upload, Trophy, ScrollText, Gavel,
-  HardDrive, Cloud, AlertTriangle, CheckCircle, Info
+  HardDrive, CheckCircle, Info, Server
 } from 'lucide-react'
 import { useGameStore } from '@/store'
 import lots from '@/data/lots'
@@ -48,10 +48,11 @@ function DifficultyStars({ difficulty }: { difficulty: 1 | 2 | 3 }) {
 
 export default function Lobby() {
   const navigate = useNavigate()
-  const { activeProfileId, profiles, getLotProgress, exportAllData, importData } = useGameStore()
+  const { activeProfileId, profiles, getLotProgress, exportAllData, importData, serverSynced } = useGameStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [showStorageInfo, setShowStorageInfo] = useState(false)
   const [exportSuccess, setExportSuccess] = useState(false)
+  const [importing, setImporting] = useState(false)
 
   const activeProfile = profiles.find(p => p.profileId === activeProfileId)
   const hasActiveProfile = !!activeProfileId && !!activeProfile
@@ -60,18 +61,21 @@ export default function Lobby() {
   const completedCount = Object.values(activeProfile?.lotProgress || {})
     .filter(p => p.completedAt).length
 
-  const handleExport = () => {
-    const json = exportAllData()
-    const blob = new Blob([json], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `拍卖行估价闯关-备份-${new Date().toISOString().slice(0, 10)}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-
-    setExportSuccess(true)
-    setTimeout(() => setExportSuccess(false), 2000)
+  const handleExport = async () => {
+    try {
+      const json = await exportAllData()
+      const blob = new Blob([json], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `拍卖行估价闯关-备份-${new Date().toISOString().slice(0, 10)}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      setExportSuccess(true)
+      setTimeout(() => setExportSuccess(false), 2000)
+    } catch {
+      alert('导出失败，请检查服务是否正常运行')
+    }
   }
 
   const handleImport = () => {
@@ -82,13 +86,18 @@ export default function Lobby() {
     const file = e.target.files?.[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       const text = ev.target?.result as string
-      const success = importData(text)
-      if (!success) {
-        alert('导入失败，请检查文件格式是否正确')
-      } else {
-        alert('数据导入成功！')
+      setImporting(true)
+      try {
+        const success = await importData(text)
+        if (!success) {
+          alert('导入失败，请检查文件格式是否正确')
+        }
+      } catch {
+        alert('导入失败，请检查服务是否正常运行')
+      } finally {
+        setImporting(false)
       }
     }
     reader.readAsText(file)
@@ -113,13 +122,19 @@ export default function Lobby() {
               <span className="font-serif text-gold-light tracking-widest text-sm">AUCTION HOUSE</span>
             </div>
             <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                <Server className={`w-4 h-4 ${serverSynced ? 'text-jade' : 'text-gold/50'}`} />
+                <span className={`font-body text-xs ${serverSynced ? 'text-jade' : 'text-parchment-dark'}`}>
+                  {serverSynced ? '已同步' : '本地模式'}
+                </span>
+              </div>
               <button
                 onClick={() => setShowStorageInfo(!showStorageInfo)}
                 className="flex items-center gap-1.5 text-parchment-dark hover:text-gold transition-colors"
                 title="数据存储说明"
               >
                 <HardDrive className="w-4 h-4" />
-                <span className="font-body text-xs">数据存储</span>
+                <span className="font-body text-xs">存储说明</span>
               </button>
               <ProfileManager />
             </div>
@@ -134,23 +149,22 @@ export default function Lobby() {
                     <h4 className="font-serif text-ink font-semibold mb-2">数据存储说明</h4>
                     <div className="font-body text-sm text-ink/70 space-y-2">
                       <p>
+                        <Server className="w-4 h-4 inline mr-1.5 text-jade" />
+                        <strong>服务端持久化：</strong>您的所有进度数据自动保存在服务端文件中。
+                        刷新页面、关闭浏览器、重启服务、甚至更换浏览器后，
+                        数据仍然保留，无需手动操作。
+                      </p>
+                      <p>
                         <HardDrive className="w-4 h-4 inline mr-1.5 text-gold" />
-                        <strong>本地存储：</strong>您的所有进度数据（鉴定师档案、关卡进度、估价记录等）
-                        自动保存在浏览器的本地存储（localStorage）中。
-                        刷新页面、关闭浏览器、重启服务后，数据仍然保留。
+                        <strong>双重保障：</strong>同时保留浏览器本地缓存作为离线降级方案。
+                        当服务端不可用时，仍可使用本地数据继续操作，
+                        服务恢复后自动同步。
                       </p>
                       <p>
-                        <AlertTriangle className="w-4 h-4 inline mr-1.5 text-seal" />
-                        <strong>跨浏览器使用：</strong>由于浏览器安全限制，
-                        本地存储的数据无法在不同浏览器间自动共享。
-                        如需在其他浏览器或设备上继续，
-                        请使用下方「备份数据」和「恢复数据」功能。
-                      </p>
-                      <p>
-                        <Cloud className="w-4 h-4 inline mr-1.5 text-jade" />
-                        <strong>备份建议：</strong>完成重要进度后，
-                        建议定期导出备份文件保存。
-                        备份文件可在任何浏览器中导入恢复。
+                        <CheckCircle className="w-4 h-4 inline mr-1.5 text-jade" />
+                        <strong>跨浏览器自动恢复：</strong>在同一台机器上，
+                        无论使用 Chrome、Safari、Firefox 等任何浏览器访问，
+                        都能自动读取同一份保存数据。
                       </p>
                     </div>
                   </div>
@@ -312,7 +326,7 @@ export default function Lobby() {
             <div className="max-w-5xl mx-auto">
               <div className="flex items-center gap-3 mb-6">
                 <div className="h-px flex-1 bg-gradient-to-r from-gold/20 to-transparent" />
-                <h2 className="font-serif text-base text-gold/60 tracking-widest">数据备份与恢复</h2>
+                <h2 className="font-serif text-base text-gold/60 tracking-widest">数据管理</h2>
                 <div className="h-px flex-1 bg-gradient-to-l from-gold/20 to-transparent" />
               </div>
 
@@ -322,9 +336,9 @@ export default function Lobby() {
                     <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gold/10 flex items-center justify-center">
                       <Download className="w-6 h-6 text-gold" />
                     </div>
-                    <h3 className="font-serif text-ink font-semibold mb-2">备份数据</h3>
+                    <h3 className="font-serif text-ink font-semibold mb-2">导出备份</h3>
                     <p className="font-body text-sm text-ink/60 mb-4">
-                      将所有进度导出为备份文件，可在其他浏览器或设备上恢复
+                      导出完整数据备份文件，可用于迁移到其他设备
                     </p>
                     <button
                       onClick={handleExport}
@@ -348,13 +362,17 @@ export default function Lobby() {
                     <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-jade/10 flex items-center justify-center">
                       <Upload className="w-6 h-6 text-jade" />
                     </div>
-                    <h3 className="font-serif text-ink font-semibold mb-2">恢复数据</h3>
+                    <h3 className="font-serif text-ink font-semibold mb-2">导入恢复</h3>
                     <p className="font-body text-sm text-ink/60 mb-4">
                       从备份文件恢复之前保存的进度数据
                     </p>
-                    <button onClick={handleImport} className="btn-gold text-sm flex items-center gap-2 mx-auto">
+                    <button
+                      onClick={handleImport}
+                      disabled={importing}
+                      className="btn-gold text-sm flex items-center gap-2 mx-auto disabled:opacity-50"
+                    >
                       <Upload className="w-4 h-4" />
-                      导入备份文件
+                      {importing ? '导入中...' : '导入备份文件'}
                     </button>
                     <input
                       ref={fileInputRef}
@@ -367,7 +385,7 @@ export default function Lobby() {
                 </div>
                 <div className="mt-6 pt-4 border-t border-ink/10 text-center">
                   <p className="font-body text-xs text-ink/50">
-                    💡 提示：建议定期备份数据。备份文件包含所有鉴定师档案和关卡进度。
+                    数据已自动保存到服务端，跨浏览器访问时自动恢复。导出功能用于设备迁移。
                   </p>
                 </div>
               </div>

@@ -2,11 +2,14 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { PlayerProfile, LotProgress, AuctionResult, TrapResult, ExportReport } from '@/types'
 import lots from '@/data/lots'
+import { saveState, fetchState, exportFromServer, importToServer } from '@/lib/api'
 
 interface GameState {
   profiles: PlayerProfile[]
   activeProfileId: string | null
+  serverSynced: boolean
 
+  hydrateFromServer: () => Promise<void>
   getActiveProfile: () => PlayerProfile | null
   createProfile: (name: string) => string
   switchProfile: (profileId: string) => void
@@ -24,8 +27,8 @@ interface GameState {
   getLotScore: (lotId: string) => number
 
   exportReport: (lotId: string) => ExportReport | null
-  exportAllData: () => string
-  importData: (json: string) => boolean
+  exportAllData: () => Promise<string>
+  importData: (json: string) => Promise<boolean>
 }
 
 const createDefaultProgress = (lotId: string): LotProgress => ({
@@ -41,11 +44,29 @@ const createDefaultProgress = (lotId: string): LotProgress => ({
 
 const generateId = () => `profile-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 
+function syncToServer(profiles: PlayerProfile[], activeProfileId: string | null) {
+  saveState(profiles, activeProfileId).catch(() => {})
+}
+
 export const useGameStore = create<GameState>()(
   persist(
     (set, get) => ({
       profiles: [],
       activeProfileId: null,
+      serverSynced: false,
+
+      hydrateFromServer: async () => {
+        try {
+          const data = await fetchState()
+          set({
+            profiles: data.profiles || [],
+            activeProfileId: data.activeProfileId || null,
+            serverSynced: true,
+          })
+        } catch {
+          set({ serverSynced: false })
+        }
+      },
 
       getActiveProfile: () => {
         const { profiles, activeProfileId } = get()
@@ -63,22 +84,29 @@ export const useGameStore = create<GameState>()(
           createdAt: Date.now(),
           updatedAt: Date.now(),
         }
-        set(state => ({
-          profiles: [...state.profiles, profile],
-          activeProfileId: id,
-        }))
+        set(state => {
+          const newProfiles = [...state.profiles, profile]
+          syncToServer(newProfiles, id)
+          return { profiles: newProfiles, activeProfileId: id }
+        })
         return id
       },
 
       switchProfile: (profileId: string) => {
         set({ activeProfileId: profileId })
+        syncToServer(get().profiles, profileId)
       },
 
       deleteProfile: (profileId: string) => {
-        set(state => ({
-          profiles: state.profiles.filter(p => p.profileId !== profileId),
-          activeProfileId: state.activeProfileId === profileId ? null : state.activeProfileId,
-        }))
+        set(state => {
+          const newProfiles = state.profiles.filter(p => p.profileId !== profileId)
+          const newActiveId = state.activeProfileId === profileId ? null : state.activeProfileId
+          syncToServer(newProfiles, newActiveId)
+          return {
+            profiles: newProfiles,
+            activeProfileId: newActiveId,
+          }
+        })
       },
 
       markDocumentRead: (lotId: string, docId: string) => {
@@ -87,23 +115,23 @@ export const useGameStore = create<GameState>()(
           if (!profile) return state
           const progress = profile.lotProgress[lotId] || createDefaultProgress(lotId)
           if (progress.readDocuments.includes(docId)) return state
-          return {
-            profiles: state.profiles.map(p =>
-              p.profileId === state.activeProfileId
-                ? {
-                    ...p,
-                    updatedAt: Date.now(),
-                    lotProgress: {
-                      ...p.lotProgress,
-                      [lotId]: {
-                        ...progress,
-                        readDocuments: [...progress.readDocuments, docId],
-                      },
+          const newProfiles = state.profiles.map(p =>
+            p.profileId === state.activeProfileId
+              ? {
+                  ...p,
+                  updatedAt: Date.now(),
+                  lotProgress: {
+                    ...p.lotProgress,
+                    [lotId]: {
+                      ...progress,
+                      readDocuments: [...progress.readDocuments, docId],
                     },
-                  }
-                : p
-            ),
-          }
+                  },
+                }
+              : p
+          )
+          syncToServer(newProfiles, state.activeProfileId)
+          return { profiles: newProfiles }
         })
       },
 
@@ -113,23 +141,23 @@ export const useGameStore = create<GameState>()(
           if (!profile) return state
           const progress = profile.lotProgress[lotId] || createDefaultProgress(lotId)
           if (progress.collectedClues.includes(sectionId)) return state
-          return {
-            profiles: state.profiles.map(p =>
-              p.profileId === state.activeProfileId
-                ? {
-                    ...p,
-                    updatedAt: Date.now(),
-                    lotProgress: {
-                      ...p.lotProgress,
-                      [lotId]: {
-                        ...progress,
-                        collectedClues: [...progress.collectedClues, sectionId],
-                      },
+          const newProfiles = state.profiles.map(p =>
+            p.profileId === state.activeProfileId
+              ? {
+                  ...p,
+                  updatedAt: Date.now(),
+                  lotProgress: {
+                    ...p.lotProgress,
+                    [lotId]: {
+                      ...progress,
+                      collectedClues: [...progress.collectedClues, sectionId],
                     },
-                  }
-                : p
-            ),
-          }
+                  },
+                }
+              : p
+          )
+          syncToServer(newProfiles, state.activeProfileId)
+          return { profiles: newProfiles }
         })
       },
 
@@ -139,23 +167,23 @@ export const useGameStore = create<GameState>()(
           if (!profile) return state
           const progress = profile.lotProgress[lotId]
           if (!progress) return state
-          return {
-            profiles: state.profiles.map(p =>
-              p.profileId === state.activeProfileId
-                ? {
-                    ...p,
-                    updatedAt: Date.now(),
-                    lotProgress: {
-                      ...p.lotProgress,
-                      [lotId]: {
-                        ...progress,
-                        collectedClues: progress.collectedClues.filter(id => id !== sectionId),
-                      },
+          const newProfiles = state.profiles.map(p =>
+            p.profileId === state.activeProfileId
+              ? {
+                  ...p,
+                  updatedAt: Date.now(),
+                  lotProgress: {
+                    ...p.lotProgress,
+                    [lotId]: {
+                      ...progress,
+                      collectedClues: progress.collectedClues.filter(id => id !== sectionId),
                     },
-                  }
-                : p
-            ),
-          }
+                  },
+                }
+              : p
+          )
+          syncToServer(newProfiles, state.activeProfileId)
+          return { profiles: newProfiles }
         })
       },
 
@@ -164,23 +192,23 @@ export const useGameStore = create<GameState>()(
           const profile = state.profiles.find(p => p.profileId === state.activeProfileId)
           if (!profile) return state
           const progress = profile.lotProgress[lotId] || createDefaultProgress(lotId)
-          return {
-            profiles: state.profiles.map(p =>
-              p.profileId === state.activeProfileId
-                ? {
-                    ...p,
-                    updatedAt: Date.now(),
-                    lotProgress: {
-                      ...p.lotProgress,
-                      [lotId]: {
-                        ...progress,
-                        valuation: { low, high },
-                      },
+          const newProfiles = state.profiles.map(p =>
+            p.profileId === state.activeProfileId
+              ? {
+                  ...p,
+                  updatedAt: Date.now(),
+                  lotProgress: {
+                    ...p.lotProgress,
+                    [lotId]: {
+                      ...progress,
+                      valuation: { low, high },
                     },
-                  }
-                : p
-            ),
-          }
+                  },
+                }
+              : p
+          )
+          syncToServer(newProfiles, state.activeProfileId)
+          return { profiles: newProfiles }
         })
       },
 
@@ -189,23 +217,23 @@ export const useGameStore = create<GameState>()(
           const profile = state.profiles.find(p => p.profileId === state.activeProfileId)
           if (!profile) return state
           const progress = profile.lotProgress[lotId] || createDefaultProgress(lotId)
-          return {
-            profiles: state.profiles.map(p =>
-              p.profileId === state.activeProfileId
-                ? {
-                    ...p,
-                    updatedAt: Date.now(),
-                    lotProgress: {
-                      ...p.lotProgress,
-                      [lotId]: {
-                        ...progress,
-                        confidence,
-                      },
+          const newProfiles = state.profiles.map(p =>
+            p.profileId === state.activeProfileId
+              ? {
+                  ...p,
+                  updatedAt: Date.now(),
+                  lotProgress: {
+                    ...p.lotProgress,
+                    [lotId]: {
+                      ...progress,
+                      confidence,
                     },
-                  }
-                : p
-            ),
-          }
+                  },
+                }
+              : p
+          )
+          syncToServer(newProfiles, state.activeProfileId)
+          return { profiles: newProfiles }
         })
       },
 
@@ -264,8 +292,8 @@ export const useGameStore = create<GameState>()(
           trapResults,
         }
 
-        set(state => ({
-          profiles: state.profiles.map(p =>
+        set(state => {
+          const newProfiles = state.profiles.map(p =>
             p.profileId === state.activeProfileId
               ? {
                   ...p,
@@ -281,8 +309,10 @@ export const useGameStore = create<GameState>()(
                   totalScore: Object.values(p.lotProgress).reduce((sum, lp) => sum + (lp.score || 0), 0) + totalScore - (progress.score || 0),
                 }
               : p
-          ),
-        }))
+          )
+          syncToServer(newProfiles, state.activeProfileId)
+          return { profiles: newProfiles }
+        })
       },
 
       completeLot: (lotId: string) => {
@@ -291,23 +321,23 @@ export const useGameStore = create<GameState>()(
           if (!profile) return state
           const progress = profile.lotProgress[lotId]
           if (!progress) return state
-          return {
-            profiles: state.profiles.map(p =>
-              p.profileId === state.activeProfileId
-                ? {
-                    ...p,
-                    updatedAt: Date.now(),
-                    lotProgress: {
-                      ...p.lotProgress,
-                      [lotId]: {
-                        ...progress,
-                        completedAt: Date.now(),
-                      },
+          const newProfiles = state.profiles.map(p =>
+            p.profileId === state.activeProfileId
+              ? {
+                  ...p,
+                  updatedAt: Date.now(),
+                  lotProgress: {
+                    ...p.lotProgress,
+                    [lotId]: {
+                      ...progress,
+                      completedAt: Date.now(),
                     },
-                  }
-                : p
-            ),
-          }
+                  },
+                }
+              : p
+          )
+          syncToServer(newProfiles, state.activeProfileId)
+          return { profiles: newProfiles }
         })
       },
 
@@ -361,26 +391,39 @@ export const useGameStore = create<GameState>()(
         return report
       },
 
-      exportAllData: () => {
-        const state = get()
-        return JSON.stringify({
-          profiles: state.profiles,
-          activeProfileId: state.activeProfileId,
-          exportedAt: new Date().toISOString(),
-        }, null, 2)
+      exportAllData: async () => {
+        try {
+          return await exportFromServer()
+        } catch {
+          const state = get()
+          return JSON.stringify({
+            profiles: state.profiles,
+            activeProfileId: state.activeProfileId,
+            exportedAt: new Date().toISOString(),
+          }, null, 2)
+        }
       },
 
-      importData: (json: string) => {
+      importData: async (json: string) => {
         try {
-          const data = JSON.parse(json)
-          if (!data.profiles || !Array.isArray(data.profiles)) return false
-          set({
-            profiles: data.profiles,
-            activeProfileId: data.activeProfileId || null,
-          })
-          return true
+          const result = await importToServer(json)
+          if (result) {
+            await get().hydrateFromServer()
+          }
+          return result
         } catch {
-          return false
+          try {
+            const data = JSON.parse(json)
+            if (!data.profiles || !Array.isArray(data.profiles)) return false
+            set({
+              profiles: data.profiles,
+              activeProfileId: data.activeProfileId || null,
+            })
+            syncToServer(data.profiles, data.activeProfileId || null)
+            return true
+          } catch {
+            return false
+          }
         }
       },
     }),
