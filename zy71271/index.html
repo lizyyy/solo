@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天文光谱星系墙</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="logo">
+                <h1>🌌 天文光谱星系墙</h1>
+            </div>
+            
+            <div class="control-section">
+                <div class="section-title">数据导入</div>
+                <input type="file" id="fileInput" accept=".csv,.json" multiple>
+                <div class="file-list" id="fileList"></div>
+            </div>
+            
+            <div class="control-section">
+                <div class="section-title">批次切换</div>
+                <div class="batch-selector" id="batchSelector"></div>
+            </div>
+            
+            <div class="control-section">
+                <div class="section-title">红移筛选 (z)</div>
+                <div class="range-slider">
+                    <span>最小值: <input type="number" id="redshiftMin" step="0.001" value="0"></span>
+                    <span>最大值: <input type="number" id="redshiftMax" step="0.001" value="10"></span>
+                </div>
+                <input type="range" id="redshiftRange" min="0" max="10" step="0.001" value="10">
+                <div class="range-labels">
+                    <span>0</span>
+                    <span id="redshiftValue">10.000</span>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showMissingRedshift" checked>
+                    <label for="showMissingRedshift">显示红移缺失数据 (待复核)</label>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <div class="section-title">亮度筛选 (mag)</div>
+                <div class="range-slider">
+                    <span>最亮: <input type="number" id="brightnessMin" step="0.1" value="-30"></span>
+                    <span>最暗: <input type="number" id="brightnessMax" step="0.1" value="30"></span>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showExtremeBrightness" checked>
+                    <label for="showExtremeBrightness">显示极端亮度数据 (待复核)</label>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <div class="section-title">光谱类型</div>
+                <div id="spectrumFilters" class="spectrum-filters"></div>
+            </div>
+            
+            <div class="control-section">
+                <div class="section-title">显示选项</div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showLabels" checked>
+                    <label for="showLabels">显示星系标签</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="autoRotate">
+                    <label for="autoRotate">自动旋转</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="showGrid" checked>
+                    <label for="showGrid">显示坐标网格</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="highlightPending" checked>
+                    <label for="highlightPending">突出显示待复核数据</label>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <div class="section-title">导出功能</div>
+                <button id="exportScreenshot" class="action-btn">📸 截图导出</button>
+                <button id="exportFiltered" class="action-btn">📊 导出筛选数据</button>
+            </div>
+            
+            <div class="status-bar">
+                <div>总星系: <span id="totalCount">0</span></div>
+                <div>显示中: <span id="visibleCount">0</span></div>
+                <div>待复核: <span id="pendingCount" class="pending">0</span></div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div id="canvas-container" class="canvas-container"></div>
+            <div id="tooltip" class="tooltip"></div>
+            <div class="legend">
+                <div class="legend-title">光谱类型图例</div>
+                <div id="legendItems" class="legend-items"></div>
+                <div class="legend-note">
+                    <span class="pending-dot"></span> 待复核数据
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="app.js"></script>
+</body>
+</html>
