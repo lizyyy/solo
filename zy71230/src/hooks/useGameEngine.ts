@@ -30,6 +30,7 @@ export function useGameEngine() {
     stops,
     merchItems,
     currentStopIndex,
+    currentStopPhase,
     cashFlow,
     totalRevenue,
     totalExpense,
@@ -44,10 +45,13 @@ export function useGameEngine() {
     processStop,
     recordDecision,
     recordRiskEvent,
+    resolveRisk,
+    dismissRisk,
     updateCashFlow,
     updateMerchStock,
     updateRiskIndex,
     setCurrentStopIndex,
+    setCurrentStopPhase,
     goToPhase,
     resetGame,
   } = useGameStore();
@@ -62,17 +66,20 @@ export function useGameEngine() {
 
   const projectedExpenses = useMemo(() => {
     return remainingStops.map(
-      (stop) => stop.venueRent + stop.transportCost
+      (stop) => Number(stop.venueRent || 0) + Number(stop.transportCost || 0)
     );
   }, [remainingStops]);
 
-  const checkRisks = useCallback(
-    (stop: Stop, actualAttendance: number): RiskEvent[] => {
+  const checkPreShowRisks = useCallback(
+    (stop: Stop): RiskEvent[] => {
       const detectedRisks: RiskEvent[] = [];
+
+      const predictedRatio = 0.65 + Math.random() * 0.3;
+      const estimatedAttendance = Math.round(stop.predictedAttendance * predictedRatio);
 
       const boxOfficeRisk = calculateBoxOfficeRisk(
         stop.predictedAttendance,
-        actualAttendance
+        estimatedAttendance
       );
       if (boxOfficeRisk !== 'low') {
         detectedRisks.push({
@@ -82,8 +89,8 @@ export function useGameEngine() {
           type: 'box_office',
           severity: boxOfficeRisk === 'high' ? 'critical' : 'warning',
           level: boxOfficeRisk,
-          description: `票房预测过高：预测${stop.predictedAttendance}人，实际${actualAttendance}人，完成率${Math.round((actualAttendance / stop.predictedAttendance) * 100)}%`,
-          impact: Math.round((stop.predictedAttendance - actualAttendance) * stop.ticketPrice * (1 - (stop.venueSplit || 0))),
+          description: `票房预测偏高风险：预测${stop.predictedAttendance}人，预估实际约${estimatedAttendance}人，完成率可能仅${Math.round((estimatedAttendance / stop.predictedAttendance) * 100)}%，建议调整票价或加大宣传`,
+          impact: Math.round((stop.predictedAttendance - estimatedAttendance) * stop.ticketPrice * (1 - (stop.venueSplit || 0))),
           triggeredAt: new Date().toISOString(),
         });
       }
@@ -104,7 +111,7 @@ export function useGameEngine() {
             type: 'inventory',
             severity: inventoryRisk === 'high' ? 'critical' : 'warning',
             level: inventoryRisk,
-            description: `库存压货风险：${item.name} 当前库存${item.currentStock}件，按当前销售速度需要${Math.round(item.currentStock / Math.max(1, salesRate))}天售完，剩余巡演仅${remainingDays}天`,
+            description: `库存压货风险：${item.name} 当前库存${item.currentStock}件，按当前销售速度需要${Math.round(item.currentStock / Math.max(1, salesRate))}天售完，剩余巡演仅${remainingDays}天，可能造成库存积压`,
             impact: Math.round(item.currentStock * item.costPrice * 0.3),
             triggeredAt: new Date().toISOString(),
           });
@@ -122,7 +129,7 @@ export function useGameEngine() {
             type: 'route',
             severity: routeRisk === 'high' ? 'critical' : 'warning',
             level: routeRisk,
-            description: `路线绕远：本站距上一站${stop.distanceFromPrev}km，超出最优路线${Math.round(((stop.distanceFromPrev / optimalDistance) - 1) * 100)}%`,
+            description: `路线绕远风险：本站距上一站${stop.distanceFromPrev}km，超出最优路线${Math.round(((stop.distanceFromPrev / optimalDistance) - 1) * 100)}%，交通成本和时间成本将增加`,
             impact: Math.round((stop.distanceFromPrev - optimalDistance) * 2.5),
             triggeredAt: new Date().toISOString(),
           });
@@ -139,7 +146,7 @@ export function useGameEngine() {
           type: 'cashflow',
           severity: cashFlowRisk === 'high' ? 'critical' : 'warning',
           level: cashFlowRisk,
-          description: `现金流紧张：当前余额${cashFlow}元，未来3站预计支出${next3Expenses}元`,
+          description: `现金流紧张风险：当前余额¥${cashFlow.toLocaleString()}，未来3站预计支出¥${next3Expenses.toLocaleString()}，资金可能不足以支撑后续巡演`,
           impact: next3Expenses - cashFlow,
           triggeredAt: new Date().toISOString(),
         });
@@ -149,6 +156,17 @@ export function useGameEngine() {
     },
     [merchItems, currentStopIndex, stops.length, cashFlow, projectedExpenses, dailySalesRate]
   );
+
+  const currentStopRisks = useMemo(() => {
+    if (!currentStop) return [];
+    return riskEvents.filter(
+      (r) => r.stopId === currentStop.id && !r.resolvedAt && !r.dismissed
+    );
+  }, [riskEvents, currentStop]);
+
+  const hasUnresolvedRisks = useMemo(() => {
+    return currentStopRisks.length > 0;
+  }, [currentStopRisks]);
 
   const calculateStopResult = useCallback(
     (stop: Stop, actualAttendance: number): StopResult => {
@@ -189,8 +207,6 @@ export function useGameEngine() {
       const totalExpense = venueExpense + transportExpense + merchCost + otherExpenses;
       const netProfit = totalRevenue - totalExpense;
 
-      const risks = checkRisks(stop, actualAttendance);
-
       return {
         stopId: stop.id,
         ticketRevenue,
@@ -204,10 +220,10 @@ export function useGameEngine() {
         netProfit,
         actualAttendance,
         merchSales,
-        risks,
+        risks: [],
       };
     },
-    [merchItems, checkRisks]
+    [merchItems]
   );
 
   const simulateAttendance = useCallback(
@@ -216,6 +232,33 @@ export function useGameEngine() {
       const riskFactor = 1 - riskModifier * 0.3;
       const actual = Math.round(stop.predictedAttendance * baseVariation * riskFactor);
       return Math.max(0, actual);
+    },
+    []
+  );
+
+  const detectPostShowRisks = useCallback(
+    (stop: Stop, actualAttendance: number): RiskEvent[] => {
+      const detectedRisks: RiskEvent[] = [];
+
+      const boxOfficeRisk = calculateBoxOfficeRisk(
+        stop.predictedAttendance,
+        actualAttendance
+      );
+      if (boxOfficeRisk !== 'low') {
+        detectedRisks.push({
+          id: generateId(),
+          tourId: stop.tourId,
+          stopId: stop.id,
+          type: 'box_office',
+          severity: boxOfficeRisk === 'high' ? 'critical' : 'warning',
+          level: boxOfficeRisk,
+          description: `票房预测过高：预测${stop.predictedAttendance}人，实际${actualAttendance}人，完成率${Math.round((actualAttendance / stop.predictedAttendance) * 100)}%`,
+          impact: Math.round((stop.predictedAttendance - actualAttendance) * stop.ticketPrice * (1 - (stop.venueSplit || 0))),
+          triggeredAt: new Date().toISOString(),
+        });
+      }
+
+      return detectedRisks;
     },
     []
   );
@@ -231,11 +274,14 @@ export function useGameEngine() {
         updateMerchStock(sale.merchItemId, -sale.quantity);
       });
 
-      result.risks.forEach((risk) => {
+      const postRisks = detectPostShowRisks(currentStop, attendance);
+      postRisks.forEach((risk) => {
         recordRiskEvent(risk);
       });
 
-      const riskValues = result.risks.map((r) => ({
+      result.risks = postRisks;
+
+      const riskValues = postRisks.map((r) => ({
         type: r.type,
         level: r.level,
       }));
@@ -244,6 +290,32 @@ export function useGameEngine() {
         ...riskValues,
       ]);
       updateRiskIndex(newRiskIndex - riskIndex);
+
+      const dismissedRisks = riskEvents.filter(
+        (r) => r.stopId === currentStop.id && r.dismissed
+      );
+      if (dismissedRisks.length > 0) {
+        recordDecision({
+          tourId: currentStop.tourId,
+          stopId: currentStop.id,
+          decisionType: 'risk_mitigation',
+          description: `本站共忽略${dismissedRisks.length}个风险预警，已自动扣除惩罚成本`,
+          chosenOption: {
+            id: 'dismiss',
+            name: '忽略风险',
+            description: '未处置的风险自动造成损失',
+            riskLevel: 'aggressive',
+            immediateImpact: { cashFlow: 0, riskIndex: 0 },
+            projectedOutcome: { bestCase: 0, expectedCase: 0, worstCase: 0 },
+          },
+          alternatives: [],
+          outcome: {
+            actualImpact: dismissedRisks.reduce((sum, r) => sum + (r.dismissedImpact?.cashFlow || 0), 0),
+            riskChange: dismissedRisks.length * 5,
+            notes: `忽略了${dismissedRisks.length}个风险预警`,
+          },
+        });
+      }
 
       processStop(currentStop.id, result);
 
@@ -254,8 +326,10 @@ export function useGameEngine() {
       isGameOver,
       simulateAttendance,
       calculateStopResult,
+      detectPostShowRisks,
       processStop,
       recordRiskEvent,
+      recordDecision,
       updateMerchStock,
       updateRiskIndex,
       riskIndex,
@@ -298,6 +372,7 @@ export function useGameEngine() {
       recordDecision(decision);
       updateCashFlow(option.immediateImpact.cashFlow);
       updateRiskIndex(option.immediateImpact.riskIndex);
+      resolveRisk(riskEvent.id, option.id);
 
       if (option.riskLevel === 'conservative' && riskEvent.type === 'inventory') {
         const overstockedItem = merchItems.find(
@@ -320,7 +395,44 @@ export function useGameEngine() {
         }
       }
     },
-    [getDisposalOptions, recordDecision, updateCashFlow, updateRiskIndex, merchItems]
+    [getDisposalOptions, recordDecision, updateCashFlow, updateRiskIndex, resolveRisk, merchItems]
+  );
+
+  const dismissRiskEvent = useCallback(
+    (riskEvent: RiskEvent) => {
+      const penaltyMultiplier = riskEvent.level === 'high' ? 1.0 : riskEvent.level === 'medium' ? 0.6 : 0.3;
+      const penaltyCashFlow = -Math.round(riskEvent.impact * penaltyMultiplier);
+      const penaltyDescription = `忽略${riskEvent.type === 'box_office' ? '票房' : riskEvent.type === 'inventory' ? '库存' : riskEvent.type === 'route' ? '路线' : '现金流'}风险：${riskEvent.description.substring(0, 30)}...，自动扣除预估影响的${Math.round(penaltyMultiplier * 100)}%`;
+
+      dismissRisk(riskEvent.id, {
+        cashFlow: penaltyCashFlow,
+        description: penaltyDescription,
+      });
+
+      recordDecision({
+        tourId: riskEvent.tourId,
+        stopId: riskEvent.stopId,
+        decisionType: 'risk_mitigation',
+        description: `忽略风险：${riskEvent.description}`,
+        chosenOption: {
+          id: 'dismiss',
+          name: '忽略风险',
+          description: penaltyDescription,
+          riskLevel: 'aggressive',
+          immediateImpact: { cashFlow: penaltyCashFlow, riskIndex: 10 },
+          projectedOutcome: { bestCase: 0, expectedCase: penaltyCashFlow, worstCase: penaltyCashFlow * 2 },
+        },
+        alternatives: [],
+        outcome: {
+          actualImpact: penaltyCashFlow,
+          riskChange: 10,
+          notes: penaltyDescription,
+        },
+      });
+
+      updateRiskIndex(10);
+    },
+    [dismissRisk, recordDecision, updateRiskIndex]
   );
 
   const initializeTour = useCallback(
@@ -414,13 +526,13 @@ export function useGameEngine() {
   }, [stops, stopResults, riskEvents, decisions]);
 
   return {
-    // State
     currentTour,
     currentStop,
     remainingStops,
     stops,
     merchItems,
     currentStopIndex,
+    currentStopPhase,
     cashFlow,
     totalRevenue,
     totalExpense,
@@ -430,15 +542,18 @@ export function useGameEngine() {
     stopResults,
     isGameOver,
     gameOverReason,
+    currentStopRisks,
+    hasUnresolvedRisks,
 
-    // Actions
     initializeTour,
     processCurrentStop,
-    checkRisks,
+    checkPreShowRisks,
     getDisposalOptions,
     applyDisposalOption,
+    dismissRiskEvent,
     goToStop,
     goToPhase,
+    setCurrentStopPhase,
     resetGame,
     getGameStats,
     calculateStopResult,

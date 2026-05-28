@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { GameState, GameActions } from '../types/game';
+import type { GameState, GameActions, StopPhase } from '../types/game';
 import type { Tour, Stop, MerchItem, DecisionLog, RiskEvent, StopResult, GamePhase } from '../types/tour';
 
 const initialState: GameState = {
@@ -8,6 +8,7 @@ const initialState: GameState = {
   stops: [],
   merchItems: [],
   currentStopIndex: 0,
+  currentStopPhase: 'risk_check',
   gamePhase: 'setup',
   cashFlow: 0,
   totalRevenue: 0,
@@ -37,6 +38,7 @@ export const useGameStore = create<GameState & GameActions>()(
           stops: stops.map((s, i) => ({ ...s, status: i === 0 ? 'current' : 'pending' })),
           merchItems,
           currentStopIndex: 0,
+          currentStopPhase: 'risk_check',
           gamePhase: 'playing',
           cashFlow: tour.initialBudget,
           totalRevenue: 0,
@@ -71,6 +73,7 @@ export const useGameStore = create<GameState & GameActions>()(
           return {
             stops: newStops,
             currentStopIndex: nextIndex,
+            currentStopPhase: nextIndex >= newStops.length ? 'settled' : 'risk_check',
             cashFlow: newCashFlow,
             totalRevenue: state.totalRevenue + results.totalRevenue,
             totalExpense: state.totalExpense + results.totalExpense,
@@ -108,6 +111,33 @@ export const useGameStore = create<GameState & GameActions>()(
         }));
       },
 
+      resolveRisk: (riskId: string, optionId?: string) => {
+        set((state) => ({
+          riskEvents: state.riskEvents.map((r) =>
+            r.id === riskId
+              ? { ...r, resolvedAt: new Date().toISOString(), chosenOptionId: optionId }
+              : r
+          ),
+        }));
+      },
+
+      dismissRisk: (riskId: string, impact: { cashFlow: number; description: string }) => {
+        set((state) => ({
+          riskEvents: state.riskEvents.map((r) =>
+            r.id === riskId
+              ? {
+                  ...r,
+                  dismissed: true,
+                  resolvedAt: new Date().toISOString(),
+                  dismissedImpact: impact,
+                }
+              : r
+          ),
+          cashFlow: state.cashFlow + impact.cashFlow,
+          totalExpense: impact.cashFlow < 0 ? state.totalExpense + Math.abs(impact.cashFlow) : state.totalExpense,
+        }));
+      },
+
       updateCashFlow: (amount: number) => {
         set((state) => {
           const newCashFlow = state.cashFlow + amount;
@@ -141,11 +171,16 @@ export const useGameStore = create<GameState & GameActions>()(
       setCurrentStopIndex: (index: number) => {
         set((state) => ({
           currentStopIndex: index,
+          currentStopPhase: 'risk_check' as StopPhase,
           stops: state.stops.map((stop, i) => ({
             ...stop,
             status: i === index ? 'current' : i < index ? 'completed' : 'pending',
           })),
         }));
+      },
+
+      setCurrentStopPhase: (phase: StopPhase) => {
+        set({ currentStopPhase: phase });
       },
 
       goToPhase: (phase: GamePhase) => {
@@ -179,6 +214,7 @@ export const useGameStore = create<GameState & GameActions>()(
         stops: state.stops,
         merchItems: state.merchItems,
         currentStopIndex: state.currentStopIndex,
+        currentStopPhase: state.currentStopPhase,
         gamePhase: state.gamePhase,
         cashFlow: state.cashFlow,
         totalRevenue: state.totalRevenue,

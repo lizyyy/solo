@@ -370,6 +370,12 @@ function calculateRiskAnalysis(riskEvents: RiskEvent[], stops: Stop[]): RiskAnal
   });
 
   const unresolvedRisks = riskEvents.filter((r) => !r.resolvedAt);
+  const dismissedRisks = riskEvents.filter((r) => r.dismissed);
+  const resolvedRisks = riskEvents.filter((r) => r.resolvedAt && !r.dismissed);
+  const totalDismissedImpact = dismissedRisks.reduce(
+    (sum, r) => sum + (r.dismissedImpact?.cashFlow || 0),
+    0
+  );
 
   return {
     totalRisks,
@@ -378,6 +384,9 @@ function calculateRiskAnalysis(riskEvents: RiskEvent[], stops: Stop[]): RiskAnal
     highRiskEvents,
     riskTimeline,
     unresolvedRisks,
+    dismissedRisks,
+    resolvedRisks,
+    totalDismissedImpact,
   };
 }
 
@@ -500,6 +509,24 @@ function generateRecommendations(
       ],
       expectedImpact: '降低风险事件发生频率和影响程度',
       relatedRiskEventId: riskAnalysis.highRiskEvents[0]?.id,
+    });
+  }
+
+  if ('dismissedRisks' in riskAnalysis && riskAnalysis.dismissedRisks.length > 0) {
+    const totalImpact = 'totalDismissedImpact' in riskAnalysis ? riskAnalysis.totalDismissedImpact : 0;
+    const ratio = riskAnalysis.totalRisks > 0 ? (riskAnalysis.dismissedRisks.length / riskAnalysis.totalRisks) * 100 : 0;
+    recommendations.push({
+      id: `rec-${idCounter++}`,
+      category: 'risk_management',
+      priority: 'high',
+      title: '重视风险预警',
+      description: `本次巡演共忽略 ${riskAnalysis.dismissedRisks.length} 起风险预警（占比 ${ratio.toFixed(0)}%），造成额外损失 ¥${Math.abs(totalImpact).toLocaleString()}`,
+      actionableSteps: [
+        '每站开演前认真审查风险预警，避免因忽略风险造成不必要损失',
+        '根据风险严重程度调整处置策略，严重风险优先处置',
+        '建立风险处置流程，确保所有风险事件都有跟踪和反馈',
+      ],
+      expectedImpact: `预计可避免 ¥${Math.abs(totalImpact).toLocaleString()} 以上的风险损失`,
     });
   }
 

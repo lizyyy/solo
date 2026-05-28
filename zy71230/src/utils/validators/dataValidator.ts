@@ -632,20 +632,22 @@ export function cleanStopsData(
       cleanStop.transportCost = defaultCost;
     } else {
       const num = toNumber(stop.transportCost);
-      if (num !== null && needsCleaning(stop.transportCost)) {
-        logs.push({
-          id: generateId(),
-          priority: 2,
-          type: 'format_error',
-          severity: 'warning',
-          field: 'transport_cost',
-          rowIndex: index,
-          originalValue: String(stop.transportCost),
-          cleanedValue: String(num),
-          message: `第 ${index + 1} 行：交通费用从 "${stop.transportCost}" 清理为 ${num}`,
-          requiresUserAction: false,
-          resolved: true,
-        });
+      if (num !== null) {
+        if (needsCleaning(stop.transportCost)) {
+          logs.push({
+            id: generateId(),
+            priority: 2,
+            type: 'format_error',
+            severity: 'warning',
+            field: 'transport_cost',
+            rowIndex: index,
+            originalValue: String(stop.transportCost),
+            cleanedValue: String(num),
+            message: `第 ${index + 1} 行：交通费用从 "${stop.transportCost}" 清理为 ${num}`,
+            requiresUserAction: false,
+            resolved: true,
+          });
+        }
         cleanStop.transportCost = num;
       }
     }
@@ -674,20 +676,22 @@ export function cleanStopsData(
     numericFields.forEach((field) => {
       if (stop[field] !== undefined && stop[field] !== null) {
         const num = toNumber(stop[field]);
-        if (num !== null && needsCleaning(stop[field])) {
-          logs.push({
-            id: generateId(),
-            priority: 2,
-            type: 'format_error',
-            severity: 'warning',
-            field,
-            rowIndex: index,
-            originalValue: String(stop[field]),
-            cleanedValue: String(num),
-            message: `第 ${index + 1} 行：${field} 从 "${stop[field]}" 清理为 ${num}`,
-            requiresUserAction: false,
-            resolved: true,
-          });
+        if (num !== null) {
+          if (needsCleaning(stop[field])) {
+            logs.push({
+              id: generateId(),
+              priority: 2,
+              type: 'format_error',
+              severity: 'warning',
+              field,
+              rowIndex: index,
+              originalValue: String(stop[field]),
+              cleanedValue: String(num),
+              message: `第 ${index + 1} 行：${field} 从 "${stop[field]}" 清理为 ${num}`,
+              requiresUserAction: false,
+              resolved: true,
+            });
+          }
           (cleanStop as Record<string, unknown>)[field] = num;
         }
       }
@@ -739,20 +743,22 @@ export function cleanMerchData(
     numericFields.forEach((field) => {
       if (item[field] !== undefined && item[field] !== null) {
         const num = toNumber(item[field]);
-        if (num !== null && needsCleaning(item[field])) {
-          logs.push({
-            id: generateId(),
-            priority: 2,
-            type: 'format_error',
-            severity: 'warning',
-            field,
-            rowIndex: index,
-            originalValue: String(item[field]),
-            cleanedValue: String(num),
-            message: `第 ${index + 1} 行：${field} 从 "${item[field]}" 清理为 ${num}`,
-            requiresUserAction: false,
-            resolved: true,
-          });
+        if (num !== null) {
+          if (needsCleaning(item[field])) {
+            logs.push({
+              id: generateId(),
+              priority: 2,
+              type: 'format_error',
+              severity: 'warning',
+              field,
+              rowIndex: index,
+              originalValue: String(item[field]),
+              cleanedValue: String(num),
+              message: `第 ${index + 1} 行：${field} 从 "${item[field]}" 清理为 ${num}`,
+              requiresUserAction: false,
+              resolved: true,
+            });
+          }
           (cleanItem as Record<string, unknown>)[field] = num;
         }
       }

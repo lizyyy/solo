@@ -1,10 +1,13 @@
 import type { Tour, Stop, MerchItem, DecisionLog, RiskEvent, StopResult, GamePhase } from './tour';
 
+export type StopPhase = 'risk_check' | 'show' | 'settled';
+
 export interface GameState {
   currentTour: Tour | null;
   stops: Stop[];
   merchItems: MerchItem[];
   currentStopIndex: number;
+  currentStopPhase: StopPhase;
   gamePhase: GamePhase;
   cashFlow: number;
   totalRevenue: number;
@@ -24,10 +27,13 @@ export interface GameActions {
   processStop: (stopId: string, results: StopResult) => void;
   recordDecision: (decision: Omit<DecisionLog, 'id' | 'createdAt'>) => void;
   recordRiskEvent: (event: Omit<RiskEvent, 'id' | 'triggeredAt'>) => void;
+  resolveRisk: (riskId: string, optionId?: string) => void;
+  dismissRisk: (riskId: string, impact: { cashFlow: number; description: string }) => void;
   updateCashFlow: (amount: number) => void;
   updateMerchStock: (merchItemId: string, quantityChange: number) => void;
   updateRiskIndex: (delta: number) => void;
   setCurrentStopIndex: (index: number) => void;
+  setCurrentStopPhase: (phase: StopPhase) => void;
   goToPhase: (phase: GamePhase) => void;
   setPaused: (paused: boolean) => void;
   endGame: (reason?: string) => void;

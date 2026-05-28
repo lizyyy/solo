@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Calendar, DollarSign, Users, Music, AlertCircle } from 'lucide-react';
+import { MapPin, Calendar, DollarSign, Users, Music, AlertCircle, Shield, X } from 'lucide-react';
 import { useGameEngine } from '../hooks/useGameEngine';
+import { useGameStore } from '../store/useGameStore';
 import { NeonButton, NeonCard, GaugeMeter, RiskBadge } from '../components/ui';
 import { RiskEventCard, TourMap, CashFlowPanel, InventoryPanel } from '../components/game';
 import type { DisposalOption, RiskEvent } from '../types/tour';
@@ -15,6 +16,7 @@ export default function Game() {
     stops,
     merchItems,
     currentStopIndex,
+    currentStopPhase,
     cashFlow,
     totalRevenue,
     totalExpense,
@@ -23,13 +25,17 @@ export default function Game() {
     decisions,
     isGameOver,
     processCurrentStop,
+    checkPreShowRisks,
     applyDisposalOption,
+    dismissRiskEvent,
     getDisposalOptions,
     goToPhase,
+    setCurrentStopPhase,
   } = useGameEngine();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeRiskEvent, setActiveRiskEvent] = useState<RiskEvent | null>(null);
+  const [riskCheckDone, setRiskCheckDone] = useState(false);
 
   useEffect(() => {
     if (isGameOver) {
@@ -44,10 +50,47 @@ export default function Game() {
     }
   }, [currentTour, navigate]);
 
+  useEffect(() => {
+    if (!currentStop || currentStopPhase !== 'risk_check' || riskCheckDone) return;
+
+    const existingRisks = riskEvents.filter(
+      (r) => r.stopId === currentStop.id && !r.resolvedAt && !r.dismissed
+    );
+    if (existingRisks.length > 0) {
+      setRiskCheckDone(true);
+      return;
+    }
+
+    const detectedRisks = checkPreShowRisks(currentStop);
+    if (detectedRisks.length > 0) {
+      const store = useGameStore.getState();
+      detectedRisks.forEach((risk) => {
+        const alreadyExists = store.riskEvents.some(
+          (r) => r.stopId === risk.stopId && r.type === risk.type && r.description === risk.description
+        );
+        if (!alreadyExists) {
+          store.recordRiskEvent(risk);
+        }
+      });
+    }
+    setRiskCheckDone(true);
+  }, [currentStop, currentStopPhase, riskCheckDone, checkPreShowRisks, riskEvents]);
+
+  useEffect(() => {
+    setRiskCheckDone(false);
+  }, [currentStopIndex]);
+
   const unresolvedRisks = useMemo(() => {
     if (!currentStop) return [];
     return riskEvents.filter(
-      (r) => r.stopId === currentStop.id && !r.resolvedAt
+      (r) => r.stopId === currentStop.id && !r.resolvedAt && !r.dismissed
+    );
+  }, [riskEvents, currentStop]);
+
+  const resolvedRisks = useMemo(() => {
+    if (!currentStop) return [];
+    return riskEvents.filter(
+      (r) => r.stopId === currentStop.id && !!r.resolvedAt
     );
   }, [riskEvents, currentStop]);
 
@@ -61,11 +104,16 @@ export default function Game() {
     return getDisposalOptions(activeRiskEvent.type, activeRiskEvent.level);
   }, [activeRiskEvent, getDisposalOptions]);
 
+  const canStartShow = useMemo(() => {
+    return unresolvedRisks.length === 0 && currentStopPhase === 'risk_check' && riskCheckDone;
+  }, [unresolvedRisks, currentStopPhase, riskCheckDone]);
+
   const handleStartShow = async () => {
-    if (!currentStop || unresolvedRisks.length > 0) return;
+    if (!currentStop || !canStartShow) return;
 
     setIsProcessing(true);
     try {
+      setCurrentStopPhase('show');
       const result = processCurrentStop();
       if (result) {
         goToPhase('settlement');
@@ -79,6 +127,11 @@ export default function Game() {
   const handleRiskOptionSelect = (option: DisposalOption) => {
     if (!activeRiskEvent) return;
     applyDisposalOption(activeRiskEvent, option);
+    setActiveRiskEvent(null);
+  };
+
+  const handleRiskDismiss = (risk: RiskEvent) => {
+    dismissRiskEvent(risk);
     setActiveRiskEvent(null);
   };
 
@@ -226,6 +279,16 @@ export default function Game() {
                     }
                     size="sm"
                   />
+                  {unresolvedRisks.length > 0 && (
+                    <span className="text-xs px-2 py-1 bg-danger-red/20 text-danger-red rounded-full animate-pulse">
+                      风险检查中
+                    </span>
+                  )}
+                  {resolvedRisks.length > 0 && unresolvedRisks.length === 0 && riskCheckDone && (
+                    <span className="text-xs px-2 py-1 bg-success-green/20 text-success-green rounded-full">
+                      风险已处置
+                    </span>
+                  )}
                 </div>
                 <p className="text-rock-light mb-3">{currentStop.venue}</p>
                 <div className="flex flex-wrap items-center gap-6 text-sm">
@@ -282,10 +345,12 @@ export default function Game() {
                 variant="primary"
                 size="lg"
                 onClick={handleStartShow}
-                disabled={unresolvedRisks.length > 0 || isProcessing}
+                disabled={!canStartShow || isProcessing}
                 loading={isProcessing}
               >
-                {unresolvedRisks.length > 0
+                {!riskCheckDone
+                  ? '风险检查中...'
+                  : unresolvedRisks.length > 0
                   ? '请先处理风险事件'
                   : isProcessing
                   ? '演出进行中...'
@@ -304,15 +369,21 @@ export default function Game() {
             exit={{ opacity: 0, y: -20 }}
             className="mt-6"
           >
-            <NeonCard borderColor="danger-red" title="待处理风险事件">
+            <NeonCard borderColor="danger-red">
+              <div className="flex items-center gap-3 mb-4">
+                <AlertCircle className="w-6 h-6 text-danger-red" />
+                <h3 className="text-lg font-rock text-white">风险预警 — 处置后方可开演</h3>
+                <span className="text-xs text-rock-light ml-auto">
+                  点击风险卡片查看处置方案，或直接忽略（将自动扣除惩罚成本）
+                </span>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {unresolvedRisks.map((risk) => (
-                  <motion.button
+                  <motion.div
                     key={risk.id}
-                    onClick={() => setActiveRiskEvent(risk)}
-                    className="p-4 bg-rock-darker/50 border border-rock-light rounded-lg text-left hover:border-danger-red/50 transition-all duration-300"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    className="p-4 bg-rock-darker/50 border border-rock-light rounded-lg"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <RiskBadge level={risk.level} size="sm" showLabel={false} />
@@ -320,11 +391,31 @@ export default function Game() {
                         {risk.severity === 'critical' ? '严重' : '警告'}
                       </span>
                     </div>
-                    <p className="text-sm text-white mb-2 line-clamp-2">{risk.description}</p>
-                    <div className="text-xs text-rock-light">
+                    <p className="text-sm text-white mb-3 line-clamp-3">{risk.description}</p>
+                    <div className="text-xs text-rock-light mb-3">
                       预计影响: <span className="text-danger-red font-mono">¥{Math.abs(risk.impact).toLocaleString()}</span>
                     </div>
-                  </motion.button>
+                    <div className="flex gap-2">
+                      <motion.button
+                        onClick={() => setActiveRiskEvent(risk)}
+                        className="flex-1 px-3 py-2 text-sm font-bold rounded-lg bg-neon-pink/20 text-neon-pink border border-neon-pink/30 hover:bg-neon-pink/30 transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Shield className="w-3 h-3 inline mr-1" />
+                        处置
+                      </motion.button>
+                      <motion.button
+                        onClick={() => handleRiskDismiss(risk)}
+                        className="px-3 py-2 text-sm rounded-lg bg-rock-gray/50 text-rock-light border border-rock-light/30 hover:bg-danger-red/20 hover:text-danger-red hover:border-danger-red/30 transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <X className="w-3 h-3 inline mr-1" />
+                        忽略
+                      </motion.button>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
             </NeonCard>

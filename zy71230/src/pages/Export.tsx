@@ -62,6 +62,7 @@ export default function Export() {
     stops,
     merchItems,
     currentStopIndex: stops.findIndex(s => s.status === 'current'),
+    currentStopPhase: 'settled' as const,
     gamePhase: 'review' as const,
     cashFlow,
     totalRevenue: stopResults.reduce((sum, r) => sum + r.totalRevenue, 0),

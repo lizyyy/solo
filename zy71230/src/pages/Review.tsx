@@ -142,6 +142,7 @@ export default function Review() {
     stops,
     merchItems,
     currentStopIndex: stops.findIndex(s => s.status === 'current'),
+    currentStopPhase: 'settled' as const,
     gamePhase: 'review' as const,
     cashFlow,
     totalRevenue: stopResults.reduce((sum, r) => sum + r.totalRevenue, 0),
@@ -559,7 +560,7 @@ export default function Review() {
 
           {activeTab === 'risks' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <NeonCard borderColor="warning-orange" className="text-center">
                   <p className="text-gray-400 text-sm">风险总数</p>
                   <p className="font-rock text-3xl text-warning-orange mt-2">{riskAnalysis.totalRisks}</p>
@@ -571,6 +572,23 @@ export default function Review() {
                 <NeonCard borderColor="neon-cyan" className="text-center">
                   <p className="text-gray-400 text-sm">未解决风险</p>
                   <p className="font-rock text-3xl text-neon-cyan mt-2">{riskAnalysis.unresolvedRisks.length}</p>
+                </NeonCard>
+                <NeonCard borderColor="success-green" className="text-center">
+                  <p className="text-gray-400 text-sm">已处置风险</p>
+                  <p className="font-rock text-3xl text-success-green mt-2">
+                    {'resolvedRisks' in riskAnalysis ? riskAnalysis.resolvedRisks.length : 0}
+                  </p>
+                </NeonCard>
+                <NeonCard borderColor="danger-red" className="text-center">
+                  <p className="text-gray-400 text-sm">已忽略风险</p>
+                  <p className="font-rock text-3xl text-danger-red mt-2">
+                    {'dismissedRisks' in riskAnalysis ? riskAnalysis.dismissedRisks.length : 0}
+                  </p>
+                  {'totalDismissedImpact' in riskAnalysis && riskAnalysis.totalDismissedImpact < 0 && (
+                    <p className="text-xs text-danger-red mt-1">
+                      损失: -{formatCurrency(Math.abs(riskAnalysis.totalDismissedImpact))}
+                    </p>
+                  )}
                 </NeonCard>
                 <NeonCard borderColor="neon-purple" className="text-center">
                   <p className="text-gray-400 text-sm">风险类型</p>

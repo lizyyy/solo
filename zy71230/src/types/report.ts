@@ -82,6 +82,9 @@ export interface RiskAnalysis {
     riskIndex: number;
   }[];
   unresolvedRisks: RiskEvent[];
+  dismissedRisks: RiskEvent[];
+  resolvedRisks: RiskEvent[];
+  totalDismissedImpact: number;
 }
 
 export interface DecisionAnalysis {

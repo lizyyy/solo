@@ -74,6 +74,7 @@ export default function DataImport() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<TabType>('tour');
   const [isDragging, setIsDragging] = useState(false);
+  const hasImportedRef = useRef(false);
 
   const {
     rawFiles,
@@ -93,10 +94,11 @@ export default function DataImport() {
   } = useDataImport();
 
   useEffect(() => {
-    if (locationState?.sampleType && !parsedData.tour.name) {
+    if (locationState?.sampleType && !parsedData.tour.name && !hasImportedRef.current) {
+      hasImportedRef.current = true;
       importSampleData(locationState.sampleType);
     }
-  }, []);
+  }, [locationState, parsedData.tour.name, importSampleData]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();

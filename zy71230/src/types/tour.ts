@@ -89,6 +89,11 @@ export interface RiskEvent {
   outcome?: string;
   triggeredAt: string;
   resolvedAt?: string;
+  dismissed?: boolean;
+  dismissedImpact?: {
+    cashFlow: number;
+    description: string;
+  };
 }
 
 export type DecisionType = 'route' | 'pricing' | 'inventory' | 'marketing' | 'risk_mitigation';
