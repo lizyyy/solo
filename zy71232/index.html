@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画材采购预算战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <!-- 顶部状态栏 -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="title">🎨 画材采购预算战</h1>
+                <div class="level-info">
+                    <span class="level-badge" id="levelBadge">关卡 1</span>
+                    <span class="course-theme" id="courseTheme">课程主题：静物素描</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="budget-display">
+                    <span class="budget-label">预算</span>
+                    <span class="budget-amount" id="budgetAmount">¥500</span>
+                    <span class="budget-spent" id="budgetSpent">已用: ¥0</span>
+                    <div class="budget-bar">
+                        <div class="budget-bar-fill" id="budgetBarFill"></div>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="btnReplay">📽️ 回放</button>
+                    <button class="btn btn-secondary" id="btnReports">📊 报告管理</button>
+                    <button class="btn btn-secondary" id="btnReset">🔄 重置</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="main">
+            <!-- 左侧：采购市场 -->
+            <section class="market-section">
+                <div class="section-header">
+                    <h2>🛒 采购市场</h2>
+                    <div class="category-tabs">
+                        <button class="tab-btn active" data-category="paint">颜料</button>
+                        <button class="tab-btn" data-category="paper">画纸</button>
+                        <button class="tab-btn" data-category="tool">工具</button>
+                    </div>
+                </div>
+                <div class="market-grid" id="marketGrid">
+                    <!-- 商品卡片动态生成 -->
+                </div>
+            </section>
+
+            <!-- 右侧：购物车和要求 -->
+            <aside class="sidebar">
+                <!-- 课程要求 -->
+                <div class="requirements-card">
+                    <h3>📋 课程要求</h3>
+                    <div class="requirement-item">
+                        <span class="req-label">必填颜色:</span>
+                        <span class="req-value" id="reqColors">--</span>
+                    </div>
+                    <div class="requirement-item">
+                        <span class="req-label">必填工具:</span>
+                        <span class="req-value" id="reqTools">--</span>
+                    </div>
+                    <div class="requirement-item">
+                        <span class="req-label">画纸规格:</span>
+                        <span class="req-value" id="reqPaper">--</span>
+                    </div>
+                    <div class="requirement-item">
+                        <span class="req-label">难度:</span>
+                        <span class="req-value" id="reqDifficulty">⭐</span>
+                    </div>
+                </div>
+
+                <!-- 购物车 -->
+                <div class="cart-card">
+                    <div class="cart-header">
+                        <h3>🛍️ 购物车</h3>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </div>
+                    <div class="cart-items" id="cartItems">
+                        <div class="empty-cart">购物车是空的，去市场选点东西吧~</div>
+                    </div>
+                    <div class="cart-footer">
+                        <div class="cart-total">
+                            <span>合计:</span>
+                            <span class="total-amount" id="cartTotal">¥0</span>
+                        </div>
+                        <button class="btn btn-primary btn-block" id="btnSubmit">✅ 提交采购</button>
+                    </div>
+                </div>
+
+                <!-- 实时校验提示 -->
+                <div class="validation-card" id="validationCard">
+                    <h3>⚠️ 实时检查</h3>
+                    <div class="validation-list" id="validationList">
+                        <div class="validation-item info">开始采购后会显示检查结果</div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- 关卡选择弹窗 -->
+        <div class="modal" id="levelModal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2>🎯 选择关卡</h2>
+                    <button class="modal-close" data-close="levelModal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="level-grid" id="levelGrid">
+                        <!-- 关卡卡片动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果弹窗 -->
+        <div class="modal" id="resultModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="resultTitle">🎉 采购完成</h2>
+                    <button class="modal-close" data-close="resultModal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="result-score">
+                        <div class="score-circle" id="scoreCircle">
+                            <span class="score-number" id="scoreNumber">0</span>
+                            <span class="score-label">分</span>
+                        </div>
+                        <div class="score-rank" id="scoreRank">--</div>
+                    </div>
+                    
+                    <div class="result-section">
+                        <h4>📝 评分明细</h4>
+                        <div class="score-breakdown" id="scoreBreakdown"></div>
+                    </div>
+
+                    <div class="result-section">
+                        <h4>❌ 问题识别</h4>
+                        <div class="issues-list" id="issuesList"></div>
+                    </div>
+
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" id="btnViewReplay">📽️ 查看错因回放</button>
+                        <button class="btn btn-primary" id="btnSaveReport">💾 保存报告</button>
+                        <button class="btn btn-success" id="btnNextLevel">➡️ 下一关</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 回放弹窗 -->
+        <div class="modal" id="replayModal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2>📽️ 错因回放</h2>
+                    <button class="modal-close" data-close="replayModal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="replay-controls">
+                        <button class="btn btn-small" id="btnReplayPrev">⏮️ 上一步</button>
+                        <button class="btn btn-small btn-primary" id="btnReplayPlay">▶️ 播放</button>
+                        <button class="btn btn-small" id="btnReplayNext">⏭️ 下一步</button>
+                        <span class="replay-progress" id="replayProgress">0 / 0</span>
+                    </div>
+                    <div class="replay-timeline" id="replayTimeline"></div>
+                    <div class="replay-detail" id="replayDetail">
+                        <div class="replay-step-info">
+                            <span class="step-number" id="replayStepNum">0</span>
+                            <span class="step-action" id="replayStepAction">--</span>
+                        </div>
+                        <div class="replay-step-desc" id="replayStepDesc">--</div>
+                        <div class="replay-step-cart" id="replayStepCart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 报告管理弹窗 -->
+        <div class="modal" id="reportsModal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2>📊 报告管理</h2>
+                    <button class="modal-close" data-close="reportsModal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="reports-tabs">
+                        <button class="report-tab active" data-status="all">全部</button>
+                        <button class="report-tab" data-status="approved">✅ 已处理</button>
+                        <button class="report-tab" data-status="pending">⏳ 待确认</button>
+                        <button class="report-tab" data-status="rejected">❌ 需退回</button>
+                        <button class="report-tab" data-status="incomplete">⚠️ 字段不齐</button>
+                    </div>
+                    <div class="reports-toolbar">
+                        <button class="btn btn-small" id="btnExportSelected">📥 导出选中</button>
+                        <button class="btn btn-small" id="btnExportAll">📤 导出全部</button>
+                        <button class="btn btn-small btn-danger" id="btnClearReports">🗑️ 清空</button>
+                    </div>
+                    <div class="reports-table-container">
+                        <table class="reports-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px;"><input type="checkbox" id="checkAllReports"></th>
+                                    <th>关卡</th>
+                                    <th>课程主题</th>
+                                    <th>预算</th>
+                                    <th>实付</th>
+                                    <th>得分</th>
+                                    <th>问题数</th>
+                                    <th>状态</th>
+                                    <th>提交时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportsTableBody">
+                                <!-- 动态生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 报告详情弹窗 -->
+        <div class="modal" id="reportDetailModal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2>📋 采购报告详情</h2>
+                    <button class="modal-close" data-close="reportDetailModal">×</button>
+                </div>
+                <div class="modal-body" id="reportDetailBody">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 字段不齐标记弹窗 -->
+        <div class="modal" id="incompleteModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>⚠️ 字段不齐</h2>
+                    <button class="modal-close" data-close="incompleteModal">×</button>
+                </div>
+                <div class="modal-body">
+                    <p class="incomplete-desc">以下字段缺失，请标记后继续处理：</p>
+                    <div class="incomplete-fields" id="incompleteFields"></div>
+                    <div class="incomplete-actions">
+                        <label class="incomplete-note-label">
+                            备注:
+                            <textarea id="incompleteNote" rows="2" placeholder="填写缺失信息说明..."></textarea>
+                        </label>
+                        <button class="btn btn-warning" id="btnMarkIncomplete">⚠️ 标记为字段不齐</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 提示Toast -->
+        <div class="toast" id="toast"></div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="game.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
