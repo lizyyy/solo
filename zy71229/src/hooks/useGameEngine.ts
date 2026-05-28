@@ -5,12 +5,22 @@ export function useGameEngine() {
   const { state, tick, finalizeGame } = useGameStore();
   const lastTimeRef = useRef<number>(0);
   const animationFrameRef = useRef<number>();
+  const hasFinalizedRef = useRef(false);
+  const lastGameIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (state.isGameOver && state.endTime === null) {
+    if (state.id !== lastGameIdRef.current) {
+      lastGameIdRef.current = state.id;
+      hasFinalizedRef.current = false;
+    }
+  }, [state.id]);
+
+  useEffect(() => {
+    if (state.isGameOver && !hasFinalizedRef.current) {
+      hasFinalizedRef.current = true;
       finalizeGame();
     }
-  }, [state.isGameOver, state.endTime, finalizeGame]);
+  }, [state.isGameOver, finalizeGame]);
 
   useEffect(() => {
     if (state.isPaused || state.isGameOver) {

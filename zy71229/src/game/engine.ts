@@ -262,16 +262,17 @@ export function checkGameOver(state: GameState): Partial<GameState> | null {
   if (state.gameTime >= state.totalTime) {
     return {
       isGameOver: true,
-      endTime: Date.now(),
     };
   }
 
   const allResolved = state.anomalies.every(a => a.status !== AnomalyStatus.PENDING);
   if (allResolved && state.anomalies.length > 0) {
-    return {
-      isGameOver: true,
-      endTime: Date.now(),
-    };
+    const allDetected = state.anomalies.every(a => a.detectedTime !== null);
+    if (allDetected) {
+      return {
+        isGameOver: true,
+      };
+    }
   }
 
   return null;
