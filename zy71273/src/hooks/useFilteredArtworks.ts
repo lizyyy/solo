@@ -1,19 +1,26 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { useArtworkStore } from '../store/useArtworkStore';
 import { useFilterStore } from '../store/useFilterStore';
 import { completeMissingFields } from '../utils/versionManager';
 
 export function useFilteredArtworks() {
   const artworks = useArtworkStore(state => state.artworks);
-  const filterState = useFilterStore();
+  
+  const selectedClassIds = useFilterStore(state => state.selectedClassIds);
+  const hueRange = useFilterStore(state => state.hueRange);
+  const lightnessRange = useFilterStore(state => state.lightnessRange);
+  const saturationRange = useFilterStore(state => state.saturationRange);
+  const showQualityFlags = useFilterStore(state => state.showQualityFlags);
   const checkFilterFailure = useFilterStore(state => state.checkFilterFailure);
+
+  const lastResultCount = useRef<number | null>(null);
 
   const filtered = useMemo(() => {
     let result = [...artworks];
 
-    if (filterState.selectedClassIds.length > 0) {
+    if (selectedClassIds.length > 0) {
       result = result.filter(a => 
-        filterState.selectedClassIds.includes(a.classId)
+        selectedClassIds.includes(a.classId)
       );
     }
 
@@ -23,22 +30,27 @@ export function useFilteredArtworks() {
       const saturation = a.saturation ?? 50;
 
       return (
-        hue >= filterState.hueRange[0] && hue <= filterState.hueRange[1] &&
-        lightness >= filterState.lightnessRange[0] && lightness <= filterState.lightnessRange[1] &&
-        saturation >= filterState.saturationRange[0] && saturation <= filterState.saturationRange[1]
+        hue >= hueRange[0] && hue <= hueRange[1] &&
+        lightness >= lightnessRange[0] && lightness <= lightnessRange[1] &&
+        saturation >= saturationRange[0] && saturation <= saturationRange[1]
       );
     });
 
-    if (filterState.showQualityFlags.length > 0) {
+    if (showQualityFlags.length > 0) {
       result = result.filter(a => 
-        filterState.showQualityFlags.some(flag => a.qualityFlags[flag])
+        showQualityFlags.some(flag => a.qualityFlags[flag])
       );
     }
 
-    checkFilterFailure(result.length);
-
     return result;
-  }, [artworks, filterState, checkFilterFailure]);
+  }, [artworks, selectedClassIds, hueRange, lightnessRange, saturationRange, showQualityFlags]);
+
+  useEffect(() => {
+    if (lastResultCount.current !== filtered.length) {
+      lastResultCount.current = filtered.length;
+      checkFilterFailure(filtered.length);
+    }
+  }, [filtered.length, checkFilterFailure]);
 
   const filteredWithCompleteData = useMemo(() => 
     filtered.map(completeMissingFields),
