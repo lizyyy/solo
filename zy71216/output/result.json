@@ -1,0 +1,323 @@
+{
+  "metadata": {
+    "deal_id": "ABS-CONSUMER-2024-001",
+    "deal_name": "鑫荣2024年第一期消费金融资产支持证券",
+    "period_start": "2025-01-01",
+    "period_end": "2025-01-31",
+    "payment_date": "2025-02-25",
+    "generation_time": "2026-05-28"
+  },
+  "cashflow_summary": {
+    "total_inflow": 69930.0,
+    "total_outflow": 37616930.0,
+    "beginning_collection_balance": 32500000.0,
+    "ending_collection_balance": 0.0,
+    "beginning_reserve_balance": 5000000.0,
+    "ending_reserve_balance": 0.0
+  },
+  "fee_payments": [
+    {
+      "fee_id": "FEE-001",
+      "fee_name": "服务商管理费",
+      "scheduled_amount": 27.9375,
+      "paid_amount": 27.94,
+      "shortfall_amount": 0.0,
+      "carried_shortfall": 0.0
+    },
+    {
+      "fee_id": "FEE-002",
+      "fee_name": "特殊服务商费",
+      "scheduled_amount": 12513.96875,
+      "paid_amount": 12513.97,
+      "shortfall_amount": 0.0,
+      "carried_shortfall": 0.0
+    },
+    {
+      "fee_id": "FEE-003",
+      "fee_name": "托管银行费",
+      "scheduled_amount": 71250.0,
+      "paid_amount": 71250.0,
+      "shortfall_amount": 0.0,
+      "carried_shortfall": 0.0
+    },
+    {
+      "fee_id": "FEE-004",
+      "fee_name": "受托机构报酬",
+      "scheduled_amount": 106875.0,
+      "paid_amount": 106875.0,
+      "shortfall_amount": 0.0,
+      "carried_shortfall": 0.0
+    }
+  ],
+  "tranche_payments": [
+    {
+      "tranche_id": "A-1",
+      "tranche_name": "优先A-1档",
+      "payment_type": "interest",
+      "scheduled_amount": 1009375.0,
+      "paid_amount": 1009375.0,
+      "shortfall_amount": 0.0,
+      "carried_shortfall": 0.0,
+      "is_from_recovery": false
+    },
+    {
+      "tranche_id": "A-1",
+      "tranche_name": "优先A-1档",
+      "payment_type": "principal",
+      "scheduled_amount": 285000000.0,
+      "paid_amount": 36416888.09,
+      "shortfall_amount": 248583111.91,
+      "carried_shortfall": 248583111.91,
+      "is_from_recovery": true
+    }
+  ],
+  "trigger_results": [
+    {
+      "event_id": "TRIG-001",
+      "event_name": "违约率触发事件",
+      "event_type": "default",
+      "test_formula": "default_rate",
+      "actual_value": 0.169435,
+      "threshold": 0.05,
+      "status": "triggered"
+    },
+    {
+      "event_id": "TRIG-002",
+      "event_name": "累计损失率触发事件",
+      "event_type": "acceleration",
+      "test_formula": "cumulative_losses",
+      "actual_value": 0.0,
+      "threshold": 0.03,
+      "status": "not_triggered"
+    },
+    {
+      "event_id": "TRIG-003",
+      "event_name": "DSCR不足触发事件",
+      "event_type": "cash_trap",
+      "test_formula": "dscr_below",
+      "actual_value": 0.002208,
+      "threshold": 1.2,
+      "status": "triggered"
+    },
+    {
+      "event_id": "TRIG-004",
+      "event_name": "超额抵押率不足触发事件",
+      "event_type": "acceleration",
+      "test_formula": "oc_ratio_below",
+      "actual_value": 0.011747,
+      "threshold": 1.08,
+      "status": "triggered"
+    }
+  ],
+  "discrepancies": [
+    {
+      "discrepancy_id": "DIS-09B7ED6C",
+      "discrepancy_type": "duplicate_fee_deduction",
+      "severity": "MEDIUM",
+      "description": "多项服务费按同一基数计提，总费率2.2%偏高",
+      "expected_value": 0.02,
+      "actual_value": 0.0225,
+      "related_tranche": null,
+      "related_asset": null,
+      "affected_records": [
+        "FEE-001",
+        "FEE-002"
+      ],
+      "explanation": "检测到 2 项服务费均按回款基数计提，综合费率达到 2.2%。请确认是否存在服务范围重叠导致的重复收费，例如：服务商管理费与特殊服务商费是否应合并计提。"
+    },
+    {
+      "discrepancy_id": "DIS-B7752B69",
+      "discrepancy_type": "cashflow_not_allocated",
+      "severity": "HIGH",
+      "description": "现金流分配存在尾差，部分资金去向不明",
+      "expected_value": -5047000.0,
+      "actual_value": 0.0,
+      "related_tranche": null,
+      "related_asset": null,
+      "affected_records": [
+        "CF-2025-01-001",
+        "CF-2025-01-002",
+        "CF-2025-01-003",
+        "CF-2025-01-004",
+        "CF-2025-01-005",
+        "CF-2025-01-006",
+        "CF-2025-01-007"
+      ],
+      "explanation": "现金流平衡校验失败。期初余额 ¥32,500,000.00 + 本期流入 ¥69,930.00 - 本期分配 ¥37,616,930.00 = 理论期末余额 ¥-5,047,000.00，但实际期末余额为 ¥0.00，差异 ¥5,047,000.00。原始回款记录合计 ¥69,930.00，请逐一核对每笔现金流的分配路径，确认是否存在：1) 回款记录重复入账；2) 分配时四舍五入误差累积；3) 某笔现金流未经过 waterfall 分配直接转出。"
+    },
+    {
+      "discrepancy_id": "DIS-6669D033",
+      "discrepancy_type": "cashflow_not_allocated",
+      "severity": "MEDIUM",
+      "description": "违约回款[CF-2025-01-003]未用于弥补债券短缺",
+      "expected_value": 35000.0,
+      "actual_value": 0.0,
+      "related_tranche": null,
+      "related_asset": "LOAN-000004",
+      "affected_records": [
+        "CF-2025-01-003"
+      ],
+      "explanation": "违约资产 LOAN-000004 的回款 ¥35,000.00 (记录ID: CF-2025-01-003) 已到账但未用于弥补任何分层的支付短缺。在仍有分层存在支付短缺的情况下，违约回款应按优先级顺序用于弥补短缺，请检查违约回款的分配逻辑。"
+    },
+    {
+      "discrepancy_id": "DIS-EF79DFDC",
+      "discrepancy_type": "cashflow_not_allocated",
+      "severity": "MEDIUM",
+      "description": "违约回款[CF-2025-01-006]未用于弥补债券短缺",
+      "expected_value": 12000.0,
+      "actual_value": 0.0,
+      "related_tranche": null,
+      "related_asset": "LOAN-000008",
+      "affected_records": [
+        "CF-2025-01-006"
+      ],
+      "explanation": "违约资产 LOAN-000008 的回款 ¥12,000.00 (记录ID: CF-2025-01-006) 已到账但未用于弥补任何分层的支付短缺。在仍有分层存在支付短缺的情况下，违约回款应按优先级顺序用于弥补短缺，请检查违约回款的分配逻辑。"
+    },
+    {
+      "discrepancy_id": "DIS-48A5832C",
+      "discrepancy_type": "wrong_priority_order",
+      "severity": "HIGH",
+      "description": "支付顺序异常：[优先A-1档]在现金流不足时仍获得足额支付",
+      "expected_value": 31369888.09,
+      "actual_value": 36416888.09,
+      "related_tranche": "A-1",
+      "related_asset": null,
+      "affected_records": [
+        "A-1"
+      ],
+      "explanation": "检测到支付顺序异常。在支付 优先A-1档(优先级 #10) 时，可用现金流仅剩 ¥31,369,888.09，但实际支付了 ¥36,416,888.09。这表明可能存在：1) 优先级配置错误；2) 跳过了优先级更高但存在短缺的支付项；3) 使用了未入账的表外资金进行支付。请核对交易文件第5条的现金流瀑布顺序条款。"
+    },
+    {
+      "discrepancy_id": "DIS-6FB0E085",
+      "discrepancy_type": "sample_variance_exceeded",
+      "severity": "HIGH",
+      "description": "抽样核对不通过：[优先A-1档]的principal差异538.9%",
+      "expected_value": 5700000.0,
+      "actual_value": 36416888.09,
+      "related_tranche": "A-1",
+      "related_asset": null,
+      "affected_records": [
+        "SAMP-002",
+        "A-1"
+      ],
+      "explanation": "分配报告抽样核对失败。样本 SAMP-002：优先A-1档 的 principal 预期金额 ¥5,700,000.00，实际计算金额 ¥36,416,888.09，差异 ¥30,716,888.09 (538.9%)。差异超过±0.5%的可接受阈值。请检查：1) 分层余额是否正确；2) 利率计算是否准确；3) 应计天数是否正确；4) 四舍五入规则是否一致。"
+    },
+    {
+      "discrepancy_id": "DIS-6DB41C42",
+      "discrepancy_type": "sample_variance_exceeded",
+      "severity": "HIGH",
+      "description": "抽样核对不通过：[优先A-2档]的interest差异-100.0%",
+      "expected_value": 564062.5,
+      "actual_value": 0.0,
+      "related_tranche": "A-2",
+      "related_asset": null,
+      "affected_records": [
+        "SAMP-003",
+        "A-2"
+      ],
+      "explanation": "分配报告抽样核对失败。样本 SAMP-003：优先A-2档 的 interest 预期金额 ¥564,062.50，实际计算金额 ¥0.00，差异 ¥-564,062.50 (-100.0%)。差异超过±0.5%的可接受阈值。请检查：1) 分层余额是否正确；2) 利率计算是否准确；3) 应计天数是否正确；4) 四舍五入规则是否一致。"
+    },
+    {
+      "discrepancy_id": "DIS-8F009229",
+      "discrepancy_type": "sample_variance_exceeded",
+      "severity": "HIGH",
+      "description": "抽样核对不通过：[次级B档]的interest差异-100.0%",
+      "expected_value": 281250.0,
+      "actual_value": 0.0,
+      "related_tranche": "B",
+      "related_asset": null,
+      "affected_records": [
+        "SAMP-004",
+        "B"
+      ],
+      "explanation": "分配报告抽样核对失败。样本 SAMP-004：次级B档 的 interest 预期金额 ¥281,250.00，实际计算金额 ¥0.00，差异 ¥-281,250.00 (-100.0%)。差异超过±0.5%的可接受阈值。请检查：1) 分层余额是否正确；2) 利率计算是否准确；3) 应计天数是否正确；4) 四舍五入规则是否一致。"
+    }
+  ],
+  "original_values_preserved": {
+    "beginning_collection_balance": 32500000.0,
+    "beginning_reserve_balance": 5000000.0,
+    "reinvestment_balance": 0.0,
+    "tranche_balances": {
+      "A-1": 285000000.0,
+      "A-2": 142500000.0,
+      "B": 45000000.0,
+      "E": 30000000.0
+    },
+    "fee_arrears": {
+      "FEE-001": 0.0,
+      "FEE-002": 12500.0,
+      "FEE-003": 0.0,
+      "FEE-004": 0.0
+    },
+    "trigger_statuses": {
+      "TRIG-001": "triggered",
+      "TRIG-002": "not_triggered",
+      "TRIG-003": "triggered",
+      "TRIG-004": "triggered"
+    }
+  },
+  "raw_cashflows_used": [
+    {
+      "record_id": "CF-2025-01-001",
+      "asset_id": "LOAN-000001",
+      "payment_date": "2025-01-15",
+      "payment_type": "principal_and_interest",
+      "amount": 5250.0,
+      "is_recovery": false
+    },
+    {
+      "record_id": "CF-2025-01-002",
+      "asset_id": "LOAN-000002",
+      "payment_date": "2025-01-18",
+      "payment_type": "principal_and_interest",
+      "amount": 2800.0,
+      "is_recovery": false
+    },
+    {
+      "record_id": "CF-2025-01-003",
+      "asset_id": "LOAN-000004",
+      "payment_date": "2025-01-20",
+      "payment_type": "recovery",
+      "amount": 35000.0,
+      "is_recovery": true
+    },
+    {
+      "record_id": "CF-2025-01-004",
+      "asset_id": "LOAN-000005",
+      "payment_date": "2025-01-22",
+      "payment_type": "principal_and_interest",
+      "amount": 8500.0,
+      "is_recovery": false
+    },
+    {
+      "record_id": "CF-2025-01-005",
+      "asset_id": "LOAN-000007",
+      "payment_date": "2025-01-24",
+      "payment_type": "principal_and_interest",
+      "amount": 5800.0,
+      "is_recovery": false
+    },
+    {
+      "record_id": "CF-2025-01-006",
+      "asset_id": "LOAN-000008",
+      "payment_date": "2025-01-26",
+      "payment_type": "recovery",
+      "amount": 12000.0,
+      "is_recovery": true
+    },
+    {
+      "record_id": "CF-2025-01-007",
+      "asset_id": "LOAN-000003",
+      "payment_date": "2025-01-28",
+      "payment_type": "late_fee",
+      "amount": 580.0,
+      "is_recovery": false
+    }
+  ],
+  "conclusion": {
+    "has_critical_issues": false,
+    "has_high_issues": true,
+    "total_issues": 8,
+    "can_issue_report": false
+  }
+}

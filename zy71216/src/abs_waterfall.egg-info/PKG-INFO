@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: abs-waterfall
+Version: 0.1.0
+Summary: ABS现金流瀑布复核工具 - 用于投行助理复核资产证券化现金流分配
+Author: ABS Waterfall Team
+Requires-Python: >=3.9
+Requires-Dist: click>=8.0
+Requires-Dist: pandas>=1.5
+Requires-Dist: rich>=13.0
+Requires-Dist: pydantic>=2.0

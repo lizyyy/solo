@@ -1,0 +1,392 @@
+{
+  "deal": {
+    "deal_id": "ABS-CONSUMER-2024-001",
+    "deal_name": "鑫荣2024年第一期消费金融资产支持证券",
+    "closing_date": "2024-01-25",
+    "next_payment_date": "2025-02-25",
+    "reserve_account_balance": 5000000.00,
+    "collection_account_balance": 32500000.00,
+    "reinvestment_account_balance": 0.00,
+    "assets": [
+      {
+        "asset_id": "LOAN-000001",
+        "original_balance": 150000.00,
+        "current_balance": 125000.00,
+        "coupon_rate": 0.125,
+        "origination_date": "2023-06-15",
+        "maturity_date": "2026-06-15",
+        "status": "performing",
+        "borrower_id": "BORR-000001",
+        "collateral_type": "consumer_unsecured"
+      },
+      {
+        "asset_id": "LOAN-000002",
+        "original_balance": 80000.00,
+        "current_balance": 65000.00,
+        "coupon_rate": 0.145,
+        "origination_date": "2023-08-20",
+        "maturity_date": "2026-08-20",
+        "status": "performing",
+        "borrower_id": "BORR-000002",
+        "collateral_type": "consumer_unsecured"
+      },
+      {
+        "asset_id": "LOAN-000003",
+        "original_balance": 200000.00,
+        "current_balance": 180000.00,
+        "coupon_rate": 0.130,
+        "origination_date": "2023-05-10",
+        "maturity_date": "2028-05-10",
+        "status": "delinquent",
+        "borrower_id": "BORR-000003",
+        "collateral_type": "auto_loan"
+      },
+      {
+        "asset_id": "LOAN-000004",
+        "original_balance": 120000.00,
+        "current_balance": 95000.00,
+        "coupon_rate": 0.150,
+        "origination_date": "2023-09-01",
+        "maturity_date": "2027-09-01",
+        "status": "defaulted",
+        "borrower_id": "BORR-000004",
+        "collateral_type": "consumer_unsecured"
+      },
+      {
+        "asset_id": "LOAN-000005",
+        "original_balance": 250000.00,
+        "current_balance": 220000.00,
+        "coupon_rate": 0.115,
+        "origination_date": "2023-03-15",
+        "maturity_date": "2027-03-15",
+        "status": "performing",
+        "borrower_id": "BORR-000005",
+        "collateral_type": "auto_loan"
+      },
+      {
+        "asset_id": "LOAN-000006",
+        "original_balance": 95000.00,
+        "current_balance": 0.00,
+        "coupon_rate": 0.135,
+        "origination_date": "2023-07-20",
+        "maturity_date": "2026-07-20",
+        "status": "written_off",
+        "borrower_id": "BORR-000006",
+        "collateral_type": "consumer_unsecured"
+      },
+      {
+        "asset_id": "LOAN-000007",
+        "original_balance": 175000.00,
+        "current_balance": 160000.00,
+        "coupon_rate": 0.120,
+        "origination_date": "2023-04-10",
+        "maturity_date": "2027-04-10",
+        "status": "performing",
+        "borrower_id": "BORR-000007",
+        "collateral_type": "auto_loan"
+      },
+      {
+        "asset_id": "LOAN-000008",
+        "original_balance": 65000.00,
+        "current_balance": 58000.00,
+        "coupon_rate": 0.140,
+        "origination_date": "2023-10-01",
+        "maturity_date": "2026-10-01",
+        "status": "defaulted",
+        "borrower_id": "BORR-000008",
+        "collateral_type": "consumer_unsecured"
+      }
+    ],
+    "cashflows": [
+      {
+        "record_id": "CF-2025-01-001",
+        "asset_id": "LOAN-000001",
+        "payment_date": "2025-01-15",
+        "payment_type": "principal_and_interest",
+        "amount": 5250.00,
+        "source_account": "collection_001",
+        "reference": "PMT-20250115-001"
+      },
+      {
+        "record_id": "CF-2025-01-002",
+        "asset_id": "LOAN-000002",
+        "payment_date": "2025-01-18",
+        "payment_type": "principal_and_interest",
+        "amount": 2800.00,
+        "source_account": "collection_001",
+        "reference": "PMT-20250118-002"
+      },
+      {
+        "record_id": "CF-2025-01-003",
+        "asset_id": "LOAN-000004",
+        "payment_date": "2025-01-20",
+        "payment_type": "recovery",
+        "amount": 35000.00,
+        "is_recovery": true,
+        "recovery_asset_id": "LOAN-000004",
+        "source_account": "recovery_001",
+        "reference": "REC-20250120-001"
+      },
+      {
+        "record_id": "CF-2025-01-004",
+        "asset_id": "LOAN-000005",
+        "payment_date": "2025-01-22",
+        "payment_type": "principal_and_interest",
+        "amount": 8500.00,
+        "source_account": "collection_001",
+        "reference": "PMT-20250122-004"
+      },
+      {
+        "record_id": "CF-2025-01-005",
+        "asset_id": "LOAN-000007",
+        "payment_date": "2025-01-24",
+        "payment_type": "principal_and_interest",
+        "amount": 5800.00,
+        "source_account": "collection_001",
+        "reference": "PMT-20250124-005"
+      },
+      {
+        "record_id": "CF-2025-01-006",
+        "asset_id": "LOAN-000008",
+        "payment_date": "2025-01-26",
+        "payment_type": "recovery",
+        "amount": 12000.00,
+        "is_recovery": true,
+        "recovery_asset_id": "LOAN-000008",
+        "source_account": "recovery_001",
+        "reference": "REC-20250126-002"
+      },
+      {
+        "record_id": "CF-2025-01-007",
+        "asset_id": "LOAN-000003",
+        "payment_date": "2025-01-28",
+        "payment_type": "late_fee",
+        "amount": 580.00,
+        "source_account": "collection_001",
+        "reference": "LATE-20250128-001"
+      },
+      {
+        "record_id": "CF-2025-01-008",
+        "asset_id": "LOAN-000001",
+        "payment_date": "2025-02-10",
+        "payment_type": "principal_and_interest",
+        "amount": 5250.00,
+        "source_account": "collection_001",
+        "reference": "PMT-20250210-001"
+      },
+      {
+        "record_id": "CF-2025-01-009",
+        "asset_id": "LOAN-000002",
+        "payment_date": "2025-02-12",
+        "payment_type": "principal_and_interest",
+        "amount": 2800.00,
+        "source_account": "collection_001",
+        "reference": "PMT-20250212-002"
+      },
+      {
+        "record_id": "CF-2025-01-010",
+        "asset_id": "LOAN-000005",
+        "payment_date": "2025-02-15",
+        "payment_type": "principal_and_interest",
+        "amount": 8500.00,
+        "source_account": "collection_001",
+        "reference": "PMT-20250215-004"
+      },
+      {
+        "record_id": "CF-2025-01-011",
+        "asset_id": "LOAN-000007",
+        "payment_date": "2025-02-18",
+        "payment_type": "principal_and_interest",
+        "amount": 5800.00,
+        "source_account": "collection_001",
+        "reference": "PMT-20250218-005"
+      },
+      {
+        "record_id": "CF-2025-01-012",
+        "asset_id": "LOAN-000003",
+        "payment_date": "2025-02-20",
+        "payment_type": "principal_and_interest",
+        "amount": 6500.00,
+        "source_account": "collection_001",
+        "reference": "PMT-20250220-003"
+      }
+    ],
+    "tranches": [
+      {
+        "tranche_id": "A-1",
+        "tranche_name": "优先A-1档",
+        "tranche_type": "senior",
+        "original_balance": 300000000.00,
+        "current_balance": 285000000.00,
+        "coupon_rate": 0.0425,
+        "payment_priority": 10,
+        "payment_type": "principal_and_interest",
+        "is_shortfall_carry": true
+      },
+      {
+        "tranche_id": "A-2",
+        "tranche_name": "优先A-2档",
+        "tranche_type": "senior",
+        "original_balance": 150000000.00,
+        "current_balance": 142500000.00,
+        "coupon_rate": 0.0475,
+        "payment_priority": 20,
+        "payment_type": "principal_and_interest",
+        "is_shortfall_carry": true
+      },
+      {
+        "tranche_id": "B",
+        "tranche_name": "次级B档",
+        "tranche_type": "subordinated",
+        "original_balance": 45000000.00,
+        "current_balance": 45000000.00,
+        "coupon_rate": 0.0750,
+        "payment_priority": 40,
+        "payment_type": "principal_and_interest",
+        "is_shortfall_carry": true
+      },
+      {
+        "tranche_id": "E",
+        "tranche_name": "权益档",
+        "tranche_type": "equity",
+        "original_balance": 30000000.00,
+        "current_balance": 30000000.00,
+        "coupon_rate": 0.0000,
+        "payment_priority": 99,
+        "payment_type": "principal",
+        "is_shortfall_carry": false
+      }
+    ],
+    "servicing_fees": [
+      {
+        "fee_id": "FEE-001",
+        "fee_name": "服务商管理费",
+        "rate": 0.015,
+        "calculation_base": "collections",
+        "payment_priority": 1,
+        "is_flat_fee": false,
+        "arrears": 0.00
+      },
+      {
+        "fee_id": "FEE-002",
+        "fee_name": "特殊服务商费",
+        "rate": 0.0075,
+        "calculation_base": "collections",
+        "payment_priority": 2,
+        "is_flat_fee": false,
+        "arrears": 12500.00
+      },
+      {
+        "fee_id": "FEE-003",
+        "fee_name": "托管银行费",
+        "rate": 0.0020,
+        "calculation_base": "senior_balance",
+        "payment_priority": 3,
+        "is_flat_fee": false,
+        "arrears": 0.00
+      },
+      {
+        "fee_id": "FEE-004",
+        "fee_name": "受托机构报酬",
+        "rate": 0.0030,
+        "calculation_base": "senior_balance",
+        "payment_priority": 4,
+        "is_flat_fee": false,
+        "arrears": 0.00
+      }
+    ],
+    "default_records": [
+      {
+        "default_id": "DEF-2024-001",
+        "asset_id": "LOAN-000004",
+        "default_date": "2024-10-15",
+        "original_default_amount": 95000.00,
+        "remaining_default_amount": 60000.00,
+        "recovery_amount": 35000.00,
+        "write_off_amount": 0.00
+      },
+      {
+        "default_id": "DEF-2024-002",
+        "asset_id": "LOAN-000006",
+        "default_date": "2024-08-20",
+        "original_default_amount": 95000.00,
+        "remaining_default_amount": 0.00,
+        "recovery_amount": 15000.00,
+        "write_off_amount": 80000.00
+      },
+      {
+        "default_id": "DEF-2024-003",
+        "asset_id": "LOAN-000008",
+        "default_date": "2024-12-01",
+        "original_default_amount": 58000.00,
+        "remaining_default_amount": 46000.00,
+        "recovery_amount": 12000.00,
+        "write_off_amount": 0.00
+      }
+    ],
+    "trigger_events": [
+      {
+        "event_id": "TRIG-001",
+        "event_name": "违约率触发事件",
+        "event_type": "default",
+        "test_formula": "default_rate",
+        "threshold": 0.05,
+        "cure_period": 0
+      },
+      {
+        "event_id": "TRIG-002",
+        "event_name": "累计损失率触发事件",
+        "event_type": "acceleration",
+        "test_formula": "cumulative_losses",
+        "threshold": 0.03,
+        "cure_period": 2
+      },
+      {
+        "event_id": "TRIG-003",
+        "event_name": "DSCR不足触发事件",
+        "event_type": "cash_trap",
+        "test_formula": "dscr_below",
+        "threshold": 1.2,
+        "cure_period": 3
+      },
+      {
+        "event_id": "TRIG-004",
+        "event_name": "超额抵押率不足触发事件",
+        "event_type": "acceleration",
+        "test_formula": "oc_ratio_below",
+        "threshold": 1.08,
+        "cure_period": 0
+      }
+    ],
+    "allocation_samples": [
+      {
+        "sample_id": "SAMP-001",
+        "report_date": "2025-02-25",
+        "tranche_id": "A-1",
+        "expected_payment_type": "interest",
+        "expected_amount": 1009375.00
+      },
+      {
+        "sample_id": "SAMP-002",
+        "report_date": "2025-02-25",
+        "tranche_id": "A-1",
+        "expected_payment_type": "principal",
+        "expected_amount": 5700000.00
+      },
+      {
+        "sample_id": "SAMP-003",
+        "report_date": "2025-02-25",
+        "tranche_id": "A-2",
+        "expected_payment_type": "interest",
+        "expected_amount": 564062.50
+      },
+      {
+        "sample_id": "SAMP-004",
+        "report_date": "2025-02-25",
+        "tranche_id": "B",
+        "expected_payment_type": "interest",
+        "expected_amount": 281250.00
+      }
+    ]
+  }
+}

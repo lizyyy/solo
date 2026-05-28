@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "abs-waterfall"
+version = "0.1.0"
+description = "ABS现金流瀑布复核工具 - 用于投行助理复核资产证券化现金流分配"
+requires-python = ">=3.9"
+authors = [{ name = "ABS Waterfall Team" }]
+dependencies = [
+    "click>=8.0",
+    "pandas>=1.5",
+    "rich>=13.0",
+    "pydantic>=2.0",
+]
+
+[project.scripts]
+abs-waterfall = "abs_waterfall.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
