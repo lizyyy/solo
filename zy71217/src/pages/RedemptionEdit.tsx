@@ -64,6 +64,7 @@ const RedemptionEdit: React.FC = () => {
     addOperationLog,
     batches,
     redemptions,
+    identifications,
     currentUser
   } = useAppStore();
 
@@ -105,7 +106,7 @@ const RedemptionEdit: React.FC = () => {
       initialBalance: 0,
       currentBalance: 0,
       status: 'pending',
-      identityId: '',
+      identityId: identification?.id || '',
       hasDispute: false,
       isFrozen: false,
       createdAt: '',
@@ -114,8 +115,11 @@ const RedemptionEdit: React.FC = () => {
       ...redemption,
       ...formData
     };
-    return detectAnomalies(tempRedemption, redemptions);
-  }, [formData, redemptions, id, redemption]);
+    const allIdentifications = identification
+      ? [...identifications.filter(i => i.id !== identification.id), identification]
+      : identifications;
+    return detectAnomalies(tempRedemption, redemptions, allIdentifications);
+  }, [formData, redemptions, identifications, identification, id, redemption]);
 
   const processingConclusion = useMemo(() => {
     if (!validationResult) return null;

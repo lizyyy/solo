@@ -124,6 +124,21 @@ export const mockRedemptions: Redemption[] = [
     createdAt: '2026-05-24 10:15:00',
     updatedAt: '2026-05-24 10:15:00',
     createdBy: '兑付专员A'
+  },
+  {
+    id: '9',
+    cardNumber: 'VIP00123463',
+    cardHolderName: '张三',
+    phone: '13800138001',
+    initialBalance: 2000,
+    currentBalance: 1650,
+    status: 'pending',
+    identityId: 'ID008',
+    hasDispute: false,
+    isFrozen: false,
+    createdAt: '2026-05-25 14:30:00',
+    updatedAt: '2026-05-25 14:30:00',
+    createdBy: '兑付专员B'
   }
 ];
 
@@ -146,6 +161,7 @@ export const mockIdentifications: Identification[] = [
   { id: 'ID005', idType: 'id_card', idNumber: '310***********3456', verificationStatus: 'verified' },
   { id: 'ID006', idType: 'id_card', idNumber: '310***********7890', verificationStatus: 'rejected' },
   { id: 'ID007', idType: 'id_card', idNumber: '310***********2345', verificationStatus: 'verified' },
+  { id: 'ID008', idType: 'id_card', idNumber: '310***********1234', verificationStatus: 'verified' },
 ];
 
 export const mockDisputeNotes: DisputeNote[] = [

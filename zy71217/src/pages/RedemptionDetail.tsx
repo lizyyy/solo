@@ -52,7 +52,8 @@ const RedemptionDetail: React.FC = () => {
     getDisputeNotesByRedemptionId,
     getBatchById,
     getOperationLogsByRedemptionId,
-    redemptions
+    redemptions,
+    identifications
   } = useAppStore();
 
   const redemption = useMemo(() => getRedemptionById(id || ''), [id, getRedemptionById]);
@@ -64,8 +65,8 @@ const RedemptionDetail: React.FC = () => {
 
   const validationResult = useMemo(() => {
     if (!redemption) return null;
-    return detectAnomalies(redemption, redemptions);
-  }, [redemption, redemptions]);
+    return detectAnomalies(redemption, redemptions, identifications);
+  }, [redemption, redemptions, identifications]);
 
   const processingConclusion = useMemo(() => {
     if (!validationResult) return null;

@@ -41,7 +41,7 @@ const { Option } = Select;
 
 const RedemptionList: React.FC = () => {
   const navigate = useNavigate();
-  const { redemptions, batches, updateRedemption, deleteRedemption, addOperationLog, currentUser } = useAppStore();
+  const { redemptions, identifications, batches, updateRedemption, deleteRedemption, addOperationLog, currentUser } = useAppStore();
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [batchFilter, setBatchFilter] = useState<string>('all');
@@ -70,13 +70,13 @@ const RedemptionList: React.FC = () => {
 
     if (showErrorOnly) {
       result = result.filter(r => {
-        const validation = detectAnomalies(r, redemptions);
+        const validation = detectAnomalies(r, redemptions, identifications);
         return !validation.isValid || validation.warnings.length > 0;
       });
     }
 
     return result;
-  }, [redemptions, searchText, statusFilter, batchFilter, showErrorOnly]);
+  }, [redemptions, identifications, searchText, statusFilter, batchFilter, showErrorOnly]);
 
   const stats = useMemo(() => {
     const totalAmount = redemptions.reduce((sum, r) => sum + Math.max(0, r.currentBalance), 0);
@@ -136,7 +136,7 @@ const RedemptionList: React.FC = () => {
   ];
 
   const getRowClassName = (record: Redemption) => {
-    const validation = detectAnomalies(record, redemptions);
+    const validation = detectAnomalies(record, redemptions, identifications);
     if (validation.errors.length > 0) {
       return 'row-error-flash';
     }
@@ -153,12 +153,14 @@ const RedemptionList: React.FC = () => {
       key: 'cardNumber',
       width: 140,
       render: (text: string, record: Redemption) => {
-        const validation = detectAnomalies(record, redemptions);
-        const hasDuplicate = validation.errors.some(e => e.code === 'DUPLICATE_REGISTRATION');
+        const validation = detectAnomalies(record, redemptions, identifications);
+        const hasCardDuplicate = validation.errors.some(e => e.code === 'DUPLICATE_REGISTRATION');
+        const hasIdentityDuplicate = validation.errors.some(e => e.code === 'DUPLICATE_IDENTITY');
         return (
           <div className="flex items-center gap-1">
             <span className="font-mono">{text}</span>
-            {hasDuplicate && <CopyOutlined className="text-yellow-500" title="重复登记" />}
+            {hasCardDuplicate && <CopyOutlined className="text-yellow-500" title="卡号重复登记" />}
+            {hasIdentityDuplicate && <WarningOutlined className="text-red-500" title="身份证重复登记" />}
           </div>
         );
       }
@@ -284,14 +286,14 @@ const RedemptionList: React.FC = () => {
 
   const hasGlobalIssues = useMemo(() => {
     return redemptions.some(r => {
-      const v = detectAnomalies(r, redemptions);
+      const v = detectAnomalies(r, redemptions, identifications);
       return !v.isValid || v.warnings.length > 0;
     });
-  }, [redemptions]);
+  }, [redemptions, identifications]);
 
   const globalConclusion = useMemo(() => {
     const allIssues = redemptions.flatMap(r => {
-      const v = detectAnomalies(r, redemptions);
+      const v = detectAnomalies(r, redemptions, identifications);
       return [...v.errors, ...v.warnings];
     });
     return generateProcessingConclusion({
@@ -299,7 +301,7 @@ const RedemptionList: React.FC = () => {
       errors: allIssues.filter(i => i.severity === 'error'),
       warnings: allIssues.filter(i => i.severity === 'warning') as ValidationWarning[]
     });
-  }, [redemptions]);
+  }, [redemptions, identifications]);
 
   return (
     <div className="space-y-6">
