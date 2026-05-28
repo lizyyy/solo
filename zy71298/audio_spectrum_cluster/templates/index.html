@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐音频片段谱聚类系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; }
+        h1 { font-size: 28px; margin-bottom: 10px; }
+        .subtitle { opacity: 0.9; font-size: 16px; }
+
+        .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
+
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .card h2 { font-size: 20px; margin-bottom: 15px; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 8px; }
+
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .summary-item { text-align: center; padding: 15px; background: #f8f9ff; border-radius: 8px; }
+        .summary-value { font-size: 28px; font-weight: bold; color: #667eea; }
+        .summary-label { font-size: 13px; color: #666; margin-top: 5px; }
+
+        .upload-area { border: 2px dashed #667eea; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .upload-area:hover { background: #f0f3ff; }
+        .upload-area.dragover { background: #e8edff; border-color: #764ba2; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group select, .form-group input, .form-group textarea {
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;
+        }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #d0d0d0; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-small { padding: 6px 12px; font-size: 12px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9ff; font-weight: 600; color: #555; }
+        tr:hover { background: #f8f9ff; }
+
+        .tag { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; margin-right: 4px; }
+        .tag-piano { background: #e3f2fd; color: #1565c0; }
+        .tag-violin { background: #fce4ec; color: #ad1457; }
+        .tag-guitar { background: #e8f5e9; color: #2e7d32; }
+        .tag-default { background: #f5f5f5; color: #555; }
+
+        .cluster-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; color: white; }
+        .cluster-0 { background: #e74c3c; }
+        .cluster-1 { background: #3498db; }
+        .cluster-2 { background: #2ecc71; }
+        .cluster-3 { background: #f39c12; }
+        .cluster-4 { background: #9b59b6; }
+        .cluster-5 { background: #1abc9c; }
+        .cluster-6 { background: #e67e22; }
+        .cluster-7 { background: #34495e; }
+        .cluster-default { background: #95a5a6; }
+
+        .anomaly { padding: 10px; border-radius: 6px; margin-top: 10px; }
+        .anomaly-high { background: #ffebee; border-left: 4px solid #e74c3c; }
+        .anomaly-medium { background: #fff8e1; border-left: 4px solid #ff9800; }
+        .anomaly-low { background: #e8f5e9; border-left: 4px solid #4caf50; }
+
+        .history-item { padding: 12px; border-left: 3px solid #667eea; background: #f8f9ff; margin-bottom: 8px; border-radius: 0 6px 6px 0; }
+        .history-time { font-size: 12px; color: #888; }
+        .history-type { font-weight: 600; color: #667eea; }
+
+        .alert { padding: 15px; border-radius: 6px; margin-bottom: 15px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+        .chart-container { margin: 20px 0; }
+        .chart-container img { max-width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 5% auto; padding: 20px; border-radius: 12px; max-width: 900px; max-height: 85vh; overflow-y: auto; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close:hover { color: #333; }
+
+        .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 15px; }
+        .tab { padding: 10px 20px; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+        .tab.active { border-bottom-color: #667eea; color: #667eea; font-weight: 600; }
+
+        .progress { width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; margin-top: 10px; display: none; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); width: 0%; transition: width 0.3s; }
+
+        .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎵 音乐音频片段谱聚类系统</h1>
+            <p class="subtitle">按频谱特征自动分组，方便学生比较不同演奏版本</p>
+        </header>
+
+        <div id="alertContainer"></div>
+
+        <div class="grid">
+            <div>
+                <div class="card">
+                    <div class="section-title">
+                        <h2>📊 数据概览</h2>
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-small" onclick="refreshData()">🔄 刷新聚类</button>
+                            <button class="btn btn-primary btn-small" onclick="exportData()">📥 导出数据</button>
+                        </div>
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-value">{{ summary.total_segments }}</div>
+                            <div class="summary-label">音频片段总数</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">{{ summary.n_clusters }}</div>
+                            <div class="summary-label">聚类数量</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">{{ "%.2f"|format(summary.silhouette_score or 0) }}</div>
+                            <div class="summary-label">轮廓系数</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">{{ summary.total_anomalies }}</div>
+                            <div class="summary-label">异常检测</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">
+                        <h2>📁 音频片段列表</h2>
+                    </div>
+                    {% if segments %}
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>文件名</th>
+                                    <th>时长</th>
+                                    <th>采样率</th>
+                                    <th>乐器标签</th>
+                                    <th>聚类</th>
+                                    <th>置信度</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for seg in segments %}
+                                <tr>
+                                    <td>{{ seg.file_name }}</td>
+                                    <td>{{ "%.2f"|format(seg.duration) }}s</td>
+                                    <td>{{ seg.sample_rate }} Hz</td>
+                                    <td>
+                                        {% for tag in seg.instrument_tags %}
+                                        <span class="tag tag-{{ tag }}">{{ tag }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% if seg.cluster_name %}
+                                        <span class="cluster-badge cluster-{{ seg.cluster_label % 8 }}">{{ seg.cluster_name }}</span>
+                                        {% else %}
+                                        <span style="color: #999;">未聚类</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if seg.confidence %}
+                                        {{ "%.1f%%"|format(seg.confidence * 100) }}
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-secondary btn-small" onclick="showSegmentDetail('{{ seg.segment_id }}')">详情</button>
+                                        <button class="btn btn-danger btn-small" onclick="withdrawSegment('{{ seg.segment_id }}')">撤回</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p style="color: #888; text-align: center; padding: 30px;">暂无音频片段，请上传或指定目录处理</p>
+                    {% endif %}
+                </div>
+
+                {% if summary.charts %}
+                <div class="card">
+                    <h2>📈 可视化图表</h2>
+                    <div class="tabs">
+                        <div class="tab active" data-tab="umap">UMAP聚类图</div>
+                        <div class="tab" data-tab="features">特征分布</div>
+                        <div class="tab" data-tab="importance">特征重要性</div>
+                        <div class="tab" data-tab="sizes">聚类大小</div>
+                        <div class="tab" data-tab="tempo">节拍对比</div>
+                        <div class="tab" data-tab="heatmap">热力图</div>
+                        <div class="tab" data-tab="anomalies">异常检测</div>
+                    </div>
+                    <div class="chart-container" id="chart-umap">
+                        <img src="data:image/png;base64,{{ get_b64(summary.charts.umap_clusters) }}" alt="UMAP聚类图">
+                    </div>
+                    <div class="chart-container" id="chart-features" style="display: none;">
+                        <img src="data:image/png;base64,{{ get_b64(summary.charts.feature_distributions) }}" alt="特征分布">
+                    </div>
+                    <div class="chart-container" id="chart-importance" style="display: none;">
+                        <img src="data:image/png;base64,{{ get_b64(summary.charts.feature_importance) }}" alt="特征重要性">
+                    </div>
+                    <div class="chart-container" id="chart-sizes" style="display: none;">
+                        <img src="data:image/png;base64,{{ get_b64(summary.charts.cluster_sizes) }}" alt="聚类大小">
+                    </div>
+                    <div class="chart-container" id="chart-tempo" style="display: none;">
+                        <img src="data:image/png;base64,{{ get_b64(summary.charts.tempo_comparison) }}" alt="节拍对比">
+                    </div>
+                    <div class="chart-container" id="chart-heatmap" style="display: none;">
+                        <img src="data:image/png;base64,{{ get_b64(summary.charts.cluster_heatmap) }}" alt="热力图">
+                    </div>
+                    <div class="chart-container" id="chart-anomalies" style="display: none;">
+                        <img src="data:image/png;base64,{{ get_b64(summary.charts.anomalies) }}" alt="异常检测">
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <div class="card">
+                    <h2>📤 上传音频</h2>
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>操作类型</label>
+                            <select name="operation_type" required>
+                                <option value="normal">正常提交</option>
+                                <option value="supplement">补录</option>
+                                <option value="duplicate">重复提交</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>选择音频文件 (wav, mp3, flac, ogg)</label>
+                            <input type="file" name="files" multiple accept=".wav,.mp3,.flac,.ogg" required>
+                        </div>
+                        <div class="form-group">
+                            <label>乐器标签 (逗号分隔，可选)</label>
+                            <input type="text" name="tags" placeholder="例如: piano, violin">
+                            <small style="color: #666;">将应用于所有上传文件</small>
+                        </div>
+                        <div class="form-group">
+                            <label>操作人 (可选)</label>
+                            <input type="text" name="operator" placeholder="你的名字">
+                        </div>
+                        <div class="form-group">
+                            <label>备注 (可选)</label>
+                            <textarea name="description" placeholder="本次操作的说明"></textarea>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">开始处理</button>
+                        </div>
+                        <div class="progress" id="uploadProgress">
+                            <div class="progress-bar"></div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>📂 处理目录</h2>
+                    <form id="directoryForm">
+                        <div class="form-group">
+                            <label>操作类型</label>
+                            <select name="operation_type" required>
+                                <option value="normal">正常提交</option>
+                                <option value="supplement">补录</option>
+                                <option value="duplicate">重复提交</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>目录绝对路径</label>
+                            <input type="text" name="directory" required placeholder="/path/to/audio/files">
+                        </div>
+                        <div class="form-group">
+                            <label>操作人 (可选)</label>
+                            <input type="text" name="operator" placeholder="你的名字">
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">扫描并处理</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>📜 操作历史</h2>
+                    {% if history %}
+                    {% for record in history[:10] %}
+                    <div class="history-item">
+                        <div>
+                            <span class="history-type">{{ record.operation_type.value }}</span>
+                            <span style="color: #666; font-size: 13px;"> · {{ record.description or '' }}</span>
+                        </div>
+                        <div class="history-time">{{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+                        <div style="font-size: 13px; margin-top: 5px;">
+                            影响 {{ record.segment_ids|length }} 个片段
+                            {% if record.operator %} · {{ record.operator }}{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if history|length > 10 %}
+                    <p style="text-align: center; color: #666; margin-top: 10px; font-size: 13px;">
+                        还有 {{ history|length - 10 }} 条历史记录
+                    </p>
+                    {% endif %}
+                    {% else %}
+                    <p style="color: #888; text-align: center; padding: 20px;">暂无历史记录</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="segmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('segmentModal')">&times;</span>
+            <h2 id="modalTitle">片段详情</h2>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        function getB64(filepath) {
+            return "{{ get_b64('') }}";
+        }
+
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.chart-container').forEach(c => c.style.display = 'none');
+                this.classList.add('active');
+                document.getElementById(`chart-${this.dataset.tab}`).style.display = 'block';
+            });
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const progress = document.getElementById('uploadProgress');
+            const progressBar = progress.querySelector('.progress-bar');
+            progress.style.display = 'block';
+            progressBar.style.width = '30%';
+
+            const formData = new FormData(this);
+            const tagsInput = this.querySelector('input[name="tags"]').value;
+            const files = this.querySelector('input[name="files"]').files;
+            for (let file of files) {
+                if (tagsInput) {
+                    formData.set(`tags_${file.name}`, tagsInput);
+                }
+            }
+
+            try {
+                progressBar.style.width = '60%';
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                progressBar.style.width = '100%';
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(`成功处理 ${result.n_new_segments} 个音频片段`, 'success');
+                    if (result.skipped_files && result.skipped_files.length > 0) {
+                        showAlert(`跳过 ${result.skipped_files.length} 个已存在的文件`, 'info');
+                    }
+                    if (result.anomalies && result.anomalies.length > 0) {
+                        showAlert(`检测到 ${result.anomalies.length} 个异常`, 'info');
+                    }
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert(result.error || '处理失败', 'error');
+                }
+            } catch (err) {
+                showAlert('网络错误: ' + err.message, 'error');
+            } finally {
+                setTimeout(() => {
+                    progress.style.display = 'none';
+                    progressBar.style.width = '0%';
+                }, 1000);
+            }
+        });
+
+        document.getElementById('directoryForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/process_directory', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(`成功处理 ${result.n_new_segments} 个音频片段`, 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert(result.error || '处理失败', 'error');
+                }
+            } catch (err) {
+                showAlert('网络错误: ' + err.message, 'error');
+            }
+        });
+
+        async function refreshData() {
+            try {
+                const response = await fetch('/api/refresh', {method: 'POST'});
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('聚类已刷新', 'success');
+                    setTimeout(() => location.reload(), 500);
+                } else {
+                    showAlert(result.error || '刷新失败', 'error');
+                }
+            } catch (err) {
+                showAlert('网络错误: ' + err.message, 'error');
+            }
+        }
+
+        async function exportData() {
+            try {
+                const response = await fetch('/api/export', {method: 'POST'});
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('导出成功！文件保存在 output 目录', 'success');
+                    console.log('导出文件:', result.files);
+                } else {
+                    showAlert(result.error || '导出失败', 'error');
+                }
+            } catch (err) {
+                showAlert('网络错误: ' + err.message, 'error');
+            }
+        }
+
+        async function showSegmentDetail(segmentId) {
+            try {
+                const response = await fetch(`/api/segment/${segmentId}`);
+                const data = await response.json();
+
+                const modal = document.getElementById('segmentModal');
+                const content = document.getElementById('modalContent');
+                const title = document.getElementById('modalTitle');
+
+                title.textContent = data.segment.file_name;
+
+                let html = `
+                    <div class="card" style="box-shadow: none; border: 1px solid #eee;">
+                        <h3>基本信息</h3>
+                        <p><strong>片段ID:</strong> ${data.segment.segment_id}</p>
+                        <p><strong>时长:</strong> ${data.segment.duration.toFixed(2)} 秒</p>
+                        <p><strong>采样率:</strong> ${data.segment.sample_rate} Hz</p>
+                        <p><strong>乐器标签:</strong> ${data.segment.instrument_tags.join(', ') || '无'}</p>
+                        ${data.segment.performance_version ? `<p><strong>版本:</strong> ${data.segment.performance_version}</p>` : ''}
+                    </div>
+                `;
+
+                if (data.cluster) {
+                    html += `
+                        <div class="card" style="box-shadow: none; border: 1px solid #eee;">
+                            <h3>聚类信息</h3>
+                            <p><strong>所属聚类:</strong> <span class="cluster-badge cluster-${data.cluster.cluster_label % 8}">${data.cluster.cluster_name}</span></p>
+                            <p><strong>置信度:</strong> ${(data.cluster.confidence * 100).toFixed(1)}%</p>
+                            <p><strong>到中心距离:</strong> ${data.cluster.distance_to_centroid.toFixed(4)}</p>
+                        </div>
+                    `;
+                }
+
+                if (data.features) {
+                    html += `
+                        <div class="card" style="box-shadow: none; border: 1px solid #eee;">
+                            <h3>频谱特征解释</h3>
+                            <p><strong>节拍:</strong> ${data.features.tempo.description} - ${data.features.tempo.interpretation}</p>
+                            <p><strong>频谱质心:</strong> ${data.features.spectral_centroid.description} - ${data.features.spectral_centroid.interpretation}</p>
+                            <p><strong>过零率:</strong> ${data.features.zero_crossing_rate.description} - ${data.features.zero_crossing_rate.interpretation}</p>
+                            <p><strong>RMS能量:</strong> ${data.features.rms_energy.description} - ${data.features.rms_energy.interpretation}</p>
+                            <p><strong>音色特性:</strong> ${data.features.timbre}</p>
+                        </div>
+                    `;
+                }
+
+                if (data.anomalies && data.anomalies.length > 0) {
+                    html += `
+                        <div class="card" style="box-shadow: none; border: 1px solid #eee;">
+                            <h3>异常检测</h3>
+                    `;
+                    for (let anomaly of data.anomalies) {
+                        html += `
+                            <div class="anomaly anomaly-${anomaly.severity}">
+                                <strong>${anomaly.anomaly_type}</strong> (${anomaly.severity}): ${anomaly.description}
+                            </div>
+                        `;
+                    }
+                    html += `</div>`;
+                }
+
+                if (data.nearest_neighbors && data.nearest_neighbors.length > 0) {
+                    html += `
+                        <div class="card" style="box-shadow: none; border: 1px solid #eee;">
+                            <h3>最相似的片段</h3>
+                    `;
+                    for (let neighbor of data.nearest_neighbors) {
+                        html += `
+                            <p>${neighbor.file_name} - 距离: ${neighbor.distance.toFixed(4)}</p>
+                        `;
+                    }
+                    html += `</div>`;
+                }
+
+                content.innerHTML = html;
+                modal.style.display = 'block';
+            } catch (err) {
+                showAlert('加载详情失败: ' + err.message, 'error');
+            }
+        }
+
+        async function withdrawSegment(segmentId) {
+            if (!confirm('确定要撤回这个片段吗？历史记录会保留。')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/withdraw', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        segment_ids: [segmentId],
+                        description: '手动撤回'
+                    })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('片段已撤回', 'success');
+                    setTimeout(() => location.reload(), 500);
+                } else {
+                    showAlert(result.error || '撤回失败', 'error');
+                }
+            } catch (err) {
+                showAlert('网络错误: ' + err.message, 'error');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('segmentModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>
