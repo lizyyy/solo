@@ -30,6 +30,7 @@ interface AppStore {
   setStatusFilter: (status: DataStatus | 'all') => void;
   toggleAnomalyFilter: (anomaly: AnomalyType) => void;
   toggleRouteFilter: (routeId: string) => void;
+  toggleAircraftTypeFilter: (aircraftModel: string) => void;
   setLoadFactorRange: (min: number, max: number) => void;
   setEmissionRange: (min: number, max: number) => void;
   toggleRotation: () => void;
@@ -117,6 +118,16 @@ export const useAppStore = create<AppStore>((set, get) => ({
         ? current.filter(r => r !== routeId)
         : [...current, routeId];
       return { filters: { ...state.filters, routes: next } };
+    });
+  },
+
+  toggleAircraftTypeFilter: (aircraftModel) => {
+    set((state) => {
+      const current = state.filters.aircraftTypes;
+      const next = current.includes(aircraftModel)
+        ? current.filter(m => m !== aircraftModel)
+        : [...current, aircraftModel];
+      return { filters: { ...state.filters, aircraftTypes: next } };
     });
   },
 

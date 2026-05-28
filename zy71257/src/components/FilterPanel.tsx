@@ -11,6 +11,7 @@ export default function FilterPanel() {
     setStatusFilter,
     toggleAnomalyFilter,
     toggleRouteFilter,
+    toggleAircraftTypeFilter,
     setLoadFactorRange,
     setEmissionRange,
     resetFilters,
@@ -18,7 +19,7 @@ export default function FilterPanel() {
     currentTimeRange,
   } = useAppStore();
 
-  // const aircraftModels = [...new Set(aircraft.map(a => a.model))];
+  const aircraftModels = [...new Set(aircraft.map(a => a.model))];
 
   const timeRanges = ['1月', '2月', '3月', 'Q1'];
 
@@ -135,6 +136,31 @@ export default function FilterPanel() {
               </span>
             </label>
           ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm text-slate-300">机型筛选</label>
+        <div className="space-y-1 max-h-28 overflow-y-auto">
+          {aircraftModels.map(model => {
+            const ac = aircraft.find(a => a.model === model);
+            return (
+              <label key={model} className="flex items-center gap-2 cursor-pointer hover:bg-slate-700/50 px-2 py-1 rounded">
+                <input
+                  type="checkbox"
+                  checked={filters.aircraftTypes.includes(model)}
+                  onChange={() => toggleAircraftTypeFilter(model)}
+                  className="rounded bg-slate-700 border-slate-600"
+                />
+                <span className="text-sm truncate">{model}</span>
+                <span className={`text-xs ml-auto px-1 rounded ${
+                  ac?.status === 'confirmed' ? 'bg-blue-900 text-blue-300' : 'bg-purple-900 text-purple-300'
+                }`}>
+                  {ac?.status === 'confirmed' ? '已确认' : '临时'}
+                </span>
+              </label>
+            );
+          })}
         </div>
       </div>
 
