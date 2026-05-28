@@ -1,0 +1,23 @@
+{
+  "sampleSizeThresholds": {
+    "critical": 10,
+    "warning": 30,
+    "good": 50
+  },
+  "commissionIndustryStandard": [
+    { "tier": 1, "minAmount": 0, "maxAmount": 50000, "rate": 25, "description": "5万元及以下" },
+    { "tier": 2, "minAmount": 50000, "maxAmount": 200000, "rate": 20, "description": "5万-20万元" },
+    { "tier": 3, "minAmount": 200000, "maxAmount": 1000000, "rate": 15, "description": "20万-100万元" },
+    { "tier": 4, "minAmount": 1000000, "maxAmount": null, "rate": 12, "description": "100万元以上" }
+  ],
+  "unsoldCostComponents": [
+    { "key": "storage", "name": "仓储成本", "default": 0.015, "description": "按估值月1.5%" },
+    { "key": "marketing", "name": "营销成本", "default": 0.03, "description": "按估值3%" },
+    { "key": "opportunity", "name": "机会成本", "default": 0.05, "description": "按估值5%" }
+  ],
+  "scenarioAdjustments": {
+    "conservative": { "activity": 0.8, "probability": 1.2 },
+    "neutral": { "activity": 1.0, "probability": 1.0 },
+    "optimistic": { "activity": 1.2, "probability": 0.8 }
+  }
+}

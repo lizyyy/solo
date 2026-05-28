@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #1a1a2e;
+  background-color: #fdfcfa;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  h1 {
+    @apply font-serif text-3xl font-semibold text-auction-navy;
+  }
+  h2 {
+    @apply font-serif text-2xl font-semibold text-auction-navy;
+  }
+  h3 {
+    @apply font-serif text-xl font-medium text-auction-navy;
+  }
+  h4 {
+    @apply font-serif text-lg font-medium text-auction-navy;
+  }
+}
+
+@layer components {
+  .auction-card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-300;
+  }
+  
+  .auction-btn-primary {
+    @apply bg-auction-navy text-white px-6 py-2.5 rounded-lg hover:bg-auction-navy-light transition-colors duration-200 font-medium;
+  }
+  
+  .auction-btn-secondary {
+    @apply bg-auction-gold text-auction-ink px-6 py-2.5 rounded-lg hover:bg-auction-gold-light transition-colors duration-200 font-medium;
+  }
+  
+  .auction-btn-outline {
+    @apply border border-auction-navy text-auction-navy px-6 py-2.5 rounded-lg hover:bg-auction-navy hover:text-white transition-colors duration-200 font-medium;
+  }
+  
+  .auction-input {
+    @apply w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-auction-gold focus:border-transparent outline-none transition-all duration-200;
+  }
+  
+  .auction-label {
+    @apply block text-sm font-medium text-gray-700 mb-1.5;
+  }
+  
+  .nav-link {
+    @apply px-4 py-2 rounded-lg text-gray-600 hover:text-auction-navy hover:bg-auction-cream transition-colors duration-200 font-medium;
+  }
+  
+  .nav-link.active {
+    @apply text-auction-navy bg-auction-cream;
+  }
+  
+  .severity-critical {
+    @apply bg-red-50 text-red-700 border-red-200;
+  }
+  
+  .severity-warning {
+    @apply bg-amber-50 text-amber-700 border-amber-200;
+  }
+  
+  .severity-info {
+    @apply bg-blue-50 text-blue-700 border-blue-200;
+  }
+  
+  .scenario-conservative {
+    @apply border-l-4 border-blue-500;
+  }
+  
+  .scenario-neutral {
+    @apply border-l-4 border-auction-gold;
+  }
+  
+  .scenario-optimistic {
+    @apply border-l-4 border-green-500;
+  }
+  
+  .data-table {
+    @apply w-full border-collapse;
+  }
+  
+  .data-table th {
+    @apply bg-auction-cream text-auction-navy font-semibold px-4 py-3 text-left text-sm border-b border-gray-200;
+  }
+  
+  .data-table td {
+    @apply px-4 py-3 text-sm border-b border-gray-100;
+  }
+  
+  .data-table tr:hover td {
+    @apply bg-gray-50;
+  }
+  
+  .metric-value {
+    @apply font-mono text-2xl font-bold text-auction-navy;
+  }
+  
+  .metric-label {
+    @apply text-sm text-gray-500 font-medium;
+  }
+  
+  .tooltip {
+    @apply absolute z-50 px-3 py-2 text-sm bg-auction-ink text-white rounded-lg shadow-lg pointer-events-none;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
