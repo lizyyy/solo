@@ -21,6 +21,8 @@ import {
 import dayjs from 'dayjs';
 import { useDataStore } from '../../store/dataStore';
 import { ExposureCalculator, formatQuantity } from '../../utils/calculator';
+import { exportToFile, ExportOptions } from '../../utils/excel';
+import { message } from 'antd';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -88,10 +90,40 @@ const Export: React.FC = () => {
 
   const handleExport = (values: any) => {
     setExporting(true);
-    setTimeout(() => {
+    
+    try {
+      const includeMap: Record<string, boolean> = {};
+      (values.include as string[]).forEach((key) => {
+        includeMap[key] = true;
+      });
+
+      const options: ExportOptions = {
+        format: values.format === 'pdf' ? 'xlsx' : values.format,
+        include: includeMap,
+      };
+
+      if (values.format === 'pdf') {
+        message.info('PDF格式暂不支持，已自动转换为Excel格式导出');
+      }
+
+      exportToFile(
+        result,
+        exposureConfig,
+        lots,
+        positions,
+        basisRecords,
+        rollovers,
+        auditLogs,
+        options
+      );
+
+      const formatName = values.format === 'xlsx' || values.format === 'pdf' ? 'Excel' : 'CSV';
+      message.success(`报告已成功导出为${formatName}文件`);
+    } catch (error) {
+      message.error(`导出失败: ${(error as Error).message}`);
+    } finally {
       setExporting(false);
-      console.log('Export config:', values);
-    }, 1500);
+    }
   };
 
   return (
