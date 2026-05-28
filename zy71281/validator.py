@@ -95,7 +95,9 @@ class RoyaltyMatrixValidator:
                     message=f"曲目[{track.title if track else track_id}] {right_type.value}在{platform_name}"
                            f"的分成比例总和为{total:.2%}，与100%相差{diff:+.2%}",
                     evidence=evidence,
-                    track_id=track_id
+                    track_id=track_id,
+                    right_type=right_type.value,
+                    platform=platform_name
                 ))
 
         return issues
@@ -156,7 +158,8 @@ class RoyaltyMatrixValidator:
                     message=f"曲目[{track.title if track else track_id}]在{platform.value}的"
                            f"{ded_type}存在{len(ded_list)}次扣费，总计{total_ratio:.2%}",
                     evidence=evidence,
-                    track_id=track_id
+                    track_id=track_id,
+                    platform=platform.value
                 ))
 
         return issues
@@ -168,8 +171,22 @@ class RoyaltyMatrixValidator:
         issues.extend(self.validate_duplicate_deductions())
 
         if filters:
-            issues = [i for i in issues if
-                      (not filters.get('track_id') or i.track_id == filters['track_id'])]
+            def match_filter(issue: ValidationIssue) -> bool:
+                if filters.get('track_id') and issue.track_id != filters['track_id']:
+                    return False
+                if filters.get('right_type'):
+                    if issue.right_type is None:
+                        return False
+                    if issue.right_type != filters['right_type']:
+                        return False
+                if filters.get('platform'):
+                    if issue.platform is None:
+                        return False
+                    if issue.platform != filters['platform']:
+                        return False
+                return True
+
+            issues = [i for i in issues if match_filter(i)]
 
         matrix = self.build_matrix(filters)
 

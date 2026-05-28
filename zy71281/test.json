@@ -1,0 +1,83 @@
+{
+  "export_time": "2026-05-29 05:40:30",
+  "filters": {
+    "platform": "QQ音乐"
+  },
+  "summary": {
+    "总记录数": 2,
+    "错误数": 0,
+    "警告数": 2,
+    "涉及曲目数": 1,
+    "平台数": 1,
+    "权利类型数": 1
+  },
+  "is_valid": true,
+  "issues": [
+    {
+      "level": "warning",
+      "category": "比例不闭合",
+      "message": "曲目[夜曲] 录音在QQ音乐的分成比例总和为95.00%，与100%相差-5.00%",
+      "evidence": [
+        {
+          "权利人": "杰威尔音乐",
+          "比例": "80.00%",
+          "来源": "合同C001第7条"
+        },
+        {
+          "权利人": "腾讯音乐",
+          "比例": "15.00%",
+          "来源": "合同C001第7条"
+        }
+      ],
+      "track_id": "T001",
+      "contract_id": null,
+      "right_type": "录音",
+      "platform": "QQ音乐"
+    },
+    {
+      "level": "warning",
+      "category": "平台扣费重复",
+      "message": "曲目[夜曲]在QQ音乐的平台服务费存在2次扣费，总计30.00%",
+      "evidence": [
+        {
+          "扣费类型": "平台服务费",
+          "比例": "15.00%",
+          "来源": "QQ音乐2024版费率表"
+        },
+        {
+          "扣费类型": "平台服务费",
+          "比例": "15.00%",
+          "来源": "QQ音乐2024版费率表-副本"
+        }
+      ],
+      "track_id": "T001",
+      "contract_id": null,
+      "right_type": null,
+      "platform": "QQ音乐"
+    }
+  ],
+  "matrix": [
+    {
+      "track_title": "夜曲",
+      "track_id": "T001",
+      "right_type": "录音",
+      "rights_holder": "杰威尔音乐",
+      "platform": "QQ音乐",
+      "split_ratio": 0.8,
+      "normalized_ratio": 0.8421052631578947,
+      "contract_version": "v1.0",
+      "source_ref": "合同C001第7条"
+    },
+    {
+      "track_title": "夜曲",
+      "track_id": "T001",
+      "right_type": "录音",
+      "rights_holder": "腾讯音乐",
+      "platform": "QQ音乐",
+      "split_ratio": 0.15,
+      "normalized_ratio": 0.15789473684210525,
+      "contract_version": "v1.0",
+      "source_ref": "合同C001第7条"
+    }
+  ]
+}

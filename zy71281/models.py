@@ -74,6 +74,8 @@ class ValidationIssue:
     evidence: List[Dict]
     track_id: Optional[str] = None
     contract_id: Optional[str] = None
+    right_type: Optional[str] = None
+    platform: Optional[str] = None
 
 
 @dataclass

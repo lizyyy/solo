@@ -54,7 +54,7 @@ class ReportExporter:
                 writer.writerow([f'筛选条件: {filter_str if filter_str else "无"}'])
             writer.writerow([])
 
-            headers = ['级别', '类别', '问题描述', '判断依据', '曲目ID', '合同ID']
+            headers = ['级别', '类别', '问题描述', '判断依据', '曲目ID', '合同ID', '权利类型', '平台']
             writer.writerow(headers)
 
             for issue in issues:
@@ -67,7 +67,9 @@ class ReportExporter:
                     issue.message,
                     evidence_str,
                     issue.track_id or '-',
-                    issue.contract_id or '-'
+                    issue.contract_id or '-',
+                    issue.right_type or '-',
+                    issue.platform or '-'
                 ])
 
         return filepath
@@ -137,7 +139,9 @@ class ReportExporter:
                     'message': i.message,
                     'evidence': i.evidence,
                     'track_id': i.track_id,
-                    'contract_id': i.contract_id
+                    'contract_id': i.contract_id,
+                    'right_type': i.right_type,
+                    'platform': i.platform
                 }
                 for i in result.issues
             ],
