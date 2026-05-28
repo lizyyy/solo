@@ -1,0 +1,38 @@
+[
+  {
+    "problem_id": "A1",
+    "student_name": "张三",
+    "student_answer": "x**2 + 2*x + 1",
+    "standard_expression": "(x+1)**2",
+    "steps": ["(x+1)*(x+1)", "x*x + x*1 + 1*x + 1*1"],
+    "constraints": [],
+    "note": "第一次作业"
+  },
+  {
+    "problem_id": "A1",
+    "student_name": "李四",
+    "student_answer": "x**2 + x + 1",
+    "standard_expression": "(x+1)**2",
+    "steps": ["x**2 + 1"],
+    "constraints": [],
+    "note": "计算错误"
+  },
+  {
+    "problem_id": "A2",
+    "student_name": "王五",
+    "student_answer": "1/(x-1)",
+    "standard_expression": "(x+1)/(x**2-1)",
+    "steps": ["(x+1)/((x-1)*(x+1))"],
+    "constraints": ["x != 1", "x != -1"],
+    "note": "分式化简"
+  },
+  {
+    "problem_id": "A3",
+    "student_name": "赵六",
+    "student_answer": "2*x*exp(x**2)",
+    "standard_expression": "exp(x**2)*2*x",
+    "steps": [],
+    "constraints": [],
+    "note": "乘法交换律"
+  }
+]
