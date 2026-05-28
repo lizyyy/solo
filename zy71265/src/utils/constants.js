@@ -55,7 +55,8 @@ export const EXPORT_FORMATS = {
 export const STORAGE_KEYS = {
   RECORDS: 'gallery_heatmap_records',
   CURRENT_RECORD: 'gallery_heatmap_current',
-  SETTINGS: 'gallery_heatmap_settings'
+  SETTINGS: 'gallery_heatmap_settings',
+  IMPORTED_FILES: 'gallery_heatmap_imported_files'
 };
 
 export const DEFAULT_SETTINGS = {

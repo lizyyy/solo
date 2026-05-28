@@ -27,6 +27,11 @@ export class DataManager {
       if (settingsStr) {
         this.settings = { ...DEFAULT_SETTINGS, ...JSON.parse(settingsStr) };
       }
+
+      const importedFilesStr = localStorage.getItem(STORAGE_KEYS.IMPORTED_FILES);
+      if (importedFilesStr) {
+        this.importedFiles = new Map(JSON.parse(importedFilesStr));
+      }
     } catch (e) {
       console.error('加载存储数据失败:', e);
     }
@@ -37,6 +42,7 @@ export class DataManager {
       localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(this.records));
       localStorage.setItem(STORAGE_KEYS.CURRENT_RECORD, this.currentRecordId || '');
       localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(this.settings));
+      localStorage.setItem(STORAGE_KEYS.IMPORTED_FILES, JSON.stringify(Array.from(this.importedFiles.entries())));
     } catch (e) {
       console.error('保存存储数据失败:', e);
     }
