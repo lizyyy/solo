@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Users, LayoutGrid, Calculator, AlertTriangle, FileText, Plane } from 'lucide-react';
+import { Users, Calculator, AlertTriangle, FileText, Plane } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [

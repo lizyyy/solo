@@ -44,11 +44,14 @@ export default function DataInputPage() {
   const handleValidate = () => {
     const errors = validateAll(passengers, seatMap, paidSeats, companionGroups, rebookingRecords);
     setValidationErrors(errors);
+    return errors;
   };
 
   const handleProceed = () => {
-    handleValidate();
-    if (validationErrors.filter((e) => e.severity === 'error').length === 0) {
+    const errors = validateAll(passengers, seatMap, paidSeats, companionGroups, rebookingRecords);
+    setValidationErrors(errors);
+    const fatalErrors = errors.filter((e) => e.severity === 'error');
+    if (fatalErrors.length === 0) {
       navigate('/compute');
     }
   };

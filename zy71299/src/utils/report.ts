@@ -5,7 +5,6 @@ import {
   CompanionGroup,
   RebookingRecord,
   SwapScheme,
-  SwapAction,
 } from '@/types';
 import { calculateSeatDistance } from '@/algorithm/seatSwap';
 
@@ -138,7 +137,6 @@ export function generateCSVReport(
 ): string {
   const headers = ['乘客ID', '姓名', '原座位', '新座位', '舱位', '是否付费', '同行组', '冲突类型', '冲突说明'];
 
-  const passengerMap = new Map(passengers.map((p) => [p.id, p]));
   const paidSeatMap = new Map(paidSeats.map((ps) => [ps.passengerId, ps]));
   const companionMap = new Map<string, string>();
   companionGroups.forEach((g) => {

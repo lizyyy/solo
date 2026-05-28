@@ -1,5 +1,5 @@
 import { useAppStore } from '@/store/appStore';
-import { AlertTriangle, DollarSign, Users, AlertOctagon, ArrowRight } from 'lucide-react';
+import { AlertTriangle, DollarSign, Users, AlertOctagon, ArrowRight, LucideIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { ConflictType } from '@/types';
@@ -10,7 +10,7 @@ export default function ConflictPage() {
 
   const selectedScheme = swapSchemes.find((s) => s.schemeId === selectedSchemeId);
 
-  const conflictTypeConfig: Record<ConflictType, { icon: any; label: string; color: string; bgColor: string }> = {
+  const conflictTypeConfig: Record<ConflictType, { icon: LucideIcon; label: string; color: string; bgColor: string }> = {
     paid_displaced: {
       icon: DollarSign,
       label: '付费座位变更',

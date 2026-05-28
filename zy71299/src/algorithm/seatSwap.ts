@@ -7,7 +7,6 @@ import {
   WeightConfig,
   SwapAction,
   ConflictEntry,
-  ConflictType,
   SwapScheme,
 } from '@/types';
 
