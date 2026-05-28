@@ -8,6 +8,7 @@ import { EventLog } from './EventLog';
 import { CustomerPanel } from './CustomerPanel';
 import { DetailModal } from './DetailModal';
 import { GameOverScreen } from './GameOverScreen';
+import { HistoryModal } from './HistoryModal';
 
 export const GameBoard: React.FC = () => {
   const { state, actions } = useGame();
@@ -20,6 +21,7 @@ export const GameBoard: React.FC = () => {
     data: null
   });
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     const hasSavedGame = actions.loadSavedGame();
@@ -85,6 +87,12 @@ export const GameBoard: React.FC = () => {
               className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors"
             >
               🔄 新游戏
+            </button>
+            <button
+              onClick={() => setShowHistory(true)}
+              className="w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl font-medium transition-colors"
+            >
+              📜 查看历史对局
             </button>
           </div>
 
@@ -160,6 +168,11 @@ export const GameBoard: React.FC = () => {
       />
 
       {state.isGameOver && <GameOverScreen />}
+      
+      <HistoryModal 
+        isOpen={showHistory} 
+        onClose={() => setShowHistory(false)} 
+      />
     </div>
   );
 };
