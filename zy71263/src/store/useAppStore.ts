@@ -123,6 +123,9 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   exportCurrentReport: () => {
     const s = get();
+    const selectedSample = s.selectedSampleId
+      ? samplePacks.find((p) => p.id === s.selectedSampleId) ?? null
+      : null;
     const data = {
       timestamp: new Date().toISOString(),
       currentQuaternion: s.currentQuaternion,
@@ -131,6 +134,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       interpolationConfig: s.interpolationConfig,
       validationResults: s.validationResults,
       animationProgress: s.animationProgress,
+      attitudeModel: selectedSample?.attitudeModel ?? null,
+      sampleReport: selectedSample?.report ?? null,
+      sampleItems: selectedSample?.items ?? null,
     };
     const json = exportReport(data);
     downloadJson(json, `quat-report-${Date.now()}.json`);

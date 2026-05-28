@@ -54,4 +54,7 @@ export interface ExportData {
   interpolationConfig: InterpolationConfig;
   validationResults: ValidationResult[];
   animationProgress: number;
+  attitudeModel: string | null;
+  sampleReport: string | null;
+  sampleItems: SampleItem[] | null;
 }
