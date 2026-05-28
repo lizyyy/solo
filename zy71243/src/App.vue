@@ -224,6 +224,7 @@ const showReport = ref(false)
 const report = ref(null)
 const maxTurns = 24
 const archiveNotes = ref([])
+const transferTrigger = ref(0)
 
 const isReplayMode = ref(false)
 const replayCurrentTurn = ref(0)
@@ -373,21 +374,28 @@ function handleTransferDevice({ device, type, from, to }) {
   if (!sourceModule || !targetModule) return
   
   if (type === 'solar') {
-    sourceModule.removeSolarPanel(device.id)
-    const actualPanel = sourceModule.solarPanels.find(p => p.id === device.id) || device
-    targetModule.addSolarPanel(actualPanel)
+    const actualPanel = sourceModule.solarPanels.find(p => p.id === device.id)
+    if (actualPanel) {
+      sourceModule.removeSolarPanel(actualPanel.id)
+      targetModule.addSolarPanel(actualPanel)
+    }
   } else if (type === 'battery') {
-    sourceModule.removeBattery(device.id)
-    const actualBattery = sourceModule.batteries.find(b => b.id === device.id) || device
-    targetModule.addBattery(actualBattery)
+    const actualBattery = sourceModule.batteries.find(b => b.id === device.id)
+    if (actualBattery) {
+      sourceModule.removeBattery(actualBattery.id)
+      targetModule.addBattery(actualBattery)
+    }
   } else if (type === 'load') {
-    sourceModule.removeLoad(device.id)
-    const actualLoad = sourceModule.loads.find(l => l.id === device.id) || device
-    actualLoad.moduleId = to
-    targetModule.addLoad(actualLoad)
+    const actualLoad = sourceModule.loads.find(l => l.id === device.id)
+    if (actualLoad) {
+      sourceModule.removeLoad(actualLoad.id)
+      actualLoad.moduleId = to
+      targetModule.addLoad(actualLoad)
+    }
   }
   
-  station.value = { ...station.value }
+  transferTrigger.value++
+  updateState(turnManager.value.getCurrentState())
 }
 
 function handleArchiveNote(note) {

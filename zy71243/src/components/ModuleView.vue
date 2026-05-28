@@ -303,7 +303,9 @@ function getDevicePower(device) {
 
 function selectDeviceForTransfer(device, type, moduleId) {
   selectedDevice.value = {
-    ...device,
+    ref: device,
+    id: device.id,
+    name: device.name,
     deviceType: type,
     sourceModuleId: moduleId
   }
@@ -317,8 +319,13 @@ function transferDevice(device) {
   
   if (!sourceModule || !targetModule) return
   
+  const actualDevice = sourceModule.solarPanels.find(p => p.id === device.id) ||
+                       sourceModule.batteries.find(b => b.id === device.id) ||
+                       sourceModule.loads.find(l => l.id === device.id) ||
+                       device
+  
   emit('transfer-device', {
-    device,
+    device: actualDevice,
     type: transferType.value,
     from: sourceModuleId.value,
     to: targetModuleId.value
@@ -329,7 +336,7 @@ function confirmTransfer(targetModuleId) {
   if (!selectedDevice.value) return
   
   emit('transfer-device', {
-    device: selectedDevice.value,
+    device: selectedDevice.value.ref,
     type: selectedDevice.value.deviceType,
     from: selectedDevice.value.sourceModuleId,
     to: targetModuleId
