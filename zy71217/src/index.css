@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Serif SC', serif;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 异常行闪烁动画 */
+@keyframes row-flash {
+  0%, 100% {
+    background-color: rgba(245, 63, 63, 0.1);
+  }
+  50% {
+    background-color: rgba(245, 63, 63, 0.2);
+  }
+}
+
+.row-error-flash {
+  animation: row-flash 2s ease-in-out infinite;
+}
+
+/* 争议未冻结边框闪烁 */
+@keyframes border-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 125, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(255, 125, 0, 0.2);
+  }
+}
+
+.border-warning-pulse {
+  animation: border-pulse 1.5s ease-in-out infinite;
+}
+
+/* 处理结论脉冲效果 */
+@keyframes conclusion-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.conclusion-pulse {
+  animation: conclusion-pulse 2s ease-in-out infinite;
+}
+
+/* Ant Design 主题覆盖 */
+:root {
+  --ant-primary-color: #165DFF;
+  --ant-success-color: #00B42A;
+  --ant-warning-color: #FF7D00;
+  --ant-error-color: #F53F3F;
+}
