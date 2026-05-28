@@ -50,7 +50,7 @@ export default function Detail() {
   const {
     getBusinessById,
     currentUser,
-    runValidation,
+    performAction,
     exportConclusion,
     getBusinessObjects,
   } = useBusinessStore();
@@ -94,7 +94,7 @@ export default function Detail() {
     if (action === 'export') {
       handleExport();
     } else if (action === 'recheck') {
-      runValidation(business.id);
+      performAction(business.id, 'recheck', '重新校验');
     } else {
       setSelectedAction(action);
     }
@@ -159,7 +159,7 @@ export default function Detail() {
             </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => runValidation(business.id)}
+                onClick={() => performAction(business.id, 'recheck', '手动触发重新校验')}
                 className="flex items-center gap-2 px-3 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
               >
                 <RefreshCw size={16} />

@@ -219,6 +219,18 @@ export const useBusinessStore = create<BusinessState>()(
               : issue
           );
 
+          const openIssuesAfter = updatedIssues.filter((i) => i.status === 'open');
+
+          let newStatus: BusinessStatus = business.status;
+          const canAdvanceToReview =
+            business.status === 'issue_found' ||
+            business.status === 'duplicate_check' ||
+            business.status === 'processing';
+
+          if (openIssuesAfter.length === 0 && canAdvanceToReview) {
+            newStatus = 'pending_review';
+          }
+
           const trail: AuditTrail = {
             id: `trail-${Date.now()}`,
             businessNo: business.businessNo,
@@ -227,12 +239,13 @@ export const useBusinessStore = create<BusinessState>()(
             operateTime: new Date().toISOString(),
             remark: `解决问题：${issueId}，${resolution}`,
             fromStatus: business.status,
-            toStatus: business.status,
+            toStatus: newStatus,
           };
 
           const updatedBusiness: BusinessObject = {
             ...business,
             issues: updatedIssues,
+            status: newStatus,
             riskLevel: calculateRiskLevel(updatedIssues),
             auditTrails: [...business.auditTrails, trail],
             updatedAt: new Date().toISOString(),
@@ -265,6 +278,18 @@ export const useBusinessStore = create<BusinessState>()(
               : issue
           );
 
+          const openIssuesAfter = updatedIssues.filter((i) => i.status === 'open');
+
+          let newStatus: BusinessStatus = business.status;
+          const canAdvanceToReview =
+            business.status === 'issue_found' ||
+            business.status === 'duplicate_check' ||
+            business.status === 'processing';
+
+          if (openIssuesAfter.length === 0 && canAdvanceToReview) {
+            newStatus = 'pending_review';
+          }
+
           const trail: AuditTrail = {
             id: `trail-${Date.now()}`,
             businessNo: business.businessNo,
@@ -273,12 +298,13 @@ export const useBusinessStore = create<BusinessState>()(
             operateTime: new Date().toISOString(),
             remark: `忽略问题：${issueId}`,
             fromStatus: business.status,
-            toStatus: business.status,
+            toStatus: newStatus,
           };
 
           const updatedBusiness: BusinessObject = {
             ...business,
             issues: updatedIssues,
+            status: newStatus,
             riskLevel: calculateRiskLevel(updatedIssues),
             auditTrails: [...business.auditTrails, trail],
             updatedAt: new Date().toISOString(),
@@ -441,7 +467,7 @@ export const useBusinessStore = create<BusinessState>()(
             toStatus: 'processing',
           };
 
-          const updatedBusiness: BusinessObject = {
+          const businessAfterUpload: BusinessObject = {
             ...business,
             currentVersion: newVersion,
             contracts: newContracts,
@@ -454,8 +480,56 @@ export const useBusinessStore = create<BusinessState>()(
             amount: newApplications[newApplications.length - 1]?.amount || business.amount,
           };
 
+          const allBusinessAfterUpload = state.businessObjects.map((bo) =>
+            bo.id === businessId ? businessAfterUpload : bo
+          );
+
+          const validationResult = runFullValidation(
+            businessAfterUpload,
+            allBusinessAfterUpload
+          );
+
+          const mergedIssues = validationResult.issues.map((newIssue) => {
+            const existing = business.issues.find((i) => i.id === newIssue.id);
+            if (existing && existing.status === 'resolved') {
+              return existing;
+            }
+            return newIssue;
+          });
+
+          const openIssues = mergedIssues.filter((i) => i.status === 'open');
+          let finalStatus: BusinessStatus = 'processing';
+          if (openIssues.length > 0) {
+            const hasDuplicate = openIssues.some(
+              (i) => i.type === 'duplicate_remittance'
+            );
+            finalStatus = hasDuplicate ? 'duplicate_check' : 'issue_found';
+          } else {
+            finalStatus = 'pending_review';
+          }
+
+          const recheckTrail: AuditTrail = {
+            id: `trail-${Date.now() + 1}`,
+            businessNo: business.businessNo,
+            action: 'recheck',
+            operator: state.currentUser.name,
+            operateTime: new Date().toISOString(),
+            remark: `补件上传后自动校验：${openIssues.length > 0 ? `发现 ${openIssues.length} 个待处理问题` : '校验通过，进入待复核'}`,
+            fromStatus: 'processing',
+            toStatus: finalStatus,
+          };
+
+          const updatedBusiness: BusinessObject = {
+            ...businessAfterUpload,
+            status: finalStatus,
+            issues: mergedIssues,
+            riskLevel: calculateRiskLevel(mergedIssues),
+            auditTrails: [...businessAfterUpload.auditTrails, recheckTrail],
+            updatedAt: new Date().toISOString(),
+          };
+
           return {
-            businessObjects: state.businessObjects.map((bo) =>
+            businessObjects: allBusinessAfterUpload.map((bo) =>
               bo.id === businessId ? updatedBusiness : bo
             ),
           };
@@ -494,7 +568,7 @@ export const useBusinessStore = create<BusinessState>()(
             toStatus: 'processing',
           };
 
-          const updatedBusiness: BusinessObject = {
+          const businessAfterUpdate: BusinessObject = {
             ...business,
             purposeCode,
             purposeName,
@@ -505,8 +579,56 @@ export const useBusinessStore = create<BusinessState>()(
             updatedAt: new Date().toISOString(),
           };
 
+          const allBusinessAfterUpdate = state.businessObjects.map((bo) =>
+            bo.id === businessId ? businessAfterUpdate : bo
+          );
+
+          const validationResult = runFullValidation(
+            businessAfterUpdate,
+            allBusinessAfterUpdate
+          );
+
+          const mergedIssues = validationResult.issues.map((newIssue) => {
+            const existing = business.issues.find((i) => i.id === newIssue.id);
+            if (existing && existing.status === 'resolved') {
+              return existing;
+            }
+            return newIssue;
+          });
+
+          const openIssues = mergedIssues.filter((i) => i.status === 'open');
+          let finalStatus: BusinessStatus = 'processing';
+          if (openIssues.length > 0) {
+            const hasDuplicate = openIssues.some(
+              (i) => i.type === 'duplicate_remittance'
+            );
+            finalStatus = hasDuplicate ? 'duplicate_check' : 'issue_found';
+          } else {
+            finalStatus = 'pending_review';
+          }
+
+          const recheckTrail: AuditTrail = {
+            id: `trail-${Date.now() + 1}`,
+            businessNo: business.businessNo,
+            action: 'recheck',
+            operator: state.currentUser.name,
+            operateTime: new Date().toISOString(),
+            remark: `用途代码修改后自动校验：${openIssues.length > 0 ? `发现 ${openIssues.length} 个待处理问题` : '校验通过，进入待复核'}`,
+            fromStatus: 'processing',
+            toStatus: finalStatus,
+          };
+
+          const updatedBusiness: BusinessObject = {
+            ...businessAfterUpdate,
+            status: finalStatus,
+            issues: mergedIssues,
+            riskLevel: calculateRiskLevel(mergedIssues),
+            auditTrails: [...businessAfterUpdate.auditTrails, recheckTrail],
+            updatedAt: new Date().toISOString(),
+          };
+
           return {
-            businessObjects: state.businessObjects.map((bo) =>
+            businessObjects: allBusinessAfterUpdate.map((bo) =>
               bo.id === businessId ? updatedBusiness : bo
             ),
           };
