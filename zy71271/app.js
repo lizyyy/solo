@@ -288,16 +288,21 @@ class GalaxyWallApp {
         if (galaxy.redshift === null || galaxy.redshift < 0) {
             galaxy.isPending = true;
             galaxy.pendingReasons.push('红移值缺失或无效');
-            galaxy.redshift = galaxy.redshift || 0;
+            galaxy.displayRedshift = 0;
+        } else {
+            galaxy.displayRedshift = galaxy.redshift;
         }
 
         if (galaxy.brightness === null) {
             galaxy.isPending = true;
             galaxy.pendingReasons.push('亮度值缺失');
-            galaxy.brightness = 0;
+            galaxy.displayBrightness = 0;
         } else if (galaxy.brightness < -25 || galaxy.brightness > 20) {
             galaxy.isPending = true;
             galaxy.pendingReasons.push('亮度值超出正常范围');
+            galaxy.displayBrightness = galaxy.brightness;
+        } else {
+            galaxy.displayBrightness = galaxy.brightness;
         }
 
         if (!this.spectrumColorMap[galaxy.spectrumType]) {
@@ -305,19 +310,25 @@ class GalaxyWallApp {
         }
 
         if (galaxy.x === null) {
-            galaxy.x = (Math.random() - 0.5) * 80;
+            galaxy.displayX = (Math.random() - 0.5) * 80;
             galaxy.isPending = true;
             galaxy.pendingReasons.push('X坐标缺失');
+        } else {
+            galaxy.displayX = galaxy.x;
         }
         if (galaxy.y === null) {
-            galaxy.y = (Math.random() - 0.5) * 40;
+            galaxy.displayY = (Math.random() - 0.5) * 40;
             galaxy.isPending = true;
             galaxy.pendingReasons.push('Y坐标缺失');
+        } else {
+            galaxy.displayY = galaxy.y;
         }
         if (galaxy.z === null) {
-            galaxy.z = galaxy.redshift * 30 + (Math.random() - 0.5) * 10;
+            galaxy.displayZ = galaxy.displayRedshift * 30 + (Math.random() - 0.5) * 10;
             galaxy.isPending = true;
             galaxy.pendingReasons.push('Z坐标缺失');
+        } else {
+            galaxy.displayZ = galaxy.z;
         }
     }
 
@@ -466,9 +477,9 @@ class GalaxyWallApp {
 
         const sphere = new THREE.Mesh(geometry, material);
         sphere.position.set(
-            this.normalizeCoordinate(galaxy.x, -50, 50, -40, 40),
-            this.normalizeCoordinate(galaxy.y, -30, 30, -20, 20),
-            this.normalizeCoordinate(galaxy.z, 0, 100, -30, 30)
+            this.normalizeCoordinate(galaxy.displayX, -50, 50, -40, 40),
+            this.normalizeCoordinate(galaxy.displayY, -30, 30, -20, 20),
+            this.normalizeCoordinate(galaxy.displayZ, 0, 100, -30, 30)
         );
 
         const glowGeometry = new THREE.SphereGeometry(size * 1.5, 16, 16);
@@ -499,7 +510,7 @@ class GalaxyWallApp {
     }
 
     calculateMarkerSize(galaxy) {
-        let size = 0.3 + (1 - (galaxy.brightness + 20) / 40) * 0.8;
+        let size = 0.3 + (1 - (galaxy.displayBrightness + 20) / 40) * 0.8;
         size = Math.max(0.2, Math.min(1.5, size));
         
         if (galaxy.isPending && document.getElementById('highlightPending').checked) {
@@ -524,9 +535,9 @@ class GalaxyWallApp {
 
         const label = new THREE.CSS2DObject(div);
         label.position.set(
-            this.normalizeCoordinate(galaxy.x, -50, 50, -40, 40),
-            this.normalizeCoordinate(galaxy.y, -30, 30, -20, 20) + 1,
-            this.normalizeCoordinate(galaxy.z, 0, 100, -30, 30)
+            this.normalizeCoordinate(galaxy.displayX, -50, 50, -40, 40),
+            this.normalizeCoordinate(galaxy.displayY, -30, 30, -20, 20) + 1,
+            this.normalizeCoordinate(galaxy.displayZ, 0, 100, -30, 30)
         );
         label.userData = { galaxy };
 
@@ -661,8 +672,11 @@ class GalaxyWallApp {
         const exportData = this.filteredGalaxies.map(g => ({
             名称: g.name,
             光谱类型: g.spectrumType,
-            红移: g.redshift,
-            亮度: g.brightness,
+            红移: g.redshift !== null ? g.redshift : '',
+            亮度: g.brightness !== null ? g.brightness : '',
+            坐标X: g.x !== null ? g.x : '',
+            坐标Y: g.y !== null ? g.y : '',
+            坐标Z: g.z !== null ? g.z : '',
             观测批次: g.batch,
             状态: g.isPending ? '待复核' : '正常',
             备注: g.pendingReasons.join('; '),
