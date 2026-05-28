@@ -1,12 +1,24 @@
 import { useState } from 'react';
-import { Search, SlidersHorizontal, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
+import { Search, SlidersHorizontal, ChevronDown, ChevronUp, RotateCcw, Eye, Sun, DollarSign } from 'lucide-react';
 import { useFilterStore } from '../../store/useFilterStore';
 import { ANOMALY_LABELS, STATUS_LABELS } from '../../types';
 
 export function FilterPanel() {
-  const { criteria, toggleStatus, toggleAnomaly, setSearchText, resetFilters } = useFilterStore();
+  const {
+    criteria,
+    toggleStatus,
+    toggleAnomaly,
+    setSearchText,
+    setTransparencyRange,
+    setLightfastnessRange,
+    setCostRange,
+    resetFilters,
+  } = useFilterStore();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     search: true,
+    transparency: true,
+    lightfastness: true,
+    cost: true,
     status: true,
     anomalies: true,
   });
@@ -65,6 +77,208 @@ export function FilterPanel() {
                 onChange={(e) => setSearchText(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <button
+            onClick={() => toggleSection('transparency')}
+            className="w-full flex items-center justify-between text-sm font-medium text-slate-300 hover:text-white"
+          >
+            <div className="flex items-center gap-2">
+              <Eye className="w-4 h-4 text-green-500" />
+              <span>透明度范围</span>
+            </div>
+            {expandedSections.transparency ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {expandedSections.transparency && (
+            <div className="space-y-3 bg-slate-700/30 rounded-lg p-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <label className="text-xs text-slate-400">最小值</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={Math.round(criteria.transparencyRange[0] * 100)}
+                    onChange={(e) => {
+                      const val = Math.min(Math.max(parseInt(e.target.value) || 0, 0), 100);
+                      setTransparencyRange([val / 100, criteria.transparencyRange[1]]);
+                    }}
+                    className="w-20 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-sm text-white text-right focus:outline-none focus:ring-1 focus:ring-green-500"
+                  />
+                  <span className="text-xs text-slate-400 ml-1">%</span>
+                </div>
+                <div className="text-xs text-slate-500">—</div>
+                <div className="space-y-1">
+                  <label className="text-xs text-slate-400">最大值</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={Math.round(criteria.transparencyRange[1] * 100)}
+                    onChange={(e) => {
+                      const val = Math.min(Math.max(parseInt(e.target.value) || 0, 0), 100);
+                      setTransparencyRange([criteria.transparencyRange[0], val / 100]);
+                    }}
+                    className="w-20 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-sm text-white text-right focus:outline-none focus:ring-1 focus:ring-green-500"
+                  />
+                  <span className="text-xs text-slate-400 ml-1">%</span>
+                </div>
+              </div>
+              <div className="relative pt-2">
+                <div className="h-1.5 bg-slate-600 rounded-full">
+                  <div
+                    className="absolute h-1.5 bg-green-500 rounded-full"
+                    style={{
+                      left: `${criteria.transparencyRange[0] * 100}%`,
+                      right: `${100 - criteria.transparencyRange[1] * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <button
+            onClick={() => toggleSection('lightfastness')}
+            className="w-full flex items-center justify-between text-sm font-medium text-slate-300 hover:text-white"
+          >
+            <div className="flex items-center gap-2">
+              <Sun className="w-4 h-4 text-blue-500" />
+              <span>耐光等级范围</span>
+            </div>
+            {expandedSections.lightfastness ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {expandedSections.lightfastness && (
+            <div className="space-y-3 bg-slate-700/30 rounded-lg p-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <label className="text-xs text-slate-400">最低等级</label>
+                  <select
+                    value={criteria.lightfastnessRange[0]}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      setLightfastnessRange([val, criteria.lightfastnessRange[1]]);
+                    }}
+                    className="w-20 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
+                      <option key={n} value={n}>等级 {n}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="text-xs text-slate-500">—</div>
+                <div className="space-y-1">
+                  <label className="text-xs text-slate-400">最高等级</label>
+                  <select
+                    value={criteria.lightfastnessRange[1]}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      setLightfastnessRange([criteria.lightfastnessRange[0], val]);
+                    }}
+                    className="w-20 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
+                      <option key={n} value={n}>等级 {n}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="relative pt-2">
+                <div className="h-1.5 bg-slate-600 rounded-full">
+                  <div
+                    className="absolute h-1.5 bg-blue-500 rounded-full"
+                    style={{
+                      left: `${((criteria.lightfastnessRange[0] - 1) / 7) * 100}%`,
+                      right: `${100 - ((criteria.lightfastnessRange[1] - 1) / 7) * 100}%`,
+                    }}
+                  />
+                </div>
+                <div className="flex justify-between mt-1 text-[10px] text-slate-500">
+                  <span>1</span>
+                  <span>2</span>
+                  <span>3</span>
+                  <span>4</span>
+                  <span>5</span>
+                  <span>6</span>
+                  <span>7</span>
+                  <span>8</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <button
+            onClick={() => toggleSection('cost')}
+            className="w-full flex items-center justify-between text-sm font-medium text-slate-300 hover:text-white"
+          >
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-amber-500" />
+              <span>成本范围</span>
+            </div>
+            {expandedSections.cost ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {expandedSections.cost && (
+            <div className="space-y-3 bg-slate-700/30 rounded-lg p-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <label className="text-xs text-slate-400">最低成本</label>
+                  <div className="flex items-center">
+                    <span className="text-xs text-slate-400 mr-1">¥</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="1000"
+                      value={criteria.costRange[0]}
+                      onChange={(e) => {
+                        const val = Math.min(Math.max(parseInt(e.target.value) || 0, 0), 1000);
+                        setCostRange([val, criteria.costRange[1]]);
+                      }}
+                      className="w-16 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-sm text-white text-right focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    />
+                  </div>
+                </div>
+                <div className="text-xs text-slate-500">—</div>
+                <div className="space-y-1">
+                  <label className="text-xs text-slate-400">最高成本</label>
+                  <div className="flex items-center">
+                    <span className="text-xs text-slate-400 mr-1">¥</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="1000"
+                      value={criteria.costRange[1]}
+                      onChange={(e) => {
+                        const val = Math.min(Math.max(parseInt(e.target.value) || 0, 0), 1000);
+                        setCostRange([criteria.costRange[0], val]);
+                      }}
+                      className="w-16 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-sm text-white text-right focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="relative pt-2">
+                <div className="h-1.5 bg-slate-600 rounded-full">
+                  <div
+                    className="absolute h-1.5 bg-amber-500 rounded-full"
+                    style={{
+                      left: `${(criteria.costRange[0] / 1000) * 100}%`,
+                      right: `${100 - (criteria.costRange[1] / 1000) * 100}%`,
+                    }}
+                  />
+                </div>
+                <div className="flex justify-between mt-1 text-[10px] text-slate-500">
+                  <span>¥0</span>
+                  <span>¥500</span>
+                  <span>¥1000</span>
+                </div>
+              </div>
             </div>
           )}
         </div>
