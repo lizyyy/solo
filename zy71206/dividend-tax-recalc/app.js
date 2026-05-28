@@ -90,6 +90,7 @@ const DataValidator = {
       const rowNum = d.row || (idx + 1);
       const src = `分红流水第${rowNum}行`;
       if (!d.dividendId) errors.push({ row: rowNum, source: src, field: 'dividendId', error: '缺少分红编号', raw: JSON.stringify(d) });
+      if (!d.accountId) errors.push({ row: rowNum, source: src, field: 'accountId', error: '缺少账户编号', raw: JSON.stringify(d) });
       if (!d.stockCode) errors.push({ row: rowNum, source: src, field: 'stockCode', error: '缺少证券代码', raw: JSON.stringify(d) });
       if (!isValidDate(d.exDate)) errors.push({ row: rowNum, source: src, field: 'exDate', error: `除权日格式无效: ${d.exDate}`, raw: JSON.stringify(d) });
       if (!isValidDate(d.payDate)) errors.push({ row: rowNum, source: src, field: 'payDate', error: `派息日格式无效: ${d.payDate}`, raw: JSON.stringify(d) });
