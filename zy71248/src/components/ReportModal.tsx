@@ -4,7 +4,7 @@ import { GradingReport } from '../types';
 import { formatDateTime } from '../utils/colorMath';
 import { formatParamsForDisplay } from '../utils/reportGenerator';
 import { getGradeColor, getIssueIcon, getIssueName } from '../utils/scoring';
-import { X, Download, FileText, CheckCircle } from 'lucide-react';
+import { X, Download, FileText, CheckCircle, User, Target, Edit3 } from 'lucide-react';
 
 interface ReportModalProps {
   report: GradingReport | null;
@@ -90,9 +90,22 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             </div>
 
             <div className="flex-1">
-              <div className="text-sm text-gray-400 mb-1">生成时间</div>
-              <div className="text-gray-200 font-mono mb-4">
-                {formatDateTime(report.timestamp)}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <div className="text-sm text-gray-400 mb-1">关卡</div>
+                  <div className="text-gray-200 font-medium">{report.levelName}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-400 mb-1 flex items-center gap-1">
+                    <User className="w-3.5 h-3.5" />
+                    操作者
+                  </div>
+                  <div className="text-gray-200 font-medium">{report.operator}</div>
+                </div>
+                <div className="col-span-2">
+                  <div className="text-sm text-gray-400 mb-1">生成时间</div>
+                  <div className="text-gray-200 font-mono">{formatDateTime(report.timestamp)}</div>
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
@@ -116,33 +129,54 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             </div>
           )}
 
-          <div>
-            <div className="text-sm text-gray-400 mb-2">最终参数</div>
-            <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-500">曝光: </span>
-                  <span className="text-cyan-400 font-mono">
-                    {report.finalParams.exposure.toFixed(2)}
-                  </span>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <div className="text-sm text-gray-400 mb-2 flex items-center gap-1">
+                <Target className="w-3.5 h-3.5" />
+                目标参数
+              </div>
+              <div className="p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">曝光:</span>
+                    <span className="text-gray-400 font-mono">{report.targetParams.exposure.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">色温:</span>
+                    <span className="text-gray-400 font-mono">{report.targetParams.temperature}K</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">LUT:</span>
+                    <span className="text-gray-400 font-mono">{report.targetParams.lutId || '无'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">LUT 强度:</span>
+                    <span className="text-gray-400 font-mono">{report.targetParams.lutIntensity}%</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-gray-500">色温: </span>
-                  <span className="text-orange-400 font-mono">
-                    {report.finalParams.temperature}K
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-500">LUT: </span>
-                  <span className="text-purple-400 font-mono">
-                    {report.finalParams.lutId || '无'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-gray-500">LUT 强度: </span>
-                  <span className="text-purple-400 font-mono">
-                    {report.finalParams.lutIntensity}%
-                  </span>
+              </div>
+            </div>
+
+            <div>
+              <div className="text-sm text-gray-400 mb-2">最终参数</div>
+              <div className="p-4 bg-cyan-900/20 rounded-lg border border-cyan-700/50">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">曝光:</span>
+                    <span className="text-cyan-400 font-mono">{report.finalParams.exposure.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">色温:</span>
+                    <span className="text-cyan-400 font-mono">{report.finalParams.temperature}K</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">LUT:</span>
+                    <span className="text-cyan-400 font-mono">{report.finalParams.lutId || '无'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">LUT 强度:</span>
+                    <span className="text-cyan-400 font-mono">{report.finalParams.lutIntensity}%</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -183,6 +217,42 @@ export const ReportModal: React.FC<ReportModalProps> = ({
             </div>
           )}
 
+          {report.notes && (
+            <div>
+              <div className="text-sm text-gray-400 mb-2">备注</div>
+              <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700 text-gray-300 whitespace-pre-wrap">
+                {report.notes}
+              </div>
+            </div>
+          )}
+
+          {report.manualCorrections && report.manualCorrections.length > 0 && (
+            <div>
+              <div className="text-sm text-gray-400 mb-2 flex items-center gap-1">
+                <Edit3 className="w-3.5 h-3.5 text-pink-400" />
+                人工更正记录 ({report.manualCorrections.length} 次)
+              </div>
+              <div className="space-y-2">
+                {report.manualCorrections.map((entry, index) => (
+                  <div
+                    key={entry.id}
+                    className="flex items-center gap-3 p-3 bg-pink-900/20 rounded-lg border border-pink-700/30"
+                  >
+                    <Edit3 className="w-4 h-4 text-pink-400 flex-shrink-0" />
+                    <div className="flex-1">
+                      <div className="text-sm text-gray-200">
+                        {entry.note || '人工参数调整'}
+                      </div>
+                      <div className="text-xs text-gray-500 font-mono">
+                        {formatDateTime(entry.timestamp)} · {entry.operator}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div>
             <div className="text-sm text-gray-400 mb-2">
               操作历史 ({report.history.length} 步)
@@ -191,18 +261,34 @@ export const ReportModal: React.FC<ReportModalProps> = ({
               {report.history.map((entry, index) => (
                 <div
                   key={entry.id}
-                  className="flex items-center gap-3 p-2 text-xs bg-gray-800/30 rounded"
+                  className={`flex items-center gap-3 p-2 text-xs rounded ${
+                    entry.isManualCorrection ? 'bg-pink-900/20 border border-pink-700/30' : 'bg-gray-800/30'
+                  }`}
                 >
-                  <span className="w-6 h-6 flex items-center justify-center bg-gray-700 rounded text-gray-300">
+                  <span className="w-6 h-6 flex items-center justify-center bg-gray-700 rounded text-gray-300 flex-shrink-0">
                     {index + 1}
                   </span>
-                  <span className="w-20 text-gray-400 font-mono">
+                  <span className="w-20 text-gray-400 font-mono flex-shrink-0">
                     {formatDateTime(entry.timestamp).split(' ')[1]}
                   </span>
-                  <span className="w-16 text-cyan-400">{entry.actionType}</span>
-                  <span className="flex-1 text-gray-500 truncate font-mono">
-                    {formatParamsForDisplay(entry.params)}
+                  <span className={`w-20 flex-shrink-0 ${entry.isManualCorrection ? 'text-pink-400' : 'text-cyan-400'}`}>
+                    {entry.actionType}
                   </span>
+                  {entry.modificationSource && (
+                    <span className="text-gray-600 text-xs flex-shrink-0">
+                      [{entry.modificationSource}]
+                    </span>
+                  )}
+                  {entry.actionType !== 'note' && (
+                    <span className="flex-1 text-gray-500 truncate font-mono">
+                      {formatParamsForDisplay(entry.params)}
+                    </span>
+                  )}
+                  {entry.note && entry.actionType === 'note' && (
+                    <span className="flex-1 text-gray-500 truncate">
+                      {entry.note}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>

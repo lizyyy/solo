@@ -179,9 +179,77 @@ export function calculateBrightness(r: number, g: number, b: number): number {
   return 0.299 * r + 0.587 * g + 0.114 * b;
 }
 
+export function isSkinTone(r: number, g: number, b: number): boolean {
+  const y = calculateBrightness(r, g, b);
+  if (y < 40 || y > 220) return false;
+
+  const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+  const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+
+  return cb >= 77 && cb <= 127 && cr >= 133 && cr <= 173;
+}
+
+export function calculateSkinToneShift(
+  imageData: ImageData,
+  referenceData?: ImageData
+): { hasShift: boolean; shiftAmount: number; skinPixelRatio: number } {
+  const data = imageData.data;
+  const refData = referenceData?.data;
+
+  let skinPixelCount = 0;
+  let totalShift = 0;
+  let totalSkinPixelsInRef = 0;
+
+  const sampleRate = Math.max(1, Math.floor((data.length / 4) / 5000));
+  let sampledCount = 0;
+
+  for (let i = 0; i < data.length; i += 4 * sampleRate) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+
+    sampledCount++;
+
+    if (isSkinTone(r, g, b)) {
+      skinPixelCount++;
+
+      if (refData && i < refData.length) {
+        const refR = refData[i];
+        const refG = refData[i + 1];
+        const refB = refData[i + 2];
+
+        if (isSkinTone(refR, refG, refB)) {
+          totalSkinPixelsInRef++;
+          const lab1 = rgbToLab(r, g, b);
+          const lab2 = rgbToLab(refR, refG, refB);
+          totalShift += calculateDeltaE(lab1, lab2);
+        }
+      }
+    }
+  }
+
+  const skinPixelRatio = skinPixelCount / sampledCount;
+  const avgShift = totalSkinPixelsInRef > 0 ? totalShift / totalSkinPixelsInRef : 0;
+
+  if (referenceData && skinPixelRatio > 0.05) {
+    return {
+      hasShift: avgShift > 8,
+      shiftAmount: avgShift,
+      skinPixelRatio,
+    };
+  }
+
+  return {
+    hasShift: false,
+    shiftAmount: avgShift,
+    skinPixelRatio,
+  };
+}
+
 export function detectIssues(
   imageData: ImageData,
-  params: ColorParams
+  params: ColorParams,
+  referenceData?: ImageData
 ): IssueDetected[] {
   const issues: IssueDetected[] = [];
   const data = imageData.data;
@@ -225,6 +293,18 @@ export function detectIssues(
       message: `LUT强度过高，色彩可能失真 (强度: ${params.lutIntensity}%)`,
       value: params.lutIntensity,
     });
+  }
+
+  if (referenceData) {
+    const skinAnalysis = calculateSkinToneShift(imageData, referenceData);
+    if (skinAnalysis.hasShift && skinAnalysis.skinPixelRatio > 0.05) {
+      issues.push({
+        type: 'skin_shift',
+        severity: skinAnalysis.shiftAmount > 15 ? 'error' : 'warning',
+        message: `肤色偏移检测 (ΔE: ${skinAnalysis.shiftAmount.toFixed(1)})`,
+        value: skinAnalysis.shiftAmount,
+      });
+    }
   }
 
   return issues;

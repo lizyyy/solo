@@ -1,12 +1,20 @@
 
-import { GradingReport, ColorParams } from '../types';
+import { GradingReport, ColorParams, HistoryEntry } from '../types';
 import { formatDateTime } from './colorMath';
-import { getGradeColor } from './scoring';
+import { getGradeColor, getIssueName } from './scoring';
 import jsPDF from 'jspdf';
 
-const OPERATOR_NAME = 'Player';
-
+const OPERATOR_KEY = 'color_challenge_operator';
 const REPORT_KEY = 'color_challenge_reports';
+
+export function getOperatorName(): string {
+  const saved = localStorage.getItem(OPERATOR_KEY);
+  return saved || '调色师';
+}
+
+export function setOperatorName(name: string): void {
+  localStorage.setItem(OPERATOR_KEY, name);
+}
 
 export function saveReport(report: GradingReport): void {
   const reports = getReports();
@@ -32,10 +40,6 @@ export function clearReports(): void {
   localStorage.removeItem(REPORT_KEY);
 }
 
-export function getOperatorName(): string {
-  return OPERATOR_NAME;
-}
-
 export async function exportReportAsPDF(report: GradingReport): Promise<void> {
   const pdf = new jsPDF('l', 'mm', 'a4');
 
@@ -49,8 +53,12 @@ export async function exportReportAsPDF(report: GradingReport): Promise<void> {
 
   pdf.setTextColor(200, 200, 200);
   pdf.setFontSize(12);
-  pdf.text('Report', 148, 30, { align: 'center' });
-  pdf.text(formatDateTime(report.timestamp), 148, 38, { align: 'center' });
+  pdf.text('调色分析报告', 148, 30, { align: 'center' });
+
+  pdf.setFontSize(10);
+  pdf.setTextColor(150, 150, 150);
+  pdf.text('关卡: ' + report.levelName + ' | 操作者: ' + report.operator, 148, 38, { align: 'center' });
+  pdf.text(formatDateTime(report.timestamp), 148, 45, { align: 'center' });
 
   const gradeColor = getGradeColor(report.score.grade);
   const r = parseInt(gradeColor.slice(1, 3), 16);
@@ -60,43 +68,79 @@ export async function exportReportAsPDF(report: GradingReport): Promise<void> {
   pdf.setTextColor(r, g, b);
   pdf.setFontSize(48);
   pdf.setFont('helvetica', 'bold');
-  pdf.text(report.score.grade, 40, 60);
+  pdf.text(report.score.grade, 25, 70);
 
   pdf.setTextColor(200, 200, 200);
   pdf.setFontSize(14);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('Overall Score', 40, 75);
-  pdf.text(report.score.overall + '/100', 40, 85);
+  pdf.text('综合评分', 25, 85);
+  pdf.text(report.score.overall + '/100', 25, 95);
 
-  pdf.text('Brightness', 100, 65);
-  pdf.text(String(report.score.brightness), 100, 75);
+  pdf.text('亮度', 85, 65);
+  pdf.text(String(report.score.brightness), 85, 75);
 
-  pdf.text('Color', 100, 90);
-  pdf.text(String(report.score.color), 100, 100);
+  pdf.text('色彩', 85, 90);
+  pdf.text(String(report.score.color), 85, 100);
 
-  pdf.text('Detail', 100, 115);
-  pdf.text(String(report.score.detail), 100, 125);
+  pdf.text('细节', 85, 115);
+  pdf.text(String(report.score.detail), 85, 125);
 
   pdf.setTextColor(0, 212, 255);
-  pdf.setFontSize(14);
-  pdf.text('Parameters', 180, 55);
+  pdf.setFontSize(12);
+  pdf.text('最终参数', 145, 60);
 
   pdf.setTextColor(200, 200, 200);
-  pdf.setFontSize(11);
-  pdf.text('Exposure: ' + report.finalParams.exposure.toFixed(2), 180, 65);
-  pdf.text('Temperature: ' + report.finalParams.temperature + 'K', 180, 75);
-  pdf.text('LUT: ' + (report.finalParams.lutId || 'None'), 180, 85);
-  pdf.text('LUT Intensity: ' + report.finalParams.lutIntensity + '%', 180, 95);
+  pdf.setFontSize(10);
+  pdf.text('曝光: ' + report.finalParams.exposure.toFixed(2), 145, 70);
+  pdf.text('色温: ' + report.finalParams.temperature + 'K', 145, 78);
+  pdf.text('LUT: ' + (report.finalParams.lutId || '无'), 145, 86);
+  pdf.text('LUT强度: ' + report.finalParams.lutIntensity + '%', 145, 94);
+
+  pdf.setTextColor(0, 212, 255);
+  pdf.setFontSize(12);
+  pdf.text('目标参数', 215, 60);
+
+  pdf.setTextColor(150, 150, 150);
+  pdf.setFontSize(10);
+  pdf.text('曝光: ' + report.targetParams.exposure.toFixed(2), 215, 70);
+  pdf.text('色温: ' + report.targetParams.temperature + 'K', 215, 78);
+  pdf.text('LUT: ' + (report.targetParams.lutId || '无'), 215, 86);
+  pdf.text('LUT强度: ' + report.targetParams.lutIntensity + '%', 215, 94);
 
   if (report.score.issues.length > 0) {
     pdf.setTextColor(255, 107, 53);
     pdf.setFontSize(12);
-    pdf.text('Issues Detected', 20, 140);
+    pdf.text('检测到的问题', 25, 140);
 
     pdf.setTextColor(200, 200, 200);
-    pdf.setFontSize(10);
+    pdf.setFontSize(9);
     report.score.issues.forEach((issue, index) => {
-      pdf.text('* ' + issue.message, 20, 150 + index * 8);
+      const severity = issue.severity === 'error' ? '[严重] ' : '[警告] ';
+      pdf.text(severity + getIssueName(issue.type) + ': ' + issue.message, 25, 150 + index * 7);
+    });
+  }
+
+  if (report.notes) {
+    pdf.setTextColor(0, 212, 255);
+    pdf.setFontSize(12);
+    pdf.text('备注', 145, 140);
+
+    pdf.setTextColor(200, 200, 200);
+    pdf.setFontSize(9);
+    const noteLines = pdf.splitTextToSize(report.notes, 80);
+    pdf.text(noteLines, 145, 150);
+  }
+
+  if (report.manualCorrections && report.manualCorrections.length > 0) {
+    pdf.setTextColor(168, 85, 247);
+    pdf.setFontSize(12);
+    pdf.text('人工更正记录', 25, 175);
+
+    pdf.setTextColor(200, 200, 200);
+    pdf.setFontSize(8);
+    report.manualCorrections.slice(0, 3).forEach((entry, index) => {
+      const time = new Date(entry.timestamp).toLocaleTimeString('zh-CN');
+      pdf.text(time + ' - ' + (entry.note || '参数调整'), 25, 183 + index * 6);
     });
   }
 
@@ -127,6 +171,11 @@ export async function captureComparisonScreenshot(
     ctx.moveTo(width / 2, 0);
     ctx.lineTo(width / 2, height);
     ctx.stroke();
+
+    ctx.fillStyle = '#00d4ff';
+    ctx.font = '14px monospace';
+    ctx.fillText('参考画面', 10, 25);
+    ctx.fillText('调色结果', sourceCanvas.width + 10, 25);
   }
 
   return tempCanvas.toDataURL('image/png');
@@ -147,4 +196,8 @@ export function formatParamsForDisplay(params: ColorParams): string {
     parts.push('LUT: ' + params.lutId + ' (' + params.lutIntensity + '%)');
   }
   return parts.join(' | ');
+}
+
+export function getManualCorrections(history: HistoryEntry[]): HistoryEntry[] {
+  return history.filter((entry) => entry.isManualCorrection);
 }

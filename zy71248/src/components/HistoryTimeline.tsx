@@ -2,7 +2,7 @@
 import React from 'react';
 import { HistoryEntry } from '../types';
 import { formatTime } from '../utils/colorMath';
-import { History, RotateCcw, Undo2, Redo2 } from 'lucide-react';
+import { History, RotateCcw, Undo2, Redo2, Edit3, StickyNote } from 'lucide-react';
 
 interface HistoryTimelineProps {
   history: HistoryEntry[];
@@ -14,12 +14,14 @@ interface HistoryTimelineProps {
   canRedo: boolean;
 }
 
-const actionTypeLabels: Record<string, { label: string; color: string; icon: string }> = {
-  exposure: { label: '曝光', color: '#00d4ff', icon: '☀️' },
-  temperature: { label: '色温', color: '#ff6b35', icon: '🌡️' },
-  lut: { label: 'LUT', color: '#a855f7', icon: '🎨' },
-  reset: { label: '重置', color: '#6b7280', icon: '🔄' },
-  revert: { label: '回退', color: '#f59e0b', icon: '↩️' },
+const actionTypeLabels: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+  exposure: { label: '曝光', color: '#00d4ff', icon: <span className="text-sm">☀️</span> },
+  temperature: { label: '色温', color: '#ff6b35', icon: <span className="text-sm">🌡️</span> },
+  lut: { label: 'LUT', color: '#a855f7', icon: <span className="text-sm">🎨</span> },
+  reset: { label: '重置', color: '#6b7280', icon: <span className="text-sm">🔄</span> },
+  revert: { label: '回退', color: '#f59e0b', icon: <span className="text-sm">↩️</span> },
+  manual_correction: { label: '人工更正', color: '#ec4899', icon: <Edit3 className="w-3.5 h-3.5" /> },
+  note: { label: '备注', color: '#22c55e', icon: <StickyNote className="w-3.5 h-3.5" /> },
 };
 
 export const HistoryTimeline: React.FC<HistoryTimelineProps> = ({
@@ -76,7 +78,7 @@ export const HistoryTimeline: React.FC<HistoryTimelineProps> = ({
           const actionInfo = actionTypeLabels[entry.actionType] || {
             label: entry.actionType,
             color: '#6b7280',
-            icon: '•',
+            icon: <span className="text-sm">•</span>,
           };
           const isActive = index === currentIndex;
 
@@ -87,40 +89,58 @@ export const HistoryTimeline: React.FC<HistoryTimelineProps> = ({
               className={`relative flex items-start gap-3 p-2 rounded cursor-pointer transition-all ${
                 isActive
                   ? 'bg-cyan-900/30 border border-cyan-500/50'
+                  : entry.isManualCorrection
+                  ? 'bg-pink-900/20 border border-pink-500/30 hover:bg-pink-900/30'
                   : 'hover:bg-gray-800/50 border border-transparent'
               }`}
             >
               <div
-                className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                style={{ backgroundColor: `${actionInfo.color}22` }}
+                className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: `${actionInfo.color}22`, color: actionInfo.color }}
               >
                 {actionInfo.icon}
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span
-                    className="text-sm font-medium"
-                    style={{ color: isActive ? actionInfo.color : '#e5e7eb' }}
-                  >
-                    {actionInfo.label}
-                    {entry.note && <span className="text-gray-500 ml-2">({entry.note})</span>}
-                  </span>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="text-sm font-medium"
+                      style={{ color: isActive ? actionInfo.color : '#e5e7eb' }}
+                    >
+                      {actionInfo.label}
+                    </span>
+                    {entry.isManualCorrection && (
+                      <span className="text-xs px-1.5 py-0.5 bg-pink-500/20 text-pink-400 rounded">
+                        人工
+                      </span>
+                    )}
+                    {entry.note && (
+                      <span className="text-xs text-gray-500 truncate max-w-[100px]">
+                        ({entry.note})
+                      </span>
+                    )}
+                  </div>
                   {isActive && (
-                    <span className="text-xs px-1.5 py-0.5 bg-cyan-500/20 text-cyan-400 rounded">
+                    <span className="flex-shrink-0 text-xs px-1.5 py-0.5 bg-cyan-500/20 text-cyan-400 rounded">
                       当前
                     </span>
                   )}
                 </div>
                 <div className="text-xs text-gray-500 mt-0.5 font-mono">
                   {formatTime(entry.timestamp)} · {entry.operator}
+                  {entry.modificationSource && (
+                    <span className="text-gray-600 ml-2">· {entry.modificationSource}</span>
+                  )}
                 </div>
-                <div className="text-xs text-gray-400 mt-1 truncate font-mono">
-                  曝光: {entry.params.exposure.toFixed(2)} | 色温:{' '}
-                  {entry.params.temperature}K
-                  {entry.params.lutId && entry.params.lutId !== 'none' &&
-                    ` | LUT: ${entry.params.lutId}`}
-                </div>
+                {entry.actionType !== 'note' && (
+                  <div className="text-xs text-gray-400 mt-1 truncate font-mono">
+                    曝光: {entry.params.exposure.toFixed(2)} | 色温:{' '}
+                    {entry.params.temperature}K
+                    {entry.params.lutId && entry.params.lutId !== 'none' &&
+                      ` | LUT: ${entry.params.lutId}`}
+                  </div>
+                )}
               </div>
 
               {!isActive && (

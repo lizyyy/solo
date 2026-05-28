@@ -7,7 +7,16 @@ import { getOperatorName } from '../utils/reportGenerator';
 interface UseHistoryResult {
   history: HistoryEntry[];
   currentIndex: number;
-  addHistory: (actionType: ActionType, params: ColorParams, previousParams?: ColorParams) => void;
+  addHistory: (
+    actionType: ActionType,
+    params: ColorParams,
+    previousParams?: ColorParams,
+    options?: {
+      note?: string;
+      modificationSource?: string;
+      isManualCorrection?: boolean;
+    }
+  ) => void;
   undo: () => HistoryEntry | null;
   redo: () => HistoryEntry | null;
   revertTo: (index: number) => HistoryEntry | null;
@@ -26,12 +35,23 @@ export function useHistory(initialParams: ColorParams): UseHistoryResult {
       params: initialParams,
       operator: getOperatorName(),
       note: '初始状态',
+      modificationSource: '系统初始化',
+      isManualCorrection: false,
     },
   ]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const addHistory = useCallback(
-    (actionType: ActionType, params: ColorParams, previousParams?: ColorParams) => {
+    (
+      actionType: ActionType,
+      params: ColorParams,
+      previousParams?: ColorParams,
+      options?: {
+        note?: string;
+        modificationSource?: string;
+        isManualCorrection?: boolean;
+      }
+    ) => {
       const newEntry: HistoryEntry = {
         id: generateId(),
         timestamp: Date.now(),
@@ -39,6 +59,9 @@ export function useHistory(initialParams: ColorParams): UseHistoryResult {
         params: { ...params },
         previousParams: previousParams ? { ...previousParams } : undefined,
         operator: getOperatorName(),
+        note: options?.note,
+        modificationSource: options?.modificationSource,
+        isManualCorrection: options?.isManualCorrection || false,
       };
 
       setHistory((prev) => {
@@ -82,6 +105,8 @@ export function useHistory(initialParams: ColorParams): UseHistoryResult {
           previousParams: history[currentIndex]?.params,
           operator: getOperatorName(),
           note: `回退到步骤 ${index + 1}`,
+          modificationSource: '历史回退',
+          isManualCorrection: false,
         };
         setHistory((prev) => [...prev, revertEntry]);
         setCurrentIndex((prev) => prev + 1);
@@ -101,6 +126,8 @@ export function useHistory(initialParams: ColorParams): UseHistoryResult {
         params: initialParams,
         operator: getOperatorName(),
         note: '重置',
+        modificationSource: '用户操作',
+        isManualCorrection: false,
       },
     ]);
     setCurrentIndex(0);

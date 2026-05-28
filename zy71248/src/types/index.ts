@@ -6,7 +6,7 @@ export interface ColorParams {
   lutIntensity: number;
 }
 
-export type ActionType = 'exposure' | 'temperature' | 'lut' | 'reset' | 'revert';
+export type ActionType = 'exposure' | 'temperature' | 'lut' | 'reset' | 'revert' | 'manual_correction' | 'note';
 
 export interface HistoryEntry {
   id: string;
@@ -16,6 +16,8 @@ export interface HistoryEntry {
   previousParams?: ColorParams;
   operator: string;
   note?: string;
+  modificationSource?: string;
+  isManualCorrection?: boolean;
 }
 
 export type IssueType = 'skin_shift' | 'shadows_clipped' | 'lut_overdose';
@@ -59,12 +61,18 @@ export interface Level {
 export interface GradingReport {
   id: string;
   levelId: string;
+  levelName: string;
   timestamp: number;
+  operator: string;
   finalParams: ColorParams;
+  targetParams: ColorParams;
   score: ScoreResult;
   history: HistoryEntry[];
   comparisonScreenshot: string;
+  sourceImage: string;
+  targetImage: string;
   notes: string;
+  manualCorrections: HistoryEntry[];
 }
 
 export interface LevelProgress {
