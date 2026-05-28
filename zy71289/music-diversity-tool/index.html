@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>音乐推荐多样性评分工具</title>
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">🎵 多样性评分</div>
+      <h2>复盘入口</h2>
+    </div>
+    <div class="review-list" id="reviewList">
+      <div class="review-empty">暂无历史报告</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <nav class="topbar" id="topbar"></nav>
+
+    <div class="content">
+      <div class="panel active" id="panel-import"></div>
+      <div class="panel" id="panel-diversity"></div>
+      <div class="panel" id="panel-preference"></div>
+      <div class="panel" id="panel-exposure"></div>
+      <div class="panel" id="panel-explain"></div>
+      <div class="panel" id="panel-report"></div>
+    </div>
+
+    <div class="trace-bar" id="traceBar">
+      <span class="trace-label">流水线追溯</span>
+      <span>尚无计算步骤</span>
+    </div>
+  </div>
+
+  <div id="drilldownModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:100; align-items:center; justify-content:center;">
+    <div style="background:var(--surface); border-radius:var(--radius); padding:24px; max-width:640px; width:90%; max-height:80vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 id="drilldownTitle" style="font-size:16px;"></h3>
+        <button id="drilldownClose" style="background:none; border:none; color:var(--text2); font-size:20px; cursor:pointer;">✕</button>
+      </div>
+      <div id="drilldownBody"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
