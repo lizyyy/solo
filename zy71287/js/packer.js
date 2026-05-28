@@ -112,8 +112,10 @@ class BinPacker {
   }
 
   _findBestFit(product) {
-    let bestFit = null;
-    let bestScore = Infinity;
+    let bestSafe = null;
+    let bestSafeScore = Infinity;
+    let bestOverlap = null;
+    let bestOverlapScore = Infinity;
 
     for (const rotation of product.allowedRotations) {
       if (!ROTATION_MAP[rotation]) continue;
@@ -122,20 +124,25 @@ class BinPacker {
       for (const space of this.spaces) {
         if (!space.canFit(rotated.dx, rotated.dy, rotated.dz)) continue;
 
-        if (this._overlapsFragileColumn(space, rotated)) continue;
-
         const waste = space.volume() - (rotated.dx * rotated.dy * rotated.dz);
         const touchFloor = space.z === 0 ? 1000 : 0;
         const score = waste - touchFloor;
 
-        if (score < bestScore) {
-          bestScore = score;
-          bestFit = { space, rotated, rotation };
+        if (this._overlapsFragileColumn(space, rotated)) {
+          if (score < bestOverlapScore) {
+            bestOverlapScore = score;
+            bestOverlap = { space, rotated, rotation };
+          }
+        } else {
+          if (score < bestSafeScore) {
+            bestSafeScore = score;
+            bestSafe = { space, rotated, rotation };
+          }
         }
       }
     }
 
-    return bestFit;
+    return bestSafe || bestOverlap;
   }
 
   _overlapsFragileColumn(space, rotated) {
@@ -219,12 +226,34 @@ class BinPacker {
       };
     }
 
+    if (this._wouldOverlapFragileColumn(product)) {
+      return {
+        status: PACK_STATUS.FAILED_FRAGILE,
+        message: `商品 ${product.name}(${product.id}): 所有可用空间均会压到下方易碎品，存在易碎受压风险`,
+        productId: product.id,
+        productName: product.name,
+      };
+    }
+
     return {
       status: PACK_STATUS.FAILED_NO_FIT,
       message: `商品 ${product.name}(${product.id}): 剩余空间不足以容纳`,
       productId: product.id,
       productName: product.name,
     };
+  }
+
+  _wouldOverlapFragileColumn(product) {
+    if (this.fragileColumns.length === 0) return false;
+    for (const rotation of product.allowedRotations) {
+      if (!ROTATION_MAP[rotation]) continue;
+      const rotated = product.rotatedDims(rotation);
+      for (const space of this.spaces) {
+        if (!space.canFit(rotated.dx, rotated.dy, rotated.dz)) continue;
+        if (!this._overlapsFragileColumn(space, rotated)) return false;
+      }
+    }
+    return true;
   }
 
   _classifyConstraintFailure(violations) {
