@@ -15,7 +15,6 @@ interface StarPointsProps {
 
 export function StarPoints({ artworks, selectedArtworkId, onSelect, clusterMode }: StarPointsProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const outlineMeshRef = useRef<THREE.InstancedMesh>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const { clusters, isHighlighted, getArtworkCluster } = useClusters();
 
@@ -105,9 +104,9 @@ export function StarPoints({ artworks, selectedArtworkId, onSelect, clusterMode 
     }
   });
 
-  const handlePointerMove = (event: any) => {
+  const handlePointerMove = (event: { instanceId?: number; stopPropagation?: () => void }) => {
     event.stopPropagation?.();
-    const instanceId = event.instanceId as number;
+    const instanceId = event.instanceId;
     if (instanceId !== undefined) {
       setHoveredId(artworkIds[instanceId]);
       document.body.style.cursor = 'pointer';
@@ -119,9 +118,9 @@ export function StarPoints({ artworks, selectedArtworkId, onSelect, clusterMode 
     document.body.style.cursor = 'auto';
   };
 
-  const handleClick = (event: any) => {
+  const handleClick = (event: { instanceId?: number; stopPropagation?: () => void }) => {
     event.stopPropagation?.();
-    const instanceId = event.instanceId as number;
+    const instanceId = event.instanceId;
     if (instanceId !== undefined) {
       const clickedId = artworkIds[instanceId];
       onSelect(clickedId === selectedArtworkId ? null : clickedId);

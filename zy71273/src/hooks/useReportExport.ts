@@ -198,7 +198,7 @@ export function useReportExport() {
       yPos += 8;
       doc.setFont('helvetica', 'normal');
 
-      classStats.forEach((stat, idx) => {
+      classStats.forEach((stat) => {
         if (!stat) return;
         if (yPos > pageHeight - 30) {
           doc.addPage();
@@ -243,7 +243,7 @@ export function useReportExport() {
         version_conflict: '版本冲突'
       };
 
-      qualityAlerts.slice(0, 15).forEach((alert, idx) => {
+      qualityAlerts.slice(0, 15).forEach((alert) => {
         if (yPos > pageHeight - 30) {
           doc.addPage();
           yPos = 20;

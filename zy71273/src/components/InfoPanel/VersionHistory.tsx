@@ -1,5 +1,5 @@
 import { History, ChevronRight, AlertTriangle, CheckCircle } from 'lucide-react';
-import { Artwork, VersionEntry } from '../../types/artwork';
+import { Artwork } from '../../types/artwork';
 import { GlassCard } from '../common/GlassCard';
 import { getVersionDiff } from '../../utils/versionManager';
 

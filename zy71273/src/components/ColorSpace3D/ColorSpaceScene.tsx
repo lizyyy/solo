@@ -25,6 +25,7 @@ function SceneContent({ artworks, selectedArtworkId, onSelectArtwork }: ColorSpa
   const setCameraPosition = useSceneStore(state => state.setCameraPosition);
   const setCameraTarget = useSceneStore(state => state.setCameraTarget);
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const controlsRef = useRef<any>(null);
   const { camera } = useThree();
   const rotationGroupRef = useRef<THREE.Group>(null);

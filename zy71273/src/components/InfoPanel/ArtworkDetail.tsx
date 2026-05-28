@@ -13,7 +13,7 @@ interface ArtworkDetailProps {
   onClose: () => void;
 }
 
-const alertTypeConfig: Record<string, { icon: any; color: string; bgColor: string; label: string }> = {
+const alertTypeConfig: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bgColor: string; label: string }> = {
   transparent_bg: { 
     icon: AlertCircle, 
     color: 'text-amber-400', 

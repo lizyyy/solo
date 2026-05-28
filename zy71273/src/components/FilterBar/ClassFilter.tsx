@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, ChevronDown, Save, Trash2, Download, Upload, Filter } from 'lucide-react';
+import { Check, ChevronDown, Save, Trash2, Filter } from 'lucide-react';
 import { CLASSES } from '../../data/artworks';
 import { useFilterStore } from '../../store/useFilterStore';
 import { GlassCard } from '../common/GlassCard';
@@ -194,7 +194,7 @@ export function ClassFilter() {
   );
 }
 
-function RotateCcw(props: any) {
+function RotateCcw(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
