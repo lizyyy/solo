@@ -14,6 +14,7 @@ from .models import (
     SpectralFeatures,
     ClusteringReport,
     AnomalyReport,
+    AnomalyType,
     OperationType,
     HistoryManager
 )
