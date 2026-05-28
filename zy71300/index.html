@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>麦克风阵列声源定位系统</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--panel:#161822;--card:#1e2030;--border:#2a2d3e;--text:#c8cad8;--dim:#6b7094;--accent:#4ea8f6;--warn:#f0a030;--err:#e84057;--ok:#40c880;--hover:#252840}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh;display:flex;flex-direction:column}
+.top-bar{height:48px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
+.top-bar h1{font-size:15px;font-weight:600;white-space:nowrap}
+.top-bar .sep{width:1px;height:20px;background:var(--border)}
+.top-bar .status{font-size:12px;color:var(--dim);margin-left:auto}
+.btn{padding:5px 12px;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:4px;cursor:pointer;font-size:12px;transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--hover);border-color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.85}
+.btn-warn{border-color:var(--warn);color:var(--warn)}
+.btn-warn:hover{background:var(--warn);color:#000}
+.btn-sm{padding:2px 8px;font-size:10px}
+.main{flex:1;display:flex;overflow:hidden}
+#canvas-wrap{flex:1;position:relative;overflow:hidden}
+#canvas-wrap canvas{display:block}
+.view-controls{position:absolute;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap}
+.view-controls .btn{font-size:11px;padding:4px 10px}
+.scene-legend{position:absolute;top:12px;left:12px;background:rgba(22,24,34,.88);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:11px;line-height:1.8}
+.scene-legend .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.side-panel{width:420px;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.tab-bar button{flex:1;padding:10px 2px;background:none;border:none;border-bottom:2px solid transparent;color:var(--dim);font-size:12px;cursor:pointer;transition:all .15s}
+.tab-bar button.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-bar button:hover{color:var(--text)}
+.tab-content{flex:1;overflow-y:auto;padding:14px}
+.tab-content::-webkit-scrollbar{width:5px}
+.tab-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.tab-page{display:none}
+.tab-page.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:10px}
+.card-title{font-size:12px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.badge{font-size:10px;padding:1px 6px;border-radius:3px;font-weight:500}
+.badge-ok{background:rgba(64,200,128,.15);color:var(--ok)}
+.badge-warn{background:rgba(240,160,48,.15);color:var(--warn)}
+.badge-err{background:rgba(232,64,87,.15);color:var(--err)}
+.badge-info{background:rgba(78,168,246,.15);color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{text-align:left;padding:4px 6px;color:var(--dim);font-weight:500;border-bottom:1px solid var(--border)}
+td{padding:4px 6px;border-bottom:1px solid rgba(42,45,62,.5)}
+tr:hover td{background:var(--hover)}
+tr.selected td{background:rgba(78,168,246,.1)}
+tr.flagged td{background:rgba(232,64,87,.06)}
+.mic-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.field-group{margin-bottom:10px}
+.field-group label{display:block;font-size:11px;color:var(--dim);margin-bottom:3px}
+.field-group input,.field-group select,.field-group textarea{width:100%;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:12px}
+.field-group textarea{resize:vertical;min-height:50px}
+.field-group input:focus,.field-group select:focus,.field-group textarea:focus{outline:none;border-color:var(--accent)}
+.audit-entry{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px;margin-bottom:6px;font-size:11px}
+.audit-entry .meta{color:var(--dim);margin-bottom:4px;font-size:10px}
+.audit-entry .change span{margin-right:4px}
+.audit-entry .old-val{color:var(--err);text-decoration:line-through}
+.audit-entry .new-val{color:var(--ok)}
+.audit-entry .reason{color:var(--warn);margin-top:4px;font-style:italic;font-size:10px}
+.report-section{margin-bottom:14px}
+.report-section h3{font-size:12px;font-weight:600;margin-bottom:6px;color:var(--accent)}
+.report-section p,.report-section li{font-size:11px;line-height:1.7}
+.report-section ul{padding-left:16px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:100}
+.modal-overlay.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:20px;width:460px;max-height:80vh;overflow-y:auto}
+.modal h2{font-size:14px;margin-bottom:14px}
+.modal .btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px 18px;font-size:12px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.filter-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.filter-row .btn{font-size:11px;padding:3px 10px}
+.filter-row .btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--dim);font-size:12px}
+.detail-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
+.detail-row .lbl{color:var(--dim)}
+.coords-3d{font-family:'SF Mono',Monaco,Consolas,monospace;font-size:11px;color:var(--accent)}
+.quick-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <h1>🎙 麦克风阵列声源定位</h1>
+  <div class="sep"></div>
+  <button class="btn" onclick="App.showImportModal()">导入数据</button>
+  <button class="btn" onclick="App.runLocalization()">重新定位</button>
+  <button class="btn" onclick="App.showExportModal()">导出图表</button>
+  <button class="btn btn-primary" onclick="App.generateReport()">生成报告</button>
+  <span class="status" id="statusBar">就绪</span>
+</div>
+<div class="main">
+  <div id="canvas-wrap">
+    <div class="scene-legend">
+      <div><span class="dot" style="background:var(--accent)"></span>麦克风</div>
+      <div><span class="dot" style="background:var(--err)"></span>声源定位</div>
+      <div><span class="dot" style="background:var(--warn)"></span>误差椭圆(95%)</div>
+      <div><span class="dot" style="background:#666"></span>TDOA 双曲面</div>
+    </div>
+    <div class="view-controls">
+      <button class="btn" onclick="App.resetCamera()">重置视角</button>
+      <button class="btn" id="btnEllipses" onclick="App.toggleEllipses()">误差椭圆:开</button>
+      <button class="btn" id="btnHyper" onclick="App.toggleHyperboloids()">TDOA面:关</button>
+      <button class="btn" id="btnLabels" onclick="App.toggleLabels()">标签:开</button>
+      <button class="btn" id="btnGrid" onclick="App.toggleGrid()">网格:开</button>
+    </div>
+  </div>
+  <div class="side-panel">
+    <div class="tab-bar">
+      <button class="active" data-tab="overview">概览</button>
+      <button data-tab="mics">麦克风</button>
+      <button data-tab="peaks">峰值</button>
+      <button data-tab="loc">定位</button>
+      <button data-tab="audit">日志</button>
+      <button data-tab="report">报告</button>
+    </div>
+    <div class="tab-content">
+      <div id="tab-overview" class="tab-page active"></div>
+      <div id="tab-mics" class="tab-page"></div>
+      <div id="tab-peaks" class="tab-page"></div>
+      <div id="tab-loc" class="tab-page"></div>
+      <div id="tab-audit" class="tab-page"></div>
+      <div id="tab-report" class="tab-page"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="editModal">
+  <div class="modal"><h2 id="editModalTitle">修改数据</h2><div id="editModalBody"></div>
+  <div class="btn-row"><button class="btn" onclick="App.closeModal()">取消</button><button class="btn btn-primary" onclick="App.saveEdit()">保存修改</button></div></div>
+</div>
+<div class="modal-overlay" id="exportModal">
+  <div class="modal"><h2>导出图表</h2>
+  <div class="field-group"><label>导出格式</label><select id="exportFormat"><option value="png">PNG 图片 (3D截图)</option><option value="json">JSON 数据包</option><option value="csv">CSV 表格</option></select></div>
+  <div class="field-group"><label>包含内容</label><div style="display:flex;flex-direction:column;gap:4px;font-size:12px;margin-top:4px">
+    <label><input type="checkbox" checked id="expScene"> 3D 场景截图</label>
+    <label><input type="checkbox" checked id="expEllipses"> 误差椭圆数据</label>
+    <label><input type="checkbox" id="expHyperboloids"> TDOA 双曲面数据</label>
+    <label><input type="checkbox" checked id="expTDOA"> TDOA 明细</label>
+    <label><input type="checkbox" checked id="expAudit"> 修改日志</label>
+  </div></div>
+  <div class="btn-row"><button class="btn" onclick="App.closeExportModal()">取消</button><button class="btn btn-primary" onclick="App.doExport()">导出</button></div></div>
+</div>
+<div class="modal-overlay" id="importModal">
+  <div class="modal"><h2>导入数据</h2>
+  <div class="field-group"><label>粘贴 JSON 数据 (麦克风坐标 / 峰值检测 / 采样率等)</label>
+  <textarea id="importData" style="min-height:180px;font-family:monospace;font-size:11px" placeholder='{"microphones":[...],"detections":[...],"soundSpeed":343}'></textarea></div>
+  <div style="font-size:11px;color:var(--dim);margin-bottom:8px">支持部分导入：仅麦克风、仅检测数据均可，系统自动合并。采样率不一致、坐标轴反转等异常将自动检测。</div>
+  <div class="btn-row"><button class="btn" onclick="App.closeImportModal()">取消</button><button class="btn btn-primary" onclick="App.doImport()">导入并检测</button></div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var App=(function(){
+var scene,camera,renderer,raycaster,mouse;
+var stageGroup,micGroup,sourceGroup,ellipseGroup,hyperGroup,labelGroup,gridHelper;
+var showEllipses=true,showHyperboloids=false,showLabels=true,showGrid=true;
+var selectedMic=null,dragObj=null,dragPlane=new THREE.Plane(),dragOffset=new THREE.Vector3();
+var data=null,auditLog=[],editContext=null,peakFilter='all';
+var orbitSph={radius:22,theta:Math.PI/4,phi:Math.PI/3};
+var orbitTarget=new THREE.Vector3(6,0,5);
+var isOrbiting=false,prevMouse={x:0,y:0};
+
+var SAMPLE={
+  projectName:"录音棚舞台啸叫排查",
+  stage:{width:12,depth:10,height:5,label:"主舞台"},
+  soundSpeed:343,
+  microphones:[
+    {id:"M1",x:0,y:0,z:1.5,axisFlipped:false,label:"前左"},
+    {id:"M2",x:6,y:0,z:1.5,axisFlipped:false,label:"前中"},
+    {id:"M3",x:12,y:0,z:1.5,axisFlipped:false,label:"前右"},
+    {id:"M4",x:1,y:5,z:1.2,axisFlipped:false,label:"后左"},
+    {id:"M5",x:11,y:5,z:1.2,axisFlipped:true,label:"后右"},
+    {id:"M6",x:6,y:8,z:2.0,axisFlipped:false,label:"顶置"}
+  ],
+  detections:[
+    {id:"D1",micId:"M1",peakSample:10234,samplingRate:48000,confidence:0.92,flagged:false,flagReason:""},
+    {id:"D2",micId:"M2",peakSample:10198,samplingRate:48000,confidence:0.88,flagged:false,flagReason:""},
+    {id:"D3",micId:"M3",peakSample:10150,samplingRate:48000,confidence:0.85,flagged:false,flagReason:""},
+    {id:"D4",micId:"M4",peakSample:10410,samplingRate:48000,confidence:0.90,flagged:false,flagReason:""},
+    {id:"D5",micId:"M5",peakSample:10280,samplingRate:44100,confidence:0.40,flagged:true,flagReason:"采样率不一致(44100≠48000),置信度低"},
+    {id:"D6",micId:"M6",peakSample:10390,samplingRate:48000,confidence:0.87,flagged:false,flagReason:""},
+    {id:"D7",micId:"M1",peakSample:25890,samplingRate:48000,confidence:0.30,flagged:true,flagReason:"疑似误检:峰值幅度过低"},
+    {id:"D8",micId:"M3",peakSample:25710,samplingRate:48000,confidence:0.28,flagged:true,flagReason:"疑似误检:与D7间隔过短"},
+    {id:"D9",micId:"M4",peakSample:51200,samplingRate:48000,confidence:0.75,flagged:false,flagReason:""},
+    {id:"D10",micId:"M5",peakSample:51380,samplingRate:44100,confidence:0.35,flagged:true,flagReason:"采样率不一致+置信度低"},
+    {id:"D11",micId:"M2",peakSample:51150,samplingRate:48000,confidence:0.78,flagged:false,flagReason:""},
+    {id:"D12",micId:"M6",peakSample:51420,samplingRate:48000,confidence:0.72,flagged:false,flagReason:""}
+  ],
+  events:[
+    {id:"E1",detectionIds:["D1","D2","D3","D4","D5","D6"],label:"啸叫事件A",time:"14:23:05"},
+    {id:"E2",detectionIds:["D7","D8"],label:"疑似误检",time:"14:25:31"},
+    {id:"E3",detectionIds:["D9","D10","D11","D12"],label:"啸叫事件B",time:"14:28:17"}
+  ]
+};
+
+function init(){
+  data=JSON.parse(JSON.stringify(SAMPLE));
+  ensureFields();
+  initThree();
+  buildScene();
+  runLocalization();
+  renderAll();
+  setupTabs();
+  setStatus("已加载样例 · "+data.microphones.length+"麦 · "+data.detections.length+"检测 · "+data.events.length+"事件");
+}
+
+function ensureFields(){
+  data.microphones.forEach(function(m){m.axisFlipped=!!m.axisFlipped;});
+  data.detections.forEach(function(d){d.flagged=!!d.flagged;d.flagReason=d.flagReason||"";d.confidence=d.confidence||0;});
+  if(!data.localizationResults) data.localizationResults=[];
+}
+
+function initThree(){
+  var wrap=document.getElementById('canvas-wrap');
+  var w=wrap.clientWidth,h=wrap.clientHeight;
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x0f1117);
+  scene.fog=new THREE.Fog(0x0f1117,40,80);
+  camera=new THREE.PerspectiveCamera(50,w/h,0.1,100);
+  renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+  renderer.setSize(w,h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  wrap.insertBefore(renderer.domElement,wrap.firstChild);
+  raycaster=new THREE.Raycaster();
+  mouse=new THREE.Vector2();
+  scene.add(new THREE.AmbientLight(0x606080,0.6));
+  var dl=new THREE.DirectionalLight(0xffffff,0.8);dl.position.set(10,15,10);scene.add(dl);
+  stageGroup=new THREE.Group();scene.add(stageGroup);
+  micGroup=new THREE.Group();scene.add(micGroup);
+  sourceGroup=new THREE.Group();scene.add(sourceGroup);
+  ellipseGroup=new THREE.Group();scene.add(ellipseGroup);
+  hyperGroup=new THREE.Group();scene.add(hyperGroup);
+  labelGroup=new THREE.Group();scene.add(labelGroup);
+  setupOrbit(wrap);
+  setupDrag(wrap);
+  window.addEventListener('resize',function(){
+    var w2=wrap.clientWidth,h2=wrap.clientHeight;
+    camera.aspect=w2/h2;camera.updateProjectionMatrix();renderer.setSize(w2,h2);
+  });
+  updateCam();
+  animate();
+}
+
+function updateCam(){
+  var s=orbitSph;
+  camera.position.set(
+    orbitTarget.x+s.radius*Math.sin(s.phi)*Math.cos(s.theta),
+    orbitTarget.y+s.radius*Math.cos(s.phi),
+    orbitTarget.z+s.radius*Math.sin(s.phi)*Math.sin(s.theta));
+  camera.lookAt(orbitTarget);
+}
+
+function setupOrbit(wrap){
+  wrap.addEventListener('mousedown',function(e){if(e.button===0){isOrbiting=true;prevMouse={x:e.clientX,y:e.clientY};}});
+  wrap.addEventListener('mousemove',function(e){
+    if(isOrbiting&&!dragObj){
+      var dx=e.clientX-prevMouse.x,dy=e.clientY-prevMouse.y;
+      orbitSph.theta-=dx*0.005;
+      orbitSph.phi=Math.max(0.1,Math.min(Math.PI/2-0.05,orbitSph.phi-dy*0.005));
+      prevMouse={x:e.clientX,y:e.clientY};
+      updateCam();
+    }
+  });
+  wrap.addEventListener('mouseup',function(){isOrbiting=false;});
+  wrap.addEventListener('wheel',function(e){
+    e.preventDefault();
+    orbitSph.radius=Math.max(5,Math.min(50,orbitSph.radius+e.deltaY*0.02));
+    updateCam();
+  },{passive:false});
+}
+
+function setupDrag(wrap){
+  wrap.addEventListener('mousedown',function(e){
+    if(e.button!==0) return;
+    var rect=wrap.getBoundingClientRect();
+    mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+    mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+    raycaster.setFromCamera(mouse,camera);
+    var mm=micGroup.children.filter(function(c){return c.userData&&c.userData.micId;});
+    var hits=raycaster.intersectObjects(mm);
+    if(hits.length>0){
+      dragObj=hits[0].object;isOrbiting=false;
+      var pos=dragObj.position.clone();
+      dragPlane.setFromNormalAndCoplanarPoint(new THREE.Vector3(0,1,0),pos);
+      var pt=new THREE.Vector3();raycaster.ray.intersectPlane(dragPlane,pt);
+      dragOffset.copy(pos).sub(pt);
+      selectMic(dragObj.userData.micId);
+    }
+  });
+  wrap.addEventListener('mousemove',function(e){
+    if(!dragObj) return;
+    var rect=wrap.getBoundingClientRect();
+    mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+    mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+    raycaster.setFromCamera(mouse,camera);
+    var pt=new THREE.Vector3();raycaster.ray.intersectPlane(dragPlane,pt);
+    if(pt){
+      var np=pt.add(dragOffset);np.y=Math.max(0,np.y);
+      dragObj.position.copy(np);
+      var mic=findMic(dragObj.userData.micId);
+      if(mic){
+        var ox=mic.x,oy=mic.y,oz=mic.z;
+        mic.x=+np.x.toFixed(2);mic.y=+np.z.toFixed(2);mic.z=+np.y.toFixed(2);
+        addAudit("拖动修改","麦克风"+mic.id+"坐标",ox+","+oy+","+oz,mic.x+","+mic.y+","+mic.z,"3D拖动调整位置");
+      }
+      runLocalization();renderAll();
+    }
+  });
+  wrap.addEventListener('mouseup',function(){dragObj=null;});
+}
+
+function buildScene(){
+  stageGroup.clear();micGroup.clear();sourceGroup.clear();
+  ellipseGroup.clear();hyperGroup.clear();labelGroup.clear();
+  var st=data.stage;
+  var fl=new THREE.Mesh(new THREE.PlaneGeometry(st.width,st.depth),
+    new THREE.MeshStandardMaterial({color:0x1a1c2a,roughness:0.8}));
+  fl.rotation.x=-Math.PI/2;fl.position.set(st.width/2,0,st.depth/2);
+  stageGroup.add(fl);
+  var eg=new THREE.EdgesGeometry(new THREE.BoxGeometry(st.width,st.height,st.depth));
+  var ed=new THREE.LineSegments(eg,new THREE.LineBasicMaterial({color:0x3a3d5e}));
+  ed.position.set(st.width/2,st.height/2,st.depth/2);stageGroup.add(ed);
+  gridHelper=new THREE.GridHelper(Math.max(st.width,st.depth)+4,20,0x2a2d3e,0x1e2030);
+  gridHelper.position.set(st.width/2,0,st.depth/2);gridHelper.visible=showGrid;
+  stageGroup.add(gridHelper);
+  var aL=2;
+  stageGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(aL,0,0)]),new THREE.LineBasicMaterial({color:0x4ea8f6})));
+  stageGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(0,aL,0)]),new THREE.LineBasicMaterial({color:0x40c880})));
+  stageGroup.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(0,0,aL)]),new THREE.LineBasicMaterial({color:0xf0a030})));
+  data.microphones.forEach(function(mic){
+    var col=mic.axisFlipped?0xf0a030:0x4ea8f6;
+    var mesh=new THREE.Mesh(new THREE.SphereGeometry(0.18,16,16),
+      new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:0.3}));
+    mesh.position.set(mic.x,mic.z,mic.y);mesh.userData={micId:mic.id};
+    micGroup.add(mesh);
+    if(showLabels){
+      var sp=mkSprite(mic.id+(mic.axisFlipped?" ⚠":""),col);
+      sp.position.set(mic.x,mic.z+0.5,mic.y);labelGroup.add(sp);
+    }
+    if(mic.axisFlipped){
+      var ring=new THREE.Mesh(new THREE.RingGeometry(0.25,0.32,24),
+        new THREE.MeshBasicMaterial({color:0xf0a030,side:THREE.DoubleSide}));
+      ring.position.set(mic.x,mic.z,mic.y);ring.rotation.x=-Math.PI/2;micGroup.add(ring);
+    }
+  });
+}
+
+function mkSprite(text,color){
+  var c=document.createElement('canvas'),ctx=c.getContext('2d');
+  c.width=256;c.height=64;
+  ctx.font='bold 22px sans-serif';
+  ctx.fillStyle='#'+color.toString(16).padStart(6,'0');
+  ctx.textAlign='center';ctx.fillText(text,128,40);
+  var tex=new THREE.CanvasTexture(c);
+  var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false}));
+  sp.scale.set(1.4,0.35,1);return sp;
+}
+
+function runLocalization(){
+  data.localizationResults=[];
+  ellipseGroup.clear();hyperGroup.clear();sourceGroup.clear();labelGroup.clear();
+  data.microphones.forEach(function(mic){
+    if(showLabels){
+      var col=mic.axisFlipped?0xf0a030:0x4ea8f6;
+      var sp=mkSprite(mic.id+(mic.axisFlipped?" ⚠":""),col);
+      sp.position.set(mic.x,mic.z+0.5,mic.y);labelGroup.add(sp);
+    }
+  });
+  data.events.forEach(function(ev){
+    var dets=ev.detectionIds.map(function(did){return findDet(did);}).filter(Boolean);
+    var valid=dets.filter(function(d){return !d.flagged;});
+    if(valid.length<3){
+      data.localizationResults.push({eventId:ev.id,eventLabel:ev.label,time:ev.time,
+        success:false,reason:"有效检测不足3个(排除标记后仅"+valid.length+"个)",position:null,errorEllipse:null,tdoa:null});
+      return;
+    }
+    var ref=valid[0],refMic=findMic(ref.micId);
+    if(!refMic) return;
+    var refT=ref.peakSample/ref.samplingRate;
+    var tdoa=[];
+    for(var i=1;i<valid.length;i++){
+      var d=valid[i],m=findMic(d.micId);if(!m) continue;
+      var t=d.peakSample/d.samplingRate,td=t-refT;
+      var eM=m.axisFlipped?{x:m.y,y:m.x,z:m.z}:{x:m.x,y:m.y,z:m.z};
+      var eR=refMic.axisFlipped?{x:refMic.y,y:refMic.x,z:refMic.z}:{x:refMic.x,y:refMic.y,z:refMic.z};
+      tdoa.push({pair:refMic.id+"→"+m.id,timeDiffSec:td,distDiff:td*data.soundSpeed,
+        mic1:{id:refMic.id,x:eR.x,y:eR.y,z:eR.z},mic2:{id:m.id,x:eM.x,y:eM.y,z:eM.z}});
+    }
+    if(tdoa.length<2){
+      data.localizationResults.push({eventId:ev.id,eventLabel:ev.label,time:ev.time,
+        success:false,reason:"TDOA对不足2组",position:null,errorEllipse:null,tdoa:tdoa});
+      return;
+    }
+    var refPos=refMic.axisFlipped?{x:refMic.y,y:refMic.x,z:refMic.z}:{x:refMic.x,y:refMic.y,z:refMic.z};
+    var res=solveML(refPos,tdoa,data.soundSpeed);
+    if(!res.success){
+      data.localizationResults.push({eventId:ev.id,eventLabel:ev.label,time:ev.time,
+        success:false,reason:res.reason||"求解失败",position:null,errorEllipse:null,tdoa:tdoa});
+      return;
+    }
+    var el=computeEllipse(refPos,tdoa,res.position,data.soundSpeed);
+    data.localizationResults.push({eventId:ev.id,eventLabel:ev.label,time:ev.time,
+      success:true,reason:"",position:res.position,errorEllipse:el,tdoa:tdoa,
+      iterations:res.iterations,residual:res.residual});
+  });
+  drawResults();renderAll();
+  setStatus("定位完成 · "+data.localizationResults.filter(function(r){return r.success;}).length+"/"+data.events.length+" 成功");
+}
+
+function solveML(refPos,tdoa,c){
+  var pos={x:refPos.x+2,y:refPos.y+1,z:refPos.z+0.5};
+  var maxI=300,lam=0.01,nu=2.0,eps=1e-8,n=tdoa.length;
+  var bestPos=null,bestRes=Infinity;
+  for(var it=0;it<maxI;it++){
+    var J=[],r=[];
+    for(var i=0;i<n;i++){
+      var t=tdoa[i];
+      var dx1=pos.x-t.mic1.x,dy1=pos.y-t.mic1.y,dz1=pos.z-t.mic1.z;
+      var d1=Math.max(eps,Math.sqrt(dx1*dx1+dy1*dy1+dz1*dz1));
+      var dx2=pos.x-t.mic2.x,dy2=pos.y-t.mic2.y,dz2=pos.z-t.mic2.z;
+      var d2=Math.max(eps,Math.sqrt(dx2*dx2+dy2*dy2+dz2*dz2));
+      r.push((d2-d1)/c-t.timeDiffSec);
+      J.push([(dx2/d2-dx1/d1)/c,(dy2/d2-dy1/d1)/c,(dz2/d2-dz1/d1)/c]);
+    }
+    var Jt=[[],[],[]];
+    for(var i=0;i<n;i++){Jt[0].push(J[i][0]);Jt[1].push(J[i][1]);Jt[2].push(J[i][2]);}
+    var H=[[0,0,0],[0,0,0],[0,0,0]];
+    for(var i=0;i<3;i++) for(var j=0;j<3;j++){
+      for(var k=0;k<n;k++) H[i][j]+=Jt[i][k]*J[k][j]; H[i][j]*=(1+lam);
+    }
+    var g=[0,0,0];
+    for(var i=0;i<3;i++) for(var k=0;k<n;k++) g[i]+=Jt[i][k]*r[k];
+    var inv=inv3(H);
+    if(!inv){if(bestPos) break; return {success:false,reason:"矩阵求逆失败"};}
+    var step=[0,0,0];
+    for(var i=0;i<3;i++) for(var j=0;j<3;j++) step[i]+=inv[i][j]*g[j];
+    var np={x:pos.x+step[0],y:pos.y+step[1],z:pos.z+step[2]};
+    var nRes=0;
+    for(var i=0;i<n;i++){
+      var t=tdoa[i];
+      var d1=Math.sqrt((np.x-t.mic1.x)**2+(np.y-t.mic1.y)**2+(np.z-t.mic1.z)**2);
+      var d2=Math.sqrt((np.x-t.mic2.x)**2+(np.y-t.mic2.y)**2+(np.z-t.mic2.z)**2);
+      var rr=(d2-d1)/c-t.timeDiffSec;nRes+=rr*rr;
+    }
+    var oRes=0;for(var i=0;i<r.length;i++) oRes+=r[i]*r[i];
+    if(nRes<oRes){pos=np;lam*=0.1;nu=2;if(nRes<bestRes){bestRes=nRes;bestPos={x:pos.x,y:pos.y,z:pos.z};}}
+    else{lam*=nu;nu*=2;}
+    if(Math.abs(oRes-nRes)<1e-14&&it>10) break;
+  }
+  if(!bestPos) return {success:false,reason:"迭代未收敛"};
+  return {success:true,position:bestPos,iterations:it||maxI,residual:Math.sqrt(bestRes)};
+}
+
+function inv3(m){
+  var a=m[0][0],b=m[0][1],c=m[0][2],d=m[1][0],e=m[1][1],f=m[1][2],g=m[2][0],h=m[2][1],i=m[2][2];
+  var det=a*(e*i-f*h)-b*(d*i-f*g)+c*(d*h-e*g);
+  if(Math.abs(det)<1e-20) return null;
+  var s=1/det;
+  return[[(e*i-f*h)*s,(c*h-b*i)*s,(b*f-c*e)*s],
+    [(f*g-d*i)*s,(a*i-c*g)*s,(c*d-a*f)*s],
+    [(d*h-e*g)*s,(b*g-a*h)*s,(a*e-b*d)*s]];
+}
+
+function computeEllipse(refPos,tdoa,solPos,c){
+  var n=tdoa.length,pos=solPos,J=[];
+  for(var i=0;i<n;i++){
+    var t=tdoa[i];
+    var dx1=pos.x-t.mic1.x,dy1=pos.y-t.mic1.y,dz1=pos.z-t.mic1.z;
+    var d1=Math.max(1e-8,Math.sqrt(dx1*dx1+dy1*dy1+dz1*dz1));
+    var dx2=pos.x-t.mic2.x,dy2=pos.y-t.mic2.y,dz2=pos.z-t.mic2.z;
+    var d2=Math.max(1e-8,Math.sqrt(dx2*dx2+dy2*dy2+dz2*dz2));
+    J.push([(dx2/d2-dx1/d1)/c,(dy2/d2-dy1/d1)/c,(dz2/d2-dz1/d1)/c]);
+  }
+  var JtJ=[[0,0,0],[0,0,0],[0,0,0]];
+  for(var i=0;i<3;i++) for(var j=0;j<3;j++)
+    for(var k=0;k<n;k++) JtJ[i][j]+=J[k][i]*J[k][j];
+  var sigma=0.0005,cov=inv3(JtJ);
+  if(!cov) return null;
+  for(var i=0;i<3;i++) for(var j=0;j<3;j++) cov[i][j]*=sigma*sigma;
+  function eig2(m){var a=m[0][0],b=m[0][1],c=m[1][0],d=m[1][1];var tr=a+d,det=a*d-b*c;var disc=Math.sqrt(Math.max(0,tr*tr-4*det));return[(tr+disc)/2,(tr-disc)/2];}
+  var chi=5.991;
+  var eXY=eig2([[cov[0][0],cov[0][1]],[cov[1][0],cov[1][1]]]);
+  var eXZ=eig2([[cov[0][0],cov[0][2]],[cov[2][0],cov[2][2]]]);
+  var eYZ=eig2([[cov[1][1],cov[1][2]],[cov[2][1],cov[2][2]]]);
+  return{covariance3D:cov,chiSq95:chi,semiAxes:{
+    XY:[Math.sqrt(Math.max(0,eXY[0])*chi),Math.sqrt(Math.max(0,eXY[1])*chi)],
+    XZ:[Math.sqrt(Math.max(0,eXZ[0])*chi),Math.sqrt(Math.max(0,eXZ[1])*chi)],
+    YZ:[Math.sqrt(Math.max(0,eYZ[0])*chi),Math.sqrt(Math.max(0,eYZ[1])*chi)]
+  }};
+}
+
+function drawResults(){
+  sourceGroup.clear();ellipseGroup.clear();hyperGroup.clear();
+  data.localizationResults.forEach(function(lr){
+    if(!lr.success) return;
+    var p=lr.position;
+    var mesh=new THREE.Mesh(new THREE.OctahedronGeometry(0.22),
+      new THREE.MeshStandardMaterial({color:0xe84057,emissive:0xe84057,emissiveIntensity:0.4}));
+    mesh.position.set(p.x,p.z,p.y);mesh.userData={sourceId:lr.eventId};
+    sourceGroup.add(mesh);
+    if(showLabels){
+      var sp=mkSprite(lr.eventLabel,0xe84057);
+      sp.position.set(p.x,p.z+0.6,p.y);labelGroup.add(sp);
+    }
+    if(showEllipses&&lr.errorEllipse) drawEllipse(lr,p);
+    if(showHyperboloids&&lr.tdoa) drawHyper(lr);
+  });
+  labelGroup.visible=showLabels;
+}
+
+function drawEllipse(lr,p3){
+  var el=lr.errorEllipse;if(!el||!el.semiAxes) return;
+  var a=Math.min(15,el.semiAxes.XY[0]),b=Math.min(15,el.semiAxes.XY[1]);
+  if(a<=0||b<=0) return;
+  var pts=[],seg=64;
+  for(var i=0;i<=seg;i++){var ang=(i/seg)*Math.PI*2;pts.push(new THREE.Vector3(p3.x+a*Math.cos(ang),p3.z,p3.y+b*Math.sin(ang)));}
+  ellipseGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),
+    new THREE.LineBasicMaterial({color:0xf0a030,transparent:true,opacity:0.7})));
+  var shape=new THREE.Shape();
+  for(var i=0;i<=seg;i++){var ang=(i/seg)*Math.PI*2;var px=a*Math.cos(ang),pz=b*Math.sin(ang);if(i===0)shape.moveTo(px,pz);else shape.lineTo(px,pz);}
+  var sm=new THREE.Mesh(new THREE.ShapeGeometry(shape),
+    new THREE.MeshBasicMaterial({color:0xf0a030,transparent:true,opacity:0.08,side:THREE.DoubleSide}));
+  sm.rotation.x=-Math.PI/2;sm.position.set(p3.x,p3.z+0.02,p3.y);ellipseGroup.add(sm);
+}
+
+function drawHyper(lr){
+  if(!lr.tdoa) return;
+  lr.tdoa.forEach(function(td){
+    var m1=td.mic1,m2=td.mic2;
+    var hd=Math.sqrt((m2.x-m1.x)**2+(m2.y-m1.y)**2)/2;
+    if(hd<0.01) return;
+    var pts=[],seg=80,dd=td.distDiff;
+    for(var i=0;i<=seg;i++){
+      var t=(i/seg-0.5)*hd*2;
+      var den=Math.max(0.01,Math.abs(t));
+      var s=(dd*dd/4-hd*hd+t*t)/(2*den);
+      var px=(m1.x+m2.x)/2+(m2.x-m1.x)/(2*hd)*t-(m2.y-m1.y)/(2*hd)*s;
+      var py=(m1.y+m2.y)/2+(m2.y-m1.y)/(2*hd)*t+(m2.x-m1.x)/(2*hd)*s;
+      if(isFinite(px)&&isFinite(py)&&Math.abs(px)<30&&Math.abs(py)<30)
+        pts.push(new THREE.Vector3(px,0.05,py));
+    }
+    if(pts.length>2){
+      hyperGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),
+        new THREE.LineBasicMaterial({color:0x555577,transparent:true,opacity:0.35})));
+    }
+  });
+}
+
+function selectMic(id){
+  selectedMic=id;
+  micGroup.children.forEach(function(c){
+    if(c.userData&&c.userData.micId===id){c.material.emissiveIntensity=0.8;c.scale.set(1.4,1.4,1.4);}
+    else if(c.userData&&c.userData.micId){c.material.emissiveIntensity=0.3;c.scale.set(1,1,1);}
+  });
+  renderAll();
+}
+
+function animate(){requestAnimationFrame(animate);renderer.render(scene,camera);}
+
+function findMic(id){return data.microphones.find(function(m){return m.id===id;});}
+function findDet(id){return data.detections.find(function(d){return d.id===id;});}
+function mode(a){var f={};a.forEach(function(v){f[v]=(f[v]||0)+1;});var b=a[0],bc=0;Object.keys(f).forEach(function(k){if(f[k]>bc){bc=f[k];b=+k;}});return b;}
+
+function addAudit(act,field,oldV,newV,reason){
+  auditLog.push({timestamp:new Date().toISOString(),action:act,field:field,oldVal:String(oldV),newVal:String(newV),reason:reason||""});
+}
+
+function renderAll(){
+  rOverview();rMics();rPeaks();rLoc();rAudit();rReport();
+}
+
+function rOverview(){
+  var el=document.getElementById('tab-overview');
+  var nF=data.detections.filter(function(d){return d.flagged;}).length;
+  var nFlip=data.microphones.filter(function(m){return m.axisFlipped;}).length;
+  var nOk=(data.localizationResults||[]).filter(function(r){return r.success;}).length;
+  var nFail=(data.localizationResults||[]).filter(function(r){return !r.success;}).length;
+  var warns=[];
+  data.microphones.forEach(function(m){if(m.axisFlipped) warns.push("麦克风"+m.id+"("+m.label+") 坐标轴可能反转");});
+  var mr=mode(data.detections.map(function(d){return d.samplingRate;}));
+  data.detections.forEach(function(d){
+    if(d.flagged) warns.push("检测"+d.id+" 已标记: "+d.flagReason);
+    if(Math.abs(d.samplingRate-mr)>1&&!d.flagged) warns.push("检测"+d.id+" 采样率"+d.samplingRate+"与主流"+mr+"不一致(未标记!)");
+  });
+  var h='<div class="card"><div class="card-title">项目: '+data.projectName+'</div>';
+  h+='<div class="detail-row"><span class="lbl">舞台</span><span>'+data.stage.label+' ('+data.stage.width+'×'+data.stage.depth+'×'+data.stage.height+' m)</span></div>';
+  h+='<div class="detail-row"><span class="lbl">声速</span><span>'+data.soundSpeed+' m/s</span></div>';
+  h+='<div class="detail-row"><span class="lbl">麦克风</span><span>'+data.microphones.length+' 路 (轴反转: '+nFlip+')</span></div>';
+  h+='<div class="detail-row"><span class="lbl">检测峰值</span><span>'+data.detections.length+' 个 (标记: '+nF+')</span></div>';
+  h+='<div class="detail-row"><span class="lbl">事件</span><span>'+data.events.length+' 个</span></div>';
+  h+='<div class="detail-row"><span class="lbl">定位成功/失败</span><span style="color:'+(nOk?'var(--ok)':'var(--err)')+'">'+nOk+' / '+nFail+'</span></div>';
+  h+='</div>';
+  if(warns.length>0){
+    h+='<div class="card"><div class="card-title">⚠ 数据异常提醒 <span class="badge badge-warn">'+warns.length+'</span></div>';
+    warns.forEach(function(w){h+='<div style="font-size:11px;color:var(--warn);margin-bottom:2px">• '+w+'</div>';});
+    h+='</div>';
+  }
+  h+='<div class="card"><div class="card-title">快速操作</div><div class="quick-btns">';
+  h+='<button class="btn" onclick="App.autoFlag()">自动标记异常</button>';
+  h+='<button class="btn" onclick="App.fixAxisFlips()">修复轴反转</button>';
+  h+='<button class="btn" onclick="App.fixSamplingRates()">统一采样率</button>';
+  h+='</div></div>';
+  el.innerHTML=h;
+}
+
+function rMics(){
+  var el=document.getElementById('tab-mics');
+  var h='<div class="card"><div class="card-title">麦克风坐标表</div>';
+  h+='<table><tr><th>ID</th><th>标签</th><th>X</th><th>Y</th><th>Z</th><th>轴反转</th><th></th></tr>';
+  data.microphones.forEach(function(m){
+    var cls=selectedMic===m.id?' class="selected"':'';
+    var fb=m.axisFlipped?'<span style="color:var(--warn)">⚠反转</span>':'—';
+    h+='<tr'+cls+' onclick="App.selectMic(\''+m.id+'\')" style="cursor:pointer">';
+    h+='<td><span class="mic-dot" style="background:'+(m.axisFlipped?'var(--warn)':'var(--accent)')+'"></span>'+m.id+'</td>';
+    h+='<td>'+m.label+'</td><td class="coords-3d">'+m.x+'</td><td class="coords-3d">'+m.y+'</td><td class="coords-3d">'+m.z+'</td>';
+    h+='<td>'+fb+'</td>';
+    h+='<td><button class="btn btn-sm" onclick="event.stopPropagation();App.editMic(\''+m.id+'\')">编辑</button></td></tr>';
+  });
+  h+='</table></div>';
+  if(selectedMic){
+    var m=findMic(selectedMic);
+    if(m){
+      var mD=data.detections.filter(function(d){return d.micId===m.id;});
+      h+='<div class="card"><div class="card-title">选中: '+m.id+' ('+m.label+')</div>';
+      h+='<div class="detail-row"><span class="lbl">3D 坐标</span><span class="coords-3d">('+m.x+', '+m.y+', '+m.z+')</span></div>';
+      h+='<div class="detail-row"><span class="lbl">轴反转</span><span>'+(m.axisFlipped?'是 ⚠':'否')+'</span></div>';
+      h+='<div class="detail-row"><span class="lbl">关联检测</span><span>'+mD.length+' 个</span></div></div>';
+    }
+  }
+  el.innerHTML=h;
+}
+
+function rPeaks(){
+  var el=document.getElementById('tab-peaks');
+  var h='<div class="filter-row">';
+  h+='<button class="btn '+(peakFilter==='all'?'active':'')+'" onclick="App.setPeakFilter(\'all\')">全部</button>';
+  h+='<button class="btn '+(peakFilter==='valid'?'active':'')+'" onclick="App.setPeakFilter(\'valid\')">有效</button>';
+  h+='<button class="btn '+(peakFilter==='flagged'?'active':'')+'" onclick="App.setPeakFilter(\'flagged\')">已标记</button></div>';
+  var fd=data.detections;
+  if(peakFilter==='valid') fd=fd.filter(function(d){return !d.flagged;});
+  if(peakFilter==='flagged') fd=fd.filter(function(d){return d.flagged;});
+  var mr=mode(data.detections.map(function(d){return d.samplingRate;}));
+  h+='<div class="card"><div class="card-title">峰值检测结果 <span class="badge badge-info">'+fd.length+'</span></div>';
+  h+='<table><tr><th>ID</th><th>麦克风</th><th>采样点</th><th>采样率</th><th>时间(s)</th><th>置信度</th><th>状态</th><th></th></tr>';
+  fd.forEach(function(d){
+    var mic=findMic(d.micId);
+    var t=(d.peakSample/d.samplingRate).toFixed(6);
+    var cb=d.confidence>0.7?'badge-ok':d.confidence>0.4?'badge-warn':'badge-err';
+    var sb=d.flagged?'<span class="badge badge-err">标记</span>':'<span class="badge badge-ok">有效</span>';
+    var srW=Math.abs(d.samplingRate-mr)>1?'<span style="color:var(--err);font-size:9px">⚠SR</span>':'';
+    h+='<tr class="'+(d.flagged?'flagged':'')+'">';
+    h+='<td>'+d.id+'</td><td>'+(mic?mic.id+'('+mic.label+')':d.micId)+'</td>';
+    h+='<td class="coords-3d">'+d.peakSample+'</td><td>'+d.samplingRate+srW+'</td>';
+    h+='<td>'+t+'</td><td><span class="badge '+cb+'">'+d.confidence.toFixed(2)+'</span></td><td>'+sb+'</td>';
+    h+='<td><button class="btn btn-sm" onclick="App.editDetection(\''+d.id+'\')">编辑</button> ';
+    h+='<button class="btn btn-sm" onclick="App.toggleFlag(\''+d.id+'\')">'+(d.flagged?'取消标记':'标记异常')+'</button></td></tr>';
+  });
+  h+='</table></div>';
+  el.innerHTML=h;
+}
+
+function rLoc(){
+  var el=document.getElementById('tab-loc');
+  var res=data.localizationResults||[];
+  if(!res.length){el.innerHTML='<div class="empty-state">尚无定位结果，请点击"重新定位"</div>';return;}
+  var h='';
+  res.forEach(function(lr){
+    var sb=lr.success?'<span class="badge badge-ok">成功</span>':'<span class="badge badge-err">失败</span>';
+    h+='<div class="card"><div class="card-title">'+lr.eventLabel+' ('+lr.time+') '+sb+'</div>';
+    if(lr.success){
+      var p=lr.position;
+      h+='<div class="detail-row"><span class="lbl">定位坐标</span><span class="coords-3d">('+p.x.toFixed(3)+', '+p.y.toFixed(3)+', '+p.z.toFixed(3)+')</span></div>';
+      h+='<div class="detail-row"><span class="lbl">残差</span><span>'+((lr.residual||0)*1000).toFixed(3)+' ms</span></div>';
+      h+='<div class="detail-row"><span class="lbl">迭代次数</span><span>'+lr.iterations+'</span></div>';
+      if(lr.errorEllipse){
+        var se=lr.errorEllipse.semiAxes;
+        h+='<div class="detail-row"><span class="lbl">95%误差椭圆(XY)</span><span>'+(se.XY[0]*100).toFixed(1)+'×'+(se.XY[1]*100).toFixed(1)+' cm</span></div>';
+        h+='<div class="detail-row"><span class="lbl">95%误差椭圆(XZ)</span><span>'+(se.XZ[0]*100).toFixed(1)+'×'+(se.XZ[1]*100).toFixed(1)+' cm</span></div>';
+        h+='<div class="detail-row"><span class="lbl">95%误差椭圆(YZ)</span><span>'+(se.YZ[0]*100).toFixed(1)+'×'+(se.YZ[1]*100).toFixed(1)+' cm</span></div>';
+      }
+      if(lr.tdoa&&lr.tdoa.length>0){
+        h+='<div style="margin-top:8px;font-size:11px;color:var(--dim)">TDOA 明细</div>';
+        h+='<table style="margin-top:4px"><tr><th>麦克风对</th><th>时差</th><th>距差</th></tr>';
+        lr.tdoa.forEach(function(t){h+='<tr><td>'+t.pair+'</td><td>'+(t.timeDiffSec*1000).toFixed(3)+' ms</td><td>'+t.distDiff.toFixed(4)+' m</td></tr>';});
+        h+='</table>';
+      }
+    } else {
+      h+='<div style="color:var(--err);font-size:11px">失败原因: '+lr.reason+'</div>';
+    }
+    h+='</div>';
+  });
+  el.innerHTML=h;
+}
+
+function rAudit(){
+  var el=document.getElementById('tab-audit');
+  if(!auditLog.length){el.innerHTML='<div class="empty-state">暂无修改记录</div>';return;}
+  var h='<div class="card"><div class="card-title">修改日志 <span class="badge badge-info">'+auditLog.length+'</span></div>';
+  for(var i=auditLog.length-1;i>=0;i--){
+    var a=auditLog[i];
+    h+='<div class="audit-entry"><div class="meta">'+a.timestamp+' · '+a.action+'</div>';
+    h+='<div class="change"><span>'+a.field+':</span> <span class="old-val">'+a.oldVal+'</span> <span>→</span> <span class="new-val">'+a.newVal+'</span></div>';
+    if(a.reason) h+='<div class="reason">理由: '+a.reason+'</div>';
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<button class="btn" onclick="App.exportAudit()">导出修改日志(JSON)</button>';
+  el.innerHTML=h;
+}
+
+function rReport(){
+  var el=document.getElementById('tab-report');
+  var res=data.localizationResults||[];
+  var h='<div class="report-section"><h3>定位报告摘要</h3>';
+  h+='<p><strong>项目:</strong> '+data.projectName+'</p>';
+  h+='<p><strong>舞台:</strong> '+data.stage.label+' ('+data.stage.width+'×'+data.stage.depth+'×'+data.stage.height+' m)</p>';
+  h+='<p><strong>声速:</strong> '+data.soundSpeed+' m/s</p>';
+  h+='<p><strong>麦克风数:</strong> '+data.microphones.length+'</p></div>';
+  h+='<div class="report-section"><h3>数据质量</h3><ul>';
+  var nF=data.detections.filter(function(d){return d.flagged;}).length;
+  var nFl=data.microphones.filter(function(m){return m.axisFlipped;}).length;
+  h+='<li>检测总数: '+data.detections.length+'，标记异常: '+nF+'</li>';
+  h+='<li>坐标轴反转麦克风: '+nFl+'</li>';
+  h+='<li>修改记录: '+auditLog.length+' 条</li></ul></div>';
+  h+='<div class="report-section"><h3>定位结果</h3>';
+  res.forEach(function(lr){
+    h+='<p><strong>'+lr.eventLabel+'</strong> ('+lr.time+'): ';
+    if(lr.success){
+      var p=lr.position;
+      h+='位置('+p.x.toFixed(2)+', '+p.y.toFixed(2)+', '+p.z.toFixed(2)+')';
+      if(lr.errorEllipse) h+=', 95%误差椭圆(XY): '+(lr.errorEllipse.semiAxes.XY[0]*100).toFixed(1)+'×'+(lr.errorEllipse.semiAxes.XY[1]*100).toFixed(1)+' cm';
+    } else h+='<span style="color:var(--err)">失败 — '+lr.reason+'</span>';
+    h+='</p>';
+  });
+  h+='</div>';
+  if(auditLog.length>0){
+    h+='<div class="report-section"><h3>人工修改记录</h3><ul>';
+    auditLog.forEach(function(a){
+      h+='<li>['+a.timestamp+'] '+a.action+': '+a.field+' | '+a.oldVal+' → '+a.newVal;
+      if(a.reason) h+=' | 理由: '+a.reason;
+      h+='</li>';
+    });
+    h+='</ul></div>';
+  }
+  h+='<button class="btn btn-primary" onclick="App.generateReport()">下载完整报告</button>';
+  el.innerHTML=h;
+}
+
+function setupTabs(){
+  document.querySelectorAll('.tab-bar button').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.tab-bar button').forEach(function(b){b.classList.remove('active');});
+      document.querySelectorAll('.tab-page').forEach(function(p){p.classList.remove('active');});
+      btn.classList.add('active');
+      document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    });
+  });
+}
+
+function setStatus(msg){document.getElementById('statusBar').textContent=msg;}
+function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show');},2000);}
+
+function showEditModal(title,fields,onSave){
+  editContext={fields:fields,onSave:onSave};
+  document.getElementById('editModalTitle').textContent=title;
+  var body=document.getElementById('editModalBody');
+  var h='';
+  fields.forEach(function(f){
+    h+='<div class="field-group"><label>'+f.label+'</label>';
+    if(f.type==='textarea') h+='<textarea id="edit_'+f.key+'">'+f.value+'</textarea>';
+    else if(f.type==='select'){
+      h+='<select id="edit_'+f.key+'">';
+      f.options.forEach(function(o){h+='<option value="'+o.value+'"'+(o.value==f.value?' selected':'')+'>'+o.label+'</option>';});
+      h+='</select>';
+    } else h+='<input type="'+(f.type||'text')+'" id="edit_'+f.key+'" value="'+f.value+'">';
+    h+='</div>';
+  });
+  h+='<div class="field-group"><label>修改理由 (必填，便于月底复盘)</label><textarea id="edit_reason" placeholder="请说明修改原因"></textarea></div>';
+  body.innerHTML=h;
+  document.getElementById('editModal').classList.add('show');
+}
+
+function closeModal(){document.getElementById('editModal').classList.remove('show');editContext=null;}
+
+function saveEdit(){
+  if(!editContext) return;
+  var reason=document.getElementById('edit_reason').value.trim();
+  if(!reason){toast('请填写修改理由');return;}
+  editContext.fields.forEach(function(f){
+    var el=document.getElementById('edit_'+f.key);
+    var nv=el.type==='number'?+el.value:el.value;
+    if(String(nv)!==String(f.value)) addAudit('手动修改',f.label,f.value,nv,reason);
+    f.onSave(nv);
+  });
+  closeModal();
+  runLocalization();buildScene();renderAll();
+  toast('修改已保存');
+}
+
+function editMic(micId){
+  var m=findMic(micId);if(!m) return;
+  showEditModal('编辑麦克风 '+m.id,[
+    {key:'x',label:'X 坐标 (m)',value:m.x,type:'number',onSave:function(v){m.x=+v;}},
+    {key:'y',label:'Y 坐标 (m)',value:m.y,type:'number',onSave:function(v){m.y=+v;}},
+    {key:'z',label:'Z 坐标 (m)',value:m.z,type:'number',onSave:function(v){m.z=+v;}},
+    {key:'axisFlipped',label:'轴反转',value:m.axisFlipped?'1':'0',type:'select',
+     options:[{value:'0',label:'否'},{value:'1',label:'是'}],onSave:function(v){m.axisFlipped=v==='1';}},
+    {key:'label',label:'标签',value:m.label,onSave:function(v){m.label=v;}}
+  ],null);
+}
+
+function editDetection(detId){
+  var d=findDet(detId);if(!d) return;
+  showEditModal('编辑检测 '+d.id,[
+    {key:'peakSample',label:'峰值采样点',value:d.peakSample,type:'number',onSave:function(v){d.peakSample=+v;}},
+    {key:'samplingRate',label:'采样率 (Hz)',value:d.samplingRate,type:'number',onSave:function(v){d.samplingRate=+v;}},
+    {key:'confidence',label:'置信度',value:d.confidence,type:'number',onSave:function(v){d.confidence=+v;}},
+    {key:'flagged',label:'是否标记异常',value:d.flagged?'1':'0',type:'select',
+     options:[{value:'0',label:'否'},{value:'1',label:'是'}],onSave:function(v){d.flagged=v==='1';}},
+    {key:'flagReason',label:'标记原因',value:d.flagReason,type:'textarea',onSave:function(v){d.flagReason=v;}}
+  ],null);
+}
+
+function toggleFlag(detId){
+  var d=findDet(detId);if(!d) return;
+  var old=d.flagged;
+  d.flagged=!d.flagged;
+  if(d.flagged&&!d.flagReason) d.flagReason="人工标记";
+  addAudit('切换标记','检测'+d.id+'标记状态',old?'已标记':'未标记',d.flagged?'已标记':'未标记',d.flagged?'人工标记为异常':'人工取消标记');
+  runLocalization();renderAll();
+  toast(d.flagged?'已标记为异常':'已取消标记');
+}
+
+function autoFlag(){
+  var mr=mode(data.detections.map(function(d){return d.samplingRate;}));
+  var count=0;
+  data.detections.forEach(function(d){
+    if(d.flagged) return;
+    var reasons=[];
+    if(Math.abs(d.samplingRate-mr)>1) reasons.push('采样率异常('+d.samplingRate+'≠'+mr+')');
+    if(d.confidence<0.5) reasons.push('置信度过低('+d.confidence.toFixed(2)+')');
+    if(reasons.length>0){
+      d.flagged=true;d.flagReason=reasons.join('; ');count++;
+      addAudit('自动标记','检测'+d.id+'标记状态','未标记','已标记','自动检测: '+d.flagReason);
+    }
+  });
+  runLocalization();renderAll();
+  toast('自动标记了 '+count+' 条异常检测');
+}
+
+function fixAxisFlips(){
+  var count=0;
+  data.microphones.forEach(function(m){
+    if(!m.axisFlipped) return;
+    var ox=m.x,oy=m.y;
+    m.x=oy;m.y=ox;m.axisFlipped=false;
+    addAudit('修复轴反转','麦克风'+m.id+'坐标',ox+','+oy,m.x+','+m.y,'自动修复X/Y轴反转');
+    count++;
+  });
+  buildScene();runLocalization();renderAll();
+  toast('已修复 '+count+' 个麦克风轴反转');
+}
+
+function fixSamplingRates(){
+  var mr=mode(data.detections.map(function(d){return d.samplingRate;}));
+  var count=0;
+  data.detections.forEach(function(d){
+    if(Math.abs(d.samplingRate-mr)>1){
+      var old=d.samplingRate;d.samplingRate=mr;
+      addAudit('修复采样率','检测'+d.id+'采样率',old,mr,'自动统一为主流采样率');
+      count++;
+    }
+  });
+  runLocalization();renderAll();
+  toast('已修复 '+count+' 条采样率异常');
+}
+
+function showExportModal(){document.getElementById('exportModal').classList.add('show');}
+function closeExportModal(){document.getElementById('exportModal').classList.remove('show');}
+
+function doExport(){
+  var fmt=document.getElementById('exportFormat').value;
+  if(fmt==='png'){
+    renderer.render(scene,camera);
+    var url=renderer.domElement.toDataURL('image/png');
+    var a=document.createElement('a');a.href=url;a.download='mic_array_localization.png';a.click();
+    toast('PNG 截图已导出');
+  } else if(fmt==='json'){
+    var exp={projectName:data.projectName,stage:data.stage,soundSpeed:data.soundSpeed,
+      microphones:data.microphones,detections:data.detections,events:data.events,
+      localizationResults:data.localizationResults,auditLog:auditLog};
+    if(document.getElementById('expTDOA').checked) exp.tdoaDetails=data.localizationResults.map(function(r){return{eventId:r.eventId,tdoa:r.tdoa};});
+    var blob=new Blob([JSON.stringify(exp,null,2)],{type:'application/json'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mic_array_data.json';a.click();
+    toast('JSON 数据已导出');
+  } else if(fmt==='csv'){
+    var csv='ID,EventLabel,Time,Success,X,Y,Z,Residual_ms\n';
+    data.localizationResults.forEach(function(r){
+      csv+=r.eventId+','+r.eventLabel+','+r.time+','+r.success+',';
+      if(r.success) csv+=r.position.x.toFixed(4)+','+r.position.y.toFixed(4)+','+r.position.z.toFixed(4)+','+((r.residual||0)*1000).toFixed(4);
+      else csv+=',,,,';
+      csv+='\n';
+    });
+    var blob=new Blob([csv],{type:'text/csv'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='localization_results.csv';a.click();
+    toast('CSV 表格已导出');
+  }
+  closeExportModal();
+}
+
+function showImportModal(){document.getElementById('importModal').classList.add('show');}
+function closeImportModal(){document.getElementById('importModal').classList.remove('show');}
+
+function doImport(){
+  var txt=document.getElementById('importData').value.trim();
+  if(!txt){toast('请粘贴数据');return;}
+  try{
+    var imp=JSON.parse(txt);
+    if(imp.microphones){
+      imp.microphones.forEach(function(m){
+        if(!m.id||m.x===undefined||m.y===undefined) return;
+        m.z=m.z||0;m.axisFlipped=!!m.axisFlipped;m.label=m.label||m.id;
+        var existing=findMic(m.id);
+        if(existing){
+          addAudit('导入覆盖','麦克风'+m.id+'坐标',existing.x+','+existing.y+','+existing.z,m.x+','+m.y+','+m.z,'数据导入');
+          existing.x=m.x;existing.y=m.y;existing.z=m.z;existing.axisFlipped=m.axisFlipped;existing.label=m.label;
+        } else data.microphones.push(m);
+      });
+    }
+    if(imp.detections){
+      imp.detections.forEach(function(d){
+        if(!d.id||!d.micId||d.peakSample===undefined) return;
+        d.samplingRate=d.samplingRate||48000;d.confidence=d.confidence||0;
+        d.flagged=!!d.flagged;d.flagReason=d.flagReason||'';
+        var existing=findDet(d.id);
+        if(existing){
+          addAudit('导入覆盖','检测'+d.id,existing.peakSample+'@'+existing.samplingRate,d.peakSample+'@'+d.samplingRate,'数据导入');
+          Object.assign(existing,d);
+        } else data.detections.push(d);
+      });
+    }
+    if(imp.soundSpeed) data.soundSpeed=imp.soundSpeed;
+    if(imp.stage) Object.assign(data.stage,imp.stage);
+    if(imp.events) data.events=imp.events;
+    closeImportModal();
+    buildScene();runLocalization();renderAll();
+    toast('数据导入完成，已自动检测异常');
+  } catch(e){toast('JSON 解析失败: '+e.message);}
+}
+
+function loadData(){showImportModal();}
+
+function generateReport(){
+  var res=data.localizationResults||[];
+  var nF=data.detections.filter(function(d){return d.flagged;}).length;
+  var rep='========================================\n';
+  rep+='  麦克风阵列声源定位报告\n';
+  rep+='========================================\n\n';
+  rep+='项目: '+data.projectName+'\n';
+  rep+='舞台: '+data.stage.label+' ('+data.stage.width+'×'+data.stage.depth+'×'+data.stage.height+' m)\n';
+  rep+='声速: '+data.soundSpeed+' m/s\n';
+  rep+='麦克风: '+data.microphones.length+' 路\n';
+  rep+='检测峰值: '+data.detections.length+' 个 (标记异常: '+nF+')\n\n';
+  rep+='--- 麦克风坐标 ---\n';
+  data.microphones.forEach(function(m){
+    rep+=m.id+'('+m.label+'): ('+m.x+', '+m.y+', '+m.z+')'+(m.axisFlipped?' [轴反转]':'')+'\n';
+  });
+  rep+='\n--- 定位结果 ---\n';
+  res.forEach(function(lr){
+    rep+=lr.eventLabel+' ('+lr.time+'): ';
+    if(lr.success){
+      var p=lr.position;
+      rep+='位置('+p.x.toFixed(3)+', '+p.y.toFixed(3)+', '+p.z.toFixed(3)+')';
+      if(lr.errorEllipse) rep+=' 95%误差椭圆(XY): '+(lr.errorEllipse.semiAxes.XY[0]*100).toFixed(1)+'×'+(lr.errorEllipse.semiAxes.XY[1]*100).toFixed(1)+' cm';
+      rep+=' 残差: '+((lr.residual||0)*1000).toFixed(3)+' ms\n';
+      if(lr.tdoa){
+        lr.tdoa.forEach(function(t){rep+='  '+t.pair+': Δt='+(t.timeDiffSec*1000).toFixed(3)+'ms Δd='+t.distDiff.toFixed(4)+'m\n';});
+      }
+    } else rep+='失败 — '+lr.reason+'\n';
+  });
+  if(auditLog.length>0){
+    rep+='\n--- 人工修改记录 ---\n';
+    auditLog.forEach(function(a){
+      rep+='['+a.timestamp+'] '+a.action+': '+a.field+' | '+a.oldVal+' → '+a.newVal;
+      if(a.reason) rep+=' | 理由: '+a.reason;
+      rep+='\n';
+    });
+  }
+  rep+='\n报告生成时间: '+new Date().toISOString()+'\n';
+  var blob=new Blob([rep],{type:'text/plain'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='localization_report_'+new Date().toISOString().slice(0,10)+'.txt';a.click();
+  toast('报告已生成并下载');
+}
+
+function exportAudit(){
+  var blob=new Blob([JSON.stringify(auditLog,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='audit_log.json';a.click();
+  toast('修改日志已导出');
+}
+
+function resetCamera(){
+  orbitSph={radius:22,theta:Math.PI/4,phi:Math.PI/3};
+  orbitTarget.set(6,0,5);updateCam();
+}
+
+function toggleEllipses(){
+  showEllipses=!showEllipses;
+  document.getElementById('btnEllipses').textContent='误差椭圆:'+(showEllipses?'开':'关');
+  drawResults();
+}
+
+function toggleHyperboloids(){
+  showHyperboloids=!showHyperboloids;
+  document.getElementById('btnHyper').textContent='TDOA面:'+(showHyperboloids?'开':'关');
+  drawResults();
+}
+
+function toggleLabels(){
+  showLabels=!showLabels;
+  document.getElementById('btnLabels').textContent='标签:'+(showLabels?'开':'关');
+  labelGroup.visible=showLabels;
+}
+
+function toggleGrid(){
+  showGrid=!showGrid;
+  document.getElementById('btnGrid').textContent='网格:'+(showGrid?'开':'关');
+  if(gridHelper) gridHelper.visible=showGrid;
+}
+
+function setPeakFilter(f){peakFilter=f;rPeaks();}
+
+return{
+  init:init,runLocalization:runLocalization,selectMic:selectMic,
+  editMic:editMic,editDetection:editDetection,toggleFlag:toggleFlag,
+  autoFlag:autoFlag,fixAxisFlips:fixAxisFlips,fixSamplingRates:fixSamplingRates,
+  showExportModal:showExportModal,closeExportModal:closeExportModal,doExport:doExport,
+  showImportModal:showImportModal,closeImportModal:closeImportModal,doImport:doImport,
+  loadData:loadData,generateReport:generateReport,exportAudit:exportAudit,
+  closeModal:closeModal,saveEdit:saveEdit,
+  resetCamera:resetCamera,toggleEllipses:toggleEllipses,toggleHyperboloids:toggleHyperboloids,
+  toggleLabels:toggleLabels,toggleGrid:toggleGrid,setPeakFilter:setPeakFilter
+};
+})();
+
+window.addEventListener('DOMContentLoaded',function(){App.init();});
+</script>
+</html>
