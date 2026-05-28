@@ -9,27 +9,41 @@ class PensionCalculator {
   归集缴费年限(参保记录列表, 补缴单列表) {
     const 缴费月数Map = new Map();
     const 边界提示 = [];
+    const 参保记录ID到参保地的映射 = new Map();
+    
+    for (const 记录 of 参保记录列表) {
+      参保记录ID到参保地的映射.set(记录.id, 记录.参保地);
+    }
     
     for (const 记录 of 参保记录列表) {
       const 起始 = moment(记录.起始年月, 'YYYY-MM');
       const 终止 = moment(记录.终止年月, 'YYYY-MM');
       let 当前 = 起始.clone();
+      const 总月数 = 终止.diff(起始, 'month') + 1;
+      const 每月个人账户储存额 = 记录.个人账户储存额 / 总月数;
       
       while (当前.isSameOrBefore(终止)) {
         const key = `${记录.参保地}_${当前.format('YYYY-MM')}`;
         if (缴费月数Map.has(key)) {
+          const 现有记录 = 缴费月数Map.get(key);
           边界提示.push({
             type: '重复缴费',
             severity: 'warning',
-            message: `${key} 存在重复缴费记录`,
-            detail: { 月份: 当前.format('YYYY-MM'), 参保地: 记录.参保地 }
+            message: `${记录.参保地} ${当前.format('YYYY-MM')} 存在重复缴费记录`,
+            detail: { 
+              月份: 当前.format('YYYY-MM'), 
+              参保地: 记录.参保地,
+              原有缴费基数: 现有记录.缴费基数,
+              新缴费基数: 记录.缴费基数
+            }
           });
         }
         缴费月数Map.set(key, {
           参保地: 记录.参保地,
           缴费基数: 记录.缴费基数,
           缴费类型: 记录.缴费类型,
-          个人账户储存额: 记录.个人账户储存额
+          个人账户储存额: 每月个人账户储存额,
+          参保记录ID: 记录.id
         });
         当前.add(1, 'month');
       }
@@ -39,22 +53,35 @@ class PensionCalculator {
       const 起始 = moment(补缴.补缴起始年月, 'YYYY-MM');
       const 终止 = moment(补缴.补缴终止年月, 'YYYY-MM');
       let 当前 = 起始.clone();
+      const 补缴月数 = 终止.diff(起始, 'month') + 1;
+      const 每月补缴个人账户 = (补缴.补缴基数 * 0.08);
+      const 参保地 = 参保记录ID到参保地的映射.get(补缴.参保记录ID) || '未知';
       
       while (当前.isSameOrBefore(终止)) {
-        const key = `${补缴.参保记录ID}_${当前.format('YYYY-MM')}`;
+        const key = `${参保地}_${当前.format('YYYY-MM')}`;
         if (缴费月数Map.has(key)) {
+          const 现有记录 = 缴费月数Map.get(key);
           边界提示.push({
             type: '补缴重复',
             severity: 'error',
-            message: `${当前.format('YYYY-MM')} 月份已存在缴费记录，补缴将覆盖`,
-            detail: { 月份: 当前.format('YYYY-MM'), 补缴单ID: 补缴.id }
+            message: `${参保地} ${当前.format('YYYY-MM')} 月份已存在${现有记录.缴费类型}记录，补缴将覆盖`,
+            detail: { 
+              月份: 当前.format('YYYY-MM'), 
+              参保地,
+              补缴单ID: 补缴.id,
+              原有缴费基数: 现有记录.缴费基数,
+              补缴基数: 补缴.补缴基数,
+              原有缴费类型: 现有记录.缴费类型
+            }
           });
         }
         缴费月数Map.set(key, {
-          参保地: 补缴.参保记录ID,
+          参保地,
           缴费基数: 补缴.补缴基数,
           缴费类型: '补缴',
-          个人账户储存额: 补缴.补缴金额 * 0.08
+          个人账户储存额: 每月补缴个人账户,
+          参保记录ID: 补缴.参保记录ID,
+          补缴单ID: 补缴.id
         });
         当前.add(1, 'month');
       }
