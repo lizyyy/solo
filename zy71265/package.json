@@ -1,0 +1,17 @@
+{
+  "name": "gallery-heatmap-3d",
+  "version": "1.0.0",
+  "description": "美术馆3D展厅观展动线热图分析工具",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
