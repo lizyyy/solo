@@ -221,11 +221,15 @@ class TimeSeriesForecaster:
         
         forecast_df['reservation_count'] = 0
         res_df = pd.DataFrame(reservation_data) if reservation_data else pd.DataFrame()
-        if not res_df.empty:
+        if not res_df.empty and 'status' in res_df.columns and 'people_count' in res_df.columns:
             res_df['date'] = res_df['date'].astype(str)
             res_agg = res_df[res_df['status'] == 'confirmed'].groupby(['date', 'hour'])['people_count'].sum().reset_index()
             forecast_df = forecast_df.merge(res_agg, on=['date', 'hour'], how='left', suffixes=('', '_res'))
-            forecast_df['reservation_count'] = forecast_df['reservation_count'].fillna(0)
+            if 'people_count_res' in forecast_df.columns:
+                forecast_df['reservation_count'] = forecast_df['people_count_res'].fillna(0)
+                forecast_df.drop('people_count_res', axis=1, inplace=True)
+            elif 'people_count' in forecast_df.columns:
+                forecast_df['reservation_count'] = forecast_df['people_count'].fillna(0)
         
         X_pred = forecast_df[self.feature_columns].copy()
         for col in self.feature_columns:
@@ -235,6 +239,10 @@ class TimeSeriesForecaster:
         X_pred_scaled = self.scaler.transform(X_pred)
         
         predictions = self.model.predict(X_pred_scaled)
+        
+        predictions = self._apply_rule_based_adjustments(
+            predictions, forecast_df, scenario
+        )
         
         base_prediction = np.mean(predictions)
         lower_bound = predictions * 0.75
@@ -255,6 +263,38 @@ class TimeSeriesForecaster:
         
         logger.info(f"预测完成，共{len(results)}条记录")
         return results
+    
+    def _apply_rule_based_adjustments(self, predictions: np.ndarray, 
+                                        forecast_df: pd.DataFrame, 
+                                        scenario: str) -> np.ndarray:
+        adjusted = predictions.copy()
+        
+        for i in range(len(adjusted)):
+            row = forecast_df.iloc[i]
+            
+            rain_prob = row.get('rain_probability', 0.3)
+            if rain_prob > 0.7:
+                adjusted[i] *= 0.7
+            elif rain_prob < 0.2:
+                adjusted[i] *= 1.15
+            
+            has_event = row.get('has_event', 0)
+            event_attendance = row.get('event_attendance', 0)
+            if has_event == 1:
+                event_factor = 1.2 + min(0.8, event_attendance / 500)
+                adjusted[i] *= event_factor
+            
+            res_count = row.get('reservation_count', 0)
+            if res_count > 0:
+                res_ratio = min(1.0, res_count / 100)
+                adjusted[i] = adjusted[i] * (1 - res_ratio) + res_count * res_ratio
+            
+            if scenario == 'optimistic':
+                adjusted[i] *= 1.15
+            elif scenario == 'pessimistic':
+                adjusted[i] *= 0.85
+        
+        return adjusted
     
     def predict_with_scenarios(self, weather_data: List[Dict[str, Any]] = None,
                                 event_data: List[Dict[str, Any]] = None,
@@ -277,8 +317,24 @@ class TimeSeriesForecaster:
                 w_opt['temperature'] = w.get('temperature', 20) + 2
                 optimistic_weather.append(w_opt)
         
+        optimistic_events = []
+        if event_data:
+            for e in event_data:
+                e_opt = e.copy()
+                e_opt['expected_attendance'] = int(e.get('expected_attendance', 0) * 1.25)
+                optimistic_events.append(e_opt)
+        
+        optimistic_reservations = []
+        if reservation_data:
+            for r in reservation_data:
+                r_opt = r.copy()
+                if r_opt.get('status') == 'pending':
+                    r_opt['status'] = 'confirmed'
+                r_opt['people_count'] = int(r.get('people_count', 0) * 1.15)
+                optimistic_reservations.append(r_opt)
+        
         optimistic_predictions = self.predict(
-            optimistic_weather, event_data, reservation_data,
+            optimistic_weather, optimistic_events, optimistic_reservations,
             start_date, forecast_hours, "optimistic"
         )
         
@@ -297,8 +353,17 @@ class TimeSeriesForecaster:
                 e_pess['expected_attendance'] = int(e.get('expected_attendance', 0) * 0.7)
                 pessimistic_events.append(e_pess)
         
+        pessimistic_reservations = []
+        if reservation_data:
+            for r in reservation_data:
+                r_pess = r.copy()
+                if r_pess.get('status') == 'pending':
+                    r_pess['status'] = 'cancelled'
+                r_pess['people_count'] = int(r.get('people_count', 0) * 0.85)
+                pessimistic_reservations.append(r_pess)
+        
         pessimistic_predictions = self.predict(
-            pessimistic_weather, pessimistic_events, reservation_data,
+            pessimistic_weather, pessimistic_events, pessimistic_reservations,
             start_date, forecast_hours, "pessimistic"
         )
         

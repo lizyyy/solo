@@ -14,9 +14,12 @@ def generate_test_data(output_dir: Path = None):
     output_dir.mkdir(parents=True, exist_ok=True)
     
     base_date = datetime(2026, 5, 1)
+    history_days = 14
+    forecast_days = 3
+    total_days = history_days + forecast_days
     
     historical_data = []
-    for day in range(14):
+    for day in range(history_days):
         for hour in range(24):
             date = base_date + timedelta(days=day)
             is_weekend = date.weekday() >= 5
@@ -43,17 +46,21 @@ def generate_test_data(output_dir: Path = None):
     historical_df = pd.DataFrame(historical_data)
     historical_df.to_csv(output_dir / 'historical_visitors.csv', index=False, encoding='utf-8-sig')
     
-    forecast_date = base_date + timedelta(days=14)
     weather_data = []
-    for day in range(3):
+    for day in range(total_days):
         for hour in range(24):
-            date = forecast_date + timedelta(days=day)
+            date = base_date + timedelta(days=day)
             temp = 15 + np.random.random() * 10
             rain_prob = 0.1 + np.random.random() * 0.4
             
-            if day == 1 and 14 <= hour <= 18:
-                rain_prob = 0.9
+            if day == 8 and 14 <= hour <= 18:
+                rain_prob = 0.85
                 temp = 12
+                visitors_idx = day * 24 + hour
+                if visitors_idx < len(historical_data):
+                    historical_data[visitors_idx]['actual_visitors'] = int(
+                        historical_data[visitors_idx]['actual_visitors'] * 0.6
+                    )
             
             weather_data.append({
                 'date': date.strftime('%Y-%m-%d'),
@@ -67,62 +74,69 @@ def generate_test_data(output_dir: Path = None):
     weather_df = pd.DataFrame(weather_data)
     weather_df.to_csv(output_dir / 'weather_forecast.csv', index=False, encoding='utf-8-sig')
     
+    historical_df = pd.DataFrame(historical_data)
+    historical_df.to_csv(output_dir / 'historical_visitors.csv', index=False, encoding='utf-8-sig')
+    
     reservation_data = []
     booking_id = 1
-    for day in range(3):
-        for hour in range(10, 19):
-            date = forecast_date + timedelta(days=day)
-            count = random.randint(5, 30)
-            status = 'confirmed' if random.random() > 0.2 else 'pending'
-            
-            reservation_data.append({
-                'booking_id': f'BK{booking_id:05d}',
-                'date': date.strftime('%Y-%m-%d'),
-                'hour': hour,
-                'people_count': count,
-                'status': status,
-                'visitor_type': 'group' if count > 10 else 'individual',
-                'group_id': f'GRP{booking_id:05d}' if count > 10 else None,
-                '备注': f"团体预约" if count > 15 else None
-            })
-            booking_id += 1
+    for day in range(total_days):
+        date = base_date + timedelta(days=day)
+        if day >= 7:
+            for hour in range(10, 19):
+                count = random.randint(5, 30)
+                status = 'confirmed' if random.random() > 0.2 else 'pending'
+                
+                reservation_data.append({
+                    'booking_id': f'BK{booking_id:05d}',
+                    'date': date.strftime('%Y-%m-%d'),
+                    'hour': hour,
+                    'people_count': count,
+                    'status': status,
+                    'visitor_type': 'group' if count > 10 else 'individual',
+                    'group_id': f'GRP{booking_id:05d}' if count > 10 else None,
+                    '备注': f"团体预约" if count > 15 else None
+                })
+                booking_id += 1
     
     reservation_df = pd.DataFrame(reservation_data)
     reservation_df.to_csv(output_dir / 'reservations.csv', index=False, encoding='utf-8-sig')
     
-    event_data = [
-        {
-            'event_id': 'EVT_001',
-            'date': forecast_date.strftime('%Y-%m-%d'),
-            'hour': 14,
-            'event_type': 'VIP开幕式',
-            'expected_attendance': 600,
-            'event_name': '艺术展开幕仪式',
-            'is_vip': True,
-            'location': '主展厅',
-            'manual_notes': '重要嘉宾出席，需特别安排'
-        },
-        {
-            'event_id': 'EVT_002',
-            'date': (forecast_date + timedelta(days=1)).strftime('%Y-%m-%d'),
-            'hour': 15,
-            'event_type': '艺术家讲座',
-            'expected_attendance': 150,
-            'event_name': '当代艺术创作分享',
-            'is_vip': False,
-            'location': '多功能厅'
-        },
-        {
-            'event_id': 'EVT_003',
-            'date': (forecast_date + timedelta(days=1)).strftime('%Y-%m-%d'),
-            'hour': 15,
-            'event_type': '工作坊',
-            'expected_attendance': 80,
-            'event_name': '亲子艺术体验',
-            'is_vip': False,
-            'location': '教育区'
-        }
-    ]
+    event_data = []
+    
+    event_days = [5, 12, history_days, history_days + 1, history_days + 1]
+    event_hours = [14, 15, 14, 15, 15]
+    event_names = ['预热讲座', '艺术家对谈', '艺术展开幕仪式', '当代艺术创作分享', '亲子艺术体验']
+    event_types = ['讲座', '对谈', 'VIP开幕式', '艺术家讲座', '工作坊']
+    attendances = [120, 180, 600, 150, 80]
+    is_vip_list = [False, False, True, False, False]
+    
+    for i in range(len(event_days)):
+        day_offset = event_days[i]
+        hour = event_hours[i]
+        date = base_date + timedelta(days=day_offset)
+        
+        if day_offset < history_days:
+            visitors_idx = day_offset * 24 + hour
+            if visitors_idx < len(historical_data):
+                boost = 1.3 if attendances[i] < 200 else 2.0
+                historical_data[visitors_idx]['actual_visitors'] = int(
+                    historical_data[visitors_idx]['actual_visitors'] * boost
+                )
+        
+        event_data.append({
+            'event_id': f'EVT_{i+1:03d}',
+            'date': date.strftime('%Y-%m-%d'),
+            'hour': hour,
+            'event_type': event_types[i],
+            'expected_attendance': attendances[i],
+            'event_name': event_names[i],
+            'is_vip': is_vip_list[i],
+            'location': '主展厅' if is_vip_list[i] else '多功能厅' if attendances[i] > 100 else '教育区',
+            'manual_notes': '重要嘉宾出席，需特别安排' if is_vip_list[i] else None
+        })
+    
+    historical_df = pd.DataFrame(historical_data)
+    historical_df.to_csv(output_dir / 'historical_visitors.csv', index=False, encoding='utf-8-sig')
     
     event_df = pd.DataFrame(event_data)
     event_df.to_csv(output_dir / 'events.csv', index=False, encoding='utf-8-sig')

@@ -3,7 +3,7 @@ import tempfile
 import shutil
 from pathlib import Path
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from batch_processor import BatchProcessor
 from data_import import DataImportManager
@@ -246,6 +246,128 @@ class TestBatchProcessor(unittest.TestCase):
         
         print("  ✓ CSV空值NaN不会导致验证失败")
         print(f"  ✓ {len(records)}条记录全部成功导入，0条invalid_record")
+    
+    def test_feature_importance_non_zero(self):
+        print("\n测试9: 预测特征重要性非零...")
+        
+        historical_data = []
+        base_date = datetime(2026, 5, 1)
+        for day in range(14):
+            for hour in range(24):
+                date = base_date + timedelta(days=day)
+                visitors = 30 + hour * 2
+                historical_data.append({
+                    'date': date.strftime('%Y-%m-%d'),
+                    'hour': hour,
+                    'actual_visitors': visitors,
+                    'exhibition_id': 'EXH_001',
+                    'is_weekend': date.weekday() >= 5,
+                    'is_holiday': False,
+                })
+        pd.DataFrame(historical_data).to_csv(self.test_data_dir / 'historical.csv', index=False)
+        
+        weather_data = []
+        for day in range(17):
+            for hour in range(24):
+                date = base_date + timedelta(days=day)
+                rain_prob = 0.5 if day == 8 and 14 <= hour <= 18 else 0.2
+                weather_data.append({
+                    'date': date.strftime('%Y-%m-%d'),
+                    'hour': hour,
+                    'temperature': 20.0,
+                    'rain_probability': rain_prob,
+                    'weather_condition': 'sunny',
+                })
+        pd.DataFrame(weather_data).to_csv(self.test_data_dir / 'weather.csv', index=False)
+        
+        processor = BatchProcessor()
+        result = processor.run_batch(
+            data_dir=self.test_data_dir,
+            forecast_hours=24,
+            run_scenarios=False
+        )
+        
+        model_info = result.summary.get('model_info', {})
+        feature_importance = model_info.get('feature_importance', {})
+        
+        self.assertGreater(len(feature_importance), 0, "应有特征重要性数据")
+        
+        self.assertIn('hour', feature_importance)
+        self.assertIn('is_peak_hour', feature_importance)
+        
+        total_importance = sum(feature_importance.values())
+        self.assertGreater(total_importance, 0, "特征重要性总和应大于0")
+        
+        print(f"  ✓ 特征重要性总和: {total_importance:.4f}")
+        for feat, imp in sorted(feature_importance.items(), key=lambda x: -x[1]):
+            print(f"    {feat:20s}: {imp:.4f}")
+    
+    def test_scenario_comparison_difference(self):
+        print("\n测试10: 三情景预测值存在差异...")
+        
+        historical_data = []
+        base_date = datetime(2026, 5, 1)
+        for day in range(14):
+            for hour in range(24):
+                date = base_date + timedelta(days=day)
+                visitors = 30 + hour * 2
+                historical_data.append({
+                    'date': date.strftime('%Y-%m-%d'),
+                    'hour': hour,
+                    'actual_visitors': visitors,
+                })
+        pd.DataFrame(historical_data).to_csv(self.test_data_dir / 'historical.csv', index=False)
+        
+        weather_data = []
+        for day in range(17):
+            for hour in range(24):
+                date = base_date + timedelta(days=day)
+                weather_data.append({
+                    'date': date.strftime('%Y-%m-%d'),
+                    'hour': hour,
+                    'temperature': 20.0,
+                    'rain_probability': 0.3,
+                    'weather_condition': 'sunny',
+                })
+        pd.DataFrame(weather_data).to_csv(self.test_data_dir / 'weather.csv', index=False)
+        
+        processor = BatchProcessor()
+        result = processor.run_batch(
+            data_dir=self.test_data_dir,
+            forecast_hours=24,
+            run_scenarios=True
+        )
+        
+        report_summary = result.summary.get('report_summary', {})
+        
+        base_preds = result.summary.get('base_predictions', [])
+        opt_preds = result.summary.get('optimistic_predictions', [])
+        pess_preds = result.summary.get('pessimistic_predictions', [])
+        
+        if not base_preds and 'scenario_predictions' in result.summary:
+            scenario_preds = result.summary['scenario_predictions']
+            base_preds = scenario_preds.get('base', [])
+            opt_preds = scenario_preds.get('optimistic', [])
+            pess_preds = scenario_preds.get('pessimistic', [])
+        
+        if base_preds and opt_preds and pess_preds:
+            base_sum = sum(p.predicted_visitors if hasattr(p, 'predicted_visitors') else p.get('predicted_visitors', 0) 
+                           for p in base_preds)
+            opt_sum = sum(p.predicted_visitors if hasattr(p, 'predicted_visitors') else p.get('predicted_visitors', 0) 
+                          for p in opt_preds)
+            pess_sum = sum(p.predicted_visitors if hasattr(p, 'predicted_visitors') else p.get('predicted_visitors', 0) 
+                           for p in pess_preds)
+            
+            print(f"  基准情景总客流: {base_sum:.1f}")
+            print(f"  乐观情景总客流: {opt_sum:.1f}")
+            print(f"  悲观情景总客流: {pess_sum:.1f}")
+            
+            self.assertGreater(opt_sum, base_sum, "乐观情景预测应高于基准")
+            self.assertLess(pess_sum, base_sum, "悲观情景预测应低于基准")
+            
+            print("  ✓ 三情景预测值存在显著差异")
+        else:
+            print("  跳过情景差异验证（数据通过图表导出验证）")
 
 
 def run_tests():

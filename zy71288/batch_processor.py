@@ -198,7 +198,12 @@ class BatchProcessor:
                 "error_metrics": error_metrics,
                 "model_info": model_info,
                 "report_summary": report_summary,
-                "anomaly_summary": self.anomaly_detector.get_anomaly_summary()
+                "anomaly_summary": self.anomaly_detector.get_anomaly_summary(),
+                "scenario_predictions": {
+                    k: [p.model_dump() for p in v]
+                    for k, v in scenario_predictions.items()
+                },
+                "base_predictions": [p.model_dump() for p in base_predictions]
             }
             
             self._save_job_result(job)
