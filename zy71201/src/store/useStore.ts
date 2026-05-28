@@ -64,6 +64,9 @@ interface AppState {
   importNetValues: (data: NetValue[], fileName: string, rawData: Record<string, unknown>[]) => ImportResult;
   importRedemptions: (data: Redemption[], fileName: string, rawData: Record<string, unknown>[]) => ImportResult;
   importWarningLines: (data: Array<{ productCode: string; warningLine: number; stopLossLine: number; effectiveDate: string }>, fileName: string, rawData: Record<string, unknown>[]) => ImportResult;
+  importValuations: (data: Valuation[], fileName: string, rawData: Record<string, unknown>[]) => ImportResult;
+  getValuations: (productId: string) => Valuation[];
+  getProductValuationDate: (productId: string) => string | undefined;
   getProductHistory: (productId: string) => VersionRecord[];
   getProductLatestVersion: (productId: string) => string;
   getRawImportById: (id: string) => RawImportRecord | undefined;
@@ -491,6 +494,108 @@ export const useStore = create<AppState>()(
         };
       },
 
+      importValuations: (data, fileName, rawData) => {
+        const state = get();
+        const updatedProducts: string[] = [];
+        const allAnomalies: Anomaly[] = [];
+        const warnings: string[] = [];
+
+        const newValuations = { ...state.valuations };
+        const newProductsList = [...state.products];
+
+        const valuationByProduct: Record<string, Valuation[]> = {};
+        data.forEach((v) => {
+          if (!valuationByProduct[v.productId]) {
+            valuationByProduct[v.productId] = [];
+          }
+          valuationByProduct[v.productId].push(v);
+        });
+
+        Object.entries(valuationByProduct).forEach(([productCode, valuations]) => {
+          const productId = getProductIdByCode(state.products, productCode);
+          
+          if (!productId) {
+            warnings.push(`未找到产品 ${productCode}，已跳过`);
+            return;
+          }
+
+          newValuations[productId] = valuations;
+          updatedProducts.push(productId);
+
+          const productIndex = newProductsList.findIndex((p) => p.id === productId);
+          if (productIndex >= 0) {
+            const product = newProductsList[productIndex];
+            const valuationDate = valuations[0]?.valuationDate;
+            const netValues = state.netValues[productId] || [];
+            const latestNetValue = netValues[netValues.length - 1];
+            const netValueDate = latestNetValue?.valueDate;
+
+            if (valuationDate && netValueDate && valuationDate !== netValueDate) {
+              const dateAnomalies = detectAnomalies(
+                [],
+                undefined,
+                undefined,
+                undefined,
+                valuationDate,
+                netValueDate
+              );
+
+              if (dateAnomalies.length > 0) {
+                const existingAnomalies = product.anomalies.filter(
+                  (a) => a.type !== 'date_mismatch'
+                );
+                newProductsList[productIndex] = {
+                  ...product,
+                  anomalies: [...existingAnomalies, ...dateAnomalies],
+                  lastUpdated: new Date().toISOString(),
+                };
+                allAnomalies.push(...dateAnomalies);
+              }
+            }
+          }
+
+          get().recordVersion(
+            productId,
+            'import',
+            { valuationCount: (state.valuations[productId] || []).length },
+            { valuationCount: valuations.length, valuationDate: valuations[0]?.valuationDate },
+            `导入估值数据: ${valuations.length} 条持仓, 估值日期 ${valuations[0]?.valuationDate || '未知'}`
+          );
+        });
+
+        const rawImport: RawImportRecord = {
+          id: `import-${Date.now()}`,
+          fileName,
+          category: 'valuation',
+          importTime: new Date().toISOString(),
+          rawData,
+          parsedData: data as unknown as Record<string, unknown>[],
+        };
+
+        set({
+          valuations: newValuations,
+          products: newProductsList,
+          rawImports: [rawImport, ...state.rawImports],
+        });
+
+        return {
+          success: true,
+          updatedProducts,
+          newProducts: [],
+          anomalies: allAnomalies,
+          warnings,
+        };
+      },
+
+      getValuations: (productId) => {
+        return get().valuations[productId] || [];
+      },
+
+      getProductValuationDate: (productId) => {
+        const valuations = get().valuations[productId];
+        return valuations?.[0]?.valuationDate;
+      },
+
       getProductHistory: (productId) => {
         return get().versionHistory[productId] || [];
       },
@@ -525,6 +630,7 @@ export const useStore = create<AppState>()(
         rawImports: state.rawImports,
         redemptions: state.redemptions,
         netValues: state.netValues,
+        valuations: state.valuations,
       }),
     }
   )

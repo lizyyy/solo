@@ -21,6 +21,7 @@ import {
   parseNetValueFile,
   parseRedemptionFile,
   parseWarningLineFile,
+  parseValuationFile,
   type FileCategory,
   type ImportPreview,
 } from '../services/fileParser';
@@ -89,6 +90,7 @@ export default function Import() {
   const importNetValues = useStore((state) => state.importNetValues);
   const importRedemptions = useStore((state) => state.importRedemptions);
   const importWarningLines = useStore((state) => state.importWarningLines);
+  const importValuations = useStore((state) => state.importValuations);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -137,6 +139,13 @@ export default function Import() {
         };
       } else if (preview.category === 'warning') {
         const result = await parseWarningLineFile(rawData);
+        upload.parseResult = {
+          data: result.data,
+          rawData,
+          warnings: result.warnings,
+        };
+      } else if (preview.category === 'valuation') {
+        const result = await parseValuationFile(rawData);
         upload.parseResult = {
           data: result.data,
           rawData,
@@ -206,6 +215,12 @@ export default function Import() {
       } else if (upload.category === 'warning') {
         result = importWarningLines(
           upload.parseResult.data as Parameters<typeof importWarningLines>[0],
+          upload.name,
+          upload.parseResult.rawData
+        );
+      } else if (upload.category === 'valuation') {
+        result = importValuations(
+          upload.parseResult.data as Parameters<typeof importValuations>[0],
           upload.name,
           upload.parseResult.rawData
         );

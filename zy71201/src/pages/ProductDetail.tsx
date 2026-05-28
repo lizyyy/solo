@@ -13,6 +13,8 @@ import {
   TrendingDown,
   Ban,
   Edit3,
+  PieChart,
+  Database,
 } from 'lucide-react';
 import {
   LineChart,
@@ -45,11 +47,14 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const product = useStore((state) => state.getProductById(id || ''));
   const getNetValues = useStore((state) => state.getNetValues);
+  const getValuations = useStore((state) => state.getValuations);
   const getScript = useStore((state) => state.getScript);
   const saveScript = useStore((state) => state.saveScript);
   const saveDraft = useStore((state) => state.saveDraft);
   const getDraft = useStore((state) => state.getDraft);
   const recordVersion = useStore((state) => state.recordVersion);
+  const getProductLatestVersion = useStore((state) => state.getProductLatestVersion);
+  const getProductHistory = useStore((state) => state.getProductHistory);
   const redemptions = useStore((state) => state.redemptions);
 
   const [activeTab, setActiveTab] = useState<ScriptType>('normal');
@@ -57,7 +62,10 @@ export default function ProductDetail() {
   const [note, setNote] = useState('');
 
   const netValues = useMemo(() => (id ? getNetValues(id) : []), [id, getNetValues]);
+  const valuations = useMemo(() => (id ? getValuations(id) : []), [id, getValuations]);
   const redemption = id ? redemptions[id] : null;
+  const latestVersion = id ? getProductLatestVersion(id) : 'v1.0';
+  const versionHistory = id ? getProductHistory(id) : [];
 
   useEffect(() => {
     if (id) {
@@ -345,6 +353,67 @@ export default function ProductDetail() {
               <div className="flex justify-between">
                 <span className="text-gray-500">产品代码</span>
                 <span className="text-gray-800 font-mono">{product.code}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">持仓估值</h3>
+              <PieChart className="w-5 h-5 text-navy-500" />
+            </div>
+            {valuations.length > 0 ? (
+              <div className="space-y-3">
+                <div className="text-xs text-gray-500 mb-2">
+                  估值日期：{valuations[0]?.valuationDate || '未知'}
+                </div>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {valuations.slice(0, 8).map((v, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-sm">
+                      <span className="text-gray-700 truncate max-w-24">{v.holdingName}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500">{v.holdingRatio}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-gray-100">
+                  共 {valuations.length} 条持仓
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <Database className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-500">暂无估值数据</p>
+                <p className="text-xs text-gray-400 mt-1">请先导入估值表</p>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">数据口径</h3>
+              <Database className="w-5 h-5 text-navy-500" />
+            </div>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-500">当前版本</span>
+                <span className="text-navy-600 font-mono font-medium">{latestVersion}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">版本记录</span>
+                <span className="text-gray-800">{versionHistory.length} 条</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">最后更新</span>
+                <span className="text-gray-800">
+                  {new Date(product.lastUpdated).toLocaleDateString('zh-CN')}
+                </span>
+              </div>
+              <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                <p className="text-xs text-gray-500">
+                  口径说明：系统导入数据 + 人工编辑备注均保留原始记录，可通过历史记录回溯
+                </p>
               </div>
             </div>
           </div>

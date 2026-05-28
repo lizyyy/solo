@@ -233,6 +233,53 @@ export async function parseRedemptionFile(
   };
 }
 
+export async function parseValuationFile(
+  rawData: Record<string, unknown>[]
+): Promise<ParsedResult<Valuation>> {
+  const mappings = COLUMN_MAPPINGS.valuation;
+  const data: Valuation[] = [];
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  
+  rawData.forEach((row, index) => {
+    const productCode = findColumnValue(row, mappings.productCode);
+    
+    if (!productCode) {
+      warnings.push(`第${index + 2}行：缺少产品代码，已跳过`);
+      return;
+    }
+    
+    const holdingName = String(findColumnValue(row, mappings.holdingName) || '');
+    const valuationDate = parseDate(findColumnValue(row, mappings.valuationDate));
+    
+    if (!holdingName) {
+      warnings.push(`第${index + 2}行：产品${productCode}缺少持仓名称`);
+    }
+    
+    if (!valuationDate) {
+      warnings.push(`第${index + 2}行：产品${productCode}缺少估值日期`);
+    }
+    
+    data.push({
+      id: `val-${productCode}-${valuationDate || index}-${holdingName || index}`,
+      productId: String(productCode),
+      valuationDate,
+      holdingName,
+      holdingRatio: parseNumber(findColumnValue(row, mappings.holdingRatio)),
+      marketValue: parseNumber(findColumnValue(row, mappings.marketValue)),
+      source: '导入',
+    });
+  });
+  
+  return {
+    success: errors.length === 0,
+    data,
+    errors,
+    warnings,
+    rawData,
+  };
+}
+
 export async function parseWarningLineFile(
   rawData: Record<string, unknown>[]
 ): Promise<ParsedResult<{ productCode: string; warningLine: number; stopLossLine: number; effectiveDate: string }>> {
