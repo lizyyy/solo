@@ -17,6 +17,57 @@ import { formatQuantity, formatCurrency } from './calculator';
 
 const generateId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
+const fieldAliases: Record<DataType, Record<string, string[]>> = {
+  contracts: {
+    contractNo: ['contractNo', '合同编号', '合同号', '合约编号', 'ContractNo', 'contract_no', '合同编码'],
+    supplier: ['supplier', '供应商', '供货商', 'Supplier', 'supplier_name', '供方'],
+    copperGrade: ['copperGrade', '铜品种', '品种', '牌号', 'CopperGrade', 'grade'],
+    quantity: ['quantity', '数量(吨)', '数量', '吨数', 'Quantity', 'qty', '重量(吨)'],
+    price: ['price', '单价(元/吨)', '单价', '价格', 'Price', 'unit_price'],
+    deliveryDate: ['deliveryDate', '交货日期', '交货日', 'DeliveryDate', 'delivery_date', '交期'],
+    arrivalDate: ['arrivalDate', '到货日期', '到货日', 'ArrivalDate', 'arrival_date', '入库日期'],
+    status: ['status', '状态', 'Status', '合同状态'],
+  },
+  lots: {
+    lotNo: ['lotNo', '批次号', '批次编号', 'LotNo', 'lot_no', '批号'],
+    contractId: ['contractId', '关联合同编号', '关联合同', '合同编号', 'contract_id', '合同号'],
+    quantity: ['quantity', '数量(吨)', '数量', '吨数', 'Quantity', 'qty'],
+    warehouse: ['warehouse', '仓库', 'Warehouse', 'storage', '库房', '存放地点'],
+    receiptDate: ['receiptDate', '入库日期', '到货日期', 'ReceiptDate', 'receipt_date', '入库日'],
+    matchStatus: ['matchStatus', '匹配状态', '状态', 'MatchStatus'],
+    notes: ['notes', '备注', '说明', 'Notes', 'remark', 'remarks'],
+  },
+  positions: {
+    contractMonth: ['contractMonth', '合约月份', '合约', 'ContractMonth', 'contract_month', '月份'],
+    direction: ['direction', '方向', 'Direction', '买卖方向', '持仓方向', '多空'],
+    quantity: ['quantity', '数量(吨)', '数量', '手数', 'Quantity', 'qty', '持仓量'],
+    openPrice: ['openPrice', '开仓价', 'OpenPrice', 'open_price', '开仓价格'],
+    currentPrice: ['currentPrice', '当前价', '现价', 'CurrentPrice', 'current_price', '最新价'],
+    openDate: ['openDate', '开仓日期', '开仓日', 'OpenDate', 'open_date', '建仓日期'],
+    deliveryMonth: ['deliveryMonth', '交割月', '交割月份', 'DeliveryMonth', 'delivery_month'],
+    status: ['status', '状态', 'Status', '持仓状态'],
+  },
+  basis: {
+    positionId: ['positionId', '关联持仓ID', '持仓ID', 'PositionId', 'position_id'],
+    basisDate: ['basisDate', '日期', '基差日期', 'BasisDate', 'basis_date', '计算日期'],
+    spotPrice: ['spotPrice', '现货价', '现货价格', 'SpotPrice', 'spot_price'],
+    futuresPrice: ['futuresPrice', '期货价', '期货价格', 'FuturesPrice', 'futures_price'],
+    basisValue: ['basisValue', '基差', 'BasisValue', 'basis_value'],
+    isLocked: ['isLocked', '是否锁定', '锁定', 'IsLocked', 'locked', '是否已锁定'],
+  },
+  rollovers: {
+    fromPositionId: ['fromPositionId', '原持仓ID', 'FromPositionId'],
+    toPositionId: ['toPositionId', '新持仓ID', 'ToPositionId'],
+    rolloverDate: ['rolloverDate', '移仓日期', 'RolloverDate'],
+    closePrice: ['closePrice', '平仓价', 'ClosePrice'],
+    openPrice: ['openPrice', '开仓价', 'OpenPrice'],
+    rolloverCost: ['rolloverCost', '移仓成本', 'RolloverCost'],
+    quantity: ['quantity', '数量(吨)', '数量', 'Quantity'],
+    reason: ['reason', '移仓原因', 'Reason'],
+    isComplete: ['isComplete', '是否完成', 'IsComplete'],
+  },
+};
+
 const fieldMappings: Record<DataType, Record<string, string>> = {
   contracts: {
     contractNo: '合同编号',
@@ -79,6 +130,11 @@ const parseDate = (value: any): string => {
 
 const parseNumber = (value: any): number => {
   if (value === null || value === undefined || value === '') return 0;
+  if (typeof value === 'string') {
+    const cleaned = value.replace(/,/g, '').replace(/，/g, '');
+    const num = Number(cleaned);
+    return isNaN(num) ? 0 : num;
+  }
   const num = Number(value);
   return isNaN(num) ? 0 : num;
 };
@@ -86,9 +142,66 @@ const parseNumber = (value: any): number => {
 const parseBoolean = (value: any): boolean => {
   if (typeof value === 'boolean') return value;
   if (typeof value === 'string') {
-    return ['是', 'true', 'yes', '1', '锁定'].includes(value.toLowerCase());
+    return ['是', 'true', 'yes', '1', '锁定', '已锁定'].includes(value.toLowerCase());
   }
   return false;
+};
+
+const detectEncoding = (buffer: ArrayBuffer): string => {
+  const uint8 = new Uint8Array(buffer);
+
+  if (uint8.length >= 3 && uint8[0] === 0xef && uint8[1] === 0xbb && uint8[2] === 0xbf) {
+    return 'utf-8';
+  }
+
+  let hasHighByte = false;
+  for (let i = 0; i < Math.min(uint8.length, 1000); i++) {
+    if (uint8[i] > 127) {
+      hasHighByte = true;
+      break;
+    }
+  }
+
+  return hasHighByte ? 'gbk' : 'utf-8';
+};
+
+const decodeText = (buffer: ArrayBuffer, encoding: string): string => {
+  try {
+    const decoder = new TextDecoder(encoding);
+    return decoder.decode(buffer);
+  } catch (e) {
+    const decoder = new TextDecoder('utf-8');
+    return decoder.decode(buffer);
+  }
+};
+
+const normalizeRowKeys = (row: any, dataType: DataType): any => {
+  const normalized: any = {};
+  const aliases = fieldAliases[dataType];
+
+  Object.keys(aliases).forEach((field) => {
+    const possibleNames = aliases[field];
+
+    for (const name of possibleNames) {
+      const lowerName = name.toLowerCase().trim();
+
+      if (row[name] !== undefined && row[name] !== null && row[name] !== '') {
+        normalized[field] = row[name];
+        break;
+      }
+
+      const foundKey = Object.keys(row).find(
+        (k) => k.toLowerCase().trim() === lowerName
+      );
+
+      if (foundKey && row[foundKey] !== undefined && row[foundKey] !== null && row[foundKey] !== '') {
+        normalized[field] = row[foundKey];
+        break;
+      }
+    }
+  });
+
+  return normalized;
 };
 
 export interface ParseResult<T> {
@@ -97,25 +210,57 @@ export interface ParseResult<T> {
   warnings: string[];
 }
 
+const parseCsvFile = async <T>(csvText: string, dataType: DataType): Promise<ParseResult<T>> => {
+  try {
+    const workbook = XLSX.read(csvText, { type: 'string' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const jsonData = XLSX.utils.sheet_to_json<any>(sheet, { defval: '' });
+
+    return parseJsonData<T>(jsonData, dataType);
+  } catch (error) {
+    throw new Error(`CSV解析失败: ${(error as Error).message}`);
+  }
+};
+
 export function parseExcelFile<T>(file: File, dataType: DataType): Promise<ParseResult<T>> {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json<any>(sheet, { defval: '' });
+    const isCSV = file.name.toLowerCase().endsWith('.csv');
 
-        const result = parseJsonData<T>(jsonData, dataType);
-        resolve(result);
-      } catch (error) {
-        reject(new Error(`文件解析失败: ${(error as Error).message}`));
-      }
-    };
-    reader.onerror = () => reject(new Error('文件读取失败'));
-    reader.readAsArrayBuffer(file);
+    if (isCSV) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const buffer = e.target?.result as ArrayBuffer;
+          const encoding = detectEncoding(buffer);
+          const text = decodeText(buffer, encoding);
+          const result = await parseCsvFile<T>(text, dataType);
+          resolve(result);
+        } catch (error) {
+          reject(new Error(`CSV文件解析失败: ${(error as Error).message}`));
+        }
+      };
+      reader.onerror = () => reject(new Error('文件读取失败'));
+      reader.readAsArrayBuffer(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json<any>(sheet, { defval: '' });
+
+          const result = parseJsonData<T>(jsonData, dataType);
+          resolve(result);
+        } catch (error) {
+          reject(new Error(`文件解析失败: ${(error as Error).message}`));
+        }
+      };
+      reader.onerror = () => reject(new Error('文件读取失败'));
+      reader.readAsArrayBuffer(file);
+    }
   });
 }
 
@@ -123,11 +268,27 @@ function parseJsonData<T>(jsonData: any[], dataType: DataType): ParseResult<T> {
   const data: T[] = [];
   const errors: string[] = [];
   const warnings: string[] = [];
-  const mappings = fieldMappings[dataType];
+
+  if (jsonData.length > 0) {
+    const firstRowKeys = Object.keys(jsonData[0]);
+    const expectedFields = Object.keys(fieldMappings[dataType]);
+    const matchedFields = expectedFields.filter((field) => {
+      const aliases = fieldAliases[dataType][field];
+      return firstRowKeys.some((key) => aliases.some((alias) => key.toLowerCase().includes(alias.toLowerCase())));
+    });
+
+    if (matchedFields.length === 0) {
+      warnings.push('未匹配到字段，请检查表头名称是否正确');
+      warnings.push(`期望字段：${expectedFields.map((f) => fieldMappings[dataType][f]).join('、')}`);
+    } else if (matchedFields.length < expectedFields.length / 2) {
+      warnings.push('部分字段未匹配到，可能影响解析结果');
+    }
+  }
 
   jsonData.forEach((row, index) => {
     try {
-      const parsed = parseRow(row, dataType, index + 2);
+      const normalizedRow = normalizeRowKeys(row, dataType);
+      const parsed = parseRow(normalizedRow, dataType, index + 2);
       if (parsed) {
         data.push(parsed as T);
       }
@@ -136,8 +297,9 @@ function parseJsonData<T>(jsonData: any[], dataType: DataType): ParseResult<T> {
     }
   });
 
-  if (data.length === 0) {
+  if (data.length === 0 && jsonData.length > 0) {
     warnings.push('未解析到有效数据，请检查文件格式和字段名称');
+    warnings.push('可点击"下载模板"获取标准模板');
   }
 
   return { data, errors, warnings };
@@ -145,12 +307,8 @@ function parseJsonData<T>(jsonData: any[], dataType: DataType): ParseResult<T> {
 
 function parseRow(row: any, dataType: DataType, rowNum: number): any {
   const getValue = (field: string) => {
-    const mapping = fieldMappings[dataType];
-    const possibleNames = [field, mapping[field], field.toLowerCase()];
-    for (const name of possibleNames) {
-      if (row[name] !== undefined && row[name] !== null && row[name] !== '') {
-        return row[name];
-      }
+    if (row[field] !== undefined && row[field] !== null && row[field] !== '') {
+      return row[field];
     }
     return undefined;
   };
@@ -213,10 +371,13 @@ function parseRow(row: any, dataType: DataType, rowNum: number): any {
       if (quantity <= 0) throw new Error('数量必须大于0');
       if (!openDate) throw new Error('开仓日期不能为空');
 
+      const direction = getValue('direction') as string;
+      const directionValue = direction === '买入' || direction?.toLowerCase() === 'long' || direction?.toLowerCase() === '多' ? 'long' : 'short';
+
       return {
         id: generateId(),
         contractMonth,
-        direction: (getValue('direction') as string) === '买入' ? 'long' : 'short',
+        direction: directionValue,
         quantity,
         openPrice,
         currentPrice: parseNumber(getValue('currentPrice')) || openPrice,
