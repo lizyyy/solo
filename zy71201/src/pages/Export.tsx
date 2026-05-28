@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import {
   Download,
@@ -179,7 +179,6 @@ export default function Export() {
   const [exportFormat, setExportFormat] = useState<'xlsx' | 'pdf'>('xlsx');
   const [isExporting, setIsExporting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const printRef = useRef<HTMLIFrameElement>(null);
 
   const warningProducts = useMemo(
     () => products.filter((p) => p.status === 'warning' || p.status === 'stop_loss'),

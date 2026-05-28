@@ -86,6 +86,15 @@ export default function ProductDetail() {
     }
   }, [scriptContent, note, id, saveDraft]);
 
+  useEffect(() => {
+    if (product) {
+      let scriptType: ScriptType = 'normal';
+      if (product.status === 'stop_loss') scriptType = 'special';
+      else if (product.status === 'warning') scriptType = 'warning';
+      setActiveTab(scriptType);
+    }
+  }, [product]);
+
   if (!product) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -121,16 +130,6 @@ export default function ProductDetail() {
     netValue: nv.netValue,
     drawdown: nv.drawdownRate,
   }));
-
-  const getScriptType = () => {
-    if (product.status === 'stop_loss') return 'special';
-    if (product.status === 'warning') return 'warning';
-    return 'normal';
-  };
-
-  useEffect(() => {
-    setActiveTab(getScriptType());
-  }, [product?.status]);
 
   return (
     <div className="space-y-6">

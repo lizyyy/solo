@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import type { Product, NetValue, Valuation, Redemption, Anomaly, AnomalyType } from '../types';
+import type { NetValue, Valuation, Redemption, Anomaly } from '../types';
 
 export type FileCategory = 'netvalue' | 'valuation' | 'redemption' | 'warning' | 'unknown';
 
