@@ -195,26 +195,13 @@ export const useTermWallStore = create<TermWallState>((set, get) => ({
 
   exportCSV: async () => {
     const state = get();
-    const { filteredPositions, aggregatedBlocks, filter, dataHash } = state;
-    const uniqueRecordIds = new Set<string>();
-    for (const b of aggregatedBlocks) {
-      if (b.recordIds.length > 0) {
-        uniqueRecordIds.add(b.recordIds[0]);
-      }
-    }
-    const dedupedPositions = filteredPositions.filter((r) => uniqueRecordIds.has(r.id));
+    const { aggregatedBlocks, filter, dataHash } = state;
     const header =
-      "ID,客户ID,客户名称,品种代码,品种名称,合约月份,方向,保证金,数量,风险报告,聚合记录数";
-    const recordToBlock = new Map<string, AggregatedBlock>();
-    for (const b of aggregatedBlocks) {
-      for (const id of b.recordIds) {
-        recordToBlock.set(id, b);
-      }
-    }
-    const rows = dedupedPositions.map((r) => {
-      const block = recordToBlock.get(r.id);
-      const aggCount = block ? block.recordIds.length : 1;
-      return `${r.id},${r.clientId},${r.clientName ?? ""},${r.varietyCode},${r.varietyName ?? ""},${r.contractMonth ?? ""},${r.direction ?? ""},${r.margin ?? ""},${r.quantity ?? ""},${r.riskReport ?? ""},${aggCount}`;
+      "品种代码,品种名称,合约月份,方向,客户ID,客户名称,保证金(去重),数量,聚合记录数,重复保证金,重复笔数,含缺失字段";
+    const rows = aggregatedBlocks.map((b) => {
+      const displayMonth = b.contractMonth === "__MISSING__" ? "" : b.contractMonth;
+      const displayDir = b.direction === "missing" ? "" : b.direction === "long" ? "多头" : "空头";
+      return `${b.varietyCode},${b.varietyName},${displayMonth},${displayDir},${b.clientId},${b.clientName},${b.totalMargin},${b.totalQuantity},${b.recordIds.length},${b.duplicateMargin},${b.duplicateCount},${b.hasMissingFields ? "是" : "否"}`;
     });
     const csv = [header, ...rows].join("\n");
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
