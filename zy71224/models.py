@@ -146,7 +146,13 @@ class SurrenderProcess(BaseModel):
     refund: Optional[RefundRecord] = None
     exceptions: List[SurrenderException] = Field(default_factory=list)
     
+    all_sign_records: List[SignRecord] = Field(default_factory=list, description="同保单所有签收记录（用于检测重复）")
+    all_applications: List[SurrenderApplication] = Field(default_factory=list, description="同保单所有退保申请（用于检测重复）")
+    
     cooling_off_days_used: Optional[int] = None
     is_within_cooling_off: Optional[bool] = None
     status: SurrenderStatus = SurrenderStatus.PENDING
     process_notes: Optional[str] = None
+
+    class Config:
+        extra = "allow"

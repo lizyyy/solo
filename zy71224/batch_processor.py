@@ -96,13 +96,10 @@ class BatchProcessor:
                 reviews=[],
                 refund=None,
                 exceptions=[],
+                all_sign_records=sign_records[policy_no],
+                all_applications=apps,
                 status=SurrenderStatus.PENDING
             )
-            
-            if len(sign_records[policy_no]) > 1:
-                process.all_sign_records = sign_records[policy_no]
-            if len(apps) > 1:
-                process.all_applications = apps
             
             self.processes[f"{policy_no}_{latest_app.apply_no}"] = process
         
@@ -180,6 +177,7 @@ class BatchProcessor:
 
     def _detect_exceptions(self):
         logger.info("开始异常检测...")
+        self.exception_detector.reset()
         
         for process in self.processes.values():
             exceptions = self.exception_detector.detect_all(process)

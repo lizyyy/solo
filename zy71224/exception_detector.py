@@ -37,8 +37,11 @@ class ExceptionDetector:
     def __init__(self):
         self.exceptions: List[SurrenderException] = []
 
-    def detect_all(self, process: SurrenderProcess) -> List[SurrenderException]:
+    def reset(self):
         self.exceptions = []
+
+    def detect_all(self, process: SurrenderProcess) -> List[SurrenderException]:
+        prev_count = len(self.exceptions)
         
         self._detect_sign_exceptions(process)
         self._detect_visit_exceptions(process)
@@ -47,7 +50,7 @@ class ExceptionDetector:
         self._detect_cooling_off_exception(process)
         self._detect_missing_data_exceptions(process)
         
-        return self.exceptions
+        return self.exceptions[prev_count:]
 
     def _add_exception(
         self,
@@ -87,16 +90,26 @@ class ExceptionDetector:
                     suggested_action="立即核实签收日期真实性，联系客户确认实际签收时间，必要时调阅签收凭证"
                 )
 
-        if hasattr(process, 'all_sign_records') and len(process.all_sign_records) > 1:
+        if len(process.all_sign_records) > 1:
             dates = [r.sign_date for r in process.all_sign_records]
-            if len(set(dates)) < len(dates):
+            has_duplicate_dates = len(set(dates)) < len(dates)
+            if has_duplicate_dates:
                 self._add_exception(
                     policy_no=policy_no,
                     apply_no=apply_no,
                     exception_type=ExceptionType.DUPLICATE_SIGN_RECORD,
                     exception_level=ExceptionLevel.HIGH,
                     exception_desc=f"存在{len(process.all_sign_records)}条签收记录，日期存在重复，请确认哪条有效",
-                    suggested_action="核对原始签收凭证，确认有效签收记录，标记重复数据"
+                    suggested_action="核对原始签收凭证，确认有效签收记录，标记重复数据，不覆盖前一版"
+                )
+            else:
+                self._add_exception(
+                    policy_no=policy_no,
+                    apply_no=apply_no,
+                    exception_type=ExceptionType.LATE_SIGN_RECORD,
+                    exception_level=ExceptionLevel.MEDIUM,
+                    exception_desc=f"存在{len(process.all_sign_records)}条签收记录，可能为晚到材料，已保留全部版本未覆盖",
+                    suggested_action="核对各签收记录的来源，以最早有效记录为准，后续材料仅供参考"
                 )
 
         if process.sign_record.sign_date:
@@ -195,15 +208,28 @@ class ExceptionDetector:
         policy_no = process.policy_no
         apply_no = process.apply_no
 
-        if hasattr(process, 'all_applications') and len(process.all_applications) > 1:
-            self._add_exception(
-                policy_no=policy_no,
-                apply_no=apply_no,
-                exception_type=ExceptionType.DUPLICATE_SURRENDER_APP,
-                exception_level=ExceptionLevel.HIGH,
-                exception_desc=f"该保单存在{len(process.all_applications)}条退保申请，请确认最新申请",
-                suggested_action="核对各申请时间和内容，以最新有效申请为准，标记重复申请"
-            )
+        if len(process.all_applications) > 1:
+            apply_nos = [app.apply_no for app in process.all_applications]
+            has_duplicate_app_nos = len(set(apply_nos)) < len(apply_nos)
+            
+            if has_duplicate_app_nos:
+                self._add_exception(
+                    policy_no=policy_no,
+                    apply_no=apply_no,
+                    exception_type=ExceptionType.DUPLICATE_SURRENDER_APP,
+                    exception_level=ExceptionLevel.HIGH,
+                    exception_desc=f"该保单存在{len(process.all_applications)}条退保申请，申请编号重复，已保留多版本未覆盖，请人工确认",
+                    suggested_action="核对各申请的来源和时间，以最新有效申请为准，重复申请幂等处理，不得重复退费"
+                )
+            else:
+                self._add_exception(
+                    policy_no=policy_no,
+                    apply_no=apply_no,
+                    exception_type=ExceptionType.DUPLICATE_SURRENDER_APP,
+                    exception_level=ExceptionLevel.HIGH,
+                    exception_desc=f"该保单存在{len(process.all_applications)}条退保申请，可能为客户重复提交",
+                    suggested_action="联系客户确认真实意愿，各版本均已保留未覆盖，以客户确认的有效申请为准"
+                )
 
         if process.application:
             days_since_apply = (date.today() - process.application.apply_date).days
