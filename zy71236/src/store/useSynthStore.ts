@@ -24,6 +24,8 @@ import {
   generateId,
   validateSynthParams,
   sanitizeParams,
+  validateSession,
+  detectFileType,
 } from '../utils/validator';
 import { generateReportData } from '../utils/export';
 
@@ -47,6 +49,8 @@ interface SynthState {
   exportConfig: () => string;
   exportSession: () => string;
   importSession: (jsonString: string) => ValidationResult;
+  importFile: (jsonString: string) => ValidationResult;
+  exportSessionFile: () => string;
   generateReport: () => ReportData;
   clearWarnings: () => void;
   resetSession: () => void;
@@ -335,8 +339,8 @@ export const useSynthStore = create<SynthState>((set, get) => ({
   },
 
   importSession: (jsonString: string): ValidationResult => {
-    const result = validateSynthParams(jsonString);
-    if (!result.valid) {
+    const result = validateSession(jsonString);
+    if (!result.valid && result.errors.some((e) => e.type === 'json_parse')) {
       return result;
     }
 
@@ -371,6 +375,18 @@ export const useSynthStore = create<SynthState>((set, get) => ({
     const session = sessionData.session;
     const sanitized = sanitizeParams(session.params);
 
+    if (sanitized.master.volume > 0.8) {
+      sanitized.master.volume = 0.8;
+      result.errors.push({
+        type: 'out_of_range',
+        message: '导入会话的音量过高，已自动降低到安全值 0.8',
+        field: 'session.params.master.volume',
+        value: session.params?.master?.volume || 1,
+        expected: '<= 0.8',
+        actual: String(session.params?.master?.volume || 1),
+      });
+    }
+
     const audioEngine = AudioEngine.getInstance();
     if (audioEngine.getIsInitialized()) {
       audioEngine.setAllParams(sanitized);
@@ -387,9 +403,49 @@ export const useSynthStore = create<SynthState>((set, get) => ({
 
     return {
       valid: true,
-      errors: [],
+      errors: result.errors,
       correctedParams: sanitized,
     };
+  },
+
+  importFile: (jsonString: string): ValidationResult => {
+    const { type } = detectFileType(jsonString);
+
+    if (type === 'session') {
+      return get().importSession(jsonString);
+    } else if (type === 'config') {
+      return get().importConfig(jsonString);
+    }
+
+    return {
+      valid: false,
+      errors: [
+        {
+          type: 'json_parse',
+          message: '无法识别的文件格式，请导入配置文件(.synthconfig)或会话文件(.synthsession)',
+        },
+      ],
+    };
+  },
+
+  exportSessionFile: () => {
+    const state = get();
+    const session: Session = {
+      id: state.sessionId,
+      createdAt: state.sessionStartTime,
+      updatedAt: Date.now(),
+      params: state.params,
+      history: state.history,
+      presets: state.presets,
+      currentScore: state.currentScore,
+    };
+    const exportData = {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      type: 'session',
+      session,
+    };
+    return JSON.stringify(exportData, null, 2);
   },
 
   generateReport: (): ReportData => {

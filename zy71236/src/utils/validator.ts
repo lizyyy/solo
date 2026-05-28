@@ -446,3 +446,104 @@ export function formatTime(ms: number): string {
   }
   return `${seconds}s`;
 }
+
+export type FileType = 'config' | 'session' | 'unknown';
+
+export function detectFileType(jsonString: string): { type: FileType; data: unknown } {
+  try {
+    const data = JSON.parse(jsonString);
+
+    if (data && typeof data === 'object') {
+      if ('type' in data && data.type === 'session' && 'session' in data) {
+        return { type: 'session', data };
+      }
+      if ('type' in data && data.type === 'config' && 'params' in data) {
+        return { type: 'config', data };
+      }
+      if ('oscillator' in data && 'filter' in data && 'envelope' in data) {
+        return { type: 'config', data };
+      }
+    }
+
+    return { type: 'unknown', data };
+  } catch {
+    return { type: 'unknown', data: null };
+  }
+}
+
+export function validateSession(jsonString: string): ValidationResult {
+  const errors: ValidationError[] = [];
+
+  let data: { session?: { id?: string; params?: SynthParams; history?: unknown[]; presets?: unknown[]; currentScore?: unknown } };
+  try {
+    data = JSON.parse(jsonString);
+  } catch (e) {
+    const parseResult = parseJsonWithDiagnostics(jsonString);
+    return {
+      valid: false,
+      errors: parseResult.error ? [parseResult.error] : [],
+    };
+  }
+
+  const session = data.session;
+  if (!session) {
+    return {
+      valid: false,
+      errors: [
+        {
+          type: 'missing_field',
+          message: '会话文件缺少 session 字段',
+          field: 'session',
+        },
+      ],
+    };
+  }
+
+  if (!session.id) {
+    errors.push({
+      type: 'missing_field',
+      message: '缺少会话ID',
+      field: 'session.id',
+    });
+  }
+
+  if (!session.params) {
+    errors.push({
+      type: 'missing_field',
+      message: '缺少参数配置',
+      field: 'session.params',
+    });
+  } else {
+    const paramsValidation = validateSynthParams(JSON.stringify(session.params));
+    if (!paramsValidation.valid) {
+      paramsValidation.errors.forEach((err) => {
+        err.field = `session.params.${err.field}`;
+        errors.push(err);
+      });
+    }
+  }
+
+  if (!session.history) {
+    errors.push({
+      type: 'missing_field',
+      message: '缺少历史记录',
+      field: 'session.history',
+    });
+  }
+
+  if (!session.currentScore) {
+    errors.push({
+      type: 'missing_field',
+      message: '缺少分数数据',
+      field: 'session.currentScore',
+    });
+  }
+
+  const sanitizedParams = session.params ? sanitizeParams(session.params) : undefined;
+
+  return {
+    valid: errors.length === 0 || errors.every((e) => e.type !== 'json_parse'),
+    errors,
+    correctedParams: sanitizedParams,
+  };
+}

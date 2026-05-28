@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useSynthStore } from '../../store/useSynthStore';
 import { Button } from '../ui/Button';
 import { Preset } from '../../types/synth';
-import { Save, Trash2, Download, Upload, Play } from 'lucide-react';
-import { downloadConfig, readFileAsText } from '../../utils/export';
+import { Save, Trash2, Download, Upload, Play, FileJson, History } from 'lucide-react';
+import { readFileAsText } from '../../utils/export';
 import { BadDataDialog } from '../presets/BadDataDialog';
 import { ValidationResult, ValidationError } from '../../types/synth';
 
@@ -52,11 +52,20 @@ function PresetCard({ preset, onLoad, onDelete }: PresetCardProps) {
 }
 
 export function PresetList() {
-  const { presets, savePreset, loadPreset, deletePreset, importConfig, exportConfig } = useSynthStore();
+  const {
+    presets,
+    savePreset,
+    loadPreset,
+    deletePreset,
+    importFile,
+    exportConfig,
+    exportSessionFile,
+  } = useSynthStore();
   const [newPresetName, setNewPresetName] = useState('');
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const handleSave = () => {
     if (!newPresetName.trim()) {
@@ -80,7 +89,7 @@ export function PresetList() {
 
     try {
       const content = await readFileAsText(file);
-      const result = importConfig(content);
+      const result = importFile(content);
       setValidationResult(result);
 
       if (!result.valid) {
@@ -101,15 +110,28 @@ export function PresetList() {
     e.target.value = '';
   };
 
-  const handleExport = () => {
+  const handleExportConfig = () => {
     const json = exportConfig();
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `synth-config-${Date.now()}.json`;
+    link.download = `synth-config-${Date.now()}.synthconfig.json`;
     link.click();
     URL.revokeObjectURL(url);
+    setShowExportMenu(false);
+  };
+
+  const handleExportSession = () => {
+    const json = exportSessionFile();
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `synth-session-${Date.now()}.synthsession.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setShowExportMenu(false);
   };
 
   return (
@@ -132,14 +154,39 @@ export function PresetList() {
           <Save size={14} className="mr-1" />
           保存
         </Button>
-        <Button size="sm" variant="secondary" onClick={handleExport} className="flex-1">
-          <Download size={14} className="mr-1" />
-          导出
-        </Button>
+        <div className="relative flex-1">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setShowExportMenu(!showExportMenu)}
+            className="w-full"
+          >
+            <Download size={14} className="mr-1" />
+            导出
+          </Button>
+          {showExportMenu && (
+            <div className="absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-10 min-w-40">
+              <button
+                onClick={handleExportConfig}
+                className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2 rounded-t-lg"
+              >
+                <FileJson size={14} />
+                仅配置
+              </button>
+              <button
+                onClick={handleExportSession}
+                className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2 rounded-b-lg"
+              >
+                <History size={14} />
+                完整会话
+              </button>
+            </div>
+          )}
+        </div>
         <label className="flex-1">
           <input
             type="file"
-            accept=".json,.synthlab"
+            accept=".json,.synthconfig,.synthsession"
             onChange={handleImport}
             className="hidden"
           />

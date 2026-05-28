@@ -11,17 +11,24 @@ interface HeaderProps {
 }
 
 export function Header({ onGenerateReport }: HeaderProps) {
-  const { currentScore, sessionId, resetSession, exportSession } = useSynthStore();
+  const { currentScore, sessionId, sessionStartTime, resetSession, exportSessionFile } = useSynthStore();
 
   const handleSaveSession = () => {
-    const json = exportSession();
+    const json = exportSessionFile();
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `synth-session-${Date.now()}.synthlab`;
+    link.download = `synth-session-${Date.now()}.synthsession.json`;
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  const sessionDuration = Math.floor((Date.now() - sessionStartTime) / 1000);
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -51,6 +58,8 @@ export function Header({ onGenerateReport }: HeaderProps) {
           <div className="text-xs text-gray-500">
             <span className="text-gray-400">会话ID:</span>{' '}
             <span className="font-mono">{sessionId.slice(0, 12)}...</span>
+            <span className="ml-3 text-gray-400">时长:</span>{' '}
+            <span className="font-mono">{formatDuration(sessionDuration)}</span>
           </div>
         </div>
 
