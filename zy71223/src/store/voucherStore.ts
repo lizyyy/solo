@@ -30,7 +30,7 @@ interface VoucherState {
   completeVoucher: (id: string, operator: string) => Promise<void>;
 
   generateReport: (period: string, operator: string) => Promise<CollationReport | null>;
-  exportReport: (reportId: string, format: 'csv' | 'excel', operator: string) => Promise<void>;
+  exportReport: (reportId: string, format: 'csv' | 'xlsx', operator: string) => Promise<void>;
   calculateBalances: (period: string) => Promise<void>;
 
   clearError: () => void;

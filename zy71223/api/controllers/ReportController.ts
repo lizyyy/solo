@@ -45,7 +45,7 @@ export class ReportController {
       const { format } = req.body;
       const operator = req.headers['x-operator'] as string || '系统管理员';
 
-      const exportFormat = (format as string) === 'xlsx' ? 'xlsx' : 'csv';
+      const exportFormat = (format as string) === 'csv' ? 'csv' : 'xlsx';
       const { fileName, filePath } = ReportService.exportReport(id, exportFormat, operator);
 
       if (fs.existsSync(filePath)) {

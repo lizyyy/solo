@@ -129,8 +129,8 @@ export class ReportService {
     const log = (logs as any[]).find(l => l.id === exportId);
     if (!log) return null;
 
-    if (log.report_id) {
-      const report = ReportRepository.findById(log.report_id);
+    if (log.reportId) {
+      const report = ReportRepository.findById(log.reportId);
       if (report) {
         return {
           exportLog: log,

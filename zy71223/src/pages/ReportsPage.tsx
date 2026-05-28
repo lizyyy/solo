@@ -17,7 +17,7 @@ export default function ReportsPage() {
     await generateReport(period, '张会计');
   };
 
-  const handleExport = async (reportId: string, format: 'csv' | 'excel') => {
+  const handleExport = async (reportId: string, format: 'csv' | 'xlsx') => {
     await exportReport(reportId, format, '张会计');
   };
 
@@ -187,7 +187,7 @@ export default function ReportsPage() {
                     导出 CSV
                   </button>
                   <button
-                    onClick={() => handleExport(selectedReportData.id, 'excel')}
+                    onClick={() => handleExport(selectedReportData.id, 'xlsx')}
                     disabled={loading}
                     className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors disabled:opacity-50"
                   >
