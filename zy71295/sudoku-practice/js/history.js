@@ -9,11 +9,14 @@ var HistoryManager = (function() {
         };
     }
 
-    function pushAction(history, action, boardSnapshot) {
+    function pushAction(history, action, oldSnapshot, newSnapshot) {
         action.timestamp = action.timestamp || Date.now();
         action.id = action.id || Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-        if (boardSnapshot) {
-            action.snapshot = boardSnapshot;
+        if (oldSnapshot) {
+            action.oldSnapshot = oldSnapshot;
+        }
+        if (newSnapshot) {
+            action.newSnapshot = newSnapshot;
         }
         history.undoStack.push(action);
         history.redoStack = [];
@@ -50,8 +53,8 @@ var HistoryManager = (function() {
         var action = history.undoStack.pop();
 
         if (action.index === -1 || action.type === 'import') {
-            if (action.snapshot) {
-                board.fromJSON(action.snapshot);
+            if (action.oldSnapshot) {
+                board.fromJSON(action.oldSnapshot);
                 board.propagateAll();
                 board.detectConflicts();
             }
@@ -79,8 +82,8 @@ var HistoryManager = (function() {
         var action = history.redoStack.pop();
 
         if (action.index === -1 || action.type === 'import') {
-            if (action.snapshot) {
-                board.fromJSON(action.snapshot);
+            if (action.newSnapshot) {
+                board.fromJSON(action.newSnapshot);
                 board.propagateAll();
                 board.detectConflicts();
             }

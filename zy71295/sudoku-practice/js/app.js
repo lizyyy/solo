@@ -27,6 +27,7 @@ var SudokuApp = (function() {
         var oldBoardSnapshot = board.toJSON();
         board.loadFromString(sample);
         board.detectConflicts();
+        var newBoardSnapshot = board.toJSON();
         renderBoard();
         updateStatus();
 
@@ -40,7 +41,7 @@ var SudokuApp = (function() {
             wasGiven: false,
             isGiven: false,
             description: '加载示例盘面'
-        }, oldBoardSnapshot);
+        }, oldBoardSnapshot, newBoardSnapshot);
         updateHistoryDisplay();
     }
 
@@ -405,6 +406,7 @@ var SudokuApp = (function() {
 
         board.detectConflicts();
         SudokuIO.recordImport(board.hash());
+        var newBoardSnapshot = board.toJSON();
 
         HistoryManager.pushAction(history, {
             type: 'import',
@@ -416,7 +418,7 @@ var SudokuApp = (function() {
             wasGiven: false,
             isGiven: false,
             description: mode === 'append' ? '追加新盘面' : '导入盘面'
-        }, oldBoardSnapshot);
+        }, oldBoardSnapshot, newBoardSnapshot);
 
         currentHint = null;
         selectedCell = -1;
