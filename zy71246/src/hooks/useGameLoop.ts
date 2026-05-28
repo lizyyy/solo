@@ -10,7 +10,7 @@ import {
 } from '../engine/windowEngine';
 import { detectCommandTimeout, getNextCommand } from '../engine/queueEngine';
 import { detectPacketLoss, calculateTransmissionProgress } from '../engine/transmissionEngine';
-import type { Command, DataPacket, VisibilityWindow, ScheduleBlock } from '../types/mission';
+import type { Command, DataPacket, VisibilityWindow, ScheduleBlock, ErrorDetail } from '../types/mission';
 import { formatTime } from '../utils/time';
 
 export function useGameLoop() {
@@ -45,6 +45,7 @@ export function useGameLoop() {
   const lastUpdateRef = useRef<number>(0);
   const processedWindowsRef = useRef<Set<string>>(new Set());
   const processedCommandsRef = useRef<Set<string>>(new Set());
+  const processedPacketLossRef = useRef<Set<string>>(new Set());
 
   const processWindowStarts = useCallback((time: number) => {
     const newWindow = detectWindowStart(visibilityWindows, time);
@@ -181,43 +182,75 @@ export function useGameLoop() {
     const targetWindow = activeWindow || recentlyEndedWindow;
     if (!targetWindow) return;
 
+    const station = groundStations.find(s => s.id === targetWindow.groundStationId);
+
     dataPackets.forEach(packet => {
       if (packet.isDownloaded) return;
+      if (processedPacketLossRef.current.has(`${packet.id}-${targetWindow.id}`)) return;
+
+      const isInCurrentWindow = blocks.some(
+        b => b.windowId === targetWindow.id && b.taskIds.includes(packet.id)
+      );
+      if (!isInCurrentWindow) return;
 
       const transmission = activeTransmissions.find(
         t => t.packetId === packet.id && t.type === 'download' && t.windowId === targetWindow.id
       );
-      
-      if (!transmission) return;
 
-      const downloadedPercent = calculateTransmissionProgress(transmission, time);
+      if (transmission) {
+        const downloadedPercent = calculateTransmissionProgress(transmission, time);
 
-      if (time >= targetWindow.endTime && downloadedPercent < 100) {
-        const station = groundStations.find(s => s.id === targetWindow.groundStationId);
-        if (!station) return;
+        if (time >= targetWindow.endTime && downloadedPercent < 100) {
+          if (!station) return;
 
-        const error = detectPacketLoss(
-          packet,
-          targetWindow,
-          time,
-          downloadedPercent,
-          station
-        );
-
-        if (error) {
-          const result = addError(error, time, useGameStore.getState().score);
-          deductScore(result.scoreDeduction);
-
-          const transIndex = activeTransmissions.findIndex(
-            t => t.packetId === packet.id && t.type === 'download'
+          const error = detectPacketLoss(
+            packet,
+            targetWindow,
+            time,
+            downloadedPercent,
+            station
           );
-          if (transIndex >= 0) {
-            removeActiveTransmission(transIndex);
+
+          if (error) {
+            processedPacketLossRef.current.add(`${packet.id}-${targetWindow.id}`);
+            const result = addError(error, time, useGameStore.getState().score);
+            deductScore(result.scoreDeduction);
+
+            const transIndex = activeTransmissions.findIndex(
+              t => t.packetId === packet.id && t.type === 'download'
+            );
+            if (transIndex >= 0) {
+              removeActiveTransmission(transIndex);
+            }
           }
         }
+      } else if (time >= targetWindow.endTime) {
+        if (!station) return;
+
+        const error: ErrorDetail = {
+          errorType: 'data_packet_lost',
+          dataPacketLost: {
+            packetId: packet.id,
+            windowId: targetWindow.id,
+            reason: 'bandwidth_exceeded',
+            recoveredPercent: 0,
+          },
+        };
+
+        processedPacketLossRef.current.add(`${packet.id}-${targetWindow.id}`);
+        const result = addError(error, time, useGameStore.getState().score);
+        deductScore(result.scoreDeduction);
+
+        addEvent({
+          timestamp: time,
+          type: 'data_download_failed',
+          severity: 'error',
+          message: `数据包丢失：${packet.description || packet.dataType} 数据 ${packet.size}MB — 窗口剩余带宽不足，下载从未启动`,
+          relatedEntityId: packet.id,
+        });
       }
     });
-  }, [visibilityWindows, dataPackets, activeTransmissions, groundStations, addError, deductScore, removeActiveTransmission]);
+  }, [visibilityWindows, dataPackets, activeTransmissions, groundStations, blocks, addError, deductScore, removeActiveTransmission, addEvent]);
 
   const processActiveTransmissions = useCallback((time: number) => {
     const currentWindow = getCurrentWindow(visibilityWindows, time);
@@ -356,6 +389,15 @@ export function useGameLoop() {
                 message: `开始下载：${packet.dataType} 数据 ${packet.size}MB`,
                 relatedEntityId: packet.id,
               });
+            } else {
+              const remainingTime = currentWindow.endTime - time;
+              addEvent({
+                timestamp: time,
+                type: 'data_download_failed',
+                severity: 'warning',
+                message: `带宽不足：${packet.description || packet.dataType} 数据 ${packet.size}MB 需 ${formatTime(requiredTime)}，窗口仅剩 ${formatTime(remainingTime)}`,
+                relatedEntityId: packet.id,
+              });
             }
           }
         }
@@ -383,6 +425,15 @@ export function useGameLoop() {
                 type: 'command_sent',
                 severity: 'info',
                 message: `开始发送指令：${command.name}`,
+                relatedEntityId: command.id,
+              });
+            } else {
+              const remainingTime = currentWindow.endTime - time;
+              addEvent({
+                timestamp: time,
+                type: 'command_timeout',
+                severity: 'warning',
+                message: `窗口不足：指令 ${command.name} 需 ${formatTime(requiredTime)}，窗口仅剩 ${formatTime(remainingTime)}`,
                 relatedEntityId: command.id,
               });
             }
@@ -472,6 +523,7 @@ export function useGameLoop() {
   const resetLoop = useCallback(() => {
     processedWindowsRef.current.clear();
     processedCommandsRef.current.clear();
+    processedPacketLossRef.current.clear();
     lastUpdateRef.current = 0;
   }, []);
 

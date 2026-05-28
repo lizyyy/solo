@@ -86,6 +86,7 @@ export type EventType =
   | 'command_failed'
   | 'data_download_start'
   | 'data_download_complete'
+  | 'data_download_failed'
   | 'data_packet_lost'
   | 'ground_station_error'
   | 'storage_overflow'
