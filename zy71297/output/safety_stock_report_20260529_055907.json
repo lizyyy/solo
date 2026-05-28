@@ -1,0 +1,259 @@
+{
+  "run_id": "62e56be9",
+  "run_date": "2026-05-29T05:59:07.214849",
+  "overall_status": "clean",
+  "sku_results": [
+    {
+      "sku": "SKU-001",
+      "supplier": "供应商A",
+      "demand_stats": {
+        "sku": "SKU-001",
+        "mean_daily_demand": 104.4833,
+        "std_daily_demand": 15.7961,
+        "variance_daily_demand": 249.5164,
+        "max_demand": 142,
+        "min_demand": 72,
+        "data_points": 60,
+        "cv": 0.1512
+      },
+      "lead_time_stats": {
+        "sku": "SKU-001",
+        "supplier": "供应商A",
+        "mean_lead_time_days": 6.12,
+        "std_lead_time_days": 1.2686,
+        "min_lead_time_days": 4,
+        "max_lead_time_days": 8,
+        "data_points": 8
+      },
+      "safety_stock": {
+        "sku": "SKU-001",
+        "supplier": "供应商A",
+        "service_level": 0.95,
+        "z_score": 1.64,
+        "safety_stock_units": 227,
+        "reorder_point": 867,
+        "average_demand_during_lead_time": 639.96,
+        "stockout_risk_percentage": 5.0,
+        "fill_rate_percentage": 95.0
+      },
+      "sensitivity": {
+        "sku": "SKU-001",
+        "points": [
+          {
+            "service_level": 0.75,
+            "safety_stock_units": 93,
+            "marginal_increase": 93
+          },
+          {
+            "service_level": 0.8,
+            "safety_stock_units": 117,
+            "marginal_increase": 24
+          },
+          {
+            "service_level": 0.85,
+            "safety_stock_units": 144,
+            "marginal_increase": 27
+          },
+          {
+            "service_level": 0.9,
+            "safety_stock_units": 177,
+            "marginal_increase": 33
+          },
+          {
+            "service_level": 0.95,
+            "safety_stock_units": 227,
+            "marginal_increase": 50
+          },
+          {
+            "service_level": 0.97,
+            "safety_stock_units": 260,
+            "marginal_increase": 33
+          },
+          {
+            "service_level": 0.98,
+            "safety_stock_units": 284,
+            "marginal_increase": 24
+          },
+          {
+            "service_level": 0.99,
+            "safety_stock_units": 322,
+            "marginal_increase": 38
+          }
+        ]
+      },
+      "current_inventory": 150,
+      "recommended_action": "PLACE_ORDER_SOON",
+      "anomalies": [],
+      "data_quality": "clean"
+    },
+    {
+      "sku": "SKU-002",
+      "supplier": "供应商B",
+      "demand_stats": {
+        "sku": "SKU-002",
+        "mean_daily_demand": 49.4068,
+        "std_daily_demand": 8.683,
+        "variance_daily_demand": 75.3939,
+        "max_demand": 71,
+        "min_demand": 25,
+        "data_points": 59,
+        "cv": 0.1757
+      },
+      "lead_time_stats": {
+        "sku": "SKU-002",
+        "supplier": "供应商B",
+        "mean_lead_time_days": 14.12,
+        "std_lead_time_days": 2.0272,
+        "min_lead_time_days": 11,
+        "max_lead_time_days": 17,
+        "data_points": 8
+      },
+      "safety_stock": {
+        "sku": "SKU-002",
+        "supplier": "供应商B",
+        "service_level": 0.9,
+        "z_score": 1.28,
+        "safety_stock_units": 135,
+        "reorder_point": 833,
+        "average_demand_during_lead_time": 697.87,
+        "stockout_risk_percentage": 10.0,
+        "fill_rate_percentage": 90.0
+      },
+      "sensitivity": {
+        "sku": "SKU-002",
+        "points": [
+          {
+            "service_level": 0.75,
+            "safety_stock_units": 71,
+            "marginal_increase": 71
+          },
+          {
+            "service_level": 0.8,
+            "safety_stock_units": 89,
+            "marginal_increase": 18
+          },
+          {
+            "service_level": 0.85,
+            "safety_stock_units": 110,
+            "marginal_increase": 21
+          },
+          {
+            "service_level": 0.9,
+            "safety_stock_units": 135,
+            "marginal_increase": 25
+          },
+          {
+            "service_level": 0.95,
+            "safety_stock_units": 173,
+            "marginal_increase": 38
+          },
+          {
+            "service_level": 0.97,
+            "safety_stock_units": 199,
+            "marginal_increase": 26
+          },
+          {
+            "service_level": 0.98,
+            "safety_stock_units": 216,
+            "marginal_increase": 17
+          },
+          {
+            "service_level": 0.99,
+            "safety_stock_units": 246,
+            "marginal_increase": 30
+          }
+        ]
+      },
+      "current_inventory": 80,
+      "recommended_action": "PLACE_ORDER_SOON",
+      "anomalies": [],
+      "data_quality": "clean"
+    },
+    {
+      "sku": "SKU-003",
+      "supplier": "供应商A",
+      "demand_stats": {
+        "sku": "SKU-003",
+        "mean_daily_demand": 197.9333,
+        "std_daily_demand": 31.4716,
+        "variance_daily_demand": 990.4622,
+        "max_demand": 271,
+        "min_demand": 128,
+        "data_points": 60,
+        "cv": 0.159
+      },
+      "lead_time_stats": {
+        "sku": "SKU-003",
+        "supplier": "供应商A",
+        "mean_lead_time_days": 4.25,
+        "std_lead_time_days": 0.6614,
+        "min_lead_time_days": 3,
+        "max_lead_time_days": 5,
+        "data_points": 8
+      },
+      "safety_stock": {
+        "sku": "SKU-003",
+        "supplier": "供应商A",
+        "service_level": 0.98,
+        "z_score": 2.05,
+        "safety_stock_units": 300,
+        "reorder_point": 1141,
+        "average_demand_during_lead_time": 841.22,
+        "stockout_risk_percentage": 2.0,
+        "fill_rate_percentage": 98.0
+      },
+      "sensitivity": {
+        "sku": "SKU-003",
+        "points": [
+          {
+            "service_level": 0.75,
+            "safety_stock_units": 98,
+            "marginal_increase": 98
+          },
+          {
+            "service_level": 0.8,
+            "safety_stock_units": 123,
+            "marginal_increase": 25
+          },
+          {
+            "service_level": 0.85,
+            "safety_stock_units": 152,
+            "marginal_increase": 29
+          },
+          {
+            "service_level": 0.9,
+            "safety_stock_units": 188,
+            "marginal_increase": 36
+          },
+          {
+            "service_level": 0.95,
+            "safety_stock_units": 240,
+            "marginal_increase": 52
+          },
+          {
+            "service_level": 0.97,
+            "safety_stock_units": 275,
+            "marginal_increase": 35
+          },
+          {
+            "service_level": 0.98,
+            "safety_stock_units": 300,
+            "marginal_increase": 25
+          },
+          {
+            "service_level": 0.99,
+            "safety_stock_units": 341,
+            "marginal_increase": 41
+          }
+        ]
+      },
+      "current_inventory": 300,
+      "recommended_action": "MONITOR_CLOSELY",
+      "anomalies": [],
+      "data_quality": "clean"
+    }
+  ],
+  "total_anomalies": 0,
+  "critical_anomalies": 0,
+  "manual_review_required": []
+}

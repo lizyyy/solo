@@ -12,6 +12,12 @@ from .models import (
     SKUResult,
     TrialRunReport,
     DataQualityStatus,
+    AnomalyRecord,
+    AnomalyType,
+    DemandStatistics,
+    LeadTimeStatistics,
+    SafetyStockResult,
+    SensitivityAnalysis,
 )
 from .calculator import (
     calculate_demand_statistics,
@@ -107,6 +113,8 @@ def run_trial(
         
         has_critical = any(a.severity == "critical" for a in anomalies)
         
+        calculation_failed = False
+        
         try:
             clean_sales = filter_clean_sales_data(
                 sku_sales,
@@ -150,7 +158,35 @@ def run_trial(
             
         except Exception as e:
             print(f"  警告: SKU {sku} 计算出错: {e}")
-            continue
+            calculation_failed = True
+            
+            anomalies.append(AnomalyRecord(
+                sku=sku,
+                anomaly_type=AnomalyType.MISSING_DATA,
+                description=f"计算失败: {str(e)}，无法完成安全库存计算",
+                severity="critical",
+                affected_data={"error_message": str(e)}
+            ))
+            
+            data_status = DataQualityStatus.ERROR
+            demand_stats = DemandStatistics(
+                sku=sku, mean_daily_demand=0, std_daily_demand=0,
+                variance_daily_demand=0, max_demand=0, min_demand=0,
+                data_points=len(sku_sales), cv=0
+            )
+            lead_time_stats = LeadTimeStatistics(
+                sku=sku, supplier=supplier, mean_lead_time_days=0,
+                std_lead_time_days=0, min_lead_time_days=0,
+                max_lead_time_days=0, data_points=len(sku_lead_times)
+            )
+            safety_stock_result = SafetyStockResult(
+                sku=sku, supplier=supplier, service_level=service_level,
+                z_score=0, safety_stock_units=0, reorder_point=0,
+                average_demand_during_lead_time=0, stockout_risk_percentage=100,
+                fill_rate_percentage=0
+            )
+            sensitivity = SensitivityAnalysis(sku=sku, points=[])
+            recommended_action = "REQUIRES_MANUAL_REVIEW"
         
         sku_result = SKUResult(
             sku=sku,
@@ -165,7 +201,11 @@ def run_trial(
             data_quality=data_status
         )
         sku_results.append(sku_result)
-        print(f"  完成 - 安全库存: {safety_stock_result.safety_stock_units} 件")
+        
+        if calculation_failed:
+            print(f"  已记录 - 计算失败，需人工复核")
+        else:
+            print(f"  完成 - 安全库存: {safety_stock_result.safety_stock_units} 件")
     
     total_anomalies = sum(len(r.anomalies) for r in sku_results)
     critical_anomalies = sum(

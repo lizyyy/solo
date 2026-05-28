@@ -1,0 +1,319 @@
+{
+  "run_id": "8baad76b",
+  "run_date": "2026-05-29T05:58:39.787882",
+  "overall_status": "error",
+  "sku_results": [
+    {
+      "sku": "SKU-101",
+      "supplier": "供应商X",
+      "demand_stats": {
+        "sku": "SKU-101",
+        "mean_daily_demand": 81.4259,
+        "std_daily_demand": 12.5648,
+        "variance_daily_demand": 157.8741,
+        "max_demand": 106,
+        "min_demand": 57,
+        "data_points": 54,
+        "cv": 0.1543
+      },
+      "lead_time_stats": {
+        "sku": "SKU-101",
+        "supplier": "供应商X",
+        "mean_lead_time_days": 9.12,
+        "std_lead_time_days": 2.315,
+        "min_lead_time_days": 7,
+        "max_lead_time_days": 14,
+        "data_points": 8
+      },
+      "safety_stock": {
+        "sku": "SKU-101",
+        "supplier": "供应商X",
+        "service_level": 0.7,
+        "z_score": 0.67,
+        "safety_stock_units": 129,
+        "reorder_point": 872,
+        "average_demand_during_lead_time": 743.01,
+        "stockout_risk_percentage": 30.0,
+        "fill_rate_percentage": 70.0
+      },
+      "sensitivity": {
+        "sku": "SKU-101",
+        "points": [
+          {
+            "service_level": 0.75,
+            "safety_stock_units": 129,
+            "marginal_increase": 129
+          },
+          {
+            "service_level": 0.8,
+            "safety_stock_units": 162,
+            "marginal_increase": 33
+          },
+          {
+            "service_level": 0.85,
+            "safety_stock_units": 200,
+            "marginal_increase": 38
+          },
+          {
+            "service_level": 0.9,
+            "safety_stock_units": 247,
+            "marginal_increase": 47
+          },
+          {
+            "service_level": 0.95,
+            "safety_stock_units": 316,
+            "marginal_increase": 69
+          },
+          {
+            "service_level": 0.97,
+            "safety_stock_units": 362,
+            "marginal_increase": 46
+          },
+          {
+            "service_level": 0.98,
+            "safety_stock_units": 395,
+            "marginal_increase": 33
+          },
+          {
+            "service_level": 0.99,
+            "safety_stock_units": 449,
+            "marginal_increase": 54
+          }
+        ]
+      },
+      "current_inventory": 120,
+      "recommended_action": "REQUIRES_MANUAL_REVIEW",
+      "anomalies": [
+        {
+          "sku": "SKU-101",
+          "anomaly_type": "invalid_service_level",
+          "description": "服务水平过低: 70.00%, 建议不低于 75%",
+          "severity": "critical",
+          "affected_data": {
+            "service_level": 0.7,
+            "minimum_required": 0.75
+          },
+          "date_detected": "2026-05-29T05:58:39.787407"
+        },
+        {
+          "sku": "SKU-101",
+          "anomaly_type": "promotion",
+          "description": "促销期间销量显著偏高: 促销日均 266.3 vs 平日 81.4",
+          "severity": "warning",
+          "affected_data": {
+            "avg_normal_sales": 81.43,
+            "avg_promotion_sales": 266.33,
+            "uplift_percentage": 227.1
+          },
+          "date_detected": "2026-05-29T05:58:39.787489"
+        }
+      ],
+      "data_quality": "error"
+    },
+    {
+      "sku": "SKU-102",
+      "supplier": "供应商Y",
+      "demand_stats": {
+        "sku": "SKU-102",
+        "mean_daily_demand": 0,
+        "std_daily_demand": 0,
+        "variance_daily_demand": 0,
+        "max_demand": 0,
+        "min_demand": 0,
+        "data_points": 8,
+        "cv": 0
+      },
+      "lead_time_stats": {
+        "sku": "SKU-102",
+        "supplier": "供应商Y",
+        "mean_lead_time_days": 0,
+        "std_lead_time_days": 0,
+        "min_lead_time_days": 0,
+        "max_lead_time_days": 0,
+        "data_points": 0
+      },
+      "safety_stock": {
+        "sku": "SKU-102",
+        "supplier": "供应商Y",
+        "service_level": 0.95,
+        "z_score": 0,
+        "safety_stock_units": 0,
+        "reorder_point": 0,
+        "average_demand_during_lead_time": 0,
+        "stockout_risk_percentage": 100,
+        "fill_rate_percentage": 0
+      },
+      "sensitivity": {
+        "sku": "SKU-102",
+        "points": []
+      },
+      "current_inventory": 50,
+      "recommended_action": "REQUIRES_MANUAL_REVIEW",
+      "anomalies": [
+        {
+          "sku": "SKU-102",
+          "anomaly_type": "missing_data",
+          "description": "有效销售数据不足: 8 条, 建议至少 10 条",
+          "severity": "warning",
+          "affected_data": {
+            "data_points": 8,
+            "minimum_required": 10
+          },
+          "date_detected": "2026-05-29T05:58:39.787599"
+        },
+        {
+          "sku": "SKU-102",
+          "anomaly_type": "missing_data",
+          "description": "发现 1 处超过7天的数据断层",
+          "severity": "warning",
+          "affected_data": {
+            "gaps": [
+              {
+                "from": "2026-01-05",
+                "to": "2026-01-21",
+                "days_missing": 15
+              }
+            ]
+          },
+          "date_detected": "2026-05-29T05:58:39.787605"
+        },
+        {
+          "sku": "SKU-102",
+          "anomaly_type": "missing_data",
+          "description": "没有到货周期数据",
+          "severity": "critical",
+          "affected_data": {
+            "data_points": 0,
+            "minimum_required": 3
+          },
+          "date_detected": "2026-05-29T05:58:39.787608"
+        },
+        {
+          "sku": "SKU-102",
+          "anomaly_type": "missing_data",
+          "description": "计算失败: No lead time records found for SKU SKU-102, supplier 供应商Y，无法完成安全库存计算",
+          "severity": "critical",
+          "affected_data": {
+            "error_message": "No lead time records found for SKU SKU-102, supplier 供应商Y"
+          },
+          "date_detected": "2026-05-29T05:58:39.787630"
+        }
+      ],
+      "data_quality": "error"
+    },
+    {
+      "sku": "SKU-103",
+      "supplier": "供应商X",
+      "demand_stats": {
+        "sku": "SKU-103",
+        "mean_daily_demand": 146.9138,
+        "std_daily_demand": 51.833,
+        "variance_daily_demand": 2686.665,
+        "max_demand": 265,
+        "min_demand": 49,
+        "data_points": 58,
+        "cv": 0.3528
+      },
+      "lead_time_stats": {
+        "sku": "SKU-103",
+        "supplier": "供应商X",
+        "mean_lead_time_days": 26.0,
+        "std_lead_time_days": 19.0,
+        "min_lead_time_days": 7,
+        "max_lead_time_days": 45,
+        "data_points": 10
+      },
+      "safety_stock": {
+        "sku": "SKU-103",
+        "supplier": "供应商X",
+        "service_level": 0.999,
+        "z_score": 3.09,
+        "safety_stock_units": 8664,
+        "reorder_point": 12484,
+        "average_demand_during_lead_time": 3819.76,
+        "stockout_risk_percentage": 0.1,
+        "fill_rate_percentage": 99.9
+      },
+      "sensitivity": {
+        "sku": "SKU-103",
+        "points": [
+          {
+            "service_level": 0.75,
+            "safety_stock_units": 1879,
+            "marginal_increase": 1879
+          },
+          {
+            "service_level": 0.8,
+            "safety_stock_units": 2356,
+            "marginal_increase": 477
+          },
+          {
+            "service_level": 0.85,
+            "safety_stock_units": 2917,
+            "marginal_increase": 561
+          },
+          {
+            "service_level": 0.9,
+            "safety_stock_units": 3589,
+            "marginal_increase": 672
+          },
+          {
+            "service_level": 0.95,
+            "safety_stock_units": 4599,
+            "marginal_increase": 1010
+          },
+          {
+            "service_level": 0.97,
+            "safety_stock_units": 5272,
+            "marginal_increase": 673
+          },
+          {
+            "service_level": 0.98,
+            "safety_stock_units": 5748,
+            "marginal_increase": 476
+          },
+          {
+            "service_level": 0.99,
+            "safety_stock_units": 6533,
+            "marginal_increase": 785
+          }
+        ]
+      },
+      "current_inventory": 500,
+      "recommended_action": "PLACE_ORDER_SOON",
+      "anomalies": [
+        {
+          "sku": "SKU-103",
+          "anomaly_type": "invalid_service_level",
+          "description": "服务水平过高: 99.95%, 建议不超过 99.9%",
+          "severity": "warning",
+          "affected_data": {
+            "service_level": 0.9995,
+            "maximum_allowed": 0.999
+          },
+          "date_detected": "2026-05-29T05:58:39.787645"
+        },
+        {
+          "sku": "SKU-103",
+          "anomaly_type": "outlier",
+          "description": "到货周期波动过大: 最长 45 天 vs 最短 7 天",
+          "severity": "warning",
+          "affected_data": {
+            "max_lead_time": 45,
+            "min_lead_time": 7,
+            "ratio": 6.4
+          },
+          "date_detected": "2026-05-29T05:58:39.787719"
+        }
+      ],
+      "data_quality": "warning"
+    }
+  ],
+  "total_anomalies": 8,
+  "critical_anomalies": 3,
+  "manual_review_required": [
+    "SKU-101",
+    "SKU-102",
+    "SKU-103"
+  ]
+}
