@@ -1,0 +1,27 @@
+{
+  "version_id": "20260528_220317_ce0d0680",
+  "created_at": "2026-05-28T22:03:17.455957",
+  "config_hash": "ce0d0680",
+  "notes": "终稿 - 已批",
+  "receipt_info": "主任已阅，同意增加1个窗口",
+  "config": {
+    "num_patients": 150,
+    "num_windows": 3,
+    "arrival_rate": 2.0,
+    "avg_service_time": 10.0,
+    "std_service_time": 3.0,
+    "sim_duration": 480.0,
+    "random_seed": 999,
+    "strategy_name": "FCFS",
+    "strategy_params": {},
+    "window_breaks": [],
+    "priority_ratio": {
+      "NORMAL": 0.7,
+      "PRIORITY": 0.2,
+      "EMERGENCY": 0.1
+    },
+    "notes": "初稿 - 等待主任确认",
+    "receipt_info": ""
+  },
+  "result_summary": null
+}

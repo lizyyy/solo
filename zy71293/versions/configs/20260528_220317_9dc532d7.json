@@ -1,0 +1,27 @@
+{
+  "version_id": "20260528_220317_9dc532d7",
+  "created_at": "2026-05-28T22:03:17.456180",
+  "config_hash": "9dc532d7",
+  "notes": "第二稿 - 调整窗口数",
+  "receipt_info": "",
+  "config": {
+    "num_patients": 200,
+    "num_windows": 4,
+    "arrival_rate": 2.5,
+    "avg_service_time": 8.0,
+    "std_service_time": 3.0,
+    "sim_duration": 480.0,
+    "random_seed": 999,
+    "strategy_name": "FCFS",
+    "strategy_params": {},
+    "window_breaks": [],
+    "priority_ratio": {
+      "NORMAL": 0.7,
+      "PRIORITY": 0.2,
+      "EMERGENCY": 0.1
+    },
+    "notes": "第二稿 - 调整窗口数",
+    "receipt_info": ""
+  },
+  "result_summary": null
+}
