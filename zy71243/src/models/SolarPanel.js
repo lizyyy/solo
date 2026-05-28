@@ -14,10 +14,11 @@ export class SolarPanel {
     if (this.status !== 'operational') return 0
     
     const angleDiff = Math.abs(sunAngle - this.tiltAngle)
-    this.sunAngleFactor = Math.cos(angleDiff * Math.PI / 180)
+    const rawCosine = Math.cos(angleDiff * Math.PI / 180)
+    const sunAngleFactor = Math.max(0, rawCosine)
     const healthFactor = 1 - (this.damageLevel * 0.3)
     
-    return this.maxOutput * this.efficiency * this.sunAngleFactor * healthFactor
+    return Math.max(0, this.maxOutput * this.efficiency * sunAngleFactor * healthFactor)
   }
 
   applyDamage(amount) {

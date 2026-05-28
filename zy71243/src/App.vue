@@ -193,6 +193,7 @@ import { ScenarioData } from './data/ScenarioData.js'
 import { TurnManager } from './core/TurnManager.js'
 import { ReportGenerator } from './core/ReportGenerator.js'
 import { ReplaySystem } from './core/ReplaySystem.js'
+import { globalValidator } from './core/RuntimeValidator.js'
 
 import ScenarioSelector from './components/ScenarioSelector.vue'
 import PowerOverview from './components/PowerOverview.vue'
@@ -316,6 +317,12 @@ function startGame() {
   turnManager.value = new TurnManager(station.value)
   replaySystem.value = new ReplaySystem(turnManager.value)
   
+  const validation = globalValidator.validateScenario(station.value)
+  console.log('🔍 场景验证结果:', validation.summary)
+  if (!validation.passed) {
+    console.warn('⚠️ 场景存在验证问题:', validation.results.filter(r => !r.result.passed))
+  }
+  
   const state = turnManager.value.start()
   updateState(state)
   
@@ -373,6 +380,8 @@ function handleTransferDevice({ device, type, from, to }) {
   
   if (!sourceModule || !targetModule) return
   
+  const transferInfo = { device, type, from, to }
+  
   if (type === 'solar') {
     const actualPanel = sourceModule.solarPanels.find(p => p.id === device.id)
     if (actualPanel) {
@@ -392,6 +401,13 @@ function handleTransferDevice({ device, type, from, to }) {
       actualLoad.moduleId = to
       targetModule.addLoad(actualLoad)
     }
+  }
+  
+  const validation = globalValidator.validateAfterTransfer(station.value, transferInfo)
+  if (!validation.passed) {
+    console.error('❌ 设备转移验证失败:', validation.message, validation.details)
+  } else {
+    console.log('✅ 设备转移成功:', `${type} ${device.id} ${from} → ${to}`)
   }
   
   transferTrigger.value++

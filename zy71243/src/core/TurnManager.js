@@ -5,6 +5,7 @@ import { EventSystem } from './EventSystem.js'
 export class TurnManager {
   constructor(station) {
     this.station = station
+    this.initialSunAngle = station.sunAngle
     this.ledger = new EnergyLedger()
     this.powerManager = new PowerManager(station, this.ledger)
     this.eventSystem = new EventSystem(station)
@@ -26,8 +27,8 @@ export class TurnManager {
     this.station.currentTurn++
     
     this.station.sunAngle += this.station.sunAngleRate
-    if (this.station.sunAngle < -30) {
-      this.station.sunAngle = 90
+    if (this.station.sunAngle < -90) {
+      this.station.sunAngle = this.station.sunAngle + 270
     }
 
     this.ledger.createEntry(this.station.currentTurn)
@@ -105,7 +106,7 @@ export class TurnManager {
 
   reset() {
     this.station.currentTurn = 0
-    this.station.sunAngle = 90
+    this.station.sunAngle = this.initialSunAngle
     this.station.crewAlive = true
     this.station.status = 'stable'
     this.isGameOver = false
