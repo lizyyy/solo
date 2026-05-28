@@ -1,0 +1,52 @@
+{
+  "sampleNegotiation": {
+    "title": "新人培训样例 - 流行单曲版权谈判",
+    "scenario": "假设你是一位新晋厂牌版权经理，正在处理一首热门单曲的版权谈判事宜。你需要在词曲作者、录音制作方和发行平台之间达成公平的分成协议。",
+    "expectedOutcome": {
+      "totalRevenue": 1000000,
+      "idealSplits": {
+        "songwriter": 25,
+        "recording": 40,
+        "publisher": 35
+      },
+      "requiredRights": [
+        "mechanical_right",
+        "performance_right",
+        "sync_right"
+      ]
+    }
+  },
+  "commonIssues": [
+    {
+      "id": "issue-1",
+      "type": "split_mismatch",
+      "severity": "critical",
+      "description": "分成比例总和异常",
+      "example": "三方分成总和仅为85%，剩余15%去向不明",
+      "solution": "仔细核对每张卡牌的分成效果，确保没有重复计算或遗漏"
+    },
+    {
+      "id": "issue-2",
+      "type": "right_missing",
+      "severity": "major",
+      "description": "机械复制权缺失",
+      "example": "录音合同中未明确机械复制权（CD、数字下载）的归属",
+      "solution": "使用'机械复制权'卡牌或'法务审核'卡牌补全权利"
+    },
+    {
+      "id": "issue-3",
+      "type": "deduction_ignored",
+      "severity": "minor",
+      "description": "平台扣费未计入",
+      "example": "选择了头部流媒体平台但未在结算中扣除平台费用",
+      "solution": "平台卡会自动计算扣费，确保结算时已考虑此成本"
+    }
+  ],
+  "glossary": {
+    "mechanical_right": "机械复制权：制作和分发音乐作品实体或数字副本的权利",
+    "performance_right": "表演权：公开表演音乐作品的权利（包括现场演出、广播、流媒体）",
+    "sync_right": "同步权：将音乐与视觉内容结合使用的权利（如电影、广告、游戏）",
+    "publisher_split": "发行分成：发行方因推广和分销音乐获得的收入比例",
+    "royalty": "版税：版权所有者因他人使用其作品而获得的报酬"
+  }
+}

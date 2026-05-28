@@ -1,0 +1,262 @@
+[
+  {
+    "id": "level-1",
+    "name": "基础谈判",
+    "description": "学习版权谈判的基础知识，掌握三方基本分成概念",
+    "difficulty": 1,
+    "unlocked": true,
+    "completed": false,
+    "stars": 0,
+    "minStars": 0,
+    "initialCards": ["c001", "c002", "c003", "a002", "p003"],
+    "initialParties": [
+      {
+        "id": "party-songwriter",
+        "name": "词曲作者",
+        "type": "songwriter",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      },
+      {
+        "id": "party-recording",
+        "name": "录音制作方",
+        "type": "recording",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      },
+      {
+        "id": "party-publisher",
+        "name": "发行方",
+        "type": "publisher",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      }
+    ],
+    "totalRevenue": 100000,
+    "winCondition": {
+      "minReputation": 60,
+      "maxCriticalIssues": 0,
+      "maxMajorIssues": 1
+    }
+  },
+  {
+    "id": "level-2",
+    "name": "分成结算",
+    "description": "深入学习复杂的分成计算，理解平台扣费机制",
+    "difficulty": 2,
+    "unlocked": true,
+    "completed": false,
+    "stars": 0,
+    "minStars": 1,
+    "initialCards": ["c001", "c002", "c003", "c005", "p001", "a001", "cl002"],
+    "initialParties": [
+      {
+        "id": "party-songwriter",
+        "name": "词曲作者",
+        "type": "songwriter",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": ["performance_right"],
+        "rawRights": ["performance_right"],
+        "risks": [],
+        "reputation": 50
+      },
+      {
+        "id": "party-recording",
+        "name": "录音制作方",
+        "type": "recording",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      },
+      {
+        "id": "party-publisher",
+        "name": "发行方",
+        "type": "publisher",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      }
+    ],
+    "totalRevenue": 500000,
+    "winCondition": {
+      "minReputation": 65,
+      "maxCriticalIssues": 0,
+      "maxMajorIssues": 1
+    }
+  },
+  {
+    "id": "level-3",
+    "name": "条款冲突",
+    "description": "识别合同中的漏洞和条款冲突，学习法务审核重要性",
+    "difficulty": 3,
+    "unlocked": true,
+    "completed": false,
+    "stars": 0,
+    "minStars": 2,
+    "initialCards": ["c001", "c002", "c003", "c004", "cl004", "cl005", "act001", "act002"],
+    "initialParties": [
+      {
+        "id": "party-songwriter",
+        "name": "词曲作者",
+        "type": "songwriter",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      },
+      {
+        "id": "party-recording",
+        "name": "录音制作方",
+        "type": "recording",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": ["pending_mechanical"],
+        "reputation": 40
+      },
+      {
+        "id": "party-publisher",
+        "name": "发行方",
+        "type": "publisher",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      }
+    ],
+    "totalRevenue": 800000,
+    "winCondition": {
+      "minReputation": 70,
+      "maxCriticalIssues": 1,
+      "maxMajorIssues": 2
+    }
+  },
+  {
+    "id": "level-4",
+    "name": "信誉评分",
+    "description": "综合运用版权谈判技巧，平衡各方利益与风险控制",
+    "difficulty": 4,
+    "unlocked": true,
+    "completed": false,
+    "stars": 0,
+    "minStars": 3,
+    "initialCards": ["c001", "c002", "c003", "c004", "c005", "a001", "a003", "p002", "cl001", "cl003", "act002", "act003"],
+    "initialParties": [
+      {
+        "id": "party-songwriter",
+        "name": "词曲作者",
+        "type": "songwriter",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      },
+      {
+        "id": "party-recording",
+        "name": "录音制作方",
+        "type": "recording",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      },
+      {
+        "id": "party-publisher",
+        "name": "发行方",
+        "type": "publisher",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      }
+    ],
+    "totalRevenue": 1500000,
+    "winCondition": {
+      "minReputation": 75,
+      "maxCriticalIssues": 0,
+      "maxMajorIssues": 1
+    }
+  },
+  {
+    "id": "level-5",
+    "name": "综合实战",
+    "description": "终极挑战：完整模拟真实版权谈判全流程",
+    "difficulty": 5,
+    "unlocked": true,
+    "completed": false,
+    "stars": 0,
+    "minStars": 4,
+    "initialCards": ["c001", "c002", "c003", "c004", "c005", "a001", "a002", "a003", "p001", "p002", "p003", "cl001", "cl002", "cl003", "cl004", "cl005", "act001", "act002", "act003"],
+    "initialParties": [
+      {
+        "id": "party-songwriter",
+        "name": "词曲作者",
+        "type": "songwriter",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      },
+      {
+        "id": "party-recording",
+        "name": "录音制作方",
+        "type": "recording",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": ["pending_mechanical"],
+        "reputation": 45
+      },
+      {
+        "id": "party-publisher",
+        "name": "发行方",
+        "type": "publisher",
+        "splitPercentage": 0,
+        "rawSplitPercentage": 0,
+        "rights": [],
+        "rawRights": [],
+        "risks": [],
+        "reputation": 50
+      }
+    ],
+    "totalRevenue": 3000000,
+    "winCondition": {
+      "minReputation": 80,
+      "maxCriticalIssues": 0,
+      "maxMajorIssues": 0
+    }
+  }
+]

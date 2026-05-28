@@ -1,0 +1,255 @@
+[
+  {
+    "id": "c001",
+    "name": "词曲版权基本协议",
+    "type": "copyright",
+    "description": "词曲作者享有基本版税分成权",
+    "effect": {
+      "type": "split_modifier",
+      "target": "songwriter",
+      "value": 25,
+      "isRaw": true
+    },
+    "rarity": "common",
+    "rawData": { "originalSplit": 25, "source": "行业标准" }
+  },
+  {
+    "id": "c002",
+    "name": "录音版权制作权",
+    "type": "copyright",
+    "description": "录音方享有录音制作版权",
+    "effect": {
+      "type": "split_modifier",
+      "target": "recording",
+      "value": 35,
+      "isRaw": true
+    },
+    "rarity": "common",
+    "rawData": { "originalSplit": 35, "source": "录音协议" }
+  },
+  {
+    "id": "c003",
+    "name": "发行权基本分成",
+    "type": "copyright",
+    "description": "发行方享有发行渠道分成",
+    "effect": {
+      "type": "split_modifier",
+      "target": "publisher",
+      "value": 30,
+      "isRaw": true
+    },
+    "rarity": "common",
+    "rawData": { "originalSplit": 30, "source": "发行合同" }
+  },
+  {
+    "id": "c004",
+    "name": "机械复制权",
+    "type": "copyright",
+    "description": "录音方获得机械复制权（CD、数字下载）",
+    "effect": {
+      "type": "right_add",
+      "target": "recording",
+      "value": 0,
+      "right": "mechanical_right"
+    },
+    "rarity": "rare",
+    "rawData": { "rightType": "mechanical", "applicableRegions": ["中国大陆", "全球"] }
+  },
+  {
+    "id": "c005",
+    "name": "表演权补充",
+    "type": "copyright",
+    "description": "词曲方增加公开表演权",
+    "effect": {
+      "type": "right_add",
+      "target": "songwriter",
+      "value": 5,
+      "right": "performance_right"
+    },
+    "rarity": "rare",
+    "rawData": { "rightType": "performance", "society": "CASH" }
+  },
+  {
+    "id": "a001",
+    "name": "一线歌手代言",
+    "type": "artist",
+    "description": "知名歌手演唱，提升分成议价能力",
+    "effect": {
+      "type": "split_modifier",
+      "target": "recording",
+      "value": 5
+    },
+    "rarity": "epic",
+    "rawData": { "artistLevel": "A", "expectedROI": 2.5 }
+  },
+  {
+    "id": "a002",
+    "name": "新人歌手出道",
+    "type": "artist",
+    "description": "新人歌手，分成较低但潜力大",
+    "effect": {
+      "type": "split_modifier",
+      "target": "recording",
+      "value": -5
+    },
+    "rarity": "common",
+    "rawData": { "artistLevel": "C", "expectedROI": 0.8 }
+  },
+  {
+    "id": "a003",
+    "name": "金牌制作人",
+    "type": "artist",
+    "description": "顶级制作人操刀，提升录音方价值",
+    "effect": {
+      "type": "reputation_mod",
+      "target": "recording",
+      "value": 15
+    },
+    "rarity": "epic",
+    "rawData": { "producerRank": "S", "hitRate": 0.85 }
+  },
+  {
+    "id": "p001",
+    "name": "头部流媒体平台",
+    "type": "platform",
+    "description": "与腾讯音乐/网易云合作，平台扣费15%",
+    "effect": {
+      "type": "deduction_add",
+      "target": "all",
+      "value": 15
+    },
+    "rarity": "rare",
+    "rawData": { "platformName": "TME", "userBase": "8亿", "deductionRate": 0.15 }
+  },
+  {
+    "id": "p002",
+    "name": "短视频平台推广",
+    "type": "platform",
+    "description": "抖音/TikTok推广，平台扣费20%但曝光量大",
+    "effect": {
+      "type": "deduction_add",
+      "target": "all",
+      "value": 20
+    },
+    "rarity": "rare",
+    "rawData": { "platformName": "抖音", "userBase": "6亿", "deductionRate": 0.20 }
+  },
+  {
+    "id": "p003",
+    "name": "独立发行平台",
+    "type": "platform",
+    "description": "独立音乐人平台，扣费仅5%",
+    "effect": {
+      "type": "deduction_add",
+      "target": "all",
+      "value": 5
+    },
+    "rarity": "common",
+    "rawData": { "platformName": "独立发行", "userBase": "500万", "deductionRate": 0.05 }
+  },
+  {
+    "id": "cl001",
+    "name": "独家发行协议",
+    "type": "clause",
+    "description": "发行方独家代理权，增加发行分成",
+    "effect": {
+      "type": "split_modifier",
+      "target": "publisher",
+      "value": 10
+    },
+    "rarity": "rare",
+    "rawData": { "exclusivityPeriod": "3年", "territory": "全球" }
+  },
+  {
+    "id": "cl002",
+    "name": "保底分成条款",
+    "type": "clause",
+    "description": "词曲方享有最低保底收入保障",
+    "effect": {
+      "type": "split_modifier",
+      "target": "songwriter",
+      "value": 8
+    },
+    "rarity": "rare",
+    "rawData": { "minimumGuarantee": 100000, "currency": "CNY" }
+  },
+  {
+    "id": "cl003",
+    "name": "版权追溯期",
+    "type": "clause",
+    "description": "延长版权保护期，增加长期收益",
+    "effect": {
+      "type": "reputation_mod",
+      "target": "all",
+      "value": 10
+    },
+    "rarity": "epic",
+    "rawData": { "protectionPeriod": "作者终身+50年", "lawBasis": "著作权法第21条" }
+  },
+  {
+    "id": "cl004",
+    "name": "漏洞条款：漏算录音权",
+    "type": "clause",
+    "description": "合同存在漏洞，未明确录音权归属",
+    "effect": {
+      "type": "risk_add",
+      "target": "recording",
+      "value": 0,
+      "right": "missing_mechanical"
+    },
+    "rarity": "common",
+    "rawData": { "riskType": "right_missing", "clauseStatus": "ambiguous" }
+  },
+  {
+    "id": "cl005",
+    "name": "不完整分成协议",
+    "type": "clause",
+    "description": "分成比例不完整，总和不足100%",
+    "effect": {
+      "type": "risk_add",
+      "target": "all",
+      "value": -10
+    },
+    "rarity": "common",
+    "rawData": { "riskType": "split_mismatch", "totalSplit": 90 }
+  },
+  {
+    "id": "act001",
+    "name": "重新谈判",
+    "type": "action",
+    "description": "重新协商分成比例，可抵消一张负面卡",
+    "effect": {
+      "type": "reputation_mod",
+      "target": "all",
+      "value": 5
+    },
+    "rarity": "rare",
+    "rawData": { "actionType": "renegotiation", "maxUses": 1 }
+  },
+  {
+    "id": "act002",
+    "name": "法务审核",
+    "type": "action",
+    "description": "专业法务团队审核，发现合同漏洞",
+    "effect": {
+      "type": "reputation_mod",
+      "target": "all",
+      "value": 20
+    },
+    "rarity": "epic",
+    "rawData": { "firm": "顶级知识产权律所", "successRate": 0.95 }
+  },
+  {
+    "id": "act003",
+    "name": "行业专家咨询",
+    "type": "action",
+    "description": "咨询版权专家，优化分成方案",
+    "effect": {
+      "type": "split_modifier",
+      "target": "all",
+      "value": 3
+    },
+    "rarity": "rare",
+    "rawData": { "expertLevel": "资深", "hourlyRate": 5000 }
+  }
+]
