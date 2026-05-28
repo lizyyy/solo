@@ -6,14 +6,18 @@ import {
   NoiseError,
   NoiseType,
   NormalizationError,
+  ProbabilityMismatch,
+  ProbabilityMismatchError,
   ValidationResult,
 } from '@/types';
 import { getNoiseInfo, simulateCircuit } from '../quantum/quantumEngine';
 
 const NORMALIZATION_TOLERANCE = 0.001;
+const PROBABILITY_TOLERANCE = 0.05;
 const GATE_ORDER_PENALTY = 15;
 const NORMALIZATION_PENALTY = 20;
 const NOISE_PENALTY = 25;
+const PROBABILITY_MISMATCH_PENALTY_UNIT = 10;
 
 export const checkGateOrder = (
   circuitGates: CircuitGate[],
@@ -160,10 +164,46 @@ export const calculateGrade = (score: number, maxScore: number): ValidationResul
   return 'F';
 };
 
+export const checkProbabilityMatch = (
+  actual: Record<string, number>,
+  target: Record<string, number>
+): ProbabilityMismatchError | null => {
+  const mismatches: ProbabilityMismatch[] = [];
+  const allKeys = new Set([...Object.keys(actual), ...Object.keys(target)]);
+
+  for (const key of allKeys) {
+    const a = actual[key] ?? 0;
+    const t = target[key] ?? 0;
+    const diff = Math.abs(a - t);
+    if (diff > PROBABILITY_TOLERANCE) {
+      mismatches.push({ state: key, actual: a, target: t, diff });
+    }
+  }
+
+  if (mismatches.length === 0) {
+    return null;
+  }
+
+  const maxDeviation = Math.max(...mismatches.map((m) => m.diff));
+  const penalty = mismatches.length * PROBABILITY_MISMATCH_PENALTY_UNIT;
+
+  const details = mismatches
+    .map((m) => `|${m.state}⟩: 实际 ${(m.actual * 100).toFixed(1)}%, 目标 ${(m.target * 100).toFixed(1)}%, 偏差 ${(m.diff * 100).toFixed(1)}%`)
+    .join('; ');
+
+  return {
+    mismatches,
+    maxDeviation,
+    penalty,
+    message: `概率与目标不匹配（${mismatches.length} 项偏差超过 ${(PROBABILITY_TOLERANCE * 100).toFixed(0)}%）: ${details}`,
+  };
+};
+
 export const generateSuggestions = (
   gateOrderErrors: GateOrderError[],
   normalizationError: NormalizationError | null,
-  noiseError: NoiseError | null
+  noiseError: NoiseError | null,
+  probabilityMismatchError: ProbabilityMismatchError | null
 ): string[] => {
   const suggestions: string[] = [];
 
@@ -191,6 +231,18 @@ export const generateSuggestions = (
   if (noiseError) {
     suggestions.push(`添加正确的噪声抵消门：${noiseError.expectedGate}`);
     suggestions.push('确保抵消门在噪声门之后的同一量子位上');
+  }
+
+  if (probabilityMismatchError) {
+    suggestions.push(
+      `有 ${probabilityMismatchError.mismatches.length} 个态的概率与目标偏差过大，检查门的类型和顺序`
+    );
+    const worst = probabilityMismatchError.mismatches.reduce((a, b) =>
+      a.diff > b.diff ? a : b
+    );
+    suggestions.push(
+      `最大偏差在 |${worst.state}⟩: 实际 ${(worst.actual * 100).toFixed(1)}%, 目标 ${(worst.target * 100).toFixed(1)}%`
+    );
   }
 
   if (suggestions.length === 0) {
@@ -232,19 +284,35 @@ export const validateCircuit = (circuit: Circuit, level: Level): ValidationResul
   const noiseError = checkNoiseCancellation(circuit, level.requiredNoise, level.noiseOffsetGate);
   const noisePenalty = noiseError?.penalty || 0;
 
-  const totalPenalty = gatePenalty + normPenalty + noisePenalty;
+  const probabilityMismatchError = checkProbabilityMatch(
+    simulationResult.probabilities,
+    level.targetProbabilities
+  );
+  const probPenalty = probabilityMismatchError?.penalty || 0;
+
+  const totalPenalty = gatePenalty + normPenalty + noisePenalty + probPenalty;
   const score = Math.max(0, level.maxScore - totalPenalty);
 
   const grade = calculateGrade(score, level.maxScore);
-  const suggestions = generateSuggestions(gateErrors, normalizationError, noiseError);
+  const suggestions = generateSuggestions(
+    gateErrors,
+    normalizationError,
+    noiseError,
+    probabilityMismatchError
+  );
 
-  const isValid = gateErrors.length === 0 && !normalizationError && !noiseError;
+  const isValid =
+    gateErrors.length === 0 &&
+    !normalizationError &&
+    !noiseError &&
+    !probabilityMismatchError;
 
   return {
     isValid,
     gateOrderErrors: gateErrors,
     normalizationError,
     noiseError,
+    probabilityMismatchError,
     score,
     maxScore: level.maxScore,
     grade,

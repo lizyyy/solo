@@ -128,7 +128,8 @@ export const ValidationResultPanel = () => {
   const totalPenalties =
     validationResult.gateOrderErrors.reduce((sum, e) => sum + e.penalty, 0) +
     (validationResult.normalizationError?.penalty || 0) +
-    (validationResult.noiseError?.penalty || 0);
+    (validationResult.noiseError?.penalty || 0) +
+    (validationResult.probabilityMismatchError?.penalty || 0);
 
   return (
     <div className="bg-slate-800/50 rounded-xl p-6 backdrop-blur-sm border border-slate-700">
@@ -184,11 +185,35 @@ export const ValidationResultPanel = () => {
           )}
 
           {validationResult.noiseError && (
-            <div>
+            <div className="mb-3">
               <div className="text-sm text-red-300 mb-1">噪声未扣除</div>
               <div className="text-xs text-slate-400 ml-2">
                 • {validationResult.noiseError.message}{' '}
                 <span className="text-red-400">(-{validationResult.noiseError.penalty}分)</span>
+              </div>
+            </div>
+          )}
+
+          {validationResult.probabilityMismatchError && (
+            <div>
+              <div className="text-sm text-red-300 mb-1">
+                概率不匹配 ({validationResult.probabilityMismatchError.mismatches.length} 项)
+              </div>
+              {validationResult.probabilityMismatchError.mismatches.slice(0, 4).map((m, i) => (
+                <div key={i} className="text-xs text-slate-400 ml-2 mb-1">
+                  • |{m.state}⟩: 实际 {(m.actual * 100).toFixed(1)}%, 目标{' '}
+                  {(m.target * 100).toFixed(1)}%, 偏差 {(m.diff * 100).toFixed(1)}%
+                </div>
+              ))}
+              {validationResult.probabilityMismatchError.mismatches.length > 4 && (
+                <div className="text-xs text-slate-500 ml-2">
+                  • 还有 {validationResult.probabilityMismatchError.mismatches.length - 4} 项偏差...
+                </div>
+              )}
+              <div className="text-xs text-slate-400 ml-2 mt-1">
+                <span className="text-red-400">
+                  (-{validationResult.probabilityMismatchError.penalty}分)
+                </span>
               </div>
             </div>
           )}

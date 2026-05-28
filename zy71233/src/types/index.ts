@@ -81,11 +81,26 @@ export interface NoiseError {
   message: string;
 }
 
+export interface ProbabilityMismatch {
+  state: string;
+  actual: number;
+  target: number;
+  diff: number;
+}
+
+export interface ProbabilityMismatchError {
+  mismatches: ProbabilityMismatch[];
+  maxDeviation: number;
+  penalty: number;
+  message: string;
+}
+
 export interface ValidationResult {
   isValid: boolean;
   gateOrderErrors: GateOrderError[];
   normalizationError: NormalizationError | null;
   noiseError: NoiseError | null;
+  probabilityMismatchError: ProbabilityMismatchError | null;
   score: number;
   maxScore: number;
   grade: 'S' | 'A' | 'B' | 'C' | 'D' | 'F';

@@ -4,11 +4,13 @@ import {
   applyGate,
   simulateCircuit,
   calculateProbabilities,
+  applyCNOT,
 } from '@/utils/quantum/quantumEngine';
 import {
   checkGateOrder,
   checkNormalization,
   checkNoiseCancellation,
+  checkProbabilityMatch,
   validateCircuit,
 } from '@/utils/validation/validator';
 import { Circuit, GateType, NoiseType } from '@/types';
@@ -81,6 +83,31 @@ describe('量子计算引擎 - 核心功能验证', () => {
     expect(result.probabilities['10']).toBeCloseTo(0);
     expect(result.probabilities['11']).toBeCloseTo(0.5);
     expect(result.probabilitySum).toBeCloseTo(1);
+  });
+
+  it('CNOT缺少controlQubit时应该不产生纠缠（仅作为单量子门）', () => {
+    const result = simulateCircuit(
+      2,
+      [
+        { type: 'H', qubit: 0 },
+        { type: 'CNOT', qubit: 1 },
+      ],
+      [],
+      ['Z', 'Z']
+    );
+    expect(result.probabilities['00']).toBeCloseTo(0.5);
+    expect(result.probabilities['10']).toBeCloseTo(0.5);
+    expect(result.probabilities['11']).toBeCloseTo(0);
+    expect(result.probabilitySum).toBeCloseTo(1);
+  });
+
+  it('applyCNOT应该直接产生纠缠', () => {
+    let state = initializeState(2);
+    state = applyGate(state, 'H', 0, 2);
+    state = applyCNOT(state, 0, 1, 2);
+    const probs = calculateProbabilities(state, 2, ['Z', 'Z']);
+    expect(probs['00']).toBeCloseTo(0.5);
+    expect(probs['11']).toBeCloseTo(0.5);
   });
 });
 
@@ -201,6 +228,29 @@ describe('错误检测系统 - 核心验证', () => {
     const error = checkNoiseCancellation(circuit, 'bit-flip', 'X');
     expect(error).toBeNull();
   });
+
+  it('应该检测概率不匹配', () => {
+    const actual = { '00': 0.6, '01': 0.2, '10': 0.1, '11': 0.1 };
+    const target = { '00': 0.5, '01': 0.0, '10': 0.0, '11': 0.5 };
+    const error = checkProbabilityMatch(actual, target);
+    expect(error).not.toBeNull();
+    expect(error?.mismatches.length).toBeGreaterThanOrEqual(3);
+    expect(error?.penalty).toBe(error?.mismatches.length * 10);
+  });
+
+  it('应该通过匹配的概率（在容差范围内）', () => {
+    const actual = { '00': 0.51, '01': 0.01, '10': 0.01, '11': 0.47 };
+    const target = { '00': 0.5, '01': 0.0, '10': 0.0, '11': 0.5 };
+    const error = checkProbabilityMatch(actual, target);
+    expect(error).toBeNull();
+  });
+
+  it('完全相同的概率应该通过', () => {
+    const actual = { '00': 0.5, '11': 0.5 };
+    const target = { '00': 0.5, '11': 0.5 };
+    const error = checkProbabilityMatch(actual, target);
+    expect(error).toBeNull();
+  });
 });
 
 describe('完整验证流程 - 端到端测试', () => {
@@ -224,8 +274,32 @@ describe('完整验证流程 - 端到端测试', () => {
     expect(result.gateOrderErrors.length).toBe(0);
     expect(result.normalizationError).toBeNull();
     expect(result.noiseError).toBeNull();
+    expect(result.probabilityMismatchError).toBeNull();
+    expect(result.isValid).toBe(true);
     expect(result.score).toBeGreaterThanOrEqual(level!.maxScore - 10);
     expect(['S', 'A']).toContain(result.grade);
+  });
+
+  it('CNOT缺少controlQubit应该导致验证失败', () => {
+    const level = getLevelById('demo-correct');
+    expect(level).toBeDefined();
+
+    const circuit: Circuit = {
+      id: 'test-bell-no-control',
+      qubits: 2,
+      slots: 4,
+      gates: [
+        { id: 'g1', type: 'H' as GateType, position: { qubit: 0, slot: 0 } },
+        { id: 'g2', type: 'CNOT' as GateType, position: { qubit: 1, slot: 1 } },
+      ],
+      noiseCards: [],
+      measurementBasis: ['Z', 'Z'],
+    };
+
+    const result = validateCircuit(circuit, level!);
+    expect(result.gateOrderErrors.length).toBe(0);
+    expect(result.probabilityMismatchError).not.toBeNull();
+    expect(result.isValid).toBe(false);
   });
 
   it('应该检测门顺序错误的电路', () => {

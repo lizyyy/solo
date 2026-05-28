@@ -28,10 +28,18 @@ export const CircuitEditor = ({ activeGateType }: CircuitEditorProps) => {
       removeGate(existingGate.id);
     } else if (activeGateType) {
       const gateId = Math.random().toString(36).substring(2, 11);
+      const controlQubit =
+        activeGateType === 'CNOT'
+          ? qubit > 0
+            ? qubit - 1
+            : 1
+          : undefined;
+
       addGate({
         id: gateId,
         type: activeGateType,
         position: { qubit, slot },
+        controlQubit,
       });
     }
   };

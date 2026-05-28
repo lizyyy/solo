@@ -75,10 +75,18 @@ export default function Game() {
           (g) => g.position.qubit === qubit && g.position.slot === slot
         );
         if (!existingGate) {
+          const controlQubit =
+            gateType === 'CNOT'
+              ? qubit > 0
+                ? qubit - 1
+                : 1
+              : undefined;
+
           addGate({
             id: gateId,
             type: gateType,
             position: { qubit, slot },
+            controlQubit,
           });
         }
       }
