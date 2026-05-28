@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, FileText, Users, Percent, Tag, Receipt, ClipboardCheck } from 'lucide-react';
-import type { AuditLinkNode, NodeType, NodeStatus } from '../../../shared/types';
+import type { AuditLinkNode, NodeType, NodeStatus } from '../../shared/types';
 
 interface AuditTimelineProps {
   nodes: AuditLinkNode[];

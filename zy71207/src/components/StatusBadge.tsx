@@ -1,4 +1,4 @@
-import { AuditStatus, NodeStatus, RollbackStatus } from '../../../shared/types';
+import { AuditStatus, NodeStatus, RollbackStatus } from '../../shared/types';
 
 interface StatusBadgeProps {
   status: AuditStatus | NodeStatus | RollbackStatus;

@@ -140,7 +140,7 @@ router.get('/export/audits', (req: Request, res: Response) => {
   try {
     const { status, customerId, productId, startDate, endDate } = req.query;
     const filters = {
-      status: status as string | undefined,
+      status: status as AuditStatus | undefined,
       customerId: customerId as string | undefined,
       productId: productId as string | undefined,
       startDate: startDate as string | undefined,

@@ -18,7 +18,7 @@ import { useAuditStore } from '../store/audit.store';
 import { api, downloadBlob } from '../api/client';
 import { StatCard } from '../components/StatCard';
 import { StatusBadge } from '../components/StatusBadge';
-import type { AuditStatus } from '../../../shared/types';
+import type { AuditStatus } from '../../shared/types';
 
 export function AuditList() {
   const navigate = useNavigate();

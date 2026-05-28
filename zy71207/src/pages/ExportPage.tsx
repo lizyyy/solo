@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Download, FileSpreadsheet, Filter, CheckCircle, FileText, Clock } from 'lucide-react';
 import { api, downloadBlob } from '../api/client';
-import type { AuditStatus } from '../../../shared/types';
+import type { AuditStatus } from '../../shared/types';
 
 export function ExportPage() {
   const [filters, setFilters] = useState({

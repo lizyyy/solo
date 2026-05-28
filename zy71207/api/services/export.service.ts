@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { AuditService } from './audit.service';
-import { AuditRecord, AuditLinkNode } from '../../shared/types';
+import { AuditRecord, AuditLinkNode, AuditStatus } from '../../shared/types';
 
 export class ExportService {
   private auditService: AuditService;
@@ -82,7 +82,7 @@ export class ExportService {
   }
 
   exportAuditsToExcel(auditIds?: string[], filters?: {
-    status?: string;
+    status?: AuditStatus;
     customerId?: string;
     productId?: string;
     startDate?: string;
