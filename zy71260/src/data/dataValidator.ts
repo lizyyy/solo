@@ -1,5 +1,5 @@
 import type { Mode, Chord, ModulationPath, AudioSample, ValidationResult } from '../types';
-import { checkEnharmonicConfusion, checkModulationDistance, isValidModulation, noteToMidi } from '../utils/musicTheory';
+import { checkEnharmonicConfusion, checkModulationDistance, isValidModulation, noteToMidi, getModeScale, getChordNotes, midiToNote } from '../utils/musicTheory';
 
 export const validateMode = (mode: Mode, allModes: Mode[]): ValidationResult => {
   const warnings: string[] = [];
@@ -28,6 +28,38 @@ export const validateMode = (mode: Mode, allModes: Mode[]): ValidationResult => 
   if (mode.brightness < -3 || mode.brightness > 3) {
     checks.invalidInterval = true;
     errors.push('调式亮度值超出有效范围 (-3 到 3)');
+  }
+
+  const isValid = errors.length === 0;
+
+  return {
+    isValid,
+    checks,
+    warnings,
+    errors,
+  };
+};
+
+export const validateChord = (chord: Chord, allModes: Mode[]): ValidationResult => {
+  const warnings: string[] = [];
+  const errors: string[] = [];
+  const checks = {
+    enharmonicConfusion: false,
+    audioMismatch: false,
+    brokenPath: false,
+    invalidInterval: false,
+  };
+
+  const parentMode = allModes.find((m) => m.id === chord.modeId);
+  if (!parentMode) {
+    checks.brokenPath = true;
+    errors.push('和弦所属调式不存在');
+  }
+
+  const validFunctions = ['tonic', 'supertonic', 'mediant', 'subdominant', 'dominant', 'submediant', 'leading'];
+  if (!validFunctions.includes(chord.function)) {
+    checks.invalidInterval = true;
+    errors.push(`无效的和弦功能: ${chord.function}`);
   }
 
   const isValid = errors.length === 0;
@@ -119,6 +151,82 @@ export const validateAudioSample = (
     checks.audioMismatch = true;
     sample.isMismatched = true;
     warnings.push('音频示例音符数量过少，可能不完整');
+  } else {
+    let expectedNotes: number[] = [];
+    
+    if (sample.targetType === 'mode') {
+      const modeTarget = target as Mode;
+      expectedNotes = getModeScale(modeTarget.rootNote, modeTarget.type);
+    } else if (sample.targetType === 'chord') {
+      const chordTarget = target as Chord;
+      const chordType = chordTarget.function === 'leading' ? 'diminished' : 
+                       chordTarget.name.includes('m') ? 'minor' : 'major';
+      expectedNotes = getChordNotes(chordTarget.name.replace('m', ''), chordType);
+    }
+
+    const expectedNoteNames = expectedNotes.map((midi) => midiToNote(midi).replace(/\d/g, ''));
+    const actualNoteNames = sample.notes.map((note) => note.replace(/\d/g, ''));
+
+    const actualMidiSet = new Set(sample.notes.map((n) => noteToMidi(n)));
+    const expectedMidiSet = new Set(expectedNotes);
+
+    const missingNotes: number[] = [];
+    expectedNotes.forEach((midi) => {
+      if (!actualMidiSet.has(midi)) {
+        missingNotes.push(midi);
+      }
+    });
+
+    const extraNotes: number[] = [];
+    sample.notes.forEach((note) => {
+      const midi = noteToMidi(note);
+      if (!expectedMidiSet.has(midi)) {
+        extraNotes.push(midi);
+      }
+    });
+
+    if (missingNotes.length > 0) {
+      checks.audioMismatch = true;
+      sample.isMismatched = true;
+      const missingNoteNames = missingNotes.map((m) => midiToNote(m)).join(', ');
+      warnings.push(`音频缺少预期音符: ${missingNoteNames}`);
+    }
+
+    if (extraNotes.length > 0) {
+      checks.audioMismatch = true;
+      sample.isMismatched = true;
+      const extraNoteNames = extraNotes.map((m) => midiToNote(m)).join(', ');
+      errors.push(`音频包含多余/错误音符: ${extraNoteNames}`);
+    }
+
+    if (sample.targetType === 'mode' && sample.notes.length !== expectedNotes.length) {
+      checks.audioMismatch = true;
+      sample.isMismatched = true;
+      warnings.push(`音阶音符数量不匹配: 预期${expectedNotes.length}个，实际${sample.notes.length}个`);
+    }
+
+    if (sample.targetType === 'chord' && sample.notes.length !== expectedNotes.length) {
+      checks.audioMismatch = true;
+      sample.isMismatched = true;
+      warnings.push(`和弦音符数量不匹配: 预期${expectedNotes.length}个，实际${sample.notes.length}个`);
+    }
+
+    let hasEnharmonicConfusion = false;
+    actualNoteNames.forEach((actualNote, index) => {
+      if (index < expectedNoteNames.length) {
+        const expectedNote = expectedNoteNames[index];
+        const actualMidi = noteToMidi(actualNote);
+        const expectedMidi = noteToMidi(expectedNote);
+        if (actualMidi === expectedMidi && actualNote !== expectedNote) {
+          hasEnharmonicConfusion = true;
+        }
+      }
+    });
+
+    if (hasEnharmonicConfusion) {
+      checks.enharmonicConfusion = true;
+      warnings.push('音频音符存在等音记谱不一致');
+    }
   }
 
   const isValid = errors.length === 0;
@@ -157,6 +265,16 @@ export const validateAllData = (data: {
     };
   });
 
+  const validatedChords = data.chords.map((chord) => {
+    const validation = validateChord(chord, validatedModes);
+    const quality = determineDataQuality(validation);
+    return {
+      ...chord,
+      validation,
+      quality,
+    };
+  });
+
   const validatedPaths = data.modulationPaths.map((path) => {
     const validation = validateModulationPath(path, validatedModes);
     const quality = determineDataQuality(validation);
@@ -169,7 +287,7 @@ export const validateAllData = (data: {
   const validatedSamples = data.audioSamples.map((sample) => {
     const target = sample.targetType === 'mode'
       ? validatedModes.find((m) => m.id === sample.targetId)
-      : data.chords.find((c) => c.id === sample.targetId);
+      : validatedChords.find((c) => c.id === sample.targetId);
     const validation = validateAudioSample(sample, target || null);
     const quality = determineDataQuality(validation);
     return {
@@ -180,7 +298,7 @@ export const validateAllData = (data: {
 
   return {
     modes: validatedModes,
-    chords: data.chords,
+    chords: validatedChords,
     modulationPaths: validatedPaths,
     audioSamples: validatedSamples,
   };

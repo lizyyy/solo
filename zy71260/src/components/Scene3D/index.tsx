@@ -1,14 +1,15 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, Effects } from '@react-three/drei';
+import { OrbitControls, Effects, Line } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import StarsBackground from './StarsBackground';
 import CustomAxesHelper from './AxesHelper';
 import ModeNode from './ModeNode';
+import ChordNode from './ChordNode';
 import ModulationLine from './ModulationLine';
-import { useAppStore, useFilteredModes, useFilteredPaths } from '../../store/useAppStore';
-import type { Mode } from '../../types';
+import { useAppStore, useFilteredModes, useFilteredPaths, useFilteredChords } from '../../store/useAppStore';
+import type { Mode, Chord } from '../../types';
 
 interface CameraControllerProps {
   autoRotate: boolean;
@@ -35,12 +36,15 @@ const CameraController = ({ autoRotate }: CameraControllerProps) => {
 
 interface SceneContentProps {
   onSelectMode: (mode: Mode) => void;
+  onSelectChord: (chord: Chord) => void;
 }
 
-const SceneContent = ({ onSelectMode }: SceneContentProps) => {
+const SceneContent = ({ onSelectMode, onSelectChord }: SceneContentProps) => {
   const modes = useFilteredModes();
+  const chords = useFilteredChords();
   const paths = useFilteredPaths();
   const selectedModeId = useAppStore((state) => state.selectedModeId);
+  const selectedChordId = useAppStore((state) => state.selectedChordId);
   const highlightedPathId = useAppStore((state) => state.highlightedPathId);
   const setHighlightedPath = useAppStore((state) => state.setHighlightedPath);
   const currentAudioId = useAppStore((state) => state.currentAudioId);
@@ -49,6 +53,33 @@ const SceneContent = ({ onSelectMode }: SceneContentProps) => {
   const handlePathHover = (pathId: string | null) => {
     setHighlightedPath(pathId);
   };
+
+  const chordModeLines = useMemo(() => {
+    const lines: Array<{
+      id: string;
+      points: [number, number, number][];
+      color: string;
+      opacity: number;
+    }> = [];
+
+    chords.forEach((chord) => {
+      const mode = modes.find((m) => m.id === chord.modeId);
+      if (mode) {
+        const isHighlighted = selectedModeId === chord.modeId || selectedChordId === chord.id;
+        lines.push({
+          id: `line-${chord.id}-${chord.modeId}`,
+          points: [
+            [chord.position.x, chord.position.y, chord.position.z],
+            [mode.position.x, mode.position.y, mode.position.z],
+          ],
+          color: mode.color,
+          opacity: isHighlighted ? 0.6 : 0.2,
+        });
+      }
+    });
+
+    return lines;
+  }, [chords, modes, selectedModeId, selectedChordId]);
 
   return (
     <>
@@ -63,6 +94,20 @@ const SceneContent = ({ onSelectMode }: SceneContentProps) => {
       <CustomAxesHelper size={12} />
 
       <fog attach="fog" args={['#0a1628', 20, 60]} />
+
+      {chordModeLines.map((line) => (
+        <Line
+          key={line.id}
+          points={line.points}
+          color={line.color}
+          lineWidth={1}
+          transparent
+          opacity={line.opacity}
+          dashed
+          dashSize={0.2}
+          gapSize={0.1}
+        />
+      ))}
 
       {paths.map((path) => (
         <ModulationLine
@@ -86,6 +131,16 @@ const SceneContent = ({ onSelectMode }: SceneContentProps) => {
         />
       ))}
 
+      {chords.map((chord) => (
+        <ChordNode
+          key={chord.id}
+          chord={chord}
+          isSelected={selectedChordId === chord.id}
+          isPlaying={chord.audioSampleId === currentAudioId}
+          onSelect={onSelectChord}
+        />
+      ))}
+
       <Effects>
         <EffectComposer>
           <Bloom
@@ -103,16 +158,17 @@ const SceneContent = ({ onSelectMode }: SceneContentProps) => {
 
 interface Scene3DProps {
   onSelectMode: (mode: Mode) => void;
+  onSelectChord: (chord: Chord) => void;
 }
 
-const Scene3D = ({ onSelectMode }: Scene3DProps) => {
+const Scene3D = ({ onSelectMode, onSelectChord }: Scene3DProps) => {
   return (
     <Canvas
       camera={{ position: [15, 10, 15], fov: 60 }}
       gl={{ antialias: true, alpha: false }}
       style={{ background: '#0a1628' }}
     >
-      <SceneContent onSelectMode={onSelectMode} />
+      <SceneContent onSelectMode={onSelectMode} onSelectChord={onSelectChord} />
     </Canvas>
   );
 };

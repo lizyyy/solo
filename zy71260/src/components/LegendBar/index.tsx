@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Layers, ChevronUp, ChevronDown, Download } from 'lucide-react';
-import { MODE_TYPE_COLORS, MODULATION_TYPE_COLORS, QUALITY_COLORS } from '../../types';
+import { MODE_TYPE_COLORS, MODULATION_TYPE_COLORS, QUALITY_COLORS, CHORD_FUNCTION_COLORS } from '../../types';
 import { getModeName, getModulationTypeName, getQualityName } from '../../utils/musicTheory';
 
 interface LegendItemProps {
@@ -86,6 +86,16 @@ const LegendBar = ({ onExport }: LegendBarProps) => {
     { key: 'error', label: '错误' },
   ];
 
+  const chordFunctions = [
+    { key: 'tonic', label: '主和弦 (I)' },
+    { key: 'supertonic', label: '上主和弦 (ii)' },
+    { key: 'mediant', label: '中和弦 (iii)' },
+    { key: 'subdominant', label: '下属和弦 (IV)' },
+    { key: 'dominant', label: '属和弦 (V)' },
+    { key: 'submediant', label: '下中和弦 (vi)' },
+    { key: 'leading', label: '导和弦 (vii°)' },
+  ];
+
   if (isCollapsed) {
     return (
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
@@ -127,9 +137,14 @@ const LegendBar = ({ onExport }: LegendBarProps) => {
 
       <div className="p-4 space-y-3">
         <LegendGroup
-          title="调式类型 (节点颜色)"
+          title="调式类型 (球体颜色)"
           items={modeTypes}
           colorMap={MODE_TYPE_COLORS}
+        />
+        <LegendGroup
+          title="和弦功能 (八面体颜色)"
+          items={chordFunctions}
+          colorMap={CHORD_FUNCTION_COLORS}
         />
         <LegendGroup
           title="转调类型 (连线颜色)"
@@ -149,7 +164,9 @@ const LegendBar = ({ onExport }: LegendBarProps) => {
             </div>
           </div>
           <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-            <span>🟢 虚线 = 断裂路径</span>
+            <span>� 球体 = 调式</span>
+            <span>🔺 八面体 = 和弦</span>
+            <span>〰️ 虚线 = 断裂路径</span>
             <span>🔴 红色标记 = 数据问题</span>
             <span>💫 点击节点 = 查看详情</span>
           </div>

@@ -7,13 +7,14 @@ import ExportModal from './components/ExportModal';
 import { initializeStore, useAppStore } from './store/useAppStore';
 import { getMockData } from './data/mockData';
 import { validateAllData } from './data/dataValidator';
-import type { Mode } from './types';
+import type { Mode, Chord } from './types';
 import { Music2, Sparkles } from 'lucide-react';
 
 function App() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const setSelectedMode = useAppStore((state) => state.setSelectedMode);
+  const setSelectedChord = useAppStore((state) => state.setSelectedChord);
 
   useEffect(() => {
     const rawData = getMockData();
@@ -27,6 +28,10 @@ function App() {
 
   const handleSelectMode = (mode: Mode) => {
     setSelectedMode(mode.id);
+  };
+
+  const handleSelectChord = (chord: Chord) => {
+    setSelectedChord(chord.id);
   };
 
   if (!isDataLoaded) {
@@ -59,7 +64,7 @@ function App() {
         </div>
       </div>
 
-      <Scene3D onSelectMode={handleSelectMode} />
+      <Scene3D onSelectMode={handleSelectMode} onSelectChord={handleSelectChord} />
       <ControlPanel />
       <DetailPanel />
       <LegendBar onExport={() => setIsExportModalOpen(true)} />

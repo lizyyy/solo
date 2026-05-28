@@ -53,6 +53,7 @@ export interface Chord {
   quality: DataQuality;
   sourceId: string;
   audioSampleId?: string;
+  validation?: ValidationResult;
   position: { x: number; y: number; z: number };
 }
 

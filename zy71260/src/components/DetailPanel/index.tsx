@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { X, Play, Pause, Volume2, Music, Info, AlertTriangle, AlertCircle, CheckCircle, Clock, FileText, Database } from 'lucide-react';
-import { useAppStore, useSelectedMode, useDataSource, useAudioSample } from '../../store/useAppStore';
+import { X, Play, Pause, Volume2, Music, Info, AlertTriangle, AlertCircle, CheckCircle, Clock, FileText, Database, Link } from 'lucide-react';
+import { useAppStore, useSelectedMode, useSelectedChord, useDataSource, useAudioSample } from '../../store/useAppStore';
 import useAudio from '../../hooks/useAudio';
-import { QUALITY_COLORS } from '../../types';
-import { getModeName, getQualityName } from '../../utils/musicTheory';
+import { QUALITY_COLORS, CHORD_FUNCTION_COLORS } from '../../types';
+import { getModeName, getQualityName, getChordFunctionName } from '../../utils/musicTheory';
 
 const ValidationBadge = ({ type }: { type: 'warning' | 'error' | 'success' }) => {
   const config = {
@@ -78,7 +78,7 @@ const SourceTimeline = ({ sourceId }: { sourceId: string }) => {
   );
 };
 
-const AudioPlayer = ({ sampleId, modeName }: { sampleId?: string; modeName: string }) => {
+const AudioPlayer = ({ sampleId, name, type = 'mode' }: { sampleId?: string; name: string; type?: 'mode' | 'chord' }) => {
   const sample = useAudioSample(sampleId);
   const { playSample, isPlaying, stop } = useAudio();
   const currentAudioId = useAppStore((state) => state.currentAudioId);
@@ -124,7 +124,7 @@ const AudioPlayer = ({ sampleId, modeName }: { sampleId?: string; modeName: stri
         
         <div className="flex-1">
           <div className="text-xs text-slate-400 mb-1">
-            {modeName} 音阶
+            {name} {type === 'chord' ? '和弦' : '音阶'}
           </div>
           <div className="flex items-center gap-1">
             {sample.notes.map((note, index) => (
@@ -144,10 +144,10 @@ const AudioPlayer = ({ sampleId, modeName }: { sampleId?: string; modeName: stri
   );
 };
 
-const ValidationSection = ({ mode }: { mode: any }) => {
-  if (!mode.validation) return null;
+const ValidationSection = ({ validation }: { validation?: any }) => {
+  if (!validation) return null;
 
-  const { checks, warnings, errors } = mode.validation;
+  const { checks, warnings, errors } = validation;
 
   return (
     <div className="mt-4 p-3 bg-slate-800/50 rounded-lg">
@@ -200,26 +200,133 @@ const ValidationSection = ({ mode }: { mode: any }) => {
   );
 };
 
-const DetailPanel = () => {
+const ChordDetailView = ({ onClose }: { onClose: () => void }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const selectedMode = useSelectedMode();
+  const selectedChord = useSelectedChord();
+  const modes = useAppStore((state) => state.modes);
   const setSelectedMode = useAppStore((state) => state.setSelectedMode);
 
-  if (!selectedMode) {
+  if (!selectedChord) return null;
+
+  const parentMode = modes.find((m) => m.id === selectedChord.modeId);
+  const chordColor = CHORD_FUNCTION_COLORS[selectedChord.function];
+
+  if (isCollapsed) {
     return (
-      <div className="fixed right-4 top-4 z-40 w-72 bg-slate-900/90 backdrop-blur-md rounded-xl border border-slate-700/50 shadow-2xl p-6">
-        <div className="text-center">
-          <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-3">
-            <Info className="w-6 h-6 text-slate-500" />
-          </div>
-          <h3 className="text-slate-300 font-medium mb-2">选择调式查看详情</h3>
-          <p className="text-sm text-slate-500">
-            点击3D空间中的任意调式节点查看详细信息、试听音频示例和数据来源
-          </p>
-        </div>
+      <div className="fixed right-4 top-4 z-40">
+        <button
+          onClick={() => setIsCollapsed(false)}
+          className="p-3 bg-slate-900/90 backdrop-blur-md rounded-xl border border-slate-700/50 hover:bg-slate-800/90 transition-colors"
+          style={{ backgroundColor: chordColor + '30', borderColor: chordColor + '50' }}
+        >
+          <FileText className="w-5 h-5" style={{ color: chordColor }} />
+        </button>
       </div>
     );
   }
+
+  return (
+    <div 
+      className="fixed right-4 top-4 z-40 w-80 bg-slate-900/90 backdrop-blur-md rounded-xl border shadow-2xl overflow-hidden"
+      style={{ borderColor: chordColor + '40' }}
+    >
+      <div 
+        className="flex items-center justify-between p-4 border-b"
+        style={{ backgroundColor: chordColor + '15', borderColor: chordColor + '30' }}
+      >
+        <div className="flex items-center gap-3">
+          <div 
+            className="w-10 h-10 rounded-lg flex items-center justify-center"
+            style={{ backgroundColor: chordColor + '30' }}
+          >
+            <Music className="w-5 h-5" style={{ color: chordColor }} />
+          </div>
+          <div>
+            <h2 className="font-semibold text-slate-100">
+              {selectedChord.symbol} 和弦
+            </h2>
+            <div className="flex items-center gap-2">
+              <span 
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: QUALITY_COLORS[selectedChord.quality] }}
+              />
+              <span className="text-xs text-slate-400">
+                {getQualityName(selectedChord.quality)}
+              </span>
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={onClose}
+          className="p-1 hover:bg-slate-700/50 rounded transition-colors"
+        >
+          <X className="w-4 h-4 text-slate-400" />
+        </button>
+      </div>
+
+      <div className="p-4 max-h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="p-3 bg-slate-800/50 rounded-lg text-center">
+            <div className="text-sm font-semibold" style={{ color: chordColor }}>
+              {getChordFunctionName(selectedChord.function)}
+            </div>
+            <div className="text-xs text-slate-400 mt-1">和弦功能</div>
+          </div>
+          <div className="p-3 bg-slate-800/50 rounded-lg text-center">
+            <div className="text-sm font-semibold text-cyan-400">
+              {selectedChord.name}
+            </div>
+            <div className="text-xs text-slate-400 mt-1">根音</div>
+          </div>
+        </div>
+
+        {parentMode && (
+          <button
+            onClick={() => setSelectedMode(parentMode.id)}
+            className="w-full flex items-center justify-between p-3 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors mb-4"
+          >
+            <div className="flex items-center gap-2">
+              <Link className="w-4 h-4 text-cyan-400" />
+              <span className="text-sm text-slate-300">所属调式</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div 
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: parentMode.color }}
+              />
+              <span className="text-sm text-slate-200">
+                {getModeName(parentMode.rootNote, parentMode.type)}
+              </span>
+            </div>
+          </button>
+        )}
+
+        <AudioPlayer 
+          sampleId={selectedChord.audioSampleId} 
+          name={selectedChord.symbol} 
+          type="chord"
+        />
+
+        <ValidationSection validation={selectedChord.validation} />
+
+        <SourceTimeline sourceId={selectedChord.sourceId} />
+      </div>
+
+      <button
+        onClick={() => setIsCollapsed(true)}
+        className="w-full py-2 border-t border-slate-700/50 text-xs text-slate-400 hover:text-slate-300 hover:bg-slate-800/30 transition-colors"
+      >
+        收起面板
+      </button>
+    </div>
+  );
+};
+
+const ModeDetailView = ({ onClose }: { onClose: () => void }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const selectedMode = useSelectedMode();
+
+  if (!selectedMode) return null;
 
   if (isCollapsed) {
     return (
@@ -267,7 +374,7 @@ const DetailPanel = () => {
           </div>
         </div>
         <button
-          onClick={() => setSelectedMode(null)}
+          onClick={onClose}
           className="p-1 hover:bg-slate-700/50 rounded transition-colors"
         >
           <X className="w-4 h-4 text-slate-400" />
@@ -290,9 +397,13 @@ const DetailPanel = () => {
           </div>
         </div>
 
-        <AudioPlayer sampleId={selectedMode.audioSampleId} modeName={getModeName(selectedMode.rootNote, selectedMode.type)} />
+        <AudioPlayer 
+          sampleId={selectedMode.audioSampleId} 
+          name={getModeName(selectedMode.rootNote, selectedMode.type)} 
+          type="mode"
+        />
 
-        <ValidationSection mode={selectedMode} />
+        <ValidationSection validation={selectedMode.validation} />
 
         <SourceTimeline sourceId={selectedMode.sourceId} />
       </div>
@@ -305,6 +416,35 @@ const DetailPanel = () => {
       </button>
     </div>
   );
+};
+
+const DetailPanel = () => {
+  const selectedMode = useSelectedMode();
+  const selectedChord = useSelectedChord();
+  const setSelectedMode = useAppStore((state) => state.setSelectedMode);
+  const setSelectedChord = useAppStore((state) => state.setSelectedChord);
+
+  if (!selectedMode && !selectedChord) {
+    return (
+      <div className="fixed right-4 top-4 z-40 w-72 bg-slate-900/90 backdrop-blur-md rounded-xl border border-slate-700/50 shadow-2xl p-6">
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-3">
+            <Info className="w-6 h-6 text-slate-500" />
+          </div>
+          <h3 className="text-slate-300 font-medium mb-2">选择元素查看详情</h3>
+          <p className="text-sm text-slate-500">
+            点击3D空间中的调式（球体）或和弦（八面体）节点，查看详细信息、试听音频示例和数据来源
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (selectedChord) {
+    return <ChordDetailView onClose={() => setSelectedChord(null)} />;
+  }
+
+  return <ModeDetailView onClose={() => setSelectedMode(null)} />;
 };
 
 export default DetailPanel;

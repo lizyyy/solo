@@ -125,6 +125,16 @@ export const useFilteredPaths = () => {
   );
 };
 
+export const useFilteredChords = () => {
+  const chords = useAppStore((state) => state.chords);
+  const filters = useAppStore((state) => state.filters);
+  return chords.filter(
+    (chord) =>
+      filters.chordFunctions.includes(chord.function) &&
+      filters.dataQualities.includes(chord.quality)
+  );
+};
+
 export const useSelectedMode = () => {
   const modes = useAppStore((state) => state.modes);
   const selectedId = useAppStore((state) => state.selectedModeId);

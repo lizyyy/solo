@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Filter, RotateCw, X, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
-import { MODE_TYPE_COLORS, MODULATION_TYPE_COLORS, QUALITY_COLORS } from '../../types';
-import { getModeName, getModulationTypeName, getQualityName } from '../../utils/musicTheory';
+import { MODE_TYPE_COLORS, MODULATION_TYPE_COLORS, QUALITY_COLORS, CHORD_FUNCTION_COLORS } from '../../types';
+import { getModeName, getModulationTypeName, getQualityName, getChordFunctionName } from '../../utils/musicTheory';
 
 const modeTypes: Array<{ key: string; label: string }> = [
   { key: 'major', label: '大调' },
@@ -26,6 +26,16 @@ const dataQualities: Array<{ key: string; label: string }> = [
   { key: 'normal', label: '正常数据' },
   { key: 'borderline', label: '临界数据' },
   { key: 'error', label: '错误数据' },
+];
+
+const chordFunctions: Array<{ key: string; label: string }> = [
+  { key: 'tonic', label: '主和弦 (I)' },
+  { key: 'supertonic', label: '上主和弦 (ii)' },
+  { key: 'mediant', label: '中和弦 (iii)' },
+  { key: 'subdominant', label: '下属和弦 (IV)' },
+  { key: 'dominant', label: '属和弦 (V)' },
+  { key: 'submediant', label: '下中和弦 (vi)' },
+  { key: 'leading', label: '导和弦 (vii°)' },
 ];
 
 interface FilterGroupProps {
@@ -85,6 +95,7 @@ const ControlPanel = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const filters = useAppStore((state) => state.filters);
   const toggleModeType = useAppStore((state) => state.toggleModeType);
+  const toggleChordFunction = useAppStore((state) => state.toggleChordFunction);
   const toggleModulationType = useAppStore((state) => state.toggleModulationType);
   const toggleDataQuality = useAppStore((state) => state.toggleDataQuality);
   const setShowBrokenPaths = useAppStore((state) => state.setShowBrokenPaths);
@@ -128,6 +139,14 @@ const ControlPanel = () => {
           selected={filters.modeTypes}
           onToggle={toggleModeType}
           colorMap={MODE_TYPE_COLORS}
+        />
+
+        <FilterGroup
+          title="和弦功能"
+          items={chordFunctions}
+          selected={filters.chordFunctions}
+          onToggle={toggleChordFunction}
+          colorMap={CHORD_FUNCTION_COLORS}
         />
 
         <FilterGroup
