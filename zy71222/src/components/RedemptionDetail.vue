@@ -81,6 +81,9 @@
       <div class="section-title">
         <el-icon><Clock /></el-icon>
         <span>状态流转历史</span>
+        <el-tag v-if="timeOrderAnomalies.length > 0" type="warning" size="small" style="margin-left: 10px;">
+          时间倒序 {{ timeOrderAnomalies.length }} 处
+        </el-tag>
       </div>
       <el-timeline>
         <el-timeline-item
@@ -92,12 +95,26 @@
           <div class="timeline-content">
             <div class="timeline-status">
               <el-tag size="small">{{ getStatusLabel(item.toStatus) }}</el-tag>
+              <el-tag
+                v-if="timeOrderAnomalies.some(a => a.toIndex === index)"
+                type="warning"
+                size="small"
+                style="margin-left: 6px;"
+              >
+                ⏰ 时间倒序
+              </el-tag>
             </div>
             <div class="timeline-remark">{{ item.remark }}</div>
             <div class="timeline-operator">操作人：{{ item.operator }}</div>
           </div>
         </el-timeline-item>
       </el-timeline>
+      <div v-if="timeOrderAnomalies.length > 0" class="time-anomaly-hint">
+        <el-icon color="#e6a23c"><Warning /></el-icon>
+        <span>操作时间与状态逻辑顺序不一致：{{ timeOrderAnomalies.map(a =>
+          `「${getStatusLabel(a.fromStatus)}(${formatTimeShort(a.fromTime)})」→「${getStatusLabel(a.toStatus)}(${formatTimeShort(a.toTime)})」`
+        ).join('；') }}，可能存在额度提前释放等异常操作</span>
+      </div>
     </div>
 
     <div v-if="relatedPayments.length > 0" class="payment-section">
@@ -146,7 +163,31 @@ const sortedHistory = computed(() => {
       merged.push(h)
     }
   })
-  return merged.sort((a, b) => new Date(a.operateTime) - new Date(b.operateTime))
+  const sorted = merged.sort((a, b) => {
+    if (a.id && b.id) return a.id.localeCompare(b.id)
+    return new Date(a.operateTime) - new Date(b.operateTime)
+  })
+  return sorted
+})
+
+const timeOrderAnomalies = computed(() => {
+  const history = sortedHistory.value
+  const anomalies = []
+  for (let i = 1; i < history.length; i++) {
+    const prev = history[i - 1]
+    const curr = history[i]
+    if (new Date(curr.operateTime) < new Date(prev.operateTime)) {
+      anomalies.push({
+        fromIndex: i - 1,
+        toIndex: i,
+        fromTime: prev.operateTime,
+        toTime: curr.operateTime,
+        fromStatus: prev.toStatus,
+        toStatus: curr.toStatus
+      })
+    }
+  }
+  return anomalies
 })
 
 const historyConsistency = computed(() => {
@@ -165,6 +206,11 @@ function formatMoney(value) {
 function formatTime(value) {
   if (!value) return '-'
   return dayjs(value).format('YYYY-MM-DD HH:mm:ss')
+}
+
+function formatTimeShort(value) {
+  if (!value) return '-'
+  return dayjs(value).format('MM-DD HH:mm')
 }
 
 function getStatusLabel(status) {
@@ -316,6 +362,9 @@ function getTimelineType(index) {
   .timeline-content {
     .timeline-status {
       margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .timeline-remark {
@@ -328,6 +377,20 @@ function getTimelineType(index) {
       font-size: 12px;
       color: #909399;
     }
+  }
+
+  .time-anomaly-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #fdf6ec;
+    border: 1px solid #faecd8;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #e6a23c;
+    line-height: 1.6;
   }
 }
 </style>
