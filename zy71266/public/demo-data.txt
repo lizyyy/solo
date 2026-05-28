@@ -1,0 +1,78 @@
+# 舞台灯光锥预演 - 演示数据
+# 此文件包含故意的错误数据，用于测试系统检测能力
+
+[LIGHTS]
+# 主舞台灯光 - 正常数据
+name=主光_左, type=spot, px=-4, py=6, pz=0, tx=-2, ty=0, tz=0, colortemp=5600, intensity=1.2, angle=45, penumbra=0.5
+
+# 面光 - 正常数据
+name=主光_右, type=spot, px=4, py=6, pz=0, tx=2, ty=0, tz=0, colortemp=5600, intensity=1.2, angle=45, penumbra=0.5
+
+# 错误：色温超出范围（正常2000-10000K）
+name=暖色灯, type=spot, px=0, py=7, pz=3, tx=0, ty=0, tz=0, colortemp=15000, intensity=1, angle=30, penumbra=0.3
+
+# 错误：灯光角度过大
+name=广角灯, type=spot, px=0, py=5, pz=-4, tx=0, ty=0, tz=0, colortemp=4500, intensity=0.8, angle=200, penumbra=0.6
+
+# 侧光 - 正常数据
+name=侧光_前, type=spot, px=-6, py=4, pz=4, tx=-3, ty=1, tz=2, colortemp=3200, intensity=1, angle=35, penumbra=0.4
+
+name=侧光_后, type=spot, px=6, py=4, pz=-4, tx=3, ty=1, tz=-2, colortemp=3200, intensity=1, angle=35, penumbra=0.4
+
+# 追光灯 - 正常数据
+name=追光灯, type=spot, px=0, py=8, pz=6, tx=0, ty=0, tz=0, colortemp=6000, intensity=1.5, angle=15, penumbra=0.2
+
+[ACTORS]
+# 主角 - 正常数据
+name=主角_A, height=1.75, color=#ff6b6b
+
+# 配角 - 正常数据
+name=配角_B, height=1.68, color=#4ecdc4
+
+# 错误：身高无效
+name=演员_C, height=-0.5, color=#ffe66d
+
+# 舞者
+name=舞者_D, height=1.65, color=#95e1d3
+
+[PROPS]
+# 布景 - 标记为遮挡物
+name=背景板, type=box, px=0, py=2, pz=-5, rx=0, ry=0, rz=0, sx=8, sy=4, sz=0.3, occluder=true
+
+# 道具桌 - 标记为遮挡物（会造成灯光穿透）
+name=道具桌, type=box, px=0, py=0.5, pz=0, rx=0, ry=0, rz=0, sx=2, sy=1, sz=1, occluder=true
+
+# 装饰柱 - 正常
+name=装饰柱_左, type=cylinder, px=-5, py=1.5, pz=-2, rx=0, ry=0, rz=0, sx=0.5, sy=3, sz=0.5, occluder=false
+
+name=装饰柱_右, type=cylinder, px=5, py=1.5, pz=-2, rx=0, ry=0, rz=0, sx=0.5, sy=3, sz=0.5, occluder=false
+
+# 错误：缩放值无效
+name=错误道具, type=box, px=3, py=1, pz=2, rx=0, ry=0, rz=0, sx=-1, sy=2, sz=1, occluder=false
+
+[TRAJECTORY]
+actorid=主角_A
+# 路径点格式: 时间:X:Y:Z
+0:-5:0:3
+10:-2:0:1
+20:0:0:0
+30:2:0:-1
+40:5:0:-3
+
+[TRAJECTORY]
+actorid=配角_B
+0:5:0:-3
+15:2:0:-1
+30:0:0:0
+45:-2:0:1
+60:-5:0:3
+
+[TRAJECTORY]
+actorid=舞者_D
+0:0:0:4
+10:-3:0:2
+20:-3:0:-2
+30:0:0:-4
+40:3:0:-2
+50:3:0:2
+60:0:0:4
