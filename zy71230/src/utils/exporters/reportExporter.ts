@@ -941,29 +941,76 @@ function addRawDataToExcel(
   report: ReviewReport,
   lang: Language
 ): void {
-  const riskData = [
-    [
-      lang === 'zh' ? '风险ID' : 'Risk ID',
-      lang === 'zh' ? '类型' : 'Type',
-      lang === 'zh' ? '严重程度' : 'Severity',
-      lang === 'zh' ? '描述' : 'Description',
-      lang === 'zh' ? '影响' : 'Impact',
-      lang === 'zh' ? '触发时间' : 'Triggered At',
-      lang === 'zh' ? '解决时间' : 'Resolved At',
-    ],
-    ...report.riskAnalysis.highRiskEvents.map((event: RiskEvent) => [
-      event.id,
-      event.type,
-      event.severity,
-      event.description,
-      event.impact,
-      event.triggeredAt,
-      event.resolvedAt || '',
-    ]),
-  ];
+  if (report.rawData?.tour && Object.keys(report.rawData.tour).length > 0) {
+    const tourHeaders = Object.keys(report.rawData.tour);
+    const tourData = [
+      tourHeaders,
+      tourHeaders.map((h) => report.rawData.tour[h]),
+    ];
+    const tourWs = XLSX.utils.aoa_to_sheet(tourData);
+    XLSX.utils.book_append_sheet(wb, tourWs, lang === 'zh' ? '原始巡演数据' : 'Raw Tour Data');
+  }
 
-  const riskWs = XLSX.utils.aoa_to_sheet(riskData);
-  XLSX.utils.book_append_sheet(wb, riskWs, lang === 'zh' ? '风险原始数据' : 'Raw Risk Data');
+  if (report.rawData?.stops && report.rawData.stops.length > 0) {
+    const stopHeaders = Object.keys(report.rawData.stops[0]);
+    const stopData = [
+      stopHeaders,
+      ...report.rawData.stops.map((stop) =>
+        stopHeaders.map((h) => stop[h])
+      ),
+    ];
+    const stopWs = XLSX.utils.aoa_to_sheet(stopData);
+    XLSX.utils.book_append_sheet(wb, stopWs, lang === 'zh' ? '原始站点数据' : 'Raw Stops Data');
+  }
+
+  if (report.rawData?.merch && report.rawData.merch.length > 0) {
+    const merchHeaders = Object.keys(report.rawData.merch[0]);
+    const merchData = [
+      merchHeaders,
+      ...report.rawData.merch.map((item) =>
+        merchHeaders.map((h) => item[h])
+      ),
+    ];
+    const merchWs = XLSX.utils.aoa_to_sheet(merchData);
+    XLSX.utils.book_append_sheet(wb, merchWs, lang === 'zh' ? '原始周边数据' : 'Raw Merch Data');
+  }
+
+  if (report.riskAnalysis?.highRiskEvents && report.riskAnalysis.highRiskEvents.length > 0) {
+    const riskData = [
+      [
+        lang === 'zh' ? '风险ID' : 'Risk ID',
+        lang === 'zh' ? '类型' : 'Type',
+        lang === 'zh' ? '严重程度' : 'Severity',
+        lang === 'zh' ? '描述' : 'Description',
+        lang === 'zh' ? '影响' : 'Impact',
+        lang === 'zh' ? '触发时间' : 'Triggered At',
+        lang === 'zh' ? '解决时间' : 'Resolved At',
+      ],
+      ...report.riskAnalysis.highRiskEvents.map((event: RiskEvent) => [
+        event.id,
+        event.type,
+        event.severity,
+        event.description,
+        event.impact,
+        event.triggeredAt,
+        event.resolvedAt || '',
+      ]),
+    ];
+    const riskWs = XLSX.utils.aoa_to_sheet(riskData);
+    XLSX.utils.book_append_sheet(wb, riskWs, lang === 'zh' ? '高风险事件' : 'High Risk Events');
+  }
+
+  if (report.processingLog && report.processingLog.length > 0) {
+    const logHeaders = ['id', 'priority', 'type', 'severity', 'field', 'rowIndex', 'originalValue', 'cleanedValue', 'message', 'requiresUserAction', 'resolved', 'userOverride', 'createdAt'];
+    const logData = [
+      logHeaders,
+      ...report.processingLog.map((log: any) =>
+        logHeaders.map((h) => log[h] !== undefined ? log[h] : '')
+      ),
+    ];
+    const logWs = XLSX.utils.aoa_to_sheet(logData);
+    XLSX.utils.book_append_sheet(wb, logWs, lang === 'zh' ? '数据处理日志' : 'Processing Log');
+  }
 }
 
 export { exportToPDF, exportToExcel };

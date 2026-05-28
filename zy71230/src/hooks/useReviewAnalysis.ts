@@ -102,6 +102,8 @@ export function useReviewAnalysis() {
       alternativePaths: [],
       gameStats,
       generatedAt: new Date().toISOString(),
+      rawData: tour.rawData,
+      processingLog: tour.processingLog,
     };
   };
 

@@ -11,6 +11,12 @@ export interface ReviewReport {
   alternativePaths: AlternativePath[];
   gameStats: GameStats;
   generatedAt: string;
+  rawData: {
+    tour: Record<string, unknown>;
+    stops: Record<string, unknown>[];
+    merch: Record<string, unknown>[];
+  };
+  processingLog: any[];
 }
 
 export interface ExecutionSummary {

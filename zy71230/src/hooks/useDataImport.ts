@@ -15,12 +15,14 @@ import type { Tour, Stop, MerchItem, ProcessingLogEntry } from '../types/tour';
 export function useDataImport() {
   const {
     rawFiles,
+    rawData,
     parsedData,
     processingLog,
     validationErrors,
     isDirty,
     isProcessing,
     setRawFiles,
+    setRawData,
     setParsedData,
     addProcessingLog,
     addValidationErrors,
@@ -62,6 +64,7 @@ export function useDataImport() {
         useDataStore.getState().addProcessingLog([...tourLogs, ...stopsLogs, ...merchLogs]);
         useDataStore.getState().addValidationErrors([...tourErrors, ...stopsErrors, ...merchErrors]);
 
+        setRawData(result.rawData);
         setParsedData({
           tour: cleanedTour,
           stops: cleanedStops,
@@ -82,7 +85,7 @@ export function useDataImport() {
         return false;
       }
     },
-    [setRawFiles, setParsedData, setIsProcessing, markAsDirty]
+    [setRawFiles, setRawData, setParsedData, setIsProcessing, markAsDirty]
   );
 
   const importSampleData = useCallback(
@@ -192,6 +195,7 @@ export function useDataImport() {
         useDataStore.getState().addProcessingLog([...tourLogs, ...stopsLogs, ...merchLogs]);
         useDataStore.getState().addValidationErrors([...tourErrors, ...stopsErrors, ...merchErrors]);
 
+        setRawData(rawData);
         setParsedData({
           tour: cleanedTour,
           stops: cleanedStops,
@@ -208,7 +212,7 @@ export function useDataImport() {
         return false;
       }
     },
-    [setParsedData, setIsProcessing, markAsDirty]
+    [setRawData, setParsedData, setIsProcessing, markAsDirty]
   );
 
   const canStartGame = useCallback((): boolean => {
@@ -261,10 +265,6 @@ export function useDataImport() {
 
     if (!allMerchValid) return false;
 
-    const rawTourData = rawFiles.length > 0 ? parsedData.tour : {};
-    const rawStopsData = rawFiles.length > 0 ? parsedData.stops : [];
-    const rawMerchData = rawFiles.length > 0 ? parsedData.merch : [];
-
     initializeTour(
       {
         id: '',
@@ -275,9 +275,9 @@ export function useDataImport() {
         endDate: tour.endDate,
         notes: tour.notes,
         rawData: {
-          tour: rawTourData,
-          stops: rawStopsData,
-          merch: rawMerchData,
+          tour: rawData.tour,
+          stops: rawData.stops,
+          merch: rawData.merch,
         },
         processingLog: [...processingLog],
       },
@@ -307,7 +307,7 @@ export function useDataImport() {
 
     goToPhase('playing');
     return true;
-  }, [parsedData, rawFiles, processingLog, canStartGame, initializeTour, goToPhase]);
+  }, [parsedData, rawData, processingLog, canStartGame, initializeTour, goToPhase]);
 
   const resolveLogEntry = useCallback(
     (entryId: string, userOverride?: string) => {

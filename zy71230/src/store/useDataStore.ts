@@ -7,8 +7,15 @@ interface ParsedData {
   merch: Partial<MerchItem>[];
 }
 
+interface RawData {
+  tour: Record<string, unknown>;
+  stops: Record<string, unknown>[];
+  merch: Record<string, unknown>[];
+}
+
 interface DataState {
   rawFiles: File[];
+  rawData: RawData;
   parsedData: ParsedData;
   processingLog: ProcessingLogEntry[];
   validationErrors: ValidationError[];
@@ -16,6 +23,7 @@ interface DataState {
   isProcessing: boolean;
 
   setRawFiles: (files: File[]) => void;
+  setRawData: (data: RawData) => void;
   setParsedData: (data: ParsedData) => void;
   addProcessingLog: (entries: ProcessingLogEntry[]) => void;
   addValidationErrors: (errors: ValidationError[]) => void;
@@ -32,8 +40,15 @@ const initialParsedData: ParsedData = {
   merch: [],
 };
 
+const initialRawData: RawData = {
+  tour: {},
+  stops: [],
+  merch: [],
+};
+
 export const useDataStore = create<DataState>((set) => ({
   rawFiles: [],
+  rawData: initialRawData,
   parsedData: initialParsedData,
   processingLog: [],
   validationErrors: [],
@@ -42,6 +57,10 @@ export const useDataStore = create<DataState>((set) => ({
 
   setRawFiles: (files: File[]) => {
     set({ rawFiles: files, isDirty: true });
+  },
+
+  setRawData: (data: RawData) => {
+    set({ rawData: data, isDirty: true });
   },
 
   setParsedData: (data: ParsedData) => {
@@ -83,6 +102,7 @@ export const useDataStore = create<DataState>((set) => ({
   clearData: () => {
     set({
       rawFiles: [],
+      rawData: initialRawData,
       parsedData: initialParsedData,
       processingLog: [],
       validationErrors: [],
