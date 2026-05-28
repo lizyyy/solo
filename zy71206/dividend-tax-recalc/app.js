@@ -19,9 +19,9 @@ const MockData = {
   ],
 
   dividends: [
-    { row: 1, dividendId: 'D001', stockCode: '600000', stockName: '浦发银行', exDate: '2025-06-20', payDate: '2025-07-15', dividendPerShare: 0.35, totalShares: 4500 },
-    { row: 2, dividendId: 'D002', stockCode: '000001', stockName: '平安银行', exDate: '2025-07-20', payDate: '2025-08-10', dividendPerShare: 0.25, totalShares: 4000 },
-    { row: 3, dividendId: 'D003', stockCode: '601398', stockName: '工商银行', exDate: '2025-07-10', payDate: '2025-08-05', dividendPerShare: 0.3064, totalShares: 10000 }
+    { row: 1, dividendId: 'D001', accountId: 'A001', stockCode: '600000', stockName: '浦发银行', exDate: '2025-06-20', payDate: '2025-07-15', dividendPerShare: 0.35, totalShares: 4500 },
+    { row: 2, dividendId: 'D002', accountId: 'A002', stockCode: '000001', stockName: '平安银行', exDate: '2025-07-20', payDate: '2025-08-10', dividendPerShare: 0.25, totalShares: 4000 },
+    { row: 3, dividendId: 'D003', accountId: 'A001', stockCode: '601398', stockName: '工商银行', exDate: '2025-07-10', payDate: '2025-08-05', dividendPerShare: 0.3064, totalShares: 10000 }
   ],
 
   deductions: [
@@ -267,14 +267,26 @@ const PositionConsolidator = {
 };
 
 const TaxRecalculator = {
-  recalculate(consolidated, dividends) {
+  recalculate(consolidated, dividends, accounts) {
     const results = [];
     const anomalies = [];
 
     dividends.forEach(div => {
-      const relatedPositions = consolidated.filter(p => p.stockCode === div.stockCode);
+      let stockPositions = consolidated.filter(p => p.stockCode === div.stockCode);
 
-      if (relatedPositions.length === 0) {
+      if (div.accountId) {
+        const targetAccount = accounts.find(a => a.accountId === div.accountId);
+        if (targetAccount && targetAccount.idNumber) {
+          const relatedAccountIds = accounts
+            .filter(a => a.idNumber === targetAccount.idNumber)
+            .map(a => a.accountId);
+          stockPositions = stockPositions.filter(p => relatedAccountIds.includes(p.accountId));
+        } else {
+          stockPositions = stockPositions.filter(p => p.accountId === div.accountId);
+        }
+      }
+
+      if (stockPositions.length === 0) {
         anomalies.push({
           type: 'warning',
           code: 'NO_POSITION',
@@ -287,42 +299,80 @@ const TaxRecalculator = {
         return;
       }
 
-      const totalShares = relatedPositions.reduce((s, p) => s + p.shares, 0);
-      const dividendAmount = totalShares * div.dividendPerShare;
+      const positionsByAccount = {};
+      stockPositions.forEach(p => {
+        if (!positionsByAccount[p.accountId]) positionsByAccount[p.accountId] = [];
+        positionsByAccount[p.accountId].push(p);
+      });
 
       let positionDetails = [];
+      let totalShares = 0;
       let weightedHoldingDays = 0;
       let totalWeight = 0;
 
-      relatedPositions.forEach(pos => {
-        let holdDays;
-        if (pos.isUnsold) {
-          holdDays = daysBetween(pos.buyDate, div.exDate);
-        } else if (pos.sellDate && pos.buyDate) {
-          holdDays = pos.holdingDays || daysBetween(pos.buyDate, pos.sellDate);
-        } else {
-          holdDays = null;
-        }
+      Object.entries(positionsByAccount).forEach(([accountId, accountPositions]) => {
+        accountPositions.forEach(pos => {
+          let eligible = false;
+          let holdDays = null;
 
-        const taxInfo = holdDays != null ? getTaxRate(holdDays) : { rate: null, tier: null };
-        const posDividend = pos.shares * div.dividendPerShare;
-        const posTax = taxInfo.rate != null ? posDividend * taxInfo.rate : null;
+          if (pos.isUnsold || !pos.sellDate) {
+            eligible = true;
+            holdDays = daysBetween(pos.buyDate, div.exDate);
+          } else if (pos.sellDate > div.exDate) {
+            eligible = true;
+            holdDays = daysBetween(pos.buyDate, pos.sellDate);
+          }
 
-        positionDetails.push({
-          ...pos,
-          calculatedHoldingDays: holdDays,
-          calculatedRate: taxInfo.rate,
-          calculatedTier: taxInfo.tier,
-          posDividend,
-          posTax
+          if (eligible) {
+            const taxInfo = holdDays != null ? getTaxRate(holdDays) : { rate: null, tier: null };
+            const posDividend = pos.shares * div.dividendPerShare;
+            const posTax = taxInfo.rate != null ? posDividend * taxInfo.rate : null;
+
+            positionDetails.push({
+              ...pos,
+              calculatedHoldingDays: holdDays,
+              calculatedRate: taxInfo.rate,
+              calculatedTier: taxInfo.tier,
+              posDividend,
+              posTax,
+              dividendExDate: div.exDate
+            });
+
+            totalShares += pos.shares;
+            if (holdDays != null) {
+              weightedHoldingDays += holdDays * pos.shares;
+              totalWeight += pos.shares;
+            }
+          }
         });
-
-        if (holdDays != null) {
-          weightedHoldingDays += holdDays * pos.shares;
-          totalWeight += pos.shares;
-        }
       });
 
+      if (div.totalShares && Math.abs(totalShares - div.totalShares) > 0.01) {
+        anomalies.push({
+          type: 'warning',
+          code: 'SHARES_MISMATCH',
+          stockCode: div.stockCode,
+          stockName: div.stockName,
+          message: `持仓股数不匹配：分红记录声明${div.totalShares}股，重算实际持仓${totalShares}股`,
+          source: `分红流水第${div.row}行`,
+          declaredShares: div.totalShares,
+          calculatedShares: totalShares
+        });
+      }
+
+      if (positionDetails.length === 0) {
+        anomalies.push({
+          type: 'warning',
+          code: 'NO_ELIGIBLE_POSITION',
+          stockCode: div.stockCode,
+          stockName: div.stockName,
+          message: `除权日${div.exDate}无有效持仓，可能已全部卖出`,
+          source: `分红流水第${div.row}行`,
+          dividendId: div.dividendId
+        });
+      }
+
+      const dividendAmount = totalShares * div.dividendPerShare;
       const avgHoldingDays = totalWeight > 0 ? Math.round(weightedHoldingDays / totalWeight) : null;
       const avgTaxInfo = avgHoldingDays != null ? getTaxRate(avgHoldingDays) : { rate: null, tier: null };
 
@@ -332,7 +382,7 @@ const TaxRecalculator = {
       const refund = Math.max(0, preWithheld - correctTax);
 
       const crossCustodianSeen = new Set();
-      relatedPositions.forEach(pos => {
+      stockPositions.forEach(pos => {
         if (pos.isCrossCustodian && !crossCustodianSeen.has(pos.accountId)) {
           crossCustodianSeen.add(pos.accountId);
           anomalies.push({
@@ -359,18 +409,32 @@ const TaxRecalculator = {
             position: pos
           });
         }
+      });
 
-        if (pos.calculatedHoldingDays != null) {
-          if (pos.calculatedHoldingDays > 30 && pos.calculatedHoldingDays <= 60) {
+      positionDetails.forEach(pd => {
+        if (pd.calculatedHoldingDays != null) {
+          if (pd.calculatedHoldingDays > 25 && pd.calculatedHoldingDays <= 35) {
             anomalies.push({
               type: 'warning',
               code: 'TIER_BOUNDARY',
               stockCode: div.stockCode,
               stockName: div.stockName,
-              accountId: pos.accountId,
-              message: `持股期限${pos.calculatedHoldingDays}天，接近1个月/1年档位边界，请核实`,
-              source: `买入流水第${pos.buyRow}行`,
-              position: pos
+              accountId: pd.accountId,
+              message: `持股期限${pd.calculatedHoldingDays}天，接近1个月档位边界，请核实`,
+              source: `买入流水第${pd.buyRow}行`,
+              position: pd
+            });
+          }
+          if (pd.calculatedHoldingDays > 355 && pd.calculatedHoldingDays <= 375) {
+            anomalies.push({
+              type: 'warning',
+              code: 'TIER_BOUNDARY',
+              stockCode: div.stockCode,
+              stockName: div.stockName,
+              accountId: pd.accountId,
+              message: `持股期限${pd.calculatedHoldingDays}天，接近1年档位边界，请核实`,
+              source: `买入流水第${pd.buyRow}行`,
+              position: pd
             });
           }
         }
@@ -383,6 +447,8 @@ const TaxRecalculator = {
         exDate: div.exDate,
         payDate: div.payDate,
         dividendPerShare: div.dividendPerShare,
+        declaredTotalShares: div.totalShares,
+        calculatedTotalShares: totalShares,
         totalShares,
         dividendAmount,
         avgHoldingDays,
@@ -533,8 +599,12 @@ const ExplanationGenerator = {
       lines.push(`  除权除息日：${tr.exDate}`);
       lines.push(`  派息日：${tr.payDate}`);
       lines.push(`  每股红利：${tr.dividendPerShare}元`);
-      lines.push(`  持仓总股数：${tr.totalShares}股`);
+      lines.push(`  分红声明股数：${tr.declaredTotalShares || '-'}股`);
+      lines.push(`  重算实际持仓：${tr.totalShares}股（除权日时点有效持仓）`);
       lines.push(`  红利总额：${formatMoney(tr.dividendAmount)}`);
+      if (tr.declaredTotalShares && Math.abs(tr.totalShares - tr.declaredTotalShares) > 0.01) {
+        lines.push(`  ⚠ 注意：声明股数与实际持仓不一致，已按实际持仓计算`);
+      }
       lines.push('');
 
       lines.push(`二、持股期限与适用税率`);
@@ -596,11 +666,11 @@ const ExportManager = {
 
     rows.push(['=== 分红税费重算明细 ===']);
     rows.push([]);
-    rows.push(['分红编号', '证券代码', '证券名称', '除权日', '派息日', '每股红利', '持仓股数', '红利总额', '加权持股天数', '适用税率', '应纳税额', '已预扣', '应补扣', '应退还']);
+    rows.push(['分红编号', '证券代码', '证券名称', '除权日', '派息日', '每股红利', '声明股数', '计算股数', '红利总额', '加权持股天数', '适用税率', '应纳税额', '已预扣', '应补扣', '应退还']);
     taxResults.forEach(tr => {
       rows.push([
         tr.dividendId, tr.stockCode, tr.stockName, tr.exDate, tr.payDate,
-        tr.dividendPerShare, tr.totalShares, tr.dividendAmount.toFixed(2),
+        tr.dividendPerShare, tr.declaredTotalShares || '', tr.totalShares, tr.dividendAmount.toFixed(2),
         tr.avgHoldingDays != null ? tr.avgHoldingDays : '',
         tr.avgTaxRate != null ? (tr.avgTaxRate * 100).toFixed(0) + '%' : '',
         tr.correctTax.toFixed(2), tr.preWithheld.toFixed(2),
@@ -833,7 +903,7 @@ const App = {
     this.state.crossCustodianStocks = crossCustodianStocks;
     this.state.linkedAccounts = linkedAccounts;
 
-    const { results, anomalies } = TaxRecalculator.recalculate(consolidated, this.state.dividends);
+    const { results, anomalies } = TaxRecalculator.recalculate(consolidated, this.state.dividends, this.state.accounts);
     this.state.taxResults = results;
     this.state.taxAnomalies = anomalies;
 
@@ -960,7 +1030,7 @@ const App = {
     if (!container) return;
 
     let html = `<table class="data-table"><thead><tr>
-      <th>分红编号</th><th>证券</th><th>除权日</th><th>每股红利</th><th>总股数</th>
+      <th>分红编号</th><th>证券</th><th>除权日</th><th>每股红利</th><th>声明股数</th><th>计算股数</th>
       <th>红利总额</th><th>加权持股天数</th><th>适用税率</th><th>应纳税额</th>
       <th>已预扣</th><th>应补扣</th><th>应退还</th>
     </tr></thead><tbody>`;
@@ -968,6 +1038,7 @@ const App = {
     this.state.taxResults.forEach(tr => {
       const stockAnomalies = [...this.state.taxAnomalies, ...this.state.deductionAnomalies].filter(a => a.stockCode === tr.stockCode);
       const hasAnomaly = stockAnomalies.some(a => a.type === 'error');
+      const hasShareMismatch = tr.declaredTotalShares && Math.abs(tr.totalShares - tr.declaredTotalShares) > 0.01;
       const cls = hasAnomaly ? 'row-anomaly' : '';
 
       html += `<tr class="${cls}" data-stock="${tr.stockCode}">
@@ -975,7 +1046,8 @@ const App = {
         <td>${tr.stockName}(${tr.stockCode})</td>
         <td>${tr.exDate}</td>
         <td>${tr.dividendPerShare}</td>
-        <td>${tr.totalShares}</td>
+        <td>${tr.declaredTotalShares || '-'}</td>
+        <td class="${hasShareMismatch ? 'text-warning' : ''}">${tr.totalShares}</td>
         <td>${formatMoney(tr.dividendAmount)}</td>
         <td>${tr.avgHoldingDays != null ? tr.avgHoldingDays + '天' : '-'}</td>
         <td>${tr.avgTaxRate != null ? (tr.avgTaxRate * 100).toFixed(0) + '%' : '-'}</td>
@@ -1112,6 +1184,8 @@ const App = {
       'TIER_BOUNDARY': '持股天数接近税率档位边界，稍有偏差就会改变税率，需核实买入卖出日期',
       'UNMATCHED_SELL': '卖出记录找不到对应的买入记录，可能是数据缺失或录入错误',
       'NO_POSITION': '分红记录找不到对应持仓，可能是账户未归集或分红信息错误',
+      'NO_ELIGIBLE_POSITION': '除权日当天无有效持仓，该股票可能在除权日前已全部卖出',
+      'SHARES_MISMATCH': '分红记录声明的股数与重算实际持仓股数不一致，需核实分红范围和实际持仓',
       'AMOUNT_MISMATCH': '实际总扣税额与重算应纳税额不一致，需逐笔核对补扣流水'
     };
     return reasons[code] || '需人工核实';

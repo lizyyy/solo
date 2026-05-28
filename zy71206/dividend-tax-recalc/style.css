@@ -432,6 +432,11 @@ body {
   border-left: 2px solid var(--border);
 }
 
+.text-warning {
+  color: var(--warning);
+  font-weight: 600;
+}
+
 .no-anomaly {
   padding: 16px;
   text-align: center;
