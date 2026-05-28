@@ -1,9 +1,15 @@
+import {
+  CaseDAO,
+  InvoiceDAO,
+  ConfirmationDAO,
+  ContractDAO,
+  RepaymentPlanDAO,
+  CollectionNoteDAO,
+  RiskReportDAO,
+  LinkDAO,
+} from '../dao/index.js';
 import type {
   BusinessCase,
-  Invoice,
-  Confirmation,
-  FactoringContract,
-  RepaymentPlan,
   BusinessLink,
   LinkGraph,
   LinkGraphNode,
@@ -11,184 +17,177 @@ import type {
   PaginatedResponse,
 } from '../../shared/types.js';
 
-const mockCases: BusinessCase[] = [
-  {
-    id: 'c001',
-    businessNo: 'BIZ2024001',
-    buyerName: 'ABC贸易有限公司',
-    sellerName: 'XYZ供应链有限公司',
-    totalAmount: 500000,
-    financingAmount: 400000,
-    currentStatus: 'overdue',
-    overdueDays: 30,
-    riskLevel: 'high',
-    createdAt: '2024-01-15T00:00:00Z',
-    updatedAt: '2024-02-20T00:00:00Z',
-  },
-  {
-    id: 'c002',
-    businessNo: 'BIZ2024002',
-    buyerName: 'DEF科技有限公司',
-    sellerName: 'XYZ供应链有限公司',
-    totalAmount: 800000,
-    financingAmount: 640000,
-    currentStatus: 'normal_repayment',
-    overdueDays: 0,
-    riskLevel: 'low',
-    createdAt: '2024-01-20T00:00:00Z',
-    updatedAt: '2024-02-15T00:00:00Z',
-  },
-];
-
-const mockInvoices: Invoice[] = [
-  {
-    id: 'inv001',
-    businessNo: 'BIZ2024001',
-    invoiceNo: 'INV-2024-0001',
-    sellerName: 'XYZ供应链有限公司',
-    amount: 500000,
-    taxAmount: 65000,
-    goodsDescription: '电子产品一批',
-    issueDate: '2024-01-10T00:00:00Z',
-    dueDate: '2024-02-10T00:00:00Z',
-    status: 'confirmed',
-    version: 1,
-    createdAt: '2024-01-10T00:00:00Z',
-    updatedAt: '2024-01-10T00:00:00Z',
-  },
-];
-
-const mockConfirmations: Confirmation[] = [
-  {
-    id: 'conf001',
-    businessNo: 'BIZ2024001',
-    confirmDate: '2024-01-12T00:00:00Z',
-    confirmAmount: 500000,
-    goodsReceived: true,
-    qualityIssue: false,
-    qualityIssueDesc: '',
-    confirmer: '李经理',
-    isWithdrawn: false,
-    withdrawReason: '',
-    withdrawDate: '',
-    status: 'confirmed',
-    version: 1,
-    createdAt: '2024-01-12T00:00:00Z',
-    updatedAt: '2024-01-12T00:00:00Z',
-  },
-];
-
-const mockContracts: FactoringContract[] = [
-  {
-    id: 'contract001',
-    businessNo: 'BIZ2024001',
-    contractNo: 'FA-2024-0001',
-    factoringRate: 0.08,
-    financingAmount: 400000,
-    startDate: '2024-01-15T00:00:00Z',
-    endDate: '2024-07-15T00:00:00Z',
-    status: 'active',
-    version: 1,
-    createdAt: '2024-01-15T00:00:00Z',
-    updatedAt: '2024-01-15T00:00:00Z',
-  },
-];
-
-const mockRepaymentPlans: RepaymentPlan[] = [
-  {
-    id: 'plan001',
-    businessNo: 'BIZ2024001',
-    instalmentNo: 1,
-    principal: 200000,
-    interest: 8000,
-    plannedDate: '2024-03-15T00:00:00Z',
-    status: 'pending',
-    version: 1,
-    createdAt: '2024-01-15T00:00:00Z',
-    updatedAt: '2024-01-15T00:00:00Z',
-  },
-];
-
-const mockLinks: BusinessLink[] = [
-  {
-    id: 'link001',
-    sourceId: 'c001',
-    sourceType: 'invoice',
-    targetId: 'inv001',
-    targetType: 'invoice',
-    linkType: 'belongs_to',
-    confidence: 1.0,
-    createdAt: '2024-01-15T00:00:00Z',
-  },
-];
+function generateId(prefix: string): string {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
 
 export const businessService = {
   async getLinkGraph(businessNo?: string): Promise<LinkGraph> {
     const nodes: LinkGraphNode[] = [];
     const links: LinkGraphLink[] = [];
 
-    mockCases.forEach((c) => {
-      if (!businessNo || c.businessNo === businessNo) {
-        nodes.push({
-          id: c.id,
-          type: 'case',
-          name: c.businessNo,
-          amount: c.totalAmount,
-          status: c.currentStatus,
-          date: c.createdAt,
-        });
-      }
-    });
+    if (businessNo) {
+      const graph = await LinkDAO.getLinkGraph(businessNo);
+      return graph as LinkGraph;
+    }
 
-    mockInvoices.forEach((inv) => {
-      if (!businessNo || inv.businessNo === businessNo) {
-        nodes.push({
-          id: inv.id,
-          type: 'invoice',
-          name: inv.invoiceNo,
-          amount: inv.amount,
-          status: inv.status,
-          date: inv.issueDate,
-        });
-      }
-    });
+    const { list: cases } = await CaseDAO.list({}, 1, 1000);
+    for (const c of cases) {
+      nodes.push({
+        id: c.businessNo,
+        type: 'case',
+        name: c.businessNo,
+        amount: c.totalAmount,
+        status: c.currentStatus,
+        date: c.createdAt,
+      });
+    }
 
-    mockConfirmations.forEach((conf) => {
-      if (!businessNo || conf.businessNo === businessNo) {
-        nodes.push({
-          id: conf.id,
-          type: 'confirmation',
-          name: `确认-${conf.businessNo}`,
-          amount: conf.confirmAmount,
-          status: conf.status,
-          date: conf.confirmDate,
-        });
-      }
-    });
+    const { list: allLinks } = await LinkDAO.list({}, 1, 5000);
+    const caseBusinessNos = new Set(cases.map(c => c.businessNo));
 
-    mockContracts.forEach((contract) => {
-      if (!businessNo || contract.businessNo === businessNo) {
-        nodes.push({
-          id: contract.id,
-          type: 'contract',
-          name: contract.contractNo,
-          amount: contract.financingAmount,
-          status: contract.status,
-          date: contract.startDate,
-        });
-      }
-    });
-
-    mockLinks.forEach((link) => {
-      if (nodes.find((n) => n.id === link.sourceId) && nodes.find((n) => n.id === link.targetId)) {
+    for (const link of allLinks) {
+      if (caseBusinessNos.has(link.sourceId) || caseBusinessNos.has(link.targetId)) {
         links.push({
           source: link.sourceId,
           target: link.targetId,
           linkType: link.linkType,
           confidence: link.confidence,
         });
+
+        if (!nodes.find(n => n.id === link.sourceId) && !caseBusinessNos.has(link.sourceId)) {
+          nodes.push({
+            id: link.sourceId,
+            type: link.sourceType,
+            name: `${link.sourceType}-${link.sourceId}`,
+            amount: 0,
+            status: '',
+            date: '',
+          });
+        }
+        if (!nodes.find(n => n.id === link.targetId) && !caseBusinessNos.has(link.targetId)) {
+          nodes.push({
+            id: link.targetId,
+            type: link.targetType,
+            name: `${link.targetType}-${link.targetId}`,
+            amount: 0,
+            status: '',
+            date: '',
+          });
+        }
       }
+    }
+
+    return { nodes, links };
+  },
+
+  async getFullLinkGraph(businessNo: string): Promise<LinkGraph> {
+    const nodes: LinkGraphNode[] = [];
+    const links: LinkGraphLink[] = [];
+
+    const caseInfo = await CaseDAO.findByBusinessNo(businessNo);
+    if (!caseInfo) {
+      return { nodes, links };
+    }
+
+    nodes.push({
+      id: caseInfo.businessNo,
+      type: 'case',
+      name: caseInfo.businessNo,
+      amount: caseInfo.totalAmount,
+      status: caseInfo.currentStatus,
+      date: caseInfo.createdAt,
     });
+
+    const invoices = await InvoiceDAO.findByBusinessNo(businessNo);
+    for (const inv of invoices) {
+      nodes.push({
+        id: inv.id,
+        type: 'invoice',
+        name: inv.invoiceNo,
+        amount: inv.amount,
+        status: inv.status,
+        date: inv.issueDate,
+      });
+      links.push({ source: inv.id, target: businessNo, linkType: 'belongs_to', confidence: 100 });
+    }
+
+    const confirmations = await ConfirmationDAO.findByBusinessNo(businessNo);
+    for (const conf of confirmations) {
+      nodes.push({
+        id: conf.id,
+        type: 'confirmation',
+        name: `确认-v${conf.version}`,
+        amount: conf.confirmAmount,
+        status: conf.status,
+        date: conf.confirmDate,
+      });
+      links.push({ source: conf.id, target: businessNo, linkType: 'belongs_to', confidence: 100 });
+    }
+
+    const contracts = await ContractDAO.findByBusinessNo(businessNo);
+    for (const contract of contracts) {
+      nodes.push({
+        id: contract.id,
+        type: 'contract',
+        name: contract.contractNo,
+        amount: contract.financingAmount,
+        status: contract.status,
+        date: contract.startDate,
+      });
+      links.push({ source: contract.id, target: businessNo, linkType: 'belongs_to', confidence: 100 });
+    }
+
+    const plans = await RepaymentPlanDAO.findByBusinessNo(businessNo);
+    for (const plan of plans) {
+      nodes.push({
+        id: plan.id,
+        type: 'repayment_plan',
+        name: `第${plan.instalmentNo}期`,
+        amount: plan.principal + plan.interest,
+        status: plan.status,
+        date: plan.plannedDate,
+      });
+      links.push({ source: plan.id, target: businessNo, linkType: 'belongs_to', confidence: 100 });
+    }
+
+    const notes = await CollectionNoteDAO.findByBusinessNo(businessNo);
+    for (const note of notes) {
+      nodes.push({
+        id: note.id,
+        type: 'collection_note',
+        name: `催收-${note.collectionDate}`,
+        amount: 0,
+        status: '',
+        date: note.collectionDate,
+      });
+      links.push({ source: note.id, target: businessNo, linkType: 'belongs_to', confidence: 100 });
+    }
+
+    const reports = await RiskReportDAO.findByBusinessNo(businessNo);
+    for (const report of reports) {
+      nodes.push({
+        id: report.id,
+        type: 'risk_report',
+        name: `风险报告-${report.reportDate}`,
+        amount: 0,
+        status: report.riskLevel,
+        date: report.reportDate,
+      });
+      links.push({ source: report.id, target: businessNo, linkType: 'belongs_to', confidence: 100 });
+    }
+
+    if (invoices.length > 0 && confirmations.length > 0) {
+      links.push({ source: invoices[0].id, target: confirmations[0].id, linkType: 'confirmed_by', confidence: 100 });
+    }
+    if (confirmations.length > 0 && contracts.length > 0) {
+      links.push({ source: confirmations[0].id, target: contracts[0].id, linkType: 'secured_by', confidence: 100 });
+    }
+    if (contracts.length > 0 && plans.length > 0) {
+      for (const plan of plans) {
+        links.push({ source: contracts[0].id, target: plan.id, linkType: 'repay_schedule', confidence: 100 });
+      }
+    }
 
     return { nodes, links };
   },
@@ -198,35 +197,20 @@ export const businessService = {
     pageSize: number = 10,
     filters?: any,
   ): Promise<PaginatedResponse<BusinessCase>> {
-    let filtered = [...mockCases];
-
-    if (filters?.status) {
-      filtered = filtered.filter((c) => c.currentStatus === filters.status);
-    }
-
-    if (filters?.riskLevel) {
-      filtered = filtered.filter((c) => c.riskLevel === filters.riskLevel);
-    }
-
-    if (filters?.keyword) {
-      const kw = filters.keyword.toLowerCase();
-      filtered = filtered.filter(
-        (c) =>
-          c.businessNo.toLowerCase().includes(kw) ||
-          c.buyerName.toLowerCase().includes(kw) ||
-          c.sellerName.toLowerCase().includes(kw),
-      );
-    }
-
-    const total = filtered.length;
-    const start = (page - 1) * pageSize;
-    const list = filtered.slice(start, start + pageSize);
-
-    return { list, total, page, pageSize };
+    const result = await CaseDAO.list(filters || {}, page, pageSize);
+    return {
+      list: result.list,
+      total: result.total,
+      page,
+      pageSize,
+    };
   },
 
   async getBusinessDetail(id: string): Promise<BusinessCase | null> {
-    return mockCases.find((c) => c.id === id || c.businessNo === id) || null;
+    const byId = await CaseDAO.getById(id);
+    if (byId) return byId;
+
+    return await CaseDAO.findByBusinessNo(id);
   },
 
   async createLink(
@@ -238,27 +222,22 @@ export const businessService = {
     operatorId: string,
     operatorName: string,
   ): Promise<BusinessLink> {
-    const newLink: BusinessLink = {
-      id: `link${Date.now()}`,
+    const id = generateId('link');
+    const link = await LinkDAO.create({
+      id,
       sourceId,
       sourceType: sourceType as any,
       targetId,
       targetType: targetType as any,
       linkType,
-      confidence: 1.0,
-      createdAt: new Date().toISOString(),
-    };
-
-    mockLinks.push(newLink);
-    return newLink;
+      confidence: 100,
+    });
+    return link;
   },
 
   async deleteLink(id: string): Promise<boolean> {
-    const index = mockLinks.findIndex((l) => l.id === id);
-    if (index !== -1) {
-      mockLinks.splice(index, 1);
-      return true;
-    }
-    return false;
+    return await LinkDAO.delete(id);
   },
 };
+
+export default businessService;

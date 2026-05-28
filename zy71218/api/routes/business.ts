@@ -12,9 +12,12 @@ router.get('/links', async (req: Request, res: Response): Promise<void> => {
   try {
     const { businessNo } = req.query;
 
-    const graph = await businessService.getLinkGraph(
-      businessNo as string | undefined,
-    );
+    let graph;
+    if (businessNo) {
+      graph = await businessService.getFullLinkGraph(businessNo as string);
+    } else {
+      graph = await businessService.getLinkGraph();
+    }
 
     res.json({
       success: true,

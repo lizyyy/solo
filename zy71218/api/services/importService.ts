@@ -91,6 +91,14 @@ export const importService = {
 
     result.errors = [...result.errors, ...errors];
 
+    if (result.importedIds && result.importedIds.length > 0) {
+      try {
+        await importService.autoMatchLinks(result.importedIds);
+      } catch (_e) {
+        // autoMatchLinks failure should not block import result
+      }
+    }
+
     await auditService.logAction(
       operator.id,
       operator.name,
@@ -450,6 +458,7 @@ export const importService = {
       success: errors.length === 0,
       total: rows.length,
       imported: importedIds.length,
+      importedIds,
       errors,
     };
   },
@@ -494,6 +503,7 @@ export const importService = {
       success: errors.length === 0,
       total: rows.length,
       imported: importedIds.length,
+      importedIds,
       errors,
     };
   },
@@ -533,6 +543,7 @@ export const importService = {
       success: errors.length === 0,
       total: rows.length,
       imported: importedIds.length,
+      importedIds,
       errors,
     };
   },
@@ -571,6 +582,7 @@ export const importService = {
       success: errors.length === 0,
       total: rows.length,
       imported: importedIds.length,
+      importedIds,
       errors,
     };
   },
@@ -640,6 +652,7 @@ export const importService = {
       success: errors.length === 0,
       total: rows.length,
       imported: importedIds.length,
+      importedIds,
       errors,
     };
   },
@@ -677,6 +690,7 @@ export const importService = {
       success: errors.length === 0,
       total: rows.length,
       imported: importedIds.length,
+      importedIds,
       errors,
     };
   },

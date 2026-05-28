@@ -293,6 +293,7 @@ export interface ImportResult {
   total: number;
   imported: number;
   errors: string[];
+  importedIds?: string[];
 }
 
 export interface ApiResponse<T = any> {

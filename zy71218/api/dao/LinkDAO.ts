@@ -150,6 +150,8 @@ export const LinkDAO = {
                WHEN bl.source_type = 'confirmation' THEN '确认-' || bl.source_id
                WHEN bl.source_type = 'contract' THEN fc.contract_no
                WHEN bl.source_type = 'repayment_plan' THEN '计划-' || bl.source_id
+               WHEN bl.source_type = 'collection_note' THEN '催收-' || bl.source_id
+               WHEN bl.source_type = 'risk_report' THEN '风险报告-' || bl.source_id
                ELSE bl.source_id
              END as source_name,
              CASE 
@@ -158,6 +160,8 @@ export const LinkDAO = {
                WHEN bl.source_type = 'confirmation' THEN c.confirm_amount
                WHEN bl.source_type = 'contract' THEN fc.financing_amount
                WHEN bl.source_type = 'repayment_plan' THEN rp.principal + rp.interest
+               WHEN bl.source_type = 'collection_note' THEN 0
+               WHEN bl.source_type = 'risk_report' THEN 0
                ELSE 0
              END as source_amount,
              CASE 
@@ -166,6 +170,8 @@ export const LinkDAO = {
                WHEN bl.source_type = 'confirmation' THEN c.status
                WHEN bl.source_type = 'contract' THEN fc.status
                WHEN bl.source_type = 'repayment_plan' THEN rp.status
+               WHEN bl.source_type = 'collection_note' THEN cn.status
+               WHEN bl.source_type = 'risk_report' THEN rr.status
                ELSE NULL
              END as source_status,
              CASE 
@@ -174,6 +180,8 @@ export const LinkDAO = {
                WHEN bl.source_type = 'confirmation' THEN c.confirm_date
                WHEN bl.source_type = 'contract' THEN fc.start_date
                WHEN bl.source_type = 'repayment_plan' THEN rp.planned_date
+               WHEN bl.source_type = 'collection_note' THEN cn.collection_date
+               WHEN bl.source_type = 'risk_report' THEN rr.report_date
                ELSE bl.created_at
              END as source_date,
              CASE 
@@ -182,6 +190,8 @@ export const LinkDAO = {
                WHEN bl.target_type = 'confirmation' THEN '确认-' || bl.target_id
                WHEN bl.target_type = 'contract' THEN fc2.contract_no
                WHEN bl.target_type = 'repayment_plan' THEN '计划-' || bl.target_id
+               WHEN bl.target_type = 'collection_note' THEN '催收-' || bl.target_id
+               WHEN bl.target_type = 'risk_report' THEN '风险报告-' || bl.target_id
                ELSE bl.target_id
              END as target_name,
              CASE 
@@ -190,6 +200,8 @@ export const LinkDAO = {
                WHEN bl.target_type = 'confirmation' THEN c2.confirm_amount
                WHEN bl.target_type = 'contract' THEN fc2.financing_amount
                WHEN bl.target_type = 'repayment_plan' THEN rp2.principal + rp2.interest
+               WHEN bl.target_type = 'collection_note' THEN 0
+               WHEN bl.target_type = 'risk_report' THEN 0
                ELSE 0
              END as target_amount,
              CASE 
@@ -198,6 +210,8 @@ export const LinkDAO = {
                WHEN bl.target_type = 'confirmation' THEN c2.status
                WHEN bl.target_type = 'contract' THEN fc2.status
                WHEN bl.target_type = 'repayment_plan' THEN rp2.status
+               WHEN bl.target_type = 'collection_note' THEN cn2.status
+               WHEN bl.target_type = 'risk_report' THEN rr2.status
                ELSE NULL
              END as target_status,
              CASE 
@@ -206,6 +220,8 @@ export const LinkDAO = {
                WHEN bl.target_type = 'confirmation' THEN c2.confirm_date
                WHEN bl.target_type = 'contract' THEN fc2.start_date
                WHEN bl.target_type = 'repayment_plan' THEN rp2.planned_date
+               WHEN bl.target_type = 'collection_note' THEN cn2.collection_date
+               WHEN bl.target_type = 'risk_report' THEN rr2.report_date
                ELSE bl.created_at
              END as target_date
       FROM business_link bl
@@ -214,11 +230,15 @@ export const LinkDAO = {
       LEFT JOIN confirmation c ON bl.source_type = 'confirmation' AND bl.source_id = c.id
       LEFT JOIN factoring_contract fc ON bl.source_type = 'contract' AND bl.source_id = fc.id
       LEFT JOIN repayment_plan rp ON bl.source_type = 'repayment_plan' AND bl.source_id = rp.id
+      LEFT JOIN collection_note cn ON bl.source_type = 'collection_note' AND bl.source_id = cn.id
+      LEFT JOIN risk_report rr ON bl.source_type = 'risk_report' AND bl.source_id = rr.id
       LEFT JOIN business_case bc2 ON bl.target_type = 'case' AND bl.target_id = bc2.business_no
       LEFT JOIN invoice i2 ON bl.target_type = 'invoice' AND bl.target_id = i2.id
       LEFT JOIN confirmation c2 ON bl.target_type = 'confirmation' AND bl.target_id = c2.id
       LEFT JOIN factoring_contract fc2 ON bl.target_type = 'contract' AND bl.target_id = fc2.id
       LEFT JOIN repayment_plan rp2 ON bl.target_type = 'repayment_plan' AND bl.target_id = rp2.id
+      LEFT JOIN collection_note cn2 ON bl.target_type = 'collection_note' AND bl.target_id = cn2.id
+      LEFT JOIN risk_report rr2 ON bl.target_type = 'risk_report' AND bl.target_id = rr2.id
       WHERE bl.source_id = @businessNo OR bl.target_id = @businessNo
     `);
     
