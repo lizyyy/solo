@@ -1,0 +1,26 @@
+{
+  "experiment_id": "EXP-001-NORMAL",
+  "experiment_name": "首页按钮优化试验 - 正常数据",
+  "control": {
+    "name": "原按钮",
+    "variant_type": "control",
+    "sample_size": 5000,
+    "conversions": 250
+  },
+  "treatment": {
+    "name": "新按钮",
+    "variant_type": "treatment",
+    "sample_size": 5000,
+    "conversions": 310
+  },
+  "prior": {
+    "alpha": 10,
+    "beta": 90,
+    "description": "基于历史数据的弱信息先验，预期转化率约10%"
+  },
+  "observation_window_days": 14,
+  "planned_sample_size": 10000,
+  "current_day": 14,
+  "stopping_threshold": 0.95,
+  "notes": "测试样例1：数据完整、样本量充足、试验完成的正常场景"
+}

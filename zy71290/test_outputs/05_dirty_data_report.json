@@ -1,0 +1,236 @@
+{
+  "experiment_id": "EXP-005-DIRTY",
+  "input_hash": "02092205beb7f60a863bc6e0243e86158c03eb871d2fadd95990e315b4601b31",
+  "reproducibility_seed": 3199727114,
+  "validation": {
+    "is_valid": false,
+    "fields": [
+      {
+        "field_name": "experiment_id",
+        "status": "present",
+        "message": "试验ID已提供",
+        "provided_value": "EXP-005-DIRTY"
+      },
+      {
+        "field_name": "control",
+        "status": "present",
+        "message": "对照组数据已提供",
+        "provided_value": "VariantData(name='对照组', variant_type=<VariantType.CONTROL: 'control'>, sample_size=500, conversions="
+      },
+      {
+        "field_name": "treatment",
+        "status": "present",
+        "message": "实验组数据已提供",
+        "provided_value": "VariantData(name='实验组', variant_type=<VariantType.TREATMENT: 'treatment'>, sample_size=-100, convers"
+      },
+      {
+        "field_name": "prior",
+        "status": "present",
+        "message": "先验参数已提供",
+        "provided_value": "PriorParams(alpha=-5, beta=None, description='无效的先验参数')"
+      },
+      {
+        "field_name": "observation_window_days",
+        "status": "present",
+        "message": "观察窗口(天)已提供",
+        "provided_value": "0"
+      },
+      {
+        "field_name": "planned_sample_size",
+        "status": "present",
+        "message": "计划样本量已提供",
+        "provided_value": "not_a_number"
+      },
+      {
+        "field_name": "current_day",
+        "status": "present",
+        "message": "当前试验天数已提供",
+        "provided_value": "20"
+      },
+      {
+        "field_name": "stopping_threshold",
+        "status": "present",
+        "message": "停测阈值已提供",
+        "provided_value": "1.5"
+      },
+      {
+        "field_name": "control.name",
+        "status": "present",
+        "message": "对照组变体名称已提供",
+        "provided_value": "对照组"
+      },
+      {
+        "field_name": "control.sample_size",
+        "status": "present",
+        "message": "对照组样本量有效",
+        "provided_value": 500
+      },
+      {
+        "field_name": "control.conversions",
+        "status": "invalid",
+        "message": "对照组转化数不能大于样本量",
+        "provided_value": 600
+      },
+      {
+        "field_name": "treatment.name",
+        "status": "present",
+        "message": "实验组变体名称已提供",
+        "provided_value": "实验组"
+      },
+      {
+        "field_name": "treatment.sample_size",
+        "status": "invalid",
+        "message": "实验组样本量必须是非负整数",
+        "provided_value": -100
+      },
+      {
+        "field_name": "treatment.conversions",
+        "status": "missing",
+        "message": "缺少必需字段: 实验组转化数",
+        "provided_value": null
+      },
+      {
+        "field_name": "prior.alpha",
+        "status": "invalid",
+        "message": "先验参数 alpha 必须是正数",
+        "provided_value": -5
+      },
+      {
+        "field_name": "prior.beta",
+        "status": "missing",
+        "message": "缺少先验参数: beta（不假设默认值）",
+        "provided_value": null
+      },
+      {
+        "field_name": "observation_window_days",
+        "status": "invalid",
+        "message": "观察窗口必须是正整数",
+        "provided_value": 0
+      },
+      {
+        "field_name": "planned_sample_size",
+        "status": "invalid",
+        "message": "计划样本量必须是正整数",
+        "provided_value": "not_a_number"
+      },
+      {
+        "field_name": "stopping_threshold",
+        "status": "invalid",
+        "message": "停测阈值必须在(0, 1)之间",
+        "provided_value": 1.5
+      }
+    ],
+    "data_quality": "dirty",
+    "processing_order": [
+      "开始验证试验ID和基本信息",
+      "验证对照组数据",
+      "验证实验组数据",
+      "验证先验参数",
+      "验证试验参数",
+      "验证多指标数据",
+      "检查数据质量和一致性",
+      "验证完成 - 有效: False, 数据质量: dirty"
+    ],
+    "missing_fields": [
+      "treatment.conversions",
+      "prior.beta"
+    ],
+    "invalid_fields": [
+      "control.conversions",
+      "treatment.sample_size",
+      "prior.alpha",
+      "observation_window_days",
+      "planned_sample_size",
+      "stopping_threshold"
+    ],
+    "warnings": [
+      "缺少先验参数: prior.beta - 不假设默认值，将无法进行贝叶斯更新",
+      "当前试验天数 (20) 超过观察窗口 (0天)"
+    ],
+    "errors": [
+      "字段无效: 对照组转化数 (control.conversions) = 600 大于样本量 500",
+      "字段无效: 实验组样本量 (treatment.sample_size) 必须是非负整数，当前值: -100",
+      "缺少必需字段: 实验组转化数 (treatment.conversions)",
+      "字段无效: prior.alpha = -5 必须是正数",
+      "字段无效: observation_window_days = 0 必须是正整数",
+      "字段无效: planned_sample_size = not_a_number 必须是正整数",
+      "字段无效: stopping_threshold = 1.5 必须在(0, 1)之间"
+    ]
+  },
+  "bayesian_result": {
+    "control_posterior": {
+      "mean": 0.0,
+      "median": 0.0,
+      "std": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "credible_level": 0.95
+    },
+    "treatment_posterior": {
+      "mean": 0.0,
+      "median": 0.0,
+      "std": 0.0,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "credible_level": 0.95
+    },
+    "prior_strength": 0.0,
+    "effective_sample_size": 0.0,
+    "probability_treatment_better": 0.5,
+    "expected_lift": 0.0,
+    "lift_ci_lower": 0.0,
+    "lift_ci_upper": 0.0,
+    "computation_trace": {
+      "note": "输入无效，未执行贝叶斯计算"
+    }
+  },
+  "risk_assessment": {
+    "has_early_stop": false,
+    "has_strong_prior": false,
+    "has_metric_conflict": false,
+    "overall_risk_level": "critical",
+    "flags": [
+      {
+        "risk_type": "invalid_input",
+        "level": "critical",
+        "message": "输入数据无效，请修正缺失或错误的字段后重新运行",
+        "evidence": {
+          "missing_fields": [
+            "treatment.conversions",
+            "prior.beta"
+          ],
+          "invalid_fields": [
+            "control.conversions",
+            "treatment.sample_size",
+            "prior.alpha",
+            "observation_window_days",
+            "planned_sample_size",
+            "stopping_threshold"
+          ],
+          "errors": [
+            "字段无效: 对照组转化数 (control.conversions) = 600 大于样本量 500",
+            "字段无效: 实验组样本量 (treatment.sample_size) 必须是非负整数，当前值: -100",
+            "缺少必需字段: 实验组转化数 (treatment.conversions)",
+            "字段无效: prior.alpha = -5 必须是正数",
+            "字段无效: observation_window_days = 0 必须是正整数",
+            "字段无效: planned_sample_size = not_a_number 必须是正整数",
+            "字段无效: stopping_threshold = 1.5 必须在(0, 1)之间"
+          ]
+        },
+        "recommendation": "请参考验证结果修正输入数据，特别注意必填字段和数据类型要求"
+      }
+    ],
+    "stopping_recommendation": "not_stopped",
+    "stopping_message": "输入数据无效，无法给出停测建议。请先修正数据问题。"
+  },
+  "conclusions": [
+    "❌ 输入数据验证未通过",
+    "缺失字段: treatment.conversions, prior.beta",
+    "无效字段: control.conversions, treatment.sample_size, prior.alpha, observation_window_days, planned_sample_size, stopping_threshold"
+  ],
+  "recommendations": [
+    "请修正上述缺失或无效的字段后重新运行分析",
+    "注意：本工具不会自动填充默认值，所有必需字段必须明确提供"
+  ],
+  "generated_at": "2026-05-28T22:15:14.959587"
+}

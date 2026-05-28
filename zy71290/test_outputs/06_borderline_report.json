@@ -1,0 +1,211 @@
+{
+  "experiment_id": "EXP-006-BORDERLINE",
+  "input_hash": "251a32ff794a5793c7718c4d0bce727e3342b6cd5d1d992067753cbb31a0565f",
+  "reproducibility_seed": 2034915219,
+  "validation": {
+    "is_valid": true,
+    "fields": [
+      {
+        "field_name": "experiment_id",
+        "status": "present",
+        "message": "试验ID已提供",
+        "provided_value": "EXP-006-BORDERLINE"
+      },
+      {
+        "field_name": "control",
+        "status": "present",
+        "message": "对照组数据已提供",
+        "provided_value": "VariantData(name='旧算法', variant_type=<VariantType.CONTROL: 'control'>, sample_size=80, conversions=1"
+      },
+      {
+        "field_name": "treatment",
+        "status": "present",
+        "message": "实验组数据已提供",
+        "provided_value": "VariantData(name='新算法', variant_type=<VariantType.TREATMENT: 'treatment'>, sample_size=90, conversio"
+      },
+      {
+        "field_name": "prior",
+        "status": "present",
+        "message": "先验参数已提供",
+        "provided_value": "PriorParams(alpha=5, beta=45, description='弱信息先验')"
+      },
+      {
+        "field_name": "observation_window_days",
+        "status": "missing",
+        "message": "缺少推荐字段: 观察窗口(天)（不假设默认值，可能影响分析）",
+        "provided_value": null
+      },
+      {
+        "field_name": "planned_sample_size",
+        "status": "missing",
+        "message": "缺少推荐字段: 计划样本量（不假设默认值，可能影响分析）",
+        "provided_value": null
+      },
+      {
+        "field_name": "current_day",
+        "status": "missing",
+        "message": "缺少推荐字段: 当前试验天数（不假设默认值，可能影响分析）",
+        "provided_value": null
+      },
+      {
+        "field_name": "stopping_threshold",
+        "status": "missing",
+        "message": "缺少推荐字段: 停测阈值（不假设默认值，可能影响分析）",
+        "provided_value": null
+      },
+      {
+        "field_name": "control.name",
+        "status": "present",
+        "message": "对照组变体名称已提供",
+        "provided_value": "旧算法"
+      },
+      {
+        "field_name": "control.sample_size",
+        "status": "present",
+        "message": "对照组样本量有效",
+        "provided_value": 80
+      },
+      {
+        "field_name": "control.conversions",
+        "status": "present",
+        "message": "对照组转化数有效",
+        "provided_value": 12
+      },
+      {
+        "field_name": "treatment.name",
+        "status": "present",
+        "message": "实验组变体名称已提供",
+        "provided_value": "新算法"
+      },
+      {
+        "field_name": "treatment.sample_size",
+        "status": "present",
+        "message": "实验组样本量有效",
+        "provided_value": 90
+      },
+      {
+        "field_name": "treatment.conversions",
+        "status": "present",
+        "message": "实验组转化数有效",
+        "provided_value": 18
+      },
+      {
+        "field_name": "prior.alpha",
+        "status": "present",
+        "message": "先验参数 alpha 有效",
+        "provided_value": 5
+      },
+      {
+        "field_name": "prior.beta",
+        "status": "present",
+        "message": "先验参数 beta 有效",
+        "provided_value": 45
+      }
+    ],
+    "data_quality": "borderline",
+    "processing_order": [
+      "开始验证试验ID和基本信息",
+      "验证对照组数据",
+      "验证实验组数据",
+      "验证先验参数",
+      "验证试验参数",
+      "验证多指标数据",
+      "检查数据质量和一致性",
+      "验证完成 - 有效: True, 数据质量: borderline"
+    ],
+    "missing_fields": [
+      "observation_window_days",
+      "planned_sample_size",
+      "current_day",
+      "stopping_threshold"
+    ],
+    "invalid_fields": [],
+    "warnings": [
+      "缺少推荐字段: 观察窗口(天) (observation_window_days) - 不假设默认值，可能影响分析准确性",
+      "缺少推荐字段: 计划样本量 (planned_sample_size) - 不假设默认值，可能影响分析准确性",
+      "缺少推荐字段: 当前试验天数 (current_day) - 不假设默认值，可能影响分析准确性",
+      "缺少推荐字段: 停测阈值 (stopping_threshold) - 不假设默认值，可能影响分析准确性"
+    ],
+    "errors": []
+  },
+  "bayesian_result": {
+    "control_posterior": {
+      "mean": 0.13076923076923078,
+      "median": 0.12887423874384746,
+      "std": 0.02945674005652471,
+      "ci_lower": 0.07868037392100209,
+      "ci_upper": 0.19359326114793532,
+      "credible_level": 0.95
+    },
+    "treatment_posterior": {
+      "mean": 0.16428571428571428,
+      "median": 0.1626848150301112,
+      "std": 0.031204645767880693,
+      "ci_lower": 0.10787885311765863,
+      "ci_upper": 0.22976509725841313,
+      "credible_level": 0.95
+    },
+    "prior_strength": 50,
+    "effective_sample_size": 131.36363636363637,
+    "probability_treatment_better": 0.79396,
+    "expected_lift": 0.32369514867696436,
+    "lift_ci_lower": -0.2953892778911487,
+    "lift_ci_upper": 1.2929703239270125,
+    "computation_trace": {
+      "prior_strength": 50,
+      "effective_sample_size": 131.36363636363637,
+      "control_posterior_alpha": 17,
+      "control_posterior_beta": 113,
+      "treatment_posterior_alpha": 23,
+      "treatment_posterior_beta": 117,
+      "sample_count": 50000,
+      "credible_level": 0.95,
+      "seed": 2034915219
+    }
+  },
+  "risk_assessment": {
+    "has_early_stop": false,
+    "has_strong_prior": false,
+    "has_metric_conflict": false,
+    "overall_risk_level": "medium",
+    "flags": [
+      {
+        "risk_type": "small_sample",
+        "level": "medium",
+        "message": "样本量偏小：对照组 80，实验组 90，总样本量 170，有效样本量 131。结论可能不够稳健",
+        "evidence": {
+          "control_sample_size": 80,
+          "treatment_sample_size": 90,
+          "total_sample_size": 170,
+          "effective_sample_size": 131.36363636363637
+        },
+        "recommendation": "建议继续收集数据以提高结论稳健性。如需基于当前数据决策，请谨慎解读并报告不确定性。"
+      },
+      {
+        "risk_type": "wide_ci",
+        "level": "medium",
+        "message": "提升量的95%可信区间包含零 [-0.2954, 1.2930]，无法确定实验组是否真的优于对照组",
+        "evidence": {
+          "lift_ci_lower": -0.2953892778911487,
+          "lift_ci_upper": 1.2929703239270125,
+          "ci_width": 1.5883596018181612,
+          "expected_lift": 0.32369514867696436,
+          "ci_includes_zero": true
+        },
+        "recommendation": "可信区间包含零，说明效应方向尚不明确。建议继续收集数据以缩小可信区间，或使用区间假设检验（如ROPE）进行决策。"
+      }
+    ],
+    "stopping_recommendation": "not_stopped",
+    "stopping_message": "提升量可信区间包含零，效应方向不明确，建议继续收集数据以获得更明确的结论。"
+  },
+  "conclusions": [
+    "⚠️ 数据质量临界，部分推荐字段缺失或样本量偏小",
+    "⚖️ 统计结论：当前证据不足以判断优劣，P(实验组>对照组) = 79.4%"
+  ],
+  "recommendations": [
+    "建议继续收集数据以缩小可信区间，获得更明确的效应方向判断",
+    "建议继续运行试验或进行迭代优化，当前证据不足以支持决策",
+    "建议补全缺失字段：observation_window_days, planned_sample_size, current_day, stopping_threshold，以获得更完整的分析结果"
+  ],
+  "generated_at": "2026-05-28T22:15:14.974100"
+}

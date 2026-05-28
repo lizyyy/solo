@@ -1,0 +1,26 @@
+{
+  "experiment_id": "EXP-005-DIRTY",
+  "experiment_name": "脏数据测试样例",
+  "control": {
+    "name": "对照组",
+    "variant_type": "treatment",
+    "sample_size": 500,
+    "conversions": 600
+  },
+  "treatment": {
+    "name": "实验组",
+    "variant_type": "control",
+    "sample_size": -100,
+    "conversions": null
+  },
+  "prior": {
+    "alpha": -5,
+    "beta": null,
+    "description": "无效的先验参数"
+  },
+  "observation_window_days": 0,
+  "planned_sample_size": "not_a_number",
+  "current_day": 20,
+  "stopping_threshold": 1.5,
+  "notes": "测试样例5：脏数据场景。包含：变体类型错误、转化数>样本量、负样本量、缺失转化数、负的先验参数、缺失beta、零观察窗口、计划样本量类型错误、阈值超出范围、当前天数>观察窗口"
+}

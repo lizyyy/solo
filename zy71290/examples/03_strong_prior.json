@@ -1,0 +1,26 @@
+{
+  "experiment_id": "EXP-003-STRONGPRIOR",
+  "experiment_name": "支付流程优化 - 先验过强风险",
+  "control": {
+    "name": "原流程",
+    "variant_type": "control",
+    "sample_size": 200,
+    "conversions": 60
+  },
+  "treatment": {
+    "name": "新流程",
+    "variant_type": "treatment",
+    "sample_size": 210,
+    "conversions": 72
+  },
+  "prior": {
+    "alpha": 500,
+    "beta": 1500,
+    "description": "非常强的先验，认为转化率稳定在25%左右，先验强度达2000"
+  },
+  "observation_window_days": 21,
+  "planned_sample_size": 2000,
+  "current_day": 7,
+  "stopping_threshold": 0.95,
+  "notes": "测试样例3：先验强度2000，实际样本仅410，先验贡献占比达83%，检测先验过强风险"
+}

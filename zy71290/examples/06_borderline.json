@@ -1,0 +1,26 @@
+{
+  "experiment_id": "EXP-006-BORDERLINE",
+  "experiment_name": "推荐算法优化 - 临界数据",
+  "control": {
+    "name": "旧算法",
+    "variant_type": "control",
+    "sample_size": 80,
+    "conversions": 12
+  },
+  "treatment": {
+    "name": "新算法",
+    "variant_type": "treatment",
+    "sample_size": 90,
+    "conversions": 18
+  },
+  "prior": {
+    "alpha": 5,
+    "beta": 45,
+    "description": "弱信息先验"
+  },
+  "observation_window_days": null,
+  "planned_sample_size": null,
+  "current_day": null,
+  "stopping_threshold": null,
+  "notes": "测试样例6：临界数据。样本量偏小(每组<100)，缺少多个推荐字段，数据质量为临界。P(实验组>对照组)约91%，95%CI包含零。"
+}

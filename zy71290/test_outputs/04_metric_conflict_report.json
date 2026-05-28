@@ -1,0 +1,336 @@
+{
+  "experiment_id": "EXP-004-CONFLICT",
+  "input_hash": "72bfde8e387147c575bf58f7317465c94b950230d6bd5be53a9da96939fd65c6",
+  "reproducibility_seed": 946948037,
+  "validation": {
+    "is_valid": true,
+    "fields": [
+      {
+        "field_name": "experiment_id",
+        "status": "present",
+        "message": "试验ID已提供",
+        "provided_value": "EXP-004-CONFLICT"
+      },
+      {
+        "field_name": "control",
+        "status": "present",
+        "message": "对照组数据已提供",
+        "provided_value": "VariantData(name='旧版详情页', variant_type=<VariantType.CONTROL: 'control'>, sample_size=3000, conversio"
+      },
+      {
+        "field_name": "treatment",
+        "status": "present",
+        "message": "实验组数据已提供",
+        "provided_value": "VariantData(name='新版详情页', variant_type=<VariantType.TREATMENT: 'treatment'>, sample_size=3000, conve"
+      },
+      {
+        "field_name": "prior",
+        "status": "present",
+        "message": "先验参数已提供",
+        "provided_value": "PriorParams(alpha=15, beta=85, description='基于历史数据的先验')"
+      },
+      {
+        "field_name": "observation_window_days",
+        "status": "present",
+        "message": "观察窗口(天)已提供",
+        "provided_value": "14"
+      },
+      {
+        "field_name": "planned_sample_size",
+        "status": "present",
+        "message": "计划样本量已提供",
+        "provided_value": "6000"
+      },
+      {
+        "field_name": "current_day",
+        "status": "present",
+        "message": "当前试验天数已提供",
+        "provided_value": "14"
+      },
+      {
+        "field_name": "stopping_threshold",
+        "status": "present",
+        "message": "停测阈值已提供",
+        "provided_value": "0.95"
+      },
+      {
+        "field_name": "control.name",
+        "status": "present",
+        "message": "对照组变体名称已提供",
+        "provided_value": "旧版详情页"
+      },
+      {
+        "field_name": "control.sample_size",
+        "status": "present",
+        "message": "对照组样本量有效",
+        "provided_value": 3000
+      },
+      {
+        "field_name": "control.conversions",
+        "status": "present",
+        "message": "对照组转化数有效",
+        "provided_value": 450
+      },
+      {
+        "field_name": "treatment.name",
+        "status": "present",
+        "message": "实验组变体名称已提供",
+        "provided_value": "新版详情页"
+      },
+      {
+        "field_name": "treatment.sample_size",
+        "status": "present",
+        "message": "实验组样本量有效",
+        "provided_value": 3000
+      },
+      {
+        "field_name": "treatment.conversions",
+        "status": "present",
+        "message": "实验组转化数有效",
+        "provided_value": 510
+      },
+      {
+        "field_name": "prior.alpha",
+        "status": "present",
+        "message": "先验参数 alpha 有效",
+        "provided_value": 15
+      },
+      {
+        "field_name": "prior.beta",
+        "status": "present",
+        "message": "先验参数 beta 有效",
+        "provided_value": 85
+      }
+    ],
+    "data_quality": "clean",
+    "processing_order": [
+      "开始验证试验ID和基本信息",
+      "验证对照组数据",
+      "验证实验组数据",
+      "验证先验参数",
+      "验证试验参数",
+      "验证多指标数据",
+      "检查数据质量和一致性",
+      "验证完成 - 有效: True, 数据质量: clean"
+    ],
+    "missing_fields": [],
+    "invalid_fields": [],
+    "warnings": [],
+    "errors": []
+  },
+  "bayesian_result": {
+    "control_posterior": {
+      "mean": 0.15,
+      "median": 0.1499247270100861,
+      "std": 0.006412157913428191,
+      "ci_lower": 0.13764847885577386,
+      "ci_upper": 0.16277923751173415,
+      "credible_level": 0.95
+    },
+    "treatment_posterior": {
+      "mean": 0.1693548387096774,
+      "median": 0.16928372728108107,
+      "std": 0.006735280565341865,
+      "ci_lower": 0.15635802370301577,
+      "ci_upper": 0.1827557244628488,
+      "credible_level": 0.95
+    },
+    "prior_strength": 100,
+    "effective_sample_size": 5901.639344262296,
+    "probability_treatment_better": 0.9964,
+    "expected_lift": 0.12959713741216333,
+    "lift_ci_lower": 0.07550719772085321,
+    "lift_ci_upper": 0.18785647762874733,
+    "computation_trace": {
+      "prior_strength": 100,
+      "effective_sample_size": 5901.639344262296,
+      "control_posterior_alpha": 465,
+      "control_posterior_beta": 2635,
+      "treatment_posterior_alpha": 525,
+      "treatment_posterior_beta": 2575,
+      "sample_count": 50000,
+      "credible_level": 0.95,
+      "seed": 946948037
+    },
+    "metric_results": {
+      "click_rate": {
+        "control_posterior": {
+          "mean": 0.29516129032258065,
+          "median": 0.29511723398383677,
+          "std": 0.00819075038166824,
+          "ci_lower": 0.2792343411299862,
+          "ci_upper": 0.31133857965658635,
+          "credible_level": 0.95
+        },
+        "treatment_posterior": {
+          "mean": 0.3435483870967742,
+          "median": 0.34351473752722655,
+          "std": 0.00852794584349425,
+          "ci_lower": 0.326930863858598,
+          "ci_upper": 0.3603571166643307,
+          "credible_level": 0.95
+        },
+        "prior_strength": 100,
+        "effective_sample_size": 5901.639344262296,
+        "probability_treatment_better": 0.99996,
+        "expected_lift": 0.16491205923247934,
+        "lift_ci_lower": 0.08396981735330517,
+        "lift_ci_upper": 0.25189770657019095,
+        "computation_trace": {
+          "prior_strength": 100,
+          "effective_sample_size": 5901.639344262296,
+          "control_posterior_alpha": 915,
+          "control_posterior_beta": 2185,
+          "treatment_posterior_alpha": 1065,
+          "treatment_posterior_beta": 2035,
+          "sample_count": 50000,
+          "credible_level": 0.95,
+          "seed": 946948037
+        }
+      },
+      "add_to_cart_rate": {
+        "control_posterior": {
+          "mean": 0.375,
+          "median": 0.37491663466458497,
+          "std": 0.015301661973160274,
+          "ci_lower": 0.3452531146872954,
+          "ci_upper": 0.4052204800791608,
+          "credible_level": 0.95
+        },
+        "treatment_posterior": {
+          "mean": 0.28695652173913044,
+          "median": 0.286832980992376,
+          "std": 0.013333015806147418,
+          "ci_lower": 0.2611817746323548,
+          "ci_upper": 0.3134331251965555,
+          "credible_level": 0.95
+        },
+        "prior_strength": 100,
+        "effective_sample_size": 1854.8780487804877,
+        "probability_treatment_better": 0.0,
+        "expected_lift": -0.23490339165134486,
+        "lift_ci_lower": -0.2454517929260196,
+        "lift_ci_upper": -0.22460657512976973,
+        "computation_trace": {
+          "prior_strength": 100,
+          "effective_sample_size": 1854.8780487804877,
+          "control_posterior_alpha": 375,
+          "control_posterior_beta": 625,
+          "treatment_posterior_alpha": 330,
+          "treatment_posterior_beta": 820,
+          "sample_count": 50000,
+          "credible_level": 0.95,
+          "seed": 946948037
+        }
+      },
+      "favorite_rate": {
+        "control_posterior": {
+          "mean": 0.19838709677419356,
+          "median": 0.19832222825673165,
+          "std": 0.0071612391534833465,
+          "ci_lower": 0.18453748655856692,
+          "ci_upper": 0.21260530538068148,
+          "credible_level": 0.95
+        },
+        "treatment_posterior": {
+          "mean": 0.1596774193548387,
+          "median": 0.15960422709833616,
+          "std": 0.006578000260290732,
+          "ci_lower": 0.1469948570078089,
+          "ci_upper": 0.1727758755846313,
+          "credible_level": 0.95
+        },
+        "prior_strength": 100,
+        "effective_sample_size": 5901.639344262296,
+        "probability_treatment_better": 0.0,
+        "expected_lift": -0.19524812021823967,
+        "lift_ci_lower": -0.20401299378589785,
+        "lift_ci_upper": -0.18682966317813696,
+        "computation_trace": {
+          "prior_strength": 100,
+          "effective_sample_size": 5901.639344262296,
+          "control_posterior_alpha": 615,
+          "control_posterior_beta": 2485,
+          "treatment_posterior_alpha": 495,
+          "treatment_posterior_beta": 2605,
+          "sample_count": 50000,
+          "credible_level": 0.95,
+          "seed": 946948037
+        }
+      }
+    }
+  },
+  "risk_assessment": {
+    "has_early_stop": false,
+    "has_strong_prior": false,
+    "has_metric_conflict": true,
+    "overall_risk_level": "high",
+    "flags": [
+      {
+        "risk_type": "metric_conflict",
+        "level": "high",
+        "message": "多指标方向冲突：正向指标 [click_rate] 与负向指标 [add_to_cart_rate, favorite_rate] 同时存在。正向指标P(实验组>对照组)≥80%，负向指标P(实验组>对照组)≤20%",
+        "evidence": {
+          "metric_directions": {
+            "click_rate": {
+              "probability_treatment_better": 0.99996,
+              "expected_lift": 0.16491205923247934,
+              "ci_lower": 0.08396981735330517,
+              "ci_upper": 0.25189770657019095,
+              "ci_includes_zero": false
+            },
+            "add_to_cart_rate": {
+              "probability_treatment_better": 0.0,
+              "expected_lift": -0.23490339165134486,
+              "ci_lower": -0.2454517929260196,
+              "ci_upper": -0.22460657512976973,
+              "ci_includes_zero": false
+            },
+            "favorite_rate": {
+              "probability_treatment_better": 0.0,
+              "expected_lift": -0.19524812021823967,
+              "ci_lower": -0.20401299378589785,
+              "ci_upper": -0.18682966317813696,
+              "ci_includes_zero": false
+            }
+          },
+          "positive_metrics": [
+            "click_rate"
+          ],
+          "negative_metrics": [
+            "add_to_cart_rate",
+            "favorite_rate"
+          ],
+          "inconclusive_metrics": [],
+          "conflict_threshold": 0.8
+        },
+        "recommendation": "存在指标冲突，需谨慎解读试验结果。建议：1) 检查各指标的业务相关性和权重；2) 进行多重比较校正（如使用贝叶斯多重检验）；3) 综合考虑预期损失进行决策；4) 如有可能，结合定性研究理解冲突原因。"
+      },
+      {
+        "risk_type": "wide_ci",
+        "level": "low",
+        "message": "提升量的可信区间较宽（11.2%），效应量估计不够精确",
+        "evidence": {
+          "lift_ci_lower": 0.07550719772085321,
+          "lift_ci_upper": 0.18785647762874733,
+          "ci_width": 0.11234927990789412,
+          "expected_lift": 0.12959713741216333,
+          "ci_includes_zero": false
+        },
+        "recommendation": "建议收集更多数据以提高效应量估计精度。"
+      }
+    ],
+    "stopping_recommendation": "not_stopped",
+    "stopping_message": "⚠️ 多指标方向冲突，不建议停测。需要进一步分析指标冲突原因，综合评估业务影响。"
+  },
+  "conclusions": [
+    "✅ 数据质量良好，所有必需字段完整有效",
+    "✅ 统计结论：实验组以 99.6% 的概率优于对照组，预期提升 12.96%",
+    "⚠️ 多指标方向存在冲突，需综合业务判断"
+  ],
+  "recommendations": [
+    "建议组织跨部门评审，综合考虑各指标的业务权重和影响",
+    "建议上线实验组方案，并持续监控核心指标表现"
+  ],
+  "generated_at": "2026-05-28T22:15:14.955693"
+}

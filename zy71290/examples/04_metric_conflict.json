@@ -1,0 +1,70 @@
+{
+  "experiment_id": "EXP-004-CONFLICT",
+  "experiment_name": "商品详情页改版 - 多指标方向冲突",
+  "control": {
+    "name": "旧版详情页",
+    "variant_type": "control",
+    "sample_size": 3000,
+    "conversions": 450
+  },
+  "treatment": {
+    "name": "新版详情页",
+    "variant_type": "treatment",
+    "sample_size": 3000,
+    "conversions": 510
+  },
+  "prior": {
+    "alpha": 15,
+    "beta": 85,
+    "description": "基于历史数据的先验"
+  },
+  "observation_window_days": 14,
+  "planned_sample_size": 6000,
+  "current_day": 14,
+  "stopping_threshold": 0.95,
+  "metrics": [
+    {
+      "name": "点击率_控制",
+      "variant_type": "control",
+      "metric_name": "click_rate",
+      "sample_size": 3000,
+      "conversions": 900
+    },
+    {
+      "name": "点击率_实验",
+      "variant_type": "treatment",
+      "metric_name": "click_rate",
+      "sample_size": 3000,
+      "conversions": 1050
+    },
+    {
+      "name": "加购率_控制",
+      "variant_type": "control",
+      "metric_name": "add_to_cart_rate",
+      "sample_size": 900,
+      "conversions": 360
+    },
+    {
+      "name": "加购率_实验",
+      "variant_type": "treatment",
+      "metric_name": "add_to_cart_rate",
+      "sample_size": 1050,
+      "conversions": 315
+    },
+    {
+      "name": "收藏率_控制",
+      "variant_type": "control",
+      "metric_name": "favorite_rate",
+      "sample_size": 3000,
+      "conversions": 600
+    },
+    {
+      "name": "收藏率_实验",
+      "variant_type": "treatment",
+      "metric_name": "favorite_rate",
+      "sample_size": 3000,
+      "conversions": 480
+    }
+  ],
+  "notes": "测试样例4：多指标冲突场景。点击率正向(92%+)，但加购率和收藏率负向(95%+)，检测指标方向冲突"
+}

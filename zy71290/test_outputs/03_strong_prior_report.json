@@ -1,0 +1,215 @@
+{
+  "experiment_id": "EXP-003-STRONGPRIOR",
+  "input_hash": "2afbb312a48f81ba19e560d9ebdfc1e9319ec1539fe43ea8844bbe7851e65a1c",
+  "reproducibility_seed": 2760868282,
+  "validation": {
+    "is_valid": true,
+    "fields": [
+      {
+        "field_name": "experiment_id",
+        "status": "present",
+        "message": "试验ID已提供",
+        "provided_value": "EXP-003-STRONGPRIOR"
+      },
+      {
+        "field_name": "control",
+        "status": "present",
+        "message": "对照组数据已提供",
+        "provided_value": "VariantData(name='原流程', variant_type=<VariantType.CONTROL: 'control'>, sample_size=200, conversions="
+      },
+      {
+        "field_name": "treatment",
+        "status": "present",
+        "message": "实验组数据已提供",
+        "provided_value": "VariantData(name='新流程', variant_type=<VariantType.TREATMENT: 'treatment'>, sample_size=210, conversi"
+      },
+      {
+        "field_name": "prior",
+        "status": "present",
+        "message": "先验参数已提供",
+        "provided_value": "PriorParams(alpha=500, beta=1500, description='非常强的先验，认为转化率稳定在25%左右，先验强度达2000')"
+      },
+      {
+        "field_name": "observation_window_days",
+        "status": "present",
+        "message": "观察窗口(天)已提供",
+        "provided_value": "21"
+      },
+      {
+        "field_name": "planned_sample_size",
+        "status": "present",
+        "message": "计划样本量已提供",
+        "provided_value": "2000"
+      },
+      {
+        "field_name": "current_day",
+        "status": "present",
+        "message": "当前试验天数已提供",
+        "provided_value": "7"
+      },
+      {
+        "field_name": "stopping_threshold",
+        "status": "present",
+        "message": "停测阈值已提供",
+        "provided_value": "0.95"
+      },
+      {
+        "field_name": "control.name",
+        "status": "present",
+        "message": "对照组变体名称已提供",
+        "provided_value": "原流程"
+      },
+      {
+        "field_name": "control.sample_size",
+        "status": "present",
+        "message": "对照组样本量有效",
+        "provided_value": 200
+      },
+      {
+        "field_name": "control.conversions",
+        "status": "present",
+        "message": "对照组转化数有效",
+        "provided_value": 60
+      },
+      {
+        "field_name": "treatment.name",
+        "status": "present",
+        "message": "实验组变体名称已提供",
+        "provided_value": "新流程"
+      },
+      {
+        "field_name": "treatment.sample_size",
+        "status": "present",
+        "message": "实验组样本量有效",
+        "provided_value": 210
+      },
+      {
+        "field_name": "treatment.conversions",
+        "status": "present",
+        "message": "实验组转化数有效",
+        "provided_value": 72
+      },
+      {
+        "field_name": "prior.alpha",
+        "status": "present",
+        "message": "先验参数 alpha 有效",
+        "provided_value": 500
+      },
+      {
+        "field_name": "prior.beta",
+        "status": "present",
+        "message": "先验参数 beta 有效",
+        "provided_value": 1500
+      }
+    ],
+    "data_quality": "clean",
+    "processing_order": [
+      "开始验证试验ID和基本信息",
+      "验证对照组数据",
+      "验证实验组数据",
+      "验证先验参数",
+      "验证试验参数",
+      "验证多指标数据",
+      "检查数据质量和一致性",
+      "验证完成 - 有效: True, 数据质量: clean"
+    ],
+    "missing_fields": [],
+    "invalid_fields": [],
+    "warnings": [],
+    "errors": []
+  },
+  "bayesian_result": {
+    "control_posterior": {
+      "mean": 0.2545454545454545,
+      "median": 0.254471063407449,
+      "std": 0.009285028378174652,
+      "ci_lower": 0.23656114108304602,
+      "ci_upper": 0.2729524579941222,
+      "credible_level": 0.95
+    },
+    "treatment_posterior": {
+      "mean": 0.25882352941176473,
+      "median": 0.25875076553268356,
+      "std": 0.009314688119315078,
+      "ci_lower": 0.24077641611557432,
+      "ci_upper": 0.2772840870590583,
+      "credible_level": 0.95
+    },
+    "prior_strength": 2000,
+    "effective_sample_size": 69.75103734439834,
+    "probability_treatment_better": 1.0,
+    "expected_lift": 0.01682087844165695,
+    "lift_ci_lower": 0.01581542486554065,
+    "lift_ci_upper": 0.01788821963677573,
+    "computation_trace": {
+      "prior_strength": 2000,
+      "effective_sample_size": 69.75103734439834,
+      "control_posterior_alpha": 560,
+      "control_posterior_beta": 1640,
+      "treatment_posterior_alpha": 572,
+      "treatment_posterior_beta": 1638,
+      "sample_count": 50000,
+      "credible_level": 0.95,
+      "seed": 2760868282
+    }
+  },
+  "risk_assessment": {
+    "has_early_stop": true,
+    "has_strong_prior": true,
+    "has_metric_conflict": false,
+    "overall_risk_level": "critical",
+    "flags": [
+      {
+        "risk_type": "early_stopping",
+        "level": "medium",
+        "message": "当前仅收集了计划样本量的 20.5%（410/2000） | 但P(实验组>对照组)已达 100.0%，存在过早得出结论的风险 | 当前仅进行了观察窗口的 33.3%（7/21天）",
+        "evidence": {
+          "current_sample_size": 410,
+          "planned_sample_size": 2000,
+          "sample_ratio": 0.205,
+          "probability_treatment_better": 1.0,
+          "current_day": 7,
+          "observation_window_days": 21,
+          "day_ratio": 0.3333333333333333
+        },
+        "recommendation": "建议继续收集数据直至达到计划样本量或观察窗口结束。提前停测可能高估效应量并增加假阳性风险。如需提前决策，请参考预期损失（EL）和贝叶斯因子（BF）。"
+      },
+      {
+        "risk_type": "strong_prior",
+        "level": "critical",
+        "message": "先验强度 (2000.0) 相对于实际样本量 (410) 过强，先验对后验的贡献占比达 83.0%，后验结果可能主要由先验主导而非实际数据",
+        "evidence": {
+          "prior_strength": 2000,
+          "total_observations": 410,
+          "prior_contribution_ratio": 0.8298755186721992,
+          "prior_description": "非常强的先验，认为转化率稳定在25%左右，先验强度达2000"
+        },
+        "recommendation": "强烈建议弱化先验（减小alpha+beta）或收集更多实际数据。当前先验可能掩盖了数据中的真实效应。可考虑使用无信息先验（如Beta(1,1)）进行敏感性分析。"
+      },
+      {
+        "risk_type": "small_sample",
+        "level": "medium",
+        "message": "样本量偏小：对照组 200，实验组 210，总样本量 410，有效样本量 70。结论可能不够稳健",
+        "evidence": {
+          "control_sample_size": 200,
+          "treatment_sample_size": 210,
+          "total_sample_size": 410,
+          "effective_sample_size": 69.75103734439834
+        },
+        "recommendation": "建议继续收集数据以提高结论稳健性。如需基于当前数据决策，请谨慎解读并报告不确定性。"
+      }
+    ],
+    "stopping_recommendation": "early_stop",
+    "stopping_message": "⚠️ 检测到提前停测风险！虽然P(实验组>对照组)=100.0% 已达到阈值95%，但当前仅完成了计划的一部分。建议：继续试验直至样本量或观察窗口达标，或使用贝叶斯因子/预期损失进行更保守的决策。"
+  },
+  "conclusions": [
+    "✅ 数据质量良好，所有必需字段完整有效",
+    "✅ 统计结论：实验组以 100.0% 的概率优于对照组，预期提升 1.68%",
+    "⚠️ 检测到提前停测风险，结论需谨慎解读",
+    "⚠️ 先验设置较强，可能影响结论客观性"
+  ],
+  "recommendations": [
+    "建议继续收集数据直至达到计划样本量或观察窗口结束"
+  ],
+  "generated_at": "2026-05-28T22:15:14.905173"
+}

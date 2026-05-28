@@ -1,0 +1,26 @@
+{
+  "experiment_id": "EXP-002-EARLYSTOP",
+  "experiment_name": "新用户引导试验 - 提前停测风险",
+  "control": {
+    "name": "对照组",
+    "variant_type": "control",
+    "sample_size": 500,
+    "conversions": 45
+  },
+  "treatment": {
+    "name": "实验组",
+    "variant_type": "treatment",
+    "sample_size": 520,
+    "conversions": 78
+  },
+  "prior": {
+    "alpha": 5,
+    "beta": 45,
+    "description": "基于历史数据的弱先验"
+  },
+  "observation_window_days": 14,
+  "planned_sample_size": 4000,
+  "current_day": 3,
+  "stopping_threshold": 0.95,
+  "notes": "测试样例2：样本量仅完成25%，试验仅进行3天，但P(实验组>对照组)已达97%+，检测提前停测风险"
+}
