@@ -55,13 +55,6 @@ export default function Conclusion() {
     }
   };
 
-  const getCorrectness = (clueId: string) => {
-    const choice = session.playerChoices.find(c => c.clueId === clueId);
-    const clue = currentLevel.clues.find(c => c.id === clueId);
-    if (!choice || !clue) return null;
-    return choice.markedAsAnomaly === clue.isAnomaly;
-  };
-
   const handleExportSummary = () => {
     const report = exportReport(session.id);
     const summaryText = generateSummaryText(report);
@@ -321,7 +314,7 @@ ${currentLevel.expertComments.map(c => `> **${c.expertName}**：${c.content}`).j
                   
                   {session.playerChoices
                     .sort((a, b) => a.timestamp - b.timestamp)
-                    .map((choice, index) => {
+                    .map((choice) => {
                       const clue = currentLevel.clues.find(c => c.id === choice.clueId);
                       if (!clue) return null;
                       

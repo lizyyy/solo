@@ -1,57 +1,110 @@
-# React + TypeScript + Vite
+# 古画鉴定线索局
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+博物馆教育类古画鉴定推理小游戏，玩家通过分析纸张、印章、题跋、修复痕迹等线索进行疑点识别，体验专业文物鉴定过程。
 
-Currently, two official plugins are available:
+## ✨ 功能特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🎮 核心玩法
+- **线索分析**：五大类线索（纸张、印章、题跋、修复、科学检测报告）
+- **年代推断**：7个朝代选项 + 推理依据输入
+- **风险评级**：三级风险等级评定
+- **结算回放**：完整游戏记录回放，关键选择时间线展示
+- **双格式报告**：人读摘要(Markdown) + 结构化明细(JSON)
 
-## Expanding the ESLint configuration
+### 📊 评分系统
+- **准确度分 (40%)**：标记疑点的正确率
+- **发现率分 (30%)**：发现疑点的覆盖率
+- **逻辑分 (30%)**：年代推断 + 推理依据
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 🎨 古风UI设计
+- 宣纸纹理背景，水墨配色
+- 卷轴展开、墨韵扩散动画
+- 楷体/宋体双字体系统
+- 扇面式线索分类标签
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 🚀 快速开始
+
+### 安装依赖
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 启动开发服务器
+```bash
+npm run dev
 ```
+
+### 构建生产版本
+```bash
+npm run build
+```
+
+### 代码检查
+```bash
+npm run lint
+```
+
+### TypeScript类型检查
+```bash
+npx tsc --noEmit
+```
+
+## 📁 项目结构
+
+```
+src/
+├── types/              # 类型定义
+│   └── index.ts        # 核心类型
+├── data/               # 游戏数据
+│   └── levels.ts       # 关卡配置
+├── store/              # 状态管理
+│   └── gameStore.ts    # Zustand store
+├── pages/              # 页面组件
+│   ├── Home.tsx        # 首页
+│   ├── Game.tsx        # 游戏主界面
+│   ├── Conclusion.tsx  # 结算页面
+│   └── Replay.tsx      # 回放页面
+├── components/         # 功能组件
+│   ├── CluePanel.tsx   # 线索面板
+│   ├── DynastyGuess.tsx # 年代推断
+│   └── RiskRating.tsx  # 风险评级
+├── App.tsx             # 路由配置
+└── main.tsx            # 应用入口
+```
+
+## 🎯 游戏路线
+
+1. **首页** → 选择关卡，查看历史记录
+2. **任务介绍** → 了解鉴定任务
+3. **线索分析** → 浏览线索，标记疑点
+4. **年代推断** → 选择朝代，填写推理依据
+5. **风险评级** → 评估疑点风险等级
+6. **结算回放** → 查看得分、专家解析
+7. **报告导出** → 下载鉴定报告
+
+## 🔄 回放功能
+
+- 从首页历史记录进入回放模式
+- 支持播放/暂停、步进控制
+- 0.5x/1x/2x 三档播放速度
+- 时间线节点快速跳转
+- 完整操作详情展示
+
+## 🛠️ 技术栈
+
+- **框架**: React 18 + TypeScript
+- **构建**: Vite 5
+- **样式**: TailwindCSS 3
+- **状态**: Zustand
+- **路由**: React Router 6
+- **动画**: Framer Motion
+- **图标**: Lucide React
+- **存储**: LocalStorage
+
+## 📜 License
+
+MIT
+
+---
+
+*故宫博物院 · 古画鉴定教育体验项目*

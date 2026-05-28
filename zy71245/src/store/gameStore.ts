@@ -189,12 +189,9 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
 
     const anomalyClues = currentLevel.clues.filter(c => c.isAnomaly);
-    const normalClues = currentLevel.clues.filter(c => !c.isAnomaly);
 
     let truePositives = 0;
     let falsePositives = 0;
-    let trueNegatives = 0;
-    let falseNegatives = 0;
 
     currentSession.playerChoices.forEach(choice => {
       const clue = currentLevel.clues.find(c => c.id === choice.clueId);
@@ -206,24 +203,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         } else {
           falsePositives++;
         }
-      } else {
-        if (!clue.isAnomaly) {
-          trueNegatives++;
-        } else {
-          falseNegatives++;
-        }
       }
     });
-
-    const unmarkedAnomalies = anomalyClues.filter(
-      ac => !currentSession.playerChoices.some(pc => pc.clueId === ac.id)
-    ).length;
-    falseNegatives += unmarkedAnomalies;
-
-    const unmarkedNormal = normalClues.filter(
-      nc => !currentSession.playerChoices.some(pc => pc.clueId === nc.id)
-    ).length;
-    trueNegatives += unmarkedNormal;
 
     const accuracy = anomalyClues.length > 0 
       ? (truePositives / anomalyClues.length) * 100

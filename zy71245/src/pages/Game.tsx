@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Home, ChevronLeft, ChevronRight, Image as ImageIcon, Info } from 'lucide-react';
+import { Home, ChevronRight, Image as ImageIcon, Info } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import CluePanel from '../components/CluePanel';
 import DynastyGuess from '../components/DynastyGuess';
