@@ -1,0 +1,69 @@
+{
+  "simulation_info": {
+    "simulation_id": "8be91fa2",
+    "simulation_name": "测试模拟",
+    "start_time": "2026-05-28T21:31:02.195238",
+    "end_time": "2026-05-28T21:31:02.195291",
+    "total_applications": 2,
+    "confirmed_count": 2,
+    "partial_confirmed_count": 0,
+    "rejected_count": 0,
+    "queued_count": 0
+  },
+  "applications": [
+    {
+      "app_id": "APP48E0B684",
+      "customer_id": "C001",
+      "customer_name": "测试客户A",
+      "customer_level": "INSTITUTION",
+      "app_type": "REDEEM",
+      "amount": 5000000.0,
+      "shares": null,
+      "app_time": "2026-05-29T09:30:00",
+      "trading_day": "2026-05-29",
+      "status": "CONFIRMED",
+      "confirmed_amount": 5000000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 1.0,
+      "queue_position": 1,
+      "reject_reason": null,
+      "explanation": [
+        "正常确认: 全额确认5000000.00"
+      ],
+      "metadata": {}
+    },
+    {
+      "app_id": "APPA5670CA1",
+      "customer_id": "C002",
+      "customer_name": "测试客户B",
+      "customer_level": "NORMAL",
+      "app_type": "REDEEM",
+      "amount": 500000.0,
+      "shares": null,
+      "app_time": "2026-05-29T09:30:00",
+      "trading_day": "2026-05-29",
+      "status": "CONFIRMED",
+      "confirmed_amount": 500000.0,
+      "confirmed_shares": 0.0,
+      "confirm_ratio": 1.0,
+      "queue_position": 2,
+      "reject_reason": null,
+      "explanation": [
+        "正常确认: 全额确认500000.00"
+      ],
+      "metadata": {}
+    }
+  ],
+  "fund_pool_snapshots": [
+    {
+      "timestamp": "2026-05-28T21:31:02.195242",
+      "fund_pool": {
+        "fund_id": "F001",
+        "fund_name": "测试基金",
+        "total_shares": 10000000,
+        "available_cash": 15000000,
+        "total_asset": 100000000,
+        "daily_redeem_limit": 20000000,
+        "mass_redemption_ratio": 0.1,
+        "current_redeemed_amount": 0.0,
+        "last_update": 
