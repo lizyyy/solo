@@ -1,0 +1,5 @@
+name,sku,cost_price,selling_price,initial_stock,notes
+巡演限定T恤,TSHIRT-001,100元,89元,500,成本价100 > 售价89，逻辑矛盾，数值带单位
+乐队卫衣,,75,168,,SKU缺失，库存为空
+巡演海报,POSTER-001,,25,800,成本价缺失
+纪念徽章,PIN-001,5,20,-100,库存为负数，逻辑矛盾
