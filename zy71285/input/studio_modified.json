@@ -1,0 +1,20 @@
+{
+  "project_id": "studio_normal_v1",
+  "room_dimensions": {
+    "length": 6.5,
+    "width": 4.5,
+    "height": 3.0,
+    "unit": "m"
+  },
+  "sound_speed": 343.0,
+  "min_frequency": 20.0,
+  "max_frequency": 200.0,
+  "listening_points": [
+    {
+      "x": 3.25,
+      "y": 2.25,
+      "z": 1.2
+    }
+  ],
+  "notes": "修改后的配置 - 用于差异对比测试"
+}

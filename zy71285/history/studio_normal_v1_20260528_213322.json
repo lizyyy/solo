@@ -1,0 +1,2887 @@
+{
+  "project_id": "studio_normal_v1",
+  "config": {
+    "project_id": "studio_normal_v1",
+    "room_dimensions": {
+      "length": 6.5,
+      "width": 4.5,
+      "height": 3.0,
+      "unit": "m"
+    },
+    "sound_speed": 343.0,
+    "min_frequency": 20.0,
+    "max_frequency": 200.0,
+    "listening_points": [
+      {
+        "x": 3.25,
+        "y": 2.25,
+        "z": 1.2,
+        "unit": "m"
+      }
+    ],
+    "absorption_materials": {},
+    "notes": "修改后的配置 - 用于差异对比测试",
+    "issues": [],
+    "is_valid": true
+  },
+  "modes": [
+    {
+      "frequency": 26.38,
+      "nx": 1,
+      "ny": 0,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 13.0,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 38.11,
+      "nx": 0,
+      "ny": 1,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 9.0,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 46.35,
+      "nx": 1,
+      "ny": 1,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 7.4,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 52.77,
+      "nx": 2,
+      "ny": 0,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 6.5,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 57.17,
+      "nx": 0,
+      "ny": 0,
+      "nz": 1,
+      "mode_type": "axial",
+      "wavelength": 6.0,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 62.96,
+      "nx": 1,
+      "ny": 0,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 5.448,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 65.09,
+      "nx": 2,
+      "ny": 1,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 5.269,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 68.71,
+      "nx": 0,
+      "ny": 1,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 4.992,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 73.6,
+      "nx": 1,
+      "ny": 1,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 4.66,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 76.22,
+      "nx": 0,
+      "ny": 2,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 4.5,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 77.8,
+      "nx": 2,
+      "ny": 0,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 4.409,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 79.15,
+      "nx": 3,
+      "ny": 0,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 4.333,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 80.66,
+      "nx": 1,
+      "ny": 2,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 4.252,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 86.63,
+      "nx": 2,
+      "ny": 1,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 3.959,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 87.85,
+      "nx": 3,
+      "ny": 1,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 3.904,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 92.71,
+      "nx": 2,
+      "ny": 2,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 3.7,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 95.28,
+      "nx": 0,
+      "ny": 2,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 3.6,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 97.64,
+      "nx": 3,
+      "ny": 0,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 3.513,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 98.86,
+      "nx": 1,
+      "ny": 2,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 3.469,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 104.81,
+      "nx": 3,
+      "ny": 1,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 3.272,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 105.54,
+      "nx": 4,
+      "ny": 0,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 3.25,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 108.91,
+      "nx": 2,
+      "ny": 2,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 3.149,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 109.89,
+      "nx": 3,
+      "ny": 2,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 3.121,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 112.21,
+      "nx": 4,
+      "ny": 1,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 3.057,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 114.33,
+      "nx": 0,
+      "ny": 0,
+      "nz": 2,
+      "mode_type": "axial",
+      "wavelength": 3.0,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 114.33,
+      "nx": 0,
+      "ny": 3,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 3.0,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 117.34,
+      "nx": 1,
+      "ny": 0,
+      "nz": 2,
+      "mode_type": "tangential",
+      "wavelength": 2.923,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 117.34,
+      "nx": 1,
+      "ny": 3,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 2.923,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 120.03,
+      "nx": 4,
+      "ny": 0,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 2.858,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 120.52,
+      "nx": 0,
+      "ny": 1,
+      "nz": 2,
+      "mode_type": "tangential",
+      "wavelength": 2.846,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 123.37,
+      "nx": 1,
+      "ny": 1,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 2.78,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 123.87,
+      "nx": 3,
+      "ny": 2,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 2.769,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 125.92,
+      "nx": 2,
+      "ny": 0,
+      "nz": 2,
+      "mode_type": "tangential",
+      "wavelength": 2.724,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 125.92,
+      "nx": 2,
+      "ny": 3,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 2.724,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 125.93,
+      "nx": 4,
+      "ny": 1,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 2.724,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 127.83,
+      "nx": 0,
+      "ny": 3,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 2.683,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 130.19,
+      "nx": 4,
+      "ny": 2,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 2.635,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 130.52,
+      "nx": 1,
+      "ny": 3,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 2.628,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 131.56,
+      "nx": 2,
+      "ny": 1,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 2.607,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 131.92,
+      "nx": 5,
+      "ny": 0,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 2.6,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 137.32,
+      "nx": 5,
+      "ny": 1,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 2.498,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 137.41,
+      "nx": 0,
+      "ny": 2,
+      "nz": 2,
+      "mode_type": "tangential",
+      "wavelength": 2.496,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 138.29,
+      "nx": 2,
+      "ny": 3,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 2.48,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 139.06,
+      "nx": 3,
+      "ny": 0,
+      "nz": 2,
+      "mode_type": "tangential",
+      "wavelength": 2.467,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 139.06,
+      "nx": 3,
+      "ny": 3,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 2.467,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 139.92,
+      "nx": 1,
+      "ny": 2,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 2.451,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 142.18,
+      "nx": 4,
+      "ny": 2,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 2.412,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 143.78,
+      "nx": 5,
+      "ny": 0,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 2.386,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 144.19,
+      "nx": 3,
+      "ny": 1,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 2.379,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 147.2,
+      "nx": 2,
+      "ny": 2,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 2.33,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 148.74,
+      "nx": 5,
+      "ny": 1,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 2.306,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 150.35,
+      "nx": 3,
+      "ny": 3,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 2.281,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 152.36,
+      "nx": 5,
+      "ny": 2,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 2.251,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 152.44,
+      "nx": 0,
+      "ny": 4,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 2.25,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 154.71,
+      "nx": 1,
+      "ny": 4,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 2.217,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 155.6,
+      "nx": 4,
+      "ny": 0,
+      "nz": 2,
+      "mode_type": "tangential",
+      "wavelength": 2.204,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 155.6,
+      "nx": 4,
+      "ny": 3,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 2.204,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 158.31,
+      "nx": 6,
+      "ny": 0,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 2.167,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 158.58,
+      "nx": 3,
+      "ny": 2,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 2.163,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 160.2,
+      "nx": 4,
+      "ny": 1,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 2.141,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 161.32,
+      "nx": 2,
+      "ny": 4,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 2.126,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 161.69,
+      "nx": 0,
+      "ny": 3,
+      "nz": 2,
+      "mode_type": "tangential",
+      "wavelength": 2.121,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 162.73,
+      "nx": 5,
+      "ny": 2,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 2.108,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 162.81,
+      "nx": 0,
+      "ny": 4,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 2.107,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 162.83,
+      "nx": 6,
+      "ny": 1,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 2.106,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 163.83,
+      "nx": 1,
+      "ny": 3,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 2.094,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 164.93,
+      "nx": 1,
+      "ny": 4,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 2.08,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 165.77,
+      "nx": 4,
+      "ny": 3,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 2.069,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 168.31,
+      "nx": 6,
+      "ny": 0,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 2.038,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 170.08,
+      "nx": 2,
+      "ny": 3,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 2.017,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 171.15,
+      "nx": 2,
+      "ny": 4,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 2.004,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 171.5,
+      "nx": 0,
+      "ny": 0,
+      "nz": 3,
+      "mode_type": "axial",
+      "wavelength": 2.0,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 171.77,
+      "nx": 3,
+      "ny": 4,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 1.997,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 172.57,
+      "nx": 6,
+      "ny": 1,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 1.988,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 173.26,
+      "nx": 4,
+      "ny": 2,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 1.98,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 173.52,
+      "nx": 1,
+      "ny": 0,
+      "nz": 3,
+      "mode_type": "tangential",
+      "wavelength": 1.977,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 174.57,
+      "nx": 5,
+      "ny": 0,
+      "nz": 2,
+      "mode_type": "tangential",
+      "wavelength": 1.965,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 174.57,
+      "nx": 5,
+      "ny": 3,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 1.965,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 175.68,
+      "nx": 0,
+      "ny": 1,
+      "nz": 3,
+      "mode_type": "tangential",
+      "wavelength": 1.952,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 175.7,
+      "nx": 6,
+      "ny": 2,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 1.952,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 177.65,
+      "nx": 1,
+      "ny": 1,
+      "nz": 3,
+      "mode_type": "oblique",
+      "wavelength": 1.931,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 178.68,
+      "nx": 5,
+      "ny": 1,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 1.92,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 179.43,
+      "nx": 2,
+      "ny": 0,
+      "nz": 3,
+      "mode_type": "tangential",
+      "wavelength": 1.912,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 180.03,
+      "nx": 3,
+      "ny": 3,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 1.905,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 181.03,
+      "nx": 3,
+      "ny": 4,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 1.895,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 183.44,
+      "nx": 2,
+      "ny": 1,
+      "nz": 3,
+      "mode_type": "oblique",
+      "wavelength": 1.87,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 183.69,
+      "nx": 5,
+      "ny": 3,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 1.867,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 184.69,
+      "nx": 7,
+      "ny": 0,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 1.857,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 184.77,
+      "nx": 6,
+      "ny": 2,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 1.856,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 185.41,
+      "nx": 4,
+      "ny": 4,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 1.85,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 187.68,
+      "nx": 0,
+      "ny": 2,
+      "nz": 3,
+      "mode_type": "tangential",
+      "wavelength": 1.828,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 188.58,
+      "nx": 7,
+      "ny": 1,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 1.819,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 188.89,
+      "nx": 3,
+      "ny": 0,
+      "nz": 3,
+      "mode_type": "tangential",
+      "wavelength": 1.816,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 189.52,
+      "nx": 1,
+      "ny": 2,
+      "nz": 3,
+      "mode_type": "oblique",
+      "wavelength": 1.81,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 190.49,
+      "nx": 5,
+      "ny": 2,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 1.801,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 190.56,
+      "nx": 0,
+      "ny": 4,
+      "nz": 2,
+      "mode_type": "tangential",
+      "wavelength": 1.8,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 190.56,
+      "nx": 0,
+      "ny": 5,
+      "nz": 0,
+      "mode_type": "axial",
+      "wavelength": 1.8,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 192.37,
+      "nx": 1,
+      "ny": 4,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 1.783,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 192.37,
+      "nx": 1,
+      "ny": 5,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 1.783,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 192.69,
+      "nx": 3,
+      "ny": 1,
+      "nz": 3,
+      "mode_type": "oblique",
+      "wavelength": 1.78,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 193.09,
+      "nx": 4,
+      "ny": 3,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 1.776,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 193.34,
+      "nx": 7,
+      "ny": 0,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 1.774,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 194.03,
+      "nx": 4,
+      "ny": 4,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 1.768,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 194.95,
+      "nx": 2,
+      "ny": 2,
+      "nz": 3,
+      "mode_type": "oblique",
+      "wavelength": 1.759,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 195.28,
+      "nx": 6,
+      "ny": 0,
+      "nz": 2,
+      "mode_type": "tangential",
+      "wavelength": 1.756,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 195.28,
+      "nx": 6,
+      "ny": 3,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 1.756,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 197.06,
+      "nx": 7,
+      "ny": 1,
+      "nz": 1,
+      "mode_type": "oblique",
+      "wavelength": 1.741,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 197.73,
+      "nx": 2,
+      "ny": 4,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 1.735,
+      "degeneracy": 2
+    },
+    {
+      "frequency": 197.73,
+      "nx": 2,
+      "ny": 5,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 1.735,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 198.95,
+      "nx": 0,
+      "ny": 5,
+      "nz": 1,
+      "mode_type": "tangential",
+      "wavelength": 1.724,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 198.96,
+      "nx": 6,
+      "ny": 1,
+      "nz": 2,
+      "mode_type": "oblique",
+      "wavelength": 1.724,
+      "degeneracy": 1
+    },
+    {
+      "frequency": 199.8,
+      "nx": 7,
+      "ny": 2,
+      "nz": 0,
+      "mode_type": "tangential",
+      "wavelength": 1.717,
+      "degeneracy": 1
+    }
+  ],
+  "frequency_gaps": [
+    {
+      "start_freq": 26.38,
+      "end_freq": 38.11,
+      "gap_size": 11.73,
+      "risk_level": "normal"
+    }
+  ],
+  "mode_clusters": [
+    {
+      "center_freq": 114.33,
+      "mode_count": 2,
+      "bandwidth": 0.0,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 114.33,
+          "nx": 0,
+          "ny": 0,
+          "nz": 2,
+          "mode_type": "axial",
+          "wavelength": 3.0,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 114.33,
+          "nx": 0,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "axial",
+          "wavelength": 3.0,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 117.34,
+      "mode_count": 2,
+      "bandwidth": 0.0,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 117.34,
+          "nx": 1,
+          "ny": 0,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 2.923,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 117.34,
+          "nx": 1,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.923,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 174.57,
+      "mode_count": 2,
+      "bandwidth": 0.0,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 174.57,
+          "nx": 5,
+          "ny": 0,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 1.965,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 174.57,
+          "nx": 5,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.965,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 195.28,
+      "mode_count": 2,
+      "bandwidth": 0.0,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 195.28,
+          "nx": 6,
+          "ny": 0,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 1.756,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 195.28,
+          "nx": 6,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.756,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 125.93,
+      "mode_count": 3,
+      "bandwidth": 0.01,
+      "risk_level": "warning",
+      "modes": [
+        {
+          "frequency": 125.92,
+          "nx": 2,
+          "ny": 0,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 2.724,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 125.92,
+          "nx": 2,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.724,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 125.93,
+          "nx": 4,
+          "ny": 1,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 2.724,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "center_freq": 175.69,
+      "mode_count": 2,
+      "bandwidth": 0.02,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 175.68,
+          "nx": 0,
+          "ny": 1,
+          "nz": 3,
+          "mode_type": "tangential",
+          "wavelength": 1.952,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 175.7,
+          "nx": 6,
+          "ny": 2,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.952,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 190.52,
+      "mode_count": 3,
+      "bandwidth": 0.07,
+      "risk_level": "warning",
+      "modes": [
+        {
+          "frequency": 190.49,
+          "nx": 5,
+          "ny": 2,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 1.801,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 190.56,
+          "nx": 0,
+          "ny": 4,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 1.8,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 190.56,
+          "nx": 0,
+          "ny": 5,
+          "nz": 0,
+          "mode_type": "axial",
+          "wavelength": 1.8,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 152.4,
+      "mode_count": 2,
+      "bandwidth": 0.08,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 152.36,
+          "nx": 5,
+          "ny": 2,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.251,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 152.44,
+          "nx": 0,
+          "ny": 4,
+          "nz": 0,
+          "mode_type": "axial",
+          "wavelength": 2.25,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 162.78,
+      "mode_count": 3,
+      "bandwidth": 0.1,
+      "risk_level": "warning",
+      "modes": [
+        {
+          "frequency": 162.73,
+          "nx": 5,
+          "ny": 2,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 2.108,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 162.81,
+          "nx": 0,
+          "ny": 4,
+          "nz": 1,
+          "mode_type": "tangential",
+          "wavelength": 2.107,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 162.83,
+          "nx": 6,
+          "ny": 1,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.106,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 183.57,
+      "mode_count": 2,
+      "bandwidth": 0.26,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 183.44,
+          "nx": 2,
+          "ny": 1,
+          "nz": 3,
+          "mode_type": "oblique",
+          "wavelength": 1.87,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 183.69,
+          "nx": 5,
+          "ny": 3,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 1.867,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 158.44,
+      "mode_count": 2,
+      "bandwidth": 0.27,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 158.31,
+          "nx": 6,
+          "ny": 0,
+          "nz": 0,
+          "mode_type": "axial",
+          "wavelength": 2.167,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 158.58,
+          "nx": 3,
+          "ny": 2,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 2.163,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "center_freq": 130.35,
+      "mode_count": 2,
+      "bandwidth": 0.34,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 130.19,
+          "nx": 4,
+          "ny": 2,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.635,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 130.52,
+          "nx": 1,
+          "ny": 3,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 2.628,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "center_freq": 131.74,
+      "mode_count": 2,
+      "bandwidth": 0.36,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 131.56,
+          "nx": 2,
+          "ny": 1,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 2.607,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 131.92,
+          "nx": 5,
+          "ny": 0,
+          "nz": 0,
+          "mode_type": "axial",
+          "wavelength": 2.6,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 161.51,
+      "mode_count": 2,
+      "bandwidth": 0.37,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 161.32,
+          "nx": 2,
+          "ny": 4,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.126,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 161.69,
+          "nx": 0,
+          "ny": 3,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 2.121,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 143.98,
+      "mode_count": 2,
+      "bandwidth": 0.41,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 143.78,
+          "nx": 5,
+          "ny": 0,
+          "nz": 1,
+          "mode_type": "tangential",
+          "wavelength": 2.386,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 144.19,
+          "nx": 3,
+          "ny": 1,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 2.379,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 120.27,
+      "mode_count": 2,
+      "bandwidth": 0.49,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 120.03,
+          "nx": 4,
+          "ny": 0,
+          "nz": 1,
+          "mode_type": "tangential",
+          "wavelength": 2.858,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 120.52,
+          "nx": 0,
+          "ny": 1,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 2.846,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 123.62,
+      "mode_count": 2,
+      "bandwidth": 0.5,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 123.37,
+          "nx": 1,
+          "ny": 1,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 2.78,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 123.87,
+          "nx": 3,
+          "ny": 2,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 2.769,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 171.46,
+      "mode_count": 3,
+      "bandwidth": 0.62,
+      "risk_level": "warning",
+      "modes": [
+        {
+          "frequency": 171.15,
+          "nx": 2,
+          "ny": 4,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 2.004,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 171.5,
+          "nx": 0,
+          "ny": 0,
+          "nz": 3,
+          "mode_type": "axial",
+          "wavelength": 2.0,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 171.77,
+          "nx": 3,
+          "ny": 4,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.997,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 189.2,
+      "mode_count": 2,
+      "bandwidth": 0.64,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 188.89,
+          "nx": 3,
+          "ny": 0,
+          "nz": 3,
+          "mode_type": "tangential",
+          "wavelength": 1.816,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 189.52,
+          "nx": 1,
+          "ny": 2,
+          "nz": 3,
+          "mode_type": "oblique",
+          "wavelength": 1.81,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 197.39,
+      "mode_count": 3,
+      "bandwidth": 0.67,
+      "risk_level": "warning",
+      "modes": [
+        {
+          "frequency": 197.06,
+          "nx": 7,
+          "ny": 1,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 1.741,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 197.73,
+          "nx": 2,
+          "ny": 4,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 1.735,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 197.73,
+          "nx": 2,
+          "ny": 5,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.735,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 185.05,
+      "mode_count": 3,
+      "bandwidth": 0.72,
+      "risk_level": "warning",
+      "modes": [
+        {
+          "frequency": 184.69,
+          "nx": 7,
+          "ny": 0,
+          "nz": 0,
+          "mode_type": "axial",
+          "wavelength": 1.857,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 184.77,
+          "nx": 6,
+          "ny": 2,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 1.856,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 185.41,
+          "nx": 4,
+          "ny": 4,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.85,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "center_freq": 105.18,
+      "mode_count": 2,
+      "bandwidth": 0.73,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 104.81,
+          "nx": 3,
+          "ny": 1,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 3.272,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 105.54,
+          "nx": 4,
+          "ny": 0,
+          "nz": 0,
+          "mode_type": "axial",
+          "wavelength": 3.25,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 179.06,
+      "mode_count": 2,
+      "bandwidth": 0.75,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 178.68,
+          "nx": 5,
+          "ny": 1,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 1.92,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 179.43,
+          "nx": 2,
+          "ny": 0,
+          "nz": 3,
+          "mode_type": "tangential",
+          "wavelength": 1.912,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 165.35,
+      "mode_count": 2,
+      "bandwidth": 0.83,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 164.93,
+          "nx": 1,
+          "ny": 4,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 2.08,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 165.77,
+          "nx": 4,
+          "ny": 3,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 2.069,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 199.37,
+      "mode_count": 3,
+      "bandwidth": 0.86,
+      "risk_level": "warning",
+      "modes": [
+        {
+          "frequency": 198.95,
+          "nx": 0,
+          "ny": 5,
+          "nz": 1,
+          "mode_type": "tangential",
+          "wavelength": 1.724,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 198.96,
+          "nx": 6,
+          "ny": 1,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 1.724,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 199.8,
+          "nx": 7,
+          "ny": 2,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.717,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 139.49,
+      "mode_count": 3,
+      "bandwidth": 0.86,
+      "risk_level": "warning",
+      "modes": [
+        {
+          "frequency": 139.06,
+          "nx": 3,
+          "ny": 0,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 2.467,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 139.06,
+          "nx": 3,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.467,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 139.92,
+          "nx": 1,
+          "ny": 2,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 2.451,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "center_freq": 155.15,
+      "mode_count": 3,
+      "bandwidth": 0.89,
+      "risk_level": "warning",
+      "modes": [
+        {
+          "frequency": 154.71,
+          "nx": 1,
+          "ny": 4,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.217,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 155.6,
+          "nx": 4,
+          "ny": 0,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 2.204,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 155.6,
+          "nx": 4,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.204,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 188.13,
+      "mode_count": 2,
+      "bandwidth": 0.91,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 187.68,
+          "nx": 0,
+          "ny": 2,
+          "nz": 3,
+          "mode_type": "tangential",
+          "wavelength": 1.828,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 188.58,
+          "nx": 7,
+          "ny": 1,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.819,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 194.49,
+      "mode_count": 2,
+      "bandwidth": 0.93,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 194.03,
+          "nx": 4,
+          "ny": 4,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 1.768,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 194.95,
+          "nx": 2,
+          "ny": 2,
+          "nz": 3,
+          "mode_type": "oblique",
+          "wavelength": 1.759,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "center_freq": 173.05,
+      "mode_count": 3,
+      "bandwidth": 0.94,
+      "risk_level": "warning",
+      "modes": [
+        {
+          "frequency": 172.57,
+          "nx": 6,
+          "ny": 1,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 1.988,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 173.26,
+          "nx": 4,
+          "ny": 2,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 1.98,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 173.52,
+          "nx": 1,
+          "ny": 0,
+          "nz": 3,
+          "mode_type": "tangential",
+          "wavelength": 1.977,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 192.86,
+      "mode_count": 5,
+      "bandwidth": 0.96,
+      "risk_level": "critical",
+      "modes": [
+        {
+          "frequency": 192.37,
+          "nx": 1,
+          "ny": 4,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 1.783,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 192.37,
+          "nx": 1,
+          "ny": 5,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.783,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 192.69,
+          "nx": 3,
+          "ny": 1,
+          "nz": 3,
+          "mode_type": "oblique",
+          "wavelength": 1.78,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 193.09,
+          "nx": 4,
+          "ny": 3,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 1.776,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 193.34,
+          "nx": 7,
+          "ny": 0,
+          "nz": 1,
+          "mode_type": "tangential",
+          "wavelength": 1.774,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 109.4,
+      "mode_count": 2,
+      "bandwidth": 0.97,
+      "risk_level": "normal",
+      "modes": [
+        {
+          "frequency": 108.91,
+          "nx": 2,
+          "ny": 2,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 3.149,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 109.89,
+          "nx": 3,
+          "ny": 2,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 3.121,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "center_freq": 137.8,
+      "mode_count": 3,
+      "bandwidth": 0.97,
+      "risk_level": "warning",
+      "modes": [
+        {
+          "frequency": 137.32,
+          "nx": 5,
+          "ny": 1,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.498,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 137.41,
+          "nx": 0,
+          "ny": 2,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 2.496,
+          "degeneracy": 2
+        },
+        {
+          "frequency": 138.29,
+          "nx": 2,
+          "ny": 3,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 2.48,
+          "degeneracy": 1
+        }
+      ]
+    }
+  ],
+  "listening_point_analyses": [
+    {
+      "point": {
+        "x": 3.25,
+        "y": 2.25,
+        "z": 1.2,
+        "unit": "m"
+      },
+      "is_valid": true,
+      "issues": [
+        "模式 (2,0,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,1,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (0,2,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,0,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (1,2,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,1,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,2,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (0,2,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (1,2,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,0,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,2,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (3,2,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,1,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,0,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (3,2,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,0,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,3,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,1,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,2,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,1,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (0,2,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,3,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (1,2,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,2,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,2,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (5,2,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (0,4,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (1,4,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,0,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,3,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (6,0,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (3,2,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,1,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,4,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (5,2,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (0,4,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (6,1,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (1,4,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,3,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (6,0,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,3,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,4,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (3,4,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (6,1,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,2,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (6,2,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,0,3) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (3,4,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,1,3) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (6,2,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,4,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (0,2,3) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (1,2,3) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (5,2,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (0,4,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (1,4,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,3,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (4,4,1) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,2,3) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (6,0,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (6,3,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,4,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (2,5,0) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (6,1,2) 在监听点处存在节点 (振幅=0.000)",
+        "模式 (7,2,0) 在监听点处存在节点 (振幅=0.000)"
+      ],
+      "mode_amplitude_factors": {
+        "1,0,0": 1.0,
+        "0,1,0": 1.0,
+        "1,1,0": 1.0,
+        "2,0,0": 0.0,
+        "0,0,1": 0.951,
+        "1,0,1": 0.951,
+        "2,1,0": 0.0,
+        "0,1,1": 0.951,
+        "1,1,1": 0.951,
+        "0,2,0": 0.0,
+        "2,0,1": 0.0,
+        "3,0,0": 1.0,
+        "1,2,0": 0.0,
+        "2,1,1": 0.0,
+        "3,1,0": 1.0,
+        "2,2,0": 0.0,
+        "0,2,1": 0.0,
+        "3,0,1": 0.951,
+        "1,2,1": 0.0,
+        "3,1,1": 0.951,
+        "4,0,0": 0.0,
+        "2,2,1": 0.0,
+        "3,2,0": 0.0,
+        "4,1,0": 0.0,
+        "0,0,2": 0.588,
+        "0,3,0": 1.0,
+        "1,0,2": 0.588,
+        "1,3,0": 1.0,
+        "4,0,1": 0.0,
+        "0,1,2": 0.588,
+        "1,1,2": 0.588,
+        "3,2,1": 0.0,
+        "2,0,2": 0.0,
+        "2,3,0": 0.0,
+        "4,1,1": 0.0,
+        "0,3,1": 0.951,
+        "4,2,0": 0.0,
+        "1,3,1": 0.951,
+        "2,1,2": 0.0,
+        "5,0,0": 1.0,
+        "5,1,0": 1.0,
+        "0,2,2": 0.0,
+        "2,3,1": 0.0,
+        "3,0,2": 0.588,
+        "3,3,0": 1.0,
+        "1,2,2": 0.0,
+        "4,2,1": 0.0,
+        "5,0,1": 0.951,
+        "3,1,2": 0.588,
+        "2,2,2": 0.0,
+        "5,1,1": 0.951,
+        "3,3,1": 0.951,
+        "5,2,0": 0.0,
+        "0,4,0": 0.0,
+        "1,4,0": 0.0,
+        "4,0,2": 0.0,
+        "4,3,0": 0.0,
+        "6,0,0": 0.0,
+        "3,2,2": 0.0,
+        "4,1,2": 0.0,
+        "2,4,0": 0.0,
+        "0,3,2": 0.588,
+        "5,2,1": 0.0,
+        "0,4,1": 0.0,
+        "6,1,0": 0.0,
+        "1,3,2": 0.588,
+        "1,4,1": 0.0,
+        "4,3,1": 0.0,
+        "6,0,1": 0.0,
+        "2,3,2": 0.0,
+        "2,4,1": 0.0,
+        "0,0,3": 0.588,
+        "3,4,0": 0.0,
+        "6,1,1": 0.0,
+        "4,2,2": 0.0,
+        "1,0,3": 0.588,
+        "5,0,2": 0.588,
+        "5,3,0": 1.0,
+        "0,1,3": 0.588,
+        "6,2,0": 0.0,
+        "1,1,3": 0.588,
+        "5,1,2": 0.588,
+        "2,0,3": 0.0,
+        "3,3,2": 0.588,
+        "3,4,1": 0.0,
+        "2,1,3": 0.0,
+        "5,3,1": 0.951,
+        "7,0,0": 1.0,
+        "6,2,1": 0.0,
+        "4,4,0": 0.0,
+        "0,2,3": 0.0,
+        "7,1,0": 1.0,
+        "3,0,3": 0.588,
+        "1,2,3": 0.0,
+        "5,2,2": 0.0,
+        "0,4,2": 0.0,
+        "0,5,0": 1.0,
+        "1,4,2": 0.0,
+        "1,5,0": 1.0,
+        "3,1,3": 0.588,
+        "4,3,2": 0.0,
+        "7,0,1": 0.951,
+        "4,4,1": 0.0,
+        "2,2,3": 0.0,
+        "6,0,2": 0.0,
+        "6,3,0": 0.0,
+        "7,1,1": 0.951,
+        "2,4,2": 0.0,
+        "2,5,0": 0.0,
+        "0,5,1": 0.951,
+        "6,1,2": 0.0,
+        "7,2,0": 0.0
+      }
+    }
+  ],
+  "duplicate_modes": [
+    {
+      "primary": {
+        "frequency": 114.33,
+        "nx": 0,
+        "ny": 0,
+        "nz": 2,
+        "mode_type": "axial",
+        "wavelength": 3.0,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 114.33,
+          "nx": 0,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "axial",
+          "wavelength": 3.0,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 117.34,
+        "nx": 1,
+        "ny": 0,
+        "nz": 2,
+        "mode_type": "tangential",
+        "wavelength": 2.923,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 117.34,
+          "nx": 1,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.923,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 120.03,
+        "nx": 4,
+        "ny": 0,
+        "nz": 1,
+        "mode_type": "tangential",
+        "wavelength": 2.858,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 120.52,
+          "nx": 0,
+          "ny": 1,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 2.846,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 123.37,
+        "nx": 1,
+        "ny": 1,
+        "nz": 2,
+        "mode_type": "oblique",
+        "wavelength": 2.78,
+        "degeneracy": 2
+      },
+      "duplicates": [
+        {
+          "frequency": 123.87,
+          "nx": 3,
+          "ny": 2,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 2.769,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 125.92,
+        "nx": 2,
+        "ny": 0,
+        "nz": 2,
+        "mode_type": "tangential",
+        "wavelength": 2.724,
+        "degeneracy": 2
+      },
+      "duplicates": [
+        {
+          "frequency": 125.92,
+          "nx": 2,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.724,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 125.93,
+          "nx": 4,
+          "ny": 1,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 2.724,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 130.19,
+        "nx": 4,
+        "ny": 2,
+        "nz": 0,
+        "mode_type": "tangential",
+        "wavelength": 2.635,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 130.52,
+          "nx": 1,
+          "ny": 3,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 2.628,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 131.56,
+        "nx": 2,
+        "ny": 1,
+        "nz": 2,
+        "mode_type": "oblique",
+        "wavelength": 2.607,
+        "degeneracy": 2
+      },
+      "duplicates": [
+        {
+          "frequency": 131.92,
+          "nx": 5,
+          "ny": 0,
+          "nz": 0,
+          "mode_type": "axial",
+          "wavelength": 2.6,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 137.32,
+        "nx": 5,
+        "ny": 1,
+        "nz": 0,
+        "mode_type": "tangential",
+        "wavelength": 2.498,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 137.41,
+          "nx": 0,
+          "ny": 2,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 2.496,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 139.06,
+        "nx": 3,
+        "ny": 0,
+        "nz": 2,
+        "mode_type": "tangential",
+        "wavelength": 2.467,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 139.06,
+          "nx": 3,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.467,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 143.78,
+        "nx": 5,
+        "ny": 0,
+        "nz": 1,
+        "mode_type": "tangential",
+        "wavelength": 2.386,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 144.19,
+          "nx": 3,
+          "ny": 1,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 2.379,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 152.36,
+        "nx": 5,
+        "ny": 2,
+        "nz": 0,
+        "mode_type": "tangential",
+        "wavelength": 2.251,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 152.44,
+          "nx": 0,
+          "ny": 4,
+          "nz": 0,
+          "mode_type": "axial",
+          "wavelength": 2.25,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 155.6,
+        "nx": 4,
+        "ny": 0,
+        "nz": 2,
+        "mode_type": "tangential",
+        "wavelength": 2.204,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 155.6,
+          "nx": 4,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.204,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 158.31,
+        "nx": 6,
+        "ny": 0,
+        "nz": 0,
+        "mode_type": "axial",
+        "wavelength": 2.167,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 158.58,
+          "nx": 3,
+          "ny": 2,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 2.163,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 161.32,
+        "nx": 2,
+        "ny": 4,
+        "nz": 0,
+        "mode_type": "tangential",
+        "wavelength": 2.126,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 161.69,
+          "nx": 0,
+          "ny": 3,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 2.121,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 162.73,
+        "nx": 5,
+        "ny": 2,
+        "nz": 1,
+        "mode_type": "oblique",
+        "wavelength": 2.108,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 162.81,
+          "nx": 0,
+          "ny": 4,
+          "nz": 1,
+          "mode_type": "tangential",
+          "wavelength": 2.107,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 162.83,
+          "nx": 6,
+          "ny": 1,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 2.106,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 171.15,
+        "nx": 2,
+        "ny": 4,
+        "nz": 1,
+        "mode_type": "oblique",
+        "wavelength": 2.004,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 171.5,
+          "nx": 0,
+          "ny": 0,
+          "nz": 3,
+          "mode_type": "axial",
+          "wavelength": 2.0,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 173.26,
+        "nx": 4,
+        "ny": 2,
+        "nz": 2,
+        "mode_type": "oblique",
+        "wavelength": 1.98,
+        "degeneracy": 2
+      },
+      "duplicates": [
+        {
+          "frequency": 173.52,
+          "nx": 1,
+          "ny": 0,
+          "nz": 3,
+          "mode_type": "tangential",
+          "wavelength": 1.977,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 174.57,
+        "nx": 5,
+        "ny": 0,
+        "nz": 2,
+        "mode_type": "tangential",
+        "wavelength": 1.965,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 174.57,
+          "nx": 5,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.965,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 175.68,
+        "nx": 0,
+        "ny": 1,
+        "nz": 3,
+        "mode_type": "tangential",
+        "wavelength": 1.952,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 175.7,
+          "nx": 6,
+          "ny": 2,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.952,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 183.44,
+        "nx": 2,
+        "ny": 1,
+        "nz": 3,
+        "mode_type": "oblique",
+        "wavelength": 1.87,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 183.69,
+          "nx": 5,
+          "ny": 3,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 1.867,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 184.69,
+        "nx": 7,
+        "ny": 0,
+        "nz": 0,
+        "mode_type": "axial",
+        "wavelength": 1.857,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 184.77,
+          "nx": 6,
+          "ny": 2,
+          "nz": 1,
+          "mode_type": "oblique",
+          "wavelength": 1.856,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 188.58,
+        "nx": 7,
+        "ny": 1,
+        "nz": 0,
+        "mode_type": "tangential",
+        "wavelength": 1.819,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 188.89,
+          "nx": 3,
+          "ny": 0,
+          "nz": 3,
+          "mode_type": "tangential",
+          "wavelength": 1.816,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 190.49,
+        "nx": 5,
+        "ny": 2,
+        "nz": 2,
+        "mode_type": "oblique",
+        "wavelength": 1.801,
+        "degeneracy": 2
+      },
+      "duplicates": [
+        {
+          "frequency": 190.56,
+          "nx": 0,
+          "ny": 4,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 1.8,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 190.56,
+          "nx": 0,
+          "ny": 5,
+          "nz": 0,
+          "mode_type": "axial",
+          "wavelength": 1.8,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 192.37,
+        "nx": 1,
+        "ny": 4,
+        "nz": 2,
+        "mode_type": "oblique",
+        "wavelength": 1.783,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 192.37,
+          "nx": 1,
+          "ny": 5,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.783,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 192.69,
+          "nx": 3,
+          "ny": 1,
+          "nz": 3,
+          "mode_type": "oblique",
+          "wavelength": 1.78,
+          "degeneracy": 2
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 193.09,
+        "nx": 4,
+        "ny": 3,
+        "nz": 2,
+        "mode_type": "oblique",
+        "wavelength": 1.776,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 193.34,
+          "nx": 7,
+          "ny": 0,
+          "nz": 1,
+          "mode_type": "tangential",
+          "wavelength": 1.774,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 194.95,
+        "nx": 2,
+        "ny": 2,
+        "nz": 3,
+        "mode_type": "oblique",
+        "wavelength": 1.759,
+        "degeneracy": 2
+      },
+      "duplicates": [
+        {
+          "frequency": 195.28,
+          "nx": 6,
+          "ny": 0,
+          "nz": 2,
+          "mode_type": "tangential",
+          "wavelength": 1.756,
+          "degeneracy": 1
+        },
+        {
+          "frequency": 195.28,
+          "nx": 6,
+          "ny": 3,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.756,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 197.73,
+        "nx": 2,
+        "ny": 4,
+        "nz": 2,
+        "mode_type": "oblique",
+        "wavelength": 1.735,
+        "degeneracy": 2
+      },
+      "duplicates": [
+        {
+          "frequency": 197.73,
+          "nx": 2,
+          "ny": 5,
+          "nz": 0,
+          "mode_type": "tangential",
+          "wavelength": 1.735,
+          "degeneracy": 1
+        }
+      ]
+    },
+    {
+      "primary": {
+        "frequency": 198.95,
+        "nx": 0,
+        "ny": 5,
+        "nz": 1,
+        "mode_type": "tangential",
+        "wavelength": 1.724,
+        "degeneracy": 1
+      },
+      "duplicates": [
+        {
+          "frequency": 198.96,
+          "nx": 6,
+          "ny": 1,
+          "nz": 2,
+          "mode_type": "oblique",
+          "wavelength": 1.724,
+          "degeneracy": 1
+        }
+      ]
+    }
+  ],
+  "generated_at": "2026-05-28T21:33:22.905689"
+}

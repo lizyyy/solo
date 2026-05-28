@@ -1,0 +1,2207 @@
+config:
+  absorption_materials: {}
+  is_valid: true
+  issues: []
+  listening_points:
+  - unit: m
+    x: 3.25
+    y: 2.25
+    z: 1.2
+  max_frequency: 200.0
+  min_frequency: 20.0
+  notes: 修改后的配置 - 用于差异对比测试
+  project_id: studio_normal_v1
+  room_dimensions:
+    height: 3.0
+    length: 6.5
+    unit: m
+    width: 4.5
+  sound_speed: 343.0
+duplicate_modes:
+- duplicates:
+  - degeneracy: 1
+    frequency: 114.33
+    mode_type: axial
+    nx: 0
+    ny: 3
+    nz: 0
+    wavelength: 3.0
+  primary:
+    degeneracy: 1
+    frequency: 114.33
+    mode_type: axial
+    nx: 0
+    ny: 0
+    nz: 2
+    wavelength: 3.0
+- duplicates:
+  - degeneracy: 1
+    frequency: 117.34
+    mode_type: tangential
+    nx: 1
+    ny: 3
+    nz: 0
+    wavelength: 2.923
+  primary:
+    degeneracy: 1
+    frequency: 117.34
+    mode_type: tangential
+    nx: 1
+    ny: 0
+    nz: 2
+    wavelength: 2.923
+- duplicates:
+  - degeneracy: 1
+    frequency: 120.52
+    mode_type: tangential
+    nx: 0
+    ny: 1
+    nz: 2
+    wavelength: 2.846
+  primary:
+    degeneracy: 1
+    frequency: 120.03
+    mode_type: tangential
+    nx: 4
+    ny: 0
+    nz: 1
+    wavelength: 2.858
+- duplicates:
+  - degeneracy: 1
+    frequency: 123.87
+    mode_type: oblique
+    nx: 3
+    ny: 2
+    nz: 1
+    wavelength: 2.769
+  primary:
+    degeneracy: 2
+    frequency: 123.37
+    mode_type: oblique
+    nx: 1
+    ny: 1
+    nz: 2
+    wavelength: 2.78
+- duplicates:
+  - degeneracy: 1
+    frequency: 125.92
+    mode_type: tangential
+    nx: 2
+    ny: 3
+    nz: 0
+    wavelength: 2.724
+  - degeneracy: 2
+    frequency: 125.93
+    mode_type: oblique
+    nx: 4
+    ny: 1
+    nz: 1
+    wavelength: 2.724
+  primary:
+    degeneracy: 2
+    frequency: 125.92
+    mode_type: tangential
+    nx: 2
+    ny: 0
+    nz: 2
+    wavelength: 2.724
+- duplicates:
+  - degeneracy: 2
+    frequency: 130.52
+    mode_type: oblique
+    nx: 1
+    ny: 3
+    nz: 1
+    wavelength: 2.628
+  primary:
+    degeneracy: 1
+    frequency: 130.19
+    mode_type: tangential
+    nx: 4
+    ny: 2
+    nz: 0
+    wavelength: 2.635
+- duplicates:
+  - degeneracy: 1
+    frequency: 131.92
+    mode_type: axial
+    nx: 5
+    ny: 0
+    nz: 0
+    wavelength: 2.6
+  primary:
+    degeneracy: 2
+    frequency: 131.56
+    mode_type: oblique
+    nx: 2
+    ny: 1
+    nz: 2
+    wavelength: 2.607
+- duplicates:
+  - degeneracy: 2
+    frequency: 137.41
+    mode_type: tangential
+    nx: 0
+    ny: 2
+    nz: 2
+    wavelength: 2.496
+  primary:
+    degeneracy: 1
+    frequency: 137.32
+    mode_type: tangential
+    nx: 5
+    ny: 1
+    nz: 0
+    wavelength: 2.498
+- duplicates:
+  - degeneracy: 2
+    frequency: 139.06
+    mode_type: tangential
+    nx: 3
+    ny: 3
+    nz: 0
+    wavelength: 2.467
+  primary:
+    degeneracy: 1
+    frequency: 139.06
+    mode_type: tangential
+    nx: 3
+    ny: 0
+    nz: 2
+    wavelength: 2.467
+- duplicates:
+  - degeneracy: 1
+    frequency: 144.19
+    mode_type: oblique
+    nx: 3
+    ny: 1
+    nz: 2
+    wavelength: 2.379
+  primary:
+    degeneracy: 1
+    frequency: 143.78
+    mode_type: tangential
+    nx: 5
+    ny: 0
+    nz: 1
+    wavelength: 2.386
+- duplicates:
+  - degeneracy: 1
+    frequency: 152.44
+    mode_type: axial
+    nx: 0
+    ny: 4
+    nz: 0
+    wavelength: 2.25
+  primary:
+    degeneracy: 1
+    frequency: 152.36
+    mode_type: tangential
+    nx: 5
+    ny: 2
+    nz: 0
+    wavelength: 2.251
+- duplicates:
+  - degeneracy: 1
+    frequency: 155.6
+    mode_type: tangential
+    nx: 4
+    ny: 3
+    nz: 0
+    wavelength: 2.204
+  primary:
+    degeneracy: 1
+    frequency: 155.6
+    mode_type: tangential
+    nx: 4
+    ny: 0
+    nz: 2
+    wavelength: 2.204
+- duplicates:
+  - degeneracy: 2
+    frequency: 158.58
+    mode_type: oblique
+    nx: 3
+    ny: 2
+    nz: 2
+    wavelength: 2.163
+  primary:
+    degeneracy: 1
+    frequency: 158.31
+    mode_type: axial
+    nx: 6
+    ny: 0
+    nz: 0
+    wavelength: 2.167
+- duplicates:
+  - degeneracy: 1
+    frequency: 161.69
+    mode_type: tangential
+    nx: 0
+    ny: 3
+    nz: 2
+    wavelength: 2.121
+  primary:
+    degeneracy: 1
+    frequency: 161.32
+    mode_type: tangential
+    nx: 2
+    ny: 4
+    nz: 0
+    wavelength: 2.126
+- duplicates:
+  - degeneracy: 1
+    frequency: 162.81
+    mode_type: tangential
+    nx: 0
+    ny: 4
+    nz: 1
+    wavelength: 2.107
+  - degeneracy: 1
+    frequency: 162.83
+    mode_type: tangential
+    nx: 6
+    ny: 1
+    nz: 0
+    wavelength: 2.106
+  primary:
+    degeneracy: 1
+    frequency: 162.73
+    mode_type: oblique
+    nx: 5
+    ny: 2
+    nz: 1
+    wavelength: 2.108
+- duplicates:
+  - degeneracy: 1
+    frequency: 171.5
+    mode_type: axial
+    nx: 0
+    ny: 0
+    nz: 3
+    wavelength: 2.0
+  primary:
+    degeneracy: 1
+    frequency: 171.15
+    mode_type: oblique
+    nx: 2
+    ny: 4
+    nz: 1
+    wavelength: 2.004
+- duplicates:
+  - degeneracy: 1
+    frequency: 173.52
+    mode_type: tangential
+    nx: 1
+    ny: 0
+    nz: 3
+    wavelength: 1.977
+  primary:
+    degeneracy: 2
+    frequency: 173.26
+    mode_type: oblique
+    nx: 4
+    ny: 2
+    nz: 2
+    wavelength: 1.98
+- duplicates:
+  - degeneracy: 1
+    frequency: 174.57
+    mode_type: tangential
+    nx: 5
+    ny: 3
+    nz: 0
+    wavelength: 1.965
+  primary:
+    degeneracy: 1
+    frequency: 174.57
+    mode_type: tangential
+    nx: 5
+    ny: 0
+    nz: 2
+    wavelength: 1.965
+- duplicates:
+  - degeneracy: 1
+    frequency: 175.7
+    mode_type: tangential
+    nx: 6
+    ny: 2
+    nz: 0
+    wavelength: 1.952
+  primary:
+    degeneracy: 1
+    frequency: 175.68
+    mode_type: tangential
+    nx: 0
+    ny: 1
+    nz: 3
+    wavelength: 1.952
+- duplicates:
+  - degeneracy: 1
+    frequency: 183.69
+    mode_type: oblique
+    nx: 5
+    ny: 3
+    nz: 1
+    wavelength: 1.867
+  primary:
+    degeneracy: 1
+    frequency: 183.44
+    mode_type: oblique
+    nx: 2
+    ny: 1
+    nz: 3
+    wavelength: 1.87
+- duplicates:
+  - degeneracy: 1
+    frequency: 184.77
+    mode_type: oblique
+    nx: 6
+    ny: 2
+    nz: 1
+    wavelength: 1.856
+  primary:
+    degeneracy: 1
+    frequency: 184.69
+    mode_type: axial
+    nx: 7
+    ny: 0
+    nz: 0
+    wavelength: 1.857
+- duplicates:
+  - degeneracy: 2
+    frequency: 188.89
+    mode_type: tangential
+    nx: 3
+    ny: 0
+    nz: 3
+    wavelength: 1.816
+  primary:
+    degeneracy: 1
+    frequency: 188.58
+    mode_type: tangential
+    nx: 7
+    ny: 1
+    nz: 0
+    wavelength: 1.819
+- duplicates:
+  - degeneracy: 1
+    frequency: 190.56
+    mode_type: tangential
+    nx: 0
+    ny: 4
+    nz: 2
+    wavelength: 1.8
+  - degeneracy: 1
+    frequency: 190.56
+    mode_type: axial
+    nx: 0
+    ny: 5
+    nz: 0
+    wavelength: 1.8
+  primary:
+    degeneracy: 2
+    frequency: 190.49
+    mode_type: oblique
+    nx: 5
+    ny: 2
+    nz: 2
+    wavelength: 1.801
+- duplicates:
+  - degeneracy: 1
+    frequency: 192.37
+    mode_type: tangential
+    nx: 1
+    ny: 5
+    nz: 0
+    wavelength: 1.783
+  - degeneracy: 2
+    frequency: 192.69
+    mode_type: oblique
+    nx: 3
+    ny: 1
+    nz: 3
+    wavelength: 1.78
+  primary:
+    degeneracy: 1
+    frequency: 192.37
+    mode_type: oblique
+    nx: 1
+    ny: 4
+    nz: 2
+    wavelength: 1.783
+- duplicates:
+  - degeneracy: 1
+    frequency: 193.34
+    mode_type: tangential
+    nx: 7
+    ny: 0
+    nz: 1
+    wavelength: 1.774
+  primary:
+    degeneracy: 1
+    frequency: 193.09
+    mode_type: oblique
+    nx: 4
+    ny: 3
+    nz: 2
+    wavelength: 1.776
+- duplicates:
+  - degeneracy: 1
+    frequency: 195.28
+    mode_type: tangential
+    nx: 6
+    ny: 0
+    nz: 2
+    wavelength: 1.756
+  - degeneracy: 1
+    frequency: 195.28
+    mode_type: tangential
+    nx: 6
+    ny: 3
+    nz: 0
+    wavelength: 1.756
+  primary:
+    degeneracy: 2
+    frequency: 194.95
+    mode_type: oblique
+    nx: 2
+    ny: 2
+    nz: 3
+    wavelength: 1.759
+- duplicates:
+  - degeneracy: 1
+    frequency: 197.73
+    mode_type: tangential
+    nx: 2
+    ny: 5
+    nz: 0
+    wavelength: 1.735
+  primary:
+    degeneracy: 2
+    frequency: 197.73
+    mode_type: oblique
+    nx: 2
+    ny: 4
+    nz: 2
+    wavelength: 1.735
+- duplicates:
+  - degeneracy: 1
+    frequency: 198.96
+    mode_type: oblique
+    nx: 6
+    ny: 1
+    nz: 2
+    wavelength: 1.724
+  primary:
+    degeneracy: 1
+    frequency: 198.95
+    mode_type: tangential
+    nx: 0
+    ny: 5
+    nz: 1
+    wavelength: 1.724
+frequency_gaps:
+- end_freq: 38.11
+  gap_size: 11.73
+  risk_level: normal
+  start_freq: 26.38
+generated_at: '2026-05-28T21:34:23.619631'
+listening_point_analyses:
+- is_valid: true
+  issues:
+  - 模式 (2,0,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,1,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (0,2,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,0,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (1,2,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,1,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,2,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (0,2,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (1,2,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,0,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,2,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (3,2,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,1,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,0,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (3,2,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,0,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,3,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,1,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,2,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,1,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (0,2,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,3,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (1,2,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,2,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,2,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (5,2,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (0,4,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (1,4,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,0,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,3,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (6,0,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (3,2,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,1,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,4,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (5,2,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (0,4,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (6,1,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (1,4,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,3,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (6,0,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,3,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,4,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (3,4,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (6,1,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,2,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (6,2,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,0,3) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (3,4,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,1,3) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (6,2,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,4,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (0,2,3) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (1,2,3) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (5,2,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (0,4,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (1,4,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,3,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (4,4,1) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,2,3) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (6,0,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (6,3,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,4,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (2,5,0) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (6,1,2) 在监听点处存在节点 (振幅=0.000)
+  - 模式 (7,2,0) 在监听点处存在节点 (振幅=0.000)
+  mode_amplitude_factors:
+    0,0,1: 0.951
+    0,0,2: 0.588
+    0,0,3: 0.588
+    0,1,0: 1.0
+    0,1,1: 0.951
+    0,1,2: 0.588
+    0,1,3: 0.588
+    0,2,0: 0.0
+    0,2,1: 0.0
+    0,2,2: 0.0
+    0,2,3: 0.0
+    0,3,0: 1.0
+    0,3,1: 0.951
+    0,3,2: 0.588
+    0,4,0: 0.0
+    0,4,1: 0.0
+    0,4,2: 0.0
+    0,5,0: 1.0
+    0,5,1: 0.951
+    1,0,0: 1.0
+    1,0,1: 0.951
+    1,0,2: 0.588
+    1,0,3: 0.588
+    1,1,0: 1.0
+    1,1,1: 0.951
+    1,1,2: 0.588
+    1,1,3: 0.588
+    1,2,0: 0.0
+    1,2,1: 0.0
+    1,2,2: 0.0
+    1,2,3: 0.0
+    1,3,0: 1.0
+    1,3,1: 0.951
+    1,3,2: 0.588
+    1,4,0: 0.0
+    1,4,1: 0.0
+    1,4,2: 0.0
+    1,5,0: 1.0
+    2,0,0: 0.0
+    2,0,1: 0.0
+    2,0,2: 0.0
+    2,0,3: 0.0
+    2,1,0: 0.0
+    2,1,1: 0.0
+    2,1,2: 0.0
+    2,1,3: 0.0
+    2,2,0: 0.0
+    2,2,1: 0.0
+    2,2,2: 0.0
+    2,2,3: 0.0
+    2,3,0: 0.0
+    2,3,1: 0.0
+    2,3,2: 0.0
+    2,4,0: 0.0
+    2,4,1: 0.0
+    2,4,2: 0.0
+    2,5,0: 0.0
+    3,0,0: 1.0
+    3,0,1: 0.951
+    3,0,2: 0.588
+    3,0,3: 0.588
+    3,1,0: 1.0
+    3,1,1: 0.951
+    3,1,2: 0.588
+    3,1,3: 0.588
+    3,2,0: 0.0
+    3,2,1: 0.0
+    3,2,2: 0.0
+    3,3,0: 1.0
+    3,3,1: 0.951
+    3,3,2: 0.588
+    3,4,0: 0.0
+    3,4,1: 0.0
+    4,0,0: 0.0
+    4,0,1: 0.0
+    4,0,2: 0.0
+    4,1,0: 0.0
+    4,1,1: 0.0
+    4,1,2: 0.0
+    4,2,0: 0.0
+    4,2,1: 0.0
+    4,2,2: 0.0
+    4,3,0: 0.0
+    4,3,1: 0.0
+    4,3,2: 0.0
+    4,4,0: 0.0
+    4,4,1: 0.0
+    5,0,0: 1.0
+    5,0,1: 0.951
+    5,0,2: 0.588
+    5,1,0: 1.0
+    5,1,1: 0.951
+    5,1,2: 0.588
+    5,2,0: 0.0
+    5,2,1: 0.0
+    5,2,2: 0.0
+    5,3,0: 1.0
+    5,3,1: 0.951
+    6,0,0: 0.0
+    6,0,1: 0.0
+    6,0,2: 0.0
+    6,1,0: 0.0
+    6,1,1: 0.0
+    6,1,2: 0.0
+    6,2,0: 0.0
+    6,2,1: 0.0
+    6,3,0: 0.0
+    7,0,0: 1.0
+    7,0,1: 0.951
+    7,1,0: 1.0
+    7,1,1: 0.951
+    7,2,0: 0.0
+  point:
+    unit: m
+    x: 3.25
+    y: 2.25
+    z: 1.2
+mode_clusters:
+- bandwidth: 0.0
+  center_freq: 114.33
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 114.33
+    mode_type: axial
+    nx: 0
+    ny: 0
+    nz: 2
+    wavelength: 3.0
+  - degeneracy: 1
+    frequency: 114.33
+    mode_type: axial
+    nx: 0
+    ny: 3
+    nz: 0
+    wavelength: 3.0
+  risk_level: normal
+- bandwidth: 0.0
+  center_freq: 117.34
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 117.34
+    mode_type: tangential
+    nx: 1
+    ny: 0
+    nz: 2
+    wavelength: 2.923
+  - degeneracy: 1
+    frequency: 117.34
+    mode_type: tangential
+    nx: 1
+    ny: 3
+    nz: 0
+    wavelength: 2.923
+  risk_level: normal
+- bandwidth: 0.0
+  center_freq: 174.57
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 174.57
+    mode_type: tangential
+    nx: 5
+    ny: 0
+    nz: 2
+    wavelength: 1.965
+  - degeneracy: 1
+    frequency: 174.57
+    mode_type: tangential
+    nx: 5
+    ny: 3
+    nz: 0
+    wavelength: 1.965
+  risk_level: normal
+- bandwidth: 0.0
+  center_freq: 195.28
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 195.28
+    mode_type: tangential
+    nx: 6
+    ny: 0
+    nz: 2
+    wavelength: 1.756
+  - degeneracy: 1
+    frequency: 195.28
+    mode_type: tangential
+    nx: 6
+    ny: 3
+    nz: 0
+    wavelength: 1.756
+  risk_level: normal
+- bandwidth: 0.01
+  center_freq: 125.93
+  mode_count: 3
+  modes:
+  - degeneracy: 2
+    frequency: 125.92
+    mode_type: tangential
+    nx: 2
+    ny: 0
+    nz: 2
+    wavelength: 2.724
+  - degeneracy: 1
+    frequency: 125.92
+    mode_type: tangential
+    nx: 2
+    ny: 3
+    nz: 0
+    wavelength: 2.724
+  - degeneracy: 2
+    frequency: 125.93
+    mode_type: oblique
+    nx: 4
+    ny: 1
+    nz: 1
+    wavelength: 2.724
+  risk_level: warning
+- bandwidth: 0.02
+  center_freq: 175.69
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 175.68
+    mode_type: tangential
+    nx: 0
+    ny: 1
+    nz: 3
+    wavelength: 1.952
+  - degeneracy: 1
+    frequency: 175.7
+    mode_type: tangential
+    nx: 6
+    ny: 2
+    nz: 0
+    wavelength: 1.952
+  risk_level: normal
+- bandwidth: 0.07
+  center_freq: 190.52
+  mode_count: 3
+  modes:
+  - degeneracy: 2
+    frequency: 190.49
+    mode_type: oblique
+    nx: 5
+    ny: 2
+    nz: 2
+    wavelength: 1.801
+  - degeneracy: 1
+    frequency: 190.56
+    mode_type: tangential
+    nx: 0
+    ny: 4
+    nz: 2
+    wavelength: 1.8
+  - degeneracy: 1
+    frequency: 190.56
+    mode_type: axial
+    nx: 0
+    ny: 5
+    nz: 0
+    wavelength: 1.8
+  risk_level: warning
+- bandwidth: 0.08
+  center_freq: 152.4
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 152.36
+    mode_type: tangential
+    nx: 5
+    ny: 2
+    nz: 0
+    wavelength: 2.251
+  - degeneracy: 1
+    frequency: 152.44
+    mode_type: axial
+    nx: 0
+    ny: 4
+    nz: 0
+    wavelength: 2.25
+  risk_level: normal
+- bandwidth: 0.1
+  center_freq: 162.78
+  mode_count: 3
+  modes:
+  - degeneracy: 1
+    frequency: 162.73
+    mode_type: oblique
+    nx: 5
+    ny: 2
+    nz: 1
+    wavelength: 2.108
+  - degeneracy: 1
+    frequency: 162.81
+    mode_type: tangential
+    nx: 0
+    ny: 4
+    nz: 1
+    wavelength: 2.107
+  - degeneracy: 1
+    frequency: 162.83
+    mode_type: tangential
+    nx: 6
+    ny: 1
+    nz: 0
+    wavelength: 2.106
+  risk_level: warning
+- bandwidth: 0.26
+  center_freq: 183.57
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 183.44
+    mode_type: oblique
+    nx: 2
+    ny: 1
+    nz: 3
+    wavelength: 1.87
+  - degeneracy: 1
+    frequency: 183.69
+    mode_type: oblique
+    nx: 5
+    ny: 3
+    nz: 1
+    wavelength: 1.867
+  risk_level: normal
+- bandwidth: 0.27
+  center_freq: 158.44
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 158.31
+    mode_type: axial
+    nx: 6
+    ny: 0
+    nz: 0
+    wavelength: 2.167
+  - degeneracy: 2
+    frequency: 158.58
+    mode_type: oblique
+    nx: 3
+    ny: 2
+    nz: 2
+    wavelength: 2.163
+  risk_level: normal
+- bandwidth: 0.34
+  center_freq: 130.35
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 130.19
+    mode_type: tangential
+    nx: 4
+    ny: 2
+    nz: 0
+    wavelength: 2.635
+  - degeneracy: 2
+    frequency: 130.52
+    mode_type: oblique
+    nx: 1
+    ny: 3
+    nz: 1
+    wavelength: 2.628
+  risk_level: normal
+- bandwidth: 0.36
+  center_freq: 131.74
+  mode_count: 2
+  modes:
+  - degeneracy: 2
+    frequency: 131.56
+    mode_type: oblique
+    nx: 2
+    ny: 1
+    nz: 2
+    wavelength: 2.607
+  - degeneracy: 1
+    frequency: 131.92
+    mode_type: axial
+    nx: 5
+    ny: 0
+    nz: 0
+    wavelength: 2.6
+  risk_level: normal
+- bandwidth: 0.37
+  center_freq: 161.51
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 161.32
+    mode_type: tangential
+    nx: 2
+    ny: 4
+    nz: 0
+    wavelength: 2.126
+  - degeneracy: 1
+    frequency: 161.69
+    mode_type: tangential
+    nx: 0
+    ny: 3
+    nz: 2
+    wavelength: 2.121
+  risk_level: normal
+- bandwidth: 0.41
+  center_freq: 143.98
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 143.78
+    mode_type: tangential
+    nx: 5
+    ny: 0
+    nz: 1
+    wavelength: 2.386
+  - degeneracy: 1
+    frequency: 144.19
+    mode_type: oblique
+    nx: 3
+    ny: 1
+    nz: 2
+    wavelength: 2.379
+  risk_level: normal
+- bandwidth: 0.49
+  center_freq: 120.27
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 120.03
+    mode_type: tangential
+    nx: 4
+    ny: 0
+    nz: 1
+    wavelength: 2.858
+  - degeneracy: 1
+    frequency: 120.52
+    mode_type: tangential
+    nx: 0
+    ny: 1
+    nz: 2
+    wavelength: 2.846
+  risk_level: normal
+- bandwidth: 0.5
+  center_freq: 123.62
+  mode_count: 2
+  modes:
+  - degeneracy: 2
+    frequency: 123.37
+    mode_type: oblique
+    nx: 1
+    ny: 1
+    nz: 2
+    wavelength: 2.78
+  - degeneracy: 1
+    frequency: 123.87
+    mode_type: oblique
+    nx: 3
+    ny: 2
+    nz: 1
+    wavelength: 2.769
+  risk_level: normal
+- bandwidth: 0.62
+  center_freq: 171.46
+  mode_count: 3
+  modes:
+  - degeneracy: 1
+    frequency: 171.15
+    mode_type: oblique
+    nx: 2
+    ny: 4
+    nz: 1
+    wavelength: 2.004
+  - degeneracy: 1
+    frequency: 171.5
+    mode_type: axial
+    nx: 0
+    ny: 0
+    nz: 3
+    wavelength: 2.0
+  - degeneracy: 1
+    frequency: 171.77
+    mode_type: tangential
+    nx: 3
+    ny: 4
+    nz: 0
+    wavelength: 1.997
+  risk_level: warning
+- bandwidth: 0.64
+  center_freq: 189.2
+  mode_count: 2
+  modes:
+  - degeneracy: 2
+    frequency: 188.89
+    mode_type: tangential
+    nx: 3
+    ny: 0
+    nz: 3
+    wavelength: 1.816
+  - degeneracy: 1
+    frequency: 189.52
+    mode_type: oblique
+    nx: 1
+    ny: 2
+    nz: 3
+    wavelength: 1.81
+  risk_level: normal
+- bandwidth: 0.67
+  center_freq: 197.39
+  mode_count: 3
+  modes:
+  - degeneracy: 2
+    frequency: 197.06
+    mode_type: oblique
+    nx: 7
+    ny: 1
+    nz: 1
+    wavelength: 1.741
+  - degeneracy: 2
+    frequency: 197.73
+    mode_type: oblique
+    nx: 2
+    ny: 4
+    nz: 2
+    wavelength: 1.735
+  - degeneracy: 1
+    frequency: 197.73
+    mode_type: tangential
+    nx: 2
+    ny: 5
+    nz: 0
+    wavelength: 1.735
+  risk_level: warning
+- bandwidth: 0.72
+  center_freq: 185.05
+  mode_count: 3
+  modes:
+  - degeneracy: 1
+    frequency: 184.69
+    mode_type: axial
+    nx: 7
+    ny: 0
+    nz: 0
+    wavelength: 1.857
+  - degeneracy: 1
+    frequency: 184.77
+    mode_type: oblique
+    nx: 6
+    ny: 2
+    nz: 1
+    wavelength: 1.856
+  - degeneracy: 2
+    frequency: 185.41
+    mode_type: tangential
+    nx: 4
+    ny: 4
+    nz: 0
+    wavelength: 1.85
+  risk_level: warning
+- bandwidth: 0.73
+  center_freq: 105.18
+  mode_count: 2
+  modes:
+  - degeneracy: 2
+    frequency: 104.81
+    mode_type: oblique
+    nx: 3
+    ny: 1
+    nz: 1
+    wavelength: 3.272
+  - degeneracy: 1
+    frequency: 105.54
+    mode_type: axial
+    nx: 4
+    ny: 0
+    nz: 0
+    wavelength: 3.25
+  risk_level: normal
+- bandwidth: 0.75
+  center_freq: 179.06
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 178.68
+    mode_type: oblique
+    nx: 5
+    ny: 1
+    nz: 2
+    wavelength: 1.92
+  - degeneracy: 1
+    frequency: 179.43
+    mode_type: tangential
+    nx: 2
+    ny: 0
+    nz: 3
+    wavelength: 1.912
+  risk_level: normal
+- bandwidth: 0.83
+  center_freq: 165.35
+  mode_count: 2
+  modes:
+  - degeneracy: 2
+    frequency: 164.93
+    mode_type: oblique
+    nx: 1
+    ny: 4
+    nz: 1
+    wavelength: 2.08
+  - degeneracy: 1
+    frequency: 165.77
+    mode_type: oblique
+    nx: 4
+    ny: 3
+    nz: 1
+    wavelength: 2.069
+  risk_level: normal
+- bandwidth: 0.86
+  center_freq: 199.37
+  mode_count: 3
+  modes:
+  - degeneracy: 1
+    frequency: 198.95
+    mode_type: tangential
+    nx: 0
+    ny: 5
+    nz: 1
+    wavelength: 1.724
+  - degeneracy: 1
+    frequency: 198.96
+    mode_type: oblique
+    nx: 6
+    ny: 1
+    nz: 2
+    wavelength: 1.724
+  - degeneracy: 1
+    frequency: 199.8
+    mode_type: tangential
+    nx: 7
+    ny: 2
+    nz: 0
+    wavelength: 1.717
+  risk_level: warning
+- bandwidth: 0.86
+  center_freq: 139.49
+  mode_count: 3
+  modes:
+  - degeneracy: 1
+    frequency: 139.06
+    mode_type: tangential
+    nx: 3
+    ny: 0
+    nz: 2
+    wavelength: 2.467
+  - degeneracy: 2
+    frequency: 139.06
+    mode_type: tangential
+    nx: 3
+    ny: 3
+    nz: 0
+    wavelength: 2.467
+  - degeneracy: 2
+    frequency: 139.92
+    mode_type: oblique
+    nx: 1
+    ny: 2
+    nz: 2
+    wavelength: 2.451
+  risk_level: warning
+- bandwidth: 0.89
+  center_freq: 155.15
+  mode_count: 3
+  modes:
+  - degeneracy: 1
+    frequency: 154.71
+    mode_type: tangential
+    nx: 1
+    ny: 4
+    nz: 0
+    wavelength: 2.217
+  - degeneracy: 1
+    frequency: 155.6
+    mode_type: tangential
+    nx: 4
+    ny: 0
+    nz: 2
+    wavelength: 2.204
+  - degeneracy: 1
+    frequency: 155.6
+    mode_type: tangential
+    nx: 4
+    ny: 3
+    nz: 0
+    wavelength: 2.204
+  risk_level: warning
+- bandwidth: 0.91
+  center_freq: 188.13
+  mode_count: 2
+  modes:
+  - degeneracy: 1
+    frequency: 187.68
+    mode_type: tangential
+    nx: 0
+    ny: 2
+    nz: 3
+    wavelength: 1.828
+  - degeneracy: 1
+    frequency: 188.58
+    mode_type: tangential
+    nx: 7
+    ny: 1
+    nz: 0
+    wavelength: 1.819
+  risk_level: normal
+- bandwidth: 0.93
+  center_freq: 194.49
+  mode_count: 2
+  modes:
+  - degeneracy: 2
+    frequency: 194.03
+    mode_type: oblique
+    nx: 4
+    ny: 4
+    nz: 1
+    wavelength: 1.768
+  - degeneracy: 2
+    frequency: 194.95
+    mode_type: oblique
+    nx: 2
+    ny: 2
+    nz: 3
+    wavelength: 1.759
+  risk_level: normal
+- bandwidth: 0.94
+  center_freq: 173.05
+  mode_count: 3
+  modes:
+  - degeneracy: 2
+    frequency: 172.57
+    mode_type: oblique
+    nx: 6
+    ny: 1
+    nz: 1
+    wavelength: 1.988
+  - degeneracy: 2
+    frequency: 173.26
+    mode_type: oblique
+    nx: 4
+    ny: 2
+    nz: 2
+    wavelength: 1.98
+  - degeneracy: 1
+    frequency: 173.52
+    mode_type: tangential
+    nx: 1
+    ny: 0
+    nz: 3
+    wavelength: 1.977
+  risk_level: warning
+- bandwidth: 0.96
+  center_freq: 192.86
+  mode_count: 5
+  modes:
+  - degeneracy: 1
+    frequency: 192.37
+    mode_type: oblique
+    nx: 1
+    ny: 4
+    nz: 2
+    wavelength: 1.783
+  - degeneracy: 1
+    frequency: 192.37
+    mode_type: tangential
+    nx: 1
+    ny: 5
+    nz: 0
+    wavelength: 1.783
+  - degeneracy: 2
+    frequency: 192.69
+    mode_type: oblique
+    nx: 3
+    ny: 1
+    nz: 3
+    wavelength: 1.78
+  - degeneracy: 1
+    frequency: 193.09
+    mode_type: oblique
+    nx: 4
+    ny: 3
+    nz: 2
+    wavelength: 1.776
+  - degeneracy: 1
+    frequency: 193.34
+    mode_type: tangential
+    nx: 7
+    ny: 0
+    nz: 1
+    wavelength: 1.774
+  risk_level: critical
+- bandwidth: 0.97
+  center_freq: 109.4
+  mode_count: 2
+  modes:
+  - degeneracy: 2
+    frequency: 108.91
+    mode_type: oblique
+    nx: 2
+    ny: 2
+    nz: 1
+    wavelength: 3.149
+  - degeneracy: 1
+    frequency: 109.89
+    mode_type: tangential
+    nx: 3
+    ny: 2
+    nz: 0
+    wavelength: 3.121
+  risk_level: normal
+- bandwidth: 0.97
+  center_freq: 137.8
+  mode_count: 3
+  modes:
+  - degeneracy: 1
+    frequency: 137.32
+    mode_type: tangential
+    nx: 5
+    ny: 1
+    nz: 0
+    wavelength: 2.498
+  - degeneracy: 2
+    frequency: 137.41
+    mode_type: tangential
+    nx: 0
+    ny: 2
+    nz: 2
+    wavelength: 2.496
+  - degeneracy: 1
+    frequency: 138.29
+    mode_type: oblique
+    nx: 2
+    ny: 3
+    nz: 1
+    wavelength: 2.48
+  risk_level: warning
+modes:
+- degeneracy: 1
+  frequency: 26.38
+  mode_type: axial
+  nx: 1
+  ny: 0
+  nz: 0
+  wavelength: 13.0
+- degeneracy: 1
+  frequency: 38.11
+  mode_type: axial
+  nx: 0
+  ny: 1
+  nz: 0
+  wavelength: 9.0
+- degeneracy: 2
+  frequency: 46.35
+  mode_type: tangential
+  nx: 1
+  ny: 1
+  nz: 0
+  wavelength: 7.4
+- degeneracy: 1
+  frequency: 52.77
+  mode_type: axial
+  nx: 2
+  ny: 0
+  nz: 0
+  wavelength: 6.5
+- degeneracy: 1
+  frequency: 57.17
+  mode_type: axial
+  nx: 0
+  ny: 0
+  nz: 1
+  wavelength: 6.0
+- degeneracy: 2
+  frequency: 62.96
+  mode_type: tangential
+  nx: 1
+  ny: 0
+  nz: 1
+  wavelength: 5.448
+- degeneracy: 1
+  frequency: 65.09
+  mode_type: tangential
+  nx: 2
+  ny: 1
+  nz: 0
+  wavelength: 5.269
+- degeneracy: 2
+  frequency: 68.71
+  mode_type: tangential
+  nx: 0
+  ny: 1
+  nz: 1
+  wavelength: 4.992
+- degeneracy: 2
+  frequency: 73.6
+  mode_type: oblique
+  nx: 1
+  ny: 1
+  nz: 1
+  wavelength: 4.66
+- degeneracy: 1
+  frequency: 76.22
+  mode_type: axial
+  nx: 0
+  ny: 2
+  nz: 0
+  wavelength: 4.5
+- degeneracy: 1
+  frequency: 77.8
+  mode_type: tangential
+  nx: 2
+  ny: 0
+  nz: 1
+  wavelength: 4.409
+- degeneracy: 1
+  frequency: 79.15
+  mode_type: axial
+  nx: 3
+  ny: 0
+  nz: 0
+  wavelength: 4.333
+- degeneracy: 1
+  frequency: 80.66
+  mode_type: tangential
+  nx: 1
+  ny: 2
+  nz: 0
+  wavelength: 4.252
+- degeneracy: 2
+  frequency: 86.63
+  mode_type: oblique
+  nx: 2
+  ny: 1
+  nz: 1
+  wavelength: 3.959
+- degeneracy: 1
+  frequency: 87.85
+  mode_type: tangential
+  nx: 3
+  ny: 1
+  nz: 0
+  wavelength: 3.904
+- degeneracy: 2
+  frequency: 92.71
+  mode_type: tangential
+  nx: 2
+  ny: 2
+  nz: 0
+  wavelength: 3.7
+- degeneracy: 1
+  frequency: 95.28
+  mode_type: tangential
+  nx: 0
+  ny: 2
+  nz: 1
+  wavelength: 3.6
+- degeneracy: 1
+  frequency: 97.64
+  mode_type: tangential
+  nx: 3
+  ny: 0
+  nz: 1
+  wavelength: 3.513
+- degeneracy: 2
+  frequency: 98.86
+  mode_type: oblique
+  nx: 1
+  ny: 2
+  nz: 1
+  wavelength: 3.469
+- degeneracy: 2
+  frequency: 104.81
+  mode_type: oblique
+  nx: 3
+  ny: 1
+  nz: 1
+  wavelength: 3.272
+- degeneracy: 1
+  frequency: 105.54
+  mode_type: axial
+  nx: 4
+  ny: 0
+  nz: 0
+  wavelength: 3.25
+- degeneracy: 2
+  frequency: 108.91
+  mode_type: oblique
+  nx: 2
+  ny: 2
+  nz: 1
+  wavelength: 3.149
+- degeneracy: 1
+  frequency: 109.89
+  mode_type: tangential
+  nx: 3
+  ny: 2
+  nz: 0
+  wavelength: 3.121
+- degeneracy: 1
+  frequency: 112.21
+  mode_type: tangential
+  nx: 4
+  ny: 1
+  nz: 0
+  wavelength: 3.057
+- degeneracy: 1
+  frequency: 114.33
+  mode_type: axial
+  nx: 0
+  ny: 0
+  nz: 2
+  wavelength: 3.0
+- degeneracy: 1
+  frequency: 114.33
+  mode_type: axial
+  nx: 0
+  ny: 3
+  nz: 0
+  wavelength: 3.0
+- degeneracy: 1
+  frequency: 117.34
+  mode_type: tangential
+  nx: 1
+  ny: 0
+  nz: 2
+  wavelength: 2.923
+- degeneracy: 1
+  frequency: 117.34
+  mode_type: tangential
+  nx: 1
+  ny: 3
+  nz: 0
+  wavelength: 2.923
+- degeneracy: 1
+  frequency: 120.03
+  mode_type: tangential
+  nx: 4
+  ny: 0
+  nz: 1
+  wavelength: 2.858
+- degeneracy: 1
+  frequency: 120.52
+  mode_type: tangential
+  nx: 0
+  ny: 1
+  nz: 2
+  wavelength: 2.846
+- degeneracy: 2
+  frequency: 123.37
+  mode_type: oblique
+  nx: 1
+  ny: 1
+  nz: 2
+  wavelength: 2.78
+- degeneracy: 1
+  frequency: 123.87
+  mode_type: oblique
+  nx: 3
+  ny: 2
+  nz: 1
+  wavelength: 2.769
+- degeneracy: 2
+  frequency: 125.92
+  mode_type: tangential
+  nx: 2
+  ny: 0
+  nz: 2
+  wavelength: 2.724
+- degeneracy: 1
+  frequency: 125.92
+  mode_type: tangential
+  nx: 2
+  ny: 3
+  nz: 0
+  wavelength: 2.724
+- degeneracy: 2
+  frequency: 125.93
+  mode_type: oblique
+  nx: 4
+  ny: 1
+  nz: 1
+  wavelength: 2.724
+- degeneracy: 1
+  frequency: 127.83
+  mode_type: tangential
+  nx: 0
+  ny: 3
+  nz: 1
+  wavelength: 2.683
+- degeneracy: 1
+  frequency: 130.19
+  mode_type: tangential
+  nx: 4
+  ny: 2
+  nz: 0
+  wavelength: 2.635
+- degeneracy: 2
+  frequency: 130.52
+  mode_type: oblique
+  nx: 1
+  ny: 3
+  nz: 1
+  wavelength: 2.628
+- degeneracy: 2
+  frequency: 131.56
+  mode_type: oblique
+  nx: 2
+  ny: 1
+  nz: 2
+  wavelength: 2.607
+- degeneracy: 1
+  frequency: 131.92
+  mode_type: axial
+  nx: 5
+  ny: 0
+  nz: 0
+  wavelength: 2.6
+- degeneracy: 1
+  frequency: 137.32
+  mode_type: tangential
+  nx: 5
+  ny: 1
+  nz: 0
+  wavelength: 2.498
+- degeneracy: 2
+  frequency: 137.41
+  mode_type: tangential
+  nx: 0
+  ny: 2
+  nz: 2
+  wavelength: 2.496
+- degeneracy: 1
+  frequency: 138.29
+  mode_type: oblique
+  nx: 2
+  ny: 3
+  nz: 1
+  wavelength: 2.48
+- degeneracy: 1
+  frequency: 139.06
+  mode_type: tangential
+  nx: 3
+  ny: 0
+  nz: 2
+  wavelength: 2.467
+- degeneracy: 2
+  frequency: 139.06
+  mode_type: tangential
+  nx: 3
+  ny: 3
+  nz: 0
+  wavelength: 2.467
+- degeneracy: 2
+  frequency: 139.92
+  mode_type: oblique
+  nx: 1
+  ny: 2
+  nz: 2
+  wavelength: 2.451
+- degeneracy: 1
+  frequency: 142.18
+  mode_type: oblique
+  nx: 4
+  ny: 2
+  nz: 1
+  wavelength: 2.412
+- degeneracy: 1
+  frequency: 143.78
+  mode_type: tangential
+  nx: 5
+  ny: 0
+  nz: 1
+  wavelength: 2.386
+- degeneracy: 1
+  frequency: 144.19
+  mode_type: oblique
+  nx: 3
+  ny: 1
+  nz: 2
+  wavelength: 2.379
+- degeneracy: 2
+  frequency: 147.2
+  mode_type: oblique
+  nx: 2
+  ny: 2
+  nz: 2
+  wavelength: 2.33
+- degeneracy: 2
+  frequency: 148.74
+  mode_type: oblique
+  nx: 5
+  ny: 1
+  nz: 1
+  wavelength: 2.306
+- degeneracy: 2
+  frequency: 150.35
+  mode_type: oblique
+  nx: 3
+  ny: 3
+  nz: 1
+  wavelength: 2.281
+- degeneracy: 1
+  frequency: 152.36
+  mode_type: tangential
+  nx: 5
+  ny: 2
+  nz: 0
+  wavelength: 2.251
+- degeneracy: 1
+  frequency: 152.44
+  mode_type: axial
+  nx: 0
+  ny: 4
+  nz: 0
+  wavelength: 2.25
+- degeneracy: 1
+  frequency: 154.71
+  mode_type: tangential
+  nx: 1
+  ny: 4
+  nz: 0
+  wavelength: 2.217
+- degeneracy: 1
+  frequency: 155.6
+  mode_type: tangential
+  nx: 4
+  ny: 0
+  nz: 2
+  wavelength: 2.204
+- degeneracy: 1
+  frequency: 155.6
+  mode_type: tangential
+  nx: 4
+  ny: 3
+  nz: 0
+  wavelength: 2.204
+- degeneracy: 1
+  frequency: 158.31
+  mode_type: axial
+  nx: 6
+  ny: 0
+  nz: 0
+  wavelength: 2.167
+- degeneracy: 2
+  frequency: 158.58
+  mode_type: oblique
+  nx: 3
+  ny: 2
+  nz: 2
+  wavelength: 2.163
+- degeneracy: 1
+  frequency: 160.2
+  mode_type: oblique
+  nx: 4
+  ny: 1
+  nz: 2
+  wavelength: 2.141
+- degeneracy: 1
+  frequency: 161.32
+  mode_type: tangential
+  nx: 2
+  ny: 4
+  nz: 0
+  wavelength: 2.126
+- degeneracy: 1
+  frequency: 161.69
+  mode_type: tangential
+  nx: 0
+  ny: 3
+  nz: 2
+  wavelength: 2.121
+- degeneracy: 1
+  frequency: 162.73
+  mode_type: oblique
+  nx: 5
+  ny: 2
+  nz: 1
+  wavelength: 2.108
+- degeneracy: 1
+  frequency: 162.81
+  mode_type: tangential
+  nx: 0
+  ny: 4
+  nz: 1
+  wavelength: 2.107
+- degeneracy: 1
+  frequency: 162.83
+  mode_type: tangential
+  nx: 6
+  ny: 1
+  nz: 0
+  wavelength: 2.106
+- degeneracy: 1
+  frequency: 163.83
+  mode_type: oblique
+  nx: 1
+  ny: 3
+  nz: 2
+  wavelength: 2.094
+- degeneracy: 2
+  frequency: 164.93
+  mode_type: oblique
+  nx: 1
+  ny: 4
+  nz: 1
+  wavelength: 2.08
+- degeneracy: 1
+  frequency: 165.77
+  mode_type: oblique
+  nx: 4
+  ny: 3
+  nz: 1
+  wavelength: 2.069
+- degeneracy: 1
+  frequency: 168.31
+  mode_type: tangential
+  nx: 6
+  ny: 0
+  nz: 1
+  wavelength: 2.038
+- degeneracy: 2
+  frequency: 170.08
+  mode_type: oblique
+  nx: 2
+  ny: 3
+  nz: 2
+  wavelength: 2.017
+- degeneracy: 1
+  frequency: 171.15
+  mode_type: oblique
+  nx: 2
+  ny: 4
+  nz: 1
+  wavelength: 2.004
+- degeneracy: 1
+  frequency: 171.5
+  mode_type: axial
+  nx: 0
+  ny: 0
+  nz: 3
+  wavelength: 2.0
+- degeneracy: 1
+  frequency: 171.77
+  mode_type: tangential
+  nx: 3
+  ny: 4
+  nz: 0
+  wavelength: 1.997
+- degeneracy: 2
+  frequency: 172.57
+  mode_type: oblique
+  nx: 6
+  ny: 1
+  nz: 1
+  wavelength: 1.988
+- degeneracy: 2
+  frequency: 173.26
+  mode_type: oblique
+  nx: 4
+  ny: 2
+  nz: 2
+  wavelength: 1.98
+- degeneracy: 1
+  frequency: 173.52
+  mode_type: tangential
+  nx: 1
+  ny: 0
+  nz: 3
+  wavelength: 1.977
+- degeneracy: 1
+  frequency: 174.57
+  mode_type: tangential
+  nx: 5
+  ny: 0
+  nz: 2
+  wavelength: 1.965
+- degeneracy: 1
+  frequency: 174.57
+  mode_type: tangential
+  nx: 5
+  ny: 3
+  nz: 0
+  wavelength: 1.965
+- degeneracy: 1
+  frequency: 175.68
+  mode_type: tangential
+  nx: 0
+  ny: 1
+  nz: 3
+  wavelength: 1.952
+- degeneracy: 1
+  frequency: 175.7
+  mode_type: tangential
+  nx: 6
+  ny: 2
+  nz: 0
+  wavelength: 1.952
+- degeneracy: 2
+  frequency: 177.65
+  mode_type: oblique
+  nx: 1
+  ny: 1
+  nz: 3
+  wavelength: 1.931
+- degeneracy: 1
+  frequency: 178.68
+  mode_type: oblique
+  nx: 5
+  ny: 1
+  nz: 2
+  wavelength: 1.92
+- degeneracy: 1
+  frequency: 179.43
+  mode_type: tangential
+  nx: 2
+  ny: 0
+  nz: 3
+  wavelength: 1.912
+- degeneracy: 2
+  frequency: 180.03
+  mode_type: oblique
+  nx: 3
+  ny: 3
+  nz: 2
+  wavelength: 1.905
+- degeneracy: 1
+  frequency: 181.03
+  mode_type: oblique
+  nx: 3
+  ny: 4
+  nz: 1
+  wavelength: 1.895
+- degeneracy: 1
+  frequency: 183.44
+  mode_type: oblique
+  nx: 2
+  ny: 1
+  nz: 3
+  wavelength: 1.87
+- degeneracy: 1
+  frequency: 183.69
+  mode_type: oblique
+  nx: 5
+  ny: 3
+  nz: 1
+  wavelength: 1.867
+- degeneracy: 1
+  frequency: 184.69
+  mode_type: axial
+  nx: 7
+  ny: 0
+  nz: 0
+  wavelength: 1.857
+- degeneracy: 1
+  frequency: 184.77
+  mode_type: oblique
+  nx: 6
+  ny: 2
+  nz: 1
+  wavelength: 1.856
+- degeneracy: 2
+  frequency: 185.41
+  mode_type: tangential
+  nx: 4
+  ny: 4
+  nz: 0
+  wavelength: 1.85
+- degeneracy: 1
+  frequency: 187.68
+  mode_type: tangential
+  nx: 0
+  ny: 2
+  nz: 3
+  wavelength: 1.828
+- degeneracy: 1
+  frequency: 188.58
+  mode_type: tangential
+  nx: 7
+  ny: 1
+  nz: 0
+  wavelength: 1.819
+- degeneracy: 2
+  frequency: 188.89
+  mode_type: tangential
+  nx: 3
+  ny: 0
+  nz: 3
+  wavelength: 1.816
+- degeneracy: 1
+  frequency: 189.52
+  mode_type: oblique
+  nx: 1
+  ny: 2
+  nz: 3
+  wavelength: 1.81
+- degeneracy: 2
+  frequency: 190.49
+  mode_type: oblique
+  nx: 5
+  ny: 2
+  nz: 2
+  wavelength: 1.801
+- degeneracy: 1
+  frequency: 190.56
+  mode_type: tangential
+  nx: 0
+  ny: 4
+  nz: 2
+  wavelength: 1.8
+- degeneracy: 1
+  frequency: 190.56
+  mode_type: axial
+  nx: 0
+  ny: 5
+  nz: 0
+  wavelength: 1.8
+- degeneracy: 1
+  frequency: 192.37
+  mode_type: oblique
+  nx: 1
+  ny: 4
+  nz: 2
+  wavelength: 1.783
+- degeneracy: 1
+  frequency: 192.37
+  mode_type: tangential
+  nx: 1
+  ny: 5
+  nz: 0
+  wavelength: 1.783
+- degeneracy: 2
+  frequency: 192.69
+  mode_type: oblique
+  nx: 3
+  ny: 1
+  nz: 3
+  wavelength: 1.78
+- degeneracy: 1
+  frequency: 193.09
+  mode_type: oblique
+  nx: 4
+  ny: 3
+  nz: 2
+  wavelength: 1.776
+- degeneracy: 1
+  frequency: 193.34
+  mode_type: tangential
+  nx: 7
+  ny: 0
+  nz: 1
+  wavelength: 1.774
+- degeneracy: 2
+  frequency: 194.03
+  mode_type: oblique
+  nx: 4
+  ny: 4
+  nz: 1
+  wavelength: 1.768
+- degeneracy: 2
+  frequency: 194.95
+  mode_type: oblique
+  nx: 2
+  ny: 2
+  nz: 3
+  wavelength: 1.759
+- degeneracy: 1
+  frequency: 195.28
+  mode_type: tangential
+  nx: 6
+  ny: 0
+  nz: 2
+  wavelength: 1.756
+- degeneracy: 1
+  frequency: 195.28
+  mode_type: tangential
+  nx: 6
+  ny: 3
+  nz: 0
+  wavelength: 1.756
+- degeneracy: 2
+  frequency: 197.06
+  mode_type: oblique
+  nx: 7
+  ny: 1
+  nz: 1
+  wavelength: 1.741
+- degeneracy: 2
+  frequency: 197.73
+  mode_type: oblique
+  nx: 2
+  ny: 4
+  nz: 2
+  wavelength: 1.735
+- degeneracy: 1
+  frequency: 197.73
+  mode_type: tangential
+  nx: 2
+  ny: 5
+  nz: 0
+  wavelength: 1.735
+- degeneracy: 1
+  frequency: 198.95
+  mode_type: tangential
+  nx: 0
+  ny: 5
+  nz: 1
+  wavelength: 1.724
+- degeneracy: 1
+  frequency: 198.96
+  mode_type: oblique
+  nx: 6
+  ny: 1
+  nz: 2
+  wavelength: 1.724
+- degeneracy: 1
+  frequency: 199.8
+  mode_type: tangential
+  nx: 7
+  ny: 2
+  nz: 0
+  wavelength: 1.717
+project_id: studio_normal_v1

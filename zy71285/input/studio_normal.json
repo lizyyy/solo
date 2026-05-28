@@ -1,0 +1,35 @@
+{
+  "project_id": "studio_normal_v1",
+  "room_dimensions": {
+    "length": 6.0,
+    "width": 4.2,
+    "height": 2.8,
+    "unit": "m"
+  },
+  "sound_speed": 343.0,
+  "min_frequency": 20.0,
+  "max_frequency": 200.0,
+  "listening_points": [
+    {
+      "x": 3.0,
+      "y": 2.1,
+      "z": 1.2
+    },
+    {
+      "x": 1.5,
+      "y": 2.1,
+      "z": 1.2
+    }
+  ],
+  "absorption_materials": {
+    "bass_trap": {
+      "63": 0.8,
+      "125": 0.6
+    },
+    "acoustic_panel": {
+      "125": 0.3,
+      "250": 0.7
+    }
+  },
+  "notes": "标准录音棚配置 v1"
+}
