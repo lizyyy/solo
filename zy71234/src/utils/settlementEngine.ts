@@ -19,6 +19,7 @@ export function calculateSplitModifiers(
   const updatedParties = parties.map(party => ({ ...party }));
 
   cards.forEach(card => {
+    if (card.effect.isRaw) return;
     if (card.effect.type === 'split_modifier') {
       const targets = card.effect.target === 'all' 
         ? splitDetails 
@@ -55,6 +56,7 @@ export function calculateDeductions(
   const deductions: Array<{ name: string; amount: number; cardId: string }> = [];
   
   cards.forEach(card => {
+    if (card.effect.isRaw) return;
     if (card.effect.type === 'deduction_add') {
       const amount = totalRevenue * (card.effect.value / 100);
       deductions.push({
@@ -75,6 +77,7 @@ export function applyRights(parties: PartyState[], cards: Card[]): PartyState[] 
     const updatedParty = { ...party, rights: [...party.rights] };
     
     cards.forEach(card => {
+      if (card.effect.isRaw) return;
       if (card.effect.type === 'right_add' && card.effect.right) {
         const shouldApply = card.effect.target === 'all' || 
           updatedParty.type === card.effect.target;
@@ -99,6 +102,7 @@ export function calculateReputation(
   let rawScore = parties.reduce((sum, p) => sum + p.reputation, 0) / parties.length;
   
   cards.forEach(card => {
+    if (card.effect.isRaw) return;
     if (card.effect.type === 'reputation_mod') {
       if (card.effect.target === 'all') {
         rawScore += card.effect.value;
