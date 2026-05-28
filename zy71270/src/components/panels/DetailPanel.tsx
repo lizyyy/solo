@@ -7,10 +7,11 @@ import {
   X,
   Plus,
   Check,
+  Route,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useDataStore, useViewStore, useModificationStore } from '../../store';
-import type { Shelf, Robot, ChargingStation } from '../../types';
+import type { Shelf, Robot, ChargingStation, PathSegment } from '../../types';
 import Badge from '../common/Badge';
 import GlassPanel from '../common/GlassPanel';
 import ModificationModal from './ModificationModal';
@@ -26,7 +27,7 @@ interface FieldRow {
 
 type CompareElement = {
   id: string;
-  type: 'shelf' | 'robot' | 'station';
+  type: 'shelf' | 'robot' | 'station' | 'path';
   name: string;
 };
 
@@ -42,6 +43,7 @@ export default function DetailPanel() {
   const getShelfById = useDataStore((s) => s.getShelfById);
   const getRobotById = useDataStore((s) => s.getRobotById);
   const getStationById = useDataStore((s) => s.getStationById);
+  const getPathSegmentById = useDataStore((s) => s.getPathSegmentById);
 
   const getModificationsByEntity = useModificationStore(
     (s) => s.getModificationsByEntity
@@ -62,10 +64,12 @@ export default function DetailPanel() {
         return getRobotById(selectedElementId) ?? null;
       case 'station':
         return getStationById(selectedElementId) ?? null;
+      case 'path':
+        return getPathSegmentById(selectedElementId) ?? null;
       default:
         return null;
     }
-  }, [selectedElementId, selectedElementType, getShelfById, getRobotById, getStationById]);
+  }, [selectedElementId, selectedElementType, getShelfById, getRobotById, getStationById, getPathSegmentById]);
 
   const modifications = useMemo(() => {
     if (!selectedElementId || !selectedElementType) return [];
@@ -75,16 +79,15 @@ export default function DetailPanel() {
   }, [selectedElementId, selectedElementType, getModificationsByEntity]);
 
   const isInCompareList = useMemo(() => {
-    if (!selectedElementId || !selectedElementType || selectedElementType === 'path') return false;
+    if (!selectedElementId || !selectedElementType) return false;
     return compareList.some((c) => c.id === selectedElementId);
   }, [selectedElementId, selectedElementType, compareList]);
 
   const toggleCompare = useCallback(() => {
-    if (!selectedElementId || !selectedElementType || selectedElementType === 'path') return;
+    if (!selectedElementId || !selectedElementType) return;
     if (isInCompareList) {
       setCompareList((prev) => prev.filter((c) => c.id !== selectedElementId));
     } else if (compareList.length < 2) {
-      const type = selectedElementType === 'station' ? 'charging' : selectedElementType;
       let name = selectedElementId;
       if (selectedElementType === 'shelf') {
         const shelf = getShelfById(selectedElementId);
@@ -95,22 +98,26 @@ export default function DetailPanel() {
       } else if (selectedElementType === 'station') {
         const station = getStationById(selectedElementId);
         name = station ? `充电站 ${station.id.slice(-4)}` : name;
+      } else if (selectedElementType === 'path') {
+        const segment = getPathSegmentById(selectedElementId);
+        name = segment ? `路径 ${segment.id.slice(-6)}` : name;
       }
       setCompareList((prev) => [
         ...prev,
-        { id: selectedElementId, type: selectedElementType as 'shelf' | 'robot' | 'station', name },
+        { id: selectedElementId, type: selectedElementType as 'shelf' | 'robot' | 'station' | 'path', name },
       ]);
     }
-  }, [selectedElementId, selectedElementType, compareList.length, isInCompareList, getShelfById, getRobotById, getStationById]);
+  }, [selectedElementId, selectedElementType, compareList.length, isInCompareList, getShelfById, getRobotById, getStationById, getPathSegmentById]);
 
   const getEntityForCompare = useCallback(
     (item: CompareElement) => {
       if (item.type === 'shelf') return getShelfById(item.id);
       if (item.type === 'robot') return getRobotById(item.id);
       if (item.type === 'station') return getStationById(item.id);
+      if (item.type === 'path') return getPathSegmentById(item.id);
       return null;
     },
-    [getShelfById, getRobotById, getStationById]
+    [getShelfById, getRobotById, getStationById, getPathSegmentById]
   );
 
   const fields: FieldRow[] = useMemo(() => {
@@ -149,6 +156,22 @@ export default function DetailPanel() {
         { label: '状态', value: station.status, fieldName: 'status' },
         { label: '功率', value: `${station.power}kW`, fieldName: 'power' },
         { label: '排队数', value: station.queue.length, fieldName: 'queue' },
+      ];
+    }
+    if ('density' in entity && 'startPoint' in entity) {
+      const segment = entity as PathSegment;
+      return [
+        { label: '路径ID', value: segment.id, fieldName: 'id' },
+        { label: '机器人ID', value: segment.robotId, fieldName: 'robotId' },
+        { label: '路径密度', value: segment.density, fieldName: 'density' },
+        { label: '平均速度', value: `${segment.avgSpeed.toFixed(2)} m/s`, fieldName: 'avgSpeed' },
+        { label: '是否断点', value: segment.isBroken ? '是' : '否', fieldName: 'isBroken' },
+        { label: '起点楼层', value: segment.startPoint.floor, fieldName: 'startFloor' },
+        { label: '终点楼层', value: segment.endPoint.floor, fieldName: 'endFloor' },
+        { label: '起点X', value: segment.startPoint.position.x.toFixed(2), fieldName: 'startX' },
+        { label: '起点Y', value: segment.startPoint.position.y.toFixed(2), fieldName: 'startY' },
+        { label: '终点X', value: segment.endPoint.position.x.toFixed(2), fieldName: 'endX' },
+        { label: '终点Y', value: segment.endPoint.position.y.toFixed(2), fieldName: 'endY' },
       ];
     }
     return [];
@@ -199,43 +222,41 @@ export default function DetailPanel() {
         {activeTab === 'detail' && (
           <div className="space-y-2">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-slate-200">
+              <span className="text-sm font-semibold text-slate-200 flex items-center gap-1">
                 {selectedElementType === 'shelf'
                   ? '货架'
                   : selectedElementType === 'robot'
                     ? '机器人'
                     : selectedElementType === 'station'
                       ? '充电站'
-                      : '路径'}
+                      : <><Route className="w-4 h-4" />路径段</>}
               </span>
               <div className="flex gap-1">
+                <button
+                  onClick={toggleCompare}
+                  disabled={!isInCompareList && compareList.length >= 2}
+                  className={cn(
+                    'btn text-xs py-1 px-2 gap-1',
+                    isInCompareList
+                      ? 'btn-primary'
+                      : 'btn-secondary',
+                    !isInCompareList && compareList.length >= 2 && 'opacity-50 cursor-not-allowed'
+                  )}
+                >
+                  {isInCompareList ? (
+                    <><Check className="w-3 h-3" />已添加</>
+                  ) : (
+                    <><Plus className="w-3 h-3" />对比</>
+                  )}
+                </button>
                 {selectedElementType !== 'path' && (
-                  <>
-                    <button
-                      onClick={toggleCompare}
-                      disabled={!isInCompareList && compareList.length >= 2}
-                      className={cn(
-                        'btn text-xs py-1 px-2 gap-1',
-                        isInCompareList
-                          ? 'btn-primary'
-                          : 'btn-secondary',
-                        !isInCompareList && compareList.length >= 2 && 'opacity-50 cursor-not-allowed'
-                      )}
-                    >
-                      {isInCompareList ? (
-                        <><Check className="w-3 h-3" />已添加</>
-                      ) : (
-                        <><Plus className="w-3 h-3" />对比</>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => setShowModifyModal(true)}
-                      className="btn btn-secondary text-xs py-1 px-2 gap-1"
-                    >
-                      <Edit3 className="w-3 h-3" />
-                      修正
-                    </button>
-                  </>
+                  <button
+                    onClick={() => setShowModifyModal(true)}
+                    className="btn btn-secondary text-xs py-1 px-2 gap-1"
+                  >
+                    <Edit3 className="w-3 h-3" />
+                    修正
+                  </button>
                 )}
               </div>
             </div>
@@ -307,26 +328,34 @@ export default function DetailPanel() {
                             if (Array.isArray(val)) return String(val.length);
                             return String(val);
                           };
-                          const fieldsToCompare =
-                            compareList[0].type === 'shelf'
-                              ? [
-                                  { label: '容量', field: 'capacity' },
-                                  { label: '库存', field: 'currentStock' },
-                                  { label: '区域', field: 'zone' },
-                                  { label: '拥堵等级', field: 'congestionLevel' },
-                                ]
-                              : compareList[0].type === 'robot'
-                                ? [
-                                    { label: '名称', field: 'name' },
-                                    { label: '型号', field: 'model' },
-                                    { label: '状态', field: 'status' },
-                                    { label: '电量', field: 'batteryLevel' },
-                                  ]
-                                : [
-                                    { label: '状态', field: 'status' },
-                                    { label: '功率', field: 'power' },
-                                    { label: '排队数', field: 'queue' },
-                                  ];
+                          let fieldsToCompare: Array<{ label: string; field: string }>;
+                          if (compareList[0].type === 'shelf') {
+                            fieldsToCompare = [
+                              { label: '容量', field: 'capacity' },
+                              { label: '库存', field: 'currentStock' },
+                              { label: '区域', field: 'zone' },
+                              { label: '拥堵等级', field: 'congestionLevel' },
+                            ];
+                          } else if (compareList[0].type === 'robot') {
+                            fieldsToCompare = [
+                              { label: '名称', field: 'name' },
+                              { label: '型号', field: 'model' },
+                              { label: '状态', field: 'status' },
+                              { label: '电量', field: 'batteryLevel' },
+                            ];
+                          } else if (compareList[0].type === 'station') {
+                            fieldsToCompare = [
+                              { label: '状态', field: 'status' },
+                              { label: '功率', field: 'power' },
+                              { label: '排队数', field: 'queue' },
+                            ];
+                          } else {
+                            fieldsToCompare = [
+                              { label: '路径密度', field: 'density' },
+                              { label: '平均速度', field: 'avgSpeed' },
+                              { label: '是否断点', field: 'isBroken' },
+                            ];
+                          }
                           return fieldsToCompare.map((f) => {
                             const v1 = getFieldValue(e1, f.field);
                             const v2 = getFieldValue(e2, f.field);

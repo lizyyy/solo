@@ -43,6 +43,7 @@ interface DataStore extends DataState {
   getStationById: (stationId: string) => ChargingStation | undefined;
   getZoneById: (zoneId: string) => Zone | undefined;
   getTrajectoriesByRobotId: (robotId: string) => TrajectoryPoint[];
+  getPathSegmentById: (segmentId: string) => PathSegment | undefined;
   getPathSegmentsByRobotId: (robotId: string) => PathSegment[];
   getCongestionByShelfId: (shelfId: string) => CongestionReport[];
   getShelvesByFloor: (floorLevel: number) => Shelf[];
@@ -138,6 +139,10 @@ export const useDataStore = create<DataStore>((set, get) => ({
 
   getTrajectoriesByRobotId: (robotId) => {
     return get().trajectories.filter((t) => t.robotId === robotId);
+  },
+
+  getPathSegmentById: (segmentId) => {
+    return get().pathSegments.find((s) => s.id === segmentId);
   },
 
   getPathSegmentsByRobotId: (robotId) => {
