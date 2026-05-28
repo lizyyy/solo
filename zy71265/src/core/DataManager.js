@@ -50,24 +50,10 @@ export class DataManager {
       conflicts: []
     };
 
+    const parsedFiles = new Map();
+
     for (const file of files) {
       try {
-        const fileHash = await this.generateFileHash(file);
-        const existingImport = this.importedFiles.get(fileHash);
-        
-        if (existingImport) {
-          results.conflicts.push({
-            file: file.name,
-            hash: fileHash,
-            existingRecordId: existingImport.recordId,
-            existingRecordName: existingImport.recordName,
-            importedAt: existingImport.importedAt,
-            reason: '该文件已导入过',
-            action: CONFLICT_ACTIONS.SKIP
-          });
-          continue;
-        }
-
         let data;
         try {
           data = await readFileAsJSON(file);
@@ -88,6 +74,26 @@ export class DataManager {
           continue;
         }
 
+        const fileHash = await this.generateFileHash(file);
+        const existingImport = this.importedFiles.get(fileHash);
+
+        if (existingImport) {
+          results.conflicts.push({
+            file: file.name,
+            hash: fileHash,
+            data: data,
+            existingRecordId: existingImport.recordId,
+            existingRecordName: existingImport.recordName,
+            importedAt: existingImport.importedAt,
+            reason: '该文件已导入过',
+            action: CONFLICT_ACTIONS.SKIP
+          });
+          parsedFiles.set(file.name, { hash: fileHash, data, file: file.name });
+          continue;
+        }
+
+        parsedFiles.set(file.name, { hash: fileHash, data, file: file.name });
+
         results.success.push({
           file: file.name,
           hash: fileHash,
@@ -104,23 +110,64 @@ export class DataManager {
 
     if (results.conflicts.length > 0 && onConflict) {
       const resolvedConflicts = await onConflict(results.conflicts);
-      
+
       for (const conflict of resolvedConflicts) {
+        const parsed = parsedFiles.get(conflict.file);
+
         if (conflict.action === CONFLICT_ACTIONS.SKIP) {
           results.skipped.push({
             file: conflict.file,
             reason: '用户选择跳过'
           });
         } else if (conflict.action === CONFLICT_ACTIONS.OVERWRITE) {
-          const successItem = results.success.find(s => s.file === conflict.file);
-          if (successItem) {
+          if (parsed) {
             this.deleteRecord(conflict.existingRecordId);
+            this.importedFiles.delete(parsed.hash);
+            const record = this.createRecord(parsed.data, parsed.file);
+            this.importedFiles.set(parsed.hash, {
+              recordId: record.id,
+              recordName: record.name,
+              importedAt: Date.now(),
+              fileName: parsed.file
+            });
+            results.success.push({
+              file: conflict.file,
+              hash: parsed.hash,
+              data: parsed.data,
+              resolved: 'overwrite'
+            });
+            results.conflicts = results.conflicts.filter(c => c.file !== conflict.file);
+          }
+        } else if (conflict.action === CONFLICT_ACTIONS.APPEND) {
+          if (parsed) {
+            const mergedRecord = this.createRecordFromExisting(
+              conflict.existingRecordId,
+              parsed.data,
+              parsed.file
+            );
+            if (mergedRecord) {
+              this.importedFiles.set(parsed.hash, {
+                recordId: mergedRecord.id,
+                recordName: mergedRecord.name,
+                importedAt: Date.now(),
+                fileName: parsed.file
+              });
+              results.success.push({
+                file: conflict.file,
+                hash: parsed.hash,
+                data: parsed.data,
+                resolved: 'append'
+              });
+              results.conflicts = results.conflicts.filter(c => c.file !== conflict.file);
+            }
           }
         }
       }
     }
 
     for (const item of results.success) {
+      if (item.resolved) continue;
+
       const record = this.createRecord(item.data, item.file);
       this.importedFiles.set(item.hash, {
         recordId: record.id,
