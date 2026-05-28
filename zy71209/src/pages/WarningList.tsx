@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search, Filter, Download, RefreshCw, AlertTriangle, TrendingUp, Clock, FileText } from 'lucide-react';
+import { Search, Filter, Download, RefreshCw, AlertTriangle, TrendingUp, Clock } from 'lucide-react';
 import { Header } from '../components/layout/Header';
 import { Container } from '../components/layout/Container';
 import { StatCard } from '../components/cards/StatCard';
@@ -40,7 +40,7 @@ export default function WarningList() {
     setConsistencyStatus({
       passed: result.passed,
       message: result.passed
-        ? `数据一致性校验通过：${pledges.length}条记录，${statistics.totalWarning}条预警，${passedCount}/${result.details.length}项校验通过`
+        ? `数据一致性校验通过：${pledges.length}条记录，今日触线${statistics.todayTriggered}条，预警${statistics.totalWarning}条，平仓${statistics.totalClose}条，${passedCount}/${result.details.length}项校验通过`
         : `数据不一致：${result.errors.map((e) => e).join('；')}`,
     });
     setTimeout(() => setConsistencyStatus(null), 5000);
@@ -93,7 +93,7 @@ export default function WarningList() {
             </div>
           </div>
           <p className="text-gray-600">
-            共 {filteredPledges.length} 条质押合约，其中预警 {statistics.totalWarning} 条
+            共 {filteredPledges.length} 条质押合约，其中今日触线 {statistics.todayTriggered} 条，预警 {statistics.totalWarning} 条，平仓 {statistics.totalClose} 条
           </p>
         </div>
 
@@ -109,13 +109,27 @@ export default function WarningList() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           <StatCard
             title="今日触线"
-            value={statistics.totalWarning}
+            value={statistics.todayTriggered}
             icon={<AlertTriangle className="w-5 h-5" />}
             color="red"
+            highlight={statistics.todayTriggered > 0}
+          />
+          <StatCard
+            title="预警总数"
+            value={statistics.totalWarning}
+            icon={<AlertTriangle className="w-5 h-5" />}
+            color="orange"
             highlight={statistics.totalWarning > 0}
+          />
+          <StatCard
+            title="平仓总数"
+            value={statistics.totalClose}
+            icon={<AlertTriangle className="w-5 h-5" />}
+            color="red"
+            highlight={statistics.totalClose > 0}
           />
           <StatCard
             title="待补仓"
@@ -130,13 +144,6 @@ export default function WarningList() {
             icon={<Clock className="w-5 h-5" />}
             color="purple"
             highlight={statistics.pendingExtension > 0}
-          />
-          <StatCard
-            title="待处置"
-            value={statistics.pendingDisposal}
-            icon={<FileText className="w-5 h-5" />}
-            color="red"
-            highlight={statistics.pendingDisposal > 0}
           />
           <StatCard
             title="特殊场景"

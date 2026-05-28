@@ -117,7 +117,9 @@ export interface CalculationStep {
 }
 
 export interface Statistics {
+  todayTriggered: number;
   totalWarning: number;
+  totalClose: number;
   pendingSupplement: number;
   pendingExtension: number;
   pendingDisposal: number;

@@ -24,9 +24,37 @@ export function validateStatisticsConsistency(
   const warnings: string[] = [];
   const details: ConsistencyDetail[] = [];
 
+  const today = new Date().toISOString().split('T')[0];
+
+  const closePledges = pledges.filter((p) => {
+    const calc = calculations.get(p.id);
+    return calc?.isClose;
+  });
+
+  if (closePledges.length !== statistics.totalClose) {
+    errors.push(
+      `平仓总数不一致：统计显示${statistics.totalClose}，实际计算${closePledges.length}`
+    );
+    details.push({
+      type: 'statistics',
+      field: 'totalClose',
+      expected: statistics.totalClose.toString(),
+      actual: closePledges.length.toString(),
+      passed: false,
+    });
+  } else {
+    details.push({
+      type: 'statistics',
+      field: 'totalClose',
+      expected: statistics.totalClose.toString(),
+      actual: closePledges.length.toString(),
+      passed: true,
+    });
+  }
+
   const warningPledges = pledges.filter((p) => {
     const calc = calculations.get(p.id);
-    return calc?.isWarning;
+    return calc?.isWarning && !calc?.isClose;
   });
 
   if (warningPledges.length !== statistics.totalWarning) {
@@ -46,6 +74,33 @@ export function validateStatisticsConsistency(
       field: 'totalWarning',
       expected: statistics.totalWarning.toString(),
       actual: warningPledges.length.toString(),
+      passed: true,
+    });
+  }
+
+  const todayTriggeredPledges = pledges.filter((p) => {
+    const calc = calculations.get(p.id);
+    const updatedAtDate = p.updatedAt?.split('T')[0];
+    return (calc?.isWarning || calc?.isClose) && updatedAtDate === today;
+  });
+
+  if (todayTriggeredPledges.length !== statistics.todayTriggered) {
+    errors.push(
+      `今日触线数不一致：统计显示${statistics.todayTriggered}，实际计算${todayTriggeredPledges.length}`
+    );
+    details.push({
+      type: 'statistics',
+      field: 'todayTriggered',
+      expected: statistics.todayTriggered.toString(),
+      actual: todayTriggeredPledges.length.toString(),
+      passed: false,
+    });
+  } else {
+    details.push({
+      type: 'statistics',
+      field: 'todayTriggered',
+      expected: statistics.todayTriggered.toString(),
+      actual: todayTriggeredPledges.length.toString(),
       passed: true,
     });
   }

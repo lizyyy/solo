@@ -14,6 +14,15 @@ export function calculatePledgeRatio(
 ): PledgeCalculation {
   const steps: PledgeCalculation['calculationSteps'] = [];
 
+  const validation = validateWarningLineParams(pledge.warningLine, pledge.closeLine);
+  if (!validation.valid) {
+    steps.push({
+      label: '参数校验',
+      value: '警告',
+      formula: validation.errors.join('；'),
+    });
+  }
+
   let effectivePrice: number;
   if (!marketData) {
     effectivePrice = 0;
@@ -192,4 +201,51 @@ export function formatCurrencyFull(value: number): string {
 
 export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+export function validateWarningLineParams(warningLine: number, closeLine: number): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  if (isNaN(warningLine) || warningLine <= 0) {
+    errors.push(`警戒线必须大于0，当前值：${warningLine}`);
+  }
+
+  if (isNaN(closeLine) || closeLine <= 0) {
+    errors.push(`平仓线必须大于0，当前值：${closeLine}`);
+  }
+
+  if (warningLine >= 200) {
+    errors.push(`警戒线过高，建议不超过200%，当前值：${warningLine}%`);
+  }
+
+  if (warningLine >= closeLine) {
+    errors.push(`警戒线(${warningLine}%)必须低于平仓线(${closeLine}%)`);
+  }
+
+  const diff = closeLine - warningLine;
+  if (diff < 5) {
+    errors.push(`警戒线与平仓线差距过小，建议至少相差5%，当前差距：${diff}%`);
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+export function validatePledgeParams(pledgeShares: number, principal: number): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  if (isNaN(pledgeShares) || pledgeShares <= 0) {
+    errors.push(`质押股数必须大于0，当前值：${pledgeShares}`);
+  }
+
+  if (isNaN(principal) || principal <= 0) {
+    errors.push(`融资本金必须大于0，当前值：${principal}`);
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
 }

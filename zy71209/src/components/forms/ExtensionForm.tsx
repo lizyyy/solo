@@ -27,8 +27,12 @@ export function ExtensionForm({ pledgeId, pledge, onClose, onSuccess }: Extensio
       newErrors.newEndDate = '新到期日必须晚于原到期日';
     }
     const warningLine = parseFloat(formData.newWarningLine);
-    if (isNaN(warningLine) || warningLine <= 0 || warningLine >= 100) {
-      newErrors.newWarningLine = '警戒线必须在0-100之间';
+    if (isNaN(warningLine) || warningLine <= 0 || warningLine >= 200) {
+      newErrors.newWarningLine = '警戒线必须在0-200%之间';
+    } else if (warningLine >= pledge.closeLine) {
+      newErrors.newWarningLine = `警戒线必须低于平仓线(${pledge.closeLine.toFixed(2)}%)`;
+    } else if (warningLine <= pledge.warningLine) {
+      newErrors.newWarningLine = `展期警戒线必须高于原警戒线(${pledge.warningLine.toFixed(2)}%)`;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

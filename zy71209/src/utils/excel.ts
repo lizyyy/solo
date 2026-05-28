@@ -13,7 +13,7 @@ import type {
   ImportError,
   ImportWarning,
 } from '../types';
-import { generateId } from './calculator';
+import { generateId, validateWarningLineParams, validatePledgeParams } from './calculator';
 
 export const IMPORT_TEMPLATES: Record<ImportDataType, { headers: string[]; required: string[] }> = {
   customer: {
@@ -105,9 +105,10 @@ export function validateImportData(
     }
 
     if (type === 'supplement' && row['账户编号'] && row['股票代码']) {
-      const pledgeExists = existingPledges.some(
-        (p) => p.customerId === row['账户编号'] && p.stockCode === row['股票代码']
-      );
+      const customer = existingCustomers.find((c) => c.accountNo === row['账户编号']);
+      const pledgeExists = customer ? existingPledges.some(
+        (p) => p.customerId === customer.id && p.stockCode === row['股票代码']
+      ) : false;
       if (!pledgeExists) {
         errors.push({
           row: rowNum,
@@ -182,6 +183,20 @@ export function transformImportData(
           customerId = newCustomer.id;
         }
 
+        const warningLine = parseFloat(row['警戒线(%)']) || 66.67;
+        const closeLine = parseFloat(row['平仓线(%)']) || 76.92;
+        const pledgeShares = parseFloat(row['质押股数']) || 0;
+        const principal = parseFloat(row['融资本金']) || 0;
+
+        const lineValidation = validateWarningLineParams(warningLine, closeLine);
+        if (!lineValidation.valid) {
+          throw new Error(`第${row._rowNum}行：${lineValidation.errors.join('；')}`);
+        }
+
+        const pledgeValidation = validatePledgeParams(pledgeShares, principal);
+        if (!pledgeValidation.valid) {
+          throw new Error(`第${row._rowNum}行：${pledgeValidation.errors.join('；')}`);
+        }
         result.pledges.push({
           id: generateId(),
           customerId,
@@ -189,8 +204,8 @@ export function transformImportData(
           stockName: row['股票名称'] || row['股票代码'],
           pledgeShares: parseFloat(row['质押股数']) || 0,
           principal: parseFloat(row['融资本金']) || 0,
-          warningLine: parseFloat(row['警戒线(%)']) || 160,
-          closeLine: parseFloat(row['平仓线(%)']) || 140,
+          warningLine,
+          closeLine,
           startDate: row['开始日期'] || now.split('T')[0],
           endDate: row['到期日期'] || '',
           status: 'normal',
@@ -215,12 +230,18 @@ export function transformImportData(
       }
 
       case 'warningLine': {
-        const pledge = existingPledges.find(
-          (p) => p.customerId === row['账户编号'] && p.stockCode === row['股票代码']
-        );
+        const customer = existingCustomers.find((c) => c.accountNo === row['账户编号']);
+        const pledge = customer ? existingPledges.find(
+          (p) => p.customerId === customer.id && p.stockCode === row['股票代码']
+        ) : undefined;
         if (pledge) {
-          pledge.warningLine = parseFloat(row['警戒线(%)']) || pledge.warningLine;
-          pledge.closeLine = parseFloat(row['平仓线(%)']) || pledge.closeLine;
+          const warningLine = parseFloat(row['警戒线(%)']);
+          const closeLine = parseFloat(row['平仓线(%)']);
+          if (warningLine >= closeLine) {
+            throw new Error(`第${row._rowNum}行：警戒线(${warningLine}%)必须低于平仓线(${closeLine}%)`);
+          }
+          pledge.warningLine = warningLine || pledge.warningLine;
+          pledge.closeLine = closeLine || pledge.closeLine;
           pledge.updatedAt = now;
           result.pledges.push(pledge);
         }
@@ -228,14 +249,19 @@ export function transformImportData(
       }
 
       case 'supplement': {
-        const pledge = existingPledges.find(
-          (p) => p.customerId === row['账户编号'] && p.stockCode === row['股票代码']
-        );
+        const customer = existingCustomers.find((c) => c.accountNo === row['账户编号']);
+        const pledge = customer ? existingPledges.find(
+          (p) => p.customerId === customer.id && p.stockCode === row['股票代码']
+        ) : undefined;
         if (pledge) {
+          const amount = parseFloat(row['补仓金额']);
+          if (amount <= 0) {
+            throw new Error(`第${row._rowNum}行：补仓金额必须大于0`);
+          }
           result.supplements.push({
             id: generateId(),
             pledgeId: pledge.id,
-            amount: parseFloat(row['补仓金额']) || 0,
+            amount,
             expectedDate: row['预计到账日'],
             actualDate: row['实际到账日'] || undefined,
             status: row['状态'] === '已到账' ? 'received' : row['状态'] === '已取消' ? 'cancelled' : 'pending',
@@ -246,9 +272,10 @@ export function transformImportData(
       }
 
       case 'disposal': {
-        const pledge = existingPledges.find(
-          (p) => p.customerId === row['账户编号'] && p.stockCode === row['股票代码']
-        );
+        const customer = existingCustomers.find((c) => c.accountNo === row['账户编号']);
+        const pledge = customer ? existingPledges.find(
+          (p) => p.customerId === customer.id && p.stockCode === row['股票代码']
+        ) : undefined;
         if (pledge) {
           result.disposals.push({
             id: generateId(),
@@ -277,7 +304,9 @@ export interface ExportReportData {
   history: HistoryRecord[];
   calculations: Map<string, PledgeCalculation>;
   statistics: {
+    todayTriggered: number;
     totalWarning: number;
+    totalClose: number;
     pendingSupplement: number;
     pendingExtension: number;
     pendingDisposal: number;
@@ -295,18 +324,20 @@ export function generateExportReport(data: ExportReportData): Blob {
     [],
     ['统计概览'],
     ['指标', '数量'],
-    ['今日触线总数', data.statistics.totalWarning],
+    ['今日触线', data.statistics.todayTriggered],
+    ['预警总数', data.statistics.totalWarning],
+    ['平仓总数', data.statistics.totalClose],
     ['待补仓', data.statistics.pendingSupplement],
     ['待展期', data.statistics.pendingExtension],
     ['待处置', data.statistics.pendingDisposal],
     ['特殊场景', data.statistics.specialCases],
     [],
-    ['预警客户明细'],
+    ['预警/平仓客户明细'],
     ['账户编号', '客户姓名', '股票代码', '股票名称', '质押率(%)', '警戒线(%)', '平仓线(%)', '状态', '特殊标记'],
     ...data.pledges
       .filter((p) => {
         const calc = data.calculations.get(p.id);
-        return calc?.isWarning;
+        return calc?.isWarning || calc?.isClose;
       })
       .map((p) => {
         const calc = data.calculations.get(p.id);

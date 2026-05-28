@@ -63,6 +63,7 @@ interface AppState {
   calculatePledge: (pledgeId: string) => PledgeCalculation | null;
   invalidateCalculationCache: (pledgeId?: string) => void;
   getStatistics: () => Statistics;
+  isTodayTriggered: (pledge: Pledge, calculation: PledgeCalculation | null) => boolean;
   getFilteredPledges: () => Pledge[];
   getPledgeCustomer: (pledgeId: string) => Customer | undefined;
   getTimelineEvents: (pledgeId: string) => TimelineEvent[];
@@ -221,11 +222,36 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
   },
 
+  isTodayTriggered: (pledge, calculation) => {
+    if (!calculation) return false;
+    if (!calculation.isWarning && !calculation.isClose) return false;
+
+    const today = new Date().toISOString().split('T')[0];
+    const updatedAtDate = pledge.updatedAt?.split('T')[0];
+
+    return updatedAtDate === today;
+  },
+
   getStatistics: () => {
     const state = get();
-    const warningPledges = state.pledges.filter((p) => {
+
+    let totalWarning = 0;
+    let totalClose = 0;
+    let todayTriggered = 0;
+
+    state.pledges.forEach((p) => {
       const calc = state.calculatePledge(p.id);
-      return calc?.isWarning;
+      if (calc?.isClose) {
+        totalClose++;
+        if (state.isTodayTriggered(p, calc)) {
+          todayTriggered++;
+        }
+      } else if (calc?.isWarning) {
+        totalWarning++;
+        if (state.isTodayTriggered(p, calc)) {
+          todayTriggered++;
+        }
+      }
     });
 
     const pendingSupplement = state.pledges.filter((p) =>
@@ -241,7 +267,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     const specialCases = state.pledges.filter((p) => p.specialFlags.length > 0).length;
 
     return {
-      totalWarning: warningPledges.length,
+      todayTriggered,
+      totalWarning,
+      totalClose,
       pendingSupplement,
       pendingExtension,
       pendingDisposal,
