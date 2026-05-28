@@ -426,7 +426,7 @@ async function handleFileUpload(e) {
         const result = await response.json();
         hideLoading();
         if (!response.ok) throw new Error(result.error || '上传失败');
-        renderProcessingResult(result);
+        renderProcessingResult(result.data || result);
         loadDashboard();
         loadGraceData();
     } catch (error) {
@@ -440,29 +440,61 @@ function renderProcessingResult(result) {
     const container = document.getElementById('processingResult');
     container.style.display = 'block';
     const { summary, results, failed } = result;
+
+    const displayResults = (results || []).map(r => {
+        if (r.records && Array.isArray(r.records)) {
+            return r.records.map(rec => ({
+                fileName: r.file ? r.file.split('/').pop().split('\\').pop() : '未知文件',
+                inputType: rec.typeName || rec.type || '未知类型',
+                missingFields: rec.missingFields || [],
+                status: rec.valid ? 'success' : 'warning',
+                message: rec.error || ''
+            }));
+        }
+        return [{
+            fileName: r.file ? r.file.split('/').pop().split('\\').pop() : '未知文件',
+            inputType: '未知类型',
+            missingFields: [],
+            status: r.success ? 'success' : 'error',
+            message: r.error || ''
+        }];
+    }).flat();
+
+    const displayFailed = (failed || []).map(f => ({
+        fileName: f.file ? f.file.split('/').pop().split('\\').pop() : '未知文件',
+        error: f.error || '处理失败'
+    }));
+
+    const displaySummary = summary || {
+        total: (results?.length || 0) + (failed?.length || 0),
+        success: results?.length || 0,
+        failed: failed?.length || 0,
+        records: result.records?.length || 0
+    };
+
     container.innerHTML = `
         <div class="result-summary">
             <div class="summary-item success">
                 <span class="summary-icon">✅</span>
-                <span>成功: ${summary?.success || 0}</span>
-            </div>
-            <div class="summary-item warning">
-                <span class="summary-icon">⚠️</span>
-                <span>警告: ${summary?.warning || 0}</span>
-            </div>
-            <div class="summary-item error">
-                <span class="summary-icon">❌</span>
-                <span>失败: ${summary?.failed || 0}</span>
+                <span>成功文件: ${displaySummary.success || 0}</span>
             </div>
             <div class="summary-item info">
                 <span class="summary-icon">📄</span>
-                <span>总计: ${summary?.total || 0}</span>
+                <span>解析记录: ${displaySummary.records || 0}</span>
+            </div>
+            <div class="summary-item error">
+                <span class="summary-icon">❌</span>
+                <span>失败文件: ${displaySummary.failed || 0}</span>
+            </div>
+            <div class="summary-item info">
+                <span class="summary-icon">📁</span>
+                <span>总计文件: ${displaySummary.total || 0}</span>
             </div>
         </div>
-        ${results && results.length > 0 ? `
+        ${displayResults.length > 0 ? `
             <div class="result-details">
                 <h4>处理详情</h4>
-                ${results.slice(0, 10).map(r => `
+                ${displayResults.slice(0, 20).map(r => `
                     <div class="result-item ${r.status}">
                         <div class="result-file">${r.fileName}</div>
                         <div class="result-info">
@@ -474,13 +506,13 @@ function renderProcessingResult(result) {
                         </div>
                     </div>
                 `).join('')}
-                ${results.length > 10 ? `<div class="text-muted">还有 ${results.length - 10} 条记录...</div>` : ''}
+                ${displayResults.length > 20 ? `<div class="text-muted">还有 ${displayResults.length - 20} 条记录...</div>` : ''}
             </div>
         ` : ''}
-        ${failed && failed.length > 0 ? `
+        ${displayFailed.length > 0 ? `
             <div class="result-failed">
                 <h4>失败文件</h4>
-                ${failed.map(f => `
+                ${displayFailed.map(f => `
                     <div class="result-item error">
                         <div class="result-file">${f.fileName}</div>
                         <div class="result-info">

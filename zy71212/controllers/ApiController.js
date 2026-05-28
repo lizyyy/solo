@@ -659,8 +659,9 @@ class ApiController {
         });
       }
 
-      const { FileProcessor } = require('../services');
-      const fileProcessor = new FileProcessor({ stopOnError: false });
+      const { BusinessWorkflowService } = require('../services');
+      const fileProcessor = new (require('../services/FileProcessor'))({ stopOnError: false });
+      const workflow = new BusinessWorkflowService();
       
       const allResults = {
         success: true,
@@ -670,7 +671,16 @@ class ApiController {
         records: [],
         results: [],
         failed: [],
-        summary: {}
+        summary: {},
+        savedRecords: { policies: 0, paymentPlans: 0, visitRecords: 0, advancePayments: 0, reminderRecords: 0 }
+      };
+
+      const validRecords = {
+        policies: [],
+        paymentPlans: [],
+        advancePayments: [],
+        visitRecords: [],
+        reminderRecords: []
       };
 
       for (const file of uploadedFiles) {
@@ -680,6 +690,28 @@ class ApiController {
             allResults.successCount++;
             allResults.results.push(result);
             allResults.records.push(...(result.records || []));
+
+            (result.records || []).forEach(record => {
+              if (record.valid && record.model) {
+                switch (record.type) {
+                  case 'policy':
+                    validRecords.policies.push(record.model);
+                    break;
+                  case 'paymentPlan':
+                    validRecords.paymentPlans.push(record.model);
+                    break;
+                  case 'advancePayment':
+                    validRecords.advancePayments.push(record.model);
+                    break;
+                  case 'visitRecord':
+                    validRecords.visitRecords.push(record.model);
+                    break;
+                  case 'reminderRecord':
+                    validRecords.reminderRecords.push(record.model);
+                    break;
+                }
+              }
+            });
           } else {
             allResults.failedCount++;
             allResults.failed.push(result);
@@ -692,6 +724,41 @@ class ApiController {
             error: error.message
           });
         }
+      }
+
+      if (validRecords.policies.length > 0) {
+        const existing = workflow.storageService.getPolicies();
+        const merged = workflow.mergeById(existing, validRecords.policies, 'policyNo');
+        workflow.storageService.savePolicies(merged);
+        allResults.savedRecords.policies = validRecords.policies.length;
+      }
+      if (validRecords.paymentPlans.length > 0) {
+        const existing = workflow.storageService.getPaymentPlans();
+        const merged = workflow.mergeById(existing, validRecords.paymentPlans, 'planId');
+        workflow.storageService.savePaymentPlans(merged);
+        allResults.savedRecords.paymentPlans = validRecords.paymentPlans.length;
+      }
+      if (validRecords.advancePayments.length > 0) {
+        const existing = workflow.storageService.getAdvancePayments();
+        const merged = workflow.mergeById(existing, validRecords.advancePayments, 'recordId');
+        workflow.storageService.saveAdvancePayments(merged);
+        allResults.savedRecords.advancePayments = validRecords.advancePayments.length;
+      }
+      if (validRecords.visitRecords.length > 0) {
+        const existing = workflow.storageService.getVisitRecords();
+        const merged = workflow.mergeById(existing, validRecords.visitRecords, 'visitId');
+        workflow.storageService.saveVisitRecords(merged);
+        allResults.savedRecords.visitRecords = validRecords.visitRecords.length;
+      }
+      if (validRecords.reminderRecords.length > 0) {
+        const existing = workflow.storageService.getReminderRecords();
+        const merged = workflow.mergeById(existing, validRecords.reminderRecords, 'reminderId');
+        workflow.storageService.saveReminderRecords(merged);
+        allResults.savedRecords.reminderRecords = validRecords.reminderRecords.length;
+      }
+
+      if (validRecords.paymentPlans.length > 0) {
+        workflow.gracePeriodService.updateAllGraceEndDates();
       }
 
       allResults.summary = {

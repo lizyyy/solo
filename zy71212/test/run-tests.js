@@ -323,6 +323,14 @@ async function runTests() {
         };
     }
 
+    const dataDir = path.join(__dirname, '..', 'data');
+    const dataFiles = ['policies.json', 'payment_plans.json', 'visit_records.json'];
+    const snapshots = {};
+    dataFiles.forEach(f => {
+        const fp = path.join(dataDir, f);
+        snapshots[f] = fs.existsSync(fp) ? fs.readFileSync(fp, 'utf-8') : '[]';
+    });
+
     await test('上传接口字段名 file（单文件）', async () => {
         const testFile = path.join(TEST_DATA_DIR, 'policies.json');
         const mockReq = createMockReq({
@@ -339,7 +347,7 @@ async function runTests() {
         if (!result.data?.success) {
             throw new Error('上传失败: ' + (result.data?.error || '未知错误'));
         }
-        console.log(` [成功${result.data?.data?.successCount || 0}个文件, 记录${result.data?.data?.records?.length || 0}条]`);
+        console.log(` [成功${result.data?.data?.successCount || 0}个文件, 记录${result.data?.data?.records?.length || 0}条, 保存保单${result.data?.data?.savedRecords?.policies || 0}条]`);
     });
 
     await test('上传接口字段名 files（单文件）', async () => {
@@ -358,7 +366,7 @@ async function runTests() {
         if (!result.data?.success) {
             throw new Error('上传失败: ' + (result.data?.error || '未知错误'));
         }
-        console.log(` [成功${result.data?.data?.successCount || 0}个文件, 记录${result.data?.data?.records?.length || 0}条]`);
+        console.log(` [成功${result.data?.data?.successCount || 0}个文件, 记录${result.data?.data?.records?.length || 0}条, 保存缴费计划${result.data?.data?.savedRecords?.paymentPlans || 0}条]`);
     });
 
     await test('上传接口多文件上传', async () => {
@@ -398,6 +406,11 @@ async function runTests() {
             throw new Error('状态码应为400，实际为' + result.statusCode);
         }
         console.log(` [正确返回错误: ${result.data?.error}]`);
+    });
+
+    Object.keys(snapshots).forEach(f => {
+        const fp = path.join(dataDir, f);
+        fs.writeFileSync(fp, snapshots[f], 'utf-8');
     });
 
     console.log();

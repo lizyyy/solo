@@ -1,0 +1,31 @@
+{
+  "policies": [
+    {
+      "testData": {
+        "test": "data",
+        "timestamp": 1779984089907
+      }
+    }
+  ],
+  "paymentPlans": [],
+  "advancePayments": [],
+  "visitRecords": [],
+  "reminderRecords": [],
+  "reports": [],
+  "config": {
+    "gracePeriodDays": 60,
+    "defaultInterestRate": 0.05,
+    "reminderIntervals": [
+      3,
+      7,
+      15,
+      30
+    ],
+    "autoAdvanceEnabled": false,
+    "lastUpdated": null
+  },
+  "version": {
+    "version": 4,
+    "lastUpdated": "2026-05-29 00:01:29"
+  }
+}
