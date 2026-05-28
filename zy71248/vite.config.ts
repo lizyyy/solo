@@ -8,6 +8,15 @@ export default defineConfig({
   build: {
     sourcemap: 'hidden',
   },
+  server: {
+    proxy: {
+      '/picsum': {
+        target: 'https://picsum.photos',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/picsum/, ''),
+      },
+    },
+  },
   plugins: [
     react({
       babel: {

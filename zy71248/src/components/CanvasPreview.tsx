@@ -4,58 +4,55 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 interface CanvasPreviewProps {
   sourceImage: string;
   targetImage: string;
-  onSourceCanvasReady?: (canvas: HTMLCanvasElement) => void;
-  onTargetCanvasReady?: (canvas: HTMLCanvasElement) => void;
+  onSourceImageLoaded?: (img: HTMLImageElement) => void;
+  onTargetImageLoaded?: (img: HTMLImageElement) => void;
   sourceCanvasRef?: React.RefObject<HTMLCanvasElement>;
-  targetCanvasRef?: React.RefObject<HTMLCanvasElement>;
 }
 
 export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   sourceImage,
   targetImage,
-  onSourceCanvasReady,
-  onTargetCanvasReady,
+  onSourceImageLoaded,
+  onTargetImageLoaded,
   sourceCanvasRef,
-  targetCanvasRef,
 }) => {
-  const internalSourceRef = useRef<HTMLCanvasElement>(null);
-  const internalTargetRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [splitPosition, setSplitPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState({ source: false, target: false });
-
-  const actualSourceRef = sourceCanvasRef || internalSourceRef;
-  const actualTargetRef = targetCanvasRef || internalTargetRef;
+  const sourceImgRef = useRef<HTMLImageElement | null>(null);
+  const targetImgRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
-    const loadImage = (src: string, type: 'source' | 'target') => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        setImagesLoaded((prev) => ({ ...prev, [type]: true }));
-      };
-      img.onerror = () => {
-        console.error(`Failed to load ${type} image:`, src);
-      };
-      img.src = src;
+    const srcImg = new Image();
+    srcImg.onload = () => {
+      sourceImgRef.current = srcImg;
+      setImagesLoaded((prev) => ({ ...prev, source: true }));
+      if (onSourceImageLoaded) onSourceImageLoaded(srcImg);
     };
+    srcImg.onerror = () => {
+      console.error('Failed to load source image:', sourceImage);
+      setImagesLoaded((prev) => ({ ...prev, source: true }));
+    };
+    srcImg.src = sourceImage;
 
-    loadImage(sourceImage, 'source');
-    loadImage(targetImage, 'target');
+    const tgtImg = new Image();
+    tgtImg.onload = () => {
+      targetImgRef.current = tgtImg;
+      setImagesLoaded((prev) => ({ ...prev, target: true }));
+      if (onTargetImageLoaded) onTargetImageLoaded(tgtImg);
+    };
+    tgtImg.onerror = () => {
+      console.error('Failed to load target image:', targetImage);
+      setImagesLoaded((prev) => ({ ...prev, target: true }));
+    };
+    tgtImg.src = targetImage;
+
+    return () => {
+      sourceImgRef.current = null;
+      targetImgRef.current = null;
+    };
   }, [sourceImage, targetImage]);
-
-  useEffect(() => {
-    const sourceCanvas = actualSourceRef.current;
-    const targetCanvas = actualTargetRef.current;
-
-    if (sourceCanvas && imagesLoaded.source && onSourceCanvasReady) {
-      onSourceCanvasReady(sourceCanvas);
-    }
-    if (targetCanvas && imagesLoaded.target && onTargetCanvasReady) {
-      onTargetCanvasReady(targetCanvas);
-    }
-  }, [imagesLoaded, actualSourceRef, actualTargetRef, onSourceCanvasReady, onTargetCanvasReady]);
 
   const handleMouseDown = useCallback(() => {
     setIsDragging(true);
@@ -95,7 +92,6 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
               src={targetImage}
               alt="Target"
               className="absolute inset-0 w-full h-full object-contain"
-              crossOrigin="anonymous"
             />
             <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 rounded text-xs text-cyan-400 font-mono">
               参考画面
@@ -109,7 +105,7 @@ export const CanvasPreview: React.FC<CanvasPreviewProps> = ({
         >
           <div className="relative h-full">
             <canvas
-              ref={actualSourceRef as React.RefObject<HTMLCanvasElement>}
+              ref={sourceCanvasRef || null}
               className="absolute inset-0 w-full h-full object-contain"
             />
             <div className="absolute top-2 right-2 px-2 py-1 bg-black/70 rounded text-xs text-orange-400 font-mono">

@@ -45,7 +45,7 @@ export interface LUTPreset {
   id: string;
   name: string;
   description: string;
-  data: number[][][];
+  data: number[][][][];
 }
 
 export interface Level {

@@ -83,52 +83,53 @@ function App() {
       sourceCanvasRef.current
     );
 
-    if (processedData && targetImageDataRef.current) {
+    if (processedData) {
       setIsCalculating(true);
 
       setTimeout(() => {
-        const newScore = calculateScore(processedData, targetImageDataRef.current);
-        const issues = detectIssues(processedData, params, targetImageDataRef.current);
-        newScore.issues = issues;
-
-        setScore(newScore);
+        if (targetImageDataRef.current) {
+          const newScore = calculateScore(processedData, targetImageDataRef.current);
+          const issues = detectIssues(processedData, params, targetImageDataRef.current);
+          newScore.issues = issues;
+          setScore(newScore);
+        } else {
+          const issues = detectIssues(processedData, params);
+          setScore({
+            overall: 0,
+            brightness: 0,
+            color: 0,
+            detail: 0,
+            grade: 'D' as const,
+            issues,
+          });
+        }
         setIsCalculating(false);
       }, 100);
     }
   }, [params, processImage]);
 
-  const handleSourceCanvasReady = useCallback((canvas: HTMLCanvasElement) => {
-    if (!sourceImageRef.current) {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        sourceImageRef.current = img;
-        sourceImageLoadedRef.current = true;
-        applyColorGradingToCanvas();
-      };
-      img.src = currentLevel.sourceImage;
-    }
-  }, [currentLevel, applyColorGradingToCanvas]);
+  const handleSourceImageLoaded = useCallback((img: HTMLImageElement) => {
+    sourceImageRef.current = img;
+    sourceImageLoadedRef.current = true;
+    applyColorGradingToCanvas();
+  }, [applyColorGradingToCanvas]);
 
-  const handleTargetCanvasReady = useCallback(() => {
-    if (!targetImageRef.current) {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        targetImageRef.current = img;
+  const handleTargetImageLoaded = useCallback((img: HTMLImageElement) => {
+    targetImageRef.current = img;
 
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = img.naturalWidth;
-        tempCanvas.height = img.naturalHeight;
-        const tempCtx = tempCanvas.getContext('2d');
-        if (tempCtx) {
-          tempCtx.drawImage(img, 0, 0);
-          targetImageDataRef.current = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-        }
-      };
-      img.src = currentLevel.targetImage;
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = img.naturalWidth || 800;
+    tempCanvas.height = img.naturalHeight || 450;
+    const tempCtx = tempCanvas.getContext('2d');
+    if (tempCtx) {
+      try {
+        tempCtx.drawImage(img, 0, 0);
+        targetImageDataRef.current = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+      } catch {
+        targetImageDataRef.current = null;
+      }
     }
-  }, [currentLevel]);
+  }, []);
 
   const addHistoryWithSource = useCallback((
     actionType: 'exposure' | 'temperature' | 'lut' | 'reset' | 'revert' | 'manual_correction' | 'note',
@@ -406,8 +407,8 @@ function App() {
                 <CanvasPreview
                   sourceImage={currentLevel.sourceImage}
                   targetImage={currentLevel.targetImage}
-                  onSourceCanvasReady={handleSourceCanvasReady}
-                  onTargetCanvasReady={handleTargetCanvasReady}
+                  onSourceImageLoaded={handleSourceImageLoaded}
+                  onTargetImageLoaded={handleTargetImageLoaded}
                   sourceCanvasRef={sourceCanvasRef}
                 />
               </div>

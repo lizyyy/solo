@@ -1,131 +1,157 @@
 
 import { LUTPreset } from '../types';
 
-function generateIdentityLUT(size: number): number[][][] {
-  const lut: number[][][] = [];
-  for (let r = 0; r < size; r++) {
-    lut[r] = [];
-    for (let g = 0; g < size; g++) {
-      lut[r][g] = [];
-      for (let b = 0; b < size; b++) {
-        const value = (r + g + b) / (3 * (size - 1));
-        lut[r][g][b] = value;
+type LUTData = number[][][][];
+
+function generateIdentityLUT(size: number): LUTData {
+  const lut: LUTData = [];
+  for (let ri = 0; ri < size; ri++) {
+    lut[ri] = [];
+    for (let gi = 0; gi < size; gi++) {
+      lut[ri][gi] = [];
+      for (let bi = 0; bi < size; bi++) {
+        lut[ri][gi][bi] = [
+          Math.round(ri / (size - 1) * 255),
+          Math.round(gi / (size - 1) * 255),
+          Math.round(bi / (size - 1) * 255),
+        ];
       }
     }
   }
   return lut;
 }
 
-function generateCinematicLUT(size: number): number[][][] {
-  const lut: number[][][] = [];
-  for (let r = 0; r < size; r++) {
-    lut[r] = [];
-    for (let g = 0; g < size; g++) {
-      lut[r][g] = [];
-      for (let b = 0; b < size; b++) {
-        const rn = r / (size - 1);
-        const gn = g / (size - 1);
-        const bn = b / (size - 1);
-        
+function generateCinematicLUT(size: number): LUTData {
+  const lut: LUTData = [];
+  for (let ri = 0; ri < size; ri++) {
+    lut[ri] = [];
+    for (let gi = 0; gi < size; gi++) {
+      lut[ri][gi] = [];
+      for (let bi = 0; bi < size; bi++) {
+        const rn = ri / (size - 1);
+        const gn = gi / (size - 1);
+        const bn = bi / (size - 1);
+
         const luminance = 0.299 * rn + 0.587 * gn + 0.114 * bn;
         const contrast = Math.pow(luminance, 0.85);
-        
-        const rOut = contrast * 0.95 + rn * 0.05;
-        const gOut = contrast * 0.9 + gn * 0.1;
-        const bOut = contrast * 0.85 + bn * 0.15 + 0.05;
-        
-        lut[r][g][b] = (rOut + gOut + bOut) / 3;
+
+        const rOut = clamp01(contrast * 0.95 + rn * 0.05 + 0.02);
+        const gOut = clamp01(contrast * 0.90 + gn * 0.10);
+        const bOut = clamp01(contrast * 0.85 + bn * 0.15 + 0.06);
+
+        lut[ri][gi][bi] = [
+          Math.round(rOut * 255),
+          Math.round(gOut * 255),
+          Math.round(bOut * 255),
+        ];
       }
     }
   }
   return lut;
 }
 
-function generateVintageLUT(size: number): number[][][] {
-  const lut: number[][][] = [];
-  for (let r = 0; r < size; r++) {
-    lut[r] = [];
-    for (let g = 0; g < size; g++) {
-      lut[r][g] = [];
-      for (let b = 0; b < size; b++) {
-        const rn = r / (size - 1);
-        const gn = g / (size - 1);
-        const bn = b / (size - 1);
-        
-        const rOut = Math.pow(rn, 0.9) * 1.05;
-        const gOut = Math.pow(gn, 0.95) * 0.95;
-        const bOut = Math.pow(bn, 1.1) * 0.85;
-        
-        lut[r][g][b] = (rOut + gOut + bOut) / 3;
+function generateVintageLUT(size: number): LUTData {
+  const lut: LUTData = [];
+  for (let ri = 0; ri < size; ri++) {
+    lut[ri] = [];
+    for (let gi = 0; gi < size; gi++) {
+      lut[ri][gi] = [];
+      for (let bi = 0; bi < size; bi++) {
+        const rn = ri / (size - 1);
+        const gn = gi / (size - 1);
+        const bn = bi / (size - 1);
+
+        const rOut = clamp01(Math.pow(rn, 0.9) * 1.1 + 0.03);
+        const gOut = clamp01(Math.pow(gn, 0.95) * 0.95);
+        const bOut = clamp01(Math.pow(bn, 1.1) * 0.82);
+
+        lut[ri][gi][bi] = [
+          Math.round(rOut * 255),
+          Math.round(gOut * 255),
+          Math.round(bOut * 255),
+        ];
       }
     }
   }
   return lut;
 }
 
-function generateCoolToneLUT(size: number): number[][][] {
-  const lut: number[][][] = [];
-  for (let r = 0; r < size; r++) {
-    lut[r] = [];
-    for (let g = 0; g < size; g++) {
-      lut[r][g] = [];
-      for (let b = 0; b < size; b++) {
-        const rn = r / (size - 1);
-        const gn = g / (size - 1);
-        const bn = b / (size - 1);
-        
-        const rOut = rn * 0.85;
-        const gOut = gn * 0.95 + 0.05;
-        const bOut = Math.min(bn * 1.15 + 0.05, 1);
-        
-        lut[r][g][b] = (rOut + gOut + bOut) / 3;
+function generateCoolToneLUT(size: number): LUTData {
+  const lut: LUTData = [];
+  for (let ri = 0; ri < size; ri++) {
+    lut[ri] = [];
+    for (let gi = 0; gi < size; gi++) {
+      lut[ri][gi] = [];
+      for (let bi = 0; bi < size; bi++) {
+        const rn = ri / (size - 1);
+        const gn = gi / (size - 1);
+        const bn = bi / (size - 1);
+
+        const rOut = clamp01(rn * 0.82);
+        const gOut = clamp01(gn * 0.95 + 0.04);
+        const bOut = clamp01(bn * 1.18 + 0.06);
+
+        lut[ri][gi][bi] = [
+          Math.round(rOut * 255),
+          Math.round(gOut * 255),
+          Math.round(bOut * 255),
+        ];
       }
     }
   }
   return lut;
 }
 
-function generateWarmToneLUT(size: number): number[][][] {
-  const lut: number[][][] = [];
-  for (let r = 0; r < size; r++) {
-    lut[r] = [];
-    for (let g = 0; g < size; g++) {
-      lut[r][g] = [];
-      for (let b = 0; b < size; b++) {
-        const rn = r / (size - 1);
-        const gn = g / (size - 1);
-        const bn = b / (size - 1);
-        
-        const rOut = Math.min(rn * 1.15 + 0.05, 1);
-        const gOut = gn * 0.95;
-        const bOut = bn * 0.8;
-        
-        lut[r][g][b] = (rOut + gOut + bOut) / 3;
+function generateWarmToneLUT(size: number): LUTData {
+  const lut: LUTData = [];
+  for (let ri = 0; ri < size; ri++) {
+    lut[ri] = [];
+    for (let gi = 0; gi < size; gi++) {
+      lut[ri][gi] = [];
+      for (let bi = 0; bi < size; bi++) {
+        const rn = ri / (size - 1);
+        const gn = gi / (size - 1);
+        const bn = bi / (size - 1);
+
+        const rOut = clamp01(rn * 1.18 + 0.06);
+        const gOut = clamp01(gn * 0.95 + 0.02);
+        const bOut = clamp01(bn * 0.78);
+
+        lut[ri][gi][bi] = [
+          Math.round(rOut * 255),
+          Math.round(gOut * 255),
+          Math.round(bOut * 255),
+        ];
       }
     }
   }
   return lut;
 }
 
-function generateBWLUT(size: number): number[][][] {
-  const lut: number[][][] = [];
-  for (let r = 0; r < size; r++) {
-    lut[r] = [];
-    for (let g = 0; g < size; g++) {
-      lut[r][g] = [];
-      for (let b = 0; b < size; b++) {
-        const rn = r / (size - 1);
-        const gn = g / (size - 1);
-        const bn = b / (size - 1);
-        
+function generateBWLUT(size: number): LUTData {
+  const lut: LUTData = [];
+  for (let ri = 0; ri < size; ri++) {
+    lut[ri] = [];
+    for (let gi = 0; gi < size; gi++) {
+      lut[ri][gi] = [];
+      for (let bi = 0; bi < size; bi++) {
+        const rn = ri / (size - 1);
+        const gn = gi / (size - 1);
+        const bn = bi / (size - 1);
+
         const luminance = 0.299 * rn + 0.587 * gn + 0.114 * bn;
-        const contrasted = Math.pow(luminance, 0.95);
-        
-        lut[r][g][b] = contrasted;
+        const contrasted = clamp01(Math.pow(luminance, 0.9));
+
+        const v = Math.round(contrasted * 255);
+        lut[ri][gi][bi] = [v, v, v];
       }
     }
   }
   return lut;
+}
+
+function clamp01(v: number): number {
+  return Math.min(Math.max(v, 0), 1);
 }
 
 const LUT_SIZE = 16;

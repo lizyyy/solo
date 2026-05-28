@@ -68,7 +68,7 @@ export function applyWhiteBalance(
 export function applyColorGrading(
   pixel: { r: number; g: number; b: number },
   params: ColorParams,
-  lutData?: number[][][]
+  lutData?: number[][][][]
 ): { r: number; g: number; b: number } {
   let result = { ...pixel };
 
@@ -94,7 +94,7 @@ export function applyColorGrading(
 
 export function applyLUT(
   pixel: { r: number; g: number; b: number },
-  lutData: number[][][]
+  lutData: number[][][][]
 ): { r: number; g: number; b: number } {
   const size = lutData.length;
   const maxIndex = size - 1;
@@ -123,17 +123,23 @@ export function applyLUT(
   const c011 = lutData[r0][g1][b1];
   const c111 = lutData[r1][g1][b1];
 
-  const c00 = c000 + (c100 - c000) * rFrac;
-  const c10 = c010 + (c110 - c010) * rFrac;
-  const c01 = c001 + (c101 - c001) * rFrac;
-  const c11 = c011 + (c111 - c011) * rFrac;
+  const channels = [0, 1, 2] as const;
+  const result = channels.map((ch) => {
+    const v000 = c000[ch], v100 = c100[ch], v010 = c010[ch], v110 = c110[ch];
+    const v001 = c001[ch], v101 = c101[ch], v011 = c011[ch], v111 = c111[ch];
 
-  const c0 = c00 + (c10 - c00) * gFrac;
-  const c1 = c01 + (c11 - c01) * gFrac;
+    const c00 = v000 + (v100 - v000) * rFrac;
+    const c10 = v010 + (v110 - v010) * rFrac;
+    const c01 = v001 + (v101 - v001) * rFrac;
+    const c11 = v011 + (v111 - v011) * rFrac;
 
-  const c = c0 + (c1 - c0) * bFrac;
+    const c0 = c00 + (c10 - c00) * gFrac;
+    const c1 = c01 + (c11 - c01) * gFrac;
 
-  return { r: c, g: c, b: c };
+    return clamp(c0 + (c1 - c0) * bFrac, 0, 255);
+  });
+
+  return { r: result[0], g: result[1], b: result[2] };
 }
 
 export function rgbToLab(r: number, g: number, b: number): { l: number; a: number; b: number } {
