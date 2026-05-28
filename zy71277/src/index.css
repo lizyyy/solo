@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #1A1A2E;
+  color: #E8E8EC;
+  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #16213E;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3A3A4A;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5E5E70;
+}
+
+/* Custom file upload drag state */
+.dragover {
+  border-color: #00F5D4 !important;
+  background: rgba(0, 245, 212, 0.05) !important;
+}
+
+/* Confidence bar gradient */
+.confidence-high { background: linear-gradient(90deg, #00F5D4, #00B39B); }
+.confidence-medium { background: linear-gradient(90deg, #FFD466, #F5A623); }
+.confidence-low { background: linear-gradient(90deg, #D48A17, #B36F0E); }
