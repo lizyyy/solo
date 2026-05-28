@@ -10,7 +10,6 @@ import {
   Calculator,
   FileText,
   X,
-  DollarSign,
   AlertCircle,
 } from 'lucide-react';
 import { useAuditStore } from '../store/audit.store';

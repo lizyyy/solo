@@ -4,8 +4,6 @@ import {
   FileText,
   AlertTriangle,
   CheckCircle,
-  Clock,
-  CheckSquare,
   DollarSign,
   Search,
   Filter,

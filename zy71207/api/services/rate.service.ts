@@ -35,7 +35,6 @@ export class RateService {
       return { rate: null, contract: null, reasons };
     }
 
-    const purchaseDate = contract.effectiveDate;
     let applicableContract = contract;
 
     if (contract.expireDate && chargeDate > contract.expireDate) {

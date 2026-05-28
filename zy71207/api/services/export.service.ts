@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { AuditService } from './audit.service';
-import { AuditRecord, AuditLinkNode, AuditStatus } from '../../shared/types';
+import { AuditRecord, AuditStatus } from '../../shared/types';
 
 export class ExportService {
   private auditService: AuditService;

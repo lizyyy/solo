@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, Home, Percent, Download, Scale } from 'lucide-react';
+import { Home, Percent, Download, Scale } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;

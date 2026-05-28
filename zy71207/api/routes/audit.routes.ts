@@ -3,6 +3,7 @@ import { AuditService } from '../services/audit.service';
 import { RateService } from '../services/rate.service';
 import { RollbackService } from '../services/rollback.service';
 import { ExportService } from '../services/export.service';
+import { ContractRepository } from '../repositories/contract.repository';
 import { AuditStatus } from '../../shared/types';
 
 const router = Router();
@@ -116,7 +117,6 @@ router.get('/rate-versions', (_req: Request, res: Response) => {
 
 router.get('/contracts', (_req: Request, res: Response) => {
   try {
-    const { ContractRepository } = require('../repositories/contract.repository');
     const contractRepo = new ContractRepository();
     const contracts = contractRepo.findAll();
     res.json(contracts);

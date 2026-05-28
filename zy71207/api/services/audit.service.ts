@@ -7,7 +7,6 @@ import { ChargeService } from './charge.service';
 import {
   AuditRecord,
   AuditLinkNode,
-  NodeType,
   NodeStatus,
   AuditStatus,
   AuditStats,
