@@ -9,10 +9,12 @@ from models.schemas import (
     AdvanceCheckRequest,
     AdvanceCheckResponse,
     AdvanceStatus,
+    DailyMerchantRow,
     FeeRule,
     FreezeRecord,
     FreezeReason,
     FreezeStatus,
+    MerchantDashboardView,
     RefundRecord,
     RefundRollbackRequest,
     RefundRollbackResponse,
@@ -101,6 +103,14 @@ class DataStore:
     def get_latest_report(self, merchant_id: str) -> Optional[RiskReport]:
         reps = self.reports.get(merchant_id, [])
         return reps[-1] if reps else None
+
+    def get_all_trade_dates(self, merchant_id: str) -> list[date]:
+        dates = set()
+        for f in self.flows.get(merchant_id, []):
+            dates.add(f.trade_date)
+        for a in self.get_advances_by_merchant(merchant_id):
+            dates.add(a.apply_date)
+        return sorted(dates)
 
 
 store = DataStore()
@@ -315,6 +325,133 @@ class RiskEngine:
             rolled_back=True,
             affected_advances=affected,
             reason=f"退款回滚完成, 冻结{target.refund_amount:.2f}, 影响{len(affected)}笔垫资",
+        )
+
+    def build_daily_row(self, merchant_id: str, trade_date: date) -> DailyMerchantRow:
+        flows = store.get_flows(merchant_id, start=trade_date, end=trade_date)
+        tx_count = sum(f.tx_count for f in flows)
+        tx_amount = sum(f.tx_amount for f in flows)
+        refund_count = sum(f.refund_count for f in flows)
+        refund_amount = sum(f.refund_amount for f in flows)
+
+        refunds = store.get_refunds(merchant_id, start=trade_date, end=trade_date)
+        refund_amount += sum(r.refund_amount for r in refunds)
+        refund_count += len(refunds)
+
+        refund_rate = refund_amount / tx_amount if tx_amount > 0 else 0.0
+
+        fee_rule = store.get_effective_fee(merchant_id, trade_date)
+        fee_version = fee_rule.fee_version if fee_rule else None
+        d0_fee_rate = fee_rule.d0_fee_rate if fee_rule else None
+        advance_ratio = fee_rule.advance_ratio if fee_rule else None
+        max_advance = tx_amount * advance_ratio if advance_ratio else 0.0
+
+        freezes = store.freezes.get(merchant_id, [])
+        freeze_active = False
+        freeze_reason = None
+        frozen_amount = 0.0
+        for fz in freezes:
+            fz_date = fz.effective_from.date()
+            is_active = fz.status == FreezeStatus.ACTIVE
+            is_within_range = fz_date <= trade_date
+            if is_active and is_within_range:
+                freeze_active = True
+                freeze_reason = fz.reason.value
+                frozen_amount = fz.frozen_amount
+                break
+
+        advances = store.get_advances_by_merchant(merchant_id)
+        day_advances = [a for a in advances if a.apply_date == trade_date]
+        apply_count = len(day_advances)
+        approved_count = sum(1 for a in day_advances if a.status == AdvanceStatus.APPROVED)
+        total_approved = sum(a.apply_amount for a in day_advances if a.status == AdvanceStatus.APPROVED)
+
+        risk_items = self.check_refund_surge(merchant_id, trade_date)
+        if freeze_active:
+            risk_items.extend(self.check_freeze(merchant_id))
+        if fee_rule is None:
+            risk_items.extend(self.check_fee_version(merchant_id, trade_date, None))
+
+        risk_level = RiskLevel.LOW
+        if any(i.level == RiskLevel.CRITICAL for i in risk_items):
+            risk_level = RiskLevel.CRITICAL
+        elif any(i.level == RiskLevel.HIGH for i in risk_items):
+            risk_level = RiskLevel.HIGH
+        elif any(i.level == RiskLevel.MEDIUM for i in risk_items):
+            risk_level = RiskLevel.MEDIUM
+
+        return DailyMerchantRow(
+            merchant_id=merchant_id,
+            trade_date=trade_date,
+            tx_count=tx_count,
+            tx_amount=tx_amount,
+            refund_count=refund_count,
+            refund_amount=refund_amount,
+            refund_rate=refund_rate,
+            fee_version=fee_version,
+            d0_fee_rate=d0_fee_rate,
+            advance_ratio=advance_ratio,
+            max_advance_amount=max_advance,
+            freeze_active=freeze_active,
+            freeze_reason=freeze_reason,
+            frozen_amount=frozen_amount,
+            advance_apply_count=apply_count,
+            advance_approved_count=approved_count,
+            advance_total_approved=total_approved,
+            risk_level=risk_level,
+            risk_items=risk_items,
+        )
+
+    def build_merchant_dashboard(self, merchant_id: str, start: Optional[date] = None, end: Optional[date] = None) -> MerchantDashboardView:
+        all_dates = store.get_all_trade_dates(merchant_id)
+        if start:
+            all_dates = [d for d in all_dates if d >= start]
+        if end:
+            all_dates = [d for d in all_dates if d <= end]
+
+        daily_rows = [self.build_daily_row(merchant_id, d) for d in all_dates]
+        daily_rows.sort(key=lambda r: r.trade_date, reverse=True)
+
+        total_tx = sum(r.tx_amount for r in daily_rows)
+        total_refund = sum(r.refund_amount for r in daily_rows)
+        overall_refund_rate = total_refund / total_tx if total_tx > 0 else 0.0
+        total_advances = sum(r.advance_apply_count for r in daily_rows)
+        total_approved = sum(r.advance_total_approved for r in daily_rows)
+
+        active_freezes = len(store.get_active_freezes(merchant_id))
+        fee_versions = list({r.fee_version for r in daily_rows if r.fee_version})
+
+        date_range = [str(min(all_dates)), str(max(all_dates))] if all_dates else []
+
+        latest_level = RiskLevel.LOW
+        if daily_rows:
+            latest_level = daily_rows[0].risk_level
+
+        summary_lines = [
+            f"【商户{merchant_id} D0垫资实时合表】",
+            f"日期范围: {date_range[0] if date_range else '无数据'} ~ {date_range[1] if date_range else '无数据'}",
+            f"累计交易额: {total_tx:.2f}",
+            f"累计退款额: {total_refund:.2f}",
+            f"综合退款率: {overall_refund_rate:.2%}",
+            f"垫资申请数: {total_advances}笔, 累计通过: {total_approved:.2f}",
+            f"当前冻结数: {active_freezes}条",
+            f"最新风险等级: {latest_level.value}",
+            f"费率版本: {', '.join(fee_versions) if fee_versions else '无'}",
+        ]
+
+        return MerchantDashboardView(
+            merchant_id=merchant_id,
+            summary="\n".join(summary_lines),
+            daily_rows=daily_rows,
+            latest_risk_level=latest_level,
+            total_tx_amount=total_tx,
+            total_refund_amount=total_refund,
+            overall_refund_rate=overall_refund_rate,
+            total_advances=total_advances,
+            total_approved_amount=total_approved,
+            active_freeze_count=active_freezes,
+            fee_versions=fee_versions,
+            date_range=date_range,
         )
 
 

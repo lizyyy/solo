@@ -1,17 +1,21 @@
 from __future__ import annotations
 
 from datetime import date
+from io import StringIO
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import PlainTextResponse
 
 from models.schemas import (
     AdvanceApplication,
     AdvanceCheckRequest,
     AdvanceCheckResponse,
     AdvanceStatus,
+    DailyMerchantRow,
     FeeRule,
     FreezeRecord,
+    MerchantDashboardView,
     RefundRecord,
     RefundRollbackRequest,
     RefundRollbackResponse,
@@ -141,6 +145,7 @@ def export_report(merchant_id: str, report_date: Optional[date] = None):
         "items": [item.model_dump() for item in sorted_items],
         "advance_count": len(advances),
         "active_freeze_count": len(active_freezes),
+        "daily_summary": build_full_detail(merchant_id),
     }
 
     return ReportExportResponse(
@@ -149,3 +154,79 @@ def export_report(merchant_id: str, report_date: Optional[date] = None):
         summary="\n".join(summary_lines),
         detail=detail,
     )
+
+
+def build_full_detail(merchant_id: str) -> dict:
+    dashboard = engine.build_merchant_dashboard(merchant_id)
+    return {
+        "total_tx_amount": dashboard.total_tx_amount,
+        "total_refund_amount": dashboard.total_refund_amount,
+        "overall_refund_rate": dashboard.overall_refund_rate,
+        "total_advances": dashboard.total_advances,
+        "total_approved_amount": dashboard.total_approved_amount,
+        "active_freeze_count": dashboard.active_freeze_count,
+        "fee_versions": dashboard.fee_versions,
+        "date_range": dashboard.date_range,
+        "daily_rows": [row.model_dump() for row in dashboard.daily_rows],
+    }
+
+
+@router.get("/merchant-view/{merchant_id}", response_model=MerchantDashboardView, summary="实时合表-商户D0垫资全景视图")
+def get_merchant_view(merchant_id: str, start: Optional[date] = None, end: Optional[date] = None):
+    dashboard = engine.build_merchant_dashboard(merchant_id, start, end)
+    if not dashboard.daily_rows:
+        raise HTTPException(status_code=404, detail=f"商户{merchant_id}无交易数据")
+    return dashboard
+
+
+@router.get("/export/{merchant_id}/csv", summary="导出商户D0垫资合表为CSV", response_class=PlainTextResponse)
+def export_csv(merchant_id: str, start: Optional[date] = None, end: Optional[date] = None):
+    dashboard = engine.build_merchant_dashboard(merchant_id, start, end)
+    if not dashboard.daily_rows:
+        raise HTTPException(status_code=404, detail=f"商户{merchant_id}无交易数据")
+
+    headers = [
+        "trade_date", "tx_count", "tx_amount", "refund_count", "refund_amount",
+        "refund_rate", "fee_version", "d0_fee_rate", "advance_ratio", "max_advance_amount",
+        "freeze_active", "freeze_reason", "frozen_amount",
+        "advance_apply_count", "advance_approved_count", "advance_total_approved",
+        "risk_level", "risk_count"
+    ]
+
+    rows: list[list[str]] = [headers]
+    for r in dashboard.daily_rows:
+        rows.append([
+            str(r.trade_date),
+            str(r.tx_count),
+            f"{r.tx_amount:.2f}",
+            str(r.refund_count),
+            f"{r.refund_amount:.2f}",
+            f"{r.refund_rate:.4f}",
+            r.fee_version or "",
+            f"{r.d0_fee_rate:.6f}" if r.d0_fee_rate else "",
+            f"{r.advance_ratio:.4f}" if r.advance_ratio else "",
+            f"{r.max_advance_amount:.2f}",
+            str(r.freeze_active).lower(),
+            r.freeze_reason or "",
+            f"{r.frozen_amount:.2f}",
+            str(r.advance_apply_count),
+            str(r.advance_approved_count),
+            f"{r.advance_total_approved:.2f}",
+            r.risk_level.value,
+            str(len(r.risk_items)),
+        ])
+
+    csv_content = "\n".join(",".join(row) for row in rows)
+    return PlainTextResponse(
+        content=csv_content,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=d0_risk_{merchant_id}.csv"},
+    )
+
+
+@router.get("/export/{merchant_id}/json", summary="导出商户D0垫资合表为JSON")
+def export_json(merchant_id: str, start: Optional[date] = None, end: Optional[date] = None):
+    dashboard = engine.build_merchant_dashboard(merchant_id, start, end)
+    if not dashboard.daily_rows:
+        raise HTTPException(status_code=404, detail=f"商户{merchant_id}无交易数据")
+    return dashboard

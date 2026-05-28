@@ -143,3 +143,40 @@ class ReportExportResponse(BaseModel):
     report_date: date
     summary: str
     detail: dict
+
+
+class DailyMerchantRow(BaseModel):
+    merchant_id: str
+    trade_date: date
+    tx_count: int = 0
+    tx_amount: float = 0.0
+    refund_count: int = 0
+    refund_amount: float = 0.0
+    refund_rate: float = 0.0
+    fee_version: Optional[str] = None
+    d0_fee_rate: Optional[float] = None
+    advance_ratio: Optional[float] = None
+    max_advance_amount: float = 0.0
+    freeze_active: bool = False
+    freeze_reason: Optional[str] = None
+    frozen_amount: float = 0.0
+    advance_apply_count: int = 0
+    advance_approved_count: int = 0
+    advance_total_approved: float = 0.0
+    risk_level: RiskLevel = RiskLevel.LOW
+    risk_items: list[RiskReportItem] = Field(default_factory=list)
+
+
+class MerchantDashboardView(BaseModel):
+    merchant_id: str
+    summary: str
+    daily_rows: list[DailyMerchantRow]
+    latest_risk_level: RiskLevel
+    total_tx_amount: float
+    total_refund_amount: float
+    overall_refund_rate: float
+    total_advances: int
+    total_approved_amount: float
+    active_freeze_count: int
+    fee_versions: list[str]
+    date_range: list[str]
