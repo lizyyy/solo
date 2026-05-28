@@ -1,0 +1,671 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>光栅衍射测波长 - 实验分析报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .header {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header .meta { opacity: 0.9; font-size: 14px; }
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .section h2 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        .section h3 {
+            color: #34495e;
+            margin: 15px 0 10px;
+            font-size: 16px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .info-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .info-card .label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .info-card .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .info-card .trace {
+            font-size: 11px;
+            color: #95a5a6;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+        .result-highlight {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .result-highlight .value {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .result-highlight .uncertainty {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .result-highlight .error {
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 5px 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .anomaly {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+        }
+        .anomaly.error {
+            background: #ffebee;
+            border-color: #e74c3c;
+        }
+        .anomaly.warning {
+            background: #fff3cd;
+            border-color: #f39c12;
+        }
+        .anomaly .type {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .anomaly.error .type { color: #c0392b; }
+        .anomaly.warning .type { color: #d35400; }
+        .anomaly .desc { font-size: 13px; margin-bottom: 5px; }
+        .anomaly .suggestion {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        .anomaly .affected {
+            font-size: 11px;
+            color: #95a5a6;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        th {
+            background: #34495e;
+            color: white;
+            font-weight: 600;
+        }
+        tr:hover { background: #f8f9fa; }
+        tr.anomaly-row { background: #ffebee; }
+        .step {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #2ecc71;
+        }
+        .step.completed { border-color: #2ecc71; }
+        .step.failed { border-color: #e74c3c; }
+        .step.running { border-color: #f39c12; }
+        .step .name {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        .step .status {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+        .step.completed .status { background: #2ecc71; color: white; }
+        .step.failed .status { background: #e74c3c; color: white; }
+        .step.running .status { background: #f39c12; color: white; }
+        .step .trace-info {
+            font-size: 11px;
+            color: #95a5a6;
+            margin-top: 8px;
+            font-family: monospace;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .chart-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .chart-card .caption {
+            padding: 10px 15px;
+            font-size: 13px;
+            color: #7f8c8d;
+            background: #f8f9fa;
+        }
+        .conclusion {
+            background: #e8f5e9;
+            border-left: 4px solid #2ecc71;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .conclusion h3 { color: #27ae60; }
+        .trace-section {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        .trace-section summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .trace-section pre {
+            margin-top: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 11px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #95a5a6;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔬 光栅衍射测波长 - 实验分析报告</h1>
+        <div class="meta">
+            学生: 张三 (2024001001)
+            | 实验: 光栅衍射测波长
+            | 生成时间: 2026-05-29 07:06:25
+        </div>
+        <div class="meta" style="margin-top: 5px;">
+            报告ID: <code>edb2f0e0-470d-4010-93ae-e3195f3e15e7</code>
+            | 学生记录ID: <code>cc7ba0de-1b57-4dbb-85c1-5a7a622531a4</code>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📋 实验参数输入</h2>
+        <div class="info-grid">
+
+            <div class="info-card">
+                <div class="label">光栅常数 (d)</div>
+                <div class="value">3.333e-06 m</div>
+                <div class="value" style="font-size: 14px; color: #7f8c8d;">
+                    = 3.333 μm
+                </div>
+                <div class="trace">不确定度: ±3.333e-09 m</div>
+                <div class="trace">ID: 2afec8d7...</div>
+            </div>
+
+            <div class="info-card">
+                <div class="label">屏距 (L)</div>
+                <div class="value">1.5 m</div>
+                <div class="value" style="font-size: 14px; color: #7f8c8d;">
+                    = 150 cm
+                </div>
+                <div class="trace">不确定度: ±0.002 m</div>
+                <div class="trace">ID: 6a681f1e...</div>
+            </div>
+
+            <div class="info-card">
+                <div class="label">参考波长</div>
+                <div class="value">546.1 nm</div>
+                <div class="value" style="font-size: 14px; color: #7f8c8d;">
+                    = 5.461e-07 m
+                </div>
+                <div class="trace">来源: 标准值</div>
+            </div>
+
+            <div class="info-card">
+                <div class="label">记录条纹数</div>
+                <div class="value">5 条</div>
+                <div class="trace">级次范围: 0 - 2</div>
+            </div>
+        </div>
+
+        <h3>📏 条纹位置记录</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>级次 k</th>
+                    <th>侧别</th>
+                    <th>位置 (m)</th>
+                    <th>位置 (mm)</th>
+                    <th>不确定度 (m)</th>
+                    <th>数据来源</th>
+                    <th>ID</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr class="">
+                    <td>-2</td>
+                    <td>left</td>
+                    <td>-1.670000e-01</td>
+                    <td>-167.000</td>
+                    <td>±5.000000e-04</td>
+                    <td>measured</td>
+                    <td><code>ca0eb183...</code></td>
+                </tr>
+
+                <tr class="">
+                    <td>-1</td>
+                    <td>left</td>
+                    <td>-8.250000e-02</td>
+                    <td>-82.500</td>
+                    <td>±5.000000e-04</td>
+                    <td>measured</td>
+                    <td><code>f24744e6...</code></td>
+                </tr>
+
+                <tr class="">
+                    <td>0</td>
+                    <td>center</td>
+                    <td>0.000000e+00</td>
+                    <td>0.000</td>
+                    <td>±5.000000e-04</td>
+                    <td>measured</td>
+                    <td><code>d25db4a2...</code></td>
+                </tr>
+
+                <tr class="">
+                    <td>1</td>
+                    <td>right</td>
+                    <td>8.200000e-02</td>
+                    <td>82.000</td>
+                    <td>±5.000000e-04</td>
+                    <td>measured</td>
+                    <td><code>b55e26c4...</code></td>
+                </tr>
+
+                <tr class="">
+                    <td>2</td>
+                    <td>right</td>
+                    <td>1.665000e-01</td>
+                    <td>166.500</td>
+                    <td>±5.000000e-04</td>
+                    <td>measured</td>
+                    <td><code>324e2349...</code></td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>⚠️ 异常检测结果</h2>
+
+        <div style="margin-bottom: 15px;">
+            <span style="background: #e74c3c; color: white; padding: 5px 15px; border-radius: 20px; margin-right: 10px;">
+                ❌ 4 个严重错误
+            </span>
+            <span style="background: #f39c12; color: white; padding: 5px 15px; border-radius: 20px;">
+                ⚠️ 0 个警告
+            </span>
+        </div>
+
+            <div class="anomaly error">
+                <div class="type">
+                    [ERROR] 条纹缺失
+                </div>
+                <div class="desc">第3级条纹缺少左、右侧数据</div>
+                <div class="suggestion">💡 建议: 请检查并补充第3级左、右侧的条纹位置测量</div>
+                <div class="affected">影响数据ID: cc7ba0de-1b57-4dbb-85c1-5a7a622531a4</div>
+                <details class="trace-section">
+                    <summary>查看追溯信息</summary>
+                    <pre>{
+  "source_id": "d36bbe2c-a26b-42be-9dbd-034d18acddec",
+  "source_type": "calculated",
+  "created_at": "2026-05-29T07:06:25.893954",
+  "parent_ids": [
+    "cc7ba0de-1b57-4dbb-85c1-5a7a622531a4"
+  ],
+  "notes": "对称测量可以减小系统误差，建议同时记录左右两侧同级条纹"
+}</pre>
+                </details>
+            </div>
+
+            <div class="anomaly error">
+                <div class="type">
+                    [ERROR] 级次混淆
+                </div>
+                <div class="desc">第1级和第2级计算的波长不符合比例关系。实测比值 λ(2)/λ(1) = 1.0090，理论比值应为 2.0000，偏差 49.6%</div>
+                <div class="suggestion">💡 建议: 请核对第1级和第2级条纹的级次标记是否正确。常见错误：将k=1记为k=2，或混淆了左右两侧的级次方向。如果数据是角度，检查是否将1级记为了2级。</div>
+                <div class="affected">影响数据ID: 73c56d78-0864-49d5-9319-254f9ebceaa8, 76b71f33-9df4-4a82-b8a3-0c6b6288eeb3, 60db7d48-a5b3-4b22-9026-2e13ed69ca4d, f16c9655-6dda-432e-8a58-be127c11bc33</div>
+                <details class="trace-section">
+                    <summary>查看追溯信息</summary>
+                    <pre>{
+  "source_id": "b4e0bfb2-f9c4-4597-b8d5-b1c0ac6018a0",
+  "source_type": "calculated",
+  "created_at": "2026-05-29T07:06:25.893976",
+  "parent_ids": [
+    "73c56d78-0864-49d5-9319-254f9ebceaa8",
+    "76b71f33-9df4-4a82-b8a3-0c6b6288eeb3",
+    "60db7d48-a5b3-4b22-9026-2e13ed69ca4d",
+    "f16c9655-6dda-432e-8a58-be127c11bc33"
+  ],
+  "notes": "根据光栅方程，λ与级次k成反比（同级条纹）。如果是同一级次的两侧，波长应该接近相等。"
+}</pre>
+                </details>
+            </div>
+
+            <div class="anomaly error">
+                <div class="type">
+                    [ERROR] 级次混淆
+                </div>
+                <div class="desc">第1级条纹计算波长 183.06 nm 与参考值 546.10 nm 偏差 66.5%。若级次应为 [3]，则波长计算值将在合理范围内。</div>
+                <div class="suggestion">💡 建议: 建议检查该条纹的级次标记。若标记为k=3，则计算波长为 61.02 nm，与参考值更接近。</div>
+                <div class="affected">影响数据ID: 73c56d78-0864-49d5-9319-254f9ebceaa8</div>
+                <details class="trace-section">
+                    <summary>查看追溯信息</summary>
+                    <pre>{
+  "source_id": "d163567a-588c-445a-a6c2-d8e31adcfa0a",
+  "source_type": "calculated",
+  "created_at": "2026-05-29T07:06:25.893985",
+  "parent_ids": [
+    "73c56d78-0864-49d5-9319-254f9ebceaa8"
+  ],
+  "notes": "级次混淆是最常见的错误之一，特别是当条纹较密时容易数错。"
+}</pre>
+                </details>
+            </div>
+
+            <div class="anomaly error">
+                <div class="type">
+                    [ERROR] 级次混淆
+                </div>
+                <div class="desc">第1级条纹计算波长 181.95 nm 与参考值 546.10 nm 偏差 66.7%。若级次应为 [3]，则波长计算值将在合理范围内。</div>
+                <div class="suggestion">💡 建议: 建议检查该条纹的级次标记。若标记为k=3，则计算波长为 60.65 nm，与参考值更接近。</div>
+                <div class="affected">影响数据ID: 76b71f33-9df4-4a82-b8a3-0c6b6288eeb3</div>
+                <details class="trace-section">
+                    <summary>查看追溯信息</summary>
+                    <pre>{
+  "source_id": "225f08d0-f3ca-45ee-aefe-ff2e1268d60c",
+  "source_type": "calculated",
+  "created_at": "2026-05-29T07:06:25.893994",
+  "parent_ids": [
+    "76b71f33-9df4-4a82-b8a3-0c6b6288eeb3"
+  ],
+  "notes": "级次混淆是最常见的错误之一，特别是当条纹较密时容易数错。"
+}</pre>
+                </details>
+            </div>
+
+    </div>
+
+    <div class="section">
+        <h2>📊 波长计算结果</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>级次 k</th>
+                    <th>波长 (nm)</th>
+                    <th>不确定度 (nm)</th>
+                    <th>相对不确定度</th>
+                    <th>与参考值偏差</th>
+                    <th>数据来源</th>
+                    <th>ID</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr class="anomaly-row">
+                    <td>-2</td>
+                    <td><strong>184.416</strong></td>
+                    <td>±0.625</td>
+                    <td>0.34%</td>
+                    <td><span style="color: #e74c3c;">-66.23%</span></td>
+                    <td>calculated</td>
+                    <td><code>60db7d48...</code></td>
+                </tr>
+
+                <tr class="anomaly-row">
+                    <td>-1</td>
+                    <td><strong>183.057</strong></td>
+                    <td>±1.147</td>
+                    <td>0.63%</td>
+                    <td><span style="color: #e74c3c;">-66.48%</span></td>
+                    <td>calculated</td>
+                    <td><code>73c56d78...</code></td>
+                </tr>
+
+                <tr class="anomaly-row">
+                    <td>1</td>
+                    <td><strong>181.951</strong></td>
+                    <td>±1.147</td>
+                    <td>0.63%</td>
+                    <td><span style="color: #e74c3c;">-66.68%</span></td>
+                    <td>calculated</td>
+                    <td><code>76b71f33...</code></td>
+                </tr>
+
+                <tr class="anomaly-row">
+                    <td>2</td>
+                    <td><strong>183.871</strong></td>
+                    <td>±0.624</td>
+                    <td>0.34%</td>
+                    <td><span style="color: #e74c3c;">-66.33%</span></td>
+                    <td>calculated</td>
+                    <td><code>f16c9655...</code></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <div class="result-highlight">
+            <div style="font-size: 14px; opacity: 0.9;">最终测量结果（加权平均）</div>
+            <div class="value">183.77 ± 0.39 nm</div>
+            <div class="uncertainty">
+                = (1.837682e-07 ± 3.879101e-10) m
+            </div>
+
+            <div class="error" style="background: #e74c3c;">
+                与参考值相对误差: -66.35%
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="section">
+        <h2>📈 分析过程追溯</h2>
+
+        <div class="step completed">
+            <div class="name">
+                衍射计算
+                <span class="status">COMPLETED</span>
+            </div>
+            <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+                输入: {"student_record_id": "cc7ba0de-1b57-4dbb-85c1-5a7a622531a4", "grating_constant": 3.3333333333333337e-06, "screen_distance": 1.5, "fringe_count": 5}
+            </div>
+            <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+                输出: {"wavelength_results": ["WavelengthResult(source_id='73c56d78-0864-49d5-9319-254f9ebceaa8', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893778), parent_ids=['2afec8d7-aaa4-4d76-915b-60347b82b2b1', 'f24744e6-e7fd-4e83-b093-fa691cb79bc4', '6a681f1e-8eac-456c-ba6f-3d1b437f05b3', '852e47da-4056-4e4a-9adf-3cb230c49f7f', 'b6df50a9-0b88-45a0-8d7f-25b439e92d07'], notes='由第-1级条纹计算得到的波长', value=1.830566691904516e-07, unit='m', uncertainty=1.1472381946417524e-09, order=-1, fringe_id='f24744e6-e7fd-4e83-b093-fa691cb79bc4')", "WavelengthResult(source_id='76b71f33-9df4-4a82-b8a3-0c6b6288eeb3', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893789), parent_ids=['2afec8d7-aaa4-4d76-915b-60347b82b2b1', 'b55e26c4-7e48-45ce-90c1-59856d02fe20', '6a681f1e-8eac-456c-ba6f-3d1b437f05b3', '852e47da-4056-4e4a-9adf-3cb230c49f7f', 'b6df50a9-0b88-45a0-8d7f-25b439e92d07'], notes='由第1级条纹计算得到的波长', value=1.819505504839037e-07, unit='m', uncertainty=1.1468113766423017e-09, order=1, fringe_id='b55e26c4-7e48-45ce-90c1-59856d02fe20')", "WavelengthResult(source_id='60db7d48-a5b3-4b22-9026-2e13ed69ca4d', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893829), parent_ids=['2afec8d7-aaa4-4d76-915b-60347b82b2b1', 'ca0eb183-8202-4001-9950-f132d3effc21', '6a681f1e-8eac-456c-ba6f-3d1b437f05b3', '852e47da-4056-4e4a-9adf-3cb230c49f7f', 'b6df50a9-0b88-45a0-8d7f-25b439e92d07'], notes='由第-2级条纹计算得到的波长', value=1.8441614614721645e-07, unit='m', uncertainty=6.248541094530966e-10, order=-2, fringe_id='ca0eb183-8202-4001-9950-f132d3effc21')", "WavelengthResult(source_id='f16c9655-6dda-432e-8a58-be127c11bc33', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893845), parent_ids=['2afec8d7-aaa4-4d76-915b-60347b82b2b1', '324e2349-3ac3-4efa-a809-3421bef70dcf', '6a681f1e-8eac-456c-ba6f-3d1b437f05b3', '852e47da-4056-4e4a-9adf-3cb230c49f7f', 'b6df50a9-0b88-45a0-8d7f-25b439e92d07'], notes='由第2级条纹计算得到的波长', value=1.8387073213311737e-07, unit='m', uncertainty=6.244736165959019e-10, order=2, fringe_id='324e2349-3ac3-4efa-a809-3421bef70dcf')"], "traces": [{"angle_calculation": {"fringe_id": "f24744e6-e7fd-4e83-b093-fa691cb79bc4", "screen_distance_id": "6a681f1e-8eac-456c-ba6f-3d1b437f05b3", "calculation_method": "position_to_angle", "raw_inputs": {"fringe_position": -0.0825, "fringe_position_unit": "m", "screen_distance": 1.5, "screen_distance_unit": "m"}}, "grating_equation": {"grating_constant": 3.3333333333333337e-06, "angle_rad": -0.054944642106561366, "angle_deg": -3.148096099562759, "sin_theta": -0.05491700075713548, "order": -1, "equation": "λ = d * sin(θ) / |k|", "calculation": "λ = 3.333333e-06 * -0.054917 / 1 = 1.830567e-07 m"}, "wavelength_nm": 183.0566691904516, "result_id": "73c56d78-0864-49d5-9319-254f9ebceaa8"}, {"angle_calculation": {"fringe_id": "b55e26c4-7e48-45ce-90c1-59856d02fe20", "screen_distance_id": "6a681f1e-8eac-456c-ba6f-3d1b437f05b3", "calculation_method": "position_to_angle", "raw_inputs": {"fringe_position": 0.082, "fringe_position_unit": "m", "screen_distance": 1.5, "screen_distance_unit": "m"}}, "grating_equation": {"grating_constant": 3.3333333333333337e-06, "angle_rad": 0.054612308003370066, "angle_deg": 3.1290547580616326, "sin_theta": 0.0545851651451711, "order": 1, "equation": "λ = d * sin(θ) / |k|", "calculation": "λ = 3.333333e-06 * 0.054585 / 1 = 1.819506e-07 m"}, "wavelength_nm": 181.9505504839037, "result_id": "76b71f33-9df4-4a82-b8a3-0c6b6288eeb3"}, {"angle_calculation": {"fringe_id": "ca0eb183-8202-4001-9950-f132d3effc21", "screen_distance_id": "6a681f1e-8eac-456c-ba6f-3d1b437f05b3", "calculation_method": "position_to_angle", "raw_inputs": {"fringe_position": -0.167, "fringe_position_unit": "m", "screen_distance": 1.5, "screen_distance_unit": "m"}}, "grating_equation": {"grating_constant": 3.3333333333333337e-06, "angle_rad": -0.11087672801166669, "angle_deg": -6.352768561288453, "sin_theta": -0.11064968768832985, "order": -2, "equation": "λ = d * sin(θ) / |k|", "calculation": "λ = 3.333333e-06 * -0.110650 / 2 = 1.844161e-07 m"}, "wavelength_nm": 184.41614614721644, "result_id": "60db7d48-a5b3-4b22-9026-2e13ed69ca4d"}, {"angle_calculation": {"fringe_id": "324e2349-3ac3-4efa-a809-3421bef70dcf", "screen_distance_id": "6a681f1e-8eac-456c-ba6f-3d1b437f05b3", "calculation_method": "position_to_angle", "raw_inputs": {"fringe_position": 0.1665, "fringe_position_unit": "m", "screen_distance": 1.5, "screen_distance_unit": "m"}}, "grating_equation": {"grating_constant": 3.3333333333333337e-06, "angle_rad": 0.1105474637382701, "angle_deg": 6.3339031080783865, "sin_theta": 0.11032243927987041, "order": 2, "equation": "λ = d * sin(θ) / |k|", "calculation": "λ = 3.333333e-06 * 0.110322 / 2 = 1.838707e-07 m"}, "wavelength_nm": 183.87073213311737, "result_id": "f16c9655-6dda-432e-8a58-be127c11bc33"}]}
+            </div>
+            <details class="trace-section">
+                <summary>查看完整追溯信息</summary>
+                <pre>{
+  "source_id": "852e47da-4056-4e4a-9adf-3cb230c49f7f",
+  "source_type": "calculated",
+  "created_at": "2026-05-29T07:06:25.893660",
+  "parent_ids": [
+    "cc7ba0de-1b57-4dbb-85c1-5a7a622531a4"
+  ],
+  "notes": "使用光栅方程 d·sin(θ) = k·λ 从条纹位置反推波长"
+}</pre>
+            </details>
+        </div>
+
+        <div class="step completed">
+            <div class="name">
+                误差传播分析
+                <span class="status">COMPLETED</span>
+            </div>
+            <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+                输入: {"student_record_id": "cc7ba0de-1b57-4dbb-85c1-5a7a622531a4", "grating_constant_uncertainty": 3.333333333333334e-09, "screen_distance_uncertainty": 0.002, "result_count": 4}
+            </div>
+            <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+                输出: {"updated_results": ["WavelengthResult(source_id='73c56d78-0864-49d5-9319-254f9ebceaa8', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893778), parent_ids=['2afec8d7-aaa4-4d76-915b-60347b82b2b1', 'f24744e6-e7fd-4e83-b093-fa691cb79bc4', '6a681f1e-8eac-456c-ba6f-3d1b437f05b3', '852e47da-4056-4e4a-9adf-3cb230c49f7f', 'b6df50a9-0b88-45a0-8d7f-25b439e92d07'], notes='由第-1级条纹计算得到的波长', value=1.830566691904516e-07, unit='m', uncertainty=1.1472381946417524e-09, order=-1, fringe_id='f24744e6-e7fd-4e83-b093-fa691cb79bc4')", "WavelengthResult(source_id='76b71f33-9df4-4a82-b8a3-0c6b6288eeb3', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893789), parent_ids=['2afec8d7-aaa4-4d76-915b-60347b82b2b1', 'b55e26c4-7e48-45ce-90c1-59856d02fe20', '6a681f1e-8eac-456c-ba6f-3d1b437f05b3', '852e47da-4056-4e4a-9adf-3cb230c49f7f', 'b6df50a9-0b88-45a0-8d7f-25b439e92d07'], notes='由第1级条纹计算得到的波长', value=1.819505504839037e-07, unit='m', uncertainty=1.1468113766423017e-09, order=1, fringe_id='b55e26c4-7e48-45ce-90c1-59856d02fe20')", "WavelengthResult(source_id='60db7d48-a5b3-4b22-9026-2e13ed69ca4d', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893829), parent_ids=['2afec8d7-aaa4-4d76-915b-60347b82b2b1', 'ca0eb183-8202-4001-9950-f132d3effc21', '6a681f1e-8eac-456c-ba6f-3d1b437f05b3', '852e47da-4056-4e4a-9adf-3cb230c49f7f', 'b6df50a9-0b88-45a0-8d7f-25b439e92d07'], notes='由第-2级条纹计算得到的波长', value=1.8441614614721645e-07, unit='m', uncertainty=6.248541094530966e-10, order=-2, fringe_id='ca0eb183-8202-4001-9950-f132d3effc21')", "WavelengthResult(source_id='f16c9655-6dda-432e-8a58-be127c11bc33', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893845), parent_ids=['2afec8d7-aaa4-4d76-915b-60347b82b2b1', '324e2349-3ac3-4efa-a809-3421bef70dcf', '6a681f1e-8eac-456c-ba6f-3d1b437f05b3', '852e47da-4056-4e4a-9adf-3cb230c49f7f', 'b6df50a9-0b88-45a0-8d7f-25b439e92d07'], notes='由第2级条纹计算得到的波长', value=1.8387073213311737e-07, unit='m', uncertainty=6.244736165959019e-10, order=2, fringe_id='324e2349-3ac3-4efa-a809-3421bef70dcf')"], "traces": [{"angle_uncertainty": {"method": "position_propagation", "components": {"dtheta/dx": 0.6646560820185605, "dtheta/dL": 0.03655608451102083, "delta_theta_x": 0.0003323280410092803, "delta_theta_L": 7.311216902204167e-05, "delta_theta_rad": 0.00034027535335397636, "formula": "Δθ = √[(∂θ/∂x·Δx)² + (∂θ/∂L·ΔL)²]", "calculation": "Δθ = √[(6.646561e-01×5.000000e-04)² + (3.655608e-02×2.000000e-03)²] = √[3.323280e-04² + 7.311217e-05²] = 3.402754e-04 rad"}, "raw_inputs": {"fringe_position": -0.0825, "fringe_position_uncertainty": 0.0005, "screen_distance": 1.5, "screen_distance_uncertainty": 0.002}}, "components": {"grating_constant": 3.3333333333333337e-06, "grating_constant_uncertainty": 3.333333333333334e-09, "angle_rad": -0.054944642106561366, "angle_deg": -3.148096099562759, "angle_uncertainty_rad": 0.00034027535335397636, "sin_theta": -0.05491700075713548, "cos_theta": 0.9984909228570087, "order": 1, "wavelength_m": 1.830566691904516e-07, "relative_uncertainty_d": 0.001, "relative_uncertainty_theta": 0.006186824606435933, "total_relative_uncertainty": 0.0062671204480846815, "absolute_uncertainty": 1.1472381946417524e-09, "formula": "(Δλ/λ)² = (Δd/d)² + (cot(θ)·Δθ)²", "calculation": "(Δλ/λ)² = (3.333333e-09/3.333333e-06)² + (0.998491/-0.054917×3.402754e-04)²\n       = 1.000000e-06 + 3.827680e-05 = 3.927680e-05\nΔλ/λ = 0.0063 (0.63%)\nΔλ = 1.830567e-07 × 0.0063 = 1.147238e-09 m"}, "result_id": "73c56d78-0864-49d5-9319-254f9ebceaa8", "success": true, "wavelength_nm": 183.0566691904516, "uncertainty_nm": 1.1472381946417525, "relative_uncertainty_percent": 0.6267120448084682}, {"angle_uncertainty": {"method": "position_propagation", "components": {"dtheta/dx": 0.6646803064973829, "dtheta/dL": -0.036335856755190264, "delta_theta_x": 0.00033234015324869144, "delta_theta_L": 7.267171351038054e-05, "delta_theta_rad": 0.0003401928209205752, "formula": "Δθ = √[(∂θ/∂x·Δx)² + (∂θ/∂L·ΔL)²]", "calculation": "Δθ = √[(6.646803e-01×5.000000e-04)² + (3.633586e-02×2.000000e-03)²] = √[3.323402e-04² + 7.267171e-05²] = 3.401928e-04 rad"}, "raw_inputs": {"fringe_position": 0.082, "fringe_position_uncertainty": 0.0005, "screen_distance": 1.5, "screen_distance_uncertainty": 0.002}}, "components": {"grating_constant": 3.3333333333333337e-06, "grating_constant_uncertainty": 3.333333333333334e-09, "angle_rad": 0.054612308003370066, "angle_deg": 3.1290547580616326, "angle_uncertainty_rad": 0.0003401928209205752, "sin_theta": 0.0545851651451711, "cos_theta": 0.9985091185092274, "order": 1, "wavelength_m": 1.819505504839037e-07, "relative_uncertainty_d": 0.001, "relative_uncertainty_theta": 0.006223039407083693, "total_relative_uncertainty": 0.006302873904983072, "absolute_uncertainty": 1.1468113766423017e-09, "formula": "(Δλ/λ)² = (Δd/d)² + (cot(θ)·Δθ)²", "calculation": "(Δλ/λ)² = (3.333333e-09/3.333333e-06)² + (0.998509/0.054585×3.401928e-04)²\n       = 1.000000e-06 + 3.872622e-05 = 3.972622e-05\nΔλ/λ = 0.0063 (0.63%)\nΔλ = 1.819506e-07 × 0.0063 = 1.146811e-09 m"}, "result_id": "76b71f33-9df4-4a82-b8a3-0c6b6288eeb3", "success": true, "wavelength_nm": 181.9505504839037, "uncertainty_nm": 1.1468113766423016, "relative_uncertainty_percent": 0.6302873904983072}, {"angle_uncertainty": {"method": "position_propagation", "components": {"dtheta/dx": 0.6585044310763167, "dtheta/dL": 0.0733134933264966, "delta_theta_x": 0.0003292522155381584, "delta_theta_L": 0.0001466269866529932, "delta_theta_rad": 0.00036042543563367295, "formula": "Δθ = √[(∂θ/∂x·Δx)² + (∂θ/∂L·ΔL)²]", "calculation": "Δθ = √[(6.585044e-01×5.000000e-04)² + (7.331349e-02×2.000000e-03)²] = √[3.292522e-04² + 1.466270e-04²] = 3.604254e-04 rad"}, "raw_inputs": {"fringe_position": -0.167, "fringe_position_uncertainty": 0.0005, "screen_distance": 1.5, "screen_distance_uncertainty": 0.002}}, "components": {"grating_constant": 3.3333333333333337e-06, "grating_constant_uncertainty": 3.333333333333334e-09, "angle_rad": -0.11087672801166669, "angle_deg": -6.352768561288453, "angle_uncertainty_rad": 0.00036042543563367295, "sin_theta": -0.11064968768832985, "cos_theta": 0.9938594702544596, "order": 2, "wavelength_m": 1.8441614614721645e-07, "relative_uncertainty_d": 0.001, "relative_uncertainty_theta": 0.0032373542122784995, "total_relative_uncertainty": 0.003388283089672016, "absolute_uncertainty": 6.248541094530966e-10, "formula": "(Δλ/λ)² = (Δd/d)² + (cot(θ)·Δθ)²", "calculation": "(Δλ/λ)² = (3.333333e-09/3.333333e-06)² + (0.993859/-0.110650×3.604254e-04)²\n       = 1.000000e-06 + 1.048046e-05 = 1.148046e-05\nΔλ/λ = 0.0034 (0.34%)\nΔλ = 1.844161e-07 × 0.0034 = 6.248541e-10 m"}, "result_id": "60db7d48-a5b3-4b22-9026-2e13ed69ca4d", "success": true, "wavelength_nm": 184.41614614721644, "uncertainty_nm": 0.6248541094530966, "relative_uncertainty_percent": 0.3388283089672016}, {"angle_uncertainty": {"method": "position_propagation", "components": {"dtheta/dx": 0.6585526395942262, "dtheta/dL": -0.07309934299495911, "delta_theta_x": 0.0003292763197971131, "delta_theta_L": 0.00014619868598991822, "delta_theta_rad": 0.0003602734386050537, "formula": "Δθ = √[(∂θ/∂x·Δx)² + (∂θ/∂L·ΔL)²]", "calculation": "Δθ = √[(6.585526e-01×5.000000e-04)² + (7.309934e-02×2.000000e-03)²] = √[3.292763e-04² + 1.461987e-04²] = 3.602734e-04 rad"}, "raw_inputs": {"fringe_position": 0.1665, "fringe_position_uncertainty": 0.0005, "screen_distance": 1.5, "screen_distance_uncertainty": 0.002}}, "components": {"grating_constant": 3.3333333333333337e-06, "grating_constant_uncertainty": 3.333333333333334e-09, "angle_rad": 0.1105474637382701, "angle_deg": 6.3339031080783865, "angle_uncertainty_rad": 0.0003602734386050537, "sin_theta": 0.11032243927987041, "cos_theta": 0.9938958493682019, "order": 2, "wavelength_m": 1.8387073213311737e-07, "relative_uncertainty_d": 0.001, "relative_uncertainty_theta": 0.0032457066540995823, "total_relative_uncertainty": 0.0033962643719926025, "absolute_uncertainty": 6.244736165959019e-10, "formula": "(Δλ/λ)² = (Δd/d)² + (cot(θ)·Δθ)²", "calculation": "(Δλ/λ)² = (3.333333e-09/3.333333e-06)² + (0.993896/0.110322×3.602734e-04)²\n       = 1.000000e-06 + 1.053461e-05 = 1.153461e-05\nΔλ/λ = 0.0034 (0.34%)\nΔλ = 1.838707e-07 × 0.0034 = 6.244736e-10 m"}, "result_id": "f16c9655-6dda-432e-8a58-be127c11bc33", "success": true, "wavelength_nm": 183.87073213311737, "uncertainty_nm": 0.6244736165959018, "relative_uncertainty_percent": 0.3396264371992602}], "final_uncertainty": 3.8791008245480897e-10, "final_trace": {"individual_results": [{"order": -1, "wavelength_m": 1.830566691904516e-07, "wavelength_nm": 183.0566691904516, "uncertainty_m": 1.1472381946417524e-09, "uncertainty_nm": 1.1472381946417525, "weight": 0.11432861459023398}, {"order": 1, "wavelength_m": 1.819505504839037e-07, "wavelength_nm": 181.9505504839037, "uncertainty_m": 1.1468113766423017e-09, "uncertainty_nm": 1.1468113766423016, "weight": 0.11441373162383538}, {"order": -2, "wavelength_m": 1.8441614614721645e-07, "wavelength_nm": 184.41614614721644, "uncertainty_m": 6.248541094530966e-10, "uncertainty_nm": 0.6248541094530966, "weight": 0.3853939341622721}, {"order": 2, "wavelength_m": 1.8387073213311737e-07, "wavelength_nm": 183.87073213311737, "uncertainty_m": 6.244736165959019e-10, "uncertainty_nm": 0.6244736165959018, "weight": 0.3858637196236585}], "weighted_average_m": 1.8376816554945187e-07, "weighted_average_nm": 183.76816554945188, "final_uncertainty_m": 3.8791008245480897e-10, "final_uncertainty_nm": 0.38791008245480896, "relative_uncertainty_percent": 0.21108665981128416, "formula": "加权平均: λ_avg = Σ(w_i·λ_i), 其中 w_i = 1/σ_i²\n不确定度: σ_avg = 1/√(Σ1/σ_i²)"}}
+            </div>
+            <details class="trace-section">
+                <summary>查看完整追溯信息</summary>
+                <pre>{
+  "source_id": "b6df50a9-0b88-45a0-8d7f-25b439e92d07",
+  "source_type": "calculated",
+  "created_at": "2026-05-29T07:06:25.893872",
+  "parent_ids": [
+    "cc7ba0de-1b57-4dbb-85c1-5a7a622531a4",
+    "73c56d78-0864-49d5-9319-254f9ebceaa8",
+    "76b71f33-9df4-4a82-b8a3-0c6b6288eeb3",
+    "60db7d48-a5b3-4b22-9026-2e13ed69ca4d",
+    "f16c9655-6dda-432e-8a58-be127c11bc33"
+  ],
+  "notes": "基于误差传播公式计算各测量量不确定度对波长的影响"
+}</pre>
+            </details>
+        </div>
+
+        <div class="step completed">
+            <div class="name">
+                异常检测
+                <span class="status">COMPLETED</span>
+            </div>
+            <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+                输入: {"student_record_id": "cc7ba0de-1b57-4dbb-85c1-5a7a622531a4", "fringe_count": 5, "result_count": 4, "detection_types": ["条纹缺失", "级次混淆", "角度单位错误", "对称性异常", "数据不一致"]}
+            </div>
+            <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+                输出: {"anomalies": ["Anomaly(source_id='d36bbe2c-a26b-42be-9dbd-034d18acddec', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893954), parent_ids=['cc7ba0de-1b57-4dbb-85c1-5a7a622531a4'], notes='对称测量可以减小系统误差，建议同时记录左右两侧同级条纹', anomaly_type='条纹缺失', severity='error', description='第3级条纹缺少左、右侧数据', affected_ids=['cc7ba0de-1b57-4dbb-85c1-5a7a622531a4'], suggestion='请检查并补充第3级左、右侧的条纹位置测量')", "Anomaly(source_id='b4e0bfb2-f9c4-4597-b8d5-b1c0ac6018a0', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893976), parent_ids=['73c56d78-0864-49d5-9319-254f9ebceaa8', '76b71f33-9df4-4a82-b8a3-0c6b6288eeb3', '60db7d48-a5b3-4b22-9026-2e13ed69ca4d', 'f16c9655-6dda-432e-8a58-be127c11bc33'], notes='根据光栅方程，λ与级次k成反比（同级条纹）。如果是同一级次的两侧，波长应该接近相等。', anomaly_type='级次混淆', severity='error', description='第1级和第2级计算的波长不符合比例关系。实测比值 λ(2)/λ(1) = 1.0090，理论比值应为 2.0000，偏差 49.6%', affected_ids=['73c56d78-0864-49d5-9319-254f9ebceaa8', '76b71f33-9df4-4a82-b8a3-0c6b6288eeb3', '60db7d48-a5b3-4b22-9026-2e13ed69ca4d', 'f16c9655-6dda-432e-8a58-be127c11bc33'], suggestion='请核对第1级和第2级条纹的级次标记是否正确。常见错误：将k=1记为k=2，或混淆了左右两侧的级次方向。如果数据是角度，检查是否将1级记为了2级。')", "Anomaly(source_id='d163567a-588c-445a-a6c2-d8e31adcfa0a', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893985), parent_ids=['73c56d78-0864-49d5-9319-254f9ebceaa8'], notes='级次混淆是最常见的错误之一，特别是当条纹较密时容易数错。', anomaly_type='级次混淆', severity='error', description='第1级条纹计算波长 183.06 nm 与参考值 546.10 nm 偏差 66.5%。若级次应为 [3]，则波长计算值将在合理范围内。', affected_ids=['73c56d78-0864-49d5-9319-254f9ebceaa8'], suggestion='建议检查该条纹的级次标记。若标记为k=3，则计算波长为 61.02 nm，与参考值更接近。')", "Anomaly(source_id='225f08d0-f3ca-45ee-aefe-ff2e1268d60c', source_type=<SourceType.CALCULATED: 'calculated'>, created_at=datetime.datetime(2026, 5, 29, 7, 6, 25, 893994), parent_ids=['76b71f33-9df4-4a82-b8a3-0c6b6288eeb3'], notes='级次混淆是最常见的错误之一，特别是当条纹较密时容易数错。', anomaly_type='级次混淆', severity='error', description='第1级条纹计算波长 181.95 nm 与参考值 546.10 nm 偏差 66.7%。若级次应为 [3]，则波长计算值将在合理范围内。', affected_ids=['76b71f33-9df4-4a82-b8a3-0c6b6288eeb3'], suggestion='建议检查该条纹的级次标记。若标记为k=3，则计算波长为 60.65 nm，与参考值更接近。')"], "trace": {"条纹缺失": 1, "角度单位错误": 0, "对称性异常": 0, "级次混淆": 3, "数据不一致": 0, "总异常数": 4, "严重错误": 4, "警告": 0}}
+            </div>
+            <details class="trace-section">
+                <summary>查看完整追溯信息</summary>
+                <pre>{
+  "source_id": "9fd4a065-192b-4b1c-98aa-e6ef05772622",
+  "source_type": "calculated",
+  "created_at": "2026-05-29T07:06:25.893940",
+  "parent_ids": [
+    "cc7ba0de-1b57-4dbb-85c1-5a7a622531a4",
+    "73c56d78-0864-49d5-9319-254f9ebceaa8",
+    "76b71f33-9df4-4a82-b8a3-0c6b6288eeb3",
+    "60db7d48-a5b3-4b22-9026-2e13ed69ca4d",
+    "f16c9655-6dda-432e-8a58-be127c11bc33"
+  ],
+  "notes": "检测条纹缺失、级次混淆、角度单位错误等常见实验问题"
+}</pre>
+            </details>
+        </div>
+
+    </div>
+
+    <div class="section">
+        <h2>🖼️ 可视化图表</h2>
+        <div class="charts-grid">
+
+            <div class="chart-card">
+                <img src="../charts/fringe_positions.png" alt="条纹位置分布">
+                <div class="caption">条纹位置分布</div>
+            </div>
+
+            <div class="chart-card">
+                <img src="../charts/wavelength_comparison.png" alt="波长计算结果对比">
+                <div class="caption">波长计算结果对比</div>
+            </div>
+
+            <div class="chart-card">
+                <img src="../charts/error_contribution.png" alt="误差来源分析">
+                <div class="caption">误差来源分析</div>
+            </div>
+
+            <div class="chart-card">
+                <img src="../charts/grating_diagram.png" alt="光栅衍射原理图">
+                <div class="caption">光栅衍射原理图</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📝 结论</h2>
+        <div class="conclusion">
+            <h3>🎯 实验结论</h3>
+            <p>暂无结论</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>本报告由光栅衍射分析系统自动生成 | 所有数据均可追溯 | 报告ID: edb2f0e0-470d-4010-93ae-e3195f3e15e7</p>
+    </div>
+</body>
+</html>
