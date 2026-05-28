@@ -123,11 +123,16 @@ export function useGameLoop() {
   }, [visibilityWindows, blocks, commands, dataPackets, updateWindow, updateCommand, updatePacket, addError, deductScore]);
 
   const processCommandTimeouts = useCallback((time: number) => {
-    const currentWindow = getCurrentWindow(visibilityWindows, time);
-    if (!currentWindow) return;
+    const activeWindow = getCurrentWindow(visibilityWindows, time);
+    const recentlyEndedWindow = visibilityWindows.find(
+      w => w.status === 'active' && time >= w.endTime
+    );
+    
+    const targetWindow = activeWindow || recentlyEndedWindow;
+    if (!targetWindow) return;
 
     Object.entries(queues).forEach(([stationId, queue]) => {
-      if (stationId !== currentWindow.groundStationId) return;
+      if (stationId !== targetWindow.groundStationId) return;
 
       queue.commands.forEach((commandId, index) => {
         if (processedCommandsRef.current.has(commandId)) return;
@@ -143,7 +148,7 @@ export function useGameLoop() {
 
         const error = detectCommandTimeout(
           command,
-          currentWindow,
+          targetWindow,
           time,
           index,
           transmittedPercent
@@ -168,27 +173,32 @@ export function useGameLoop() {
   }, [visibilityWindows, queues, commands, activeTransmissions, updateCommand, addError, deductScore, removeActiveTransmission]);
 
   const processPacketLoss = useCallback((time: number) => {
-    const currentWindow = getCurrentWindow(visibilityWindows, time);
-    if (!currentWindow) return;
+    const activeWindow = getCurrentWindow(visibilityWindows, time);
+    const recentlyEndedWindow = visibilityWindows.find(
+      w => w.status === 'active' && time >= w.endTime
+    );
+    
+    const targetWindow = activeWindow || recentlyEndedWindow;
+    if (!targetWindow) return;
 
     dataPackets.forEach(packet => {
       if (packet.isDownloaded) return;
 
       const transmission = activeTransmissions.find(
-        t => t.packetId === packet.id && t.type === 'download'
+        t => t.packetId === packet.id && t.type === 'download' && t.windowId === targetWindow.id
       );
       
       if (!transmission) return;
 
       const downloadedPercent = calculateTransmissionProgress(transmission, time);
 
-      if (time >= currentWindow.endTime && downloadedPercent < 100) {
-        const station = groundStations.find(s => s.id === currentWindow.groundStationId);
+      if (time >= targetWindow.endTime && downloadedPercent < 100) {
+        const station = groundStations.find(s => s.id === targetWindow.groundStationId);
         if (!station) return;
 
         const error = detectPacketLoss(
           packet,
-          currentWindow,
+          targetWindow,
           time,
           downloadedPercent,
           station
@@ -426,10 +436,10 @@ export function useGameLoop() {
         processWindowStarts(newTime);
         processScheduledBlocks(newTime);
         processActiveTransmissions(newTime);
-        processWindowEnds(newTime);
-        processMissedWindows(newTime);
         processCommandTimeouts(newTime);
         processPacketLoss(newTime);
+        processMissedWindows(newTime);
+        processWindowEnds(newTime);
         checkMissionEnd(newTime);
         
         lastUpdateRef.current = timestamp;
