@@ -86,7 +86,7 @@ class MonotonicChecker:
             )
             results.append(result)
 
-        overall_pass = all(r.overall_severity != Severity.FAIL for r in results)
+        overall_pass = all(r.overall_severity == Severity.PASS for r in results)
 
         input_hash = compute_input_hash(feature_bins, model_version)
         config_hash = compute_config_hash(self.config.to_dict())

@@ -1,5 +1,5 @@
 from .checker import MonotonicChecker, CheckConfig
-from .models import BinRecord, FeatureCheckResult, CheckReport, MonotonicDirection
+from .models import BinRecord, FeatureCheckResult, CheckReport, MonotonicDirection, Severity
 from .report import ReportGenerator
 
 __all__ = [
@@ -9,5 +9,6 @@ __all__ = [
     "FeatureCheckResult",
     "CheckReport",
     "MonotonicDirection",
+    "Severity",
     "ReportGenerator",
 ]
