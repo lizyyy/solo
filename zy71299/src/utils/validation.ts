@@ -54,8 +54,8 @@ export function validatePassengers(passengers: Passenger[]): ValidationError[] {
     } else if (seats.has(p.currentSeat)) {
       errors.push({
         field: `passengers[${idx}].currentSeat`,
-        message: `座位 ${p.currentSeat} 被多名乘客占用`,
-        severity: 'error',
+        message: `座位 ${p.currentSeat} 被多名乘客占用（超售），需要调座解决`,
+        severity: 'warning',
       });
     } else {
       seats.add(p.currentSeat);
