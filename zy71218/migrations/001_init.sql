@@ -217,6 +217,26 @@ CREATE TABLE IF NOT EXISTS business_link (
   UNIQUE(source_id, target_id, link_type)
 );
 
+-- 导出历史记录表
+CREATE TABLE IF NOT EXISTS report_history (
+  id TEXT PRIMARY KEY,
+  report_id TEXT UNIQUE NOT NULL,
+  template_id TEXT NOT NULL,
+  template_name TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+  file_format TEXT NOT NULL DEFAULT 'csv',
+  record_count INTEGER DEFAULT 0,
+  file_size INTEGER DEFAULT 0,
+  operator_id TEXT NOT NULL,
+  operator_name TEXT NOT NULL,
+  filters TEXT,
+  status TEXT NOT NULL DEFAULT 'completed',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_report_history_template ON report_history(template_id);
+CREATE INDEX IF NOT EXISTS idx_report_history_operator ON report_history(operator_id);
+CREATE INDEX IF NOT EXISTS idx_report_history_time ON report_history(created_at);
+
 -- 初始化测试用户
 INSERT OR IGNORE INTO user (id, username, name, role, status, password_hash) VALUES
 ('u001', 'risk01', '张明', 'risk_officer', 'active', '123456'),

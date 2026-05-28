@@ -98,8 +98,11 @@ export default function ReportExport() {
 
       clearInterval(progressInterval);
 
-      if (res.success) {
+      if (res.success && res.data) {
         setExportProgress((prev) => (prev ? { ...prev, progress: 100 } : null));
+        
+        reportService.downloadReport(res.data.reportId);
+        
         setTimeout(() => {
           setShowConfigModal(false);
           setExportProgress(null);
@@ -111,7 +114,7 @@ export default function ReportExport() {
             riskLevel: '',
           });
           loadData();
-        }, 1000);
+        }, 1500);
       } else {
         setError(res.error || '生成报告失败');
         setExportProgress(null);
@@ -139,28 +142,34 @@ export default function ReportExport() {
           <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
             <FileText size={16} className="text-blue-600" />
           </div>
-          <span className="font-medium text-slate-800">{record.templateName}</span>
+          <div>
+            <span className="font-medium text-slate-800">{record.templateName}</span>
+            <div className="text-xs text-slate-500">
+              {record.recordCount} 条记录 · {Math.round((record.fileSize || 0) / 1024)} KB
+            </div>
+          </div>
         </div>
       ),
     },
     {
-      key: 'generateTime',
+      key: 'createdAt',
       title: '生成时间',
-      dataIndex: 'generateTime' as keyof ReportHistoryItem,
+      dataIndex: 'createdAt' as keyof ReportHistoryItem,
       render: (record: ReportHistoryItem) =>
-        new Date(record.generateTime).toLocaleString('zh-CN'),
+        new Date(record.createdAt).toLocaleString('zh-CN'),
     },
     {
-      key: 'operator',
+      key: 'operatorName',
       title: '操作人',
-      dataIndex: 'operator' as keyof ReportHistoryItem,
+      dataIndex: 'operatorName' as keyof ReportHistoryItem,
     },
     {
       key: 'status',
       title: '状态',
       render: (record: ReportHistoryItem) => {
-        const statusConfig = {
+        const statusConfig: Record<string, { label: string; icon: any; color: string }> = {
           pending: { label: '生成中', icon: Clock, color: 'text-amber-500 bg-amber-100' },
+          completed: { label: '已完成', icon: CheckCircle, color: 'text-green-500 bg-green-100' },
           success: { label: '已完成', icon: CheckCircle, color: 'text-green-500 bg-green-100' },
           failed: { label: '失败', icon: XCircle, color: 'text-red-500 bg-red-100' },
         };
@@ -179,18 +188,20 @@ export default function ReportExport() {
       title: '操作',
       render: (record: ReportHistoryItem) => (
         <div className="flex items-center gap-2">
-          {record.status === 'success' && record.downloadUrl && (
-            <button className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-medium">
+          {record.status === 'completed' || record.status === 'success' ? (
+            <button
+              onClick={() => reportService.downloadReport(record.reportId)}
+              className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-medium"
+            >
               <Download size={14} />
               下载
             </button>
-          )}
-          {record.status === 'failed' && (
+          ) : record.status === 'failed' ? (
             <button className="flex items-center gap-1 text-slate-600 hover:text-slate-800 text-sm font-medium">
               <RefreshCw size={14} />
               重试
             </button>
-          )}
+          ) : null}
         </div>
       ),
     },

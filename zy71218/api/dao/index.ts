@@ -12,4 +12,5 @@ export { default as VersionDAO, default as VersionHistoryDAO } from './VersionDA
 export { default as AuditDAO, default as AuditLogDAO } from './AuditDAO.js';
 export { default as LinkDAO, default as BusinessLinkDAO } from './LinkDAO.js';
 export { default as UserDAO } from './UserDAO.js';
+export { default as ReportHistoryDAO } from './ReportHistoryDAO.js';
 export { toCamelCase, toSnakeCase, buildWhereClause } from './utils.js';

@@ -4,6 +4,7 @@ import {
   RepaymentPlanDAO,
   InvoiceDAO,
   RiskReportDAO,
+  ReportHistoryDAO,
 } from '../dao/index.js';
 import { auditService } from './auditService.js';
 import type {
@@ -11,6 +12,7 @@ import type {
   PaginatedResponse,
   User,
 } from '../../shared/types.js';
+import type { ReportHistoryRecord } from '../dao/ReportHistoryDAO.js';
 
 const REPORT_TEMPLATES: ReportTemplate[] = [
   {
@@ -33,8 +35,8 @@ const REPORT_TEMPLATES: ReportTemplate[] = [
   },
 ];
 
-function generateId(): string {
-  return `rpt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+function generateId(prefix: string = 'rpt'): string {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 export const reportService = {
@@ -49,10 +51,12 @@ export const reportService = {
   ): Promise<{
     reportId: string;
     templateId: string;
-    name: string;
+    templateName: string;
+    fileName: string;
     data: any[];
     columns: string[];
     generatedAt: string;
+    recordCount: number;
   }> {
     if (!templateId) {
       throw new Error('模板ID不能为空');
@@ -96,6 +100,24 @@ export const reportService = {
 
     const reportId = generateId();
     const generatedAt = new Date().toISOString();
+    const fileName = `${template.name}_${new Date().toISOString().slice(0, 10)}.csv`;
+    const csvContent = reportService.convertToCSV({ name: template.name, columns, data: reportData });
+    const fileSize = new Blob([csvContent]).size;
+
+    await ReportHistoryDAO.create({
+      id: generateId('rh'),
+      reportId,
+      templateId,
+      templateName: template.name,
+      fileName,
+      fileFormat: 'csv',
+      recordCount: reportData.length,
+      fileSize,
+      operatorId: operator.id,
+      operatorName: operator.name,
+      filters: JSON.stringify(filters),
+      status: 'completed',
+    });
 
     await auditService.logAction(
       operator.id,
@@ -109,10 +131,83 @@ export const reportService = {
     return {
       reportId,
       templateId,
-      name: template.name,
+      templateName: template.name,
+      fileName,
       data: reportData,
       columns,
       generatedAt,
+      recordCount: reportData.length,
+    };
+  },
+
+  async getHistory(
+    page: number = 1,
+    pageSize: number = 10,
+    filters?: Record<string, any>
+  ): Promise<{ list: ReportHistoryRecord[]; total: number; page: number; pageSize: number }> {
+    const result = ReportHistoryDAO.list(filters, page, pageSize);
+    return {
+      list: result.list,
+      total: result.total,
+      page,
+      pageSize,
+    };
+  },
+
+  async downloadReport(
+    reportId: string
+  ): Promise<{
+    fileName: string;
+    content: string;
+    mimeType: string;
+    templateId: string;
+  }> {
+    const history = ReportHistoryDAO.getByReportId(reportId);
+    if (!history) {
+      throw new Error('报表不存在');
+    }
+
+    const filters = history.filters ? JSON.parse(history.filters) : {};
+    
+    let reportData: any[] = [];
+    let columns: string[] = [];
+
+    switch (history.templateId) {
+      case 'collection_progress':
+        const result1 = await reportService.generateCollectionProgressReport(filters);
+        reportData = result1.data;
+        columns = result1.columns;
+        break;
+      case 'risk_assessment':
+        const result2 = await reportService.generateRiskAssessmentReport(filters);
+        reportData = result2.data;
+        columns = result2.columns;
+        break;
+      case 'repayment_detail':
+        const result3 = await reportService.generateRepaymentDetailReport(filters);
+        reportData = result3.data;
+        columns = result3.columns;
+        break;
+      case 'case_overview':
+        const result4 = await reportService.generateCaseOverviewReport(filters);
+        reportData = result4.data;
+        columns = result4.columns;
+        break;
+      default:
+        throw new Error(`不支持的报表模板: ${history.templateId}`);
+    }
+
+    const csv = reportService.convertToCSV({
+      name: history.templateName,
+      columns,
+      data: reportData,
+    });
+
+    return {
+      fileName: history.fileName,
+      content: csv,
+      mimeType: 'text/csv; charset=utf-8',
+      templateId: history.templateId,
     };
   },
 
@@ -277,27 +372,6 @@ export const reportService = {
     );
 
     return { data, columns };
-  },
-
-  async downloadReport(
-    templateId: string,
-    filters: Record<string, any>,
-    operator: User
-  ): Promise<{
-    filename: string;
-    content: string;
-    mimeType: string;
-  }> {
-    const report = await reportService.generateReport(templateId, filters, operator);
-    const csv = reportService.convertToCSV(report);
-    
-    const filename = `${report.name}_${new Date().toISOString().slice(0, 10)}.csv`;
-    
-    return {
-      filename,
-      content: csv,
-      mimeType: 'text/csv; charset=utf-8',
-    };
   },
 
   convertToCSV(report: {

@@ -3,6 +3,8 @@ import {
   ConfirmationDAO,
   ContractDAO,
   RepaymentPlanDAO,
+  CollectionNoteDAO,
+  RiskReportDAO,
   CaseDAO,
   LinkDAO,
 } from '../dao/index.js';
@@ -14,6 +16,8 @@ import type {
   Confirmation,
   FactoringContract,
   RepaymentPlan,
+  CollectionNote,
+  RiskReport,
   User,
 } from '../../shared/types.js';
 
@@ -75,6 +79,12 @@ export const importService = {
       case 'repayment_plan':
         result = await importService.importRepaymentPlans(validRows, operator);
         break;
+      case 'collection_note':
+        result = await importService.importCollectionNotes(validRows, operator);
+        break;
+      case 'risk_report':
+        result = await importService.importRiskReports(validRows, operator);
+        break;
       default:
         throw new Error(`不支持的导入类型: ${type}`);
     }
@@ -122,6 +132,12 @@ export const importService = {
       rows = file?.rows || [];
     } else if (type === 'repayment_plan') {
       columns = ['businessNo', 'instalmentNo', 'principal', 'interest', 'plannedDate', 'status'];
+      rows = file?.rows || [];
+    } else if (type === 'collection_note') {
+      columns = ['businessNo', 'collectionDate', 'collector', 'collectionMethod', 'contactPerson', 'contactResult', 'nextAction', 'followUpDate'];
+      rows = file?.rows || [];
+    } else if (type === 'risk_report') {
+      columns = ['businessNo', 'riskLevel', 'reportDate', 'analyst', 'keyFindings', 'recommendations'];
       rows = file?.rows || [];
     }
 
@@ -238,6 +254,48 @@ export const importService = {
           }
         }
       }
+
+      const collectionNote = await CollectionNoteDAO.getById(id);
+      if (collectionNote && collectionNote.businessNo) {
+        const caseInfo = await CaseDAO.findByBusinessNo(collectionNote.businessNo);
+        if (caseInfo) {
+          const existingLinks = await LinkDAO.findBySource(id, 'collection_note');
+          const alreadyLinked = existingLinks.some(l => l.targetId === collectionNote.businessNo);
+          
+          if (!alreadyLinked) {
+            linksToCreate.push({
+              id: generateId('link'),
+              sourceId: id,
+              sourceType: 'collection_note',
+              targetId: collectionNote.businessNo,
+              targetType: 'case',
+              linkType: 'belongs_to',
+              confidence: 100,
+            });
+          }
+        }
+      }
+
+      const riskReport = await RiskReportDAO.getById(id);
+      if (riskReport && riskReport.businessNo) {
+        const caseInfo = await CaseDAO.findByBusinessNo(riskReport.businessNo);
+        if (caseInfo) {
+          const existingLinks = await LinkDAO.findBySource(id, 'risk_report');
+          const alreadyLinked = existingLinks.some(l => l.targetId === riskReport.businessNo);
+          
+          if (!alreadyLinked) {
+            linksToCreate.push({
+              id: generateId('link'),
+              sourceId: id,
+              sourceType: 'risk_report',
+              targetId: riskReport.businessNo,
+              targetType: 'case',
+              linkType: 'belongs_to',
+              confidence: 100,
+            });
+          }
+        }
+      }
     }
 
     if (linksToCreate.length > 0) {
@@ -265,6 +323,12 @@ export const importService = {
         break;
       case 'repayment_plan':
         importService.validateRepaymentPlanRow(row, rowNum);
+        break;
+      case 'collection_note':
+        importService.validateCollectionNoteRow(row, rowNum);
+        break;
+      case 'risk_report':
+        importService.validateRiskReportRow(row, rowNum);
         break;
       default:
         throw new Error(`不支持的导入类型: ${type}`);
@@ -497,6 +561,112 @@ export const importService = {
         };
 
         await RepaymentPlanDAO.create(planData);
+        importedIds.push(id);
+      } catch (e: any) {
+        errors.push(`第${i + 1}行: ${e.message}`);
+      }
+    }
+
+    return {
+      success: errors.length === 0,
+      total: rows.length,
+      imported: importedIds.length,
+      errors,
+    };
+  },
+
+  validateCollectionNoteRow(row: Record<string, any>, rowNum: number): void {
+    if (!row.businessNo) {
+      throw new Error('业务编号不能为空');
+    }
+    if (!row.collectionDate) {
+      throw new Error('催收日期不能为空');
+    }
+    if (!row.collector) {
+      throw new Error('催收人不能为空');
+    }
+    if (!row.collectionMethod) {
+      throw new Error('催收方式不能为空');
+    }
+  },
+
+  validateRiskReportRow(row: Record<string, any>, rowNum: number): void {
+    if (!row.businessNo) {
+      throw new Error('业务编号不能为空');
+    }
+    if (!row.riskLevel) {
+      throw new Error('风险等级不能为空');
+    }
+    if (!row.reportDate) {
+      throw new Error('报告日期不能为空');
+    }
+    if (!row.analyst) {
+      throw new Error('分析师不能为空');
+    }
+  },
+
+  async importCollectionNotes(
+    rows: Record<string, any>[],
+    operator: User
+  ): Promise<ImportResult> {
+    const importedIds: string[] = [];
+    const errors: string[] = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      try {
+        const row = rows[i];
+        
+        const id = generateId('note');
+        const noteData: Partial<CollectionNote> & { id: string } = {
+          id,
+          businessNo: row.businessNo,
+          collectionDate: row.collectionDate,
+          collector: row.collector,
+          collectionMethod: row.collectionMethod,
+          contactPerson: row.contactPerson,
+          contactResult: row.contactResult,
+          nextAction: row.nextAction,
+          followUpDate: row.followUpDate,
+        };
+
+        await CollectionNoteDAO.create(noteData);
+        importedIds.push(id);
+      } catch (e: any) {
+        errors.push(`第${i + 1}行: ${e.message}`);
+      }
+    }
+
+    return {
+      success: errors.length === 0,
+      total: rows.length,
+      imported: importedIds.length,
+      errors,
+    };
+  },
+
+  async importRiskReports(
+    rows: Record<string, any>[],
+    operator: User
+  ): Promise<ImportResult> {
+    const importedIds: string[] = [];
+    const errors: string[] = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      try {
+        const row = rows[i];
+        
+        const id = generateId('risk');
+        const reportData: Partial<RiskReport> & { id: string } = {
+          id,
+          businessNo: row.businessNo,
+          riskLevel: row.riskLevel,
+          reportDate: row.reportDate,
+          analyst: row.analyst,
+          keyFindings: row.keyFindings,
+          recommendations: row.recommendations,
+        };
+
+        await RiskReportDAO.create(reportData);
         importedIds.push(id);
       } catch (e: any) {
         errors.push(`第${i + 1}行: ${e.message}`);
