@@ -127,6 +127,9 @@ export interface AppActions {
   createTask: (task: Omit<Task, 'id' | 'createTime' | 'operationLog'>) => void;
   updateTaskStatus: (taskId: string, status: Task['status'], operator: string, remark?: string) => void;
   cancelTask: (taskId: string, operator: string, remark?: string) => void;
+  supplementTask: (taskId: string, operator: string, remark: string) => void;
+  assignBoxToLocation: (locationId: string, box: ArtBox, operator: string) => void;
+  revokeBoxFromLocation: (locationId: string, operator: string, remark?: string) => void;
   addOperationLog: (action: string, operator: string, remark?: string) => void;
   getFilteredLocations: () => Location[];
   planRoute: (fromId: string, toId: string) => RoutePoint[];

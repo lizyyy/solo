@@ -111,6 +111,59 @@ const useStore = create<AppState & AppActions>((set, get) => ({
     get().updateTaskStatus(taskId, 'cancelled', operator, remark || '任务取消');
   },
   
+  supplementTask: (taskId, operator, remark) => {
+    set((state) => ({
+      tasks: state.tasks.map(t => {
+        if (t.id !== taskId) return t;
+        return {
+          ...t,
+          status: 'completed',
+          operationLog: [...t.operationLog, {
+            action: '补录完成',
+            time: new Date().toISOString(),
+            operator,
+            remark: remark || '补录入库/出库记录'
+          }]
+        };
+      })
+    }));
+    get().addOperationLog('补录任务', operator, `任务 ${taskId}: ${remark}`);
+  },
+  
+  assignBoxToLocation: (locationId, box, operator) => {
+    set((state) => {
+      const newLocations = state.locations.map(loc => {
+        if (loc.id !== locationId) return loc;
+        return {
+          ...loc,
+          status: 'occupied' as const,
+          box: { ...box, locationId }
+        };
+      });
+      return { locations: newLocations };
+    });
+    const loc = get().locations.find(l => l.id === locationId);
+    get().addOperationLog('补录分配', operator, `箱子 ${box.id} 分配至库位 ${loc?.code || locationId}`);
+  },
+  
+  revokeBoxFromLocation: (locationId, operator, remark) => {
+    const loc = get().locations.find(l => l.id === locationId);
+    const boxId = loc?.box?.id || '未知';
+    set((state) => {
+      const newLocations = state.locations.map(loc => {
+        if (loc.id !== locationId) return loc;
+        const { box: _box, ...rest } = loc;
+        return { ...rest, status: 'empty' as const };
+      });
+      return { locations: newLocations };
+    });
+    if (get().selectedLocation?.id === locationId) {
+      const updated = get().locations.find(l => l.id === locationId) || null;
+      set({ selectedLocation: updated });
+    }
+    get().addOperationLog('撤回分配', operator, `从库位 ${loc?.code || locationId} 撤回箱子 ${boxId}${remark ? ` - ${remark}` : ''}`);
+  },
+  
   addOperationLog: (action, operator, remark) => {
     set((state) => ({
       operationLogs: [{

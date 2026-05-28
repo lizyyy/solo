@@ -6,9 +6,11 @@ import InfoPanel from '../components/ui/InfoPanel';
 import Toolbar from '../components/ui/Toolbar';
 import StatusBar from '../components/ui/StatusBar';
 import ReportModal from '../components/ui/ReportModal';
+import TaskPanel from '../components/ui/TaskPanel';
 
 export default function Home() {
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showTaskPanel, setShowTaskPanel] = useState(false);
   const [screenshotData, setScreenshotData] = useState<string | undefined>();
   const sceneRef = useRef<HTMLDivElement>(null);
 
@@ -58,6 +60,7 @@ export default function Home() {
           <Toolbar 
             onExportScreenshot={handleExportScreenshot}
             onExportReport={handleExportReport}
+            onOpenTaskPanel={() => setShowTaskPanel(true)}
           />
         </div>
         
@@ -73,6 +76,11 @@ export default function Home() {
           setScreenshotData(undefined);
         }}
         screenshotData={screenshotData}
+      />
+      
+      <TaskPanel
+        isOpen={showTaskPanel}
+        onClose={() => setShowTaskPanel(false)}
       />
     </div>
   );

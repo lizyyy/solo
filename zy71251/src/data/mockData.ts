@@ -150,10 +150,49 @@ export const locations: Location[] = shelves.flatMap(shelf => {
   return shelfLocations;
 });
 
-locations[15].status = 'occupied';
-locations[15].box = locations[35].box;
-if (locations[35].box) {
-  locations[35].box.locationId = locations[15].id;
+const duplicateBox: ArtBox = {
+  id: 'BX-DUP-2024-00001',
+  code: 'BX-2024-00301',
+  locationId: '',
+  artworks: [
+    {
+      id: 'ART-DUP-001',
+      name: '富春山居图摹本',
+      artist: '张大千',
+      type: 'chinese',
+      year: 1947,
+      size: '690×34cm',
+      condition: 'excellent',
+      value: 8500000,
+      accessionNumber: 'AC-23-0142'
+    },
+    {
+      id: 'ART-DUP-002',
+      name: '墨竹图',
+      artist: '郑板桥',
+      type: 'chinese',
+      year: 1756,
+      size: '180×90cm',
+      condition: 'good',
+      value: 3200000,
+      accessionNumber: 'AC-21-0087'
+    }
+  ],
+  inDate: '2024-03-15',
+  handler: '李典藏',
+  notes: '重点保护作品，双库位备份存放',
+  status: 'in_stock',
+  material: 'custom',
+  weight: 28.5
+};
+
+const dupLocA = locations.find(l => l.id === 'S-A01-L2-P01')!;
+const dupLocB = locations.find(l => l.id === 'S-A02-L2-P03')!;
+if (dupLocA && dupLocB) {
+  dupLocA.status = 'occupied';
+  dupLocA.box = { ...duplicateBox, locationId: dupLocA.id };
+  dupLocB.status = 'occupied';
+  dupLocB.box = { ...duplicateBox, locationId: dupLocB.id };
 }
 
 export const forbiddenZones: ForbiddenZone[] = [
@@ -184,8 +223,8 @@ export const tasks: Task[] = [
   {
     id: 'TASK-2024-001',
     type: 'outbound',
-    boxId: locations[10].box?.id || '',
-    fromLocation: locations[10].id,
+    boxId: 'BX-DUP-2024-00001',
+    fromLocation: 'S-A01-L2-P01',
     toLocation: 'EXIT-01',
     status: 'in_progress',
     route: [
@@ -199,38 +238,38 @@ export const tasks: Task[] = [
     operator: '张管理员',
     operationLog: [
       { action: '任务创建', time: new Date(Date.now() - 3600000).toISOString(), operator: '李典藏', remark: '春季展览出库' },
-      { action: '开始执行', time: new Date(Date.now() - 1800000).toISOString(), operator: '张管理员', remark: '已确认库位' }
+      { action: '状态更新: in_progress', time: new Date(Date.now() - 1800000).toISOString(), operator: '张管理员', remark: '已确认库位' }
     ],
     priority: 'urgent'
   },
   {
     id: 'TASK-2024-002',
     type: 'transfer',
-    boxId: locations[45].box?.id || '',
-    fromLocation: locations[45].id,
-    toLocation: locations[85].id,
+    boxId: 'BX-DUP-2024-00001',
+    fromLocation: 'S-A02-L2-P03',
+    toLocation: 'S-D01-L1-P01',
     status: 'pending',
     route: [
+      { x: -15, y: 0, z: 0 },
       { x: -5, y: 0, z: 0 },
-      { x: 0, y: 0, z: 0 },
-      { x: 0, y: 0, z: -8 },
-      { x: 18, y: 0, z: -8 }
+      { x: 5, y: 0, z: 0 },
+      { x: 15, y: 0, z: -10 }
     ],
     hasForbiddenCrossing: true,
     createTime: new Date(Date.now() - 7200000).toISOString(),
     operator: '李典藏',
     operationLog: [
       { action: '任务创建', time: new Date(Date.now() - 7200000).toISOString(), operator: '李典藏', remark: '调整至恒温区' },
-      { action: '路线告警', time: new Date(Date.now() - 7100000).toISOString(), operator: '系统', remark: '检测到穿越禁区' }
+      { action: '路线告警', time: new Date(Date.now() - 7100000).toISOString(), operator: '系统', remark: '检测到穿越禁区: 精密仪器存储区' }
     ],
     priority: 'normal'
   },
   {
     id: 'TASK-2024-003',
     type: 'inbound',
-    boxId: 'BX-NEW-001',
+    boxId: 'BX-NEW-20240601',
     fromLocation: 'ENTRANCE-01',
-    toLocation: locations[60].id,
+    toLocation: 'S-C02-L3-P02',
     status: 'pending',
     route: [
       { x: 0, y: 0, z: -12 },

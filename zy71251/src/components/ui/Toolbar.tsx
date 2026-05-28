@@ -7,7 +7,8 @@ import {
   AlertTriangle,
   Box,
   MapPin,
-  RefreshCw
+  RefreshCw,
+  ListChecks
 } from 'lucide-react';
 import useStore from '../../store/useStore';
 import { useState } from 'react';
@@ -15,15 +16,17 @@ import { useState } from 'react';
 interface ToolbarProps {
   onExportScreenshot: () => void;
   onExportReport: () => void;
+  onOpenTaskPanel: () => void;
 }
 
-export default function Toolbar({ onExportScreenshot, onExportReport }: ToolbarProps) {
+export default function Toolbar({ onExportScreenshot, onExportReport, onOpenTaskPanel }: ToolbarProps) {
   const { 
     showHeatmap, 
     showRoutes, 
     toggleHeatmap, 
     toggleRoutes,
     locations,
+    tasks,
     detectTemperatureAlerts,
     detectHumidityAlerts,
     detectDuplicateLocations
@@ -91,6 +94,20 @@ export default function Toolbar({ onExportScreenshot, onExportReport }: ToolbarP
         <div className="w-px h-8 bg-slate-700/50" />
 
         <div className="flex items-center gap-1">
+          <button
+            onClick={onOpenTaskPanel}
+            className="p-2.5 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-all flex items-center gap-2 relative"
+            title="任务与操作管理"
+          >
+            <ListChecks size={18} />
+            <span className="text-sm hidden sm:inline">任务</span>
+            {tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                {tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length}
+              </span>
+            )}
+          </button>
+
           <button
             onClick={onExportScreenshot}
             className="p-2.5 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-all flex items-center gap-2"

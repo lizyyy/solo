@@ -1,6 +1,8 @@
-import { X, Package, Thermometer, Droplets, Clock, User, AlertTriangle, MapPin, Archive } from 'lucide-react';
+import { X, Package, Thermometer, Droplets, Clock, User, AlertTriangle, MapPin, Archive, PenLine, RotateCcw } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useState } from 'react';
 import useStore from '../../store/useStore';
+import type { ArtBox } from '../../types';
 
 const getConditionText = (condition: string) => {
   const map: Record<string, string> = {
@@ -50,7 +52,56 @@ const formatValue = (value: number) => {
 };
 
 export default function InfoPanel() {
-  const { selectedLocation, setSelectedLocation } = useStore();
+  const { selectedLocation, setSelectedLocation, assignBoxToLocation, revokeBoxFromLocation, addOperationLog } = useStore();
+  const [showSupplementForm, setShowSupplementForm] = useState(false);
+  const [supplementRemark, setSupplementRemark] = useState('');
+  const [operator, setOperator] = useState('张管理员');
+
+  const handleRevoke = () => {
+    if (!selectedLocation) return;
+    if (confirm(`确定要从库位 ${selectedLocation.code} 撤回箱子吗？`)) {
+      revokeBoxFromLocation(selectedLocation.id, operator, supplementRemark || '撤回库位分配');
+      setShowSupplementForm(false);
+      setSupplementRemark('');
+    }
+  };
+
+  const handleSupplementSubmit = () => {
+    if (!selectedLocation || !supplementRemark.trim()) return;
+    
+    if (!selectedLocation.box) {
+      const newBox: ArtBox = {
+        id: `BX-SUP-${Date.now()}`,
+        code: `BX-${String(2024500 + Math.floor(Math.random() * 1000))}`,
+        locationId: selectedLocation.id,
+        artworks: [
+          {
+            id: `ART-SUP-${Date.now()}`,
+            name: '补录作品',
+            artist: '待确认',
+            type: 'mixed',
+            year: new Date().getFullYear(),
+            size: '待测量',
+            condition: 'good',
+            value: 0,
+            accessionNumber: `SUP-${Date.now()}`
+          }
+        ],
+        inDate: new Date().toISOString().split('T')[0],
+        handler: operator,
+        notes: supplementRemark,
+        status: 'in_stock',
+        material: 'wood',
+        weight: 10
+      };
+      assignBoxToLocation(selectedLocation.id, newBox, operator);
+    } else {
+      addOperationLog('补录登记', operator, `库位 ${selectedLocation.code}: ${supplementRemark}`);
+    }
+    
+    setShowSupplementForm(false);
+    setSupplementRemark('');
+  };
 
   if (!selectedLocation) {
     return (
@@ -231,9 +282,85 @@ export default function InfoPanel() {
 
         {!selectedLocation.box && (
           <div className="p-4 border-b border-slate-700/50">
-            <div className="bg-slate-800/30 rounded-lg p-4 text-center">
+            <div className="bg-slate-800/30 rounded-lg p-4 text-center mb-3">
               <Archive size={32} className="mx-auto mb-2 text-slate-600" />
               <p className="text-slate-500 text-sm">该库位当前为空</p>
+            </div>
+            <button
+              onClick={() => setShowSupplementForm(true)}
+              className="w-full py-2 px-3 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-sm flex items-center justify-center gap-2 transition-colors"
+            >
+              <PenLine size={14} />
+              补录箱子
+            </button>
+          </div>
+        )}
+
+        {selectedLocation.box && (
+          <div className="p-4 border-b border-slate-700/50">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleRevoke()}
+                className="flex-1 py-2 px-3 bg-red-600/80 hover:bg-red-500 text-white rounded-lg text-sm flex items-center justify-center gap-2 transition-colors"
+              >
+                <RotateCcw size={14} />
+                撤回分配
+              </button>
+              <button
+                onClick={() => setShowSupplementForm(true)}
+                className="flex-1 py-2 px-3 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-sm flex items-center justify-center gap-2 transition-colors"
+              >
+                <PenLine size={14} />
+                补录登记
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showSupplementForm && (
+          <div className="p-4 border-b border-slate-700/50 bg-slate-800/30">
+            <h4 className="text-sm font-medium text-slate-300 mb-3">
+              {selectedLocation.box ? '补录登记信息' : '补录箱子分配'}
+            </h4>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs text-slate-400 block mb-1">操作人</label>
+                <select
+                  value={operator}
+                  onChange={(e) => setOperator(e.target.value)}
+                  className="w-full bg-slate-800 border border-slate-600/50 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                >
+                  <option>张管理员</option>
+                  <option>李典藏</option>
+                  <option>王组长</option>
+                  <option>陈助理</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs text-slate-400 block mb-1">补录原因 / 说明</label>
+                <textarea
+                  value={supplementRemark}
+                  onChange={(e) => setSupplementRemark(e.target.value)}
+                  placeholder="请输入补录原因，例如：补录2024-01-15入库记录"
+                  rows={3}
+                  className="w-full bg-slate-800 border border-slate-600/50 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 resize-none"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowSupplementForm(false)}
+                  className="flex-1 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg text-sm transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleSupplementSubmit}
+                  disabled={!supplementRemark.trim()}
+                  className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg text-sm transition-colors"
+                >
+                  确认提交
+                </button>
+              </div>
             </div>
           </div>
         )}
