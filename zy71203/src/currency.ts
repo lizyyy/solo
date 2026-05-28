@@ -74,6 +74,15 @@ export function convertToCNY(
   exchangeRateToCNY: ExchangeRate,
   referenceDate: string
 ): ConvertResult {
+  if (fromCurrency === 'CNY') {
+    return {
+      convertedAmount: roundTo2Decimals(amount),
+      rate: 1,
+      rateDate: exchangeRateToCNY.rateDate,
+      warnings: [],
+      valid: true,
+    };
+  }
   return convertCurrency({
     amount,
     fromCurrency,

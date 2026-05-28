@@ -47,6 +47,15 @@ function convertCurrency(params) {
     };
 }
 function convertToCNY(amount, fromCurrency, exchangeRateToCNY, referenceDate) {
+    if (fromCurrency === 'CNY') {
+        return {
+            convertedAmount: roundTo2Decimals(amount),
+            rate: 1,
+            rateDate: exchangeRateToCNY.rateDate,
+            warnings: [],
+            valid: true,
+        };
+    }
     return convertCurrency({
         amount,
         fromCurrency,

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.storage = void 0;
 const uuid_1 = require("uuid");
+const currency_1 = require("./currency");
 class Storage {
     constructor() {
         this.invoices = new Map();
@@ -110,11 +111,32 @@ class Storage {
         for (const payment of invoicePayments) {
             if (remainingToMatch <= 0)
                 break;
+            const unmatched = payment.paymentAmount - payment.matchedAmount;
             if (payment.paymentCurrency !== invoice.invoiceCurrency) {
-                warnings.push(`回款${payment.id}币种(${payment.paymentCurrency})与发票币种(${invoice.invoiceCurrency})不一致，已跳过自动匹配`);
+                if (!invoice.exchangeRatePaymentToCNY || !invoice.exchangeRateToCNY) {
+                    warnings.push(`回款${payment.id}币种(${payment.paymentCurrency})与发票币种(${invoice.invoiceCurrency})不一致，且缺少汇率配置，已跳过自动匹配`);
+                    continue;
+                }
+                const conversion = (0, currency_1.convertBetweenCurrencies)(1, payment.paymentCurrency, invoice.invoiceCurrency, invoice.exchangeRatePaymentToCNY, invoice.exchangeRateToCNY, invoice.discountDate);
+                if (conversion.crossRate === 0) {
+                    warnings.push(`回款${payment.id}跨币种换算失败(${payment.paymentCurrency}→${invoice.invoiceCurrency})，已跳过自动匹配`);
+                    continue;
+                }
+                const paymentInInvoiceCurrency = roundTo2Decimals(unmatched * conversion.crossRate);
+                const matchAmountInInvoiceCurrency = Math.min(paymentInInvoiceCurrency, remainingToMatch);
+                const matchAmountInPaymentCurrency = roundTo2Decimals(matchAmountInInvoiceCurrency / conversion.crossRate);
+                const updatedPayment = {
+                    ...payment,
+                    matched: true,
+                    matchedAmount: payment.matchedAmount + matchAmountInPaymentCurrency,
+                };
+                this.payments.set(payment.id, updatedPayment);
+                remainingToMatch -= matchAmountInInvoiceCurrency;
+                matchedPayments.push(updatedPayment);
+                warnings.push(`回款${payment.id}跨币种自动匹配: ${matchAmountInPaymentCurrency} ${payment.paymentCurrency} → ${roundTo2Decimals(matchAmountInInvoiceCurrency)} ${invoice.invoiceCurrency} (交叉汇率: ${roundTo6Decimals(conversion.crossRate)})`);
+                warnings.push(...conversion.warnings);
                 continue;
             }
-            const unmatched = payment.paymentAmount - payment.matchedAmount;
             const matchAmount = Math.min(unmatched, remainingToMatch);
             const result = this.matchPaymentToInvoice(payment.id, invoiceId, matchAmount);
             if (result) {
@@ -123,7 +145,7 @@ class Storage {
             }
         }
         if (remainingToMatch > 0 && invoicePayments.length > 0) {
-            warnings.push(`仍有${remainingToMatch} ${invoice.invoiceCurrency}未匹配`);
+            warnings.push(`仍有${roundTo2Decimals(remainingToMatch)} ${invoice.invoiceCurrency}未匹配`);
         }
         return { matchedPayments, warnings };
     }
@@ -223,5 +245,11 @@ class Storage {
         };
         this.createPayment(samplePayment);
     }
+}
+function roundTo2Decimals(num) {
+    return Math.round(num * 100) / 100;
+}
+function roundTo6Decimals(num) {
+    return Math.round(num * 1000000) / 1000000;
 }
 exports.storage = new Storage();

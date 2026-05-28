@@ -101,25 +101,47 @@ export function calculatePartialDiscount(
 } {
   const warnings: string[] = [];
 
-  if (partialAmount > invoice.remainingUndiscountedAmount) {
-    warnings.push(
-      `部分贴现金额(${partialAmount})超过剩余未贴现金额(${invoice.remainingUndiscountedAmount})`
-    );
-  }
-
   if (partialAmount <= 0) {
     warnings.push('部分贴现金额必须大于0');
+    return {
+      partialDetail: {
+        id: uuidv4(),
+        discountAmount: 0,
+        discountDate: new Date().toISOString().split('T')[0],
+        discountRate: partialRate,
+        interestAmount: 0,
+        interestCurrency: invoice.invoiceCurrency,
+      },
+      updatedInvoice: invoice,
+      warnings,
+    };
+  }
+
+  let effectiveAmount = partialAmount;
+  if (partialAmount > invoice.remainingUndiscountedAmount) {
+    warnings.push(
+      `部分贴现金额(${partialAmount})超过剩余未贴现金额(${invoice.remainingUndiscountedAmount})，已自动截断为${invoice.remainingUndiscountedAmount}`
+    );
+    effectiveAmount = invoice.remainingUndiscountedAmount;
   }
 
   const dailyRate = partialRate / 100 / 360;
-  const interestAmount = partialAmount * dailyRate * invoice.discountDays;
 
   let interestCurrency: Currency = invoice.invoiceCurrency;
-  let interestInInvoiceCurrency = interestAmount;
+  let interestInInvoiceCurrency = effectiveAmount * dailyRate * invoice.discountDays;
 
   if (invoice.exchangeRateToCNY) {
+    const amountInCNY = convertToCNY(
+      effectiveAmount,
+      invoice.invoiceCurrency,
+      invoice.exchangeRateToCNY,
+      referenceDate
+    ).convertedAmount;
+
+    const interestInCNY = amountInCNY * dailyRate * invoice.discountDays;
+
     const conversionResult = convertBetweenCurrencies(
-      interestAmount,
+      interestInCNY,
       'CNY',
       invoice.invoiceCurrency,
       invoice.exchangeRateToCNY,
@@ -132,14 +154,14 @@ export function calculatePartialDiscount(
 
   const partialDetail: PartialDiscountDetail = {
     id: uuidv4(),
-    discountAmount: partialAmount,
+    discountAmount: effectiveAmount,
     discountDate: new Date().toISOString().split('T')[0],
     discountRate: partialRate,
     interestAmount: roundTo2Decimals(interestInInvoiceCurrency),
     interestCurrency,
   };
 
-  const newTotalDiscounted = invoice.totalDiscountedAmount + partialAmount;
+  const newTotalDiscounted = invoice.totalDiscountedAmount + effectiveAmount;
   const newRemaining = invoice.invoiceAmount - newTotalDiscounted;
 
   const updatedInvoice: InvoiceDiscount = {
