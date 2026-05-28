@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, AlertTriangle } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
@@ -5,7 +6,13 @@ import { ArtworkCard } from '../components/ArtworkCard';
 
 export default function Artworks() {
   const navigate = useNavigate();
-  const { artworks, updateArtwork, resolveConflict } = useGameStore();
+  const { artworks, updateArtwork, resolveConflict, initGame } = useGameStore();
+
+  useEffect(() => {
+    if (artworks.length === 0) {
+      initGame();
+    }
+  }, [artworks.length, initGame]);
 
   const flaggedCount = artworks.filter(a => a.conflictStatus === 'flagged').length;
 

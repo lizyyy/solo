@@ -34,6 +34,7 @@ interface GameStore {
   processNextAuction: () => void;
   calculateSettlement: () => void;
   generateReport: (sanitized?: boolean) => ReportData;
+  nextRound: () => void;
   resetGame: () => void;
 }
 
@@ -348,6 +349,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
     };
 
     return sanitized ? sanitizeReport(report) : report;
+  },
+
+  nextRound: () => {
+    set(state => {
+      if (state.gameState.currentRound >= state.gameState.totalRounds) {
+        return {
+          gameState: { ...state.gameState, phase: 'report' }
+        };
+      }
+      return {
+        gameState: {
+          ...state.gameState,
+          currentRound: state.gameState.currentRound + 1,
+          phase: 'curation'
+        },
+        booths: state.booths.map(b => ({
+          ...b,
+          artworkId: null,
+          reservePrice: 0,
+          royaltyRate: 0
+        })),
+        currentAuctionIndex: 0,
+        isAuctionRunning: false
+      };
+    });
   },
 
   resetGame: () => {

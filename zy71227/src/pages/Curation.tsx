@@ -1,23 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { ArrowRight, Flame, X, AlertTriangle } from 'lucide-react';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
+import { ArrowRight, AlertTriangle, Home } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
-import { heatLevelColors } from '../data/mockData';
 import { checkRoyaltyRateConflicts } from '../utils/conflictDetector';
+import { DraggableArtwork } from '../components/DraggableArtwork';
+import { DroppableBooth } from '../components/DroppableBooth';
+import type { Artwork } from '../types';
 
 export default function Curation() {
   const navigate = useNavigate();
-  const { artworks, booths, assignArtworkToBooth, removeArtworkFromBooth, setReservePrice, setRoyaltyRate } = useGameStore();
+  const { artworks, booths, assignArtworkToBooth, removeArtworkFromBooth, setReservePrice, setRoyaltyRate, gameState, initGame } = useGameStore();
   const [selectedBooth, setSelectedBooth] = useState<string | null>(null);
+  const [activeArtwork, setActiveArtwork] = useState<Artwork | null>(null);
+
+  useEffect(() => {
+    if (artworks.length === 0 || booths.length === 0) {
+      initGame();
+    }
+  }, [artworks.length, booths.length, initGame]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor)
   );
 
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    const artwork = artworks.find(a => a.id === active.id);
+    if (artwork) {
+      setActiveArtwork(artwork);
+    }
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveArtwork(null);
+    
     if (over && active.id !== over.id) {
       const artworkId = active.id as string;
       const boothId = over.id as string;
@@ -36,22 +55,41 @@ export default function Curation() {
     return checkRoyaltyRateConflicts(artwork, booth.royaltyRate);
   };
 
+  const assignedCount = booths.filter(b => b.artworkId).length;
+
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext 
+      sensors={sensors} 
+      collisionDetection={closestCenter} 
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-serif text-amber-100 mb-2">策展布局</h1>
-            <p className="text-slate-400">拖拽作品到展位，设置底价和版税</p>
+            <p className="text-slate-400">第 {gameState.currentRound} 回合 · 拖拽作品到展位，设置底价和版税</p>
           </div>
           <button
             onClick={() => navigate('/auction')}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-rose-500 rounded-lg font-semibold hover:shadow-lg hover:shadow-amber-500/20 transition-all"
+            disabled={assignedCount === 0}
+            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+              assignedCount > 0
+                ? 'bg-gradient-to-r from-amber-500 to-rose-500 hover:shadow-lg hover:shadow-amber-500/20'
+                : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+            }`}
           >
-            开始拍卖
+            开始拍卖 ({assignedCount}/{booths.length})
             <ArrowRight size={18} />
           </button>
         </div>
+
+        {assignedCount === 0 && (
+          <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-3">
+            <AlertTriangle className="text-amber-400" size={20} />
+            <span className="text-amber-200 text-sm">请至少将一件作品拖拽到展位后再开始拍卖</span>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
@@ -63,57 +101,15 @@ export default function Curation() {
                 const isSelected = selectedBooth === booth.id;
 
                 return (
-                  <div
+                  <DroppableBooth
                     key={booth.id}
-                    data-id={booth.id}
-                    className={`
-                      relative rounded-xl border-2 border-dashed overflow-hidden transition-all duration-300
-                      ${artwork ? 'border-solid border-amber-500/50' : 'border-slate-600 hover:border-amber-500/30'}
-                      ${isSelected ? 'ring-2 ring-amber-400' : ''}
-                    `}
-                    onClick={() => artwork && setSelectedBooth(isSelected ? null : booth.id)}
-                  >
-                    <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${heatLevelColors[booth.heatLevel]} to-transparent`} />
-                    
-                    <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-1 bg-black/50 rounded-full text-xs">
-                      <Flame size={12} className={booth.heatLevel >= 4 ? 'text-orange-400' : 'text-slate-400'} />
-                      <span className="text-slate-300">热度 {booth.heatLevel}</span>
-                    </div>
-
-                    {warnings.length > 0 && (
-                      <div className="absolute top-2 right-2">
-                        <div className="p-1 bg-red-500 rounded-full animate-pulse">
-                          <AlertTriangle size={12} className="text-white" />
-                        </div>
-                      </div>
-                    )}
-
-                    {artwork ? (
-                      <div className="cursor-pointer">
-                        <img src={artwork.imageUrl} alt={artwork.title} className="w-full aspect-square object-cover" />
-                        <div className="p-3 bg-slate-800/90">
-                          <div className="font-medium text-amber-100 text-sm truncate">{artwork.title}</div>
-                          <div className="text-xs text-slate-400">{artwork.artist}</div>
-                          <div className="flex items-center justify-between mt-2 text-xs">
-                            <span className="text-amber-400 font-mono">¥{booth.reservePrice.toLocaleString()}</span>
-                            <span className="text-slate-400">{booth.royaltyRate}%</span>
-                          </div>
-                        </div>
-                        <button
-                          onClick={e => { e.stopPropagation(); removeArtworkFromBooth(booth.id); }}
-                          className="absolute top-10 right-2 p-1 bg-red-500/80 rounded-full hover:bg-red-500 transition-colors"
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="aspect-square flex flex-col items-center justify-center bg-slate-800/30 text-slate-500">
-                        <div className="text-4xl mb-2">🎨</div>
-                        <div className="text-sm">拖放作品</div>
-                        <div className="text-xs text-slate-600">加成 x{booth.heatBonus.toFixed(1)}</div>
-                      </div>
-                    )}
-                  </div>
+                    booth={booth}
+                    artwork={artwork}
+                    warnings={warnings}
+                    isSelected={isSelected}
+                    onSelect={() => artwork && setSelectedBooth(isSelected ? null : booth.id)}
+                    onRemove={() => removeArtworkFromBooth(booth.id)}
+                  />
                 );
               })}
             </div>
@@ -187,20 +183,7 @@ export default function Curation() {
                 </div>
               ) : (
                 unassignedArtworks.map(artwork => (
-                  <div
-                    key={artwork.id}
-                    draggable
-                    className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700 cursor-grab active:cursor-grabbing hover:border-amber-500/50 transition-colors"
-                  >
-                    <img src={artwork.imageUrl} alt={artwork.title} className="w-12 h-12 rounded object-cover" />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-amber-100 text-sm truncate">{artwork.title}</div>
-                      <div className="text-xs text-slate-500">¥{artwork.estimatedValue.toLocaleString()}</div>
-                    </div>
-                    {artwork.conflictStatus === 'flagged' && (
-                      <AlertTriangle size={14} className="text-red-400 flex-shrink-0" />
-                    )}
-                  </div>
+                  <DraggableArtwork key={artwork.id} artwork={artwork} />
                 ))
               )}
             </div>
@@ -214,9 +197,35 @@ export default function Curation() {
                 <li>🎯 匹配藏家偏好的作品更易成交</li>
               </ul>
             </div>
+
+            <div className="mt-4 p-4 bg-slate-800/30 rounded-xl border border-slate-700">
+              <h3 className="text-sm font-medium text-amber-100 mb-2">操作说明</h3>
+              <p className="text-xs text-slate-400">
+                从左侧拖拽作品到展位上，点击展位卡片可设置底价和版税率。
+                每个展位有不同热度等级，影响最终成交价格。
+              </p>
+            </div>
           </div>
         </div>
       </div>
+
+      <DragOverlay>
+        {activeArtwork ? (
+          <div className="p-3 bg-slate-800 rounded-lg border-2 border-amber-400 shadow-2xl shadow-amber-500/30 opacity-90">
+            <div className="flex items-center gap-3">
+              <img 
+                src={activeArtwork.imageUrl} 
+                alt={activeArtwork.title} 
+                className="w-12 h-12 rounded object-cover" 
+              />
+              <div>
+                <div className="font-medium text-amber-100 text-sm">{activeArtwork.title}</div>
+                <div className="text-xs text-slate-400">¥{activeArtwork.estimatedValue.toLocaleString()}</div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 }

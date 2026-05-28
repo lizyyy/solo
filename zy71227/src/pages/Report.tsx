@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Download, Eye, EyeOff, RefreshCw, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,14 @@ const COLORS = ['#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 export default function Report() {
   const navigate = useNavigate();
   const [sanitized, setSanitized] = useState(true);
-  const { generateReport, resetGame } = useGameStore();
+  const { generateReport, resetGame, initGame, artworks, booths } = useGameStore();
+
+  useEffect(() => {
+    if (artworks.length === 0 || booths.length === 0) {
+      initGame();
+    }
+  }, [artworks.length, booths.length, initGame]);
+
   const report = generateReport(sanitized);
 
   const scenarioData = report.scenarios.map(s => ({

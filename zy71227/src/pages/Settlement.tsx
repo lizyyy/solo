@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Coins, Percent, Flame, ChevronDown, ChevronUp, Play, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
@@ -6,8 +6,14 @@ import { scenarioLabels } from '../data/mockData';
 
 export default function Settlement() {
   const navigate = useNavigate();
-  const { artworks, booths, collectors, auctionRecords, replayScenes, gameState } = useGameStore();
+  const { artworks, booths, collectors, auctionRecords, replayScenes, gameState, nextRound, initGame } = useGameStore();
   const [expandedScene, setExpandedScene] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (artworks.length === 0 || booths.length === 0) {
+      initGame();
+    }
+  }, [artworks.length, booths.length, initGame]);
 
   const roundRecords = auctionRecords.filter(r => r.roundNumber === gameState.currentRound);
   const roundScenes = replayScenes.filter(s => s.round === gameState.currentRound);
@@ -25,10 +31,12 @@ export default function Settlement() {
     }, 0);
 
   const handleNextRound = () => {
-    if (gameState.currentRound < gameState.totalRounds) {
-      navigate('/curation');
-    } else {
+    const isLastRound = gameState.currentRound >= gameState.totalRounds;
+    nextRound();
+    if (isLastRound) {
       navigate('/report');
+    } else {
+      navigate('/curation');
     }
   };
 

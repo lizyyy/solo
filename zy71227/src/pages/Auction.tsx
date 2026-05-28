@@ -16,8 +16,15 @@ export default function Auction() {
     gameState,
     startAuctionRound,
     processNextAuction,
-    calculateSettlement
+    calculateSettlement,
+    initGame
   } = useGameStore();
+
+  useEffect(() => {
+    if (artworks.length === 0 || booths.length === 0) {
+      initGame();
+    }
+  }, [artworks.length, booths.length, initGame]);
 
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const activeBooths = booths.filter(b => b.artworkId);
