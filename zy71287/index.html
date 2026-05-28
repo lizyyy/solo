@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>三维装箱体积估算</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>三维装箱体积估算</h1>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+      <input type="checkbox" id="toggle-perm">
+      <span style="font-size:12px;">管理员权限</span>
+    </label>
+    <span class="perm-badge">标准</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <div class="card-title">
+      商品主数据
+      <span class="source-tag source-product">商品</span>
+    </div>
+    <div class="form-grid" id="product-form">
+      <div><label>ID</label><input name="id" placeholder="P007"></div>
+      <div><label>名称</label><input name="name" placeholder="商品名称"></div>
+      <div><label>长 (mm)</label><input name="length" type="number" min="1" step="1"></div>
+      <div><label>宽 (mm)</label><input name="width" type="number" min="1" step="1"></div>
+      <div><label>高 (mm)</label><input name="height" type="number" min="1" step="1"></div>
+      <div><label>重量 (g)</label><input name="weight" type="number" min="0" step="1"></div>
+      <div class="full" style="display:flex;align-items:center;gap:16px;">
+        <label style="display:flex;align-items:center;gap:4px;">
+          <input type="checkbox" name="fragile"> 易碎品（仅允许直立旋转）
+        </label>
+        <button class="btn btn-primary btn-sm" id="btn-add-product">添加商品</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>名称</th><th>尺寸</th><th>重量</th><th>易碎</th><th>旋转</th></tr></thead>
+        <tbody id="product-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      箱型主数据
+      <span class="source-tag source-box">箱型</span>
+    </div>
+    <div class="form-grid" id="box-form">
+      <div><label>ID</label><input name="id" placeholder="BX-XX"></div>
+      <div><label>名称</label><input name="name" placeholder="箱型名称"></div>
+      <div><label>内径长 (mm)</label><input name="innerLength" type="number" min="1" step="1"></div>
+      <div><label>内径宽 (mm)</label><input name="innerWidth" type="number" min="1" step="1"></div>
+      <div><label>内径高 (mm)</label><input name="innerHeight" type="number" min="1" step="1"></div>
+      <div><label>承重 (g)</label><input name="maxWeight" type="number" min="1" step="1"></div>
+      <div class="full">
+        <button class="btn btn-primary btn-sm" id="btn-add-box">添加箱型</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>名称</th><th>内径</th><th>承重</th><th>容积</th></tr></thead>
+        <tbody id="box-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      装箱任务
+      <span class="source-tag source-order">订单</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:end;margin-bottom:10px;">
+      <div style="flex:1;">
+        <label>关联订单（可选）</label>
+        <select id="sel-order"><option value="">-- 自由模式 --</option></select>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="btn-add-order">保存为订单</button>
+    </div>
+    <div>
+      <label>订单ID（保存时）</label>
+      <input id="order-id" placeholder="ORD-001" style="width:200px;">
+    </div>
+    <div class="form-grid" style="margin-top:12px;">
+      <div class="full"><label>选择箱型</label>
+        <select id="sel-box"><option value="">-- 选择箱型 --</option></select>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <label>商品行</label>
+      <div id="order-items-list"></div>
+      <div class="btn-row">
+        <button class="btn btn-secondary btn-sm" id="btn-add-item">+ 商品行</button>
+        <button class="btn btn-secondary btn-sm" id="btn-clear-items">清空</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btn-pack">执行装箱</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      装箱结果
+      <span class="source-tag source-report">报告</span>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-value" id="stat-placed">0</div><div class="stat-label">已装入</div></div>
+      <div class="stat-box"><div class="stat-value" id="stat-unpacked">0</div><div class="stat-label">未装入</div></div>
+      <div class="stat-box"><div class="stat-value" id="stat-vol">0%</div><div class="stat-label">体积利用率</div></div>
+      <div class="stat-box"><div class="stat-value" id="stat-wt">0%</div><div class="stat-label">重量利用率</div></div>
+      <div class="stat-box"><div class="stat-value" id="stat-weight">0g</div><div class="stat-label">总重量</div></div>
+      <div class="stat-box"><div id="stat-status">—</div><div class="stat-label">状态</div></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>名称</th><th>位置</th><th>放置尺寸</th><th>旋转</th><th>易碎</th><th>重量</th></tr></thead>
+        <tbody id="placement-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">侧视图（XZ 平面）</div>
+    <canvas class="viz-canvas" id="viz-canvas"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="card-title">失败项与约束解释</div>
+    <div id="failures-area"><div class="empty-msg">尚未执行装箱</div></div>
+  </div>
+
+  <div class="card full-span">
+    <div class="card-title">操作日志</div>
+    <div class="log-area" id="log-area"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary btn-sm" id="btn-export-csv">导出 CSV</button>
+      <button class="btn btn-secondary btn-sm" id="btn-export-json">导出 JSON</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/models.js"></script>
+<script src="js/constraints.js"></script>
+<script src="js/packer.js"></script>
+<script src="js/report.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
