@@ -5,3 +5,13 @@
 【studio_dirty.json】
   项目ID: studio_dirty
   有效配置: 否
+  [error] room_dimensions.unit: 未知单位 'unknown'，默认使用米(m)
+    原始值: unknown
+    建议值: m
+  [error] room_dimensions.length: 'invalid' 不是有效的数值
+    原始值: invalid
+  [warning] listening_points[0]: 监听点坐标未完全校验 (缺少有效房间尺寸): x=10.0(length=invalid无法解析)
+    原始值: (10.0, 2.1, 1.2)
+  [warning] listening_points[1]: 监听点坐标未完全校验 (缺少有效房间尺寸): x=3.0(length=invalid无法解析)
+    原始值: (3.0, 2.1, 1.2)
+  [warning] listening_points[2]: 监听点 (3.0, 2.1, 1.2) 重复

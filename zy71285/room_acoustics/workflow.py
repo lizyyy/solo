@@ -137,25 +137,26 @@ class AcousticWorkflow:
         ext = os.path.splitext(filepath)[1].lower()
 
         if ext == '.json':
-            data, issues = self.file_handler.load_json(filepath)
+            data, file_issues = self.file_handler.load_json(filepath)
         elif ext in ['.yaml', '.yml']:
-            data, issues = self.file_handler.load_yaml(filepath)
+            data, file_issues = self.file_handler.load_yaml(filepath)
         else:
-            issues = [DataIssue(
+            file_issues = [DataIssue(
                 issue_type='format_error',
                 field='__file__',
                 message=f"不支持的文件格式: {ext}",
                 severity="error"
             )]
-            return None, issues
+            return None, file_issues
 
         if data is None:
-            return None, issues
+            return None, file_issues
 
         config = self.file_handler.parse_config(data)
+        all_issues = file_issues + config.issues
 
         if not config.is_valid:
-            return None, config.issues
+            return None, all_issues
 
         result = self.process_single_config(config)
 
@@ -171,7 +172,7 @@ class AcousticWorkflow:
                 diff = self.diff_analyzer.compare_results(old_result, result)
                 self.diff_analyzer.generate_diff_report(diff, self.output_dir)
 
-        return result, issues
+        return result, all_issues
 
     def export_dirty_data_report(
         self,
@@ -191,11 +192,21 @@ class AcousticWorkflow:
             if config:
                 lines.append(f"  项目ID: {config.project_id}")
                 lines.append(f"  有效配置: {'是' if config.is_valid else '否'}")
-            for issue in issues:
+
+            all_issues = list(issues)
+            if config and config.issues:
+                config_issue_ids = {id(ci) for ci in all_issues}
+                for ci in config.issues:
+                    if id(ci) not in config_issue_ids:
+                        all_issues.append(ci)
+
+            if not all_issues:
+                lines.append("  (未检测到具体问题)")
+            for issue in all_issues:
                 lines.append(f"  [{issue.severity}] {issue.field}: {issue.message}")
-                if issue.original_value:
+                if issue.original_value is not None:
                     lines.append(f"    原始值: {issue.original_value}")
-                if issue.suggested_value:
+                if issue.suggested_value is not None:
                     lines.append(f"    建议值: {issue.suggested_value}")
             lines.append("")
 

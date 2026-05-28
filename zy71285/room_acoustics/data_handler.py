@@ -274,8 +274,53 @@ class DataValidator:
                     field=field_prefix,
                     message=f"监听点 ({lp.x}, {lp.y}, {lp.z}) 超出房间范围",
                     original_value=f"({x}, {y}, {z})",
-                    severity="error"
+                    severity="warning"
                 ))
+            elif room_dims is None:
+                raw_dims = data.get('room_dimensions', {})
+                raw_unit = raw_dims.get('unit', 'm')
+                raw_factor, _ = self.validate_unit(raw_unit, 'room_dimensions.unit')
+                out_of_bounds = []
+                unvalidated = []
+                for axis, coord, dim_key in [
+                    ('x', x, 'length'), ('y', y, 'width'), ('z', z, 'height')
+                ]:
+                    raw_val = raw_dims.get(dim_key)
+                    if raw_val is None:
+                        unvalidated.append(f"{axis}={float(coord)}(缺{dim_key})")
+                        continue
+                    try:
+                        dim_m = float(raw_val) * raw_factor
+                        if float(coord) * unit_factor > dim_m:
+                            out_of_bounds.append(
+                                f"{axis}={float(coord)} > {dim_key}={raw_val}"
+                            )
+                    except (ValueError, TypeError):
+                        unvalidated.append(
+                            f"{axis}={float(coord)}({dim_key}={raw_val}无法解析)"
+                        )
+                if out_of_bounds:
+                    issues.append(DataIssue(
+                        issue_type=DataIssueType.OUT_OF_RANGE,
+                        field=field_prefix,
+                        message=(
+                            f"监听点越界 (房间尺寸不完整，仅部分维度可校验): "
+                            f"{', '.join(out_of_bounds)}"
+                        ),
+                        original_value=f"({x}, {y}, {z})",
+                        severity="error"
+                    ))
+                if unvalidated:
+                    issues.append(DataIssue(
+                        issue_type=DataIssueType.OUT_OF_RANGE,
+                        field=field_prefix,
+                        message=(
+                            f"监听点坐标未完全校验 (缺少有效房间尺寸): "
+                            f"{', '.join(unvalidated)}"
+                        ),
+                        original_value=f"({x}, {y}, {z})",
+                        severity="warning"
+                    ))
 
             points.append(lp)
 
@@ -447,24 +492,24 @@ class FileHandler:
                 continue
 
             if ext == '.json':
-                data, issues = self.load_json(filepath)
+                data, file_issues = self.load_json(filepath)
                 if data is not None:
                     config = self.parse_config(data)
-                    results[filename] = (config, issues)
+                    results[filename] = (config, file_issues + config.issues)
                 else:
-                    results[filename] = (None, issues)
+                    results[filename] = (None, file_issues)
             elif ext in ['.yaml', '.yml']:
-                data, issues = self.load_yaml(filepath)
+                data, file_issues = self.load_yaml(filepath)
                 if data is not None:
                     config = self.parse_config(data)
-                    results[filename] = (config, issues)
+                    results[filename] = (config, file_issues + config.issues)
                 else:
-                    results[filename] = (None, issues)
+                    results[filename] = (None, file_issues)
             elif ext == '.csv':
-                rows, issues = self.load_csv(filepath)
+                rows, file_issues = self.load_csv(filepath)
                 for i, row in enumerate(rows):
                     config = self.parse_config(row)
-                    results[f"{filename}#row{i}"] = (config, [])
+                    results[f"{filename}#row{i}"] = (config, file_issues + config.issues)
 
         return results
 
