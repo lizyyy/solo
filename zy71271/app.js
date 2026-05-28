@@ -242,7 +242,7 @@ class GalaxyWallApp {
                 x: this.safeParseFloat(row, ['x', 'X', '坐标x', 'ra']),
                 y: this.safeParseFloat(row, ['y', 'Y', '坐标y', 'dec']),
                 z: this.safeParseFloat(row, ['z', 'Z', '坐标z', '距离', 'distance']),
-                redshift: this.safeParseFloat(row, ['红移', 'redshift', 'z_value', 'z']),
+                redshift: this.safeParseFloat(row, ['红移', 'redshift', 'z_value', '红移值']),
                 brightness: this.safeParseFloat(row, ['亮度', 'brightness', 'mag', 'magnitude', '视星等']),
                 spectrumType: this.safeGetValue(row, ['光谱类型', 'spectrum', 'type', 'spectral_type'], '未知'),
                 batch: this.safeGetValue(row, ['批次', 'batch', '观测批次', 'survey'], '默认批次'),
