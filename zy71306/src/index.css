@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a0f0a 0%, #2C1810 50%, #361c17 100%);
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2C1810;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4AF37;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #E8C04A;
+}
+
+/* 旋钮样式 */
+.knob-track {
+  background: linear-gradient(135deg, #361c17 0%, #523023 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.knob-handle {
+  background: linear-gradient(135deg, #D4AF37 0%, #b8942b 100%);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+}
+
+/* 卡片玻璃效果 */
+.glass-card {
+  background: rgba(44, 24, 16, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+/* 3D场景容器 */
+.scene-container {
+  background: radial-gradient(ellipse at center, #361c17 0%, #1a0f0a 100%);
+}
+
+/* 动画 */
+@keyframes pulse-gold {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+  }
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
