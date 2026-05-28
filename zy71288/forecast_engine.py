@@ -64,8 +64,10 @@ class TimeSeriesForecaster:
         
         if not weather_df.empty:
             weather_df['date'] = weather_df['date'].astype(str)
-            merged = merged.merge(weather_df[['date', 'hour', 'temperature', 'rain_probability']],
-                                   on=['date', 'hour'], how='left')
+            avail_cols = [c for c in ['date', 'hour', 'temperature', 'rain_probability'] if c in weather_df.columns]
+            if len(avail_cols) >= 3:
+                merged = merged.merge(weather_df[avail_cols],
+                                       on=['date', 'hour'], how='left')
         
         merged['has_event'] = 0
         merged['event_attendance'] = 0
@@ -79,11 +81,15 @@ class TimeSeriesForecaster:
         
         merged['reservation_count'] = 0
         
-        if not res_df.empty:
+        if not res_df.empty and 'status' in res_df.columns and 'people_count' in res_df.columns:
             res_df['date'] = res_df['date'].astype(str)
             res_agg = res_df[res_df['status'] == 'confirmed'].groupby(['date', 'hour'])['people_count'].sum().reset_index()
             merged = merged.merge(res_agg, on=['date', 'hour'], how='left', suffixes=('', '_res'))
-            merged['reservation_count'] = merged['people_count'].fillna(0)
+            if 'people_count_res' in merged.columns:
+                merged['reservation_count'] = merged['people_count_res'].fillna(0)
+                merged.drop('people_count_res', axis=1, inplace=True)
+            elif 'people_count' in merged.columns and 'people_count' not in hist_df.columns:
+                merged['reservation_count'] = merged['people_count'].fillna(0)
         
         merged = self._prepare_features(merged)
         return merged
@@ -100,7 +106,16 @@ class TimeSeriesForecaster:
         )
         
         if len(training_data) < 24:
-            raise ValueError("训练数据不足，至少需要24小时的历史数据")
+            logger.warning(f"训练数据不足({len(training_data)}条)，将使用简单均值模型替代")
+            self.model = "mean_fallback"
+            self._mean_visitors = training_data['actual_visitors'].mean() if len(training_data) > 0 else 50
+            self._std_visitors = training_data['actual_visitors'].std() if len(training_data) > 1 else 20
+            return {
+                "training_samples": len(training_data),
+                "feature_importance": {},
+                "model_type": "MeanFallback",
+                "warning": "数据不足，使用均值模型"
+            }
         
         X = training_data[self.feature_columns]
         y = training_data['actual_visitors']
@@ -169,6 +184,30 @@ class TimeSeriesForecaster:
                     forecast_df.drop('rain_probability_weather', axis=1, inplace=True)
         
         forecast_df = self._prepare_features(forecast_df)
+        
+        if self.model == "mean_fallback":
+            mean_v = self._mean_visitors
+            std_v = self._std_visitors if self._std_visitors > 0 else 20
+            results = []
+            for i, row in forecast_df.iterrows():
+                hour = int(row['hour'])
+                if 10 <= hour <= 18:
+                    pred = mean_v * 1.3
+                elif hour < 8 or hour > 20:
+                    pred = mean_v * 0.3
+                else:
+                    pred = mean_v * 0.8
+                results.append(ForecastResult(
+                    date=row['date'],
+                    hour=hour,
+                    predicted_visitors=float(pred),
+                    lower_bound=float(pred * 0.75),
+                    upper_bound=float(pred * 1.25),
+                    confidence_level=0.6,
+                    scenario=scenario
+                ))
+            logger.info(f"均值模型预测完成，共{len(results)}条记录")
+            return results
         
         forecast_df['has_event'] = 0
         forecast_df['event_attendance'] = 0

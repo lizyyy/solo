@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import json
 import hashlib
 from pathlib import Path
@@ -41,6 +42,53 @@ class DataImportManager:
         self.processed_hashes.add(record_hash)
         return False
     
+    @staticmethod
+    def _clean_row(row: 'pd.Series') -> Dict[str, Any]:
+        cleaned = {}
+        for key, value in row.items():
+            if pd.isna(value):
+                cleaned[key] = None
+            else:
+                cleaned[key] = value
+        return cleaned
+    
+    @staticmethod
+    def _str_val(value: Any) -> Optional[str]:
+        if value is None:
+            return None
+        s = str(value)
+        if s == 'nan':
+            return None
+        return s
+    
+    @staticmethod
+    def _int_val(value: Any) -> Optional[int]:
+        if value is None or (isinstance(value, float) and pd.isna(value)):
+            return None
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return None
+    
+    @staticmethod
+    def _float_val(value: Any) -> Optional[float]:
+        if value is None or (isinstance(value, float) and pd.isna(value)):
+            return None
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return None
+    
+    @staticmethod
+    def _bool_val(value: Any) -> Optional[bool]:
+        if value is None or (isinstance(value, float) and pd.isna(value)):
+            return None
+        if isinstance(value, (bool, np.bool_)):
+            return bool(value)
+        if isinstance(value, str):
+            return value.lower() in ('true', '1', 'yes')
+        return None
+    
     def _validate_required_fields(self, df: pd.DataFrame, source_type: DataSourceType) -> List[str]:
         required_fields = config.REQUIRED_FIELDS.get(source_type.value, [])
         missing_fields = [f for f in required_fields if f not in df.columns]
@@ -66,15 +114,15 @@ class DataImportManager:
             return records, anomalies
         
         for _, row in df.iterrows():
-            raw_data = row.to_dict()
-            record_hash = self._compute_record_hash(raw_data)
+            cleaned = self._clean_row(row)
+            record_hash = self._compute_record_hash(cleaned)
             
             if self._check_duplicate(record_hash):
                 anomaly = AnomalyRecord(
                     anomaly_type="duplicate_record",
                     severity="warning",
-                    message=f"重复的预约记录: {raw_data.get('booking_id', 'unknown')}",
-                    related_data={"booking_id": raw_data.get('booking_id')},
+                    message=f"重复的预约记录: {cleaned.get('booking_id', 'unknown')}",
+                    related_data={"booking_id": cleaned.get('booking_id')},
                     suggestion="该记录已存在，已跳过处理"
                 )
                 anomalies.append(anomaly)
@@ -82,15 +130,15 @@ class DataImportManager:
             
             try:
                 record = ReservationRecord(
-                    booking_id=str(row['booking_id']),
-                    date=str(row['date']),
-                    hour=int(row['hour']),
-                    people_count=int(row['people_count']),
-                    status=str(row['status']).lower(),
-                    visitor_type=row.get('visitor_type'),
-                    group_id=row.get('group_id'),
-                    raw_data=raw_data,
-                    manual_notes=row.get('manual_notes', row.get('备注', None)),
+                    booking_id=self._str_val(cleaned['booking_id']),
+                    date=self._str_val(cleaned['date']),
+                    hour=self._int_val(cleaned['hour']),
+                    people_count=self._int_val(cleaned['people_count']),
+                    status=self._str_val(cleaned['status']).lower(),
+                    visitor_type=self._str_val(cleaned.get('visitor_type')),
+                    group_id=self._str_val(cleaned.get('group_id')),
+                    raw_data=cleaned,
+                    manual_notes=self._str_val(cleaned.get('manual_notes') or cleaned.get('备注')),
                     data_source=DataSourceType.RESERVATIONS
                 )
                 records.append(record)
@@ -99,7 +147,7 @@ class DataImportManager:
                     anomaly_type="invalid_record",
                     severity="error",
                     message=f"预约记录验证失败: {str(e)}",
-                    related_data={"raw_data": raw_data},
+                    related_data={"raw_data": cleaned},
                     suggestion="请检查数据格式是否正确"
                 )
                 anomalies.append(anomaly)
@@ -128,36 +176,36 @@ class DataImportManager:
             anomalies.append(anomaly)
         
         for _, row in df.iterrows():
-            raw_data = row.to_dict()
-            record_hash = self._compute_record_hash(raw_data)
+            cleaned = self._clean_row(row)
+            record_hash = self._compute_record_hash(cleaned)
             
             if self._check_duplicate(record_hash):
                 continue
             
             try:
-                temp = row.get('temperature')
-                rain_prob = row.get('rain_probability')
-                weather_cond = row.get('weather_condition')
+                temp = cleaned.get('temperature')
+                rain_prob = cleaned.get('rain_probability')
+                weather_cond = cleaned.get('weather_condition')
                 
-                if pd.isna(temp) or pd.isna(rain_prob) or pd.isna(weather_cond):
+                if temp is None or rain_prob is None or weather_cond is None:
                     anomaly = AnomalyRecord(
                         anomaly_type="weather_missing",
                         severity="warning",
-                        message=f"{row['date']} {row['hour']}时天气数据缺失",
-                        related_data={"date": str(row['date']), "hour": int(row['hour'])},
+                        message=f"{cleaned.get('date', '?')} {cleaned.get('hour', '?')}时天气数据缺失",
+                        related_data={"date": self._str_val(cleaned.get('date')), "hour": self._int_val(cleaned.get('hour'))},
                         suggestion="将使用历史均值填充，建议检查天气数据源"
                     )
                     anomalies.append(anomaly)
                 
                 record = WeatherRecord(
-                    date=str(row['date']),
-                    hour=int(row['hour']),
-                    temperature=float(temp) if not pd.isna(temp) else None,
-                    rain_probability=float(rain_prob) if not pd.isna(rain_prob) else None,
-                    weather_condition=str(weather_cond).lower() if not pd.isna(weather_cond) else None,
-                    wind_speed=float(row['wind_speed']) if 'wind_speed' in df and not pd.isna(row['wind_speed']) else None,
-                    raw_data=raw_data,
-                    manual_notes=row.get('manual_notes', row.get('备注', None)),
+                    date=self._str_val(cleaned['date']),
+                    hour=self._int_val(cleaned['hour']),
+                    temperature=self._float_val(temp),
+                    rain_probability=self._float_val(rain_prob),
+                    weather_condition=self._str_val(weather_cond).lower() if weather_cond else None,
+                    wind_speed=self._float_val(cleaned.get('wind_speed')),
+                    raw_data=cleaned,
+                    manual_notes=self._str_val(cleaned.get('manual_notes') or cleaned.get('备注')),
                     data_source=DataSourceType.WEATHER
                 )
                 records.append(record)
@@ -166,7 +214,7 @@ class DataImportManager:
                     anomaly_type="invalid_record",
                     severity="error",
                     message=f"天气记录验证失败: {str(e)}",
-                    related_data={"raw_data": raw_data},
+                    related_data={"raw_data": cleaned},
                     suggestion="请检查数据格式"
                 )
                 anomalies.append(anomaly)
@@ -196,43 +244,46 @@ class DataImportManager:
             return records, anomalies
         
         for _, row in df.iterrows():
-            raw_data = row.to_dict()
-            record_hash = self._compute_record_hash(raw_data)
+            cleaned = self._clean_row(row)
+            record_hash = self._compute_record_hash(cleaned)
             
             if self._check_duplicate(record_hash):
                 anomaly = AnomalyRecord(
                     anomaly_type="duplicate_record",
                     severity="warning",
-                    message=f"重复的活动记录: {raw_data.get('event_id', 'unknown')}",
-                    related_data={"event_id": raw_data.get('event_id')},
+                    message=f"重复的活动记录: {cleaned.get('event_id', 'unknown')}",
+                    related_data={"event_id": cleaned.get('event_id')},
                     suggestion="该活动已存在，已跳过"
                 )
                 anomalies.append(anomaly)
                 continue
             
             try:
-                expected_attendance = int(row['expected_attendance'])
+                expected_attendance = self._int_val(cleaned['expected_attendance'])
+                if expected_attendance is None:
+                    raise ValueError("expected_attendance 不能为空")
+                    
                 if expected_attendance > config.GALLERY_CAPACITY:
                     anomaly = AnomalyRecord(
                         anomaly_type="event_abnormal",
                         severity="warning",
-                        message=f"活动 {row['event_id']} 预期参与人数({expected_attendance})超过展厅容量({config.GALLERY_CAPACITY})",
-                        related_data={"event_id": row['event_id'], "expected": expected_attendance, "capacity": config.GALLERY_CAPACITY},
+                        message=f"活动 {cleaned['event_id']} 预期参与人数({expected_attendance})超过展厅容量({config.GALLERY_CAPACITY})",
+                        related_data={"event_id": cleaned['event_id'], "expected": expected_attendance, "capacity": config.GALLERY_CAPACITY},
                         suggestion="建议评估场地承载能力，考虑分流或增加场次"
                     )
                     anomalies.append(anomaly)
                 
                 record = EventRecord(
-                    event_id=str(row['event_id']),
-                    date=str(row['date']),
-                    hour=int(row['hour']),
-                    event_type=str(row['event_type']),
+                    event_id=self._str_val(cleaned['event_id']),
+                    date=self._str_val(cleaned['date']),
+                    hour=self._int_val(cleaned['hour']),
+                    event_type=self._str_val(cleaned['event_type']),
                     expected_attendance=expected_attendance,
-                    event_name=row.get('event_name'),
-                    is_vip=bool(row.get('is_vip', False)),
-                    location=row.get('location'),
-                    raw_data=raw_data,
-                    manual_notes=row.get('manual_notes', row.get('备注', None)),
+                    event_name=self._str_val(cleaned.get('event_name')),
+                    is_vip=self._bool_val(cleaned.get('is_vip')) or False,
+                    location=self._str_val(cleaned.get('location')),
+                    raw_data=cleaned,
+                    manual_notes=self._str_val(cleaned.get('manual_notes') or cleaned.get('备注')),
                     data_source=DataSourceType.EVENTS
                 )
                 records.append(record)
@@ -241,7 +292,7 @@ class DataImportManager:
                     anomaly_type="invalid_record",
                     severity="error",
                     message=f"活动记录验证失败: {str(e)}",
-                    related_data={"raw_data": raw_data},
+                    related_data={"raw_data": cleaned},
                     suggestion="请检查活动数据格式"
                 )
                 anomalies.append(anomaly)
@@ -271,22 +322,22 @@ class DataImportManager:
             return records, anomalies
         
         for _, row in df.iterrows():
-            raw_data = row.to_dict()
-            record_hash = self._compute_record_hash(raw_data)
+            cleaned = self._clean_row(row)
+            record_hash = self._compute_record_hash(cleaned)
             
             if self._check_duplicate(record_hash):
                 continue
             
             try:
                 record = HistoricalRecord(
-                    date=str(row['date']),
-                    hour=int(row['hour']),
-                    actual_visitors=int(row['actual_visitors']),
-                    exhibition_id=row.get('exhibition_id'),
-                    is_weekend=bool(row.get('is_weekend')) if 'is_weekend' in df else None,
-                    is_holiday=bool(row.get('is_holiday')) if 'is_holiday' in df else None,
-                    raw_data=raw_data,
-                    manual_notes=row.get('manual_notes', row.get('备注', None)),
+                    date=self._str_val(cleaned['date']),
+                    hour=self._int_val(cleaned['hour']),
+                    actual_visitors=self._int_val(cleaned['actual_visitors']),
+                    exhibition_id=self._str_val(cleaned.get('exhibition_id')),
+                    is_weekend=self._bool_val(cleaned.get('is_weekend')),
+                    is_holiday=self._bool_val(cleaned.get('is_holiday')),
+                    raw_data=cleaned,
+                    manual_notes=self._str_val(cleaned.get('manual_notes') or cleaned.get('备注')),
                     data_source=DataSourceType.HISTORICAL
                 )
                 records.append(record)
@@ -295,7 +346,7 @@ class DataImportManager:
                     anomaly_type="invalid_record",
                     severity="error",
                     message=f"历史客流记录验证失败: {str(e)}",
-                    related_data={"raw_data": raw_data},
+                    related_data={"raw_data": cleaned},
                     suggestion="请检查历史数据格式"
                 )
                 anomalies.append(anomaly)
@@ -325,33 +376,33 @@ class DataImportManager:
             return records, anomalies
         
         for _, row in df.iterrows():
-            raw_data = row.to_dict()
-            record_hash = self._compute_record_hash(raw_data)
+            cleaned = self._clean_row(row)
+            record_hash = self._compute_record_hash(cleaned)
             
             if self._check_duplicate(record_hash):
                 continue
             
             try:
-                max_capacity = int(row['max_capacity'])
-                if max_capacity <= 0:
+                max_capacity = self._int_val(cleaned['max_capacity'])
+                if max_capacity is None or max_capacity <= 0:
                     anomaly = AnomalyRecord(
                         anomaly_type="capacity_invalid",
                         severity="error",
-                        message=f"区域 {row['area_name']} 容量值无效: {max_capacity}",
-                        related_data={"area_id": row['area_id'], "capacity": max_capacity},
+                        message=f"区域 {cleaned.get('area_name', '?')} 容量值无效: {cleaned.get('max_capacity')}",
+                        related_data={"area_id": cleaned.get('area_id'), "capacity": cleaned.get('max_capacity')},
                         suggestion="容量值必须为正整数"
                     )
                     anomalies.append(anomaly)
                     continue
                 
                 record = CapacityRecord(
-                    area_id=str(row['area_id']),
-                    area_name=str(row['area_name']),
+                    area_id=self._str_val(cleaned['area_id']),
+                    area_name=self._str_val(cleaned['area_name']),
                     max_capacity=max_capacity,
-                    current_count=int(row['current_count']) if 'current_count' in df and not pd.isna(row['current_count']) else None,
-                    exhibition_name=row.get('exhibition_name'),
-                    raw_data=raw_data,
-                    manual_notes=row.get('manual_notes', row.get('备注', None)),
+                    current_count=self._int_val(cleaned.get('current_count')),
+                    exhibition_name=self._str_val(cleaned.get('exhibition_name')),
+                    raw_data=cleaned,
+                    manual_notes=self._str_val(cleaned.get('manual_notes') or cleaned.get('备注')),
                     data_source=DataSourceType.CAPACITY
                 )
                 records.append(record)
@@ -360,7 +411,7 @@ class DataImportManager:
                     anomaly_type="invalid_record",
                     severity="error",
                     message=f"容量记录验证失败: {str(e)}",
-                    related_data={"raw_data": raw_data},
+                    related_data={"raw_data": cleaned},
                     suggestion="请检查容量数据格式"
                 )
                 anomalies.append(anomaly)

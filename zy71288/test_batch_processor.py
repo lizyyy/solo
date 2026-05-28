@@ -209,11 +209,43 @@ class TestBatchProcessor(unittest.TestCase):
         records, _ = import_manager.import_reservations(self.test_data_dir / 'reservations.csv')
         
         self.assertEqual(len(records), 1)
-        self.assertIn('extra_field', records[0].raw_data, "原始字段应被保留")
+        self.assertIn('extra_field', records[0].raw_data, "原始字段应被保留在raw_data中")
+        self.assertEqual(records[0].raw_data['extra_field'], '自定义数据')
         self.assertIsNotNone(records[0].manual_notes, "手工备注应被保留")
+        self.assertEqual(records[0].manual_notes, 'VIP客人预约')
         
         print("  ✓ 原始数据保留正常")
         print("  ✓ 手工备注保留正常")
+    
+    def test_nan_field_handling(self):
+        print("\n测试8: CSV空值NaN字段处理...")
+        
+        historical_with_nan = pd.DataFrame([
+            {'date': '2026-05-01', 'hour': 0, 'actual_visitors': 50,
+             'exhibition_id': 'EXH_001', 'is_weekend': False, 'is_holiday': True,
+             'manual_notes': '有备注'},
+            {'date': '2026-05-01', 'hour': 1, 'actual_visitors': 40,
+             'exhibition_id': 'EXH_001', 'is_weekend': False, 'is_holiday': True,
+             'manual_notes': None},
+            {'date': '2026-05-01', 'hour': 2, 'actual_visitors': 30,
+             'exhibition_id': 'EXH_001', 'is_weekend': False, 'is_holiday': True,
+             'manual_notes': None},
+        ])
+        historical_with_nan.to_csv(self.test_data_dir / 'historical.csv', index=False)
+        
+        import_manager = DataImportManager()
+        records, anomalies = import_manager.import_historical(self.test_data_dir / 'historical.csv')
+        
+        self.assertEqual(len(records), 3, "3条历史记录（含空备注）应全部成功导入")
+        
+        invalid_count = sum(1 for a in anomalies if a.anomaly_type == 'invalid_record')
+        self.assertEqual(invalid_count, 0, "空备注不应导致invalid_record异常")
+        
+        self.assertEqual(records[0].manual_notes, '有备注')
+        self.assertIsNone(records[1].manual_notes)
+        
+        print("  ✓ CSV空值NaN不会导致验证失败")
+        print(f"  ✓ {len(records)}条记录全部成功导入，0条invalid_record")
 
 
 def run_tests():
