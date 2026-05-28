@@ -108,12 +108,23 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
 
   addTrajectories: (trajectories) =>
     set((state) => {
+      const resolved = trajectories.map((t) => {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(t.actorId)
+        if (!isUuid) {
+          const actor = state.actors.find((a) => a.name === t.actorId)
+          if (actor) {
+            return { ...t, actorId: actor.id }
+          }
+        }
+        return t
+      })
+
       const maxTime = Math.max(
-        ...trajectories.flatMap((t) => t.waypoints.map((w) => w.time)),
+        ...resolved.flatMap((t) => t.waypoints.map((w) => w.time)),
         state.playback.duration
       )
       return {
-        trajectories: [...state.trajectories, ...trajectories],
+        trajectories: [...state.trajectories, ...resolved],
         playback: { ...state.playback, duration: maxTime },
       }
     }),
