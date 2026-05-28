@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { GameState, GameActions, IndexComponent, Holding } from '../types';
+import type { GameState, GameActions, IndexComponent, Holding, Warning } from '../types';
 import {
   calculateTrackingError,
   calculateTotalAssets,
@@ -36,9 +36,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   ...initialState,
 
   initializeGame: (components: IndexComponent[]) => {
-    const initialCash = 100000000;
+    const initialFund = 100000000;
     const holdings: Holding[] = components.map(c => {
-      const targetValue = initialCash * (c.weight / 100) * 0.95;
+      const targetValue = initialFund * (c.weight / 100) * 0.95;
       const quantity = Math.floor(targetValue / c.price);
       return {
         code: c.code,
@@ -50,14 +50,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       };
     });
 
-    const totalAssets = calculateTotalAssets(holdings, initialCash);
+    const totalBuyCost = holdings.reduce((sum, h) => sum + h.quantity * h.avgCost, 0);
+    const cash = initialFund - totalBuyCost;
+    const totalAssets = calculateTotalAssets(holdings, cash);
     const initialNav = totalAssets;
     const indexBaseValue = 1000;
+
+    const initialWarnings: Warning[] = [];
+    const cashWarning = checkCashWarning(cash, totalAssets);
+    if (cashWarning) initialWarnings.push(cashWarning);
+    
+    const suspensionWarning = checkSuspensionWarning(holdings, components);
+    if (suspensionWarning) initialWarnings.push(suspensionWarning);
 
     set({
       round: 1,
       maxRounds: 10,
-      cash: initialCash,
+      cash,
       totalAssets,
       holdings,
       indexComponents: components,
@@ -67,7 +76,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       indexValueHistory: [indexBaseValue],
       currentEvent: null,
       operationLogs: [],
-      warnings: [],
+      warnings: initialWarnings,
       gameStatus: 'playing',
       initialNav,
       indexBaseValue,

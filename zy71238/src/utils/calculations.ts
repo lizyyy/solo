@@ -52,21 +52,21 @@ export function checkSuspensionWarning(
   holdings: Holding[],
   indexComponents: IndexComponent[]
 ): Warning | null {
-  const suspendedHoldings = holdings.filter(h => h.isSuspended);
-  if (suspendedHoldings.length === 0) return null;
-
   const suspendedInIndex = indexComponents.filter(c => c.isSuspended);
+  if (suspendedInIndex.length === 0) return null;
+
   const suspendedCodes = new Set(suspendedInIndex.map(c => c.code));
-  
-  const mismatchedSuspensions = suspendedHoldings.filter(h => !suspendedCodes.has(h.code));
-  
-  if (mismatchedSuspensions.length > 0) {
+  const heldSuspendedStocks = holdings.filter(h => 
+    suspendedCodes.has(h.code) && h.quantity > 0
+  );
+
+  if (heldSuspendedStocks.length > 0) {
     return {
       id: Date.now().toString(),
       type: 'suspension_mismatch',
       severity: 'warning',
-      message: `持有停牌股票: ${mismatchedSuspensions.map(h => h.name).join(', ')}`,
-      suggestion: '考虑用流动性好的同类股票替代停牌股',
+      message: `指数成分股停牌: ${heldSuspendedStocks.map(h => h.name).join(', ')}`,
+      suggestion: '停牌股票无法交易，考虑用流动性好的同类股票替代以减小跟踪误差',
       timestamp: Date.now()
     };
   }
