@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from app.database import Base, engine
+from sqlalchemy.orm import Session
+from app.database import Base, engine, get_db
 from app.routers import letters_of_credit, documents, discrepancies, clauses, reports
 
 Base.metadata.create_all(bind=engine)
@@ -53,14 +54,14 @@ def health_check():
 
 
 @app.get("/api/version-history/{related_type}/{related_id}", tags=["版本管理"])
-def get_version_history(related_type: str, related_id: int):
-    from sqlalchemy.orm import Session
-    from app.database import get_db
-    from fastapi import Depends
+def get_version_history(
+    related_type: str,
+    related_id: int,
+    db: Session = Depends(get_db)
+):
     from app.core import VersionManager
     from app.schemas import ApiResponse, VersionRecord
 
-    db: Session = Depends(get_db).__next__()
     version_manager = VersionManager(db)
     history = version_manager.get_version_history(related_type.upper(), related_id)
 

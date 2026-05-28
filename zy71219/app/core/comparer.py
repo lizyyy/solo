@@ -137,8 +137,22 @@ class ClauseParser:
         return results
 
     def _split_clauses(self, text: str) -> List[str]:
-        clauses = re.split(r'\n\s*\n+|(?=\d{1,2}\.)|(?=[A-Z]{2}\d)', text)
-        return [c.strip() for c in clauses if c.strip()]
+        boundaries = []
+        for m in re.finditer(r'(?m)^(?:\d{1,2}[A-Za-z]?\s*[:：]|[A-Z]{2}\d{1,2}[A-Z]?\s*[:：])', text):
+            boundaries.append(m.start())
+
+        if not boundaries:
+            clauses = re.split(r'\n\s*\n+', text)
+            return [c.strip() for c in clauses if c.strip()]
+
+        result = []
+        for i, start in enumerate(boundaries):
+            end = boundaries[i + 1] if i + 1 < len(boundaries) else len(text)
+            clause = text[start:end].strip()
+            if clause:
+                result.append(clause)
+
+        return result
 
     def _identify_clause_type(self, clause: str) -> str:
         for clause_type, patterns in self.patterns.items():
