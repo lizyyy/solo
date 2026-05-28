@@ -100,6 +100,11 @@ export const GameBoard: React.FC = () => {
             游戏进度会自动保存，刷新页面也不会丢失
           </p>
         </div>
+
+        <HistoryModal
+          isOpen={showHistory}
+          onClose={() => setShowHistory(false)}
+        />
       </div>
     );
   }
