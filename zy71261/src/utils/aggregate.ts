@@ -97,12 +97,15 @@ export function filterPositions(
     )
       return false;
     if (filter.months.length > 0) {
-      if (r.contractMonth == null) return true;
+      if (r.contractMonth == null) return false;
       if (!filter.months.includes(r.contractMonth)) return false;
     }
     if (filter.directions.length > 0) {
-      if (r.direction == null) return true;
-      if (!filter.directions.includes(r.direction)) return false;
+      if (r.direction == null) {
+        if (!filter.directions.includes("missing")) return false;
+      } else {
+        if (!filter.directions.includes(r.direction)) return false;
+      }
     }
     if (
       filter.clientSearch &&

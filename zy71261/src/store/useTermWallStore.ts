@@ -196,18 +196,26 @@ export const useTermWallStore = create<TermWallState>((set, get) => ({
   exportCSV: async () => {
     const state = get();
     const { filteredPositions, aggregatedBlocks, filter, dataHash } = state;
-    const duplicateIds = new Set<string>();
+    const uniqueRecordIds = new Set<string>();
     for (const b of aggregatedBlocks) {
-      if (b.duplicateCount > 0) {
-        for (const id of b.recordIds) duplicateIds.add(id);
+      if (b.recordIds.length > 0) {
+        uniqueRecordIds.add(b.recordIds[0]);
       }
     }
+    const dedupedPositions = filteredPositions.filter((r) => uniqueRecordIds.has(r.id));
     const header =
-      "ID,客户ID,客户名称,品种代码,品种名称,合约月份,方向,保证金,数量,风险报告,是否重复";
-    const rows = filteredPositions.map(
-      (r) =>
-        `${r.id},${r.clientId},${r.clientName ?? ""},${r.varietyCode},${r.varietyName ?? ""},${r.contractMonth ?? ""},${r.direction ?? ""},${r.margin ?? ""},${r.quantity ?? ""},${r.riskReport ?? ""},${duplicateIds.has(r.id) ? "是" : "否"}`
-    );
+      "ID,客户ID,客户名称,品种代码,品种名称,合约月份,方向,保证金,数量,风险报告,聚合记录数";
+    const recordToBlock = new Map<string, AggregatedBlock>();
+    for (const b of aggregatedBlocks) {
+      for (const id of b.recordIds) {
+        recordToBlock.set(id, b);
+      }
+    }
+    const rows = dedupedPositions.map((r) => {
+      const block = recordToBlock.get(r.id);
+      const aggCount = block ? block.recordIds.length : 1;
+      return `${r.id},${r.clientId},${r.clientName ?? ""},${r.varietyCode},${r.varietyName ?? ""},${r.contractMonth ?? ""},${r.direction ?? ""},${r.margin ?? ""},${r.quantity ?? ""},${r.riskReport ?? ""},${aggCount}`;
+    });
     const csv = [header, ...rows].join("\n");
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
