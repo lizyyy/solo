@@ -4,18 +4,42 @@ import { Thermometer, Zap, AlertTriangle, Target } from 'lucide-react';
 
 export const StatsPanel = () => {
   const chipPackage = useThermalStore((state) => state.chipPackage);
+  const filterConditions = useThermalStore((state) => state.filterConditions);
   
   const stats = useMemo(() => {
+    const filteredPowerPoints = chipPackage.powerPoints.filter(pp => {
+      const tempInRange = pp.temperature >= filterConditions.tempRange[0] && 
+                         pp.temperature <= filterConditions.tempRange[1];
+      const powerInRange = pp.power >= filterConditions.powerRange[0] && 
+                          pp.power <= filterConditions.powerRange[1];
+      const isAnomaly = pp.status !== 'normal';
+      const anomalyFilter = !filterConditions.showOnlyAnomalies || isAnomaly;
+      return tempInRange && powerInRange && anomalyFilter;
+    });
+
+    const filteredSensors = chipPackage.tempSensors.filter(s => {
+      if (s.isMissing) return true;
+      const tempInRange = s.temperature >= filterConditions.tempRange[0] && 
+                         s.temperature <= filterConditions.tempRange[1];
+      const anomalyFilter = !filterConditions.showOnlyAnomalies || s.isMissing;
+      return tempInRange && anomalyFilter;
+    });
+
     const allTemps = [
-      ...chipPackage.powerPoints.map(p => p.temperature),
-      ...chipPackage.tempSensors.filter(s => !s.isMissing).map(s => s.temperature)
+      ...filteredPowerPoints.map(p => p.temperature),
+      ...filteredSensors.filter(s => !s.isMissing).map(s => s.temperature)
     ];
+    
+    if (allTemps.length === 0) {
+      return { maxTemp: 0, minTemp: 0, avgTemp: 0, hotspotCount: 0 };
+    }
+    
     const maxTemp = Math.max(...allTemps);
     const minTemp = Math.min(...allTemps);
     const avgTemp = allTemps.reduce((a, b) => a + b, 0) / allTemps.length;
-    const hotspotCount = chipPackage.powerPoints.filter(p => p.status === 'critical').length;
+    const hotspotCount = filteredPowerPoints.filter(p => p.status === 'critical').length;
     return { maxTemp, minTemp, avgTemp, hotspotCount };
-  }, [chipPackage]);
+  }, [chipPackage, filterConditions]);
 
   const statItems = [
     {

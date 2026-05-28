@@ -14,21 +14,9 @@ export const Toolbar = () => {
   } = useView3DStore();
   const chipPackage = useThermalStore((state) => state.chipPackage);
   const filterConditions = useThermalStore((state) => state.filterConditions);
+  const setFilter = useThermalStore((state) => state.setFilter);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
-
-  const stats = useMemo(() => {
-    const allTemps = [
-      ...chipPackage.powerPoints.map(p => p.temperature),
-      ...chipPackage.tempSensors.filter(s => !s.isMissing).map(s => s.temperature)
-    ];
-    return {
-      maxTemp: Math.max(...allTemps),
-      minTemp: Math.min(...allTemps),
-      avgTemp: allTemps.reduce((a, b) => a + b, 0) / allTemps.length,
-      hotspotCount: chipPackage.powerPoints.filter(p => p.status === 'critical').length
-    };
-  }, [chipPackage]);
 
   const powerPoints = useMemo(() => {
     return chipPackage.powerPoints.filter(pp => {
@@ -52,8 +40,23 @@ export const Toolbar = () => {
     });
   }, [chipPackage.tempSensors, filterConditions]);
 
-  const handleExportExcel = () => {
+  const stats = useMemo(() => {
+    const filteredTemps = [
+      ...powerPoints.map(p => p.temperature),
+      ...sensors.filter(s => !s.isMissing).map(s => s.temperature)
+    ];
+    if (filteredTemps.length === 0) {
+      return { maxTemp: 0, minTemp: 0, avgTemp: 0, hotspotCount: 0 };
+    }
+    return {
+      maxTemp: Math.max(...filteredTemps),
+      minTemp: Math.min(...filteredTemps),
+      avgTemp: filteredTemps.reduce((a, b) => a + b, 0) / filteredTemps.length,
+      hotspotCount: powerPoints.filter(p => p.status === 'critical').length
+    };
+  }, [powerPoints, sensors]);
 
+  const handleExportExcel = () => {
     const wb = XLSX.utils.book_new();
     
     const statsData = [
@@ -155,8 +158,13 @@ export const Toolbar = () => {
             <div className="absolute top-full left-0 mt-2 bg-slate-900/95 backdrop-blur-md rounded-xl border border-slate-700/50 p-4 min-w-64 shadow-2xl">
               <h4 className="text-xs font-medium text-slate-200 mb-3">显示筛选</h4>
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-xs text-slate-300">
-                  <input type="checkbox" className="rounded bg-slate-700 border-slate-600" />
+                <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    className="rounded bg-slate-700 border-slate-600 cursor-pointer"
+                    checked={filterConditions.showOnlyAnomalies}
+                    onChange={(e) => setFilter({ showOnlyAnomalies: e.target.checked })}
+                  />
                   只显示异常项
                 </label>
               </div>
