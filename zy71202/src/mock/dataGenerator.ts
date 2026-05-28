@@ -268,10 +268,21 @@ export const generateReminderLogs = (
 export const generateDisposalTasks = (
   bonds: ConvertibleBond[],
   positions: CustomerPosition[],
-  triggerResults: Record<string, TriggerWindowResult>
+  triggerResults: Record<string, TriggerWindowResult>,
+  announcements: Record<string, RedemptionAnnouncement[]>
 ): DisposalTask[] => {
   const tasks: DisposalTask[] = [];
-  const triggeredBonds = Object.values(triggerResults).filter(r => r.isTriggered);
+  
+  const triggeredBonds = Object.values(triggerResults).filter(r => {
+    if (!r.isTriggered) return false;
+    if (r.hasGap) return false;
+    
+    const bondAnns = announcements[r.bondCode] || [];
+    const hasWithdrawn = bondAnns.some(a => a.isWithdrawn);
+    if (hasWithdrawn) return false;
+    
+    return true;
+  });
   
   triggeredBonds.forEach((result, index) => {
     const bond = bonds.find(b => b.bondCode === result.bondCode);

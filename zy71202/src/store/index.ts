@@ -88,7 +88,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
     
     const reminderLogs = generateReminderLogs(bonds, positions);
-    const disposalTasks = generateDisposalTasks(bonds, positions, triggerResults);
+    const disposalTasks = generateDisposalTasks(bonds, positions, triggerResults, announcements);
     const dataTraces = generateDataTraces(bonds, stockQuotes, announcements, positions);
     
     set({
@@ -160,6 +160,18 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   sendReminder: (params: SendReminderParams) => {
     const { reminderLogs } = get();
+    
+    const idempotencyCheck = idempotencyService.checkIdempotency(
+      params.bondCode,
+      params.customerId,
+      params.reminderType,
+      reminderLogs
+    );
+    
+    if (idempotencyCheck.isDuplicate && idempotencyCheck.existingLog) {
+      return idempotencyCheck.existingLog;
+    }
+    
     const idempotencyKey = idempotencyService.generateIdempotencyKey(
       params.bondCode,
       params.customerId,

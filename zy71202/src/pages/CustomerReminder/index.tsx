@@ -119,7 +119,6 @@ const CustomerReminder: React.FC = () => {
     return idempotencyService.dedupeReminders(
       pendingReminders,
       reminderLogs,
-      undefined,
       7
     );
   }, [filteredPositions, reminderLogs, selectedReminderTypes]);
@@ -299,12 +298,12 @@ const CustomerReminder: React.FC = () => {
       header: '操作',
       cell: (info: any) => {
         const row = info.row.original;
-        const idempotencyKey = idempotencyService.generateIdempotencyKey(
+        const checkResult = idempotencyService.checkIdempotency(
           row.bondCode,
           row.customerId,
-          selectedReminderTypes[0] as ReminderType
+          selectedReminderTypes[0] as ReminderType,
+          reminderLogs
         );
-        const checkResult = idempotencyService.checkIdempotency(idempotencyKey, reminderLogs);
         
         return (
           <div className="flex items-center gap-2">

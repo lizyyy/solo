@@ -52,6 +52,8 @@ export class TriggerWindowService {
       }
     }
     
+    const hasGap = gapDates.length > 0;
+    
     return {
       bondCode,
       windowStartDate: sortedQuotes[0]?.tradeDate || '',
@@ -60,10 +62,10 @@ export class TriggerWindowService {
       totalDays: windowDays,
       meetDays: maxMeetDays,
       consecutiveDays: maxConsecutive,
-      hasGap: gapDates.length > 0,
+      hasGap,
       gapDates,
-      isTriggered: maxMeetDays >= requiredDays,
-      triggeredAt: triggerDate,
+      isTriggered: !hasGap && maxMeetDays >= requiredDays,
+      triggeredAt: hasGap ? null : triggerDate,
       dailyQuotes: sortedQuotes,
     };
   }

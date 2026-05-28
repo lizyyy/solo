@@ -7,14 +7,15 @@ export class IdempotencyService {
   generateIdempotencyKey(
     bondCode: string,
     customerId: string,
-    reminderType: ReminderType,
-    date: string = dayjs().format('YYYY-MM-DD')
+    reminderType: ReminderType
   ): string {
-    return `${bondCode}_${customerId}_${reminderType}_${date}`;
+    return `${bondCode}_${customerId}_${reminderType}`;
   }
   
   checkIdempotency(
-    idempotencyKey: string,
+    bondCode: string,
+    customerId: string,
+    reminderType: ReminderType,
     existingLogs: ReminderLog[],
     coolingPeriodDays: number = this.DEFAULT_COOLING_PERIOD_DAYS
   ): {
@@ -23,10 +24,19 @@ export class IdempotencyService {
     coolingPeriodEnd: string | null;
     daysRemaining: number | null;
   } {
-    const existingLog = existingLogs.find(log => log.idempotencyKey === idempotencyKey);
+    const idempotencyKey = this.generateIdempotencyKey(bondCode, customerId, reminderType);
     
-    if (existingLog) {
-      const remindedDate = dayjs(existingLog.remindedAt);
+    const matchingLogs = existingLogs.filter(log => {
+      const logKey = this.extractBaseKey(log.idempotencyKey);
+      return logKey === idempotencyKey;
+    });
+    
+    if (matchingLogs.length > 0) {
+      const latestLog = matchingLogs.reduce((latest, log) => {
+        return dayjs(log.remindedAt).isAfter(dayjs(latest.remindedAt)) ? log : latest;
+      });
+      
+      const remindedDate = dayjs(latestLog.remindedAt);
       const now = dayjs();
       const diffDays = now.diff(remindedDate, 'day');
       
@@ -36,9 +46,9 @@ export class IdempotencyService {
         
         return {
           isDuplicate: true,
-          existingLog,
+          existingLog: latestLog,
           coolingPeriodEnd: coolingEnd.format('YYYY-MM-DD'),
-          daysRemaining,
+          daysRemaining: Math.max(0, daysRemaining),
         };
       }
     }
@@ -51,10 +61,17 @@ export class IdempotencyService {
     };
   }
   
+  private extractBaseKey(fullKey: string): string {
+    const parts = fullKey.split('_');
+    if (parts.length >= 3) {
+      return parts.slice(0, 3).join('_');
+    }
+    return fullKey;
+  }
+  
   dedupeReminders(
     pendingReminders: { bondCode: string; customerId: string; customerName: string; reminderType: ReminderType }[],
     existingLogs: ReminderLog[],
-    date: string = dayjs().format('YYYY-MM-DD'),
     coolingPeriodDays: number = this.DEFAULT_COOLING_PERIOD_DAYS
   ): {
     toSend: { bondCode: string; customerId: string; customerName: string; reminderType: ReminderType }[];
@@ -76,12 +93,18 @@ export class IdempotencyService {
     const processedKeys = new Set<string>();
     
     for (const item of pendingReminders) {
-      const key = this.generateIdempotencyKey(item.bondCode, item.customerId, item.reminderType, date);
+      const key = this.generateIdempotencyKey(item.bondCode, item.customerId, item.reminderType);
       
       if (processedKeys.has(key)) continue;
       processedKeys.add(key);
       
-      const result = this.checkIdempotency(key, existingLogs, coolingPeriodDays);
+      const result = this.checkIdempotency(
+        item.bondCode,
+        item.customerId,
+        item.reminderType,
+        existingLogs,
+        coolingPeriodDays
+      );
       
       if (result.isDuplicate && result.existingLog && result.coolingPeriodEnd && result.daysRemaining !== null) {
         duplicates.push({
