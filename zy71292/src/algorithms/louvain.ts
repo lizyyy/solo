@@ -24,16 +24,45 @@ function getProjectConstraintGroups(
     nodeProjectMap[node.id] = new Set(node.projectLabels)
   }
 
-  const groups: string[][] = []
-  const assigned = new Set<string>()
-
+  const parent: Record<string, string> = {}
   for (const projectId of Object.keys(projectLabels)) {
-    const members = projectLabels[projectId].filter(
-      (id) => !assigned.has(id)
-    )
+    parent[projectId] = projectId
+  }
+
+  const find = (x: string): string => {
+    if (parent[x] !== x) parent[x] = find(parent[x])
+    return parent[x]
+  }
+
+  const union = (x: string, y: string) => {
+    const px = find(x)
+    const py = find(y)
+    if (px !== py) parent[px] = py
+  }
+
+  for (const nodeId of Object.keys(nodeProjectMap)) {
+    const projects = [...nodeProjectMap[nodeId]]
+    for (let i = 0; i < projects.length; i++) {
+      for (let j = i + 1; j < projects.length; j++) {
+        union(projects[i], projects[j])
+      }
+    }
+  }
+
+  const mergedGroups: Record<string, Set<string>> = {}
+  for (const projectId of Object.keys(projectLabels)) {
+    const root = find(projectId)
+    if (!mergedGroups[root]) mergedGroups[root] = new Set()
+    for (const memberId of projectLabels[projectId]) {
+      mergedGroups[root].add(memberId)
+    }
+  }
+
+  const groups: string[][] = []
+  for (const memberSet of Object.values(mergedGroups)) {
+    const members = [...memberSet]
     if (members.length > 1) {
       groups.push(members)
-      members.forEach((id) => assigned.add(id))
     }
   }
 
@@ -111,8 +140,6 @@ export function louvain(
     iterations++
 
     for (const nodeId of nodeIds) {
-      if (nodeToConstraintGroup[nodeId] !== undefined) continue
-
       const currentComm = community[nodeId]
       const ki = degree[nodeId]
       const kiInCurrent = ki_in(nodeId, currentComm)
@@ -156,9 +183,23 @@ export function louvain(
       }
 
       if (bestComm !== currentComm) {
-        sigma[currentComm] -= ki
-        sigma[bestComm] = (sigma[bestComm] || 0) + ki
-        community[nodeId] = bestComm
+        if (nodeToConstraintGroup[nodeId] !== undefined) {
+          const gIdx = nodeToConstraintGroup[nodeId]
+          const groupMembers = constraintGroups[gIdx]
+          let totalKi = 0
+          for (const mid of groupMembers) {
+            totalKi += degree[mid]
+          }
+          sigma[currentComm] -= totalKi
+          sigma[bestComm] = (sigma[bestComm] || 0) + totalKi
+          for (const mid of groupMembers) {
+            community[mid] = bestComm
+          }
+        } else {
+          sigma[currentComm] -= ki
+          sigma[bestComm] = (sigma[bestComm] || 0) + ki
+          community[nodeId] = bestComm
+        }
         improved = true
       }
     }

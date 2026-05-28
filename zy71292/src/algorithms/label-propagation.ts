@@ -25,14 +25,50 @@ function getProjectConstraintGroups(
     nodeLabels[node.id] = node.projectLabels
   }
 
-  const projectMembers: Record<string, string[]> = {}
-  for (const [projectId, memberIds] of Object.entries(projectLabels)) {
-    projectMembers[projectId] = memberIds
-    const rep = memberIds[0]
-    for (const id of memberIds) {
-      representative.set(id, rep)
+  const parent: Record<string, string> = {}
+  for (const projectId of Object.keys(projectLabels)) {
+    parent[projectId] = projectId
+  }
+
+  const find = (x: string): string => {
+    if (parent[x] !== x) parent[x] = find(parent[x])
+    return parent[x]
+  }
+
+  const union = (x: string, y: string) => {
+    const px = find(x)
+    const py = find(y)
+    if (px !== py) parent[px] = py
+  }
+
+  for (const nodeId of Object.keys(nodeLabels)) {
+    const projects = nodeLabels[nodeId]
+    for (let i = 0; i < projects.length; i++) {
+      for (let j = i + 1; j < projects.length; j++) {
+        union(projects[i], projects[j])
+      }
     }
   }
+
+  const mergedGroups: Record<string, Set<string>> = {}
+  for (const projectId of Object.keys(projectLabels)) {
+    const root = find(projectId)
+    if (!mergedGroups[root]) mergedGroups[root] = new Set()
+    for (const memberId of projectLabels[projectId]) {
+      mergedGroups[root].add(memberId)
+    }
+  }
+
+  for (const memberSet of Object.values(mergedGroups)) {
+    const members = [...memberSet]
+    if (members.length > 1) {
+      const rep = members[0]
+      for (const id of members) {
+        representative.set(id, rep)
+      }
+    }
+  }
+
   return representative
 }
 
