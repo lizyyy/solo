@@ -6,10 +6,9 @@ import { useGameStore } from '../store/useGameStore';
 interface QueuePanelProps {
   normalQueue: Audience[];
   vipQueue: Audience[];
-  onDispatch?: (audienceId: string, channel: ChannelType) => void;
 }
 
-const QueuePanel: React.FC<QueuePanelProps> = ({ normalQueue, vipQueue, onDispatch }) => {
+const QueuePanel: React.FC<QueuePanelProps> = ({ normalQueue, vipQueue }) => {
   const { sendToChannel } = useGameStore();
 
   const getRiskColor = (audience: Audience) => {
@@ -46,15 +45,13 @@ const QueuePanel: React.FC<QueuePanelProps> = ({ normalQueue, vipQueue, onDispat
             )}
           </div>
         </div>
-        {onDispatch && (
-          <button
-            onClick={() => sendToChannel(audience.id, channel === 'vip' ? 'normal' : 'vip')}
-            className="p-1 hover:bg-navy-500 rounded transition-colors"
-            title={`调度到${channel === 'vip' ? '普通' : 'VIP'}通道`}
-          >
-            <ArrowRightLeft className="w-4 h-4 text-gray-400" />
-          </button>
-        )}
+        <button
+          onClick={() => sendToChannel(audience.id, channel === 'vip' ? 'normal' : 'vip')}
+          className="p-1 hover:bg-navy-500 rounded transition-colors"
+          title={`调度到${channel === 'vip' ? '普通' : 'VIP'}通道`}
+        >
+          <ArrowRightLeft className="w-4 h-4 text-gray-400" />
+        </button>
       </div>
     </div>
   );
