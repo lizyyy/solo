@@ -226,9 +226,11 @@ async function runTests() {
     console.log('💾 测试4: 持久化存储');
     console.log('-'.repeat(60));
 
+    const TEST_STORAGE_DIR = path.join(__dirname, 'temp-storage');
+    
     await test('数据保存和读取', async () => {
         const { StorageService } = require('../services');
-        const storage = new StorageService();
+        const storage = new StorageService(TEST_STORAGE_DIR);
         const testData = { test: 'data', timestamp: Date.now() };
         const success = storage.saveAllData({
             policies: [{ testData }]
@@ -245,7 +247,7 @@ async function runTests() {
 
     await test('备份创建', async () => {
         const { StorageService } = require('../services');
-        const storage = new StorageService();
+        const storage = new StorageService(TEST_STORAGE_DIR);
         const result = storage.backupData();
         if (!result || !result.success) {
             throw new Error('备份创建失败: ' + (result.error || '未知错误'));
@@ -320,4 +322,10 @@ async function runTests() {
 runTests().catch(error => {
     console.error('❌ 测试执行出错:', error);
     process.exit(1);
+}).finally(() => {
+    const fs = require('fs');
+    const TEST_STORAGE_DIR = path.join(__dirname, 'temp-storage');
+    if (fs.existsSync(TEST_STORAGE_DIR)) {
+        fs.rmSync(TEST_STORAGE_DIR, { recursive: true, force: true });
+    }
 });
