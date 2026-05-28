@@ -108,7 +108,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       settlement: null,
       errorImpacts: [],
       report: null,
-      amendments: [],
       timeRemaining: INITIAL_TIME,
     })
   },
@@ -188,7 +187,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   addAmendment: (fieldName, oldValue, newValue, reason) => {
-    const { report, amendments, session, judgments, settlement, errorImpacts } = get()
+    const { report, amendments, session, judgments, settlement, errorImpacts, currentCaseId } = get()
     let currentReport = report
     if (!currentReport) {
       currentReport = {
@@ -203,6 +202,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
     const amendment = createAmendment(
       currentReport.id,
+      currentCaseId || "",
       fieldName,
       oldValue,
       newValue,

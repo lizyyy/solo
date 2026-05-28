@@ -104,14 +104,25 @@ export default function Review() {
   const navigate = useNavigate()
   const amendments = useGameStore((s) => s.amendments)
 
+  const amendmentsByCase = useMemo(() => {
+    const grouped: Record<string, AmendmentRecord[]> = {}
+    for (const a of amendments) {
+      const key = a.caseId || "unknown"
+      if (!grouped[key]) grouped[key] = []
+      grouped[key].push(a)
+    }
+    return grouped
+  }, [amendments])
+
   const caseStats = useMemo(
     () =>
       CASES.map((c) => ({
         ...c,
         errorRate: MOCK_ERROR_RATES[c.id] ?? 0,
         errorTypes: getErrorTypesForCase(c.id),
+        amendmentCount: (amendmentsByCase[c.id] || []).length,
       })),
-    []
+    [amendmentsByCase]
   )
 
   const maxErrorCount = Math.max(
@@ -208,6 +219,14 @@ export default function Review() {
                       })}
                     </div>
                   </div>
+                  {c.amendmentCount > 0 && (
+                    <div className="flex items-center gap-2 pt-1 border-t border-steel-50">
+                      <Edit className="w-3.5 h-3.5 text-amber" />
+                      <span className="text-sm">
+                        累计修正 <span className="font-bold text-amber">{c.amendmentCount}</span> 条
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -249,29 +268,59 @@ export default function Review() {
             <Edit className="w-5 h-5" />
             修正追溯
           </h2>
-          <div className="card">
-            <div className="card-header">
-              <span>修正记录</span>
-            </div>
-            {amendments.length === 0 ? (
+          {amendments.length === 0 ? (
+            <div className="card">
               <div className="card-body text-center text-cool py-8">
                 暂无修正记录
               </div>
-            ) : (
-              <div>
-                <div className="grid grid-cols-[140px_100px_1fr_1fr_80px] gap-2 px-4 py-2 bg-steel-50 text-xs font-medium text-cool">
-                  <span>修正时间</span>
-                  <span>字段</span>
-                  <span>旧值</span>
-                  <span>新值</span>
-                  <span className="text-right">修改人</span>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {CASES.map((c) => {
+                const caseAmendments = amendmentsByCase[c.id]
+                if (!caseAmendments || caseAmendments.length === 0) return null
+                return (
+                  <div key={c.id} className="card">
+                    <div className="card-header flex items-center justify-between">
+                      <span>{c.caseNumber} — {c.carModel}</span>
+                      <span className="text-xs bg-white/20 px-2 py-0.5 rounded">
+                        {caseAmendments.length} 条修正
+                      </span>
+                    </div>
+                    <div>
+                      <div className="grid grid-cols-[140px_100px_1fr_1fr_80px] gap-2 px-4 py-2 bg-steel-50 text-xs font-medium text-cool">
+                        <span>修正时间</span>
+                        <span>字段</span>
+                        <span>旧值</span>
+                        <span>新值</span>
+                        <span className="text-right">修改人</span>
+                      </div>
+                      {caseAmendments.map((a) => (
+                        <AmendmentRow key={a.id} record={a} />
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+              {amendmentsByCase["unknown"] && amendmentsByCase["unknown"].length > 0 && (
+                <div className="card">
+                  <div className="card-header">其他修正记录</div>
+                  <div>
+                    <div className="grid grid-cols-[140px_100px_1fr_1fr_80px] gap-2 px-4 py-2 bg-steel-50 text-xs font-medium text-cool">
+                      <span>修正时间</span>
+                      <span>字段</span>
+                      <span>旧值</span>
+                      <span>新值</span>
+                      <span className="text-right">修改人</span>
+                    </div>
+                    {amendmentsByCase["unknown"].map((a) => (
+                      <AmendmentRow key={a.id} record={a} />
+                    ))}
+                  </div>
                 </div>
-                {amendments.map((a) => (
-                  <AmendmentRow key={a.id} record={a} />
-                ))}
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </section>
 
         <div className="flex justify-center pb-8">

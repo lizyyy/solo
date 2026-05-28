@@ -144,6 +144,7 @@ export interface DamageReport {
 export interface AmendmentRecord {
   id: string
   reportId: string
+  caseId: string
   fieldName: string
   oldValue: string
   newValue: string

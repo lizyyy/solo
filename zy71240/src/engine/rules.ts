@@ -153,6 +153,7 @@ export function runSettlement(
 
 export function createAmendment(
   reportId: string,
+  caseId: string,
   fieldName: string,
   oldValue: string,
   newValue: string,
@@ -162,6 +163,7 @@ export function createAmendment(
   return {
     id: `amend-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     reportId,
+    caseId,
     fieldName,
     oldValue,
     newValue,
