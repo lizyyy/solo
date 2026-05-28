@@ -1,0 +1,128 @@
+{
+  "report_id": "demo_001_v001_20260529_070141",
+  "timestamp": "2026-05-29T07:01:41.440117",
+  "version": 1,
+  "sample_id": "demo_001",
+  "input_params": {
+    "mass_kg": 1.0,
+    "sampling_rate_hz": 100.0,
+    "initial_displacement_m": 0.10248357076505617,
+    "noise_marker": "5pct",
+    "num_data_points": 1000,
+    "duration_s": 9.99
+  },
+  "sampling_quality": {
+    "quality": "一般",
+    "points_per_cycle": 11.454545454545455,
+    "avg_period": 0.11454545454545455,
+    "recommendation": "采样率基本满足要求"
+  },
+  "fitting_results": {
+    "spring_constant_k_Nm": 100.17271049637101,
+    "damping_ratio_zeta": 0.05091096501180162,
+    "mass_m_kg": 1.0,
+    "natural_frequency_omega_n_radps": 10.008631799420488,
+    "damped_frequency_omega_d_radps": 9.995652565372598,
+    "damping_coefficient_c_Nsm": 1.019098206712603,
+    "damping_type": "欠阻尼",
+    "fitting_method": "非线性最小二乘法",
+    "r_squared": 0.9560889654200267,
+    "rmse_m": 0.004886147476356888,
+    "nrmse": 0.025327825300721085
+  },
+  "intermediate_data": {
+    "popt": [
+      100.17271049637101,
+      0.05091096501180162
+    ],
+    "pcov": [
+      [
+        0.009681648699751286,
+        2.4666682186250092e-06
+      ],
+      [
+        2.4666682186250092e-06,
+        2.3940039551978107e-07
+      ]
+    ],
+    "param_uncertainty": [
+      0.09839536930034505,
+      0.0004892855970900647
+    ]
+  },
+  "residual_analysis": {
+    "mean_residual": 9.045806309930086e-05,
+    "std_residual": 0.004887754560549587,
+    "max_abs_residual": 0.019851081528092097,
+    "skewness": 0.12277178634590148,
+    "kurtosis": 0.09253306868538358,
+    "jarque_bera_pvalue": 0.2382443042000559,
+    "durbin_watson": 2.020533671594706,
+    "anomaly_indices": [
+      209,
+      262,
+      478
+    ],
+    "is_normal": true,
+    "is_independent": true,
+    "has_heteroscedasticity": false,
+    "details": {
+      "normality_test": "通过",
+      "independence_test": "通过",
+      "homoscedasticity_test": "通过",
+      "residual_range": [
+        -0.015736257695654,
+        0.019851081528092097
+      ],
+      "percentiles": [
+        -0.003328159828200402,
+        9.968571823532968e-05,
+        0.0032567652999261638
+      ]
+    }
+  },
+  "peak_analysis": {
+    "all_peaks": [
+      33,
+      65,
+      95,
+      125
+    ],
+    "all_peak_heights": [
+      -0.08972312475684856,
+      0.0782157389496701,
+      -0.06957843946919277,
+      0.06407904299960789
+    ],
+    "anomalous_peaks": [],
+    "peak_z_scores": [
+      1.5102059228607594,
+      0.4121089199457743,
+      -0.41210891994577564,
+      -0.9368910800542244
+    ],
+    "num_peaks": 4,
+    "num_anomalous": 0
+  },
+  "overdamping_diagnosis": {
+    "is_overdamped": true,
+    "confidence": 1.0,
+    "evidence": "峰值数量: 145, 间隔变异: 1.32, 衰减变异: 22.99",
+    "num_peaks": 145,
+    "interval_variation": 1.3152187152738093,
+    "decay_rate_variation": 22.99316993504558
+  },
+  "quality_flags": {
+    "high_r_squared": true,
+    "normal_residuals": true,
+    "independent_residuals": true,
+    "no_heteroscedasticity": true,
+    "no_anomalies": false,
+    "good_sampling_rate": false
+  },
+  "warnings": [
+    "检测到 3 个异常点",
+    "过阻尼警告: 峰值数量: 145, 间隔变异: 1.32, 衰减变异: 22.99"
+  ],
+  "raw_data_hash": "-160549143817510557"
+}
