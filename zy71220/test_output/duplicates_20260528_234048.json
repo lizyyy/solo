@@ -1,0 +1,30 @@
+[
+  {
+    "investor_id": "INV001",
+    "investor_name": "张三",
+    "product_code": "PROD001",
+    "count": 2,
+    "orders": [
+      {
+        "subscription_id": "82dac68a3e83",
+        "order_no": "TEST001",
+        "subscription_amount": 1000000.0,
+        "submit_time": "2026-05-25 23:40:48",
+        "status": "草稿",
+        "cool_off_status": "冷静期中",
+        "errors": []
+      },
+      {
+        "subscription_id": "aed133c10f73",
+        "order_no": "TEST004",
+        "subscription_amount": 2000000.0,
+        "submit_time": "2026-05-27 23:40:48",
+        "status": "草稿",
+        "cool_off_status": "冷静期中",
+        "errors": [
+          "重复认购拦截：投资者[张三]在产品[PROD001]下已有2笔认购，本单为第2笔重复认购已拦截；首单：TEST001"
+        ]
+      }
+    ]
+  }
+]

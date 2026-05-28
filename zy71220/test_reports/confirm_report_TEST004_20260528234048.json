@@ -1,0 +1,72 @@
+{
+  "报告基本信息": {
+    "report_id": "bd945d3e7a5f",
+    "generate_time": "2026-05-28 23:40:48",
+    "operator": "test_operator",
+    "include_items": [
+      "打款流水信息",
+      "警告信息",
+      "材料明细",
+      "回访明细",
+      "冷静期明细",
+      "错误详情"
+    ]
+  },
+  "认购单信息": {
+    "subscription_id": "27a8c1a0d83b",
+    "order_no": "TEST004",
+    "investor_id": "INV001",
+    "investor_name": "张三 - 重复认购",
+    "product_code": "PROD001",
+    "product_name": "私募产品A",
+    "subscription_amount": 2000000,
+    "submit_time": "2026-05-27 23:40:48",
+    "status": "已锁住"
+  },
+  "材料信息": {
+    "material_count": 3,
+    "materials": [
+      {
+        "material_id": "f66919540268",
+        "material_type": "身份证",
+        "status": "有效",
+        "upload_date": "2026-05-28",
+        "expire_date": "2027-05-28",
+        "file_path": "/data/id/INV001_id.jpg"
+      },
+      {
+        "material_id": "b544419ca254",
+        "material_type": "合格投资者认定",
+        "status": "有效",
+        "upload_date": "2026-05-28",
+        "expire_date": "2026-11-24",
+        "file_path": "/data/qual/INV001_qual.pdf"
+      },
+      {
+        "material_id": "952f4fb092b3",
+        "material_type": "风险测评",
+        "status": "有效",
+        "upload_date": "2026-05-28",
+        "expire_date": "2026-08-26",
+        "file_path": "/data/risk/INV001_risk.pdf"
+      }
+    ]
+  },
+  "冷静期信息": {
+    "cool_off_id": "adddf9854ea7",
+    "status": "冷静期完成",
+    "is_locked": true,
+    "lock_reason": "操作员[test_operator]于2026-05-28 23:40:48锁住：材料、冷静期、回访三者关联",
+    "start_time": "2026-05-27 11:40:48",
+    "end_time": "2026-05-28 11:40:48"
+  },
+  "回访信息": {
+    "visit_id": "a90d8e88435b",
+    "status": "已确认",
+    "record_file": "/data/visit/TEST004.mp3",
+    "visit_time": "2026-05-27 12:40:48",
+    "operator": "test_op",
+    "confirm_result": true,
+    "confirm_time": "2026-05-28 23:40:48"
+  }
+}
