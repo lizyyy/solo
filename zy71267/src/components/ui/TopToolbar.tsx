@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Upload,
   Download,
@@ -14,10 +14,12 @@ import {
   Loader2,
   CheckCircle2,
   AlertTriangle,
+  XCircle,
+  FileUp,
 } from 'lucide-react';
 import type { AcousticDataset, DisplayParameter } from '../../data/models/acoustic';
 import type { Anomaly } from '../../data/models/anomalies';
-import { captureScreenshot, exportReport, exportCSV, exportJSON } from '../../utils/exporter';
+import { captureScreenshot, exportReport, exportCSV, exportJSON, exportDataTemplate } from '../../utils/exporter';
 
 interface TopToolbarProps {
   dataset: AcousticDataset | null;
@@ -26,6 +28,7 @@ interface TopToolbarProps {
   isLoading: boolean;
   cameraView: string;
   onLoadDataset: (type: 'normal' | 'anomaly') => Promise<void>;
+  onLoadCustomDataset: (dataset: AcousticDataset) => void;
   onSetCameraView: (view: 'perspective' | 'top' | 'front' | 'side') => void;
 }
 
@@ -36,6 +39,7 @@ export function TopToolbar({
   isLoading,
   cameraView,
   onLoadDataset,
+  onLoadCustomDataset,
   onSetCameraView,
 }: TopToolbarProps) {
   const [showImportMenu, setShowImportMenu] = useState(false);
@@ -43,6 +47,71 @@ export function TopToolbar({
   const [showViewMenu, setShowViewMenu] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportSuccess, setExportSuccess] = useState<string | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const validateDataset = (data: unknown): data is AcousticDataset => {
+    if (!data || typeof data !== 'object') return false;
+    const obj = data as Record<string, unknown>;
+    
+    const requiredFields = ['hall', 'materialFaces', 'absorptionData', 'soundSources', 'seats', 'acousticReadings', 'rayPaths', 'reportSummary'];
+    for (const field of requiredFields) {
+      if (!(field in obj)) {
+        throw new Error(`缺少必填字段: ${field}`);
+      }
+    }
+
+    if (!Array.isArray(obj.materialFaces)) throw new Error('materialFaces 必须是数组');
+    if (!Array.isArray(obj.absorptionData)) throw new Error('absorptionData 必须是数组');
+    if (!Array.isArray(obj.soundSources)) throw new Error('soundSources 必须是数组');
+    if (!Array.isArray(obj.seats)) throw new Error('seats 必须是数组');
+    if (!Array.isArray(obj.acousticReadings)) throw new Error('acousticReadings 必须是数组');
+    if (!Array.isArray(obj.rayPaths)) throw new Error('rayPaths 必须是数组');
+
+    const reportSummary = obj.reportSummary as Record<string, unknown>;
+    if (!reportSummary.projectName || typeof reportSummary.projectName !== 'string') {
+      throw new Error('reportSummary.projectName 必须是字符串');
+    }
+
+    return true;
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImportError(null);
+    
+    try {
+      const text = await file.text();
+      let data: unknown;
+      
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error('JSON 解析失败，请检查文件格式');
+      }
+
+      if (validateDataset(data)) {
+        onLoadCustomDataset(data);
+        setShowImportMenu(false);
+        setExportSuccess('数据导入成功');
+        setTimeout(() => setExportSuccess(null), 2000);
+      }
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : '未知错误';
+      setImportError(errorMessage);
+      console.error('导入失败:', e);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleScreenshot = async () => {
     if (!dataset) return;
@@ -182,8 +251,45 @@ export function TopToolbar({
           </button>
 
           {showImportMenu && (
-            <div className="absolute right-0 top-full mt-2 w-64 rounded-xl bg-slate-800/95 backdrop-blur-md border border-slate-700/50 shadow-2xl overflow-hidden z-50">
+            <div className="absolute right-0 top-full mt-2 w-72 rounded-xl bg-slate-800/95 backdrop-blur-md border border-slate-700/50 shadow-2xl overflow-hidden z-50">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              
               <div className="p-3 border-b border-slate-700/50">
+                <p className="text-xs text-slate-400">自定义数据</p>
+              </div>
+              <div className="p-2">
+                <button
+                  className="w-full p-3 rounded-lg hover:bg-slate-700/50 flex items-start gap-3 transition-colors text-left"
+                  onClick={triggerFileInput}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                    <FileUp className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-200">导入 JSON 文件</p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      选择本地 JSON 格式的声学数据文件
+                    </p>
+                  </div>
+                </button>
+              </div>
+
+              {importError && (
+                <div className="px-3 py-2 bg-red-500/10 border-t border-red-400/30">
+                  <div className="flex items-start gap-2">
+                    <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-red-400">{importError}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="p-3 border-t border-b border-slate-700/50">
                 <p className="text-xs text-slate-400">演示数据</p>
               </div>
               <div className="p-2">
@@ -197,7 +303,7 @@ export function TopToolbar({
                   <div>
                     <p className="text-sm font-semibold text-slate-200">标准演示数据</p>
                     <p className="text-xs text-slate-400 mt-0.5">
-                      完整的音乐厅声学数据，无异常，用于正常展示流程
+                      完整的音乐厅声学数据，无异常
                     </p>
                   </div>
                 </button>
@@ -211,14 +317,14 @@ export function TopToolbar({
                   <div>
                     <p className="text-sm font-semibold text-slate-200">含异常演示数据</p>
                     <p className="text-xs text-slate-400 mt-0.5">
-                      包含材料缺失、路径过密、采样错误等真实问题
+                      材料缺失、路径过密、采样错误
                     </p>
                   </div>
                 </button>
               </div>
-              <div className="p-3 border-t border-slate-700/50">
+              <div className="p-3 bg-slate-900/50">
                 <p className="text-xs text-slate-500 text-center">
-                  支持导入自定义JSON格式声学数据
+                  支持字段: 厅堂模型、声源、座位区、材料吸声率、反射路径、声场报告
                 </p>
               </div>
             </div>
@@ -336,6 +442,24 @@ export function TopToolbar({
                   <div>
                     <p className="text-sm font-medium text-slate-200">原始数据</p>
                     <p className="text-xs text-slate-500">JSON 格式，完整数据</p>
+                  </div>
+                </button>
+                <div className="my-2 border-t border-slate-700/50" />
+                <button
+                  className="w-full p-3 rounded-lg hover:bg-slate-700/50 flex items-center gap-3 transition-colors text-left"
+                  onClick={() => {
+                    exportDataTemplate();
+                    setShowExportMenu(false);
+                    setExportSuccess('模板已导出');
+                    setTimeout(() => setExportSuccess(null), 2000);
+                  }}
+                >
+                  <div className="w-9 h-9 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                    <FileJson className="w-4 h-4 text-cyan-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-200">数据模板</p>
+                    <p className="text-xs text-slate-500">JSON 格式，示例模板</p>
                   </div>
                 </button>
               </div>

@@ -246,3 +246,104 @@ export function exportJSON(dataset: AcousticDataset, filename: string): void {
   
   URL.revokeObjectURL(url);
 }
+
+export function exportDataTemplate(): void {
+  const template: AcousticDataset = {
+    hall: {
+      id: 'hall_001',
+      name: '示例音乐厅',
+      dimensions: { width: 20, height: 8, depth: 30 },
+      center: { x: 0, y: 4, z: 0 }
+    },
+    materialFaces: [
+      {
+        id: 'face_001',
+        hallId: 'hall_001',
+        surfaceName: '左侧墙面',
+        vertices: [
+          { x: -10, y: 0, z: -15 },
+          { x: -10, y: 8, z: -15 },
+          { x: -10, y: 8, z: 15 },
+          { x: -10, y: 0, z: 15 }
+        ],
+        materialType: 'wood'
+      }
+    ],
+    absorptionData: [
+      {
+        faceId: 'face_001',
+        frequency_125Hz: 0.1,
+        frequency_250Hz: 0.15,
+        frequency_500Hz: 0.2,
+        frequency_1kHz: 0.25,
+        frequency_2kHz: 0.3,
+        frequency_4kHz: 0.35
+      }
+    ],
+    soundSources: [
+      {
+        id: 'source_001',
+        position: { x: 0, y: 5, z: -12 },
+        type: 'directional',
+        power_dB: 90,
+        name: '主舞台声源'
+      }
+    ],
+    seats: [
+      {
+        id: 'seat_001',
+        row: 'A',
+        number: 1,
+        position: { x: -8, y: 0.5, z: -5 },
+        isVip: false,
+        area: '池座区'
+      }
+    ],
+    acousticReadings: [
+      {
+        seatId: 'seat_001',
+        reverberationTime: 1.8,
+        soundPressureLevel: 85,
+        clarity: 4.5,
+        definition: 55
+      }
+    ],
+    rayPaths: [
+      {
+        id: 'ray_001',
+        sourceId: 'source_001',
+        order: 1,
+        energy: 0.8,
+        travelTime: 0.015,
+        points: [
+          { x: 0, y: 5, z: -12 },
+          { x: -8, y: 0.5, z: -5 }
+        ],
+        color: [1, 0.8, 0.2]
+      }
+    ],
+    reportSummary: {
+      projectName: '示例音乐厅声学分析',
+      date: new Date().toISOString().split('T')[0],
+      avgRT60: 1.8,
+      avgSPL: 85,
+      avgClarity: 4.5,
+      recommendations: [
+        '根据实际测量数据填写此文件',
+        '确保所有必填字段都有数据',
+        '座位坐标应在厅堂几何范围内'
+      ]
+    }
+  };
+
+  const json = JSON.stringify(template, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const link = document.createElement('a');
+  link.download = '声学数据模板.json';
+  link.href = url;
+  link.click();
+  
+  URL.revokeObjectURL(url);
+}

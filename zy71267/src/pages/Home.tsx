@@ -23,6 +23,7 @@ export default function Home() {
     showSources,
     cameraView,
     loadDataset,
+    loadCustomDataset,
     updateDisplayParam,
     updateRayFilter,
     selectSeat,
@@ -54,6 +55,7 @@ export default function Home() {
         isLoading={isLoading}
         cameraView={cameraView}
         onLoadDataset={loadDataset}
+        onLoadCustomDataset={loadCustomDataset}
         onSetCameraView={setCameraView}
       />
 
@@ -80,7 +82,7 @@ export default function Home() {
           className="flex-1 relative overflow-hidden"
         >
           {!dataset ? (
-            <WelcomeScreen onLoadDemo={loadDataset} isLoading={isLoading} />
+            <WelcomeScreen onLoadDemo={loadDataset} onLoadCustomDataset={loadCustomDataset} isLoading={isLoading} />
           ) : (
             <>
               <HallScene

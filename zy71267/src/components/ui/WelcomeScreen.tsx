@@ -1,11 +1,76 @@
-import { Activity, Eye, FileWarning, CheckCircle, ArrowRight } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Activity, Eye, FileWarning, CheckCircle, ArrowRight, FileUp, XCircle } from 'lucide-react';
+import type { AcousticDataset } from '../../data/models/acoustic';
 
 interface WelcomeScreenProps {
   onLoadDemo: (type: 'normal' | 'anomaly') => Promise<void>;
+  onLoadCustomDataset: (dataset: AcousticDataset) => void;
   isLoading: boolean;
 }
 
-export function WelcomeScreen({ onLoadDemo, isLoading }: WelcomeScreenProps) {
+export function WelcomeScreen({ onLoadDemo, onLoadCustomDataset, isLoading }: WelcomeScreenProps) {
+  const [importError, setImportError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const validateDataset = (data: unknown): data is AcousticDataset => {
+    if (!data || typeof data !== 'object') return false;
+    const obj = data as Record<string, unknown>;
+    
+    const requiredFields = ['hall', 'materialFaces', 'absorptionData', 'soundSources', 'seats', 'acousticReadings', 'rayPaths', 'reportSummary'];
+    for (const field of requiredFields) {
+      if (!(field in obj)) {
+        throw new Error(`缺少必填字段: ${field}`);
+      }
+    }
+
+    if (!Array.isArray(obj.materialFaces)) throw new Error('materialFaces 必须是数组');
+    if (!Array.isArray(obj.absorptionData)) throw new Error('absorptionData 必须是数组');
+    if (!Array.isArray(obj.soundSources)) throw new Error('soundSources 必须是数组');
+    if (!Array.isArray(obj.seats)) throw new Error('seats 必须是数组');
+    if (!Array.isArray(obj.acousticReadings)) throw new Error('acousticReadings 必须是数组');
+    if (!Array.isArray(obj.rayPaths)) throw new Error('rayPaths 必须是数组');
+
+    const reportSummary = obj.reportSummary as Record<string, unknown>;
+    if (!reportSummary.projectName || typeof reportSummary.projectName !== 'string') {
+      throw new Error('reportSummary.projectName 必须是字符串');
+    }
+
+    return true;
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImportError(null);
+    
+    try {
+      const text = await file.text();
+      let data: unknown;
+      
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error('JSON 解析失败，请检查文件格式');
+      }
+
+      if (validateDataset(data)) {
+        onLoadCustomDataset(data);
+      }
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : '未知错误';
+      setImportError(errorMessage);
+      console.error('导入失败:', e);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
@@ -59,9 +124,63 @@ export function WelcomeScreen({ onLoadDemo, isLoading }: WelcomeScreenProps) {
 
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-6">
           <h3 className="text-lg font-semibold text-slate-200 mb-4 text-center">
-            选择演示数据开始体验
+            选择数据开始体验
           </h3>
-          <div className="grid grid-cols-2 gap-4">
+          
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          
+          <button
+            className="w-full mb-4 p-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-400/30 hover:border-blue-400/50 hover:from-blue-500/20 hover:to-purple-500/20 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed group"
+            onClick={triggerFileInput}
+            disabled={isLoading}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                <FileUp className="w-6 h-6 text-blue-400" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-base font-semibold text-blue-300">导入自定义数据</h4>
+                <p className="text-sm text-slate-400">
+                  选择本地 JSON 格式的声学数据文件
+                </p>
+              </div>
+              <ArrowRight className="w-5 h-5 text-blue-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+            </div>
+            <div className="flex items-center gap-2 mt-3 ml-16">
+              <span className="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400">厅堂模型</span>
+              <span className="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400">声源</span>
+              <span className="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400">座位区</span>
+              <span className="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400">材料吸声率</span>
+              <span className="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400">反射路径</span>
+              <span className="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400">声场报告</span>
+            </div>
+          </button>
+
+          {importError && (
+            <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-400/30">
+              <div className="flex items-start gap-2">
+                <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-400">{importError}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-700/50" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="px-3 bg-slate-800/50 text-xs text-slate-500">或使用演示数据</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mt-4">
             <button
               className="group p-5 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-400/30 hover:border-emerald-400/50 hover:from-emerald-500/20 hover:to-emerald-600/20 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => onLoadDemo('normal')}
@@ -75,12 +194,11 @@ export function WelcomeScreen({ onLoadDemo, isLoading }: WelcomeScreenProps) {
               </div>
               <h4 className="text-base font-semibold text-emerald-300 mb-1">标准演示流程</h4>
               <p className="text-sm text-slate-400">
-                完整的音乐厅声学数据，无异常。体验从数据导入、参数切换到报告导出的完整工作流
+                完整的音乐厅声学数据，无异常
               </p>
               <div className="flex items-center gap-2 mt-3">
                 <span className="text-xs px-2 py-1 rounded bg-emerald-500/20 text-emerald-400">192 座位</span>
                 <span className="text-xs px-2 py-1 rounded bg-emerald-500/20 text-emerald-400">800 射线</span>
-                <span className="text-xs px-2 py-1 rounded bg-emerald-500/20 text-emerald-400">无异常</span>
               </div>
             </button>
 
@@ -97,12 +215,11 @@ export function WelcomeScreen({ onLoadDemo, isLoading }: WelcomeScreenProps) {
               </div>
               <h4 className="text-base font-semibold text-amber-300 mb-1">异常检测演示</h4>
               <p className="text-sm text-slate-400">
-                故意混入材料缺失、路径过密、采样错误等真实问题，验证系统的异常识别能力
+                包含材料缺失、路径过密、采样错误
               </p>
               <div className="flex items-center gap-2 mt-3">
                 <span className="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400">材料缺失</span>
                 <span className="text-xs px-2 py-1 rounded bg-amber-500/20 text-amber-400">路径过密</span>
-                <span className="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400">采样错误</span>
               </div>
             </button>
           </div>
