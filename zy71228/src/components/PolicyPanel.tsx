@@ -49,14 +49,20 @@ export function PolicyPanel({ gameId, currentRound, disabled }: PolicyPanelProps
   ) || [];
 
   const onSubmit = (data: PolicyFormData) => {
-    const validation = validatePolicyAction(data);
+    const action = {
+      type: data.type!,
+      direction: data.direction!,
+      amount: data.amount!,
+      term: data.term!,
+    };
+    const validation = validatePolicyAction(action);
     if (!validation.valid) {
       setErrors(validation.errors);
       return;
     }
     
     addPolicyAction(gameId, {
-      ...data,
+      ...action,
       status: 'tentative',
     });
     setErrors([]);

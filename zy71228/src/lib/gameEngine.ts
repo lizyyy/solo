@@ -343,7 +343,7 @@ export function getDifficultyConfig(difficulty: Difficulty): {
   }
 }
 
-export function validatePolicyAction(action: Omit<PolicyAction, 'id' | 'roundNumber'>): {
+export function validatePolicyAction(action: Omit<PolicyAction, 'id' | 'roundNumber' | 'status'>): {
   valid: boolean;
   errors: string[];
 } {

@@ -22,7 +22,6 @@ describe('gameEngine - 验证逻辑', () => {
         direction: 'inject',
         amount: 0,
         term: 7,
-        status: 'tentative',
       });
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('金额必须大于0');
@@ -34,7 +33,6 @@ describe('gameEngine - 验证逻辑', () => {
         direction: 'inject',
         amount: undefined as unknown as number,
         term: 7,
-        status: 'tentative',
       });
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('金额必须大于0');
@@ -46,7 +44,6 @@ describe('gameEngine - 验证逻辑', () => {
         direction: 'inject',
         amount: 500,
         term: 0,
-        status: 'tentative',
       });
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('期限必须大于0');
@@ -58,7 +55,6 @@ describe('gameEngine - 验证逻辑', () => {
         direction: 'inject',
         amount: 6000,
         term: 7,
-        status: 'tentative',
       });
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('单次操作金额不能超过5000亿元');
@@ -70,7 +66,6 @@ describe('gameEngine - 验证逻辑', () => {
         direction: 'inject',
         amount: 500,
         term: 7,
-        status: 'tentative',
       });
       expect(result.valid).toBe(true);
       expect(result.errors).toHaveLength(0);

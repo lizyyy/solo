@@ -77,8 +77,6 @@ export interface ClassNote {
   createdAt: string;
 }
 
-export type RoundStatus = 'pending' | 'confirmed';
-
 export interface GameState {
   game: Game;
   marketHistory: MarketState[];
