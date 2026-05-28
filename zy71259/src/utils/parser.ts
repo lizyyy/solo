@@ -63,7 +63,7 @@ function transformRows(
       return { type, data, warnings, rawRows }
     }
     case 'exposure': {
-      const data: Exposure[] = rows.map((r) => {
+      const data: Exposure[] = rows.map((r, i) => {
         const amt = parseFloat(r['金额'] || r['amount'] || '0')
         const dir = (r['方向'] || r['direction'] || '').toUpperCase()
         const direction = dir === '收' || dir === 'RECEIVE' || dir === 'LONG' ? 'LONG' : 'SHORT'
@@ -78,7 +78,7 @@ function transformRows(
           direction,
           dueDate: r['到期日'] || r['dueDate'] || '',
           contractNo: r['合同编号'] || r['contractNo'] || '',
-          originalRaw: rawRows[0] || JSON.stringify(r),
+          originalRaw: rawRows[i] || JSON.stringify(r),
           manualNote: r['手工备注'] || r['manualNote'] || '',
           source: 'import',
           hedged: false,
@@ -88,7 +88,7 @@ function transformRows(
       return { type, data, warnings, rawRows }
     }
     case 'hedge': {
-      const data: HedgeContract[] = rows.map((r) => {
+      const data: HedgeContract[] = rows.map((r, i) => {
         const amt = parseFloat(r['名义金额'] || r['notionalAmount'] || '0')
         const dir = (r['方向'] || r['direction'] || '').toUpperCase()
         const direction = dir === '买' || dir === 'LONG' || dir === 'BUY' ? 'LONG' : 'SHORT'
@@ -104,7 +104,7 @@ function transformRows(
           dueDate: r['到期日'] || r['dueDate'] || '',
           hedgeType: r['套保工具类型'] || r['hedgeType'] || '',
           counterparty: r['对手方'] || r['counterparty'] || '',
-          originalRaw: JSON.stringify(r),
+          originalRaw: rawRows[i] || JSON.stringify(r),
           manualNote: r['手工备注'] || r['manualNote'] || '',
         }
       })

@@ -1,15 +1,18 @@
 import { useState } from 'react'
 import { useExposureStore } from '@/store/exposureStore'
-import { Pencil, Check, X } from 'lucide-react'
+import { Pencil, Check, X, Info } from 'lucide-react'
+import type { Exposure } from '@/types'
 
 export default function DetailTable() {
   const exposures = useExposureStore((s) => s.exposures)
   const subsidiaries = useExposureStore((s) => s.subsidiaries)
   const selectedNodeId = useExposureStore((s) => s.selectedNodeId)
+  const setSelectedNodeId = useExposureStore((s) => s.setSelectedNodeId)
   const updateExposureNote = useExposureStore((s) => s.updateExposureNote)
   const toggleExposureHedge = useExposureStore((s) => s.toggleExposureHedge)
   const [editingNote, setEditingNote] = useState<string | null>(null)
   const [noteText, setNoteText] = useState('')
+  const [showRawId, setShowRawId] = useState<string | null>(null)
 
   const filtered = selectedNodeId
     ? selectedNodeId.startsWith('cur-')
@@ -40,6 +43,22 @@ export default function DetailTable() {
     setNoteText('')
   }
 
+  const handleRowClick = (exp: Exposure) => {
+    const nodeId = `cur-${exp.subsidiaryCode}-${exp.currencyCode}`
+    setSelectedNodeId(selectedNodeId === nodeId ? null : nodeId)
+  }
+
+  const formatRaw = (raw: string): string => {
+    try {
+      const obj = JSON.parse(raw)
+      return Object.entries(obj)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(' | ')
+    } catch {
+      return raw
+    }
+  }
+
   if (exposures.length === 0) {
     return (
       <div className="text-center text-txt-muted py-8 text-sm">
@@ -60,6 +79,7 @@ export default function DetailTable() {
             <th className="text-center py-2 px-2 text-txt-secondary font-medium">套保</th>
             <th className="text-left py-2 px-2 text-txt-secondary font-medium">到期日</th>
             <th className="text-left py-2 px-2 text-txt-secondary font-medium">备注</th>
+            <th className="text-center py-2 px-2 text-txt-secondary font-medium">原始</th>
           </tr>
         </thead>
         <tbody>
@@ -67,57 +87,79 @@ export default function DetailTable() {
             const sub = subsidiaries.find((s) => s.code === exp.subsidiaryCode)
             const isSelected = selectedNodeId === `cur-${exp.subsidiaryCode}-${exp.currencyCode}`
             return (
-              <tr
-                key={exp.id}
-                className={`border-b border-border/50 transition-colors ${isSelected ? 'bg-accent-green/5' : 'hover:bg-card'}`}
-              >
-                <td className="py-2 px-2">{sub?.name || exp.subsidiaryCode}</td>
-                <td className="py-2 px-2 font-mono">{exp.currencyCode}</td>
-                <td className="py-2 px-2 text-right font-mono">
-                  {exp.amount.toLocaleString()}
-                </td>
-                <td className="py-2 px-2 text-center">
-                  <span className={`px-2 py-0.5 rounded-full text-xs ${exp.direction === 'LONG' ? 'bg-accent-green/15 text-accent-green' : 'bg-accent-red/15 text-accent-red'}`}>
-                    {exp.direction === 'LONG' ? '多' : '空'}
-                  </span>
-                </td>
-                <td className="py-2 px-2 text-center">
-                  <button
-                    className={`px-2 py-0.5 rounded-full text-xs cursor-pointer transition-colors ${exp.hedged ? 'bg-accent-gold/15 text-accent-gold' : 'bg-card text-txt-muted'}`}
-                    onClick={() => toggleExposureHedge(exp.id, exp.hedgeContractNo)}
-                  >
-                    {exp.hedged ? '已套保' : '未套保'}
-                  </button>
-                </td>
-                <td className="py-2 px-2 text-txt-secondary">{exp.dueDate}</td>
-                <td className="py-2 px-2">
-                  {editingNote === exp.id ? (
-                    <div className="flex items-center gap-1">
-                      <input
-                        className="bg-deep border border-border rounded px-1 py-0.5 text-xs w-24 text-txt-primary outline-none focus:border-accent-green"
-                        value={noteText}
-                        onChange={(e) => setNoteText(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter') saveNote(exp.id); if (e.key === 'Escape') cancelEdit() }}
-                        autoFocus
-                      />
-                      <button className="text-accent-green hover:text-accent-green/80" onClick={() => saveNote(exp.id)}><Check size={12} /></button>
-                      <button className="text-accent-red hover:text-accent-red/80" onClick={cancelEdit}><X size={12} /></button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1 group">
-                      <span className="text-txt-muted truncate max-w-[100px]" title={exp.manualNote}>
-                        {exp.manualNote || '-'}
-                      </span>
-                      <button
-                        className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-accent-green transition-opacity"
-                        onClick={() => startEdit(exp.id, exp.manualNote)}
-                      >
-                        <Pencil size={10} />
-                      </button>
-                    </div>
-                  )}
-                </td>
-              </tr>
+              <>
+                <tr
+                  key={exp.id}
+                  className={`border-b border-border/50 transition-colors cursor-pointer ${isSelected ? 'bg-accent-green/5' : 'hover:bg-card'}`}
+                  onClick={() => handleRowClick(exp)}
+                >
+                  <td className="py-2 px-2">{sub?.name || exp.subsidiaryCode}</td>
+                  <td className="py-2 px-2 font-mono">{exp.currencyCode}</td>
+                  <td className="py-2 px-2 text-right font-mono">
+                    {exp.amount.toLocaleString()}
+                  </td>
+                  <td className="py-2 px-2 text-center">
+                    <span className={`px-2 py-0.5 rounded-full text-xs ${exp.direction === 'LONG' ? 'bg-accent-green/15 text-accent-green' : 'bg-accent-red/15 text-accent-red'}`}>
+                      {exp.direction === 'LONG' ? '多' : '空'}
+                    </span>
+                  </td>
+                  <td className="py-2 px-2 text-center">
+                    <button
+                      className={`px-2 py-0.5 rounded-full text-xs cursor-pointer transition-colors ${exp.hedged ? 'bg-accent-gold/15 text-accent-gold' : 'bg-card text-txt-muted'}`}
+                      onClick={(e) => { e.stopPropagation(); toggleExposureHedge(exp.id, exp.hedgeContractNo) }}
+                    >
+                      {exp.hedged ? '已套保' : '未套保'}
+                    </button>
+                  </td>
+                  <td className="py-2 px-2 text-txt-secondary">{exp.dueDate}</td>
+                  <td className="py-2 px-2">
+                    {editingNote === exp.id ? (
+                      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          className="bg-deep border border-border rounded px-1 py-0.5 text-xs w-24 text-txt-primary outline-none focus:border-accent-green"
+                          value={noteText}
+                          onChange={(e) => setNoteText(e.target.value)}
+                          onKeyDown={(e) => { if (e.key === 'Enter') saveNote(exp.id); if (e.key === 'Escape') cancelEdit() }}
+                          autoFocus
+                        />
+                        <button className="text-accent-green hover:text-accent-green/80" onClick={() => saveNote(exp.id)}><Check size={12} /></button>
+                        <button className="text-accent-red hover:text-accent-red/80" onClick={cancelEdit}><X size={12} /></button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 group" onClick={(e) => e.stopPropagation()}>
+                        <span className="text-txt-muted truncate max-w-[100px]" title={exp.manualNote}>
+                          {exp.manualNote || '-'}
+                        </span>
+                        <button
+                          className="opacity-0 group-hover:opacity-100 text-txt-muted hover:text-accent-green transition-opacity"
+                          onClick={() => startEdit(exp.id, exp.manualNote)}
+                        >
+                          <Pencil size={10} />
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                  <td className="py-2 px-2 text-center" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="text-txt-muted hover:text-accent-blue transition-colors"
+                      onClick={() => setShowRawId(showRawId === exp.id ? null : exp.id)}
+                      title="查看原始口径"
+                    >
+                      <Info size={12} />
+                    </button>
+                  </td>
+                </tr>
+                {showRawId === exp.id && (
+                  <tr className="bg-deep/50">
+                    <td colSpan={8} className="py-2 px-4">
+                      <div className="text-xs text-txt-muted mb-1 font-medium">原始口径数据（导入时保留）：</div>
+                      <div className="text-xs text-txt-secondary font-mono break-all bg-deep p-2 rounded">
+                        {formatRaw(exp.originalRaw)}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </>
             )
           })}
         </tbody>

@@ -96,9 +96,7 @@ export function buildTreeData(
   return root
 }
 
-export function calcSummary(exposures: Exposure[], hedgeContracts: HedgeContract[]): ExposureSummary {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  void hedgeContracts
+export function calcSummary(exposures: Exposure[], _hedgeContracts: HedgeContract[]): ExposureSummary {
   const totalLong = exposures.filter((e) => e.direction === 'LONG').reduce((s, e) => s + e.amount, 0)
   const totalShort = exposures.filter((e) => e.direction === 'SHORT').reduce((s, e) => s + e.amount, 0)
   const netExposure = totalLong - totalShort
