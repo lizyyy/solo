@@ -21,6 +21,7 @@ interface WorkshopState {
   priceHistory: PriceRecord[]
   selectedBondId: string | null
   lastEventId: string | null
+  lastSnapshotAt: number
 
   setCurveRate: (tenor: Tenor, rate: number) => void
   setWeight: (bondId: string, weight: number) => void
@@ -31,7 +32,7 @@ interface WorkshopState {
   completeSession: () => void
   loadSession: (id: string) => void
   deleteSession: (id: string) => void
-  snapshotCurve: () => void
+  snapshot: () => void
   clearAlerts: () => void
   resetCurve: () => void
 
@@ -85,6 +86,7 @@ export const useStore = create<WorkshopState>((set, get) => ({
   priceHistory: [],
   selectedBondId: null,
   lastEventId: null,
+  lastSnapshotAt: 0,
 
   setCurveRate: (tenor, rate) => {
     set(state => {
@@ -105,7 +107,7 @@ export const useStore = create<WorkshopState>((set, get) => ({
 
       return { curve: newCurve, alerts: newAlerts, priceHistory: newPriceHistory }
     })
-    get().snapshotCurve()
+    get().snapshot()
   },
 
   setWeight: (bondId, weight) => {
@@ -117,6 +119,7 @@ export const useStore = create<WorkshopState>((set, get) => ({
       const newAlerts = runAllChecks(state.curve, newPositions, portDur, state.targetDuration)
       return { positions: newPositions, alerts: newAlerts }
     })
+    get().snapshot()
   },
 
   setTargetDuration: (d) => {
@@ -144,7 +147,7 @@ export const useStore = create<WorkshopState>((set, get) => ({
       }
       return { curve: newCurve, alerts: newAlerts, priceHistory: newPriceHistory, lastEventId: eventId }
     })
-    get().snapshotCurve()
+    get().snapshot()
   },
 
   selectBond: (bondId) => set({ selectedBondId: bondId }),
@@ -176,13 +179,20 @@ export const useStore = create<WorkshopState>((set, get) => ({
   completeSession: () => {
     const session = get().currentSession
     if (!session) return
+    const finalCurve = { points: get().curve.map(p => ({ ...p })), timestamp: Date.now() }
+    const finalPortfolio = get().positions.map(p => ({ ...p }))
     const completed: PracticeSession = {
       ...session,
       completedAt: Date.now(),
       durationScore: get().getDurationScore(),
       actualDuration: get().getPortfolioDuration(),
+      targetDuration: get().targetDuration,
       alerts: [...get().alerts],
       priceHistory: [...get().priceHistory],
+      curveSnapshots: [...session.curveSnapshots, finalCurve],
+      portfolioHistory: [...session.portfolioHistory, finalPortfolio],
+      finalWeights: finalPortfolio,
+      finalCurve: finalCurve.points,
     }
     const sessions = [...get().sessions, completed]
     saveSessionsToStorage(sessions)
@@ -210,17 +220,19 @@ export const useStore = create<WorkshopState>((set, get) => ({
     set({ sessions })
   },
 
-  snapshotCurve: () => {
+  snapshot: () => {
     const session = get().currentSession
     if (!session) return
-    const snapshot: CurveSnapshot = { points: get().curve.map(p => ({ ...p })), timestamp: Date.now() }
+    const now = Date.now()
+    if (now - get().lastSnapshotAt < 2000) return
+    const curveSnap: CurveSnapshot = { points: get().curve.map(p => ({ ...p })), timestamp: now }
     const portfolio = get().positions.map(p => ({ ...p }))
     const updated: PracticeSession = {
       ...session,
-      curveSnapshots: [...session.curveSnapshots, snapshot],
+      curveSnapshots: [...session.curveSnapshots, curveSnap],
       portfolioHistory: [...session.portfolioHistory, portfolio],
     }
-    set({ currentSession: updated })
+    set({ currentSession: updated, lastSnapshotAt: now })
   },
 
   clearAlerts: () => set({ alerts: [] }),

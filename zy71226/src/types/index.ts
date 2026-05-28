@@ -66,6 +66,8 @@ export interface PracticeSession {
   actualDuration: number
   createdAt: number
   completedAt?: number
+  finalWeights?: PortfolioPosition[]
+  finalCurve?: YieldCurvePoint[]
 }
 
 export interface PolicyEvent {

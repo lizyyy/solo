@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useStore } from '@/store/useStore'
 import { ALERT_CONFIG } from '@/utils/scenarioDetect'
-import { Play, RotateCcw, ChevronLeft, ChevronRight, AlertTriangle, GaugeCircle, Weight } from 'lucide-react'
+import { Play, RotateCcw, ChevronLeft, ChevronRight, AlertTriangle, GaugeCircle, Weight, Target, Clock } from 'lucide-react'
 
 export default function ReviewPage() {
   const sessions = useStore(s => s.sessions)
@@ -134,6 +134,85 @@ export default function ReviewPage() {
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+
+            <div className="glass-panel rounded-xl p-5 mb-6">
+              <h3 className="font-semibold text-slate-200 mb-4">📋 最终配置摘要</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2 text-sm text-slate-400">
+                    <Target size={14} />
+                    久期结果
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-xs text-slate-500">目标久期</span>
+                      <span className="font-mono text-sm text-slate-300">{selected.targetDuration.toFixed(2)}年</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-xs text-slate-500">实际久期</span>
+                      <span className={`font-mono text-sm ${Math.abs(selected.actualDuration - selected.targetDuration) > 1 ? 'text-red-400' : 'text-emerald-400'}`}>
+                        {selected.actualDuration.toFixed(2)}年
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-xs text-slate-500">最终得分</span>
+                      <span className={`font-mono text-lg font-bold ${
+                        selected.durationScore >= 80 ? 'text-emerald-400' :
+                        selected.durationScore >= 50 ? 'text-gold-400' : 'text-red-400'
+                      }`}>
+                        {selected.durationScore}分
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-2 text-sm text-slate-400">
+                    <Clock size={14} />
+                    组合权重
+                  </div>
+                  <div className="space-y-1">
+                    {selected.finalWeights?.map((w, i) => {
+                      const bond = useStore.getState().bonds[i]
+                      return (
+                        <div key={i} className="flex justify-between text-xs">
+                          <span className="text-slate-500">{bond?.name || `债券${i+1}`}</span>
+                          <span className="font-mono text-slate-300">{w.weight.toFixed(1)}%</span>
+                        </div>
+                      )
+                    })}
+                    <div className="flex justify-between text-xs pt-1 border-t border-navy-600">
+                      <span className="text-slate-400">合计</span>
+                      <span className={`font-mono font-medium ${
+                        (selected.finalWeights?.reduce((s, w) => s + w.weight, 0) || 0) > 100
+                          ? 'text-red-400' : 'text-gold-400'
+                      }`}>
+                        {(selected.finalWeights?.reduce((s, w) => s + w.weight, 0) || 0).toFixed(1)}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-2 text-sm text-slate-400">
+                    <AlertTriangle size={14} />
+                    收益率曲线
+                  </div>
+                  <div className="grid grid-cols-4 gap-1">
+                    {selected.finalCurve?.map(p => (
+                      <div key={p.tenor} className="text-center">
+                        <div className="text-xs text-slate-600">{p.tenor}</div>
+                        <div className="font-mono text-xs text-slate-300">{p.rate.toFixed(1)}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-2 text-xs">
+                    <span className="text-slate-500">形态：</span>
+                    <span className={selected.alerts.some(a => a.type === 'inversion') ? 'text-red-400' : 'text-emerald-400'}>
+                      {selected.alerts.some(a => a.type === 'inversion') ? '⚠ 倒挂' : '✓ 正常'}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
