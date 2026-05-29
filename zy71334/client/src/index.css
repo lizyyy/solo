@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-stage-border;
+  }
+  
+  body {
+    @apply bg-stage-darker text-slate-200 font-mono;
+    background-image: linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+}
+
+@layer components {
+  .status-dot {
+    @apply w-2 h-2 rounded-full inline-block;
+  }
+  
+  .status-pending {
+    @apply bg-accent-amber shadow-glow-amber;
+  }
+  
+  .status-in_progress {
+    @apply bg-accent-yellow animate-pulse;
+  }
+  
+  .status-resolved {
+    @apply bg-accent-green shadow-glow-green;
+  }
+  
+  .status-confirmed {
+    @apply bg-accent-green shadow-glow-green;
+  }
+  
+  .card {
+    @apply bg-stage-dark border border-stage-border rounded-md p-4;
+  }
+  
+  .card-hover {
+    @apply card transition-all duration-200 hover:border-accent-amber/50 hover:shadow-glow-amber/20;
+  }
+  
+  .btn {
+    @apply px-4 py-2 rounded text-sm font-medium transition-all duration-200 border;
+  }
+  
+  .btn-primary {
+    @apply btn bg-accent-amber text-stage-darker border-accent-amber hover:bg-accent-amber/90 hover:shadow-glow-amber/50;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-stage-blue text-slate-200 border-stage-border hover:border-accent-amber/50;
+  }
+  
+  .btn-danger {
+    @apply btn bg-accent-red/20 text-accent-red border-accent-red/50 hover:bg-accent-red/30;
+  }
+  
+  .input {
+    @apply w-full px-3 py-2 bg-stage-darker border border-stage-border rounded text-sm text-slate-200 focus:outline-none focus:border-accent-amber focus:shadow-glow-amber/30 transition-all duration-200;
+  }
+  
+  .label {
+    @apply block text-xs text-slate-400 mb-1 uppercase tracking-wider;
+  }
+  
+  .timeline-line {
+    @apply absolute left-3 top-0 bottom-0 w-px bg-stage-border;
+  }
+  
+  .timeline-dot {
+    @apply absolute left-1.5 w-4 h-4 rounded-full border-2 border-stage-dark bg-stage-border z-10;
+  }
+  
+  .timeline-dot-active {
+    @apply bg-accent-amber border-accent-amber shadow-glow-amber;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #334155 #0f172a;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+}
