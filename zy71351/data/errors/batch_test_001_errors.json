@@ -1,0 +1,115 @@
+[
+  {
+    "conflict_type": "duplicate_edition",
+    "severity": "critical",
+    "description": "版号重复: 山水系列::1/50 被分配给 2 个购买人: 张三, 李四",
+    "affected_records": [
+      "rec_6bf7105d22d6",
+      "rec_e9bbfc6381b6"
+    ],
+    "details": {
+      "edition_key": "山水系列::1/50",
+      "buyers": [
+        "张三",
+        "李四"
+      ],
+      "record_ids": [
+        "rec_6bf7105d22d6",
+        "rec_e9bbfc6381b6"
+      ],
+      "conflict_scope": "within_batch"
+    }
+  },
+  {
+    "conflict_type": "stale_return_status",
+    "severity": "info",
+    "description": "退货后状态未改: 花鸟系列::3/30 可能已退货但仍标记为已售",
+    "affected_records": [
+      "rec_3aaf3406adca"
+    ],
+    "details": {
+      "edition_key": "花鸟系列::3/30",
+      "buyer": null,
+      "status": "sold",
+      "suggested_status": "returned"
+    }
+  },
+  {
+    "conflict_type": "stale_return_status",
+    "severity": "info",
+    "description": "退货状态未清理: 人物系列::5/20 标记为退货，但仍保留购买人/证书信息",
+    "affected_records": [
+      "rec_f431891c9bd6"
+    ],
+    "details": {
+      "edition_key": "人物系列::5/20",
+      "buyer": "孙八",
+      "certificate_number": null,
+      "status": "returned",
+      "should_clear": [
+        "buyer",
+        "certificate_number"
+      ]
+    }
+  },
+  {
+    "conflict_type": "duplicate_certificate",
+    "severity": "critical",
+    "description": "证书号重复: CERT-001 被分配给多个版号: 山水系列::1/50, 山水系列::3/50",
+    "affected_records": [
+      "rec_6bf7105d22d6",
+      "rec_b273266e720b"
+    ],
+    "details": {
+      "certificate_number": "CERT-001",
+      "editions": [
+        "山水系列::1/50",
+        "山水系列::3/50"
+      ]
+    }
+  },
+  {
+    "conflict_type": "duplicate_edition",
+    "severity": "critical",
+    "description": "同系列版号重复: 山水系列 regular版 第1号出现2次",
+    "affected_records": [
+      "rec_6bf7105d22d6",
+      "rec_e9bbfc6381b6"
+    ],
+    "details": {
+      "series": "山水系列",
+      "type": "regular",
+      "duplicate_number": 1
+    }
+  },
+  {
+    "conflict_type": "inconsistent_edition_total",
+    "severity": "warning",
+    "description": "版号总数不一致: 人物系列 regular版 出现不同总数: {50, 20}",
+    "affected_records": [
+      "rec_f431891c9bd6",
+      "rec_432ea30f49d9"
+    ],
+    "details": {
+      "series": "人物系列",
+      "type": "regular",
+      "totals": [
+        50,
+        20
+      ]
+    }
+  },
+  {
+    "conflict_type": "invalid_edition_number",
+    "severity": "critical",
+    "description": "版号超出范围: 人物系列 51/50 超出1-50范围",
+    "affected_records": [
+      "rec_432ea30f49d9"
+    ],
+    "details": {
+      "series": "人物系列",
+      "edition": "51/50",
+      "max_number": 50
+    }
+  }
+]

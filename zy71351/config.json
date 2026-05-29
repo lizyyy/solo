@@ -1,0 +1,17 @@
+{
+  "data_dirs": {
+    "input": "data/input",
+    "output": "data/output",
+    "errors": "data/errors",
+    "history": "data/history"
+  },
+  "edition_formats": {
+    "regular": "^(\\d+)/(\\d+)$",
+    "ap": "^AP\\s+(\\d+)/(\\d+)$"
+  },
+  "conflict_severity": {
+    "duplicate_edition": "critical",
+    "missing_certificate": "warning",
+    "stale_return_status": "info"
+  }
+}

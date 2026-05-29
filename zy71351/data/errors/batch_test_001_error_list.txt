@@ -1,0 +1,30 @@
+错误清单 - 批次 batch_test_001
+============================================================
+生成时间: 2026-05-29 19:31:29
+
+🔴 严重 (4项):
+  1. 版号重复: 山水系列::1/50 被分配给 2 个购买人: 张三, 李四
+     记录ID: rec_6bf7105d22d6, rec_e9bbfc6381b6
+     详情: {"edition_key": "山水系列::1/50", "buyers": ["张三", "李四"], "record_ids": ["rec_6bf7105d22d6", "rec_e9bbfc6381b6"], "conflict_scope": "within_batch"}
+  2. 证书号重复: CERT-001 被分配给多个版号: 山水系列::1/50, 山水系列::3/50
+     记录ID: rec_6bf7105d22d6, rec_b273266e720b
+     详情: {"certificate_number": "CERT-001", "editions": ["山水系列::1/50", "山水系列::3/50"]}
+  3. 同系列版号重复: 山水系列 regular版 第1号出现2次
+     记录ID: rec_6bf7105d22d6, rec_e9bbfc6381b6
+     详情: {"series": "山水系列", "type": "regular", "duplicate_number": 1}
+  4. 版号超出范围: 人物系列 51/50 超出1-50范围
+     记录ID: rec_432ea30f49d9
+     详情: {"series": "人物系列", "edition": "51/50", "max_number": 50}
+
+🟡 警告 (1项):
+  1. 版号总数不一致: 人物系列 regular版 出现不同总数: {50, 20}
+     记录ID: rec_f431891c9bd6, rec_432ea30f49d9
+     详情: {"series": "人物系列", "type": "regular", "totals": [50, 20]}
+
+🔵 信息 (2项):
+  1. 退货后状态未改: 花鸟系列::3/30 可能已退货但仍标记为已售
+     记录ID: rec_3aaf3406adca
+     详情: {"edition_key": "花鸟系列::3/30", "buyer": null, "status": "sold", "suggested_status": "returned"}
+  2. 退货状态未清理: 人物系列::5/20 标记为退货，但仍保留购买人/证书信息
+     记录ID: rec_f431891c9bd6
+     详情: {"edition_key": "人物系列::5/20", "buyer": "孙八", "certificate_number": null, "status": "returned", "should_clear": ["buyer", "certificate_number"]}

@@ -1,0 +1,106 @@
+[
+  {
+    "operation": "add_with_validation",
+    "batch_id": "batch_test_001",
+    "timestamp": "2026-05-29T19:30:33.260445",
+    "record_count": 8,
+    "conflict_count": 8,
+    "export_count": null,
+    "user": null,
+    "details": {
+      "input_file": "test_data_batch1.json",
+      "is_valid": false
+    }
+  },
+  {
+    "operation": "add_certificate",
+    "batch_id": "batch_test_001",
+    "timestamp": "2026-05-29T19:31:21.003669",
+    "record_count": 1,
+    "conflict_count": 0,
+    "export_count": null,
+    "user": null,
+    "details": {
+      "record_id": "rec_146cf0f90694",
+      "certificate_number": "CERT-008"
+    }
+  },
+  {
+    "operation": "return",
+    "batch_id": "batch_test_001",
+    "timestamp": "2026-05-29T19:31:21.205056",
+    "record_count": 1,
+    "conflict_count": 0,
+    "export_count": null,
+    "user": null,
+    "details": {
+      "record_id": "rec_f431891c9bd6",
+      "edition": "人物系列::5/20",
+      "clear_certificate": true
+    }
+  },
+  {
+    "operation": "check",
+    "batch_id": "batch_test_001",
+    "timestamp": "2026-05-29T19:31:29.428468",
+    "record_count": 8,
+    "conflict_count": 7,
+    "export_count": null,
+    "user": null,
+    "details": {
+      "is_valid": false
+    }
+  },
+  {
+    "operation": "export_txt",
+    "batch_id": "batch_test_001",
+    "timestamp": "2026-05-29T19:31:41.107795",
+    "record_count": 8,
+    "conflict_count": 0,
+    "export_count": 8,
+    "user": null,
+    "details": {
+      "format": "txt",
+      "output_file": "/Users/lzy/pro/solo/workspaces/zy71351/data/output/batch_test_001_report.txt"
+    }
+  },
+  {
+    "operation": "export_csv",
+    "batch_id": "batch_test_001",
+    "timestamp": "2026-05-29T19:31:41.447703",
+    "record_count": 8,
+    "conflict_count": 0,
+    "export_count": 8,
+    "user": null,
+    "details": {
+      "format": "csv",
+      "output_file": "/Users/lzy/pro/solo/workspaces/zy71351/data/output/batch_test_001_report.csv"
+    }
+  },
+  {
+    "operation": "add_with_validation",
+    "batch_id": "batch_test_002",
+    "timestamp": "2026-05-29T19:32:00.376363",
+    "record_count": 4,
+    "conflict_count": 0,
+    "export_count": null,
+    "user": null,
+    "details": {
+      "input_file": "test_data_batch2.json",
+      "is_valid": true
+    }
+  },
+  {
+    "operation": "add_with_validation",
+    "batch_id": "batch_test_dup",
+    "timestamp": "2026-05-29T19:32:16.780419",
+    "record_count": 1,
+    "conflict_count": 1,
+    "export_count": null,
+    "user": null,
+    "details": {
+      "input_file": "/tmp/test_dup.json",
+      "is_valid": false
+    }
+  }
+]

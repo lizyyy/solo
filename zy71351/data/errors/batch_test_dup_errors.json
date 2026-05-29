@@ -1,0 +1,18 @@
+[
+  {
+    "conflict_type": "duplicate_edition",
+    "severity": "critical",
+    "description": "版号重复: 山水系列::4/50 已在历史记录中存在，购买人: 吴十",
+    "affected_records": [
+      "rec_f2466ddcda05",
+      "rec_1612bb147a59"
+    ],
+    "details": {
+      "edition_key": "山水系列::4/50",
+      "existing_buyer": "吴十",
+      "new_buyer": "测试重复",
+      "existing_batch": "batch_test_002",
+      "conflict_scope": "cross_batch"
+    }
+  }
+]

@@ -1,0 +1,68 @@
+[
+  {
+    "series": "山水系列",
+    "edition_number": "1/50",
+    "buyer": "张三",
+    "certificate_number": "CERT-001",
+    "status": "sold",
+    "verification_report": "核对通过",
+    "remarks": "VIP客户"
+  },
+  {
+    "series": "山水系列",
+    "edition_number": "1/50",
+    "buyer": "李四",
+    "certificate_number": "CERT-002",
+    "status": "sold",
+    "verification_report": "核对通过"
+  },
+  {
+    "series": "山水系列",
+    "edition_number": "2/50",
+    "buyer": "王五",
+    "certificate_number": "",
+    "status": "sold",
+    "verification_report": "待补充证书"
+  },
+  {
+    "series": "花鸟系列",
+    "edition_number": "AP 1/5",
+    "buyer": "赵六",
+    "certificate_number": "CERT-AP001",
+    "status": "sold",
+    "verification_report": "AP版核对"
+  },
+  {
+    "series": "花鸟系列",
+    "edition_number": "3/30",
+    "buyer": "",
+    "certificate_number": "CERT-003",
+    "status": "sold",
+    "verification_report": "疑似退货未更新状态"
+  },
+  {
+    "series": "山水系列",
+    "edition_number": "3/50",
+    "buyer": "钱七",
+    "certificate_number": "CERT-001",
+    "status": "sold",
+    "verification_report": "核对通过"
+  },
+  {
+    "series": "人物系列",
+    "edition_number": "5/20",
+    "buyer": "孙八",
+    "certificate_number": "CERT-004",
+    "status": "returned",
+    "verification_report": "已退货",
+    "receipt": ""
+  },
+  {
+    "series": "人物系列",
+    "edition_number": "51/50",
+    "buyer": "周九",
+    "certificate_number": "CERT-005",
+    "status": "sold",
+    "verification_report": "版号超出范围"
+  }
+]
