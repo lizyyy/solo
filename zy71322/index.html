@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>篮球投篮模拟器 - 空气阻力模型</title>
+<style>
+:root{--bg:#0f1923;--card:#1a2733;--border:#2a3a4a;--text:#e0e8f0;--dim:#7a8a9a;--accent:#00b4d8;--hit:#2ecc71;--miss:#e74c3c;--warn:#f39c12;--pending:#3498db;--returned:#e67e22}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+.app{max-width:1400px;margin:0 auto;padding:16px}
+.title{text-align:center;font-size:1.4rem;color:var(--accent);margin-bottom:16px;font-weight:700}
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--border);margin-bottom:16px;flex-wrap:wrap}
+.tab-btn{padding:10px 18px;background:0 0;border:none;color:var(--dim);cursor:pointer;font-size:.9rem;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap}
+.tab-btn:hover{color:var(--text)}.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
+.card h3{color:var(--accent);margin-bottom:10px;font-size:1rem}
+.sim-layout{display:flex;gap:16px;flex-wrap:wrap}
+.sim-left{flex:0 0 340px;min-width:280px}.sim-right{flex:1;min-width:380px}
+.param-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.param-item{display:flex;flex-direction:column;gap:2px}
+.param-item label{font-size:.78rem;color:var(--dim)}
+.param-item input,.param-item textarea{background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:5px 8px;font-size:.85rem;outline:none}
+.param-item input:focus,.param-item textarea:focus{border-color:var(--accent)}
+.param-item.full{grid-column:1/-1}
+.btn{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:.88rem;transition:all .15s;font-weight:600}
+.btn-accent{background:var(--accent);color:#000}.btn-accent:hover{filter:brightness(1.15)}
+.btn-sm{padding:4px 10px;font-size:.78rem}
+.btn-outline{background:0 0;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--accent)}
+.rules-box{background:rgba(0,180,216,.05);border:1px solid rgba(0,180,216,.15);border-radius:6px;padding:10px;margin-top:10px}
+.rules-box h4{color:var(--accent);font-size:.85rem;margin-bottom:6px}
+.rule-item{font-size:.78rem;color:var(--dim);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}.rule-item:last-child{border-bottom:none}
+.rule-item strong{color:var(--text)}
+.val-log{margin-top:10px}
+.val-entry{padding:6px 10px;font-size:.8rem;border-left:3px solid var(--border);margin-bottom:4px;background:rgba(255,255,255,.02);border-radius:0 4px 4px 0}
+.val-entry.reject{border-left-color:var(--miss)}.val-entry.pass{border-left-color:var(--hit)}.val-entry.warn{border-left-color:var(--warn)}
+.val-entry .rule-id{font-weight:700;margin-right:6px}
+canvas{width:100%;border-radius:6px;background:#0a1218;display:block}
+.result-box{margin-top:10px;padding:10px;border-radius:6px;font-size:.85rem}
+.result-box.hit{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.3)}
+.result-box.miss{background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.3)}
+.result-box .lbl{color:var(--dim);font-size:.78rem}.result-box .val{font-weight:700;font-size:1.05rem}
+.scan-config{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
+.sg{display:flex;flex-direction:column;gap:3px}.sg label{font-size:.75rem;color:var(--dim)}
+.sg select,.sg input{background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 8px;font-size:.82rem}
+.scan-stats{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0}
+.scan-stat{text-align:center;padding:8px 16px;background:var(--bg);border-radius:6px;min-width:80px}
+.scan-stat .num{font-size:1.2rem;font-weight:700}.scan-stat .lbl{font-size:.72rem;color:var(--dim)}
+.scan-table-wrap{max-height:300px;overflow:auto;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th,td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--dim);font-weight:600;position:sticky;top:0;background:var(--card);z-index:1}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.72rem;font-weight:600}
+.tag-hit{background:rgba(46,204,113,.2);color:var(--hit)}.tag-miss{background:rgba(231,76,60,.2);color:var(--miss)}
+.tag-rim{background:rgba(243,156,18,.2);color:var(--warn)}.tag-processed{background:rgba(46,204,113,.2);color:var(--hit)}
+.tag-pending{background:rgba(52,152,219,.2);color:var(--pending)}.tag-returned{background:rgba(230,126,34,.2);color:var(--returned)}
+.tag-rejected{background:rgba(231,76,60,.15);color:var(--miss)}
+.replay-layout{display:flex;gap:16px;flex-wrap:wrap}
+.replay-left{flex:0 0 240px;min-width:200px}.replay-right{flex:1;min-width:380px}
+.replay-list{max-height:480px;overflow-y:auto}
+.replay-item{padding:8px;border-radius:6px;margin-bottom:4px;cursor:pointer;border:1px solid var(--border);transition:all .15s;font-size:.8rem}
+.replay-item:hover{border-color:var(--accent)}.replay-item.selected{border-color:var(--accent);background:rgba(0,180,216,.08)}
+.replay-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.replay-controls input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
+.replay-info{margin-top:8px;font-size:.8rem;display:grid;grid-template-columns:1fr 1fr;gap:4px}.replay-info .lbl{color:var(--dim)}
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.filter-bar select,.filter-bar input{background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:5px 8px;font-size:.82rem}
+.stats-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.stat-chip{padding:6px 14px;border-radius:6px;font-size:.8rem;font-weight:600}
+.batch-bar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.batch-bar select{background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 8px;font-size:.82rem}
+.records-table-wrap{max-height:500px;overflow:auto}
+.rec-note{font-size:.75rem;color:var(--dim);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-actions{display:flex;gap:4px;flex-wrap:wrap}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;min-width:340px;max-width:500px}
+.modal h3{color:var(--accent);margin-bottom:12px}
+.modal textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:8px;font-size:.85rem;min-height:80px;resize:vertical;font-family:inherit}
+.modal .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.export-opts{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.export-opts label{font-size:.82rem;display:flex;align-items:center;gap:4px}
+.export-opts select{background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:4px 8px;font-size:.82rem}
+.export-btns{display:flex;gap:10px;margin-top:12px}
+.preview-wrap{max-height:350px;overflow:auto}
+.history-list{max-height:150px;overflow-y:auto;margin-top:6px}
+.history-item{font-size:.72rem;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);color:var(--dim)}
+.history-item .ts{color:var(--accent);margin-right:6px}
+.flex-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="title">🏀 篮球投篮模拟器 — 空气阻力模型</div>
+<nav class="tabs">
+<button class="tab-btn active" data-tab="sim">单次模拟</button>
+<button class="tab-btn" data-tab="scan">参数扫描</button>
+<button class="tab-btn" data-tab="replay">轨迹回放</button>
+<button class="tab-btn" data-tab="records">模拟记录</button>
+<button class="tab-btn" data-tab="export">报告导出</button>
+</nav>
+
+<div class="panel active" id="panel-sim">
+<div class="sim-layout">
+<div class="sim-left">
+<div class="card"><h3>参数设置</h3><div class="param-grid" id="param-grid"></div></div>
+<div class="card">
+<div class="flex-row" style="margin-bottom:8px"><button class="btn btn-accent" id="btn-run">运行模拟</button><button class="btn btn-outline btn-sm" id="btn-save">保存记录</button></div>
+<textarea id="inp-note" placeholder="备注（可选）..." style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:6px;font-size:.82rem;min-height:44px;resize:vertical;font-family:inherit"></textarea>
+</div>
+<div class="rules-box"><h4>验证规则</h4>
+<div class="rule-item"><strong>R1</strong>: 出手角度须在5°~85°（过低无距离/过高近垂直）</div>
+<div class="rule-item"><strong>R2</strong>: Cd须≤2.0（真实0.1~0.7，>2不切实际）</div>
+<div class="rule-item"><strong>R3</strong>: 轨迹不可穿过篮板（无反弹建模）</div>
+<div class="rule-item"><strong>R4</strong>: v0&gt;0 且 rimX&gt;x0</div>
+<div class="rule-item"><strong>R5</strong>: 飞行时间≤5s（超出则警告）</div>
+</div>
+<div class="rules-box"><h4>命中判定规则</h4>
+<div class="rule-item"><strong>D1</strong>: 球心过篮筐水平区时，纵坐标在[rimY-rimR+ballR, rimY+rimR-ballR]→命中</div>
+<div class="rule-item"><strong>D2</strong>: 距边缘±5cm内→擦边</div>
+<div class="rule-item"><strong>D3</strong>: 否则未命中，显示偏高/偏低距离</div>
+<div class="rule-item"><strong>D4</strong>: 球先穿过篮板→命中无效</div>
+</div>
+</div>
+<div class="sim-right">
+<div class="card"><canvas id="sim-canvas" height="420"></canvas></div>
+<div id="sim-results"></div>
+<div id="val-log" class="val-log"></div>
+</div>
+</div>
+</div>
+
+<div class="panel" id="panel-scan">
+<div class="card"><h3>参数扫描配置</h3>
+<div class="scan-config">
+<div class="sg"><label>维度组合</label><select id="scan-pair"><option value="angle_vel">角度 × 速度</option><option value="angle_cd">角度 × Cd</option><option value="vel_cd">速度 × Cd</option></select></div>
+<div class="sg"><label>X轴起点</label><input type="number" id="scan-x0" value="30" step="1"></div>
+<div class="sg"><label>X轴终点</label><input type="number" id="scan-x1" value="70" step="1"></div>
+<div class="sg"><label>X轴步长</label><input type="number" id="scan-xs" value="5" step="1"></div>
+<div class="sg"><label>Y轴起点</label><input type="number" id="scan-y0" value="5" step="0.5"></div>
+<div class="sg"><label>Y轴终点</label><input type="number" id="scan-y1" value="15" step="0.5"></div>
+<div class="sg"><label>Y轴步长</label><input type="number" id="scan-ys" value="1" step="0.5"></div>
+<button class="btn btn-accent" id="btn-scan">运行扫描</button>
+</div></div>
+<div class="card"><h3>扫描热力图</h3><canvas id="scan-canvas" height="420"></canvas><div class="scan-stats" id="scan-stats"></div></div>
+<div class="card"><h3>扫描详情</h3><div class="scan-table-wrap" id="scan-detail-wrap"></div></div>
+</div>
+
+<div class="panel" id="panel-replay">
+<div class="replay-layout">
+<div class="replay-left"><div class="card"><h3>已保存轨迹</h3><div class="replay-list" id="replay-list"></div></div></div>
+<div class="replay-right"><div class="card">
+<canvas id="replay-canvas" height="420"></canvas>
+<div class="replay-controls">
+<button class="btn btn-accent btn-sm" id="btn-rp-play">▶ 播放</button>
+<button class="btn btn-outline btn-sm" id="btn-rp-pause">⏸ 暂停</button>
+<button class="btn btn-outline btn-sm" id="btn-rp-reset">⏮ 重置</button>
+<select id="rp-speed" style="background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:3px 6px;font-size:.8rem">
+<option value="0.25">0.25x</option><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="1.5">1.5x</option><option value="2">2x</option></select>
+<input type="range" id="rp-slider" min="0" max="1000" value="0" style="flex:1;accent-color:var(--accent)">
+</div>
+<div class="replay-info" id="replay-info"></div>
+</div></div>
+</div>
+</div>
+
+<div class="panel" id="panel-records">
+<div class="card"><h3>模拟记录管理</h3>
+<div class="filter-bar">
+<select id="rec-fs"><option value="">全部状态</option><option value="processed">已处理</option><option value="pending">待确认</option><option value="returned">退回补材料</option></select>
+<select id="rec-fr"><option value="">全部结果</option><option value="HIT">命中</option><option value="RIM_HIT">擦边</option><option value="MISS">未命中</option></select>
+<input type="text" id="rec-fn" placeholder="搜索备注...">
+</div>
+<div class="stats-row" id="rec-stats"></div>
+<div class="batch-bar">
+<label style="font-size:.8rem"><input type="checkbox" id="rec-sel-all"> 全选</label>
+<select id="rec-batch-st"><option value="processed">→ 已处理</option><option value="pending">→ 待确认</option><option value="returned">→ 退回补材料</option></select>
+<button class="btn btn-sm btn-outline" id="btn-batch">批量修改</button>
+</div>
+<div class="records-table-wrap" id="rec-table-wrap"></div>
+</div></div>
+
+<div class="panel" id="panel-export">
+<div class="card"><h3>报告导出</h3>
+<div class="export-opts">
+<label>状态筛选<select id="exp-fs"><option value="">全部</option><option value="processed">已处理</option><option value="pending">待确认</option><option value="returned">退回补材料</option></select></label>
+<label><input type="checkbox" id="exp-ir" checked> 包含被拒绝记录</label>
+</div>
+<div class="export-btns"><button class="btn btn-accent" id="btn-csv">导出 CSV</button><button class="btn btn-outline" id="btn-json">导出 JSON</button></div>
+</div>
+<div class="card"><h3>预览</h3><div class="preview-wrap" id="exp-preview"></div></div>
+</div>
+</div>
+<div id="modal-container"></div>
+
+<script>
+var BALL_R=0.12,GRAV=9.81,DT=0.0005,MAX_T=5.0;
+var records=[],nextId=1,lastSimResult=null;
+var PARAM_DEFS=[
+  {key:'v0',label:'出手速度 v0 (m/s)',def:8,step:0.1},
+  {key:'angle',label:'出手角度 angle (°)',def:52,step:1},
+  {key:'mass',label:'篮球质量 mass (kg)',def:0.625,step:0.01},
+  {key:'Cd',label:'阻力系数 Cd',def:0.47,step:0.01},
+  {key:'h0',label:'出手高度 h0 (m)',def:2.0,step:0.1},
+  {key:'x0',label:'出手水平位置 x0 (m)',def:0,step:0.1},
+  {key:'rimX',label:'篮筐水平距离 rimX (m)',def:4.6,step:0.1},
+  {key:'rimY',label:'篮筐高度 rimY (m)',def:3.05,step:0.01},
+  {key:'rimR',label:'篮筐内径 rimR (m)',def:0.23,step:0.01},
+  {key:'boardThick',label:'篮板厚度 boardThick (m)',def:0.03,step:0.01},
+  {key:'rho',label:'空气密度 rho (kg/m³)',def:1.225,step:0.001}
+];
+var rpState={recordId:null,points:null,params:null,idx:0,playing:false,speed:1,animFrame:null,lastTime:null};
+
+function buildParamGrid(){
+  var g=document.getElementById('param-grid');g.innerHTML='';
+  PARAM_DEFS.forEach(function(p){
+    var d=document.createElement('div');d.className='param-item';
+    d.innerHTML='<label>'+p.label+'</label><input type="number" id="inp-'+p.key+'" value="'+p.def+'" step="'+p.step+'">';
+    g.appendChild(d);
+  });
+}
+
+function readParams(){
+  var p={};PARAM_DEFS.forEach(function(d){var v=parseFloat(document.getElementById('inp-'+d.key).value);p[d.key]=isNaN(v)?d.def:v;});
+  p.note=document.getElementById('inp-note').value;return p;
+}
+
+function derivs(x,y,vx,vy,mass,Cd,rho,A){
+  var v=Math.sqrt(vx*vx+vy*vy),df=v>0?0.5*Cd*rho*A*v/mass:0;
+  return{dx:vx,dy:vy,dvx:-df*vx,dvy:-GRAV-df*vy};
+}
+
+function computeTrajectory(params){
+  var A=Math.PI*BALL_R*BALL_R,rad=params.angle*Math.PI/180;
+  var x=params.x0,y=params.h0,vx=params.v0*Math.cos(rad),vy=params.v0*Math.sin(rad),t=0;
+  var pts=[{x:x,y:y,vx:vx,vy:vy,t:t}];
+  var maxN=Math.ceil(MAX_T/DT);
+  for(var i=0;i<maxN;i++){
+    var k1=derivs(x,y,vx,vy,params.mass,params.Cd,params.rho,A);
+    var k2=derivs(x+DT/2*k1.dx,y+DT/2*k1.dy,vx+DT/2*k1.dvx,vy+DT/2*k1.dvy,params.mass,params.Cd,params.rho,A);
+    var k3=derivs(x+DT/2*k2.dx,y+DT/2*k2.dy,vx+DT/2*k2.dvx,vy+DT/2*k2.dvy,params.mass,params.Cd,params.rho,A);
+    var k4=derivs(x+DT*k3.dx,y+DT*k3.dy,vx+DT*k3.dvx,vy+DT*k3.dvy,params.mass,params.Cd,params.rho,A);
+    x+=DT/6*(k1.dx+2*k2.dx+2*k3.dx+k4.dx);
+    y+=DT/6*(k1.dy+2*k2.dy+2*k3.dy+k4.dy);
+    vx+=DT/6*(k1.dvx+2*k2.dvx+2*k3.dvx+k4.dvx);
+    vy+=DT/6*(k1.dvy+2*k2.dvy+2*k3.dvy+k4.dvy);
+    t+=DT;pts.push({x:x,y:y,vx:vx,vy:vy,t:t});
+    if(y<=0&&t>DT)break;
+  }
+  return pts;
+}
+
+function validateParams(params){
+  var rej=[],warn=[],pass=[];
+  if(params.angle<5||params.angle>85)rej.push({rule:'R1',msg:'出手角度必须在5°~85°之间',explain:params.angle<5?'角度过低，无法达到有效距离':'角度过高，接近垂直抛射'});
+  else pass.push({rule:'R1',msg:'角度范围有效'});
+  if(params.Cd>2.0)rej.push({rule:'R2',msg:'阻力系数Cd不能大于2.0',explain:'真实Cd范围为0.1~0.7，>2不切实际'});
+  else pass.push({rule:'R2',msg:'阻力系数有效'});
+  if(params.v0<=0)rej.push({rule:'R4',msg:'出手速度必须大于0',explain:''});
+  else pass.push({rule:'R4a',msg:'出手速度有效'});
+  if(params.rimX<=params.x0)rej.push({rule:'R4',msg:'篮筐水平距离必须大于出手水平位置',explain:''});
+  else pass.push({rule:'R4b',msg:'篮筐距离有效'});
+  return{rejections:rej,warnings:warn,passes:pass};
+}
+
+function validateTrajectory(points,params){
+  var rej=[],warn=[];
+  var bbL=params.rimX+params.rimR+0.15,bbR=bbL+params.boardThick,bbB=params.rimY-0.15,bbT=params.rimY+1.05;
+  var hitBoard=false;
+  for(var i=0;i<points.length;i++){var p=points[i];if(p.x>=bbL&&p.x<=bbR&&p.y>=bbB&&p.y<=bbT){hitBoard=true;break;}}
+  if(hitBoard)rej.push({rule:'R3',msg:'轨迹穿过篮板',explain:'篮板为刚性体，未建模反弹'});
+  var last=points[points.length-1];
+  if(last.t>=MAX_T-DT)warn.push({rule:'R5',msg:'飞行时间超过5s',explain:'可能不合理'});
+  return{rejections:rej,warnings:warn,hitBackboard:hitBoard};
+}
+
+function determineHit(points,params){
+  var rimX=params.rimX,rimY=params.rimY,rimR=params.rimR;
+  var bbL=rimX+rimR+0.15,bbB=rimY-0.15,bbT=rimY+1.05;
+  var hzLow=rimY-rimR+BALL_R,hzHigh=rimY+rimR-BALL_R;
+  var bestDist=Infinity,bestPt=null,bestInZone=false;
+  var boardReached=false,reachedRim=false,hitBbFirst=false,entryAngle=0;
+
+  for(var i=0;i<points.length;i++){
+    var p=points[i];
+    if(!boardReached&&p.x>=bbL&&p.y>=bbB&&p.y<=bbT)boardReached=true;
+    if(p.x>=rimX-rimR&&p.x<=rimX+rimR){
+      if(!reachedRim){reachedRim=true;if(boardReached)hitBbFirst=true;entryAngle=Math.abs(Math.atan2(p.vy,p.vx))*180/Math.PI;}
+      var dist=Math.abs(p.y-rimY);
+      if(dist<bestDist){bestDist=dist;bestPt=p;bestInZone=(p.y>=hzLow&&p.y<=hzHigh);}
+    }
+  }
+  if(!reachedRim)return{hitResult:'MISS',missDist:-1,hitDetail:'未到达篮筐区域',hitBackboard:boardReached,hitBackboardFirst:false,entryAngle:0};
+
+  var result,detail,mD=0;
+  if(bestInZone){
+    var dL=bestPt.y-hzLow,dH=hzHigh-bestPt.y,mE=Math.min(dL,dH);
+    if(mE<=0.05){result='RIM_HIT';detail='擦边';mD=mE;}
+    else{result='HIT';detail='命中';mD=0;}
+  }else{
+    result='MISS';
+    if(bestPt.y>hzHigh){mD=bestPt.y-hzHigh;detail='偏高 '+mD.toFixed(3)+'m';}
+    else{mD=hzLow-bestPt.y;detail='偏低 '+mD.toFixed(3)+'m';}
+  }
+  if(hitBbFirst&&(result==='HIT'||result==='RIM_HIT')){result='BOARD_INVALID';detail='球先穿过篮板，命中无效';}
+  return{hitResult:result,missDist:mD,hitDetail:detail,hitBackboard:boardReached,hitBackboardFirst:hitBbFirst,entryAngle:entryAngle};
+}
+
+function runSim(params){
+  var pre=validateParams(params);
+  if(pre.rejections.length>0)return{rejected:true,rejections:pre.rejections,warnings:pre.warnings,passes:pre.passes,points:null,hit:{hitResult:'REJECTED',missDist:0,hitDetail:'模拟被拒绝',hitBackboard:false,hitBackboardFirst:false,entryAngle:0},maxH:0,flightTime:0};
+  var pts=computeTrajectory(params);
+  var post=validateTrajectory(pts,params);
+  var allR=pre.rejections.concat(post.rejections),allW=pre.warnings.concat(post.warnings);
+  var hit=determineHit(pts,params);
+  var maxH=0;for(var i=0;i<pts.length;i++){if(pts[i].y>maxH)maxH=pts[i].y;}
+  return{rejected:allR.length>0,rejections:allR,warnings:allW,passes:pre.passes,points:pts,hit:hit,maxH:maxH,flightTime:pts[pts.length-1].t};
+}
+
+function renderCanvas(cid,points,params,hitRes,hlIdx){
+  var canvas=document.getElementById(cid);
+  var dpr=window.devicePixelRatio||1;
+  var W=Math.max(canvas.parentElement.clientWidth-28,400),H=420;
+  canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+  var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  if(!points||points.length<2){ctx.fillStyle='#0a1218';ctx.fillRect(0,0,W,H);ctx.fillStyle='#7a8a9a';ctx.font='14px sans-serif';ctx.textAlign='center';ctx.fillText('暂无轨迹数据',W/2,H/2);return;}
+
+  var mg={t:30,r:30,b:50,l:60},pW=W-mg.l-mg.r,pH=H-mg.t-mg.b;
+  var xMin=params.x0-0.5,xMax=params.rimX+params.rimR+0.15+params.boardThick+0.8;
+  var yMin=-0.3,yMax=0;
+  for(var i=0;i<points.length;i++){if(points[i].y>yMax)yMax=points[i].y;}
+  yMax=Math.max(yMax+0.5,params.rimY+1.5);
+  function tx(px){return mg.l+(px-xMin)/(xMax-xMin)*pW;}
+  function ty(py){return mg.t+pH-(py-yMin)/(yMax-yMin)*pH;}
+
+  ctx.fillStyle='#0a1218';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#1e2e3e';ctx.lineWidth=0.5;
+  for(var gx=Math.ceil(xMin);gx<=xMax;gx++){ctx.beginPath();ctx.moveTo(tx(gx),mg.t);ctx.lineTo(tx(gx),mg.t+pH);ctx.stroke();}
+  for(var gy=0;gy<=yMax;gy++){ctx.beginPath();ctx.moveTo(mg.l,ty(gy));ctx.lineTo(mg.l+pW,ty(gy));ctx.stroke();}
+
+  ctx.fillStyle='#5a6a7a';ctx.font='10px sans-serif';ctx.textAlign='center';
+  for(var gx2=Math.ceil(xMin);gx2<=xMax;gx2++)ctx.fillText(gx2+'m',tx(gx2),mg.t+pH+16);
+  ctx.textAlign='right';
+  for(var gy2=0;gy2<=yMax;gy2++)ctx.fillText(gy2+'m',mg.l-6,ty(gy2)+3);
+
+  var rlX=params.rimX-params.rimR,rrX=params.rimX+params.rimR;
+  ctx.strokeStyle='#e74c3c';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(tx(rlX),ty(params.rimY));ctx.lineTo(tx(rrX),ty(params.rimY));ctx.stroke();
+  ctx.fillStyle='#e74c3c';ctx.beginPath();ctx.arc(tx(rlX),ty(params.rimY),3,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(tx(rrX),ty(params.rimY),3,0,Math.PI*2);ctx.fill();
+
+  var bbL=params.rimX+params.rimR+0.15,bbB=params.rimY-0.15,bbH=1.2;
+  ctx.fillStyle='rgba(231,76,60,0.25)';ctx.strokeStyle='rgba(231,76,60,0.6)';ctx.lineWidth=1;
+  ctx.fillRect(tx(bbL),ty(bbB+bbH),tx(bbL+params.boardThick)-tx(bbL),ty(bbB)-ty(bbB+bbH));
+  ctx.strokeRect(tx(bbL),ty(bbB+bbH),tx(bbL+params.boardThick)-tx(bbL),ty(bbB)-ty(bbB+bbH));
+
+  var isHit=hitRes&&(hitRes.hitResult==='HIT'||hitRes.hitResult==='RIM_HIT');
+  var tCol=isHit?'#2ecc71':'#e74c3c';
+
+  if(typeof hlIdx==='number'&&hlIdx>=0){
+    var stp=Math.max(1,Math.floor(points.length/800));
+    ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(tx(points[0].x),ty(points[0].y));
+    for(var j=stp;j<points.length;j+=stp)ctx.lineTo(tx(points[j].x),ty(points[j].y));ctx.stroke();
+    ctx.strokeStyle=tCol;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(tx(points[0].x),ty(points[0].y));
+    var endJ=Math.min(hlIdx,points.length-1);
+    for(var j2=1;j2<=endJ;j2++)ctx.lineTo(tx(points[j2].x),ty(points[j2].y));ctx.stroke();
+    var gi2=Math.max(1,Math.floor(points.length/20));
+    for(var gi=0;gi<hlIdx;gi+=gi2){ctx.fillStyle='rgba(255,255,255,0.2)';ctx.beginPath();ctx.arc(tx(points[gi].x),ty(points[gi].y),3,0,Math.PI*2);ctx.fill();}
+    var cp=points[endJ];ctx.fillStyle='#ff9800';ctx.beginPath();ctx.arc(tx(cp.x),ty(cp.y),7,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+  }else{
+    ctx.strokeStyle=tCol;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(tx(points[0].x),ty(points[0].y));
+    var stp2=Math.max(1,Math.floor(points.length/800));
+    for(var k=stp2;k<points.length;k+=stp2)ctx.lineTo(tx(points[k].x),ty(points[k].y));
+    ctx.lineTo(tx(points[points.length-1].x),ty(points[points.length-1].y));ctx.stroke();
+  }
+
+  ctx.fillStyle='#00b4d8';ctx.beginPath();ctx.arc(tx(params.x0),ty(params.h0),5,0,Math.PI*2);ctx.fill();
+  var arL=40,rad=params.angle*Math.PI/180;
+  var ax=tx(params.x0)+arL*Math.cos(rad),ay=ty(params.h0)-arL*Math.sin(rad);
+  ctx.strokeStyle='#00b4d8';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(tx(params.x0),ty(params.h0));ctx.lineTo(ax,ay);ctx.stroke();
+  var ha=8,hang=0.4;
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(ax-ha*Math.cos(rad-hang),ay+ha*Math.sin(rad-hang));ctx.moveTo(ax,ay);ctx.lineTo(ax-ha*Math.cos(rad+hang),ay+ha*Math.sin(rad+hang));ctx.stroke();
+
+  ctx.fillStyle='#5a6a7a';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText('x (m)',mg.l+pW/2,H-4);
+  ctx.save();ctx.translate(12,mg.t+pH/2);ctx.rotate(-Math.PI/2);ctx.fillText('y (m)',0,0);ctx.restore();
+}
+
+function showValLog(el,res){
+  var h='';
+  res.passes.forEach(function(p){h+='<div class="val-entry pass"><span class="rule-id">'+p.rule+'</span>'+p.msg+'</div>';});
+  res.rejections.forEach(function(r){h+='<div class="val-entry reject"><span class="rule-id">'+r.rule+'</span>'+r.msg+(r.explain?' — '+r.explain:'')+'</div>';});
+  res.warnings.forEach(function(w){h+='<div class="val-entry warn"><span class="rule-id">'+w.rule+'</span>'+w.msg+(w.explain?' — '+w.explain:'')+'</div>';});
+  el.innerHTML=h;
+}
+
+function showSimResults(el,res){
+  if(!res.points){el.innerHTML='<div class="result-box miss"><div class="lbl">模拟被拒绝</div></div>';return;}
+  var h=res.hit,cls=(h.hitResult==='HIT'||h.hitResult==='RIM_HIT')?'hit':'miss';
+  var tag='';
+  if(h.hitResult==='HIT')tag='<span class="tag tag-hit">命中</span>';
+  else if(h.hitResult==='RIM_HIT')tag='<span class="tag tag-rim">擦边</span>';
+  else if(h.hitResult==='BOARD_INVALID')tag='<span class="tag tag-rejected">命中无效(穿板)</span>';
+  else tag='<span class="tag tag-miss">未命中</span>';
+  el.innerHTML='<div class="result-box '+cls+'"><div style="margin-bottom:6px">'+tag+' '+(h.hitDetail||'')+'</div><div class="flex-row" style="flex-wrap:wrap;gap:12px"><span><span class="lbl">最大高度</span> <span class="val">'+res.maxH.toFixed(3)+' m</span></span><span><span class="lbl">飞行时间</span> <span class="val">'+res.flightTime.toFixed(3)+' s</span></span><span><span class="lbl">入筐角度</span> <span class="val">'+h.entryAngle.toFixed(1)+'°</span></span>'+(h.hitResult==='MISS'?'<span><span class="lbl">偏差</span> <span class="val">'+h.missDist.toFixed(3)+' m</span></span>':'')+(h.hitBackboard?'<span><span class="lbl">穿板</span> <span class="val" style="color:var(--miss)">是</span></span>':'')+'</div></div>';
+}
+
+function onRunSim(){
+  var params=readParams(),res=runSim(params);
+  lastSimResult={params:params,result:res};
+  renderCanvas('sim-canvas',res.points,params,res.hit);
+  showValLog(document.getElementById('val-log'),res);
+  showSimResults(document.getElementById('sim-results'),res);
+}
+
+function autoStatus(note,rejected){if(rejected)return'returned';if(!note||note.trim()==='')return'pending';return'processed';}
+
+function onSaveRecord(){
+  if(!lastSimResult){alert('请先运行模拟');return;}
+  var params=lastSimParams(),res=lastSimResult.result,note=document.getElementById('inp-note').value||'';
+  var now=new Date().toISOString();
+  var rec={id:nextId++,params:params,rejected:res.rejected,hit:res.hit,maxH:res.maxH,flightTime:res.flightTime,
+    rejections:res.rejections.map(function(r){return Object.assign({},r);}),
+    warnings:res.warnings?res.warnings.map(function(w){return Object.assign({},w);}):[],
+    status:autoStatus(note,res.rejected),note:note,noteVersion:note?1:0,
+    noteHistory:note?[{version:1,text:note,timestamp:now}]:[],createdAt:now};
+  records.push(rec);alert('记录 #'+rec.id+' 已保存');
+  refreshRecords();refreshReplayList();refreshExportPreview();
+}
+
+function lastSimParams(){return lastSimResult?Object.assign({},lastSimResult.params):{};}
+
+function onTabClick(tab){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='panel-'+tab);});
+  if(tab==='sim'&&lastSimResult)renderCanvas('sim-canvas',lastSimResult.result.points,lastSimResult.params,lastSimResult.result.hit);
+  if(tab==='records')refreshRecords();if(tab==='replay')refreshReplayList();if(tab==='export')refreshExportPreview();
+}
+
+function onScan(){
+  var pair=document.getElementById('scan-pair').value;
+  var x0v=parseFloat(document.getElementById('scan-x0').value),x1v=parseFloat(document.getElementById('scan-x1').value),xsv=parseFloat(document.getElementById('scan-xs').value);
+  var y0v=parseFloat(document.getElementById('scan-y0').value),y1v=parseFloat(document.getElementById('scan-y1').value),ysv=parseFloat(document.getElementById('scan-ys').value);
+  var xKey,yKey,xLab,yLab;
+  if(pair==='angle_vel'){xKey='angle';yKey='v0';xLab='角度 (°)';yLab='速度 (m/s)';}
+  else if(pair==='angle_cd'){xKey='angle';yKey='Cd';xLab='角度 (°)';yLab='Cd';}
+  else{xKey='v0';yKey='Cd';xLab='速度 (m/s)';yLab='Cd';}
+  var base=readParams(),xVals=[],yVals=[];
+  for(var xv=x0v;xv<=x1v+xsv*0.01;xv+=xsv)xVals.push(Math.round(xv*1000)/1000);
+  for(var yv=y0v;yv<=y1v+ysv*0.01;yv+=ysv)yVals.push(Math.round(yv*1000)/1000);
+  var grid=[],hits=0,misses=0,rej=0,rows=[];
+  for(var yi=0;yi<yVals.length;yi++){grid[yi]=[];
+    for(var xi=0;xi<xVals.length;xi++){
+      var p=Object.assign({},base);p[xKey]=xVals[xi];p[yKey]=yVals[yi];
+      var res=runSim(p),cell={xVal:xVals[xi],yVal:yVals[yi],result:res};
+      if(res.rejected){rej++;cell.type='rejected';}
+      else if(res.hit.hitResult==='HIT'||res.hit.hitResult==='RIM_HIT'){hits++;cell.type='hit';}
+      else{misses++;cell.type='miss';}
+      grid[yi][xi]=cell;
+      var rr=res.rejections.map(function(r){return r.rule+': '+r.msg;}).join('; ');
+      var ht=res.rejected?'被拒绝':(res.hit.hitResult==='HIT'?'命中':res.hit.hitResult==='RIM_HIT'?'擦边':'未命中');
+      rows.push({xVal:xVals[xi],yVal:yVals[yi],ht:ht,rr:rr,type:cell.type});
+    }
+  }
+  renderScanHeatmap(xVals,yVals,grid,xLab,yLab);
+  var total=xVals.length*yVals.length,hr=total>0?(hits/total*100).toFixed(1):'0.0';
+  document.getElementById('scan-stats').innerHTML=
+    '<div class="scan-stat"><div class="num" style="color:var(--hit)">'+hits+'</div><div class="lbl">命中</div></div>'+
+    '<div class="scan-stat"><div class="num" style="color:var(--miss)">'+misses+'</div><div class="lbl">未命中</div></div>'+
+    '<div class="scan-stat"><div class="num" style="color:var(--dim)">'+rej+'</div><div class="lbl">被拒绝</div></div>'+
+    '<div class="scan-stat"><div class="num" style="color:var(--accent)">'+hr+'%</div><div class="lbl">命中率</div></div>'+
+    '<div class="scan-stat"><div class="num">'+total+'</div><div class="lbl">总计</div></div>';
+  var dh='<table><tr><th>'+xLab+'</th><th>'+yLab+'</th><th>结果</th><th>拒绝原因</th></tr>';
+  rows.forEach(function(r){var tc=r.type==='hit'?'tag-hit':r.type==='miss'?'tag-miss':'tag-rejected';dh+='<tr><td>'+r.xVal+'</td><td>'+r.yVal+'</td><td><span class="tag '+tc+'">'+r.ht+'</span></td><td>'+(r.rr||'-')+'</td></tr>';});
+  dh+='</table>';document.getElementById('scan-detail-wrap').innerHTML=dh;
+}
+
+function renderScanHeatmap(xVals,yVals,grid,xLab,yLab){
+  var canvas=document.getElementById('scan-canvas'),dpr=window.devicePixelRatio||1;
+  var W=Math.max(canvas.parentElement.clientWidth-28,400),H=420;
+  canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+  var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  ctx.fillStyle='#0a1218';ctx.fillRect(0,0,W,H);
+  var ml=70,mr=30,mt=30,mb=60,pW=W-ml-mr,pH=H-mt-mb;
+  var cW=pW/xVals.length,cH=pH/yVals.length;
+  for(var yi=yVals.length-1;yi>=0;yi--){for(var xi=0;xi<xVals.length;xi++){
+    var c=grid[yi][xi];
+    ctx.fillStyle=c.type==='hit'?'#2ecc71':c.type==='miss'?'#e74c3c':'#4a4a4a';
+    ctx.fillRect(ml+xi*cW,mt+(yVals.length-1-yi)*cH,cW-1,cH-1);
+  }}
+  ctx.fillStyle='#5a6a7a';ctx.font='9px sans-serif';ctx.textAlign='center';
+  var xSt=Math.max(1,Math.floor(xVals.length/12));
+  for(var xi2=0;xi2<xVals.length;xi2+=xSt)ctx.fillText(xVals[xi2],ml+xi2*cW+cW/2,mt+pH+14);
+  ctx.textAlign='right';var ySt=Math.max(1,Math.floor(yVals.length/10));
+  for(var yi2=0;yi2<yVals.length;yi2+=ySt){var yy=mt+(yVals.length-1-yi2)*cH+cH/2;ctx.fillText(yVals[yi2],ml-4,yy+3);}
+  ctx.fillStyle='#7a8a9a';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(xLab,ml+pW/2,H-4);
+  ctx.save();ctx.translate(12,mt+pH/2);ctx.rotate(-Math.PI/2);ctx.fillText(yLab,0,0);ctx.restore();
+}
+
+function refreshReplayList(){
+  var list=document.getElementById('replay-list');
+  if(!records.length){list.innerHTML='<div style="color:var(--dim);font-size:.82rem;padding:8px">暂无记录</div>';return;}
+  var h='';records.forEach(function(r){
+    var tg=r.hit.hitResult==='HIT'?'tag-hit':r.hit.hitResult==='RIM_HIT'?'tag-rim':'tag-miss';
+    h+='<div class="replay-item'+(rpState.recordId===r.id?' selected':'')+'" data-id="'+r.id+'"><span style="color:var(--accent)">#'+r.id+'</span> <span class="tag '+tg+'">'+r.hit.hitDetail+'</span><div style="font-size:.72rem;color:var(--dim)">v0='+r.params.v0+' angle='+r.params.angle+'°</div></div>';
+  });
+  list.innerHTML=h;
+  list.querySelectorAll('.replay-item').forEach(function(el){el.onclick=function(){selectReplay(parseInt(el.dataset.id));};});
+}
+
+function selectReplay(id){
+  var rec=records.find(function(r){return r.id===id;});if(!rec)return;
+  stopReplay();rpState.recordId=id;rpState.params=rec.params;rpState.points=computeTrajectory(rec.params);rpState.idx=0;
+  refreshReplayList();renderReplayFrame();
+}
+
+function renderReplayFrame(){
+  if(!rpState.points)return;
+  var idx=Math.min(rpState.idx,rpState.points.length-1);
+  var hitRes=determineHit(rpState.points,rpState.params);
+  renderCanvas('replay-canvas',rpState.points,rpState.params,hitRes,idx);
+  var p=rpState.points[idx];
+  document.getElementById('replay-info').innerHTML=
+    '<div><span class="lbl">时间:</span> '+p.t.toFixed(3)+'s</div><div><span class="lbl">位置:</span> ('+p.x.toFixed(3)+', '+p.y.toFixed(3)+')m</div>'+
+    '<div><span class="lbl">速度:</span> ('+p.vx.toFixed(3)+', '+p.vy.toFixed(3)+')m/s</div><div><span class="lbl">速率:</span> '+Math.sqrt(p.vx*p.vx+p.vy*p.vy).toFixed(3)+'m/s</div>';
+  document.getElementById('rp-slider').value=rpState.points.length>1?Math.round(idx/(rpState.points.length-1)*1000):0;
+}
+
+function startReplay(){if(!rpState.points)return;rpState.playing=true;rpState.lastTime=performance.now();animReplay();}
+
+function animReplay(){
+  if(!rpState.playing||!rpState.points)return;
+  var now=performance.now(),dt=(now-rpState.lastTime)/1000;rpState.lastTime=now;
+  var adv=Math.round((1/DT)*dt*rpState.speed);
+  rpState.idx=Math.min(rpState.idx+adv,rpState.points.length-1);
+  renderReplayFrame();
+  if(rpState.idx>=rpState.points.length-1){rpState.playing=false;return;}
+  rpState.animFrame=requestAnimationFrame(animReplay);
+}
+
+function pauseReplay(){rpState.playing=false;if(rpState.animFrame){cancelAnimationFrame(rpState.animFrame);rpState.animFrame=null;}}
+function stopReplay(){pauseReplay();rpState.idx=0;}
+function resetReplay(){stopReplay();if(rpState.points){rpState.idx=0;renderReplayFrame();}}
+
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function statusLbl(s){return s==='processed'?'已处理':s==='pending'?'待确认':'退回补材料';}
+
+function refreshRecords(){
+  var fs=document.getElementById('rec-fs').value,fr=document.getElementById('rec-fr').value,fn=(document.getElementById('rec-fn').value||'').toLowerCase();
+  var filtered=records.filter(function(r){
+    if(fs&&r.status!==fs)return false;if(fr&&r.hit.hitResult!==fr)return false;
+    if(fn&&(!r.note||r.note.toLowerCase().indexOf(fn)<0))return false;return true;
+  });
+  var tot=records.length,proc=0,pend=0,ret=0,hc=0;
+  records.forEach(function(r){if(r.status==='processed')proc++;if(r.status==='pending')pend++;if(r.status==='returned')ret++;if(r.hit.hitResult==='HIT'||r.hit.hitResult==='RIM_HIT')hc++;});
+  document.getElementById('rec-stats').innerHTML=
+    '<div class="stat-chip" style="background:rgba(255,255,255,.08)">总计 '+tot+'</div>'+
+    '<div class="stat-chip" style="background:rgba(46,204,113,.15);color:var(--hit)">已处理 '+proc+'</div>'+
+    '<div class="stat-chip" style="background:rgba(52,152,219,.15);color:var(--pending)">待确认 '+pend+'</div>'+
+    '<div class="stat-chip" style="background:rgba(230,126,34,.15);color:var(--returned)">退回 '+ret+'</div>'+
+    '<div class="stat-chip" style="background:rgba(46,204,113,.1);color:var(--hit)">命中 '+hc+'</div>';
+  var h='<table><tr><th><input type="checkbox" id="rec-sa"></th><th>ID</th><th>参数摘要</th><th>结果</th><th>状态</th><th>版本</th><th>备注</th><th>拒绝原因</th><th>操作</th></tr>';
+  filtered.forEach(function(r){
+    var tg=r.hit.hitResult==='HIT'?'tag-hit':r.hit.hitResult==='RIM_HIT'?'tag-rim':r.hit.hitResult==='BOARD_INVALID'?'tag-rejected':'tag-miss';
+    var stg='tag-'+r.status,rStr=r.rejections.map(function(e){return e.rule;}).join(', ')||'-';
+    var nd=r.note?(r.note.length>20?r.note.substring(0,20)+'...':r.note):'-';
+    h+='<tr data-id="'+r.id+'"><td><input type="checkbox" class="rec-chk" data-id="'+r.id+'"></td><td>'+r.id+'</td>'+
+      '<td style="font-size:.72rem">v0='+r.params.v0+' θ='+r.params.angle+'° m='+r.params.mass+'</td>'+
+      '<td><span class="tag '+tg+'">'+escH(r.hit.hitDetail)+'</span></td>'+
+      '<td><span class="tag '+stg+'">'+statusLbl(r.status)+'</span></td>'+
+      '<td>v'+r.noteVersion+'</td><td><div class="rec-note" title="'+escH(r.note||'')+'">'+escH(nd)+'</div></td>'+
+      '<td style="font-size:.72rem">'+rStr+'</td>'+
+      '<td><div class="rec-actions"><button class="btn btn-sm btn-outline" onclick="editNoteModal('+r.id+')">编辑备注</button>'+
+      '<button class="btn btn-sm btn-outline" style="color:var(--miss)" onclick="deleteRecord('+r.id+')">删除</button></div></td></tr>';
+  });
+  h+='</table>';document.getElementById('rec-table-wrap').innerHTML=h;
+  var sa=document.getElementById('rec-sa');
+  if(sa)sa.onchange=function(){document.querySelectorAll('.rec-chk').forEach(function(c){c.checked=sa.checked;});};
+}
+
+function editNoteModal(id){
+  var rec=records.find(function(r){return r.id===id;});if(!rec)return;
+  var hh='';rec.noteHistory.forEach(function(h){hh+='<div class="history-item"><span class="ts">'+new Date(h.timestamp).toLocaleString()+'</span> v'+h.version+': '+escH(h.text)+'</div>';});
+  var m=document.createElement('div');m.className='modal-overlay';
+  m.innerHTML='<div class="modal"><h3>编辑备注 — #'+id+'</h3><textarea id="modal-note">'+escH(rec.note||'')+'</textarea>'+
+    '<div class="history-list">'+(hh||'<div style="font-size:.75rem;color:var(--dim)">暂无历史</div>')+'</div>'+
+    '<div class="modal-btns"><button class="btn btn-accent btn-sm" id="modal-save">保存</button><button class="btn btn-outline btn-sm" id="modal-cancel">取消</button></div></div>';
+  document.getElementById('modal-container').appendChild(m);
+  document.getElementById('modal-save').onclick=function(){
+    var nt=document.getElementById('modal-note').value,now=new Date().toISOString();
+    rec.note=nt;rec.noteVersion++;rec.noteHistory.push({version:rec.noteVersion,text:nt,timestamp:now});
+    rec.status=autoStatus(nt,rec.rejected);m.remove();refreshRecords();refreshReplayList();refreshExportPreview();
+  };
+  document.getElementById('modal-cancel').onclick=function(){m.remove();};
+  m.onclick=function(e){if(e.target===m)m.remove();};
+}
+
+function deleteRecord(id){
+  if(!confirm('确定删除记录 #'+id+'？'))return;
+  records=records.filter(function(r){return r.id!==id;});
+  if(rpState.recordId===id){stopReplay();rpState.recordId=null;rpState.points=null;}
+  refreshRecords();refreshReplayList();refreshExportPreview();
+}
+
+function onBatch(){
+  var ns=document.getElementById('rec-batch-st').value,chs=document.querySelectorAll('.rec-chk:checked');
+  if(!chs.length){alert('请先选择记录');return;}
+  chs.forEach(function(c){var id=parseInt(c.dataset.id),rec=records.find(function(r){return r.id===id;});if(rec)rec.status=ns;});
+  refreshRecords();refreshExportPreview();
+}
+
+function refreshExportPreview(){
+  var fs=document.getElementById('exp-fs').value,ir=document.getElementById('exp-ir').checked;
+  var filtered=records.filter(function(r){if(fs&&r.status!==fs)return false;if(!ir&&r.rejected)return false;return true;});
+  if(!filtered.length){document.getElementById('exp-preview').innerHTML='<div style="color:var(--dim);font-size:.82rem">无记录</div>';return;}
+  var h='<table><tr><th>ID</th><th>v0</th><th>角度</th><th>结果</th><th>状态</th><th>备注</th></tr>';
+  filtered.forEach(function(r){
+    h+='<tr><td>'+r.id+'</td><td>'+r.params.v0+'</td><td>'+r.params.angle+'°</td><td>'+escH(r.hit.hitDetail)+'</td><td>'+statusLbl(r.status)+'</td><td>'+escH(r.note||'-')+'</td></tr>';
+  });
+  h+='</table>';document.getElementById('exp-preview').innerHTML=h;
+}
+
+function getExpRecs(){
+  var fs=document.getElementById('exp-fs').value,ir=document.getElementById('exp-ir').checked;
+  return records.filter(function(r){if(fs&&r.status!==fs)return false;if(!ir&&r.rejected)return false;return true;});
+}
+
+function downloadFile(content,name,type){
+  var blob=new Blob(['\uFEFF'+content],{type:type+';charset=utf-8'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);
+}
+
+function exportCSV(){
+  var recs=getExpRecs();if(!recs.length){alert('无记录可导出');return;}
+  var hdrs=['id','v0','angle','mass','cd','h0','x0','rimX','rimY','rimR','boardThick','rho','hit','rejected','hitBackboard','maxH','flightTime','entryAngle','missDist','hitDetail','status','noteVersion','note','rejectionReasons','createdAt'];
+  var rows=[hdrs.join(',')];
+  recs.forEach(function(r){
+    rows.push(
+      r.id+','+r.params.v0+','+r.params.angle+','+r.params.mass+','+r.params.Cd+','+r.params.h0+','+
+      r.params.x0+','+r.params.rimX+','+r.params.rimY+','+r.params.rimR+','+r.params.boardThick+','+r.params.rho+','+
+      r.hit.hitResult+','+r.rejected+','+r.hit.hitBackboard+','+r.maxH.toFixed(4)+','+r.flightTime.toFixed(4)+','+
+      r.hit.entryAngle.toFixed(2)+','+r.hit.missDist.toFixed(4)+','+'"'+r.hit.hitDetail+'"'+','+
+      r.status+','+r.noteVersion+','+'"'+(r.note||'').replace(/"/g,'""')+'"'+','+
+      '"'+r.rejections.map(function(e){return e.rule+':'+e.msg;}).join('; ')+'"'+','+
+      r.createdAt
+    );
+  });
+  downloadFile(rows.join('\n'),'basketball_sim_report.csv','text/csv');
+}
+
+function exportJSON(){
+  var recs=getExpRecs();if(!recs.length){alert('无记录可导出');return;}
+  var data=recs.map(function(r){
+    return{id:r.id,v0:r.params.v0,angle:r.params.angle,mass:r.params.mass,cd:r.params.Cd,
+      h0:r.params.h0,x0:r.params.x0,rimX:r.params.rimX,rimY:r.params.rimY,rimR:r.params.rimR,
+      boardThick:r.params.boardThick,rho:r.params.rho,hit:r.hit.hitResult,rejected:r.rejected,
+      hitBackboard:r.hit.hitBackboard,maxH:r.maxH,flightTime:r.flightTime,
+      entryAngle:r.hit.entryAngle,missDist:r.hit.missDist,hitDetail:r.hit.hitDetail,
+      status:r.status,noteVersion:r.noteVersion,note:r.note,
+      rejectionReasons:r.rejections.map(function(e){return{rule:e.rule,msg:e.msg};}),
+      noteHistory:r.noteHistory,createdAt:r.createdAt};
+  });
+  downloadFile(JSON.stringify(data,null,2),'basketball_sim_report.json','application/json');
+}
+
+document.querySelectorAll('.tab-btn').forEach(function(b){
+  b.addEventListener('click',function(){onTabClick(b.dataset.tab);});
+});
+document.getElementById('btn-run').addEventListener('click',onRunSim);
+document.getElementById('btn-save').addEventListener('click',onSaveRecord);
+document.getElementById('btn-scan').addEventListener('click',onScan);
+document.getElementById('btn-rp-play').addEventListener('click',startReplay);
+document.getElementById('btn-rp-pause').addEventListener('click',pauseReplay);
+document.getElementById('btn-rp-reset').addEventListener('click',resetReplay);
+document.getElementById('rp-speed').addEventListener('change',function(){rpState.speed=parseFloat(this.value);});
+document.getElementById('rp-slider').addEventListener('input',function(){
+  if(!rpState.points)return;pauseReplay();
+  rpState.idx=Math.round(this.value/1000*(rpState.points.length-1));renderReplayFrame();
+});
+document.getElementById('btn-batch').addEventListener('click',onBatch);
+document.getElementById('btn-csv').addEventListener('click',exportCSV);
+document.getElementById('btn-json').addEventListener('click',exportJSON);
+document.getElementById('rec-fs').addEventListener('change',refreshRecords);
+document.getElementById('rec-fr').addEventListener('change',refreshRecords);
+document.getElementById('rec-fn').addEventListener('input',refreshRecords);
+document.getElementById('rec-sel-all').addEventListener('change',function(){
+  document.querySelectorAll('.rec-chk').forEach(function(c){c.checked=document.getElementById('rec-sel-all').checked;});
+});
+document.getElementById('exp-fs').addEventListener('change',refreshExportPreview);
+document.getElementById('exp-ir').addEventListener('change',refreshExportPreview);
+
+buildParamGrid();
+renderCanvas('sim-canvas',null,readParams(),null);
+</script>
+</body>
+</html>
