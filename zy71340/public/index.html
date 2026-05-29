@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>音乐治疗情绪日志</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>🎵 音乐治疗情绪日志系统</h1>
+      <nav>
+        <button class="nav-btn active" data-tab="log">日志录入</button>
+        <button class="nav-btn" data-tab="logs">日志列表</button>
+        <button class="nav-btn" data-tab="trends">趋势图</button>
+        <button class="nav-btn" data-tab="report">月报导出</button>
+        <button class="nav-btn" data-tab="warnings">警告中心</button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="tab-log" class="tab-content active">
+        <div class="form-container">
+          <h2>治疗日志录入</h2>
+          
+          <div class="form-row">
+            <label>患者 <span class="required">*</span></label>
+            <select id="patient-select">
+              <option value="">请选择患者</option>
+            </select>
+            <button class="btn-small" onclick="showPatientModal()">+ 新增患者</button>
+          </div>
+
+          <div class="form-row">
+            <label>治疗日期 <span class="required">*</span></label>
+            <input type="date" id="session-date">
+          </div>
+
+          <div class="form-row">
+            <label>治疗时间</label>
+            <input type="time" id="session-time">
+          </div>
+
+          <div class="form-row">
+            <label>治疗阶段</label>
+            <select id="time-point">
+              <option value="">请选择</option>
+              <option value="initial">初次评估</option>
+              <option value="middle">中期治疗</option>
+              <option value="review">阶段回顾</option>
+              <option value="final">结束评估</option>
+            </select>
+          </div>
+
+          <div class="section-title">情绪量表 <span class="required">*</span></div>
+          <div id="emotion-scales" class="scales-container"></div>
+
+          <div class="section-title">关联曲目</div>
+          <div id="tracks-list" class="tracks-container">
+            <p class="empty-text">暂无关联曲目</p>
+          </div>
+          <button class="btn-outline" onclick="showTrackModal()">+ 添加曲目</button>
+
+          <div class="form-row">
+            <label>患者反应片段</label>
+            <textarea id="reaction-snippets" rows="3" placeholder="记录患者的关键反应..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <label>治疗师备注</label>
+            <textarea id="therapist-notes" rows="3" placeholder="治疗师的观察和建议..."></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn-primary" onclick="saveLog()">保存记录</button>
+            <button class="btn-outline" onclick="clearForm()">清空表单</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-logs" class="tab-content">
+        <div class="filters">
+          <select id="filter-patient">
+            <option value="">全部患者</option>
+          </select>
+          <button class="btn-primary" onclick="loadLogs()">刷新</button>
+        </div>
+        <div id="logs-table" class="table-container"></div>
+      </section>
+
+      <section id="tab-trends" class="tab-content">
+        <div class="filters">
+          <select id="trend-patient">
+            <option value="">请选择患者</option>
+          </select>
+          <input type="month" id="trend-month">
+          <button class="btn-primary" onclick="loadTrends()">查看趋势</button>
+        </div>
+        <div id="trend-chart" class="chart-container"></div>
+      </section>
+
+      <section id="tab-report" class="tab-content">
+        <div class="filters">
+          <select id="report-patient">
+            <option value="">请选择患者</option>
+          </select>
+          <input type="month" id="report-month">
+          <button class="btn-primary" onclick="generateReport()">生成月报</button>
+          <button class="btn-outline" onclick="exportReport()">导出PDF</button>
+        </div>
+        <div id="report-content" class="report-container"></div>
+      </section>
+
+      <section id="tab-warnings" class="tab-content">
+        <div id="warnings-list" class="warnings-container"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="patient-modal" class="modal">
+    <div class="modal-content">
+      <h3>新增患者</h3>
+      <div class="form-row">
+        <label>姓名</label>
+        <input type="text" id="new-patient-name">
+      </div>
+      <div class="form-row">
+        <label>年龄</label>
+        <input type="number" id="new-patient-age">
+      </div>
+      <div class="form-row">
+        <label>诊断（脱敏存储）</label>
+        <input type="text" id="new-patient-diagnosis">
+      </div>
+      <div class="form-row">
+        <label>联系方式</label>
+        <input type="text" id="new-patient-contact" placeholder="手机号或邮箱">
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" onclick="savePatient()">保存</button>
+        <button class="btn-outline" onclick="closeModal('patient-modal')">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="track-modal" class="modal">
+    <div class="modal-content">
+      <h3>添加曲目</h3>
+      <div class="form-row">
+        <label>选择现有曲目</label>
+        <select id="existing-track-select">
+          <option value="">-- 或新增曲目 --</option>
+        </select>
+      </div>
+      <hr>
+      <div class="form-row">
+        <label>曲目名称</label>
+        <input type="text" id="new-track-name">
+      </div>
+      <div class="form-row">
+        <label>艺术家</label>
+        <input type="text" id="new-track-artist">
+      </div>
+      <div class="form-row">
+        <label>使用备注</label>
+        <input type="text" id="track-notes" placeholder="使用场景、效果等">
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" onclick="addTrack()">添加</button>
+        <button class="btn-outline" onclick="closeModal('track-modal')">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="withdraw-modal" class="modal">
+    <div class="modal-content">
+      <h3>撤回记录</h3>
+      <div class="form-row">
+        <label>撤回原因</label>
+        <textarea id="withdraw-reason" rows="3"></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" onclick="confirmWithdraw()">确认撤回</button>
+        <button class="btn-outline" onclick="closeModal('withdraw-modal')">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

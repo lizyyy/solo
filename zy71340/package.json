@@ -1,0 +1,15 @@
+{
+  "name": "music-therapy-log",
+  "version": "1.0.0",
+  "description": "音乐治疗情绪日志系统",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^9.2.2",
+    "cors": "^2.8.5"
+  }
+}
