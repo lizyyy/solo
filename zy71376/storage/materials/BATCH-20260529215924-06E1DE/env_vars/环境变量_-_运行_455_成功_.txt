@@ -1,0 +1,9 @@
+CI=true
+BUILD_NUMBER=457
+BRANCH=main
+COMMIT_SHA=b2c3d4e5f6a7
+JAVA_HOME=/usr/lib/jvm/java-8
+PYTHONPATH=/opt/python3.10
+PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin
+NODE_ENV=staging
+DATABASE_URL=postgresql://localhost:5432/test

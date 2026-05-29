@@ -1,0 +1,34 @@
+2024-01-15 10:30:00 [INFO] Starting CI pipeline #456 for commit a1b2c3d
+2024-01-15 10:30:01 [INFO] Checking out repository...
+2024-01-15 10:30:05 [INFO] Restoring cache...
+2024-01-15 10:30:05 [DEBUG] Cache key: pip-v1-hash-abc123def456
+2024-01-15 10:30:06 [DEBUG] Cache key mismatch: expected abc123def456, got 789xyz012
+2024-01-15 10:30:06 [WARN] Cache miss unexpectedly, cache key mismatch detected
+2024-01-15 10:30:07 [INFO] Cache fingerprint changed from last run
+2024-01-15 10:30:10 [INFO] Installing dependencies...
+2024-01-15 10:30:10 [INFO] pip install -r requirements.txt
+2024-01-15 10:30:15 [DEBUG] Found leftover __pycache__ directory from previous build
+2024-01-15 10:30:15 [WARN] Leftover file detected: target/classes/com/example/Test.class
+2024-01-15 10:30:16 [WARN] Previous build artifact detected in workspace
+2024-01-15 10:30:16 [WARN] Workspace not clean before build
+2024-01-15 10:30:20 [INFO] Setting up environment...
+2024-01-15 10:30:20 [INFO] export CI=true
+2024-01-15 10:30:20 [INFO] export BUILD_NUMBER=456
+2024-01-15 10:30:21 [INFO] export JAVA_HOME=/usr/lib/jvm/java-11
+2024-01-15 10:30:21 [DEBUG] Environment variable changed: JAVA_HOME was /usr/lib/jvm/java-8
+2024-01-15 10:30:22 [WARN] Version mismatch between runs detected for PYTHONPATH
+2024-01-15 10:30:25 [INFO] Running tests...
+2024-01-15 10:30:25 [INFO] pytest tests/ -v
+2024-01-15 10:31:00 [ERROR] Test failure: test_cache_invalidation
+2024-01-15 10:31:00 [ERROR] AssertionError: expected cache hit, got cache miss
+2024-01-15 10:31:05 [ERROR] Test failure: test_clean_workspace
+2024-01-15 10:31:05 [ERROR] FileNotFoundError: stale test result file found
+2024-01-15 10:31:10 [ERROR] Test failure: test_env_consistency
+2024-01-15 10:31:10 [ERROR] Environment variable JAVA_HOME mismatch
+2024-01-15 10:31:15 [WARN] 3 tests failed, 127 passed
+2024-01-15 10:31:16 [INFO] Generating test report...
+2024-01-15 10:31:20 [INFO] JUnit XML report generated at target/test-results.xml
+2024-01-15 10:31:25 [INFO] Saving cache for next run...
+2024-01-15 10:31:25 [DEBUG] Cache key: pip-v1-hash-789xyz012
+2024-01-15 10:31:30 [INFO] Cache saved successfully
+2024-01-15 10:31:30 [ERROR] CI pipeline #456 failed with exit code 1

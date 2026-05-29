@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="CI Tests" tests="130" failures="3" errors="0" time="45.32">
+  <testsuite name="cache_tests" tests="20" failures="1" errors="0" time="12.5">
+    <testcase classname="cache_tests" name="test_cache_hit" time="0.1"/>
+    <testcase classname="cache_tests" name="test_cache_invalidation" time="0.2">
+      <failure message="expected cache hit, got cache miss">
+        AssertionError at line 42 in test_cache.py
+        Expected: 'hit'
+        Actual: 'miss'
+      </failure>
+    </testcase>
+    <testcase classname="cache_tests" name="test_cache_expiry" time="0.1"/>
+  </testsuite>
+  <testsuite name="workspace_tests" tests="15" failures="1" errors="0" time="8.3">
+    <testcase classname="workspace_tests" name="test_clean_workspace" time="0.15">
+      <failure message="stale test result file found">
+        FileNotFoundError: target/test-results.xml already exists
+        at line 28 in test_workspace.py
+      </failure>
+    </testcase>
+    <testcase classname="workspace_tests" name="test_git_status" time="0.1"/>
+  </testsuite>
+  <testsuite name="env_tests" tests="10" failures="1" errors="0" time="5.2">
+    <testcase classname="env_tests" name="test_env_consistency" time="0.08">
+      <failure message="JAVA_HOME mismatch">
+        AssertionError: Expected /usr/lib/jvm/java-11, got /usr/lib/jvm/java-8
+        at line 35 in test_env.py
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="other_tests" tests="85" failures="0" errors="0" time="19.32">
+    <testcase classname="other_tests" name="test_feature_a" time="0.5"/>
+    <testcase classname="other_tests" name="test_feature_b" time="0.3"/>
+  </testsuite>
+</testsuites>

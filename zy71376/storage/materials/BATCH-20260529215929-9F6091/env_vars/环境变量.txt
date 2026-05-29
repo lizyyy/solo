@@ -1,0 +1,9 @@
+CI=true
+BUILD_NUMBER=456
+BRANCH=main
+COMMIT_SHA=a1b2c3d4e5f6
+JAVA_HOME=/usr/lib/jvm/java-11
+PYTHONPATH=/opt/python3.11
+PATH=/usr/local/bin:/usr/bin:/bin
+NODE_ENV=production
+DATABASE_URL=postgresql://localhost:5432/test
