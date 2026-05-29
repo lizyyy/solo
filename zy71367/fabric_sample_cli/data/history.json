@@ -1,0 +1,5182 @@
+[
+  {
+    "record_id": "HIST-20260529210436550",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-001",
+    "operator": null,
+    "operation_time": "2026-05-29T21:04:36.550821",
+    "before_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "after_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": "SAMP-001-A",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "change_reason": "自动匹配样卡 SAMP-001-A, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #DC143C -> #DC143C",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 283.46",
+      "    匹配度 = 1 - 色差/255 = 1 - 283.46/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.3000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210436551",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-002",
+    "operator": null,
+    "operation_time": "2026-05-29T21:04:36.551236",
+    "before_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "after_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": "SAMP-002-B",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "change_reason": "自动匹配样卡 SAMP-002-B, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 255,0,0 -> #FF0000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 373.04",
+      "    匹配度 = 1 - 色差/255 = 1 - 373.04/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210436551",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-003",
+    "operator": null,
+    "operation_time": "2026-05-29T21:04:36.551734",
+    "before_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "after_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": "SAMP-003-C",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "change_reason": "自动匹配样卡 SAMP-003-C, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: PANTONE 186 C -> #CE1126",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 270.07",
+      "    匹配度 = 1 - 色差/255 = 1 - 270.07/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210436552",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-004",
+    "operator": null,
+    "operation_time": "2026-05-29T21:04:36.552115",
+    "before_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": "SAMP-004-D",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-004-D, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 藏蓝 -> #003366",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 94.68",
+      "    匹配度 = 1 - 色差/255 = 1 - 94.68/255 = 0.6287",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6287*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6772"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210436552",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-005",
+    "operator": null,
+    "operation_time": "2026-05-29T21:04:36.552784",
+    "before_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "after_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": "SAMP-005-E",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "change_reason": "自动匹配样卡 SAMP-005-E, 匹配度=0.8887",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #F5F5DC -> #F5F5DC",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 515.87",
+      "    匹配度 = 1 - 色差/255 = 1 - 515.87/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210436554",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-006",
+    "operator": null,
+    "operation_time": "2026-05-29T21:04:36.554189",
+    "before_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": "SAMP-006-F",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-006-F, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #000000 -> #000000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 207.90",
+      "    匹配度 = 1 - 色差/255 = 1 - 207.90/255 = 0.1847",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.1847*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.1108"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210436555",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-007",
+    "operator": null,
+    "operation_time": "2026-05-29T21:04:36.555636",
+    "before_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": "SAMP-007-G",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-007-G, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 军绿 -> #4B5320",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 88.54",
+      "    匹配度 = 1 - 色差/255 = 1 - 88.54/255 = 0.6528",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6528*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6917"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210436556",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-008",
+    "operator": null,
+    "operation_time": "2026-05-29T21:04:36.556751",
+    "before_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": "SAMP-008-H",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-008-H, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #722F37 -> #722F37",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 108.88",
+      "    匹配度 = 1 - 色差/255 = 1 - 108.88/255 = 0.5730",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.5730*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.3438"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210436558",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-010",
+    "operator": null,
+    "operation_time": "2026-05-29T21:04:36.558471",
+    "before_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "after_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": "SAMP-010-J",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "change_reason": "自动匹配样卡 SAMP-010-J, 匹配度=0.5600",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: C193, M154, Y107, K0 -> None",
+      "    色号2: 碳黑 -> #36454F",
+      "    警告: 缺少标准化RGB值，无法精确比对",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.3000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.2600"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210436560",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-011",
+    "operator": null,
+    "operation_time": "2026-05-29T21:04:36.560117",
+    "before_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "after_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": "SAMP-011-K",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "change_reason": "自动匹配样卡 SAMP-011-K, 匹配度=0.6305",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 香芋紫 -> #B19CD9",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 340.33",
+      "    匹配度 = 1 - 色差/255 = 1 - 340.33/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.0800"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210539042",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-001",
+    "operator": null,
+    "operation_time": "2026-05-29T21:05:39.042185",
+    "before_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "after_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": "SAMP-001-A",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "change_reason": "自动匹配样卡 SAMP-001-A, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #DC143C -> #DC143C",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 283.46",
+      "    匹配度 = 1 - 色差/255 = 1 - 283.46/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.3000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210539043",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-002",
+    "operator": null,
+    "operation_time": "2026-05-29T21:05:39.043522",
+    "before_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "after_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": "SAMP-002-B",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "change_reason": "自动匹配样卡 SAMP-002-B, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 255,0,0 -> #FF0000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 373.04",
+      "    匹配度 = 1 - 色差/255 = 1 - 373.04/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210539044",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-003",
+    "operator": null,
+    "operation_time": "2026-05-29T21:05:39.044344",
+    "before_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "after_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": "SAMP-003-C",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "change_reason": "自动匹配样卡 SAMP-003-C, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: PANTONE 186 C -> #CE1126",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 270.07",
+      "    匹配度 = 1 - 色差/255 = 1 - 270.07/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210539045",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-004",
+    "operator": null,
+    "operation_time": "2026-05-29T21:05:39.045212",
+    "before_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": "SAMP-004-D",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-004-D, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 藏蓝 -> #003366",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 94.68",
+      "    匹配度 = 1 - 色差/255 = 1 - 94.68/255 = 0.6287",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6287*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6772"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210539046",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-005",
+    "operator": null,
+    "operation_time": "2026-05-29T21:05:39.046047",
+    "before_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "after_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": "SAMP-005-E",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "change_reason": "自动匹配样卡 SAMP-005-E, 匹配度=0.8887",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #F5F5DC -> #F5F5DC",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 515.87",
+      "    匹配度 = 1 - 色差/255 = 1 - 515.87/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210539046",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-006",
+    "operator": null,
+    "operation_time": "2026-05-29T21:05:39.046949",
+    "before_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": "SAMP-006-F",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-006-F, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #000000 -> #000000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 207.90",
+      "    匹配度 = 1 - 色差/255 = 1 - 207.90/255 = 0.1847",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.1847*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.1108"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210539047",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-007",
+    "operator": null,
+    "operation_time": "2026-05-29T21:05:39.047871",
+    "before_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": "SAMP-007-G",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-007-G, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 军绿 -> #4B5320",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 88.54",
+      "    匹配度 = 1 - 色差/255 = 1 - 88.54/255 = 0.6528",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6528*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6917"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210539048",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-008",
+    "operator": null,
+    "operation_time": "2026-05-29T21:05:39.048832",
+    "before_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": "SAMP-008-H",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-008-H, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #722F37 -> #722F37",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 108.88",
+      "    匹配度 = 1 - 色差/255 = 1 - 108.88/255 = 0.5730",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.5730*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.3438"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210539049",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-010",
+    "operator": null,
+    "operation_time": "2026-05-29T21:05:39.049855",
+    "before_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "after_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": "SAMP-010-J",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "change_reason": "自动匹配样卡 SAMP-010-J, 匹配度=0.5600",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: C193, M154, Y107, K0 -> None",
+      "    色号2: 碳黑 -> #36454F",
+      "    警告: 缺少标准化RGB值，无法精确比对",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.3000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.2600"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210539050",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-011",
+    "operator": null,
+    "operation_time": "2026-05-29T21:05:39.050913",
+    "before_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "after_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": "SAMP-011-K",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "change_reason": "自动匹配样卡 SAMP-011-K, 匹配度=0.6305",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 香芋紫 -> #B19CD9",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 340.33",
+      "    匹配度 = 1 - 色差/255 = 1 - 340.33/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.0800"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617520",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-001",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.520429",
+    "before_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "after_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": "SAMP-001-A",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "change_reason": "自动匹配样卡 SAMP-001-A, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #DC143C -> #DC143C",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 283.46",
+      "    匹配度 = 1 - 色差/255 = 1 - 283.46/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.3000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617523",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-002",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.523275",
+    "before_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "after_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": "SAMP-002-B",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "change_reason": "自动匹配样卡 SAMP-002-B, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 255,0,0 -> #FF0000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 373.04",
+      "    匹配度 = 1 - 色差/255 = 1 - 373.04/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617527",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-003",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.527363",
+    "before_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "after_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": "SAMP-003-C",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "change_reason": "自动匹配样卡 SAMP-003-C, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: PANTONE 186 C -> #CE1126",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 270.07",
+      "    匹配度 = 1 - 色差/255 = 1 - 270.07/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617529",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-004",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.529646",
+    "before_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": "SAMP-004-D",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-004-D, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 藏蓝 -> #003366",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 94.68",
+      "    匹配度 = 1 - 色差/255 = 1 - 94.68/255 = 0.6287",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6287*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6772"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617531",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-005",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.531076",
+    "before_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "after_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": "SAMP-005-E",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "change_reason": "自动匹配样卡 SAMP-005-E, 匹配度=0.8887",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #F5F5DC -> #F5F5DC",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 515.87",
+      "    匹配度 = 1 - 色差/255 = 1 - 515.87/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617532",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-006",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.532348",
+    "before_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": "SAMP-006-F",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-006-F, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #000000 -> #000000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 207.90",
+      "    匹配度 = 1 - 色差/255 = 1 - 207.90/255 = 0.1847",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.1847*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.1108"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617533",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-007",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.533906",
+    "before_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": "SAMP-007-G",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-007-G, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 军绿 -> #4B5320",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 88.54",
+      "    匹配度 = 1 - 色差/255 = 1 - 88.54/255 = 0.6528",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6528*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6917"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617535",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-008",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.535831",
+    "before_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": "SAMP-008-H",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-008-H, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #722F37 -> #722F37",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 108.88",
+      "    匹配度 = 1 - 色差/255 = 1 - 108.88/255 = 0.5730",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.5730*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.3438"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617537",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-010",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.537450",
+    "before_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "after_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": "SAMP-010-J",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "change_reason": "自动匹配样卡 SAMP-010-J, 匹配度=0.5600",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: C193, M154, Y107, K0 -> None",
+      "    色号2: 碳黑 -> #36454F",
+      "    警告: 缺少标准化RGB值，无法精确比对",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.3000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.2600"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617538",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-011",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.538990",
+    "before_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "after_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": "SAMP-011-K",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "change_reason": "自动匹配样卡 SAMP-011-K, 匹配度=0.6305",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 香芋紫 -> #B19CD9",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 340.33",
+      "    匹配度 = 1 - 色差/255 = 1 - 340.33/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.0800"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617545",
+    "operation_type": "更新",
+    "entity_type": "sample",
+    "entity_id": "SAMP-003-C",
+    "operator": "测试用户",
+    "operation_time": "2026-05-29T21:06:17.545845",
+    "before_data": {
+      "sample_id": "SAMP-003-C",
+      "fabric_name": "40支精梳棉汗布",
+      "fabric_type": "100%新疆长绒棉，精梳，210g/㎡",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "supplier_id": "SUP-003",
+      "arrival_date": null,
+      "expected_arrival": "2026-05-27",
+      "inspection_deadline": "2026-05-31",
+      "sample_report_path": null,
+      "inspection_status": "待检验",
+      "remark": "供应商说发错了色号，等通知",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.540747",
+      "updated_at": "2026-05-29T21:06:17.540748"
+    },
+    "after_data": {
+      "sample_id": "SAMP-003-C",
+      "fabric_name": "40支精梳棉汗布",
+      "fabric_type": "100%新疆长绒棉，精梳，210g/㎡",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "supplier_id": "SUP-003",
+      "arrival_date": null,
+      "expected_arrival": "2026-05-27",
+      "inspection_deadline": "2026-05-31",
+      "sample_report_path": null,
+      "inspection_status": "检验中",
+      "remark": "供应商说发错了色号，等通知",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.540747",
+      "updated_at": "2026-05-29T21:06:17.545827"
+    },
+    "change_reason": "待检验 → 检验中 (正常)",
+    "calculation_trace": [
+      "状态流转: SAMP-003-C",
+      "  当前状态: 待检验",
+      "  目标状态: 检验中"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617547",
+    "operation_type": "更新",
+    "entity_type": "sample",
+    "entity_id": "SAMP-003-C",
+    "operator": "测试用户",
+    "operation_time": "2026-05-29T21:06:17.547554",
+    "before_data": {
+      "sample_id": "SAMP-003-C",
+      "fabric_name": "40支精梳棉汗布",
+      "fabric_type": "100%新疆长绒棉，精梳，210g/㎡",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "supplier_id": "SUP-003",
+      "arrival_date": null,
+      "expected_arrival": "2026-05-27",
+      "inspection_deadline": "2026-05-31",
+      "sample_report_path": null,
+      "inspection_status": "检验中",
+      "remark": "供应商说发错了色号，等通知",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.540747",
+      "updated_at": "2026-05-29T21:06:17.545827"
+    },
+    "after_data": {
+      "sample_id": "SAMP-003-C",
+      "fabric_name": "40支精梳棉汗布",
+      "fabric_type": "100%新疆长绒棉，精梳，210g/㎡",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "supplier_id": "SUP-003",
+      "arrival_date": null,
+      "expected_arrival": "2026-05-27",
+      "inspection_deadline": "2026-05-31",
+      "sample_report_path": null,
+      "inspection_status": "检验通过",
+      "remark": "供应商说发错了色号，等通知",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.540747",
+      "updated_at": "2026-05-29T21:06:17.547531"
+    },
+    "change_reason": "检验中 → 检验通过 (正常)",
+    "calculation_trace": [
+      "状态流转: SAMP-003-C",
+      "  当前状态: 检验中",
+      "  目标状态: 检验通过"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617549",
+    "operation_type": "更新",
+    "entity_type": "sample",
+    "entity_id": "SAMP-002-B",
+    "operator": "测试用户",
+    "operation_time": "2026-05-29T21:06:17.549567",
+    "before_data": {
+      "sample_id": "SAMP-002-B",
+      "fabric_name": "16姆米双绉真丝",
+      "fabric_type": "100%桑蚕丝，双绉，16姆米",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "supplier_id": "SUP-002",
+      "arrival_date": "2026-05-27",
+      "expected_arrival": "2026-05-26",
+      "inspection_deadline": "2026-05-28",
+      "sample_report_path": null,
+      "inspection_status": "检验中",
+      "remark": "有轻微色差，需与设计师确认",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.540698",
+      "updated_at": "2026-05-29T21:06:17.540699"
+    },
+    "after_data": {
+      "sample_id": "SAMP-002-B",
+      "fabric_name": "16姆米双绉真丝",
+      "fabric_type": "100%桑蚕丝，双绉，16姆米",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "supplier_id": "SUP-002",
+      "arrival_date": "2026-05-27",
+      "expected_arrival": "2026-05-26",
+      "inspection_deadline": "2026-05-28",
+      "sample_report_path": null,
+      "inspection_status": "检验不合格",
+      "remark": "有轻微色差，需与设计师确认",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.540698",
+      "updated_at": "2026-05-29T21:06:17.549552"
+    },
+    "change_reason": "检验中 → 检验不合格 (正常)",
+    "calculation_trace": [
+      "状态流转: SAMP-002-B",
+      "  当前状态: 检验中",
+      "  目标状态: 检验不合格"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617551",
+    "operation_type": "更新",
+    "entity_type": "sample",
+    "entity_id": "SAMP-002-B",
+    "operator": "测试用户",
+    "operation_time": "2026-05-29T21:06:17.551100",
+    "before_data": {
+      "sample_id": "SAMP-002-B",
+      "fabric_name": "16姆米双绉真丝",
+      "fabric_type": "100%桑蚕丝，双绉，16姆米",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "supplier_id": "SUP-002",
+      "arrival_date": "2026-05-27",
+      "expected_arrival": "2026-05-26",
+      "inspection_deadline": "2026-05-28",
+      "sample_report_path": null,
+      "inspection_status": "检验不合格",
+      "remark": "有轻微色差，需与设计师确认",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.540698",
+      "updated_at": "2026-05-29T21:06:17.549552"
+    },
+    "after_data": {
+      "sample_id": "SAMP-002-B",
+      "fabric_name": "16姆米双绉真丝",
+      "fabric_type": "100%桑蚕丝，双绉，16姆米",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "supplier_id": "SUP-002",
+      "arrival_date": "2026-05-27",
+      "expected_arrival": "2026-05-26",
+      "inspection_deadline": "2026-05-28",
+      "sample_report_path": null,
+      "inspection_status": "待复检",
+      "remark": "有轻微色差，需与设计师确认",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.540698",
+      "updated_at": "2026-05-29T21:06:17.551086"
+    },
+    "change_reason": "检验不合格 → 待复检 (正常)",
+    "calculation_trace": [
+      "状态流转: SAMP-002-B",
+      "  当前状态: 检验不合格",
+      "  目标状态: 待复检"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617553",
+    "operation_type": "撤回",
+    "entity_type": "sample",
+    "entity_id": "SAMP-004-D",
+    "operator": "测试用户",
+    "operation_time": "2026-05-29T21:06:17.553275",
+    "before_data": {
+      "sample_id": "SAMP-004-D",
+      "fabric_name": "藏青色哔叽毛料",
+      "fabric_type": "70%羊毛30%涤纶，哔叽，克重320g/㎡",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "supplier_id": "SUP-001",
+      "arrival_date": "2026-05-21",
+      "expected_arrival": "2026-05-22",
+      "inspection_deadline": "2026-05-25",
+      "sample_report_path": "/reports/SAMP-004-D.pdf",
+      "inspection_status": "检验通过",
+      "remark": "样卡边缘有污渍，不影响大货",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.540907",
+      "updated_at": "2026-05-29T21:06:17.540909"
+    },
+    "after_data": {
+      "sample_id": "SAMP-004-D",
+      "fabric_name": "藏青色哔叽毛料",
+      "fabric_type": "70%羊毛30%涤纶，哔叽，克重320g/㎡",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "supplier_id": "SUP-001",
+      "arrival_date": "2026-05-21",
+      "expected_arrival": "2026-05-22",
+      "inspection_deadline": "2026-05-25",
+      "sample_report_path": "/reports/SAMP-004-D.pdf",
+      "inspection_status": "已撤回",
+      "remark": "样卡边缘有污渍，不影响大货",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.540907",
+      "updated_at": "2026-05-29T21:06:17.553249"
+    },
+    "change_reason": "检验通过 → 已撤回 (正常)",
+    "calculation_trace": [
+      "状态流转: SAMP-004-D",
+      "  当前状态: 检验通过",
+      "  目标状态: 已撤回"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617556",
+    "operation_type": "补录",
+    "entity_type": "sample",
+    "entity_id": "SAMP-003-C",
+    "operator": "设计助理-小王",
+    "operation_time": "2026-05-29T21:06:17.556208",
+    "before_data": {
+      "sample_id": "SAMP-003-C",
+      "fabric_name": "40支精梳棉汗布",
+      "fabric_type": "100%新疆长绒棉，精梳，210g/㎡",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "supplier_id": "SUP-003",
+      "arrival_date": null,
+      "expected_arrival": "2026-05-27",
+      "inspection_deadline": "2026-05-31",
+      "sample_report_path": null,
+      "inspection_status": "待检验",
+      "remark": "供应商说发错了色号，等通知",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.555387",
+      "updated_at": "2026-05-29T21:06:17.555387"
+    },
+    "after_data": {
+      "sample_id": "SAMP-003-C",
+      "fabric_name": "40支精梳棉汗布",
+      "fabric_type": "100%新疆长绒棉，精梳，210g/㎡",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "supplier_id": "SUP-003",
+      "arrival_date": "2026-05-28",
+      "expected_arrival": "2026-05-27",
+      "inspection_deadline": "2026-06-03",
+      "sample_report_path": null,
+      "inspection_status": "待检验",
+      "remark": "补录: 供应商已重新发货，实际到货日期更正",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.555387",
+      "updated_at": "2026-05-29T21:06:17.556195"
+    },
+    "change_reason": "供应商通知实际到货日期变更，需要补录更正",
+    "calculation_trace": [
+      "样卡补录: SAMP-003-C",
+      "  操作人: 设计助理-小王",
+      "  原因: 供应商通知实际到货日期变更，需要补录更正",
+      "  更新字段: arrival_date, inspection_deadline, remark",
+      "    arrival_date: None → 2026-05-28",
+      "    inspection_deadline: 2026-05-31 → 2026-06-03",
+      "    remark: 供应商说发错了色号，等通知 → 补录: 供应商已重新发货，实际到货日期更正"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617559",
+    "operation_type": "更新",
+    "entity_type": "sample",
+    "entity_id": "SAMP-003-C",
+    "operator": "质检员-小李",
+    "operation_time": "2026-05-29T21:06:17.559890",
+    "before_data": {
+      "sample_id": "SAMP-003-C",
+      "fabric_name": "40支精梳棉汗布",
+      "fabric_type": "100%新疆长绒棉，精梳，210g/㎡",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "supplier_id": "SUP-003",
+      "arrival_date": "2026-05-28",
+      "expected_arrival": "2026-05-27",
+      "inspection_deadline": "2026-06-03",
+      "sample_report_path": null,
+      "inspection_status": "待检验",
+      "remark": "补录: 供应商已重新发货，实际到货日期更正",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.555387",
+      "updated_at": "2026-05-29T21:06:17.556195"
+    },
+    "after_data": {
+      "sample_id": "SAMP-003-C",
+      "fabric_name": "40支精梳棉汗布",
+      "fabric_type": "100%新疆长绒棉，精梳，210g/㎡",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "supplier_id": "SUP-003",
+      "arrival_date": "2026-05-28",
+      "expected_arrival": "2026-05-27",
+      "inspection_deadline": "2026-06-03",
+      "sample_report_path": null,
+      "inspection_status": "检验中",
+      "remark": "补录: 供应商已重新发货，实际到货日期更正",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.555387",
+      "updated_at": "2026-05-29T21:06:17.559863"
+    },
+    "change_reason": "补录完成后开始检验",
+    "calculation_trace": [
+      "状态流转: SAMP-003-C",
+      "  当前状态: 待检验",
+      "  目标状态: 检验中"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617562",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-001",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.562803",
+    "before_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "after_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": "SAMP-001-A",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "change_reason": "自动匹配样卡 SAMP-001-A, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #DC143C -> #DC143C",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 283.46",
+      "    匹配度 = 1 - 色差/255 = 1 - 283.46/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.3000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617564",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-002",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.564921",
+    "before_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "after_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": "SAMP-002-B",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "change_reason": "自动匹配样卡 SAMP-002-B, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 255,0,0 -> #FF0000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 373.04",
+      "    匹配度 = 1 - 色差/255 = 1 - 373.04/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617567",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-003",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.567657",
+    "before_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "after_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": "SAMP-003-C",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "change_reason": "自动匹配样卡 SAMP-003-C, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: PANTONE 186 C -> #CE1126",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 270.07",
+      "    匹配度 = 1 - 色差/255 = 1 - 270.07/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617571",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-004",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.571525",
+    "before_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": "SAMP-004-D",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-004-D, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 藏蓝 -> #003366",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 94.68",
+      "    匹配度 = 1 - 色差/255 = 1 - 94.68/255 = 0.6287",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6287*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6772"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617580",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-005",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.580190",
+    "before_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "after_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": "SAMP-005-E",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "change_reason": "自动匹配样卡 SAMP-005-E, 匹配度=0.8887",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #F5F5DC -> #F5F5DC",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 515.87",
+      "    匹配度 = 1 - 色差/255 = 1 - 515.87/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617584",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-006",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.584950",
+    "before_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": "SAMP-006-F",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-006-F, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #000000 -> #000000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 207.90",
+      "    匹配度 = 1 - 色差/255 = 1 - 207.90/255 = 0.1847",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.1847*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.1108"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617588",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-007",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.588227",
+    "before_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": "SAMP-007-G",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-007-G, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 军绿 -> #4B5320",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 88.54",
+      "    匹配度 = 1 - 色差/255 = 1 - 88.54/255 = 0.6528",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6528*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6917"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617594",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-008",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.594784",
+    "before_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": "SAMP-008-H",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-008-H, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #722F37 -> #722F37",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 108.88",
+      "    匹配度 = 1 - 色差/255 = 1 - 108.88/255 = 0.5730",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.5730*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.3438"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617599",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-010",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.599120",
+    "before_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "after_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": "SAMP-010-J",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "change_reason": "自动匹配样卡 SAMP-010-J, 匹配度=0.5600",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: C193, M154, Y107, K0 -> None",
+      "    色号2: 碳黑 -> #36454F",
+      "    警告: 缺少标准化RGB值，无法精确比对",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.3000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.2600"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617602",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-011",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.602102",
+    "before_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "after_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": "SAMP-011-K",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "change_reason": "自动匹配样卡 SAMP-011-K, 匹配度=0.6305",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 香芋紫 -> #B19CD9",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 340.33",
+      "    匹配度 = 1 - 色差/255 = 1 - 340.33/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.0800"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617605",
+    "operation_type": "撤回",
+    "entity_type": "sample",
+    "entity_id": "SAMP-002-B",
+    "operator": "设计主管-老张",
+    "operation_time": "2026-05-29T21:06:17.605777",
+    "before_data": {
+      "sample_id": "SAMP-002-B",
+      "fabric_name": "16姆米双绉真丝",
+      "fabric_type": "100%桑蚕丝，双绉，16姆米",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "supplier_id": "SUP-002",
+      "arrival_date": "2026-05-27",
+      "expected_arrival": "2026-05-26",
+      "inspection_deadline": "2026-05-28",
+      "sample_report_path": null,
+      "inspection_status": "检验中",
+      "remark": "有轻微色差，需与设计师确认",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.561955",
+      "updated_at": "2026-05-29T21:06:17.561955"
+    },
+    "after_data": {
+      "sample_id": "SAMP-002-B",
+      "fabric_name": "16姆米双绉真丝",
+      "fabric_type": "100%桑蚕丝，双绉，16姆米",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "supplier_id": "SUP-002",
+      "arrival_date": "2026-05-27",
+      "expected_arrival": "2026-05-26",
+      "inspection_deadline": "2026-05-28",
+      "sample_report_path": null,
+      "inspection_status": "已撤回",
+      "remark": "有轻微色差，需与设计师确认",
+      "is_missing": false,
+      "created_at": "2026-05-29T21:06:17.561955",
+      "updated_at": "2026-05-29T21:06:17.605707"
+    },
+    "change_reason": "样卡颜色不符合设计要求，退回供应商重新打样",
+    "calculation_trace": [
+      "状态流转: SAMP-002-B",
+      "  当前状态: 检验中",
+      "  目标状态: 已撤回"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617608",
+    "operation_type": "撤回",
+    "entity_type": "garment",
+    "entity_id": "GAR-002",
+    "operator": "设计主管-老张",
+    "operation_time": "2026-05-29T21:06:17.608753",
+    "before_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": "SAMP-002-B",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "after_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": null,
+      "supplier_id": null,
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "change_reason": "样卡 SAMP-002-B 已撤回，解除关联",
+    "calculation_trace": [
+      "解除与样卡 SAMP-002-B 的关联"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617613",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-001",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.613978",
+    "before_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "after_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": "SAMP-001-A",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "change_reason": "自动匹配样卡 SAMP-001-A, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #DC143C -> #DC143C",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 283.46",
+      "    匹配度 = 1 - 色差/255 = 1 - 283.46/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.3000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617616",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-002",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.616392",
+    "before_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "after_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": "SAMP-002-B",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "change_reason": "自动匹配样卡 SAMP-002-B, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 255,0,0 -> #FF0000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 373.04",
+      "    匹配度 = 1 - 色差/255 = 1 - 373.04/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617618",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-003",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.618879",
+    "before_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "after_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": "SAMP-003-C",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "change_reason": "自动匹配样卡 SAMP-003-C, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: PANTONE 186 C -> #CE1126",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 270.07",
+      "    匹配度 = 1 - 色差/255 = 1 - 270.07/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617621",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-004",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.622003",
+    "before_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": "SAMP-004-D",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-004-D, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 藏蓝 -> #003366",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 94.68",
+      "    匹配度 = 1 - 色差/255 = 1 - 94.68/255 = 0.6287",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6287*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6772"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617624",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-005",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.624637",
+    "before_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "after_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": "SAMP-005-E",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "change_reason": "自动匹配样卡 SAMP-005-E, 匹配度=0.8887",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #F5F5DC -> #F5F5DC",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 515.87",
+      "    匹配度 = 1 - 色差/255 = 1 - 515.87/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617629",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-006",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.630002",
+    "before_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": "SAMP-006-F",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-006-F, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #000000 -> #000000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 207.90",
+      "    匹配度 = 1 - 色差/255 = 1 - 207.90/255 = 0.1847",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.1847*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.1108"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617632",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-007",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.632793",
+    "before_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": "SAMP-007-G",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-007-G, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 军绿 -> #4B5320",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 88.54",
+      "    匹配度 = 1 - 色差/255 = 1 - 88.54/255 = 0.6528",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6528*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6917"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617635",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-008",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.635469",
+    "before_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": "SAMP-008-H",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-008-H, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #722F37 -> #722F37",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 108.88",
+      "    匹配度 = 1 - 色差/255 = 1 - 108.88/255 = 0.5730",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.5730*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.3438"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617638",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-010",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.638380",
+    "before_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "after_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": "SAMP-010-J",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "change_reason": "自动匹配样卡 SAMP-010-J, 匹配度=0.5600",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: C193, M154, Y107, K0 -> None",
+      "    色号2: 碳黑 -> #36454F",
+      "    警告: 缺少标准化RGB值，无法精确比对",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.3000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.2600"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617641",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-011",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.641187",
+    "before_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "after_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": "SAMP-011-K",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "change_reason": "自动匹配样卡 SAMP-011-K, 匹配度=0.6305",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 香芋紫 -> #B19CD9",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 340.33",
+      "    匹配度 = 1 - 色差/255 = 1 - 340.33/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.0800"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617646",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-001",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.646321",
+    "before_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "after_data": {
+      "garment_id": "GAR-001",
+      "style_name": "修身西装外套",
+      "style_code": "SS24-CX-001",
+      "sample_id": "SAMP-001-A",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "#DC143C",
+        "color_name": "大红",
+        "format_detected": "HEX",
+        "normalized_hex": "#DC143C",
+        "normalized_rgb": [
+          220,
+          20,
+          60
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "大红(#DC143C, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 1,
+      "remark": "开场第一套，红色系主题"
+    },
+    "change_reason": "自动匹配样卡 SAMP-001-A, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #DC143C -> #DC143C",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 283.46",
+      "    匹配度 = 1 - 色差/255 = 1 - 283.46/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.3000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617649",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-002",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.649252",
+    "before_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "after_data": {
+      "garment_id": "GAR-002",
+      "style_name": "真丝连衣裙",
+      "style_code": "SS24-LYQ-002",
+      "sample_id": "SAMP-002-B",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "255,0,0",
+        "color_name": "正红",
+        "format_detected": "RGB",
+        "normalized_hex": "#FF0000",
+        "normalized_rgb": [
+          255,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.9,
+        "is_confusing": true,
+        "confusing_with": [
+          "正红(#FF0000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-03",
+      "show_order": 3,
+      "remark": "注意与西装外套的红色是否一致"
+    },
+    "change_reason": "自动匹配样卡 SAMP-002-B, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 255,0,0 -> #FF0000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 373.04",
+      "    匹配度 = 1 - 色差/255 = 1 - 373.04/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617652",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-003",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.652299",
+    "before_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "after_data": {
+      "garment_id": "GAR-003",
+      "style_name": "纯棉T恤",
+      "style_code": "SS24-TX-003",
+      "sample_id": "SAMP-003-C",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "PANTONE 186 C",
+        "color_name": "中国红",
+        "format_detected": "PANTONE",
+        "normalized_hex": "#CE1126",
+        "normalized_rgb": [
+          206,
+          17,
+          38
+        ],
+        "pantone_code": "PANTONE 186 C",
+        "color_confidence": 0.7,
+        "is_confusing": false,
+        "confusing_with": null
+      },
+      "fitting_date": "2026-06-02",
+      "show_order": 5,
+      "remark": "内搭单品"
+    },
+    "change_reason": "自动匹配样卡 SAMP-003-C, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: PANTONE 186 C -> #CE1126",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 270.07",
+      "    匹配度 = 1 - 色差/255 = 1 - 270.07/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617655",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-004",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.655360",
+    "before_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-004",
+      "style_name": "藏青色西装套装",
+      "style_code": "SS24-TZ-004",
+      "sample_id": "SAMP-004-D",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "藏蓝",
+        "color_name": "藏蓝",
+        "format_detected": "中文名称",
+        "normalized_hex": "#003366",
+        "normalized_rgb": [
+          0,
+          51,
+          102
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "深蓝(同色系易混, 阈值=60)",
+          "宝蓝(同色系易混, 阈值=60)"
+        ]
+      },
+      "fitting_date": "2026-05-31",
+      "show_order": 7,
+      "remark": "商务系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-004-D, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 藏蓝 -> #003366",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 94.68",
+      "    匹配度 = 1 - 色差/255 = 1 - 94.68/255 = 0.6287",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6287*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6772"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617658",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-005",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.658819",
+    "before_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "after_data": {
+      "garment_id": "GAR-005",
+      "style_name": "米白色羊绒开衫",
+      "style_code": "SS24-KS-005",
+      "sample_id": "SAMP-005-E",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "象牙白",
+        "color_name": "米白",
+        "format_detected": "中文名称",
+        "normalized_hex": "#FFFFF0",
+        "normalized_rgb": [
+          255,
+          255,
+          240
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "纯白(#FFFFFF, 色差=21.2)",
+          "米白(同色系易混, 阈值=30)",
+          "本白(同色系易混, 阈值=30)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 9,
+      "remark": "颜色名称故意混淆测试：样卡是米白，成衣写象牙白"
+    },
+    "change_reason": "自动匹配样卡 SAMP-005-E, 匹配度=0.8887",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #F5F5DC -> #F5F5DC",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 515.87",
+      "    匹配度 = 1 - 色差/255 = 1 - 515.87/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.0000"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617663",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-006",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.663210",
+    "before_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-006",
+      "style_name": "黑色皮夹克",
+      "style_code": "SS24-PY-006",
+      "sample_id": "SAMP-006-F",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#000000",
+        "color_name": "黑色",
+        "format_detected": "HEX",
+        "normalized_hex": "#000000",
+        "normalized_rgb": [
+          0,
+          0,
+          0
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "黑色(#000000, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-05-30",
+      "show_order": 11,
+      "remark": "朋克风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-006-F, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #000000 -> #000000",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 207.90",
+      "    匹配度 = 1 - 色差/255 = 1 - 207.90/255 = 0.1847",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.1847*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.1108"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617666",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-007",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.666401",
+    "before_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": null,
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "after_data": {
+      "garment_id": "GAR-007",
+      "style_name": "军绿色风衣",
+      "style_code": "SS24-FY-007",
+      "sample_id": "SAMP-007-G",
+      "supplier_id": "SUP-001",
+      "color_spec": {
+        "color_code": "军绿",
+        "color_name": "军绿",
+        "format_detected": "中文名称",
+        "normalized_hex": "#4B5320",
+        "normalized_rgb": [
+          75,
+          83,
+          32
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.85,
+        "is_confusing": true,
+        "confusing_with": [
+          "墨绿(同色系易混, 阈值=40)"
+        ]
+      },
+      "fitting_date": "2026-06-05",
+      "show_order": 13,
+      "remark": "工装风格"
+    },
+    "change_reason": "自动匹配样卡 SAMP-007-G, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 军绿 -> #4B5320",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 88.54",
+      "    匹配度 = 1 - 色差/255 = 1 - 88.54/255 = 0.6528",
+      "    判定: 可接受差异",
+      "    供应商匹配: 一致 (SUP-001)，得分=1.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.6528*0.6 + 1.0000*0.3 + 0.0000*0.1 = 0.6917"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617669",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-008",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.669663",
+    "before_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": null,
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "after_data": {
+      "garment_id": "GAR-008",
+      "style_name": "酒红色丝绒长裙",
+      "style_code": "SS24-CQ-008",
+      "sample_id": "SAMP-008-H",
+      "supplier_id": "SUP-002",
+      "color_spec": {
+        "color_code": "#722F37",
+        "color_name": "酒红",
+        "format_detected": "HEX",
+        "normalized_hex": "#722F37",
+        "normalized_rgb": [
+          114,
+          47,
+          55
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "酒红(#722F37, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-06",
+      "show_order": 15,
+      "remark": "晚宴系列"
+    },
+    "change_reason": "自动匹配样卡 SAMP-008-H, 匹配度=0.9800",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: #722F37 -> #722F37",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 108.88",
+      "    匹配度 = 1 - 色差/255 = 1 - 108.88/255 = 0.5730",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-002, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.0000",
+      "    加权总分 = 0.5730*0.6 + 0.0000*0.3 + 0.0000*0.1 = 0.3438"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617672",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-010",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.672933",
+    "before_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": null,
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "after_data": {
+      "garment_id": "GAR-010",
+      "style_name": "驼色双面呢大衣",
+      "style_code": "SS24-DY-010",
+      "sample_id": "SAMP-010-J",
+      "supplier_id": "SUP-004",
+      "color_spec": {
+        "color_code": "#C19A6B",
+        "color_name": "驼色",
+        "format_detected": "HEX",
+        "normalized_hex": "#C19A6B",
+        "normalized_rgb": [
+          193,
+          154,
+          107
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "驼色(#C19A6B, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-04",
+      "show_order": 19,
+      "remark": "主打款，手工双面呢"
+    },
+    "change_reason": "自动匹配样卡 SAMP-010-J, 匹配度=0.5600",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: C193, M154, Y107, K0 -> None",
+      "    色号2: 碳黑 -> #36454F",
+      "    警告: 缺少标准化RGB值，无法精确比对",
+      "    供应商匹配: 不一致 (样卡=SUP-004, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.3000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.2600"
+    ]
+  },
+  {
+    "record_id": "HIST-20260529210617679",
+    "operation_type": "匹配",
+    "entity_type": "garment",
+    "entity_id": "GAR-011",
+    "operator": null,
+    "operation_time": "2026-05-29T21:06:17.679690",
+    "before_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": null,
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "after_data": {
+      "garment_id": "GAR-011",
+      "style_name": "藕粉色雪纺上衣",
+      "style_code": "SS24-SY-011",
+      "sample_id": "SAMP-011-K",
+      "supplier_id": "SUP-003",
+      "color_spec": {
+        "color_code": "#EDC9AF",
+        "color_name": "藕粉",
+        "format_detected": "HEX",
+        "normalized_hex": "#EDC9AF",
+        "normalized_rgb": [
+          237,
+          201,
+          175
+        ],
+        "pantone_code": null,
+        "color_confidence": 0.95,
+        "is_confusing": true,
+        "confusing_with": [
+          "藕粉(#EDC9AF, 色差=0.0)"
+        ]
+      },
+      "fitting_date": "2026-06-01",
+      "show_order": 21,
+      "remark": "颜色名和样卡不一致测试"
+    },
+    "change_reason": "自动匹配样卡 SAMP-011-K, 匹配度=0.6305",
+    "calculation_trace": [
+      "  比对成衣 GAR-012 (黑色阔腿裤):",
+      "    颜色比对开始",
+      "    色号1: 香芋紫 -> #B19CD9",
+      "    色号2: 碳黑 -> #36454F",
+      "    计算色差 (Redmean公式): 340.33",
+      "    匹配度 = 1 - 色差/255 = 1 - 340.33/255 = 0.0000",
+      "    判定: 差异较大",
+      "    供应商匹配: 不一致 (样卡=SUP-003, 成衣=SUP-001)，得分=0.0",
+      "    编号关联度: 0.8000",
+      "    加权总分 = 0.0000*0.6 + 0.0000*0.3 + 0.8000*0.1 = 0.0800"
+    ]
+  }
+]

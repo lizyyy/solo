@@ -1,0 +1,305 @@
+{
+  "matching_report": {
+    "report_type": "样卡匹配报告",
+    "generated_at": "2026-05-29T21:05:39.457666",
+    "summary": {
+      "total_samples": 11,
+      "missing_samples": 1,
+      "total_garments": 12,
+      "matched_pairs": 9,
+      "unmatched_samples": 1,
+      "unmatched_garments": 2,
+      "auto_matches": 9,
+      "manual_matches": 0
+    },
+    "matches": [
+      {
+        "match_id": "MATCH-20260529210539042",
+        "match_score": 0.98,
+        "color_match_score": 1.0,
+        "supplier_match_score": 1.0,
+        "is_manual": false,
+        "matched_by": "系统自动匹配",
+        "matched_at": "2026-05-29T21:05:39.042111",
+        "sample": {
+          "sample_id": "SAMP-001-A",
+          "fabric_name": "80支精纺羊毛面料",
+          "color_code": "#DC143C",
+          "normalized_hex": "#DC143C"
+        },
+        "garment": {
+          "garment_id": "GAR-001",
+          "style_name": "修身西装外套",
+          "color_code": "#DC143C"
+        },
+        "supplier": {
+          "supplier_id": "SUP-001",
+          "supplier_name": "江苏阳光毛纺织有限公司"
+        }
+      },
+      {
+        "match_id": "MATCH-20260529210539043",
+        "match_score": 0.98,
+        "color_match_score": 1.0,
+        "supplier_match_score": 1.0,
+        "is_manual": false,
+        "matched_by": "系统自动匹配",
+        "matched_at": "2026-05-29T21:05:39.043491",
+        "sample": {
+          "sample_id": "SAMP-002-B",
+          "fabric_name": "16姆米双绉真丝",
+          "color_code": "255,0,0",
+          "normalized_hex": "#FF0000"
+        },
+        "garment": {
+          "garment_id": "GAR-002",
+          "style_name": "真丝连衣裙",
+          "color_code": "255,0,0"
+        },
+        "supplier": {
+          "supplier_id": "SUP-002",
+          "supplier_name": "浙江柯桥丝绸集团"
+        }
+      },
+      {
+        "match_id": "MATCH-20260529210539044",
+        "match_score": 0.98,
+        "color_match_score": 1.0,
+        "supplier_match_score": 1.0,
+        "is_manual": false,
+        "matched_by": "系统自动匹配",
+        "matched_at": "2026-05-29T21:05:39.044320",
+        "sample": {
+          "sample_id": "SAMP-003-C",
+          "fabric_name": "40支精梳棉汗布",
+          "color_code": "PANTONE 186 C",
+          "normalized_hex": "#CE1126"
+        },
+        "garment": {
+          "garment_id": "GAR-003",
+          "style_name": "纯棉T恤",
+          "color_code": "PANTONE 186 C"
+        },
+        "supplier": {
+          "supplier_id": "SUP-003",
+          "supplier_name": "广东东莞针织面料厂"
+        }
+      },
+      {
+        "match_id": "MATCH-20260529210539045",
+        "match_score": 0.98,
+        "color_match_score": 1.0,
+        "supplier_match_score": 1.0,
+        "is_manual": false,
+        "matched_by": "系统自动匹配",
+        "matched_at": "2026-05-29T21:05:39.045188",
+        "sample": {
+          "sample_id": "SAMP-004-D",
+          "fabric_name": "藏青色哔叽毛料",
+          "color_code": "藏蓝",
+          "normalized_hex": "#003366"
+        },
+        "garment": {
+          "garment_id": "GAR-004",
+          "style_name": "藏青色西装套装",
+          "color_code": "藏蓝"
+        },
+        "supplier": {
+          "supplier_id": "SUP-001",
+          "supplier_name": "江苏阳光毛纺织有限公司"
+        }
+      },
+      {
+        "match_id": "MATCH-20260529210539046",
+        "match_score": 0.98,
+        "color_match_score": 1.0,
+        "supplier_match_score": 1.0,
+        "is_manual": false,
+        "matched_by": "系统自动匹配",
+        "matched_at": "2026-05-29T21:05:39.046927",
+        "sample": {
+          "sample_id": "SAMP-006-F",
+          "fabric_name": "头层牛皮荔枝纹",
+          "color_code": "#000000",
+          "normalized_hex": "#000000"
+        },
+        "garment": {
+          "garment_id": "GAR-006",
+          "style_name": "黑色皮夹克",
+          "color_code": "#000000"
+        },
+        "supplier": {
+          "supplier_id": "SUP-004",
+          "supplier_name": "上海皮革制品有限公司"
+        }
+      },
+      {
+        "match_id": "MATCH-20260529210539047",
+        "match_score": 0.98,
+        "color_match_score": 1.0,
+        "supplier_match_score": 1.0,
+        "is_manual": false,
+        "matched_by": "系统自动匹配",
+        "matched_at": "2026-05-29T21:05:39.047847",
+        "sample": {
+          "sample_id": "SAMP-007-G",
+          "fabric_name": "军绿色纯棉帆布",
+          "color_code": "军绿",
+          "normalized_hex": "#4B5320"
+        },
+        "garment": {
+          "garment_id": "GAR-007",
+          "style_name": "军绿色风衣",
+          "color_code": "军绿"
+        },
+        "supplier": {
+          "supplier_id": "SUP-001",
+          "supplier_name": "江苏阳光毛纺织有限公司"
+        }
+      },
+      {
+        "match_id": "MATCH-20260529210539048",
+        "match_score": 0.98,
+        "color_match_score": 1.0,
+        "supplier_match_score": 1.0,
+        "is_manual": false,
+        "matched_by": "系统自动匹配",
+        "matched_at": "2026-05-29T21:05:39.048813",
+        "sample": {
+          "sample_id": "SAMP-008-H",
+          "fabric_name": "酒红色丝绒面料",
+          "color_code": "#722F37",
+          "normalized_hex": "#722F37"
+        },
+        "garment": {
+          "garment_id": "GAR-008",
+          "style_name": "酒红色丝绒长裙",
+          "color_code": "#722F37"
+        },
+        "supplier": {
+          "supplier_id": "SUP-002",
+          "supplier_name": "浙江柯桥丝绸集团"
+        }
+      },
+      {
+        "match_id": "MATCH-20260529210539049",
+        "match_score": 0.56,
+        "color_match_score": 0.3,
+        "supplier_match_score": 1.0,
+        "is_manual": false,
+        "matched_by": "系统自动匹配",
+        "matched_at": "2026-05-29T21:05:39.049830",
+        "sample": {
+          "sample_id": "SAMP-010-J",
+          "fabric_name": "驼色羊毛大衣呢",
+          "color_code": "C193, M154, Y107, K0",
+          "normalized_hex": null
+        },
+        "garment": {
+          "garment_id": "GAR-010",
+          "style_name": "驼色双面呢大衣",
+          "color_code": "#C19A6B"
+        },
+        "supplier": {
+          "supplier_id": "SUP-004",
+          "supplier_name": "上海皮革制品有限公司"
+        }
+      },
+      {
+        "match_id": "MATCH-20260529210539050",
+        "match_score": 0.6305,
+        "color_match_score": 0.4174,
+        "supplier_match_score": 1.0,
+        "is_manual": false,
+        "matched_by": "系统自动匹配",
+        "matched_at": "2026-05-29T21:05:39.050890",
+        "sample": {
+          "sample_id": "SAMP-011-K",
+          "fabric_name": "藕粉色雪纺面料",
+          "color_code": "香芋紫",
+          "normalized_hex": "#B19CD9"
+        },
+        "garment": {
+          "garment_id": "GAR-011",
+          "style_name": "藕粉色雪纺上衣",
+          "color_code": "#EDC9AF"
+        },
+        "supplier": {
+          "supplier_id": "SUP-003",
+          "supplier_name": "广东东莞针织面料厂"
+        }
+      }
+    ],
+    "calculation_details": [
+      {
+        "title": "匹配置信度计算方法",
+        "formula": "总分 = 颜色匹配度 * 0.6 + 供应商匹配度 * 0.3 + 编号关联度 * 0.1",
+        "weights": {
+          "color": 0.6,
+          "supplier": 0.3,
+          "id_correlation": 0.1
+        },
+        "threshold": 0.5,
+        "description": "总分 >= 0.5 判定为匹配成功"
+      },
+      {
+        "title": "颜色匹配度计算方法",
+        "formula": "匹配度 = 1 - 色差 / 255",
+        "color_distance_formula": "Redmean公式: sqrt((2+rmean/256)*r² + 4*g² + (2+(255-rmean)/256)*b²)",
+        "thresholds": {
+          "exact_match": "< 10",
+          "similar": "10 - 40",
+          "acceptable": "40 - 100",
+          "different": "> 100"
+        }
+      }
+    ]
+  },
+  "arrival_report": {
+    "report_type": "到货与检验状态报告",
+    "generated_at": "2026-05-29T21:05:39.457709",
+    "reference_date": "2026-05-29",
+    "summary": {
+      "total_samples": 11,
+      "on_time": 0,
+      "early": 0,
+      "delayed": 0,
+      "not_arrived": 0,
+      "missing_samples": 0,
+      "by_status": {
+        "待检验": 5,
+        "检验中": 1,
+        "检验通过": 2,
+        "检验不合格": 1,
+        "待复检": 1,
+        "已撤回": 1
+      }
+    },
+    "reminders": [],
+    "calculation_details": [
+      {
+        "title": "到货状态判定规则",
+        "rules": [
+          "实际到货日期 = 预计到货日期 → 准时到货",
+          "实际到货日期 < 预计到货日期 → 提前到货",
+          "实际到货日期 > 预计到货日期 → 到货逾期 (逾期天数=实际-预计)",
+          "当前日期 > 预计到货日期 且 未到货 → 到货逾期 (逾期天数=当前-预计)",
+          "当前日期 <= 预计到货日期 且 未到货 → 未到货"
+        ],
+        "thresholds": {
+          "delay_warning": ">= 3 天 (警告)",
+          "delay_error": "> 7 天 (错误)",
+          "deadline_warning": "<= 7 天 (检验截止提醒)"
+        }
+      },
+      {
+        "title": "状态流转可靠性校验",
+        "checks": [
+          "到货日期 > 检验截止日期 且 检验状态 ≠ 待检验/已撤回 → 状态流转异常",
+          "状态变更必须遵循流转规则: PENDING → IN_PROGRESS → PASSED/FAILED → REINSPECT → ...",
+          "撤回操作必须解除所有关联的成衣匹配"
+        ]
+      }
+    ]
+  }
+}

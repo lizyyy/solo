@@ -1,0 +1,522 @@
+[
+  {
+    "error_id": "ERR-20260529210443699",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-002",
+    "message": "样卡 SAMP-003-C 已逾期 2 天未到货 (预计2026-05-27)",
+    "related_sample_id": "SAMP-003-C",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "warning",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-27",
+      "actual_arrival": null,
+      "inspection_deadline": "2026-05-31",
+      "days_since_expected": 2,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:04:43.699522",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210443699",
+    "error_type": "检验提醒",
+    "error_code": "INSPECT-001",
+    "message": "样卡 SAMP-003-C 检验还有 2 天截止",
+    "related_sample_id": "SAMP-003-C",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "info",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-27",
+      "actual_arrival": null,
+      "inspection_deadline": "2026-05-31",
+      "days_since_expected": 2,
+      "days_before_deadline": 2
+    },
+    "created_at": "2026-05-29T21:04:43.699795",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210443699",
+    "error_type": "检验提醒",
+    "error_code": "INSPECT-001",
+    "message": "样卡 SAMP-005-E 检验还有 5 天截止",
+    "related_sample_id": "SAMP-005-E",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "info",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-30",
+      "actual_arrival": null,
+      "inspection_deadline": "2026-06-03",
+      "days_since_expected": -1,
+      "days_before_deadline": 5
+    },
+    "created_at": "2026-05-29T21:04:43.700002",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210443700",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-001",
+    "message": "样卡 SAMP-006-F 到货逾期 15 天 (预计2026-05-19, 实际2026-06-03)",
+    "related_sample_id": "SAMP-006-F",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "error",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-19",
+      "actual_arrival": "2026-06-03",
+      "inspection_deadline": "2026-05-29",
+      "arrival_days_diff": 15,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:04:43.700180",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210443700",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-001",
+    "message": "样卡 SAMP-007-G 到货逾期 3 天 (预计2026-05-25, 实际2026-05-28)",
+    "related_sample_id": "SAMP-007-G",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "warning",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-25",
+      "actual_arrival": "2026-05-28",
+      "inspection_deadline": "2026-05-19",
+      "arrival_days_diff": 3,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:04:43.700448",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210443700",
+    "error_type": "状态流转",
+    "error_code": "FLOW-001",
+    "message": "样卡 SAMP-007-G 状态流转异常: 检验状态(检验不合格)早于实际到货(2026-05-28)，检验截止2026-05-19",
+    "related_sample_id": "SAMP-007-G",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "error",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-25",
+      "actual_arrival": "2026-05-28",
+      "inspection_deadline": "2026-05-19",
+      "arrival_days_diff": 3,
+      "days_before_deadline": -10,
+      "status_chain": [
+        "待检验",
+        "检验不合格"
+      ],
+      "arrival_after_deadline_days": 9,
+      "current_status": "检验不合格",
+      "anomaly": "检验状态流转早于到货日期"
+    },
+    "created_at": "2026-05-29T21:04:43.700635",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210443700",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-001",
+    "message": "样卡 SAMP-008-H 到货逾期 3 天 (预计2026-05-14, 实际2026-05-17)",
+    "related_sample_id": "SAMP-008-H",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "warning",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-14",
+      "actual_arrival": "2026-05-17",
+      "inspection_deadline": "2026-05-21",
+      "arrival_days_diff": 3,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:04:43.700853",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210443701",
+    "error_type": "检验提醒",
+    "error_code": "INSPECT-001",
+    "message": "样卡 SAMP-010-J 检验还有 4 天截止",
+    "related_sample_id": "SAMP-010-J",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "info",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-28",
+      "actual_arrival": "2026-05-28",
+      "inspection_deadline": "2026-06-02",
+      "arrival_days_diff": 0,
+      "days_before_deadline": 4
+    },
+    "created_at": "2026-05-29T21:04:43.701068",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617542",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-002",
+    "message": "样卡 SAMP-003-C 已逾期 2 天未到货 (预计2026-05-27)",
+    "related_sample_id": "SAMP-003-C",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "warning",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-27",
+      "actual_arrival": null,
+      "inspection_deadline": "2026-05-31",
+      "days_since_expected": 2,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:06:17.542978",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617543",
+    "error_type": "检验提醒",
+    "error_code": "INSPECT-001",
+    "message": "样卡 SAMP-003-C 检验还有 2 天截止",
+    "related_sample_id": "SAMP-003-C",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "info",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-27",
+      "actual_arrival": null,
+      "inspection_deadline": "2026-05-31",
+      "days_since_expected": 2,
+      "days_before_deadline": 2
+    },
+    "created_at": "2026-05-29T21:06:17.543596",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617543",
+    "error_type": "检验提醒",
+    "error_code": "INSPECT-001",
+    "message": "样卡 SAMP-005-E 检验还有 5 天截止",
+    "related_sample_id": "SAMP-005-E",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "info",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-30",
+      "actual_arrival": null,
+      "inspection_deadline": "2026-06-03",
+      "days_since_expected": -1,
+      "days_before_deadline": 5
+    },
+    "created_at": "2026-05-29T21:06:17.543971",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617544",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-001",
+    "message": "样卡 SAMP-006-F 到货逾期 15 天 (预计2026-05-19, 实际2026-06-03)",
+    "related_sample_id": "SAMP-006-F",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "error",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-19",
+      "actual_arrival": "2026-06-03",
+      "inspection_deadline": "2026-05-29",
+      "arrival_days_diff": 15,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:06:17.544227",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617544",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-001",
+    "message": "样卡 SAMP-007-G 到货逾期 3 天 (预计2026-05-25, 实际2026-05-28)",
+    "related_sample_id": "SAMP-007-G",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "warning",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-25",
+      "actual_arrival": "2026-05-28",
+      "inspection_deadline": "2026-05-19",
+      "arrival_days_diff": 3,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:06:17.544484",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617544",
+    "error_type": "状态流转",
+    "error_code": "FLOW-001",
+    "message": "样卡 SAMP-007-G 状态流转异常: 检验状态(检验不合格)早于实际到货(2026-05-28)，检验截止2026-05-19",
+    "related_sample_id": "SAMP-007-G",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "error",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-25",
+      "actual_arrival": "2026-05-28",
+      "inspection_deadline": "2026-05-19",
+      "arrival_days_diff": 3,
+      "days_before_deadline": -10,
+      "status_chain": [
+        "待检验",
+        "检验不合格"
+      ],
+      "arrival_after_deadline_days": 9,
+      "current_status": "检验不合格",
+      "anomaly": "检验状态流转早于到货日期"
+    },
+    "created_at": "2026-05-29T21:06:17.544751",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617545",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-001",
+    "message": "样卡 SAMP-008-H 到货逾期 3 天 (预计2026-05-14, 实际2026-05-17)",
+    "related_sample_id": "SAMP-008-H",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "warning",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-14",
+      "actual_arrival": "2026-05-17",
+      "inspection_deadline": "2026-05-21",
+      "arrival_days_diff": 3,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:06:17.545042",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617545",
+    "error_type": "检验提醒",
+    "error_code": "INSPECT-001",
+    "message": "样卡 SAMP-010-J 检验还有 4 天截止",
+    "related_sample_id": "SAMP-010-J",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "info",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-28",
+      "actual_arrival": "2026-05-28",
+      "inspection_deadline": "2026-06-02",
+      "arrival_days_diff": 0,
+      "days_before_deadline": 4
+    },
+    "created_at": "2026-05-29T21:06:17.545411",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617549",
+    "error_type": "状态流转",
+    "error_code": "FLOW-003",
+    "message": "状态流转不允许: 从 检验通过 不能直接转为 待检验，允许的状态: 已撤回",
+    "related_sample_id": "SAMP-003-C",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "error",
+    "calculation_detail": {
+      "current_status": "检验通过",
+      "new_status": "待检验",
+      "allowed_transitions": [
+        "已撤回"
+      ]
+    },
+    "created_at": "2026-05-29T21:06:17.549188",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617683",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-002",
+    "message": "样卡 SAMP-003-C 已逾期 2 天未到货 (预计2026-05-27)",
+    "related_sample_id": "SAMP-003-C",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "warning",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-27",
+      "actual_arrival": null,
+      "inspection_deadline": "2026-05-31",
+      "days_since_expected": 2,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:06:17.683404",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617683",
+    "error_type": "检验提醒",
+    "error_code": "INSPECT-001",
+    "message": "样卡 SAMP-003-C 检验还有 2 天截止",
+    "related_sample_id": "SAMP-003-C",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "info",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-27",
+      "actual_arrival": null,
+      "inspection_deadline": "2026-05-31",
+      "days_since_expected": 2,
+      "days_before_deadline": 2
+    },
+    "created_at": "2026-05-29T21:06:17.683812",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617684",
+    "error_type": "检验提醒",
+    "error_code": "INSPECT-001",
+    "message": "样卡 SAMP-005-E 检验还有 5 天截止",
+    "related_sample_id": "SAMP-005-E",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "info",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-30",
+      "actual_arrival": null,
+      "inspection_deadline": "2026-06-03",
+      "days_since_expected": -1,
+      "days_before_deadline": 5
+    },
+    "created_at": "2026-05-29T21:06:17.684200",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617684",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-001",
+    "message": "样卡 SAMP-006-F 到货逾期 15 天 (预计2026-05-19, 实际2026-06-03)",
+    "related_sample_id": "SAMP-006-F",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "error",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-19",
+      "actual_arrival": "2026-06-03",
+      "inspection_deadline": "2026-05-29",
+      "arrival_days_diff": 15,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:06:17.684551",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617684",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-001",
+    "message": "样卡 SAMP-007-G 到货逾期 3 天 (预计2026-05-25, 实际2026-05-28)",
+    "related_sample_id": "SAMP-007-G",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "warning",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-25",
+      "actual_arrival": "2026-05-28",
+      "inspection_deadline": "2026-05-19",
+      "arrival_days_diff": 3,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:06:17.684911",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617685",
+    "error_type": "状态流转",
+    "error_code": "FLOW-001",
+    "message": "样卡 SAMP-007-G 状态流转异常: 检验状态(检验不合格)早于实际到货(2026-05-28)，检验截止2026-05-19",
+    "related_sample_id": "SAMP-007-G",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "error",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-25",
+      "actual_arrival": "2026-05-28",
+      "inspection_deadline": "2026-05-19",
+      "arrival_days_diff": 3,
+      "days_before_deadline": -10,
+      "status_chain": [
+        "待检验",
+        "检验不合格"
+      ],
+      "arrival_after_deadline_days": 9,
+      "current_status": "检验不合格",
+      "anomaly": "检验状态流转早于到货日期"
+    },
+    "created_at": "2026-05-29T21:06:17.685267",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617685",
+    "error_type": "到货管理",
+    "error_code": "ARRIVAL-001",
+    "message": "样卡 SAMP-008-H 到货逾期 3 天 (预计2026-05-14, 实际2026-05-17)",
+    "related_sample_id": "SAMP-008-H",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "warning",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-14",
+      "actual_arrival": "2026-05-17",
+      "inspection_deadline": "2026-05-21",
+      "arrival_days_diff": 3,
+      "threshold": 3
+    },
+    "created_at": "2026-05-29T21:06:17.685999",
+    "resolved": false
+  },
+  {
+    "error_id": "ERR-20260529210617686",
+    "error_type": "检验提醒",
+    "error_code": "INSPECT-001",
+    "message": "样卡 SAMP-010-J 检验还有 4 天截止",
+    "related_sample_id": "SAMP-010-J",
+    "related_garment_id": null,
+    "related_supplier_id": null,
+    "severity": "info",
+    "calculation_detail": {
+      "reference_date": "2026-05-29",
+      "expected_arrival": "2026-05-28",
+      "actual_arrival": "2026-05-28",
+      "inspection_deadline": "2026-06-02",
+      "arrival_days_diff": 0,
+      "days_before_deadline": 4
+    },
+    "created_at": "2026-05-29T21:06:17.686851",
+    "resolved": false
+  }
+]
