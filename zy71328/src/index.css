@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  background-color: #121217;
+  color: #F8FAFC;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1A1A21;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+::-webkit-scrollbar-corner {
+  background: #1A1A21;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #1A1A21;
+}
+
+::selection {
+  background-color: rgba(0, 240, 255, 0.3);
+  color: #F8FAFC;
+}
+
+::-moz-selection {
+  background-color: rgba(0, 240, 255, 0.3);
+  color: #F8FAFC;
+}
+
+@keyframes levelMeter {
+  0%, 100% {
+    transform: scaleY(0.3);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes levelMeterAlt {
+  0%, 100% {
+    transform: scaleY(0.6);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scaleY(0.2);
+    opacity: 0.4;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(0, 240, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+  }
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes waveformBar {
+  0%, 100% {
+    height: 20%;
+  }
+  50% {
+    height: 100%;
+  }
+}
+
+.animate-level-meter > * {
+  animation: levelMeter 0.8s ease-in-out infinite;
+}
+
+.animate-level-meter > *:nth-child(2n) {
+  animation-name: levelMeterAlt;
+}
+
+.animate-level-meter > *:nth-child(1) { animation-delay: 0s; }
+.animate-level-meter > *:nth-child(2) { animation-delay: 0.1s; }
+.animate-level-meter > *:nth-child(3) { animation-delay: 0.2s; }
+.animate-level-meter > *:nth-child(4) { animation-delay: 0.3s; }
+.animate-level-meter > *:nth-child(5) { animation-delay: 0.4s; }
+.animate-level-meter > *:nth-child(6) { animation-delay: 0.5s; }
+.animate-level-meter > *:nth-child(7) { animation-delay: 0.6s; }
+.animate-level-meter > *:nth-child(8) { animation-delay: 0.7s; }
+
+button {
+  font-family: inherit;
+}
+
+input, textarea, select {
+  font-family: inherit;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+}
+
+.numeric {
+  font-family: 'Roboto Mono', 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
