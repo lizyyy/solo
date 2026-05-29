@@ -1,0 +1,1993 @@
+{
+  "run_id": "first_run",
+  "timestamp": "2026-05-29T21:51:55.538458",
+  "deprecated_keys": [
+    "K001",
+    "K003",
+    "K006",
+    "K009"
+  ],
+  "missing_owners": [
+    "订单服务",
+    "数据同步",
+    "会员系统"
+  ],
+  "callback_failures": [
+    "CB002",
+    "CB006"
+  ],
+  "alert_ids": [
+    "deprecated_key_K001",
+    "deprecated_key_K003",
+    "deprecated_key_K006",
+    "deprecated_key_K009",
+    "expired_key_K001",
+    "expired_key_K003",
+    "expired_key_K006",
+    "expired_key_K007",
+    "expired_key_K009",
+    "service_old_keys_用户中心",
+    "service_old_keys_订单服务",
+    "service_old_keys_通知服务",
+    "service_old_keys_数据同步",
+    "service_old_keys_会员系统",
+    "callback_signature_CB002",
+    "callback_signature_CB006",
+    "missing_owner_订单服务",
+    "missing_owner_数据同步",
+    "missing_owner_会员系统",
+    "task_issues_通知服务",
+    "task_issues_数据同步",
+    "task_issues_报表服务",
+    "callback_url_format_CB005",
+    "expiring_key_K002",
+    "expiring_key_K004"
+  ],
+  "full_data": {
+    "run_id": "first_run",
+    "data_summary": {
+      "service_list": {
+        "count": 8,
+        "columns": [
+          "服务ID",
+          "服务名称",
+          "服务类型",
+          "服务状态",
+          "环境",
+          "负责人",
+          "备注",
+          "_raw_source",
+          "_load_time",
+          "_row_hash",
+          "_has_manual_note"
+        ],
+        "load_time": "2026-05-29 21:51:55.423809",
+        "has_manual_notes": "True"
+      },
+      "key_versions": {
+        "count": 10,
+        "columns": [
+          "密钥ID",
+          "服务名称",
+          "密钥版本",
+          "是否启用",
+          "创建时间",
+          "备注",
+          "_raw_source",
+          "_load_time",
+          "_row_hash",
+          "_has_manual_note"
+        ],
+        "load_time": "2026-05-29 21:51:55.425556",
+        "has_manual_notes": "True"
+      },
+      "callback_urls": {
+        "count": 7,
+        "columns": [
+          "回调ID",
+          "服务名称",
+          "回调地址",
+          "签名方式",
+          "签名密钥",
+          "状态",
+          "最后成功时间",
+          "备注",
+          "_raw_source",
+          "_load_time",
+          "_row_hash",
+          "_has_manual_note"
+        ],
+        "load_time": "2026-05-29 21:51:55.426935",
+        "has_manual_notes": "True"
+      },
+      "task_logs": {
+        "count": 8,
+        "columns": [
+          "任务ID",
+          "服务名称",
+          "任务类型",
+          "执行时间",
+          "状态",
+          "耗时(秒)",
+          "备注",
+          "_raw_source",
+          "_load_time",
+          "_row_hash",
+          "_has_manual_note"
+        ],
+        "load_time": "2026-05-29 21:51:55.428321",
+        "has_manual_notes": "True"
+      },
+      "owners": {
+        "count": 5,
+        "columns": [
+          "服务名称",
+          "负责人",
+          "邮箱",
+          "电话",
+          "部门",
+          "备注",
+          "_raw_source",
+          "_load_time",
+          "_row_hash",
+          "_has_manual_note"
+        ],
+        "load_time": "2026-05-29 21:51:55.429633",
+        "has_manual_notes": "False"
+      },
+      "inspection_reports": {
+        "count": 4,
+        "columns": [
+          "报告ID",
+          "巡检日期",
+          "巡检人员",
+          "问题数量",
+          "已修复数量",
+          "备注",
+          "_raw_source",
+          "_load_time",
+          "_row_hash",
+          "_has_manual_note"
+        ],
+        "load_time": "2026-05-29 21:51:55.430888",
+        "has_manual_notes": "True"
+      }
+    },
+    "key_check_results": {
+      "current_version": "v2.0",
+      "total_keys": 10,
+      "deprecated_keys_in_use": [
+        {
+          "key_id": "K001",
+          "version": "v1.0",
+          "service_name": "用户中心",
+          "enabled": true,
+          "create_time": "2026-03-15",
+          "explanation": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+          "manual_note": "旧密钥，待清理"
+        },
+        {
+          "key_id": "K003",
+          "version": "v1.0",
+          "service_name": "订单服务",
+          "enabled": true,
+          "create_time": "2026-03-20",
+          "explanation": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+          "manual_note": "旧版本密钥仍在使用"
+        },
+        {
+          "key_id": "K006",
+          "version": "v1.0",
+          "service_name": "通知服务",
+          "enabled": true,
+          "create_time": "2026-04-01",
+          "explanation": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+          "manual_note": "未更新到v2.0"
+        },
+        {
+          "key_id": "K009",
+          "version": "v1.0",
+          "service_name": "会员系统",
+          "enabled": true,
+          "create_time": "2026-04-20",
+          "explanation": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+          "manual_note": "忘记更新了"
+        }
+      ],
+      "expiring_soon": [
+        {
+          "key_id": "K002",
+          "version": "v2.0",
+          "service_name": "用户中心",
+          "create_time": "2026-05-01",
+          "is_enabled": true,
+          "explanation": "密钥将在 1 天后过期（过期时间：2026-05-31）",
+          "manual_note": "当前在用密钥"
+        },
+        {
+          "key_id": "K004",
+          "version": "v2.0",
+          "service_name": "订单服务",
+          "create_time": "2026-05-05",
+          "is_enabled": true,
+          "explanation": "密钥将在 5 天后过期（过期时间：2026-06-04）",
+          "manual_note": "新版本密钥"
+        }
+      ],
+      "expired_keys": [
+        {
+          "key_id": "K001",
+          "version": "v1.0",
+          "service_name": "用户中心",
+          "create_time": "2026-03-15",
+          "is_enabled": true,
+          "explanation": "密钥已过期 46 天（过期时间：2026-04-14）",
+          "manual_note": "旧密钥，待清理"
+        },
+        {
+          "key_id": "K003",
+          "version": "v1.0",
+          "service_name": "订单服务",
+          "create_time": "2026-03-20",
+          "is_enabled": true,
+          "explanation": "密钥已过期 41 天（过期时间：2026-04-19）",
+          "manual_note": "旧版本密钥仍在使用"
+        },
+        {
+          "key_id": "K006",
+          "version": "v1.0",
+          "service_name": "通知服务",
+          "create_time": "2026-04-01",
+          "is_enabled": true,
+          "explanation": "密钥已过期 29 天（过期时间：2026-05-01）",
+          "manual_note": "未更新到v2.0"
+        },
+        {
+          "key_id": "K007",
+          "version": "v1.0",
+          "service_name": "数据同步",
+          "create_time": "2026-03-25",
+          "is_enabled": false,
+          "explanation": "密钥已过期 36 天（过期时间：2026-04-24）",
+          "manual_note": "已禁用的旧密钥"
+        },
+        {
+          "key_id": "K009",
+          "version": "v1.0",
+          "service_name": "会员系统",
+          "create_time": "2026-04-20",
+          "is_enabled": true,
+          "explanation": "密钥已过期 10 天（过期时间：2026-05-20）",
+          "manual_note": "忘记更新了"
+        }
+      ],
+      "key_versions_summary": {
+        "v1.0": 5,
+        "v2.0": 5
+      },
+      "service_key_mapping": {
+        "用户中心": [
+          {
+            "key_id": "K001",
+            "version": "v1.0",
+            "enabled": "是"
+          },
+          {
+            "key_id": "K002",
+            "version": "v2.0",
+            "enabled": "是"
+          }
+        ],
+        "订单服务": [
+          {
+            "key_id": "K003",
+            "version": "v1.0",
+            "enabled": "是"
+          },
+          {
+            "key_id": "K004",
+            "version": "v2.0",
+            "enabled": "是"
+          }
+        ],
+        "支付网关": [
+          {
+            "key_id": "K005",
+            "version": "v2.0",
+            "enabled": "是"
+          }
+        ],
+        "通知服务": [
+          {
+            "key_id": "K006",
+            "version": "v1.0",
+            "enabled": "是"
+          }
+        ],
+        "数据同步": [
+          {
+            "key_id": "K007",
+            "version": "v1.0",
+            "enabled": "否"
+          },
+          {
+            "key_id": "K008",
+            "version": "v2.0",
+            "enabled": "是"
+          }
+        ],
+        "会员系统": [
+          {
+            "key_id": "K009",
+            "version": "v1.0",
+            "enabled": "是"
+          }
+        ],
+        "优惠券系统": [
+          {
+            "key_id": "K010",
+            "version": "v2.0",
+            "enabled": "是"
+          }
+        ]
+      }
+    },
+    "service_scan_results": {
+      "total_services": 8,
+      "services_missing_owner": [
+        {
+          "service_name": "订单服务",
+          "missing_owner": true,
+          "owner_name": "",
+          "owner_email": "",
+          "explanation": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+          "owner_found_in": "none"
+        },
+        {
+          "service_name": "数据同步",
+          "missing_owner": true,
+          "owner_name": "",
+          "owner_email": "",
+          "explanation": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+          "owner_found_in": "none"
+        },
+        {
+          "service_name": "会员系统",
+          "missing_owner": true,
+          "owner_name": "",
+          "owner_email": "",
+          "explanation": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+          "owner_found_in": "none"
+        }
+      ],
+      "services_with_multiple_keys": [
+        {
+          "service_name": "用户中心",
+          "total_keys": 2,
+          "old_key_count": 1,
+          "keys": [
+            {
+              "key_id": "K001",
+              "version": "v1.0",
+              "enabled": "是"
+            },
+            {
+              "key_id": "K002",
+              "version": "v2.0",
+              "enabled": "是"
+            }
+          ],
+          "explanation": "该服务配置了 1 个旧版本密钥"
+        },
+        {
+          "service_name": "订单服务",
+          "total_keys": 2,
+          "old_key_count": 1,
+          "keys": [
+            {
+              "key_id": "K003",
+              "version": "v1.0",
+              "enabled": "是"
+            },
+            {
+              "key_id": "K004",
+              "version": "v2.0",
+              "enabled": "是"
+            }
+          ],
+          "explanation": "该服务配置了 1 个旧版本密钥"
+        },
+        {
+          "service_name": "数据同步",
+          "total_keys": 2,
+          "old_key_count": 1,
+          "keys": [
+            {
+              "key_id": "K007",
+              "version": "v1.0",
+              "enabled": "否"
+            },
+            {
+              "key_id": "K008",
+              "version": "v2.0",
+              "enabled": "是"
+            }
+          ],
+          "explanation": "该服务配置了 1 个旧版本密钥"
+        }
+      ],
+      "services_with_old_keys": [
+        {
+          "service_name": "用户中心",
+          "total_keys": 2,
+          "old_key_count": 1,
+          "keys": [
+            {
+              "key_id": "K001",
+              "version": "v1.0",
+              "enabled": "是"
+            },
+            {
+              "key_id": "K002",
+              "version": "v2.0",
+              "enabled": "是"
+            }
+          ],
+          "explanation": "该服务配置了 1 个旧版本密钥"
+        },
+        {
+          "service_name": "订单服务",
+          "total_keys": 2,
+          "old_key_count": 1,
+          "keys": [
+            {
+              "key_id": "K003",
+              "version": "v1.0",
+              "enabled": "是"
+            },
+            {
+              "key_id": "K004",
+              "version": "v2.0",
+              "enabled": "是"
+            }
+          ],
+          "explanation": "该服务配置了 1 个旧版本密钥"
+        },
+        {
+          "service_name": "通知服务",
+          "total_keys": 1,
+          "old_key_count": 1,
+          "keys": [
+            {
+              "key_id": "K006",
+              "version": "v1.0",
+              "enabled": "是"
+            }
+          ],
+          "explanation": "该服务配置了 1 个旧版本密钥"
+        },
+        {
+          "service_name": "数据同步",
+          "total_keys": 2,
+          "old_key_count": 1,
+          "keys": [
+            {
+              "key_id": "K007",
+              "version": "v1.0",
+              "enabled": "否"
+            },
+            {
+              "key_id": "K008",
+              "version": "v2.0",
+              "enabled": "是"
+            }
+          ],
+          "explanation": "该服务配置了 1 个旧版本密钥"
+        },
+        {
+          "service_name": "会员系统",
+          "total_keys": 1,
+          "old_key_count": 1,
+          "keys": [
+            {
+              "key_id": "K009",
+              "version": "v1.0",
+              "enabled": "是"
+            }
+          ],
+          "explanation": "该服务配置了 1 个旧版本密钥"
+        }
+      ],
+      "inactive_services": [
+        {
+          "service_name": "报表服务",
+          "status": "已停止",
+          "is_active": false,
+          "explanation": "服务状态为 已停止，非活跃状态"
+        }
+      ],
+      "services_with_task_issues": [
+        {
+          "service_name": "通知服务",
+          "has_issues": true,
+          "logs_count": 2,
+          "error_count": 1,
+          "explanation": "发现 1 条异常任务日志",
+          "recent_errors": [
+            {
+              "任务ID": "T002",
+              "服务名称": "通知服务",
+              "任务类型": "定时任务",
+              "执行时间": "2026-05-29 09:00:00",
+              "状态": "失败",
+              "耗时(秒)": "10.5",
+              "备注": "签名验证失败",
+              "_raw_source": "task_logs",
+              "_load_time": "2026-05-29T21:51:55.427644",
+              "_row_hash": -3720826804473110375,
+              "_has_manual_note": true
+            }
+          ]
+        },
+        {
+          "service_name": "数据同步",
+          "has_issues": true,
+          "logs_count": 2,
+          "error_count": 1,
+          "explanation": "发现 1 条异常任务日志",
+          "recent_errors": [
+            {
+              "任务ID": "T004",
+              "服务名称": "数据同步",
+              "任务类型": "定时任务",
+              "执行时间": "2026-05-29 08:30:00",
+              "状态": "异常",
+              "耗时(秒)": "150.0",
+              "备注": "API密钥无效",
+              "_raw_source": "task_logs",
+              "_load_time": "2026-05-29T21:51:55.427644",
+              "_row_hash": -7856412446763139622,
+              "_has_manual_note": true
+            }
+          ]
+        },
+        {
+          "service_name": "报表服务",
+          "has_issues": true,
+          "logs_count": 1,
+          "error_count": 1,
+          "explanation": "发现 1 条异常任务日志",
+          "recent_errors": [
+            {
+              "任务ID": "T006",
+              "服务名称": "报表服务",
+              "任务类型": "定时任务",
+              "执行时间": "2026-05-28 23:00:00",
+              "状态": "失败",
+              "耗时(秒)": "60.0",
+              "备注": "数据库连接超时",
+              "_raw_source": "task_logs",
+              "_load_time": "2026-05-29T21:51:55.427644",
+              "_row_hash": -5670664985863675779,
+              "_has_manual_note": true
+            }
+          ]
+        }
+      ],
+      "service_details": {
+        "用户中心": {
+          "basic": {
+            "name": "用户中心",
+            "id": "S001",
+            "type": "微服务",
+            "status": "运行中",
+            "env": "生产",
+            "owner": "张三"
+          },
+          "owner": {
+            "service_name": "用户中心",
+            "missing_owner": false,
+            "owner_name": "张三",
+            "owner_email": "zhangsan@example.com",
+            "explanation": "",
+            "owner_found_in": "service_list"
+          },
+          "keys": {
+            "service_name": "用户中心",
+            "total_keys": 2,
+            "old_key_count": 1,
+            "keys": [
+              {
+                "key_id": "K001",
+                "version": "v1.0",
+                "enabled": "是"
+              },
+              {
+                "key_id": "K002",
+                "version": "v2.0",
+                "enabled": "是"
+              }
+            ],
+            "explanation": "该服务配置了 1 个旧版本密钥"
+          },
+          "status": {
+            "service_name": "用户中心",
+            "status": "运行中",
+            "is_active": true,
+            "explanation": ""
+          },
+          "tasks": {
+            "service_name": "用户中心",
+            "has_issues": false,
+            "logs_count": 0
+          },
+          "manual_note": "核心业务服务"
+        },
+        "订单服务": {
+          "basic": {
+            "name": "订单服务",
+            "id": "S002",
+            "type": "微服务",
+            "status": "运行中",
+            "env": "生产",
+            "owner": "nan"
+          },
+          "owner": {
+            "service_name": "订单服务",
+            "missing_owner": true,
+            "owner_name": "",
+            "owner_email": "",
+            "explanation": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+            "owner_found_in": "none"
+          },
+          "keys": {
+            "service_name": "订单服务",
+            "total_keys": 2,
+            "old_key_count": 1,
+            "keys": [
+              {
+                "key_id": "K003",
+                "version": "v1.0",
+                "enabled": "是"
+              },
+              {
+                "key_id": "K004",
+                "version": "v2.0",
+                "enabled": "是"
+              }
+            ],
+            "explanation": "该服务配置了 1 个旧版本密钥"
+          },
+          "status": {
+            "service_name": "订单服务",
+            "status": "运行中",
+            "is_active": true,
+            "explanation": ""
+          },
+          "tasks": {
+            "service_name": "订单服务",
+            "has_issues": false,
+            "logs_count": 1,
+            "error_count": 0,
+            "explanation": "",
+            "recent_errors": []
+          },
+          "manual_note": "订单处理核心服务"
+        },
+        "支付网关": {
+          "basic": {
+            "name": "支付网关",
+            "id": "S003",
+            "type": "网关",
+            "status": "运行中",
+            "env": "生产",
+            "owner": "李四"
+          },
+          "owner": {
+            "service_name": "支付网关",
+            "missing_owner": false,
+            "owner_name": "李四",
+            "owner_email": "lisi@example.com",
+            "explanation": "",
+            "owner_found_in": "service_list"
+          },
+          "keys": {
+            "service_name": "支付网关",
+            "total_keys": 1,
+            "old_key_count": 0,
+            "keys": [
+              {
+                "key_id": "K005",
+                "version": "v2.0",
+                "enabled": "是"
+              }
+            ],
+            "explanation": ""
+          },
+          "status": {
+            "service_name": "支付网关",
+            "status": "运行中",
+            "is_active": true,
+            "explanation": ""
+          },
+          "tasks": {
+            "service_name": "支付网关",
+            "has_issues": false,
+            "logs_count": 0
+          },
+          "manual_note": "对接第三方支付"
+        },
+        "通知服务": {
+          "basic": {
+            "name": "通知服务",
+            "id": "S004",
+            "type": "定时任务",
+            "status": "运行中",
+            "env": "生产",
+            "owner": "王五"
+          },
+          "owner": {
+            "service_name": "通知服务",
+            "missing_owner": false,
+            "owner_name": "王五",
+            "owner_email": "wangwu@example.com",
+            "explanation": "",
+            "owner_found_in": "service_list"
+          },
+          "keys": {
+            "service_name": "通知服务",
+            "total_keys": 1,
+            "old_key_count": 1,
+            "keys": [
+              {
+                "key_id": "K006",
+                "version": "v1.0",
+                "enabled": "是"
+              }
+            ],
+            "explanation": "该服务配置了 1 个旧版本密钥"
+          },
+          "status": {
+            "service_name": "通知服务",
+            "status": "运行中",
+            "is_active": true,
+            "explanation": ""
+          },
+          "tasks": {
+            "service_name": "通知服务",
+            "has_issues": true,
+            "logs_count": 2,
+            "error_count": 1,
+            "explanation": "发现 1 条异常任务日志",
+            "recent_errors": [
+              {
+                "任务ID": "T002",
+                "服务名称": "通知服务",
+                "任务类型": "定时任务",
+                "执行时间": "2026-05-29 09:00:00",
+                "状态": "失败",
+                "耗时(秒)": "10.5",
+                "备注": "签名验证失败",
+                "_raw_source": "task_logs",
+                "_load_time": "2026-05-29T21:51:55.427644",
+                "_row_hash": -3720826804473110375,
+                "_has_manual_note": true
+              }
+            ]
+          },
+          "manual_note": "短信/邮件通知"
+        },
+        "数据同步": {
+          "basic": {
+            "name": "数据同步",
+            "id": "S005",
+            "type": "定时任务",
+            "status": "运行中",
+            "env": "生产",
+            "owner": "nan"
+          },
+          "owner": {
+            "service_name": "数据同步",
+            "missing_owner": true,
+            "owner_name": "",
+            "owner_email": "",
+            "explanation": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+            "owner_found_in": "none"
+          },
+          "keys": {
+            "service_name": "数据同步",
+            "total_keys": 2,
+            "old_key_count": 1,
+            "keys": [
+              {
+                "key_id": "K007",
+                "version": "v1.0",
+                "enabled": "否"
+              },
+              {
+                "key_id": "K008",
+                "version": "v2.0",
+                "enabled": "是"
+              }
+            ],
+            "explanation": "该服务配置了 1 个旧版本密钥"
+          },
+          "status": {
+            "service_name": "数据同步",
+            "status": "运行中",
+            "is_active": true,
+            "explanation": ""
+          },
+          "tasks": {
+            "service_name": "数据同步",
+            "has_issues": true,
+            "logs_count": 2,
+            "error_count": 1,
+            "explanation": "发现 1 条异常任务日志",
+            "recent_errors": [
+              {
+                "任务ID": "T004",
+                "服务名称": "数据同步",
+                "任务类型": "定时任务",
+                "执行时间": "2026-05-29 08:30:00",
+                "状态": "异常",
+                "耗时(秒)": "150.0",
+                "备注": "API密钥无效",
+                "_raw_source": "task_logs",
+                "_load_time": "2026-05-29T21:51:55.427644",
+                "_row_hash": -7856412446763139622,
+                "_has_manual_note": true
+              }
+            ]
+          },
+          "manual_note": "与第三方数据同步"
+        },
+        "报表服务": {
+          "basic": {
+            "name": "报表服务",
+            "id": "S006",
+            "type": "定时任务",
+            "status": "已停止",
+            "env": "测试",
+            "owner": "赵六"
+          },
+          "owner": {
+            "service_name": "报表服务",
+            "missing_owner": false,
+            "owner_name": "赵六",
+            "owner_email": "zhaoliu@example.com",
+            "explanation": "",
+            "owner_found_in": "service_list"
+          },
+          "keys": {
+            "service_name": "报表服务",
+            "total_keys": 0,
+            "old_key_count": 0,
+            "explanation": "该服务未配置API密钥"
+          },
+          "status": {
+            "service_name": "报表服务",
+            "status": "已停止",
+            "is_active": false,
+            "explanation": "服务状态为 已停止，非活跃状态"
+          },
+          "tasks": {
+            "service_name": "报表服务",
+            "has_issues": true,
+            "logs_count": 1,
+            "error_count": 1,
+            "explanation": "发现 1 条异常任务日志",
+            "recent_errors": [
+              {
+                "任务ID": "T006",
+                "服务名称": "报表服务",
+                "任务类型": "定时任务",
+                "执行时间": "2026-05-28 23:00:00",
+                "状态": "失败",
+                "耗时(秒)": "60.0",
+                "备注": "数据库连接超时",
+                "_raw_source": "task_logs",
+                "_load_time": "2026-05-29T21:51:55.427644",
+                "_row_hash": -5670664985863675779,
+                "_has_manual_note": true
+              }
+            ]
+          },
+          "manual_note": "仅供测试环境使用"
+        },
+        "会员系统": {
+          "basic": {
+            "name": "会员系统",
+            "id": "S007",
+            "type": "微服务",
+            "status": "运行中",
+            "env": "生产",
+            "owner": "nan"
+          },
+          "owner": {
+            "service_name": "会员系统",
+            "missing_owner": true,
+            "owner_name": "",
+            "owner_email": "",
+            "explanation": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+            "owner_found_in": "none"
+          },
+          "keys": {
+            "service_name": "会员系统",
+            "total_keys": 1,
+            "old_key_count": 1,
+            "keys": [
+              {
+                "key_id": "K009",
+                "version": "v1.0",
+                "enabled": "是"
+              }
+            ],
+            "explanation": "该服务配置了 1 个旧版本密钥"
+          },
+          "status": {
+            "service_name": "会员系统",
+            "status": "运行中",
+            "is_active": true,
+            "explanation": ""
+          },
+          "tasks": {
+            "service_name": "会员系统",
+            "has_issues": false,
+            "logs_count": 1,
+            "error_count": 0,
+            "explanation": "",
+            "recent_errors": []
+          },
+          "manual_note": "VIP会员相关功能"
+        },
+        "优惠券系统": {
+          "basic": {
+            "name": "优惠券系统",
+            "id": "S008",
+            "type": "微服务",
+            "status": "运行中",
+            "env": "生产",
+            "owner": "孙七"
+          },
+          "owner": {
+            "service_name": "优惠券系统",
+            "missing_owner": false,
+            "owner_name": "孙七",
+            "owner_email": "sunqi@example.com",
+            "explanation": "",
+            "owner_found_in": "service_list"
+          },
+          "keys": {
+            "service_name": "优惠券系统",
+            "total_keys": 1,
+            "old_key_count": 0,
+            "keys": [
+              {
+                "key_id": "K010",
+                "version": "v2.0",
+                "enabled": "是"
+              }
+            ],
+            "explanation": ""
+          },
+          "status": {
+            "service_name": "优惠券系统",
+            "status": "运行中",
+            "is_active": true,
+            "explanation": ""
+          },
+          "tasks": {
+            "service_name": "优惠券系统",
+            "has_issues": false,
+            "logs_count": 1,
+            "error_count": 0,
+            "explanation": "",
+            "recent_errors": []
+          },
+          "manual_note": "营销活动使用"
+        }
+      }
+    },
+    "callback_validation_results": {
+      "total_callbacks": 7,
+      "signature_failures": [
+        {
+          "callback_id": "CB002",
+          "service_name": "订单服务",
+          "url": "https://example.com/order/callback",
+          "sign_method": "hmac-sha256",
+          "has_configured_secret": false,
+          "has_service_keys": false,
+          "valid": false,
+          "explanation": "该回调缺少配置或服务密钥，无法进行签名验证"
+        },
+        {
+          "callback_id": "CB006",
+          "service_name": "会员系统",
+          "url": "https://vip.example.com/callback",
+          "sign_method": "hmac-sha256",
+          "has_configured_secret": false,
+          "has_service_keys": false,
+          "valid": false,
+          "explanation": "该回调缺少配置或服务密钥，无法进行签名验证"
+        }
+      ],
+      "unreachable_urls": [],
+      "url_format_errors": [
+        {
+          "callback_id": "CB005",
+          "service_name": "数据同步",
+          "url": "ftp://sync.example.com/data",
+          "valid": false,
+          "errors": [
+            "回调地址缺少http/https协议"
+          ],
+          "explanation": "回调地址缺少http/https协议",
+          "manual_note": ""
+        }
+      ],
+      "callback_details": {
+        "CB001": {
+          "basic": {
+            "callback_id": "CB001",
+            "service_name": "用户中心",
+            "url": "https://example.com/user/callback",
+            "sign_method": "hmac-sha256",
+            "secret_key": "secret_user",
+            "status": "启用",
+            "last_success": "2026-05-28 10:30:00"
+          },
+          "format": {
+            "callback_id": "CB001",
+            "service_name": "用户中心",
+            "url": "https://example.com/user/callback",
+            "valid": true,
+            "errors": [],
+            "explanation": "",
+            "manual_note": ""
+          },
+          "signature": {
+            "callback_id": "CB001",
+            "service_name": "用户中心",
+            "url": "https://example.com/user/callback",
+            "sign_method": "hmac-sha256",
+            "has_configured_secret": true,
+            "has_service_keys": false,
+            "valid": true,
+            "explanation": "签名配置存在"
+          },
+          "manual_note": NaN
+        },
+        "CB002": {
+          "basic": {
+            "callback_id": "CB002",
+            "service_name": "订单服务",
+            "url": "https://example.com/order/callback",
+            "sign_method": "hmac-sha256",
+            "secret_key": "nan",
+            "status": "启用",
+            "last_success": "2026-05-27 15:20:00"
+          },
+          "format": {
+            "callback_id": "CB002",
+            "service_name": "订单服务",
+            "url": "https://example.com/order/callback",
+            "valid": true,
+            "errors": [],
+            "explanation": "",
+            "manual_note": ""
+          },
+          "signature": {
+            "callback_id": "CB002",
+            "service_name": "订单服务",
+            "url": "https://example.com/order/callback",
+            "sign_method": "hmac-sha256",
+            "has_configured_secret": false,
+            "has_service_keys": false,
+            "valid": false,
+            "explanation": "该回调缺少配置或服务密钥，无法进行签名验证"
+          },
+          "manual_note": "未配置签名密钥"
+        },
+        "CB003": {
+          "basic": {
+            "callback_id": "CB003",
+            "service_name": "支付网关",
+            "url": "https://pay.example.com/notify",
+            "sign_method": "hmac-sha256",
+            "secret_key": "secret_pay",
+            "status": "启用",
+            "last_success": "2026-05-29 09:15:00"
+          },
+          "format": {
+            "callback_id": "CB003",
+            "service_name": "支付网关",
+            "url": "https://pay.example.com/notify",
+            "valid": true,
+            "errors": [],
+            "explanation": "",
+            "manual_note": ""
+          },
+          "signature": {
+            "callback_id": "CB003",
+            "service_name": "支付网关",
+            "url": "https://pay.example.com/notify",
+            "sign_method": "hmac-sha256",
+            "has_configured_secret": true,
+            "has_service_keys": false,
+            "valid": true,
+            "explanation": "签名配置存在"
+          },
+          "manual_note": NaN
+        },
+        "CB004": {
+          "basic": {
+            "callback_id": "CB004",
+            "service_name": "通知服务",
+            "url": "http://notify.example.com/sms",
+            "sign_method": "hmac-sha1",
+            "secret_key": "secret_sms",
+            "status": "启用",
+            "last_success": "2026-05-26 18:45:00"
+          },
+          "format": {
+            "callback_id": "CB004",
+            "service_name": "通知服务",
+            "url": "http://notify.example.com/sms",
+            "valid": true,
+            "errors": [],
+            "explanation": "",
+            "manual_note": ""
+          },
+          "signature": {
+            "callback_id": "CB004",
+            "service_name": "通知服务",
+            "url": "http://notify.example.com/sms",
+            "sign_method": "hmac-sha1",
+            "has_configured_secret": true,
+            "has_service_keys": false,
+            "valid": true,
+            "explanation": "签名配置存在"
+          },
+          "manual_note": "使用http非https"
+        },
+        "CB005": {
+          "basic": {
+            "callback_id": "CB005",
+            "service_name": "数据同步",
+            "url": "ftp://sync.example.com/data",
+            "sign_method": "hmac-sha256",
+            "secret_key": "secret_sync",
+            "status": "启用",
+            "last_success": "2026-05-25 12:00:00"
+          },
+          "format": {
+            "callback_id": "CB005",
+            "service_name": "数据同步",
+            "url": "ftp://sync.example.com/data",
+            "valid": false,
+            "errors": [
+              "回调地址缺少http/https协议"
+            ],
+            "explanation": "回调地址缺少http/https协议",
+            "manual_note": ""
+          },
+          "signature": {
+            "callback_id": "CB005",
+            "service_name": "数据同步",
+            "url": "ftp://sync.example.com/data",
+            "sign_method": "hmac-sha256",
+            "has_configured_secret": true,
+            "has_service_keys": false,
+            "valid": true,
+            "explanation": "签名配置存在"
+          },
+          "manual_note": "非http协议"
+        },
+        "CB006": {
+          "basic": {
+            "callback_id": "CB006",
+            "service_name": "会员系统",
+            "url": "https://vip.example.com/callback",
+            "sign_method": "hmac-sha256",
+            "secret_key": "nan",
+            "status": "启用",
+            "last_success": "2026-05-20 08:30:00"
+          },
+          "format": {
+            "callback_id": "CB006",
+            "service_name": "会员系统",
+            "url": "https://vip.example.com/callback",
+            "valid": true,
+            "errors": [],
+            "explanation": "",
+            "manual_note": ""
+          },
+          "signature": {
+            "callback_id": "CB006",
+            "service_name": "会员系统",
+            "url": "https://vip.example.com/callback",
+            "sign_method": "hmac-sha256",
+            "has_configured_secret": false,
+            "has_service_keys": false,
+            "valid": false,
+            "explanation": "该回调缺少配置或服务密钥，无法进行签名验证"
+          },
+          "manual_note": NaN
+        },
+        "CB007": {
+          "basic": {
+            "callback_id": "CB007",
+            "service_name": "优惠券系统",
+            "url": "https://coupon.example.com/webhook",
+            "sign_method": "hmac-sha256",
+            "secret_key": "secret_coupon",
+            "status": "启用",
+            "last_success": "2026-05-28 14:20:00"
+          },
+          "format": {
+            "callback_id": "CB007",
+            "service_name": "优惠券系统",
+            "url": "https://coupon.example.com/webhook",
+            "valid": true,
+            "errors": [],
+            "explanation": "",
+            "manual_note": ""
+          },
+          "signature": {
+            "callback_id": "CB007",
+            "service_name": "优惠券系统",
+            "url": "https://coupon.example.com/webhook",
+            "sign_method": "hmac-sha256",
+            "has_configured_secret": true,
+            "has_service_keys": false,
+            "valid": true,
+            "explanation": "签名配置存在"
+          },
+          "manual_note": NaN
+        }
+      }
+    },
+    "alert_results": {
+      "total_alerts": 25,
+      "deduplicated_alerts": [
+        {
+          "alert_id": "deprecated_key_K001",
+          "alert_type": "deprecated_key_enabled",
+          "severity": "critical",
+          "service_name": "用户中心",
+          "key_id": "K001",
+          "version": "v1.0",
+          "message": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+          "manual_note": "旧密钥，待清理",
+          "timestamp": "2026-05-29T21:51:55.442942",
+          "source": "key_version_check",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "deprecated_key_K003",
+          "alert_type": "deprecated_key_enabled",
+          "severity": "critical",
+          "service_name": "订单服务",
+          "key_id": "K003",
+          "version": "v1.0",
+          "message": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+          "manual_note": "旧版本密钥仍在使用",
+          "timestamp": "2026-05-29T21:51:55.442949",
+          "source": "key_version_check",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "deprecated_key_K006",
+          "alert_type": "deprecated_key_enabled",
+          "severity": "critical",
+          "service_name": "通知服务",
+          "key_id": "K006",
+          "version": "v1.0",
+          "message": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+          "manual_note": "未更新到v2.0",
+          "timestamp": "2026-05-29T21:51:55.442950",
+          "source": "key_version_check",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "deprecated_key_K009",
+          "alert_type": "deprecated_key_enabled",
+          "severity": "critical",
+          "service_name": "会员系统",
+          "key_id": "K009",
+          "version": "v1.0",
+          "message": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+          "manual_note": "忘记更新了",
+          "timestamp": "2026-05-29T21:51:55.442952",
+          "source": "key_version_check",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "expired_key_K001",
+          "alert_type": "key_expired",
+          "severity": "critical",
+          "service_name": "用户中心",
+          "key_id": "K001",
+          "version": "v1.0",
+          "message": "密钥已过期 46 天（过期时间：2026-04-14）",
+          "manual_note": "旧密钥，待清理",
+          "timestamp": "2026-05-29T21:51:55.442956",
+          "source": "key_version_check",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "expired_key_K003",
+          "alert_type": "key_expired",
+          "severity": "critical",
+          "service_name": "订单服务",
+          "key_id": "K003",
+          "version": "v1.0",
+          "message": "密钥已过期 41 天（过期时间：2026-04-19）",
+          "manual_note": "旧版本密钥仍在使用",
+          "timestamp": "2026-05-29T21:51:55.442957",
+          "source": "key_version_check",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "expired_key_K006",
+          "alert_type": "key_expired",
+          "severity": "critical",
+          "service_name": "通知服务",
+          "key_id": "K006",
+          "version": "v1.0",
+          "message": "密钥已过期 29 天（过期时间：2026-05-01）",
+          "manual_note": "未更新到v2.0",
+          "timestamp": "2026-05-29T21:51:55.442958",
+          "source": "key_version_check",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "expired_key_K007",
+          "alert_type": "key_expired",
+          "severity": "critical",
+          "service_name": "数据同步",
+          "key_id": "K007",
+          "version": "v1.0",
+          "message": "密钥已过期 36 天（过期时间：2026-04-24）",
+          "manual_note": "已禁用的旧密钥",
+          "timestamp": "2026-05-29T21:51:55.442959",
+          "source": "key_version_check",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "expired_key_K009",
+          "alert_type": "key_expired",
+          "severity": "critical",
+          "service_name": "会员系统",
+          "key_id": "K009",
+          "version": "v1.0",
+          "message": "密钥已过期 10 天（过期时间：2026-05-20）",
+          "manual_note": "忘记更新了",
+          "timestamp": "2026-05-29T21:51:55.442960",
+          "source": "key_version_check",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "service_old_keys_用户中心",
+          "alert_type": "service_has_old_keys",
+          "severity": "high",
+          "service_name": "用户中心",
+          "old_key_count": 1,
+          "message": "该服务配置了 1 个旧版本密钥",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442967",
+          "source": "service_scan",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "service_old_keys_订单服务",
+          "alert_type": "service_has_old_keys",
+          "severity": "high",
+          "service_name": "订单服务",
+          "old_key_count": 1,
+          "message": "该服务配置了 1 个旧版本密钥",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442968",
+          "source": "service_scan",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "service_old_keys_通知服务",
+          "alert_type": "service_has_old_keys",
+          "severity": "high",
+          "service_name": "通知服务",
+          "old_key_count": 1,
+          "message": "该服务配置了 1 个旧版本密钥",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442970",
+          "source": "service_scan",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "service_old_keys_数据同步",
+          "alert_type": "service_has_old_keys",
+          "severity": "high",
+          "service_name": "数据同步",
+          "old_key_count": 1,
+          "message": "该服务配置了 1 个旧版本密钥",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442971",
+          "source": "service_scan",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "service_old_keys_会员系统",
+          "alert_type": "service_has_old_keys",
+          "severity": "high",
+          "service_name": "会员系统",
+          "old_key_count": 1,
+          "message": "该服务配置了 1 个旧版本密钥",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442972",
+          "source": "service_scan",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "callback_signature_CB002",
+          "alert_type": "callback_signature_failure",
+          "severity": "high",
+          "service_name": "订单服务",
+          "callback_id": "CB002",
+          "url": "https://example.com/order/callback",
+          "message": "该回调缺少配置或服务密钥，无法进行签名验证",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442980",
+          "source": "callback_validation",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "callback_signature_CB006",
+          "alert_type": "callback_signature_failure",
+          "severity": "high",
+          "service_name": "会员系统",
+          "callback_id": "CB006",
+          "url": "https://vip.example.com/callback",
+          "message": "该回调缺少配置或服务密钥，无法进行签名验证",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442981",
+          "source": "callback_validation",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "missing_owner_订单服务",
+          "alert_type": "missing_owner",
+          "severity": "medium",
+          "service_name": "订单服务",
+          "message": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442963",
+          "source": "service_scan",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "missing_owner_数据同步",
+          "alert_type": "missing_owner",
+          "severity": "medium",
+          "service_name": "数据同步",
+          "message": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442964",
+          "source": "service_scan",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "missing_owner_会员系统",
+          "alert_type": "missing_owner",
+          "severity": "medium",
+          "service_name": "会员系统",
+          "message": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442965",
+          "source": "service_scan",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "task_issues_通知服务",
+          "alert_type": "task_execution_issues",
+          "severity": "medium",
+          "service_name": "通知服务",
+          "error_count": 1,
+          "message": "发现 1 条异常任务日志",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442974",
+          "source": "service_scan",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "task_issues_数据同步",
+          "alert_type": "task_execution_issues",
+          "severity": "medium",
+          "service_name": "数据同步",
+          "error_count": 1,
+          "message": "发现 1 条异常任务日志",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442977",
+          "source": "service_scan",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "task_issues_报表服务",
+          "alert_type": "task_execution_issues",
+          "severity": "medium",
+          "service_name": "报表服务",
+          "error_count": 1,
+          "message": "发现 1 条异常任务日志",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442978",
+          "source": "service_scan",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "callback_url_format_CB005",
+          "alert_type": "callback_url_invalid",
+          "severity": "medium",
+          "service_name": "数据同步",
+          "callback_id": "CB005",
+          "url": "ftp://sync.example.com/data",
+          "message": "回调地址缺少http/https协议",
+          "manual_note": "",
+          "timestamp": "2026-05-29T21:51:55.442983",
+          "source": "callback_validation",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "expiring_key_K002",
+          "alert_type": "key_expiring_soon",
+          "severity": "warning",
+          "service_name": "用户中心",
+          "key_id": "K002",
+          "version": "v2.0",
+          "message": "密钥将在 1 天后过期（过期时间：2026-05-31）",
+          "manual_note": "当前在用密钥",
+          "timestamp": "2026-05-29T21:51:55.442954",
+          "source": "key_version_check",
+          "dedup_status": "new"
+        },
+        {
+          "alert_id": "expiring_key_K004",
+          "alert_type": "key_expiring_soon",
+          "severity": "warning",
+          "service_name": "订单服务",
+          "key_id": "K004",
+          "version": "v2.0",
+          "message": "密钥将在 5 天后过期（过期时间：2026-06-04）",
+          "manual_note": "新版本密钥",
+          "timestamp": "2026-05-29T21:51:55.442955",
+          "source": "key_version_check",
+          "dedup_status": "new"
+        }
+      ],
+      "categorized_alerts": {
+        "critical": [
+          {
+            "alert_id": "deprecated_key_K001",
+            "alert_type": "deprecated_key_enabled",
+            "severity": "critical",
+            "service_name": "用户中心",
+            "key_id": "K001",
+            "version": "v1.0",
+            "message": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+            "manual_note": "旧密钥，待清理",
+            "timestamp": "2026-05-29T21:51:55.442942",
+            "source": "key_version_check",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "deprecated_key_K003",
+            "alert_type": "deprecated_key_enabled",
+            "severity": "critical",
+            "service_name": "订单服务",
+            "key_id": "K003",
+            "version": "v1.0",
+            "message": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+            "manual_note": "旧版本密钥仍在使用",
+            "timestamp": "2026-05-29T21:51:55.442949",
+            "source": "key_version_check",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "deprecated_key_K006",
+            "alert_type": "deprecated_key_enabled",
+            "severity": "critical",
+            "service_name": "通知服务",
+            "key_id": "K006",
+            "version": "v1.0",
+            "message": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+            "manual_note": "未更新到v2.0",
+            "timestamp": "2026-05-29T21:51:55.442950",
+            "source": "key_version_check",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "deprecated_key_K009",
+            "alert_type": "deprecated_key_enabled",
+            "severity": "critical",
+            "service_name": "会员系统",
+            "key_id": "K009",
+            "version": "v1.0",
+            "message": "密钥版本 v1.0 已过时，当前最新版本为 v2.0，但该密钥仍处于启用状态",
+            "manual_note": "忘记更新了",
+            "timestamp": "2026-05-29T21:51:55.442952",
+            "source": "key_version_check",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "expired_key_K001",
+            "alert_type": "key_expired",
+            "severity": "critical",
+            "service_name": "用户中心",
+            "key_id": "K001",
+            "version": "v1.0",
+            "message": "密钥已过期 46 天（过期时间：2026-04-14）",
+            "manual_note": "旧密钥，待清理",
+            "timestamp": "2026-05-29T21:51:55.442956",
+            "source": "key_version_check",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "expired_key_K003",
+            "alert_type": "key_expired",
+            "severity": "critical",
+            "service_name": "订单服务",
+            "key_id": "K003",
+            "version": "v1.0",
+            "message": "密钥已过期 41 天（过期时间：2026-04-19）",
+            "manual_note": "旧版本密钥仍在使用",
+            "timestamp": "2026-05-29T21:51:55.442957",
+            "source": "key_version_check",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "expired_key_K006",
+            "alert_type": "key_expired",
+            "severity": "critical",
+            "service_name": "通知服务",
+            "key_id": "K006",
+            "version": "v1.0",
+            "message": "密钥已过期 29 天（过期时间：2026-05-01）",
+            "manual_note": "未更新到v2.0",
+            "timestamp": "2026-05-29T21:51:55.442958",
+            "source": "key_version_check",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "expired_key_K007",
+            "alert_type": "key_expired",
+            "severity": "critical",
+            "service_name": "数据同步",
+            "key_id": "K007",
+            "version": "v1.0",
+            "message": "密钥已过期 36 天（过期时间：2026-04-24）",
+            "manual_note": "已禁用的旧密钥",
+            "timestamp": "2026-05-29T21:51:55.442959",
+            "source": "key_version_check",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "expired_key_K009",
+            "alert_type": "key_expired",
+            "severity": "critical",
+            "service_name": "会员系统",
+            "key_id": "K009",
+            "version": "v1.0",
+            "message": "密钥已过期 10 天（过期时间：2026-05-20）",
+            "manual_note": "忘记更新了",
+            "timestamp": "2026-05-29T21:51:55.442960",
+            "source": "key_version_check",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "service_old_keys_用户中心",
+            "alert_type": "service_has_old_keys",
+            "severity": "high",
+            "service_name": "用户中心",
+            "old_key_count": 1,
+            "message": "该服务配置了 1 个旧版本密钥",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442967",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "service_old_keys_订单服务",
+            "alert_type": "service_has_old_keys",
+            "severity": "high",
+            "service_name": "订单服务",
+            "old_key_count": 1,
+            "message": "该服务配置了 1 个旧版本密钥",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442968",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "service_old_keys_通知服务",
+            "alert_type": "service_has_old_keys",
+            "severity": "high",
+            "service_name": "通知服务",
+            "old_key_count": 1,
+            "message": "该服务配置了 1 个旧版本密钥",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442970",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "service_old_keys_数据同步",
+            "alert_type": "service_has_old_keys",
+            "severity": "high",
+            "service_name": "数据同步",
+            "old_key_count": 1,
+            "message": "该服务配置了 1 个旧版本密钥",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442971",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "service_old_keys_会员系统",
+            "alert_type": "service_has_old_keys",
+            "severity": "high",
+            "service_name": "会员系统",
+            "old_key_count": 1,
+            "message": "该服务配置了 1 个旧版本密钥",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442972",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "callback_signature_CB002",
+            "alert_type": "callback_signature_failure",
+            "severity": "high",
+            "service_name": "订单服务",
+            "callback_id": "CB002",
+            "url": "https://example.com/order/callback",
+            "message": "该回调缺少配置或服务密钥，无法进行签名验证",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442980",
+            "source": "callback_validation",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "callback_signature_CB006",
+            "alert_type": "callback_signature_failure",
+            "severity": "high",
+            "service_name": "会员系统",
+            "callback_id": "CB006",
+            "url": "https://vip.example.com/callback",
+            "message": "该回调缺少配置或服务密钥，无法进行签名验证",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442981",
+            "source": "callback_validation",
+            "dedup_status": "new"
+          }
+        ],
+        "high": [
+          {
+            "alert_id": "service_old_keys_用户中心",
+            "alert_type": "service_has_old_keys",
+            "severity": "high",
+            "service_name": "用户中心",
+            "old_key_count": 1,
+            "message": "该服务配置了 1 个旧版本密钥",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442967",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "service_old_keys_订单服务",
+            "alert_type": "service_has_old_keys",
+            "severity": "high",
+            "service_name": "订单服务",
+            "old_key_count": 1,
+            "message": "该服务配置了 1 个旧版本密钥",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442968",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "service_old_keys_通知服务",
+            "alert_type": "service_has_old_keys",
+            "severity": "high",
+            "service_name": "通知服务",
+            "old_key_count": 1,
+            "message": "该服务配置了 1 个旧版本密钥",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442970",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "service_old_keys_数据同步",
+            "alert_type": "service_has_old_keys",
+            "severity": "high",
+            "service_name": "数据同步",
+            "old_key_count": 1,
+            "message": "该服务配置了 1 个旧版本密钥",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442971",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "service_old_keys_会员系统",
+            "alert_type": "service_has_old_keys",
+            "severity": "high",
+            "service_name": "会员系统",
+            "old_key_count": 1,
+            "message": "该服务配置了 1 个旧版本密钥",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442972",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "callback_signature_CB002",
+            "alert_type": "callback_signature_failure",
+            "severity": "high",
+            "service_name": "订单服务",
+            "callback_id": "CB002",
+            "url": "https://example.com/order/callback",
+            "message": "该回调缺少配置或服务密钥，无法进行签名验证",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442980",
+            "source": "callback_validation",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "callback_signature_CB006",
+            "alert_type": "callback_signature_failure",
+            "severity": "high",
+            "service_name": "会员系统",
+            "callback_id": "CB006",
+            "url": "https://vip.example.com/callback",
+            "message": "该回调缺少配置或服务密钥，无法进行签名验证",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442981",
+            "source": "callback_validation",
+            "dedup_status": "new"
+          }
+        ],
+        "medium": [
+          {
+            "alert_id": "missing_owner_订单服务",
+            "alert_type": "missing_owner",
+            "severity": "medium",
+            "service_name": "订单服务",
+            "message": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442963",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "missing_owner_数据同步",
+            "alert_type": "missing_owner",
+            "severity": "medium",
+            "service_name": "数据同步",
+            "message": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442964",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "missing_owner_会员系统",
+            "alert_type": "missing_owner",
+            "severity": "medium",
+            "service_name": "会员系统",
+            "message": "该服务未配置负责人，出现问题时无法快速定位对接人，存在运维风险",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442965",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "task_issues_通知服务",
+            "alert_type": "task_execution_issues",
+            "severity": "medium",
+            "service_name": "通知服务",
+            "error_count": 1,
+            "message": "发现 1 条异常任务日志",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442974",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "task_issues_数据同步",
+            "alert_type": "task_execution_issues",
+            "severity": "medium",
+            "service_name": "数据同步",
+            "error_count": 1,
+            "message": "发现 1 条异常任务日志",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442977",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "task_issues_报表服务",
+            "alert_type": "task_execution_issues",
+            "severity": "medium",
+            "service_name": "报表服务",
+            "error_count": 1,
+            "message": "发现 1 条异常任务日志",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442978",
+            "source": "service_scan",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "callback_url_format_CB005",
+            "alert_type": "callback_url_invalid",
+            "severity": "medium",
+            "service_name": "数据同步",
+            "callback_id": "CB005",
+            "url": "ftp://sync.example.com/data",
+            "message": "回调地址缺少http/https协议",
+            "manual_note": "",
+            "timestamp": "2026-05-29T21:51:55.442983",
+            "source": "callback_validation",
+            "dedup_status": "new"
+          }
+        ],
+        "low": [],
+        "warning": [
+          {
+            "alert_id": "expiring_key_K002",
+            "alert_type": "key_expiring_soon",
+            "severity": "warning",
+            "service_name": "用户中心",
+            "key_id": "K002",
+            "version": "v2.0",
+            "message": "密钥将在 1 天后过期（过期时间：2026-05-31）",
+            "manual_note": "当前在用密钥",
+            "timestamp": "2026-05-29T21:51:55.442954",
+            "source": "key_version_check",
+            "dedup_status": "new"
+          },
+          {
+            "alert_id": "expiring_key_K004",
+            "alert_type": "key_expiring_soon",
+            "severity": "warning",
+            "service_name": "订单服务",
+            "key_id": "K004",
+            "version": "v2.0",
+            "message": "密钥将在 5 天后过期（过期时间：2026-06-04）",
+            "manual_note": "新版本密钥",
+            "timestamp": "2026-05-29T21:51:55.442955",
+            "source": "key_version_check",
+            "dedup_status": "new"
+          }
+        ]
+      },
+      "summary": {
+        "critical": 9,
+        "high": 7,
+        "medium": 7,
+        "low": 0,
+        "warning": 2,
+        "total": 25
+      }
+    },
+    "raw_data": {
+      "service_list": "   服务ID   服务名称  服务类型  ...                  _load_time            _row_hash _has_manual_note\n0  S001   用户中心   微服务  ...  2026-05-29T21:51:55.423026   201365022550374922             True\n1  S002   订单服务   微服务  ...  2026-05-29T21:51:55.423026  5022150308910914292             True\n2  S003   支付网关    网关  ...  2026-05-29T21:51:55.423026  9097290313039612099             True\n3  S004   通知服务  定时任务  ...  2026-05-29T21:51:55.423026 -6402424850649613803             True\n4  S005   数据同步  定时任务  ...  2026-05-29T21:51:55.423026 -1609395579917754048             True\n5  S006   报表服务  定时任务  ...  2026-05-29T21:51:55.423026 -6417791311560714909             True\n6  S007   会员系统   微服务  ...  2026-05-29T21:51:55.423026  2290391190501146597             True\n7  S008  优惠券系统   微服务  ...  2026-05-29T21:51:55.423026 -8334987374841697597             True\n\n[8 rows x 11 columns]",
+      "key_versions": "   密钥ID   服务名称  密钥版本  ...                  _load_time            _row_hash _has_manual_note\n0  K001   用户中心  v1.0  ...  2026-05-29T21:51:55.424779  5863205385986433498             True\n1  K002   用户中心  v2.0  ...  2026-05-29T21:51:55.424779 -8487133410453678566             True\n2  K003   订单服务  v1.0  ...  2026-05-29T21:51:55.424779  1916130480657887008             True\n3  K004   订单服务  v2.0  ...  2026-05-29T21:51:55.424779  8659128711080444139             True\n4  K005   支付网关  v2.0  ...  2026-05-29T21:51:55.424779  8726755956965080063            False\n5  K006   通知服务  v1.0  ...  2026-05-29T21:51:55.424779  3947860059398967880             True\n6  K007   数据同步  v1.0  ...  2026-05-29T21:51:55.424779  3330958101720366917             True\n7  K008   数据同步  v2.0  ...  2026-05-29T21:51:55.424779  4991062234389764282            False\n8  K009   会员系统  v1.0  ...  2026-05-29T21:51:55.424779 -5436333728726586686             True\n9  K010  优惠券系统  v2.0  ...  2026-05-29T21:51:55.424779  7567493979735843754            False\n\n[10 rows x 10 columns]",
+      "callback_urls": "    回调ID   服务名称  ...            _row_hash _has_manual_note\n0  CB001   用户中心  ...  5749366157344874223            False\n1  CB002   订单服务  ...  8070515851453474154             True\n2  CB003   支付网关  ... -7834336735541167077            False\n3  CB004   通知服务  ...  6407497683672246496             True\n4  CB005   数据同步  ...  4945696133265734215             True\n5  CB006   会员系统  ... -1082986990448019257            False\n6  CB007  优惠券系统  ...  4391528000823094299            False\n\n[7 rows x 12 columns]",
+      "task_logs": "   任务ID   服务名称  任务类型  ...                  _load_time            _row_hash _has_manual_note\n0  T001   通知服务  定时任务  ...  2026-05-29T21:51:55.427644 -7260235682933989519            False\n1  T002   通知服务  定时任务  ...  2026-05-29T21:51:55.427644 -3720826804473110375             True\n2  T003   数据同步  定时任务  ...  2026-05-29T21:51:55.427644 -6061657702222416575            False\n3  T004   数据同步  定时任务  ...  2026-05-29T21:51:55.427644 -7856412446763139622             True\n4  T005   订单服务  回调重试  ...  2026-05-29T21:51:55.427644 -6232746754857821668            False\n5  T006   报表服务  定时任务  ...  2026-05-29T21:51:55.427644 -5670664985863675779             True\n6  T007   会员系统  定时任务  ...  2026-05-29T21:51:55.427644 -6616786949612200023            False\n7  T008  优惠券系统  定时任务  ...  2026-05-29T21:51:55.427644 -4051137574619142480            False\n\n[8 rows x 11 columns]",
+      "owners": "    服务名称 负责人                    邮箱  ...                  _load_time            _row_hash _has_manual_note\n0   用户中心  张三  zhangsan@example.com  ...  2026-05-29T21:51:55.429029  5598507082509681173            False\n1   支付网关  李四      lisi@example.com  ...  2026-05-29T21:51:55.429029 -2146237481662598320            False\n2   通知服务  王五    wangwu@example.com  ...  2026-05-29T21:51:55.429029  -839259401929038440            False\n3   报表服务  赵六   zhaoliu@example.com  ...  2026-05-29T21:51:55.429029 -4546671632327736475            False\n4  优惠券系统  孙七     sunqi@example.com  ...  2026-05-29T21:51:55.429029 -8667687163898705361            False\n\n[5 rows x 10 columns]",
+      "inspection_reports": "   报告ID        巡检日期 巡检人员  ...                  _load_time            _row_hash _has_manual_note\n0  R001  2026-04-01   周八  ...  2026-05-29T21:51:55.430345  5091351206018151651             True\n1  R002  2026-04-15   周八  ...  2026-05-29T21:51:55.430345 -2532449697960419515             True\n2  R003  2026-05-01   周八  ...  2026-05-29T21:51:55.430345 -5819147617934752770             True\n3  R004  2026-05-15   周八  ...  2026-05-29T21:51:55.430345 -4863452767819048749             True\n\n[4 rows x 10 columns]"
+    }
+  }
+}

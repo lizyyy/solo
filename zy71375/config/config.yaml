@@ -1,0 +1,48 @@
+api_key_rotation:
+  current_key_version: "v2.0"
+  key_expiry_days: 30
+  warning_days_before_expiry: 7
+  
+  data_sources:
+    service_list:
+      file: "data/input/service_list.csv"
+      encoding: "utf-8"
+    key_versions:
+      file: "data/input/key_versions.csv"
+      encoding: "utf-8"
+    callback_urls:
+      file: "data/input/callback_urls.csv"
+      encoding: "utf-8"
+    task_logs:
+      file: "data/input/task_logs.csv"
+      encoding: "utf-8"
+    owners:
+      file: "data/input/owners.csv"
+      encoding: "utf-8"
+    inspection_reports:
+      file: "data/input/inspection_reports.csv"
+      encoding: "utf-8"
+
+  callback_validation:
+    timeout: 10
+    max_retries: 3
+    verify_ssl: true
+
+  output:
+    report_dir: "data/output/reports"
+    diff_dir: "data/output/diffs"
+    format: ["xlsx", "json"]
+
+  alert_rules:
+    deprecated_key_enabled:
+      severity: "critical"
+      description: "旧密钥版本仍在使用中，存在安全风险"
+    callback_signature_failure:
+      severity: "high"
+      description: "回调地址签名验证失败"
+    missing_owner:
+      severity: "medium"
+      description: "服务缺少负责人"
+    key_expiring_soon:
+      severity: "warning"
+      description: "密钥即将过期"

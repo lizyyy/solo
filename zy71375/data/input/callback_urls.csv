@@ -1,0 +1,8 @@
+回调ID,服务名称,回调地址,签名方式,签名密钥,状态,最后成功时间,备注
+CB001,用户中心,https://example.com/user/callback,hmac-sha256,secret_user,启用,2026-05-28 10:30:00,
+CB002,订单服务,https://example.com/order/callback,hmac-sha256,,启用,2026-05-27 15:20:00,未配置签名密钥
+CB003,支付网关,https://pay.example.com/notify,hmac-sha256,secret_pay,启用,2026-05-29 09:15:00,
+CB004,通知服务,http://notify.example.com/sms,hmac-sha1,secret_sms,启用,2026-05-26 18:45:00,使用http非https
+CB005,数据同步,ftp://sync.example.com/data,hmac-sha256,secret_sync,启用,2026-05-25 12:00:00,非http协议
+CB006,会员系统,https://vip.example.com/callback,hmac-sha256,,启用,2026-05-20 08:30:00,
+CB007,优惠券系统,https://coupon.example.com/webhook,hmac-sha256,secret_coupon,启用,2026-05-28 14:20:00,

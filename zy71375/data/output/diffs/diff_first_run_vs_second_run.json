@@ -1,0 +1,80 @@
+{
+  "run_id_old": "first_run",
+  "run_id_new": "second_run",
+  "deprecated_keys_diff": {
+    "name": "旧密钥",
+    "removed": [
+      "K003",
+      "K006",
+      "K001"
+    ],
+    "added": [],
+    "unchanged": [
+      "K009"
+    ],
+    "count_old": 4,
+    "count_new": 1,
+    "change": -3
+  },
+  "missing_owners_diff": {
+    "name": "缺少负责人",
+    "removed": [],
+    "added": [],
+    "unchanged": [
+      "订单服务",
+      "会员系统",
+      "数据同步"
+    ],
+    "count_old": 3,
+    "count_new": 3,
+    "change": 0
+  },
+  "callback_failures_diff": {
+    "name": "回调签名失败",
+    "removed": [],
+    "added": [],
+    "unchanged": [
+      "CB002",
+      "CB006"
+    ],
+    "count_old": 2,
+    "count_new": 2,
+    "change": 0
+  },
+  "alerts_diff": {
+    "name": "告警",
+    "removed": [
+      "deprecated_key_K006",
+      "service_old_keys_通知服务",
+      "deprecated_key_K003",
+      "deprecated_key_K001"
+    ],
+    "added": [],
+    "unchanged": [
+      "expired_key_K003",
+      "callback_url_format_CB005",
+      "callback_signature_CB002",
+      "missing_owner_数据同步",
+      "service_old_keys_订单服务",
+      "service_old_keys_数据同步",
+      "expiring_key_K002",
+      "expiring_key_K004",
+      "task_issues_数据同步",
+      "expired_key_K009",
+      "callback_signature_CB006",
+      "deprecated_key_K009",
+      "service_old_keys_会员系统",
+      "task_issues_通知服务",
+      "service_old_keys_用户中心",
+      "expired_key_K006",
+      "expired_key_K007",
+      "task_issues_报表服务",
+      "expired_key_K001",
+      "missing_owner_会员系统",
+      "missing_owner_订单服务"
+    ],
+    "count_old": 25,
+    "count_new": 21,
+    "change": -4
+  }
+}
