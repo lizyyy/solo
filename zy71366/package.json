@@ -1,0 +1,27 @@
+{
+  "name": "lut-ledger",
+  "version": "1.0.0",
+  "description": "电影调色LUT台账管理系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node tests/run-all.js",
+    "init-db": "node src/scripts/init-db.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.1.6",
+    "crypto": "^1.0.1",
+    "fs-extra": "^11.1.1",
+    "archiver": "^6.0.1",
+    "csv-writer": "^1.6.0",
+    "uuid": "^9.0.0",
+    "joi": "^17.10.0",
+    "form-data": "^4.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
