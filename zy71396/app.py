@@ -1,0 +1,20 @@
+from edge_health_radar import app
+
+if __name__ == '__main__':
+    print("=" * 60)
+    print("边缘节点健康雷达 API 服务启动中...")
+    print("=" * 60)
+    print("可用API端点:")
+    print("  GET /api/health           - 服务健康检查")
+    print("  GET /api/radar            - 健康雷达数据 (支持 ?region= 和 ?health= 筛选)")
+    print("  GET /api/regions          - 区域列表")
+    print("  GET /api/nodes            - 节点列表 (支持 ?region= 筛选)")
+    print("  GET /api/nodes/<id>       - 节点详情")
+    print("  GET /api/trend            - 趋势数据 (支持 ?hours= 和 ?region=)")
+    print("  GET /api/anomalies        - 异常列表 (支持 ?node=, ?type=, ?severity=)")
+    print("  GET /api/verification     - 验证报告 (证书漏报、区域聚合校验等)")
+    print("  GET /api/certificates/expiring  - 即将过期的证书 (?days=)")
+    print("  GET /api/dashboard/stats  - 仪表盘统计")
+    print("  GET /api/export/<format>  - 导出报告 (format: json/csv/pdf)")
+    print("=" * 60)
+    app.run(host='0.0.0.0', port=5000, debug=True)
