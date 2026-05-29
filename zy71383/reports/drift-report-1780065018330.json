@@ -1,0 +1,2340 @@
+{
+  "id": "2984d645-9d27-4215-8648-845b127f1eaf",
+  "generatedAt": "2026-05-29T14:29:55.283Z",
+  "baselineEnvironment": "development",
+  "targetEnvironments": [
+    "testing",
+    "production"
+  ],
+  "summary": {
+    "totalDiffs": 58,
+    "criticalDiffs": 13,
+    "warningDiffs": 34,
+    "infoDiffs": 10,
+    "falsePositives": 1,
+    "requiresManualReview": 47
+  },
+  "groupedBySeverity": {
+    "critical": 13,
+    "warning": 34,
+    "info": 10,
+    "false_positive": 1
+  },
+  "groupedByEnvironment": {
+    "testing": [
+      {
+        "key": "database.password",
+        "type": "plaintext_secret",
+        "severity": "critical",
+        "environment": "testing",
+        "targetValue": "test_db_password_123!",
+        "explanation": "检测到明文密钥: database.password 匹配模式 \"Sensitive Field Name Pattern\"",
+        "requiresManualReview": true,
+        "suggestedAction": "立即替换为环境变量或密钥管理服务引用"
+      },
+      {
+        "key": "redis.password",
+        "type": "plaintext_secret",
+        "severity": "critical",
+        "environment": "testing",
+        "targetValue": "sk_test_abcdefghijklmnopqrstuvwxyz1234567890",
+        "explanation": "检测到明文密钥: redis.password 匹配模式 \"Sensitive Field Name Pattern\"",
+        "requiresManualReview": true,
+        "suggestedAction": "立即替换为环境变量或密钥管理服务引用"
+      },
+      {
+        "key": "security.jwtSecret",
+        "type": "plaintext_secret",
+        "severity": "critical",
+        "environment": "testing",
+        "targetValue": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA0ZJ5sF4w8fGQ==\n-----END RSA PRIVATE KEY-----",
+        "explanation": "检测到明文密钥: security.jwtSecret 匹配模式 \"Sensitive Field Name Pattern\"",
+        "requiresManualReview": true,
+        "suggestedAction": "立即替换为环境变量或密钥管理服务引用"
+      },
+      {
+        "key": "monitoring.datadogApiKey",
+        "type": "plaintext_secret",
+        "severity": "critical",
+        "environment": "testing",
+        "targetValue": "AKIAIOSFODNN7EXAMPLE",
+        "explanation": "检测到明文密钥: monitoring.datadogApiKey 匹配模式 \"Sensitive Field Name Pattern\"",
+        "requiresManualReview": true,
+        "suggestedAction": "立即替换为环境变量或密钥管理服务引用"
+      },
+      {
+        "key": "app.environment",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": "development",
+        "targetValue": "testing",
+        "explanation": "值不匹配: 基线(\"development\") vs 目标(\"testing\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "app.debug",
+        "type": "value_mismatch",
+        "severity": "critical",
+        "environment": "testing",
+        "baselineValue": true,
+        "targetValue": false,
+        "explanation": "值不匹配: 基线(true) vs 目标(false)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "app.logLevel",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": "debug",
+        "targetValue": "info",
+        "explanation": "值不匹配: 基线(\"debug\") vs 目标(\"info\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "server.host",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": "localhost",
+        "targetValue": "0.0.0.0",
+        "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"0.0.0.0\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "server.port",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": 3000,
+        "targetValue": 8080,
+        "explanation": "值不匹配: 基线(3000) vs 目标(8080)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "server.timeout",
+        "type": "type_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": 30000,
+        "targetValue": "30000",
+        "explanation": "类型不匹配: 基线(number) vs 目标(string)",
+        "requiresManualReview": true,
+        "suggestedAction": "检查是否为配置格式错误"
+      },
+      {
+        "key": "server.maxConnections",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": 100,
+        "targetValue": 200,
+        "explanation": "值不匹配: 基线(100) vs 目标(200)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "database.host",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": "localhost",
+        "targetValue": "test-db.internal",
+        "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"test-db.internal\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "database.name",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": "dev_db",
+        "targetValue": "test_db",
+        "explanation": "值不匹配: 基线(\"dev_db\") vs 目标(\"test_db\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "database.username",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": "dev_user",
+        "targetValue": "test_user",
+        "explanation": "值不匹配: 基线(\"dev_user\") vs 目标(\"test_user\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "database.password",
+        "type": "value_mismatch",
+        "severity": "critical",
+        "environment": "testing",
+        "baselineValue": "${DB_PASSWORD}",
+        "targetValue": "test_db_password_123!",
+        "explanation": "值不匹配: 基线(\"${DB_PASSWORD}\") vs 目标(\"test_db_password_123!\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "database.ssl",
+        "type": "value_mismatch",
+        "severity": "critical",
+        "environment": "testing",
+        "baselineValue": false,
+        "targetValue": true,
+        "explanation": "值不匹配: 基线(false) vs 目标(true)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "redis.host",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": "localhost",
+        "targetValue": "test-redis.internal",
+        "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"test-redis.internal\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "redis.password",
+        "type": "value_mismatch",
+        "severity": "critical",
+        "environment": "testing",
+        "baselineValue": "${REDIS_PASSWORD}",
+        "targetValue": "sk_test_abcdefghijklmnopqrstuvwxyz1234567890",
+        "explanation": "值不匹配: 基线(\"${REDIS_PASSWORD}\") vs 目标(\"sk_test_abcdefghijklmnopqrstuvwxyz1234567890\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "redis.db",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": 0,
+        "targetValue": 1,
+        "explanation": "值不匹配: 基线(0) vs 目标(1)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "externalApis.notification",
+        "type": "missing_key",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": {
+          "baseUrl": "https://api.sandbox.notification.com",
+          "apiKey": "${NOTIFICATION_API_KEY}",
+          "enabled": true
+        },
+        "explanation": "目标环境缺少字段: externalApis.notification",
+        "requiresManualReview": true,
+        "suggestedAction": "确认此字段是否在目标环境中被错误删除"
+      },
+      {
+        "key": "featureFlags.newDashboard",
+        "type": "value_mismatch",
+        "severity": "info",
+        "environment": "testing",
+        "baselineValue": false,
+        "targetValue": true,
+        "explanation": "已知变更: 测试环境启用新仪表盘功能进行验收",
+        "requiresManualReview": false,
+        "relatedChangeId": "CHG-001"
+      },
+      {
+        "key": "featureFlags.experimentalMode",
+        "type": "value_mismatch",
+        "severity": "critical",
+        "environment": "testing",
+        "baselineValue": false,
+        "targetValue": true,
+        "explanation": "值不匹配: 基线(false) vs 目标(true)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "security.jwtSecret",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": "${JWT_SECRET}",
+        "targetValue": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA0ZJ5sF4w8fGQ==\n-----END RSA PRIVATE KEY-----",
+        "explanation": "值不匹配: 基线(\"${JWT_SECRET}\") vs 目标(\"-----BEGIN RSA PRIVATE KEY-----\\nMIIEowIBAAKCAQEA0ZJ5sF4w8fGQ==\\n-----END RSA PRIVATE KEY-----\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "security.sessionTimeout",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": 3600,
+        "targetValue": 7200,
+        "explanation": "值不匹配: 基线(3600) vs 目标(7200)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "security.allowedOrigins",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": 3,
+        "targetValue": 4,
+        "explanation": "数组长度不匹配: 基线(3) vs 目标(4)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "security.allowedOrigins[3]",
+        "type": "extra_key",
+        "severity": "info",
+        "environment": "testing",
+        "targetValue": "https://test-app.example.com",
+        "explanation": "数组额外元素: security.allowedOrigins[3]",
+        "requiresManualReview": false
+      },
+      {
+        "key": "security.allowedOrigins",
+        "type": "array_order_mismatch",
+        "severity": "false_positive",
+        "environment": "testing",
+        "baselineValue": [
+          "http://localhost:3000",
+          "http://localhost:8080",
+          "http://127.0.0.1:3000"
+        ],
+        "targetValue": [
+          "http://127.0.0.1:3000",
+          "http://localhost:3000",
+          "http://localhost:8080",
+          "https://test-app.example.com"
+        ],
+        "explanation": "数组整体顺序不同但元素完全相同: security.allowedOrigins",
+        "requiresManualReview": false,
+        "falsePositiveReason": "数组顺序不影响功能，属于误报"
+      },
+      {
+        "key": "cache.ttl",
+        "type": "default_value_changed",
+        "severity": "info",
+        "environment": "testing",
+        "baselineValue": 300,
+        "targetValue": 600,
+        "explanation": "默认值变更（允许）: cache.ttl 从 300 变为 600",
+        "requiresManualReview": false,
+        "suggestedAction": "该字段标记为可变更，当前值: 600"
+      },
+      {
+        "key": "rateLimiting.enabled",
+        "type": "default_value_changed",
+        "severity": "info",
+        "environment": "testing",
+        "baselineValue": false,
+        "targetValue": true,
+        "explanation": "默认值变更（允许）: rateLimiting.enabled 从 false 变为 true",
+        "requiresManualReview": false,
+        "suggestedAction": "该字段标记为可变更，当前值: true"
+      },
+      {
+        "key": "rateLimiting.maxRequests",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "testing",
+        "baselineValue": 1000,
+        "targetValue": 500,
+        "explanation": "值不匹配: 基线(1000) vs 目标(500)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "monitoring",
+        "type": "extra_key",
+        "severity": "warning",
+        "environment": "testing",
+        "targetValue": {
+          "enabled": true,
+          "datadogApiKey": "AKIAIOSFODNN7EXAMPLE"
+        },
+        "explanation": "目标环境存在额外字段: monitoring",
+        "requiresManualReview": true,
+        "suggestedAction": "确认此字段是否应在基线环境中添加"
+      }
+    ],
+    "production": [
+      {
+        "key": "app.environment",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": "development",
+        "targetValue": "production",
+        "explanation": "值不匹配: 基线(\"development\") vs 目标(\"production\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "app.debug",
+        "type": "value_mismatch",
+        "severity": "critical",
+        "environment": "production",
+        "baselineValue": true,
+        "targetValue": false,
+        "explanation": "值不匹配: 基线(true) vs 目标(false)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "app.logLevel",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": "debug",
+        "targetValue": "warn",
+        "explanation": "值不匹配: 基线(\"debug\") vs 目标(\"warn\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "server.host",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": "localhost",
+        "targetValue": "0.0.0.0",
+        "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"0.0.0.0\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "server.port",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": 3000,
+        "targetValue": 443,
+        "explanation": "值不匹配: 基线(3000) vs 目标(443)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "server.maxConnections",
+        "type": "value_mismatch",
+        "severity": "info",
+        "environment": "production",
+        "baselineValue": 100,
+        "targetValue": 500,
+        "explanation": "已知变更: 春节流量高峰扩容",
+        "requiresManualReview": false,
+        "relatedChangeId": "CHG-003"
+      },
+      {
+        "key": "database.host",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": "localhost",
+        "targetValue": "prod-db.internal",
+        "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"prod-db.internal\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "database.name",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": "dev_db",
+        "targetValue": "prod_db",
+        "explanation": "值不匹配: 基线(\"dev_db\") vs 目标(\"prod_db\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "database.username",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": "dev_user",
+        "targetValue": "prod_user",
+        "explanation": "值不匹配: 基线(\"dev_user\") vs 目标(\"prod_user\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "database.poolSize",
+        "type": "default_value_changed",
+        "severity": "info",
+        "environment": "production",
+        "baselineValue": 10,
+        "targetValue": 50,
+        "explanation": "默认值变更（允许）: database.poolSize 从 10 变为 50",
+        "requiresManualReview": false,
+        "suggestedAction": "该字段标记为可变更，当前值: 50"
+      },
+      {
+        "key": "database.ssl",
+        "type": "value_mismatch",
+        "severity": "critical",
+        "environment": "production",
+        "baselineValue": false,
+        "targetValue": true,
+        "explanation": "值不匹配: 基线(false) vs 目标(true)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "redis.host",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": "localhost",
+        "targetValue": "prod-redis.internal",
+        "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"prod-redis.internal\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "externalApis.payment.baseUrl",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": "https://api.sandbox.payment.com",
+        "targetValue": "https://api.production.payment.com",
+        "explanation": "值不匹配: 基线(\"https://api.sandbox.payment.com\") vs 目标(\"https://api.production.payment.com\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "externalApis.payment.timeout",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": 5000,
+        "targetValue": 3000,
+        "explanation": "值不匹配: 基线(5000) vs 目标(3000)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "externalApis.notification.baseUrl",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": "https://api.sandbox.notification.com",
+        "targetValue": "https://api.production.notification.com",
+        "explanation": "值不匹配: 基线(\"https://api.sandbox.notification.com\") vs 目标(\"https://api.production.notification.com\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "featureFlags.newDashboard",
+        "type": "value_mismatch",
+        "severity": "info",
+        "environment": "production",
+        "baselineValue": false,
+        "targetValue": true,
+        "explanation": "已知变更: 测试环境启用新仪表盘功能进行验收",
+        "requiresManualReview": false,
+        "relatedChangeId": "CHG-001"
+      },
+      {
+        "key": "featureFlags.betaFeatures",
+        "type": "value_mismatch",
+        "severity": "critical",
+        "environment": "production",
+        "baselineValue": true,
+        "targetValue": false,
+        "explanation": "值不匹配: 基线(true) vs 目标(false)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "security.sessionTimeout",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": 3600,
+        "targetValue": 1800,
+        "explanation": "值不匹配: 基线(3600) vs 目标(1800)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "security.maxLoginAttempts",
+        "type": "default_value_changed",
+        "severity": "critical",
+        "environment": "production",
+        "baselineValue": 5,
+        "targetValue": 3,
+        "explanation": "默认值变更（禁止）: security.maxLoginAttempts 从 5 变为 3",
+        "requiresManualReview": true,
+        "suggestedAction": "该字段不应变更，请恢复为默认值: 5"
+      },
+      {
+        "key": "security.allowedOrigins",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": 3,
+        "targetValue": 2,
+        "explanation": "数组长度不匹配: 基线(3) vs 目标(2)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "security.allowedOrigins[2]",
+        "type": "missing_key",
+        "severity": "info",
+        "environment": "production",
+        "baselineValue": "http://127.0.0.1:3000",
+        "explanation": "数组缺少元素: security.allowedOrigins[2]",
+        "requiresManualReview": false
+      },
+      {
+        "key": "security.allowedOrigins[0]",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": "http://localhost:3000",
+        "targetValue": "https://app.example.com",
+        "explanation": "值不匹配: 基线(\"http://localhost:3000\") vs 目标(\"https://app.example.com\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "security.allowedOrigins[1]",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": "http://localhost:8080",
+        "targetValue": "https://admin.example.com",
+        "explanation": "值不匹配: 基线(\"http://localhost:8080\") vs 目标(\"https://admin.example.com\")",
+        "requiresManualReview": true
+      },
+      {
+        "key": "cache.ttl",
+        "type": "default_value_changed",
+        "severity": "info",
+        "environment": "production",
+        "baselineValue": 300,
+        "targetValue": 1800,
+        "explanation": "默认值变更（允许）: cache.ttl 从 300 变为 1800",
+        "requiresManualReview": false,
+        "suggestedAction": "该字段标记为可变更，当前值: 1800"
+      },
+      {
+        "key": "cache.maxSize",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": 1000,
+        "targetValue": 5000,
+        "explanation": "值不匹配: 基线(1000) vs 目标(5000)",
+        "requiresManualReview": true
+      },
+      {
+        "key": "rateLimiting.enabled",
+        "type": "default_value_changed",
+        "severity": "info",
+        "environment": "production",
+        "baselineValue": false,
+        "targetValue": true,
+        "explanation": "默认值变更（允许）: rateLimiting.enabled 从 false 变为 true",
+        "requiresManualReview": false,
+        "suggestedAction": "该字段标记为可变更，当前值: true"
+      },
+      {
+        "key": "rateLimiting.maxRequests",
+        "type": "value_mismatch",
+        "severity": "warning",
+        "environment": "production",
+        "baselineValue": 1000,
+        "targetValue": 100,
+        "explanation": "值不匹配: 基线(1000) vs 目标(100)",
+        "requiresManualReview": true
+      }
+    ]
+  },
+  "groupedByType": {
+    "plaintext_secret": 4,
+    "value_mismatch": 42,
+    "type_mismatch": 1,
+    "missing_key": 2,
+    "extra_key": 2,
+    "array_order_mismatch": 1,
+    "default_value_changed": 6
+  },
+  "manualReviewRequired": [
+    {
+      "key": "database.password",
+      "type": "plaintext_secret",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "检测到明文密钥: database.password 匹配模式 \"Sensitive Field Name Pattern\"",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "明文密钥检测",
+        "impact": "testing环境存在明文密钥，存在严重安全隐患",
+        "rootCause": "密码字段直接写入配置文件，未使用环境变量或密钥管理服务。",
+        "priority": "immediate"
+      },
+      "targetValue": "test...123!"
+    },
+    {
+      "key": "redis.password",
+      "type": "plaintext_secret",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "检测到明文密钥: redis.password 匹配模式 \"Sensitive Field Name Pattern\"",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "明文密钥检测",
+        "impact": "testing环境存在明文密钥，存在严重安全隐患",
+        "rootCause": "密码字段直接写入配置文件，未使用环境变量或密钥管理服务。",
+        "priority": "immediate"
+      },
+      "targetValue": "sk_t...7890"
+    },
+    {
+      "key": "security.jwtSecret",
+      "type": "plaintext_secret",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "检测到明文密钥: security.jwtSecret 匹配模式 \"Sensitive Field Name Pattern\"",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "明文密钥检测",
+        "impact": "testing环境存在明文密钥，存在严重安全隐患",
+        "rootCause": "敏感数据以明文形式存储在配置文件中，存在泄露风险。",
+        "priority": "immediate"
+      },
+      "targetValue": "----...----"
+    },
+    {
+      "key": "monitoring.datadogApiKey",
+      "type": "plaintext_secret",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "检测到明文密钥: monitoring.datadogApiKey 匹配模式 \"Sensitive Field Name Pattern\"",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "明文密钥检测",
+        "impact": "testing环境存在明文密钥，存在严重安全隐患",
+        "rootCause": "私钥或敏感密钥直接存储在配置文件中，违反安全最佳实践。",
+        "priority": "immediate"
+      },
+      "targetValue": "AKIA...MPLE"
+    },
+    {
+      "key": "app.environment",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"development\") vs 目标(\"testing\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"development\") vs 目标(\"testing\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "deve...ment",
+      "targetValue": "testing"
+    },
+    {
+      "key": "app.debug",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(true) vs 目标(false)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(true) vs 目标(false)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": true,
+      "targetValue": false
+    },
+    {
+      "key": "app.logLevel",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"debug\") vs 目标(\"info\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"debug\") vs 目标(\"info\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "debug",
+      "targetValue": "info"
+    },
+    {
+      "key": "server.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"0.0.0.0\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"0.0.0.0\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "0.0.0.0"
+    },
+    {
+      "key": "server.port",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(3000) vs 目标(8080)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(3000) vs 目标(8080)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3000,
+      "targetValue": 8080
+    },
+    {
+      "key": "server.timeout",
+      "type": "type_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "类型不匹配: 基线(number) vs 目标(string)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置类型不匹配",
+        "impact": "testing环境配置项类型与基线不一致，可能导致类型转换错误",
+        "rootCause": "配置项类型从 number 变为 string。这可能是由于配置文件解析错误、手动编辑错误或不同部署工具的类型处理差异导致的。",
+        "priority": "soon"
+      },
+      "baselineValue": 30000,
+      "targetValue": "30000"
+    },
+    {
+      "key": "server.maxConnections",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(100) vs 目标(200)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "资源限制值不同: 基线(100) vs 目标(200)。需要评估目标环境是否能承受此配置。",
+        "priority": "soon"
+      },
+      "baselineValue": 100,
+      "targetValue": 200
+    },
+    {
+      "key": "database.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"test-db.internal\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"test-db.internal\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "test...rnal"
+    },
+    {
+      "key": "database.name",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"dev_db\") vs 目标(\"test_db\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"dev_db\") vs 目标(\"test_db\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "dev_db",
+      "targetValue": "test_db"
+    },
+    {
+      "key": "database.username",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"dev_user\") vs 目标(\"test_user\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"dev_user\") vs 目标(\"test_user\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "dev_user",
+      "targetValue": "test...user"
+    },
+    {
+      "key": "database.password",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"${DB_PASSWORD}\") vs 目标(\"test_db_password_123!\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"${DB_PASSWORD}\") vs 目标(\"test_db_password_123!\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "immediate"
+      },
+      "baselineValue": "${DB...ORD}",
+      "targetValue": "test...123!"
+    },
+    {
+      "key": "database.ssl",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(false) vs 目标(true)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(false) vs 目标(true)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": false,
+      "targetValue": true
+    },
+    {
+      "key": "redis.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"test-redis.internal\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"test-redis.internal\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "test...rnal"
+    },
+    {
+      "key": "redis.password",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"${REDIS_PASSWORD}\") vs 目标(\"sk_test_abcdefghijklmnopqrstuvwxyz1234567890\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"${REDIS_PASSWORD}\") vs 目标(\"sk_test_abcdefghijklmnopqrstuvwxyz1234567890\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "immediate"
+      },
+      "baselineValue": "${RE...ORD}",
+      "targetValue": "sk_t...7890"
+    },
+    {
+      "key": "redis.db",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(0) vs 目标(1)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(0) vs 目标(1)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 0,
+      "targetValue": 1
+    },
+    {
+      "key": "externalApis.notification",
+      "type": "missing_key",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "目标环境缺少字段: externalApis.notification",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "缺少配置项",
+        "impact": "testing环境缺少必要配置项，可能导致功能不可用或使用默认值",
+        "rootCause": "配置项 \"externalApis.notification\" 在目标环境中未定义，可能是部署流程遗漏或配置文件不完整。",
+        "priority": "soon"
+      },
+      "baselineValue": {
+        "baseUrl": "https://api.sandbox.notification.com",
+        "apiKey": "${NOTIFICATION_API_KEY}",
+        "enabled": true
+      }
+    },
+    {
+      "key": "featureFlags.experimentalMode",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(false) vs 目标(true)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(false) vs 目标(true)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": false,
+      "targetValue": true
+    },
+    {
+      "key": "security.jwtSecret",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"${JWT_SECRET}\") vs 目标(\"-----BEGIN RSA PRIVATE KEY-----\\nMIIEowIBAAKCAQEA0ZJ5sF4w8fGQ==\\n-----END RSA PRIVATE KEY-----\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"${JWT_SECRET}\") vs 目标(\"-----BEGIN RSA PRIVATE KEY-----\\nMIIEowIBAAKCAQEA0ZJ5sF4w8fGQ==\\n-----END RSA PRIVATE KEY-----\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "${JW...RET}",
+      "targetValue": "----...----"
+    },
+    {
+      "key": "security.sessionTimeout",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(3600) vs 目标(7200)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(3600) vs 目标(7200)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3600,
+      "targetValue": 7200
+    },
+    {
+      "key": "security.allowedOrigins",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "数组长度不匹配: 基线(3) vs 目标(4)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(3) vs 目标(4)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3,
+      "targetValue": 4
+    },
+    {
+      "key": "rateLimiting.maxRequests",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(1000) vs 目标(500)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "资源限制值不同: 基线(1000) vs 目标(500)。需要评估目标环境是否能承受此配置。",
+        "priority": "soon"
+      },
+      "baselineValue": 1000,
+      "targetValue": 500
+    },
+    {
+      "key": "monitoring",
+      "type": "extra_key",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "目标环境存在额外字段: monitoring",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "额外配置项",
+        "impact": "testing环境存在基线中未定义的配置项，可能是未同步的变更",
+        "rootCause": "配置项 \"monitoring\" 在目标环境中存在但基线中未定义，可能是未同步的新功能配置。",
+        "priority": "soon"
+      },
+      "targetValue": {
+        "enabled": true,
+        "datadogApiKey": "AKIAIOSFODNN7EXAMPLE"
+      }
+    },
+    {
+      "key": "app.environment",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"development\") vs 目标(\"production\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"development\") vs 目标(\"production\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "deve...ment",
+      "targetValue": "prod...tion"
+    },
+    {
+      "key": "app.debug",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(true) vs 目标(false)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(true) vs 目标(false)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": true,
+      "targetValue": false
+    },
+    {
+      "key": "app.logLevel",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"debug\") vs 目标(\"warn\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"debug\") vs 目标(\"warn\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "debug",
+      "targetValue": "warn"
+    },
+    {
+      "key": "server.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"0.0.0.0\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"0.0.0.0\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "0.0.0.0"
+    },
+    {
+      "key": "server.port",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(3000) vs 目标(443)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(3000) vs 目标(443)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3000,
+      "targetValue": 443
+    },
+    {
+      "key": "database.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"prod-db.internal\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"prod-db.internal\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "prod...rnal"
+    },
+    {
+      "key": "database.name",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"dev_db\") vs 目标(\"prod_db\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"dev_db\") vs 目标(\"prod_db\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "dev_db",
+      "targetValue": "prod_db"
+    },
+    {
+      "key": "database.username",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"dev_user\") vs 目标(\"prod_user\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"dev_user\") vs 目标(\"prod_user\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "dev_user",
+      "targetValue": "prod...user"
+    },
+    {
+      "key": "database.ssl",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(false) vs 目标(true)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(false) vs 目标(true)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": false,
+      "targetValue": true
+    },
+    {
+      "key": "redis.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"prod-redis.internal\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"prod-redis.internal\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "prod...rnal"
+    },
+    {
+      "key": "externalApis.payment.baseUrl",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"https://api.sandbox.payment.com\") vs 目标(\"https://api.production.payment.com\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"https://api.sandbox.payment.com\") vs 目标(\"https://api.production.payment.com\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "http....com",
+      "targetValue": "http....com"
+    },
+    {
+      "key": "externalApis.payment.timeout",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(5000) vs 目标(3000)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(5000) vs 目标(3000)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 5000,
+      "targetValue": 3000
+    },
+    {
+      "key": "externalApis.notification.baseUrl",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"https://api.sandbox.notification.com\") vs 目标(\"https://api.production.notification.com\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"https://api.sandbox.notification.com\") vs 目标(\"https://api.production.notification.com\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "http....com",
+      "targetValue": "http....com"
+    },
+    {
+      "key": "featureFlags.betaFeatures",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(true) vs 目标(false)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(true) vs 目标(false)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": true,
+      "targetValue": false
+    },
+    {
+      "key": "security.sessionTimeout",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(3600) vs 目标(1800)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(3600) vs 目标(1800)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3600,
+      "targetValue": 1800
+    },
+    {
+      "key": "security.maxLoginAttempts",
+      "type": "default_value_changed",
+      "severity": "critical",
+      "environment": "production",
+      "explanation": "默认值变更（禁止）: security.maxLoginAttempts 从 5 变为 3",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "默认值变更",
+        "impact": "production环境配置值与默认值不一致",
+        "rootCause": "默认值从 5 变更为 3。此变更需要人工确认是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": 5,
+      "targetValue": 3
+    },
+    {
+      "key": "security.allowedOrigins",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "数组长度不匹配: 基线(3) vs 目标(2)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(3) vs 目标(2)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3,
+      "targetValue": 2
+    },
+    {
+      "key": "security.allowedOrigins[0]",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"http://localhost:3000\") vs 目标(\"https://app.example.com\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"http://localhost:3000\") vs 目标(\"https://app.example.com\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "http...3000",
+      "targetValue": "http....com"
+    },
+    {
+      "key": "security.allowedOrigins[1]",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"http://localhost:8080\") vs 目标(\"https://admin.example.com\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"http://localhost:8080\") vs 目标(\"https://admin.example.com\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "http...8080",
+      "targetValue": "http....com"
+    },
+    {
+      "key": "cache.maxSize",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(1000) vs 目标(5000)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "资源限制值不同: 基线(1000) vs 目标(5000)。需要评估目标环境是否能承受此配置。",
+        "priority": "soon"
+      },
+      "baselineValue": 1000,
+      "targetValue": 5000
+    },
+    {
+      "key": "rateLimiting.maxRequests",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(1000) vs 目标(100)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "资源限制值不同: 基线(1000) vs 目标(100)。需要评估目标环境是否能承受此配置。",
+        "priority": "soon"
+      },
+      "baselineValue": 1000,
+      "targetValue": 100
+    }
+  ],
+  "diffs": [
+    {
+      "key": "database.password",
+      "type": "plaintext_secret",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "检测到明文密钥: database.password 匹配模式 \"Sensitive Field Name Pattern\"",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "明文密钥检测",
+        "impact": "testing环境存在明文密钥，存在严重安全隐患",
+        "rootCause": "密码字段直接写入配置文件，未使用环境变量或密钥管理服务。",
+        "priority": "immediate"
+      },
+      "targetValue": "test...123!"
+    },
+    {
+      "key": "redis.password",
+      "type": "plaintext_secret",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "检测到明文密钥: redis.password 匹配模式 \"Sensitive Field Name Pattern\"",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "明文密钥检测",
+        "impact": "testing环境存在明文密钥，存在严重安全隐患",
+        "rootCause": "密码字段直接写入配置文件，未使用环境变量或密钥管理服务。",
+        "priority": "immediate"
+      },
+      "targetValue": "sk_t...7890"
+    },
+    {
+      "key": "security.jwtSecret",
+      "type": "plaintext_secret",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "检测到明文密钥: security.jwtSecret 匹配模式 \"Sensitive Field Name Pattern\"",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "明文密钥检测",
+        "impact": "testing环境存在明文密钥，存在严重安全隐患",
+        "rootCause": "敏感数据以明文形式存储在配置文件中，存在泄露风险。",
+        "priority": "immediate"
+      },
+      "targetValue": "----...----"
+    },
+    {
+      "key": "monitoring.datadogApiKey",
+      "type": "plaintext_secret",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "检测到明文密钥: monitoring.datadogApiKey 匹配模式 \"Sensitive Field Name Pattern\"",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "明文密钥检测",
+        "impact": "testing环境存在明文密钥，存在严重安全隐患",
+        "rootCause": "私钥或敏感密钥直接存储在配置文件中，违反安全最佳实践。",
+        "priority": "immediate"
+      },
+      "targetValue": "AKIA...MPLE"
+    },
+    {
+      "key": "app.environment",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"development\") vs 目标(\"testing\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"development\") vs 目标(\"testing\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "deve...ment",
+      "targetValue": "testing"
+    },
+    {
+      "key": "app.debug",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(true) vs 目标(false)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(true) vs 目标(false)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": true,
+      "targetValue": false
+    },
+    {
+      "key": "app.logLevel",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"debug\") vs 目标(\"info\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"debug\") vs 目标(\"info\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "debug",
+      "targetValue": "info"
+    },
+    {
+      "key": "server.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"0.0.0.0\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"0.0.0.0\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "0.0.0.0"
+    },
+    {
+      "key": "server.port",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(3000) vs 目标(8080)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(3000) vs 目标(8080)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3000,
+      "targetValue": 8080
+    },
+    {
+      "key": "server.timeout",
+      "type": "type_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "类型不匹配: 基线(number) vs 目标(string)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置类型不匹配",
+        "impact": "testing环境配置项类型与基线不一致，可能导致类型转换错误",
+        "rootCause": "配置项类型从 number 变为 string。这可能是由于配置文件解析错误、手动编辑错误或不同部署工具的类型处理差异导致的。",
+        "priority": "soon"
+      },
+      "baselineValue": 30000,
+      "targetValue": "30000"
+    },
+    {
+      "key": "server.maxConnections",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(100) vs 目标(200)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "资源限制值不同: 基线(100) vs 目标(200)。需要评估目标环境是否能承受此配置。",
+        "priority": "soon"
+      },
+      "baselineValue": 100,
+      "targetValue": 200
+    },
+    {
+      "key": "database.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"test-db.internal\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"test-db.internal\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "test...rnal"
+    },
+    {
+      "key": "database.name",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"dev_db\") vs 目标(\"test_db\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"dev_db\") vs 目标(\"test_db\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "dev_db",
+      "targetValue": "test_db"
+    },
+    {
+      "key": "database.username",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"dev_user\") vs 目标(\"test_user\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"dev_user\") vs 目标(\"test_user\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "dev_user",
+      "targetValue": "test...user"
+    },
+    {
+      "key": "database.password",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"${DB_PASSWORD}\") vs 目标(\"test_db_password_123!\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"${DB_PASSWORD}\") vs 目标(\"test_db_password_123!\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "immediate"
+      },
+      "baselineValue": "${DB...ORD}",
+      "targetValue": "test...123!"
+    },
+    {
+      "key": "database.ssl",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(false) vs 目标(true)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(false) vs 目标(true)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": false,
+      "targetValue": true
+    },
+    {
+      "key": "redis.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"test-redis.internal\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"test-redis.internal\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "test...rnal"
+    },
+    {
+      "key": "redis.password",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"${REDIS_PASSWORD}\") vs 目标(\"sk_test_abcdefghijklmnopqrstuvwxyz1234567890\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"${REDIS_PASSWORD}\") vs 目标(\"sk_test_abcdefghijklmnopqrstuvwxyz1234567890\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "immediate"
+      },
+      "baselineValue": "${RE...ORD}",
+      "targetValue": "sk_t...7890"
+    },
+    {
+      "key": "redis.db",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(0) vs 目标(1)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(0) vs 目标(1)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 0,
+      "targetValue": 1
+    },
+    {
+      "key": "externalApis.notification",
+      "type": "missing_key",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "目标环境缺少字段: externalApis.notification",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "缺少配置项",
+        "impact": "testing环境缺少必要配置项，可能导致功能不可用或使用默认值",
+        "rootCause": "配置项 \"externalApis.notification\" 在目标环境中未定义，可能是部署流程遗漏或配置文件不完整。",
+        "priority": "soon"
+      },
+      "baselineValue": {
+        "baseUrl": "https://api.sandbox.notification.com",
+        "apiKey": "${NOTIFICATION_API_KEY}",
+        "enabled": true
+      }
+    },
+    {
+      "key": "featureFlags.newDashboard",
+      "type": "value_mismatch",
+      "severity": "info",
+      "environment": "testing",
+      "explanation": "已知变更: 测试环境启用新仪表盘功能进行验收",
+      "requiresManualReview": false,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(false) vs 目标(true)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "scheduled"
+      },
+      "baselineValue": false,
+      "targetValue": true,
+      "relatedChangeId": "CHG-001"
+    },
+    {
+      "key": "featureFlags.experimentalMode",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(false) vs 目标(true)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(false) vs 目标(true)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": false,
+      "targetValue": true
+    },
+    {
+      "key": "security.jwtSecret",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(\"${JWT_SECRET}\") vs 目标(\"-----BEGIN RSA PRIVATE KEY-----\\nMIIEowIBAAKCAQEA0ZJ5sF4w8fGQ==\\n-----END RSA PRIVATE KEY-----\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(\"${JWT_SECRET}\") vs 目标(\"-----BEGIN RSA PRIVATE KEY-----\\nMIIEowIBAAKCAQEA0ZJ5sF4w8fGQ==\\n-----END RSA PRIVATE KEY-----\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "${JW...RET}",
+      "targetValue": "----...----"
+    },
+    {
+      "key": "security.sessionTimeout",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(3600) vs 目标(7200)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(3600) vs 目标(7200)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3600,
+      "targetValue": 7200
+    },
+    {
+      "key": "security.allowedOrigins",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "数组长度不匹配: 基线(3) vs 目标(4)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "配置值差异: 基线(3) vs 目标(4)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3,
+      "targetValue": 4
+    },
+    {
+      "key": "security.allowedOrigins[3]",
+      "type": "extra_key",
+      "severity": "info",
+      "environment": "testing",
+      "explanation": "数组额外元素: security.allowedOrigins[3]",
+      "requiresManualReview": false,
+      "interpretation": {
+        "summary": "额外配置项",
+        "impact": "testing环境存在基线中未定义的配置项，可能是未同步的变更",
+        "rootCause": "配置项 \"security.allowedOrigins[3]\" 在目标环境中存在但基线中未定义，可能是未同步的新功能配置。",
+        "priority": "scheduled"
+      },
+      "targetValue": "http....com"
+    },
+    {
+      "key": "security.allowedOrigins",
+      "type": "array_order_mismatch",
+      "severity": "false_positive",
+      "environment": "testing",
+      "explanation": "数组整体顺序不同但元素完全相同: security.allowedOrigins",
+      "requiresManualReview": false,
+      "interpretation": {
+        "summary": "误报: 数组顺序不匹配",
+        "impact": "此差异已被识别为误报，不会影响系统功能。",
+        "rootCause": "数组顺序不影响功能，属于误报",
+        "priority": "none"
+      },
+      "baselineValue": [
+        "http://localhost:3000",
+        "http://localhost:8080",
+        "http://127.0.0.1:3000"
+      ],
+      "targetValue": [
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+        "http://localhost:8080",
+        "https://test-app.example.com"
+      ],
+      "falsePositiveReason": "数组顺序不影响功能，属于误报"
+    },
+    {
+      "key": "cache.ttl",
+      "type": "default_value_changed",
+      "severity": "info",
+      "environment": "testing",
+      "explanation": "默认值变更（允许）: cache.ttl 从 300 变为 600",
+      "requiresManualReview": false,
+      "interpretation": {
+        "summary": "默认值变更",
+        "impact": "testing环境配置值与默认值不一致",
+        "rootCause": "默认值从 300 变更为 600。此变更是允许的，但建议记录变更原因。",
+        "priority": "scheduled"
+      },
+      "baselineValue": 300,
+      "targetValue": 600
+    },
+    {
+      "key": "rateLimiting.enabled",
+      "type": "default_value_changed",
+      "severity": "info",
+      "environment": "testing",
+      "explanation": "默认值变更（允许）: rateLimiting.enabled 从 false 变为 true",
+      "requiresManualReview": false,
+      "interpretation": {
+        "summary": "默认值变更",
+        "impact": "testing环境配置值与默认值不一致",
+        "rootCause": "默认值从 false 变更为 true。此变更是允许的，但建议记录变更原因。",
+        "priority": "scheduled"
+      },
+      "baselineValue": false,
+      "targetValue": true
+    },
+    {
+      "key": "rateLimiting.maxRequests",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "值不匹配: 基线(1000) vs 目标(500)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致testing环境行为异常",
+        "rootCause": "资源限制值不同: 基线(1000) vs 目标(500)。需要评估目标环境是否能承受此配置。",
+        "priority": "soon"
+      },
+      "baselineValue": 1000,
+      "targetValue": 500
+    },
+    {
+      "key": "monitoring",
+      "type": "extra_key",
+      "severity": "warning",
+      "environment": "testing",
+      "explanation": "目标环境存在额外字段: monitoring",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "额外配置项",
+        "impact": "testing环境存在基线中未定义的配置项，可能是未同步的变更",
+        "rootCause": "配置项 \"monitoring\" 在目标环境中存在但基线中未定义，可能是未同步的新功能配置。",
+        "priority": "soon"
+      },
+      "targetValue": {
+        "enabled": true,
+        "datadogApiKey": "AKIAIOSFODNN7EXAMPLE"
+      }
+    },
+    {
+      "key": "app.environment",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"development\") vs 目标(\"production\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"development\") vs 目标(\"production\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "deve...ment",
+      "targetValue": "prod...tion"
+    },
+    {
+      "key": "app.debug",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(true) vs 目标(false)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(true) vs 目标(false)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": true,
+      "targetValue": false
+    },
+    {
+      "key": "app.logLevel",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"debug\") vs 目标(\"warn\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"debug\") vs 目标(\"warn\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "debug",
+      "targetValue": "warn"
+    },
+    {
+      "key": "server.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"0.0.0.0\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"0.0.0.0\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "0.0.0.0"
+    },
+    {
+      "key": "server.port",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(3000) vs 目标(443)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(3000) vs 目标(443)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3000,
+      "targetValue": 443
+    },
+    {
+      "key": "server.maxConnections",
+      "type": "value_mismatch",
+      "severity": "info",
+      "environment": "production",
+      "explanation": "已知变更: 春节流量高峰扩容",
+      "requiresManualReview": false,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "资源限制值不同: 基线(100) vs 目标(500)。需要评估目标环境是否能承受此配置。",
+        "priority": "scheduled"
+      },
+      "baselineValue": 100,
+      "targetValue": 500,
+      "relatedChangeId": "CHG-003"
+    },
+    {
+      "key": "database.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"prod-db.internal\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"prod-db.internal\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "prod...rnal"
+    },
+    {
+      "key": "database.name",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"dev_db\") vs 目标(\"prod_db\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"dev_db\") vs 目标(\"prod_db\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "dev_db",
+      "targetValue": "prod_db"
+    },
+    {
+      "key": "database.username",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"dev_user\") vs 目标(\"prod_user\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"dev_user\") vs 目标(\"prod_user\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "dev_user",
+      "targetValue": "prod...user"
+    },
+    {
+      "key": "database.poolSize",
+      "type": "default_value_changed",
+      "severity": "info",
+      "environment": "production",
+      "explanation": "默认值变更（允许）: database.poolSize 从 10 变为 50",
+      "requiresManualReview": false,
+      "interpretation": {
+        "summary": "默认值变更",
+        "impact": "production环境配置值与默认值不一致",
+        "rootCause": "默认值从 10 变更为 50。此变更是允许的，但建议记录变更原因。",
+        "priority": "scheduled"
+      },
+      "baselineValue": 10,
+      "targetValue": 50
+    },
+    {
+      "key": "database.ssl",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(false) vs 目标(true)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(false) vs 目标(true)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": false,
+      "targetValue": true
+    },
+    {
+      "key": "redis.host",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"localhost\") vs 目标(\"prod-redis.internal\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"localhost\") vs 目标(\"prod-redis.internal\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "loca...host",
+      "targetValue": "prod...rnal"
+    },
+    {
+      "key": "externalApis.payment.baseUrl",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"https://api.sandbox.payment.com\") vs 目标(\"https://api.production.payment.com\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"https://api.sandbox.payment.com\") vs 目标(\"https://api.production.payment.com\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "http....com",
+      "targetValue": "http....com"
+    },
+    {
+      "key": "externalApis.payment.timeout",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(5000) vs 目标(3000)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(5000) vs 目标(3000)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 5000,
+      "targetValue": 3000
+    },
+    {
+      "key": "externalApis.notification.baseUrl",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"https://api.sandbox.notification.com\") vs 目标(\"https://api.production.notification.com\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "服务端点地址不同: 基线(\"https://api.sandbox.notification.com\") vs 目标(\"https://api.production.notification.com\")。这在多环境部署中是预期的，但需要确认目标地址是否正确。",
+        "priority": "soon"
+      },
+      "baselineValue": "http....com",
+      "targetValue": "http....com"
+    },
+    {
+      "key": "featureFlags.newDashboard",
+      "type": "value_mismatch",
+      "severity": "info",
+      "environment": "production",
+      "explanation": "已知变更: 测试环境启用新仪表盘功能进行验收",
+      "requiresManualReview": false,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(false) vs 目标(true)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "scheduled"
+      },
+      "baselineValue": false,
+      "targetValue": true,
+      "relatedChangeId": "CHG-001"
+    },
+    {
+      "key": "featureFlags.betaFeatures",
+      "type": "value_mismatch",
+      "severity": "critical",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(true) vs 目标(false)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "功能开关状态不同: 基线(true) vs 目标(false)。需要确认目标环境的功能开关状态是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": true,
+      "targetValue": false
+    },
+    {
+      "key": "security.sessionTimeout",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(3600) vs 目标(1800)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(3600) vs 目标(1800)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3600,
+      "targetValue": 1800
+    },
+    {
+      "key": "security.maxLoginAttempts",
+      "type": "default_value_changed",
+      "severity": "critical",
+      "environment": "production",
+      "explanation": "默认值变更（禁止）: security.maxLoginAttempts 从 5 变为 3",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "默认值变更",
+        "impact": "production环境配置值与默认值不一致",
+        "rootCause": "默认值从 5 变更为 3。此变更需要人工确认是否符合预期。",
+        "priority": "immediate"
+      },
+      "baselineValue": 5,
+      "targetValue": 3
+    },
+    {
+      "key": "security.allowedOrigins",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "数组长度不匹配: 基线(3) vs 目标(2)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(3) vs 目标(2)。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": 3,
+      "targetValue": 2
+    },
+    {
+      "key": "security.allowedOrigins[2]",
+      "type": "missing_key",
+      "severity": "info",
+      "environment": "production",
+      "explanation": "数组缺少元素: security.allowedOrigins[2]",
+      "requiresManualReview": false,
+      "interpretation": {
+        "summary": "缺少配置项",
+        "impact": "production环境缺少必要配置项，可能导致功能不可用或使用默认值",
+        "rootCause": "配置项 \"security.allowedOrigins[2]\" 在目标环境中未定义，可能是部署流程遗漏或配置文件不完整。",
+        "priority": "scheduled"
+      },
+      "baselineValue": "http...3000"
+    },
+    {
+      "key": "security.allowedOrigins[0]",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"http://localhost:3000\") vs 目标(\"https://app.example.com\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"http://localhost:3000\") vs 目标(\"https://app.example.com\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "http...3000",
+      "targetValue": "http....com"
+    },
+    {
+      "key": "security.allowedOrigins[1]",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(\"http://localhost:8080\") vs 目标(\"https://admin.example.com\")",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "配置值差异: 基线(\"http://localhost:8080\") vs 目标(\"https://admin.example.com\")。需要确认此变更是有意的还是部署错误。",
+        "priority": "soon"
+      },
+      "baselineValue": "http...8080",
+      "targetValue": "http....com"
+    },
+    {
+      "key": "cache.ttl",
+      "type": "default_value_changed",
+      "severity": "info",
+      "environment": "production",
+      "explanation": "默认值变更（允许）: cache.ttl 从 300 变为 1800",
+      "requiresManualReview": false,
+      "interpretation": {
+        "summary": "默认值变更",
+        "impact": "production环境配置值与默认值不一致",
+        "rootCause": "默认值从 300 变更为 1800。此变更是允许的，但建议记录变更原因。",
+        "priority": "scheduled"
+      },
+      "baselineValue": 300,
+      "targetValue": 1800
+    },
+    {
+      "key": "cache.maxSize",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(1000) vs 目标(5000)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "资源限制值不同: 基线(1000) vs 目标(5000)。需要评估目标环境是否能承受此配置。",
+        "priority": "soon"
+      },
+      "baselineValue": 1000,
+      "targetValue": 5000
+    },
+    {
+      "key": "rateLimiting.enabled",
+      "type": "default_value_changed",
+      "severity": "info",
+      "environment": "production",
+      "explanation": "默认值变更（允许）: rateLimiting.enabled 从 false 变为 true",
+      "requiresManualReview": false,
+      "interpretation": {
+        "summary": "默认值变更",
+        "impact": "production环境配置值与默认值不一致",
+        "rootCause": "默认值从 false 变更为 true。此变更是允许的，但建议记录变更原因。",
+        "priority": "scheduled"
+      },
+      "baselineValue": false,
+      "targetValue": true
+    },
+    {
+      "key": "rateLimiting.maxRequests",
+      "type": "value_mismatch",
+      "severity": "warning",
+      "environment": "production",
+      "explanation": "值不匹配: 基线(1000) vs 目标(100)",
+      "requiresManualReview": true,
+      "interpretation": {
+        "summary": "配置值不匹配",
+        "impact": "环境间配置值不一致，可能导致production环境行为异常",
+        "rootCause": "资源限制值不同: 基线(1000) vs 目标(100)。需要评估目标环境是否能承受此配置。",
+        "priority": "soon"
+      },
+      "baselineValue": 1000,
+      "targetValue": 100
+    }
+  ]
+}

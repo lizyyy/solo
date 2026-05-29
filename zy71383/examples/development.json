@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "my-awesome-app",
+    "version": "1.0.0",
+    "environment": "development",
+    "debug": true,
+    "logLevel": "debug"
+  },
+  "server": {
+    "host": "localhost",
+    "port": 3000,
+    "timeout": 30000,
+    "maxConnections": 100
+  },
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "name": "dev_db",
+    "username": "dev_user",
+    "password": "${DB_PASSWORD}",
+    "poolSize": 10,
+    "ssl": false
+  },
+  "redis": {
+    "host": "localhost",
+    "port": 6379,
+    "password": "${REDIS_PASSWORD}",
+    "db": 0
+  },
+  "externalApis": {
+    "payment": {
+      "baseUrl": "https://api.sandbox.payment.com",
+      "apiKey": "${PAYMENT_API_KEY}",
+      "timeout": 5000
+    },
+    "notification": {
+      "baseUrl": "https://api.sandbox.notification.com",
+      "apiKey": "${NOTIFICATION_API_KEY}",
+      "enabled": true
+    }
+  },
+  "featureFlags": {
+    "newDashboard": false,
+    "betaFeatures": true,
+    "experimentalMode": false
+  },
+  "security": {
+    "jwtSecret": "${JWT_SECRET}",
+    "sessionTimeout": 3600,
+    "maxLoginAttempts": 5,
+    "allowedOrigins": [
+      "http://localhost:3000",
+      "http://localhost:8080",
+      "http://127.0.0.1:3000"
+    ]
+  },
+  "cache": {
+    "ttl": 300,
+    "maxSize": 1000,
+    "strategy": "lru"
+  },
+  "rateLimiting": {
+    "enabled": false,
+    "maxRequests": 1000,
+    "windowMs": 60000
+  }
+}

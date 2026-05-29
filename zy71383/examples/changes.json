@@ -1,0 +1,35 @@
+[
+  {
+    "id": "CHG-001",
+    "timestamp": "2024-01-15T10:30:00Z",
+    "environment": "testing",
+    "key": "featureFlags.newDashboard",
+    "oldValue": false,
+    "newValue": true,
+    "author": "zhang.san@example.com",
+    "reason": "测试环境启用新仪表盘功能进行验收",
+    "ticketId": "FEAT-1234"
+  },
+  {
+    "id": "CHG-002",
+    "timestamp": "2024-01-20T14:00:00Z",
+    "environment": "production",
+    "key": "featureFlags.newDashboard",
+    "oldValue": false,
+    "newValue": true,
+    "author": "li.si@example.com",
+    "reason": "新仪表盘功能正式上线",
+    "ticketId": "FEAT-1234"
+  },
+  {
+    "id": "CHG-003",
+    "timestamp": "2024-01-10T09:15:00Z",
+    "environment": "production",
+    "key": "server.maxConnections",
+    "oldValue": 100,
+    "newValue": 500,
+    "author": "wang.wu@example.com",
+    "reason": "春节流量高峰扩容",
+    "ticketId": "OPS-5678"
+  }
+]

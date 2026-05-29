@@ -1,0 +1,66 @@
+{
+  "app": {
+    "name": "my-awesome-app",
+    "version": "1.0.0",
+    "environment": "production",
+    "debug": false,
+    "logLevel": "warn"
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 443,
+    "timeout": 30000,
+    "maxConnections": 500
+  },
+  "database": {
+    "host": "prod-db.internal",
+    "port": 5432,
+    "name": "prod_db",
+    "username": "prod_user",
+    "password": "${DB_PASSWORD}",
+    "poolSize": 50,
+    "ssl": true
+  },
+  "redis": {
+    "host": "prod-redis.internal",
+    "port": 6379,
+    "password": "${REDIS_PASSWORD}",
+    "db": 0
+  },
+  "externalApis": {
+    "payment": {
+      "baseUrl": "https://api.production.payment.com",
+      "apiKey": "${PAYMENT_API_KEY}",
+      "timeout": 3000
+    },
+    "notification": {
+      "baseUrl": "https://api.production.notification.com",
+      "apiKey": "${NOTIFICATION_API_KEY}",
+      "enabled": true
+    }
+  },
+  "featureFlags": {
+    "newDashboard": true,
+    "betaFeatures": false,
+    "experimentalMode": false
+  },
+  "security": {
+    "jwtSecret": "${JWT_SECRET}",
+    "sessionTimeout": 1800,
+    "maxLoginAttempts": 3,
+    "allowedOrigins": [
+      "https://app.example.com",
+      "https://admin.example.com"
+    ]
+  },
+  "cache": {
+    "ttl": 1800,
+    "maxSize": 5000,
+    "strategy": "lru"
+  },
+  "rateLimiting": {
+    "enabled": true,
+    "maxRequests": 100,
+    "windowMs": 60000
+  }
+}

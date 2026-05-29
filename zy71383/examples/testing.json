@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "my-awesome-app",
+    "version": "1.0.0",
+    "environment": "testing",
+    "debug": false,
+    "logLevel": "info"
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8080,
+    "timeout": "30000",
+    "maxConnections": 200
+  },
+  "database": {
+    "host": "test-db.internal",
+    "port": 5432,
+    "name": "test_db",
+    "username": "test_user",
+    "password": "test_db_password_123!",
+    "poolSize": 10,
+    "ssl": true
+  },
+  "redis": {
+    "host": "test-redis.internal",
+    "port": 6379,
+    "password": "sk_test_abcdefghijklmnopqrstuvwxyz1234567890",
+    "db": 1
+  },
+  "externalApis": {
+    "payment": {
+      "baseUrl": "https://api.sandbox.payment.com",
+      "apiKey": "${PAYMENT_API_KEY}",
+      "timeout": 5000
+    }
+  },
+  "featureFlags": {
+    "newDashboard": true,
+    "betaFeatures": true,
+    "experimentalMode": true
+  },
+  "security": {
+    "jwtSecret": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA0ZJ5sF4w8fGQ==\n-----END RSA PRIVATE KEY-----",
+    "sessionTimeout": 7200,
+    "maxLoginAttempts": 5,
+    "allowedOrigins": [
+      "http://127.0.0.1:3000",
+      "http://localhost:3000",
+      "http://localhost:8080",
+      "https://test-app.example.com"
+    ]
+  },
+  "cache": {
+    "ttl": 600,
+    "maxSize": 1000,
+    "strategy": "lru"
+  },
+  "rateLimiting": {
+    "enabled": true,
+    "maxRequests": 500,
+    "windowMs": 60000
+  },
+  "monitoring": {
+    "enabled": true,
+    "datadogApiKey": "AKIAIOSFODNN7EXAMPLE"
+  }
+}
