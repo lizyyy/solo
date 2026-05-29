@@ -1,0 +1,82 @@
+{
+  "summary": {
+    "totalDiffs": 5,
+    "breakingChanges": 4,
+    "warnings": 1,
+    "infos": 0,
+    "isCompatible": false
+  },
+  "timestamp": "2026-05-29T14:40:50.361Z",
+  "sources": {
+    "contractA": {
+      "version": "1.0.0",
+      "source": "openapi",
+      "sourceName": "演示系统"
+    },
+    "contractB": {
+      "version": "mock-1.0",
+      "source": "mock",
+      "sourceName": "演示系统"
+    }
+  },
+  "breakingChanges": [
+    {
+      "type": "required_changed",
+      "path": "/users",
+      "field": "response.200.response",
+      "expected": false,
+      "actual": true,
+      "severity": "breaking",
+      "source": {
+        "context": "Required status changed: false -> true"
+      },
+      "endpoint": "GET /users"
+    }
+  ],
+  "warnings": [
+    {
+      "type": "parameter_removed",
+      "path": "/users",
+      "field": "param.page",
+      "severity": "warning",
+      "source": {
+        "context": "Required parameter page is missing"
+      },
+      "endpoint": "GET /users"
+    },
+    {
+      "type": "parameter_removed",
+      "path": "/users",
+      "field": "param.status",
+      "severity": "warning",
+      "source": {
+        "context": "Required parameter status is missing"
+      },
+      "endpoint": "GET /users"
+    }
+  ],
+  "info": [],
+  "missingEndpoints": [
+    {
+      "method": "POST",
+      "path": "/users",
+      "summary": "创建用户"
+    },
+    {
+      "method": "GET",
+      "path": "/users/{id}",
+      "summary": "获取用户详情"
+    },
+    {
+      "method": "PUT",
+      "path": "/users/{id}",
+      "summary": "更新用户"
+    }
+  ],
+  "newEndpoints": [
+    {
+      "method": "GET",
+      "path": "/users/1"
+    }
+  ]
+}

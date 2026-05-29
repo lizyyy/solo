@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>接口契约差异报告</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { background: white; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .status { display: inline-block; padding: 8px 16px; border-radius: 20px; color: white; font-weight: 600; background: #ef4444; }
+    .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 20px; }
+    .summary-card { background: #f1f5f9; border-radius: 8px; padding: 16px; text-align: center; }
+    .summary-card .number { font-size: 32px; font-weight: 700; color: #1e293b; }
+    .summary-card .label { font-size: 14px; color: #64748b; margin-top: 4px; }
+    .section { background: white; border-radius: 8px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .section-title { font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 16px; }
+    .diff-item { border-left: 3px solid #e2e8f0; padding: 12px 16px; margin-bottom: 8px; background: #f8fafc; border-radius: 0 4px 4px 0; }
+    .diff-item.breaking { border-left-color: #ef4444; background: #fef2f2; }
+    .diff-item.warning { border-left-color: #f59e0b; background: #fffbeb; }
+    .diff-item.info { border-left-color: #3b82f6; background: #eff6ff; }
+    .diff-field { font-family: 'Monaco', 'Menlo', monospace; font-size: 13px; color: #1e293b; font-weight: 500; }
+    .diff-type { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 4px; margin-right: 8px; }
+    .diff-type.breaking { background: #fee2e2; color: #dc2626; }
+    .diff-type.warning { background: #fef3c7; color: #d97706; }
+    .diff-type.info { background: #dbeafe; color: #2563eb; }
+    .diff-context { font-size: 13px; color: #64748b; margin-top: 4px; }
+    .diff-source { font-size: 12px; color: #94a3b8; margin-top: 4px; font-family: monospace; }
+    .endpoint { margin-bottom: 24px; }
+    .endpoint-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .method { font-family: monospace; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 4px; background: #e2e8f0; }
+    .method.GET { background: #dbeafe; color: #1d4ed8; }
+    .method.POST { background: #dcfce7; color: #15803d; }
+    .method.PUT { background: #fef3c7; color: #a16207; }
+    .method.DELETE { background: #fee2e2; color: #b91c1c; }
+    .endpoint-path { font-family: monospace; font-size: 14px; color: #334155; }
+    .source-info { display: flex; gap: 20px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+    .source { font-size: 13px; color: #64748b; }
+    .source span { font-weight: 600; color: #334155; }
+    pre { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="font-size: 24px; color: #1e293b; margin-bottom: 8px;">接口契约差异报告</h1>
+      <p style="color: #64748b;">生成时间: 2026/5/29 22:40:50</p>
+      <div style="margin-top: 16px;">
+        <span class="status">不兼容</span>
+      </div>
+      <div class="summary">
+        <div class="summary-card">
+          <div class="number">5</div>
+          <div class="label">总差异</div>
+        </div>
+        <div class="summary-card">
+          <div class="number" style="color: #ef4444;">4</div>
+          <div class="label">破坏性变更</div>
+        </div>
+        <div class="summary-card">
+          <div class="number" style="color: #f59e0b;">1</div>
+          <div class="label">警告</div>
+        </div>
+        <div class="summary-card">
+          <div class="number" style="color: #3b82f6;">0</div>
+          <div class="label">提示</div>
+        </div>
+      </div>
+      <div class="source-info">
+        <div class="source">
+          基准: <span>演示系统</span> (v1.0.0, openapi)
+        </div>
+        <div class="source">
+          目标: <span>演示系统</span> (vmock-1.0, mock)
+        </div>
+      </div>
+    </div>
+
+    <div class="section"><h2 class="section-title">破坏性变更</h2>
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/users</span>
+          </div>
+          <div class="diff-item breaking">
+            <span class="diff-type breaking">必填性变更</span>
+            <span class="diff-field">response.200.response</span>
+            <div class="diff-context">
+                预期: <code>false</code>
+                实际: <code>true</code>
+              </div>
+            <div class="diff-context">Required status changed: false -> true</div>
+            
+          </div></div></div>
+    <div class="section"><h2 class="section-title">警告</h2>
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/users</span>
+          </div>
+          <div class="diff-item warning">
+            <span class="diff-type warning">移除参数</span>
+            <span class="diff-field">param.page</span>
+            
+            <div class="diff-context">Required parameter page is missing</div>
+            
+          </div>
+          <div class="diff-item warning">
+            <span class="diff-type warning">移除参数</span>
+            <span class="diff-field">param.status</span>
+            
+            <div class="diff-context">Required parameter status is missing</div>
+            
+          </div></div></div>
+    
+    
+    <div class="section"><h2 class="section-title">缺失的端点 (3)</h2>
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/users</span>
+          </div>
+          <p style="color: #64748b; font-size: 14px;">创建用户</p>
+        </div>
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/users/{id}</span>
+          </div>
+          <p style="color: #64748b; font-size: 14px;">获取用户详情</p>
+        </div>
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method PUT">PUT</span>
+            <span class="endpoint-path">/users/{id}</span>
+          </div>
+          <p style="color: #64748b; font-size: 14px;">更新用户</p>
+        </div></div>
+    <div class="section"><h2 class="section-title">新增的端点 (1)</h2>
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/users/1</span>
+          </div>
+          
+        </div></div>
+
+    <div class="section"><h2 class="section-title">响应样例</h2>
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/users</span>
+          </div>
+          <div style="margin-top: 8px;">
+            <div style="font-size: 13px; color: #64748b; margin-bottom: 4px;">响应 200:</div>
+            <pre>{
+  "code": 885,
+  "data": [
+    {
+      "id": "id_9589",
+      "name": "Eve",
+      "email": "user56@example.com",
+      "status": "completed",
+      "createdAt": "sample_createdAt_59"
+    },
+    {
+      "id": "id_539",
+      "name": "Eve",
+      "email": "user78@example.com",
+      "status": "completed",
+      "createdAt": "sample_createdAt_32"
+    },
+    {
+      "id": "id_7411",
+      "name": "Frank",
+      "email": "user99@example.com",
+      "status": "failed",
+      "createdAt": "sample_createdAt_18"
+    },
+    {
+      "id": "id_1349",
+      "name": "Diana",
+      "email": "user83@example.com",
+      "status": "active",
+      "createdAt": "sample_createdAt_44"
+    },
+    {
+      "id": "id_3124",
+      "name": "Charlie",
+      "email": "user67@example.com",
+      "status": "active",
+      "createdAt": "sample_createdAt_54"
+    }
+  ],
+  "total": 758,
+  "extraField": "sample_extraField_43"
+}</pre>
+          </div></div>
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/users/1</span>
+          </div>
+          <div style="margin-top: 8px;">
+            <div style="font-size: 13px; color: #64748b; margin-bottom: 4px;">响应 200:</div>
+            <pre>{
+  "code": 734,
+  "data": {
+    "id": "id_1213",
+    "name": "Frank",
+    "email": "user47@example.com",
+    "status": "active"
+  }
+}</pre>
+          </div></div></div>
+  </div>
+</body>
+</html>
