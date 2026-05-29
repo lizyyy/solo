@@ -1,0 +1,213 @@
+{
+  "performance_name": "「春日回响」独立音乐现场",
+  "performance_date": "2026-05-25",
+  "venue": "星光音乐厅",
+  "total_box_office": 128500.00,
+  "operator": "张会计",
+  "notes": "本场为厂牌季度演出，含1组串烧，平台结算周期跨月",
+  "tracks": [
+    {
+      "name": "春风十里",
+      "isrc": "CN-A01-24-00001",
+      "duration_seconds": 268,
+      "is_medley": false,
+      "medley_tracks": [],
+      "authors": [
+        {
+          "author_id": "A001",
+          "author_name": "李建国",
+          "role": "composer",
+          "ratio": 0.6,
+          "notes": "词曲作者，占60%"
+        },
+        {
+          "author_id": "A002",
+          "author_name": "王小明",
+          "role": "lyricist",
+          "ratio": 0.4,
+          "notes": "作词，占40%"
+        }
+      ],
+      "notes": "返场曲目",
+      "attachments": [
+        {
+          "name": "曲目版权证明.jpg",
+          "type": "image",
+          "path": "attachments/copyright_001.jpg",
+          "description": "词曲版权登记证书"
+        }
+      ]
+    },
+    {
+      "name": "城市夜曲",
+      "isrc": "CN-A01-24-00002",
+      "duration_seconds": 312,
+      "is_medley": false,
+      "medley_tracks": [],
+      "authors": [
+        {
+          "author_id": "A003",
+          "author_name": "陈思远",
+          "role": "composer",
+          "ratio": 0.7,
+          "notes": ""
+        },
+        {
+          "author_id": "A004",
+          "author_name": "刘雨晴",
+          "role": "lyricist",
+          "ratio": 0.3,
+          "notes": ""
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "name": "经典串烧组曲",
+      "isrc": "",
+      "duration_seconds": 420,
+      "is_medley": true,
+      "medley_tracks": [
+        {
+          "track_name": "童年回忆",
+          "duration_seconds": 140,
+          "notes": "原曲1998年发行"
+        },
+        {
+          "track_name": "青春日记",
+          "duration_seconds": 140,
+          "notes": ""
+        },
+        {
+          "track_name": "未来可期",
+          "duration_seconds": 140,
+          "notes": ""
+        }
+      ],
+      "authors": [
+        {
+          "author_id": "A005",
+          "author_name": "赵老师",
+          "role": "composer",
+          "ratio": 0.4,
+          "notes": "三首作品均为赵老师创作"
+        },
+        {
+          "author_id": "A006",
+          "author_name": "钱编辑",
+          "role": "lyricist",
+          "ratio": 0.4,
+          "notes": ""
+        }
+      ],
+      "notes": "比例总和为0.8，遗漏了编曲的20%份额，待确认",
+      "corrections": [
+        {
+          "field": "duration_seconds",
+          "old_value": 400,
+          "new_value": 420,
+          "operator": "张会计",
+          "reason": "现场实际演出时长比原计划多20秒",
+          "timestamp": "2026-05-28T10:30:00"
+        }
+      ]
+    },
+    {
+      "name": "远方的路",
+      "isrc": "CN-A01-24-00004",
+      "duration_seconds": 285,
+      "is_medley": false,
+      "medley_tracks": [],
+      "authors": [
+        {
+          "author_id": "A007",
+          "author_name": "孙行者",
+          "role": "composer",
+          "ratio": 0.5,
+          "notes": ""
+        },
+        {
+          "author_id": "A008",
+          "author_name": "周作家",
+          "role": "lyricist",
+          "ratio": 0.5,
+          "notes": ""
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "name": "安可曲-星空下",
+      "isrc": "CN-A01-24-00005",
+      "duration_seconds": 215,
+      "is_medley": false,
+      "medley_tracks": [],
+      "authors": [
+        {
+          "author_id": "A009",
+          "author_name": "吴音乐人",
+          "role": "composer",
+          "ratio": 1.2,
+          "notes": "比例登记错误，应为0.5，已提交更正申请"
+        }
+      ],
+      "notes": "安可曲，作者比例待确认"
+    }
+  ],
+  "platform_fees": [
+    {
+      "fee_type": "票务平台服务费",
+      "amount": 12850.00,
+      "period": "current",
+      "notes": "按票房10%收取"
+    },
+    {
+      "fee_type": "场地租赁费",
+      "amount": 25000.00,
+      "period": "current",
+      "notes": ""
+    },
+    {
+      "fee_type": "音响设备租赁费",
+      "amount": 8000.00,
+      "period": "previous",
+      "notes": "上期演出未结清的设备费，从本期扣除"
+    },
+    {
+      "fee_type": "季度宣传推广费",
+      "amount": 15000.00,
+      "period": "cross",
+      "period_start": "2026-05-15",
+      "period_end": "2026-06-15",
+      "notes": "跨两月的宣传费用，按实际天数分摊",
+      "deductions": [
+        {
+          "fee_type": "线上推广",
+          "amount": 10000.00,
+          "period": "current",
+          "notes": "社交媒体投放"
+        },
+        {
+          "fee_type": "线下物料",
+          "amount": 5000.00,
+          "period": "current",
+          "notes": "海报、宣传单印刷"
+        }
+      ]
+    }
+  ],
+  "attachments": [
+    {
+      "name": "票房结算单.pdf",
+      "type": "document",
+      "path": "attachments/box_office_20260525.pdf",
+      "description": "票务平台出具的票房结算单"
+    },
+    {
+      "name": "演出录像片段.mp4",
+      "type": "video",
+      "path": "attachments/performance_clip.mp4",
+      "description": "演出实况录像，用于核对时长"
+    }
+  ]
+}
