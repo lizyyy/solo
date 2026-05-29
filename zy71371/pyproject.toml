@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "photo-curator-cli"
+version = "0.1.0"
+description = "摄影选片去重CLI工具 - 用于批量筛选照片，去重、人脸分组、评分筛选和报告导出"
+authors = ["Photo Curator Team"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+click = "^8.1.7"
+pillow = "^10.0.0"
+imagehash = "^4.3.1"
+numpy = "^1.26.0"
+opencv-python = "^4.8.0"
+face-recognition = "^1.3.0"
+pandas = "^2.1.0"
+rich = "^13.7.0"
+pyyaml = "^6.0.1"
+tqdm = "^4.66.0"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+photo-curator = "photo_curator.cli:main"

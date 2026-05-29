@@ -1,0 +1,1043 @@
+{
+  "export_time": "2026-05-29T21:15:48.929779",
+  "total_photos": 50,
+  "photos": [
+    {
+      "photo_id": "b5349783-0f5c-4abf-8dc5-64b90990f1ad",
+      "file_path": "./simulated_photos/IMG_0001.jpg",
+      "file_name": "IMG_0001.jpg",
+      "capture_time": "2026-05-27T19:15:47.623924",
+      "score": 55.0,
+      "score_reasons": [
+        "包含 1 张人脸 (+5.0)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_001",
+      "duplicate_rank": 2,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "1392c455-f1b7-4c45-a6fb-a7bba9635b41",
+      "file_path": "./simulated_photos/IMG_0002.jpg",
+      "file_name": "IMG_0002.jpg",
+      "capture_time": "2026-05-27T19:16:03.623924",
+      "score": 63.0,
+      "score_reasons": [
+        "高分辨率 (+10)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": null,
+      "duplicate_group_id": "dup_group_002",
+      "duplicate_rank": 0,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "9b7bf1be-5076-4529-9b50-d2274ac98768",
+      "file_path": "./simulated_photos/IMG_0003.jpg",
+      "file_name": "IMG_0003.jpg",
+      "capture_time": "2026-05-27T19:16:43.623924",
+      "score": 55.0,
+      "score_reasons": [
+        "中高分辨率 (+5)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_008",
+      "duplicate_rank": 3,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "5d3a65db-1c34-4c0d-b290-1b5be4ca949a",
+      "file_path": "./simulated_photos/IMG_0004.jpg",
+      "file_name": "IMG_0004.jpg",
+      "capture_time": "2026-05-27T19:16:44.623924",
+      "score": 55.0,
+      "score_reasons": [
+        "中高分辨率 (+5)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_007",
+      "duplicate_rank": 4,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "fa1fdd34-cfb8-4659-b2ea-587f7d124ed8",
+      "file_path": "./simulated_photos/IMG_0005.jpg",
+      "file_name": "IMG_0005.jpg",
+      "capture_time": "2026-05-27T19:16:59.623924",
+      "score": 50.0,
+      "score_reasons": [],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_003",
+      "duplicate_rank": 4,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "5ce14b8c-246b-413b-9089-f6852e5f2a4b",
+      "file_path": "./simulated_photos/IMG_0006.jpg",
+      "file_name": "IMG_0006.jpg",
+      "capture_time": "2026-05-27T19:17:02.623924",
+      "score": 90.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 3 张人脸 (+15.0)",
+        "中高分辨率 (+5)"
+      ],
+      "status": "keep",
+      "status_reason": null,
+      "duplicate_group_id": "dup_group_003",
+      "duplicate_rank": 0,
+      "faces_count": 3,
+      "key_persons": [
+        "新娘"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "a607626e-0ec2-44a3-bef4-36e50f83fa74",
+      "file_path": "./simulated_photos/IMG_0007.jpg",
+      "file_name": "IMG_0007.jpg",
+      "capture_time": "2026-05-27T19:16:53.623924",
+      "score": 0.0,
+      "score_reasons": [
+        "闭眼检测失败: 1 人闭眼"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_009",
+      "duplicate_rank": 3,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 1,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "09b4d957-2bae-4b11-b782-2098da084582",
+      "file_path": "./simulated_photos/IMG_0008.jpg",
+      "file_name": "IMG_0008.jpg",
+      "capture_time": "2026-05-27T19:16:01.623924",
+      "score": 0.0,
+      "score_reasons": [
+        "闭眼检测失败: 1 人闭眼"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_009",
+      "duplicate_rank": 4,
+      "faces_count": 4,
+      "key_persons": [],
+      "closed_eyes_count": 1,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "d7573bda-3e5c-4bbd-bf10-37fcdc738625",
+      "file_path": "./simulated_photos/IMG_0009.jpg",
+      "file_name": "IMG_0009.jpg",
+      "capture_time": "2026-05-27T19:18:51.623924",
+      "score": 60.0,
+      "score_reasons": [
+        "包含 2 张人脸 (+10.0)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_003",
+      "duplicate_rank": 2,
+      "faces_count": 2,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "c2fc675d-47c3-4fb4-8c1a-3654fb547a19",
+      "file_path": "./simulated_photos/IMG_0010.jpg",
+      "file_name": "IMG_0010.jpg",
+      "capture_time": "2026-05-27T19:19:59.623924",
+      "score": 65.0,
+      "score_reasons": [
+        "包含 1 张人脸 (+5.0)",
+        "高分辨率 (+10)"
+      ],
+      "status": "keep",
+      "status_reason": "自动保留",
+      "duplicate_group_id": null,
+      "duplicate_rank": 0,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "affaf66d-a4ac-45e5-8912-3c9a3c47676b",
+      "file_path": "./simulated_photos/IMG_0011.jpg",
+      "file_name": "IMG_0011.jpg",
+      "capture_time": "2026-05-27T19:20:17.623924",
+      "score": 58.0,
+      "score_reasons": [
+        "中高分辨率 (+5)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_008",
+      "duplicate_rank": 2,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "1f93b4ef-6eed-485a-91e2-ffa24be83a34",
+      "file_path": "./simulated_photos/IMG_0012.jpg",
+      "file_name": "IMG_0012.jpg",
+      "capture_time": "2026-05-27T19:20:33.623924",
+      "score": 78.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 1 张人脸 (+5.0)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_008",
+      "duplicate_rank": 1,
+      "faces_count": 1,
+      "key_persons": [
+        "新娘"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "d0b6b136-81da-4512-83b8-56d0f66f51c6",
+      "file_path": "./simulated_photos/IMG_0013.jpg",
+      "file_name": "IMG_0013.jpg",
+      "capture_time": "2026-05-27T19:19:59.623924",
+      "score": 63.0,
+      "score_reasons": [
+        "高分辨率 (+10)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_007",
+      "duplicate_rank": 3,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "987d591c-efd9-4919-b105-1fb731dcae9c",
+      "file_path": "./simulated_photos/IMG_0014.jpg",
+      "file_name": "IMG_0014.jpg",
+      "capture_time": "2026-05-27T19:16:26.623924",
+      "score": 83.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 1 张人脸 (+5.0)",
+        "中高分辨率 (+5)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_007",
+      "duplicate_rank": 1,
+      "faces_count": 1,
+      "key_persons": [
+        "新娘"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "13e6355e-5b13-40db-8b69-5e281b03ca7a",
+      "file_path": "./simulated_photos/IMG_0015.jpg",
+      "file_name": "IMG_0015.jpg",
+      "capture_time": "2026-05-27T19:16:29.623924",
+      "score": 83.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 1 张人脸 (+5.0)",
+        "中高分辨率 (+5)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": null,
+      "duplicate_group_id": "dup_group_000",
+      "duplicate_rank": 0,
+      "faces_count": 1,
+      "key_persons": [
+        "新娘"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "203e5231-6cb0-47e8-91b1-6e305206b1dc",
+      "file_path": "./simulated_photos/IMG_0016.jpg",
+      "file_name": "IMG_0016.jpg",
+      "capture_time": "2026-05-27T19:17:02.623924",
+      "score": 100.0,
+      "score_reasons": [
+        "包含 2 位重点人物 (+40.0)",
+        "包含 3 张人脸 (+15.0)",
+        "高分辨率 (+10)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": "自动保留",
+      "duplicate_group_id": null,
+      "duplicate_rank": 0,
+      "faces_count": 3,
+      "key_persons": [
+        "新娘",
+        "新娘"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "1ebdbd06-ba5b-4d9e-83d3-7cf138b1db68",
+      "file_path": "./simulated_photos/IMG_0017.jpg",
+      "file_name": "IMG_0017.jpg",
+      "capture_time": "2026-05-27T19:19:31.623924",
+      "score": 0.0,
+      "score_reasons": [
+        "闭眼检测失败: 1 人闭眼"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_000",
+      "duplicate_rank": 4,
+      "faces_count": 1,
+      "key_persons": [
+        "新郎"
+      ],
+      "closed_eyes_count": 1,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "6662f7db-8b54-477a-b400-7d8e9e45f7de",
+      "file_path": "./simulated_photos/IMG_0018.jpg",
+      "file_name": "IMG_0018.jpg",
+      "capture_time": "2026-05-27T19:19:45.623924",
+      "score": 50.0,
+      "score_reasons": [],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_006",
+      "duplicate_rank": 1,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "63712d1c-7f55-4ac9-a91d-4905fa71215b",
+      "file_path": "./simulated_photos/IMG_0019.jpg",
+      "file_name": "IMG_0019.jpg",
+      "capture_time": "2026-05-27T19:20:35.623924",
+      "score": 0.0,
+      "score_reasons": [
+        "闭眼检测失败: 1 人闭眼"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_004",
+      "duplicate_rank": 4,
+      "faces_count": 4,
+      "key_persons": [
+        "新娘"
+      ],
+      "closed_eyes_count": 1,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "c5c5de5d-d00a-41b7-a042-74ac2913cfa9",
+      "file_path": "./simulated_photos/IMG_0020.jpg",
+      "file_name": "IMG_0020.jpg",
+      "capture_time": "2026-05-27T19:18:57.623924",
+      "score": 68.0,
+      "score_reasons": [
+        "包含 1 张人脸 (+5.0)",
+        "高分辨率 (+10)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": "自动保留",
+      "duplicate_group_id": null,
+      "duplicate_rank": 0,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "9f098c89-5b0f-4879-8aa7-23164e1dd2db",
+      "file_path": "./simulated_photos/IMG_0021.jpg",
+      "file_name": "IMG_0021.jpg",
+      "capture_time": "2026-05-27T19:21:07.623924",
+      "score": 63.0,
+      "score_reasons": [
+        "包含 1 张人脸 (+5.0)",
+        "中高分辨率 (+5)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_000",
+      "duplicate_rank": 3,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "4e951daa-8e4c-4877-9376-fd8c09726302",
+      "file_path": "./simulated_photos/IMG_0022.jpg",
+      "file_name": "IMG_0022.jpg",
+      "capture_time": "2026-05-27T19:21:44.623924",
+      "score": 65.0,
+      "score_reasons": [
+        "包含 2 张人脸 (+10.0)",
+        "中高分辨率 (+5)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_004",
+      "duplicate_rank": 1,
+      "faces_count": 2,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "a3250087-4516-4652-9601-7582d76159e2",
+      "file_path": "./simulated_photos/IMG_0023.jpg",
+      "file_name": "IMG_0023.jpg",
+      "capture_time": "2026-05-27T19:18:43.623924",
+      "score": 70.0,
+      "score_reasons": [
+        "包含 3 张人脸 (+15.0)",
+        "中高分辨率 (+5)"
+      ],
+      "status": "keep",
+      "status_reason": "自动保留",
+      "duplicate_group_id": null,
+      "duplicate_rank": 0,
+      "faces_count": 3,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "01778b1b-9aa2-4372-b421-1d1f6cc61e18",
+      "file_path": "./simulated_photos/IMG_0024.jpg",
+      "file_name": "IMG_0024.jpg",
+      "capture_time": "2026-05-27T19:20:23.623924",
+      "score": 55.0,
+      "score_reasons": [
+        "中高分辨率 (+5)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_003",
+      "duplicate_rank": 3,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "65b9a199-ef31-4a4d-a6ee-748fc0f8102e",
+      "file_path": "./simulated_photos/IMG_0025.jpg",
+      "file_name": "IMG_0025.jpg",
+      "capture_time": "2026-05-27T19:24:35.623924",
+      "score": 50.0,
+      "score_reasons": [],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_002",
+      "duplicate_rank": 1,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "746aab91-58e4-46db-bb90-2c7e1a22957e",
+      "file_path": "./simulated_photos/IMG_0026.jpg",
+      "file_name": "IMG_0026.jpg",
+      "capture_time": "2026-05-27T19:21:37.623924",
+      "score": 75.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 1 张人脸 (+5.0)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_003",
+      "duplicate_rank": 1,
+      "faces_count": 1,
+      "key_persons": [
+        "新娘"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "594ceeb0-a0ee-41e2-9b0d-afc699580d15",
+      "file_path": "./simulated_photos/IMG_0027.jpg",
+      "file_name": "IMG_0027.jpg",
+      "capture_time": "2026-05-27T19:25:19.623924",
+      "score": 58.0,
+      "score_reasons": [
+        "包含 1 张人脸 (+5.0)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": "自动保留",
+      "duplicate_group_id": null,
+      "duplicate_rank": 0,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "7da6e79a-e6e9-4dc9-abf5-d44aa0ad9392",
+      "file_path": "./simulated_photos/IMG_0028.jpg",
+      "file_name": "IMG_0028.jpg",
+      "capture_time": "2026-05-27T19:17:08.623924",
+      "score": 80.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 1 张人脸 (+5.0)",
+        "中高分辨率 (+5)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_000",
+      "duplicate_rank": 2,
+      "faces_count": 1,
+      "key_persons": [
+        "新娘"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "e164c81a-9f85-456a-adbf-282295bc8856",
+      "file_path": "./simulated_photos/IMG_0029.jpg",
+      "file_name": "IMG_0029.jpg",
+      "capture_time": "2026-05-27T19:25:35.623924",
+      "score": 53.0,
+      "score_reasons": [
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": "自动保留",
+      "duplicate_group_id": null,
+      "duplicate_rank": 0,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "88c42b2a-36a2-429c-badb-26cd19001320",
+      "file_path": "./simulated_photos/IMG_0030.jpg",
+      "file_name": "IMG_0030.jpg",
+      "capture_time": "2026-05-27T19:24:00.623924",
+      "score": 78.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 1 张人脸 (+5.0)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_005",
+      "duplicate_rank": 1,
+      "faces_count": 1,
+      "key_persons": [
+        "新娘"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "4f106af8-7ded-4fdf-9aa4-33fd33a8d3d8",
+      "file_path": "./simulated_photos/IMG_0031.jpg",
+      "file_name": "IMG_0031.jpg",
+      "capture_time": "2026-05-27T19:18:17.623924",
+      "score": 0.0,
+      "score_reasons": [
+        "闭眼检测失败: 1 人闭眼"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_004",
+      "duplicate_rank": 3,
+      "faces_count": 2,
+      "key_persons": [
+        "新郎"
+      ],
+      "closed_eyes_count": 1,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "e98206d3-5ea3-406d-af82-0b45a9dfca3b",
+      "file_path": "./simulated_photos/IMG_0032.jpg",
+      "file_name": "IMG_0032.jpg",
+      "capture_time": "2026-05-27T19:19:55.623924",
+      "score": 0.0,
+      "score_reasons": [
+        "闭眼检测失败: 1 人闭眼"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_006",
+      "duplicate_rank": 2,
+      "faces_count": 1,
+      "key_persons": [
+        "新郎"
+      ],
+      "closed_eyes_count": 1,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "b161d925-9f79-4945-b553-6adb44261c63",
+      "file_path": "./simulated_photos/IMG_0033.jpg",
+      "file_name": "IMG_0033.jpg",
+      "capture_time": "2026-05-27T19:28:35.623924",
+      "score": 50.0,
+      "score_reasons": [],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_005",
+      "duplicate_rank": 3,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "bc81c5d7-7a27-4eaa-ad73-ff5a5eaee740",
+      "file_path": "./simulated_photos/IMG_0034.jpg",
+      "file_name": "IMG_0034.jpg",
+      "capture_time": "2026-05-27T19:27:20.623924",
+      "score": 58.0,
+      "score_reasons": [
+        "包含 1 张人脸 (+5.0)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_009",
+      "duplicate_rank": 2,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "a8282840-214a-41b4-94b0-e6707c4a5be5",
+      "file_path": "./simulated_photos/IMG_0035.jpg",
+      "file_name": "IMG_0035.jpg",
+      "capture_time": "2026-05-27T19:20:19.623924",
+      "score": 95.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 4 张人脸 (+20.0)",
+        "中高分辨率 (+5)"
+      ],
+      "status": "keep",
+      "status_reason": null,
+      "duplicate_group_id": "dup_group_008",
+      "duplicate_rank": 0,
+      "faces_count": 4,
+      "key_persons": [
+        "新娘"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "e881b4c4-f913-4394-9371-d9cce00d74fc",
+      "file_path": "./simulated_photos/IMG_0036.jpg",
+      "file_name": "IMG_0036.jpg",
+      "capture_time": "2026-05-27T19:16:57.623924",
+      "score": 0.0,
+      "score_reasons": [
+        "闭眼检测失败: 1 人闭眼"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_001",
+      "duplicate_rank": 3,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 1,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "ce6f7c20-3963-402d-992e-31fd1aa0a5fd",
+      "file_path": "./simulated_photos/IMG_0037.jpg",
+      "file_name": "IMG_0037.jpg",
+      "capture_time": "2026-05-27T19:21:11.623924",
+      "score": 88.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 2 张人脸 (+10.0)",
+        "中高分辨率 (+5)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": null,
+      "duplicate_group_id": "dup_group_007",
+      "duplicate_rank": 0,
+      "faces_count": 2,
+      "key_persons": [
+        "新郎"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "5370571f-59f8-430b-90fe-8d46b7ff274f",
+      "file_path": "./simulated_photos/IMG_0038.jpg",
+      "file_name": "IMG_0038.jpg",
+      "capture_time": "2026-05-27T19:25:02.623924",
+      "score": 83.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 1 张人脸 (+5.0)",
+        "中高分辨率 (+5)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_000",
+      "duplicate_rank": 1,
+      "faces_count": 1,
+      "key_persons": [
+        "新郎"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "ae780f82-0041-4196-bc78-4656b6ce00a3",
+      "file_path": "./simulated_photos/IMG_0039.jpg",
+      "file_name": "IMG_0039.jpg",
+      "capture_time": "2026-05-27T19:30:21.623924",
+      "score": 53.0,
+      "score_reasons": [
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": "自动保留",
+      "duplicate_group_id": null,
+      "duplicate_rank": 0,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "a761341e-1df3-45a7-8950-82493fd8b16b",
+      "file_path": "./simulated_photos/IMG_0040.jpg",
+      "file_name": "IMG_0040.jpg",
+      "capture_time": "2026-05-27T19:20:59.623924",
+      "score": 68.0,
+      "score_reasons": [
+        "包含 1 张人脸 (+5.0)",
+        "高分辨率 (+10)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": null,
+      "duplicate_group_id": "dup_group_006",
+      "duplicate_rank": 0,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "8a7661e2-a708-4f1e-872c-24eb5e200c8a",
+      "file_path": "./simulated_photos/IMG_0041.jpg",
+      "file_name": "IMG_0041.jpg",
+      "capture_time": "2026-05-27T19:22:27.623924",
+      "score": 90.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 2 张人脸 (+10.0)",
+        "高分辨率 (+10)"
+      ],
+      "status": "keep",
+      "status_reason": null,
+      "duplicate_group_id": "dup_group_009",
+      "duplicate_rank": 0,
+      "faces_count": 2,
+      "key_persons": [
+        "新娘"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "8e3cdc80-ab6d-480e-8d02-78f58b797607",
+      "file_path": "./simulated_photos/IMG_0042.jpg",
+      "file_name": "IMG_0042.jpg",
+      "capture_time": "2026-05-27T19:21:15.623924",
+      "score": 65.0,
+      "score_reasons": [
+        "包含 1 张人脸 (+5.0)",
+        "高分辨率 (+10)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_009",
+      "duplicate_rank": 1,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "0c33a74e-cf93-4d1f-b574-1951e69a5f00",
+      "file_path": "./simulated_photos/IMG_0043.jpg",
+      "file_name": "IMG_0043.jpg",
+      "capture_time": "2026-05-27T19:31:11.623924",
+      "score": 83.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 2 张人脸 (+10.0)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": null,
+      "duplicate_group_id": "dup_group_005",
+      "duplicate_rank": 0,
+      "faces_count": 2,
+      "key_persons": [
+        "新郎"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "90e9efdb-b6ed-4ec6-b4f1-d2506040f7a3",
+      "file_path": "./simulated_photos/IMG_0044.jpg",
+      "file_name": "IMG_0044.jpg",
+      "capture_time": "2026-05-27T19:24:23.623924",
+      "score": 93.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 3 张人脸 (+15.0)",
+        "中高分辨率 (+5)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": null,
+      "duplicate_group_id": "dup_group_004",
+      "duplicate_rank": 0,
+      "faces_count": 3,
+      "key_persons": [
+        "新娘"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "285bfd97-c80a-4081-af3e-3215d033a42b",
+      "file_path": "./simulated_photos/IMG_0045.jpg",
+      "file_name": "IMG_0045.jpg",
+      "capture_time": "2026-05-27T19:21:39.623924",
+      "score": 60.0,
+      "score_reasons": [
+        "包含 1 张人脸 (+5.0)",
+        "中高分辨率 (+5)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_001",
+      "duplicate_rank": 1,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "18290c6a-e4d8-48b7-8da9-ebc5df1f0e86",
+      "file_path": "./simulated_photos/IMG_0046.jpg",
+      "file_name": "IMG_0046.jpg",
+      "capture_time": "2026-05-27T19:18:02.623924",
+      "score": 63.0,
+      "score_reasons": [
+        "高分辨率 (+10)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "keep",
+      "status_reason": null,
+      "duplicate_group_id": "dup_group_001",
+      "duplicate_rank": 0,
+      "faces_count": 0,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "67b19578-1f43-4931-a603-6c4e04dfe566",
+      "file_path": "./simulated_photos/IMG_0047.jpg",
+      "file_name": "IMG_0047.jpg",
+      "capture_time": "2026-05-27T19:19:37.623924",
+      "score": 0.0,
+      "score_reasons": [
+        "闭眼检测失败: 1 人闭眼"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_004",
+      "duplicate_rank": 2,
+      "faces_count": 2,
+      "key_persons": [],
+      "closed_eyes_count": 1,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "f2d39800-8090-478c-8f45-ccdfb06f2e7a",
+      "file_path": "./simulated_photos/IMG_0048.jpg",
+      "file_name": "IMG_0048.jpg",
+      "capture_time": "2026-05-27T19:29:06.623924",
+      "score": 0.0,
+      "score_reasons": [
+        "闭眼检测失败: 2 人闭眼"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_001",
+      "duplicate_rank": 4,
+      "faces_count": 4,
+      "key_persons": [
+        "新娘",
+        "新娘"
+      ],
+      "closed_eyes_count": 2,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "ae9785ca-7bd4-4ad8-9ce9-27fb8292a3e4",
+      "file_path": "./simulated_photos/IMG_0049.jpg",
+      "file_name": "IMG_0049.jpg",
+      "capture_time": "2026-05-27T19:21:23.623924",
+      "score": 78.0,
+      "score_reasons": [
+        "包含 1 位重点人物 (+20.0)",
+        "包含 1 张人脸 (+5.0)",
+        "文件大小正常 (+3)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_007",
+      "duplicate_rank": 2,
+      "faces_count": 1,
+      "key_persons": [
+        "新郎"
+      ],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    },
+    {
+      "photo_id": "42c70c1a-b5d2-4632-8d4a-7c5977e556fa",
+      "file_path": "./simulated_photos/IMG_0050.jpg",
+      "file_name": "IMG_0050.jpg",
+      "capture_time": "2026-05-27T19:28:02.623924",
+      "score": 60.0,
+      "score_reasons": [
+        "包含 1 张人脸 (+5.0)",
+        "中高分辨率 (+5)"
+      ],
+      "status": "remove_manual",
+      "status_reason": "手动删除",
+      "duplicate_group_id": "dup_group_005",
+      "duplicate_rank": 2,
+      "faces_count": 1,
+      "key_persons": [],
+      "closed_eyes_count": 0,
+      "user_notes": "",
+      "tags": []
+    }
+  ]
+}

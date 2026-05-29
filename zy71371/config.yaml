@@ -1,0 +1,40 @@
+# 摄影选片去重CLI配置文件
+
+# 输入输出配置
+input_dir: ./photos
+output_dir: ./output
+
+# 重点人物配置
+key_persons:
+  - 新郎
+  - 新娘
+  - 父亲
+  - 母亲
+
+# 去重配置
+duplicate_detection:
+  hash_size: 16
+  similarity_threshold: 5
+  burst_time_window_seconds: 2
+
+# 评分配置
+scoring:
+  min_score: 50.0
+  reject_closed_eyes: true
+  closed_eyes_threshold: 1
+  key_person_bonus: 20.0
+  face_count_bonus: 5.0
+
+# 人脸检测配置
+face_detection:
+  tolerance: 0.6
+  min_face_size: 20
+
+# 报告配置
+report:
+  formats:
+    - summary_md
+    - details_csv
+    - details_json
+    - duplicates_md
+    - key_persons_md
