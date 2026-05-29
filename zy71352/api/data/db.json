@@ -1,0 +1,934 @@
+{
+  "artworks": [
+    {
+      "id": "art-001",
+      "name": "墨竹图",
+      "artworkNo": "EXH-2026-001",
+      "artist": "郑板桥",
+      "year": "清代",
+      "material": "纸本水墨",
+      "size": "180×90cm",
+      "createdAt": "2026-04-29T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "processed"
+    },
+    {
+      "id": "art-002",
+      "name": "三峡云帆图",
+      "artworkNo": "EXH-2026-002",
+      "artist": "张大千",
+      "year": "1948年",
+      "material": "设色纸本",
+      "size": "210×120cm",
+      "createdAt": "2026-05-09T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "processed"
+    },
+    {
+      "id": "art-003",
+      "name": "秋山访友图",
+      "artworkNo": "EXH-2026-003",
+      "artist": "傅抱石",
+      "year": "1945年",
+      "material": "设色纸本",
+      "size": "150×80cm",
+      "createdAt": "2026-05-09T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "processed"
+    },
+    {
+      "id": "art-004",
+      "name": "奔马图",
+      "artworkNo": "EXH-2026-004",
+      "artist": "徐悲鸿",
+      "year": "1939年",
+      "material": "设色纸本",
+      "size": "130×70cm",
+      "createdAt": "2026-05-14T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "pending"
+    },
+    {
+      "id": "art-005",
+      "name": "泼墨山水",
+      "artworkNo": "EXH-2026-005",
+      "artist": "刘海粟",
+      "year": "1982年",
+      "material": "设色纸本",
+      "size": "190×100cm",
+      "createdAt": "2026-05-14T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "pending"
+    },
+    {
+      "id": "art-006",
+      "name": "红梅",
+      "artworkNo": "EXH-2026-006",
+      "artist": "关山月",
+      "year": "1978年",
+      "material": "设色纸本",
+      "size": "140×90cm",
+      "createdAt": "2026-05-19T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "pending"
+    },
+    {
+      "id": "art-007",
+      "name": "漓江渔歌",
+      "artworkNo": "EXH-2026-007",
+      "artist": "李可染",
+      "year": "1962年",
+      "material": "设色纸本",
+      "size": "160×100cm",
+      "createdAt": "2026-05-19T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "pending"
+    },
+    {
+      "id": "art-008",
+      "name": "黄山云海",
+      "artworkNo": "EXH-2026-008",
+      "artist": "亚明",
+      "year": "1975年",
+      "material": "设色纸本",
+      "size": "150×85cm",
+      "createdAt": "2026-05-24T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "rejected"
+    },
+    {
+      "id": "art-009",
+      "name": "花鸟四条屏",
+      "artworkNo": "EXH-2026-009",
+      "artist": "任伯年",
+      "year": "清代",
+      "material": "设色纸本",
+      "size": "170×45cm×4",
+      "createdAt": "2026-05-24T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "rejected"
+    },
+    {
+      "id": "art-010",
+      "name": "人物故事图",
+      "artworkNo": "EXH-2026-010",
+      "artist": "程十发",
+      "year": "1965年",
+      "material": "设色纸本",
+      "size": "140×75cm",
+      "createdAt": "2026-05-24T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "pending"
+    },
+    {
+      "id": "art-011",
+      "name": "青绿山水",
+      "artworkNo": "EXH-2026-011",
+      "artist": "何海霞",
+      "year": "1985年",
+      "material": "设色纸本",
+      "size": "200×110cm",
+      "createdAt": "2026-05-24T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "rejected"
+    },
+    {
+      "id": "art-012",
+      "name": "行书四条屏",
+      "artworkNo": "EXH-2026-012",
+      "artist": "于右任",
+      "year": "1942年",
+      "material": "纸本水墨",
+      "size": "180×40cm×4",
+      "createdAt": "2026-05-24T11:46:43.987Z",
+      "updatedAt": "2026-05-24T11:46:43.987Z",
+      "status": "pending"
+    }
+  ],
+  "valuations": [
+    {
+      "id": "val-001",
+      "artworkId": "art-001",
+      "amount": 8500000,
+      "currency": "CNY",
+      "valuationDate": "2026-05-15",
+      "institution": "故宫博物院文物鉴定中心",
+      "valuer": "李教授",
+      "convertedAmount": 8500000,
+      "convertedCurrency": "CNY",
+      "createdAt": "2026-04-29T11:46:43.987Z"
+    },
+    {
+      "id": "val-002",
+      "artworkId": "art-002",
+      "amount": 32000000,
+      "currency": "CNY",
+      "valuationDate": "2026-05-10",
+      "institution": "中国嘉德拍卖",
+      "valuer": "王主任",
+      "convertedAmount": 32000000,
+      "convertedCurrency": "CNY",
+      "createdAt": "2026-05-09T11:46:43.987Z"
+    },
+    {
+      "id": "val-003",
+      "artworkId": "art-003",
+      "amount": 1800000,
+      "currency": "USD",
+      "valuationDate": "2026-05-12",
+      "institution": "Sotheby's",
+      "valuer": "Dr. Smith",
+      "convertedAmount": 13050000,
+      "convertedCurrency": "CNY",
+      "createdAt": "2026-05-09T11:46:43.987Z"
+    },
+    {
+      "id": "val-004",
+      "artworkId": "art-004",
+      "amount": 1500000,
+      "currency": "EUR",
+      "valuationDate": "2026-05-18",
+      "institution": "Christie's",
+      "valuer": "Jean Dubois",
+      "convertedAmount": 11775000,
+      "convertedCurrency": "CNY",
+      "createdAt": "2026-05-14T11:46:43.987Z"
+    },
+    {
+      "id": "val-005",
+      "artworkId": "art-005",
+      "amount": 6800000,
+      "currency": "CNY",
+      "valuationDate": "2026-05-20",
+      "institution": "上海博物馆",
+      "valuer": "陈研究员",
+      "convertedAmount": 6800000,
+      "convertedCurrency": "CNY",
+      "createdAt": "2026-05-14T11:46:43.987Z"
+    },
+    {
+      "id": "val-006",
+      "artworkId": "art-006",
+      "amount": 4200000,
+      "currency": "CNY",
+      "valuationDate": "2026-05-22",
+      "institution": "广州艺术博物院",
+      "valuer": "黄馆长",
+      "convertedAmount": 4200000,
+      "convertedCurrency": "CNY",
+      "createdAt": "2026-05-19T11:46:43.987Z"
+    },
+    {
+      "id": "val-007",
+      "artworkId": "art-007",
+      "amount": 9500000,
+      "currency": "CNY",
+      "valuationDate": "2026-05-23",
+      "institution": "中央美术学院",
+      "valuer": "靳教授",
+      "convertedAmount": 9500000,
+      "convertedCurrency": "CNY",
+      "createdAt": "2026-05-19T11:46:43.987Z"
+    },
+    {
+      "id": "val-008",
+      "artworkId": "art-008",
+      "amount": 5200000,
+      "currency": "CNY",
+      "valuationDate": "2026-05-25",
+      "institution": "南京博物院",
+      "valuer": "张研究员",
+      "convertedAmount": 5200000,
+      "convertedCurrency": "CNY",
+      "createdAt": "2026-05-24T11:46:43.987Z"
+    },
+    {
+      "id": "val-009",
+      "artworkId": "art-010",
+      "amount": 3800000,
+      "currency": "CNY",
+      "valuationDate": "2026-05-26",
+      "institution": "上海朵云轩",
+      "valuer": "刘老师",
+      "convertedAmount": 3800000,
+      "convertedCurrency": "CNY",
+      "createdAt": "2026-05-24T11:46:43.987Z"
+    },
+    {
+      "id": "val-010",
+      "artworkId": "art-012",
+      "amount": 2800000,
+      "currency": "CNY",
+      "valuationDate": "2026-05-26",
+      "institution": "西安碑林博物馆",
+      "valuer": "赵研究员",
+      "convertedAmount": 2800000,
+      "convertedCurrency": "CNY",
+      "createdAt": "2026-05-24T11:46:43.987Z"
+    }
+  ],
+  "loanContracts": [
+    {
+      "id": "cnt-001",
+      "artworkId": "art-001",
+      "version": "v1.2",
+      "lender": "故宫博物院",
+      "lenderContact": "王主任 13800138001",
+      "startDate": "2026-06-01",
+      "endDate": "2026-08-30",
+      "specialTerms": "需温湿度控制运输，全程押运",
+      "isLatest": true,
+      "createdAt": "2026-04-29T11:46:43.987Z"
+    },
+    {
+      "id": "cnt-002",
+      "artworkId": "art-001",
+      "version": "v1.1",
+      "lender": "故宫博物院",
+      "lenderContact": "王主任 13800138001",
+      "startDate": "2026-06-01",
+      "endDate": "2026-08-15",
+      "specialTerms": "需温湿度控制运输",
+      "isLatest": false,
+      "createdAt": "2026-04-29T11:46:43.987Z"
+    },
+    {
+      "id": "cnt-003",
+      "artworkId": "art-002",
+      "version": "v2.0",
+      "lender": "私人藏家 张先生",
+      "lenderContact": "张总 13900139002",
+      "startDate": "2026-06-05",
+      "endDate": "2026-09-05",
+      "specialTerms": "展览结束后需由原运输公司送回",
+      "isLatest": true,
+      "createdAt": "2026-05-09T11:46:43.987Z"
+    },
+    {
+      "id": "cnt-004",
+      "artworkId": "art-003",
+      "version": "v1.0",
+      "lender": "美国大都会博物馆",
+      "lenderContact": "Sarah Johnson +1-212-555-0123",
+      "startDate": "2026-06-10",
+      "endDate": "2026-09-10",
+      "specialTerms": "国际运输需全额保险，海关文件齐全",
+      "signedDate": "2026-05-15",
+      "isLatest": true,
+      "createdAt": "2026-05-09T11:46:43.987Z"
+    },
+    {
+      "id": "cnt-005",
+      "artworkId": "art-004",
+      "version": "v1.0",
+      "lender": "法国卢浮宫",
+      "lenderContact": "Pierre Martin +33-1-555-0145",
+      "startDate": "2026-06-15",
+      "endDate": "2026-09-15",
+      "isLatest": true,
+      "createdAt": "2026-05-14T11:46:43.987Z"
+    },
+    {
+      "id": "cnt-006",
+      "artworkId": "art-005",
+      "version": "v1.0",
+      "lender": "上海博物馆",
+      "lenderContact": "李主任 13700137005",
+      "startDate": "2026-06-08",
+      "endDate": "2026-09-08",
+      "specialTerms": "需专业艺术运输公司承运",
+      "signedDate": "2026-05-20",
+      "isLatest": true,
+      "createdAt": "2026-05-14T11:46:43.987Z"
+    },
+    {
+      "id": "cnt-007",
+      "artworkId": "art-006",
+      "version": "v1.0",
+      "lender": "广州艺术博物院",
+      "lenderContact": "黄馆长 13600136006",
+      "startDate": "2026-06-12",
+      "endDate": "2026-09-12",
+      "isLatest": true,
+      "createdAt": "2026-05-19T11:46:43.987Z"
+    },
+    {
+      "id": "cnt-008",
+      "artworkId": "art-007",
+      "version": "v1.0",
+      "lender": "李可染基金会",
+      "lenderContact": "李先生 13500135007",
+      "startDate": "2026-06-01",
+      "endDate": "2026-09-01",
+      "specialTerms": "需投保一切险，保额不低于1200万",
+      "signedDate": "2026-05-25",
+      "isLatest": true,
+      "createdAt": "2026-05-19T11:46:43.987Z"
+    },
+    {
+      "id": "cnt-009",
+      "artworkId": "art-009",
+      "version": "v1.0",
+      "lender": "浙江博物馆",
+      "lenderContact": "陈主任 13400134009",
+      "startDate": "2026-06-20",
+      "endDate": "2026-09-20",
+      "isLatest": true,
+      "createdAt": "2026-05-24T11:46:43.987Z"
+    },
+    {
+      "id": "cnt-010",
+      "artworkId": "art-010",
+      "version": "v1.0",
+      "lender": "上海中国画院",
+      "lenderContact": "周院长 13300133010",
+      "startDate": "2026-06-10",
+      "endDate": "2026-09-10",
+      "signedDate": "2026-05-28",
+      "isLatest": true,
+      "createdAt": "2026-05-24T11:46:43.987Z"
+    },
+    {
+      "id": "cnt-011",
+      "artworkId": "art-011",
+      "version": "v1.0",
+      "lender": "陕西历史博物馆",
+      "lenderContact": "秦馆长 13200132011",
+      "startDate": "2026-06-15",
+      "endDate": "2026-09-15",
+      "isLatest": true,
+      "createdAt": "2026-05-24T11:46:43.987Z"
+    }
+  ],
+  "transportNodes": [
+    {
+      "id": "trn-001",
+      "artworkId": "art-001",
+      "nodeType": "origin",
+      "location": "北京·故宫博物院",
+      "status": "delivered",
+      "timestamp": "2026-04-29T11:46:43.987Z",
+      "handler": "北京艺术运输有限公司"
+    },
+    {
+      "id": "trn-002",
+      "artworkId": "art-001",
+      "nodeType": "destination",
+      "location": "上海·龙美术馆",
+      "status": "delivered",
+      "timestamp": "2026-05-09T11:46:43.987Z",
+      "handler": "北京艺术运输有限公司"
+    },
+    {
+      "id": "trn-003",
+      "artworkId": "art-002",
+      "nodeType": "origin",
+      "location": "香港·私人藏家仓库",
+      "status": "delivered",
+      "timestamp": "2026-05-09T11:46:43.987Z",
+      "handler": "香港国际艺术物流"
+    },
+    {
+      "id": "trn-004",
+      "artworkId": "art-002",
+      "nodeType": "transit",
+      "location": "深圳·海关保税仓",
+      "status": "delivered",
+      "timestamp": "2026-05-11T11:46:43.987Z",
+      "handler": "香港国际艺术物流"
+    },
+    {
+      "id": "trn-005",
+      "artworkId": "art-002",
+      "nodeType": "destination",
+      "location": "上海·龙美术馆",
+      "status": "delivered",
+      "timestamp": "2026-05-14T11:46:43.987Z",
+      "handler": "香港国际艺术物流"
+    },
+    {
+      "id": "trn-006",
+      "artworkId": "art-003",
+      "nodeType": "origin",
+      "location": "纽约·大都会博物馆",
+      "status": "delivered",
+      "timestamp": "2026-05-09T11:46:43.987Z",
+      "handler": "Momart Fine Art Transport"
+    },
+    {
+      "id": "trn-007",
+      "artworkId": "art-003",
+      "nodeType": "transit",
+      "location": "首尔·仁川机场保税仓",
+      "status": "delivered",
+      "timestamp": "2026-05-17T11:46:43.987Z",
+      "handler": "Momart Fine Art Transport"
+    },
+    {
+      "id": "trn-008",
+      "artworkId": "art-003",
+      "nodeType": "destination",
+      "location": "上海·龙美术馆",
+      "status": "delivered",
+      "timestamp": "2026-05-19T11:46:43.987Z",
+      "handler": "Momart Fine Art Transport"
+    },
+    {
+      "id": "trn-009",
+      "artworkId": "art-004",
+      "nodeType": "origin",
+      "location": "巴黎·卢浮宫",
+      "status": "in_transit",
+      "timestamp": "2026-05-24T11:46:43.987Z",
+      "handler": "Caisse de Transport d'Oeuvres d'Art"
+    },
+    {
+      "id": "trn-010",
+      "artworkId": "art-004",
+      "nodeType": "transit",
+      "location": "法兰克福·机场",
+      "status": "pending",
+      "handler": "Caisse de Transport d'Oeuvres d'Art"
+    },
+    {
+      "id": "trn-011",
+      "artworkId": "art-004",
+      "nodeType": "destination",
+      "location": "上海·龙美术馆",
+      "status": "pending",
+      "handler": "Caisse de Transport d'Oeuvres d'Art"
+    },
+    {
+      "id": "trn-012",
+      "artworkId": "art-005",
+      "nodeType": "origin",
+      "location": "上海博物馆",
+      "status": "in_transit",
+      "timestamp": "2026-05-26T11:46:43.987Z",
+      "handler": "上海文物运输公司"
+    },
+    {
+      "id": "trn-013",
+      "artworkId": "art-005",
+      "nodeType": "destination",
+      "location": "上海·龙美术馆",
+      "status": "pending",
+      "handler": "上海文物运输公司"
+    },
+    {
+      "id": "trn-014",
+      "artworkId": "art-006",
+      "nodeType": "origin",
+      "location": "广州艺术博物院",
+      "status": "pending",
+      "handler": "广州艺术运输有限公司"
+    },
+    {
+      "id": "trn-015",
+      "artworkId": "art-006",
+      "nodeType": "destination",
+      "location": "上海·龙美术馆",
+      "status": "pending",
+      "handler": "广州艺术运输有限公司"
+    },
+    {
+      "id": "trn-016",
+      "artworkId": "art-007",
+      "nodeType": "origin",
+      "location": "北京·李可染基金会",
+      "status": "delivered",
+      "timestamp": "2026-05-19T11:46:43.987Z",
+      "handler": "北京艺术运输有限公司"
+    },
+    {
+      "id": "trn-017",
+      "artworkId": "art-007",
+      "nodeType": "destination",
+      "location": "上海·龙美术馆",
+      "status": "arrived",
+      "timestamp": "2026-05-21T11:46:43.987Z",
+      "handler": "北京艺术运输有限公司"
+    },
+    {
+      "id": "trn-018",
+      "artworkId": "art-008",
+      "nodeType": "origin",
+      "location": "南京博物院",
+      "status": "pending"
+    },
+    {
+      "id": "trn-019",
+      "artworkId": "art-009",
+      "nodeType": "origin",
+      "location": "浙江博物馆",
+      "status": "pending"
+    },
+    {
+      "id": "trn-020",
+      "artworkId": "art-010",
+      "nodeType": "origin",
+      "location": "上海中国画院",
+      "status": "in_transit",
+      "timestamp": "2026-05-27T11:46:43.987Z",
+      "handler": "上海文物运输公司"
+    },
+    {
+      "id": "trn-021",
+      "artworkId": "art-010",
+      "nodeType": "destination",
+      "location": "上海·龙美术馆",
+      "status": "pending",
+      "handler": "上海文物运输公司"
+    },
+    {
+      "id": "trn-022",
+      "artworkId": "art-011",
+      "nodeType": "origin",
+      "location": "陕西历史博物馆",
+      "status": "pending"
+    },
+    {
+      "id": "trn-023",
+      "artworkId": "art-012",
+      "nodeType": "origin",
+      "location": "西安碑林博物馆",
+      "status": "pending",
+      "handler": "西安文物运输公司"
+    },
+    {
+      "id": "trn-024",
+      "artworkId": "art-012",
+      "nodeType": "transit",
+      "location": "郑州·中转站",
+      "status": "pending",
+      "handler": "西安文物运输公司"
+    },
+    {
+      "id": "trn-025",
+      "artworkId": "art-012",
+      "nodeType": "destination",
+      "location": "上海·龙美术馆",
+      "status": "pending",
+      "handler": "西安文物运输公司"
+    }
+  ],
+  "insuranceClauses": [
+    {
+      "id": "ins-001",
+      "artworkId": "art-001",
+      "policyType": "艺术品一切险",
+      "coverageAmount": 8500000,
+      "currency": "CNY",
+      "deductible": 0,
+      "effectiveDate": "2026-05-25",
+      "expiryDate": "2026-09-05",
+      "specialClauses": "含往返运输险，展览期间全险",
+      "insurer": "中国人保财险",
+      "policyNo": "PICC-ART-2026-0001",
+      "createdAt": "2026-04-29T11:46:43.987Z"
+    },
+    {
+      "id": "ins-002",
+      "artworkId": "art-002",
+      "policyType": "艺术品一切险",
+      "coverageAmount": 32000000,
+      "currency": "CNY",
+      "deductible": 50000,
+      "effectiveDate": "2026-05-20",
+      "expiryDate": "2026-09-10",
+      "specialClauses": "含香港至上海国际运输险，免赔额5万",
+      "insurer": "平安保险",
+      "policyNo": "PINGAN-ART-2026-0002",
+      "createdAt": "2026-05-09T11:46:43.987Z"
+    },
+    {
+      "id": "ins-003",
+      "artworkId": "art-003",
+      "policyType": "国际艺术品运输及展览险",
+      "coverageAmount": 1800000,
+      "currency": "USD",
+      "deductible": 10000,
+      "effectiveDate": "2026-05-15",
+      "expiryDate": "2026-09-15",
+      "specialClauses": "门到门运输险，展览期间一切险",
+      "insurer": "Chubb Insurance",
+      "policyNo": "CHUBB-ART-2026-0003",
+      "createdAt": "2026-05-09T11:46:43.987Z"
+    },
+    {
+      "id": "ins-004",
+      "artworkId": "art-004",
+      "policyType": "国际艺术品运输及展览险",
+      "coverageAmount": 1500000,
+      "currency": "EUR",
+      "deductible": 5000,
+      "effectiveDate": "2026-06-01",
+      "expiryDate": "2026-09-20",
+      "specialClauses": "含巴黎至上海全程运输温控保险",
+      "insurer": "Axa Art",
+      "policyNo": "AXA-ART-2026-0004",
+      "createdAt": "2026-05-14T11:46:43.987Z"
+    },
+    {
+      "id": "ins-005",
+      "artworkId": "art-005",
+      "policyType": "艺术品一切险",
+      "coverageAmount": 6800000,
+      "currency": "CNY",
+      "deductible": 0,
+      "effectiveDate": "2026-06-01",
+      "expiryDate": "2026-09-10",
+      "insurer": "中国人保财险",
+      "policyNo": "PICC-ART-2026-0005",
+      "createdAt": "2026-05-14T11:46:43.987Z"
+    },
+    {
+      "id": "ins-006",
+      "artworkId": "art-007",
+      "policyType": "艺术品一切险",
+      "coverageAmount": 9500000,
+      "currency": "CNY",
+      "deductible": 0,
+      "effectiveDate": "2026-05-28",
+      "expiryDate": "2026-09-05",
+      "specialClauses": "展览期间一切险，保额不低于合同要求",
+      "insurer": "太平洋保险",
+      "policyNo": "CPIC-ART-2026-0007",
+      "createdAt": "2026-05-19T11:46:43.987Z"
+    },
+    {
+      "id": "ins-007",
+      "artworkId": "art-010",
+      "policyType": "艺术品一切险",
+      "coverageAmount": 3800000,
+      "currency": "CNY",
+      "deductible": 10000,
+      "effectiveDate": "2026-06-05",
+      "expiryDate": "2026-09-15",
+      "insurer": "平安保险",
+      "policyNo": "PINGAN-ART-2026-0010",
+      "createdAt": "2026-05-24T11:46:43.987Z"
+    }
+  ],
+  "changeLogs": [
+    {
+      "id": "log-001",
+      "recordId": "art-001",
+      "fieldName": "status",
+      "oldValue": "pending",
+      "newValue": "processed",
+      "operator": "策展助理-李娜",
+      "timestamp": "2026-05-24T11:46:43.987Z",
+      "reason": "三要素核对无误，保险材料齐全"
+    },
+    {
+      "id": "log-002",
+      "recordId": "art-001",
+      "fieldName": "contract.version",
+      "oldValue": "v1.1",
+      "newValue": "v1.2",
+      "operator": "保险专员-王强",
+      "timestamp": "2026-05-21T11:46:43.987Z",
+      "reason": "出借期限延长至8月30日"
+    },
+    {
+      "id": "log-003",
+      "recordId": "art-002",
+      "fieldName": "status",
+      "oldValue": "pending",
+      "newValue": "processed",
+      "operator": "策展助理-李娜",
+      "timestamp": "2026-05-24T11:46:43.987Z",
+      "reason": "材料齐全，运输已完成"
+    },
+    {
+      "id": "log-004",
+      "recordId": "art-003",
+      "fieldName": "status",
+      "oldValue": "pending",
+      "newValue": "processed",
+      "operator": "策展助理-李娜",
+      "timestamp": "2026-05-24T11:46:43.987Z",
+      "reason": "国际运输已到达，合同保单齐全"
+    },
+    {
+      "id": "log-005",
+      "recordId": "art-003",
+      "fieldName": "valuation.amount",
+      "oldValue": 1750000,
+      "newValue": 1800000,
+      "operator": "保险专员-王强",
+      "timestamp": "2026-05-17T11:46:43.987Z",
+      "reason": "苏富比重新估值调整"
+    },
+    {
+      "id": "log-006",
+      "recordId": "art-007",
+      "fieldName": "transport.destination.status",
+      "oldValue": "in_transit",
+      "newValue": "arrived",
+      "operator": "策展助理-李娜",
+      "timestamp": "2026-05-21T11:46:43.987Z",
+      "reason": "作品已安全送达，等待验收"
+    },
+    {
+      "id": "log-007",
+      "recordId": "art-008",
+      "fieldName": "status",
+      "oldValue": "pending",
+      "newValue": "rejected",
+      "operator": "保险专员-王强",
+      "timestamp": "2026-05-26T11:46:43.987Z",
+      "reason": "缺少保险条款信息，运输承运方未填写"
+    },
+    {
+      "id": "log-008",
+      "recordId": "art-009",
+      "fieldName": "status",
+      "oldValue": "pending",
+      "newValue": "rejected",
+      "operator": "保险专员-王强",
+      "timestamp": "2026-05-26T11:46:43.987Z",
+      "reason": "估值信息缺失，保险条款未录入"
+    },
+    {
+      "id": "log-009",
+      "recordId": "art-011",
+      "fieldName": "status",
+      "oldValue": "pending",
+      "newValue": "rejected",
+      "operator": "保险专员-王强",
+      "timestamp": "2026-05-27T11:46:43.987Z",
+      "reason": "估值币种不明确，运输节点缺失，保险未办理"
+    }
+  ],
+  "gapAlerts": [
+    {
+      "id": "gap-001",
+      "artworkId": "art-004",
+      "type": "transport",
+      "severity": "warning",
+      "message": "中转节点（法兰克福机场）状态为待处理",
+      "field": "transportNodes[1].status",
+      "resolved": false,
+      "createdAt": "2026-05-24T11:46:43.987Z"
+    },
+    {
+      "id": "gap-002",
+      "artworkId": "art-006",
+      "type": "transport",
+      "severity": "warning",
+      "message": "运输节点承运方信息缺失",
+      "field": "transportNodes[0].handler",
+      "resolved": false,
+      "createdAt": "2026-05-24T11:46:43.987Z"
+    },
+    {
+      "id": "gap-003",
+      "artworkId": "art-008",
+      "type": "insurance",
+      "severity": "error",
+      "message": "缺少保险条款信息，请补充投保信息",
+      "field": "insuranceClauses",
+      "resolved": false,
+      "createdAt": "2026-05-26T11:46:43.987Z"
+    },
+    {
+      "id": "gap-004",
+      "artworkId": "art-008",
+      "type": "transport",
+      "severity": "error",
+      "message": "运输节点承运方信息缺失",
+      "field": "transportNodes[0].handler",
+      "resolved": false,
+      "createdAt": "2026-05-26T11:46:43.987Z"
+    },
+    {
+      "id": "gap-005",
+      "artworkId": "art-009",
+      "type": "valuation",
+      "severity": "error",
+      "message": "估值信息缺失，请补充估值报告",
+      "field": "valuations",
+      "resolved": false,
+      "createdAt": "2026-05-26T11:46:43.987Z"
+    },
+    {
+      "id": "gap-006",
+      "artworkId": "art-009",
+      "type": "insurance",
+      "severity": "error",
+      "message": "保险条款未录入",
+      "field": "insuranceClauses",
+      "resolved": false,
+      "createdAt": "2026-05-26T11:46:43.987Z"
+    },
+    {
+      "id": "gap-007",
+      "artworkId": "art-009",
+      "type": "transport",
+      "severity": "warning",
+      "message": "运输目的地节点缺失",
+      "field": "transportNodes",
+      "resolved": false,
+      "createdAt": "2026-05-26T11:46:43.987Z"
+    },
+    {
+      "id": "gap-008",
+      "artworkId": "art-011",
+      "type": "valuation",
+      "severity": "error",
+      "message": "估值信息缺失，请补充估值报告",
+      "field": "valuations",
+      "resolved": false,
+      "createdAt": "2026-05-27T11:46:43.987Z"
+    },
+    {
+      "id": "gap-009",
+      "artworkId": "art-011",
+      "type": "transport",
+      "severity": "error",
+      "message": "运输目的地节点缺失",
+      "field": "transportNodes",
+      "resolved": false,
+      "createdAt": "2026-05-27T11:46:43.987Z"
+    },
+    {
+      "id": "gap-010",
+      "artworkId": "art-011",
+      "type": "insurance",
+      "severity": "error",
+      "message": "保险条款未录入",
+      "field": "insuranceClauses",
+      "resolved": false,
+      "createdAt": "2026-05-27T11:46:43.987Z"
+    },
+    {
+      "id": "gap-011",
+      "artworkId": "art-011",
+      "type": "contract",
+      "severity": "warning",
+      "message": "合同特殊条款未填写",
+      "field": "contracts[0].specialTerms",
+      "resolved": false,
+      "createdAt": "2026-05-27T11:46:43.987Z"
+    },
+    {
+      "id": "gap-zQ8p8ibM",
+      "artworkId": "art-001",
+      "type": "contract",
+      "severity": "warning",
+      "message": "合同签署日期未填写",
+      "field": "contracts[0].signedDate",
+      "resolved": false,
+      "createdAt": "2026-05-29T11:48:55.104Z"
+    }
+  ],
+  "exchangeRates": {
+    "CNY": 1,
+    "USD": 7.25,
+    "EUR": 7.85,
+    "GBP": 9.15,
+    "JPY": 0.048
+  }
+}

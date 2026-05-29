@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 255 250 245;
+    --foreground: 41 37 36;
+    --primary: 30 58 95;
+    --accent: 212 165 116;
+    --success: 5 150 105;
+    --warning: 245 158 11;
+    --danger: 220 38 38;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: "Noto Sans SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    background-color: #faf8f5;
+    color: #292524;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: rgba(30, 58, 95, 0.15);
+    color: #1e3a5f;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f5f5f4;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #d6d3d1;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a8a29e;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-slate-800 hover:bg-slate-900 transition-colors shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-stone-700 bg-white border border-stone-300 hover:bg-stone-50 transition-colors shadow-sm;
+  }
+
+  .btn-success {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm;
+  }
+
+  .btn-warning {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 transition-colors shadow-sm;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 rounded-lg border border-stone-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-200 focus:border-slate-400 transition-colors;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-stone-700 mb-1;
+  }
+
+  .section-title {
+    @apply text-sm font-bold text-stone-700 uppercase tracking-wider mb-4;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-stagger {
+    animation-delay: calc(var(--stagger, 0) * 50ms);
+  }
+}
