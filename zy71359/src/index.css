@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #2D3748;
+  background-color: #FAF5EF;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F0E6D6;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C9A87C;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A0522D;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-clay-500 text-white px-4 py-2 rounded-lg font-medium
+      hover:bg-clay-600 active:bg-clay-700 transition-colors duration-150
+      disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply border border-clay-300 text-clay-700 px-4 py-2 rounded-lg font-medium
+      hover:bg-clay-50 active:bg-clay-100 transition-colors duration-150;
+  }
+  .btn-danger {
+    @apply bg-kiln-400 text-white px-4 py-2 rounded-lg font-medium
+      hover:bg-kiln-500 active:bg-kiln-600 transition-colors duration-150;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+  .card {
+    @apply bg-white rounded-xl border border-clay-100 shadow-sm
+      hover:shadow-md transition-shadow duration-200;
+  }
+  .badge-pending {
+    @apply bg-clay-100 text-clay-600 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-queued {
+    @apply bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-firing {
+    @apply bg-kiln-100 text-kiln-600 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-completed {
+    @apply bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-rescheduled {
+    @apply bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-cancelled {
+    @apply bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-open {
+    @apply bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .badge-locked {
+    @apply bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  .input-field {
+    @apply w-full border border-clay-200 rounded-lg px-3 py-2 text-sm
+      focus:outline-none focus:ring-2 focus:ring-clay-400 focus:border-transparent
+      bg-white placeholder:text-clay-300;
+  }
+  .select-field {
+    @apply w-full border border-clay-200 rounded-lg px-3 py-2 text-sm
+      focus:outline-none focus:ring-2 focus:ring-clay-400 focus:border-transparent
+      bg-white;
+  }
+}
