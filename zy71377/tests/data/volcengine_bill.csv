@@ -1,0 +1,13 @@
+ResourceID,Product,ProductName,BillingStart,BillingEnd,Cost,OriginalCost,Currency,Region,InstanceType,DiscountType,Tags
+i-volc123456789,ecs,云服务器,2024-05-01 00:00:00,2024-05-31 23:59:59,980.50,1200.00,CNY,cn-beijing,ecs.g1.large,,"project=data-platform;team=backend;env=production"
+i-volc987654321,veened,边缘计算,2024-05-01 00:00:00,2024-05-31 23:59:59,650.00,650.00,CNY,cn-guangzhou,ve.c1.large,,"project=frontend;team=cdn;env=production"
+i-volc456789012,tos,对象存储,2024-05-01 00:00:00,2024-05-31 23:59:59,210.75,260.00,CNY,cn-shanghai,,,"project=data-platform;team=data"
+i-volc789012345,ecs,云服务器,2024-05-01 00:00:00,2024-05-31 23:59:59,420.00,420.00,CNY,cn-shenzhen,ecs.c1.xlarge,MonthlyPackage,"project=frontend;team=web;env=staging"
+i-volc012345678,rds,云数据库,2024-05-01 00:00:00,2024-05-31 23:59:59,1560.00,1560.00,CNY,cn-beijing,rds.mysql.m1.large,,"project=data-platform;team=backend;env=production"
+i-volc345678901,ecs,云服务器,2024-04-01 00:00:00,2024-04-30 23:59:59,350.00,350.00,CNY,cn-beijing,ecs.g1.large,,"project=frontend;team=mobile;env=production"
+i-volc345678901,ecs,云服务器,2024-05-01 00:00:00,2024-05-31 23:59:59,520.00,520.00,CNY,cn-beijing,ecs.g1.large,,"project=frontend;team=mobile;env=production"
+i-volc678901234,cdn,内容分发,2024-05-01 00:00:00,2024-05-31 23:59:59,280.00,350.00,CNY,cn-hangzhou,,ResourcePackage,"project=data-platform;team=backend;env=production"
+i-volc901234567,mongodb,文档数据库,2024-05-01 00:00:00,2024-05-31 23:59:59,890.00,890.00,CNY,cn-beijing,mongodb.1c2g,,"project=frontend;team=backend;env=production"
+i-volc234567890,ecs,云服务器,2024-05-01 00:00:00,2024-05-31 23:59:59,1650.00,1650.00,CNY,cn-beijing,ecs.g1.2xlarge,,"team=backend;env=production"
+i-volc567890123,ckafka,消息队列,2024-05-01 00:00:00,2024-05-31 23:59:59,320.00,320.00,CNY,cn-beijing,,,"project=data-platform;team=backend;env=production"
+i-volc890123456,clb,负载均衡,2024-05-01 00:00:00,2024-05-31 23:59:59,195.00,195.00,CNY,cn-beijing,,,"project=frontend;team=web;env=production"

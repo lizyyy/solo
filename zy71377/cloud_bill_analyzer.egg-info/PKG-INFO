@@ -1,0 +1,22 @@
+Metadata-Version: 2.4
+Name: cloud-bill-analyzer
+Version: 1.0.0
+Summary: 多云账单异常检测CLI工具 - 支持AWS、阿里云、火山引擎
+Author: Cloud Cost Team
+License: MIT
+Keywords: cloud,billing,aws,aliyun,volcengine,anomaly-detection
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: click>=8.1.0
+Requires-Dist: pandas>=1.5.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: jinja2>=3.1.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: openpyxl>=3.1.0
+Requires-Dist: python-dateutil>=2.8.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.10; extra == "dev"

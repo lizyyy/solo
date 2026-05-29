@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多云账单异常检测报告</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header .subtitle { opacity: 0.9; font-size: 14px; }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: #2c3e50;
+            border-bottom: 2px solid #e8ecf1;
+            padding-bottom: 8px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .stat-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-item .label { font-size: 13px; color: #7f8c8d; margin-bottom: 4px; }
+        .stat-item .value { font-size: 24px; font-weight: bold; color: #2c3e50; }
+        .stat-item.danger .value { color: #e74c3c; }
+        .stat-item.warning .value { color: #f39c12; }
+        .stat-item.success .value { color: #27ae60; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e8ecf1;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        tr:hover { background: #f8f9fa; }
+        .severity-high {
+            background: #fee;
+            color: #c0392b;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .severity-medium {
+            background: #fff8e1;
+            color: #f39c12;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .severity-low {
+            background: #e8f5e9;
+            color: #27ae60;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-exceeded { color: #e74c3c; font-weight: bold; }
+        .status-warning { color: #f39c12; font-weight: bold; }
+        .status-normal { color: #27ae60; font-weight: bold; }
+        .status-no_budget { color: #95a5a6; font-style: italic; }
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 4px solid;
+        }
+        .alert-danger {
+            background: #fee;
+            border-color: #e74c3c;
+            color: #c0392b;
+        }
+        .alert-warning {
+            background: #fff8e1;
+            border-color: #f39c12;
+            color: #c29800;
+        }
+        .tag-issue {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 2px;
+        }
+        .tag-missing { background: #fee; color: #c0392b; }
+        .tag-empty { background: #fff8e1; color: #f39c12; }
+        .tag-invalid { background: #ffebee; color: #e57373; }
+        .anomaly-icon { margin-right: 8px; }
+        .generated-at {
+            text-align: center;
+            color: #95a5a6;
+            font-size: 12px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e8ecf1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>☁️ 多云账单异常检测报告</h1>
+            <p class="subtitle">Cloud Bill Anomaly Analysis Report</p>
+        </div>
+
+        <div class="card">
+            <h2>📊 总体统计</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="label">总记录数</div>
+                    <div class="value">{{ summary.total_records }}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="label">归一化账单数</div>
+                    <div class="value">{{ summary.total_normalized_bills }}</div>
+                </div>
+                <div class="stat-item danger">
+                    <div class="label">异常总数</div>
+                    <div class="value">{{ summary.total_anomalies }}</div>
+                </div>
+                <div class="stat-item warning">
+                    <div class="label">标签问题数</div>
+                    <div class="value">{{ summary.total_tag_issues }}</div>
+                </div>
+                <div class="stat-item success">
+                    <div class="label">总费用(不含RI)</div>
+                    <div class="value">{{ "%.2f"|format(summary.total_normalized_cost) }} {{ summary.target_currency }}</div>
+                </div>
+            </div>
+            {% if summary.period_range %}
+            <p style="margin-top: 16px; color: #7f8c8d;">
+                <strong>账期范围:</strong> {{ summary.period_range[0] }} ~ {{ summary.period_range[1] }}
+            </p>
+            {% endif %}
+            {% if summary.provider_breakdown %}
+            <p style="margin-top: 8px; color: #7f8c8d;">
+                <strong>云厂商分布:</strong>
+                {% for provider, count in summary.provider_breakdown.items() %}
+                    {{ provider }}: {{ count }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            {% endif %}
+        </div>
+
+        {% if duplicate_ri_count > 0 %}
+        <div class="alert alert-danger">
+            <strong>🔄 警告:</strong> 检测到 {{ duplicate_ri_count }} 条疑似重复的预留实例抵扣记录，请人工核对！
+        </div>
+        {% endif %}
+
+        {% if currency_errors_count > 0 %}
+        <div class="alert alert-warning">
+            <strong>💱 警告:</strong> 检测到 {{ currency_errors_count }} 条货币相关错误，请检查汇率配置！
+        </div>
+        {% endif %}
+
+        {% if anomaly_breakdown.by_type %}
+        <div class="card">
+            <h2>📈 异常类型分布</h2>
+            <div class="stats-grid">
+                {% for atype, count in anomaly_breakdown.by_type.items() %}
+                <div class="stat-item">
+                    <div class="label">{{ atype }}</div>
+                    <div class="value">{{ count }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if high_anomalies %}
+        <div class="card">
+            <h2>🚨 高优先级异常</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>严重程度</th>
+                        <th>服务/项目</th>
+                        <th>描述</th>
+                        <th>金额</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in high_anomalies %}
+                    <tr>
+                        <td>
+                            {% if a.anomaly_type == 'cost_spike' %}📈
+                            {% elif a.anomaly_type == 'cost_drop' %}📉
+                            {% elif a.anomaly_type == 'missing_tag' %}🏷️
+                            {% elif a.anomaly_type == 'invalid_tag' %}⚠️
+                            {% elif a.anomaly_type == 'duplicate_ri_credit' %}🔄
+                            {% elif a.anomaly_type == 'currency_error' %}💱
+                            {% elif a.anomaly_type == 'budget_exceeded' %}💰
+                            {% elif a.anomaly_type == 'missing_required_field' %}❌
+                            {% else %}🔍{% endif %}
+                            {{ a.anomaly_type }}
+                        </td>
+                        <td><span class="severity-high">高</span></td>
+                        <td>{{ a.project or a.service or a.resource_id or 'N/A' }}</td>
+                        <td>{{ a.message }}</td>
+                        <td>{% if a.current_cost is not none %}{{ "%.2f"|format(a.current_cost) }} {{ summary.target_currency }}{% else %}-{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if budget_comparison %}
+        <div class="card">
+            <h2>💰 预算执行情况</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>预算</th>
+                        <th>实际</th>
+                        <th>使用率</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project, data in budget_comparison.items() | sort %}
+                    <tr>
+                        <td><strong>{{ project }}</strong></td>
+                        <td>{{ "%.2f"|format(data.budget) }} {{ data.currency }}</td>
+                        <td>{{ "%.2f"|format(data.actual) }} {{ data.currency }}</td>
+                        <td>{{ "%.1f"|format(data.usage_percent) }}%</td>
+                        <td>
+                            {% if data.status == 'exceeded' %}
+                                <span class="status-exceeded">🚨 超支</span>
+                            {% elif data.status == 'warning' %}
+                                <span class="status-warning">⚠️ 预警</span>
+                            {% elif data.status == 'normal' %}
+                                <span class="status-normal">✅ 正常</span>
+                            {% else %}
+                                <span class="status-no_budget">❓ 无预算</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if tag_issues_count %}
+        <div class="card">
+            <h2>🏷️ 标签问题明细</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>标签字段</th>
+                        <th>问题类型</th>
+                        <th>数量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, count in tag_issues_count.items() | sort %}
+                    {% set field_name, issue_type = key.split(':', 1) %}
+                    <tr>
+                        <td><strong>{{ field_name }}</strong></td>
+                        <td>
+                            <span class="tag-issue {% if issue_type == 'missing' %}tag-missing{% elif issue_type == 'empty' %}tag-empty{% else %}tag-invalid{% endif %}">
+                                {{ issue_type }}
+                            </span>
+                        </td>
+                        <td>{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h2>📋 所有异常 ({{ anomalies | length }})</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>严重程度</th>
+                        <th>项目/服务</th>
+                        <th>期间</th>
+                        <th>描述</th>
+                        <th>变化</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in anomalies %}
+                    <tr>
+                        <td>
+                            {% if a.anomaly_type == 'cost_spike' %}📈
+                            {% elif a.anomaly_type == 'cost_drop' %}📉
+                            {% elif a.anomaly_type == 'missing_tag' %}🏷️
+                            {% elif a.anomaly_type == 'invalid_tag' %}⚠️
+                            {% elif a.anomaly_type == 'duplicate_ri_credit' %}🔄
+                            {% elif a.anomaly_type == 'currency_error' %}💱
+                            {% elif a.anomaly_type == 'budget_exceeded' %}💰
+                            {% elif a.anomaly_type == 'missing_required_field' %}❌
+                            {% else %}🔍{% endif %}
+                            {{ a.anomaly_type }}
+                        </td>
+                        <td>
+                            <span class="severity-{{ a.severity }}">
+                                {% if a.severity == 'high' %}高{% elif a.severity == 'medium' %}中{% else %}低{% endif %}
+                            </span>
+                        </td>
+                        <td>{{ a.project or a.service or a.resource_id or 'N/A' }}</td>
+                        <td>{{ a.period or '-' }}</td>
+                        <td>{{ a.message }}</td>
+                        <td>
+                            {% if a.change_percent is not none %}
+                                {% if a.change_percent > 0 %}+{% endif %}{{ "%.1f"|format(a.change_percent) }}%
+                            {% else %}-{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <p class="generated-at">
+            报告生成时间: {{ generated_at }} |
+            共 {{ anomalies | length }} 条异常
+            (高: {{ severity_counts.high }}, 中: {{ severity_counts.medium }}, 低: {{ severity_counts.low }})
+        </p>
+    </div>
+</body>
+</html>

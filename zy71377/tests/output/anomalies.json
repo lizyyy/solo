@@ -1,0 +1,3468 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-05-29T21:59:40.771924",
+  "summary": {
+    "total_records": 36,
+    "total_normalized_bills": 36,
+    "total_anomalies": 32,
+    "total_tag_issues": 10,
+    "total_normalized_cost": 14547.55,
+    "target_currency": "CNY",
+    "provider_breakdown": {
+      "aws": "***",
+      "aliyun": "***",
+      "volcengine": 12
+    },
+    "period_range": [
+      "2024-04-01",
+      "2024-05-15"
+    ],
+    "anomaly_breakdown": {
+      "by_type": {
+        "missing_tag": 12,
+        "duplicate_ri_credit": 1,
+        "cost_spike": 15,
+        "budget_exceeded": 4
+      },
+      "by_severity": {
+        "medium": 13,
+        "high": 19
+      }
+    }
+  },
+  "anomalies": [
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "Required tag 'project' is missing",
+      "provider": "aws",
+      "resource_id": "i-3vwx123yza456bcd7",
+      "service": "AmazonEC2",
+      "project": "unknown",
+      "period": "2024-05",
+      "current_cost": null,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "tag_name": "project",
+        "tag_value": null,
+        "issue_type": "missing"
+      }
+    },
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "Required tag 'team' is missing",
+      "provider": "aws",
+      "resource_id": "i-3vwx123yza456bcd7",
+      "service": "AmazonEC2",
+      "project": "unknown",
+      "period": "2024-05",
+      "current_cost": null,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "tag_name": "team",
+        "tag_value": null,
+        "issue_type": "missing"
+      }
+    },
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "Required tag 'project' is missing",
+      "provider": "aws",
+      "resource_id": "i-6ghi012jkl345mno6",
+      "service": "AWSLambda",
+      "project": "unknown",
+      "period": "2024-05",
+      "current_cost": null,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "tag_name": "project",
+        "tag_value": null,
+        "issue_type": "missing"
+      }
+    },
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "Required tag 'environment' is missing",
+      "provider": "aliyun",
+      "resource_id": "i-ghi1234567890",
+      "service": "oss",
+      "project": "data-platform",
+      "period": "2024-05",
+      "current_cost": null,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "tag_name": "environment",
+        "tag_value": null,
+        "issue_type": "missing"
+      }
+    },
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "Required tag 'project' is missing",
+      "provider": "aliyun",
+      "resource_id": "i-stu1234567890",
+      "service": "slb",
+      "project": "unknown",
+      "period": "2024-05",
+      "current_cost": null,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "tag_name": "project",
+        "tag_value": null,
+        "issue_type": "missing"
+      }
+    },
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "Required tag 'project' is missing",
+      "provider": "aliyun",
+      "resource_id": "i-yza1234567890",
+      "service": "cdn",
+      "project": "unknown",
+      "period": "2024-05",
+      "current_cost": null,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "tag_name": "project",
+        "tag_value": null,
+        "issue_type": "missing"
+      }
+    },
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "Required tag 'team' is missing",
+      "provider": "aliyun",
+      "resource_id": "i-yza1234567890",
+      "service": "cdn",
+      "project": "unknown",
+      "period": "2024-05",
+      "current_cost": null,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "tag_name": "team",
+        "tag_value": null,
+        "issue_type": "missing"
+      }
+    },
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "Required tag 'environment' is missing",
+      "provider": "aliyun",
+      "resource_id": "i-yza1234567890",
+      "service": "cdn",
+      "project": "unknown",
+      "period": "2024-05",
+      "current_cost": null,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "tag_name": "environment",
+        "tag_value": null,
+        "issue_type": "missing"
+      }
+    },
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "Required tag 'environment' is missing",
+      "provider": "volcengine",
+      "resource_id": "i-volc456789012",
+      "service": "tos",
+      "project": "data-platform",
+      "period": "2024-05",
+      "current_cost": null,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "tag_name": "environment",
+        "tag_value": null,
+        "issue_type": "missing"
+      }
+    },
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "Required tag 'project' is missing",
+      "provider": "volcengine",
+      "resource_id": "i-volc234567890",
+      "service": "ecs",
+      "project": "unknown",
+      "period": "2024-05",
+      "current_cost": null,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "tag_name": "project",
+        "tag_value": null,
+        "issue_type": "missing"
+      }
+    },
+    {
+      "anomaly_type": "duplicate_ri_credit",
+      "severity": "high",
+      "message": "Potential duplicate RI credit detected: 2 entries for same RI/resource on 2024-05-01, total: -1450.00 CNY, sum of absolute values: 1450.00 CNY",
+      "provider": "aws",
+      "resource_id": "ri-arn-001",
+      "service": "AmazonEC2",
+      "project": "data-platform",
+      "period": "2024-05-01",
+      "current_cost": -725.0,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": 0.0,
+      "raw_data": {
+        "ri_arn": "arn:aws:ec2:us-east-1:123456789012:reserved-instances/ri-001",
+        "group_size": 2,
+        "group_total": -1450.0,
+        "group_abs_total": 1450.0,
+        "has_sign_mix": false,
+        "has_duplicate_values": true
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for AmazonEC2: 2024-04 1236.12 -> 2024-05 7988.41 CNY (+546.2%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "AmazonEC2",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 7988.4125,
+      "previous_cost": 1236.125,
+      "change_percent": 546.2463343108504,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for tos: 2024-04 0.00 -> 2024-05 210.75 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "tos",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 210.75,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for AmazonS3: 2024-04 0.00 -> 2024-05 327.70 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "AmazonS3",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 327.70000000000005,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for ecs: 2024-04 950.00 -> 2024-05 8590.50 CNY (+804.3%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "ecs",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 8590.5,
+      "previous_cost": 950.0,
+      "change_percent": 804.2631578947369,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for AWSLambda: 2024-04 0.00 -> 2024-05 114.19 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "AWSLambda",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 114.1875,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for AmazonRDS: 2024-04 0.00 -> 2024-05 2320.00 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "AmazonRDS",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 2320.0,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for ckafka: 2024-04 0.00 -> 2024-05 320.00 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "ckafka",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 320.0,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for mongodb: 2024-04 0.00 -> 2024-05 890.00 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "mongodb",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 890.0,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for clb: 2024-04 0.00 -> 2024-05 195.00 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "clb",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 195.0,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for rds: 2024-04 0.00 -> 2024-05 2760.50 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "rds",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 2760.5,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for cdn: 2024-04 0.00 -> 2024-05 375.50 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "cdn",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 375.5,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for kvstore: 2024-04 0.00 -> 2024-05 450.00 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "kvstore",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 450.0,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for oss: 2024-04 0.00 -> 2024-05 125.30 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "oss",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 125.3,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for veened: 2024-04 0.00 -> 2024-05 650.00 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "veened",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 650.0,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "cost_spike",
+      "severity": "high",
+      "message": "Cost spike detected for slb: 2024-04 0.00 -> 2024-05 180.00 CNY (+100.0%)",
+      "provider": null,
+      "resource_id": null,
+      "service": "slb",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 180.0,
+      "previous_cost": 0.0,
+      "change_percent": 100.0,
+      "threshold": 20.0,
+      "raw_data": {
+        "group_by": "service"
+      }
+    },
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "High-cost resource i-3vwx123yza456bcd7 (647.42 CNY) has missing project/team tags",
+      "provider": "aws",
+      "resource_id": "i-3vwx123yza456bcd7",
+      "service": "AmazonEC2",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 647.425,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "has_project": false,
+        "has_team": false
+      }
+    },
+    {
+      "anomaly_type": "missing_tag",
+      "severity": "medium",
+      "message": "High-cost resource i-volc234567890 (1650.00 CNY) has missing project/team tags",
+      "provider": "volcengine",
+      "resource_id": "i-volc234567890",
+      "service": "ecs",
+      "project": null,
+      "period": "2024-05",
+      "current_cost": 1650.0,
+      "previous_cost": null,
+      "change_percent": null,
+      "threshold": null,
+      "raw_data": {
+        "has_project": false,
+        "has_team": true
+      }
+    },
+    {
+      "anomaly_type": "budget_exceeded",
+      "severity": "high",
+      "message": "Budget exceeded for project 'data-platform': actual 16327.61 CNY > budget 15000.00 CNY (108.9%)",
+      "provider": null,
+      "resource_id": null,
+      "service": null,
+      "project": "data-platform",
+      "period": null,
+      "current_cost": 16327.6125,
+      "previous_cost": null,
+      "change_percent": 108.85074999999999,
+      "threshold": 15000.0,
+      "raw_data": {
+        "budget": 15000.0,
+        "usage_percent": 108.85074999999999,
+        "team": "backend",
+        "service": null
+      }
+    },
+    {
+      "anomaly_type": "budget_exceeded",
+      "severity": "medium",
+      "message": "Budget warning for project 'frontend': usage at 86.7% (8669.25 / 10000.00 CNY)",
+      "provider": null,
+      "resource_id": null,
+      "service": null,
+      "project": "frontend",
+      "period": null,
+      "current_cost": 8669.25,
+      "previous_cost": null,
+      "change_percent": 86.6925,
+      "threshold": 10000.0,
+      "raw_data": {
+        "budget": 10000.0,
+        "usage_percent": 86.6925,
+        "warning_threshold": 80.0
+      }
+    },
+    {
+      "anomaly_type": "budget_exceeded",
+      "severity": "high",
+      "message": "Budget exceeded for project 'data-platform': actual 16327.61 CNY > budget 3000.00 CNY (544.3%)",
+      "provider": null,
+      "resource_id": null,
+      "service": null,
+      "project": "data-platform",
+      "period": null,
+      "current_cost": 16327.6125,
+      "previous_cost": null,
+      "change_percent": 544.25375,
+      "threshold": 3000.0,
+      "raw_data": {
+        "budget": 3000.0,
+        "usage_percent": 544.25375,
+        "team": "data",
+        "service": null
+      }
+    },
+    {
+      "anomaly_type": "budget_exceeded",
+      "severity": "high",
+      "message": "Budget exceeded for project 'frontend': actual 8669.25 CNY > budget 2000.00 CNY (433.5%)",
+      "provider": null,
+      "resource_id": null,
+      "service": null,
+      "project": "frontend",
+      "period": null,
+      "current_cost": 8669.25,
+      "previous_cost": null,
+      "change_percent": 433.4625,
+      "threshold": 2000.0,
+      "raw_data": {
+        "budget": 2000.0,
+        "usage_percent": 433.4625,
+        "team": "mobile",
+        "service": null
+      }
+    }
+  ],
+  "tag_issues_count": {
+    "project:missing": 5,
+    "team:missing": 2,
+    "environment:missing": 3
+  },
+  "duplicate_ri_credits_count": 2,
+  "currency_errors_count": 0,
+  "missing_fields_count": 0,
+  "total_normalized_cost": 14547.55,
+  "budget_comparison": {
+    "data-platform": {
+      "project": "data-platform",
+      "budget": 3000.0,
+      "actual": 16327.6125,
+      "difference": 13327.6125,
+      "usage_percent": 544.25375,
+      "currency": "CNY",
+      "service_breakdown": {
+        "AmazonEC2": 7743.362499999999,
+        "AmazonS3": 327.70000000000005,
+        "ecs": 5310.5,
+        "oss": 125.3,
+        "kvstore": 450.0,
+        "tos": 210.75,
+        "rds": 1560.0,
+        "cdn": 280.0,
+        "ckafka": 320.0
+      },
+      "team_breakdown": {
+        "backend": 15663.8625,
+        "data": 663.75
+      },
+      "status": "exceeded"
+    },
+    "frontend": {
+      "project": "frontend",
+      "budget": 2000.0,
+      "actual": 8669.25,
+      "difference": 6669.25,
+      "usage_percent": 433.4625,
+      "currency": "CNY",
+      "service_breakdown": {
+        "AmazonRDS": 2320.0,
+        "AmazonEC2": 833.75,
+        "rds": 1200.5,
+        "ecs": 2580.0,
+        "veened": 650.0,
+        "mongodb": 890.0,
+        "clb": 195.0
+      },
+      "team_breakdown": {
+        "web": 5105.5,
+        "mobile": 2023.75,
+        "cdn": 650.0,
+        "backend": 890.0
+      },
+      "status": "exceeded"
+    },
+    "ai-platform": {
+      "project": "ai-platform",
+      "budget": 5000.0,
+      "actual": 0.0,
+      "difference": -5000.0,
+      "usage_percent": 0.0,
+      "currency": "CNY",
+      "service_breakdown": {},
+      "team_breakdown": {},
+      "status": "normal"
+    }
+  },
+  "normalized_bills": [
+    {
+      "provider": "aws",
+      "resource_id": "i-0abc123def456ghi7",
+      "billing_period_start": "2024-04-01T00:00:00",
+      "billing_period_end": "2024-04-30T23:59:59",
+      "cost": 120.5,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": 873.625,
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "instance_type": "t3.large",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 2
+    },
+    {
+      "provider": "aws",
+      "resource_id": "i-0abc123def456ghi7",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 156.65,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": 1135.7125,
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "instance_type": "t3.large",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 3
+    },
+    {
+      "provider": "aws",
+      "resource_id": "i-1xyz789def012jkl3",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 45.2,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": 327.70000000000005,
+      "service": "AmazonS3",
+      "region": "us-east-1",
+      "instance_type": null,
+      "tags": {
+        "project": "data-platform",
+        "team": "data",
+        "environment": "staging"
+      },
+      "project": "data-platform",
+      "team": "data",
+      "environment": "staging",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 4
+    },
+    {
+      "provider": "aws",
+      "resource_id": "i-2mno456pqr789stu0",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 320.0,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": 2320.0,
+      "service": "AmazonRDS",
+      "region": "us-west-2",
+      "instance_type": "db.t3.medium",
+      "tags": {
+        "project": "frontend",
+        "team": "web",
+        "environment": "production"
+      },
+      "project": "frontend",
+      "team": "web",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 5
+    },
+    {
+      "provider": "aws",
+      "resource_id": "i-3vwx123yza456bcd7",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 89.3,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": 647.425,
+      "service": "AmazonEC2",
+      "region": "us-west-2",
+      "instance_type": "t2.micro",
+      "tags": {
+        "environment": "testing"
+      },
+      "project": null,
+      "team": null,
+      "environment": "testing",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 6
+    },
+    {
+      "provider": "aws",
+      "resource_id": "i-4efg890hij123klm4",
+      "billing_period_start": "2024-05-15T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 780.5,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": 5658.625,
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "instance_type": "t3.2xlarge",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 7
+    },
+    {
+      "provider": "aws",
+      "resource_id": "ri-arn-001",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": -100.0,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": -725.0,
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "instance_type": "t3.large",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": "arn:aws:ec2:us-east-1:123456789012:reserved-instances/ri-001",
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 8
+    },
+    {
+      "provider": "aws",
+      "resource_id": "ri-arn-001",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": -100.0,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": -725.0,
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "instance_type": "t3.large",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": "arn:aws:ec2:us-east-1:123456789012:reserved-instances/ri-001",
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 9
+    },
+    {
+      "provider": "aws",
+      "resource_id": "i-5nop567qrs890tuv1",
+      "billing_period_start": "2024-04-01T00:00:00",
+      "billing_period_end": "2024-04-30T23:59:59",
+      "cost": 50.0,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": 362.5,
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "instance_type": "t2.small",
+      "tags": {
+        "project": "frontend",
+        "team": "mobile",
+        "environment": "production"
+      },
+      "project": "frontend",
+      "team": "mobile",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 10
+    },
+    {
+      "provider": "aws",
+      "resource_id": "i-5nop567qrs890tuv1",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 65.0,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": 471.25,
+      "service": "AmazonEC2",
+      "region": "us-east-1",
+      "instance_type": "t2.small",
+      "tags": {
+        "project": "frontend",
+        "team": "mobile",
+        "environment": "production"
+      },
+      "project": "frontend",
+      "team": "mobile",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 11
+    },
+    {
+      "provider": "aws",
+      "resource_id": "i-6ghi012jkl345mno6",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 15.75,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": 114.1875,
+      "service": "AWSLambda",
+      "region": "us-east-1",
+      "instance_type": null,
+      "tags": {
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": null,
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 12
+    },
+    {
+      "provider": "aws",
+      "resource_id": "i-7pqr789stu012vwx3",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 210.4,
+      "original_currency": "USD",
+      "normalized_currency": "CNY",
+      "exchange_rate": 7.25,
+      "normalized_cost": 1525.4,
+      "service": "AmazonEC2",
+      "region": "eu-west-1",
+      "instance_type": "c5.large",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        }
+      ],
+      "source_file": "tests/data/aws_bill.csv",
+      "line_number": 13
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-abc1234567890",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 850.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 850.0,
+      "service": "ecs",
+      "region": "cn-hangzhou",
+      "instance_type": "ecs.g6.large",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 2
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-def0987654321",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 1200.5,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 1200.5,
+      "service": "rds",
+      "region": "cn-hangzhou",
+      "instance_type": "rds.mysql.m1.large",
+      "tags": {
+        "project": "frontend",
+        "team": "web",
+        "environment": "production"
+      },
+      "project": "frontend",
+      "team": "web",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 3
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-ghi1234567890",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 125.3,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 125.3,
+      "service": "oss",
+      "region": "cn-beijing",
+      "instance_type": null,
+      "tags": {
+        "project": "data-platform",
+        "team": "data"
+      },
+      "project": "data-platform",
+      "team": "data",
+      "environment": null,
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 4
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-jkl0987654321",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 320.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 320.0,
+      "service": "ecs",
+      "region": "cn-shenzhen",
+      "instance_type": "ecs.c6.xlarge",
+      "tags": {
+        "project": "frontend",
+        "team": "mobile",
+        "environment": "staging"
+      },
+      "project": "frontend",
+      "team": "mobile",
+      "environment": "staging",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 5
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-mno1234567890",
+      "billing_period_start": "2024-05-15T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 2100.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 2100.0,
+      "service": "ecs",
+      "region": "cn-hangzhou",
+      "instance_type": "ecs.g6.2xlarge",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 6
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-pqr0987654321",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 450.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 450.0,
+      "service": "ecs",
+      "region": "cn-shanghai",
+      "instance_type": "ecs.c5.large",
+      "tags": {
+        "project": "frontend",
+        "team": "web",
+        "environment": "production"
+      },
+      "project": "frontend",
+      "team": "web",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 7
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-stu1234567890",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 180.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 180.0,
+      "service": "slb",
+      "region": "cn-hangzhou",
+      "instance_type": null,
+      "tags": {
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": null,
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 8
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-vwx0987654321",
+      "billing_period_start": "2024-04-01T00:00:00",
+      "billing_period_end": "2024-04-30T23:59:59",
+      "cost": 600.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 600.0,
+      "service": "ecs",
+      "region": "cn-hangzhou",
+      "instance_type": "ecs.g6.large",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 9
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-vwx0987654321",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 780.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 780.0,
+      "service": "ecs",
+      "region": "cn-hangzhou",
+      "instance_type": "ecs.g6.large",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 10
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-yza1234567890",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 95.5,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 95.5,
+      "service": "cdn",
+      "region": "cn-hangzhou",
+      "instance_type": null,
+      "tags": {},
+      "project": null,
+      "team": null,
+      "environment": null,
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 11
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-bcd0987654321",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 520.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 520.0,
+      "service": "ecs",
+      "region": "cn-hangzhou",
+      "instance_type": "ecs.c6.large",
+      "tags": {
+        "project": "frontend",
+        "team": "web",
+        "environment": "production"
+      },
+      "project": "frontend",
+      "team": "web",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 12
+    },
+    {
+      "provider": "aliyun",
+      "resource_id": "i-efg1234567890",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 450.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 450.0,
+      "service": "kvstore",
+      "region": "cn-hangzhou",
+      "instance_type": "redis.master.mid",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/aliyun_bill.csv",
+      "line_number": 13
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc123456789",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 980.5,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 980.5,
+      "service": "ecs",
+      "region": "cn-beijing",
+      "instance_type": "ecs.g1.large",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 2
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc987654321",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 650.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 650.0,
+      "service": "veened",
+      "region": "cn-guangzhou",
+      "instance_type": "ve.c1.large",
+      "tags": {
+        "project": "frontend",
+        "team": "cdn",
+        "environment": "production"
+      },
+      "project": "frontend",
+      "team": "cdn",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 3
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc456789012",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 210.75,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 210.75,
+      "service": "tos",
+      "region": "cn-shanghai",
+      "instance_type": null,
+      "tags": {
+        "project": "data-platform",
+        "team": "data"
+      },
+      "project": "data-platform",
+      "team": "data",
+      "environment": null,
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 4
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc789012345",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 420.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 420.0,
+      "service": "ecs",
+      "region": "cn-shenzhen",
+      "instance_type": "ecs.c1.xlarge",
+      "tags": {
+        "project": "frontend",
+        "team": "web",
+        "environment": "staging"
+      },
+      "project": "frontend",
+      "team": "web",
+      "environment": "staging",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 5
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc012345678",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 1560.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 1560.0,
+      "service": "rds",
+      "region": "cn-beijing",
+      "instance_type": "rds.mysql.m1.large",
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 6
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc345678901",
+      "billing_period_start": "2024-04-01T00:00:00",
+      "billing_period_end": "2024-04-30T23:59:59",
+      "cost": 350.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 350.0,
+      "service": "ecs",
+      "region": "cn-beijing",
+      "instance_type": "ecs.g1.large",
+      "tags": {
+        "project": "frontend",
+        "team": "mobile",
+        "environment": "production"
+      },
+      "project": "frontend",
+      "team": "mobile",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 7
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc345678901",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 520.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 520.0,
+      "service": "ecs",
+      "region": "cn-beijing",
+      "instance_type": "ecs.g1.large",
+      "tags": {
+        "project": "frontend",
+        "team": "mobile",
+        "environment": "production"
+      },
+      "project": "frontend",
+      "team": "mobile",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 8
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc678901234",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 280.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 280.0,
+      "service": "cdn",
+      "region": "cn-hangzhou",
+      "instance_type": null,
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": true,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 9
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc901234567",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 890.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 890.0,
+      "service": "mongodb",
+      "region": "cn-beijing",
+      "instance_type": "mongodb.1c2g",
+      "tags": {
+        "project": "frontend",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "frontend",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 10
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc234567890",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 1650.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 1650.0,
+      "service": "ecs",
+      "region": "cn-beijing",
+      "instance_type": "ecs.g1.2xlarge",
+      "tags": {
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": null,
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 11
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc567890123",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 320.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 320.0,
+      "service": "ckafka",
+      "region": "cn-beijing",
+      "instance_type": null,
+      "tags": {
+        "project": "data-platform",
+        "team": "backend",
+        "environment": "production"
+      },
+      "project": "data-platform",
+      "team": "backend",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 12
+    },
+    {
+      "provider": "volcengine",
+      "resource_id": "i-volc890123456",
+      "billing_period_start": "2024-05-01T00:00:00",
+      "billing_period_end": "2024-05-31T23:59:59",
+      "cost": 195.0,
+      "original_currency": "CNY",
+      "normalized_currency": "CNY",
+      "exchange_rate": 1.0,
+      "normalized_cost": 195.0,
+      "service": "clb",
+      "region": "cn-beijing",
+      "instance_type": null,
+      "tags": {
+        "project": "frontend",
+        "team": "web",
+        "environment": "production"
+      },
+      "project": "frontend",
+      "team": "web",
+      "environment": "production",
+      "is_ri_credit": false,
+      "ri_arn": null,
+      "missing_fields": [],
+      "issues": [
+        {
+          "field_name": "resource_id",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'resource_id' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_start",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_start' is missing or empty"
+        },
+        {
+          "field_name": "billing_period_end",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'billing_period_end' is missing or empty"
+        },
+        {
+          "field_name": "cost",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'cost' is missing or empty"
+        },
+        {
+          "field_name": "currency",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'currency' is missing or empty"
+        },
+        {
+          "field_name": "service",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required field 'service' is missing or empty"
+        },
+        {
+          "field_name": "project",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'project' is missing"
+        },
+        {
+          "field_name": "team",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'team' is missing"
+        },
+        {
+          "field_name": "environment",
+          "issue_type": "missing",
+          "original_value": null,
+          "message": "Required tag 'environment' is missing"
+        }
+      ],
+      "source_file": "tests/data/volcengine_bill.csv",
+      "line_number": 13
+    }
+  ]
+}

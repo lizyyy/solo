@@ -1,0 +1,13 @@
+实例ID,资源ID,产品代码,产品名称,计费开始时间,计费结束时间,优惠后金额,币种,区域,实例规格,优惠类型,标签
+i-abc1234567890,i-abc1234567890,ecs,云服务器ECS,2024-05-01 00:00:00,2024-05-31 23:59:59,850.00,CNY,cn-hangzhou,ecs.g6.large,,"项目:data-platform,团队:backend,环境:production"
+i-def0987654321,i-def0987654321,rds,云数据库RDS,2024-05-01 00:00:00,2024-05-31 23:59:59,1200.50,CNY,cn-hangzhou,rds.mysql.m1.large,,"项目:frontend,团队:web,环境:production"
+i-ghi1234567890,i-ghi1234567890,oss,对象存储OSS,2024-05-01 00:00:00,2024-05-31 23:59:59,125.30,CNY,cn-beijing,,,"项目:data-platform,团队:data"
+i-jkl0987654321,i-jkl0987654321,ecs,云服务器ECS,2024-05-01 00:00:00,2024-05-31 23:59:59,320.00,CNY,cn-shenzhen,ecs.c6.xlarge,,"项目:frontend,团队:mobile,环境:staging"
+i-mno1234567890,i-mno1234567890,ecs,云服务器ECS,2024-05-15 00:00:00,2024-05-31 23:59:59,2100.00,CNY,cn-hangzhou,ecs.g6.2xlarge,,"项目:data-platform,团队:backend,环境:production"
+i-pqr0987654321,i-pqr0987654321,ecs,云服务器ECS,2024-05-01 00:00:00,2024-05-31 23:59:59,450.00,CNY,cn-shanghai,ecs.c5.large,包年包月,"项目:frontend,团队:web,环境:production"
+i-stu1234567890,i-stu1234567890,slb,负载均衡SLB,2024-05-01 00:00:00,2024-05-31 23:59:59,180.00,CNY,cn-hangzhou,,,"项目:,团队:backend,环境:production"
+i-vwx0987654321,i-vwx0987654321,ecs,云服务器ECS,2024-04-01 00:00:00,2024-04-30 23:59:59,600.00,CNY,cn-hangzhou,ecs.g6.large,,"项目:data-platform,团队:backend,环境:production"
+i-vwx0987654321,i-vwx0987654321,ecs,云服务器ECS,2024-05-01 00:00:00,2024-05-31 23:59:59,780.00,CNY,cn-hangzhou,ecs.g6.large,,"项目:data-platform,团队:backend,环境:production"
+i-yza1234567890,i-yza1234567890,cdn,CDN,2024-05-01 00:00:00,2024-05-31 23:59:59,95.50,CNY,cn-hangzhou,,,
+i-bcd0987654321,i-bcd0987654321,ecs,云服务器ECS,2024-05-01 00:00:00,2024-05-31 23:59:59,520.00,CNY,cn-hangzhou,ecs.c6.large,,"项目:frontend,团队:web,环境:production"
+i-efg1234567890,i-efg1234567890,kvstore,云数据库Redis,2024-05-01 00:00:00,2024-05-31 23:59:59,450.00,CNY,cn-hangzhou,redis.master.mid,,"项目:data-platform,团队:backend,环境:production"

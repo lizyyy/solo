@@ -1,0 +1,13 @@
+lineItem/UsageAccountId,lineItem/ResourceId,lineItem/ProductCode,lineItem/UsageStartDate,lineItem/UsageEndDate,lineItem/UnblendedCost,lineItem/CurrencyCode,product/region,product/instanceType,identity/LineItemType,user:project,user:team,user:environment,reservation/ReservationARN
+123456789012,i-0abc123def456ghi7,AmazonEC2,2024-04-01T00:00:00Z,2024-04-30T23:59:59Z,120.50,USD,us-east-1,t3.large,Usage,data-platform,backend,production,
+123456789012,i-0abc123def456ghi7,AmazonEC2,2024-05-01T00:00:00Z,2024-05-31T23:59:59Z,156.65,USD,us-east-1,t3.large,Usage,data-platform,backend,production,
+123456789012,i-1xyz789def012jkl3,AmazonS3,2024-05-01T00:00:00Z,2024-05-31T23:59:59Z,45.20,USD,us-east-1,,Usage,data-platform,data,staging,
+123456789012,i-2mno456pqr789stu0,AmazonRDS,2024-05-01T00:00:00Z,2024-05-31T23:59:59Z,320.00,USD,us-west-2,db.t3.medium,Usage,frontend,web,production,
+123456789012,i-3vwx123yza456bcd7,AmazonEC2,2024-05-01T00:00:00Z,2024-05-31T23:59:59Z,89.30,USD,us-west-2,t2.micro,Usage,,,testing,
+123456789012,i-4efg890hij123klm4,AmazonEC2,2024-05-15T00:00:00Z,2024-05-31T23:59:59Z,780.50,USD,us-east-1,t3.2xlarge,Usage,data-platform,backend,production,
+123456789012,ri-arn-001,AmazonEC2,2024-05-01T00:00:00Z,2024-05-31T23:59:59Z,-100.00,USD,us-east-1,t3.large,DiscountedUsage,data-platform,backend,production,arn:aws:ec2:us-east-1:123456789012:reserved-instances/ri-001
+123456789012,ri-arn-001,AmazonEC2,2024-05-01T00:00:00Z,2024-05-31T23:59:59Z,-100.00,USD,us-east-1,t3.large,DiscountedUsage,data-platform,backend,production,arn:aws:ec2:us-east-1:123456789012:reserved-instances/ri-001
+123456789012,i-5nop567qrs890tuv1,AmazonEC2,2024-04-01T00:00:00Z,2024-04-30T23:59:59Z,50.00,USD,us-east-1,t2.small,Usage,frontend,mobile,production,
+123456789012,i-5nop567qrs890tuv1,AmazonEC2,2024-05-01T00:00:00Z,2024-05-31T23:59:59Z,65.00,USD,us-east-1,t2.small,Usage,frontend,mobile,production,
+123456789012,i-6ghi012jkl345mno6,AWSLambda,2024-05-01T00:00:00Z,2024-05-31T23:59:59Z,15.75,USD,us-east-1,,Usage,,backend,production,
+123456789012,i-7pqr789stu012vwx3,AmazonEC2,2024-05-01T00:00:00Z,2024-05-31T23:59:59Z,210.40,USD,eu-west-1,c5.large,Usage,data-platform,backend,production,

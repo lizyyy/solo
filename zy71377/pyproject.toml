@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cloud-bill-analyzer"
+version = "1.0.0"
+description = "多云账单异常检测CLI工具 - 支持AWS、阿里云、火山引擎"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [{name = "Cloud Cost Team"}]
+keywords = ["cloud", "billing", "aws", "aliyun", "volcengine", "anomaly-detection"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "click>=8.1.0",
+    "pandas>=1.5.0",
+    "pyyaml>=6.0",
+    "jinja2>=3.1.0",
+    "rich>=13.0.0",
+    "openpyxl>=3.1.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+cloudbill = "cloud_bill_analyzer.cli:cli"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-mock>=3.10",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cloud_bill_analyzer*"]
