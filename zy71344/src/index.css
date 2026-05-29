@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-brand: #8B2252;
+  --color-brand-light: #B84479;
+  --color-gold: #D4A843;
+  --color-surface: #1A1A2E;
+  --color-surface-card: #16213E;
+  --color-surface-hover: #1C2A4A;
+  --color-surface-border: #2A3A5C;
+}
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background-color: var(--color-surface);
+  color: #E0E0E0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A4A6C;
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-gradient-to-r from-brand to-brand-light text-white rounded-lg
+      font-medium text-sm transition-all duration-200
+      hover:shadow-lg hover:shadow-brand/30 hover:-translate-y-0.5
+      active:translate-y-0 active:shadow-none;
+  }
+
+  .btn-gold {
+    @apply px-4 py-2 bg-gradient-to-r from-gold-dark to-gold text-surface rounded-lg
+      font-medium text-sm transition-all duration-200
+      hover:shadow-lg hover:shadow-gold/30 hover:-translate-y-0.5
+      active:translate-y-0 active:shadow-none;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 bg-transparent border border-surface-border text-gray-300 rounded-lg
+      font-medium text-sm transition-all duration-200
+      hover:bg-surface-hover hover:text-white hover:border-gray-500;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-status-conflict/20 text-status-conflict border border-status-conflict/30 rounded-lg
+      font-medium text-sm transition-all duration-200
+      hover:bg-status-conflict/30;
+  }
+
+  .card {
+    @apply bg-surface-card rounded-xl border border-surface-border p-5
+      transition-all duration-200 hover:border-brand/50 hover:shadow-lg hover:shadow-brand/10;
+  }
+
+  .input-field {
+    @apply w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white
+      placeholder-gray-500 outline-none transition-all duration-200
+      focus:border-brand focus:ring-1 focus:ring-brand/50;
+  }
+
+  .select-field {
+    @apply w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-white
+      outline-none transition-all duration-200
+      focus:border-brand focus:ring-1 focus:ring-brand/50;
+  }
+}
