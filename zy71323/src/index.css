@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  body {
+    @apply bg-ocean-800 text-gray-100 min-h-screen;
+  }
+}
+
+@layer components {
+  .input-field {
+    @apply w-full px-4 py-3 bg-ocean-700/60 border border-ocean-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-tech-500 focus:ring-2 focus:ring-tech-500/20 transition-all duration-200;
+  }
+  
+  .input-label {
+    @apply block text-sm font-medium text-gray-300 mb-2;
+  }
+  
+  .card {
+    @apply bg-ocean-700/40 backdrop-blur-sm border border-ocean-500/20 rounded-xl p-6 shadow-xl;
+  }
+  
+  .btn-primary {
+    @apply px-6 py-3 bg-gradient-to-r from-tech-500 to-tech-600 text-white font-medium rounded-lg hover:from-tech-400 hover:to-tech-500 transition-all duration-200 shadow-lg hover:shadow-tech-500/30 active:scale-[0.98];
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 bg-ocean-600 text-white font-medium rounded-lg border border-ocean-500/50 hover:bg-ocean-500/80 transition-all duration-200;
+  }
+  
+  .btn-danger {
+    @apply px-6 py-3 bg-alert-500 text-white font-medium rounded-lg hover:bg-alert-600 transition-all duration-200;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .badge-error {
+    @apply bg-alert-500/20 text-alert-500 border border-alert-500/30;
+  }
+  
+  .badge-warning {
+    @apply bg-yellow-500/20 text-yellow-400 border border-yellow-500/30;
+  }
+  
+  .badge-success {
+    @apply bg-success-500/20 text-success-500 border border-success-500/30;
+  }
+  
+  .badge-info {
+    @apply bg-tech-500/20 text-tech-400 border border-tech-500/30;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-tech-400 to-tech-500 bg-clip-text text-transparent;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(10, 37, 64, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.5);
+}
+
+/* Number input spin buttons */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+  background: rgba(0, 212, 255, 0.1);
+}
+
+/* Animation classes */
+.animate-number {
+  animation: countUp 1s ease-out forwards;
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
