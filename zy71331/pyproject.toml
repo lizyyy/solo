@@ -1,0 +1,15 @@
+[project]
+name = "dj-energy-curve"
+version = "0.1.0"
+description = "DJ歌单能量曲线CLI - 分析歌单能量起伏，检测BPM误判、调性冲突和能量骤降"
+requires-python = ">=3.9"
+
+[project.scripts]
+dj-energy = "dj_energy_curve.cli:main"
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[tool.setuptools.packages.find]
+include = ["dj_energy_curve*"]
