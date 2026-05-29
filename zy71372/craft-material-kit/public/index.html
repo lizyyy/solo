@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手作课程材料包管理系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#5b6abf;--primary-light:#e8eaf6;--danger:#e74c3c;--danger-light:#fdeaea;--warning:#f39c12;--warning-light:#fef5e7;--success:#27ae60;--success-light:#eafaf1;--gray:#95a5a6;--bg:#f5f6fa;--card:#fff;--text:#2c3e50;--border:#e0e0e0;--radius:8px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.header{background:linear-gradient(135deg,#5b6abf,#7c4dff);color:#fff;padding:20px 30px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header h1{font-size:22px;font-weight:600}
+.header .stats{display:flex;gap:20px;font-size:13px;opacity:.9}
+.header .stats span{background:rgba(255,255,255,.2);padding:4px 12px;border-radius:20px}
+.tabs{display:flex;background:#fff;border-bottom:1px solid var(--border);padding:0 20px;overflow-x:auto;position:sticky;top:64px;z-index:99}
+.tab{padding:14px 22px;cursor:pointer;font-size:14px;color:var(--gray);border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.tab:hover{color:var(--primary)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.content{max-width:1200px;margin:0 auto;padding:24px}
+.panel{display:none}
+.panel.active{display:block}
+.card{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.card-header h2{font-size:17px;font-weight:600}
+.btn{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:#4a59ae}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#c0392b}
+.btn-warning{background:var(--warning);color:#fff}
+.btn-warning:hover{background:#e67e22}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#219a52}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+th{background:var(--primary-light);color:var(--primary);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+tr:hover{background:#f8f9ff}
+.badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;display:inline-block}
+.badge-success{background:var(--success-light);color:var(--success)}
+.badge-danger{background:var(--danger-light);color:var(--danger)}
+.badge-warning{background:var(--warning-light);color:var(--warning)}
+.badge-info{background:var(--primary-light);color:var(--primary)}
+.badge-gray{background:#f0f0f0;color:var(--gray)}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal{background:#fff;border-radius:var(--radius);padding:24px;width:480px;max-width:90vw;max-height:85vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.modal h3{margin-bottom:18px;font-size:17px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#555}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{border-color:var(--primary);outline:none}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.conflict-card{border-left:4px solid var(--danger);background:var(--danger-light);padding:14px;margin-bottom:10px;border-radius:0 var(--radius) var(--radius) 0}
+.conflict-card .type{font-weight:600;color:var(--danger);font-size:13px}
+.conflict-card .desc{margin:6px 0;font-size:13px}
+.conflict-card .reason{background:#fff;padding:8px;border-radius:4px;font-size:12px;color:#666;margin:6px 0}
+.conflict-card .reason::before{content:'🤖 自动判断：';font-weight:600}
+.reason-tag{background:var(--primary-light);color:var(--primary);padding:4px 10px;border-radius:4px;font-size:11px;margin:4px 2px;display:inline-block}
+.reason-tag::before{content:'📌 '}
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:20px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.stat-card .number{font-size:32px;font-weight:700;color:var(--primary)}
+.stat-card .label{font-size:13px;color:var(--gray);margin-top:4px}
+.empty-state{text-align:center;padding:40px;color:var(--gray)}
+.empty-state .icon{font-size:48px;margin-bottom:12px}
+.toast{position:fixed;top:80px;right:20px;background:#fff;padding:14px 20px;border-radius:var(--radius);box-shadow:0 4px 20px rgba(0,0,0,.15);z-index:300;max-width:380px;animation:slideIn .3s ease}
+.toast.success{border-left:4px solid var(--success)}
+.toast.error{border-left:4px solid var(--danger)}
+.toast.info{border-left:4px solid var(--primary)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.deduction-log{background:#f8f9fa;padding:10px;border-radius:6px;margin:6px 0;font-size:12px}
+.deduction-log .log-reason{color:var(--primary);font-style:italic;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧶 手作课程材料包</h1>
+  <div class="stats" id="headerStats"></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="dashboard">仪表盘</div>
+  <div class="tab" data-tab="courses">课程管理</div>
+  <div class="tab" data-tab="materials">材料库存</div>
+  <div class="tab" data-tab="substitutions">替代规则</div>
+  <div class="tab" data-tab="purchases">采购单</div>
+  <div class="tab" data-tab="conflicts">冲突处理</div>
+  <div class="tab" data-tab="reports">备料报告</div>
+</div>
+
+<div class="content">
+  <div class="panel active" id="panel-dashboard"></div>
+  <div class="panel" id="panel-courses"></div>
+  <div class="panel" id="panel-materials"></div>
+  <div class="panel" id="panel-substitutions"></div>
+  <div class="panel" id="panel-purchases"></div>
+  <div class="panel" id="panel-conflicts"></div>
+  <div class="panel" id="panel-reports"></div>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script>
+const API = '';
+let currentTab = 'dashboard';
+
+function toast(msg, type='info') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  document.getElementById('toast-root').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+async function api(path, opts={}) {
+  try {
+    const res = await fetch(API + path, {
+      headers: { 'Content-Type': 'application/json' },
+      ...opts,
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    });
+    const data = await res.json();
+    if (!res.ok) { toast(data.error || '操作失败', 'error'); throw data; }
+    return data;
+  } catch (e) {
+    if (e.error) throw e;
+    toast('网络错误', 'error');
+    throw e;
+  }
+}
+
+function badge(text, type='info') {
+  return `<span class="badge badge-${type}">${text}</span>`;
+}
+
+function conflictTypeLabel(t) {
+  const m = { insufficient_stock:'库存不足', withdraw_no_rollback:'退课未回滚', over_capacity:'超员', substitute_conflict:'替代冲突' };
+  return m[t] || t;
+}
+
+function poStatusLabel(s) {
+  const m = { pending:'待采购', ordered:'已下单', arrived:'已到货' };
+  return m[s] || s;
+}
+
+function poStatusBadge(s) {
+  const m = { pending:'warning', ordered:'info', arrived:'success' };
+  return badge(poStatusLabel(s), m[s] || 'gray');
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    const name = tab.dataset.tab;
+    currentTab = name;
+    document.getElementById('panel-' + name).classList.add('active');
+    renderPanel(name);
+  });
+});
+
+function renderPanel(name) {
+  const fns = { dashboard:renderDashboard, courses:renderCourses, materials:renderMaterials, substitutions:renderSubstitutions, purchases:renderPurchases, conflicts:renderConflicts, reports:renderReports };
+  if (fns[name]) fns[name]();
+}
+
+async function loadDashboard() {
+  return api('/api/dashboard');
+}
+
+async function renderDashboard() {
+  const d = await loadDashboard();
+  document.getElementById('headerStats').innerHTML = `
+    <span>📚 课程 ${d.course_count}</span>
+    <span>👤 在学 ${d.enrolled_total}</span>
+    <span>⚠️ 冲突 ${d.conflict_count}</span>
+    <span>📦 待采购 ${d.pending_po_count}</span>
+  `;
+  const panel = document.getElementById('panel-dashboard');
+  panel.innerHTML = `
+    <div class="dashboard-grid">
+      <div class="stat-card"><div class="number">${d.course_count}</div><div class="label">课程总数</div></div>
+      <div class="stat-card"><div class="number">${d.enrolled_total}</div><div class="label">在学人数</div></div>
+      <div class="stat-card"><div class="number">${d.withdrawn_total}</div><div class="label">退课人数</div></div>
+      <div class="stat-card"><div class="number">${d.material_count}</div><div class="label">材料种类</div></div>
+      <div class="stat-card" style="${d.conflict_count>0?'color:var(--danger)':''}"><div class="number" style="${d.conflict_count>0?'color:var(--danger)':''}">${d.conflict_count}</div><div class="label">未解决冲突</div></div>
+      <div class="stat-card" style="${d.pending_po_count>0?'color:var(--warning)':''}"><div class="number" style="${d.pending_po_count>0?'color:var(--warning)':''}">${d.pending_po_count}</div><div class="label">待采购单</div></div>
+    </div>
+    ${d.low_stock_materials.length > 0 ? `
+      <div class="card">
+        <div class="card-header"><h2>⚠️ 低库存材料</h2></div>
+        <table><tr><th>材料</th><th>单位</th><th>库存</th></tr>
+        ${d.low_stock_materials.map(m => `<tr><td>${m.name}</td><td>${m.unit}</td><td style="color:var(--danger);font-weight:600">${m.stock_qty}</td></tr>`).join('')}
+        </table>
+      </div>
+    ` : ''}
+    ${d.recent_conflicts.length > 0 ? `
+      <div class="card">
+        <div class="card-header"><h2>🚨 未解决冲突</h2></div>
+        ${d.recent_conflicts.map(c => `
+          <div class="conflict-card">
+            <div class="type">${conflictTypeLabel(c.type)}</div>
+            <div class="desc">${c.description}</div>
+            ${c.auto_reason ? `<div class="reason">${c.auto_reason}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+  `;
+}
+
+async function renderCourses() {
+  const [courses, materials] = await Promise.all([api('/api/courses'), api('/api/materials')]);
+  const panel = document.getElementById('panel-courses');
+  panel.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <h2>📚 课程列表</h2>
+        <button class="btn btn-primary" onclick="showAddCourseModal()">+ 新增课程</button>
+      </div>
+      ${courses.length === 0 ? '<div class="empty-state"><div class="icon">📚</div>暂无课程，点击右上角新增</div>' : `
+      <table>
+        <tr><th>课程名</th><th>日期</th><th>人数</th><th>状态</th><th>操作</th></tr>
+        ${courses.map(c => {
+          const statusMap = { planned:'info', active:'success', completed:'gray', cancelled:'danger' };
+          const statusLabel = { planned:'筹备中', active:'进行中', completed:'已结束', cancelled:'已取消' };
+          return `<tr>
+            <td><strong>${c.name}</strong></td>
+            <td>${c.schedule_date}</td>
+            <td>${c.enrolled_count}/${c.max_students}</td>
+            <td>${badge(statusLabel[c.status]||c.status, statusMap[c.status]||'gray')}</td>
+            <td>
+              <button class="btn btn-sm btn-outline" onclick="showCourseDetail(${c.id})">详情</button>
+              <button class="btn btn-sm btn-outline" onclick="showEnrollModal(${c.id},'${c.name}',${c.enrolled_count},${c.max_students})">报名</button>
+              <button class="btn btn-sm btn-outline" onclick="showCourseMaterialsModal(${c.id},'${c.name}')">材料</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteCourse(${c.id},'${c.name}')">删除</button>
+            </td>
+          </tr>`;
+        }).join('')}
+      </table>`}
+    </div>
+  `;
+}
+
+function showAddCourseModal() {
+  showModal('新增课程', `
+    <div class="form-group"><label>课程名</label><input id="m-name" placeholder="如：毛线编织入门"></div>
+    <div class="form-group"><label>最大人数</label><input id="m-max" type="number" value="10"></div>
+    <div class="form-group"><label>课程日期</label><input id="m-date" type="date"></div>
+  `, async () => {
+    const name = document.getElementById('m-name').value.trim();
+    const max = parseInt(document.getElementById('m-max').value) || 10;
+    const date = document.getElementById('m-date').value;
+    if (!name || !date) { toast('课程名和日期必填','error'); return; }
+    await api('/api/courses', { method:'POST', body:{ name, max_students:max, schedule_date:date }});
+    toast('课程已创建','success');
+    closeModal();
+    renderCourses();
+  });
+}
+
+async function showCourseDetail(id) {
+  const [course, enrollments, courseMats] = await Promise.all([
+    api('/api/courses').then(cs => cs.find(c => c.id === id)),
+    api(`/api/enrollments?course_id=${id}`),
+    api(`/api/courses/${id}/materials`)
+  ]);
+  const enrolled = enrollments.filter(e => e.status === 'enrolled');
+  const withdrawn = enrollments.filter(e => e.status === 'withdrawn');
+
+  showModal(`课程详情：${course.name}`, `
+    <p style="margin-bottom:12px">📅 ${course.schedule_date} | 👥 ${enrolled.length}/${course.max_students}人 | ${badge({planned:'筹备中',active:'进行中',completed:'已结束'}[course.status]||course.status, {planned:'info',active:'success',completed:'gray'}[course.status]||'info')}</p>
+    ${courseMats.length > 0 ? `<h4 style="margin:12px 0 8px">📦 材料清单</h4><table><tr><th>材料</th><th>每人用量</th><th>总需求</th><th>库存</th><th>状态</th></tr>
+    ${courseMats.map(cm => {
+      const need = enrolled.length * cm.qty_per_person;
+      const ok = cm.stock_qty >= need;
+      return `<tr><td>${cm.material_name}</td><td>${cm.qty_per_person} ${cm.unit}/人</td><td>${need}</td><td>${cm.stock_qty}</td><td>${ok ? badge('充足','success') : badge('缺'+(need-cm.stock_qty).toFixed(1),'danger')}</td></tr>`;
+    }).join('')}</table>` : '<p style="color:var(--gray)">尚未配置材料</p>'}
+    <h4 style="margin:16px 0 8px">👤 已报名 (${enrolled.length})</h4>
+    ${enrolled.length ? `<table><tr><th>学员</th><th>报名时间</th><th>材料已扣</th><th>操作</th></tr>
+    ${enrolled.map(e => `<tr><td>${e.student_name}</td><td>${e.enrolled_at}</td><td>${e.material_deducted ? badge('是','info') : badge('否','gray')}</td><td><button class="btn btn-sm btn-warning" onclick="withdrawEnrollment(${e.id})">退课</button></td></tr>`).join('')}</table>` : '<p style="color:var(--gray)">暂无报名</p>'}
+    ${withdrawn.length ? `<h4 style="margin:16px 0 8px">🚪 已退课 (${withdrawn.length})</h4><table><tr><th>学员</th><th>退课时间</th><th>材料扣减</th><th>操作</th></tr>
+    ${withdrawn.map(e => `<tr><td>${e.student_name}</td><td>${e.withdrawn_at||'-'}</td><td>${e.material_deducted ? badge('未回滚','danger') : badge('已回滚','success')}</td><td>${e.material_deducted ? `<button class="btn btn-sm btn-primary" onclick="rollbackMaterials(${e.id})">回滚材料</button>` : '-'}</td></tr>`).join('')}</table>` : ''}
+  `, null, true);
+}
+
+async function withdrawEnrollment(id) {
+  const result = await api(`/api/enrollments/${id}/withdraw`, { method:'PUT' });
+  toast('已退课。若材料已扣减，请在冲突列表处理回滚','warning');
+  closeModal();
+  renderCourses();
+}
+
+async function rollbackMaterials(id) {
+  const result = await api(`/api/enrollments/${id}/rollback-materials`, { method:'POST' });
+  toast(result.auto_reason, 'success');
+  closeModal();
+  renderCourses();
+}
+
+function showEnrollModal(courseId, courseName, enrolled, max) {
+  showModal(`报名：${courseName} (${enrolled}/${max}人)`, `
+    <div class="form-group"><label>学员姓名</label><input id="m-student" placeholder="请输入学员名"></div>
+  `, async () => {
+    const name = document.getElementById('m-student').value.trim();
+    if (!name) { toast('学员姓名必填','error'); return; }
+    await api('/api/enrollments', { method:'POST', body:{ course_id:courseId, student_name:name }});
+    toast(`${name} 已报名`,'success');
+    closeModal();
+    renderCourses();
+  });
+}
+
+async function showCourseMaterialsModal(courseId, courseName) {
+  const materials = await api('/api/materials');
+  const courseMats = await api(`/api/courses/${courseId}/materials`);
+  const selectOpts = materials.filter(m => !courseMats.find(cm => cm.material_id === m.id)).map(m => `<option value="${m.id}">${m.name} (${m.unit}, 库存${m.stock_qty})</option>`).join('');
+
+  showModal(`材料配置：${courseName}`, `
+    ${courseMats.length ? `<table><tr><th>材料</th><th>每人用量</th><th>单位</th><th>库存</th><th>操作</th></tr>
+    ${courseMats.map(cm => `<tr><td>${cm.material_name}</td><td>${cm.qty_per_person}</td><td>${cm.unit}</td><td>${cm.stock_qty}</td><td><button class="btn btn-sm btn-danger" onclick="removeCourseMaterial(${courseId},${cm.material_id})">移除</button></td></tr>`).join('')}</table>` : '<p style="color:var(--gray)">暂无材料</p>'}
+    ${selectOpts ? `<hr style="margin:16px 0"><h4>添加材料</h4>
+    <div class="form-group"><label>选择材料</label><select id="m-matid">${selectOpts}</select></div>
+    <div class="form-group"><label>每人用量</label><input id="m-qty" type="number" step="0.1" value="1"></div>
+    ` : '<p style="margin-top:12px;color:var(--gray)">所有材料已添加或无可用材料</p>'}
+  `, selectOpts ? async () => {
+    const matId = parseInt(document.getElementById('m-matid').value);
+    const qty = parseFloat(document.getElementById('m-qty').value);
+    if (!matId || !qty) { toast('请填写完整','error'); return; }
+    await api(`/api/courses/${courseId}/materials`, { method:'POST', body:{ material_id:matId, qty_per_person:qty }});
+    toast('材料已添加','success');
+    closeModal();
+    showCourseMaterialsModal(courseId, courseName);
+  } : null, true);
+}
+
+async function removeCourseMaterial(courseId, matId) {
+  await api(`/api/courses/${courseId}/materials/${matId}`, { method:'DELETE' });
+  toast('材料已移除','success');
+  closeModal();
+  renderCourses();
+}
+
+async function deleteCourse(id, name) {
+  if (!confirm(`确定删除课程"${name}"？仅无报名学员的课程可删除。`)) return;
+  try {
+    await api(`/api/courses/${id}`, { method:'DELETE' });
+    toast('课程已删除','success');
+    renderCourses();
+  } catch(e) {}
+}
+
+async function renderMaterials() {
+  const materials = await api('/api/materials');
+  const panel = document.getElementById('panel-materials');
+  panel.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <h2>📦 材料库存</h2>
+        <button class="btn btn-primary" onclick="showAddMaterialModal()">+ 新增材料</button>
+      </div>
+      ${materials.length === 0 ? '<div class="empty-state"><div class="icon">📦</div>暂无材料</div>' : `
+      <table>
+        <tr><th>名称</th><th>单位</th><th>库存</th><th>操作</th></tr>
+        ${materials.map(m => `<tr>
+          <td><strong>${m.name}</strong></td>
+          <td>${m.unit}</td>
+          <td style="${m.stock_qty < 5 ? 'color:var(--danger);font-weight:600' : ''}">${m.stock_qty}</td>
+          <td>
+            <button class="btn btn-sm btn-outline" onclick="showEditMaterialModal(${m.id},'${m.name}','${m.unit}',${m.stock_qty})">编辑</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteMaterial(${m.id},'${m.name}')">删除</button>
+          </td>
+        </tr>`).join('')}
+      </table>`}
+    </div>
+  `;
+}
+
+function showAddMaterialModal() {
+  showModal('新增材料', `
+    <div class="form-group"><label>名称</label><input id="m-name" placeholder="如：毛线团"></div>
+    <div class="form-group"><label>单位</label><input id="m-unit" value="个" placeholder="如：团、米、包"></div>
+    <div class="form-group"><label>库存数量</label><input id="m-stock" type="number" step="0.1" value="0"></div>
+  `, async () => {
+    const name = document.getElementById('m-name').value.trim();
+    if (!name) { toast('名称必填','error'); return; }
+    await api('/api/materials', { method:'POST', body:{ name, unit:document.getElementById('m-unit').value||'个', stock_qty:parseFloat(document.getElementById('m-stock').value)||0 }});
+    toast('材料已添加','success');
+    closeModal();
+    renderMaterials();
+  });
+}
+
+function showEditMaterialModal(id, name, unit, stock) {
+  showModal('编辑材料', `
+    <div class="form-group"><label>名称</label><input id="m-name" value="${name}"></div>
+    <div class="form-group"><label>单位</label><input id="m-unit" value="${unit}"></div>
+    <div class="form-group"><label>库存数量</label><input id="m-stock" type="number" step="0.1" value="${stock}"></div>
+  `, async () => {
+    await api(`/api/materials/${id}`, { method:'PUT', body:{
+      name:document.getElementById('m-name').value.trim(),
+      unit:document.getElementById('m-unit').value.trim(),
+      stock_qty:parseFloat(document.getElementById('m-stock').value)
+    }});
+    toast('材料已更新','success');
+    closeModal();
+    renderMaterials();
+  });
+}
+
+async function deleteMaterial(id, name) {
+  if (!confirm(`确定删除材料"${name}"？`)) return;
+  try {
+    await api(`/api/materials/${id}`, { method:'DELETE' });
+    toast('材料已删除','success');
+    renderMaterials();
+  } catch(e) {}
+}
+
+async function renderSubstitutions() {
+  const [rules, materials] = await Promise.all([api('/api/substitution-rules'), api('/api/materials')]);
+  const panel = document.getElementById('panel-substitutions');
+  const matOpts = materials.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+  panel.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <h2>🔄 材料替代规则</h2>
+        <button class="btn btn-primary" onclick="showAddSubModal()">+ 新增规则</button>
+      </div>
+      ${rules.length === 0 ? '<div class="empty-state"><div class="icon">🔄</div>暂无替代规则</div>' : `
+      <table>
+        <tr><th>原材</th><th>替代品</th><th>转换比例</th><th>原因</th><th>状态</th><th>操作</th></tr>
+        ${rules.map(r => `<tr>
+          <td>${r.original_name}</td>
+          <td>${r.substitute_name}</td>
+          <td>1:${r.conversion_ratio}</td>
+          <td>${r.reason}</td>
+          <td>${r.active ? badge('生效中','success') : badge('已停用','gray')}</td>
+          <td>
+            <button class="btn btn-sm btn-outline" onclick="toggleSubRule(${r.id},${r.active?0:1})">${r.active?'停用':'启用'}</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteSubRule(${r.id})">删除</button>
+          </td>
+        </tr>`).join('')}
+      </table>`}
+    </div>
+  `;
+
+  window._matOpts = matOpts;
+}
+
+function showAddSubModal() {
+  showModal('新增替代规则', `
+    <div class="form-group"><label>原材</label><select id="m-orig">${window._matOpts||''}</select></div>
+    <div class="form-group"><label>替代品</label><select id="m-sub">${window._matOpts||''}</select></div>
+    <div class="form-group"><label>转换比例（1单位原材 = ? 单位替代品）</label><input id="m-ratio" type="number" step="0.1" value="1"></div>
+    <div class="form-group"><label>替代原因</label><input id="m-reason" placeholder="如：毛线缺货时用棉线替代"></div>
+  `, async () => {
+    const orig = parseInt(document.getElementById('m-orig').value);
+    const sub = parseInt(document.getElementById('m-sub').value);
+    const reason = document.getElementById('m-reason').value.trim();
+    if (!reason) { toast('原因必填','error'); return; }
+    await api('/api/substitution-rules', { method:'POST', body:{ original_material_id:orig, substitute_material_id:sub, conversion_ratio:parseFloat(document.getElementById('m-ratio').value)||1, reason }});
+    toast('替代规则已添加','success');
+    closeModal();
+    renderSubstitutions();
+  });
+}
+
+async function toggleSubRule(id, active) {
+  await api(`/api/substitution-rules/${id}`, { method:'PUT', body:{ active }});
+  toast(active ? '规则已启用' : '规则已停用','success');
+  renderSubstitutions();
+}
+
+async function deleteSubRule(id) {
+  if (!confirm('确定删除此替代规则？')) return;
+  await api(`/api/substitution-rules/${id}`, { method:'DELETE' });
+  toast('规则已删除','success');
+  renderSubstitutions();
+}
+
+async function renderPurchases() {
+  const orders = await api('/api/purchase-orders');
+  const panel = document.getElementById('panel-purchases');
+  panel.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <h2>🛒 采购单</h2>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-warning" onclick="autoGeneratePO()">🤖 自动生成采购单</button>
+          <button class="btn btn-primary" onclick="showAddPOModal()">+ 手动新增</button>
+        </div>
+      </div>
+      ${orders.length === 0 ? '<div class="empty-state"><div class="icon">🛒</div>暂无采购单</div>' : `
+      <table>
+        <tr><th>材料</th><th>数量</th><th>状态</th><th>原因</th><th>创建时间</th><th>操作</th></tr>
+        ${orders.map(o => `<tr>
+          <td>${o.material_name}</td>
+          <td>${o.qty} ${o.unit}</td>
+          <td>${poStatusBadge(o.status)}</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${o.reason||''}">${o.reason||'-'}</td>
+          <td>${o.created_at||'-'}</td>
+          <td>
+            ${o.status==='pending'?`<button class="btn btn-sm btn-primary" onclick="updatePO(${o.id},'ordered')">下单</button>`:''}
+            ${o.status==='ordered'?`<button class="btn btn-sm btn-success" onclick="updatePO(${o.id},'arrived')">到货</button>`:''}
+            ${o.status!=='arrived'?`<button class="btn btn-sm btn-danger" onclick="deletePO(${o.id})">删除</button>`:''}
+          </td>
+        </tr>`).join('')}
+      </table>`}
+    </div>
+  `;
+}
+
+async function autoGeneratePO() {
+  const result = await api('/api/purchase-orders/auto', { method:'POST' });
+  if (result.generated > 0) {
+    toast(`${result.auto_reason}（共${result.generated}条）`, 'success');
+  } else {
+    toast(result.auto_reason, 'info');
+  }
+  renderPurchases();
+}
+
+async function showAddPOModal() {
+  const materials = await api('/api/materials');
+  const opts = materials.map(m => `<option value="${m.id}">${m.name} (${m.unit})</option>`).join('');
+  showModal('手动新增采购单', `
+    <div class="form-group"><label>材料</label><select id="m-matid">${opts}</select></div>
+    <div class="form-group"><label>数量</label><input id="m-qty" type="number" step="0.1"></div>
+    <div class="form-group"><label>原因</label><input id="m-reason" placeholder="采购原因"></div>
+  `, async () => {
+    const matId = parseInt(document.getElementById('m-matid').value);
+    const qty = parseFloat(document.getElementById('m-qty').value);
+    if (!qty) { toast('数量必填','error'); return; }
+    await api('/api/purchase-orders', { method:'POST', body:{ material_id:matId, qty, reason:document.getElementById('m-reason').value.trim()||'手动创建' }});
+    toast('采购单已创建','success');
+    closeModal();
+    renderPurchases();
+  });
+}
+
+async function updatePO(id, status) {
+  const result = await api(`/api/purchase-orders/${id}`, { method:'PUT', body:{ status }});
+  if (result.auto_reason) toast(result.auto_reason, 'success');
+  else toast('状态已更新','success');
+  renderPurchases();
+}
+
+async function deletePO(id) {
+  if (!confirm('确定删除此采购单？')) return;
+  try {
+    await api(`/api/purchase-orders/${id}`, { method:'DELETE' });
+    toast('采购单已删除','success');
+    renderPurchases();
+  } catch(e) {}
+}
+
+async function renderConflicts() {
+  const conflicts = await api('/api/conflicts');
+  const panel = document.getElementById('panel-conflicts');
+  const unresolved = conflicts.filter(c => !c.resolved);
+  const resolved = conflicts.filter(c => c.resolved);
+  panel.innerHTML = `
+    <div class="card">
+      <div class="card-header"><h2>🚨 未解决冲突 (${unresolved.length})</h2></div>
+      ${unresolved.length === 0 ? '<div class="empty-state"><div class="icon">✅</div>暂无未解决冲突</div>' :
+      unresolved.map(c => `
+        <div class="conflict-card">
+          <div style="display:flex;justify-content:space-between;align-items:start">
+            <div>
+              <div class="type">${conflictTypeLabel(c.type)}</div>
+              <div class="desc">${c.description}</div>
+              ${c.auto_reason ? `<div class="reason">${c.auto_reason}</div>` : ''}
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;margin-left:12px">
+              <button class="btn btn-sm btn-primary" onclick="resolveConflict(${c.id})">标记已解决</button>
+              <button class="btn btn-sm btn-warning" onclick="resolveAndRollback(${c.id})">解决并处理</button>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    ${resolved.length ? `
+    <div class="card">
+      <div class="card-header"><h2>✅ 已解决冲突 (${resolved.length})</h2></div>
+      <table>
+        <tr><th>类型</th><th>描述</th><th>判断理由</th><th>解决时间</th></tr>
+        ${resolved.map(c => `<tr style="opacity:.6"><td>${conflictTypeLabel(c.type)}</td><td>${c.description}</td><td><span class="reason-tag">${c.auto_reason||'手动解决'}</span></td><td>${c.resolved_at||'-'}</td></tr>`).join('')}
+      </table>
+    </div>
+    ` : ''}
+  `;
+}
+
+async function resolveConflict(id) {
+  await api(`/api/conflicts/${id}/resolve`, { method:'PUT' });
+  toast('冲突已标记为已解决','success');
+  renderConflicts();
+}
+
+async function resolveAndRollback(id) {
+  const result = await api(`/api/conflicts/${id}/resolve-and-rollback`, { method:'POST' });
+  toast(result.auto_reason, 'success');
+  renderConflicts();
+}
+
+async function renderReports() {
+  const courses = await api('/api/courses');
+  const panel = document.getElementById('panel-reports');
+  panel.innerHTML = `
+    <div class="card">
+      <div class="card-header"><h2>📊 备料报告</h2></div>
+      ${courses.length === 0 ? '<div class="empty-state"><div class="icon">📊</div>暂无课程</div>' : `
+      <table>
+        <tr><th>课程</th><th>日期</th><th>报名人数</th><th>操作</th></tr>
+        ${courses.map(c => {
+          const enrolled = c.enrolled_count || 0;
+          return `<tr>
+            <td><strong>${c.name}</strong></td>
+            <td>${c.schedule_date}</td>
+            <td>${enrolled}/${c.max_students}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="showReport(${c.id})">查看报告</button>
+              <button class="btn btn-sm btn-outline" onclick="exportReport(${c.id})">导出CSV</button>
+            </td>
+          </tr>`;
+        }).join('')}
+      </table>`}
+    </div>
+    <div id="report-detail"></div>
+  `;
+}
+
+async function showReport(courseId) {
+  const report = await api(`/api/reports/preparation/${courseId}`);
+  const detail = document.getElementById('report-detail');
+  detail.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <h2>📋 ${report.course.name} - 备料报告</h2>
+        <div style="font-size:12px;color:var(--gray)">${report.generated_at}</div>
+      </div>
+      <div style="margin-bottom:16px">
+        ${badge(`报名 ${report.enrolled_count} 人`,'info')}
+        ${badge(`退课 ${report.withdrawn_count} 人`,'warning')}
+        ${report.conflicts.length > 0 ? badge(`冲突 ${report.conflicts.length} 项`,'danger') : badge('无冲突','success')}
+      </div>
+      <div style="margin-bottom:12px"><span class="reason-tag">${report.auto_reason}</span></div>
+      ${report.materials.length === 0 ? '<p style="color:var(--gray)">尚未配置材料</p>' : `
+      <table>
+        <tr><th>材料</th><th>单位</th><th>每人用量</th><th>总需求</th><th>库存</th><th>充足?</th><th>缺口</th><th>替代方案</th></tr>
+        ${report.materials.map(m => `<tr>
+          <td>${m.material_name}</td>
+          <td>${m.unit}</td>
+          <td>${m.qty_per_person}</td>
+          <td><strong>${m.enrolled_need}</strong></td>
+          <td style="${!m.stock_sufficient?'color:var(--danger);font-weight:600':''}">${m.current_stock}</td>
+          <td>${m.stock_sufficient ? badge('是','success') : badge('否','danger')}</td>
+          <td>${m.shortage > 0 ? m.shortage.toFixed(1) : '-'}</td>
+          <td>${m.substitution ? `${m.substitution.substitute_name}(1:${m.substitution.conversion_ratio},需${m.substitution.substitute_needed.toFixed(1)})` : '-'}</td>
+        </tr>`).join('')}
+      </table>
+      ${report.materials.some(m => m.deductions.length > 0 || m.substitute_deductions.length > 0) ? `
+        <h4 style="margin:16px 0 8px">📝 扣减记录</h4>
+        ${report.materials.filter(m => m.deductions.length > 0 || m.substitute_deductions.length > 0).map(m => `
+          ${m.deductions.map(d => `<div class="deduction-log">扣减 ${m.material_name} ${d.qty} ${m.unit} (${d.enrollment_count}人) <div class="log-reason">${d.reason}</div></div>`).join('')}
+          ${m.substitute_deductions.map(d => `<div class="deduction-log">替代扣减 ${d.qty} <div class="log-reason">${d.reason}</div></div>`).join('')}
+        `).join('')}
+      ` : ''}
+      `}
+      ${report.conflicts.length > 0 ? `
+        <h4 style="margin:16px 0 8px">🚨 冲突</h4>
+        ${report.conflicts.map(c => `
+          <div class="conflict-card">
+            <div class="type">${conflictTypeLabel(c.type)}</div>
+            <div class="desc">${c.description}</div>
+            ${c.auto_reason ? `<div class="reason">${c.auto_reason}</div>` : ''}
+          </div>
+        `).join('')}
+      ` : ''}
+    </div>
+  `;
+}
+
+function exportReport(courseId) {
+  window.open(`/api/reports/preparation/${courseId}/export`, '_blank');
+}
+
+function showModal(title, body, onConfirm, wide) {
+  const root = document.getElementById('modal-root');
+  root.innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal" style="${wide?'width:680px':''}">
+        <h3>${title}</h3>
+        ${body}
+        <div class="form-actions">
+          <button class="btn btn-outline" onclick="closeModal()">关闭</button>
+          ${onConfirm ? '<button class="btn btn-primary" id="modal-confirm">确认</button>' : ''}
+        </div>
+      </div>
+    </div>
+  `;
+  if (onConfirm) {
+    document.getElementById('modal-confirm').addEventListener('click', onConfirm);
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal-root').innerHTML = '';
+}
+
+renderDashboard();
+</script>
+</body>
+</html>
