@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "'Noto Sans SC'", "'Source Han Sans SC'", system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  html {
+    font-family: "'Noto Sans SC'", "'Source Han Sans SC'", system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-neutral-50 text-neutral-900 min-h-screen;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "'Noto Serif SC'", "'Source Han Serif SC'", serif;
+    @apply font-semibold text-primary-900;
+  }
+  
+  .font-mono, .tabular-nums {
+    font-family: "'JetBrains Mono'", "'Fira Code'", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 border-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-800 border-primary-800 text-white hover:bg-primary-700 hover:border-primary-700;
+  }
+  
+  .btn-accent {
+    @apply btn bg-accent-500 border-accent-500 text-white hover:bg-accent-600 hover:border-accent-600;
+  }
+  
+  .btn-outline {
+    @apply btn bg-white border-neutral-300 text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400;
+  }
+  
+  .btn-danger {
+    @apply btn bg-conflict-withdrawn border-conflict-withdrawn text-white hover:bg-red-600 hover:border-red-600;
+  }
+  
+  .card {
+    @apply bg-white border border-neutral-200 shadow-card;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-card-hover hover:border-neutral-300;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border-2 border-neutral-300 text-sm focus:outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 transition-colors;
+  }
+  
+  .select-field {
+    @apply w-full px-3 py-2 border-2 border-neutral-300 text-sm bg-white focus:outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 transition-colors;
+  }
+  
+  .table-header {
+    @apply bg-neutral-100 text-left text-xs font-semibold text-neutral-600 uppercase tracking-wider px-4 py-3;
+  }
+  
+  .table-cell {
+    @apply px-4 py-3 text-sm text-neutral-800;
+  }
+  
+  .table-row {
+    @apply border-b border-neutral-200 transition-colors hover:bg-primary-50/30;
+  }
+  
+  .table-row-conflict {
+    @apply border-b border-conflict-date/30 bg-conflict-date/5;
+  }
+  
+  .tag {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded;
+  }
+  
+  .status-pending {
+    @apply tag bg-neutral-100 text-neutral-700 border border-neutral-300;
+  }
+  
+  .status-confirmed {
+    @apply tag bg-accent-100 text-accent-700 border border-accent-300;
+  }
+  
+  .status-exercised {
+    @apply tag bg-success-500/20 text-success-600 border border-success-500/30;
+  }
+  
+  .status-withdrawn {
+    @apply tag bg-conflict-withdrawn/10 text-conflict-withdrawn border border-conflict-withdrawn/30;
+  }
+  
+  .conflict-date {
+    @apply tag bg-conflict-date/10 text-conflict-date border border-conflict-date/30;
+  }
+  
+  .conflict-withdrawn {
+    @apply tag bg-conflict-withdrawn/10 text-conflict-withdrawn border border-conflict-withdrawn/30;
+  }
+  
+  .conflict-position {
+    @apply tag bg-conflict-position/10 text-conflict-position border border-conflict-position/30;
+  }
+  
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f7fafc;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+  }
+}
