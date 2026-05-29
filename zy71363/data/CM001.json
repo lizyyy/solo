@@ -1,0 +1,75 @@
+{
+  "id": "CM001",
+  "title": "头像插画 - 小A",
+  "client_name": "Alice",
+  "created_at": "2026-04-29T20:21:34.758952",
+  "description": "二次元风格头像，蓝发猫耳少女",
+  "status": "in_progress",
+  "max_revisions": 3,
+  "sketches": [
+    {
+      "version": 1,
+      "file_path": "./sketches/CM001_v1.png",
+      "created_at": "2026-04-30T20:21:34.758952",
+      "description": "初始草图",
+      "revisions": [
+        {
+          "version": 1,
+          "feedback": "耳朵再大一点",
+          "date": "2026-05-01T20:21:34.758952",
+          "replied_at": null,
+          "is_resolved": true,
+          "resolved_at": "2026-05-01T20:21:34.758952"
+        }
+      ]
+    },
+    {
+      "version": 2,
+      "file_path": "./sketches/CM001_v2.png",
+      "created_at": "2026-05-02T20:21:34.758952",
+      "description": "修改后草图",
+      "revisions": [
+        {
+          "version": 1,
+          "feedback": "眼睛颜色换成紫色",
+          "date": "2026-05-03T20:21:34.758952",
+          "replied_at": null,
+          "is_resolved": false,
+          "resolved_at": null
+        }
+      ]
+    }
+  ],
+  "payments": [
+    {
+      "node_type": "deposit",
+      "amount": 200.0,
+      "due_date": "2026-04-30T20:21:34.758952",
+      "paid": true,
+      "paid_at": "2026-04-30T20:21:34.758952",
+      "transaction_id": "TXN001"
+    },
+    {
+      "node_type": "final",
+      "amount": 300.0,
+      "due_date": "2026-05-13T20:21:34.758952",
+      "paid": false,
+      "paid_at": null,
+      "transaction_id": null
+    }
+  ],
+  "confirmations": [
+    {
+      "stage": "sketch",
+      "confirmed": true,
+      "confirmed_at": "2026-05-02T20:21:34.758952",
+      "screenshot_path": "./screenshots/CM001_sketch.png",
+      "notes": ""
+    }
+  ],
+  "tags": [
+    "头像",
+    "二次元"
+  ],
+  "notes": ""
+}

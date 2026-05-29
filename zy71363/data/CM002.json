@@ -1,0 +1,99 @@
+{
+  "id": "CM002",
+  "title": "商插海报 - 品牌B",
+  "client_name": "Brand Company",
+  "created_at": "2026-05-04T20:21:34.758952",
+  "description": "产品宣传海报，需要活泼可爱风格",
+  "status": "revising",
+  "max_revisions": 3,
+  "sketches": [
+    {
+      "version": 1,
+      "file_path": "./sketches/CM002_v1.png",
+      "created_at": "2026-05-05T20:21:34.758952",
+      "description": "方案A",
+      "revisions": [
+        {
+          "version": 1,
+          "feedback": "配色太暗",
+          "date": "2026-05-06T20:21:34.758952",
+          "replied_at": null,
+          "is_resolved": true,
+          "resolved_at": "2026-05-06T20:21:34.758952"
+        },
+        {
+          "version": 2,
+          "feedback": "人物位置左移",
+          "date": "2026-05-07T20:21:34.758952",
+          "replied_at": null,
+          "is_resolved": true,
+          "resolved_at": "2026-05-07T20:21:34.758952"
+        },
+        {
+          "version": 3,
+          "feedback": "LOGO放大",
+          "date": "2026-05-08T20:21:34.758952",
+          "replied_at": null,
+          "is_resolved": true,
+          "resolved_at": "2026-05-08T20:21:34.758952"
+        },
+        {
+          "version": 4,
+          "feedback": "背景换成渐变",
+          "date": "2026-05-09T20:21:34.758952",
+          "replied_at": null,
+          "is_resolved": true,
+          "resolved_at": "2026-05-09T20:21:34.758952"
+        }
+      ]
+    },
+    {
+      "version": 2,
+      "file_path": "./sketches/CM002_v2.png",
+      "created_at": "2026-05-10T20:21:34.758952",
+      "description": "方案B",
+      "revisions": [
+        {
+          "version": 1,
+          "feedback": "风格不对，要更简约",
+          "date": "2026-05-11T20:21:34.758952",
+          "replied_at": null,
+          "is_resolved": false,
+          "resolved_at": null
+        }
+      ]
+    }
+  ],
+  "payments": [
+    {
+      "node_type": "deposit",
+      "amount": 1500.0,
+      "due_date": "2026-05-04T20:21:34.758952",
+      "paid": true,
+      "paid_at": "2026-05-04T20:21:34.758952",
+      "transaction_id": null
+    },
+    {
+      "node_type": "final",
+      "amount": 3500.0,
+      "due_date": "2026-05-24T20:21:34.758952",
+      "paid": false,
+      "paid_at": null,
+      "transaction_id": null
+    }
+  ],
+  "confirmations": [
+    {
+      "stage": "sketch",
+      "confirmed": true,
+      "confirmed_at": "2026-05-10T20:21:34.758952",
+      "screenshot_path": "./screenshots/CM002_sketch.png",
+      "notes": ""
+    }
+  ],
+  "tags": [
+    "商业",
+    "海报"
+  ],
+  "notes": ""
+}

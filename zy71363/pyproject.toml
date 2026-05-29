@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "illust-board"
+version = "0.1.0"
+description = "插画委托进度看板 CLI"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+typer = "^0.9.0"
+rich = "^13.0.0"
+pydantic = "^2.0.0"
+python-dateutil = "^2.8.0"
+
+[tool.poetry.group.dev.dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+illust-board = "illust_board.cli:app"

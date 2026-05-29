@@ -1,0 +1,73 @@
+{
+  "id": "CM005",
+  "title": "书籍封面",
+  "client_name": "出版社E",
+  "created_at": "2026-05-01T20:21:34.758952",
+  "description": "科幻小说封面设计",
+  "status": "completed",
+  "max_revisions": 3,
+  "sketches": [
+    {
+      "version": 1,
+      "file_path": "./sketches/CM005_v1.png",
+      "created_at": "2026-05-02T20:21:34.758952",
+      "description": "",
+      "revisions": [
+        {
+          "version": 1,
+          "feedback": "字体再大一点",
+          "date": "2026-05-03T20:21:34.758952",
+          "replied_at": null,
+          "is_resolved": true,
+          "resolved_at": "2026-05-03T20:21:34.758952"
+        }
+      ]
+    },
+    {
+      "version": 2,
+      "file_path": "./sketches/CM005_v2.png",
+      "created_at": "2026-05-04T20:21:34.758952",
+      "description": "",
+      "revisions": []
+    }
+  ],
+  "payments": [
+    {
+      "node_type": "deposit",
+      "amount": 500.0,
+      "due_date": "2026-05-01T20:21:34.758952",
+      "paid": true,
+      "paid_at": "2026-05-01T20:21:34.758952",
+      "transaction_id": null
+    },
+    {
+      "node_type": "final",
+      "amount": 1000.0,
+      "due_date": "2026-05-09T20:21:34.758952",
+      "paid": true,
+      "paid_at": "2026-05-09T20:21:34.758952",
+      "transaction_id": null
+    }
+  ],
+  "confirmations": [
+    {
+      "stage": "sketch",
+      "confirmed": true,
+      "confirmed_at": "2026-05-05T20:21:34.758952",
+      "screenshot_path": "./screenshots/CM005_sketch.png",
+      "notes": ""
+    },
+    {
+      "stage": "final",
+      "confirmed": true,
+      "confirmed_at": "2026-05-11T20:21:34.758952",
+      "screenshot_path": "./screenshots/CM005_final.png",
+      "notes": ""
+    }
+  ],
+  "tags": [
+    "封面",
+    "书籍"
+  ],
+  "notes": ""
+}
