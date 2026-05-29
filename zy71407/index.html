@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商户退款清算滞留</title>
+<style>
+:root {
+  --bg: #f5f6fa;
+  --card: #ffffff;
+  --border: #e4e7ed;
+  --text: #1d2129;
+  --text-secondary: #4e5969;
+  --text-muted: #86909c;
+  --primary: #165dff;
+  --primary-light: #e8f3ff;
+  --danger: #f53f3f;
+  --danger-light: #ffece8;
+  --warning: #ff7d00;
+  --warning-light: #fff7e8;
+  --success: #00b42a;
+  --success-light: #e8ffea;
+  --purple: #722ed1;
+  --purple-light: #f5e8ff;
+  --cyan: #0fc6c2;
+  --cyan-light: #e8fffb;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.app-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.app-header .header-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.app-header .header-meta .data-date {
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.main-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title .icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #fff;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.filter-group select,
+.filter-group input {
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--text);
+  background: #fff;
+  min-width: 140px;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(22,93,255,0.1);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.btn {
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #4080ff;
+}
+
+.btn-outline {
+  background: #fff;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.summary-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-item .summary-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.summary-item .summary-value {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.summary-item .summary-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.summary-item.total .summary-value { color: var(--primary); }
+.summary-item.receipt-late .summary-value { color: var(--warning); }
+.summary-item.balance-frozen .summary-value { color: var(--danger); }
+.summary-item.duplicate .summary-value { color: var(--purple); }
+
+.chart-and-detail {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 20px;
+}
+
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bar-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.bar-label-row .bar-name { color: var(--text-secondary); }
+.bar-label-row .bar-count { font-weight: 600; }
+
+.bar-track {
+  height: 8px;
+  background: var(--bg);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.bar-fill.receipt-late { background: var(--warning); }
+.bar-fill.balance-frozen { background: var(--danger); }
+.bar-fill.duplicate { background: var(--purple); }
+.bar-fill.normal { background: var(--success); }
+
+.conflict-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.legend-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 13px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.legend-item .legend-text {
+  color: var(--text-secondary);
+}
+
+.legend-item .legend-text strong {
+  color: var(--text);
+}
+
+.detail-table-wrap {
+  overflow-x: auto;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.detail-table th {
+  background: var(--bg);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.detail-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: top;
+}
+
+.detail-table tr:hover td {
+  background: var(--primary-light);
+}
+
+.tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.tag-success { background: var(--success-light); color: var(--success); }
+.tag-danger { background: var(--danger-light); color: var(--danger); }
+.tag-warning { background: var(--warning-light); color: var(--warning); }
+.tag-purple { background: var(--purple-light); color: var(--purple); }
+.tag-cyan { background: var(--cyan-light); color: var(--cyan); }
+.tag-muted { background: #f2f3f5; color: var(--text-muted); }
+
+.conflict-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.explanation-col {
+  max-width: 220px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.state-machine-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.state-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.state-node {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #fff;
+  position: relative;
+}
+
+.state-node.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.state-node .state-code {
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 130px;
+}
+
+.state-node .state-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.state-arrow {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  position: relative;
+}
+
+.state-arrow::before {
+  content: "↓";
+  font-size: 16px;
+}
+
+.state-arrow .arrow-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.business-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rule-item {
+  padding: 12px 16px;
+  border-radius: 6px;
+  border-left: 3px solid;
+}
+
+.rule-item.reconciliation {
+  background: var(--cyan-light);
+  border-left-color: var(--cyan);
+}
+
+.rule-item.idempotent {
+  background: var(--purple-light);
+  border-left-color: var(--purple);
+}
+
+.rule-item.state-machine {
+  background: var(--primary-light);
+  border-left-color: var(--primary);
+}
+
+.rule-item .rule-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.rule-item .rule-explain {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.record-detail-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+
+.record-detail-modal.visible {
+  display: flex;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 8px;
+  width: 720px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 24px 28px;
+}
+
+.modal-content h3 {
+  font-size: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-section {
+  margin-bottom: 16px;
+}
+
+.modal-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.modal-field {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 4px 12px;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.modal-field .field-label {
+  color: var(--text-muted);
+}
+
+.modal-field .field-value {
+  color: var(--text);
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--text-muted);
+}
+
+.pulse-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.amount { font-family: "SF Mono", "Fira Code", monospace; font-size: 13px; }
+
+.expand-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+}
+
+.expand-btn:hover {
+  text-decoration: underline;
+}
+
+.disclaimer-bar {
+  background: var(--warning-light);
+  border: 1px solid #ffe4ba;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: #7d5a00;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.disclaimer-bar .disclaimer-icon {
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .chart-and-detail {
+    grid-template-columns: 1fr;
+  }
+  .summary-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .state-machine-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .summary-row {
+    grid-template-columns: 1fr;
+  }
+  .main-container {
+    padding: 16px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>商户退款清算滞留</h1>
+  <div class="header-meta">
+    <span class="data-date" id="dataDate"></span>
+    <span>数据口径：退款单 × 渠道回执 × 商户余额</span>
+  </div>
+</div>
+
+<div class="main-container">
+
+  <div class="card">
+    <div class="card-title">
+      <span class="icon" style="background:var(--primary);">⊘</span>
+      筛选条件
+    </div>
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>滞留类型</label>
+        <select id="filterConflict">
+          <option value="all">全部类型</option>
+          <option value="RECEIPT_LATE">回执晚到</option>
+          <option value="BALANCE_FROZEN">余额冻结</option>
+          <option value="DUPLICATE_RESEND">重复补发</option>
+          <option value="NONE">无冲突（顺利流程）</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>退款状态</label>
+        <select id="filterStatus">
+          <option value="all">全部状态</option>
+          <option value="INITIATED">已发起</option>
+          <option value="CHANNEL_SUBMITTED">已提交渠道</option>
+          <option value="CHANNEL_SUCCESS">渠道确认成功</option>
+          <option value="CHANNEL_FAILED">渠道确认失败</option>
+          <option value="SETTLED">已清算到账</option>
+          <option value="TIMEOUT">超时未回执</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>商户</label>
+        <select id="filterMerchant">
+          <option value="all">全部商户</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>是否需人工补资料</label>
+        <select id="filterManual">
+          <option value="all">不限</option>
+          <option value="yes">需要</option>
+          <option value="no">不需要</option>
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-primary" onclick="applyFilters()">查询</button>
+        <button class="btn btn-outline" onclick="resetFilters()">重置</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer-bar">
+    <span class="disclaimer-icon">⚠</span>
+    <span>口径说明：本页面按退款单、渠道回执、商户余额三类数据交叉比对。当数据冲突时，系统仅标注冲突类型和原始口径，不替业务修改判定结果。需人工确认的记录已单独标出。</span>
+  </div>
+
+  <div class="summary-row" id="summaryRow"></div>
+
+  <div class="chart-and-detail">
+    <div class="card chart-container">
+      <div class="card-title">
+        <span class="icon" style="background:var(--warning);">▤</span>
+        滞留分类分布
+      </div>
+      <div class="bar-chart" id="barChart"></div>
+      <div class="conflict-legend">
+        <div class="legend-item">
+          <span class="legend-dot" style="background:var(--warning);"></span>
+          <span class="legend-text"><strong>回执晚到</strong>：渠道回执到达时间晚于预期T+N，退款单已提交但清算挂起</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:var(--danger);"></span>
+          <span class="legend-text"><strong>余额冻结</strong>：商户可用余额不足或被冻结，退款无法完成清算划拨</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:var(--purple);"></span>
+          <span class="legend-text"><strong>重复补发</strong>：同一退款单出现多次渠道提交或补发请求，需幂等判断</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:var(--success);"></span>
+          <span class="legend-text"><strong>无冲突</strong>：三类数据口径一致，流程顺利</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="icon" style="background:var(--danger);">☰</span>
+        滞留明细
+        <span style="font-weight:400;font-size:12px;color:var(--text-muted);margin-left:auto;" id="detailCount"></span>
+      </div>
+      <div class="detail-table-wrap">
+        <table class="detail-table" id="detailTable">
+          <thead>
+            <tr>
+              <th>退款单号</th>
+              <th>商户</th>
+              <th>退款金额</th>
+              <th>退款状态</th>
+              <th>冲突类型</th>
+              <th>渠道回执</th>
+              <th>商户余额</th>
+              <th>业务解释</th>
+              <th>需补资料</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="detailBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        没有匹配的滞留记录
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="icon" style="background:var(--primary);">⬡</span>
+      退款状态机与业务规则说明
+    </div>
+    <div class="state-machine-section">
+      <div class="state-flow" id="stateFlow"></div>
+      <div class="business-rules">
+        <div class="rule-item state-machine">
+          <div class="rule-title">退款状态机</div>
+          <div class="rule-explain">
+            退款从「发起」到「清算到账」经历六个状态。每一步流转都要求上游数据（渠道回执或商户余额）先到位，否则停在当前状态并标记滞留原因。状态只向前流转或因失败回退，不会跳步。<br>
+            <strong>业务含义</strong>：只要看到状态就能判断退款卡在哪一步，不需要查日志。
+          </div>
+        </div>
+        <div class="rule-item reconciliation">
+          <div class="rule-title">渠道对账</div>
+          <div class="rule-explain">
+            渠道回执和退款单按「退款单号 + 渠道编码」匹配。匹配成功后，以渠道回执的最终状态为准——如果退款单标记成功但渠道返回失败，按渠道失败处理，并标注口径冲突。<br>
+            <strong>业务含义</strong>：两边说法不一致时，以渠道实际结果为准，但会把不一致的地方亮出来让你确认，不会自动改你那边的记录。
+          </div>
+        </div>
+        <div class="rule-item idempotent">
+          <div class="rule-title">补发幂等</div>
+          <div class="rule-explain">
+            同一笔退款如果被多次提交到渠道（补发），以渠道第一次成功回执为准，后续重复回执不会重复清算。系统检测到同一退款单号出现多条渠道回执时，标记为「重复补发」，并列出所有回执时间和状态。<br>
+            <strong>业务含义</strong>：补发不会导致重复扣款，但你需要确认是不是真的补发了，还是数据有误。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="record-detail-modal" id="detailModal">
+  <div class="modal-content" style="position:relative;">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+var REFUND_STATES = {
+  INITIATED: { label: '已发起', tag: 'tag-muted' },
+  CHANNEL_SUBMITTED: { label: '已提交渠道', tag: 'tag-cyan' },
+  CHANNEL_SUCCESS: { label: '渠道确认成功', tag: 'tag-success' },
+  CHANNEL_FAILED: { label: '渠道确认失败', tag: 'tag-danger' },
+  SETTLED: { label: '已清算到账', tag: 'tag-success' },
+  TIMEOUT: { label: '超时未回执', tag: 'tag-warning' }
+};
+
+var CONFLICT_TYPES = {
+  RECEIPT_LATE: { label: '回执晚到', tag: 'tag-warning', barClass: 'receipt-late' },
+  BALANCE_FROZEN: { label: '余额冻结', tag: 'tag-danger', barClass: 'balance-frozen' },
+  DUPLICATE_RESEND: { label: '重复补发', tag: 'tag-purple', barClass: 'duplicate' },
+  NONE: { label: '无冲突', tag: 'tag-success', barClass: 'normal' }
+};
+
+var STATE_FLOW = [
+  { code: 'INITIATED', label: '已发起', desc: '退款单创建，等待提交渠道' },
+  { code: 'CHANNEL_SUBMITTED', label: '已提交渠道', desc: '退款请求已发送至支付渠道' },
+  { code: 'CHANNEL_SUCCESS', label: '渠道确认成功', desc: '渠道返回退款成功确认' },
+  { code: 'SETTLED', label: '已清算到账', desc: '退款金额已划拨至用户账户' }
+];
+
+var SAMPLE_DATA = [
+  {
+    refund_id: 'RF202605300001',
+    merchant_id: 'M001',
+    merchant_name: '盛和数码专营店',
+    original_order_id: 'OD202605250012',
+    amount: 299.00,
+    reason: '用户申请退货退款',
+    status: 'SETTLED',
+    create_time: '2026-05-26 09:15:00',
+    update_time: '2026-05-27 14:30:00',
+    conflict_type: 'NONE',
+    need_manual: false,
+    channel_receipts: [
+      { receipt_id: 'CR202605260001', channel_code: 'WX', channel_name: '微信支付', channel_status: 'SUCCESS', receipt_time: '2026-05-26 09:20:00' }
+    ],
+    merchant_balance: { frozen_amount: 0, available_amount: 58000.00, total_amount: 58000.00, snapshot_time: '2026-05-27 14:30:00' },
+    business_explanation: '退款三步顺利完成：渠道T+0回执，商户余额充足，清算T+1到账。'
+  },
+  {
+    refund_id: 'RF202605300002',
+    merchant_id: 'M002',
+    merchant_name: '优品家居旗舰店',
+    original_order_id: 'OD202605230045',
+    amount: 1580.00,
+    reason: '商品质量问题',
+    status: 'CHANNEL_SUBMITTED',
+    create_time: '2026-05-23 16:40:00',
+    update_time: '2026-05-28 10:00:00',
+    conflict_type: 'RECEIPT_LATE',
+    need_manual: false,
+    channel_receipts: [
+      { receipt_id: 'CR202605280001', channel_code: 'ALI', channel_name: '支付宝', channel_status: 'PROCESSING', receipt_time: '2026-05-28 09:50:00' }
+    ],
+    merchant_balance: { frozen_amount: 1580.00, available_amount: 12420.00, total_amount: 14000.00, snapshot_time: '2026-05-28 10:00:00' },
+    business_explanation: '回执晚到：退款5月23日提交渠道，预期T+1回执，实际5月28日才收到，超出5天。渠道状态仍为处理中，退款挂起。口径以渠道回执时间为准。'
+  },
+  {
+    refund_id: 'RF202605300003',
+    merchant_id: 'M003',
+    merchant_name: '鲜达生活超市',
+    original_order_id: 'OD202605200078',
+    amount: 86.50,
+    reason: '未收到商品',
+    status: 'CHANNEL_SUCCESS',
+    create_time: '2026-05-20 11:30:00',
+    update_time: '2026-05-22 09:00:00',
+    conflict_type: 'BALANCE_FROZEN',
+    need_manual: true,
+    channel_receipts: [
+      { receipt_id: 'CR202605210001', channel_code: 'WX', channel_name: '微信支付', channel_status: 'SUCCESS', receipt_time: '2026-05-21 08:45:00' }
+    ],
+    merchant_balance: { frozen_amount: 0, available_amount: 32.10, total_amount: 32.10, snapshot_time: '2026-05-22 09:00:00' },
+    business_explanation: '余额冻结：渠道已确认退款成功，但商户可用余额仅32.10元，不足以覆盖86.50元退款清算划拨。需商户充值或解冻后才能完成清算。系统不自动调整商户余额口径。'
+  },
+  {
+    refund_id: 'RF202605300004',
+    merchant_id: 'M001',
+    merchant_name: '盛和数码专营店',
+    original_order_id: 'OD202605180033',
+    amount: 459.00,
+    reason: '发货延迟',
+    status: 'CHANNEL_SUCCESS',
+    create_time: '2026-05-18 14:20:00',
+    update_time: '2026-05-25 17:30:00',
+    conflict_type: 'DUPLICATE_RESEND',
+    need_manual: true,
+    channel_receipts: [
+      { receipt_id: 'CR202605190001', channel_code: 'WX', channel_name: '微信支付', channel_status: 'SUCCESS', receipt_time: '2026-05-19 09:10:00' },
+      { receipt_id: 'CR202605240001', channel_code: 'WX', channel_name: '微信支付', channel_status: 'SUCCESS', receipt_time: '2026-05-24 16:40:00' }
+    ],
+    merchant_balance: { frozen_amount: 459.00, available_amount: 57541.00, total_amount: 58000.00, snapshot_time: '2026-05-25 17:30:00' },
+    business_explanation: '重复补发：同一退款单出现2条渠道回执（5/19和5/24），以首次成功回执(5/19)为准，不重复清算。需确认5/24补发是否为业务操作，还是系统异常重试。'
+  },
+  {
+    refund_id: 'RF202605300005',
+    merchant_id: 'M004',
+    merchant_name: '恒通通讯设备',
+    original_order_id: 'OD202605150021',
+    amount: 3299.00,
+    reason: '商品与描述不符',
+    status: 'CHANNEL_SUBMITTED',
+    create_time: '2026-05-15 10:00:00',
+    update_time: '2026-05-30 09:00:00',
+    conflict_type: 'RECEIPT_LATE',
+    need_manual: true,
+    channel_receipts: [],
+    merchant_balance: { frozen_amount: 3299.00, available_amount: 8701.00, total_amount: 12000.00, snapshot_time: '2026-05-30 09:00:00' },
+    business_explanation: '回执晚到：退款5月15日提交渠道，至今(5/30)已15天未收到回执，状态为超时。退款单口径为"已提交"，渠道口径为"无回执"，两者冲突。需人工联系渠道确认退款结果后补录回执。'
+  },
+  {
+    refund_id: 'RF202605300006',
+    merchant_id: 'M002',
+    merchant_name: '优品家居旗舰店',
+    original_order_id: 'OD202605220019',
+    amount: 426.00,
+    reason: '用户取消订单',
+    status: 'SETTLED',
+    create_time: '2026-05-22 08:30:00',
+    update_time: '2026-05-24 11:00:00',
+    conflict_type: 'NONE',
+    need_manual: false,
+    channel_receipts: [
+      { receipt_id: 'CR202605220002', channel_code: 'ALI', channel_name: '支付宝', channel_status: 'SUCCESS', receipt_time: '2026-05-22 10:20:00' }
+    ],
+    merchant_balance: { frozen_amount: 0, available_amount: 14000.00, total_amount: 14000.00, snapshot_time: '2026-05-24 11:00:00' },
+    business_explanation: '退款流程顺利：T+0渠道回执，T+2清算到账，三类数据口径一致。'
+  },
+  {
+    refund_id: 'RF202605300007',
+    merchant_id: 'M005',
+    merchant_name: '锦程教育用品',
+    original_order_id: 'OD202605120056',
+    amount: 1280.00,
+    reason: '课程退款',
+    status: 'CHANNEL_SUCCESS',
+    create_time: '2026-05-12 15:45:00',
+    update_time: '2026-05-29 10:00:00',
+    conflict_type: 'BALANCE_FROZEN',
+    need_manual: true,
+    channel_receipts: [
+      { receipt_id: 'CR202605140001', channel_code: 'WX', channel_name: '微信支付', channel_status: 'SUCCESS', receipt_time: '2026-05-14 09:30:00' }
+    ],
+    merchant_balance: { frozen_amount: 12800.00, available_amount: 0, total_amount: 12800.00, snapshot_time: '2026-05-29 10:00:00' },
+    business_explanation: '余额冻结：商户全部余额12800元已被冻结（可能是风控或司法冻结），可用余额为0，无法完成1280元退款清算。需确认冻结原因并解冻。系统不自动修改余额口径。'
+  },
+  {
+    refund_id: 'RF202605300008',
+    merchant_id: 'M003',
+    merchant_name: '鲜达生活超市',
+    original_order_id: 'OD202605270011',
+    amount: 35.80,
+    reason: '多收运费',
+    status: 'INITIATED',
+    create_time: '2026-05-28 17:00:00',
+    update_time: '2026-05-28 17:00:00',
+    conflict_type: 'NONE',
+    need_manual: false,
+    channel_receipts: [],
+    merchant_balance: { frozen_amount: 0, available_amount: 32.10, total_amount: 32.10, snapshot_time: '2026-05-28 17:00:00' },
+    business_explanation: '退款单刚发起，尚未提交渠道，无冲突。正常流程中。'
+  }
+];
+
+var filteredData = [];
+
+function initData() {
+  document.getElementById('dataDate').textContent = '数据日期：2026-05-30';
+
+  var merchantSelect = document.getElementById('filterMerchant');
+  var merchants = {};
+  SAMPLE_DATA.forEach(function(d) {
+    if (!merchants[d.merchant_id]) {
+      merchants[d.merchant_id] = d.merchant_name;
+    }
+  });
+  Object.keys(merchants).sort().forEach(function(mid) {
+    var opt = document.createElement('option');
+    opt.value = mid;
+    opt.textContent = merchants[mid];
+    merchantSelect.appendChild(opt);
+  });
+
+  renderStateFlow();
+  applyFilters();
+}
+
+function applyFilters() {
+  var conflictFilter = document.getElementById('filterConflict').value;
+  var statusFilter = document.getElementById('filterStatus').value;
+  var merchantFilter = document.getElementById('filterMerchant').value;
+  var manualFilter = document.getElementById('filterManual').value;
+
+  filteredData = SAMPLE_DATA.filter(function(d) {
+    if (conflictFilter !== 'all' && d.conflict_type !== conflictFilter) return false;
+    if (statusFilter !== 'all' && d.status !== statusFilter) return false;
+    if (merchantFilter !== 'all' && d.merchant_id !== merchantFilter) return false;
+    if (manualFilter === 'yes' && !d.need_manual) return false;
+    if (manualFilter === 'no' && d.need_manual) return false;
+    return true;
+  });
+
+  renderSummary();
+  renderChart();
+  renderDetail();
+}
+
+function resetFilters() {
+  document.getElementById('filterConflict').value = 'all';
+  document.getElementById('filterStatus').value = 'all';
+  document.getElementById('filterMerchant').value = 'all';
+  document.getElementById('filterManual').value = 'all';
+  applyFilters();
+}
+
+function renderSummary() {
+  var total = filteredData.length;
+  var receiptLate = 0, balanceFrozen = 0, duplicate = 0;
+  filteredData.forEach(function(d) {
+    if (d.conflict_type === 'RECEIPT_LATE') receiptLate++;
+    if (d.conflict_type === 'BALANCE_FROZEN') balanceFrozen++;
+    if (d.conflict_type === 'DUPLICATE_RESEND') duplicate++;
+  });
+
+  document.getElementById('summaryRow').innerHTML =
+    '<div class="summary-item total"><span class="summary-label">滞留总数</span><span class="summary-value">' + total + '</span><span class="summary-sub">笔退款涉及滞留或冲突</span></div>' +
+    '<div class="summary-item receipt-late"><span class="summary-label">回执晚到</span><span class="summary-value">' + receiptLate + '</span><span class="summary-sub">渠道回执超出预期时效</span></div>' +
+    '<div class="summary-item balance-frozen"><span class="summary-label">余额冻结</span><span class="summary-value">' + balanceFrozen + '</span><span class="summary-sub">商户余额不足或被冻结</span></div>' +
+    '<div class="summary-item duplicate"><span class="summary-label">重复补发</span><span class="summary-value">' + duplicate + '</span><span class="summary-sub">同退款多次渠道提交</span></div>';
+}
+
+function renderChart() {
+  var counts = { RECEIPT_LATE: 0, BALANCE_FROZEN: 0, DUPLICATE_RESEND: 0, NONE: 0 };
+  filteredData.forEach(function(d) { counts[d.conflict_type]++; });
+  var maxCount = Math.max(1, Math.max(counts.RECEIPT_LATE, counts.BALANCE_FROZEN, counts.DUPLICATE_RESEND, counts.NONE));
+
+  var items = [
+    { key: 'RECEIPT_LATE', label: '回执晚到', cls: 'receipt-late' },
+    { key: 'BALANCE_FROZEN', label: '余额冻结', cls: 'balance-frozen' },
+    { key: 'DUPLICATE_RESEND', label: '重复补发', cls: 'duplicate' },
+    { key: 'NONE', label: '无冲突', cls: 'normal' }
+  ];
+
+  var html = '';
+  items.forEach(function(item) {
+    var pct = Math.round((counts[item.key] / maxCount) * 100);
+    html += '<div class="bar-row">' +
+      '<div class="bar-label-row"><span class="bar-name">' + item.label + '</span><span class="bar-count">' + counts[item.key] + ' 笔</span></div>' +
+      '<div class="bar-track"><div class="bar-fill ' + item.cls + '" style="width:' + pct + '%;"></div></div>' +
+      '</div>';
+  });
+  document.getElementById('barChart').innerHTML = html;
+}
+
+function renderDetail() {
+  var tbody = document.getElementById('detailBody');
+  var emptyState = document.getElementById('emptyState');
+  document.getElementById('detailCount').textContent = '共 ' + filteredData.length + ' 条';
+
+  if (filteredData.length === 0) {
+    tbody.innerHTML = '';
+    emptyState.style.display = 'block';
+    return;
+  }
+  emptyState.style.display = 'none';
+
+  var html = '';
+  filteredData.forEach(function(d, idx) {
+    var stateInfo = REFUND_STATES[d.status];
+    var conflictInfo = CONFLICT_TYPES[d.conflict_type];
+
+    var receiptHtml = '—';
+    if (d.channel_receipts.length > 0) {
+      receiptHtml = d.channel_receipts.map(function(r) {
+        return '<div style="font-size:12px;">' + r.channel_name + ' · ' + r.channel_status + '<br><span style="color:var(--text-muted);">' + r.receipt_time + '</span></div>';
+      }).join('<hr style="border:none;border-top:1px dashed var(--border);margin:4px 0;">');
+    }
+
+    var balanceHtml = '<div style="font-size:12px;">可用: <span class="amount">' + d.merchant_balance.available_amount.toFixed(2) + '</span></div>';
+    if (d.merchant_balance.frozen_amount > 0) {
+      balanceHtml += '<div style="font-size:12px;color:var(--danger);">冻结: <span class="amount">' + d.merchant_balance.frozen_amount.toFixed(2) + '</span></div>';
+    }
+
+    var conflictBadge = '<span class="tag ' + conflictInfo.tag + '">' + conflictInfo.label + '</span>';
+    if (d.conflict_type !== 'NONE') {
+      conflictBadge += ' <span class="pulse-dot" style="background:' + getConflictColor(d.conflict_type) + ';"></span>';
+    }
+
+    var manualHtml = d.need_manual
+      ? '<span class="tag tag-danger">需要</span>'
+      : '<span class="tag tag-muted">不需要</span>';
+
+    var explainShort = d.business_explanation.length > 40
+      ? d.business_explanation.substring(0, 40) + '…'
+      : d.business_explanation;
+
+    html += '<tr>' +
+      '<td><span style="font-family:monospace;font-size:12px;">' + d.refund_id + '</span></td>' +
+      '<td>' + d.merchant_name + '</td>' +
+      '<td><span class="amount">¥' + d.amount.toFixed(2) + '</span></td>' +
+      '<td><span class="tag ' + stateInfo.tag + '">' + stateInfo.label + '</span></td>' +
+      '<td>' + conflictBadge + '</td>' +
+      '<td>' + receiptHtml + '</td>' +
+      '<td>' + balanceHtml + '</td>' +
+      '<td class="explanation-col">' + explainShort + '</td>' +
+      '<td>' + manualHtml + '</td>' +
+      '<td><button class="expand-btn" onclick="openModal(' + idx + ')">详情</button></td>' +
+      '</tr>';
+  });
+
+  tbody.innerHTML = html;
+}
+
+function getConflictColor(type) {
+  switch (type) {
+    case 'RECEIPT_LATE': return 'var(--warning)';
+    case 'BALANCE_FROZEN': return 'var(--danger)';
+    case 'DUPLICATE_RESEND': return 'var(--purple)';
+    default: return 'var(--success)';
+  }
+}
+
+function openModal(idx) {
+  var d = filteredData[idx];
+  var stateInfo = REFUND_STATES[d.status];
+  var conflictInfo = CONFLICT_TYPES[d.conflict_type];
+
+  document.getElementById('modalTitle').textContent = '退款滞留详情 — ' + d.refund_id;
+
+  var receiptRows = '';
+  if (d.channel_receipts.length === 0) {
+    receiptRows = '<div style="color:var(--text-muted);font-size:13px;">暂无渠道回执</div>';
+  } else {
+    d.channel_receipts.forEach(function(r, i) {
+      receiptRows += '<div class="modal-field">' +
+        '<span class="field-label">回执 #' + (i + 1) + '</span>' +
+        '<span class="field-value">' + r.receipt_id + ' | ' + r.channel_name + ' | ' + r.channel_status + ' | ' + r.receipt_time + '</span>' +
+        '</div>';
+    });
+    if (d.channel_receipts.length > 1) {
+      receiptRows += '<div style="margin-top:8px;padding:8px 12px;background:var(--purple-light);border-radius:4px;font-size:12px;color:var(--purple);">检测到多条回执，以首次成功回执为准，不重复清算。请确认是否为业务补发操作。</div>';
+    }
+  }
+
+  var conflictDetail = '';
+  if (d.conflict_type === 'RECEIPT_LATE') {
+    conflictDetail = '<div style="padding:8px 12px;background:var(--warning-light);border-radius:4px;font-size:12px;color:#7d5a00;margin-top:8px;">口径标注：退款单显示「' + stateInfo.label + '」，渠道回执' + (d.channel_receipts.length > 0 ? '显示「' + d.channel_receipts[0].channel_status + '」' : '为空') + '。系统不修改任何一方口径，需人工确认最终状态。</div>';
+  } else if (d.conflict_type === 'BALANCE_FROZEN') {
+    conflictDetail = '<div style="padding:8px 12px;background:var(--danger-light);border-radius:4px;font-size:12px;color:var(--danger);margin-top:8px;">口径标注：渠道确认退款成功，但商户可用余额(¥' + d.merchant_balance.available_amount.toFixed(2) + ')不足以完成清算。系统不自动调整余额，需确认冻结原因。</div>';
+  } else if (d.conflict_type === 'DUPLICATE_RESEND') {
+    conflictDetail = '<div style="padding:8px 12px;background:var(--purple-light);border-radius:4px;font-size:12px;color:var(--purple);margin-top:8px;">口径标注：同一退款单号出现 ' + d.channel_receipts.length + ' 条渠道回执。首次成功回执作为清算依据，后续回执仅记录。需确认是否为业务补发操作。</div>';
+  }
+
+  var html =
+    '<div class="modal-section">' +
+      '<h4>退款单信息</h4>' +
+      '<div class="modal-field"><span class="field-label">退款单号</span><span class="field-value" style="font-family:monospace;">' + d.refund_id + '</span></div>' +
+      '<div class="modal-field"><span class="field-label">原订单号</span><span class="field-value" style="font-family:monospace;">' + d.original_order_id + '</span></div>' +
+      '<div class="modal-field"><span class="field-label">商户</span><span class="field-value">' + d.merchant_name + ' (' + d.merchant_id + ')</span></div>' +
+      '<div class="modal-field"><span class="field-label">退款金额</span><span class="field-value amount">¥' + d.amount.toFixed(2) + '</span></div>' +
+      '<div class="modal-field"><span class="field-label">退款原因</span><span class="field-value">' + d.reason + '</span></div>' +
+      '<div class="modal-field"><span class="field-label">退款状态</span><span class="field-value"><span class="tag ' + stateInfo.tag + '">' + stateInfo.label + '</span></span></div>' +
+      '<div class="modal-field"><span class="field-label">创建时间</span><span class="field-value">' + d.create_time + '</span></div>' +
+      '<div class="modal-field"><span class="field-label">更新时间</span><span class="field-value">' + d.update_time + '</span></div>' +
+    '</div>' +
+    '<div class="modal-section">' +
+      '<h4>渠道回执</h4>' +
+      receiptRows +
+    '</div>' +
+    '<div class="modal-section">' +
+      '<h4>商户余额快照</h4>' +
+      '<div class="modal-field"><span class="field-label">可用余额</span><span class="field-value amount">¥' + d.merchant_balance.available_amount.toFixed(2) + '</span></div>' +
+      '<div class="modal-field"><span class="field-label">冻结金额</span><span class="field-value amount" style="' + (d.merchant_balance.frozen_amount > 0 ? 'color:var(--danger);' : '') + '">¥' + d.merchant_balance.frozen_amount.toFixed(2) + '</span></div>' +
+      '<div class="modal-field"><span class="field-label">余额总计</span><span class="field-value amount">¥' + d.merchant_balance.total_amount.toFixed(2) + '</span></div>' +
+      '<div class="modal-field"><span class="field-label">快照时间</span><span class="field-value">' + d.merchant_balance.snapshot_time + '</span></div>' +
+    '</div>' +
+    '<div class="modal-section">' +
+      '<h4>冲突与滞留分析</h4>' +
+      '<div class="modal-field"><span class="field-label">冲突类型</span><span class="field-value"><span class="tag ' + conflictInfo.tag + '">' + conflictInfo.label + '</span></span></div>' +
+      '<div class="modal-field"><span class="field-label">需人工补资料</span><span class="field-value">' + (d.need_manual ? '<span class="tag tag-danger">是</span>' : '<span class="tag tag-muted">否</span>') + '</span></div>' +
+      conflictDetail +
+    '</div>' +
+    '<div class="modal-section">' +
+      '<h4>业务解释</h4>' +
+      '<div style="padding:12px 16px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--text-secondary);line-height:1.8;">' + d.business_explanation + '</div>' +
+    '</div>';
+
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('detailModal').classList.add('visible');
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('visible');
+}
+
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function renderStateFlow() {
+  var container = document.getElementById('stateFlow');
+  var html = '';
+
+  STATE_FLOW.forEach(function(state, idx) {
+    html += '<div class="state-node">' +
+      '<span class="state-code">' + state.code + '</span>' +
+      '<span class="state-label">' + state.label + ' — ' + state.desc + '</span>' +
+      '</div>';
+
+    if (idx < STATE_FLOW.length - 1) {
+      var arrowLabels = ['提交退款请求至渠道', '等待渠道处理结果', '执行清算划拨至用户'];
+      html += '<div class="state-arrow"><span class="arrow-label">' + arrowLabels[idx] + '</span></div>';
+    }
+  });
+
+  html += '<div style="margin-top:12px;padding:10px 14px;border:1px dashed var(--border);border-radius:6px;font-size:12px;color:var(--text-muted);line-height:1.7;">' +
+    '<strong style="color:var(--text-secondary);">异常分支：</strong><br>' +
+    '↘ CHANNEL_FAILED — 渠道返回失败，退款终止，需重新发起<br>' +
+    '↘ TIMEOUT — 超过预期时效未收到回执，标记为回执晚到<br>' +
+    '↘ 余额冻结 — 渠道成功但清算无法执行，挂起等待解冻<br>' +
+    '↘ 重复补发 — 检测到多条回执，按首次成功结果清算' +
+    '</div>';
+
+  container.innerHTML = html;
+}
+
+document.addEventListener('DOMContentLoaded', initData);
+</script>
+</body>
+</html>
