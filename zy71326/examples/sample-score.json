@@ -1,0 +1,71 @@
+{
+  "title": "奇妙恩典",
+  "originalKey": "C",
+  "metadata": {
+    "composer": "传统赞美诗",
+    "timeSignature": "4/4",
+    "tempo": "Andante"
+  },
+  "parts": [
+    {
+      "name": "女高音 (Soprano)",
+      "sections": [
+        {
+          "name": "第一段",
+          "measures": [
+            { "notes": ["C4", "E4", "G4", "C5"], "line": 8 },
+            { "notes": ["G4", "E4", "C4", "D4"], "line": 9 },
+            { "notes": ["E4", "F#4", "G4", "A4"], "line": 10 },
+            { "notes": ["G4", "E4", "C4", "C4"], "line": 11 }
+          ],
+          "chords": [
+            { "chords": ["C", "Am", "F", "G"], "line": 6 },
+            { "chords": ["C", "G", "C", "C"], "line": 12 }
+          ],
+          "lyrics": [
+            { "text": "奇 妙 恩 典 如 何 甜 蜜", "line": 13 },
+            { "text": "救 我 如 此 罪 人", "line": 14 }
+          ]
+        },
+        {
+          "name": "副歌",
+          "measures": [
+            { "notes": ["C5", "B4", "A4", "G4"], "line": 17 },
+            { "notes": ["F4", "G4", "A4", "G4"], "line": 18 },
+            { "notes": ["E4", "C4", "D4", "E4"], "line": 19 },
+            { "notes": ["F4", "E4", "D4", "C4"], "line": 20 }
+          ],
+          "chords": [
+            { "chords": ["F", "C", "Dm", "G7"], "line": 15 },
+            { "chords": ["C", "F", "G", "C"], "line": 21 }
+          ],
+          "lyrics": [
+            { "text": "我 曾 失 丧 今 被 找 回", "line": 22 },
+            { "text": "曾 瞎 眼 今 得 看 见", "line": 23 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "男高音 (Tenor)",
+      "sections": [
+        {
+          "name": "第一段",
+          "measures": [
+            { "notes": ["E4", "G4", "C5", "E5"], "line": 28 },
+            { "notes": ["C5", "A4", "G4", "F4"], "line": 29 },
+            { "notes": ["G4", "B4", "C5", "D5"], "line": 30 },
+            { "notes": ["C5", "A4", "G4", "G4"], "line": 31 }
+          ],
+          "chords": [
+            { "chords": ["C", "Am", "F", "G"], "line": 26 }
+          ],
+          "lyrics": [
+            { "text": "奇 妙 恩 典 如 何 甜 蜜", "line": 32 },
+            { "text": "救 我 如 此 罪 人", "line": 33 }
+          ]
+        }
+      ]
+    }
+  ]
+}
