@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "barrier-watcher"
+version = "1.0.0"
+description = "期权障碍观察日报工具"
+requires-python = ">=3.10"
+
+[project.scripts]
+barrier-watcher = "barrier_watcher.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["barrier_watcher*"]
