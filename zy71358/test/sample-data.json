@@ -1,0 +1,152 @@
+{
+  "description": "数字藏品元数据审计测试样例 - 包含各种异常场景",
+  "items": [
+    {
+      "tokenId": "NFT-2024-0001",
+      "name": "数字山水《春山晨曦》",
+      "creator": "张艺术",
+      "imageHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "metadata": {
+        "name": "春山晨曦",
+        "description": "中国传统山水画，描绘春日清晨山间云雾缭绕之景",
+        "image": "ipfs://QmXYZ123",
+        "attributes": [
+          { "trait_type": "风格", "value": "水墨" },
+          { "trait_type": "尺寸", "value": "1024x1024" }
+        ]
+      },
+      "rights": {
+        "version": "v2.0",
+        "expiryDate": "2027-12-31T23:59:59Z",
+        "commercialUse": true,
+        "transferable": true
+      }
+    },
+    {
+      "tokenId": "NFT-2024-0002",
+      "name": "赛博朋克霓虹街",
+      "creator": "李设计",
+      "imageHash": "incorrect_hash_value_123456789",
+      "metadata": {
+        "name": "赛博朋克霓虹街",
+        "description": "未来城市夜景，霓虹灯闪烁",
+        "image": "ipfs://QmABC456"
+      },
+      "rights": {
+        "version": "v1.0",
+        "expiryDate": "2020-01-15T00:00:00Z"
+      }
+    },
+    {
+      "tokenId": "NFT-2024-0001",
+      "name": "数字山水《春山晨曦》副本",
+      "creator": "张艺术",
+      "imageHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "metadata": {
+        "name": "春山晨曦",
+        "description": "中国传统山水画",
+        "image": "ipfs://QmXYZ123"
+      },
+      "rights": {
+        "version": "v2.0",
+        "expiryDate": "2027-12-31T23:59:59Z"
+      }
+    },
+    {
+      "tokenId": "NFT-2024-0003",
+      "name": "抽象几何之舞",
+      "creator": "王创意",
+      "metadata": {
+        "name": "抽象几何之舞"
+      },
+      "rights": {
+        "version": "v1.5",
+        "expiryDate": "2026-06-15T00:00:00Z"
+      }
+    },
+    {
+      "tokenId": "NFT-2024-0004",
+      "name": "即将过期的作品",
+      "creator": "陈艺术",
+      "imageHash": "a1b2c3d4e5f6g7h8i9j0",
+      "metadata": {
+        "name": "即将过期的作品",
+        "description": "权益即将到期",
+        "image": "ipfs://QmDEF789"
+      },
+      "rights": {
+        "version": "v1.0",
+        "expiryDate": "2026-06-10T00:00:00Z"
+      }
+    },
+    {
+      "name": "无编号作品A",
+      "creator": "佚名",
+      "imageHash": "hash_without_id_001",
+      "metadata": {
+        "name": "无编号作品A",
+        "description": "缺少链上编号",
+        "image": "ipfs://QmGHI012"
+      },
+      "rights": {
+        "version": "v1.0"
+      }
+    },
+    {
+      "tokenId": "NFT-2024-0005",
+      "name": "缺失权益信息",
+      "creator": "赵设计",
+      "imageHash": "missing_rights_hash_002",
+      "metadata": {
+        "name": "缺失权益信息",
+        "description": "未提供权益说明",
+        "image": "ipfs://QmJKL345"
+      }
+    },
+    {
+      "tokenId": "NFT-2024-0006",
+      "name": "完整正常作品B",
+      "creator": "刘艺术",
+      "imageHash": "correct_hash_0006",
+      "metadata": {
+        "name": "完整正常作品B",
+        "description": "所有信息完整",
+        "image": "ipfs://QmMNO678"
+      },
+      "rights": {
+        "version": "v2.1",
+        "expiryDate": "2028-06-30T23:59:59Z"
+      }
+    },
+    {
+      "tokenId": "NFT-2024-0004",
+      "name": "重复编号-即将过期",
+      "creator": "陈艺术",
+      "imageHash": "another_hash_same_id",
+      "metadata": {
+        "name": "重复编号作品",
+        "description": "",
+        "image": "ipfs://QmPQR901"
+      },
+      "rights": {
+        "version": "v1.0",
+        "expiryDate": "2026-06-10T00:00:00Z"
+      }
+    },
+    {
+      "tokenId": "NFT-2024-0007",
+      "name": "权益已过期半年",
+      "creator": "孙创意",
+      "imageHash": "expired_long_ago_007",
+      "metadata": {
+        "name": "权益已过期半年",
+        "description": "测试数据",
+        "image": "ipfs://QmSTU234"
+      },
+      "rights": {
+        "version": "v1.0",
+        "expiryDate": "2025-11-01T00:00:00Z"
+      }
+    }
+  ]
+}

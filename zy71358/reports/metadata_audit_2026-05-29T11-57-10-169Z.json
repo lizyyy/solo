@@ -1,0 +1,518 @@
+{
+  "total": 10,
+  "passed": 2,
+  "failed": 8,
+  "warnings": 14,
+  "items": [
+    {
+      "index": 1,
+      "tokenId": "NFT-2024-0001",
+      "name": "数字山水《春山晨曦》",
+      "creator": "张艺术",
+      "checks": [
+        {
+          "type": "rights_expiry",
+          "name": "权益有效期检查",
+          "expiryDate": "2027-12-31T23:59:59.000Z",
+          "daysRemaining": 582,
+          "passed": true
+        },
+        {
+          "type": "rights_version",
+          "name": "权益版本检查",
+          "version": "v2.0",
+          "passed": true
+        },
+        {
+          "type": "metadata_completeness",
+          "name": "元数据完整性",
+          "missingFields": [],
+          "passed": true
+        }
+      ],
+      "status": "FAIL",
+      "warnings": [
+        "未提供图片数据，跳过哈希校验"
+      ],
+      "errors": [
+        "链上编号重复"
+      ]
+    },
+    {
+      "index": 2,
+      "tokenId": "NFT-2024-0002",
+      "name": "赛博朋克霓虹街",
+      "creator": "李设计",
+      "checks": [
+        {
+          "type": "rights_expiry",
+          "name": "权益有效期检查",
+          "expiryDate": "2020-01-15T00:00:00.000Z",
+          "daysRemaining": -2326,
+          "passed": false
+        },
+        {
+          "type": "rights_version",
+          "name": "权益版本检查",
+          "version": "v1.0",
+          "passed": true
+        },
+        {
+          "type": "metadata_completeness",
+          "name": "元数据完整性",
+          "missingFields": [],
+          "passed": true
+        }
+      ],
+      "status": "FAIL",
+      "warnings": [
+        "未提供图片数据，跳过哈希校验"
+      ],
+      "errors": [
+        "权益已过期: 2020/1/15"
+      ]
+    },
+    {
+      "index": 3,
+      "tokenId": "NFT-2024-0001",
+      "name": "数字山水《春山晨曦》副本",
+      "creator": "张艺术",
+      "checks": [
+        {
+          "type": "rights_expiry",
+          "name": "权益有效期检查",
+          "expiryDate": "2027-12-31T23:59:59.000Z",
+          "daysRemaining": 582,
+          "passed": true
+        },
+        {
+          "type": "rights_version",
+          "name": "权益版本检查",
+          "version": "v2.0",
+          "passed": true
+        },
+        {
+          "type": "metadata_completeness",
+          "name": "元数据完整性",
+          "missingFields": [],
+          "passed": true
+        }
+      ],
+      "status": "FAIL",
+      "warnings": [
+        "未提供图片数据，跳过哈希校验"
+      ],
+      "errors": [
+        "链上编号重复"
+      ]
+    },
+    {
+      "index": 4,
+      "tokenId": "NFT-2024-0003",
+      "name": "抽象几何之舞",
+      "creator": "王创意",
+      "checks": [
+        {
+          "type": "rights_expiry",
+          "name": "权益有效期检查",
+          "expiryDate": "2026-06-15T00:00:00.000Z",
+          "daysRemaining": 17,
+          "passed": true
+        },
+        {
+          "type": "rights_version",
+          "name": "权益版本检查",
+          "version": "v1.5",
+          "passed": true
+        },
+        {
+          "type": "metadata_completeness",
+          "name": "元数据完整性",
+          "missingFields": [
+            "description",
+            "image"
+          ],
+          "passed": false
+        }
+      ],
+      "status": "FAIL",
+      "warnings": [
+        "未提供图片数据，跳过哈希校验",
+        "权益将在30天内过期: 2026/6/15"
+      ],
+      "errors": [
+        "元数据缺少必填字段: description, image"
+      ]
+    },
+    {
+      "index": 5,
+      "tokenId": "NFT-2024-0004",
+      "name": "即将过期的作品",
+      "creator": "陈艺术",
+      "checks": [
+        {
+          "type": "rights_expiry",
+          "name": "权益有效期检查",
+          "expiryDate": "2026-06-10T00:00:00.000Z",
+          "daysRemaining": 12,
+          "passed": true
+        },
+        {
+          "type": "rights_version",
+          "name": "权益版本检查",
+          "version": "v1.0",
+          "passed": true
+        },
+        {
+          "type": "metadata_completeness",
+          "name": "元数据完整性",
+          "missingFields": [],
+          "passed": true
+        }
+      ],
+      "status": "FAIL",
+      "warnings": [
+        "未提供图片数据，跳过哈希校验",
+        "权益将在30天内过期: 2026/6/10"
+      ],
+      "errors": [
+        "链上编号重复"
+      ]
+    },
+    {
+      "index": 6,
+      "name": "无编号作品A",
+      "creator": "佚名",
+      "checks": [
+        {
+          "type": "rights_version",
+          "name": "权益版本检查",
+          "version": "v1.0",
+          "passed": true
+        },
+        {
+          "type": "metadata_completeness",
+          "name": "元数据完整性",
+          "missingFields": [],
+          "passed": true
+        }
+      ],
+      "status": "FAIL",
+      "warnings": [
+        "未提供图片数据，跳过哈希校验"
+      ],
+      "errors": [
+        "缺少链上编号"
+      ]
+    },
+    {
+      "index": 7,
+      "tokenId": "NFT-2024-0005",
+      "name": "缺失权益信息",
+      "creator": "赵设计",
+      "checks": [
+        {
+          "type": "metadata_completeness",
+          "name": "元数据完整性",
+          "missingFields": [],
+          "passed": true
+        }
+      ],
+      "status": "PASS",
+      "warnings": [
+        "未提供图片数据，跳过哈希校验",
+        "未提供权益信息"
+      ],
+      "errors": []
+    },
+    {
+      "index": 8,
+      "tokenId": "NFT-2024-0006",
+      "name": "完整正常作品B",
+      "creator": "刘艺术",
+      "checks": [
+        {
+          "type": "rights_expiry",
+          "name": "权益有效期检查",
+          "expiryDate": "2028-06-30T23:59:59.000Z",
+          "daysRemaining": 764,
+          "passed": true
+        },
+        {
+          "type": "rights_version",
+          "name": "权益版本检查",
+          "version": "v2.1",
+          "passed": true
+        },
+        {
+          "type": "metadata_completeness",
+          "name": "元数据完整性",
+          "missingFields": [],
+          "passed": true
+        }
+      ],
+      "status": "PASS",
+      "warnings": [
+        "未提供图片数据，跳过哈希校验"
+      ],
+      "errors": []
+    },
+    {
+      "index": 9,
+      "tokenId": "NFT-2024-0004",
+      "name": "重复编号-即将过期",
+      "creator": "陈艺术",
+      "checks": [
+        {
+          "type": "rights_expiry",
+          "name": "权益有效期检查",
+          "expiryDate": "2026-06-10T00:00:00.000Z",
+          "daysRemaining": 12,
+          "passed": true
+        },
+        {
+          "type": "rights_version",
+          "name": "权益版本检查",
+          "version": "v1.0",
+          "passed": true
+        },
+        {
+          "type": "metadata_completeness",
+          "name": "元数据完整性",
+          "missingFields": [
+            "description"
+          ],
+          "passed": false
+        }
+      ],
+      "status": "FAIL",
+      "warnings": [
+        "未提供图片数据，跳过哈希校验",
+        "权益将在30天内过期: 2026/6/10"
+      ],
+      "errors": [
+        "元数据缺少必填字段: description",
+        "链上编号重复"
+      ]
+    },
+    {
+      "index": 10,
+      "tokenId": "NFT-2024-0007",
+      "name": "权益已过期半年",
+      "creator": "孙创意",
+      "checks": [
+        {
+          "type": "rights_expiry",
+          "name": "权益有效期检查",
+          "expiryDate": "2025-11-01T00:00:00.000Z",
+          "daysRemaining": -209,
+          "passed": false
+        },
+        {
+          "type": "rights_version",
+          "name": "权益版本检查",
+          "version": "v1.0",
+          "passed": true
+        },
+        {
+          "type": "metadata_completeness",
+          "name": "元数据完整性",
+          "missingFields": [],
+          "passed": true
+        }
+      ],
+      "status": "FAIL",
+      "warnings": [
+        "未提供图片数据，跳过哈希校验"
+      ],
+      "errors": [
+        "权益已过期: 2025/11/1"
+      ]
+    }
+  ],
+  "anomalies": [
+    {
+      "tokenId": "NFT-2024-0001",
+      "indices": [
+        1,
+        3
+      ],
+      "type": "duplicate_token_id"
+    },
+    {
+      "tokenId": "NFT-2024-0004",
+      "indices": [
+        5,
+        9
+      ],
+      "type": "duplicate_token_id"
+    },
+    {
+      "index": 1,
+      "tokenId": "NFT-2024-0001",
+      "name": "数字山水《春山晨曦》",
+      "type": "error",
+      "message": "链上编号重复"
+    },
+    {
+      "index": 1,
+      "tokenId": "NFT-2024-0001",
+      "name": "数字山水《春山晨曦》",
+      "type": "warning",
+      "message": "未提供图片数据，跳过哈希校验"
+    },
+    {
+      "index": 2,
+      "tokenId": "NFT-2024-0002",
+      "name": "赛博朋克霓虹街",
+      "type": "error",
+      "message": "权益已过期: 2020/1/15"
+    },
+    {
+      "index": 2,
+      "tokenId": "NFT-2024-0002",
+      "name": "赛博朋克霓虹街",
+      "type": "warning",
+      "message": "未提供图片数据，跳过哈希校验"
+    },
+    {
+      "index": 3,
+      "tokenId": "NFT-2024-0001",
+      "name": "数字山水《春山晨曦》副本",
+      "type": "error",
+      "message": "链上编号重复"
+    },
+    {
+      "index": 3,
+      "tokenId": "NFT-2024-0001",
+      "name": "数字山水《春山晨曦》副本",
+      "type": "warning",
+      "message": "未提供图片数据，跳过哈希校验"
+    },
+    {
+      "index": 4,
+      "tokenId": "NFT-2024-0003",
+      "name": "抽象几何之舞",
+      "type": "error",
+      "message": "元数据缺少必填字段: description, image"
+    },
+    {
+      "index": 4,
+      "tokenId": "NFT-2024-0003",
+      "name": "抽象几何之舞",
+      "type": "warning",
+      "message": "未提供图片数据，跳过哈希校验"
+    },
+    {
+      "index": 4,
+      "tokenId": "NFT-2024-0003",
+      "name": "抽象几何之舞",
+      "type": "warning",
+      "message": "权益将在30天内过期: 2026/6/15"
+    },
+    {
+      "index": 5,
+      "tokenId": "NFT-2024-0004",
+      "name": "即将过期的作品",
+      "type": "error",
+      "message": "链上编号重复"
+    },
+    {
+      "index": 5,
+      "tokenId": "NFT-2024-0004",
+      "name": "即将过期的作品",
+      "type": "warning",
+      "message": "未提供图片数据，跳过哈希校验"
+    },
+    {
+      "index": 5,
+      "tokenId": "NFT-2024-0004",
+      "name": "即将过期的作品",
+      "type": "warning",
+      "message": "权益将在30天内过期: 2026/6/10"
+    },
+    {
+      "index": 6,
+      "name": "无编号作品A",
+      "type": "error",
+      "message": "缺少链上编号"
+    },
+    {
+      "index": 6,
+      "name": "无编号作品A",
+      "type": "warning",
+      "message": "未提供图片数据，跳过哈希校验"
+    },
+    {
+      "index": 7,
+      "tokenId": "NFT-2024-0005",
+      "name": "缺失权益信息",
+      "type": "warning",
+      "message": "未提供图片数据，跳过哈希校验"
+    },
+    {
+      "index": 7,
+      "tokenId": "NFT-2024-0005",
+      "name": "缺失权益信息",
+      "type": "warning",
+      "message": "未提供权益信息"
+    },
+    {
+      "index": 8,
+      "tokenId": "NFT-2024-0006",
+      "name": "完整正常作品B",
+      "type": "warning",
+      "message": "未提供图片数据，跳过哈希校验"
+    },
+    {
+      "index": 9,
+      "tokenId": "NFT-2024-0004",
+      "name": "重复编号-即将过期",
+      "type": "error",
+      "message": "元数据缺少必填字段: description"
+    },
+    {
+      "index": 9,
+      "tokenId": "NFT-2024-0004",
+      "name": "重复编号-即将过期",
+      "type": "error",
+      "message": "链上编号重复"
+    },
+    {
+      "index": 9,
+      "tokenId": "NFT-2024-0004",
+      "name": "重复编号-即将过期",
+      "type": "warning",
+      "message": "未提供图片数据，跳过哈希校验"
+    },
+    {
+      "index": 9,
+      "tokenId": "NFT-2024-0004",
+      "name": "重复编号-即将过期",
+      "type": "warning",
+      "message": "权益将在30天内过期: 2026/6/10"
+    },
+    {
+      "index": 10,
+      "tokenId": "NFT-2024-0007",
+      "name": "权益已过期半年",
+      "type": "error",
+      "message": "权益已过期: 2025/11/1"
+    },
+    {
+      "index": 10,
+      "tokenId": "NFT-2024-0007",
+      "name": "权益已过期半年",
+      "type": "warning",
+      "message": "未提供图片数据，跳过哈希校验"
+    }
+  ],
+  "summary": {
+    "hashFailures": 0,
+    "duplicateIds": 2,
+    "expiredRights": 2,
+    "missingMetadata": 2
+  },
+  "auditTime": "2026-05-29T11:57:10.168Z",
+  "auditId": "ee3f0341-5c1e-474d-85f6-6ee876914981"
+}

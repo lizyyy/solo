@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数字藏品元数据审计平台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+    .header {
+      background: rgba(255,255,255,0.95);
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .header h1 { font-size: 28px; color: #333; margin-bottom: 8px; }
+    .header p { color: #666; }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .card h2 { font-size: 18px; color: #333; margin-bottom: 16px; }
+    .upload-area {
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 16px;
+    }
+    .upload-area:hover { border-color: #667eea; background: #f8f9ff; }
+    .upload-area.dragover { border-color: #667eea; background: #f0f2ff; }
+    .upload-icon { font-size: 48px; color: #999; margin-bottom: 12px; }
+    .file-list { margin: 16px 0; }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      width: 100%;
+    }
+    .btn:hover { background: #5a67d8; }
+    .btn:disabled { background: #ccc; cursor: not-allowed; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-box {
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-box .num { font-size: 32px; font-weight: bold; }
+    .stat-box .label { font-size: 13px; opacity: 0.85; }
+    .stat-pass { background: #d4edda; color: #155724; }
+    .stat-fail { background: #f8d7da; color: #721c24; }
+    .stat-warn { background: #fff3cd; color: #856404; }
+    .stat-total { background: #d1ecf1; color: #0c5460; }
+    .anomaly-list { max-height: 400px; overflow-y: auto; }
+    .anomaly-item {
+      padding: 12px 16px;
+      border-left: 4px solid;
+      margin-bottom: 8px;
+      background: #f9f9f9;
+      border-radius: 0 6px 6px 0;
+    }
+    .anomaly-item.error { border-color: #dc3545; }
+    .anomaly-item.warning { border-color: #ffc107; }
+    .anomaly-item .title { font-weight: 600; margin-bottom: 4px; }
+    .anomaly-item .meta { font-size: 12px; color: #666; }
+    .hidden { display: none; }
+    .loading { text-align: center; padding: 40px; }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab {
+      padding: 8px 16px;
+      border: none;
+      background: #f0f0f0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .tab.active { background: #667eea; color: white; }
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .export-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .export-btns .btn { flex: 1; font-size: 14px; padding: 10px; }
+    .sample-data {
+      background: #fff3cd;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔍 数字藏品元数据审计</h1>
+      <p>校验图片哈希、链上编号去重、权益有效期检查、一键生成审计报告</p>
+    </div>
+
+    <div id="uploadSection" class="card">
+      <h2>📁 上传审计数据</h2>
+      
+      <div class="sample-data" onclick="loadSampleData()">
+        💡 点击加载示例数据（包含各种异常情况，用于测试）
+      </div>
+      
+      <div class="upload-area" id="dropZone">
+        <div class="upload-icon">📄</div>
+        <p>拖拽 JSON 数据文件到这里，或 <strong>点击选择</strong></p>
+        <p style="color: #999; font-size: 13px; margin-top: 8px;">支持批量上传图片文件（文件名对应编号）</p>
+        <input type="file" id="fileInput" multiple accept=".json,.csv,.jpg,.jpeg,.png" hidden>
+      </div>
+      
+      <div class="file-list" id="fileList"></div>
+      
+      <button class="btn" id="auditBtn" disabled>开始审计</button>
+    </div>
+
+    <div id="loadingSection" class="card hidden">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>正在执行审计，请稍候...</p>
+      </div>
+    </div>
+
+    <div id="resultsSection" class="card hidden">
+      <h2>📊 审计结果</h2>
+      
+      <div class="summary-grid">
+        <div class="stat-box stat-total">
+          <div class="num" id="statTotal">0</div>
+          <div class="label">总计项目</div>
+        </div>
+        <div class="stat-box stat-pass">
+          <div class="num" id="statPass">0</div>
+          <div class="label">通过</div>
+        </div>
+        <div class="stat-box stat-fail">
+          <div class="num" id="statFail">0</div>
+          <div class="label">未通过</div>
+        </div>
+        <div class="stat-box stat-warn">
+          <div class="num" id="statWarn">0</div>
+          <div class="label">警告</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="anomalies">异常清单</button>
+        <button class="tab" data-tab="details">详细数据</button>
+      </div>
+
+      <div id="tabAnomalies">
+        <div class="anomaly-list" id="anomalyList"></div>
+      </div>
+
+      <div id="tabDetails" class="hidden">
+        <div class="code-block" id="detailsJson"></div>
+      </div>
+
+      <div class="export-btns">
+        <button class="btn" onclick="exportReport('json')">导出 JSON</button>
+        <button class="btn" onclick="exportReport('csv')">导出 CSV</button>
+        <button class="btn" onclick="exportReport('pdf')">导出 PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedFiles = [];
+    let auditResults = null;
+
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    const auditBtn = document.getElementById('auditBtn');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      handleFiles(e.dataTransfer.files);
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+      handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+      selectedFiles = Array.from(files);
+      renderFileList();
+      auditBtn.disabled = selectedFiles.length === 0;
+    }
+
+    function renderFileList() {
+      fileList.innerHTML = selectedFiles.map(file => `
+        <div class="file-item">
+          <span>📄 ${file.name}</span>
+          <span>${(file.size / 1024).toFixed(1)} KB</span>
+        </div>
+      `).join('');
+    }
+
+    function loadSampleData() {
+      fetch('/api/audit/json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: getSampleData() })
+      })
+      .then(res => res.json())
+      .then(data => {
+        auditResults = data;
+        showResults(data);
+      });
+    }
+
+    function getSampleData() {
+      return [
+        {
+          tokenId: "NFT-001",
+          name: "数字山水 #1",
+          creator: "张艺术",
+          imageHash: "a1b2c3d4e5f6g7h8",
+          metadata: { name: "数字山水 #1", description: "中国山水画", image: "ipfs://..." },
+          rights: { version: "v2.0", expiryDate: "2027-12-31" }
+        },
+        {
+          tokenId: "NFT-001",
+          name: "数字山水 #1 (重复)",
+          creator: "张艺术",
+          imageHash: "a1b2c3d4e5f6g7h8",
+          metadata: { name: "数字山水 #1", description: "中国山水画", image: "ipfs://..." },
+          rights: { version: "v2.0", expiryDate: "2027-12-31" }
+        },
+        {
+          tokenId: "NFT-002",
+          name: "赛博朋克城市",
+          creator: "李设计",
+          imageHash: "wrong_hash_value",
+          metadata: { name: "赛博朋克城市", description: "" },
+          rights: { version: "v1.0", expiryDate: "2020-01-01" }
+        },
+        {
+          tokenId: "NFT-003",
+          name: "抽象几何 #3",
+          creator: "王创意",
+          metadata: { name: "抽象几何 #3" },
+          rights: { version: "v1.5", expiryDate: "2026-06-15" }
+        },
+        {
+          name: "缺失编号作品",
+          creator: "佚名",
+          imageHash: "xyz789",
+          metadata: { name: "缺失编号", description: "测试作品", image: "..." },
+          rights: { version: "v1.0" }
+        }
+      ];
+    }
+
+    auditBtn.addEventListener('click', async () => {
+      document.getElementById('uploadSection').classList.add('hidden');
+      document.getElementById('loadingSection').classList.remove('hidden');
+
+      const formData = new FormData();
+      
+      const jsonFile = selectedFiles.find(f => f.name.endsWith('.json'));
+      if (jsonFile) {
+        const text = await jsonFile.text();
+        const data = JSON.parse(text);
+        formData.append('items', JSON.stringify(data.items || data));
+      }
+      
+      selectedFiles.filter(f => f.type.startsWith('image/')).forEach(file => {
+        formData.append('images', file);
+      });
+
+      try {
+        const response = await fetch('/api/audit', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        auditResults = data;
+        showResults(data);
+      } catch (error) {
+        alert('审计失败: ' + error.message);
+        document.getElementById('uploadSection').classList.remove('hidden');
+      }
+      
+      document.getElementById('loadingSection').classList.add('hidden');
+    });
+
+    function showResults(data) {
+      document.getElementById('resultsSection').classList.remove('hidden');
+      
+      const s = data.summary;
+      document.getElementById('statTotal').textContent = s.summary.total;
+      document.getElementById('statPass').textContent = s.summary.passed;
+      document.getElementById('statFail').textContent = s.summary.failed;
+      document.getElementById('statWarn').textContent = s.summary.warnings;
+
+      const anomalyHtml = data.anomalies.slice(0, 50).map(a => `
+        <div class="anomaly-item ${a.type === 'error' ? 'error' : 'warning'}">
+          <div class="title">${a.name || '未知项目'} [${a.tokenId || 'N/A'}]</div>
+          <div>${a.message || a.type}</div>
+          <div class="meta">位置: #${a.index || a.indices?.join(', ')}</div>
+        </div>
+      `).join('');
+      document.getElementById('anomalyList').innerHTML = anomalyHtml || '<p style="color:#666;text-align:center;padding:40px;">无异常发现 ✓</p>';
+
+      document.getElementById('detailsJson').textContent = JSON.stringify(data, null, 2);
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tabAnomalies').classList.add('hidden');
+        document.getElementById('tabDetails').classList.add('hidden');
+        document.getElementById('tab' + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1)).classList.remove('hidden');
+      });
+    });
+
+    async function exportReport(format) {
+      const response = await fetch('/api/audit/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: getSampleData(), format })
+      });
+      const data = await response.json();
+      
+      if (data.exports && data.exports[0]) {
+        window.open(`/api/reports/${data.exports[0].filename}`, '_blank');
+      }
+    }
+  </script>
+</body>
+</html>
