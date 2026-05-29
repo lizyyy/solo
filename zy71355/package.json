@@ -1,0 +1,24 @@
+{
+  "name": "studio-gear-return",
+  "version": "1.0.0",
+  "description": "摄影棚器材归还管理CLI工具",
+  "main": "src/index.js",
+  "bin": {
+    "gear-return": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": ["studio", "equipment", "rental", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "inquirer": "^8.2.6",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "uuid": "^9.0.1",
+    "date-fns": "^2.30.0"
+  }
+}

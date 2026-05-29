@@ -1,0 +1,43 @@
+{
+  "rentalId": "RENT-2024-001",
+  "customerName": "示例客户",
+  "depositAmount": 5000,
+  "items": [
+    {
+      "id": "1",
+      "category": "lens",
+      "name": "索尼 24-70mm F2.8",
+      "serialNumber": "LENS-001"
+    },
+    {
+      "id": "2",
+      "category": "lens",
+      "name": "索尼 70-200mm F2.8",
+      "serialNumber": "LENS-002"
+    },
+    {
+      "id": "3",
+      "category": "lightStand",
+      "name": "曼富图灯架",
+      "serialNumber": "STAND-001"
+    },
+    {
+      "id": "4",
+      "category": "battery",
+      "name": "NP-F970电池",
+      "serialNumber": "BAT-001"
+    },
+    {
+      "id": "5",
+      "category": "battery",
+      "name": "NP-F970电池",
+      "serialNumber": "BAT-002"
+    },
+    {
+      "id": "6",
+      "category": "accessory",
+      "name": "SD卡 128G",
+      "serialNumber": "SD-001"
+    }
+  ]
+}
