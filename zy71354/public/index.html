@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雕塑安装风险单</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      color: #2d3748;
+      margin-bottom: 20px;
+      font-size: 1.4rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-success {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #38a169;
+    }
+
+    .btn-warning {
+      background: #ed8936;
+      color: white;
+    }
+
+    .btn-danger {
+      background: #f56565;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #e53e3e;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 10px 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-draft { background: #fef3c7; color: #92400e; }
+    .status-pending { background: #dbeafe; color: #1e40af; }
+    .status-risk_detected { background: #fee2e2; color: #991b1b; }
+    .status-approved { background: #d1fae5; color: #065f46; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+
+    .risk-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .risk-safe { background: #d1fae5; color: #065f46; }
+    .risk-warning { background: #fef3c7; color: #92400e; }
+    .risk-critical { background: #fee2e2; color: #991b1b; }
+
+    .installation-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .installation-item {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .installation-item:hover {
+      border-color: #667eea;
+      transform: translateX(4px);
+    }
+
+    .installation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .installation-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .installation-meta {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .installation-meta span {
+      font-size: 13px;
+      color: #718096;
+    }
+
+    .risk-stats {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .stat-item {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .stat-safe { background: #d1fae5; color: #065f46; }
+    .stat-warning { background: #fef3c7; color: #92400e; }
+    .stat-critical { background: #fee2e2; color: #991b1b; }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #718096;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab:hover:not(.active) {
+      color: #4a5568;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .material-list,
+    .signature-list,
+    .risk-list,
+    .history-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .material-item,
+    .signature-item,
+    .risk-item,
+    .history-item {
+      background: #f7fafc;
+      border-radius: 8px;
+      padding: 16px;
+      border-left: 4px solid #667eea;
+    }
+
+    .risk-item.safe { border-left-color: #48bb78; }
+    .risk-item.warning { border-left-color: #ed8936; }
+    .risk-item.critical { border-left-color: #f56565; }
+
+    .risk-details {
+      margin-top: 10px;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #4a5568;
+    }
+
+    .risk-details summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .detail-row {
+      display: flex;
+      padding: 6px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      width: 120px;
+      font-weight: 600;
+      color: #718096;
+    }
+
+    .detail-value {
+      flex: 1;
+      color: #2d3748;
+    }
+
+    .upload-area {
+      border: 2px dashed #cbd5e0;
+      border-radius: 8px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .upload-area:hover {
+      border-color: #667eea;
+      background: #f7fafc;
+    }
+
+    .upload-area.dragover {
+      border-color: #667eea;
+      background: #eef2ff;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #e2e8f0;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 20px;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #cbd5e0;
+    }
+
+    .action-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #718096;
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏗️ 雕塑安装风险单</h1>
+      <p>底座 · 吊装 · 风载 · 签字 - 全链路风险管控</p>
+    </header>
+
+    <div id="list-view">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="margin: 0; border: none; padding: 0;">安装项目列表</h2>
+          <button class="btn btn-primary" onclick="showCreateForm()">+ 新建项目</button>
+        </div>
+        <div id="installation-list" class="installation-list"></div>
+      </div>
+    </div>
+
+    <div id="create-view" class="hidden">
+      <div class="card">
+        <button class="back-btn" onclick="showListView()">← 返回列表</button>
+        <h2>新建安装项目</h2>
+        <form id="create-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>项目名称 *</label>
+              <input type="text" name="projectName" required>
+            </div>
+            <div class="form-group">
+              <label>雕塑名称 *</label>
+              <input type="text" name="sculptureName" required>
+            </div>
+            <div class="form-group">
+              <label>高度 (米) *</label>
+              <input type="number" name="height" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label>宽度 (米) *</label>
+              <input type="number" name="width" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label>深度 (米) *</label>
+              <input type="number" name="depth" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label>重量 (kg) *</label>
+              <input type="number" name="weight" required>
+            </div>
+            <div class="form-group">
+              <label>计划安装日期 *</label>
+              <input type="date" name="plannedInstallationDate" required>
+            </div>
+          </div>
+          <div style="margin-top: 20px; display: flex; gap: 12px;">
+            <button type="submit" class="btn btn-primary">创建项目</button>
+            <button type="button" class="btn" onclick="showListView()">取消</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="detail-view" class="hidden">
+      <div class="card">
+        <button class="back-btn" onclick="showListView()">← 返回列表</button>
+        <div id="detail-header"></div>
+      </div>
+
+      <div class="card">
+        <div class="tabs">
+          <div class="tab active" data-tab="materials">📁 材料上传</div>
+          <div class="tab" data-tab="signatures">✍️ 签字留痕</div>
+          <div class="tab" data-tab="risk">⚠️ 风险校验</div>
+          <div class="tab" data-tab="history">📋 版本历史</div>
+        </div>
+
+        <div id="tab-materials" class="tab-content active">
+          <div class="form-grid" style="margin-bottom: 20px;">
+            <div class="form-group">
+              <label>材料类型</label>
+              <select id="material-type">
+                <option value="base_drawing">底座图</option>
+                <option value="lifting_plan">吊装计划</option>
+                <option value="wind_load_params">风载参数</option>
+                <option value="on_site_signature">现场签字</option>
+                <option value="risk_report">风险报告</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>材料名称</label>
+              <input type="text" id="material-name" placeholder="自定义名称（可选）">
+            </div>
+          </div>
+          <div class="upload-area" id="upload-area">
+            <p>📤 点击或拖拽文件到此处上传</p>
+            <p style="font-size: 12px; color: #718096; margin-top: 8px;">支持 JSON、图片、PDF 等格式</p>
+          </div>
+          <input type="file" id="file-input" style="display: none;">
+          <div id="materials-list" class="material-list" style="margin-top: 20px;"></div>
+        </div>
+
+        <div id="tab-signatures" class="tab-content">
+          <div class="form-grid" style="margin-bottom: 20px;">
+            <div class="form-group">
+              <label>签字人姓名 *</label>
+              <input type="text" id="signer-name">
+            </div>
+            <div class="form-group">
+              <label>职务/角色 *</label>
+              <input type="text" id="signer-role" placeholder="如：项目经理、现场负责人">
+            </div>
+            <div class="form-group">
+              <label>签字日期 *</label>
+              <input type="date" id="signature-date">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="addSignature()">添加签字记录</button>
+          <div id="signatures-list" class="signature-list" style="margin-top: 20px;"></div>
+        </div>
+
+        <div id="tab-risk" class="tab-content">
+          <div class="action-bar">
+            <button class="btn btn-primary" onclick="runRiskCheck()">🔍 执行风险校验</button>
+            <button class="btn btn-success" onclick="exportPDF()">📄 导出PDF报告</button>
+          </div>
+          <div id="risk-summary"></div>
+          <div id="risk-list" class="risk-list" style="margin-top: 20px;"></div>
+        </div>
+
+        <div id="tab-history" class="tab-content">
+          <div id="history-list" class="history-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api';
+    let currentInstallationId = null;
+
+    async function fetchInstallations() {
+      const res = await fetch(`${API_BASE}/installations`);
+      return res.json();
+    }
+
+    async function fetchInstallationDetail(id) {
+      const res = await fetch(`${API_BASE}/installations/${id}`);
+      return res.json();
+    }
+
+    async function createInstallation(data) {
+      const res = await fetch(`${API_BASE}/installations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return res.json();
+    }
+
+    function showListView() {
+      document.getElementById('list-view').classList.remove('hidden');
+      document.getElementById('create-view').classList.add('hidden');
+      document.getElementById('detail-view').classList.add('hidden');
+      loadInstallations();
+    }
+
+    function showCreateForm() {
+      document.getElementById('list-view').classList.add('hidden');
+      document.getElementById('create-view').classList.remove('hidden');
+      document.getElementById('detail-view').classList.add('hidden');
+    }
+
+    async function showDetailView(id) {
+      currentInstallationId = id;
+      document.getElementById('list-view').classList.add('hidden');
+      document.getElementById('create-view').classList.add('hidden');
+      document.getElementById('detail-view').classList.remove('hidden');
+      await loadDetailView(id);
+    }
+
+    async function loadInstallations() {
+      const installations = await fetchInstallations();
+      const container = document.getElementById('installation-list');
+
+      if (installations.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+            </svg>
+            <p>暂无安装项目</p>
+            <p style="font-size: 13px;">点击"新建项目"开始创建</p>
+          </div>
+        `;
+        return;
+      }
+
+      const statusLabels = {
+        draft: '草稿',
+        pending: '待审核',
+        risk_detected: '发现风险',
+        approved: '已批准',
+        completed: '已完成',
+      };
+
+      container.innerHTML = installations.map(inst => {
+        const stats = inst.riskSummary?.statistics || { safe: 0, warning: 0, critical: 0 };
+        const overallLevel = inst.riskSummary?.overallLevel || 'safe';
+
+        return `
+          <div class="installation-item" onclick="showDetailView('${inst.id}')">
+            <div class="installation-header">
+              <span class="installation-title">${inst.projectName} - ${inst.sculptureName}</span>
+              <span class="status-badge status-${inst.status}">${statusLabels[inst.status]}</span>
+            </div>
+            <div class="installation-meta">
+              <span>📐 ${inst.dimensions.height}×${inst.dimensions.width}×${inst.dimensions.depth}m</span>
+              <span>⚖️ ${inst.dimensions.weight}kg</span>
+              <span>📅 计划: ${inst.plannedInstallationDate}</span>
+              <span>🏷️ v${inst.version}</span>
+            </div>
+            <div class="risk-stats">
+              <span class="risk-badge risk-${overallLevel}">整体: ${overallLevel === 'safe' ? '安全' : overallLevel === 'warning' ? '警告' : '严重'}</span>
+              <span class="stat-item stat-safe">✓ ${stats.safe}</span>
+              <span class="stat-item stat-warning">⚠ ${stats.warning}</span>
+              <span class="stat-item stat-critical">✗ ${stats.critical}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadDetailView(id) {
+      const data = await fetchInstallationDetail(id);
+      renderDetailHeader(data);
+      renderMaterials(data.materials);
+      renderSignatures(data.signatures);
+      renderRiskSummary(data.risk);
+      renderRiskList(data.risk.checks);
+      renderHistory(data.versionHistory);
+    }
+
+    function renderDetailHeader(data) {
+      const { installation } = data;
+      const statusLabels = {
+        draft: '草稿',
+        pending: '待审核',
+        risk_detected: '发现风险',
+        approved: '已批准',
+        completed: '已完成',
+      };
+
+      document.getElementById('detail-header').innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+          <div>
+            <h2 style="margin: 0 0 12px 0; border: none; padding: 0;">${installation.projectName}</h2>
+            <p style="font-size: 18px; color: #4a5568; margin-bottom: 12px;">${installation.sculptureName}</p>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+              <span>📐 ${installation.dimensions.height}×${installation.dimensions.width}×${installation.dimensions.depth}m</span>
+              <span>⚖️ ${installation.dimensions.weight}kg</span>
+              <span>📅 计划: ${installation.plannedInstallationDate}</span>
+              ${installation.actualInstallationDate ? `<span>✅ 实际: ${installation.actualInstallationDate}</span>` : ''}
+              <span>🏷️ v${installation.version}</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+            <span class="status-badge status-${installation.status}" style="font-size: 14px;">${statusLabels[installation.status]}</span>
+            <div style="display: flex; gap: 8px;">
+              <select id="status-select" class="btn btn-small" style="background: #e2e8f0; color: #4a5568;">
+                <option value="draft" ${installation.status === 'draft' ? 'selected' : ''}>草稿</option>
+                <option value="pending" ${installation.status === 'pending' ? 'selected' : ''}>待审核</option>
+                <option value="approved" ${installation.status === 'approved' ? 'selected' : ''}>已批准</option>
+                <option value="completed" ${installation.status === 'completed' ? 'selected' : ''}>已完成</option>
+              </select>
+              <button class="btn btn-small btn-primary" onclick="updateStatus()">更新状态</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMaterials(materials) {
+      const typeLabels = {
+        base_drawing: '底座图',
+        lifting_plan: '吊装计划',
+        wind_load_params: '风载参数',
+        on_site_signature: '现场签字',
+        risk_report: '风险报告',
+      };
+
+      const container = document.getElementById('materials-list');
+
+      if (materials.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+              <polyline points="13 2 13 9 20 9"/>
+            </svg>
+            <p>暂无上传材料</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = materials.map(mat => `
+        <div class="material-item">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>${typeLabels[mat.type] || mat.type}</strong>
+              <span style="color: #718096; margin-left: 12px;">${mat.name}</span>
+              <span style="color: #a0aec0; margin-left: 8px;">v${mat.version}</span>
+            </div>
+            <span style="font-size: 12px; color: #718096;">${new Date(mat.uploadedAt).toLocaleString('zh-CN')}</span>
+          </div>
+          <div style="font-size: 13px; color: #718096; margin-top: 8px;">
+            ${(mat.fileSize / 1024).toFixed(1)} KB · ${mat.fileType}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderSignatures(signatures) {
+      const container = document.getElementById('signatures-list');
+
+      if (signatures.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <p>暂无签字记录</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = signatures.map(sig => `
+        <div class="signature-item">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>✍️ ${sig.signerName}</strong>
+              <span style="color: #718096; margin-left: 12px;">${sig.signerRole}</span>
+            </div>
+            <span class="status-badge status-approved">已签字</span>
+          </div>
+          <div style="font-size: 13px; color: #718096; margin-top: 8px;">
+            签字日期: ${sig.signatureDate} · 记录时间: ${new Date(sig.signedAt).toLocaleString('zh-CN')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderRiskSummary(risk) {
+      const container = document.getElementById('risk-summary');
+      const stats = risk.statistics;
+      const overallLevel = risk.overallLevel;
+
+      const levelLabels = { safe: '安全', warning: '警告', critical: '严重' };
+
+      container.innerHTML = `
+        <div style="display: flex; gap: 20px; padding: 20px; background: #f7fafc; border-radius: 12px; align-items: center;">
+          <div style="text-align: center;">
+            <div class="risk-badge risk-${overallLevel}" style="font-size: 18px; padding: 10px 24px;">
+              ${overallLevel === 'safe' ? '✅' : overallLevel === 'warning' ? '⚠️' : '🚨'}
+              ${levelLabels[overallLevel]}
+            </div>
+          </div>
+          <div style="flex: 1;">
+            <div style="display: flex; gap: 16px;">
+              <div style="text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #48bb78;">${stats.safe}</div>
+                <div style="font-size: 12px; color: #718096;">通过</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #ed8936;">${stats.warning}</div>
+                <div style="font-size: 12px; color: #718096;">警告</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #f56565;">${stats.critical}</div>
+                <div style="font-size: 12px; color: #718096;">严重</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRiskList(checks) {
+      const container = document.getElementById('risk-list');
+      const typeLabels = {
+        lifting_point_missing: '🔗 吊点检查',
+        wind_load_exceed: '💨 风载检查',
+        signature_late: '📅 签字时间检查',
+      };
+
+      if (checks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <p>暂无风险检查记录</p>
+            <p style="font-size: 13px;">点击"执行风险校验"开始检查</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = checks.map(check => `
+        <div class="risk-item ${check.level}">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>${typeLabels[check.type] || check.type}</strong>
+              <span class="risk-badge risk-${check.level}" style="margin-left: 12px;">
+                ${check.level === 'safe' ? '✓ 通过' : check.level === 'warning' ? '⚠ 警告' : '✗ 严重'}
+              </span>
+            </div>
+            <span style="font-size: 12px; color: #718096;">${new Date(check.checkedAt).toLocaleString('zh-CN')}</span>
+          </div>
+          <p style="margin: 8px 0; color: #4a5568;">${check.description}</p>
+          <details class="risk-details">
+            <summary>查看详细原因 →</summary>
+            ${Object.entries(check.details).map(([key, value]) => `
+              <div class="detail-row">
+                <span class="detail-label">${key}</span>
+                <span class="detail-value">${typeof value === 'object' ? JSON.stringify(value, null, 2) : value}</span>
+              </div>
+            `).join('')}
+          </details>
+        </div>
+      `).join('');
+    }
+
+    function renderHistory(history) {
+      const container = document.getElementById('history-list');
+
+      if (history.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <p>暂无版本历史</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = history.map(h => `
+        <div class="history-item">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>🏷️ v${h.version}</strong>
+              <span style="color: #718096; margin-left: 12px;">${h.changeType}</span>
+            </div>
+            <span style="font-size: 12px; color: #718096;">${new Date(h.changedAt).toLocaleString('zh-CN')}</span>
+          </div>
+          <div style="font-size: 13px; color: #718096; margin-top: 4px;">
+            操作人: ${h.changedBy}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('create-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+
+      const data = {
+        projectName: formData.get('projectName'),
+        sculptureName: formData.get('sculptureName'),
+        dimensions: {
+          height: parseFloat(formData.get('height')),
+          width: parseFloat(formData.get('width')),
+          depth: parseFloat(formData.get('depth')),
+          weight: parseFloat(formData.get('weight')),
+        },
+        plannedInstallationDate: formData.get('plannedInstallationDate'),
+      };
+
+      await createInstallation(data);
+      showListView();
+    });
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+      });
+    });
+
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        await uploadFile(files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', async (e) => {
+      if (e.target.files.length > 0) {
+        await uploadFile(e.target.files[0]);
+      }
+    });
+
+    async function uploadFile(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', document.getElementById('material-type').value);
+      formData.append('name', document.getElementById('material-name').value || file.name);
+      formData.append('installationId', currentInstallationId);
+
+      const res = await fetch(`${API_BASE}/installations/${currentInstallationId}/materials`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (res.ok) {
+        document.getElementById('material-name').value = '';
+        loadDetailView(currentInstallationId);
+      }
+    }
+
+    async function addSignature() {
+      const signerName = document.getElementById('signer-name').value;
+      const signerRole = document.getElementById('signer-role').value;
+      const signatureDate = document.getElementById('signature-date').value;
+
+      if (!signerName || !signerRole || !signatureDate) {
+        alert('请填写完整的签字信息');
+        return;
+      }
+
+      const res = await fetch(`${API_BASE}/installations/${currentInstallationId}/signatures`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ signerName, signerRole, signatureDate }),
+      });
+
+      if (res.ok) {
+        document.getElementById('signer-name').value = '';
+        document.getElementById('signer-role').value = '';
+        document.getElementById('signature-date').value = '';
+        loadDetailView(currentInstallationId);
+      }
+    }
+
+    async function runRiskCheck() {
+      const res = await fetch(`${API_BASE}/installations/${currentInstallationId}/risk-check`, {
+        method: 'POST',
+      });
+      const data = await res.json();
+      renderRiskSummary(data.summary);
+      renderRiskList(data.checks);
+    }
+
+    async function exportPDF() {
+      const res = await fetch(`${API_BASE}/installations/${currentInstallationId}/export-pdf`, {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.open(data.downloadUrl, '_blank');
+      }
+    }
+
+    async function updateStatus() {
+      const status = document.getElementById('status-select').value;
+      await fetch(`${API_BASE}/installations/${currentInstallationId}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, changedBy: '用户' }),
+      });
+      loadDetailView(currentInstallationId);
+    }
+
+    loadInstallations();
+  </script>
+</body>
+</html>

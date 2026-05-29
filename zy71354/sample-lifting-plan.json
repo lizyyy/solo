@@ -1,0 +1,25 @@
+{
+  "points": [
+    {
+      "id": "p1",
+      "location": "顶部左侧",
+      "capacity": 2500,
+      "position": { "x": 100, "y": 50 }
+    },
+    {
+      "id": "p2",
+      "location": "顶部右侧",
+      "capacity": 2500,
+      "position": { "x": 400, "y": 50 }
+    },
+    {
+      "id": "p3",
+      "location": "底部中央",
+      "capacity": 1500,
+      "position": { "x": 250, "y": 400 }
+    }
+  ],
+  "equipment": "25吨汽车吊",
+  "operator": "张师傅",
+  "date": "2026-06-15"
+}

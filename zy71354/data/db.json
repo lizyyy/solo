@@ -1,0 +1,149 @@
+{
+  "installations": [
+    {
+      "id": "f59be70c-4981-4972-aaaf-fe56b122cf29",
+      "projectName": "城市广场雕塑项目",
+      "sculptureName": "未来之翼",
+      "dimensions": {
+        "height": 8.5,
+        "width": 4.2,
+        "depth": 3,
+        "weight": 3500
+      },
+      "plannedInstallationDate": "2026-06-20",
+      "status": "draft",
+      "version": 1,
+      "createdAt": "2026-05-29T11:55:29.088Z",
+      "updatedAt": "2026-05-29T11:55:29.088Z"
+    }
+  ],
+  "materials": [
+    {
+      "id": "7be2910b-9325-4ecd-9eba-98fc18966c74",
+      "installationId": "f59be70c-4981-4972-aaaf-fe56b122cf29",
+      "type": "lifting_plan",
+      "name": "吊装方案_v1",
+      "filePath": "data/uploads/f59be70c-4981-4972-aaaf-fe56b122cf29/1780055738261-sample-lifting-plan.json",
+      "fileType": "application/octet-stream",
+      "fileSize": 493,
+      "uploadedAt": "2026-05-29T11:55:38.265Z",
+      "version": 1
+    },
+    {
+      "id": "9527ff4b-9d56-4ebd-ba00-72a7250f4f71",
+      "installationId": "f59be70c-4981-4972-aaaf-fe56b122cf29",
+      "type": "wind_load_params",
+      "name": "风载计算参数",
+      "filePath": "data/uploads/f59be70c-4981-4972-aaaf-fe56b122cf29/1780055738639-sample-wind-params.json",
+      "fileType": "application/octet-stream",
+      "fileSize": 101,
+      "uploadedAt": "2026-05-29T11:55:38.640Z",
+      "version": 1
+    }
+  ],
+  "signatures": [
+    {
+      "id": "29c187dd-baab-442c-ac01-989db681e16a",
+      "installationId": "f59be70c-4981-4972-aaaf-fe56b122cf29",
+      "signerName": "李明",
+      "signerRole": "项目经理",
+      "signatureDate": "2026-06-18",
+      "signedAt": "2026-05-29T11:55:48.300Z",
+      "version": 1
+    }
+  ],
+  "riskChecks": [
+    {
+      "id": "6dd14412-aaa7-480a-9a96-a13a4f908399",
+      "installationId": "f59be70c-4981-4972-aaaf-fe56b122cf29",
+      "type": "lifting_point_missing",
+      "level": "safe",
+      "description": "吊点配置检查通过",
+      "details": {
+        "pointsCount": 3,
+        "points": [
+          {
+            "location": "顶部左侧",
+            "capacity": 2500
+          },
+          {
+            "location": "顶部右侧",
+            "capacity": 2500
+          },
+          {
+            "location": "底部中央",
+            "capacity": 1500
+          }
+        ],
+        "equipment": "25吨汽车吊"
+      },
+      "checkedAt": "2026-05-29T11:55:48.620Z"
+    },
+    {
+      "id": "a9973efd-4b1f-42b3-a5ca-3d5bbce3428c",
+      "installationId": "f59be70c-4981-4972-aaaf-fe56b122cf29",
+      "type": "wind_load_exceed",
+      "level": "safe",
+      "description": "风载参数检查通过",
+      "details": {
+        "windSpeed": 8.5,
+        "maxAllowed": 12,
+        "ratio": "0.71",
+        "windPressure": 0.45,
+        "safetyFactor": 1.5
+      },
+      "checkedAt": "2026-05-29T11:55:48.621Z"
+    },
+    {
+      "id": "049b230c-0cf0-4be4-a753-167439b8ed71",
+      "installationId": "f59be70c-4981-4972-aaaf-fe56b122cf29",
+      "type": "signature_late",
+      "level": "safe",
+      "description": "签字有效，等待安装实施",
+      "details": {
+        "signatures": [
+          {
+            "signer": "李明",
+            "role": "项目经理",
+            "date": "2026-06-18"
+          }
+        ]
+      },
+      "checkedAt": "2026-05-29T11:55:48.621Z"
+    }
+  ],
+  "versionHistory": [
+    {
+      "id": "45bf3351-1085-4293-8f3b-bc3cc84b9526",
+      "installationId": "f59be70c-4981-4972-aaaf-fe56b122cf29",
+      "version": 1,
+      "changeType": "创建记录",
+      "changedBy": "system",
+      "changedAt": "2026-05-29T11:55:29.089Z"
+    },
+    {
+      "id": "5496e068-d17c-47e2-8c3c-731396771376",
+      "installationId": "f59be70c-4981-4972-aaaf-fe56b122cf29",
+      "version": 1,
+      "changeType": "上传材料: 吊装方案_v1",
+      "changedBy": "system",
+      "changedAt": "2026-05-29T11:55:38.267Z"
+    },
+    {
+      "id": "a5cadf68-4f4b-4492-aa79-3cf9e25252ec",
+      "installationId": "f59be70c-4981-4972-aaaf-fe56b122cf29",
+      "version": 1,
+      "changeType": "上传材料: 风载计算参数",
+      "changedBy": "system",
+      "changedAt": "2026-05-29T11:55:38.640Z"
+    },
+    {
+      "id": "b815559c-ec6b-4a77-acdc-e8b5a7cdc049",
+      "installationId": "f59be70c-4981-4972-aaaf-fe56b122cf29",
+      "version": 1,
+      "changeType": "签字确认: 李明 (项目经理)",
+      "changedBy": "李明",
+      "changedAt": "2026-05-29T11:55:48.300Z"
+    }
+  ]
+}
