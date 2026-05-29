@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>画廊寄售结算表</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f0;
+      color: #333;
+      padding: 20px;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    header { 
+      background: #2c3e50; 
+      color: #fff; 
+      padding: 20px; 
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    header h1 { font-size: 24px; font-weight: 500; }
+    header p { opacity: 0.8; font-size: 14px; margin-top: 5px; }
+    
+    .section { 
+      background: #fff; 
+      border-radius: 8px; 
+      padding: 20px; 
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .section h2 { 
+      font-size: 18px; 
+      margin-bottom: 15px; 
+      color: #2c3e50;
+      border-bottom: 2px solid #ecf0f1;
+      padding-bottom: 10px;
+    }
+    
+    .form-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+    .form-group label { font-weight: 500; min-width: 100px; }
+    input[type="text"], input[type="month"], input[type="file"] {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      min-width: 200px;
+    }
+    button {
+      padding: 8px 16px;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    button:hover { background: #2980b9; }
+    button:disabled { background: #bdc3c7; cursor: not-allowed; }
+    button.success { background: #27ae60; }
+    button.success:hover { background: #229954; }
+    button.warning { background: #e67e22; }
+    button.warning:hover { background: #d35400; }
+    button.danger { background: #e74c3c; }
+    button.danger:hover { background: #c0392b; }
+    button.secondary { background: #95a5a6; }
+    button.secondary:hover { background: #7f8c8d; }
+    
+    .batch-list { display: flex; flex-direction: column; gap: 10px; }
+    .batch-item {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr auto;
+      gap: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      align-items: center;
+    }
+    .batch-item:hover { background: #e9ecef; }
+    .batch-no { font-weight: 600; color: #2c3e50; }
+    .batch-meta { font-size: 13px; color: #7f8c8d; }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-imported { background: #d1ecf1; color: #0c5460; }
+    .status-validated { background: #fff3cd; color: #856404; }
+    .status-pending_review { background: #ffeeba; color: #856404; }
+    .status-authorized { background: #d4edda; color: #155724; }
+    .status-settled { background: #c3e6cb; color: #155724; }
+    
+    .severity-critical { background: #f8d7da; color: #721c24; }
+    .severity-warning { background: #fff3cd; color: #856404; }
+    .severity-info { background: #d1ecf1; color: #0c5460; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { 
+      padding: 10px 12px; 
+      text-align: left; 
+      border-bottom: 1px solid #ecf0f1;
+      font-size: 13px;
+    }
+    th { background: #f8f9fa; font-weight: 600; color: #495057; }
+    tr:hover { background: #f8f9fa; }
+    
+    .trace-panel {
+      background: #fafafa;
+      border-left: 3px solid #3498db;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+    .trace-item {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px dashed #ddd;
+      font-size: 13px;
+    }
+    .trace-item:last-child { border-bottom: none; }
+    .trace-step { font-weight: 600; color: #3498db; }
+    .trace-meta { font-size: 11px; color: #95a5a6; }
+    .trace-original { background: #fff3cd; padding: 2px 6px; border-radius: 3px; font-size: 11px; }
+    .trace-processed { background: #d4edda; padding: 2px 6px; border-radius: 3px; font-size: 11px; }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .stat-value { font-size: 28px; font-weight: 600; color: #2c3e50; }
+    .stat-label { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
+    .stat-critical .stat-value { color: #e74c3c; }
+    .stat-warning .stat-value { color: #e67e22; }
+    .stat-success .stat-value { color: #27ae60; }
+    
+    .actions { display: flex; gap: 8px; }
+    .checkbox-cell { width: 40px; }
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal h3 { margin-bottom: 15px; }
+    .modal-actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+    
+    .issue-count {
+      display: inline-block;
+      background: #e74c3c;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>画廊寄售结算表</h1>
+      <p>作品编号 · 艺术家 · 展期 · 成交价 · 折扣 · 佣金报告 — 全程可追溯</p>
+    </header>
+
+    <div class="section">
+      <h2>数据导入</h2>
+      <div class="form-group">
+        <label>结算月份:</label>
+        <input type="month" id="settlementMonth" value="2026-04">
+        <label>备注:</label>
+        <input type="text" id="remarks" placeholder="可选">
+      </div>
+      <div class="form-group">
+        <button onclick="loadSampleData()">加载样例数据</button>
+        <button onclick="document.getElementById('csvFile').click()">上传CSV文件</button>
+        <input type="file" id="csvFile" accept=".csv" style="display:none" onchange="handleFileUpload(event)">
+        <span id="importStatus" style="color: #27ae60;"></span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>批次列表</h2>
+      <div id="batchList" class="batch-list">
+        <p style="color: #95a5a6;">暂无批次数据</p>
+      </div>
+    </div>
+
+    <div id="detailSection" class="section hidden">
+      <h2>批次详情 <span id="detailBatchNo"></span></h2>
+      
+      <div id="statsGrid" class="stats-grid"></div>
+      
+      <div class="form-group">
+        <button onclick="validateBatch()" class="secondary">校验数据</button>
+        <button onclick="trialCalculate()" class="warning">佣金试算</button>
+        <button onclick="showAuthModal()" class="warning">批量授权</button>
+        <button onclick="settleBatch()" class="success">完成结算</button>
+        <button onclick="exportBatch()" class="secondary">导出CSV</button>
+        <button onclick="refreshDetail()" class="secondary">刷新</button>
+        <button onclick="hideDetail()" class="secondary">返回</button>
+      </div>
+
+      <table id="itemsTable">
+        <thead>
+          <tr>
+            <th class="checkbox-cell"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+            <th>处理顺序</th>
+            <th>作品编号</th>
+            <th>艺术家</th>
+            <th>展期</th>
+            <th>标价</th>
+            <th>成交价</th>
+            <th>折扣</th>
+            <th>佣金率</th>
+            <th>佣金</th>
+            <th>艺术家应得</th>
+            <th>状态</th>
+            <th>问题</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="itemsTbody"></tbody>
+      </table>
+    </div>
+
+    <div id="traceSection" class="section hidden">
+      <h2>数据追溯 <span id="traceArtworkNo"></span></h2>
+      <div id="traceContent"></div>
+      <div class="form-group">
+        <button onclick="hideTrace()" class="secondary">返回列表</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="authModal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3>批量授权</h3>
+      <div class="form-group">
+        <label>授权类型:</label>
+        <select id="authType" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+          <option value="discount">折扣授权</option>
+          <option value="commission">佣金比例授权</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>授权值:</label>
+        <input type="text" id="authValue" placeholder="如 0.15 表示15%">
+      </div>
+      <div class="form-group">
+        <label>原因:</label>
+        <input type="text" id="authReason" placeholder="授权原因" style="flex: 1;">
+      </div>
+      <div class="form-group">
+        <label>授权人:</label>
+        <input type="text" id="authBy" placeholder="授权人姓名">
+      </div>
+      <div class="modal-actions">
+        <button onclick="document.getElementById('authModal').classList.add('hidden')" class="secondary">取消</button>
+        <button onclick="executeBatchAuth()" class="success">确认授权</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentBatchId = null;
+    let selectedItems = new Set();
+
+    async function api(url, method = 'GET', body = null) {
+      const options = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) options.body = JSON.stringify(body);
+      const res = await fetch('/api' + url, options);
+      return await res.json();
+    }
+
+    async function loadBatches() {
+      const res = await api('/batches');
+      const list = document.getElementById('batchList');
+      if (!res.data || res.data.length === 0) {
+        list.innerHTML = '<p style="color: #95a5a6;">暂无批次数据</p>';
+        return;
+      }
+      list.innerHTML = res.data.map(b => `
+        <div class="batch-item">
+          <div>
+            <div class="batch-no">${b.batch_no}</div>
+            <div class="batch-meta">结算月份: ${b.settlement_month}</div>
+          </div>
+          <div>
+            <div>共 ${b.total_items} 条</div>
+            <div class="batch-meta">已处理 ${b.processed_items || 0} 条</div>
+          </div>
+          <div>
+            <span class="status-badge status-${b.status}">${getStatusText(b.status)}</span>
+          </div>
+          <div class="batch-meta">
+            <div>创建: ${b.created_at}</div>
+            ${b.remarks ? `<div>备注: ${b.remarks}</div>` : ''}
+          </div>
+          <div class="actions">
+            <button onclick="showDetail(${b.id})">查看</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function getStatusText(status) {
+      const map = {
+        imported: '已导入',
+        validated: '已校验',
+        pending_review: '待审核',
+        authorized: '已授权',
+        settled: '已结算',
+        rejected: '已驳回'
+      };
+      return map[status] || status;
+    }
+
+    async function loadSampleData() {
+      const month = document.getElementById('settlementMonth').value;
+      const remarks = document.getElementById('remarks').value;
+      
+      if (!month) {
+        alert('请选择结算月份');
+        return;
+      }
+
+      const sampleData = await getSampleData();
+      const res = await api('/import/json', 'POST', {
+        data: sampleData,
+        settlement_month: month,
+        remarks: remarks || '样例数据'
+      });
+
+      if (res.success) {
+        document.getElementById('importStatus').textContent = `✓ 导入成功，批次号: ${res.data.batch_no}`;
+        setTimeout(() => {
+          document.getElementById('importStatus').textContent = '';
+        }, 5000);
+        loadBatches();
+      } else {
+        alert('导入失败: ' + res.error);
+      }
+    }
+
+    async function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const month = document.getElementById('settlementMonth').value;
+      const remarks = document.getElementById('remarks').value;
+      
+      if (!month) {
+        alert('请选择结算月份');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('settlement_month', month);
+      formData.append('remarks', remarks);
+
+      const res = await fetch('/api/import/csv', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById('importStatus').textContent = `✓ 导入成功，批次号: ${data.data.batch_no}`;
+        loadBatches();
+      } else {
+        alert('导入失败: ' + data.error);
+      }
+    }
+
+    async function getSampleData() {
+      return [
+        {
+          artwork_no: 'ART-2026-001',
+          artist_code: 'A001',
+          artist_name: '张艺涵',
+          exhibition_start_date: '2026-04-01',
+          exhibition_end_date: '2026-04-15',
+          transaction_date: '2026-04-10',
+          listed_price: 15000,
+          transaction_price: 15000,
+          discount_rate: 0,
+          commission_rate: 0.35
+        },
+        {
+          artwork_no: 'ART-2026-002',
+          artist_code: 'A002',
+          artist_name: '李明远',
+          exhibition_start_date: '2026-03-20',
+          exhibition_end_date: '2026-04-05',
+          transaction_date: '2026-04-02',
+          listed_price: 8000,
+          transaction_price: 8000,
+          discount_rate: 0,
+          commission_rate: 0.25
+        },
+        {
+          artwork_no: 'ART-2026-003',
+          artist_code: 'A003',
+          artist_name: '王思齐',
+          exhibition_start_date: '2026-04-10',
+          exhibition_end_date: '2026-04-20',
+          transaction_date: '2026-04-15',
+          listed_price: 50000,
+          transaction_price: 44000,
+          discount_rate: 0.12,
+          commission_rate: 0.40
+        },
+        {
+          artwork_no: 'ART-2026-004',
+          artist_code: 'A001',
+          artist_name: '张艺涵',
+          exhibition_start_date: '2026-04-01',
+          exhibition_end_date: '2026-04-30',
+          transaction_date: '2026-04-20',
+          listed_price: 22000,
+          transaction_price: 22000,
+          discount_rate: 0,
+          commission_rate: 0.30
+        },
+        {
+          artwork_no: 'ART-2026-005',
+          artist_code: 'A999',
+          artist_name: '未知艺术家',
+          exhibition_start_date: '2026-04-01',
+          exhibition_end_date: '2026-04-10',
+          transaction_date: '2026-04-05',
+          listed_price: -5000,
+          transaction_price: 5000,
+          discount_rate: 0,
+          commission_rate: 0.30
+        }
+      ];
+    }
+
+    async function showDetail(batchId) {
+      currentBatchId = batchId;
+      selectedItems.clear();
+      document.getElementById('selectAll').checked = false;
+      await refreshDetail();
+      document.getElementById('detailSection').classList.remove('hidden');
+      document.getElementById('traceSection').classList.add('hidden');
+    }
+
+    async function refreshDetail() {
+      if (!currentBatchId) return;
+      
+      const res = await api(`/batches/${currentBatchId}`);
+      if (!res.success) {
+        alert('加载失败: ' + res.error);
+        return;
+      }
+
+      const { batch, stats, items } = res.data;
+      document.getElementById('detailBatchNo').textContent = batch.batch_no;
+
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card"><div class="stat-value">${stats.total}</div><div class="stat-label">总记录数</div></div>
+        <div class="stat-card stat-success"><div class="stat-value">${stats.settled}</div><div class="stat-label">已结算</div></div>
+        <div class="stat-card"><div class="stat-value">${stats.authorized}</div><div class="stat-label">已授权</div></div>
+        <div class="stat-card"><div class="stat-value">${stats.pending_review}</div><div class="stat-label">待审核</div></div>
+        <div class="stat-card stat-critical"><div class="stat-value">${stats.critical_count}</div><div class="stat-label">严重问题</div></div>
+        <div class="stat-card stat-warning"><div class="stat-value">${stats.warning_count}</div><div class="stat-label">警告</div></div>
+        <div class="stat-card stat-success"><div class="stat-value">¥${stats.total_commission.toFixed(0)}</div><div class="stat-label">佣金总额</div></div>
+        <div class="stat-card stat-success"><div class="stat-value">¥${stats.total_artist_amount.toFixed(0)}</div><div class="stat-label">艺术家总额</div></div>
+      `;
+
+      const tbody = document.getElementById('itemsTbody');
+      tbody.innerHTML = items.map((item, idx) => {
+        const hasIssues = item.has_issues === 1;
+        const severity = item.highest_severity;
+        const checked = selectedItems.has(item.id) ? 'checked' : '';
+        
+        return `
+          <tr>
+            <td><input type="checkbox" class="item-checkbox" data-id="${item.id}" ${checked} onchange="toggleItem(${item.id})"></td>
+            <td>${item.processing_order || '-'}</td>
+            <td><strong>${item.artwork_no}</strong></td>
+            <td>${item.artist_code} ${item.artist_name ? '(' + item.artist_name + ')' : ''}</td>
+            <td>${item.exhibition_start_date}<br>${item.exhibition_end_date}</td>
+            <td>¥${item.listed_price.toLocaleString()}</td>
+            <td>¥${item.transaction_price.toLocaleString()}</td>
+            <td>${((item.discount_rate || 0) * 100).toFixed(1)}%</td>
+            <td>${item.final_commission_rate ? (item.final_commission_rate * 100).toFixed(1) + '%' : '-'}</td>
+            <td>${item.final_commission_amount !== null ? '¥' + item.final_commission_amount.toLocaleString() : '-'}</td>
+            <td>${item.final_artist_amount !== null ? '¥' + item.final_artist_amount.toLocaleString() : '-'}</td>
+            <td><span class="status-badge status-${item.status}">${getStatusText(item.status)}</span></td>
+            <td>${hasIssues ? `<span class="status-badge severity-${severity}">${getSeverityText(severity)}</span>` : '-'}</td>
+            <td>
+              <button onclick="showTrace(${item.id})">追溯</button>
+              ${hasIssues ? `<button onclick="quickAuth(${item.id})" class="warning">授权</button>` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function getSeverityText(severity) {
+      const map = { critical: '严重', warning: '警告', info: '提示' };
+      return map[severity] || '无';
+    }
+
+    function hideDetail() {
+      currentBatchId = null;
+      document.getElementById('detailSection').classList.add('hidden');
+      loadBatches();
+    }
+
+    async function showTrace(itemId) {
+      const res = await api(`/items/${itemId}/trace`);
+      if (!res.success) {
+        alert('加载失败: ' + res.error);
+        return;
+      }
+
+      const trace = res.data;
+      document.getElementById('traceArtworkNo').textContent = trace.item.artwork_no;
+      
+      let html = `
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">${trace.item.status_text}</div>
+            <div class="stat-label">当前状态</div>
+          </div>
+          <div class="stat-card ${trace.item.highest_severity === 'critical' ? 'stat-critical' : trace.item.highest_severity === 'warning' ? 'stat-warning' : 'stat-success'}">
+            <div class="stat-value">${trace.item.highest_severity_text || '无'}</div>
+            <div class="stat-label">最高问题级别</div>
+          </div>
+          ${trace.item.final_commission_amount !== null ? `
+            <div class="stat-card stat-success">
+              <div class="stat-value">¥${trace.item.final_commission_amount.toLocaleString()}</div>
+              <div class="stat-label">佣金</div>
+            </div>
+            <div class="stat-card stat-success">
+              <div class="stat-value">¥${trace.item.final_artist_amount.toLocaleString()}</div>
+              <div class="stat-label">艺术家应得</div>
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="trace-panel">
+          <h3 style="margin-bottom: 10px; font-size: 16px;">原始数据</h3>
+          <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 12px; overflow-x: auto;">${JSON.stringify(trace.original_data, null, 2)}</pre>
+        </div>
+      `;
+
+      if (trace.artist) {
+        html += `
+          <div class="trace-panel">
+            <h3 style="margin-bottom: 10px; font-size: 16px;">艺术家信息</h3>
+            <p><strong>编码:</strong> ${trace.artist.artist_code}</p>
+            <p><strong>姓名:</strong> ${trace.artist.artist_name}</p>
+            <p><strong>等级:</strong> ${trace.artist.artist_level}</p>
+            <p><strong>系统佣金率:</strong> ${(trace.artist.commission_rate * 100).toFixed(1)}%</p>
+          </div>
+        `;
+      }
+
+      if (trace.authorizations && trace.authorizations.length > 0) {
+        html += `
+          <div class="trace-panel">
+            <h3 style="margin-bottom: 10px; font-size: 16px;">授权记录</h3>
+            ${trace.authorizations.map(a => `
+              <div style="padding: 10px; background: #e8f4fd; border-radius: 4px; margin-bottom: 8px;">
+                <p><strong>${a.auth_type} - ${a.auth_field}</strong></p>
+                <p>原值: ${a.original_value} → 授权值: ${a.authorized_value}</p>
+                <p>原因: ${a.reason}</p>
+                <p>授权人: ${a.authorized_by} · ${a.authorized_at}</p>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="trace-panel">
+          <h3 style="margin-bottom: 10px; font-size: 16px;">处理轨迹</h3>
+          ${trace.processing_trace.map(log => `
+            <div class="trace-item">
+              <div>
+                <div class="trace-step">${log.step}</div>
+                <div class="trace-meta">${log.created_at}</div>
+              </div>
+              <div>
+                <div>${log.message}</div>
+                ${log.raw_value ? `<div class="trace-meta">原值: ${log.raw_value}${log.expected_value ? ' → 期望值: ' + log.expected_value : ''}</div>` : ''}
+                ${log.rule_code ? `<div class="trace-meta" style="color: #e74c3c;">规则: ${log.rule_code}</div>` : ''}
+              </div>
+              <div>
+                <span class="status-badge severity-${log.severity}" style="margin-right: 5px;">${log.severity_text}</span>
+                ${log.is_original ? '<span class="trace-original">原始</span>' : ''}
+                ${log.is_processed ? '<span class="trace-processed">处理</span>' : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      document.getElementById('traceContent').innerHTML = html;
+      document.getElementById('traceSection').classList.remove('hidden');
+      document.getElementById('detailSection').classList.add('hidden');
+    }
+
+    function hideTrace() {
+      document.getElementById('traceSection').classList.add('hidden');
+      document.getElementById('detailSection').classList.remove('hidden');
+    }
+
+    async function validateBatch() {
+      if (!currentBatchId) return;
+      const res = await api(`/batches/${currentBatchId}/validate`, 'POST');
+      if (res.success) {
+        alert(`校验完成，共处理 ${res.data.totalItems} 条记录`);
+        refreshDetail();
+      } else {
+        alert('校验失败: ' + res.error);
+      }
+    }
+
+    async function trialCalculate() {
+      if (!currentBatchId) return;
+      const res = await api(`/batches/${currentBatchId}/trial`, 'POST');
+      if (res.success) {
+        alert(`试算完成，共 ${res.data.items.length} 条记录`);
+        refreshDetail();
+      } else {
+        alert('试算失败: ' + res.error);
+      }
+    }
+
+    async function settleBatch() {
+      if (!currentBatchId) return;
+      if (!confirm('确认完成本批次结算？此操作不可逆。')) return;
+      
+      const res = await api(`/batches/${currentBatchId}/settle`, 'POST');
+      if (res.success) {
+        alert(`结算完成: 成功${res.data.success_count}条，失败${res.data.failed_count}条`);
+        refreshDetail();
+      } else {
+        alert('结算失败: ' + res.error);
+      }
+    }
+
+    async function exportBatch() {
+      if (!currentBatchId) return;
+      const res = await api(`/batches/${currentBatchId}/export`, 'POST');
+      if (res.success) {
+        if (confirm(`导出成功: ${res.data.file_name}\n是否下载？`)) {
+          window.location.href = `/api/exports/${res.data.export_id}/download`;
+        }
+      } else {
+        alert('导出失败: ' + res.error);
+      }
+    }
+
+    function toggleSelectAll() {
+      const checked = document.getElementById('selectAll').checked;
+      document.querySelectorAll('.item-checkbox').forEach(cb => {
+        cb.checked = checked;
+        const id = parseInt(cb.dataset.id);
+        if (checked) selectedItems.add(id);
+        else selectedItems.delete(id);
+      });
+    }
+
+    function toggleItem(id) {
+      if (selectedItems.has(id)) selectedItems.delete(id);
+      else selectedItems.add(id);
+    }
+
+    function showAuthModal() {
+      if (selectedItems.size === 0) {
+        alert('请先选择要授权的记录');
+        return;
+      }
+      document.getElementById('authModal').classList.remove('hidden');
+    }
+
+    async function executeBatchAuth() {
+      const authType = document.getElementById('authType').value;
+      const authField = authType === 'discount' ? 'discount_rate' : 'commission_rate';
+      const authValue = parseFloat(document.getElementById('authValue').value);
+      const reason = document.getElementById('authReason').value;
+      const authBy = document.getElementById('authBy').value;
+
+      if (isNaN(authValue) || !reason || !authBy) {
+        alert('请填写完整授权信息');
+        return;
+      }
+
+      const res = await api(`/batches/${currentBatchId}/authorize-batch`, 'POST', {
+        item_ids: Array.from(selectedItems),
+        auth_type: authType,
+        auth_field: authField,
+        authorized_value: authValue,
+        reason: reason,
+        authorized_by: authBy
+      });
+
+      if (res.success) {
+        const success = res.data.filter(r => r.success).length;
+        alert(`授权完成: 成功${success}条，失败${res.data.length - success}条`);
+        document.getElementById('authModal').classList.add('hidden');
+        refreshDetail();
+      } else {
+        alert('授权失败: ' + res.error);
+      }
+    }
+
+    async function quickAuth(itemId) {
+      const reason = prompt('请输入授权原因:');
+      if (!reason) return;
+      const authBy = prompt('请输入授权人:');
+      if (!authBy) return;
+
+      const itemRes = await api(`/items/${itemId}`);
+      if (!itemRes.success) return;
+      const item = itemRes.data;
+
+      let authType, authField, authValue;
+      if (item.highest_severity === 'critical' && (item.discount_rate || 0) > 0.10) {
+        authType = 'discount';
+        authField = 'discount_rate';
+        authValue = item.discount_rate;
+      } else {
+        authType = 'commission';
+        authField = 'commission_rate';
+        authValue = item.declared_commission_rate || 0.30;
+      }
+
+      const res = await api(`/items/${itemId}/authorize`, 'POST', {
+        auth_type: authType,
+        auth_field: authField,
+        authorized_value: authValue,
+        reason: reason,
+        authorized_by: authBy
+      });
+
+      if (res.success) {
+        alert('授权成功');
+        refreshDetail();
+      } else {
+        alert('授权失败: ' + res.error);
+      }
+    }
+
+    loadBatches();
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "gallery-consignment-settlement",
+  "version": "1.0.0",
+  "description": "画廊寄售结算表服务 - 作品结算、佣金试算、授权留痕、历史追溯",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "init-db": "node scripts/init-db.js",
+    "test-sample": "node scripts/process-sample.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "better-sqlite3": "^11.3.0",
+    "csv-parser": "^3.0.0",
+    "multer": "^2.0.0",
+    "@json2csv/plainjs": "^7.0.6",
+    "dayjs": "^1.11.13"
+  }
+}
