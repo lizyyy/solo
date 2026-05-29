@@ -1,0 +1,9 @@
+{
+  "version": "4.0.0",
+  "released_apis": ["document.export", "document.render", "ui.theme.apply", "ui.settings.get", "clean-plugin.api"],
+  "deprecated_apis": ["ui.settings.get"],
+  "removed_apis": ["file.import", "file.parse", "doc.renderLegacy"],
+  "alias_map": {
+    "doc.renderLegacy": "document.render"
+  }
+}

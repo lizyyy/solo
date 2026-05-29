@@ -1,0 +1,13 @@
+{
+  "plugin_id": "pdf-exporter",
+  "name": "PDF Exporter",
+  "author_id": "author-alice",
+  "version": "2.1.0",
+  "min_host_version": "3.0.0",
+  "declared_apis": ["document.export", "document.render"],
+  "api_calls": [
+    {"api_name": "document.export", "call_site": "main.py:42"},
+    {"api_name": "document.render", "call_site": "render.py:15"},
+    {"api_name": "doc.renderLegacy", "call_site": "legacy.py:8"}
+  ]
+}

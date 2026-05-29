@@ -1,0 +1,10 @@
+{
+  "plugin_id": "old-importer",
+  "name": "Legacy Importer",
+  "author_id": "author-bob",
+  "version": "1.0.0",
+  "api_calls": [
+    {"api_name": "file.import", "call_site": "import.py:5"},
+    {"api_name": "file.parse", "call_site": "import.py:12"}
+  ]
+}

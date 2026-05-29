@@ -1,0 +1,28 @@
+[
+  {
+    "plugin_id": "clean-plugin",
+    "name": "Clean Plugin",
+    "author_id": "author-alice",
+    "version": "1.0.0",
+    "api_calls": []
+  },
+  {
+    "name": "Missing ID Plugin"
+  },
+  {
+    "plugin_id": "bad id!",
+    "name": "Bad ID",
+    "author_id": "author-x"
+  },
+  {
+    "plugin_id": "bad-ver",
+    "name": "Bad Version",
+    "author_id": "author-x",
+    "version": "not-semver"
+  },
+  {
+    "plugin_id": "clean-plugin",
+    "name": "Duplicate",
+    "author_id": "author-x"
+  }
+]

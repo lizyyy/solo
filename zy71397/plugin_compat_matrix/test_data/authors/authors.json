@@ -1,0 +1,14 @@
+[
+  {
+    "author_id": "author-alice",
+    "name": "Alice Chen",
+    "email": "alice@example.com",
+    "plugin_ids": ["pdf-exporter", "clean-plugin"]
+  },
+  {
+    "author_id": "author-bob",
+    "name": "Bob Wang",
+    "email": "bob@example.com",
+    "plugin_ids": ["theme-dark", "old-importer"]
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "plugin_id": "theme-dark",
+  "name": "Dark Theme",
+  "author_id": "author-bob",
+  "api_calls": [
+    {"api_name": "ui.theme.apply", "call_site": "index.py:10"},
+    {"api_name": "ui.settings.get", "call_site": "index.py:20"}
+  ]
+}

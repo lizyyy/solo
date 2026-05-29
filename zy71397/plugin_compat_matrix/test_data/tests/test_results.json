@@ -1,0 +1,23 @@
+[
+  {
+    "plugin_id": "pdf-exporter",
+    "host_version": "4.0.0",
+    "status": "passed",
+    "tested_apis": ["document.export", "document.render"],
+    "timestamp": "2026-05-30T10:00:00Z"
+  },
+  {
+    "plugin_id": "theme-dark",
+    "host_version": "4.0.0",
+    "status": "failed",
+    "tested_apis": ["ui.theme.apply"],
+    "timestamp": "2026-05-30T10:05:00Z"
+  },
+  {
+    "plugin_id": "old-importer",
+    "host_version": "4.0.0",
+    "status": "missing",
+    "tested_apis": [],
+    "timestamp": "2026-05-30T10:10:00Z"
+  }
+]
