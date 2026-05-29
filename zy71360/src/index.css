@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-film-bg text-film-text-primary font-sans;
+  }
+
+  body {
+    @apply min-h-screen bg-film-bg text-film-text-primary;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-film-panel;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-film-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-film-primary/50;
+  }
+}
+
+@layer components {
+  .film-border {
+    position: relative;
+  }
+
+  .film-border::before,
+  .film-border::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background-image: 
+      radial-gradient(circle, #2a2a4a 2px, transparent 2px);
+    background-size: 16px 8px;
+    background-repeat: repeat-x;
+  }
+
+  .film-border::before {
+    top: 0;
+  }
+
+  .film-border::after {
+    bottom: 0;
+  }
+
+  .timecode {
+    @apply font-mono text-sm tracking-wider bg-film-accent px-3 py-1 rounded text-film-text-secondary;
+  }
+
+  .diff-added {
+    @apply bg-green-500/20 text-green-400 underline decoration-green-400;
+  }
+
+  .diff-removed {
+    @apply bg-red-500/20 text-red-400 line-through decoration-red-400;
+  }
+
+  .diff-unchanged {
+    @apply text-film-text-primary;
+  }
+}
+
+@layer utilities {
+  .text-shadow-glow {
+    text-shadow: 0 0 10px currentColor;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
