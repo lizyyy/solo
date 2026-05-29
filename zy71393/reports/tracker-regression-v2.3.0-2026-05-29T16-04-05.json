@@ -1,0 +1,1047 @@
+{
+  "id": "report-afbe6c44a01b1f7a",
+  "title": "埋点回归报告 - v2.3.0",
+  "generatedAt": "2026-05-29T16:04:05.616Z",
+  "manifestVersion": "1.0.0",
+  "releaseVersion": "v2.3.0",
+  "totalEvents": 9,
+  "passedEvents": 1,
+  "failedEvents": 3,
+  "warningEvents": 3,
+  "missingEvents": 2,
+  "summary": {
+    "critical": 3,
+    "high": 5,
+    "medium": 6,
+    "low": 2,
+    "info": 0
+  },
+  "results": [
+    {
+      "eventId": "page_view_home",
+      "eventName": "首页浏览",
+      "status": "warning",
+      "issues": [
+        {
+          "id": "sampling-delay-1780070645615",
+          "type": "sampling_delay",
+          "severity": "medium",
+          "eventId": "page_view_home",
+          "eventName": "首页浏览",
+          "message": "检测到采样延迟: 最大 10.0s，平均 10.0s",
+          "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+          "impactScope": [
+            "事件数: 2",
+            "最大延迟: 10.0s",
+            "平均延迟: 10.0s",
+            "阈值: 5.0s",
+            "事件ID: page_view_home"
+          ],
+          "nextActions": [
+            "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+            "2. 确认采样率配置是否合理",
+            "3. 分析网络请求日志是否存在拥塞",
+            "4. 如是预期行为，可调高延迟阈值",
+            "5. 检查事件触发场景是否均匀分布"
+          ],
+          "expected": 5000,
+          "actual": 10000
+        }
+      ],
+      "parameterValidations": [
+        {
+          "parameterName": "userId",
+          "status": "pass",
+          "expectedType": "string"
+        },
+        {
+          "parameterName": "sessionId",
+          "status": "pass",
+          "expectedType": "string"
+        },
+        {
+          "parameterName": "referrer",
+          "status": "pass",
+          "expectedType": "string"
+        },
+        {
+          "parameterName": "abTestGroup",
+          "status": "pass",
+          "expectedType": "string"
+        }
+      ],
+      "pagePathMatch": true,
+      "expectedPagePath": "/home",
+      "actualPagePath": "/home",
+      "sampleCount": 2,
+      "firstSeen": 1705300200000,
+      "lastSeen": 1705300210000,
+      "samplingDelayMs": 10000
+    },
+    {
+      "eventId": "click_buy_button",
+      "eventName": "购买按钮点击",
+      "status": "fail",
+      "issues": [
+        {
+          "id": "param-parameter_type_changed-price-1780070645615",
+          "type": "parameter_type_changed",
+          "severity": "high",
+          "eventId": "click_buy_button",
+          "eventName": "购买按钮点击",
+          "message": "参数 \"price\" 类型错误: 期望 number，实际 string (1/2 条记录)",
+          "reason": "参数类型不匹配。Schema定义为 number，但实际采集到 string。可能是前端数据类型转换问题或Schema定义过时。",
+          "impactScope": [
+            "参数名: price",
+            "必填: 是",
+            "影响事件数: 2",
+            "事件ID: click_buy_button"
+          ],
+          "nextActions": [
+            "1. 检查前端代码中该参数的数据类型",
+            "2. 确认是否存在隐式类型转换（如字符串转数字）",
+            "3. 如是Schema过时，更新Schema定义为 string",
+            "4. 添加类型校验逻辑确保数据一致性"
+          ],
+          "expected": "number",
+          "actual": "string",
+          "parameterName": "price"
+        },
+        {
+          "id": "param-parameter_type_changed-source-1780070645615",
+          "type": "parameter_type_changed",
+          "severity": "high",
+          "eventId": "click_buy_button",
+          "eventName": "购买按钮点击",
+          "message": "参数 \"source\" 值不在枚举范围内: invalid_source",
+          "reason": "参数类型不匹配。Schema定义为 undefined，但实际采集到 undefined。可能是前端数据类型转换问题或Schema定义过时。",
+          "impactScope": [
+            "参数名: source",
+            "必填: 是",
+            "影响事件数: 2",
+            "事件ID: click_buy_button"
+          ],
+          "nextActions": [
+            "1. 检查前端代码中该参数的数据类型",
+            "2. 确认是否存在隐式类型转换（如字符串转数字）",
+            "3. 如是Schema过时，更新Schema定义为 undefined",
+            "4. 添加类型校验逻辑确保数据一致性"
+          ],
+          "expected": [
+            "recommend",
+            "search",
+            "category",
+            "direct"
+          ],
+          "actual": "invalid_source",
+          "parameterName": "source"
+        },
+        {
+          "id": "sampling-delay-1780070645615",
+          "type": "sampling_delay",
+          "severity": "critical",
+          "eventId": "click_buy_button",
+          "eventName": "购买按钮点击",
+          "message": "检测到采样延迟: 最大 1.7min，平均 1.7min",
+          "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+          "impactScope": [
+            "事件数: 2",
+            "最大延迟: 1.7min",
+            "平均延迟: 1.7min",
+            "阈值: 5.0s",
+            "事件ID: click_buy_button"
+          ],
+          "nextActions": [
+            "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+            "2. 确认采样率配置是否合理",
+            "3. 分析网络请求日志是否存在拥塞",
+            "4. 如是预期行为，可调高延迟阈值",
+            "5. 检查事件触发场景是否均匀分布"
+          ],
+          "expected": 5000,
+          "actual": 100000
+        }
+      ],
+      "parameterValidations": [
+        {
+          "parameterName": "productId",
+          "status": "pass",
+          "expectedType": "string"
+        },
+        {
+          "parameterName": "price",
+          "status": "fail",
+          "message": "参数 \"price\" 类型错误: 期望 number，实际 string (1/2 条记录)",
+          "expectedType": "number",
+          "actualType": "string",
+          "actual": "199.99"
+        },
+        {
+          "parameterName": "quantity",
+          "status": "pass",
+          "expectedType": "number"
+        },
+        {
+          "parameterName": "source",
+          "status": "fail",
+          "message": "参数 \"source\" 值不在枚举范围内: invalid_source",
+          "expected": [
+            "recommend",
+            "search",
+            "category",
+            "direct"
+          ],
+          "actual": "invalid_source"
+        }
+      ],
+      "pagePathMatch": true,
+      "expectedPagePath": "/product/detail",
+      "actualPagePath": "/product/detail",
+      "sampleCount": 2,
+      "firstSeen": 1705300500000,
+      "lastSeen": 1705300600000,
+      "samplingDelayMs": 100000
+    },
+    {
+      "eventId": "checkout_start",
+      "eventName": "开始结账",
+      "status": "pass",
+      "issues": [],
+      "parameterValidations": [
+        {
+          "parameterName": "orderId",
+          "status": "pass",
+          "expectedType": "string"
+        },
+        {
+          "parameterName": "totalAmount",
+          "status": "pass",
+          "expectedType": "number"
+        },
+        {
+          "parameterName": "itemCount",
+          "status": "pass",
+          "expectedType": "number"
+        },
+        {
+          "parameterName": "couponApplied",
+          "status": "pass",
+          "expectedType": "boolean"
+        }
+      ],
+      "pagePathMatch": true,
+      "expectedPagePath": "/checkout",
+      "actualPagePath": "/checkout",
+      "sampleCount": 1,
+      "firstSeen": 1705300700000,
+      "lastSeen": 1705300700000,
+      "samplingDelayMs": 0
+    },
+    {
+      "eventId": "payment_success",
+      "eventName": "支付成功",
+      "status": "fail",
+      "issues": [
+        {
+          "id": "param-parameter_type_changed-payAmount-1780070645615",
+          "type": "parameter_type_changed",
+          "severity": "high",
+          "eventId": "payment_success",
+          "eventName": "支付成功",
+          "message": "参数 \"payAmount\" 类型错误: 期望 number，实际 string (1/2 条记录)",
+          "reason": "参数类型不匹配。Schema定义为 number，但实际采集到 string。可能是前端数据类型转换问题或Schema定义过时。",
+          "impactScope": [
+            "参数名: payAmount",
+            "必填: 是",
+            "影响事件数: 2",
+            "事件ID: payment_success"
+          ],
+          "nextActions": [
+            "1. 检查前端代码中该参数的数据类型",
+            "2. 确认是否存在隐式类型转换（如字符串转数字）",
+            "3. 如是Schema过时，更新Schema定义为 string",
+            "4. 添加类型校验逻辑确保数据一致性"
+          ],
+          "expected": "number",
+          "actual": "string",
+          "parameterName": "payAmount"
+        },
+        {
+          "id": "sampling-delay-1780070645615",
+          "type": "sampling_delay",
+          "severity": "critical",
+          "eventId": "payment_success",
+          "eventName": "支付成功",
+          "message": "检测到采样延迟: 最大 8.3min，平均 8.3min",
+          "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+          "impactScope": [
+            "事件数: 2",
+            "最大延迟: 8.3min",
+            "平均延迟: 8.3min",
+            "阈值: 5.0s",
+            "事件ID: payment_success"
+          ],
+          "nextActions": [
+            "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+            "2. 确认采样率配置是否合理",
+            "3. 分析网络请求日志是否存在拥塞",
+            "4. 如是预期行为，可调高延迟阈值",
+            "5. 检查事件触发场景是否均匀分布"
+          ],
+          "expected": 5000,
+          "actual": 500000
+        }
+      ],
+      "parameterValidations": [
+        {
+          "parameterName": "orderId",
+          "status": "pass",
+          "expectedType": "string"
+        },
+        {
+          "parameterName": "payAmount",
+          "status": "fail",
+          "message": "参数 \"payAmount\" 类型错误: 期望 number，实际 string (1/2 条记录)",
+          "expectedType": "number",
+          "actualType": "string",
+          "actual": "99.99"
+        },
+        {
+          "parameterName": "payMethod",
+          "status": "pass",
+          "expectedType": "string"
+        },
+        {
+          "parameterName": "payTime",
+          "status": "pass",
+          "expectedType": "number"
+        }
+      ],
+      "pagePathMatch": true,
+      "expectedPagePath": "/checkout/success",
+      "actualPagePath": "/checkout/success",
+      "sampleCount": 2,
+      "firstSeen": 1705301000000,
+      "lastSeen": 1705301500000,
+      "samplingDelayMs": 500000
+    },
+    {
+      "eventId": "sampling_delay_test",
+      "eventName": "采样延迟测试事件",
+      "status": "warning",
+      "issues": [
+        {
+          "id": "sampling-delay-1780070645615",
+          "type": "sampling_delay",
+          "severity": "critical",
+          "eventId": "sampling_delay_test",
+          "eventName": "采样延迟测试事件",
+          "message": "检测到采样延迟: 最大 1.2min，平均 24.0s",
+          "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+          "impactScope": [
+            "事件数: 6",
+            "最大延迟: 1.2min",
+            "平均延迟: 24.0s",
+            "阈值: 5.0s",
+            "事件ID: sampling_delay_test"
+          ],
+          "nextActions": [
+            "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+            "2. 确认采样率配置是否合理",
+            "3. 分析网络请求日志是否存在拥塞",
+            "4. 如是预期行为，可调高延迟阈值",
+            "5. 检查事件触发场景是否均匀分布"
+          ],
+          "expected": 5000,
+          "actual": 70000
+        }
+      ],
+      "parameterValidations": [
+        {
+          "parameterName": "seq",
+          "status": "pass",
+          "expectedType": "number"
+        }
+      ],
+      "pagePathMatch": true,
+      "expectedPagePath": "/test/delay",
+      "actualPagePath": "/test/delay",
+      "sampleCount": 6,
+      "firstSeen": 1705303000000,
+      "lastSeen": 1705303120000,
+      "samplingDelayMs": 70000
+    },
+    {
+      "eventId": "wrong_param_type_event",
+      "eventName": "参数类型错误测试",
+      "status": "fail",
+      "issues": [
+        {
+          "id": "param-parameter_type_changed-shouldBeNumber-1780070645615",
+          "type": "parameter_type_changed",
+          "severity": "high",
+          "eventId": "wrong_param_type_event",
+          "eventName": "参数类型错误测试",
+          "message": "参数 \"shouldBeNumber\" 类型错误: 期望 number，实际 string (2/2 条记录)",
+          "reason": "参数类型不匹配。Schema定义为 number，但实际采集到 string。可能是前端数据类型转换问题或Schema定义过时。",
+          "impactScope": [
+            "参数名: shouldBeNumber",
+            "必填: 是",
+            "影响事件数: 2",
+            "事件ID: wrong_param_type_event"
+          ],
+          "nextActions": [
+            "1. 检查前端代码中该参数的数据类型",
+            "2. 确认是否存在隐式类型转换（如字符串转数字）",
+            "3. 如是Schema过时，更新Schema定义为 string",
+            "4. 添加类型校验逻辑确保数据一致性"
+          ],
+          "expected": "number",
+          "actual": "string",
+          "parameterName": "shouldBeNumber"
+        },
+        {
+          "id": "param-parameter_type_changed-shouldBeString-1780070645615",
+          "type": "parameter_type_changed",
+          "severity": "high",
+          "eventId": "wrong_param_type_event",
+          "eventName": "参数类型错误测试",
+          "message": "参数 \"shouldBeString\" 类型错误: 期望 string，实际 number (1/2 条记录)",
+          "reason": "参数类型不匹配。Schema定义为 string，但实际采集到 number。可能是前端数据类型转换问题或Schema定义过时。",
+          "impactScope": [
+            "参数名: shouldBeString",
+            "必填: 是",
+            "影响事件数: 2",
+            "事件ID: wrong_param_type_event"
+          ],
+          "nextActions": [
+            "1. 检查前端代码中该参数的数据类型",
+            "2. 确认是否存在隐式类型转换（如字符串转数字）",
+            "3. 如是Schema过时，更新Schema定义为 number",
+            "4. 添加类型校验逻辑确保数据一致性"
+          ],
+          "expected": "string",
+          "actual": "number",
+          "parameterName": "shouldBeString"
+        },
+        {
+          "id": "param-parameter_value_invalid-optionalParam-1780070645615",
+          "type": "parameter_value_invalid",
+          "severity": "medium",
+          "eventId": "wrong_param_type_event",
+          "eventName": "参数类型错误测试",
+          "message": "可选参数 \"optionalParam\" 在所有日志中都缺失",
+          "reason": "参数值不符合约束条件。",
+          "impactScope": [
+            "参数名: optionalParam",
+            "必填: 否",
+            "影响事件数: 2",
+            "事件ID: wrong_param_type_event"
+          ],
+          "nextActions": [
+            "1. 检查前端代码中参数值的生成逻辑",
+            "2. 确认是否需要更新枚举值范围",
+            "3. 添加前端参数值校验",
+            "4. 如是合法新值，更新Schema定义"
+          ],
+          "expected": "boolean",
+          "parameterName": "optionalParam"
+        },
+        {
+          "id": "sampling-delay-1780070645615",
+          "type": "sampling_delay",
+          "severity": "medium",
+          "eventId": "wrong_param_type_event",
+          "eventName": "参数类型错误测试",
+          "message": "检测到采样延迟: 最大 10.0s，平均 10.0s",
+          "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+          "impactScope": [
+            "事件数: 2",
+            "最大延迟: 10.0s",
+            "平均延迟: 10.0s",
+            "阈值: 5.0s",
+            "事件ID: wrong_param_type_event"
+          ],
+          "nextActions": [
+            "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+            "2. 确认采样率配置是否合理",
+            "3. 分析网络请求日志是否存在拥塞",
+            "4. 如是预期行为，可调高延迟阈值",
+            "5. 检查事件触发场景是否均匀分布"
+          ],
+          "expected": 5000,
+          "actual": 10000
+        }
+      ],
+      "parameterValidations": [
+        {
+          "parameterName": "shouldBeNumber",
+          "status": "fail",
+          "message": "参数 \"shouldBeNumber\" 类型错误: 期望 number，实际 string (2/2 条记录)",
+          "expectedType": "number",
+          "actualType": "string",
+          "actual": "123"
+        },
+        {
+          "parameterName": "shouldBeString",
+          "status": "fail",
+          "message": "参数 \"shouldBeString\" 类型错误: 期望 string，实际 number (1/2 条记录)",
+          "expectedType": "string",
+          "actualType": "number",
+          "actual": 456
+        },
+        {
+          "parameterName": "optionalParam",
+          "status": "warning",
+          "message": "可选参数 \"optionalParam\" 在所有日志中都缺失",
+          "expectedType": "boolean"
+        }
+      ],
+      "pagePathMatch": true,
+      "expectedPagePath": "/test/param-type",
+      "actualPagePath": "/test/param-type",
+      "sampleCount": 2,
+      "firstSeen": 1705304000000,
+      "lastSeen": 1705304010000,
+      "samplingDelayMs": 10000
+    },
+    {
+      "eventId": "page_path_mismatch",
+      "eventName": "页面路径不匹配测试",
+      "status": "warning",
+      "issues": [
+        {
+          "id": "page-path-mismatch-1780070645615",
+          "type": "page_path_changed",
+          "severity": "low",
+          "eventId": "page_path_mismatch",
+          "eventName": "页面路径不匹配测试",
+          "message": "页面路径不匹配: 期望 \"/expected/path\"，实际 \"/actual/different/path\"",
+          "reason": "事件在不同的页面路径下被触发。可能是URL结构变更、路由配置调整，或事件被复用到其他页面。",
+          "impactScope": [
+            "期望路径: /expected/path",
+            "实际路径: /actual/different/path",
+            "匹配模式: prefix",
+            "不匹配记录数: 1"
+          ],
+          "nextActions": [
+            "1. 确认页面路由是否已变更",
+            "2. 检查事件是否应在新路径下触发",
+            "3. 如是预期行为，更新清单中的 pagePath 定义",
+            "4. 考虑使用路径前缀匹配模式"
+          ],
+          "expected": "/expected/path",
+          "actual": "/actual/different/path"
+        },
+        {
+          "id": "sampling-delay-1780070645615",
+          "type": "sampling_delay",
+          "severity": "medium",
+          "eventId": "page_path_mismatch",
+          "eventName": "页面路径不匹配测试",
+          "message": "检测到采样延迟: 最大 10.0s，平均 10.0s",
+          "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+          "impactScope": [
+            "事件数: 2",
+            "最大延迟: 10.0s",
+            "平均延迟: 10.0s",
+            "阈值: 5.0s",
+            "事件ID: page_path_mismatch"
+          ],
+          "nextActions": [
+            "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+            "2. 确认采样率配置是否合理",
+            "3. 分析网络请求日志是否存在拥塞",
+            "4. 如是预期行为，可调高延迟阈值",
+            "5. 检查事件触发场景是否均匀分布"
+          ],
+          "expected": 5000,
+          "actual": 10000
+        }
+      ],
+      "parameterValidations": [
+        {
+          "parameterName": "data",
+          "status": "pass",
+          "expectedType": "string"
+        }
+      ],
+      "pagePathMatch": false,
+      "expectedPagePath": "/expected/path",
+      "actualPagePath": "/actual/different/path",
+      "sampleCount": 2,
+      "firstSeen": 1705305000000,
+      "lastSeen": 1705305010000,
+      "samplingDelayMs": 10000
+    },
+    {
+      "eventId": "event_with_renamed_log",
+      "eventName": "搜索提交",
+      "status": "missing",
+      "issues": [],
+      "parameterValidations": [],
+      "pagePathMatch": false,
+      "expectedPagePath": "/search",
+      "sampleCount": 0
+    },
+    {
+      "eventId": "missing_event_example",
+      "eventName": "缺失事件示例",
+      "status": "missing",
+      "issues": [],
+      "parameterValidations": [],
+      "pagePathMatch": false,
+      "expectedPagePath": "/test/missing",
+      "sampleCount": 0
+    }
+  ],
+  "issues": [
+    {
+      "id": "missing-event_with_renamed_log",
+      "type": "event_missing",
+      "severity": "medium",
+      "eventId": "event_with_renamed_log",
+      "eventName": "搜索提交",
+      "message": "事件 \"搜索提交\" (event_with_renamed_log) 在日志中缺失",
+      "reason": "在采集的事件日志中未找到匹配的事件记录。可能原因：埋点代码未触发、事件ID/名称不匹配、采样过滤或前端埋点丢失。",
+      "impactScope": [
+        "页面: /search",
+        "分类: search",
+        "负责人: search-team"
+      ],
+      "nextActions": [
+        "1. 验证前端埋点代码中事件ID是否为 \"event_with_renamed_log\"",
+        "2. 检查页面路径 /search 是否可正常访问",
+        "3. 确认事件触发条件（如按钮点击、页面加载等）",
+        "4. 检查采样率配置是否过滤了该事件",
+        "5. 查看浏览器控制台是否有埋点相关错误"
+      ],
+      "pagePath": "/search",
+      "notes": "事件已改名：由 search_submit 改为 event_with_renamed_log"
+    },
+    {
+      "id": "missing-missing_event_example",
+      "type": "event_missing",
+      "severity": "medium",
+      "eventId": "missing_event_example",
+      "eventName": "缺失事件示例",
+      "message": "事件 \"缺失事件示例\" (missing_event_example) 在日志中缺失",
+      "reason": "在采集的事件日志中未找到匹配的事件记录。可能原因：埋点代码未触发、事件ID/名称不匹配、采样过滤或前端埋点丢失。",
+      "impactScope": [
+        "页面: /test/missing",
+        "分类: test",
+        "负责人: qa-team"
+      ],
+      "nextActions": [
+        "1. 验证前端埋点代码中事件ID是否为 \"missing_event_example\"",
+        "2. 检查页面路径 /test/missing 是否可正常访问",
+        "3. 确认事件触发条件（如按钮点击、页面加载等）",
+        "4. 检查采样率配置是否过滤了该事件",
+        "5. 查看浏览器控制台是否有埋点相关错误"
+      ],
+      "pagePath": "/test/missing"
+    },
+    {
+      "id": "deprecated-old_banner_click",
+      "type": "event_deprecated",
+      "severity": "low",
+      "eventId": "old_banner_click",
+      "eventName": "Banner点击(旧)",
+      "message": "已废弃事件 \"Banner点击(旧)\" 仍在被触发",
+      "reason": "该事件在 v2.2.0 标记为废弃，但日志中仍有采集记录。",
+      "impactScope": [
+        "事件ID: old_banner_click",
+        "废弃版本: v2.2.0",
+        "页面: /home"
+      ],
+      "nextActions": [
+        "1. 确认该事件是否应该被移除",
+        "2. 检查前端代码是否仍在调用该埋点",
+        "3. 评估历史数据依赖关系",
+        "4. 安排完全移除的时间节点"
+      ],
+      "pagePath": "/home"
+    },
+    {
+      "id": "sampling-delay-1780070645615",
+      "type": "sampling_delay",
+      "severity": "medium",
+      "eventId": "page_view_home",
+      "eventName": "首页浏览",
+      "message": "检测到采样延迟: 最大 10.0s，平均 10.0s",
+      "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+      "impactScope": [
+        "事件数: 2",
+        "最大延迟: 10.0s",
+        "平均延迟: 10.0s",
+        "阈值: 5.0s",
+        "事件ID: page_view_home"
+      ],
+      "nextActions": [
+        "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+        "2. 确认采样率配置是否合理",
+        "3. 分析网络请求日志是否存在拥塞",
+        "4. 如是预期行为，可调高延迟阈值",
+        "5. 检查事件触发场景是否均匀分布"
+      ],
+      "expected": 5000,
+      "actual": 10000
+    },
+    {
+      "id": "param-parameter_type_changed-price-1780070645615",
+      "type": "parameter_type_changed",
+      "severity": "high",
+      "eventId": "click_buy_button",
+      "eventName": "购买按钮点击",
+      "message": "参数 \"price\" 类型错误: 期望 number，实际 string (1/2 条记录)",
+      "reason": "参数类型不匹配。Schema定义为 number，但实际采集到 string。可能是前端数据类型转换问题或Schema定义过时。",
+      "impactScope": [
+        "参数名: price",
+        "必填: 是",
+        "影响事件数: 2",
+        "事件ID: click_buy_button"
+      ],
+      "nextActions": [
+        "1. 检查前端代码中该参数的数据类型",
+        "2. 确认是否存在隐式类型转换（如字符串转数字）",
+        "3. 如是Schema过时，更新Schema定义为 string",
+        "4. 添加类型校验逻辑确保数据一致性"
+      ],
+      "expected": "number",
+      "actual": "string",
+      "parameterName": "price"
+    },
+    {
+      "id": "param-parameter_type_changed-source-1780070645615",
+      "type": "parameter_type_changed",
+      "severity": "high",
+      "eventId": "click_buy_button",
+      "eventName": "购买按钮点击",
+      "message": "参数 \"source\" 值不在枚举范围内: invalid_source",
+      "reason": "参数类型不匹配。Schema定义为 undefined，但实际采集到 undefined。可能是前端数据类型转换问题或Schema定义过时。",
+      "impactScope": [
+        "参数名: source",
+        "必填: 是",
+        "影响事件数: 2",
+        "事件ID: click_buy_button"
+      ],
+      "nextActions": [
+        "1. 检查前端代码中该参数的数据类型",
+        "2. 确认是否存在隐式类型转换（如字符串转数字）",
+        "3. 如是Schema过时，更新Schema定义为 undefined",
+        "4. 添加类型校验逻辑确保数据一致性"
+      ],
+      "expected": [
+        "recommend",
+        "search",
+        "category",
+        "direct"
+      ],
+      "actual": "invalid_source",
+      "parameterName": "source"
+    },
+    {
+      "id": "sampling-delay-1780070645615",
+      "type": "sampling_delay",
+      "severity": "critical",
+      "eventId": "click_buy_button",
+      "eventName": "购买按钮点击",
+      "message": "检测到采样延迟: 最大 1.7min，平均 1.7min",
+      "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+      "impactScope": [
+        "事件数: 2",
+        "最大延迟: 1.7min",
+        "平均延迟: 1.7min",
+        "阈值: 5.0s",
+        "事件ID: click_buy_button"
+      ],
+      "nextActions": [
+        "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+        "2. 确认采样率配置是否合理",
+        "3. 分析网络请求日志是否存在拥塞",
+        "4. 如是预期行为，可调高延迟阈值",
+        "5. 检查事件触发场景是否均匀分布"
+      ],
+      "expected": 5000,
+      "actual": 100000
+    },
+    {
+      "id": "param-parameter_type_changed-payAmount-1780070645615",
+      "type": "parameter_type_changed",
+      "severity": "high",
+      "eventId": "payment_success",
+      "eventName": "支付成功",
+      "message": "参数 \"payAmount\" 类型错误: 期望 number，实际 string (1/2 条记录)",
+      "reason": "参数类型不匹配。Schema定义为 number，但实际采集到 string。可能是前端数据类型转换问题或Schema定义过时。",
+      "impactScope": [
+        "参数名: payAmount",
+        "必填: 是",
+        "影响事件数: 2",
+        "事件ID: payment_success"
+      ],
+      "nextActions": [
+        "1. 检查前端代码中该参数的数据类型",
+        "2. 确认是否存在隐式类型转换（如字符串转数字）",
+        "3. 如是Schema过时，更新Schema定义为 string",
+        "4. 添加类型校验逻辑确保数据一致性"
+      ],
+      "expected": "number",
+      "actual": "string",
+      "parameterName": "payAmount"
+    },
+    {
+      "id": "sampling-delay-1780070645615",
+      "type": "sampling_delay",
+      "severity": "critical",
+      "eventId": "payment_success",
+      "eventName": "支付成功",
+      "message": "检测到采样延迟: 最大 8.3min，平均 8.3min",
+      "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+      "impactScope": [
+        "事件数: 2",
+        "最大延迟: 8.3min",
+        "平均延迟: 8.3min",
+        "阈值: 5.0s",
+        "事件ID: payment_success"
+      ],
+      "nextActions": [
+        "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+        "2. 确认采样率配置是否合理",
+        "3. 分析网络请求日志是否存在拥塞",
+        "4. 如是预期行为，可调高延迟阈值",
+        "5. 检查事件触发场景是否均匀分布"
+      ],
+      "expected": 5000,
+      "actual": 500000
+    },
+    {
+      "id": "sampling-delay-1780070645615",
+      "type": "sampling_delay",
+      "severity": "critical",
+      "eventId": "sampling_delay_test",
+      "eventName": "采样延迟测试事件",
+      "message": "检测到采样延迟: 最大 1.2min，平均 24.0s",
+      "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+      "impactScope": [
+        "事件数: 6",
+        "最大延迟: 1.2min",
+        "平均延迟: 24.0s",
+        "阈值: 5.0s",
+        "事件ID: sampling_delay_test"
+      ],
+      "nextActions": [
+        "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+        "2. 确认采样率配置是否合理",
+        "3. 分析网络请求日志是否存在拥塞",
+        "4. 如是预期行为，可调高延迟阈值",
+        "5. 检查事件触发场景是否均匀分布"
+      ],
+      "expected": 5000,
+      "actual": 70000
+    },
+    {
+      "id": "param-parameter_type_changed-shouldBeNumber-1780070645615",
+      "type": "parameter_type_changed",
+      "severity": "high",
+      "eventId": "wrong_param_type_event",
+      "eventName": "参数类型错误测试",
+      "message": "参数 \"shouldBeNumber\" 类型错误: 期望 number，实际 string (2/2 条记录)",
+      "reason": "参数类型不匹配。Schema定义为 number，但实际采集到 string。可能是前端数据类型转换问题或Schema定义过时。",
+      "impactScope": [
+        "参数名: shouldBeNumber",
+        "必填: 是",
+        "影响事件数: 2",
+        "事件ID: wrong_param_type_event"
+      ],
+      "nextActions": [
+        "1. 检查前端代码中该参数的数据类型",
+        "2. 确认是否存在隐式类型转换（如字符串转数字）",
+        "3. 如是Schema过时，更新Schema定义为 string",
+        "4. 添加类型校验逻辑确保数据一致性"
+      ],
+      "expected": "number",
+      "actual": "string",
+      "parameterName": "shouldBeNumber"
+    },
+    {
+      "id": "param-parameter_type_changed-shouldBeString-1780070645615",
+      "type": "parameter_type_changed",
+      "severity": "high",
+      "eventId": "wrong_param_type_event",
+      "eventName": "参数类型错误测试",
+      "message": "参数 \"shouldBeString\" 类型错误: 期望 string，实际 number (1/2 条记录)",
+      "reason": "参数类型不匹配。Schema定义为 string，但实际采集到 number。可能是前端数据类型转换问题或Schema定义过时。",
+      "impactScope": [
+        "参数名: shouldBeString",
+        "必填: 是",
+        "影响事件数: 2",
+        "事件ID: wrong_param_type_event"
+      ],
+      "nextActions": [
+        "1. 检查前端代码中该参数的数据类型",
+        "2. 确认是否存在隐式类型转换（如字符串转数字）",
+        "3. 如是Schema过时，更新Schema定义为 number",
+        "4. 添加类型校验逻辑确保数据一致性"
+      ],
+      "expected": "string",
+      "actual": "number",
+      "parameterName": "shouldBeString"
+    },
+    {
+      "id": "param-parameter_value_invalid-optionalParam-1780070645615",
+      "type": "parameter_value_invalid",
+      "severity": "medium",
+      "eventId": "wrong_param_type_event",
+      "eventName": "参数类型错误测试",
+      "message": "可选参数 \"optionalParam\" 在所有日志中都缺失",
+      "reason": "参数值不符合约束条件。",
+      "impactScope": [
+        "参数名: optionalParam",
+        "必填: 否",
+        "影响事件数: 2",
+        "事件ID: wrong_param_type_event"
+      ],
+      "nextActions": [
+        "1. 检查前端代码中参数值的生成逻辑",
+        "2. 确认是否需要更新枚举值范围",
+        "3. 添加前端参数值校验",
+        "4. 如是合法新值，更新Schema定义"
+      ],
+      "expected": "boolean",
+      "parameterName": "optionalParam"
+    },
+    {
+      "id": "sampling-delay-1780070645615",
+      "type": "sampling_delay",
+      "severity": "medium",
+      "eventId": "wrong_param_type_event",
+      "eventName": "参数类型错误测试",
+      "message": "检测到采样延迟: 最大 10.0s，平均 10.0s",
+      "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+      "impactScope": [
+        "事件数: 2",
+        "最大延迟: 10.0s",
+        "平均延迟: 10.0s",
+        "阈值: 5.0s",
+        "事件ID: wrong_param_type_event"
+      ],
+      "nextActions": [
+        "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+        "2. 确认采样率配置是否合理",
+        "3. 分析网络请求日志是否存在拥塞",
+        "4. 如是预期行为，可调高延迟阈值",
+        "5. 检查事件触发场景是否均匀分布"
+      ],
+      "expected": 5000,
+      "actual": 10000
+    },
+    {
+      "id": "page-path-mismatch-1780070645615",
+      "type": "page_path_changed",
+      "severity": "low",
+      "eventId": "page_path_mismatch",
+      "eventName": "页面路径不匹配测试",
+      "message": "页面路径不匹配: 期望 \"/expected/path\"，实际 \"/actual/different/path\"",
+      "reason": "事件在不同的页面路径下被触发。可能是URL结构变更、路由配置调整，或事件被复用到其他页面。",
+      "impactScope": [
+        "期望路径: /expected/path",
+        "实际路径: /actual/different/path",
+        "匹配模式: prefix",
+        "不匹配记录数: 1"
+      ],
+      "nextActions": [
+        "1. 确认页面路由是否已变更",
+        "2. 检查事件是否应在新路径下触发",
+        "3. 如是预期行为，更新清单中的 pagePath 定义",
+        "4. 考虑使用路径前缀匹配模式"
+      ],
+      "expected": "/expected/path",
+      "actual": "/actual/different/path"
+    },
+    {
+      "id": "sampling-delay-1780070645615",
+      "type": "sampling_delay",
+      "severity": "medium",
+      "eventId": "page_path_mismatch",
+      "eventName": "页面路径不匹配测试",
+      "message": "检测到采样延迟: 最大 10.0s，平均 10.0s",
+      "reason": "事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。",
+      "impactScope": [
+        "事件数: 2",
+        "最大延迟: 10.0s",
+        "平均延迟: 10.0s",
+        "阈值: 5.0s",
+        "事件ID: page_path_mismatch"
+      ],
+      "nextActions": [
+        "1. 检查埋点SDK的上报策略（实时/批量/定时）",
+        "2. 确认采样率配置是否合理",
+        "3. 分析网络请求日志是否存在拥塞",
+        "4. 如是预期行为，可调高延迟阈值",
+        "5. 检查事件触发场景是否均匀分布"
+      ],
+      "expected": 5000,
+      "actual": 10000
+    }
+  ],
+  "versionComparison": {
+    "baseVersion": "v2.2.0",
+    "targetVersion": "v2.3.0",
+    "newEvents": [
+      "event_with_renamed_log",
+      "missing_event_example",
+      "sampling_delay_test",
+      "wrong_param_type_event",
+      "page_path_mismatch"
+    ],
+    "removedEvents": [
+      "search_submit",
+      "removed_event_in_new_version"
+    ],
+    "renamedEvents": [],
+    "modifiedEvents": [
+      "page_view_home",
+      "checkout_start",
+      "payment_success",
+      "old_banner_click"
+    ],
+    "parameterChanges": [
+      {
+        "eventId": "page_view_home",
+        "parameterName": "abTestGroup",
+        "changeType": "added",
+        "newValue": {
+          "type": "string",
+          "required": false
+        }
+      },
+      {
+        "eventId": "checkout_start",
+        "parameterName": "itemCount",
+        "changeType": "type_changed",
+        "oldValue": "string",
+        "newValue": "number"
+      },
+      {
+        "eventId": "checkout_start",
+        "parameterName": "couponApplied",
+        "changeType": "added",
+        "newValue": {
+          "type": "boolean",
+          "required": false
+        }
+      },
+      {
+        "eventId": "payment_success",
+        "parameterName": "payTime",
+        "changeType": "added",
+        "newValue": {
+          "type": "number",
+          "required": true
+        }
+      }
+    ]
+  },
+  "notes": "生成耗时: 3ms",
+  "attachments": []
+}

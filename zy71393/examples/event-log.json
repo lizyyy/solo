@@ -1,0 +1,250 @@
+{
+  "version": "1.0.0",
+  "collectedAt": "2024-01-15T14:30:00.000Z",
+  "collectionDuration": 3600000,
+  "source": "production-harvester",
+  "notes": "2024-01-15 生产环境采样数据，包含1小时的埋点记录",
+  "attachments": ["raw-logs/2024-01-15.tar.gz"],
+  "entries": [
+    {
+      "eventId": "page_view_home",
+      "eventName": "首页浏览",
+      "timestamp": 1705300200000,
+      "pagePath": "/home",
+      "parameters": {
+        "userId": "user_001",
+        "sessionId": "sess_abc123",
+        "referrer": "https://google.com",
+        "abTestGroup": "A"
+      },
+      "sessionId": "sess_abc123",
+      "userId": "user_001",
+      "version": "v2.3.0",
+      "samplingRate": 1.0
+    },
+    {
+      "eventId": "page_view_home",
+      "eventName": "首页浏览",
+      "timestamp": 1705300210000,
+      "pagePath": "/home",
+      "parameters": {
+        "userId": "user_002",
+        "sessionId": "sess_def456",
+        "referrer": "https://baidu.com"
+      },
+      "sessionId": "sess_def456",
+      "userId": "user_002",
+      "version": "v2.3.0"
+    },
+    {
+      "eventId": "click_buy_button",
+      "eventName": "购买按钮点击",
+      "timestamp": 1705300500000,
+      "pagePath": "/product/detail",
+      "parameters": {
+        "productId": "prod_123",
+        "price": 99.99,
+        "quantity": 2,
+        "source": "recommend"
+      },
+      "sessionId": "sess_abc123",
+      "userId": "user_001",
+      "version": "v2.3.0"
+    },
+    {
+      "eventId": "click_buy_button",
+      "eventName": "购买按钮点击",
+      "timestamp": 1705300600000,
+      "pagePath": "/product/detail",
+      "parameters": {
+        "productId": "prod_456",
+        "price": "199.99",
+        "quantity": 1,
+        "source": "invalid_source"
+      },
+      "sessionId": "sess_def456",
+      "userId": "user_002",
+      "version": "v2.3.0"
+    },
+    {
+      "eventId": "checkout_start",
+      "eventName": "开始结账",
+      "timestamp": 1705300700000,
+      "pagePath": "/checkout",
+      "parameters": {
+        "orderId": "order_001",
+        "totalAmount": 199.98,
+        "itemCount": 2,
+        "couponApplied": true
+      },
+      "sessionId": "sess_abc123",
+      "userId": "user_001",
+      "version": "v2.3.0"
+    },
+    {
+      "eventId": "payment_success",
+      "eventName": "支付成功",
+      "timestamp": 1705301000000,
+      "pagePath": "/checkout/success",
+      "parameters": {
+        "orderId": "order_001",
+        "payAmount": 199.98,
+        "payMethod": "alipay",
+        "payTime": 3500
+      },
+      "sessionId": "sess_abc123",
+      "userId": "user_001",
+      "version": "v2.3.0"
+    },
+    {
+      "eventId": "payment_success",
+      "eventName": "支付成功",
+      "timestamp": 1705301500000,
+      "pagePath": "/checkout/success",
+      "parameters": {
+        "orderId": "order_002",
+        "payAmount": "99.99",
+        "payMethod": "wechat"
+      },
+      "sessionId": "sess_def456",
+      "userId": "user_002",
+      "version": "v2.3.0"
+    },
+    {
+      "eventName": "search_submit_old",
+      "timestamp": 1705302000000,
+      "pagePath": "/search",
+      "parameters": {
+        "keyword": "手机壳",
+        "resultCount": 256
+      },
+      "sessionId": "sess_abc123",
+      "userId": "user_001",
+      "version": "v2.2.0"
+    },
+    {
+      "eventName": "search_submit_old",
+      "timestamp": 1705302100000,
+      "pagePath": "/search",
+      "parameters": {
+        "keyword": "充电器",
+        "resultCount": 89
+      },
+      "sessionId": "sess_def456",
+      "userId": "user_002",
+      "version": "v2.2.0"
+    },
+    {
+      "eventId": "old_banner_click",
+      "eventName": "Banner点击(旧)",
+      "timestamp": 1705302500000,
+      "pagePath": "/home",
+      "parameters": {
+        "bannerId": "banner_sale_001"
+      },
+      "sessionId": "sess_abc123",
+      "userId": "user_001",
+      "version": "v2.1.0"
+    },
+    {
+      "eventId": "sampling_delay_test",
+      "eventName": "采样延迟测试事件",
+      "timestamp": 1705303000000,
+      "pagePath": "/test/delay",
+      "parameters": { "seq": 1 },
+      "sessionId": "sess_test",
+      "userId": "user_test"
+    },
+    {
+      "eventId": "sampling_delay_test",
+      "eventName": "采样延迟测试事件",
+      "timestamp": 1705303010000,
+      "pagePath": "/test/delay",
+      "parameters": { "seq": 2 },
+      "sessionId": "sess_test",
+      "userId": "user_test"
+    },
+    {
+      "eventId": "sampling_delay_test",
+      "eventName": "采样延迟测试事件",
+      "timestamp": 1705303020000,
+      "pagePath": "/test/delay",
+      "parameters": { "seq": 3 },
+      "sessionId": "sess_test",
+      "userId": "user_test"
+    },
+    {
+      "eventId": "sampling_delay_test",
+      "eventName": "采样延迟测试事件",
+      "timestamp": 1705303035000,
+      "pagePath": "/test/delay",
+      "parameters": { "seq": 4 },
+      "sessionId": "sess_test",
+      "userId": "user_test"
+    },
+    {
+      "eventId": "sampling_delay_test",
+      "eventName": "采样延迟测试事件",
+      "timestamp": 1705303050000,
+      "pagePath": "/test/delay",
+      "parameters": { "seq": 5 },
+      "sessionId": "sess_test",
+      "userId": "user_test"
+    },
+    {
+      "eventId": "sampling_delay_test",
+      "eventName": "采样延迟测试事件",
+      "timestamp": 1705303120000,
+      "pagePath": "/test/delay",
+      "parameters": { "seq": 6 },
+      "sessionId": "sess_test",
+      "userId": "user_test"
+    },
+    {
+      "eventId": "wrong_param_type_event",
+      "eventName": "参数类型错误测试",
+      "timestamp": 1705304000000,
+      "pagePath": "/test/param-type",
+      "parameters": {
+        "shouldBeNumber": "123",
+        "shouldBeString": 456
+      },
+      "sessionId": "sess_test",
+      "userId": "user_test"
+    },
+    {
+      "eventId": "wrong_param_type_event",
+      "eventName": "参数类型错误测试",
+      "timestamp": 1705304010000,
+      "pagePath": "/test/param-type",
+      "parameters": {
+        "shouldBeNumber": null,
+        "shouldBeString": "correct"
+      },
+      "sessionId": "sess_test",
+      "userId": "user_test"
+    },
+    {
+      "eventId": "page_path_mismatch",
+      "eventName": "页面路径不匹配测试",
+      "timestamp": 1705305000000,
+      "pagePath": "/actual/different/path",
+      "parameters": {
+        "data": "test data"
+      },
+      "sessionId": "sess_test",
+      "userId": "user_test"
+    },
+    {
+      "eventId": "page_path_mismatch",
+      "eventName": "页面路径不匹配测试",
+      "timestamp": 1705305010000,
+      "pagePath": "",
+      "parameters": {
+        "data": "empty path test"
+      },
+      "sessionId": "sess_test",
+      "userId": "user_test"
+    }
+  ]
+}

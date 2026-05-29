@@ -1,0 +1,168 @@
+{
+  "version": "1.0.0",
+  "releaseVersion": "v2.3.0",
+  "generatedAt": "2024-01-15T10:00:00.000Z",
+  "generatedBy": "data-team",
+  "notes": "2024年Q1发版埋点清单，包含首页重构和支付流程优化的埋点变更",
+  "attachments": ["screenshots/home-page.png", "docs/payment-flow.md"],
+  "events": [
+    {
+      "id": "page_view_home",
+      "name": "首页浏览",
+      "description": "用户进入首页时触发",
+      "pagePath": "/home",
+      "parameters": [
+        { "name": "userId", "type": "string", "required": true, "description": "用户ID" },
+        { "name": "sessionId", "type": "string", "required": true, "description": "会话ID" },
+        { "name": "referrer", "type": "string", "required": false, "description": "来源页面" },
+        { "name": "abTestGroup", "type": "string", "required": false, "description": "AB测试分组" }
+      ],
+      "status": "active",
+      "version": "v2.3.0",
+      "categories": ["page_view", "core"],
+      "owner": "frontend-team",
+      "tags": ["critical", "core"],
+      "notes": "首页重构后新增的核心埋点，必须100%触发"
+    },
+    {
+      "id": "click_buy_button",
+      "name": "购买按钮点击",
+      "description": "用户点击商品购买按钮",
+      "pagePath": "/product/detail",
+      "parameters": [
+        { "name": "productId", "type": "string", "required": true, "description": "商品ID" },
+        { "name": "price", "type": "number", "required": true, "description": "商品价格" },
+        { "name": "quantity", "type": "number", "required": true, "description": "购买数量", "minimum": 1, "maximum": 99 },
+        { "name": "source", "type": "string", "required": true, "enum": ["recommend", "search", "category", "direct"], "description": "流量来源" }
+      ],
+      "status": "active",
+      "version": "v2.3.0",
+      "categories": ["click", "conversion", "business"],
+      "owner": "product-team",
+      "tags": ["core", "conversion"],
+      "notes": "核心转化事件，参数变更：source字段新增枚举值",
+      "attachments": ["screenshots/buy-button.png"]
+    },
+    {
+      "id": "checkout_start",
+      "name": "开始结账",
+      "description": "用户进入结账流程",
+      "pagePath": "/checkout",
+      "parameters": [
+        { "name": "orderId", "type": "string", "required": true, "description": "订单ID" },
+        { "name": "totalAmount", "type": "number", "required": true, "description": "订单总金额" },
+        { "name": "itemCount", "type": "number", "required": true, "description": "商品数量" },
+        { "name": "couponApplied", "type": "boolean", "required": false, "description": "是否使用优惠券" }
+      ],
+      "status": "active",
+      "version": "v2.3.0",
+      "categories": ["checkout", "conversion"],
+      "owner": "payment-team",
+      "tags": ["business"]
+    },
+    {
+      "id": "payment_success",
+      "name": "支付成功",
+      "description": "用户完成支付",
+      "pagePath": "/checkout/success",
+      "parameters": [
+        { "name": "orderId", "type": "string", "required": true, "description": "订单ID" },
+        { "name": "payAmount", "type": "number", "required": true, "description": "实际支付金额" },
+        { "name": "payMethod", "type": "string", "required": true, "description": "支付方式" },
+        { "name": "payTime", "type": "number", "required": true, "description": "支付耗时(毫秒)" }
+      ],
+      "status": "active",
+      "version": "v2.3.0",
+      "categories": ["payment", "conversion", "business"],
+      "owner": "payment-team",
+      "tags": ["critical", "business"],
+      "notes": "核心支付事件，payTime为v2.3.0新增参数"
+    },
+    {
+      "id": "event_with_renamed_log",
+      "name": "搜索提交",
+      "description": "用户提交搜索",
+      "pagePath": "/search",
+      "parameters": [
+        { "name": "keyword", "type": "string", "required": true, "description": "搜索关键词" },
+        { "name": "resultCount", "type": "number", "required": false, "description": "搜索结果数" }
+      ],
+      "status": "active",
+      "version": "v2.3.0",
+      "renamedFrom": "search_submit_old",
+      "categories": ["search"],
+      "owner": "search-team",
+      "notes": "事件已改名：由 search_submit 改为 event_with_renamed_log"
+    },
+    {
+      "id": "old_banner_click",
+      "name": "Banner点击(旧)",
+      "description": "用户点击首页Banner（已废弃）",
+      "pagePath": "/home",
+      "parameters": [
+        { "name": "bannerId", "type": "string", "required": true, "description": "Banner ID" }
+      ],
+      "status": "deprecated",
+      "version": "v2.0.0",
+      "deprecatedSince": "v2.2.0",
+      "categories": ["click"],
+      "owner": "operation-team",
+      "notes": "v2.2.0后废弃，由 banner_click_v2 替代"
+    },
+    {
+      "id": "missing_event_example",
+      "name": "缺失事件示例",
+      "description": "这个事件在日志中不会出现，用于测试缺失告警",
+      "pagePath": "/test/missing",
+      "parameters": [
+        { "name": "testParam", "type": "string", "required": true, "description": "测试参数" }
+      ],
+      "status": "active",
+      "version": "v2.3.0",
+      "categories": ["test"],
+      "owner": "qa-team",
+      "tags": ["test"]
+    },
+    {
+      "id": "sampling_delay_test",
+      "name": "采样延迟测试事件",
+      "description": "用于测试采样延迟检测",
+      "pagePath": "/test/delay",
+      "parameters": [
+        { "name": "seq", "type": "number", "required": true, "description": "序号" }
+      ],
+      "status": "active",
+      "version": "v2.3.0",
+      "categories": ["test"],
+      "owner": "qa-team"
+    },
+    {
+      "id": "wrong_param_type_event",
+      "name": "参数类型错误测试",
+      "description": "用于测试参数类型校验失败",
+      "pagePath": "/test/param-type",
+      "parameters": [
+        { "name": "shouldBeNumber", "type": "number", "required": true, "description": "应该是数字" },
+        { "name": "shouldBeString", "type": "string", "required": true, "description": "应该是字符串" },
+        { "name": "optionalParam", "type": "boolean", "required": false, "description": "可选参数" }
+      ],
+      "status": "active",
+      "version": "v2.3.0",
+      "categories": ["test"],
+      "owner": "qa-team"
+    },
+    {
+      "id": "page_path_mismatch",
+      "name": "页面路径不匹配测试",
+      "description": "日志中的页面路径与清单不一致",
+      "pagePath": "/expected/path",
+      "parameters": [
+        { "name": "data", "type": "string", "required": false, "description": "数据" }
+      ],
+      "status": "active",
+      "version": "v2.3.0",
+      "categories": ["test"],
+      "owner": "qa-team"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "version": "1.0.0",
+  "releaseVersion": "v2.2.0",
+  "generatedAt": "2024-01-01T10:00:00.000Z",
+  "generatedBy": "data-team",
+  "notes": "v2.2.0版本埋点清单 - 作为基线版本对比",
+  "events": [
+    {
+      "id": "page_view_home",
+      "name": "首页浏览",
+      "description": "用户进入首页时触发",
+      "pagePath": "/home",
+      "parameters": [
+        { "name": "userId", "type": "string", "required": true, "description": "用户ID" },
+        { "name": "sessionId", "type": "string", "required": true, "description": "会话ID" },
+        { "name": "referrer", "type": "string", "required": false, "description": "来源页面" }
+      ],
+      "status": "active",
+      "version": "v2.2.0",
+      "categories": ["page_view", "core"],
+      "owner": "frontend-team"
+    },
+    {
+      "id": "click_buy_button",
+      "name": "购买按钮点击",
+      "description": "用户点击商品购买按钮",
+      "pagePath": "/product/detail",
+      "parameters": [
+        { "name": "productId", "type": "string", "required": true, "description": "商品ID" },
+        { "name": "price", "type": "number", "required": true, "description": "商品价格" },
+        { "name": "quantity", "type": "number", "required": true, "description": "购买数量" },
+        { "name": "source", "type": "string", "required": true, "enum": ["recommend", "search", "category"], "description": "流量来源" }
+      ],
+      "status": "active",
+      "version": "v2.2.0",
+      "categories": ["click", "conversion"],
+      "owner": "product-team"
+    },
+    {
+      "id": "checkout_start",
+      "name": "开始结账",
+      "description": "用户进入结账流程",
+      "pagePath": "/checkout",
+      "parameters": [
+        { "name": "orderId", "type": "string", "required": true, "description": "订单ID" },
+        { "name": "totalAmount", "type": "number", "required": true, "description": "订单总金额" },
+        { "name": "itemCount", "type": "string", "required": true, "description": "商品数量" }
+      ],
+      "status": "active",
+      "version": "v2.2.0",
+      "categories": ["checkout", "conversion"],
+      "owner": "payment-team"
+    },
+    {
+      "id": "payment_success",
+      "name": "支付成功",
+      "description": "用户完成支付",
+      "pagePath": "/checkout/success",
+      "parameters": [
+        { "name": "orderId", "type": "string", "required": true, "description": "订单ID" },
+        { "name": "payAmount", "type": "number", "required": true, "description": "实际支付金额" },
+        { "name": "payMethod", "type": "string", "required": true, "description": "支付方式" }
+      ],
+      "status": "active",
+      "version": "v2.2.0",
+      "categories": ["payment", "conversion"],
+      "owner": "payment-team"
+    },
+    {
+      "id": "search_submit",
+      "name": "搜索提交",
+      "description": "用户提交搜索",
+      "pagePath": "/search",
+      "parameters": [
+        { "name": "keyword", "type": "string", "required": true, "description": "搜索关键词" }
+      ],
+      "status": "active",
+      "version": "v2.2.0",
+      "categories": ["search"],
+      "owner": "search-team"
+    },
+    {
+      "id": "old_banner_click",
+      "name": "Banner点击",
+      "description": "用户点击首页Banner",
+      "pagePath": "/home",
+      "parameters": [
+        { "name": "bannerId", "type": "string", "required": true, "description": "Banner ID" }
+      ],
+      "status": "active",
+      "version": "v2.2.0",
+      "categories": ["click"],
+      "owner": "operation-team"
+    },
+    {
+      "id": "removed_event_in_new_version",
+      "name": "新版本删除的事件",
+      "description": "这个事件在v2.3.0中被删除",
+      "pagePath": "/legacy",
+      "parameters": [
+        { "name": "oldParam", "type": "string", "required": true, "description": "旧参数" }
+      ],
+      "status": "active",
+      "version": "v2.2.0",
+      "categories": ["legacy"],
+      "owner": "archive-team"
+    }
+  ]
+}

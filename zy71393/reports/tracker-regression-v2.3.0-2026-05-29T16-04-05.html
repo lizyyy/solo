@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>埋点回归报告 - v2.3.0</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .header .meta { opacity: 0.9; font-size: 14px; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 30px; background: #fafafa; }
+    .stat-card { background: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .stat-card .number { font-size: 36px; font-weight: bold; }
+    .stat-card .label { color: #666; margin-top: 8px; }
+    .stat-card.pass .number { color: #52c41a; }
+    .stat-card.fail .number { color: #ff4d4f; }
+    .stat-card.warning .number { color: #faad14; }
+    .stat-card.missing .number { color: #8c8c8c; }
+    .severity-badge { display: inline-block; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+    .severity-critical { background: #ff4d4f; color: white; }
+    .severity-high { background: #ff7a45; color: white; }
+    .severity-medium { background: #faad14; color: white; }
+    .severity-low { background: #1890ff; color: white; }
+    .severity-info { background: #8c8c8c; color: white; }
+    .section { padding: 30px; border-bottom: 1px solid #eee; }
+    .section h2 { font-size: 20px; margin-bottom: 20px; color: #333; }
+    .section h3 { font-size: 16px; margin: 20px 0 10px; color: #555; }
+    .issue { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 15px; }
+    .issue-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .issue-title { font-weight: bold; font-size: 16px; }
+    .issue-meta { color: #666; font-size: 13px; margin-bottom: 10px; }
+    .issue-section { margin-top: 10px; }
+    .issue-section h4 { font-size: 13px; color: #888; margin-bottom: 5px; }
+    .issue-section ul { margin-left: 20px; color: #555; }
+    .issue-section li { margin: 3px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #fafafa; font-weight: 600; }
+    tr:hover { background: #fafafa; }
+    .status-pass { color: #52c41a; }
+    .status-fail { color: #ff4d4f; }
+    .status-warning { color: #faad14; }
+    .status-missing { color: #8c8c8c; }
+    .conclusion { padding: 30px; background: #fff1f0; }
+    .conclusion h2 { margin-bottom: 15px; }
+    .conclusion-text { font-size: 18px; font-weight: bold; color: #ff4d4f; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>埋点回归报告 - v2.3.0</h1>
+      <div class="meta">
+        报告ID: report-afbe6c44a01b1f7a | 生成时间: 2026/5/30 00:04:05 | 发版号: v2.3.0
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="stat-card pass">
+        <div class="number">1</div>
+        <div class="label">✅ 通过</div>
+      </div>
+      <div class="stat-card fail">
+        <div class="number">3</div>
+        <div class="label">❌ 失败</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="number">3</div>
+        <div class="label">⚠️ 警告</div>
+      </div>
+      <div class="stat-card missing">
+        <div class="number">2</div>
+        <div class="label">⚫ 缺失</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>问题严重级别</h2>
+      <table>
+        <tr><th>级别</th><th>数量</th></tr>
+        <tr><td><span class="severity-badge severity-critical">CRITICAL</span></td><td>3</td></tr>
+        <tr><td><span class="severity-badge severity-high">HIGH</span></td><td>5</td></tr>
+        <tr><td><span class="severity-badge severity-medium">MEDIUM</span></td><td>6</td></tr>
+        <tr><td><span class="severity-badge severity-low">LOW</span></td><td>2</td></tr>
+        <tr><td><span class="severity-badge severity-info">INFO</span></td><td>0</td></tr>
+      </table>
+    </div>
+
+    
+    <div class="section">
+      <h2>版本对比: v2.2.0 → v2.3.0</h2>
+      <table>
+        <tr><th>变更类型</th><th>数量</th></tr>
+        <tr><td>新增事件</td><td>5</td></tr>
+        <tr><td>删除事件</td><td>2</td></tr>
+        <tr><td>修改事件</td><td>4</td></tr>
+        <tr><td>改名事件</td><td>0</td></tr>
+        <tr><td>参数变更</td><td>4</td></tr>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>问题详情</h2>
+      
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-medium">MEDIUM</span>
+            <span class="issue-title">事件 "搜索提交" (event_with_renamed_log) 在日志中缺失</span>
+          </div>
+          <div class="issue-meta">
+            类型: event_missing | 事件: event_with_renamed_log
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>在采集的事件日志中未找到匹配的事件记录。可能原因：埋点代码未触发、事件ID/名称不匹配、采样过滤或前端埋点丢失。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>页面: /search</li><li>分类: search</li><li>负责人: search-team</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 验证前端埋点代码中事件ID是否为 "event_with_renamed_log"</li><li>2. 检查页面路径 /search 是否可正常访问</li><li>3. 确认事件触发条件（如按钮点击、页面加载等）</li><li>4. 检查采样率配置是否过滤了该事件</li><li>5. 查看浏览器控制台是否有埋点相关错误</li></ul>
+          </div>
+          
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-medium">MEDIUM</span>
+            <span class="issue-title">事件 "缺失事件示例" (missing_event_example) 在日志中缺失</span>
+          </div>
+          <div class="issue-meta">
+            类型: event_missing | 事件: missing_event_example
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>在采集的事件日志中未找到匹配的事件记录。可能原因：埋点代码未触发、事件ID/名称不匹配、采样过滤或前端埋点丢失。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>页面: /test/missing</li><li>分类: test</li><li>负责人: qa-team</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 验证前端埋点代码中事件ID是否为 "missing_event_example"</li><li>2. 检查页面路径 /test/missing 是否可正常访问</li><li>3. 确认事件触发条件（如按钮点击、页面加载等）</li><li>4. 检查采样率配置是否过滤了该事件</li><li>5. 查看浏览器控制台是否有埋点相关错误</li></ul>
+          </div>
+          
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-low">LOW</span>
+            <span class="issue-title">已废弃事件 "Banner点击(旧)" 仍在被触发</span>
+          </div>
+          <div class="issue-meta">
+            类型: event_deprecated | 事件: old_banner_click
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>该事件在 v2.2.0 标记为废弃，但日志中仍有采集记录。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>事件ID: old_banner_click</li><li>废弃版本: v2.2.0</li><li>页面: /home</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 确认该事件是否应该被移除</li><li>2. 检查前端代码是否仍在调用该埋点</li><li>3. 评估历史数据依赖关系</li><li>4. 安排完全移除的时间节点</li></ul>
+          </div>
+          
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-medium">MEDIUM</span>
+            <span class="issue-title">检测到采样延迟: 最大 10.0s，平均 10.0s</span>
+          </div>
+          <div class="issue-meta">
+            类型: sampling_delay | 事件: page_view_home
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>事件数: 2</li><li>最大延迟: 10.0s</li><li>平均延迟: 10.0s</li><li>阈值: 5.0s</li><li>事件ID: page_view_home</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查埋点SDK的上报策略（实时/批量/定时）</li><li>2. 确认采样率配置是否合理</li><li>3. 分析网络请求日志是否存在拥塞</li><li>4. 如是预期行为，可调高延迟阈值</li><li>5. 检查事件触发场景是否均匀分布</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>5000</code></li>
+              <li>实际: <code>10000</code></li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-high">HIGH</span>
+            <span class="issue-title">参数 "price" 类型错误: 期望 number，实际 string (1/2 条记录)</span>
+          </div>
+          <div class="issue-meta">
+            类型: parameter_type_changed | 事件: click_buy_button
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>参数类型不匹配。Schema定义为 number，但实际采集到 string。可能是前端数据类型转换问题或Schema定义过时。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>参数名: price</li><li>必填: 是</li><li>影响事件数: 2</li><li>事件ID: click_buy_button</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查前端代码中该参数的数据类型</li><li>2. 确认是否存在隐式类型转换（如字符串转数字）</li><li>3. 如是Schema过时，更新Schema定义为 string</li><li>4. 添加类型校验逻辑确保数据一致性</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>"number"</code></li>
+              <li>实际: <code>"string"</code></li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-high">HIGH</span>
+            <span class="issue-title">参数 "source" 值不在枚举范围内: invalid_source</span>
+          </div>
+          <div class="issue-meta">
+            类型: parameter_type_changed | 事件: click_buy_button
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>参数类型不匹配。Schema定义为 undefined，但实际采集到 undefined。可能是前端数据类型转换问题或Schema定义过时。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>参数名: source</li><li>必填: 是</li><li>影响事件数: 2</li><li>事件ID: click_buy_button</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查前端代码中该参数的数据类型</li><li>2. 确认是否存在隐式类型转换（如字符串转数字）</li><li>3. 如是Schema过时，更新Schema定义为 undefined</li><li>4. 添加类型校验逻辑确保数据一致性</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>["recommend","search","category","direct"]</code></li>
+              <li>实际: <code>"invalid_source"</code></li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-critical">CRITICAL</span>
+            <span class="issue-title">检测到采样延迟: 最大 1.7min，平均 1.7min</span>
+          </div>
+          <div class="issue-meta">
+            类型: sampling_delay | 事件: click_buy_button
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>事件数: 2</li><li>最大延迟: 1.7min</li><li>平均延迟: 1.7min</li><li>阈值: 5.0s</li><li>事件ID: click_buy_button</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查埋点SDK的上报策略（实时/批量/定时）</li><li>2. 确认采样率配置是否合理</li><li>3. 分析网络请求日志是否存在拥塞</li><li>4. 如是预期行为，可调高延迟阈值</li><li>5. 检查事件触发场景是否均匀分布</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>5000</code></li>
+              <li>实际: <code>100000</code></li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-high">HIGH</span>
+            <span class="issue-title">参数 "payAmount" 类型错误: 期望 number，实际 string (1/2 条记录)</span>
+          </div>
+          <div class="issue-meta">
+            类型: parameter_type_changed | 事件: payment_success
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>参数类型不匹配。Schema定义为 number，但实际采集到 string。可能是前端数据类型转换问题或Schema定义过时。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>参数名: payAmount</li><li>必填: 是</li><li>影响事件数: 2</li><li>事件ID: payment_success</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查前端代码中该参数的数据类型</li><li>2. 确认是否存在隐式类型转换（如字符串转数字）</li><li>3. 如是Schema过时，更新Schema定义为 string</li><li>4. 添加类型校验逻辑确保数据一致性</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>"number"</code></li>
+              <li>实际: <code>"string"</code></li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-critical">CRITICAL</span>
+            <span class="issue-title">检测到采样延迟: 最大 8.3min，平均 8.3min</span>
+          </div>
+          <div class="issue-meta">
+            类型: sampling_delay | 事件: payment_success
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>事件数: 2</li><li>最大延迟: 8.3min</li><li>平均延迟: 8.3min</li><li>阈值: 5.0s</li><li>事件ID: payment_success</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查埋点SDK的上报策略（实时/批量/定时）</li><li>2. 确认采样率配置是否合理</li><li>3. 分析网络请求日志是否存在拥塞</li><li>4. 如是预期行为，可调高延迟阈值</li><li>5. 检查事件触发场景是否均匀分布</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>5000</code></li>
+              <li>实际: <code>500000</code></li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-critical">CRITICAL</span>
+            <span class="issue-title">检测到采样延迟: 最大 1.2min，平均 24.0s</span>
+          </div>
+          <div class="issue-meta">
+            类型: sampling_delay | 事件: sampling_delay_test
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>事件数: 6</li><li>最大延迟: 1.2min</li><li>平均延迟: 24.0s</li><li>阈值: 5.0s</li><li>事件ID: sampling_delay_test</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查埋点SDK的上报策略（实时/批量/定时）</li><li>2. 确认采样率配置是否合理</li><li>3. 分析网络请求日志是否存在拥塞</li><li>4. 如是预期行为，可调高延迟阈值</li><li>5. 检查事件触发场景是否均匀分布</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>5000</code></li>
+              <li>实际: <code>70000</code></li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-high">HIGH</span>
+            <span class="issue-title">参数 "shouldBeNumber" 类型错误: 期望 number，实际 string (2/2 条记录)</span>
+          </div>
+          <div class="issue-meta">
+            类型: parameter_type_changed | 事件: wrong_param_type_event
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>参数类型不匹配。Schema定义为 number，但实际采集到 string。可能是前端数据类型转换问题或Schema定义过时。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>参数名: shouldBeNumber</li><li>必填: 是</li><li>影响事件数: 2</li><li>事件ID: wrong_param_type_event</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查前端代码中该参数的数据类型</li><li>2. 确认是否存在隐式类型转换（如字符串转数字）</li><li>3. 如是Schema过时，更新Schema定义为 string</li><li>4. 添加类型校验逻辑确保数据一致性</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>"number"</code></li>
+              <li>实际: <code>"string"</code></li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-high">HIGH</span>
+            <span class="issue-title">参数 "shouldBeString" 类型错误: 期望 string，实际 number (1/2 条记录)</span>
+          </div>
+          <div class="issue-meta">
+            类型: parameter_type_changed | 事件: wrong_param_type_event
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>参数类型不匹配。Schema定义为 string，但实际采集到 number。可能是前端数据类型转换问题或Schema定义过时。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>参数名: shouldBeString</li><li>必填: 是</li><li>影响事件数: 2</li><li>事件ID: wrong_param_type_event</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查前端代码中该参数的数据类型</li><li>2. 确认是否存在隐式类型转换（如字符串转数字）</li><li>3. 如是Schema过时，更新Schema定义为 number</li><li>4. 添加类型校验逻辑确保数据一致性</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>"string"</code></li>
+              <li>实际: <code>"number"</code></li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-medium">MEDIUM</span>
+            <span class="issue-title">可选参数 "optionalParam" 在所有日志中都缺失</span>
+          </div>
+          <div class="issue-meta">
+            类型: parameter_value_invalid | 事件: wrong_param_type_event
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>参数值不符合约束条件。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>参数名: optionalParam</li><li>必填: 否</li><li>影响事件数: 2</li><li>事件ID: wrong_param_type_event</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查前端代码中参数值的生成逻辑</li><li>2. 确认是否需要更新枚举值范围</li><li>3. 添加前端参数值校验</li><li>4. 如是合法新值，更新Schema定义</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>"boolean"</code></li>
+              
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-medium">MEDIUM</span>
+            <span class="issue-title">检测到采样延迟: 最大 10.0s，平均 10.0s</span>
+          </div>
+          <div class="issue-meta">
+            类型: sampling_delay | 事件: wrong_param_type_event
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>事件数: 2</li><li>最大延迟: 10.0s</li><li>平均延迟: 10.0s</li><li>阈值: 5.0s</li><li>事件ID: wrong_param_type_event</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查埋点SDK的上报策略（实时/批量/定时）</li><li>2. 确认采样率配置是否合理</li><li>3. 分析网络请求日志是否存在拥塞</li><li>4. 如是预期行为，可调高延迟阈值</li><li>5. 检查事件触发场景是否均匀分布</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>5000</code></li>
+              <li>实际: <code>10000</code></li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-low">LOW</span>
+            <span class="issue-title">页面路径不匹配: 期望 "/expected/path"，实际 "/actual/different/path"</span>
+          </div>
+          <div class="issue-meta">
+            类型: page_path_changed | 事件: page_path_mismatch
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>事件在不同的页面路径下被触发。可能是URL结构变更、路由配置调整，或事件被复用到其他页面。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>期望路径: /expected/path</li><li>实际路径: /actual/different/path</li><li>匹配模式: prefix</li><li>不匹配记录数: 1</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 确认页面路由是否已变更</li><li>2. 检查事件是否应在新路径下触发</li><li>3. 如是预期行为，更新清单中的 pagePath 定义</li><li>4. 考虑使用路径前缀匹配模式</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>"/expected/path"</code></li>
+              <li>实际: <code>"/actual/different/path"</code></li>
+            </ul>
+          </div>
+        </div>
+      
+        <div class="issue">
+          <div class="issue-header">
+            <span class="severity-badge severity-medium">MEDIUM</span>
+            <span class="issue-title">检测到采样延迟: 最大 10.0s，平均 10.0s</span>
+          </div>
+          <div class="issue-meta">
+            类型: sampling_delay | 事件: page_path_mismatch
+          </div>
+          <div class="issue-section">
+            <h4>原因</h4>
+            <p>事件采集间隔超过阈值 (5.0s)。可能原因：采样率过低、网络拥塞、批量上报延迟、或事件触发频率不均匀。</p>
+          </div>
+          <div class="issue-section">
+            <h4>影响范围</h4>
+            <ul><li>事件数: 2</li><li>最大延迟: 10.0s</li><li>平均延迟: 10.0s</li><li>阈值: 5.0s</li><li>事件ID: page_path_mismatch</li></ul>
+          </div>
+          <div class="issue-section">
+            <h4>下一步动作</h4>
+            <ul><li>1. 检查埋点SDK的上报策略（实时/批量/定时）</li><li>2. 确认采样率配置是否合理</li><li>3. 分析网络请求日志是否存在拥塞</li><li>4. 如是预期行为，可调高延迟阈值</li><li>5. 检查事件触发场景是否均匀分布</li></ul>
+          </div>
+          
+          <div class="issue-section">
+            <h4>对比</h4>
+            <ul>
+              <li>期望: <code>5000</code></li>
+              <li>实际: <code>10000</code></li>
+            </ul>
+          </div>
+        </div>
+      
+    </div>
+
+    <div class="section">
+      <h2>事件验证结果</h2>
+      <table>
+        <tr><th>事件ID</th><th>事件名称</th><th>状态</th><th>采样数</th><th>页面匹配</th></tr>
+        
+          <tr>
+            <td><code>page_view_home</code></td>
+            <td>首页浏览</td>
+            <td class="status-warning">warning</td>
+            <td>2</td>
+            <td>✅</td>
+          </tr>
+        
+          <tr>
+            <td><code>click_buy_button</code></td>
+            <td>购买按钮点击</td>
+            <td class="status-fail">fail</td>
+            <td>2</td>
+            <td>✅</td>
+          </tr>
+        
+          <tr>
+            <td><code>checkout_start</code></td>
+            <td>开始结账</td>
+            <td class="status-pass">pass</td>
+            <td>1</td>
+            <td>✅</td>
+          </tr>
+        
+          <tr>
+            <td><code>payment_success</code></td>
+            <td>支付成功</td>
+            <td class="status-fail">fail</td>
+            <td>2</td>
+            <td>✅</td>
+          </tr>
+        
+          <tr>
+            <td><code>sampling_delay_test</code></td>
+            <td>采样延迟测试事件</td>
+            <td class="status-warning">warning</td>
+            <td>6</td>
+            <td>✅</td>
+          </tr>
+        
+          <tr>
+            <td><code>wrong_param_type_event</code></td>
+            <td>参数类型错误测试</td>
+            <td class="status-fail">fail</td>
+            <td>2</td>
+            <td>✅</td>
+          </tr>
+        
+          <tr>
+            <td><code>page_path_mismatch</code></td>
+            <td>页面路径不匹配测试</td>
+            <td class="status-warning">warning</td>
+            <td>2</td>
+            <td>❌</td>
+          </tr>
+        
+          <tr>
+            <td><code>event_with_renamed_log</code></td>
+            <td>搜索提交</td>
+            <td class="status-missing">missing</td>
+            <td>0</td>
+            <td>❌</td>
+          </tr>
+        
+          <tr>
+            <td><code>missing_event_example</code></td>
+            <td>缺失事件示例</td>
+            <td class="status-missing">missing</td>
+            <td>0</td>
+            <td>❌</td>
+          </tr>
+        
+      </table>
+    </div>
+
+    <div class="conclusion">
+      <h2>结论</h2>
+      <div class="conclusion-text">
+        ❌ 不通过 - 存在阻断性问题，请优先修复 critical 和 high 级别的问题
+      </div>
+    </div>
+  </div>
+</body>
+</html>
