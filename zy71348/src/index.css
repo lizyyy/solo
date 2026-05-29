@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+Pro:wght@300;400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    background-color: #f5f0e8;
+    color: #1a3c34;
+  }
+
+  body {
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-vinyl-700 text-white px-4 py-2 rounded-sm shadow-vinyl hover:bg-vinyl-600 hover:shadow-vinyl-lg transition-all duration-200 hover:-translate-y-px disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
+  }
+
+  .btn-secondary {
+    @apply bg-caramel-400 text-vinyl-900 px-4 py-2 rounded-sm shadow-vinyl hover:bg-caramel-300 hover:shadow-vinyl-lg transition-all duration-200 hover:-translate-y-px disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
+  }
+
+  .btn-danger {
+    @apply bg-alert-500 text-white px-4 py-2 rounded-sm shadow-vinyl hover:bg-alert-600 hover:shadow-vinyl-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 rounded-sm hover:bg-vinyl-700/10 transition-colors duration-200 text-vinyl-700;
+  }
+
+  .card {
+    @apply bg-white rounded-sm shadow-vinyl p-4;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 border border-vinyl-700/20 rounded-sm bg-cream-50 focus:border-vinyl-700 focus:ring-1 focus:ring-vinyl-700 outline-none transition-all duration-200;
+  }
+
+  .input-field-error {
+    @apply border-alert-500 focus:border-alert-500 focus:ring-alert-500 animate-pulse-soft;
+  }
+
+  .label-field {
+    @apply block text-sm font-medium text-vinyl-800 mb-1;
+  }
+
+  .label-required::after {
+    content: ' *';
+    @apply text-alert-500;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2 py-1 rounded-sm text-xs font-medium;
+  }
+
+  .table-header {
+    @apply bg-vinyl-700 text-white;
+  }
+
+  .table-row-alt {
+    @apply bg-cream-50;
+  }
+
+  .table-row-hover {
+    @apply hover:bg-caramel-100 transition-colors duration-200;
+  }
+
+  .exception-highlight {
+    @apply border-l-4 border-alert-500 bg-alert-500/5;
+  }
+}
