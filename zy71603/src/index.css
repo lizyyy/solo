@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #1a1f2e;
+  color: #f0ece4;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #1a1f2e;
+  color: #f0ece4;
+  min-height: 100vh;
+}
+
+.font-mono-data {
+  font-family: "JetBrains Mono", monospace;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1f2e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a3f52;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a4f62;
+}
+
+.recharts-default-tooltip {
+  background: #1e2230 !important;
+  border: 1px solid #2a3042 !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+}
+
+.recharts-tooltip-label {
+  color: #f0ece4 !important;
+  font-weight: 600 !important;
+}
+
+.recharts-tooltip-item {
+  color: #a0a0b0 !important;
+}
