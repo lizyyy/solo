@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: #f1f5f9;
+  background-color: #0f172a;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent-cyan text-bg-primary px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-glow hover:scale-105 active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply bg-bg-tertiary text-text-primary px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-bg-secondary hover:scale-105 active:scale-95;
+  }
+  
+  .btn-danger {
+    @apply bg-accent-red text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-glow hover:scale-105 active:scale-95;
+  }
+  
+  .card {
+    @apply bg-bg-secondary rounded-xl border border-bg-tertiary p-4 transition-all duration-300 hover:border-accent-cyan/30;
+  }
+  
+  .input-field {
+    @apply bg-bg-tertiary border border-bg-tertiary rounded-lg px-4 py-2 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition-all duration-200;
+  }
+  
+  .waveform-container {
+    @apply relative bg-bg-primary rounded-lg overflow-hidden border border-bg-tertiary;
+  }
+}
