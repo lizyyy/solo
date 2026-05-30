@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐课听辨成绩管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            font-size: 24px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab.active {
+            border-bottom-color: #3498db;
+            color: #3498db;
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        form {
+            display: grid;
+            gap: 15px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        button.secondary {
+            background: #95a5a6;
+        }
+        button.secondary:hover {
+            background: #7f8c8d;
+        }
+        button.success {
+            background: #27ae60;
+        }
+        button.success:hover {
+            background: #229954;
+        }
+        button.danger {
+            background: #e74c3c;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .badge.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .badge.danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .badge.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .stat-card h4 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        .stat-card.interval {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .stat-card.rhythm {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .stat-card.melody {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        .issue-item {
+            padding: 10px;
+            border-left: 4px solid #e74c3c;
+            background: #fef8f8;
+            margin-bottom: 10px;
+            border-radius: 0 4px 4px 0;
+        }
+        .issue-item.resolved {
+            border-left-color: #27ae60;
+            background: #f0f9f4;
+        }
+        .issue-item p {
+            margin-bottom: 5px;
+        }
+        .issue-item small {
+            color: #666;
+        }
+        .audit-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .audit-item:last-child {
+            border-bottom: none;
+        }
+        .audit-item .timestamp {
+            color: #888;
+            font-size: 12px;
+        }
+        .audit-item .change {
+            color: #e74c3c;
+            font-family: monospace;
+        }
+        .audit-item .change.new {
+            color: #27ae60;
+        }
+        .import-result {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .import-result.created {
+            background: #d4edda;
+            color: #155724;
+        }
+        .import-result.updated {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .import-result.duplicate {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .import-result.conflict {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🎵 音乐课听辨成绩管理系统</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" data-tab="overview">概览</button>
+            <button class="tab" data-tab="classes">班级管理</button>
+            <button class="tab" data-tab="questions">题目管理</button>
+            <button class="tab" data-tab="submissions">答案提交</button>
+            <button class="tab" data-tab="grading">判分</button>
+            <button class="tab" data-tab="supplement">补录信息</button>
+            <button class="tab" data-tab="detection">检测问题</button>
+            <button class="tab" data-tab="statistics">统计分析</button>
+            <button class="tab" data-tab="audit">审计日志</button>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <div class="card">
+                <h3>今日数据概览</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>班级总数</h4>
+                        <div class="value" id="totalClasses">-</div>
+                    </div>
+                    <div class="stat-card interval">
+                        <h4>音程题正确率</h4>
+                        <div class="value" id="intervalAccuracy">-</div>
+                    </div>
+                    <div class="stat-card rhythm">
+                        <h4>节奏题正确率</h4>
+                        <div class="value" id="rhythmAccuracy">-</div>
+                    </div>
+                    <div class="stat-card melody">
+                        <h4>旋律题正确率</h4>
+                        <div class="value" id="melodyAccuracy">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>选择班级和练习日期</h3>
+                <div class="form-row">
+                    <div>
+                        <label>选择班级</label>
+                        <select id="overviewClassId"></select>
+                    </div>
+                    <div>
+                        <label>练习日期</label>
+                        <input type="date" id="overviewPracticeDate">
+                    </div>
+                    <div style="align-self: end;">
+                        <button onclick="loadOverview()">刷新数据</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="classes" class="tab-content">
+            <div class="card">
+                <h3>创建班级</h3>
+                <form onsubmit="createClass(event)">
+                    <div class="form-row">
+                        <div>
+                            <label>班级名称</label>
+                            <input type="text" id="className" required>
+                        </div>
+                        <div>
+                            <label>操作人</label>
+                            <input type="text" id="classOperator">
+                        </div>
+                        <div style="align-self: end;">
+                            <button type="submit">创建班级</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>班级列表</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>班级ID</th>
+                            <th>班级名称</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classesTableBody"></tbody>
+                </table>
+            </div>
+            <div class="card">
+                <h3>添加学生</h3>
+                <form onsubmit="createStudent(event)">
+                    <div class="form-row">
+                        <div>
+                            <label>选择班级</label>
+                            <select id="studentClassId" required></select>
+                        </div>
+                        <div>
+                            <label>学生姓名</label>
+                            <input type="text" id="studentName" required>
+                        </div>
+                        <div>
+                            <label>学号</label>
+                            <input type="text" id="studentNo" required>
+                        </div>
+                        <div>
+                            <label>操作人</label>
+                            <input type="text" id="studentOperator">
+                        </div>
+                        <div style="align-self: end;">
+                            <button type="submit">添加学生</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>学生列表</h3>
+                <div class="form-row">
+                    <div>
+                        <label>选择班级查看学生</label>
+                        <select id="viewStudentsClassId" onchange="loadStudents()"></select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>创建时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="questions" class="tab-content">
+            <div class="card">
+                <h3>创建题目</h3>
+                <form onsubmit="createQuestion(event)">
+                    <div class="form-row">
+                        <div>
+                            <label>练习日期</label>
+                            <input type="date" id="questionPracticeDate" required>
+                        </div>
+                        <div>
+                            <label>题型</label>
+                            <select id="questionType" required>
+                                <option value="interval">音程</option>
+                                <option value="rhythm">节奏</option>
+                                <option value="melody">旋律</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>题号</label>
+                            <input type="number" id="questionNo" required>
+                        </div>
+                        <div>
+                            <label>标准答案</label>
+                            <input type="text" id="questionStandardAnswer" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>题目描述</label>
+                            <input type="text" id="questionDescription">
+                        </div>
+                        <div>
+                            <label>操作人</label>
+                            <input type="text" id="questionOperator">
+                        </div>
+                        <div style="align-self: end;">
+                            <button type="submit">创建题目</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>题目列表</h3>
+                <div class="form-row">
+                    <div>
+                        <label>练习日期</label>
+                        <input type="date" id="viewQuestionsDate" onchange="loadQuestions()">
+                    </div>
+                    <div>
+                        <label>题型筛选</label>
+                        <select id="viewQuestionsType" onchange="loadQuestions()">
+                            <option value="">全部</option>
+                            <option value="interval">音程</option>
+                            <option value="rhythm">节奏</option>
+                            <option value="melody">旋律</option>
+                        </select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>题号</th>
+                            <th>题型</th>
+                            <th>标准答案</th>
+                            <th>描述</th>
+                            <th>创建时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questionsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="submissions" class="tab-content">
+            <div class="card">
+                <h3>提交答案</h3>
+                <form onsubmit="createSubmission(event)">
+                    <div class="form-row">
+                        <div>
+                            <label>选择班级</label>
+                            <select id="submissionClassId" onchange="loadSubmissionStudents()" required></select>
+                        </div>
+                        <div>
+                            <label>选择学生</label>
+                            <select id="submissionStudentId" required></select>
+                        </div>
+                        <div>
+                            <label>练习日期</label>
+                            <input type="date" id="submissionPracticeDate" onchange="loadSubmissionQuestions()" required>
+                        </div>
+                        <div>
+                            <label>选择题目</label>
+                            <select id="submissionQuestionId" required></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>学生答案</label>
+                            <input type="text" id="submissionAnswer" required>
+                        </div>
+                        <div>
+                            <label>备注</label>
+                            <input type="text" id="submissionNotes">
+                        </div>
+                        <div>
+                            <label>操作人</label>
+                            <input type="text" id="submissionOperator">
+                        </div>
+                        <div style="align-self: end;">
+                            <button type="submit">提交答案</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>批量导入（带冲突检测）</h3>
+                <form onsubmit="importSubmission(event)">
+                    <div class="form-row">
+                        <div>
+                            <label>选择班级</label>
+                            <select id="importClassId" onchange="loadImportStudents()" required></select>
+                        </div>
+                        <div>
+                            <label>选择学生</label>
+                            <select id="importStudentId" required></select>
+                        </div>
+                        <div>
+                            <label>练习日期</label>
+                            <input type="date" id="importPracticeDate" onchange="loadImportQuestions()" required>
+                        </div>
+                        <div>
+                            <label>选择题目</label>
+                            <select id="importQuestionId" required></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>学生答案</label>
+                            <input type="text" id="importAnswer" required>
+                        </div>
+                        <div>
+                            <label>是否正确（可选）</label>
+                            <select id="importIsCorrect">
+                                <option value="">未判分</option>
+                                <option value="true">正确</option>
+                                <option value="false">错误</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>分数（可选）</label>
+                            <input type="number" id="importScore">
+                        </div>
+                        <div>
+                            <label>备注</label>
+                            <input type="text" id="importNotes">
+                        </div>
+                        <div>
+                            <label>操作人</label>
+                            <input type="text" id="importOperator">
+                        </div>
+                        <div style="align-self: end;">
+                            <button type="submit">导入检测</button>
+                        </div>
+                    </div>
+                </form>
+                <div id="importResult"></div>
+            </div>
+            <div class="card">
+                <h3>提交记录</h3>
+                <div class="form-row">
+                    <div>
+                        <label>练习日期</label>
+                        <input type="date" id="viewSubmissionsDate" onchange="loadSubmissions()">
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>学生</th>
+                            <th>题目</th>
+                            <th>学生答案</th>
+                            <th>状态</th>
+                            <th>得分</th>
+                            <th>提交时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="submissionsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="grading" class="tab-content">
+            <div class="card">
+                <h3>待判分列表</h3>
+                <div class="form-row">
+                    <div>
+                        <label>练习日期</label>
+                        <input type="date" id="gradingPracticeDate" onchange="loadGradingList()">
+                    </div>
+                    <div style="align-self: end;">
+                        <button onclick="autoGradeAll()">一键自动判分</button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>学生</th>
+                            <th>题目</th>
+                            <th>学生答案</th>
+                            <th>标准答案</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gradingTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="supplement" class="tab-content">
+            <div class="card">
+                <h3>补录/修改信息</h3>
+                <form onsubmit="supplementData(event)">
+                    <div class="form-row">
+                        <div>
+                            <label>实体类型</label>
+                            <select id="supplementEntityType" onchange="loadSupplementFields()" required>
+                                <option value="">请选择</option>
+                                <option value="submission">提交记录</option>
+                                <option value="question">题目</option>
+                                <option value="student">学生</option>
+                                <option value="class">班级</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>字段名</label>
+                            <select id="supplementFieldName" required></select>
+                        </div>
+                        <div>
+                            <label>实体ID</label>
+                            <input type="text" id="supplementEntityId" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>新值</label>
+                            <input type="text" id="supplementValue" required>
+                        </div>
+                        <div>
+                            <label>操作人</label>
+                            <input type="text" id="supplementOperator">
+                        </div>
+                        <div style="align-self: end;">
+                            <button type="submit">提交补录</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <h3>补录历史</h3>
+                <div class="form-row">
+                    <div>
+                        <label>实体类型</label>
+                        <select id="historyEntityType" onchange="loadSupplementHistory()">
+                            <option value="submission">提交记录</option>
+                            <option value="question">题目</option>
+                            <option value="student">学生</option>
+                            <option value="class">班级</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>实体ID</label>
+                        <input type="text" id="historyEntityId" onchange="loadSupplementHistory()">
+                    </div>
+                </div>
+                <div id="supplementHistory"></div>
+            </div>
+        </div>
+
+        <div id="detection" class="tab-content">
+            <div class="card">
+                <h3>检测到的问题</h3>
+                <div class="form-row">
+                    <div>
+                        <label>问题状态</label>
+                        <select id="detectionStatus" onchange="loadDetectionIssues()">
+                            <option value="">全部</option>
+                            <option value="false">待处理</option>
+                            <option value="true">已解决</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>问题类型</label>
+                        <select id="detectionType" onchange="loadDetectionIssues()">
+                            <option value="">全部</option>
+                            <option value="enharmonic_mismatch">等音误判</option>
+                            <option value="type_mismatch">题型归错</option>
+                            <option value="duplicate_submission">重复提交</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="detectionIssuesList"></div>
+            </div>
+        </div>
+
+        <div id="statistics" class="tab-content">
+            <div class="card">
+                <h3>班级统计</h3>
+                <div class="form-row">
+                    <div>
+                        <label>选择班级</label>
+                        <select id="statsClassId" required></select>
+                    </div>
+                    <div>
+                        <label>练习日期</label>
+                        <input type="date" id="statsPracticeDate" required>
+                    </div>
+                    <div style="align-self: end;">
+                        <button onclick="loadStatistics()">查看统计</button>
+                        <button class="success" onclick="exportExcel()">导出Excel</button>
+                    </div>
+                </div>
+            </div>
+            <div id="statisticsResult"></div>
+            <div class="card">
+                <h3>错题归类</h3>
+                <div class="form-row">
+                    <div>
+                        <label>选择班级</label>
+                        <select id="wrongClassId" required></select>
+                    </div>
+                    <div>
+                        <label>练习日期</label>
+                        <input type="date" id="wrongPracticeDate" required>
+                    </div>
+                    <div>
+                        <label>题型</label>
+                        <select id="wrongType" required>
+                            <option value="interval">音程</option>
+                            <option value="rhythm">节奏</option>
+                            <option value="melody">旋律</option>
+                        </select>
+                    </div>
+                    <div style="align-self: end;">
+                        <button onclick="loadWrongQuestions()">查看错题</button>
+                    </div>
+                </div>
+                <div id="wrongQuestionsResult"></div>
+            </div>
+        </div>
+
+        <div id="audit" class="tab-content">
+            <div class="card">
+                <h3>审计日志</h3>
+                <div id="auditLogsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        let state = {
+            classes: [],
+            students: [],
+            questions: [],
+            submissions: []
+        };
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                
+                if (tab.dataset.tab === 'classes') loadClasses();
+                if (tab.dataset.tab === 'detection') loadDetectionIssues();
+                if (tab.dataset.tab === 'audit') loadAuditLogs();
+            });
+        });
+
+        async function fetchJSON(url, options = {}) {
+            const res = await fetch(url, {
+                ...options,
+                headers: { 'Content-Type': 'application/json', ...options.headers }
+            });
+            return res.json();
+        }
+
+        function getTodayDate() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        async function init() {
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                input.value = getTodayDate();
+            });
+            
+            await loadClasses();
+            await loadOverview();
+        }
+
+        async function loadOverview() {
+            const classId = document.getElementById('overviewClassId').value;
+            const practiceDate = document.getElementById('overviewPracticeDate').value;
+            
+            document.getElementById('totalClasses').textContent = state.classes.length;
+            
+            if (classId && practiceDate) {
+                try {
+                    const stats = await fetchJSON(`${API_BASE}/statistics/class/${classId}?practiceDate=${practiceDate}`);
+                    document.getElementById('intervalAccuracy').textContent = 
+                        (stats.intervalStats.accuracy * 100).toFixed(1) + '%';
+                    document.getElementById('rhythmAccuracy').textContent = 
+                        (stats.rhythmStats.accuracy * 100).toFixed(1) + '%';
+                    document.getElementById('melodyAccuracy').textContent = 
+                        (stats.melodyStats.accuracy * 100).toFixed(1) + '%';
+                } catch (e) {
+                    document.getElementById('intervalAccuracy').textContent = '-';
+                    document.getElementById('rhythmAccuracy').textContent = '-';
+                    document.getElementById('melodyAccuracy').textContent = '-';
+                }
+            }
+        }
+
+        async function loadClasses() {
+            state.classes = await fetchJSON(`${API_BASE}/classes`);
+            
+            const html = state.classes.map(c => `
+                <tr>
+                    <td>${c.id.slice(0, 8)}...</td>
+                    <td>${c.name}</td>
+                    <td>${new Date(c.createdAt).toLocaleString()}</td>
+                    <td><button class="secondary" onclick="selectClass('${c.id}')">选择</button></td>
+                </tr>
+            `).join('');
+            document.getElementById('classesTableBody').innerHTML = html;
+            
+            const selects = ['studentClassId', 'viewStudentsClassId', 'submissionClassId', 
+                           'importClassId', 'overviewClassId', 'statsClassId', 'wrongClassId'];
+            selects.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = '<option value="">请选择班级</option>' + 
+                        state.classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                }
+            });
+        }
+
+        async function createClass(e) {
+            e.preventDefault();
+            const name = document.getElementById('className').value;
+            const operator = document.getElementById('classOperator').value;
+            
+            await fetchJSON(`${API_BASE}/classes`, {
+                method: 'POST',
+                body: JSON.stringify({ name, operator })
+            });
+            
+            document.getElementById('className').value = '';
+            loadClasses();
+        }
+
+        function selectClass(id) {
+            document.getElementById('viewStudentsClassId').value = id;
+            loadStudents();
+        }
+
+        async function loadStudents() {
+            const classId = document.getElementById('viewStudentsClassId').value;
+            if (!classId) return;
+            
+            state.students = await fetchJSON(`${API_BASE}/classes/${classId}/students`);
+            
+            const html = state.students.map(s => `
+                <tr>
+                    <td>${s.studentNo}</td>
+                    <td>${s.name}</td>
+                    <td>${new Date(s.createdAt).toLocaleString()}</td>
+                </tr>
+            `).join('');
+            document.getElementById('studentsTableBody').innerHTML = html;
+        }
+
+        async function createStudent(e) {
+            e.preventDefault();
+            const classId = document.getElementById('studentClassId').value;
+            const name = document.getElementById('studentName').value;
+            const studentNo = document.getElementById('studentNo').value;
+            const operator = document.getElementById('studentOperator').value;
+            
+            await fetchJSON(`${API_BASE}/students`, {
+                method: 'POST',
+                body: JSON.stringify({ classId, name, studentNo, operator })
+            });
+            
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentNo').value = '';
+            loadStudents();
+        }
+
+        async function createQuestion(e) {
+            e.preventDefault();
+            const data = {
+                practiceDate: document.getElementById('questionPracticeDate').value,
+                type: document.getElementById('questionType').value,
+                questionNo: parseInt(document.getElementById('questionNo').value),
+                standardAnswer: document.getElementById('questionStandardAnswer').value,
+                description: document.getElementById('questionDescription').value,
+                operator: document.getElementById('questionOperator').value
+            };
+            
+            await fetchJSON(`${API_BASE}/questions`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            document.getElementById('questionNo').value = '';
+            document.getElementById('questionStandardAnswer').value = '';
+            loadQuestions();
+        }
+
+        async function loadQuestions() {
+            const practiceDate = document.getElementById('viewQuestionsDate').value;
+            const type = document.getElementById('viewQuestionsType').value;
+            
+            if (!practiceDate) return;
+            
+            let url = `${API_BASE}/questions?practiceDate=${practiceDate}`;
+            if (type) url += `&type=${type}`;
+            
+            state.questions = await fetchJSON(url);
+            
+            const typeNames = { interval: '音程', rhythm: '节奏', melody: '旋律' };
+            
+            const html = state.questions.map(q => `
+                <tr>
+                    <td>${q.questionNo}</td>
+                    <td><span class="badge info">${typeNames[q.type]}</span></td>
+                    <td>${q.standardAnswer}</td>
+                    <td>${q.description || '-'}</td>
+                    <td>${new Date(q.createdAt).toLocaleString()}</td>
+                </tr>
+            `).join('');
+            document.getElementById('questionsTableBody').innerHTML = html;
+        }
+
+        async function loadSubmissionStudents() {
+            const classId = document.getElementById('submissionClassId').value;
+            if (!classId) return;
+            
+            const students = await fetchJSON(`${API_BASE}/classes/${classId}/students`);
+            const select = document.getElementById('submissionStudentId');
+            select.innerHTML = '<option value="">请选择学生</option>' + 
+                students.map(s => `<option value="${s.id}">${s.name} (${s.studentNo})</option>`).join('');
+        }
+
+        async function loadSubmissionQuestions() {
+            const practiceDate = document.getElementById('submissionPracticeDate').value;
+            if (!practiceDate) return;
+            
+            const questions = await fetchJSON(`${API_BASE}/questions?practiceDate=${practiceDate}`);
+            const select = document.getElementById('submissionQuestionId');
+            const typeNames = { interval: '音程', rhythm: '节奏', melody: '旋律' };
+            select.innerHTML = '<option value="">请选择题目</option>' + 
+                questions.map(q => `<option value="${q.id}">${typeNames[q.type]} - 第${q.questionNo}题</option>`).join('');
+        }
+
+        async function createSubmission(e) {
+            e.preventDefault();
+            const data = {
+                studentId: document.getElementById('submissionStudentId').value,
+                questionId: document.getElementById('submissionQuestionId').value,
+                studentAnswer: document.getElementById('submissionAnswer').value,
+                practiceDate: document.getElementById('submissionPracticeDate').value,
+                notes: document.getElementById('submissionNotes').value,
+                operator: document.getElementById('submissionOperator').value
+            };
+            
+            const result = await fetchJSON(`${API_BASE}/submissions`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            if (result.error) {
+                alert('提交失败：' + result.error);
+            } else {
+                document.getElementById('submissionAnswer').value = '';
+                document.getElementById('submissionNotes').value = '';
+                loadSubmissions();
+            }
+        }
+
+        async function loadImportStudents() {
+            const classId = document.getElementById('importClassId').value;
+            if (!classId) return;
+            
+            const students = await fetchJSON(`${API_BASE}/classes/${classId}/students`);
+            const select = document.getElementById('importStudentId');
+            select.innerHTML = '<option value="">请选择学生</option>' + 
+                students.map(s => `<option value="${s.id}">${s.name} (${s.studentNo})</option>`).join('');
+        }
+
+        async function loadImportQuestions() {
+            const practiceDate = document.getElementById('importPracticeDate').value;
+            if (!practiceDate) return;
+            
+            const questions = await fetchJSON(`${API_BASE}/questions?practiceDate=${practiceDate}`);
+            const select = document.getElementById('importQuestionId');
+            const typeNames = { interval: '音程', rhythm: '节奏', melody: '旋律' };
+            select.innerHTML = '<option value="">请选择题目</option>' + 
+                questions.map(q => `<option value="${q.id}">${typeNames[q.type]} - 第${q.questionNo}题</option>`).join('');
+        }
+
+        async function importSubmission(e) {
+            e.preventDefault();
+            
+            const isCorrectVal = document.getElementById('importIsCorrect').value;
+            const scoreVal = document.getElementById('importScore').value;
+            
+            const data = {
+                studentId: document.getElementById('importStudentId').value,
+                questionId: document.getElementById('importQuestionId').value,
+                studentAnswer: document.getElementById('importAnswer').value,
+                practiceDate: document.getElementById('importPracticeDate').value,
+                isCorrect: isCorrectVal ? isCorrectVal === 'true' : undefined,
+                score: scoreVal ? parseInt(scoreVal) : undefined,
+                notes: document.getElementById('importNotes').value,
+                operator: document.getElementById('importOperator').value
+            };
+            
+            const result = await fetchJSON(`${API_BASE}/submissions/import`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            const resultDiv = document.getElementById('importResult');
+            let conflictsHtml = '';
+            if (result.conflicts) {
+                conflictsHtml = '<ul>' + result.conflicts.map(c => `<li>${c}</li>`).join('') + '</ul>';
+            }
+            
+            resultDiv.innerHTML = `
+                <div class="import-result ${result.type}">
+                    <strong>${result.message}</strong> (ID: ${result.entityId.slice(0, 8)}...)
+                    ${conflictsHtml}
+                </div>
+            `;
+        }
+
+        async function loadSubmissions() {
+            const practiceDate = document.getElementById('viewSubmissionsDate').value;
+            if (!practiceDate) return;
+            
+            const submissions = await fetchJSON(`${API_BASE}/submissions?practiceDate=${practiceDate}`);
+            
+            const statusBadges = {
+                pending: '<span class="badge warning">待判分</span>',
+                graded: '<span class="badge success">已判分</span>',
+                reviewed: '<span class="badge info">已复核</span>',
+                conflict: '<span class="badge danger">有冲突</span>'
+            };
+            
+            const html = submissions.map(s => `
+                <tr>
+                    <td>${s.studentId.slice(0, 8)}...</td>
+                    <td>${s.questionId.slice(0, 8)}...</td>
+                    <td>${s.studentAnswer}</td>
+                    <td>${statusBadges[s.status] || s.status}</td>
+                    <td>${s.score !== undefined ? s.score : '-'}</td>
+                    <td>${new Date(s.submittedAt).toLocaleString()}</td>
+                </tr>
+            `).join('');
+            document.getElementById('submissionsTableBody').innerHTML = html;
+        }
+
+        async function loadGradingList() {
+            const practiceDate = document.getElementById('gradingPracticeDate').value;
+            if (!practiceDate) return;
+            
+            const submissions = await fetchJSON(`${API_BASE}/submissions?practiceDate=${practiceDate}`);
+            const questions = await fetchJSON(`${API_BASE}/questions?practiceDate=${practiceDate}`);
+            const questionMap = new Map(questions.map(q => [q.id, q]));
+            
+            const statusBadges = {
+                pending: '<span class="badge warning">待判分</span>',
+                graded: '<span class="badge success">已判分</span>'
+            };
+            
+            const html = submissions.map(s => {
+                const q = questionMap.get(s.questionId);
+                return `
+                    <tr>
+                        <td>${s.studentId.slice(0, 8)}...</td>
+                        <td>${q ? `第${q.questionNo}题` : s.questionId.slice(0, 8)}</td>
+                        <td>${s.studentAnswer}</td>
+                        <td>${q ? q.standardAnswer : '-'}</td>
+                        <td>${statusBadges[s.status] || s.status}</td>
+                        <td>
+                            ${s.status === 'pending' ? `
+                                <button class="success" onclick="gradeSubmission('${s.id}', true, 100)">判对</button>
+                                <button class="danger" onclick="gradeSubmission('${s.id}', false, 0)">判错</button>
+                                <button class="secondary" onclick="autoGradeSubmission('${s.id}')">自动判分</button>
+                            ` : '已完成'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            document.getElementById('gradingTableBody').innerHTML = html;
+        }
+
+        async function gradeSubmission(id, isCorrect, score) {
+            await fetchJSON(`${API_BASE}/submissions/${id}/grade`, {
+                method: 'POST',
+                body: JSON.stringify({ isCorrect, score })
+            });
+            loadGradingList();
+        }
+
+        async function autoGradeSubmission(id) {
+            await fetchJSON(`${API_BASE}/submissions/${id}/autograde`, {
+                method: 'POST',
+                body: JSON.stringify({})
+            });
+            loadGradingList();
+        }
+
+        async function autoGradeAll() {
+            const practiceDate = document.getElementById('gradingPracticeDate').value;
+            if (!practiceDate) return;
+            
+            const submissions = await fetchJSON(`${API_BASE}/submissions?practiceDate=${practiceDate}`);
+            
+            for (const s of submissions) {
+                if (s.status === 'pending') {
+                    await fetchJSON(`${API_BASE}/submissions/${s.id}/autograde`, {
+                        method: 'POST',
+                        body: JSON.stringify({})
+                    });
+                }
+            }
+            
+            loadGradingList();
+        }
+
+        function loadSupplementFields() {
+            const entityType = document.getElementById('supplementEntityType').value;
+            const fieldSelect = document.getElementById('supplementFieldName');
+            
+            const fields = {
+                submission: [
+                    { value: 'notes', label: '备注' },
+                    { value: 'studentAnswer', label: '学生答案' }
+                ],
+                question: [
+                    { value: 'standardAnswer', label: '标准答案' },
+                    { value: 'description', label: '题目描述' }
+                ],
+                student: [
+                    { value: 'name', label: '姓名' },
+                    { value: 'studentNo', label: '学号' }
+                ],
+                class: [
+                    { value: 'name', label: '班级名称' }
+                ]
+            };
+            
+            fieldSelect.innerHTML = '<option value="">请选择字段</option>' + 
+                (fields[entityType] || []).map(f => `<option value="${f.value}">${f.label}</option>`).join('');
+        }
+
+        async function supplementData(e) {
+            e.preventDefault();
+            const data = {
+                entityType: document.getElementById('supplementEntityType').value,
+                entityId: document.getElementById('supplementEntityId').value,
+                fieldName: document.getElementById('supplementFieldName').value,
+                value: document.getElementById('supplementValue').value,
+                operator: document.getElementById('supplementOperator').value
+            };
+            
+            await fetchJSON(`${API_BASE}/supplement`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            alert('补录成功！');
+            document.getElementById('supplementValue').value = '';
+        }
+
+        async function loadSupplementHistory() {
+            const entityType = document.getElementById('historyEntityType').value;
+            const entityId = document.getElementById('historyEntityId').value;
+            
+            if (!entityId) {
+                document.getElementById('supplementHistory').innerHTML = '';
+                return;
+            }
+            
+            const logs = await fetchJSON(`${API_BASE}/audit/${entityType}/${entityId}`);
+            const supplementLogs = logs.filter(l => l.action === 'supplement');
+            
+            const html = supplementLogs.map(l => `
+                <div class="audit-item">
+                    <div class="timestamp">${new Date(l.timestamp).toLocaleString()} - ${l.operator || '未知操作人'}</div>
+                    <p>${l.description}</p>
+                    ${l.oldValue !== undefined ? `
+                        <p><span class="change">${l.oldValue || '(空)'}</span> → <span class="change new">${l.newValue}</span></p>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            document.getElementById('supplementHistory').innerHTML = html || '<p>暂无补录记录</p>';
+        }
+
+        async function loadDetectionIssues() {
+            const isResolved = document.getElementById('detectionStatus').value;
+            const type = document.getElementById('detectionType').value;
+            
+            let url = `${API_BASE}/detection/issues?limit=100`;
+            if (isResolved !== '') url += `&isResolved=${isResolved}`;
+            if (type) url += `&type=${type}`;
+            
+            const issues = await fetchJSON(url);
+            
+            const typeNames = {
+                enharmonic_mismatch: '等音误判',
+                type_mismatch: '题型归错',
+                duplicate_submission: '重复提交'
+            };
+            
+            const html = issues.map(i => `
+                <div class="issue-item ${i.isResolved ? 'resolved' : ''}">
+                    <p><strong>${typeNames[i.type]}</strong> - ${i.description}</p>
+                    <small>提交ID: ${i.submissionId || 'N/A'} | 创建时间: ${new Date(i.createdAt).toLocaleString()}</small>
+                    <br>
+                    <details>
+                        <summary>查看详情</summary>
+                        <pre>${JSON.stringify(i.details, null, 2)}</pre>
+                    </details>
+                    ${!i.isResolved ? `
+                        <br><button class="success" onclick="resolveIssue('${i.id}')">标记为已解决</button>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            document.getElementById('detectionIssuesList').innerHTML = html || '<p>暂无检测到的问题</p>';
+        }
+
+        async function resolveIssue(id) {
+            await fetchJSON(`${API_BASE}/detection/issues/${id}/resolve`, {
+                method: 'POST',
+                body: JSON.stringify({})
+            });
+            loadDetectionIssues();
+        }
+
+        async function loadStatistics() {
+            const classId = document.getElementById('statsClassId').value;
+            const practiceDate = document.getElementById('statsPracticeDate').value;
+            
+            if (!classId || !practiceDate) return;
+            
+            const stats = await fetchJSON(`${API_BASE}/statistics/class/${classId}?practiceDate=${practiceDate}`);
+            
+            document.getElementById('statisticsResult').innerHTML = `
+                <div class="card">
+                    <h3>${stats.className} - ${stats.practiceDate} 统计报告</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h4>学生总数</h4>
+                            <div class="value">${stats.totalStudents}</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>已提交人数</h4>
+                            <div class="value">${stats.submittedCount}</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>平均分</h4>
+                            <div class="value">${stats.averageScore.toFixed(1)}</div>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card interval">
+                            <h4>音程题正确率</h4>
+                            <div class="value">${(stats.intervalStats.accuracy * 100).toFixed(1)}%</div>
+                        </div>
+                        <div class="stat-card rhythm">
+                            <h4>节奏题正确率</h4>
+                            <div class="value">${(stats.rhythmStats.accuracy * 100).toFixed(1)}%</div>
+                        </div>
+                        <div class="stat-card melody">
+                            <h4>旋律题正确率</h4>
+                            <div class="value">${(stats.melodyStats.accuracy * 100).toFixed(1)}%</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function exportExcel() {
+            const classId = document.getElementById('statsClassId').value;
+            const practiceDate = document.getElementById('statsPracticeDate').value;
+            
+            if (!classId || !practiceDate) {
+                alert('请选择班级和日期');
+                return;
+            }
+            
+            window.open(`${API_BASE}/export/class/${classId}?practiceDate=${practiceDate}`);
+        }
+
+        async function loadWrongQuestions() {
+            const classId = document.getElementById('wrongClassId').value;
+            const practiceDate = document.getElementById('wrongPracticeDate').value;
+            const type = document.getElementById('wrongType').value;
+            
+            if (!classId || !practiceDate) return;
+            
+            const wrongQuestions = await fetchJSON(
+                `${API_BASE}/statistics/class/${classId}/wrong/${type}?practiceDate=${practiceDate}`
+            );
+            
+            const typeNames = { interval: '音程', rhythm: '节奏', melody: '旋律' };
+            
+            const html = wrongQuestions.length > 0 ? `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>题号</th>
+                            <th>标准答案</th>
+                            <th>学生姓名</th>
+                            <th>学生答案</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${wrongQuestions.map(w => `
+                            <tr>
+                                <td>${w.questionNo}</td>
+                                <td>${w.standardAnswer}</td>
+                                <td>${w.studentName || '-'}</td>
+                                <td>${w.studentAnswer}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            ` : '<p>暂无错题</p>';
+            
+            document.getElementById('wrongQuestionsResult').innerHTML = `
+                <h4>${typeNames[type]}错题列表</h4>
+                ${html}
+            `;
+        }
+
+        async function loadAuditLogs() {
+            const logs = await fetchJSON(`${API_BASE}/audit?limit=50`);
+            
+            const html = logs.map(l => `
+                <div class="audit-item">
+                    <div class="timestamp">${new Date(l.timestamp).toLocaleString()} - ${l.operator || '未知操作人'}</div>
+                    <p><strong>[${l.entityType}] ${l.action}</strong>: ${l.description}</p>
+                    ${l.fieldName ? `<p>字段: ${l.fieldName}</p>` : ''}
+                    ${l.oldValue !== undefined && l.newValue !== undefined ? `
+                        <p><span class="change">${l.oldValue || '(空)'}</span> → <span class="change new">${l.newValue}</span></p>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            document.getElementById('auditLogsList').innerHTML = html;
+        }
+
+        init();
+    </script>
+</body>
+</html>
