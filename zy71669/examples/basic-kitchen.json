@@ -1,0 +1,180 @@
+{
+  "id": "kitchen-001",
+  "name": "示例厨房 - 基础排风方案",
+  "description": "典型中餐厅厨房布局，包含2个炒锅、1个炸炉和1个蒸箱",
+  "dimensions": {
+    "width": 8,
+    "height": 6,
+    "unit": "m"
+  },
+  "gridResolution": 0.2,
+  "stoves": [
+    {
+      "id": "stove-1",
+      "name": "炒锅1号",
+      "type": "wok",
+      "position": {
+        "x": 1,
+        "y": 1,
+        "unit": "m"
+      },
+      "dimensions": {
+        "width": 1.2,
+        "height": 1,
+        "unit": "m"
+      },
+      "fumeEmissionRate": 800,
+      "heatOutput": 25000,
+      "enabled": true
+    },
+    {
+      "id": "stove-2",
+      "name": "炒锅2号",
+      "type": "wok",
+      "position": {
+        "x": 2.5,
+        "y": 1,
+        "unit": "m"
+      },
+      "dimensions": {
+        "width": 1.2,
+        "height": 1,
+        "unit": "m"
+      },
+      "fumeEmissionRate": 800,
+      "heatOutput": 25000,
+      "enabled": true
+    },
+    {
+      "id": "stove-3",
+      "name": "炸炉",
+      "type": "fryer",
+      "position": {
+        "x": 4,
+        "y": 1,
+        "unit": "m"
+      },
+      "dimensions": {
+        "width": 0.8,
+        "height": 0.8,
+        "unit": "m"
+      },
+      "fumeEmissionRate": 500,
+      "heatOutput": 15000,
+      "enabled": true
+    },
+    {
+      "id": "stove-4",
+      "name": "蒸箱",
+      "type": "steamer",
+      "position": {
+        "x": 5.5,
+        "y": 1,
+        "unit": "m"
+      },
+      "dimensions": {
+        "width": 1,
+        "height": 1,
+        "unit": "m"
+      },
+      "fumeEmissionRate": 300,
+      "heatOutput": 10000,
+      "enabled": true
+    }
+  ],
+  "exhaustVents": [
+    {
+      "id": "exhaust-1",
+      "name": "主排烟罩",
+      "type": "hood",
+      "position": {
+        "x": 0.5,
+        "y": 0.5,
+        "unit": "m"
+      },
+      "dimensions": {
+        "width": 6.5,
+        "height": 1.5,
+        "unit": "m"
+      },
+      "airflowRate": 12000,
+      "captureEfficiency": 0.85,
+      "enabled": true
+    }
+  ],
+  "detectionPoints": [
+    {
+      "id": "dp-1",
+      "name": "厨师呼吸区1",
+      "position": {
+        "x": 1.6,
+        "y": 2.2,
+        "unit": "m"
+      },
+      "threshold": 2
+    },
+    {
+      "id": "dp-2",
+      "name": "厨师呼吸区2",
+      "position": {
+        "x": 3.1,
+        "y": 2.2,
+        "unit": "m"
+      },
+      "threshold": 2
+    },
+    {
+      "id": "dp-3",
+      "name": "厨房入口",
+      "position": {
+        "x": 7,
+        "y": 3,
+        "unit": "m"
+      },
+      "threshold": 1
+    },
+    {
+      "id": "dp-4",
+      "name": "备餐区",
+      "position": {
+        "x": 3,
+        "y": 4.5,
+        "unit": "m"
+      },
+      "threshold": 0.5
+    }
+  ],
+  "obstacles": [
+    {
+      "id": "wall-1",
+      "name": "隔墙",
+      "position": {
+        "x": 0,
+        "y": 3.5,
+        "unit": "m"
+      },
+      "dimensions": {
+        "width": 8,
+        "height": 0.2,
+        "unit": "m"
+      },
+      "permeability": 0.1
+    }
+  ],
+  "version": {
+    "version": "1.0.0",
+    "createdAt": "2026-05-30T14:46:41.407Z",
+    "createdBy": "system",
+    "modifiedAt": "2026-05-30T14:46:41.407Z",
+    "modifiedBy": "system",
+    "status": "draft",
+    "comments": [
+      "初始方案",
+      "示例配置"
+    ]
+  },
+  "metadata": {
+    "restaurant": "示例餐厅",
+    "chef": "张师傅"
+  }
+}

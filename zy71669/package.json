@@ -1,0 +1,40 @@
+{
+  "name": "kitchen-fume-simulator",
+  "version": "1.0.0",
+  "description": "厨房油烟扩散模拟系统 - 用于餐饮店排风方案设计与验证",
+  "main": "dist/index.js",
+  "bin": {
+    "fume-sim": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli/index.js",
+    "dev": "ts-node src/cli/index.ts",
+    "example:gen": "ts-node src/cli/index.ts example -o examples/basic-kitchen.json",
+    "example:run": "ts-node src/cli/index.ts run examples/basic-kitchen.json",
+    "example:compare": "ts-node src/cli/index.ts compare examples/basic-kitchen.json examples/high-airflow.json",
+    "example:validate": "ts-node src/cli/index.ts validate examples/basic-kitchen.json",
+    "example": "npm run example:gen && npm run example:run",
+    "compare": "ts-node src/cli/index.ts compare examples/basic-kitchen.json examples/high-airflow.json",
+    "report": "ts-node src/cli/index.ts report examples/basic-kitchen.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "kitchen",
+    "fume",
+    "simulation",
+    "ventilation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^20.10.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  }
+}
