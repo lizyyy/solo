@@ -1,0 +1,148 @@
+╔══════════════════════════════════════════════════════════════╗
+║              DJ曲库调性清洗报告                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+会话ID:     session-1780155609829-3zret0
+生成时间:   2026/5/30 23:40:09
+输入文件:   sample-data/dirty-library.csv
+输入总行数: 31
+成功解析:   30
+
+━━━ 处理统计总览 ━━━
+┌─────────────────────────────────┐
+│         处理统计总览             │
+└─────────────────────────────────┘
+
+  输入总数:         31
+  成功解析:         30
+  解析错误:         1
+
+  ── BPM处理 ──
+  BPM修正总计:     3
+  其中半速修正:     2
+  其中双速修正:     1
+  其中四舍五入:     0
+
+  ── 调性处理 ──
+  调性标准化:       8
+  调性识别失败:     2
+
+  ── 能量值处理 ──
+  能量值解析成功:   28
+  能量值解析失败:   0
+
+  ── 去重处理 ──
+  重复曲目数:       6
+  已合并:           6
+  合并补字段数:     0
+
+  ── 人工干预 ──
+  人工确认保护:     0
+  自动变更数:       17
+  人工变更数:       0
+
+  ── 数据口径说明 ──
+  以上数字与下方明细列表来自同一次清洗流水线，
+  不存在二次统计或抽样。数字 = 明细条目数。
+
+━━━ BPM变更明细 ━━━
+共 3 条BPM变更 (半速:2 双速:1 四舍五入:0)
+
+  【半速修正明细】
+    Strobe - deadmau5
+      64 → 128  (BPM 64 低于 85，疑似半速，修正为 ×2 = 128)
+    Titanium - David Guetta ft Sia
+      63 → 126  (BPM 63 低于 85，疑似半速，修正为 ×2 = 126)
+
+  【双速修正明细】
+    BPM Weird Track - Test DJ
+      300 → 150  (BPM 300 超过 190，疑似双速，修正为 ÷2 = 150)
+
+
+━━━ 调性变更明细 ━━━
+共 8 条调性标准化
+
+  【标准化明细】
+    Midnight Groove - DJ Shadow
+      "Am" → 8A (A minor)  (调性格式标准化: "Am" → 8A (A minor)，置信度 90%)
+    Clarity - Zedd feat Foxes
+      "F#m" → 11A (F# minor)  (调性格式标准化: "F#m" → 11A (F# minor)，置信度 95%)
+    Levels - avicii
+      "C maj" → 8B (C major)  (调性格式标准化: "C maj" → 8B (C major)，置信度 90%)
+    Insomnia - Faithless
+      "G# minor" → 1A (Ab minor)  (调性格式标准化: "G# minor" → 1A (Ab minor)，置信度 95%)
+    Open Key Track - Test DJ4
+      "6d" → 6B (Bb major)  (调性格式标准化: "6d" → 6B (Bb major)，置信度 95%)
+    Dash Key Track - Test DJ5
+      "8-A" → 8A (A minor)  (调性格式标准化: "8-A" → 8A (A minor)，置信度 95%)
+    Slash Key Track - Test DJ6
+      "8B/Am" → 8B (C major)  (调性格式标准化: "8B/Am" → 8B (C major)，置信度 100%)
+    Mixed Format - Test DJ8
+      "(8A)" → 8A (A minor)  (调性格式标准化: "(8A)" → 8A (A minor)，置信度 100%)
+
+━━━ 重复曲目明细 ━━━
+发现 5 组重复，共 6 条被合并
+
+  【Midnight Groove - DJ Shadow】
+    保留策略: 保留完整度最高的记录
+     ★保留 [Traktor] 128BPM 8A E7 (完整度:100%)
+     →合并 [Serato] 128BPM 8A E7 (完整度:100%)
+
+  【Strobe - deadmau5】
+    保留策略: 保留完整度最高的记录
+     ★保留 [Rekordbox] 128BPM 10B E8 (完整度:100%)
+     →合并 [Traktor] 128BPM 10B 能量缺失 (完整度:80%)
+     →合并 [Traktor] 127.5BPM 10A E8 (完整度:100%)
+
+  【Levels - Avicii】
+    保留策略: 保留完整度最高的记录
+     ★保留 [Rekordbox] 128BPM 8B E8 (完整度:100%)
+     →合并 [Serato] 128BPM 8B E8 (完整度:100%)
+
+  【Insomnia - Faithless】
+    保留策略: 保留完整度最高的记录
+     ★保留 [Rekordbox] 129BPM 11B E9 (完整度:100%)
+     →合并 [Serato] 129BPM 1A E9 (完整度:100%)
+
+  【Titanium - David Guetta ft Sia】
+    保留策略: 保留完整度最高的记录
+     ★保留 [Traktor] 126BPM 1B E8 (完整度:100%)
+     →合并 [Serato] 126BPM 4B E8 (完整度:100%)
+
+
+━━━ 解析警告明细 ━━━
+共 2 条解析提示 (错误:1 警告:1 信息:0)
+
+  ⚠ 行19 [title/artist] 行缺少标题和艺术家，跳过
+    原始内容: {"title":"","artist":"","bpm":"","key":"5","energy":"","album":"","genre":"","year":"Traktor"}
+  ✗ 行19 [FieldMismatch] CSV解析错误: Too few fields: expected 9 fields but parsed 8
+
+━━━ 人工干预记录 ━━━
+本次清洗无人工干预记录
+
+━━━ 数据口径说明 ━━━
+本报告所有数字统计均来自同一次清洗流水线(CleaningSession)，
+与各明细列表条目一一对应，无二次统计或抽样。具体映射关系:
+
+  处理统计总览.bpmFixed (3)
+    = BPM变更明细中半速修正(2)
+    + 双速修正(1)
+    + 四舍五入(0)
+    = 3 ✓
+
+  处理统计总览.keysNormalized (8)
+    = 调性变更明细中标准化条目数
+
+  处理统计总览.duplicatesFound (6)
+    = 重复曲目明细中各组(members.length-1)之和
+
+  处理统计总览.manualConfirmed (0)
+    = 人工干预记录中被阻止的自动变更数
+
+所有变更记录(ChangeRecord)包含完整的: 原值、新值、原因、时间戳、
+来源(auto/manual)、是否被覆盖(superseded)。无需反查数据库即可理解处理口径。
+
+
+════════════════════════════════════════════════════════════════
+报告结束 | 会话: session-1780155609829-3zret0 | 时间: 2026/5/30 23:40:09
+════════════════════════════════════════════════════════════════
