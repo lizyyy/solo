@@ -1,0 +1,47 @@
+[
+    {
+        "account_id": "ACC001",
+        "currency": "USD",
+        "available_balance": 50000,
+        "daily_limit": 100000,
+        "single_limit": 50000,
+        "daily_used": 30000,
+        "source": "CoreBank"
+    },
+    {
+        "account_id": "ACC001",
+        "currency": "EUR",
+        "available_balance": 25000,
+        "daily_limit": 80000,
+        "single_limit": 40000,
+        "daily_used": 10000,
+        "source": "CoreBank"
+    },
+    {
+        "account_id": "ACC001",
+        "currency": "HKD",
+        "available_balance": 200000,
+        "daily_limit": 500000,
+        "single_limit": 200000,
+        "daily_used": 50000,
+        "source": "CoreBank"
+    },
+    {
+        "account_id": "ACC001",
+        "currency": "GBP",
+        "available_balance": 5000,
+        "daily_limit": 50000,
+        "single_limit": 20000,
+        "daily_used": 0,
+        "source": "CoreBank"
+    },
+    {
+        "account_id": "ACC001",
+        "currency": "CNY",
+        "available_balance": 100000,
+        "daily_limit": 500000,
+        "single_limit": 200000,
+        "daily_used": 50000,
+        "source": "CoreBank"
+    }
+]

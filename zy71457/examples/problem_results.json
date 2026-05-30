@@ -1,0 +1,881 @@
+{
+  "summary": {
+    "total_requests": 6,
+    "normal_count": 1,
+    "problem_count": 5,
+    "risk_breakdown": {
+      "DATA_CONFLICT": 10,
+      "FEE_MISSED": 20,
+      "INSUFFICIENT_BALANCE": 9,
+      "LIMIT_EXCEEDED": 13
+    }
+  },
+  "records": [
+    {
+      "record_id": "FX20260530_001",
+      "status": "PROBLEM",
+      "source_currency": "USD",
+      "target_currency": "CNY",
+      "source_amount": 10000,
+      "final_amount": 72500.0,
+      "total_fee": 0.0,
+      "path_currencies": [
+        "USD",
+        "CNY"
+      ],
+      "effective_rate": 7.25,
+      "steps": 1,
+      "business_explanation": "直接兑换：USD->CNY，综合汇率7.25，总手续费0.0 | 图搜索逻辑：从USD出发，尝试所有不超过4次中转的路径；成本计算：每步扣除手续费后用实际到手金额比较；限额校验：每步都检查余额和单笔/日累计限额",
+      "path_details": [
+        {
+          "step": 0,
+          "currency": "USD",
+          "amount": 10000,
+          "fee_paid": 0,
+          "rate_used": 1.0,
+          "from_amount": 10000
+        },
+        {
+          "step": 1,
+          "currency": "CNY",
+          "amount": 72500.0,
+          "fee_paid": 0,
+          "rate_used": 7.25,
+          "from_amount": 10000
+        }
+      ],
+      "issues": [
+        {
+          "risk_type": "DATA_CONFLICT",
+          "severity": "MEDIUM",
+          "message": "汇率口径冲突：USD->CNY",
+          "business_explanation": "Reuters与其他数据源汇率不一致，当前使用7.25，原始值：[{'rate': 7.25, 'source': 'Reuters', 'effective_date': '2026-05-30'}, {'rate': 7.24, 'source': 'Bloomberg', 'effective_date': '2026-05-30'}]",
+          "details": {
+            "rate_key": "USD_CNY",
+            "sources": [
+              "Reuters",
+              "Bloomberg"
+            ]
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "DATA_CONFLICT",
+          "severity": "MEDIUM",
+          "message": "手续费口径冲突：USD->CNY",
+          "business_explanation": "不同来源手续费标准不同，不自动选择，请人工确认",
+          "details": {
+            "sources": [
+              "Bank_A",
+              "Bank_B"
+            ]
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "缺少手续费配置：USD->GBP",
+          "business_explanation": "从USD兑换到GBP的手续费规则未配置，实际执行时可能产生未知费用",
+          "details": {
+            "missing_fee": "USD_GBP"
+          },
+          "path_reference": [
+            "USD",
+            "GBP"
+          ]
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "手续费可能漏算：USD->GBP",
+          "business_explanation": "计算出的手续费为0，请检查手续费配置是否完整，避免实际换汇时产生额外成本",
+          "details": {
+            "from_amount": 10000,
+            "fee_type": "PERCENTAGE"
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "缺少手续费配置：GBP->CNY",
+          "business_explanation": "从GBP兑换到CNY的手续费规则未配置，实际执行时可能产生未知费用",
+          "details": {
+            "missing_fee": "GBP_CNY"
+          },
+          "path_reference": [
+            "USD",
+            "GBP",
+            "CNY"
+          ]
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "手续费可能漏算：GBP->CNY",
+          "business_explanation": "计算出的手续费为0，请检查手续费配置是否完整，避免实际换汇时产生额外成本",
+          "details": {
+            "from_amount": 7900.0,
+            "fee_type": "PERCENTAGE"
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "INSUFFICIENT_BALANCE",
+          "severity": "HIGH",
+          "message": "余额不足：GBP 需7900.0 仅5000",
+          "business_explanation": "账户ACC001的GBP可用余额5000，不足以支付本次兑换的7900.0",
+          "details": {
+            "account_id": "ACC001",
+            "currency": "GBP",
+            "available": 5000,
+            "required": 7900.0
+          },
+          "path_reference": null
+        }
+      ],
+      "manual_overrides": []
+    },
+    {
+      "record_id": "FX20260530_002",
+      "status": "PROBLEM",
+      "source_currency": "USD",
+      "target_currency": "CNY",
+      "source_amount": 80000,
+      "final_amount": 580000.0,
+      "total_fee": 0.0,
+      "path_currencies": [
+        "USD",
+        "CNY"
+      ],
+      "effective_rate": 7.25,
+      "steps": 1,
+      "business_explanation": "直接兑换：USD->CNY，综合汇率7.25，总手续费0.0 | 图搜索逻辑：从USD出发，尝试所有不超过4次中转的路径；成本计算：每步扣除手续费后用实际到手金额比较；限额校验：每步都检查余额和单笔/日累计限额",
+      "path_details": [
+        {
+          "step": 0,
+          "currency": "USD",
+          "amount": 80000,
+          "fee_paid": 0,
+          "rate_used": 1.0,
+          "from_amount": 80000
+        },
+        {
+          "step": 1,
+          "currency": "CNY",
+          "amount": 580000.0,
+          "fee_paid": 0,
+          "rate_used": 7.25,
+          "from_amount": 80000
+        }
+      ],
+      "issues": [
+        {
+          "risk_type": "DATA_CONFLICT",
+          "severity": "MEDIUM",
+          "message": "汇率口径冲突：USD->CNY",
+          "business_explanation": "Reuters与其他数据源汇率不一致，当前使用7.25，原始值：[{'rate': 7.25, 'source': 'Reuters', 'effective_date': '2026-05-30'}, {'rate': 7.24, 'source': 'Bloomberg', 'effective_date': '2026-05-30'}]",
+          "details": {
+            "rate_key": "USD_CNY",
+            "sources": [
+              "Reuters",
+              "Bloomberg"
+            ]
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "DATA_CONFLICT",
+          "severity": "MEDIUM",
+          "message": "手续费口径冲突：USD->CNY",
+          "business_explanation": "不同来源手续费标准不同，不自动选择，请人工确认",
+          "details": {
+            "sources": [
+              "Bank_A",
+              "Bank_B"
+            ]
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "INSUFFICIENT_BALANCE",
+          "severity": "HIGH",
+          "message": "余额不足：USD 需80000 仅50000",
+          "business_explanation": "账户ACC001的USD可用余额50000，不足以支付本次兑换的80000",
+          "details": {
+            "account_id": "ACC001",
+            "currency": "USD",
+            "available": 50000,
+            "required": 80000
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "单笔超限：USD 单笔限50000",
+          "business_explanation": "本次兑换80000USD超过单笔限额50000，需拆分或申请提额",
+          "details": {
+            "limit_type": "SINGLE",
+            "limit": 50000,
+            "amount": 80000
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "日累计超限：USD 日限100000 已用30000",
+          "business_explanation": "当日已用30000，剩余70000，本次80000超出日累计限额",
+          "details": {
+            "limit_type": "DAILY",
+            "limit": 100000,
+            "used": 30000,
+            "amount": 80000,
+            "remaining": 70000
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "缺少手续费配置：USD->GBP",
+          "business_explanation": "从USD兑换到GBP的手续费规则未配置，实际执行时可能产生未知费用",
+          "details": {
+            "missing_fee": "USD_GBP"
+          },
+          "path_reference": [
+            "USD",
+            "GBP"
+          ]
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "手续费可能漏算：USD->GBP",
+          "business_explanation": "计算出的手续费为0，请检查手续费配置是否完整，避免实际换汇时产生额外成本",
+          "details": {
+            "from_amount": 80000,
+            "fee_type": "PERCENTAGE"
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "INSUFFICIENT_BALANCE",
+          "severity": "HIGH",
+          "message": "余额不足：EUR 需73563.2 仅25000",
+          "business_explanation": "账户ACC001的EUR可用余额25000，不足以支付本次兑换的73563.2",
+          "details": {
+            "account_id": "ACC001",
+            "currency": "EUR",
+            "available": 25000,
+            "required": 73563.2
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "单笔超限：EUR 单笔限40000",
+          "business_explanation": "本次兑换73563.2EUR超过单笔限额40000，需拆分或申请提额",
+          "details": {
+            "limit_type": "SINGLE",
+            "limit": 40000,
+            "amount": 73563.2
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "日累计超限：EUR 日限80000 已用10000",
+          "business_explanation": "当日已用10000，剩余70000，本次73563.2超出日累计限额",
+          "details": {
+            "limit_type": "DAILY",
+            "limit": 80000,
+            "used": 10000,
+            "amount": 73563.2,
+            "remaining": 70000
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "INSUFFICIENT_BALANCE",
+          "severity": "HIGH",
+          "message": "余额不足：HKD 需624760.95 仅200000",
+          "business_explanation": "账户ACC001的HKD可用余额200000，不足以支付本次兑换的624760.95",
+          "details": {
+            "account_id": "ACC001",
+            "currency": "HKD",
+            "available": 200000,
+            "required": 624760.95
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "单笔超限：HKD 单笔限200000",
+          "business_explanation": "本次兑换624760.95HKD超过单笔限额200000，需拆分或申请提额",
+          "details": {
+            "limit_type": "SINGLE",
+            "limit": 200000,
+            "amount": 624760.95
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "日累计超限：HKD 日限500000 已用50000",
+          "business_explanation": "当日已用50000，剩余450000，本次624760.95超出日累计限额",
+          "details": {
+            "limit_type": "DAILY",
+            "limit": 500000,
+            "used": 50000,
+            "amount": 624760.95,
+            "remaining": 450000
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "缺少手续费配置：GBP->CNY",
+          "business_explanation": "从GBP兑换到CNY的手续费规则未配置，实际执行时可能产生未知费用",
+          "details": {
+            "missing_fee": "GBP_CNY"
+          },
+          "path_reference": [
+            "USD",
+            "GBP",
+            "CNY"
+          ]
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "手续费可能漏算：GBP->CNY",
+          "business_explanation": "计算出的手续费为0，请检查手续费配置是否完整，避免实际换汇时产生额外成本",
+          "details": {
+            "from_amount": 63200.0,
+            "fee_type": "PERCENTAGE"
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "INSUFFICIENT_BALANCE",
+          "severity": "HIGH",
+          "message": "余额不足：GBP 需63200.0 仅5000",
+          "business_explanation": "账户ACC001的GBP可用余额5000，不足以支付本次兑换的63200.0",
+          "details": {
+            "account_id": "ACC001",
+            "currency": "GBP",
+            "available": 5000,
+            "required": 63200.0
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "单笔超限：GBP 单笔限20000",
+          "business_explanation": "本次兑换63200.0GBP超过单笔限额20000，需拆分或申请提额",
+          "details": {
+            "limit_type": "SINGLE",
+            "limit": 20000,
+            "amount": 63200.0
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "日累计超限：GBP 日限50000 已用0",
+          "business_explanation": "当日已用0，剩余50000，本次63200.0超出日累计限额",
+          "details": {
+            "limit_type": "DAILY",
+            "limit": 50000,
+            "used": 0,
+            "amount": 63200.0,
+            "remaining": 50000
+          },
+          "path_reference": null
+        }
+      ],
+      "manual_overrides": [
+        {
+          "field_name": "source_amount",
+          "old_value": 80000,
+          "new_value": 70000,
+          "reason": "日累计限额不足，拆分两笔执行，本日先处理70000，剩余10000下周一再执行",
+          "operator": "财务组-李会计",
+          "timestamp": "2026-05-30T16:00:00"
+        }
+      ]
+    },
+    {
+      "record_id": "FX20260530_003",
+      "status": "PROBLEM",
+      "source_currency": "USD",
+      "target_currency": "CNY",
+      "source_amount": 60000,
+      "final_amount": 435000.0,
+      "total_fee": 0.0,
+      "path_currencies": [
+        "USD",
+        "CNY"
+      ],
+      "effective_rate": 7.25,
+      "steps": 1,
+      "business_explanation": "直接兑换：USD->CNY，综合汇率7.25，总手续费0.0 | 图搜索逻辑：从USD出发，尝试所有不超过4次中转的路径；成本计算：每步扣除手续费后用实际到手金额比较；限额校验：每步都检查余额和单笔/日累计限额",
+      "path_details": [
+        {
+          "step": 0,
+          "currency": "USD",
+          "amount": 60000,
+          "fee_paid": 0,
+          "rate_used": 1.0,
+          "from_amount": 60000
+        },
+        {
+          "step": 1,
+          "currency": "CNY",
+          "amount": 435000.0,
+          "fee_paid": 0,
+          "rate_used": 7.25,
+          "from_amount": 60000
+        }
+      ],
+      "issues": [
+        {
+          "risk_type": "DATA_CONFLICT",
+          "severity": "MEDIUM",
+          "message": "汇率口径冲突：USD->CNY",
+          "business_explanation": "Reuters与其他数据源汇率不一致，当前使用7.25，原始值：[{'rate': 7.25, 'source': 'Reuters', 'effective_date': '2026-05-30'}, {'rate': 7.24, 'source': 'Bloomberg', 'effective_date': '2026-05-30'}]",
+          "details": {
+            "rate_key": "USD_CNY",
+            "sources": [
+              "Reuters",
+              "Bloomberg"
+            ]
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "DATA_CONFLICT",
+          "severity": "MEDIUM",
+          "message": "手续费口径冲突：USD->CNY",
+          "business_explanation": "不同来源手续费标准不同，不自动选择，请人工确认",
+          "details": {
+            "sources": [
+              "Bank_A",
+              "Bank_B"
+            ]
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "INSUFFICIENT_BALANCE",
+          "severity": "HIGH",
+          "message": "余额不足：USD 需60000 仅50000",
+          "business_explanation": "账户ACC001的USD可用余额50000，不足以支付本次兑换的60000",
+          "details": {
+            "account_id": "ACC001",
+            "currency": "USD",
+            "available": 50000,
+            "required": 60000
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "单笔超限：USD 单笔限50000",
+          "business_explanation": "本次兑换60000USD超过单笔限额50000，需拆分或申请提额",
+          "details": {
+            "limit_type": "SINGLE",
+            "limit": 50000,
+            "amount": 60000
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "缺少手续费配置：USD->GBP",
+          "business_explanation": "从USD兑换到GBP的手续费规则未配置，实际执行时可能产生未知费用",
+          "details": {
+            "missing_fee": "USD_GBP"
+          },
+          "path_reference": [
+            "USD",
+            "GBP"
+          ]
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "手续费可能漏算：USD->GBP",
+          "business_explanation": "计算出的手续费为0，请检查手续费配置是否完整，避免实际换汇时产生额外成本",
+          "details": {
+            "from_amount": 60000,
+            "fee_type": "PERCENTAGE"
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "INSUFFICIENT_BALANCE",
+          "severity": "HIGH",
+          "message": "余额不足：EUR 需55163.2 仅25000",
+          "business_explanation": "账户ACC001的EUR可用余额25000，不足以支付本次兑换的55163.2",
+          "details": {
+            "account_id": "ACC001",
+            "currency": "EUR",
+            "available": 25000,
+            "required": 55163.2
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "单笔超限：EUR 单笔限40000",
+          "business_explanation": "本次兑换55163.2EUR超过单笔限额40000，需拆分或申请提额",
+          "details": {
+            "limit_type": "SINGLE",
+            "limit": 40000,
+            "amount": 55163.2
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "INSUFFICIENT_BALANCE",
+          "severity": "HIGH",
+          "message": "余额不足：HKD 需468560.95 仅200000",
+          "business_explanation": "账户ACC001的HKD可用余额200000，不足以支付本次兑换的468560.95",
+          "details": {
+            "account_id": "ACC001",
+            "currency": "HKD",
+            "available": 200000,
+            "required": 468560.95
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "单笔超限：HKD 单笔限200000",
+          "business_explanation": "本次兑换468560.95HKD超过单笔限额200000，需拆分或申请提额",
+          "details": {
+            "limit_type": "SINGLE",
+            "limit": 200000,
+            "amount": 468560.95
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "日累计超限：HKD 日限500000 已用50000",
+          "business_explanation": "当日已用50000，剩余450000，本次468560.95超出日累计限额",
+          "details": {
+            "limit_type": "DAILY",
+            "limit": 500000,
+            "used": 50000,
+            "amount": 468560.95,
+            "remaining": 450000
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "缺少手续费配置：GBP->CNY",
+          "business_explanation": "从GBP兑换到CNY的手续费规则未配置，实际执行时可能产生未知费用",
+          "details": {
+            "missing_fee": "GBP_CNY"
+          },
+          "path_reference": [
+            "USD",
+            "GBP",
+            "CNY"
+          ]
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "手续费可能漏算：GBP->CNY",
+          "business_explanation": "计算出的手续费为0，请检查手续费配置是否完整，避免实际换汇时产生额外成本",
+          "details": {
+            "from_amount": 47400.0,
+            "fee_type": "PERCENTAGE"
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "INSUFFICIENT_BALANCE",
+          "severity": "HIGH",
+          "message": "余额不足：GBP 需47400.0 仅5000",
+          "business_explanation": "账户ACC001的GBP可用余额5000，不足以支付本次兑换的47400.0",
+          "details": {
+            "account_id": "ACC001",
+            "currency": "GBP",
+            "available": 5000,
+            "required": 47400.0
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "LIMIT_EXCEEDED",
+          "severity": "HIGH",
+          "message": "单笔超限：GBP 单笔限20000",
+          "business_explanation": "本次兑换47400.0GBP超过单笔限额20000，需拆分或申请提额",
+          "details": {
+            "limit_type": "SINGLE",
+            "limit": 20000,
+            "amount": 47400.0
+          },
+          "path_reference": null
+        }
+      ],
+      "manual_overrides": []
+    },
+    {
+      "record_id": "FX20260530_004",
+      "status": "PROBLEM",
+      "source_currency": "USD",
+      "target_currency": "GBP",
+      "source_amount": 5000,
+      "final_amount": 3950.0,
+      "total_fee": 0.0,
+      "path_currencies": [
+        "USD",
+        "GBP"
+      ],
+      "effective_rate": 0.79,
+      "steps": 1,
+      "business_explanation": "直接兑换：USD->GBP，综合汇率0.79，总手续费0.0 | 图搜索逻辑：从USD出发，尝试所有不超过4次中转的路径；成本计算：每步扣除手续费后用实际到手金额比较；限额校验：每步都检查余额和单笔/日累计限额",
+      "path_details": [
+        {
+          "step": 0,
+          "currency": "USD",
+          "amount": 5000,
+          "fee_paid": 0,
+          "rate_used": 1.0,
+          "from_amount": 5000
+        },
+        {
+          "step": 1,
+          "currency": "GBP",
+          "amount": 3950.0,
+          "fee_paid": 0,
+          "rate_used": 0.79,
+          "from_amount": 5000
+        }
+      ],
+      "issues": [
+        {
+          "risk_type": "DATA_CONFLICT",
+          "severity": "MEDIUM",
+          "message": "汇率口径冲突：USD->CNY",
+          "business_explanation": "Reuters与其他数据源汇率不一致，当前使用7.25，原始值：[{'rate': 7.25, 'source': 'Reuters', 'effective_date': '2026-05-30'}, {'rate': 7.24, 'source': 'Bloomberg', 'effective_date': '2026-05-30'}]",
+          "details": {
+            "rate_key": "USD_CNY",
+            "sources": [
+              "Reuters",
+              "Bloomberg"
+            ]
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "DATA_CONFLICT",
+          "severity": "MEDIUM",
+          "message": "手续费口径冲突：USD->CNY",
+          "business_explanation": "不同来源手续费标准不同，不自动选择，请人工确认",
+          "details": {
+            "sources": [
+              "Bank_A",
+              "Bank_B"
+            ]
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "缺少手续费配置：USD->GBP",
+          "business_explanation": "从USD兑换到GBP的手续费规则未配置，实际执行时可能产生未知费用",
+          "details": {
+            "missing_fee": "USD_GBP"
+          },
+          "path_reference": [
+            "USD",
+            "GBP"
+          ]
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "手续费可能漏算：USD->GBP",
+          "business_explanation": "计算出的手续费为0，请检查手续费配置是否完整，避免实际换汇时产生额外成本",
+          "details": {
+            "from_amount": 5000,
+            "fee_type": "PERCENTAGE"
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "缺少手续费配置：GBP->CNY",
+          "business_explanation": "从GBP兑换到CNY的手续费规则未配置，实际执行时可能产生未知费用",
+          "details": {
+            "missing_fee": "GBP_CNY"
+          },
+          "path_reference": [
+            "USD",
+            "GBP",
+            "CNY"
+          ]
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "手续费可能漏算：GBP->CNY",
+          "business_explanation": "计算出的手续费为0，请检查手续费配置是否完整，避免实际换汇时产生额外成本",
+          "details": {
+            "from_amount": 3950.0,
+            "fee_type": "PERCENTAGE"
+          },
+          "path_reference": null
+        }
+      ],
+      "manual_overrides": []
+    },
+    {
+      "record_id": "FX20260530_006",
+      "status": "PROBLEM",
+      "source_currency": "USD",
+      "target_currency": "CNY",
+      "source_amount": 5000,
+      "final_amount": 36250.0,
+      "total_fee": 0.0,
+      "path_currencies": [
+        "USD",
+        "CNY"
+      ],
+      "effective_rate": 7.25,
+      "steps": 1,
+      "business_explanation": "直接兑换：USD->CNY，综合汇率7.25，总手续费0.0 | 图搜索逻辑：从USD出发，尝试所有不超过4次中转的路径；成本计算：每步扣除手续费后用实际到手金额比较；限额校验：每步都检查余额和单笔/日累计限额",
+      "path_details": [
+        {
+          "step": 0,
+          "currency": "USD",
+          "amount": 5000,
+          "fee_paid": 0,
+          "rate_used": 1.0,
+          "from_amount": 5000
+        },
+        {
+          "step": 1,
+          "currency": "CNY",
+          "amount": 36250.0,
+          "fee_paid": 0,
+          "rate_used": 7.25,
+          "from_amount": 5000
+        }
+      ],
+      "issues": [
+        {
+          "risk_type": "DATA_CONFLICT",
+          "severity": "MEDIUM",
+          "message": "汇率口径冲突：USD->CNY",
+          "business_explanation": "Reuters与其他数据源汇率不一致，当前使用7.25，原始值：[{'rate': 7.25, 'source': 'Reuters', 'effective_date': '2026-05-30'}, {'rate': 7.24, 'source': 'Bloomberg', 'effective_date': '2026-05-30'}]",
+          "details": {
+            "rate_key": "USD_CNY",
+            "sources": [
+              "Reuters",
+              "Bloomberg"
+            ]
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "DATA_CONFLICT",
+          "severity": "MEDIUM",
+          "message": "手续费口径冲突：USD->CNY",
+          "business_explanation": "不同来源手续费标准不同，不自动选择，请人工确认",
+          "details": {
+            "sources": [
+              "Bank_A",
+              "Bank_B"
+            ]
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "缺少手续费配置：USD->GBP",
+          "business_explanation": "从USD兑换到GBP的手续费规则未配置，实际执行时可能产生未知费用",
+          "details": {
+            "missing_fee": "USD_GBP"
+          },
+          "path_reference": [
+            "USD",
+            "GBP"
+          ]
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "手续费可能漏算：USD->GBP",
+          "business_explanation": "计算出的手续费为0，请检查手续费配置是否完整，避免实际换汇时产生额外成本",
+          "details": {
+            "from_amount": 5000,
+            "fee_type": "PERCENTAGE"
+          },
+          "path_reference": null
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "缺少手续费配置：GBP->CNY",
+          "business_explanation": "从GBP兑换到CNY的手续费规则未配置，实际执行时可能产生未知费用",
+          "details": {
+            "missing_fee": "GBP_CNY"
+          },
+          "path_reference": [
+            "USD",
+            "GBP",
+            "CNY"
+          ]
+        },
+        {
+          "risk_type": "FEE_MISSED",
+          "severity": "HIGH",
+          "message": "手续费可能漏算：GBP->CNY",
+          "business_explanation": "计算出的手续费为0，请检查手续费配置是否完整，避免实际换汇时产生额外成本",
+          "details": {
+            "from_amount": 3950.0,
+            "fee_type": "PERCENTAGE"
+          },
+          "path_reference": null
+        }
+      ],
+      "manual_overrides": [
+        {
+          "field_name": "effective_rate",
+          "old_value": 7.25,
+          "new_value": 7.245,
+          "reason": "路透与彭博汇率口径冲突，经确认取中间价7.245，符合集团月末结账口径",
+          "operator": "财务组-张经理",
+          "timestamp": "2026-05-30T15:30:00"
+        }
+      ]
+    }
+  ]
+}

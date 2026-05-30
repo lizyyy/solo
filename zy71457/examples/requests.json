@@ -1,0 +1,44 @@
+[
+    {
+        "record_id": "FX20260530_001",
+        "source_currency": "USD",
+        "target_currency": "CNY",
+        "source_amount": 10000,
+        "remark": "日常供应商付款-正常单"
+    },
+    {
+        "record_id": "FX20260530_002",
+        "source_currency": "USD",
+        "target_currency": "CNY",
+        "source_amount": 80000,
+        "remark": "大额货款-日累计可能超限"
+    },
+    {
+        "record_id": "FX20260530_003",
+        "source_currency": "USD",
+        "target_currency": "CNY",
+        "source_amount": 60000,
+        "remark": "余额不足测试"
+    },
+    {
+        "record_id": "FX20260530_004",
+        "source_currency": "USD",
+        "target_currency": "GBP",
+        "source_amount": 5000,
+        "remark": "GBP->CNY手续费未配置-测试漏算"
+    },
+    {
+        "record_id": "FX20260530_005",
+        "source_currency": "EUR",
+        "target_currency": "CNY",
+        "source_amount": 20000,
+        "remark": "欧元付款-正常"
+    },
+    {
+        "record_id": "FX20260530_006",
+        "source_currency": "USD",
+        "target_currency": "CNY",
+        "source_amount": 5000,
+        "remark": "需人工修正汇率口径冲突"
+    }
+]

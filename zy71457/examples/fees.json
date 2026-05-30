@@ -1,0 +1,60 @@
+[
+    {
+        "from_currency": "USD",
+        "to_currency": "CNY",
+        "fee_type": "PERCENTAGE",
+        "fee_value": 0.001,
+        "min_fee": 2,
+        "max_fee": 50,
+        "currency": "USD",
+        "source": "Bank_A"
+    },
+    {
+        "from_currency": "USD",
+        "to_currency": "EUR",
+        "fee_type": "PERCENTAGE",
+        "fee_value": 0.0008,
+        "min_fee": 1.5,
+        "max_fee": 40,
+        "currency": "USD",
+        "source": "Bank_A"
+    },
+    {
+        "from_currency": "EUR",
+        "to_currency": "CNY",
+        "fee_type": "PERCENTAGE",
+        "fee_value": 0.001,
+        "min_fee": 2,
+        "max_fee": 60,
+        "currency": "EUR",
+        "source": "Bank_B"
+    },
+    {
+        "from_currency": "USD",
+        "to_currency": "HKD",
+        "fee_type": "FIXED",
+        "fee_value": 5,
+        "currency": "USD",
+        "source": "Bank_C"
+    },
+    {
+        "from_currency": "HKD",
+        "to_currency": "CNY",
+        "fee_type": "PERCENTAGE",
+        "fee_value": 0.0005,
+        "min_fee": 10,
+        "max_fee": 200,
+        "currency": "HKD",
+        "source": "Bank_C"
+    },
+    {
+        "from_currency": "USD",
+        "to_currency": "CNY",
+        "fee_type": "PERCENTAGE",
+        "fee_value": 0.0015,
+        "min_fee": 3,
+        "max_fee": 80,
+        "currency": "USD",
+        "source": "Bank_B"
+    }
+]

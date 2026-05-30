@@ -1,0 +1,51 @@
+{
+  "summary": {
+    "total_requests": 6,
+    "normal_count": 1,
+    "problem_count": 5,
+    "risk_breakdown": {
+      "DATA_CONFLICT": 10,
+      "FEE_MISSED": 20,
+      "INSUFFICIENT_BALANCE": 9,
+      "LIMIT_EXCEEDED": 13
+    }
+  },
+  "records": [
+    {
+      "record_id": "FX20260530_005",
+      "status": "NORMAL",
+      "source_currency": "EUR",
+      "target_currency": "CNY",
+      "source_amount": 20000,
+      "final_amount": 157442.4,
+      "total_fee": 20.0,
+      "path_currencies": [
+        "EUR",
+        "CNY"
+      ],
+      "effective_rate": 7.87212,
+      "steps": 1,
+      "business_explanation": "直接兑换：EUR->CNY，综合汇率7.87212，总手续费20.0 | 图搜索逻辑：从EUR出发，尝试所有不超过4次中转的路径；成本计算：每步扣除手续费后用实际到手金额比较；限额校验：每步都检查余额和单笔/日累计限额",
+      "path_details": [
+        {
+          "step": 0,
+          "currency": "EUR",
+          "amount": 20000,
+          "fee_paid": 0,
+          "rate_used": 1.0,
+          "from_amount": 20000
+        },
+        {
+          "step": 1,
+          "currency": "CNY",
+          "amount": 157442.4,
+          "fee_paid": 20.0,
+          "rate_used": 7.88,
+          "from_amount": 20000
+        }
+      ],
+      "issues": [],
+      "manual_overrides": []
+    }
+  ]
+}
