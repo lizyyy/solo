@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: error-propagation
+Version: 0.1.0
+Summary: 物理实验误差传播分析工具 - 支持误差传播计算、单位校验、步骤解释、图表导出和历史追踪
+Requires-Python: >=3.9
+Requires-Dist: numpy>=1.21
+Requires-Dist: scipy>=1.7
+Requires-Dist: sympy>=1.9
+Requires-Dist: pint>=0.18
+Requires-Dist: pandas>=1.3
+Requires-Dist: matplotlib>=3.4
+Requires-Dist: plotly>=5.3
+Requires-Dist: typer>=0.4
+Requires-Dist: rich>=10.12
+Requires-Dist: sqlalchemy>=1.4
+Requires-Dist: python-dateutil>=2.8

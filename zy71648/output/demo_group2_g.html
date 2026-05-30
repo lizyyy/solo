@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang='zh-CN'>
+<head>
+<meta charset='UTF-8'>
+<title>误差传播分析 - g</title>
+<style>
+
+            body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
+            h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+            h2 { color: #34495e; margin-top: 30px; }
+            h3 { color: #2980b9; }
+            .result-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                          color: white; padding: 20px; border-radius: 10px; margin: 20px 0; }
+            .result-box .value { font-size: 2em; font-weight: bold; }
+            .step-box { background: #f8f9fa; border-left: 4px solid #3498db;
+                        padding: 15px; margin: 15px 0; border-radius: 0 5px 5px 0; }
+            .formula { background: #fff; padding: 10px; border-radius: 5px;
+                       overflow-x: auto; font-family: 'Times New Roman', serif; }
+            table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background: #3498db; color: white; }
+            tr:nth-child(even) { background: #f2f2f2; }
+            .contribution-bar { height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden; }
+            .contribution-fill { height: 100%; background: linear-gradient(90deg, #e74c3c, #f39c12, #2ecc71); }
+            .issue { padding: 10px; margin: 10px 0; border-radius: 5px; }
+            .issue-error { background: #ffebee; border-left: 4px solid #f44336; }
+            .issue-warning { background: #fff3e0; border-left: 4px solid #ff9800; }
+            .issue-info { background: #e3f2fd; border-left: 4px solid #2196f3; }
+            .check-pass { color: #27ae60; }
+            .check-warn { color: #f39c12; }
+            .check-fail { color: #e74c3c; }
+        
+</style>
+</head>
+<body>
+<h1>🔬 误差传播分析报告</h1>
+<p><strong>实验组:</strong> group2 | <strong>目标量:</strong> g</p>
+<div class='result-box'>
+<div class='value'>g = 9.79 ± 0.02 derived</div>
+<p>相对不确定度: 0.18% | 主要来源: L</p>
+</div>
+<h2>📊 边界检查</h2>
+<p class='check-pass'>✅ 边界检查通过</p>
+<h2>💡 结果解释</h2>
+<pre style='white-space: pre-wrap; background: #f8f9fa; padding: 15px; border-radius: 5px;'>测量结果为: 9.794 ± 0.01721
+相对不确定度为 0.18%，测量精度很高
+不确定度的主要来源是 'L'，贡献了总不确定度的 57.3%
+结果可表示为: 9.794(2)</pre>
+<h2>📈 不确定度贡献分析</h2>
+<table>
+<tr><th>变量</th><th>测量值 ± 不确定度</th><th>单位</th><th>贡献值</th><th>占比</th><th>贡献分布</th></tr>
+<tr>
+<td><strong>L</strong></td>
+<td>0.752 ± 0.001</td>
+<td>m</td>
+<td>0.0130245</td>
+<td>57.26%</td>
+<td><div class='contribution-bar'><div class='contribution-fill' style='width:57.26479223789023%'></div></div></td>
+</tr>
+<tr>
+<td><strong>T</strong></td>
+<td>1.741 ± 0.001</td>
+<td>s</td>
+<td>0.0112515</td>
+<td>42.74%</td>
+<td><div class='contribution-bar'><div class='contribution-fill' style='width:42.73520776210978%'></div></div></td>
+</tr>
+</table>
+<h2>📝 计算步骤</h2>
+<div class='step-box'>
+<h3>步骤 1: 定义计算公式和变量</h3>
+<div class='formula'>$$ g = \frac{4 \pi^{2} L}{T^{2}} $$</div>
+<p><em>g = 4*pi**2*L/T**2</em></p>
+<h4>说明:</h4>
+<p>• 公式: 单摆法测重力加速度: g = 4π²L/T²</p>
+</div>
+<div class='step-box'>
+<h3>步骤 2: 计算目标量的最佳估计值</h3>
+<div class='formula'>$$ g = \frac{4 \pi^{2} L}{T^{2}} = 9.79445 $$</div>
+<p><em>g = 4*pi**2*L/T**2 = 9.79445</em></p>
+</div>
+<div class='step-box'>
+<h3>步骤 3: 计算各变量的偏导数</h3>
+<div class='formula'>$$ \frac{\partial g}{\partial L} = \frac{4 \pi^{2}}{T^{2}}\\\frac{\partial g}{\partial T} = - \frac{8 \pi^{2} L}{T^{3}} $$</div>
+<p><em>d(g)/d(L) = 4*pi**2/T**2; d(g)/d(T) = -8*pi**2*L/T**3</em></p>
+<h4>说明:</h4>
+<p>• 偏导数描述了目标量对每个输入量变化的敏感程度</p>
+</div>
+<div class='step-box'>
+<h3>步骤 4: 代入测量值计算偏导数数值</h3>
+<div class='formula'>$$ \frac{\partial g}{\partial L} = 13.0245\\\frac{\partial g}{\partial T} = -11.2515 $$</div>
+<p><em>∂(g)/∂(L) = 13.0245; ∂(g)/∂(T) = -11.2515</em></p>
+</div>
+<div class='step-box'>
+<h3>步骤 5: 计算各变量的不确定度贡献</h3>
+<div class='formula'>$$ |\frac{\partial g}{\partial L}| \cdot u(L) = 0.0130245\\|\frac{\partial g}{\partial T}| \cdot u(T) = 0.0112515 $$</div>
+<p><em>|∂(g)/∂(L)| × u(L) = 0.0130245; |∂(g)/∂(T)| × u(T) = 0.0112515</em></p>
+<h4>不确定度贡献:</h4>
+<p>L: 0.0130245 (57.3%)</p>
+<p>T: 0.0112515 (42.7%)</p>
+<h4>说明:</h4>
+<p>• 每个变量的不确定度贡献 = |偏导数| × 该变量的不确定度</p>
+</div>
+<div class='step-box'>
+<h3>步骤 6: 合成标准不确定度</h3>
+<div class='formula'>$$ u(g) = \sqrt{\left(\frac{\partial g}{\partial L}\right)^2 u(L)^2 + \left(\frac{\partial g}{\partial T}\right)^2 u(T)^2} = 0.0172115 $$</div>
+<p><em>u(g) = sqrt((∂g/∂L)² × u(L)² + (∂g/∂T)² × u(T)²) = 0.0172115</em></p>
+<h4>不确定度贡献:</h4>
+<p>L: 0.0130245 (57.3%)</p>
+<p>T: 0.0112515 (42.7%)</p>
+<h4>说明:</h4>
+<p>• 假设各变量独立不相关，使用方和根法合成</p>
+</div>
+<h2>📐 合成不确定度公式</h2>
+<div class='formula' style='font-size: 1.2em;'>$$ u(g) = \sqrt{\left(\frac{\partial g}{\partial L}\right)^2 u(L)^2 + \left(\frac{\partial g}{\partial T}\right)^2 u(T)^2} $$</div>
+<script src='https://polyfill.io/v3/polyfill.min.js?features=es6'></script>
+<script id='MathJax-script' async src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>
+</body>
+</html>
