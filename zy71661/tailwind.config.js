@@ -1,0 +1,103 @@
+/** @type {import('tailwindcss').Config} */
+
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    container: {
+      center: true,
+    },
+    extend: {
+      colors: {
+        primary: {
+          50: "#e8f0fa",
+          100: "#c5d5ee",
+          200: "#9fb9e2",
+          300: "#799dd6",
+          400: "#5e88cd",
+          500: "#4273c4",
+          600: "#1e3a5f",
+          700: "#1a3355",
+          800: "#162d4b",
+          900: "#0e203a",
+        },
+        accent: {
+          50: "#fff1e6",
+          100: "#ffd9bf",
+          200: "#ffbe93",
+          300: "#ffa366",
+          400: "#ff8f42",
+          500: "#ff7a1e",
+          600: "#ff8c42",
+          700: "#e6731a",
+          800: "#cc6317",
+          900: "#994a11",
+        },
+        success: {
+          50: "#e7faf0",
+          100: "#c2f0d6",
+          200: "#98e6bb",
+          300: "#6edca0",
+          400: "#4ed48b",
+          500: "#2ecc71",
+          600: "#29c769",
+          700: "#23c05e",
+          800: "#1db954",
+          900: "#12ad42",
+        },
+        warning: {
+          50: "#fef3e7",
+          100: "#fce0c3",
+          200: "#facc9b",
+          300: "#f7b773",
+          400: "#f5a756",
+          500: "#f39739",
+          600: "#e08930",
+          700: "#c97625",
+          800: "#b2651b",
+          900: "#87480a",
+        },
+        danger: {
+          50: "#fde9e9",
+          100: "#fac8c8",
+          200: "#f6a3a3",
+          300: "#f27e7e",
+          400: "#ef6363",
+          500: "#eb4848",
+          600: "#d94141",
+          700: "#c23838",
+          800: "#ac3030",
+          900: "#801f1f",
+        },
+      },
+      fontFamily: {
+        display: ['"Space Grotesk"', "system-ui", "sans-serif"],
+        sans: ['"Inter"', "system-ui", "sans-serif"],
+        mono: ['"JetBrains Mono"', "ui-monospace", "monospace"],
+      },
+      boxShadow: {
+        "glow-primary": "0 0 20px rgba(30, 58, 95, 0.3)",
+        "glow-accent": "0 0 20px rgba(255, 140, 66, 0.4)",
+        "glow-success": "0 0 20px rgba(46, 204, 113, 0.4)",
+        "card": "0 4px 20px rgba(0, 0, 0, 0.08)",
+        "card-hover": "0 8px 30px rgba(0, 0, 0, 0.12)",
+      },
+      animation: {
+        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "float": "float 6s ease-in-out infinite",
+        "glow": "glow 2s ease-in-out infinite alternate",
+      },
+      keyframes: {
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        glow: {
+          "0%": { boxShadow: "0 0 5px rgba(255, 140, 66, 0.5)" },
+          "100%": { boxShadow: "0 0 20px rgba(255, 140, 66, 0.8)" },
+        },
+      },
+    },
+  },
+  plugins: [],
+};

@@ -1,0 +1,12 @@
+export const DEFAULT_GRAVITY = 9.81
+export const DEFAULT_FRICTION_COEFF = 0.3
+export const DEFAULT_AIR_DRAG_COEFF = 0.5
+export const DEFAULT_FRONTAL_AREA = 0.5
+export const DEFAULT_AIR_DENSITY = 1.225
+export const DEFAULT_RAMP_ANGLE = 30
+export const DEFAULT_RAMP_LENGTH = 10
+export const DEFAULT_SKATEBOARD_MASS = 5
+export const MIN_RAMP_ANGLE = 1
+export const MAX_RAMP_ANGLE = 89
+export const ENERGY_TOLERANCE = 0.01
+export const SPIKE_ACCELERATION_THRESHOLD = 5.0
