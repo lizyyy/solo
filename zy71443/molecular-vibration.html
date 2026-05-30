@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分子振动模式台</title>
+<style>
+:root {
+  --bg: #0f1923;
+  --surface: #1a2733;
+  --surface2: #223344;
+  --border: #2e4455;
+  --text: #e0e8f0;
+  --text-dim: #8899aa;
+  --accent: #4fc3f7;
+  --accent2: #81d4fa;
+  --green: #66bb6a;
+  --yellow: #fdd835;
+  --orange: #ffa726;
+  --red: #ef5350;
+  --blue: #42a5f5;
+  --purple: #ab47bc;
+  --cyan: #26c6da;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: 48px 1fr 240px;
+  grid-template-columns: 1fr 380px;
+}
+header {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 16px;
+}
+header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+header .subtitle {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+#viewport {
+  grid-column: 1;
+  grid-row: 2;
+  position: relative;
+  background: linear-gradient(135deg, #0a1520 0%, #162030 100%);
+  overflow: hidden;
+}
+#viewport canvas { display: block; }
+#viewport-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  font-size: 11px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+#freq-display {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(15,25,35,0.85);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  pointer-events: none;
+}
+#freq-display .freq-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-right: 4px;
+}
+#freq-display .freq-unit {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+#freq-display .freq-mode-name {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+#freq-display .freq-warning {
+  font-size: 11px;
+  color: var(--orange);
+  margin-top: 4px;
+}
+#sidebar {
+  grid-column: 2;
+  grid-row: 2;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.panel {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+}
+.molecule-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.mol-btn {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mol-btn:hover { border-color: var(--accent); color: var(--accent); }
+.mol-btn.active {
+  background: rgba(79,195,247,0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.mol-btn .status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.mode-list { display: flex; flex-direction: column; gap: 6px; }
+.mode-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--surface2);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.mode-item:hover { border-color: var(--border); }
+.mode-item.active {
+  border-color: var(--accent);
+  background: rgba(79,195,247,0.1);
+}
+.mode-item .mode-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.mode-item .mode-info { flex: 1; min-width: 0; }
+.mode-item .mode-name { font-size: 13px; font-weight: 500; }
+.mode-item .mode-freq {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+.mode-item .mode-tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.molecule-info dt {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 2px;
+}
+.molecule-info dd {
+  font-size: 13px;
+  margin-bottom: 8px;
+  padding-left: 0;
+}
+.molecule-info .anomaly-tag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(255,167,38,0.2);
+  color: var(--orange);
+  margin-left: 6px;
+}
+#bottom-panel {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  display: flex;
+  border-top: 1px solid var(--border);
+  overflow: hidden;
+}
+.bottom-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.bottom-section + .bottom-section {
+  border-left: 1px solid var(--border);
+}
+.bottom-header {
+  padding: 8px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.bottom-header h3 {
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.badge {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.badge-green { background: rgba(102,187,106,0.2); color: var(--green); }
+.badge-yellow { background: rgba(253,216,53,0.2); color: var(--yellow); }
+.badge-orange { background: rgba(255,167,38,0.2); color: var(--orange); }
+.badge-red { background: rgba(239,83,80,0.2); color: var(--red); }
+.badge-blue { background: rgba(66,165,245,0.2); color: var(--blue); }
+.badge-purple { background: rgba(171,71,188,0.2); color: var(--purple); }
+.badge-cyan { background: rgba(38,198,218,0.2); color: var(--cyan); }
+.bottom-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+th {
+  text-align: left;
+  padding: 6px 10px;
+  background: rgba(0,0,0,0.2);
+  color: var(--text-dim);
+  font-weight: 500;
+  font-size: 11px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+td {
+  padding: 5px 10px;
+  border-top: 1px solid rgba(46,68,85,0.5);
+  vertical-align: middle;
+}
+tr:hover td { background: rgba(79,195,247,0.04); }
+tr.row-pending td { background: rgba(253,216,53,0.04); }
+tr.row-anomaly td { background: rgba(239,83,80,0.04); }
+tr.row-withdrawn td { opacity: 0.5; text-decoration: line-through; }
+tr.row-duplicate td { background: rgba(171,71,188,0.04); }
+.missing-field {
+  color: var(--orange);
+  font-style: italic;
+  font-size: 11px;
+}
+.note-marker {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: rgba(79,195,247,0.2);
+  color: var(--accent);
+  font-size: 9px;
+  line-height: 14px;
+  text-align: center;
+  cursor: help;
+}
+.action-btn {
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.action-btn:hover { border-color: var(--accent); color: var(--accent); }
+.action-btn.btn-confirm { border-color: var(--green); color: var(--green); }
+.action-btn.btn-withdraw { border-color: var(--orange); color: var(--orange); }
+.action-btn.btn-supplement { border-color: var(--blue); color: var(--blue); }
+#tooltip {
+  display: none;
+  position: fixed;
+  background: rgba(15,25,35,0.95);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  max-width: 260px;
+  z-index: 9999;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+#tooltip .tip-date { color: var(--text-dim); font-size: 10px; }
+#tooltip .tip-content { margin-top: 3px; }
+#tooltip .tip-correction { color: var(--orange); font-size: 11px; margin-top: 2px; }
+#atom-labels-container {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+.atom-label {
+  position: absolute;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 4px rgba(0,0,0,0.8);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.anim-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.anim-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.anim-btn:hover { border-color: var(--accent); color: var(--accent); }
+.anim-btn.active { background: rgba(79,195,247,0.15); border-color: var(--accent); color: var(--accent); }
+.speed-label { font-size: 11px; color: var(--text-dim); min-width: 32px; }
+.color-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.workflow-flow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.workflow-flow .flow-arrow { color: var(--border); }
+.workflow-flow .flow-step.active { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>分子振动模式台</h1>
+  <span class="subtitle">Molecular Vibration Mode Workbench — 旋转分子 · 切换模式 · 观察频率</span>
+</header>
+
+<div id="viewport">
+  <div id="freq-display">
+    <div><span class="freq-value" id="freq-val">—</span><span class="freq-unit" id="freq-unit">cm⁻¹</span></div>
+    <div class="freq-mode-name" id="freq-mode-name">选择振动模式</div>
+    <div class="freq-warning" id="freq-warning" style="display:none"></div>
+  </div>
+  <div id="atom-labels-container"></div>
+  <div id="viewport-overlay">拖拽旋转 · 滚轮缩放 · 右键平移</div>
+</div>
+
+<div id="sidebar">
+  <div class="panel">
+    <div class="panel-title">分子选择</div>
+    <div class="molecule-selector" id="mol-selector"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">振动模式</div>
+    <div class="mode-list" id="mode-list"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">动画控制</div>
+    <div class="anim-controls">
+      <button class="anim-btn" id="btn-play" title="播放/暂停">▶</button>
+      <button class="anim-btn" id="btn-reset" title="重置">⟲</button>
+      <span class="speed-label" id="speed-label">1.0×</span>
+      <input type="range" min="0.1" max="3" step="0.1" value="1" id="speed-slider"
+        style="flex:1;accent-color:var(--accent);">
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">分子信息</div>
+    <dl class="molecule-info" id="mol-info"></dl>
+  </div>
+  <div class="panel">
+    <div class="panel-title">原子颜色</div>
+    <div class="color-legend" id="color-legend"></div>
+  </div>
+  <div class="panel" style="border-bottom:none">
+    <div class="panel-title">记录状态流</div>
+    <div class="workflow-flow" id="workflow-flow">
+      <span class="flow-step active">录入</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">待确认</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">已确认</span>
+      <span class="flow-arrow">|</span>
+      <span class="flow-step">补录</span>
+      <span class="flow-arrow">|</span>
+      <span class="flow-step">撤回</span>
+      <span class="flow-arrow">|</span>
+      <span class="flow-step">重复</span>
+    </div>
+  </div>
+</div>
+
+<div id="bottom-panel">
+  <div class="bottom-section">
+    <div class="bottom-header">
+      <h3>正常明细 <span class="badge badge-green" id="normal-count">0</span></h3>
+    </div>
+    <div class="bottom-body">
+      <table>
+        <thead>
+          <tr>
+            <th>编号</th><th>分子</th><th>结构</th><th>键长(Å)</th><th>模式</th><th>频率(cm⁻¹)</th><th>状态</th><th>备注</th><th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="normal-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="bottom-section">
+    <div class="bottom-header">
+      <h3>待确认 / 异常清单 <span class="badge badge-orange" id="anomaly-count">0</span></h3>
+    </div>
+    <div class="bottom-body">
+      <table>
+        <thead>
+          <tr>
+            <th>编号</th><th>分子</th><th>异常类型</th><th>详情</th><th>状态</th><th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="anomaly-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const ELEMENT_COLORS = {
+  H: 0xffffff, C: 0x555555, N: 0x3050F8, O: 0xff2010,
+  S: 0xFFFF30, Cl: 0x1FF01F, F: 0x90E050, Br: 0xA62929
+};
+const ELEMENT_RADII = { H: 0.25, C: 0.35, N: 0.33, O: 0.32, S: 0.40, Cl: 0.38, F: 0.28, Br: 0.42 };
+const ELEMENT_CSS = {
+  H: '#ffffff', C: '#888888', N: '#3050F8', O: '#ff4444',
+  S: '#cccc33', Cl: '#33cc33', F: '#90E050', Br: '#cc4444'
+};
+
+const MOLECULES = {
+  H2O: {
+    name: '水', formula: 'H₂O', structure: 'V形弯曲',
+    atoms: [
+      { el: 'O', pos: [0, 0.15, 0] },
+      { el: 'H', pos: [-0.76, 0.74, 0] },
+      { el: 'H', pos: [0.76, 0.74, 0] }
+    ],
+    bonds: [[0,1],[0,2]],
+    bondLengths: [
+      { atoms: 'O-H(1)', length: 0.96, expected: 0.96 },
+      { atoms: 'O-H(2)', length: 0.96, expected: 0.96 }
+    ],
+    bondAngle: 104.5,
+    modes: [
+      {
+        id: 'v1', name: '对称伸缩 ν₁', freq: 3657, unit: 'cm⁻¹',
+        color: '#4fc3f7',
+        displacements: [[0.0, -0.1, 0], [-0.2, 0.15, 0], [0.2, 0.15, 0]]
+      },
+      {
+        id: 'v2', name: '弯曲振动 ν₂', freq: 1595, unit: 'cm⁻¹',
+        color: '#66bb6a',
+        displacements: [[0.0, -0.12, 0], [0.18, 0.08, 0], [-0.18, 0.08, 0]]
+      },
+      {
+        id: 'v3', name: '不对称伸缩 ν₃', freq: 3756, unit: 'cm⁻¹',
+        color: '#ffa726',
+        displacements: [[0.0, 0.05, 0], [-0.25, 0.2, 0], [0.25, -0.15, 0]]
+      }
+    ]
+  },
+  CO2: {
+    name: '二氧化碳', formula: 'CO₂', structure: '线性',
+    atoms: [
+      { el: 'C', pos: [0, 0, 0] },
+      { el: 'O', pos: [-1.16, 0, 0] },
+      { el: 'O', pos: [1.16, 0, 0] }
+    ],
+    bonds: [[0,1],[0,2]],
+    bondLengths: [
+      { atoms: 'C-O(1)', length: 1.16, expected: 1.16 },
+      { atoms: 'C-O(2)', length: 1.16, expected: 1.16 }
+    ],
+    bondAngle: 180,
+    modes: [
+      {
+        id: 'v1', name: '对称伸缩 ν₁', freq: 1388, unit: 'cm⁻¹',
+        color: '#4fc3f7',
+        displacements: [[0, 0, 0], [0.25, 0, 0], [-0.25, 0, 0]]
+      },
+      {
+        id: 'v2a', name: '弯曲振动 ν₂a', freq: 667, unit: 'cm⁻¹',
+        color: '#66bb6a',
+        displacements: [[0, 0.08, 0], [0, -0.15, 0], [0, -0.15, 0]]
+      },
+      {
+        id: 'v2b', name: '弯曲振动 ν₂b', freq: 667, unit: 'cm⁻¹',
+        color: '#26c6da',
+        displacements: [[0, 0, 0.08], [0, 0, -0.15], [0, 0, -0.15]]
+      },
+      {
+        id: 'v3', name: '不对称伸缩 ν₃', freq: 2349, unit: 'cm⁻¹',
+        color: '#ffa726',
+        displacements: [[0.1, 0, 0], [0.25, 0, 0], [-0.25, 0, 0]]
+      }
+    ]
+  },
+  NH3: {
+    name: '氨', formula: 'NH₃', structure: '三角锥形',
+    atoms: [
+      { el: 'N', pos: [0, 0.27, 0] },
+      { el: 'H', pos: [0.94, 0.65, 0] },
+      { el: 'H', pos: [-0.47, 0.65, 0.81] },
+      { el: 'H', pos: [-0.47, 0.65, -0.81] }
+    ],
+    bonds: [[0,1],[0,2],[0,3]],
+    bondLengths: [
+      { atoms: 'N-H(1)', length: 1.02, expected: 1.02 },
+      { atoms: 'N-H(2)', length: 1.02, expected: 1.02 },
+      { atoms: 'N-H(3)', length: 1.02, expected: 1.02 }
+    ],
+    bondAngle: 107.8,
+    modes: [
+      {
+        id: 'v1', name: '对称伸缩 ν₁', freq: 3337, unit: 'cm⁻¹',
+        color: '#4fc3f7',
+        displacements: [[0, -0.1, 0], [0.15, 0.1, 0], [-0.08, 0.1, 0.13], [-0.08, 0.1, -0.13]]
+      },
+      {
+        id: 'v2', name: '对称弯曲 ν₂', freq: 950, unit: 'cm⁻¹',
+        color: '#66bb6a',
+        displacements: [[0, -0.15, 0], [0, 0.1, 0], [0, 0.1, 0], [0, 0.1, 0]]
+      },
+      {
+        id: 'v3a', name: '不对称伸缩 ν₃a', freq: 3444, unit: 'cm⁻¹',
+        color: '#ffa726',
+        displacements: [[0, 0.05, 0], [0.2, -0.1, 0], [-0.1, -0.1, 0.17], [-0.1, -0.1, -0.17]]
+      },
+      {
+        id: 'v4', name: '不对称弯曲 ν₄', freq: 1627, unit: 'cm⁻¹',
+        color: '#ab47bc',
+        displacements: [[0, 0, 0], [0, 0.12, 0], [0, -0.06, 0.1], [0, -0.06, -0.1]]
+      }
+    ]
+  },
+  CH4: {
+    name: '甲烷', formula: 'CH₄', structure: '正四面体',
+    atoms: [
+      { el: 'C', pos: [0, 0, 0] },
+      { el: 'H', pos: [0.63, 0.63, 0.63] },
+      { el: 'H', pos: [-0.63, -0.63, 0.63] },
+      { el: 'H', pos: [-0.63, 0.63, -0.63] },
+      { el: 'H', pos: [0.63, -0.63, -0.63] }
+    ],
+    bonds: [[0,1],[0,2],[0,3],[0,4]],
+    bondLengths: [
+      { atoms: 'C-H(1)', length: 2.50, expected: 1.09 },
+      { atoms: 'C-H(2)', length: 1.09, expected: 1.09 },
+      { atoms: 'C-H(3)', length: 1.09, expected: 1.09 },
+      { atoms: 'C-H(4)', length: 1.09, expected: 1.09 }
+    ],
+    bondAngle: 109.5,
+    modes: [
+      {
+        id: 'v1', name: '对称伸缩 ν₁', freq: 2917, unit: 'cm⁻¹',
+        color: '#4fc3f7',
+        displacements: [[0,0,0],[0.18,0.18,0.18],[-0.18,-0.18,0.18],[-0.18,0.18,-0.18],[0.18,-0.18,-0.18]]
+      },
+      {
+        id: 'v2', name: '弯曲振动 ν₂', freq: 1534, unit: 'cm⁻¹',
+        color: '#66bb6a',
+        displacements: [[0,0,0],[0.15,-0.15,0],[-0.15,0.15,0],[0.15,0,-0.15],[-0.15,0,0.15]]
+      },
+      {
+        id: 'v3', name: '不对称伸缩 ν₃', freq: 3019, unit: 'cm⁻¹',
+        color: '#ffa726',
+        displacements: [[0,0,0],[0.2,0,0],[0,0.2,0],[0,0,0.2],[-0.13,-0.13,-0.13]]
+      },
+      {
+        id: 'v4', name: '不对称弯曲 ν₄', freq: 1306, unit: 'cm⁻¹',
+        color: '#ab47bc',
+        displacements: [[0,0,0],[0,0.12,0.12],[0.12,0,-0.12],[-0.12,-0.12,0],[0,-0.12,0.12]]
+      }
+    ]
+  },
+  SO2: {
+    name: '二氧化硫', formula: 'SO₂', structure: 'V形弯曲',
+    atoms: [
+      { el: 'S', pos: [0, 0.15, 0] },
+      { el: 'O', pos: [-0.72, 0.88, 0] },
+      { el: 'O', pos: [0.72, 0.88, 0] }
+    ],
+    bonds: [[0,1],[0,2]],
+    bondLengths: [
+      { atoms: 'S-O(1)', length: 1.43, expected: 1.43 },
+      { atoms: 'S-O(2)', length: 1.43, expected: 1.43 }
+    ],
+    bondAngle: 119.5,
+    modes: [
+      {
+        id: 'v1', name: '对称伸缩 ν₁', freq: 1151, unit: 'cm⁻¹',
+        color: '#4fc3f7',
+        displacements: [[0, -0.1, 0], [-0.2, 0.15, 0], [0.2, 0.15, 0]]
+      },
+      {
+        id: 'v2', name: '弯曲振动 ν₂', freq: 518, unit: 'cm⁻¹',
+        color: '#66bb6a',
+        displacements: [[0, -0.12, 0], [0.15, 0.08, 0], [-0.15, 0.08, 0]]
+      },
+      {
+        id: 'v3', name: '不对称伸缩 ν₃', freq: 1151, unit: 'cm⁻¹',
+        color: '#ffa726',
+        displacements: [[0.08, 0.05, 0], [-0.2, 0.15, 0], [0.25, -0.1, 0]]
+      }
+    ]
+  },
+  HCl: {
+    name: '氯化氢', formula: 'HCl', structure: '线性双原子',
+    atoms: [
+      { el: 'H', pos: [-0.64, 0, 0] },
+      { el: 'Cl', pos: [0.64, 0, 0] }
+    ],
+    bonds: [[0,1]],
+    bondLengths: [
+      { atoms: 'H-Cl', length: 1.27, expected: 1.27 }
+    ],
+    bondAngle: null,
+    modes: [
+      {
+        id: 'v1', name: '伸缩振动 ν₁', freq: 8.66e13, unit: 'Hz',
+        color: '#4fc3f7',
+        displacements: [[-0.25, 0, 0], [0.08, 0, 0]]
+      }
+    ]
+  },
+  N2: {
+    name: '氮气', formula: 'N₂', structure: '线性双原子',
+    atoms: [
+      { el: 'N', pos: [-0.55, 0, 0] },
+      { el: 'N', pos: [0.55, 0, 0] }
+    ],
+    bonds: [[0,1]],
+    bondLengths: [
+      { atoms: 'N≡N', length: 1.10, expected: 1.10 }
+    ],
+    bondAngle: null,
+    modes: [
+      {
+        id: 'v1', name: '伸缩振动 ν₁', freq: 2331, unit: 'cm⁻¹',
+        color: '#4fc3f7',
+        displacements: [[-0.2, 0, 0], [0.2, 0, 0]]
+      }
+    ]
+  }
+};
+
+const RECORDS = [
+  {
+    id: 'R001', molecule: 'H2O', status: 'normal',
+    notes: [
+      { date: '2026-03-15', content: '标准水分子数据，三模式完整', correction: false }
+    ],
+    missingFields: []
+  },
+  {
+    id: 'R002', molecule: 'CO2', status: 'normal',
+    notes: [
+      { date: '2026-03-16', content: 'CO₂四模式含简并，ν₂a/ν₂b同频' , correction: false }
+    ],
+    missingFields: []
+  },
+  {
+    id: 'R003', molecule: 'NH3', status: 'supplementary',
+    notes: [
+      { date: '2026-03-17', content: '初始录入缺少ν₃a频率', correction: false },
+      { date: '2026-03-20', content: '补录ν₃a频率3444 cm⁻¹', correction: false },
+      { date: '2026-03-20', content: '原备注"暂无"改为实际值', correction: true }
+    ],
+    missingFields: ['freq_v3a'],
+    supplementedAt: '2026-03-20'
+  },
+  {
+    id: 'R004', molecule: 'CH4', status: 'pending',
+    notes: [
+      { date: '2026-03-18', content: 'C-H(1)键长2.50Å，远超预期1.09Å，疑似单位错误或数据录入错误', correction: false }
+    ],
+    missingFields: [],
+    anomalies: ['bond_length']
+  },
+  {
+    id: 'R005', molecule: 'SO2', status: 'pending',
+    notes: [
+      { date: '2026-03-19', content: 'ν₁与ν₃频率相同(1151 cm⁻¹)，模式可能重叠，需确认', correction: false }
+    ],
+    missingFields: [],
+    anomalies: ['mode_overlap']
+  },
+  {
+    id: 'R006', molecule: 'HCl', status: 'anomaly',
+    notes: [
+      { date: '2026-03-20', content: '频率8.66×10¹³ Hz，单位应为cm⁻¹(约2886)，当前单位错误', correction: false }
+    ],
+    missingFields: [],
+    anomalies: ['frequency_unit']
+  },
+  {
+    id: 'R007', molecule: 'N2', status: 'withdrawn',
+    notes: [
+      { date: '2026-03-20', content: '录入完成', correction: false },
+      { date: '2026-03-21', content: '撤回：数据来源不可靠，待重新测量', correction: true }
+    ],
+    missingFields: [],
+    withdrawnAt: '2026-03-21'
+  },
+  {
+    id: 'R008', molecule: 'H2O', status: 'duplicate',
+    notes: [
+      { date: '2026-03-22', content: '与R001重复提交', correction: false }
+    ],
+    missingFields: [],
+    duplicateOf: 'R001'
+  }
+];
+
+const STATUS_MAP = {
+  normal: { label: '正常', badge: 'badge-green', rowClass: '' },
+  pending: { label: '待确认', badge: 'badge-yellow', rowClass: 'row-pending' },
+  anomaly: { label: '异常', badge: 'badge-red', rowClass: 'row-anomaly' },
+  supplementary: { label: '补录', badge: 'badge-blue', rowClass: '' },
+  withdrawn: { label: '已撤回', badge: 'badge-orange', rowClass: 'row-withdrawn' },
+  duplicate: { label: '重复', badge: 'badge-purple', rowClass: 'row-duplicate' }
+};
+
+let currentMol = 'H2O';
+let currentMode = null;
+let isPlaying = true;
+let animSpeed = 1.0;
+let animTime = 0;
+
+const viewport = document.getElementById('viewport');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+camera.position.set(0, 1.5, 4);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setClearColor(0x000000, 0);
+viewport.insertBefore(renderer.domElement, viewport.firstChild);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 1.5;
+controls.maxDistance = 10;
+
+const ambientLight = new THREE.AmbientLight(0x404050, 1.2);
+scene.add(ambientLight);
+const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.9);
+dirLight1.position.set(3, 5, 4);
+scene.add(dirLight1);
+const dirLight2 = new THREE.DirectionalLight(0x4488aa, 0.4);
+dirLight2.position.set(-3, -2, -3);
+scene.add(dirLight2);
+
+const molGroup = new THREE.Group();
+scene.add(molGroup);
+
+const gridHelper = new THREE.GridHelper(6, 12, 0x1a2733, 0x1a2733);
+gridHelper.position.y = -1.2;
+scene.add(gridHelper);
+
+let atomMeshes = [];
+let bondMeshes = [];
+let atomLabels = [];
+
+function createAtomMesh(el, pos) {
+  const r = ELEMENT_RADII[el] || 0.3;
+  const c = ELEMENT_COLORS[el] || 0xcccccc;
+  const geo = new THREE.SphereGeometry(r, 32, 24);
+  const mat = new THREE.MeshPhongMaterial({
+    color: c, shininess: 80,
+    specular: 0x444444,
+    emissive: new THREE.Color(c).multiplyScalar(0.15)
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(pos[0], pos[1], pos[2]);
+  mesh.userData = { el, eqPos: [...pos] };
+  return mesh;
+}
+
+function createBondMesh(p1, p2) {
+  const start = new THREE.Vector3(...p1);
+  const end = new THREE.Vector3(...p2);
+  const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+  const dir = new THREE.Vector3().subVectors(end, start);
+  const len = dir.length();
+  const geo = new THREE.CylinderGeometry(0.06, 0.06, len, 12, 1);
+  const mat = new THREE.MeshPhongMaterial({ color: 0x667788, shininess: 40 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(mid);
+  const axis = new THREE.Vector3(0, 1, 0);
+  const quat = new THREE.Quaternion().setFromUnitVectors(axis, dir.normalize());
+  mesh.quaternion.copy(quat);
+  mesh.userData = { eqPos: [mid.x, mid.y, mid.z], p1: [...p1], p2: [...p2] };
+  return mesh;
+}
+
+function buildMolecule(key) {
+  while (molGroup.children.length) molGroup.remove(molGroup.children[0]);
+  atomMeshes = [];
+  bondMeshes = [];
+
+  const mol = MOLECULES[key];
+  mol.atoms.forEach((a, i) => {
+    const mesh = createAtomMesh(a.el, a.pos);
+    molGroup.add(mesh);
+    atomMeshes.push(mesh);
+  });
+  mol.bonds.forEach(([i, j]) => {
+    const mesh = createBondMesh(mol.atoms[i].pos, mol.atoms[j].pos);
+    molGroup.add(mesh);
+    bondMeshes.push(mesh);
+  });
+
+  updateAtomLabels(key);
+}
+
+function updateAtomLabels(key) {
+  const container = document.getElementById('atom-labels-container');
+  container.innerHTML = '';
+  atomLabels = [];
+  const mol = MOLECULES[key];
+  mol.atoms.forEach((a, i) => {
+    const label = document.createElement('div');
+    label.className = 'atom-label';
+    label.textContent = a.el;
+    label.style.color = ELEMENT_CSS[a.el] || '#ffffff';
+    container.appendChild(label);
+    atomLabels.push(label);
+  });
+}
+
+function projectToScreen(pos) {
+  const v = new THREE.Vector3(pos[0], pos[1], pos[2]);
+  v.project(camera);
+  const rect = renderer.domElement.getBoundingClientRect();
+  return {
+    x: (v.x * 0.5 + 0.5) * rect.width,
+    y: (-v.y * 0.5 + 0.5) * rect.height
+  };
+}
+
+function updateLabelPositions() {
+  atomMeshes.forEach((mesh, i) => {
+    const p = mesh.position;
+    const s = projectToScreen([p.x, p.y, p.z]);
+    const label = atomLabels[i];
+    if (label) {
+      label.style.left = s.x + 'px';
+      label.style.top = (s.y - 18) + 'px';
+    }
+  });
+}
+
+function updateBondPositions() {
+  const mol = MOLECULES[currentMol];
+  bondMeshes.forEach((mesh, bi) => {
+    const [i, j] = mol.bonds[bi];
+    const p1 = atomMeshes[i].position;
+    const p2 = atomMeshes[j].position;
+    const start = p1.clone();
+    const end = p2.clone();
+    const mid = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+    const dir = new THREE.Vector3().subVectors(end, start);
+    const len = dir.length();
+    mesh.position.copy(mid);
+    mesh.scale.y = len / mesh.userData.eqPos ? len / (mesh.geometry.parameters.height || 1) : 1;
+    const axis = new THREE.Vector3(0, 1, 0);
+    if (dir.length() > 0.001) {
+      const quat = new THREE.Quaternion().setFromUnitVectors(axis, dir.normalize());
+      mesh.quaternion.copy(quat);
+    }
+  });
+}
+
+function animateVibration(t) {
+  if (!currentMode || !isPlaying) return;
+  const mol = MOLECULES[currentMol];
+  const mode = mol.modes.find(m => m.id === currentMode);
+  if (!mode) return;
+
+  const amp = 0.3 * animSpeed;
+  const phase = Math.sin(t * 2.5 * animSpeed);
+
+  atomMeshes.forEach((mesh, i) => {
+    const eq = mesh.userData.eqPos;
+    const d = mode.displacements[i];
+    if (d) {
+      mesh.position.set(
+        eq[0] + d[0] * amp * phase,
+        eq[1] + d[1] * amp * phase,
+        eq[2] + d[2] * amp * phase
+      );
+    }
+  });
+
+  updateBondPositions();
+}
+
+function resetPositions() {
+  atomMeshes.forEach(mesh => {
+    const eq = mesh.userData.eqPos;
+    mesh.position.set(eq[0], eq[1], eq[2]);
+  });
+  updateBondPositions();
+}
+
+function renderMolSelector() {
+  const container = document.getElementById('mol-selector');
+  container.innerHTML = '';
+  Object.keys(MOLECULES).forEach(key => {
+    const mol = MOLECULES[key];
+    const record = RECORDS.find(r => r.molecule === key);
+    const status = record ? record.status : 'normal';
+    const statusInfo = STATUS_MAP[status];
+    const dotColor = {
+      normal: '#66bb6a', pending: '#fdd835', anomaly: '#ef5350',
+      supplementary: '#42a5f5', withdrawn: '#888888', duplicate: '#ab47bc'
+    }[status] || '#66bb6a';
+
+    const btn = document.createElement('button');
+    btn.className = 'mol-btn' + (key === currentMol ? ' active' : '');
+    btn.innerHTML = `<span class="status-dot" style="background:${dotColor}"></span>${mol.formula}`;
+    btn.onclick = () => selectMolecule(key);
+    container.appendChild(btn);
+  });
+}
+
+function renderModeList() {
+  const container = document.getElementById('mode-list');
+  container.innerHTML = '';
+  const mol = MOLECULES[currentMol];
+  mol.modes.forEach(mode => {
+    const item = document.createElement('div');
+    item.className = 'mode-item' + (currentMode === mode.id ? ' active' : '');
+    const record = RECORDS.find(r => r.molecule === currentMol);
+    let tag = '';
+    if (record) {
+      if (record.missingFields && record.missingFields.includes('freq_' + mode.id)) {
+        tag = '<span class="mode-tag" style="background:rgba(255,167,38,0.2);color:#ffa726">缺字段</span>';
+      }
+    }
+    const iconBg = mode.color + '33';
+    item.innerHTML = `
+      <div class="mode-icon" style="background:${iconBg};color:${mode.color}">${mode.id.charAt(0)}</div>
+      <div class="mode-info">
+        <div class="mode-name">${mode.name}</div>
+        <div class="mode-freq">${formatFreq(mode.freq, mode.unit)}</div>
+      </div>
+      ${tag}
+    `;
+    item.onclick = () => selectMode(mode.id);
+    container.appendChild(item);
+  });
+}
+
+function formatFreq(freq, unit) {
+  if (freq === null || freq === undefined) return '— 待补录';
+  if (unit === 'Hz') return `${(freq / 1e13).toFixed(2)}×10¹³ ${unit}`;
+  return `${freq} ${unit}`;
+}
+
+function renderMolInfo() {
+  const container = document.getElementById('mol-info');
+  const mol = MOLECULES[currentMol];
+  const record = RECORDS.find(r => r.molecule === currentMol);
+
+  let html = `
+    <dt>分子名称</dt><dd>${mol.name} (${mol.formula})</dd>
+    <dt>分子结构</dt><dd>${mol.structure}</dd>
+    <dt>键角</dt><dd>${mol.bondAngle ? mol.bondAngle + '°' : '—'}</dd>
+    <dt>键长</dt>
+    <dd>
+  `;
+
+  mol.bondLengths.forEach(bl => {
+    const isAnomalous = Math.abs(bl.length - bl.expected) / bl.expected > 0.3;
+    html += `<span>${bl.atoms}: ${bl.length}Å</span>`;
+    if (isAnomalous) {
+      html += `<span class="anomaly-tag">异常 (预期${bl.expected}Å)</span>`;
+    }
+    html += '<br>';
+  });
+
+  html += `</dd>`;
+
+  if (record) {
+    const statusInfo = STATUS_MAP[record.status];
+    html += `<dt>记录状态</dt><dd><span class="badge ${statusInfo.badge}">${statusInfo.label}</span>`;
+    if (record.duplicateOf) html += ` <span style="color:var(--text-dim);font-size:11px">重复于 ${record.duplicateOf}</span>`;
+    if (record.supplementedAt) html += ` <span style="color:var(--text-dim);font-size:11px">补录于 ${record.supplementedAt}</span>`;
+    if (record.withdrawnAt) html += ` <span style="color:var(--text-dim);font-size:11px">撤回于 ${record.withdrawnAt}</span>`;
+    html += `</dd>`;
+
+    if (record.notes && record.notes.length > 0) {
+      html += `<dt>备注</dt><dd style="font-size:11px">`;
+      record.notes.forEach(n => {
+        const cls = n.correction ? 'style="color:var(--orange)"' : '';
+        const marker = n.correction ? '✎ ' : '';
+        html += `<div ${cls}>${marker}${n.date}: ${n.content}</div>`;
+      });
+      html += `</dd>`;
+    }
+
+    if (record.missingFields && record.missingFields.length > 0) {
+      html += `<dt>缺失字段</dt><dd style="color:var(--orange);font-size:11px">${record.missingFields.join(', ')}</dd>`;
+    }
+  }
+
+  container.innerHTML = html;
+}
+
+function renderColorLegend() {
+  const container = document.getElementById('color-legend');
+  const mol = MOLECULES[currentMol];
+  const elements = [...new Set(mol.atoms.map(a => a.el))];
+  container.innerHTML = elements.map(el =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${ELEMENT_CSS[el]}"></div>${el}</div>`
+  ).join('');
+}
+
+function renderRecordTables() {
+  const normalTbody = document.getElementById('normal-tbody');
+  const anomalyTbody = document.getElementById('anomaly-tbody');
+  const normalRecords = RECORDS.filter(r => ['normal', 'supplementary'].includes(r.status));
+  const anomalyRecords = RECORDS.filter(r => ['pending', 'anomaly', 'withdrawn', 'duplicate'].includes(r.status));
+
+  document.getElementById('normal-count').textContent = normalRecords.length;
+  document.getElementById('anomaly-count').textContent = anomalyRecords.length;
+
+  normalTbody.innerHTML = normalRecords.map(r => {
+    const mol = MOLECULES[r.molecule];
+    const statusInfo = STATUS_MAP[r.status];
+    const modeStr = mol.modes.map(m => {
+      if (r.missingFields && r.missingFields.includes('freq_' + m.id)) {
+        return `<span class="missing-field">${m.name}: 待补录</span>`;
+      }
+      return `${m.name}: ${formatFreq(m.freq, m.unit)}`;
+    }).join('<br>');
+    const bondStr = mol.bondLengths.map(bl => `${bl.atoms}: ${bl.length}`).join('<br>');
+    const noteMarkers = r.notes.map((n, i) =>
+      `<span class="note-marker" data-record="${r.id}" data-note="${i}" title="">${n.correction ? '✎' : '·'}</span>`
+    ).join(' ');
+
+    return `<tr class="${statusInfo.rowClass}">
+      <td>${r.id}</td>
+      <td>${mol.formula}</td>
+      <td>${mol.structure}</td>
+      <td>${bondStr}</td>
+      <td>${modeStr}</td>
+      <td>${mol.modes.map(m => r.missingFields?.includes('freq_' + m.id) ? '<span class="missing-field">—</span>' : formatFreq(m.freq, m.unit)).join('<br>')}</td>
+      <td><span class="badge ${statusInfo.badge}">${statusInfo.label}</span></td>
+      <td>${noteMarkers}</td>
+      <td>${r.status === 'supplementary' ? '<button class="action-btn btn-supplement" onclick="handleAction(\'' + r.id + '\',\'resubmit\')">重新提交</button>' : ''}</td>
+    </tr>`;
+  }).join('');
+
+  anomalyTbody.innerHTML = anomalyRecords.map(r => {
+    const mol = MOLECULES[r.molecule];
+    const statusInfo = STATUS_MAP[r.status];
+    let anomalyType = '';
+    let detail = '';
+
+    if (r.anomalies) {
+      r.anomalies.forEach(a => {
+        if (a === 'bond_length') {
+          anomalyType += '键长异常<br>';
+          const bad = mol.bondLengths.find(bl => Math.abs(bl.length - bl.expected) / bl.expected > 0.3);
+          if (bad) detail += `${bad.atoms}: ${bad.length}Å (预期${bad.expected}Å)<br>`;
+        }
+        if (a === 'mode_overlap') {
+          anomalyType += '模式重叠<br>';
+          const freqs = {};
+          mol.modes.forEach(m => {
+            if (!freqs[m.freq]) freqs[m.freq] = [];
+            freqs[m.freq].push(m.name);
+          });
+          Object.entries(freqs).filter(([, v]) => v.length > 1).forEach(([f, names]) => {
+            detail += `${names.join(' / ')} 同频 ${f} cm⁻¹<br>`;
+          });
+        }
+        if (a === 'frequency_unit') {
+          anomalyType += '频率单位错<br>';
+          const m = mol.modes[0];
+          detail += `${m.name}: ${formatFreq(m.freq, m.unit)}，应为cm⁻¹<br>`;
+        }
+      });
+    }
+    if (r.status === 'withdrawn') {
+      anomalyType += '已撤回<br>';
+      detail += r.notes.filter(n => n.correction).map(n => n.content).join('<br>') || '撤回';
+    }
+    if (r.status === 'duplicate') {
+      anomalyType += '重复提交<br>';
+      detail += `与 ${r.duplicateOf} 重复`;
+    }
+
+    let actions = '';
+    if (r.status === 'pending') {
+      actions = `<button class="action-btn btn-confirm" onclick="handleAction('${r.id}','confirm')">确认</button>
+        <button class="action-btn btn-withdraw" onclick="handleAction('${r.id}','withdraw')">撤回</button>`;
+    } else if (r.status === 'anomaly') {
+      actions = `<button class="action-btn btn-supplement" onclick="handleAction('${r.id}','correct')">修正</button>
+        <button class="action-btn btn-withdraw" onclick="handleAction('${r.id}','withdraw')">撤回</button>`;
+    } else if (r.status === 'duplicate') {
+      actions = `<button class="action-btn btn-withdraw" onclick="handleAction('${r.id}','withdraw')">撤回</button>`;
+    }
+
+    return `<tr class="${statusInfo.rowClass}">
+      <td>${r.id}</td>
+      <td>${mol.formula}</td>
+      <td>${anomalyType}</td>
+      <td style="font-size:11px">${detail}</td>
+      <td><span class="badge ${statusInfo.badge}">${statusInfo.label}</span></td>
+      <td>${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+function selectMolecule(key) {
+  currentMol = key;
+  currentMode = null;
+  animTime = 0;
+  buildMolecule(key);
+  renderMolSelector();
+  renderModeList();
+  renderMolInfo();
+  renderColorLegend();
+  updateFreqDisplay();
+  updateWorkflowFlow();
+  if (MOLECULES[key].modes.length > 0) {
+    selectMode(MOLECULES[key].modes[0].id);
+  }
+}
+
+function selectMode(modeId) {
+  currentMode = modeId;
+  animTime = 0;
+  renderModeList();
+  updateFreqDisplay();
+  updateWorkflowFlow();
+
+  atomMeshes.forEach(mesh => {
+    mesh.material.emissiveIntensity = 1;
+  });
+}
+
+function updateFreqDisplay() {
+  const freqVal = document.getElementById('freq-val');
+  const freqUnit = document.getElementById('freq-unit');
+  const freqModeName = document.getElementById('freq-mode-name');
+  const freqWarning = document.getElementById('freq-warning');
+
+  if (!currentMode) {
+    freqVal.textContent = '—';
+    freqUnit.textContent = 'cm⁻¹';
+    freqModeName.textContent = '选择振动模式';
+    freqWarning.style.display = 'none';
+    return;
+  }
+
+  const mol = MOLECULES[currentMol];
+  const mode = mol.modes.find(m => m.id === currentMode);
+  const record = RECORDS.find(r => r.molecule === currentMol);
+
+  if (record && record.missingFields && record.missingFields.includes('freq_' + mode.id)) {
+    freqVal.textContent = '—';
+    freqUnit.textContent = '待补录';
+    freqModeName.textContent = mode.name;
+    freqWarning.textContent = '⚠ 频率字段缺失，需人工补录';
+    freqWarning.style.display = 'block';
+    return;
+  }
+
+  if (mode.unit === 'Hz') {
+    freqVal.textContent = (mode.freq / 1e13).toFixed(2) + '×10¹³';
+    freqUnit.textContent = mode.unit;
+    freqWarning.textContent = '⚠ 频率单位异常：应为 cm⁻¹';
+    freqWarning.style.display = 'block';
+  } else {
+    freqVal.textContent = mode.freq;
+    freqUnit.textContent = mode.unit;
+    freqWarning.style.display = 'none';
+  }
+
+  freqModeName.textContent = mode.name;
+
+  const freqs = mol.modes.map(m => m.freq);
+  const overlap = freqs.filter(f => f === mode.freq).length > 1;
+  if (overlap && mode.unit === 'cm⁻¹') {
+    freqWarning.textContent = '⚠ 此频率与其他模式重叠，需确认';
+    freqWarning.style.display = 'block';
+  }
+}
+
+function updateWorkflowFlow() {
+  const container = document.getElementById('workflow-flow');
+  const record = RECORDS.find(r => r.molecule === currentMol);
+  const statusSteps = {
+    normal: [0, 1, 2],
+    pending: [0, 1],
+    anomaly: [0, 1],
+    supplementary: [0, 1, 2, 3],
+    withdrawn: [0, 4],
+    duplicate: [0, 5]
+  };
+  const activeSteps = record ? (statusSteps[record.status] || [0]) : [0];
+  const steps = container.querySelectorAll('.flow-step');
+  steps.forEach((step, i) => {
+    step.classList.toggle('active', activeSteps.includes(i));
+  });
+}
+
+window.handleAction = function(recordId, action) {
+  const record = RECORDS.find(r => r.id === recordId);
+  if (!record) return;
+
+  if (action === 'confirm') {
+    const hasAnomaly = record.anomalies && record.anomalies.length > 0;
+    if (hasAnomaly) {
+      const mol = MOLECULES[record.molecule];
+      const bondAnomalous = mol.bondLengths.some(bl => Math.abs(bl.length - bl.expected) / bl.expected > 0.3);
+      if (bondAnomalous) {
+        record.notes.push({ date: new Date().toISOString().slice(0,10), content: '确认：键长数据经核实无误（特殊键型）', correction: false });
+      }
+      const freqOverlap = Object.values(
+        mol.modes.reduce((acc, m) => { (acc[m.freq] = acc[m.freq] || []).push(m.name); return acc; }, {})
+      ).some(v => v.length > 1);
+      if (freqOverlap) {
+        record.notes.push({ date: new Date().toISOString().slice(0,10), content: '确认：模式简并属正常现象', correction: false });
+      }
+    }
+    record.status = 'normal';
+    delete record.anomalies;
+  } else if (action === 'withdraw') {
+    record.status = 'withdrawn';
+    record.withdrawnAt = new Date().toISOString().slice(0,10);
+    record.notes.push({ date: record.withdrawnAt, content: '人工撤回', correction: true });
+  } else if (action === 'correct') {
+    const mol = MOLECULES[record.molecule];
+    mol.modes.forEach(m => {
+      if (m.unit === 'Hz') {
+        m.freq = Math.round(m.freq / 2.998e10);
+        m.unit = 'cm⁻¹';
+      }
+    });
+    record.status = 'normal';
+    delete record.anomalies;
+    record.notes.push({ date: new Date().toISOString().slice(0,10), content: '修正频率单位 Hz → cm⁻¹', correction: true });
+  } else if (action === 'resubmit') {
+    record.status = 'normal';
+    record.missingFields = [];
+    record.notes.push({ date: new Date().toISOString().slice(0,10), content: '补录完成后重新提交', correction: false });
+  }
+
+  renderRecordTables();
+  renderMolSelector();
+  renderModeList();
+  renderMolInfo();
+  updateFreqDisplay();
+  updateWorkflowFlow();
+};
+
+const tooltip = document.getElementById('tooltip');
+document.addEventListener('mouseover', e => {
+  if (e.target.classList.contains('note-marker')) {
+    const rid = e.target.dataset.record;
+    const nidx = parseInt(e.target.dataset.note);
+    const record = RECORDS.find(r => r.id === rid);
+    if (record && record.notes[nidx]) {
+      const n = record.notes[nidx];
+      tooltip.innerHTML = `<div class="tip-date">${n.date}</div><div class="tip-content">${n.content}</div>${n.correction ? '<div class="tip-correction">✎ 修正/更正记录</div>' : ''}`;
+      tooltip.style.display = 'block';
+    }
+  }
+});
+document.addEventListener('mousemove', e => {
+  if (tooltip.style.display === 'block') {
+    tooltip.style.left = (e.clientX + 12) + 'px';
+    tooltip.style.top = (e.clientY + 12) + 'px';
+  }
+});
+document.addEventListener('mouseout', e => {
+  if (e.target.classList.contains('note-marker')) {
+    tooltip.style.display = 'none';
+  }
+});
+
+document.getElementById('btn-play').addEventListener('click', () => {
+  isPlaying = !isPlaying;
+  document.getElementById('btn-play').textContent = isPlaying ? '⏸' : '▶';
+  document.getElementById('btn-play').classList.toggle('active', isPlaying);
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  animTime = 0;
+  resetPositions();
+});
+
+document.getElementById('speed-slider').addEventListener('input', e => {
+  animSpeed = parseFloat(e.target.value);
+  document.getElementById('speed-label').textContent = animSpeed.toFixed(1) + '×';
+});
+
+function onResize() {
+  const rect = viewport.getBoundingClientRect();
+  camera.aspect = rect.width / rect.height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(rect.width, rect.height);
+}
+window.addEventListener('resize', onResize);
+
+let lastTime = 0;
+function animate(time) {
+  requestAnimationFrame(animate);
+  const dt = (time - lastTime) / 1000;
+  lastTime = time;
+
+  if (isPlaying && currentMode) {
+    animTime += dt;
+    animateVibration(animTime);
+  }
+
+  updateLabelPositions();
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+function init() {
+  onResize();
+  buildMolecule(currentMol);
+  renderMolSelector();
+  renderModeList();
+  renderMolInfo();
+  renderColorLegend();
+  renderRecordTables();
+  updateFreqDisplay();
+  updateWorkflowFlow();
+
+  document.getElementById('btn-play').textContent = '⏸';
+  document.getElementById('btn-play').classList.add('active');
+
+  if (MOLECULES[currentMol].modes.length > 0) {
+    selectMode(MOLECULES[currentMol].modes[0].id);
+  }
+
+  requestAnimationFrame(animate);
+}
+
+init();
+</script>
+</body>
+</html>
