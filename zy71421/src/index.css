@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 50%, #FED7AA 100%);
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+@layer components {
+  .factory-card {
+    @apply bg-white rounded-2xl shadow-lg border-2 border-factory-200;
+  }
+  
+  .factory-button {
+    @apply px-6 py-3 bg-gradient-to-b from-factory-400 to-factory-600 text-white font-bold rounded-xl shadow-lg hover:from-factory-500 hover:to-factory-700 transform hover:scale-105 transition-all duration-200 active:scale-95;
+  }
+  
+  .factory-button-secondary {
+    @apply px-6 py-3 bg-white text-factory-600 font-bold rounded-xl border-2 border-factory-400 shadow-md hover:bg-factory-50 transform hover:scale-105 transition-all duration-200 active:scale-95;
+  }
+  
+  .note-card {
+    @apply w-20 h-24 bg-white rounded-xl shadow-lg border-2 border-factory-300 cursor-grab active:cursor-grabbing flex flex-col items-center justify-center transition-all duration-200 hover:shadow-xl hover:border-factory-500;
+  }
+  
+  .work-slot {
+    @apply w-20 h-24 bg-gear-100 rounded-xl border-2 border-dashed border-gear-400 flex items-center justify-center transition-all duration-200;
+  }
+  
+  .work-slot-active {
+    @apply border-factory-500 bg-factory-50;
+  }
+  
+  .work-slot-error {
+    @apply border-red-500 bg-red-50 animate-shake;
+  }
+  
+  .work-slot-success {
+    @apply border-green-500 bg-green-50;
+  }
+}
