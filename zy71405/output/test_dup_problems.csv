@@ -1,0 +1,2 @@
+﻿record_id,status,error_type,description,rule_version,related_ids,source_files,source_lines,raw_data
+1efa156d-21b3-4ab2-b5db-aa214dd5a0ac,error,返还重复入账,返还重复入账: 客户C001 产品股票 交易T001,V1.0,"eaf31209-4c21-408f-b21e-b83ccb631f6f,4ecaffcb-00cc-468a-ab52-cfad9aeceb31",test.csv;test.csv,5;1,"{""trade_id"": ""T001"", ""customer_id"": ""C001""}"

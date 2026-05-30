@@ -1,0 +1,8 @@
+rule_id,rule_version,group_id,product_type,effective_date,tiers
+R001,V1.0,G001,股票,2026-05-01,"[{""min_amount"":0,""max_amount"":100000,""refund_rate"":0.001},{""min_amount"":100000,""max_amount"":500000,""refund_rate"":0.002},{""min_amount"":500000,""max_amount"":null,""refund_rate"":0.003}]"
+R002,V1.0,G001,基金,2026-05-01,"[{""min_amount"":0,""max_amount"":50000,""refund_rate"":0.0005},{""min_amount"":50000,""max_amount"":null,""refund_rate"":0.001}]"
+R003,V1.0,G002,股票,2026-05-01,"[{""min_amount"":0,""max_amount"":150000,""refund_rate"":0.0015},{""min_amount"":150000,""max_amount"":300000,""refund_rate"":0.0025},{""min_amount"":300000,""max_amount"":null,""refund_rate"":0.004}]"
+R004,V1.0,G002,基金,2026-05-01,"[{""min_amount"":0,""max_amount"":100000,""refund_rate"":0.0008},{""min_amount"":100000,""max_amount"":null,""refund_rate"":0.0012}]"
+R005,V1.0,G003,股票,2026-05-01,"[{""min_amount"":0,""max_amount"":100000,""refund_rate"":0.001},{""min_amount"":90000,""max_amount"":500000,""refund_rate"":0.002}]"
+R006,V1.0,G003,基金,2026-05-01,"[{""min_amount"":0,""max_amount"":100000,""refund_rate"":0.0006},{""min_amount"":100000,""max_amount"":null,""refund_rate"":0.0009}]"
+R007,V1.0,G001,债券,2026-05-01,"[{""min_amount"":0,""max_amount"":200000,""refund_rate"":0.0002},{""min_amount"":200000,""max_amount"":null,""refund_rate"":0.0003}]"

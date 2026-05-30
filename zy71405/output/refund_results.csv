@@ -1,0 +1,9 @@
+﻿refund_id,trade_id,customer_id,customer_name,group_id,product_type,trade_amount,refund_amount,refund_rate,rule_id,rule_version,refund_date,trade_source_file,trade_source_line,rule_source_file,rule_source_line
+6081602c-016a-4125-b04a-fbc0508ed6cb,T001,C001,机构客户A,G002,股票,100000.0,150.0,0.0015,R003,V1.0,2026-05-30,sample_trades.csv,2,sample_rules.csv,4
+700672b1-a65e-41d8-a1c4-15988c8d18e6,T002,C001,机构客户A,G002,基金,50000.0,40.0,0.0008,R004,V1.0,2026-05-30,sample_trades.csv,3,sample_rules.csv,5
+83005bf5-c6e0-43e7-89c3-d247738dd564,T003,C002,机构客户B,G001,股票,200000.0,400.0,0.002,R001,V1.0,2026-05-30,sample_trades.csv,4,sample_rules.csv,2
+84d65a90-7847-44d1-abce-3f775f7370bb,T004,C002,机构客户B,G001,债券,150000.0,30.0,0.0002,R007,V1.0,2026-05-30,sample_trades.csv,5,sample_rules.csv,8
+ff2aee20-af96-4439-8824-2abef6f981ba,T006,C001,机构客户A,G002,股票,300000.0,1200.0,0.004,R003,V1.0,2026-05-30,sample_trades.csv,7,sample_rules.csv,4
+ce4ba306-e9b3-471c-8a80-976a3aa66e75,T007,C004,机构客户D,G002,股票,80000.0,120.0,0.0015,R003,V1.0,2026-05-30,sample_trades.csv,8,sample_rules.csv,4
+f6b5d377-9d7d-405e-9e68-1e38b814d966,T008,C002,机构客户B,G001,基金,120000.0,120.0,0.001,R002,V1.0,2026-05-30,sample_trades.csv,9,sample_rules.csv,3
+b89522e6-2bb7-4384-82d4-49075afa2de0,T011,C003,机构客户C,G003,基金,250000.0,225.0,0.0009,R006,V1.0,2026-05-30,sample_trades.csv,12,sample_rules.csv,7
