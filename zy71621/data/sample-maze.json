@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "batchId": "class_101_experiment_2024",
+    "createdAt": "2024-01-15T10:00:00.000Z",
+    "description": "物理课示例迷宫 - 初级难度"
+  },
+  "maze": {
+    "width": 600,
+    "height": 600
+  },
+  "walls": [
+    {
+      "x1": 150,
+      "y1": 100,
+      "x2": 150,
+      "y2": 400,
+      "material": "hard",
+      "reflectionCoefficient": 0.95,
+      "id": "wall_1",
+      "addedInBatch": "initial"
+    },
+    {
+      "x1": 300,
+      "y1": 200,
+      "x2": 300,
+      "y2": 550,
+      "material": "soft",
+      "reflectionCoefficient": 0.6,
+      "id": "wall_2",
+      "addedInBatch": "initial"
+    },
+    {
+      "x1": 450,
+      "y1": 50,
+      "x2": 450,
+      "y2": 450,
+      "material": "hard",
+      "reflectionCoefficient": 0.95,
+      "id": "wall_3",
+      "addedInBatch": "initial"
+    },
+    {
+      "x1": 150,
+      "y1": 400,
+      "x2": 450,
+      "y2": 450,
+      "material": "absorbent",
+      "reflectionCoefficient": 0.1,
+      "id": "wall_4",
+      "addedInBatch": "initial"
+    }
+  ],
+  "characters": [
+    {
+      "type": "player",
+      "x": 50,
+      "y": 550,
+      "status": "active",
+      "health": 100,
+      "id": "player_1",
+      "addedInBatch": "initial"
+    },
+    {
+      "type": "teammate",
+      "x": 550,
+      "y": 50,
+      "status": "trapped",
+      "health": 75,
+      "id": "teammate_1",
+      "addedInBatch": "initial"
+    }
+  ],
+  "soundSources": [
+    {
+      "x": 300,
+      "y": 300,
+      "direction": 45,
+      "frequency": 2000,
+      "amplitude": 1.0,
+      "id": "source_1",
+      "addedInBatch": "initial"
+    }
+  ],
+  "notes": [
+    {
+      "timestamp": "2024-01-15T10:05:00.000Z",
+      "author": "王老师",
+      "content": "注意观察硬质墙体和吸声墙体的反射差异",
+      "addedInBatch": "notes_001"
+    },
+    {
+      "timestamp": "2024-01-15T10:10:00.000Z",
+      "author": "李老师",
+      "content": "建议先向右上方发射声波探测队友位置",
+      "addedInBatch": "notes_002"
+    }
+  ]
+}
