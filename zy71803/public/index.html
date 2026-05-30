@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>多账户资金水位管理系统</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-content">
+        <h1>💰 多账户资金水位管理系统</h1>
+        <div class="header-actions">
+          <button onclick="initSampleData()" class="btn btn-secondary">初始化示例数据</button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="summary" onclick="switchTab('summary')">资金水位总览</button>
+      <button class="tab-btn" data-tab="records" onclick="switchTab('records')">授信记录管理</button>
+      <button class="tab-btn" data-tab="review" onclick="switchTab('review')">风控复核清单</button>
+    </nav>
+
+    <main class="main-content">
+      <div id="tab-summary" class="tab-content active">
+        <div class="page-header">
+          <h2>资金水位总览</h2>
+          <button onclick="loadSummary()" class="btn btn-primary">刷新数据</button>
+        </div>
+        <div id="summary-content"></div>
+      </div>
+
+      <div id="tab-records" class="tab-content">
+        <div class="page-header">
+          <h2>授信记录管理</h2>
+          <button onclick="openAddModal()" class="btn btn-primary">+ 新增记录</button>
+        </div>
+
+        <div class="filter-bar">
+          <select id="filter-status" onchange="loadRecords()">
+            <option value="">全部状态</option>
+            <option value="confirmed">已确认</option>
+            <option value="pending_supplement">待补材料</option>
+            <option value="manually_modified">人工修改</option>
+          </select>
+          <select id="filter-source" onchange="loadRecords()">
+            <option value="">全部来源</option>
+            <option value="supplement_email">补充邮件</option>
+            <option value="review_daily">复核日报</option>
+            <option value="credit_ledger">授信台账</option>
+          </select>
+          <select id="filter-operation" onchange="loadRecords()">
+            <option value="">全部操作类型</option>
+            <option value="material_supplement">补充材料</option>
+            <option value="conclusion_change">修改结论</option>
+          </select>
+        </div>
+
+        <div id="records-table"></div>
+      </div>
+
+      <div id="tab-review" class="tab-content">
+        <div class="page-header">
+          <h2>风控复核清单</h2>
+          <button onclick="loadReviewList()" class="btn btn-primary">刷新清单</button>
+        </div>
+        <div id="review-content"></div>
+      </div>
+    </main>
+
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-title">新增授信记录</h3>
+          <button onclick="closeModal()" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="record-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>账户编号 *</label>
+                <select id="form-accountId" required onchange="updateAccountName()">
+                  <option value="">请选择账户</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>账户名称</label>
+                <input type="text" id="form-accountName" readonly>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>授信额度(万元) *</label>
+                <input type="number" id="form-creditAmount" step="0.01" required>
+              </div>
+              <div class="form-group">
+                <label>已用额度(万元)</label>
+                <input type="number" id="form-usedAmount" step="0.01" value="0">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>数据来源 *</label>
+                <select id="form-sourceType" required>
+                  <option value="">请选择来源</option>
+                  <option value="supplement_email">补充邮件</option>
+                  <option value="review_daily">复核日报</option>
+                  <option value="credit_ledger">授信台账</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>来源编号</label>
+                <input type="text" id="form-sourceId" placeholder="如：邮件编号、日报编号等">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>来源日期 *</label>
+                <input type="date" id="form-sourceDate" required>
+              </div>
+              <div class="form-group">
+                <label>操作类型 *</label>
+                <select id="form-operationType" required>
+                  <option value="material_supplement">补充材料</option>
+                  <option value="conclusion_change">修改结论</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>状态</label>
+                <select id="form-status">
+                  <option value="pending_supplement">待补材料</option>
+                  <option value="confirmed">已确认</option>
+                  <option value="manually_modified">人工修改</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>处理人</label>
+                <input type="text" id="form-handler" placeholder="客户经理姓名">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>备注说明</label>
+              <textarea id="form-remark" rows="3" placeholder="请填写相关说明..."></textarea>
+            </div>
+          </form>
+          <div id="form-error" class="error-message" style="display: none;"></div>
+          <div id="form-warning" class="warning-message" style="display: none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button onclick="closeModal()" class="btn btn-secondary">取消</button>
+          <button onclick="saveRecord()" class="btn btn-primary">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
