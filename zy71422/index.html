@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月面滑翔补给局</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>月面滑翔补给局</h1>
+            <div class="mission-info">
+                <span class="mission-label">任务状态:</span>
+                <span id="missionStatus" class="mission-status standby">待命</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="control-panel left-panel">
+                <div class="panel-section">
+                    <h3>📊 飞行参数</h3>
+                    <div class="param-group">
+                        <div class="param-item">
+                            <span class="param-label">水平速度</span>
+                            <span id="vxDisplay" class="param-value">0.0 m/s</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-label">垂直速度</span>
+                            <span id="vyDisplay" class="param-value">0.0 m/s</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-label">合速度</span>
+                            <span id="speedDisplay" class="param-value">0.0 m/s</span>
+                        </div>
+                        <div class="param-item">
+                            <span class="param-label">高度</span>
+                            <span id="altitudeDisplay" class="param-value">0 m</span>
+                        </div>
+                        <div class="param-item fuel-item">
+                            <span class="param-label">燃料</span>
+                            <div class="fuel-bar-container">
+                                <div id="fuelBar" class="fuel-bar"></div>
+                            </div>
+                            <span id="fuelDisplay" class="param-value">100%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🎮 操控</h3>
+                    <div class="control-info">
+                        <p><kbd>↑</kbd> 主推进器</p>
+                        <p><kbd>←</kbd> 左平移</p>
+                        <p><kbd>→</kbd> 右平移</p>
+                        <p><kbd>空格</kbd> 悬停制动</p>
+                        <p><kbd>R</kbd> 重开</p>
+                        <p><kbd>P</kbd> 回放</p>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📥 材料导入</h3>
+                    <div class="import-group">
+                        <label class="import-label">
+                            <input type="file" id="capsuleImport" accept=".json" data-type="capsule">
+                            <span>补给舱参数</span>
+                        </label>
+                        <label class="import-label">
+                            <input type="file" id="craterImport" accept=".json" data-type="crater">
+                            <span>月坑分布</span>
+                        </label>
+                        <label class="import-label">
+                            <input type="file" id="fuelImport" accept=".json" data-type="fuel">
+                            <span>燃料配置</span>
+                        </label>
+                        <button id="defaultConfigBtn" class="btn-secondary">加载默认配置</button>
+                    </div>
+                    <div id="materialStatus" class="material-status">
+                        <p>未导入自定义材料</p>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="game-area">
+                <canvas id="gameCanvas" width="900" height="600"></canvas>
+                <div id="overlay" class="overlay hidden">
+                    <div class="overlay-content">
+                        <h2 id="overlayTitle">任务结束</h2>
+                        <div id="failureAnalysis" class="failure-analysis"></div>
+                        <div class="overlay-buttons">
+                            <button id="retryBtn" class="btn-primary">重新开始</button>
+                            <button id="replayBtn" class="btn-secondary">查看回放</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="replayOverlay" class="overlay hidden">
+                    <div class="overlay-content">
+                        <h2>📼 飞行回放</h2>
+                        <div class="replay-controls">
+                            <button id="playPauseBtn" class="btn-primary">播放</button>
+                            <button id="stepBackBtn" class="btn-secondary">⏪ 后退</button>
+                            <button id="stepFwdBtn" class="btn-secondary">前进 ⏩</button>
+                            <button id="closeReplayBtn" class="btn-secondary">关闭</button>
+                        </div>
+                        <div class="replay-info">
+                            <span>帧: <span id="replayFrame">0</span> / <span id="replayTotal">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="control-panel right-panel">
+                <div class="panel-section">
+                    <h3>🎯 任务目标</h3>
+                    <div class="objective">
+                        <p>将补给舱安全送达<span class="highlight">着陆区</span></p>
+                        <p>着陆速度 ≤ <span class="highlight">5 m/s</span></p>
+                        <p>避开所有<span class="danger">月坑</span></p>
+                        <p>燃料耗尽前着陆</p>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📝 飞行日志</h3>
+                    <div id="flightLog" class="flight-log">
+                        <p class="log-entry info">系统就绪，等待发射...</p>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📋 材料追溯</h3>
+                    <div id="materialTrace" class="material-trace">
+                        <div class="trace-section">
+                            <h4>原始材料</h4>
+                            <div id="rawMaterials" class="raw-materials">
+                                <p class="empty">无</p>
+                            </div>
+                        </div>
+                        <div class="trace-section">
+                            <h4>处理结果</h4>
+                            <div id="processedResults" class="processed-results">
+                                <p class="empty">无</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>❓ 快速帮助</h3>
+                    <button id="showHelpBtn" class="btn-secondary full-width">查看操作说明</button>
+                </div>
+            </aside>
+        </div>
+
+        <div id="helpModal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-btn" id="closeHelpBtn">&times;</span>
+                <h2>月面滑翔补给局 - 操作说明</h2>
+                <div class="help-content">
+                    <h3>🚀 快速上手（5分钟）</h3>
+                    <ol>
+                        <li>点击 <strong>"加载默认配置"</strong> 或导入自定义材料</li>
+                        <li>按 <kbd>↑</kbd> 启动推进器开始飞行</li>
+                        <li>用 <kbd>←</kbd> <kbd>→</kbd> 调整水平轨迹</li>
+                        <li>接近地面时控制速度 ≤ 5 m/s</li>
+                        <li>在绿色着陆区平稳着陆</li>
+                    </ol>
+                    
+                    <h3>⚠️ 失败条件</h3>
+                    <ul>
+                        <li><strong>速度过高</strong>: 着陆时速度超过5 m/s → 补给舱损毁</li>
+                        <li><strong>燃料耗尽</strong>: 燃料归零后无法控制 → 自由坠毁</li>
+                        <li><strong>落点越界</strong>: 落在着陆区外或月坑中</li>
+                        <li><strong>撞击月坑</strong>: 飞行中直接撞击月坑边缘</li>
+                    </ul>
+
+                    <h3>📥 材料导入格式（JSON）</h3>
+                    <div class="code-block">
+<pre>// 补给舱参数 capsule.json
+{
+  "mass": 100,
+  "maxThrust": 1500,
+  "dragCoeff": 0.02
+}
+
+// 月坑分布 crater.json
+{
+  "craters": [
+    {"x": 200, "y": 550, "radius": 40, "depth": 20},
+    {"x": 500, "y": 550, "radius": 60, "depth": 30}
+  ]
+}
+
+// 燃料配置 fuel.json
+{
+  "initialFuel": 100,
+  "consumptionRate": 0.5,
+  "landingZone": {"x": 700, "width": 120}
+}</pre>
+                    </div>
+
+                    <h3>🔍 失败分析</h3>
+                    <p>每次失败后系统会显示：</p>
+                    <ul>
+                        <li><strong>触发材料</strong>: 哪份配置导致失败</li>
+                        <li><strong>卡点位置</strong>: 失败发生的坐标和时间</li>
+                        <li><strong>下一步建议</strong>: 如何调整材料和操作</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

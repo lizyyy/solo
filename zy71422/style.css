@@ -1,0 +1,577 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+    color: #e0e0e0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.game-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background: rgba(20, 25, 50, 0.8);
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(100, 150, 255, 0.2);
+}
+
+.game-header h1 {
+    font-size: 24px;
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mission-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mission-label {
+    color: #8892b0;
+    font-size: 14px;
+}
+
+.mission-status {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.mission-status.standby {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.mission-status.flying {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+    animation: pulse 2s infinite;
+}
+
+.mission-status.success {
+    background: rgba(76, 175, 80, 0.3);
+    color: #4caf50;
+}
+
+.mission-status.failed {
+    background: rgba(244, 67, 54, 0.3);
+    color: #f44336;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.main-content {
+    display: grid;
+    grid-template-columns: 260px 1fr 260px;
+    gap: 15px;
+}
+
+.control-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.panel-section {
+    background: rgba(20, 25, 50, 0.8);
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid rgba(100, 150, 255, 0.2);
+}
+
+.panel-section h3 {
+    font-size: 14px;
+    color: #4facfe;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(100, 150, 255, 0.2);
+}
+
+.param-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.param-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.param-label {
+    color: #8892b0;
+}
+
+.param-value {
+    color: #fff;
+    font-weight: 600;
+    font-family: 'Consolas', monospace;
+}
+
+.fuel-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.fuel-bar-container {
+    width: 100%;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.fuel-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+    border-radius: 6px;
+    transition: width 0.1s linear, background 0.3s;
+}
+
+.fuel-bar.warning {
+    background: linear-gradient(90deg, #ff9800 0%, #ffc107 100%);
+}
+
+.fuel-bar.danger {
+    background: linear-gradient(90deg, #f44336 0%, #ff5722 100%);
+}
+
+.control-info p {
+    font-size: 13px;
+    margin: 6px 0;
+    color: #b0bec5;
+}
+
+kbd {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(100, 150, 255, 0.2);
+    border: 1px solid rgba(100, 150, 255, 0.4);
+    border-radius: 4px;
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+    color: #4facfe;
+    margin-right: 4px;
+}
+
+.import-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.import-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(100, 150, 255, 0.1);
+    border: 1px dashed rgba(100, 150, 255, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.import-label:hover {
+    background: rgba(100, 150, 255, 0.2);
+    border-color: rgba(100, 150, 255, 0.5);
+}
+
+.import-label input[type="file"] {
+    display: none;
+}
+
+.material-status {
+    margin-top: 10px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    font-size: 12px;
+    color: #8892b0;
+}
+
+.material-status p {
+    margin: 3px 0;
+}
+
+.material-status .loaded {
+    color: #4caf50;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: #0a0e27;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(100, 150, 255, 0.2);
+    color: #4facfe;
+    border: 1px solid rgba(100, 150, 255, 0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(100, 150, 255, 0.3);
+}
+
+.full-width {
+    width: 100%;
+}
+
+.game-area {
+    position: relative;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(100, 150, 255, 0.3);
+}
+
+#gameCanvas {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+.overlay-content {
+    background: rgba(20, 25, 50, 0.95);
+    padding: 30px;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    border: 1px solid rgba(100, 150, 255, 0.3);
+    text-align: center;
+}
+
+.overlay-content h2 {
+    color: #4facfe;
+    margin-bottom: 20px;
+}
+
+.failure-analysis {
+    text-align: left;
+    margin: 20px 0;
+}
+
+.analysis-section {
+    margin-bottom: 15px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border-left: 3px solid #4facfe;
+}
+
+.analysis-section h4 {
+    color: #4facfe;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.analysis-section p {
+    font-size: 13px;
+    color: #b0bec5;
+    margin: 4px 0;
+}
+
+.analysis-section .trigger-material {
+    color: #ffc107;
+    font-weight: 600;
+}
+
+.analysis-section .position {
+    color: #00f2fe;
+    font-family: 'Consolas', monospace;
+}
+
+.analysis-section .suggestion {
+    color: #4caf50;
+}
+
+.overlay-buttons, .replay-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.replay-info {
+    margin-top: 15px;
+    color: #8892b0;
+    font-size: 13px;
+}
+
+.objective p {
+    font-size: 13px;
+    margin: 8px 0;
+    color: #b0bec5;
+}
+
+.highlight {
+    color: #4caf50;
+    font-weight: 600;
+}
+
+.danger {
+    color: #f44336;
+    font-weight: 600;
+}
+
+.flight-log {
+    max-height: 180px;
+    overflow-y: auto;
+    font-size: 12px;
+}
+
+.log-entry {
+    padding: 6px 8px;
+    margin: 2px 0;
+    border-radius: 4px;
+    font-family: 'Consolas', monospace;
+}
+
+.log-entry.info {
+    background: rgba(33, 150, 243, 0.1);
+    color: #2196f3;
+}
+
+.log-entry.warning {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+}
+
+.log-entry.error {
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+}
+
+.log-entry.success {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+}
+
+.flight-log::-webkit-scrollbar {
+    width: 4px;
+}
+
+.flight-log::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.flight-log::-webkit-scrollbar-thumb {
+    background: rgba(100, 150, 255, 0.3);
+    border-radius: 2px;
+}
+
+.material-trace {
+    font-size: 12px;
+}
+
+.trace-section {
+    margin-bottom: 12px;
+}
+
+.trace-section h4 {
+    color: #8892b0;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.raw-materials, .processed-results {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    border-radius: 6px;
+    max-height: 80px;
+    overflow-y: auto;
+}
+
+.raw-materials p, .processed-results p {
+    margin: 2px 0;
+    color: #b0bec5;
+}
+
+.raw-materials .material-item, .processed-results .result-item {
+    padding: 4px 6px;
+    background: rgba(100, 150, 255, 0.1);
+    border-radius: 4px;
+    margin: 3px 0;
+    font-family: 'Consolas', monospace;
+}
+
+.processed-results .result-item {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+}
+
+.empty {
+    color: #546e7a;
+    font-style: italic;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: rgba(20, 25, 50, 0.98);
+    padding: 30px;
+    border-radius: 16px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    border: 1px solid rgba(100, 150, 255, 0.3);
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    color: #8892b0;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #f44336;
+}
+
+.modal-content h2 {
+    color: #4facfe;
+    margin-bottom: 20px;
+}
+
+.help-content h3 {
+    color: #00f2fe;
+    margin: 20px 0 10px;
+    font-size: 16px;
+}
+
+.help-content ol, .help-content ul {
+    padding-left: 25px;
+    margin: 10px 0;
+}
+
+.help-content li {
+    margin: 8px 0;
+    color: #b0bec5;
+    font-size: 14px;
+}
+
+.help-content strong {
+    color: #fff;
+}
+
+.code-block {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    overflow-x: auto;
+}
+
+.code-block pre {
+    color: #4caf50;
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(100, 150, 255, 0.3);
+    border-radius: 3px;
+}
+
+@media (max-width: 1200px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .control-panel {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .panel-section {
+        flex: 1;
+        min-width: 250px;
+    }
+}
