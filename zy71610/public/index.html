@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消费分期提前结清管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; }
+        .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 20px; margin-bottom: 20px; }
+        .filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .filters input, .filters select { padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; min-width: 160px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a6fd6; }
+        .btn-success { background: #48bb78; color: white; }
+        .btn-success:hover { background: #3da86a; }
+        .btn-warning { background: #ed8936; color: white; }
+        .btn-warning:hover { background: #dd7725; }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #f8f9fa; font-weight: 600; color: #4a5568; font-size: 13px; }
+        td { font-size: 14px; }
+        tr:hover { background: #f8f9fa; }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-DRAFT { background: #e2e8f0; color: #4a5568; }
+        .status-PENDING_REVIEW { background: #fef5e7; color: #dd7725; }
+        .status-REVIEWED { background: #ebf8ff; color: #3182ce; }
+        .status-APPROVED { background: #f0fff4; color: #38a169; }
+        .status-EXECUTED { background: #e6fffa; color: #319795; }
+        .status-CANCELLED { background: #fed7d7; color: #c53030; }
+        .anomaly-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 4px; }
+        .anomaly-HIGH { background: #fed7d7; color: #c53030; }
+        .anomaly-MEDIUM { background: #fef5e7; color: #dd7725; }
+        .anomaly-LOW { background: #e6fffa; color: #319795; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 12px; max-width: 900px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { font-size: 18px; font-weight: 600; }
+        .modal-body { padding: 20px; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #718096; }
+        .detail-section { margin-bottom: 24px; }
+        .detail-section h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #2d3748; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+        .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .detail-item { display: flex; flex-direction: column; }
+        .detail-label { font-size: 12px; color: #718096; margin-bottom: 4px; }
+        .detail-value { font-size: 14px; font-weight: 500; }
+        .detail-value.corrected { color: #ed8936; }
+        .three-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 8px; }
+        .col-header { font-size: 12px; font-weight: 600; color: #718096; text-align: center; }
+        .col-value { font-size: 15px; font-weight: 600; text-align: center; }
+        .col-value.original { color: #4a5568; }
+        .col-value.corrected { color: #ed8936; }
+        .col-value.final { color: #38a169; }
+        .reason-list { max-height: 200px; overflow-y: auto; }
+        .reason-item { padding: 10px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; font-size: 13px; }
+        .reason-code { font-weight: 600; color: #667eea; margin-right: 8px; }
+        .reason-time { color: #718096; font-size: 11px; }
+        .history-item { padding: 12px; border-left: 3px solid #667eea; background: #f8f9fa; margin-bottom: 8px; border-radius: 0 6px 6px 0; }
+        .history-field { font-weight: 600; font-size: 14px; }
+        .history-change { font-size: 13px; color: #4a5568; margin: 4px 0; }
+        .history-meta { font-size: 12px; color: #718096; }
+        .actions { display: flex; gap: 8px; }
+        .btn-small { padding: 4px 10px; font-size: 12px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #4a5568; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; }
+        .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .export-options { display: flex; gap: 12px; flex-wrap: wrap; }
+        .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
+        .tabs { display: flex; border-bottom: 1px solid #e0e0e0; margin-bottom: 20px; }
+        .tab { padding: 12px 20px; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: #718096; }
+        .tab.active { border-bottom-color: #667eea; color: #667eea; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>消费分期提前结清管理</h1>
+            <p>列表、详情、修正、回看、导出 - 每一步都清清楚楚</p>
+        </div>
+
+        <div class="card">
+            <div class="filters">
+                <input type="text" id="filterContractNo" placeholder="合同编号">
+                <select id="filterStatus">
+                    <option value="">全部状态</option>
+                    <option value="DRAFT">草稿</option>
+                    <option value="PENDING_REVIEW">待审核</option>
+                    <option value="REVIEWED">已审核</option>
+                    <option value="APPROVED">已批准</option>
+                    <option value="EXECUTED">已执行</option>
+                    <option value="CANCELLED">已取消</option>
+                </select>
+                <select id="filterAnomaly">
+                    <option value="">全部异常</option>
+                    <option value="true">有异常</option>
+                    <option value="false">无异常</option>
+                </select>
+                <button class="btn btn-primary" onclick="searchApplications()">搜索</button>
+                <button class="btn btn-secondary" onclick="resetSearch()">重置</button>
+                <div style="flex: 1;"></div>
+                <button class="btn btn-success" onclick="showExportModal()">导出</button>
+                <button class="btn btn-warning" onclick="showCreateModal()">新建申请</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-wrapper">
+                <table id="applicationsTable">
+                    <thead>
+                        <tr>
+                            <th>申请编号</th>
+                            <th>合同编号</th>
+                            <th>申请人</th>
+                            <th>申请日期</th>
+                            <th>剩余本金</th>
+                            <th>可退服务费</th>
+                            <th>应还总额</th>
+                            <th>状态</th>
+                            <th>异常</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicationsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>提前结清申请详情</h2>
+                <button class="close-btn" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('basic')">基本信息</div>
+                    <div class="tab" onclick="switchTab('amount')">金额明细</div>
+                    <div class="tab" onclick="switchTab('anomaly')">异常标记</div>
+                    <div class="tab" onclick="switchTab('reason')">判断理由</div>
+                    <div class="tab" onclick="switchTab('history')">变更历史</div>
+                </div>
+
+                <div id="tab-basic" class="tab-content active">
+                    <div class="detail-section">
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">申请编号</span>
+                                <span class="detail-value" id="detail-applicationNo"></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">合同编号</span>
+                                <span class="detail-value" id="detail-contractNo"></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">申请人</span>
+                                <span class="detail-value" id="detail-applicant"></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">状态</span>
+                                <span class="detail-value" id="detail-status"></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">申请日期</span>
+                                <span class="detail-value" id="detail-applicationDate"></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">创建人</span>
+                                <span class="detail-value" id="detail-createdBy"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>结清原因</h3>
+                        <p id="detail-settlementReason" style="font-size: 14px;"></p>
+                    </div>
+                    <div class="detail-section">
+                        <h3>备注</h3>
+                        <div style="display: flex; gap: 10px; align-items: flex-start;">
+                            <textarea id="detail-remark" style="flex: 1; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; min-height: 80px;"></textarea>
+                            <button class="btn btn-primary btn-small" onclick="saveRemark()" style="white-space: nowrap;">保存备注</button>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>状态流转</h3>
+                        <div id="detail-transitions" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+                    </div>
+                </div>
+
+                <div id="tab-amount" class="tab-content">
+                    <div class="detail-section">
+                        <h3>金额三段式对比</h3>
+                        <div class="three-columns">
+                            <div class="col-header">原始值</div>
+                            <div class="col-header">修正值</div>
+                            <div class="col-header">最终值</div>
+                        </div>
+                        <div id="amount-comparison"></div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>修正金额</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>修正字段</label>
+                                <select id="correctField">
+                                    <option value="remainingPrincipal">剩余本金</option>
+                                    <option value="remainingServiceFee">剩余服务费</option>
+                                    <option value="refundableServiceFee">可退服务费</option>
+                                    <option value="earlySettlementPenalty">提前结清违约金</option>
+                                    <option value="totalPayableAmount">应还总额</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>修正后金额</label>
+                                <input type="number" id="correctValue" step="0.01">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>修正原因</label>
+                            <input type="text" id="correctReason" placeholder="请输入修正原因">
+                        </div>
+                        <button class="btn btn-warning" onclick="correctAmount()">提交修正</button>
+                        <button class="btn btn-secondary" onclick="recalculate()">重新试算</button>
+                    </div>
+                </div>
+
+                <div id="tab-anomaly" class="tab-content">
+                    <div class="detail-section">
+                        <h3>异常标记列表</h3>
+                        <div id="anomaly-list"></div>
+                    </div>
+                </div>
+
+                <div id="tab-reason" class="tab-content">
+                    <div class="detail-section">
+                        <h3>结清试算理由</h3>
+                        <div class="reason-list" id="reason-trial"></div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>费用冲回理由</h3>
+                        <div class="reason-list" id="reason-fee"></div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>流水核对理由</h3>
+                        <div class="reason-list" id="reason-flow"></div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>状态流转理由</h3>
+                        <div class="reason-list" id="reason-state"></div>
+                    </div>
+                </div>
+
+                <div id="tab-history" class="tab-content">
+                    <div class="detail-section">
+                        <h3>变更历史</h3>
+                        <div id="history-list"></div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
+                    <button class="btn btn-secondary" onclick="closeModal('detailModal')">关闭</button>
+                    <button class="btn btn-primary" onclick="exportReport()">导出详细报告</button>
+                    <button class="btn btn-success" onclick="createStatement()">生成结清单</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="createModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>新建提前结清申请</h2>
+                <button class="close-btn" onclick="closeModal('createModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>合同编号</label>
+                    <input type="text" id="create-contractNo" placeholder="请输入合同编号">
+                </div>
+                <div class="form-group">
+                    <label>申请人</label>
+                    <input type="text" id="create-applicant" placeholder="请输入申请人姓名">
+                </div>
+                <div class="form-group">
+                    <label>结清原因</label>
+                    <textarea id="create-settlementReason" placeholder="请输入结清原因" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="create-operator" value="admin">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-secondary" style="flex: 1;" onclick="closeModal('createModal')">取消</button>
+                    <button class="btn btn-primary" style="flex: 1;" onclick="createApplication()">创建申请</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="exportModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>导出设置</h2>
+                <button class="close-btn" onclick="closeModal('exportModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>导出格式</label>
+                    <select id="export-format">
+                        <option value="CSV">CSV</option>
+                        <option value="EXCEL">Excel</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>导出内容</label>
+                    <div class="export-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="export-includeOriginal"> 包含原始值
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="export-includeCorrection"> 包含修正值
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="export-includeAnomalies" checked> 包含异常标记
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="export-includeReasons"> 包含判断理由
+                        </label>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-secondary" style="flex: 1;" onclick="closeModal('exportModal')">取消</button>
+                    <button class="btn btn-primary" style="flex: 1;" onclick="doExport()">开始导出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentApplicationId = null;
+        let currentUserRole = 'OPERATOR';
+
+        async function searchApplications() {
+            const params = new URLSearchParams();
+            const contractNo = document.getElementById('filterContractNo').value;
+            const status = document.getElementById('filterStatus').value;
+            const hasAnomalies = document.getElementById('filterAnomaly').value;
+
+            if (contractNo) params.append('contractNo', contractNo);
+            if (status) params.append('status', status);
+            if (hasAnomalies) params.append('hasAnomalies', hasAnomalies);
+
+            const res = await fetch('/api/applications?' + params.toString());
+            const result = await res.json();
+            renderTable(result.data);
+        }
+
+        function resetSearch() {
+            document.getElementById('filterContractNo').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterAnomaly').value = '';
+            searchApplications();
+        }
+
+        function renderTable(applications) {
+            const tbody = document.getElementById('applicationsTableBody');
+            tbody.innerHTML = applications.map(app => {
+                const unresolvedAnomalies = (app.anomalies || []).filter(a => !a.resolved);
+                const anomalyBadges = unresolvedAnomalies.slice(0, 2).map(a => 
+                    `<span class="anomaly-badge anomaly-${a.severity}">${a.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>`
+                ).join('');
+
+                return `
+                    <tr>
+                        <td><a href="javascript:void(0)" onclick="showDetail('${app.id}')" style="color: #667eea; text-decoration: none;">${app.applicationNo}</a></td>
+                        <td>${app.contractNo}</td>
+                        <td>${app.applicant}</td>
+                        <td>${new Date(app.applicationDate).toLocaleDateString()}</td>
+                        <td>¥${app.remainingPrincipal.final.toFixed(2)}</td>
+                        <td>¥${app.refundableServiceFee.final.toFixed(2)}</td>
+                        <td>¥${app.totalPayableAmount.final.toFixed(2)}</td>
+                        <td><span class="status-badge status-${app.status}">${app.status}</span></td>
+                        <td>${unresolvedAnomalies.length > 0 ? anomalyBadges + (unresolvedAnomalies.length > 2 ? ` +${unresolvedAnomalies.length - 2}` : '') : '-'}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn btn-secondary btn-small" onclick="showDetail('${app.id}')">查看</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function showDetail(id) {
+            currentApplicationId = id;
+            const [appRes, historyRes] = await Promise.all([
+                fetch(`/api/applications/${id}`),
+                fetch(`/api/applications/${id}/history`)
+            ]);
+            
+            const appResult = await appRes.json();
+            const historyResult = await historyRes.json();
+            
+            const app = appResult.data;
+            const history = historyResult.data;
+
+            document.getElementById('detail-applicationNo').textContent = app.applicationNo;
+            document.getElementById('detail-contractNo').textContent = app.contractNo;
+            document.getElementById('detail-applicant').textContent = app.applicant;
+            document.getElementById('detail-status').innerHTML = `<span class="status-badge status-${app.status}">${app.status}</span>`;
+            document.getElementById('detail-applicationDate').textContent = new Date(app.applicationDate).toLocaleString();
+            document.getElementById('detail-createdBy').textContent = app.createdBy;
+            document.getElementById('detail-settlementReason').textContent = app.settlementReason || '-';
+            document.getElementById('detail-remark').value = app.remark || '';
+
+            const amountFields = [
+                { key: 'remainingPrincipal', label: '剩余本金' },
+                { key: 'remainingServiceFee', label: '剩余服务费' },
+                { key: 'refundableServiceFee', label: '可退服务费' },
+                { key: 'earlySettlementPenalty', label: '提前结清违约金' },
+                { key: 'totalPayableAmount', label: '应还总额' }
+            ];
+
+            document.getElementById('amount-comparison').innerHTML = amountFields.map(field => {
+                const value = app[field.key];
+                return `
+                    <div class="three-columns">
+                        <div class="col-value original">¥${value.original.toFixed(2)}</div>
+                        <div class="col-value corrected">${value.corrected !== undefined ? `¥${value.corrected.toFixed(2)}` : '-'}</div>
+                        <div class="col-value final">¥${value.final.toFixed(2)}</div>
+                    </div>
+                    <div style="text-align: center; font-size: 12px; color: #718096; margin-bottom: 8px;">${field.label}</div>
+                `;
+            }).join('');
+
+            const anomalyList = document.getElementById('anomaly-list');
+            if (app.anomalies && app.anomalies.length > 0) {
+                anomalyList.innerHTML = app.anomalies.map((a, i) => `
+                    <div style="padding: 12px; background: ${a.resolved ? '#f0fff4' : '#fff5f5'}; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid ${a.resolved ? '#48bb78' : '#f56565'};">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-weight: 600;">[${a.severity}] ${a.type}</span>
+                            <span style="font-size: 12px; color: #718096;">${a.resolved ? '已解决' : '未解决'}</span>
+                        </div>
+                        <div style="font-size: 13px; margin-bottom: 8px;">${a.message}</div>
+                        ${!a.resolved ? `<button class="btn btn-small btn-success" onclick="resolveAnomaly('${a.type}')">标记已解决</button>` : ''}
+                    </div>
+                `).join('');
+            } else {
+                anomalyList.innerHTML = '<p style="color: #718096;">暂无异常</p>';
+            }
+
+            document.getElementById('reason-trial').innerHTML = app.reasons.trialCalculation.map(r => 
+                `<div class="reason-item"><span class="reason-code">[${r.code}]</span>${r.message}<br><span class="reason-time">${new Date(r.timestamp).toLocaleString()} | ${r.source}</span></div>`
+            ).join('') || '<p style="color: #718096;">暂无记录</p>';
+
+            document.getElementById('reason-fee').innerHTML = app.reasons.feeReversal.map(r => 
+                `<div class="reason-item"><span class="reason-code">[${r.code}]</span>${r.message}<br><span class="reason-time">${new Date(r.timestamp).toLocaleString()} | ${r.source}</span></div>`
+            ).join('') || '<p style="color: #718096;">暂无记录</p>';
+
+            document.getElementById('reason-flow').innerHTML = app.reasons.flowVerification.map(r => 
+                `<div class="reason-item"><span class="reason-code">[${r.code}]</span>${r.message}<br><span class="reason-time">${new Date(r.timestamp).toLocaleString()} | ${r.source}</span></div>`
+            ).join('') || '<p style="color: #718096;">暂无记录</p>';
+
+            document.getElementById('reason-state').innerHTML = app.reasons.stateTransition.map(r => 
+                `<div class="reason-item"><span class="reason-code">[${r.code}]</span>${r.message}<br><span class="reason-time">${new Date(r.timestamp).toLocaleString()} | 操作人: ${r.operator || '系统'}</span></div>`
+            ).join('') || '<p style="color: #718096;">暂无记录</p>';
+
+            document.getElementById('history-list').innerHTML = history.map(h => `
+                <div class="history-item">
+                    <div class="history-field">${h.fieldName}</div>
+                    <div class="history-change">
+                        旧值: ${JSON.stringify(h.oldValue)} → 新值: ${JSON.stringify(h.newValue)}
+                    </div>
+                    <div class="history-meta">
+                        ${h.changeReason} | ${h.changedBy} | ${new Date(h.changedAt).toLocaleString()}
+                    </div>
+                </div>
+            `).join('') || '<p style="color: #718096;">暂无变更记录</p>';
+
+            const transitionsRes = await fetch(`/api/transitions?status=${app.status}&userRole=${currentUserRole}`);
+            const transitionsResult = await transitionsRes.json();
+            document.getElementById('detail-transitions').innerHTML = transitionsResult.data.map(s => 
+                `<button class="btn btn-small btn-secondary" onclick="transitionStatus('${s}')">${s}</button>`
+            ).join('');
+
+            document.getElementById('detailModal').classList.add('active');
+            switchTab('basic');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        async function saveRemark() {
+            const remark = document.getElementById('detail-remark').value;
+            const res = await fetch(`/api/applications/${currentApplicationId}/remark`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ remark, operator: 'admin' })
+            });
+            if (res.ok) {
+                alert('备注已保存');
+                showDetail(currentApplicationId);
+            }
+        }
+
+        async function correctAmount() {
+            const fieldName = document.getElementById('correctField').value;
+            const correctedValue = parseFloat(document.getElementById('correctValue').value);
+            const correctionReason = document.getElementById('correctReason').value;
+
+            if (!correctionReason) {
+                alert('请输入修正原因');
+                return;
+            }
+
+            const res = await fetch(`/api/applications/${currentApplicationId}/correct`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fieldName, correctedValue, correctedBy: 'admin', correctionReason })
+            });
+
+            if (res.ok) {
+                alert('修正已提交');
+                showDetail(currentApplicationId);
+            } else {
+                const result = await res.json();
+                alert(result.message);
+            }
+        }
+
+        async function recalculate() {
+            const res = await fetch(`/api/applications/${currentApplicationId}/recalculate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ operator: 'admin' })
+            });
+
+            if (res.ok) {
+                alert('重新试算完成');
+                showDetail(currentApplicationId);
+            } else {
+                const result = await res.json();
+                alert(result.message);
+            }
+        }
+
+        async function transitionStatus(targetStatus) {
+            const remark = prompt('请输入状态变更备注（可选）:');
+            const res = await fetch(`/api/applications/${currentApplicationId}/transition`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ targetStatus, userRole: currentUserRole, operator: 'admin', remark })
+            });
+
+            if (res.ok) {
+                alert('状态已更新');
+                showDetail(currentApplicationId);
+            } else {
+                const result = await res.json();
+                alert(result.message);
+            }
+        }
+
+        async function resolveAnomaly(anomalyType) {
+            const reason = prompt('请输入解决原因:');
+            if (!reason) return;
+
+            const res = await fetch(`/api/applications/${currentApplicationId}/resolve-anomaly`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ anomalyType, resolvedBy: 'admin', resolveReason: reason })
+            });
+
+            if (res.ok) {
+                alert('异常已标记为解决');
+                showDetail(currentApplicationId);
+            }
+        }
+
+        function showCreateModal() {
+            document.getElementById('createModal').classList.add('active');
+        }
+
+        async function createApplication() {
+            const contractNo = document.getElementById('create-contractNo').value;
+            const applicant = document.getElementById('create-applicant').value;
+            const settlementReason = document.getElementById('create-settlementReason').value;
+            const operator = document.getElementById('create-operator').value;
+
+            if (!contractNo || !applicant) {
+                alert('请填写必填项');
+                return;
+            }
+
+            const res = await fetch('/api/applications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contractNo, applicant, settlementReason, operator })
+            });
+
+            if (res.ok) {
+                alert('申请创建成功');
+                closeModal('createModal');
+                searchApplications();
+            } else {
+                const result = await res.json();
+                alert(result.message);
+            }
+        }
+
+        function showExportModal() {
+            document.getElementById('exportModal').classList.add('active');
+        }
+
+        async function doExport() {
+            const format = document.getElementById('export-format').value;
+            const options = {
+                format,
+                includeOriginal: document.getElementById('export-includeOriginal').checked,
+                includeCorrection: document.getElementById('export-includeCorrection').checked,
+                includeAnomalies: document.getElementById('export-includeAnomalies').checked,
+                includeReasons: document.getElementById('export-includeReasons').checked
+            };
+
+            const filter = {};
+            const contractNo = document.getElementById('filterContractNo').value;
+            const status = document.getElementById('filterStatus').value;
+            const hasAnomalies = document.getElementById('filterAnomaly').value;
+
+            if (contractNo) filter.contractNo = contractNo;
+            if (status) filter.status = [status];
+            if (hasAnomalies) filter.hasAnomalies = hasAnomalies === 'true';
+
+            const res = await fetch('/api/applications/export', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filter, options })
+            });
+
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = format === 'CSV' ? 'applications.csv' : 'applications.xlsx';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            closeModal('exportModal');
+        }
+
+        async function exportReport() {
+            window.open(`/api/applications/${currentApplicationId}/report`);
+        }
+
+        async function createStatement() {
+            const res = await fetch('/api/statements', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ applicationId: currentApplicationId, createdBy: 'admin' })
+            });
+
+            if (res.ok) {
+                alert('结清单已生成');
+            } else {
+                const result = await res.json();
+                alert(result.message);
+            }
+        }
+
+        searchApplications();
+    </script>
+</body>
+</html>

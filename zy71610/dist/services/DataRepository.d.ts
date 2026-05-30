@@ -1,0 +1,41 @@
+import { SettlementApplication, SettlementStatement, SettlementHistory, SettlementFilter, Currency, InstallmentContract, RepaymentFlow, OverdueRecord, FeeRule } from '../types/models';
+export declare class DataRepository {
+    private applications;
+    private statements;
+    private histories;
+    private contracts;
+    private flows;
+    private overdues;
+    private feeRules;
+    private applicationNoCounter;
+    private statementNoCounter;
+    private generateApplicationNo;
+    private generateStatementNo;
+    saveContract(contract: InstallmentContract): void;
+    getContract(contractNo: string): InstallmentContract | undefined;
+    saveFlows(contractNo: string, flows: RepaymentFlow[]): void;
+    getFlows(contractNo: string): RepaymentFlow[];
+    saveOverdues(contractNo: string, records: OverdueRecord[]): void;
+    getOverdues(contractNo: string): OverdueRecord[];
+    saveFeeRule(rule: FeeRule): void;
+    getActiveFeeRule(contractType: string): FeeRule | undefined;
+    createApplication(data: Partial<SettlementApplication> & {
+        contractNo: string;
+        applicant: string;
+        operator: string;
+    }): SettlementApplication;
+    getApplication(id: string): SettlementApplication | undefined;
+    getApplicationByNo(applicationNo: string): SettlementApplication | undefined;
+    getAllApplications(): SettlementApplication[];
+    filterApplications(filter: SettlementFilter): SettlementApplication[];
+    private recordHistory;
+    correctValue(application: SettlementApplication, fieldName: 'remainingPrincipal' | 'remainingServiceFee' | 'refundableServiceFee' | 'earlySettlementPenalty' | 'totalPayableAmount', correctedValue: Currency, correctedBy: string, correctionReason: string): SettlementApplication;
+    updateRemark(application: SettlementApplication, remark: string, updatedBy: string): SettlementApplication;
+    updateApplication(application: SettlementApplication, updatedBy: string): SettlementApplication;
+    getHistory(applicationId: string): SettlementHistory[];
+    createStatement(application: SettlementApplication, createdBy: string): SettlementStatement;
+    getStatement(id: string): SettlementStatement | undefined;
+    getStatementByApplicationNo(applicationNo: string): SettlementStatement | undefined;
+    markAsExported(statementId: string, exportedBy: string): SettlementStatement | undefined;
+}
+export declare const repository: DataRepository;
