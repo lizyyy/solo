@@ -1,0 +1,42 @@
+[
+  {
+    "txn_id": "BX001",
+    "txn_date": "2025-07-15",
+    "stage": "主舞台",
+    "ticket_type": "全价票",
+    "quantity": 2000,
+    "unit_price": "680",
+    "total_amount": "1360000",
+    "notes": ""
+  },
+  {
+    "txn_id": "BX002",
+    "txn_date": "2025-07-15",
+    "stage": "主舞台",
+    "ticket_type": "学生票",
+    "quantity": 500,
+    "unit_price": "380",
+    "total_amount": "190000",
+    "notes": "凭学生证入场"
+  },
+  {
+    "txn_id": "BX003",
+    "txn_date": "2025-07-16",
+    "stage": "主舞台",
+    "ticket_type": "全价票",
+    "quantity": 1800,
+    "unit_price": "680",
+    "total_amount": "1224000",
+    "notes": ""
+  },
+  {
+    "txn_id": "BX004",
+    "txn_date": "2025-07-15",
+    "stage": "副舞台",
+    "ticket_type": "全价票",
+    "quantity": 800,
+    "unit_price": "480",
+    "total_amount": "384000",
+    "notes": ""
+  }
+]

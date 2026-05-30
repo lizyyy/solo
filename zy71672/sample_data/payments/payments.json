@@ -1,0 +1,29 @@
+[
+  {
+    "payment_id": "PAY001",
+    "artist_id": "ART001",
+    "amount": "200000",
+    "payment_date": "2025-07-01",
+    "payment_type": "保底",
+    "reference_id": "CT001",
+    "notes": "预付保底"
+  },
+  {
+    "payment_id": "PAY002",
+    "artist_id": "ART002",
+    "amount": "300000",
+    "payment_date": "2025-07-01",
+    "payment_type": "保底",
+    "reference_id": "CT002",
+    "notes": ""
+  },
+  {
+    "payment_id": "PAY003",
+    "artist_id": "ART003",
+    "amount": "50000",
+    "payment_date": "2025-07-10",
+    "payment_type": "保底",
+    "reference_id": "CT003",
+    "notes": "部分支付，尾款待结算"
+  }
+]

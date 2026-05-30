@@ -1,0 +1,20 @@
+[
+  {
+    "sponsor_id": "SP001",
+    "sponsor_name": "红牛",
+    "exposure_type": "舞台冠名",
+    "amount": "500000",
+    "artist_ids": ["ART001", "ART002"],
+    "deduction_ratio": "0.10",
+    "notes": "主舞台冠名，仅压轴艺人扣"
+  },
+  {
+    "sponsor_id": "SP002",
+    "sponsor_name": "青岛啤酒",
+    "exposure_type": "展位露出",
+    "amount": "200000",
+    "artist_ids": [],
+    "deduction_ratio": "0.05",
+    "notes": "全场合企，所有艺人均摊"
+  }
+]

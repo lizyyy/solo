@@ -1,0 +1,52 @@
+[
+  {
+    "contract_id": "CT001",
+    "artist_id": "ART001",
+    "artist_name": "陈粒",
+    "guarantee_amount": "200000",
+    "revenue_share_ratio": "0.15",
+    "contract_date": "2025-06-01",
+    "stage": "压轴",
+    "notes": "含3首原创曲目"
+  },
+  {
+    "contract_id": "CT002",
+    "artist_id": "ART002",
+    "artist_name": "新裤子",
+    "guarantee_amount": "300000",
+    "revenue_share_ratio": "0.20",
+    "contract_date": "2025-06-01",
+    "stage": "压轴",
+    "notes": ""
+  },
+  {
+    "contract_id": "CT003",
+    "artist_id": "ART003",
+    "artist_name": "房东的猫",
+    "guarantee_amount": "80000",
+    "revenue_share_ratio": "0.08",
+    "contract_date": "2025-06-01",
+    "stage": "support",
+    "notes": "暖场嘉宾临时替换"
+  },
+  {
+    "contract_id": "CT004_DUP",
+    "artist_id": "ART002",
+    "artist_name": "新裤子",
+    "guarantee_amount": "300000",
+    "revenue_share_ratio": "0.20",
+    "contract_date": "2025-06-05",
+    "stage": "压轴",
+    "notes": "重复录入测试"
+  },
+  {
+    "contract_id": "CT005",
+    "artist_id": "ART005",
+    "artist_name": "马頔",
+    "guarantee_amount": "100000",
+    "revenue_share_ratio": "0.55",
+    "contract_date": "2025-06-01",
+    "stage": "暖场",
+    "notes": "分成比例异常测试"
+  }
+]
