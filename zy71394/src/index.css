@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: #e5e7eb;
+  background-color: #0f1117;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #0f1117;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #151823;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2d3244;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3d445a;
+}
+
+::selection {
+  background-color: rgba(245, 158, 11, 0.3);
+}
+
+code, pre {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2 justify-center;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-amber text-black hover:bg-brand-amberLight active:bg-brand-amberDark;
+  }
+
+  .btn-secondary {
+    @apply btn bg-bg-card text-gray-200 border border-bg-border hover:bg-bg-hover;
+  }
+
+  .btn-danger {
+    @apply btn bg-status-danger/20 text-status-danger border border-status-danger/30 hover:bg-status-danger/30;
+  }
+
+  .btn-success {
+    @apply btn bg-status-success/20 text-status-success border border-status-success/30 hover:bg-status-success/30;
+  }
+
+  .card {
+    @apply bg-bg-card border border-bg-border rounded-lg shadow-card;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 bg-bg-lighter border border-bg-border rounded-md text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand-amber focus:ring-1 focus:ring-brand-amber/50 transition-colors;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-gray-300 mb-1.5;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold;
+  }
+}
+
+mark {
+  background-color: rgba(245, 158, 11, 0.35);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 2px;
+}
