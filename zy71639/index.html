@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>航天器姿态四元数台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0e1a;--panel:#111827;--panel2:#1a2236;--border:#2a3454;
+--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+--accent:#3b82f6;--accent2:#6366f1;--warn:#f59e0b;--error:#ef4444;--ok:#22c55e;
+--glow:0 0 12px rgba(59,130,246,.3)
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'SF Mono','Menlo','Consolas',monospace;font-size:13px}
+#app{display:grid;grid-template-rows:48px 1fr 180px;grid-template-columns:1fr 340px;height:100vh}
+#topbar{grid-column:1/-1;display:flex;align-items:center;padding:0 16px;gap:12px;background:var(--panel);border-bottom:1px solid var(--border);z-index:10}
+#topbar .logo{font-size:15px;font-weight:700;letter-spacing:1px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#topbar .sep{width:1px;height:24px;background:var(--border)}
+.topbtn{background:var(--panel2);border:1px solid var(--border);color:var(--text2);padding:4px 12px;border-radius:4px;cursor:pointer;font:inherit;font-size:12px;transition:.2s}
+.topbtn:hover{border-color:var(--accent);color:var(--text);box-shadow:var(--glow)}
+.topbtn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+#viewport{position:relative;overflow:hidden;background:#060a14}
+#viewport canvas{width:100%!important;height:100%!important}
+.viewport-label{position:absolute;top:10px;left:14px;font-size:11px;color:var(--text3);pointer-events:none}
+.viewport-label span{color:var(--accent);font-weight:600}
+#sidebar{display:flex;flex-direction:column;gap:1px;background:var(--border);overflow-y:auto}
+.panel{background:var(--panel);padding:12px}
+.panel-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.panel-title .dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.panel-title .dot.warn{background:var(--warn)}
+.panel-title .dot.err{background:var(--error)}
+.row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.row label{width:28px;font-size:11px;color:var(--text3);text-align:right;flex-shrink:0}
+.row input[type=number]{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:3px 6px;border-radius:3px;font:inherit;font-size:12px;width:0}
+.row input[type=number]:focus{outline:none;border-color:var(--accent);box-shadow:var(--glow)}
+.row .unit{font-size:10px;color:var(--text3);width:20px;flex-shrink:0}
+.row select{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:3px 4px;border-radius:3px;font:inherit;font-size:12px}
+.metric{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12px}
+.metric .val{font-weight:600}
+.metric .val.ok{color:var(--ok)}.metric .val.warn{color:var(--warn)}.metric .val.err{color:var(--error)}
+.normbtn{background:var(--panel2);border:1px solid var(--accent);color:var(--accent);padding:2px 10px;border-radius:3px;cursor:pointer;font:inherit;font-size:11px;margin-top:4px;transition:.2s}
+.normbtn:hover{background:var(--accent);color:#fff}
+.thruster-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.thruster{background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-size:11px;cursor:pointer;transition:.2s}
+.thruster:hover{border-color:var(--accent)}
+.thruster.firing{border-color:var(--warn);box-shadow:0 0 8px rgba(245,158,11,.3)}
+.thruster .tid{color:var(--text3)}.thruster .tstat{float:right;font-weight:600}
+.thruster .tstat.on{color:var(--warn)}.thruster .tstat.off{color:var(--text3)}
+#timeline{grid-column:1/-1;background:var(--panel);border-top:1px solid var(--border);display:flex;flex-direction:column}
+.tl-header{display:flex;align-items:center;padding:6px 14px;gap:8px;border-bottom:1px solid var(--border);flex-shrink:0}
+.tl-header .panel-title{margin:0}
+.tl-btn{background:none;border:1px solid var(--border);color:var(--text2);width:26px;height:26px;border-radius:4px;cursor:pointer;font:inherit;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.2s}
+.tl-btn:hover{border-color:var(--accent);color:var(--text)}
+.tl-btn.rec{border-color:var(--error);color:var(--error)}
+.tl-time{font-size:12px;color:var(--text2);margin-left:auto}
+.tl-body{flex:1;position:relative;overflow-x:auto;overflow-y:hidden;padding:0 14px}
+.tl-axis{position:absolute;top:50%;left:14px;right:14px;height:1px;background:var(--border)}
+.tl-cursor{position:absolute;top:0;bottom:0;width:2px;background:var(--accent);z-index:5;pointer-events:none;transition:left .1s}
+.tl-cursor::before{content:'';position:absolute;top:-2px;left:-4px;width:10px;height:10px;background:var(--accent);border-radius:50%}
+.tl-keyframe{position:absolute;top:50%;width:8px;height:8px;background:var(--accent2);border-radius:2px;transform:translate(-50%,-50%) rotate(45deg);cursor:pointer;z-index:4;transition:.2s}
+.tl-keyframe:hover{background:var(--accent);transform:translate(-50%,-50%) rotate(45deg) scale(1.4)}
+.tl-keyframe.exception{background:var(--error)}
+.tl-keyframe.confirm{background:var(--ok)}
+#detail-panel{position:fixed;top:48px;right:340px;width:320px;max-height:calc(100vh - 240px);background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:20;overflow-y:auto;display:none}
+#detail-panel.show{display:block}
+.dp-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.dp-header h3{font-size:13px;font-weight:700}
+.dp-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1}
+.dp-body{padding:12px 14px}
+.dp-section{margin-bottom:10px}
+.dp-section .ds-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.dp-section .ds-value{font-size:12px;line-height:1.6}
+.dp-section .ds-value .tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600;margin-right:4px}
+.tag-normal{background:rgba(34,197,94,.15);color:var(--ok)}
+.tag-warn{background:rgba(245,158,11,.15);color:var(--warn)}
+.tag-error{background:rgba(239,68,68,.15);color:var(--error)}
+.tag-info{background:rgba(59,130,246,.15);color:var(--accent)}
+#exception-bar{position:absolute;top:10px;right:10px;width:280px;z-index:15;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.exc-item{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:8px 10px;pointer-events:auto;cursor:pointer;transition:.2s;font-size:12px}
+.exc-item:hover{border-color:var(--accent);box-shadow:var(--glow)}
+.exc-item.ex-err{border-left:3px solid var(--error)}
+.exc-item.ex-warn{border-left:3px solid var(--warn)}
+.exc-item .ex-title{font-weight:600;margin-bottom:2px}
+.exc-item .ex-desc{color:var(--text3);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#history-panel{position:fixed;bottom:200px;left:14px;width:300px;max-height:300px;background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:20;display:none;overflow-y:auto}
+#history-panel.show{display:block}
+.hp-header{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.hp-header h3{font-size:12px;font-weight:700}
+.hp-body{padding:6px 0}
+.hp-entry{padding:4px 12px;font-size:11px;border-left:3px solid transparent;cursor:pointer;transition:.1s}
+.hp-entry:hover{background:var(--panel2)}
+.hp-entry.he-confirm{border-left-color:var(--ok)}
+.hp-entry.he-exception{border-left-color:var(--error)}
+.hp-entry.he-edit{border-left-color:var(--accent)}
+.hp-entry .he-time{color:var(--text3);margin-right:8px}
+.hp-entry .he-before{color:var(--error);text-decoration:line-through;opacity:.6}
+.hp-entry .he-after{color:var(--ok)}
+.hp-entry .he-arrow{color:var(--text3);margin:0 4px}
+.confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:50;display:none;align-items:center;justify-content:center}
+.confirm-overlay.show{display:flex}
+.confirm-dialog{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px;max-width:400px;width:90%}
+.confirm-dialog h3{margin-bottom:12px;font-size:14px}
+.confirm-dialog .cd-diff{background:var(--panel2);border-radius:6px;padding:10px;margin-bottom:14px;font-size:12px;line-height:1.8}
+.confirm-dialog .cd-diff .del{color:var(--error);text-decoration:line-through;opacity:.7}
+.confirm-dialog .cd-diff .ins{color:var(--ok)}
+.confirm-dialog .cd-btns{display:flex;gap:8px;justify-content:flex-end}
+.confirm-dialog .cd-btns button{padding:6px 16px;border-radius:4px;cursor:pointer;font:inherit;font-size:12px;border:1px solid var(--border)}
+.cd-yes{background:var(--accent);color:#fff;border-color:var(--accent)!important}
+.cd-no{background:var(--panel2);color:var(--text2)}
+#report-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:50;display:none;align-items:center;justify-content:center}
+#report-modal.show{display:flex}
+.rm-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto}
+.rm-box h3{margin-bottom:12px;font-size:14px}
+.rm-box pre{background:var(--panel2);border-radius:6px;padding:12px;font-size:11px;line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.rm-box .rm-actions{margin-top:12px;display:flex;gap:8px;justify-content:flex-end}
+.gimbal-legend{position:absolute;bottom:14px;left:14px;display:flex;gap:12px;font-size:11px;color:var(--text3);pointer-events:none}
+.gimbal-legend span{display:flex;align-items:center;gap:4px}
+.gimbal-legend .ldot{width:8px;height:8px;border-radius:50%}
+.param-chart{position:absolute;bottom:14px;right:10px;width:260px;height:120px;background:var(--panel);border:1px solid var(--border);border-radius:6px;z-index:14;display:none;padding:6px 8px}
+.param-chart.show{display:block}
+.param-chart .pc-title{font-size:10px;color:var(--text3);margin-bottom:2px}
+.param-chart canvas{width:100%;height:90px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <span class="logo">航天器姿态四元数台</span>
+    <span class="sep"></span>
+    <button class="topbtn" id="btnGimbal">万向节锁演示</button>
+    <button class="topbtn" id="btnReset">重置姿态</button>
+    <button class="topbtn" id="btnHistory">操作历史</button>
+    <button class="topbtn" id="btnChart">参数历史</button>
+    <button class="topbtn" id="btnReport">课堂报告</button>
+    <button class="topbtn" id="btnScreenshot">截图导出</button>
+    <span style="flex:1"></span>
+    <span style="font-size:11px;color:var(--text3)" id="statusLine">就绪</span>
+  </div>
+  <div id="viewport">
+    <div class="viewport-label">当前视图: <span id="viewModeLabel">姿态总览</span></div>
+    <div id="exception-bar"></div>
+    <div class="gimbal-legend" id="gimbalLegend" style="display:none">
+      <span><span class="ldot" style="background:#ef4444"></span>外环 (Yaw)</span>
+      <span><span class="ldot" style="background:#22c55e"></span>中环 (Pitch)</span>
+      <span><span class="ldot" style="background:#3b82f6"></span>内环 (Roll)</span>
+    </div>
+    <div class="param-chart" id="paramChart">
+      <div class="pc-title">参数历史曲线</div>
+      <canvas id="chartCanvas"></canvas>
+    </div>
+  </div>
+  <div id="sidebar">
+    <div class="panel" id="quatPanel">
+      <div class="panel-title"><span class="dot" id="quatDot"></span>四元数 Quaternion</div>
+      <div class="row"><label>q0</label><input type="number" id="q0" step="0.01" value="1"><span class="unit">w</span></div>
+      <div class="row"><label>q1</label><input type="number" id="q1" step="0.01" value="0"><span class="unit">i</span></div>
+      <div class="row"><label>q2</label><input type="number" id="q2" step="0.01" value="0"><span class="unit">j</span></div>
+      <div class="row"><label>q3</label><input type="number" id="q3" step="0.01" value="0"><span class="unit">k</span></div>
+      <div class="metric"><span>模 ||q||</span><span class="val" id="qNorm">1.0000</span></div>
+      <div class="metric"><span>归一化状态</span><span class="val ok" id="qNormStatus">已归一</span></div>
+      <button class="normbtn" id="btnNormalize">归一化 q <- q/||q||</button>
+    </div>
+    <div class="panel" id="eulerPanel">
+      <div class="panel-title"><span class="dot" id="eulerDot"></span>姿态角 Euler Angles</div>
+      <div class="row"><label>f</label><input type="number" id="eulerRoll" step="1" value="0"><span class="unit">deg</span></div>
+      <div class="row"><label>q</label><input type="number" id="eulerPitch" step="1" value="0"><span class="unit">deg</span></div>
+      <div class="row"><label>y</label><input type="number" id="eulerYaw" step="1" value="0"><span class="unit">deg</span></div>
+      <div class="row"><label>序</label>
+        <select id="rotOrder">
+          <option value="ZYX" selected>ZYX (航天常用)</option>
+          <option value="XYZ">XYZ</option>
+          <option value="ZXY">ZXY</option>
+          <option value="YXZ">YXZ</option>
+          <option value="YZX">YZX</option>
+          <option value="XZY">XZY</option>
+        </select>
+      </div>
+      <div class="metric"><span>万向节锁</span><span class="val" id="gimbalStatus">无</span></div>
+    </div>
+    <div class="panel" id="thrusterPanel">
+      <div class="panel-title"><span class="dot"></span>推力器 Thrusters</div>
+      <div class="thruster-grid" id="thrusterGrid"></div>
+    </div>
+    <div class="panel" id="infoPanel">
+      <div class="panel-title"><span class="dot"></span>选中对象</div>
+      <div id="selectedInfo" style="font-size:12px;color:var(--text3);line-height:1.6">点击3D场景中的对象查看详情</div>
+    </div>
+  </div>
+  <div id="timeline">
+    <div class="tl-header">
+      <span class="panel-title" style="margin:0">时间轴 Timeline</span>
+      <button class="tl-btn" id="tlPlay" title="播放">▶</button>
+      <button class="tl-btn" id="tlPause" title="暂停">⏸</button>
+      <button class="tl-btn rec" id="tlRecord" title="记录关键帧">●</button>
+      <span class="tl-time" id="tlTime">T = 0.00s</span>
+    </div>
+    <div class="tl-body" id="tlBody">
+      <div class="tl-axis"></div>
+      <div class="tl-cursor" id="tlCursor" style="left:14px"></div>
+    </div>
+  </div>
+</div>
+
+<div id="detail-panel">
+  <div class="dp-header"><h3 id="dpTitle">对象详情</h3><button class="dp-close" id="dpClose">✕</button></div>
+  <div class="dp-body" id="dpBody"></div>
+</div>
+
+<div id="history-panel">
+  <div class="hp-header"><h3>操作历史</h3><button class="dp-close" id="hpClose">✕</button></div>
+  <div class="hp-body" id="hpBody"></div>
+</div>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-dialog">
+    <h3 id="confirmTitle">确认操作</h3>
+    <div class="cd-diff" id="confirmDiff"></div>
+    <div class="cd-btns">
+      <button class="cd-no" id="confirmNo">取消</button>
+      <button class="cd-yes" id="confirmYes">确认</button>
+    </div>
+  </div>
+</div>
+
+<div id="report-modal">
+  <div class="rm-box">
+    <h3>课堂报告</h3>
+    <pre id="reportContent"></pre>
+    <div class="rm-actions">
+      <button class="topbtn" id="reportCopy">复制</button>
+      <button class="topbtn" id="reportClose">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+const DEG=Math.PI/180, RAD=180/Math.PI, EPS=1e-6;
+
+const state={
+  quaternion:new THREE.Quaternion(1,0,0,0),
+  euler:new THREE.Euler(0,0,0,'ZYX'),
+  rotOrder:'ZYX',
+  gimbalMode:false,
+  thrusters:[
+    {id:'T1',label:'+X 推力',axis:new THREE.Vector3(1,0,0),firing:false},
+    {id:'T2',label:'-X 推力',axis:new THREE.Vector3(-1,0,0),firing:false},
+    {id:'T3',label:'+Y 推力',axis:new THREE.Vector3(0,1,0),firing:false},
+    {id:'T4',label:'-Y 推力',axis:new THREE.Vector3(0,-1,0),firing:false},
+    {id:'T5',label:'+Z 推力',axis:new THREE.Vector3(0,0,1),firing:false},
+    {id:'T6',label:'-Z 推力',axis:new THREE.Vector3(0,0,-1),firing:false}
+  ],
+  selectedObj:null,
+  exceptions:[],
+  history:[],
+  keyframes:[],
+  paramHistory:[],
+  tlTime:0,
+  tlPlaying:false,
+  prevEulerDeg:[0,0,0],
+  confirmCallback:null
+};
+
+const container=document.getElementById('viewport');
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setClearColor(0x060a14);
+container.appendChild(renderer.domElement);
+
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(50,1,0.1,100);
+camera.position.set(4,3,5);
+camera.lookAt(0,0,0);
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+controls.dampingFactor=0.08;
+
+scene.add(new THREE.AmbientLight(0x404060,1.5));
+const dirLight=new THREE.DirectionalLight(0xffffff,1.2);
+dirLight.position.set(5,8,5);
+scene.add(dirLight);
+const pl=new THREE.PointLight(0x3b82f6,0.5,20);
+pl.position.set(-3,2,-3);
+scene.add(pl);
+
+const starsGeo=new THREE.BufferGeometry();
+const starsPos=new Float32Array(3000);
+for(let i=0;i<3000;i++)starsPos[i]=(Math.random()-0.5)*80;
+starsGeo.setAttribute('position',new THREE.BufferAttribute(starsPos,3));
+scene.add(new THREE.Points(starsGeo,new THREE.PointsMaterial({color:0xffffff,size:0.08})));
+
+function makeAxisLine(dir,color,len){
+  const pts=[new THREE.Vector3(),dir.clone().multiplyScalar(len)];
+  return new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(pts),
+    new THREE.LineBasicMaterial({color})
+  );
+}
+
+const inertialFrame=new THREE.Group();
+inertialFrame.add(makeAxisLine(new THREE.Vector3(1,0,0),0xff4444,3));
+inertialFrame.add(makeAxisLine(new THREE.Vector3(0,1,0),0x44ff44,3));
+inertialFrame.add(makeAxisLine(new THREE.Vector3(0,0,1),0x4488ff,3));
+scene.add(inertialFrame);
+
+const spacecraft=new THREE.Group();
+spacecraft.name='spacecraft';
+
+const bodyMesh=new THREE.Mesh(
+  new THREE.BoxGeometry(1.2,0.8,0.8),
+  new THREE.MeshPhongMaterial({color:0x334155,emissive:0x0a1020,specular:0x556688,shininess:60})
+);
+bodyMesh.name='scBody';
+bodyMesh.userData._origEmissive=0x0a1020;
+spacecraft.add(bodyMesh);
+
+const panelMat=new THREE.MeshPhongMaterial({color:0x1a3a5c,emissive:0x0a1a30,specular:0x3366aa,shininess:80});
+const panelL=new THREE.Mesh(new THREE.BoxGeometry(2.0,0.04,0.8),panelMat);
+panelL.position.set(0,0,0.9);
+panelL.name='scPanelL';
+panelL.userData._origEmissive=0x0a1a30;
+spacecraft.add(panelL);
+const panelR=new THREE.Mesh(new THREE.BoxGeometry(2.0,0.04,0.8),panelMat.clone());
+panelR.position.set(0,0,-0.9);
+panelR.name='scPanelR';
+panelR.userData._origEmissive=0x0a1a30;
+spacecraft.add(panelR);
+
+const antenna=new THREE.Mesh(
+  new THREE.CylinderGeometry(0.02,0.02,0.8,8),
+  new THREE.MeshPhongMaterial({color:0x88aacc})
+);
+antenna.position.set(0,0.8,0);
+antenna.name='scAntenna';
+antenna.userData._origEmissive=0;
+spacecraft.add(antenna);
+
+const dish=new THREE.Mesh(
+  new THREE.SphereGeometry(0.15,16,8,0,Math.PI),
+  new THREE.MeshPhongMaterial({color:0xccddee,side:THREE.DoubleSide})
+);
+dish.position.set(0,1.2,0);
+dish.rotation.x=Math.PI/2;
+dish.name='scDish';
+dish.userData._origEmissive=0;
+spacecraft.add(dish);
+
+const bodyFrame=new THREE.Group();
+bodyFrame.add(makeAxisLine(new THREE.Vector3(1,0,0),0xff6666,1.8));
+bodyFrame.add(makeAxisLine(new THREE.Vector3(0,1,0),0x66ff66,1.8));
+bodyFrame.add(makeAxisLine(new THREE.Vector3(0,0,1),0x6688ff,1.8));
+spacecraft.add(bodyFrame);
+
+const thrusterMeshes=[];
+const thrusterArms={
+  T1:new THREE.Vector3(0,0.3,0.3),
+  T2:new THREE.Vector3(0,0.3,-0.3),
+  T3:new THREE.Vector3(0.3,0,0.3),
+  T4:new THREE.Vector3(0.3,0,-0.3),
+  T5:new THREE.Vector3(0.3,0.3,0),
+  T6:new THREE.Vector3(0.3,-0.3,0)
+};
+state.thrusters.forEach((t)=>{
+  const cone=new THREE.Mesh(
+    new THREE.ConeGeometry(0.06,0.2,8),
+    new THREE.MeshPhongMaterial({color:0x445566,emissive:0x000000})
+  );
+  cone.name='thruster_'+t.id;
+  cone.userData._origEmissive=0;
+  const pos=t.axis.clone().multiplyScalar(0.65);
+  if(Math.abs(t.axis.x)===1){cone.rotation.z=-Math.sign(t.axis.x)*Math.PI/2;}
+  else if(Math.abs(t.axis.z)===1){cone.rotation.x=Math.sign(t.axis.z)*Math.PI/2;}
+  cone.position.copy(pos);
+  spacecraft.add(cone);
+  thrusterMeshes.push(cone);
+});
+
+scene.add(spacecraft);
+
+let gimbalGroup=null;
+function buildGimbal(){
+  if(gimbalGroup)scene.remove(gimbalGroup);
+  gimbalGroup=new THREE.Group();
+  gimbalGroup.name='gimbalSystem';
+  const ringMat=(c)=>new THREE.MeshPhongMaterial({color:c,transparent:true,opacity:0.35,side:THREE.DoubleSide});
+
+  const outerGroup=new THREE.Group();
+  outerGroup.name='gimbalYaw';
+  const outerRing=new THREE.Mesh(new THREE.TorusGeometry(2.2,0.04,8,64),ringMat(0xef4444));
+  outerRing.name='gimbalOuter';
+  outerRing.rotation.x=Math.PI/2;
+  outerRing.userData._origEmissive=0;
+  outerGroup.add(outerRing);
+
+  const midGroup=new THREE.Group();
+  midGroup.name='gimbalPitch';
+  const midRing=new THREE.Mesh(new THREE.TorusGeometry(1.8,0.04,8,64),ringMat(0x22c55e));
+  midRing.name='gimbalMid';
+  midRing.userData._origEmissive=0;
+  midGroup.add(midRing);
+  outerGroup.add(midGroup);
+
+  const innerGroup=new THREE.Group();
+  innerGroup.name='gimbalRoll';
+  const innerRing=new THREE.Mesh(new THREE.TorusGeometry(1.4,0.04,8,64),ringMat(0x3b82f6));
+  innerRing.name='gimbalInner';
+  innerRing.rotation.y=Math.PI/2;
+  innerRing.userData._origEmissive=0;
+  innerGroup.add(innerRing);
+  midGroup.add(innerGroup);
+
+  gimbalGroup.add(outerGroup);
+  scene.add(gimbalGroup);
+  gimbalGroup.visible=state.gimbalMode;
+}
+buildGimbal();
+
+const raycaster=new THREE.Raycaster();
+const mouse=new THREE.Vector2();
+
+function quatFromInputs(){
+  return new THREE.Quaternion(
+    parseFloat(document.getElementById('q1').value)||0,
+    parseFloat(document.getElementById('q2').value)||0,
+    parseFloat(document.getElementById('q3').value)||0,
+    parseFloat(document.getElementById('q0').value)||0
+  );
+}
+
+function setQuatInputs(q){
+  document.getElementById('q0').value=q.w.toFixed(4);
+  document.getElementById('q1').value=q.x.toFixed(4);
+  document.getElementById('q2').value=q.y.toFixed(4);
+  document.getElementById('q3').value=q.z.toFixed(4);
+}
+
+function eulerFromInputs(){
+  return new THREE.Euler(
+    (parseFloat(document.getElementById('eulerRoll').value)||0)*DEG,
+    (parseFloat(document.getElementById('eulerPitch').value)||0)*DEG,
+    (parseFloat(document.getElementById('eulerYaw').value)||0)*DEG,
+    state.rotOrder
+  );
+}
+
+function setEulerInputs(e){
+  document.getElementById('eulerRoll').value=(e.x*RAD).toFixed(2);
+  document.getElementById('eulerPitch').value=(e.y*RAD).toFixed(2);
+  document.getElementById('eulerYaw').value=(e.z*RAD).toFixed(2);
+}
+
+function updateNormDisplay(){
+  const q=quatFromInputs();
+  const norm=Math.sqrt(q.w*q.w+q.x*q.x+q.y*q.y+q.z*q.z);
+  const el=document.getElementById('qNorm');
+  el.textContent=norm.toFixed(6);
+  const statusEl=document.getElementById('qNormStatus');
+  const dotEl=document.getElementById('quatDot');
+  if(Math.abs(norm-1)<0.01){
+    el.className='val ok';statusEl.className='val ok';statusEl.textContent='已归一';dotEl.className='dot';
+  }else if(Math.abs(norm-1)<0.05){
+    el.className='val warn';statusEl.className='val warn';statusEl.textContent='接近未归一';dotEl.className='dot warn';
+  }else{
+    el.className='val err';statusEl.className='val err';statusEl.textContent='未归一!';dotEl.className='dot err';
+  }
+}
+
+function detectExceptions(){
+  const exceptions=[];
+  const q=quatFromInputs();
+  const norm=Math.sqrt(q.w*q.w+q.x*q.x+q.y*q.y+q.z*q.z);
+
+  if(Math.abs(norm-1)>0.05){
+    exceptions.push({
+      type:'error',code:'QUAT_NOT_NORMALIZED',
+      title:'四元数未归一',
+      desc:'||q|| = '+norm.toFixed(6)+'，偏离单位四元数。\n姿态旋转矩阵将附带缩放分量，物理含义失效。\n根因分析：数值积分漂移 / 人为输入错误 / 插值算法缺陷\n处置：执行归一化 q <- q/||q||',
+      source:'四元数输入',severity:'error'
+    });
+  }else if(Math.abs(norm-1)>0.01){
+    exceptions.push({
+      type:'warn',code:'QUAT_NEAR_DENORM',
+      title:'四元数接近未归一',
+      desc:'||q|| = '+norm.toFixed(6)+'，虽在容忍范围内，\n但数值漂移在迭代积分中会指数增长。\n建议：每步积分后强制归一化',
+      source:'四元数输入',severity:'warn'
+    });
+  }
+
+  if(state.rotOrder!=='ZYX'){
+    exceptions.push({
+      type:'warn',code:'ROT_ORDER_UNUSUAL',
+      title:'旋转顺序非航天标准',
+      desc:'当前顺序 '+state.rotOrder+'，航天领域标准为 ZYX (3-2-1)。\n不同旋转顺序下同一四元数对应的欧拉角完全不同，\n可能导致：理解偏差 / 万向节锁出现在不同轴 / 控制指令解释错误',
+      source:'姿态角设置',severity:'warn'
+    });
+  }
+
+  const euler=eulerFromInputs();
+  const pitchDeg=Math.abs(euler.y*RAD);
+  if(pitchDeg>85&&pitchDeg<95){
+    exceptions.push({
+      type:'error',code:'GIMBAL_LOCK',
+      title:'万向节锁!',
+      desc:'Pitch = '+(euler.y*RAD).toFixed(1)+'deg，接近±90deg。\n数学机理：Pitch±90deg时 Yaw轴与Roll轴重合，\n旋转矩阵从3自由度退化为2自由度。\n此时 YawΔ 和 RollΔ 产生相同的物理旋转。\n四元数表示无此问题——这正是本课核心知识点。',
+      source:'姿态角计算',severity:'error'
+    });
+    document.getElementById('gimbalStatus').className='val err';
+    document.getElementById('gimbalStatus').textContent='已锁定!';
+    document.getElementById('eulerDot').className='dot err';
+  }else if(pitchDeg>80&&pitchDeg<100){
+    exceptions.push({
+      type:'warn',code:'NEAR_GIMBAL_LOCK',
+      title:'接近万向节锁',
+      desc:'Pitch = '+(euler.y*RAD).toFixed(1)+'deg，距临界区不到10deg。\n欧拉角数值导数趋于无穷，\n小角度变化导致大数值跳变，\n控制系统可能出现震荡。',
+      source:'姿态角计算',severity:'warn'
+    });
+    document.getElementById('gimbalStatus').className='val warn';
+    document.getElementById('gimbalStatus').textContent='接近锁定';
+    document.getElementById('eulerDot').className='dot warn';
+  }else{
+    document.getElementById('gimbalStatus').className='val ok';
+    document.getElementById('gimbalStatus').textContent='无';
+    document.getElementById('eulerDot').className='dot';
+  }
+
+  const curDeg=[euler.x*RAD,euler.y*RAD,euler.z*RAD];
+  const maxDelta=Math.max(
+    Math.abs(curDeg[0]-state.prevEulerDeg[0]),
+    Math.abs(curDeg[1]-state.prevEulerDeg[1]),
+    Math.abs(curDeg[2]-state.prevEulerDeg[2])
+  );
+  if(maxDelta>60&&state.prevEulerDeg[0]!==0){
+    exceptions.push({
+      type:'warn',code:'ATTITUDE_JUMP',
+      title:'姿态跳变',
+      desc:'单步姿态变化达 '+maxDelta.toFixed(1)+'deg，超出常规机动速率限制。\n可能原因：\n1) 欧拉角穿越±180deg边界 (正常，但需确认)\n2) 数值奇点导致非物理跳变\n3) 非法指令注入\n4) 姿态确定系统故障\n\n需人工确认是否为期望机动。',
+      source:'姿态角变化',severity:'warn'
+    });
+  }
+  state.prevEulerDeg=curDeg;
+
+  const firing=state.thrusters.filter(t=>t.firing);
+  if(firing.length>1){
+    const torque=new THREE.Vector3();
+    firing.forEach(t=>{
+      torque.add(new THREE.Vector3().crossVectors(thrusterArms[t.id],t.axis));
+    });
+    if(torque.length()<EPS){
+      exceptions.push({
+        type:'warn',code:'ZERO_TORQUE',
+        title:'推力器力矩抵消',
+        desc:firing.map(t=>t.id).join(' + ')+' 产生的力矩矢量合成趋近零。\n推力器做无用功，且消耗推进剂。\n需检查推力器分配策略或确认是否为力平衡维持模式。',
+        source:'推力器系统',severity:'warn'
+      });
+    }
+  }
+
+  state.exceptions=exceptions;
+  renderExceptions();
+}
+
+function renderExceptions(){
+  const bar=document.getElementById('exception-bar');
+  bar.innerHTML='';
+  state.exceptions.forEach(ex=>{
+    const el=document.createElement('div');
+    el.className='exc-item '+(ex.type==='error'?'ex-err':'ex-warn');
+    el.innerHTML='<div class="ex-title">'+ex.title+'</div><div class="ex-desc">'+ex.desc.split('\n')[0]+'</div>';
+    el.onclick=()=>showExceptionDetail(ex);
+    bar.appendChild(el);
+  });
+}
+
+function showExceptionDetail(ex){
+  const dp=document.getElementById('detail-panel');
+  document.getElementById('dpTitle').textContent=ex.title;
+  const sevClass=ex.severity==='error'?'tag-error':ex.severity==='warn'?'tag-warn':'tag-info';
+  document.getElementById('dpBody').innerHTML=
+    '<div class="dp-section"><div class="ds-label">异常代码</div><div class="ds-value"><span class="tag '+sevClass+'">'+ex.code+'</span></div></div>'+
+    '<div class="dp-section"><div class="ds-label">来源</div><div class="ds-value">'+ex.source+'</div></div>'+
+    '<div class="dp-section"><div class="ds-label">严重等级</div><div class="ds-value"><span class="tag '+sevClass+'">'+(ex.severity==='error'?'严重':ex.severity==='warn'?'警告':'提示')+'</span></div></div>'+
+    '<div class="dp-section"><div class="ds-label">详细说明</div><div class="ds-value" style="white-space:pre-wrap">'+ex.desc+'</div></div>'+
+    '<div class="dp-section"><div class="ds-label">处置建议</div><div class="ds-value">'+getExceptionAdvice(ex.code)+'</div></div>';
+  dp.classList.add('show');
+}
+
+function getExceptionAdvice(code){
+  const m={
+    'QUAT_NOT_NORMALIZED':'立即执行归一化 q <- q/||q||。\n如持续出现，检查数值积分算法是否每步归一化。\n在RK4积分中，归一化应在每步完成后执行。',
+    'QUAT_NEAR_DENORM':'预防性归一化。长期积分中漂移不可避免，\n建议在姿态更新循环中加入自动归一化步骤。',
+    'ROT_ORDER_UNUSUAL':'确认旋转顺序是否为任务需求。\n航天标准 ZYX (3-2-1)：先偏航，再俯仰，再滚转。\n如无特殊需求，请切换回ZYX。',
+    'GIMBAL_LOCK':'万向节锁是欧拉角固有数学缺陷！\n1) 切换到四元数控制模式 (无万向节锁)\n2) 如必须用欧拉角，避免Pitch接近±90deg\n3) 这是本课核心知识点：四元数 vs 欧拉角',
+    'NEAR_GIMBAL_LOCK':'欧拉角数值不稳定性增大。\n建议此区域使用四元数进行姿态描述和控制器设计。\n如需欧拉角输出，考虑使用修正罗德里格参数(MRP)。',
+    'ATTITUDE_JUMP':'需人工确认此变化是否为期望机动。\n确认后将在历史中标记"人工确认-合法跳变"。\n如为异常，检查指令链路和ADS子系统。',
+    'ZERO_TORQUE':'推力器组合未产生有效力矩。\n检查：1)是否为力平衡模式 2)分配算法是否正确 3)关闭冗余推力器节省推进剂。'
+  };
+  return m[code]||'请根据具体情况分析处理。';
+}
+
+function addHistory(type,description,before,after){
+  state.history.push({
+    type,description,
+    before:before?JSON.parse(JSON.stringify(before)):null,
+    after:after?JSON.parse(JSON.stringify(after)):null,
+    time:state.tlTime,
+    timestamp:Date.now()
+  });
+  renderHistory();
+}
+
+function renderHistory(){
+  const body=document.getElementById('hpBody');
+  body.innerHTML='';
+  [...state.history].reverse().forEach((h)=>{
+    const el=document.createElement('div');
+    el.className='hp-entry he-'+h.type;
+    let detail=h.description;
+    if(h.before&&h.after){
+      detail+=' <span class="he-before">'+fmtHV(h.before)+'</span><span class="he-arrow">→</span><span class="he-after">'+fmtHV(h.after)+'</span>';
+    }
+    el.innerHTML='<span class="he-time">T'+h.time.toFixed(1)+'s</span>'+detail;
+    el.onclick=()=>showHistoryDetail(h);
+    body.appendChild(el);
+  });
+}
+
+function fmtHV(v){
+  if(v.quaternion)return 'q('+v.quaternion.map(n=>n.toFixed(3)).join(',')+')';
+  if(v.euler)return 'E('+v.euler.map(n=>n.toFixed(1)).join(',')+'deg)['+(v.order||'ZYX')+']';
+  if(v.thruster)return v.thruster+': '+v.from+'→'+v.to;
+  if(v.time!==undefined)return 'T='+v.time.toFixed(1)+'s';
+  return JSON.stringify(v);
+}
+
+function showHistoryDetail(h){
+  const dp=document.getElementById('detail-panel');
+  document.getElementById('dpTitle').textContent='历史记录详情';
+  const typeLabels={confirm:'人工确认',exception:'异常',edit:'编辑'};
+  const typeClasses={confirm:'tag-normal',exception:'tag-error',edit:'tag-info'};
+  let html='<div class="dp-section"><div class="ds-label">时间</div><div class="ds-value">T = '+h.time.toFixed(2)+'s</div></div>';
+  html+='<div class="dp-section"><div class="ds-label">类型</div><div class="ds-value"><span class="tag '+(typeClasses[h.type]||'tag-info')+'">'+(typeLabels[h.type]||h.type)+'</span></div></div>';
+  html+='<div class="dp-section"><div class="ds-label">描述</div><div class="ds-value">'+h.description+'</div></div>';
+  if(h.before)html+='<div class="dp-section"><div class="ds-label">变更前</div><div class="ds-value" style="color:var(--error)">'+fmtHV(h.before)+'</div></div>';
+  if(h.after)html+='<div class="dp-section"><div class="ds-label">变更后</div><div class="ds-value" style="color:var(--ok)">'+fmtHV(h.after)+'</div></div>';
+  document.getElementById('dpBody').innerHTML=html;
+  dp.classList.add('show');
+}
+
+function requestConfirm(title,before,after,callback){
+  state.confirmCallback=callback;
+  document.getElementById('confirmTitle').textContent=title;
+  const diffEl=document.getElementById('confirmDiff');
+  let html='';
+  if(before)html+='<div class="del">变更前: '+fmtHV(before)+'</div>';
+  if(after)html+='<div class="ins">变更后: '+fmtHV(after)+'</div>';
+  if(!before&&!after)html='<div>确认执行此操作？</div>';
+  diffEl.innerHTML=html;
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+
+document.getElementById('confirmYes').onclick=()=>{
+  if(state.confirmCallback){
+    state.confirmCallback();
+  }
+  document.getElementById('confirmOverlay').classList.remove('show');
+  state.confirmCallback=null;
+};
+document.getElementById('confirmNo').onclick=()=>{
+  addHistory('confirm','取消确认操作',null,null);
+  document.getElementById('confirmOverlay').classList.remove('show');
+  state.confirmCallback=null;
+};
+
+document.getElementById('dpClose').onclick=()=>{
+  document.getElementById('detail-panel').classList.remove('show');
+};
+document.getElementById('hpClose').onclick=()=>{
+  document.getElementById('history-panel').classList.remove('show');
+};
+
+function syncFromQuaternion(recordHist){
+  const q=quatFromInputs();
+  const norm=Math.sqrt(q.w*q.w+q.x*q.x+q.y*q.y+q.z*q.z);
+  const qNorm=(norm>EPS)?q.clone().normalize():new THREE.Quaternion(1,0,0,0);
+  const before={quaternion:[state.quaternion.w,state.quaternion.x,state.quaternion.y,state.quaternion.z]};
+  state.quaternion.copy(qNorm);
+  const euler=new THREE.Euler().setFromQuaternion(state.quaternion,state.rotOrder);
+  state.euler.copy(euler);
+  setEulerInputs(euler);
+  updateNormDisplay();
+  detectExceptions();
+  applyAttitude();
+  recordParamSnapshot();
+  if(recordHist){
+    const after={quaternion:[state.quaternion.w,state.quaternion.x,state.quaternion.y,state.quaternion.z]};
+    if(JSON.stringify(before)!==JSON.stringify(after)){
+      addHistory('edit','修改四元数',before,after);
+    }
+  }
+}
+
+function syncFromEuler(recordHist){
+  const euler=eulerFromInputs();
+  const before={euler:[state.euler.x*RAD,state.euler.y*RAD,state.euler.z*RAD],order:state.rotOrder};
+  state.euler.copy(euler);
+  const q=new THREE.Quaternion().setFromEuler(euler);
+  state.quaternion.copy(q);
+  setQuatInputs(q);
+  updateNormDisplay();
+  detectExceptions();
+  applyAttitude();
+  recordParamSnapshot();
+  if(recordHist){
+    const after={euler:[state.euler.x*RAD,state.euler.y*RAD,state.euler.z*RAD],order:state.rotOrder};
+    if(JSON.stringify(before)!==JSON.stringify(after)){
+      addHistory('edit','修改姿态角',before,after);
+    }
+  }
+}
+
+function applyAttitude(){
+  spacecraft.quaternion.copy(state.quaternion);
+  if(state.gimbalMode&&gimbalGroup){
+    const euler=state.euler;
+    const yawGroup=gimbalGroup.children[0];
+    const pitchGroup=yawGroup.children[0];
+    yawGroup.rotation.set(0,0,euler.z);
+    pitchGroup.rotation.set(0,euler.y,0);
+    pitchGroup.children[0].rotation.set(euler.x,0,0);
+  }
+}
+
+let quatEditTimeout=null;
+['q0','q1','q2','q3'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    clearTimeout(quatEditTimeout);
+    updateNormDisplay();
+    quatEditTimeout=setTimeout(()=>syncFromQuaternion(true),300);
+  });
+});
+
+let eulerEditTimeout=null;
+['eulerRoll','eulerPitch','eulerYaw'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    clearTimeout(eulerEditTimeout);
+    eulerEditTimeout=setTimeout(()=>syncFromEuler(true),300);
+  });
+});
+
+document.getElementById('rotOrder').addEventListener('change',(e)=>{
+  const oldOrder=state.rotOrder;
+  const newOrder=e.target.value;
+  const before={euler:[state.euler.x*RAD,state.euler.y*RAD,state.euler.z*RAD],order:oldOrder};
+  requestConfirm(
+    '确认旋转顺序变更: '+oldOrder+' → '+newOrder,
+    before,
+    {euler:[state.euler.x*RAD,state.euler.y*RAD,state.euler.z*RAD],order:newOrder},
+    ()=>{
+      state.rotOrder=newOrder;
+      const newEuler=new THREE.Euler().setFromQuaternion(state.quaternion,newOrder);
+      state.euler.copy(newEuler);
+      setEulerInputs(newEuler);
+      detectExceptions();
+      applyAttitude();
+      document.getElementById('rotOrder').value=newOrder;
+      addHistory('confirm','确认旋转顺序变更: '+oldOrder+' → '+newOrder,before,
+        {euler:[newEuler.x*RAD,newEuler.y*RAD,newEuler.z*RAD],order:newOrder});
+    }
+  );
+  e.target.value=oldOrder;
+});
+
+document.getElementById('btnNormalize').addEventListener('click',()=>{
+  const q=quatFromInputs();
+  const norm=Math.sqrt(q.w*q.w+q.x*q.x+q.y*q.y+q.z*q.z);
+  if(Math.abs(norm-1)<0.001)return;
+  const before={quaternion:[+q.w.toFixed(6),+q.x.toFixed(6),+q.y.toFixed(6),+q.z.toFixed(6)]};
+  const qN=q.clone().normalize();
+  const after={quaternion:[+qN.w.toFixed(6),+qN.x.toFixed(6),+qN.y.toFixed(6),+qN.z.toFixed(6)]};
+  requestConfirm('确认归一化四元数',before,after,()=>{
+    state.quaternion.copy(qN);
+    const euler=new THREE.Euler().setFromQuaternion(state.quaternion,state.rotOrder);
+    state.euler.copy(euler);
+    setQuatInputs(state.quaternion);
+    setEulerInputs(euler);
+    updateNormDisplay();
+    detectExceptions();
+    applyAttitude();
+    recordParamSnapshot();
+    addHistory('confirm','归一化四元数',before,after);
+  });
+});
+
+function buildThrusterGrid(){
+  const grid=document.getElementById('thrusterGrid');
+  grid.innerHTML='';
+  state.thrusters.forEach((t,i)=>{
+    const el=document.createElement('div');
+    el.className='thruster'+(t.firing?' firing':'');
+    el.innerHTML='<span class="tid">'+t.id+'</span> <span class="tstat '+(t.firing?'on':'off')+'">'+(t.firing?'点火':'关闭')+'</span><br>'+t.label;
+    el.onclick=()=>{
+      const wasFiring=t.firing;
+      const before={thruster:t.id,from:wasFiring?'点火':'关闭',to:wasFiring?'关闭':'点火'};
+      const after={thruster:t.id,from:wasFiring?'关闭':'点火',to:wasFiring?'点火':'关闭'};
+      requestConfirm(
+        t.id+' '+(wasFiring?'关闭':'点火')+'确认',
+        before,after,
+        ()=>{
+          t.firing=!wasFiring;
+          thrusterMeshes[i].material.emissive.setHex(t.firing?0xff6600:0);
+          buildThrusterGrid();
+          detectExceptions();
+          updateSelectedInfo();
+          addHistory('confirm',t.id+' '+(t.firing?'点火':'关闭'),before,after);
+        }
+      );
+    };
+    grid.appendChild(el);
+  });
+}
+buildThrusterGrid();
+
+renderer.domElement.addEventListener('click',(e)=>{
+  const rect=renderer.domElement.getBoundingClientRect();
+  mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+
+  const clickable=[bodyMesh,panelL,panelR,antenna,dish,...thrusterMeshes];
+  bodyFrame.children.forEach(c=>clickable.push(c));
+  if(state.gimbalMode&&gimbalGroup){
+    gimbalGroup.traverse(c=>{if(c.isMesh)clickable.push(c);});
+  }
+  const intersects=raycaster.intersectObjects(clickable,false);
+  if(intersects.length>0){
+    selectObject(intersects[0].object);
+  }else{
+    deselectObject();
+  }
+});
+
+function selectObject(obj){
+  state.selectedObj=obj;
+  highlightObject(obj);
+  showObjectDetail(obj);
+  updateSelectedInfo();
+}
+
+function highlightObject(obj){
+  clearHighlights();
+  if(obj.material&&obj.userData._origEmissive!==undefined){
+    obj.material.emissive.setHex(0x2244aa);
+  }
+}
+
+function clearHighlights(){
+  spacecraft.traverse(c=>{if(c.isMesh&&c.userData._origEmissive!==undefined)c.material.emissive.setHex(c.userData._origEmissive);});
+  if(gimbalGroup)gimbalGroup.traverse(c=>{if(c.isMesh&&c.userData._origEmissive!==undefined)c.material.emissive.setHex(c.userData._origEmissive);});
+}
+
+function deselectObject(){
+  state.selectedObj=null;
+  clearHighlights();
+  document.getElementById('selectedInfo').innerHTML='点击3D场景中的对象查看详情';
+  document.getElementById('detail-panel').classList.remove('show');
+}
+
+function showObjectDetail(obj){
+  const dp=document.getElementById('detail-panel');
+  const info=getObjectInfo(obj);
+  document.getElementById('dpTitle').textContent=info.title;
+  document.getElementById('dpBody').innerHTML=info.html;
+  dp.classList.add('show');
+}
+
+function getObjectInfo(obj){
+  const nameMap={
+    'scBody':'航天器主体','scPanelL':'太阳能板(左)','scPanelR':'太阳能板(右)',
+    'scAntenna':'天线杆','scDish':'天线碟',
+    'gimbalOuter':'万向节外环','gimbalMid':'万向节中环','gimbalInner':'万向节内环'
+  };
+
+  if(obj.name&&obj.name.startsWith('thruster_')){
+    const tid=obj.name.replace('thruster_','');
+    const t=state.thrusters.find(x=>x.id===tid);
+    if(t){
+      const torque=t.firing?new THREE.Vector3().crossVectors(thrusterArms[tid],t.axis):null;
+      return{title:'推力器 '+tid,html:
+        '<div class="dp-section"><div class="ds-label">标识</div><div class="ds-value"><span class="tag tag-info">'+tid+'</span></div></div>'+
+        '<div class="dp-section"><div class="ds-label">功能</div><div class="ds-value">'+t.label+'</div></div>'+
+        '<div class="dp-section"><div class="ds-label">推力方向</div><div class="ds-value">['+t.axis.x+', '+t.axis.y+', '+t.axis.z+']</div></div>'+
+        '<div class="dp-section"><div class="ds-label">状态</div><div class="ds-value"><span class="tag '+(t.firing?'tag-warn':'tag-info')+'">'+(t.firing?'点火中':'关闭')+'</span></div></div>'+
+        '<div class="dp-section"><div class="ds-label">力臂矢量</div><div class="ds-value">['+thrusterArms[tid].toArray().map(v=>v.toFixed(2)).join(', ')+']</div></div>'+
+        '<div class="dp-section"><div class="ds-label">产生力矩</div><div class="ds-value">'+(t.firing?'['+torque.toArray().map(v=>v.toFixed(4)).join(', ')+'] Nm':'未点火')+'</div></div>'+
+        '<div class="dp-section"><div class="ds-label">标出原因</div><div class="ds-value">'+(t.firing?'当前正在点火，产生力矩改变航天器姿态':'推力器处于关闭状态，点击侧边栏可确认点火')+'</div></div>'+
+        '<div class="dp-section"><div class="ds-label">来源</div><div class="ds-value">推进子系统 (PROP)</div></div>'
+      };
+    }
+  }
+
+  if(obj.name==='scBody'){
+    return{title:'航天器主体',html:
+      '<div class="dp-section"><div class="ds-label">类型</div><div class="ds-value">刚体模型</div></div>'+
+      '<div class="dp-section"><div class="ds-label">当前姿态(四元数)</div><div class="ds-value">['+state.quaternion.w.toFixed(4)+', '+state.quaternion.x.toFixed(4)+', '+state.quaternion.y.toFixed(4)+', '+state.quaternion.z.toFixed(4)+']</div></div>'+
+      '<div class="dp-section"><div class="ds-label">当前姿态(欧拉角)</div><div class="ds-value">Roll='+(state.euler.x*RAD).toFixed(1)+'deg Pitch='+(state.euler.y*RAD).toFixed(1)+'deg Yaw='+(state.euler.z*RAD).toFixed(1)+'deg ['+state.rotOrder+']</div></div>'+
+      '<div class="dp-section"><div class="ds-label">标出原因</div><div class="ds-value">主体承载姿态，四元数直接作用于刚体旋转</div></div>'+
+      '<div class="dp-section"><div class="ds-label">来源</div><div class="ds-value">姿态确定子系统 (ADS)</div></div>'
+    };
+  }
+
+  if(obj.name&&obj.name.startsWith('scPanel')){
+    const side=obj.name==='scPanelL'?'左':'右';
+    return{title:'太阳能板('+side+')',html:
+      '<div class="dp-section"><div class="ds-label">类型</div><div class="ds-value">太阳电池阵</div></div>'+
+      '<div class="dp-section"><div class="ds-label">位置</div><div class="ds-value">'+side+'侧 Z轴偏移 ±0.9m</div></div>'+
+      '<div class="dp-section"><div class="ds-label">标出原因</div><div class="ds-value">太阳板法向需对准太阳以保障供电\n姿态偏差直接影响发电效率</div></div>'+
+      '<div class="dp-section"><div class="ds-label">来源</div><div class="ds-value">电源子系统 (EPS)</div></div>'
+    };
+  }
+
+  if(obj.name==='scAntenna'||obj.name==='scDish'){
+    return{title:obj.name==='scAntenna'?'天线杆':'天线碟',html:
+      '<div class="dp-section"><div class="ds-label">类型</div><div class="ds-value">测控天线</div></div>'+
+      '<div class="dp-section"><div class="ds-label">标出原因</div><div class="ds-value">天线指向需对准地面站\n姿态偏差直接影响通信链路余量</div></div>'+
+      '<div class="dp-section"><div class="ds-label">来源</div><div class="ds-value">测控子系统 (TT&C)</div></div>'
+    };
+  }
+
+  if(obj.name&&obj.name.startsWith('gimbal')){
+    const ringDescs={
+      'gimbalOuter':'外环绕Z轴旋转，对应Yaw角。\n它是万向节链的最外层框架，\n提供偏航运动的基准。',
+      'gimbalMid':'中环绕Y轴旋转，对应Pitch角。\n当Pitch≈±90deg时，中环面与外环面重合，\n万向节锁发生！失去一个自由度。',
+      'gimbalInner':'内环绕X轴旋转，对应Roll角。\n万向节锁时，Roll旋转与Yaw旋转\n产生相同的物理效果——自由度退化。'
+    };
+    const pitchDeg=Math.abs(state.euler.y*RAD);
+    return{title:nameMap[obj.name]||obj.name,html:
+      '<div class="dp-section"><div class="ds-label">类型</div><div class="ds-value">'+obj.name+' 万向节环</div></div>'+
+      '<div class="dp-section"><div class="ds-label">说明</div><div class="ds-value" style="white-space:pre-wrap">'+(ringDescs[obj.name]||'万向节环组件')+'</div></div>'+
+      '<div class="dp-section"><div class="ds-label">万向节锁状态</div><div class="ds-value"><span class="tag '+(pitchDeg>85?'tag-error':'tag-normal')+'">'+(pitchDeg>85?'已锁定':'正常')+'</span></div></div>'+
+      '<div class="dp-section"><div class="ds-label">标出原因</div><div class="ds-value">可视化欧拉角旋转链\n直观展示万向节锁的物理机理</div></div>'
+    };
+  }
+
+  if(obj.parent&&obj.parent.name==='bodyFrame'){
+    return{title:'体坐标系轴',html:
+      '<div class="dp-section"><div class="ds-label">类型</div><div class="ds-value">体坐标系 (Body Frame)</div></div>'+
+      '<div class="dp-section"><div class="ds-label">红色 Xb</div><div class="ds-value">滚转轴 (Roll)</div></div>'+
+      '<div class="dp-section"><div class="ds-label">绿色 Yb</div><div class="ds-value">俯仰轴 (Pitch)</div></div>'+
+      '<div class="dp-section"><div class="ds-label">蓝色 Zb</div><div class="ds-value">偏航轴 (Yaw)</div></div>'+
+      '<div class="dp-section"><div class="ds-label">标出原因</div><div class="ds-value">体坐标轴随航天器旋转\n与惯性系(背景淡色轴)对比可直观看出姿态变化</div></div>'
+    };
+  }
+
+  return{title:nameMap[obj.name]||obj.name||'未知对象',html:
+    '<div class="dp-section"><div class="ds-label">名称</div><div class="ds-value">'+(obj.name||obj.type)+'</div></div>'};
+}
+
+function updateSelectedInfo(){
+  const el=document.getElementById('selectedInfo');
+  if(!state.selectedObj){el.innerHTML='点击3D场景中的对象查看详情';return;}
+  const n=state.selectedObj.name;
+  if(n&&n.startsWith('thruster_')){
+    const tid=n.replace('thruster_','');
+    const t=state.thrusters.find(x=>x.id===tid);
+    el.innerHTML='<strong>'+t.label+'</strong><br>状态: '+(t.firing?'<span style="color:var(--warn)">点火</span>':'关闭');
+  }else{
+    const m={'scBody':'航天器主体','scPanelL':'太阳能板(左)','scPanelR':'太阳能板(右)','scAntenna':'天线杆','scDish':'天线碟'};
+    el.innerHTML='<strong>'+(m[n]||n||'对象')+'</strong><br>点击查看详情面板';
+  }
+}
+
+document.getElementById('btnGimbal').addEventListener('click',()=>{
+  state.gimbalMode=!state.gimbalMode;
+  document.getElementById('btnGimbal').classList.toggle('active',state.gimbalMode);
+  document.getElementById('gimbalLegend').style.display=state.gimbalMode?'flex':'none';
+  document.getElementById('viewModeLabel').textContent=state.gimbalMode?'万向节锁演示':'姿态总览';
+  if(gimbalGroup)gimbalGroup.visible=state.gimbalMode;
+  if(state.gimbalMode)applyAttitude();
+  addHistory('edit',state.gimbalMode?'开启万向节锁演示':'关闭万向节锁演示',null,null);
+});
+
+document.getElementById('btnReset').addEventListener('click',()=>{
+  const before={quaternion:[state.quaternion.w,state.quaternion.x,state.quaternion.y,state.quaternion.z]};
+  requestConfirm('确认重置姿态为单位四元数',before,{quaternion:[1,0,0,0]},()=>{
+    state.quaternion.set(1,0,0,0);
+    state.euler.set(0,0,0,state.rotOrder);
+    state.prevEulerDeg=[0,0,0];
+    setQuatInputs(state.quaternion);
+    setEulerInputs(state.euler);
+    state.thrusters.forEach((t,i)=>{t.firing=false;thrusterMeshes[i].material.emissive.setHex(0);});
+    buildThrusterGrid();
+    updateNormDisplay();
+    detectExceptions();
+    applyAttitude();
+    recordParamSnapshot();
+    addHistory('confirm','重置姿态',before,{quaternion:[1,0,0,0]});
+  });
+});
+
+document.getElementById('btnHistory').addEventListener('click',()=>{
+  document.getElementById('history-panel').classList.toggle('show');
+});
+
+document.getElementById('btnScreenshot').addEventListener('click',()=>{
+  renderer.render(scene,camera);
+  const url=renderer.domElement.toDataURL('image/png');
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='航天器姿态_'+new Date().toISOString().slice(0,19).replace(/:/g,'-')+'.png';
+  a.click();
+  addHistory('edit','截图导出',null,null);
+  document.getElementById('statusLine').textContent='截图已保存';
+  setTimeout(()=>document.getElementById('statusLine').textContent='就绪',2000);
+});
+
+let chartVisible=false;
+document.getElementById('btnChart').addEventListener('click',()=>{
+  chartVisible=!chartVisible;
+  document.getElementById('paramChart').classList.toggle('show',chartVisible);
+  document.getElementById('btnChart').classList.toggle('active',chartVisible);
+  if(chartVisible)drawChart();
+});
+
+function recordParamSnapshot(){
+  state.paramHistory.push({
+    time:state.tlTime,
+    e:[state.euler.x*RAD,state.euler.y*RAD,state.euler.z*RAD]
+  });
+  if(state.paramHistory.length>200)state.paramHistory.shift();
+  if(chartVisible)drawChart();
+}
+
+function drawChart(){
+  const canvas=document.getElementById('chartCanvas');
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width=canvas.clientWidth*2;
+  const h=canvas.height=canvas.clientHeight*2;
+  ctx.clearRect(0,0,w,h);
+  if(state.paramHistory.length<2)return;
+  const data=state.paramHistory;
+  const tMin=data[0].time;
+  const tMax=data[data.length-1].time;
+  const tRange=Math.max(tMax-tMin,1);
+  const drawLine=(getter,color)=>{
+    ctx.beginPath();
+    ctx.strokeStyle=color;
+    ctx.lineWidth=1.5;
+    data.forEach((d,i)=>{
+      const x=((d.time-tMin)/tRange)*(w-20)+10;
+      const v=getter(d);
+      const y=h/2-(v/180)*(h/2-5);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  };
+  drawLine(d=>d.e[0],'#ff6666');
+  drawLine(d=>d.e[1],'#66ff66');
+  drawLine(d=>d.e[2],'#6688ff');
+  ctx.fillStyle='#6688ff';ctx.font='16px monospace';ctx.fillText('Roll',10,16);
+  ctx.fillStyle='#66ff66';ctx.fillText('Pitch',60,16);
+  ctx.fillStyle='#ff6666';ctx.fillText('Yaw',120,16);
+  ctx.strokeStyle='rgba(255,255,255,0.1)';
+  ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(10,h/2);ctx.lineTo(w-10,h/2);ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+document.getElementById('btnReport').addEventListener('click',()=>{
+  const q=state.quaternion;
+  const e=state.euler;
+  const firing=state.thrusters.filter(t=>t.firing);
+  const excCount=state.exceptions.length;
+  const histCount=state.history.length;
+  const confCount=state.history.filter(h=>h.type==='confirm').length;
+  let r='';
+  r+='=====================================\n';
+  r+='        航天器姿态四元数台 课堂报告\n';
+  r+='=====================================\n\n';
+  r+='生成时间: '+new Date().toLocaleString('zh-CN')+'\n';
+  r+='模拟时间: T = '+state.tlTime.toFixed(2)+'s\n\n';
+  r+='--- 姿态参数 ---\n\n';
+  r+='四元数: q = '+q.w.toFixed(6)+' + '+q.x.toFixed(6)+'i + '+q.y.toFixed(6)+'j + '+q.z.toFixed(6)+'k\n';
+  r+='模: ||q|| = '+Math.sqrt(q.w*q.w+q.x*q.x+q.y*q.y+q.z*q.z).toFixed(8)+'\n';
+  r+='欧拉角 ['+state.rotOrder+']: Roll='+(e.x*RAD).toFixed(2)+'deg Pitch='+(e.y*RAD).toFixed(2)+'deg Yaw='+(e.z*RAD).toFixed(2)+'deg\n\n';
+  r+='--- 万向节锁分析 ---\n\n';
+  const pitch=Math.abs(e.y*RAD);
+  if(pitch>85){
+    r+='⚠ 万向节锁状态: 已锁定 (Pitch='+(e.y*RAD).toFixed(1)+'deg)\n';
+    r+='  Yaw与Roll退化耦合，自由度从3降为2\n';
+    r+='  四元数表示不受影响，仍可完整描述姿态\n';
+  }else if(pitch>80){
+    r+='△ 接近万向节锁 (Pitch='+(e.y*RAD).toFixed(1)+'deg)\n';
+    r+='  建议切换到四元数控制模式\n';
+  }else{
+    r+='✓ 万向节锁: 无 (Pitch='+(e.y*RAD).toFixed(1)+'deg)\n';
+  }
+  r+='\n--- 推力器状态 ---\n\n';
+  state.thrusters.forEach(t=>{
+    r+=t.id+' '+t.label+': '+(t.firing?'点火 ●':'关闭 ○')+'\n';
+  });
+  if(firing.length>0){
+    r+='\n点火推力器: '+firing.map(t=>t.id).join(', ')+'\n';
+    const torque=new THREE.Vector3();
+    firing.forEach(t=>{torque.add(new THREE.Vector3().crossVectors(thrusterArms[t.id],t.axis));});
+    r+='合成力矩: ['+torque.toArray().map(v=>v.toFixed(4)).join(', ')+'] Nm\n';
+  }
+  r+='\n--- 异常记录 ---\n\n';
+  if(excCount===0)r+='✓ 无异常\n';
+  else state.exceptions.forEach(ex=>{
+    r+=(ex.severity==='error'?'✗':'△')+' ['+ex.code+'] '+ex.title+'\n  '+ex.desc.split('\n')[0]+'\n\n';
+  });
+  r+='--- 操作统计 ---\n\n';
+  r+='总操作数: '+histCount+'\n';
+  r+='人工确认: '+confCount+'次\n';
+  r+='异常事件: '+state.history.filter(h=>h.type==='exception').length+'次\n';
+  r+='编辑操作: '+state.history.filter(h=>h.type==='edit').length+'次\n';
+  r+='\n=====================================\n';
+  document.getElementById('reportContent').textContent=r;
+  document.getElementById('report-modal').classList.add('show');
+  addHistory('edit','生成课堂报告',null,null);
+});
+
+document.getElementById('reportClose').addEventListener('click',()=>{
+  document.getElementById('report-modal').classList.remove('show');
+});
+document.getElementById('reportCopy').addEventListener('click',()=>{
+  navigator.clipboard.writeText(document.getElementById('reportContent').textContent).then(()=>{
+    document.getElementById('statusLine').textContent='报告已复制到剪贴板';
+    setTimeout(()=>document.getElementById('statusLine').textContent='就绪',2000);
+  });
+});
+
+let tlInterval=null;
+document.getElementById('tlPlay').addEventListener('click',()=>{
+  if(state.tlPlaying)return;
+  state.tlPlaying=true;
+  tlInterval=setInterval(()=>{
+    state.tlTime+=0.1;
+    document.getElementById('tlTime').textContent='T = '+state.tlTime.toFixed(2)+'s';
+    updateTimelineCursor();
+    if(Math.abs(state.tlTime%1.0)<0.1)recordParamSnapshot();
+  },100);
+});
+document.getElementById('tlPause').addEventListener('click',()=>{
+  state.tlPlaying=false;
+  if(tlInterval){clearInterval(tlInterval);tlInterval=null;}
+});
+document.getElementById('tlRecord').addEventListener('click',()=>{
+  const kf={
+    time:state.tlTime,
+    quaternion:[state.quaternion.w,state.quaternion.x,state.quaternion.y,state.quaternion.z],
+    euler:[state.euler.x*RAD,state.euler.y*RAD,state.euler.z*RAD],
+    order:state.rotOrder,
+    exceptions:state.exceptions.map(e=>e.code)
+  };
+  state.keyframes.push(kf);
+  renderKeyframes();
+  addHistory('edit','记录关键帧',null,{time:state.tlTime});
+  document.getElementById('statusLine').textContent='关键帧 T='+state.tlTime.toFixed(1)+'s 已记录';
+  setTimeout(()=>document.getElementById('statusLine').textContent='就绪',2000);
+});
+
+function updateTimelineCursor(){
+  const body=document.getElementById('tlBody');
+  const width=body.clientWidth-28;
+  const maxTime=Math.max(state.tlTime+5,20);
+  const pct=Math.min(state.tlTime/maxTime,1);
+  document.getElementById('tlCursor').style.left=(14+pct*width)+'px';
+}
+
+function renderKeyframes(){
+  document.querySelectorAll('.tl-keyframe').forEach(e=>e.remove());
+  const body=document.getElementById('tlBody');
+  const width=body.clientWidth-28;
+  const maxTime=Math.max(state.tlTime+5,20);
+  state.keyframes.forEach((kf)=>{
+    const el=document.createElement('div');
+    el.className='tl-keyframe'+(kf.exceptions.length>0?' exception':'');
+    const pct=Math.min(kf.time/maxTime,1);
+    el.style.left=(14+pct*width)+'px';
+    el.title='T='+kf.time.toFixed(1)+'s';
+    el.onclick=()=>{
+      state.tlTime=kf.time;
+      state.quaternion.set(...kf.quaternion);
+      state.euler.set(kf.euler[0]*DEG,kf.euler[1]*DEG,kf.euler[2]*DEG,kf.order);
+      state.rotOrder=kf.order;
+      document.getElementById('rotOrder').value=kf.order;
+      setQuatInputs(state.quaternion);
+      setEulerInputs(state.euler);
+      updateNormDisplay();
+      detectExceptions();
+      applyAttitude();
+      document.getElementById('tlTime').textContent='T = '+state.tlTime.toFixed(2)+'s';
+      updateTimelineCursor();
+      recordParamSnapshot();
+    };
+    body.appendChild(el);
+  });
+}
+
+function onResize(){
+  const w=container.clientWidth,h=container.clientHeight;
+  camera.aspect=w/h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w,h);
+  renderKeyframes();
+  updateTimelineCursor();
+}
+window.addEventListener('resize',onResize);
+onResize();
+
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  state.thrusters.forEach((t,i)=>{
+    if(t.firing){
+      const s=1+Math.random()*0.3;
+      thrusterMeshes[i].scale.set(s,1+Math.random()*0.5,s);
+    }else{
+      thrusterMeshes[i].scale.set(1,1,1);
+    }
+  });
+  renderer.render(scene,camera);
+}
+animate();
+
+syncFromQuaternion(false);
+addHistory('confirm','系统初始化',null,{quaternion:[1,0,0,0]});
+</script>
+</body>
+</html>
