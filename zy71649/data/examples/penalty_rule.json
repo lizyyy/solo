@@ -1,0 +1,38 @@
+[
+  {
+    "contract_no": "LOAN001",
+    "rule_name": "提前还款违约金规则",
+    "rule_effective_date": "2022-01-01",
+    "penalty_type": "interest_months",
+    "penalty_value": 3,
+    "min_months_to_prepay": 12,
+    "min_prepay_amount": 10000,
+    "max_prepay_times_per_year": 3,
+    "prepay_date_restriction": "还款日前后3天",
+    "special_conditions": "还款满3年后免违约金",
+    "source_document": "贷款合同第15条",
+    "notes": "3年期内提前还款收3个月利息作为违约金",
+    "tiers": [
+      {
+        "min_months": 0,
+        "max_months": 12,
+        "penalty_type": "interest_months",
+        "penalty_value": 6,
+        "description": "1年内提前还款收6个月利息"
+      },
+      {
+        "min_months": 12,
+        "max_months": 36,
+        "penalty_type": "interest_months",
+        "penalty_value": 3,
+        "description": "1-3年提前还款收3个月利息"
+      },
+      {
+        "min_months": 36,
+        "penalty_type": "no_penalty",
+        "penalty_value": 0,
+        "description": "3年以上免违约金"
+      }
+    ]
+  }
+]

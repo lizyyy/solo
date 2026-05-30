@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mortgage-planner"
+version = "1.0.0"
+description = "房贷提前还款规划 CLI 工具 - 等额本息计算、违约金分析、现金流压力测试"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "家庭理财顾问团队"}]
+dependencies = [
+    "click>=8.1.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "rich>=13.7.0",
+    "pandas>=2.1.0",
+    "openpyxl>=3.1.0",
+    "pyyaml>=6.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+mortgage = "mortgage_planner.cli.main:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

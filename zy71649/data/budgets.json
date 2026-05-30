@@ -1,0 +1,114 @@
+{
+  "ee8b70a332ee": {
+    "id": "ee8b70a332ee",
+    "data": {
+      "created_by": null,
+      "confirmed_by": "测试员",
+      "confirmed_at": "2026-05-30T21:49:25.986322",
+      "is_confirmed": true,
+      "change_history": [],
+      "id": "ee8b70a332ee",
+      "created_at": "2026-05-30T21:49:14.699588",
+      "updated_at": "2026-05-30T21:49:25.986329",
+      "version": 2,
+      "notes": "家庭财务状况良好，有一定积蓄",
+      "customer_id": "CUST001",
+      "budget_month": "2025-01-01",
+      "monthly_household_income": "35000",
+      "monthly_household_expense": "15000",
+      "monthly_mortgage_payment": "4890.17",
+      "monthly_surplus": "15109.83",
+      "total_assets": "2500000",
+      "total_liabilities": "950000",
+      "emergency_fund": "100000",
+      "available_cash": "300000",
+      "income_details": [
+        {
+          "id": "9911b7ac214c",
+          "created_at": "2026-05-30T21:49:14.699365",
+          "updated_at": "2026-05-30T21:49:14.699367",
+          "version": 1,
+          "notes": null,
+          "item_type": "income",
+          "category": "工资收入",
+          "amount": "25000",
+          "is_monthly": true,
+          "start_date": null,
+          "end_date": null,
+          "description": "夫妻双方月工资"
+        },
+        {
+          "id": "2ecd27e22b26",
+          "created_at": "2026-05-30T21:49:14.699382",
+          "updated_at": "2026-05-30T21:49:14.699383",
+          "version": 1,
+          "notes": null,
+          "item_type": "income",
+          "category": "投资收益",
+          "amount": "10000",
+          "is_monthly": true,
+          "start_date": null,
+          "end_date": null,
+          "description": "理财和租金收入"
+        }
+      ],
+      "expense_details": [
+        {
+          "id": "9c08e73256d8",
+          "created_at": "2026-05-30T21:49:14.699397",
+          "updated_at": "2026-05-30T21:49:14.699398",
+          "version": 1,
+          "notes": null,
+          "item_type": "expense",
+          "category": "日常生活",
+          "amount": "8000",
+          "is_monthly": true,
+          "start_date": null,
+          "end_date": null,
+          "description": "衣食住行"
+        },
+        {
+          "id": "dc9cdd80834a",
+          "created_at": "2026-05-30T21:49:14.699405",
+          "updated_at": "2026-05-30T21:49:14.699406",
+          "version": 1,
+          "notes": null,
+          "item_type": "expense",
+          "category": "子女教育",
+          "amount": "5000",
+          "is_monthly": true,
+          "start_date": null,
+          "end_date": null,
+          "description": "学费和培训班"
+        },
+        {
+          "id": "c8d67cbb2040",
+          "created_at": "2026-05-30T21:49:14.699412",
+          "updated_at": "2026-05-30T21:49:14.699412",
+          "version": 1,
+          "notes": null,
+          "item_type": "expense",
+          "category": "赡养老人",
+          "amount": "2000",
+          "is_monthly": true,
+          "start_date": null,
+          "end_date": null,
+          "description": "双方父母赡养费"
+        }
+      ],
+      "risk_tolerance": "medium",
+      "future_income_change": "stable",
+      "major_expense_plan": "预计2026年子女教育支出增加"
+    },
+    "status": "active",
+    "created_at": "2026-05-30T21:49:14.699588",
+    "updated_at": "2026-05-30T21:49:25.986386",
+    "version": 1,
+    "data_type": "Budget",
+    "business_key": {
+      "customer_id": "CUST001",
+      "budget_month": "2025-01-01"
+    },
+    "conflict_info": null
+  }
+}

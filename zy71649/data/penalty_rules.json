@@ -1,0 +1,77 @@
+{
+  "aa6853c45f64": {
+    "id": "aa6853c45f64",
+    "data": {
+      "created_by": null,
+      "confirmed_by": "测试员",
+      "confirmed_at": "2026-05-30T21:49:25.986978",
+      "is_confirmed": true,
+      "change_history": [],
+      "id": "aa6853c45f64",
+      "created_at": "2026-05-30T21:49:16.576743",
+      "updated_at": "2026-05-30T21:49:25.986982",
+      "version": 2,
+      "notes": "3年期内提前还款收3个月利息作为违约金",
+      "contract_no": "LOAN001",
+      "rule_name": "提前还款违约金规则",
+      "rule_effective_date": "2022-01-01",
+      "rule_expiry_date": null,
+      "penalty_type": "tiered",
+      "penalty_value": "3",
+      "tiers": [
+        {
+          "id": "7cb79ce944e9",
+          "created_at": "2026-05-30T21:49:16.573404",
+          "updated_at": "2026-05-30T21:49:16.573409",
+          "version": 1,
+          "notes": null,
+          "min_months": 0,
+          "max_months": 12,
+          "penalty_type": "interest_months",
+          "penalty_value": "6",
+          "description": "1年内提前还款收6个月利息"
+        },
+        {
+          "id": "d911f71a39e2",
+          "created_at": "2026-05-30T21:49:16.573432",
+          "updated_at": "2026-05-30T21:49:16.573432",
+          "version": 1,
+          "notes": null,
+          "min_months": 12,
+          "max_months": 36,
+          "penalty_type": "interest_months",
+          "penalty_value": "3",
+          "description": "1-3年提前还款收3个月利息"
+        },
+        {
+          "id": "986d57a7daec",
+          "created_at": "2026-05-30T21:49:16.573443",
+          "updated_at": "2026-05-30T21:49:16.573443",
+          "version": 1,
+          "notes": null,
+          "min_months": 36,
+          "max_months": null,
+          "penalty_type": "no_penalty",
+          "penalty_value": "0",
+          "description": "3年以上免违约金"
+        }
+      ],
+      "min_months_to_prepay": 12,
+      "min_prepay_amount": "10000",
+      "max_prepay_times_per_year": 3,
+      "prepay_date_restriction": "还款日前后3天",
+      "special_conditions": "还款满3年后免违约金",
+      "source_document": "贷款合同第15条"
+    },
+    "status": "active",
+    "created_at": "2026-05-30T21:49:16.576743",
+    "updated_at": "2026-05-30T21:49:25.986990",
+    "version": 1,
+    "data_type": "PenaltyRule",
+    "business_key": {
+      "contract_no": "LOAN001",
+      "rule_name": "提前还款违约金规则"
+    },
+    "conflict_info": null
+  }
+}

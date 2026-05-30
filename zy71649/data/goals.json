@@ -1,0 +1,38 @@
+{
+  "1479355c4b68": {
+    "id": "1479355c4b68",
+    "data": {
+      "created_by": null,
+      "confirmed_by": "测试员",
+      "confirmed_at": "2026-05-30T21:49:25.987294",
+      "is_confirmed": true,
+      "change_history": [],
+      "id": "1479355c4b68",
+      "created_at": "2026-05-30T21:49:17.886645",
+      "updated_at": "2026-05-30T21:49:25.987298",
+      "version": 2,
+      "notes": "客户有一笔年终奖可用于提前还款",
+      "customer_id": "CUST001",
+      "target_date": null,
+      "prepay_amount": "200000",
+      "prepay_strategy": "shorten_term",
+      "priority": "interest_saving",
+      "target_monthly_payment": null,
+      "target_payoff_date": null,
+      "maximum_monthly_payment": "8000",
+      "minimum_monthly_surplus": "10000",
+      "expected_interest_saving": "100000",
+      "risk_preference": "conservative",
+      "other_requirements": "希望尽量减少总利息支出"
+    },
+    "status": "active",
+    "created_at": "2026-05-30T21:49:17.886645",
+    "updated_at": "2026-05-30T21:49:25.987340",
+    "version": 1,
+    "data_type": "ClientGoal",
+    "business_key": {
+      "customer_id": "CUST001"
+    },
+    "conflict_info": null
+  }
+}

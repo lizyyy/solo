@@ -1,0 +1,57 @@
+[
+  {
+    "customer_id": "CUST001",
+    "budget_month": "2025-01-01",
+    "monthly_household_income": 35000,
+    "monthly_household_expense": 15000,
+    "monthly_mortgage_payment": 4890.17,
+    "monthly_surplus": 15109.83,
+    "total_assets": 2500000,
+    "total_liabilities": 950000,
+    "emergency_fund": 100000,
+    "available_cash": 300000,
+    "risk_tolerance": "medium",
+    "future_income_change": "stable",
+    "major_expense_plan": "预计2026年子女教育支出增加",
+    "notes": "家庭财务状况良好，有一定积蓄",
+    "income_details": [
+      {
+        "item_type": "income",
+        "category": "工资收入",
+        "amount": 25000,
+        "is_monthly": true,
+        "description": "夫妻双方月工资"
+      },
+      {
+        "item_type": "income",
+        "category": "投资收益",
+        "amount": 10000,
+        "is_monthly": true,
+        "description": "理财和租金收入"
+      }
+    ],
+    "expense_details": [
+      {
+        "item_type": "expense",
+        "category": "日常生活",
+        "amount": 8000,
+        "is_monthly": true,
+        "description": "衣食住行"
+      },
+      {
+        "item_type": "expense",
+        "category": "子女教育",
+        "amount": 5000,
+        "is_monthly": true,
+        "description": "学费和培训班"
+      },
+      {
+        "item_type": "expense",
+        "category": "赡养老人",
+        "amount": 2000,
+        "is_monthly": true,
+        "description": "双方父母赡养费"
+      }
+    ]
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "contract_no": "LOAN001",
+    "customer_name": "张三",
+    "customer_id": "CUST001",
+    "loan_amount": 1000000,
+    "loan_term_months": 360,
+    "annual_interest_rate": 0.042,
+    "repayment_method": "equal_principal_interest",
+    "start_date": "2022-01-01",
+    "first_payment_date": "2022-02-01",
+    "maturity_date": "2052-01-01",
+    "lpr_based": true,
+    "lpr_adjustment_period_months": 12,
+    "current_lpr_rate": 0.0345,
+    "lpr_margin": 0.0075,
+    "loan_purpose": "首套住房贷款",
+    "property_address": "北京市朝阳区建国路88号",
+    "bank_name": "中国工商银行",
+    "account_no": "6222021234567890123",
+    "notes": "2022年购房贷款，享受首套利率优惠"
+  }
+]

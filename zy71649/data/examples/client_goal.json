@@ -1,0 +1,14 @@
+[
+  {
+    "customer_id": "CUST001",
+    "prepay_amount": 200000,
+    "prepay_strategy": "shorten_term",
+    "priority": "interest_saving",
+    "maximum_monthly_payment": 8000,
+    "minimum_monthly_surplus": 10000,
+    "expected_interest_saving": 100000,
+    "risk_preference": "conservative",
+    "other_requirements": "希望尽量减少总利息支出",
+    "notes": "客户有一笔年终奖可用于提前还款"
+  }
+]
