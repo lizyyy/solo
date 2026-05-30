@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: #E5E5E5;
+  background-color: #0F0F12;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #0F0F12;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 136, 0.02) 2px,
+    rgba(0, 255, 136, 0.02) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3A3A47 #15151A;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #15151A;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #3A3A47;
+  border-radius: 0;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #5A5A6B;
+}
+
+@layer components {
+  .neon-border {
+    @apply border-2;
+    box-shadow: 0 0 10px currentColor, inset 0 0 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .panel {
+    @apply bg-base-850 border border-base-700;
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.3),
+      0 2px 4px -1px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .panel-header {
+    @apply px-4 py-3 bg-base-800 border-b border-base-700 font-display font-bold text-sm uppercase tracking-wider;
+  }
+
+  .btn {
+    @apply px-4 py-2 font-mono text-sm font-medium border-2 transition-all duration-150 active:translate-y-px;
+  }
+
+  .btn-primary {
+    @apply bg-neon-purple border-neon-purple text-black hover:bg-opacity-80 active:bg-opacity-60;
+  }
+
+  .btn-danger {
+    @apply bg-neon-red border-neon-red text-black hover:bg-opacity-80 active:bg-opacity-60;
+  }
+
+  .btn-success {
+    @apply bg-neon-green border-neon-green text-black hover:bg-opacity-80 active:bg-opacity-60;
+  }
+
+  .btn-warning {
+    @apply bg-neon-orange border-neon-orange text-black hover:bg-opacity-80 active:bg-opacity-60;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent border-base-600 text-base-500 hover:border-base-500 hover:text-white;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-base-900 border-2 border-base-700 text-white font-mono text-sm
+           focus:outline-none focus:border-neon-purple transition-colors;
+  }
+
+  .status-badge {
+    @apply px-2 py-1 text-xs font-mono font-bold border;
+  }
+
+  .status-normal {
+    @apply bg-neon-green bg-opacity-20 border-neon-green text-neon-green;
+  }
+
+  .status-pending {
+    @apply bg-neon-orange bg-opacity-20 border-neon-orange text-neon-orange;
+  }
+
+  .status-conflict {
+    @apply bg-neon-red bg-opacity-20 border-neon-red text-neon-red;
+  }
+
+  .table-cell {
+    @apply px-3 py-2 border-b border-base-700 font-mono text-sm;
+  }
+
+  .table-header {
+    @apply px-3 py-2 bg-base-800 border-b-2 border-base-600 font-display font-bold text-xs uppercase tracking-wider text-left;
+  }
+
+  .glitch-text {
+    animation: glitch 0.3s ease-in-out;
+    position: relative;
+  }
+
+  .glitch-text::before,
+  .glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .glitch-text::before {
+    color: #FF3366;
+    animation: glitch-1 0.3s infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  }
+
+  .glitch-text::after {
+    color: #00FF88;
+    animation: glitch-2 0.3s infinite;
+    clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+  }
+}
+
+@keyframes glitch-1 {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(-1px, -1px); }
+  60% { transform: translate(1px, 1px); }
+  80% { transform: translate(1px, -1px); }
+}
+
+@keyframes glitch-2 {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(2px, -1px); }
+  40% { transform: translate(1px, 1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(-1px, 1px); }
+}
+
+::selection {
+  background: #AA55FF;
+  color: #000;
+}
