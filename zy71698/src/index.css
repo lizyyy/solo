@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-bg-primary text-text-primary;
+  }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-bg-primary text-text-primary min-h-screen;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-accent-success text-white rounded hover:bg-accent-success/90 transition-colors duration-200 font-medium;
+  }
+  .btn-secondary {
+    @apply px-4 py-2 bg-bg-secondary text-text-primary rounded hover:bg-bg-secondary/80 transition-colors duration-200 font-medium;
+  }
+  .btn-warning {
+    @apply px-4 py-2 bg-accent-warning text-white rounded hover:bg-accent-warning/90 transition-colors duration-200 font-medium;
+  }
+  .btn-danger {
+    @apply px-4 py-2 bg-accent-error text-white rounded hover:bg-accent-error/90 transition-colors duration-200 font-medium;
+  }
+  .card {
+    @apply bg-bg-secondary rounded-lg p-4 shadow-lg;
+  }
+  .input-field {
+    @apply w-full px-3 py-2 bg-bg-tertiary border border-bg-secondary rounded text-text-primary placeholder-text-muted focus:outline-none focus:border-accent-success transition-colors;
+  }
+  .status-dot {
+    @apply w-2 h-2 rounded-full inline-block;
+  }
+  .status-success {
+    @apply bg-accent-success;
+  }
+  .status-warning {
+    @apply bg-accent-warning;
+  }
+  .status-error {
+    @apply bg-accent-error;
+  }
+  .timecode {
+    font-family: 'Space Mono', monospace;
+    @apply tracking-wide;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-bg-tertiary;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-bg-secondary rounded;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-text-muted;
+  }
+}
