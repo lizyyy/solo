@@ -1,0 +1,6 @@
+[
+  {"temperature": 18, "echo_time": 0.55, "distance": 397.6, "device_id": "SN-004", "team": "C组", "notes": "邮件转发-正常"},
+  {"temperature": 22, "echo_time": 0.4, "distance": 290.0, "device_id": "SN-005", "team": "D组", "notes": "邮件转发-正常"},
+  {"temperature": 30, "echo_time": 0.6, "distance": 438.0, "device_id": "SN-004", "team": "C组", "notes": "邮件转发-交叉验证不一致"},
+  {"temperature": 20, "echo_time": 120, "distance": 362.3, "device_id": "SN-005", "team": "D组", "notes": "邮件转发-回波时间与距离疑似填反"}
+]
