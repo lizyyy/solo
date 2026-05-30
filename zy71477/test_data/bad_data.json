@@ -1,0 +1,69 @@
+{
+  "submission_id": "student_005_bad_data",
+  "source_file": "test_data/bad_data.json",
+  "charges": [
+    {
+      "charge_id": "bad_charge_1",
+      "position": "not_a_list",
+      "sign": "positive",
+      "magnitude": 1.0
+    },
+    {
+      "charge_id": "bad_charge_2",
+      "position": [0, 2],
+      "sign": "invalid_sign",
+      "magnitude": 1.0
+    },
+    {
+      "charge_id": "bad_charge_3",
+      "position": [0, -2],
+      "sign": "negative",
+      "magnitude": -5.0
+    },
+    {
+      "charge_id": "good_charge_1",
+      "position": [3, 0],
+      "sign": "positive",
+      "magnitude": 1.0
+    }
+  ],
+  "field_lines": [
+    {
+      "line_id": "bad_line_1",
+      "points": [
+        [1, 1], "invalid_point", [2, 2]
+      ],
+      "arrows": []
+    },
+    {
+      "line_id": "bad_line_2",
+      "points": [[1, 0]],
+      "arrows": []
+    },
+    {
+      "line_id": "good_line_1",
+      "points": [
+        [3.2, 0.2], [4.0, 0.5], [5.0, 0.5]
+      ],
+      "arrows": [
+        {
+          "arrow_id": "arrow_1",
+          "position": [4.0, 0.5],
+          "direction": [0, 0]
+        }
+      ]
+    },
+    {
+      "line_id": "good_line_2",
+      "points": [
+        [3.2, -0.2], [4.0, -0.5], [5.0, -0.5]
+      ],
+      "arrows": [
+        {
+          "arrow_id": "arrow_missing_dir",
+          "position": [4.0, -0.5]
+        }
+      ]
+    }
+  ]
+}

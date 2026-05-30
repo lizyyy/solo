@@ -1,0 +1,80 @@
+{
+  "submission_id": "student_001_correct",
+  "source_file": "test_data/correct_dipole.json",
+  "charges": [
+    {
+      "charge_id": "pos_1",
+      "position": [-2, 0],
+      "sign": "positive",
+      "magnitude": 1.0
+    },
+    {
+      "charge_id": "neg_1",
+      "position": [2, 0],
+      "sign": "negative",
+      "magnitude": 1.0
+    }
+  ],
+  "field_lines": [
+    {
+      "line_id": "line_1",
+      "points": [
+        [-1.8, 0.5], [-1.0, 1.2], [0.0, 1.5], [1.0, 1.2], [1.8, 0.5]
+      ],
+      "arrows": [
+        {
+          "arrow_id": "arrow_1_1",
+          "position": [-0.5, 1.45],
+          "direction": [0.8, -0.2]
+        }
+      ]
+    },
+    {
+      "line_id": "line_2",
+      "points": [
+        [-1.8, -0.5], [-1.0, -1.2], [0.0, -1.5], [1.0, -1.2], [1.8, -0.5]
+      ],
+      "arrows": [
+        {
+          "arrow_id": "arrow_2_1",
+          "position": [0.5, -1.45],
+          "direction": [0.8, 0.2]
+        }
+      ]
+    },
+    {
+      "line_id": "line_3",
+      "points": [
+        [-1.7, 0.8], [-0.8, 1.8], [0.2, 2.0], [1.2, 1.6], [1.9, 0.8]
+      ],
+      "arrows": []
+    },
+    {
+      "line_id": "line_4",
+      "points": [
+        [-1.7, -0.8], [-0.8, -1.8], [0.2, -2.0], [1.2, -1.6], [1.9, -0.8]
+      ],
+      "arrows": []
+    },
+    {
+      "line_id": "line_5",
+      "points": [
+        [-1.9, 0.2], [-1.0, 0.5], [0.0, 0.5], [1.0, 0.5], [1.9, 0.2]
+      ],
+      "arrows": [
+        {
+          "arrow_id": "arrow_5_1",
+          "position": [0.0, 0.5],
+          "direction": [1.0, 0.0]
+        }
+      ]
+    },
+    {
+      "line_id": "line_6",
+      "points": [
+        [-1.9, -0.2], [-1.0, -0.5], [0.0, -0.5], [1.0, -0.5], [1.9, -0.2]
+      ],
+      "arrows": []
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "submission_id": "student_003_traversal_error",
+  "source_file": "test_data/line_traverses_charge.json",
+  "charges": [
+    {
+      "charge_id": "pos_1",
+      "position": [0, 2],
+      "sign": "positive",
+      "magnitude": 1.0
+    },
+    {
+      "charge_id": "neg_1",
+      "position": [0, -2],
+      "sign": "negative",
+      "magnitude": 1.0
+    }
+  ],
+  "field_lines": [
+    {
+      "line_id": "line_traverse_1",
+      "points": [
+        [0, 3.0], [0, 1.5], [0, 0.0], [0, -1.5], [0, -3.0]
+      ],
+      "arrows": [
+        {
+          "arrow_id": "arrow_trav_1",
+          "position": [0, 0.5],
+          "direction": [0, -1.0]
+        }
+      ]
+    },
+    {
+      "line_id": "line_deep_1",
+      "points": [
+        [0.0, 2.0], [0.5, 1.8], [1.0, 1.5], [1.5, 0.8], [1.5, 0.0]
+      ],
+      "arrows": []
+    },
+    {
+      "line_id": "line_good_1",
+      "points": [
+        [0.2, 1.8], [0.8, 1.2], [1.2, 0.5], [1.2, -0.5], [0.8, -1.2], [0.2, -1.8]
+      ],
+      "arrows": []
+    }
+  ]
+}

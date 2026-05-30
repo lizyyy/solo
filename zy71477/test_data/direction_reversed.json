@@ -1,0 +1,59 @@
+{
+  "submission_id": "student_002_direction_error",
+  "source_file": "test_data/direction_reversed.json",
+  "charges": [
+    {
+      "charge_id": "pos_1",
+      "position": [-2, 0],
+      "sign": "positive",
+      "magnitude": 1.0
+    },
+    {
+      "charge_id": "neg_1",
+      "position": [2, 0],
+      "sign": "negative",
+      "magnitude": 1.0
+    }
+  ],
+  "field_lines": [
+    {
+      "line_id": "line_bad_1",
+      "points": [
+        [1.8, 0.5], [1.0, 1.2], [0.0, 1.5], [-1.0, 1.2], [-1.8, 0.5]
+      ],
+      "arrows": [
+        {
+          "arrow_id": "arrow_bad_1",
+          "position": [0.0, 1.5],
+          "direction": [-0.9, 0.1]
+        }
+      ]
+    },
+    {
+      "line_id": "line_bad_2",
+      "points": [
+        [1.9, 0.2], [1.0, 0.5], [0.0, 0.5], [-1.0, 0.5], [-1.9, 0.2]
+      ],
+      "arrows": [
+        {
+          "arrow_id": "arrow_bad_2",
+          "position": [0.0, 0.5],
+          "direction": [-1.0, 0.0]
+        }
+      ]
+    },
+    {
+      "line_id": "line_good_1",
+      "points": [
+        [-1.8, -0.5], [-1.0, -1.2], [0.0, -1.5], [1.0, -1.2], [1.8, -0.5]
+      ],
+      "arrows": [
+        {
+          "arrow_id": "arrow_good_1",
+          "position": [0.5, -1.4],
+          "direction": [0.8, 0.2]
+        }
+      ]
+    }
+  ]
+}
