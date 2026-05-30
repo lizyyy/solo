@@ -1,0 +1,105 @@
+{
+  "batch_id": "BATCH_20260530_115518_78038a6d",
+  "batch_name": "2024春季第15周测试排期",
+  "generated_at": "2026-05-30T11:55:18.336071",
+  "algorithm_summary": {
+    "algorithm": "IntegerProgramming",
+    "solver": "PuLP-CBC",
+    "status": "Optimal",
+    "objective_value": 3.0,
+    "total_candidates": 3,
+    "scheduled_count": 1,
+    "conflict_count": 2,
+    "scheduling_date": "2026-05-31",
+    "room_count": 3,
+    "priority_distribution": {
+      "high": 1,
+      "normal": 2
+    }
+  },
+  "schedules": [
+    {
+      "booking_id": 3,
+      "room_id": 1,
+      "scheduled_date": "2026-05-31",
+      "start_time": "09:00",
+      "end_time": "11:00",
+      "batch_id": "BATCH_20260530_115518_78038a6d",
+      "source_note": "IP求解分配: 优先级normal, 人数5"
+    }
+  ],
+  "conflicts": [
+    {
+      "booking_id": 1,
+      "conflict_type": "time_overlap",
+      "conflict_details": {
+        "type": "time_overlap",
+        "booking_id": 1,
+        "requested_date": "2026-05-31",
+        "requested_time": "14:00-17:00",
+        "participants": 25,
+        "priority": "high",
+        "equipment_needs": {
+          "1": 1,
+          "4": 1
+        },
+        "issues": [
+          "时间冲突: 1个房间时段被占用"
+        ],
+        "alternative_suggestions": [
+          {
+            "date": "2026-06-01",
+            "rooms": [
+              1
+            ],
+            "score": 1.0
+          },
+          {
+            "date": "2026-06-02",
+            "rooms": [
+              1
+            ],
+            "score": 0.5
+          },
+          {
+            "date": "2026-06-03",
+            "rooms": [
+              1
+            ],
+            "score": 0.3333333333333333
+          }
+        ]
+      },
+      "severity": "warning",
+      "batch_id": "BATCH_20260530_115518_78038a6d"
+    },
+    {
+      "booking_id": 2,
+      "conflict_type": "time_overlap",
+      "conflict_details": {
+        "type": "time_overlap",
+        "booking_id": 2,
+        "requested_date": "2026-05-31",
+        "requested_time": "15:00-18:00",
+        "participants": 8,
+        "priority": "normal",
+        "equipment_needs": {
+          "3": 1,
+          "2": 1
+        },
+        "issues": [
+          "时间冲突: 1个房间时段被占用"
+        ],
+        "alternative_suggestions": []
+      },
+      "severity": "warning",
+      "batch_id": "BATCH_20260530_115518_78038a6d"
+    }
+  ],
+  "statistics": {
+    "total": 3,
+    "scheduled": 1,
+    "conflicts": 2,
+    "success_rate": 0.3333333333333333
+  }
+}
