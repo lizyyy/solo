@@ -1,0 +1,6 @@
+[
+  {"fine_id": "FNE001", "driver_id": "D001", "amount": 200.00, "fine_date": "2026-05-02", "reason": "取消订单过多", "is_deducted": false},
+  {"fine_id": "FNE002", "driver_id": "D002", "amount": 150.00, "fine_date": "2026-05-03", "reason": "绕路投诉成立", "is_deducted": "已扣"},
+  {"fine_id": "FNE003", "driver_id": "D003", "amount": 300.00, "fine_date": "2026-05-04", "reason": "爽约乘客", "is_deducted": false},
+  {"fine_id": "FNE004", "driver_id": "D004", "amount": 100.00, "fine_date": "2026-05-05", "reason": "车内卫生投诉", "is_deducted": true}
+]

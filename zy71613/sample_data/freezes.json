@@ -1,0 +1,6 @@
+[
+  {"freeze_id": "FRZ001", "driver_id": "D001", "amount": 500.00, "freeze_date": "2026-05-01", "reason": "乘客纠纷调查中", "status": "active", "released_date": null, "released_amount": 0},
+  {"freeze_id": "FRZ002", "driver_id": "D003", "amount": 1000.00, "freeze_date": "2026-04-01", "reason": "账户异常已解冻待确认", "status": "active", "released_date": null, "released_amount": 0},
+  {"freeze_id": "FRZ003", "driver_id": "D004", "amount": 200.00, "freeze_date": "2026-05-02", "reason": "安全培训待完成", "status": "released", "released_date": "2026-05-05", "released_amount": 200.00},
+  {"freeze_id": "FRZ004", "driver_id": "D004", "amount": 80.00, "freeze_date": "2026-05-03", "reason": "投诉处理中", "status": "partial", "released_date": "2026-05-04", "released_amount": 30.00}
+]

@@ -1,0 +1,217 @@
+{
+  "report_id": "e4f46580-892",
+  "generated_at": "2026-05-30T16:41:58.808378",
+  "audit_date": "2026-05-30",
+  "summary": {
+    "driver_count": 5,
+    "total_income": 2648.89,
+    "total_rewards": 950.0,
+    "total_fines": 750.0,
+    "total_frozen": 1550.0,
+    "total_withdrawable": 1798.89,
+    "total_exceptions": 6,
+    "critical_count": 1,
+    "warning_count": 4
+  },
+  "global_exceptions": [],
+  "items": [
+    {
+      "driver_id": "D004",
+      "driver_name": "王强",
+      "total_income": 225.5,
+      "total_rewards": 50.0,
+      "total_fines": 100.0,
+      "total_frozen": 50.0,
+      "withdrawable": 125.5,
+      "exceptions": []
+    },
+    {
+      "driver_id": "D001",
+      "driver_name": "张伟",
+      "total_income": 706.02,
+      "total_rewards": 200.0,
+      "total_fines": 200.0,
+      "total_frozen": 500.0,
+      "withdrawable": 406.02,
+      "exceptions": [
+        {
+          "exception_id": "8c5beabe-d3f",
+          "driver_id": "D001",
+          "category": "奖励重复入账",
+          "severity": "error",
+          "title": "发现重复奖励记录",
+          "detail": "司机 D001 有 2 条相同奖励(类型=早高峰奖励, 金额=100.0, 日期=2026-05-01)",
+          "suggestion": "请核实是否重复发放，若重复应退回多入账部分，或人工确认保留",
+          "related_ids": [
+            "RWD001",
+            "RWD002"
+          ],
+          "auto_fixable": false,
+          "fixed": false,
+          "fix_action": ""
+        },
+        {
+          "exception_id": "85fcb19b-4ef",
+          "driver_id": "D001",
+          "category": "罚款未扣",
+          "severity": "warning",
+          "title": "存在 1 笔未扣除罚款",
+          "detail": "司机 D001 有 1 笔罚款合计 ¥200.00 尚未从余额中扣除",
+          "suggestion": "请确认是否需要补扣，或补充相关处罚材料后人工确认",
+          "related_ids": [
+            "FNE001"
+          ],
+          "auto_fixable": false,
+          "fixed": false,
+          "fix_action": ""
+        }
+      ]
+    },
+    {
+      "driver_id": "D002",
+      "driver_name": "李娜",
+      "total_income": 711.92,
+      "total_rewards": 200.0,
+      "total_fines": 150.0,
+      "total_frozen": 0,
+      "withdrawable": 761.92,
+      "exceptions": []
+    },
+    {
+      "driver_id": "D003",
+      "driver_name": "张伟",
+      "total_income": 735.45,
+      "total_rewards": 500.0,
+      "total_fines": 300.0,
+      "total_frozen": 1000.0,
+      "withdrawable": 235.45,
+      "exceptions": [
+        {
+          "exception_id": "c529093e-da2",
+          "driver_id": "D003",
+          "category": "罚款未扣",
+          "severity": "warning",
+          "title": "存在 1 笔未扣除罚款",
+          "detail": "司机 D003 有 1 笔罚款合计 ¥300.00 尚未从余额中扣除",
+          "suggestion": "请确认是否需要补扣，或补充相关处罚材料后人工确认",
+          "related_ids": [
+            "FNE003"
+          ],
+          "auto_fixable": false,
+          "fixed": false,
+          "fix_action": ""
+        },
+        {
+          "exception_id": "15d2a94d-c9f",
+          "driver_id": "D003",
+          "category": "冻结解除晚到",
+          "severity": "warning",
+          "title": "冻结记录标记为生效但原因含'解冻'",
+          "detail": "冻结单 FRZ002 状态为生效中，但原因包含'解冻'字样，可能解冻操作延迟",
+          "suggestion": "确认解冻状态，如确已解除请更新冻结记录，或人工确认后手动释放",
+          "related_ids": [
+            "FRZ002"
+          ],
+          "auto_fixable": false,
+          "fixed": false,
+          "fix_action": ""
+        },
+        {
+          "exception_id": "38646d36-6e6",
+          "driver_id": "D003",
+          "category": "长期冻结",
+          "severity": "info",
+          "title": "冻结已持续 59 天",
+          "detail": "冻结单 FRZ002 自 2026-04-01 起生效，已持续 59 天",
+          "suggestion": "如冻结原因已消除，建议及时解除冻结",
+          "related_ids": [
+            "FRZ002"
+          ],
+          "auto_fixable": false,
+          "fixed": false,
+          "fix_action": ""
+        },
+        {
+          "exception_id": "f2d45e4f-9ed",
+          "driver_id": "D003",
+          "category": "余额为负",
+          "severity": "critical",
+          "title": "司机净余额为负数",
+          "detail": "司机 D003 计算净余额为 ¥-64.55，存在超扣风险",
+          "suggestion": "检查是否有罚款重复扣除或冻结金额异常，冻结释放后余额应恢复正常",
+          "related_ids": [],
+          "auto_fixable": false,
+          "fixed": false,
+          "fix_action": ""
+        }
+      ]
+    },
+    {
+      "driver_id": "D999",
+      "driver_name": "未知司机(D999)",
+      "total_income": 270.0,
+      "total_rewards": 0,
+      "total_fines": 0,
+      "total_frozen": 0,
+      "withdrawable": 270.0,
+      "exceptions": []
+    }
+  ],
+  "withdrawals": [
+    {
+      "withdrawal_id": "74cc6c4a-d28",
+      "driver_id": "D004",
+      "amount": 125.5,
+      "request_date": "2026-05-30",
+      "status": "approved",
+      "idempotency_key": "wd_D004_2026-05-30",
+      "reviewer": "系统自动",
+      "review_note": "",
+      "approved_at": "2026-05-30T16:41:58.809158"
+    },
+    {
+      "withdrawal_id": "e345714d-218",
+      "driver_id": "D001",
+      "amount": 406.02,
+      "request_date": "2026-05-30",
+      "status": "approved",
+      "idempotency_key": "wd_D001_2026-05-30",
+      "reviewer": "系统自动",
+      "review_note": "",
+      "approved_at": "2026-05-30T16:41:58.809331"
+    },
+    {
+      "withdrawal_id": "23a17ec1-20d",
+      "driver_id": "D002",
+      "amount": 761.92,
+      "request_date": "2026-05-30",
+      "status": "approved",
+      "idempotency_key": "wd_D002_2026-05-30",
+      "reviewer": "系统自动",
+      "review_note": "",
+      "approved_at": "2026-05-30T16:41:58.809369"
+    },
+    {
+      "withdrawal_id": "13524a58-8b8",
+      "driver_id": "D003",
+      "amount": 235.45,
+      "request_date": "2026-05-30",
+      "status": "approved",
+      "idempotency_key": "wd_D003_2026-05-30",
+      "reviewer": "系统自动",
+      "review_note": "",
+      "approved_at": "2026-05-30T16:41:58.809432"
+    },
+    {
+      "withdrawal_id": "81aebe27-3b5",
+      "driver_id": "D999",
+      "amount": 270.0,
+      "request_date": "2026-05-30",
+      "status": "approved",
+      "idempotency_key": "wd_D999_2026-05-30",
+      "reviewer": "系统自动",
+      "review_note": "",
+      "approved_at": "2026-05-30T16:41:58.809459"
+    }
+  ]
+}
