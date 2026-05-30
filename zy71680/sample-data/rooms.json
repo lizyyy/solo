@@ -1,0 +1,32 @@
+[
+  {
+    "id": "ROOM-DRUM-01",
+    "name": "大鼓房",
+    "type": "drum",
+    "equipmentIds": ["EQ-DRUM-MIC", "EQ-MIXER-01"]
+  },
+  {
+    "id": "ROOM-VOCAL-01",
+    "name": "人声棚A",
+    "type": "vocal",
+    "equipmentIds": ["EQ-VOCAL-MIC"]
+  },
+  {
+    "id": "ROOM-MIX-01",
+    "name": "混音室",
+    "type": "mixing",
+    "equipmentIds": ["EQ-MIXER-01"]
+  },
+  {
+    "id": "ROOM-LIVE-01",
+    "name": "现场录音厅",
+    "type": "live",
+    "equipmentIds": ["EQ-VOCAL-MIC", "EQ-DRUM-MIC"]
+  },
+  {
+    "id": "ROOM-REHEARSAL-01",
+    "name": "排练室",
+    "type": "rehearsal",
+    "equipmentIds": []
+  }
+]

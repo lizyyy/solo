@@ -1,0 +1,29 @@
+[
+  {
+    "id": "NOTE-001",
+    "bookingId": "BK-001",
+    "content": "星河乐队上周邮件说希望用新的鼓皮，请提前准备",
+    "source": "email",
+    "sourceDetail": "王经理邮件 2025-06-08"
+  },
+  {
+    "id": "NOTE-002",
+    "clientName": "陈默",
+    "content": "上次录音说调音台有点底噪，这次注意检查",
+    "source": "chat",
+    "sourceDetail": "录音棚微信群 2025-06-07"
+  },
+  {
+    "id": "NOTE-003",
+    "content": "6月10日有客户临时加约，具体信息待确认",
+    "source": "phone",
+    "sourceDetail": "前台电话记录 2025-06-09"
+  },
+  {
+    "id": "NOTE-004",
+    "bookingId": "BK-009",
+    "content": "野火乐队上次来录音时对古董话放很满意，想继续用",
+    "source": "spreadsheet",
+    "sourceDetail": "客户偏好表-2025Q2"
+  }
+]

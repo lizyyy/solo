@@ -1,0 +1,1090 @@
+{
+  "generatedAt": "2026-05-30T15:34:28.462Z",
+  "inputDirectory": "./sample-data",
+  "outputDirectory": "./output-strict",
+  "summary": {
+    "totalBookings": 11,
+    "processedBookings": 11,
+    "confirmedBookings": 9,
+    "cancelledBookings": 1,
+    "pendingBookings": 1,
+    "totalConflicts": 6,
+    "criticalConflicts": 4,
+    "warningConflicts": 2,
+    "roomOverlaps": 2,
+    "engineerDoubles": 2,
+    "missingEquipment": 2,
+    "totalReschedules": 0,
+    "validationErrors": 4
+  },
+  "validationResults": [
+    {
+      "recordId": "BK-001",
+      "recordType": "booking",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-002",
+      "recordType": "booking",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-003",
+      "recordType": "booking",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-004",
+      "recordType": "booking",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-005",
+      "recordType": "booking",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-006",
+      "recordType": "booking",
+      "valid": false,
+      "issues": [
+        "缺少客户姓名"
+      ],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-007",
+      "recordType": "booking",
+      "valid": false,
+      "issues": [
+        "缺少房间ID"
+      ],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-008",
+      "recordType": "booking",
+      "valid": false,
+      "issues": [
+        "开始时间(15:00) >= 结束时间(12:00)，时间范围不合理"
+      ],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-009",
+      "recordType": "booking",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-010",
+      "recordType": "booking",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-011",
+      "recordType": "booking",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-012",
+      "recordType": "booking",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-013",
+      "recordType": "booking",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-014",
+      "recordType": "booking",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "BK-015",
+      "recordType": "booking",
+      "valid": false,
+      "issues": [
+        "日期格式异常: \"not-a-date\"，期望 YYYY-MM-DD",
+        "日期无法解析: \"not-a-date\""
+      ],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "bookings.json",
+        "importedAt": "2026-05-30T15:34:28.423Z"
+      }
+    },
+    {
+      "recordId": "ROOM-DRUM-01",
+      "recordType": "room",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "rooms.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    },
+    {
+      "recordId": "ROOM-VOCAL-01",
+      "recordType": "room",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "rooms.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    },
+    {
+      "recordId": "ROOM-MIX-01",
+      "recordType": "room",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "rooms.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    },
+    {
+      "recordId": "ROOM-LIVE-01",
+      "recordType": "room",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "rooms.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    },
+    {
+      "recordId": "ROOM-REHEARSAL-01",
+      "recordType": "room",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "rooms.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    },
+    {
+      "recordId": "ENG-ZHANG",
+      "recordType": "engineer",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "engineers.json",
+        "importedAt": "2026-05-30T15:34:28.439Z"
+      }
+    },
+    {
+      "recordId": "ENG-LI",
+      "recordType": "engineer",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "engineers.json",
+        "importedAt": "2026-05-30T15:34:28.439Z"
+      }
+    },
+    {
+      "recordId": "ENG-WANG",
+      "recordType": "engineer",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "engineers.json",
+        "importedAt": "2026-05-30T15:34:28.439Z"
+      }
+    },
+    {
+      "recordId": "EQ-DRUM-MIC",
+      "recordType": "equipment",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "equipment.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    },
+    {
+      "recordId": "EQ-VOCAL-MIC",
+      "recordType": "equipment",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "equipment.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    },
+    {
+      "recordId": "EQ-MIXER-01",
+      "recordType": "equipment",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "equipment.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    },
+    {
+      "recordId": "EQ-COMPRESSOR",
+      "recordType": "equipment",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "equipment.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    },
+    {
+      "recordId": "EQ-VINTAGE-PRE",
+      "recordType": "equipment",
+      "valid": true,
+      "issues": [],
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "equipment.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    }
+  ],
+  "processingResults": [
+    {
+      "bookingId": "BK-001",
+      "processingOrder": 1,
+      "status": "confirmed",
+      "conflicts": [
+        {
+          "id": "LEG-CFL-001",
+          "type": "ROOM_OVERLAP",
+          "severity": "critical",
+          "bookingIds": [
+            "BK-003",
+            "BK-001"
+          ],
+          "description": "历史遗留：月光合唱团和星河乐队6月10日上午抢同一个鼓房",
+          "affectedResources": [
+            "ROOM-DRUM-01"
+          ],
+          "resolutionStatus": "open",
+          "resolutionNote": "等前台确认谁先预约的",
+          "detectedAt": "2025-06-09T08:00:00Z",
+          "provenance": {
+            "source": "legacy",
+            "sourceDetail": "legacy-conflicts.json",
+            "importedAt": "2026-05-30T15:34:28.440Z"
+          }
+        },
+        {
+          "id": "LEG-CFL-002",
+          "type": "ENGINEER_DOUBLE",
+          "severity": "critical",
+          "bookingIds": [
+            "BK-003",
+            "BK-001"
+          ],
+          "description": "历史遗留：张工6月10日上午被两批客户同时预约",
+          "affectedResources": [
+            "ENG-ZHANG"
+          ],
+          "resolutionStatus": "open",
+          "detectedAt": "2025-06-09T08:05:00Z",
+          "provenance": {
+            "source": "legacy",
+            "sourceDetail": "legacy-conflicts.json",
+            "importedAt": "2026-05-30T15:34:28.440Z"
+          }
+        },
+        {
+          "id": "CFL-1780155268460-wls19",
+          "type": "ROOM_OVERLAP",
+          "severity": "critical",
+          "bookingIds": [
+            "BK-001",
+            "BK-003"
+          ],
+          "description": "房间 ROOM-DRUM-01 在 2025-06-10 09:00-12:00 与 11:00-14:00 重叠（预约 BK-001 vs BK-003）",
+          "affectedResources": [
+            "ROOM-DRUM-01"
+          ],
+          "resolutionStatus": "open",
+          "detectedAt": "2026-05-30T15:34:28.460Z",
+          "provenance": {
+            "source": "system",
+            "sourceDetail": "scheduler",
+            "importedAt": "2026-05-30T15:34:28.460Z"
+          }
+        },
+        {
+          "id": "CFL-1780155268460-2damt",
+          "type": "ENGINEER_DOUBLE",
+          "severity": "critical",
+          "bookingIds": [
+            "BK-001",
+            "BK-003"
+          ],
+          "description": "工程师 ENG-ZHANG 在 2025-06-10 被双约（预约 BK-001 09:00-12:00 vs 预约 BK-003 11:00-14:00）",
+          "affectedResources": [
+            "ENG-ZHANG"
+          ],
+          "resolutionStatus": "open",
+          "detectedAt": "2026-05-30T15:34:28.460Z",
+          "provenance": {
+            "source": "system",
+            "sourceDetail": "scheduler",
+            "importedAt": "2026-05-30T15:34:28.460Z"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "resourceId": "ROOM-DRUM-01",
+          "resourceType": "room",
+          "bookingId": "BK-001",
+          "date": "2025-06-10",
+          "startTime": "09:00",
+          "endTime": "12:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        },
+        {
+          "resourceId": "ENG-ZHANG",
+          "resourceType": "engineer",
+          "bookingId": "BK-001",
+          "date": "2025-06-10",
+          "startTime": "09:00",
+          "endTime": "12:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        }
+      ],
+      "reschedules": []
+    },
+    {
+      "bookingId": "BK-002",
+      "processingOrder": 2,
+      "status": "confirmed",
+      "conflicts": [],
+      "locks": [
+        {
+          "resourceId": "ROOM-VOCAL-01",
+          "resourceType": "room",
+          "bookingId": "BK-002",
+          "date": "2025-06-10",
+          "startTime": "10:00",
+          "endTime": "13:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        },
+        {
+          "resourceId": "ENG-LI",
+          "resourceType": "engineer",
+          "bookingId": "BK-002",
+          "date": "2025-06-10",
+          "startTime": "10:00",
+          "endTime": "13:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        }
+      ],
+      "reschedules": []
+    },
+    {
+      "bookingId": "BK-003",
+      "processingOrder": 3,
+      "status": "pending",
+      "conflicts": [
+        {
+          "id": "LEG-CFL-001",
+          "type": "ROOM_OVERLAP",
+          "severity": "critical",
+          "bookingIds": [
+            "BK-003",
+            "BK-001"
+          ],
+          "description": "历史遗留：月光合唱团和星河乐队6月10日上午抢同一个鼓房",
+          "affectedResources": [
+            "ROOM-DRUM-01"
+          ],
+          "resolutionStatus": "open",
+          "resolutionNote": "等前台确认谁先预约的",
+          "detectedAt": "2025-06-09T08:00:00Z",
+          "provenance": {
+            "source": "legacy",
+            "sourceDetail": "legacy-conflicts.json",
+            "importedAt": "2026-05-30T15:34:28.440Z"
+          }
+        },
+        {
+          "id": "LEG-CFL-002",
+          "type": "ENGINEER_DOUBLE",
+          "severity": "critical",
+          "bookingIds": [
+            "BK-003",
+            "BK-001"
+          ],
+          "description": "历史遗留：张工6月10日上午被两批客户同时预约",
+          "affectedResources": [
+            "ENG-ZHANG"
+          ],
+          "resolutionStatus": "open",
+          "detectedAt": "2025-06-09T08:05:00Z",
+          "provenance": {
+            "source": "legacy",
+            "sourceDetail": "legacy-conflicts.json",
+            "importedAt": "2026-05-30T15:34:28.440Z"
+          }
+        },
+        {
+          "id": "CFL-1780155268460-wls19",
+          "type": "ROOM_OVERLAP",
+          "severity": "critical",
+          "bookingIds": [
+            "BK-001",
+            "BK-003"
+          ],
+          "description": "房间 ROOM-DRUM-01 在 2025-06-10 09:00-12:00 与 11:00-14:00 重叠（预约 BK-001 vs BK-003）",
+          "affectedResources": [
+            "ROOM-DRUM-01"
+          ],
+          "resolutionStatus": "open",
+          "detectedAt": "2026-05-30T15:34:28.460Z",
+          "provenance": {
+            "source": "system",
+            "sourceDetail": "scheduler",
+            "importedAt": "2026-05-30T15:34:28.460Z"
+          }
+        },
+        {
+          "id": "CFL-1780155268460-2damt",
+          "type": "ENGINEER_DOUBLE",
+          "severity": "critical",
+          "bookingIds": [
+            "BK-001",
+            "BK-003"
+          ],
+          "description": "工程师 ENG-ZHANG 在 2025-06-10 被双约（预约 BK-001 09:00-12:00 vs 预约 BK-003 11:00-14:00）",
+          "affectedResources": [
+            "ENG-ZHANG"
+          ],
+          "resolutionStatus": "open",
+          "detectedAt": "2026-05-30T15:34:28.460Z",
+          "provenance": {
+            "source": "system",
+            "sourceDetail": "scheduler",
+            "importedAt": "2026-05-30T15:34:28.460Z"
+          }
+        }
+      ],
+      "locks": [],
+      "reschedules": []
+    },
+    {
+      "bookingId": "BK-004",
+      "processingOrder": 4,
+      "status": "confirmed",
+      "conflicts": [],
+      "locks": [
+        {
+          "resourceId": "ROOM-VOCAL-01",
+          "resourceType": "room",
+          "bookingId": "BK-004",
+          "date": "2025-06-10",
+          "startTime": "14:00",
+          "endTime": "17:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        },
+        {
+          "resourceId": "ENG-WANG",
+          "resourceType": "engineer",
+          "bookingId": "BK-004",
+          "date": "2025-06-10",
+          "startTime": "14:00",
+          "endTime": "17:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        }
+      ],
+      "reschedules": []
+    },
+    {
+      "bookingId": "BK-005",
+      "processingOrder": 5,
+      "status": "confirmed",
+      "conflicts": [],
+      "locks": [
+        {
+          "resourceId": "ROOM-MIX-01",
+          "resourceType": "room",
+          "bookingId": "BK-005",
+          "date": "2025-06-10",
+          "startTime": "14:00",
+          "endTime": "18:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        },
+        {
+          "resourceId": "ENG-LI",
+          "resourceType": "engineer",
+          "bookingId": "BK-005",
+          "date": "2025-06-10",
+          "startTime": "14:00",
+          "endTime": "18:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        }
+      ],
+      "reschedules": []
+    },
+    {
+      "bookingId": "BK-009",
+      "processingOrder": 9,
+      "status": "confirmed",
+      "conflicts": [
+        {
+          "id": "CFL-1780155268460-4lizq",
+          "type": "MISSING_EQUIPMENT",
+          "severity": "warning",
+          "bookingIds": [
+            "BK-009"
+          ],
+          "description": "预约 BK-009 缺少设备: 古董话放Neve 1073(EQ-VINTAGE-PRE)（房间 ROOM-DRUM-01 无此设备）",
+          "affectedResources": [
+            "EQ-VINTAGE-PRE"
+          ],
+          "resolutionStatus": "open",
+          "detectedAt": "2026-05-30T15:34:28.460Z",
+          "provenance": {
+            "source": "system",
+            "sourceDetail": "scheduler",
+            "importedAt": "2026-05-30T15:34:28.460Z"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "resourceId": "ROOM-DRUM-01",
+          "resourceType": "room",
+          "bookingId": "BK-009",
+          "date": "2025-06-12",
+          "startTime": "09:00",
+          "endTime": "12:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        },
+        {
+          "resourceId": "ENG-WANG",
+          "resourceType": "engineer",
+          "bookingId": "BK-009",
+          "date": "2025-06-12",
+          "startTime": "09:00",
+          "endTime": "12:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        }
+      ],
+      "reschedules": []
+    },
+    {
+      "bookingId": "BK-010",
+      "processingOrder": 10,
+      "status": "confirmed",
+      "conflicts": [],
+      "locks": [
+        {
+          "resourceId": "ROOM-MIX-01",
+          "resourceType": "room",
+          "bookingId": "BK-010",
+          "date": "2025-06-12",
+          "startTime": "14:00",
+          "endTime": "18:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        },
+        {
+          "resourceId": "ENG-LI",
+          "resourceType": "engineer",
+          "bookingId": "BK-010",
+          "date": "2025-06-12",
+          "startTime": "14:00",
+          "endTime": "18:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        }
+      ],
+      "reschedules": []
+    },
+    {
+      "bookingId": "BK-011",
+      "processingOrder": 11,
+      "status": "confirmed",
+      "conflicts": [],
+      "locks": [
+        {
+          "resourceId": "ROOM-LIVE-01",
+          "resourceType": "room",
+          "bookingId": "BK-011",
+          "date": "2025-06-13",
+          "startTime": "10:00",
+          "endTime": "16:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        },
+        {
+          "resourceId": "ENG-ZHANG",
+          "resourceType": "engineer",
+          "bookingId": "BK-011",
+          "date": "2025-06-13",
+          "startTime": "10:00",
+          "endTime": "16:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        }
+      ],
+      "reschedules": []
+    },
+    {
+      "bookingId": "BK-012",
+      "processingOrder": 12,
+      "status": "confirmed",
+      "conflicts": [],
+      "locks": [
+        {
+          "resourceId": "ROOM-VOCAL-01",
+          "resourceType": "room",
+          "bookingId": "BK-012",
+          "date": "2025-06-13",
+          "startTime": "10:00",
+          "endTime": "13:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        },
+        {
+          "resourceId": "ENG-LI",
+          "resourceType": "engineer",
+          "bookingId": "BK-012",
+          "date": "2025-06-13",
+          "startTime": "10:00",
+          "endTime": "13:00",
+          "lockedAt": "2026-05-30T15:34:28.460Z"
+        }
+      ],
+      "reschedules": []
+    },
+    {
+      "bookingId": "BK-013",
+      "processingOrder": 13,
+      "status": "cancelled",
+      "conflicts": [],
+      "locks": [],
+      "reschedules": []
+    },
+    {
+      "bookingId": "BK-014",
+      "processingOrder": 14,
+      "status": "confirmed",
+      "conflicts": [
+        {
+          "id": "CFL-1780155268460-awl5y",
+          "type": "MISSING_EQUIPMENT",
+          "severity": "warning",
+          "bookingIds": [
+            "BK-014"
+          ],
+          "description": "预约 BK-014 缺少设备: EQ-NONEXIST（房间 ROOM-VOCAL-01 无此设备）",
+          "affectedResources": [
+            "EQ-NONEXIST"
+          ],
+          "resolutionStatus": "open",
+          "detectedAt": "2026-05-30T15:34:28.460Z",
+          "provenance": {
+            "source": "system",
+            "sourceDetail": "scheduler",
+            "importedAt": "2026-05-30T15:34:28.460Z"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "resourceId": "ROOM-VOCAL-01",
+          "resourceType": "room",
+          "bookingId": "BK-014",
+          "date": "2025-06-14",
+          "startTime": "09:00",
+          "endTime": "12:00",
+          "lockedAt": "2026-05-30T15:34:28.461Z"
+        },
+        {
+          "resourceId": "ENG-WANG",
+          "resourceType": "engineer",
+          "bookingId": "BK-014",
+          "date": "2025-06-14",
+          "startTime": "09:00",
+          "endTime": "12:00",
+          "lockedAt": "2026-05-30T15:34:28.461Z"
+        }
+      ],
+      "reschedules": []
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "LEG-CFL-001",
+      "type": "ROOM_OVERLAP",
+      "severity": "critical",
+      "bookingIds": [
+        "BK-003",
+        "BK-001"
+      ],
+      "description": "历史遗留：月光合唱团和星河乐队6月10日上午抢同一个鼓房",
+      "affectedResources": [
+        "ROOM-DRUM-01"
+      ],
+      "resolutionStatus": "open",
+      "resolutionNote": "等前台确认谁先预约的",
+      "detectedAt": "2025-06-09T08:00:00Z",
+      "provenance": {
+        "source": "legacy",
+        "sourceDetail": "legacy-conflicts.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    },
+    {
+      "id": "LEG-CFL-002",
+      "type": "ENGINEER_DOUBLE",
+      "severity": "critical",
+      "bookingIds": [
+        "BK-003",
+        "BK-001"
+      ],
+      "description": "历史遗留：张工6月10日上午被两批客户同时预约",
+      "affectedResources": [
+        "ENG-ZHANG"
+      ],
+      "resolutionStatus": "open",
+      "detectedAt": "2025-06-09T08:05:00Z",
+      "provenance": {
+        "source": "legacy",
+        "sourceDetail": "legacy-conflicts.json",
+        "importedAt": "2026-05-30T15:34:28.440Z"
+      }
+    },
+    {
+      "id": "CFL-1780155268460-wls19",
+      "type": "ROOM_OVERLAP",
+      "severity": "critical",
+      "bookingIds": [
+        "BK-001",
+        "BK-003"
+      ],
+      "description": "房间 ROOM-DRUM-01 在 2025-06-10 09:00-12:00 与 11:00-14:00 重叠（预约 BK-001 vs BK-003）",
+      "affectedResources": [
+        "ROOM-DRUM-01"
+      ],
+      "resolutionStatus": "open",
+      "detectedAt": "2026-05-30T15:34:28.460Z",
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "scheduler",
+        "importedAt": "2026-05-30T15:34:28.460Z"
+      }
+    },
+    {
+      "id": "CFL-1780155268460-2damt",
+      "type": "ENGINEER_DOUBLE",
+      "severity": "critical",
+      "bookingIds": [
+        "BK-001",
+        "BK-003"
+      ],
+      "description": "工程师 ENG-ZHANG 在 2025-06-10 被双约（预约 BK-001 09:00-12:00 vs 预约 BK-003 11:00-14:00）",
+      "affectedResources": [
+        "ENG-ZHANG"
+      ],
+      "resolutionStatus": "open",
+      "detectedAt": "2026-05-30T15:34:28.460Z",
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "scheduler",
+        "importedAt": "2026-05-30T15:34:28.460Z"
+      }
+    },
+    {
+      "id": "CFL-1780155268460-4lizq",
+      "type": "MISSING_EQUIPMENT",
+      "severity": "warning",
+      "bookingIds": [
+        "BK-009"
+      ],
+      "description": "预约 BK-009 缺少设备: 古董话放Neve 1073(EQ-VINTAGE-PRE)（房间 ROOM-DRUM-01 无此设备）",
+      "affectedResources": [
+        "EQ-VINTAGE-PRE"
+      ],
+      "resolutionStatus": "open",
+      "detectedAt": "2026-05-30T15:34:28.460Z",
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "scheduler",
+        "importedAt": "2026-05-30T15:34:28.460Z"
+      }
+    },
+    {
+      "id": "CFL-1780155268460-awl5y",
+      "type": "MISSING_EQUIPMENT",
+      "severity": "warning",
+      "bookingIds": [
+        "BK-014"
+      ],
+      "description": "预约 BK-014 缺少设备: EQ-NONEXIST（房间 ROOM-VOCAL-01 无此设备）",
+      "affectedResources": [
+        "EQ-NONEXIST"
+      ],
+      "resolutionStatus": "open",
+      "detectedAt": "2026-05-30T15:34:28.460Z",
+      "provenance": {
+        "source": "system",
+        "sourceDetail": "scheduler",
+        "importedAt": "2026-05-30T15:34:28.460Z"
+      }
+    }
+  ],
+  "rescheduleLogs": [],
+  "resourceLocks": [
+    {
+      "resourceId": "ROOM-DRUM-01",
+      "resourceType": "room",
+      "bookingId": "BK-001",
+      "date": "2025-06-10",
+      "startTime": "09:00",
+      "endTime": "12:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ENG-ZHANG",
+      "resourceType": "engineer",
+      "bookingId": "BK-001",
+      "date": "2025-06-10",
+      "startTime": "09:00",
+      "endTime": "12:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ROOM-VOCAL-01",
+      "resourceType": "room",
+      "bookingId": "BK-002",
+      "date": "2025-06-10",
+      "startTime": "10:00",
+      "endTime": "13:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ENG-LI",
+      "resourceType": "engineer",
+      "bookingId": "BK-002",
+      "date": "2025-06-10",
+      "startTime": "10:00",
+      "endTime": "13:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ROOM-VOCAL-01",
+      "resourceType": "room",
+      "bookingId": "BK-004",
+      "date": "2025-06-10",
+      "startTime": "14:00",
+      "endTime": "17:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ENG-WANG",
+      "resourceType": "engineer",
+      "bookingId": "BK-004",
+      "date": "2025-06-10",
+      "startTime": "14:00",
+      "endTime": "17:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ROOM-MIX-01",
+      "resourceType": "room",
+      "bookingId": "BK-005",
+      "date": "2025-06-10",
+      "startTime": "14:00",
+      "endTime": "18:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ENG-LI",
+      "resourceType": "engineer",
+      "bookingId": "BK-005",
+      "date": "2025-06-10",
+      "startTime": "14:00",
+      "endTime": "18:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ROOM-DRUM-01",
+      "resourceType": "room",
+      "bookingId": "BK-009",
+      "date": "2025-06-12",
+      "startTime": "09:00",
+      "endTime": "12:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ENG-WANG",
+      "resourceType": "engineer",
+      "bookingId": "BK-009",
+      "date": "2025-06-12",
+      "startTime": "09:00",
+      "endTime": "12:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ROOM-MIX-01",
+      "resourceType": "room",
+      "bookingId": "BK-010",
+      "date": "2025-06-12",
+      "startTime": "14:00",
+      "endTime": "18:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ENG-LI",
+      "resourceType": "engineer",
+      "bookingId": "BK-010",
+      "date": "2025-06-12",
+      "startTime": "14:00",
+      "endTime": "18:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ROOM-LIVE-01",
+      "resourceType": "room",
+      "bookingId": "BK-011",
+      "date": "2025-06-13",
+      "startTime": "10:00",
+      "endTime": "16:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ENG-ZHANG",
+      "resourceType": "engineer",
+      "bookingId": "BK-011",
+      "date": "2025-06-13",
+      "startTime": "10:00",
+      "endTime": "16:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ROOM-VOCAL-01",
+      "resourceType": "room",
+      "bookingId": "BK-012",
+      "date": "2025-06-13",
+      "startTime": "10:00",
+      "endTime": "13:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ENG-LI",
+      "resourceType": "engineer",
+      "bookingId": "BK-012",
+      "date": "2025-06-13",
+      "startTime": "10:00",
+      "endTime": "13:00",
+      "lockedAt": "2026-05-30T15:34:28.460Z"
+    },
+    {
+      "resourceId": "ROOM-VOCAL-01",
+      "resourceType": "room",
+      "bookingId": "BK-014",
+      "date": "2025-06-14",
+      "startTime": "09:00",
+      "endTime": "12:00",
+      "lockedAt": "2026-05-30T15:34:28.461Z"
+    },
+    {
+      "resourceId": "ENG-WANG",
+      "resourceType": "engineer",
+      "bookingId": "BK-014",
+      "date": "2025-06-14",
+      "startTime": "09:00",
+      "endTime": "12:00",
+      "lockedAt": "2026-05-30T15:34:28.461Z"
+    }
+  ]
+}

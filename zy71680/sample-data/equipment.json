@@ -1,0 +1,33 @@
+[
+  {
+    "id": "EQ-DRUM-MIC",
+    "name": "鼓组麦克风套装",
+    "type": "microphone",
+    "quantity": 2
+  },
+  {
+    "id": "EQ-VOCAL-MIC",
+    "name": "人声电容麦",
+    "type": "microphone",
+    "quantity": 3
+  },
+  {
+    "id": "EQ-MIXER-01",
+    "name": "SSL调音台",
+    "type": "mixer",
+    "quantity": 1
+  },
+  {
+    "id": "EQ-COMPRESSOR",
+    "name": "1176压缩器",
+    "type": "compressor",
+    "quantity": 2
+  },
+  {
+    "id": "EQ-VINTAGE-PRE",
+    "name": "古董话放Neve 1073",
+    "type": "preamp",
+    "roomId": "ROOM-VOCAL-01",
+    "quantity": 1
+  }
+]

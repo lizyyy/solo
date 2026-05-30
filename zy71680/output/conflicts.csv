@@ -1,0 +1,7 @@
+booking_ids,type,severity,description,affected_resources,resolution_status,detected_at,source
+BK-003;BK-001,ROOM_OVERLAP,critical,"历史遗留：月光合唱团和星河乐队6月10日上午抢同一个鼓房",ROOM-DRUM-01,open,2025-06-09T08:00:00Z,legacy
+BK-003;BK-001,ENGINEER_DOUBLE,critical,"历史遗留：张工6月10日上午被两批客户同时预约",ENG-ZHANG,open,2025-06-09T08:05:00Z,legacy
+BK-001;BK-003,ROOM_OVERLAP,critical,"房间 ROOM-DRUM-01 在 2025-06-10 09:00-12:00 与 11:00-14:00 重叠（预约 BK-001 vs BK-003）",ROOM-DRUM-01,open,2026-05-30T15:33:52.158Z,system
+BK-001;BK-003,ENGINEER_DOUBLE,critical,"工程师 ENG-ZHANG 在 2025-06-10 被双约（预约 BK-001 09:00-12:00 vs 预约 BK-003 11:00-14:00）",ENG-ZHANG,open,2026-05-30T15:33:52.158Z,system
+BK-009,MISSING_EQUIPMENT,warning,"预约 BK-009 缺少设备: 古董话放Neve 1073(EQ-VINTAGE-PRE)（房间 ROOM-DRUM-01 无此设备）",EQ-VINTAGE-PRE,open,2026-05-30T15:33:52.159Z,system
+BK-014,MISSING_EQUIPMENT,warning,"预约 BK-014 缺少设备: EQ-NONEXIST（房间 ROOM-VOCAL-01 无此设备）",EQ-NONEXIST,open,2026-05-30T15:33:52.159Z,system

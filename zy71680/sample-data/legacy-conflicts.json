@@ -1,0 +1,23 @@
+[
+  {
+    "id": "LEG-CFL-001",
+    "type": "ROOM_OVERLAP",
+    "severity": "critical",
+    "bookingIds": ["BK-003", "BK-001"],
+    "description": "历史遗留：月光合唱团和星河乐队6月10日上午抢同一个鼓房",
+    "affectedResources": ["ROOM-DRUM-01"],
+    "resolutionStatus": "open",
+    "resolutionNote": "等前台确认谁先预约的",
+    "detectedAt": "2025-06-09T08:00:00Z"
+  },
+  {
+    "id": "LEG-CFL-002",
+    "type": "ENGINEER_DOUBLE",
+    "severity": "critical",
+    "bookingIds": ["BK-003", "BK-001"],
+    "description": "历史遗留：张工6月10日上午被两批客户同时预约",
+    "affectedResources": ["ENG-ZHANG"],
+    "resolutionStatus": "open",
+    "detectedAt": "2025-06-09T08:05:00Z"
+  }
+]
