@@ -1,0 +1,912 @@
+{
+  "generated_at": "2026-05-30T14:38:25.324950",
+  "summary": {
+    "total_tracks": 16,
+    "renamed_count": 16,
+    "channel_group_count": 15,
+    "conflict_count": 28,
+    "duplicate_channel_count": 1,
+    "misaligned_timestamp_count": 0,
+    "missing_part_count": 0,
+    "timestamp_anchor": "2025-05-30T20:00:00"
+  },
+  "channel_groups": [
+    {
+      "name": "Bass_Di",
+      "part": "DI_20250530_200003",
+      "track_indices": [
+        6
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "Bgv_L",
+      "part": "L_20250530_200000",
+      "track_indices": [
+        12
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "Bgv_R",
+      "part": "R_20250530_200000",
+      "track_indices": [
+        13
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "FX",
+      "part": "FX",
+      "track_indices": [
+        16
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "Gtr_L",
+      "part": "Guitar",
+      "track_indices": [
+        7
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "Gtr_R",
+      "part": "Guitar",
+      "track_indices": [
+        8
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "HiHat",
+      "part": "Drums",
+      "track_indices": [
+        3
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "Keys_L",
+      "part": "Keys",
+      "track_indices": [
+        9
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "Keys_R",
+      "part": "Keys",
+      "track_indices": [
+        10
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "Kick",
+      "part": "Drums",
+      "track_indices": [
+        1
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "Kick_Dup",
+      "part": "20250530_200000",
+      "track_indices": [
+        14
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "Oh_L",
+      "part": "L_20250530_200000",
+      "track_indices": [
+        4
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "Oh_R",
+      "part": "R_20250530_200000",
+      "track_indices": [
+        5,
+        5
+      ],
+      "duplicate_count": 1
+    },
+    {
+      "name": "Snare",
+      "part": "Drums",
+      "track_indices": [
+        2
+      ],
+      "duplicate_count": 0
+    },
+    {
+      "name": "Vox",
+      "part": "Vocals",
+      "track_indices": [
+        11
+      ],
+      "duplicate_count": 0
+    }
+  ],
+  "renames": [
+    {
+      "original": "01_Kick_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_Drums_Kick.wav",
+      "track_index": 1,
+      "resolved_channel": "Kick",
+      "resolved_part": "Drums"
+    },
+    {
+      "original": "02_Snare_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_Drums_Snare.wav",
+      "track_index": 2,
+      "resolved_channel": "Snare",
+      "resolved_part": "Drums"
+    },
+    {
+      "original": "03_HiHat_20250530_200001.wav",
+      "new_name": "UNKNOWN_TS_Drums_HiHat.wav",
+      "track_index": 3,
+      "resolved_channel": "HiHat",
+      "resolved_part": "Drums"
+    },
+    {
+      "original": "04_OH_L_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_L_20250530_200000_Oh_L.wav",
+      "track_index": 4,
+      "resolved_channel": "Oh_L",
+      "resolved_part": "L_20250530_200000"
+    },
+    {
+      "original": "05_OH_R_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_R_20250530_200000_Oh_R.wav",
+      "track_index": 5,
+      "resolved_channel": "Oh_R",
+      "resolved_part": "R_20250530_200000"
+    },
+    {
+      "original": "06_Bass DI_20250530_200003.wav",
+      "new_name": "UNKNOWN_TS_DI_20250530_200003_Bass_Di.wav",
+      "track_index": 6,
+      "resolved_channel": "Bass_Di",
+      "resolved_part": "DI_20250530_200003"
+    },
+    {
+      "original": "07_Gtr_L_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_Guitar_Gtr_L.wav",
+      "track_index": 7,
+      "resolved_channel": "Gtr_L",
+      "resolved_part": "Guitar"
+    },
+    {
+      "original": "08_Gtr_R_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_Guitar_Gtr_R.wav",
+      "track_index": 8,
+      "resolved_channel": "Gtr_R",
+      "resolved_part": "Guitar"
+    },
+    {
+      "original": "09_Keys_L_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_Keys_Keys_L.wav",
+      "track_index": 9,
+      "resolved_channel": "Keys_L",
+      "resolved_part": "Keys"
+    },
+    {
+      "original": "10_Keys_R_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_Keys_Keys_R.wav",
+      "track_index": 10,
+      "resolved_channel": "Keys_R",
+      "resolved_part": "Keys"
+    },
+    {
+      "original": "11_Vox_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_Vocals_Vox.wav",
+      "track_index": 11,
+      "resolved_channel": "Vox",
+      "resolved_part": "Vocals"
+    },
+    {
+      "original": "12_BGV_L_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_L_20250530_200000_Bgv_L.wav",
+      "track_index": 12,
+      "resolved_channel": "Bgv_L",
+      "resolved_part": "L_20250530_200000"
+    },
+    {
+      "original": "13_BGV_R_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_R_20250530_200000_Bgv_R.wav",
+      "track_index": 13,
+      "resolved_channel": "Bgv_R",
+      "resolved_part": "R_20250530_200000"
+    },
+    {
+      "original": "14_Kick_20250530_200000.wav",
+      "new_name": "UNKNOWN_TS_20250530_200000_Kick_Dup.wav",
+      "track_index": 14,
+      "resolved_channel": "Kick_Dup",
+      "resolved_part": "20250530_200000"
+    },
+    {
+      "original": "15_20250530_200500.wav",
+      "new_name": "UNKNOWN_TS_200500_Oh_R.wav",
+      "track_index": 5,
+      "resolved_channel": "Oh_R",
+      "resolved_part": "200500"
+    },
+    {
+      "original": "16_FX_20250530_201000.wav",
+      "new_name": "UNKNOWN_TS_FX_FX.wav",
+      "track_index": 16,
+      "resolved_channel": "FX",
+      "resolved_part": "FX"
+    }
+  ],
+  "conflicts": [
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        1
+      ],
+      "description": "声部信息不一致: ['Drums', '20250530_200000']",
+      "sources": {
+        "candidates": "['Drums', '20250530_200000']"
+      },
+      "resolution": "采用首个: Drums",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        2
+      ],
+      "description": "声部信息不一致: ['Drums', '20250530_200000']",
+      "sources": {
+        "candidates": "['Drums', '20250530_200000']"
+      },
+      "resolution": "采用首个: Drums",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        3
+      ],
+      "description": "声部信息不一致: ['Drums', '20250530_200001']",
+      "sources": {
+        "candidates": "['Drums', '20250530_200001']"
+      },
+      "resolution": "采用首个: Drums",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        4
+      ],
+      "description": "通道名三源不一致: {'filename': 'Oh', 'metadata': 'Oh_L', 'channel_table': 'Oh_L'}",
+      "sources": {
+        "filename": "Oh",
+        "metadata": "Oh_L",
+        "channel_table": "Oh_L"
+      },
+      "resolution": "优先采用 channel_table: Oh_L",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        4
+      ],
+      "description": "声部信息不一致: ['L_20250530_200000', 'Drums']",
+      "sources": {
+        "candidates": "['L_20250530_200000', 'Drums']"
+      },
+      "resolution": "采用首个: L_20250530_200000",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        5
+      ],
+      "description": "通道名三源不一致: {'filename': 'Oh', 'metadata': 'Oh_R', 'channel_table': 'Oh_R'}",
+      "sources": {
+        "filename": "Oh",
+        "metadata": "Oh_R",
+        "channel_table": "Oh_R"
+      },
+      "resolution": "优先采用 channel_table: Oh_R",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        5
+      ],
+      "description": "声部信息不一致: ['R_20250530_200000', 'Drums']",
+      "sources": {
+        "candidates": "['R_20250530_200000', 'Drums']"
+      },
+      "resolution": "采用首个: R_20250530_200000",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        6
+      ],
+      "description": "通道名三源不一致: {'filename': 'Bass', 'metadata': 'Bass_Di', 'channel_table': 'Bass_Di'}",
+      "sources": {
+        "filename": "Bass",
+        "metadata": "Bass_Di",
+        "channel_table": "Bass_Di"
+      },
+      "resolution": "优先采用 channel_table: Bass_Di",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        6
+      ],
+      "description": "声部信息不一致: ['DI_20250530_200003', 'Bass']",
+      "sources": {
+        "candidates": "['DI_20250530_200003', 'Bass']"
+      },
+      "resolution": "采用首个: DI_20250530_200003",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        7
+      ],
+      "description": "通道名三源不一致: {'filename': 'Gtr', 'metadata': 'Gtr_L', 'channel_table': 'Gtr_L'}",
+      "sources": {
+        "filename": "Gtr",
+        "metadata": "Gtr_L",
+        "channel_table": "Gtr_L"
+      },
+      "resolution": "优先采用 channel_table: Gtr_L",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        7
+      ],
+      "description": "声部信息不一致: ['Guitar', 'L_20250530_200000']",
+      "sources": {
+        "candidates": "['Guitar', 'L_20250530_200000']"
+      },
+      "resolution": "采用首个: Guitar",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        8
+      ],
+      "description": "通道名三源不一致: {'filename': 'Gtr', 'metadata': 'Gtr_R', 'channel_table': 'Gtr_R'}",
+      "sources": {
+        "filename": "Gtr",
+        "metadata": "Gtr_R",
+        "channel_table": "Gtr_R"
+      },
+      "resolution": "优先采用 channel_table: Gtr_R",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        8
+      ],
+      "description": "声部信息不一致: ['Guitar', 'R_20250530_200000']",
+      "sources": {
+        "candidates": "['Guitar', 'R_20250530_200000']"
+      },
+      "resolution": "采用首个: Guitar",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        9
+      ],
+      "description": "通道名三源不一致: {'filename': 'Keys', 'metadata': 'Keys_L', 'channel_table': 'Keys_L'}",
+      "sources": {
+        "filename": "Keys",
+        "metadata": "Keys_L",
+        "channel_table": "Keys_L"
+      },
+      "resolution": "优先采用 channel_table: Keys_L",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        9
+      ],
+      "description": "声部信息不一致: ['Keys', 'L_20250530_200000']",
+      "sources": {
+        "candidates": "['Keys', 'L_20250530_200000']"
+      },
+      "resolution": "采用首个: Keys",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        10
+      ],
+      "description": "通道名三源不一致: {'filename': 'Keys', 'metadata': 'Keys_R', 'channel_table': 'Keys_R'}",
+      "sources": {
+        "filename": "Keys",
+        "metadata": "Keys_R",
+        "channel_table": "Keys_R"
+      },
+      "resolution": "优先采用 channel_table: Keys_R",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        10
+      ],
+      "description": "声部信息不一致: ['Keys', 'R_20250530_200000']",
+      "sources": {
+        "candidates": "['Keys', 'R_20250530_200000']"
+      },
+      "resolution": "采用首个: Keys",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        11
+      ],
+      "description": "声部信息不一致: ['Vocals', '20250530_200000']",
+      "sources": {
+        "candidates": "['Vocals', '20250530_200000']"
+      },
+      "resolution": "采用首个: Vocals",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        12
+      ],
+      "description": "通道名三源不一致: {'filename': 'Vox_BG', 'metadata': 'Vox_Bg_L', 'channel_table': 'Bgv_L'}",
+      "sources": {
+        "filename": "Vox_BG",
+        "metadata": "Vox_Bg_L",
+        "channel_table": "Bgv_L"
+      },
+      "resolution": "优先采用 channel_table: Bgv_L",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        12
+      ],
+      "description": "声部信息不一致: ['L_20250530_200000', 'Vocals']",
+      "sources": {
+        "candidates": "['L_20250530_200000', 'Vocals']"
+      },
+      "resolution": "采用首个: L_20250530_200000",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        13
+      ],
+      "description": "通道名三源不一致: {'filename': 'Vox_BG', 'metadata': 'Vox_Bg_R', 'channel_table': 'Bgv_R'}",
+      "sources": {
+        "filename": "Vox_BG",
+        "metadata": "Vox_Bg_R",
+        "channel_table": "Bgv_R"
+      },
+      "resolution": "优先采用 channel_table: Bgv_R",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        13
+      ],
+      "description": "声部信息不一致: ['R_20250530_200000', 'Vocals']",
+      "sources": {
+        "candidates": "['R_20250530_200000', 'Vocals']"
+      },
+      "resolution": "采用首个: R_20250530_200000",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        14
+      ],
+      "description": "通道名三源不一致: {'filename': 'Kick', 'metadata': 'Kick', 'channel_table': 'Kick_Dup'}",
+      "sources": {
+        "filename": "Kick",
+        "metadata": "Kick",
+        "channel_table": "Kick_Dup"
+      },
+      "resolution": "优先采用 channel_table: Kick_Dup",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        14
+      ],
+      "description": "声部信息不一致: ['20250530_200000', 'Drums']",
+      "sources": {
+        "candidates": "['20250530_200000', 'Drums']"
+      },
+      "resolution": "采用首个: 20250530_200000",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        5
+      ],
+      "description": "通道名三源不一致: {'filename': '20250530', 'channel_table': 'Oh_R'}",
+      "sources": {
+        "filename": "20250530",
+        "channel_table": "Oh_R"
+      },
+      "resolution": "优先采用 channel_table: Oh_R",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        5
+      ],
+      "description": "声部信息不一致: ['200500', 'Drums']",
+      "sources": {
+        "candidates": "['200500', 'Drums']"
+      },
+      "resolution": "采用首个: 200500",
+      "resolved": true
+    },
+    {
+      "type": "triple_conflict",
+      "track_indices": [
+        16
+      ],
+      "description": "声部信息不一致: ['FX', '20250530_201000']",
+      "sources": {
+        "candidates": "['FX', '20250530_201000']"
+      },
+      "resolution": "采用首个: FX",
+      "resolved": true
+    },
+    {
+      "type": "channel_duplicate",
+      "track_indices": [
+        5,
+        5
+      ],
+      "description": "通道重名: 'Oh_R' 出现 2 次 (轨道 [5, 5])",
+      "sources": {
+        "count": "2"
+      },
+      "resolution": "",
+      "resolved": false
+    },
+    {
+      "type": "timestamp_misalign",
+      "track_indices": [
+        5
+      ],
+      "description": "时间戳缺失已推断: 轨道=5, 推断值=2025-05-30T20:00:00, 基于锚点推断",
+      "sources": {
+        "inferred_from": "2025-05-30T20:00:00"
+      },
+      "resolution": "推断为锚点时间: 2025-05-30T20:00:00",
+      "resolved": true
+    }
+  ],
+  "tracks": [
+    {
+      "original_name": "01_Kick_20250530_200000.wav",
+      "track_index": 1,
+      "channel_from_filename": "Kick",
+      "channel_from_metadata": "Kick",
+      "channel_from_table": "Kick",
+      "part_from_filename": "20250530_200000",
+      "part_from_assignment": "Drums",
+      "resolved_channel": "Kick",
+      "resolved_part": "Drums",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "new_name": "UNKNOWN_TS_Drums_Kick.wav"
+    },
+    {
+      "original_name": "02_Snare_20250530_200000.wav",
+      "track_index": 2,
+      "channel_from_filename": "Snare",
+      "channel_from_metadata": "Snare",
+      "channel_from_table": "Snare",
+      "part_from_filename": "20250530_200000",
+      "part_from_assignment": "Drums",
+      "resolved_channel": "Snare",
+      "resolved_part": "Drums",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "new_name": "UNKNOWN_TS_Drums_Snare.wav"
+    },
+    {
+      "original_name": "03_HiHat_20250530_200001.wav",
+      "track_index": 3,
+      "channel_from_filename": "HiHat",
+      "channel_from_metadata": "HiHat",
+      "channel_from_table": "HiHat",
+      "part_from_filename": "20250530_200001",
+      "part_from_assignment": "Drums",
+      "resolved_channel": "HiHat",
+      "resolved_part": "Drums",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "new_name": "UNKNOWN_TS_Drums_HiHat.wav"
+    },
+    {
+      "original_name": "04_OH_L_20250530_200000.wav",
+      "track_index": 4,
+      "channel_from_filename": "OH",
+      "channel_from_metadata": "OH_L",
+      "channel_from_table": "OH_L",
+      "part_from_filename": "L_20250530_200000",
+      "part_from_assignment": "Drums",
+      "resolved_channel": "Oh_L",
+      "resolved_part": "L_20250530_200000",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "new_name": "UNKNOWN_TS_L_20250530_200000_Oh_L.wav"
+    },
+    {
+      "original_name": "05_OH_R_20250530_200000.wav",
+      "track_index": 5,
+      "channel_from_filename": "OH",
+      "channel_from_metadata": "OH_R",
+      "channel_from_table": "OH_R",
+      "part_from_filename": "R_20250530_200000",
+      "part_from_assignment": "Drums",
+      "resolved_channel": "Oh_R",
+      "resolved_part": "R_20250530_200000",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "new_name": "UNKNOWN_TS_R_20250530_200000_Oh_R.wav"
+    },
+    {
+      "original_name": "06_Bass DI_20250530_200003.wav",
+      "track_index": 6,
+      "channel_from_filename": "Bass",
+      "channel_from_metadata": "Bass_DI",
+      "channel_from_table": "Bass_DI",
+      "part_from_filename": "DI_20250530_200003",
+      "part_from_assignment": "Bass",
+      "resolved_channel": "Bass_Di",
+      "resolved_part": "DI_20250530_200003",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 44100,
+      "channels": 1,
+      "duration_seconds": 10.0,
+      "new_name": "UNKNOWN_TS_DI_20250530_200003_Bass_Di.wav"
+    },
+    {
+      "original_name": "07_Gtr_L_20250530_200000.wav",
+      "track_index": 7,
+      "channel_from_filename": "Gtr",
+      "channel_from_metadata": "Gtr_L",
+      "channel_from_table": "Gtr_L",
+      "part_from_filename": "L_20250530_200000",
+      "part_from_assignment": "Guitar",
+      "resolved_channel": "Gtr_L",
+      "resolved_part": "Guitar",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "new_name": "UNKNOWN_TS_Guitar_Gtr_L.wav"
+    },
+    {
+      "original_name": "08_Gtr_R_20250530_200000.wav",
+      "track_index": 8,
+      "channel_from_filename": "Gtr",
+      "channel_from_metadata": "Gtr_R",
+      "channel_from_table": "Gtr_R",
+      "part_from_filename": "R_20250530_200000",
+      "part_from_assignment": "Guitar",
+      "resolved_channel": "Gtr_R",
+      "resolved_part": "Guitar",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "new_name": "UNKNOWN_TS_Guitar_Gtr_R.wav"
+    },
+    {
+      "original_name": "09_Keys_L_20250530_200000.wav",
+      "track_index": 9,
+      "channel_from_filename": "Keys",
+      "channel_from_metadata": "Keys_L",
+      "channel_from_table": "Keys_L",
+      "part_from_filename": "L_20250530_200000",
+      "part_from_assignment": "Keys",
+      "resolved_channel": "Keys_L",
+      "resolved_part": "Keys",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 44100,
+      "channels": 1,
+      "duration_seconds": 10.0,
+      "new_name": "UNKNOWN_TS_Keys_Keys_L.wav"
+    },
+    {
+      "original_name": "10_Keys_R_20250530_200000.wav",
+      "track_index": 10,
+      "channel_from_filename": "Keys",
+      "channel_from_metadata": "Keys_R",
+      "channel_from_table": "Keys_R",
+      "part_from_filename": "R_20250530_200000",
+      "part_from_assignment": "Keys",
+      "resolved_channel": "Keys_R",
+      "resolved_part": "Keys",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 44100,
+      "channels": 1,
+      "duration_seconds": 10.0,
+      "new_name": "UNKNOWN_TS_Keys_Keys_R.wav"
+    },
+    {
+      "original_name": "11_Vox_20250530_200000.wav",
+      "track_index": 11,
+      "channel_from_filename": "Vox",
+      "channel_from_metadata": "Vox",
+      "channel_from_table": "Vox",
+      "part_from_filename": "20250530_200000",
+      "part_from_assignment": "Vocals",
+      "resolved_channel": "Vox",
+      "resolved_part": "Vocals",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "new_name": "UNKNOWN_TS_Vocals_Vox.wav"
+    },
+    {
+      "original_name": "12_BGV_L_20250530_200000.wav",
+      "track_index": 12,
+      "channel_from_filename": "BGV",
+      "channel_from_metadata": "Vox_BG_L",
+      "channel_from_table": "BGV_L",
+      "part_from_filename": "L_20250530_200000",
+      "part_from_assignment": "Vocals",
+      "resolved_channel": "Bgv_L",
+      "resolved_part": "L_20250530_200000",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "new_name": "UNKNOWN_TS_L_20250530_200000_Bgv_L.wav"
+    },
+    {
+      "original_name": "13_BGV_R_20250530_200000.wav",
+      "track_index": 13,
+      "channel_from_filename": "BGV",
+      "channel_from_metadata": "Vox_BG_R",
+      "channel_from_table": "BGV_R",
+      "part_from_filename": "R_20250530_200000",
+      "part_from_assignment": "Vocals",
+      "resolved_channel": "Bgv_R",
+      "resolved_part": "R_20250530_200000",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "new_name": "UNKNOWN_TS_R_20250530_200000_Bgv_R.wav"
+    },
+    {
+      "original_name": "14_Kick_20250530_200000.wav",
+      "track_index": 14,
+      "channel_from_filename": "Kick",
+      "channel_from_metadata": "Kick",
+      "channel_from_table": "Kick_Dup",
+      "part_from_filename": "20250530_200000",
+      "part_from_assignment": "Drums",
+      "resolved_channel": "Kick_Dup",
+      "resolved_part": "20250530_200000",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 0,
+      "channels": 0,
+      "duration_seconds": 0.0,
+      "new_name": "UNKNOWN_TS_20250530_200000_Kick_Dup.wav"
+    },
+    {
+      "original_name": "15_20250530_200500.wav",
+      "track_index": 5,
+      "channel_from_filename": "20250530",
+      "channel_from_metadata": "",
+      "channel_from_table": "OH_R",
+      "part_from_filename": "200500",
+      "part_from_assignment": "Drums",
+      "resolved_channel": "Oh_R",
+      "resolved_part": "200500",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": null,
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 44100,
+      "channels": 1,
+      "duration_seconds": 10.0,
+      "new_name": "UNKNOWN_TS_200500_Oh_R.wav"
+    },
+    {
+      "original_name": "16_FX_20250530_201000.wav",
+      "track_index": 16,
+      "channel_from_filename": "FX",
+      "channel_from_metadata": "FX",
+      "channel_from_table": "FX",
+      "part_from_filename": "20250530_201000",
+      "part_from_assignment": "FX",
+      "resolved_channel": "FX",
+      "resolved_part": "FX",
+      "timestamp_from_filename": null,
+      "timestamp_from_metadata": "2025-05-30T20:00:00",
+      "resolved_timestamp": "2025-05-30T20:00:00",
+      "sample_rate": 44100,
+      "channels": 1,
+      "duration_seconds": 10.0,
+      "new_name": "UNKNOWN_TS_FX_FX.wav"
+    }
+  ]
+}
