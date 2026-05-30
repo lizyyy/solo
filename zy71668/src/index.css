@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1a365d 50%, #0f172a 100%);
+  color: #e2e8f0;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+@layer components {
+  .card {
+    @apply bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-lg shadow-xl;
+  }
+  
+  .card-hover {
+    @apply hover:border-aviation-400/50 hover:shadow-aviation-500/10 transition-all duration-300;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 bg-aviation-500 text-white rounded-md hover:bg-aviation-600 transition-colors duration-200 font-medium;
+  }
+  
+  .btn-danger {
+    @apply px-4 py-2 bg-danger-500 text-white rounded-md hover:bg-danger-600 transition-colors duration-200 font-medium;
+  }
+  
+  .btn-warning {
+    @apply px-4 py-2 bg-warning-500 text-white rounded-md hover:bg-warning-600 transition-colors duration-200 font-medium;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-md text-white placeholder-slate-400 focus:outline-none focus:border-aviation-400 focus:ring-1 focus:ring-aviation-400 transition-colors;
+  }
+  
+  .label-text {
+    @apply block text-sm font-medium text-slate-300 mb-1;
+  }
+  
+  .gauge-container {
+    @apply relative w-full h-3 bg-slate-700 rounded-full overflow-hidden;
+  }
+  
+  .gauge-fill {
+    @apply h-full transition-all duration-500 ease-out;
+  }
+  
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #475569 #1e293b;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #1e293b;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.4s ease-out forwards;
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-count {
+  animation: countUp 0.5s ease-out forwards;
+}
+
+.risk-critical {
+  @apply border-danger-500 bg-danger-500/10;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.risk-warning {
+  @apply border-warning-500 bg-warning-500/10;
+}
+
+.risk-notice {
+  @apply border-amber-500 bg-amber-500/10;
+}
