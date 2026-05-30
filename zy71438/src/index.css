@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #0d0221 0%, #1a0a2e 50%, #0d0221 100%);
+  min-height: 100vh;
+  color: #e0e0e0;
+}
+
+/* 网格背景 */
+.cyber-grid {
+  background-image: 
+    linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* 霓虹文字效果 */
+.neon-text {
+  text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+.neon-text-cyan {
+  color: #00f5ff;
+  text-shadow: 0 0 5px #00f5ff, 0 0 10px #00f5ff, 0 0 20px #00f5ff;
+}
+
+.neon-text-pink {
+  color: #ff00ff;
+  text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+}
+
+/* 霓虹边框 */
+.neon-border {
+  border: 1px solid #00f5ff;
+  box-shadow: 0 0 5px #00f5ff, inset 0 0 5px rgba(0, 245, 255, 0.1);
+}
+
+.neon-border-pink {
+  border: 1px solid #ff00ff;
+  box-shadow: 0 0 5px #ff00ff, inset 0 0 5px rgba(255, 0, 255, 0.1);
+}
+
+/* 扫描线效果 */
+.scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+}
+
+/* 旋钮样式 */
+.knob {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #2a1a4e, #1a0a2e);
+  border: 2px solid #00f5ff;
+  box-shadow: 
+    0 0 10px rgba(0, 245, 255, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  user-select: none;
+}
+
+.knob::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 20px;
+  background: #00f5ff;
+  border-radius: 2px;
+  box-shadow: 0 0 5px #00f5ff;
+}
+
+/* 按钮悬停效果 */
+.cyber-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.cyber-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.cyber-btn:hover::before {
+  left: 100%;
+}
+
+/* 波形画布 */
+.waveform-canvas {
+  background: linear-gradient(180deg, #0a0118 0%, #1a0a2e 100%);
+  border: 1px solid rgba(0, 245, 255, 0.3);
+  border-radius: 8px;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a0a2e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00f5ff;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff00ff;
+}
+
+/* 时间线样式 */
+.timeline-node {
+  position: relative;
+}
+
+.timeline-node::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 30px;
+  bottom: -20px;
+  width: 2px;
+  background: linear-gradient(180deg, #00f5ff, transparent);
+}
+
+.timeline-node:last-child::before {
+  display: none;
+}
