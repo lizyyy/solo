@@ -1,0 +1,74 @@
+[
+  {
+    "player_name": "张伟",
+    "angle_deg": 52,
+    "velocity_ms": 7.2,
+    "release_height": 1.95,
+    "rim_height": 3.048,
+    "rim_distance": 4.225,
+    "note": "罚球线标准出手"
+  },
+  {
+    "player_name": "李强",
+    "angle_deg": 0.87,
+    "velocity_ms": 7.0,
+    "release_height": 1.90,
+    "rim_height": 3.048,
+    "rim_distance": 4.225,
+    "note": "角度疑似弧度制填入"
+  },
+  {
+    "player_name": "王磊",
+    "angle_deg": 45,
+    "velocity_ms": 7.5,
+    "release_height": null,
+    "rim_height": null,
+    "rim_distance": 4.225,
+    "note": "出手高度和篮筐高度漏填"
+  },
+  {
+    "player_name": "赵鹏",
+    "angle_deg": 50,
+    "velocity_ms": 36,
+    "release_height": 2.05,
+    "rim_height": 3.048,
+    "rim_distance": 6.75,
+    "note": "速度疑似km/h填入，三分线距离"
+  },
+  {
+    "player_name": "孙浩",
+    "angle_deg": 52,
+    "velocity_ms": 7.2,
+    "release_height": 1.95,
+    "rim_height": 3.048,
+    "rim_distance": 4.225,
+    "note": "与张伟完全相同的参数——重复记录"
+  },
+  {
+    "player_name": "周涛",
+    "angle_deg": -5,
+    "velocity_ms": 8.0,
+    "release_height": 1.88,
+    "rim_height": 3.048,
+    "rim_distance": 4.225,
+    "note": "角度为负值，手工录入更正前数据"
+  },
+  {
+    "player_name": "吴峰",
+    "angle_deg": 55,
+    "velocity_ms": 7.8,
+    "release_height": 1.92,
+    "rim_height": 2.5,
+    "rim_distance": 4.225,
+    "note": "篮筐高度2.5m，看起来像正常值但实际偏低——疑似cm/m混淆"
+  },
+  {
+    "player_name": "郑凯",
+    "angle_deg": 48,
+    "velocity_ms": 7.1,
+    "release_height": 1.98,
+    "rim_height": 3.048,
+    "rim_distance": 4.225,
+    "note": "正常数据，命中率参照"
+  }
+]
