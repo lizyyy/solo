@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>合唱队站位声场</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <div id="viewport-container">
+    <canvas id="three-canvas"></canvas>
+    <div id="viewport-toolbar">
+      <button id="btn-toggle-heatmap" class="toolbar-btn active" title="声场热力图">🌡️ 热力</button>
+      <button id="btn-toggle-mics" class="toolbar-btn active" title="麦克风">🎙️ 麦克风</button>
+      <button id="btn-toggle-labels" class="toolbar-btn active" title="标签">🏷️ 标签</button>
+      <button id="btn-reset-camera" class="toolbar-btn" title="重置视角">🎥 重置</button>
+      <button id="btn-save-formation" class="toolbar-btn" title="保存站位">💾 保存</button>
+    </div>
+    <div id="drag-hint" class="hint-overlay">拖拽站位圆点或麦克风可调整位置</div>
+  </div>
+  <div id="sidebar">
+    <div class="sidebar-section">
+      <h3>📋 站位方案</h3>
+      <div id="formation-controls">
+        <select id="formation-select"></select>
+        <button id="btn-new-formation" class="small-btn">新建</button>
+        <button id="btn-delete-formation" class="small-btn danger">删除</button>
+      </div>
+      <input id="formation-name" type="text" placeholder="方案名称">
+    </div>
+    <div class="sidebar-section">
+      <h3>🎤 声部人员</h3>
+      <div id="member-list" class="scrollable-list"></div>
+      <div class="import-row">
+        <button id="btn-import-members" class="small-btn">导入数据</button>
+        <input id="file-members" type="file" accept=".json,.csv" hidden>
+      </div>
+      <div class="mic-add-row">
+        <input id="new-member-name" type="text" placeholder="姓名" style="width:80px;">
+        <select id="new-member-part">
+          <option value="soprano">女高</option>
+          <option value="alto">女低</option>
+          <option value="tenor">男高</option>
+          <option value="bass">男低</option>
+        </select>
+        <button id="btn-add-member" class="small-btn">添加成员</button>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <h3>🎙️ 麦克风</h3>
+      <div id="mic-list" class="scrollable-list"></div>
+      <div class="import-row">
+        <button id="btn-import-mics" class="small-btn">导入数据</button>
+        <input id="file-mics" type="file" accept=".json,.csv" hidden>
+      <div class="mic-add-row">
+          <select id="mic-type-select">
+            <option value="cardioid">心形</option>
+            <option value="omni">全指向</option>
+            <option value="figure8">8字形</option>
+          </select>
+          <button id="btn-add-mic" class="small-btn">添加麦克风</button>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <h3>⚠️ 问题检测</h3>
+      <div id="error-list" class="scrollable-list error-list"></div>
+    </div>
+    <div class="sidebar-section">
+      <h3>📝 调整历史</h3>
+      <div id="history-list" class="scrollable-list history-list"></div>
+      <button id="btn-clear-history" class="small-btn">清空历史</button>
+    </div>
+  </div>
+</div>
+<div id="toast-container"></div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
