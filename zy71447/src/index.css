@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Roboto Mono", "JetBrains Mono", Consolas, monospace;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.92);
+  background-color: #121212;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Source Han Serif SC", "Noto Serif SC", SimSun, serif;
+  font-weight: 600;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #121212;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(62, 39, 35, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(184, 134, 11, 0.08) 0%, transparent 50%);
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-walnut-800 text-bronze-400 rounded-lg border border-bronze-700/50 
+           transition-all duration-200 hover:bg-walnut-700 hover:shadow-bronze-glow-hover
+           active:scale-95 font-mono text-sm;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-charcoal-800 text-gray-300 rounded-lg border border-charcoal-700
+           transition-all duration-200 hover:bg-charcoal-700 hover:text-white
+           active:scale-95 font-mono text-sm;
+  }
+
+  .btn-band-low {
+    @apply px-6 py-3 bg-charcoal-800 text-acoustic-low rounded-lg border-2 border-transparent
+           transition-all duration-300 hover:bg-charcoal-700
+           active:scale-95 font-mono font-medium;
+  }
+
+  .btn-band-low.active {
+    @apply border-acoustic-low bg-acoustic-low/20 shadow-lg;
+    box-shadow: 0 0 20px rgba(30, 136, 229, 0.4);
+  }
+
+  .btn-band-mid {
+    @apply px-6 py-3 bg-charcoal-800 text-acoustic-mid rounded-lg border-2 border-transparent
+           transition-all duration-300 hover:bg-charcoal-700
+           active:scale-95 font-mono font-medium;
+  }
+
+  .btn-band-mid.active {
+    @apply border-acoustic-mid bg-acoustic-mid/20 shadow-lg;
+    box-shadow: 0 0 20px rgba(67, 160, 71, 0.4);
+  }
+
+  .btn-band-high {
+    @apply px-6 py-3 bg-charcoal-800 text-acoustic-high rounded-lg border-2 border-transparent
+           transition-all duration-300 hover:bg-charcoal-700
+           active:scale-95 font-mono font-medium;
+  }
+
+  .btn-band-high.active {
+    @apply border-acoustic-high bg-acoustic-high/20 shadow-lg;
+    box-shadow: 0 0 20px rgba(229, 57, 53, 0.4);
+  }
+
+  .card-panel {
+    @apply bg-charcoal-900/80 backdrop-blur-sm rounded-xl border border-charcoal-700/50
+           shadow-inner-walnut p-4;
+  }
+
+  .risk-card {
+    @apply card-panel border-l-4 transition-all duration-300;
+  }
+
+  .risk-card.low {
+    @apply border-l-acoustic-mid;
+  }
+
+  .risk-card.medium {
+    @apply border-l-bronze-500;
+  }
+
+  .risk-card.high {
+    @apply border-l-acoustic-high;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-charcoal-800 border border-charcoal-600 rounded-lg
+           text-gray-200 placeholder-gray-500 focus:outline-none focus:border-bronze-500
+           focus:ring-1 focus:ring-bronze-500/50 transition-all font-mono text-sm;
+  }
+
+  .nav-item {
+    @apply px-4 py-2 text-gray-400 hover:text-bronze-400 transition-colors duration-200
+           font-mono text-sm relative;
+  }
+
+  .nav-item.active {
+    @apply text-bronze-400;
+  }
+
+  .nav-item.active::after {
+    content: '';
+    @apply absolute bottom-0 left-0 right-0 h-0.5 bg-bronze-500;
+    box-shadow: 0 0 8px rgba(184, 134, 11, 0.6);
+  }
+
+  .section-plane {
+    background: linear-gradient(135deg, rgba(184, 134, 11, 0.1) 0%, rgba(184, 134, 11, 0.05) 100%);
+    border: 1px solid rgba(184, 134, 11, 0.3);
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-charcoal-800 rounded;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-walnut-700 rounded hover:bg-walnut-600;
+  }
+}
+
+canvas {
+  display: block;
+}
+
+/* 3D Canvas 容器 */
+.canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: radial-gradient(ellipse at center, #1a1a1a 0%, #0d0d0d 100%);
+}
+
+/* 热点标记动画 */
+@keyframes hotspot-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+.hotspot-marker {
+  animation: hotspot-pulse 2s ease-in-out infinite;
+}
+
+/* 加载动画 */
+.loading-ring {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(184, 134, 11, 0.2);
+  border-top-color: #B8860B;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
