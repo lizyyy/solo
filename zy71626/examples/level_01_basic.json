@@ -1,0 +1,85 @@
+{
+  "version": "1.0.0",
+  "id": "level_01",
+  "name": "入门关卡：初识火星温室",
+  "max_rounds": 20,
+  "target_yield": 50.0,
+  "greenhouse_modules": [
+    {
+      "id": "gh_01",
+      "name": "主温室舱",
+      "capacity": 10,
+      "temperature": 22.0,
+      "target_temperature": 24.0,
+      "humidity": 65.0,
+      "light_intensity": 80.0,
+      "light_on": true,
+      "insulation_level": 3
+    }
+  ],
+  "crops": [
+    {
+      "id": "crop_01",
+      "name": "火星番茄一号",
+      "species": "Solanum lycopersicum",
+      "water_consumption": 8.0,
+      "energy_consumption": 3.0,
+      "optimal_temp_min": 20.0,
+      "optimal_temp_max": 28.0,
+      "optimal_light_hours": 12.0
+    },
+    {
+      "id": "crop_02",
+      "name": "火星生菜",
+      "species": "Lactuca sativa",
+      "water_consumption": 6.0,
+      "energy_consumption": 2.0,
+      "optimal_temp_min": 18.0,
+      "optimal_temp_max": 25.0,
+      "optimal_light_hours": 10.0
+    },
+    {
+      "id": "crop_03",
+      "name": "火星萝卜",
+      "species": "Raphanus sativus",
+      "water_consumption": 5.0,
+      "energy_consumption": 2.0,
+      "optimal_temp_min": 15.0,
+      "optimal_temp_max": 22.0,
+      "optimal_light_hours": 8.0
+    }
+  ],
+  "water_tanks": [
+    {
+      "id": "tank_01",
+      "name": "主水箱",
+      "capacity": 500.0,
+      "current_level": 400.0,
+      "purification_rate": 8.0,
+      "leak_rate": 0.1
+    }
+  ],
+  "batteries": [
+    {
+      "id": "bat_01",
+      "name": "主电池组",
+      "capacity": 300.0,
+      "current_charge": 250.0,
+      "charge_rate": 15.0,
+      "discharge_rate": 12.0,
+      "efficiency": 0.9
+    }
+  ],
+  "upcoming_events": [
+    {
+      "id": "storm_01",
+      "name": "小型沙尘暴",
+      "severity": 1,
+      "duration": 2,
+      "trigger_round": 8,
+      "light_blockage": 0.3,
+      "temperature_drop": 5.0,
+      "damage_factor": 0.05
+    }
+  ]
+}

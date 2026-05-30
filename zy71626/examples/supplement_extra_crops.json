@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "name": "补充：额外作物",
+  "is_supplement": true,
+  "crops": [
+    {
+      "id": "crop_04",
+      "name": "火星小麦",
+      "species": "Triticum aestivum",
+      "water_consumption": 10.0,
+      "energy_consumption": 4.0,
+      "optimal_temp_min": 16.0,
+      "optimal_temp_max": 24.0,
+      "optimal_light_hours": 14.0
+    },
+    {
+      "id": "crop_05",
+      "name": "火星土豆",
+      "species": "Solanum tuberosum",
+      "water_consumption": 12.0,
+      "energy_consumption": 5.0,
+      "optimal_temp_min": 18.0,
+      "optimal_temp_max": 26.0,
+      "optimal_light_hours": 12.0
+    }
+  ]
+}

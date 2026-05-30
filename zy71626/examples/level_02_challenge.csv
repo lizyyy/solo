@@ -1,0 +1,14 @@
+type,id,name,capacity,temperature,target_temperature,version
+greenhouse,gh_01,实验舱A,8,21.0,25.0,1.1.0
+greenhouse,gh_02,实验舱B,6,19.0,20.0,1.1.0
+type,id,name,species,water_consumption,optimal_temp_min,optimal_temp_max,version
+crop,crop_01,抗寒菠菜,Spinacia oleracea,7.0,10.0,20.0,1.1.0
+crop,crop_02,耐热青椒,Capsicum annuum,9.0,22.0,30.0,1.1.0
+type,id,name,capacity,current_level,purification_rate,version
+tank,tank_01,A舱水箱,400.0,350.0,6.0,1.1.0
+tank,tank_02,B舱水箱,300.0,280.0,5.0,1.1.0
+type,id,name,capacity,current_charge,version
+battery,bat_01,主电池,400.0,380.0,1.1.0
+type,id,name,severity,duration,trigger_round,version
+event,storm_01,强沙尘暴,2,3,12,1.1.0
+event,storm_02,特大沙尘暴,3,4,18,1.1.0
