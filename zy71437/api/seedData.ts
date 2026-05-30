@@ -1,0 +1,195 @@
+import type { Scenario } from '../shared/types.js'
+
+export const scenarios: Scenario[] = [
+  {
+    id: 'cross-easy-01',
+    name: '城市主干道十字路口',
+    difficulty: 'easy',
+    intersectionType: 'cross',
+    passThreshold: 200,
+    approaches: [
+      {
+        id: 'approach-north',
+        direction: 'north',
+        vehicleFlow: 800,
+        pedestrianFlow: 200,
+        lanes: [
+          { id: 'n-straight', type: 'straight', direction: 'north' },
+          { id: 'n-left', type: 'left', direction: 'north' },
+          { id: 'n-right', type: 'right', direction: 'north' },
+        ],
+      },
+      {
+        id: 'approach-south',
+        direction: 'south',
+        vehicleFlow: 800,
+        pedestrianFlow: 200,
+        lanes: [
+          { id: 's-straight', type: 'straight', direction: 'south' },
+          { id: 's-left', type: 'left', direction: 'south' },
+          { id: 's-right', type: 'right', direction: 'south' },
+        ],
+      },
+      {
+        id: 'approach-east',
+        direction: 'east',
+        vehicleFlow: 600,
+        pedestrianFlow: 150,
+        lanes: [
+          { id: 'e-straight', type: 'straight', direction: 'east' },
+          { id: 'e-left', type: 'left', direction: 'east' },
+          { id: 'e-right', type: 'right', direction: 'east' },
+        ],
+      },
+      {
+        id: 'approach-west',
+        direction: 'west',
+        vehicleFlow: 600,
+        pedestrianFlow: 150,
+        lanes: [
+          { id: 'w-straight', type: 'straight', direction: 'west' },
+          { id: 'w-left', type: 'left', direction: 'west' },
+          { id: 'w-right', type: 'right', direction: 'west' },
+        ],
+      },
+    ],
+    busRoutes: [
+      { id: 'bus-101', name: '101路', approachId: 'approach-north', headwayMinutes: 10, peakHeadwayMinutes: 8 },
+      { id: 'bus-202', name: '202路', approachId: 'approach-east', headwayMinutes: 12, peakHeadwayMinutes: 10 },
+    ],
+    pedestrianCrossings: [
+      { id: 'cross-north-near', approachId: 'approach-north', side: 'near', avgWaitSeconds: 45 },
+      { id: 'cross-south-near', approachId: 'approach-south', side: 'near', avgWaitSeconds: 45 },
+      { id: 'cross-east-near', approachId: 'approach-east', side: 'near', avgWaitSeconds: 40 },
+      { id: 'cross-west-near', approachId: 'approach-west', side: 'near', avgWaitSeconds: 40 },
+    ],
+  },
+  {
+    id: 'cross-medium-01',
+    name: '商业区繁忙路口',
+    difficulty: 'medium',
+    intersectionType: 'cross',
+    passThreshold: 220,
+    approaches: [
+      {
+        id: 'approach-north',
+        direction: 'north',
+        vehicleFlow: 1200,
+        pedestrianFlow: 500,
+        lanes: [
+          { id: 'n-straight', type: 'straight', direction: 'north' },
+          { id: 'n-left', type: 'left', direction: 'north' },
+          { id: 'n-right', type: 'right', direction: 'north' },
+          { id: 'n-bus', type: 'bus', direction: 'north' },
+        ],
+      },
+      {
+        id: 'approach-south',
+        direction: 'south',
+        vehicleFlow: 1200,
+        pedestrianFlow: 500,
+        lanes: [
+          { id: 's-straight', type: 'straight', direction: 'south' },
+          { id: 's-left', type: 'left', direction: 'south' },
+          { id: 's-right', type: 'right', direction: 'south' },
+          { id: 's-bus', type: 'bus', direction: 'south' },
+        ],
+      },
+      {
+        id: 'approach-east',
+        direction: 'east',
+        vehicleFlow: 900,
+        pedestrianFlow: 400,
+        lanes: [
+          { id: 'e-straight', type: 'straight', direction: 'east' },
+          { id: 'e-left', type: 'left', direction: 'east' },
+          { id: 'e-right', type: 'right', direction: 'east' },
+          { id: 'e-bus', type: 'bus', direction: 'east' },
+        ],
+      },
+      {
+        id: 'approach-west',
+        direction: 'west',
+        vehicleFlow: 900,
+        pedestrianFlow: 400,
+        lanes: [
+          { id: 'w-straight', type: 'straight', direction: 'west' },
+          { id: 'w-left', type: 'left', direction: 'west' },
+          { id: 'w-right', type: 'right', direction: 'west' },
+          { id: 'w-bus', type: 'bus', direction: 'west' },
+        ],
+      },
+    ],
+    busRoutes: [
+      { id: 'bus-301', name: '301路', approachId: 'approach-north', headwayMinutes: 8, peakHeadwayMinutes: 5 },
+      { id: 'bus-302', name: '302路', approachId: 'approach-south', headwayMinutes: 8, peakHeadwayMinutes: 6 },
+      { id: 'bus-401', name: '401路', approachId: 'approach-east', headwayMinutes: 10, peakHeadwayMinutes: 7 },
+      { id: 'bus-402', name: '402路', approachId: 'approach-west', headwayMinutes: 12, peakHeadwayMinutes: 8 },
+    ],
+    pedestrianCrossings: [
+      { id: 'cross-north-near', approachId: 'approach-north', side: 'near', avgWaitSeconds: 65 },
+      { id: 'cross-north-far', approachId: 'approach-north', side: 'far', avgWaitSeconds: 70 },
+      { id: 'cross-south-near', approachId: 'approach-south', side: 'near', avgWaitSeconds: 65 },
+      { id: 'cross-south-far', approachId: 'approach-south', side: 'far', avgWaitSeconds: 70 },
+      { id: 'cross-east-near', approachId: 'approach-east', side: 'near', avgWaitSeconds: 60 },
+      { id: 'cross-east-far', approachId: 'approach-east', side: 'far', avgWaitSeconds: 65 },
+      { id: 'cross-west-near', approachId: 'approach-west', side: 'near', avgWaitSeconds: 60 },
+      { id: 'cross-west-far', approachId: 'approach-west', side: 'far', avgWaitSeconds: 65 },
+    ],
+  },
+  {
+    id: 'T-hard-01',
+    name: 'T型交汇路口',
+    difficulty: 'hard',
+    intersectionType: 'T',
+    passThreshold: 240,
+    approaches: [
+      {
+        id: 'approach-north',
+        direction: 'north',
+        vehicleFlow: 700,
+        pedestrianFlow: 300,
+        lanes: [
+          { id: 'n-straight', type: 'straight', direction: 'north' },
+          { id: 'n-left', type: 'left', direction: 'north' },
+          { id: 'n-right', type: 'right', direction: 'north' },
+        ],
+      },
+      {
+        id: 'approach-east',
+        direction: 'east',
+        vehicleFlow: 500,
+        pedestrianFlow: 250,
+        lanes: [
+          { id: 'e-straight', type: 'straight', direction: 'east' },
+          { id: 'e-left', type: 'left', direction: 'east' },
+          { id: 'e-right', type: 'right', direction: 'east' },
+        ],
+      },
+      {
+        id: 'approach-west',
+        direction: 'west',
+        vehicleFlow: 600,
+        pedestrianFlow: 200,
+        lanes: [
+          { id: 'w-straight', type: 'straight', direction: 'west' },
+          { id: 'w-left', type: 'left', direction: 'west' },
+          { id: 'w-right', type: 'right', direction: 'west' },
+          { id: 'w-bus', type: 'bus', direction: 'west' },
+        ],
+      },
+    ],
+    busRoutes: [
+      { id: 'bus-501', name: '501路', approachId: 'approach-west', headwayMinutes: 6, peakHeadwayMinutes: 4 },
+      { id: 'bus-502', name: '502路', approachId: 'approach-north', headwayMinutes: 8, peakHeadwayMinutes: 5 },
+    ],
+    pedestrianCrossings: [
+      { id: 'cross-north-near', approachId: 'approach-north', side: 'near', avgWaitSeconds: 55 },
+      { id: 'cross-north-far', approachId: 'approach-north', side: 'far', avgWaitSeconds: 60 },
+      { id: 'cross-east-near', approachId: 'approach-east', side: 'near', avgWaitSeconds: 65 },
+      { id: 'cross-east-far', approachId: 'approach-east', side: 'far', avgWaitSeconds: 70 },
+      { id: 'cross-west-near', approachId: 'approach-west', side: 'near', avgWaitSeconds: 75 },
+      { id: 'cross-west-far', approachId: 'approach-west', side: 'far', avgWaitSeconds: 80 },
+    ],
+  },
+]
