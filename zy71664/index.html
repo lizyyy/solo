@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>冷链箱温度滞后分析</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-layout">
+  <header class="app-header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 2v20M16 2v20M2 8h20M2 16h20"/></svg>
+      冷链箱温度滞后分析
+    </div>
+    <div class="header-stats" id="headerStats"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" onclick="App.showImportModal()">导入数据</button>
+      <button class="btn btn-secondary" onclick="App.switchView('export')">导出报告</button>
+    </div>
+  </header>
+  <nav class="sidebar">
+    <div class="sidebar-section">视角</div>
+    <div class="nav-item active" data-view="dashboard" onclick="App.switchView('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      总览仪表盘
+    </div>
+    <div class="nav-item" data-view="order" onclick="App.switchView('order')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      订单视角
+    </div>
+    <div class="nav-item" data-view="sensor" onclick="App.switchView('sensor')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      传感器视角
+    </div>
+    <div class="nav-item" data-view="timeline" onclick="App.switchView('timeline')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      时间线视角
+    </div>
+    <div class="nav-item" data-view="risk" onclick="App.switchView('risk')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      风险视角
+    </div>
+    <div class="sidebar-section">管理</div>
+    <div class="nav-item" data-view="anomalies" onclick="App.switchView('anomalies')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      异常溯源
+    </div>
+    <div class="nav-item" data-view="versions" onclick="App.switchView('versions')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+      版本与结论
+    </div>
+    <div class="nav-item" data-view="export" onclick="App.switchView('export')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      报告导出
+    </div>
+  </nav>
+  <main class="main-content" id="mainContent">
+    <div class="view-panel active" id="view-dashboard"></div>
+    <div class="view-panel" id="view-order"></div>
+    <div class="view-panel" id="view-sensor"></div>
+    <div class="view-panel" id="view-timeline"></div>
+    <div class="view-panel" id="view-risk"></div>
+    <div class="view-panel" id="view-anomalies"></div>
+    <div class="view-panel" id="view-versions"></div>
+    <div class="view-panel" id="view-export"></div>
+  </main>
+</div>
+<div class="overlay" id="overlay" onclick="App.closeDrawer()"></div>
+<div class="detail-drawer" id="detailDrawer">
+  <div class="drawer-header"><h3 id="drawerTitle">详情</h3><button class="drawer-close" onclick="App.closeDrawer()">&times;</button></div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+<div class="modal" id="importModal">
+  <div class="modal-header"><h3>导入冷链数据</h3><button class="drawer-close" onclick="App.closeImportModal()">&times;</button></div>
+  <div class="import-area" id="importArea"></div>
+  <div style="margin-top:12px;"><button class="btn btn-primary" onclick="App.loadDemoData()">加载演示数据</button><button class="btn btn-secondary" style="margin-left:8px;" onclick="App.executeImport()">执行导入</button></div>
+  <div id="importPreview" style="margin-top:12px;"></div>
+</div>
+<div class="modal" id="conclusionModal">
+  <div class="modal-header"><h3>添加处理结论</h3><button class="drawer-close" onclick="App.closeConclusionModal()">&times;</button></div>
+  <div class="form-group"><label>结论类型</label><select id="conclusionType"><option value="processed">已处理</option><option value="pending">待确认</option><option value="returned">退回补材料</option></select></div>
+  <div class="form-group"><label>处理说明</label><textarea id="conclusionText" placeholder="请输入处理说明..."></textarea></div>
+  <div class="form-group"><label>操作人</label><input id="conclusionAuthor" placeholder="姓名"/></div>
+  <button class="btn btn-primary" onclick="App.saveConclusion()">保存结论</button>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+<script src="app.js"></script>
+</body>
+</html>
