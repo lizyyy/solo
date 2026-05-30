@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>古典乐队指挥局</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0e0e1a;--surface:#161628;--surface2:#1e1e36;--border:#2a2a4a;
+  --text:#e8e6f0;--text2:#a0a0b8;--accent:#c9a44c;--accent2:#e8c870;
+  --strings:#5b9bd5;--woodwinds:#70c17a;--brass:#e07c4f;
+  --success:#4caf7a;--warning:#e8b84c;--danger:#e05555;
+  --strings-bg:rgba(91,155,213,.15);--woodwinds-bg:rgba(112,193,122,.15);--brass-bg:rgba(224,124,79,.15);
+}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif;min-height:100vh;overflow-x:hidden}
+.header{background:linear-gradient(135deg,#1a1a30,#0e0e1a);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header h1{font-size:20px;font-weight:700;letter-spacing:2px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-info{display:flex;gap:12px;align-items:center;font-size:12px;color:var(--text2)}
+.phase-badge{background:var(--accent);color:#1a1a2e;padding:3px 10px;border-radius:20px;font-weight:600;font-size:11px}
+.main{display:grid;grid-template-columns:1fr 300px;gap:0;min-height:calc(100vh - 52px)}
+.left{padding:16px;overflow-y:auto}
+.right{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.panel{padding:14px;border-bottom:1px solid var(--border)}
+.panel-title{font-size:12px;font-weight:600;color:var(--accent);margin-bottom:10px;letter-spacing:1px;display:flex;align-items:center;gap:6px}
+.timeline-container{background:var(--surface);border-radius:10px;padding:14px;margin-bottom:14px;border:1px solid var(--border);overflow-x:auto}
+.timeline-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.timeline-header h2{font-size:14px;font-weight:600}
+.section-markers{display:flex;gap:2px;margin-bottom:6px;padding-left:64px}
+.section-marker{font-size:9px;padding:2px 6px;border-radius:3px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);white-space:nowrap;transition:all .3s;text-align:center}
+.section-marker.revealed{background:rgba(201,164,76,.12);color:var(--accent);border-color:rgba(201,164,76,.4)}
+.measure-headers{display:flex;gap:0;padding-left:64px;margin-bottom:2px}
+.measure-header{min-width:38px;text-align:center;font-size:9px;color:var(--text2);position:relative;border-right:1px solid rgba(255,255,255,.04);padding-bottom:2px}
+.measure-header .ts-change{position:absolute;top:-16px;left:50%;transform:translateX(-50%);background:var(--danger);color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;white-space:nowrap;cursor:pointer;opacity:0;transition:opacity .3s;z-index:10}
+.measure-header .ts-change.visible{opacity:1}
+.measure-header .ts-change.acknowledged{background:var(--success)}
+.timeline-grid{display:flex;flex-direction:column;gap:2px}
+.instrument-row{display:flex;align-items:center;gap:0;min-height:30px}
+.instrument-label{width:60px;font-size:11px;font-weight:600;text-align:right;padding-right:6px;flex-shrink:0}
+.instrument-label.strings{color:var(--strings)}
+.instrument-label.woodwinds{color:var(--woodwinds)}
+.instrument-label.brass{color:var(--brass)}
+.beat-row{display:flex;gap:0;flex:1}
+.measure-group{display:flex;gap:0;border-right:2px solid rgba(255,255,255,.06);padding-right:1px;margin-right:1px}
+.measure-group:last-child{border-right:none}
+.beat-cell{width:30px;min-width:30px;height:28px;background:var(--surface2);border-radius:3px;border:1.5px solid transparent;cursor:pointer;transition:all .15s;position:relative;display:flex;align-items:center;justify-content:center;font-size:8px;margin:1px}
+.beat-cell:hover{border-color:var(--accent);transform:scale(1.08);z-index:5}
+.beat-cell:active{transform:scale(.95)}
+.beat-cell.strings-active{background:var(--strings-bg);border-color:rgba(91,155,213,.5);box-shadow:0 0 6px rgba(91,155,213,.2)}
+.beat-cell.woodwinds-active{background:var(--woodwinds-bg);border-color:rgba(112,193,122,.5);box-shadow:0 0 6px rgba(112,193,122,.2)}
+.beat-cell.brass-active{background:var(--brass-bg);border-color:rgba(224,124,79,.5);box-shadow:0 0 6px rgba(224,124,79,.2)}
+.beat-cell .dynamics-badge{font-size:7px;font-weight:800;opacity:.95;letter-spacing:.5px}
+.beat-cell.mismatch{outline:2px dashed var(--warning);outline-offset:-1px;animation:pulse-warn 2s infinite}
+.beat-cell.missing{outline:2px dashed var(--danger);outline-offset:-1px;animation:pulse-missing 1.5s infinite}
+@keyframes pulse-missing{0%,100%{outline-color:var(--danger)}50%{outline-color:transparent}}
+@keyframes pulse-warn{0%,100%{outline-color:var(--warning)}50%{outline-color:transparent}}
+.controls-bar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.btn{padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:11px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;font-family:inherit;white-space:nowrap}
+.btn:hover{border-color:var(--accent);background:rgba(201,164,76,.08)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);color:#1a1a2e;border-color:var(--accent);font-weight:600}
+.btn.primary:hover{background:var(--accent2)}
+.btn.danger{border-color:var(--danger);color:var(--danger)}
+.btn.danger:hover{background:rgba(224,85,85,.1)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.instrument-selector{display:flex;gap:6px;margin-bottom:10px}
+.inst-btn{flex:1;padding:8px 6px;border-radius:8px;border:2px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;transition:all .2s;font-family:inherit;color:var(--text)}
+.inst-btn:hover{transform:translateY(-1px)}
+.inst-btn.strings-sel{border-color:var(--strings);background:var(--strings-bg)}
+.inst-btn.woodwinds-sel{border-color:var(--woodwinds);background:var(--woodwinds-bg)}
+.inst-btn.brass-sel{border-color:var(--brass);background:var(--brass-bg)}
+.inst-btn .inst-icon{font-size:20px;display:block;margin-bottom:2px}
+.inst-btn .inst-name{font-size:10px;font-weight:600}
+.dynamics-selector{display:flex;gap:3px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.dyn-label{font-size:10px;color:var(--text2);margin-right:2px;line-height:22px}
+.dyn-btn{padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:10px;cursor:pointer;transition:all .15s;font-family:inherit}
+.dyn-btn:hover{border-color:var(--accent)}
+.dyn-btn.active{background:var(--accent);color:#1a1a2e;border-color:var(--accent);font-weight:600}
+.balance-meter{margin-top:4px}
+.balance-bar{height:16px;background:var(--surface2);border-radius:8px;overflow:hidden;display:flex;margin-bottom:4px}
+.balance-segment{height:100%;transition:width .3s;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;color:#1a1a2e}
+.balance-label{display:flex;justify-content:space-between;font-size:9px;color:var(--text2)}
+.balance-warning{font-size:10px;color:var(--warning);margin-top:4px;padding:5px 7px;background:rgba(232,184,76,.06);border-radius:5px;border-left:2px solid var(--warning);line-height:1.4}
+.balance-danger{font-size:10px;color:var(--danger);margin-top:4px;padding:5px 7px;background:rgba(224,85,85,.06);border-radius:5px;border-left:2px solid var(--danger);line-height:1.4}
+.score-section{margin-top:2px}
+.score-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.score-row:last-child{border-bottom:none}
+.score-label{font-size:11px;color:var(--text2)}
+.score-value{font-size:14px;font-weight:700;min-width:30px;text-align:right}
+.score-value.good{color:var(--success)}
+.score-value.mid{color:var(--warning)}
+.score-value.bad{color:var(--danger)}
+.score-bar{width:70px;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-left:6px}
+.score-bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.history-list{max-height:220px;overflow-y:auto;font-size:10px}
+.history-item{padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.03);display:flex;gap:6px;line-height:1.3}
+.history-time{color:var(--text2);white-space:nowrap;flex-shrink:0;font-size:9px}
+.history-action{color:var(--text);flex:1}
+.history-action .hl{color:var(--accent);font-weight:500}
+.history-action .gs{color:var(--strings)}
+.history-action .gw{color:var(--woodwinds)}
+.history-action .gb{color:var(--brass)}
+.history-action .tag{font-size:8px;padding:0 4px;border-radius:2px;margin-left:3px}
+.history-action .tag-auto{background:rgba(91,155,213,.12);color:var(--strings)}
+.history-action .tag-manual{background:rgba(201,164,76,.12);color:var(--accent)}
+.feedback-list{max-height:180px;overflow-y:auto;font-size:10px}
+.feedback-item{padding:6px;margin-bottom:3px;border-radius:5px;display:flex;gap:6px;align-items:flex-start;line-height:1.3}
+.feedback-item.warn{background:rgba(232,184,76,.05);border-left:2px solid var(--warning)}
+.feedback-item.error{background:rgba(224,85,85,.05);border-left:2px solid var(--danger)}
+.feedback-item.ok{background:rgba(76,175,122,.05);border-left:2px solid var(--success)}
+.feedback-icon{flex-shrink:0;width:14px;text-align:center;font-size:11px}
+.feedback-text{flex:1}
+.feedback-text .ref{color:var(--accent);font-weight:500}
+.rehearsal-overlay{position:fixed;inset:0;background:rgba(14,14,26,.96);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center}
+.rehearsal-overlay.active{display:flex}
+.rehearsal-stage{width:92%;max-width:860px}
+.rehearsal-measure{font-size:13px;color:var(--accent);margin-bottom:10px;text-align:center}
+.rehearsal-timeline{display:flex;align-items:center;gap:3px;margin-bottom:16px;justify-content:center;flex-wrap:wrap}
+.rehearsal-beat{width:34px;height:34px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text2);transition:all .15s}
+.rehearsal-beat.active{border-color:var(--accent);color:var(--accent);transform:scale(1.12);background:rgba(201,164,76,.12)}
+.rehearsal-beat.hit{border-color:var(--success);color:var(--success);background:rgba(76,175,122,.12)}
+.rehearsal-beat.miss{border-color:var(--danger);color:var(--danger);background:rgba(224,85,85,.12)}
+.rehearsal-insts{display:flex;gap:12px;justify-content:center;margin-bottom:16px}
+.rehearsal-inst{padding:6px 14px;border-radius:7px;font-size:11px;font-weight:600;border:2px solid var(--border);transition:all .2s}
+.rehearsal-inst.playing{animation:inst-pulse .4s ease-in-out}
+@keyframes inst-pulse{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+.rehearsal-inst.strings-inst{color:var(--strings)}
+.rehearsal-inst.strings-inst.playing{border-color:var(--strings);background:var(--strings-bg)}
+.rehearsal-inst.woodwinds-inst{color:var(--woodwinds)}
+.rehearsal-inst.woodwinds-inst.playing{border-color:var(--woodwinds);background:var(--woodwinds-bg)}
+.rehearsal-inst.brass-inst{color:var(--brass)}
+.rehearsal-inst.brass-inst.playing{border-color:var(--brass);background:var(--brass-bg)}
+.rehearsal-feedback{min-height:50px;padding:10px;background:var(--surface);border-radius:7px;font-size:11px;line-height:1.5}
+.rehearsal-controls{margin-top:14px;display:flex;gap:10px;justify-content:center}
+.ts-ack-modal{position:fixed;inset:0;background:rgba(14,14,26,.92);z-index:150;display:none;align-items:center;justify-content:center}
+.ts-ack-modal.active{display:flex}
+.ts-ack-content{background:var(--surface);border:2px solid var(--warning);border-radius:14px;padding:28px;text-align:center;max-width:380px}
+.ts-ack-content h3{color:var(--warning);font-size:16px;margin-bottom:10px}
+.ts-ack-content p{color:var(--text2);font-size:12px;margin-bottom:6px}
+.ts-ack-content .ts-display{font-size:32px;font-weight:700;color:var(--accent);margin:14px 0}
+.result-overlay{position:fixed;inset:0;background:rgba(14,14,26,.97);z-index:300;display:none;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:30px}
+.result-overlay.active{display:flex}
+.result-card{background:var(--surface);border-radius:14px;padding:28px;max-width:660px;width:92%;border:1px solid var(--border)}
+.result-card h2{font-size:20px;text-align:center;margin-bottom:20px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.result-scores{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.result-score-item{text-align:center;padding:14px;background:var(--surface2);border-radius:10px}
+.result-score-item .label{font-size:10px;color:var(--text2);margin-bottom:6px}
+.result-score-item .value{font-size:28px;font-weight:700}
+.result-score-item .bar{width:100%;height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden}
+.result-score-item .bar-fill{height:100%;border-radius:2px;transition:width 1s}
+.result-details{margin-bottom:20px}
+.result-detail-section{margin-bottom:14px}
+.result-detail-section h4{font-size:12px;color:var(--accent);margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid var(--border)}
+.result-detail-item{font-size:11px;padding:3px 0;color:var(--text2);display:flex;gap:6px;line-height:1.4}
+.result-detail-item .icon{flex-shrink:0}
+.result-detail-item.warn .icon{color:var(--warning)}
+.result-detail-item.err .icon{color:var(--danger)}
+.result-detail-item.ok .icon{color:var(--success)}
+.missing-data-modal{position:fixed;inset:0;background:rgba(14,14,26,.92);z-index:160;display:none;align-items:center;justify-content:center}
+.missing-data-modal.active{display:flex}
+.missing-data-content{background:var(--surface);border:2px solid var(--accent);border-radius:14px;padding:28px;text-align:center;max-width:380px}
+.missing-data-content h3{color:var(--accent);font-size:15px;margin-bottom:10px}
+.missing-data-content p{color:var(--text2);font-size:11px;margin-bottom:14px}
+.missing-dyn-btns{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
+.missing-dyn-btns .dyn-btn{padding:6px 14px;font-size:12px}
+.intro-overlay{position:fixed;inset:0;background:rgba(14,14,26,.96);z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.intro-overlay.active{display:flex}
+.intro-card{background:var(--surface);border-radius:16px;padding:32px;max-width:520px;width:92%;border:1px solid var(--border);text-align:center}
+.intro-card h2{font-size:22px;margin-bottom:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.intro-card .subtitle{font-size:12px;color:var(--text2);margin-bottom:20px}
+.intro-steps{text-align:left;margin-bottom:24px}
+.intro-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;font-size:12px;line-height:1.5}
+.intro-step .step-num{background:var(--accent);color:#1a1a2e;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0}
+.intro-step .step-text{color:var(--text);flex:1}
+.intro-step .step-text em{color:var(--accent);font-style:normal;font-weight:500}
+.tip-box{background:rgba(201,164,76,.06);border:1px solid rgba(201,164,76,.2);border-radius:8px;padding:10px 14px;margin-bottom:20px;font-size:11px;color:var(--text2);text-align:left;line-height:1.5}
+.tip-box strong{color:var(--accent)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🎼 古典乐队指挥局</h1>
+  <div class="header-info">
+    <span id="pieceName">晨曦序曲</span>
+    <span id="phaseInfo" class="phase-badge">阶段 1/3 · 乐器调度</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="left">
+    <div class="controls-bar">
+      <button class="btn" id="btnPhase" onclick="advancePhase()">⏩ 补充材料：谱面段落</button>
+      <button class="btn primary" id="btnRehearse" onclick="startRehearsal()">🎵 开始排练</button>
+      <button class="btn" id="btnReset" onclick="resetGame()">↺ 重置</button>
+      <button class="btn" id="btnGuide" onclick="showIntro()">❓ 操作说明</button>
+    </div>
+
+    <div class="instrument-selector">
+      <button class="inst-btn strings-sel" id="selStrings" onclick="selectInstrument('strings')">
+        <span class="inst-icon">🎻</span>
+        <span class="inst-name">弦乐</span>
+      </button>
+      <button class="inst-btn" id="selWoodwinds" onclick="selectInstrument('woodwinds')">
+        <span class="inst-icon">🎷</span>
+        <span class="inst-name">木管</span>
+      </button>
+      <button class="inst-btn" id="selBrass" onclick="selectInstrument('brass')">
+        <span class="inst-icon">🎺</span>
+        <span class="inst-name">铜管</span>
+      </button>
+    </div>
+
+    <div class="dynamics-selector">
+      <span class="dyn-label">强弱：</span>
+      <button class="dyn-btn" data-dyn="pp" onclick="selectDynamics('pp')">pp</button>
+      <button class="dyn-btn" data-dyn="p" onclick="selectDynamics('p')">p</button>
+      <button class="dyn-btn" data-dyn="mp" onclick="selectDynamics('mp')">mp</button>
+      <button class="dyn-btn active" data-dyn="mf" onclick="selectDynamics('mf')">mf</button>
+      <button class="dyn-btn" data-dyn="f" onclick="selectDynamics('f')">f</button>
+      <button class="dyn-btn" data-dyn="ff" onclick="selectDynamics('ff')">ff</button>
+    </div>
+
+    <div class="timeline-container">
+      <div class="timeline-header">
+        <h2>📋 谱面时间线</h2>
+        <span style="font-size:10px;color:var(--text2)">点击拍位放置/移除选中乐器</span>
+      </div>
+      <div id="sectionMarkers" class="section-markers"></div>
+      <div id="measureHeaders" class="measure-headers"></div>
+      <div id="timelineGrid" class="timeline-grid"></div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="panel">
+      <div class="panel-title">⚖️ 强弱平衡</div>
+      <div class="balance-meter">
+        <div class="balance-bar" id="balanceBar"></div>
+        <div class="balance-label">
+          <span style="color:var(--strings)">弦乐</span>
+          <span style="color:var(--woodwinds)">木管</span>
+          <span style="color:var(--brass)">铜管</span>
+        </div>
+        <div id="balanceWarnings"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🥁 节拍反馈</div>
+      <div id="beatFeedback" class="feedback-list"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">📊 排练评分</div>
+      <div class="score-section">
+        <div class="score-row">
+          <span class="score-label">声部调度</span>
+          <div style="display:flex;align-items:center"><span class="score-value" id="scoreVoice">—</span><div class="score-bar"><div class="score-bar-fill" id="barVoice" style="width:0;background:var(--text2)"></div></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">节拍反馈</span>
+          <div style="display:flex;align-items:center"><span class="score-value" id="scoreBeat">—</span><div class="score-bar"><div class="score-bar-fill" id="barBeat" style="width:0;background:var(--text2)"></div></div></div>
+        </div>
+        <div class="score-row">
+          <span class="score-label">强弱平衡</span>
+          <div style="display:flex;align-items:center"><span class="score-value" id="scoreDyn">—</span><div class="score-bar"><div class="score-bar-fill" id="barDyn" style="width:0;background:var(--text2)"></div></div></div>
+        </div>
+        <div class="score-row" style="border-top:1px solid var(--border);padding-top:8px;margin-top:2px">
+          <span class="score-label" style="font-weight:600;color:var(--accent)">综合评分</span>
+          <div style="display:flex;align-items:center"><span class="score-value" id="scoreTotal" style="font-size:18px">—</span><div class="score-bar" style="width:90px"><div class="score-bar-fill" id="barTotal" style="width:0;background:var(--accent)"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="flex:1;min-height:0">
+      <div class="panel-title">📝 操作历史</div>
+      <div id="historyList" class="history-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="intro-overlay" id="introOverlay">
+  <div class="intro-card">
+    <h2>🎼 古典乐队指挥局</h2>
+    <div class="subtitle">以指挥视角调度弦乐、木管、铜管，感受取舍与平衡</div>
+    <div class="intro-steps">
+      <div class="intro-step"><div class="step-num">1</div><div class="step-text">选择<em>乐器组</em>和<em>强弱</em>，点击谱面拍位放置进场点。同位置再点可移除。</div></div>
+      <div class="intro-step"><div class="step-num">2</div><div class="step-text">点击<em>「补充材料」</em>逐步揭示谱面段落、拍号与强弱要求。后补材料<em>不会覆盖</em>你的已有判断，只会标记冲突。</div></div>
+      <div class="intro-step"><div class="step-num">3</div><div class="step-text">遇到<em>拍号变化</em>时需确认，否则整曲节拍错位。部分强弱标记可能<em>缺失</em>，需人工补录。</div></div>
+      <div class="intro-step"><div class="step-num">4</div><div class="step-text">材料齐全后<em>开始排练</em>：实时击拍指挥，系统综合声部调度、节拍反馈、强弱平衡三维度评分。</div></div>
+    </div>
+    <div class="tip-box">
+      <strong>常见失误：</strong>声部早进（铜管抢拍）、拍号变化漏看、强弱失衡（铜管压过弦乐）。提示会具体到乐器组和小节，不会只写"处理失败"。
+    </div>
+    <button class="btn primary" onclick="closeIntro()" style="margin:0 auto;font-size:13px;padding:10px 32px">开始指挥</button>
+  </div>
+</div>
+
+<div class="ts-ack-modal" id="tsAckModal">
+  <div class="ts-ack-content">
+    <h3>⚠️ 拍号变化</h3>
+    <p>小节 <span id="tsAckMeasure">9</span> 拍号切换</p>
+    <div class="ts-display"><span id="tsAckFrom">4/4</span> → <span id="tsAckTo">3/4</span></div>
+    <p style="font-size:10px;color:var(--text2);margin-bottom:14px">请确认拍号变化，否则后续节拍将错位</p>
+    <button class="btn primary" onclick="acknowledgeTimeSig()">确认拍号</button>
+  </div>
+</div>
+
+<div class="missing-data-modal" id="missingDataModal">
+  <div class="missing-data-content">
+    <h3>📋 缺失强弱标记</h3>
+    <p id="missingDataDesc">第4段「凯旋」木管强弱标记缺失，请人工补充：</p>
+    <div class="missing-dyn-btns">
+      <button class="dyn-btn" onclick="supplyMissingDynamics('pp')">pp</button>
+      <button class="dyn-btn" onclick="supplyMissingDynamics('p')">p</button>
+      <button class="dyn-btn" onclick="supplyMissingDynamics('mp')">mp</button>
+      <button class="dyn-btn" onclick="supplyMissingDynamics('mf')">mf</button>
+      <button class="dyn-btn" onclick="supplyMissingDynamics('f')">f</button>
+      <button class="dyn-btn" onclick="supplyMissingDynamics('ff')">ff</button>
+    </div>
+  </div>
+</div>
+
+<div class="rehearsal-overlay" id="rehearsalOverlay">
+  <div class="rehearsal-stage">
+    <div class="rehearsal-measure" id="rehMeasure">准备排练…</div>
+    <div class="rehearsal-timeline" id="rehBeats"></div>
+    <div class="rehearsal-insts" id="rehInsts"></div>
+    <div class="rehearsal-feedback" id="rehFeedback">排练即将开始</div>
+    <div class="rehearsal-controls">
+      <button class="btn primary" id="btnRehTap" onclick="rehearsalTap()">🤚 指挥击拍</button>
+      <button class="btn danger" onclick="stopRehearsal()">⏹ 停止排练</button>
+    </div>
+  </div>
+</div>
+
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-card">
+    <h2>排练报告</h2>
+    <div class="result-scores">
+      <div class="result-score-item"><div class="label">声部调度</div><div class="value" id="rScoreVoice">—</div><div class="bar"><div class="bar-fill" id="rBarVoice" style="width:0"></div></div></div>
+      <div class="result-score-item"><div class="label">节拍反馈</div><div class="value" id="rScoreBeat">—</div><div class="bar"><div class="bar-fill" id="rBarBeat" style="width:0"></div></div></div>
+      <div class="result-score-item"><div class="label">强弱平衡</div><div class="value" id="rScoreDyn">—</div><div class="bar"><div class="bar-fill" id="rBarDyn" style="width:0"></div></div></div>
+    </div>
+    <div class="result-details" id="resultDetails"></div>
+    <div style="text-align:center"><button class="btn primary" onclick="closeResult()">返回调整</button></div>
+  </div>
+</div>
+
+<script>
+const DYNAMICS_MAP={pp:1,p:2,mp:3,mf:4,f:5,ff:6};
+const DYNAMICS_LABEL={pp:'很弱',p:'弱',mp:'中弱',mf:'中强',f:'强',ff:'很强'};
+const INST_NAMES={strings:'弦乐',woodwinds:'木管',brass:'铜管'};
+const INST_COLORS={strings:'var(--strings)',woodwinds:'var(--woodwinds)',brass:'var(--brass)'};
+const INST_CSS={strings:'gs',woodwinds:'gw',brass:'gb'};
+
+const PIECE={
+  title:'晨曦序曲',
+  totalMeasures:16,
+  sections:[
+    {id:1,name:'破晓',startMeasure:1,endMeasure:4,timeSig:{n:4,d:4},tempo:80,dynamics:'mp',
+      required:{strings:{entry:1,beat:1,dynamics:'mp'}}},
+    {id:2,name:'林间',startMeasure:5,endMeasure:8,timeSig:{n:4,d:4},tempo:90,dynamics:'mf',
+      required:{strings:{entry:5,beat:1,dynamics:'mf'},woodwinds:{entry:5,beat:1,dynamics:'mp'}}},
+    {id:3,name:'号角',startMeasure:9,endMeasure:12,timeSig:{n:3,d:4},tempo:100,dynamics:'f',
+      required:{strings:{entry:9,beat:1,dynamics:'f'},woodwinds:{entry:9,beat:1,dynamics:'mf'},brass:{entry:10,beat:1,dynamics:'f'}}},
+    {id:4,name:'凯旋',startMeasure:13,endMeasure:16,timeSig:{n:3,d:4},tempo:110,dynamics:'ff',
+      required:{strings:{entry:13,beat:1,dynamics:'ff'},woodwinds:{entry:13,beat:1,dynamics:null},brass:{entry:13,beat:1,dynamics:'ff'}}}
+  ]
+};
+
+function getTimeSigForMeasure(m){for(let s of PIECE.sections){if(m>=s.startMeasure&&m<=s.endMeasure)return s.timeSig}return{n:4,d:4}}
+function getSectionForMeasure(m){for(let s of PIECE.sections){if(m>=s.startMeasure&&m<=s.endMeasure)return s}return null}
+function getTimeSigChanges(){let changes=[],prev=null;for(let s of PIECE.sections){let key=s.timeSig.n+'/'+s.timeSig.d;if(prev&&prev!==key)changes.push({measure:s.startMeasure,from:prev,to:key});prev=key}return changes}
+function getMeasureBeats(m){return getTimeSigForMeasure(m).n}
+function dynName(v){return Object.keys(DYNAMICS_MAP).find(k=>DYNAMICS_MAP[k]===v)||'?'}
+
+const state={
+  phase:1,selectedInstrument:'strings',selectedDynamics:'mf',
+  entries:{},acknowledgedTimeSigs:[],manualDynamics:{},history:[],
+  scores:{voice:0,beat:0,dynamics:0},rehearsing:false
+};
+
+function addHistory(action,tag){
+  let now=new Date();
+  let ts=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+  state.history.unshift({time:ts,action,tag:tag||'auto'});
+  if(state.history.length>50)state.history.length=50;
+  renderHistory()
+}
+
+function renderHistory(){
+  let el=document.getElementById('historyList');
+  el.innerHTML=state.history.map(h=>
+    '<div class="history-item"><span class="history-time">'+h.time+'</span><span class="history-action">'+h.action+' <span class="tag tag-'+h.tag+'">'+(h.tag==='manual'?'人工':'自动')+'</span></span></div>'
+  ).join('')
+}
+
+function selectInstrument(group){
+  state.selectedInstrument=group;
+  document.querySelectorAll('.inst-btn').forEach(b=>{b.className='inst-btn'});
+  let id='sel'+group.charAt(0).toUpperCase()+group.slice(1);
+  document.getElementById(id).classList.add(group+'-sel')
+}
+
+function selectDynamics(dyn){
+  state.selectedDynamics=dyn;
+  document.querySelectorAll('#dynSelector .dyn-btn').forEach(b=>{b.classList.toggle('active',b.dataset.dyn===dyn)})
+}
+
+function toggleEntry(group,measure,beat){
+  let key=group+'_'+measure+'_'+beat;
+  if(state.entries[key]){
+    delete state.entries[key];
+    addHistory('移除 <span class="'+INST_CSS[group]+'">'+INST_NAMES[group]+'</span> @小节'+measure+'拍'+beat,'manual')
+  }else{
+    state.entries[key]={group,measure,beat,dynamics:state.selectedDynamics};
+    addHistory('放置 <span class="'+INST_CSS[group]+'">'+INST_NAMES[group]+'</span> <span class="hl">'+state.selectedDynamics+'</span> @小节'+measure+'拍'+beat,'manual')
+  }
+  renderTimeline();updateBalance();checkTimeSigAck(measure);updateBeatFeedback()
+}
+
+function checkTimeSigAck(measure){
+  if(state.phase<3)return;
+  let changes=getTimeSigChanges();
+  for(let c of changes){if(c.measure===measure&&!state.acknowledgedTimeSigs.includes(c.measure)){showTimeSigModal(c);return}}
+}
+
+function showTimeSigModal(c){
+  document.getElementById('tsAckMeasure').textContent=c.measure;
+  document.getElementById('tsAckFrom').textContent=c.from;
+  document.getElementById('tsAckTo').textContent=c.to;
+  document.getElementById('tsAckModal').classList.add('active')
+}
+
+function acknowledgeTimeSig(){
+  let measure=parseInt(document.getElementById('tsAckMeasure').textContent);
+  if(!state.acknowledgedTimeSigs.includes(measure)){
+    state.acknowledgedTimeSigs.push(measure);
+    addHistory('确认拍号变化 @小节'+measure,'manual')
+  }
+  document.getElementById('tsAckModal').classList.remove('active');
+  renderTimeline();updateBeatFeedback()
+}
+
+function getEntriesForGroup(group){return Object.values(state.entries).filter(e=>e.group===group).sort((a,b)=>a.measure*10+a.beat-(b.measure*10+b.beat))}
+
+function getActiveEntryAtMeasure(group,measure){
+  let entries=getEntriesForGroup(group),active=null;
+  for(let e of entries){if(e.measure<=measure)active=e;else break}
+  return active
+}
+
+function getActiveDynamicsAtMeasure(group,measure){
+  let mk=group+'_m'+measure;
+  if(state.manualDynamics[mk])return state.manualDynamics[mk];
+  let entry=getActiveEntryAtMeasure(group,measure);
+  return entry?entry.dynamics:null
+}
+
+function isGroupPlayingAtMeasure(group,measure){
+  return !!getActiveEntryAtMeasure(group,measure)
+}
+
+function renderTimeline(){
+  let grid=document.getElementById('timelineGrid');
+  let headers=document.getElementById('measureHeaders');
+  let markers=document.getElementById('sectionMarkers');
+  grid.innerHTML='';headers.innerHTML='';markers.innerHTML='';
+
+  if(state.phase>=2){
+    PIECE.sections.forEach(s=>{
+      let span=s.endMeasure-s.startMeasure+1;
+      let w=0;for(let m=s.startMeasure;m<=s.endMeasure;m++)w+=getMeasureBeats(m);
+      let marker=document.createElement('div');
+      marker.className='section-marker revealed';
+      marker.style.width=(w*32+span*4)+'px';
+      marker.textContent=s.name+' ('+s.timeSig.n+'/'+s.timeSig.d+')';
+      markers.appendChild(marker)
+    })
+  }
+
+  let tsChanges=getTimeSigChanges();
+
+  for(let m=1;m<=PIECE.totalMeasures;m++){
+    let beats=getMeasureBeats(m);
+    let header=document.createElement('div');
+    header.className='measure-header';
+    header.style.minWidth=(beats*32+4)+'px';
+    header.textContent='M'+m;
+    let tsChange=tsChanges.find(c=>c.measure===m);
+    if(tsChange&&state.phase>=3){
+      let badge=document.createElement('div');
+      badge.className='ts-change visible';
+      if(state.acknowledgedTimeSigs.includes(m))badge.classList.add('acknowledged');
+      badge.textContent=(state.acknowledgedTimeSigs.includes(m)?'✓ ':'⚠ ')+tsChange.to;
+      badge.onclick=()=>showTimeSigModal(tsChange);
+      header.appendChild(badge)
+    }
+    headers.appendChild(header)
+  }
+
+  ['strings','woodwinds','brass'].forEach(group=>{
+    let row=document.createElement('div');
+    row.className='instrument-row';
+    let label=document.createElement('div');
+    label.className='instrument-label '+group;
+    label.textContent=INST_NAMES[group];
+    row.appendChild(label);
+
+    let beatRow=document.createElement('div');
+    beatRow.className='beat-row';
+
+    for(let m=1;m<=PIECE.totalMeasures;m++){
+      let mg=document.createElement('div');
+      mg.className='measure-group';
+      let beats=getMeasureBeats(m);
+      for(let b=1;b<=beats;b++){
+        let cell=document.createElement('div');
+        cell.className='beat-cell';
+        cell.setAttribute('role','button');
+        cell.setAttribute('tabindex','0');
+        cell.setAttribute('aria-label',INST_NAMES[group]+' 小节'+m+' 拍'+b);
+        let key=group+'_'+m+'_'+b;
+        let isActive=!!state.entries[key];
+        let section=getSectionForMeasure(m);
+
+        if(isActive){
+          cell.classList.add(group+'-active');
+          let badge=document.createElement('span');
+          badge.className='dynamics-badge';
+          badge.style.color=INST_COLORS[group];
+          badge.textContent=state.entries[key].dynamics;
+          cell.appendChild(badge)
+        }
+
+        if(state.phase>=2&&section){
+          let req=section.required[group];
+          if(req){
+            if(m===req.entry&&b===req.beat&&!isActive)cell.classList.add('missing');
+            if(m===req.entry&&b===req.beat&&isActive){
+              let eDyn=state.entries[key].dynamics;
+              if(req.dynamics&&eDyn&&Math.abs(DYNAMICS_MAP[eDyn]-DYNAMICS_MAP[req.dynamics])>=2)cell.classList.add('mismatch')
+            }
+          }
+          if(isActive){
+            if(req&&m<req.entry)cell.classList.add('mismatch');
+            if(!req){
+              let anyReq=false;
+              for(let s2 of PIECE.sections){if(s2.required[group]&&m>=s2.required[group].entry&&m<=s2.endMeasure){anyReq=true;break}}
+            }
+          }
+        }
+
+        cell.onclick=()=>toggleEntry(group,m,b);
+        cell.onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleEntry(group,m,b)}};
+        mg.appendChild(cell)
+      }
+      beatRow.appendChild(mg)
+    }
+    row.appendChild(beatRow);
+    grid.appendChild(row)
+  })
+}
+
+function updateBalance(){
+  let bar=document.getElementById('balanceBar');
+  let warnings=document.getElementById('balanceWarnings');
+  let groups=['strings','woodwinds','brass'];
+  let dynValues={},totalWeight=0,activeGroups=0;
+
+  groups.forEach(g=>{
+    let dyn=null;
+    for(let m=PIECE.totalMeasures;m>=1;m--){
+      dyn=getActiveDynamicsAtMeasure(g,m);
+      if(dyn)break
+    }
+    let val=dyn?DYNAMICS_MAP[dyn]:0;
+    dynValues[g]=val;
+    if(val>0){totalWeight+=val;activeGroups++}
+  });
+
+  if(totalWeight===0){
+    bar.innerHTML='<div style="width:100%;background:var(--border);display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:9px">尚无乐器进场</div>';
+    warnings.innerHTML='';return
+  }
+
+  let html='',colors={strings:'#5b9bd5',woodwinds:'#70c17a',brass:'#e07c4f'};
+  groups.forEach(g=>{
+    let pct=dynValues[g]/totalWeight*100;
+    if(pct>0)html+='<div class="balance-segment" style="width:'+pct+'%;background:'+colors[g]+'">'+(pct>12?INST_NAMES[g]:'')+'</div>'
+  });
+  bar.innerHTML=html;
+
+  let warnHtml='';
+  if(activeGroups>=2){
+    let maxG=null,minG=null,maxV=0,minV=Infinity;
+    groups.forEach(g=>{if(dynValues[g]>0){if(dynValues[g]>maxV){maxV=dynValues[g];maxG=g}if(dynValues[g]<minV){minV=dynValues[g];minG=g}}});
+    if(maxV-minV>=3)warnHtml+='<div class="balance-danger">'+INST_NAMES[maxG]+'('+dynName(maxV)+') 远强于 '+INST_NAMES[minG]+'('+dynName(minV)+')，严重失衡</div>';
+    else if(maxV-minV>=2)warnHtml+='<div class="balance-warning">'+INST_NAMES[maxG]+'('+dynName(maxV)+') 偏强于 '+INST_NAMES[minG]+'('+dynName(minV)+')，注意平衡</div>'
+  }
+  if(activeGroups===3&&dynValues.brass>=5&&dynValues.strings<=3)warnHtml+='<div class="balance-warning">铜管过强可能遮盖弦乐细节，考虑调弱铜管或增强弦乐</div>';
+  warnings.innerHTML=warnHtml
+}
+
+function updateBeatFeedback(){
+  let el=document.getElementById('beatFeedback'),items=[];
+
+  if(state.phase<3){
+    items.push({type:'ok',icon:'ℹ',text:'阶段 3 将揭示拍号变化'});
+    el.innerHTML=items.map(i=>'<div class="feedback-item '+i.type+'"><span class="feedback-icon">'+i.icon+'</span><span class="feedback-text">'+i.text+'</span></div>').join('');
+    return
+  }
+
+  let tsChanges=getTimeSigChanges();
+  tsChanges.forEach(c=>{
+    if(state.acknowledgedTimeSigs.includes(c.measure))items.push({type:'ok',icon:'✓',text:'小节 <span class="ref">'+c.measure+'</span> 拍号 <span class="ref">'+c.from+'→'+c.to+'</span> 已确认'});
+    else items.push({type:'error',icon:'✗',text:'小节 <span class="ref">'+c.measure+'</span> 拍号 <span class="ref">'+c.from+'→'+c.to+'</span> 未确认！节拍将错位'})
+  });
+  if(items.length===0)items.push({type:'ok',icon:'✓',text:'无拍号变化'});
+
+  PIECE.sections.forEach(s=>{
+    Object.keys(s.required).forEach(g=>{
+      let req=s.required[g];
+      let entry=getEntriesForGroup(g).find(e=>e.measure===req.entry&&e.beat===req.beat);
+      if(!entry)items.push({type:'warn',icon:'⚠',text:'<span class="ref">'+s.name+'</span>段 <span class="'+INST_CSS[g]+'">'+INST_NAMES[g]+'</span> 尚未安排进场'});
+
+      if(state.phase>=3){
+        let earlyEntries=getEntriesForGroup(g).filter(e=>e.measure>=s.startMeasure&&e.measure<req.entry);
+        if(earlyEntries.length>0)items.push({type:'error',icon:'✗',text:'<span class="'+INST_CSS[g]+'">'+INST_NAMES[g]+'</span> 在<span class="ref">'+s.name+'段</span>早进了'+earlyEntries.length+'个位置（应@M'+req.entry+'）'})
+      }
+    })
+  });
+
+  el.innerHTML=items.map(i=>'<div class="feedback-item '+i.type+'"><span class="feedback-icon">'+i.icon+'</span><span class="feedback-text">'+i.text+'</span></div>').join('')
+}
+
+function advancePhase(){
+  if(state.phase>=3)return;
+  state.phase++;
+  let phaseNames={1:'乐器调度',2:'谱面段落',3:'拍号强弱'};
+  document.getElementById('phaseInfo').textContent='阶段 '+state.phase+'/3 · '+phaseNames[state.phase];
+
+  if(state.phase===2){
+    document.getElementById('btnPhase').textContent='⏩ 补充材料：拍号强弱';
+    addHistory('进入阶段2：谱面段落已揭示（<em>已有判断不受影响</em>）','auto')
+  }else if(state.phase===3){
+    document.getElementById('btnPhase').textContent='✓ 材料已齐全';
+    document.getElementById('btnPhase').disabled=true;
+    addHistory('进入阶段3：拍号强弱已揭示（<em>已有判断不受影响</em>）','auto');
+    let missing=[];
+    PIECE.sections.forEach(s=>{Object.keys(s.required).forEach(g=>{if(s.required[g].dynamics===null)missing.push({section:s,group:g})})});
+    if(missing.length>0)setTimeout(()=>showMissingDataModal(missing[0]),600)
+  }
+
+  renderTimeline();updateBalance();updateBeatFeedback()
+}
+
+let pendingMissingData=null;
+function showMissingDataModal(item){
+  pendingMissingData=item;
+  document.getElementById('missingDataDesc').textContent='第'+item.section.id+'段「'+item.section.name+'」'+INST_NAMES[item.group]+'强弱标记缺失，请人工补充：';
+  document.getElementById('missingDataModal').classList.add('active')
+}
+
+function supplyMissingDynamics(dyn){
+  if(!pendingMissingData)return;
+  let key=pendingMissingData.group+'_m'+pendingMissingData.section.startMeasure;
+  state.manualDynamics[key]=dyn;
+  addHistory('人工补充 <span class="'+INST_CSS[pendingMissingData.group]+'">'+INST_NAMES[pendingMissingData.group]+'</span> @'+pendingMissingData.section.name+'段 强弱为 <span class="hl">'+dyn+'</span>','manual');
+  document.getElementById('missingDataModal').classList.remove('active');
+  pendingMissingData=null;
+  updateBalance()
+}
+
+function computeScores(){
+  let voiceScore=100,beatScore=100,dynScore=100;
+  let details={voice:[],beat:[],dynamics:[]};
+
+  PIECE.sections.forEach(s=>{
+    Object.keys(s.required).forEach(g=>{
+      let req=s.required[g];
+      let entry=getEntriesForGroup(g).find(e=>e.measure===req.entry&&e.beat===req.beat);
+
+      if(!entry){
+        let early=getEntriesForGroup(g).filter(e=>e.measure<req.entry&&e.measure>=s.startMeasure);
+        if(early.length>0){
+          voiceScore-=15;
+          details.voice.push({type:'err',text:'<span class="'+INST_CSS[g]+'">'+INST_NAMES[g]+'</span> 在<span class="ref">'+s.name+'段</span>早进 '+(req.entry-early[early.length-1].measure)+' 小节（应@M'+req.entry+'，实际@M'+early[early.length-1].measure+'）'})
+        }else{
+          voiceScore-=20;
+          details.voice.push({type:'err',text:'<span class="'+INST_CSS[g]+'">'+INST_NAMES[g]+'</span> 在<span class="ref">'+s.name+'段</span>未安排进场'})
+        }
+      }else{
+        if(req.dynamics&&entry.dynamics){
+          let diff=Math.abs(DYNAMICS_MAP[entry.dynamics]-DYNAMICS_MAP[req.dynamics]);
+          if(diff>=2){voiceScore-=5;details.voice.push({type:'warn',text:'<span class="'+INST_CSS[g]+'">'+INST_NAMES[g]+'</span> 在<span class="ref">'+s.name+'段</span>强弱偏差大（要求'+req.dynamics+'，实际'+entry.dynamics+'）'})}
+          else if(diff===1){voiceScore-=2;details.voice.push({type:'ok',text:'<span class="'+INST_CSS[g]+'">'+INST_NAMES[g]+'</span> 在<span class="ref">'+s.name+'段</span>强弱微差（要求'+req.dynamics+'，实际'+entry.dynamics+'）'})}
+          else details.voice.push({type:'ok',text:'<span class="'+INST_CSS[g]+'">'+INST_NAMES[g]+'</span> 在<span class="ref">'+s.name+'段</span>进场正确'})
+        }else if(!req.dynamics){
+          details.voice.push({type:'ok',text:'<span class="'+INST_CSS[g]+'">'+INST_NAMES[g]+'</span> 在<span class="ref">'+s.name+'段</span>已进场（强弱人工补充）'})
+        }
+      }
+
+      let stray=getEntriesForGroup(g).filter(e=>{
+        let sec=getSectionForMeasure(e.measure);if(!sec)return true;
+        let r=sec.required[g];if(!r)return false;
+        return e.measure<r.entry
+      });
+      stray.forEach(e=>{voiceScore-=8;details.voice.push({type:'warn',text:'<span class="'+INST_CSS[g]+'">'+INST_NAMES[g]+'</span> @M'+e.measure+'拍'+e.beat+' 为多余进场（该段尚未要求）'})})
+    })
+  });
+
+  if(state.phase>=3){
+    let tsChanges=getTimeSigChanges();
+    tsChanges.forEach(c=>{
+      if(!state.acknowledgedTimeSigs.includes(c.measure)){beatScore-=25;details.beat.push({type:'err',text:'小节<span class="ref">'+c.measure+'</span>拍号变化 '+c.from+'→'+c.to+' 未确认，节拍错位'})}
+      else details.beat.push({type:'ok',text:'小节<span class="ref">'+c.measure+'</span>拍号变化 '+c.from+'→'+c.to+' 已确认'})
+    })
+  }else{beatScore=0;details.beat.push({type:'err',text:'拍号强弱材料未补充，无法评分'})}
+
+  PIECE.sections.forEach(s=>{
+    let gd=[];
+    Object.keys(s.required).forEach(g=>{
+      let dyn=getActiveDynamicsAtMeasure(g,s.startMeasure);
+      if(dyn)gd.push({group:g,dynamics:dyn,val:DYNAMICS_MAP[dyn]})
+    });
+    if(gd.length>=2){
+      let maxG=gd.reduce((a,b)=>a.val>b.val?a:b);
+      let minG=gd.reduce((a,b)=>a.val<b.val?a:b);
+      let diff=maxG.val-minG.val;
+      if(diff>=3){dynScore-=10;details.dynamics.push({type:'err',text:'<span class="ref">'+s.name+'段</span>：'+INST_NAMES[maxG.group]+'('+maxG.dynamics+') 远强于 '+INST_NAMES[minG.group]+'('+minG.dynamics+')，严重失衡'})}
+      else if(diff===2){dynScore-=3;details.dynamics.push({type:'warn',text:'<span class="ref">'+s.name+'段</span>：'+INST_NAMES[maxG.group]+'('+maxG.dynamics+') 偏强于 '+INST_NAMES[minG.group]+'('+minG.dynamics+')'})}
+      else details.dynamics.push({type:'ok',text:'<span class="ref">'+s.name+'段</span>强弱平衡良好'})
+    }else details.dynamics.push({type:'ok',text:'<span class="ref">'+s.name+'段</span>声部不足，无法评估平衡'})
+  });
+
+  voiceScore=Math.max(0,Math.min(100,voiceScore));
+  beatScore=Math.max(0,Math.min(100,beatScore));
+  dynScore=Math.max(0,Math.min(100,dynScore));
+  return{voice:voiceScore,beat:beatScore,dynamics:dynScore,details}
+}
+
+function updateScoreDisplay(scores){
+  let setScore=(id,barId,val)=>{
+    let el=document.getElementById(id),bar=document.getElementById(barId);
+    el.textContent=val;
+    let cls=val>=80?'good':val>=50?'mid':'bad';
+    el.className='score-value '+cls;
+    let color=val>=80?'var(--success)':val>=50?'var(--warning)':'var(--danger)';
+    bar.style.width=val+'%';bar.style.background=color
+  };
+  setScore('scoreVoice','barVoice',scores.voice);
+  setScore('scoreBeat','barBeat',scores.beat);
+  setScore('scoreDyn','barDyn',scores.dynamics);
+  let total=Math.round(scores.voice*0.4+scores.beat*0.3+scores.dynamics*0.3);
+  setScore('scoreTotal','barTotal',total);
+  state.scores={voice:scores.voice,beat:scores.beat,dynamics:scores.dynamics,total}
+}
+
+let rehearsalState=null;
+function startRehearsal(){
+  if(state.phase<3){alert('请先完成所有材料补充（进入阶段3）');return}
+  if(Object.keys(state.entries).length===0){alert('请先在谱面上安排乐器进场');return}
+
+  let scores=computeScores();
+  updateScoreDisplay(scores);updateBeatFeedback();
+  document.getElementById('rehearsalOverlay').classList.add('active');
+  state.rehearsing=true;
+
+  rehearsalState={currentMeasure:1,currentBeat:1,tapExpected:false,tapped:false,feedback:[],intervalId:null};
+  renderRehearsalBeat();buildRehearsalBeats();buildRehearsalInsts();
+
+  let tempo=getSectionForMeasure(1).tempo;
+  let interval=Math.round(60000/tempo/2);
+  rehearsalState.intervalId=setInterval(()=>advanceRehearsalBeat(),interval);
+  addHistory('开始排练','auto')
+}
+
+function buildRehearsalBeats(){
+  let el=document.getElementById('rehBeats');el.innerHTML='';
+  for(let m=1;m<=PIECE.totalMeasures;m++){let beats=getMeasureBeats(m);for(let b=1;b<=beats;b++){let div=document.createElement('div');div.className='rehearsal-beat';div.id='rehB_'+m+'_'+b;div.textContent=b;el.appendChild(div)}}
+}
+
+function buildRehearsalInsts(){
+  let el=document.getElementById('rehInsts');el.innerHTML='';
+  ['strings','woodwinds','brass'].forEach(g=>{let div=document.createElement('div');div.className='rehearsal-inst '+g+'-inst';div.id='rehI_'+g;div.textContent=INST_NAMES[g];el.appendChild(div)})
+}
+
+function renderRehearsalBeat(){
+  let s=getSectionForMeasure(rehearsalState.currentMeasure);
+  let info=s?' '+s.name+' · '+s.timeSig.n+'/'+s.timeSig.d+' · ♩='+s.tempo:'';
+  document.getElementById('rehMeasure').textContent='小节 '+rehearsalState.currentMeasure+' 拍 '+rehearsalState.currentBeat+info;
+
+  let tsChanges=getTimeSigChanges();
+  let tsChange=tsChanges.find(c=>c.measure===rehearsalState.currentMeasure&&rehearsalState.currentBeat===1);
+
+  if(tsChange){
+    rehearsalState.tapExpected=true;rehearsalState.tapped=false;
+    document.getElementById('rehFeedback').innerHTML='<span style="color:var(--warning)">⚠ 拍号变化！'+tsChange.from+'→'+tsChange.to+'，请击拍确认</span>';
+    document.getElementById('btnRehTap').style.background='var(--warning)'
+  }else if(rehearsalState.currentBeat===1){
+    rehearsalState.tapExpected=true;rehearsalState.tapped=false;
+    document.getElementById('btnRehTap').style.background='var(--accent)'
+  }else{
+    rehearsalState.tapExpected=false;
+    document.getElementById('btnRehTap').style.background='var(--surface2)'
+  }
+
+  ['strings','woodwinds','brass'].forEach(g=>{
+    let instEl=document.getElementById('rehI_'+g);
+    if(isGroupPlayingAtMeasure(g,rehearsalState.currentMeasure)){instEl.classList.add('playing');setTimeout(()=>instEl.classList.remove('playing'),300)}
+  });
+
+  let prevBeat=rehearsalState.currentBeat>1?document.getElementById('rehB_'+rehearsalState.currentMeasure+'_'+(rehearsalState.currentBeat-1)):(rehearsalState.currentMeasure>1?document.getElementById('rehB_'+(rehearsalState.currentMeasure-1)+'_'+getMeasureBeats(rehearsalState.currentMeasure-1)):null);
+  if(prevBeat)prevBeat.classList.remove('active');
+  let curEl=document.getElementById('rehB_'+rehearsalState.currentMeasure+'_'+rehearsalState.currentBeat);
+  if(curEl)curEl.classList.add('active')
+}
+
+function advanceRehearsalBeat(){
+  if(!rehearsalState)return;
+  if(rehearsalState.tapExpected&&!rehearsalState.tapped){
+    let tsChanges=getTimeSigChanges();
+    let tsChange=tsChanges.find(c=>c.measure===rehearsalState.currentMeasure&&rehearsalState.currentBeat===1);
+    if(tsChange){let el=document.getElementById('rehB_'+rehearsalState.currentMeasure+'_'+rehearsalState.currentBeat);if(el)el.classList.add('miss');rehearsalState.feedback.push({type:'err',text:'小节'+rehearsalState.currentMeasure+'拍号变化未确认！'});document.getElementById('rehFeedback').innerHTML='<span style="color:var(--danger)">✗ 漏确认拍号变化！节拍错位</span>'}
+    else if(rehearsalState.currentBeat===1){let el=document.getElementById('rehB_'+rehearsalState.currentMeasure+'_'+rehearsalState.currentBeat);if(el)el.classList.add('miss');rehearsalState.feedback.push({type:'warn',text:'小节'+rehearsalState.currentMeasure+'强拍未击拍'})}
+
+  }else if(rehearsalState.tapExpected&&rehearsalState.tapped){
+    let el=document.getElementById('rehB_'+rehearsalState.currentMeasure+'_'+rehearsalState.currentBeat);if(el)el.classList.add('hit')
+  }
+
+  rehearsalState.currentBeat++;
+  let beats=getMeasureBeats(rehearsalState.currentMeasure);
+  if(rehearsalState.currentBeat>beats){
+    rehearsalState.currentMeasure++;rehearsalState.currentBeat=1;
+    if(rehearsalState.currentMeasure>PIECE.totalMeasures){finishRehearsal();return}
+    let s=getSectionForMeasure(rehearsalState.currentMeasure);
+    clearInterval(rehearsalState.intervalId);
+    let interval=Math.round(60000/s.tempo/2);
+    rehearsalState.intervalId=setInterval(()=>advanceRehearsalBeat(),interval)
+  }
+  renderRehearsalBeat()
+}
+
+function rehearsalTap(){
+  if(!rehearsalState||!rehearsalState.tapExpected)return;
+  rehearsalState.tapped=true;
+  let tsChanges=getTimeSigChanges();
+  let tsChange=tsChanges.find(c=>c.measure===rehearsalState.currentMeasure&&rehearsalState.currentBeat===1);
+  if(tsChange){
+    if(!state.acknowledgedTimeSigs.includes(tsChange.measure)){state.acknowledgedTimeSigs.push(tsChange.measure);addHistory('排练中确认拍号变化 @小节'+tsChange.measure,'manual')}
+    document.getElementById('rehFeedback').innerHTML='<span style="color:var(--success)">✓ 拍号变化已确认：'+tsChange.from+'→'+tsChange.to+'</span>'
+  }else document.getElementById('rehFeedback').innerHTML='<span style="color:var(--success)">✓ 强拍到位</span>';
+  let el=document.getElementById('rehB_'+rehearsalState.currentMeasure+'_'+rehearsalState.currentBeat);if(el)el.classList.add('hit');
+  document.getElementById('btnRehTap').style.background='var(--surface2)'
+}
+
+function stopRehearsal(){
+  if(rehearsalState&&rehearsalState.intervalId)clearInterval(rehearsalState.intervalId);
+  rehearsalState=null;state.rehearsing=false;
+  document.getElementById('rehearsalOverlay').classList.remove('active');
+  addHistory('停止排练','auto')
+}
+
+function finishRehearsal(){
+  if(rehearsalState&&rehearsalState.intervalId)clearInterval(rehearsalState.intervalId);
+  state.rehearsing=false;
+  document.getElementById('rehearsalOverlay').classList.remove('active');
+  let scores=computeScores();
+  updateScoreDisplay(scores);updateBeatFeedback();renderTimeline();updateBalance();
+  showResult(scores);addHistory('排练完成','auto')
+}
+
+function showResult(scores){
+  let overlay=document.getElementById('resultOverlay');overlay.classList.add('active');
+  let total=Math.round(scores.voice*0.4+scores.beat*0.3+scores.dynamics*0.3);
+  let cf=v=>v>=80?'var(--success)':v>=50?'var(--warning)':'var(--danger)';
+
+  [['rScoreVoice','rBarVoice',scores.voice],['rScoreBeat','rBarBeat',scores.beat],['rScoreDyn','rBarDyn',scores.dynamics]].forEach(([sid,bid,val])=>{
+    document.getElementById(sid).textContent=val;document.getElementById(sid).style.color=cf(val);
+    document.getElementById(bid).style.width=val+'%';document.getElementById(bid).style.background=cf(val)
+  });
+
+  let html='';
+  html+='<div class="result-detail-section"><h4>🎻 声部调度 (权重40%)</h4>';
+  scores.details.voice.forEach(d=>{html+='<div class="result-detail-item '+d.type+'"><span class="icon">'+(d.type==='ok'?'✓':d.type==='warn'?'⚠':'✗')+'</span><span>'+d.text+'</span></div>'});
+  html+='</div>';
+  html+='<div class="result-detail-section"><h4>🥁 节拍反馈 (权重30%)</h4>';
+  scores.details.beat.forEach(d=>{html+='<div class="result-detail-item '+d.type+'"><span class="icon">'+(d.type==='ok'?'✓':d.type==='warn'?'⚠':'✗')+'</span><span>'+d.text+'</span></div>'});
+  html+='</div>';
+  html+='<div class="result-detail-section"><h4>⚖️ 强弱平衡 (权重30%)</h4>';
+  scores.details.dynamics.forEach(d=>{html+='<div class="result-detail-item '+d.type+'"><span class="icon">'+(d.type==='ok'?'✓':d.type==='warn'?'⚠':'✗')+'</span><span>'+d.text+'</span></div>'});
+  html+='</div>';
+
+  if(rehearsalState&&rehearsalState.feedback.length>0){
+    html+='<div class="result-detail-section"><h4>🎵 排练实况</h4>';
+    rehearsalState.feedback.forEach(d=>{html+='<div class="result-detail-item '+d.type+'"><span class="icon">'+(d.type==='err'?'✗':'⚠')+'</span><span>'+d.text+'</span></div>'});
+    html+='</div>'
+  }
+
+  document.getElementById('resultDetails').innerHTML=html
+}
+
+function closeResult(){document.getElementById('resultOverlay').classList.remove('active')}
+
+function showIntro(){document.getElementById('introOverlay').classList.add('active')}
+function closeIntro(){document.getElementById('introOverlay').classList.remove('active')}
+
+function resetGame(){
+  state.phase=1;state.entries={};state.acknowledgedTimeSigs=[];state.manualDynamics={};state.history=[];state.scores={voice:0,beat:0,dynamics:0};
+  document.getElementById('phaseInfo').textContent='阶段 1/3 · 乐器调度';
+  document.getElementById('btnPhase').textContent='⏩ 补充材料：谱面段落';
+  document.getElementById('btnPhase').disabled=false;
+  ['scoreVoice','scoreBeat','scoreDyn'].forEach(id=>{document.getElementById(id).textContent='—';document.getElementById(id).className='score-value'});
+  document.getElementById('scoreTotal').textContent='—';document.getElementById('scoreTotal').className='score-value';
+  ['barVoice','barBeat','barDyn','barTotal'].forEach(id=>{document.getElementById(id).style.width='0'});
+  renderTimeline();updateBalance();updateBeatFeedback();renderHistory();
+  addHistory('重置游戏','auto')
+}
+
+function init(){
+  selectInstrument('strings');selectDynamics('mf');
+  renderTimeline();updateBalance();updateBeatFeedback();
+  addHistory('游戏开始：请安排弦乐进场','auto');
+  showIntro()
+}
+
+init();
+</script>
+</body>
+</html>
