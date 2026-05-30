@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>风筝升力试算器</title>
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-light: #dbeafe;
+  --success: #16a34a;
+  --success-light: #dcfce7;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-500: #6b7280;
+  --gray-700: #374151;
+  --gray-900: #111827;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--gray-50);
+  color: var(--gray-900);
+  line-height: 1.6;
+}
+
+.app-header {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  padding: 24px 32px;
+  box-shadow: var(--shadow-md);
+}
+
+.app-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.app-header p {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.section {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.section-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-header h2 .icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.section-body {
+  padding: 16px 20px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: #15803d; }
+.btn-warning { background: var(--warning); color: white; }
+.btn-warning:hover { background: #b45309; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-outline {
+  background: white;
+  color: var(--gray-700);
+  border: 1px solid var(--gray-300);
+}
+.btn-outline:hover { background: var(--gray-50); }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.data-table-wrap {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th {
+  background: var(--gray-50);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--gray-700);
+  border-bottom: 2px solid var(--gray-200);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--gray-100);
+  vertical-align: middle;
+}
+
+.data-table tr:hover td {
+  background: var(--gray-50);
+}
+
+.data-table input[type="number"],
+.data-table input[type="text"] {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  font-size: 13px;
+  transition: border-color 0.15s;
+}
+
+.data-table input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-ok { background: var(--success-light); color: var(--success); }
+.status-warn { background: var(--warning-light); color: var(--warning); }
+.status-err { background: var(--danger-light); color: var(--danger); }
+.status-wait { background: var(--gray-100); color: var(--gray-500); }
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .results-grid { grid-template-columns: 1fr; }
+}
+
+.result-card {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.result-card-header {
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.result-card-header.lift { background: #eff6ff; color: #1e40af; }
+.result-card-header.stability { background: #f0fdf4; color: #166534; }
+.result-card-header.comparison { background: #fefce8; color: #854d0e; }
+
+.result-card-body {
+  padding: 14px;
+  font-size: 13px;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.result-item:last-child { border-bottom: none; }
+
+.result-label { color: var(--gray-500); }
+.result-value { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.result-value.positive { color: var(--success); }
+.result-value.negative { color: var(--danger); }
+.result-value.neutral { color: var(--warning); }
+
+.error-detail {
+  background: var(--danger-light);
+  border-left: 3px solid var(--danger);
+  padding: 8px 12px;
+  border-radius: 0 4px 4px 0;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #991b1b;
+}
+
+.error-detail .err-target {
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.sensitivity-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.sensitivity-bar .bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--gray-100);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sensitivity-bar .bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+.sensitivity-bar .bar-label {
+  font-size: 12px;
+  color: var(--gray-700);
+  width: 80px;
+  text-align: right;
+}
+
+.sensitivity-bar .bar-value {
+  font-size: 12px;
+  color: var(--gray-500);
+  width: 50px;
+  font-variant-numeric: tabular-nums;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--gray-500);
+  font-size: 14px;
+}
+
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 0 20px;
+}
+
+.tab-btn {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-500);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab-btn:hover { color: var(--gray-700); }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.correction-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+
+.correction-modal-overlay.show { display: flex; }
+
+.correction-modal {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 25px rgba(0,0,0,0.15);
+  width: 420px;
+  max-width: 90vw;
+  overflow: hidden;
+}
+
+.correction-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-200);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.correction-modal-body {
+  padding: 20px;
+}
+
+.correction-modal-body .field-row {
+  margin-bottom: 14px;
+}
+
+.correction-modal-body label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-700);
+  margin-bottom: 4px;
+}
+
+.correction-modal-body .old-val {
+  background: var(--danger-light);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #991b1b;
+  margin-bottom: 6px;
+}
+
+.correction-modal-body input,
+.correction-modal-body textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.correction-modal-body textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.correction-modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--gray-200);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.history-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.history-filter label {
+  font-size: 13px;
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+.history-filter input[type="month"] {
+  padding: 6px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  color: var(--gray-500);
+  font-size: 13px;
+}
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: var(--shadow-md);
+  animation: toastIn 0.3s ease;
+  max-width: 360px;
+}
+
+.toast-success { background: var(--success); color: white; }
+.toast-error { background: var(--danger); color: white; }
+.toast-info { background: var(--primary); color: white; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.select-row {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.select-row label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-700);
+  min-width: 60px;
+}
+
+.select-row select {
+  padding: 6px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  font-size: 13px;
+  min-width: 120px;
+}
+
+.seq-cell {
+  font-weight: 600;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-bar {
+  display: flex;
+  gap: 20px;
+  padding: 12px 20px;
+  background: var(--gray-50);
+  border-radius: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  font-size: 13px;
+  color: var(--gray-700);
+}
+
+.summary-item strong {
+  font-size: 18px;
+  margin-right: 2px;
+}
+
+.summary-item strong.text-ok { color: var(--success); }
+.summary-item strong.text-warn { color: var(--warning); }
+.summary-item strong.text-err { color: var(--danger); }
+.summary-item strong.text-wait { color: var(--gray-500); }
+
+.param-hint {
+  font-size: 11px;
+  color: var(--gray-500);
+  margin-top: 2px;
+}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>🪁 风筝升力试算器</h1>
+  <p>亲子科学课实验工具 — 调整面积、风速、线角，试算风筝能否稳定飞行</p>
+</div>
+
+<div class="container">
+
+  <div class="section">
+    <div class="section-header">
+      <h2><span class="icon">📋</span> 实验数据录入</h2>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="addRow()">+ 添加一行</button>
+        <button class="btn btn-outline" onclick="addBatchRows()">批量添加</button>
+        <button class="btn btn-outline" onclick="if(confirm('将清除当前数据并加载5条演示记录，确认？'))loadDemoData()">加载演示数据</button>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="data-table-wrap">
+        <table class="data-table" id="inputTable">
+          <thead>
+            <tr>
+              <th style="width:50px">序号</th>
+              <th style="width:140px">风筝面积 (m²)</th>
+              <th style="width:140px">风速 (m/s)</th>
+              <th style="width:140px">线角 (°)</th>
+              <th style="width:100px">状态</th>
+              <th style="width:180px">备注</th>
+              <th style="width:100px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="inputBody"></tbody>
+        </table>
+      </div>
+      <div id="inputEmpty" class="empty-state">点击「添加一行」开始录入实验数据，面积可先填，风速和线角后续补充</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2><span class="icon">🔍</span> 试算结果</h2>
+      <div class="btn-group">
+        <button class="btn btn-success" onclick="runCalculation()">开始试算</button>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="summary-bar" id="summaryBar" style="display:none">
+        <div class="summary-item">总记录 <strong id="sumTotal">0</strong></div>
+        <div class="summary-item">可飞行 <strong class="text-ok" id="sumOk">0</strong></div>
+        <div class="summary-item">临界 <strong class="text-warn" id="sumWarn">0</strong></div>
+        <div class="summary-item">不可飞 <strong class="text-err" id="sumErr">0</strong></div>
+        <div class="summary-item">待补充 <strong class="text-wait" id="sumWait">0</strong></div>
+      </div>
+      <div id="resultsContainer">
+        <div class="empty-state">录入数据后点击「开始试算」查看结果</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2><span class="icon">📤</span> 数据导出</h2>
+    </div>
+    <div class="section-body">
+      <div class="btn-group">
+        <button class="btn btn-success" onclick="exportValid()">导出正常结果 (CSV)</button>
+        <button class="btn btn-danger" onclick="exportErrors()">导出异常记录 (CSV)</button>
+        <button class="btn btn-outline" onclick="exportAll()">导出全部数据 (CSV)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2><span class="icon">📝</span> 修正历史</h2>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="exportHistory()">导出修正记录 (CSV)</button>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="history-filter">
+        <label>按月份筛选：</label>
+        <input type="month" id="historyMonth" onchange="renderHistory()">
+        <button class="btn btn-sm btn-outline" onclick="document.getElementById('historyMonth').value='';renderHistory()">清除筛选</button>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table" id="historyTable">
+          <thead>
+            <tr>
+              <th>时间</th>
+              <th>记录序号</th>
+              <th>修改字段</th>
+              <th>旧值</th>
+              <th>新值</th>
+              <th>修正理由</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+      <div id="historyEmpty" class="empty-state">暂无修正记录，手动修改数据时将自动记录</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="correction-modal-overlay" id="correctionOverlay">
+  <div class="correction-modal">
+    <div class="correction-modal-header">记录修正</div>
+    <div class="correction-modal-body">
+      <div class="field-row">
+        <label>修改字段</label>
+        <div id="modalField" style="font-weight:600;color:var(--primary)"></div>
+      </div>
+      <div class="field-row">
+        <label>旧值</label>
+        <div class="old-val" id="modalOldVal"></div>
+      </div>
+      <div class="field-row">
+        <label>新值</label>
+        <input type="text" id="modalNewVal" readonly>
+      </div>
+      <div class="field-row">
+        <label>修正理由 <span style="color:var(--danger)">*</span></label>
+        <textarea id="modalReason" placeholder="请填写修正理由，如：重新测量后发现原数据有误"></textarea>
+      </div>
+    </div>
+    <div class="correction-modal-footer">
+      <button class="btn btn-outline" onclick="cancelCorrection()">取消</button>
+      <button class="btn btn-primary" onclick="confirmCorrection()">确认修正</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const RHO = 1.225;
+const G = 9.81;
+const KITE_MASS_PER_M2 = 0.15;
+
+let records = [];
+let calculationResults = [];
+let correctionHistory = [];
+let pendingCorrection = null;
+
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+}
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem('kite_records');
+    if (saved) records = JSON.parse(saved);
+    const hist = localStorage.getItem('kite_history');
+    if (hist) correctionHistory = JSON.parse(hist);
+  } catch(e) {}
+}
+
+function saveData() {
+  localStorage.setItem('kite_records', JSON.stringify(records));
+  localStorage.setItem('kite_history', JSON.stringify(correctionHistory));
+}
+
+function addRow() {
+  const seq = records.length + 1;
+  records.push({
+    id: generateId(),
+    seq: seq,
+    area: '',
+    windSpeed: '',
+    lineAngle: '',
+    note: ''
+  });
+  saveData();
+  renderTable();
+}
+
+function addBatchRows() {
+  const count = prompt('要添加多少行？', '5');
+  if (!count) return;
+  const n = parseInt(count);
+  if (isNaN(n) || n < 1 || n > 100) {
+    showToast('请输入1-100之间的数字', 'error');
+    return;
+  }
+  for (let i = 0; i < n; i++) {
+    const seq = records.length + 1;
+    records.push({
+      id: generateId(),
+      seq: seq,
+      area: '',
+      windSpeed: '',
+      lineAngle: '',
+      note: ''
+    });
+  }
+  saveData();
+  renderTable();
+  showToast('已添加 ' + n + ' 行', 'success');
+}
+
+function deleteRow(id) {
+  records = records.filter(r => r.id !== id);
+  records.forEach((r, i) => r.seq = i + 1);
+  saveData();
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('inputBody');
+  const empty = document.getElementById('inputEmpty');
+
+  if (records.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = records.map(r => {
+    const status = getRowStatus(r);
+    return `<tr data-id="${r.id}">
+      <td class="seq-cell">${r.seq}</td>
+      <td>
+        <input type="number" step="0.01" min="0" value="${r.area}" placeholder="如 0.5"
+          data-field="area" data-id="${r.id}" onchange="onFieldChange(this)" oninput="onFieldInput(this)" onfocus="onFieldFocus(this)">
+        <div class="param-hint">正面受风面积</div>
+      </td>
+      <td>
+        <input type="number" step="0.1" min="0" value="${r.windSpeed}" placeholder="如 5.0"
+          data-field="windSpeed" data-id="${r.id}" onchange="onFieldChange(this)" oninput="onFieldInput(this)" onfocus="onFieldFocus(this)">
+        <div class="param-hint">m/s</div>
+      </td>
+      <td>
+        <input type="number" step="1" min="0" max="90" value="${r.lineAngle}" placeholder="如 45"
+          data-field="lineAngle" data-id="${r.id}" onchange="onFieldChange(this)" oninput="onFieldInput(this)" onfocus="onFieldFocus(this)">
+        <div class="param-hint">0°-90°</div>
+      </td>
+      <td>${status}</td>
+      <td>
+        <input type="text" value="${r.note}" placeholder="备注"
+          data-field="note" data-id="${r.id}" onchange="onNoteChange(this)">
+      </td>
+      <td>
+        <button class="btn btn-sm btn-danger" onclick="deleteRow('${r.id}')">删除</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function getRowStatus(r) {
+  const area = parseFloat(r.area);
+  const ws = parseFloat(r.windSpeed);
+  const la = parseFloat(r.lineAngle);
+  const hasArea = r.area !== '' && !isNaN(area);
+  const hasWs = r.windSpeed !== '' && !isNaN(ws);
+  const hasLa = r.lineAngle !== '' && !isNaN(la);
+
+  if (!hasArea && !hasWs && !hasLa) {
+    return '<span class="status-badge status-wait">待录入</span>';
+  }
+  if (hasArea && !hasWs && !hasLa) {
+    return '<span class="status-badge status-wait">等待风速和线角</span>';
+  }
+  if (hasArea && hasWs && !hasLa) {
+    if (ws === 0) return '<span class="status-badge status-err">风速为零</span>';
+    return '<span class="status-badge status-wait">等待线角</span>';
+  }
+  if (!hasArea && hasWs) {
+    return '<span class="status-badge status-wait">等待面积</span>';
+  }
+  if (hasArea && hasWs && hasLa) {
+    const errors = validateRecord(r);
+    if (errors.length > 0) {
+      const worst = errors[0];
+      if (worst.level === 'error') return '<span class="status-badge status-err">参数异常</span>';
+      return '<span class="status-badge status-warn">临界状态</span>';
+    }
+    const result = calculateLift(r);
+    if (result.stable) return '<span class="status-badge status-ok">可飞行</span>';
+    return '<span class="status-badge status-warn">升力不足</span>';
+  }
+  return '<span class="status-badge status-wait">数据不完整</span>';
+}
+
+let fieldOldValues = {};
+
+function onFieldFocus(input) {
+  const id = input.dataset.id;
+  const field = input.dataset.field;
+  fieldOldValues[id + '_' + field] = input.value;
+}
+
+function onFieldInput(input) {
+  const id = input.dataset.id;
+  const field = input.dataset.field;
+  const record = records.find(r => r.id === id);
+  if (record) {
+    record[field] = input.value;
+    saveData();
+  }
+  const statusCell = input.closest('tr').querySelector('td:nth-child(5)');
+  if (statusCell && record) {
+    statusCell.innerHTML = getRowStatus(record);
+  }
+}
+
+function onFieldChange(input) {
+  const id = input.dataset.id;
+  const field = input.dataset.field;
+  const newVal = input.value;
+  const oldVal = fieldOldValues[id + '_' + field] || '';
+
+  const record = records.find(r => r.id === id);
+  if (!record) return;
+
+  if (oldVal !== '' && oldVal !== newVal) {
+    pendingCorrection = {
+      recordId: id,
+      recordSeq: record.seq,
+      field: field,
+      oldVal: oldVal,
+      newVal: newVal
+    };
+    showCorrectionModal();
+    return;
+  }
+}
+
+function onNoteChange(input) {
+  const id = input.dataset.id;
+  const record = records.find(r => r.id === id);
+  if (record) {
+    record.note = input.value;
+    saveData();
+  }
+}
+
+function showCorrectionModal() {
+  if (!pendingCorrection) return;
+  const pc = pendingCorrection;
+  const fieldNames = { area: '风筝面积', windSpeed: '风速', lineAngle: '线角' };
+  document.getElementById('modalField').textContent = '第 ' + pc.recordSeq + ' 条 — ' + (fieldNames[pc.field] || pc.field);
+  document.getElementById('modalOldVal').textContent = pc.oldVal;
+  document.getElementById('modalNewVal').value = pc.newVal;
+  document.getElementById('modalReason').value = '';
+  document.getElementById('correctionOverlay').classList.add('show');
+}
+
+function cancelCorrection() {
+  document.getElementById('correctionOverlay').classList.remove('show');
+  pendingCorrection = null;
+  renderTable();
+}
+
+function confirmCorrection() {
+  const reason = document.getElementById('modalReason').value.trim();
+  if (!reason) {
+    showToast('请填写修正理由', 'error');
+    return;
+  }
+  const pc = pendingCorrection;
+  const record = records.find(r => r.id === pc.recordId);
+  if (record) {
+    record[pc.field] = pc.newVal;
+  }
+  correctionHistory.push({
+    timestamp: new Date().toISOString(),
+    recordSeq: pc.recordSeq,
+    recordId: pc.recordId,
+    field: pc.field,
+    fieldLabel: { area: '风筝面积', windSpeed: '风速', lineAngle: '线角' }[pc.field] || pc.field,
+    oldVal: pc.oldVal,
+    newVal: pc.newVal,
+    reason: reason
+  });
+  saveData();
+  pendingCorrection = null;
+  document.getElementById('correctionOverlay').classList.remove('show');
+  renderTable();
+  renderHistory();
+  showToast('修正已记录', 'success');
+}
+
+function validateRecord(r) {
+  const errors = [];
+  const area = parseFloat(r.area);
+  const ws = parseFloat(r.windSpeed);
+  const la = parseFloat(r.lineAngle);
+  const hasArea = r.area !== '' && !isNaN(area);
+  const hasWs = r.windSpeed !== '' && !isNaN(ws);
+  const hasLa = r.lineAngle !== '' && !isNaN(la);
+
+  if (hasArea && area <= 0) {
+    errors.push({
+      level: 'error',
+      target: '风筝面积',
+      message: `风筝面积 ${area} m² 不合法：面积须为正数，请检查第${r.seq}条记录的风筝尺寸测量`
+    });
+  }
+
+  if (hasWs && ws < 0) {
+    errors.push({
+      level: 'error',
+      target: '风速',
+      message: `风速 ${ws} m/s 为负值：风速不可为负，请检查第${r.seq}条记录的风速仪读数方向`
+    });
+  }
+
+  if (hasWs && ws === 0) {
+    errors.push({
+      level: 'error',
+      target: '风速',
+      message: `风速为 0 m/s：风筝面积${hasArea ? ' ' + area + ' m²' : ''}的风筝无法获得气动升力，请检查风速传感器或更换测量位置（第${r.seq}条）`
+    });
+  }
+
+  if (hasLa) {
+    if (la < 0) {
+      errors.push({
+        level: 'error',
+        target: '线角',
+        message: `线角 ${la}° 为负值：线角为风筝线与地面的夹角，取值范围 0°-90°，请检查第${r.seq}条记录的测角仪读数方向（第${r.seq}条）`
+      });
+    }
+    if (la > 90) {
+      errors.push({
+        level: 'error',
+        target: '线角',
+        message: `线角 ${la}° 超出物理范围：线角为风筝线与地面的夹角，最大90°（正上方），请检查第${r.seq}条记录的测角仪读数（第${r.seq}条）`
+      });
+    }
+  }
+
+  if (hasArea && hasWs && hasLa && area > 0 && ws > 0 && la >= 0 && la <= 90) {
+    const aoa = 90 - la;
+    const aoaRad = aoa * Math.PI / 180;
+    const cL = 1.2 * Math.sin(2 * aoaRad);
+    if (cL < 0) {
+      errors.push({
+        level: 'error',
+        target: '升力方向',
+        message: `第${r.seq}条风筝升力方向朝下：迎角=${aoa.toFixed(1)}°导致升力系数为负(${cL.toFixed(3)})，升阻方向反转，请检查风筝是否反向安装或线角${la}°是否过大`
+      });
+    }
+
+    const cD = 0.05 + 1.5 * Math.sin(aoaRad) * Math.sin(aoaRad);
+    const q = 0.5 * RHO * ws * ws;
+    const lift = q * area * cL;
+    const drag = q * area * cD;
+    const weight = area * KITE_MASS_PER_M2 * G;
+
+    if (cL > 0 && lift < weight) {
+      errors.push({
+        level: 'warning',
+        target: '升力不足',
+        message: `第${r.seq}条风筝升力(${lift.toFixed(2)}N)小于重力(${weight.toFixed(2)}N)：面积${area}m²在风速${ws}m/s、线角${la}°条件下升力不足，建议增大面积或提高风速`
+      });
+    }
+
+    if (cL > 0 && cL < cD) {
+      errors.push({
+        level: 'warning',
+        target: '升阻比',
+        message: `第${r.seq}条风筝升阻比(${(cL/cD).toFixed(2)})小于1：升力不及阻力，风筝将被吹向下方而非升起，建议减小线角${la}°以增加迎角`
+      });
+    }
+  }
+
+  return errors;
+}
+
+function calculateLift(r) {
+  const area = parseFloat(r.area);
+  const ws = parseFloat(r.windSpeed);
+  const la = parseFloat(r.lineAngle);
+
+  const aoa = 90 - la;
+  const aoaRad = aoa * Math.PI / 180;
+
+  const cL = 1.2 * Math.sin(2 * aoaRad);
+  const cD = 0.05 + 1.5 * Math.sin(aoaRad) * Math.sin(aoaRad);
+
+  const q = 0.5 * RHO * ws * ws;
+  const lift = q * area * Math.max(0, cL);
+  const drag = q * area * cD;
+  const weight = area * KITE_MASS_PER_M2 * G;
+
+  const liftVertical = lift * Math.cos(la * Math.PI / 180);
+  const dragVertical = drag * Math.sin(la * Math.PI / 180);
+  const netVertical = liftVertical - dragVertical - weight;
+
+  const ldRatio = cD > 0 ? cL / cD : 0;
+  const stable = cL > 0 && lift > weight && ldRatio >= 1 && netVertical > 0;
+  const marginal = cL > 0 && (lift >= weight * 0.8 || (ldRatio >= 0.8 && ldRatio < 1));
+
+  return {
+    area, windSpeed: ws, lineAngle: la,
+    aoa, cL, cD,
+    dynamicPressure: q,
+    lift, drag, weight,
+    liftVertical, dragVertical, netVertical,
+    ldRatio, stable, marginal,
+    status: stable ? 'ok' : (marginal ? 'warn' : (cL <= 0 ? 'error' : 'err'))
+  };
+}
+
+function syncFromDOM() {
+  document.querySelectorAll('#inputBody tr[data-id]').forEach(tr => {
+    const id = tr.dataset.id;
+    const record = records.find(r => r.id === id);
+    if (!record) return;
+    const areaInput = tr.querySelector('input[data-field="area"]');
+    const wsInput = tr.querySelector('input[data-field="windSpeed"]');
+    const laInput = tr.querySelector('input[data-field="lineAngle"]');
+    const noteInput = tr.querySelector('input[data-field="note"]');
+    if (areaInput) record.area = areaInput.value;
+    if (wsInput) record.windSpeed = wsInput.value;
+    if (laInput) record.lineAngle = laInput.value;
+    if (noteInput) record.note = noteInput.value;
+  });
+  saveData();
+}
+
+function runCalculation() {
+  syncFromDOM();
+  calculationResults = [];
+
+  const validRecords = records.filter(r => {
+    const a = parseFloat(r.area);
+    const w = parseFloat(r.windSpeed);
+    const l = parseFloat(r.lineAngle);
+    return r.area !== '' && r.windSpeed !== '' && r.lineAngle !== '' &&
+           !isNaN(a) && !isNaN(w) && !isNaN(l);
+  });
+
+  if (validRecords.length === 0) {
+    showToast('没有可计算的完整记录，请至少填写一条完整数据', 'error');
+    return;
+  }
+
+  let okCount = 0, warnCount = 0, errCount = 0, waitCount = 0;
+
+  records.forEach(r => {
+    const a = parseFloat(r.area);
+    const w = parseFloat(r.windSpeed);
+    const l = parseFloat(r.lineAngle);
+    const hasA = r.area !== '' && !isNaN(a);
+    const hasW = r.windSpeed !== '' && !isNaN(w);
+    const hasL = r.lineAngle !== '' && !isNaN(l);
+
+    if (!hasA || !hasW || !hasL) {
+      waitCount++;
+      calculationResults.push({
+        seq: r.seq,
+        id: r.id,
+        status: 'waiting',
+        missingFields: [
+          !hasA ? '风筝面积' : null,
+          !hasW ? '风速' : null,
+          !hasL ? '线角' : null
+        ].filter(Boolean),
+        errors: [],
+        result: null
+      });
+      return;
+    }
+
+    const errors = validateRecord(r);
+    const hasError = errors.some(e => e.level === 'error');
+
+    if (hasError) {
+      errCount++;
+      calculationResults.push({
+        seq: r.seq,
+        id: r.id,
+        status: 'error',
+        errors: errors,
+        result: null
+      });
+      return;
+    }
+
+    const result = calculateLift(r);
+    if (result.stable) okCount++;
+    else if (result.marginal) warnCount++;
+    else errCount++;
+
+    calculationResults.push({
+      seq: r.seq,
+      id: r.id,
+      status: result.status,
+      errors: errors.filter(e => e.level === 'warning'),
+      result: result
+    });
+  });
+
+  document.getElementById('summaryBar').style.display = '';
+  document.getElementById('sumTotal').textContent = records.length;
+  document.getElementById('sumOk').textContent = okCount;
+  document.getElementById('sumWarn').textContent = warnCount;
+  document.getElementById('sumErr').textContent = errCount;
+  document.getElementById('sumWait').textContent = waitCount;
+
+  renderResults();
+  showToast('试算完成 — ' + okCount + '可飞/' + warnCount + '临界/' + errCount + '异常/' + waitCount + '待补', 'success');
+}
+
+function renderResults() {
+  const container = document.getElementById('resultsContainer');
+
+  if (calculationResults.length === 0) {
+    container.innerHTML = '<div class="empty-state">录入数据后点击「开始试算」查看结果</div>';
+    return;
+  }
+
+  container.innerHTML = calculationResults.map(cr => {
+    if (cr.status === 'waiting') {
+      return `<div class="result-card" style="margin-bottom:16px;border-left:4px solid var(--gray-300)">
+        <div class="result-card-header" style="background:var(--gray-50);color:var(--gray-500)">
+          第 ${cr.seq} 条 — 待补充数据
+        </div>
+        <div class="result-card-body">
+          <div>缺少：${cr.missingFields.join('、')}</div>
+          <div style="color:var(--gray-500);font-size:12px;margin-top:4px">已有数据将保留，补充完整后重新试算</div>
+        </div>
+      </div>`;
+    }
+
+    if (cr.status === 'error') {
+      return `<div class="result-card" style="margin-bottom:16px;border-left:4px solid var(--danger)">
+        <div class="result-card-header" style="background:var(--danger-light);color:var(--danger)">
+          第 ${cr.seq} 条 — 参数异常
+        </div>
+        <div class="result-card-body">
+          ${cr.errors.map(e => `<div class="error-detail"><span class="err-target">【${e.target}】</span> ${e.message}</div>`).join('')}
+        </div>
+      </div>`;
+    }
+
+    const r = cr.result;
+    const borderColor = r.stable ? 'var(--success)' : (r.marginal ? 'var(--warning)' : 'var(--danger)');
+
+    return `<div class="result-card" style="margin-bottom:16px;border-left:4px solid ${borderColor}">
+      <div class="result-card-header" style="background:${r.stable ? 'var(--success-light)' : (r.marginal ? 'var(--warning-light)' : 'var(--danger-light)')};color:${borderColor}">
+        第 ${cr.seq} 条 — ${r.stable ? '可稳定飞行 ✓' : (r.marginal ? '临界状态 ⚠' : '不可飞行 ✗')}
+      </div>
+      <div class="result-card-body">
+        <div class="results-grid">
+          <div>
+            <div style="font-weight:600;font-size:12px;color:var(--primary);margin-bottom:8px">升力估算</div>
+            <div class="result-item"><span class="result-label">动压</span><span class="result-value">${r.dynamicPressure.toFixed(2)} Pa</span></div>
+            <div class="result-item"><span class="result-label">升力系数 C_L</span><span class="result-value ${r.cL > 0 ? 'positive' : 'negative'}">${r.cL.toFixed(3)}</span></div>
+            <div class="result-item"><span class="result-label">阻力系数 C_D</span><span class="result-value">${r.cD.toFixed(3)}</span></div>
+            <div class="result-item"><span class="result-label">升力</span><span class="result-value ${r.lift > 0 ? 'positive' : 'negative'}">${r.lift.toFixed(2)} N</span></div>
+            <div class="result-item"><span class="result-label">阻力</span><span class="result-value">${r.drag.toFixed(2)} N</span></div>
+            <div class="result-item"><span class="result-label">重力</span><span class="result-value">${r.weight.toFixed(2)} N</span></div>
+          </div>
+          <div>
+            <div style="font-weight:600;font-size:12px;color:var(--success);margin-bottom:8px">稳定判定</div>
+            <div class="result-item"><span class="result-label">迎角</span><span class="result-value">${r.aoa.toFixed(1)}°</span></div>
+            <div class="result-item"><span class="result-label">升阻比 L/D</span><span class="result-value ${r.ldRatio >= 1 ? 'positive' : 'negative'}">${r.ldRatio.toFixed(2)}</span></div>
+            <div class="result-item"><span class="result-label">垂直净力</span><span class="result-value ${r.netVertical > 0 ? 'positive' : 'negative'}">${r.netVertical.toFixed(2)} N</span></div>
+            <div class="result-item"><span class="result-label">升力>重力</span><span class="result-value ${r.lift > r.weight ? 'positive' : 'negative'}">${r.lift > r.weight ? '是' : '否'}</span></div>
+            <div class="result-item"><span class="result-label">升阻比≥1</span><span class="result-value ${r.ldRatio >= 1 ? 'positive' : 'negative'}">${r.ldRatio >= 1 ? '是' : '否'}</span></div>
+            <div class="result-item"><span class="result-label">垂直净力>0</span><span class="result-value ${r.netVertical > 0 ? 'positive' : 'negative'}">${r.netVertical > 0 ? '是' : '否'}</span></div>
+          </div>
+          <div>
+            <div style="font-weight:600;font-size:12px;color:var(--warning);margin-bottom:8px">参数对比</div>
+            ${renderSensitivity(r)}
+          </div>
+        </div>
+        ${cr.errors.length > 0 ? cr.errors.map(e => `<div class="error-detail" style="background:var(--warning-light);border-left-color:var(--warning);color:#92400e"><span class="err-target">【${e.target}】</span> ${e.message}</div>`).join('') : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderSensitivity(r) {
+  const baseArea = r.area;
+  const baseWs = r.windSpeed;
+  const baseLa = r.lineAngle;
+
+  const deltaA = baseArea * 0.1;
+  const deltaW = baseWs * 0.1;
+  const deltaL = 5;
+
+  function calcLift(area, ws, la) {
+    const aoa = 90 - la;
+    const aoaRad = aoa * Math.PI / 180;
+    const cL = 1.2 * Math.sin(2 * aoaRad);
+    const q = 0.5 * RHO * ws * ws;
+    return q * area * Math.max(0, cL);
+  }
+
+  const baseLift = calcLift(baseArea, baseWs, baseLa);
+  const dArea = calcLift(baseArea + deltaA, baseWs, baseLa) - baseLift;
+  const dWind = calcLift(baseArea, baseWs + deltaW, baseLa) - baseLift;
+  const dAngle = calcLift(baseArea, baseWs, baseLa + deltaL) - baseLift;
+
+  const maxD = Math.max(Math.abs(dArea), Math.abs(dWind), Math.abs(dAngle), 0.001);
+
+  function barColor(d) {
+    if (d > 0.01) return 'var(--success)';
+    if (d < -0.01) return 'var(--danger)';
+    return 'var(--gray-300)';
+  }
+
+  return `
+    <div style="font-size:12px;color:var(--gray-500);margin-bottom:6px">各参数±10%对升力的影响</div>
+    <div class="sensitivity-bar">
+      <span class="bar-label">面积 +10%</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.abs(dArea)/maxD*100}%;background:${barColor(dArea)}"></div></div>
+      <span class="bar-value">${dArea >= 0 ? '+' : ''}${dArea.toFixed(2)}N</span>
+    </div>
+    <div class="sensitivity-bar">
+      <span class="bar-label">风速 +10%</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.abs(dWind)/maxD*100}%;background:${barColor(dWind)}"></div></div>
+      <span class="bar-value">${dWind >= 0 ? '+' : ''}${dWind.toFixed(2)}N</span>
+    </div>
+    <div class="sensitivity-bar">
+      <span class="bar-label">线角 +5°</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.abs(dAngle)/maxD*100}%;background:${barColor(dAngle)}"></div></div>
+      <span class="bar-value">${dAngle >= 0 ? '+' : ''}${dAngle.toFixed(2)}N</span>
+    </div>
+  `;
+}
+
+function renderHistory() {
+  const tbody = document.getElementById('historyBody');
+  const empty = document.getElementById('historyEmpty');
+  const monthFilter = document.getElementById('historyMonth').value;
+
+  let filtered = correctionHistory;
+  if (monthFilter) {
+    filtered = correctionHistory.filter(h => {
+      const d = new Date(h.timestamp);
+      const ym = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      return ym === monthFilter;
+    });
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map(h => {
+    const d = new Date(h.timestamp);
+    const ts = d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0') + ' ' +
+      String(d.getHours()).padStart(2, '0') + ':' +
+      String(d.getMinutes()).padStart(2, '0') + ':' +
+      String(d.getSeconds()).padStart(2, '0');
+    return `<tr>
+      <td>${ts}</td>
+      <td class="seq-cell">${h.recordSeq}</td>
+      <td>${h.fieldLabel}</td>
+      <td style="color:var(--danger);font-weight:500">${h.oldVal}</td>
+      <td style="color:var(--success);font-weight:500">${h.newVal}</td>
+      <td>${h.reason}</td>
+    </tr>`;
+  }).join('');
+}
+
+function showToast(msg, type) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-' + type;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => { toast.remove(); }, 3000);
+}
+
+function buildCSV(headers, rows) {
+  const BOM = '\uFEFF';
+  const headerLine = headers.join(',');
+  const dataLines = rows.map(row =>
+    row.map(cell => {
+      const s = String(cell == null ? '' : cell);
+      if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+        return '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    }).join(',')
+  );
+  return BOM + headerLine + '\n' + dataLines.join('\n');
+}
+
+function downloadCSV(filename, csv) {
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportValid() {
+  if (calculationResults.length === 0) {
+    showToast('请先执行试算', 'error');
+    return;
+  }
+  const valid = calculationResults.filter(cr => cr.result && (cr.result.stable || cr.result.marginal));
+  if (valid.length === 0) {
+    showToast('没有可导出的正常结果', 'error');
+    return;
+  }
+  const headers = ['序号', '面积(m²)', '风速(m/s)', '线角(°)', '迎角(°)', '升力系数', '阻力系数', '升力(N)', '阻力(N)', '重力(N)', '升阻比', '垂直净力(N)', '稳定判定'];
+  const rows = valid.map(cr => {
+    const r = cr.result;
+    return [
+      cr.seq, r.area, r.windSpeed, r.lineAngle,
+      r.aoa.toFixed(1), r.cL.toFixed(3), r.cD.toFixed(3),
+      r.lift.toFixed(2), r.drag.toFixed(2), r.weight.toFixed(2),
+      r.ldRatio.toFixed(2), r.netVertical.toFixed(2),
+      r.stable ? '可稳定飞行' : '临界状态'
+    ];
+  });
+  const csv = buildCSV(headers, rows);
+  downloadCSV('风筝升力_正常结果.csv', csv);
+  showToast('已导出 ' + valid.length + ' 条正常结果', 'success');
+}
+
+function exportErrors() {
+  if (calculationResults.length === 0) {
+    showToast('请先执行试算', 'error');
+    return;
+  }
+  const errs = calculationResults.filter(cr => cr.status === 'error' || (cr.result && !cr.result.stable && !cr.result.marginal));
+  const waiting = calculationResults.filter(cr => cr.status === 'waiting');
+  const all = [...errs, ...waiting];
+  if (all.length === 0) {
+    showToast('没有异常记录', 'error');
+    return;
+  }
+  const headers = ['序号', '面积(m²)', '风速(m/s)', '线角(°)', '状态', '异常原因'];
+  const rows = all.map(cr => {
+    const r = records.find(rec => rec.id === cr.id);
+    if (cr.status === 'waiting') {
+      return [cr.seq, r ? r.area : '', r ? r.windSpeed : '', r ? r.lineAngle : '', '待补充', '缺少：' + cr.missingFields.join('、')];
+    }
+    const errMsgs = cr.errors.map(e => '[' + e.target + '] ' + e.message).join('; ');
+    return [cr.seq, r ? r.area : '', r ? r.windSpeed : '', r ? r.lineAngle : '', '异常', errMsgs];
+  });
+  const csv = buildCSV(headers, rows);
+  downloadCSV('风筝升力_异常记录.csv', csv);
+  showToast('已导出 ' + all.length + ' 条异常记录', 'success');
+}
+
+function exportAll() {
+  if (calculationResults.length === 0) {
+    showToast('请先执行试算', 'error');
+    return;
+  }
+  const headers = ['序号', '面积(m²)', '风速(m/s)', '线角(°)', '迎角(°)', '升力系数', '阻力系数', '升力(N)', '阻力(N)', '重力(N)', '升阻比', '垂直净力(N)', '稳定判定', '状态', '异常/等待原因'];
+  const rows = calculationResults.map(cr => {
+    const r = records.find(rec => rec.id === cr.id);
+    if (cr.status === 'waiting') {
+      return [cr.seq, r ? r.area : '', r ? r.windSpeed : '', r ? r.lineAngle : '', '', '', '', '', '', '', '', '', '待补充', '缺少：' + cr.missingFields.join('、')];
+    }
+    if (cr.status === 'error') {
+      const errMsgs = cr.errors.map(e => '[' + e.target + '] ' + e.message).join('; ');
+      return [cr.seq, r ? r.area : '', r ? r.windSpeed : '', r ? r.lineAngle : '', '', '', '', '', '', '', '', '', '异常', errMsgs];
+    }
+    const res = cr.result;
+    return [
+      cr.seq, res.area, res.windSpeed, res.lineAngle,
+      res.aoa.toFixed(1), res.cL.toFixed(3), res.cD.toFixed(3),
+      res.lift.toFixed(2), res.drag.toFixed(2), res.weight.toFixed(2),
+      res.ldRatio.toFixed(2), res.netVertical.toFixed(2),
+      res.stable ? '可稳定飞行' : (res.marginal ? '临界状态' : '不可飞行'),
+      cr.errors.length > 0 ? cr.errors.map(e => '[' + e.target + '] ' + e.message).join('; ') : ''
+    ];
+  });
+  const csv = buildCSV(headers, rows);
+  downloadCSV('风筝升力_全部数据.csv', csv);
+  showToast('已导出全部数据', 'success');
+}
+
+function exportHistory() {
+  const monthFilter = document.getElementById('historyMonth').value;
+  let filtered = correctionHistory;
+  if (monthFilter) {
+    filtered = correctionHistory.filter(h => {
+      const d = new Date(h.timestamp);
+      const ym = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      return ym === monthFilter;
+    });
+  }
+  if (filtered.length === 0) {
+    showToast('没有修正记录可导出', 'error');
+    return;
+  }
+  const headers = ['时间', '记录序号', '修改字段', '旧值', '新值', '修正理由'];
+  const rows = filtered.map(h => {
+    const d = new Date(h.timestamp);
+    const ts = d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0') + ' ' +
+      String(d.getHours()).padStart(2, '0') + ':' +
+      String(d.getMinutes()).padStart(2, '0') + ':' +
+      String(d.getSeconds()).padStart(2, '0');
+    return [ts, h.recordSeq, h.fieldLabel, h.oldVal, h.newVal, h.reason];
+  });
+  const csv = buildCSV(headers, rows);
+  downloadCSV('风筝升力_修正历史.csv', csv);
+  showToast('已导出修正历史', 'success');
+}
+
+loadData();
+renderTable();
+renderHistory();
+
+if (records.length === 0) {
+  loadDemoData();
+}
+
+function loadDemoData() {
+  localStorage.removeItem('kite_records');
+  localStorage.removeItem('kite_history');
+  records = [
+    { id: generateId(), seq: 1, area: '0.5', windSpeed: '5', lineAngle: '45', note: '正常飞行' },
+    { id: generateId(), seq: 2, area: '0.3', windSpeed: '0', lineAngle: '30', note: '风速仪故障' },
+    { id: generateId(), seq: 3, area: '0.4', windSpeed: '3', lineAngle: '95', note: '线角越界' },
+    { id: generateId(), seq: 4, area: '0.8', windSpeed: '6', lineAngle: '60', note: '大风筝高风速' },
+    { id: generateId(), seq: 5, area: '0.2', windSpeed: '', lineAngle: '', note: '只量了面积' }
+  ];
+  correctionHistory = [];
+  saveData();
+  renderTable();
+  renderHistory();
+  runCalculation();
+}
+</script>
+</body>
+</html>
