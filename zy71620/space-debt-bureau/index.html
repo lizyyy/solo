@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>太空债务清偿局</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="screen-menu" class="screen active">
+    <h1 class="menu-title">太空债务清偿局</h1>
+    <p class="menu-subtitle">SPACE DEBT CLEARANCE BUREAU</p>
+    <div class="menu-desc">
+      <h4>你的任务</h4>
+      <p>你是星际货运公司的新任局长，公司背负巨额债务。你需要在12个经营回合内还清所有贷款，否则公司将被迫破产。</p>
+      <ul>
+        <li>每回合选择航线订单赚取收入，消耗燃料</li>
+        <li>每笔贷款按利率滚动计息，逾期加重负担</li>
+        <li>现金为负会自动触发高利率紧急贷款</li>
+        <li>合理安排还款顺序：先还高利率、即将到期的贷款</li>
+        <li>真实数据可能缺失或异常——学会识别和处理</li>
+        <li>所有操作都有来源追溯，出错能找到源头</li>
+      </ul>
+    </div>
+    <button id="btn-menu-start" class="btn btn-primary btn-large">开始任务</button>
+  </div>
+
+  <div id="screen-import" class="screen">
+    <div id="import-content"></div>
+  </div>
+
+  <div id="screen-playing" class="screen">
+    <div id="status-bar"></div>
+    <div class="game-layout">
+      <div class="game-column">
+        <div id="loans-panel" class="panel"></div>
+        <div id="log-panel" class="panel"></div>
+      </div>
+      <div class="game-column">
+        <div id="orders-panel" class="panel"></div>
+      </div>
+      <div id="warnings-panel"></div>
+    </div>
+    <div class="game-controls">
+      <button id="btn-execute-turn" class="btn btn-primary btn-large">确认执行本回合</button>
+      <button id="btn-pause" class="btn btn-secondary">暂停</button>
+      <button id="btn-restart" class="btn btn-secondary">重新开始</button>
+    </div>
+  </div>
+
+  <div id="screen-paused" class="screen">
+    <h2 class="pause-title">⏸ 已暂停</h2>
+    <p style="margin-bottom:20px;color:var(--text-secondary);">经营暂时冻结，准备好后继续</p>
+    <button id="btn-resume" class="btn btn-primary btn-large">继续游戏</button>
+  </div>
+
+  <div id="gameover-overlay"></div>
+
+  <div id="screen-settlement" class="screen">
+    <div id="settlement-content"></div>
+  </div>
+
+  <script src="js/engine.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      UI.init();
+    });
+  </script>
+</body>
+</html>
