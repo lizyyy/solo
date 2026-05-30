@@ -1,0 +1,9 @@
+{
+  "max_insurance_per_batch_cny": 5000000,
+  "high_value_threshold_cny": 2000000,
+  "temp_violation_penalty_per_degree_hour": 500,
+  "route_duplication_penalty": 1000,
+  "insurance_risk_weight": 0.4,
+  "temp_risk_weight": 0.35,
+  "time_risk_weight": 0.25
+}

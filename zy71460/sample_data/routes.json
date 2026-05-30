@@ -1,0 +1,74 @@
+[
+  {
+    "route_id": "R_BJ_SH",
+    "from_city_id": "C_BJ",
+    "to_city_id": "C_SH",
+    "distance_km": 1200,
+    "avg_temp_c": 20,
+    "transit_hours": 14
+  },
+  {
+    "route_id": "R_BJ_GZ",
+    "from_city_id": "C_BJ",
+    "to_city_id": "C_GZ",
+    "distance_km": 2200,
+    "avg_temp_c": 25,
+    "transit_hours": 26
+  },
+  {
+    "route_id": "R_BJ_CD",
+    "from_city_id": "C_BJ",
+    "to_city_id": "C_CD",
+    "distance_km": 1800,
+    "avg_temp_c": 17,
+    "transit_hours": 22
+  },
+  {
+    "route_id": "R_SH_GZ",
+    "from_city_id": "C_SH",
+    "to_city_id": "C_GZ",
+    "distance_km": 1400,
+    "avg_temp_c": 27,
+    "transit_hours": 16
+  },
+  {
+    "route_id": "R_SH_CD",
+    "from_city_id": "C_SH",
+    "to_city_id": "C_CD",
+    "distance_km": 2000,
+    "avg_temp_c": 19,
+    "transit_hours": 24
+  },
+  {
+    "route_id": "R_GZ_CD",
+    "from_city_id": "C_GZ",
+    "to_city_id": "C_CD",
+    "distance_km": 1600,
+    "avg_temp_c": 23,
+    "transit_hours": 18
+  },
+  {
+    "route_id": "R_SH_BJ",
+    "from_city_id": "C_SH",
+    "to_city_id": "C_BJ",
+    "distance_km": 1200,
+    "avg_temp_c": 19,
+    "transit_hours": 14
+  },
+  {
+    "route_id": "R_GZ_BJ",
+    "from_city_id": "C_GZ",
+    "to_city_id": "C_BJ",
+    "distance_km": 2200,
+    "avg_temp_c": 22,
+    "transit_hours": 26
+  },
+  {
+    "route_id": "R_CD_BJ",
+    "from_city_id": "C_CD",
+    "to_city_id": "C_BJ",
+    "distance_km": 1800,
+    "avg_temp_c": 16,
+    "transit_hours": 22
+  }
+]
