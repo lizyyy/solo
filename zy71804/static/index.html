@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>质押品折扣回看系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; color: #333; background: #f5f5f5; }
+        .header { background: #1e3a5f; color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 16px; font-weight: 500; }
+        .container { padding: 15px; }
+        .tabs { display: flex; border-bottom: 1px solid #ddd; margin-bottom: 15px; background: #fff; }
+        .tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; color: #666; }
+        .tab.active { color: #1e3a5f; border-bottom-color: #1e3a5f; font-weight: 500; }
+        .tab-content { display: none; background: #fff; padding: 15px; border-radius: 4px; }
+        .tab-content.active { display: block; }
+
+        .toolbar { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .btn { padding: 6px 14px; border: 1px solid #ddd; background: #fff; cursor: pointer; border-radius: 3px; font-size: 13px; }
+        .btn:hover { background: #f0f0f0; }
+        .btn-primary { background: #1e3a5f; color: #fff; border-color: #1e3a5f; }
+        .btn-primary:hover { background: #2a4d7a; }
+        .btn-success { background: #28a745; color: #fff; border-color: #28a745; }
+        .btn-success:hover { background: #218838; }
+        .btn-warning { background: #ffc107; color: #212529; border-color: #ffc107; }
+        .btn-danger { background: #dc3545; color: #fff; border-color: #dc3545; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 500; color: #555; position: sticky; top: 0; }
+        tr:hover { background: #f8f9fa; }
+
+        .status { padding: 2px 8px; border-radius: 3px; font-size: 11px; display: inline-block; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-exception { background: #f8d7da; color: #721c24; }
+        .status-manual { background: #fff3cd; color: #856404; }
+        .status-pending { background: #e2e3e5; color: #383d41; }
+
+        .exception-badge { background: #dc3545; color: #fff; padding: 1px 6px; border-radius: 2px; font-size: 10px; }
+        .note-badge { background: #ffc107; color: #212529; padding: 1px 6px; border-radius: 2px; font-size: 10px; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: #fff; padding: 20px; border-radius: 4px; max-width: 90%; max-height: 85%; overflow: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .modal-header h3 { font-size: 15px; font-weight: 500; }
+        .close { cursor: pointer; font-size: 20px; color: #999; }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #555; font-size: 12px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 3px; font-size: 13px; font-family: inherit; }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+        .filter-bar label { font-size: 12px; color: #666; }
+        .filter-bar input, .filter-bar select { padding: 4px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; }
+
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        .card { padding: 15px; background: #f8f9fa; border-radius: 4px; border-left: 4px solid #1e3a5f; }
+        .card h4 { font-size: 11px; color: #666; margin-bottom: 5px; font-weight: 500; }
+        .card .value { font-size: 22px; font-weight: 500; color: #1e3a5f; }
+        .card.warning { border-left-color: #ffc107; }
+        .card.warning .value { color: #856404; }
+        .card.danger { border-left-color: #dc3545; }
+        .card.danger .value { color: #721c24; }
+        .card.success { border-left-color: #28a745; }
+        .card.success .value { color: #155724; }
+
+        .history-timeline { border-left: 2px solid #ddd; margin-left: 10px; padding-left: 20px; }
+        .history-item { position: relative; margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 3px; }
+        .history-item::before { content: ''; position: absolute; left: -26px; top: 15px; width: 10px; height: 10px; background: #1e3a5f; border-radius: 50%; }
+        .history-item .version { font-weight: 500; color: #1e3a5f; font-size: 12px; }
+        .history-item .meta { font-size: 11px; color: #999; margin-top: 3px; }
+        .history-item .change { margin-top: 8px; font-size: 12px; }
+        .history-item .remark { margin-top: 5px; font-size: 11px; color: #666; }
+
+        .exception-item { padding: 12px; background: #fff5f5; border-left: 3px solid #dc3545; margin-bottom: 10px; border-radius: 3px; }
+        .exception-item .code { font-weight: 500; color: #721c24; }
+        .exception-item .desc { margin-top: 5px; color: #555; }
+        .exception-item .suggestion { margin-top: 8px; padding: 8px; background: #fff; border-radius: 3px; font-size: 12px; color: #28a745; }
+
+        .review-check { padding: 15px; background: #e7f3ff; border-radius: 4px; margin-bottom: 15px; }
+        .review-check.ok { background: #d4edda; }
+        .review-check.warning { background: #fff3cd; }
+        .review-check.error { background: #f8d7da; }
+        .review-check h4 { margin-bottom: 8px; font-size: 14px; }
+        .review-check ul { margin-left: 20px; }
+        .review-check li { margin-bottom: 4px; font-size: 12px; }
+
+        .snapshot-list { font-size: 11px; color: #666; }
+        .snapshot-item { padding: 6px; border-bottom: 1px dashed #eee; }
+        .hash { font-family: monospace; font-size: 11px; color: #999; }
+
+        .notes-list { margin-top: 10px; }
+        .note-item { padding: 10px; background: #fffbe6; border-radius: 3px; margin-bottom: 8px; position: relative; }
+        .note-item.overridden { opacity: 0.6; text-decoration: line-through; }
+        .note-item .note-meta { font-size: 11px; color: #999; margin-bottom: 5px; }
+        .note-item .note-content { font-size: 13px; color: #333; }
+        .note-item .overridden-tag { position: absolute; top: 5px; right: 5px; font-size: 10px; background: #999; color: #fff; padding: 1px 6px; border-radius: 2px; }
+
+        .alert { padding: 10px 15px; border-radius: 3px; margin-bottom: 15px; font-size: 13px; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        .action-link { color: #1e3a5f; cursor: pointer; text-decoration: underline; margin-right: 8px; font-size: 12px; }
+        .action-link:hover { color: #2a4d7a; }
+
+        .table-container { overflow-x: auto; max-height: 500px; overflow-y: auto; }
+        .empty { text-align: center; padding: 40px; color: #999; }
+
+        .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; }
+        .file-input-wrapper input[type=file] { position: absolute; left: -9999px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>质押品折扣回看系统</h1>
+        <div>
+            <span style="font-size: 12px; opacity: 0.8;">v1.0 | 幂等处理 · 状态留痕 · 导出一致</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="batches">批次管理</div>
+            <div class="tab" data-tab="records">记录列表</div>
+            <div class="tab" data-tab="exceptions">异常汇总</div>
+            <div class="tab" data-tab="export">复核导出</div>
+            <div class="tab" data-tab="help">操作说明</div>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <div id="tab-batches" class="tab-content active">
+            <div class="toolbar">
+                <div class="file-input-wrapper">
+                    <button class="btn btn-primary" onclick="document.getElementById('file-upload').click()">+ 导入批次文件</button>
+                    <input type="file" id="file-upload" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFileUpload(event)">
+                </div>
+                <input type="date" id="batch-date" style="padding: 6px; border: 1px solid #ddd; border-radius: 3px;">
+                <input type="text" id="operator" placeholder="操作人" value="system" style="padding: 6px; border: 1px solid #ddd; border-radius: 3px; width: 120px;">
+                <button class="btn" onclick="loadBatches()">刷新</button>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>提示：</strong>同一批次号重复导入会触发重跑机制，已有人工备注的记录会保留原值并标记覆盖风险，不会被系统重算覆盖。
+            </div>
+
+            <div class="table-container">
+                <table id="batches-table">
+                    <thead>
+                        <tr>
+                            <th>批次号</th>
+                            <th>批次日期</th>
+                            <th>源文件</th>
+                            <th>总记录</th>
+                            <th>成功</th>
+                            <th>异常</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>更新时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="batches-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-records" class="tab-content">
+            <div class="toolbar">
+                <select id="record-batch-filter" onchange="loadRecords()">
+                    <option value="">选择批次</option>
+                </select>
+                <select id="record-status-filter" onchange="loadRecords()">
+                    <option value="">全部状态</option>
+                    <option value="success">成功</option>
+                    <option value="exception">异常</option>
+                    <option value="manual_override">人工覆盖</option>
+                    <option value="pending">待处理</option>
+                </select>
+                <label style="display: flex; align-items: center; gap: 4px;">
+                    <input type="checkbox" id="only-exception" onchange="loadRecords()"> 仅异常
+                </label>
+                <label style="display: flex; align-items: center; gap: 4px;">
+                    <input type="checkbox" id="only-manual" onchange="loadRecords()"> 仅人工备注
+                </label>
+                <button class="btn" onclick="loadRecords()">查询</button>
+            </div>
+
+            <div class="table-container">
+                <table id="records-table">
+                    <thead>
+                        <tr>
+                            <th>质押品代码</th>
+                            <th>名称</th>
+                            <th>类型</th>
+                            <th>市值</th>
+                            <th>折扣率</th>
+                            <th>系统计算</th>
+                            <th>最终值</th>
+                            <th>状态</th>
+                            <th>异常</th>
+                            <th>人工备注</th>
+                            <th>版本</th>
+                            <th>更新时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-exceptions" class="tab-content">
+            <div class="toolbar">
+                <select id="exception-batch-filter" onchange="loadExceptions()">
+                    <option value="">选择批次</option>
+                </select>
+                <button class="btn" onclick="loadExceptions()">查询</button>
+            </div>
+            <div id="exceptions-container"></div>
+        </div>
+
+        <div id="tab-export" class="tab-content">
+            <div class="toolbar">
+                <select id="export-batch-filter" onchange="loadExportInfo()">
+                    <option value="">选择批次</option>
+                </select>
+                <button class="btn" onclick="loadExportInfo()">查询</button>
+            </div>
+
+            <div id="review-check-container"></div>
+
+            <div id="snapshots-container"></div>
+
+            <div class="toolbar" style="margin-top: 15px;">
+                <button class="btn btn-warning" onclick="checkReview()">复核检查</button>
+                <button class="btn btn-success" onclick="createSnapshot()">创建导出快照</button>
+                <button class="btn btn-primary" onclick="downloadExport()">下载复核清单</button>
+            </div>
+
+            <div class="alert alert-info" id="export-hash-display" style="display: none;">
+                <strong>数据摘要：</strong><span class="hash" id="current-hash"></span>
+                <br><small>同一批次数据未变更时，重复导出会返回相同的快照，确保导出一致性。</small>
+            </div>
+        </div>
+
+        <div id="tab-help" class="tab-content">
+            <div id="help-content"></div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="modal">
+        <div class="modal-content" style="min-width: 600px;">
+            <div class="modal-header">
+                <h3>状态历史回看</h3>
+                <span class="close" onclick="closeModal('history-modal')">&times;</span>
+            </div>
+            <div id="history-content"></div>
+        </div>
+    </div>
+
+    <div id="note-modal" class="modal">
+        <div class="modal-content" style="min-width: 500px;">
+            <div class="modal-header">
+                <h3>人工备注 / 调整</h3>
+                <span class="close" onclick="closeModal('note-modal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>质押品代码：<span id="note-collateral-code"></span></label>
+            </div>
+            <div class="form-group">
+                <label>当前最终折扣值：<span id="note-current-discount"></span></label>
+            </div>
+            <div class="form-group">
+                <label>备注内容 *</label>
+                <textarea id="note-content" placeholder="请详细说明调整原因或复核结论，该内容会永久留存"></textarea>
+            </div>
+            <div class="form-group">
+                <label>新的最终折扣值（可选，不填则不修改）</label>
+                <input type="number" id="note-new-discount" step="0.01" placeholder="留空则保持原值">
+            </div>
+            <div class="form-group">
+                <label>新状态（可选）</label>
+                <select id="note-new-status">
+                    <option value="">不修改</option>
+                    <option value="manual_override">人工覆盖</option>
+                    <option value="reviewed">已复核</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>操作人 *</label>
+                <input type="text" id="note-operator" placeholder="请输入操作人姓名">
+            </div>
+            <div id="existing-notes" class="notes-list"></div>
+            <div style="text-align: right; margin-top: 15px;">
+                <button class="btn" onclick="closeModal('note-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitNote()">确认提交</button>
+            </div>
+            <div class="alert alert-warning" style="margin-top: 15px;">
+                <strong>重要：</strong>人工备注不会覆盖历史记录，所有版本都会在状态历史中留存备查。新备注会标记旧备注为"已覆盖"，但旧备注内容不会删除。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentBatchId = null;
+        let currentRecordKey = null;
+
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            setTimeout(() => { alert.remove(); }, 5000);
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+                if (tab.dataset.tab === 'records') loadBatchFilters();
+                if (tab.dataset.tab === 'exceptions') loadBatchFilters();
+                if (tab.dataset.tab === 'export') loadBatchFilters();
+            });
+        });
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const batchDate = document.getElementById('batch-date').value;
+            if (!batchDate) {
+                showAlert('请先选择批次日期', 'warning');
+                return;
+            }
+
+            const operator = document.getElementById('operator').value || 'system';
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch(`/api/batch/upload?batch_date=${batchDate}&operator=${operator}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    const msg = data.is_reprocess
+                        ? `批次重跑完成：${data.message}`
+                        : `批次导入完成：${data.message}`;
+                    showAlert(msg, 'success');
+                    loadBatches();
+                } else {
+                    showAlert(data.detail || '导入失败', 'error');
+                }
+            } catch (e) {
+                showAlert('上传失败：' + e.message, 'error');
+            }
+            event.target.value = '';
+        }
+
+        async function loadBatches() {
+            try {
+                const res = await fetch('/api/batches');
+                const data = await res.json();
+                const tbody = document.getElementById('batches-tbody');
+                tbody.innerHTML = data.map(b => `
+                    <tr>
+                        <td><code>${b.batch_id}</code></td>
+                        <td>${b.batch_date}</td>
+                        <td>${b.source_file}</td>
+                        <td>${b.total_records}</td>
+                        <td style="color: #28a745;">${b.success_count}</td>
+                        <td style="color: #dc3545;">${b.exception_count}</td>
+                        <td><span class="status status-${b.status === 'completed' ? 'success' : b.status === 'reprocessing' ? 'warning' : 'pending'}">${b.status === 'completed' ? '已完成' : b.status === 'reprocessing' ? '重跑中' : b.status}</span></td>
+                        <td>${new Date(b.created_at).toLocaleString()}</td>
+                        <td>${new Date(b.updated_at).toLocaleString()}</td>
+                        <td>
+                            <span class="action-link" onclick="viewBatchRecords('${b.batch_id}')">查看记录</span>
+                            <span class="action-link" onclick="goToExport('${b.batch_id}')">导出</span>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showAlert('加载批次失败', 'error');
+            }
+        }
+
+        async function loadBatchFilters() {
+            try {
+                const res = await fetch('/api/batches');
+                const data = await res.json();
+                const options = '<option value="">选择批次</option>' +
+                    data.map(b => `<option value="${b.batch_id}">${b.batch_id} (${b.batch_date})</option>`).join('');
+
+                ['record-batch-filter', 'exception-batch-filter', 'export-batch-filter'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = options;
+                });
+            } catch (e) {}
+        }
+
+        function viewBatchRecords(batchId) {
+            document.querySelector('[data-tab="records"]').click();
+            setTimeout(() => {
+                document.getElementById('record-batch-filter').value = batchId;
+                loadRecords();
+            }, 100);
+        }
+
+        function goToExport(batchId) {
+            document.querySelector('[data-tab="export"]').click();
+            setTimeout(() => {
+                document.getElementById('export-batch-filter').value = batchId;
+                loadExportInfo();
+            }, 100);
+        }
+
+        async function loadRecords() {
+            const batchId = document.getElementById('record-batch-filter').value;
+            if (!batchId) {
+                document.getElementById('records-tbody').innerHTML = '<tr><td colspan="13" class="empty">请先选择批次</td></tr>';
+                return;
+            }
+
+            const status = document.getElementById('record-status-filter').value;
+            const onlyException = document.getElementById('only-exception').checked;
+            const onlyManual = document.getElementById('only-manual').checked;
+
+            let url = `/api/batch/${batchId}/records?`;
+            if (status) url += `status=${status}&`;
+            if (onlyException) url += 'only_exception=true&';
+            if (onlyManual) url += 'only_manual=true&';
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                const tbody = document.getElementById('records-tbody');
+
+                tbody.innerHTML = data.map(r => {
+                    const statusClass = r.status === 'success' ? 'success' :
+                                       r.status === 'exception' ? 'exception' :
+                                       r.status === 'manual_override' ? 'manual' : 'pending';
+                    const statusText = r.status === 'success' ? '成功' :
+                                      r.status === 'exception' ? '异常' :
+                                      r.status === 'manual_override' ? '人工覆盖' :
+                                      r.status === 'reviewed' ? '已复核' : '待处理';
+
+                    return `
+                        <tr>
+                            <td><code>${r.collateral_code}</code></td>
+                            <td>${r.collateral_name || '-'}</td>
+                            <td>${r.collateral_type || '-'}</td>
+                            <td>${r.market_value.toLocaleString()}</td>
+                            <td>${(r.discount_rate * 100).toFixed(0)}%</td>
+                            <td>${r.calculated_discount.toLocaleString()}</td>
+                            <td style="font-weight: 500;">${r.final_discount.toLocaleString()}</td>
+                            <td><span class="status status-${statusClass}">${statusText}</span></td>
+                            <td>${r.is_exception ? `<span class="exception-badge" title="${r.exception_msg}">${r.exception_code}</span>` : '-'}</td>
+                            <td>${r.has_manual_note ? `<span class="note-badge" title="${r.latest_note}">有</span>` : '-'}</td>
+                            <td>v${r.current_version}</td>
+                            <td>${new Date(r.updated_at).toLocaleString()}</td>
+                            <td>
+                                <span class="action-link" onclick="viewHistory('${r.record_key}')">历史</span>
+                                <span class="action-link" onclick="openNoteModal('${r.record_key}', '${batchId}', '${r.collateral_code}', ${r.final_discount})">备注</span>
+                                ${r.is_exception ? `<span class="action-link" style="color: #dc3545;" title="${r.exception_suggestion}">处理建议</span>` : ''}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="13" class="empty">暂无数据</td></tr>';
+                }
+            } catch (e) {
+                showAlert('加载记录失败', 'error');
+            }
+        }
+
+        async function viewHistory(recordKey) {
+            try {
+                const res = await fetch(`/api/record/${recordKey}/history`);
+                const data = await res.json();
+                const notesRes = await fetch(`/api/record/${recordKey}/notes`);
+                const notes = await notesRes.json();
+
+                const content = document.getElementById('history-content');
+                content.innerHTML = `
+                    <div class="summary-cards">
+                        <div class="card">
+                            <h4>记录键</h4>
+                            <div class="value" style="font-size: 12px; font-family: monospace;">${recordKey}</div>
+                        </div>
+                        <div class="card">
+                            <h4>变更次数</h4>
+                            <div class="value">${data.length}</div>
+                        </div>
+                        <div class="card">
+                            <h4>备注次数</h4>
+                            <div class="value">${notes.length}</div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 15px 0 10px; font-size: 13px;">状态变更轨迹</h4>
+                    <div class="history-timeline">
+                        ${data.map(h => `
+                            <div class="history-item">
+                                <div class="version">版本 v${h.version} · ${h.operation_type === 'import' ? '初始导入' : h.operation_type === 'reprocess' ? '批次重跑' : h.operation_type === 'manual_note' ? '人工备注' : h.operation_type}</div>
+                                <div class="meta">操作人：${h.operator} · ${new Date(h.created_at).toLocaleString()}</div>
+                                <div class="change">
+                                    状态：${h.old_status || '-'} → <strong>${h.new_status}</strong>
+                                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                                    折扣：${h.old_discount !== null ? h.old_discount.toLocaleString() : '-'} → <strong>${h.new_discount.toLocaleString()}</strong>
+                                </div>
+                                ${h.change_reason ? `<div class="change" style="color: #1e3a5f;">原因：${h.change_reason}</div>` : ''}
+                                ${h.remark ? `<div class="remark">备注：${h.remark}</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${notes.length > 0 ? `
+                        <h4 style="margin: 20px 0 10px; font-size: 13px;">人工备注记录</h4>
+                        <div class="notes-list">
+                            ${notes.map(n => `
+                                <div class="note-item ${n.overridden ? 'overridden' : ''}">
+                                    ${n.overridden ? '<span class="overridden-tag">已覆盖</span>' : ''}
+                                    <div class="note-meta">
+                                        ${n.operator} · ${new Date(n.created_at).toLocaleString()}
+                                        ${n.overridden ? ` · 被 ${n.overridden_by} 于 ${new Date(n.overridden_at).toLocaleString()} 覆盖` : ''}
+                                    </div>
+                                    <div class="note-content">${n.note_content}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                `;
+                document.getElementById('history-modal').classList.add('active');
+            } catch (e) {
+                showAlert('加载历史失败', 'error');
+            }
+        }
+
+        function openNoteModal(recordKey, batchId, collateralCode, currentDiscount) {
+            currentRecordKey = recordKey;
+            currentBatchId = batchId;
+            document.getElementById('note-collateral-code').textContent = collateralCode;
+            document.getElementById('note-current-discount').textContent = currentDiscount.toLocaleString();
+            document.getElementById('note-content').value = '';
+            document.getElementById('note-new-discount').value = '';
+            document.getElementById('note-new-status').value = '';
+            document.getElementById('note-operator').value = '';
+
+            fetch(`/api/record/${recordKey}/notes`)
+                .then(res => res.json())
+                .then(notes => {
+                    const container = document.getElementById('existing-notes');
+                    if (notes.length > 0) {
+                        container.innerHTML = `
+                            <h4 style="margin: 15px 0 8px; font-size: 12px; color: #666;">历史备注（新备注将覆盖以下内容的有效性，但不会删除）</h4>
+                            <div class="notes-list">
+                                ${notes.map(n => `
+                                    <div class="note-item ${n.overridden ? 'overridden' : ''}">
+                                        ${n.overridden ? '<span class="overridden-tag">已覆盖</span>' : ''}
+                                        <div class="note-meta">
+                                            ${n.operator} · ${new Date(n.created_at).toLocaleString()}
+                                        </div>
+                                        <div class="note-content">${n.note_content}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = '';
+                    }
+                });
+
+            document.getElementById('note-modal').classList.add('active');
+        }
+
+        async function submitNote() {
+            const noteContent = document.getElementById('note-content').value.trim();
+            const operator = document.getElementById('note-operator').value.trim();
+
+            if (!noteContent || !operator) {
+                showAlert('请填写备注内容和操作人', 'warning');
+                return;
+            }
+
+            const newDiscount = document.getElementById('note-new-discount').value;
+            const newStatus = document.getElementById('note-new-status').value;
+
+            const body = {
+                record_key: currentRecordKey,
+                batch_id: currentBatchId,
+                note_content: noteContent,
+                operator: operator
+            };
+            if (newDiscount) body.new_final_discount = parseFloat(newDiscount);
+            if (newStatus) body.new_status = newStatus;
+
+            try {
+                const res = await fetch('/api/record/note', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    showAlert('备注提交成功，历史版本已留存', 'success');
+                    closeModal('note-modal');
+                    loadRecords();
+                } else {
+                    showAlert(data.detail || '提交失败', 'error');
+                }
+            } catch (e) {
+                showAlert('提交失败：' + e.message, 'error');
+            }
+        }
+
+        async function loadExceptions() {
+            const batchId = document.getElementById('exception-batch-filter').value;
+            if (!batchId) {
+                document.getElementById('exceptions-container').innerHTML = '<div class="empty">请先选择批次</div>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/exceptions/summary?batch_id=${batchId}`);
+                const data = await res.json();
+                const container = document.getElementById('exceptions-container');
+
+                if (data.length === 0) {
+                    container.innerHTML = `
+                        <div class="summary-cards">
+                            <div class="card success">
+                                <h4>异常总数</h4>
+                                <div class="value">0</div>
+                            </div>
+                        </div>
+                        <div class="alert alert-success">该批次暂无异常记录，所有数据校验通过。</div>
+                    `;
+                    return;
+                }
+
+                const total = data.reduce((sum, e) => sum + e.count, 0);
+                container.innerHTML = `
+                    <div class="summary-cards">
+                        <div class="card danger">
+                            <h4>异常总数</h4>
+                            <div class="value">${total}</div>
+                        </div>
+                        <div class="card warning">
+                            <h4>异常类型</h4>
+                            <div class="value">${data.length}</div>
+                        </div>
+                    </div>
+                    ${data.map(e => `
+                        <div class="exception-item">
+                            <div class="code">${e.exception_code} · ${e.description} (${e.count}条)</div>
+                            <div class="suggestion">💡 处理建议：${e.suggestion}</div>
+                        </div>
+                    `).join('')}
+                `;
+            } catch (e) {
+                showAlert('加载异常汇总失败', 'error');
+            }
+        }
+
+        async function loadExportInfo() {
+            const batchId = document.getElementById('export-batch-filter').value;
+            if (!batchId) {
+                document.getElementById('review-check-container').innerHTML = '<div class="empty">请先选择批次</div>';
+                document.getElementById('snapshots-container').innerHTML = '';
+                return;
+            }
+            currentBatchId = batchId;
+            checkReview();
+            loadSnapshots();
+        }
+
+        async function checkReview() {
+            const batchId = document.getElementById('export-batch-filter').value || currentBatchId;
+            if (!batchId) return;
+
+            try {
+                const res = await fetch(`/api/batch/${batchId}/review-check`);
+                const data = await res.json();
+                const container = document.getElementById('review-check-container');
+
+                const checkClass = data.can_export ? 'ok' :
+                                  data.has_exceptions ? 'error' : 'warning';
+
+                container.innerHTML = `
+                    <div class="review-check ${checkClass}">
+                        <h4>复核检查结果：${data.can_export ? '✅ 可以导出' : '⚠️ 需要处理'}</h4>
+                        <div class="summary-cards" style="margin-top: 10px;">
+                            <div class="card"><h4>总记录数</h4><div class="value">${data.total_records}</div></div>
+                            <div class="card success"><h4>已复核</h4><div class="value">${data.reviewed_count}</div></div>
+                            <div class="card warning"><h4>待处理</h4><div class="value">${data.pending_review}</div></div>
+                            <div class="card ${data.has_exceptions ? 'danger' : ''}"><h4>异常数</h4><div class="value">${data.exception_count}</div></div>
+                            <div class="card"><h4>人工备注</h4><div class="value">${data.manual_note_count}</div></div>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <strong>复核建议：</strong>${data.review_suggestion}
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                showAlert('复核检查失败', 'error');
+            }
+        }
+
+        async function loadSnapshots() {
+            const batchId = document.getElementById('export-batch-filter').value || currentBatchId;
+            if (!batchId) return;
+
+            try {
+                const res = await fetch(`/api/batch/${batchId}/snapshots`);
+                const data = await res.json();
+                const container = document.getElementById('snapshots-container');
+
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="alert alert-info">该批次暂无导出快照，首次导出时会自动创建。</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <h4 style="margin-bottom: 10px; font-size: 13px;">历史导出快照</h4>
+                    <div class="snapshot-list">
+                        ${data.map(s => `
+                            <div class="snapshot-item">
+                                <strong>${s.snapshot_id}</strong> · ${s.record_count}条 ·
+                                导出人：${s.exported_by} · ${new Date(s.created_at).toLocaleString()}
+                                <br><span class="hash">${s.export_hash}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                if (data.length > 0) {
+                    document.getElementById('current-hash').textContent = data[0].export_hash;
+                    document.getElementById('export-hash-display').style.display = 'block';
+                }
+            } catch (e) {}
+        }
+
+        async function createSnapshot() {
+            const batchId = document.getElementById('export-batch-filter').value || currentBatchId;
+            if (!batchId) {
+                showAlert('请先选择批次', 'warning');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/batch/export?batch_id=${batchId}&export_type=review&operator=system`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                showAlert(data.message, 'success');
+                loadSnapshots();
+
+                document.getElementById('current-hash').textContent = data.export_hash;
+                document.getElementById('export-hash-display').style.display = 'block';
+            } catch (e) {
+                showAlert('创建快照失败', 'error');
+            }
+        }
+
+        async function downloadExport() {
+            const batchId = document.getElementById('export-batch-filter').value || currentBatchId;
+            if (!batchId) {
+                showAlert('请先选择批次', 'warning');
+                return;
+            }
+
+            try {
+                const checkRes = await fetch(`/api/batch/${batchId}/review-check`);
+                const checkData = await checkRes.json();
+
+                if (!checkData.can_export) {
+                    if (!confirm(`存在待处理问题：${checkData.review_suggestion}\n\n是否仍要导出？`)) {
+                        return;
+                    }
+                }
+
+                window.location.href = `/api/batch/${batchId}/download`;
+                showAlert('导出已开始，请查看下载栏', 'success');
+            } catch (e) {
+                showAlert('导出失败', 'error');
+            }
+        }
+
+        function loadHelp() {
+            document.getElementById('help-content').innerHTML = `
+                <div style="max-width: 900px; line-height: 1.8;">
+                    <h3 style="margin-bottom: 15px; font-size: 16px;">质押品折扣回看 - 风控运营操作指引</h3>
+
+                    <div class="alert alert-info">
+                        <strong>核心设计原则：</strong>重复批次不新增、人工备注不覆盖、历史状态可追溯、导出结果可验证。
+                    </div>
+
+                    <h4 style="margin-top: 20px; font-size: 14px; color: #1e3a5f;">一、如何放置复核日报样例</h4>
+                    <ol style="margin-left: 20px;">
+                        <li>准备好 Excel 或 CSV 文件，必须包含以下列：<strong>质押品代码、市值、折扣率</strong></li>
+                        <li>可选列：质押品名称、质押品类型、面值</li>
+                        <li>在【批次管理】标签页，选择<strong>批次日期</strong>（该批次的业务日期），填写<strong>操作人</strong></li>
+                        <li>点击【+ 导入批次文件】，选择准备好的日报文件</li>
+                        <li>系统自动计算折扣并进行校验，返回成功/异常数量</li>
+                    </ol>
+                    <p style="margin-top: 8px; color: #666; font-size: 12px;">
+                        💡 同一日期+同一文件名重复导入会触发<strong>重跑机制</strong>，会更新已有批次而非创建新批次。
+                        重跑时，已有人工备注的记录会被保护，原值保留并标记 E008 覆盖风险。
+                    </p>
+
+                    <h4 style="margin-top: 20px; font-size: 14px; color: #1e3a5f;">二、去哪看人工备注盖掉旧结论</h4>
+                    <ol style="margin-left: 20px;">
+                        <li>在【记录列表】标签页，勾选"仅人工备注"筛选器</li>
+                        <li>点击每条记录右侧的【历史】链接，可查看完整变更轨迹</li>
+                        <li>历史轨迹按版本号排序，可看到：
+                            <ul style="margin-left: 20px; margin-top: 5px;">
+                                <li>每次变更的操作人、时间、原因</li>
+                                <li>状态变化（如：异常 → 人工覆盖）</li>
+                                <li>折扣值变化（原值 → 新值）</li>
+                            </ul>
+                        </li>
+                        <li>在历史页面底部可查看所有人工备注记录，被覆盖的备注会有"已覆盖"标记，但<strong>内容不会被删除</strong></li>
+                    </ol>
+                    <p style="margin-top: 8px; color: #666; font-size: 12px;">
+                        🔒 <strong>重要保障：</strong>人工备注不会真正覆盖历史数据，所有版本都会永久留存。
+                        旧备注被标记为"已覆盖"仅表示其不再作为当前有效结论，审计时可完整追溯。
+                    </p>
+
+                    <h4 style="margin-top: 20px; font-size: 14px; color: #1e3a5f;">三、导出复核清单前怎么复核</h4>
+                    <ol style="margin-left: 20px;">
+                        <li>在【复核导出】标签页，选择要导出的批次</li>
+                        <li>点击【复核检查】按钮，系统自动检查：
+                            <ul style="margin-left: 20px; margin-top: 5px;">
+                                <li>是否还有未处理的异常记录（红色标记）</li>
+                                <li>是否还有待复核的记录</li>
+                                <li>有多少条人工备注记录需要确认</li>
+                            </ul>
+                        </li>
+                        <li>根据复核建议处理问题：
+                            <ul style="margin-left: 20px; margin-top: 5px;">
+                                <li>异常记录：到【异常汇总】查看处理建议，修正后重跑或人工备注</li>
+                                <li>待复核记录：逐一点击【备注】填写复核结论</li>
+                                <li>人工备注：点击【历史】确认备注内容的完整性和合理性</li>
+                            </ul>
+                        </li>
+                        <li>所有问题处理完毕后，可点击【创建导出快照】记录当前数据状态</li>
+                        <li>点击【下载复核清单】导出 Excel 文件</li>
+                    </ol>
+
+                    <h4 style="margin-top: 20px; font-size: 14px; color: #1e3a5f;">四、批量处理与重复运行说明</h4>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>幂等性保证：</strong>同一批次（同日期+同文件名）重复导入不会产生新记录，仅更新已有数据</li>
+                        <li><strong>人工备注保护：</strong>已有人工备注的记录，重跑时不会被系统计算覆盖，会标记 E008 异常</li>
+                        <li><strong>导出一致性：</strong>每次导出生成数据哈希（SHA-256），同一批数据未变更时哈希值相同</li>
+                        <li><strong>版本追踪：</strong>每次变更版本号+1，状态历史表完整记录每一次变化</li>
+                    </ul>
+
+                    <h4 style="margin-top: 20px; font-size: 14px; color: #1e3a5f;">五、异常代码速查表</h4>
+                    <table style="margin-top: 10px;">
+                        <thead>
+                            <tr><th>代码</th><th>说明</th><th>处理建议</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>E001</td><td>质押品代码不存在或无效</td><td>核对代码或联系数据维护组</td></tr>
+                            <tr><td>E002</td><td>市值为0或负数</td><td>检查数据源</td></tr>
+                            <tr><td>E003</td><td>折扣率超出正常范围(0-1)</td><td>核对折扣率配置</td></tr>
+                            <tr><td>E004</td><td>计算值与人工值差异超过阈值</td><td>复核人工调整的合理性</td></tr>
+                            <tr><td>E005</td><td>质押品类型未配置折扣规则</td><td>联系风控参数组</td></tr>
+                            <tr><td>E006</td><td>批次内重复记录</td><td>清理重复数据后重跑</td></tr>
+                            <tr><td>E007</td><td>缺少关键字段</td><td>检查导入文件格式</td></tr>
+                            <tr><td>E008</td><td>人工备注后系统重算覆盖风险</td><td>确认是否保留原有人工结论</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert alert-warning" style="margin-top: 20px;">
+                        <strong>操作红线：</strong>
+                        <br>1. 人工备注必须填写真实姓名，禁止使用 system 等通用账号
+                        <br>2. 调整折扣值必须在备注中说明具体原因，禁止无理由调整
+                        <br>3. 导出前必须完成复核检查，异常未处理禁止导出正式文件
+                        <br>4. 同一批次建议不要频繁重跑，确需重跑请在批次备注中说明原因
+                    </div>
+                </div>
+            `;
+        }
+
+        loadBatches();
+        loadHelp();
+    </script>
+</body>
+</html>
