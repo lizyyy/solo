@@ -1,0 +1,102 @@
+{
+  "generated_at": "2026-05-30T14:16:41.954295",
+  "sources": {
+    "src_df64f367": {
+      "file_name": "vinyl_records_batch2.json",
+      "source_type": "vinyl_record",
+      "imported_at": "2026-05-30T14:16:41.917068",
+      "imported_by": "system",
+      "affected_records": {
+        "vinyl_records": [
+          "rec_001",
+          "rec_004"
+        ],
+        "customers": [],
+        "cleaning_records": [],
+        "scratches": [],
+        "listening_tests": []
+      }
+    },
+    "src_4d8295c1": {
+      "file_name": "vinyl_records_batch1.json",
+      "source_type": "vinyl_record",
+      "imported_at": "2026-05-30T14:16:41.917593",
+      "imported_by": "system",
+      "affected_records": {
+        "vinyl_records": [
+          "rec_002",
+          "rec_003"
+        ],
+        "customers": [],
+        "cleaning_records": [],
+        "scratches": [],
+        "listening_tests": []
+      }
+    },
+    "src_886e4a0e": {
+      "file_name": "customers_202401.json",
+      "source_type": "customer",
+      "imported_at": "2026-05-30T14:16:41.918711",
+      "imported_by": "system",
+      "affected_records": {
+        "vinyl_records": [],
+        "customers": [
+          "cust_001",
+          "cust_002"
+        ],
+        "cleaning_records": [],
+        "scratches": [],
+        "listening_tests": []
+      }
+    },
+    "src_9d196098": {
+      "file_name": "cleaning_records_01.json",
+      "source_type": "cleaning_record",
+      "imported_at": "2026-05-30T14:16:41.920246",
+      "imported_by": "system",
+      "affected_records": {
+        "vinyl_records": [],
+        "customers": [],
+        "cleaning_records": [
+          "cln_001",
+          "cln_002"
+        ],
+        "scratches": [],
+        "listening_tests": []
+      }
+    },
+    "src_df956527": {
+      "file_name": "scratch_inspection_01.json",
+      "source_type": "scratch",
+      "imported_at": "2026-05-30T14:16:41.921490",
+      "imported_by": "system",
+      "affected_records": {
+        "vinyl_records": [],
+        "customers": [],
+        "cleaning_records": [],
+        "scratches": [
+          "scr_001",
+          "scr_002",
+          "scr_003"
+        ],
+        "listening_tests": []
+      }
+    },
+    "src_a037087c": {
+      "file_name": "listening_tests_01.json",
+      "source_type": "listening_test",
+      "imported_at": "2026-05-30T14:16:41.924054",
+      "imported_by": "system",
+      "affected_records": {
+        "vinyl_records": [],
+        "customers": [],
+        "cleaning_records": [],
+        "scratches": [],
+        "listening_tests": [
+          "test_001",
+          "test_002"
+        ]
+      }
+    }
+  }
+}

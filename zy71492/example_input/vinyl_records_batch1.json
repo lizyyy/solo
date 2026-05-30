@@ -1,0 +1,29 @@
+[
+  {
+    "record_id": "rec_001",
+    "catalog_number": "DG-419-862-2",
+    "artist": "Beethoven",
+    "album_title": "Symphony No.9",
+    "customer_id": "cust_001",
+    "status": "pending",
+    "total_cleanings": 0
+  },
+  {
+    "record_id": "rec_002",
+    "catalog_number": "DECCA-SXL-6000",
+    "artist": "Led Zeppelin",
+    "album_title": "IV",
+    "customer_id": "cust_002",
+    "status": "completed",
+    "total_cleanings": 2
+  },
+  {
+    "record_id": "rec_003",
+    "catalog_number": "RCA-LSC-2526",
+    "artist": "Pink Floyd",
+    "album_title": "Dark Side of the Moon",
+    "customer_id": "cust_999",
+    "status": "cleaned",
+    "total_cleanings": 1
+  }
+]

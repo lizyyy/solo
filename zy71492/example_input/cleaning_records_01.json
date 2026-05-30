@@ -1,0 +1,41 @@
+[
+  {
+    "cleaning_id": "cln_001",
+    "record_id": "rec_001",
+    "sequence": 1,
+    "status": "completed",
+    "cleaning_agent": "Tergikleen",
+    "brush_type": "carbon fiber",
+    "machine": "Okki Nokki",
+    "steps": [
+      {"step_name": "预洗", "duration_seconds": 120, "completed": true},
+      {"step_name": "主洗", "duration_seconds": 300, "completed": true},
+      {"step_name": "冲洗", "duration_seconds": 180, "completed": true},
+      {"step_name": "干燥", "duration_seconds": 600, "completed": true}
+    ],
+    "photo_before": ["photo_rec001_before_01.jpg"],
+    "photo_after": ["photo_rec001_after_01.jpg"],
+    "notes": "第一次标准清洗",
+    "performed_by": "店员A",
+    "started_at": "2024-01-15T10:00:00",
+    "completed_at": "2024-01-15T10:20:00"
+  },
+  {
+    "cleaning_id": "cln_002",
+    "record_id": "rec_002",
+    "sequence": 2,
+    "status": "completed",
+    "cleaning_agent": "Tergikleen",
+    "machine": "Okki Nokki",
+    "steps": [
+      {"step_name": "主洗", "duration_seconds": 300, "completed": true},
+      {"step_name": "冲洗", "duration_seconds": 180, "completed": true},
+      {"step_name": "干燥", "duration_seconds": 600, "completed": true}
+    ],
+    "photo_after": ["photo_rec002_after_02.jpg"],
+    "notes": "第二次清洗，使用超声波辅助",
+    "performed_by": "店员B",
+    "started_at": "2024-01-16T14:00:00",
+    "completed_at": "2024-01-16T14:18:00"
+  }
+]

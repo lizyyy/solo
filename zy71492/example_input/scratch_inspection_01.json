@@ -1,0 +1,35 @@
+[
+  {
+    "scratch_id": "scr_001",
+    "record_id": "rec_001",
+    "side": "A",
+    "location": "外环 1cm处",
+    "severity": "light",
+    "description": "发丝状划痕，目测不影响播放",
+    "track": "Track 1",
+    "photo_ids": ["scr_rec001_A_01.jpg"],
+    "recorded_at": "2024-01-15T09:00:00"
+  },
+  {
+    "scratch_id": "scr_002",
+    "record_id": "rec_002",
+    "side": "B",
+    "location": "中圈",
+    "severity": "moderate",
+    "description": "约2cm长的横向划痕",
+    "track": "Track 4",
+    "photo_ids": ["scr_rec002_B_01.jpg"],
+    "recorded_at": "2024-01-15T09:30:00"
+  },
+  {
+    "scratch_id": "scr_003",
+    "record_id": "rec_002",
+    "side": "B",
+    "location": "中圈",
+    "severity": "heavy",
+    "description": "明显划痕，约2cm长，可能有爆音",
+    "track": "Track 4",
+    "photo_ids": ["scr_rec002_B_02.jpg"],
+    "recorded_at": "2024-01-16T16:00:00"
+  }
+]

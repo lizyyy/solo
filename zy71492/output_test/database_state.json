@@ -1,0 +1,708 @@
+{
+  "sources": {
+    "src_df64f367": {
+      "source_id": "src_df64f367",
+      "source_type": "vinyl_record",
+      "file_name": "vinyl_records_batch2.json",
+      "imported_at": "2026-05-30T14:16:41.917068",
+      "imported_by": "system",
+      "raw_data": {
+        "records": [
+          {
+            "record_id": "rec_001",
+            "catalog_number": "DG-419-862-2",
+            "artist": "Ludwig van Beethoven",
+            "album_title": "Symphony No.9 'Choral'",
+            "customer_id": "cust_001",
+            "status": "in_progress",
+            "total_cleanings": 1
+          },
+          {
+            "record_id": "rec_004",
+            "catalog_number": "DECCA-SXL-6000",
+            "artist": "Led Zeppelin",
+            "album_title": "Four Symbols",
+            "customer_id": "cust_001",
+            "status": "pending",
+            "total_cleanings": 0
+          }
+        ]
+      }
+    },
+    "src_4d8295c1": {
+      "source_id": "src_4d8295c1",
+      "source_type": "vinyl_record",
+      "file_name": "vinyl_records_batch1.json",
+      "imported_at": "2026-05-30T14:16:41.917593",
+      "imported_by": "system",
+      "raw_data": {
+        "records": [
+          {
+            "record_id": "rec_001",
+            "catalog_number": "DG-419-862-2",
+            "artist": "Beethoven",
+            "album_title": "Symphony No.9",
+            "customer_id": "cust_001",
+            "status": "pending",
+            "total_cleanings": 0
+          },
+          {
+            "record_id": "rec_002",
+            "catalog_number": "DECCA-SXL-6000",
+            "artist": "Led Zeppelin",
+            "album_title": "IV",
+            "customer_id": "cust_002",
+            "status": "completed",
+            "total_cleanings": 2
+          },
+          {
+            "record_id": "rec_003",
+            "catalog_number": "RCA-LSC-2526",
+            "artist": "Pink Floyd",
+            "album_title": "Dark Side of the Moon",
+            "customer_id": "cust_999",
+            "status": "cleaned",
+            "total_cleanings": 1
+          }
+        ]
+      }
+    },
+    "src_886e4a0e": {
+      "source_id": "src_886e4a0e",
+      "source_type": "customer",
+      "file_name": "customers_202401.json",
+      "imported_at": "2026-05-30T14:16:41.918711",
+      "imported_by": "system",
+      "raw_data": {
+        "records": [
+          {
+            "customer_id": "cust_001",
+            "name": "张三",
+            "phone": "13800138001",
+            "email": "zhangsan@example.com",
+            "notes": "VIP客户，偏好古典音乐"
+          },
+          {
+            "customer_id": "cust_002",
+            "name": "李四",
+            "phone": "13800138002",
+            "notes": "对划痕非常敏感"
+          }
+        ]
+      }
+    },
+    "src_9d196098": {
+      "source_id": "src_9d196098",
+      "source_type": "cleaning_record",
+      "file_name": "cleaning_records_01.json",
+      "imported_at": "2026-05-30T14:16:41.920246",
+      "imported_by": "system",
+      "raw_data": {
+        "records": [
+          {
+            "cleaning_id": "cln_001",
+            "record_id": "rec_001",
+            "sequence": 1,
+            "status": "completed",
+            "cleaning_agent": "Tergikleen",
+            "brush_type": "carbon fiber",
+            "machine": "Okki Nokki",
+            "steps": [
+              {
+                "step_name": "预洗",
+                "duration_seconds": 120,
+                "completed": true
+              },
+              {
+                "step_name": "主洗",
+                "duration_seconds": 300,
+                "completed": true
+              },
+              {
+                "step_name": "冲洗",
+                "duration_seconds": 180,
+                "completed": true
+              },
+              {
+                "step_name": "干燥",
+                "duration_seconds": 600,
+                "completed": true
+              }
+            ],
+            "photo_before": [
+              "photo_rec001_before_01.jpg"
+            ],
+            "photo_after": [
+              "photo_rec001_after_01.jpg"
+            ],
+            "notes": "第一次标准清洗",
+            "performed_by": "店员A",
+            "started_at": "2024-01-15T10:00:00",
+            "completed_at": "2024-01-15T10:20:00"
+          },
+          {
+            "cleaning_id": "cln_002",
+            "record_id": "rec_002",
+            "sequence": 2,
+            "status": "completed",
+            "cleaning_agent": "Tergikleen",
+            "machine": "Okki Nokki",
+            "steps": [
+              {
+                "step_name": "主洗",
+                "duration_seconds": 300,
+                "completed": true
+              },
+              {
+                "step_name": "冲洗",
+                "duration_seconds": 180,
+                "completed": true
+              },
+              {
+                "step_name": "干燥",
+                "duration_seconds": 600,
+                "completed": true
+              }
+            ],
+            "photo_after": [
+              "photo_rec002_after_02.jpg"
+            ],
+            "notes": "第二次清洗，使用超声波辅助",
+            "performed_by": "店员B",
+            "started_at": "2024-01-16T14:00:00",
+            "completed_at": "2024-01-16T14:18:00"
+          }
+        ]
+      }
+    },
+    "src_df956527": {
+      "source_id": "src_df956527",
+      "source_type": "scratch",
+      "file_name": "scratch_inspection_01.json",
+      "imported_at": "2026-05-30T14:16:41.921490",
+      "imported_by": "system",
+      "raw_data": {
+        "records": [
+          {
+            "scratch_id": "scr_001",
+            "record_id": "rec_001",
+            "side": "A",
+            "location": "外环 1cm处",
+            "severity": "light",
+            "description": "发丝状划痕，目测不影响播放",
+            "track": "Track 1",
+            "photo_ids": [
+              "scr_rec001_A_01.jpg"
+            ],
+            "recorded_at": "2024-01-15T09:00:00"
+          },
+          {
+            "scratch_id": "scr_002",
+            "record_id": "rec_002",
+            "side": "B",
+            "location": "中圈",
+            "severity": "moderate",
+            "description": "约2cm长的横向划痕",
+            "track": "Track 4",
+            "photo_ids": [
+              "scr_rec002_B_01.jpg"
+            ],
+            "recorded_at": "2024-01-15T09:30:00"
+          },
+          {
+            "scratch_id": "scr_003",
+            "record_id": "rec_002",
+            "side": "B",
+            "location": "中圈",
+            "severity": "heavy",
+            "description": "明显划痕，约2cm长，可能有爆音",
+            "track": "Track 4",
+            "photo_ids": [
+              "scr_rec002_B_02.jpg"
+            ],
+            "recorded_at": "2024-01-16T16:00:00"
+          }
+        ]
+      }
+    },
+    "src_a037087c": {
+      "source_id": "src_a037087c",
+      "source_type": "listening_test",
+      "file_name": "listening_tests_01.json",
+      "imported_at": "2026-05-30T14:16:41.924054",
+      "imported_by": "system",
+      "raw_data": {
+        "records": [
+          {
+            "test_id": "test_001",
+            "record_id": "rec_001",
+            "side": "A",
+            "result": "good",
+            "crackle": 2,
+            "surface_noise": 2,
+            "pops": 1,
+            "distortion": 1,
+            "notes": "整体良好，仅有轻微底噪",
+            "tested_by": "店员A",
+            "tested_at": "2024-01-15T11:00:00"
+          },
+          {
+            "test_id": "test_002",
+            "record_id": "rec_001",
+            "side": "B",
+            "result": "excellent",
+            "crackle": 1,
+            "surface_noise": 1,
+            "pops": 0,
+            "distortion": 0,
+            "notes": "非常安静，清洗效果良好",
+            "tested_by": "店员A",
+            "tested_at": "2024-01-15T11:15:00"
+          }
+        ]
+      }
+    }
+  },
+  "customers": {
+    "cust_001": {
+      "customer_id": "cust_001",
+      "name": "张三",
+      "phone": "13800138001",
+      "email": "zhangsan@example.com",
+      "notes": "VIP客户，偏好古典音乐",
+      "source_id": "src_886e4a0e",
+      "created_at": "2026-05-30T14:16:41.918722"
+    },
+    "cust_002": {
+      "customer_id": "cust_002",
+      "name": "李四",
+      "phone": "13800138002",
+      "email": null,
+      "notes": "对划痕非常敏感",
+      "source_id": "src_886e4a0e",
+      "created_at": "2026-05-30T14:16:41.918725"
+    }
+  },
+  "vinyl_records": {
+    "rec_001": {
+      "record_id": "rec_001",
+      "catalog_number": "DG-419-862-2",
+      "artist": "Ludwig van Beethoven",
+      "album_title": "Symphony No.9 'Choral'",
+      "customer_id": "cust_001",
+      "status": "in_progress",
+      "scratches": [
+        "scr_001"
+      ],
+      "listening_tests": [
+        "test_001",
+        "test_002"
+      ],
+      "cleaning_records": [
+        "cln_001"
+      ],
+      "photos": [],
+      "total_cleanings": 1,
+      "source_id": "src_df64f367",
+      "created_at": "2026-05-30T14:16:41.917104",
+      "updated_at": "2026-05-30T14:16:41.924157"
+    },
+    "rec_004": {
+      "record_id": "rec_004",
+      "catalog_number": "DECCA-SXL-6000",
+      "artist": "Led Zeppelin",
+      "album_title": "Four Symbols",
+      "customer_id": "cust_001",
+      "status": "pending",
+      "scratches": [],
+      "listening_tests": [],
+      "cleaning_records": [],
+      "photos": [],
+      "total_cleanings": 0,
+      "source_id": "src_df64f367",
+      "created_at": "2026-05-30T14:16:41.917109",
+      "updated_at": "2026-05-30T14:16:41.917110"
+    },
+    "rec_002": {
+      "record_id": "rec_002",
+      "catalog_number": "DECCA-SXL-6000",
+      "artist": "Led Zeppelin",
+      "album_title": "IV",
+      "customer_id": "cust_002",
+      "status": "completed",
+      "scratches": [
+        "scr_002",
+        "scr_003"
+      ],
+      "listening_tests": [],
+      "cleaning_records": [
+        "cln_002"
+      ],
+      "photos": [],
+      "total_cleanings": 2,
+      "source_id": "src_4d8295c1",
+      "created_at": "2026-05-30T14:16:41.917604",
+      "updated_at": "2026-05-30T14:16:41.921575"
+    },
+    "rec_003": {
+      "record_id": "rec_003",
+      "catalog_number": "RCA-LSC-2526",
+      "artist": "Pink Floyd",
+      "album_title": "Dark Side of the Moon",
+      "customer_id": "cust_999",
+      "status": "cleaned",
+      "scratches": [],
+      "listening_tests": [],
+      "cleaning_records": [],
+      "photos": [],
+      "total_cleanings": 1,
+      "source_id": "src_4d8295c1",
+      "created_at": "2026-05-30T14:16:41.917609",
+      "updated_at": "2026-05-30T14:16:41.917609"
+    }
+  },
+  "scratches": {
+    "scr_001": {
+      "scratch_id": "scr_001",
+      "record_id": "rec_001",
+      "location": "外环 1cm处",
+      "severity": "light",
+      "description": "发丝状划痕，目测不影响播放",
+      "side": "A",
+      "track": "Track 1",
+      "photo_ids": [
+        "scr_rec001_A_01.jpg"
+      ],
+      "source_id": "src_df956527",
+      "recorded_at": "2024-01-15T09:00:00"
+    },
+    "scr_002": {
+      "scratch_id": "scr_002",
+      "record_id": "rec_002",
+      "location": "中圈",
+      "severity": "moderate",
+      "description": "约2cm长的横向划痕",
+      "side": "B",
+      "track": "Track 4",
+      "photo_ids": [
+        "scr_rec002_B_01.jpg"
+      ],
+      "source_id": "src_df956527",
+      "recorded_at": "2024-01-15T09:30:00"
+    },
+    "scr_003": {
+      "scratch_id": "scr_003",
+      "record_id": "rec_002",
+      "location": "中圈",
+      "severity": "heavy",
+      "description": "明显划痕，约2cm长，可能有爆音",
+      "side": "B",
+      "track": "Track 4",
+      "photo_ids": [
+        "scr_rec002_B_02.jpg"
+      ],
+      "source_id": "src_df956527",
+      "recorded_at": "2024-01-16T16:00:00"
+    }
+  },
+  "listening_tests": {
+    "test_001": {
+      "test_id": "test_001",
+      "record_id": "rec_001",
+      "side": "A",
+      "result": "good",
+      "crackle": 2,
+      "surface_noise": 2,
+      "pops": 1,
+      "distortion": 1,
+      "overall_score": 1.5,
+      "notes": "整体良好，仅有轻微底噪",
+      "tested_by": "店员A",
+      "source_id": "src_a037087c",
+      "tested_at": "2024-01-15T11:00:00"
+    },
+    "test_002": {
+      "test_id": "test_002",
+      "record_id": "rec_001",
+      "side": "B",
+      "result": "excellent",
+      "crackle": 1,
+      "surface_noise": 1,
+      "pops": 0,
+      "distortion": 0,
+      "overall_score": 0.5,
+      "notes": "非常安静，清洗效果良好",
+      "tested_by": "店员A",
+      "source_id": "src_a037087c",
+      "tested_at": "2024-01-15T11:15:00"
+    }
+  },
+  "cleaning_records": {
+    "cln_001": {
+      "cleaning_id": "cln_001",
+      "record_id": "rec_001",
+      "sequence": 1,
+      "status": "completed",
+      "cleaning_agent": "Tergikleen",
+      "brush_type": "carbon fiber",
+      "machine": "Okki Nokki",
+      "steps": [
+        {
+          "step_name": "预洗",
+          "duration_seconds": 120,
+          "notes": null,
+          "completed": true,
+          "completed_at": null
+        },
+        {
+          "step_name": "主洗",
+          "duration_seconds": 300,
+          "notes": null,
+          "completed": true,
+          "completed_at": null
+        },
+        {
+          "step_name": "冲洗",
+          "duration_seconds": 180,
+          "notes": null,
+          "completed": true,
+          "completed_at": null
+        },
+        {
+          "step_name": "干燥",
+          "duration_seconds": 600,
+          "notes": null,
+          "completed": true,
+          "completed_at": null
+        }
+      ],
+      "photo_before": [
+        "photo_rec001_before_01.jpg"
+      ],
+      "photo_after": [
+        "photo_rec001_after_01.jpg"
+      ],
+      "notes": "第一次标准清洗",
+      "performed_by": "店员A",
+      "source_id": "src_9d196098",
+      "started_at": "2024-01-15T10:00:00",
+      "completed_at": "2024-01-15T10:20:00"
+    },
+    "cln_002": {
+      "cleaning_id": "cln_002",
+      "record_id": "rec_002",
+      "sequence": 2,
+      "status": "completed",
+      "cleaning_agent": "Tergikleen",
+      "brush_type": null,
+      "machine": "Okki Nokki",
+      "steps": [
+        {
+          "step_name": "主洗",
+          "duration_seconds": 300,
+          "notes": null,
+          "completed": true,
+          "completed_at": null
+        },
+        {
+          "step_name": "冲洗",
+          "duration_seconds": 180,
+          "notes": null,
+          "completed": true,
+          "completed_at": null
+        },
+        {
+          "step_name": "干燥",
+          "duration_seconds": 600,
+          "notes": null,
+          "completed": true,
+          "completed_at": null
+        }
+      ],
+      "photo_before": [],
+      "photo_after": [
+        "photo_rec002_after_02.jpg"
+      ],
+      "notes": "第二次清洗，使用超声波辅助",
+      "performed_by": "店员B",
+      "source_id": "src_9d196098",
+      "started_at": "2024-01-16T14:00:00",
+      "completed_at": "2024-01-16T14:18:00"
+    }
+  },
+  "photos": {},
+  "conflicts": [
+    {
+      "conflict_id": "conf_4dd528c4",
+      "conflict_type": "duplicate_record_id",
+      "record_id": "rec_001",
+      "source_ids": [
+        "src_df64f367",
+        "src_4d8295c1"
+      ],
+      "message": "唱片编号 rec_001 出现重复，涉及 2 个来源文件",
+      "details": {
+        "duplicate_id": "rec_001",
+        "source_files": [
+          "vinyl_records_batch2.json",
+          "vinyl_records_batch1.json"
+        ],
+        "source_ids": [
+          "src_df64f367",
+          "src_4d8295c1"
+        ],
+        "next_step": "请确认哪个是正确的原始记录，保留一个，其余标记为重复或合并数据",
+        "catalog_number": "DG-419-862-2"
+      },
+      "resolved": false,
+      "resolution": null,
+      "detected_at": "2026-05-30T14:16:41.924401"
+    },
+    {
+      "conflict_id": "conf_3a682915",
+      "conflict_type": "duplicate_catalog_number",
+      "record_id": "rec_004",
+      "source_ids": [
+        "src_df64f367",
+        "src_4d8295c1"
+      ],
+      "message": "目录号 DECCA-SXL-6000 对应 2 张不同唱片记录",
+      "details": {
+        "catalog_number": "DECCA-SXL-6000",
+        "record_ids": [
+          "rec_004",
+          "rec_002"
+        ],
+        "source_files": [
+          "vinyl_records_batch2.json",
+          "vinyl_records_batch1.json"
+        ],
+        "next_step": "检查是否同一张唱片被多次录入，或确为不同版本需区分目录号",
+        "artists": [
+          "Led Zeppelin",
+          "Led Zeppelin"
+        ],
+        "titles": [
+          "Four Symbols",
+          "IV"
+        ]
+      },
+      "resolved": false,
+      "resolution": null,
+      "detected_at": "2026-05-30T14:16:41.924420"
+    },
+    {
+      "conflict_id": "conf_a887d800",
+      "conflict_type": "scratch_overlap",
+      "record_id": "rec_002",
+      "source_ids": [
+        "src_df956527"
+      ],
+      "message": "唱片 rec_002 的 B 面 中圈 位置有 2 条重复划痕记录",
+      "details": {
+        "location_key": "rec_002|B|中圈",
+        "scratch_ids": [
+          "scr_002",
+          "scr_003"
+        ],
+        "scratch_details": [
+          {
+            "scratch_id": "scr_002",
+            "severity": "moderate",
+            "description": "约2cm长的横向划痕",
+            "source_file": "scratch_inspection_01.json",
+            "recorded_at": "2024-01-15T09:30:00"
+          },
+          {
+            "scratch_id": "scr_003",
+            "severity": "heavy",
+            "description": "明显划痕，约2cm长，可能有爆音",
+            "source_file": "scratch_inspection_01.json",
+            "recorded_at": "2024-01-16T16:00:00"
+          }
+        ],
+        "source_files": [
+          "scratch_inspection_01.json"
+        ],
+        "severity_diff": true,
+        "next_step": "比对各来源的划痕照片和描述，确认是否同一划痕，严重程度以最新或最详细记录为准"
+      },
+      "resolved": false,
+      "resolution": null,
+      "detected_at": "2026-05-30T14:16:41.924447"
+    },
+    {
+      "conflict_id": "conf_7ca74d24",
+      "conflict_type": "missing_listening_test",
+      "record_id": "rec_002",
+      "source_ids": [
+        "src_4d8295c1"
+      ],
+      "message": "唱片 rec_002 (DECCA-SXL-6000) 状态为 completed，但缺少试听记录",
+      "details": {
+        "record_id": "rec_002",
+        "catalog_number": "DECCA-SXL-6000",
+        "artist": "Led Zeppelin",
+        "album_title": "IV",
+        "current_status": "completed",
+        "cleaning_count": 2,
+        "source_file": "vinyl_records_batch1.json",
+        "next_step": "补充清洗后试听记录，或确认唱片状态是否正确",
+        "missing_data": "listening_tests",
+        "required_for_status": [
+          "cleaned",
+          "completed"
+        ]
+      },
+      "resolved": false,
+      "resolution": null,
+      "detected_at": "2026-05-30T14:16:41.924461"
+    },
+    {
+      "conflict_id": "conf_c4415de5",
+      "conflict_type": "missing_listening_test",
+      "record_id": "rec_003",
+      "source_ids": [
+        "src_4d8295c1"
+      ],
+      "message": "唱片 rec_003 (RCA-LSC-2526) 状态为 cleaned，但缺少试听记录",
+      "details": {
+        "record_id": "rec_003",
+        "catalog_number": "RCA-LSC-2526",
+        "artist": "Pink Floyd",
+        "album_title": "Dark Side of the Moon",
+        "current_status": "cleaned",
+        "cleaning_count": 1,
+        "source_file": "vinyl_records_batch1.json",
+        "next_step": "补充清洗后试听记录，或确认唱片状态是否正确",
+        "missing_data": "listening_tests",
+        "required_for_status": [
+          "cleaned",
+          "completed"
+        ]
+      },
+      "resolved": false,
+      "resolution": null,
+      "detected_at": "2026-05-30T14:16:41.924471"
+    },
+    {
+      "conflict_id": "conf_308ab1fd",
+      "conflict_type": "missing_customer",
+      "record_id": "rec_003",
+      "source_ids": [
+        "src_4d8295c1"
+      ],
+      "message": "唱片 rec_003 关联的顾客 cust_999 不存在",
+      "details": {
+        "record_id": "rec_003",
+        "catalog_number": "RCA-LSC-2526",
+        "missing_customer_id": "cust_999",
+        "source_file": "vinyl_records_batch1.json",
+        "next_step": "导入顾客信息文件，或修正customer_id"
+      },
+      "resolved": false,
+      "resolution": null,
+      "detected_at": "2026-05-30T14:16:41.924483"
+    }
+  ]
+}

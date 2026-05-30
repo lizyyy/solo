@@ -1,0 +1,28 @@
+[
+  {
+    "test_id": "test_001",
+    "record_id": "rec_001",
+    "side": "A",
+    "result": "good",
+    "crackle": 2,
+    "surface_noise": 2,
+    "pops": 1,
+    "distortion": 1,
+    "notes": "整体良好，仅有轻微底噪",
+    "tested_by": "店员A",
+    "tested_at": "2024-01-15T11:00:00"
+  },
+  {
+    "test_id": "test_002",
+    "record_id": "rec_001",
+    "side": "B",
+    "result": "excellent",
+    "crackle": 1,
+    "surface_noise": 1,
+    "pops": 0,
+    "distortion": 0,
+    "notes": "非常安静，清洗效果良好",
+    "tested_by": "店员A",
+    "tested_at": "2024-01-15T11:15:00"
+  }
+]
