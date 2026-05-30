@@ -1,0 +1,12 @@
+﻿乐评ID,乐评文本(前100字),用户ID,歌曲ID,歌曲名,歌曲状态,当前标签,标签版本链,算法标签,人工修正,风险类型,风险等级,风险描述,复核状态,处理说明,来源追溯,举报数
+R001,这首歌太好听了，简直完美！,U001,S001,月光曲,上架,正面,正面[算法:v2.1],"正面(v2.1,conf=0.95)",,,,,待确认,,test_data/reviews.csv#L2 | test_data/tags.csv#L2 | test_data/songs.csv#L2,0
+R002,呵呵真好呢，谁信啊,U002,S001,月光曲,上架,讽刺,正面[算法:v2.1] → 讽刺[人工修正:manual],"正面(v2.1,conf=0.72)",正面→讽刺 by REVIEWER_01 (文本含明显讽刺语调),,,,已处理,人工修正: 正面→讽刺 (文本含明显讽刺语调),test_data/reviews.csv#L3 | test_data/tags.csv#L3 | test_data/corrections.csv#L2 | test_data/songs.csv#L2,0
+R003,一般般吧，没什么感觉,U003,S002,夜曲,上架,中性,中性[算法:v2.1],"中性(v2.1,conf=0.88)",,,,,待确认,,test_data/reviews.csv#L4 | test_data/tags.csv#L4 | test_data/songs.csv#L3,0
+R004,绝了！多好的歌啊（讽刺）,U004,S002,夜曲,上架,讽刺,正面[算法:v2.1] → 讽刺[人工修正:manual],"正面(v2.1,conf=0.68)",正面→讽刺 by REVIEWER_01 (用户标注讽刺),,,,已处理,人工修正: 正面→讽刺 (用户标注讽刺),test_data/reviews.csv#L5 | test_data/tags.csv#L5 | test_data/corrections.csv#L3 | test_data/songs.csv#L3,1
+R005,旋律优美，歌词动人,U005,S003,红豆,上架,正面,正面[算法:v2.1],"正面(v2.1,conf=0.91)",,,,,待确认,,test_data/reviews.csv#L6 | test_data/tags.csv#L6 | test_data/songs.csv#L4,0
+R006,哈哈哈真棒哦，真棒,U006,S003,红豆,上架,负面,正面[算法:v2.1] → 负面[人工修正:manual],"正面(v2.1,conf=0.75)",正面→负面 by REVIEWER_02 (阴阳怪气),讽刺误判,高,算法标签'正面'被人工修正为'负面'，疑为讽刺误判,已处理,人工修正: 正面→负面 (阴阳怪气),test_data/reviews.csv#L7 | test_data/tags.csv#L7 | test_data/corrections.csv#L4 | test_data/songs.csv#L4,0
+R007,非常喜欢，循环播放中,U007,S004,小幸运,上架,正面,正面[算法:v2.1],"正面(v2.1,conf=0.93)",,,,,待确认,,test_data/reviews.csv#L8 | test_data/tags.csv#L8 | test_data/songs.csv#L5,0
+R009,垃圾，别听了,U008,S005,已删除的歌,下架,负面,负面[算法:v2.1],"负面(v2.1,conf=0.89)",,下架歌曲仍推荐,高,歌曲'已删除的歌'(ID:S005)已下架，但仍存在关联乐评,退回补材料,有1条未解决举报，需补充材料,test_data/reviews.csv#L10 | test_data/tags.csv#L10 | test_data/songs.csv#L6,2
+R010,还行，凑合听,U009,S005,已删除的歌,下架,中性,中性[算法:v2.1],"中性(v2.1,conf=0.82)",,下架歌曲仍推荐,高,歌曲'已删除的歌'(ID:S005)已下架，但仍存在关联乐评,退回补材料,关联歌曲已下架，需补材料,test_data/reviews.csv#L11 | test_data/tags.csv#L11 | test_data/songs.csv#L6,0
+R011,太好听了太好听了太好听了,U010,S001,月光曲,上架,正面,正面[算法:v2.1],"正面(v2.1,conf=0.7)",,,,,待确认,,test_data/reviews.csv#L12 | test_data/tags.csv#L12 | test_data/songs.csv#L2,0
+R017,感动到哭,U011,S006,晚风,上架,感动,感动[算法:v2.2],"感动(v2.2,conf=0.85)",,,,,待确认,,test_data/reviews.csv#L19 | test_data/tags.csv#L18 | test_data/songs.csv#L7,0

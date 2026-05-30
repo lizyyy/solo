@@ -1,0 +1,548 @@
+{
+  "report_title": "乐评情绪标签复核报告",
+  "generated_at": "2026-05-30 23:35:20",
+  "statistics": {
+    "total": 11,
+    "dedup_removed": 6,
+    "by_status": {
+      "待确认": 6,
+      "已处理": 3,
+      "退回补材料": 2
+    },
+    "songs_total": 6,
+    "songs_delisted": 1,
+    "tags_total": 17,
+    "corrections_total": 3,
+    "reports_total": 3
+  },
+  "risk_summary": {
+    "total_risks": 3,
+    "by_type": {
+      "讽刺误判": 1,
+      "下架歌曲仍推荐": 2
+    },
+    "by_severity": {
+      "高": 3
+    },
+    "detail": {
+      "讽刺误判_高": 1,
+      "下架歌曲仍推荐_高": 2
+    }
+  },
+  "entries": [
+    {
+      "review_id": "R001",
+      "review_text": "这首歌太好听了，简直完美！",
+      "user_id": "U001",
+      "song_id": "S001",
+      "song_title": "月光曲",
+      "song_status": "上架",
+      "algorithm_tags": [
+        {
+          "review_id": "R001",
+          "tag": "正面",
+          "confidence": 0.95,
+          "algorithm_version": "v2.1",
+          "tagged_at": "2025-01-15",
+          "source": "test_data/tags.csv#L2"
+        }
+      ],
+      "manual_correction": null,
+      "current_tag": "正面",
+      "tag_version_chain": [
+        {
+          "tag": "正面",
+          "source_type": "算法",
+          "version": "v2.1",
+          "timestamp": "2025-01-15",
+          "operator": "v2.1"
+        }
+      ],
+      "report_records": [],
+      "risks": [],
+      "audit_status": "待确认",
+      "audit_note": "",
+      "source_traces": [
+        "test_data/reviews.csv#L2",
+        "test_data/tags.csv#L2",
+        "test_data/songs.csv#L2"
+      ]
+    },
+    {
+      "review_id": "R002",
+      "review_text": "呵呵真好呢，谁信啊",
+      "user_id": "U002",
+      "song_id": "S001",
+      "song_title": "月光曲",
+      "song_status": "上架",
+      "algorithm_tags": [
+        {
+          "review_id": "R002",
+          "tag": "正面",
+          "confidence": 0.72,
+          "algorithm_version": "v2.1",
+          "tagged_at": "2025-01-16",
+          "source": "test_data/tags.csv#L3"
+        }
+      ],
+      "manual_correction": {
+        "review_id": "R002",
+        "original_tag": "正面",
+        "corrected_tag": "讽刺",
+        "reviewer_id": "REVIEWER_01",
+        "corrected_at": "2025-01-17",
+        "note": "文本含明显讽刺语调",
+        "source": "test_data/corrections.csv#L2"
+      },
+      "current_tag": "讽刺",
+      "tag_version_chain": [
+        {
+          "tag": "正面",
+          "source_type": "算法",
+          "version": "v2.1",
+          "timestamp": "2025-01-16",
+          "operator": "v2.1"
+        },
+        {
+          "tag": "讽刺",
+          "source_type": "人工修正",
+          "version": "manual",
+          "timestamp": "2025-01-17",
+          "operator": "REVIEWER_01"
+        }
+      ],
+      "report_records": [],
+      "risks": [],
+      "audit_status": "已处理",
+      "audit_note": "人工修正: 正面→讽刺 (文本含明显讽刺语调)",
+      "source_traces": [
+        "test_data/reviews.csv#L3",
+        "test_data/tags.csv#L3",
+        "test_data/corrections.csv#L2",
+        "test_data/songs.csv#L2"
+      ]
+    },
+    {
+      "review_id": "R003",
+      "review_text": "一般般吧，没什么感觉",
+      "user_id": "U003",
+      "song_id": "S002",
+      "song_title": "夜曲",
+      "song_status": "上架",
+      "algorithm_tags": [
+        {
+          "review_id": "R003",
+          "tag": "中性",
+          "confidence": 0.88,
+          "algorithm_version": "v2.1",
+          "tagged_at": "2025-01-17",
+          "source": "test_data/tags.csv#L4"
+        }
+      ],
+      "manual_correction": null,
+      "current_tag": "中性",
+      "tag_version_chain": [
+        {
+          "tag": "中性",
+          "source_type": "算法",
+          "version": "v2.1",
+          "timestamp": "2025-01-17",
+          "operator": "v2.1"
+        }
+      ],
+      "report_records": [],
+      "risks": [],
+      "audit_status": "待确认",
+      "audit_note": "",
+      "source_traces": [
+        "test_data/reviews.csv#L4",
+        "test_data/tags.csv#L4",
+        "test_data/songs.csv#L3"
+      ]
+    },
+    {
+      "review_id": "R004",
+      "review_text": "绝了！多好的歌啊（讽刺）",
+      "user_id": "U004",
+      "song_id": "S002",
+      "song_title": "夜曲",
+      "song_status": "上架",
+      "algorithm_tags": [
+        {
+          "review_id": "R004",
+          "tag": "正面",
+          "confidence": 0.68,
+          "algorithm_version": "v2.1",
+          "tagged_at": "2025-01-18",
+          "source": "test_data/tags.csv#L5"
+        }
+      ],
+      "manual_correction": {
+        "review_id": "R004",
+        "original_tag": "正面",
+        "corrected_tag": "讽刺",
+        "reviewer_id": "REVIEWER_01",
+        "corrected_at": "2025-01-19",
+        "note": "用户标注讽刺",
+        "source": "test_data/corrections.csv#L3"
+      },
+      "current_tag": "讽刺",
+      "tag_version_chain": [
+        {
+          "tag": "正面",
+          "source_type": "算法",
+          "version": "v2.1",
+          "timestamp": "2025-01-18",
+          "operator": "v2.1"
+        },
+        {
+          "tag": "讽刺",
+          "source_type": "人工修正",
+          "version": "manual",
+          "timestamp": "2025-01-19",
+          "operator": "REVIEWER_01"
+        }
+      ],
+      "report_records": [
+        {
+          "report_id": "REP001",
+          "review_id": "R004",
+          "reason": "讽刺辱骂",
+          "status": "待处理",
+          "reported_at": "2025-01-19",
+          "source": "test_data/reports.csv#L2"
+        }
+      ],
+      "risks": [],
+      "audit_status": "已处理",
+      "audit_note": "人工修正: 正面→讽刺 (用户标注讽刺)",
+      "source_traces": [
+        "test_data/reviews.csv#L5",
+        "test_data/tags.csv#L5",
+        "test_data/corrections.csv#L3",
+        "test_data/songs.csv#L3"
+      ]
+    },
+    {
+      "review_id": "R005",
+      "review_text": "旋律优美，歌词动人",
+      "user_id": "U005",
+      "song_id": "S003",
+      "song_title": "红豆",
+      "song_status": "上架",
+      "algorithm_tags": [
+        {
+          "review_id": "R005",
+          "tag": "正面",
+          "confidence": 0.91,
+          "algorithm_version": "v2.1",
+          "tagged_at": "2025-01-19",
+          "source": "test_data/tags.csv#L6"
+        }
+      ],
+      "manual_correction": null,
+      "current_tag": "正面",
+      "tag_version_chain": [
+        {
+          "tag": "正面",
+          "source_type": "算法",
+          "version": "v2.1",
+          "timestamp": "2025-01-19",
+          "operator": "v2.1"
+        }
+      ],
+      "report_records": [],
+      "risks": [],
+      "audit_status": "待确认",
+      "audit_note": "",
+      "source_traces": [
+        "test_data/reviews.csv#L6",
+        "test_data/tags.csv#L6",
+        "test_data/songs.csv#L4"
+      ]
+    },
+    {
+      "review_id": "R006",
+      "review_text": "哈哈哈真棒哦，真棒",
+      "user_id": "U006",
+      "song_id": "S003",
+      "song_title": "红豆",
+      "song_status": "上架",
+      "algorithm_tags": [
+        {
+          "review_id": "R006",
+          "tag": "正面",
+          "confidence": 0.75,
+          "algorithm_version": "v2.1",
+          "tagged_at": "2025-01-20",
+          "source": "test_data/tags.csv#L7"
+        }
+      ],
+      "manual_correction": {
+        "review_id": "R006",
+        "original_tag": "正面",
+        "corrected_tag": "负面",
+        "reviewer_id": "REVIEWER_02",
+        "corrected_at": "2025-01-21",
+        "note": "阴阳怪气",
+        "source": "test_data/corrections.csv#L4"
+      },
+      "current_tag": "负面",
+      "tag_version_chain": [
+        {
+          "tag": "正面",
+          "source_type": "算法",
+          "version": "v2.1",
+          "timestamp": "2025-01-20",
+          "operator": "v2.1"
+        },
+        {
+          "tag": "负面",
+          "source_type": "人工修正",
+          "version": "manual",
+          "timestamp": "2025-01-21",
+          "operator": "REVIEWER_02"
+        }
+      ],
+      "report_records": [],
+      "risks": [
+        {
+          "risk_type": "讽刺误判",
+          "severity": "高",
+          "description": "算法标签'正面'被人工修正为'负面'，疑为讽刺误判",
+          "evidence": "哈哈哈真棒哦，真棒",
+          "source": "test_data/corrections.csv#L4"
+        }
+      ],
+      "audit_status": "已处理",
+      "audit_note": "人工修正: 正面→负面 (阴阳怪气)",
+      "source_traces": [
+        "test_data/reviews.csv#L7",
+        "test_data/tags.csv#L7",
+        "test_data/corrections.csv#L4",
+        "test_data/songs.csv#L4"
+      ]
+    },
+    {
+      "review_id": "R007",
+      "review_text": "非常喜欢，循环播放中",
+      "user_id": "U007",
+      "song_id": "S004",
+      "song_title": "小幸运",
+      "song_status": "上架",
+      "algorithm_tags": [
+        {
+          "review_id": "R007",
+          "tag": "正面",
+          "confidence": 0.93,
+          "algorithm_version": "v2.1",
+          "tagged_at": "2025-01-21",
+          "source": "test_data/tags.csv#L8"
+        }
+      ],
+      "manual_correction": null,
+      "current_tag": "正面",
+      "tag_version_chain": [
+        {
+          "tag": "正面",
+          "source_type": "算法",
+          "version": "v2.1",
+          "timestamp": "2025-01-21",
+          "operator": "v2.1"
+        }
+      ],
+      "report_records": [],
+      "risks": [],
+      "audit_status": "待确认",
+      "audit_note": "",
+      "source_traces": [
+        "test_data/reviews.csv#L8",
+        "test_data/tags.csv#L8",
+        "test_data/songs.csv#L5"
+      ]
+    },
+    {
+      "review_id": "R009",
+      "review_text": "垃圾，别听了",
+      "user_id": "U008",
+      "song_id": "S005",
+      "song_title": "已删除的歌",
+      "song_status": "下架",
+      "algorithm_tags": [
+        {
+          "review_id": "R009",
+          "tag": "负面",
+          "confidence": 0.89,
+          "algorithm_version": "v2.1",
+          "tagged_at": "2025-01-22",
+          "source": "test_data/tags.csv#L10"
+        }
+      ],
+      "manual_correction": null,
+      "current_tag": "负面",
+      "tag_version_chain": [
+        {
+          "tag": "负面",
+          "source_type": "算法",
+          "version": "v2.1",
+          "timestamp": "2025-01-22",
+          "operator": "v2.1"
+        }
+      ],
+      "report_records": [
+        {
+          "report_id": "REP002",
+          "review_id": "R009",
+          "reason": "恶意差评",
+          "status": "已解决",
+          "reported_at": "2025-01-23",
+          "source": "test_data/reports.csv#L3"
+        },
+        {
+          "report_id": "REP003",
+          "review_id": "R009",
+          "reason": "人身攻击",
+          "status": "待处理",
+          "reported_at": "2025-01-23",
+          "source": "test_data/reports.csv#L4"
+        }
+      ],
+      "risks": [
+        {
+          "risk_type": "下架歌曲仍推荐",
+          "severity": "高",
+          "description": "歌曲'已删除的歌'(ID:S005)已下架，但仍存在关联乐评",
+          "evidence": "乐评ID: R009"
+        }
+      ],
+      "audit_status": "退回补材料",
+      "audit_note": "有1条未解决举报，需补充材料",
+      "source_traces": [
+        "test_data/reviews.csv#L10",
+        "test_data/tags.csv#L10",
+        "test_data/songs.csv#L6"
+      ]
+    },
+    {
+      "review_id": "R010",
+      "review_text": "还行，凑合听",
+      "user_id": "U009",
+      "song_id": "S005",
+      "song_title": "已删除的歌",
+      "song_status": "下架",
+      "algorithm_tags": [
+        {
+          "review_id": "R010",
+          "tag": "中性",
+          "confidence": 0.82,
+          "algorithm_version": "v2.1",
+          "tagged_at": "2025-01-23",
+          "source": "test_data/tags.csv#L11"
+        }
+      ],
+      "manual_correction": null,
+      "current_tag": "中性",
+      "tag_version_chain": [
+        {
+          "tag": "中性",
+          "source_type": "算法",
+          "version": "v2.1",
+          "timestamp": "2025-01-23",
+          "operator": "v2.1"
+        }
+      ],
+      "report_records": [],
+      "risks": [
+        {
+          "risk_type": "下架歌曲仍推荐",
+          "severity": "高",
+          "description": "歌曲'已删除的歌'(ID:S005)已下架，但仍存在关联乐评",
+          "evidence": "乐评ID: R010"
+        }
+      ],
+      "audit_status": "退回补材料",
+      "audit_note": "关联歌曲已下架，需补材料",
+      "source_traces": [
+        "test_data/reviews.csv#L11",
+        "test_data/tags.csv#L11",
+        "test_data/songs.csv#L6"
+      ]
+    },
+    {
+      "review_id": "R011",
+      "review_text": "太好听了太好听了太好听了",
+      "user_id": "U010",
+      "song_id": "S001",
+      "song_title": "月光曲",
+      "song_status": "上架",
+      "algorithm_tags": [
+        {
+          "review_id": "R011",
+          "tag": "正面",
+          "confidence": 0.7,
+          "algorithm_version": "v2.1",
+          "tagged_at": "2025-01-24",
+          "source": "test_data/tags.csv#L12"
+        }
+      ],
+      "manual_correction": null,
+      "current_tag": "正面",
+      "tag_version_chain": [
+        {
+          "tag": "正面",
+          "source_type": "算法",
+          "version": "v2.1",
+          "timestamp": "2025-01-24",
+          "operator": "v2.1"
+        }
+      ],
+      "report_records": [],
+      "risks": [],
+      "audit_status": "待确认",
+      "audit_note": "",
+      "source_traces": [
+        "test_data/reviews.csv#L12",
+        "test_data/tags.csv#L12",
+        "test_data/songs.csv#L2"
+      ]
+    },
+    {
+      "review_id": "R017",
+      "review_text": "感动到哭",
+      "user_id": "U011",
+      "song_id": "S006",
+      "song_title": "晚风",
+      "song_status": "上架",
+      "algorithm_tags": [
+        {
+          "review_id": "R017",
+          "tag": "感动",
+          "confidence": 0.85,
+          "algorithm_version": "v2.2",
+          "tagged_at": "2025-01-26",
+          "source": "test_data/tags.csv#L18"
+        }
+      ],
+      "manual_correction": null,
+      "current_tag": "感动",
+      "tag_version_chain": [
+        {
+          "tag": "感动",
+          "source_type": "算法",
+          "version": "v2.2",
+          "timestamp": "2025-01-26",
+          "operator": "v2.2"
+        }
+      ],
+      "report_records": [],
+      "risks": [],
+      "audit_status": "待确认",
+      "audit_note": "",
+      "source_traces": [
+        "test_data/reviews.csv#L19",
+        "test_data/tags.csv#L18",
+        "test_data/songs.csv#L7"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+﻿乐评ID,乐评文本,用户ID,歌曲ID,歌曲名,歌曲状态,当前标签,标签版本链,风险,处理说明,来源追溯
+R001,这首歌太好听了，简直完美！,U001,S001,月光曲,上架,正面,正面[算法:v2.1],,,test_data/reviews.csv#L2 | test_data/tags.csv#L2 | test_data/songs.csv#L2
+R003,一般般吧，没什么感觉,U003,S002,夜曲,上架,中性,中性[算法:v2.1],,,test_data/reviews.csv#L4 | test_data/tags.csv#L4 | test_data/songs.csv#L3
+R005,旋律优美，歌词动人,U005,S003,红豆,上架,正面,正面[算法:v2.1],,,test_data/reviews.csv#L6 | test_data/tags.csv#L6 | test_data/songs.csv#L4
+R007,非常喜欢，循环播放中,U007,S004,小幸运,上架,正面,正面[算法:v2.1],,,test_data/reviews.csv#L8 | test_data/tags.csv#L8 | test_data/songs.csv#L5
+R011,太好听了太好听了太好听了,U010,S001,月光曲,上架,正面,正面[算法:v2.1],,,test_data/reviews.csv#L12 | test_data/tags.csv#L12 | test_data/songs.csv#L2
+R017,感动到哭,U011,S006,晚风,上架,感动,感动[算法:v2.2],,,test_data/reviews.csv#L19 | test_data/tags.csv#L18 | test_data/songs.csv#L7

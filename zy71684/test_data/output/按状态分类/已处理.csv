@@ -1,0 +1,4 @@
+﻿乐评ID,乐评文本,用户ID,歌曲ID,歌曲名,歌曲状态,当前标签,标签版本链,风险,处理说明,来源追溯
+R002,呵呵真好呢，谁信啊,U002,S001,月光曲,上架,讽刺,正面[算法:v2.1] → 讽刺[人工修正:manual],,人工修正: 正面→讽刺 (文本含明显讽刺语调),test_data/reviews.csv#L3 | test_data/tags.csv#L3 | test_data/corrections.csv#L2 | test_data/songs.csv#L2
+R004,绝了！多好的歌啊（讽刺）,U004,S002,夜曲,上架,讽刺,正面[算法:v2.1] → 讽刺[人工修正:manual],,人工修正: 正面→讽刺 (用户标注讽刺),test_data/reviews.csv#L5 | test_data/tags.csv#L5 | test_data/corrections.csv#L3 | test_data/songs.csv#L3
+R006,哈哈哈真棒哦，真棒,U006,S003,红豆,上架,负面,正面[算法:v2.1] → 负面[人工修正:manual],[讽刺误判/高] 算法标签'正面'被人工修正为'负面'，疑为讽刺误判,人工修正: 正面→负面 (阴阳怪气),test_data/reviews.csv#L7 | test_data/tags.csv#L7 | test_data/corrections.csv#L4 | test_data/songs.csv#L4
