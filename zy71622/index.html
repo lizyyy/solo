@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基金经理早餐摊 - 资产配置模拟游戏</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header class="game-header">
+            <h1>🍳 基金经理早餐摊</h1>
+            <div class="round-info">
+                <span id="currentRound">第 1 回合</span>
+                <span id="gamePhase">准备阶段</span>
+            </div>
+        </header>
+
+        <main class="game-container">
+            <aside class="status-panel">
+                <div class="cash-section">
+                    <h3>💰 现金</h3>
+                    <div class="cash-display" id="cashDisplay">¥1,000</div>
+                </div>
+                
+                <div class="portfolio-section">
+                    <h3>📊 资产组合</h3>
+                    <div class="portfolio-summary" id="portfolioSummary">
+                        <div class="portfolio-item">
+                            <span>食材价值</span>
+                            <span id="ingredientsValue">¥0</span>
+                        </div>
+                        <div class="portfolio-item">
+                            <span>基金市值</span>
+                            <span id="fundsValue">¥0</span>
+                        </div>
+                        <div class="portfolio-total">
+                            <span>总资产</span>
+                            <span id="totalAssets">¥1,000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pending-section" id="pendingSection" style="display: none;">
+                    <h3>⚠️ 待处理记录</h3>
+                    <div id="pendingList"></div>
+                </div>
+            </aside>
+
+            <section class="main-game">
+                <div class="market-events">
+                    <h3>📰 市场动态</h3>
+                    <div id="marketEvent" class="event-card">
+                        <p>新的一天开始了，准备好迎接挑战吧！</p>
+                    </div>
+                </div>
+
+                <div class="game-tabs">
+                    <button class="tab-btn active" data-tab="ingredients">🥬 食材采购</button>
+                    <button class="tab-btn" data-tab="funds">📈 基金交易</button>
+                    <button class="tab-btn" data-tab="orders">📋 顾客订单</button>
+                    <button class="tab-btn" data-tab="history">📜 历史记录</button>
+                </div>
+
+                <div class="tab-content">
+                    <div id="ingredients-tab" class="tab-panel active">
+                        <div class="inventory-grid" id="inventoryGrid"></div>
+                    </div>
+
+                    <div id="funds-tab" class="tab-panel">
+                        <div class="funds-grid" id="fundsGrid"></div>
+                    </div>
+
+                    <div id="orders-tab" class="tab-panel">
+                        <div class="orders-list" id="ordersList"></div>
+                    </div>
+
+                    <div id="history-tab" class="tab-panel">
+                        <div class="history-panel">
+                            <div class="history-controls">
+                                <label>
+                                    <input type="checkbox" id="compareMode"> 对比模式
+                                </label>
+                                <select id="historySelect"></select>
+                            </div>
+                            <div class="history-view" id="historyView"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="action-panel">
+                <div class="operations-section">
+                    <h3>⚙️ 操作</h3>
+                    <button id="processOrdersBtn" class="action-btn primary">🍽️ 处理订单</button>
+                    <button id="nextRoundBtn" class="action-btn success">⏭️ 下一回合</button>
+                    <button id="resetBtn" class="action-btn warning">🔄 重新开始</button>
+                </div>
+
+                <div class="report-section">
+                    <h3>📑 报告</h3>
+                    <button id="viewReportBtn" class="action-btn info">📊 查看复盘报告</button>
+                    <button id="exportBtn" class="action-btn secondary">💾 导出数据</button>
+                    <button id="importBtn" class="action-btn secondary">📂 导入数据</button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                </div>
+
+                <div class="log-section">
+                    <h3>📝 操作日志</h3>
+                    <div class="log-container" id="logContainer"></div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📊 经营复盘报告</h2>
+                <button class="close-btn" onclick="closeReportModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="reportContent"></div>
+        </div>
+    </div>
+
+    <script src="gameState.js"></script>
+    <script src="gameEngine.js"></script>
+    <script src="ui.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
