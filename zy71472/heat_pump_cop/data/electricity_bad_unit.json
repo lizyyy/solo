@@ -1,0 +1,9 @@
+{
+    "name": "天价电价-单位错",
+    "flat_rate_yuan_per_kwh": 850.0,
+    "provenance": {
+        "provider": "测试用-故意把元/kWh写成元/MWh",
+        "received_date": "2026-01-10",
+        "notes": "0.85元/kWh 误写为850元/kWh(把kWh当MWh)"
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "name": "常规空气源热泵B",
+    "model": "HP-STD-15B",
+    "operating_range": {
+        "outdoor_min_c": -15,
+        "outdoor_max_c": 43,
+        "water_outlet_min_c": 25,
+        "water_outlet_max_c": 55
+    },
+    "rated_points": [
+        {
+            "outdoor_temp_c": 7,
+            "water_outlet_temp_c": 45,
+            "heating_capacity_kw": 90.0,
+            "compressor_power_kw": 22.5
+        },
+        {
+            "outdoor_temp_c": 2,
+            "water_outlet_temp_c": 45,
+            "heating_capacity_kw": 72.0,
+            "compressor_power_kw": 22.5
+        },
+        {
+            "outdoor_temp_c": -7,
+            "water_outlet_temp_c": 45,
+            "heating_capacity_kw": 55.0,
+            "compressor_power_kw": 21.2
+        }
+    ],
+    "provenance": {
+        "provider": "厂家B销售 李工",
+        "received_date": "2025-12-03",
+        "notes": "样本数据, 低温段需确认结霜修正"
+    }
+}

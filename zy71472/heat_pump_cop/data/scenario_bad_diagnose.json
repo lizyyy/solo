@@ -1,0 +1,22 @@
+{
+    "import": [
+        {"type": "equipment", "file": "equip_c_bad.json"},
+        {"type": "temp_curve", "file": "temp_curve_beijing.json"},
+        {"type": "electricity", "file": "electricity_bad_unit.json"},
+        {"type": "fuel", "file": "fuel_gas.json"}
+    ],
+    "water_outlet_temp_c": 45.0,
+    "heating_load_kw": 100.0,
+    "temp_curve_key": "北京_采暖季",
+    "electricity_name": "天价电价-单位错",
+    "baseline_fuel": "天然气",
+    "verify_points": [
+        {"outdoor_temp_c": -15},
+        {"outdoor_temp_c": 7}
+    ],
+    "slice_equipments": ["边界外设备C"],
+    "compare_equipments": ["边界外设备C"],
+    "investment_costs": {
+        "边界外设备C": 150000
+    }
+}

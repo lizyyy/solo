@@ -1,0 +1,27 @@
+{
+    "import": [
+        {"type": "equipment", "file": "equip_a.json"},
+        {"type": "equipment", "file": "equip_b.json"},
+        {"type": "temp_curve", "file": "temp_curve_beijing.json"},
+        {"type": "electricity", "file": "electricity_beijing.json"},
+        {"type": "fuel", "file": "fuel_gas.json"}
+    ],
+    "water_outlet_temp_c": 45.0,
+    "heating_load_kw": 100.0,
+    "temp_curve_key": "北京_采暖季",
+    "electricity_name": "北京工商业电价",
+    "baseline_fuel": "天然气",
+    "verify_points": [
+        {"equipment": "低温空气源热泵A", "outdoor_temp_c": 7, "water_outlet_temp_c": 45},
+        {"equipment": "低温空气源热泵A", "outdoor_temp_c": -7, "water_outlet_temp_c": 45},
+        {"equipment": "低温空气源热泵A", "outdoor_temp_c": -20, "water_outlet_temp_c": 45},
+        {"equipment": "常规空气源热泵B", "outdoor_temp_c": 7, "water_outlet_temp_c": 45},
+        {"equipment": "常规空气源热泵B", "outdoor_temp_c": -7, "water_outlet_temp_c": 45}
+    ],
+    "slice_equipments": ["低温空气源热泵A", "常规空气源热泵B"],
+    "compare_equipments": ["低温空气源热泵A", "常规空气源热泵B"],
+    "investment_costs": {
+        "低温空气源热泵A": 280000,
+        "常规空气源热泵B": 200000
+    }
+}

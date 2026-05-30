@@ -1,0 +1,27 @@
+{
+    "location": "北京",
+    "season": "采暖季",
+    "design_outdoor_temp_c": -9.9,
+    "bins": [
+        {"outdoor_temp_c": -15, "hours": 48},
+        {"outdoor_temp_c": -12, "hours": 72},
+        {"outdoor_temp_c": -9, "hours": 120},
+        {"outdoor_temp_c": -7, "hours": 168},
+        {"outdoor_temp_c": -5, "hours": 216},
+        {"outdoor_temp_c": -3, "hours": 240},
+        {"outdoor_temp_c": -1, "hours": 264},
+        {"outdoor_temp_c": 1, "hours": 264},
+        {"outdoor_temp_c": 3, "hours": 240},
+        {"outdoor_temp_c": 5, "hours": 216},
+        {"outdoor_temp_c": 7, "hours": 192},
+        {"outdoor_temp_c": 9, "hours": 168},
+        {"outdoor_temp_c": 11, "hours": 144},
+        {"outdoor_temp_c": 13, "hours": 120},
+        {"outdoor_temp_c": 15, "hours": 96}
+    ],
+    "provenance": {
+        "provider": "气象院 王工",
+        "received_date": "2025-10-20",
+        "notes": "北京典型采暖季(11.15-3.15)逐时温度频段, 来源于典型气象年TMY数据"
+    }
+}

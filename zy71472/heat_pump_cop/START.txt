@@ -1,0 +1,48 @@
+热泵COP试算台 - 快速上手
+==========================
+
+1. 一键跑通样例
+   cd heat_pump_cop
+   python3 cop_studio.py run data/scenario_beijing.json
+
+   你会看到5步输出: 导入 → 诊断 → 单点COP → 工况切片 → 费用对比
+
+2. 看审计轨迹(公式/中间量/数据来源)
+   python3 cop_studio.py run data/scenario_beijing.json --audit
+
+3. 只算一个点的COP
+   python3 cop_studio.py calc -e "低温空气源热泵A" -t -7 -w 45 \
+     -d data/equip_a.json
+
+4. 诊断数据问题
+   python3 cop_studio.py run data/scenario_bad_diagnose.json
+   观察越界/单位错误的诊断报告
+
+5. 自建场景
+   - 按data/下的JSON格式准备: 设备参数、温度曲线、电价、替代燃料
+   - 每份文件带provenance字段(谁提供、哪天、备注)
+   - 写一个scenario_xxx.json引用这些文件
+   - python3 cop_studio.py run data/scenario_xxx.json
+
+6. 核心公式(不藏)
+   COP_carnot = T_hot / (T_hot - T_cold)    # K
+   η = COP_rated / COP_carnot               # 从额定工况点反算
+   COP_actual = COP_carnot × η
+   用电量 = 制热量 / COP_actual
+   费用 = 用电量 × 电价
+   等效燃费 = (制热量 / (热值×效率)) × 燃料单价
+
+7. 诊断会查什么
+   - 温度越界: 室外/出水温度超出设备运行范围 → 降级为COP=1.0
+   - 单位异常: 电价超出0.3~2.0元/kWh → 疑似kWh写成MWh
+   - 能耗重复: 同名数据被重复导入
+   - 物理不合理: COP<1 或 COP>8
+
+8. 文件说明
+   cop_studio.py  CLI入口
+   models.py      数据模型+数据仓库(溯源)
+   cop_calc.py    COP计算引擎(全程审计)
+   slicing.py     工况切片(温度频段分组)
+   comparison.py  方案费用对比(含回收期)
+   diagnostics.py 诊断引擎(越界/单位/重复)
+   data/          样例数据+场景文件

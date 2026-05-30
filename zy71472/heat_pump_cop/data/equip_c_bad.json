@@ -1,0 +1,23 @@
+{
+    "name": "边界外设备C",
+    "model": "HP-POOR-C",
+    "operating_range": {
+        "outdoor_min_c": -10,
+        "outdoor_max_c": 35,
+        "water_outlet_min_c": 30,
+        "water_outlet_max_c": 50
+    },
+    "rated_points": [
+        {
+            "outdoor_temp_c": 7,
+            "water_outlet_temp_c": 45,
+            "heating_capacity_kw": 80.0,
+            "compressor_power_kw": 22.9
+        }
+    ],
+    "provenance": {
+        "provider": "测试用-故意设置窄温度范围",
+        "received_date": "2026-01-10",
+        "notes": "运行范围-10~35°C, 面对北京采暖季-15°C频段会越界"
+    }
+}
