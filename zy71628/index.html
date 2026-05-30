@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>浮力潜艇寻宝赛</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:#0a1628;color:#e0e8f0;overflow:hidden;height:100vh}
+#app{display:flex;height:100vh;width:100vw}
+#game-area{flex:1;position:relative;display:flex;align-items:center;justify-content:center;background:#060d1a}
+#gameCanvas{border:2px solid #1a3a5c;border-radius:8px;display:block}
+#physics-overlay{position:absolute;top:12px;left:12px;background:rgba(6,13,26,0.88);border:1px solid #1a5a8c;border-radius:8px;padding:10px 14px;font-size:13px;line-height:1.7;pointer-events:none;min-width:220px}
+#physics-overlay .lb{color:#6a9fc0}
+#physics-overlay .vl{color:#4ae0ff;font-weight:bold}
+#physics-overlay .up{color:#4aff8f}
+#physics-overlay .dn{color:#ff6a6a}
+#side-panel{width:380px;background:#0d1b2e;border-left:2px solid #1a3a5c;display:flex;flex-direction:column;overflow:hidden}
+.tab-bar{display:flex;background:#0a1425;border-bottom:2px solid #1a3a5c}
+.tab-btn{flex:1;padding:10px 0;text-align:center;cursor:pointer;font-size:14px;border:none;background:transparent;color:#6a9fc0;transition:all .2s}
+.tab-btn:hover{background:#132744}
+.tab-btn.active{color:#4ae0ff;background:#0d1b2e;border-bottom:2px solid #4ae0ff}
+.tab-content{flex:1;overflow-y:auto;padding:16px;display:none}
+.tab-content.active{display:block}
+.tab-content::-webkit-scrollbar{width:6px}
+.tab-content::-webkit-scrollbar-thumb{background:#1a3a5c;border-radius:3px}
+.st{font-size:14px;color:#4ae0ff;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid #1a3a5c}
+.st:first-child{margin-top:0}
+.cr{display:flex;align-items:center;justify-content:space-between;margin:8px 0;font-size:13px}
+.cr .lb{color:#6a9fc0;min-width:80px}
+.cr .vl{color:#e0e8f0;font-weight:bold}
+.sw{flex:1;margin:0 10px}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;background:#1a3a5c;border-radius:3px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:#4ae0ff;border-radius:50%;cursor:pointer}
+.gb{width:100%;height:16px;background:#1a2a3c;border-radius:8px;overflow:hidden;position:relative}
+.gf{height:100%;border-radius:8px;transition:width .3s}
+.gt{position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:11px;line-height:16px;color:#fff;font-weight:bold}
+.btn{padding:8px 16px;border:1px solid #1a5a8c;background:#0d2640;color:#4ae0ff;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s}
+.btn:hover{background:#1a3a5c}
+.btn.pri{background:#1a5a8c;border-color:#4ae0ff}
+.btn.dng{background:#4a1a1a;border-color:#ff6a6a;color:#ff6a6a}
+.br{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.dt{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+.dt th{background:#0a1425;color:#4ae0ff;padding:6px 4px;border:1px solid #1a3a5c;text-align:center;font-weight:normal}
+.dt td{padding:5px 4px;border:1px solid #1a3a5c;text-align:center;background:#0d1b2e}
+.dt tr:hover td{background:#132744}
+.dt .w{background:#2a1a00!important;color:#ffaa00}
+.dt .e{background:#2a0000!important;color:#ff4444}
+.dt .fx{background:#002a00!important;color:#44ff44}
+.dt input{width:60px;background:#0a1425;border:1px solid #1a3a5c;color:#e0e8f0;text-align:center;padding:2px;border-radius:3px;font-size:12px}
+.dt input:focus{border-color:#4ae0ff;outline:none}
+.ib{display:inline-block;padding:1px 5px;border-radius:3px;font-size:10px;margin-left:3px;font-weight:bold}
+.ib.w{background:#2a1a00;color:#ffaa00}
+.ib.e{background:#2a0000;color:#ff4444}
+.ib.fx{background:#002a00;color:#44ff44}
+.rb{background:#0a1425;border:1px solid #1a3a5c;border-radius:6px;padding:12px;margin:8px 0;font-size:13px}
+.rb h4{color:#4ae0ff;margin-bottom:6px;font-size:13px}
+.rb p{line-height:1.6;color:#b0c0d0}
+.sb{font-size:32px;color:#4ae0ff;font-weight:bold;text-align:center;margin:10px 0}
+.ae{background:#0a1425;border-left:3px solid #1a5a8c;padding:6px 10px;margin:4px 0;font-size:12px;line-height:1.5;border-radius:0 4px 4px 0}
+.ae.ml{border-left-color:#4aff8f}
+.ae.al{border-left-color:#ffaa00}
+.ae .ts{color:#6a9fc0;font-size:11px}
+.ae .op{color:#4ae0ff;font-weight:bold}
+.ae .ch{color:#b0c0d0}
+.ci{width:100%;height:80px;background:#0a1425;border:1px solid #1a3a5c;color:#e0e8f0;padding:8px;font-size:12px;font-family:monospace;border-radius:4px;resize:vertical}
+.ci:focus{border-color:#4ae0ff;outline:none}
+#start-overlay,#end-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(6,13,26,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10}
+#start-overlay h1,#end-overlay h1{font-size:28px;color:#4ae0ff;margin-bottom:16px}
+#start-overlay p,#end-overlay p{font-size:14px;color:#b0c0d0;margin:4px 0;max-width:420px;text-align:center;line-height:1.6}
+.hid{display:none!important}
+.vs{background:#0a1425;border:1px solid #1a3a5c;border-radius:6px;padding:10px;margin:8px 0;font-size:12px}
+.vs .ct{font-weight:bold;color:#4ae0ff}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="game-area">
+  <canvas id="gameCanvas" width="700" height="680"></canvas>
+  <div id="physics-overlay"></div>
+  <div id="start-overlay">
+    <h1>浮力潜艇寻宝赛</h1>
+    <p>调整压载水量控制潜艇浮沉，穿越不同密度的水层，收集海底宝箱！</p>
+    <p style="color:#6a9fc0;margin-top:10px">↑↓键 / 滑块：调节压载水 | 空格：暂停 | R：重新开始</p>
+    <p style="color:#ffaa00;margin-top:6px;font-size:12px">物理提示：潜艇平均密度 &lt; 水层密度 → 上浮；&gt; 水层密度 → 下沉</p>
+    <button class="btn pri" style="margin-top:20px;font-size:16px;padding:12px 32px" onclick="GC.startGame()">开始探险</button>
+  </div>
+  <div id="end-overlay" class="hid">
+    <h1 id="end-title">探险结束</h1>
+    <p id="end-reason"></p>
+    <div id="end-score" class="sb"></div>
+    <div id="end-stats" style="font-size:13px;color:#b0c0d0;line-height:1.8"></div>
+    <div class="br" style="margin-top:16px;justify-content:center">
+      <button class="btn pri" onclick="GC.restartGame()">再来一局</button>
+      <button class="btn" onclick="UI.switchTab('report');document.getElementById('end-overlay').classList.add('hid')">查看报告</button>
+    </div>
+  </div>
+</div>
+<div id="side-panel">
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="controls" onclick="UI.switchTab('controls')">操控</button>
+    <button class="tab-btn" data-tab="data" onclick="UI.switchTab('data')">数据</button>
+    <button class="tab-btn" data-tab="report" onclick="UI.switchTab('report')">报告</button>
+  </div>
+  <div id="tab-controls" class="tab-content active">
+    <div class="st">压载水控制</div>
+    <div class="cr"><span class="lb">压载水量</span><div class="sw"><input type="range" id="ballast-slider" min="0" max="100" value="50" oninput="GC.setBallast(this.value)"></div><span class="vl" id="ballast-pct">50%</span></div>
+    <div class="st">状态面板</div>
+    <div class="cr"><span class="lb">氧气</span><div class="gb" style="flex:1;margin-left:10px"><div class="gf" id="oxygen-fill" style="width:100%;background:linear-gradient(90deg,#ff6a6a,#4aff8f)"></div><span class="gt" id="oxygen-text">100%</span></div></div>
+    <div class="cr"><span class="lb">当前深度</span><span class="vl" id="depth-val">0.0 m</span></div>
+    <div class="cr"><span class="lb">水层密度</span><span class="vl" id="wd-val">1000 kg/m³</span></div>
+    <div class="cr"><span class="lb">潜艇密度</span><span class="vl" id="sd-val">800 kg/m³</span></div>
+    <div class="cr"><span class="lb">净力方向</span><span class="vl" id="fd-val">—</span></div>
+    <div class="cr"><span class="lb">宝箱</span><span class="vl" id="tv-val">0 / 0</span></div>
+    <div class="cr"><span class="lb">用时</span><span class="vl" id="tm-val">00:00</span></div>
+    <div class="st">操作</div>
+    <div class="br"><button class="btn" id="btn-pause" onclick="GC.togglePause()">暂停</button><button class="btn dng" onclick="GC.restartGame()">重新开始</button></div>
+    <div class="st">失败原因分析</div>
+    <div id="fail-log" style="font-size:12px;color:#b0c0d0;line-height:1.6;max-height:120px;overflow-y:auto"></div>
+  </div>
+  <div id="tab-data" class="tab-content">
+    <div class="st">水层数据</div>
+    <div id="vs" class="vs"></div>
+    <div style="overflow-x:auto"><table class="dt"><thead><tr><th>层名</th><th>起点(m)</th><th>厚度(m)</th><th>密度</th><th>标记</th></tr></thead><tbody id="ltb"></tbody></table></div>
+    <div class="st">宝箱数据</div>
+    <div style="overflow-x:auto"><table class="dt"><thead><tr><th>名称</th><th>深度(m)</th><th>水平位置</th><th>分值</th><th>标记</th></tr></thead><tbody id="ttb"></tbody></table></div>
+    <div class="st">CSV 导入（水层数据）</div>
+    <textarea class="ci" id="csv-imp" placeholder="粘贴CSV：层名,深度起点,厚度,密度&#10;例：淡水层,0,100,1.0"></textarea>
+    <div class="br"><button class="btn pri" onclick="UI.importCSV()">导入并验证</button><button class="btn" onclick="UI.resetDefault()">恢复默认</button></div>
+    <div class="st">审计追踪</div>
+    <div id="alp" style="max-height:200px;overflow-y:auto"></div>
+  </div>
+  <div id="tab-report" class="tab-content">
+    <div class="st">实验报告</div>
+    <div id="rpt"><div class="rb"><h4>尚未完成游戏</h4><p>完成一局游戏后可查看完整实验报告</p></div></div>
+    <div class="st">导出</div>
+    <div class="br"><button class="btn pri" onclick="RPT.exportHTML()">导出 HTML 报告</button><button class="btn" onclick="RPT.exportCSV()">导出 CSV 数据</button></div>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+
+var CFG={
+  VOL:10, HM:6000, BM:4000, G:9.8, DRAG:0.15,
+  MAX_D:500, O2_MAX:120, O2_RATE:1,
+  CW:700, CH:680, PPM:1.3, SW:80, SH:35
+};
+
+var RAW_LAYERS=[
+  {name:"淡水层",ds:0,th:100,den:1.0},
+  {name:"海水层",ds:100,th:80,den:1.025},
+  {name:"深海水层",ds:180,th:60,den:1028},
+  {name:"高盐度水层",ds:240,th:80,den:1.050},
+  {name:"",ds:null,th:null,den:null},
+  {name:"高盐度水层",ds:240,th:80,den:1.050},
+  {name:"盐水湖底",ds:320,th:80,den:0.95},
+  {name:"极深海层",ds:400,th:100,den:1.12}
+];
+
+var RAW_TREAS=[
+  {name:"铜币箱",dep:50,xp:450,sc:80},
+  {name:"银币箱",dep:150,xp:300,sc:120},
+  {name:"金币箱",dep:220,xp:520,sc:200},
+  {name:"珍珠箱",dep:290,xp:200,sc:250},
+  {name:"珊瑚箱",dep:360,xp:400,sc:180},
+  {name:"钻石箱",dep:450,xp:550,sc:500}
+];
+
+var AuditLog={
+  entries:[],
+  clear:function(){this.entries=[];},
+  log:function(action,field,oldV,newV,source,op){
+    this.entries.push({
+      ts:new Date(), action:action, field:field,
+      oldVal:oldV, newVal:newV,
+      source:source||"auto", operator:op||"系统"
+    });
+  },
+  render:function(){
+    var p=document.getElementById("alp");
+    if(!p)return;
+    if(!this.entries.length){
+      p.innerHTML='<div style="color:#6a9fc0;font-size:12px">暂无审计记录</div>';
+      return;
+    }
+    var h="";
+    for(var i=this.entries.length-1;i>=0;i--){
+      var e=this.entries[i];
+      var cls=e.source==="manual"?"ml":"al";
+      h+='<div class="ae '+cls+'">'+
+        '<span class="ts">'+e.ts.toLocaleTimeString("zh-CN")+'</span> '+
+        '<span class="op">['+e.operator+']</span> '+
+        '<span class="ch">'+e.action+' | '+e.field+' | '+String(e.oldVal)+' \u2192 '+String(e.newVal)+'</span></div>';
+    }
+    p.innerHTML=h;
+  }
+};
+
+var DataProc={
+  layers:[], treasures:[],
+  stats:{dup:0,empty:0,unitFix:0,reversal:0,total:0},
+
+  reset:function(){
+    this.layers=[]; this.treasures=[];
+    this.stats={dup:0,empty:0,unitFix:0,reversal:0,total:0};
+  },
+
+  processLayers:function(raw){
+    this.reset();
+    var seen={};
+    for(var i=0;i<raw.length;i++){
+      var r=raw[i];
+      var allNull=(!r.name||r.name.trim()==="")&&(r.ds===null||r.ds===undefined)&&(r.den===null||r.den===undefined);
+      if(allNull){
+        this.stats.empty++; this.stats.total++;
+        AuditLog.log("空行删除","行"+(i+1),JSON.stringify(r),"已删除","auto","系统");
+        continue;
+      }
+      if(!r.name)r.name="未命名层";
+      var key=r.name+"_"+r.ds+"_"+r.th+"_"+r.den;
+      if(seen[key]){
+        this.stats.dup++; this.stats.total++;
+        AuditLog.log("去重","行"+(i+1),JSON.stringify(r),"已跳过","auto","系统");
+        continue;
+      }
+      seen[key]=true;
+
+      var layer={
+        name:r.name,
+        ds:Number(r.ds)||0,
+        th:Number(r.th)||50,
+        den:Number(r.den)||1000,
+        origDen:Number(r.den),
+        issues:[],
+        rowIdx:i
+      };
+
+      if(layer.den>0&&layer.den<5){
+        var old=layer.den;
+        layer.den=layer.den*1000;
+        layer.issues.push({type:"unit",msg:"密度单位修正: "+old+" g/cm\u00B3 \u2192 "+layer.den+" kg/m\u00B3",sev:"w"});
+        this.stats.unitFix++; this.stats.total++;
+        AuditLog.log("单位修正",r.name+".密度",old+" g/cm\u00B3",layer.den+" kg/m\u00B3","auto","系统");
+      }
+
+      if(layer.den>0&&layer.den<800){
+        layer.issues.push({type:"reversal",msg:"密度异常低("+layer.den+" kg/m\u00B3)，浮力方向可能反转",sev:"e"});
+        this.stats.reversal++; this.stats.total++;
+        AuditLog.log("浮力方向异常",r.name+".密度",layer.den+" kg/m\u00B3","标记警告","auto","系统");
+      }
+
+      this.layers.push(layer);
+    }
+    this.layers.sort(function(a,b){return a.ds-b.ds;});
+    return this.layers;
+  },
+
+  processTreasures:function(raw){
+    for(var i=0;i<raw.length;i++){
+      var r=raw[i];
+      var t={
+        name:r.name||"宝箱"+(i+1),
+        dep:Number(r.dep)||0,
+        xp:Number(r.xp)||300,
+        sc:Number(r.sc)||100,
+        issues:[],
+        rowIdx:i
+      };
+      if(t.dep<0||t.dep>CFG.MAX_D){
+        t.issues.push({type:"range",msg:"深度超出范围",sev:"w"});
+        this.stats.total++;
+      }
+      if(t.sc<=0){
+        t.issues.push({type:"value",msg:"分值无效，已修正为100",sev:"w"});
+        t.sc=100; this.stats.total++;
+      }
+      this.treasures.push(t);
+    }
+    return this.treasures;
+  },
+
+  fixLayer:function(idx,field,newVal){
+    if(idx<0||idx>=this.layers.length)return;
+    var l=this.layers[idx], oldVal=l[field];
+    if(String(oldVal)===String(newVal))return;
+    l[field]=newVal;
+    if(field==="den"){
+      var had=false;
+      for(var j=l.issues.length-1;j>=0;j--){
+        var tp=l.issues[j].type;
+        if(tp==="unit"||tp==="reversal"||tp==="manual_fixed"){
+          l.issues.splice(j,1); had=true;
+        }
+      }
+      if(newVal>0&&newVal<800){
+        l.issues.push({type:"reversal",msg:"密度异常低，浮力方向可能反转",sev:"e"});
+      } else if(had){
+        l.issues.push({type:"manual_fixed",msg:"已手动修正",sev:"f"});
+      }
+    }
+    AuditLog.log("手动修改",l.name+"."+field,String(oldVal),String(newVal),"manual","教师");
+    this.renderTables(); AuditLog.render();
+  },
+
+  fixTreasure:function(idx,field,newVal){
+    if(idx<0||idx>=this.treasures.length)return;
+    var t=this.treasures[idx], oldVal=t[field];
+    if(String(oldVal)===String(newVal))return;
+    t[field]=newVal;
+    for(var j=t.issues.length-1;j>=0;j--){
+      if(t.issues[j].type==="range"||t.issues[j].type==="value")t.issues.splice(j,1);
+    }
+    AuditLog.log("手动修改",t.name+"."+field,String(oldVal),String(newVal),"manual","教师");
+    this.renderTables(); AuditLog.render();
+  },
+
+  renderTables:function(){
+    var ltb=document.getElementById("ltb"), h="";
+    for(var i=0;i<this.layers.length;i++){
+      var l=this.layers[i], cls="", bd="";
+      for(var j=0;j<l.issues.length;j++){
+        var is=l.issues[j];
+        if(is.sev==="e"){cls="e";bd+='<span class="ib e">\u2716</span>';}
+        else if(is.sev==="w"){cls="w";bd+='<span class="ib w">\u26A0</span>';}
+        else if(is.sev==="f"){cls="fx";bd+='<span class="ib fx">\u2714</span>';}
+      }
+      h+='<tr class="'+cls+'">'+
+        '<td><input value="'+l.name+'" onchange="DP.fixLayer('+i+',\'name\',this.value)"></td>'+
+        '<td><input type="number" value="'+l.ds+'" onchange="DP.fixLayer('+i+',\'ds\',Number(this.value))"></td>'+
+        '<td><input type="number" value="'+l.th+'" onchange="DP.fixLayer('+i+',\'th\',Number(this.value))"></td>'+
+        '<td><input type="number" value="'+l.den+'" onchange="DP.fixLayer('+i+',\'den\',Number(this.value))"></td>'+
+        '<td>'+bd+'</td></tr>';
+    }
+    ltb.innerHTML=h;
+
+    var ttb=document.getElementById("ttb"), th="";
+    for(var i=0;i<this.treasures.length;i++){
+      var t=this.treasures[i], cls2="", bd2="";
+      for(var j=0;j<t.issues.length;j++){
+        var is=t.issues[j];
+        if(is.sev==="e"){cls2="e";bd2+='<span class="ib e">\u2716</span>';}
+        else if(is.sev==="w"){cls2="w";bd2+='<span class="ib w">\u26A0</span>';}
+        else if(is.sev==="f"){cls2="fx";bd2+='<span class="ib fx">\u2714</span>';}
+      }
+      th+='<tr class="'+cls2+'">'+
+        '<td><input value="'+t.name+'" onchange="DP.fixTreasure('+i+',\'name\',this.value)"></td>'+
+        '<td><input type="number" value="'+t.dep+'" onchange="DP.fixTreasure('+i+',\'dep\',Number(this.value))"></td>'+
+        '<td><input type="number" value="'+t.xp+'" onchange="DP.fixTreasure('+i+',\'xp\',Number(this.value))"></td>'+
+        '<td><input type="number" value="'+t.sc+'" onchange="DP.fixTreasure('+i+',\'sc\',Number(this.value))"></td>'+
+        '<td>'+bd2+'</td></tr>';
+    }
+    ttb.innerHTML=th;
+
+    var vs=document.getElementById("vs");
+    vs.innerHTML='共处理 <span class="ct">'+this.layers.length+'</span> 层 | '+
+      '问题: <span class="ct" style="color:#ffaa00">'+this.stats.total+'</span> | '+
+      '去重 <span class="ct">'+this.stats.dup+'</span> | '+
+      '空行 <span class="ct">'+this.stats.empty+'</span> | '+
+      '单位修正 <span class="ct">'+this.stats.unitFix+'</span> | '+
+      '浮力异常 <span class="ct" style="color:#ff4444">'+this.stats.reversal+'</span>';
+  }
+};
+
+var Physics={
+  densityAt:function(depth,layers){
+    for(var i=layers.length-1;i>=0;i--){
+      if(depth>=layers[i].ds)return layers[i].den;
+    }
+    return layers.length?layers[0].den:1000;
+  },
+  layerAt:function(depth,layers){
+    for(var i=layers.length-1;i>=0;i--){
+      if(depth>=layers[i].ds)return layers[i];
+    }
+    return layers.length?layers[0]:null;
+  },
+  subDensity:function(bp){
+    return(CFG.HM+(bp/100)*CFG.BM)/CFG.VOL;
+  },
+  netForce:function(sd,wd){
+    return(wd-sd)*CFG.VOL*CFG.G;
+  },
+  update:function(st,dt,layers){
+    if(!st.running||st.paused)return;
+    var bm=(st.bp/100)*CFG.BM;
+    var totalM=CFG.HM+bm;
+    var sd=totalM/CFG.VOL;
+    var wd=this.densityAt(st.depth,layers);
+    var nf=this.netForce(sd,wd);
+    var drag=-st.vel*CFG.DRAG*wd*0.001;
+    st.vel+=(nf+drag)/totalM*dt;
+    st.depth+=st.vel*dt;
+    if(st.depth<0){st.depth=0;st.vel=Math.max(st.vel,0);}
+    if(st.depth>CFG.MAX_D){st.depth=CFG.MAX_D;st.vel=Math.min(st.vel,0);}
+    st.o2-=CFG.O2_RATE*dt;
+    if(st.o2<0)st.o2=0;
+    st.sd=sd; st.wd=wd; st.nf=nf;
+    st.curLayer=this.layerAt(st.depth,layers);
+    st.elapsed+=dt;
+
+    if(!st.hist.length||st.elapsed-st.hist[st.hist.length-1].t>0.05){
+      st.hist.push({
+        t:st.elapsed, d:st.depth, bp:st.bp,
+        sd:sd, wd:wd, nf:nf, o2:st.o2, v:st.vel
+      });
+    }
+    if(st.hist.length>3000){
+      st.hist=st.hist.filter(function(_,i){return i%2===0;});
+    }
+    this.checkFail(st);
+  },
+  checkFail:function(st){
+    if(st.o2<=0&&st.fails.indexOf("o2")===-1){
+      st.fails.push("o2");
+      st.failReasons.push({type:"o2",msg:"氧气耗尽！潜艇无法继续航行",depth:st.depth,time:st.elapsed});
+    }
+    if(st.depth<=0.1&&st.vel<-0.5&&st.fails.indexOf("surf")===-1){
+      st.fails.push("surf");
+      st.failReasons.push({type:"surf",msg:"潜艇冲出水面！浮力过大导致失控",depth:st.depth,time:st.elapsed});
+    }
+    if(st.depth>=CFG.MAX_D-0.1&&st.vel>0.5&&st.fails.indexOf("bot")===-1){
+      st.fails.push("bot");
+      st.failReasons.push({type:"bot",msg:"潜艇撞击海底！压载过重导致下沉失控",depth:st.depth,time:st.elapsed});
+    }
+    if(st.wd>0&&st.wd<800&&st.nf>0&&st.fails.indexOf("rev")===-1){
+      st.fails.push("rev");
+      st.failReasons.push({type:"rev",msg:"浮力方向反转！水层密度("+Math.round(st.wd)+" kg/m\u00B3)异常低",depth:st.depth,time:st.elapsed});
+    }
+  }
+};
+
+function makeState(layers,treas){
+  return{
+    running:false, paused:false,
+    depth:0, vel:0, bp:50,
+    o2:CFG.O2_MAX, sd:0, wd:1000, nf:0,
+    curLayer:null, elapsed:0,
+    treas:treas.map(function(t){
+      return{name:t.name,dep:t.dep,xp:t.xp,sc:t.sc,collected:false,issues:t.issues||[]};
+    }),
+    layers:layers,
+    collected:0, totalTreas:treas.length,
+    score:0, fails:[], failReasons:[],
+    hist:[], bubbles:[], collectEffect:null,
+    gameOver:false
+  };
+}
+
+function checkCollision(st,subX){
+  var sTop=st.depth-CFG.SH/(2*CFG.PPM);
+  var sBot=st.depth+CFG.SH/(2*CFG.PPM);
+  var sL=subX-CFG.SW/2, sR=subX+CFG.SW/2;
+  for(var i=0;i<st.treas.length;i++){
+    var t=st.treas[i];
+    if(t.collected)continue;
+    var tTop=t.dep-12/CFG.PPM;
+    var tBot=t.dep+12/CFG.PPM;
+    var tL=t.xp-20, tR=t.xp+20;
+    if(sBot>tTop&&sTop<tBot&&sR>tL&&sL<tR){
+      t.collected=true;
+      st.collected++;
+      st.score+=t.sc;
+      return t;
+    }
+  }
+  return null;
+}
+
+var Renderer={
+  canvas:null, ctx:null, subX:200,
+  init:function(){
+    this.canvas=document.getElementById("gameCanvas");
+    this.ctx=this.canvas.getContext("2d");
+  },
+  render:function(st){
+    var ctx=this.ctx, W=CFG.CW, H=CFG.CH;
+    ctx.clearRect(0,0,W,H);
+    this.drawLayers(ctx,st);
+    this.drawScale(ctx,st);
+    this.drawTreasures(ctx,st);
+    this.drawSub(ctx,st);
+    this.drawBubbles(ctx,st);
+    this.drawCollectFx(ctx,st);
+    if(st.paused&&st.running){
+      ctx.fillStyle="rgba(6,13,26,0.6)";
+      ctx.fillRect(0,0,W,H);
+      ctx.font="bold 28px 'Microsoft YaHei'";
+      ctx.fillStyle="#4ae0ff";
+      ctx.textAlign="center";
+      ctx.fillText("\u5DF2\u6682\u505C",W/2,H/2);
+      ctx.font="14px 'Microsoft YaHei'";
+      ctx.fillStyle="#6a9fc0";
+      ctx.fillText("\u6309\u7A7A\u683C\u952E\u7EE7\u7EED",W/2,H/2+30);
+    }
+  },
+  drawLayers:function(ctx,st){
+    var W=CFG.CW, H=CFG.CH;
+    var camD=st.depth, camT=camD-H/(2*CFG.PPM);
+    var colors=[
+      ["#4a90d9","#3a7ac4"],["#2d5f8a","#1d4f7a"],
+      ["#1a3a5c","#0f2a4c"],["#0d2137","#081527"],
+      ["#060d1a","#030a14"],["#050810","#020508"]
+    ];
+    ctx.fillStyle="#030810";
+    ctx.fillRect(0,0,W,H);
+    for(var i=0;i<st.layers.length;i++){
+      var l=st.layers[i];
+      var top=l.ds, bot=top+l.th;
+      if(bot<camT||top>camT+H/CFG.PPM)continue;
+      var dT=Math.max(0,(top-camT)*CFG.PPM);
+      var dB=Math.min(H,(bot-camT)*CFG.PPM);
+      var ci=Math.min(i,colors.length-1);
+      var g=ctx.createLinearGradient(0,dT,0,dB);
+      g.addColorStop(0,colors[ci][0]);
+      g.addColorStop(1,colors[ci][1]);
+      ctx.fillStyle=g;
+      ctx.fillRect(0,dT,W,dB-dT);
+
+      ctx.font="11px 'Microsoft YaHei'";
+      ctx.fillStyle="rgba(74,224,255,0.45)";
+      ctx.textAlign="left";
+      var ly=dT+18;
+      if(ly>10&&ly<H-10){
+        ctx.fillText(l.name+" (\u03C1="+l.den+" kg/m\u00B3)",50,ly);
+      }
+      ctx.strokeStyle="rgba(74,224,255,0.2)";
+      ctx.setLineDash([5,5]);
+      ctx.beginPath();
+      ctx.moveTo(0,dT);
+      ctx.lineTo(W,dT);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  },
+  drawScale:function(ctx,st){
+    var H=CFG.CH, camD=st.depth, camT=camD-H/(2*CFG.PPM);
+    ctx.font="10px 'Microsoft YaHei'";
+    ctx.fillStyle="rgba(106,159,192,0.6)";
+    ctx.textAlign="right";
+    var step=50, start=Math.floor(camT/step)*step;
+    for(var d=start;d<camT+H/CFG.PPM+step;d+=step){
+      var y=(d-camT)*CFG.PPM;
+      if(y<0||y>H)continue;
+      ctx.fillText(d+"m",45,y+3);
+    }
+  },
+  drawTreasures:function(ctx,st){
+    var H=CFG.CH, camD=st.depth, camT=camD-H/(2*CFG.PPM);
+    for(var i=0;i<st.treas.length;i++){
+      var t=st.treas[i];
+      if(t.collected)continue;
+      var y=(t.dep-camT)*CFG.PPM;
+      if(y<-30||y>H+30)continue;
+      ctx.save();
+      ctx.translate(t.xp,y);
+      ctx.fillStyle="#8B6914";
+      ctx.fillRect(-14,-10,28,20);
+      ctx.strokeStyle="#DAA520";
+      ctx.lineWidth=2;
+      ctx.strokeRect(-14,-10,28,20);
+      ctx.fillStyle="#DAA520";
+      ctx.fillRect(-16,-13,32,5);
+      ctx.beginPath();
+      ctx.arc(0,-2,4,0,Math.PI*2);
+      ctx.fillStyle="#FFD700";
+      ctx.fill();
+      var gl=ctx.createRadialGradient(0,0,5,0,0,25);
+      gl.addColorStop(0,"rgba(255,215,0,0.3)");
+      gl.addColorStop(1,"rgba(255,215,0,0)");
+      ctx.fillStyle=gl;
+      ctx.fillRect(-25,-25,50,50);
+      ctx.font="10px 'Microsoft YaHei'";
+      ctx.fillStyle="#FFD700";
+      ctx.textAlign="center";
+      ctx.fillText(t.name,0,-18);
+      ctx.restore();
+    }
+  },
+  drawSub:function(ctx,st){
+    var H=CFG.CH, camD=st.depth, camT=camD-H/(2*CFG.PPM);
+    var y=(st.depth-camT)*CFG.PPM, x=this.subX;
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.fillStyle="#cc4422";
+    ctx.beginPath();
+    ctx.ellipse(0,0,CFG.SW/2,CFG.SH/2,0,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle="#ff6644";
+    ctx.lineWidth=2;
+    ctx.stroke();
+    ctx.fillStyle="#88bbee";
+    ctx.beginPath();
+    ctx.ellipse(15,0,10,8,0,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle="#aaddff";
+    ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.fillStyle="#aa3322";
+    ctx.fillRect(-CFG.SW/2,-8,8,16);
+    ctx.fillStyle="#993322";
+    ctx.fillRect(-5,-CFG.SH/2-6,3,6);
+    ctx.fillRect(5,-CFG.SH/2-6,3,6);
+    var bH=(st.bp/100)*CFG.SH*0.6;
+    ctx.fillStyle="rgba(68,119,170,0.6)";
+    ctx.fillRect(-CFG.SW/2+12,CFG.SH/2-bH,CFG.SW-30,bH);
+    if(st.nf>50){
+      ctx.fillStyle="rgba(74,255,143,0.6)";
+      ctx.font="bold 16px sans-serif";
+      ctx.textAlign="center";
+      ctx.fillText("\u2191",0,-CFG.SH/2-10);
+    }else if(st.nf<-50){
+      ctx.fillStyle="rgba(255,106,106,0.6)";
+      ctx.font="bold 16px sans-serif";
+      ctx.textAlign="center";
+      ctx.fillText("\u2193",0,CFG.SH/2+18);
+    }
+    ctx.restore();
+  },
+  drawBubbles:function(ctx,st){
+    var H=CFG.CH, camD=st.depth, camT=camD-H/(2*CFG.PPM);
+    while(st.bubbles.length<15){
+      st.bubbles.push({
+        x:this.subX+(Math.random()-0.5)*80,
+        dOff:(Math.random()-0.3)*50,
+        sz:2+Math.random()*4,
+        sp:15+Math.random()*25,
+        al:0.3+Math.random()*0.4,
+        wb:Math.random()*Math.PI*2
+      });
+    }
+    for(var i=st.bubbles.length-1;i>=0;i--){
+      var b=st.bubbles[i];
+      b.dOff-=b.sp*0.016;
+      b.wb+=0.05;
+      var bx=b.x+Math.sin(b.wb)*5;
+      var bd=st.depth+b.dOff/CFG.PPM;
+      var by=(bd-camT)*CFG.PPM;
+      if(by<-20||by>H+20){st.bubbles.splice(i,1);continue;}
+      ctx.beginPath();
+      ctx.arc(bx,by,b.sz,0,Math.PI*2);
+      ctx.fillStyle="rgba(150,210,255,"+b.al+")";
+      ctx.fill();
+    }
+  },
+  drawCollectFx:function(ctx,st){
+    if(!st.collectEffect)return;
+    var e=st.collectEffect;
+    e.timer-=0.016;
+    if(e.timer<=0){st.collectEffect=null;return;}
+    var H=CFG.CH, camD=st.depth, camT=camD-H/(2*CFG.PPM);
+    var y=(e.dep-camT)*CFG.PPM;
+    ctx.save();
+    ctx.font="bold 16px 'Microsoft YaHei'";
+    ctx.fillStyle="rgba(255,215,0,"+Math.min(1,e.timer)+")";
+    ctx.textAlign="center";
+    ctx.fillText("+"+e.sc,e.xp,y-30-(1-e.timer)*40);
+    ctx.restore();
+  }
+};
+
+var UI={
+  switchTab:function(name){
+    document.querySelectorAll(".tab-btn").forEach(function(b){
+      b.classList.toggle("active",b.getAttribute("data-tab")===name);
+    });
+    document.querySelectorAll(".tab-content").forEach(function(c){
+      c.classList.toggle("active",c.id==="tab-"+name);
+    });
+    if(name==="report")Report.render();
+    if(name==="data"){DataProc.renderTables();AuditLog.render();}
+  },
+  update:function(st){
+    var sl=document.getElementById("ballast-slider");
+    if(document.activeElement!==sl)sl.value=Math.round(st.bp);
+    document.getElementById("ballast-pct").textContent=Math.round(st.bp)+"%";
+
+    var oPct=Math.max(0,(st.o2/CFG.O2_MAX)*100);
+    document.getElementById("oxygen-fill").style.width=oPct+"%";
+    document.getElementById("oxygen-text").textContent=Math.round(oPct)+"%";
+    var oFill=document.getElementById("oxygen-fill");
+    if(oPct<20)oFill.style.background="#ff4444";
+    else if(oPct<50)oFill.style.background="linear-gradient(90deg,#ff6a6a,#ffaa00)";
+    else oFill.style.background="linear-gradient(90deg,#ff6a6a,#4aff8f)";
+
+    document.getElementById("depth-val").textContent=st.depth.toFixed(1)+" m";
+    document.getElementById("wd-val").textContent=Math.round(st.wd)+" kg/m\u00B3";
+    document.getElementById("sd-val").textContent=Math.round(st.sd)+" kg/m\u00B3";
+    document.getElementById("tv-val").textContent=st.collected+" / "+st.totalTreas;
+
+    var fe=document.getElementById("fd-val");
+    if(Math.abs(st.nf)<50){fe.textContent="\u5E73\u8861";fe.className="vl";}
+    else if(st.nf>0){fe.textContent="\u2191 \u4E0A\u6D6E ("+Math.round(st.nf)+" N)";fe.className="vl up";}
+    else{fe.textContent="\u2193 \u4E0B\u6C89 ("+Math.round(Math.abs(st.nf))+" N)";fe.className="vl dn";}
+
+    var sec=Math.floor(st.elapsed), min=Math.floor(sec/60); sec%=60;
+    document.getElementById("tm-val").textContent=
+      (min<10?"0":"")+min+":"+(sec<10?"0":"")+sec;
+
+    var ov=document.getElementById("physics-overlay");
+    var cmp=st.sd<st.wd?"\u6F5C\u8247\u5BC6\u5EA6<\u6C34\u5BC6\u5EA6\u2192\u4E0A\u6D6E":
+            st.sd>st.wd?"\u6F5C\u8247\u5BC6\u5EA6>\u6C34\u5BC6\u5EA6\u2192\u4E0B\u6C89":
+            "\u5BC6\u5EA6\u76F8\u7B49\u2192\u60AC\u6D6E";
+    ov.innerHTML=
+      '<div><span class="lb">\u6C34\u5C42\u5BC6\u5EA6:</span> <span class="vl">'+Math.round(st.wd)+' kg/m\u00B3</span></div>'+
+      '<div><span class="lb">\u6F5C\u8247\u5BC6\u5EA6:</span> <span class="vl">'+Math.round(st.sd)+' kg/m\u00B3</span></div>'+
+      '<div><span class="lb">\u5224\u65AD:</span> <span class="'+(st.sd<=st.wd?"up":"dn")+'">'+cmp+'</span></div>'+
+      '<div><span class="lb">\u538B\u8F7D:</span> <span class="vl">'+Math.round(st.bp)+'%</span></div>';
+
+    var fl=document.getElementById("fail-log");
+    if(st.failReasons.length>0){
+      fl.innerHTML=st.failReasons.map(function(f){
+        return '<div style="color:#ff6a6a;margin:2px 0">\u26A0 '+f.msg+' (\u6DF1\u5EA6:'+f.depth.toFixed(1)+'m, \u65F6\u95F4:'+f.time.toFixed(1)+'s)</div>';
+      }).join("");
+    }
+  },
+  importCSV:function(){
+    var tx=document.getElementById("csv-imp").value.trim();
+    if(!tx)return;
+    var lines=tx.split("\n"), raw=[];
+    for(var i=0;i<lines.length;i++){
+      var ps=lines[i].split(",").map(function(s){return s.trim();});
+      if(ps.length<4)continue;
+      if(i===0&&(ps[0]==="\u5C42\u540D"||ps[0].toLowerCase()==="name"))continue;
+      raw.push({name:ps[0]||"",ds:parseFloat(ps[1])||0,th:parseFloat(ps[2])||50,den:parseFloat(ps[3])||1000});
+    }
+    if(!raw.length)return;
+    DataProc.processLayers(raw);
+    DataProc.processTreasures(RAW_TREAS);
+    DataProc.renderTables();
+    AuditLog.render();
+    if(GC.state){
+      GC.state.layers=DataProc.layers;
+      GC.state.treas=DataProc.treasures.map(function(t){
+        return{name:t.name,dep:t.dep,xp:t.xp,sc:t.sc,collected:false,issues:t.issues||[]};
+      });
+      GC.state.totalTreas=GC.state.treas.length;
+    }
+  },
+  resetDefault:function(){
+    AuditLog.clear();
+    DataProc.processLayers(RAW_LAYERS);
+    DataProc.processTreasures(RAW_TREAS);
+    DataProc.renderTables();
+    AuditLog.render();
+    document.getElementById("csv-imp").value="";
+    if(GC.state){
+      GC.state.layers=DataProc.layers;
+      GC.state.treas=DataProc.treasures.map(function(t){
+        return{name:t.name,dep:t.dep,xp:t.xp,sc:t.sc,collected:false,issues:t.issues||[]};
+      });
+      GC.state.totalTreas=GC.state.treas.length;
+    }
+  }
+};
+
+var Report={
+  generate:function(st){
+    if(!st)return{title:"\u5C1A\u672A\u5B8C\u6210\u6E38\u620F",sections:[]};
+    var tPct=st.totalTreas>0?(st.collected/st.totalTreas*100):0;
+    var layerVisits={};
+    for(var i=0;i<st.hist.length;i++){
+      var h=st.hist[i];
+      for(var j=st.layers.length-1;j>=0;j--){
+        if(h.d>=st.layers[j].ds){
+          var ln=st.layers[j].name;
+          layerVisits[ln]=(layerVisits[ln]||0)+1;
+          break;
+        }
+      }
+    }
+    var ballastChanges=0;
+    for(var i=1;i<st.hist.length;i++){
+      if(Math.abs(st.hist[i].bp-st.hist[i-1].bp)>1)ballastChanges++;
+    }
+    var balCount=0, sampleN=0;
+    for(var i=0;i<st.hist.length;i+=10){
+      sampleN++;
+      if(Math.abs(st.hist[i].sd-st.hist[i].wd)<50)balCount++;
+    }
+    var accuracy=sampleN>0?(balCount/sampleN*100):0;
+    var totalScore=st.score+Math.round(accuracy*0.5)+Math.round(st.o2*2)+Math.max(0,Math.round(300-st.elapsed));
+    var collNames=st.treas.filter(function(t){return t.collected;}).map(function(t){return t.name;});
+    var missNames=st.treas.filter(function(t){return!t.collected;}).map(function(t){return t.name;});
+    return{
+      title:"\u6D6E\u529B\u6F5C\u8247\u5BFB\u5B9D\u8D5B \u2014 \u5B9E\u9A8C\u62A5\u544A",
+      totalScore:totalScore,
+      sections:[
+        {t:"\u57FA\u672C\u6570\u636E",c:"\u7528\u65F6: "+st.elapsed.toFixed(1)+"s | \u6536\u96C6\u5B9D\u7BB1: "+st.collected+"/"+st.totalTreas+" ("+tPct.toFixed(0)+"%) | \u5269\u4F59\u6C27\u6C14: "+Math.round(st.o2)+"s | \u6700\u7EC8\u6DF1\u5EA6: "+st.depth.toFixed(1)+"m"},
+        {t:"\u5F97\u5206\u660E\u7EC6",c:"\u5B9D\u7BB1\u4EF7\u503C: "+st.score+"\u5206 | \u6D6E\u529B\u63A7\u5236\u7CBE\u5EA6\u52A0\u5206: "+Math.round(accuracy*0.5)+"\u5206 ("+accuracy.toFixed(0)+"%\u65F6\u95F4\u5BC6\u5EA6\u63A5\u8FD1\u5E73\u8861) | \u6C27\u6C14\u8282\u7701\u52A0\u5206: "+Math.round(st.o2*2)+"\u5206 | \u65F6\u95F4\u52A0\u5206: "+Math.max(0,Math.round(300-st.elapsed))+"\u5206"},
+        {t:"\u6536\u96C6\u7684\u5B9D\u7BB1",c:collNames.length?collNames.join("\u3001"):"\u65E0"},
+        {t:"\u672A\u6536\u96C6\u7684\u5B9D\u7BB1",c:missNames.length?missNames.join("\u3001"):"\u5168\u90E8\u6536\u96C6\uFF01"},
+        {t:"\u6C34\u5C42\u63A2\u8BBF\u7EDF\u8BA1",c:Object.keys(layerVisits).map(function(k){return k+": "+(layerVisits[k]*0.05).toFixed(1)+"s";}).join(" | ")},
+        {t:"\u64CD\u4F5C\u7EDF\u8BA1",c:"\u538B\u8F7D\u8C03\u8282\u6B21\u6570: "+ballastChanges+" | \u6D6E\u529B\u63A7\u5236\u7CBE\u5EA6: "+accuracy.toFixed(0)+"%"},
+        {t:"\u5931\u8D25/\u8B66\u544A\u8BB0\u5F55",c:st.failReasons.length?st.failReasons.map(function(f){return f.msg+" (\u6DF1\u5EA6:"+f.depth.toFixed(1)+"m)";}).join(" | "):"\u65E0\u5F02\u5E38"},
+        {t:"\u6570\u636E\u8D28\u91CF\u62A5\u544A",c:"\u5904\u7406\u95EE\u9898: "+DataProc.stats.total+"\u9879 | \u53BB\u91CD: "+DataProc.stats.dup+" | \u7A7A\u884C\u5220\u9664: "+DataProc.stats.empty+" | \u5BC6\u5EA6\u5355\u4F4D\u4FEE\u6B63: "+DataProc.stats.unitFix+" | \u6D6E\u529B\u65B9\u5411\u5F02\u5E38: "+DataProc.stats.reversal},
+        {t:"\u5BA1\u8BA1\u8FFD\u8E2A",c:AuditLog.entries.length+" \u6761\u8BB0\u5F55 (\u8BE6\u89C1\u5BA1\u8BA1\u65E5\u5FD7)"},
+        {t:"\u7269\u7406\u77E5\u8BC6\u5C0F\u7ED3",c:"\u6D6E\u529B = \u03C1\u6C34 \u00D7 V\u6392 \u00D7 g | \u91CD\u529B = m \u00D7 g | \u03C1\u6F5C\u8247<\u03C1\u6C34\u2192\u4E0A\u6D6E | \u03C1\u6F5C\u8247>\u03C1\u6C34\u2192\u4E0B\u6C89 | \u03C1\u6F5C\u8247=\u03C1\u6C34\u2192\u60AC\u6D6E | \u538B\u8F7D\u6C34\u589E\u52A0\u2192\u6F5C\u8247\u5E73\u5747\u5BC6\u5EA6\u589E\u5927\u2192\u8D8B\u4E8E\u4E0B\u6C89\uFF1B\u53CD\u4E4B\u8D8B\u4E8E\u4E0A\u6D6E"}
+      ],
+      hist:st.hist, auditEntries:AuditLog.entries, failReasons:st.failReasons
+    };
+  },
+  render:function(){
+    var r=this.generate(GC.state), c=document.getElementById("rpt");
+    if(!r.sections||!r.sections.length){
+      c.innerHTML='<div class="rb"><h4>\u5C1A\u672A\u5B8C\u6210\u6E38\u620F</h4><p>\u5B8C\u6210\u4E00\u5C40\u6E38\u620F\u540E\u53EF\u67E5\u770B\u5B8C\u6574\u5B9E\u9A8C\u62A5\u544A</p></div>';
+      return;
+    }
+    var h='<div class="sb">'+r.totalScore+' \u5206</div>';
+    for(var i=0;i<r.sections.length;i++){
+      h+='<div class="rb"><h4>'+r.sections[i].t+'</h4><p>'+r.sections[i].c+'</p></div>';
+    }
+    if(r.auditEntries&&r.auditEntries.length){
+      h+='<div class="rb"><h4>\u5BA1\u8BA1\u8FFD\u8E2A\u8BE6\u60C5</h4>';
+      for(var i=0;i<r.auditEntries.length;i++){
+        var e=r.auditEntries[i];
+        h+='<div class="ae '+(e.source==="manual"?"ml":"al")+'">'+
+          '<span class="ts">'+e.ts.toLocaleTimeString("zh-CN")+'</span> '+
+          '<span class="op">['+e.operator+']</span> '+
+          '<span class="ch">'+e.action+' | '+e.field+' | '+String(e.oldVal)+' \u2192 '+String(e.newVal)+'</span></div>';
+      }
+      h+='</div>';
+    }
+    c.innerHTML=h;
+  },
+  exportHTML:function(){
+    var r=this.generate(GC.state);
+    if(!r.sections||!r.sections.length){alert("\u8BF7\u5148\u5B8C\u6210\u4E00\u5C40\u6E38\u620F");return;}
+    var h='<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>'+r.title+'</title>'+
+      '<style>body{font-family:"Microsoft YaHei",sans-serif;background:#0a1628;color:#e0e8f0;padding:40px;max-width:800px;margin:0 auto}'+
+      'h1{color:#4ae0ff;text-align:center}h2{color:#4ae0ff;border-bottom:1px solid #1a3a5c;padding-bottom:6px;margin-top:24px}'+
+      '.sc{font-size:48px;color:#4ae0ff;text-align:center;margin:20px 0}.bk{background:#0d1b2e;border:1px solid #1a3a5c;padding:12px;margin:10px 0;border-radius:6px}'+
+      '.au{border-left:3px solid #1a5a8c;padding:4px 10px;margin:4px 0;font-size:12px}.au.ml{border-left-color:#4aff8f}'+
+      '.ts{color:#6a9fc0}.op{color:#4ae0ff;font-weight:bold}</style></head><body>'+
+      '<h1>'+r.title+'</h1><div class="sc">'+r.totalScore+' \u5206</div>';
+    for(var i=0;i<r.sections.length;i++){
+      h+='<h2>'+r.sections[i].t+'</h2><div class="bk"><p>'+r.sections[i].c+'</p></div>';
+    }
+    if(r.auditEntries&&r.auditEntries.length){
+      h+='<h2>\u5BA1\u8BA1\u8FFD\u8E2A\u8BE6\u60C5</h2><div class="bk">';
+      for(var i=0;i<r.auditEntries.length;i++){
+        var e=r.auditEntries[i];
+        h+='<div class="au'+(e.source==="manual"?" ml":"")+'"><span class="ts">'+e.ts.toLocaleTimeString("zh-CN")+'</span> <span class="op">['+e.operator+']</span> '+e.action+' | '+e.field+' | '+String(e.oldVal)+' \u2192 '+String(e.newVal)+'</div>';
+      }
+      h+='</div>';
+    }
+    h+='</body></html>';
+    var blob=new Blob([h],{type:"text/html;charset=utf-8"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url;
+    a.download="\u6D6E\u529B\u6F5C\u8247\u5B9E\u9A8C\u62A5\u544A_"+new Date().toLocaleDateString("zh-CN").replace(/\//g,"-")+".html";
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+  exportCSV:function(){
+    var r=this.generate(GC.state);
+    if(!r.hist||!r.hist.length){alert("\u8BF7\u5148\u5B8C\u6210\u4E00\u5C40\u6E38\u620F");return;}
+    var lines=["\u65F6\u95F4(s),\u6DF1\u5EA6(m),\u538B\u8F7D(%),\u6F5C\u8247\u5BC6\u5EA6(kg/m\u00B3),\u6C34\u5BC6\u5EA6(kg/m\u00B3),\u51C0\u529B(N),\u6C27\u6C14(s),\u901F\u5EA6(m/s)"];
+    var step=Math.max(1,Math.floor(r.hist.length/500));
+    for(var i=0;i<r.hist.length;i+=step){
+      var h2=r.hist[i];
+      lines.push([h2.t.toFixed(2),h2.d.toFixed(2),h2.bp.toFixed(1),h2.sd.toFixed(1),h2.wd.toFixed(1),h2.nf.toFixed(1),h2.o2.toFixed(2),h2.v.toFixed(3)].join(","));
+    }
+    lines.push("");
+    lines.push("--- \u5BA1\u8BA1\u8FFD\u8E2A ---");
+    lines.push("\u65F6\u95F4,\u64CD\u4F5C\u8005,\u52A8\u4F5C,\u5B57\u6BB5,\u65E7\u503C,\u65B0\u503C,\u6765\u6E90");
+    for(var i=0;i<r.auditEntries.length;i++){
+      var e=r.auditEntries[i];
+      lines.push([e.ts.toLocaleTimeString("zh-CN"),e.operator,e.action,e.field,String(e.oldVal),String(e.newVal),e.source].join(","));
+    }
+    var csv=lines.join("\n");
+    var blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url;
+    a.download="\u6D6E\u529B\u6F5C\u8247\u6570\u636E_"+new Date().toLocaleDateString("zh-CN").replace(/\//g,"-")+".csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+};
+
+var GC={
+  state:null, lastTime:0, animFrame:null, keys:{},
+  init:function(){
+    Renderer.init();
+    DataProc.processLayers(RAW_LAYERS);
+    DataProc.processTreasures(RAW_TREAS);
+    DataProc.renderTables();
+    AuditLog.render();
+    this.renderIdle();
+
+    var self=this;
+    document.addEventListener("keydown",function(e){
+      self.keys[e.code]=true;
+      if(e.code==="Space"){e.preventDefault();self.togglePause();}
+      if(e.code==="KeyR")self.restartGame();
+    });
+    document.addEventListener("keyup",function(e){self.keys[e.code]=false;});
+  },
+  renderIdle:function(){
+    var idle=makeState(DataProc.layers,DataProc.treasures);
+    idle.running=false;idle.depth=0;idle.bp=50;
+    idle.sd=Physics.subDensity(50);idle.wd=1000;
+    Renderer.render(idle);
+  },
+  startGame:function(){
+    document.getElementById("start-overlay").classList.add("hid");
+    document.getElementById("end-overlay").classList.add("hid");
+    this.state=makeState(DataProc.layers,DataProc.treasures);
+    this.state.running=true;
+    this.state.sd=Physics.subDensity(this.state.bp);
+    this.state.wd=Physics.densityAt(0,this.state.layers);
+    this.state.curLayer=Physics.layerAt(0,this.state.layers);
+    this.lastTime=performance.now();
+    if(this.animFrame)cancelAnimationFrame(this.animFrame);
+    this.loop();
+  },
+  restartGame:function(){
+    if(this.animFrame)cancelAnimationFrame(this.animFrame);
+    AuditLog.clear();
+    DataProc.processLayers(RAW_LAYERS);
+    DataProc.processTreasures(RAW_TREAS);
+    DataProc.renderTables();
+    AuditLog.render();
+    this.startGame();
+  },
+  togglePause:function(){
+    if(!this.state||!this.state.running)return;
+    this.state.paused=!this.state.paused;
+    document.getElementById("btn-pause").textContent=this.state.paused?"\u7EE7\u7EED":"\u6682\u505C";
+  },
+  setBallast:function(val){
+    if(this.state&&this.state.running)this.state.bp=Number(val);
+  },
+  loop:function(){
+    var self=this;
+    this.animFrame=requestAnimationFrame(function(){self.loop();});
+    var now=performance.now();
+    var dt=Math.min((now-this.lastTime)/1000,0.05);
+    this.lastTime=now;
+    if(!this.state||!this.state.running)return;
+
+    if(this.keys["ArrowUp"]){
+      this.state.bp=Math.max(0,this.state.bp-40*dt);
+      document.getElementById("ballast-slider").value=Math.round(this.state.bp);
+    }
+    if(this.keys["ArrowDown"]){
+      this.state.bp=Math.min(100,this.state.bp+40*dt);
+      document.getElementById("ballast-slider").value=Math.round(this.state.bp);
+    }
+
+    if(!this.state.paused){
+      Physics.update(this.state,dt,this.state.layers);
+      var col=checkCollision(this.state,Renderer.subX);
+      if(col){
+        this.state.collectEffect={dep:col.dep,xp:col.xp,sc:col.sc,timer:1.5};
+      }
+      if(this.state.o2<=0||this.state.collected>=this.state.totalTreas){
+        this.endGame();return;
+      }
+    }
+    Renderer.render(this.state);
+    UI.update(this.state);
+  },
+  endGame:function(){
+    this.state.running=false;
+    this.state.gameOver=true;
+    var r=Report.generate(this.state);
+    var eo=document.getElementById("end-overlay");
+    var et=document.getElementById("end-title");
+    var er=document.getElementById("end-reason");
+    var es=document.getElementById("end-score");
+    var est=document.getElementById("end-stats");
+
+    if(this.state.o2<=0){
+      et.textContent="\u63A2\u9669\u5931\u8D25";
+      er.textContent="\u6C27\u6C14\u8017\u5C3D\uFF0C\u6F5C\u8247\u65E0\u6CD5\u7EE7\u7EED\u822A\u884C";
+    }else{
+      et.textContent="\u63A2\u9669\u6210\u529F\uFF01";
+      er.textContent="\u606D\u559C\uFF01\u4F60\u6536\u96C6\u4E86\u6240\u6709\u5B9D\u7BB1\uFF01";
+    }
+    es.textContent=r.totalScore+" \u5206";
+    est.innerHTML=
+      "\u7528\u65F6: "+this.state.elapsed.toFixed(1)+"s | "+
+      "\u6536\u96C6\u5B9D\u7BB1: "+this.state.collected+"/"+this.state.totalTreas+" | "+
+      "\u5269\u4F59\u6C27\u6C14: "+Math.round(this.state.o2)+"s | "+
+      "\u6700\u7EC8\u6DF1\u5EA6: "+this.state.depth.toFixed(1)+"m";
+
+    eo.classList.remove("hid");
+    Renderer.render(this.state);
+  }
+};
+
+window.DP=DataProc;
+window.RPT=Report;
+window.UI=UI;
+window.GC=GC;
+
+GC.init();
+
+})();
+</script>
+</body>
+</html>
