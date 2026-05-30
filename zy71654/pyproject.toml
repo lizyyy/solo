@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "risk-parity-rebalancer"
+version = "0.1.0"
+description = "风险平价再平衡CLI - 量化助理周调分析工具"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+]
+
+[project.scripts]
+risk-parity-rebalancer = "risk_parity_rebalancer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
