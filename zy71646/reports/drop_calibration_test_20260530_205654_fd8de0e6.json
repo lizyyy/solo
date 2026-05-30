@@ -1,0 +1,1247 @@
+{
+  "report_info": {
+    "generated_at": "2026-05-30T20:56:54.492354",
+    "filter_hash": "fd8de0e618b67005008000de485eba19",
+    "version": "1.0"
+  },
+  "summary": {
+    "total_pools": 2,
+    "total_items": 15,
+    "critical_items": 5,
+    "warning_items": 2,
+    "normal_items": 4,
+    "significant_items": 11,
+    "average_abs_deviation_percent": 35.46948196966803,
+    "total_attempts": 25113,
+    "significance_level": 0.05,
+    "confidence_level": 0.95,
+    "deviation_warning_threshold": 0.1,
+    "deviation_critical_threshold": 0.3,
+    "generated_at": "2026-05-30T20:56:54.276611",
+    "filter_hash": "fd8de0e618b67005008000de485eba19"
+  },
+  "params": {
+    "params_id": "e9b1dc1c-9617-4cd3-94f6-5a6a0d75f545",
+    "created_time": "2026-05-30T20:56:51.123453",
+    "start_time": "2026-05-01T00:00:00",
+    "end_time": "2026-05-20T23:59:59",
+    "pool_ids": [],
+    "item_ids": [],
+    "player_ids": [],
+    "server_ids": [],
+    "channels": [],
+    "activity_ids": [],
+    "deduplicate_enabled": true,
+    "deduplicate_keys": [
+      "player_id",
+      "pool_id",
+      "item_id",
+      "drop_time"
+    ],
+    "activity_bonus_enabled": true,
+    "probability_normalization_enabled": true,
+    "confidence_level": 0.95,
+    "min_sample_size": 30,
+    "max_sample_size": null,
+    "test_method": "chi_square",
+    "significance_level": 0.05,
+    "deviation_warning_threshold": 0.1,
+    "deviation_critical_threshold": 0.3,
+    "group_by": [
+      "pool_id"
+    ],
+    "notes": "五一活动期间掉落概率校准"
+  },
+  "probability_comparison": [
+    {
+      "pool_id": "pool_gacha",
+      "pool_name": "抽卡池",
+      "total_attempts": 24728,
+      "total_items": 9,
+      "chi_square_statistic": 282.67873703994695,
+      "chi_square_p_value": 1.9905845685482106e-56,
+      "is_distribution_significant": true,
+      "items": [
+        {
+          "item_id": "item_sr",
+          "item_name": "SR级装备",
+          "config_probability": 0.030303030303030304,
+          "actual_probability": 0.07127464282863756,
+          "deviation": 0.010668582222576953,
+          "deviation_percent": 17.60316066725197,
+          "confidence_interval": [
+            0.06689976106635666,
+            0.07591234301248274
+          ],
+          "p_value": 1.1249963309692873e-157,
+          "is_significant": true,
+          "status": "warning",
+          "total_attempts": 12529,
+          "drop_count": 893,
+          "activity_multiplier": 2.0
+        },
+        {
+          "item_id": "item_ssr",
+          "item_name": "SSR级装备",
+          "config_probability": 0.007575757575757576,
+          "actual_probability": 0.004310000798148296,
+          "deviation": -0.01252501603686854,
+          "deviation_percent": -74.39859525899912,
+          "confidence_interval": [
+            0.0033050193893153215,
+            0.0056188514813226694
+          ],
+          "p_value": 2.4889078933089992e-05,
+          "is_significant": true,
+          "status": "critical",
+          "total_attempts": 12529,
+          "drop_count": 54,
+          "activity_multiplier": 2.2222222222222223
+        },
+        {
+          "item_id": "item_r",
+          "item_name": "R级装备",
+          "config_probability": 0.21212121212121213,
+          "actual_probability": 0.40521988985553514,
+          "deviation": -0.01902253438688911,
+          "deviation_percent": -4.483883105481005,
+          "confidence_interval": [
+            0.3966538715068359,
+            0.41384401057333203
+          ],
+          "p_value": 0.0,
+          "is_significant": true,
+          "status": "normal",
+          "total_attempts": 12529,
+          "drop_count": 5077,
+          "activity_multiplier": 2.0
+        },
+        {
+          "item_id": "item_n",
+          "item_name": "N级装备",
+          "config_probability": 0.255050505050505,
+          "actual_probability": 0.4928565727512172,
+          "deviation": -0.017244437349792863,
+          "deviation_percent": -3.3805926685732546,
+          "confidence_interval": [
+            0.4841059219117323,
+            0.5016116026745205
+          ],
+          "p_value": 0.0,
+          "is_significant": true,
+          "status": "normal",
+          "total_attempts": 12529,
+          "drop_count": 6175,
+          "activity_multiplier": 2.0
+        },
+        {
+          "item_id": "item_ur",
+          "item_name": "UR级装备",
+          "config_probability": 0.010101010101010102,
+          "actual_probability": 0.02633889376646181,
+          "deviation": 0.006136873564441606,
+          "deviation_percent": 30.377524143985944,
+          "confidence_interval": [
+            0.02367665562085296,
+            0.029291496972626018
+          ],
+          "p_value": 7.926068746745646e-74,
+          "is_significant": true,
+          "status": "critical",
+          "total_attempts": 12529,
+          "drop_count": 330,
+          "activity_multiplier": 2.0
+        },
+        {
+          "item_id": "item_sr",
+          "item_name": "SR级装备",
+          "config_probability": 0.030303030303030304,
+          "actual_probability": 0.07127464282863756,
+          "deviation": 0.010668582222576953,
+          "deviation_percent": 17.60316066725197,
+          "confidence_interval": [
+            0.06689976106635666,
+            0.07591234301248274
+          ],
+          "p_value": 1.1249963309692873e-157,
+          "is_significant": true,
+          "status": "warning",
+          "total_attempts": 12529,
+          "drop_count": 893,
+          "activity_multiplier": 2.0
+        },
+        {
+          "item_id": "item_ssr",
+          "item_name": "SSR级装备",
+          "config_probability": 0.007575757575757576,
+          "actual_probability": 0.004310000798148296,
+          "deviation": -0.01252501603686854,
+          "deviation_percent": -74.39859525899912,
+          "confidence_interval": [
+            0.0033050193893153215,
+            0.0056188514813226694
+          ],
+          "p_value": 2.4889078933089992e-05,
+          "is_significant": true,
+          "status": "critical",
+          "total_attempts": 12529,
+          "drop_count": 54,
+          "activity_multiplier": 2.2222222222222223
+        },
+        {
+          "item_id": "item_r",
+          "item_name": "R级装备",
+          "config_probability": 0.21212121212121213,
+          "actual_probability": 0.40521988985553514,
+          "deviation": -0.01902253438688911,
+          "deviation_percent": -4.483883105481005,
+          "confidence_interval": [
+            0.3966538715068359,
+            0.41384401057333203
+          ],
+          "p_value": 0.0,
+          "is_significant": true,
+          "status": "normal",
+          "total_attempts": 12529,
+          "drop_count": 5077,
+          "activity_multiplier": 2.0
+        },
+        {
+          "item_id": "item_n",
+          "item_name": "N级装备",
+          "config_probability": 0.255050505050505,
+          "actual_probability": 0.4928565727512172,
+          "deviation": -0.017244437349792863,
+          "deviation_percent": -3.3805926685732546,
+          "confidence_interval": [
+            0.4841059219117323,
+            0.5016116026745205
+          ],
+          "p_value": 0.0,
+          "is_significant": true,
+          "status": "normal",
+          "total_attempts": 12529,
+          "drop_count": 6175,
+          "activity_multiplier": 2.0
+        }
+      ]
+    },
+    {
+      "pool_id": "pool_dungeon",
+      "pool_name": "副本掉落池",
+      "total_attempts": 12584,
+      "total_items": 6,
+      "chi_square_statistic": 76.4464176732358,
+      "chi_square_p_value": 4.6414618569416746e-15,
+      "is_distribution_significant": true,
+      "items": [
+        {
+          "item_id": "item_gold",
+          "item_name": "金币",
+          "config_probability": 0.3015075376884422,
+          "actual_probability": 0.3040368722186904,
+          "deviation": -0.29897820315819396,
+          "deviation_percent": -49.58055202373384,
+          "confidence_interval": [
+            0.29606065989930186,
+            0.3121326895216988
+          ],
+          "p_value": 0.5363903322212099,
+          "is_significant": false,
+          "status": "critical_not_significant",
+          "total_attempts": 12584,
+          "drop_count": 3826,
+          "activity_multiplier": 2.0
+        },
+        {
+          "item_id": "item_exp",
+          "item_name": "经验药水",
+          "config_probability": 0.25125628140703515,
+          "actual_probability": 0.25150985378258106,
+          "deviation": -0.25100270903148925,
+          "deviation_percent": -49.94953909726637,
+          "confidence_interval": [
+            0.24400576400671165,
+            0.2591656081098614
+          ],
+          "p_value": 0.9477104305456373,
+          "is_significant": false,
+          "status": "critical_not_significant",
+          "total_attempts": 12584,
+          "drop_count": 3165,
+          "activity_multiplier": 2.0
+        },
+        {
+          "item_id": "item_mat_common",
+          "item_name": "普通材料",
+          "config_probability": 0.25125628140703515,
+          "actual_probability": 0.246900826446281,
+          "deviation": -0.25561173636778933,
+          "deviation_percent": -50.86673553719008,
+          "confidence_interval": [
+            0.23944481067779846,
+            0.2545113198598688
+          ],
+          "p_value": 0.2599686160944863,
+          "is_significant": false,
+          "status": "critical_not_significant",
+          "total_attempts": 12584,
+          "drop_count": 3107,
+          "activity_multiplier": 2.0
+        },
+        {
+          "item_id": "item_mat_rare",
+          "item_name": "稀有材料",
+          "config_probability": 0.10050251256281408,
+          "actual_probability": 0.11776859504132231,
+          "deviation": -0.08323643008430584,
+          "deviation_percent": -41.41012396694215,
+          "confidence_interval": [
+            0.11225312496996631,
+            0.12351735788283721
+          ],
+          "p_value": 1.1797836160213307e-10,
+          "is_significant": true,
+          "status": "critical",
+          "total_attempts": 12584,
+          "drop_count": 1482,
+          "activity_multiplier": 2.0
+        },
+        {
+          "item_id": "item_mat_epic",
+          "item_name": "史诗材料",
+          "config_probability": 0.08040201005025126,
+          "actual_probability": 0.06484424666242848,
+          "deviation": -0.09595977343807403,
+          "deviation_percent": -59.674984106802285,
+          "confidence_interval": [
+            0.0606731953944695,
+            0.06928089277641453
+          ],
+          "p_value": 1.3775040901731223e-10,
+          "is_significant": true,
+          "status": "critical",
+          "total_attempts": 12584,
+          "drop_count": 816,
+          "activity_multiplier": 2.0
+        },
+        {
+          "item_id": "item_weapon",
+          "item_name": "专属武器",
+          "config_probability": 0.01507537688442211,
+          "actual_probability": 0.014939605848696759,
+          "deviation": -0.015211147920147461,
+          "deviation_percent": -50.450307268489084,
+          "confidence_interval": [
+            0.012963261839188809,
+            0.017212003718714078
+          ],
+          "p_value": 0.9005301840664522,
+          "is_significant": false,
+          "status": "critical_not_significant",
+          "total_attempts": 12584,
+          "drop_count": 188,
+          "activity_multiplier": 2.0
+        }
+      ]
+    }
+  ],
+  "anomalies": [
+    {
+      "anomaly_id": "ANOM_20260530_0001",
+      "level": "warning",
+      "anomaly_type": "duplicate_samples",
+      "title": "发现 50 条重复记录",
+      "description": "总记录数 25163 条，检测到重复记录 50 条，唯一记录 25113 条。去重键：player_id, pool_id, item_id, drop_time",
+      "reason_analysis": "样本重复可能的原因：\n1. 日志重复上报（玩家网络重连导致）\n2. 数据导入时重复导入了相同文件\n3. 日志文件本身包含重复条目\n4. 去重键可能不够精确（例如时间精度问题）",
+      "suggestion": "已自动标记重复记录并在后续统计中排除。建议：\n1. 检查数据源是否存在重复导入\n2. 如果是日志系统问题，联系开发排查上报逻辑\n3. 确认去重键是否合理，必要时调整",
+      "pool_id": null,
+      "item_id": null,
+      "player_id": null,
+      "source_file": null,
+      "source_row": null,
+      "object_id": null,
+      "related_data": {
+        "total_records": 25163,
+        "duplicate_count": 50,
+        "unique_count": 25113,
+        "duplicate_keys": [
+          "player_id",
+          "pool_id",
+          "item_id",
+          "drop_time"
+        ],
+        "duplicate_groups_count": 50
+      },
+      "detected_time": "2026-05-30T20:56:54.276656"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0002",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0003",
+      "description": "玩家 player_0003 在 2026-05-03 12:48:07 从池子 pool_dungeon 获得道具 item_gold 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_gold",
+      "player_id": "player_0003",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 752,
+      "object_id": "a9c4311a-bf7b-4228-b721-fd8877caafdd",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "e27448e2-cd2a-4490-b6f4-85c7d62fb5e2"
+        ]
+      },
+      "detected_time": "2026-05-30T20:56:54.276757"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0003",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0004",
+      "description": "玩家 player_0004 在 2026-05-08 09:18:57 从池子 pool_gacha 获得道具 item_ur 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_ur",
+      "player_id": "player_0004",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 1076,
+      "object_id": "0c5a4813-81df-4c03-b80e-322041e39f9e",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "9b481899-0de4-4d08-bfff-767184b92419"
+        ]
+      },
+      "detected_time": "2026-05-30T20:56:54.276807"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0004",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0005",
+      "description": "玩家 player_0005 在 2026-05-10 18:35:20 从池子 pool_dungeon 获得道具 item_gold 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_gold",
+      "player_id": "player_0005",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 1328,
+      "object_id": "a26b083f-3e9d-4c88-9476-929e27ea52f0",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "849ecf8a-abb2-459d-be16-d0cc57b69f41"
+        ]
+      },
+      "detected_time": "2026-05-30T20:56:54.276860"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0005",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0006",
+      "description": "玩家 player_0006 在 2026-05-01 22:57:55 从池子 pool_dungeon 获得道具 item_gold 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_gold",
+      "player_id": "player_0006",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 1464,
+      "object_id": "fe2f6b8c-1ddf-4003-a6c6-c07256f55c8c",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "6b06738f-00d2-4697-8bf0-a56a742af4d9"
+        ]
+      },
+      "detected_time": "2026-05-30T20:56:54.276953"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0006",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0007",
+      "description": "玩家 player_0007 在 2026-05-06 11:50:07 从池子 pool_gacha 获得道具 item_r 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_r",
+      "player_id": "player_0007",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 1768,
+      "object_id": "c9812bc6-f4f8-4491-97ac-3a08c0f1d87a",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "6db901ac-a774-4871-ac93-92ee4ee303b3"
+        ]
+      },
+      "detected_time": "2026-05-30T20:56:54.277057"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0007",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0012",
+      "description": "玩家 player_0012 在 2026-05-07 16:57:39 从池子 pool_dungeon 获得道具 item_mat_common 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_mat_common",
+      "player_id": "player_0012",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 2974,
+      "object_id": "e51e4cda-d8ce-49f8-a142-49a5171f2643",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "217323ef-b273-42c0-823a-6f519827249a"
+        ]
+      },
+      "detected_time": "2026-05-30T20:56:54.277209"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0008",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0016",
+      "description": "玩家 player_0016 在 2026-05-14 08:55:50 从池子 pool_gacha 获得道具 item_n 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_n",
+      "player_id": "player_0016",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 4101,
+      "object_id": "1c6a9eb0-7e40-4e1b-b5c0-77fe5919c418",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "6f2d4879-be4a-4765-bc9a-6cd02ba8a292"
+        ]
+      },
+      "detected_time": "2026-05-30T20:56:54.277446"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0009",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0017",
+      "description": "玩家 player_0017 在 2026-05-18 18:52:52 从池子 pool_gacha 获得道具 item_n 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_n",
+      "player_id": "player_0017",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 4409,
+      "object_id": "1999134f-ed6d-4dc9-a205-6df27943aa5a",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "3fcdf7cc-fc4a-4a63-8003-a74efc8481d4"
+        ]
+      },
+      "detected_time": "2026-05-30T20:56:54.277593"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0010",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0017",
+      "description": "玩家 player_0017 在 2026-05-19 09:46:23 从池子 pool_gacha 获得道具 item_r 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_r",
+      "player_id": "player_0017",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 4414,
+      "object_id": "95ccd465-5c80-4d17-8c32-6a00bd86a217",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "39d3d79f-3ae4-43f7-8291-89b33570206b"
+        ]
+      },
+      "detected_time": "2026-05-30T20:56:54.277733"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0011",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0019",
+      "description": "玩家 player_0019 在 2026-05-19 22:43:24 从池子 pool_gacha 获得道具 item_r 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_r",
+      "player_id": "player_0019",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 4950,
+      "object_id": "87a507d1-a447-4a77-81b0-7cfae6d6d543",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "76c7c03b-732c-4970-8f2b-56c982e270bb"
+        ]
+      },
+      "detected_time": "2026-05-30T20:56:54.277891"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0012",
+      "level": "info",
+      "anomaly_type": "activity_applied",
+      "title": "活动 五一庆典活动 已应用",
+      "description": "活动 五一庆典活动 (act_001) 倍率 2.0x，影响了 4413 条掉落记录。活动时间：2026-05-01 00:00:00 ~ 2026-05-08 00:00:00",
+      "reason_analysis": "正常的活动加成应用",
+      "suggestion": "在计算期望概率时已考虑此活动加成",
+      "pool_id": null,
+      "item_id": null,
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv",
+      "source_row": 2,
+      "object_id": "act_001",
+      "related_data": {
+        "multiplier": 2.0,
+        "affected_records": 4413,
+        "start_time": "2026-05-01T00:00:00",
+        "end_time": "2026-05-08T00:00:00"
+      },
+      "detected_time": "2026-05-30T20:56:54.277911"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0013",
+      "level": "info",
+      "anomaly_type": "activity_applied",
+      "title": "活动 周末双倍掉落 已应用",
+      "description": "活动 周末双倍掉落 (act_003) 倍率 2.0x，影响了 1312 条掉落记录。活动时间：2026-05-15 00:00:00 ~ 2026-05-17 00:00:00",
+      "reason_analysis": "正常的活动加成应用",
+      "suggestion": "在计算期望概率时已考虑此活动加成",
+      "pool_id": null,
+      "item_id": null,
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv",
+      "source_row": 4,
+      "object_id": "act_003",
+      "related_data": {
+        "multiplier": 2.0,
+        "affected_records": 1312,
+        "start_time": "2026-05-15T00:00:00",
+        "end_time": "2026-05-17T00:00:00"
+      },
+      "detected_time": "2026-05-30T20:56:54.277919"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0014",
+      "level": "info",
+      "anomaly_type": "activity_applied",
+      "title": "活动 SSR概率UP 已应用",
+      "description": "活动 SSR概率UP (act_002) 倍率 3.0x，影响了 13 条掉落记录。活动时间：2026-05-03 00:00:00 ~ 2026-05-05 00:00:00",
+      "reason_analysis": "正常的活动加成应用",
+      "suggestion": "在计算期望概率时已考虑此活动加成",
+      "pool_id": null,
+      "item_id": null,
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv",
+      "source_row": 3,
+      "object_id": "act_002",
+      "related_data": {
+        "multiplier": 3.0,
+        "affected_records": 13,
+        "start_time": "2026-05-03T00:00:00",
+        "end_time": "2026-05-05T00:00:00"
+      },
+      "detected_time": "2026-05-30T20:56:54.277925"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0015",
+      "level": "critical",
+      "anomaly_type": "probability_not_normalized",
+      "title": "道具池 pool_gacha 概率未归一化",
+      "description": "道具池 pool_gacha 包含 9 个道具，原始概率总和为 1.980000，与1的偏差为 0.980000，已自动归一化。",
+      "reason_analysis": "概率不归一的可能原因：\n1. 配置时计算错误，各道具概率相加不等于1\n2. 使用权重配置但未正确转换为概率\n3. 新增或删除道具后未重新计算概率\n4. 使用百分比配置时忘记除以100\n5. 四舍五入累积误差",
+      "suggestion": "已自动归一化，后续计算将使用归一化后的概率。建议：\n1. 检查配置表中各道具概率之和\n2. 确认是否使用权重而非直接概率配置\n3. 如有新增道具，确认是否更新了所有相关概率\n4. 检查是否存在百分比与小数混用的情况",
+      "pool_id": "pool_gacha",
+      "item_id": null,
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "source_row": null,
+      "object_id": null,
+      "related_data": {
+        "item_count": 9,
+        "original_total": 1.98,
+        "diff_from_one": 0.98,
+        "original_probabilities": {
+          "item_sr": 0.06,
+          "item_ssr": 0.015,
+          "item_r": 0.42,
+          "item_n": 0.505,
+          "item_ur": 0.02
+        },
+        "normalized_probabilities": {
+          "item_sr": 0.030303030303030304,
+          "item_ssr": 0.007575757575757576,
+          "item_r": 0.21212121212121213,
+          "item_n": 0.255050505050505,
+          "item_ur": 0.010101010101010102
+        }
+      },
+      "detected_time": "2026-05-30T20:56:54.277940"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0016",
+      "level": "warning",
+      "anomaly_type": "probability_not_normalized",
+      "title": "道具池 pool_dungeon 概率未归一化",
+      "description": "道具池 pool_dungeon 包含 6 个道具，原始概率总和为 0.995000，与1的偏差为 0.005000，已自动归一化。",
+      "reason_analysis": "概率不归一的可能原因：\n1. 配置时计算错误，各道具概率相加不等于1\n2. 使用权重配置但未正确转换为概率\n3. 新增或删除道具后未重新计算概率\n4. 使用百分比配置时忘记除以100\n5. 四舍五入累积误差",
+      "suggestion": "已自动归一化，后续计算将使用归一化后的概率。建议：\n1. 检查配置表中各道具概率之和\n2. 确认是否使用权重而非直接概率配置\n3. 如有新增道具，确认是否更新了所有相关概率\n4. 检查是否存在百分比与小数混用的情况",
+      "pool_id": "pool_dungeon",
+      "item_id": null,
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "source_row": null,
+      "object_id": null,
+      "related_data": {
+        "item_count": 6,
+        "original_total": 0.995,
+        "diff_from_one": 0.0050000000000000044,
+        "original_probabilities": {
+          "item_gold": 0.3,
+          "item_exp": 0.25,
+          "item_mat_common": 0.25,
+          "item_mat_rare": 0.1,
+          "item_mat_epic": 0.08,
+          "item_weapon": 0.015
+        },
+        "normalized_probabilities": {
+          "item_gold": 0.3015075376884422,
+          "item_exp": 0.25125628140703515,
+          "item_mat_common": 0.25125628140703515,
+          "item_mat_rare": 0.10050251256281408,
+          "item_mat_epic": 0.08040201005025126,
+          "item_weapon": 0.01507537688442211
+        }
+      },
+      "detected_time": "2026-05-30T20:56:54.277947"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0017",
+      "level": "critical",
+      "anomaly_type": "significant_deviation_overall",
+      "title": "发现 7 个道具存在统计显著偏离",
+      "description": "在显著性水平 0.05 下，共有 7 个道具的实际掉落概率与配置概率存在统计显著差异。",
+      "reason_analysis": "统计显著偏离意味着观察到的差异不太可能是随机波动造成的，可能的原因：\n1. 实际掉落配置与文档配置不一致\n2. 存在未记录的热更新或临时调整\n3. 活动加成计算有误\n4. 样本存在偏差（如只统计了特定玩家群体）\n5. 随机数生成器存在问题",
+      "suggestion": "请重点关注这些道具，检查：\n1. 实际配置的概率值\n2. 是否有临时调整未同步到配置文件\n3. 活动加成是否正确应用\n4. 抽样方法是否存在偏差",
+      "pool_id": null,
+      "item_id": null,
+      "player_id": null,
+      "source_file": null,
+      "source_row": null,
+      "object_id": null,
+      "related_data": {
+        "significant_count": 7,
+        "significance_level": 0.05,
+        "total_items": 15,
+        "significant_items": [
+          {
+            "pool_id": "pool_gacha",
+            "item_id": "item_sr",
+            "item_name": "SR级装备",
+            "p_value": 1.1249963309692873e-157,
+            "deviation_percent": 135.20632133450394
+          },
+          {
+            "pool_id": "pool_gacha",
+            "item_id": "item_ssr",
+            "item_name": "SSR级装备",
+            "p_value": 2.4889078933089992e-05,
+            "deviation_percent": -43.10798946444249
+          },
+          {
+            "pool_id": "pool_gacha",
+            "item_id": "item_r",
+            "item_name": "R级装备",
+            "p_value": 0.0,
+            "deviation_percent": 91.03223378903799
+          },
+          {
+            "pool_id": "pool_gacha",
+            "item_id": "item_n",
+            "item_name": "N级装备",
+            "p_value": 0.0,
+            "deviation_percent": 93.23881466285349
+          },
+          {
+            "pool_id": "pool_gacha",
+            "item_id": "item_ur",
+            "item_name": "UR级装备",
+            "p_value": 7.926068746745646e-74,
+            "deviation_percent": 160.7550482879719
+          },
+          {
+            "pool_id": "pool_dungeon",
+            "item_id": "item_mat_rare",
+            "item_name": "稀有材料",
+            "p_value": 1.1797836160213307e-10,
+            "deviation_percent": 17.179752066115693
+          },
+          {
+            "pool_id": "pool_dungeon",
+            "item_id": "item_mat_epic",
+            "item_name": "史诗材料",
+            "p_value": 1.3775040901731223e-10,
+            "deviation_percent": -19.349968213604576
+          }
+        ]
+      },
+      "detected_time": "2026-05-30T20:56:54.277962"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0018",
+      "level": "critical",
+      "anomaly_type": "significant_deviation_item",
+      "title": "道具 SR级装备 掉落显著偏高",
+      "description": "道具 SR级装备 (item_sr) 在池子 pool_gacha 中：\n  配置概率: 3.0303%\n  实际概率: 7.1275%\n  偏离值: +4.0972pp (+135.21%)\n  P值: 0.000000 (小于 0.05，统计显著)\n  样本量: 12529 次抽取，掉落 893 次\n  置信区间: [6.6900%, 7.5912%]",
+      "reason_analysis": "实际掉率严重偏高（+135.2%），可能配置错误或存在未记录的活动\n统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大\n样本量充足（12529 次），检验结果可靠\n\n可能的具体原因：\n  - 配置概率填错（多写了一个零）\n  - 存在未记录的活动加成\n  - 该道具被临时调高概率\n  - 权重计算错误\n  - 随机数生成器存在偏向性\n  - 样本存在选择性偏差",
+      "suggestion": "即时检查：\n  1. 查看实际配置文件中 SR级装备 的概率值\n  2. 检查该道具池是否有未记录的热更新\n  3. 确认相关活动配置是否正确\n  4. 核对配置的单位（百分比 vs 小数）\n\n紧急处理：\n  - 如果确认配置错误，立即修正\n  - 评估对经济系统和玩家体验的影响\n  - 考虑对受影响玩家进行补偿或回收\n  - 发布公告说明情况\n\n后续预防：\n  - 建立配置发布前的自动校验机制\n  - 定期运行此校准脚本监控掉率\n  - 设置告警阈值，偏差过大时自动通知\n  - 保留所有配置变更历史，便于回溯",
+      "pool_id": "pool_gacha",
+      "item_id": "item_sr",
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "source_row": 2,
+      "object_id": "item_sr",
+      "related_data": {
+        "expected_probability": 0.030303030303030304,
+        "observed_probability": 0.07127464282863756,
+        "deviation": 0.04097161252560726,
+        "deviation_percent": 135.20632133450394,
+        "p_value": 1.1249963309692873e-157,
+        "total_attempts": 12529,
+        "drop_count": 893,
+        "confidence_lower": 0.06689976106635666,
+        "confidence_upper": 0.07591234301248274
+      },
+      "detected_time": "2026-05-30T20:56:54.277983"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0019",
+      "level": "info",
+      "anomaly_type": "significant_deviation_item",
+      "title": "道具 SSR级装备 掉落显著偏低",
+      "description": "道具 SSR级装备 (item_ssr) 在池子 pool_gacha 中：\n  配置概率: 0.7576%\n  实际概率: 0.4310%\n  偏离值: -0.3266pp (-43.11%)\n  P值: 0.000025 (小于 0.05，统计显著)\n  样本量: 12529 次抽取，掉落 54 次\n  置信区间: [0.3305%, 0.5619%]",
+      "reason_analysis": "实际掉率明显偏低（-43.1%），可能配置偏低或活动结束未更新\n统计检验P值=0.000025 < 0.01，高度显著，差异真实存在的可能性极大\n样本量充足（12529 次），检验结果可靠\n\n可能的具体原因：\n  - 配置概率填错（少写了一个零）\n  - 活动已结束但配置未恢复\n  - 该道具被临时屏蔽或调整\n  - 权重计算错误\n  - 随机数生成器存在偏向性\n  - 样本存在选择性偏差",
+      "suggestion": "即时检查：\n  1. 查看实际配置文件中 SSR级装备 的概率值\n  2. 检查该道具池是否有未记录的热更新\n  3. 确认相关活动配置是否正确\n  4. 核对配置的单位（百分比 vs 小数）\n\n后续预防：\n  - 建立配置发布前的自动校验机制\n  - 定期运行此校准脚本监控掉率\n  - 设置告警阈值，偏差过大时自动通知\n  - 保留所有配置变更历史，便于回溯",
+      "pool_id": "pool_gacha",
+      "item_id": "item_ssr",
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "source_row": 3,
+      "object_id": "item_ssr",
+      "related_data": {
+        "expected_probability": 0.007575757575757576,
+        "observed_probability": 0.004310000798148296,
+        "deviation": -0.00326575677760928,
+        "deviation_percent": -43.10798946444249,
+        "p_value": 2.4889078933089992e-05,
+        "total_attempts": 12529,
+        "drop_count": 54,
+        "confidence_lower": 0.0033050193893153215,
+        "confidence_upper": 0.0056188514813226694
+      },
+      "detected_time": "2026-05-30T20:56:54.277993"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0020",
+      "level": "warning",
+      "anomaly_type": "significant_deviation_item",
+      "title": "道具 R级装备 掉落显著偏高",
+      "description": "道具 R级装备 (item_r) 在池子 pool_gacha 中：\n  配置概率: 21.2121%\n  实际概率: 40.5220%\n  偏离值: +19.3099pp (+91.03%)\n  P值: 0.000000 (小于 0.05，统计显著)\n  样本量: 12529 次抽取，掉落 5077 次\n  置信区间: [39.6654%, 41.3844%]",
+      "reason_analysis": "实际掉率严重偏高（+91.0%），可能配置错误或存在未记录的活动\n统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大\n样本量充足（12529 次），检验结果可靠\n\n可能的具体原因：\n  - 配置概率填错（多写了一个零）\n  - 存在未记录的活动加成\n  - 该道具被临时调高概率\n  - 权重计算错误\n  - 随机数生成器存在偏向性\n  - 样本存在选择性偏差",
+      "suggestion": "即时检查：\n  1. 查看实际配置文件中 R级装备 的概率值\n  2. 检查该道具池是否有未记录的热更新\n  3. 确认相关活动配置是否正确\n  4. 核对配置的单位（百分比 vs 小数）\n\n紧急处理：\n  - 如果确认配置错误，立即修正\n  - 评估对经济系统和玩家体验的影响\n  - 考虑对受影响玩家进行补偿或回收\n  - 发布公告说明情况\n\n后续预防：\n  - 建立配置发布前的自动校验机制\n  - 定期运行此校准脚本监控掉率\n  - 设置告警阈值，偏差过大时自动通知\n  - 保留所有配置变更历史，便于回溯",
+      "pool_id": "pool_gacha",
+      "item_id": "item_r",
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "source_row": 4,
+      "object_id": "item_r",
+      "related_data": {
+        "expected_probability": 0.21212121212121213,
+        "observed_probability": 0.40521988985553514,
+        "deviation": 0.19309867773432302,
+        "deviation_percent": 91.03223378903799,
+        "p_value": 0.0,
+        "total_attempts": 12529,
+        "drop_count": 5077,
+        "confidence_lower": 0.3966538715068359,
+        "confidence_upper": 0.41384401057333203
+      },
+      "detected_time": "2026-05-30T20:56:54.278004"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0021",
+      "level": "warning",
+      "anomaly_type": "significant_deviation_item",
+      "title": "道具 N级装备 掉落显著偏高",
+      "description": "道具 N级装备 (item_n) 在池子 pool_gacha 中：\n  配置概率: 25.5051%\n  实际概率: 49.2857%\n  偏离值: +23.7806pp (+93.24%)\n  P值: 0.000000 (小于 0.05，统计显著)\n  样本量: 12529 次抽取，掉落 6175 次\n  置信区间: [48.4106%, 50.1612%]",
+      "reason_analysis": "实际掉率严重偏高（+93.2%），可能配置错误或存在未记录的活动\n统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大\n样本量充足（12529 次），检验结果可靠\n\n可能的具体原因：\n  - 配置概率填错（多写了一个零）\n  - 存在未记录的活动加成\n  - 该道具被临时调高概率\n  - 权重计算错误\n  - 随机数生成器存在偏向性\n  - 样本存在选择性偏差",
+      "suggestion": "即时检查：\n  1. 查看实际配置文件中 N级装备 的概率值\n  2. 检查该道具池是否有未记录的热更新\n  3. 确认相关活动配置是否正确\n  4. 核对配置的单位（百分比 vs 小数）\n\n紧急处理：\n  - 如果确认配置错误，立即修正\n  - 评估对经济系统和玩家体验的影响\n  - 考虑对受影响玩家进行补偿或回收\n  - 发布公告说明情况\n\n后续预防：\n  - 建立配置发布前的自动校验机制\n  - 定期运行此校准脚本监控掉率\n  - 设置告警阈值，偏差过大时自动通知\n  - 保留所有配置变更历史，便于回溯",
+      "pool_id": "pool_gacha",
+      "item_id": "item_n",
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "source_row": 5,
+      "object_id": "item_n",
+      "related_data": {
+        "expected_probability": 0.255050505050505,
+        "observed_probability": 0.4928565727512172,
+        "deviation": 0.23780606770071216,
+        "deviation_percent": 93.23881466285349,
+        "p_value": 0.0,
+        "total_attempts": 12529,
+        "drop_count": 6175,
+        "confidence_lower": 0.4841059219117323,
+        "confidence_upper": 0.5016116026745205
+      },
+      "detected_time": "2026-05-30T20:56:54.278013"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0022",
+      "level": "critical",
+      "anomaly_type": "significant_deviation_item",
+      "title": "道具 UR级装备 掉落显著偏高",
+      "description": "道具 UR级装备 (item_ur) 在池子 pool_gacha 中：\n  配置概率: 1.0101%\n  实际概率: 2.6339%\n  偏离值: +1.6238pp (+160.76%)\n  P值: 0.000000 (小于 0.05，统计显著)\n  样本量: 12529 次抽取，掉落 330 次\n  置信区间: [2.3677%, 2.9291%]",
+      "reason_analysis": "实际掉率严重偏高（+160.8%），可能配置错误或存在未记录的活动\n统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大\n样本量充足（12529 次），检验结果可靠\n\n可能的具体原因：\n  - 配置概率填错（多写了一个零）\n  - 存在未记录的活动加成\n  - 该道具被临时调高概率\n  - 权重计算错误\n  - 随机数生成器存在偏向性\n  - 样本存在选择性偏差",
+      "suggestion": "即时检查：\n  1. 查看实际配置文件中 UR级装备 的概率值\n  2. 检查该道具池是否有未记录的热更新\n  3. 确认相关活动配置是否正确\n  4. 核对配置的单位（百分比 vs 小数）\n\n紧急处理：\n  - 如果确认配置错误，立即修正\n  - 评估对经济系统和玩家体验的影响\n  - 考虑对受影响玩家进行补偿或回收\n  - 发布公告说明情况\n\n后续预防：\n  - 建立配置发布前的自动校验机制\n  - 定期运行此校准脚本监控掉率\n  - 设置告警阈值，偏差过大时自动通知\n  - 保留所有配置变更历史，便于回溯",
+      "pool_id": "pool_gacha",
+      "item_id": "item_ur",
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "source_row": 6,
+      "object_id": "item_ur",
+      "related_data": {
+        "expected_probability": 0.010101010101010102,
+        "observed_probability": 0.02633889376646181,
+        "deviation": 0.01623788366545171,
+        "deviation_percent": 160.7550482879719,
+        "p_value": 7.926068746745646e-74,
+        "total_attempts": 12529,
+        "drop_count": 330,
+        "confidence_lower": 0.02367665562085296,
+        "confidence_upper": 0.029291496972626018
+      },
+      "detected_time": "2026-05-30T20:56:54.278021"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0023",
+      "level": "info",
+      "anomaly_type": "significant_deviation_item",
+      "title": "道具 稀有材料 掉落显著偏高",
+      "description": "道具 稀有材料 (item_mat_rare) 在池子 pool_dungeon 中：\n  配置概率: 10.0503%\n  实际概率: 11.7769%\n  偏离值: +1.7266pp (+17.18%)\n  P值: 0.000000 (小于 0.05，统计显著)\n  样本量: 12584 次抽取，掉落 1482 次\n  置信区间: [11.2253%, 12.3517%]",
+      "reason_analysis": "实际掉率轻微偏高（+17.2%），可能是正常波动\n统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大\n样本量充足（12584 次），检验结果可靠\n\n可能的具体原因：\n  - 配置概率填错（多写了一个零）\n  - 存在未记录的活动加成\n  - 该道具被临时调高概率\n  - 权重计算错误\n  - 随机数生成器存在偏向性\n  - 样本存在选择性偏差",
+      "suggestion": "即时检查：\n  1. 查看实际配置文件中 稀有材料 的概率值\n  2. 检查该道具池是否有未记录的热更新\n  3. 确认相关活动配置是否正确\n  4. 核对配置的单位（百分比 vs 小数）\n\n后续预防：\n  - 建立配置发布前的自动校验机制\n  - 定期运行此校准脚本监控掉率\n  - 设置告警阈值，偏差过大时自动通知\n  - 保留所有配置变更历史，便于回溯",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_mat_rare",
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "source_row": 10,
+      "object_id": "item_mat_rare",
+      "related_data": {
+        "expected_probability": 0.10050251256281408,
+        "observed_probability": 0.11776859504132231,
+        "deviation": 0.017266082478508235,
+        "deviation_percent": 17.179752066115693,
+        "p_value": 1.1797836160213307e-10,
+        "total_attempts": 12584,
+        "drop_count": 1482,
+        "confidence_lower": 0.11225312496996631,
+        "confidence_upper": 0.12351735788283721
+      },
+      "detected_time": "2026-05-30T20:56:54.278030"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0024",
+      "level": "info",
+      "anomaly_type": "significant_deviation_item",
+      "title": "道具 史诗材料 掉落显著偏低",
+      "description": "道具 史诗材料 (item_mat_epic) 在池子 pool_dungeon 中：\n  配置概率: 8.0402%\n  实际概率: 6.4844%\n  偏离值: -1.5558pp (-19.35%)\n  P值: 0.000000 (小于 0.05，统计显著)\n  样本量: 12584 次抽取，掉落 816 次\n  置信区间: [6.0673%, 6.9281%]",
+      "reason_analysis": "实际掉率轻微偏低（-19.3%），可能是正常波动\n统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大\n样本量充足（12584 次），检验结果可靠\n\n可能的具体原因：\n  - 配置概率填错（少写了一个零）\n  - 活动已结束但配置未恢复\n  - 该道具被临时屏蔽或调整\n  - 权重计算错误\n  - 随机数生成器存在偏向性\n  - 样本存在选择性偏差",
+      "suggestion": "即时检查：\n  1. 查看实际配置文件中 史诗材料 的概率值\n  2. 检查该道具池是否有未记录的热更新\n  3. 确认相关活动配置是否正确\n  4. 核对配置的单位（百分比 vs 小数）\n\n后续预防：\n  - 建立配置发布前的自动校验机制\n  - 定期运行此校准脚本监控掉率\n  - 设置告警阈值，偏差过大时自动通知\n  - 保留所有配置变更历史，便于回溯",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_mat_epic",
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "source_row": 11,
+      "object_id": "item_mat_epic",
+      "related_data": {
+        "expected_probability": 0.08040201005025126,
+        "observed_probability": 0.06484424666242848,
+        "deviation": -0.015557763387822776,
+        "deviation_percent": -19.349968213604576,
+        "p_value": 1.3775040901731223e-10,
+        "total_attempts": 12584,
+        "drop_count": 816,
+        "confidence_lower": 0.0606731953944695,
+        "confidence_upper": 0.06928089277641453
+      },
+      "detected_time": "2026-05-30T20:56:54.278038"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0025",
+      "level": "info",
+      "anomaly_type": "moderate_deviation",
+      "title": "道具 稀有材料 轻微偏高",
+      "description": "道具 稀有材料 (item_mat_rare) 偏差 +17.18%，偏高，在警戒阈值内（10%），统计显著。",
+      "reason_analysis": "轻微波动可能是正常随机现象，建议持续观察。",
+      "suggestion": "持续观察，如果偏差持续扩大需要介入检查。",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_mat_rare",
+      "player_id": null,
+      "source_file": null,
+      "source_row": null,
+      "object_id": null,
+      "related_data": {},
+      "detected_time": "2026-05-30T20:56:54.278045"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0026",
+      "level": "info",
+      "anomaly_type": "moderate_deviation",
+      "title": "道具 史诗材料 轻微偏低",
+      "description": "道具 史诗材料 (item_mat_epic) 偏差 -19.35%，偏低，在警戒阈值内（10%），统计显著。",
+      "reason_analysis": "轻微波动可能是正常随机现象，建议持续观察。",
+      "suggestion": "持续观察，如果偏差持续扩大需要介入检查。",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_mat_epic",
+      "player_id": null,
+      "source_file": null,
+      "source_row": null,
+      "object_id": null,
+      "related_data": {},
+      "detected_time": "2026-05-30T20:56:54.278049"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0027",
+      "level": "info",
+      "anomaly_type": "complaint_summary",
+      "title": "投诉记录汇总",
+      "description": "共有 3 条投诉记录，其中已核实 2 条，未核实 1 条。",
+      "reason_analysis": "投诉记录反映了玩家的主观感受，需要结合客观数据验证。",
+      "suggestion": "重点关注已核实且数据支持的投诉案例。",
+      "pool_id": null,
+      "item_id": null,
+      "player_id": null,
+      "source_file": null,
+      "source_row": null,
+      "object_id": null,
+      "related_data": {
+        "total_complaints": 3,
+        "verified_count": 2,
+        "unverified_count": 1
+      },
+      "detected_time": "2026-05-30T20:56:54.278058"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0028",
+      "level": "warning",
+      "anomaly_type": "verified_complaint_supported",
+      "title": "玩家投诉被数据支持: 玩家 player_0012",
+      "description": "玩家 player_0012 投诉道具 item_ssr 掉率低，数据显示该道具实际掉率 0.4310%，低于配置 0.7576%，偏差 -43.11%。玩家声称 500 次抽取仅获得 0 次。",
+      "reason_analysis": "投诉与数据一致，说明确实可能存在掉率问题。需要进一步确认是配置问题、活动问题还是随机波动。",
+      "suggestion": "建议：\n1. 检查该道具的实际配置\n2. 确认活动加成是否正确\n3. 考虑对受影响玩家进行补偿\n4. 向玩家反馈调查结果",
+      "pool_id": "pool_gacha",
+      "item_id": "item_ssr",
+      "player_id": "player_0012",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/complaint_records.csv",
+      "source_row": 2,
+      "object_id": "cmp_001",
+      "related_data": {
+        "complaint_content": "抽了500次都没出SSR，掉率肯定有问题！",
+        "total_attempts": 500,
+        "actual_drop_count": 0,
+        "deviation_percent": -43.10798946444249,
+        "is_significant": true
+      },
+      "detected_time": "2026-05-30T20:56:54.278069"
+    }
+  ],
+  "anomaly_summary": {
+    "total": 28,
+    "critical": 4,
+    "warning": 5,
+    "info": 19
+  },
+  "data_sources": [
+    {
+      "source_id": "ae24684f-8a85-4c73-a069-147e89944105",
+      "source_type": "drop_config",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "file_name": "drop_config.csv",
+      "sheet_name": null,
+      "version": "1.0",
+      "import_time": "2026-05-30T20:56:51.123680",
+      "is_active": true,
+      "import_notes": "正式版掉落配置",
+      "original_row_count": 11,
+      "imported_row_count": 11,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "pool_id",
+          "pool_name",
+          "item_id",
+          "item_name",
+          "probability",
+          "weight",
+          "min_count",
+          "max_count"
+        ],
+        "skipped_reasons": []
+      }
+    },
+    {
+      "source_id": "e08a8d67-a4cb-42e7-9dc4-dee130358c45",
+      "source_type": "drop_config",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config_old_v0.9.csv",
+      "file_name": "drop_config_old_v0.9.csv",
+      "sheet_name": null,
+      "version": "0.9",
+      "import_time": "2026-05-30T20:56:51.126622",
+      "is_active": false,
+      "import_notes": "旧版配置，已停用，仅保留用于对比",
+      "original_row_count": 4,
+      "imported_row_count": 4,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "pool_id",
+          "pool_name",
+          "item_id",
+          "item_name",
+          "probability",
+          "weight",
+          "min_count",
+          "max_count"
+        ],
+        "skipped_reasons": []
+      }
+    },
+    {
+      "source_id": "66b4f692-1461-48f4-b246-d56c775e990e",
+      "source_type": "item_pool",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/item_pool.csv",
+      "file_name": "item_pool.csv",
+      "sheet_name": null,
+      "version": "1.0",
+      "import_time": "2026-05-30T20:56:51.136049",
+      "is_active": true,
+      "import_notes": "",
+      "original_row_count": 2,
+      "imported_row_count": 2,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "pool_id",
+          "pool_name",
+          "description",
+          "pool_type",
+          "total_weight",
+          "item_count"
+        ],
+        "skipped_reasons": []
+      }
+    },
+    {
+      "source_id": "b3878528-0585-4b5d-afb5-3632b8e95ace",
+      "source_type": "activity_period",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv",
+      "file_name": "activity_period.csv",
+      "sheet_name": null,
+      "version": "1.0",
+      "import_time": "2026-05-30T20:56:51.138490",
+      "is_active": true,
+      "import_notes": "",
+      "original_row_count": 3,
+      "imported_row_count": 3,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "activity_id",
+          "activity_name",
+          "start_time",
+          "end_time",
+          "pool_id",
+          "item_id",
+          "drop_rate_multiplier",
+          "guaranteed_drop_count"
+        ],
+        "skipped_reasons": []
+      }
+    },
+    {
+      "source_id": "bacf36de-be09-4c57-8446-1eebc6f03ac1",
+      "source_type": "player_log",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "file_name": "player_logs.csv",
+      "sheet_name": null,
+      "version": "1.0",
+      "import_time": "2026-05-30T20:56:51.140015",
+      "is_active": true,
+      "import_notes": "2026年5月1日-5月20日玩家掉落日志",
+      "original_row_count": 25163,
+      "imported_row_count": 25163,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "player_id",
+          "pool_id",
+          "item_id",
+          "item_name",
+          "drop_count",
+          "drop_time",
+          "server_id",
+          "channel"
+        ],
+        "skipped_reasons": []
+      }
+    },
+    {
+      "source_id": "99ad65d1-b920-441b-b112-610011660e01",
+      "source_type": "complaint_record",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/complaint_records.csv",
+      "file_name": "complaint_records.csv",
+      "sheet_name": null,
+      "version": "1.0",
+      "import_time": "2026-05-30T20:56:53.410738",
+      "is_active": true,
+      "import_notes": "",
+      "original_row_count": 3,
+      "imported_row_count": 3,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "complaint_id",
+          "player_id",
+          "pool_id",
+          "item_id",
+          "complaint_time",
+          "complaint_content",
+          "expected_probability",
+          "actual_drop_count",
+          "total_attempts",
+          "is_verified",
+          "verification_result"
+        ],
+        "skipped_reasons": []
+      }
+    }
+  ]
+}

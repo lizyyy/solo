@@ -1,0 +1,12 @@
+﻿pool_id,pool_name,item_id,item_name,probability,weight,min_count,max_count
+pool_gacha,抽卡池,item_sr,SR级装备,0.05,50,1,1
+pool_gacha,抽卡池,item_ssr,SSR级装备,0.01,10,1,1
+pool_gacha,抽卡池,item_r,R级装备,0.4,400,1,1
+pool_gacha,抽卡池,item_n,N级装备,0.5,500,1,1
+pool_gacha,抽卡池,item_ur,UR级装备,0.02,20,1,1
+pool_dungeon,副本掉落池,item_gold,金币,0.3,300,100,500
+pool_dungeon,副本掉落池,item_exp,经验药水,0.25,250,1,3
+pool_dungeon,副本掉落池,item_mat_common,普通材料,0.25,250,1,5
+pool_dungeon,副本掉落池,item_mat_rare,稀有材料,0.1,100,1,1
+pool_dungeon,副本掉落池,item_mat_epic,史诗材料,0.08,80,1,1
+pool_dungeon,副本掉落池,item_weapon,专属武器,0.015,15,1,1

@@ -1,0 +1,4 @@
+﻿pool_id,item_id,item_name,probability
+pool_gacha,,缺少item_id,0.05
+,item_test,缺少pool_id,0.05
+pool_gacha,item_test2,概率格式错误,不是数字

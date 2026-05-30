@@ -1,0 +1,4 @@
+﻿complaint_id,player_id,pool_id,item_id,complaint_time,complaint_content,expected_probability,actual_drop_count,total_attempts,is_verified,verification_result
+cmp_001,player_0012,pool_gacha,item_ssr,2026-05-05 14:30:00,抽了500次都没出SSR，掉率肯定有问题！,0.01,0,500,True,已核实，玩家确实500抽未获得SSR
+cmp_002,player_0045,pool_gacha,item_ur,2026-05-08 09:15:00,活动结束前UR掉率明显降低，暗改实锤！,0.02,0,200,True,已核实，活动结束后概率恢复正常
+cmp_003,player_0078,pool_dungeon,item_weapon,2026-05-15 18:45:00,刷了一个月副本都没出专属武器，这合理吗？,0.015,0,300,False,

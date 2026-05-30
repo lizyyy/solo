@@ -1,0 +1,636 @@
+{
+  "report_info": {
+    "generated_at": "2026-05-30T20:51:40.986919",
+    "filter_hash": "fd8de0e618b67005008000de485eba19",
+    "version": "1.0"
+  },
+  "summary": {
+    "total_pools": 0,
+    "total_items": 0,
+    "critical_items": 0,
+    "warning_items": 0,
+    "normal_items": 0,
+    "significant_items": 0,
+    "average_abs_deviation_percent": 0,
+    "total_attempts": 25113,
+    "significance_level": 0.05,
+    "confidence_level": 0.95,
+    "deviation_warning_threshold": 0.1,
+    "deviation_critical_threshold": 0.3,
+    "generated_at": "2026-05-30T20:51:40.870368",
+    "filter_hash": "fd8de0e618b67005008000de485eba19"
+  },
+  "params": {
+    "params_id": "86a82874-7afc-48cb-9726-0b4f2fb37fba",
+    "created_time": "2026-05-30T20:51:38.382610",
+    "start_time": "2026-05-01T00:00:00",
+    "end_time": "2026-05-20T23:59:59",
+    "pool_ids": [],
+    "item_ids": [],
+    "player_ids": [],
+    "server_ids": [],
+    "channels": [],
+    "activity_ids": [],
+    "deduplicate_enabled": true,
+    "deduplicate_keys": [
+      "player_id",
+      "pool_id",
+      "item_id",
+      "drop_time"
+    ],
+    "activity_bonus_enabled": true,
+    "probability_normalization_enabled": true,
+    "confidence_level": 0.95,
+    "min_sample_size": 30,
+    "max_sample_size": null,
+    "test_method": "chi_square",
+    "significance_level": 0.05,
+    "deviation_warning_threshold": 0.1,
+    "deviation_critical_threshold": 0.3,
+    "group_by": [
+      "pool_id"
+    ],
+    "notes": "五一活动期间掉落概率校准"
+  },
+  "probability_comparison": [],
+  "anomalies": [
+    {
+      "anomaly_id": "ANOM_20260530_0001",
+      "level": "warning",
+      "anomaly_type": "duplicate_samples",
+      "title": "发现 50 条重复记录",
+      "description": "总记录数 25163 条，检测到重复记录 50 条，唯一记录 25113 条。去重键：player_id, pool_id, item_id, drop_time",
+      "reason_analysis": "样本重复可能的原因：\n1. 日志重复上报（玩家网络重连导致）\n2. 数据导入时重复导入了相同文件\n3. 日志文件本身包含重复条目\n4. 去重键可能不够精确（例如时间精度问题）",
+      "suggestion": "已自动标记重复记录并在后续统计中排除。建议：\n1. 检查数据源是否存在重复导入\n2. 如果是日志系统问题，联系开发排查上报逻辑\n3. 确认去重键是否合理，必要时调整",
+      "pool_id": null,
+      "item_id": null,
+      "player_id": null,
+      "source_file": null,
+      "source_row": null,
+      "object_id": null,
+      "related_data": {
+        "total_records": 25163,
+        "duplicate_count": 50,
+        "unique_count": 25113,
+        "duplicate_keys": [
+          "player_id",
+          "pool_id",
+          "item_id",
+          "drop_time"
+        ],
+        "duplicate_groups_count": 50
+      },
+      "detected_time": "2026-05-30T20:51:40.870403"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0002",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0003",
+      "description": "玩家 player_0003 在 2026-05-03 12:48:07 从池子 pool_dungeon 获得道具 item_gold 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_gold",
+      "player_id": "player_0003",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 752,
+      "object_id": "c6f13f8d-c96b-429e-8396-fe69243e0c28",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "3c228d84-c1d7-4726-b6e8-20beb50f2803"
+        ]
+      },
+      "detected_time": "2026-05-30T20:51:40.870477"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0003",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0004",
+      "description": "玩家 player_0004 在 2026-05-08 09:18:57 从池子 pool_gacha 获得道具 item_ur 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_ur",
+      "player_id": "player_0004",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 1076,
+      "object_id": "5c983249-e6a8-4c29-914a-f314d821b33f",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "2c54cd91-f4a6-4de1-a6f0-e15ceaa81e6d"
+        ]
+      },
+      "detected_time": "2026-05-30T20:51:40.870534"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0004",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0005",
+      "description": "玩家 player_0005 在 2026-05-10 18:35:20 从池子 pool_dungeon 获得道具 item_gold 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_gold",
+      "player_id": "player_0005",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 1328,
+      "object_id": "8c9da3b5-358a-447e-8b99-6d991b92378d",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "2bc4b848-c780-4706-b9d1-ad5db8cb5467"
+        ]
+      },
+      "detected_time": "2026-05-30T20:51:40.870582"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0005",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0006",
+      "description": "玩家 player_0006 在 2026-05-01 22:57:55 从池子 pool_dungeon 获得道具 item_gold 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_gold",
+      "player_id": "player_0006",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 1464,
+      "object_id": "ac72867a-12df-4531-a826-68e9649b2e05",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "45eec9e8-c677-4679-b9f9-2e37186d5a04"
+        ]
+      },
+      "detected_time": "2026-05-30T20:51:40.870628"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0006",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0007",
+      "description": "玩家 player_0007 在 2026-05-06 11:50:07 从池子 pool_gacha 获得道具 item_r 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_r",
+      "player_id": "player_0007",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 1768,
+      "object_id": "45af257b-89c8-42b9-a3a5-8a8f7d6dd4ba",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "23290e51-207b-441d-8d74-bb540623fb04"
+        ]
+      },
+      "detected_time": "2026-05-30T20:51:40.870684"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0007",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0012",
+      "description": "玩家 player_0012 在 2026-05-07 16:57:39 从池子 pool_dungeon 获得道具 item_mat_common 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_dungeon",
+      "item_id": "item_mat_common",
+      "player_id": "player_0012",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 2974,
+      "object_id": "906412b1-e03b-4ac0-a6f1-94cdb7134544",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "ea92d757-4619-4e94-9f2c-a10c01cf3f1c"
+        ]
+      },
+      "detected_time": "2026-05-30T20:51:40.870795"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0008",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0016",
+      "description": "玩家 player_0016 在 2026-05-14 08:55:50 从池子 pool_gacha 获得道具 item_n 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_n",
+      "player_id": "player_0016",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 4101,
+      "object_id": "42cf8c36-a863-4061-b0a6-82732064ad38",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "c5b52969-b400-4e2b-8ad1-8e026b4fe86b"
+        ]
+      },
+      "detected_time": "2026-05-30T20:51:40.870930"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0009",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0017",
+      "description": "玩家 player_0017 在 2026-05-18 18:52:52 从池子 pool_gacha 获得道具 item_n 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_n",
+      "player_id": "player_0017",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 4409,
+      "object_id": "38737445-3c82-43c6-bd90-3d97c9545d29",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "4d4beb4b-af85-4a5e-bc2b-e5fa6b6cc1e9"
+        ]
+      },
+      "detected_time": "2026-05-30T20:51:40.871065"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0010",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0017",
+      "description": "玩家 player_0017 在 2026-05-19 09:46:23 从池子 pool_gacha 获得道具 item_r 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_r",
+      "player_id": "player_0017",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 4414,
+      "object_id": "148ea89c-a5cb-4c1d-b916-d0804abb3746",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "91e7befa-7687-4928-b569-af25b7fc0619"
+        ]
+      },
+      "detected_time": "2026-05-30T20:51:40.871176"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0011",
+      "level": "info",
+      "anomaly_type": "duplicate_sample_detail",
+      "title": "重复记录示例: 玩家 player_0019",
+      "description": "玩家 player_0019 在 2026-05-19 22:43:24 从池子 pool_gacha 获得道具 item_r 的记录重复了 1 次",
+      "reason_analysis": "单条重复记录，属于上述重复样本问题的具体案例",
+      "suggestion": "已自动排除重复记录，如无其他问题可忽略",
+      "pool_id": "pool_gacha",
+      "item_id": "item_r",
+      "player_id": "player_0019",
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "source_row": 4950,
+      "object_id": "c126c08c-628d-44f4-aa0f-47ea1a05bbe6",
+      "related_data": {
+        "duplicate_count": 1,
+        "duplicate_log_ids": [
+          "1146c3bc-605e-4aaf-b2c9-1f2739baa43f"
+        ]
+      },
+      "detected_time": "2026-05-30T20:51:40.871315"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0012",
+      "level": "info",
+      "anomaly_type": "activity_applied",
+      "title": "活动 五一庆典活动 已应用",
+      "description": "活动 五一庆典活动 (act_001) 倍率 2.0x，影响了 4413 条掉落记录。活动时间：2026-05-01 00:00:00 ~ 2026-05-08 00:00:00",
+      "reason_analysis": "正常的活动加成应用",
+      "suggestion": "在计算期望概率时已考虑此活动加成",
+      "pool_id": null,
+      "item_id": null,
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv",
+      "source_row": 2,
+      "object_id": "act_001",
+      "related_data": {
+        "multiplier": 2.0,
+        "affected_records": 4413,
+        "start_time": "2026-05-01T00:00:00",
+        "end_time": "2026-05-08T00:00:00"
+      },
+      "detected_time": "2026-05-30T20:51:40.871333"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0013",
+      "level": "info",
+      "anomaly_type": "activity_applied",
+      "title": "活动 周末双倍掉落 已应用",
+      "description": "活动 周末双倍掉落 (act_003) 倍率 2.0x，影响了 1312 条掉落记录。活动时间：2026-05-15 00:00:00 ~ 2026-05-17 00:00:00",
+      "reason_analysis": "正常的活动加成应用",
+      "suggestion": "在计算期望概率时已考虑此活动加成",
+      "pool_id": null,
+      "item_id": null,
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv",
+      "source_row": 4,
+      "object_id": "act_003",
+      "related_data": {
+        "multiplier": 2.0,
+        "affected_records": 1312,
+        "start_time": "2026-05-15T00:00:00",
+        "end_time": "2026-05-17T00:00:00"
+      },
+      "detected_time": "2026-05-30T20:51:40.871341"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0014",
+      "level": "info",
+      "anomaly_type": "activity_applied",
+      "title": "活动 SSR概率UP 已应用",
+      "description": "活动 SSR概率UP (act_002) 倍率 3.0x，影响了 13 条掉落记录。活动时间：2026-05-03 00:00:00 ~ 2026-05-05 00:00:00",
+      "reason_analysis": "正常的活动加成应用",
+      "suggestion": "在计算期望概率时已考虑此活动加成",
+      "pool_id": null,
+      "item_id": null,
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv",
+      "source_row": 3,
+      "object_id": "act_002",
+      "related_data": {
+        "multiplier": 3.0,
+        "affected_records": 13,
+        "start_time": "2026-05-03T00:00:00",
+        "end_time": "2026-05-05T00:00:00"
+      },
+      "detected_time": "2026-05-30T20:51:40.871347"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0015",
+      "level": "critical",
+      "anomaly_type": "probability_not_normalized",
+      "title": "道具池 pool_gacha 概率未归一化",
+      "description": "道具池 pool_gacha 包含 9 个道具，原始概率总和为 1980.000000，与1的偏差为 1979.000000，已自动归一化。",
+      "reason_analysis": "概率不归一的可能原因：\n1. 配置时计算错误，各道具概率相加不等于1\n2. 使用权重配置但未正确转换为概率\n3. 新增或删除道具后未重新计算概率\n4. 使用百分比配置时忘记除以100\n5. 四舍五入累积误差",
+      "suggestion": "已自动归一化，后续计算将使用归一化后的概率。建议：\n1. 检查配置表中各道具概率之和\n2. 确认是否使用权重而非直接概率配置\n3. 如有新增道具，确认是否更新了所有相关概率\n4. 检查是否存在百分比与小数混用的情况",
+      "pool_id": "pool_gacha",
+      "item_id": null,
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "source_row": null,
+      "object_id": null,
+      "related_data": {
+        "item_count": 9,
+        "original_total": 1980.0,
+        "diff_from_one": 1979.0,
+        "original_probabilities": {
+          "item_sr": 60.0,
+          "item_ssr": 15.0,
+          "item_r": 420.0,
+          "item_n": 505.0,
+          "item_ur": 20.0
+        },
+        "normalized_probabilities": {
+          "item_sr": 0.030303030303030304,
+          "item_ssr": 0.007575757575757576,
+          "item_r": 0.21212121212121213,
+          "item_n": 0.255050505050505,
+          "item_ur": 0.010101010101010102
+        }
+      },
+      "detected_time": "2026-05-30T20:51:40.871359"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0016",
+      "level": "critical",
+      "anomaly_type": "probability_not_normalized",
+      "title": "道具池 pool_dungeon 概率未归一化",
+      "description": "道具池 pool_dungeon 包含 6 个道具，原始概率总和为 995.000000，与1的偏差为 994.000000，已自动归一化。",
+      "reason_analysis": "概率不归一的可能原因：\n1. 配置时计算错误，各道具概率相加不等于1\n2. 使用权重配置但未正确转换为概率\n3. 新增或删除道具后未重新计算概率\n4. 使用百分比配置时忘记除以100\n5. 四舍五入累积误差",
+      "suggestion": "已自动归一化，后续计算将使用归一化后的概率。建议：\n1. 检查配置表中各道具概率之和\n2. 确认是否使用权重而非直接概率配置\n3. 如有新增道具，确认是否更新了所有相关概率\n4. 检查是否存在百分比与小数混用的情况",
+      "pool_id": "pool_dungeon",
+      "item_id": null,
+      "player_id": null,
+      "source_file": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "source_row": null,
+      "object_id": null,
+      "related_data": {
+        "item_count": 6,
+        "original_total": 995.0,
+        "diff_from_one": 994.0,
+        "original_probabilities": {
+          "item_gold": 300.0,
+          "item_exp": 250.0,
+          "item_mat_common": 250.0,
+          "item_mat_rare": 100.0,
+          "item_mat_epic": 80.0,
+          "item_weapon": 15.0
+        },
+        "normalized_probabilities": {
+          "item_gold": 0.3015075376884422,
+          "item_exp": 0.25125628140703515,
+          "item_mat_common": 0.25125628140703515,
+          "item_mat_rare": 0.10050251256281408,
+          "item_mat_epic": 0.08040201005025126,
+          "item_weapon": 0.01507537688442211
+        }
+      },
+      "detected_time": "2026-05-30T20:51:40.871365"
+    },
+    {
+      "anomaly_id": "ANOM_20260530_0017",
+      "level": "info",
+      "anomaly_type": "complaint_summary",
+      "title": "投诉记录汇总",
+      "description": "共有 3 条投诉记录，其中已核实 2 条，未核实 1 条。",
+      "reason_analysis": "投诉记录反映了玩家的主观感受，需要结合客观数据验证。",
+      "suggestion": "重点关注已核实且数据支持的投诉案例。",
+      "pool_id": null,
+      "item_id": null,
+      "player_id": null,
+      "source_file": null,
+      "source_row": null,
+      "object_id": null,
+      "related_data": {
+        "total_complaints": 3,
+        "verified_count": 2,
+        "unverified_count": 1
+      },
+      "detected_time": "2026-05-30T20:51:40.871374"
+    }
+  ],
+  "anomaly_summary": {
+    "total": 17,
+    "critical": 2,
+    "warning": 1,
+    "info": 14
+  },
+  "data_sources": [
+    {
+      "source_id": "1ccf5dcf-178e-479a-aef0-881d9063986f",
+      "source_type": "drop_config",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv",
+      "file_name": "drop_config.csv",
+      "sheet_name": null,
+      "version": "1.0",
+      "import_time": "2026-05-30T20:51:38.382757",
+      "is_active": true,
+      "import_notes": "正式版掉落配置",
+      "original_row_count": 11,
+      "imported_row_count": 11,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "pool_id",
+          "pool_name",
+          "item_id",
+          "item_name",
+          "probability",
+          "weight",
+          "min_count",
+          "max_count"
+        ],
+        "skipped_reasons": []
+      }
+    },
+    {
+      "source_id": "81614e7f-eaaa-43d7-9b76-42df708e53a4",
+      "source_type": "drop_config",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config_old_v0.9.csv",
+      "file_name": "drop_config_old_v0.9.csv",
+      "sheet_name": null,
+      "version": "0.9",
+      "import_time": "2026-05-30T20:51:38.386707",
+      "is_active": false,
+      "import_notes": "旧版配置，已停用，仅保留用于对比",
+      "original_row_count": 4,
+      "imported_row_count": 4,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "pool_id",
+          "pool_name",
+          "item_id",
+          "item_name",
+          "probability",
+          "weight",
+          "min_count",
+          "max_count"
+        ],
+        "skipped_reasons": []
+      }
+    },
+    {
+      "source_id": "d07af1c3-8e4c-4ce8-8b5c-a52dace37127",
+      "source_type": "item_pool",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/item_pool.csv",
+      "file_name": "item_pool.csv",
+      "sheet_name": null,
+      "version": "1.0",
+      "import_time": "2026-05-30T20:51:38.387579",
+      "is_active": true,
+      "import_notes": "",
+      "original_row_count": 2,
+      "imported_row_count": 2,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "pool_id",
+          "pool_name",
+          "description",
+          "pool_type",
+          "total_weight",
+          "item_count"
+        ],
+        "skipped_reasons": []
+      }
+    },
+    {
+      "source_id": "9e212b6f-edec-404d-8443-ddb8f9679391",
+      "source_type": "activity_period",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv",
+      "file_name": "activity_period.csv",
+      "sheet_name": null,
+      "version": "1.0",
+      "import_time": "2026-05-30T20:51:38.388405",
+      "is_active": true,
+      "import_notes": "",
+      "original_row_count": 3,
+      "imported_row_count": 3,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "activity_id",
+          "activity_name",
+          "start_time",
+          "end_time",
+          "pool_id",
+          "item_id",
+          "drop_rate_multiplier",
+          "guaranteed_drop_count"
+        ],
+        "skipped_reasons": []
+      }
+    },
+    {
+      "source_id": "10e29e4e-2654-4500-bfe9-86a2cb883f6c",
+      "source_type": "player_log",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv",
+      "file_name": "player_logs.csv",
+      "sheet_name": null,
+      "version": "1.0",
+      "import_time": "2026-05-30T20:51:38.389443",
+      "is_active": true,
+      "import_notes": "2026年5月1日-5月20日玩家掉落日志",
+      "original_row_count": 25163,
+      "imported_row_count": 25163,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "player_id",
+          "pool_id",
+          "item_id",
+          "item_name",
+          "drop_count",
+          "drop_time",
+          "server_id",
+          "channel"
+        ],
+        "skipped_reasons": []
+      }
+    },
+    {
+      "source_id": "6944966c-666f-468c-bff4-ee3396f7b2f1",
+      "source_type": "complaint_record",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/complaint_records.csv",
+      "file_name": "complaint_records.csv",
+      "sheet_name": null,
+      "version": "1.0",
+      "import_time": "2026-05-30T20:51:39.870985",
+      "is_active": true,
+      "import_notes": "",
+      "original_row_count": 3,
+      "imported_row_count": 3,
+      "skipped_row_count": 0,
+      "metadata": {
+        "columns": [
+          "complaint_id",
+          "player_id",
+          "pool_id",
+          "item_id",
+          "complaint_time",
+          "complaint_content",
+          "expected_probability",
+          "actual_drop_count",
+          "total_attempts",
+          "is_verified",
+          "verification_result"
+        ],
+        "skipped_reasons": []
+      }
+    }
+  ]
+}

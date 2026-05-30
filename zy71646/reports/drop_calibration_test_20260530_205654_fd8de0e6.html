@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏掉落概率校准报告</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f8fafc; color: #1e293b; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #1e293b; border-bottom: 3px solid #3b82f6; padding-bottom: 10px; }
+        h2 { color: #334155; margin-top: 30px; border-left: 4px solid #3b82f6; padding-left: 10px; }
+        h3 { color: #475569; }
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .card-value { font-size: 28px; font-weight: bold; color: #3b82f6; }
+        .card-label { color: #64748b; font-size: 14px; }
+        .critical .card-value { color: #dc2626; }
+        .warning .card-value { color: #f59e0b; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f1f5f9; font-weight: 600; color: #475569; }
+        tr:hover { background: #f8fafc; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-critical { background: #fef2f2; color: #dc2626; }
+        .status-warning { background: #fefce8; color: #f59e0b; }
+        .status-normal { background: #f0fdf4; color: #16a34a; }
+        .anomaly-item { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #ccc; }
+        .anomaly-critical { border-left-color: #dc2626; }
+        .anomaly-warning { border-left-color: #f59e0b; }
+        .anomaly-info { border-left-color: #3b82f6; }
+        .anomaly-title { font-weight: 600; margin-bottom: 8px; }
+        .anomaly-desc { color: #475569; margin-bottom: 8px; white-space: pre-line; }
+        .anomaly-meta { font-size: 12px; color: #64748b; }
+        .params-section { background: #f8fafc; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; overflow-x: auto; }
+        .source-item { background: white; padding: 12px; margin: 8px 0; border-radius: 6px; border-left: 3px solid #94a3b8; }
+        .deviation-positive { color: #16a34a; }
+        .deviation-negative { color: #dc2626; }
+        .filter-hash { background: #1e293b; color: #e2e8f0; padding: 8px 12px; border-radius: 4px; font-family: monospace; display: inline-block; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 游戏掉落概率校准报告</h1>
+        <p>生成时间: 2026-05-30 20:56:54</p>
+        <p>筛选条件哈希 (用于复现): <span class="filter-hash">fd8de0e618b67005008000de485eba19</span></p>
+
+        <h2>📊 概览摘要</h2>
+        <div class="summary-cards">
+            <div class="card"><div class="card-value">2</div><div class="card-label">道具池数量</div></div>
+            <div class="card"><div class="card-value">15</div><div class="card-label">道具总数</div></div>
+            <div class="card"><div class="card-value">25,113</div><div class="card-label">总抽取次数</div></div>
+            <div class="card critical"><div class="card-value">5</div><div class="card-label">严重异常道具</div></div>
+            <div class="card warning"><div class="card-value">2</div><div class="card-label">警告道具</div></div>
+            <div class="card"><div class="card-value">11</div><div class="card-label">统计显著道具</div></div>
+            <div class="card"><div class="card-value">35.5%</div><div class="card-label">平均绝对偏差</div></div>
+        </div>
+
+        <h2>⚠️ 异常检测 (28 个)</h2>
+        <div class="summary-cards">
+            <div class="card critical"><div class="card-value">4</div><div class="card-label">严重异常</div></div>
+            <div class="card warning"><div class="card-value">5</div><div class="card-label">警告</div></div>
+            <div class="card"><div class="card-value">19</div><div class="card-label">提示信息</div></div>
+        </div>
+
+        <div class="anomaly-item anomaly-critical">
+            <div class="anomaly-title">[CRITICAL] 道具池 pool_gacha 概率未归一化</div>
+            <div class="anomaly-desc">道具池 pool_gacha 包含 9 个道具，原始概率总和为 1.980000，与1的偏差为 0.980000，已自动归一化。</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>概率不归一的可能原因：
+1. 配置时计算错误，各道具概率相加不等于1
+2. 使用权重配置但未正确转换为概率
+3. 新增或删除道具后未重新计算概率
+4. 使用百分比配置时忘记除以100
+5. 四舍五入累积误差</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动归一化，后续计算将使用归一化后的概率。建议：
+1. 检查配置表中各道具概率之和
+2. 确认是否使用权重而非直接概率配置
+3. 如有新增道具，确认是否更新了所有相关概率
+4. 检查是否存在百分比与小数混用的情况</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0015 |
+                类型: probability_not_normalized |
+                池子: pool_gacha
+                
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv
+                
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-critical">
+            <div class="anomaly-title">[CRITICAL] 发现 7 个道具存在统计显著偏离</div>
+            <div class="anomaly-desc">在显著性水平 0.05 下，共有 7 个道具的实际掉落概率与配置概率存在统计显著差异。</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>统计显著偏离意味着观察到的差异不太可能是随机波动造成的，可能的原因：
+1. 实际掉落配置与文档配置不一致
+2. 存在未记录的热更新或临时调整
+3. 活动加成计算有误
+4. 样本存在偏差（如只统计了特定玩家群体）
+5. 随机数生成器存在问题</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>请重点关注这些道具，检查：
+1. 实际配置的概率值
+2. 是否有临时调整未同步到配置文件
+3. 活动加成是否正确应用
+4. 抽样方法是否存在偏差</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0017 |
+                类型: significant_deviation_overall |
+                
+                
+                
+                
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-critical">
+            <div class="anomaly-title">[CRITICAL] 道具 SR级装备 掉落显著偏高</div>
+            <div class="anomaly-desc">道具 SR级装备 (item_sr) 在池子 pool_gacha 中：
+  配置概率: 3.0303%
+  实际概率: 7.1275%
+  偏离值: +4.0972pp (+135.21%)
+  P值: 0.000000 (小于 0.05，统计显著)
+  样本量: 12529 次抽取，掉落 893 次
+  置信区间: [6.6900%, 7.5912%]</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>实际掉率严重偏高（+135.2%），可能配置错误或存在未记录的活动
+统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大
+样本量充足（12529 次），检验结果可靠
+
+可能的具体原因：
+  - 配置概率填错（多写了一个零）
+  - 存在未记录的活动加成
+  - 该道具被临时调高概率
+  - 权重计算错误
+  - 随机数生成器存在偏向性
+  - 样本存在选择性偏差</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>即时检查：
+  1. 查看实际配置文件中 SR级装备 的概率值
+  2. 检查该道具池是否有未记录的热更新
+  3. 确认相关活动配置是否正确
+  4. 核对配置的单位（百分比 vs 小数）
+
+紧急处理：
+  - 如果确认配置错误，立即修正
+  - 评估对经济系统和玩家体验的影响
+  - 考虑对受影响玩家进行补偿或回收
+  - 发布公告说明情况
+
+后续预防：
+  - 建立配置发布前的自动校验机制
+  - 定期运行此校准脚本监控掉率
+  - 设置告警阈值，偏差过大时自动通知
+  - 保留所有配置变更历史，便于回溯</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0018 |
+                类型: significant_deviation_item |
+                池子: pool_gacha
+                道具: item_sr
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv
+                行号: 2
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-critical">
+            <div class="anomaly-title">[CRITICAL] 道具 UR级装备 掉落显著偏高</div>
+            <div class="anomaly-desc">道具 UR级装备 (item_ur) 在池子 pool_gacha 中：
+  配置概率: 1.0101%
+  实际概率: 2.6339%
+  偏离值: +1.6238pp (+160.76%)
+  P值: 0.000000 (小于 0.05，统计显著)
+  样本量: 12529 次抽取，掉落 330 次
+  置信区间: [2.3677%, 2.9291%]</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>实际掉率严重偏高（+160.8%），可能配置错误或存在未记录的活动
+统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大
+样本量充足（12529 次），检验结果可靠
+
+可能的具体原因：
+  - 配置概率填错（多写了一个零）
+  - 存在未记录的活动加成
+  - 该道具被临时调高概率
+  - 权重计算错误
+  - 随机数生成器存在偏向性
+  - 样本存在选择性偏差</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>即时检查：
+  1. 查看实际配置文件中 UR级装备 的概率值
+  2. 检查该道具池是否有未记录的热更新
+  3. 确认相关活动配置是否正确
+  4. 核对配置的单位（百分比 vs 小数）
+
+紧急处理：
+  - 如果确认配置错误，立即修正
+  - 评估对经济系统和玩家体验的影响
+  - 考虑对受影响玩家进行补偿或回收
+  - 发布公告说明情况
+
+后续预防：
+  - 建立配置发布前的自动校验机制
+  - 定期运行此校准脚本监控掉率
+  - 设置告警阈值，偏差过大时自动通知
+  - 保留所有配置变更历史，便于回溯</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0022 |
+                类型: significant_deviation_item |
+                池子: pool_gacha
+                道具: item_ur
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv
+                行号: 6
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-warning">
+            <div class="anomaly-title">[WARNING] 发现 50 条重复记录</div>
+            <div class="anomaly-desc">总记录数 25163 条，检测到重复记录 50 条，唯一记录 25113 条。去重键：player_id, pool_id, item_id, drop_time</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>样本重复可能的原因：
+1. 日志重复上报（玩家网络重连导致）
+2. 数据导入时重复导入了相同文件
+3. 日志文件本身包含重复条目
+4. 去重键可能不够精确（例如时间精度问题）</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动标记重复记录并在后续统计中排除。建议：
+1. 检查数据源是否存在重复导入
+2. 如果是日志系统问题，联系开发排查上报逻辑
+3. 确认去重键是否合理，必要时调整</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0001 |
+                类型: duplicate_samples |
+                
+                
+                
+                
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-warning">
+            <div class="anomaly-title">[WARNING] 道具池 pool_dungeon 概率未归一化</div>
+            <div class="anomaly-desc">道具池 pool_dungeon 包含 6 个道具，原始概率总和为 0.995000，与1的偏差为 0.005000，已自动归一化。</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>概率不归一的可能原因：
+1. 配置时计算错误，各道具概率相加不等于1
+2. 使用权重配置但未正确转换为概率
+3. 新增或删除道具后未重新计算概率
+4. 使用百分比配置时忘记除以100
+5. 四舍五入累积误差</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动归一化，后续计算将使用归一化后的概率。建议：
+1. 检查配置表中各道具概率之和
+2. 确认是否使用权重而非直接概率配置
+3. 如有新增道具，确认是否更新了所有相关概率
+4. 检查是否存在百分比与小数混用的情况</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0016 |
+                类型: probability_not_normalized |
+                池子: pool_dungeon
+                
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv
+                
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-warning">
+            <div class="anomaly-title">[WARNING] 道具 R级装备 掉落显著偏高</div>
+            <div class="anomaly-desc">道具 R级装备 (item_r) 在池子 pool_gacha 中：
+  配置概率: 21.2121%
+  实际概率: 40.5220%
+  偏离值: +19.3099pp (+91.03%)
+  P值: 0.000000 (小于 0.05，统计显著)
+  样本量: 12529 次抽取，掉落 5077 次
+  置信区间: [39.6654%, 41.3844%]</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>实际掉率严重偏高（+91.0%），可能配置错误或存在未记录的活动
+统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大
+样本量充足（12529 次），检验结果可靠
+
+可能的具体原因：
+  - 配置概率填错（多写了一个零）
+  - 存在未记录的活动加成
+  - 该道具被临时调高概率
+  - 权重计算错误
+  - 随机数生成器存在偏向性
+  - 样本存在选择性偏差</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>即时检查：
+  1. 查看实际配置文件中 R级装备 的概率值
+  2. 检查该道具池是否有未记录的热更新
+  3. 确认相关活动配置是否正确
+  4. 核对配置的单位（百分比 vs 小数）
+
+紧急处理：
+  - 如果确认配置错误，立即修正
+  - 评估对经济系统和玩家体验的影响
+  - 考虑对受影响玩家进行补偿或回收
+  - 发布公告说明情况
+
+后续预防：
+  - 建立配置发布前的自动校验机制
+  - 定期运行此校准脚本监控掉率
+  - 设置告警阈值，偏差过大时自动通知
+  - 保留所有配置变更历史，便于回溯</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0020 |
+                类型: significant_deviation_item |
+                池子: pool_gacha
+                道具: item_r
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv
+                行号: 4
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-warning">
+            <div class="anomaly-title">[WARNING] 道具 N级装备 掉落显著偏高</div>
+            <div class="anomaly-desc">道具 N级装备 (item_n) 在池子 pool_gacha 中：
+  配置概率: 25.5051%
+  实际概率: 49.2857%
+  偏离值: +23.7806pp (+93.24%)
+  P值: 0.000000 (小于 0.05，统计显著)
+  样本量: 12529 次抽取，掉落 6175 次
+  置信区间: [48.4106%, 50.1612%]</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>实际掉率严重偏高（+93.2%），可能配置错误或存在未记录的活动
+统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大
+样本量充足（12529 次），检验结果可靠
+
+可能的具体原因：
+  - 配置概率填错（多写了一个零）
+  - 存在未记录的活动加成
+  - 该道具被临时调高概率
+  - 权重计算错误
+  - 随机数生成器存在偏向性
+  - 样本存在选择性偏差</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>即时检查：
+  1. 查看实际配置文件中 N级装备 的概率值
+  2. 检查该道具池是否有未记录的热更新
+  3. 确认相关活动配置是否正确
+  4. 核对配置的单位（百分比 vs 小数）
+
+紧急处理：
+  - 如果确认配置错误，立即修正
+  - 评估对经济系统和玩家体验的影响
+  - 考虑对受影响玩家进行补偿或回收
+  - 发布公告说明情况
+
+后续预防：
+  - 建立配置发布前的自动校验机制
+  - 定期运行此校准脚本监控掉率
+  - 设置告警阈值，偏差过大时自动通知
+  - 保留所有配置变更历史，便于回溯</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0021 |
+                类型: significant_deviation_item |
+                池子: pool_gacha
+                道具: item_n
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv
+                行号: 5
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-warning">
+            <div class="anomaly-title">[WARNING] 玩家投诉被数据支持: 玩家 player_0012</div>
+            <div class="anomaly-desc">玩家 player_0012 投诉道具 item_ssr 掉率低，数据显示该道具实际掉率 0.4310%，低于配置 0.7576%，偏差 -43.11%。玩家声称 500 次抽取仅获得 0 次。</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>投诉与数据一致，说明确实可能存在掉率问题。需要进一步确认是配置问题、活动问题还是随机波动。</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>建议：
+1. 检查该道具的实际配置
+2. 确认活动加成是否正确
+3. 考虑对受影响玩家进行补偿
+4. 向玩家反馈调查结果</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0028 |
+                类型: verified_complaint_supported |
+                池子: pool_gacha
+                道具: item_ssr
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/complaint_records.csv
+                行号: 2
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 重复记录示例: 玩家 player_0003</div>
+            <div class="anomaly-desc">玩家 player_0003 在 2026-05-03 12:48:07 从池子 pool_dungeon 获得道具 item_gold 的记录重复了 1 次</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>单条重复记录，属于上述重复样本问题的具体案例</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动排除重复记录，如无其他问题可忽略</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0002 |
+                类型: duplicate_sample_detail |
+                池子: pool_dungeon
+                道具: item_gold
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv
+                行号: 752
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 重复记录示例: 玩家 player_0004</div>
+            <div class="anomaly-desc">玩家 player_0004 在 2026-05-08 09:18:57 从池子 pool_gacha 获得道具 item_ur 的记录重复了 1 次</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>单条重复记录，属于上述重复样本问题的具体案例</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动排除重复记录，如无其他问题可忽略</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0003 |
+                类型: duplicate_sample_detail |
+                池子: pool_gacha
+                道具: item_ur
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv
+                行号: 1076
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 重复记录示例: 玩家 player_0005</div>
+            <div class="anomaly-desc">玩家 player_0005 在 2026-05-10 18:35:20 从池子 pool_dungeon 获得道具 item_gold 的记录重复了 1 次</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>单条重复记录，属于上述重复样本问题的具体案例</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动排除重复记录，如无其他问题可忽略</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0004 |
+                类型: duplicate_sample_detail |
+                池子: pool_dungeon
+                道具: item_gold
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv
+                行号: 1328
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 重复记录示例: 玩家 player_0006</div>
+            <div class="anomaly-desc">玩家 player_0006 在 2026-05-01 22:57:55 从池子 pool_dungeon 获得道具 item_gold 的记录重复了 1 次</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>单条重复记录，属于上述重复样本问题的具体案例</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动排除重复记录，如无其他问题可忽略</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0005 |
+                类型: duplicate_sample_detail |
+                池子: pool_dungeon
+                道具: item_gold
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv
+                行号: 1464
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 重复记录示例: 玩家 player_0007</div>
+            <div class="anomaly-desc">玩家 player_0007 在 2026-05-06 11:50:07 从池子 pool_gacha 获得道具 item_r 的记录重复了 1 次</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>单条重复记录，属于上述重复样本问题的具体案例</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动排除重复记录，如无其他问题可忽略</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0006 |
+                类型: duplicate_sample_detail |
+                池子: pool_gacha
+                道具: item_r
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv
+                行号: 1768
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 重复记录示例: 玩家 player_0012</div>
+            <div class="anomaly-desc">玩家 player_0012 在 2026-05-07 16:57:39 从池子 pool_dungeon 获得道具 item_mat_common 的记录重复了 1 次</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>单条重复记录，属于上述重复样本问题的具体案例</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动排除重复记录，如无其他问题可忽略</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0007 |
+                类型: duplicate_sample_detail |
+                池子: pool_dungeon
+                道具: item_mat_common
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv
+                行号: 2974
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 重复记录示例: 玩家 player_0016</div>
+            <div class="anomaly-desc">玩家 player_0016 在 2026-05-14 08:55:50 从池子 pool_gacha 获得道具 item_n 的记录重复了 1 次</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>单条重复记录，属于上述重复样本问题的具体案例</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动排除重复记录，如无其他问题可忽略</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0008 |
+                类型: duplicate_sample_detail |
+                池子: pool_gacha
+                道具: item_n
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv
+                行号: 4101
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 重复记录示例: 玩家 player_0017</div>
+            <div class="anomaly-desc">玩家 player_0017 在 2026-05-18 18:52:52 从池子 pool_gacha 获得道具 item_n 的记录重复了 1 次</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>单条重复记录，属于上述重复样本问题的具体案例</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动排除重复记录，如无其他问题可忽略</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0009 |
+                类型: duplicate_sample_detail |
+                池子: pool_gacha
+                道具: item_n
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv
+                行号: 4409
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 重复记录示例: 玩家 player_0017</div>
+            <div class="anomaly-desc">玩家 player_0017 在 2026-05-19 09:46:23 从池子 pool_gacha 获得道具 item_r 的记录重复了 1 次</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>单条重复记录，属于上述重复样本问题的具体案例</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动排除重复记录，如无其他问题可忽略</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0010 |
+                类型: duplicate_sample_detail |
+                池子: pool_gacha
+                道具: item_r
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv
+                行号: 4414
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 重复记录示例: 玩家 player_0019</div>
+            <div class="anomaly-desc">玩家 player_0019 在 2026-05-19 22:43:24 从池子 pool_gacha 获得道具 item_r 的记录重复了 1 次</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>单条重复记录，属于上述重复样本问题的具体案例</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>已自动排除重复记录，如无其他问题可忽略</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0011 |
+                类型: duplicate_sample_detail |
+                池子: pool_gacha
+                道具: item_r
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv
+                行号: 4950
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 活动 五一庆典活动 已应用</div>
+            <div class="anomaly-desc">活动 五一庆典活动 (act_001) 倍率 2.0x，影响了 4413 条掉落记录。活动时间：2026-05-01 00:00:00 ~ 2026-05-08 00:00:00</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>正常的活动加成应用</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>在计算期望概率时已考虑此活动加成</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0012 |
+                类型: activity_applied |
+                
+                
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv
+                行号: 2
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 活动 周末双倍掉落 已应用</div>
+            <div class="anomaly-desc">活动 周末双倍掉落 (act_003) 倍率 2.0x，影响了 1312 条掉落记录。活动时间：2026-05-15 00:00:00 ~ 2026-05-17 00:00:00</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>正常的活动加成应用</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>在计算期望概率时已考虑此活动加成</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0013 |
+                类型: activity_applied |
+                
+                
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv
+                行号: 4
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 活动 SSR概率UP 已应用</div>
+            <div class="anomaly-desc">活动 SSR概率UP (act_002) 倍率 3.0x，影响了 13 条掉落记录。活动时间：2026-05-03 00:00:00 ~ 2026-05-05 00:00:00</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>正常的活动加成应用</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>在计算期望概率时已考虑此活动加成</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0014 |
+                类型: activity_applied |
+                
+                
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv
+                行号: 3
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 道具 SSR级装备 掉落显著偏低</div>
+            <div class="anomaly-desc">道具 SSR级装备 (item_ssr) 在池子 pool_gacha 中：
+  配置概率: 0.7576%
+  实际概率: 0.4310%
+  偏离值: -0.3266pp (-43.11%)
+  P值: 0.000025 (小于 0.05，统计显著)
+  样本量: 12529 次抽取，掉落 54 次
+  置信区间: [0.3305%, 0.5619%]</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>实际掉率明显偏低（-43.1%），可能配置偏低或活动结束未更新
+统计检验P值=0.000025 < 0.01，高度显著，差异真实存在的可能性极大
+样本量充足（12529 次），检验结果可靠
+
+可能的具体原因：
+  - 配置概率填错（少写了一个零）
+  - 活动已结束但配置未恢复
+  - 该道具被临时屏蔽或调整
+  - 权重计算错误
+  - 随机数生成器存在偏向性
+  - 样本存在选择性偏差</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>即时检查：
+  1. 查看实际配置文件中 SSR级装备 的概率值
+  2. 检查该道具池是否有未记录的热更新
+  3. 确认相关活动配置是否正确
+  4. 核对配置的单位（百分比 vs 小数）
+
+后续预防：
+  - 建立配置发布前的自动校验机制
+  - 定期运行此校准脚本监控掉率
+  - 设置告警阈值，偏差过大时自动通知
+  - 保留所有配置变更历史，便于回溯</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0019 |
+                类型: significant_deviation_item |
+                池子: pool_gacha
+                道具: item_ssr
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv
+                行号: 3
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 道具 稀有材料 掉落显著偏高</div>
+            <div class="anomaly-desc">道具 稀有材料 (item_mat_rare) 在池子 pool_dungeon 中：
+  配置概率: 10.0503%
+  实际概率: 11.7769%
+  偏离值: +1.7266pp (+17.18%)
+  P值: 0.000000 (小于 0.05，统计显著)
+  样本量: 12584 次抽取，掉落 1482 次
+  置信区间: [11.2253%, 12.3517%]</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>实际掉率轻微偏高（+17.2%），可能是正常波动
+统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大
+样本量充足（12584 次），检验结果可靠
+
+可能的具体原因：
+  - 配置概率填错（多写了一个零）
+  - 存在未记录的活动加成
+  - 该道具被临时调高概率
+  - 权重计算错误
+  - 随机数生成器存在偏向性
+  - 样本存在选择性偏差</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>即时检查：
+  1. 查看实际配置文件中 稀有材料 的概率值
+  2. 检查该道具池是否有未记录的热更新
+  3. 确认相关活动配置是否正确
+  4. 核对配置的单位（百分比 vs 小数）
+
+后续预防：
+  - 建立配置发布前的自动校验机制
+  - 定期运行此校准脚本监控掉率
+  - 设置告警阈值，偏差过大时自动通知
+  - 保留所有配置变更历史，便于回溯</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0023 |
+                类型: significant_deviation_item |
+                池子: pool_dungeon
+                道具: item_mat_rare
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv
+                行号: 10
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 道具 史诗材料 掉落显著偏低</div>
+            <div class="anomaly-desc">道具 史诗材料 (item_mat_epic) 在池子 pool_dungeon 中：
+  配置概率: 8.0402%
+  实际概率: 6.4844%
+  偏离值: -1.5558pp (-19.35%)
+  P值: 0.000000 (小于 0.05，统计显著)
+  样本量: 12584 次抽取，掉落 816 次
+  置信区间: [6.0673%, 6.9281%]</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>实际掉率轻微偏低（-19.3%），可能是正常波动
+统计检验P值=0.000000 < 0.01，高度显著，差异真实存在的可能性极大
+样本量充足（12584 次），检验结果可靠
+
+可能的具体原因：
+  - 配置概率填错（少写了一个零）
+  - 活动已结束但配置未恢复
+  - 该道具被临时屏蔽或调整
+  - 权重计算错误
+  - 随机数生成器存在偏向性
+  - 样本存在选择性偏差</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>即时检查：
+  1. 查看实际配置文件中 史诗材料 的概率值
+  2. 检查该道具池是否有未记录的热更新
+  3. 确认相关活动配置是否正确
+  4. 核对配置的单位（百分比 vs 小数）
+
+后续预防：
+  - 建立配置发布前的自动校验机制
+  - 定期运行此校准脚本监控掉率
+  - 设置告警阈值，偏差过大时自动通知
+  - 保留所有配置变更历史，便于回溯</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0024 |
+                类型: significant_deviation_item |
+                池子: pool_dungeon
+                道具: item_mat_epic
+                来源文件: /Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv
+                行号: 11
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 道具 稀有材料 轻微偏高</div>
+            <div class="anomaly-desc">道具 稀有材料 (item_mat_rare) 偏差 +17.18%，偏高，在警戒阈值内（10%），统计显著。</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>轻微波动可能是正常随机现象，建议持续观察。</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>持续观察，如果偏差持续扩大需要介入检查。</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0025 |
+                类型: moderate_deviation |
+                池子: pool_dungeon
+                道具: item_mat_rare
+                
+                
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 道具 史诗材料 轻微偏低</div>
+            <div class="anomaly-desc">道具 史诗材料 (item_mat_epic) 偏差 -19.35%，偏低，在警戒阈值内（10%），统计显著。</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>轻微波动可能是正常随机现象，建议持续观察。</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>持续观察，如果偏差持续扩大需要介入检查。</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0026 |
+                类型: moderate_deviation |
+                池子: pool_dungeon
+                道具: item_mat_epic
+                
+                
+            </div>
+        </div>
+
+        <div class="anomaly-item anomaly-info">
+            <div class="anomaly-title">[INFO] 投诉记录汇总</div>
+            <div class="anomaly-desc">共有 3 条投诉记录，其中已核实 2 条，未核实 1 条。</div>
+            <div class="anomaly-desc"><strong>原因分析:</strong><br>投诉记录反映了玩家的主观感受，需要结合客观数据验证。</div>
+            <div class="anomaly-desc"><strong>处理建议:</strong><br>重点关注已核实且数据支持的投诉案例。</div>
+            <div class="anomaly-meta">
+                异常ID: ANOM_20260530_0027 |
+                类型: complaint_summary |
+                
+                
+                
+                
+            </div>
+        </div>
+
+        <h2>📈 概率对比详情</h2>
+
+        <h3>抽卡池 (pool_gacha)</h3>
+        <p>
+            总抽取次数: <strong>24,728</strong> |
+            道具数量: <strong>9</strong> |
+            卡方值: <strong>282.6787</strong> |
+            P值: <strong>0.000000</strong> |
+            <span class="status-badge status-critical">分布显著偏离</span>
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>道具ID</th>
+                    <th>道具名称</th>
+                    <th>配置概率</th>
+                    <th>实际概率</th>
+                    <th>偏差</th>
+                    <th>偏差%</th>
+                    <th>置信区间</th>
+                    <th>P值</th>
+                    <th>样本量</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td><code>item_ssr</code></td>
+                    <td>SSR级装备</td>
+                    <td>0.7576%</td>
+                    <td>0.4310%</td>
+                    <td class="deviation-negative">-1.2525pp</td>
+                    <td class="deviation-negative">-74.40%</td>
+                    <td>[0.3305%, 0.5619%]</td>
+                    <td>0.000025</td>
+                    <td>12,529</td>
+                    <td><span class="status-badge status-critical">严重异常</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_ssr</code></td>
+                    <td>SSR级装备</td>
+                    <td>0.7576%</td>
+                    <td>0.4310%</td>
+                    <td class="deviation-negative">-1.2525pp</td>
+                    <td class="deviation-negative">-74.40%</td>
+                    <td>[0.3305%, 0.5619%]</td>
+                    <td>0.000025</td>
+                    <td>12,529</td>
+                    <td><span class="status-badge status-critical">严重异常</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_ur</code></td>
+                    <td>UR级装备</td>
+                    <td>1.0101%</td>
+                    <td>2.6339%</td>
+                    <td class="deviation-positive">+0.6137pp</td>
+                    <td class="deviation-positive">+30.38%</td>
+                    <td>[2.3677%, 2.9291%]</td>
+                    <td>0.000000</td>
+                    <td>12,529</td>
+                    <td><span class="status-badge status-critical">严重异常</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_sr</code></td>
+                    <td>SR级装备</td>
+                    <td>3.0303%</td>
+                    <td>7.1275%</td>
+                    <td class="deviation-positive">+1.0669pp</td>
+                    <td class="deviation-positive">+17.60%</td>
+                    <td>[6.6900%, 7.5912%]</td>
+                    <td>0.000000</td>
+                    <td>12,529</td>
+                    <td><span class="status-badge status-warning">警告</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_sr</code></td>
+                    <td>SR级装备</td>
+                    <td>3.0303%</td>
+                    <td>7.1275%</td>
+                    <td class="deviation-positive">+1.0669pp</td>
+                    <td class="deviation-positive">+17.60%</td>
+                    <td>[6.6900%, 7.5912%]</td>
+                    <td>0.000000</td>
+                    <td>12,529</td>
+                    <td><span class="status-badge status-warning">警告</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_r</code></td>
+                    <td>R级装备</td>
+                    <td>21.2121%</td>
+                    <td>40.5220%</td>
+                    <td class="deviation-negative">-1.9023pp</td>
+                    <td class="deviation-negative">-4.48%</td>
+                    <td>[39.6654%, 41.3844%]</td>
+                    <td>0.000000</td>
+                    <td>12,529</td>
+                    <td><span class="status-badge status-normal">正常</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_r</code></td>
+                    <td>R级装备</td>
+                    <td>21.2121%</td>
+                    <td>40.5220%</td>
+                    <td class="deviation-negative">-1.9023pp</td>
+                    <td class="deviation-negative">-4.48%</td>
+                    <td>[39.6654%, 41.3844%]</td>
+                    <td>0.000000</td>
+                    <td>12,529</td>
+                    <td><span class="status-badge status-normal">正常</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_n</code></td>
+                    <td>N级装备</td>
+                    <td>25.5051%</td>
+                    <td>49.2857%</td>
+                    <td class="deviation-negative">-1.7244pp</td>
+                    <td class="deviation-negative">-3.38%</td>
+                    <td>[48.4106%, 50.1612%]</td>
+                    <td>0.000000</td>
+                    <td>12,529</td>
+                    <td><span class="status-badge status-normal">正常</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_n</code></td>
+                    <td>N级装备</td>
+                    <td>25.5051%</td>
+                    <td>49.2857%</td>
+                    <td class="deviation-negative">-1.7244pp</td>
+                    <td class="deviation-negative">-3.38%</td>
+                    <td>[48.4106%, 50.1612%]</td>
+                    <td>0.000000</td>
+                    <td>12,529</td>
+                    <td><span class="status-badge status-normal">正常</span></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <h3>副本掉落池 (pool_dungeon)</h3>
+        <p>
+            总抽取次数: <strong>12,584</strong> |
+            道具数量: <strong>6</strong> |
+            卡方值: <strong>76.4464</strong> |
+            P值: <strong>0.000000</strong> |
+            <span class="status-badge status-critical">分布显著偏离</span>
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>道具ID</th>
+                    <th>道具名称</th>
+                    <th>配置概率</th>
+                    <th>实际概率</th>
+                    <th>偏差</th>
+                    <th>偏差%</th>
+                    <th>置信区间</th>
+                    <th>P值</th>
+                    <th>样本量</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td><code>item_mat_epic</code></td>
+                    <td>史诗材料</td>
+                    <td>8.0402%</td>
+                    <td>6.4844%</td>
+                    <td class="deviation-negative">-9.5960pp</td>
+                    <td class="deviation-negative">-59.67%</td>
+                    <td>[6.0673%, 6.9281%]</td>
+                    <td>0.000000</td>
+                    <td>12,584</td>
+                    <td><span class="status-badge status-critical">严重异常</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_mat_common</code></td>
+                    <td>普通材料</td>
+                    <td>25.1256%</td>
+                    <td>24.6901%</td>
+                    <td class="deviation-negative">-25.5612pp</td>
+                    <td class="deviation-negative">-50.87%</td>
+                    <td>[23.9445%, 25.4511%]</td>
+                    <td>0.259969</td>
+                    <td>12,584</td>
+                    <td><span class="status-badge status-critical">严重偏差(样本不足)</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_weapon</code></td>
+                    <td>专属武器</td>
+                    <td>1.5075%</td>
+                    <td>1.4940%</td>
+                    <td class="deviation-negative">-1.5211pp</td>
+                    <td class="deviation-negative">-50.45%</td>
+                    <td>[1.2963%, 1.7212%]</td>
+                    <td>0.900530</td>
+                    <td>12,584</td>
+                    <td><span class="status-badge status-critical">严重偏差(样本不足)</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_exp</code></td>
+                    <td>经验药水</td>
+                    <td>25.1256%</td>
+                    <td>25.1510%</td>
+                    <td class="deviation-negative">-25.1003pp</td>
+                    <td class="deviation-negative">-49.95%</td>
+                    <td>[24.4006%, 25.9166%]</td>
+                    <td>0.947710</td>
+                    <td>12,584</td>
+                    <td><span class="status-badge status-critical">严重偏差(样本不足)</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_gold</code></td>
+                    <td>金币</td>
+                    <td>30.1508%</td>
+                    <td>30.4037%</td>
+                    <td class="deviation-negative">-29.8978pp</td>
+                    <td class="deviation-negative">-49.58%</td>
+                    <td>[29.6061%, 31.2133%]</td>
+                    <td>0.536390</td>
+                    <td>12,584</td>
+                    <td><span class="status-badge status-critical">严重偏差(样本不足)</span></td>
+                </tr>
+
+                <tr>
+                    <td><code>item_mat_rare</code></td>
+                    <td>稀有材料</td>
+                    <td>10.0503%</td>
+                    <td>11.7769%</td>
+                    <td class="deviation-negative">-8.3236pp</td>
+                    <td class="deviation-negative">-41.41%</td>
+                    <td>[11.2253%, 12.3517%]</td>
+                    <td>0.000000</td>
+                    <td>12,584</td>
+                    <td><span class="status-badge status-critical">严重异常</span></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <h2>⚙️ 计算参数 (可复现)</h2>
+        <p>使用相同参数可复现此报告。筛选条件哈希: <code>fd8de0e618b67005008000de485eba19</code></p>
+        <div class="params-section">
+{
+  "params_id": "e9b1dc1c-9617-4cd3-94f6-5a6a0d75f545",
+  "created_time": "2026-05-30T20:56:51.123453",
+  "start_time": "2026-05-01T00:00:00",
+  "end_time": "2026-05-20T23:59:59",
+  "pool_ids": [],
+  "item_ids": [],
+  "player_ids": [],
+  "server_ids": [],
+  "channels": [],
+  "activity_ids": [],
+  "deduplicate_enabled": true,
+  "deduplicate_keys": [
+    "player_id",
+    "pool_id",
+    "item_id",
+    "drop_time"
+  ],
+  "activity_bonus_enabled": true,
+  "probability_normalization_enabled": true,
+  "confidence_level": 0.95,
+  "min_sample_size": 30,
+  "max_sample_size": null,
+  "test_method": "chi_square",
+  "significance_level": 0.05,
+  "deviation_warning_threshold": 0.1,
+  "deviation_critical_threshold": 0.3,
+  "group_by": [
+    "pool_id"
+  ],
+  "notes": "五一活动期间掉落概率校准"
+}
+        </div>
+
+        <h2>📁 数据源</h2>
+
+        <div class="source-item">
+            <strong>drop_config</strong> - drop_config.csv
+            <br>
+            版本: 1.0 | 导入时间: 2026-05-30 20:56:51<br>
+            原始行数: 11 | 成功导入: 11 | 跳过: 0<br>
+            路径: <code>/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config.csv</code>
+            <br>备注: 正式版掉落配置
+        </div>
+
+        <div class="source-item">
+            <strong>drop_config</strong> - drop_config_old_v0.9.csv
+            <br>
+            版本: 0.9 | 导入时间: 2026-05-30 20:56:51<br>
+            原始行数: 4 | 成功导入: 4 | 跳过: 0<br>
+            路径: <code>/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/drop_config_old_v0.9.csv</code>
+            <br>备注: 旧版配置，已停用，仅保留用于对比
+        </div>
+
+        <div class="source-item">
+            <strong>item_pool</strong> - item_pool.csv
+            <br>
+            版本: 1.0 | 导入时间: 2026-05-30 20:56:51<br>
+            原始行数: 2 | 成功导入: 2 | 跳过: 0<br>
+            路径: <code>/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/item_pool.csv</code>
+            
+        </div>
+
+        <div class="source-item">
+            <strong>activity_period</strong> - activity_period.csv
+            <br>
+            版本: 1.0 | 导入时间: 2026-05-30 20:56:51<br>
+            原始行数: 3 | 成功导入: 3 | 跳过: 0<br>
+            路径: <code>/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/activity_period.csv</code>
+            
+        </div>
+
+        <div class="source-item">
+            <strong>player_log</strong> - player_logs.csv
+            <br>
+            版本: 1.0 | 导入时间: 2026-05-30 20:56:51<br>
+            原始行数: 25163 | 成功导入: 25163 | 跳过: 0<br>
+            路径: <code>/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/player_logs.csv</code>
+            <br>备注: 2026年5月1日-5月20日玩家掉落日志
+        </div>
+
+        <div class="source-item">
+            <strong>complaint_record</strong> - complaint_records.csv
+            <br>
+            版本: 1.0 | 导入时间: 2026-05-30 20:56:53<br>
+            原始行数: 3 | 成功导入: 3 | 跳过: 0<br>
+            路径: <code>/Users/lzy/pro/solo/workspaces/zy71646/examples/sample_data/complaint_records.csv</code>
+            
+        </div>
+
+    </div>
+</body>
+</html>
