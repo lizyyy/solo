@@ -1,0 +1,183 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #121212;
+  --color-gold: #D4AF37;
+  --color-red: #E53935;
+  --color-orange: #FB8C00;
+
+  font-family: 'Noto Sans SC', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.92);
+  background-color: var(--color-bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 600;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+body {
+  background-image: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(212, 175, 55, 0.08) 0%,
+    transparent 50%
+  );
+  background-attachment: fixed;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 10px rgba(229, 57, 53, 0);
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer components {
+  .btn-stage {
+    @apply px-4 py-2 rounded-stage font-medium transition-all duration-300;
+    @apply bg-gradient-to-b from-neutral-800 to-neutral-900;
+    @apply border border-neutral-700;
+    @apply hover:shadow-glow hover:text-gold;
+    @apply active:translate-y-[1px];
+  }
+
+  .btn-stage:hover {
+    border-color: rgba(212, 175, 55, 0.5);
+  }
+
+  .btn-gold {
+    @apply px-4 py-2 rounded-stage font-medium transition-all duration-300 text-gold;
+    @apply hover:shadow-glow-hover;
+    @apply active:translate-y-[1px];
+    background: linear-gradient(to bottom, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
+    border: 1px solid rgba(212, 175, 55, 0.5);
+  }
+
+  .btn-gold:hover {
+    background: linear-gradient(to bottom, rgba(212, 175, 55, 0.3), rgba(212, 175, 55, 0.2));
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 rounded-stage font-medium transition-all duration-300 text-red;
+    @apply active:translate-y-[1px];
+    background: linear-gradient(to bottom, rgba(229, 57, 53, 0.2), rgba(229, 57, 53, 0.1));
+    border: 1px solid rgba(229, 57, 53, 0.5);
+  }
+
+  .btn-danger:hover {
+    background: linear-gradient(to bottom, rgba(229, 57, 53, 0.3), rgba(229, 57, 53, 0.2));
+    box-shadow: 0 0 15px rgba(229, 57, 53, 0.3);
+  }
+
+  .card-stage {
+    @apply bg-neutral-900/80 backdrop-blur-sm rounded-stage;
+    @apply border border-neutral-800;
+    @apply shadow-card;
+    @apply transition-all duration-300;
+  }
+
+  .card-stage:hover {
+    @apply shadow-card-hover;
+    border-color: rgba(212, 175, 55, 0.3);
+  }
+
+  .input-stage {
+    @apply w-full px-3 py-2 rounded-stage;
+    @apply bg-neutral-800/50 border border-neutral-700;
+    @apply text-white placeholder-neutral-500;
+    @apply focus:outline-none;
+    @apply transition-all duration-200;
+  }
+
+  .input-stage:focus {
+    border-color: rgba(212, 175, 55, 0.5);
+    box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.3);
+  }
+
+  .badge-gold {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs text-gold;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+  }
+
+  .badge-red {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs text-red;
+    background: rgba(229, 57, 53, 0.15);
+    border: 1px solid rgba(229, 57, 53, 0.3);
+  }
+
+  .badge-orange {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs text-orange;
+    background: rgba(251, 140, 0, 0.15);
+    border: 1px solid rgba(251, 140, 0, 0.3);
+  }
+
+  .badge-neutral {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs;
+    background: rgba(64, 64, 64, 0.5);
+    color: #a3a3a3;
+    border: 1px solid #525252;
+  }
+}
