@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记录详情 #{{ record.id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .timeline { position: relative; padding-left: 30px; }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+        .timeline-item { position: relative; margin-bottom: 1rem; }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #0d6efd;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #0d6efd;
+        }
+        .evidence-card { transition: transform 0.1s; }
+        .evidence-card:hover { transform: translateY(-2px); }
+        .status-timeline .step {
+            padding: 0.5rem 1rem;
+            border-left: 3px solid #dee2e6;
+            margin-bottom: 0.25rem;
+            background: #f8f9fa;
+        }
+        .status-timeline .step.active {
+            border-left-color: #0d6efd;
+            background: #e7f1ff;
+            font-weight: bold;
+        }
+        .status-timeline .step.completed {
+            border-left-color: #198754;
+            background: #d1e7dd;
+        }
+        .step.special {
+            border-left-color: #ffc107 !important;
+            background: #fff3cd !important;
+        }
+        .step.special.danger {
+            border-left-color: #dc3545 !important;
+            background: #f8d7da !important;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid py-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">返回列表</a></li>
+                <li class="breadcrumb-item active" aria-current="page">记录 #{{ record.id }}</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">基本信息</h5>
+                        {% set sl = status_labels[record.current_status] %}
+                        <span class="badge bg-{{ sl[1] }} fs-6">{{ sl[0] }}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">客户ID</label>
+                                <p class="fw-bold mb-0">{{ record.customer_id }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">客户名称</label>
+                                <p class="fw-bold mb-0">{{ record.customer_name }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">问卷ID</label>
+                                <p class="mb-0">{{ record.questionnaire_id }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">问卷版本</label>
+                                <p class="mb-0">{{ record.questionnaire_version }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">来源类型</label>
+                                <p class="mb-0">
+                                    <span class="badge bg-secondary">{{ record.source_type }}</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">来源批次</label>
+                                <p class="mb-0 font-monospace small">{{ record.source_batch_id }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">创建人</label>
+                                <p class="mb-0">{{ record.created_by }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">处理人</label>
+                                <p class="mb-0">{{ record.assigned_to or '-' }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">创建时间</label>
+                                <p class="mb-0">{{ record.created_at|datetime }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted small">更新时间</label>
+                                <p class="mb-0">{{ record.updated_at|datetime }}</p>
+                            </div>
+                        </div>
+
+                        {% if record.is_duplicate %}
+                        <div class="alert alert-warning mt-3">
+                            <strong>⚠️ 重复记录</strong>
+                            <p class="mb-0">此记录与 <a href="{{ url_for('record_detail', record_id=record.duplicate_of_id) }}">记录 #{{ record.duplicate_of_id }}</a> 重复</p>
+                        </div>
+                        {% endif %}
+
+                        {% if record.correction_note %}
+                        <div class="alert alert-info mt-3">
+                            <strong>📝 修正备注</strong>
+                            <p class="mb-0">{{ record.correction_note }}</p>
+                        </div>
+                        {% endif %}
+
+                        <div class="alert alert-info mt-3">
+                            <strong>待处理原因</strong>
+                            <p class="mb-0">{{ detail.pending_reason_explanation }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">证据链</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            {% for ev in record.evidences %}
+                            <div class="col-md-6">
+                                <div class="card evidence-card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <span class="badge bg-primary">{{ evidence_labels[ev.evidence_type] }}</span>
+                                            <small class="text-muted">#{{ ev.id }}</small>
+                                        </div>
+                                        <h6 class="card-title mb-1">{{ ev.file_name }}</h6>
+                                        <p class="small text-muted mb-2">
+                                            上传人: {{ ev.uploaded_by }}<br>
+                                            上传时间: {{ ev.uploaded_at|datetime }}
+                                        </p>
+                                        {% if ev.description %}
+                                        <p class="small mb-2"><strong>描述:</strong> {{ ev.description }}</p>
+                                        {% endif %}
+                                        <p class="small text-muted mb-0 font-monospace" style="font-size: 0.7rem;">
+                                            SHA256: {{ ev.file_hash[:32] }}...
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="col-12 text-center text-muted py-4">
+                                暂无证据文件
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">审计日志</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            {% for log in record.audit_logs %}
+                            <div class="timeline-item">
+                                <div class="d-flex justify-content-between align-items-baseline">
+                                    <span class="badge bg-outline-dark border">{{ action_labels[log.action_type] }}</span>
+                                    <small class="text-muted">{{ log.created_at|datetime }}</small>
+                                </div>
+                                <p class="mb-1">
+                                    <strong>{{ log.operator }}</strong>
+                                    {% if log.old_status or log.new_status %}
+                                    <span class="text-muted">
+                                        ({{ log.old_status or '-' }} → {{ log.new_status or '-' }})
+                                    </span>
+                                    {% endif %}
+                                </p>
+                                <p class="small mb-0">{{ log.reason }}</p>
+                                {% if log.details %}
+                                <details class="mt-1">
+                                    <summary class="small text-muted cursor-pointer">详细信息</summary>
+                                    <pre class="small mt-1 bg-light p-2 rounded">{{ log.details | tojson(indent=2) }}</pre>
+                                </details>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-4 sticky-top" style="top: 1rem;">
+                    <div class="card-header">
+                        <h6 class="mb-0">状态流转</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="status-timeline">
+                            {% for s_val, s_text in status_order %}
+                                {% set idx = loop.index0 %}
+                                <div class="step {% if s_val == record.current_status %}active{% elif idx < current_idx %}completed{% endif %}">
+                                    {{ s_text }}
+                                </div>
+                            {% endfor %}
+
+                            {% if record.current_status == 'withdrawn' %}
+                                <div class="step active special danger">已撤回</div>
+                            {% elif record.current_status == 'needs_correction' %}
+                                <div class="step active special">需要修正</div>
+                            {% elif record.current_status == 'rejected' %}
+                                <div class="step active special danger">已驳回</div>
+                            {% endif %}
+                        </div>
+
+                        <hr>
+
+                        <h6 class="small text-muted mb-2">可转换到的状态:</h6>
+                        {% if transition_labels %}
+                            {% for t in transition_labels %}
+                                <span class="badge bg-{{ t.class }} me-1 mb-1">{{ t.label }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted small">无（已为终态）</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

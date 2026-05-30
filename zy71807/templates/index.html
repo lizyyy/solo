@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户风险问卷补审系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .status-badge { font-size: 0.85em; }
+        .evidence-icon { width: 20px; height: 20px; display: inline-block; text-align: center; font-weight: bold; }
+        .evidence-present { color: #198754; }
+        .evidence-missing { color: #dc3545; }
+        .stat-card { border-left: 4px solid #0d6efd; }
+        .filter-bar { background: #f8f9fa; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid py-4">
+        <h2 class="mb-4">客户风险问卷补审系统</h2>
+
+        <div class="row g-3 mb-4">
+            {% for status_key, count in stats.by_status.items() %}
+                {% set label_text = status_labels[status_key][0] %}
+                {% set label_class = status_labels[status_key][1] %}
+                <div class="col-md-3">
+                    <div class="card stat-card">
+                        <div class="card-body">
+                            <h6 class="card-subtitle text-muted mb-1">{{ label_text }}</h6>
+                            <h3 class="card-title mb-0">{{ count }}</h3>
+                            <span class="badge bg-{{ label_class }} status-badge">{{ status_key }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="col-md-3">
+                <div class="card stat-card border-warning">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted mb-1">重复记录</h6>
+                        <h3 class="card-title mb-0">{{ stats.duplicates }}</h3>
+                        <span class="badge bg-warning status-badge">总计 {{ stats.total }} 条</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label small">状态</label>
+                    <select name="status" class="form-select form-select-sm" multiple size="4">
+                        {% for s_val, s_text in status_options.items() %}
+                            <option value="{{ s_val }}" {% if s_val in status_filters %}selected{% endif %}>
+                                {{ s_text }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">来源类型</label>
+                    <select name="source_type" class="form-select form-select-sm">
+                        <option value="">全部</option>
+                        {% for s_val, s_text in source_options.items() %}
+                            <option value="{{ s_val }}" {% if s_val == source_type %}selected{% endif %}>
+                                {{ s_text }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">批次ID</label>
+                    <input type="text" name="batch_id" class="form-control form-control-sm" value="{{ batch_id }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">客户ID</label>
+                    <input type="text" name="customer_id" class="form-control form-control-sm" value="{{ customer_id }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">重复记录</label>
+                    <select name="duplicate" class="form-select form-select-sm">
+                        <option value="">全部</option>
+                        <option value="only" {% if duplicate_filter == 'only' %}selected{% endif %}>仅重复</option>
+                        <option value="exclude" {% if duplicate_filter == 'exclude' %}selected{% endif %}>排除重复</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">筛选</button>
+                </div>
+            </form>
+            <div class="mt-2">
+                <a href="{{ url_for('api_export', status=status_filters, source_type=source_type, batch_id=batch_id, format='csv') }}" class="btn btn-sm btn-outline-success">导出CSV</a>
+                <a href="{{ url_for('api_export', status=status_filters, source_type=source_type, batch_id=batch_id, format='json') }}" class="btn btn-sm btn-outline-info">导出JSON</a>
+                <a href="{{ url_for('api_export', status=status_filters, source_type=source_type, batch_id=batch_id, format='csv', with_audit=1) }}" class="btn btn-sm btn-outline-secondary">导出CSV(含审计)</a>
+                <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-dark">重置</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>记录列表 (共 {{ total }} 条，第 {{ page }}/{{ total_pages }} 页)</span>
+                <div class="btn-group btn-group-sm">
+                    {% if page > 1 %}
+                        <a href="?{{ query_string }}&page={{ page-1 }}" class="btn btn-outline-secondary">上一页</a>
+                    {% endif %}
+                    {% if page < total_pages %}
+                        <a href="?{{ query_string }}&page={{ page+1 }}" class="btn btn-outline-secondary">下一页</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>客户</th>
+                            <th>问卷</th>
+                            <th>来源/批次</th>
+                            <th>状态</th>
+                            <th>待处理原因</th>
+                            <th>证据链</th>
+                            <th>操作人</th>
+                            <th>更新时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in records %}
+                        <tr {% if r.is_duplicate %}class="table-warning"{% endif %}>
+                            <td>
+                                <strong>#{{ r.id }}</strong>
+                                {% if r.is_duplicate %}
+                                    <br><span class="badge bg-warning">重复</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ r.customer_name }}</strong>
+                                <br><small class="text-muted">{{ r.customer_id }}</small>
+                            </td>
+                            <td>
+                                {{ r.questionnaire_id }}
+                                <br><small class="text-muted">{{ r.questionnaire_version }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ source_options.get(r.source_type, r.source_type) }}</span>
+                                <br><small class="text-muted">{{ r.source_batch_id[:20] }}...</small>
+                            </td>
+                            <td>
+                                {% set sl = status_labels.get(r.current_status, (r.current_status, "secondary")) %}
+                                <span class="badge bg-{{ sl[1] }}">{{ sl[0] }}</span>
+                            </td>
+                            <td><small>{{ r.pending_reason }}</small></td>
+                            <td class="text-nowrap">
+                                {% set ev = r.evidence_status %}
+                                <span class="evidence-icon {% if ev.screenshot %}evidence-present{% else %}evidence-missing{% endif %}" title="审批截图">📷</span>
+                                <span class="evidence-icon {% if ev.email %}evidence-present{% else %}evidence-missing{% endif %}" title="补充邮件">📧</span>
+                                <span class="evidence-icon {% if ev.confirm %}evidence-present{% else %}evidence-missing{% endif %}" title="人工确认">✓</span>
+                                <span class="evidence-icon {% if ev.checklist %}evidence-present{% else %}evidence-missing{% endif %}" title="复核清单">📋</span>
+                            </td>
+                            <td>
+                                <small>{{ r.created_by }}</small>
+                                {% if r.assigned_to %}
+                                    <br><small class="text-muted">→ {{ r.assigned_to }}</small>
+                                {% endif %}
+                            </td>
+                            <td><small>{{ r.updated_at|datetime }}</small></td>
+                            <td>
+                                <a href="{{ url_for('record_detail', record_id=r.id) }}" class="btn btn-sm btn-outline-primary">详情</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center text-muted py-4">暂无记录</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <h6>证据链图例：</h6>
+            <small class="text-muted">
+                <span class="evidence-icon evidence-present">📷</span> 审批截图
+                <span class="evidence-icon evidence-present">📧</span> 补充邮件
+                <span class="evidence-icon evidence-present">✓</span> 人工确认
+                <span class="evidence-icon evidence-present">📋</span> 复核清单
+                <span class="ms-2"><span class="text-danger">红色</span>表示缺失</span>
+            </small>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
