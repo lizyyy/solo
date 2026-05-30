@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黑洞逃逸速度棋</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🌌 黑洞逃逸速度棋</h1>
+            <div class="batch-info" id="batchInfo">
+                <span class="batch-label">当前批次:</span>
+                <span class="batch-id" id="batchId">未开始</span>
+            </div>
+            <nav class="main-nav">
+                <button class="nav-btn active" data-tab="import">📥 导入</button>
+                <button class="nav-btn" data-tab="game">🎮 游戏</button>
+                <button class="nav-btn" data-tab="review">🔍 回看</button>
+                <button class="nav-btn" data-tab="export">📤 导出</button>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <!-- 导入模块 -->
+            <section class="tab-content active" id="tab-import">
+                <div class="module-header">
+                    <h2>数据导入</h2>
+                    <p class="module-desc">导入天体卡、飞船、燃料卡数据，系统自动校验单位和建立溯源关系</p>
+                </div>
+                
+                <div class="import-section">
+                    <div class="import-actions">
+                        <button class="btn btn-primary" id="loadSampleBtn">📦 加载样例数据</button>
+                        <label class="btn btn-secondary">
+                            📁 选择JSON文件
+                            <input type="file" id="fileInput" accept=".json" hidden>
+                        </label>
+                        <button class="btn btn-danger" id="clearDataBtn">🗑️ 清空数据</button>
+                    </div>
+                    
+                    <div class="import-status" id="importStatus">
+                        <span class="status-text">等待导入数据...</span>
+                    </div>
+
+                    <div class="data-preview">
+                        <div class="preview-section">
+                            <h3>🚀 飞船 <span class="count-badge" id="shipCount">0</span></h3>
+                            <div class="preview-list" id="shipList"></div>
+                        </div>
+                        <div class="preview-section">
+                            <h3>🌍 天体 <span class="count-badge" id="bodyCount">0</span></h3>
+                            <div class="preview-list" id="bodyList"></div>
+                        </div>
+                        <div class="preview-section">
+                            <h3>⛽ 燃料卡 <span class="count-badge" id="fuelCount">0</span></h3>
+                            <div class="preview-list" id="fuelList"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 游戏模块 -->
+            <section class="tab-content" id="tab-game">
+                <div class="module-header">
+                    <h2>游戏进行</h2>
+                    <p class="module-desc">选择燃料卡组合摆脱天体引力，体验策略取舍</p>
+                </div>
+
+                <div class="game-container" id="gameContainer">
+                    <div class="game-empty" id="gameEmpty">
+                        <div class="empty-icon">🎯</div>
+                        <p>请先在「导入」模块加载数据，然后选择飞船开始游戏</p>
+                        <button class="btn btn-primary" id="startGameBtn">开始游戏</button>
+                    </div>
+
+                    <div class="game-active" id="gameActive" style="display: none;">
+                        <div class="game-status-bar">
+                            <div class="status-item">
+                                <span class="status-label">回合</span>
+                                <span class="status-value" id="currentRound">1</span>
+                                <span class="status-sep">/</span>
+                                <span class="status-value" id="totalRounds">0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">已逃逸</span>
+                                <span class="status-value" id="escapedCount">0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">剩余燃料</span>
+                                <span class="status-value" id="remainingFuel">0</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">当前分数</span>
+                                <span class="status-value" id="currentScore">0</span>
+                            </div>
+                        </div>
+
+                        <div class="game-board">
+                            <div class="current-target">
+                                <h3>当前天体</h3>
+                                <div class="body-card" id="currentBodyCard"></div>
+                                <div class="escape-calc">
+                                    <div class="calc-formula">
+                                        <span class="formula-label">逃逸速度计算公式:</span>
+                                        <code>v = √(2GM/r)</code>
+                                    </div>
+                                    <div class="calc-details" id="calcDetails"></div>
+                                    <div class="escape-velocity">
+                                        <span class="ev-label">逃逸速度:</span>
+                                        <span class="ev-value" id="escapeVelocity">-- km/s</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="player-panel">
+                                <div class="ship-info">
+                                    <h3>飞船状态</h3>
+                                    <div class="ship-card" id="playerShipCard"></div>
+                                </div>
+
+                                <div class="direction-select">
+                                    <h3>推进方向</h3>
+                                    <div class="direction-buttons">
+                                        <button class="dir-btn active" data-direction="away">🚀 远离天体 (+)</button>
+                                        <button class="dir-btn danger" data-direction="towards">⚠️ 朝向天体 (-)</button>
+                                    </div>
+                                </div>
+
+                                <div class="velocity-summary">
+                                    <div class="vel-row">
+                                        <span class="vel-label">飞船基础速度:</span>
+                                        <span class="vel-value" id="baseVelocity">0 km/s</span>
+                                    </div>
+                                    <div class="vel-row">
+                                        <span class="vel-label">燃料卡增量:</span>
+                                        <span class="vel-value" id="fuelBoost">+0 km/s</span>
+                                    </div>
+                                    <div class="vel-row">
+                                        <span class="vel-label">方向修正:</span>
+                                        <span class="vel-value" id="dirModifier">×1.0</span>
+                                    </div>
+                                    <div class="vel-row total">
+                                        <span class="vel-label">总速度:</span>
+                                        <span class="vel-value" id="totalVelocity">0 km/s</span>
+                                    </div>
+                                    <div class="vel-row comparison">
+                                        <span class="vel-label">与逃逸速度差:</span>
+                                        <span class="vel-value" id="velocityDiff">0 km/s</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="fuel-hand">
+                            <h3>燃料卡手牌 <small class="text-muted">(点击选择/取消)</small></h3>
+                            <div class="fuel-cards" id="fuelCards"></div>
+                        </div>
+
+                        <div class="game-actions">
+                            <button class="btn btn-danger" id="abandonBtn">🙈 放弃本回合</button>
+                            <button class="btn btn-warning" id="clearSelectionBtn">🔄 清空选择</button>
+                            <button class="btn btn-success btn-lg" id="attemptEscapeBtn">🔥 点火逃逸！</button>
+                        </div>
+
+                        <div class="result-panel" id="resultPanel" style="display: none;">
+                            <div class="result-content" id="resultContent"></div>
+                            <button class="btn btn-primary" id="nextRoundBtn">下一回合 →</button>
+                        </div>
+                    </div>
+
+                    <div class="game-over" id="gameOver" style="display: none;">
+                        <div class="over-icon" id="overIcon">🎉</div>
+                        <h2 id="overTitle">游戏结束</h2>
+                        <div class="final-stats" id="finalStats"></div>
+                        <div class="over-actions">
+                            <button class="btn btn-primary" id="newGameBtn">🔄 新游戏</button>
+                            <button class="btn btn-secondary" id="goReviewBtn">📊 查看复盘</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 回看模块 -->
+            <section class="tab-content" id="tab-review">
+                <div class="module-header">
+                    <h2>历史回看</h2>
+                    <p class="module-desc">查看历史游戏记录，点击任意元素追溯数据来源</p>
+                </div>
+
+                <div class="review-container">
+                    <div class="history-list" id="historyList">
+                        <div class="empty-state">
+                            <div class="empty-icon">📜</div>
+                            <p>暂无游戏记录</p>
+                        </div>
+                    </div>
+
+                    <div class="review-detail" id="reviewDetail" style="display: none;">
+                        <div class="detail-header">
+                            <h3>批次详情</h3>
+                            <button class="btn btn-secondary" id="closeDetailBtn">✕ 关闭</button>
+                        </div>
+                        <div class="detail-content" id="detailContent"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 导出模块 -->
+            <section class="tab-content" id="tab-export">
+                <div class="module-header">
+                    <h2>报告导出</h2>
+                    <p class="module-desc">导出批次报告，文件名和内容均包含批次标识，便于归档和复盘</p>
+                </div>
+
+                <div class="export-container">
+                    <div class="export-list" id="exportList">
+                        <div class="empty-state">
+                            <div class="empty-icon">📁</div>
+                            <p>暂无可导出的游戏记录</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 溯源弹窗 -->
+        <div class="modal" id="traceModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>数据溯源</h3>
+                    <button class="modal-close" id="closeTraceModal">✕</button>
+                </div>
+                <div class="modal-body" id="traceModalBody"></div>
+            </div>
+        </div>
+
+        <!-- 通知 -->
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/physics.js"></script>
+    <script src="js/dataTrace.js"></script>
+    <script src="js/sampleData.js"></script>
+    <script src="js/importModule.js"></script>
+    <script src="js/gameModule.js"></script>
+    <script src="js/reviewModule.js"></script>
+    <script src="js/exportModule.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
