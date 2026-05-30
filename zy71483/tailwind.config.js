@@ -1,0 +1,96 @@
+/** @type {import('tailwindcss').Config} */
+
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    container: {
+      center: true,
+    },
+    extend: {
+      colors: {
+        primary: {
+          50: '#E8F3FF',
+          100: '#BEDAFF',
+          200: '#94BFFF',
+          300: '#6AA2FF',
+          400: '#4080FF',
+          500: '#165DFF',
+          600: '#0E42D2',
+          700: '#0A2BA6',
+          800: '#061A79',
+          900: '#030F4D',
+        },
+        solar: {
+          50: '#E8FFEA',
+          100: '#B3FFBA',
+          200: '#80F58B',
+          300: '#4DE85C',
+          400: '#26D939',
+          500: '#00B42A',
+          600: '#009A29',
+          700: '#007D26',
+          800: '#006021',
+          900: '#004A1B',
+        },
+        warning: {
+          50: '#FFF7E8',
+          100: '#FFE7BA',
+          200: '#FFD58A',
+          300: '#FFC157',
+          400: '#FFAA24',
+          500: '#FF7D00',
+          600: '#DB6800',
+          700: '#B75400',
+          800: '#934100',
+          900: '#7A3400',
+        },
+        danger: {
+          50: '#FFECE8',
+          100: '#FDCDC4',
+          200: '#FAA99B',
+          300: '#F58372',
+          400: '#F55D4B',
+          500: '#F53F3F',
+          600: '#CB2631',
+          700: '#A11928',
+          800: '#771120',
+          900: '#590A1A',
+        },
+        neutral: {
+          50: '#F7F8FA',
+          100: '#E5E6EB',
+          200: '#C9CDD4',
+          300: '#86909C',
+          400: '#4E5969',
+          500: '#272E3B',
+          600: '#1D2129',
+          700: '#171A1F',
+          800: '#0F1216',
+          900: '#0A0C0F',
+        },
+      },
+      fontFamily: {
+        sans: ['"Source Han Sans CN"', '"PingFang SC"', 'system-ui', 'sans-serif'],
+        serif: ['"Source Han Serif CN"', '"Songti SC"', 'serif'],
+        mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
+        'slide-in': 'slideIn 0.3s ease-out',
+      },
+      keyframes: {
+        glow: {
+          '0%': { boxShadow: '0 0 5px rgba(22, 93, 255, 0.5)' },
+          '100%': { boxShadow: '0 0 20px rgba(22, 93, 255, 0.8)' },
+        },
+        slideIn: {
+          '0%': { transform: 'translateY(-10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+      },
+    },
+  },
+  plugins: [],
+};

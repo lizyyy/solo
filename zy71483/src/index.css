@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Source Han Sans CN", "PingFang SC", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #1D2129;
+  background-color: #F7F8FA;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-neutral-100 overflow-hidden;
+  }
+  
+  .card-header {
+    @apply px-5 py-4 border-b border-neutral-100 font-semibold text-neutral-600;
+  }
+  
+  .card-body {
+    @apply p-5;
+  }
+  
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-neutral-100 text-neutral-600 hover:bg-neutral-200 focus:ring-neutral-400;
+  }
+  
+  .btn-success {
+    @apply btn bg-solar-500 text-white hover:bg-solar-600 focus:ring-solar-500;
+  }
+  
+  .btn-warning {
+    @apply btn bg-warning-500 text-white hover:bg-warning-600 focus:ring-warning-500;
+  }
+  
+  .btn-danger {
+    @apply btn bg-danger-500 text-white hover:bg-danger-600 focus:ring-danger-500;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-neutral-500 mb-1.5;
+  }
+  
+  .form-input {
+    @apply w-full px-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
+  }
+  
+  .form-select {
+    @apply w-full px-3 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white;
+  }
+  
+  .slider {
+    @apply w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-primary-500;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-normal {
+    @apply badge bg-solar-100 text-solar-700;
+  }
+  
+  .badge-pending {
+    @apply badge bg-warning-100 text-warning-700;
+  }
+  
+  .badge-anomaly {
+    @apply badge bg-danger-100 text-danger-700;
+  }
+  
+  .badge-supplement {
+    @apply badge bg-primary-100 text-primary-700;
+  }
+  
+  .table-header {
+    @apply px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider bg-neutral-50;
+  }
+  
+  .table-cell {
+    @apply px-4 py-3 text-sm text-neutral-600 whitespace-nowrap;
+  }
+  
+  .table-row {
+    @apply hover:bg-neutral-50 transition-colors border-b border-neutral-100;
+  }
+  
+  .table-row-anomaly {
+    @apply table-row bg-danger-50;
+  }
+  
+  .diode-glow {
+    animation: diodeGlow 1.5s ease-in-out infinite alternate;
+  }
+  
+  .shadow-pulse {
+    animation: shadowPulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes diodeGlow {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(255, 125, 0, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0 0 8px rgba(255, 125, 0, 0.9));
+  }
+}
+
+@keyframes shadowPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F8FA;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C9CDD4;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #86909C;
+}
