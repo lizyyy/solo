@@ -1,0 +1,386 @@
+{
+  "timestamp": "2026-05-30T11:47:47.802344",
+  "version": "1.0.0",
+  "audio_info": {
+    "file_path": "test_audio/sawtooth_A4.wav",
+    "sample_rate": 44100,
+    "duration_seconds": 2.0,
+    "num_samples": 88200,
+    "original_channels": 1,
+    "peak_amplitude": 0.9000244140625,
+    "rms_amplitude": 0.45645654349461234,
+    "dc_offset": -1.525186897675737e-05,
+    "nyquist_frequency": 0
+  },
+  "spectrum_analysis": {
+    "window_type": "hann",
+    "window_size": 2048,
+    "n_fft": 2048,
+    "freq_resolution_hz": 21.533203125,
+    "bin_bandwidth_hz": 21.533203125,
+    "window_enbw_hz": 32.31558378114313,
+    "coherent_gain": 0.49975585937500006,
+    "spectral_leakage": {
+      "ratio": 0,
+      "severity": "low"
+    }
+  },
+  "peak_analysis": {
+    "peak_threshold_db": -26.020599895907846,
+    "peak_threshold_linear": 12.913661001280037,
+    "total_peaks_detected": 15,
+    "duplicate_peaks": {
+      "found": false,
+      "groups_count": 0,
+      "merged_count": 0
+    },
+    "peaks_detail": [
+      {
+        "index": 1,
+        "frequency": 430.6640625,
+        "magnitude_raw": 258.2732200256007,
+        "magnitude_db": 8.685890356304473e-10,
+        "relative_amplitude": 1.0,
+        "note": "A4",
+        "cents_deviation": -37.128699966062584
+      },
+      {
+        "index": 2,
+        "frequency": 882.861328125,
+        "magnitude_raw": 144.32628915106898,
+        "magnitude_db": -5.054678633491853,
+        "relative_amplitude": 0.5588124434146249,
+        "note": "A5",
+        "cents_deviation": 5.619991710803163
+      },
+      {
+        "index": 3,
+        "frequency": 1313.525390625,
+        "magnitude_raw": 91.78269252570428,
+        "magnitude_db": -8.98637166135921,
+        "relative_amplitude": 0.35537053557703946,
+        "note": "E6",
+        "cents_deviation": -6.557608755433364
+      },
+      {
+        "index": 4,
+        "frequency": 1765.72265625,
+        "magnitude_raw": 69.72854311602147,
+        "magnitude_db": -11.37337571364874,
+        "relative_amplitude": 0.26997976448781563,
+        "note": "A6",
+        "cents_deviation": 5.619991710803163
+      },
+      {
+        "index": 5,
+        "frequency": 2196.38671875,
+        "magnitude_raw": 57.340869994190946,
+        "magnitude_db": -13.072301980653798,
+        "relative_amplitude": 0.22201632050162678,
+        "note": "C#7",
+        "cents_deviation": -16.532003465101752
+      },
+      {
+        "index": 6,
+        "frequency": 2648.583984375,
+        "magnitude_raw": 43.877392389499555,
+        "magnitude_db": -15.396771342274675,
+        "relative_amplitude": 0.16988750279703918,
+        "note": "E7",
+        "cents_deviation": 7.574992576191164
+      },
+      {
+        "index": 7,
+        "frequency": 3079.248046875,
+        "magnitude_raw": 41.6758651046647,
+        "magnitude_db": -15.843895064558055,
+        "relative_amplitude": 0.16136347818226637,
+        "note": "G7",
+        "cents_deviation": -31.59680969683052
+      },
+      {
+        "index": 8,
+        "frequency": 3962.109375,
+        "magnitude_raw": 32.23942549790988,
+        "magnitude_db": -18.07384165324676,
+        "relative_amplitude": 0.1248268229075946,
+        "note": "B7",
+        "cents_deviation": 4.831933437517932
+      },
+      {
+        "index": 9,
+        "frequency": 3509.912109375,
+        "magnitude_raw": 31.61846896611656,
+        "magnitude_db": -18.24277080304645,
+        "relative_amplitude": 0.12242256074006609,
+        "note": "A7",
+        "cents_deviation": -4.968628753604776
+      },
+      {
+        "index": 10,
+        "frequency": 4392.7734375,
+        "magnitude_raw": 27.138713564804657,
+        "magnitude_db": -19.569802388825437,
+        "relative_amplitude": 0.10507753596023078,
+        "note": "C#8",
+        "cents_deviation": -16.532003465101752
+      },
+      {
+        "index": 11,
+        "frequency": 4844.970703125,
+        "magnitude_raw": 25.642617525328347,
+        "magnitude_db": -20.062340441093482,
+        "relative_amplitude": 0.09928484851347183,
+        "note": "D#8",
+        "cents_deviation": -46.904984370452496
+      },
+      {
+        "index": 12,
+        "frequency": 5275.634765625,
+        "magnitude_raw": 23.692376898682653,
+        "magnitude_db": -20.749414877690015,
+        "relative_amplitude": 0.09173377284851368,
+        "note": "E8",
+        "cents_deviation": 0.5231129721877892
+      },
+      {
+        "index": 13,
+        "frequency": 6158.49609375,
+        "magnitude_raw": 20.788597226477854,
+        "magnitude_db": -21.885083832396823,
+        "relative_amplitude": 0.08049071918651587,
+        "note": "G8",
+        "cents_deviation": -31.59680969683052
+      },
+      {
+        "index": 14,
+        "frequency": 5727.83203125,
+        "magnitude_raw": 20.608277425322942,
+        "magnitude_db": -21.96075368957764,
+        "relative_amplitude": 0.07979254459010576,
+        "note": "F8",
+        "cents_deviation": 42.89650877053077
+      },
+      {
+        "index": 15,
+        "frequency": 6610.693359375,
+        "magnitude_raw": 16.561271412384116,
+        "magnitude_db": -23.859714037152784,
+        "relative_amplitude": 0.06412306862764369,
+        "note": "G#8",
+        "cents_deviation": -8.928599386680958
+      }
+    ]
+  },
+  "harmonic_analysis": {
+    "fundamental_frequency": 1313.525390625,
+    "fundamental_magnitude_db": -8.98637166135921,
+    "fundamental_note": "E6",
+    "harmonic_count": 3,
+    "inharmonic_count": 11,
+    "fundamental_tolerance_percent": 2.0,
+    "harmonics_detail": [
+      {
+        "index": 1,
+        "frequency": 430.6640625,
+        "magnitude_raw": 258.2732200256007,
+        "magnitude_db": 8.685890356304473e-10,
+        "relative_amplitude": 1.0,
+        "note": "A4",
+        "cents_deviation": -37.128699966062584,
+        "harmonic_number": null,
+        "type": "inharmonic",
+        "frequency_ratio": 0.32786885245901637
+      },
+      {
+        "index": 2,
+        "frequency": 882.861328125,
+        "magnitude_raw": 144.32628915106898,
+        "magnitude_db": -5.054678633491853,
+        "relative_amplitude": 0.5588124434146249,
+        "note": "A5",
+        "cents_deviation": 5.619991710803163,
+        "harmonic_number": null,
+        "type": "inharmonic",
+        "frequency_ratio": 0.6721311475409836
+      },
+      {
+        "index": 3,
+        "frequency": 1313.525390625,
+        "magnitude_raw": 91.78269252570428,
+        "magnitude_db": -8.98637166135921,
+        "relative_amplitude": 0.35537053557703946,
+        "note": "E6",
+        "cents_deviation": -6.557608755433364,
+        "harmonic_number": 1,
+        "type": "fundamental",
+        "frequency_ratio": 1.0,
+        "ideal_frequency": 1313.525390625
+      },
+      {
+        "index": 4,
+        "frequency": 1765.72265625,
+        "magnitude_raw": 69.72854311602147,
+        "magnitude_db": -11.37337571364874,
+        "relative_amplitude": 0.26997976448781563,
+        "note": "A6",
+        "cents_deviation": 5.619991710803163,
+        "harmonic_number": null,
+        "type": "inharmonic",
+        "frequency_ratio": 1.3442622950819672
+      },
+      {
+        "index": 5,
+        "frequency": 2196.38671875,
+        "magnitude_raw": 57.340869994190946,
+        "magnitude_db": -13.072301980653798,
+        "relative_amplitude": 0.22201632050162678,
+        "note": "C#7",
+        "cents_deviation": -16.532003465101752,
+        "harmonic_number": null,
+        "type": "inharmonic",
+        "frequency_ratio": 1.6721311475409837
+      },
+      {
+        "index": 6,
+        "frequency": 2648.583984375,
+        "magnitude_raw": 43.877392389499555,
+        "magnitude_db": -15.396771342274675,
+        "relative_amplitude": 0.16988750279703918,
+        "note": "E7",
+        "cents_deviation": 7.574992576191164,
+        "harmonic_number": 2,
+        "type": "harmonic",
+        "frequency_ratio": 2.0163934426229506,
+        "ideal_frequency": 2627.05078125,
+        "deviation_cents": 1.6393442622950616
+      },
+      {
+        "index": 7,
+        "frequency": 3079.248046875,
+        "magnitude_raw": 41.6758651046647,
+        "magnitude_db": -15.843895064558055,
+        "relative_amplitude": 0.16136347818226637,
+        "note": "G7",
+        "cents_deviation": -31.59680969683052,
+        "harmonic_number": null,
+        "type": "inharmonic",
+        "frequency_ratio": 2.3442622950819674
+      },
+      {
+        "index": 9,
+        "frequency": 3509.912109375,
+        "magnitude_raw": 31.61846896611656,
+        "magnitude_db": -18.24277080304645,
+        "relative_amplitude": 0.12242256074006609,
+        "note": "A7",
+        "cents_deviation": -4.968628753604776,
+        "harmonic_number": null,
+        "type": "inharmonic",
+        "frequency_ratio": 2.6721311475409837
+      },
+      {
+        "index": 8,
+        "frequency": 3962.109375,
+        "magnitude_raw": 32.23942549790988,
+        "magnitude_db": -18.07384165324676,
+        "relative_amplitude": 0.1248268229075946,
+        "note": "B7",
+        "cents_deviation": 4.831933437517932,
+        "harmonic_number": 3,
+        "type": "harmonic",
+        "frequency_ratio": 3.0163934426229506,
+        "ideal_frequency": 3940.576171875,
+        "deviation_cents": 1.6393442622950616
+      },
+      {
+        "index": 10,
+        "frequency": 4392.7734375,
+        "magnitude_raw": 27.138713564804657,
+        "magnitude_db": -19.569802388825437,
+        "relative_amplitude": 0.10507753596023078,
+        "note": "C#8",
+        "cents_deviation": -16.532003465101752,
+        "harmonic_number": null,
+        "type": "inharmonic",
+        "frequency_ratio": 3.3442622950819674
+      },
+      {
+        "index": 11,
+        "frequency": 4844.970703125,
+        "magnitude_raw": 25.642617525328347,
+        "magnitude_db": -20.062340441093482,
+        "relative_amplitude": 0.09928484851347183,
+        "note": "D#8",
+        "cents_deviation": -46.904984370452496,
+        "harmonic_number": null,
+        "type": "inharmonic",
+        "frequency_ratio": 3.6885245901639343
+      },
+      {
+        "index": 12,
+        "frequency": 5275.634765625,
+        "magnitude_raw": 23.692376898682653,
+        "magnitude_db": -20.749414877690015,
+        "relative_amplitude": 0.09173377284851368,
+        "note": "E8",
+        "cents_deviation": 0.5231129721877892,
+        "harmonic_number": 4,
+        "type": "harmonic",
+        "frequency_ratio": 4.016393442622951,
+        "ideal_frequency": 5254.1015625,
+        "deviation_cents": 1.6393442622950616
+      },
+      {
+        "index": 14,
+        "frequency": 5727.83203125,
+        "magnitude_raw": 20.608277425322942,
+        "magnitude_db": -21.96075368957764,
+        "relative_amplitude": 0.07979254459010576,
+        "note": "F8",
+        "cents_deviation": 42.89650877053077,
+        "harmonic_number": null,
+        "type": "inharmonic",
+        "frequency_ratio": 4.360655737704918
+      },
+      {
+        "index": 13,
+        "frequency": 6158.49609375,
+        "magnitude_raw": 20.788597226477854,
+        "magnitude_db": -21.885083832396823,
+        "relative_amplitude": 0.08049071918651587,
+        "note": "G8",
+        "cents_deviation": -31.59680969683052,
+        "harmonic_number": null,
+        "type": "inharmonic",
+        "frequency_ratio": 4.688524590163935
+      },
+      {
+        "index": 15,
+        "frequency": 6610.693359375,
+        "magnitude_raw": 16.561271412384116,
+        "magnitude_db": -23.859714037152784,
+        "relative_amplitude": 0.06412306862764369,
+        "note": "G#8",
+        "cents_deviation": -8.928599386680958,
+        "harmonic_number": null,
+        "type": "inharmonic",
+        "frequency_ratio": 5.032786885245901
+      }
+    ]
+  },
+  "warnings": [],
+  "processing_decisions": [],
+  "intermediate_values": {
+    "fft": {
+      "window_power": 767.625,
+      "window_coherent_gain": 0.49975585937500006
+    },
+    "peak_detection": {
+      "max_magnitude": 258.2732200256007,
+      "threshold_linear": 12.913661001280037,
+      "threshold_db": -26.020599895907846
+    },
+    "conflicting_values": []
+  }
+}
