@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ISRC版号登记核对系统</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; }
+    .app { min-height: 100vh; }
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 40px; }
+    .header h1 { font-size: 24px; margin-bottom: 5px; }
+    .header p { opacity: 0.9; font-size: 14px; }
+    .main-container { padding: 20px 40px; }
+    .action-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .batch-card { background: white; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .batch-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .batch-title { font-size: 16px; font-weight: 600; color: #303133; }
+    .batch-meta { font-size: 12px; color: #909399; margin-top: 4px; }
+    .batch-stats { display: flex; gap: 16px; margin-top: 12px; }
+    .stat-item { text-align: center; padding: 8px 16px; border-radius: 4px; min-width: 80px; }
+    .stat-total { background: #ecf5ff; }
+    .stat-pending { background: #fdf6ec; }
+    .stat-confirmed { background: #f0f9eb; }
+    .stat-rejected { background: #fef0f0; }
+    .track-table { background: white; border-radius: 8px; padding: 16px; }
+    .back-btn { margin-bottom: 16px; }
+    .issue-tag { margin-right: 4px; margin-bottom: 2px; }
+    .log-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
+    .log-time { color: #909399; }
+    .log-content { margin-top: 4px; color: #606266; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #909399; }
+    .import-preview { max-height: 300px; overflow-y: auto; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div id="app" class="app">
+    <div class="header">
+      <h1>🎵 ISRC版号登记核对系统</h1>
+      <p>独立厂牌新歌发行前的ISRC、词曲作者、平台版本核对工具</p>
+    </div>
+    <div class="main-container">
+      <div v-if="currentView === 'list'">
+        <div class="action-bar">
+          <el-button type="primary" @click="showCreateBatch">新建批次</el-button>
+          <el-button @click="loadSamples">加载样例数据</el-button>
+          <el-upload
+            action=""
+            :show-file-list="false"
+            accept=".xlsx,.xls,.csv"
+            :before-upload="handleFileUpload">
+            <el-button>导入Excel/CSV</el-button>
+          </el-upload>
+        </div>
+
+        <div v-if="batches.length === 0" class="empty-state">
+          <el-empty description="暂无批次，点击上方按钮开始"></el-empty>
+        </div>
+
+        <div v-for="batch in batches" :key="batch.id" class="batch-card">
+          <div class="batch-header">
+            <div>
+              <div class="batch-title">{{ batch.name }}</div>
+              <div class="batch-meta">
+                来源: {{ batch.source }} | 创建: {{ formatDate(batch.created_at) }}
+              </div>
+            </div>
+            <div>
+              <el-button size="small" @click="openBatch(batch)">查看</el-button>
+              <el-button size="small" type="danger" @click="deleteBatch(batch)">删除</el-button>
+            </div>
+          </div>
+          <div class="batch-stats">
+            <div class="stat-item stat-total">
+              <div style="font-size: 20px; font-weight: 600; color: #409eff;">{{ batch.total_tracks || 0 }}</div>
+              <div style="font-size: 12px; color: #909399;">总曲目</div>
+            </div>
+            <div class="stat-item stat-pending">
+              <div style="font-size: 20px; font-weight: 600; color: #e6a23c;">{{ batch.pending_count || 0 }}</div>
+              <div style="font-size: 12px; color: #909399;">待处理</div>
+            </div>
+            <div class="stat-item stat-confirmed">
+              <div style="font-size: 20px; font-weight: 600; color: #67c23a;">{{ batch.confirmed_count || 0 }}</div>
+              <div style="font-size: 12px; color: #909399;">已确认</div>
+            </div>
+            <div class="stat-item stat-rejected">
+              <div style="font-size: 20px; font-weight: 600; color: #f56c6c;">{{ batch.rejected_count || 0 }}</div>
+              <div style="font-size: 12px; color: #909399;">已驳回</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="currentView === 'detail'">
+        <el-button class="back-btn" @click="backToList">← 返回列表</el-button>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 style="font-size: 20px;">{{ currentBatch?.name }}</h2>
+          <div>
+            <el-button @click="exportBatch">导出Excel</el-button>
+            <el-upload
+              action=""
+              :show-file-list="false"
+              accept=".xlsx,.xls,.csv"
+              :before-upload="handleImportToBatch">
+              <el-button type="primary">追加导入</el-button>
+            </el-upload>
+          </div>
+        </div>
+
+        <div class="track-table">
+          <el-table :data="currentTracks" border style="width: 100%">
+            <el-table-column prop="source_row" label="序号" width="60" />
+            <el-table-column prop="isrc" label="ISRC码" width="160">
+              <template #default="scope">
+                <span :style="{color: hasErrorIssue(scope.row, 'isrc') ? '#f56c6c' : ''}">{{ scope.row.isrc }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="track_name" label="曲目名称" width="180" />
+            <el-table-column prop="artist" label="演唱者" width="120" />
+            <el-table-column prop="lyricist" label="词作者" width="140" />
+            <el-table-column prop="composer" label="曲作者" width="140" />
+            <el-table-column prop="platform_version" label="平台版本" width="140" />
+            <el-table-column label="问题" min-width="200">
+              <template #default="scope">
+                <div v-for="(issue, idx) in parseIssues(scope.row.issues)" :key="idx">
+                  <el-tag 
+                    class="issue-tag"
+                    :type="getIssueType(issue.severity)"
+                    size="small">
+                    {{ issue.message }}
+                  </el-tag>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="status" label="状态" width="100">
+              <template #default="scope">
+                <el-tag :type="getStatusType(scope.row.status)">
+                  {{ getStatusText(scope.row.status) }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="180" fixed="right">
+              <template #default="scope">
+                <el-button size="small" @click="editTrack(scope.row)">编辑</el-button>
+                <el-button size="small" @click="viewLogs(scope.row)">日志</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+    </div>
+
+    <el-dialog v-model="createBatchDialog" title="新建批次" width="500px">
+      <el-form :model="newBatchForm">
+        <el-form-item label="批次名称">
+          <el-input v-model="newBatchForm.name" placeholder="例如：2024年5月新歌发行" />
+        </el-form-item>
+        <el-form-item label="来源">
+          <el-input v-model="newBatchForm.source" placeholder="例如：QQ音乐、网易云音乐" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="createBatchDialog = false">取消</el-button>
+        <el-button type="primary" @click="createBatch">确定</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="editTrackDialog" title="编辑曲目信息" width="600px">
+      <el-form :model="editTrackForm" label-width="100px">
+        <el-form-item label="ISRC码">
+          <el-input v-model="editTrackForm.isrc" @blur="validateISRC" />
+          <div v-if="isrcValidation.issues && isrcValidation.issues.length" style="color: #f56c6c; font-size: 12px;">
+            {{ isrcValidation.issues.join('; ') }}
+          </div>
+        </el-form-item>
+        <el-form-item label="曲目名称">
+          <el-input v-model="editTrackForm.track_name" />
+        </el-form-item>
+        <el-form-item label="演唱者">
+          <el-input v-model="editTrackForm.artist" />
+        </el-form-item>
+        <el-form-item label="词作者">
+          <el-input v-model="editTrackForm.lyricist" placeholder="多个作者用分号分隔" />
+        </el-form-item>
+        <el-form-item label="曲作者">
+          <el-input v-model="editTrackForm.composer" placeholder="多个作者用分号分隔" />
+        </el-form-item>
+        <el-form-item label="平台版本">
+          <el-input v-model="editTrackForm.platform_version" placeholder="多个版本用|分隔" />
+        </el-form-item>
+        <el-form-item label="时长">
+          <el-input v-model="editTrackForm.duration" placeholder="例如：3:45" />
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="editTrackForm.status">
+            <el-option label="待处理" value="pending" />
+            <el-option label="已确认" value="confirmed" />
+            <el-option label="已驳回" value="rejected" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="editTrackForm.notes" type="textarea" :rows="3" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="editTrackDialog = false">取消</el-button>
+        <el-button type="primary" @click="saveTrack">保存</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="logsDialog" title="操作日志" width="500px">
+      <div v-if="currentLogs.length === 0" style="text-align: center; padding: 20px; color: #909399;">
+        暂无日志
+      </div>
+      <div v-else>
+        <div v-for="log in currentLogs" :key="log.id" class="log-item">
+          <div class="log-time">{{ formatDate(log.created_at) }} - {{ log.operator }}</div>
+          <div class="log-content">
+            <span v-if="log.operation === 'import'">导入曲目: {{ log.new_value }}</span>
+            <span v-else-if="log.operation === 'update'">
+              修改 {{ log.field_name }}: 
+              <span style="text-decoration: line-through;">{{ log.old_value || '(空)' }}</span>
+              → 
+              <span style="color: #67c23a;">{{ log.new_value || '(空)' }}</span>
+            </span>
+            <span v-else>{{ log.operation }}</span>
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <el-button @click="logsDialog = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="importPreviewDialog" title="导入预览" width="900px">
+      <div v-if="importPreviewData.length">
+        <p>共 {{ importPreviewData.length }} 条数据，确认导入？</p>
+        <div class="import-preview">
+          <el-table :data="importPreviewData" border size="small">
+            <el-table-column prop="isrc" label="ISRC" width="140" />
+            <el-table-column prop="track_name" label="曲目" width="160" />
+            <el-table-column prop="artist" label="演唱者" width="120" />
+            <el-table-column prop="lyricist" label="词作者" />
+            <el-table-column prop="composer" label="曲作者" />
+            <el-table-column prop="platform_version" label="平台版本" width="120" />
+          </el-table>
+        </div>
+      </div>
+      <template #footer>
+        <el-button @click="importPreviewDialog = false">取消</el-button>
+        <el-button type="primary" @click="confirmImport">确认导入</el-button>
+      </template>
+    </el-dialog>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/element-plus"></script>
+  <script src="https://unpkg.com/@element-plus/icons-vue"></script>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
