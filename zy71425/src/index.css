@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: #E2E8F0;
+  background-color: #0A1628;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0A1628 0%, #0F1D35 50%, #0A1628 100%);
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1A2D4A;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4A5568;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-plasma-blue text-space-deep font-semibold rounded-lg
+           hover:bg-plasma-cyan hover:shadow-glow-blue
+           transition-all duration-300 transform hover:scale-105
+           active:scale-95 focus:outline-none focus:ring-2 focus:ring-plasma-blue;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-space-medium border border-tech-gray text-tech-light font-medium rounded-lg
+           hover:border-plasma-blue hover:text-plasma-blue hover:bg-space-dark
+           transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-plasma-blue;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-energy-red text-white font-semibold rounded-lg
+           hover:shadow-glow-red transition-all duration-300 transform hover:scale-105
+           active:scale-95 focus:outline-none focus:ring-2 focus:ring-energy-red;
+  }
+
+  .btn-success {
+    @apply px-4 py-2 bg-neon-green text-space-deep font-semibold rounded-lg
+           hover:shadow-glow-green transition-all duration-300 transform hover:scale-105
+           active:scale-95 focus:outline-none focus:ring-2 focus:ring-neon-green;
+  }
+
+  .card {
+    @apply bg-space-dark border border-tech-gray/30 rounded-xl p-4
+           hover:border-plasma-blue/50 transition-all duration-300;
+  }
+
+  .card-glow {
+    @apply card hover:shadow-glow-blue;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-space-medium border border-tech-gray/50 rounded-lg
+           text-white placeholder-tech-light focus:outline-none focus:border-plasma-blue
+           focus:ring-1 focus:ring-plasma-blue transition-all duration-200;
+  }
+
+  .slider {
+    @apply w-full h-2 bg-space-medium rounded-lg appearance-none cursor-pointer
+           accent-plasma-blue;
+  }
+}
+
+@keyframes particle-trail {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.5); }
+}
+
+@keyframes shockwave {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+@keyframes success-burst {
+  0% { transform: scale(0) rotate(0deg); opacity: 1; }
+  100% { transform: scale(2) rotate(180deg); opacity: 0; }
+}
+
+.particle-trail {
+  animation: particle-trail 0.5s ease-out forwards;
+}
+
+.shockwave {
+  animation: shockwave 0.6s ease-out forwards;
+}
+
+.success-burst {
+  animation: success-burst 0.8s ease-out forwards;
+}
