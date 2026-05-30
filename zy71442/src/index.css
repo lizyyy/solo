@@ -1,0 +1,216 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(226, 232, 240, 0.95);
+  background-color: #0a0f1a;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Serif SC', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+code, pre, .mono {
+  font-family: 'JetBrains Mono', SFMono-Regular, Menlo, monospace;
+}
+
+@layer components {
+  .panel {
+    @apply bg-slate-900/90 backdrop-blur-md border border-slate-700/50 rounded-lg shadow-xl;
+  }
+
+  .panel-header {
+    @apply px-4 py-3 border-b border-slate-700/50 font-semibold text-sm text-slate-200 flex items-center gap-2;
+  }
+
+  .panel-body {
+    @apply p-4 overflow-y-auto;
+  }
+
+  .card {
+    @apply bg-slate-800/70 border border-slate-700/50 rounded-md p-3 transition-all duration-200;
+  }
+
+  .card:hover {
+    @apply border-slate-600/70 bg-slate-800/90;
+  }
+
+  .card-raw {
+    @apply border-blue-500/40 bg-blue-950/30;
+  }
+
+  .card-raw:hover {
+    @apply border-blue-500/60 bg-blue-950/50;
+  }
+
+  .card-processed {
+    @apply border-emerald-500/40 bg-emerald-950/30;
+  }
+
+  .card-processed:hover {
+    @apply border-emerald-500/60 bg-emerald-950/50;
+  }
+
+  .btn {
+    @apply px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150 flex items-center gap-1.5;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-500 text-white;
+  }
+
+  .btn-secondary {
+    @apply bg-slate-700 hover:bg-slate-600 text-slate-200;
+  }
+
+  .btn-danger {
+    @apply bg-red-600/80 hover:bg-red-500 text-white;
+  }
+
+  .btn-success {
+    @apply bg-emerald-600/80 hover:bg-emerald-500 text-white;
+  }
+
+  .btn-warning {
+    @apply bg-amber-600/80 hover:bg-amber-500 text-white;
+  }
+
+  .btn-ghost {
+    @apply hover:bg-slate-700/50 text-slate-400 hover:text-slate-200;
+  }
+
+  .input {
+    @apply bg-slate-800/80 border border-slate-600/50 rounded-md px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all;
+  }
+
+  .badge {
+    @apply px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-raw {
+    @apply bg-blue-500/20 text-blue-400 border border-blue-500/30;
+  }
+
+  .badge-processed {
+    @apply bg-emerald-500/20 text-emerald-400 border border-emerald-500/30;
+  }
+
+  .badge-error {
+    @apply bg-red-500/20 text-red-400 border border-red-500/30;
+  }
+
+  .badge-warning {
+    @apply bg-amber-500/20 text-amber-400 border border-amber-500/30;
+  }
+
+  .slider-track {
+    @apply h-1.5 bg-slate-700 rounded-full overflow-hidden;
+  }
+
+  .slider-fill {
+    @apply h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full;
+  }
+
+  .slider-thumb {
+    @apply w-4 h-4 bg-white rounded-full shadow-lg cursor-grab active:cursor-grabbing border-2 border-blue-500 transition-transform hover:scale-110;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(71, 85, 105, 0.5);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(71, 85, 105, 0.8);
+  }
+
+  .timeline-line {
+    @apply absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-cyan-400 to-transparent;
+  }
+
+  .timeline-dot {
+    @apply absolute left-2.5 w-3 h-3 rounded-full border-2 border-slate-900 bg-blue-500;
+  }
+
+  .timeline-dot-active {
+    @apply bg-cyan-400 scale-125;
+  }
+}
+
+canvas {
+  display: block;
+  outline: none;
+}
+
+.react-resizable-handle {
+  position: absolute;
+  width: 8px;
+  height: 100%;
+  right: 0;
+  top: 0;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.react-resizable-handle:hover {
+  background: rgba(59, 130, 246, 0.3);
+}
+
+::selection {
+  background: rgba(59, 130, 246, 0.4);
+  color: white;
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: rgba(249, 115, 22, 0.4);
+  }
+  50% {
+    border-color: rgba(249, 115, 22, 0.8);
+  }
+}
+
+.pulse-border {
+  animation: pulse-border 2s ease-in-out infinite;
+}
