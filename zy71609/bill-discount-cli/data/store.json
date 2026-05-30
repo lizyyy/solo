@@ -1,0 +1,829 @@
+{
+  "bills": [
+    {
+      "billNo": "BIL2024001",
+      "drawer": "深圳天启科技",
+      "payee": "上海锦鹏贸易",
+      "acceptor": "工商银行深圳分行",
+      "amount": 500000,
+      "issueDate": "2024-01-15",
+      "maturityDate": "2024-07-15",
+      "billType": "电子",
+      "status": "pending",
+      "notes": "正常票据",
+      "createdAt": "2026-05-30T08:29:03.259Z",
+      "updatedAt": "2026-05-30T08:29:03.259Z"
+    },
+    {
+      "billNo": "BIL2024002",
+      "drawer": "北京宏远集团",
+      "payee": "广州华信电子",
+      "acceptor": "建设银行北京分行",
+      "amount": 1200000,
+      "issueDate": "2024-02-01",
+      "maturityDate": "2024-08-01",
+      "billType": "电子",
+      "status": "pending",
+      "notes": "大额票据",
+      "createdAt": "2026-05-30T08:29:03.259Z",
+      "updatedAt": "2026-05-30T08:29:03.259Z"
+    },
+    {
+      "billNo": "BIL2024003",
+      "drawer": "杭州云端网络",
+      "payee": "南京明德实业",
+      "acceptor": "农业银行杭州分行",
+      "amount": 300000,
+      "issueDate": "2024-03-10",
+      "maturityDate": "2024-06-10",
+      "billType": "纸质",
+      "status": "pending",
+      "notes": "短期票据",
+      "createdAt": "2026-05-30T08:29:03.259Z",
+      "updatedAt": "2026-05-30T08:29:03.259Z"
+    },
+    {
+      "billNo": "BIL2024004",
+      "drawer": "成都新创能源",
+      "payee": "重庆恒达物流",
+      "acceptor": "中国银行成都分行",
+      "amount": 800000,
+      "issueDate": "2024-01-20",
+      "maturityDate": "2024-12-20",
+      "billType": "电子",
+      "status": "pending",
+      "notes": "长期票据",
+      "createdAt": "2026-05-30T08:29:03.259Z",
+      "updatedAt": "2026-05-30T08:29:03.259Z"
+    },
+    {
+      "billNo": "BIL2024005",
+      "drawer": "武汉长江贸易",
+      "payee": "长沙湘江科技",
+      "acceptor": "招商银行武汉分行",
+      "amount": 200000,
+      "issueDate": "2024-04-01",
+      "maturityDate": "2024-04-05",
+      "billType": "电子",
+      "status": "pending",
+      "notes": "计息天数极短",
+      "createdAt": "2026-05-30T08:29:03.259Z",
+      "updatedAt": "2026-05-30T08:29:03.259Z"
+    }
+  ],
+  "quotes": [
+    {
+      "id": "Q-ICBC-001",
+      "bankName": "工商银行深圳分行",
+      "billType": "电子",
+      "rate": 2.85,
+      "effectiveDate": "2024-01-01",
+      "expiryDate": "2024-06-30",
+      "version": 1,
+      "minAmount": 100000,
+      "maxAmount": 2000000,
+      "createdAt": "2026-05-30T08:29:12.956Z"
+    },
+    {
+      "id": "Q-ICBC-002",
+      "bankName": "工商银行深圳分行",
+      "billType": "电子",
+      "rate": 2.75,
+      "effectiveDate": "2024-07-01",
+      "expiryDate": "2024-12-31",
+      "version": 2,
+      "minAmount": 100000,
+      "maxAmount": 2000000,
+      "createdAt": "2026-05-30T08:29:12.956Z"
+    },
+    {
+      "id": "Q-CCB-001",
+      "bankName": "建设银行北京分行",
+      "billType": "电子",
+      "rate": 3,
+      "effectiveDate": "2024-01-01",
+      "expiryDate": "2024-06-30",
+      "version": 1,
+      "minAmount": 500000,
+      "maxAmount": 5000000,
+      "createdAt": "2026-05-30T08:29:12.956Z"
+    },
+    {
+      "id": "Q-CCB-002",
+      "bankName": "建设银行北京分行",
+      "billType": "电子",
+      "rate": 2.9,
+      "effectiveDate": "2024-07-01",
+      "expiryDate": "2024-12-31",
+      "version": 2,
+      "minAmount": 500000,
+      "maxAmount": 5000000,
+      "createdAt": "2026-05-30T08:29:12.956Z"
+    },
+    {
+      "id": "Q-ABC-001",
+      "bankName": "农业银行杭州分行",
+      "billType": "纸质",
+      "rate": 3.2,
+      "effectiveDate": "2024-01-01",
+      "expiryDate": "2024-12-31",
+      "version": 1,
+      "minAmount": 100000,
+      "maxAmount": 1000000,
+      "createdAt": "2026-05-30T08:29:12.956Z"
+    },
+    {
+      "id": "Q-BOC-001",
+      "bankName": "中国银行成都分行",
+      "billType": "电子",
+      "rate": 2.95,
+      "effectiveDate": "2024-01-01",
+      "expiryDate": "2024-03-31",
+      "version": 1,
+      "minAmount": 500000,
+      "maxAmount": 3000000,
+      "createdAt": "2026-05-30T08:29:12.956Z"
+    },
+    {
+      "id": "Q-CMB-001",
+      "bankName": "招商银行武汉分行",
+      "billType": "电子",
+      "rate": 3.1,
+      "effectiveDate": "2024-01-01",
+      "expiryDate": "2024-12-31",
+      "version": 1,
+      "minAmount": 100000,
+      "maxAmount": 500000,
+      "createdAt": "2026-05-30T08:29:12.956Z"
+    }
+  ],
+  "applications": [
+    {
+      "appId": "APP2024001",
+      "billNo": "BIL2024001",
+      "bankName": "工商银行深圳分行",
+      "discountDate": "2024-02-15",
+      "appliedRate": 2.85,
+      "status": "pending",
+      "notes": "利率与报价一致",
+      "createdAt": "2026-05-30T08:29:19.592Z",
+      "updatedAt": "2026-05-30T08:29:19.592Z"
+    },
+    {
+      "appId": "APP2024002",
+      "billNo": "BIL2024002",
+      "bankName": "建设银行北京分行",
+      "discountDate": "2024-03-01",
+      "appliedRate": 2.8,
+      "status": "pending",
+      "notes": "申请利率低于报价利率",
+      "createdAt": "2026-05-30T08:29:19.592Z",
+      "updatedAt": "2026-05-30T08:29:19.592Z"
+    },
+    {
+      "appId": "APP2024003",
+      "billNo": "BIL2024003",
+      "bankName": "农业银行杭州分行",
+      "discountDate": "2024-03-20",
+      "appliedRate": 3.2,
+      "status": "pending",
+      "notes": "利率与报价一致",
+      "createdAt": "2026-05-30T08:29:19.592Z",
+      "updatedAt": "2026-05-30T08:29:19.592Z"
+    },
+    {
+      "appId": "APP2024004",
+      "billNo": "BIL2024004",
+      "bankName": "中国银行成都分行",
+      "discountDate": "2024-04-01",
+      "appliedRate": 2.95,
+      "status": "pending",
+      "notes": "报价已过期",
+      "createdAt": "2026-05-30T08:29:19.592Z",
+      "updatedAt": "2026-05-30T08:29:19.592Z"
+    },
+    {
+      "appId": "APP2024005",
+      "billNo": "BIL2024005",
+      "bankName": "招商银行武汉分行",
+      "discountDate": "2024-04-02",
+      "appliedRate": 3.1,
+      "status": "pending",
+      "notes": "计息天数极少",
+      "createdAt": "2026-05-30T08:29:19.592Z",
+      "updatedAt": "2026-05-30T08:29:19.592Z"
+    },
+    {
+      "appId": "APP2024006",
+      "billNo": "BIL2024001",
+      "bankName": "工商银行深圳分行",
+      "discountDate": "2024-02-20",
+      "appliedRate": 2.85,
+      "status": "pending",
+      "notes": "同票重复贴现",
+      "createdAt": "2026-05-30T08:29:19.592Z",
+      "updatedAt": "2026-05-30T08:29:19.592Z"
+    }
+  ],
+  "calendar": [
+    {
+      "date": "2024-01-01",
+      "isWorkday": false,
+      "holidayName": "元旦"
+    },
+    {
+      "date": "2024-01-02",
+      "isWorkday": false,
+      "holidayName": "元旦假期"
+    },
+    {
+      "date": "2024-01-03",
+      "isWorkday": false,
+      "holidayName": "元旦假期"
+    },
+    {
+      "date": "2024-02-10",
+      "isWorkday": false,
+      "holidayName": "春节"
+    },
+    {
+      "date": "2024-02-11",
+      "isWorkday": false,
+      "holidayName": "春节"
+    },
+    {
+      "date": "2024-02-12",
+      "isWorkday": false,
+      "holidayName": "春节"
+    },
+    {
+      "date": "2024-02-13",
+      "isWorkday": false,
+      "holidayName": "春节"
+    },
+    {
+      "date": "2024-02-14",
+      "isWorkday": false,
+      "holidayName": "春节"
+    },
+    {
+      "date": "2024-02-15",
+      "isWorkday": false,
+      "holidayName": "春节"
+    },
+    {
+      "date": "2024-02-16",
+      "isWorkday": false,
+      "holidayName": "春节"
+    },
+    {
+      "date": "2024-02-17",
+      "isWorkday": false,
+      "holidayName": "春节"
+    },
+    {
+      "date": "2024-04-04",
+      "isWorkday": false,
+      "holidayName": "清明节"
+    },
+    {
+      "date": "2024-04-05",
+      "isWorkday": false,
+      "holidayName": "清明节"
+    },
+    {
+      "date": "2024-04-06",
+      "isWorkday": false,
+      "holidayName": "清明节"
+    },
+    {
+      "date": "2024-05-01",
+      "isWorkday": false,
+      "holidayName": "劳动节"
+    },
+    {
+      "date": "2024-05-02",
+      "isWorkday": false,
+      "holidayName": "劳动节"
+    },
+    {
+      "date": "2024-05-03",
+      "isWorkday": false,
+      "holidayName": "劳动节"
+    },
+    {
+      "date": "2024-05-04",
+      "isWorkday": false,
+      "holidayName": "劳动节"
+    },
+    {
+      "date": "2024-05-05",
+      "isWorkday": false,
+      "holidayName": "劳动节"
+    },
+    {
+      "date": "2024-06-08",
+      "isWorkday": false,
+      "holidayName": "端午节"
+    },
+    {
+      "date": "2024-06-09",
+      "isWorkday": false,
+      "holidayName": "端午节"
+    },
+    {
+      "date": "2024-06-10",
+      "isWorkday": false,
+      "holidayName": "端午节"
+    },
+    {
+      "date": "2024-09-15",
+      "isWorkday": false,
+      "holidayName": "中秋节"
+    },
+    {
+      "date": "2024-09-16",
+      "isWorkday": false,
+      "holidayName": "中秋节"
+    },
+    {
+      "date": "2024-09-17",
+      "isWorkday": false,
+      "holidayName": "中秋节"
+    },
+    {
+      "date": "2024-10-01",
+      "isWorkday": false,
+      "holidayName": "国庆节"
+    },
+    {
+      "date": "2024-10-02",
+      "isWorkday": false,
+      "holidayName": "国庆节"
+    },
+    {
+      "date": "2024-10-03",
+      "isWorkday": false,
+      "holidayName": "国庆节"
+    },
+    {
+      "date": "2024-10-04",
+      "isWorkday": false,
+      "holidayName": "国庆节"
+    },
+    {
+      "date": "2024-10-05",
+      "isWorkday": false,
+      "holidayName": "国庆节"
+    },
+    {
+      "date": "2024-10-06",
+      "isWorkday": false,
+      "holidayName": "国庆节"
+    },
+    {
+      "date": "2024-10-07",
+      "isWorkday": false,
+      "holidayName": "国庆节"
+    }
+  ],
+  "payments": [
+    {
+      "paymentId": "PAY2024001",
+      "billNo": "BIL2024001",
+      "amount": 500000,
+      "paymentDate": "2024-07-15",
+      "payer": "工商银行深圳分行",
+      "payee": "上海锦鹏贸易",
+      "status": "pending",
+      "createdAt": "2026-05-30T08:29:32.336Z"
+    },
+    {
+      "paymentId": "PAY2024002",
+      "billNo": "BIL2024003",
+      "amount": 300000,
+      "paymentDate": "2024-06-10",
+      "payer": "农业银行杭州分行",
+      "payee": "南京明德实业",
+      "status": "pending",
+      "createdAt": "2026-05-30T08:29:32.336Z"
+    }
+  ],
+  "anomalies": [
+    {
+      "id": "dup-discount-pending-APP2024001",
+      "billNo": "BIL2024001",
+      "category": "data",
+      "severity": "warning",
+      "code": "DUPLICATE_DISCOUNT_PENDING",
+      "message": "同一票据存在待处理的重复贴现申请",
+      "detail": "当前申请=APP2024001, 其他申请号=[APP2024006]",
+      "resolved": false,
+      "resolvedAt": "",
+      "resolution": "",
+      "createdAt": "2026-05-30T08:29:39.923Z"
+    },
+    {
+      "id": "quote-near-expiry-APP2024001",
+      "billNo": "BIL2024001",
+      "category": "rule",
+      "severity": "warning",
+      "code": "QUOTE_NEAR_EXPIRY",
+      "message": "匹配报价即将到期",
+      "detail": "银行=工商银行深圳分行, 报价到期日=2024-06-30, 当前日期=2026-05-30",
+      "resolved": false,
+      "resolvedAt": "",
+      "resolution": "",
+      "createdAt": "2026-05-30T08:29:39.929Z"
+    },
+    {
+      "id": "quote-near-expiry-APP2024002",
+      "billNo": "BIL2024002",
+      "category": "rule",
+      "severity": "warning",
+      "code": "QUOTE_NEAR_EXPIRY",
+      "message": "匹配报价即将到期",
+      "detail": "银行=建设银行北京分行, 报价到期日=2024-06-30, 当前日期=2026-05-30",
+      "resolved": false,
+      "resolvedAt": "",
+      "resolution": "",
+      "createdAt": "2026-05-30T08:29:39.933Z"
+    },
+    {
+      "id": "rate-mismatch-APP2024002",
+      "billNo": "BIL2024002",
+      "category": "data",
+      "severity": "error",
+      "code": "RATE_MISMATCH",
+      "message": "申请利率与报价利率不一致",
+      "detail": "申请利率=2.8%, 报价利率=3%, 差异=0.2000%",
+      "resolved": false,
+      "resolvedAt": "",
+      "resolution": "",
+      "createdAt": "2026-05-30T08:29:39.933Z"
+    },
+    {
+      "id": "quote-near-expiry-APP2024003",
+      "billNo": "BIL2024003",
+      "category": "rule",
+      "severity": "warning",
+      "code": "QUOTE_NEAR_EXPIRY",
+      "message": "匹配报价即将到期",
+      "detail": "银行=农业银行杭州分行, 报价到期日=2024-12-31, 当前日期=2026-05-30",
+      "resolved": false,
+      "resolvedAt": "",
+      "resolution": "",
+      "createdAt": "2026-05-30T08:29:39.935Z"
+    },
+    {
+      "id": "expired-quote-APP2024004",
+      "billNo": "BIL2024004",
+      "category": "material",
+      "severity": "error",
+      "code": "QUOTE_EXPIRED",
+      "message": "银行报价已过期",
+      "detail": "银行=中国银行成都分行, 最新报价到期日=2024-03-31, 贴现日=2024-04-01",
+      "resolved": false,
+      "resolvedAt": "",
+      "resolution": "",
+      "createdAt": "2026-05-30T08:29:39.939Z"
+    },
+    {
+      "id": "quote-near-expiry-APP2024005",
+      "billNo": "BIL2024005",
+      "category": "rule",
+      "severity": "warning",
+      "code": "QUOTE_NEAR_EXPIRY",
+      "message": "匹配报价即将到期",
+      "detail": "银行=招商银行武汉分行, 报价到期日=2024-12-31, 当前日期=2026-05-30",
+      "resolved": false,
+      "resolvedAt": "",
+      "resolution": "",
+      "createdAt": "2026-05-30T08:29:39.939Z"
+    },
+    {
+      "id": "dup-calc-APP2024006-APP2024001",
+      "billNo": "BIL2024001",
+      "category": "data",
+      "severity": "info",
+      "code": "DUPLICATE_CALCULATION_EXISTS",
+      "message": "同一票据已有复算记录",
+      "detail": "当前申请=APP2024006, 已有复算=APP2024001, 银行=工商银行深圳分行",
+      "resolved": false,
+      "resolvedAt": "",
+      "resolution": "",
+      "createdAt": "2026-05-30T08:29:39.939Z"
+    }
+  ],
+  "calculations": [
+    {
+      "billNo": "BIL2024001",
+      "appId": "APP2024001",
+      "bankName": "工商银行深圳分行",
+      "amount": 500000,
+      "discountDate": "2024-02-15",
+      "maturityDate": "2024-07-15",
+      "interestDays": 100,
+      "appliedRate": 2.85,
+      "matchedQuoteId": "Q-ICBC-001",
+      "matchedRate": 2.85,
+      "discountInterest": 3958.33,
+      "netAmount": 496041.67,
+      "rateDiff": 0,
+      "interestDiff": 0,
+      "anomalies": [
+        {
+          "id": "dup-discount-pending-APP2024001",
+          "billNo": "BIL2024001",
+          "category": "data",
+          "severity": "warning",
+          "code": "DUPLICATE_DISCOUNT_PENDING",
+          "message": "同一票据存在待处理的重复贴现申请",
+          "detail": "当前申请=APP2024001, 其他申请号=[APP2024006]",
+          "resolved": false,
+          "resolvedAt": "",
+          "resolution": "",
+          "createdAt": "2026-05-30T08:29:39.923Z"
+        },
+        {
+          "id": "quote-near-expiry-APP2024001",
+          "billNo": "BIL2024001",
+          "category": "rule",
+          "severity": "warning",
+          "code": "QUOTE_NEAR_EXPIRY",
+          "message": "匹配报价即将到期",
+          "detail": "银行=工商银行深圳分行, 报价到期日=2024-06-30, 当前日期=2026-05-30",
+          "resolved": false,
+          "resolvedAt": "",
+          "resolution": "",
+          "createdAt": "2026-05-30T08:29:39.929Z"
+        }
+      ],
+      "calculatedAt": "2026-05-30T08:29:39.922Z"
+    },
+    {
+      "billNo": "BIL2024002",
+      "appId": "APP2024002",
+      "bankName": "建设银行北京分行",
+      "amount": 1200000,
+      "discountDate": "2024-03-01",
+      "maturityDate": "2024-08-01",
+      "interestDays": 103,
+      "appliedRate": 2.8,
+      "matchedQuoteId": "Q-CCB-001",
+      "matchedRate": 3,
+      "discountInterest": 10300,
+      "netAmount": 1189700,
+      "rateDiff": 0.2,
+      "interestDiff": 686.67,
+      "anomalies": [
+        {
+          "id": "quote-near-expiry-APP2024002",
+          "billNo": "BIL2024002",
+          "category": "rule",
+          "severity": "warning",
+          "code": "QUOTE_NEAR_EXPIRY",
+          "message": "匹配报价即将到期",
+          "detail": "银行=建设银行北京分行, 报价到期日=2024-06-30, 当前日期=2026-05-30",
+          "resolved": false,
+          "resolvedAt": "",
+          "resolution": "",
+          "createdAt": "2026-05-30T08:29:39.933Z"
+        },
+        {
+          "id": "rate-mismatch-APP2024002",
+          "billNo": "BIL2024002",
+          "category": "data",
+          "severity": "error",
+          "code": "RATE_MISMATCH",
+          "message": "申请利率与报价利率不一致",
+          "detail": "申请利率=2.8%, 报价利率=3%, 差异=0.2000%",
+          "resolved": false,
+          "resolvedAt": "",
+          "resolution": "",
+          "createdAt": "2026-05-30T08:29:39.933Z"
+        }
+      ],
+      "calculatedAt": "2026-05-30T08:29:39.922Z"
+    },
+    {
+      "billNo": "BIL2024003",
+      "appId": "APP2024003",
+      "bankName": "农业银行杭州分行",
+      "amount": 300000,
+      "discountDate": "2024-03-20",
+      "maturityDate": "2024-06-10",
+      "interestDays": 52,
+      "appliedRate": 3.2,
+      "matchedQuoteId": "Q-ABC-001",
+      "matchedRate": 3.2,
+      "discountInterest": 1386.67,
+      "netAmount": 298613.33,
+      "rateDiff": 0,
+      "interestDiff": 0,
+      "anomalies": [
+        {
+          "id": "quote-near-expiry-APP2024003",
+          "billNo": "BIL2024003",
+          "category": "rule",
+          "severity": "warning",
+          "code": "QUOTE_NEAR_EXPIRY",
+          "message": "匹配报价即将到期",
+          "detail": "银行=农业银行杭州分行, 报价到期日=2024-12-31, 当前日期=2026-05-30",
+          "resolved": false,
+          "resolvedAt": "",
+          "resolution": "",
+          "createdAt": "2026-05-30T08:29:39.935Z"
+        }
+      ],
+      "calculatedAt": "2026-05-30T08:29:39.922Z"
+    },
+    {
+      "billNo": "BIL2024004",
+      "appId": "APP2024004",
+      "bankName": "中国银行成都分行",
+      "amount": 800000,
+      "discountDate": "2024-04-01",
+      "maturityDate": "2024-12-20",
+      "interestDays": 176,
+      "appliedRate": 2.95,
+      "matchedQuoteId": "",
+      "matchedRate": 2.95,
+      "discountInterest": 11537.78,
+      "netAmount": 788462.22,
+      "rateDiff": 0,
+      "interestDiff": 0,
+      "anomalies": [
+        {
+          "id": "expired-quote-APP2024004",
+          "billNo": "BIL2024004",
+          "category": "material",
+          "severity": "error",
+          "code": "QUOTE_EXPIRED",
+          "message": "银行报价已过期",
+          "detail": "银行=中国银行成都分行, 最新报价到期日=2024-03-31, 贴现日=2024-04-01",
+          "resolved": false,
+          "resolvedAt": "",
+          "resolution": "",
+          "createdAt": "2026-05-30T08:29:39.939Z"
+        }
+      ],
+      "calculatedAt": "2026-05-30T08:29:39.922Z"
+    },
+    {
+      "billNo": "BIL2024005",
+      "appId": "APP2024005",
+      "bankName": "招商银行武汉分行",
+      "amount": 200000,
+      "discountDate": "2024-04-02",
+      "maturityDate": "2024-04-05",
+      "interestDays": 1,
+      "appliedRate": 3.1,
+      "matchedQuoteId": "Q-CMB-001",
+      "matchedRate": 3.1,
+      "discountInterest": 17.22,
+      "netAmount": 199982.78,
+      "rateDiff": 0,
+      "interestDiff": 0,
+      "anomalies": [
+        {
+          "id": "quote-near-expiry-APP2024005",
+          "billNo": "BIL2024005",
+          "category": "rule",
+          "severity": "warning",
+          "code": "QUOTE_NEAR_EXPIRY",
+          "message": "匹配报价即将到期",
+          "detail": "银行=招商银行武汉分行, 报价到期日=2024-12-31, 当前日期=2026-05-30",
+          "resolved": false,
+          "resolvedAt": "",
+          "resolution": "",
+          "createdAt": "2026-05-30T08:29:39.939Z"
+        }
+      ],
+      "calculatedAt": "2026-05-30T08:29:39.922Z"
+    },
+    {
+      "billNo": "BIL2024001",
+      "appId": "APP2024006",
+      "bankName": "工商银行深圳分行",
+      "amount": 500000,
+      "discountDate": "2024-02-20",
+      "maturityDate": "2024-07-15",
+      "interestDays": 98,
+      "appliedRate": 2.85,
+      "matchedQuoteId": "Q-ICBC-001",
+      "matchedRate": 2.85,
+      "discountInterest": 3879.17,
+      "netAmount": 496120.83,
+      "rateDiff": 0,
+      "interestDiff": 0,
+      "anomalies": [
+        {
+          "id": "dup-discount-pending-APP2024006",
+          "billNo": "BIL2024001",
+          "category": "data",
+          "severity": "warning",
+          "code": "DUPLICATE_DISCOUNT_PENDING",
+          "message": "同一票据存在待处理的重复贴现申请",
+          "detail": "当前申请=APP2024006, 其他申请号=[APP2024001]",
+          "resolved": false,
+          "resolvedAt": "",
+          "resolution": "",
+          "createdAt": "2026-05-30T08:29:39.939Z"
+        },
+        {
+          "id": "dup-calc-APP2024006-APP2024001",
+          "billNo": "BIL2024001",
+          "category": "data",
+          "severity": "info",
+          "code": "DUPLICATE_CALCULATION_EXISTS",
+          "message": "同一票据已有复算记录",
+          "detail": "当前申请=APP2024006, 已有复算=APP2024001, 银行=工商银行深圳分行",
+          "resolved": false,
+          "resolvedAt": "",
+          "resolution": "",
+          "createdAt": "2026-05-30T08:29:39.939Z"
+        },
+        {
+          "id": "quote-near-expiry-APP2024006",
+          "billNo": "BIL2024001",
+          "category": "rule",
+          "severity": "warning",
+          "code": "QUOTE_NEAR_EXPIRY",
+          "message": "匹配报价即将到期",
+          "detail": "银行=工商银行深圳分行, 报价到期日=2024-06-30, 当前日期=2026-05-30",
+          "resolved": false,
+          "resolvedAt": "",
+          "resolution": "",
+          "createdAt": "2026-05-30T08:29:39.941Z"
+        }
+      ],
+      "calculatedAt": "2026-05-30T08:29:39.922Z"
+    }
+  ],
+  "importHistory": [
+    {
+      "dataType": "calendar",
+      "total": 32,
+      "inserted": 32,
+      "skipped": 0,
+      "updated": 0,
+      "conflicts": [],
+      "timestamp": "2026-05-30T08:28:50.105Z"
+    },
+    {
+      "dataType": "bills",
+      "total": 5,
+      "inserted": 5,
+      "skipped": 0,
+      "updated": 0,
+      "conflicts": [],
+      "timestamp": "2026-05-30T08:29:03.259Z"
+    },
+    {
+      "dataType": "quotes",
+      "total": 7,
+      "inserted": 7,
+      "skipped": 0,
+      "updated": 0,
+      "conflicts": [],
+      "timestamp": "2026-05-30T08:29:12.956Z"
+    },
+    {
+      "dataType": "applications",
+      "total": 6,
+      "inserted": 6,
+      "skipped": 0,
+      "updated": 0,
+      "conflicts": [],
+      "timestamp": "2026-05-30T08:29:19.592Z"
+    },
+    {
+      "dataType": "payments",
+      "total": 2,
+      "inserted": 2,
+      "skipped": 0,
+      "updated": 0,
+      "conflicts": [],
+      "timestamp": "2026-05-30T08:29:32.336Z"
+    },
+    {
+      "dataType": "bills",
+      "total": 5,
+      "inserted": 0,
+      "skipped": 5,
+      "updated": 0,
+      "conflicts": [],
+      "timestamp": "2026-05-30T08:30:05.814Z"
+    },
+    {
+      "dataType": "bills",
+      "total": 5,
+      "inserted": 0,
+      "skipped": 5,
+      "updated": 0,
+      "conflicts": [],
+      "timestamp": "2026-05-30T08:30:14.140Z"
+    }
+  ]
+}
