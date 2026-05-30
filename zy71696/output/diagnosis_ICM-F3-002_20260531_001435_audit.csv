@@ -1,0 +1,23 @@
+﻿timestamp,field,method,original_value,adjusted_value,reason,can_override
+2026-05-29T08:00:00,temperature.timestamp,nearest_alignment,2026-05-29T07:58:00,2026-05-29T08:00:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T08:10:00,temperature.timestamp,nearest_alignment,2026-05-29T08:08:00,2026-05-29T08:10:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T08:20:00,temperature.timestamp,nearest_alignment,2026-05-29T08:18:00,2026-05-29T08:20:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T08:30:00,temperature.timestamp,nearest_alignment,2026-05-29T08:28:00,2026-05-29T08:30:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T08:40:00,temperature.timestamp,nearest_alignment,2026-05-29T08:38:00,2026-05-29T08:40:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T08:50:00,temperature.timestamp,nearest_alignment,2026-05-29T08:48:00,2026-05-29T08:50:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T09:00:00,temperature.timestamp,nearest_alignment,2026-05-29T08:58:00,2026-05-29T09:00:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T09:10:00,temperature.timestamp,nearest_alignment,2026-05-29T09:08:00,2026-05-29T09:10:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T09:20:00,temperature.timestamp,nearest_alignment,2026-05-29T09:18:00,2026-05-29T09:20:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T09:30:00,temperature.timestamp,nearest_alignment,2026-05-29T09:28:00,2026-05-29T09:30:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T09:40:00,temperature.timestamp,nearest_alignment,2026-05-29T09:38:00,2026-05-29T09:40:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T09:50:00,temperature.timestamp,nearest_alignment,2026-05-29T09:48:00,2026-05-29T09:50:00,"温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",True
+2026-05-29T07:30:00,temperature.timestamp,threshold_discard,2026-05-29T07:30:00,,"温度记录时间戳与能耗采样点偏差1800s, 超出对齐阈值900s, 丢弃",True
+2026-05-29T08:20:00,ice_production.production_kg,linear_interp,None,7.55,"产冰量缺失, 前后值均存在, 线性插值",True
+2026-05-29T08:30:00,ice_production.production_kg,linear_interp,None,7.55,"产冰量缺失, 前后值均存在, 线性插值",True
+2026-05-29T09:10:00,ice_production.production_kg,unavailable_exceeds_limit,None,None,"所在连续缺失块共5点, 超过插补上限3点, 整块标记为不可用",False
+2026-05-29T09:20:00,ice_production.production_kg,unavailable_exceeds_limit,None,None,"所在连续缺失块共5点, 超过插补上限3点, 整块标记为不可用",False
+2026-05-29T09:30:00,ice_production.production_kg,unavailable_exceeds_limit,None,None,"所在连续缺失块共5点, 超过插补上限3点, 整块标记为不可用",False
+2026-05-29T09:40:00,ice_production.production_kg,unavailable_exceeds_limit,None,None,"所在连续缺失块共5点, 超过插补上限3点, 整块标记为不可用",False
+2026-05-29T09:50:00,ice_production.production_kg,unavailable_exceeds_limit,None,None,"所在连续缺失块共5点, 超过插补上限3点, 整块标记为不可用",False
+2026-05-29T10:10:00,ice_production.production_kg,linear_interp,None,8.55,"产冰量缺失, 前后值均存在, 线性插值",True
+2026-05-29T08:30:00,power.power_kw,spike_detection,"[7.9, 8.2]","SPIKE_FLAGGED(保留原值, 标记为尖峰)","检测到能耗尖峰, 2点功率>6.8kW",True

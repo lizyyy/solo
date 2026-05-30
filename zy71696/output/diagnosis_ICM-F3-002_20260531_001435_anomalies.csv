@@ -1,0 +1,7 @@
+﻿anomaly_type,start_time,end_time,severity,detail,affected_records,audit_ref
+energy_spike,2026-05-29T08:30:00,2026-05-29T08:40:00,abnormal,"能耗尖峰: 2个采样点功率超过额定1.8倍 (阈值6.8kW), 峰值8.2kW",2,
+missing_production,2026-05-29T08:20:00,2026-05-29T08:30:00,warning,产冰量数据缺失2个采样点,2,
+missing_production,2026-05-29T09:10:00,2026-05-29T09:50:00,abnormal,产冰量数据缺失5个采样点,5,
+missing_production,2026-05-29T10:10:00,2026-05-29T10:10:00,warning,产冰量数据缺失1个采样点,1,
+temperature_misalignment,2026-05-29T07:30:00,2026-05-29T10:00:00,warning,"温度记录时间戳与能耗采样点错位1点, 已对齐或丢弃",1,
+door_excessive,2026-05-29T08:00:00,2026-05-29T09:00:00,warning,"开门次数12次/h, 超过正常上限10次/h",12,

@@ -1,0 +1,446 @@
+{
+  "report_header": {
+    "title": "制冰机能耗异常诊断报告",
+    "equipment_id": "ICM-F3-002",
+    "diagnosis_time": "2026-05-31T00:14:35.802886",
+    "overall_grade": "critical",
+    "report_version": "1.0",
+    "consistency_declaration": "本报告所有数字和明细列表均来自同一次诊断计算结果, 未做二次加工。数据处理痕迹详见audit_trail字段。"
+  },
+  "energy_attribution": {
+    "total_energy_kwh": 10.74,
+    "base_energy_kwh": 5.8,
+    "temperature_surcharge_kwh": 0.4,
+    "door_surcharge_kwh": 0.08,
+    "anomaly_surcharge_kwh": 0.51,
+    "unexplained_kwh": 3.96,
+    "attribution_pct": {
+      "base_pct": 53.98,
+      "temperature_pct": 3.7,
+      "door_pct": 0.72,
+      "anomaly_pct": 4.72,
+      "unexplained_pct": 36.88
+    },
+    "methodology": "能耗归因方法:\n  总能耗 = 10.74 kWh\n  基准能耗 = 产冰量(82.35kg) × 理论SEC(0.0704 kWh/kg) = 5.80 kWh\n  温度修正系数 TCF = 1 + 0.02 × (T_avg(28.4°C) - T_ref(25.0°C)) = 1.0686\n  温度附加 = 基准能耗 × (TCF - 1) = 5.80 × 0.0686 = 0.40 kWh\n  开门附加 = 开门次数(15) × 平均时长(13.9s) × 额定功率(3.8kW) × 损失系数(0.35) / 3600 = 0.08 kWh\n  异常附加 = 0.51 kWh (来自1个尖峰时段)\n  未解释 = 总能耗 - 基准 - 温度附加 - 开门附加 - 异常附加 = 3.96 kWh\n  注意: 未解释能耗可能来自设备老化、制冷剂泄漏、维护不当等因素"
+  },
+  "condition_segments": [
+    {
+      "start_time": "2026-05-29T08:00:00",
+      "end_time": "2026-05-29T08:50:00",
+      "grade": "warning",
+      "avg_sec_kwh_per_kg": 0.095,
+      "avg_temperature_c": 27.15,
+      "door_open_count": 0,
+      "total_production_kg": 47.7,
+      "total_energy_kwh": 4.53,
+      "sec_ratio_vs_baseline": 1.349,
+      "anomalies": [
+        {
+          "anomaly_type": "energy_spike",
+          "start_time": "2026-05-29T08:30:00",
+          "end_time": "2026-05-29T08:40:00",
+          "severity": "abnormal",
+          "detail": "能耗尖峰: 2个采样点功率超过额定1.8倍 (阈值6.8kW), 峰值8.2kW",
+          "affected_records": 2,
+          "audit_ref": null
+        },
+        {
+          "anomaly_type": "missing_production",
+          "start_time": "2026-05-29T08:20:00",
+          "end_time": "2026-05-29T08:30:00",
+          "severity": "warning",
+          "detail": "产冰量数据缺失2个采样点",
+          "affected_records": 2,
+          "audit_ref": null
+        },
+        {
+          "anomaly_type": "door_excessive",
+          "start_time": "2026-05-29T08:00:00",
+          "end_time": "2026-05-29T09:00:00",
+          "severity": "warning",
+          "detail": "开门次数12次/h, 超过正常上限10次/h",
+          "affected_records": 12,
+          "audit_ref": null
+        }
+      ]
+    },
+    {
+      "start_time": "2026-05-29T09:00:00",
+      "end_time": "2026-05-29T09:50:00",
+      "grade": "critical",
+      "avg_sec_kwh_per_kg": 0.34,
+      "avg_temperature_c": 29.05,
+      "door_open_count": 0,
+      "total_production_kg": 9.0,
+      "total_energy_kwh": 3.06,
+      "sec_ratio_vs_baseline": 4.8295,
+      "anomalies": [
+        {
+          "anomaly_type": "missing_production",
+          "start_time": "2026-05-29T09:10:00",
+          "end_time": "2026-05-29T09:50:00",
+          "severity": "abnormal",
+          "detail": "产冰量数据缺失5个采样点",
+          "affected_records": 5,
+          "audit_ref": null
+        }
+      ]
+    },
+    {
+      "start_time": "2026-05-29T10:00:00",
+      "end_time": "2026-05-29T10:20:00",
+      "grade": "normal",
+      "avg_sec_kwh_per_kg": 0.0733,
+      "avg_temperature_c": 30.4,
+      "door_open_count": 0,
+      "total_production_kg": 25.65,
+      "total_energy_kwh": 1.88,
+      "sec_ratio_vs_baseline": 1.0411,
+      "anomalies": [
+        {
+          "anomaly_type": "missing_production",
+          "start_time": "2026-05-29T10:10:00",
+          "end_time": "2026-05-29T10:10:00",
+          "severity": "warning",
+          "detail": "产冰量数据缺失1个采样点",
+          "affected_records": 1,
+          "audit_ref": null
+        }
+      ]
+    }
+  ],
+  "anomalies": [
+    {
+      "anomaly_type": "energy_spike",
+      "start_time": "2026-05-29T08:30:00",
+      "end_time": "2026-05-29T08:40:00",
+      "severity": "abnormal",
+      "detail": "能耗尖峰: 2个采样点功率超过额定1.8倍 (阈值6.8kW), 峰值8.2kW",
+      "affected_records": 2,
+      "audit_ref": null
+    },
+    {
+      "anomaly_type": "missing_production",
+      "start_time": "2026-05-29T08:20:00",
+      "end_time": "2026-05-29T08:30:00",
+      "severity": "warning",
+      "detail": "产冰量数据缺失2个采样点",
+      "affected_records": 2,
+      "audit_ref": null
+    },
+    {
+      "anomaly_type": "missing_production",
+      "start_time": "2026-05-29T09:10:00",
+      "end_time": "2026-05-29T09:50:00",
+      "severity": "abnormal",
+      "detail": "产冰量数据缺失5个采样点",
+      "affected_records": 5,
+      "audit_ref": null
+    },
+    {
+      "anomaly_type": "missing_production",
+      "start_time": "2026-05-29T10:10:00",
+      "end_time": "2026-05-29T10:10:00",
+      "severity": "warning",
+      "detail": "产冰量数据缺失1个采样点",
+      "affected_records": 1,
+      "audit_ref": null
+    },
+    {
+      "anomaly_type": "temperature_misalignment",
+      "start_time": "2026-05-29T07:30:00",
+      "end_time": "2026-05-29T10:00:00",
+      "severity": "warning",
+      "detail": "温度记录时间戳与能耗采样点错位1点, 已对齐或丢弃",
+      "affected_records": 1,
+      "audit_ref": null
+    },
+    {
+      "anomaly_type": "door_excessive",
+      "start_time": "2026-05-29T08:00:00",
+      "end_time": "2026-05-29T09:00:00",
+      "severity": "warning",
+      "detail": "开门次数12次/h, 超过正常上限10次/h",
+      "affected_records": 12,
+      "audit_ref": null
+    }
+  ],
+  "maintenance_suggestions": [
+    {
+      "priority": "abnormal",
+      "category": "电气检查",
+      "action": "检查压缩机电气系统, 包括启动电容、接触器和绕组绝缘",
+      "rationale": "检测到1次能耗尖峰, 功率超过额定1.8倍, 可能原因: 压缩机硬启动、电气故障、制冷剂过量",
+      "related_anomaly_types": [
+        "energy_spike"
+      ]
+    },
+    {
+      "priority": "critical",
+      "category": "全面检修",
+      "action": "安排设备全面检修, 包括制冷剂检漏、压缩机效率测试、控制系统校准",
+      "rationale": "存在1个严重工况时段, SEC超过基准2.0倍, 设备可能存在严重故障",
+      "related_anomaly_types": [
+        "energy_spike",
+        "sustained_high_sec"
+      ]
+    },
+    {
+      "priority": "abnormal",
+      "category": "设备老化评估",
+      "action": "评估设备老化程度, 检查保温层完整性、门封条密封性",
+      "rationale": "未解释能耗占比36.9%, 超过15%阈值, 可能存在保温性能下降或密封不良",
+      "related_anomaly_types": []
+    },
+    {
+      "priority": "warning",
+      "category": "使用规范",
+      "action": "培训操作人员减少开门频率和时长, 检查门封条",
+      "rationale": "开门次数超出正常范围, 每次开门导致冷量损失增加压缩机负荷",
+      "related_anomaly_types": [
+        "door_excessive"
+      ]
+    },
+    {
+      "priority": "warning",
+      "category": "数据采集",
+      "action": "检查产冰量传感器和数据采集系统, 确保数据完整性",
+      "rationale": "产冰量数据缺失影响诊断准确性, 需排除传感器故障或通讯中断",
+      "related_anomaly_types": [
+        "missing_production"
+      ]
+    },
+    {
+      "priority": "warning",
+      "category": "数据采集",
+      "action": "校准温度传感器时钟, 统一数据采集时间基准",
+      "rationale": "温度记录时间戳与能耗采样点存在错位, 影响温度修正计算的准确性",
+      "related_anomaly_types": [
+        "temperature_misalignment"
+      ]
+    }
+  ],
+  "audit_trail": [
+    {
+      "timestamp": "2026-05-29T08:00:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T07:58:00",
+      "adjusted_value": "2026-05-29T08:00:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T08:10:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T08:08:00",
+      "adjusted_value": "2026-05-29T08:10:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T08:20:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T08:18:00",
+      "adjusted_value": "2026-05-29T08:20:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T08:30:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T08:28:00",
+      "adjusted_value": "2026-05-29T08:30:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T08:40:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T08:38:00",
+      "adjusted_value": "2026-05-29T08:40:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T08:50:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T08:48:00",
+      "adjusted_value": "2026-05-29T08:50:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T09:00:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T08:58:00",
+      "adjusted_value": "2026-05-29T09:00:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T09:10:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T09:08:00",
+      "adjusted_value": "2026-05-29T09:10:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T09:20:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T09:18:00",
+      "adjusted_value": "2026-05-29T09:20:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T09:30:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T09:28:00",
+      "adjusted_value": "2026-05-29T09:30:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T09:40:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T09:38:00",
+      "adjusted_value": "2026-05-29T09:40:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T09:50:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T09:48:00",
+      "adjusted_value": "2026-05-29T09:50:00",
+      "reason": "温度记录时间戳与能耗采样点偏差120s, 对齐到最近采样点",
+      "method": "nearest_alignment",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T07:30:00",
+      "field": "temperature.timestamp",
+      "original_value": "2026-05-29T07:30:00",
+      "adjusted_value": null,
+      "reason": "温度记录时间戳与能耗采样点偏差1800s, 超出对齐阈值900s, 丢弃",
+      "method": "threshold_discard",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T08:20:00",
+      "field": "ice_production.production_kg",
+      "original_value": "None",
+      "adjusted_value": "7.55",
+      "reason": "产冰量缺失, 前后值均存在, 线性插值",
+      "method": "linear_interp",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T08:30:00",
+      "field": "ice_production.production_kg",
+      "original_value": "None",
+      "adjusted_value": "7.55",
+      "reason": "产冰量缺失, 前后值均存在, 线性插值",
+      "method": "linear_interp",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T09:10:00",
+      "field": "ice_production.production_kg",
+      "original_value": "None",
+      "adjusted_value": "None",
+      "reason": "所在连续缺失块共5点, 超过插补上限3点, 整块标记为不可用",
+      "method": "unavailable_exceeds_limit",
+      "operator": "system",
+      "can_override": false
+    },
+    {
+      "timestamp": "2026-05-29T09:20:00",
+      "field": "ice_production.production_kg",
+      "original_value": "None",
+      "adjusted_value": "None",
+      "reason": "所在连续缺失块共5点, 超过插补上限3点, 整块标记为不可用",
+      "method": "unavailable_exceeds_limit",
+      "operator": "system",
+      "can_override": false
+    },
+    {
+      "timestamp": "2026-05-29T09:30:00",
+      "field": "ice_production.production_kg",
+      "original_value": "None",
+      "adjusted_value": "None",
+      "reason": "所在连续缺失块共5点, 超过插补上限3点, 整块标记为不可用",
+      "method": "unavailable_exceeds_limit",
+      "operator": "system",
+      "can_override": false
+    },
+    {
+      "timestamp": "2026-05-29T09:40:00",
+      "field": "ice_production.production_kg",
+      "original_value": "None",
+      "adjusted_value": "None",
+      "reason": "所在连续缺失块共5点, 超过插补上限3点, 整块标记为不可用",
+      "method": "unavailable_exceeds_limit",
+      "operator": "system",
+      "can_override": false
+    },
+    {
+      "timestamp": "2026-05-29T09:50:00",
+      "field": "ice_production.production_kg",
+      "original_value": "None",
+      "adjusted_value": "None",
+      "reason": "所在连续缺失块共5点, 超过插补上限3点, 整块标记为不可用",
+      "method": "unavailable_exceeds_limit",
+      "operator": "system",
+      "can_override": false
+    },
+    {
+      "timestamp": "2026-05-29T10:10:00",
+      "field": "ice_production.production_kg",
+      "original_value": "None",
+      "adjusted_value": "8.55",
+      "reason": "产冰量缺失, 前后值均存在, 线性插值",
+      "method": "linear_interp",
+      "operator": "system",
+      "can_override": true
+    },
+    {
+      "timestamp": "2026-05-29T08:30:00",
+      "field": "power.power_kw",
+      "original_value": "[7.9, 8.2]",
+      "adjusted_value": "SPIKE_FLAGGED(保留原值, 标记为尖峰)",
+      "reason": "检测到能耗尖峰, 2点功率>6.8kW",
+      "method": "spike_detection",
+      "operator": "system",
+      "can_override": true
+    }
+  ],
+  "processing_methodology": "=== 诊断处理口径 ===\n\n1. 能耗归因:\n能耗归因方法:\n  总能耗 = 10.74 kWh\n  基准能耗 = 产冰量(82.35kg) × 理论SEC(0.0704 kWh/kg) = 5.80 kWh\n  温度修正系数 TCF = 1 + 0.02 × (T_avg(28.4°C) - T_ref(25.0°C)) = 1.0686\n  温度附加 = 基准能耗 × (TCF - 1) = 5.80 × 0.0686 = 0.40 kWh\n  开门附加 = 开门次数(15) × 平均时长(13.9s) × 额定功率(3.8kW) × 损失系数(0.35) / 3600 = 0.08 kWh\n  异常附加 = 0.51 kWh (来自1个尖峰时段)\n  未解释 = 总能耗 - 基准 - 温度附加 - 开门附加 - 异常附加 = 3.96 kWh\n  注意: 未解释能耗可能来自设备老化、制冷剂泄漏、维护不当等因素\n\n2. 工况分段 (按小时):\n  08:00-08:50: warning (SEC=0.095 kWh/kg, 比值=1.35x)\n  09:00-09:50: critical (SEC=0.340 kWh/kg, 比值=4.83x)\n  10:00-10:20: normal (SEC=0.073 kWh/kg, 比值=1.04x)\n\n3. SEC分段阈值:\n  正常 ≤ 1.2x基准\n  注意 1.2x-1.5x基准\n  异常 1.5x-2.0x基准\n  严重 > 2.0x基准\n\n4. 数据处理规则:\n  温度对齐阈值: 900s\n  尖峰检测: 功率 > 额定×1.8, 持续≥2点\n  缺失插补: 连续≤3点可插补, 超出标记不可用\n  温度修正: α=0.02/°C, T_ref=25.0°C, TCF∈[0.5,2.0]\n  开门损失系数: 0.35\n\n5. 报告一致性声明:\n  本报告所有数字和明细列表均来自同一次诊断计算, 未做二次加工。\n  数据处理痕迹详见audit_trail字段, 不会自动覆盖历史记录。"
+}
