@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  background-color: #0F172A;
+  color: #E2E8F0;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1E293B;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748B;
+}
+
+@layer components {
+  .card {
+    @apply bg-dark-100 border border-dark-200 rounded-lg shadow-lg;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md font-medium transition-colors duration-200;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-danger hover:bg-red-700 text-white rounded-md font-medium transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-dark-200 hover:bg-dark-300 text-white rounded-md font-medium transition-colors duration-200;
+  }
+
+  .table-row-hover {
+    @apply hover:bg-dark-200 transition-colors duration-150;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-dark border border-dark-200 rounded-md text-white placeholder-dark-300 focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-transparent;
+  }
+
+  .label-text {
+    @apply block text-sm font-medium text-slate-300 mb-1;
+  }
+}
