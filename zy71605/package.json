@@ -1,0 +1,13 @@
+{
+  "name": "cross-store-balance-migration",
+  "version": "1.0.0",
+  "description": "连锁门店跨店储值余额迁移工具",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node test/e2e.test.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
