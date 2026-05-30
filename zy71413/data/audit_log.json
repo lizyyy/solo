@@ -1,0 +1,172 @@
+[
+  {
+    "timestamp": "2026-05-30T06:28:12.172656",
+    "action": "DATA_CLEARED",
+    "bill_no": null,
+    "claim_no": null,
+    "details": {
+      "bills_cleared": 0,
+      "claims_cleared": 0,
+      "policies_cleared": 0
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:12.764034",
+    "action": "SAMPLE_DATA_LOADED",
+    "bill_no": null,
+    "claim_no": null,
+    "details": {
+      "policies_count": 5,
+      "claims_count": 12
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.554625",
+    "action": "BILL_CREATED",
+    "bill_no": "BILL-CLM-001-001",
+    "claim_no": "CLM-001",
+    "details": {
+      "status": "normal"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.555148",
+    "action": "BILL_CREATED",
+    "bill_no": "BILL-CLM-002-001",
+    "claim_no": "CLM-002",
+    "details": {
+      "status": "normal"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.555665",
+    "action": "BILL_CREATED",
+    "bill_no": "BILL-CLM-003-001",
+    "claim_no": "CLM-003",
+    "details": {
+      "status": "pending"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.556240",
+    "action": "BILL_CREATED",
+    "bill_no": "BILL-CLM-004-001",
+    "claim_no": "CLM-004",
+    "details": {
+      "status": "exception"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.556803",
+    "action": "BILL_CREATED",
+    "bill_no": "BILL-CLM-005-001",
+    "claim_no": "CLM-005",
+    "details": {
+      "status": "supplemented"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.559028",
+    "action": "BILL_CREATED",
+    "bill_no": "BILL-CLM-006-001",
+    "claim_no": "CLM-006",
+    "details": {
+      "status": "normal"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.560415",
+    "action": "BILL_CREATED",
+    "bill_no": "BILL-CLM-007-001",
+    "claim_no": "CLM-007",
+    "details": {
+      "status": "pending"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.561360",
+    "action": "BILL_CREATED",
+    "bill_no": "BILL-CLM-008-001",
+    "claim_no": "CLM-008",
+    "details": {
+      "status": "normal"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.562328",
+    "action": "BILL_CREATED",
+    "bill_no": "BILL-CLM-009-001",
+    "claim_no": "CLM-009",
+    "details": {
+      "status": "pending"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.563177",
+    "action": "BILL_CREATED_EXCEPTION",
+    "bill_no": "BILL-CLM-010-001",
+    "claim_no": "CLM-010",
+    "details": {
+      "reason": "POLICY_NOT_FOUND"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.564082",
+    "action": "BILL_CREATED",
+    "bill_no": "BILL-CLM-011-001",
+    "claim_no": "CLM-011",
+    "details": {
+      "status": "exception"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.565017",
+    "action": "BILL_CREATED",
+    "bill_no": "BILL-CLM-012-001",
+    "claim_no": "CLM-012",
+    "details": {
+      "status": "exception"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:19.565311",
+    "action": "BATCH_PROCESS_COMPLETED",
+    "bill_no": null,
+    "claim_no": null,
+    "details": {
+      "normal_count": 5,
+      "pending_count": 3,
+      "exception_count": 4,
+      "total_count": 12
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:36.501628",
+    "action": "INSURER_CONFIRMED",
+    "bill_no": "BILL-CLM-003-001",
+    "claim_no": null,
+    "details": {
+      "insurer_id": "INS-002",
+      "all_confirmed": true
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:46.455211",
+    "action": "BILL_WITHDRAWN",
+    "bill_no": "BILL-CLM-001-001",
+    "claim_no": "CLM-001",
+    "details": {
+      "reason": "信息有误，重新提交"
+    }
+  },
+  {
+    "timestamp": "2026-05-30T06:28:46.665733",
+    "action": "BILL_RESUBMITTED",
+    "bill_no": "BILL-CLM-001-002",
+    "claim_no": "CLM-001",
+    "details": {
+      "previous_bill": "BILL-CLM-001-001",
+      "new_version": 2
+    }
+  }
+]

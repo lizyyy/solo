@@ -1,0 +1,357 @@
+from datetime import datetime, timedelta
+from typing import List
+
+from .models import Policy, Claim, CoInsurer
+
+
+def create_sample_policies() -> List[Policy]:
+    now = datetime.now()
+    effective_date = now - timedelta(days=365)
+    expiry_date = now + timedelta(days=365)
+
+    return [
+        Policy(
+            policy_no="POL-001",
+            policy_name="企业财产保险共保项目",
+            effective_date=effective_date,
+            expiry_date=expiry_date,
+            total_sum_insured=10000000.0,
+            deductible=50000.0,
+            co_insurers=[
+                CoInsurer(
+                    insurer_id="INS-001",
+                    insurer_name="太平洋保险",
+                    is_leader=True,
+                    share_ratio=0.5,
+                    confirmed=True,
+                    confirmed_at=effective_date + timedelta(days=1),
+                ),
+                CoInsurer(
+                    insurer_id="INS-002",
+                    insurer_name="平安保险",
+                    is_leader=False,
+                    share_ratio=0.3,
+                    confirmed=True,
+                    confirmed_at=effective_date + timedelta(days=2),
+                ),
+                CoInsurer(
+                    insurer_id="INS-003",
+                    insurer_name="人保财险",
+                    is_leader=False,
+                    share_ratio=0.2,
+                    confirmed=True,
+                    confirmed_at=effective_date + timedelta(days=3),
+                ),
+            ],
+            remarks="正常共保项目，比例闭合",
+        ),
+        Policy(
+            policy_no="POL-002",
+            policy_name="物流运输保险共保",
+            effective_date=effective_date,
+            expiry_date=expiry_date,
+            total_sum_insured=5000000.0,
+            deductible=10000.0,
+            co_insurers=[
+                CoInsurer(
+                    insurer_id="INS-001",
+                    insurer_name="太平洋保险",
+                    is_leader=True,
+                    share_ratio=0.6,
+                    confirmed=True,
+                    confirmed_at=effective_date + timedelta(days=1),
+                ),
+                CoInsurer(
+                    insurer_id="INS-002",
+                    insurer_name="平安保险",
+                    is_leader=False,
+                    share_ratio=0.3,
+                    confirmed=False,
+                    confirmed_at=None,
+                ),
+                CoInsurer(
+                    insurer_id="INS-003",
+                    insurer_name="人保财险",
+                    is_leader=False,
+                    share_ratio=0.1,
+                    confirmed=True,
+                    confirmed_at=effective_date + timedelta(days=3),
+                ),
+            ],
+            remarks="从承保平安保险尚未确认",
+        ),
+        Policy(
+            policy_no="POL-003",
+            policy_name="工程保险共保项目",
+            effective_date=effective_date,
+            expiry_date=expiry_date,
+            total_sum_insured=20000000.0,
+            deductible=100000.0,
+            co_insurers=[
+                CoInsurer(
+                    insurer_id="INS-001",
+                    insurer_name="太平洋保险",
+                    is_leader=True,
+                    share_ratio=0.4,
+                    confirmed=True,
+                    confirmed_at=effective_date + timedelta(days=1),
+                ),
+                CoInsurer(
+                    insurer_id="INS-002",
+                    insurer_name="平安保险",
+                    is_leader=False,
+                    share_ratio=0.4,
+                    confirmed=True,
+                    confirmed_at=effective_date + timedelta(days=2),
+                ),
+            ],
+            remarks="比例不闭合：40% + 40% = 80%",
+        ),
+        Policy(
+            policy_no="POL-004",
+            policy_name="责任险共保",
+            effective_date=effective_date,
+            expiry_date=expiry_date,
+            total_sum_insured=8000000.0,
+            deductible=20000.0,
+            co_insurers=[
+                CoInsurer(
+                    insurer_id="INS-001",
+                    insurer_name="太平洋保险",
+                    is_leader=True,
+                    share_ratio=0.7,
+                    confirmed=True,
+                    confirmed_at=effective_date + timedelta(days=1),
+                ),
+                CoInsurer(
+                    insurer_id="INS-003",
+                    insurer_name="人保财险",
+                    is_leader=False,
+                    share_ratio=0.3,
+                    confirmed=True,
+                    confirmed_at=effective_date + timedelta(days=2),
+                ),
+            ],
+            remarks="免赔额已在另一个赔案中扣除",
+        ),
+        Policy(
+            policy_no="POL-005",
+            policy_name="船舶保险共保",
+            effective_date=effective_date,
+            expiry_date=expiry_date,
+            total_sum_insured=15000000.0,
+            deductible=0.0,
+            co_insurers=[
+                CoInsurer(
+                    insurer_id="INS-002",
+                    insurer_name="平安保险",
+                    is_leader=True,
+                    share_ratio=0.5,
+                    confirmed=True,
+                    confirmed_at=effective_date + timedelta(days=1),
+                ),
+                CoInsurer(
+                    insurer_id="INS-003",
+                    insurer_name="人保财险",
+                    is_leader=False,
+                    share_ratio=0.5,
+                    confirmed=True,
+                    confirmed_at=effective_date + timedelta(days=2),
+                ),
+            ],
+            remarks="免赔额为0",
+        ),
+    ]
+
+
+def create_sample_claims() -> List[Claim]:
+    now = datetime.now()
+    accident_date = now - timedelta(days=60)
+    reported_date = now - timedelta(days=55)
+
+    return [
+        Claim(
+            claim_no="CLM-001",
+            policy_no="POL-001",
+            claim_amount=500000.0,
+            reported_date=reported_date,
+            accident_date=accident_date,
+            loss_description="厂房火灾损失",
+            deductible_applied=None,
+            deductible_waived=False,
+            remarks="正常赔案",
+            is_late_supplement=False,
+            supplement_date=None,
+            remarks_modified=False,
+        ),
+        Claim(
+            claim_no="CLM-002",
+            policy_no="POL-001",
+            claim_amount=30000.0,
+            reported_date=reported_date,
+            accident_date=accident_date,
+            loss_description="小型设备损坏",
+            deductible_applied=None,
+            deductible_waived=False,
+            remarks="赔案金额小于免赔额",
+            is_late_supplement=False,
+            supplement_date=None,
+            remarks_modified=False,
+        ),
+        Claim(
+            claim_no="CLM-003",
+            policy_no="POL-002",
+            claim_amount=200000.0,
+            reported_date=reported_date,
+            accident_date=accident_date,
+            loss_description="货物运输途中损毁",
+            deductible_applied=None,
+            deductible_waived=False,
+            remarks="从承保人未确认",
+            is_late_supplement=False,
+            supplement_date=None,
+            remarks_modified=False,
+        ),
+        Claim(
+            claim_no="CLM-004",
+            policy_no="POL-003",
+            claim_amount=1000000.0,
+            reported_date=reported_date,
+            accident_date=accident_date,
+            loss_description="工程塌方损失",
+            deductible_applied=None,
+            deductible_waived=False,
+            remarks="比例不闭合（80%）",
+            is_late_supplement=False,
+            supplement_date=None,
+            remarks_modified=False,
+        ),
+        Claim(
+            claim_no="CLM-005",
+            policy_no="POL-001",
+            claim_amount=800000.0,
+            reported_date=now - timedelta(days=30),
+            accident_date=now - timedelta(days=90),
+            loss_description="台风导致厂房损坏",
+            deductible_applied=50000.0,
+            deductible_waived=False,
+            remarks="补录赔案，事故发生较早",
+            is_late_supplement=True,
+            supplement_date=now - timedelta(days=30),
+            remarks_modified=False,
+        ),
+        Claim(
+            claim_no="CLM-006",
+            policy_no="POL-004",
+            claim_amount=300000.0,
+            reported_date=reported_date,
+            accident_date=accident_date,
+            loss_description="第三者责任赔偿",
+            deductible_applied=None,
+            deductible_waived=False,
+            remarks="免赔额重复扣除测试",
+            is_late_supplement=False,
+            supplement_date=None,
+            remarks_modified=False,
+        ),
+        Claim(
+            claim_no="CLM-007",
+            policy_no="POL-005",
+            claim_amount=500000.0,
+            reported_date=reported_date,
+            accident_date=accident_date,
+            loss_description="船舶碰撞损失",
+            deductible_applied=None,
+            deductible_waived=False,
+            remarks="免赔额为0",
+            is_late_supplement=False,
+            supplement_date=None,
+            remarks_modified=False,
+        ),
+        Claim(
+            claim_no="CLM-008",
+            policy_no="POL-001",
+            claim_amount=250000.0,
+            reported_date=reported_date,
+            accident_date=accident_date,
+            loss_description="办公设备被盗",
+            deductible_applied=None,
+            deductible_waived=False,
+            remarks="备注已修改过：原备注为'设备丢失'，现改为'办公设备被盗'",
+            is_late_supplement=False,
+            supplement_date=None,
+            remarks_modified=True,
+        ),
+        Claim(
+            claim_no="CLM-009",
+            policy_no="POL-004",
+            claim_amount=450000.0,
+            reported_date=reported_date,
+            accident_date=accident_date,
+            loss_description="产品责任赔偿",
+            deductible_applied=15000.0,
+            deductible_waived=False,
+            remarks="赔案免赔额与保单不一致（保单20000，赔案15000）",
+            is_late_supplement=False,
+            supplement_date=None,
+            remarks_modified=False,
+        ),
+        Claim(
+            claim_no="CLM-010",
+            policy_no="POL-999",
+            claim_amount=100000.0,
+            reported_date=reported_date,
+            accident_date=accident_date,
+            loss_description="未知保单的赔案",
+            deductible_applied=None,
+            deductible_waived=False,
+            remarks="保单不存在，应进入异常清单",
+            is_late_supplement=False,
+            supplement_date=None,
+            remarks_modified=False,
+        ),
+        Claim(
+            claim_no="CLM-011",
+            policy_no="POL-001",
+            claim_amount=0.0,
+            reported_date=reported_date,
+            accident_date=accident_date,
+            loss_description="零金额赔案",
+            deductible_applied=None,
+            deductible_waived=False,
+            remarks="赔案金额为0",
+            is_late_supplement=False,
+            supplement_date=None,
+            remarks_modified=False,
+        ),
+        Claim(
+            claim_no="CLM-012",
+            policy_no="POL-001",
+            claim_amount=150000.0,
+            reported_date=reported_date,
+            accident_date=now - timedelta(days=500),
+            loss_description="保单生效前的事故",
+            deductible_applied=None,
+            deductible_waived=False,
+            remarks="事故日期在保单生效前",
+            is_late_supplement=False,
+            supplement_date=None,
+            remarks_modified=False,
+        ),
+    ]
+
+
+def load_sample_data(storage) -> None:
+    policies = create_sample_policies()
+    claims = create_sample_claims()
+
+    for policy in policies:
+        storage.policies.add(policy, overwrite=True)
+
+    for claim in claims:
+        storage.claims.add(claim, overwrite=True)
+
+    storage.log_action(
+        action="SAMPLE_DATA_LOADED",
+        details={"policies_count": len(policies), "claims_count": len(claims)},
+    )

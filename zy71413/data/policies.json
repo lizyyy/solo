@@ -1,0 +1,163 @@
+[
+  {
+    "policy_no": "POL-001",
+    "policy_name": "企业财产保险共保项目",
+    "effective_date": "2025-05-30T06:28:12.738138",
+    "expiry_date": "2027-05-30T06:28:12.738138",
+    "total_sum_insured": 10000000.0,
+    "deductible": 50000.0,
+    "co_insurers": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.5,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.2,
+        "confirmed": true,
+        "confirmed_at": "2025-06-02T06:28:12.738138"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:12.738305",
+    "updated_at": "2026-05-30T06:28:12.738307",
+    "remarks": "正常共保项目，比例闭合"
+  },
+  {
+    "policy_no": "POL-002",
+    "policy_name": "物流运输保险共保",
+    "effective_date": "2025-05-30T06:28:12.738138",
+    "expiry_date": "2027-05-30T06:28:12.738138",
+    "total_sum_insured": 5000000.0,
+    "deductible": 10000.0,
+    "co_insurers": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.6,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "confirmed": true,
+        "confirmed_at": "2026-05-30T06:28:36.500329"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.1,
+        "confirmed": true,
+        "confirmed_at": "2025-06-02T06:28:12.738138"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:12.738369",
+    "updated_at": "2026-05-30T06:28:12.738372",
+    "remarks": "从承保平安保险尚未确认"
+  },
+  {
+    "policy_no": "POL-003",
+    "policy_name": "工程保险共保项目",
+    "effective_date": "2025-05-30T06:28:12.738138",
+    "expiry_date": "2027-05-30T06:28:12.738138",
+    "total_sum_insured": 20000000.0,
+    "deductible": 100000.0,
+    "co_insurers": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.4,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.4,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:12.738425",
+    "updated_at": "2026-05-30T06:28:12.738427",
+    "remarks": "比例不闭合：40% + 40% = 80%"
+  },
+  {
+    "policy_no": "POL-004",
+    "policy_name": "责任险共保",
+    "effective_date": "2025-05-30T06:28:12.738138",
+    "expiry_date": "2027-05-30T06:28:12.738138",
+    "total_sum_insured": 8000000.0,
+    "deductible": 20000.0,
+    "co_insurers": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.7,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:12.738444",
+    "updated_at": "2026-05-30T06:28:12.738445",
+    "remarks": "免赔额已在另一个赔案中扣除"
+  },
+  {
+    "policy_no": "POL-005",
+    "policy_name": "船舶保险共保",
+    "effective_date": "2025-05-30T06:28:12.738138",
+    "expiry_date": "2027-05-30T06:28:12.738138",
+    "total_sum_insured": 15000000.0,
+    "deductible": 0.0,
+    "co_insurers": [
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": true,
+        "share_ratio": 0.5,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.5,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:12.738462",
+    "updated_at": "2026-05-30T06:28:12.738463",
+    "remarks": "免赔额为0"
+  }
+]

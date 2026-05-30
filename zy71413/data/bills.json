@@ -1,0 +1,600 @@
+[
+  {
+    "bill_no": "BILL-CLM-001-001",
+    "claim_no": "CLM-001",
+    "policy_no": "POL-001",
+    "claim_amount": 500000.0,
+    "deductible_amount": 50000.0,
+    "net_claim_amount": 450000.0,
+    "items": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.5,
+        "payable_amount": 225000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "payable_amount": 135000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.2,
+        "payable_amount": 90000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-02T06:28:12.738138"
+      }
+    ],
+    "status": "withdrawn",
+    "validation_results": [
+      {
+        "field": "status",
+        "severity": "info",
+        "message": "账单已撤回: 信息有误，重新提交",
+        "code": "BILL_WITHDRAWN"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:19.554207",
+    "updated_at": "2026-05-30T06:28:46.454308",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": "2026-05-30T06:28:19.554218",
+    "remarks": "正常赔案"
+  },
+  {
+    "bill_no": "BILL-CLM-002-001",
+    "claim_no": "CLM-002",
+    "policy_no": "POL-001",
+    "claim_amount": 30000.0,
+    "deductible_amount": 30000.0,
+    "net_claim_amount": 0.0,
+    "items": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.5,
+        "payable_amount": 0.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "payable_amount": 0.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.2,
+        "payable_amount": 0.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-02T06:28:12.738138"
+      }
+    ],
+    "status": "normal",
+    "validation_results": [],
+    "created_at": "2026-05-30T06:28:19.554886",
+    "updated_at": "2026-05-30T06:28:19.554886",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": "2026-05-30T06:28:19.554889",
+    "remarks": "赔案金额小于免赔额"
+  },
+  {
+    "bill_no": "BILL-CLM-003-001",
+    "claim_no": "CLM-003",
+    "policy_no": "POL-002",
+    "claim_amount": 200000.0,
+    "deductible_amount": 10000.0,
+    "net_claim_amount": 190000.0,
+    "items": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.6,
+        "payable_amount": 114000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "payable_amount": 57000.0,
+        "confirmed": true,
+        "confirmed_at": "2026-05-30T06:28:36.500311"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.1,
+        "payable_amount": 19000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-02T06:28:12.738138"
+      }
+    ],
+    "status": "normal",
+    "validation_results": [
+      {
+        "field": "confirmation",
+        "severity": "warning",
+        "message": "从承保人尚未确认: 平安保险",
+        "code": "FOLLOWER_NOT_CONFIRMED"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:19.555384",
+    "updated_at": "2026-05-30T06:28:36.501004",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": "2026-05-30T06:28:19.555387",
+    "remarks": "从承保人未确认"
+  },
+  {
+    "bill_no": "BILL-CLM-004-001",
+    "claim_no": "CLM-004",
+    "policy_no": "POL-003",
+    "claim_amount": 1000000.0,
+    "deductible_amount": 100000.0,
+    "net_claim_amount": 900000.0,
+    "items": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.4,
+        "payable_amount": 360000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.4,
+        "payable_amount": 540000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      }
+    ],
+    "status": "exception",
+    "validation_results": [
+      {
+        "field": "share_ratio",
+        "severity": "error",
+        "message": "共保比例不闭合，合计为 80.0000%，应为 100%",
+        "code": "RATIO_NOT_CLOSED"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:19.555897",
+    "updated_at": "2026-05-30T06:28:19.555897",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": "2026-05-30T06:28:19.555899",
+    "remarks": "比例不闭合（80%）"
+  },
+  {
+    "bill_no": "BILL-CLM-005-001",
+    "claim_no": "CLM-005",
+    "policy_no": "POL-001",
+    "claim_amount": 800000.0,
+    "deductible_amount": 50000.0,
+    "net_claim_amount": 750000.0,
+    "items": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.5,
+        "payable_amount": 375000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "payable_amount": 225000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.2,
+        "payable_amount": 150000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-02T06:28:12.738138"
+      }
+    ],
+    "status": "supplemented",
+    "validation_results": [
+      {
+        "field": "is_late_supplement",
+        "severity": "info",
+        "message": "此为补录赔案",
+        "code": "LATE_SUPPLEMENT"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:19.556476",
+    "updated_at": "2026-05-30T06:28:19.556477",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": "2026-05-30T06:28:19.556478",
+    "remarks": "补录赔案，事故发生较早"
+  },
+  {
+    "bill_no": "BILL-CLM-006-001",
+    "claim_no": "CLM-006",
+    "policy_no": "POL-004",
+    "claim_amount": 300000.0,
+    "deductible_amount": 20000.0,
+    "net_claim_amount": 280000.0,
+    "items": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.7,
+        "payable_amount": 196000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "payable_amount": 84000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      }
+    ],
+    "status": "normal",
+    "validation_results": [],
+    "created_at": "2026-05-30T06:28:19.557545",
+    "updated_at": "2026-05-30T06:28:19.557546",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": "2026-05-30T06:28:19.557549",
+    "remarks": "免赔额重复扣除测试"
+  },
+  {
+    "bill_no": "BILL-CLM-007-001",
+    "claim_no": "CLM-007",
+    "policy_no": "POL-005",
+    "claim_amount": 500000.0,
+    "deductible_amount": 0.0,
+    "net_claim_amount": 500000.0,
+    "items": [
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": true,
+        "share_ratio": 0.5,
+        "payable_amount": 250000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.5,
+        "payable_amount": 250000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      }
+    ],
+    "status": "pending",
+    "validation_results": [
+      {
+        "field": "deductible",
+        "severity": "warning",
+        "message": "保单免赔额为0，请确认是否正确",
+        "code": "DEDUCTIBLE_ZERO"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:19.559587",
+    "updated_at": "2026-05-30T06:28:19.559591",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": "2026-05-30T06:28:19.559594",
+    "remarks": "免赔额为0"
+  },
+  {
+    "bill_no": "BILL-CLM-008-001",
+    "claim_no": "CLM-008",
+    "policy_no": "POL-001",
+    "claim_amount": 250000.0,
+    "deductible_amount": 50000.0,
+    "net_claim_amount": 200000.0,
+    "items": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.5,
+        "payable_amount": 100000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "payable_amount": 60000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.2,
+        "payable_amount": 40000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-02T06:28:12.738138"
+      }
+    ],
+    "status": "normal",
+    "validation_results": [
+      {
+        "field": "remarks",
+        "severity": "info",
+        "message": "赔案备注已被修改",
+        "code": "REMARKS_MODIFIED"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:19.560884",
+    "updated_at": "2026-05-30T06:28:19.560885",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": "2026-05-30T06:28:19.560887",
+    "remarks": "备注已修改过：原备注为'设备丢失'，现改为'办公设备被盗'"
+  },
+  {
+    "bill_no": "BILL-CLM-009-001",
+    "claim_no": "CLM-009",
+    "policy_no": "POL-004",
+    "claim_amount": 450000.0,
+    "deductible_amount": 15000.0,
+    "net_claim_amount": 435000.0,
+    "items": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.7,
+        "payable_amount": 304500.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "payable_amount": 130500.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      }
+    ],
+    "status": "pending",
+    "validation_results": [
+      {
+        "field": "deductible_applied",
+        "severity": "warning",
+        "message": "赔案免赔额 15000.0 与保单免赔额 20000.0 不一致",
+        "code": "DEDUCTIBLE_MISMATCH"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:19.561716",
+    "updated_at": "2026-05-30T06:28:19.561717",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": "2026-05-30T06:28:19.561720",
+    "remarks": "赔案免赔额与保单不一致（保单20000，赔案15000）"
+  },
+  {
+    "bill_no": "BILL-CLM-010-001",
+    "claim_no": "CLM-010",
+    "policy_no": "POL-999",
+    "claim_amount": 100000.0,
+    "deductible_amount": 0.0,
+    "net_claim_amount": 0.0,
+    "items": [],
+    "status": "exception",
+    "validation_results": [
+      {
+        "field": "policy_no",
+        "severity": "error",
+        "message": "找不到保单号: POL-999",
+        "code": "POLICY_NOT_FOUND"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:19.562596",
+    "updated_at": "2026-05-30T06:28:19.562596",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": null,
+    "remarks": null
+  },
+  {
+    "bill_no": "BILL-CLM-011-001",
+    "claim_no": "CLM-011",
+    "policy_no": "POL-001",
+    "claim_amount": 0.0,
+    "deductible_amount": 0.0,
+    "net_claim_amount": 0.0,
+    "items": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.5,
+        "payable_amount": 0.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "payable_amount": 0.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.2,
+        "payable_amount": 0.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-02T06:28:12.738138"
+      }
+    ],
+    "status": "exception",
+    "validation_results": [
+      {
+        "field": "claim_amount",
+        "severity": "error",
+        "message": "赔案金额必须大于0",
+        "code": "CLAIM_AMOUNT_ZERO"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:19.563542",
+    "updated_at": "2026-05-30T06:28:19.563542",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": "2026-05-30T06:28:19.563545",
+    "remarks": "赔案金额为0"
+  },
+  {
+    "bill_no": "BILL-CLM-012-001",
+    "claim_no": "CLM-012",
+    "policy_no": "POL-001",
+    "claim_amount": 150000.0,
+    "deductible_amount": 50000.0,
+    "net_claim_amount": 100000.0,
+    "items": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.5,
+        "payable_amount": 50000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "payable_amount": 30000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.2,
+        "payable_amount": 20000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-02T06:28:12.738138"
+      }
+    ],
+    "status": "exception",
+    "validation_results": [
+      {
+        "field": "accident_date",
+        "severity": "error",
+        "message": "事故日期在保单生效日期之前",
+        "code": "ACCIDENT_BEFORE_EFFECTIVE"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:19.564468",
+    "updated_at": "2026-05-30T06:28:19.564469",
+    "version": 1,
+    "previous_version_bill_no": null,
+    "processed_at": "2026-05-30T06:28:19.564471",
+    "remarks": "事故日期在保单生效前"
+  },
+  {
+    "bill_no": "BILL-CLM-001-002",
+    "claim_no": "CLM-001",
+    "policy_no": "POL-001",
+    "claim_amount": 500000.0,
+    "deductible_amount": 50000.0,
+    "net_claim_amount": 450000.0,
+    "items": [
+      {
+        "insurer_id": "INS-001",
+        "insurer_name": "太平洋保险",
+        "is_leader": true,
+        "share_ratio": 0.5,
+        "payable_amount": 225000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-05-31T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-002",
+        "insurer_name": "平安保险",
+        "is_leader": false,
+        "share_ratio": 0.3,
+        "payable_amount": 135000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-01T06:28:12.738138"
+      },
+      {
+        "insurer_id": "INS-003",
+        "insurer_name": "人保财险",
+        "is_leader": false,
+        "share_ratio": 0.2,
+        "payable_amount": 90000.0,
+        "confirmed": true,
+        "confirmed_at": "2025-06-02T06:28:12.738138"
+      }
+    ],
+    "status": "resubmitted",
+    "validation_results": [
+      {
+        "field": "resubmit",
+        "severity": "info",
+        "message": "重复提交，覆盖账单 BILL-CLM-001-001",
+        "code": "DUPLICATE_SUBMIT"
+      }
+    ],
+    "created_at": "2026-05-30T06:28:46.664452",
+    "updated_at": "2026-05-30T06:28:46.664461",
+    "version": 2,
+    "previous_version_bill_no": "BILL-CLM-001-001",
+    "processed_at": null,
+    "remarks": "正常赔案"
+  }
+]
