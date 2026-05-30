@@ -1,0 +1,2239 @@
+{
+  "metadata": {
+    "report_version": "1.0",
+    "generated_at": "2026-05-31T00:30:51.173802",
+    "result_id": "result_req_13578324b00e",
+    "request_id": "req_13578324b00e"
+  },
+  "flight_info": {
+    "flight_no": "CA1234",
+    "flight_date": "2026-06-27",
+    "departure": "SHA",
+    "arrival": "PEK",
+    "scheduled_departure": "2026-06-27T08:30:00",
+    "capacity": {
+      "F": 14,
+      "C": 33,
+      "W": 26,
+      "Y": 159
+    }
+  },
+  "optimization_result": {
+    "optimal_overbooking": {
+      "F": 0,
+      "C": 0,
+      "W": 3,
+      "Y": 23
+    },
+    "expected_no_show_rate": {
+      "F": 0.0425385087072196,
+      "C": 0.053600106730833236,
+      "W": 0.06895791270042839,
+      "Y": 0.07380210332262423
+    },
+    "expected_revenue": 368482.46,
+    "expected_compensation_cost": 21990.49,
+    "expected_net_profit": 346491.97,
+    "risk_level": "high",
+    "risk_explanation": "🔴 高风险：最高超售概率达到 100.0%，建议超售 26 张（占总容量 11.2%）。请立即准备：1) 联系高价值旅客寻求自愿改签；2) 准备好充足的补偿预算；3) 协调后续航班空位。如无把握，建议降低超售数量。 各舱位：PREMIUM_ECONOMY舱超售3张(11.5%)，ECONOMY舱超售23张(14.5%)。",
+    "warnings": [
+      "FIRST舱最大允许超售数为0，已售 20/14 座",
+      "BUSINESS舱最大允许超售数为0，已售 39/33 座"
+    ]
+  },
+  "scenario_comparison": [
+    {
+      "scenario": "不超售",
+      "overbooking_plan": {
+        "F": 0,
+        "C": 0,
+        "W": 0,
+        "Y": 0
+      },
+      "total_overbooking": 0,
+      "expected_revenue": 343823.64,
+      "expected_compensation": 21990.49,
+      "expected_net_profit": 321833.15,
+      "max_denied_probability": 0.9999,
+      "vs_recommended_delta": -24658.82,
+      "icon": "🛡️",
+      "description": "严格按照舱位容量售票，不超售任何座位",
+      "scenario_id": "no_overbooking",
+      "recommendation": "此方案比推荐方案少赚 ¥24,659，风险相对较低。"
+    },
+    {
+      "scenario": "保守方案",
+      "overbooking_plan": {
+        "F": 0,
+        "C": 0,
+        "W": 1,
+        "Y": 11
+      },
+      "total_overbooking": 12,
+      "expected_revenue": 354987.81,
+      "expected_compensation": 21990.49,
+      "expected_net_profit": 332997.32,
+      "max_denied_probability": 0.9999,
+      "vs_recommended_delta": -13494.65,
+      "icon": "⚠️",
+      "description": "低风险策略，超售量为最优值的50%",
+      "scenario_id": "conservative",
+      "recommendation": "此方案比推荐方案少赚 ¥13,495，风险相对较低。"
+    },
+    {
+      "scenario": "推荐方案",
+      "overbooking_plan": {
+        "F": 0,
+        "C": 0,
+        "W": 3,
+        "Y": 23
+      },
+      "total_overbooking": 26,
+      "expected_revenue": 368482.46,
+      "expected_compensation": 21990.49,
+      "expected_net_profit": 346491.97,
+      "max_denied_probability": 0.9999,
+      "vs_recommended_delta": 0.0,
+      "icon": "✅",
+      "description": "收益与风险平衡的最优策略",
+      "scenario_id": "recommended",
+      "recommendation": "此方案在收益和风险之间取得最佳平衡，建议采纳。"
+    },
+    {
+      "scenario": "激进方案",
+      "overbooking_plan": {
+        "F": 0,
+        "C": 0,
+        "W": 4,
+        "Y": 34
+      },
+      "total_overbooking": 38,
+      "expected_revenue": 379646.64,
+      "expected_compensation": 22017.11,
+      "expected_net_profit": 357629.53,
+      "max_denied_probability": 0.9999,
+      "vs_recommended_delta": 11137.55,
+      "icon": "🔥",
+      "description": "高风险高收益，超售量为最优值的150%",
+      "scenario_id": "aggressive",
+      "recommendation": "此方案超售概率达 100.0%，风险较高，需谨慎使用。"
+    }
+  ],
+  "anomalies": [
+    {
+      "anomaly_id": "anomaly_e4c2d687ead7",
+      "anomaly_type": "no_show_misestimation",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "FIRST舱历史样本量不足",
+      "human_explanation": "📉 FIRST舱仅收集到 20 条历史爽约记录，低于建议的最小样本量 30 条。样本量不足可能导致爽约率预测不够稳定，建议补充更多历史数据或参考同类航线数据。",
+      "affected_records": [
+        {
+          "cabin": "F",
+          "cabin_name": "FIRST",
+          "sample_size": 20,
+          "min_required": 30
+        }
+      ],
+      "suggested_action": "request_more_data",
+      "action_options": [
+        "request_more_data",
+        "accept_with_caution",
+        "manual_review"
+      ],
+      "detected_at": "2026-05-31T00:30:51.000348",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_2a08f35b9e7e",
+      "anomaly_type": "no_show_misestimation",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "PREMIUM_ECONOMY舱历史样本量不足",
+      "human_explanation": "📉 PREMIUM_ECONOMY舱仅收集到 19 条历史爽约记录，低于建议的最小样本量 30 条。样本量不足可能导致爽约率预测不够稳定，建议补充更多历史数据或参考同类航线数据。",
+      "affected_records": [
+        {
+          "cabin": "W",
+          "cabin_name": "PREMIUM_ECONOMY",
+          "sample_size": 19,
+          "min_required": 30
+        }
+      ],
+      "suggested_action": "request_more_data",
+      "action_options": [
+        "request_more_data",
+        "accept_with_caution",
+        "manual_review"
+      ],
+      "detected_at": "2026-05-31T00:30:51.006301",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_bb882ed8bba0",
+      "anomaly_type": "compensation_missing",
+      "severity": "warning",
+      "category": "补偿规则",
+      "description": "FIRST舱距起飞656小时无精确补偿规则",
+      "human_explanation": "⏰ 当前距航班起飞还有 656 小时，但FIRST舱最大的规则阈值为 72.0 小时。系统将使用最远的规则（RULE_004）估算补偿，如航班临近起飞可能需要更高的补偿成本，建议补充更精细的时间梯度规则。",
+      "affected_records": [
+        {
+          "cabin": "F",
+          "cabin_name": "FIRST",
+          "hours_before_flight": 656.0,
+          "largest_rule_threshold": 72.0,
+          "used_rule": "RULE_004"
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "request_more_data"
+      ],
+      "detected_at": "2026-05-31T00:30:51.012107",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_3bfe629db0e2",
+      "anomaly_type": "compensation_missing",
+      "severity": "warning",
+      "category": "补偿规则",
+      "description": "ECONOMY舱距起飞656小时无精确补偿规则",
+      "human_explanation": "⏰ 当前距航班起飞还有 656 小时，但ECONOMY舱最大的规则阈值为 72.0 小时。系统将使用最远的规则（RULE_019）估算补偿，如航班临近起飞可能需要更高的补偿成本，建议补充更精细的时间梯度规则。",
+      "affected_records": [
+        {
+          "cabin": "Y",
+          "cabin_name": "ECONOMY",
+          "hours_before_flight": 656.0,
+          "largest_rule_threshold": 72.0,
+          "used_rule": "RULE_019"
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "request_more_data"
+      ],
+      "detected_at": "2026-05-31T00:30:51.014681",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_72c5bd4b55de",
+      "anomaly_type": "compensation_missing",
+      "severity": "warning",
+      "category": "补偿规则",
+      "description": "BUSINESS舱距起飞656小时无精确补偿规则",
+      "human_explanation": "⏰ 当前距航班起飞还有 656 小时，但BUSINESS舱最大的规则阈值为 72.0 小时。系统将使用最远的规则（RULE_009）估算补偿，如航班临近起飞可能需要更高的补偿成本，建议补充更精细的时间梯度规则。",
+      "affected_records": [
+        {
+          "cabin": "C",
+          "cabin_name": "BUSINESS",
+          "hours_before_flight": 656.0,
+          "largest_rule_threshold": 72.0,
+          "used_rule": "RULE_009"
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "request_more_data"
+      ],
+      "detected_at": "2026-05-31T00:30:51.016595",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_bde52d768d97",
+      "anomaly_type": "compensation_missing",
+      "severity": "warning",
+      "category": "补偿规则",
+      "description": "PREMIUM_ECONOMY舱距起飞656小时无精确补偿规则",
+      "human_explanation": "⏰ 当前距航班起飞还有 656 小时，但PREMIUM_ECONOMY舱最大的规则阈值为 72.0 小时。系统将使用最远的规则（RULE_014）估算补偿，如航班临近起飞可能需要更高的补偿成本，建议补充更精细的时间梯度规则。",
+      "affected_records": [
+        {
+          "cabin": "W",
+          "cabin_name": "PREMIUM_ECONOMY",
+          "hours_before_flight": 656.0,
+          "largest_rule_threshold": 72.0,
+          "used_rule": "RULE_014"
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "request_more_data"
+      ],
+      "detected_at": "2026-05-31T00:30:51.018035",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_3b3b73ecd993",
+      "anomaly_type": "cabin_boundary_violation",
+      "severity": "error",
+      "category": "舱位限制",
+      "description": "FIRST舱总售票数超过容量的125%",
+      "human_explanation": "🎫 FIRST舱总售票（含超售）达 20 张，是实际容量 14 座的 142.9%。即使历史最高爽约率下，也几乎必然出现严重超售。请大幅减少超售数量或停止销售该舱位。",
+      "affected_records": [
+        {
+          "cabin": "F",
+          "cabin_name": "FIRST",
+          "capacity": 14,
+          "total_sold": 20,
+          "load_factor": 1.4285714285714286
+        }
+      ],
+      "suggested_action": "reject",
+      "action_options": [
+        "reject",
+        "manual_review"
+      ],
+      "detected_at": "2026-05-31T00:30:51.019644",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_5e8bbaf1eca8",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '刘刚', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '刘刚', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 5,
+          "record": {
+            "index": 5,
+            "order_id": "ORD51F900F9",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "刘刚",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 538.39,
+            "booking_date": "2026-05-21",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 46,
+          "record": {
+            "index": 46,
+            "order_id": "ORD29D55F75",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "刘刚",
+            "passenger_id": "P000047",
+            "cabin_class": "C",
+            "fare_amount": 2825.64,
+            "booking_date": "2026-05-20",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.023666",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_8150d3246f1c",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '陈平', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '陈平', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 7,
+          "record": {
+            "index": 7,
+            "order_id": "ORDBB823174",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "陈平",
+            "passenger_id": "P000008",
+            "cabin_class": "C",
+            "fare_amount": 2786.56,
+            "booking_date": "2026-04-29",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 93,
+          "record": {
+            "index": 93,
+            "order_id": "ORD197B849F",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "陈平",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 1169.32,
+            "booking_date": "2026-05-15",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.024802",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_8ac78b634995",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 3 条同名旅客记录: '杨洋', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 3 条同名旅客记录: '杨洋', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 15,
+          "record": {
+            "index": 15,
+            "order_id": "ORD8DF3B06A",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "杨洋",
+            "passenger_id": null,
+            "cabin_class": "C",
+            "fare_amount": 2565.05,
+            "booking_date": "2026/06/11",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 65,
+          "record": {
+            "index": 65,
+            "order_id": "ORD2566DE29",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "杨洋",
+            "passenger_id": "P000066",
+            "cabin_class": "F",
+            "fare_amount": 4377.65,
+            "booking_date": "2026.05.07",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 104,
+          "record": {
+            "index": 104,
+            "order_id": "ORD43FDCCD5",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "杨洋",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 805.76,
+            "booking_date": "2026-06-01",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.025777",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_b7756c168b7f",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '张磊', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '张磊', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 20,
+          "record": {
+            "index": 20,
+            "order_id": "ORD3B32A63D",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "张磊",
+            "passenger_id": "P000021",
+            "cabin_class": "Y",
+            "fare_amount": 562.82,
+            "booking_date": "2026-05-06",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 31,
+          "record": {
+            "index": 31,
+            "order_id": "ORD9F72DCE7",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "张磊",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 1029.29,
+            "booking_date": "2026-05-02",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.028961",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_ac4a88788488",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 4 条同名旅客记录: '吴静', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 4 条同名旅客记录: '吴静', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 26,
+          "record": {
+            "index": 26,
+            "order_id": "ORD2BC07BDC",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "吴静",
+            "passenger_id": "P000027",
+            "cabin_class": "Y",
+            "fare_amount": 1059.89,
+            "booking_date": "2026-06-16",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 27,
+          "record": {
+            "index": 27,
+            "order_id": "ORD3DBC5F01",
+            "flight_no": "CA1234",
+            "flight_date": "2026/06/27",
+            "passenger_name": "吴静",
+            "passenger_id": null,
+            "cabin_class": "C",
+            "fare_amount": 2793.24,
+            "booking_date": "2026-06-07",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 119,
+          "record": {
+            "index": 119,
+            "order_id": "ORDA6F80FC0",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "吴静",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 588.51,
+            "booking_date": "2026-05-01",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 120,
+          "record": {
+            "index": 120,
+            "order_id": "ORD8955DDEC",
+            "flight_no": "CA1234",
+            "flight_date": "2026.06.27",
+            "passenger_name": "吴静",
+            "passenger_id": "P000121",
+            "cabin_class": "Y",
+            "fare_amount": 504.73,
+            "booking_date": "2026-06-20",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.032445",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_ca483105eb19",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '李杰', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '李杰', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 36,
+          "record": {
+            "index": 36,
+            "order_id": "ORD26C51FD6",
+            "flight_no": "CA1234",
+            "flight_date": "2026.06.27",
+            "passenger_name": "李杰",
+            "passenger_id": "P000037",
+            "cabin_class": "Y",
+            "fare_amount": 1180.51,
+            "booking_date": "2026-05-13",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 151,
+          "record": {
+            "index": 151,
+            "order_id": "ORD3C83F00A",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "李杰",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 1112.34,
+            "booking_date": "2026-06-22",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.033651",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_04e5fdb05301",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '杨霞', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '杨霞', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 37,
+          "record": {
+            "index": 37,
+            "order_id": "ORD558969F7",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "杨霞",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 957.34,
+            "booking_date": "2026-06-19",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 94,
+          "record": {
+            "index": 94,
+            "order_id": "ORDECFEAA0C",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "杨霞",
+            "passenger_id": "P000095",
+            "cabin_class": "Y",
+            "fare_amount": 702.35,
+            "booking_date": "2026-05-27",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.035029",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_204ad6601c1f",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '黄秀英', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '黄秀英', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 40,
+          "record": {
+            "index": 40,
+            "order_id": "ORD5457FD2A",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "黄秀英",
+            "passenger_id": "P000041",
+            "cabin_class": "Y",
+            "fare_amount": 550.75,
+            "booking_date": "2026-06-02",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 73,
+          "record": {
+            "index": 73,
+            "order_id": "ORD84DFC8F9",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "黄秀英",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 1085.09,
+            "booking_date": "2026-06-07",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.036317",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_d661cb566069",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 4 条同名旅客记录: '周艳', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 4 条同名旅客记录: '周艳', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 42,
+          "record": {
+            "index": 42,
+            "order_id": "ORD5329D5C8",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "周艳",
+            "passenger_id": "P000043",
+            "cabin_class": "Y",
+            "fare_amount": 1107.04,
+            "booking_date": "2026-05-28",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 117,
+          "record": {
+            "index": 117,
+            "order_id": "ORDF896C1B2",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "周艳",
+            "passenger_id": null,
+            "cabin_class": "C",
+            "fare_amount": 3035.88,
+            "booking_date": "2026-05-24",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 127,
+          "record": {
+            "index": 127,
+            "order_id": "ORD33DD825F",
+            "flight_no": "CA1234",
+            "flight_date": "2026年06月27日",
+            "passenger_name": "周艳",
+            "passenger_id": "P000128",
+            "cabin_class": "Y",
+            "fare_amount": 529.33,
+            "booking_date": "2026-06-24",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 212,
+          "record": {
+            "index": 212,
+            "order_id": "ORDCD3BB289",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "周艳",
+            "passenger_id": "P000213",
+            "cabin_class": "Y",
+            "fare_amount": 1134.76,
+            "booking_date": "2026-06-18",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.037201",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_9247bfb1fa20",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '陈娜', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '陈娜', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 47,
+          "record": {
+            "index": 47,
+            "order_id": "ORD66B93FBA",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "陈娜",
+            "passenger_id": null,
+            "cabin_class": "W",
+            "fare_amount": 1416.94,
+            "booking_date": "2026-06-15",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 123,
+          "record": {
+            "index": 123,
+            "order_id": "ORDF0B2D7DE",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "陈娜",
+            "passenger_id": "P000124",
+            "cabin_class": "Y",
+            "fare_amount": 1157.37,
+            "booking_date": "2026-05-16",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.038198",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_2cd240669604",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '陈刚', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '陈刚', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 48,
+          "record": {
+            "index": 48,
+            "order_id": "ORD54246E45",
+            "flight_no": "CA1234",
+            "flight_date": "2026年06月27日",
+            "passenger_name": "陈刚",
+            "passenger_id": "P000049",
+            "cabin_class": "Y",
+            "fare_amount": 694.84,
+            "booking_date": "2026-05-26",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 184,
+          "record": {
+            "index": 184,
+            "order_id": "ORD3C954725",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "陈刚",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 667.73,
+            "booking_date": "2026-06-07",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.039337",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_aef78083eda9",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 3 条同名旅客记录: '黄娜', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 3 条同名旅客记录: '黄娜', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 59,
+          "record": {
+            "index": 59,
+            "order_id": "ORD2A6BA6A2",
+            "flight_no": "CA1234",
+            "flight_date": "2026/06/27",
+            "passenger_name": "黄娜",
+            "passenger_id": "P000060",
+            "cabin_class": "W",
+            "fare_amount": 1467.43,
+            "booking_date": "2026-06-16",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 132,
+          "record": {
+            "index": 132,
+            "order_id": "ORD3FD879C8",
+            "flight_no": "CA1234",
+            "flight_date": "2026年06月27日",
+            "passenger_name": "黄娜",
+            "passenger_id": null,
+            "cabin_class": "X",
+            "fare_amount": 1188.89,
+            "booking_date": "2026-05-21",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 160,
+          "record": {
+            "index": 160,
+            "order_id": "ORD06B078F1",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "黄娜",
+            "passenger_id": "P000161",
+            "cabin_class": "Y",
+            "fare_amount": 1105.43,
+            "booking_date": "2026-05-11",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.040260",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_e3547552f269",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '吴刚', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '吴刚', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 68,
+          "record": {
+            "index": 68,
+            "order_id": "ORD3AF72D29",
+            "flight_no": "CA1234",
+            "flight_date": "27/06/2026",
+            "passenger_name": "吴刚",
+            "passenger_id": null,
+            "cabin_class": "X",
+            "fare_amount": 969.59,
+            "booking_date": "2026-06-16",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 97,
+          "record": {
+            "index": 97,
+            "order_id": "ORDF49D2CA1",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "吴刚",
+            "passenger_id": "P000098",
+            "cabin_class": "Y",
+            "fare_amount": 747.89,
+            "booking_date": "2026-05-21",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.041167",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_c97297c6f353",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 6 条同名旅客记录: '吴超', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 6 条同名旅客记录: '吴超', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 72,
+          "record": {
+            "index": 72,
+            "order_id": "ORD683F5246",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "吴超",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 718.93,
+            "booking_date": "2026-04-28",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 110,
+          "record": {
+            "index": 110,
+            "order_id": "ORDBEBA0E4C",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "吴超",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 720.85,
+            "booking_date": "2026-06-23",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 112,
+          "record": {
+            "index": 112,
+            "order_id": "ORD115B63EA",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "吴超",
+            "passenger_id": "P000113",
+            "cabin_class": "Y",
+            "fare_amount": 1021.89,
+            "booking_date": "2026-05-27",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 126,
+          "record": {
+            "index": 126,
+            "order_id": "ORD2DB7456E",
+            "flight_no": "CA1234",
+            "flight_date": "2026/06/27",
+            "passenger_name": "吴超",
+            "passenger_id": "P000127",
+            "cabin_class": "Y",
+            "fare_amount": 851.72,
+            "booking_date": "2026-06-02",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 140,
+          "record": {
+            "index": 140,
+            "order_id": "ORDB398E28C",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "吴超",
+            "passenger_id": null,
+            "cabin_class": "W",
+            "fare_amount": 1851.48,
+            "booking_date": "2026-06-03",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 178,
+          "record": {
+            "index": 178,
+            "order_id": "ORD1DFEC7AF",
+            "flight_no": "CA1234",
+            "flight_date": "2026/06/27",
+            "passenger_name": "吴超",
+            "passenger_id": "P000179",
+            "cabin_class": "W",
+            "fare_amount": 1583.96,
+            "booking_date": "2026-06-15",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.041940",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_7c396f1f6376",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '黄刚', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '黄刚', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 76,
+          "record": {
+            "index": 76,
+            "order_id": "ORD4C74AC17",
+            "flight_no": "CA1234",
+            "flight_date": "2026/06/27",
+            "passenger_name": "黄刚",
+            "passenger_id": "P000077",
+            "cabin_class": "Y",
+            "fare_amount": 738.99,
+            "booking_date": "2026-06-01",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 185,
+          "record": {
+            "index": 185,
+            "order_id": "ORD84C991C1",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "黄刚",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 733.64,
+            "booking_date": "2026-05-29",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.044719",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_f20b4260f012",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '张洋', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '张洋', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 79,
+          "record": {
+            "index": 79,
+            "order_id": "ORDA6F8FF7E",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "张洋",
+            "passenger_id": "P000080",
+            "cabin_class": "Y",
+            "fare_amount": 543.54,
+            "booking_date": "2026-05-18",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 195,
+          "record": {
+            "index": 195,
+            "order_id": "ORDE629B691",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "张洋",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 992.81,
+            "booking_date": "2026-05-30",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.046162",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_452fe237bab4",
+      "anomaly_type": "name_conflict",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "发现 2 条同名旅客记录: '吴娜', 缺少足够的身份信息区分",
+      "human_explanation": "同名旅客问题：发现 2 条同名旅客记录: '吴娜', 缺少足够的身份信息区分。缺少身份信息区分同名旅客，可能影响个人爽约率预测。",
+      "affected_records": [
+        {
+          "index": 84,
+          "record": {
+            "index": 84,
+            "order_id": "ORDCBAA4536",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "吴娜",
+            "passenger_id": null,
+            "cabin_class": "C",
+            "fare_amount": 2523.07,
+            "booking_date": "2026-05-08",
+            "status": "confirmed"
+          }
+        },
+        {
+          "index": 138,
+          "record": {
+            "index": 138,
+            "order_id": "ORD59F59C1C",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "吴娜",
+            "passenger_id": "P000139",
+            "cabin_class": "Y",
+            "fare_amount": 837.89,
+            "booking_date": "2026-05-18",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.046760",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_ae04b0ce46d1",
+      "anomaly_type": "cabin_mismatch",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "订单 ORD8911C45D 舱位 'X' 不识别，默认经济舱",
+      "human_explanation": "舱位不匹配：订单 ORD8911C45D 舱位 'X' 不识别，默认经济舱。无法识别的舱位代码已默认处理，请确认。",
+      "affected_records": [
+        {
+          "index": 12,
+          "record": {
+            "order_id": "ORD8911C45D",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "黄洋",
+            "passenger_id": "P000013",
+            "cabin_class": "X",
+            "fare_amount": 1790.7,
+            "booking_date": "2026-05-13",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.047100",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_5137375a4bd1",
+      "anomaly_type": "date_format",
+      "severity": "error",
+      "category": "数据质量",
+      "description": "订单 ORDF19C2817 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date",
+      "human_explanation": "日期格式问题：订单 ORDF19C2817 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date。不统一的日期格式已尝试自动解析，但建议源头修正。",
+      "affected_records": [
+        {
+          "index": 34,
+          "record": {
+            "order_id": "ORDF19C2817",
+            "flight_no": "CA1234",
+            "flight_date": "invalid-date",
+            "passenger_name": "王敏",
+            "passenger_id": "P000035",
+            "cabin_class": "F",
+            "fare_amount": 5493.5,
+            "booking_date": "2026-05-31",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "reject",
+      "action_options": [
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.048282",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_4df93750d7cb",
+      "anomaly_type": "date_format",
+      "severity": "error",
+      "category": "数据质量",
+      "description": "订单 ORD588D44DC 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date",
+      "human_explanation": "日期格式问题：订单 ORD588D44DC 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date。不统一的日期格式已尝试自动解析，但建议源头修正。",
+      "affected_records": [
+        {
+          "index": 43,
+          "record": {
+            "order_id": "ORD588D44DC",
+            "flight_no": "CA1234",
+            "flight_date": "invalid-date",
+            "passenger_name": "吴霞",
+            "passenger_id": "P000044",
+            "cabin_class": "Y",
+            "fare_amount": 1066.79,
+            "booking_date": "2026-05-08",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "reject",
+      "action_options": [
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.048993",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_1a4b2c0fb7cd",
+      "anomaly_type": "cabin_mismatch",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "订单 ORDFC7C349E 舱位 'X' 不识别，默认经济舱",
+      "human_explanation": "舱位不匹配：订单 ORDFC7C349E 舱位 'X' 不识别，默认经济舱。无法识别的舱位代码已默认处理，请确认。",
+      "affected_records": [
+        {
+          "index": 44,
+          "record": {
+            "order_id": "ORDFC7C349E",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "王涛",
+            "passenger_id": "P000045",
+            "cabin_class": "X",
+            "fare_amount": 698.95,
+            "booking_date": "2026-06-17",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.051756",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_1ecdbc3bca67",
+      "anomaly_type": "cabin_mismatch",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "订单 ORD0763F020 舱位 'Z' 不识别，默认经济舱",
+      "human_explanation": "舱位不匹配：订单 ORD0763F020 舱位 'Z' 不识别，默认经济舱。无法识别的舱位代码已默认处理，请确认。",
+      "affected_records": [
+        {
+          "index": 49,
+          "record": {
+            "order_id": "ORD0763F020",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "赵杰",
+            "passenger_id": "P000050",
+            "cabin_class": "Z",
+            "fare_amount": 3343.24,
+            "booking_date": "2026.05.13",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.053850",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_a9516d91f011",
+      "anomaly_type": "cabin_mismatch",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "订单 ORDD1D2064C 舱位 'X' 不识别，默认经济舱",
+      "human_explanation": "舱位不匹配：订单 ORDD1D2064C 舱位 'X' 不识别，默认经济舱。无法识别的舱位代码已默认处理，请确认。",
+      "affected_records": [
+        {
+          "index": 52,
+          "record": {
+            "order_id": "ORDD1D2064C",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "杨强",
+            "passenger_id": "P000053",
+            "cabin_class": "X",
+            "fare_amount": 1300.23,
+            "booking_date": "2026-05-05",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.054657",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_1bb53d4c9836",
+      "anomaly_type": "cabin_mismatch",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "订单 ORD3885E3D6 舱位 'U' 不识别，默认经济舱",
+      "human_explanation": "舱位不匹配：订单 ORD3885E3D6 舱位 'U' 不识别，默认经济舱。无法识别的舱位代码已默认处理，请确认。",
+      "affected_records": [
+        {
+          "index": 60,
+          "record": {
+            "order_id": "ORD3885E3D6",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "黄霞",
+            "passenger_id": "P000061",
+            "cabin_class": "U",
+            "fare_amount": 3160.31,
+            "booking_date": "2026-05-05",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.055479",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_c1b96b8d174d",
+      "anomaly_type": "cabin_mismatch",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "订单 ORD3AF72D29 舱位 'X' 不识别，默认经济舱",
+      "human_explanation": "舱位不匹配：订单 ORD3AF72D29 舱位 'X' 不识别，默认经济舱。无法识别的舱位代码已默认处理，请确认。",
+      "affected_records": [
+        {
+          "index": 68,
+          "record": {
+            "order_id": "ORD3AF72D29",
+            "flight_no": "CA1234",
+            "flight_date": "27/06/2026",
+            "passenger_name": "吴刚",
+            "passenger_id": null,
+            "cabin_class": "X",
+            "fare_amount": 969.59,
+            "booking_date": "2026-06-16",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.055923",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_22ae016b3552",
+      "anomaly_type": "cabin_mismatch",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "订单 ORDB0F1D528 舱位 'X' 不识别，默认经济舱",
+      "human_explanation": "舱位不匹配：订单 ORDB0F1D528 舱位 'X' 不识别，默认经济舱。无法识别的舱位代码已默认处理，请确认。",
+      "affected_records": [
+        {
+          "index": 89,
+          "record": {
+            "order_id": "ORDB0F1D528",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "黄涛",
+            "passenger_id": "P000090",
+            "cabin_class": "X",
+            "fare_amount": 4203.59,
+            "booking_date": "2026.04.28",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.057006",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_b8b32a7ca707",
+      "anomaly_type": "date_format",
+      "severity": "error",
+      "category": "数据质量",
+      "description": "订单 ORD26570B7E 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date",
+      "human_explanation": "日期格式问题：订单 ORD26570B7E 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date。不统一的日期格式已尝试自动解析，但建议源头修正。",
+      "affected_records": [
+        {
+          "index": 124,
+          "record": {
+            "order_id": "ORD26570B7E",
+            "flight_no": "CA1234",
+            "flight_date": "invalid-date",
+            "passenger_name": "王秀英",
+            "passenger_id": "P000125",
+            "cabin_class": "C",
+            "fare_amount": 2989.46,
+            "booking_date": "2026-04-28",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "reject",
+      "action_options": [
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.057433",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_9e2f38815edd",
+      "anomaly_type": "cabin_mismatch",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "订单 ORD3FD879C8 舱位 'X' 不识别，默认经济舱",
+      "human_explanation": "舱位不匹配：订单 ORD3FD879C8 舱位 'X' 不识别，默认经济舱。无法识别的舱位代码已默认处理，请确认。",
+      "affected_records": [
+        {
+          "index": 132,
+          "record": {
+            "order_id": "ORD3FD879C8",
+            "flight_no": "CA1234",
+            "flight_date": "2026年06月27日",
+            "passenger_name": "黄娜",
+            "passenger_id": null,
+            "cabin_class": "X",
+            "fare_amount": 1188.89,
+            "booking_date": "2026-05-21",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.057862",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_06409ad1cb71",
+      "anomaly_type": "cabin_mismatch",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "订单 ORDEE6048FD 舱位 'U' 不识别，默认经济舱",
+      "human_explanation": "舱位不匹配：订单 ORDEE6048FD 舱位 'U' 不识别，默认经济舱。无法识别的舱位代码已默认处理，请确认。",
+      "affected_records": [
+        {
+          "index": 137,
+          "record": {
+            "order_id": "ORDEE6048FD",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "黄军",
+            "passenger_id": "P000138",
+            "cabin_class": "U",
+            "fare_amount": 1137.47,
+            "booking_date": "2026-05-12",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.058186",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_7d0756f0c2e7",
+      "anomaly_type": "date_format",
+      "severity": "error",
+      "category": "数据质量",
+      "description": "订单 ORD1961FAEE 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date",
+      "human_explanation": "日期格式问题：订单 ORD1961FAEE 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date。不统一的日期格式已尝试自动解析，但建议源头修正。",
+      "affected_records": [
+        {
+          "index": 143,
+          "record": {
+            "order_id": "ORD1961FAEE",
+            "flight_no": "CA1234",
+            "flight_date": "invalid-date",
+            "passenger_name": "李桂英",
+            "passenger_id": null,
+            "cabin_class": "Y",
+            "fare_amount": 830.82,
+            "booking_date": "2026-05-18",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "reject",
+      "action_options": [
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.058575",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_8d33d187ee00",
+      "anomaly_type": "cabin_mismatch",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "订单 ORD441064F1 舱位 '' 不识别，默认经济舱",
+      "human_explanation": "舱位不匹配：订单 ORD441064F1 舱位 '' 不识别，默认经济舱。无法识别的舱位代码已默认处理，请确认。",
+      "affected_records": [
+        {
+          "index": 164,
+          "record": {
+            "order_id": "ORD441064F1",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "杨涛",
+            "passenger_id": "P000165",
+            "cabin_class": "",
+            "fare_amount": 3835.18,
+            "booking_date": "2026-05-17",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.059640",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_8deff2e0fe40",
+      "anomaly_type": "cabin_mismatch",
+      "severity": "warning",
+      "category": "数据质量",
+      "description": "订单 ORDCC369D23 舱位 '' 不识别，默认经济舱",
+      "human_explanation": "舱位不匹配：订单 ORDCC369D23 舱位 '' 不识别，默认经济舱。无法识别的舱位代码已默认处理，请确认。",
+      "affected_records": [
+        {
+          "index": 171,
+          "record": {
+            "order_id": "ORDCC369D23",
+            "flight_no": "CA1234",
+            "flight_date": "2026-06-27",
+            "passenger_name": "杨静",
+            "passenger_id": "P000172",
+            "cabin_class": "",
+            "fare_amount": 5138.7,
+            "booking_date": "2026-06-22",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.064474",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_a2ff14f06666",
+      "anomaly_type": "date_format",
+      "severity": "error",
+      "category": "数据质量",
+      "description": "订单 ORD148A7DAB 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date",
+      "human_explanation": "日期格式问题：订单 ORD148A7DAB 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date。不统一的日期格式已尝试自动解析，但建议源头修正。",
+      "affected_records": [
+        {
+          "index": 205,
+          "record": {
+            "order_id": "ORD148A7DAB",
+            "flight_no": "CA1234",
+            "flight_date": "invalid-date",
+            "passenger_name": "刘涛",
+            "passenger_id": "P000206",
+            "cabin_class": "W",
+            "fare_amount": 1467.86,
+            "booking_date": "2026-05-30",
+            "status": "confirmed"
+          }
+        }
+      ],
+      "suggested_action": "reject",
+      "action_options": [
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.067655",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    },
+    {
+      "anomaly_id": "anomaly_48ae254c69fe",
+      "anomaly_type": "missing_field",
+      "severity": "low",
+      "category": "数据质量",
+      "description": "有 29 个订单关联的旅客不在旅客名单中",
+      "human_explanation": "数据字段缺失：有 29 个订单关联的旅客不在旅客名单中。缺失字段可能影响计算准确性，请补全数据。",
+      "affected_records": [
+        {
+          "order_ids": [
+            "ORD1B33748F",
+            "ORD4F67B37E",
+            "ORD9BD64FCF",
+            "ORDAFFD1C8B",
+            "ORD7CC5A94E",
+            "ORDB75CD920",
+            "ORD880C2C9B",
+            "ORDE90A66EA",
+            "ORDB1CA514D",
+            "ORD4C2C0B72"
+          ]
+        }
+      ],
+      "suggested_action": "manual_review",
+      "action_options": [
+        "manual_review",
+        "accept_with_caution",
+        "reject"
+      ],
+      "detected_at": "2026-05-31T00:30:51.069573",
+      "resolved": false,
+      "resolution_notes": null,
+      "resolved_by": null,
+      "resolved_at": null
+    }
+  ],
+  "summary": {
+    "headline": "🔴 航班 CA1234 超售优化建议：风险高风险，预计增收 ¥24,659",
+    "decision_guide": "❌ 【不建议立即执行】检测到严重数据异常，请先修正数据问题后重新生成优化方案。",
+    "anomaly_warning": "⚠️ 检测到 6 个严重异常，建议处理后再执行优化结果",
+    "key_metrics": [
+      {
+        "name": "建议超售总数",
+        "value": 26,
+        "unit": "张",
+        "explanation": "系统建议总共超售 26 张机票。这是基于历史爽约率、票价水平和补偿成本综合计算的最优值。"
+      },
+      {
+        "name": "期望额外收入",
+        "value": 20800,
+        "unit": "元",
+        "explanation": "如果按平均票价计算，超售 26 张预计可增加收入约 ¥20,800。这部分是'空座损失'——如果不超售，这些座位很可能因为旅客爽约而空飞。"
+      },
+      {
+        "name": "期望补偿成本",
+        "value": 21990.0,
+        "unit": "元",
+        "explanation": "预计需要支付补偿 ¥21,990。这是统计期望值——大多数航班可能不需要补偿，少数航班可能需要支付较高补偿。"
+      },
+      {
+        "name": "期望净利润",
+        "value": 346492.0,
+        "unit": "元",
+        "explanation": "扣除期望补偿后，预计可增加净利润 ¥346,492。这是超售策略的预期净收益。"
+      },
+      {
+        "name": "预期爽约率",
+        "value": 6.0,
+        "unit": "%",
+        "explanation": "根据历史数据，预计约 6.0% 的购票旅客最终不会登机。这部分'消失'的旅客是我们可以超售的理论基础。"
+      }
+    ],
+    "action_items": [
+      "立即启动高风险超售预案",
+      "提前2-3天开始联系旅客寻求自愿改签",
+      "协调后续3个航班的预留座位",
+      "准备充足的现金和代金券补偿",
+      "安排资深员工负责现场处理",
+      "考虑是否降低超售数量"
+    ]
+  },
+  "manual_overrides": [],
+  "data_issues": [
+    {
+      "issue_id": "issue_8d5203164639",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '刘刚', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_b9911bb9d24f",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '陈平', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_e83c0e4198d9",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 3 条同名旅客记录: '杨洋', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_dadf962af272",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '张磊', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_8eb7c50cd0c9",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 4 条同名旅客记录: '吴静', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_f12e399c1c29",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '李杰', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_46f472ded1c0",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '杨霞', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_265227ff9e6f",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '黄秀英', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_98b108d6e9e7",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 4 条同名旅客记录: '周艳', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_97dfb7ccf64b",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '陈娜', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_76ec094f6340",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '陈刚', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_db0cd484ae4e",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 3 条同名旅客记录: '黄娜', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_566f0e4c7ed6",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '吴刚', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_ca1c1b407d3b",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 6 条同名旅客记录: '吴超', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_aef8e26a7c55",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '黄刚', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_89f7136ee23b",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '张洋', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_065f2059c8b9",
+      "issue_type": "name_conflict",
+      "severity": "warning",
+      "description": "发现 2 条同名旅客记录: '吴娜', 缺少足够的身份信息区分",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_c81564372d48",
+      "issue_type": "cabin_mismatch",
+      "severity": "warning",
+      "description": "订单 ORD8911C45D 舱位 'X' 不识别，默认经济舱",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_384d5d1194c8",
+      "issue_type": "date_format",
+      "severity": "error",
+      "description": "订单 ORDF19C2817 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date",
+      "suggested_action": "reject",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_0df88f44200f",
+      "issue_type": "date_format",
+      "severity": "error",
+      "description": "订单 ORD588D44DC 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date",
+      "suggested_action": "reject",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_83cdeb2bd49e",
+      "issue_type": "cabin_mismatch",
+      "severity": "warning",
+      "description": "订单 ORDFC7C349E 舱位 'X' 不识别，默认经济舱",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_7670ae409b0a",
+      "issue_type": "cabin_mismatch",
+      "severity": "warning",
+      "description": "订单 ORD0763F020 舱位 'Z' 不识别，默认经济舱",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_422e79bf7256",
+      "issue_type": "cabin_mismatch",
+      "severity": "warning",
+      "description": "订单 ORDD1D2064C 舱位 'X' 不识别，默认经济舱",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_3e84c88a92c0",
+      "issue_type": "cabin_mismatch",
+      "severity": "warning",
+      "description": "订单 ORD3885E3D6 舱位 'U' 不识别，默认经济舱",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_18de190ec146",
+      "issue_type": "cabin_mismatch",
+      "severity": "warning",
+      "description": "订单 ORD3AF72D29 舱位 'X' 不识别，默认经济舱",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_ae27847684f1",
+      "issue_type": "cabin_mismatch",
+      "severity": "warning",
+      "description": "订单 ORDB0F1D528 舱位 'X' 不识别，默认经济舱",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_1380cbcb86ea",
+      "issue_type": "date_format",
+      "severity": "error",
+      "description": "订单 ORD26570B7E 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date",
+      "suggested_action": "reject",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_02f5e6de081e",
+      "issue_type": "cabin_mismatch",
+      "severity": "warning",
+      "description": "订单 ORD3FD879C8 舱位 'X' 不识别，默认经济舱",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_d83c4eac4fc5",
+      "issue_type": "cabin_mismatch",
+      "severity": "warning",
+      "description": "订单 ORDEE6048FD 舱位 'U' 不识别，默认经济舱",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_af0796ae7425",
+      "issue_type": "date_format",
+      "severity": "error",
+      "description": "订单 ORD1961FAEE 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date",
+      "suggested_action": "reject",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_71b0e89388ad",
+      "issue_type": "cabin_mismatch",
+      "severity": "warning",
+      "description": "订单 ORD441064F1 舱位 '' 不识别，默认经济舱",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_771b83c21952",
+      "issue_type": "cabin_mismatch",
+      "severity": "warning",
+      "description": "订单 ORDCC369D23 舱位 '' 不识别，默认经济舱",
+      "suggested_action": "manual_review",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_0f9a2a081278",
+      "issue_type": "date_format",
+      "severity": "error",
+      "description": "订单 ORD148A7DAB 航班日期格式错误: 无法解析日期: invalid-date, 错误: String does not contain a date: invalid-date",
+      "suggested_action": "reject",
+      "resolved": false
+    },
+    {
+      "issue_id": "issue_68b1fe887e8d",
+      "issue_type": "missing_field",
+      "severity": "info",
+      "description": "有 29 个订单关联的旅客不在旅客名单中",
+      "suggested_action": "manual_review",
+      "resolved": false
+    }
+  ]
+}
