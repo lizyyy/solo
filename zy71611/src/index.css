@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-forest: #0D4B3C;
+  --color-forest-dark: #0A3D31;
+  --color-amber: #D4A843;
+  --color-sage-bg: #F8FAF9;
+  --color-cool-gray: #6B7280;
+  --color-warm-red: #DC2626;
+  --color-white: #FFFFFF;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-forest) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-forest);
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-forest-dark);
+}
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background-color: var(--color-sage-bg);
+  color: #1F2937;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.trace-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background-color: rgba(13, 75, 60, 0.08);
+  color: var(--color-forest);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.trace-badge:hover {
+  background-color: rgba(13, 75, 60, 0.18);
+}
