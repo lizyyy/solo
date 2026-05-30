@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #1a1a2e;
+  color: #e2e8f0;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: rgba(239, 68, 68, 0.4); }
+  50% { border-color: rgba(239, 68, 68, 1); }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 1.5s ease-in-out infinite;
+}
+
+@layer components {
+  .tab-btn {
+    @apply px-4 py-2 text-sm font-medium rounded-t-lg transition-colors;
+  }
+  .tab-btn-active {
+    @apply bg-brand-mid text-brand-accent border-b-2 border-brand-accent;
+  }
+  .tab-btn-inactive {
+    @apply text-zinc-400 hover:text-zinc-200 hover:bg-brand-mid/50;
+  }
+  .data-cell {
+    @apply font-mono text-sm tabular-nums;
+  }
+  .card {
+    @apply bg-brand-mid/60 rounded-lg border border-zinc-700/50 p-4;
+  }
+  .btn-primary {
+    @apply bg-brand-accent hover:bg-amber-500 text-brand-dark font-semibold px-4 py-2 rounded transition-colors text-sm;
+  }
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-500 text-white font-semibold px-4 py-2 rounded transition-colors text-sm;
+  }
+  .btn-ghost {
+    @apply text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700/50 px-3 py-2 rounded transition-colors text-sm;
+  }
+  .input-field {
+    @apply bg-brand-dark border border-zinc-600 rounded px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent/30 font-mono;
+  }
+  .select-field {
+    @apply bg-brand-dark border border-zinc-600 rounded px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-brand-accent;
+  }
+}
