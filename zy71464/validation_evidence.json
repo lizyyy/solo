@@ -1,0 +1,1635 @@
+{
+  "summary": {
+    "total_links": 36,
+    "module_distribution": {
+      "input_parser": 1,
+      "validator": 16,
+      "curvature_constraint": 19
+    },
+    "input_clues": {
+      "validate_path": {
+        "points": 10,
+        "max_curvature": 2.0,
+        "total_length": 5.0
+      }
+    },
+    "violation_count": 17,
+    "violation_links": [
+      {
+        "link_id": "284299cc3b59f684",
+        "reasoning": "路径点 8 处中心点位置 (5.00, 5.00) 与栅格 (10, 10) 障碍物碰撞"
+      },
+      {
+        "link_id": "d52bafd5cdeeb12d",
+        "reasoning": "路径点 8 处右前轮位置 (5.15, 5.15) 与栅格 (10, 10) 障碍物碰撞"
+      },
+      {
+        "link_id": "8800c89c0a240ac4",
+        "reasoning": "路径点 9 处右后轮位置 (5.35, 5.15) 与栅格 (10, 10) 障碍物碰撞"
+      },
+      {
+        "link_id": "f0baa92e68503b0a",
+        "reasoning": "路径段 7-8 插值点 2/2 中心点位置 (5.00, 5.00) 与栅格 (10, 10) 障碍物碰撞"
+      },
+      {
+        "link_id": "1e4451acee811e5d",
+        "reasoning": "路径段 7-8 插值点 2/2 右前轮位置 (5.15, 5.15) 与栅格 (10, 10) 障碍物碰撞"
+      },
+      {
+        "link_id": "9726f65ee5af2256",
+        "reasoning": "路径段 8-9 插值点 0/2 中心点位置 (5.00, 5.00) 与栅格 (10, 10) 障碍物碰撞"
+      },
+      {
+        "link_id": "b29bb857c79dd0eb",
+        "reasoning": "路径段 8-9 插值点 0/2 右前轮位置 (5.15, 5.15) 与栅格 (10, 10) 障碍物碰撞"
+      },
+      {
+        "link_id": "b95dbed2c4576e01",
+        "reasoning": "路径段 8-9 插值点 1/2 中心点位置 (5.25, 5.00) 与栅格 (10, 10) 障碍物碰撞"
+      },
+      {
+        "link_id": "3ea4f933e4033c6f",
+        "reasoning": "路径段 8-9 插值点 1/2 右前轮位置 (5.40, 5.15) 与栅格 (10, 10) 障碍物碰撞"
+      },
+      {
+        "link_id": "d083796449db0601",
+        "reasoning": "路径段 8-9 插值点 1/2 右后轮位置 (5.10, 5.15) 与栅格 (10, 10) 障碍物碰撞"
+      },
+      {
+        "link_id": "fb57f75f97030b58",
+        "reasoning": "路径段 8-9 插值点 2/2 右后轮位置 (5.35, 5.15) 与栅格 (10, 10) 障碍物碰撞"
+      },
+      {
+        "link_id": "a20904384577ff5a",
+        "reasoning": "曲率超限（点属性）：路径点 5 存储曲率 2.0000 1/m > 最大允许 1.1547 1/m"
+      },
+      {
+        "link_id": "4d1bb963e7c603bf",
+        "reasoning": "曲率 2.0000 1/m 超过最大曲率 1.1547 1/m，速度降至 0 m/s（无法通过该曲率）"
+      },
+      {
+        "link_id": "35496da09d363bc0",
+        "reasoning": "速度超限：路径点 5 速度 1.50 m/s > 最大允许 1.00 m/s，超出 0.50 m/s。该点曲率 2.0000 1/m 对应允许速度应为 0.00 m/s"
+      },
+      {
+        "link_id": "2d5532bfb8081b24",
+        "reasoning": "碰撞检查完成：发现 11 处碰撞"
+      },
+      {
+        "link_id": "0ce253a0c8425e7d",
+        "reasoning": "曲率检查完成：发现 1 处超限"
+      },
+      {
+        "link_id": "a06a9f3b676d0ccf",
+        "reasoning": "速度检查完成：发现 1 处超限"
+      }
+    ]
+  },
+  "links": [
+    {
+      "link_id": "df15e1bc60a0e652",
+      "module": "input_parser",
+      "operation": "input_normalization",
+      "timestamp": 1780114606.351167,
+      "inputs_hash": "f63941da476e359e41d0c1399fa700d6",
+      "outputs_hash": "b1b9a8420d72d252a1a1ddbbcf99b7ae",
+      "parent_link_ids": [],
+      "human_reasoning": "接收到validator提供的线索：validate_path = {'points': 10, 'max_curvature': 2.0, 'total_length': 5.0}",
+      "raw_data": {
+        "inputs": {
+          "clue_name": "validate_path",
+          "clue_value": {
+            "points": 10,
+            "max_curvature": 2.0,
+            "total_length": 5.0
+          },
+          "source": "validator"
+        },
+        "outputs": {
+          "normalized": {
+            "points": 10,
+            "max_curvature": 2.0,
+            "total_length": 5.0
+          }
+        }
+      }
+    },
+    {
+      "link_id": "284299cc3b59f684",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.351302,
+      "inputs_hash": "647a80baf8fc4f35165bb2bf998babd5",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "df15e1bc60a0e652"
+      ],
+      "human_reasoning": "路径点 8 处中心点位置 (5.00, 5.00) 与栅格 (10, 10) 障碍物碰撞",
+      "raw_data": {
+        "inputs": {
+          "path_index": 8,
+          "world_point": [
+            5.0,
+            5.0
+          ],
+          "grid_cell": [
+            10,
+            10
+          ],
+          "description": "中心点"
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    },
+    {
+      "link_id": "d52bafd5cdeeb12d",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.3513222,
+      "inputs_hash": "87d7a87e047252c317b3cfc0a6e51dd5",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "284299cc3b59f684"
+      ],
+      "human_reasoning": "路径点 8 处右前轮位置 (5.15, 5.15) 与栅格 (10, 10) 障碍物碰撞",
+      "raw_data": {
+        "inputs": {
+          "path_index": 8,
+          "world_point": [
+            5.15,
+            5.15
+          ],
+          "grid_cell": [
+            10,
+            10
+          ],
+          "description": "右前轮"
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    },
+    {
+      "link_id": "8800c89c0a240ac4",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.351352,
+      "inputs_hash": "c2dbe92f4e73bca207251240bedbde5a",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "d52bafd5cdeeb12d"
+      ],
+      "human_reasoning": "路径点 9 处右后轮位置 (5.35, 5.15) 与栅格 (10, 10) 障碍物碰撞",
+      "raw_data": {
+        "inputs": {
+          "path_index": 9,
+          "world_point": [
+            5.35,
+            5.15
+          ],
+          "grid_cell": [
+            10,
+            10
+          ],
+          "description": "右后轮"
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    },
+    {
+      "link_id": "f0baa92e68503b0a",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.3516002,
+      "inputs_hash": "39e73b4a19c7b057648f2f55f23762d9",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "8800c89c0a240ac4"
+      ],
+      "human_reasoning": "路径段 7-8 插值点 2/2 中心点位置 (5.00, 5.00) 与栅格 (10, 10) 障碍物碰撞",
+      "raw_data": {
+        "inputs": {
+          "segment": "7-8",
+          "interpolation_step": "2/2",
+          "world_point": [
+            5.0,
+            5.0
+          ],
+          "grid_cell": [
+            10,
+            10
+          ],
+          "description": "中心点"
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    },
+    {
+      "link_id": "1e4451acee811e5d",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.351615,
+      "inputs_hash": "3d4ef75cbf37a61e4f3ba4389cd9f884",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "f0baa92e68503b0a"
+      ],
+      "human_reasoning": "路径段 7-8 插值点 2/2 右前轮位置 (5.15, 5.15) 与栅格 (10, 10) 障碍物碰撞",
+      "raw_data": {
+        "inputs": {
+          "segment": "7-8",
+          "interpolation_step": "2/2",
+          "world_point": [
+            5.15,
+            5.15
+          ],
+          "grid_cell": [
+            10,
+            10
+          ],
+          "description": "右前轮"
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    },
+    {
+      "link_id": "9726f65ee5af2256",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.351638,
+      "inputs_hash": "a41a5910b907956681416546536737a8",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "1e4451acee811e5d"
+      ],
+      "human_reasoning": "路径段 8-9 插值点 0/2 中心点位置 (5.00, 5.00) 与栅格 (10, 10) 障碍物碰撞",
+      "raw_data": {
+        "inputs": {
+          "segment": "8-9",
+          "interpolation_step": "0/2",
+          "world_point": [
+            5.0,
+            5.0
+          ],
+          "grid_cell": [
+            10,
+            10
+          ],
+          "description": "中心点"
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    },
+    {
+      "link_id": "b29bb857c79dd0eb",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.351651,
+      "inputs_hash": "22a2a9188a8bc3a97fcf49d7771b843f",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "9726f65ee5af2256"
+      ],
+      "human_reasoning": "路径段 8-9 插值点 0/2 右前轮位置 (5.15, 5.15) 与栅格 (10, 10) 障碍物碰撞",
+      "raw_data": {
+        "inputs": {
+          "segment": "8-9",
+          "interpolation_step": "0/2",
+          "world_point": [
+            5.15,
+            5.15
+          ],
+          "grid_cell": [
+            10,
+            10
+          ],
+          "description": "右前轮"
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    },
+    {
+      "link_id": "b95dbed2c4576e01",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.3516722,
+      "inputs_hash": "a43894436fb43238cb1deb094e94a144",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "b29bb857c79dd0eb"
+      ],
+      "human_reasoning": "路径段 8-9 插值点 1/2 中心点位置 (5.25, 5.00) 与栅格 (10, 10) 障碍物碰撞",
+      "raw_data": {
+        "inputs": {
+          "segment": "8-9",
+          "interpolation_step": "1/2",
+          "world_point": [
+            5.25,
+            5.0
+          ],
+          "grid_cell": [
+            10,
+            10
+          ],
+          "description": "中心点"
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    },
+    {
+      "link_id": "3ea4f933e4033c6f",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.351685,
+      "inputs_hash": "59102b689e905708ed6a31e4d95dd68c",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "b95dbed2c4576e01"
+      ],
+      "human_reasoning": "路径段 8-9 插值点 1/2 右前轮位置 (5.40, 5.15) 与栅格 (10, 10) 障碍物碰撞",
+      "raw_data": {
+        "inputs": {
+          "segment": "8-9",
+          "interpolation_step": "1/2",
+          "world_point": [
+            5.4,
+            5.15
+          ],
+          "grid_cell": [
+            10,
+            10
+          ],
+          "description": "右前轮"
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    },
+    {
+      "link_id": "d083796449db0601",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.351701,
+      "inputs_hash": "6008c091cceb2492cc7972dd6463d312",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "3ea4f933e4033c6f"
+      ],
+      "human_reasoning": "路径段 8-9 插值点 1/2 右后轮位置 (5.10, 5.15) 与栅格 (10, 10) 障碍物碰撞",
+      "raw_data": {
+        "inputs": {
+          "segment": "8-9",
+          "interpolation_step": "1/2",
+          "world_point": [
+            5.1,
+            5.15
+          ],
+          "grid_cell": [
+            10,
+            10
+          ],
+          "description": "右后轮"
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    },
+    {
+      "link_id": "fb57f75f97030b58",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.351775,
+      "inputs_hash": "aa20cfbb175bbf7641d7e31df98ac16d",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "d083796449db0601"
+      ],
+      "human_reasoning": "路径段 8-9 插值点 2/2 右后轮位置 (5.35, 5.15) 与栅格 (10, 10) 障碍物碰撞",
+      "raw_data": {
+        "inputs": {
+          "segment": "8-9",
+          "interpolation_step": "2/2",
+          "world_point": [
+            5.35,
+            5.15
+          ],
+          "grid_cell": [
+            10,
+            10
+          ],
+          "description": "右后轮"
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    },
+    {
+      "link_id": "4acffd8e868287cd",
+      "module": "curvature_constraint",
+      "operation": "path_curvature_calc",
+      "timestamp": 1780114606.351799,
+      "inputs_hash": "69dddfdf8fcc50a36e31dfe2e428f20b",
+      "outputs_hash": "267dd2f1b356cbc220df11354dd2f777",
+      "parent_link_ids": [
+        "fb57f75f97030b58"
+      ],
+      "human_reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m",
+      "raw_data": {
+        "inputs": {
+          "theta1": 0,
+          "theta2": 0,
+          "delta_s": 0.5
+        },
+        "intermediate": {
+          "delta_theta": 0.0,
+          "abs_delta_theta": 0.0
+        },
+        "outputs": {
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          }
+        },
+        "formula": "κ = |θ₂ - θ₁| / Δs",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "κ = |θ₂ - θ₁| / Δs",
+          "inputs": {
+            "theta1": 0,
+            "theta2": 0,
+            "delta_s": 0.5
+          },
+          "intermediate": {
+            "delta_theta": 0.0,
+            "abs_delta_theta": 0.0
+          },
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          },
+          "reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m"
+        }
+      }
+    },
+    {
+      "link_id": "11c8c3af952ad516",
+      "module": "curvature_constraint",
+      "operation": "path_curvature_calc",
+      "timestamp": 1780114606.351821,
+      "inputs_hash": "69dddfdf8fcc50a36e31dfe2e428f20b",
+      "outputs_hash": "267dd2f1b356cbc220df11354dd2f777",
+      "parent_link_ids": [
+        "4acffd8e868287cd"
+      ],
+      "human_reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m",
+      "raw_data": {
+        "inputs": {
+          "theta1": 0,
+          "theta2": 0,
+          "delta_s": 0.5
+        },
+        "intermediate": {
+          "delta_theta": 0.0,
+          "abs_delta_theta": 0.0
+        },
+        "outputs": {
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          }
+        },
+        "formula": "κ = |θ₂ - θ₁| / Δs",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "κ = |θ₂ - θ₁| / Δs",
+          "inputs": {
+            "theta1": 0,
+            "theta2": 0,
+            "delta_s": 0.5
+          },
+          "intermediate": {
+            "delta_theta": 0.0,
+            "abs_delta_theta": 0.0
+          },
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          },
+          "reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m"
+        }
+      }
+    },
+    {
+      "link_id": "93f239f52f52b439",
+      "module": "curvature_constraint",
+      "operation": "path_curvature_calc",
+      "timestamp": 1780114606.351836,
+      "inputs_hash": "69dddfdf8fcc50a36e31dfe2e428f20b",
+      "outputs_hash": "267dd2f1b356cbc220df11354dd2f777",
+      "parent_link_ids": [
+        "11c8c3af952ad516"
+      ],
+      "human_reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m",
+      "raw_data": {
+        "inputs": {
+          "theta1": 0,
+          "theta2": 0,
+          "delta_s": 0.5
+        },
+        "intermediate": {
+          "delta_theta": 0.0,
+          "abs_delta_theta": 0.0
+        },
+        "outputs": {
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          }
+        },
+        "formula": "κ = |θ₂ - θ₁| / Δs",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "κ = |θ₂ - θ₁| / Δs",
+          "inputs": {
+            "theta1": 0,
+            "theta2": 0,
+            "delta_s": 0.5
+          },
+          "intermediate": {
+            "delta_theta": 0.0,
+            "abs_delta_theta": 0.0
+          },
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          },
+          "reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m"
+        }
+      }
+    },
+    {
+      "link_id": "1cab64239ba0cb7f",
+      "module": "curvature_constraint",
+      "operation": "path_curvature_calc",
+      "timestamp": 1780114606.351852,
+      "inputs_hash": "69dddfdf8fcc50a36e31dfe2e428f20b",
+      "outputs_hash": "267dd2f1b356cbc220df11354dd2f777",
+      "parent_link_ids": [
+        "93f239f52f52b439"
+      ],
+      "human_reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m",
+      "raw_data": {
+        "inputs": {
+          "theta1": 0,
+          "theta2": 0,
+          "delta_s": 0.5
+        },
+        "intermediate": {
+          "delta_theta": 0.0,
+          "abs_delta_theta": 0.0
+        },
+        "outputs": {
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          }
+        },
+        "formula": "κ = |θ₂ - θ₁| / Δs",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "κ = |θ₂ - θ₁| / Δs",
+          "inputs": {
+            "theta1": 0,
+            "theta2": 0,
+            "delta_s": 0.5
+          },
+          "intermediate": {
+            "delta_theta": 0.0,
+            "abs_delta_theta": 0.0
+          },
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          },
+          "reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m"
+        }
+      }
+    },
+    {
+      "link_id": "595220f38fc23715",
+      "module": "curvature_constraint",
+      "operation": "path_curvature_calc",
+      "timestamp": 1780114606.351867,
+      "inputs_hash": "69dddfdf8fcc50a36e31dfe2e428f20b",
+      "outputs_hash": "267dd2f1b356cbc220df11354dd2f777",
+      "parent_link_ids": [
+        "1cab64239ba0cb7f"
+      ],
+      "human_reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m",
+      "raw_data": {
+        "inputs": {
+          "theta1": 0,
+          "theta2": 0,
+          "delta_s": 0.5
+        },
+        "intermediate": {
+          "delta_theta": 0.0,
+          "abs_delta_theta": 0.0
+        },
+        "outputs": {
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          }
+        },
+        "formula": "κ = |θ₂ - θ₁| / Δs",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "κ = |θ₂ - θ₁| / Δs",
+          "inputs": {
+            "theta1": 0,
+            "theta2": 0,
+            "delta_s": 0.5
+          },
+          "intermediate": {
+            "delta_theta": 0.0,
+            "abs_delta_theta": 0.0
+          },
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          },
+          "reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m"
+        }
+      }
+    },
+    {
+      "link_id": "7d1d12e1da8976cd",
+      "module": "curvature_constraint",
+      "operation": "path_curvature_calc",
+      "timestamp": 1780114606.3518841,
+      "inputs_hash": "69dddfdf8fcc50a36e31dfe2e428f20b",
+      "outputs_hash": "267dd2f1b356cbc220df11354dd2f777",
+      "parent_link_ids": [
+        "595220f38fc23715"
+      ],
+      "human_reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m",
+      "raw_data": {
+        "inputs": {
+          "theta1": 0,
+          "theta2": 0,
+          "delta_s": 0.5
+        },
+        "intermediate": {
+          "delta_theta": 0.0,
+          "abs_delta_theta": 0.0
+        },
+        "outputs": {
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          }
+        },
+        "formula": "κ = |θ₂ - θ₁| / Δs",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "κ = |θ₂ - θ₁| / Δs",
+          "inputs": {
+            "theta1": 0,
+            "theta2": 0,
+            "delta_s": 0.5
+          },
+          "intermediate": {
+            "delta_theta": 0.0,
+            "abs_delta_theta": 0.0
+          },
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          },
+          "reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m"
+        }
+      }
+    },
+    {
+      "link_id": "2beba93305751970",
+      "module": "curvature_constraint",
+      "operation": "path_curvature_calc",
+      "timestamp": 1780114606.351899,
+      "inputs_hash": "69dddfdf8fcc50a36e31dfe2e428f20b",
+      "outputs_hash": "267dd2f1b356cbc220df11354dd2f777",
+      "parent_link_ids": [
+        "7d1d12e1da8976cd"
+      ],
+      "human_reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m",
+      "raw_data": {
+        "inputs": {
+          "theta1": 0,
+          "theta2": 0,
+          "delta_s": 0.5
+        },
+        "intermediate": {
+          "delta_theta": 0.0,
+          "abs_delta_theta": 0.0
+        },
+        "outputs": {
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          }
+        },
+        "formula": "κ = |θ₂ - θ₁| / Δs",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "κ = |θ₂ - θ₁| / Δs",
+          "inputs": {
+            "theta1": 0,
+            "theta2": 0,
+            "delta_s": 0.5
+          },
+          "intermediate": {
+            "delta_theta": 0.0,
+            "abs_delta_theta": 0.0
+          },
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          },
+          "reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m"
+        }
+      }
+    },
+    {
+      "link_id": "ab52176e9b2a1a57",
+      "module": "curvature_constraint",
+      "operation": "path_curvature_calc",
+      "timestamp": 1780114606.351913,
+      "inputs_hash": "69dddfdf8fcc50a36e31dfe2e428f20b",
+      "outputs_hash": "267dd2f1b356cbc220df11354dd2f777",
+      "parent_link_ids": [
+        "2beba93305751970"
+      ],
+      "human_reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m",
+      "raw_data": {
+        "inputs": {
+          "theta1": 0,
+          "theta2": 0,
+          "delta_s": 0.5
+        },
+        "intermediate": {
+          "delta_theta": 0.0,
+          "abs_delta_theta": 0.0
+        },
+        "outputs": {
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          }
+        },
+        "formula": "κ = |θ₂ - θ₁| / Δs",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "κ = |θ₂ - θ₁| / Δs",
+          "inputs": {
+            "theta1": 0,
+            "theta2": 0,
+            "delta_s": 0.5
+          },
+          "intermediate": {
+            "delta_theta": 0.0,
+            "abs_delta_theta": 0.0
+          },
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          },
+          "reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m"
+        }
+      }
+    },
+    {
+      "link_id": "e7945afa6be58747",
+      "module": "curvature_constraint",
+      "operation": "path_curvature_calc",
+      "timestamp": 1780114606.351927,
+      "inputs_hash": "69dddfdf8fcc50a36e31dfe2e428f20b",
+      "outputs_hash": "267dd2f1b356cbc220df11354dd2f777",
+      "parent_link_ids": [
+        "ab52176e9b2a1a57"
+      ],
+      "human_reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m",
+      "raw_data": {
+        "inputs": {
+          "theta1": 0,
+          "theta2": 0,
+          "delta_s": 0.5
+        },
+        "intermediate": {
+          "delta_theta": 0.0,
+          "abs_delta_theta": 0.0
+        },
+        "outputs": {
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          }
+        },
+        "formula": "κ = |θ₂ - θ₁| / Δs",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "κ = |θ₂ - θ₁| / Δs",
+          "inputs": {
+            "theta1": 0,
+            "theta2": 0,
+            "delta_s": 0.5
+          },
+          "intermediate": {
+            "delta_theta": 0.0,
+            "abs_delta_theta": 0.0
+          },
+          "result": 0.0,
+          "boundary_check": {
+            "distance_positive": true,
+            "curvature_within_limit": true
+          },
+          "reasoning": "根据公式 κ = |θ₂ - θ₁| / Δs，两点航向差 Δθ=0.0°，弧长 Δs=0.50 m，计算得曲率 κ=0.0000 1/m"
+        }
+      }
+    },
+    {
+      "link_id": "a20904384577ff5a",
+      "module": "validator",
+      "operation": "curvature_validation",
+      "timestamp": 1780114606.3519402,
+      "inputs_hash": "229663a68c8d9e1cf1c8281da6c331ac",
+      "outputs_hash": "8fa559a8b4b3adff1e1f4acf81182e55",
+      "parent_link_ids": [
+        "e7945afa6be58747"
+      ],
+      "human_reasoning": "曲率超限（点属性）：路径点 5 存储曲率 2.0000 1/m > 最大允许 1.1547 1/m",
+      "raw_data": {
+        "inputs": {
+          "path_index": 5,
+          "point_curvature": 2.0,
+          "max_allowed": 1.1547005383792512
+        },
+        "outputs": {
+          "violation": true,
+          "excess": 0.8452994616207488
+        }
+      }
+    },
+    {
+      "link_id": "6079312c18f487d4",
+      "module": "curvature_constraint",
+      "operation": "speed_for_curvature",
+      "timestamp": 1780114606.351956,
+      "inputs_hash": "12d7983962418502afb5f592404bc030",
+      "outputs_hash": "7adbeb1eeb78aafa95373e7e8c3b0c5d",
+      "parent_link_ids": [
+        "a20904384577ff5a"
+      ],
+      "human_reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s",
+      "raw_data": {
+        "inputs": {
+          "curvature": 0.0,
+          "max_curvature": 1.1547005383792512,
+          "max_speed": 1.0
+        },
+        "intermediate": {
+          "curvature_ratio": 0.0
+        },
+        "outputs": {
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          }
+        },
+        "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+          "inputs": {
+            "curvature": 0.0,
+            "max_curvature": 1.1547005383792512,
+            "max_speed": 1.0
+          },
+          "intermediate": {
+            "curvature_ratio": 0.0
+          },
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          },
+          "reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s"
+        }
+      }
+    },
+    {
+      "link_id": "6df71a5f9dcc8883",
+      "module": "curvature_constraint",
+      "operation": "speed_for_curvature",
+      "timestamp": 1780114606.351969,
+      "inputs_hash": "12d7983962418502afb5f592404bc030",
+      "outputs_hash": "7adbeb1eeb78aafa95373e7e8c3b0c5d",
+      "parent_link_ids": [
+        "6079312c18f487d4"
+      ],
+      "human_reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s",
+      "raw_data": {
+        "inputs": {
+          "curvature": 0.0,
+          "max_curvature": 1.1547005383792512,
+          "max_speed": 1.0
+        },
+        "intermediate": {
+          "curvature_ratio": 0.0
+        },
+        "outputs": {
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          }
+        },
+        "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+          "inputs": {
+            "curvature": 0.0,
+            "max_curvature": 1.1547005383792512,
+            "max_speed": 1.0
+          },
+          "intermediate": {
+            "curvature_ratio": 0.0
+          },
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          },
+          "reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s"
+        }
+      }
+    },
+    {
+      "link_id": "d60893bb5da68d6e",
+      "module": "curvature_constraint",
+      "operation": "speed_for_curvature",
+      "timestamp": 1780114606.351982,
+      "inputs_hash": "12d7983962418502afb5f592404bc030",
+      "outputs_hash": "7adbeb1eeb78aafa95373e7e8c3b0c5d",
+      "parent_link_ids": [
+        "6df71a5f9dcc8883"
+      ],
+      "human_reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s",
+      "raw_data": {
+        "inputs": {
+          "curvature": 0.0,
+          "max_curvature": 1.1547005383792512,
+          "max_speed": 1.0
+        },
+        "intermediate": {
+          "curvature_ratio": 0.0
+        },
+        "outputs": {
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          }
+        },
+        "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+          "inputs": {
+            "curvature": 0.0,
+            "max_curvature": 1.1547005383792512,
+            "max_speed": 1.0
+          },
+          "intermediate": {
+            "curvature_ratio": 0.0
+          },
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          },
+          "reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s"
+        }
+      }
+    },
+    {
+      "link_id": "a3c6ef9c350e1339",
+      "module": "curvature_constraint",
+      "operation": "speed_for_curvature",
+      "timestamp": 1780114606.351994,
+      "inputs_hash": "12d7983962418502afb5f592404bc030",
+      "outputs_hash": "7adbeb1eeb78aafa95373e7e8c3b0c5d",
+      "parent_link_ids": [
+        "d60893bb5da68d6e"
+      ],
+      "human_reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s",
+      "raw_data": {
+        "inputs": {
+          "curvature": 0.0,
+          "max_curvature": 1.1547005383792512,
+          "max_speed": 1.0
+        },
+        "intermediate": {
+          "curvature_ratio": 0.0
+        },
+        "outputs": {
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          }
+        },
+        "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+          "inputs": {
+            "curvature": 0.0,
+            "max_curvature": 1.1547005383792512,
+            "max_speed": 1.0
+          },
+          "intermediate": {
+            "curvature_ratio": 0.0
+          },
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          },
+          "reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s"
+        }
+      }
+    },
+    {
+      "link_id": "1ed0679e7345fe11",
+      "module": "curvature_constraint",
+      "operation": "speed_for_curvature",
+      "timestamp": 1780114606.352005,
+      "inputs_hash": "12d7983962418502afb5f592404bc030",
+      "outputs_hash": "7adbeb1eeb78aafa95373e7e8c3b0c5d",
+      "parent_link_ids": [
+        "a3c6ef9c350e1339"
+      ],
+      "human_reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s",
+      "raw_data": {
+        "inputs": {
+          "curvature": 0.0,
+          "max_curvature": 1.1547005383792512,
+          "max_speed": 1.0
+        },
+        "intermediate": {
+          "curvature_ratio": 0.0
+        },
+        "outputs": {
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          }
+        },
+        "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+          "inputs": {
+            "curvature": 0.0,
+            "max_curvature": 1.1547005383792512,
+            "max_speed": 1.0
+          },
+          "intermediate": {
+            "curvature_ratio": 0.0
+          },
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          },
+          "reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s"
+        }
+      }
+    },
+    {
+      "link_id": "4d1bb963e7c603bf",
+      "module": "curvature_constraint",
+      "operation": "speed_for_curvature",
+      "timestamp": 1780114606.352017,
+      "inputs_hash": "b216d4ed723e6797ecefbee885dd25e3",
+      "outputs_hash": "0c499bfee6c4c7583a535de2e0a34c1f",
+      "parent_link_ids": [
+        "1ed0679e7345fe11"
+      ],
+      "human_reasoning": "曲率 2.0000 1/m 超过最大曲率 1.1547 1/m，速度降至 0 m/s（无法通过该曲率）",
+      "raw_data": {
+        "inputs": {
+          "curvature": 2.0,
+          "max_curvature": 1.1547005383792512,
+          "max_speed": 1.0
+        },
+        "intermediate": {
+          "curvature_ratio": 1.7320508075688776
+        },
+        "outputs": {
+          "result": 0.0,
+          "boundary_check": {
+            "curvature_within_limit": false,
+            "speed_nonnegative": true
+          }
+        },
+        "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+          "inputs": {
+            "curvature": 2.0,
+            "max_curvature": 1.1547005383792512,
+            "max_speed": 1.0
+          },
+          "intermediate": {
+            "curvature_ratio": 1.7320508075688776
+          },
+          "result": 0.0,
+          "boundary_check": {
+            "curvature_within_limit": false,
+            "speed_nonnegative": true
+          },
+          "reasoning": "曲率 2.0000 1/m 超过最大曲率 1.1547 1/m，速度降至 0 m/s（无法通过该曲率）"
+        }
+      }
+    },
+    {
+      "link_id": "35496da09d363bc0",
+      "module": "validator",
+      "operation": "speed_validation",
+      "timestamp": 1780114606.352028,
+      "inputs_hash": "b600b82f203b428a8a96831b4249e80a",
+      "outputs_hash": "a5fcb8be847808a8d31c52f7920e82c2",
+      "parent_link_ids": [
+        "4d1bb963e7c603bf"
+      ],
+      "human_reasoning": "速度超限：路径点 5 速度 1.50 m/s > 最大允许 1.00 m/s，超出 0.50 m/s。该点曲率 2.0000 1/m 对应允许速度应为 0.00 m/s",
+      "raw_data": {
+        "inputs": {
+          "path_index": 5,
+          "actual_speed": 1.5,
+          "max_allowed": 1.0,
+          "curvature": 2.0,
+          "expected_speed": 0.0
+        },
+        "outputs": {
+          "violation": true,
+          "excess": 0.5
+        }
+      }
+    },
+    {
+      "link_id": "4bc2f3399bbaa64f",
+      "module": "curvature_constraint",
+      "operation": "speed_for_curvature",
+      "timestamp": 1780114606.35204,
+      "inputs_hash": "12d7983962418502afb5f592404bc030",
+      "outputs_hash": "7adbeb1eeb78aafa95373e7e8c3b0c5d",
+      "parent_link_ids": [
+        "35496da09d363bc0"
+      ],
+      "human_reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s",
+      "raw_data": {
+        "inputs": {
+          "curvature": 0.0,
+          "max_curvature": 1.1547005383792512,
+          "max_speed": 1.0
+        },
+        "intermediate": {
+          "curvature_ratio": 0.0
+        },
+        "outputs": {
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          }
+        },
+        "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+          "inputs": {
+            "curvature": 0.0,
+            "max_curvature": 1.1547005383792512,
+            "max_speed": 1.0
+          },
+          "intermediate": {
+            "curvature_ratio": 0.0
+          },
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          },
+          "reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s"
+        }
+      }
+    },
+    {
+      "link_id": "b6be2bbc437e2ff5",
+      "module": "curvature_constraint",
+      "operation": "speed_for_curvature",
+      "timestamp": 1780114606.352053,
+      "inputs_hash": "12d7983962418502afb5f592404bc030",
+      "outputs_hash": "7adbeb1eeb78aafa95373e7e8c3b0c5d",
+      "parent_link_ids": [
+        "4bc2f3399bbaa64f"
+      ],
+      "human_reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s",
+      "raw_data": {
+        "inputs": {
+          "curvature": 0.0,
+          "max_curvature": 1.1547005383792512,
+          "max_speed": 1.0
+        },
+        "intermediate": {
+          "curvature_ratio": 0.0
+        },
+        "outputs": {
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          }
+        },
+        "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+          "inputs": {
+            "curvature": 0.0,
+            "max_curvature": 1.1547005383792512,
+            "max_speed": 1.0
+          },
+          "intermediate": {
+            "curvature_ratio": 0.0
+          },
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          },
+          "reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s"
+        }
+      }
+    },
+    {
+      "link_id": "01117819056c8252",
+      "module": "curvature_constraint",
+      "operation": "speed_for_curvature",
+      "timestamp": 1780114606.352065,
+      "inputs_hash": "12d7983962418502afb5f592404bc030",
+      "outputs_hash": "7adbeb1eeb78aafa95373e7e8c3b0c5d",
+      "parent_link_ids": [
+        "b6be2bbc437e2ff5"
+      ],
+      "human_reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s",
+      "raw_data": {
+        "inputs": {
+          "curvature": 0.0,
+          "max_curvature": 1.1547005383792512,
+          "max_speed": 1.0
+        },
+        "intermediate": {
+          "curvature_ratio": 0.0
+        },
+        "outputs": {
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          }
+        },
+        "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+          "inputs": {
+            "curvature": 0.0,
+            "max_curvature": 1.1547005383792512,
+            "max_speed": 1.0
+          },
+          "intermediate": {
+            "curvature_ratio": 0.0
+          },
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          },
+          "reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s"
+        }
+      }
+    },
+    {
+      "link_id": "6c680ba43fc4eec4",
+      "module": "curvature_constraint",
+      "operation": "speed_for_curvature",
+      "timestamp": 1780114606.352076,
+      "inputs_hash": "12d7983962418502afb5f592404bc030",
+      "outputs_hash": "7adbeb1eeb78aafa95373e7e8c3b0c5d",
+      "parent_link_ids": [
+        "01117819056c8252"
+      ],
+      "human_reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s",
+      "raw_data": {
+        "inputs": {
+          "curvature": 0.0,
+          "max_curvature": 1.1547005383792512,
+          "max_speed": 1.0
+        },
+        "intermediate": {
+          "curvature_ratio": 0.0
+        },
+        "outputs": {
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          }
+        },
+        "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+        "units": {
+          "wheelbase": "m",
+          "steering_angle": "rad",
+          "turning_radius": "m",
+          "curvature": "1/m",
+          "speed": "m/s",
+          "angular_velocity": "rad/s",
+          "distance": "m"
+        },
+        "calculation": {
+          "formula": "v(κ) = v_max * (1 - κ/κ_max)",
+          "inputs": {
+            "curvature": 0.0,
+            "max_curvature": 1.1547005383792512,
+            "max_speed": 1.0
+          },
+          "intermediate": {
+            "curvature_ratio": 0.0
+          },
+          "result": 1.0,
+          "boundary_check": {
+            "curvature_within_limit": true,
+            "speed_nonnegative": true
+          },
+          "reasoning": "根据公式 v(κ) = v_max * (1 - κ/κ_max)，最大速度 v_max=1.00 m/s，曲率比 κ/κ_max=0.00%，计算得允许速度 v=1.00 m/s"
+        }
+      }
+    },
+    {
+      "link_id": "2d5532bfb8081b24",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114606.3520901,
+      "inputs_hash": "b9b77fde231e434e84b21490d2b9efbf",
+      "outputs_hash": "a65a90754bbc694a5a33db88b7b003d8",
+      "parent_link_ids": [
+        "6c680ba43fc4eec4"
+      ],
+      "human_reasoning": "碰撞检查完成：发现 11 处碰撞",
+      "raw_data": {
+        "inputs": {
+          "path_points": 10
+        },
+        "outputs": {
+          "collision_count": 11
+        }
+      }
+    },
+    {
+      "link_id": "0ce253a0c8425e7d",
+      "module": "validator",
+      "operation": "curvature_validation",
+      "timestamp": 1780114606.3520992,
+      "inputs_hash": "2528e888a3f28a7bddda995b210c09b0",
+      "outputs_hash": "3206d27e0c0cf96a745bf4dcfe85e07b",
+      "parent_link_ids": [
+        "2d5532bfb8081b24"
+      ],
+      "human_reasoning": "曲率检查完成：发现 1 处超限",
+      "raw_data": {
+        "inputs": {
+          "max_curvature_allowed": 1.1547005383792512
+        },
+        "outputs": {
+          "violation_count": 1
+        }
+      }
+    },
+    {
+      "link_id": "a06a9f3b676d0ccf",
+      "module": "validator",
+      "operation": "speed_validation",
+      "timestamp": 1780114606.352108,
+      "inputs_hash": "d19a299809481257d71454fae894f738",
+      "outputs_hash": "3206d27e0c0cf96a745bf4dcfe85e07b",
+      "parent_link_ids": [
+        "0ce253a0c8425e7d"
+      ],
+      "human_reasoning": "速度检查完成：发现 1 处超限",
+      "raw_data": {
+        "inputs": {
+          "max_speed_allowed": 1.0
+        },
+        "outputs": {
+          "violation_count": 1
+        }
+      }
+    }
+  ]
+}

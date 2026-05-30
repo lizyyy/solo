@@ -1,0 +1,177 @@
+{
+  "summary": {
+    "total_links": 5,
+    "module_distribution": {
+      "input_parser": 4,
+      "validator": 1
+    },
+    "input_clues": {
+      "map": {
+        "width_cells": 20,
+        "height_cells": 15,
+        "resolution": 0.5,
+        "obstacles": 6
+      },
+      "robot_params": {
+        "wheelbase": 0.5,
+        "max_steering_deg": 30.0,
+        "min_turning_radius": 0.8660254037844388,
+        "max_curvature": 1.1547005383792512
+      },
+      "start_pose": [
+        2.0,
+        7.0,
+        0.0
+      ],
+      "goal_pose": [
+        15.0,
+        7.0,
+        0.0
+      ]
+    },
+    "violation_count": 0,
+    "violation_links": []
+  },
+  "links": [
+    {
+      "link_id": "021fc24359b04858",
+      "module": "input_parser",
+      "operation": "input_normalization",
+      "timestamp": 1780114363.3696132,
+      "inputs_hash": "28377ee29bfc3f652ae5bd0deb8967a0",
+      "outputs_hash": "30369300009b961df865bb55056d43dc",
+      "parent_link_ids": [],
+      "human_reasoning": "接收到user提供的线索：map = {'width_cells': 20, 'height_cells': 15, 'resolution': 0.5, 'obstacles': 6}",
+      "raw_data": {
+        "inputs": {
+          "clue_name": "map",
+          "clue_value": {
+            "width_cells": 20,
+            "height_cells": 15,
+            "resolution": 0.5,
+            "obstacles": 6
+          },
+          "source": "user"
+        },
+        "outputs": {
+          "normalized": {
+            "width_cells": 20,
+            "height_cells": 15,
+            "resolution": 0.5,
+            "obstacles": 6
+          }
+        }
+      }
+    },
+    {
+      "link_id": "82a0812efb5bf32b",
+      "module": "input_parser",
+      "operation": "input_normalization",
+      "timestamp": 1780114363.369664,
+      "inputs_hash": "ca1a9fc2905a287b2e769619b1d4cb7a",
+      "outputs_hash": "d01e10e5d02daf72ceb3345626020e79",
+      "parent_link_ids": [],
+      "human_reasoning": "接收到calculated提供的线索：robot_params = {'wheelbase': 0.5, 'max_steering_deg': 30.0, 'min_turning_radius': 0.8660254037844388, 'max_curvature': 1.1547005383792512}",
+      "raw_data": {
+        "inputs": {
+          "clue_name": "robot_params",
+          "clue_value": {
+            "wheelbase": 0.5,
+            "max_steering_deg": 30.0,
+            "min_turning_radius": 0.8660254037844388,
+            "max_curvature": 1.1547005383792512
+          },
+          "source": "calculated"
+        },
+        "outputs": {
+          "normalized": {
+            "wheelbase": 0.5,
+            "max_steering_deg": 30.0,
+            "min_turning_radius": 0.8660254037844388,
+            "max_curvature": 1.1547005383792512
+          }
+        }
+      }
+    },
+    {
+      "link_id": "70e612d2a93685e7",
+      "module": "input_parser",
+      "operation": "input_normalization",
+      "timestamp": 1780114363.3697238,
+      "inputs_hash": "95e1f92bf3704ac5bd3a6fea09ab2503",
+      "outputs_hash": "13e37dffe4389bed4ce62bb1671cd7a0",
+      "parent_link_ids": [],
+      "human_reasoning": "接收到user提供的线索：start_pose = (2.0, 7.0, 0.0)",
+      "raw_data": {
+        "inputs": {
+          "clue_name": "start_pose",
+          "clue_value": [
+            2.0,
+            7.0,
+            0.0
+          ],
+          "source": "user"
+        },
+        "outputs": {
+          "normalized": [
+            2.0,
+            7.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "link_id": "9cc104d944c466e0",
+      "module": "input_parser",
+      "operation": "input_normalization",
+      "timestamp": 1780114363.36974,
+      "inputs_hash": "b939398a99912d1edcd355379f27e0d4",
+      "outputs_hash": "b047f6d8b52ba398364788a131915e89",
+      "parent_link_ids": [],
+      "human_reasoning": "接收到user提供的线索：goal_pose = (15.0, 7.0, 0.0)",
+      "raw_data": {
+        "inputs": {
+          "clue_name": "goal_pose",
+          "clue_value": [
+            15.0,
+            7.0,
+            0.0
+          ],
+          "source": "user"
+        },
+        "outputs": {
+          "normalized": [
+            15.0,
+            7.0,
+            0.0
+          ]
+        }
+      }
+    },
+    {
+      "link_id": "5c65a69003c8bc0c",
+      "module": "validator",
+      "operation": "collision_check",
+      "timestamp": 1780114363.369765,
+      "inputs_hash": "9460ae5ceb9dea91fa62fc1739a0721a",
+      "outputs_hash": "40bdff708c9d34a880e8807b84cd8bc0",
+      "parent_link_ids": [
+        "9cc104d944c466e0"
+      ],
+      "human_reasoning": "终点 (15.00, 7.00) 位于障碍物中，无法规划",
+      "raw_data": {
+        "inputs": {
+          "pose": [
+            15.0,
+            7.0,
+            0.0
+          ]
+        },
+        "outputs": {
+          "collision": true
+        }
+      }
+    }
+  ]
+}
