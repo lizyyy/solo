@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  color-scheme: dark;
+  color: #CBD5E1;
+  background-color: #0F172A;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: linear-gradient(135deg, #0F172A 0%, #0B1220 50%, #070B14 100%);
+  background-attachment: fixed;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #1E293B;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #1E293B;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #64748B;
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-neon-purple-600 text-white rounded transition-all duration-150 hover:bg-neon-purple-500 hover:shadow-glow-purple active:scale-[0.98] font-medium;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-deep-blue-600 text-deep-blue-100 rounded transition-all duration-150 hover:bg-deep-blue-500 active:scale-[0.98] font-medium border border-deep-blue-400/30;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-coral-red-500 text-white rounded transition-all duration-150 hover:bg-coral-red-600 active:scale-[0.98] font-medium;
+  }
+
+  .btn-success {
+    @apply px-4 py-2 bg-emerald-green-500 text-white rounded transition-all duration-150 hover:bg-emerald-green-600 active:scale-[0.98] font-medium;
+  }
+
+  .card {
+    @apply bg-deep-blue-600/60 backdrop-blur-sm border border-deep-blue-400/20 rounded-lg shadow-card transition-all duration-200 hover:shadow-card-hover;
+  }
+
+  .card-gradient {
+    @apply bg-gradient-to-br from-deep-blue-600/80 to-deep-blue-700/80 backdrop-blur-sm border border-deep-blue-400/20 rounded-lg shadow-card;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-deep-blue-700/50 border border-deep-blue-400/30 rounded text-deep-blue-100 placeholder-deep-blue-300/50 focus:outline-none focus:border-neon-purple-500 focus:ring-1 focus:ring-neon-purple-500 transition-all duration-150;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+  }
+
+  .status-conflict {
+    @apply status-badge bg-coral-red-500/20 text-coral-red-500 border border-coral-red-500/30;
+  }
+
+  .status-resolved {
+    @apply status-badge bg-emerald-green-500/20 text-emerald-green-500 border border-emerald-green-500/30;
+  }
+
+  .status-pending {
+    @apply status-badge bg-amber-yellow-500/20 text-amber-yellow-500 border border-amber-yellow-500/30;
+  }
+
+  .status-active {
+    @apply status-badge bg-neon-purple-500/20 text-neon-purple-300 border border-neon-purple-500/30;
+  }
+
+  .animate-stagger {
+    opacity: 0;
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+
+  .divider {
+    @apply h-px bg-deep-blue-400/20 my-4;
+  }
+
+  .table-header {
+    @apply text-left text-xs font-semibold text-deep-blue-300 uppercase tracking-wider px-4 py-3;
+  }
+
+  .table-cell {
+    @apply px-4 py-3 text-sm text-deep-blue-100;
+  }
+
+  .table-row {
+    @apply border-t border-deep-blue-400/10 hover:bg-deep-blue-500/20 transition-colors duration-150;
+  }
+
+  .table-row-alt {
+    @apply border-t border-deep-blue-400/10 bg-deep-blue-600/30 hover:bg-deep-blue-500/30 transition-colors duration-150;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+::selection {
+  background-color: rgba(124, 58, 237, 0.4);
+  color: #fff;
+}
