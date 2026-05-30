@@ -1,0 +1,152 @@
+import { GameEvent, ActionLog, EvidenceChain } from '@/types';
+
+export const sampleEvents: GameEvent[] = [
+  {
+    id: 'sample-1',
+    type: 'imbalance',
+    severity: 'warning',
+    timestamp: 15,
+    channelId: 1,
+    description: '人声被乐队盖住了，需要提一下主唱音量',
+    resolved: true,
+    resolvedAt: 18,
+    evidenceId: 'evidence-1',
+  },
+  {
+    id: 'sample-2',
+    type: 'monitor_request',
+    severity: 'warning',
+    timestamp: 28,
+    channelId: 1,
+    description: '主唱说听不清自己的声音，要加返听',
+    resolved: true,
+    resolvedAt: 32,
+    evidenceId: 'evidence-2',
+  },
+  {
+    id: 'sample-3',
+    type: 'feedback',
+    severity: 'critical',
+    timestamp: 45,
+    channelId: 1,
+    description: '主唱麦有啸叫前兆！快拉低增益！',
+    resolved: true,
+    resolvedAt: 47,
+    evidenceId: 'evidence-3',
+  },
+  {
+    id: 'sample-4',
+    type: 'clipping',
+    severity: 'critical',
+    timestamp: 68,
+    description: '主输出爆峰！总音量太高了！',
+    resolved: true,
+    resolvedAt: 70,
+    evidenceId: 'evidence-4',
+  },
+  {
+    id: 'sample-5',
+    type: 'imbalance',
+    severity: 'warning',
+    timestamp: 85,
+    channelId: 6,
+    description: '低频太轰头，架子鼓音量需要调整',
+    resolved: false,
+    evidenceId: 'evidence-5',
+  },
+];
+
+export const sampleActions: ActionLog[] = [
+  {
+    id: 'action-1',
+    type: 'fader_move',
+    channelId: 1,
+    fromValue: 70,
+    toValue: 78,
+    timestamp: 17,
+  },
+  {
+    id: 'action-2',
+    type: 'fader_move',
+    channelId: 1,
+    fromValue: 78,
+    toValue: 75,
+    timestamp: 30,
+  },
+  {
+    id: 'action-3',
+    type: 'fader_move',
+    channelId: 1,
+    fromValue: 75,
+    toValue: 65,
+    timestamp: 46,
+  },
+  {
+    id: 'action-4',
+    type: 'master_adjust',
+    fromValue: 88,
+    toValue: 75,
+    timestamp: 69,
+  },
+];
+
+export const sampleEvidenceChains: EvidenceChain[] = [
+  {
+    id: 'evidence-1',
+    eventType: 'imbalance',
+    startTime: 15,
+    endTime: 18,
+    actions: [sampleActions[0]],
+    events: [sampleEvents[0]],
+    conclusion: 'resolved',
+    notes: '快速响应，在3秒内完成调整，获得加分。',
+  },
+  {
+    id: 'evidence-2',
+    eventType: 'monitor_request',
+    startTime: 28,
+    endTime: 32,
+    actions: [sampleActions[1]],
+    events: [sampleEvents[1]],
+    conclusion: 'resolved',
+    notes: '返听调整到位，但可以更快一些。',
+  },
+  {
+    id: 'evidence-3',
+    eventType: 'feedback',
+    startTime: 45,
+    endTime: 47,
+    actions: [sampleActions[2]],
+    events: [sampleEvents[2]],
+    conclusion: 'resolved',
+    notes: '优秀！2秒内处理了啸叫，避免了演出事故。',
+  },
+  {
+    id: 'evidence-4',
+    eventType: 'clipping',
+    startTime: 68,
+    endTime: 70,
+    actions: [sampleActions[3]],
+    events: [sampleEvents[3]],
+    conclusion: 'resolved',
+    notes: '爆峰虽然处理了，但应该提前注意主输出电平。',
+  },
+  {
+    id: 'evidence-5',
+    eventType: 'imbalance',
+    startTime: 85,
+    actions: [],
+    events: [sampleEvents[4]],
+    conclusion: 'missed',
+    notes: '低频失衡问题未处理，影响了演出质量。',
+  },
+];
+
+export const loadSampleGame = () => {
+  return {
+    events: sampleEvents,
+    actions: sampleActions,
+    evidenceChains: sampleEvidenceChains,
+    finalScore: 78,
+  };
+};
