@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium;
+  }
+
+  .btn-secondary {
+    @apply bg-primary-800 hover:bg-primary-700 text-primary-100 px-4 py-2 rounded-lg transition-colors duration-200 font-medium border border-primary-600;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium;
+  }
+
+  .btn-success {
+    @apply bg-status-confirmed hover:bg-status-confirmed/80 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium;
+  }
+
+  .card {
+    @apply bg-primary-800 border border-primary-700 rounded-xl p-4;
+  }
+
+  .input {
+    @apply bg-primary-900 border border-primary-600 rounded-lg px-3 py-2 text-primary-100 placeholder-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+
+  .tag {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+  }
+
+  .tag-system {
+    @apply bg-source-system/20 text-source-system border border-source-system/30;
+  }
+
+  .tag-manual {
+    @apply bg-source-manual/20 text-source-manual border border-source-manual/30;
+  }
+
+  .tag-overlap {
+    @apply bg-problem-overlap/20 text-problem-overlap border border-problem-overlap/30;
+  }
+
+  .tag-misalignment {
+    @apply bg-problem-misalignment/20 text-problem-misalignment border border-problem-misalignment/30;
+  }
+
+  .tag-noise {
+    @apply bg-problem-noise/20 text-problem-noise border border-problem-noise/30;
+  }
+
+  .tag-confirmed {
+    @apply bg-status-confirmed/20 text-status-confirmed border border-status-confirmed/30;
+  }
+
+  .tag-rejected {
+    @apply bg-status-rejected/20 text-status-rejected border border-status-rejected/30;
+  }
+
+  .tag-pending {
+    @apply bg-status-pending/20 text-status-pending border border-status-pending/30;
+  }
+}
