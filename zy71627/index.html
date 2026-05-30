@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合约审计闯关室 - Web3安全培训</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="game-header">
+            <div class="header-left">
+                <h1>🔐 合约审计闯关室</h1>
+                <span class="level-badge" id="levelBadge">关卡 1/3</span>
+            </div>
+            <div class="header-center">
+                <div class="game-status" id="gameStatus">
+                    <span class="status-dot status-active"></span>
+                    <span id="statusText">游戏进行中</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-secondary" id="pauseBtn" onclick="Game.pauseGame()">⏸ 暂停</button>
+                <button class="btn btn-secondary" id="restartBtn" onclick="Game.restartLevel()">🔄 重开关卡</button>
+                <button class="btn btn-primary" onclick="Game.showReport()">📊 审计报告</button>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="sidebar-left">
+                <div class="panel">
+                    <h3>💰 账户余额</h3>
+                    <div class="balance-card">
+                        <div class="balance-item">
+                            <span class="balance-label">用户余额</span>
+                            <span class="balance-value" id="userBalance">100 ETH</span>
+                        </div>
+                        <div class="balance-item">
+                            <span class="balance-label">合约余额</span>
+                            <span class="balance-value" id="contractBalance">500 ETH</span>
+                        </div>
+                        <div class="balance-item attacker-balance">
+                            <span class="balance-label">攻击者余额</span>
+                            <span class="balance-value" id="attackerBalance">0 ETH</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>🔑 权限状态</h3>
+                    <div class="permission-list" id="permissionList">
+                        <div class="permission-item">
+                            <span>owner 权限</span>
+                            <span class="perm-status perm-granted">✓ 已授权</span>
+                        </div>
+                        <div class="permission-item">
+                            <span>transfer 权限</span>
+                            <span class="perm-status perm-granted">✓ 已授权</span>
+                        </div>
+                        <div class="permission-item">
+                            <span>selfdestruct 权限</span>
+                            <span class="perm-status perm-denied">✗ 未授权</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>🎯 任务目标</h3>
+                    <div class="objectives" id="objectives">
+                        <div class="objective-item">
+                            <input type="checkbox" id="obj1" disabled>
+                            <label for="obj1">识别重入风险</label>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" id="obj2" disabled>
+                            <label for="obj2">识别授权风险</label>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" id="obj3" disabled>
+                            <label for="obj3">识别溢出风险</label>
+                        </div>
+                        <div class="objective-item">
+                            <input type="checkbox" id="obj4" disabled>
+                            <label for="obj4">成功阻止攻击</label>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="contract-panel panel">
+                    <div class="panel-header">
+                        <h3>📜 智能合约代码</h3>
+                        <div class="panel-actions">
+                            <span class="contract-name" id="contractName">VulnerableVault.sol</span>
+                            <button class="btn btn-small" onclick="Game.showHint()">💡 提示</button>
+                        </div>
+                    </div>
+                    <div class="code-container">
+                        <pre class="code-display" id="codeDisplay"></pre>
+                    </div>
+                    <div class="risk-markers">
+                        <span class="risk-marker risk-reentrancy" onclick="Game.markRisk('reentrancy')">
+                            <span class="marker-dot"></span> 标记重入风险
+                        </span>
+                        <span class="risk-marker risk-authorization" onclick="Game.markRisk('authorization')">
+                            <span class="marker-dot"></span> 标记授权风险
+                        </span>
+                        <span class="risk-marker risk-overflow" onclick="Game.markRisk('overflow')">
+                            <span class="marker-dot"></span> 标记溢出风险
+                        </span>
+                    </div>
+                </div>
+
+                <div class="attack-panel panel">
+                    <div class="panel-header">
+                        <h3>⚔️ 攻击卡片</h3>
+                        <span class="attack-phase" id="attackPhase">攻击阶段: 准备中</span>
+                    </div>
+                    <div class="attack-cards" id="attackCards">
+                        <div class="attack-card" data-attack="reentrancy" onclick="Game.selectAttack('reentrancy')">
+                            <div class="card-icon">🔄</div>
+                            <h4>重入攻击</h4>
+                            <p>利用fallback函数反复调用提款</p>
+                            <span class="card-risk">高危</span>
+                        </div>
+                        <div class="attack-card" data-attack="authorization" onclick="Game.selectAttack('authorization')">
+                            <div class="card-icon">🔓</div>
+                            <h4>权限绕过</h4>
+                            <p>利用未检查的权限执行敏感操作</p>
+                            <span class="card-risk">高危</span>
+                        </div>
+                        <div class="attack-card" data-attack="overflow" onclick="Game.selectAttack('overflow')">
+                            <div class="card-icon">📈</div>
+                            <h4>整数溢出</h4>
+                            <p>利用算术溢出绕过余额检查</p>
+                            <span class="card-risk">中危</span>
+                        </div>
+                    </div>
+                    <div class="attack-actions">
+                        <button class="btn btn-danger" id="executeAttackBtn" onclick="Game.executeAttack()" disabled>
+                            🚀 执行攻击
+                        </button>
+                        <button class="btn btn-success" id="defendBtn" onclick="Game.defend()" disabled>
+                            🛡️ 部署防御
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+            <aside class="sidebar-right">
+                <div class="panel">
+                    <h3>📝 审计日志</h3>
+                    <div class="audit-log" id="auditLog">
+                        <div class="log-entry log-info">
+                            <span class="log-time">[系统]</span>
+                            <span class="log-message">欢迎来到合约审计闯关室！</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>🎮 关卡选择</h3>
+                    <div class="level-selector" id="levelSelector">
+                        <div class="level-item active" data-level="1" onclick="Game.loadLevel(1)">
+                            <div class="level-number">1</div>
+                            <div class="level-info">
+                                <h4>新手金库</h4>
+                                <p>重入攻击</p>
+                            </div>
+                            <div class="level-status" id="level1Status">●</div>
+                        </div>
+                        <div class="level-item" data-level="2" onclick="Game.loadLevel(2)">
+                            <div class="level-number">2</div>
+                            <div class="level-info">
+                                <h4>授权交易所</h4>
+                                <p>权限管理</p>
+                            </div>
+                            <div class="level-status" id="level2Status">●</div>
+                        </div>
+                        <div class="level-item" data-level="3" onclick="Game.loadLevel(3)">
+                            <div class="level-number">3</div>
+                            <div class="level-info">
+                                <h4>DeFi协议</h4>
+                                <p>综合挑战</p>
+                            </div>
+                            <div class="level-status" id="level3Status">●</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel score-panel">
+                    <h3>🏆 当前得分</h3>
+                    <div class="score-display">
+                        <span class="score-value" id="currentScore">0</span>
+                        <span class="score-max">/ 1000</span>
+                    </div>
+                    <div class="score-breakdown">
+                        <div class="score-item">
+                            <span>风险识别</span>
+                            <span id="riskScore">0</span>
+                        </div>
+                        <div class="score-item">
+                            <span>攻击防御</span>
+                            <span id="defenseScore">0</span>
+                        </div>
+                        <div class="score-item">
+                            <span>时间奖励</span>
+                            <span id="timeScore">0</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <div class="modal-overlay hidden" id="pauseModal">
+            <div class="modal">
+                <h2>⏸ 游戏已暂停</h2>
+                <p>当前进度已保存，你可以随时继续。</p>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="Game.resumeGame()">▶️ 继续游戏</button>
+                    <button class="btn btn-secondary" onclick="Game.restartGame()">🔄 重新开始</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay hidden" id="reportModal">
+            <div class="modal modal-large">
+                <h2>📊 审计闯关报告</h2>
+                <div class="report-content" id="reportContent"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="Game.exportReport()">📥 导出报告</button>
+                    <button class="btn btn-primary" onclick="Game.closeReport()">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay hidden" id="replayModal">
+            <div class="modal modal-large">
+                <h2>🎬 攻击回放</h2>
+                <div class="replay-content" id="replayContent"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="Game.closeReplay()">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast hidden" id="toast"></div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
