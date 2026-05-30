@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>音乐彩排动线图 - 3D交互工作台</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--panel:#111827;--border:#1e2d3d;--accent:#3b82f6;--warn:#f59e0b;--danger:#ef4444;--success:#10b981;--text:#e2e8f0;--muted:#64748b;--card:#1a2332}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh}
+.app{display:grid;grid-template-columns:1fr 380px;grid-template-rows:1fr 260px;height:100vh;gap:1px;background:var(--border)}
+.viewport{grid-row:1;grid-column:1;position:relative;background:var(--bg)}
+.viewport canvas{display:block}
+.viewport-hud{position:absolute;top:12px;left:12px;display:flex;gap:8px;z-index:10;flex-wrap:wrap}
+.hud-btn{padding:6px 14px;background:rgba(17,24,39,.85);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;cursor:pointer;backdrop-filter:blur(8px);transition:all .2s}
+.hud-btn:hover{border-color:var(--accent);color:var(--accent)}
+.hud-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.viewport-info{position:absolute;bottom:12px;left:12px;font-size:11px;color:var(--muted);z-index:10}
+.sidebar{grid-row:1;grid-column:2;display:flex;flex-direction:column;overflow:hidden;background:var(--panel)}
+.panel{border-bottom:1px solid var(--border)}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(0,0,0,.2)}
+.panel-header h3{font-size:13px;font-weight:600}
+.panel-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;background:rgba(59,130,246,.2);color:var(--accent)}
+.panel-body{padding:12px 14px;max-height:260px;overflow-y:auto}
+.panel-body::-webkit-scrollbar{width:4px}
+.panel-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.entity-list{display:flex;flex-direction:column;gap:6px}
+.entity-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;font-size:12px}
+.entity-item:hover{border-color:var(--accent)}
+.entity-item.selected{border-color:var(--accent);background:rgba(59,130,246,.1)}
+.entity-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.entity-icon.stage{background:rgba(139,92,246,.2);color:#a78bfa}
+.entity-icon.band{background:rgba(59,130,246,.2);color:#60a5fa}
+.entity-icon.vehicle{background:rgba(245,158,11,.2);color:#fbbf24}
+.entity-icon.volunteer{background:rgba(16,185,129,.2);color:#34d399}
+.entity-info{flex:1;min-width:0}
+.entity-name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entity-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.entity-ver{font-size:9px;padding:1px 6px;border-radius:4px;background:rgba(100,116,139,.2);color:var(--muted)}
+.route-item{padding:10px;background:var(--card);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s}
+.route-item:hover{border-color:var(--accent)}
+.route-item.selected{border-color:var(--accent);background:rgba(59,130,246,.1)}
+.route-item.has-conflict{border-color:var(--danger);background:rgba(239,68,68,.05)}
+.route-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.route-name{font-size:12px;font-weight:500}
+.route-color{width:12px;height:12px;border-radius:3px}
+.route-time{font-size:10px;color:var(--muted)}
+.route-status{font-size:10px;padding:2px 8px;border-radius:4px}
+.route-status.ok{background:rgba(16,185,129,.15);color:var(--success)}
+.route-status.warn{background:rgba(245,158,11,.15);color:var(--warn)}
+.route-status.error{background:rgba(239,68,68,.15);color:var(--danger)}
+.timeline-panel{grid-row:2;grid-column:1/-1;background:var(--panel);display:flex;flex-direction:column}
+.timeline-header{display:flex;align-items:center;gap:12px;padding:8px 14px;background:rgba(0,0,0,.2);border-bottom:1px solid var(--border)}
+.timeline-header h3{font-size:13px;font-weight:600;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:10px;padding:8px 0}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.legend-dot{width:8px;height:8px;border-radius:2px}
+.timeline-controls{display:flex;gap:6px;margin-left:auto}
+.timeline-controls button{padding:4px 10px;font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:4px;color:var(--text);cursor:pointer}
+.timeline-controls button:hover{border-color:var(--accent)}
+.timeline-body{flex:1;overflow-x:auto;overflow-y:hidden;position:relative;padding:8px 14px 14px}
+.timeline-grid{min-width:1200px;height:100%;position:relative}
+.timeline-row{display:flex;align-items:center;position:relative;height:28px}
+.timeline-label{width:100px;font-size:11px;color:var(--muted);flex-shrink:0;padding-right:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.timeline-track{flex:1;position:relative;height:20px;background:rgba(0,0,0,.15);border-radius:4px}
+.timeline-block{position:absolute;height:100%;border-radius:4px;cursor:pointer;font-size:10px;display:flex;align-items:center;padding:0 6px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:20px}
+.timeline-block:hover{opacity:.85}
+.timeline-block.conflict{animation:pc 1.5s infinite;box-shadow:0 0 8px rgba(239,68,68,.4)}
+@keyframes pc{0%,100%{opacity:1}50%{opacity:.6}}
+.conflict-item{padding:10px;background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;cursor:pointer;transition:all .15s}
+.conflict-item:hover{border-color:var(--warn)}
+.conflict-type{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin-bottom:6px}
+.conflict-type.crossing{background:rgba(239,68,68,.15);color:var(--danger)}
+.conflict-type.late{background:rgba(245,158,11,.15);color:var(--warn)}
+.conflict-type.congestion{background:rgba(139,92,246,.15);color:#a78bfa}
+.conflict-desc{font-size:12px;margin-bottom:6px;line-height:1.5}
+.conflict-impact{font-size:11px;color:var(--muted);padding:6px 8px;background:rgba(0,0,0,.2);border-radius:4px;border-left:3px solid var(--danger)}
+.conflict-impact strong{color:var(--text)}
+.audit-entry{padding:8px 10px;border-bottom:1px solid var(--border);font-size:11px;line-height:1.6}
+.audit-time{color:var(--muted);font-size:10px}
+.audit-action{color:var(--accent);font-weight:500}
+.tab-bar{display:flex;border-bottom:1px solid var(--border)}
+.tab-btn{flex:1;padding:8px;font-size:12px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none;padding:12px 14px;overflow-y:auto;flex:1}
+.tab-content.active{display:block}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:12px;width:520px;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+.modal-header h3{font-size:15px}
+.modal-close{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;font-size:16px}
+.modal-close:hover{color:var(--text);border-color:var(--accent)}
+.modal-body{padding:20px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;outline:none}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{padding:8px 16px;border:1px solid var(--border);border-radius:6px;font-size:13px;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-ghost{background:none;color:var(--muted)}
+.btn-ghost:hover{color:var(--text);border-color:var(--accent)}
+.update-badge{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;margin-left:4px}
+.update-badge.new{background:rgba(59,130,246,.2);color:var(--accent)}
+.update-badge.updated{background:rgba(245,158,11,.2);color:var(--warn)}
+.update-badge.duplicate{background:rgba(100,116,139,.15);color:var(--muted)}
+.drag-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--muted);font-size:14px;text-align:center;pointer-events:none;z-index:5;display:none}
+.drag-hint.show{display:block}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:13px;z-index:2000;animation:si .3s;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+@keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.ver-item{font-size:10px;color:var(--muted);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="viewport" id="viewport">
+    <div class="viewport-hud">
+      <button class="hud-btn active" data-mode="select" onclick="setMode('select')">🖱 选择</button>
+      <button class="hud-btn" data-mode="route" onclick="setMode('route')">✏ 绘制路线</button>
+      <button class="hud-btn" data-mode="drag" onclick="setMode('drag')">✋ 拖拽路点</button>
+      <button class="hud-btn" onclick="resetCamera()">⟲ 重置视角</button>
+      <button class="hud-btn" onclick="showImportModal()">📥 导入数据</button>
+    </div>
+    <div class="viewport-info" id="viewportInfo">左键旋转 | 右键平移 | 滚轮缩放 | 点击选择 | 双击详情</div>
+    <div class="drag-hint" id="dragHint"></div>
+  </div>
+  <div class="sidebar">
+    <div class="panel">
+      <div class="panel-header"><h3>📍 场地实体</h3><span class="panel-badge" id="entityCount">0</span></div>
+      <div class="panel-body"><div class="entity-list" id="entityList"></div></div>
+    </div>
+    <div class="panel" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'routes')">路线</button>
+        <button class="tab-btn" onclick="switchTab(this,'conflicts')">冲突</button>
+        <button class="tab-btn" onclick="switchTab(this,'audit')">审计</button>
+        <button class="tab-btn" onclick="switchTab(this,'versions')">版本</button>
+      </div>
+      <div class="tab-content active" id="tab-routes"><div id="routeList" style="display:flex;flex-direction:column;gap:6px"></div></div>
+      <div class="tab-content" id="tab-conflicts"><div id="conflictList"></div></div>
+      <div class="tab-content" id="tab-audit"><div id="auditList"></div></div>
+      <div class="tab-content" id="tab-versions"><div id="versionList"></div></div>
+    </div>
+  </div>
+  <div class="timeline-panel">
+    <div class="timeline-header">
+      <h3>🕐 时间轴</h3>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>上台</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>下台</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>运输</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div>引导</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ef4444;animation:pc 1.5s infinite"></div>冲突</div>
+      </div>
+      <div class="timeline-controls"><button onclick="zoomTimeline(-1)">−</button><button onclick="zoomTimeline(1)">+</button></div>
+    </div>
+    <div class="timeline-body" id="timelineBody"><div class="timeline-grid" id="timelineGrid"></div></div>
+  </div>
+</div>
+<div class="modal-overlay" id="importModal"><div class="modal"><div class="modal-header"><h3>📥 导入数据</h3><button class="modal-close" onclick="closeImportModal()">&times;</button></div><div class="modal-body"><div class="form-group"><label>数据类型</label><select id="importType"><option value="stage">舞台</option><option value="band">乐队</option><option value="vehicle">器材车</option><option value="volunteer">志愿者组</option></select></div><div class="form-row"><div class="form-group"><label>名称</label><input id="importName" placeholder="输入名称"></div><div class="form-group"><label>来源</label><input id="importSource" placeholder="导演组/后勤组/..."></div></div><div class="form-row"><div class="form-group"><label>到达时间</label><input id="importArrival" type="number" value="800"></div><div class="form-group"><label>离开时间</label><input id="importDeparture" type="number" value="2200"></div></div><div class="form-group"><label>JSON批量导入（可选，会自动检测新增/更新/重复）</label><textarea id="importJson" rows="4" placeholder='[{"name":"主舞台","type":"stage","position":{"x":0,"z":-15},"arrivalTime":700,"departureTime":2200}]'></textarea></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn btn-ghost" onclick="closeImportModal()">取消</button><button class="btn btn-primary" onclick="handleImport()">导入</button></div></div></div></div>
+<div class="modal-overlay" id="routeModal"><div class="modal"><div class="modal-header"><h3>✏ 创建路线</h3><button class="modal-close" onclick="closeRouteModal()">&times;</button></div><div class="modal-body"><div class="form-group"><label>路线名称</label><input id="routeName" placeholder="如：乐队A上台路线"></div><div class="form-row"><div class="form-group"><label>起始时间</label><input id="routeStart" type="number" value="800"></div><div class="form-group"><label>结束时间</label><input id="routeEnd" type="number" value="900"></div></div><div class="form-group"><label>关联实体</label><select id="routeEntity"></select></div><div class="form-group"><label>路线类型</label><select id="routeTypeSel"><option value="entrance">上台</option><option value="exit">下台</option><option value="transport">器材运输</option><option value="volunteer">志愿者引导</option></select></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn btn-ghost" onclick="closeRouteModal()">取消</button><button class="btn btn-primary" onclick="confirmRoute()">确认路线</button></div></div></div></div>
+<script>
+var S={entities:[],routes:[],conflicts:[],auditLog:[],versions:new Map(),selectedEntity:null,selectedRoute:null,mode:'select',drawingWaypoints:[],timelineScale:1,nextId:1,timeOffset:600,timeRange:1200};
+var CL={stage:0x8b5cf6,band:0x3b82f6,vehicle:0xf59e0b,volunteer:0x10b981,rEntrance:0x60a5fa,rExit:0xf87171,rTransport:0xfbbf24,rVolunteer:0x34d399,conflict:0xef4444};
+var scene,camera,renderer,raycaster,mouse,groundPlane;
+var eMeshes=new Map(),rLines=new Map(),cZones=[];
+var isDrag=false,dRId=null,dWIdx=null;
+var orbit={th:0.6,ph:0.8,rad:80,tgt:new THREE.Vector3(0,0,0),rot:false,pan:false,lx:0,ly:0};
+var drawLine=null,animT=0;
+
+function init3D(){
+var vp=document.getElementById('viewport');
+scene=new THREE.Scene();scene.background=new THREE.Color(0x1a2332);scene.fog=new THREE.Fog(0x1a2332,100,280);
+camera=new THREE.PerspectiveCamera(50,vp.clientWidth/vp.clientHeight,0.1,1000);
+updCam();
+renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(vp.clientWidth,vp.clientHeight);renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+vp.appendChild(renderer.domElement);
+raycaster=new THREE.Raycaster();mouse=new THREE.Vector2();
+scene.add(new THREE.AmbientLight(0x404060,0.6));
+var dl=new THREE.DirectionalLight(0xffffff,0.8);dl.position.set(30,50,30);dl.castShadow=true;
+dl.shadow.mapSize.set(2048,2048);dl.shadow.camera.near=1;dl.shadow.camera.far=150;
+dl.shadow.camera.left=-60;dl.shadow.camera.right=60;dl.shadow.camera.top=60;dl.shadow.camera.bottom=-60;
+scene.add(dl);scene.add(new THREE.HemisphereLight(0x4488ff,0x002244,0.3));
+var gp=new THREE.Mesh(new THREE.PlaneGeometry(140,120),new THREE.MeshStandardMaterial({color:0x141c2b,roughness:0.9}));
+gp.rotation.x=-Math.PI/2;gp.receiveShadow=true;gp.name='ground';groundPlane=gp;scene.add(gp);
+var gr=new THREE.GridHelper(140,70,0x1e2d3d,0x1e2d3d);gr.position.y=0.01;scene.add(gr);
+mkLabel('观众区',0,1,50,'#475569');mkLabel('后台区',0,1,-50,'#475569');mkLabel('左通道',-55,1,0,'#334155');mkLabel('右通道',55,1,0,'#334155');
+var au=new THREE.Mesh(new THREE.PlaneGeometry(80,20),new THREE.MeshStandardMaterial({color:0x1e293b,roughness:0.8,transparent:true,opacity:0.4}));
+au.rotation.x=-Math.PI/2;au.position.set(0,0.02,42);scene.add(au);
+setupOrbit(vp);setupClicks(vp);loadDemo();animLoop();
+}
+
+function mkLabel(txt,x,y,z,c){
+var cv=document.createElement('canvas');var cx=cv.getContext('2d');cv.width=256;cv.height=64;
+cx.fillStyle=c||'#e2e8f0';cx.font='bold 28px sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(txt,128,32);
+var tx=new THREE.CanvasTexture(cv);tx.minFilter=THREE.LinearFilter;
+var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,transparent:true,opacity:0.4}));
+sp.position.set(x,y,z);sp.scale.set(10,2.5,1);scene.add(sp);
+}
+
+function updCam(){
+var t=orbit.tgt;
+camera.position.x=t.x+orbit.rad*Math.sin(orbit.ph)*Math.sin(orbit.th);
+camera.position.y=t.y+orbit.rad*Math.cos(orbit.ph);
+camera.position.z=t.z+orbit.rad*Math.sin(orbit.ph)*Math.cos(orbit.th);
+camera.lookAt(t);
+}
+
+function mkEntityMesh(e){
+var g=new THREE.Group();g.userData.entityId=e.id;
+var col=CL[e.type]||0x666666;
+if(e.type==='stage'){
+var b=new THREE.Mesh(new THREE.BoxGeometry(14,2.5,10),new THREE.MeshStandardMaterial({color:col,roughness:0.4,metalness:0.1}));
+b.position.y=1.25;b.castShadow=true;b.receiveShadow=true;g.add(b);
+var tp=new THREE.Mesh(new THREE.BoxGeometry(14.2,0.1,10.2),new THREE.MeshStandardMaterial({color:0xc4b5fd,roughness:0.3}));
+tp.position.y=2.55;tp.receiveShadow=true;g.add(tp);
+var sc=new THREE.Mesh(new THREE.PlaneGeometry(11,5),new THREE.MeshStandardMaterial({color:0x1e1b4b,roughness:0.2,metalness:0.5,emissive:0x1e1b4b,emissiveIntensity:0.3}));
+sc.position.set(0,5.5,-4.9);g.add(sc);
+var l1=new THREE.PointLight(0x8b5cf6,0.5,15);l1.position.set(-5,4,0);g.add(l1);
+var l2=new THREE.PointLight(0x8b5cf6,0.5,15);l2.position.set(5,4,0);g.add(l2);
+}else if(e.type==='band'){
+var d=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,0.3,16),new THREE.MeshStandardMaterial({color:col,roughness:0.3,metalness:0.4}));
+d.position.y=0.15;d.castShadow=true;g.add(d);
+for(var i=0;i<5;i++){var p=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,1.5,8),new THREE.MeshStandardMaterial({color:0x93c5fd,roughness:0.5}));
+var a=(i/5)*Math.PI*2;p.position.set(Math.cos(a)*1.8,0.75,Math.sin(a)*1.8);p.castShadow=true;g.add(p);}
+}else if(e.type==='vehicle'){
+var bd=new THREE.Mesh(new THREE.BoxGeometry(7,3,3.5),new THREE.MeshStandardMaterial({color:col,roughness:0.5,metalness:0.2}));
+bd.position.y=1.8;bd.castShadow=true;g.add(bd);
+var cb=new THREE.Mesh(new THREE.BoxGeometry(2.2,2.2,3.2),new THREE.MeshStandardMaterial({color:0xd97706,roughness:0.5}));
+cb.position.set(-4.5,1.6,0);cb.castShadow=true;g.add(cb);
+for(var w=0;w<4;w++){var wh=new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.6,0.3,12),new THREE.MeshStandardMaterial({color:0x1f2937,roughness:0.8}));
+wh.rotation.z=Math.PI/2;wh.position.set(w<2?-3.8:3,0.6,w%2===0?1.8:-1.8);g.add(wh);}
+}else if(e.type==='volunteer'){
+var ld=new THREE.Mesh(new THREE.ConeGeometry(0.8,1.6,8),new THREE.MeshStandardMaterial({color:col,roughness:0.4,metalness:0.3}));
+ld.position.y=0.8;ld.castShadow=true;g.add(ld);
+for(var vi=0;vi<3;vi++){var v=new THREE.Mesh(new THREE.ConeGeometry(0.5,1.2,8),new THREE.MeshStandardMaterial({color:0x6ee7b7,roughness:0.5}));
+v.position.set((vi-1)*1.3,0.6,1.2);v.castShadow=true;g.add(v);}
+}
+var nc=document.createElement('canvas');var nx=nc.getContext('2d');nc.width=512;nc.height=128;
+nx.fillStyle='rgba(0,0,0,0.65)';nx.fillRect(0,0,512,128);
+nx.fillStyle='#ffffff';nx.font='bold 40px sans-serif';nx.textAlign='center';nx.textBaseline='middle';nx.fillText(e.name,256,64);
+var nt=new THREE.CanvasTexture(nc);nt.minFilter=THREE.LinearFilter;
+var ns=new THREE.Sprite(new THREE.SpriteMaterial({map:nt,transparent:true}));
+ns.position.set(0,e.type==='stage'?8:3.5,0);ns.scale.set(6,1.5,1);g.add(ns);
+g.position.set(e.position.x,0,e.position.z);scene.add(g);eMeshes.set(e.id,g);
+}
+
+function updEntityPos(e){var g=eMeshes.get(e.id);if(g)g.position.set(e.position.x,0,e.position.z);}
+
+function mkRouteLine(r){
+if(r.waypoints.length<2)return;
+if(rLines.has(r.id)){var old=rLines.get(r.id);scene.remove(old.tube);scene.remove(old.markers);rLines.delete(r.id);}
+var pts=r.waypoints.map(function(w){return new THREE.Vector3(w.x,w.y||0.5,w.z);});
+var curve=new THREE.CatmullRomCurve3(pts);
+var hasC=S.conflicts.some(function(c){return c.affectedRoutes.indexOf(r.id)>=0;});
+var cm={entrance:CL.rEntrance,exit:CL.rExit,transport:CL.rTransport,volunteer:CL.rVolunteer};
+var lc=hasC?CL.conflict:(cm[r.routeType]||0x60a5fa);
+var tGeo=new THREE.TubeGeometry(curve,60,0.25,8,false);
+var tMat=new THREE.MeshStandardMaterial({color:lc,roughness:0.3,metalness:0.4,emissive:lc,emissiveIntensity:hasC?0.5:0.15,transparent:true,opacity:hasC?0.95:0.75});
+var tube=new THREE.Mesh(tGeo,tMat);tube.castShadow=true;scene.add(tube);
+var mg=new THREE.Group();
+r.waypoints.forEach(function(w,idx){
+var mc=idx===0?0x10b981:idx===r.waypoints.length-1?0xef4444:lc;
+var m=new THREE.Mesh(new THREE.SphereGeometry(0.5,12,12),new THREE.MeshStandardMaterial({color:mc,emissive:mc,emissiveIntensity:0.3,roughness:0.3,metalness:0.5}));
+m.position.set(w.x,(w.y||0.5)+0.5,w.z);m.userData={routeId:r.id,waypointIndex:idx,isWaypoint:true};mg.add(m);
+var rn=new THREE.Mesh(new THREE.RingGeometry(0.7,0.9,16),new THREE.MeshBasicMaterial({color:mc,transparent:true,opacity:0.4,side:THREE.DoubleSide}));
+rn.position.set(w.x,0.1,w.z);rn.rotation.x=-Math.PI/2;mg.add(rn);
+});
+scene.add(mg);
+rLines.set(r.id,{tube:tube,markers:mg});
+if(hasC)mkConflictZone(r);
+}
+
+function mkConflictZone(r){
+S.conflicts.filter(function(c){return c.affectedRoutes.indexOf(r.id)>=0;}).forEach(function(cf){
+if(cf.position){
+var z1=new THREE.Mesh(new THREE.CylinderGeometry(3.5,3.5,0.15,32),new THREE.MeshStandardMaterial({color:CL.conflict,transparent:true,opacity:0.15,emissive:CL.conflict,emissiveIntensity:0.4}));
+z1.position.set(cf.position.x,0.15,cf.position.z);scene.add(z1);cZones.push(z1);
+var z2=new THREE.Mesh(new THREE.RingGeometry(2.5,4,32),new THREE.MeshBasicMaterial({color:CL.conflict,transparent:true,opacity:0.25,side:THREE.DoubleSide}));
+z2.position.set(cf.position.x,0.2,cf.position.z);z2.rotation.x=-Math.PI/2;scene.add(z2);cZones.push(z2);
+}});
+}
+
+function clearCZ(){cZones.forEach(function(z){scene.remove(z);});cZones=[];}
+
+function redrawRoutes(){
+rLines.forEach(function(v){scene.remove(v.tube);scene.remove(v.markers);});rLines.clear();clearCZ();
+S.routes.forEach(function(r){mkRouteLine(r);});
+}
+
+function setupOrbit(vp){
+vp.addEventListener('mousedown',function(e){
+if(e.button===0&&S.mode==='drag'){var pos=gPos(e);if(pos){var wh=wpHit(pos);if(wh){isDrag=true;dRId=wh.routeId;dWIdx=wh.waypointIndex;return;}}}
+if(e.button===0&&S.mode==='route'){var p2=gPos(e);if(p2){S.drawingWaypoints.push({x:p2.x,y:0.5,z:p2.z});updDrawLine();}return;}
+if(e.button===0&&S.mode==='select'){var eh=eHit(e);if(eh){selEntity(eh);return;}var gp=gPos(e);if(gp){var wh2=wpHit(gp);if(wh2){selRoute(wh2.routeId);return;}}}
+if(e.button===0)orbit.rot=true;else if(e.button===2)orbit.pan=true;
+orbit.lx=e.clientX;orbit.ly=e.clientY;
+});
+vp.addEventListener('mousemove',function(e){
+if(isDrag&&S.mode==='drag'){var pos=gPos(e);if(pos&&dRId!=null){
+var r=S.routes.find(function(r){return r.id===dRId;});
+if(r&&r.waypoints[dWIdx]){r.waypoints[dWIdx].x=pos.x;r.waypoints[dWIdx].z=pos.z;
+mkRouteLine(r);detectConflicts();renderTimeline();renderConflicts();renderRoutes();}}return;}
+if(orbit.rot){orbit.th-=(e.clientX-orbit.lx)*0.005;orbit.ph=Math.max(0.1,Math.min(Math.PI-0.1,orbit.ph-(e.clientY-orbit.ly)*0.005));updCam();}
+else if(orbit.pan){var dx=e.clientX-orbit.lx,dy=e.clientY-orbit.ly;
+var rt=new THREE.Vector3();camera.getWorldDirection(rt);rt.cross(new THREE.Vector3(0,1,0)).normalize();
+orbit.tgt.add(rt.multiplyScalar(-dx*0.15));orbit.tgt.y+=dy*0.15;updCam();}
+orbit.lx=e.clientX;orbit.ly=e.clientY;
+});
+vp.addEventListener('mouseup',function(){if(isDrag){isDrag=false;dRId=null;dWIdx=null;addAudit('route_drag','拖拽路点完成，冲突已重新检测',null);return;}orbit.rot=false;orbit.pan=false;});
+vp.addEventListener('contextmenu',function(e){e.preventDefault();if(S.mode==='route'&&S.drawingWaypoints.length>=2)finDraw();});
+vp.addEventListener('wheel',function(e){e.preventDefault();orbit.rad=Math.max(10,Math.min(180,orbit.rad+e.deltaY*0.06));updCam();});
+}
+
+function setupClicks(vp){vp.addEventListener('dblclick',function(e){var eh=eHit(e);if(eh)showDetail(eh);});}
+
+function gPos(e){var vp=document.getElementById('viewport');var rc=vp.getBoundingClientRect();
+mouse.x=((e.clientX-rc.left)/rc.width)*2-1;mouse.y=-((e.clientY-rc.top)/rc.height)*2+1;
+raycaster.setFromCamera(mouse,camera);var h=raycaster.intersectObject(groundPlane);return h.length>0?h[0].point:null;}
+
+function eHit(e){var vp=document.getElementById('viewport');var rc=vp.getBoundingClientRect();
+mouse.x=((e.clientX-rc.left)/rc.width)*2-1;mouse.y=-((e.clientY-rc.top)/rc.height)*2+1;
+raycaster.setFromCamera(mouse,camera);
+var it=eMeshes.entries();var en=it.next();while(!en.done){var id=en.value[0],grp=en.value[1];var ms=[];
+grp.traverse(function(c){if(c.isMesh)ms.push(c);});var h=raycaster.intersectObjects(ms);if(h.length>0)return id;en=it.next();}return null;}
+
+function wpHit(gp){
+var it=rLines.entries();var en=it.next();while(!en.done){var rid=en.value[0],val=en.value[1];
+var mk=val.markers.children.filter(function(c){return c.userData&&c.userData.isWaypoint;});
+for(var i=0;i<mk.length;i++){var m=mk[i];var dx=m.position.x-gp.x,dz=m.position.z-(gp.z||0);
+if(Math.sqrt(dx*dx+dz*dz)<2.5)return m.userData;}en=it.next();}return null;}
+
+function updDrawLine(){
+if(drawLine)scene.remove(drawLine);
+if(S.drawingWaypoints.length<2)return;
+var pts=S.drawingWaypoints.map(function(w){return new THREE.Vector3(w.x,w.y||0.5,w.z);});
+var geo=new THREE.BufferGeometry().setFromPoints(pts);
+var ln=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x60a5fa,linewidth:2,opacity:0.6,transparent:true}));
+drawLine=new THREE.Group();drawLine.add(ln);
+S.drawingWaypoints.forEach(function(w){var d=new THREE.Mesh(new THREE.SphereGeometry(0.4,8,8),new THREE.MeshBasicMaterial({color:0x60a5fa}));
+d.position.set(w.x,w.y||0.5,w.z);drawLine.add(d);});
+scene.add(drawLine);
+}
+
+function finDraw(){if(S.drawingWaypoints.length<2){S.drawingWaypoints=[];return;}
+S._pendingWp=S.drawingWaypoints.slice();S.drawingWaypoints=[];
+if(drawLine){scene.remove(drawLine);drawLine=null;}showRouteModal();}
+
+function showRouteModal(){var sel=document.getElementById('routeEntity');
+sel.innerHTML='<option value="">-- 选择关联实体 --</option>';
+S.entities.forEach(function(e){sel.innerHTML+='<option value="'+e.id+'">'+e.name+' ('+e.type+')</option>';});
+document.getElementById('routeModal').classList.add('show');}
+
+function closeRouteModal(){document.getElementById('routeModal').classList.remove('show');S._pendingWp=null;}
+
+function confirmRoute(){
+var nm=document.getElementById('routeName').value||('路线-'+(S.routes.length+1));
+var st=parseInt(document.getElementById('routeStart').value)||800;
+var et=parseInt(document.getElementById('routeEnd').value)||900;
+var eid=document.getElementById('routeEntity').value;
+var rt=document.getElementById('routeTypeSel').value;
+if(!S._pendingWp||S._pendingWp.length<2){toast('路线至少需要2个路点');return;}
+var route={id:'route_'+S.nextId++,name:nm,routeType:rt,entityId:eid||null,waypoints:S._pendingWp,
+startTime:st,endTime:et,source:'手动绘制',version:1,createdAt:new Date().toISOString(),
+updatedAt:new Date().toISOString(),status:'ok',_cr:[]};
+S.routes.push(route);mkRouteLine(route);detectConflicts();renderAll();
+addAudit('route_create','创建路线: '+nm+' ('+rt+')',route);
+closeRouteModal();document.getElementById('routeName').value='';toast('路线 "'+nm+'" 创建完成');
+}
+
+function setMode(m){S.mode=m;
+document.querySelectorAll('.hud-btn[data-mode]').forEach(function(b){b.classList.toggle('active',b.dataset.mode===m);});
+var h=document.getElementById('dragHint'),info=document.getElementById('viewportInfo');
+if(m==='route'){h.classList.add('show');h.textContent='点击3D场景放置路线节点，右键完成绘制';info.textContent='左键放置路点 | 右键完成路线';}
+else if(m==='drag'){h.classList.add('show');h.textContent='拖拽路线上的球形路点调整路线，冲突自动重检';info.textContent='拖拽路点 | 冲突自动更新';}
+else{h.classList.remove('show');info.textContent='左键旋转 | 右键平移 | 滚轮缩放 | 点击选择 | 双击详情';}
+if(m!=='route'&&S.drawingWaypoints.length>0){S.drawingWaypoints=[];if(drawLine){scene.remove(drawLine);drawLine=null;}}}
+
+function resetCamera(){orbit.th=0.6;orbit.ph=0.8;orbit.rad=80;orbit.tgt.set(0,0,0);updCam();}
+
+function selEntity(id){S.selectedEntity=id;S.selectedRoute=null;
+document.querySelectorAll('.entity-item').forEach(function(el){el.classList.toggle('selected',el.dataset.id===id);});
+document.querySelectorAll('.route-item').forEach(function(el){el.classList.remove('selected');});
+hlEntity(id);}
+
+function selRoute(id){S.selectedRoute=id;S.selectedEntity=null;
+document.querySelectorAll('.route-item').forEach(function(el){el.classList.toggle('selected',el.dataset.id===id);});
+document.querySelectorAll('.entity-item').forEach(function(el){el.classList.remove('selected');});
+hlRoute(id);}
+
+function hlEntity(id){eMeshes.forEach(function(g,iid){g.traverse(function(c){if(c.isMesh&&c.material&&c.material.emissive)c.material.emissiveIntensity=iid===id?0.5:0;});});}
+
+function hlRoute(id){rLines.forEach(function(v,iid){v.tube.material.opacity=iid===id?1:0.3;v.markers.visible=iid===id;});}
+
+function showDetail(id){var e=S.entities.find(function(e){return e.id===id;});if(!e)return;
+var vs=S.versions.get(id)||[];
+alert('名称: '+e.name+'\n类型: '+e.type+'\n来源: '+e.source+'\n版本: v'+e.version+'\n到达: '+ft(e.arrivalTime)+'\n离开: '+ft(e.departureTime)+'\n更新: '+new Date(e.updatedAt).toLocaleString('zh-CN')+'\n历史: '+vs.length+'个版本');}
+
+function detectConflicts(){
+S.conflicts=[];clearCZ();
+S.routes.forEach(function(r){r._cr=[];r.status='ok';});
+
+for(var i=0;i<S.routes.length;i++){for(var j=i+1;j<S.routes.length;j++){
+var r1=S.routes[i],r2=S.routes[j];
+var to=!(r1.endTime<=r2.startTime||r2.endTime<=r1.startTime);
+if(to){var cr=findCross(r1,r2);
+if(cr){S.conflicts.push({id:'cf_'+(S.conflicts.length+1),type:'crossing',affectedRoutes:[r1.id,r2.id],
+position:cr,severity:'high',
+description:'路线"'+r1.name+'"与"'+r2.name+'"在 '+ft(Math.max(r1.startTime,r2.startTime))+' 存在空间交叉',
+impact:'影响路线: '+r1.name+', '+r2.name+'。'+eName(r1.entityId)+' 和 '+eName(r2.entityId)+' 可能碰撞，必须调整时间或修改路线走向。',
+affectedEntities:[r1.entityId,r2.entityId].filter(Boolean)});
+r1.status='error';r2.status='error';r1._cr.push('与"'+r2.name+'"交叉');r2._cr.push('与"'+r1.name+'"交叉');}}}}
+
+S.routes.forEach(function(route){
+var ent=S.entities.find(function(e){return e.id===route.entityId;});
+if(ent&&ent.arrivalTime>route.startTime){
+S.conflicts.push({id:'cf_'+(S.conflicts.length+1),type:'late',affectedRoutes:[route.id],
+position:route.waypoints[0]?{x:route.waypoints[0].x,z:route.waypoints[0].z}:null,severity:'medium',
+description:ent.name+'预计'+ft(ent.arrivalTime)+'到达，但路线"'+route.name+'"从'+ft(route.startTime)+'就开始',
+impact:'器材/人员晚到，路线"'+route.name+'"无法按时执行。需推迟至'+ft(ent.arrivalTime)+'之后或加急。影响: '+route.name+' 全程推迟。',
+affectedEntities:[ent.id]});
+route.status='warn';route._cr.push(ent.name+'晚到');}});
+
+var se={};
+S.routes.forEach(function(route){route.waypoints.forEach(function(w){
+var k=Math.round(w.x/4)*4+','+Math.round(w.z/4)*4;if(!se[k])se[k]=[];se[k].push(route);});});
+
+Object.keys(se).forEach(function(k){var rts=se[k];if(rts.length>2){
+var ol=[];for(var i=0;i<rts.length;i++){for(var j=i+1;j<rts.length;j++){
+if(!(rts[i].endTime<=rts[j].startTime||rts[j].endTime<=rts[i].startTime)){
+if(ol.indexOf(rts[i])<0)ol.push(rts[i]);if(ol.indexOf(rts[j])<0)ol.push(rts[j]);}}}
+if(ol.length>2){var ps=k.split(',');
+S.conflicts.push({id:'cf_'+(S.conflicts.length+1),type:'congestion',affectedRoutes:ol.map(function(r){return r.id;}),
+position:{x:parseFloat(ps[0]),z:parseFloat(ps[1])},severity:'medium',
+description:'区域('+ps[0]+','+ps[1]+')有'+ol.length+'条路线交汇，存在拥堵风险',
+impact:'拥堵区域影响路线: '+ol.map(function(r){return r.name;}).join(', ')+'。建议错峰或开辟替代通道，避免人员器材混杂。',
+affectedEntities:ol.map(function(r){return r.entityId;}).filter(Boolean)});
+ol.forEach(function(r){if(r.status==='ok')r.status='warn';r._cr.push('区域拥堵');});}}});
+
+redrawRoutes();}
+
+function findCross(r1,r2){
+for(var i=0;i<r1.waypoints.length-1;i++){for(var j=0;j<r2.waypoints.length-1;j++){
+var a1=r1.waypoints[i],a2=r1.waypoints[i+1],b1=r2.waypoints[j],b2=r2.waypoints[j+1];
+var c=segX(a1.x,a1.z,a2.x,a2.z,b1.x,b1.z,b2.x,b2.z);if(c)return{x:c.x,z:c.y};}}return null;}
+
+function segX(x1,y1,x2,y2,x3,y3,x4,y4){
+var d=(x1-x2)*(y3-y4)-(y1-y2)*(x3-x4);if(Math.abs(d)<0.001)return null;
+var t=((x1-x3)*(y3-y4)-(y1-y3)*(x3-x4))/d;var u=-((x1-x2)*(y1-y3)-(y1-y2)*(x1-x3))/d;
+if(t>=0&&t<=1&&u>=0&&u<=1)return{x:x1+t*(x2-x1),y:y1+t*(y2-y1)};return null;}
+
+function eName(eid){var e=S.entities.find(function(e){return e.id===eid;});return e?e.name:'未指定';}
+function ft(t){var h=Math.floor(t/100),m=t%100;return(h<10?'0':'')+h+':'+(m<10?'0':'')+m;}
+
+function addAudit(act,desc,data){
+S.auditLog.unshift({id:'a_'+(S.auditLog.length+1),ts:new Date().toISOString(),action:act,desc:desc,
+data:data?JSON.parse(JSON.stringify(data)):null,ctx:{mode:S.mode,ents:S.entities.length,rts:S.routes.length,cfs:S.conflicts.length}});
+renderAudit();}
+
+function computeHash(o){var s=JSON.stringify(o);var h=0;for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return h.toString(36);}
+
+function importEnt(data,src){
+var ex=S.entities.find(function(e){return e.name===data.name&&e.type===data.type;});
+if(ex){
+var oh=computeHash({n:ex.name,t:ex.type,p:ex.position,a:ex.arrivalTime,d:ex.departureTime});
+var nh=computeHash({n:data.name,t:data.type,p:data.position,a:data.arrivalTime,d:data.departureTime});
+if(oh===nh){ex._us='duplicate';addAudit('import_dup',data.name+' 重复提交，无变化',data);return ex;}
+var ch=[];
+if(ex.arrivalTime!==data.arrivalTime)ch.push('到达: '+ft(ex.arrivalTime)+'→'+ft(data.arrivalTime));
+if(ex.departureTime!==data.departureTime)ch.push('离开: '+ft(ex.departureTime)+'→'+ft(data.departureTime));
+if(data.position&&(ex.position.x!==data.position.x||ex.position.z!==data.position.z))ch.push('位置变更');
+var hist=S.versions.get(ex.id)||[];hist.push({v:ex.version,data:JSON.parse(JSON.stringify(ex)),ts:ex.updatedAt});S.versions.set(ex.id,hist);
+ex.version++;if(data.arrivalTime!=null)ex.arrivalTime=data.arrivalTime;
+if(data.departureTime!=null)ex.departureTime=data.departureTime;
+if(data.position){ex.position=data.position;updEntityPos(ex);}
+ex.source=src||ex.source;ex.updatedAt=new Date().toISOString();ex._us='updated';ex._ch=ch;
+addAudit('import_upd',data.name+' 更新 (v'+ex.version+'): '+ch.join(', '),{changes:ch});return ex;}
+
+var ent={id:'e_'+S.nextId++,name:data.name,type:data.type,position:data.position||{x:0,z:0},
+arrivalTime:data.arrivalTime||800,departureTime:data.departureTime||2200,
+source:src||'导入',version:1,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),_us:'new',_ch:[]};
+S.entities.push(ent);mkEntityMesh(ent);
+addAudit('import_new','新增: '+ent.name+' ('+ent.type+')',ent);return ent;}
+
+function showImportModal(){document.getElementById('importModal').classList.add('show');}
+function closeImportModal(){document.getElementById('importModal').classList.remove('show');}
+
+function handleImport(){
+var js=document.getElementById('importJson').value.trim();
+var src=document.getElementById('importSource').value||'手动导入';
+if(js){try{var items=JSON.parse(js);var arr=Array.isArray(items)?items:[items];
+arr.forEach(function(it){importEnt({name:it.name,type:it.type,position:it.position,arrivalTime:it.arrivalTime,departureTime:it.departureTime},src);});
+}catch(e){toast('JSON格式错误: '+e.message);return;}
+}else{var tp=document.getElementById('importType').value;var nm=document.getElementById('importName').value;
+if(!nm){toast('请输入名称');return;}
+var cnt=S.entities.filter(function(e){return e.type===tp;}).length;
+var pm={stage:{x:(cnt-0.5)*22-20,z:-15},band:{x:(cnt-0.5)*12-25,z:-35},vehicle:{x:(cnt-0.5)*16-25,z:25},volunteer:{x:(cnt-0.5)*10+25,z:15}};
+importEnt({name:nm,type:tp,position:pm[tp]||{x:0,z:0},arrivalTime:parseInt(document.getElementById('importArrival').value)||800,
+departureTime:parseInt(document.getElementById('importDeparture').value)||2200},src);}
+detectConflicts();renderAll();closeImportModal();
+document.getElementById('importName').value='';document.getElementById('importJson').value='';toast('数据导入完成');}
+
+function renderAll(){renderEntities();renderRoutes();renderConflicts();renderTimeline();renderVersions();renderAudit();}
+
+function renderEntities(){
+var list=document.getElementById('entityList');list.innerHTML='';
+document.getElementById('entityCount').textContent=S.entities.length;
+var im={stage:'🎭',band:'🎸',vehicle:'🚛',volunteer:'🙋'};
+S.entities.forEach(function(e){
+var bg=e._us==='new'?'<span class="update-badge new">新增</span>':e._us==='updated'?'<span class="update-badge updated">更新</span>':e._us==='duplicate'?'<span class="update-badge duplicate">重复</span>':'';
+var d=document.createElement('div');d.className='entity-item'+(S.selectedEntity===e.id?' selected':'');d.dataset.id=e.id;
+d.innerHTML='<div class="entity-icon '+e.type+'">'+(im[e.type]||'?')+'</div><div class="entity-info"><div class="entity-name">'+e.name+bg+'</div><div class="entity-meta">'+ft(e.arrivalTime)+'-'+ft(e.departureTime)+' | '+e.source+'</div></div><span class="entity-ver">v'+e.version+'</span>';
+d.onclick=function(){selEntity(e.id);};list.appendChild(d);});
+setTimeout(function(){S.entities.forEach(function(e){e._us=null;e._ch=[];});},3000);}
+
+function renderRoutes(){
+var list=document.getElementById('routeList');list.innerHTML='';
+var cm={entrance:'#60a5fa',exit:'#f87171',transport:'#fbbf24',volunteer:'#34d399'};
+var sm={ok:'正常',warn:'注意',error:'冲突'};
+S.routes.forEach(function(r){var hc=S.conflicts.some(function(c){return c.affectedRoutes.indexOf(r.id)>=0;});
+var d=document.createElement('div');d.className='route-item'+(S.selectedRoute===r.id?' selected':'')+(hc?' has-conflict':'');d.dataset.id=r.id;
+d.innerHTML='<div class="route-head"><span class="route-name">'+r.name+'</span><div class="route-color" style="background:'+(cm[r.routeType]||'#60a5fa')+'"></div></div>'+
+'<div class="route-time">'+ft(r.startTime)+' → '+ft(r.endTime)+' | '+eName(r.entityId)+'</div>'+
+'<div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span class="route-status '+r.status+'">'+(sm[r.status]||'正常')+'</span>'+
+(r._cr&&r._cr.length?'<span style="font-size:10px;color:var(--danger)">'+r._cr.length+'个问题: '+r._cr.join(', ')+'</span>':'')+'</div>';
+d.onclick=function(){selRoute(r.id);};list.appendChild(d);});}
+
+function renderConflicts(){
+var list=document.getElementById('conflictList');list.innerHTML='';
+if(S.conflicts.length===0){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--success);font-size:12px">✅ 暂无冲突，所有路线安排合理</div>';return;}
+var tm={crossing:'🔀 路线交叉',late:'⏰ 器材晚到',congestion:'🚧 区域拥堵'};
+S.conflicts.forEach(function(cf){var d=document.createElement('div');d.className='conflict-item';
+d.innerHTML='<span class="conflict-type '+cf.type+'">'+(tm[cf.type]||cf.type)+'</span><div class="conflict-desc">'+cf.description+'</div><div class="conflict-impact"><strong>影响分析:</strong> '+cf.impact+'</div>';
+d.onclick=function(){cf.affectedRoutes.forEach(function(rid){hlRoute(rid);});
+if(cf.position){orbit.tgt.set(cf.position.x,0,cf.position.z);orbit.rad=30;orbit.ph=0.8;updCam();}};
+list.appendChild(d);});}
+
+function renderTimeline(){
+var grid=document.getElementById('timelineGrid');grid.innerHTML='';
+var ts=S.timeOffset,tr=S.timeRange,sc=S.timelineScale;
+var hr=document.createElement('div');hr.className='timeline-row';
+hr.innerHTML='<div class="timeline-label" style="font-weight:600">时间</div>';
+var ht=document.createElement('div');ht.className='timeline-track';ht.style.background='none';
+for(var t=ts;t<=ts+tr;t+=100){var tk=document.createElement('div');
+tk.style.cssText='position:absolute;left:'+(((t-ts)/tr)*100*sc)+'%;font-size:10px;color:var(--muted);transform:translateX(-50%)';
+tk.textContent=ft(t);ht.appendChild(tk);}
+hr.appendChild(ht);grid.appendChild(hr);
+var cm={entrance:'#3b82f6',exit:'#ef4444',transport:'#f59e0b',volunteer:'#10b981'};
+S.routes.forEach(function(route){
+var hc=S.conflicts.some(function(c){return c.affectedRoutes.indexOf(route.id)>=0;});
+var row=document.createElement('div');row.className='timeline-row';
+var lb=document.createElement('div');lb.className='timeline-label';lb.textContent=route.name;lb.title=route.name;row.appendChild(lb);
+var tk=document.createElement('div');tk.className='timeline-track';
+var bk=document.createElement('div');bk.className='timeline-block'+(hc?' conflict':'');
+var lp=Math.max(0,((route.startTime-ts)/tr)*100*sc);var wp=Math.max(1,((route.endTime-route.startTime)/tr)*100*sc);
+bk.style.left=lp+'%';bk.style.width=wp+'%';
+bk.style.background=hc?'linear-gradient(90deg,#ef4444,#dc2626)':(cm[route.routeType]||'#3b82f6');
+bk.textContent=route.name;bk.title=route.name+'\n'+ft(route.startTime)+' - '+ft(route.endTime)+'\n'+(hc?'⚠ 冲突':'✅ 正常');
+bk.onclick=(function(rid){return function(){selRoute(rid);};})(route.id);
+tk.appendChild(bk);row.appendChild(tk);grid.appendChild(row);
+});
+
+S.conflicts.forEach(function(cf){if(cf.type==='late'&&cf.affectedEntities[0]){
+var ent=S.entities.find(function(e){return e.id===cf.affectedEntities[0];});
+if(ent){var mk=document.createElement('div');mk.style.cssText='position:absolute;left:'+(((ent.arrivalTime-ts)/tr)*100*sc)+'%;top:0;bottom:0;width:2px;background:var(--warn);opacity:0.6;z-index:5;pointer-events:none';
+grid.appendChild(mk);}}});
+}
+
+function renderVersions(){
+var list=document.getElementById('versionList');list.innerHTML='';
+if(S.entities.length===0){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">暂无版本记录</div>';return;}
+S.entities.forEach(function(e){var vs=S.versions.get(e.id)||[];
+var d=document.createElement('div');d.style.cssText='padding:10px;background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:6px';
+var h='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:500">'+e.name+'</span><span style="font-size:10px;color:var(--muted)">v'+e.version+'</span></div>';
+h+='<div style="font-size:10px;color:var(--muted)">来源: '+e.source+' | 更新: '+new Date(e.updatedAt).toLocaleString('zh-CN')+'</div>';
+if(vs.length>0){h+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">';
+vs.forEach(function(v){h+='<div class="ver-item">v'+v.v+' | '+new Date(v.ts).toLocaleString('zh-CN')+' | 到达:'+ft(v.data.arrivalTime)+' 离开:'+ft(v.data.departureTime)+'</div>';});
+h+='</div>';}
+d.innerHTML=h;list.appendChild(d);});}
+
+function renderAudit(){
+var list=document.getElementById('auditList');list.innerHTML='';
+if(S.auditLog.length===0){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">暂无审计记录</div>';return;}
+S.auditLog.slice(0,50).forEach(function(a){
+var d=document.createElement('div');d.className='audit-entry';
+d.innerHTML='<div class="audit-time">'+new Date(a.ts).toLocaleString('zh-CN')+'</div><div><span class="audit-action">'+a.action+'</span> '+a.desc+'</div>'+
+'<div class="audit-detail">实体:'+a.ctx.ents+' 路线:'+a.ctx.rts+' 冲突:'+a.ctx.cfs+'</div>';
+list.appendChild(d);});}
+
+function switchTab(btn,name){
+document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
+btn.classList.add('active');document.getElementById('tab-'+name).classList.add('active');}
+
+function zoomTimeline(dir){S.timelineScale=Math.max(0.5,Math.min(3,S.timelineScale+dir*0.25));renderTimeline();}
+
+function toast(msg){var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);
+setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(function(){document.body.removeChild(t);},300);},2500);}
+
+function loadDemo(){
+importEnt({name:'主舞台',type:'stage',position:{x:0,z:-15},arrivalTime:700,departureTime:2300},'导演组');
+importEnt({name:'副舞台',type:'stage',position:{x:25,z:-10},arrivalTime:700,departureTime:2200},'导演组');
+importEnt({name:'星光乐队',type:'band',position:{x:-20,z:-35},arrivalTime:800,departureTime:1100},'艺人组');
+importEnt({name:'浪潮乐队',type:'band',position:{x:5,z:-35},arrivalTime:1000,departureTime:1300},'艺人组');
+importEnt({name:'器材车A',type:'vehicle',position:{x:-30,z:25},arrivalTime:750,departureTime:1000},'后勤组');
+importEnt({name:'器材车B',type:'vehicle',position:{x:10,z:25},arrivalTime:900,departureTime:1200},'后勤组');
+importEnt({name:'引导志愿者',type:'volunteer',position:{x:30,z:15},arrivalTime:700,departureTime:2200},'志愿者组');
+
+var r1={id:'route_'+S.nextId++,name:'星光乐队上台',routeType:'entrance',entityId:'e_3',
+waypoints:[{x:-20,y:0.5,z:-35},{x:-15,y:0.5,z:-25},{x:-8,y:0.5,z:-18},{x:0,y:0.5,z:-15}],
+startTime:830,endTime:900,source:'导演组',version:1,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:'ok',_cr:[]};
+var r2={id:'route_'+S.nextId++,name:'器材车A运抵主舞台',routeType:'transport',entityId:'e_5',
+waypoints:[{x:-30,y:0.5,z:25},{x:-20,y:0.5,z:10},{x:-10,y:0.5,z:-5},{x:-5,y:0.5,z:-15}],
+startTime:800,endTime:850,source:'后勤组',version:1,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:'ok',_cr:[]};
+var r3={id:'route_'+S.nextId++,name:'浪潮乐队上台',routeType:'entrance',entityId:'e_4',
+waypoints:[{x:5,y:0.5,z:-35},{x:0,y:0.5,z:-25},{x:-3,y:0.5,z:-18},{x:0,y:0.5,z:-15}],
+startTime:1000,endTime:1050,source:'导演组',version:1,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:'ok',_cr:[]};
+var r4={id:'route_'+S.nextId++,name:'星光乐队下台',routeType:'exit',entityId:'e_3',
+waypoints:[{x:0,y:0.5,z:-15},{x:10,y:0.5,z:-18},{x:15,y:0.5,z:-28},{x:-10,y:0.5,z:-35}],
+startTime:1050,endTime:1100,source:'导演组',version:1,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:'ok',_cr:[]};
+var r5={id:'route_'+S.nextId++,name:'器材车B运抵副舞台',routeType:'transport',entityId:'e_6',
+waypoints:[{x:10,y:0.5,z:25},{x:15,y:0.5,z:10},{x:20,y:0.5,z:0},{x:25,y:0.5,z:-10}],
+startTime:850,endTime:920,source:'后勤组',version:1,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:'ok',_cr:[]};
+var r6={id:'route_'+S.nextId++,name:'志愿者引导路线',routeType:'volunteer',entityId:'e_7',
+waypoints:[{x:30,y:0.5,z:15},{x:20,y:0.5,z:10},{x:10,y:0.5,z:5},{x:0,y:0.5,z:-5}],
+startTime:800,endTime:2200,source:'志愿者组',version:1,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:'ok',_cr:[]};
+
+S.routes.push(r1,r2,r3,r4,r5,r6);
+S.routes.forEach(function(r){mkRouteLine(r);});
+detectConflicts();
+renderAll();
+addAudit('system','加载演示数据: 7个实体, 6条路线',null);
+}
+
+window.addEventListener('resize',function(){
+var vp=document.getElementById('viewport');
+camera.aspect=vp.clientWidth/vp.clientHeight;camera.updateProjectionMatrix();
+renderer.setSize(vp.clientWidth,vp.clientHeight);
+});
+
+function animLoop(){
+requestAnimationFrame(animLoop);animT+=0.01;
+cZones.forEach(function(z,i){if(z.material&&z.material.opacity!==undefined){
+z.material.opacity=0.15+0.08*Math.sin(animT*3+i);}});
+renderer.render(scene,camera);
+}
+
+init3D();
+</script>
+</body>
+</html>
