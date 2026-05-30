@@ -1,0 +1,236 @@
+{
+  "snapshot_name": "test_snapshot",
+  "created_at": "2026-05-31T07:35:33.473211",
+  "records": [
+    {
+      "margin_id": "3f129f00-7a12-459f-be06-35808fa6f36f",
+      "counterparty": "华泰证券股份有限公司",
+      "calculation_date": "2026-05-31",
+      "required_margin": 4500000.0,
+      "actual_margin": 2000000.0,
+      "margin_shortfall": 2500000.0,
+      "margin_excess": 0,
+      "review_status": "CONFIRMED",
+      "review_status_name": "已确认",
+      "source_references": [
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "9ce4c4f6-eb27-4e86-856c-1f84dab66490",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "432b8f1f-7b05-4c53-9b86-6f77e7cacfa9",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "36a8a3c5-8c64-4172-a473-6ab14476f490",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "CREDIT_LEDGER",
+          "source_type_name": "授信台账",
+          "source_id": "7857c61e-9424-4c3f-acc4-e2be886bb5ab",
+          "source_field": "credit_limit"
+        }
+      ],
+      "manual_override": false,
+      "override_reason": null,
+      "override_source": null,
+      "next_follow_up": null,
+      "calculated_by": "system",
+      "calculated_at": "2026-05-31T07:35:33.372523",
+      "reviewed_by": "风控经理A",
+      "reviewed_at": "2026-05-31T07:35:33.372616",
+      "remarks": null
+    },
+    {
+      "margin_id": "3be3425c-3e5e-44af-944f-f3a66958463d",
+      "counterparty": "中信证券股份有限公司",
+      "calculation_date": "2026-05-31",
+      "required_margin": 4950000.0,
+      "actual_margin": 2500000.0,
+      "margin_shortfall": 2450000.0,
+      "margin_excess": 0,
+      "review_status": "PENDING",
+      "review_status_name": "待补",
+      "source_references": [
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "b05d6dc7-a202-4fdf-9a86-38e98ac8d740",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "e62fd1a7-1ccb-4f54-9bcc-b9aa93446252",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "2cff29b3-3897-45fa-a154-db5117948c84",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "CREDIT_LEDGER",
+          "source_type_name": "授信台账",
+          "source_id": "b924257b-10df-4c26-87da-a956afdb2953",
+          "source_field": "credit_limit"
+        }
+      ],
+      "manual_override": false,
+      "override_reason": null,
+      "override_source": null,
+      "next_follow_up": "请联系交易台确认交易明细",
+      "calculated_by": "system",
+      "calculated_at": "2026-05-31T07:35:33.372559",
+      "reviewed_by": "风控经理A",
+      "reviewed_at": "2026-05-31T07:35:33.372630",
+      "remarks": "数据待核实"
+    },
+    {
+      "margin_id": "63f78717-7e46-4544-a928-df13283a386e",
+      "counterparty": "国泰君安证券股份有限公司",
+      "calculation_date": "2026-05-31",
+      "required_margin": 5400000.0,
+      "actual_margin": 3500000.0,
+      "margin_shortfall": 1900000.0,
+      "margin_excess": 0,
+      "review_status": "MANUAL",
+      "review_status_name": "人工修改",
+      "source_references": [
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "10084b48-0f93-44a4-9664-6c1b05b8676f",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "e84db56c-8f0a-40ad-8ced-5cdedfccd34b",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "aade1164-ccd4-49ba-aabd-7e1ecfd9104c",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "CREDIT_LEDGER",
+          "source_type_name": "授信台账",
+          "source_id": "24e2f9f7-fae5-4278-98fe-f56d1ef5b43b",
+          "source_field": "credit_limit"
+        }
+      ],
+      "manual_override": true,
+      "override_reason": "补充保证金已到账",
+      "override_source": "MANUAL",
+      "next_follow_up": "联系运营岗确认到账凭证",
+      "calculated_by": "system",
+      "calculated_at": "2026-05-31T07:35:33.372572",
+      "reviewed_by": "风控经理A",
+      "reviewed_at": "2026-05-31T07:35:33.372640",
+      "remarks": "数据来源: 人工备注 - 请联系前手确认备注依据"
+    },
+    {
+      "margin_id": "adea23bb-e164-4a25-8be8-3cc7d3b924e0",
+      "counterparty": "广发证券股份有限公司",
+      "calculation_date": "2026-05-31",
+      "required_margin": 5850000.0,
+      "actual_margin": 3500000.0,
+      "margin_shortfall": 2350000.0,
+      "margin_excess": 0,
+      "review_status": "PENDING",
+      "review_status_name": "待补",
+      "source_references": [
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "a412b5df-fba5-4934-abab-437937d46d4f",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "1d0f0bf5-3853-44ba-970f-c982b40d11b1",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "0d0ce977-441a-45f8-bfbb-0e310bb13a9c",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "CREDIT_LEDGER",
+          "source_type_name": "授信台账",
+          "source_id": "b39baa30-f541-4455-af5a-62258b0e10ce",
+          "source_field": "credit_limit"
+        }
+      ],
+      "manual_override": false,
+      "override_reason": null,
+      "override_source": null,
+      "next_follow_up": null,
+      "calculated_by": "system",
+      "calculated_at": "2026-05-31T07:35:33.372580",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "remarks": null
+    },
+    {
+      "margin_id": "bff03ae3-e71e-451e-abd6-bb8b8a55fce4",
+      "counterparty": "招商证券股份有限公司",
+      "calculation_date": "2026-05-31",
+      "required_margin": 6300000.0,
+      "actual_margin": 4000000.0,
+      "margin_shortfall": 2300000.0,
+      "margin_excess": 0,
+      "review_status": "PENDING",
+      "review_status_name": "待补",
+      "source_references": [
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "19953b29-33af-478c-8c92-aafb3110d74d",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "9d566a76-03fe-4cd2-9d0d-bd43226c26d1",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "TRADE_FLOW",
+          "source_type_name": "交易流水",
+          "source_id": "3b7918cb-e34f-42a5-bb1b-183550c7bd3a",
+          "source_field": "notional_amount"
+        },
+        {
+          "source_type": "CREDIT_LEDGER",
+          "source_type_name": "授信台账",
+          "source_id": "9b722095-d245-4906-b673-8782e53acc5c",
+          "source_field": "credit_limit"
+        }
+      ],
+      "manual_override": false,
+      "override_reason": null,
+      "override_source": null,
+      "next_follow_up": null,
+      "calculated_by": "system",
+      "calculated_at": "2026-05-31T07:35:33.372588",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "remarks": null
+    }
+  ]
+}
