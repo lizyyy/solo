@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@theme {
+  --color-purple-950: #1a0a3e;
+  --color-purple-900: #2d1b69;
+  --color-purple-800: #4a2c8a;
+  --color-purple-700: #6b3fa0;
+  --color-purple-600: #8b5cbf;
+  --color-gold: #d4af37;
+  --color-gold-light: #f0d060;
+  --color-suspect-high: #b33951;
+  --color-suspect-mid: #e07c24;
+  --color-suspect-low: #2e7d32;
+  --color-card-bg: #1e1245;
+  --color-card-border: #3d2880;
+  --color-surface: #150d35;
+  --color-surface-light: #261a54;
+
+  --font-display: "Lora", serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--color-purple-950);
+  color: #e8e0f0;
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-purple-950);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-purple-700);
+  border-radius: 3px;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(179, 57, 81, 0.4); }
+  50% { box-shadow: 0 0 20px rgba(179, 57, 81, 0.8); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+.card-glow-high {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.card-float:hover {
+  animation: float 1.5s ease-in-out infinite;
+}
+
+.flip-card {
+  perspective: 1000px;
+}
+
+.flip-card-inner {
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flip-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+.probability-bar {
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.number-roll {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.timeline-connector {
+  position: relative;
+}
+
+.timeline-connector::before {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--color-purple-700), var(--color-gold));
+}
+
+.noise-bg {
+  position: relative;
+}
+
+.noise-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
