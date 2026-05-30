@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style="margin-bottom: 24px;">报表导出</h1>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+    <div class="card">
+        <h2>📋 租赁记录报表</h2>
+        <p style="color: #7f8c8d; margin-bottom: 16px;">导出所有租赁记录，包含学生、设备、押金、状态等信息</p>
+        <button class="btn btn-primary" onclick="exportReport('rental')">导出 Excel</button>
+    </div>
+    
+    <div class="card">
+        <h2>💰 押金追踪报表</h2>
+        <p style="color: #7f8c8d; margin-bottom: 16px;">押金收取、退还、余额追踪，包含统计汇总</p>
+        <button class="btn btn-primary" onclick="exportReport('deposit')">导出 Excel</button>
+    </div>
+    
+    <div class="card">
+        <h2>⚠️ 异常检测报告</h2>
+        <p style="color: #7f8c8d; margin-bottom: 16px;">所有异常记录、严重程度、处理状态</p>
+        <button class="btn btn-primary" onclick="exportReport('anomaly')">导出 Excel</button>
+    </div>
+    
+    <div class="card">
+        <h2>🔧 损坏记录报表</h2>
+        <p style="color: #7f8c8d; margin-bottom: 16px;">设备损坏记录、维修费用、赔偿费用</p>
+        <button class="btn btn-primary" onclick="exportReport('damage')">导出 Excel</button>
+    </div>
+    
+    <div class="card" style="grid-column: span 2;">
+        <h2>📊 完整导出报告</h2>
+        <p style="color: #7f8c8d; margin-bottom: 16px;">包含租赁概览、学生名单、设备清单等完整数据</p>
+        <button class="btn btn-success" onclick="exportReport('full')">导出完整报告</button>
+    </div>
+</div>
+
+<script>
+function exportReport(type) {
+    window.location.href = '/export/' + type;
+    showAlert('正在生成报表，请稍候...', 'info');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style="margin-bottom: 24px;">仪表盘</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="number">{{ stats.total_rentals }}</div>
+        <div class="label">总租赁单</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ stats.active_rentals }}</div>
+        <div class="label">进行中租赁</div>
+    </div>
+    <div class="stat-card warning">
+        <div class="number">{{ stats.overdue_rentals }}</div>
+        <div class="label">超期未归还</div>
+    </div>
+    <div class="stat-card error">
+        <div class="number">{{ stats.pending_anomalies }}</div>
+        <div class="label">待处理异常</div>
+    </div>
+    <div class="stat-card warning">
+        <div class="number">{{ stats.pending_reminders }}</div>
+        <div class="label">待确认提醒</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ stats.total_equipment }}</div>
+        <div class="label">设备总数</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ stats.total_students }}</div>
+        <div class="label">学生总数</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    <div class="card">
+        <h2>最近租赁记录</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>租赁单号</th>
+                    <th>学生</th>
+                    <th>设备</th>
+                    <th>租赁日期</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rental in recent_rentals %}
+                <tr>
+                    <td>{{ rental.rental_number or 'R%06d' % rental.id }}</td>
+                    <td>{{ rental.student.name if rental.student else '-' }}</td>
+                    <td>{{ rental.equipment.name if rental.equipment else '-' }}</td>
+                    <td>{{ rental.rent_date.strftime('%Y-%m-%d') if rental.rent_date else '-' }}</td>
+                    <td>
+                        {% if rental.status == 'active' %}
+                        <span class="badge badge-active">进行中</span>
+                        {% elif rental.status == 'overdue' %}
+                        <span class="badge badge-overdue">超期</span>
+                        {% else %}
+                        <span class="badge badge-completed">已完成</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="{{ url_for('rental_detail', rental_id=rental.id) }}" class="btn btn-sm btn-primary">查看</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div>
+        <div class="card">
+            <h2>待处理异常</h2>
+            {% if pending_anomalies %}
+                {% for anomaly in pending_anomalies %}
+                <div class="anomaly-item {{ anomaly.severity }}">
+                    <div class="desc"><strong>{{ anomaly.type }}</strong><br>{{ anomaly.description }}</div>
+                    {% if anomaly.suggested_action %}
+                    <div class="action">💡 建议: {{ anomaly.suggested_action }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <a href="{{ url_for('anomalies') }}" class="btn btn-primary" style="margin-top: 12px;">查看全部异常</a>
+            {% else %}
+                <p style="color: #7f8c8d;">暂无待处理异常</p>
+            {% endif %}
+        </div>
+        
+        <div class="card">
+            <h2>最近提醒</h2>
+            {% if pending_reminders %}
+                {% for reminder in pending_reminders[:5] %}
+                <div class="anomaly-item info">
+                    <div class="desc">{{ reminder.message }}</div>
+                    <small style="color: #7f8c8d;">{{ reminder.created_at.strftime('%m-%d %H:%M') }}</small>
+                </div>
+                {% endfor %}
+                <a href="{{ url_for('reminders') }}" class="btn btn-primary" style="margin-top: 12px;">查看全部提醒</a>
+            {% else %}
+                <p style="color: #7f8c8d;">暂无待处理提醒</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1>异常检测中心</h1>
+    <button class="btn btn-primary" onclick="runChecks()">🔍 运行异常检测</button>
+</div>
+
+<div class="card">
+    <h2>待处理异常 ({{ unresolved|length }})</h2>
+    {% if unresolved %}
+        {% for anomaly in unresolved %}
+        <div class="anomaly-item {{ anomaly.severity }}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div class="desc">
+                        <strong style="text-transform: uppercase;">[{{ anomaly.severity }}]</strong> 
+                        <strong>{{ anomaly.type }}</strong><br>
+                        {{ anomaly.description }}
+                    </div>
+                    {% if anomaly.suggested_action %}
+                    <div class="action">💡 建议处理方案: {{ anomaly.suggested_action }}</div>
+                    {% endif %}
+                    <small style="color: #7f8c8d;">检测时间: {{ anomaly.detected_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                </div>
+                <button class="btn btn-sm btn-success" onclick="resolveAnomaly({{ anomaly.id }})">标记解决</button>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #7f8c8d; text-align: center; padding: 40px;">✅ 暂无待处理异常</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>已解决异常 (最近50条)</h2>
+    {% if resolved %}
+        {% for anomaly in resolved %}
+        <div class="anomaly-item" style="opacity: 0.7;">
+            <div class="desc">
+                <strong>{{ anomaly.type }}</strong><br>
+                {{ anomaly.description }}
+            </div>
+            <small style="color: #7f8c8d;">
+                解决人: {{ anomaly.resolved_by or '-' }} | 
+                解决时间: {{ anomaly.resolved_at.strftime('%Y-%m-%d %H:%M') if anomaly.resolved_at else '-' }}
+            </small>
+            {% if anomaly.resolution %}
+            <div class="action" style="margin-top: 8px;">📝 处理说明: {{ anomaly.resolution }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #7f8c8d;">暂无已解决异常记录</p>
+    {% endif %}
+</div>
+
+<script>
+function runChecks() {
+    fetch('{{ url_for("run_anomaly_checks") }}', {method: 'POST'})
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('检测完成，发现 ' + data.count + ' 个新异常', 'info');
+                setTimeout(() => location.reload(), 1000);
+            }
+        });
+}
+
+function resolveAnomaly(id) {
+    const resolution = prompt('请输入处理说明:');
+    if (resolution !== null) {
+        const formData = new FormData();
+        formData.append('resolved_by', '系统管理员');
+        formData.append('resolution', resolution);
+        
+        fetch('/anomaly/' + id + '/resolve', {
+            method: 'POST',
+            body: formData
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                showAlert('异常已标记解决', 'info');
+                setTimeout(() => location.reload(), 1000);
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

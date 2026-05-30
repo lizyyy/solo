@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style="margin-bottom: 24px;">租赁记录</h1>
+
+<div class="card">
+    <div class="filter-bar">
+        <form method="GET" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+            <select name="status" onchange="this.form.submit()">
+                <option value="">全部状态</option>
+                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>进行中</option>
+                <option value="overdue" {% if status_filter == 'overdue' %}selected{% endif %}>超期</option>
+                <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>已完成</option>
+            </select>
+            <input type="text" name="student" placeholder="搜索学生姓名" value="{{ student_filter }}">
+            <button type="submit" class="btn btn-primary">筛选</button>
+            <a href="{{ url_for('rentals') }}" class="btn">重置</a>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>租赁单号</th>
+                <th>学生</th>
+                <th>设备</th>
+                <th>租赁日期</th>
+                <th>应还日期</th>
+                <th>归还日期</th>
+                <th>押金</th>
+                <th>押金余额</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rental in rentals %}
+            <tr>
+                <td>{{ rental.rental_number or 'R%06d' % rental.id }}</td>
+                <td>{{ rental.student.name if rental.student else '-' }}</td>
+                <td>{{ rental.equipment.name if rental.equipment else '-' }}</td>
+                <td>{{ rental.rent_date.strftime('%Y-%m-%d') if rental.rent_date else '-' }}</td>
+                <td>{{ rental.due_date.strftime('%Y-%m-%d') if rental.due_date else '-' }}</td>
+                <td>{{ rental.return_date.strftime('%Y-%m-%d') if rental.return_date else '-' }}</td>
+                <td>¥{{ "%.2f"|format(rental.deposit_paid) }}</td>
+                <td>
+                    <span style="color: {% if rental.deposit_balance > 0 %}#27ae60{% elif rental.deposit_balance < 0 %}#e74c3c{% else %}#333{% endif %}">
+                        ¥{{ "%.2f"|format(rental.deposit_balance) }}
+                    </span>
+                </td>
+                <td>
+                    {% if rental.status == 'active' %}
+                    <span class="badge badge-active">进行中</span>
+                    {% elif rental.status == 'overdue' %}
+                    <span class="badge badge-overdue">超期 {{ rental.overdue_days }}天</span>
+                    {% else %}
+                    <span class="badge badge-completed">已完成</span>
+                    {% endif %}
+                </td>
+                <td><a href="{{ url_for('rental_detail', rental_id=rental.id) }}" class="btn btn-sm btn-primary">详情</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

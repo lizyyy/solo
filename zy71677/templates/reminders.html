@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1>提醒中心</h1>
+    <button class="btn btn-primary" onclick="generateReminders()">🔔 生成提醒</button>
+</div>
+
+<div class="card">
+    <h2>待确认提醒 ({{ reminders|length }})</h2>
+    {% if reminders %}
+        {% for reminder in reminders %}
+        <div class="anomaly-item info">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div class="desc">{{ reminder.message }}</div>
+                    <small style="color: #7f8c8d;">
+                        类型: {{ reminder.type }} | 
+                        生成时间: {{ reminder.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    </small>
+                </div>
+                <button class="btn btn-sm btn-success" onclick="acknowledge({{ reminder.id }})">已确认</button>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="color: #7f8c8d; text-align: center; padding: 40px;">✅ 暂无待确认提醒</p>
+    {% endif %}
+</div>
+
+<script>
+function generateReminders() {
+    fetch('{{ url_for("generate_reminders") }}', {method: 'POST'})
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('生成了 ' + data.count + ' 条新提醒', 'info');
+                setTimeout(() => location.reload(), 1000);
+            }
+        });
+}
+
+function acknowledge(id) {
+    const formData = new FormData();
+    formData.append('acknowledged_by', '系统管理员');
+    
+    fetch('/reminder/' + id + '/acknowledge', {
+        method: 'POST',
+        body: formData
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            showAlert('已确认', 'info');
+            setTimeout(() => location.reload(), 800);
+        }
+    });
+}
+</script>
+{% endblock %}

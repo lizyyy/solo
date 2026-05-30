@@ -1,0 +1,103 @@
+from app import db
+from datetime import datetime
+
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    student_id = db.Column(db.String(50), unique=True, nullable=True)
+    phone = db.Column(db.String(20))
+    email = db.Column(db.String(100))
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    notes = db.Column(db.Text)
+
+    rentals = db.relationship('Rental', backref='student', lazy=True)
+
+class Equipment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    serial_number = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(50))
+    brand = db.Column(db.String(100))
+    model = db.Column(db.String(100))
+    deposit_amount = db.Column(db.Float, default=0)
+    daily_rate = db.Column(db.Float, default=0)
+    status = db.Column(db.String(20), default='available')
+    condition = db.Column(db.String(20), default='good')
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    notes = db.Column(db.Text)
+
+    rentals = db.relationship('Rental', backref='equipment', lazy=True)
+    damage_records = db.relationship('DamageRecord', backref='equipment', lazy=True)
+
+class Rental(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rental_number = db.Column(db.String(50), unique=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    equipment_id = db.Column(db.Integer, db.ForeignKey('equipment.id'), nullable=False)
+    rent_date = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    due_date = db.Column(db.DateTime)
+    return_date = db.Column(db.DateTime)
+    deposit_paid = db.Column(db.Float, default=0)
+    deposit_refunded = db.Column(db.Float, default=0)
+    rental_fee = db.Column(db.Float, default=0)
+    damage_fee = db.Column(db.Float, default=0)
+    status = db.Column(db.String(20), default='active')
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    confirmed_by = db.Column(db.String(100))
+    confirmed_at = db.Column(db.DateTime)
+    notes = db.Column(db.Text)
+
+    damage_records = db.relationship('DamageRecord', backref='rental', lazy=True)
+    reminders = db.relationship('Reminder', backref='rental', lazy=True)
+
+class DamageRecord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rental_id = db.Column(db.Integer, db.ForeignKey('rental.id'), nullable=False)
+    equipment_id = db.Column(db.Integer, db.ForeignKey('equipment.id'), nullable=False)
+    reported_date = db.Column(db.DateTime, default=datetime.now)
+    description = db.Column(db.Text, nullable=False)
+    severity = db.Column(db.String(20))
+    repair_cost = db.Column(db.Float, default=0)
+    fee_charged = db.Column(db.Float, default=0)
+    reported_by = db.Column(db.String(100))
+    resolved = db.Column(db.Boolean, default=False)
+    resolved_date = db.Column(db.DateTime)
+    resolution_notes = db.Column(db.Text)
+    photos = db.Column(db.Text)
+
+class Reminder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rental_id = db.Column(db.Integer, db.ForeignKey('rental.id'), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+    message = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    sent_at = db.Column(db.DateTime)
+    acknowledged = db.Column(db.Boolean, default=False)
+    acknowledged_by = db.Column(db.String(100))
+    acknowledged_at = db.Column(db.DateTime)
+    idempotency_key = db.Column(db.String(100), unique=True)
+
+class Anomaly(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rental_id = db.Column(db.Integer, db.ForeignKey('rental.id'))
+    type = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    severity = db.Column(db.String(20), default='warning')
+    detected_at = db.Column(db.DateTime, default=datetime.now)
+    resolved = db.Column(db.Boolean, default=False)
+    resolved_by = db.Column(db.String(100))
+    resolved_at = db.Column(db.DateTime)
+    resolution = db.Column(db.Text)
+    suggested_action = db.Column(db.Text)
+
+class ImportLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(255))
+    sheet_name = db.Column(db.String(100))
+    imported_at = db.Column(db.DateTime, default=datetime.now)
+    imported_by = db.Column(db.String(100))
+    records_processed = db.Column(db.Integer, default=0)
+    records_created = db.Column(db.Integer, default=0)
+    records_updated = db.Column(db.Integer, default=0)
+    errors = db.Column(db.Text)
+    notes = db.Column(db.Text)

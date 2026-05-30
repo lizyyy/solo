@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style="margin-bottom: 24px;">学生管理</h1>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>姓名</th>
+                <th>学号</th>
+                <th>电话</th>
+                <th>邮箱</th>
+                <th>租赁次数</th>
+                <th>注册时间</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.name }}</td>
+                <td>{{ student.student_id or '-' }}</td>
+                <td>{{ student.phone or '-' }}</td>
+                <td>{{ student.email or '-' }}</td>
+                <td>{{ student.rentals|length }}</td>
+                <td>{{ student.created_at.strftime('%Y-%m-%d') if student.created_at else '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

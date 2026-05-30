@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style="margin-bottom: 24px;">数据导入</h1>
+
+<div class="card">
+    <h2>Excel 导入</h2>
+    <div class="alert alert-info">
+        <strong>支持的格式：</strong>系统会自动识别列名（支持别名、临时列、合并单元格），包括：<br>
+        学生：姓名、学号、电话、邮箱<br>
+        设备：设备编号、设备名称、类型、品牌、押金金额、日租金<br>
+        租赁：租赁单号、租赁日期、应还日期、已交押金、已退押金、状态<br>
+        损坏：损坏描述、损坏程度、维修费用、赔偿费用
+    </div>
+    
+    <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <div style="font-size: 48px; margin-bottom: 16px;">📁</div>
+        <div style="font-size: 18px; margin-bottom: 8px;">点击选择 Excel 文件</div>
+        <div style="color: #7f8c8d; font-size: 14px;">支持 .xlsx, .xls 格式</div>
+    </div>
+    <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" onchange="uploadFile()">
+    
+    <div style="margin-top: 16px;">
+        <input type="text" id="importedBy" placeholder="导入人" value="系统管理员" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+    </div>
+    
+    <div id="uploadResult" style="margin-top: 16px; display: none;"></div>
+</div>
+
+<div class="card">
+    <h2>最近导入记录</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>文件名</th>
+                <th>导入时间</th>
+                <th>导入人</th>
+                <th>处理</th>
+                <th>新增</th>
+                <th>更新</th>
+                <th>状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in import_logs %}
+            <tr>
+                <td>{{ log.filename }}</td>
+                <td>{{ log.imported_at.strftime('%Y-%m-%d %H:%M') if log.imported_at else '-' }}</td>
+                <td>{{ log.imported_by or '-' }}</td>
+                <td>{{ log.records_processed }}</td>
+                <td>{{ log.records_created }}</td>
+                <td>{{ log.records_updated }}</td>
+                <td>
+                    {% if log.errors %}
+                    <span class="badge badge-error">有错误</span>
+                    {% else %}
+                    <span class="badge badge-active">成功</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+function uploadFile() {
+    const fileInput = document.getElementById('fileInput');
+    const file = fileInput.files[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('imported_by', document.getElementById('importedBy').value);
+    
+    const resultDiv = document.getElementById('uploadResult');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div class="alert alert-info">正在导入...</div>';
+    
+    fetch('{{ url_for("upload_excel") }}', {
+        method: 'POST',
+        body: formData
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-info">
+                    导入成功！处理 ${data.records_processed} 条，新增 ${data.records_created} 条，更新 ${data.records_updated} 条
+                    ${data.errors && data.errors.length ? '<br>警告: ' + data.errors.join('; ') : ''}
+                </div>
+            `;
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            resultDiv.innerHTML = `<div class="alert alert-error">导入失败: ${data.errors ? data.errors.join('; ') : '未知错误'}</div>`;
+        }
+    }).catch(e => {
+        resultDiv.innerHTML = `<div class="alert alert-error">导入失败: ${e.message}</div>`;
+    });
+}
+</script>
+{% endblock %}

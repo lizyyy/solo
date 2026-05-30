@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1>租赁详情 - {{ rental.rental_number or 'R%06d' % rental.id }}</h1>
+    <div style="display: flex; gap: 8px;">
+        {% if not rental.confirmed_at %}
+        <button class="btn btn-success" onclick="confirmRental()">确认租赁</button>
+        {% endif %}
+        {% if not rental.return_date %}
+        <button class="btn btn-warning" onclick="showReturnModal()">归还设备</button>
+        {% endif %}
+    </div>
+</div>
+
+{% if rental.status == 'overdue' %}
+<div class="alert alert-error">
+    ⚠️ 此设备已超期 {{ rental.overdue_days }} 天未归还
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>基本信息</h2>
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="label">学生姓名</div>
+            <div class="value">{{ rental.student.name if rental.student else '-' }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">学号</div>
+            <div class="value">{{ rental.student.student_id if rental.student else '-' }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">设备名称</div>
+            <div class="value">{{ rental.equipment.name if rental.equipment else '-' }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">设备编号</div>
+            <div class="value">{{ rental.equipment.serial_number if rental.equipment else '-' }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">租赁日期</div>
+            <div class="value">{{ rental.rent_date.strftime('%Y-%m-%d') if rental.rent_date else '-' }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">应还日期</div>
+            <div class="value">{{ rental.due_date.strftime('%Y-%m-%d') if rental.due_date else '-' }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">归还日期</div>
+            <div class="value">{{ rental.return_date.strftime('%Y-%m-%d') if rental.return_date else '-' }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">状态</div>
+            <div class="value">
+                {% if rental.status == 'active' %}
+                <span class="badge badge-active">进行中</span>
+                {% elif rental.status == 'overdue' %}
+                <span class="badge badge-overdue">超期</span>
+                {% else %}
+                <span class="badge badge-completed">已完成</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>押金核算</h2>
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="label">已交押金</div>
+            <div class="value">¥{{ "%.2f"|format(rental.deposit_paid) }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">租金</div>
+            <div class="value">¥{{ "%.2f"|format(rental.rental_fee) }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">损坏赔偿</div>
+            <div class="value">¥{{ "%.2f"|format(rental.damage_fee) }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">已退押金</div>
+            <div class="value">¥{{ "%.2f"|format(rental.deposit_refunded) }}</div>
+        </div>
+        <div class="detail-item" style="grid-column: span 2; background: {% if deposit_balance > 0 %}#d4edda{% elif deposit_balance < 0 %}#f8d7da{% else %}#f8f9fa{% endif %};">
+            <div class="label">押金余额（应退/应补）</div>
+            <div class="value" style="font-size: 24px;">
+                {% if deposit_balance > 0 %}
+                <span style="color: #155724;">应退 ¥{{ "%.2f"|format(deposit_balance) }}</span>
+                {% elif deposit_balance < 0 %}
+                <span style="color: #721c24;">应补 ¥{{ "%.2f"|format(-deposit_balance) }}</span>
+                {% else %}
+                <span>¥0.00</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if rental.damage_records %}
+<div class="card">
+    <h2>损坏记录</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>报告日期</th>
+                <th>损坏描述</th>
+                <th>严重程度</th>
+                <th>维修费用</th>
+                <th>赔偿费用</th>
+                <th>状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for damage in rental.damage_records %}
+            <tr>
+                <td>{{ damage.reported_date.strftime('%Y-%m-%d') if damage.reported_date else '-' }}</td>
+                <td>{{ damage.description }}</td>
+                <td>{{ damage.severity }}</td>
+                <td>¥{{ "%.2f"|format(damage.repair_cost) }}</td>
+                <td>¥{{ "%.2f"|format(damage.fee_charged) }}</td>
+                <td>
+                    {% if damage.resolved %}
+                    <span class="badge badge-completed">已解决</span>
+                    {% else %}
+                    <span class="badge badge-warning">待处理</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>确认信息</h2>
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="label">确认人</div>
+            <div class="value">{{ rental.confirmed_by or '-' }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">确认时间</div>
+            <div class="value">{{ rental.confirmed_at.strftime('%Y-%m-%d %H:%M') if rental.confirmed_at else '-' }}</div>
+        </div>
+    </div>
+    {% if rental.notes %}
+    <div class="detail-item" style="margin-top: 16px;">
+        <div class="label">备注</div>
+        <div class="value">{{ rental.notes }}</div>
+    </div>
+    {% endif %}
+</div>
+
+<div id="returnModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="card" style="width: 500px; max-width: 90%;">
+        <h2>设备归还</h2>
+        <form id="returnForm">
+            <div class="form-group">
+                <label>损坏情况（如无损坏请留空）</label>
+                <textarea name="damage_notes" rows="3" placeholder="描述设备损坏情况..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>损坏程度</label>
+                    <select name="damage_severity">
+                        <option value="minor">轻微</option>
+                        <option value="moderate">中等</option>
+                        <option value="severe">严重</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>维修/赔偿费用</label>
+                    <input type="number" name="damage_cost" value="0" step="0.01">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" name="operator" value="系统管理员">
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                <button type="button" class="btn" onclick="hideReturnModal()">取消</button>
+                <button type="submit" class="btn btn-warning">确认归还</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function confirmRental() {
+    if (confirmAction('确认此租赁单已审核通过？')) {
+        fetch('{{ url_for("confirm_rental", rental_id=rental.id) }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'confirmed_by=系统管理员'
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                showAlert('租赁单已确认', 'info');
+                setTimeout(() => location.reload(), 1000);
+            }
+        });
+    }
+}
+
+function showReturnModal() {
+    document.getElementById('returnModal').style.display = 'flex';
+}
+
+function hideReturnModal() {
+    document.getElementById('returnModal').style.display = 'none';
+}
+
+document.getElementById('returnForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    fetch('{{ url_for("return_rental", rental_id=rental.id) }}', {
+        method: 'POST',
+        body: formData
+    }).then(r => r.json()).then(data => {
+        if (data.success) {
+            showAlert('设备归还成功！租金: ¥' + data.rental_fee + ', 押金余额: ¥' + data.deposit_balance, 'info');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showAlert(data.error, 'error');
+        }
+    });
+});
+</script>
+{% endblock %}
