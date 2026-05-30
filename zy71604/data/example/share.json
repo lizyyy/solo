@@ -1,0 +1,57 @@
+{
+  "data": [
+    {
+      "id": "c63043ca-d449-4c05-8033-2370838d1760",
+      "accountId": "c988f20e-ce8f-4b64-9d19-1cea0c56b619",
+      "fundId": "6822c691-23a1-4526-9329-22904011610d",
+      "referenceDate": "2026-05-30T08:09:26.797Z",
+      "totalShares": "10000.5",
+      "availableShares": "10000.5",
+      "source": {
+        "sourceType": "share_file",
+        "sourceId": "SHARE-1",
+        "sourceFileName": "登记日份额表.xlsx",
+        "sourceRow": 2
+      },
+      "createdAt": "2026-05-30T08:09:26.798Z",
+      "updatedAt": "2026-05-30T08:09:26.798Z",
+      "version": 1
+    },
+    {
+      "id": "679a0ae0-39ff-4201-b024-b6420ac2e270",
+      "accountId": "b4d8cfbf-848c-44ee-bff1-d6caee357161",
+      "fundId": "6822c691-23a1-4526-9329-22904011610d",
+      "referenceDate": "2026-05-30T08:09:26.797Z",
+      "totalShares": "5000.25",
+      "availableShares": "5000.25",
+      "source": {
+        "sourceType": "share_file",
+        "sourceId": "SHARE-2",
+        "sourceFileName": "登记日份额表.xlsx",
+        "sourceRow": 3
+      },
+      "createdAt": "2026-05-30T08:09:26.798Z",
+      "updatedAt": "2026-05-30T08:09:26.798Z",
+      "version": 1
+    },
+    {
+      "id": "6bdc7001-1fda-40c9-9ef7-ef2d3a4c5c98",
+      "accountId": "a03f7a17-9436-4e49-a7e0-7ef9a2dbc6d4",
+      "fundId": "6822c691-23a1-4526-9329-22904011610d",
+      "referenceDate": "2026-05-30T08:09:26.797Z",
+      "totalShares": "25000.75",
+      "availableShares": "25000.75",
+      "source": {
+        "sourceType": "share_file",
+        "sourceId": "SHARE-3",
+        "sourceFileName": "登记日份额表.xlsx",
+        "sourceRow": 4
+      },
+      "createdAt": "2026-05-30T08:09:26.798Z",
+      "updatedAt": "2026-05-30T08:09:26.798Z",
+      "version": 1
+    }
+  ],
+  "versions": {},
+  "lastModified": "2026-05-30T08:09:26.798Z"
+}

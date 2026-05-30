@@ -1,0 +1,54 @@
+{
+  "data": [
+    {
+      "id": "9e32b795-708c-4d28-a83e-99cc451baa53",
+      "accountId": "c988f20e-ce8f-4b64-9d19-1cea0c56b619",
+      "fundId": "6822c691-23a1-4526-9329-22904011610d",
+      "announcementId": "0f841a80-c048-45ce-8b4c-5cb13ae6b87a",
+      "settlementDate": "2026-05-30T08:09:26.797Z",
+      "reinvestedShares": "20001",
+      "cashDividend": "0",
+      "source": {
+        "sourceType": "settlement_record",
+        "sourceId": "SETTLE-1",
+        "sourceFileName": "到账记录表.xlsx",
+        "sourceRow": 2
+      },
+      "createdAt": "2026-05-30T08:09:26.800Z"
+    },
+    {
+      "id": "7f3ccf84-691f-4a3a-925b-0f4f1b99d795",
+      "accountId": "b4d8cfbf-848c-44ee-bff1-d6caee357161",
+      "fundId": "6822c691-23a1-4526-9329-22904011610d",
+      "announcementId": "0f841a80-c048-45ce-8b4c-5cb13ae6b87a",
+      "settlementDate": "2026-05-30T08:09:26.797Z",
+      "reinvestedShares": "0",
+      "cashDividend": "1250.06",
+      "source": {
+        "sourceType": "settlement_record",
+        "sourceId": "SETTLE-2",
+        "sourceFileName": "到账记录表.xlsx",
+        "sourceRow": 3
+      },
+      "createdAt": "2026-05-30T08:09:26.800Z"
+    },
+    {
+      "id": "e0958c21-e4a4-4615-bfe7-4d44cff066da",
+      "accountId": "a03f7a17-9436-4e49-a7e0-7ef9a2dbc6d4",
+      "fundId": "6822c691-23a1-4526-9329-22904011610d",
+      "announcementId": "0f841a80-c048-45ce-8b4c-5cb13ae6b87a",
+      "settlementDate": "2026-05-30T08:09:26.797Z",
+      "reinvestedShares": "50001.52",
+      "cashDividend": "0",
+      "source": {
+        "sourceType": "settlement_record",
+        "sourceId": "SETTLE-3",
+        "sourceFileName": "到账记录表.xlsx",
+        "sourceRow": 4
+      },
+      "createdAt": "2026-05-30T08:09:26.800Z"
+    }
+  ],
+  "versions": {},
+  "lastModified": "2026-05-30T08:09:26.800Z"
+}

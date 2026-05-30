@@ -1,0 +1,369 @@
+{
+  "taskId": "5abc5947-86f4-4f76-b673-76902e8723a1",
+  "generatedAt": "2026-05-30T08:09:26.895Z",
+  "summary": {
+    "fundName": "示例混合型证券投资基金",
+    "fundCode": "000001",
+    "announcementId": "ANN-2024-001",
+    "registrationDate": "2026-05-30T08:09:26.797Z",
+    "exDividendDate": "2026-05-30T08:09:26.797Z",
+    "paymentDate": "2026-05-30T08:09:26.797Z",
+    "dividendPerUnit": "0.25",
+    "reinvestmentNav": "1.25",
+    "totalAccounts": 3,
+    "processedCount": 1,
+    "confirmedCount": 1,
+    "pendingCount": 0,
+    "rejectedCount": 2,
+    "totalReinvestedShares": "7000.25",
+    "totalDividendAmount": "10000.375"
+  },
+  "processedItems": [
+    {
+      "id": "86e9ad33-2633-4a3b-8f0d-08c6ef0e99e3",
+      "accountId": "b4d8cfbf-848c-44ee-bff1-d6caee357161",
+      "fundId": "6822c691-23a1-4526-9329-22904011610d",
+      "announcementId": "0f841a80-c048-45ce-8b4c-5cb13ae6b87a",
+      "registrationDate": "2026-05-30T08:09:26.797Z",
+      "sharesOnRecordDate": "5000.25",
+      "dividendType": "cash",
+      "dividendPerUnit": "0.25",
+      "totalDividendAmount": "1250.0625",
+      "reinvestmentNav": "1.25",
+      "theoreticalReinvestedShares": "0",
+      "actualReinvestedShares": "0",
+      "roundingDifference": "0",
+      "status": "matched",
+      "issues": [],
+      "sourceReferences": [
+        {
+          "sourceType": "share_file",
+          "sourceId": "SHARE-2",
+          "sourceFileName": "登记日份额表.xlsx",
+          "sourceRow": 3
+        },
+        {
+          "sourceType": "client_choice",
+          "sourceId": "CHOICE-2",
+          "sourceFileName": "客户分红方式表.xlsx",
+          "sourceRow": 3
+        }
+      ],
+      "calculatedAt": "2026-05-30T08:09:26.799Z",
+      "version": 2
+    }
+  ],
+  "pendingItems": [],
+  "rejectedItems": [
+    {
+      "id": "ccb678cc-50fc-4c5a-922f-775c97c4f041",
+      "accountId": "c988f20e-ce8f-4b64-9d19-1cea0c56b619",
+      "fundId": "6822c691-23a1-4526-9329-22904011610d",
+      "announcementId": "0f841a80-c048-45ce-8b4c-5cb13ae6b87a",
+      "registrationDate": "2026-05-30T08:09:26.797Z",
+      "sharesOnRecordDate": "10000.5",
+      "dividendType": "reinvestment",
+      "dividendPerUnit": "0.25",
+      "totalDividendAmount": "2500.125",
+      "reinvestmentNav": "1.25",
+      "theoreticalReinvestedShares": "2000.1",
+      "actualReinvestedShares": "20001",
+      "roundingDifference": "0",
+      "status": "mismatch",
+      "issues": [
+        {
+          "id": "84bf217f-7f80-4444-9869-b1dc82cbeb2e",
+          "type": "share_rounding",
+          "severity": "error",
+          "message": "再投资份额差异: 理论2000.10份, 实际20001.00份, 差额18000.900000份(900.0000%)",
+          "expectedValue": "2000.10",
+          "actualValue": "20001.00",
+          "sourceReferences": [
+            {
+              "sourceType": "settlement_record",
+              "sourceId": "SETTLE-1",
+              "sourceFileName": "到账记录表.xlsx",
+              "sourceRow": 2
+            },
+            {
+              "sourceType": "share_file",
+              "sourceId": "SHARE-1",
+              "sourceFileName": "登记日份额表.xlsx",
+              "sourceRow": 2
+            },
+            {
+              "sourceType": "client_choice",
+              "sourceId": "CHOICE-1",
+              "sourceFileName": "客户分红方式表.xlsx",
+              "sourceRow": 2
+            }
+          ],
+          "resolved": false,
+          "createdAt": "2026-05-30T08:09:26.800Z"
+        },
+        {
+          "id": "5d8d3896-d797-45b1-a99a-aaa650b286a7",
+          "type": "cash_to_reinvest",
+          "severity": "error",
+          "message": "客户选择红利再投资，但实际收到现金分红",
+          "expectedValue": "0",
+          "actualValue": "0",
+          "sourceReferences": [
+            {
+              "sourceType": "settlement_record",
+              "sourceId": "SETTLE-1",
+              "sourceFileName": "到账记录表.xlsx",
+              "sourceRow": 2
+            },
+            {
+              "sourceType": "share_file",
+              "sourceId": "SHARE-1",
+              "sourceFileName": "登记日份额表.xlsx",
+              "sourceRow": 2
+            },
+            {
+              "sourceType": "client_choice",
+              "sourceId": "CHOICE-1",
+              "sourceFileName": "客户分红方式表.xlsx",
+              "sourceRow": 2
+            }
+          ],
+          "resolved": false,
+          "createdAt": "2026-05-30T08:09:26.800Z"
+        }
+      ],
+      "sourceReferences": [
+        {
+          "sourceType": "share_file",
+          "sourceId": "SHARE-1",
+          "sourceFileName": "登记日份额表.xlsx",
+          "sourceRow": 2
+        },
+        {
+          "sourceType": "client_choice",
+          "sourceId": "CHOICE-1",
+          "sourceFileName": "客户分红方式表.xlsx",
+          "sourceRow": 2
+        }
+      ],
+      "calculatedAt": "2026-05-30T08:09:26.799Z",
+      "version": 2
+    },
+    {
+      "id": "9f37f662-b736-454f-9ece-e4ac37c73c7c",
+      "accountId": "a03f7a17-9436-4e49-a7e0-7ef9a2dbc6d4",
+      "fundId": "6822c691-23a1-4526-9329-22904011610d",
+      "announcementId": "0f841a80-c048-45ce-8b4c-5cb13ae6b87a",
+      "registrationDate": "2026-05-30T08:09:26.797Z",
+      "sharesOnRecordDate": "25000.75",
+      "dividendType": "reinvestment",
+      "dividendPerUnit": "0.25",
+      "totalDividendAmount": "6250.1875",
+      "reinvestmentNav": "1.25",
+      "theoreticalReinvestedShares": "5000.15",
+      "actualReinvestedShares": "50001.52",
+      "roundingDifference": "0",
+      "status": "mismatch",
+      "issues": [
+        {
+          "id": "c919211b-cbb8-420b-a954-be798abe20ae",
+          "type": "share_rounding",
+          "severity": "error",
+          "message": "再投资份额差异: 理论5000.15份, 实际50001.52份, 差额45001.370000份(900.0004%)",
+          "expectedValue": "5000.15",
+          "actualValue": "50001.52",
+          "sourceReferences": [
+            {
+              "sourceType": "settlement_record",
+              "sourceId": "SETTLE-3",
+              "sourceFileName": "到账记录表.xlsx",
+              "sourceRow": 4
+            },
+            {
+              "sourceType": "share_file",
+              "sourceId": "SHARE-3",
+              "sourceFileName": "登记日份额表.xlsx",
+              "sourceRow": 4
+            },
+            {
+              "sourceType": "client_choice",
+              "sourceId": "CHOICE-3",
+              "sourceFileName": "客户分红方式表.xlsx",
+              "sourceRow": 4
+            }
+          ],
+          "resolved": false,
+          "createdAt": "2026-05-30T08:09:26.800Z"
+        },
+        {
+          "id": "ec825d24-6e3e-4c05-9786-5cfb9f228d27",
+          "type": "cash_to_reinvest",
+          "severity": "error",
+          "message": "客户选择红利再投资，但实际收到现金分红",
+          "expectedValue": "0",
+          "actualValue": "0",
+          "sourceReferences": [
+            {
+              "sourceType": "settlement_record",
+              "sourceId": "SETTLE-3",
+              "sourceFileName": "到账记录表.xlsx",
+              "sourceRow": 4
+            },
+            {
+              "sourceType": "share_file",
+              "sourceId": "SHARE-3",
+              "sourceFileName": "登记日份额表.xlsx",
+              "sourceRow": 4
+            },
+            {
+              "sourceType": "client_choice",
+              "sourceId": "CHOICE-3",
+              "sourceFileName": "客户分红方式表.xlsx",
+              "sourceRow": 4
+            }
+          ],
+          "resolved": false,
+          "createdAt": "2026-05-30T08:09:26.800Z"
+        }
+      ],
+      "sourceReferences": [
+        {
+          "sourceType": "share_file",
+          "sourceId": "SHARE-3",
+          "sourceFileName": "登记日份额表.xlsx",
+          "sourceRow": 4
+        },
+        {
+          "sourceType": "client_choice",
+          "sourceId": "CHOICE-3",
+          "sourceFileName": "客户分红方式表.xlsx",
+          "sourceRow": 4
+        }
+      ],
+      "calculatedAt": "2026-05-30T08:09:26.799Z",
+      "version": 2
+    }
+  ],
+  "issues": [
+    {
+      "id": "84bf217f-7f80-4444-9869-b1dc82cbeb2e",
+      "type": "share_rounding",
+      "severity": "error",
+      "message": "再投资份额差异: 理论2000.10份, 实际20001.00份, 差额18000.900000份(900.0000%)",
+      "expectedValue": "2000.10",
+      "actualValue": "20001.00",
+      "sourceReferences": [
+        {
+          "sourceType": "settlement_record",
+          "sourceId": "SETTLE-1",
+          "sourceFileName": "到账记录表.xlsx",
+          "sourceRow": 2
+        },
+        {
+          "sourceType": "share_file",
+          "sourceId": "SHARE-1",
+          "sourceFileName": "登记日份额表.xlsx",
+          "sourceRow": 2
+        },
+        {
+          "sourceType": "client_choice",
+          "sourceId": "CHOICE-1",
+          "sourceFileName": "客户分红方式表.xlsx",
+          "sourceRow": 2
+        }
+      ],
+      "resolved": false,
+      "createdAt": "2026-05-30T08:09:26.800Z"
+    },
+    {
+      "id": "5d8d3896-d797-45b1-a99a-aaa650b286a7",
+      "type": "cash_to_reinvest",
+      "severity": "error",
+      "message": "客户选择红利再投资，但实际收到现金分红",
+      "expectedValue": "0",
+      "actualValue": "0",
+      "sourceReferences": [
+        {
+          "sourceType": "settlement_record",
+          "sourceId": "SETTLE-1",
+          "sourceFileName": "到账记录表.xlsx",
+          "sourceRow": 2
+        },
+        {
+          "sourceType": "share_file",
+          "sourceId": "SHARE-1",
+          "sourceFileName": "登记日份额表.xlsx",
+          "sourceRow": 2
+        },
+        {
+          "sourceType": "client_choice",
+          "sourceId": "CHOICE-1",
+          "sourceFileName": "客户分红方式表.xlsx",
+          "sourceRow": 2
+        }
+      ],
+      "resolved": false,
+      "createdAt": "2026-05-30T08:09:26.800Z"
+    },
+    {
+      "id": "c919211b-cbb8-420b-a954-be798abe20ae",
+      "type": "share_rounding",
+      "severity": "error",
+      "message": "再投资份额差异: 理论5000.15份, 实际50001.52份, 差额45001.370000份(900.0004%)",
+      "expectedValue": "5000.15",
+      "actualValue": "50001.52",
+      "sourceReferences": [
+        {
+          "sourceType": "settlement_record",
+          "sourceId": "SETTLE-3",
+          "sourceFileName": "到账记录表.xlsx",
+          "sourceRow": 4
+        },
+        {
+          "sourceType": "share_file",
+          "sourceId": "SHARE-3",
+          "sourceFileName": "登记日份额表.xlsx",
+          "sourceRow": 4
+        },
+        {
+          "sourceType": "client_choice",
+          "sourceId": "CHOICE-3",
+          "sourceFileName": "客户分红方式表.xlsx",
+          "sourceRow": 4
+        }
+      ],
+      "resolved": false,
+      "createdAt": "2026-05-30T08:09:26.800Z"
+    },
+    {
+      "id": "ec825d24-6e3e-4c05-9786-5cfb9f228d27",
+      "type": "cash_to_reinvest",
+      "severity": "error",
+      "message": "客户选择红利再投资，但实际收到现金分红",
+      "expectedValue": "0",
+      "actualValue": "0",
+      "sourceReferences": [
+        {
+          "sourceType": "settlement_record",
+          "sourceId": "SETTLE-3",
+          "sourceFileName": "到账记录表.xlsx",
+          "sourceRow": 4
+        },
+        {
+          "sourceType": "share_file",
+          "sourceId": "SHARE-3",
+          "sourceFileName": "登记日份额表.xlsx",
+          "sourceRow": 4
+        },
+        {
+          "sourceType": "client_choice",
+          "sourceId": "CHOICE-3",
+          "sourceFileName": "客户分红方式表.xlsx",
+          "sourceRow": 4
+        }
+      ],
+      "resolved": false,
+      "createdAt": "2026-05-30T08:09:26.800Z"
+    }
+  ]
+}

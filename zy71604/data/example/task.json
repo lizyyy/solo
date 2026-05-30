@@ -1,0 +1,144 @@
+{
+  "data": [
+    {
+      "id": "5abc5947-86f4-4f76-b673-76902e8723a1",
+      "fundId": "6822c691-23a1-4526-9329-22904011610d",
+      "announcementId": "0f841a80-c048-45ce-8b4c-5cb13ae6b87a",
+      "status": "processed",
+      "totalAccounts": 3,
+      "processedAccounts": 3,
+      "matchedCount": 1,
+      "mismatchCount": 2,
+      "pendingCount": 0,
+      "rejectedCount": 0,
+      "issues": [
+        {
+          "id": "84bf217f-7f80-4444-9869-b1dc82cbeb2e",
+          "type": "share_rounding",
+          "severity": "error",
+          "message": "再投资份额差异: 理论2000.10份, 实际20001.00份, 差额18000.900000份(900.0000%)",
+          "expectedValue": "2000.10",
+          "actualValue": "20001.00",
+          "sourceReferences": [
+            {
+              "sourceType": "settlement_record",
+              "sourceId": "SETTLE-1",
+              "sourceFileName": "到账记录表.xlsx",
+              "sourceRow": 2
+            },
+            {
+              "sourceType": "share_file",
+              "sourceId": "SHARE-1",
+              "sourceFileName": "登记日份额表.xlsx",
+              "sourceRow": 2
+            },
+            {
+              "sourceType": "client_choice",
+              "sourceId": "CHOICE-1",
+              "sourceFileName": "客户分红方式表.xlsx",
+              "sourceRow": 2
+            }
+          ],
+          "resolved": false,
+          "createdAt": "2026-05-30T08:09:26.800Z"
+        },
+        {
+          "id": "5d8d3896-d797-45b1-a99a-aaa650b286a7",
+          "type": "cash_to_reinvest",
+          "severity": "error",
+          "message": "客户选择红利再投资，但实际收到现金分红",
+          "expectedValue": "0",
+          "actualValue": "0",
+          "sourceReferences": [
+            {
+              "sourceType": "settlement_record",
+              "sourceId": "SETTLE-1",
+              "sourceFileName": "到账记录表.xlsx",
+              "sourceRow": 2
+            },
+            {
+              "sourceType": "share_file",
+              "sourceId": "SHARE-1",
+              "sourceFileName": "登记日份额表.xlsx",
+              "sourceRow": 2
+            },
+            {
+              "sourceType": "client_choice",
+              "sourceId": "CHOICE-1",
+              "sourceFileName": "客户分红方式表.xlsx",
+              "sourceRow": 2
+            }
+          ],
+          "resolved": false,
+          "createdAt": "2026-05-30T08:09:26.800Z"
+        },
+        {
+          "id": "c919211b-cbb8-420b-a954-be798abe20ae",
+          "type": "share_rounding",
+          "severity": "error",
+          "message": "再投资份额差异: 理论5000.15份, 实际50001.52份, 差额45001.370000份(900.0004%)",
+          "expectedValue": "5000.15",
+          "actualValue": "50001.52",
+          "sourceReferences": [
+            {
+              "sourceType": "settlement_record",
+              "sourceId": "SETTLE-3",
+              "sourceFileName": "到账记录表.xlsx",
+              "sourceRow": 4
+            },
+            {
+              "sourceType": "share_file",
+              "sourceId": "SHARE-3",
+              "sourceFileName": "登记日份额表.xlsx",
+              "sourceRow": 4
+            },
+            {
+              "sourceType": "client_choice",
+              "sourceId": "CHOICE-3",
+              "sourceFileName": "客户分红方式表.xlsx",
+              "sourceRow": 4
+            }
+          ],
+          "resolved": false,
+          "createdAt": "2026-05-30T08:09:26.800Z"
+        },
+        {
+          "id": "ec825d24-6e3e-4c05-9786-5cfb9f228d27",
+          "type": "cash_to_reinvest",
+          "severity": "error",
+          "message": "客户选择红利再投资，但实际收到现金分红",
+          "expectedValue": "0",
+          "actualValue": "0",
+          "sourceReferences": [
+            {
+              "sourceType": "settlement_record",
+              "sourceId": "SETTLE-3",
+              "sourceFileName": "到账记录表.xlsx",
+              "sourceRow": 4
+            },
+            {
+              "sourceType": "share_file",
+              "sourceId": "SHARE-3",
+              "sourceFileName": "登记日份额表.xlsx",
+              "sourceRow": 4
+            },
+            {
+              "sourceType": "client_choice",
+              "sourceId": "CHOICE-3",
+              "sourceFileName": "客户分红方式表.xlsx",
+              "sourceRow": 4
+            }
+          ],
+          "resolved": false,
+          "createdAt": "2026-05-30T08:09:26.800Z"
+        }
+      ],
+      "createdAt": "2026-05-30T08:09:26.894Z",
+      "startedAt": "2026-05-30T08:04:26.894Z",
+      "completedAt": "2026-05-30T08:09:26.894Z",
+      "operator": "system"
+    }
+  ],
+  "versions": {},
+  "lastModified": "2026-05-30T08:09:26.895Z"
+}
