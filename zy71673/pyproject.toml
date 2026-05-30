@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "festival-settle"
+version = "1.0.0"
+description = "音乐节艺人分账表 — 保底/分成/赞助统一核算"
+requires-python = ">=3.9"
+
+[project.scripts]
+festival-settle = "festival_settle.cli:main"
