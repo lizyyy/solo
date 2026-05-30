@@ -1,0 +1,22 @@
+{
+  "bpm": 120,
+  "time_signature": [4, 4],
+  "beats": [
+    {"time": 0.500, "beat_type": "downbeat", "measure": 1, "beat_in_measure": 1},
+    {"time": 1.000, "beat_type": "weak_beat", "measure": 1, "beat_in_measure": 2},
+    {"time": 1.500, "beat_type": "weak_beat", "measure": 1, "beat_in_measure": 3},
+    {"time": 2.000, "beat_type": "upbeat", "measure": 1, "beat_in_measure": 4},
+    {"time": 2.500, "beat_type": "downbeat", "measure": 2, "beat_in_measure": 1},
+    {"time": 3.000, "beat_type": "weak_beat", "measure": 2, "beat_in_measure": 2},
+    {"time": 3.500, "beat_type": "weak_beat", "measure": 2, "beat_in_measure": 3},
+    {"time": 4.000, "beat_type": "upbeat", "measure": 2, "beat_in_measure": 4},
+    {"time": 4.500, "beat_type": "downbeat", "measure": 3, "beat_in_measure": 1},
+    {"time": 5.000, "beat_type": "weak_beat", "measure": 3, "beat_in_measure": 2},
+    {"time": 5.500, "beat_type": "weak_beat", "measure": 3, "beat_in_measure": 3},
+    {"time": 6.000, "beat_type": "upbeat", "measure": 3, "beat_in_measure": 4},
+    {"time": 6.500, "beat_type": "downbeat", "measure": 4, "beat_in_measure": 1},
+    {"time": 7.000, "beat_type": "weak_beat", "measure": 4, "beat_in_measure": 2},
+    {"time": 7.500, "beat_type": "weak_beat", "measure": 4, "beat_in_measure": 3},
+    {"time": 8.000, "beat_type": "upbeat", "measure": 4, "beat_in_measure": 4}
+  ]
+}
