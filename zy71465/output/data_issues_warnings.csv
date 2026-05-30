@@ -1,0 +1,3 @@
+severity,rule_code,message,source_file,original_row,raw_line,field_name
+warning,CROSS_003,疑似重复活动: ACT003 与 ACT003 的歌曲/类型/时段完全一致,activity_calendar.csv,5,"activity_id=ACT003,song_id=S002,activity_type=live,start_date=2026-02-01,end_date=2026-02-28,exposure_multiplier=3.0",activity_id
+warning,CROSS_004,活动关联的歌曲 S005 在播放历史中无记录,activity_calendar.csv,7,"activity_id=ACT005,song_id=S005,activity_type=festival,start_date=2026-03-01,end_date=2026-03-07,exposure_multiplier=5.0",song_id

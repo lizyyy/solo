@@ -1,0 +1,5 @@
+severity,rule_code,message,source_file,original_row,raw_line,field_name
+error,SH_010,分成比例之和不等于1 (合计=0.9000),platform_sharing.csv,6,"platform=qq,effective_date=2026-04-01,artist_share=0.50,label_share=0.10,platform_share=0.30",total_share
+error,SH_010,分成比例之和不等于1 (合计=0.8000),platform_sharing.csv,7,"platform=kugou,effective_date=2026-01-01,artist_share=0.10,label_share=0.20,platform_share=0.50",total_share
+error,ACT_010,曝光倍数为负: -1.0,activity_calendar.csv,8,"activity_id=ACT006,song_id=S004,activity_type=homepage,start_date=2026-01-01,end_date=2026-01-31,exposure_multiplier=-1.0",exposure_multiplier
+error,CROSS_002,活动ID重复: ACT003 (首见于行 4),activity_calendar.csv,5,"activity_id=ACT003,song_id=S002,activity_type=live,start_date=2026-02-01,end_date=2026-02-28,exposure_multiplier=3.0",activity_id

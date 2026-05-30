@@ -1,0 +1,66 @@
+{
+  "export_time": "2026-05-30",
+  "summary": {
+    "total_issues": 6,
+    "warnings": 2,
+    "errors": 4
+  },
+  "errors": [
+    {
+      "severity": "error",
+      "rule_code": "SH_010",
+      "message": "分成比例之和不等于1 (合计=0.9000)",
+      "source_file": "platform_sharing.csv",
+      "original_row": 6,
+      "raw_line": "platform=qq,effective_date=2026-04-01,artist_share=0.50,label_share=0.10,platform_share=0.30",
+      "field_name": "total_share"
+    },
+    {
+      "severity": "error",
+      "rule_code": "SH_010",
+      "message": "分成比例之和不等于1 (合计=0.8000)",
+      "source_file": "platform_sharing.csv",
+      "original_row": 7,
+      "raw_line": "platform=kugou,effective_date=2026-01-01,artist_share=0.10,label_share=0.20,platform_share=0.50",
+      "field_name": "total_share"
+    },
+    {
+      "severity": "error",
+      "rule_code": "ACT_010",
+      "message": "曝光倍数为负: -1.0",
+      "source_file": "activity_calendar.csv",
+      "original_row": 8,
+      "raw_line": "activity_id=ACT006,song_id=S004,activity_type=homepage,start_date=2026-01-01,end_date=2026-01-31,exposure_multiplier=-1.0",
+      "field_name": "exposure_multiplier"
+    },
+    {
+      "severity": "error",
+      "rule_code": "CROSS_002",
+      "message": "活动ID重复: ACT003 (首见于行 4)",
+      "source_file": "activity_calendar.csv",
+      "original_row": 5,
+      "raw_line": "activity_id=ACT003,song_id=S002,activity_type=live,start_date=2026-02-01,end_date=2026-02-28,exposure_multiplier=3.0",
+      "field_name": "activity_id"
+    }
+  ],
+  "warnings": [
+    {
+      "severity": "warning",
+      "rule_code": "CROSS_003",
+      "message": "疑似重复活动: ACT003 与 ACT003 的歌曲/类型/时段完全一致",
+      "source_file": "activity_calendar.csv",
+      "original_row": 5,
+      "raw_line": "activity_id=ACT003,song_id=S002,activity_type=live,start_date=2026-02-01,end_date=2026-02-28,exposure_multiplier=3.0",
+      "field_name": "activity_id"
+    },
+    {
+      "severity": "warning",
+      "rule_code": "CROSS_004",
+      "message": "活动关联的歌曲 S005 在播放历史中无记录",
+      "source_file": "activity_calendar.csv",
+      "original_row": 7,
+      "raw_line": "activity_id=ACT005,song_id=S005,activity_type=festival,start_date=2026-03-01,end_date=2026-03-07,exposure_multiplier=5.0",
+      "field_name": "song_id"
+    }
+  ]
+}
