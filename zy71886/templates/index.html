@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>热传导曲线 — 实验数据管理</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f7fa;--card:#fff;--border:#e0e4ea;--primary:#2563eb;--primary-light:#dbeafe;--danger:#dc2626;--danger-light:#fef2f2;--warn:#d97706;--warn-light:#fffbeb;--success:#16a34a;--success-light:#f0fdf4;--text:#1e293b;--text2:#64748b;--radius:10px;--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.header{background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.header h1{font-size:20px;font-weight:700;letter-spacing:.5px}
+.header .subtitle{font-size:13px;opacity:.8;margin-top:2px}
+.container{max-width:1360px;margin:0 auto;padding:20px 24px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card-title{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card-title .icon{width:20px;height:20px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+@media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:#1d4ed8}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{background:#15803d}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{background:#b91c1c}
+.btn-sm{padding:5px 12px;font-size:12px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.filter-group{display:flex;align-items:center;gap:6px}
+.filter-group label{font-size:12px;color:var(--text2);white-space:nowrap}
+.filter-group select,.filter-group input{padding:5px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;min-width:120px}
+.chart-wrap{position:relative;height:420px}
+.table-wrap{overflow-x:auto;max-height:360px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#f8fafc;position:sticky;top:0;z-index:1;text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);font-weight:600;white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid #f1f5f9;white-space:nowrap}
+tr:hover td{background:#f8fafc}
+.tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:500}
+.tag-correction{background:#dbeafe;color:#1d4ed8}
+.tag-late{background:#fef3c7;color:#92400e}
+.tag-drift{background:#fecaca;color:#991b1b}
+.tag-normal{background:#e0f2fe;color:#075985}
+.alert{padding:10px 14px;border-radius:6px;font-size:13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px}
+.alert-error{background:var(--danger-light);border:1px solid #fecaca;color:#991b1b}
+.alert-warn{background:var(--warn-light);border:1px solid #fde68a;color:#92400e}
+.alert-success{background:var(--success-light);border:1px solid #bbf7d0;color:#166534}
+.alert-info{background:var(--primary-light);border:1px solid #93c5fd;color:#1e40af}
+.alert-icon{flex-shrink:0;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.alert-error .alert-icon{background:#dc2626}
+.alert-warn .alert-icon{background:#d97706}
+.alert-success .alert-icon{background:#16a34a}
+.alert-info .alert-icon{background:#2563eb}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:32px;text-align:center;cursor:pointer;transition:all .2s}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--primary);background:var(--primary-light)}
+.upload-zone .big-icon{font-size:36px;margin-bottom:8px}
+.upload-zone p{color:var(--text2);font-size:13px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:700px){.stat-grid{grid-template-columns:1fr 1fr}}
+.stat-box{text-align:center;padding:12px;border-radius:8px;background:#f8fafc;border:1px solid var(--border)}
+.stat-box .num{font-size:28px;font-weight:700}
+.stat-box .lbl{font-size:12px;color:var(--text2);margin-top:2px}
+.drift-card{border-left:4px solid var(--warn);padding:12px 16px;background:#fffbeb;border-radius:0 6px 6px 0;margin-bottom:10px}
+.drift-card .source{font-weight:600;font-size:13px}
+.drift-card .msg{font-size:13px;margin-top:4px}
+.drift-card .action{font-size:12px;color:var(--text2);margin-top:4px;font-style:italic}
+.tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)}
+.tab{padding:8px 20px;cursor:pointer;font-size:13px;font-weight:500;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;color:var(--text2)}
+.tab:hover{color:var(--primary)}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.empty-state{text-align:center;padding:48px 20px;color:var(--text2)}
+.empty-state .big{font-size:48px;margin-bottom:12px}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:0 5px;margin-left:4px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>🌡️ 热传导曲线</h1>
+    <div class="subtitle">实验数据管理 — 数据摄入 / 曲线可视化 / 零点漂移检测</div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="loadSample()">加载示例数据包</button>
+    <button class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="resetAll()">重置</button>
+  </div>
+</div>
+
+<div class="container">
+  <div id="uploadSection" class="card">
+    <div class="card-title"><span class="icon" style="background:#2563eb">📦</span> 数据包摄入</div>
+    <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="big-icon">📁</div>
+      <p>拖拽 JSON 数据包到此处，或点击选择文件</p>
+      <p style="font-size:11px;margin-top:4px">支持包含正常记录、晚到附件、重复项和人工更正的数据包</p>
+    </div>
+    <input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFile(this)">
+  </div>
+
+  <div id="mainContent" style="display:none">
+    <div class="card">
+      <div class="stat-grid" id="statGrid"></div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <div class="filter-group">
+          <label>样本</label>
+          <select id="filterSample" onchange="refreshData()"><option value="">全部</option></select>
+        </div>
+        <div class="filter-group">
+          <label>批次</label>
+          <select id="filterBatch" onchange="refreshData()"><option value="">全部</option></select>
+        </div>
+        <div class="filter-group">
+          <label>来源</label>
+          <select id="filterSource" onchange="refreshData()">
+            <option value="">全部</option>
+            <option value="experiment">实验记录</option>
+            <option value="calibration">标定表</option>
+          </select>
+        </div>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer">
+          <input type="checkbox" id="filterExcludeCorr" onchange="refreshData()"> 隐藏人工更正
+        </label>
+        <div style="flex:1"></div>
+        <button class="btn btn-primary btn-sm" onclick="refreshData()">🔄 刷新</button>
+        <button class="btn btn-success btn-sm" onclick="exportCSV()">📥 导出批改表</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="curve" onclick="switchTab('curve')">📊 曲线</div>
+      <div class="tab" data-tab="table" onclick="switchTab('table')">📋 数据表</div>
+      <div class="tab" data-tab="messages" onclick="switchTab('messages')">🔔 消息<span id="msgBadge" class="badge" style="display:none"></span></div>
+      <div class="tab" data-tab="drift" onclick="switchTab('drift')">⚠️ 零点漂移<span id="driftBadge" class="badge" style="display:none"></span></div>
+    </div>
+
+    <div id="tab-curve" class="tab-content active">
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:#2563eb">📈</span> 热传导曲线</div>
+        <div class="chart-wrap"><canvas id="curveChart"></canvas></div>
+        <div id="axisInfo" style="font-size:12px;color:var(--text2);margin-top:8px;text-align:center"></div>
+      </div>
+    </div>
+
+    <div id="tab-table" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:#16a34a">📋</span> 实验数据明细</div>
+        <div class="table-wrap">
+          <table id="dataTable">
+            <thead>
+              <tr><th>序号</th><th>ID</th><th>样本</th><th>时间</th><th>温度(°C)</th><th>热导率(W/(m·K))</th><th>来源</th><th>标记</th><th>操作员</th><th>批次</th><th>备注</th></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-messages" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:#d97706">🔔</span> 错误与警告</div>
+        <div id="messageList"></div>
+      </div>
+    </div>
+
+    <div id="tab-drift" class="tab-content">
+      <div class="card">
+        <div class="card-title"><span class="icon" style="background:#dc2626">⚠️</span> 零点漂移报告</div>
+        <div id="driftList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let chart = null;
+let currentAxisRange = null;
+let currentFilterState = {};
+
+function loadSample() {
+  fetch('/api/load-sample', {method:'POST'})
+    .then(r => r.json())
+    .then(d => { if(d.status==='ok'){showMain(d.summary)} else {alert(d.message||'加载失败')} })
+    .catch(e => alert('请求失败: '+e.message));
+}
+
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      fetch('/api/upload', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)})
+        .then(r => r.json())
+        .then(d => { if(d.status==='ok'){showMain(d.summary)} else {alert(d.message||'导入失败')} })
+        .catch(err => alert('上传失败: '+err.message));
+    } catch(err) { alert('JSON 格式错误: '+err.message); }
+  };
+  reader.readAsText(file);
+}
+
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', e => {e.preventDefault(); dropZone.classList.add('dragover')});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) { const dt = new DataTransfer(); dt.items.add(file); document.getElementById('fileInput').files = dt.files; handleFile(document.getElementById('fileInput')); }
+});
+
+function showMain(summary) {
+  document.getElementById('uploadSection').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+  updateStats(summary);
+  loadFilters();
+  refreshData();
+  loadMessages();
+  loadDrifts();
+}
+
+function updateStats(s) {
+  document.getElementById('statGrid').innerHTML = `
+    <div class="stat-box"><div class="num" style="color:#2563eb">${s.record_count}</div><div class="lbl">有效记录</div></div>
+    <div class="stat-box"><div class="num" style="color:#16a34a">${s.calibration_count}</div><div class="lbl">标定表条目</div></div>
+    <div class="stat-box"><div class="num" style="color:#d97706">${s.warning_count}</div><div class="lbl">警告</div></div>
+    <div class="stat-box"><div class="num" style="color:#dc2626">${s.error_count + s.drift_count}</div><div class="lbl">错误 + 漂移</div></div>
+  `;
+}
+
+function loadFilters() {
+  fetch('/api/samples').then(r=>r.json()).then(d => {
+    if(d.status!=='ok') return;
+    const sSel = document.getElementById('filterSample');
+    sSel.innerHTML = '<option value="">全部样本</option>';
+    d.sample_ids.forEach(id => { const o=document.createElement('option'); o.value=id; o.textContent=id; sSel.appendChild(o); });
+    const bSel = document.getElementById('filterBatch');
+    bSel.innerHTML = '<option value="">全部批次</option>';
+    d.batch_ids.forEach(id => { const o=document.createElement('option'); o.value=id; o.textContent=id; bSel.appendChild(o); });
+  });
+}
+
+function refreshData() {
+  const params = new URLSearchParams({
+    sample_id: document.getElementById('filterSample').value,
+    batch_id: document.getElementById('filterBatch').value,
+    source: document.getElementById('filterSource').value,
+    exclude_corrections: document.getElementById('filterExcludeCorr').checked,
+  });
+  fetch('/api/records?'+params).then(r=>r.json()).then(d => {
+    if(d.status!=='ok'){alert(d.message); return;}
+    currentFilterState = d.filter_state;
+    currentAxisRange = d.axis_range;
+    renderChart(d.records);
+    renderTable(d.records);
+    renderAxisInfo(d.axis_range);
+  });
+}
+
+function renderChart(records) {
+  const ctx = document.getElementById('curveChart').getContext('2d');
+  if (chart) chart.destroy();
+
+  const sampleGroups = {};
+  records.forEach(r => {
+    if (!sampleGroups[r.sample_id]) sampleGroups[r.sample_id] = [];
+    sampleGroups[r.sample_id].push(r);
+  });
+
+  const colors = ['#2563eb','#dc2626','#16a34a','#d97706','#7c3aed','#0891b2'];
+  const datasets = Object.entries(sampleGroups).map(([sid, recs], i) => {
+    const sorted = [...recs].sort((a,b) => a.temperature - b.temperature);
+    const main = {label: sid, data: sorted.map(r=>({x:r.temperature, y:r.thermal_conductivity, rid:r.id, corr:r.is_correction, late:r.is_late_attachment})), borderColor: colors[i%colors.length], backgroundColor: colors[i%colors.length]+'20', pointRadius: 5, pointHoverRadius: 8, tension: 0.3, fill: false};
+    const corrPts = sorted.filter(r=>r.is_correction);
+    const latePts = sorted.filter(r=>r.is_late_attachment);
+    const extras = [];
+    if (corrPts.length) extras.push({label: sid+' (更正)', data: corrPts.map(r=>({x:r.temperature,y:r.thermal_conductivity,rid:r.id,corr:true,late:false})), borderColor: colors[i%colors.length], backgroundColor:'#dbeafe', pointRadius:8, pointStyle:'rectRot', showLine:false});
+    if (latePts.length) extras.push({label: sid+' (晚到)', data: latePts.map(r=>({x:r.temperature,y:r.thermal_conductivity,rid:r.id,corr:false,late:true})), borderColor: colors[i%colors.length], backgroundColor:'#fef3c7', pointRadius:8, pointStyle:'triangle', showLine:false});
+    return [main, ...extras];
+  }).flat();
+
+  chart = new Chart(ctx, {
+    type: 'scatter',
+    data: {datasets},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      scales: {
+        x: {title:{display:true, text:'温度 (°C)'}, min: currentAxisRange?.x_min, max: currentAxisRange?.x_max},
+        y: {title:{display:true, text:'热导率 (W/(m·K))'}, min: currentAxisRange?.y_min, max: currentAxisRange?.y_max},
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const p = ctx.raw;
+              let s = `${p.x.toFixed(1)}°C → ${p.y.toFixed(2)} W/(m·K)`;
+              if (p.corr) s += ' [人工更正]';
+              if (p.late) s += ' [晚到附件]';
+              return s;
+            }
+          }
+        },
+        legend: {position:'top', labels:{usePointStyle:true, font:{size:12}}}
+      }
+    }
+  });
+}
+
+function renderTable(records) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = records.map((r, i) => {
+    const tags = [];
+    if (r.is_correction) tags.push('<span class="tag tag-correction">更正</span>');
+    if (r.is_late_attachment) tags.push('<span class="tag tag-late">晚到</span>');
+    if (!tags.length) tags.push('<span class="tag tag-normal">正常</span>');
+    return `<tr>
+      <td>${i+1}</td><td>${r.id}</td><td>${r.sample_id}</td><td>${r.timestamp}</td>
+      <td>${r.temperature.toFixed(2)}</td><td>${r.thermal_conductivity.toFixed(4)}</td>
+      <td>${r.source==='experiment'?'实验':'标定'}</td><td>${tags.join(' ')}</td>
+      <td>${r.operator}</td><td>${r.batch_id}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${r.notes}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAxisInfo(range) {
+  if (!range) return;
+  document.getElementById('axisInfo').textContent =
+    `屏幕范围：温度 ${range.x_min}~${range.x_max} °C ｜ 热导率 ${range.y_min}~${range.y_max} W/(m·K)  — 与导出批改表一致`;
+}
+
+function loadMessages() {
+  fetch('/api/messages').then(r=>r.json()).then(d => {
+    const list = document.getElementById('messageList');
+    const errors = d.errors || [];
+    const warnings = d.warnings || [];
+    const total = errors.length + warnings.length;
+    const badge = document.getElementById('msgBadge');
+    if (total > 0) { badge.style.display='inline-flex'; badge.textContent=total; } else { badge.style.display='none'; }
+    if (!total) { list.innerHTML = '<div class="alert alert-success"><span class="alert-icon">✓</span>没有错误或警告</div>'; return; }
+    list.innerHTML = errors.map(e => `<div class="alert alert-error"><span class="alert-icon">✕</span><span>${e}</span></div>`).join('')
+      + warnings.map(w => `<div class="alert alert-warn"><span class="alert-icon">!</span><span>${w}</span></div>`).join('');
+  });
+}
+
+function loadDrifts() {
+  fetch('/api/drifts').then(r=>r.json()).then(d => {
+    const drifts = d.drifts || [];
+    const badge = document.getElementById('driftBadge');
+    if (drifts.length) { badge.style.display='inline-flex'; badge.textContent=drifts.length; } else { badge.style.display='none'; }
+    const list = document.getElementById('driftList');
+    if (!drifts.length) { list.innerHTML = '<div class="alert alert-success"><span class="alert-icon">✓</span>未检测到零点漂移</div>'; return; }
+    list.innerHTML = drifts.map(dr => {
+      const srcLabel = dr.source === 'experiment' ? '实验记录' : '标定表';
+      const action = dr.source === 'experiment'
+        ? `下一步：请联系实验操作员「${dr.operator}」确认基线是否正常`
+        : '下一步：请联系标定组（分机 8032）重新标定';
+      return `<div class="drift-card">
+        <div class="source">样本 ${dr.sample_id} — 零点漂移（来源：${srcLabel}）</div>
+        <div class="msg">${dr.message}</div>
+        <div class="action">${action}</div>
+        ${dr.calibration_version ? `<div style="font-size:11px;color:var(--text2);margin-top:2px">标定表版本：${dr.calibration_version || '未知'}</div>` : ''}
+      </div>`;
+    }).join('');
+  });
+}
+
+function exportCSV() {
+  const params = new URLSearchParams({
+    sample_id: document.getElementById('filterSample').value || currentFilterState.sample_id || '',
+    batch_id: document.getElementById('filterBatch').value || currentFilterState.batch_id || '',
+    source: document.getElementById('filterSource').value || currentFilterState.source || '',
+    exclude_corrections: document.getElementById('filterExcludeCorr').checked,
+  });
+  window.location.href = '/api/export?'+params;
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab===name));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id==='tab-'+name));
+}
+
+function resetAll() {
+  if (!confirm('确定要重置所有数据吗？')) return;
+  document.getElementById('uploadSection').style.display = 'block';
+  document.getElementById('mainContent').style.display = 'none';
+  if (chart) { chart.destroy(); chart = null; }
+  document.getElementById('filterSample').value = '';
+  document.getElementById('filterBatch').value = '';
+  document.getElementById('filterSource').value = '';
+  document.getElementById('filterExcludeCorr').checked = false;
+  currentAxisRange = null;
+  currentFilterState = {};
+}
+</script>
+</body>
+</html>

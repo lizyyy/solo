@@ -1,0 +1,40 @@
+{
+  "package_name": "铝合金A6061热传导实验_2026Q2",
+  "calibrations": [
+    {"sample_id": "A6061-01", "temperature_ref": 25.0, "thermal_conductivity_ref": 167.0, "unit": "°C", "calibration_date": "2026-03-15", "version": "v2.3", "operator": "张工"},
+    {"sample_id": "A6061-01", "temperature_ref": 100.0, "thermal_conductivity_ref": 174.0, "unit": "°C", "calibration_date": "2026-03-15", "version": "v2.3", "operator": "张工"},
+    {"sample_id": "A6061-01", "temperature_ref": 200.0, "thermal_conductivity_ref": 182.0, "unit": "°C", "calibration_date": "2026-03-15", "version": "v2.3", "operator": "张工"},
+    {"sample_id": "A6061-02", "temperature_ref": 25.0, "thermal_conductivity_ref": 155.0, "unit": "°C", "calibration_date": "2026-03-15", "version": "v2.3", "operator": "张工"},
+    {"sample_id": "A6061-02", "temperature_ref": 100.0, "thermal_conductivity_ref": 162.0, "unit": "°C", "calibration_date": "2026-03-15", "version": "v2.3", "operator": "张工"},
+    {"sample_id": "A6061-02", "temperature_ref": 200.0, "thermal_conductivity_ref": 170.0, "unit": "°C", "calibration_date": "2026-03-15", "version": "v2.3", "operator": "张工"},
+    {"sample_id": "A6061-03", "temperature_ref": 25.0, "thermal_conductivity_ref": 170.0, "unit": "°C", "calibration_date": "2026-04-01", "version": "v2.4", "operator": "李工"},
+    {"sample_id": "A6061-03", "temperature_ref": 100.0, "thermal_conductivity_ref": 178.0, "unit": "°C", "calibration_date": "2026-04-01", "version": "v2.4", "operator": "李工"},
+    {"sample_id": "A6061-03", "temperature_ref": 200.0, "thermal_conductivity_ref": 185.0, "unit": "°C", "calibration_date": "2026-04-01", "version": "v2.4", "operator": "李工"},
+    {"sample_id": "A6061-04", "temperature_ref": 25.0, "thermal_conductivity_ref": 160.0, "unit": "°C", "calibration_date": "", "version": "", "operator": ""}
+  ],
+  "records": [
+    {"id": "R001", "sample_id": "A6061-01", "timestamp": "2026-04-10T09:00:00", "temperature": 25.0, "thermal_conductivity": 166.8, "unit": "°C", "source": "experiment", "operator": "王同学", "batch_id": "B2026-04", "notes": ""},
+    {"id": "R002", "sample_id": "A6061-01", "timestamp": "2026-04-10T09:15:00", "temperature": 50.0, "thermal_conductivity": 169.5, "unit": "°C", "source": "experiment", "operator": "王同学", "batch_id": "B2026-04", "notes": ""},
+    {"id": "R003", "sample_id": "A6061-01", "timestamp": "2026-04-10T09:30:00", "temperature": 100.0, "thermal_conductivity": 173.8, "unit": "°C", "source": "experiment", "operator": "王同学", "batch_id": "B2026-04", "notes": ""},
+    {"id": "R004", "sample_id": "A6061-01", "timestamp": "2026-04-10T09:45:00", "temperature": 150.0, "thermal_conductivity": 178.2, "unit": "°C", "source": "experiment", "operator": "王同学", "batch_id": "B2026-04", "notes": ""},
+    {"id": "R005", "sample_id": "A6061-01", "timestamp": "2026-04-10T10:00:00", "temperature": 200.0, "thermal_conductivity": 181.9, "unit": "°C", "source": "experiment", "operator": "王同学", "batch_id": "B2026-04", "notes": ""},
+
+    {"id": "R006", "sample_id": "A6061-02", "timestamp": "2026-04-10T10:30:00", "temperature": 77.0, "thermal_conductivity": 250.0, "unit": "°F", "source": "experiment", "operator": "赵同学", "batch_id": "B2026-04", "notes": "温度用了华氏度忘了转换"},
+    {"id": "R007", "sample_id": "A6061-02", "timestamp": "2026-04-10T10:45:00", "temperature": 100.0, "thermal_conductivity": 161.8, "unit": "°C", "source": "experiment", "operator": "赵同学", "batch_id": "B2026-04", "notes": ""},
+    {"id": "R008", "sample_id": "A6061-02", "timestamp": "2026-04-10T11:00:00", "temperature": 200.0, "thermal_conductivity": 169.7, "unit": "°C", "source": "experiment", "operator": "赵同学", "batch_id": "B2026-04", "notes": ""},
+
+    {"id": "R009", "sample_id": "A6061-03", "timestamp": "2026-04-10T09:00:00", "temperature": 25.0, "thermal_conductivity": 170.2, "unit": "°C", "source": "experiment", "operator": "陈同学", "batch_id": "B2026-04", "notes": ""},
+    {"id": "R010", "sample_id": "A6061-03", "timestamp": "2026-04-10T09:20:00", "temperature": 100.0, "thermal_conductivity": 177.6, "unit": "°C", "source": "experiment", "operator": "陈同学", "batch_id": "B2026-04", "notes": ""},
+    {"id": "R011", "sample_id": "A6061-03", "timestamp": "2026-04-10T09:40:00", "temperature": 200.0, "thermal_conductivity": 184.8, "unit": "°C", "source": "experiment", "operator": "陈同学", "batch_id": "B2026-04", "notes": ""},
+
+    {"id": "R003", "sample_id": "A6061-01", "timestamp": "2026-04-10T09:30:00", "temperature": 100.0, "thermal_conductivity": 173.8, "unit": "°C", "source": "experiment", "operator": "王同学", "batch_id": "B2026-04", "notes": "重复上传"},
+
+    {"id": "R012", "sample_id": "A6061-02", "timestamp": "2026-04-10T11:15:00", "temperature": 25.0, "thermal_conductivity": 154.6, "unit": "°C", "source": "experiment", "is_late_attachment": true, "operator": "赵同学", "batch_id": "B2026-04", "notes": "补交的25°C数据"},
+
+    {"id": "R013", "sample_id": "A6061-01", "timestamp": "2026-04-12T14:00:00", "temperature": 100.0, "thermal_conductivity": 174.5, "unit": "°C", "source": "experiment", "is_correction": true, "corrected_record_id": "R003", "operator": "助教刘老师", "batch_id": "B2026-04", "notes": "原记录热导率偏低，修正为174.5"},
+
+    {"id": "R014", "sample_id": "A6061-04", "timestamp": "2026-04-11T09:00:00", "temperature": 25.0, "thermal_conductivity": 140.5, "unit": "°C", "source": "experiment", "operator": "孙同学", "batch_id": "B2026-05", "notes": "基线明显偏移，零点漂移疑似"},
+
+    {"id": "R015", "sample_id": "A6061-03", "timestamp": "2026-04-10T10:00:00", "temperature": 25.0, "thermal_conductivity": 120.0, "unit": "°C", "source": "experiment", "operator": "陈同学", "batch_id": "B2026-04", "notes": "这一组基线异常低，怀疑标定表版本问题"}
+  ]
+}
