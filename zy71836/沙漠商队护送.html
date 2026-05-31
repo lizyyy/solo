@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>沙漠商队护送</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#1a1510;--fg:#e8dcc8;--muted:#8a7e6b;--accent:#d4a44c;--accent2:#c07830;--card:#2a2318;--border:#3d3528;--confirmed:#4caf50;--pending:#ff9800;--manual:#e53935;--danger:#ef5350;--safe:#66bb6a}
+body{background:var(--bg);color:var(--fg);font-family:"Microsoft YaHei","PingFang SC",sans-serif;min-height:100vh;display:flex;flex-direction:column}
+header{background:linear-gradient(135deg,#2a1f10,#3d2e18);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--accent)}
+header h1{font-size:20px;color:var(--accent);letter-spacing:2px}
+header .version{font-size:12px;color:var(--muted)}
+nav{display:flex;background:var(--card);border-bottom:1px solid var(--border)}
+nav button{flex:1;padding:10px 8px;border:none;background:transparent;color:var(--muted);font-size:14px;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent}
+nav button:hover{color:var(--fg);background:rgba(212,164,76,.08)}
+nav button.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(212,164,76,.1)}
+main{flex:1;display:flex;overflow:hidden}
+.tab-panel{display:none;flex:1;overflow:auto;padding:16px}
+.tab-panel.active{display:flex;flex-direction:column}
+.map-container{position:relative;flex:1;min-height:400px}
+.map-container canvas{border:1px solid var(--border);border-radius:4px;cursor:crosshair}
+.map-sidebar{width:280px;margin-left:16px;display:flex;flex-direction:column;gap:12px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px}
+.panel h3{font-size:13px;color:var(--accent);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.field{margin-bottom:8px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:3px}
+.field input,.field select,.field textarea{width:100%;padding:6px 8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--fg);font-size:13px;font-family:inherit}
+.field textarea{min-height:60px;resize:vertical}
+.btn{padding:7px 14px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:13px;font-family:inherit;transition:all .2s}
+.btn-primary{background:var(--accent);color:#1a1510;border-color:var(--accent);font-weight:bold}
+.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:transparent;color:var(--fg)}
+.btn-secondary:hover{background:rgba(255,255,255,.05)}
+.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:normal;font-size:12px;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0;background:var(--card)}
+tr:hover td{background:rgba(212,164,76,.04)}
+.status-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold}
+.status-confirmed{background:rgba(76,175,80,.15);color:var(--confirmed)}
+.status-pending{background:rgba(255,152,0,.15);color:var(--pending)}
+.status-manual{background:rgba(229,57,53,.15);color:var(--manual)}
+.judgment-box{padding:10px;border-radius:4px;margin:6px 0;font-size:13px;line-height:1.6}
+.judgment-match{background:rgba(76,175,80,.08);border-left:3px solid var(--confirmed)}
+.judgment-mismatch{background:rgba(255,152,0,.08);border-left:3px solid var(--pending)}
+.judgment-error{background:rgba(229,57,53,.08);border-left:3px solid var(--manual)}
+.reason-tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:11px;margin:2px;background:rgba(212,164,76,.15);color:var(--accent)}
+.import-zone{border:2px dashed var(--border);border-radius:8px;padding:40px;text-align:center;transition:all .2s;cursor:pointer}
+.import-zone:hover,.import-zone.dragover{border-color:var(--accent);background:rgba(212,164,76,.05)}
+.import-zone p{color:var(--muted);margin-top:8px;font-size:13px}
+.stats-row{display:flex;gap:12px;margin-bottom:16px}
+.stat-card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;text-align:center}
+.stat-card .num{font-size:24px;font-weight:bold}
+.stat-card .lbl{font-size:11px;color:var(--muted);margin-top:4px}
+.filter-bar{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.filter-bar select,.filter-bar input{padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--fg);font-size:13px}
+.terrain-legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.terrain-legend span{display:flex;align-items:center;gap:4px;font-size:11px}
+.terrain-legend .swatch{width:14px;height:14px;border-radius:2px;border:1px solid rgba(255,255,255,.15)}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px;max-width:600px;width:90%;max-height:80vh;overflow:auto}
+.modal h2{color:var(--accent);margin-bottom:12px;font-size:16px}
+.modal .btn-group{margin-top:16px;justify-content:flex-end}
+.empty-state{text-align:center;padding:40px;color:var(--muted)}
+.empty-state p{margin-top:8px;font-size:14px}
+.toast{position:fixed;top:20px;right:20px;padding:10px 18px;border-radius:6px;font-size:13px;z-index:200;animation:slideIn .3s ease}
+.toast-success{background:var(--confirmed);color:#fff}
+.toast-error{background:var(--danger);color:#fff}
+.toast-info{background:var(--accent);color:#1a1510}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.detail-row{display:flex;gap:16px}
+.detail-row>div{flex:1}
+.next-step{background:rgba(212,164,76,.08);border:1px solid rgba(212,164,76,.2);border-radius:4px;padding:8px 12px;margin-top:6px;font-size:13px}
+.next-step strong{color:var(--accent)}
+.history-timeline{position:relative;padding-left:20px}
+.history-timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--border)}
+.history-item{position:relative;margin-bottom:12px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:4px;font-size:13px}
+.history-item::before{content:'';position:absolute;left:-18px;top:12px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.history-item .ht-time{font-size:11px;color:var(--muted)}
+.export-preview{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:12px;font-family:monospace;font-size:12px;max-height:300px;overflow:auto;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<header>
+<h1>🐫 沙漠商队护送</h1>
+<span class="version">v1.0 — 自动判断 · 分类复核 · 复盘导出</span>
+</header>
+<nav id="mainNav">
+<button class="active" data-tab="map">🗺️ 地图</button>
+<button data-tab="import">📥 导入</button>
+<button data-tab="review">🔍 复核</button>
+<button data-tab="correct">✏️ 修正</button>
+<button data-tab="history">📜 历史</button>
+<button data-tab="export">📤 导出</button>
+</nav>
+<main>
+<div id="tab-map" class="tab-panel active" style="flex-direction:row">
+<div class="map-container"><canvas id="mapCanvas"></canvas></div>
+<div class="map-sidebar">
+<div class="panel">
+<h3>地形图例</h3>
+<div class="terrain-legend" id="terrainLegend"></div>
+</div>
+<div class="panel">
+<h3>当前选中</h3>
+<div id="cellInfo"><p style="color:var(--muted);font-size:13px">点击地图格子查看详情</p></div>
+</div>
+<div class="panel">
+<h3>商队状态</h3>
+<div id="caravanStatus"><p style="color:var(--muted);font-size:13px">暂无商队数据</p></div>
+</div>
+<div class="panel">
+<h3>边界格穿越</h3>
+<div id="boundaryInfo"><p style="color:var(--muted);font-size:13px">导入数据后显示穿越记录</p></div>
+</div>
+</div>
+</div>
+<div id="tab-import" class="tab-panel">
+<div class="import-zone" id="importZone">
+<div style="font-size:36px">📂</div>
+<p>拖放 JSON / CSV 文件到此处，或点击选择文件</p>
+<p style="font-size:11px;margin-top:4px">支持战报表、结算表、地形规则三种格式</p>
+<input type="file" id="fileInput" accept=".json,.csv" style="display:none" multiple>
+</div>
+<div class="panel" style="margin-top:16px">
+<h3>数据格式说明</h3>
+<div class="detail-row" style="margin-top:8px">
+<div>
+<p style="font-size:12px;color:var(--accent);margin-bottom:4px">战报表 (battle_reports)</p>
+<pre style="font-size:11px;color:var(--muted);background:var(--bg);padding:8px;border-radius:4px;overflow:auto">[{id,caravanId,step,terrain,enemy,resourcesLost,duration,timestamp}]</pre>
+</div>
+<div>
+<p style="font-size:12px;color:var(--accent);margin-bottom:4px">结算表 (settlements)</p>
+<pre style="font-size:11px;color:var(--muted);background:var(--bg);padding:8px;border-radius:4px;overflow:auto">[{id,caravanId,totalResources,arrived,deviation,damageTaken,timestamp}]</pre>
+</div>
+</div>
+<div style="margin-top:8px">
+<p style="font-size:12px;color:var(--accent);margin-bottom:4px">地形规则样例 (terrain_rules)</p>
+<pre style="font-size:11px;color:var(--muted);background:var(--bg);padding:8px;border-radius:4px;overflow:auto">[{type:"sand",moveCost:1,danger:0.1},
+{type:"dune",moveCost:2,danger:0.2},
+{type:"oasis",moveCost:0.5,danger:0},
+{type:"rock",moveCost:1.5,danger:0.05},
+{type:"danger",moveCost:1,danger:0.5}]</pre>
+<p style="font-size:11px;color:var(--muted);margin-top:4px">💡 玩法策划：将地形规则按上述 JSON 格式放入文件导入即可，type 对应地图格子类型</p>
+</div>
+</div>
+<div class="panel" style="margin-top:12px">
+<h3>已导入数据</h3>
+<div id="importedDataList"><p style="color:var(--muted);font-size:13px">暂无数据</p></div>
+</div>
+</div>
+<div id="tab-review" class="tab-panel">
+<div class="stats-row" id="reviewStats"></div>
+<div class="filter-bar">
+<select id="reviewFilter"><option value="all">全部状态</option><option value="confirmed">已确认</option><option value="pending">待补</option><option value="manual">人工改过</option></select>
+<input type="text" id="reviewSearch" placeholder="搜索商队ID或判断理由...">
+<button class="btn btn-secondary btn-sm" onclick="refreshReview()">刷新</button>
+</div>
+<div style="flex:1;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:6px">
+<table id="reviewTable">
+<thead><tr><th>商队</th><th>判断</th><th>判断理由</th><th>下一步</th><th>状态</th><th>操作</th></tr></thead>
+<tbody id="reviewBody"></tbody>
+</table>
+</div>
+</div>
+<div id="tab-correct" class="tab-panel">
+<div class="filter-bar">
+<select id="correctFilter"><option value="all">全部</option><option value="pending">仅待补</option><option value="manual">仅人工改过</option></select>
+<button class="btn btn-secondary btn-sm" onclick="refreshCorrect()">刷新</button>
+</div>
+<div id="correctList"></div>
+</div>
+<div id="tab-history" class="tab-panel">
+<div class="filter-bar">
+<select id="historyFilter"><option value="all">全部操作</option><option value="import">导入</option><option value="judge">判断</option><option value="correct">修正</option><option value="confirm">确认</option></select>
+<button class="btn btn-secondary btn-sm" onclick="refreshHistory()">刷新</button>
+</div>
+<div class="history-timeline" id="historyTimeline"></div>
+</div>
+<div id="tab-export" class="tab-panel">
+<div class="panel">
+<h3>复盘报告预览</h3>
+<div class="filter-bar">
+<select id="exportFilter"><option value="all">全部记录</option><option value="confirmed">仅已确认</option><option value="pending">仅待补</option><option value="manual">仅人工改过</option></select>
+<button class="btn btn-primary btn-sm" onclick="previewExport()">生成预览</button>
+<button class="btn btn-primary btn-sm" onclick="doExport()">导出报告</button>
+</div>
+<div class="export-preview" id="exportPreview">点击"生成预览"查看报告内容</div>
+</div>
+<div class="panel" style="margin-top:12px">
+<h3>处理口径说明</h3>
+<div style="font-size:13px;line-height:1.8">
+<p><span class="status-badge status-confirmed">已确认</span> 战报与结算数据一致，自动判定通过，无需人工介入</p>
+<p style="margin-top:4px"><span class="status-badge status-pending">待补</span> 战报与结算存在差异，需补充数据或确认原因后方可确认</p>
+<p style="margin-top:4px"><span class="status-badge status-manual">人工改过</span> 已由策划手动修正，修正原因记录在案，以修正后数据为准</p>
+</div>
+</div>
+</div>
+</main>
+<div id="modalContainer"></div>
+<script>
+const DB_NAME='DesertCaravanEscort';
+const DB_VERSION=1;
+const STORES={records:'records',terrainRules:'terrainRules',history:'history',meta:'meta'};
+let db=null;
+const TERRAIN_DEFAULTS=[
+{type:'sand',label:'沙地',color:'#d4b87a',moveCost:1,danger:0.1},
+{type:'dune',label:'沙丘',color:'#c49a4a',moveCost:2,danger:0.2},
+{type:'oasis',label:'绿洲',color:'#6abf69',moveCost:0.5,danger:0},
+{type:'rock',label:'岩石',color:'#8a8078',moveCost:1.5,danger:0.05},
+{type:'danger',label:'险地',color:'#c05050',moveCost:1,danger:0.5},
+{type:'border',label:'边界',color:'#5a5a8a',moveCost:0,danger:0}
+];
+let terrainRules=[...TERRAIN_DEFAULTS];
+let mapData=[];
+let MAP_COLS=16;
+let MAP_ROWS=12;
+let mapScale=1;
+let selectedCell=null;
+let caravanPaths=[];
+
+function openDB(){
+return new Promise((resolve,reject)=>{
+const req=indexedDB.open(DB_NAME,DB_VERSION);
+req.onupgradeneeded=e=>{
+const d=e.target.result;
+if(!d.objectStoreNames.contains(STORES.records)){
+const s=d.createObjectStore(STORES.records,{keyPath:'id'});
+s.createIndex('caravanId','caravanId');
+s.createIndex('status','status');
+}
+if(!d.objectStoreNames.contains(STORES.terrainRules)){
+d.createObjectStore(STORES.terrainRules,{keyPath:'type'});
+}
+if(!d.objectStoreNames.contains(STORES.history)){
+const s=d.createObjectStore(STORES.history,{keyPath:'id',autoIncrement:true});
+s.createIndex('action','action');
+s.createIndex('timestamp','timestamp');
+}
+if(!d.objectStoreNames.contains(STORES.meta)){
+d.createObjectStore(STORES.meta,{keyPath:'key'});
+}
+};
+req.onsuccess=e=>{db=e.target.result;resolve(db)};
+req.onerror=e=>reject(e.target.error);
+});
+}
+
+function dbPut(store,data){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(store,'readwrite');
+tx.objectStore(store).put(data);
+tx.oncomplete=()=>resolve();
+tx.onerror=e=>reject(e.target.error);
+});
+}
+
+function dbGet(store,key){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(store,'readonly');
+const req=tx.objectStore(store).get(key);
+req.onsuccess=()=>resolve(req.result);
+req.onerror=e=>reject(e.target.error);
+});
+}
+
+function dbGetAll(store){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(store,'readonly');
+const req=tx.objectStore(store).getAll();
+req.onsuccess=()=>resolve(req.result);
+req.onerror=e=>reject(e.target.error);
+});
+}
+
+function dbDelete(store,key){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(store,'readwrite');
+tx.objectStore(store).delete(key);
+tx.oncomplete=()=>resolve();
+tx.onerror=e=>reject(e.target.error);
+});
+}
+
+function dbClear(store){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(store,'readwrite');
+tx.objectStore(store).clear();
+tx.oncomplete=()=>resolve();
+tx.onerror=e=>reject(e.target.error);
+});
+}
+
+function addHistory(action,detail){
+return dbPut(STORES.history,{action,detail,timestamp:Date.now()});
+}
+
+function showToast(msg,type='info'){
+const t=document.createElement('div');
+t.className=`toast toast-${type}`;
+t.textContent=msg;
+document.body.appendChild(t);
+setTimeout(()=>t.remove(),3000);
+}
+
+function generateMap(){
+mapData=[];
+for(let r=0;r<MAP_ROWS;r++){
+const row=[];
+for(let c=0;c<MAP_COLS;c++){
+const rnd=Math.random();
+let type='sand';
+if(rnd<0.05)type='danger';
+else if(rnd<0.12)type='rock';
+else if(rnd<0.2)type='dune';
+else if(rnd<0.28)type='oasis';
+if(r===0||r===MAP_ROWS-1||c===0||c===MAP_COLS-1)type='border';
+row.push({row:r,col:c,type,caravan:null});
+}
+mapData.push(row);
+}
+}
+
+function getTerrainRule(type){
+return terrainRules.find(t=>t.type===type)||terrainRules[0];
+}
+
+function renderMap(){
+const canvas=document.getElementById('mapCanvas');
+const container=canvas.parentElement;
+const w=container.clientWidth;
+const h=container.clientHeight;
+const cellW=Math.floor(w/MAP_COLS);
+const cellH=Math.floor(h/MAP_ROWS);
+const cellSize=Math.min(cellW,cellH);
+canvas.width=cellSize*MAP_COLS;
+canvas.height=cellSize*MAP_ROWS;
+mapScale=cellSize;
+const ctx=canvas.getContext('2d');
+ctx.clearRect(0,0,canvas.width,canvas.height);
+for(let r=0;r<MAP_ROWS;r++){
+for(let c=0;c<MAP_COLS;c++){
+const cell=mapData[r][c];
+const rule=getTerrainRule(cell.type);
+const x=c*cellSize;
+const y=r*cellSize;
+ctx.fillStyle=rule.color;
+ctx.fillRect(x,y,cellSize,cellSize);
+ctx.strokeStyle='rgba(0,0,0,0.2)';
+ctx.lineWidth=0.5;
+ctx.strokeRect(x,y,cellSize,cellSize);
+if(cell.type==='border'){
+ctx.strokeStyle='rgba(100,100,180,0.5)';
+ctx.lineWidth=1;
+ctx.setLineDash([3,3]);
+ctx.strokeRect(x+1,y+1,cellSize-2,cellSize-2);
+ctx.setLineDash([]);
+}
+if(selectedCell&&selectedCell.row===r&&selectedCell.col===c){
+ctx.strokeStyle=var_accent();
+ctx.lineWidth=2;
+ctx.strokeRect(x+1,y+1,cellSize-2,cellSize-2);
+}
+ctx.fillStyle='rgba(0,0,0,0.35)';
+ctx.font=`${Math.max(9,cellSize*0.25)}px sans-serif`;
+ctx.textAlign='center';
+ctx.textBaseline='bottom';
+ctx.fillText(rule.label,x+cellSize/2,y+cellSize-2);
+}
+}
+caravanPaths.forEach(path=>{
+if(path.length<2)return;
+ctx.beginPath();
+ctx.strokeStyle='rgba(212,164,76,0.8)';
+ctx.lineWidth=3;
+ctx.setLineDash([6,4]);
+const first=path[0];
+ctx.moveTo(first.col*cellSize+cellSize/2,first.row*cellSize+cellSize/2);
+for(let i=1;i<path.length;i++){
+ctx.lineTo(path[i].col*cellSize+cellSize/2,path[i].row*cellSize+cellSize/2);
+}
+ctx.stroke();
+ctx.setLineDash([]);
+path.forEach((p,i)=>{
+const cx=p.col*cellSize+cellSize/2;
+const cy=p.row*cellSize+cellSize/2;
+ctx.beginPath();
+ctx.arc(cx,cy,4,0,Math.PI*2);
+ctx.fillStyle=i===0?'#4caf50':i===path.length-1?'#ef5350':'#d4a44c';
+ctx.fill();
+ctx.strokeStyle='#1a1510';
+ctx.lineWidth=1;
+ctx.stroke();
+if(i===0||i===path.length-1){
+ctx.fillStyle='#fff';
+ctx.font='bold 10px sans-serif';
+ctx.textAlign='center';
+ctx.textBaseline='middle';
+ctx.fillText(i===0?'起':'终',cx,cy);
+}
+});
+});
+}
+
+function var_accent(){return '#d4a44c'}
+
+function setupCanvasClick(){
+const canvas=document.getElementById('mapCanvas');
+canvas.addEventListener('click',e=>{
+const rect=canvas.getBoundingClientRect();
+const x=e.clientX-rect.left;
+const y=e.clientY-rect.top;
+const col=Math.floor(x/mapScale);
+const row=Math.floor(y/mapScale);
+if(row>=0&&row<MAP_ROWS&&col>=0&&col<MAP_COLS){
+selectedCell={row,col};
+renderMap();
+updateCellInfo(row,col);
+}
+});
+}
+
+function updateCellInfo(row,col){
+const cell=mapData[row][col];
+const rule=getTerrainRule(cell.type);
+const div=document.getElementById('cellInfo');
+div.innerHTML=`
+<div class="field"><label>坐标</label><span>(${col}, ${row})</span></div>
+<div class="field"><label>地形</label><span>${rule.label} (${cell.type})</span></div>
+<div class="field"><label>移动消耗</label><span>${rule.moveCost}</span></div>
+<div class="field"><label>危险系数</label><span>${rule.danger}</span></div>
+`;
+const records=caravanPaths.filter(p=>p.some(pt=>pt.row===row&&pt.col===col));
+if(records.length>0){
+div.innerHTML+=`<div class="field"><label>经过商队</label><span>${records.length} 支商队经过此格</span></div>`;
+}
+if(cell.type==='border'){
+const crossings=caravanPaths.filter(p=>p.some(pt=>pt.row===row&&pt.col===col));
+const bDiv=document.getElementById('boundaryInfo');
+if(crossings.length>0){
+bDiv.innerHTML=crossings.map((p,i)=>`<p style="font-size:12px;color:var(--accent)">商队${i+1}: 在(${col},${row})穿越边界格</p>`).join('');
+}else{
+bDiv.innerHTML='<p style="color:var(--muted);font-size:13px">该边界格无穿越记录</p>';
+}
+}
+}
+
+function renderTerrainLegend(){
+const div=document.getElementById('terrainLegend');
+div.innerHTML=terrainRules.map(t=>
+`<span><span class="swatch" style="background:${t.color}"></span>${t.label}</span>`
+).join('');
+}
+
+function autoJudge(battleReports,settlements){
+const results=[];
+const settlementMap={};
+settlements.forEach(s=>{settlementMap[s.caravanId]=s});
+battleReports.forEach(br=>{
+const settlement=settlementMap[br.caravanId];
+if(!settlement){
+results.push({
+id:`judge_${br.caravanId}_${Date.now()}`,
+caravanId:br.caravanId,
+battleReport:br,
+settlement:null,
+judgment:'mismatch',
+reasons:[`商队 ${br.caravanId} 有战报但无结算记录`],
+nextStep:'需要补充该商队的结算数据，或确认战报是否有效',
+status:'pending',
+autoResult:'mismatch',
+manualNote:'',
+modifiedAt:null,
+createdAt:Date.now()
+});
+return;
+}
+const reasons=[];
+const details=[];
+let totalLost=0;
+battleReports.filter(b=>b.caravanId===br.caravanId).forEach(b=>{
+totalLost+=(b.resourcesLost||0);
+});
+if(Math.abs(totalLost-settlement.damageTaken)>0.01){
+reasons.push(`资源损耗不一致：战报合计损失 ${totalLost}，结算记录 ${settlement.damageTaken}`);
+details.push({field:'resourcesLost',expected:totalLost,actual:settlement.damageTaken});
+}
+if(settlement.deviation>0){
+reasons.push(`路线偏移 ${settlement.deviation} 格，需确认是否为计划外绕行`);
+details.push({field:'deviation',value:settlement.deviation});
+}
+if(!settlement.arrived){
+reasons.push('商队未抵达终点，护送任务失败');
+details.push({field:'arrived',expected:true,actual:false});
+}
+if(br.duration&&settlement.timestamp){
+const settleTime=new Date(settlement.timestamp).getTime();
+const battleTime=new Date(br.timestamp).getTime();
+if(settleTime<battleTime){
+reasons.push('结算时间早于战报时间，数据可能录入顺序有误');
+details.push({field:'timestamp',battleTime:br.timestamp,settleTime:settlement.timestamp});
+}
+}
+const isMatch=reasons.length===0;
+results.push({
+id:`judge_${br.caravanId}_${Date.now()}`,
+caravanId:br.caravanId,
+battleReport:br,
+settlement,
+judgment:isMatch?'match':'mismatch',
+reasons:isMatch?['战报与结算数据一致，自动判定通过']:reasons,
+nextStep:isMatch?'无需操作，记录已自动确认':`需核查上述差异项：${reasons[0]}。建议查看原始数据后进行修正或补充`,
+details,
+status:isMatch?'confirmed':'pending',
+autoResult:isMatch?'match':'mismatch',
+manualNote:'',
+modifiedAt:null,
+createdAt:Date.now()
+});
+});
+settlements.forEach(s=>{
+if(!battleReports.some(b=>b.caravanId===s.caravanId)){
+results.push({
+id:`judge_${s.caravanId}_${Date.now()}`,
+caravanId:s.caravanId,
+battleReport:null,
+settlement:s,
+judgment:'mismatch',
+reasons:[`商队 ${s.caravanId} 有结算但无战报记录`],
+nextStep:'需要补充该商队的战报数据，或确认结算是否有效',
+status:'pending',
+autoResult:'mismatch',
+manualNote:'',
+modifiedAt:null,
+createdAt:Date.now()
+});
+}
+});
+return results;
+}
+
+function buildCaravanPaths(records){
+caravanPaths=[];
+const byCaravan={};
+records.forEach(r=>{
+if(!byCaravan[r.caravanId])byCaravan[r.caravanId]=[];
+byCaravan[r.caravanId].push(r);
+});
+Object.keys(byCaravan).forEach(cid=>{
+const recs=byCaravan[cid];
+const path=[];
+recs.sort((a,b)=>(a.battleReport?.step||0)-(b.battleReport?.step||0));
+recs.forEach((r,i)=>{
+const step=r.battleReport?.step||i;
+const col=Math.min(step%MAP_COLS,MAP_COLS-2)+1;
+const row=Math.min(Math.floor(step/MAP_COLS)+1,MAP_ROWS-2);
+path.push({row,col,step});
+});
+if(path.length===0&&recs[0]?.settlement){
+path.push({row:Math.floor(MAP_ROWS/2),col:1,step:0});
+path.push({row:Math.floor(MAP_ROWS/2),col:MAP_COLS-2,step:5});
+}
+if(path.length>0)caravanPaths.push(path);
+});
+}
+
+async function processImport(data,type){
+if(type==='terrain_rules'){
+terrainRules=TERRAIN_DEFAULTS.map(d=>{
+const imported=data.find(t=>t.type===d.type);
+return imported?{...d,...imported}:d;
+});
+await dbClear(STORES.terrainRules);
+for(const rule of terrainRules){
+await dbPut(STORES.terrainRules,rule);
+}
+renderTerrainLegend();
+renderMap();
+addHistory('import',`导入地形规则 ${terrainRules.length} 条`);
+showToast(`地形规则已更新（${terrainRules.length} 条）`,'success');
+return;
+}
+if(type==='battle_reports'){
+const existing=await dbGetAll(STORES.records);
+const settlements=existing.filter(r=>r.settlement).map(r=>r.settlement);
+const results=autoJudge(data,settlements);
+for(const r of results){
+await dbPut(STORES.records,r);
+}
+buildCaravanPaths([...existing,...results]);
+renderMap();
+addHistory('import',`导入战报 ${data.length} 条，自动判断 ${results.length} 条`);
+showToast(`战报已导入，生成 ${results.length} 条判断`,'success');
+refreshAll();
+return;
+}
+if(type==='settlements'){
+const existing=await dbGetAll(STORES.records);
+const battleReports=[];
+existing.forEach(r=>{if(r.battleReport)battleReports.push(r.battleReport)});
+const results=autoJudge(battleReports,data);
+for(const r of results){
+const existing_rec=existing.find(e=>e.caravanId===r.caravanId);
+if(existing_rec){
+existing_rec.settlement=r.settlement;
+existing_rec.judgment=r.judgment;
+existing_rec.reasons=r.reasons;
+existing_rec.nextStep=r.nextStep;
+existing_rec.details=r.details;
+existing_rec.status=r.status;
+existing_rec.autoResult=r.autoResult;
+await dbPut(STORES.records,existing_rec);
+}else{
+await dbPut(STORES.records,r);
+}
+}
+buildCaravanPaths([...existing,...results]);
+renderMap();
+addHistory('import',`导入结算 ${data.length} 条，更新判断`);
+showToast(`结算已导入，判断已更新`,'success');
+refreshAll();
+return;
+}
+}
+
+function parseFileContent(content,filename){
+const ext=filename.split('.').pop().toLowerCase();
+if(ext==='json'){
+try{
+const data=JSON.parse(content);
+if(Array.isArray(data)){
+if(data.length>0){
+if(data[0].enemy!==undefined||data[0].resourcesLost!==undefined||data[0].step!==undefined){
+return{data,type:'battle_reports'};
+}
+if(data[0].moveCost!==undefined&&data[0].type!==undefined){
+return{data,type:'terrain_rules'};
+}
+if(data[0].arrived!==undefined||data[0].damageTaken!==undefined||data[0].totalResources!==undefined){
+return{data,type:'settlements'};
+}
+}
+return{data,type:'unknown'};
+}
+if(data.battle_reports)return{data:data.battle_reports,type:'battle_reports'};
+if(data.settlements)return{data:data.settlements,type:'settlements'};
+if(data.terrain_rules)return{data:data.terrain_rules,type:'terrain_rules'};
+return{data:[data],type:'unknown'};
+}catch(e){
+showToast('JSON 解析失败：'+e.message,'error');
+return null;
+}
+}
+if(ext==='csv'){
+const lines=content.trim().split('\n');
+if(lines.length<2)return null;
+const headers=lines[0].split(',').map(h=>h.trim());
+const data=lines.slice(1).map(line=>{
+const vals=line.split(',').map(v=>v.trim());
+const obj={};
+headers.forEach((h,i)=>{
+const v=vals[i]||'';
+obj[h]=isNaN(v)?v:Number(v);
+});
+return obj;
+});
+if(headers.includes('enemy')||headers.includes('resourcesLost')||headers.includes('step')){
+return{data,type:'battle_reports'};
+}
+if(headers.includes('arrived')||headers.includes('damageTaken')||headers.includes('totalResources')){
+return{data,type:'settlements'};
+}
+if(headers.includes('moveCost')&&headers.includes('type')){
+return{data,type:'terrain_rules'};
+}
+return{data,type:'unknown'};
+}
+return null;
+}
+
+function setupImport(){
+const zone=document.getElementById('importZone');
+const input=document.getElementById('fileInput');
+zone.addEventListener('click',()=>input.click());
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('dragover')});
+zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));
+zone.addEventListener('drop',e=>{
+e.preventDefault();
+zone.classList.remove('dragover');
+handleFiles(e.dataTransfer.files);
+});
+input.addEventListener('change',e=>handleFiles(e.target.files));
+}
+
+function handleFiles(files){
+Array.from(files).forEach(file=>{
+const reader=new FileReader();
+reader.onload=e=>{
+const result=parseFileContent(e.target.result,file.name);
+if(result){
+processImport(result.data,result.type);
+}else{
+showToast(`无法识别文件 ${file.name} 的格式`,'error');
+}
+};
+reader.readAsText(file);
+});
+}
+
+async function refreshReview(){
+const records=await dbGetAll(STORES.records);
+const filter=document.getElementById('reviewFilter').value;
+const search=document.getElementById('reviewSearch').value.toLowerCase();
+let filtered=records;
+if(filter!=='all')filtered=filtered.filter(r=>r.status===filter);
+if(search)filtered=filtered.filter(r=>
+r.caravanId.toLowerCase().includes(search)||
+r.reasons.some(reason=>reason.toLowerCase().includes(search))
+);
+const confirmed=records.filter(r=>r.status==='confirmed').length;
+const pending=records.filter(r=>r.status==='pending').length;
+const manual=records.filter(r=>r.status==='manual').length;
+document.getElementById('reviewStats').innerHTML=`
+<div class="stat-card"><div class="num" style="color:var(--confirmed)">${confirmed}</div><div class="lbl">已确认</div></div>
+<div class="stat-card"><div class="num" style="color:var(--pending)">${pending}</div><div class="lbl">待补</div></div>
+<div class="stat-card"><div class="num" style="color:var(--manual)">${manual}</div><div class="lbl">人工改过</div></div>
+<div class="stat-card"><div class="num" style="color:var(--fg)">${records.length}</div><div class="lbl">总计</div></div>
+`;
+const tbody=document.getElementById('reviewBody');
+if(filtered.length===0){
+tbody.innerHTML='<tr><td colspan="6" class="empty-state">无匹配记录</td></tr>';
+return;
+}
+tbody.innerHTML=filtered.map(r=>{
+const statusMap={confirmed:'已确认',pending:'待补',manual:'人工改过'};
+const judgmentClass=r.judgment==='match'?'match':r.reasons.length>2?'error':'mismatch';
+return`<tr>
+<td>${r.caravanId}</td>
+<td><div class="judgment-box judgment-${judgmentClass}">${r.judgment==='match'?'✅ 一致':'⚠️ 不一致'}</div></td>
+<td>${r.reasons.map(reason=>`<span class="reason-tag">${reason}</span>`).join(' ')}</td>
+<td><div class="next-step"><strong>→</strong> ${r.nextStep}</div></td>
+<td><span class="status-badge status-${r.status}">${statusMap[r.status]}</span></td>
+<td><button class="btn btn-sm btn-secondary" onclick="viewDetail('${r.id}')">详情</button></td>
+</tr>`;
+}).join('');
+}
+
+async function refreshCorrect(){
+const records=await dbGetAll(STORES.records);
+const filter=document.getElementById('correctFilter').value;
+let filtered=records;
+if(filter!=='all')filtered=filtered.filter(r=>r.status===filter);
+filtered=filtered.filter(r=>r.status!=='confirmed');
+const div=document.getElementById('correctList');
+if(filtered.length===0){
+div.innerHTML='<div class="empty-state"><p>所有记录均已确认，无需修正</p></div>';
+return;
+}
+div.innerHTML=filtered.map(r=>{
+const statusMap={confirmed:'已确认',pending:'待补',manual:'人工改过'};
+return`<div class="panel" style="margin-bottom:12px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<h3 style="margin:0;border:0;padding:0">商队 ${r.caravanId}</h3>
+<span class="status-badge status-${r.status}">${statusMap[r.status]}</span>
+</div>
+<div class="judgment-box judgment-${r.judgment==='match'?'match':'mismatch'}" style="margin-bottom:8px">
+<strong>自动判断：</strong>${r.judgment==='match'?'一致':'不一致'}<br>
+${r.reasons.map(reason=>`• ${reason}`).join('<br>')}
+</div>
+<div class="field">
+<label>修正说明（必填）</label>
+<textarea id="note_${r.id}" placeholder="填写修正原因...">${r.manualNote||''}</textarea>
+</div>
+<div class="field">
+<label>修正后状态</label>
+<select id="status_${r.id}">
+<option value="pending" ${r.status==='pending'?'selected':''}>待补</option>
+<option value="confirmed" ${r.status==='confirmed'?'selected':''}>已确认</option>
+<option value="manual" ${r.status==='manual'?'selected':''}>人工改过</option>
+</select>
+</div>
+<div class="btn-group">
+<button class="btn btn-primary btn-sm" onclick="saveCorrect('${r.id}')">保存修正</button>
+<button class="btn btn-secondary btn-sm" onclick="viewDetail('${r.id}')">查看详情</button>
+</div>
+</div>`;
+}).join('');
+}
+
+async function saveCorrect(id){
+const note=document.getElementById(`note_${id}`).value.trim();
+const status=document.getElementById(`status_${id}`).value;
+if(!note&&status==='manual'){
+showToast('人工改过必须填写修正说明','error');
+return;
+}
+const record=await dbGet(STORES.records,id);
+if(!record)return;
+record.status=status;
+record.manualNote=note;
+record.modifiedAt=Date.now();
+if(status==='manual'&&note){
+record.reasons.push(`[人工修正] ${note}`);
+record.nextStep=`已由策划手动修正：${note}。以修正后数据为准`;
+}
+await dbPut(STORES.records,record);
+addHistory('correct',`修正商队 ${record.caravanId} → ${status}${note?'：'+note:''}`);
+showToast('修正已保存','success');
+refreshCorrect();
+refreshReview();
+}
+
+async function viewDetail(id){
+const record=await dbGet(STORES.records,id);
+if(!record)return;
+const statusMap={confirmed:'已确认',pending:'待补',manual:'人工改过'};
+const html=`
+<div class="modal-overlay" onclick="if(event.target===this)this.remove()">
+<div class="modal">
+<h2>商队 ${record.caravanId} 详细记录</h2>
+<div class="detail-row">
+<div>
+<h4 style="color:var(--accent);margin:8px 0 4px">战报数据</h4>
+${record.battleReport?Object.entries(record.battleReport).map(([k,v])=>`<div class="field"><label>${k}</label><span>${v}</span></div>`).join(''):'<p style="color:var(--muted)">无战报数据</p>'}
+</div>
+<div>
+<h4 style="color:var(--accent);margin:8px 0 4px">结算数据</h4>
+${record.settlement?Object.entries(record.settlement).map(([k,v])=>`<div class="field"><label>${k}</label><span>${v}</span></div>`).join(''):'<p style="color:var(--muted)">无结算数据</p>'}
+</div>
+</div>
+<div class="judgment-box judgment-${record.judgment==='match'?'match':'mismatch'}" style="margin-top:12px">
+<strong>判断结果：</strong>${record.judgment==='match'?'✅ 一致':'⚠️ 不一致'}<br>
+<strong>判断理由：</strong><br>
+${record.reasons.map(reason=>`• ${reason}`).join('<br>')}<br>
+<strong>下一步：</strong>${record.nextStep}
+</div>
+<div style="margin-top:12px">
+<span class="status-badge status-${record.status}">${statusMap[record.status]}</span>
+${record.manualNote?`<p style="margin-top:8px;font-size:13px"><strong>修正说明：</strong>${record.manualNote}</p>`:''}
+</div>
+<div class="btn-group">
+<button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">关闭</button>
+${record.status==='pending'?`<button class="btn btn-primary" onclick="quickConfirm('${record.id}')">快速确认</button>`:''}
+</div>
+</div>
+</div>`;
+document.getElementById('modalContainer').innerHTML=html;
+}
+
+async function quickConfirm(id){
+const record=await dbGet(STORES.records,id);
+if(!record)return;
+record.status='confirmed';
+record.modifiedAt=Date.now();
+await dbPut(STORES.records,record);
+addHistory('confirm',`快速确认商队 ${record.caravanId}`);
+showToast('已确认','success');
+document.querySelector('.modal-overlay')?.remove();
+refreshReview();
+refreshCorrect();
+}
+
+async function refreshHistory(){
+const all=await dbGetAll(STORES.history);
+const filter=document.getElementById('historyFilter').value;
+let filtered=all.sort((a,b)=>b.timestamp-a.timestamp);
+if(filter!=='all')filtered=filtered.filter(h=>h.action===filter);
+const div=document.getElementById('historyTimeline');
+if(filtered.length===0){
+div.innerHTML='<div class="empty-state"><p>暂无操作记录</p></div>';
+return;
+}
+const actionLabels={import:'📥 导入',judge:'⚖️ 判断',correct:'✏️ 修正',confirm:'✅ 确认'};
+div.innerHTML=filtered.map(h=>`
+<div class="history-item">
+<div class="ht-time">${new Date(h.timestamp).toLocaleString('zh-CN')}</div>
+<div style="margin-top:4px">${actionLabels[h.action]||h.action} — ${h.detail}</div>
+</div>`).join('');
+}
+
+async function previewExport(){
+const records=await dbGetAll(STORES.records);
+const filter=document.getElementById('exportFilter').value;
+let filtered=records;
+if(filter!=='all')filtered=filtered.filter(r=>r.status===filter);
+const confirmed=filtered.filter(r=>r.status==='confirmed');
+const pending=filtered.filter(r=>r.status==='pending');
+const manual=filtered.filter(r=>r.status==='manual');
+const now=new Date().toLocaleString('zh-CN');
+const report={
+title:'沙漠商队护送 — 复盘报告',
+generatedAt:now,
+summary:{total:filtered.length,confirmed:confirmed.length,pending:pending.length,manual:manual.length},
+口径说明:{
+'已确认':'战报与结算数据一致，自动判定通过，无需人工介入',
+'待补':'战报与结算存在差异，需补充数据或确认原因后方可确认',
+'人工改过':'已由策划手动修正，修正原因记录在案，以修正后数据为准'
+},
+confirmed:confirmed.map(r=>({caravanId:r.caravanId,judgment:r.judgment,reasons:r.reasons,nextStep:r.nextStep})),
+pending:pending.map(r=>({caravanId:r.caravanId,judgment:r.judgment,reasons:r.reasons,nextStep:r.nextStep,details:r.details||[]})),
+manual:manual.map(r=>({caravanId:r.caravanId,judgment:r.judgment,reasons:r.reasons,nextStep:r.nextStep,manualNote:r.manualNote,modifiedAt:r.modifiedAt?new Date(r.modifiedAt).toLocaleString('zh-CN'):''}))
+};
+document.getElementById('exportPreview').textContent=JSON.stringify(report,null,2);
+}
+
+async function doExport(){
+const records=await dbGetAll(STORES.records);
+const filter=document.getElementById('exportFilter').value;
+let filtered=records;
+if(filter!=='all')filtered=filtered.filter(r=>r.status===filter);
+const confirmed=filtered.filter(r=>r.status==='confirmed');
+const pending=filtered.filter(r=>r.status==='pending');
+const manual=filtered.filter(r=>r.status==='manual');
+const now=new Date().toLocaleString('zh-CN');
+const report={
+title:'沙漠商队护送 — 复盘报告',
+generatedAt:now,
+summary:{total:filtered.length,confirmed:confirmed.length,pending:pending.length,manual:manual.length},
+口径说明:{
+'已确认':'战报与结算数据一致，自动判定通过，无需人工介入',
+'待补':'战报与结算存在差异，需补充数据或确认原因后方可确认',
+'人工改过':'已由策划手动修正，修正原因记录在案，以修正后数据为准'
+},
+confirmed:confirmed.map(r=>({caravanId:r.caravanId,judgment:r.judgment,reasons:r.reasons,nextStep:r.nextStep})),
+pending:pending.map(r=>({caravanId:r.caravanId,judgment:r.judgment,reasons:r.reasons,nextStep:r.nextStep,details:r.details||[]})),
+manual:manual.map(r=>({caravanId:r.caravanId,judgment:r.judgment,reasons:r.reasons,nextStep:r.nextStep,manualNote:r.manualNote,modifiedAt:r.modifiedAt?new Date(r.modifiedAt).toLocaleString('zh-CN'):''}))
+};
+const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;
+a.download=`沙漠商队护送_复盘报告_${new Date().toISOString().slice(0,10)}.json`;
+a.click();
+URL.revokeObjectURL(url);
+addHistory('export',`导出复盘报告 ${filtered.length} 条记录`);
+showToast('报告已导出','success');
+}
+
+async function loadTerrainRules(){
+const rules=await dbGetAll(STORES.terrainRules);
+if(rules.length>0){
+terrainRules=TERRAIN_DEFAULTS.map(d=>{
+const imported=rules.find(t=>t.type===d.type);
+return imported?{...d,...imported}:d;
+});
+}
+}
+
+async function updateImportedList(){
+const records=await dbGetAll(STORES.records);
+const div=document.getElementById('importedList')||document.getElementById('importedDataList');
+const caravans=[...new Set(records.map(r=>r.caravanId))];
+if(caravans.length===0){
+div.innerHTML='<p style="color:var(--muted);font-size:13px">暂无数据</p>';
+return;
+}
+const confirmed=records.filter(r=>r.status==='confirmed').length;
+const pending=records.filter(r=>r.status==='pending').length;
+const manual=records.filter(r=>r.status==='manual').length;
+div.innerHTML=`
+<p style="font-size:13px">已导入 <strong>${caravans.length}</strong> 支商队，<strong>${records.length}</strong> 条判断记录</p>
+<p style="font-size:12px;color:var(--muted);margin-top:4px">
+<span style="color:var(--confirmed)">已确认 ${confirmed}</span> · 
+<span style="color:var(--pending)">待补 ${pending}</span> · 
+<span style="color:var(--manual)">人工改过 ${manual}</span>
+</p>
+<div class="btn-group" style="margin-top:8px">
+<button class="btn btn-danger btn-sm" onclick="clearAllData()">清空所有数据</button>
+</div>`;
+}
+
+async function clearAllData(){
+if(!confirm('确定清空所有数据？此操作不可恢复。'))return;
+await dbClear(STORES.records);
+await dbClear(STORES.history);
+caravanPaths=[];
+selectedCell=null;
+renderMap();
+refreshAll();
+showToast('数据已清空','info');
+}
+
+function refreshAll(){
+refreshReview();
+refreshCorrect();
+refreshHistory();
+updateImportedList();
+updateCaravanStatus();
+updateBoundaryInfo();
+}
+
+function updateCaravanStatus(){
+const div=document.getElementById('caravanStatus');
+if(caravanPaths.length===0){
+div.innerHTML='<p style="color:var(--muted);font-size:13px">暂无商队数据</p>';
+return;
+}
+div.innerHTML=caravanPaths.map((path,i)=>{
+const start=path[0];
+const end=path[path.length-1];
+return`<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)">
+<p style="color:var(--accent)">商队 ${i+1}</p>
+<p>起点:(${start.col},${start.row}) → 终点:(${end.col},${end.row})</p>
+<p>经过 ${path.length} 格</p>
+</div>`;
+}).join('');
+}
+
+function updateBoundaryInfo(){
+const div=document.getElementById('boundaryInfo');
+const crossings=[];
+caravanPaths.forEach((path,ci)=>{
+path.forEach(pt=>{
+if(mapData[pt.row]&&mapData[pt.row][pt.col]&&mapData[pt.row][pt.col].type==='border'){
+crossings.push({caravan:ci+1,col:pt.col,row:pt.row,step:pt.step});
+}
+});
+});
+if(crossings.length===0){
+div.innerHTML='<p style="color:var(--muted);font-size:13px">导入数据后显示穿越记录</p>';
+return;
+}
+div.innerHTML=crossings.map(c=>
+`<p style="font-size:11px;color:var(--accent)">商队${c.caravan} @(${c.col},${c.row}) 步骤${c.step}</p>`
+).join('');
+}
+
+function setupTabs(){
+document.querySelectorAll('#mainNav button').forEach(btn=>{
+btn.addEventListener('click',()=>{
+document.querySelectorAll('#mainNav button').forEach(b=>b.classList.remove('active'));
+document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+btn.classList.add('active');
+document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+if(btn.dataset.tab==='map')renderMap();
+if(btn.dataset.tab==='review')refreshReview();
+if(btn.dataset.tab==='correct')refreshCorrect();
+if(btn.dataset.tab==='history')refreshHistory();
+});
+});
+}
+
+function handleResize(){
+renderMap();
+}
+
+async function init(){
+await openDB();
+await loadTerrainRules();
+generateMap();
+renderTerrainLegend();
+setupCanvasClick();
+setupImport();
+setupTabs();
+renderMap();
+refreshAll();
+window.addEventListener('resize',handleResize);
+}
+
+init().catch(e=>console.error('Init failed:',e));
+</script>
+</body>
+</html>
