@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>蒸汽工厂战棋</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #1a1a2e; font-family: 'Microsoft YaHei', sans-serif; }
+    #app { width: 100%; height: 100%; display: flex; }
+    #game-container { flex: 1; min-width: 0; }
+    #side-panel { width: 420px; height: 100%; background: #16213e; color: #e0e0e0; overflow-y: auto; border-left: 2px solid #0f3460; display: flex; flex-direction: column; }
+    .panel-tab-bar { display: flex; background: #0f3460; flex-shrink: 0; }
+    .panel-tab { flex: 1; padding: 10px 4px; text-align: center; cursor: pointer; font-size: 13px; border: none; background: transparent; color: #a0a0c0; transition: all .2s; }
+    .panel-tab:hover { background: #1a1a4e; color: #fff; }
+    .panel-tab.active { background: #533483; color: #fff; font-weight: bold; }
+    .panel-content { flex: 1; overflow-y: auto; padding: 12px; }
+    .panel-section { display: none; }
+    .panel-section.active { display: block; }
+    .section-title { font-size: 15px; font-weight: bold; color: #e94560; margin-bottom: 8px; border-bottom: 1px solid #533483; padding-bottom: 4px; }
+    .btn { padding: 7px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; margin: 3px; transition: all .2s; }
+    .btn-primary { background: #533483; color: #fff; }
+    .btn-primary:hover { background: #e94560; }
+    .btn-danger { background: #c0392b; color: #fff; }
+    .btn-danger:hover { background: #e74c3c; }
+    .btn-success { background: #27ae60; color: #fff; }
+    .btn-success:hover { background: #2ecc71; }
+    .btn-warning { background: #f39c12; color: #fff; }
+    .btn-warning:hover { background: #f1c40f; color: #333; }
+    .field-label { font-size: 12px; color: #a0a0c0; margin-bottom: 2px; }
+    .field-value { font-size: 14px; color: #e0e0e0; margin-bottom: 8px; padding: 4px 8px; background: #1a1a2e; border-radius: 3px; border: 1px solid #0f3460; }
+    textarea, input[type="text"], input[type="number"], select { background: #1a1a2e; color: #e0e0e0; border: 1px solid #0f3460; border-radius: 4px; padding: 6px 10px; font-size: 13px; width: 100%; margin-bottom: 8px; }
+    textarea { min-height: 120px; resize: vertical; font-family: 'Consolas', monospace; }
+    .reason-box { background: #0f3460; border-left: 3px solid #e94560; padding: 8px 12px; margin: 6px 0; border-radius: 0 4px 4px 0; font-size: 13px; line-height: 1.6; }
+    .reason-box .reason-label { color: #e94560; font-weight: bold; }
+    .reason-box .next-step { color: #2ecc71; font-weight: bold; margin-top: 4px; }
+    .history-item { background: #1a1a2e; border: 1px solid #0f3460; border-radius: 4px; padding: 8px; margin-bottom: 6px; cursor: pointer; transition: all .2s; }
+    .history-item:hover { border-color: #533483; background: #1a1a4e; }
+    .history-item .hist-id { color: #e94560; font-weight: bold; }
+    .history-item .hist-time { color: #a0a0c0; font-size: 11px; }
+    .history-item .hist-summary { color: #e0e0e0; font-size: 12px; margin-top: 4px; }
+    .batch-log { background: #0a0a1e; border: 1px solid #0f3460; border-radius: 4px; padding: 8px; max-height: 300px; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 12px; color: #a0a0c0; }
+    .batch-log .log-ok { color: #2ecc71; }
+    .batch-log .log-err { color: #e74c3c; }
+    .batch-log .log-warn { color: #f39c12; }
+    .filter-row { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; align-items: center; }
+    .unit-card { background: #1a1a2e; border: 1px solid #0f3460; border-radius: 6px; padding: 8px; margin-bottom: 6px; }
+    .unit-card .unit-name { font-weight: bold; color: #e94560; }
+    .unit-card .unit-stat { font-size: 12px; color: #a0a0c0; }
+    .turn-order-item { display: flex; align-items: center; gap: 8px; padding: 4px 8px; margin-bottom: 2px; border-radius: 4px; background: #1a1a2e; }
+    .turn-order-item .order-num { color: #e94560; font-weight: bold; min-width: 24px; }
+    .turn-order-item .order-name { color: #e0e0e0; }
+    .turn-order-item .order-reason { color: #a0a0c0; font-size: 11px; flex: 1; text-align: right; }
+    .status-bar { padding: 8px 12px; background: #0f3460; font-size: 12px; color: #a0a0c0; flex-shrink: 0; border-top: 1px solid #533483; }
+    .export-format-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="game-container"></div>
+    <div id="side-panel">
+      <div class="panel-tab-bar">
+        <button class="panel-tab active" data-panel="import">导入</button>
+        <button class="panel-tab" data-panel="review">复核</button>
+        <button class="panel-tab" data-panel="correct">修正</button>
+        <button class="panel-tab" data-panel="history">历史</button>
+        <button class="panel-tab" data-panel="export">导出</button>
+      </div>
+      <div class="panel-content">
+        <div id="panel-import" class="panel-section active"></div>
+        <div id="panel-review" class="panel-section"></div>
+        <div id="panel-correct" class="panel-section"></div>
+        <div id="panel-history" class="panel-section"></div>
+        <div id="panel-export" class="panel-section"></div>
+      </div>
+      <div class="status-bar" id="status-bar">就绪</div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
