@@ -1,0 +1,6 @@
+api_name,api_path,app_key,app_name,permission_level,daily_quota,monthly_quota,effective_date,expiry_date
+用户查询API,/api/user/query,APP001,电商平台,standard,1000,30000,2024-01-01,2024-12-31
+订单创建API,/api/order/create,APP001,电商平台,premium,5000,150000,2024-01-01,2024-12-31
+商品列表API,/api/product/list,APP002,商家后台,standard,2000,60000,2024-02-01,2024-08-31
+支付回调API,/api/pay/callback,APP003,支付网关,admin,10000,300000,2024-01-01,2024-06-30
+用户查询API,/api/user/query,APP002,商家后台,basic,500,15000,2024-03-01,2024-09-30

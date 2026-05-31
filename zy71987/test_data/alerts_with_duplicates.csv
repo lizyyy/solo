@@ -1,0 +1,8 @@
+alert_id,api_name,app_key,alert_type,alert_level,threshold_value,actual_value,alert_time
+ALT001,用户查询API,APP001,quota_exceeded,warning,800,850,2024-03-20T10:30:00
+ALT002,订单创建API,APP001,error_rate,critical,5.0,7.2,2024-03-20T11:15:00
+ALT001,用户查询API,APP001,quota_exceeded,warning,800,850,2024-03-20T10:30:00
+ALT003,商品列表API,APP002,latency,info,500,620,2024-03-20T09:00:00
+ALT004,支付回调API,APP003,quota_exceeded,critical,9000,9500,2024-03-20T14:20:00
+ALT005,不存在的API,APP999,unknown,warning,100,150,2024-03-20T15:00:00
+ALT002,订单创建API,APP001,error_rate,critical,5.0,7.2,2024-03-20T11:15:00
