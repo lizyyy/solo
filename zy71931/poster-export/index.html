@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海报多尺寸导出</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header id="app-header">
+            <h1>海报多尺寸导出</h1>
+            <div id="project-info">
+                <span id="current-project-name">未选择项目</span>
+                <button id="btn-new-project">新建项目</button>
+            </div>
+            <nav id="main-nav">
+                <button class="nav-btn active" data-scene="import">导入</button>
+                <button class="nav-btn" data-scene="review">复核</button>
+                <button class="nav-btn" data-scene="correction">修正</button>
+                <button class="nav-btn" data-scene="history">历史</button>
+                <button class="nav-btn" data-scene="export">导出</button>
+            </nav>
+        </header>
+
+        <main id="app-main">
+            <div id="phaser-container"></div>
+
+            <aside id="side-panel">
+                <section id="panel-import" class="panel active">
+                    <h2>导入素材</h2>
+                    <div class="form-group">
+                        <label>海报素材</label>
+                        <input type="file" id="input-poster" accept="image/*" multiple>
+                        <div id="poster-preview-list" class="file-list"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>色卡文件</label>
+                        <input type="file" id="input-colorcard" accept="image/*,.json,.csv">
+                        <div id="colorcard-preview-list" class="file-list"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>授权文件（图片或PDF截图）</label>
+                        <input type="file" id="input-auth" accept="image/*,.pdf">
+                        <div id="auth-preview-list" class="file-list"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>授权信息</label>
+                        <div class="inline-fields">
+                            <label>授权方<input type="text" id="auth-holder" placeholder="授权方名称"></label>
+                            <label>开始日期<input type="date" id="auth-start"></label>
+                            <label>截止日期<input type="date" id="auth-end"></label>
+                            <label>授权范围<input type="text" id="auth-scope" placeholder="如：线上投放、线下印刷"></label>
+                        </div>
+                    </div>
+                    <button id="btn-import-confirm" class="btn-primary">确认导入</button>
+                    <div id="import-status" class="status-area"></div>
+                </section>
+
+                <section id="panel-review" class="panel">
+                    <h2>复核检查</h2>
+                    <div id="review-auth-section">
+                        <h3>授权状态</h3>
+                        <div id="auth-judgment" class="judgment-area"></div>
+                    </div>
+                    <div id="review-colorcard-section">
+                        <h3>色卡一致性</h3>
+                        <div id="colorcard-judgment" class="judgment-area"></div>
+                    </div>
+                    <div id="review-poster-section">
+                        <h3>海报规格</h3>
+                        <div id="poster-judgment" class="judgment-area"></div>
+                    </div>
+                    <button id="btn-review-run" class="btn-primary">执行复核</button>
+                    <div id="review-summary" class="status-area"></div>
+                </section>
+
+                <section id="panel-correction" class="panel">
+                    <h2>修正</h2>
+                    <div id="correction-issues"></div>
+                    <div id="correction-form"></div>
+                    <button id="btn-correction-apply" class="btn-primary">应用修正</button>
+                    <div id="correction-status" class="status-area"></div>
+                </section>
+
+                <section id="panel-history" class="panel">
+                    <h2>历史记录</h2>
+                    <div id="history-filter">
+                        <select id="history-type-filter">
+                            <option value="all">全部</option>
+                            <option value="import">导入</option>
+                            <option value="review">复核</option>
+                            <option value="correction">修正</option>
+                            <option value="colorcard_change">色卡变更</option>
+                            <option value="export">导出</option>
+                        </select>
+                    </div>
+                    <div id="history-list" class="timeline"></div>
+                </section>
+
+                <section id="panel-export" class="panel">
+                    <h2>多尺寸导出</h2>
+                    <div class="form-group">
+                        <label>选择尺寸</label>
+                        <div id="export-size-options">
+                            <label class="checkbox-label"><input type="checkbox" value="1080x1920" checked> 竖版海报 1080×1920</label>
+                            <label class="checkbox-label"><input type="checkbox" value="1920x1080" checked> 横版海报 1920×1080</label>
+                            <label class="checkbox-label"><input type="checkbox" value="800x800"> 方形 800×800</label>
+                            <label class="checkbox-label"><input type="checkbox" value="1200x628"> 社交封面 1200×628</label>
+                            <label class="checkbox-label"><input type="checkbox" value="750x1334"> 手机壁纸 750×1334</label>
+                            <label class="checkbox-label"><input type="checkbox" value="custom"> 自定义尺寸</label>
+                        </div>
+                        <div id="custom-size-inputs" class="inline-fields" style="display:none">
+                            <label>宽<input type="number" id="custom-width" value="1080" min="100"></label>
+                            <label>高<input type="number" id="custom-height" value="1920" min="100"></label>
+                        </div>
+                    </div>
+                    <button id="btn-export-run" class="btn-primary">执行导出</button>
+                    <div id="export-progress" class="status-area"></div>
+                    <div id="export-results"></div>
+                    <div id="delivery-note-section" style="display:none">
+                        <h3>交付说明</h3>
+                        <div id="delivery-note-content" class="delivery-note"></div>
+                        <button id="btn-copy-note" class="btn-secondary">复制交付说明</button>
+                    </div>
+                </section>
+            </aside>
+        </main>
+
+        <div id="colorcard-change-alert" class="modal" style="display:none">
+            <div class="modal-content">
+                <h2>色卡变更提醒</h2>
+                <div id="colorcard-change-detail"></div>
+                <div class="modal-actions">
+                    <button id="btn-accept-change" class="btn-primary">确认并保留变更记录</button>
+                    <button id="btn-reject-change" class="btn-secondary">退回旧版本</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="new-project-modal" class="modal" style="display:none">
+            <div class="modal-content">
+                <h2>新建项目</h2>
+                <div class="form-group">
+                    <label>项目名称<input type="text" id="new-project-name" placeholder="输入项目名称"></label>
+                </div>
+                <div class="modal-actions">
+                    <button id="btn-create-project" class="btn-primary">创建</button>
+                    <button id="btn-cancel-project" class="btn-secondary">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
