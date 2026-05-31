@@ -1,0 +1,115 @@
+/** @type {import('tailwindcss').Config} */
+
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    container: {
+      center: true,
+    },
+    extend: {
+      colors: {
+        primary: {
+          50: "#f0f5fa",
+          100: "#d9e4f1",
+          200: "#b3c9e3",
+          300: "#80a6cf",
+          400: "#4d80b8",
+          500: "#2d5f9e",
+          600: "#1a4a85",
+          700: "#1a365d",
+          800: "#152a47",
+          900: "#0f1f33",
+        },
+        accent: {
+          50: "#fdf9ed",
+          100: "#faf0cf",
+          200: "#f4df95",
+          300: "#eac95e",
+          400: "#dfb032",
+          500: "#d4af37",
+          600: "#b89422",
+          700: "#93731c",
+          800: "#765b1c",
+          900: "#644c1d",
+        },
+        danger: {
+          50: "#fef2f2",
+          100: "#fee2e2",
+          200: "#fecaca",
+          300: "#fca5a5",
+          400: "#f87171",
+          500: "#ef4444",
+          600: "#e53e3e",
+          700: "#dc2626",
+          800: "#b91c1c",
+          900: "#991b1b",
+        },
+        success: {
+          50: "#f0fdf4",
+          100: "#dcfce7",
+          200: "#bbf7d0",
+          300: "#86efac",
+          400: "#4ade80",
+          500: "#22c55e",
+          600: "#16a34a",
+          700: "#15803d",
+          800: "#166534",
+          900: "#14532d",
+        },
+        warning: {
+          50: "#fffbeb",
+          100: "#fef3c7",
+          200: "#fde68a",
+          300: "#fcd34d",
+          400: "#fbbf24",
+          500: "#f59e0b",
+          600: "#d97706",
+          700: "#b45309",
+          800: "#92400e",
+          900: "#78350f",
+        },
+      },
+      fontFamily: {
+        serif: ['"Source Han Serif SC"', '"Noto Serif SC"', "serif"],
+        sans: ['"Source Han Sans SC"', '"Noto Sans SC"', "system-ui", "sans-serif"],
+      },
+      animation: {
+        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "fade-in": "fadeIn 0.5s ease-out",
+        "slide-up": "slideUp 0.4s ease-out",
+        "slide-in-right": "slideInRight 0.4s ease-out",
+        "slide-in-left": "slideInLeft 0.4s ease-out",
+        "scale-in": "scaleIn 0.3s ease-out",
+        "path-draw": "pathDraw 1s ease-out forwards",
+      },
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        slideUp: {
+          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        slideInRight: {
+          "0%": { opacity: "0", transform: "translateX(20px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        slideInLeft: {
+          "0%": { opacity: "0", transform: "translateX(-20px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        scaleIn: {
+          "0%": { opacity: "0", transform: "scale(0.95)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        pathDraw: {
+          "0%": { strokeDashoffset: "1000" },
+          "100%": { strokeDashoffset: "0" },
+        },
+      },
+    },
+  },
+  plugins: [],
+};
