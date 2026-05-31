@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>视唱练耳打卡</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div id="app">
+  <header class="app-header">
+    <h1>视唱练耳打卡</h1>
+    <nav class="nav-tabs">
+      <button class="tab active" data-tab="dashboard">总览</button>
+      <button class="tab" data-tab="import">导入</button>
+      <button class="tab" data-tab="review">复核</button>
+      <button class="tab" data-tab="history">变更历史</button>
+      <button class="tab" data-tab="report">报告 & 导出</button>
+    </nav>
+  </header>
+
+  <main class="tab-content">
+    <section id="dashboard" class="panel active">
+      <div class="stats-row" id="stats-row"></div>
+      <div class="anomalies-section" id="anomalies-section"></div>
+      <div class="scores-overview" id="scores-overview"></div>
+    </section>
+
+    <section id="import" class="panel">
+      <div class="card-grid">
+        <div class="card">
+          <h3>上传曲谱PDF</h3>
+          <form id="score-form" enctype="multipart/form-data">
+            <div class="form-group">
+              <label>曲名</label>
+              <input type="text" name="title" required placeholder="例：茉莉花">
+            </div>
+            <div class="form-group">
+              <label>声部</label>
+              <input type="text" name="voice_part" required placeholder="例：女高音">
+            </div>
+            <div class="form-group">
+              <label>上传人</label>
+              <input type="text" name="uploaded_by" placeholder="选填">
+            </div>
+            <div class="form-group">
+              <label>PDF文件</label>
+              <input type="file" name="file" accept=".pdf" required>
+            </div>
+            <button type="submit" class="btn btn-primary">上传曲谱</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>新建打卡记录</h3>
+          <form id="checkin-form">
+            <div class="form-group">
+              <label>曲谱</label>
+              <select name="score_id" id="score-select" required>
+                <option value="">请选择曲谱</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>学生姓名</label>
+              <input type="text" name="student_name" required>
+            </div>
+            <div class="form-group">
+              <label>声部</label>
+              <input type="text" name="voice_part" required>
+            </div>
+            <div class="form-group">
+              <label>打卡日期</label>
+              <input type="date" name="checkin_date" required>
+            </div>
+            <div class="form-group">
+              <label>备注</label>
+              <textarea name="remark" rows="2" placeholder="选填"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">创建打卡</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>上传排练录音</h3>
+          <form id="recording-form" enctype="multipart/form-data">
+            <div class="form-group">
+              <label>关联打卡记录ID</label>
+              <input type="number" name="checkin_id" placeholder="选填，可直接关联">
+            </div>
+            <div class="form-group">
+              <label>上传人</label>
+              <input type="text" name="operator" placeholder="选填">
+            </div>
+            <div class="form-group">
+              <label>录音文件</label>
+              <input type="file" name="file" accept=".mp3,.wav,.ogg,.m4a,.flac" required>
+            </div>
+            <button type="submit" class="btn btn-primary">上传录音</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>添加排练小结</h3>
+          <form id="summary-form">
+            <div class="form-group">
+              <label>曲谱</label>
+              <select name="score_id" id="summary-score-select" required>
+                <option value="">请选择曲谱</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>小结日期</label>
+              <input type="date" name="summary_date" required>
+            </div>
+            <div class="form-group">
+              <label>小结内容</label>
+              <textarea name="content" rows="3" required placeholder="记录排练中的关键发现..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>记录人</label>
+              <input type="text" name="author" placeholder="选填">
+            </div>
+            <button type="submit" class="btn btn-primary">保存小结</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1.5rem">
+        <h3>已上传曲谱</h3>
+        <table class="data-table" id="scores-table">
+          <thead><tr><th>ID</th><th>曲名</th><th>声部</th><th>PDF</th><th>上传时间</th><th>上传人</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="review" class="panel">
+      <div class="filter-bar">
+        <select id="filter-score"><option value="">全部曲谱</option></select>
+        <select id="filter-status">
+          <option value="">全部状态</option>
+          <option value="pending">待确认</option>
+          <option value="confirmed">已确认</option>
+        </select>
+        <input type="date" id="filter-date" placeholder="筛选日期">
+        <button class="btn" onclick="loadCheckins()">查询</button>
+      </div>
+      <table class="data-table" id="checkins-table">
+        <thead>
+          <tr>
+            <th>ID</th><th>曲谱</th><th>学生</th><th>声部</th>
+            <th>日期</th><th>录音</th><th>状态</th><th>确认人</th>
+            <th>备注</th><th>证据链</th><th>操作</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="history" class="panel">
+      <div class="filter-bar">
+        <select id="hist-type">
+          <option value="">全部类型</option>
+          <option value="checkin">打卡</option>
+          <option value="score">曲谱</option>
+        </select>
+        <input type="text" id="hist-operator" placeholder="操作人">
+        <button class="btn" onclick="loadHistory()">查询</button>
+      </div>
+      <table class="data-table" id="history-table">
+        <thead><tr><th>时间</th><th>类型</th><th>对象ID</th><th>字段</th><th>旧值</th><th>新值</th><th>原因</th><th>操作人</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="report" class="panel">
+      <div class="filter-bar">
+        <select id="report-score"><option value="">全部曲谱</option></select>
+        <input type="date" id="report-start" placeholder="起始日期">
+        <input type="date" id="report-end" placeholder="截止日期">
+        <button class="btn btn-primary" onclick="loadReport()">生成报告</button>
+        <button class="btn" onclick="exportReport()">导出CSV</button>
+      </div>
+      <div id="report-content"></div>
+    </section>
+  </main>
+
+  <div id="evidence-modal" class="modal" style="display:none">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>证据链详情</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="evidence-body"></div>
+    </div>
+  </div>
+
+  <div id="edit-modal" class="modal" style="display:none">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>修正打卡记录</h3>
+        <button class="modal-close" onclick="closeEditModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="edit-body"></div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

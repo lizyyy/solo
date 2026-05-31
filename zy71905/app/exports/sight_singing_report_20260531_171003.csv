@@ -1,0 +1,11 @@
+﻿打卡ID,学生姓名,声部,打卡日期,曲谱PDF链接,录音链接,录音状态,人工确认,确认人,排练小结数,证据链链接
+8,王五,女中音,2026-05-22,/api/scores/3/pdf,/api/recordings/wangwu_caiyun.mp3,有录音,否,,1,/api/checkins/8/evidence
+9,孙七,女中音,2026-05-22,/api/scores/3/pdf,,无录音,否,,1,/api/checkins/9/evidence
+10,周八,女高音,2026-05-22,/api/scores/3/pdf,,无录音,否,,1,/api/checkins/10/evidence
+4,李四,男低音,2026-05-21,/api/scores/2/pdf,/api/recordings/lisi_chunjiang.wav,有录音,是,王老师,1,/api/checkins/4/evidence
+5,王五,男低音,2026-05-21,/api/scores/2/pdf,,无录音,否,,1,/api/checkins/5/evidence
+6,赵六,男低音,2026-05-21,/api/scores/2/pdf,,录音文件丢失,否,,1,/api/checkins/6/evidence
+7,赵六,男低音,2026-05-21,/api/scores/2/pdf,,录音文件丢失,是,王老师,1,/api/checkins/7/evidence
+1,张三,女高音,2026-05-20,/api/scores/1/pdf,/api/recordings/zhangsan_molihua.mp3,有录音,是,王老师,1,/api/checkins/1/evidence
+2,李四,女高音,2026-05-20,/api/scores/1/pdf,,无录音,否,,1,/api/checkins/2/evidence
+3,张三,女高音,2026-05-20,/api/scores/1/pdf,/api/recordings/zhangsan_molihua.mp3,有录音,否,,1,/api/checkins/3/evidence
