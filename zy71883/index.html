@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电阻温漂记录 - 证据链追踪系统</title>
+<style>
+:root{--bg:#0f1117;--surface:#1a1d27;--surface2:#222633;--border:#2e3347;--text:#e4e7ef;--text2:#8b90a5;--accent:#5b8af5;--accent2:#3d6cdb;--supplement:#f0a030;--supplement-bg:rgba(240,160,48,0.12);--correction:#e05252;--correction-bg:rgba(224,82,82,0.12);--original:#3ec97a;--original-bg:rgba(62,201,122,0.12);--photo:#a78bfa;--photo-bg:rgba(167,139,250,0.12);--opinion:#60a5fa;--opinion-bg:rgba(96,165,250,0.12);--sensor:#f472b6;--sensor-bg:rgba(244,114,182,0.12);--confirm:#34d399;--confirm-bg:rgba(52,211,153,0.12);--radius:8px;--shadow:0 2px 12px rgba(0,0,0,0.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.app-header h1{font-size:18px;font-weight:600;display:flex;align-items:center;gap:10px}
+.app-header h1 .icon{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),var(--photo));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.header-stats{display:flex;gap:16px;font-size:13px;color:var(--text2);flex-wrap:wrap}
+.header-stats span{display:flex;align-items:center;gap:5px}
+.stat-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.main-layout{display:grid;grid-template-columns:380px 1fr;height:calc(100vh - 61px)}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-header{padding:16px;border-bottom:1px solid var(--border)}
+.filter-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.filter-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.filter-btn:hover{border-color:var(--accent);color:var(--text)}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.search-box{width:100%;padding:8px 12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;outline:none;transition:border-color .2s}
+.search-box:focus{border-color:var(--accent)}
+.record-list{flex:1;overflow-y:auto;padding:8px}
+.record-card{padding:14px;border-radius:var(--radius);border:1px solid transparent;cursor:pointer;transition:all .2s;margin-bottom:4px}
+.record-card:hover{background:var(--surface2)}
+.record-card.active{background:var(--surface2);border-color:var(--accent)}
+.record-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.record-id{font-size:14px;font-weight:600;color:var(--text)}
+.record-date{font-size:11px;color:var(--text2)}
+.record-conclusion{font-size:13px;color:var(--text);margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.record-badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;white-space:nowrap}
+.badge-supplement{background:var(--supplement-bg);color:var(--supplement)}
+.badge-correction{background:var(--correction-bg);color:var(--correction)}
+.badge-original{background:var(--original-bg);color:var(--original)}
+.badge-photo{background:var(--photo-bg);color:var(--photo)}
+.badge-opinion{background:var(--opinion-bg);color:var(--opinion)}
+.badge-sensor{background:var(--sensor-bg);color:var(--sensor)}
+.badge-confirm{background:var(--confirm-bg);color:var(--confirm)}
+.detail-panel{overflow-y:auto;padding:24px}
+.detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text2);font-size:14px;gap:12px}
+.detail-empty .icon-large{font-size:48px;opacity:.3}
+.detail-title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.detail-title{font-size:20px;font-weight:700}
+.detail-meta{display:flex;gap:20px;font-size:13px;color:var(--text2);margin-bottom:24px;flex-wrap:wrap}
+.detail-meta span{display:flex;align-items:center;gap:5px}
+.section{margin-bottom:28px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.section-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.section-count{font-size:11px;background:var(--surface2);padding:2px 8px;border-radius:10px;color:var(--text2)}
+.conclusion-timeline{position:relative;padding-left:24px}
+.conclusion-timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{position:relative;padding:12px 16px;background:var(--surface2);border-radius:var(--radius);margin-bottom:8px;border:1px solid var(--border);cursor:pointer;transition:all .2s}
+.timeline-item:hover{border-color:var(--accent)}
+.timeline-item::before{content:'';position:absolute;left:-20px;top:18px;width:10px;height:10px;border-radius:50%;border:2px solid var(--border);background:var(--surface)}
+.timeline-item.type-original::before{border-color:var(--original);background:var(--original)}
+.timeline-item.type-supplement::before{border-color:var(--supplement);background:var(--supplement)}
+.timeline-item.type-correction::before{border-color:var(--correction);background:var(--correction)}
+.timeline-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.timeline-item-label{font-size:12px;font-weight:600}
+.timeline-item-time{font-size:11px;color:var(--text2)}
+.timeline-item-conclusion{font-size:13px;margin-bottom:6px}
+.timeline-item-author{font-size:11px;color:var(--text2)}
+.timeline-item-reason{font-size:12px;color:var(--text2);margin-top:4px;padding-top:4px;border-top:1px dashed var(--border)}
+.evidence-links{margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.evidence-links-label{font-size:11px;color:var(--text2);margin-bottom:6px}
+.evidence-link{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;cursor:pointer;margin:2px 4px 2px 0;transition:all .2s;border:1px solid transparent}
+.evidence-link:hover{transform:translateY(-1px)}
+.evidence-link.link-photo{background:var(--photo-bg);color:var(--photo);border-color:rgba(167,139,250,0.2)}
+.evidence-link.link-opinion{background:var(--opinion-bg);color:var(--opinion);border-color:rgba(96,165,250,0.2)}
+.evidence-link.link-sensor{background:var(--sensor-bg);color:var(--sensor);border-color:rgba(244,114,182,0.2)}
+.evidence-link.link-confirm{background:var(--confirm-bg);color:var(--confirm);border-color:rgba(52,211,153,0.2)}
+.evidence-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;transition:all .2s;cursor:pointer}
+.evidence-card:hover{border-color:var(--accent)}
+.evidence-card.highlighted{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 16px rgba(91,138,245,0.15)}
+.evidence-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px}
+.evidence-card-id{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.evidence-card-type-icon{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px}
+.evidence-card-type-icon.icon-photo{background:var(--photo-bg);color:var(--photo)}
+.evidence-card-type-icon.icon-opinion{background:var(--opinion-bg);color:var(--opinion)}
+.evidence-card-type-icon.icon-sensor{background:var(--sensor-bg);color:var(--sensor)}
+.evidence-card-type-icon.icon-confirm{background:var(--confirm-bg);color:var(--confirm)}
+.evidence-card-time{font-size:11px;color:var(--text2);white-space:nowrap}
+.evidence-card-body{font-size:13px;color:var(--text);margin-bottom:8px}
+.evidence-card-footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text2);flex-wrap:wrap;gap:4px}
+.evidence-card-backlinks{display:flex;gap:4px;flex-wrap:wrap}
+.backlink-tag{padding:2px 6px;border-radius:8px;font-size:10px;cursor:pointer;transition:all .15s}
+.backlink-tag:hover{transform:scale(1.05)}
+.backlink-tag.bl-supplement{background:var(--supplement-bg);color:var(--supplement)}
+.backlink-tag.bl-correction{background:var(--correction-bg);color:var(--correction)}
+.backlink-tag.bl-original{background:var(--original-bg);color:var(--original)}
+.sensor-edit-marker{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:8px;font-size:11px;background:var(--correction-bg);color:var(--correction);font-weight:500}
+.sensor-original{text-decoration:line-through;color:var(--text2);font-size:12px}
+.sensor-corrected{color:var(--correction);font-weight:600}
+.photo-placeholder{width:100%;height:120px;background:linear-gradient(135deg,var(--surface),var(--surface2));border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px;margin-bottom:8px;border:1px dashed var(--border)}
+.evidence-trace-panel{position:fixed;right:-420px;top:61px;width:400px;height:calc(100vh - 61px);background:var(--surface);border-left:1px solid var(--border);z-index:90;transition:right .3s ease;display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,0.3)}
+.evidence-trace-panel.open{right:0}
+.trace-panel-header{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.trace-panel-title{font-size:15px;font-weight:600}
+.trace-panel-close{width:28px;height:28px;border-radius:6px;border:none;background:var(--surface2);color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.trace-panel-close:hover{background:var(--correction-bg);color:var(--correction)}
+.trace-panel-body{flex:1;overflow-y:auto;padding:16px}
+.trace-chain{position:relative}
+.trace-node{display:flex;gap:12px;margin-bottom:4px;position:relative}
+.trace-connector{width:24px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.trace-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--border);background:var(--surface);flex-shrink:0}
+.trace-dot.dot-photo{border-color:var(--photo);background:var(--photo)}
+.trace-dot.dot-opinion{border-color:var(--opinion);background:var(--opinion)}
+.trace-dot.dot-sensor{border-color:var(--sensor);background:var(--sensor)}
+.trace-dot.dot-confirm{border-color:var(--confirm);background:var(--confirm)}
+.trace-dot.dot-conclusion{border-color:var(--accent);background:var(--accent)}
+.trace-line{width:2px;flex:1;background:var(--border);min-height:8px}
+.trace-content{flex:1;padding:10px 12px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:4px}
+.trace-content-title{font-size:12px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.trace-content-body{font-size:12px;color:var(--text2);margin-bottom:4px;word-break:break-all}
+.trace-content-meta{font-size:11px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap}
+.trace-arrow-label{font-size:10px;color:var(--text2);text-align:center;padding:2px 0;font-style:italic}
+.missing-indicator{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius);background:rgba(224,82,82,0.08);border:1px dashed var(--correction);color:var(--correction);font-size:12px;margin:4px 0}
+.duplicate-indicator{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--radius);background:rgba(240,160,48,0.08);border:1px dashed var(--supplement);color:var(--supplement);font-size:12px;margin:4px 0}
+.evidence-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:8px}
+.empty-state{text-align:center;padding:24px;color:var(--text2);font-size:13px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:560px;max-width:90vw;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{width:28px;height:28px;border-radius:6px;border:none;background:var(--surface2);color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.add-form-group{margin-bottom:16px}
+.add-form-label{font-size:12px;color:var(--text2);margin-bottom:4px;display:block}
+.add-form-input,.add-form-textarea,.add-form-select{width:100%;padding:8px 12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;outline:none;font-family:inherit}
+.add-form-input:focus,.add-form-textarea:focus,.add-form-select:focus{border-color:var(--accent)}
+.add-form-textarea{min-height:80px;resize:vertical}
+.add-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn:hover{border-color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.evidence-ref-select{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.ref-chip{padding:4px 10px;border-radius:12px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .15s}
+.ref-chip:hover{border-color:var(--accent);color:var(--text)}
+.ref-chip.selected{background:var(--accent);border-color:var(--accent);color:#fff}
+.tabs{display:flex;gap:2px;margin-bottom:16px;background:var(--surface);border-radius:var(--radius);padding:3px;border:1px solid var(--border)}
+.tab{flex:1;padding:8px 12px;text-align:center;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:var(--text2);transition:all .2s;border:none;background:transparent}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--accent);color:#fff}
+.export-bar{display:flex;gap:8px}
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;box-shadow:var(--shadow);animation:toastIn .3s ease}
+.toast.success{border-color:var(--original)}
+.toast.warning{border-color:var(--supplement)}
+.toast.error{border-color:var(--correction)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.sensor-table{width:100%;border-collapse:collapse;font-size:12px}
+.sensor-table thead tr{border-bottom:1px solid var(--border);color:var(--text2);text-align:left}
+.sensor-table th{padding:8px 6px}
+.sensor-table td{padding:8px 6px}
+.sensor-table tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.sensor-table tbody tr:hover{background:var(--surface2)}
+.sensor-table tbody tr.highlighted{background:rgba(91,138,245,0.08)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+</style>
+</head>
+<body>
+<div class="app-header">
+  <h1><span class="icon">⚡</span>电阻温漂记录 · 证据链追踪</h1>
+  <div class="header-stats" id="headerStats"></div>
+</div>
+<div class="main-layout">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="filter-row" id="filterRow"></div>
+      <input type="text" class="search-box" id="searchBox" placeholder="搜索电阻编号、结论、操作人...">
+    </div>
+    <div class="record-list" id="recordList"></div>
+  </div>
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-empty">
+      <div class="icon-large">📋</div>
+      <div>选择左侧记录查看详情</div>
+      <div style="font-size:12px">每条结论都可回溯到异常照片、批改意见或传感器日志</div>
+    </div>
+  </div>
+</div>
+<div class="evidence-trace-panel" id="tracePanel">
+  <div class="trace-panel-header">
+    <div class="trace-panel-title" id="tracePanelTitle">证据链追踪</div>
+    <button class="trace-panel-close" onclick="closeTracePanel()">&times;</button>
+  </div>
+  <div class="trace-panel-body" id="tracePanelBody"></div>
+</div>
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+var DATA={records:[],anomalyPhotos:[],correctionOpinions:[],sensorLogs:[],manualConfirmations:[]};
+
+function uid(){return 'id_'+Date.now().toString(36)+'_'+Math.random().toString(36).substr(2,6)}
+function formatDT(s){if(!s)return '—';return s.replace('T',' ')}
+function escHtml(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+
+function initTestData(){
+  var r1=uid(),r2=uid(),r3=uid(),r4=uid(),r5=uid();
+  DATA.records=[
+    {id:r1,resistorId:'R-TH-2024-0047',testDate:'2024-03-12',tester:'张明',reviewer:'李工',
+     conclusion:'温漂超差，R₂₅=100.23Ω，α=−38.2ppm/℃（超差2.2ppm）',
+     conclusionHistory:[
+       {id:uid(),conclusion:'温漂正常，R₂₅=100.05Ω，α=−36.0ppm/℃',changedBy:'张明',changedAt:'2024-03-12 14:30',changeType:'original',reason:'首次测试结论',evidenceIds:[]},
+       {id:uid(),conclusion:'温漂超差，R₂₅=100.23Ω，α=−38.2ppm/℃（超差2.2ppm）',changedBy:'李工',changedAt:'2024-03-13 09:15',changeType:'correction',reason:'传感器-20℃数据手工修正后重新计算，温漂系数偏移',evidenceIds:[]}
+     ]},
+    {id:r2,resistorId:'R-TH-2024-0051',testDate:'2024-03-15',tester:'王芳',reviewer:'陈工',
+     conclusion:'温漂正常，R₂₅=99.98Ω，α=−35.8ppm/℃',
+     conclusionHistory:[
+       {id:uid(),conclusion:'温漂正常，R₂₅=99.98Ω，α=−35.8ppm/℃',changedBy:'王芳',changedAt:'2024-03-15 16:20',changeType:'original',reason:'首次测试结论',evidenceIds:[]}
+     ]},
+    {id:r3,resistorId:'R-TH-2024-0063',testDate:'2024-03-18',tester:'刘洋',reviewer:'赵工',
+     conclusion:'温漂正常，R₂₅=100.01Ω，α=−36.1ppm/℃（原-40℃异常照片已补传）',
+     conclusionHistory:[
+       {id:uid(),conclusion:'温漂正常，R₂₅=100.01Ω，α=−36.1ppm/℃',changedBy:'刘洋',changedAt:'2024-03-18 11:00',changeType:'original',reason:'首次测试结论',evidenceIds:[]},
+       {id:uid(),conclusion:'温漂正常，R₂₅=100.01Ω，α=−36.1ppm/℃（原-40℃异常照片已补传）',changedBy:'刘洋',changedAt:'2024-03-19 10:30',changeType:'supplement',reason:'补传-40℃测试照片，结论未变，仅补充证据',evidenceIds:[]}
+     ]},
+    {id:r4,resistorId:'R-TH-2024-0078',testDate:'2024-03-20',tester:'孙磊',reviewer:'周工',
+     conclusion:'需复测，传感器数据疑似异常',
+     conclusionHistory:[
+       {id:uid(),conclusion:'温漂正常，R₂₅=100.10Ω，α=−35.5ppm/℃',changedBy:'孙磊',changedAt:'2024-03-20 15:40',changeType:'original',reason:'首次测试结论',evidenceIds:[]},
+       {id:uid(),conclusion:'需复测，传感器数据疑似异常',changedBy:'周工',changedAt:'2024-03-21 08:50',changeType:'correction',reason:'审核发现传感器-40℃读数与-20℃完全相同，数据疑似重复录入',evidenceIds:[]}
+     ]},
+    {id:r5,resistorId:'R-TH-2024-0082',testDate:'2024-03-22',tester:'陈静',reviewer:'吴工',
+     conclusion:'温漂超差，R₂₅=100.45Ω，α=−39.1ppm/℃（超差3.1ppm）',
+     conclusionHistory:[
+       {id:uid(),conclusion:'温漂超差，R₂₅=100.45Ω，α=−39.1ppm/℃（超差3.1ppm）',changedBy:'陈静',changedAt:'2024-03-22 13:10',changeType:'original',reason:'首次测试结论',evidenceIds:[]}
+     ]}
+  ];
+
+  var ch1_0=DATA.records[0].conclusionHistory[0].id,ch1_1=DATA.records[0].conclusionHistory[1].id;
+  var ch2_0=DATA.records[1].conclusionHistory[0].id;
+  var ch3_0=DATA.records[2].conclusionHistory[0].id,ch3_1=DATA.records[2].conclusionHistory[1].id;
+  var ch4_0=DATA.records[3].conclusionHistory[0].id,ch4_1=DATA.records[3].conclusionHistory[1].id;
+  var ch5_0=DATA.records[4].conclusionHistory[0].id;
+
+  DATA.anomalyPhotos=[
+    {id:uid(),recordId:r1,fileName:'R47_anomaly_minus20.jpg',description:'-20℃测试时电阻表面出现水汽凝结，可能导致接触电阻偏大',uploadedAt:'2024-03-12 14:45',uploadedBy:'张明',isSupplementary:false,relatedConclusionHistoryId:ch1_1},
+    {id:uid(),recordId:r3,fileName:'R63_minus40_setup.jpg',description:'-40℃测试环境照片（补传）',uploadedAt:'2024-03-19 10:35',uploadedBy:'刘洋',isSupplementary:true,relatedConclusionHistoryId:ch3_1},
+    {id:uid(),recordId:r3,fileName:'R63_minus40_closeup.jpg',description:'-40℃电阻特写照片（补传）',uploadedAt:'2024-03-19 10:36',uploadedBy:'刘洋',isSupplementary:true,relatedConclusionHistoryId:ch3_1},
+    {id:uid(),recordId:r4,fileName:'R78_sensor_comparison.jpg',description:'传感器-40℃与-20℃读数截图，两段数据完全一致',uploadedAt:'2024-03-20 16:00',uploadedBy:'孙磊',isSupplementary:false,relatedConclusionHistoryId:ch4_1},
+    {id:uid(),recordId:r5,fileName:'R82_high_temp_crack.jpg',description:'85℃测试后电阻表面出现微裂纹',uploadedAt:'2024-03-22 13:30',uploadedBy:'陈静',isSupplementary:false,relatedConclusionHistoryId:ch5_0}
+  ];
+
+  DATA.correctionOpinions=[
+    {id:uid(),recordId:r1,content:'传感器-20℃原始读数有跳变，手工修正为相邻两点的均值后，温漂系数从−36.0变为−38.2ppm/℃，结论由"正常"改为"超差"。',reviewer:'李工',reviewedAt:'2024-03-13 09:00',isLateSupplement:false,relatedConclusionHistoryId:ch1_1},
+    {id:uid(),recordId:r3,content:'-40℃原始照片缺失，测试人员已补传环境与特写照片各一张。结论未变更，仅补全证据。',reviewer:'赵工',reviewedAt:'2024-03-19 11:00',isLateSupplement:true,relatedConclusionHistoryId:ch3_1},
+    {id:uid(),recordId:r4,content:'审核时发现传感器-40℃数据与-20℃完全相同，高度疑为重复录入，建议复测。',reviewer:'周工',reviewedAt:'2024-03-21 08:30',isLateSupplement:false,relatedConclusionHistoryId:ch4_1}
+  ];
+
+  DATA.sensorLogs=[
+    {id:uid(),recordId:r1,timestamp:'2024-03-12 10:00',temperature:25,resistance:100.05,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch1_0},
+    {id:uid(),recordId:r1,timestamp:'2024-03-12 10:30',temperature:-20,resistance:100.23,originalResistance:100.45,isManualEdit:true,editReason:'原始读数跳变（100.45→100.23），取相邻两点均值修正',editedBy:'李工',editedAt:'2024-03-13 09:10',relatedConclusionHistoryId:ch1_1},
+    {id:uid(),recordId:r1,timestamp:'2024-03-12 11:00',temperature:85,resistance:99.82,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch1_0},
+    {id:uid(),recordId:r2,timestamp:'2024-03-15 09:00',temperature:25,resistance:99.98,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch2_0},
+    {id:uid(),recordId:r2,timestamp:'2024-03-15 09:30',temperature:-40,resistance:100.12,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch2_0},
+    {id:uid(),recordId:r3,timestamp:'2024-03-18 09:00',temperature:25,resistance:100.01,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch3_0},
+    {id:uid(),recordId:r3,timestamp:'2024-03-18 09:30',temperature:-40,resistance:100.14,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch3_0},
+    {id:uid(),recordId:r4,timestamp:'2024-03-20 10:00',temperature:25,resistance:100.10,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch4_0},
+    {id:uid(),recordId:r4,timestamp:'2024-03-20 10:30',temperature:-20,resistance:100.25,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch4_0},
+    {id:uid(),recordId:r4,timestamp:'2024-03-20 11:00',temperature:-40,resistance:100.25,originalResistance:null,isManualEdit:false,editReason:'与-20℃数据完全相同，疑似重复录入，未做手工修正',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch4_1,isDuplicate:true},
+    {id:uid(),recordId:r4,timestamp:'2024-03-20 11:30',temperature:85,resistance:99.90,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch4_0},
+    {id:uid(),recordId:r5,timestamp:'2024-03-22 10:00',temperature:25,resistance:100.45,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch5_0},
+    {id:uid(),recordId:r5,timestamp:'2024-03-22 10:30',temperature:-40,resistance:100.58,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch5_0},
+    {id:uid(),recordId:r5,timestamp:'2024-03-22 11:00',temperature:85,resistance:99.75,originalResistance:null,isManualEdit:false,editReason:'',editedBy:'',editedAt:null,relatedConclusionHistoryId:ch5_0}
+  ];
+
+  DATA.manualConfirmations=[
+    {id:uid(),recordId:r1,confirmer:'李工',confirmedAt:'2024-03-13 09:05',content:'已确认-20℃传感器原始读数100.45Ω异常跳变，修正后100.23Ω与相邻点一致，修正合理。',relatedEvidenceIds:[],relatedConclusionHistoryId:ch1_1},
+    {id:uid(),recordId:r4,confirmer:'周工',confirmedAt:'2024-03-21 08:40',content:'已确认-40℃传感器数据与-20℃完全一致（100.25Ω），非手工修改，疑为录入错误，标记为需复测。',relatedEvidenceIds:[],relatedConclusionHistoryId:ch4_1},
+    {id:uid(),recordId:r5,confirmer:'吴工',confirmedAt:'2024-03-22 14:00',content:'85℃微裂纹照片已确认与本次测试对应，非历史遗留，温漂超差结论成立。',relatedEvidenceIds:[],relatedConclusionHistoryId:ch5_0}
+  ];
+
+  linkEvidenceIds();
+  saveToStorage();
+}
+
+function linkEvidenceIds(){
+  DATA.records.forEach(function(rec){
+    rec.conclusionHistory.forEach(function(ch){
+      ch.evidenceIds=[];
+      DATA.anomalyPhotos.filter(function(p){return p.relatedConclusionHistoryId===ch.id}).forEach(function(p){ch.evidenceIds.push(p.id)});
+      DATA.correctionOpinions.filter(function(o){return o.relatedConclusionHistoryId===ch.id}).forEach(function(o){ch.evidenceIds.push(o.id)});
+      DATA.sensorLogs.filter(function(s){return s.relatedConclusionHistoryId===ch.id&&s.isManualEdit}).forEach(function(s){ch.evidenceIds.push(s.id)});
+      DATA.manualConfirmations.filter(function(c){return c.relatedConclusionHistoryId===ch.id}).forEach(function(c){ch.evidenceIds.push(c.id)});
+    });
+  });
+  DATA.manualConfirmations.forEach(function(c){
+    c.relatedEvidenceIds=[];
+    DATA.anomalyPhotos.filter(function(p){return p.recordId===c.recordId}).forEach(function(p){c.relatedEvidenceIds.push(p.id)});
+    DATA.sensorLogs.filter(function(s){return s.recordId===c.recordId&&(s.isManualEdit||s.isDuplicate)}).forEach(function(s){c.relatedEvidenceIds.push(s.id)});
+  });
+}
+
+function saveToStorage(){try{localStorage.setItem('drift_record_data',JSON.stringify(DATA))}catch(e){}}
+function loadFromStorage(){try{var s=localStorage.getItem('drift_record_data');if(s){DATA=JSON.parse(s);return true}}catch(e){}return false}
+
+var currentRecordId=null,activeFilter='all',highlightedEvidenceId=null,currentAddTab='photo',selectedChRef=null;
+
+function getRecord(id){return DATA.records.find(function(r){return r.id===id})}
+function getPhotos(rid){return DATA.anomalyPhotos.filter(function(p){return p.recordId===rid})}
+function getOpinions(rid){return DATA.correctionOpinions.filter(function(o){return o.recordId===rid})}
+function getSensorLogs(rid){return DATA.sensorLogs.filter(function(s){return s.recordId===rid})}
+function getConfirmations(rid){return DATA.manualConfirmations.filter(function(c){return c.recordId===rid})}
+function getEvidenceById(id){return DATA.anomalyPhotos.find(function(p){return p.id===id})||DATA.correctionOpinions.find(function(o){return o.id===id})||DATA.sensorLogs.find(function(s){return s.id===id})||DATA.manualConfirmations.find(function(c){return c.id===id})}
+function getEvidenceType(item){if(DATA.anomalyPhotos.indexOf(item)>=0)return 'photo';if(DATA.correctionOpinions.indexOf(item)>=0)return 'opinion';if(DATA.sensorLogs.indexOf(item)>=0)return 'sensor';if(DATA.manualConfirmations.indexOf(item)>=0)return 'confirm';return 'unknown'}
+function getTypeLabel(t){return{photo:'异常照片',opinion:'批改意见',sensor:'传感器日志',confirm:'人工确认'}[t]||'未知'}
+function getTypeBadgeClass(t){return{photo:'badge-photo',opinion:'badge-opinion',sensor:'badge-sensor',confirm:'badge-confirm'}[t]||''}
+function getChangeTypeLabel(ct){return{original:'原始结论',supplement:'补材料',correction:'改结论'}[ct]||ct}
+function getChangeTypeBadgeClass(ct){return{original:'badge-original',supplement:'badge-supplement',correction:'badge-correction'}[ct]||''}
+
+function renderHeaderStats(){
+  var total=DATA.records.length;
+  var corrections=DATA.records.filter(function(r){return r.conclusionHistory.some(function(ch){return ch.changeType==='correction'})}).length;
+  var supplements=DATA.records.filter(function(r){return r.conclusionHistory.some(function(ch){return ch.changeType==='supplement'})}).length;
+  var manualEdits=DATA.sensorLogs.filter(function(s){return s.isManualEdit}).length;
+  document.getElementById('headerStats').innerHTML=
+    '<span><span class="stat-dot" style="background:var(--accent)"></span> 总记录 '+total+'</span>'+
+    '<span><span class="stat-dot" style="background:var(--correction)"></span> 改结论 '+corrections+'</span>'+
+    '<span><span class="stat-dot" style="background:var(--supplement)"></span> 补材料 '+supplements+'</span>'+
+    '<span><span class="stat-dot" style="background:var(--sensor)"></span> 传感器手工修正 '+manualEdits+'</span>';
+}
+
+function renderFilters(){
+  var filters=[{key:'all',label:'全部'},{key:'correction',label:'改结论'},{key:'supplement',label:'补材料'},{key:'original',label:'仅原始'},{key:'manual_edit',label:'含传感器修正'},{key:'missing_opinion',label:'缺批改意见'}];
+  document.getElementById('filterRow').innerHTML=filters.map(function(f){
+    return '<button class="filter-btn '+(activeFilter===f.key?'active':'')+'" onclick="setFilter(\''+f.key+'\')">'+f.label+'</button>';
+  }).join('');
+}
+
+function setFilter(key){activeFilter=key;renderFilters();renderRecordList()}
+
+function filterRecords(){
+  var search=document.getElementById('searchBox').value.toLowerCase();
+  var records=DATA.records;
+  if(activeFilter==='correction')records=records.filter(function(r){return r.conclusionHistory.some(function(ch){return ch.changeType==='correction'})});
+  else if(activeFilter==='supplement')records=records.filter(function(r){return r.conclusionHistory.some(function(ch){return ch.changeType==='supplement'})});
+  else if(activeFilter==='original')records=records.filter(function(r){return r.conclusionHistory.every(function(ch){return ch.changeType==='original'})});
+  else if(activeFilter==='manual_edit')records=records.filter(function(r){return getSensorLogs(r.id).some(function(s){return s.isManualEdit})});
+  else if(activeFilter==='missing_opinion')records=records.filter(function(r){return r.conclusionHistory.some(function(ch){return ch.changeType!=='original'})&&getOpinions(r.id).length===0});
+  if(search)records=records.filter(function(r){return r.resistorId.toLowerCase().indexOf(search)>=0||r.conclusion.toLowerCase().indexOf(search)>=0||r.tester.indexOf(search)>=0||r.reviewer.indexOf(search)>=0});
+  return records;
+}
+
+function renderRecordList(){
+  var records=filterRecords();
+  var container=document.getElementById('recordList');
+  if(!records.length){container.innerHTML='<div class="empty-state">无匹配记录</div>';return}
+  container.innerHTML=records.map(function(r){
+    var hasCorrection=r.conclusionHistory.some(function(ch){return ch.changeType==='correction'});
+    var hasSupplement=r.conclusionHistory.some(function(ch){return ch.changeType==='supplement'});
+    var pc=getPhotos(r.id).length,oc=getOpinions(r.id).length,sc=getSensorLogs(r.id).filter(function(s){return s.isManualEdit}).length,cc=getConfirmations(r.id).length;
+    var badges='';
+    if(hasCorrection)badges+='<span class="badge badge-correction">改结论</span>';
+    if(hasSupplement)badges+='<span class="badge badge-supplement">补材料</span>';
+    if(!hasCorrection&&!hasSupplement)badges+='<span class="badge badge-original">原始</span>';
+    if(pc)badges+='<span class="badge badge-photo">📷'+pc+'</span>';
+    if(oc)badges+='<span class="badge badge-opinion">📝'+oc+'</span>';
+    if(sc)badges+='<span class="badge badge-sensor">⚙'+sc+'</span>';
+    if(cc)badges+='<span class="badge badge-confirm">✓'+cc+'</span>';
+    var missingOp=r.conclusionHistory.some(function(ch){return ch.changeType!=='original'})&&oc===0;
+    if(missingOp)badges+='<span class="badge badge-correction">⚠缺批改意见</span>';
+    return '<div class="record-card '+(currentRecordId===r.id?'active':'')+'" onclick="selectRecord(\''+r.id+'\')"><div class="record-card-header"><span class="record-id">'+escHtml(r.resistorId)+'</span><span class="record-date">'+r.testDate+'</span></div><div class="record-conclusion">'+escHtml(r.conclusion)+'</div><div class="record-badges">'+badges+'</div></div>';
+  }).join('');
+}
+
+function selectRecord(id){currentRecordId=id;renderRecordList();renderDetail()}
+
+function renderDetail(){
+  var rec=getRecord(currentRecordId);
+  if(!rec)return;
+  var photos=getPhotos(rec.id),opinions=getOpinions(rec.id),sensorLogs=getSensorLogs(rec.id),confirmations=getConfirmations(rec.id);
+  var latestCT=rec.conclusionHistory[rec.conclusionHistory.length-1].changeType;
+  var h='<div class="detail-title-row"><div><div class="detail-title">'+escHtml(rec.resistorId)+'</div><span class="badge '+getChangeTypeBadgeClass(latestCT)+'">'+getChangeTypeLabel(latestCT)+'</span></div><div class="export-bar"><button class="btn" onclick="exportRecord(\''+rec.id+'\')">📄 导出记录</button><button class="btn btn-primary" onclick="openAddModal(\''+rec.id+'\')">＋ 添加证据</button></div></div>';
+  h+='<div class="detail-meta"><span>📅 测试日期：'+rec.testDate+'</span><span>🔬 测试人：'+escHtml(rec.tester)+'</span><span>👁 审核人：'+escHtml(rec.reviewer)+'</span><span>📋 结论变更：'+rec.conclusionHistory.length+'次</span></div>';
+
+  h+='<div class="section"><div class="section-header"><div class="section-title">🔗 结论变更时间线</div><div class="section-count">'+rec.conclusionHistory.length+'次变更</div></div><div class="conclusion-timeline">';
+  rec.conclusionHistory.forEach(function(ch){
+    var elinks=ch.evidenceIds.map(function(eid){var ev=getEvidenceById(eid);if(!ev)return '';var t=getEvidenceType(ev);var lb=(ev.fileName||ev.content||'').substring(0,20)+'…';return '<span class="evidence-link link-'+t+'" onclick="highlightEvidence(\''+eid+'\',\''+t+'\')">'+getTypeLabel(t)+': '+escHtml(lb)+'</span>'}).join('');
+    h+='<div class="timeline-item type-'+ch.changeType+'" id="ch_'+ch.id+'" onclick="showConclusionTrace(\''+rec.id+'\',\''+ch.id+'\')"><div class="timeline-item-header"><span class="timeline-item-label"><span class="badge '+getChangeTypeBadgeClass(ch.changeType)+'">'+getChangeTypeLabel(ch.changeType)+'</span></span><span class="timeline-item-time">'+formatDT(ch.changedAt)+'</span></div><div class="timeline-item-conclusion">'+escHtml(ch.conclusion)+'</div><div class="timeline-item-author">操作人：'+escHtml(ch.changedBy)+'</div>';
+    if(ch.reason&&ch.changeType!=='original')h+='<div class="timeline-item-reason">原因：'+escHtml(ch.reason)+'</div>';
+    if(elinks)h+='<div class="evidence-links"><div class="evidence-links-label">关联证据：</div>'+elinks+'</div>';
+    h+='</div>';
+  });
+  h+='</div></div>';
+
+  h+='<div class="section"><div class="section-header"><div class="section-title">📷 异常照片 ('+photos.length+')</div></div>';
+  if(!photos.length){h+='<div class="empty-state">无异常照片</div>'}
+  else{h+='<div class="evidence-grid">';photos.forEach(function(p){
+    var bl=rec.conclusionHistory.filter(function(ch){return ch.evidenceIds.indexOf(p.id)>=0}).map(function(ch){return '<span class="backlink-tag bl-'+ch.changeType+'">'+getChangeTypeLabel(ch.changeType)+'</span>'}).join('');
+    h+='<div class="evidence-card '+(highlightedEvidenceId===p.id?'highlighted':'')+'" id="ev_'+p.id+'"><div class="evidence-card-header"><span class="evidence-card-id"><span class="evidence-card-type-icon icon-photo">📷</span>'+escHtml(p.fileName)+'</span><span class="evidence-card-time">'+escHtml(p.uploadedBy)+' · '+formatDT(p.uploadedAt)+'</span></div><div class="photo-placeholder">[异常照片] '+escHtml(p.description)+'</div><div class="evidence-card-body">'+escHtml(p.description)+'</div><div class="evidence-card-footer"><div>'+(p.isSupplementary?'<span class="badge badge-supplement">补传</span>':'<span class="badge badge-original">原始</span>')+'</div><div class="evidence-card-backlinks">'+(bl?'支撑结论：'+bl:'')+'</div></div></div>';
+  });h+='</div>'}
+  h+='</div>';
+
+  h+='<div class="section"><div class="section-header"><div class="section-title">📝 批改意见 ('+opinions.length+')</div></div>';
+  if(!opinions.length){var hasChg=rec.conclusionHistory.some(function(ch){return ch.changeType!=='original'});h+=hasChg?'<div class="missing-indicator">⚠ 结论已变更但缺少批改意见</div>':'<div class="empty-state">无批改意见</div>'}
+  else{opinions.forEach(function(o){
+    var bl=rec.conclusionHistory.filter(function(ch){return ch.evidenceIds.indexOf(o.id)>=0}).map(function(ch){return '<span class="backlink-tag bl-'+ch.changeType+'">'+getChangeTypeLabel(ch.changeType)+'</span>'}).join('');
+    h+='<div class="evidence-card '+(highlightedEvidenceId===o.id?'highlighted':'')+'" id="ev_'+o.id+'"><div class="evidence-card-header"><span class="evidence-card-id"><span class="evidence-card-type-icon icon-opinion">📝</span>'+(o.isLateSupplement?'晚补意见':'批改意见')+'</span><span class="evidence-card-time">'+escHtml(o.reviewer)+' · '+formatDT(o.reviewedAt)+'</span></div><div class="evidence-card-body">'+escHtml(o.content)+'</div><div class="evidence-card-footer"><div>'+(o.isLateSupplement?'<span class="badge badge-supplement">晚补</span>':'<span class="badge badge-original">同期</span>')+'</div><div class="evidence-card-backlinks">'+(bl?'支撑结论：'+bl:'')+'</div></div></div>';
+  })}
+  h+='</div>';
+
+  h+='<div class="section"><div class="section-header"><div class="section-title">⚙ 传感器日志 ('+sensorLogs.length+')</div></div>';
+  if(!sensorLogs.length){h+='<div class="empty-state">无传感器日志</div>'}
+  else{h+='<table class="sensor-table"><thead><tr><th>时间</th><th>温度</th><th>电阻值</th><th>状态</th><th>备注</th></tr></thead><tbody>';
+  sensorLogs.forEach(function(s){
+    var isDup=s.isDuplicate;
+    var bl=rec.conclusionHistory.filter(function(ch){return ch.evidenceIds.indexOf(s.id)>=0}).map(function(ch){return '<span class="backlink-tag bl-'+ch.changeType+'">'+getChangeTypeLabel(ch.changeType)+'</span>'}).join('');
+    var ts=s.timestamp.split(' ')[1]||s.timestamp;
+    var rh=s.isManualEdit?'<span class="sensor-original">'+s.originalResistance+'Ω</span> → <span class="sensor-corrected">'+s.resistance+'Ω</span>':s.resistance+'Ω';
+    var st='';if(s.isManualEdit)st+='<span class="sensor-edit-marker">手工修正</span> ';if(isDup)st+='<span class="duplicate-indicator">⚠ 重复</span> ';if(!s.isManualEdit&&!isDup)st+='<span style="color:var(--original);font-size:11px;">正常</span>';
+    h+='<tr class="'+(highlightedEvidenceId===s.id?'highlighted':'')+'" id="ev_'+s.id+'" onclick="showSensorTrace(\''+s.id+'\')"><td>'+ts+'</td><td>'+s.temperature+'℃</td><td>'+rh+'</td><td>'+st+'</td><td style="color:var(--text2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(s.editReason||'')+(bl?'<br>'+bl:'')+'</td></tr>';
+  });h+='</tbody></table>'}
+  h+='</div>';
+
+  h+='<div class="section"><div class="section-header"><div class="section-title">✓ 人工确认 ('+confirmations.length+')</div></div>';
+  if(!confirmations.length){h+='<div class="empty-state">无人工确认</div>'}
+  else{confirmations.forEach(function(c){
+    var bl=rec.conclusionHistory.filter(function(ch){return ch.evidenceIds.indexOf(c.id)>=0}).map(function(ch){return '<span class="backlink-tag bl-'+ch.changeType+'">'+getChangeTypeLabel(ch.changeType)+'</span>'}).join('');
+    var rl=c.relatedEvidenceIds.map(function(eid){var ev=getEvidenceById(eid);if(!ev)return '';var t=getEvidenceType(ev);return '<span class="evidence-link link-'+t+'" onclick="highlightEvidence(\''+eid+'\',\''+t+'\')">'+getTypeLabel(t)+'</span>'}).join('');
+    h+='<div class="evidence-card '+(highlightedEvidenceId===c.id?'highlighted':'')+'" id="ev_'+c.id+'"><div class="evidence-card-header"><span class="evidence-card-id"><span class="evidence-card-type-icon icon-confirm">✓</span>人工确认</span><span class="evidence-card-time">'+escHtml(c.confirmer)+' · '+formatDT(c.confirmedAt)+'</span></div><div class="evidence-card-body">'+escHtml(c.content)+'</div><div class="evidence-card-footer"><div class="evidence-card-backlinks">'+(rl?'确认对象：'+rl:'')+'</div><div class="evidence-card-backlinks">'+(bl?'支撑结论：'+bl:'')+'</div></div></div>';
+  })}
+  h+='</div>';
+
+  document.getElementById('detailPanel').innerHTML=h;
+}
+
+function highlightEvidence(eid,type){
+  highlightedEvidenceId=eid;renderDetail();
+  setTimeout(function(){var el=document.getElementById('ev_'+eid);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){highlightedEvidenceId=null},2000)}},100);
+}
+
+function showConclusionTrace(recordId,chId){
+  var rec=getRecord(recordId);var ch=rec.conclusionHistory.find(function(h){return h.id===chId});if(!ch)return;
+  var panel=document.getElementById('tracePanel');var body=document.getElementById('tracePanelBody');
+  document.getElementById('tracePanelTitle').textContent='证据链 · '+rec.resistorId;
+  var c='<div class="trace-chain">';
+  c+='<div class="trace-node"><div class="trace-connector"><div class="trace-dot dot-conclusion"></div><div class="trace-line"></div></div><div class="trace-content"><div class="trace-content-title"><span class="badge '+getChangeTypeBadgeClass(ch.changeType)+'">'+getChangeTypeLabel(ch.changeType)+'</span> 结论变更</div><div class="trace-content-body">'+escHtml(ch.conclusion)+'</div><div class="trace-content-meta"><span>'+escHtml(ch.changedBy)+'</span><span>'+formatDT(ch.changedAt)+'</span></div>';
+  if(ch.reason&&ch.changeType!=='original')c+='<div style="margin-top:6px;font-size:11px;color:var(--text2);border-top:1px dashed var(--border);padding-top:4px;">原因：'+escHtml(ch.reason)+'</div>';
+  c+='</div></div>';
+
+  if(ch.evidenceIds.length>0){
+    c+='<div class="trace-arrow-label">↑ 依据以下证据</div>';
+    ch.evidenceIds.forEach(function(eid){
+      var ev=getEvidenceById(eid);if(!ev)return;var type=getEvidenceType(ev);var dc='dot-'+type;
+      var bt='',mt='';
+      if(type==='photo'){bt=escHtml(ev.fileName)+'<br>'+escHtml(ev.description);mt='<span>'+escHtml(ev.uploadedBy)+'</span><span>'+formatDT(ev.uploadedAt)+'</span>'+(ev.isSupplementary?'<span class="badge badge-supplement">补传</span>':'')}
+      else if(type==='opinion'){bt=escHtml(ev.content.substring(0,100)+(ev.content.length>100?'…':''));mt='<span>'+escHtml(ev.reviewer)+'</span><span>'+formatDT(ev.reviewedAt)+'</span>'+(ev.isLateSupplement?'<span class="badge badge-supplement">晚补</span>':'')}
+      else if(type==='sensor'){bt=ev.temperature+'℃ '+(ev.isManualEdit?'<span class="sensor-original">'+ev.originalResistance+'Ω</span>→<span class="sensor-corrected">'+ev.resistance+'Ω</span>':ev.resistance+'Ω');mt=ev.isManualEdit?'<span>修正人：'+escHtml(ev.editedBy)+'</span><span>'+formatDT(ev.editedAt)+'</span>':'<span>'+formatDT(ev.timestamp)+'</span>'}
+      else if(type==='confirm'){bt=escHtml(ev.content.substring(0,100)+(ev.content.length>100?'…':''));mt='<span>'+escHtml(ev.confirmer)+'</span><span>'+formatDT(ev.confirmedAt)+'</span>'}
+      c+='<div class="trace-node"><div class="trace-connector"><div class="trace-dot '+dc+'"></div><div class="trace-line"></div></div><div class="trace-content" style="cursor:pointer" onclick="highlightEvidence(\''+eid+'\',\''+type+'\')"><div class="trace-content-title"><span class="badge '+getTypeBadgeClass(type)+'">'+getTypeLabel(type)+'</span></div><div class="trace-content-body">'+bt+'</div><div class="trace-content-meta">'+mt+'</div></div></div>';
+    });
+  }else if(ch.changeType==='original'){c+='<div class="trace-arrow-label">原始结论，无前置证据</div>'}
+  else{c+='<div class="missing-indicator">⚠ 结论已变更但无关联证据</div>'}
+
+  var confs=DATA.manualConfirmations.filter(function(c2){return c2.relatedConclusionHistoryId===chId});
+  if(confs.length>0){
+    c+='<div class="trace-arrow-label">↑ 人工确认</div>';
+    confs.forEach(function(cf){c+='<div class="trace-node"><div class="trace-connector"><div class="trace-dot dot-confirm"></div></div><div class="trace-content"><div class="trace-content-title"><span class="badge badge-confirm">人工确认</span></div><div class="trace-content-body">'+escHtml(cf.content.substring(0,80))+'…</div><div class="trace-content-meta"><span>'+escHtml(cf.confirmer)+'</span><span>'+formatDT(cf.confirmedAt)+'</span></div></div></div>'});
+  }
+  c+='</div>';body.innerHTML=c;panel.classList.add('open');
+}
+
+function showSensorTrace(sensorId){
+  var sensor=DATA.sensorLogs.find(function(s){return s.id===sensorId});if(!sensor)return;
+  var rec=getRecord(sensor.recordId);var panel=document.getElementById('tracePanel');var body=document.getElementById('tracePanelBody');
+  document.getElementById('tracePanelTitle').textContent='传感器日志追踪 · '+rec.resistorId;
+  var c='<div class="trace-chain">';
+  c+='<div class="trace-node"><div class="trace-connector"><div class="trace-dot dot-sensor"></div><div class="trace-line"></div></div><div class="trace-content"><div class="trace-content-title"><span class="badge badge-sensor">传感器日志</span> '+(sensor.isManualEdit?'<span class="sensor-edit-marker">手工修正</span>':'')+(sensor.isDuplicate?'<span class="duplicate-indicator">⚠ 重复</span>':'')+'</div><div class="trace-content-body">'+sensor.timestamp+' · '+sensor.temperature+'℃ · '+sensor.resistance+'Ω'+(sensor.isManualEdit?'<br><span class="sensor-original">'+sensor.originalResistance+'Ω</span> → <span class="sensor-corrected">'+sensor.resistance+'Ω</span>':'')+'</div>';
+  if(sensor.isManualEdit)c+='<div class="trace-content-meta"><span>修正人：'+escHtml(sensor.editedBy)+'</span><span>'+formatDT(sensor.editedAt)+'</span></div><div style="margin-top:4px;font-size:11px;color:var(--text2);">原因：'+escHtml(sensor.editReason)+'</div>';
+  c+='</div></div>';
+
+  var relatedConfs=DATA.manualConfirmations.filter(function(cf){return cf.relatedEvidenceIds.indexOf(sensorId)>=0||cf.relatedConclusionHistoryId===sensor.relatedConclusionHistoryId});
+  if(relatedConfs.length>0){c+='<div class="trace-arrow-label">↑ 人工确认</div>';relatedConfs.forEach(function(cf){c+='<div class="trace-node"><div class="trace-connector"><div class="trace-dot dot-confirm"></div><div class="trace-line"></div></div><div class="trace-content"><div class="trace-content-title"><span class="badge badge-confirm">人工确认</span></div><div class="trace-content-body">'+escHtml(cf.content.substring(0,80))+'…</div><div class="trace-content-meta"><span>'+escHtml(cf.confirmer)+'</span><span>'+formatDT(cf.confirmedAt)+'</span></div></div></div>'})}
+
+  var relatedCh=rec.conclusionHistory.find(function(ch){return ch.id===sensor.relatedConclusionHistoryId});
+  if(relatedCh){c+='<div class="trace-arrow-label">↑ 影响结论</div>';c+='<div class="trace-node"><div class="trace-connector"><div class="trace-dot dot-conclusion"></div></div><div class="trace-content"><div class="trace-content-title"><span class="badge '+getChangeTypeBadgeClass(relatedCh.changeType)+'">'+getChangeTypeLabel(relatedCh.changeType)+'</span> 结论变更</div><div class="trace-content-body">'+escHtml(relatedCh.conclusion)+'</div><div class="trace-content-meta"><span>'+escHtml(relatedCh.changedBy)+'</span><span>'+formatDT(relatedCh.changedAt)+'</span></div></div></div>'}
+  c+='</div>';body.innerHTML=c;panel.classList.add('open');
+}
+
+function closeTracePanel(){document.getElementById('tracePanel').classList.remove('open')}
+
+function openAddModal(recordId){
+  var rec=getRecord(recordId);if(!rec)return;
+  selectedChRef=rec.conclusionHistory.length>0?rec.conclusionHistory[rec.conclusionHistory.length-1].id:null;
+  currentAddTab='photo';
+  var chOptions=rec.conclusionHistory.map(function(ch,i){return '<span class="ref-chip '+(i===rec.conclusionHistory.length-1?'selected':'')+'" data-chid="'+ch.id+'" onclick="selectChRef(this,\''+ch.id+'\')">'+getChangeTypeLabel(ch.changeType)+' #'+(i+1)+'</span>'}).join('');
+  var h='<div class="modal-header"><div class="modal-title">添加证据 · '+escHtml(rec.resistorId)+'</div><button class="modal-close" onclick="closeModal()">&times;</button></div><div class="modal-body">';
+  h+='<div class="tabs" id="addTabs"><button class="tab active" onclick="switchAddTab(\'photo\')">📷 异常照片</button><button class="tab" onclick="switchAddTab(\'opinion\')">📝 批改意见</button><button class="tab" onclick="switchAddTab(\'sensor\')">⚙ 传感器修正</button><button class="tab" onclick="switchAddTab(\'confirm\')">✓ 人工确认</button></div>';
+  h+='<div id="addTab_photo"><div class="add-form-group"><label class="add-form-label">照片文件名</label><input class="add-form-input" id="add_photo_filename" placeholder="例：R47_anomaly.jpg"></div><div class="add-form-group"><label class="add-form-label">描述</label><textarea class="add-form-textarea" id="add_photo_desc" placeholder="描述异常现象..."></textarea></div><div class="add-form-row"><div class="add-form-group"><label class="add-form-label">上传人</label><input class="add-form-input" id="add_photo_uploader"></div><div class="add-form-group"><label class="add-form-label">是否补传</label><select class="add-form-select" id="add_photo_supplement"><option value="false">否</option><option value="true">是</option></select></div></div><div class="add-form-group"><label class="add-form-label">关联结论变更</label><div class="evidence-ref-select">'+chOptions+'</div></div></div>';
+  h+='<div id="addTab_opinion" style="display:none"><div class="add-form-group"><label class="add-form-label">批改意见内容</label><textarea class="add-form-textarea" id="add_opinion_content" placeholder="描述批改理由..."></textarea></div><div class="add-form-row"><div class="add-form-group"><label class="add-form-label">审核人</label><input class="add-form-input" id="add_opinion_reviewer"></div><div class="add-form-group"><label class="add-form-label">是否晚补</label><select class="add-form-select" id="add_opinion_late"><option value="false">否</option><option value="true">是</option></select></div></div><div class="add-form-group"><label class="add-form-label">关联结论变更</label><div class="evidence-ref-select">'+chOptions+'</div></div></div>';
+  h+='<div id="addTab_sensor" style="display:none"><div class="add-form-row"><div class="add-form-group"><label class="add-form-label">温度点（℃）</label><input class="add-form-input" id="add_sensor_temp" type="number"></div><div class="add-form-group"><label class="add-form-label">修正后电阻值（Ω）</label><input class="add-form-input" id="add_sensor_resistance" type="number" step="0.01"></div></div><div class="add-form-row"><div class="add-form-group"><label class="add-form-label">原始电阻值（Ω）</label><input class="add-form-input" id="add_sensor_original" type="number" step="0.01" placeholder="留空表示非手工修正"></div><div class="add-form-group"><label class="add-form-label">修正人</label><input class="add-form-input" id="add_sensor_editor"></div></div><div class="add-form-group"><label class="add-form-label">修正原因</label><textarea class="add-form-textarea" id="add_sensor_reason" placeholder="描述手工修正原因..."></textarea></div><div class="add-form-group"><label class="add-form-label">关联结论变更</label><div class="evidence-ref-select">'+chOptions+'</div></div></div>';
+  h+='<div id="addTab_confirm" style="display:none"><div class="add-form-group"><label class="add-form-label">确认内容</label><textarea class="add-form-textarea" id="add_confirm_content" placeholder="描述确认过程和结论..."></textarea></div><div class="add-form-row"><div class="add-form-group"><label class="add-form-label">确认人</label><input class="add-form-input" id="add_confirm_confirmer"></div></div><div class="add-form-group"><label class="add-form-label">关联结论变更</label><div class="evidence-ref-select">'+chOptions+'</div></div></div>';
+  h+='</div><div class="modal-footer"><button class="btn" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="submitAddEvidence(\''+recordId+'\')">提交</button></div>';
+  document.getElementById('modalContent').innerHTML=h;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function selectChRef(el,chId){
+  selectedChRef=chId;
+  var chips=el.parentElement.querySelectorAll('.ref-chip');
+  chips.forEach(function(c){c.classList.remove('selected')});
+  el.classList.add('selected');
+}
+
+function switchAddTab(tab){
+  currentAddTab=tab;
+  var tabs=['photo','opinion','sensor','confirm'];
+  tabs.forEach(function(t){
+    var el=document.getElementById('addTab_'+t);
+    if(el)el.style.display=t===tab?'block':'none';
+  });
+  var btns=document.querySelectorAll('#addTabs .tab');
+  btns.forEach(function(b,i){b.classList.toggle('active',tabs[i]===tab)});
+}
+
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open')}
+
+function showToast(msg,type){
+  var container=document.getElementById('toastContainer');
+  var toast=document.createElement('div');
+  toast.className='toast '+(type||'');
+  toast.textContent=msg;
+  container.appendChild(toast);
+  setTimeout(function(){toast.remove()},3000);
+}
+
+function submitAddEvidence(recordId){
+  var rec=getRecord(recordId);if(!rec)return;
+  var now=new Date().toISOString().slice(0,16).replace('T',' ');
+
+  if(currentAddTab==='photo'){
+    var fn=document.getElementById('add_photo_filename').value.trim();
+    var desc=document.getElementById('add_photo_desc').value.trim();
+    var uploader=document.getElementById('add_photo_uploader').value.trim();
+    var supp=document.getElementById('add_photo_supplement').value==='true';
+    if(!fn||!desc){showToast('请填写文件名和描述','error');return}
+    DATA.anomalyPhotos.push({id:uid(),recordId:recordId,fileName:fn,description:desc,uploadedAt:now,uploadedBy:uploader||'未知',isSupplementary:supp,relatedConclusionHistoryId:selectedChRef});
+    showToast('异常照片已添加','success');
+  }else if(currentAddTab==='opinion'){
+    var content=document.getElementById('add_opinion_content').value.trim();
+    var reviewer=document.getElementById('add_opinion_reviewer').value.trim();
+    var late=document.getElementById('add_opinion_late').value==='true';
+    if(!content){showToast('请填写批改意见内容','error');return}
+    DATA.correctionOpinions.push({id:uid(),recordId:recordId,content:content,reviewer:reviewer||'未知',reviewedAt:now,isLateSupplement:late,relatedConclusionHistoryId:selectedChRef});
+    showToast('批改意见已添加','success');
+  }else if(currentAddTab==='sensor'){
+    var temp=parseFloat(document.getElementById('add_sensor_temp').value);
+    var res=parseFloat(document.getElementById('add_sensor_resistance').value);
+    var orig=document.getElementById('add_sensor_original').value?parseFloat(document.getElementById('add_sensor_original').value):null;
+    var editor=document.getElementById('add_sensor_editor').value.trim();
+    var reason=document.getElementById('add_sensor_reason').value.trim();
+    if(isNaN(temp)||isNaN(res)){showToast('请填写温度和电阻值','error');return}
+    var isManual=orig!==null&&!isNaN(orig);
+    DATA.sensorLogs.push({id:uid(),recordId:recordId,timestamp:now,temperature:temp,resistance:res,originalResistance:isManual?orig:null,isManualEdit:isManual,editReason:reason,editedBy:isManual?editor:'',editedAt:isManual?now:null,relatedConclusionHistoryId:selectedChRef});
+    showToast('传感器修正已添加','success');
+  }else if(currentAddTab==='confirm'){
+    var cc=document.getElementById('add_confirm_content').value.trim();
+    var confirmer=document.getElementById('add_confirm_confirmer').value.trim();
+    if(!cc){showToast('请填写确认内容','error');return}
+    DATA.manualConfirmations.push({id:uid(),recordId:recordId,confirmer:confirmer||'未知',confirmedAt:now,content:cc,relatedEvidenceIds:[],relatedConclusionHistoryId:selectedChRef});
+    showToast('人工确认已添加','success');
+  }
+
+  linkEvidenceIds();
+  saveToStorage();
+  closeModal();
+  
+setTimeout(function(){
+  var cards = document.querySelectorAll('.record-card');
+  if(cards.length > 0) {
+    cards[0].click();
+    console.log('Auto-clicked first record card');
+  } else {
+    console.log('No record cards found');
+  }
+}, 500);
+
+renderHeaderStats();
+  renderRecordList();
+  renderDetail();
+}
+
+function exportRecord(recordId){
+  var rec=getRecord(recordId);if(!rec)return;
+  var photos=getPhotos(rec.id),opinions=getOpinions(rec.id),logs=getSensorLogs(rec.id),confs=getConfirmations(rec.id);
+  var lines=[];
+  lines.push('='.repeat(60));
+  lines.push('电阻温漂记录 · 证据链报告');
+  lines.push('='.repeat(60));
+  lines.push('');
+  lines.push('电阻编号：'+rec.resistorId);
+  lines.push('测试日期：'+rec.testDate);
+  lines.push('测试人员：'+rec.tester);
+  lines.push('审核人员：'+rec.reviewer);
+  lines.push('当前结论：'+rec.conclusion);
+  lines.push('');
+  lines.push('─'.repeat(40));
+  lines.push('结论变更历史（共'+rec.conclusionHistory.length+'次）');
+  lines.push('─'.repeat(40));
+  rec.conclusionHistory.forEach(function(ch,i){
+    lines.push('');
+    lines.push('  ['+(i+1)+'] '+getChangeTypeLabel(ch.changeType));
+    lines.push('  结论：'+ch.conclusion);
+    lines.push('  操作人：'+ch.changedBy);
+    lines.push('  时间：'+ch.changedAt);
+    if(ch.reason&&ch.changeType!=='original')lines.push('  原因：'+ch.reason);
+    if(ch.evidenceIds.length>0){
+      lines.push('  关联证据：');
+      ch.evidenceIds.forEach(function(eid){
+        var ev=getEvidenceById(eid);
+        if(!ev)return;
+        var t=getEvidenceType(ev);
+        if(t==='photo')lines.push('    - [异常照片] '+ev.fileName+' ('+ev.description+')');
+        else if(t==='opinion')lines.push('    - [批改意见] '+ev.content.substring(0,50)+'…');
+        else if(t==='sensor')lines.push('    - [传感器修正] '+ev.temperature+'℃ '+ev.originalResistance+'Ω→'+ev.resistance+'Ω');
+        else if(t==='confirm')lines.push('    - [人工确认] '+ev.content.substring(0,50)+'…');
+      });
+    }
+  });
+  lines.push('');
+  lines.push('─'.repeat(40));
+  lines.push('异常照片（共'+photos.length+'张）');
+  lines.push('─'.repeat(40));
+  photos.forEach(function(p){
+    lines.push('  '+p.fileName+(p.isSupplementary?' [补传]':' [原始]'));
+    lines.push('    '+p.description);
+    lines.push('    上传人：'+p.uploadedBy+' | 时间：'+p.uploadedAt);
+  });
+  lines.push('');
+  lines.push('─'.repeat(40));
+  lines.push('批改意见（共'+opinions.length+'条）');
+  lines.push('─'.repeat(40));
+  opinions.forEach(function(o){
+    lines.push('  '+(o.isLateSupplement?'[晚补] ':'') +o.content);
+    lines.push('    审核人：'+o.reviewer+' | 时间：'+o.reviewedAt);
+  });
+  if(!opinions.length&&rec.conclusionHistory.some(function(ch){return ch.changeType!=='original'})){
+    lines.push('  ⚠ 结论已变更但缺少批改意见！');
+  }
+  lines.push('');
+  lines.push('─'.repeat(40));
+  lines.push('传感器日志（共'+logs.length+'条）');
+  lines.push('─'.repeat(40));
+  logs.forEach(function(s){
+    var marker='';
+    if(s.isManualEdit)marker='[手工修正]';
+    else if(s.isDuplicate)marker='[⚠ 重复]';
+    lines.push('  '+s.timestamp+' | '+s.temperature+'℃ | '+s.resistance+'Ω '+marker);
+    if(s.isManualEdit)lines.push('    原始值：'+s.originalResistance+'Ω → 修正值：'+s.resistance+'Ω | 修正人：'+s.editedBy);
+    if(s.editReason)lines.push('    备注：'+s.editReason);
+  });
+  lines.push('');
+  lines.push('─'.repeat(40));
+  lines.push('人工确认（共'+confs.length+'条）');
+  lines.push('─'.repeat(40));
+  confs.forEach(function(c){
+    lines.push('  '+c.content);
+    lines.push('    确认人：'+c.confirmer+' | 时间：'+c.confirmedAt);
+  });
+  lines.push('');
+  lines.push('='.repeat(60));
+  lines.push('报告生成时间：'+new Date().toLocaleString('zh-CN'));
+  lines.push('='.repeat(60));
+
+  var blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=rec.resistorId+'_证据链报告_'+new Date().toISOString().slice(0,10)+'.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('证据链报告已导出','success');
+}
+
+document.getElementById('searchBox').addEventListener('input',function(){renderRecordList()});
+
+if(!loadFromStorage()||!DATA.records||!DATA.records.length){localStorage.removeItem('drift_record_data');initTestData()}
+else{linkEvidenceIds()}
+
+renderHeaderStats();
+renderFilters();
+renderRecordList();
+</script>
+</body>
+</html>
