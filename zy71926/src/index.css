@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-console-border;
+  }
+  html, body, #root {
+    @apply h-full;
+  }
+  body {
+    @apply bg-console-bg text-console-text font-mono text-sm antialiased;
+    font-feature-settings: "liga" 0;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-3 py-1.5 text-xs font-medium rounded-none border transition-colors;
+  }
+  .btn-primary {
+    @apply bg-console-info border-console-info text-white hover:bg-console-info/80;
+  }
+  .btn-success {
+    @apply bg-console-success border-console-success text-white hover:bg-console-success/80;
+  }
+  .btn-warning {
+    @apply bg-console-warning border-console-warning text-white hover:bg-console-warning/80;
+  }
+  .btn-danger {
+    @apply bg-console-danger border-console-danger text-white hover:bg-console-danger/80;
+  }
+  .btn-secondary {
+    @apply bg-console-panel border-console-border text-console-text hover:bg-console-border;
+  }
+  .tag {
+    @apply px-1.5 py-0.5 text-[10px] font-medium tracking-wide;
+  }
+  .tag-success {
+    @apply bg-console-success/20 text-console-success border border-console-success/30;
+  }
+  .tag-warning {
+    @apply bg-console-warning/20 text-console-warning border border-console-warning/30;
+  }
+  .tag-danger {
+    @apply bg-console-danger/20 text-console-danger border border-console-danger/30;
+  }
+  .tag-info {
+    @apply bg-console-info/20 text-console-info border border-console-info/30;
+  }
+  .tag-muted {
+    @apply bg-console-border/50 text-console-muted border border-console-border;
+  }
+  .input {
+    @apply w-full bg-console-panel border border-console-border px-3 py-2 text-sm text-console-text placeholder:text-console-muted focus:outline-none focus:border-console-info;
+  }
+  .panel {
+    @apply bg-console-panel border border-console-border;
+  }
+  .table-header {
+    @apply bg-console-bg/50 text-console-muted text-[11px] uppercase tracking-wider font-medium;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #334155 #1e293b;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #1e293b;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #334155;
+  }
+}
