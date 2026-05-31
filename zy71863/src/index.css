@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: '"Source Han Sans SC"', '"Noto Sans SC"', system-ui, sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: '"Source Han Serif SC"', '"Noto Serif SC"', Georgia, serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-700 text-white rounded-lg shadow-md hover:bg-primary-800 hover:shadow-lg transition-all duration-200;
+  }
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-primary-700 border border-primary-200 rounded-lg shadow-sm hover:bg-primary-50 hover:shadow-md transition-all duration-200;
+  }
+  .btn-accent {
+    @apply px-4 py-2 bg-accent-600 text-white rounded-lg shadow-md hover:bg-accent-700 hover:shadow-lg transition-all duration-200;
+  }
+  .card {
+    @apply bg-white rounded-xl shadow-card hover:shadow-card-hover transition-shadow duration-300 p-6;
+  }
+  .badge {
+    @apply px-3 py-1 text-xs font-medium rounded-full;
+  }
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
+  }
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
