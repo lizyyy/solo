@@ -1,0 +1,24 @@
+energy_constraints:
+  max_peak_power: 1000.0
+  min_valley_power: 50.0
+  max_peak_valley_ratio: 8.0
+  min_peak_valley_ratio: 1.5
+  max_fitting_error: 5.0
+
+time_constraints:
+  min_peak_interval: 2
+  min_valley_interval: 2
+  peak_valley_min_distance: 1
+
+algorithm_params:
+  window_size: 5
+  poly_order: 3
+  smoothing_factor: 0.1
+  peak_prominence: 0.15
+  valley_prominence: 0.15
+
+export_config:
+  include_raw_data: true
+  include_intermediate_steps: true
+  include_constraint_checks: true
+  format: "txt"
