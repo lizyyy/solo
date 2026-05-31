@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人工复判采样系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-6">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                <i class="fa fa-search text-blue-600 mr-2"></i>人工复判采样系统
+            </h1>
+            <p class="text-gray-600">数据溯源 · 变更追踪 · 筛选一致 · 批量幂等</p>
+        </header>
+
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">
+                <i class="fa fa-filter text-blue-600 mr-2"></i>筛选条件
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">批次号</label>
+                    <input type="text" id="batchNo" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="输入批次号">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">复判状态</label>
+                    <select id="reviewStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">全部</option>
+                        <option value="pending">待复判</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">是否异常</label>
+                    <select id="isAnomaly" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">全部</option>
+                        <option value="true">是</option>
+                        <option value="false">否</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">包含晚交/晚补数据</label>
+                    <select id="hasLateData" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">全部</option>
+                        <option value="true">是</option>
+                        <option value="false">否</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="loadSamples()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    <i class="fa fa-search mr-1"></i>查询
+                </button>
+                <button onclick="resetFilters()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+                    <i class="fa fa-refresh mr-1"></i>重置
+                </button>
+                <button onclick="exportReport()" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                    <i class="fa fa-download mr-1"></i>导出周报
+                </button>
+                <button onclick="batchMarkAnomaly()" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                    <i class="fa fa-exclamation-triangle mr-1"></i>批量标记异常
+                </button>
+                <button onclick="batchMarkNormal()" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                    <i class="fa fa-check-circle mr-1"></i>批量标记正常
+                </button>
+            </div>
+        </div>
+
+        <div id="filterInfo" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 hidden">
+            <div class="flex items-center justify-between">
+                <div>
+                    <i class="fa fa-info-circle text-blue-600 mr-2"></i>
+                    <span id="filterConditionText" class="text-blue-800"></span>
+                </div>
+                <button onclick="verifyConsistency()" class="text-blue-600 hover:text-blue-800 text-sm">
+                    <i class="fa fa-check-square-o mr-1"></i>验证一致性
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-xl font-semibold">
+                    <i class="fa fa-list text-blue-600 mr-2"></i>复判采样列表
+                    <span id="totalCount" class="text-sm font-normal text-gray-500 ml-2"></span>
+                </h2>
+                <div class="flex gap-2 items-center">
+                    <label class="text-sm text-gray-600">每页显示:</label>
+                    <select id="pageSize" onchange="loadSamples()" class="px-2 py-1 border border-gray-300 rounded text-sm">
+                        <option value="20">20</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <label class="text-sm text-gray-600 ml-4">排序:</label>
+                    <select id="sortBy" onchange="loadSamples()" class="px-2 py-1 border border-gray-300 rounded text-sm">
+                        <option value="created_at">创建时间</option>
+                        <option value="sample_date">采样日期</option>
+                        <option value="review_status">复判状态</option>
+                    </select>
+                    <select id="sortOrder" onchange="loadSamples()" class="px-2 py-1 border border-gray-300 rounded text-sm">
+                        <option value="desc">降序</option>
+                        <option value="asc">升序</option>
+                    </select>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="rounded">
+                            </th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">批次号</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">采样日期</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">复判状态</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">是否异常</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">异常类型</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">数据来源</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">变更标记</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sampleTableBody" class="divide-y divide-gray-200">
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+                <div id="selectedInfo" class="text-sm text-gray-600"></div>
+                <div class="flex gap-2">
+                    <button onclick="prevPage()" id="prevBtn" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50">
+                        <i class="fa fa-chevron-left"></i>
+                    </button>
+                    <span id="pageInfo" class="px-3 py-1 text-sm text-gray-600"></span>
+                    <button onclick="nextPage()" id="nextBtn" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50">
+                        <i class="fa fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="toast" class="fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let currentFilterConditionId = null;
+        let currentConditionHash = null;
+        let selectedIds = new Set();
+        let totalPages = 1;
+        let totalCount = 0;
+
+        const anomalyTypes = {
+            "SENSITIVE_DATA_LEAK": "敏感词漏脱敏",
+            "QUALITY_ISSUE": "质检问题",
+            "KNOWLEDGE_ERROR": "知识库错误",
+            "TIMING_ISSUE": "时序问题",
+            "OTHER": "其他异常"
+        };
+
+        const reviewStatusMap = {
+            "pending": { text: "待复判", class: "bg-yellow-100 text-yellow-800" },
+            "completed": { text: "已完成", class: "bg-green-100 text-green-800" }
+        };
+
+        async function loadSamples() {
+            const params = new URLSearchParams({
+                page: currentPage,
+                page_size: document.getElementById('pageSize').value,
+                sort_by: document.getElementById('sortBy').value,
+                sort_order: document.getElementById('sortOrder').value
+            });
+
+            const batchNo = document.getElementById('batchNo').value;
+            const reviewStatus = document.getElementById('reviewStatus').value;
+            const isAnomaly = document.getElementById('isAnomaly').value;
+            const hasLateData = document.getElementById('hasLateData').value;
+
+            if (batchNo) params.append('sample_batch_no', batchNo);
+            if (reviewStatus) params.append('review_status', reviewStatus);
+            if (isAnomaly) params.append('is_anomaly', isAnomaly);
+            if (hasLateData) params.append('has_late_data', hasLateData);
+
+            try {
+                const response = await fetch(`/api/review-samples?${params.toString()}`);
+                const data = await response.json();
+                
+                currentFilterConditionId = data.filter_condition_id;
+                currentConditionHash = data.condition_hash;
+                totalPages = data.total_pages;
+                totalCount = data.total;
+
+                document.getElementById('totalCount').textContent = `(共 ${totalCount} 条)`;
+                document.getElementById('pageInfo').textContent = `第 ${currentPage} / ${totalPages} 页`;
+                document.getElementById('prevBtn').disabled = currentPage <= 1;
+                document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+
+                if (currentFilterConditionId) {
+                    document.getElementById('filterInfo').classList.remove('hidden');
+                    document.getElementById('filterConditionText').textContent = 
+                        `当前筛选条件 ID: ${currentFilterConditionId}，数据已与筛选条件关联，导出时将使用相同条件`;
+                }
+
+                renderTable(data.items);
+                updateSelectedInfo();
+            } catch (error) {
+                showToast('加载数据失败: ' + error.message, 'error');
+            }
+        }
+
+        function renderTable(samples) {
+            const tbody = document.getElementById('sampleTableBody');
+            tbody.innerHTML = '';
+
+            samples.forEach(sample => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50';
+                
+                const reviewStatus = reviewStatusMap[sample.review_status] || { text: sample.review_status, class: 'bg-gray-100 text-gray-800' };
+                const anomalyBadge = sample.is_anomaly 
+                    ? '<span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">是</span>'
+                    : '<span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">否</span>';
+                
+                const sourceTypes = [];
+                if (sample.inspection_id) sourceTypes.push('质检表');
+                if (sample.dialog_id) sourceTypes.push('客服对话');
+                if (sample.knowledge_entry_id) sourceTypes.push('知识库');
+
+                let changeBadge = '';
+                if (sample.change_histories && sample.change_histories.length > 0) {
+                    const hasConclusionChange = sample.change_histories.some(c => c.change_type === 'CONCLUSION_CHANGE');
+                    const hasMaterialOnly = sample.change_histories.every(c => c.change_type === 'MATERIAL_SUPPLEMENT');
+                    if (hasConclusionChange) {
+                        changeBadge = '<span class="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800" title="结论已变更"><i class="fa fa-exclamation-circle mr-1"></i>结论变更</span>';
+                    } else if (hasMaterialOnly) {
+                        changeBadge = '<span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800" title="仅补材料"><i class="fa fa-plus-circle mr-1"></i>仅补材料</span>';
+                    } else {
+                        changeBadge = '<span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800" title="数据修正"><i class="fa fa-wrench mr-1"></i>数据修正</span>';
+                    }
+                }
+
+                tr.innerHTML = `
+                    <td class="px-4 py-3">
+                        <input type="checkbox" class="sample-checkbox rounded" data-id="${sample.id}" 
+                            ${selectedIds.has(sample.id) ? 'checked' : ''} onchange="toggleSelect(${sample.id})">
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">${sample.id}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">${sample.sample_batch_no || '-'}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">${sample.sample_date ? new Date(sample.sample_date).toLocaleDateString() : '-'}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 text-xs font-medium rounded-full ${reviewStatus.class}">${reviewStatus.text}</span>
+                    </td>
+                    <td class="px-4 py-3">${anomalyBadge}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">${anomalyTypes[sample.anomaly_type] || sample.anomaly_type || '-'}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">${sourceTypes.join('、') || '-'}</td>
+                    <td class="px-4 py-3">${changeBadge || '-'}</td>
+                    <td class="px-4 py-3">
+                        <button onclick="viewTrace(${sample.id})" class="text-blue-600 hover:text-blue-800 mr-2" title="查看溯源">
+                            <i class="fa fa-link"></i>
+                        </button>
+                        <button onclick="viewChanges(${sample.id})" class="text-purple-600 hover:text-purple-800 mr-2" title="查看变更">
+                            <i class="fa fa-history"></i>
+                        </button>
+                        <button onclick="checkSensitive(${sample.id})" class="text-red-600 hover:text-red-800" title="敏感词检查">
+                            <i class="fa fa-shield"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleSelect(id) {
+            if (selectedIds.has(id)) {
+                selectedIds.delete(id);
+            } else {
+                selectedIds.add(id);
+            }
+            updateSelectedInfo();
+        }
+
+        function toggleSelectAll() {
+            const checkboxes = document.querySelectorAll('.sample-checkbox');
+            const selectAll = document.getElementById('selectAll').checked;
+            
+            checkboxes.forEach(cb => {
+                const id = parseInt(cb.dataset.id);
+                if (selectAll) {
+                    selectedIds.add(id);
+                    cb.checked = true;
+                } else {
+                    selectedIds.delete(id);
+                    cb.checked = false;
+                }
+            });
+            updateSelectedInfo();
+        }
+
+        function updateSelectedInfo() {
+            const info = document.getElementById('selectedInfo');
+            if (selectedIds.size > 0) {
+                info.innerHTML = `已选择 <strong>${selectedIds.size}</strong> 条记录，可进行批量操作`;
+            } else {
+                info.innerHTML = '';
+            }
+            document.getElementById('selectAll').checked = 
+                document.querySelectorAll('.sample-checkbox').length > 0 && 
+                document.querySelectorAll('.sample-checkbox').length === selectedIds.size;
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadSamples();
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadSamples();
+            }
+        }
+
+        function resetFilters() {
+            currentPage = 1;
+            selectedIds.clear();
+            document.getElementById('batchNo').value = '';
+            document.getElementById('reviewStatus').value = '';
+            document.getElementById('isAnomaly').value = '';
+            document.getElementById('hasLateData').value = '';
+            document.getElementById('pageSize').value = '50';
+            document.getElementById('sortBy').value = 'created_at';
+            document.getElementById('sortOrder').value = 'desc';
+            loadSamples();
+        }
+
+        function viewTrace(sampleId) {
+            window.open(`/review-samples/${sampleId}`, '_blank');
+        }
+
+        async function viewChanges(sampleId) {
+            try {
+                const response = await fetch(`/api/review-samples/${sampleId}/change-summary`);
+                const data = await response.json();
+                
+                let html = `<div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-semibold mb-2">变更概览</h4>
+                        <p>总变更次数: ${data.total_changes}</p>
+                        <p>补材料次数: ${data.material_supplements}</p>
+                        <p>结论变更次数: ${data.conclusion_changes}</p>
+                        <p>数据修正次数: ${data.data_corrections}</p>
+                        <p class="mt-2 font-medium">${data.has_conclusion_change ? '存在结论变更' : data.has_material_only ? '仅补材料，无结论变更' : '无结论变更'}</p>
+                    </div>
+                    <h4 class="font-semibold">详细变更记录</h4>
+                    <div class="space-y-2">`;
+                
+                data.change_log.forEach(change => {
+                    const typeClass = change.is_conclusion_change ? 'border-orange-500 bg-orange-50' 
+                        : change.is_material_only ? 'border-blue-500 bg-blue-50' 
+                        : 'border-purple-500 bg-purple-50';
+                    html += `
+                        <div class="border-l-4 ${typeClass} p-3 rounded">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="font-medium">${change.change_type_name}</span>
+                                    <span class="text-sm text-gray-500 ml-2">${change.field_name}</span>
+                                </div>
+                                <span class="text-xs text-gray-500">${new Date(change.operation_time).toLocaleString()}</span>
+                            </div>
+                            <div class="text-sm mt-1">
+                                ${change.old_value !== null ? `<div><span class="text-gray-500">原值:</span> ${JSON.stringify(change.old_value)}</div>` : ''}
+                                <div><span class="text-gray-500">新值:</span> ${JSON.stringify(change.new_value)}</div>
+                                ${change.remark ? `<div class="text-gray-600 mt-1">备注: ${change.remark}</div>` : ''}
+                                ${change.operator ? `<div class="text-gray-500 text-xs mt-1">操作人: ${change.operator}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div></div>';
+                
+                showModal('变更历史 - 样本 #' + sampleId, html);
+            } catch (error) {
+                showToast('加载变更历史失败', 'error');
+            }
+        }
+
+        async function checkSensitive(sampleId) {
+            try {
+                const response = await fetch(`/api/review-samples/${sampleId}/sensitive-check`);
+                const data = await response.json();
+                
+                let bgClass = data.is_exception ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
+                let iconClass = data.is_exception ? 'text-red-600' : 'text-green-600';
+                let icon = data.is_exception ? 'fa-exclamation-circle' : 'fa-check-circle';
+                
+                const html = `
+                    <div class="${bgClass} border rounded-lg p-4 mb-4">
+                        <div class="flex items-center">
+                            <i class="fa ${icon} ${iconClass} text-2xl mr-3"></i>
+                            <div>
+                                <p class="font-semibold">${data.judgment}</p>
+                                <p class="text-sm text-gray-600">敏感词发现: ${data.sensitive_findings.length} 处，手工修正: ${data.manual_fix_count} 次</p>
+                            </div>
+                        </div>
+                    </div>
+                    ${data.sensitive_findings.length > 0 ? `
+                        <h4 class="font-semibold mb-2">敏感词发现位置</h4>
+                        <div class="space-y-2">
+                            ${data.sensitive_findings.map(f => `
+                                <div class="bg-red-50 border border-red-200 rounded p-2 text-sm">
+                                    <span class="font-medium">${f.source}</span> - ${f.field}: 
+                                    <span class="text-red-600 font-medium">${f.sensitive_word}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p class="text-gray-500">未发现敏感词</p>'}
+                `;
+                
+                showModal('敏感词检查 - 样本 #' + sampleId, html);
+            } catch (error) {
+                showToast('敏感词检查失败', 'error');
+            }
+        }
+
+        async function batchMarkAnomaly() {
+            if (selectedIds.size === 0) {
+                showToast('请先选择要标记的记录', 'warning');
+                return;
+            }
+            
+            const anomalyType = prompt('请输入异常类型 (SENSITIVE_DATA_LEAK/QUALITY_ISSUE/KNOWLEDGE_ERROR/TIMING_ISSUE/OTHER):', 'SENSITIVE_DATA_LEAK');
+            if (!anomalyType) return;
+            
+            const conclusion = prompt('请输入结论:', '批量标记为异常');
+            const reviewer = prompt('请输入复判人:');
+            
+            try {
+                const response = await fetch('/api/batch/mark-anomaly', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sample_ids: Array.from(selectedIds),
+                        anomaly_type: anomalyType,
+                        conclusion: conclusion,
+                        reviewer: reviewer
+                    })
+                });
+                const data = await response.json();
+                
+                let message = `批量任务创建成功：总计 ${data.total_count} 条，成功 ${data.success_count} 条，失败 ${data.failed_count} 条`;
+                if (data.status === 'completed') {
+                    message += ' (任务已完成)';
+                }
+                showToast(message, 'success');
+                selectedIds.clear();
+                loadSamples();
+            } catch (error) {
+                showToast('批量操作失败: ' + error.message, 'error');
+            }
+        }
+
+        async function batchMarkNormal() {
+            if (selectedIds.size === 0) {
+                showToast('请先选择要标记的记录', 'warning');
+                return;
+            }
+            
+            const conclusion = prompt('请输入结论:', '批量标记为正常');
+            const reviewer = prompt('请输入复判人:');
+            
+            try {
+                const response = await fetch('/api/batch/mark-normal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sample_ids: Array.from(selectedIds),
+                        conclusion: conclusion,
+                        reviewer: reviewer
+                    })
+                });
+                const data = await response.json();
+                
+                let message = `批量任务创建成功：总计 ${data.total_count} 条，成功 ${data.success_count} 条，失败 ${data.failed_count} 条`;
+                if (data.status === 'completed') {
+                    message += ' (任务已完成)';
+                }
+                showToast(message, 'success');
+                selectedIds.clear();
+                loadSamples();
+            } catch (error) {
+                showToast('批量操作失败: ' + error.message, 'error');
+            }
+        }
+
+        async function exportReport() {
+            if (!currentFilterConditionId) {
+                showToast('请先执行查询以生成筛选条件', 'warning');
+                return;
+            }
+            
+            const exportedBy = prompt('请输入导出人:');
+            
+            try {
+                const response = await fetch('/api/exports/weekly-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filter_condition_id: currentFilterConditionId,
+                        exported_by: exportedBy
+                    })
+                });
+                const data = await response.json();
+                
+                showToast(`周报导出成功：${data.file_name}，共 ${data.record_count} 条记录`, 'success');
+                
+                setTimeout(() => {
+                    window.open(`/api/exports/${data.id}/download`, '_blank');
+                }, 1000);
+            } catch (error) {
+                showToast('导出失败: ' + error.message, 'error');
+            }
+        }
+
+        async function verifyConsistency() {
+            if (!currentFilterConditionId) {
+                showToast('没有可验证的筛选条件', 'warning');
+                return;
+            }
+            
+            try {
+                const recentExports = await fetch('/api/exports').then(r => r.json());
+                
+                if (recentExports.length === 0) {
+                    showToast('暂无导出记录可对比', 'info');
+                    return;
+                }
+                
+                const lastExport = recentExports[0];
+                const response = await fetch(
+                    `/api/exports/${lastExport.id}/verify-consistency?current_filter_id=${currentFilterConditionId}`
+                );
+                const data = await response.json();
+                
+                let html = '';
+                if (data.is_consistent) {
+                    html = `
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <div class="flex items-center">
+                                <i class="fa fa-check-circle text-green-600 text-2xl mr-3"></i>
+                                <div>
+                                    <p class="font-semibold text-green-800">数据一致</p>
+                                    <p class="text-sm text-green-600">当前屏幕数据与导出的周报完全一致</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html = `
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                            <div class="flex items-center">
+                                <i class="fa fa-exclamation-triangle text-red-600 text-2xl mr-3"></i>
+                                <div>
+                                    <p class="font-semibold text-red-800">数据不一致</p>
+                                    <p class="text-sm text-red-600">当前屏幕数据与导出的周报存在差异</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <p><strong>导出时间:</strong> ${new Date(data.exported_at).toLocaleString()}</p>
+                            <p><strong>导出记录数:</strong> ${data.export_count}</p>
+                            <p><strong>筛选条件匹配:</strong> ${data.filter_match.hash_match ? '是' : '否'}</p>
+                            <p><strong>记录数匹配:</strong> ${data.sample_count_match ? '是' : '否'}</p>
+                            <p><strong>记录ID匹配:</strong> ${data.sample_ids_match ? '是' : '否'}</p>
+                            ${data.new_samples_since_export.length > 0 ? `
+                                <p class="text-orange-600"><strong>新增记录:</strong> ${data.new_samples_since_export.join(', ')}</p>
+                            ` : ''}
+                            ${data.removed_samples_since_export.length > 0 ? `
+                                <p class="text-red-600"><strong>移除记录:</strong> ${data.removed_samples_since_export.join(', ')}</p>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+                
+                showModal('导出一致性验证', html);
+            } catch (error) {
+                showToast('验证失败: ' + error.message, 'error');
+            }
+        }
+
+        function showModal(title, content) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col">
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h3 class="text-lg font-semibold">${title}</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fa fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div class="p-4 overflow-y-auto flex-1">${content}</div>
+                    <div class="p-4 border-t flex justify-end">
+                        <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                            关闭
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            const colors = {
+                success: 'bg-green-500 text-white',
+                error: 'bg-red-500 text-white',
+                warning: 'bg-yellow-500 text-white',
+                info: 'bg-blue-500 text-white'
+            };
+            
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 z-50 ${colors[type]}`;
+            toastMessage.textContent = message;
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateY(20px)';
+                toast.style.opacity = '0';
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSamples();
+        });
+    </script>
+</body>
+</html>

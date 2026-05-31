@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>复判样本详情 - 数据溯源</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-6">
+        <header class="mb-6 flex items-center justify-between">
+            <div>
+                <a href="/" class="text-blue-600 hover:text-blue-800 mb-2 inline-block">
+                    <i class="fa fa-arrow-left mr-1"></i>返回列表
+                </a>
+                <h1 class="text-2xl font-bold text-gray-800">
+                    <i class="fa fa-search-plus text-blue-600 mr-2"></i>复判样本详情 - 数据溯源
+                </h1>
+                <p class="text-gray-600">样本 ID: <span id="sampleId"></span></p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="exportReport()" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                    <i class="fa fa-download mr-1"></i>导出周报
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fa fa-info-circle text-blue-600 mr-2"></i>基本信息
+                    </h2>
+                    <div id="basicInfo" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold flex items-center">
+                            <i class="fa fa-link text-blue-600 mr-2"></i>数据溯源链路
+                        </h2>
+                        <button onclick="refreshTrace()" class="text-blue-600 hover:text-blue-800 text-sm">
+                            <i class="fa fa-refresh mr-1"></i>刷新
+                        </button>
+                    </div>
+                    <div id="dataSources" class="space-y-4">
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fa fa-clock-o text-purple-600 mr-2"></i>数据时间线
+                    </h2>
+                    <div id="dataTimeline" class="relative">
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fa fa-history text-orange-600 mr-2"></i>变更历史
+                    </h2>
+                    <div id="changeHistory" class="space-y-3">
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fa fa-shield text-red-600 mr-2"></i>敏感词检查
+                    </h2>
+                    <div id="sensitiveCheck">
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fa fa-bar-chart text-green-600 mr-2"></i>变更统计
+                    </h2>
+                    <div id="changeSummary">
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fa fa-edit text-blue-600 mr-2"></i>快速操作
+                    </h2>
+                    <div class="space-y-3">
+                        <button onclick="updateConclusion()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            <i class="fa fa-pencil mr-1"></i>更新结论
+                        </button>
+                        <button onclick="markAnomaly()" class="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                            <i class="fa fa-exclamation-triangle mr-1"></i>标记为异常
+                        </button>
+                        <button onclick="markNormal()" class="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                            <i class="fa fa-check-circle mr-1"></i>标记为正常
+                        </button>
+                        <button onclick="logMaterialSupplement()" class="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
+                            <i class="fa fa-plus-circle mr-1"></i>记录补材料
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fa fa-filter text-gray-600 mr-2"></i>筛选条件信息
+                    </h2>
+                    <div id="filterInfo">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="toast" class="fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        const sampleId = {{ sample_id }};
+        const anomalyTypes = {
+            "SENSITIVE_DATA_LEAK": "敏感词漏脱敏",
+            "QUALITY_ISSUE": "质检问题",
+            "KNOWLEDGE_ERROR": "知识库错误",
+            "TIMING_ISSUE": "时序问题",
+            "OTHER": "其他异常"
+        };
+        const reviewStatusMap = {
+            "pending": { text: "待复判", class: "bg-yellow-100 text-yellow-800" },
+            "completed": { text: "已完成", class: "bg-green-100 text-green-800" }
+        };
+        const changeTypeMap = {
+            "MATERIAL_SUPPLEMENT": { text: "补材料", class: "bg-blue-100 text-blue-800" },
+            "CONCLUSION_CHANGE": { text: "结论变更", class: "bg-orange-100 text-orange-800" },
+            "DATA_CORRECTION": { text: "数据修正", class: "bg-purple-100 text-purple-800" },
+            "SCREEN_REFRESH": { text: "筛选刷新", class: "bg-gray-100 text-gray-800" },
+            "BATCH_PROCESS": { text: "批量处理", class: "bg-indigo-100 text-indigo-800" }
+        };
+        const sourceTypeMap = {
+            "QUALITY_FORM": "质检表",
+            "CUSTOMER_SERVICE": "客服对话",
+            "KNOWLEDGE_BASE": "知识库导出"
+        };
+
+        document.getElementById('sampleId').textContent = sampleId;
+
+        async function loadSampleDetail() {
+            try {
+                const [traceResp, sensitiveResp, changeSummaryResp] = await Promise.all([
+                    fetch(`/api/review-samples/${sampleId}/trace`),
+                    fetch(`/api/review-samples/${sampleId}/sensitive-check`),
+                    fetch(`/api/review-samples/${sampleId}/change-summary`)
+                ]);
+
+                const trace = await traceResp.json();
+                const sensitive = await sensitiveResp.json();
+                const changeSummary = await changeSummaryResp.json();
+
+                renderBasicInfo(trace);
+                renderDataSources(trace.data_sources);
+                renderTimeline(trace.data_timeline, trace.change_history);
+                renderChangeHistory(trace.change_history);
+                renderSensitiveCheck(sensitive);
+                renderChangeSummary(changeSummary);
+                renderFilterInfo(trace);
+            } catch (error) {
+                showToast('加载数据失败: ' + error.message, 'error');
+            }
+        }
+
+        function renderBasicInfo(trace) {
+            const reviewStatus = reviewStatusMap[trace.review_status] || { text: trace.review_status, class: 'bg-gray-100 text-gray-800' };
+            const anomalyBadge = trace.is_anomaly 
+                ? '<span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">是</span>'
+                : '<span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">否</span>';
+
+            document.getElementById('basicInfo').innerHTML = `
+                <div>
+                    <p class="text-sm text-gray-500">复判状态</p>
+                    <p class="font-medium"><span class="px-2 py-1 text-xs font-medium rounded-full ${reviewStatus.class}">${reviewStatus.text}</span></p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">是否异常</p>
+                    <p class="font-medium">${anomalyBadge}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">异常类型</p>
+                    <p class="font-medium">${anomalyTypes[trace.anomaly_type] || trace.anomaly_type || '-'}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">数据来源数</p>
+                    <p class="font-medium">${trace.data_sources.length} 个</p>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-sm text-gray-500">结论</p>
+                    <p class="font-medium">${trace.conclusion || '-'}</p>
+                </div>
+                <div class="col-span-2">
+                    <p class="text-sm text-gray-500">依据摘要</p>
+                    <p class="font-medium">${trace.evidence_summary || '-'}</p>
+                </div>
+            `;
+        }
+
+        function renderDataSources(sources) {
+            const container = document.getElementById('dataSources');
+            
+            if (sources.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">暂无数据来源</p>';
+                return;
+            }
+
+            container.innerHTML = sources.map((source, index) => {
+                const bgColor = index === 0 ? 'border-blue-500 bg-blue-50' 
+                    : index === 1 ? 'border-green-500 bg-green-50' 
+                    : 'border-purple-500 bg-purple-50';
+                const iconColor = index === 0 ? 'text-blue-600' 
+                    : index === 1 ? 'text-green-600' 
+                    : 'text-purple-600';
+                const icon = index === 0 ? 'fa-file-text-o' 
+                    : index === 1 ? 'fa-comments-o' 
+                    : 'fa-book';
+
+                return `
+                    <div class="border-l-4 ${bgColor} p-4 rounded-lg">
+                        <div class="flex items-start justify-between mb-2">
+                            <div class="flex items-center">
+                                <i class="fa ${icon} ${iconColor} text-xl mr-3"></i>
+                                <div>
+                                    <h3 class="font-semibold">${source.source_name}</h3>
+                                    <p class="text-sm text-gray-600">编号: ${source.source_no}</p>
+                                </div>
+                            </div>
+                            <a href="${source.link}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
+                                <i class="fa fa-external-link mr-1"></i>查看原始数据
+                            </a>
+                        </div>
+                        ${source.details ? `
+                            <div class="mt-2 text-sm space-y-1">
+                                ${source.details.inspector ? `<p><span class="text-gray-500">质检人:</span> ${source.details.inspector}</p>` : ''}
+                                ${source.details.inspection_time ? `<p><span class="text-gray-500">质检时间:</span> ${new Date(source.details.inspection_time).toLocaleString()}</p>` : ''}
+                                ${source.details.is_late_submit !== undefined ? `<p><span class="text-gray-500">是否晚交:</span> ${source.details.is_late_submit ? '是' : '否'}</p>` : ''}
+                                ${source.details.agent_id ? `<p><span class="text-gray-500">客服ID:</span> ${source.details.agent_id}</p>` : ''}
+                                ${source.details.start_time ? `<p><span class="text-gray-500">对话时间:</span> ${new Date(source.details.start_time).toLocaleString()}</p>` : ''}
+                                ${source.details.is_late_supplement !== undefined ? `<p><span class="text-gray-500">是否晚补:</span> ${source.details.is_late_supplement ? '是' : '否'}</p>` : ''}
+                                ${source.details.title ? `<p><span class="text-gray-500">标题:</span> ${source.details.title}</p>` : ''}
+                                ${source.details.category ? `<p><span class="text-gray-500">分类:</span> ${source.details.category}</p>` : ''}
+                                ${source.details.is_manual_modified !== undefined ? `<p><span class="text-gray-500">是否手工改动:</span> ${source.details.is_manual_modified ? '是' : '否'}</p>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTimeline(timelineEvents, changeHistory) {
+            const container = document.getElementById('dataTimeline');
+            
+            let allEvents = [
+                ...timelineEvents.map(e => ({ ...e, type: 'data_event' })),
+                ...changeHistory.map(c => ({ 
+                    ...c, 
+                    type: 'change_event',
+                    event_time: c.operation_time,
+                    event_name: c.change_type_name
+                }))
+            ];
+            
+            allEvents.sort((a, b) => new Date(a.event_time) - new Date(b.event_time));
+
+            if (allEvents.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">暂无时间线数据</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="relative border-l-2 border-gray-200 ml-3 pl-6 pb-4">
+                    ${allEvents.map((event, index) => {
+                        const isChange = event.type === 'change_event';
+                        const dotColor = isChange 
+                            ? (event.change_type === 'CONCLUSION_CHANGE' ? 'bg-orange-500' 
+                                : event.change_type === 'MATERIAL_SUPPLEMENT' ? 'bg-blue-500' 
+                                : 'bg-purple-500')
+                            : (event.event_type === 'LATE_SUBMIT' ? 'bg-yellow-500'
+                                : event.event_type === 'LATE_SUPPLEMENT' ? 'bg-yellow-500'
+                                : 'bg-red-500');
+                        const label = isChange ? changeTypeMap[event.change_type]?.text || event.event_name : event.event_name;
+                        
+                        return `
+                            <div class="mb-6 relative">
+                                <div class="absolute -left-[34px] w-5 h-5 rounded-full ${dotColor} border-4 border-white shadow"></div>
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <span class="font-medium text-sm">${label}</span>
+                                        <span class="text-xs text-gray-500">${new Date(event.event_time).toLocaleString()}</span>
+                                    </div>
+                                    ${event.source ? `<p class="text-xs text-gray-600">来源: ${event.source}</p>` : ''}
+                                    ${event.remark ? `<p class="text-xs text-gray-600 mt-1">${event.remark}</p>` : ''}
+                                    ${event.old_value !== undefined && event.new_value !== undefined ? `
+                                        <div class="mt-2 text-xs">
+                                            ${event.old_value !== null ? `<p><span class="text-gray-500">原值:</span> ${JSON.stringify(event.old_value)}</p>` : ''}
+                                            <p><span class="text-gray-500">新值:</span> ${JSON.stringify(event.new_value)}</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function renderChangeHistory(changes) {
+            const container = document.getElementById('changeHistory');
+            
+            if (changes.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">暂无变更记录</p>';
+                return;
+            }
+
+            container.innerHTML = changes.map(change => {
+                const typeInfo = changeTypeMap[change.change_type] || { text: change.change_type, class: 'bg-gray-100 text-gray-800' };
+                const borderColor = change.is_conclusion_change ? 'border-orange-500' 
+                    : change.is_material_only ? 'border-blue-500' 
+                    : 'border-purple-500';
+                
+                return `
+                    <div class="border-l-4 ${borderColor} bg-gray-50 p-3 rounded">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full ${typeInfo.class}">${typeInfo.text}</span>
+                                <span class="text-sm text-gray-600">${change.field_name}</span>
+                            </div>
+                            <span class="text-xs text-gray-500">${new Date(change.operation_time).toLocaleString()}</span>
+                        </div>
+                        <div class="text-sm space-y-1">
+                            ${change.old_value !== null ? `<p><span class="text-gray-500">原值:</span> ${JSON.stringify(change.old_value)}</p>` : ''}
+                            <p><span class="text-gray-500">新值:</span> ${JSON.stringify(change.new_value)}</p>
+                            ${change.remark ? `<p class="text-gray-600">备注: ${change.remark}</p>` : ''}
+                            ${change.operator ? `<p class="text-xs text-gray-500">操作人: ${change.operator}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderSensitiveCheck(data) {
+            const container = document.getElementById('sensitiveCheck');
+            
+            let bgClass = data.is_exception ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
+            let iconClass = data.is_exception ? 'text-red-600' : 'text-green-600';
+            let icon = data.is_exception ? 'fa-exclamation-circle' : 'fa-check-circle';
+            
+            container.innerHTML = `
+                <div class="${bgClass} border rounded-lg p-4 mb-4">
+                    <div class="flex items-center">
+                        <i class="fa ${icon} ${iconClass} text-2xl mr-3"></i>
+                        <div>
+                            <p class="font-semibold">${data.judgment}</p>
+                            <p class="text-sm text-gray-600">敏感词发现: ${data.sensitive_findings.length} 处</p>
+                            <p class="text-sm text-gray-600">手工修正: ${data.manual_fix_count} 次</p>
+                        </div>
+                    </div>
+                </div>
+                ${data.sensitive_findings.length > 0 ? `
+                    <h4 class="font-semibold mb-2 text-sm">敏感词发现位置</h4>
+                    <div class="space-y-2">
+                        ${data.sensitive_findings.map(f => `
+                            <div class="bg-red-50 border border-red-200 rounded p-2 text-xs">
+                                <span class="font-medium">${f.source}</span> - ${f.field}: 
+                                <span class="text-red-600 font-medium">${f.sensitive_word}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function renderChangeSummary(data) {
+            const container = document.getElementById('changeSummary');
+            
+            let classification = '无变更';
+            let classificationClass = 'bg-gray-100 text-gray-800';
+            if (data.has_conclusion_change) {
+                classification = '结论变更';
+                classificationClass = 'bg-orange-100 text-orange-800';
+            } else if (data.has_material_only) {
+                classification = '仅补材料';
+                classificationClass = 'bg-blue-100 text-blue-800';
+            } else if (data.total_changes > 0) {
+                classification = '数据修正';
+                classificationClass = 'bg-purple-100 text-purple-800';
+            }
+            
+            container.innerHTML = `
+                <div class="mb-4">
+                    <span class="px-3 py-1 text-sm font-medium rounded-full ${classificationClass}">${classification}</span>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">总变更次数</span>
+                        <span class="font-medium">${data.total_changes}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">补材料次数</span>
+                        <span class="font-medium text-blue-600">${data.material_supplements}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">结论变更次数</span>
+                        <span class="font-medium text-orange-600">${data.conclusion_changes}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">数据修正次数</span>
+                        <span class="font-medium text-purple-600">${data.data_corrections}</span>
+                    </div>
+                </div>
+                ${data.original_conclusion || data.final_conclusion ? `
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        ${data.original_conclusion ? `
+                            <div class="mb-2">
+                                <p class="text-xs text-gray-500">原始结论</p>
+                                <p class="text-sm">${data.original_conclusion}</p>
+                            </div>
+                        ` : ''}
+                        ${data.final_conclusion ? `
+                            <div>
+                                <p class="text-xs text-gray-500">最终结论</p>
+                                <p class="text-sm font-medium">${data.final_conclusion}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function renderFilterInfo(trace) {
+            const container = document.getElementById('filterInfo');
+            if (!trace.filter_condition_id) {
+                container.innerHTML = '<p class="text-gray-500 text-sm">未关联筛选条件</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="text-sm space-y-2">
+                    <p><span class="text-gray-500">筛选条件 ID:</span> ${trace.filter_condition_id}</p>
+                    <p><span class="text-gray-500">导出一致性:</span> 
+                        <span class="text-green-600">已关联，导出时将使用相同条件</span>
+                    </p>
+                </div>
+            `;
+        }
+
+        function refreshTrace() {
+            loadSampleDetail();
+            showToast('数据已刷新', 'success');
+        }
+
+        async function updateConclusion() {
+            const conclusion = prompt('请输入新的结论:');
+            if (!conclusion) return;
+            
+            const reviewer = prompt('请输入复判人:');
+            
+            try {
+                const response = await fetch(`/api/review-samples/${sampleId}?operator=${encodeURIComponent(reviewer || '')}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conclusion: conclusion,
+                        review_status: 'completed'
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('结论更新成功', 'success');
+                    loadSampleDetail();
+                } else {
+                    showToast('更新失败', 'error');
+                }
+            } catch (error) {
+                showToast('更新失败: ' + error.message, 'error');
+            }
+        }
+
+        async function markAnomaly() {
+            const anomalyType = prompt('请输入异常类型:', 'SENSITIVE_DATA_LEAK');
+            if (!anomalyType) return;
+            
+            const conclusion = prompt('请输入结论:', '标记为异常');
+            const reviewer = prompt('请输入复判人:');
+            
+            try {
+                const response = await fetch(`/api/review-samples/${sampleId}?operator=${encodeURIComponent(reviewer || '')}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        is_anomaly: true,
+                        anomaly_type: anomalyType,
+                        conclusion: conclusion,
+                        review_status: 'completed',
+                        reviewer: reviewer
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('已标记为异常', 'success');
+                    loadSampleDetail();
+                } else {
+                    showToast('标记失败', 'error');
+                }
+            } catch (error) {
+                showToast('标记失败: ' + error.message, 'error');
+            }
+        }
+
+        async function markNormal() {
+            const conclusion = prompt('请输入结论:', '标记为正常');
+            const reviewer = prompt('请输入复判人:');
+            
+            try {
+                const response = await fetch(`/api/review-samples/${sampleId}?operator=${encodeURIComponent(reviewer || '')}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        is_anomaly: false,
+                        anomaly_type: null,
+                        conclusion: conclusion,
+                        review_status: 'completed',
+                        reviewer: reviewer
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('已标记为正常', 'success');
+                    loadSampleDetail();
+                } else {
+                    showToast('标记失败', 'error');
+                }
+            } catch (error) {
+                showToast('标记失败: ' + error.message, 'error');
+            }
+        }
+
+        async function logMaterialSupplement() {
+            const fieldName = prompt('请输入补充字段名:', 'evidence_summary');
+            if (!fieldName) return;
+            
+            const newValue = prompt('请输入补充内容:');
+            if (!newValue) return;
+            
+            const operator = prompt('请输入操作人:');
+            const remark = prompt('请输入备注:', '补材料');
+            
+            try {
+                const response = await fetch('/api/review-samples/material-supplement', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sample_id: sampleId,
+                        field_name: fieldName,
+                        new_value: newValue,
+                        operator: operator,
+                        remark: remark
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('补材料记录已添加', 'success');
+                    loadSampleDetail();
+                } else {
+                    showToast('记录失败', 'error');
+                }
+            } catch (error) {
+                showToast('记录失败: ' + error.message, 'error');
+            }
+        }
+
+        async function exportReport() {
+            try {
+                const response = await fetch('/api/exports/weekly-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sample_ids: [sampleId]
+                    })
+                });
+                const data = await response.json();
+                
+                showToast(`周报导出成功：${data.file_name}`, 'success');
+                
+                setTimeout(() => {
+                    window.open(`/api/exports/${data.id}/download`, '_blank');
+                }, 1000);
+            } catch (error) {
+                showToast('导出失败: ' + error.message, 'error');
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            const colors = {
+                success: 'bg-green-500 text-white',
+                error: 'bg-red-500 text-white',
+                warning: 'bg-yellow-500 text-white',
+                info: 'bg-blue-500 text-white'
+            };
+            
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 z-50 ${colors[type]}`;
+            toastMessage.textContent = message;
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateY(20px)';
+                toast.style.opacity = '0';
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSampleDetail();
+        });
+    </script>
+</body>
+</html>
