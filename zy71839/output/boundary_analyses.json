@@ -1,0 +1,211 @@
+[
+  {
+    "record_id": "BR-002-CORR",
+    "action_id": "A005",
+    "unit_id": "U002",
+    "start_pos": {
+      "x": 3,
+      "y": 7,
+      "zone": "wind_zone_a"
+    },
+    "end_pos": {
+      "x": 6,
+      "y": 7,
+      "zone": "wind_zone_a"
+    },
+    "boundary_zones": [
+      "wind_zone_a"
+    ],
+    "crossing_detected": false,
+    "review_reason": "移动路径经过【不可通行断崖】区域；轨迹: (3,7)→(6,7)",
+    "evidence": [
+      "[地图坐标] 起点(3,7) ∈ ['wind_zone_a']",
+      "[地图坐标] 终点(6,7) ∈ ['wind_zone_a']",
+      "[地形阻挡] 路径经过不可通行坐标: [(5, 7), (6, 7)]",
+      "[战报来源] file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_manual_correction.json#L1",
+      "[行动ID] A005"
+    ],
+    "map_data_ref": "canyon_map_v2",
+    "unit_move_ref": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L3",
+    "confirmation_status": "pending",
+    "analysis_id": "BR-002-CORR:A005",
+    "review_link": "boundary_review://BR-002-CORR:A005"
+  },
+  {
+    "record_id": "BR-002-CORR",
+    "action_id": "A006",
+    "unit_id": "U005",
+    "start_pos": {
+      "x": 16,
+      "y": 7,
+      "zone": "wind_zone_b"
+    },
+    "end_pos": {
+      "x": 13,
+      "y": 7,
+      "zone": "wind_zone_b"
+    },
+    "boundary_zones": [],
+    "crossing_detected": false,
+    "review_reason": "移动距离3.0格超过【盾卫战士】移动力上限2格；移动路径经过【不可通行断崖】区域；轨迹: (16,7)→(13,7)",
+    "evidence": [
+      "[地图坐标] 起点(16,7) ∈ []",
+      "[地图坐标] 终点(13,7) ∈ []",
+      "[移动校验] 欧氏距离=√9=3.00",
+      "[单位数据] 盾卫战士(ID:U005) 移动力=2",
+      "[单位来源] file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L6",
+      "[地形阻挡] 路径经过不可通行坐标: [(14, 7), (13, 7)]",
+      "[战报来源] file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_manual_correction.json#L1",
+      "[行动ID] A006"
+    ],
+    "map_data_ref": "canyon_map_v2",
+    "unit_move_ref": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L6",
+    "confirmation_status": "pending",
+    "analysis_id": "BR-002-CORR:A006",
+    "review_link": "boundary_review://BR-002-CORR:A006"
+  },
+  {
+    "record_id": "BR-001",
+    "action_id": "A002",
+    "unit_id": "U004",
+    "start_pos": {
+      "x": 15,
+      "y": 8,
+      "zone": "wind_zone_b"
+    },
+    "end_pos": {
+      "x": 10,
+      "y": 8,
+      "zone": "canyon_pass"
+    },
+    "boundary_zones": [
+      "wind_zone_b",
+      "canyon_pass"
+    ],
+    "crossing_detected": true,
+    "review_reason": "穿越边界区域【峡谷通道】；轨迹: (15,8)→(10,8)",
+    "evidence": [
+      "[地图坐标] 起点(15,8) ∈ ['wind_zone_b']",
+      "[地图坐标] 终点(10,8) ∈ ['canyon_pass', 'wind_zone_b']",
+      "[区域穿越] 跨越区域: ['canyon_pass']",
+      "[地图数据] canyon_pass区域坐标示例: [(8, 5), (8, 6), (8, 7)]",
+      "[战报来源] file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L1",
+      "[行动ID] A002"
+    ],
+    "map_data_ref": "canyon_map_v2",
+    "unit_move_ref": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L5",
+    "confirmation_status": "pending",
+    "analysis_id": "BR-001:A002",
+    "review_link": "boundary_review://BR-001:A002"
+  },
+  {
+    "record_id": "BR-003",
+    "action_id": "A008",
+    "unit_id": "U006",
+    "start_pos": {
+      "x": 18,
+      "y": 3,
+      "zone": "right_edge"
+    },
+    "end_pos": {
+      "x": 2,
+      "y": 3,
+      "zone": "left_edge"
+    },
+    "boundary_zones": [
+      "right_edge",
+      "wind_zone_a"
+    ],
+    "crossing_detected": true,
+    "review_reason": "穿越边界区域【东部边界、A风区】；移动距离16.0格超过【暗影刺客】移动力上限4格；轨迹: (18,3)→(2,3)",
+    "evidence": [
+      "[地图坐标] 起点(18,3) ∈ ['right_edge']",
+      "[地图坐标] 终点(2,3) ∈ ['wind_zone_a']",
+      "[区域穿越] 跨越区域: ['right_edge', 'wind_zone_a']",
+      "[地图数据] right_edge区域坐标示例: [(18, 0), (18, 1), (18, 2)]",
+      "[地图数据] wind_zone_a区域坐标示例: [(0, 0), (0, 1), (0, 2)]",
+      "[移动校验] 欧氏距离=√256=16.00",
+      "[单位数据] 暗影刺客(ID:U006) 移动力=4",
+      "[单位来源] file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L7",
+      "[战报来源] file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L3",
+      "[行动ID] A008"
+    ],
+    "map_data_ref": "canyon_map_v2",
+    "unit_move_ref": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L7",
+    "confirmation_status": "pending",
+    "analysis_id": "BR-003:A008",
+    "review_link": "boundary_review://BR-003:A008"
+  },
+  {
+    "record_id": "BR-003",
+    "action_id": "A009",
+    "unit_id": "U003",
+    "start_pos": {
+      "x": 5,
+      "y": 3,
+      "zone": "wind_zone_a"
+    },
+    "end_pos": {
+      "x": 14,
+      "y": 10,
+      "zone": "wind_zone_b"
+    },
+    "boundary_zones": [
+      "wind_zone_b",
+      "wind_zone_a"
+    ],
+    "crossing_detected": true,
+    "review_reason": "穿越边界区域【A风区、B风区】；移动距离11.4格超过【峡谷弓手】移动力上限2格；轨迹: (5,3)→(14,10)",
+    "evidence": [
+      "[地图坐标] 起点(5,3) ∈ ['wind_zone_a']",
+      "[地图坐标] 终点(14,10) ∈ ['wind_zone_b']",
+      "[区域穿越] 跨越区域: ['wind_zone_a', 'wind_zone_b']",
+      "[地图数据] wind_zone_a区域坐标示例: [(0, 0), (0, 1), (0, 2)]",
+      "[地图数据] wind_zone_b区域坐标示例: [(10, 8), (10, 9), (10, 10)]",
+      "[移动校验] 欧氏距离=√130=11.40",
+      "[单位数据] 峡谷弓手(ID:U003) 移动力=2",
+      "[单位来源] file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L4",
+      "[战报来源] file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L3",
+      "[行动ID] A009"
+    ],
+    "map_data_ref": "canyon_map_v2",
+    "unit_move_ref": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L4",
+    "confirmation_status": "pending",
+    "analysis_id": "BR-003:A009",
+    "review_link": "boundary_review://BR-003:A009"
+  },
+  {
+    "record_id": "BR-001-DUP",
+    "action_id": "A002",
+    "unit_id": "U004",
+    "start_pos": {
+      "x": 15,
+      "y": 8,
+      "zone": "wind_zone_b"
+    },
+    "end_pos": {
+      "x": 10,
+      "y": 8,
+      "zone": "canyon_pass"
+    },
+    "boundary_zones": [
+      "wind_zone_b",
+      "canyon_pass"
+    ],
+    "crossing_detected": true,
+    "review_reason": "穿越边界区域【峡谷通道】；轨迹: (15,8)→(10,8)",
+    "evidence": [
+      "[地图坐标] 起点(15,8) ∈ ['wind_zone_b']",
+      "[地图坐标] 终点(10,8) ∈ ['canyon_pass', 'wind_zone_b']",
+      "[区域穿越] 跨越区域: ['canyon_pass']",
+      "[地图数据] canyon_pass区域坐标示例: [(8, 5), (8, 6), (8, 7)]",
+      "[战报来源] file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_duplicate.json#L1",
+      "[行动ID] A002"
+    ],
+    "map_data_ref": "canyon_map_v2",
+    "unit_move_ref": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L5",
+    "confirmation_status": "pending",
+    "analysis_id": "BR-001-DUP:A002",
+    "review_link": "boundary_review://BR-001-DUP:A002"
+  }
+]

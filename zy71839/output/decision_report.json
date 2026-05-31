@@ -1,0 +1,101 @@
+[
+  {
+    "entry_id": "DEC-CANYON-001-R1",
+    "battle_id": "CANYON-001",
+    "round_number": 1,
+    "conclusion": "本回合共执行 0 个有效行动；造成总伤害 0；存活 150 单位，伤亡 0 单位；判定风向: 均衡（无主导风向）；⚠️  有 2 条记录待确认，已标记为PENDING",
+    "wind_direction": "均衡（无主导风向）",
+    "confidence_score": 0.0,
+    "confirmation_status": "pending",
+    "contributing_records": [
+      "BR-001",
+      "BR-001-DUP"
+    ],
+    "contributing_units": [
+      "U001",
+      "U004"
+    ],
+    "anomalies_found": [
+      "boundary_crossing",
+      "report_settlement_mismatch"
+    ],
+    "review_notes": "存在 2 处边界穿越可疑记录，需人工复核；战报与结算数据不一致，需核对伤亡统计",
+    "cross_refs": {
+      "记录_BR-001": "battle_record://BR-001",
+      "原文_BR-001": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L1",
+      "边界复核_BR-001": "boundary_review://BR-001:A002",
+      "记录_BR-001-DUP": "battle_record://BR-001-DUP",
+      "原文_BR-001-DUP": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_duplicate.json#L1",
+      "边界复核_BR-001-DUP": "boundary_review://BR-001-DUP:A002",
+      "结算_SET-001": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/settlement_data.json#L1",
+      "单位_U001": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L2",
+      "单位_U004": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L5"
+    }
+  },
+  {
+    "entry_id": "DEC-CANYON-001-R2",
+    "battle_id": "CANYON-001",
+    "round_number": 2,
+    "conclusion": "本回合共执行 0 个有效行动；造成总伤害 0；存活 177 单位，伤亡 1 单位；判定风向: 均衡（无主导风向）；⚠️  有 2 条记录待确认，已标记为PENDING；已排除 1 条作废记录",
+    "wind_direction": "均衡（无主导风向）",
+    "confidence_score": 0.0,
+    "confirmation_status": "pending",
+    "contributing_records": [
+      "BR-002-CORR",
+      "BR-002",
+      "BR-004"
+    ],
+    "contributing_units": [
+      "U002",
+      "U005"
+    ],
+    "anomalies_found": [
+      "boundary_crossing",
+      "report_settlement_mismatch",
+      "suspected_duplicate",
+      "turn_order_error"
+    ],
+    "review_notes": "存在回合顺序异常，需核对行动时序；存在 2 处边界穿越可疑记录，需人工复核；战报与结算数据不一致，需核对伤亡统计；存在疑似重复/晚到记录，需确认有效性",
+    "cross_refs": {
+      "记录_BR-002-CORR": "battle_record://BR-002-CORR",
+      "原文_BR-002-CORR": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_manual_correction.json#L1",
+      "边界复核_BR-002-CORR": "boundary_review://BR-002-CORR:A006",
+      "记录_BR-002": "battle_record://BR-002",
+      "原文_BR-002": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L2",
+      "记录_BR-004": "battle_record://BR-004",
+      "原文_BR-004": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_late_attachment.json#L1",
+      "结算_SET-002": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/settlement_data.json#L2",
+      "单位_U002": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L3",
+      "单位_U005": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L6"
+    }
+  },
+  {
+    "entry_id": "DEC-CANYON-001-R3",
+    "battle_id": "CANYON-001",
+    "round_number": 3,
+    "conclusion": "本回合共执行 0 个有效行动；造成总伤害 0；存活 110 单位，伤亡 2 单位；判定风向: 均衡（无主导风向）；⚠️  有 1 条记录待确认，已标记为PENDING",
+    "wind_direction": "均衡（无主导风向）",
+    "confidence_score": 0.0,
+    "confirmation_status": "pending",
+    "contributing_records": [
+      "BR-003"
+    ],
+    "contributing_units": [
+      "U003",
+      "U006"
+    ],
+    "anomalies_found": [
+      "boundary_crossing",
+      "report_settlement_mismatch"
+    ],
+    "review_notes": "存在 2 处边界穿越可疑记录，需人工复核；战报与结算数据不一致，需核对伤亡统计",
+    "cross_refs": {
+      "记录_BR-003": "battle_record://BR-003",
+      "原文_BR-003": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L3",
+      "边界复核_BR-003": "boundary_review://BR-003:A009",
+      "结算_SET-003": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/settlement_data.json#L3",
+      "单位_U003": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L4",
+      "单位_U006": "file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L7"
+    }
+  }
+]

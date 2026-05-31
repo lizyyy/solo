@@ -1,0 +1,51 @@
+[
+  {
+    "record_id": "BR-001-DUP",
+    "battle_id": "CANYON-001",
+    "round_number": 1,
+    "actions": [
+      {
+        "action_id": "A001",
+        "turn": 1,
+        "unit_id": "U001",
+        "action_type": "move",
+        "start_pos": {"x": 2, "y": 5, "zone": "wind_zone_a"},
+        "end_pos": {"x": 5, "y": 5, "zone": "wind_zone_a"},
+        "timestamp": "2026-05-31T10:00:01+08:00"
+      },
+      {
+        "action_id": "A002",
+        "turn": 1,
+        "unit_id": "U004",
+        "action_type": "move",
+        "start_pos": {"x": 15, "y": 8, "zone": "wind_zone_b"},
+        "end_pos": {"x": 10, "y": 8, "zone": "canyon_pass"},
+        "timestamp": "2026-05-31T10:00:05+08:00"
+      },
+      {
+        "action_id": "A003",
+        "turn": 2,
+        "unit_id": "U001",
+        "action_type": "attack",
+        "start_pos": {"x": 5, "y": 5, "zone": "wind_zone_a"},
+        "end_pos": {"x": 5, "y": 5, "zone": "wind_zone_a"},
+        "timestamp": "2026-05-31T10:00:10+08:00",
+        "target_unit_id": "U004",
+        "damage_dealt": 12,
+        "result": "hit"
+      },
+      {
+        "action_id": "A004",
+        "turn": 2,
+        "unit_id": "U004",
+        "action_type": "attack",
+        "start_pos": {"x": 10, "y": 8, "zone": "canyon_pass"},
+        "end_pos": {"x": 10, "y": 8, "zone": "canyon_pass"},
+        "timestamp": "2026-05-31T10:00:15+08:00",
+        "target_unit_id": "U001",
+        "damage_dealt": 18,
+        "result": "hit"
+      }
+    ]
+  }
+]

@@ -1,0 +1,53 @@
+[
+  {
+    "settlement_id": "SET-001",
+    "battle_id": "CANYON-001",
+    "round_number": 1,
+    "surviving_units": {
+      "U001": 62,
+      "U004": 88
+    },
+    "casualties": {
+      "U001": 0,
+      "U004": 0
+    },
+    "resource_changes": {
+      "A": -10,
+      "B": -5
+    }
+  },
+  {
+    "settlement_id": "SET-002",
+    "battle_id": "CANYON-001",
+    "round_number": 2,
+    "surviving_units": {
+      "U002": 92,
+      "U005": 85
+    },
+    "casualties": {
+      "U002": 0,
+      "U005": 1
+    },
+    "resource_changes": {
+      "A": -8,
+      "B": -12
+    }
+  },
+  {
+    "settlement_id": "SET-003",
+    "battle_id": "CANYON-001",
+    "round_number": 3,
+    "surviving_units": {
+      "U006": 60,
+      "U003": 50
+    },
+    "casualties": {
+      "U006": 0,
+      "U003": 2
+    },
+    "resource_changes": {
+      "A": -25,
+      "B": -15
+    }
+  }
+]

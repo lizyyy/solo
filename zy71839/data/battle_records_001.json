@@ -1,0 +1,125 @@
+[
+  {
+    "record_id": "BR-001",
+    "battle_id": "CANYON-001",
+    "round_number": 1,
+    "actions": [
+      {
+        "action_id": "A001",
+        "turn": 1,
+        "unit_id": "U001",
+        "action_type": "move",
+        "start_pos": {"x": 2, "y": 5, "zone": "wind_zone_a"},
+        "end_pos": {"x": 5, "y": 5, "zone": "wind_zone_a"},
+        "timestamp": "2026-05-31T10:00:01+08:00"
+      },
+      {
+        "action_id": "A002",
+        "turn": 1,
+        "unit_id": "U004",
+        "action_type": "move",
+        "start_pos": {"x": 15, "y": 8, "zone": "wind_zone_b"},
+        "end_pos": {"x": 10, "y": 8, "zone": "canyon_pass"},
+        "timestamp": "2026-05-31T10:00:05+08:00"
+      },
+      {
+        "action_id": "A003",
+        "turn": 2,
+        "unit_id": "U001",
+        "action_type": "attack",
+        "start_pos": {"x": 5, "y": 5, "zone": "wind_zone_a"},
+        "end_pos": {"x": 5, "y": 5, "zone": "wind_zone_a"},
+        "timestamp": "2026-05-31T10:00:10+08:00",
+        "target_unit_id": "U004",
+        "damage_dealt": 12,
+        "result": "hit"
+      },
+      {
+        "action_id": "A004",
+        "turn": 2,
+        "unit_id": "U004",
+        "action_type": "attack",
+        "start_pos": {"x": 10, "y": 8, "zone": "canyon_pass"},
+        "end_pos": {"x": 10, "y": 8, "zone": "canyon_pass"},
+        "timestamp": "2026-05-31T10:00:15+08:00",
+        "target_unit_id": "U001",
+        "damage_dealt": 18,
+        "result": "hit"
+      }
+    ]
+  },
+  {
+    "record_id": "BR-002",
+    "battle_id": "CANYON-001",
+    "round_number": 2,
+    "actions": [
+      {
+        "action_id": "A005",
+        "turn": 3,
+        "unit_id": "U002",
+        "action_type": "move",
+        "start_pos": {"x": 3, "y": 7, "zone": "wind_zone_a"},
+        "end_pos": {"x": 6, "y": 7, "zone": "wind_zone_a"},
+        "timestamp": "2026-05-31T10:01:01+08:00"
+      },
+      {
+        "action_id": "A006",
+        "turn": 4,
+        "unit_id": "U005",
+        "action_type": "move",
+        "start_pos": {"x": 16, "y": 7, "zone": "wind_zone_b"},
+        "end_pos": {"x": 13, "y": 7, "zone": "wind_zone_b"},
+        "timestamp": "2026-05-31T10:01:05+08:00"
+      },
+      {
+        "action_id": "A007",
+        "turn": 3,
+        "unit_id": "U002",
+        "action_type": "attack",
+        "start_pos": {"x": 6, "y": 7, "zone": "wind_zone_a"},
+        "end_pos": {"x": 6, "y": 7, "zone": "wind_zone_a"},
+        "timestamp": "2026-05-31T10:01:10+08:00",
+        "target_unit_id": "U005",
+        "damage_dealt": 8,
+        "result": "hit"
+      }
+    ]
+  },
+  {
+    "record_id": "BR-003",
+    "battle_id": "CANYON-001",
+    "round_number": 3,
+    "actions": [
+      {
+        "action_id": "A008",
+        "turn": 5,
+        "unit_id": "U006",
+        "action_type": "move",
+        "start_pos": {"x": 18, "y": 3, "zone": "right_edge"},
+        "end_pos": {"x": 2, "y": 3, "zone": "left_edge"},
+        "timestamp": "2026-05-31T10:02:01+08:00"
+      },
+      {
+        "action_id": "A009",
+        "turn": 6,
+        "unit_id": "U003",
+        "action_type": "move",
+        "start_pos": {"x": 5, "y": 3, "zone": "wind_zone_a"},
+        "end_pos": {"x": 14, "y": 10, "zone": "wind_zone_b"},
+        "timestamp": "2026-05-31T10:02:05+08:00"
+      },
+      {
+        "action_id": "A010",
+        "turn": 7,
+        "unit_id": "U006",
+        "action_type": "attack",
+        "start_pos": {"x": 2, "y": 3, "zone": "left_edge"},
+        "end_pos": {"x": 2, "y": 3, "zone": "left_edge"},
+        "timestamp": "2026-05-31T10:02:10+08:00",
+        "target_unit_id": "U003",
+        "damage_dealt": 25,
+        "result": "hit"
+      }
+    ]
+  }
+]

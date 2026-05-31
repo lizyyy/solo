@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang='zh-CN'>
+<head>
+<meta charset='UTF-8'>
+<title>峡谷风向决策报告</title>
+<style>
+body { font-family: 'Microsoft YaHei', sans-serif; margin: 20px; }
+table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+th { background-color: #f5f5f5; font-weight: bold; }
+tr.pending { background-color: #fff8e1; }
+tr.confirmed { background-color: #e8f5e9; }
+.anomaly-tag { display: inline-block; padding: 2px 8px; margin: 2px; border-radius: 4px; font-size: 12px; }
+.tag-turn { background-color: #ffebee; color: #c62828; }
+.tag-boundary { background-color: #fff3e0; color: #ef6c00; }
+.tag-mismatch { background-color: #fce4ec; color: #ad1457; }
+.tag-duplicate { background-color: #f3e5f5; color: #6a1b9a; }
+a { color: #1565c0; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.confidence-bar { height: 8px; background-color: #e0e0e0; border-radius: 4px; }
+.confidence-fill { height: 100%; border-radius: 4px; }
+.ref-links { font-size: 12px; color: #666; }
+.ref-links a { margin-right: 8px; }
+</style>
+</head>
+<body>
+<h1>峡谷风向决策报告</h1>
+<p>生成时间: 2026-05-31 10:06:59</p>
+<div style='background:#fafafa; padding:15px; border-radius:8px; margin-bottom:20px;'>
+<h3>汇总统计</h3>
+<div style='display:flex; gap:30px;'>
+<div><strong>总决策数:</strong> 3</div>
+<div><strong>已确认:</strong> <span style='color:#2e7d32'>0</span></div>
+<div><strong>待确认:</strong> <span style='color:#f57f17'>3</span></div>
+<div><strong>平均置信度:</strong> 0%</div>
+<div><strong>边界穿越待复核:</strong> <span style='color:#e65100'>6</span></div>
+</div>
+</div>
+<h2>决策明细</h2>
+<table>
+<thead>
+<tr>
+<th>决策ID</th>
+<th>战斗</th>
+<th>回合</th>
+<th>结论</th>
+<th>风向</th>
+<th>置信度</th>
+<th>状态</th>
+<th>异常类型</th>
+<th>复核备注</th>
+<th>追溯链接</th>
+</tr>
+</thead>
+<tbody>
+<tr class='pending'>
+<td><strong>DEC-CANYON-001-R1</strong></td>
+<td>CANYON-001</td>
+<td>1</td>
+<td>本回合共执行 0 个有效行动；造成总伤害 0；存活 150 单位，伤亡 0 单位；判定风向: 均衡（无主导风向）；⚠️  有 2 条记录待确认，已标记为PENDING</td>
+<td><strong>均衡（无主导风向）</strong></td>
+<td><div class='confidence-bar'><div class='confidence-fill' style='width:0.0%; background:#f44336'></div></div><br>0%</td>
+<td><span style='color:#f57f17'>⏳ 待确认</span></td>
+<td><span class='anomaly-tag tag-boundary'>边界穿越</span> <span class='anomaly-tag tag-mismatch'>结算不符</span></td>
+<td><em>存在 2 处边界穿越可疑记录，需人工复核；战报与结算数据不一致，需核对伤亡统计</em></td>
+<td class='ref-links'><a href='battle_record://BR-001'>记录_BR-001</a> <a href='file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L1' title='file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L1'>原文_BR-001</a> <a href='boundary_review://BR-001:A002' style='color:#ef6c00'>边界复核_BR-001</a> <a href='battle_record://BR-001-DUP'>记录_BR-001-DUP</a> <a href='file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_duplicate.json#L1' title='file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_duplicate.json#L1'>原文_BR-001-DUP</a> <span style='color:#999'>+4 更多</span></td>
+</tr>
+<tr class='pending'>
+<td><strong>DEC-CANYON-001-R2</strong></td>
+<td>CANYON-001</td>
+<td>2</td>
+<td>本回合共执行 0 个有效行动；造成总伤害 0；存活 177 单位，伤亡 1 单位；判定风向: 均衡（无主导风向）；⚠️  有 2 条记录待确认，已标记为PENDING；已排除 1 条作废记录</td>
+<td><strong>均衡（无主导风向）</strong></td>
+<td><div class='confidence-bar'><div class='confidence-fill' style='width:0.0%; background:#f44336'></div></div><br>0%</td>
+<td><span style='color:#f57f17'>⏳ 待确认</span></td>
+<td><span class='anomaly-tag tag-boundary'>边界穿越</span> <span class='anomaly-tag tag-mismatch'>结算不符</span> <span class='anomaly-tag tag-duplicate'>重复/晚到</span> <span class='anomaly-tag tag-turn'>回合顺序</span></td>
+<td><em>存在回合顺序异常，需核对行动时序；存在 2 处边界穿越可疑记录，需人工复核；战报与结算数据不一致，需核对伤亡统计；存在疑似重复/晚到记录，需确认有效性</em></td>
+<td class='ref-links'><a href='battle_record://BR-002-CORR'>记录_BR-002-CORR</a> <a href='file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_manual_correction.json#L1' title='file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_manual_correction.json#L1'>原文_BR-002-CORR</a> <a href='boundary_review://BR-002-CORR:A006' style='color:#ef6c00'>边界复核_BR-002-CORR</a> <a href='battle_record://BR-002'>记录_BR-002</a> <a href='file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L2' title='file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L2'>原文_BR-002</a> <span style='color:#999'>+5 更多</span></td>
+</tr>
+<tr class='pending'>
+<td><strong>DEC-CANYON-001-R3</strong></td>
+<td>CANYON-001</td>
+<td>3</td>
+<td>本回合共执行 0 个有效行动；造成总伤害 0；存活 110 单位，伤亡 2 单位；判定风向: 均衡（无主导风向）；⚠️  有 1 条记录待确认，已标记为PENDING</td>
+<td><strong>均衡（无主导风向）</strong></td>
+<td><div class='confidence-bar'><div class='confidence-fill' style='width:0.0%; background:#f44336'></div></div><br>0%</td>
+<td><span style='color:#f57f17'>⏳ 待确认</span></td>
+<td><span class='anomaly-tag tag-boundary'>边界穿越</span> <span class='anomaly-tag tag-mismatch'>结算不符</span></td>
+<td><em>存在 2 处边界穿越可疑记录，需人工复核；战报与结算数据不一致，需核对伤亡统计</em></td>
+<td class='ref-links'><a href='battle_record://BR-003'>记录_BR-003</a> <a href='file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L3' title='file:///Users/lzy/pro/solo/workspaces/zy71839/data/battle_records_001.json#L3'>原文_BR-003</a> <a href='boundary_review://BR-003:A009' style='color:#ef6c00'>边界复核_BR-003</a> <a href='file:///Users/lzy/pro/solo/workspaces/zy71839/data/settlement_data.json#L3' title='file:///Users/lzy/pro/solo/workspaces/zy71839/data/settlement_data.json#L3'>结算_SET-003</a> <a href='file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L4' title='file:///Users/lzy/pro/solo/workspaces/zy71839/data/units.csv#L4'>单位_U003</a> <span style='color:#999'>+1 更多</span></td>
+</tr>
+</tbody>
+</table>
+<h2>边界穿越待复核明细</h2>
+<table>
+<thead>
+<tr>
+<th>分析ID</th>
+<th>单位</th>
+<th>移动轨迹</th>
+<th>判定原因</th>
+<th>状态</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+<tr class='pending'>
+<td>BR-002-CORR:A005</td>
+<td>重装步兵</td>
+<td>(3,7) → (6,7)</td>
+<td>移动路径经过【不可通行断崖】区域；轨迹: (3,7)→(6,7)</td>
+<td><span style='color:#f57f17'>⏳ 待确认</span></td>
+<td><a href='boundary_review://BR-002-CORR:A005'>查看复核报告</a></td>
+</tr>
+<tr class='pending'>
+<td>BR-002-CORR:A006</td>
+<td>盾卫战士</td>
+<td>(16,7) → (13,7)</td>
+<td>移动距离3.0格超过【盾卫战士】移动力上限2格；移动路径经过【不可通行断崖】区域；轨迹: (16,7)→(13,7)</td>
+<td><span style='color:#f57f17'>⏳ 待确认</span></td>
+<td><a href='boundary_review://BR-002-CORR:A006'>查看复核报告</a></td>
+</tr>
+<tr class='pending'>
+<td>BR-001:A002</td>
+<td>烈焰骑兵</td>
+<td>(15,8) → (10,8)</td>
+<td>穿越边界区域【峡谷通道】；轨迹: (15,8)→(10,8)</td>
+<td><span style='color:#f57f17'>⏳ 待确认</span></td>
+<td><a href='boundary_review://BR-001:A002'>查看复核报告</a></td>
+</tr>
+<tr class='pending'>
+<td>BR-003:A008</td>
+<td>暗影刺客</td>
+<td>(18,3) → (2,3)</td>
+<td>穿越边界区域【东部边界、A风区】；移动距离16.0格超过【暗影刺客】移动力上限4格；轨迹: (18,3)→(2,3)</td>
+<td><span style='color:#f57f17'>⏳ 待确认</span></td>
+<td><a href='boundary_review://BR-003:A008'>查看复核报告</a></td>
+</tr>
+<tr class='pending'>
+<td>BR-003:A009</td>
+<td>峡谷弓手</td>
+<td>(5,3) → (14,10)</td>
+<td>穿越边界区域【A风区、B风区】；移动距离11.4格超过【峡谷弓手】移动力上限2格；轨迹: (5,3)→(14,10)</td>
+<td><span style='color:#f57f17'>⏳ 待确认</span></td>
+<td><a href='boundary_review://BR-003:A009'>查看复核报告</a></td>
+</tr>
+<tr class='pending'>
+<td>BR-001-DUP:A002</td>
+<td>烈焰骑兵</td>
+<td>(15,8) → (10,8)</td>
+<td>穿越边界区域【峡谷通道】；轨迹: (15,8)→(10,8)</td>
+<td><span style='color:#f57f17'>⏳ 待确认</span></td>
+<td><a href='boundary_review://BR-001-DUP:A002'>查看复核报告</a></td>
+</tr>
+</tbody></table>
+</body>
+</html>
