@@ -1,0 +1,23 @@
+{
+  "session_name": "2026春季拍卖会_图录校对",
+  "generated_at": "2026-05-31 18:11:39",
+  "works_list_source": "/Users/lzy/pro/solo/workspaces/zy71925/demo_data/sample_works_list.csv",
+  "wall_layout_source": "/Users/lzy/pro/solo/workspaces/zy71925/demo_data/sample_wall_layout.csv",
+  "statistics": {
+    "total_lots": 5,
+    "confirmed": 1,
+    "pending": 0,
+    "needs_info": 1,
+    "manual_edited": 3,
+    "total_differences": 34,
+    "resolved_differences": 34,
+    "pending_differences": 0,
+    "critical_differences": 25,
+    "lighting_conflicts": 5,
+    "resolved_lighting_conflicts": 5,
+    "pending_lighting_conflicts": 0
+  },
+  "summary_text": "本次校对共处理 5 件拍品：\n  • 已确认无误：1 件\n  • 待处理差异：0 件\n  • 待补充信息：1 件\n  • 已人工修改：3 件\n\n发现差异 34 处，其中：\n  • 严重差异：25 处\n  • 已解决：34 处\n  • 待处理：0 处\n\n灯光方案冲突 5 个：\n  • 已解决：5 个\n  • 待处理：0 个\n\n✅ 所有问题都已处理完毕，可以直接出图录！",
+  "pending_items": [],
+  "lighting_issues": []
+}

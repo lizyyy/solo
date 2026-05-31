@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026春季拍卖会_图录校对 - 拍卖图录校对报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            color: white;
+            padding: 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .progress-bar {
+            background: rgba(255,255,255,0.2);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #10b981;
+            width: 80%;
+            transition: width 0.3s;
+        }
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-title .badge {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: #e0e7ff;
+            color: #4338ca;
+            font-weight: 500;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+        .stat-card {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .stat-card.confirmed { background: #ecfdf5; }
+        .stat-card.confirmed .number { color: #059669; }
+        .stat-card.pending { background: #fffbeb; }
+        .stat-card.pending .number { color: #d97706; }
+        .stat-card.needs-info { background: #fef2f2; }
+        .stat-card.needs-info .number { color: #dc2626; }
+        .stat-card.manual { background: #f5f3ff; }
+        .stat-card.manual .number { color: #7c3aed; }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-confirmed { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-needs-info { background: #fee2e2; color: #991b1b; }
+        .status-manual { background: #ede9fe; color: #5b21b6; }
+        .severity-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .severity-critical { background: #fee2e2; color: #991b1b; }
+        .severity-warning { background: #fef3c7; color: #92400e; }
+        .severity-info { background: #dbeafe; color: #1e40af; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th {
+            background: #f1f5f9;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: top;
+        }
+        tr:hover { background: #f8fafc; }
+        .diff-card {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .diff-card.critical {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+        .diff-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .diff-title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .diff-message {
+            color: #475569;
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+            line-height: 1.8;
+        }
+        .diff-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .diff-value-box {
+            padding: 12px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.8);
+        }
+        .diff-value-label {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .diff-value-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .diff-resolution {
+            padding: 12px;
+            background: #d1fae5;
+            border-radius: 6px;
+            color: #065f46;
+            font-size: 13px;
+        }
+        .lighting-card {
+            background: #eff6ff;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .lighting-card.resolved {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+        .lighting-source {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 8px;
+        }
+        .next-step {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px 16px;
+            margin-top: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .history-item {
+            padding: 12px;
+            border-left: 3px solid #e2e8f0;
+            margin-bottom: 8px;
+            background: #f8fafc;
+            border-radius: 0 6px 6px 0;
+        }
+        .history-item.latest {
+            border-left-color: #10b981;
+            background: #f0fdf4;
+        }
+        .history-time {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+        .history-action {
+            font-weight: 500;
+            font-size: 13px;
+        }
+        .history-operator {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .history-notes {
+            font-size: 12px;
+            color: #475569;
+            margin-top: 4px;
+        }
+        .processing-note {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            background: #e0e7ff;
+            color: #4338ca;
+            margin-left: 8px;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        .tab:hover { color: #2563eb; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .lot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .lot-title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .lot-subtitle {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .edit-marker {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #8b5cf6;
+            margin-right: 6px;
+        }
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+        .source-info {
+            background: #f1f5f9;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #475569;
+        }
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+        .collapsible::after {
+            content: ' ▼';
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+        .collapsible.collapsed::after {
+            transform: rotate(-90deg);
+        }
+        .collapsed-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .collapsed-content.open {
+            max-height: 2000px;
+        }
+        .wall-group {
+            margin-bottom: 24px;
+        }
+        .wall-group-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: #f1f5f9;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="section">
+            <div class="section-title">
+                校对概览
+                <span class="badge">共 5 件拍品</span>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card confirmed">
+                    <div class="number">1</div>
+                    <div class="label">已确认</div>
+                </div>
+                <div class="stat-card pending">
+                    <div class="number">0</div>
+                    <div class="label">待处理</div>
+                </div>
+                <div class="stat-card needs-info">
+                    <div class="number">1</div>
+                    <div class="label">待补充</div>
+                </div>
+                <div class="stat-card manual">
+                    <div class="number">3</div>
+                    <div class="label">人工修改</div>
+                </div>
+                <div class="stat-card pending">
+                    <div class="number">0</div>
+                    <div class="label">待处理差异</div>
+                </div>
+                <div class="stat-card needs-info">
+                    <div class="number">25</div>
+                    <div class="label">严重差异</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                布展清单（给策展人）
+                <span class="badge">含处理口径</span>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab(this, 'all')">全部 (5)</div>
+                <div class="tab" onclick="switchTab(this, 'confirmed')">已确认 (1)</div>
+                <div class="tab" onclick="switchTab(this, 'pending')">待处理 (0)</div>
+                <div class="tab" onclick="switchTab(this, 'needs_info')">待补充 (1)</div>
+                <div class="tab" onclick="switchTab(this, 'manual')">人工修改 (3)</div>
+            </div>
+
+            <div id="tab-all" class="tab-content active">
+                
+            <div class="wall-group">
+                <div class="wall-group-title collapsible" onclick="toggleSection(this)">
+                    主入口展墙（W1）- 共 2 件
+                </div>
+                <div class="collapsed-content open">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>拍品编号</th>
+                                <th>作品名称</th>
+                                <th>艺术家</th>
+                                <th>尺寸</th>
+                                <th>估价</th>
+                                <th>灯光方案</th>
+                                <th>状态</th>
+                                <th>处理口径</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td><strong>LOT001</strong></td>
+                                <td>
+                                    <span class="text-gray-400 italic">（空）</span>
+                                    <div class="lot-subtitle"><span class="text-gray-400 italic">（空）</span></div>
+                                </td>
+                                <td>张大千</td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>RMB 800,000-1,200,000</td>
+                                <td>
+                                    暖白光 3000K，重点照明
+                                    <div class="lighting-source">来源：展墙图（已确认）</div>
+                                </td>
+                                <td><span class="status-badge status-confirmed">已确认</span></td>
+                                <td><span class="processing-note" style="background:#d1fae5;color:#065f46;">可直接使用</span></td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>LOT002</strong></td>
+                                <td>
+                                    <span class="text-gray-400 italic">（空）</span>
+                                    <div class="lot-subtitle"><span class="text-gray-400 italic">（空）</span></div>
+                                </td>
+                                <td>齐白石</td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>RMB 500,000-800,000</td>
+                                <td>
+                                    冷白光 4000K，重点照明
+                                    <div class="lighting-source">来源：展墙图（已确认）</div>
+                                </td>
+                                <td><span class="status-badge status-needs_info">待补充</span></td>
+                                <td><span class="processing-note" style="background:#fee2e2;color:#991b1b;">待策展人确认</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="wall-group">
+                <div class="wall-group-title collapsible" onclick="toggleSection(this)">
+                    东侧展墙（W2）- 共 2 件
+                </div>
+                <div class="collapsed-content open">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>拍品编号</th>
+                                <th>作品名称</th>
+                                <th>艺术家</th>
+                                <th>尺寸</th>
+                                <th>估价</th>
+                                <th>灯光方案</th>
+                                <th>状态</th>
+                                <th>处理口径</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td><strong>LOT003</strong></td>
+                                <td>
+                                    秋山策杖图
+                                    <div class="lot-subtitle"><span class="text-gray-400 italic">（空）</span></div>
+                                </td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>68×45cm</td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>
+                                    暖白光 3000K，标准照度
+                                    <div class="lighting-source">来源：展墙图（已确认）</div>
+                                </td>
+                                <td><span class="status-badge status-manual_edited">人工修改</span></td>
+                                <td><span class="processing-note">已人工调整</span></td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>LOT004</strong></td>
+                                <td>
+                                    <span class="text-gray-400 italic">（空）</span>
+                                    <div class="lot-subtitle"><span class="text-gray-400 italic">（空）</span></div>
+                                </td>
+                                <td>潘天寿</td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>RMB 280,000-400,000</td>
+                                <td>
+                                    暖白光 3000K，标准照度
+                                    <div class="lighting-source">来源：展墙图（已确认）</div>
+                                </td>
+                                <td><span class="status-badge status-manual_edited">人工修改</span></td>
+                                <td><span class="processing-note">已人工调整</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="wall-group">
+                <div class="wall-group-title collapsible" onclick="toggleSection(this)">
+                    西侧展墙（W3）- 共 1 件
+                </div>
+                <div class="collapsed-content open">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>拍品编号</th>
+                                <th>作品名称</th>
+                                <th>艺术家</th>
+                                <th>尺寸</th>
+                                <th>估价</th>
+                                <th>灯光方案</th>
+                                <th>状态</th>
+                                <th>处理口径</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td><strong>LOT005</strong></td>
+                                <td>
+                                    青绿山水
+                                    <div class="lot-subtitle"><span class="text-gray-400 italic">（空）</span></div>
+                                </td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>28×186cm</td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>
+                                    标准照明
+                                    <div class="lighting-source">来源：展墙图（已确认）</div>
+                                </td>
+                                <td><span class="status-badge status-manual_edited">人工修改</span></td>
+                                <td><span class="processing-note">已人工调整</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            </div>
+            <div id="tab-confirmed" class="tab-content">
+                
+            <div class="wall-group">
+                <div class="wall-group-title collapsible" onclick="toggleSection(this)">
+                    主入口展墙（W1）- 共 1 件
+                </div>
+                <div class="collapsed-content open">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>拍品编号</th>
+                                <th>作品名称</th>
+                                <th>艺术家</th>
+                                <th>尺寸</th>
+                                <th>估价</th>
+                                <th>灯光方案</th>
+                                <th>状态</th>
+                                <th>处理口径</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td><strong>LOT001</strong></td>
+                                <td>
+                                    <span class="text-gray-400 italic">（空）</span>
+                                    <div class="lot-subtitle"><span class="text-gray-400 italic">（空）</span></div>
+                                </td>
+                                <td>张大千</td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>RMB 800,000-1,200,000</td>
+                                <td>
+                                    暖白光 3000K，重点照明
+                                    <div class="lighting-source">来源：展墙图（已确认）</div>
+                                </td>
+                                <td><span class="status-badge status-confirmed">已确认</span></td>
+                                <td><span class="processing-note" style="background:#d1fae5;color:#065f46;">可直接使用</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            </div>
+            <div id="tab-pending" class="tab-content">
+                <p class="text-gray-500 text-center py-8">暂无数据</p>
+            </div>
+            <div id="tab-needs_info" class="tab-content">
+                
+            <div class="wall-group">
+                <div class="wall-group-title collapsible" onclick="toggleSection(this)">
+                    主入口展墙（W1）- 共 1 件
+                </div>
+                <div class="collapsed-content open">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>拍品编号</th>
+                                <th>作品名称</th>
+                                <th>艺术家</th>
+                                <th>尺寸</th>
+                                <th>估价</th>
+                                <th>灯光方案</th>
+                                <th>状态</th>
+                                <th>处理口径</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td><strong>LOT002</strong></td>
+                                <td>
+                                    <span class="text-gray-400 italic">（空）</span>
+                                    <div class="lot-subtitle"><span class="text-gray-400 italic">（空）</span></div>
+                                </td>
+                                <td>齐白石</td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>RMB 500,000-800,000</td>
+                                <td>
+                                    冷白光 4000K，重点照明
+                                    <div class="lighting-source">来源：展墙图（已确认）</div>
+                                </td>
+                                <td><span class="status-badge status-needs_info">待补充</span></td>
+                                <td><span class="processing-note" style="background:#fee2e2;color:#991b1b;">待策展人确认</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            </div>
+            <div id="tab-manual" class="tab-content">
+                
+            <div class="wall-group">
+                <div class="wall-group-title collapsible" onclick="toggleSection(this)">
+                    东侧展墙（W2）- 共 2 件
+                </div>
+                <div class="collapsed-content open">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>拍品编号</th>
+                                <th>作品名称</th>
+                                <th>艺术家</th>
+                                <th>尺寸</th>
+                                <th>估价</th>
+                                <th>灯光方案</th>
+                                <th>状态</th>
+                                <th>处理口径</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td><strong>LOT003</strong></td>
+                                <td>
+                                    秋山策杖图
+                                    <div class="lot-subtitle"><span class="text-gray-400 italic">（空）</span></div>
+                                </td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>68×45cm</td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>
+                                    暖白光 3000K，标准照度
+                                    <div class="lighting-source">来源：展墙图（已确认）</div>
+                                </td>
+                                <td><span class="status-badge status-manual_edited">人工修改</span></td>
+                                <td><span class="processing-note">已人工调整</span></td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>LOT004</strong></td>
+                                <td>
+                                    <span class="text-gray-400 italic">（空）</span>
+                                    <div class="lot-subtitle"><span class="text-gray-400 italic">（空）</span></div>
+                                </td>
+                                <td>潘天寿</td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>RMB 280,000-400,000</td>
+                                <td>
+                                    暖白光 3000K，标准照度
+                                    <div class="lighting-source">来源：展墙图（已确认）</div>
+                                </td>
+                                <td><span class="status-badge status-manual_edited">人工修改</span></td>
+                                <td><span class="processing-note">已人工调整</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="wall-group">
+                <div class="wall-group-title collapsible" onclick="toggleSection(this)">
+                    西侧展墙（W3）- 共 1 件
+                </div>
+                <div class="collapsed-content open">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>拍品编号</th>
+                                <th>作品名称</th>
+                                <th>艺术家</th>
+                                <th>尺寸</th>
+                                <th>估价</th>
+                                <th>灯光方案</th>
+                                <th>状态</th>
+                                <th>处理口径</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td><strong>LOT005</strong></td>
+                                <td>
+                                    青绿山水
+                                    <div class="lot-subtitle"><span class="text-gray-400 italic">（空）</span></div>
+                                </td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>28×186cm</td>
+                                <td><span class="text-gray-400 italic">（空）</span></td>
+                                <td>
+                                    标准照明
+                                    <div class="lighting-source">来源：展墙图（已确认）</div>
+                                </td>
+                                <td><span class="status-badge status-manual_edited">人工修改</span></td>
+                                <td><span class="processing-note">已人工调整</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">
+                差异详情
+                <span class="badge">34 处差异 · 0 待处理 · 34 已解决</span>
+            </div>
+
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT001 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：中文名称</div>
+                </div>
+                <div class="diff-message">「中文名称」在展墙图里是空的，但作品清单里写的是「山水清音」
+建议：如果作品清单的「中文名称」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「中文名称」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：确认无误，两边一致
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546264
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT001 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：艺术家</div>
+                </div>
+                <div class="diff-message">「艺术家」在展墙图里是空的，但作品清单里写的是「张大千」
+建议：如果作品清单的「艺术家」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「艺术家」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：确认无误，两边一致
+                     | 最终值：张大千
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546266
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT001 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：材质工艺</div>
+                </div>
+                <div class="diff-message">「材质工艺」在展墙图里是空的，但作品清单里写的是「设色纸本 立轴」
+建议：如果作品清单的「材质工艺」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「材质工艺」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：确认无误，两边一致
+                     | 最终值：设色纸本 立轴
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546269
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT001 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：尺寸</div>
+                </div>
+                <div class="diff-message">「尺寸」在展墙图里是空的，但作品清单里写的是「136×68cm」
+建议：如果作品清单的「尺寸」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「尺寸」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：确认无误，两边一致
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546271
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT001 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：估价</div>
+                </div>
+                <div class="diff-message">「估价」在展墙图里是空的，但作品清单里写的是「RMB 800,000-1,200,000」
+建议：如果作品清单的「估价」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「估价」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：确认无误，两边一致
+                     | 最终值：RMB 800,000-1,200,000
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546272
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT002 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：中文名称</div>
+                </div>
+                <div class="diff-message">「中文名称」在展墙图里是空的，但作品清单里写的是「行书七言联」
+建议：如果作品清单的「中文名称」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「中文名称」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545947
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT002 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：艺术家</div>
+                </div>
+                <div class="diff-message">「艺术家」在展墙图里是空的，但作品清单里写的是「齐白石」
+建议：如果作品清单的「艺术家」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「艺术家」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：齐白石
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545969
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT002 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：材质工艺</div>
+                </div>
+                <div class="diff-message">「材质工艺」在展墙图里是空的，但作品清单里写的是「水墨纸本 对联」
+建议：如果作品清单的「材质工艺」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「材质工艺」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：水墨纸本 对联
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546013
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT002 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：尺寸</div>
+                </div>
+                <div class="diff-message">「尺寸」在展墙图里是空的，但作品清单里写的是「132×32cm×2」
+建议：如果作品清单的「尺寸」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「尺寸」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546036
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT002 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：估价</div>
+                </div>
+                <div class="diff-message">「估价」在展墙图里是空的，但作品清单里写的是「RMB 500,000-800,000」
+建议：如果作品清单的「估价」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「估价」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：RMB 500,000-800,000
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546057
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT003 - 秋山策杖图</span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：中文名称</div>
+                </div>
+                <div class="diff-message">「中文名称」在展墙图里是空的，但作品清单里写的是「秋山策杖图」
+建议：如果作品清单的「中文名称」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「中文名称」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：秋山策杖图
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.544672
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT003 - 秋山策杖图</span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：艺术家</div>
+                </div>
+                <div class="diff-message">「艺术家」在展墙图里是空的，但作品清单里写的是「黄宾虹」
+建议：如果作品清单的「艺术家」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「艺术家」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.544857
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT003 - 秋山策杖图</span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：材质工艺</div>
+                </div>
+                <div class="diff-message">「材质工艺」在展墙图里是空的，但作品清单里写的是「设色纸本 镜框」
+建议：如果作品清单的「材质工艺」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「材质工艺」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.544893
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT003 - 秋山策杖图</span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：尺寸</div>
+                </div>
+                <div class="diff-message">「尺寸」在展墙图里是空的，但作品清单里写的是「68×45cm」
+建议：如果作品清单的「尺寸」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「尺寸」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：68×45cm
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.544905
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT003 - 秋山策杖图</span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：估价</div>
+                </div>
+                <div class="diff-message">「估价」在展墙图里是空的，但作品清单里写的是「RMB 300,000-500,000」
+建议：如果作品清单的「估价」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「估价」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.544916
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT004 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：中文名称</div>
+                </div>
+                <div class="diff-message">「中文名称」在展墙图里是空的，但作品清单里写的是「幽兰图」
+建议：如果作品清单的「中文名称」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「中文名称」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.544936
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT004 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：艺术家</div>
+                </div>
+                <div class="diff-message">「艺术家」在展墙图里是空的，但作品清单里写的是「潘天寿」
+建议：如果作品清单的「艺术家」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「艺术家」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：潘天寿
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.544947
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT004 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：材质工艺</div>
+                </div>
+                <div class="diff-message">「材质工艺」在展墙图里是空的，但作品清单里写的是「水墨纸本 立轴」
+建议：如果作品清单的「材质工艺」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「材质工艺」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：水墨纸本 立轴
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545248
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT004 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：尺寸</div>
+                </div>
+                <div class="diff-message">「尺寸」在展墙图里是空的，但作品清单里写的是「95×42cm」
+建议：如果作品清单的「尺寸」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「尺寸」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545291
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT004 - </span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：估价</div>
+                </div>
+                <div class="diff-message">「估价」在展墙图里是空的，但作品清单里写的是「RMB 280,000-400,000」
+建议：如果作品清单的「估价」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「估价」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：RMB 280,000-400,000
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545319
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT005 - 青绿山水</span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：中文名称</div>
+                </div>
+                <div class="diff-message">「中文名称」在展墙图里是空的，但作品清单里写的是「青绿山水」
+建议：如果作品清单的「中文名称」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「中文名称」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：青绿山水
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545787
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT005 - 青绿山水</span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：艺术家</div>
+                </div>
+                <div class="diff-message">「艺术家」在展墙图里是空的，但作品清单里写的是「吴湖帆」
+建议：如果作品清单的「艺术家」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「艺术家」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545811
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT005 - 青绿山水</span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：材质工艺</div>
+                </div>
+                <div class="diff-message">「材质工艺」在展墙图里是空的，但作品清单里写的是「设色绢本 手卷」
+建议：如果作品清单的「材质工艺」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「材质工艺」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545857
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT005 - 青绿山水</span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：尺寸</div>
+                </div>
+                <div class="diff-message">「尺寸」在展墙图里是空的，但作品清单里写的是「28×186cm」
+建议：如果作品清单的「尺寸」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「尺寸」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：28×186cm
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545879
+                    </div>
+                </div>
+</div>
+            <div class="diff-card critical">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT005 - 青绿山水</span>
+                        <span class="severity-badge severity-critical">严重</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：估价</div>
+                </div>
+                <div class="diff-message">「估价」在展墙图里是空的，但作品清单里写的是「RMB 1,500,000-2,000,000」
+建议：如果作品清单的「估价」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「估价」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545902
+                    </div>
+                </div>
+</div>
+            <div class="diff-card">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT001 - </span>
+                        <span class="severity-badge severity-warning">注意</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：创作年代</div>
+                </div>
+                <div class="diff-message">「创作年代」在展墙图里是空的，但作品清单里写的是「1947年」
+建议：如果作品清单的「创作年代」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「创作年代」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：确认无误，两边一致
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546268
+                    </div>
+                </div>
+</div>
+            <div class="diff-card">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT001 - </span>
+                        <span class="severity-badge severity-warning">注意</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：来源</div>
+                </div>
+                <div class="diff-message">「来源」在展墙图里是空的，但作品清单里写的是「北京文物商店旧藏」
+建议：如果作品清单的「来源」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「来源」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：确认无误，两边一致
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546274
+                    </div>
+                </div>
+</div>
+            <div class="diff-card">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT002 - </span>
+                        <span class="severity-badge severity-warning">注意</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：创作年代</div>
+                </div>
+                <div class="diff-message">「创作年代」在展墙图里是空的，但作品清单里写的是「1938年」
+建议：如果作品清单的「创作年代」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「创作年代」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545991
+                    </div>
+                </div>
+</div>
+            <div class="diff-card">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT002 - </span>
+                        <span class="severity-badge severity-warning">注意</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：展览历史</div>
+                </div>
+                <div class="diff-message">「展览历史」在展墙图里是空的，但作品清单里写的是「2018年齐白石书法展，中国美术馆」
+建议：如果作品清单的「展览历史」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「展览历史」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546085
+                    </div>
+                </div>
+</div>
+            <div class="diff-card">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT003 - 秋山策杖图</span>
+                        <span class="severity-badge severity-warning">注意</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：创作年代</div>
+                </div>
+                <div class="diff-message">「创作年代」在展墙图里是空的，但作品清单里写的是「1952年」
+建议：如果作品清单的「创作年代」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「创作年代」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：1952年
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.544879
+                    </div>
+                </div>
+</div>
+            <div class="diff-card">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT003 - 秋山策杖图</span>
+                        <span class="severity-badge severity-warning">注意</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：文献</div>
+                </div>
+                <div class="diff-message">「文献」在展墙图里是空的，但作品清单里写的是「《黄宾虹全集》卷五，2012年」
+建议：如果作品清单的「文献」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「文献」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：《黄宾虹全集》卷五，2012年
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.544926
+                    </div>
+                </div>
+</div>
+            <div class="diff-card">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT004 - </span>
+                        <span class="severity-badge severity-warning">注意</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：创作年代</div>
+                </div>
+                <div class="diff-message">「创作年代」在展墙图里是空的，但作品清单里写的是「1961年」
+建议：如果作品清单的「创作年代」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「创作年代」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用展墙图的值
+                    
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545151
+                    </div>
+                </div>
+</div>
+            <div class="diff-card">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT005 - 青绿山水</span>
+                        <span class="severity-badge severity-warning">注意</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：创作年代</div>
+                </div>
+                <div class="diff-message">「创作年代」在展墙图里是空的，但作品清单里写的是「1935年」
+建议：如果作品清单的「创作年代」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「创作年代」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：1935年
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545834
+                    </div>
+                </div>
+</div>
+            <div class="diff-card">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT005 - 青绿山水</span>
+                        <span class="severity-badge severity-warning">注意</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                    <div style="color:#64748b;font-size:12px;">字段：来源</div>
+                </div>
+                <div class="diff-message">「来源」在展墙图里是空的，但作品清单里写的是「沪上名家旧藏」
+建议：如果作品清单的「来源」是对的，直接沿用就行
+或者：问问展陈设计师，展墙图里「来源」是不是漏了</div>
+
+                <div class="diff-resolution">
+                    ✅ 已解决：采用作品清单的值
+                     | 最终值：沪上名家旧藏
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.545925
+                    </div>
+                </div>
+</div></div>
+        <div class="section">
+            <div class="section-title">
+                灯光方案追踪
+                <span class="badge">5 个冲突 · 0 待处理 · 5 已解决</span>
+            </div>
+            <div class="source-info">
+                ℹ️ 灯光方案来自两个渠道——作品清单（策展人要求）和展墙图（现场布置）。
+                两者不一致时不会自动覆盖，会保留两边的值并提示下一步该找谁确认。
+            </div>
+
+            <div class="lighting-card resolved">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT001 - </span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                </div>
+                <div class="diff-message">拍品 LOT001 的灯光方案有冲突：
+• 作品清单里没写灯光要求
+• 展墙图现在用的是：暖白光 3000K，重点照明
+两边不一样，需要确认最后按哪个来。</div>
+
+                <div class="diff-resolution">
+                    ✅ 已确定灯光方案：暖白光 3000K，重点照明
+                    <div style="margin-top:8px;">处理方式：确认灯光方案无误</div>
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：张校对 · 2026-05-31T18:11:39.546277
+                    </div>
+                </div>
+</div>
+            <div class="lighting-card resolved">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT002 - </span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                </div>
+                <div class="diff-message">拍品 LOT002 的灯光方案有冲突：
+• 作品清单里没写灯光要求
+• 展墙图现在用的是：冷白光 4000K，重点照明
+两边不一样，需要确认最后按哪个来。</div>
+
+                <div class="diff-resolution">
+                    ✅ 已确定灯光方案：冷白光 4000K，重点照明
+                    <div style="margin-top:8px;">处理方式：采用展墙图的灯光方案</div>
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：李灯光 · 2026-05-31T18:11:39.546209
+                    </div>
+                </div>
+</div>
+            <div class="lighting-card resolved">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT003 - 秋山策杖图</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                </div>
+                <div class="diff-message">拍品 LOT003 的灯光方案有冲突：
+• 作品清单里没写灯光要求
+• 展墙图现在用的是：暖白光 3000K，标准照度
+两边不一样，需要确认最后按哪个来。</div>
+
+                <div class="diff-resolution">
+                    ✅ 已确定灯光方案：暖白光 3000K，标准照度
+                    <div style="margin-top:8px;">处理方式：采用展墙图的灯光方案</div>
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：李灯光 · 2026-05-31T18:11:39.546116
+                    </div>
+                </div>
+</div>
+            <div class="lighting-card resolved">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT004 - </span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                </div>
+                <div class="diff-message">拍品 LOT004 的灯光方案有冲突：
+• 作品清单里没写灯光要求
+• 展墙图现在用的是：暖白光 3000K，标准照度
+两边不一样，需要确认最后按哪个来。</div>
+
+                <div class="diff-resolution">
+                    ✅ 已确定灯光方案：暖白光 3000K，标准照度
+                    <div style="margin-top:8px;">处理方式：采用展墙图的灯光方案</div>
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：李灯光 · 2026-05-31T18:11:39.546143
+                    </div>
+                </div>
+</div>
+            <div class="lighting-card resolved">
+                <div class="diff-header">
+                    <div>
+                        <span class="diff-title">LOT005 - 青绿山水</span>
+                        <span class="status-badge status-resolved">已解决</span>
+                    </div>
+                </div>
+                <div class="diff-message">拍品 LOT005 的灯光方案有冲突：
+• 作品清单里没写灯光要求
+• 展墙图现在用的是：标准照明
+两边不一样，需要确认最后按哪个来。</div>
+
+                <div class="diff-resolution">
+                    ✅ 已确定灯光方案：标准照明
+                    <div style="margin-top:8px;">处理方式：采用展墙图的灯光方案</div>
+                    <div style="font-size:11px;margin-top:4px;opacity:0.8;">
+                        处理人：李灯光 · 2026-05-31T18:11:39.546187
+                    </div>
+                </div>
+</div></div>
+        <div class="section">
+            <div class="section-title">
+                操作历史
+                <span class="badge">最近 50 条</span>
+            </div>
+
+            <div class="history-item latest">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546256
+                    🆕 最新
+                </div>
+                <div class="history-action">确认这条记录两边一致，没有问题</div>
+                <div class='history-notes'>📝 两边数据完全一致，无需修改</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546241
+                    
+                </div>
+                <div class="history-action">变更状态</div>
+                <div class='history-notes'>📝 标记为待补充：需要策展人确认展览历史的具体年份和场馆</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546218
+                    
+                </div>
+                <div class="history-action">确定灯光方案：冷白光 4000K，重点照明</div>
+                <div class='history-notes'>📝 现场电路限制，与策展人沟通后同意调整</div>
+                <div class='history-operator'>👤 操作人：李灯光</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546197
+                    
+                </div>
+                <div class="history-action">确定灯光方案：标准照明</div>
+                <div class='history-notes'>📝 现场电路限制，与策展人沟通后同意调整</div>
+                <div class='history-operator'>👤 操作人：李灯光</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546175
+                    
+                </div>
+                <div class="history-action">确定灯光方案：暖白光 3000K，重点照明</div>
+                <div class='history-notes'>📝 现场电路限制，与策展人沟通后同意调整</div>
+                <div class='history-operator'>👤 操作人：李灯光</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546153
+                    
+                </div>
+                <div class="history-action">确定灯光方案：暖白光 3000K，标准照度</div>
+                <div class='history-notes'>📝 现场电路限制，与策展人沟通后同意调整</div>
+                <div class='history-operator'>👤 操作人：李灯光</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546129
+                    
+                </div>
+                <div class="history-action">确定灯光方案：暖白光 3000K，标准照度</div>
+                <div class='history-notes'>📝 现场电路限制，与策展人沟通后同意调整</div>
+                <div class='history-operator'>👤 操作人：李灯光</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546096
+                    
+                </div>
+                <div class="history-action">解决「展览历史」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546067
+                    
+                </div>
+                <div class="history-action">解决「估价」的差异：从「RMB 500,000-800,000」改成「RMB 500,000-800,000」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546045
+                    
+                </div>
+                <div class="history-action">解决「尺寸」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546023
+                    
+                </div>
+                <div class="history-action">解决「材质工艺」的差异：从「水墨纸本 对联」改成「水墨纸本 对联」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.546001
+                    
+                </div>
+                <div class="history-action">解决「创作年代」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545979
+                    
+                </div>
+                <div class="history-action">解决「艺术家」的差异：从「齐白石」改成「齐白石」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545956
+                    
+                </div>
+                <div class="history-action">解决「中文名称」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545935
+                    
+                </div>
+                <div class="history-action">解决「来源」的差异：从「沪上名家旧藏」改成「沪上名家旧藏」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545913
+                    
+                </div>
+                <div class="history-action">解决「估价」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545890
+                    
+                </div>
+                <div class="history-action">解决「尺寸」的差异：从「28×186cm」改成「28×186cm」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545867
+                    
+                </div>
+                <div class="history-action">解决「材质工艺」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545844
+                    
+                </div>
+                <div class="history-action">解决「创作年代」的差异：从「1935年」改成「1935年」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545821
+                    
+                </div>
+                <div class="history-action">解决「艺术家」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545798
+                    
+                </div>
+                <div class="history-action">解决「中文名称」的差异：从「青绿山水」改成「青绿山水」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545772
+                    
+                </div>
+                <div class="history-action">解决「来源」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545735
+                    
+                </div>
+                <div class="history-action">解决「估价」的差异：从「RMB 800,000-1,200,000」改成「RMB 800,000-1,200,000」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545617
+                    
+                </div>
+                <div class="history-action">解决「尺寸」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545422
+                    
+                </div>
+                <div class="history-action">解决「材质工艺」的差异：从「设色纸本 立轴」改成「设色纸本 立轴」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545400
+                    
+                </div>
+                <div class="history-action">解决「创作年代」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545377
+                    
+                </div>
+                <div class="history-action">解决「艺术家」的差异：从「张大千」改成「张大千」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545354
+                    
+                </div>
+                <div class="history-action">解决「中文名称」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545330
+                    
+                </div>
+                <div class="history-action">解决「估价」的差异：从「RMB 280,000-400,000」改成「RMB 280,000-400,000」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545304
+                    
+                </div>
+                <div class="history-action">解决「尺寸」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545273
+                    
+                </div>
+                <div class="history-action">解决「材质工艺」的差异：从「水墨纸本 立轴」改成「水墨纸本 立轴」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.545196
+                    
+                </div>
+                <div class="history-action">解决「创作年代」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.544951
+                    
+                </div>
+                <div class="history-action">解决「艺术家」的差异：从「潘天寿」改成「潘天寿」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.544941
+                    
+                </div>
+                <div class="history-action">解决「中文名称」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.544931
+                    
+                </div>
+                <div class="history-action">解决「文献」的差异：从「《黄宾虹全集》卷五，2012年」改成「《黄宾虹全集》卷五，2012年」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.544921
+                    
+                </div>
+                <div class="history-action">解决「估价」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.544910
+                    
+                </div>
+                <div class="history-action">解决「尺寸」的差异：从「68×45cm」改成「68×45cm」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.544899
+                    
+                </div>
+                <div class="history-action">解决「材质工艺」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.544885
+                    
+                </div>
+                <div class="history-action">解决「创作年代」的差异：从「1952年」改成「1952年」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.544869
+                    
+                </div>
+                <div class="history-action">解决「艺术家」的差异</div>
+                <div class='history-notes'>📝 现场测量后确认展墙图正确</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.544757
+                    
+                </div>
+                <div class="history-action">解决「中文名称」的差异：从「秋山策杖图」改成「秋山策杖图」</div>
+                <div class='history-notes'>📝 与策展人确认，以作品清单为准</div>
+                <div class='history-operator'>👤 操作人：张校对</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.536830
+                    
+                </div>
+                <div class="history-action">proof_run</div>
+                <div class='history-notes'>📝 执行校对，发现 34 处差异，5 个灯光冲突</div>
+                <div class='history-operator'>👤 操作人：演示脚本</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.536062
+                    
+                </div>
+                <div class="history-action">导入数据</div>
+                <div class='history-notes'>📝 从展墙图导入：西侧展墙</div>
+                <div class='history-operator'>👤 操作人：system</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.536049
+                    
+                </div>
+                <div class="history-action">导入数据</div>
+                <div class='history-notes'>📝 从展墙图导入：东侧展墙</div>
+                <div class='history-operator'>👤 操作人：system</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.536034
+                    
+                </div>
+                <div class="history-action">导入数据</div>
+                <div class='history-notes'>📝 从展墙图导入：东侧展墙</div>
+                <div class='history-operator'>👤 操作人：system</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.536012
+                    
+                </div>
+                <div class="history-action">导入数据</div>
+                <div class='history-notes'>📝 从展墙图导入：主入口展墙</div>
+                <div class='history-operator'>👤 操作人：system</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.535936
+                    
+                </div>
+                <div class="history-action">导入数据</div>
+                <div class='history-notes'>📝 从展墙图导入：主入口展墙</div>
+                <div class='history-operator'>👤 操作人：system</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.535698
+                    
+                </div>
+                <div class="history-action">导入数据</div>
+                <div class='history-notes'>📝 从作品清单导入：青绿山水</div>
+                <div class='history-operator'>👤 操作人：system</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.535685
+                    
+                </div>
+                <div class="history-action">导入数据</div>
+                <div class='history-notes'>📝 从作品清单导入：幽兰图</div>
+                <div class='history-operator'>👤 操作人：system</div>
+            </div>
+
+            <div class="history-item">
+                <div class="history-time">
+                    2026-05-31T18:11:39.535672
+                    
+                </div>
+                <div class="history-action">导入数据</div>
+                <div class='history-notes'>📝 从作品清单导入：秋山策杖图</div>
+                <div class='history-operator'>👤 操作人：system</div>
+            </div>
+</div>
+        <div class="footer">
+            拍卖图录校对系统 · 报告生成于 2026-05-31 18:11:39
+        </div>
+    </div>
+
+    <script>
+        function switchTab(element, tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        function toggleSection(element) {
+            element.classList.toggle('collapsed');
+            const content = element.nextElementSibling;
+            content.classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
