@@ -1,0 +1,55 @@
+[
+  {
+    "interfaceName": "库存预占接口 - SKU2024001",
+    "stockCode": "SKU2024001",
+    "preOccupyQty": 100,
+    "releaseQty": 0,
+    "source": "api_doc",
+    "status": "pending",
+    "operator": "平台开发",
+    "pendingReason": "接口文档已到，等待调用日志核对",
+    "rawData": {
+      "requestId": "REQ202401001",
+      "orderNo": "ORD202401001",
+      "warehouse": "WH001",
+      "channel": "ONLINE",
+      "requestTime": "2024-01-15 10:30:00",
+      "docVersion": "v2.1"
+    }
+  },
+  {
+    "interfaceName": "库存释放接口 - SKU2024002",
+    "stockCode": "SKU2024002",
+    "preOccupyQty": 50,
+    "releaseQty": 50,
+    "source": "api_doc",
+    "status": "completed",
+    "operator": "平台开发",
+    "rawData": {
+      "requestId": "REQ202401002",
+      "orderNo": "ORD202401002",
+      "warehouse": "WH001",
+      "channel": "ONLINE",
+      "requestTime": "2024-01-15 11:00:00",
+      "docVersion": "v2.1"
+    }
+  },
+  {
+    "interfaceName": "库存预占接口 - SKU2024003",
+    "stockCode": "SKU2024003",
+    "preOccupyQty": 200,
+    "releaseQty": 0,
+    "source": "api_doc",
+    "status": "error",
+    "operator": "平台开发",
+    "pendingReason": "预占数量与实际库存不符，需人工核对",
+    "rawData": {
+      "requestId": "REQ202401003",
+      "orderNo": "ORD202401003",
+      "warehouse": "WH002",
+      "channel": "OFFLINE",
+      "requestTime": "2024-01-15 14:20:00",
+      "docVersion": "v2.0"
+    }
+  }
+]

@@ -1,0 +1,4 @@
+interfaceName,stockCode,preOccupyQty,releaseQty,source,status,operator,pendingReason,idempotentKey
+库存预占接口 - SKU2024001,SKU2024001,100,0,call_log,processing,平台开发,IDEMPOTENT-1A2B3C4D
+库存释放接口 - SKU2024002,SKU2024002,50,50,call_log,completed,平台开发,IDEMPOTENT-5E6F7G8H
+库存预占接口 - SKU2024004,SKU2024004,75,0,call_log,pending,平台开发,幂等键已过期,IDEMPOTENT-9I0J1K2L
