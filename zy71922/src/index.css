@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gallery-bg text-gallery-fg font-serif antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gallery-surface;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gallery-border rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gallery-muted;
+}
+
+table tbody tr:hover {
+  @apply bg-gallery-surface;
+}
+
+input, textarea, select {
+  @apply bg-gallery-surface border border-gallery-border text-gallery-fg focus:outline-none focus:border-gallery-amber transition-colors;
+}
+
+button {
+  @apply transition-all duration-150;
+}
