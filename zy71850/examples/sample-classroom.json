@@ -1,0 +1,95 @@
+{
+  "partsList": {
+    "name": "潍柴WP10发动机",
+    "creator": "张师傅",
+    "parts": [
+      { "partNumber": "P001", "partName": "气缸盖", "quantity": 1, "required": true },
+      { "partNumber": "P002", "partName": "气缸垫", "quantity": 1, "required": true },
+      { "partNumber": "P003", "partName": "活塞组件", "quantity": 6, "required": true },
+      { "partNumber": "P004", "partName": "连杆螺栓", "quantity": 12, "required": true },
+      { "partNumber": "P005", "partName": "曲轴油封", "quantity": 2, "required": true }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "stepName": "拆卸气缸盖",
+        "description": "按顺序松开缸盖螺栓",
+        "requiredParts": ["P001"],
+        "videoRequired": true
+      },
+      {
+        "stepNumber": 2,
+        "stepName": "取出活塞",
+        "description": "从缸体上方取出活塞组件",
+        "requiredParts": ["P003"],
+        "videoRequired": false
+      },
+      {
+        "stepNumber": 3,
+        "stepName": "检查曲轴",
+        "description": "检查曲轴磨损情况",
+        "requiredParts": [],
+        "videoRequired": false
+      }
+    ]
+  },
+  "classroom": {
+    "id": "CLASS-2024-05-31",
+    "name": "发动机拆装实操课",
+    "teacher": "李老师"
+  },
+  "operations": [
+    {
+      "studentName": "王小明",
+      "stepNumber": 1,
+      "stepName": "拆卸气缸盖",
+      "action": "按对角顺序松开缸盖螺栓",
+      "videoPath": "videos/step1-demo.mp4",
+      "isError": false,
+      "validate": true
+    },
+    {
+      "studentName": "张小华",
+      "stepNumber": 1,
+      "stepName": "拆卸气缸盖",
+      "action": "顺序松螺栓",
+      "isError": true,
+      "errorMessage": "螺栓松开顺序不对，应该对角松开"
+    },
+    {
+      "studentName": "张小华",
+      "stepNumber": 1,
+      "stepName": "拆卸气缸盖",
+      "action": "再次尝试松螺栓",
+      "isError": true,
+      "errorMessage": "还是没按对角顺序"
+    },
+    {
+      "studentName": "李大力",
+      "stepNumber": 1,
+      "stepName": "拆卸气缸盖",
+      "action": "正确完成缸盖拆卸",
+      "videoPath": "videos/student-li.mp4",
+      "isError": false
+    },
+    {
+      "studentName": "王小明",
+      "stepNumber": 2,
+      "stepName": "取出活塞",
+      "action": "用木槌轻轻敲出活塞",
+      "isError": false
+    },
+    {
+      "studentName": "赵晓晓",
+      "stepNumber": 3,
+      "stepName": "检查曲轴",
+      "action": "跳过第二步直接检查曲轴",
+      "isError": true,
+      "errorMessage": "步骤顺序不对",
+      "validate": true
+    }
+  ],
+  "notes": "本次课堂重点练习对角松螺栓技巧，张小华同学需要多加练习",
+  "exportTo": "exports/class-2024-05-31.txt",
+  "complete": true
+}

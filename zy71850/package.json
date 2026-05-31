@@ -1,0 +1,18 @@
+{
+  "name": "engine-assembly-classroom",
+  "version": "1.0.0",
+  "description": "发动机拆装课堂管理系统",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test tests/",
+    "example": "node src/cli.js run examples/sample-classroom.json"
+  },
+  "keywords": ["engine", "assembly", "training"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^9.2.2"
+  }
+}
