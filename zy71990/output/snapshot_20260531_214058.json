@@ -1,0 +1,110 @@
+{
+  "snapshot_time": "2026-05-31T21:40:58.083850",
+  "base_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs",
+  "summary": {
+    "total_files": 6,
+    "total_dirs": 3,
+    "total_size": 2011,
+    "space_path_count": 3,
+    "total_size_human": "2.0 KB"
+  },
+  "files": [
+    {
+      "path": ".log_doctor_history/change_records.json",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/.log_doctor_history/change_records.json",
+      "size": 60,
+      "size_human": "60.0 B",
+      "modified": "2026-05-31 21:40:50",
+      "has_space": false,
+      "extension": ".json"
+    },
+    {
+      "path": "app_config.ini",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/app_config.ini",
+      "size": 294,
+      "size_human": "294.0 B",
+      "modified": "2026-05-31 21:40:10",
+      "has_space": false,
+      "extension": ".ini"
+    },
+    {
+      "path": "error_report.csv",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/error_report.csv",
+      "size": 399,
+      "size_human": "399.0 B",
+      "modified": "2026-05-31 21:40:29",
+      "has_space": false,
+      "extension": ".csv"
+    },
+    {
+      "path": "fail_20240520.log",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/fail_20240520.log",
+      "size": 921,
+      "size_human": "921.0 B",
+      "modified": "2026-05-31 21:40:20",
+      "has_space": false,
+      "extension": ".log"
+    },
+    {
+      "path": "normal.log",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/normal.log",
+      "size": 251,
+      "size_human": "251.0 B",
+      "modified": "2026-05-31 21:40:37",
+      "has_space": false,
+      "extension": ".log"
+    },
+    {
+      "path": "日志目录 有空格/test_file.txt",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/日志目录 有空格/test_file.txt",
+      "size": 86,
+      "size_human": "86.0 B",
+      "modified": "2026-05-31 21:40:23",
+      "has_space": true,
+      "extension": ".txt"
+    }
+  ],
+  "directories": [
+    {
+      "path": ".log_doctor_history",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/.log_doctor_history",
+      "has_space": false,
+      "modified": "2026-05-31 21:40:50"
+    },
+    {
+      "path": "日志目录 有空格",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/日志目录 有空格",
+      "has_space": true,
+      "modified": "2026-05-31 21:40:23"
+    },
+    {
+      "path": "日志目录 有空格/subdir",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/日志目录 有空格/subdir",
+      "has_space": true,
+      "modified": "2026-05-31 21:40:05"
+    }
+  ],
+  "space_path_warnings": [
+    {
+      "type": "directory",
+      "path": "日志目录 有空格",
+      "source": "目录快照",
+      "message": "目录名包含空格，可能导致脚本执行异常",
+      "action": "请联系目录创建者重命名，或在脚本中用引号包裹路径"
+    },
+    {
+      "type": "directory",
+      "path": "日志目录 有空格/subdir",
+      "source": "目录快照",
+      "message": "目录名包含空格，可能导致脚本执行异常",
+      "action": "请联系目录创建者重命名，或在脚本中用引号包裹路径"
+    },
+    {
+      "type": "file",
+      "path": "日志目录 有空格/test_file.txt",
+      "source": "目录快照",
+      "message": "文件名包含空格，可能导致脚本执行异常",
+      "action": "请联系文件上传者重命名，或在脚本中用引号包裹路径"
+    }
+  ]
+}

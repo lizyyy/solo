@@ -1,0 +1,875 @@
+[
+  {
+    "timestamp": "2024-05-20T07:55:00",
+    "time_sort": "2024-05-20T07:55:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 系统初始化",
+    "description": "行号: 1",
+    "details": {
+      "line_num": 1,
+      "raw_content": "2024-05-20 07:55:00 [INFO] 系统初始化",
+      "timestamp": "2024-05-20 07:55:00",
+      "level": "INFO",
+      "type": "standard",
+      "message": "系统初始化",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "fda480b64a8993c6"
+    },
+    "order": 1
+  },
+  {
+    "timestamp": "2024-05-20T07:56:00",
+    "time_sort": "2024-05-20T07:56:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 加载配置文件完成",
+    "description": "行号: 2",
+    "details": {
+      "line_num": 2,
+      "raw_content": "2024-05-20 07:56:00 [INFO] 加载配置文件完成",
+      "timestamp": "2024-05-20 07:56:00",
+      "level": "INFO",
+      "type": "standard",
+      "message": "加载配置文件完成",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "795b39fbf273f4aa"
+    },
+    "order": 2
+  },
+  {
+    "timestamp": "2024-05-20T07:57:00",
+    "time_sort": "2024-05-20T07:57:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 建立数据库连接成功",
+    "description": "行号: 3",
+    "details": {
+      "line_num": 3,
+      "raw_content": "2024-05-20 07:57:00 [INFO] 建立数据库连接成功",
+      "timestamp": "2024-05-20 07:57:00",
+      "level": "INFO",
+      "type": "standard",
+      "message": "建立数据库连接成功",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "349fd67ff9cd23e3"
+    },
+    "order": 3
+  },
+  {
+    "timestamp": "2024-05-20T07:58:00",
+    "time_sort": "2024-05-20T07:58:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 启动定时任务调度器",
+    "description": "行号: 4",
+    "details": {
+      "line_num": 4,
+      "raw_content": "2024-05-20 07:58:00 [INFO] 启动定时任务调度器",
+      "timestamp": "2024-05-20 07:58:00",
+      "level": "INFO",
+      "type": "standard",
+      "message": "启动定时任务调度器",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "cc56b40406ba0f1e"
+    },
+    "order": 4
+  },
+  {
+    "timestamp": "2024-05-20T07:59:00",
+    "time_sort": "2024-05-20T07:59:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 所有服务就绪",
+    "description": "行号: 5",
+    "details": {
+      "line_num": 5,
+      "raw_content": "2024-05-20 07:59:00 [INFO] 所有服务就绪",
+      "timestamp": "2024-05-20 07:59:00",
+      "level": "INFO",
+      "type": "standard",
+      "message": "所有服务就绪",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "5c34e3a73e1e5aa4"
+    },
+    "order": 5
+  },
+  {
+    "timestamp": "2024-05-20T08:00:01",
+    "time_sort": "2024-05-20T08:00:01",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 系统启动完成",
+    "description": "行号: 1",
+    "details": {
+      "line_num": 1,
+      "raw_content": "2024-05-20 08:00:01 [INFO] 系统启动完成",
+      "timestamp": "2024-05-20 08:00:01",
+      "level": "INFO",
+      "type": "standard",
+      "message": "系统启动完成",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "9278530d3b435083"
+    },
+    "order": 6
+  },
+  {
+    "timestamp": "2024-05-20T08:00:05",
+    "time_sort": "2024-05-20T08:00:05",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 开始处理批次 B20240520001",
+    "description": "行号: 2",
+    "details": {
+      "line_num": 2,
+      "raw_content": "2024-05-20 08:00:05 [INFO] 开始处理批次 B20240520001",
+      "timestamp": "2024-05-20 08:00:05",
+      "level": "INFO",
+      "type": "standard",
+      "message": "开始处理批次 B20240520001",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "0f6b8af58200ca0b"
+    },
+    "order": 7
+  },
+  {
+    "timestamp": "2024-05-20T08:00:15",
+    "time_sort": "2024-05-20T08:00:15",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 处理文件 data_001.csv 失败: 文件格式错误",
+    "description": "行号: 3",
+    "details": {
+      "line_num": 3,
+      "raw_content": "2024-05-20 08:00:15 [ERROR] 处理文件 data_001.csv 失败: 文件格式错误",
+      "timestamp": "2024-05-20 08:00:15",
+      "level": "ERROR",
+      "type": "standard",
+      "message": "处理文件 data_001.csv 失败: 文件格式错误",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "70853962e2cae249"
+    },
+    "order": 8
+  },
+  {
+    "timestamp": "2024-05-20T08:00:16",
+    "time_sort": "2024-05-20T08:00:16",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 处理文件 data_002.csv 失败: 字段缺失",
+    "description": "行号: 4",
+    "details": {
+      "line_num": 4,
+      "raw_content": "2024-05-20 08:00:16 [ERROR] 处理文件 data_002.csv 失败: 字段缺失",
+      "timestamp": "2024-05-20 08:00:16",
+      "level": "ERROR",
+      "type": "standard",
+      "message": "处理文件 data_002.csv 失败: 字段缺失",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "e5448f81f4abb040"
+    },
+    "order": 9
+  },
+  {
+    "timestamp": "2024-05-20T08:05:00",
+    "time_sort": "2024-05-20T08:05:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 批次 B20240520001 处理完成，失败 2 个",
+    "description": "行号: 5",
+    "details": {
+      "line_num": 5,
+      "raw_content": "2024-05-20 08:05:00 [INFO] 批次 B20240520001 处理完成，失败 2 个",
+      "timestamp": "2024-05-20 08:05:00",
+      "level": "INFO",
+      "type": "standard",
+      "message": "批次 B20240520001 处理完成，失败 2 个",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "eb4f3a97dae915b6"
+    },
+    "order": 10
+  },
+  {
+    "timestamp": "2024-05-20T08:10:00",
+    "time_sort": "2024-05-20T08:10:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 2024-05-20 08:10:00 ERROR 数据库连接超时",
+    "description": "行号: 2",
+    "details": {
+      "line_num": 2,
+      "raw_content": "2024-05-20 08:10:00,ERROR,数据库连接超时",
+      "timestamp": "2024-05-20 08:10:00",
+      "type": "csv",
+      "fields": [
+        "2024-05-20 08:10:00",
+        "ERROR",
+        "数据库连接超时"
+      ],
+      "message": "2024-05-20 08:10:00 ERROR 数据库连接超时",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "31ce2120cc2daa88"
+    },
+    "order": 11
+  },
+  {
+    "timestamp": "2024-05-20T08:15:00",
+    "time_sort": "2024-05-20T08:15:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 2024-05-20 08:15:00 WARN 内存使用率超过80%",
+    "description": "行号: 3",
+    "details": {
+      "line_num": 3,
+      "raw_content": "2024-05-20 08:15:00,WARN,内存使用率超过80%",
+      "timestamp": "2024-05-20 08:15:00",
+      "type": "csv",
+      "fields": [
+        "2024-05-20 08:15:00",
+        "WARN",
+        "内存使用率超过80%"
+      ],
+      "message": "2024-05-20 08:15:00 WARN 内存使用率超过80%",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "d5fd813d91d7e2cc"
+    },
+    "order": 12
+  },
+  {
+    "timestamp": "2024-05-20T09:00:00",
+    "time_sort": "2024-05-20T09:00:00",
+    "type": "manual_correction",
+    "source": "失败日志",
+    "icon": "✏️",
+    "title": "人工更正: 2024-05-20 09:00:00 INFO 人工修正: 已清理临时文件释放",
+    "description": "行号: 4",
+    "details": {
+      "line_num": 4,
+      "raw_content": "2024-05-20 09:00:00,INFO,人工修正: 已清理临时文件释放空间",
+      "timestamp": "2024-05-20 09:00:00",
+      "type": "csv",
+      "fields": [
+        "2024-05-20 09:00:00",
+        "INFO",
+        "人工修正: 已清理临时文件释放空间"
+      ],
+      "message": "2024-05-20 09:00:00 INFO 人工修正: 已清理临时文件释放空间",
+      "is_normal": false,
+      "is_late": false,
+      "is_manual": true,
+      "hash": "edcb915284ff5030"
+    },
+    "order": 13
+  },
+  {
+    "timestamp": "2024-05-20T09:05:00",
+    "time_sort": "2024-05-20T09:05:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 2024-05-20 09:05:00 INFO 内存使用率恢复正常",
+    "description": "行号: 5",
+    "details": {
+      "line_num": 5,
+      "raw_content": "2024-05-20 09:05:00,INFO,内存使用率恢复正常",
+      "timestamp": "2024-05-20 09:05:00",
+      "type": "csv",
+      "fields": [
+        "2024-05-20 09:05:00",
+        "INFO",
+        "内存使用率恢复正常"
+      ],
+      "message": "2024-05-20 09:05:00 INFO 内存使用率恢复正常",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "0ef69dd4ae778d19"
+    },
+    "order": 14
+  },
+  {
+    "timestamp": "2024-05-20T09:30:00",
+    "time_sort": "2024-05-20T09:30:00",
+    "type": "late_attachment",
+    "source": "失败日志",
+    "icon": "⏰",
+    "title": "晚到附件: 晚到附件: file_003.pdf 延迟到达",
+    "description": "行号: 6",
+    "details": {
+      "line_num": 6,
+      "raw_content": "2024-05-20 09:30:00 [WARN] 晚到附件: file_003.pdf 延迟到达",
+      "timestamp": "2024-05-20 09:30:00",
+      "level": "WARN",
+      "type": "standard",
+      "message": "晚到附件: file_003.pdf 延迟到达",
+      "is_normal": false,
+      "is_late": true,
+      "is_manual": false,
+      "hash": "951724b55fe9d490"
+    },
+    "order": 15
+  },
+  {
+    "timestamp": "2024-05-20T09:30:01",
+    "time_sort": "2024-05-20T09:30:01",
+    "type": "late_attachment",
+    "source": "失败日志",
+    "icon": "⏰",
+    "title": "晚到附件: 开始处理晚到附件 file_003.pdf",
+    "description": "行号: 7",
+    "details": {
+      "line_num": 7,
+      "raw_content": "2024-05-20 09:30:01 [INFO] 开始处理晚到附件 file_003.pdf",
+      "timestamp": "2024-05-20 09:30:01",
+      "level": "INFO",
+      "type": "standard",
+      "message": "开始处理晚到附件 file_003.pdf",
+      "is_normal": false,
+      "is_late": true,
+      "is_manual": false,
+      "hash": "d2ad90c1c2cb3c8c"
+    },
+    "order": 16
+  },
+  {
+    "timestamp": "2024-05-20T10:00:00",
+    "time_sort": "2024-05-20T10:00:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 系统状态检查正常",
+    "description": "行号: 8",
+    "details": {
+      "line_num": 8,
+      "raw_content": "2024-05-20 10:00:00 [INFO] 系统状态检查正常",
+      "timestamp": "2024-05-20 10:00:00",
+      "level": "INFO",
+      "type": "standard",
+      "message": "系统状态检查正常",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "e4f0378e9850cce1"
+    },
+    "order": 17
+  },
+  {
+    "timestamp": "2024-05-20T10:15:22",
+    "time_sort": "2024-05-20T10:15:22",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 处理文件 data_001.csv 失败: 文件格式错误",
+    "description": "行号: 9",
+    "details": {
+      "line_num": 9,
+      "raw_content": "2024-05-20 10:15:22 [ERROR] 处理文件 data_001.csv 失败: 文件格式错误",
+      "timestamp": "2024-05-20 10:15:22",
+      "level": "ERROR",
+      "type": "standard",
+      "message": "处理文件 data_001.csv 失败: 文件格式错误",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "70853962e2cae249"
+    },
+    "order": 18
+  },
+  {
+    "timestamp": "2024-05-20T10:30:00",
+    "time_sort": "2024-05-20T10:30:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 2024-05-20 10:30:00 ERROR 网络连接异常 重试中",
+    "description": "行号: 6",
+    "details": {
+      "line_num": 6,
+      "raw_content": "2024-05-20 10:30:00,ERROR,网络连接异常 重试中",
+      "timestamp": "2024-05-20 10:30:00",
+      "type": "csv",
+      "fields": [
+        "2024-05-20 10:30:00",
+        "ERROR",
+        "网络连接异常 重试中"
+      ],
+      "message": "2024-05-20 10:30:00 ERROR 网络连接异常 重试中",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "36790d0a6179e3b7"
+    },
+    "order": 19
+  },
+  {
+    "timestamp": "2024-05-20T10:30:05",
+    "time_sort": "2024-05-20T10:30:05",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 2024-05-20 10:30:05 ERROR 网络连接异常 重试中",
+    "description": "行号: 7",
+    "details": {
+      "line_num": 7,
+      "raw_content": "2024-05-20 10:30:05,ERROR,网络连接异常 重试中",
+      "timestamp": "2024-05-20 10:30:05",
+      "type": "csv",
+      "fields": [
+        "2024-05-20 10:30:05",
+        "ERROR",
+        "网络连接异常 重试中"
+      ],
+      "message": "2024-05-20 10:30:05 ERROR 网络连接异常 重试中",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "93bb6490084dd521"
+    },
+    "order": 20
+  },
+  {
+    "timestamp": "2024-05-20T11:00:00",
+    "time_sort": "2024-05-20T11:00:00",
+    "type": "manual_correction",
+    "source": "失败日志",
+    "icon": "✏️",
+    "title": "人工更正: 人工更正: 已手动修复 data_002.csv 字段问题",
+    "description": "行号: 10",
+    "details": {
+      "line_num": 10,
+      "raw_content": "2024-05-20 11:00:00 [INFO] 人工更正: 已手动修复 data_002.csv 字段问题",
+      "timestamp": "2024-05-20 11:00:00",
+      "level": "INFO",
+      "type": "standard",
+      "message": "人工更正: 已手动修复 data_002.csv 字段问题",
+      "is_normal": false,
+      "is_late": false,
+      "is_manual": true,
+      "hash": "2de23bfd86249220"
+    },
+    "order": 21
+  },
+  {
+    "timestamp": "2024-05-20T11:00:00",
+    "time_sort": "2024-05-20T11:00:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 2024-05-20 11:00:00 INFO 网络恢复正常",
+    "description": "行号: 8",
+    "details": {
+      "line_num": 8,
+      "raw_content": "2024-05-20 11:00:00,INFO,网络恢复正常",
+      "timestamp": "2024-05-20 11:00:00",
+      "type": "csv",
+      "fields": [
+        "2024-05-20 11:00:00",
+        "INFO",
+        "网络恢复正常"
+      ],
+      "message": "2024-05-20 11:00:00 INFO 网络恢复正常",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "37739a997355fa66"
+    },
+    "order": 22
+  },
+  {
+    "timestamp": "2024-05-20T11:05:00",
+    "time_sort": "2024-05-20T11:05:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 重新处理 data_002.csv 成功",
+    "description": "行号: 11",
+    "details": {
+      "line_num": 11,
+      "raw_content": "2024-05-20 11:05:00 [INFO] 重新处理 data_002.csv 成功",
+      "timestamp": "2024-05-20 11:05:00",
+      "level": "INFO",
+      "type": "standard",
+      "message": "重新处理 data_002.csv 成功",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "7585be9b084e988f"
+    },
+    "order": 23
+  },
+  {
+    "timestamp": "2024-05-20T12:00:00",
+    "time_sort": "2024-05-20T12:00:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 午间系统巡检正常",
+    "description": "行号: 12",
+    "details": {
+      "line_num": 12,
+      "raw_content": "2024-05-20 12:00:00 [INFO] 午间系统巡检正常",
+      "timestamp": "2024-05-20 12:00:00",
+      "level": "INFO",
+      "type": "standard",
+      "message": "午间系统巡检正常",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "a489760a8e5c3494"
+    },
+    "order": 24
+  },
+  {
+    "timestamp": "2024-05-20T14:30:00",
+    "time_sort": "2024-05-20T14:30:00",
+    "type": "late_attachment",
+    "source": "失败日志",
+    "icon": "⏰",
+    "title": "晚到附件: 晚到附件: file_004.pdf 延迟到达，已补传",
+    "description": "行号: 13",
+    "details": {
+      "line_num": 13,
+      "raw_content": "2024-05-20 14:30:00 [WARN] 晚到附件: file_004.pdf 延迟到达，已补传",
+      "timestamp": "2024-05-20 14:30:00",
+      "level": "WARN",
+      "type": "standard",
+      "message": "晚到附件: file_004.pdf 延迟到达，已补传",
+      "is_normal": false,
+      "is_late": true,
+      "is_manual": false,
+      "hash": "5a12e7a9e2580e8c"
+    },
+    "order": 25
+  },
+  {
+    "timestamp": "2024-05-20T15:00:00",
+    "time_sort": "2024-05-20T15:00:00",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 系统运行正常",
+    "description": "行号: 14",
+    "details": {
+      "line_num": 14,
+      "raw_content": "2024-05-20 15:00:00 [INFO] 系统运行正常",
+      "timestamp": "2024-05-20 15:00:00",
+      "level": "INFO",
+      "type": "standard",
+      "message": "系统运行正常",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "6aa3f7d2d3b452c5"
+    },
+    "order": 26
+  },
+  {
+    "timestamp": "2026-05-31T21:40:05",
+    "time_sort": "2026-05-31T21:40:05",
+    "type": "directory",
+    "source": "目录快照",
+    "icon": "📁",
+    "title": "目录: 日志目录 有空格/subdir",
+    "description": "目录修改",
+    "details": {
+      "path": "日志目录 有空格/subdir",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/日志目录 有空格/subdir",
+      "has_space": true,
+      "modified": "2026-05-31 21:40:05"
+    },
+    "order": 27
+  },
+  {
+    "timestamp": "2026-05-31T21:40:10",
+    "time_sort": "2026-05-31T21:40:10",
+    "type": "file",
+    "source": "目录快照",
+    "icon": "📄",
+    "title": "文件: app_config.ini",
+    "description": "大小: 294.0 B",
+    "details": {
+      "path": "app_config.ini",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/app_config.ini",
+      "size": 294,
+      "size_human": "294.0 B",
+      "modified": "2026-05-31 21:40:10",
+      "has_space": false,
+      "extension": ".ini"
+    },
+    "order": 28
+  },
+  {
+    "timestamp": "2026-05-31T21:40:10",
+    "time_sort": "2026-05-31T21:40:10",
+    "type": "config",
+    "source": "配置文件",
+    "icon": "⚙️",
+    "title": "配置: app_config.ini",
+    "description": "类型: ini",
+    "details": {
+      "path": "app_config.ini",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/app_config.ini",
+      "type": "ini",
+      "size": 294,
+      "modified": "2026-05-31 21:40:10"
+    },
+    "order": 29
+  },
+  {
+    "timestamp": "2026-05-31T21:40:20",
+    "time_sort": "2026-05-31T21:40:20",
+    "type": "file",
+    "source": "目录快照",
+    "icon": "📄",
+    "title": "文件: fail_20240520.log",
+    "description": "大小: 921.0 B",
+    "details": {
+      "path": "fail_20240520.log",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/fail_20240520.log",
+      "size": 921,
+      "size_human": "921.0 B",
+      "modified": "2026-05-31 21:40:20",
+      "has_space": false,
+      "extension": ".log"
+    },
+    "order": 30
+  },
+  {
+    "timestamp": "2026-05-31T21:40:20",
+    "time_sort": "2026-05-31T21:40:20",
+    "type": "log_file",
+    "source": "失败日志",
+    "icon": "📋",
+    "title": "日志文件: fail_20240520.log",
+    "description": "共 14 行, 14 条记录",
+    "details": {
+      "total_records": 14,
+      "normal_count": 10,
+      "late_count": 3,
+      "duplicate_count": 1,
+      "manual_count": 1
+    },
+    "order": 31
+  },
+  {
+    "timestamp": "2026-05-31T21:40:23",
+    "time_sort": "2026-05-31T21:40:23",
+    "type": "file",
+    "source": "目录快照",
+    "icon": "📄",
+    "title": "文件: 日志目录 有空格/test_file.txt",
+    "description": "大小: 86.0 B",
+    "details": {
+      "path": "日志目录 有空格/test_file.txt",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/日志目录 有空格/test_file.txt",
+      "size": 86,
+      "size_human": "86.0 B",
+      "modified": "2026-05-31 21:40:23",
+      "has_space": true,
+      "extension": ".txt"
+    },
+    "order": 32
+  },
+  {
+    "timestamp": "2026-05-31T21:40:23",
+    "time_sort": "2026-05-31T21:40:23",
+    "type": "directory",
+    "source": "目录快照",
+    "icon": "📁",
+    "title": "目录: 日志目录 有空格",
+    "description": "目录修改",
+    "details": {
+      "path": "日志目录 有空格",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/日志目录 有空格",
+      "has_space": true,
+      "modified": "2026-05-31 21:40:23"
+    },
+    "order": 33
+  },
+  {
+    "timestamp": "2026-05-31T21:40:29",
+    "time_sort": "2026-05-31T21:40:29",
+    "type": "file",
+    "source": "目录快照",
+    "icon": "📄",
+    "title": "文件: error_report.csv",
+    "description": "大小: 399.0 B",
+    "details": {
+      "path": "error_report.csv",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/error_report.csv",
+      "size": 399,
+      "size_human": "399.0 B",
+      "modified": "2026-05-31 21:40:29",
+      "has_space": false,
+      "extension": ".csv"
+    },
+    "order": 34
+  },
+  {
+    "timestamp": "2026-05-31T21:40:29",
+    "time_sort": "2026-05-31T21:40:29",
+    "type": "log_file",
+    "source": "失败日志",
+    "icon": "📋",
+    "title": "日志文件: error_report.csv",
+    "description": "共 8 行, 8 条记录",
+    "details": {
+      "total_records": 8,
+      "normal_count": 7,
+      "late_count": 0,
+      "duplicate_count": 0,
+      "manual_count": 1
+    },
+    "order": 35
+  },
+  {
+    "timestamp": "2026-05-31T21:40:29",
+    "time_sort": "2026-05-31T21:40:29",
+    "type": "normal_log",
+    "source": "失败日志",
+    "icon": "✅",
+    "title": "日志记录: 时间 级别 消息",
+    "description": "行号: 1",
+    "details": {
+      "line_num": 1,
+      "raw_content": "时间,级别,消息",
+      "timestamp": null,
+      "type": "csv",
+      "fields": [
+        "时间",
+        "级别",
+        "消息"
+      ],
+      "message": "时间 级别 消息",
+      "is_normal": true,
+      "is_late": false,
+      "is_manual": false,
+      "hash": "6424182553644652"
+    },
+    "order": 36
+  },
+  {
+    "timestamp": "2026-05-31T21:40:37",
+    "time_sort": "2026-05-31T21:40:37",
+    "type": "file",
+    "source": "目录快照",
+    "icon": "📄",
+    "title": "文件: normal.log",
+    "description": "大小: 251.0 B",
+    "details": {
+      "path": "normal.log",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/normal.log",
+      "size": 251,
+      "size_human": "251.0 B",
+      "modified": "2026-05-31 21:40:37",
+      "has_space": false,
+      "extension": ".log"
+    },
+    "order": 37
+  },
+  {
+    "timestamp": "2026-05-31T21:40:37",
+    "time_sort": "2026-05-31T21:40:37",
+    "type": "log_file",
+    "source": "失败日志",
+    "icon": "📋",
+    "title": "日志文件: normal.log",
+    "description": "共 5 行, 5 条记录",
+    "details": {
+      "total_records": 5,
+      "normal_count": 5,
+      "late_count": 0,
+      "duplicate_count": 0,
+      "manual_count": 0
+    },
+    "order": 38
+  },
+  {
+    "timestamp": "2026-05-31T21:40:50",
+    "time_sort": "2026-05-31T21:40:50",
+    "type": "file",
+    "source": "目录快照",
+    "icon": "📄",
+    "title": "文件: .log_doctor_history/change_records.json",
+    "description": "大小: 60.0 B",
+    "details": {
+      "path": ".log_doctor_history/change_records.json",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/.log_doctor_history/change_records.json",
+      "size": 60,
+      "size_human": "60.0 B",
+      "modified": "2026-05-31 21:40:50",
+      "has_space": false,
+      "extension": ".json"
+    },
+    "order": 39
+  },
+  {
+    "timestamp": "2026-05-31T21:40:50",
+    "time_sort": "2026-05-31T21:40:50",
+    "type": "directory",
+    "source": "目录快照",
+    "icon": "📁",
+    "title": "目录: .log_doctor_history",
+    "description": "目录修改",
+    "details": {
+      "path": ".log_doctor_history",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/.log_doctor_history",
+      "has_space": false,
+      "modified": "2026-05-31 21:40:50"
+    },
+    "order": 40
+  },
+  {
+    "timestamp": "2026-05-31T21:40:50",
+    "time_sort": "2026-05-31T21:40:50",
+    "type": "config",
+    "source": "配置文件",
+    "icon": "⚙️",
+    "title": "配置: .log_doctor_history/change_records.json",
+    "description": "类型: json",
+    "details": {
+      "path": ".log_doctor_history/change_records.json",
+      "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/.log_doctor_history/change_records.json",
+      "type": "json",
+      "size": 60,
+      "modified": "2026-05-31 21:40:50"
+    },
+    "order": 41
+  }
+]

@@ -1,0 +1,181 @@
+{
+  "check_time": "2026-05-31T21:40:50.468515",
+  "base_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs",
+  "overall_status": "warning",
+  "summary": {
+    "total_checks": 5,
+    "critical_issues": 0,
+    "warnings": 6,
+    "infos": 0
+  },
+  "checks": [
+    {
+      "name": "目标目录检查",
+      "status": "pass",
+      "message": "目录存在，路径正确",
+      "level": "info"
+    },
+    {
+      "name": "路径空格检查",
+      "status": "warning",
+      "message": "发现 5 个路径包含空格",
+      "level": "warning"
+    },
+    {
+      "name": "日志文件检查",
+      "status": "warning",
+      "message": "发现 3 个日志文件共 27 条记录，含: 3 条晚到附件, 1 条重复记录",
+      "level": "warning"
+    },
+    {
+      "name": "配置文件检查",
+      "status": "pass",
+      "message": "发现 1 个配置文件",
+      "level": "info"
+    },
+    {
+      "name": "人工修改检查",
+      "status": "pass",
+      "message": "暂无人工修改记录",
+      "level": "info"
+    }
+  ],
+  "space_path_issues": [
+    {
+      "type": "directory",
+      "path": "日志目录 有空格",
+      "source": "目录快照",
+      "message": "目录名包含空格，可能导致脚本执行异常",
+      "action": "请联系目录创建者重命名，或在脚本中用引号包裹路径"
+    },
+    {
+      "type": "directory",
+      "path": "日志目录 有空格/subdir",
+      "source": "目录快照",
+      "message": "目录名包含空格，可能导致脚本执行异常",
+      "action": "请联系目录创建者重命名，或在脚本中用引号包裹路径"
+    },
+    {
+      "type": "file",
+      "path": "日志目录 有空格/test_file.txt",
+      "source": "目录快照",
+      "message": "文件名包含空格，可能导致脚本执行异常",
+      "action": "请联系文件上传者重命名，或在脚本中用引号包裹路径"
+    },
+    {
+      "type": "config_path",
+      "key": "log_dir",
+      "value": "/var/log/my app logs",
+      "section": "paths",
+      "source": "配置文件: app_config.ini",
+      "message": "配置的路径包含空格但未用引号包裹，程序读取时可能被截断",
+      "action": "请联系应用负责人修改配置，给路径加上引号"
+    },
+    {
+      "type": "config_path",
+      "key": "data_path",
+      "value": "/data/业务系统 正式环境",
+      "section": "paths",
+      "source": "配置文件: app_config.ini",
+      "message": "配置的路径包含空格但未用引号包裹，程序读取时可能被截断",
+      "action": "请联系应用负责人修改配置，给路径加上引号"
+    }
+  ],
+  "log_issues": {
+    "file_count": 3,
+    "total_records": 27,
+    "late_attachments": 3,
+    "duplicates": 1,
+    "manual_corrections": 2,
+    "files": [
+      {
+        "path": "fail_20240520.log",
+        "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/fail_20240520.log",
+        "size": 921,
+        "modified": "2026-05-31 21:40:20"
+      },
+      {
+        "path": "normal.log",
+        "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/normal.log",
+        "size": 251,
+        "modified": "2026-05-31 21:40:37"
+      },
+      {
+        "path": "error_report.csv",
+        "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/error_report.csv",
+        "size": 399,
+        "modified": "2026-05-31 21:40:29"
+      }
+    ]
+  },
+  "config_issues": {
+    "file_count": 1,
+    "files": [
+      {
+        "path": "app_config.ini",
+        "full_path": "/Users/lzy/pro/solo/workspaces/zy71990/test_logs/app_config.ini",
+        "type": "ini",
+        "size": 294,
+        "modified": "2026-05-31 21:40:10"
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "priority": "medium",
+      "category": "路径规范",
+      "item": "日志目录 有空格",
+      "source": "目录快照",
+      "problem": "目录名包含空格，可能导致脚本执行异常",
+      "action": "请联系目录创建者重命名，或在脚本中用引号包裹路径"
+    },
+    {
+      "priority": "medium",
+      "category": "路径规范",
+      "item": "日志目录 有空格/subdir",
+      "source": "目录快照",
+      "problem": "目录名包含空格，可能导致脚本执行异常",
+      "action": "请联系目录创建者重命名，或在脚本中用引号包裹路径"
+    },
+    {
+      "priority": "medium",
+      "category": "路径规范",
+      "item": "日志目录 有空格/test_file.txt",
+      "source": "目录快照",
+      "problem": "文件名包含空格，可能导致脚本执行异常",
+      "action": "请联系文件上传者重命名，或在脚本中用引号包裹路径"
+    },
+    {
+      "priority": "high",
+      "category": "路径规范",
+      "item": "log_dir",
+      "source": "配置文件: app_config.ini",
+      "problem": "配置的路径包含空格但未用引号包裹，程序读取时可能被截断",
+      "action": "请联系应用负责人修改配置，给路径加上引号"
+    },
+    {
+      "priority": "high",
+      "category": "路径规范",
+      "item": "data_path",
+      "source": "配置文件: app_config.ini",
+      "problem": "配置的路径包含空格但未用引号包裹，程序读取时可能被截断",
+      "action": "请联系应用负责人修改配置，给路径加上引号"
+    },
+    {
+      "priority": "medium",
+      "category": "日志质量",
+      "item": "晚到附件",
+      "source": "失败日志",
+      "problem": "存在 3 条晚到附件记录，可能影响数据完整性",
+      "action": "请检查上传链路是否通畅，定时任务是否准时执行"
+    },
+    {
+      "priority": "low",
+      "category": "日志质量",
+      "item": "重复记录",
+      "source": "失败日志",
+      "problem": "存在 1 条重复记录",
+      "action": "可检查日志采集程序是否有重复上报逻辑"
+    }
+  ]
+}
