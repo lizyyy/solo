@@ -1,0 +1,5 @@
+record_id,date,amount,currency,email_subject,sender,recipients,approval_action,related_record_id,batch_id,description
+APR-001,2026-04-01,0,CNY,关于并购对价第一期确认,财务总监李某,阿宁;结算组,批准,PAY-001,BATCH-2026Q1-01,邮件确认第一期到账
+APR-002,2026-04-10,0,CNY,并购对价第二期确认,财务总监李某,阿宁;结算组,批准,PAY-002,BATCH-2026Q1-01,邮件确认第二期到账
+APR-003,2026-05-10,0,CNY,冲账调整审批,财务总监李某,阿宁,批准,PAY-008,BATCH-2026Q2-01,冲账退款审批通过
+APR-004,2026-05-15,0,CNY,大额交易审批:并购尾款,CEO张某;财务总监李某,阿宁;审计组,待确认,PAY-009,BATCH-2026Q2-02,大额交易需要双重确认

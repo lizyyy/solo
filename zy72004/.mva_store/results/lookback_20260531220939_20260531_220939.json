@@ -1,0 +1,478 @@
+{
+  "run_id": "20260531220939",
+  "run_at": "2026-05-31T22:09:39.593016",
+  "total_records": 22,
+  "conflict_count": 16,
+  "duplicate_claim_count": 1,
+  "late_attachment_count": 3,
+  "null_field_count": 10,
+  "boundary_count": 2,
+  "summary_amount": 18900000.0,
+  "exception_amount": 16950000.0,
+  "judgment_changes": [
+    {
+      "record_id": "PAY-001",
+      "old_judgment": "initial",
+      "new_judgment": "revised",
+      "change_reason": "晚到附件「银行到账回单_晚到.pdf」已纳入参考，原判断保留。附件上传时间: 2026-05-22。此条目需要人工确认是否调整。",
+      "changed_at": "2026-05-22",
+      "changed_by": "system",
+      "attachment_id": "ATT-003"
+    },
+    {
+      "record_id": "PAY-006",
+      "old_judgment": "initial",
+      "new_judgment": "revised",
+      "change_reason": "晚到附件「金额确认函.pdf」已纳入参考，原判断保留。附件上传时间: 2026-05-28。此条目需要人工确认是否调整。",
+      "changed_at": "2026-05-28",
+      "changed_by": "system",
+      "attachment_id": "ATT-004"
+    },
+    {
+      "record_id": "PAY-008",
+      "old_judgment": "initial",
+      "new_judgment": "revised",
+      "change_reason": "晚到附件「冲账说明_补充.pdf」已纳入参考，原判断保留。附件上传时间: 2026-05-23。此条目需要人工确认是否调整。",
+      "changed_at": "2026-05-23",
+      "changed_by": "system",
+      "attachment_id": "ATT-005"
+    }
+  ],
+  "conflicts": [
+    {
+      "conflict_id": "CONFLICT-0001",
+      "conflict_type": "duplicate_claim",
+      "record_ids": [
+        "PAY-004",
+        "PAY-005",
+        "PAY-001"
+      ],
+      "evidence": {
+        "金额": "500000.0 CNY",
+        "涉及批次": [
+          "BATCH-2026Q1-01",
+          "BATCH-2026Q1-02",
+          "BATCH-2026Q2-01"
+        ],
+        "跨日期认领": true,
+        "涉及记录": [
+          {
+            "record_id": "PAY-001",
+            "batch_id": "BATCH-2026Q1-01",
+            "date": "2026-03-15",
+            "source_file": "payment_收款流水.csv",
+            "description": "并购对价第一期"
+          },
+          {
+            "record_id": "PAY-004",
+            "batch_id": "BATCH-2026Q1-02",
+            "date": "2026-04-10",
+            "source_file": "payment_收款流水.csv",
+            "description": "并购对价第一期（重复批次认领）"
+          },
+          {
+            "record_id": "PAY-005",
+            "batch_id": "BATCH-2026Q2-01",
+            "date": "2026-04-15",
+            "source_file": "payment_收款流水.csv",
+            "description": "并购对价第一期（另一批次认领）"
+          }
+        ]
+      },
+      "suggested_action": "同一金额 500000.0 CNY 被 3 个批次在不同日期认领，这是典型的重复认款场景。建议：核对收银后台原始流水，确认该金额实际到账次数，指定唯一归属批次。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0002",
+      "conflict_type": "null_field",
+      "record_ids": [
+        "NOTE-001"
+      ],
+      "evidence": {
+        "记录ID": "NOTE-001",
+        "记录类型": "note",
+        "空值字段": [
+          "批次(batch_id)"
+        ],
+        "来源文件": "note_手写备注.csv",
+        "原始数据": {
+          "record_id": "NOTE-001",
+          "date": "2026-04-05",
+          "amount": "0",
+          "currency": "CNY",
+          "author": "阿宁",
+          "category": "估值假设",
+          "content": "并购估值假设回看启动，本期需核实Q1全部对价到账情况",
+          "batch_id": "",
+          "description": "启动回看"
+        }
+      },
+      "suggested_action": "记录 NOTE-001 有 1 个关键字段为空：批次(batch_id)。建议：补全后再纳入汇总，或标注为待确认条目。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0003",
+      "conflict_type": "null_field",
+      "record_ids": [
+        "NOTE-002"
+      ],
+      "evidence": {
+        "记录ID": "NOTE-002",
+        "记录类型": "note",
+        "空值字段": [
+          "批次(batch_id)"
+        ],
+        "来源文件": "note_手写备注.csv",
+        "原始数据": {
+          "record_id": "NOTE-002",
+          "date": "2026-04-20",
+          "amount": "0",
+          "currency": "CNY",
+          "author": "阿宁",
+          "category": "重复认款",
+          "content": "PAY-001/PAY-004/PAY-005 三笔金额相同，疑似同一笔被两个批次认走，需核实现金流",
+          "batch_id": "",
+          "description": "发现重复"
+        }
+      },
+      "suggested_action": "记录 NOTE-002 有 1 个关键字段为空：批次(batch_id)。建议：补全后再纳入汇总，或标注为待确认条目。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0004",
+      "conflict_type": "null_field",
+      "record_ids": [
+        "NOTE-003"
+      ],
+      "evidence": {
+        "记录ID": "NOTE-003",
+        "记录类型": "note",
+        "空值字段": [
+          "批次(batch_id)"
+        ],
+        "来源文件": "note_手写备注.csv",
+        "原始数据": {
+          "record_id": "NOTE-003",
+          "date": "2026-05-02",
+          "amount": "0",
+          "currency": "CNY",
+          "author": "阿宁",
+          "category": "空值处理",
+          "content": "PAY-006 金额为空，暂不计入汇总，等对方补确认函",
+          "batch_id": "",
+          "description": "空值待确认"
+        }
+      },
+      "suggested_action": "记录 NOTE-003 有 1 个关键字段为空：批次(batch_id)。建议：补全后再纳入汇总，或标注为待确认条目。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0005",
+      "conflict_type": "null_field",
+      "record_ids": [
+        "NOTE-005"
+      ],
+      "evidence": {
+        "记录ID": "NOTE-005",
+        "记录类型": "note",
+        "空值字段": [
+          "批次(batch_id)"
+        ],
+        "来源文件": "note_手写备注.csv",
+        "原始数据": {
+          "record_id": "NOTE-005",
+          "date": "2026-05-20",
+          "amount": "0",
+          "currency": "CNY",
+          "author": "阿宁",
+          "category": "交接备注",
+          "content": "本批并购估值假设回看数据已核对，例外项已标注，可交接",
+          "batch_id": "",
+          "description": "准备交接"
+        }
+      },
+      "suggested_action": "记录 NOTE-005 有 1 个关键字段为空：批次(batch_id)。建议：补全后再纳入汇总，或标注为待确认条目。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0006",
+      "conflict_type": "null_field",
+      "record_ids": [
+        "PAY-006"
+      ],
+      "evidence": {
+        "记录ID": "PAY-006",
+        "记录类型": "payment",
+        "空值字段": [
+          "金额(amount)"
+        ],
+        "来源文件": "payment_收款流水.csv",
+        "原始数据": {
+          "record_id": "PAY-006",
+          "date": "2026-05-01",
+          "amount": "",
+          "currency": "CNY",
+          "payer": "华信科技",
+          "payee": "本公司",
+          "transaction_no": "ZX20260501006",
+          "batch_id": "BATCH-2026Q2-01",
+          "settlement_status": "待结算",
+          "description": "金额待确认的记录"
+        }
+      },
+      "suggested_action": "记录 PAY-006 有 1 个关键字段为空：金额(amount)。建议：补全后再纳入汇总，或标注为待确认条目。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0007",
+      "conflict_type": "null_field",
+      "record_ids": [
+        "PAY-007"
+      ],
+      "evidence": {
+        "记录ID": "PAY-007",
+        "记录类型": "payment",
+        "空值字段": [
+          "日期(date)"
+        ],
+        "来源文件": "payment_收款流水.csv",
+        "原始数据": {
+          "record_id": "PAY-007",
+          "date": "",
+          "amount": "300000.00",
+          "currency": "CNY",
+          "payer": "华信科技",
+          "payee": "本公司",
+          "transaction_no": "ZX20260502007",
+          "batch_id": "BATCH-2026Q2-01",
+          "settlement_status": "待结算",
+          "description": "日期缺失的记录"
+        }
+      },
+      "suggested_action": "记录 PAY-007 有 1 个关键字段为空：日期(date)。建议：补全后再纳入汇总，或标注为待确认条目。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0008",
+      "conflict_type": "null_field",
+      "record_ids": [
+        "PAY-008"
+      ],
+      "evidence": {
+        "记录ID": "PAY-008",
+        "记录类型": "payment",
+        "空值字段": [
+          "批次(batch_id)"
+        ],
+        "来源文件": "payment_收款流水.csv",
+        "原始数据": {
+          "record_id": "PAY-008",
+          "date": "2026-05-10",
+          "amount": "-50000.00",
+          "currency": "CNY",
+          "payer": "本公司",
+          "payee": "华信科技",
+          "transaction_no": "ZX20260510008",
+          "batch_id": "",
+          "settlement_status": "已退款",
+          "description": "冲账调整（边界：负数金额）"
+        }
+      },
+      "suggested_action": "记录 PAY-008 有 1 个关键字段为空：批次(batch_id)。建议：补全后再纳入汇总，或标注为待确认条目。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0009",
+      "conflict_type": "null_field",
+      "record_ids": [
+        "PAY-010"
+      ],
+      "evidence": {
+        "记录ID": "PAY-010",
+        "记录类型": "payment",
+        "空值字段": [
+          "流水号(transaction_no)"
+        ],
+        "来源文件": "payment_收款流水.csv",
+        "原始数据": {
+          "record_id": "PAY-010",
+          "date": "2026-05-20",
+          "amount": "200000.00",
+          "currency": "CNY",
+          "payer": "华信科技",
+          "payee": "本公司",
+          "transaction_no": "",
+          "batch_id": "BATCH-2026Q2-02",
+          "settlement_status": "待结算",
+          "description": "流水号缺失"
+        }
+      },
+      "suggested_action": "记录 PAY-010 有 1 个关键字段为空：流水号(transaction_no)。建议：补全后再纳入汇总，或标注为待确认条目。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0010",
+      "conflict_type": "null_field",
+      "record_ids": [
+        "REF-002"
+      ],
+      "evidence": {
+        "记录ID": "REF-002",
+        "记录类型": "refund",
+        "空值字段": [
+          "批次(batch_id)"
+        ],
+        "来源文件": "refund_退款申请.csv",
+        "原始数据": {
+          "record_id": "REF-002",
+          "date": "2026-05-18",
+          "amount": "30000.00",
+          "currency": "CNY",
+          "original_payment_id": "PAY-003",
+          "refund_reason": "估值调整差异退款",
+          "applicant": "阿宁",
+          "approval_status": "审批中",
+          "batch_id": "",
+          "description": "退款申请处理中"
+        }
+      },
+      "suggested_action": "记录 REF-002 有 1 个关键字段为空：批次(batch_id)。建议：补全后再纳入汇总，或标注为待确认条目。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0011",
+      "conflict_type": "null_field",
+      "record_ids": [
+        "REF-003"
+      ],
+      "evidence": {
+        "记录ID": "REF-003",
+        "记录类型": "refund",
+        "空值字段": [
+          "金额(amount)",
+          "批次(batch_id)"
+        ],
+        "来源文件": "refund_退款申请.csv",
+        "原始数据": {
+          "record_id": "REF-003",
+          "date": "2026-05-25",
+          "amount": "",
+          "currency": "CNY",
+          "original_payment_id": "PAY-006",
+          "refund_reason": "金额待确认暂不处理",
+          "applicant": "阿宁",
+          "approval_status": "待提交",
+          "batch_id": "",
+          "description": "空值退款记录"
+        }
+      },
+      "suggested_action": "记录 REF-003 有 2 个关键字段为空：金额(amount), 批次(batch_id)。建议：补全后再纳入汇总，或标注为待确认条目。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0012",
+      "conflict_type": "boundary",
+      "record_ids": [
+        "PAY-008"
+      ],
+      "evidence": {
+        "记录ID": "PAY-008",
+        "金额": -50000.0,
+        "异常类型": "非正数金额",
+        "来源文件": "payment_收款流水.csv"
+      },
+      "suggested_action": "记录 PAY-008 金额为 -50000.0，属于非正数边界情况。建议：确认是否为冲账或调整记录，标注后单独统计。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0013",
+      "conflict_type": "boundary",
+      "record_ids": [
+        "PAY-009"
+      ],
+      "evidence": {
+        "记录ID": "PAY-009",
+        "金额": 15000000.0,
+        "平均金额": 2368750.0,
+        "倍数": 6.3,
+        "异常类型": "金额远超平均值",
+        "来源文件": "payment_收款流水.csv"
+      },
+      "suggested_action": "记录 PAY-009 金额 15000000.0 是平均值 2368750.0 的 6.3 倍，属于边界异常。建议：核实大额交易是否有对应的审批邮件，确认后标注。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0014",
+      "conflict_type": "late_attachment",
+      "record_ids": [
+        "PAY-001"
+      ],
+      "evidence": {
+        "附件ID": "ATT-003",
+        "附件名": "银行到账回单_晚到.pdf",
+        "关联记录": "PAY-001",
+        "上传时间": "2026-05-22",
+        "晚到": true,
+        "原记录来源": "payment_收款流水.csv",
+        "原记录金额": 500000.0,
+        "原记录日期": "2026-03-15"
+      },
+      "suggested_action": "附件「银行到账回单_晚到.pdf」晚于主记录到达，不能直接覆盖原有判断。建议：将附件内容作为补充证据，保留原判断记录，由阿宁确认是否需要调整后手动更新。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0015",
+      "conflict_type": "late_attachment",
+      "record_ids": [
+        "PAY-006"
+      ],
+      "evidence": {
+        "附件ID": "ATT-004",
+        "附件名": "金额确认函.pdf",
+        "关联记录": "PAY-006",
+        "上传时间": "2026-05-28",
+        "晚到": true,
+        "原记录来源": "payment_收款流水.csv",
+        "原记录金额": null,
+        "原记录日期": "2026-05-01"
+      },
+      "suggested_action": "附件「金额确认函.pdf」晚于主记录到达，不能直接覆盖原有判断。建议：将附件内容作为补充证据，保留原判断记录，由阿宁确认是否需要调整后手动更新。",
+      "resolved": false,
+      "resolution_note": ""
+    },
+    {
+      "conflict_id": "CONFLICT-0016",
+      "conflict_type": "late_attachment",
+      "record_ids": [
+        "PAY-008"
+      ],
+      "evidence": {
+        "附件ID": "ATT-005",
+        "附件名": "冲账说明_补充.pdf",
+        "关联记录": "PAY-008",
+        "上传时间": "2026-05-23",
+        "晚到": true,
+        "原记录来源": "payment_收款流水.csv",
+        "原记录金额": -50000.0,
+        "原记录日期": "2026-05-10"
+      },
+      "suggested_action": "附件「冲账说明_补充.pdf」晚于主记录到达，不能直接覆盖原有判断。建议：将附件内容作为补充证据，保留原判断记录，由阿宁确认是否需要调整后手动更新。",
+      "resolved": false,
+      "resolution_note": ""
+    }
+  ]
+}

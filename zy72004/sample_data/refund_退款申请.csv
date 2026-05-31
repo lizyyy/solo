@@ -1,0 +1,4 @@
+record_id,date,amount,currency,original_payment_id,refund_reason,applicant,approval_status,batch_id,description
+REF-001,2026-05-12,50000.00,CNY,PAY-008,并购对价多付退回,阿宁,已批准,BATCH-2026Q2-01,冲账退款
+REF-002,2026-05-18,30000.00,CNY,PAY-003,估值调整差异退款,阿宁,审批中,,退款申请处理中
+REF-003,2026-05-25,,CNY,PAY-006,金额待确认暂不处理,阿宁,待提交,,空值退款记录
