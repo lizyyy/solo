@@ -1,0 +1,10 @@
+
+server:
+  port: 8080
+  host: localhost
+database:
+  url: jdbc:mysql://localhost:3306/mydb
+port: 9090
+bad.change=true
+another.bad.change=yes
+duplicate.exec.test=yes
