@@ -1,0 +1,31 @@
+{
+  "version_id": "v20260531203544_87ad46",
+  "name": "情感标注_v2",
+  "description": "第二版，标签口径变更",
+  "metric_schema": {
+    "confidence": "float",
+    "reviewer_score": "float"
+  },
+  "label_mappings": [
+    {
+      "source_label": "好评",
+      "target_label": "positive",
+      "confidence": 1.0,
+      "created_at": "2026-05-31T20:35:44.408393"
+    },
+    {
+      "source_label": "差评",
+      "target_label": "negative",
+      "confidence": 1.0,
+      "created_at": "2026-05-31T20:35:44.408396"
+    },
+    {
+      "source_label": "中性",
+      "target_label": "neutral",
+      "confidence": 1.0,
+      "created_at": "2026-05-31T20:35:44.408398"
+    }
+  ],
+  "created_at": "2026-05-31T20:35:44.406855",
+  "sample_count": 5
+}

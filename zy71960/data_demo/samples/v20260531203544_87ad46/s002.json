@@ -1,0 +1,35 @@
+{
+  "sample_id": "s002",
+  "content": {
+    "text": "非常不满意，退款",
+    "split": "train",
+    "confidence": 0.88
+  },
+  "labels": [
+    "negative"
+  ],
+  "meta": {
+    "split": "train",
+    "source": null,
+    "collection_date": null,
+    "confidence": 0.88,
+    "annotator": null,
+    "metrics": {}
+  },
+  "status": "needs_confirmation",
+  "anomalies": [
+    "metric_changed"
+  ],
+  "anomaly_details": {
+    "metric_changed": {
+      "reference_version": "v20260531203544_a18a49",
+      "schema_changes": {
+        "reviewer_score": "新增指标: float",
+        "agreement": "移除指标: float"
+      },
+      "explanation": "指标口径发生变化: reviewer_score, agreement"
+    }
+  },
+  "created_at": "2026-05-31T20:35:44.407646",
+  "updated_at": "2026-05-31T20:35:44.412430"
+}

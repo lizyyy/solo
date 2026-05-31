@@ -1,0 +1,48 @@
+{
+  "sample_id": "s005",
+  "content": {
+    "text": "这个产品质量很好",
+    "split": "train",
+    "confidence": 0.55
+  },
+  "labels": [
+    "positive"
+  ],
+  "meta": {
+    "split": "train",
+    "source": null,
+    "collection_date": null,
+    "confidence": 0.55,
+    "annotator": null,
+    "metrics": {}
+  },
+  "status": "needs_confirmation",
+  "anomalies": [
+    "version_conflict",
+    "metric_changed"
+  ],
+  "anomaly_details": {
+    "version_conflict": {
+      "change_type": "label_changed",
+      "field": "labels",
+      "old_value": [
+        "negative"
+      ],
+      "new_value": [
+        "positive"
+      ],
+      "explanation": "标签变更: ['negative'] → ['positive']",
+      "base_version": "v20260531203544_a18a49"
+    },
+    "metric_changed": {
+      "reference_version": "v20260531203544_a18a49",
+      "schema_changes": {
+        "reviewer_score": "新增指标: float",
+        "agreement": "移除指标: float"
+      },
+      "explanation": "指标口径发生变化: reviewer_score, agreement"
+    }
+  },
+  "created_at": "2026-05-31T20:35:44.408135",
+  "updated_at": "2026-05-31T20:35:44.412327"
+}

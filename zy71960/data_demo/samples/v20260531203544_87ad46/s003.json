@@ -1,0 +1,35 @@
+{
+  "sample_id": "s003",
+  "content": {
+    "text": "还可以，一般般",
+    "split": "test",
+    "confidence": 0.72
+  },
+  "labels": [
+    "neutral"
+  ],
+  "meta": {
+    "split": "test",
+    "source": null,
+    "collection_date": null,
+    "confidence": 0.72,
+    "annotator": null,
+    "metrics": {}
+  },
+  "status": "needs_confirmation",
+  "anomalies": [
+    "metric_changed"
+  ],
+  "anomaly_details": {
+    "metric_changed": {
+      "reference_version": "v20260531203544_a18a49",
+      "schema_changes": {
+        "reviewer_score": "新增指标: float",
+        "agreement": "移除指标: float"
+      },
+      "explanation": "指标口径发生变化: reviewer_score, agreement"
+    }
+  },
+  "created_at": "2026-05-31T20:35:44.407817",
+  "updated_at": "2026-05-31T20:35:44.412525"
+}

@@ -1,0 +1,54 @@
+[
+  {
+    "id": "s001",
+    "text": "这个产品质量很好",
+    "labels": [
+      "positive"
+    ],
+    "split": "train",
+    "confidence": 0.95
+  },
+  {
+    "id": "s002",
+    "text": "非常不满意，退款",
+    "labels": [
+      "negative"
+    ],
+    "split": "train",
+    "confidence": 0.88
+  },
+  {
+    "id": "s003",
+    "text": "还可以，一般般",
+    "labels": [
+      "neutral"
+    ],
+    "split": "test",
+    "confidence": 0.72
+  },
+  {
+    "id": "s004",
+    "text": "推荐购买",
+    "labels": [
+      "positive"
+    ],
+    "split": "test",
+    "confidence": 0.91
+  },
+  {
+    "id": "s005",
+    "text": "这个产品质量很好",
+    "labels": [
+      "negative"
+    ],
+    "split": "train",
+    "confidence": 0.55
+  },
+  {
+    "id": "s006",
+    "text": "还没使用，不清楚",
+    "labels": [],
+    "split": "val",
+    "confidence": 0.3
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "s001",
+    "text": "这个产品质量很好",
+    "labels": [
+      "好评"
+    ],
+    "split": "train",
+    "confidence": 0.95
+  },
+  {
+    "id": "s002",
+    "text": "非常不满意，退款",
+    "labels": [
+      "差评"
+    ],
+    "split": "train",
+    "confidence": 0.88
+  },
+  {
+    "id": "s003",
+    "text": "还可以，一般般",
+    "labels": [
+      "中性"
+    ],
+    "split": "test",
+    "confidence": 0.72
+  },
+  {
+    "id": "s007",
+    "text": "新产品体验不错",
+    "labels": [
+      "好评"
+    ],
+    "split": "train",
+    "confidence": 0.82
+  },
+  {
+    "id": "s005",
+    "text": "这个产品质量很好",
+    "labels": [
+      "好评"
+    ],
+    "split": "train",
+    "confidence": 0.55
+  }
+]

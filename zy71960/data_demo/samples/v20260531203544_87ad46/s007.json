@@ -1,0 +1,44 @@
+{
+  "sample_id": "s007",
+  "content": {
+    "text": "新产品体验不错",
+    "split": "train",
+    "confidence": 0.82
+  },
+  "labels": [
+    "positive"
+  ],
+  "meta": {
+    "split": "train",
+    "source": null,
+    "collection_date": null,
+    "confidence": 0.82,
+    "annotator": null,
+    "metrics": {}
+  },
+  "status": "needs_confirmation",
+  "anomalies": [
+    "version_conflict",
+    "metric_changed"
+  ],
+  "anomaly_details": {
+    "version_conflict": {
+      "change_type": "new_sample",
+      "field": null,
+      "old_value": null,
+      "new_value": null,
+      "explanation": "新版本新增样本，标签: ['positive']",
+      "base_version": "v20260531203544_a18a49"
+    },
+    "metric_changed": {
+      "reference_version": "v20260531203544_a18a49",
+      "schema_changes": {
+        "reviewer_score": "新增指标: float",
+        "agreement": "移除指标: float"
+      },
+      "explanation": "指标口径发生变化: reviewer_score, agreement"
+    }
+  },
+  "created_at": "2026-05-31T20:35:44.407993",
+  "updated_at": "2026-05-31T20:35:44.412229"
+}

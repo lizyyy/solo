@@ -1,0 +1,12 @@
+{
+  "version_id": "v20260531203544_a18a49",
+  "name": "情感标注_v1",
+  "description": "第一版情感分析标注数据",
+  "metric_schema": {
+    "confidence": "float",
+    "agreement": "float"
+  },
+  "label_mappings": [],
+  "created_at": "2026-05-31T20:35:44.399809",
+  "sample_count": 6
+}
