@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>票据到期提醒系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 30px; }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .container { padding: 20px 30px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .stat-card .label { font-size: 13px; color: #888; margin-bottom: 8px; }
+        .stat-card .value { font-size: 26px; font-weight: 600; color: #333; }
+        .stat-card.warning .value { color: #e67e22; }
+        .stat-card.danger .value { color: #e74c3c; }
+        .stat-card.success .value { color: #27ae60; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e1e4e8; }
+        .tab { padding: 12px 24px; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; font-weight: 500; color: #666; }
+        .tab.active { color: #667eea; border-bottom-color: #667eea; }
+        .tab-content { display: none; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .tab-content.active { display: block; }
+        .toolbar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #229954; }
+        .btn-warning { background: #e67e22; color: white; }
+        .btn-warning:hover { background: #d35400; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-default { background: #95a5a6; color: white; }
+        .btn-default:hover { background: #7f8c8d; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+        input, select, textarea { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #555; position: sticky; top: 0; }
+        tr:hover { background: #f8f9fa; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-normal { background: #d1ecf1; color: #0c5460; }
+        .badge-confirmed { background: #d4edda; color: #155724; }
+        .badge-revised { background: #e2e3e5; color: #383d41; }
+        .badge-disputed { background: #f8d7da; color: #721c24; }
+        .badge-duplicate { background: #f8d7da; color: #721c24; }
+        .badge-cross_period { background: #fff3cd; color: #856404; }
+        .badge-refund { background: #ffeeba; color: #856404; }
+        .badge-suspense { background: #ffeeba; color: #856404; }
+        .badge-fee_mismatch { background: #f5c6cb; color: #721c24; }
+        .table-container { max-height: 500px; overflow-y: auto; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .modal-header h3 { font-size: 18px; }
+        .close { font-size: 24px; cursor: pointer; color: #999; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; }
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
+        .upload-area { border: 2px dashed #ddd; padding: 30px; text-align: center; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .upload-area:hover { border-color: #667eea; background: #f8f9ff; }
+        .history-item { padding: 12px; border-left: 3px solid #667eea; margin-bottom: 10px; background: #f8f9fa; }
+        .history-item .meta { font-size: 12px; color: #888; margin-bottom: 5px; }
+        .history-item .content { font-size: 13px; }
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h4 { font-size: 15px; margin-bottom: 10px; color: #555; padding-bottom: 8px; border-bottom: 2px solid #eee; }
+        .evidence-box { background: #fff9e6; padding: 12px; border-radius: 4px; border-left: 3px solid #f39c12; margin-top: 10px; }
+        .evidence-box .title { font-weight: 600; color: #856404; margin-bottom: 5px; }
+        .anomaly-box { background: #fdecea; padding: 12px; border-radius: 4px; border-left: 3px solid #e74c3c; margin-top: 10px; }
+        .anomaly-box .title { font-weight: 600; color: #721c24; margin-bottom: 5px; }
+        .link { color: #667eea; cursor: pointer; text-decoration: underline; }
+        .link:hover { color: #5568d3; }
+        .checkbox-col { width: 30px; }
+        .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 15px; }
+        .pagination button { padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; }
+        .pagination button.active { background: #667eea; color: white; border-color: #667eea; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 票据到期提醒系统</h1>
+        <p>导入 · 复核 · 修正 · 历史 · 导出 —— 全流程可追溯</p>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="bills">票据列表</div>
+            <div class="tab" data-tab="import">数据导入</div>
+            <div class="tab" data-tab="history">操作历史</div>
+            <div class="tab" data-tab="uploads">上传记录</div>
+        </div>
+
+        <div class="tab-content active" id="tab-bills">
+            <div class="toolbar">
+                <select id="filterStatus">
+                    <option value="">全部状态</option>
+                    <option value="pending">待确认</option>
+                    <option value="normal">正常</option>
+                    <option value="confirmed">已复核</option>
+                    <option value="revised">已修正</option>
+                    <option value="disputed">有争议</option>
+                </select>
+                <select id="filterAnomaly">
+                    <option value="">全部异常</option>
+                    <option value="duplicate">重复入账</option>
+                    <option value="cross_period">手续费跨期</option>
+                    <option value="refund">退款挂账</option>
+                    <option value="fee_mismatch">手续费不匹配</option>
+                </select>
+                <select id="filterBillType">
+                    <option value="">全部类型</option>
+                    <option value="invoice">票据</option>
+                    <option value="statement">对账单</option>
+                </select>
+                <input type="text" id="searchKeyword" placeholder="搜索票据号/流水号/收付款方">
+                <input type="date" id="dueDateStart" placeholder="到期日起">
+                <input type="date" id="dueDateEnd" placeholder="到期日止">
+                <button class="btn btn-primary" onclick="loadBills()">查询</button>
+                <button class="btn btn-default" onclick="resetFilters()">重置</button>
+                <div style="flex: 1;"></div>
+                <button class="btn btn-success" onclick="batchReview('confirm')">批量确认</button>
+                <button class="btn btn-warning" onclick="batchReview('pending')">批量待确认</button>
+                <button class="btn btn-danger" onclick="batchReview('dispute')">批量争议</button>
+                <button class="btn btn-primary" onclick="matchRecords()">智能匹配</button>
+                <button class="btn btn-default" onclick="redetectAnomalies()">重新检测异常</button>
+                <button class="btn btn-success" onclick="exportExcel()">导出Excel</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="checkbox-col"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
+                            <th>ID</th>
+                            <th>票据号</th>
+                            <th>类型</th>
+                            <th>到期日</th>
+                            <th>金额</th>
+                            <th>手续费</th>
+                            <th>付款方</th>
+                            <th>流水号</th>
+                            <th>状态</th>
+                            <th>异常</th>
+                            <th>来源文件</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="billsTable"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+
+        <div class="tab-content" id="tab-import">
+            <h3 style="margin-bottom: 20px;">数据导入</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>导入票据 (Excel/CSV)</label>
+                    <div class="upload-area" onclick="document.getElementById('invoiceFile').click()">
+                        <p style="font-size: 16px; margin-bottom: 5px;">📄 点击上传票据文件</p>
+                        <p style="font-size: 12px; color: #888;">支持 .xlsx, .xls, .csv 格式</p>
+                        <input type="file" id="invoiceFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="uploadFile('invoice')">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>导入对账单 (Excel/CSV)</label>
+                    <div class="upload-area" onclick="document.getElementById('statementFile').click()">
+                        <p style="font-size: 16px; margin-bottom: 5px;">📊 点击上传对账单文件</p>
+                        <p style="font-size: 12px; color: #888;">支持 .xlsx, .xls, .csv 格式</p>
+                        <input type="file" id="statementFile" accept=".xlsx,.xls,.csv" style="display: none;" onchange="uploadFile('statement')">
+                    </div>
+                </div>
+            </div>
+            <div class="detail-section" style="margin-top: 30px;">
+                <h4>📋 导入模板格式说明</h4>
+                <p style="font-size: 13px; line-height: 1.8; color: #666;">
+                    系统会自动识别以下列名（支持中英文）：<br>
+                    • 票据号：票据号、票号、单号、单据号、bill_no<br>
+                    • 日期：票据日期、开票日期、日期、date<br>
+                    • 到期日：到期日期、到期日、兑付日期、due_date<br>
+                    • 金额：金额、票面金额、本金、amount<br>
+                    • 手续费：手续费、费用、fee、charge<br>
+                    • 收付款方：付款方、付款人、收款方、收款人<br>
+                    • 流水号：流水号、交易流水号、银行流水号、serial_no<br>
+                    • 备注：备注、说明、remark
+                </p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-history">
+            <div class="toolbar">
+                <input type="text" id="historyBillId" placeholder="输入票据ID筛选">
+                <button class="btn btn-primary" onclick="loadHistory()">查询</button>
+            </div>
+            <div id="historyList"></div>
+        </div>
+
+        <div class="tab-content" id="tab-uploads">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>文件名</th>
+                            <th>类型</th>
+                            <th>上传时间</th>
+                            <th>记录数</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="uploadsTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>票据详情</h3>
+                <span class="close" onclick="closeModal('detailModal')">&times;</span>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="reviewModalTitle">复核操作</h3>
+                <span class="close" onclick="closeModal('reviewModal')">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>复核原因 *</label>
+                <textarea id="reviewReason" rows="4" placeholder="请输入复核原因，便于后续追溯"></textarea>
+            </div>
+            <div class="form-group">
+                <label>复核依据（可选）</label>
+                <input type="text" id="reviewEvidence" placeholder="例如：对账单文件名、结算附件链接等">
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="reviewedBy" value="operator">
+            </div>
+            <button class="btn btn-primary" onclick="submitReview()">提交</button>
+        </div>
+    </div>
+
+    <div class="modal" id="reviseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>修正数据</h3>
+                <span class="close" onclick="closeModal('reviseModal')">&times;</span>
+            </div>
+            <div id="reviseForm"></div>
+            <div class="form-group">
+                <label>修正原因 *</label>
+                <textarea id="reviseReason" rows="3" placeholder="请输入修正原因，系统将记录所有变更历史"></textarea>
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="reviseOperator" value="operator">
+            </div>
+            <button class="btn btn-warning" onclick="submitRevise()">提交修正</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const pageSize = 20;
+        let selectedBillIds = new Set();
+        let currentReviewBillId = null;
+        let currentReviewAction = null;
+        let currentReviseBill = null;
+
+        const statusMap = {
+            normal: { text: '正常', class: 'badge-normal' },
+            pending: { text: '待确认', class: 'badge-pending' },
+            confirmed: { text: '已复核', class: 'badge-confirmed' },
+            revised: { text: '已修正', class: 'badge-revised' },
+            disputed: { text: '有争议', class: 'badge-disputed' }
+        };
+
+        const anomalyMap = {
+            duplicate: { text: '重复入账', class: 'badge-duplicate' },
+            cross_period: { text: '手续费跨期', class: 'badge-cross_period' },
+            refund: { text: '退款挂账', class: 'badge-refund' },
+            suspense: { text: '挂账', class: 'badge-suspense' },
+            fee_mismatch: { text: '手续费不匹配', class: 'badge-fee_mismatch' }
+        };
+
+        const billTypeMap = {
+            invoice: '票据',
+            statement: '对账单',
+            settlement: '结算单'
+        };
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+                if (this.dataset.tab === 'history') loadHistory();
+                if (this.dataset.tab === 'uploads') loadUploads();
+            });
+        });
+
+        async function api(url, options = {}) {
+            try {
+                const headers = {};
+                if (options.method && options.method !== 'GET' && options.body) {
+                    headers['Content-Type'] = 'application/json';
+                }
+                Object.assign(headers, options.headers || {});
+
+                const res = await fetch(url, {
+                    headers,
+                    ...options
+                });
+                if (!res.ok) {
+                    let errMsg = '请求失败';
+                    try {
+                        const err = await res.json();
+                        errMsg = err.detail || errMsg;
+                    } catch (e) {}
+                    alert(errMsg);
+                    throw new Error(errMsg);
+                }
+                return await res.json();
+            } catch (e) {
+                console.error('API Error:', e);
+                throw e;
+            }
+        }
+
+        async function loadStats() {
+            const stats = await api('/api/statistics');
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card"><div class="label">总记录数</div><div class="value">${stats.total_count}</div></div>
+                <div class="stat-card"><div class="label">总金额</div><div class="value">¥${stats.total_amount.toLocaleString()}</div></div>
+                <div class="stat-card warning"><div class="label">待确认</div><div class="value">${stats.pending_count}</div></div>
+                <div class="stat-card success"><div class="label">已复核</div><div class="value">${stats.confirmed_count}</div></div>
+                <div class="stat-card"><div class="label">已修正</div><div class="value">${stats.revised_count}</div></div>
+                <div class="stat-card danger"><div class="label">有争议</div><div class="value">${stats.disputed_count}</div></div>
+                <div class="stat-card warning"><div class="label">30天内到期</div><div class="value">${stats.due_soon_count}</div></div>
+                <div class="stat-card danger"><div class="label">重复入账</div><div class="value">${stats.anomaly_duplicate}</div></div>
+                <div class="stat-card warning"><div class="label">手续费跨期</div><div class="value">${stats.anomaly_cross_period}</div></div>
+                <div class="stat-card warning"><div class="label">退款挂账</div><div class="value">${stats.anomaly_refund}</div></div>
+            `;
+        }
+
+        async function loadBills() {
+            const params = new URLSearchParams({
+                status: document.getElementById('filterStatus').value,
+                anomaly_type: document.getElementById('filterAnomaly').value,
+                bill_type: document.getElementById('filterBillType').value,
+                keyword: document.getElementById('searchKeyword').value,
+                due_date_start: document.getElementById('dueDateStart').value,
+                due_date_end: document.getElementById('dueDateEnd').value,
+                skip: (currentPage - 1) * pageSize,
+                limit: pageSize
+            });
+            const bills = await api(`/api/bills?${params}`);
+            renderBills(bills);
+        }
+
+        function renderBills(bills) {
+            const tbody = document.getElementById('billsTable');
+            tbody.innerHTML = bills.map(bill => {
+                const status = statusMap[bill.status] || { text: bill.status, class: '' };
+                const anomaly = bill.anomaly_type ? anomalyMap[bill.anomaly_type] : null;
+                const isSelected = selectedBillIds.has(bill.id);
+                return `
+                    <tr>
+                        <td><input type="checkbox" ${isSelected ? 'checked' : ''} onclick="toggleSelect(${bill.id}, this)"></td>
+                        <td>${bill.id}</td>
+                        <td><span class="link" onclick="showDetail(${bill.id})">${bill.bill_no}</span></td>
+                        <td>${billTypeMap[bill.bill_type] || bill.bill_type}</td>
+                        <td>${bill.due_date}</td>
+                        <td style="text-align: right;">¥${bill.amount.toLocaleString()}</td>
+                        <td style="text-align: right;">${bill.fee_amount ? '¥' + bill.fee_amount.toFixed(2) : '-'}</td>
+                        <td>${bill.payer || '-'}</td>
+                        <td>${bill.serial_no || '-'}</td>
+                        <td><span class="badge ${status.class}">${status.text}</span></td>
+                        <td>${anomaly ? `<span class="badge ${anomaly.class}">${anomaly.text}</span>` : '-'}</td>
+                        <td style="font-size: 11px; color: #888;">${bill.source_file || '-'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-success" onclick="doReview(${bill.id}, 'confirm')">确认</button>
+                            <button class="btn btn-sm btn-warning" onclick="doReview(${bill.id}, 'pending')">待确认</button>
+                            <button class="btn btn-sm btn-danger" onclick="doReview(${bill.id}, 'dispute')">争议</button>
+                            <button class="btn btn-sm btn-default" onclick="doRevise(${bill.id})">修正</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            renderPagination(bills.length);
+        }
+
+        function renderPagination(count) {
+            const pagination = document.getElementById('pagination');
+            const hasMore = count >= pageSize;
+            pagination.innerHTML = `
+                <button ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">上一页</button>
+                <button class="active">${currentPage}</button>
+                <button ${!hasMore ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">下一页</button>
+            `;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            loadBills();
+        }
+
+        function resetFilters() {
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterAnomaly').value = '';
+            document.getElementById('filterBillType').value = '';
+            document.getElementById('searchKeyword').value = '';
+            document.getElementById('dueDateStart').value = '';
+            document.getElementById('dueDateEnd').value = '';
+            currentPage = 1;
+            loadBills();
+        }
+
+        function toggleSelect(billId, checkbox) {
+            if (checkbox.checked) selectedBillIds.add(billId);
+            else selectedBillIds.delete(billId);
+        }
+
+        function toggleSelectAll() {
+            const checkboxes = document.querySelectorAll('#billsTable input[type="checkbox"]');
+            const allChecked = document.getElementById('selectAll').checked;
+            checkboxes.forEach(cb => {
+                cb.checked = allChecked;
+                const billId = parseInt(cb.closest('tr').querySelector('td:nth-child(2)').textContent);
+                if (allChecked) selectedBillIds.add(billId);
+                else selectedBillIds.delete(billId);
+            });
+        }
+
+        async function doReview(billId, action) {
+            currentReviewBillId = billId;
+            currentReviewAction = action;
+            const titles = { confirm: '确认通过', pending: '标记待确认', dispute: '标记为争议' };
+            document.getElementById('reviewModalTitle').textContent = titles[action];
+            document.getElementById('reviewReason').value = '';
+            document.getElementById('reviewEvidence').value = '';
+            document.getElementById('reviewModal').classList.add('show');
+        }
+
+        async function submitReview() {
+            const reason = document.getElementById('reviewReason').value;
+            if (currentReviewAction !== 'confirm' && !reason) {
+                alert('请填写复核原因');
+                return;
+            }
+            await api(`/api/review/${currentReviewAction}`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    bill_id: currentReviewBillId,
+                    review_action: currentReviewAction,
+                    review_reason: reason,
+                    review_evidence: document.getElementById('reviewEvidence').value,
+                    reviewed_by: document.getElementById('reviewedBy').value
+                })
+            });
+            closeModal('reviewModal');
+            loadBills();
+            loadStats();
+            alert('操作成功');
+        }
+
+        async function batchReview(action) {
+            if (selectedBillIds.size === 0) {
+                alert('请先选择要操作的记录');
+                return;
+            }
+            const reason = prompt('请输入复核原因（可选）：');
+            const params = new URLSearchParams({
+                action: action,
+                review_reason: reason || '',
+                reviewed_by: 'operator'
+            });
+            const result = await api(`/api/review/batch?${params}`, {
+                method: 'POST',
+                body: JSON.stringify(Array.from(selectedBillIds))
+            });
+            alert(`成功 ${result.success.length} 条，失败 ${result.failed.length} 条`);
+            selectedBillIds.clear();
+            loadBills();
+            loadStats();
+        }
+
+        async function doRevise(billId) {
+            const bill = await api(`/api/bills/${billId}`);
+            currentReviseBill = bill;
+            const form = document.getElementById('reviseForm');
+            form.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>票据号</label>
+                        <input type="text" id="revise_bill_no" value="${bill.bill_no || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>流水号</label>
+                        <input type="text" id="revise_serial_no" value="${bill.serial_no || ''}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>金额</label>
+                        <input type="number" step="0.01" id="revise_amount" value="${bill.amount || 0}">
+                    </div>
+                    <div class="form-group">
+                        <label>手续费</label>
+                        <input type="number" step="0.01" id="revise_fee_amount" value="${bill.fee_amount || 0}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>票据日期</label>
+                        <input type="date" id="revise_bill_date" value="${bill.bill_date || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>到期日期</label>
+                        <input type="date" id="revise_due_date" value="${bill.due_date || ''}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>付款方</label>
+                        <input type="text" id="revise_payer" value="${bill.payer || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>收款方</label>
+                        <input type="text" id="revise_payee" value="${bill.payee || ''}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>银行账号</label>
+                    <input type="text" id="revise_bank_account" value="${bill.bank_account || ''}">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="revise_remark" rows="2">${bill.remark || ''}</textarea>
+                </div>
+            `;
+            document.getElementById('reviseModal').classList.add('show');
+        }
+
+        async function submitRevise() {
+            const reason = document.getElementById('reviseReason').value;
+            if (!reason) {
+                alert('请填写修正原因');
+                return;
+            }
+            const updateData = {
+                bill_no: document.getElementById('revise_bill_no').value,
+                serial_no: document.getElementById('revise_serial_no').value,
+                amount: parseFloat(document.getElementById('revise_amount').value),
+                fee_amount: parseFloat(document.getElementById('revise_fee_amount').value),
+                bill_date: document.getElementById('revise_bill_date').value,
+                due_date: document.getElementById('revise_due_date').value,
+                payer: document.getElementById('revise_payer').value,
+                payee: document.getElementById('revise_payee').value,
+                bank_account: document.getElementById('revise_bank_account').value,
+                remark: document.getElementById('revise_remark').value,
+                operator: document.getElementById('reviseOperator').value,
+                revise_reason: reason
+            };
+            await api(`/api/bills/${currentReviseBill.id}`, {
+                method: 'PUT',
+                body: JSON.stringify(updateData)
+            });
+            closeModal('reviseModal');
+            loadBills();
+            loadStats();
+            alert('修正成功，所有变更已记录历史');
+        }
+
+        async function showDetail(billId) {
+            const bill = await api(`/api/bills/${billId}`);
+            const status = statusMap[bill.status] || { text: bill.status, class: '' };
+            const anomaly = bill.anomaly_type ? anomalyMap[bill.anomaly_type] : null;
+
+            let html = `
+                <div class="detail-section">
+                    <h4>📄 基本信息</h4>
+                    <div class="form-row">
+                        <div class="form-group"><label>票据号</label><input value="${bill.bill_no}" readonly></div>
+                        <div class="form-group"><label>类型</label><input value="${billTypeMap[bill.bill_type] || bill.bill_type}" readonly></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>票据日期</label><input value="${bill.bill_date || ''}" readonly></div>
+                        <div class="form-group"><label>到期日期</label><input value="${bill.due_date || ''}" readonly></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>金额</label><input value="¥${bill.amount.toLocaleString()}" readonly></div>
+                        <div class="form-group"><label>手续费</label><input value="¥${(bill.fee_amount || 0).toFixed(2)}" readonly></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>付款方</label><input value="${bill.payer || '-'}" readonly></div>
+                        <div class="form-group"><label>收款方</label><input value="${bill.payee || '-'}" readonly></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>流水号</label><input value="${bill.serial_no || '-'}" readonly></div>
+                        <div class="form-group"><label>银行账号</label><input value="${bill.bank_account || '-'}" readonly></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>状态</label><input value="${status.text}" readonly></div>
+                        <div class="form-group"><label>来源文件</label><input value="${bill.source_file || '-'}" readonly></div>
+                    </div>
+                    ${bill.remark ? `<div class="form-group"><label>备注</label><textarea rows="2" readonly>${bill.remark}</textarea></div>` : ''}
+                </div>
+            `;
+
+            if (anomaly) {
+                html += `
+                    <div class="anomaly-box">
+                        <div class="title">⚠️ 异常检测结果：${anomaly.text}</div>
+                        <div>${bill.anomaly_reason}</div>
+                    </div>
+                `;
+            }
+
+            html += `<div class="detail-section"><h4>🔗 关联证据</h4>`;
+            if (bill.related_statement_id || bill.related_invoice_id) {
+                if (bill.related_statement_id) {
+                    html += `<p>关联对账单：<span class="link" onclick="showDetail(${bill.related_statement_id})">ID ${bill.related_statement_id}</span></p>`;
+                }
+                if (bill.related_invoice_id) {
+                    html += `<p>关联票据：<span class="link" onclick="showDetail(${bill.related_invoice_id})">ID ${bill.related_invoice_id}</span></p>`;
+                }
+            } else {
+                html += `<p style="color: #888;">暂无关联记录，可先点击"智能匹配"自动关联票据与对账单</p>`;
+            }
+            html += `</div>`;
+
+            if (bill.review_records && bill.review_records.length > 0) {
+                html += `<div class="detail-section"><h4>📝 复核记录</h4>`;
+                bill.review_records.forEach(r => {
+                    html += `
+                        <div class="history-item">
+                            <div class="meta">${r.reviewed_by} · ${r.reviewed_at}</div>
+                            <div class="content">
+                                <strong>操作：</strong>${r.review_action}<br>
+                                <strong>原因：</strong>${r.review_reason || '-'}<br>
+                                ${r.review_evidence ? `<strong>依据：</strong>${r.review_evidence}<br>` : ''}
+                                <strong>状态变更：</strong>${statusMap[r.previous_status]?.text || r.previous_status} → ${statusMap[r.new_status]?.text || r.new_status}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            if (bill.history_records && bill.history_records.length > 0) {
+                html += `<div class="detail-section"><h4>📜 操作历史</h4>`;
+                bill.history_records.forEach(h => {
+                    html += `
+                        <div class="history-item">
+                            <div class="meta">${h.operator} · ${h.operated_at}</div>
+                            <div class="content">
+                                <strong>操作：</strong>${h.operation_type}<br>
+                                ${h.field_name ? `<strong>字段：</strong>${h.field_name}<br>` : ''}
+                                ${h.old_value !== null && h.old_value !== undefined ? `<strong>原值：</strong>${h.old_value}<br>` : ''}
+                                ${h.new_value !== null && h.new_value !== undefined ? `<strong>新值：</strong>${h.new_value}<br>` : ''}
+                                ${h.remark ? `<strong>备注：</strong>${h.remark}` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            document.getElementById('detailContent').innerHTML = html;
+            document.getElementById('detailModal').classList.add('show');
+        }
+
+        async function uploadFile(type) {
+            const fileInput = document.getElementById(type + 'File');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('operator', 'operator');
+
+            try {
+                const res = await fetch(`/api/upload/${type}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    alert(result.message);
+                    loadBills();
+                    loadStats();
+                } else {
+                    alert(result.detail);
+                }
+            } catch (e) {
+                alert('上传失败：' + e.message);
+            }
+            fileInput.value = '';
+        }
+
+        async function matchRecords() {
+            const result = await api('/api/match', { method: 'POST' });
+            alert(result.message);
+            loadBills();
+        }
+
+        async function redetectAnomalies() {
+            const result = await api('/api/redetect', { method: 'POST' });
+            alert(result.message);
+            loadBills();
+            loadStats();
+        }
+
+        async function exportExcel() {
+            const params = new URLSearchParams({
+                status: document.getElementById('filterStatus').value,
+                anomaly_type: document.getElementById('filterAnomaly').value,
+                start_date: document.getElementById('dueDateStart').value,
+                end_date: document.getElementById('dueDateEnd').value,
+                include_history: 'true'
+            });
+            window.open(`/api/export?${params}`, '_blank');
+        }
+
+        async function loadHistory() {
+            const billId = document.getElementById('historyBillId').value;
+            const params = new URLSearchParams({ limit: 200 });
+            if (billId) params.append('bill_id', billId);
+            const histories = await api(`/api/history?${params}`);
+            const container = document.getElementById('historyList');
+            container.innerHTML = histories.map(h => `
+                <div class="history-item">
+                    <div class="meta">
+                        票据ID: <span class="link" onclick="showDetail(${h.bill_id})">#${h.bill_id}</span>
+                        · ${h.operator} · ${h.operated_at}
+                    </div>
+                    <div class="content">
+                        <strong>操作类型：</strong>${h.operation_type}<br>
+                        ${h.field_name ? `<strong>修改字段：</strong>${h.field_name}<br>` : ''}
+                        ${h.old_value !== null ? `<strong>原值：</strong>${h.old_value}<br>` : ''}
+                        ${h.new_value !== null ? `<strong>新值：</strong>${h.new_value}<br>` : ''}
+                        ${h.remark ? `<strong>备注：</strong>${h.remark}` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadUploads() {
+            const uploads = await api('/api/uploads');
+            document.getElementById('uploadsTable').innerHTML = uploads.map(u => `
+                <tr>
+                    <td>${u.id}</td>
+                    <td>${u.file_name}</td>
+                    <td>${billTypeMap[u.file_type] || u.file_type}</td>
+                    <td>${new Date(u.upload_time).toLocaleString()}</td>
+                    <td>${u.record_count}</td>
+                    <td>${u.processed ? '<span class="badge badge-confirmed">已处理</span>' : '<span class="badge badge-pending">处理中</span>'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        loadStats();
+        loadBills();
+    </script>
+</body>
+</html>
