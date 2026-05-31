@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>报表导出限流 - 迁移清单查看器</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+  .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; }
+  .header h1 { font-size: 24px; margin-bottom: 8px; }
+  .header .meta { opacity: 0.9; font-size: 14px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; background: white; padding: 8px; border-radius: 8px; }
+  .tab { padding: 10px 20px; border: none; background: transparent; cursor: pointer; border-radius: 6px; font-size: 14px; transition: all 0.2s; }
+  .tab.active { background: #667eea; color: white; }
+  .tab:hover:not(.active) { background: #f0f2f5; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .card-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+  .conclusion-item { border: 1px solid #e8e8e8; border-radius: 8px; padding: 16px; margin-bottom: 12px; transition: all 0.2s; }
+  .conclusion-item:hover { border-color: #667eea; box-shadow: 0 2px 12px rgba(102, 126, 234, 0.1); }
+  .conclusion-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .conclusion-content { font-size: 15px; color: #333; flex: 1; }
+  .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .badge-conclusion { background: #fff2e8; color: #fa8c16; }
+  .badge-material { background: #e6f7ff; color: #1890ff; }
+  .badge-document { background: #f6ffed; color: #52c41a; }
+  .source-refs { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #eee; }
+  .source-ref { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f5f7fa; border-radius: 6px; margin-right: 8px; margin-bottom: 8px; font-size: 13px; cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit; }
+  .source-ref:hover { background: #e8f4ff; color: #1890ff; }
+  .source-ref svg { width: 14px; height: 14px; }
+  .history-section { margin-top: 12px; padding: 12px; background: #fafafa; border-radius: 6px; }
+  .history-title { font-size: 13px; color: #666; margin-bottom: 8px; }
+  .history-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+  .history-item:last-child { border-bottom: none; }
+  .history-meta { color: #999; margin-bottom: 4px; }
+  .history-diff { display: flex; gap: 16px; flex-wrap: wrap; }
+  .diff-old { color: #f5222d; text-decoration: line-through; }
+  .diff-new { color: #52c41a; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .source-card { border: 1px solid #e8e8e8; border-radius: 8px; padding: 16px; }
+  .source-card h4 { font-size: 14px; margin-bottom: 12px; color: #667eea; }
+  .source-meta { font-size: 12px; color: #999; margin-bottom: 8px; }
+  .checklist { display: grid; gap: 12px; }
+  .check-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #fafafa; border-radius: 6px; }
+  .check-item.pass { background: #f6ffed; border-left: 3px solid #52c41a; }
+  .check-item.fail { background: #fff1f0; border-left: 3px solid #f5222d; }
+  .check-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
+  .check-icon.pass { background: #52c41a; color: white; }
+  .check-icon.fail { background: #f5222d; color: white; }
+  .param-broken { background: #fff1f0; border-left: 3px solid #f5222d; }
+  .legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .highlight-target { animation: highlight 2s ease-in-out; }
+  @keyframes highlight { 0%, 100% { background: transparent; } 50% { background: #fff7e6; } }
+  .empty-state { text-align: center; padding: 40px; color: #999; }
+  .final-note { background: #fffbe6; border: 1px solid #ffe58f; border-radius: 8px; padding: 16px; margin-top: 20px; }
+  .final-note h4 { color: #fa8c16; margin-bottom: 8px; }
+  .final-note ul { margin-left: 20px; font-size: 14px; }
+  .final-note li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📊 报表导出限流 - 迁移清单</h1>
+    <div class="meta">
+      迁移ID: MIG-2024-0531 | 状态: <span id="status-badge">复核中</span> | 最后更新: <span id="last-update">2024-05-31</span>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="badge badge-conclusion">结论变更</span> 真实影响迁移结论的变更</div>
+    <div class="legend-item"><span class="badge badge-material">补材料</span> 仅补充材料，不影响结论</div>
+    <div class="legend-item"><span class="badge badge-document">文档更新</span> 旧接口文档手工改动</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="conclusions">🎯 结论总览</button>
+    <button class="tab" data-tab="sources">📁 来源材料</button>
+    <button class="tab" data-tab="client">🔧 客户端参数</button>
+    <button class="tab" data-tab="review">✅ 复核清单</button>
+  </div>
+
+  <div id="conclusions" class="panel active">
+    <div class="card">
+      <div class="card-title">迁移结论清单（点击来源链接可跳转查看依据）</div>
+      <div id="conclusions-list"></div>
+    </div>
+  </div>
+
+  <div id="sources" class="panel">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📋 迁移清单</div>
+        <div id="migration-lists"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🚨 报警记录</div>
+        <div id="alarm-records"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📄 旧接口文档历史</div>
+      <div id="old-documents"></div>
+    </div>
+  </div>
+
+  <div id="client" class="panel">
+    <div class="card">
+      <div class="card-title">客户端参数检查结果</div>
+      <div id="client-params"></div>
+    </div>
+  </div>
+
+  <div id="review" class="panel">
+    <div class="card">
+      <div class="card-title">最终复核清单</div>
+      <div id="review-checklist"></div>
+    </div>
+    <div class="final-note">
+      <h4>📝 收尾说明</h4>
+      <ul>
+        <li><strong>迁移清单样例放置：</strong>将迁移清单文件上传至 sourceMaterials/migrationLists，系统自动关联到相关结论</li>
+        <li><strong>旧客户端参数被破坏：</strong>在「客户端参数」标签页查看 isBroken=true 的参数项，红色高亮显示</li>
+        <li><strong>导出迁移报告前复核：</strong>需全部完成本页复核清单的4项检查，确保文档历史一致</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+const migrationData = {
+  migrationId: "MIG-2024-0531-EXPORT-LIMIT",
+  featureName: "报表导出限流",
+  status: "REVIEWING",
+  lastUpdate: "2024-05-31T15:30:00",
+  conclusions: [
+    {
+      conclusionId: "C001",
+      content: "单用户导出频率限制为每小时5次，超过后需等待冷却",
+      changeType: "CONCLUSION_CHANGE",
+      sourceRefs: [
+        { sourceType: "MIGRATION_LIST", sourceId: "ML001", sourcePath: "#source-ML001", description: "迁移清单v2.1" },
+        { sourceType: "ALARM_RECORD", sourceId: "ALM002", sourcePath: "#source-ALM002", description: "高频导出报警" }
+      ],
+      history: [
+        { timestamp: "2024-05-20T10:00:00", operator: "张三", changeType: "CONCLUSION_CHANGE", field: "限流阈值", oldValue: "10次/小时", newValue: "5次/小时", reason: "根据报警数据分析调整" },
+        { timestamp: "2024-05-15T14:30:00", operator: "李四", changeType: "CONCLUSION_CHANGE", field: "结论内容", oldValue: null, newValue: "单用户导出频率限制为每小时10次", reason: "初始结论" }
+      ]
+    },
+    {
+      conclusionId: "C002",
+      content: "补充2024年Q1导出流量统计数据作为参考依据",
+      changeType: "MATERIAL_SUPPLEMENT",
+      sourceRefs: [
+        { sourceType: "MIGRATION_LIST", sourceId: "ML002", sourcePath: "#source-ML002", description: "Q1流量统计表（后补）" }
+      ],
+      history: [
+        { timestamp: "2024-05-25T09:15:00", operator: "王五", changeType: "MATERIAL_SUPPLEMENT", field: "参考材料", oldValue: null, newValue: "Q1流量统计数据", reason: "迁移清单早到，后补材料" }
+      ]
+    },
+    {
+      conclusionId: "C003",
+      content: "更新旧接口文档中导出API的限流字段说明",
+      changeType: "DOCUMENT_UPDATE",
+      sourceRefs: [
+        { sourceType: "OLD_DOCUMENT", sourceId: "DOC001", sourcePath: "#source-DOC001", description: "导出API文档v1.2" }
+      ],
+      history: [
+        { timestamp: "2024-05-28T16:45:00", operator: "赵六", changeType: "DOCUMENT_UPDATE", field: "文档说明", oldValue: "rate_limit字段未定义", newValue: "rate_limit: 每小时请求次数限制", reason: "旧接口文档手工改动，历史已留存" }
+      ]
+    },
+    {
+      conclusionId: "C004",
+      content: "批量导出任务最大并发数调整为3",
+      changeType: "CONCLUSION_CHANGE",
+      sourceRefs: [
+        { sourceType: "ALARM_RECORD", sourceId: "ALM001", sourcePath: "#source-ALM001", description: "系统过载报警（晚补）" },
+        { sourceType: "CLIENT_CHECK", sourceId: "PARAM002", sourcePath: "#param-PARAM002", description: "并发参数检查" }
+      ],
+      history: [
+        { timestamp: "2024-05-22T11:20:00", operator: "张三", changeType: "CONCLUSION_CHANGE", field: "最大并发数", oldValue: "5", newValue: "3", reason: "根据报警记录晚补的数据调整" },
+        { timestamp: "2024-05-18T13:00:00", operator: "李四", changeType: "CONCLUSION_CHANGE", field: "结论内容", oldValue: null, newValue: "批量导出最大并发数为5", reason: "初始结论" }
+      ]
+    }
+  ],
+  sourceMaterials: {
+    migrationLists: [
+      { id: "ML001", fileName: "export-limit-migration-v2.1.xlsx", uploadTime: "2024-05-20T09:00:00", uploader: "张三", contentSummary: "包含限流阈值分析、用户行为数据" },
+      { id: "ML002", fileName: "Q1-export-traffic-stats.xlsx", uploadTime: "2024-05-25T09:10:00", uploader: "王五", contentSummary: "2024年Q1导出流量统计（后补材料）" }
+    ],
+    alarmRecords: [
+      { id: "ALM001", alarmTime: "2024-05-21T14:30:00", alarmType: "SYSTEM_OVERLOAD", description: "批量导出导致系统CPU使用率超过80%", isBackfill: true },
+      { id: "ALM002", alarmTime: "2024-05-19T10:15:00", alarmType: "HIGH_FREQ_EXPORT", description: "用户ID:12345 一小时内导出12次触发报警", isBackfill: false }
+    ],
+    oldDocuments: [
+      {
+        id: "DOC001",
+        documentName: "报表导出API文档 v1.2",
+        lastModified: "2024-05-28T16:45:00",
+        manualModified: true,
+        modifyHistory: [
+          { timestamp: "2024-05-28T16:45:00", operator: "赵六", changeType: "DOCUMENT_UPDATE", field: "rate_limit说明", oldValue: "未定义", newValue: "rate_limit: 每小时请求次数限制", reason: "手工更新文档" },
+          { timestamp: "2024-05-10T11:00:00", operator: "系统", changeType: "DOCUMENT_UPDATE", field: "版本号", oldValue: "v1.1", newValue: "v1.2", reason: "版本迭代" }
+        ]
+      }
+    ]
+  },
+  clientParams: [
+    { paramName: "export.timeout", oldValue: "300s", newValue: "300s", isBroken: false, checkTime: "2024-05-30T14:00:00" },
+    { paramName: "export.maxConcurrent", oldValue: "5", newValue: "3", isBroken: true, checkTime: "2024-05-30T14:00:00" },
+    { paramName: "export.rateLimit", oldValue: "10/hour", newValue: "5/hour", isBroken: true, checkTime: "2024-05-30T14:00:00" },
+    { paramName: "export.format", oldValue: "xlsx", newValue: "xlsx", isBroken: false, checkTime: "2024-05-30T14:00:00" }
+  ],
+  finalReview: {
+    reviewer: "待指定",
+    reviewTime: null,
+    checklist: {
+      migrationListVerified: true,
+      alarmRecordsVerified: true,
+      clientParamsChecked: false,
+      documentHistoryConsistent: true
+    }
+  }
+};
+
+function getBadgeClass(type) {
+  const map = {
+    CONCLUSION_CHANGE: 'badge-conclusion',
+    MATERIAL_SUPPLEMENT: 'badge-material',
+    DOCUMENT_UPDATE: 'badge-document'
+  };
+  return map[type] || '';
+}
+
+function getBadgeText(type) {
+  const map = {
+    CONCLUSION_CHANGE: '结论变更',
+    MATERIAL_SUPPLEMENT: '补材料',
+    DOCUMENT_UPDATE: '文档更新'
+  };
+  return map[type] || type;
+}
+
+function getSourceIcon(type) {
+  const icons = {
+    MIGRATION_LIST: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>',
+    ALARM_RECORD: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+    OLD_DOCUMENT: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>',
+    CLIENT_CHECK: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>'
+  };
+  return icons[type] || '';
+}
+
+function renderConclusions() {
+  const container = document.getElementById('conclusions-list');
+  container.innerHTML = migrationData.conclusions.map(c => `
+    <div class="conclusion-item" id="conclusion-${c.conclusionId}">
+      <div class="conclusion-header">
+        <div class="conclusion-content">
+          <strong>#${c.conclusionId}</strong> ${c.content}
+        </div>
+        <span class="badge ${getBadgeClass(c.changeType)}">${getBadgeText(c.changeType)}</span>
+      </div>
+      ${c.sourceRefs && c.sourceRefs.length > 0 ? `
+        <div class="source-refs">
+          <span style="font-size:13px;color:#666;margin-right:8px;">📎 依据来源：</span>
+          ${c.sourceRefs.map(ref => `
+            <a href="${ref.sourcePath}" class="source-ref" onclick="scrollToSource('${ref.sourcePath}')">
+              ${getSourceIcon(ref.sourceType)}
+              ${ref.description}
+            </a>
+          `).join('')}
+        </div>
+      ` : ''}
+      ${c.history && c.history.length > 0 ? `
+        <div class="history-section">
+          <div class="history-title">📜 变更历史（${c.history.length}条）</div>
+          ${c.history.map(h => `
+            <div class="history-item">
+              <div class="history-meta">
+                ${h.timestamp.replace('T', ' ').substring(0, 16)} | ${h.operator} | <span class="badge ${getBadgeClass(h.changeType)}" style="padding:2px 8px;">${getBadgeText(h.changeType)}</span>
+              </div>
+              <div><strong>${h.field}：</strong>
+                ${h.oldValue !== null ? `<span class="diff-old">${h.oldValue}</span> → ` : ''}
+                <span class="diff-new">${h.newValue}</span>
+              </div>
+              ${h.reason ? `<div style="color:#666;margin-top:4px;">💬 ${h.reason}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+function renderSources() {
+  const mlContainer = document.getElementById('migration-lists');
+  mlContainer.innerHTML = migrationData.sourceMaterials.migrationLists.map(m => `
+    <div class="source-card" id="source-${m.id}">
+      <h4>📋 ${m.fileName}</h4>
+      <div class="source-meta">ID: ${m.id} | 上传人: ${m.uploader} | ${m.uploadTime.replace('T', ' ').substring(0, 16)}</div>
+      <div style="font-size:13px;">${m.contentSummary}</div>
+    </div>
+  `).join('') || '<div class="empty-state">暂无迁移清单</div>';
+
+  const alarmContainer = document.getElementById('alarm-records');
+  alarmContainer.innerHTML = migrationData.sourceMaterials.alarmRecords.map(a => `
+    <div class="source-card" id="source-${a.id}">
+      <h4>🚨 ${a.alarmType} ${a.isBackfill ? '<span style="color:#fa8c16;font-size:12px;">（晚补记录）</span>' : ''}</h4>
+      <div class="source-meta">ID: ${a.id} | 报警时间: ${a.alarmTime.replace('T', ' ').substring(0, 16)}</div>
+      <div style="font-size:13px;">${a.description}</div>
+    </div>
+  `).join('') || '<div class="empty-state">暂无报警记录</div>';
+
+  const docContainer = document.getElementById('old-documents');
+  docContainer.innerHTML = migrationData.sourceMaterials.oldDocuments.map(d => `
+    <div class="source-card" id="source-${d.id}">
+      <h4>📄 ${d.documentName} ${d.manualModified ? '<span style="color:#fa8c16;font-size:12px;">（手工改动）</span>' : ''}</h4>
+      <div class="source-meta">ID: ${d.id} | 最后修改: ${d.lastModified.replace('T', ' ').substring(0, 16)}</div>
+      ${d.modifyHistory && d.modifyHistory.length > 0 ? `
+        <div style="margin-top:12px;">
+          <div style="font-size:13px;color:#666;margin-bottom:8px;">修改历史：</div>
+          ${d.modifyHistory.map(h => `
+            <div style="padding:8px;background:#fafafa;border-radius:4px;margin-bottom:8px;font-size:13px;">
+              <div style="color:#999;margin-bottom:4px;">${h.timestamp.replace('T', ' ').substring(0, 16)} | ${h.operator}</div>
+              <div><strong>${h.field}：</strong>
+                ${h.oldValue !== null ? `<span class="diff-old">${h.oldValue}</span> → ` : ''}
+                <span class="diff-new">${h.newValue}</span>
+              </div>
+              ${h.reason ? `<div style="color:#666;margin-top:4px;">💬 ${h.reason}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `).join('') || '<div class="empty-state">暂无旧文档</div>';
+}
+
+function renderClientParams() {
+  const container = document.getElementById('client-params');
+  container.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#fafafa;">
+          <th style="padding:12px;text-align:left;border-bottom:1px solid #eee;">参数名</th>
+          <th style="padding:12px;text-align:left;border-bottom:1px solid #eee;">原值</th>
+          <th style="padding:12px;text-align:left;border-bottom:1px solid #eee;">新值</th>
+          <th style="padding:12px;text-align:left;border-bottom:1px solid #eee;">状态</th>
+          <th style="padding:12px;text-align:left;border-bottom:1px solid #eee;">检查时间</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${migrationData.clientParams.map((p, idx) => `
+          <tr id="param-PARAM${String(idx + 1).padStart(3, '0')}" class="${p.isBroken ? 'param-broken' : ''}" style="border-bottom:1px solid #f0f0f0;">
+            <td style="padding:12px;"><code>${p.paramName}</code></td>
+            <td style="padding:12px;">${p.oldValue}</td>
+            <td style="padding:12px;">${p.newValue}</td>
+            <td style="padding:12px;">
+              ${p.isBroken ? '<span style="color:#f5222d;">⚠️ 被破坏</span>' : '<span style="color:#52c41a;">✓ 正常</span>'}
+            </td>
+            <td style="padding:12px;font-size:13px;color:#666;">${p.checkTime.replace('T', ' ').substring(0, 16)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderReview() {
+  const cl = migrationData.finalReview.checklist;
+  const items = [
+    { key: 'migrationListVerified', label: '迁移清单已核验', desc: '确认所有迁移清单完整且版本正确', value: cl.migrationListVerified },
+    { key: 'alarmRecordsVerified', label: '报警记录已核验', desc: '确认报警记录真实且关联正确', value: cl.alarmRecordsVerified },
+    { key: 'clientParamsChecked', label: '客户端参数已检查', desc: '检查所有客户端参数是否被意外破坏', value: cl.clientParamsChecked },
+    { key: 'documentHistoryConsistent', label: '文档历史一致性', desc: '迁移报告与文档明细历史一致，无矛盾', value: cl.documentHistoryConsistent }
+  ];
+  
+  const container = document.getElementById('review-checklist');
+  container.innerHTML = `
+    <div style="margin-bottom:16px;padding:12px;background:#f5f7fa;border-radius:6px;">
+      <strong>复核人：</strong>${migrationData.finalReview.reviewer} | 
+      <strong>复核时间：</strong>${migrationData.finalReview.reviewTime ? migrationData.finalReview.reviewTime.replace('T', ' ').substring(0, 16) : '待完成'}
+    </div>
+    <div class="checklist">
+      ${items.map(item => `
+        <div class="check-item ${item.value ? 'pass' : 'fail'}">
+          <div class="check-icon ${item.value ? 'pass' : 'fail'}">${item.value ? '✓' : '!'}</div>
+          <div>
+            <div style="font-weight:500;">${item.label}</div>
+            <div style="font-size:13px;color:#666;">${item.desc}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:20px;padding:16px;background:${items.every(i => i.value) ? '#f6ffed' : '#fff1f0'};border-radius:6px;">
+      <strong>复核结果：</strong>${items.every(i => i.value) ? '✅ 全部通过，可以导出迁移报告' : '⚠️ 存在未完成项，请完成全部复核后导出'}
+    </div>
+  `;
+}
+
+function scrollToSource(path) {
+  event.preventDefault();
+  const id = path.replace('#', '');
+  const element = document.getElementById(id);
+  if (element) {
+    document.querySelector('.tab[data-tab="sources"]').click();
+    setTimeout(() => {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.classList.add('highlight-target');
+      setTimeout(() => element.classList.remove('highlight-target'), 2000);
+    }, 100);
+  }
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+
+renderConclusions();
+renderSources();
+renderClientParams();
+renderReview();
+</script>
+</body>
+</html>

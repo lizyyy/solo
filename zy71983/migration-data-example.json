@@ -1,0 +1,95 @@
+{
+  "migrationId": "MIG-2024-0531-EXPORT-LIMIT",
+  "featureName": "报表导出限流",
+  "status": "REVIEWING",
+  "createdAt": "2024-05-15T10:00:00",
+  "lastUpdate": "2024-05-31T15:30:00",
+  "conclusions": [
+    {
+      "conclusionId": "C001",
+      "content": "单用户导出频率限制为每小时5次，超过后需等待冷却",
+      "changeType": "CONCLUSION_CHANGE",
+      "sourceRefs": [
+        { "sourceType": "MIGRATION_LIST", "sourceId": "ML001", "sourcePath": "#source-ML001", "description": "迁移清单v2.1" },
+        { "sourceType": "ALARM_RECORD", "sourceId": "ALM002", "sourcePath": "#source-ALM002", "description": "高频导出报警" }
+      ],
+      "history": [
+        { "timestamp": "2024-05-20T10:00:00", "operator": "张三", "changeType": "CONCLUSION_CHANGE", "field": "限流阈值", "oldValue": "10次/小时", "newValue": "5次/小时", "reason": "根据报警数据分析调整" },
+        { "timestamp": "2024-05-15T14:30:00", "operator": "李四", "changeType": "CONCLUSION_CHANGE", "field": "结论内容", "oldValue": null, "newValue": "单用户导出频率限制为每小时10次", "reason": "初始结论" }
+      ]
+    },
+    {
+      "conclusionId": "C002",
+      "content": "补充2024年Q1导出流量统计数据作为参考依据",
+      "changeType": "MATERIAL_SUPPLEMENT",
+      "sourceRefs": [
+        { "sourceType": "MIGRATION_LIST", "sourceId": "ML002", "sourcePath": "#source-ML002", "description": "Q1流量统计表（后补）" }
+      ],
+      "history": [
+        { "timestamp": "2024-05-25T09:15:00", "operator": "王五", "changeType": "MATERIAL_SUPPLEMENT", "field": "参考材料", "oldValue": null, "newValue": "Q1流量统计数据", "reason": "迁移清单早到，后补材料" }
+      ]
+    },
+    {
+      "conclusionId": "C003",
+      "content": "更新旧接口文档中导出API的限流字段说明",
+      "changeType": "DOCUMENT_UPDATE",
+      "sourceRefs": [
+        { "sourceType": "OLD_DOCUMENT", "sourceId": "DOC001", "sourcePath": "#source-DOC001", "description": "导出API文档v1.2" }
+      ],
+      "history": [
+        { "timestamp": "2024-05-28T16:45:00", "operator": "赵六", "changeType": "DOCUMENT_UPDATE", "field": "文档说明", "oldValue": "rate_limit字段未定义", "newValue": "rate_limit: 每小时请求次数限制", "reason": "旧接口文档手工改动，历史已留存" }
+      ]
+    },
+    {
+      "conclusionId": "C004",
+      "content": "批量导出任务最大并发数调整为3",
+      "changeType": "CONCLUSION_CHANGE",
+      "sourceRefs": [
+        { "sourceType": "ALARM_RECORD", "sourceId": "ALM001", "sourcePath": "#source-ALM001", "description": "系统过载报警（晚补）" },
+        { "sourceType": "CLIENT_CHECK", "sourceId": "PARAM002", "sourcePath": "#param-PARAM002", "description": "并发参数检查" }
+      ],
+      "history": [
+        { "timestamp": "2024-05-22T11:20:00", "operator": "张三", "changeType": "CONCLUSION_CHANGE", "field": "最大并发数", "oldValue": "5", "newValue": "3", "reason": "根据报警记录晚补的数据调整" },
+        { "timestamp": "2024-05-18T13:00:00", "operator": "李四", "changeType": "CONCLUSION_CHANGE", "field": "结论内容", "oldValue": null, "newValue": "批量导出最大并发数为5", "reason": "初始结论" }
+      ]
+    }
+  ],
+  "sourceMaterials": {
+    "migrationLists": [
+      { "id": "ML001", "fileName": "export-limit-migration-v2.1.xlsx", "uploadTime": "2024-05-20T09:00:00", "uploader": "张三", "contentSummary": "包含限流阈值分析、用户行为数据", "isBackfill": false },
+      { "id": "ML002", "fileName": "Q1-export-traffic-stats.xlsx", "uploadTime": "2024-05-25T09:10:00", "uploader": "王五", "contentSummary": "2024年Q1导出流量统计（后补材料）", "isBackfill": true }
+    ],
+    "alarmRecords": [
+      { "id": "ALM001", "alarmTime": "2024-05-21T14:30:00", "alarmType": "SYSTEM_OVERLOAD", "description": "批量导出导致系统CPU使用率超过80%", "isBackfill": true },
+      { "id": "ALM002", "alarmTime": "2024-05-19T10:15:00", "alarmType": "HIGH_FREQ_EXPORT", "description": "用户ID:12345 一小时内导出12次触发报警", "isBackfill": false }
+    ],
+    "oldDocuments": [
+      {
+        "id": "DOC001",
+        "documentName": "报表导出API文档 v1.2",
+        "lastModified": "2024-05-28T16:45:00",
+        "manualModified": true,
+        "modifyHistory": [
+          { "timestamp": "2024-05-28T16:45:00", "operator": "赵六", "changeType": "DOCUMENT_UPDATE", "field": "rate_limit说明", "oldValue": "未定义", "newValue": "rate_limit: 每小时请求次数限制", "reason": "手工更新文档" },
+          { "timestamp": "2024-05-10T11:00:00", "operator": "系统", "changeType": "DOCUMENT_UPDATE", "field": "版本号", "oldValue": "v1.1", "newValue": "v1.2", "reason": "版本迭代" }
+        ]
+      }
+    ]
+  },
+  "clientParams": [
+    { "paramName": "export.timeout", "oldValue": "300s", "newValue": "300s", "isBroken": false, "checkTime": "2024-05-30T14:00:00" },
+    { "paramName": "export.maxConcurrent", "oldValue": "5", "newValue": "3", "isBroken": true, "checkTime": "2024-05-30T14:00:00" },
+    { "paramName": "export.rateLimit", "oldValue": "10/hour", "newValue": "5/hour", "isBroken": true, "checkTime": "2024-05-30T14:00:00" },
+    { "paramName": "export.format", "oldValue": "xlsx", "newValue": "xlsx", "isBroken": false, "checkTime": "2024-05-30T14:00:00" }
+  ],
+  "finalReview": {
+    "reviewer": "待指定",
+    "reviewTime": null,
+    "checklist": {
+      "migrationListVerified": true,
+      "alarmRecordsVerified": true,
+      "clientParamsChecked": false,
+      "documentHistoryConsistent": true
+    }
+  }
+}

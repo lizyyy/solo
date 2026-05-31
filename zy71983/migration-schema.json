@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "报表导出限流迁移清单",
+  "type": "object",
+  "definitions": {
+    "changeType": {
+      "type": "string",
+      "enum": ["CONCLUSION_CHANGE", "MATERIAL_SUPPLEMENT", "DOCUMENT_UPDATE"],
+      "description": "变更类型: CONCLUSION_CHANGE=结论变更(真实影响), MATERIAL_SUPPLEMENT=补材料(无影响), DOCUMENT_UPDATE=文档更新"
+    },
+    "sourceType": {
+      "type": "string",
+      "enum": ["MIGRATION_LIST", "ALARM_RECORD", "OLD_DOCUMENT", "CLIENT_CHECK"],
+      "description": "来源类型"
+    },
+    "historyEntry": {
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "operator": { "type": "string" },
+        "changeType": { "$ref": "#/definitions/changeType" },
+        "field": { "type": "string" },
+        "oldValue": { "type": ["string", "number", "boolean", "null"] },
+        "newValue": { "type": ["string", "number", "boolean", "null"] },
+        "reason": { "type": "string" }
+      },
+      "required": ["timestamp", "operator", "changeType", "field", "newValue"]
+    }
+  },
+  "properties": {
+    "migrationId": { "type": "string" },
+    "featureName": { "type": "string", "const": "报表导出限流" },
+    "status": {
+      "type": "string",
+      "enum": ["DRAFT", "REVIEWING", "FINALIZED"]
+    },
+    "conclusions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "conclusionId": { "type": "string" },
+          "content": { "type": "string" },
+          "changeType": { "$ref": "#/definitions/changeType" },
+          "sourceRefs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sourceType": { "$ref": "#/definitions/sourceType" },
+                "sourceId": { "type": "string" },
+                "sourcePath": { "type": "string" },
+                "description": { "type": "string" }
+              },
+              "required": ["sourceType", "sourceId"]
+            }
+          },
+          "history": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/historyEntry" }
+          }
+        },
+        "required": ["conclusionId", "content", "changeType"]
+      }
+    },
+    "sourceMaterials": {
+      "type": "object",
+      "properties": {
+        "migrationLists": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "fileName": { "type": "string" },
+              "uploadTime": { "type": "string", "format": "date-time" },
+              "uploader": { "type": "string" },
+              "contentSummary": { "type": "string" }
+            }
+          }
+        },
+        "alarmRecords": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "alarmTime": { "type": "string", "format": "date-time" },
+              "alarmType": { "type": "string" },
+              "description": { "type": "string" },
+              "isBackfill": { "type": "boolean" }
+            }
+          }
+        },
+        "oldDocuments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "documentName": { "type": "string" },
+              "lastModified": { "type": "string", "format": "date-time" },
+              "manualModified": { "type": "boolean" },
+              "modifyHistory": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/historyEntry" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "clientParams": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "paramName": { "type": "string" },
+          "oldValue": { "type": "string" },
+          "newValue": { "type": "string" },
+          "isBroken": { "type": "boolean" },
+          "checkTime": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "finalReview": {
+      "type": "object",
+      "properties": {
+        "reviewer": { "type": "string" },
+        "reviewTime": { "type": "string", "format": "date-time" },
+        "checklist": {
+          "type": "object",
+          "properties": {
+            "migrationListVerified": { "type": "boolean" },
+            "alarmRecordsVerified": { "type": "boolean" },
+            "clientParamsChecked": { "type": "boolean" },
+            "documentHistoryConsistent": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  },
+  "required": ["migrationId", "featureName", "conclusions"]
+}
