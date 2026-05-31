@@ -1,0 +1,32 @@
+battle_reports:
+  input_dir: data/raw_reports
+  archive_dir: data/archived_reports
+  encoding: utf-8
+
+data:
+  output_dir: output
+  backup_dir: backup
+  balance_file: data/balance/balance_sheet.xlsx
+
+export:
+  default_format: xlsx
+  timestamp_format: "%Y%m%d_%H%M%S"
+  encoding: utf-8-sig
+
+validation:
+  max_rounds: 30
+  expected_teams:
+    - 进攻方
+    - 防守方
+  required_fields:
+    - 回合
+    - 阵营
+    - 玩家ID
+    - 行动类型
+    - 结果
+
+anomaly_detection:
+  enable_auto_detect: true
+  damage_threshold: 5000
+  healing_threshold: 3000
+  score_gap_threshold: 1000
