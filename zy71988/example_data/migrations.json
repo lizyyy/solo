@@ -1,0 +1,32 @@
+[
+  {
+    "id": "MIG-001",
+    "interface_name": "file_upload_v1",
+    "old_endpoint": "/api/v1/upload",
+    "new_endpoint": "/api/v2/upload",
+    "migration_date": "2024-01-15",
+    "status": "已完成",
+    "owner": "张三",
+    "remarks": "补充迁移文档，完善参数说明"
+  },
+  {
+    "id": "MIG-002",
+    "interface_name": "file_download",
+    "old_endpoint": "/api/v1/download",
+    "new_endpoint": "/api/v2/download",
+    "migration_date": "2024-01-16",
+    "status": "进行中",
+    "owner": "李四",
+    "remarks": "修改返回格式，修复编码问题 request_id=abc-123-def"
+  },
+  {
+    "id": "MIG-003",
+    "interface_name": "file_delete",
+    "old_endpoint": "/api/v1/delete",
+    "new_endpoint": "/api/v2/delete",
+    "migration_date": "2024-01-17",
+    "status": "待审核",
+    "owner": "王五",
+    "remarks": "幂等键问题待确认 idempotency_key=idemp-999-xyz"
+  }
+]

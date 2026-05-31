@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp": "2024-01-15T10:30:00",
+    "interface_name": "file_upload_v1",
+    "error_type": "WARN",
+    "message": "Deprecated API usage, please upgrade to v2",
+    "request_id": "req-001-abc",
+    "idempotency_key": "idemp-001-aaa"
+  },
+  {
+    "timestamp": "2024-01-15T10:35:00",
+    "interface_name": "file_upload_v1",
+    "error_type": "WARN",
+    "message": "Deprecated API usage, please upgrade to v2",
+    "request_id": "req-002-abc",
+    "idempotency_key": "idemp-999-xyz"
+  },
+  {
+    "timestamp": "2024-01-16T14:20:00",
+    "interface_name": "file_download",
+    "error_type": "ERROR",
+    "message": "Encoding error in response",
+    "request_id": "abc-123-def",
+    "idempotency_key": "idemp-002-bbb"
+  },
+  {
+    "timestamp": "2024-01-17T09:10:00",
+    "interface_name": "file_delete",
+    "error_type": "ERROR",
+    "message": "Idempotency key validation failed",
+    "request_id": "req-003-xyz",
+    "idempotency_key": "idemp-999-xyz"
+  },
+  {
+    "timestamp": "2024-01-17T09:15:00",
+    "interface_name": "file_delete",
+    "error_type": "ERROR",
+    "message": "Duplicate request detected",
+    "request_id": "req-004-xyz",
+    "idempotency_key": "idemp-999-xyz"
+  }
+]

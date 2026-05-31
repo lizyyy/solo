@@ -1,0 +1,22 @@
+[
+  {
+    "timestamp": "2024-01-15 10:30:00",
+    "operation": "file_upload_v1",
+    "operator": "system",
+    "file_name": "report.pdf",
+    "file_size": 1024000,
+    "status": "success",
+    "request_id": "req-001-abc",
+    "idempotency_key": "idemp-001-aaa"
+  },
+  {
+    "timestamp": "2024-01-17 09:10:00",
+    "operation": "file_delete",
+    "operator": "user001",
+    "file_name": "old_data.zip",
+    "file_size": 52428800,
+    "status": "failed",
+    "request_id": "req-003-xyz",
+    "idempotency_key": "idemp-999-xyz"
+  }
+]
