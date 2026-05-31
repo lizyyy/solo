@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>水库漂浮物识别 - 飞行复盘管理</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div id="app">
+  <header class="app-header">
+    <h1>水库漂浮物识别</h1>
+    <div class="header-actions">
+      <button id="btn-batch-process" class="btn btn-secondary">批量处理</button>
+      <button id="btn-export" class="btn btn-primary">导出飞行复盘</button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="filter-group">
+      <label>状态</label>
+      <select id="filter-status">
+        <option value="all">全部</option>
+        <option value="pending">待审核</option>
+        <option value="reviewed">已审核</option>
+        <option value="anomaly">有异常</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>变更类型</label>
+      <select id="filter-change-type">
+        <option value="all">全部</option>
+        <option value="supplement">仅补充材料</option>
+        <option value="conclusion_change">影响结论</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>水库</label>
+      <select id="filter-reservoir">
+        <option value="all">全部</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>日期</label>
+      <input type="date" id="filter-date-from">
+      <span>至</span>
+      <input type="date" id="filter-date-to">
+    </div>
+    <div class="filter-group">
+      <label>关键词</label>
+      <input type="text" id="filter-keyword" placeholder="飞手/巡检员/架次号">
+    </div>
+    <button id="btn-reset-filters" class="btn btn-ghost">重置筛选</button>
+    <span id="record-count" class="record-count"></span>
+  </div>
+
+  <main class="main-layout">
+    <section class="record-list" id="record-list">
+      <div class="empty-state">暂无巡检记录</div>
+    </section>
+
+    <aside class="detail-panel" id="detail-panel">
+      <div class="empty-state">选择左侧记录查看详情</div>
+    </aside>
+  </main>
+
+  <div id="toast-container" class="toast-container"></div>
+</div>
+
+<script src="js/store.js"></script>
+<script src="js/export.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
