@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Embedding 版本比对</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#181a24;--surface2:#1e2130;--border:#2a2d3e;
+  --text:#e4e6f0;--text2:#9498ae;--text3:#6b6f86;
+  --accent:#6c7bf0;--accent2:#5563d6;--accent-soft:rgba(108,123,240,.12);
+  --green:#34d399;--green-soft:rgba(52,211,153,.12);
+  --orange:#f59e0b;--orange-soft:rgba(245,158,11,.12);
+  --red:#f87171;--red-soft:rgba(248,113,113,.12);
+  --cyan:#22d3ee;--cyan-soft:rgba(34,211,238,.12);
+  --purple:#a78bfa;--purple-soft:rgba(167,139,250,.12);
+  --radius:10px;--radius-sm:6px;
+  --shadow:0 2px 12px rgba(0,0,0,.3);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+html{font-size:14px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+header h1{font-size:1.35rem;font-weight:700;letter-spacing:-.02em}
+header h1 span{color:var(--accent)}
+.header-actions{display:flex;gap:10px;align-items:center}
+
+.stats-bar{display:flex;gap:20px;padding:16px 32px;background:var(--surface);border-bottom:1px solid var(--border)}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 18px;display:flex;flex-direction:column;min-width:120px}
+.stat-card .stat-label{font-size:.75rem;color:var(--text3);margin-bottom:2px}
+.stat-card .stat-value{font-size:1.5rem;font-weight:700}
+.stat-card.pending .stat-value{color:var(--orange)}
+.stat-card.resolved .stat-value{color:var(--green)}
+.stat-card.suspect .stat-value{color:var(--red)}
+.stat-card.supplement .stat-value{color:var(--cyan)}
+
+main{padding:24px 32px}
+
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.search-box{flex:1;min-width:200px;position:relative}
+.search-box input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px 8px 36px;color:var(--text);font-size:.9rem;outline:none;transition:border-color .2s}
+.search-box input:focus{border-color:var(--accent)}
+.search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text3)}
+select{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text);font-size:.85rem;outline:none;cursor:pointer}
+select:focus{border-color:var(--accent)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.85rem;cursor:pointer;transition:all .2s;font-family:var(--font)}
+.btn:hover{background:var(--border)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-danger{color:var(--red);border-color:var(--red-soft)}
+.btn-danger:hover{background:var(--red-soft)}
+.btn-sm{padding:5px 10px;font-size:.78rem}
+
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--surface2)}
+th{padding:12px 14px;text-align:left;font-size:.78rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:.87rem;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:rgba(108,123,240,.04)}
+
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:500;white-space:nowrap}
+.tag-supplement{background:var(--cyan-soft);color:var(--cyan)}
+.tag-conclusion{background:var(--red-soft);color:var(--red)}
+.tag-leak{background:var(--purple-soft);color:var(--purple)}
+.tag-label-gap{background:var(--orange-soft);color:var(--orange)}
+.tag-pending{background:var(--orange-soft);color:var(--orange)}
+.tag-processing{background:var(--accent-soft);color:var(--accent)}
+.tag-resolved{background:var(--green-soft);color:var(--green)}
+.tag-dismissed{background:rgba(100,100,120,.15);color:var(--text3)}
+.source-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:500}
+.source-online{background:rgba(34,211,238,.08);color:var(--cyan)}
+.source-config{background:rgba(167,139,250,.08);color:var(--purple)}
+.source-log{background:rgba(245,158,11,.08);color:var(--orange)}
+.source-manual{background:rgba(108,123,240,.08);color:var(--accent)}
+
+.actions-cell{display:flex;gap:4px}
+
+.change-count{display:inline-flex;align-items:center;gap:4px;font-size:.8rem;color:var(--text2);cursor:pointer;padding:2px 8px;border-radius:4px;background:var(--surface2);transition:background .15s}
+.change-count:hover{background:var(--border)}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;animation:fadeIn .15s}
+.modal-overlay.active{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:680px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.4);animation:slideUp .2s}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--border)}
+.modal-header h2{font-size:1.1rem;font-weight:700}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.3rem;line-height:1;padding:4px}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:20px 24px}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:.78rem;font-weight:600;color:var(--text2)}
+.form-group input,.form-group select,.form-group textarea{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text);font-size:.87rem;font-family:var(--font);outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-group textarea{resize:vertical;min-height:60px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px 20px;border-top:1px solid var(--border)}
+
+.history-timeline{display:flex;flex-direction:column;gap:0}
+.history-item{display:flex;gap:14px;padding:12px 0;position:relative}
+.history-item:not(:last-child)::before{content:'';position:absolute;left:11px;top:28px;bottom:0;width:1px;background:var(--border)}
+.history-dot{width:22px;height:22px;border-radius:50%;background:var(--surface2);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.history-dot svg{width:10px;height:10px;color:var(--accent)}
+.history-content{flex:1}
+.history-meta{display:flex;gap:10px;align-items:baseline;margin-bottom:4px}
+.history-operator{font-weight:600;font-size:.85rem}
+.history-time{font-size:.75rem;color:var(--text3)}
+.history-desc{font-size:.83rem;color:var(--text2)}
+.history-field-change{display:inline-flex;gap:4px;align-items:center;font-size:.8rem;margin-top:3px}
+.history-field-change .old-val{background:var(--red-soft);color:var(--red);padding:1px 6px;border-radius:3px}
+.history-field-change .arrow{color:var(--text3)}
+.history-field-change .new-val{background:var(--green-soft);color:var(--green);padding:1px 6px;border-radius:3px}
+
+.batch-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px;display:none}
+.batch-panel.active{display:block}
+.batch-panel h3{font-size:.95rem;font-weight:700;margin-bottom:12px}
+.batch-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.batch-info{font-size:.83rem;color:var(--text2);margin-top:10px;padding:8px 12px;background:var(--surface2);border-radius:var(--radius-sm)}
+.batch-info code{color:var(--accent);font-weight:600}
+
+.guide-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:28px}
+.guide-section h3{font-size:1.05rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.guide-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px}
+.guide-card h4{font-size:.88rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.guide-card h4 .icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700}
+.guide-card p{font-size:.82rem;color:var(--text2);line-height:1.65}
+.guide-card .step-list{list-style:none;margin-top:8px}
+.guide-card .step-list li{font-size:.8rem;color:var(--text2);padding:4px 0 4px 18px;position:relative}
+.guide-card .step-list li::before{content:attr(data-step);position:absolute;left:0;font-weight:700;color:var(--accent);font-size:.75rem}
+
+.empty-state{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-state svg{width:48px;height:48px;margin-bottom:12px;opacity:.4}
+.empty-state p{font-size:.9rem}
+
+.checkbox-wrap{display:flex;align-items:center;gap:8px}
+.checkbox-wrap input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 20px;font-size:.85rem;box-shadow:var(--shadow);z-index:300;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--green);color:var(--green)}
+.toast.error{border-color:var(--red);color:var(--red)}
+
+.idempotent-badge{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;padding:2px 8px;border-radius:4px;background:var(--green-soft);color:var(--green);margin-left:6px}
+
+@media(max-width:900px){
+  .form-grid{grid-template-columns:1fr}
+  .guide-grid{grid-template-columns:1fr}
+  .stats-bar{flex-wrap:wrap}
+  main{padding:16px}
+  header{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Embedding <span>版本比对</span></h1>
+  <div class="header-actions">
+    <button class="btn" onclick="openGuide()">收尾说明</button>
+    <button class="btn btn-primary" onclick="openAddModal()">+ 新增记录</button>
+  </div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat-card pending">
+    <span class="stat-label">待处理</span>
+    <span class="stat-value" id="statPending">0</span>
+  </div>
+  <div class="stat-card resolved">
+    <span class="stat-label">已解决</span>
+    <span class="stat-value" id="statResolved">0</span>
+  </div>
+  <div class="stat-card suspect">
+    <span class="stat-label">泄漏嫌疑</span>
+    <span class="stat-value" id="statLeak">0</span>
+  </div>
+  <div class="stat-card supplement">
+    <span class="stat-label">补材料</span>
+    <span class="stat-value" id="statSupplement">0</span>
+  </div>
+</div>
+
+<main>
+  <div class="toolbar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="搜索标题、版本号、操作人..." oninput="renderTable()">
+    </div>
+    <select id="filterSource" onchange="renderTable()">
+      <option value="">全部来源</option>
+      <option value="online_feedback">线上反馈</option>
+      <option value="config_file">配置文件</option>
+      <option value="training_log">训练日志</option>
+      <option value="manual_entry">手工录入</option>
+    </select>
+    <select id="filterCategory" onchange="renderTable()">
+      <option value="">全部分类</option>
+      <option value="supplement">补材料</option>
+      <option value="conclusion_change">结论变更</option>
+      <option value="leak_suspect">泄漏嫌疑</option>
+      <option value="label_gap">标签漏映射</option>
+    </select>
+    <select id="filterStatus" onchange="renderTable()">
+      <option value="">全部状态</option>
+      <option value="pending">待处理</option>
+      <option value="processing">处理中</option>
+      <option value="resolved">已解决</option>
+      <option value="dismissed">已忽略</option>
+    </select>
+    <button class="btn" onclick="toggleBatchPanel()">批量处理</button>
+    <button class="btn" onclick="exportCSV()">导出评估说明</button>
+  </div>
+
+  <div class="batch-panel" id="batchPanel">
+    <h3>批量处理 <span class="idempotent-badge">幂等安全 · 重复运行不产生重复记录</span></h3>
+    <div class="batch-row">
+      <select id="batchAction">
+        <option value="resolve">标记为已解决</option>
+        <option value="dismiss">标记为已忽略</option>
+        <option value="recategorize">重新分类</option>
+      </select>
+      <select id="batchCategory" style="display:none">
+        <option value="supplement">补材料</option>
+        <option value="conclusion_change">结论变更</option>
+        <option value="leak_suspect">泄漏嫌疑</option>
+        <option value="label_gap">标签漏映射</option>
+      </select>
+      <button class="btn btn-primary" onclick="runBatch()">执行批量操作</button>
+      <button class="btn" onclick="selectAllPending()">全选待处理</button>
+    </div>
+    <div class="batch-info" id="batchInfo" style="display:none"></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:32px"><input type="checkbox" id="checkAll" onchange="toggleCheckAll()"></th>
+          <th>标题</th>
+          <th>来源</th>
+          <th>分类</th>
+          <th>Embedding 版本</th>
+          <th>状态</th>
+          <th>变更</th>
+          <th>操作人</th>
+          <th>更新时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      <p>暂无记录，点击「新增记录」开始</p>
+    </div>
+  </div>
+
+  <section class="guide-section" id="guideSection" style="display:none">
+    <h3>
+      <span>📋</span> 收尾说明
+    </h3>
+    <div class="guide-grid">
+      <div class="guide-card">
+        <h4><span class="icon" style="background:var(--cyan-soft);color:var(--cyan)">1</span> 提交线上反馈样例</h4>
+        <ul class="step-list">
+          <li data-step="①">点击「新增记录」，来源选择「线上反馈」</li>
+          <li data-step="②">填写 Embedding 版本号，选择分类（补材料 / 结论变更 / 泄漏嫌疑）</li>
+          <li data-step="③">在「进入待处理原因」中说明线上反馈的触发场景</li>
+          <li data-step="④">如仅补充材料，分类选「补材料」，评审时不会影响结论判定</li>
+        </ul>
+      </div>
+      <div class="guide-card">
+        <h4><span class="icon" style="background:var(--orange-soft);color:var(--orange)">2</span> 检查标签漏映射</h4>
+        <ul class="step-list">
+          <li data-step="①">筛选分类为「标签漏映射」的记录</li>
+          <li data-step="②">确认每条记录的 Embedding 版本是否与当前训练版本一致</li>
+          <li data-step="③">如版本不一致，需在变更历史中标注版本变更原因</li>
+          <li data-step="④">处理完成后将状态改为「已解决」</li>
+        </ul>
+      </div>
+      <div class="guide-card">
+        <h4><span class="icon" style="background:var(--green-soft);color:var(--green)">3</span> 导出前复核</h4>
+        <ul class="step-list">
+          <li data-step="①">确认所有「泄漏嫌疑」记录已明确判定（非补材料即结论变更）</li>
+          <li data-step="②">检查变更历史中是否存在手工改动训练日志且未说明原因的情况</li>
+          <li data-step="③">使用筛选器逐来源确认无遗漏</li>
+          <li data-step="④">点击「导出评估说明」生成 CSV，核对后再提交</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">新增记录</h2>
+      <button class="modal-close" onclick="closeAddModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>标题</label>
+          <input type="text" id="fTitle" placeholder="如：线上反馈 - 召回率下降样例">
+        </div>
+        <div class="form-group">
+          <label>来源</label>
+          <select id="fSource">
+            <option value="online_feedback">线上反馈</option>
+            <option value="config_file">配置文件</option>
+            <option value="training_log">训练日志</option>
+            <option value="manual_entry">手工录入</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>分类</label>
+          <select id="fCategory">
+            <option value="supplement">补材料</option>
+            <option value="conclusion_change">结论变更</option>
+            <option value="leak_suspect">泄漏嫌疑</option>
+            <option value="label_gap">标签漏映射</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Embedding 版本</label>
+          <input type="text" id="fVersion" placeholder="如：emb-v3.2.1">
+        </div>
+        <div class="form-group">
+          <label>状态</label>
+          <select id="fStatus">
+            <option value="pending">待处理</option>
+            <option value="processing">处理中</option>
+            <option value="resolved">已解决</option>
+            <option value="dismissed">已忽略</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>进入待处理原因</label>
+          <textarea id="fReason" placeholder="说明为什么这条记录进入了待处理队列"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>详细描述</label>
+          <textarea id="fDesc" placeholder="补充说明（可选）"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeAddModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveRecord()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="historyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>变更历史</h2>
+      <button class="modal-close" onclick="closeHistoryModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="history-timeline" id="historyTimeline"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'emb_version_compare_records';
+const SOURCE_MAP = {online_feedback:'线上反馈',config_file:'配置文件',training_log:'训练日志',manual_entry:'手工录入'};
+const CATEGORY_MAP = {supplement:'补材料',conclusion_change:'结论变更',leak_suspect:'泄漏嫌疑',label_gap:'标签漏映射'};
+const STATUS_MAP = {pending:'待处理',processing:'处理中',resolved:'已解决',dismissed:'已忽略'};
+
+function genId(){return Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8)}
+function now(){return new Date().toISOString()}
+function fmtTime(iso){if(!iso)return '-';const d=new Date(iso);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+
+function loadRecords(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]}catch{return[]}}
+function saveRecords(records){localStorage.setItem(STORAGE_KEY,JSON.stringify(records))}
+
+function addChangeEntry(record,field,oldVal,newVal,operator,reason){
+  if(!record.changeHistory)record.changeHistory=[];
+  record.changeHistory.push({timestamp:now(),operator:operator||'当前用户',field,oldValue:String(oldVal),newValue:String(newVal),reason:reason||''});
+  record.updatedAt=now();
+}
+
+function renderStats(){
+  const records=loadRecords();
+  document.getElementById('statPending').textContent=records.filter(r=>r.status==='pending').length;
+  document.getElementById('statResolved').textContent=records.filter(r=>r.status==='resolved').length;
+  document.getElementById('statLeak').textContent=records.filter(r=>r.category==='leak_suspect').length;
+  document.getElementById('statSupplement').textContent=records.filter(r=>r.category==='supplement').length;
+}
+
+function renderTable(){
+  const records=loadRecords();
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const fSource=document.getElementById('filterSource').value;
+  const fCategory=document.getElementById('filterCategory').value;
+  const fStatus=document.getElementById('filterStatus').value;
+
+  let filtered=records.filter(r=>{
+    if(fSource&&r.source!==fSource)return false;
+    if(fCategory&&r.category!==fCategory)return false;
+    if(fStatus&&r.status!==fStatus)return false;
+    if(search){
+      const hay=(r.title+r.embeddingVersion+r.changeHistory.map(c=>c.operator).join(' ')).toLowerCase();
+      if(!hay.includes(search))return false;
+    }
+    return true;
+  });
+
+  filtered.sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt));
+
+  const tbody=document.getElementById('tableBody');
+  const empty=document.getElementById('emptyState');
+
+  if(filtered.length===0){
+    tbody.innerHTML='';
+    empty.style.display='block';
+    return;
+  }
+  empty.style.display='none';
+
+  tbody.innerHTML=filtered.map(r=>{
+    const sourceCls='source-'+r.source.replace('_','');
+    const catCls='tag-'+(r.category==='conclusion_change'?'conclusion':r.category==='leak_suspect'?'leak':r.category==='label_gap'?'label-gap':'supplement');
+    const statusCls='tag-'+r.status;
+    const changeCount=(r.changeHistory||[]).length;
+    return `<tr data-id="${r.id}">
+      <td><input type="checkbox" class="row-check" value="${r.id}"></td>
+      <td><strong style="cursor:pointer" onclick="openEditModal('${r.id}')">${esc(r.title)}</strong><br><span style="font-size:.75rem;color:var(--text3)">${esc(r.enteredPendingReason||'').slice(0,40)}</span></td>
+      <td><span class="source-tag ${sourceCls}">${SOURCE_MAP[r.source]||r.source}</span></td>
+      <td><span class="tag ${catCls}">${CATEGORY_MAP[r.category]||r.category}</span></td>
+      <td style="font-family:monospace;font-size:.82rem">${esc(r.embeddingVersion)}</td>
+      <td><span class="tag ${statusCls}">${STATUS_MAP[r.status]||r.status}</span></td>
+      <td><span class="change-count" onclick="openHistory('${r.id}')">${changeCount} 次变更</span></td>
+      <td>${esc(getLastOperator(r))}</td>
+      <td style="font-size:.8rem;color:var(--text2);white-space:nowrap">${fmtTime(r.updatedAt)}</td>
+      <td class="actions-cell">
+        <button class="btn btn-sm" onclick="openEditModal('${r.id}')">编辑</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteRecord('${r.id}')">删除</button>
+      </td>
+    </tr>`;
+  }).join('');
+  renderStats();
+}
+
+function getLastOperator(r){
+  if(!r.changeHistory||r.changeHistory.length===0)return '-';
+  return r.changeHistory[r.changeHistory.length-1].operator;
+}
+
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+
+function openAddModal(){
+  document.getElementById('modalTitle').textContent='新增记录';
+  document.getElementById('editId').value='';
+  document.getElementById('fTitle').value='';
+  document.getElementById('fSource').value='online_feedback';
+  document.getElementById('fCategory').value='supplement';
+  document.getElementById('fVersion').value='';
+  document.getElementById('fStatus').value='pending';
+  document.getElementById('fReason').value='';
+  document.getElementById('fDesc').value='';
+  document.getElementById('addModal').classList.add('active');
+}
+
+function openEditModal(id){
+  const records=loadRecords();
+  const r=records.find(x=>x.id===id);
+  if(!r)return;
+  document.getElementById('modalTitle').textContent='编辑记录';
+  document.getElementById('editId').value=id;
+  document.getElementById('fTitle').value=r.title;
+  document.getElementById('fSource').value=r.source;
+  document.getElementById('fCategory').value=r.category;
+  document.getElementById('fVersion').value=r.embeddingVersion;
+  document.getElementById('fStatus').value=r.status;
+  document.getElementById('fReason').value=r.enteredPendingReason||'';
+  document.getElementById('fDesc').value=r.description||'';
+  document.getElementById('addModal').classList.add('active');
+}
+
+function closeAddModal(){document.getElementById('addModal').classList.remove('active')}
+
+function saveRecord(){
+  const editId=document.getElementById('editId').value;
+  const title=document.getElementById('fTitle').value.trim();
+  const source=document.getElementById('fSource').value;
+  const category=document.getElementById('fCategory').value;
+  const version=document.getElementById('fVersion').value.trim();
+  const status=document.getElementById('fStatus').value;
+  const reason=document.getElementById('fReason').value.trim();
+  const desc=document.getElementById('fDesc').value.trim();
+
+  if(!title){showToast('请填写标题','error');return}
+  if(!version){showToast('请填写 Embedding 版本','error');return}
+
+  const records=loadRecords();
+  const operator='当前用户';
+
+  if(editId){
+    const r=records.find(x=>x.id===editId);
+    if(!r)return;
+    if(r.title!==title)addChangeEntry(r,'title',r.title,title,operator,'编辑修改');
+    if(r.source!==source)addChangeEntry(r,'source',SOURCE_MAP[r.source],SOURCE_MAP[source],operator,'编辑修改');
+    if(r.category!==category)addChangeEntry(r,'category',CATEGORY_MAP[r.category],CATEGORY_MAP[category],operator,'编辑修改');
+    if(r.embeddingVersion!==version)addChangeEntry(r,'embeddingVersion',r.embeddingVersion,version,operator,'编辑修改');
+    if(r.status!==status)addChangeEntry(r,'status',STATUS_MAP[r.status],STATUS_MAP[status],operator,'编辑修改');
+    r.title=title;r.source=source;r.category=category;r.embeddingVersion=version;r.status=status;r.enteredPendingReason=reason;r.description=desc;r.updatedAt=now();
+  }else{
+    const r={id:genId(),title,source,category,embeddingVersion:version,status,enteredPendingReason:reason,description:desc,changeHistory:[],createdAt:now(),updatedAt:now(),batchId:null,isProcessed:false};
+    addChangeEntry(r,'status','-',STATUS_MAP[status],operator,reason||'新建记录');
+    records.push(r);
+  }
+  saveRecords(records);
+  closeAddModal();
+  renderTable();
+  showToast(editId?'记录已更新':'记录已创建','success');
+}
+
+function deleteRecord(id){
+  if(!confirm('确认删除此记录？'))return;
+  let records=loadRecords();
+  records=records.filter(r=>r.id!==id);
+  saveRecords(records);
+  renderTable();
+  showToast('记录已删除','success');
+}
+
+function openHistory(id){
+  const records=loadRecords();
+  const r=records.find(x=>x.id===id);
+  if(!r)return;
+  const timeline=document.getElementById('historyTimeline');
+  const history=(r.changeHistory||[]).slice().reverse();
+  if(history.length===0){
+    timeline.innerHTML='<p style="color:var(--text3);text-align:center;padding:20px">暂无变更记录</p>';
+  }else{
+    timeline.innerHTML=history.map(h=>`<div class="history-item">
+      <div class="history-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></div>
+      <div class="history-content">
+        <div class="history-meta">
+          <span class="history-operator">${esc(h.operator)}</span>
+          <span class="history-time">${fmtTime(h.timestamp)}</span>
+        </div>
+        <div class="history-desc">${esc(h.reason||h.field+' 变更')}</div>
+        <div class="history-field-change">
+          <span class="old-val">${esc(h.oldValue)}</span>
+          <span class="arrow">→</span>
+          <span class="new-val">${esc(h.newValue)}</span>
+        </div>
+      </div>
+    </div>`).join('');
+  }
+  document.getElementById('historyModal').classList.add('active');
+}
+function closeHistoryModal(){document.getElementById('historyModal').classList.remove('active')}
+
+function toggleBatchPanel(){
+  const p=document.getElementById('batchPanel');
+  p.classList.toggle('active');
+}
+
+document.getElementById('batchAction').addEventListener('change',function(){
+  document.getElementById('batchCategory').style.display=this.value==='recategorize'?'inline-block':'none';
+});
+
+function selectAllPending(){
+  const records=loadRecords();
+  const pending=records.filter(r=>r.status==='pending');
+  document.querySelectorAll('.row-check').forEach(cb=>{
+    const row=cb.closest('tr');
+    const rid=row.dataset.id;
+    cb.checked=pending.some(r=>r.id===rid);
+  });
+  showBatchInfo();
+}
+
+function toggleCheckAll(){
+  const checked=document.getElementById('checkAll').checked;
+  document.querySelectorAll('.row-check').forEach(cb=>cb.checked=checked);
+  showBatchInfo();
+}
+
+function showBatchInfo(){
+  const checked=document.querySelectorAll('.row-check:checked');
+  const info=document.getElementById('batchInfo');
+  if(checked.length>0){
+    info.style.display='block';
+    info.innerHTML=`已选择 <code>${checked.length}</code> 条记录`;
+  }else{
+    info.style.display='none';
+  }
+}
+
+document.addEventListener('change',function(e){
+  if(e.target.classList.contains('row-check'))showBatchInfo();
+});
+
+function runBatch(){
+  const checked=document.querySelectorAll('.row-check:checked');
+  if(checked.length===0){showToast('请先选择记录','error');return}
+
+  const action=document.getElementById('batchAction').value;
+  const newCategory=document.getElementById('batchCategory').value;
+  const batchId=genId();
+  const operator='当前用户';
+  const records=loadRecords();
+  let affected=0;
+
+  checked.forEach(cb=>{
+    const id=cb.closest('tr').dataset.id;
+    const r=records.find(x=>x.id===id);
+    if(!r)return;
+
+    if(action==='resolve'){
+      if(r.status==='resolved')return;
+      addChangeEntry(r,'status',STATUS_MAP[r.status],STATUS_MAP['resolved'],operator,'批量标记为已解决');
+      r.status='resolved';
+    }else if(action==='dismiss'){
+      if(r.status==='dismissed')return;
+      addChangeEntry(r,'status',STATUS_MAP[r.status],STATUS_MAP['dismissed'],operator,'批量标记为已忽略');
+      r.status='dismissed';
+    }else if(action==='recategorize'){
+      if(r.category===newCategory)return;
+      addChangeEntry(r,'category',CATEGORY_MAP[r.category],CATEGORY_MAP[newCategory],operator,'批量重新分类');
+      r.category=newCategory;
+    }
+    r.batchId=batchId;
+    r.isProcessed=true;
+    affected++;
+  });
+
+  saveRecords(records);
+  renderTable();
+  document.getElementById('checkAll').checked=false;
+  document.getElementById('batchInfo').style.display='none';
+  showToast(`批量处理完成，影响 ${affected} 条记录（批次 ${batchId}）`,'success');
+}
+
+function exportCSV(){
+  const records=loadRecords();
+  if(records.length===0){showToast('无记录可导出','error');return}
+
+  const header=['ID','标题','来源','分类','Embedding版本','状态','进入待处理原因','最后操作人','变更次数','创建时间','更新时间'];
+  const rows=records.map(r=>[
+    r.id,r.title,SOURCE_MAP[r.source],CATEGORY_MAP[r.category],r.embeddingVersion,STATUS_MAP[r.status],
+    r.enteredPendingReason||'',getLastOperator(r),(r.changeHistory||[]).length,fmtTime(r.createdAt),fmtTime(r.updatedAt)
+  ]);
+
+  let csv='\uFEFF'+header.join(',')+'\n';
+  rows.forEach(row=>{
+    csv+=row.map(cell=>'"'+String(cell).replace(/"/g,'""')+'"').join(',')+'\n';
+  });
+
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='embedding_version_compare_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();URL.revokeObjectURL(url);
+  showToast('评估说明已导出','success');
+}
+
+function openGuide(){document.getElementById('guideSection').style.display=document.getElementById('guideSection').style.display==='none'?'block':'none'}
+function closeGuide(){document.getElementById('guideSection').style.display='none'}
+
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast '+(type||'')+' show';
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function initSampleData(){
+  const records=loadRecords();
+  if(records.length>0)return;
+  const operator='算法工程师A';
+  const samples=[
+    {title:'线上反馈 - 召回率异常下降',source:'online_feedback',category:'leak_suspect',embeddingVersion:'emb-v3.2.1',status:'pending',enteredPendingReason:'线上召回率从 92% 降至 87%，训练集可能存在泄漏',description:'用户反馈搜索结果质量下降，初步排查发现训练数据与测试数据存在重叠'},
+    {title:'配置文件 - 特征维度补全',source:'config_file',category:'supplement',embeddingVersion:'emb-v3.2.0',status:'pending',enteredPendingReason:'特征配置文件缺失部分维度定义，需补充',description:'v3.2.0 配置中未包含新增的 128 维特征'},
+    {title:'训练日志 - loss 曲线手工修正',source:'training_log',category:'conclusion_change',embeddingVersion:'emb-v3.1.5',status:'processing',enteredPendingReason:'训练日志中 loss 值被手工改动，需确认是否影响结论',description:'第 47 轮 loss 值从 0.23 改为 0.19，改动者未备注原因'},
+    {title:'线上反馈 - 新领域样例补充',source:'online_feedback',category:'supplement',embeddingVersion:'emb-v3.2.1',status:'resolved',enteredPendingReason:'新增医疗领域样例，属于补材料',description:'补充 200 条医疗领域标注样例至训练集'},
+    {title:'标签漏映射 - 行业分类更新',source:'config_file',category:'label_gap',embeddingVersion:'emb-v3.2.1',status:'pending',enteredPendingReason:'行业分类标签新增 3 个子类，旧版本映射缺失',description:'v3.2.1 新增的行业子标签未同步到映射表'}
+  ];
+  samples.forEach((s,i)=>{
+    const r={id:genId(),...s,changeHistory:[],createdAt:now(),updatedAt:now(),batchId:null,isProcessed:false};
+    addChangeEntry(r,'status','-',STATUS_MAP[s.status],operator,s.enteredPendingReason);
+    if(i===3){
+      addChangeEntry(r,'status',STATUS_MAP['pending'],STATUS_MAP['resolved'],operator,'确认仅为补材料，已解决');
+    }
+    records.push(r);
+  });
+  saveRecords(records);
+}
+
+initSampleData();
+renderTable();
+</script>
+</body>
+</html>
