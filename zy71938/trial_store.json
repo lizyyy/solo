@@ -1,0 +1,311 @@
+{
+  "counter": 9,
+  "records": [
+    {
+      "record_id": "MAT-0001",
+      "material_name": "618大促主图A",
+      "source": "品牌部-小李",
+      "fingerprint": "13a6bee10713ce4b",
+      "status": "approved",
+      "pending_reason": null,
+      "changelog": [
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小李",
+          "action": "create",
+          "detail": "录入素材，来源: 品牌部-小李"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小李",
+          "action": "添加审稿意见",
+          "detail": "颜色偏暖，建议微调"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小李",
+          "action": "status: 已接收 -> 审稿中",
+          "detail": ""
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小王",
+          "action": "status: 审稿中 -> 已通过",
+          "detail": "审稿通过，无需修改"
+        }
+      ],
+      "created_at": "2026-05-31T19:28:10",
+      "updated_at": "2026-05-31T19:28:10"
+    },
+    {
+      "record_id": "MAT-0002",
+      "material_name": "品牌联名海报B",
+      "source": "代理-星辰创意",
+      "fingerprint": "5aff7f228e35b98d",
+      "status": "reviewing",
+      "pending_reason": null,
+      "changelog": [
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小李",
+          "action": "create",
+          "detail": "录入素材，来源: 代理-星辰创意"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小李",
+          "action": "status: 已接收 -> 待处理，原因: 缺授权文件",
+          "detail": "授权文件缺失"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小王",
+          "action": "status: 待处理 -> 审稿中",
+          "detail": "已补授权文件"
+        }
+      ],
+      "created_at": "2026-05-31T19:28:10",
+      "updated_at": "2026-05-31T19:28:10"
+    },
+    {
+      "record_id": "MAT-0003",
+      "material_name": "618大促视频C",
+      "source": "品牌部-小李",
+      "fingerprint": "a4c5fc88bc6b8c1b",
+      "status": "pending",
+      "pending_reason": "duplicate",
+      "changelog": [
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小李",
+          "action": "create",
+          "detail": "录入素材，来源: 品牌部-小李"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小李",
+          "action": "status: 已接收 -> 待处理，原因: 重复素材",
+          "detail": "同批次内重复素材: 618大促视频C"
+        }
+      ],
+      "created_at": "2026-05-31T19:28:10",
+      "updated_at": "2026-05-31T19:28:10"
+    },
+    {
+      "record_id": "MAT-0004",
+      "material_name": "618大促视频D",
+      "source": "代理-星辰创意",
+      "fingerprint": "0fa3733cf678d6b7",
+      "status": "received",
+      "pending_reason": null,
+      "changelog": [
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小李",
+          "action": "create",
+          "detail": "录入素材，来源: 代理-星辰创意"
+        }
+      ],
+      "created_at": "2026-05-31T19:28:10",
+      "updated_at": "2026-05-31T19:28:10"
+    },
+    {
+      "record_id": "MAT-0005",
+      "material_name": "端午节KV",
+      "source": "品牌部-老赵",
+      "fingerprint": "0a07874319e2519d",
+      "status": "pending",
+      "pending_reason": "review_comment_changed",
+      "changelog": [
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "老赵",
+          "action": "create",
+          "detail": "录入素材，来源: 品牌部-老赵"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "老赵",
+          "action": "添加审稿意见",
+          "detail": "第一版意见：标题字号加大"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "老赵",
+          "action": "status: 已接收 -> 审稿中",
+          "detail": ""
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小王",
+          "action": "修改审稿意见",
+          "detail": "标题字号不需要改了，按原稿"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小王",
+          "action": "status: 审稿中 -> 待处理，原因: 审稿意见变更",
+          "detail": "审稿意见被修改，需重新确认"
+        }
+      ],
+      "created_at": "2026-05-31T19:28:10",
+      "updated_at": "2026-05-31T19:28:10"
+    },
+    {
+      "record_id": "MAT-0006",
+      "material_name": "中秋礼盒海报",
+      "source": "品牌部-小陈",
+      "fingerprint": "e65b9594074cf351",
+      "status": "pending",
+      "pending_reason": "review_comment_changed",
+      "changelog": [
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小陈",
+          "action": "create",
+          "detail": "录入素材，来源: 品牌部-小陈"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小陈",
+          "action": "添加审稿意见",
+          "detail": "初版意见"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小陈",
+          "action": "status: 已接收 -> 审稿中",
+          "detail": ""
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小王",
+          "action": "status: 审稿中 -> 已通过",
+          "detail": "一审通过"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小陈",
+          "action": "re_submit",
+          "detail": "同一素材再次提交，来源: 品牌部-小陈，历史保留不覆盖"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小陈",
+          "action": "修改审稿意见",
+          "detail": "更新版意见：背景色换深蓝"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小陈",
+          "action": "status: 已通过 -> 待处理，原因: 审稿意见变更",
+          "detail": "再次提交时审稿意见有变化"
+        }
+      ],
+      "created_at": "2026-05-31T19:28:10",
+      "updated_at": "2026-05-31T19:28:10"
+    },
+    {
+      "record_id": "MAT-0007",
+      "material_name": "国庆预热Banner",
+      "source": "代理-光年设计",
+      "fingerprint": "4de52c2b731bdc20",
+      "status": "reviewing",
+      "pending_reason": null,
+      "changelog": [
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "老赵",
+          "action": "create",
+          "detail": "录入素材，来源: 代理-光年设计"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "老赵",
+          "action": "添加审稿意见",
+          "detail": "构图偏左"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "老赵",
+          "action": "status: 已接收 -> 审稿中",
+          "detail": ""
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小王",
+          "action": "status: 审稿中 -> 已驳回",
+          "detail": "品牌调性不符"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "老赵",
+          "action": "status: 已驳回 -> 审稿中",
+          "detail": "重新提交修改稿"
+        }
+      ],
+      "created_at": "2026-05-31T19:28:10",
+      "updated_at": "2026-05-31T19:28:10"
+    },
+    {
+      "record_id": "MAT-0008",
+      "material_name": "双11预热图",
+      "source": "品牌部-小张",
+      "fingerprint": "85330571ae8ebcc8",
+      "status": "pending",
+      "pending_reason": "missing_auth",
+      "changelog": [
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小张",
+          "action": "create",
+          "detail": "录入素材，来源: 品牌部-小张"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小张",
+          "action": "添加审稿意见",
+          "detail": "OK"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小张",
+          "action": "status: 已接收 -> 审稿中",
+          "detail": ""
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小王",
+          "action": "status: 审稿中 -> 已通过",
+          "detail": "审稿通过"
+        },
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "小王",
+          "action": "status: 已通过 -> 待处理，原因: 缺授权文件",
+          "detail": "事后发现缺肖像授权"
+        }
+      ],
+      "created_at": "2026-05-31T19:28:10",
+      "updated_at": "2026-05-31T19:28:10"
+    },
+    {
+      "record_id": "MAT-0009",
+      "material_name": "测试素材",
+      "source": "品牌部-测试",
+      "fingerprint": "a7696dec7df43ee3",
+      "status": "received",
+      "pending_reason": null,
+      "changelog": [
+        {
+          "timestamp": "2026-05-31T19:28:10",
+          "operator": "测试",
+          "action": "create",
+          "detail": "录入素材，来源: 品牌部-测试"
+        }
+      ],
+      "created_at": "2026-05-31T19:28:10",
+      "updated_at": "2026-05-31T19:28:10"
+    }
+  ]
+}
