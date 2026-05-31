@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合唱声部排练系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #ddd; border: none; cursor: pointer; border-radius: 5px 5px 0 0; }
+        .tab.active { background: #3498db; color: white; }
+        .tab-content { background: white; padding: 20px; border-radius: 0 5px 5px 5px; display: none; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        .btn-small { padding: 5px 10px; font-size: 12px; }
+        .btn-danger { background: #e74c3c; }
+        .btn-success { background: #27ae60; }
+        .btn-warning { background: #f39c12; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .controversial { background: #fff3cd; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 5% auto; padding: 20px; width: 80%; max-width: 800px; max-height: 80vh; overflow-y: auto; border-radius: 5px; }
+        .close { float: right; font-size: 28px; cursor: pointer; }
+        .history-item { padding: 10px; border-left: 3px solid #3498db; margin: 10px 0; background: #f8f9fa; }
+        .badge { padding: 3px 8px; border-radius: 10px; font-size: 12px; }
+        .badge-draft { background: #95a5a6; color: white; }
+        .badge-reviewed { background: #27ae60; color: white; }
+        .badge-controversial { background: #e74c3c; color: white; }
+        .link { color: #3498db; cursor: pointer; text-decoration: underline; }
+        .section { margin-bottom: 30px; }
+        .section h3 { margin-bottom: 15px; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 合唱声部排练系统</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('sessions')">排练场次</button>
+            <button class="tab" onclick="switchTab('scores')">曲谱管理</button>
+            <button class="tab" onclick="switchTab('recordings')">录音管理</button>
+        </div>
+
+        <div id="sessions" class="tab-content active">
+            <div class="two-col">
+                <div>
+                    <div class="section">
+                        <h3>创建排练场次</h3>
+                        <div class="form-group">
+                            <label>场次名称</label>
+                            <input type="text" id="sessionTitle" placeholder="如：2024年5月30日晚排练">
+                        </div>
+                        <div class="form-group">
+                            <label>指挥</label>
+                            <input type="text" id="sessionConductor">
+                        </div>
+                        <div class="form-group">
+                            <label>备注</label>
+                            <textarea id="sessionNotes" rows="3"></textarea>
+                        </div>
+                        <button onclick="createSession()">创建场次</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="section">
+                        <h3>场次列表</h3>
+                        <div id="sessionsList"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section" id="sessionDetail" style="display:none;">
+                <h3>场次详情 <span id="currentSessionTitle"></span></h3>
+                <div class="two-col">
+                    <div>
+                        <h4>添加排练记录</h4>
+                        <div class="form-group">
+                            <label>声部</label>
+                            <select id="voicePart"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>曲谱</label>
+                            <select id="recordScore"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>关联录音（可选）</label>
+                            <select id="recordRecording">
+                                <option value="">不关联</option>
+                            </select>
+                        </div>
+                        <div class="two-col">
+                            <div class="form-group">
+                                <label>起始小节</label>
+                                <input type="number" id="measureStart">
+                            </div>
+                            <div class="form-group">
+                                <label>结束小节</label>
+                                <input type="number" id="measureEnd">
+                            </div>
+                        </div>
+                        <div class="two-col">
+                            <div class="form-group">
+                                <label>页码</label>
+                                <input type="number" id="pageNumber">
+                            </div>
+                            <div class="form-group">
+                                <label>调号</label>
+                                <input type="text" id="keySignature" placeholder="如：C大调、G大调">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>速度</label>
+                            <input type="text" id="tempo" placeholder="如：♩=80、行板">
+                        </div>
+                        <div class="form-group">
+                            <label>存在问题</label>
+                            <textarea id="issues" rows="2" placeholder="记录排练中发现的问题"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>修正方案</label>
+                            <textarea id="corrections" rows="2" placeholder="记录如何修正"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label style="display:inline;">
+                                <input type="checkbox" id="isControversial"> 标记为争议项（需特别复核）
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>争议原因/复核说明</label>
+                            <textarea id="reviewReason" rows="2" placeholder="如果是争议项，请说明原因"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>记录人</label>
+                            <input type="text" id="changedBy">
+                        </div>
+                        <button onclick="createRecord()">添加记录</button>
+                    </div>
+                    <div>
+                        <h4>排练记录列表</h4>
+                        <div id="recordsList"></div>
+                    </div>
+                </div>
+                <div style="margin-top:20px;">
+                    <button class="btn-success" onclick="exportSession()">导出排练小结</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="scores" class="tab-content">
+            <div class="two-col">
+                <div>
+                    <div class="section">
+                        <h3>上传曲谱PDF</h3>
+                        <div class="form-group">
+                            <label>曲谱名称</label>
+                            <input type="text" id="scoreName">
+                        </div>
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea id="scoreDesc" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>选择PDF文件</label>
+                            <input type="file" id="scoreFile" accept=".pdf">
+                        </div>
+                        <button onclick="uploadScore()">上传曲谱</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="section">
+                        <h3>曲谱列表</h3>
+                        <table id="scoresTable">
+                            <thead>
+                                <tr><th>ID</th><th>名称</th><th>上传时间</th><th>操作</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="recordings" class="tab-content">
+            <div class="two-col">
+                <div>
+                    <div class="section">
+                        <h3>上传录音</h3>
+                        <div class="form-group">
+                            <label>录音名称</label>
+                            <input type="text" id="recordingName">
+                        </div>
+                        <div class="form-group">
+                            <label>时长</label>
+                            <input type="text" id="recordingDuration" placeholder="如：3分20秒">
+                        </div>
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea id="recordingDesc" rows="2"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>选择录音文件</label>
+                            <input type="file" id="recordingFile" accept="audio/*">
+                        </div>
+                        <button onclick="uploadRecording()">上传录音</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="section">
+                        <h3>录音列表</h3>
+                        <table id="recordingsTable">
+                            <thead>
+                                <tr><th>ID</th><th>名称</th><th>时长</th><th>操作</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('reviewModal')">&times;</span>
+            <h3>复核记录 #<span id="reviewRecordId"></span></h3>
+            <div class="form-group">
+                <label>状态</label>
+                <select id="reviewStatus">
+                    <option value="draft">草稿</option>
+                    <option value="reviewed">已复核</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>修正方案更新</label>
+                <textarea id="reviewCorrections" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>复核原因/说明</label>
+                <textarea id="reviewReasonModal" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>复核人</label>
+                <input type="text" id="reviewChangedBy">
+            </div>
+            <button onclick="submitReview()">提交复核</button>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('historyModal')">&times;</span>
+            <h3>历史追溯 - 记录 #<span id="historyRecordId"></span></h3>
+            <div id="historyContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSessionId = null;
+        let currentReviewRecordId = null;
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        async function loadScores() {
+            const res = await fetch('/scores');
+            const scores = await res.json();
+            const tbody = document.querySelector('#scoresTable tbody');
+            const select = document.getElementById('recordScore');
+            tbody.innerHTML = '';
+            select.innerHTML = '';
+            scores.forEach(s => {
+                tbody.innerHTML += `<tr>
+                    <td>${s.id}</td>
+                    <td>${s.name}</td>
+                    <td>${new Date(s.upload_time).toLocaleString()}</td>
+                    <td><a href="/scores/${s.id}" target="_blank" class="link">查看PDF</a></td>
+                </tr>`;
+                select.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+            });
+        }
+
+        async function loadRecordings() {
+            const res = await fetch('/recordings');
+            const recordings = await res.json();
+            const tbody = document.querySelector('#recordingsTable tbody');
+            const select = document.getElementById('recordRecording');
+            tbody.innerHTML = '';
+            select.innerHTML = '<option value="">不关联</option>';
+            recordings.forEach(r => {
+                tbody.innerHTML += `<tr>
+                    <td>${r.id}</td>
+                    <td>${r.name}</td>
+                    <td>${r.duration || '-'}</td>
+                    <td><a href="/${r.file_path}" target="_blank" class="link">播放</a></td>
+                </tr>`;
+                select.innerHTML += `<option value="${r.id}">${r.name}</option>`;
+            });
+        }
+
+        async function loadVoiceParts() {
+            const res = await fetch('/voice-parts');
+            const parts = await res.json();
+            const select = document.getElementById('voicePart');
+            select.innerHTML = '';
+            parts.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
+        }
+
+        async function loadSessions() {
+            const res = await fetch('/sessions');
+            const sessions = await res.json();
+            const list = document.getElementById('sessionsList');
+            list.innerHTML = sessions.map(s => `
+                <div style="padding:10px; border:1px solid #ddd; margin:5px 0; border-radius:4px; cursor:pointer;" onclick="selectSession(${s.id}, '${s.title}')">
+                    <strong>${s.title}</strong><br>
+                    <small>${new Date(s.date).toLocaleString()} | 指挥: ${s.conductor || '未填写'}</small>
+                </div>
+            `).join('');
+        }
+
+        function selectSession(id, title) {
+            currentSessionId = id;
+            document.getElementById('currentSessionTitle').textContent = title;
+            document.getElementById('sessionDetail').style.display = 'block';
+            loadRecords();
+        }
+
+        async function loadRecords() {
+            if (!currentSessionId) return;
+            const res = await fetch(`/sessions/${currentSessionId}/records`);
+            const records = await res.json();
+            const list = document.getElementById('recordsList');
+            list.innerHTML = records.map(r => `
+                <div class="${r.is_controversial ? 'controversial' : ''}" style="padding:10px; border:1px solid #ddd; margin:5px 0; border-radius:4px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong>${r.voice_part} - 小节${r.measure_start}-${r.measure_end}</strong>
+                        <span class="badge ${r.is_controversial ? 'badge-controversial' : r.status === 'reviewed' ? 'badge-reviewed' : 'badge-draft'}">
+                            ${r.is_controversial ? '争议' : r.status === 'reviewed' ? '已复核' : '草稿'}
+                        </span>
+                    </div>
+                    <small>曲谱: ${r.score_name} | 页码: ${r.page_number || '-'}</small>
+                    ${r.key_signature ? `<br><small>调号: ${r.key_signature}</small>` : ''}
+                    ${r.tempo ? `<small>速度: ${r.tempo}</small>` : ''}
+                    ${r.issues ? `<p>问题: ${r.issues}</p>` : ''}
+                    ${r.corrections ? `<p>修正: ${r.corrections}</p>` : ''}
+                    ${r.is_controversial ? `<p style="color:#d35400;">⚠️ ${r.review_reason}</p>` : ''}
+                    <div style="margin-top:5px;">
+                        ${r.score_id ? `<a href="/scores/${r.score_id}" target="_blank" class="link" style="margin-right:10px;">查看曲谱</a>` : ''}
+                        ${r.recording_id ? `<a href="#" onclick="playRecording(${r.recording_id}); return false;" class="link" style="margin-right:10px;">听录音</a>` : ''}
+                        <button class="btn-small btn-warning" onclick="openReview(${r.id})">复核</button>
+                        <button class="btn-small" onclick="openHistory(${r.id})">历史</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function createSession() {
+            const formData = new FormData();
+            formData.append('title', document.getElementById('sessionTitle').value);
+            formData.append('conductor', document.getElementById('sessionConductor').value);
+            formData.append('notes', document.getElementById('sessionNotes').value);
+            await fetch('/sessions', { method: 'POST', body: formData });
+            document.getElementById('sessionTitle').value = '';
+            document.getElementById('sessionConductor').value = '';
+            document.getElementById('sessionNotes').value = '';
+            loadSessions();
+        }
+
+        async function uploadScore() {
+            const formData = new FormData();
+            formData.append('name', document.getElementById('scoreName').value);
+            formData.append('description', document.getElementById('scoreDesc').value);
+            formData.append('file', document.getElementById('scoreFile').files[0]);
+            await fetch('/scores/upload', { method: 'POST', body: formData });
+            document.getElementById('scoreName').value = '';
+            document.getElementById('scoreDesc').value = '';
+            document.getElementById('scoreFile').value = '';
+            loadScores();
+        }
+
+        async function uploadRecording() {
+            const formData = new FormData();
+            formData.append('name', document.getElementById('recordingName').value);
+            formData.append('duration', document.getElementById('recordingDuration').value);
+            formData.append('description', document.getElementById('recordingDesc').value);
+            formData.append('file', document.getElementById('recordingFile').files[0]);
+            await fetch('/recordings/upload', { method: 'POST', body: formData });
+            document.getElementById('recordingName').value = '';
+            document.getElementById('recordingDuration').value = '';
+            document.getElementById('recordingDesc').value = '';
+            document.getElementById('recordingFile').value = '';
+            loadRecordings();
+        }
+
+        async function createRecord() {
+            const formData = new FormData();
+            formData.append('session_id', currentSessionId);
+            formData.append('score_id', document.getElementById('recordScore').value);
+            formData.append('recording_id', document.getElementById('recordRecording').value || '');
+            formData.append('voice_part_id', document.getElementById('voicePart').value);
+            formData.append('measure_start', document.getElementById('measureStart').value);
+            formData.append('measure_end', document.getElementById('measureEnd').value);
+            formData.append('page_number', document.getElementById('pageNumber').value || '');
+            formData.append('key_signature', document.getElementById('keySignature').value);
+            formData.append('tempo', document.getElementById('tempo').value);
+            formData.append('issues', document.getElementById('issues').value);
+            formData.append('corrections', document.getElementById('corrections').value);
+            formData.append('is_controversial', document.getElementById('isControversial').checked);
+            formData.append('review_reason', document.getElementById('reviewReason').value);
+            formData.append('changed_by', document.getElementById('changedBy').value);
+            await fetch('/records', { method: 'POST', body: formData });
+            document.getElementById('measureStart').value = '';
+            document.getElementById('measureEnd').value = '';
+            document.getElementById('pageNumber').value = '';
+            document.getElementById('issues').value = '';
+            document.getElementById('corrections').value = '';
+            document.getElementById('reviewReason').value = '';
+            loadRecords();
+        }
+
+        function openReview(recordId) {
+            currentReviewRecordId = recordId;
+            document.getElementById('reviewRecordId').textContent = recordId;
+            document.getElementById('reviewModal').style.display = 'block';
+        }
+
+        async function submitReview() {
+            const formData = new FormData();
+            formData.append('status', document.getElementById('reviewStatus').value);
+            formData.append('corrections', document.getElementById('reviewCorrections').value);
+            formData.append('review_reason', document.getElementById('reviewReasonModal').value);
+            formData.append('changed_by', document.getElementById('reviewChangedBy').value);
+            await fetch(`/records/${currentReviewRecordId}/review`, { method: 'PUT', body: formData });
+            closeModal('reviewModal');
+            loadRecords();
+        }
+
+        async function openHistory(recordId) {
+            document.getElementById('historyRecordId').textContent = recordId;
+            const res = await fetch(`/records/${recordId}/history`);
+            const history = await res.json();
+            document.getElementById('historyContent').innerHTML = history.map(h => `
+                <div class="history-item">
+                    <div><strong>${h.change_type}</strong> - ${h.changed_by || '未知'} - ${new Date(h.changed_at).toLocaleString()}</div>
+                    <div style="color:#666; margin-top:5px;">原因: ${h.change_reason}</div>
+                    ${h.old_value ? `<div style="color:#e74c3c;">旧: ${h.old_value}</div>` : ''}
+                    ${h.new_value ? `<div style="color:#27ae60;">新: ${h.new_value}</div>` : ''}
+                </div>
+            `).join('');
+            document.getElementById('historyModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function exportSession() {
+            if (currentSessionId) {
+                window.open(`/sessions/${currentSessionId}/export`);
+            }
+        }
+
+        loadScores();
+        loadRecordings();
+        loadVoiceParts();
+        loadSessions();
+    </script>
+</body>
+</html>
