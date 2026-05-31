@@ -1,0 +1,22 @@
+{
+  "name": "orbit-control-review",
+  "version": "1.0.0",
+  "description": "轨控指令复核系统 - 处理载荷计划、故障纪要和轨道根数的复核工具",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zustand": "^4.4.7",
+    "date-fns": "^3.0.6",
+    "lucide-react": "^0.303.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.10"
+  }
+}
