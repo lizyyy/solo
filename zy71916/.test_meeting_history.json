@@ -1,0 +1,541 @@
+{
+  "15e3fb2db48d_01_正常完整材料": {
+    "status": "可进入剪辑",
+    "reasons": [
+      "材料齐全，无重复剪辑点，字幕无改动，可以进入剪辑"
+    ],
+    "next_steps": [
+      "安排剪辑时间",
+      "导出上线清单备用"
+    ],
+    "file_check": {
+      "exists": true,
+      "missing_files": [],
+      "file_details": {
+        "subtitle_draft": {
+          "path": "test_data/01_正常完整材料/字幕草稿.txt",
+          "mtime": 1780219778.677814,
+          "size": 288,
+          "hash": "de4151dc0cacdccec1557539ba6e0dd63b553e8e8617a506f8900d0aed49b957"
+        },
+        "recording": {
+          "path": "test_data/01_正常完整材料/录音文件.mp3",
+          "mtime": 1780219778.676734,
+          "size": 24,
+          "hash": "f656c0b76394e0ad646af1d47f1c00030905750c9c9bb960b5eb94e492e69083"
+        },
+        "clip_points": {
+          "path": "test_data/01_正常完整材料/剪辑点清单.txt",
+          "mtime": 1780219778.6783962,
+          "size": 133,
+          "hash": "fbb80e3e7695c4cc4adf2d7f6d2b91afb6bdf5f6dc6d8186b13bc325a85c1e6b"
+        },
+        "guest_list": {
+          "path": "test_data/01_正常完整材料/嘉宾名单.txt",
+          "mtime": 1780219778.6785307,
+          "size": 63,
+          "hash": "513494445886da4b4636c1c9b61fb79cc5f3c6cb762253950a7d793014c205a7"
+        }
+      }
+    },
+    "file_details": {
+      "subtitle_draft": {
+        "path": "test_data/01_正常完整材料/字幕草稿.txt",
+        "mtime": 1780219778.677814,
+        "size": 288,
+        "hash": "de4151dc0cacdccec1557539ba6e0dd63b553e8e8617a506f8900d0aed49b957"
+      },
+      "recording": {
+        "path": "test_data/01_正常完整材料/录音文件.mp3",
+        "mtime": 1780219778.676734,
+        "size": 24,
+        "hash": "f656c0b76394e0ad646af1d47f1c00030905750c9c9bb960b5eb94e492e69083"
+      },
+      "clip_points": {
+        "path": "test_data/01_正常完整材料/剪辑点清单.txt",
+        "mtime": 1780219778.6783962,
+        "size": 133,
+        "hash": "fbb80e3e7695c4cc4adf2d7f6d2b91afb6bdf5f6dc6d8186b13bc325a85c1e6b"
+      },
+      "guest_list": {
+        "path": "test_data/01_正常完整材料/嘉宾名单.txt",
+        "mtime": 1780219778.6785307,
+        "size": 63,
+        "hash": "513494445886da4b4636c1c9b61fb79cc5f3c6cb762253950a7d793014c205a7"
+      }
+    },
+    "changes": [
+      {
+        "type": "字幕未修改",
+        "reason": "字幕草稿内容与上次记录一致"
+      }
+    ],
+    "clip_check": {
+      "has_duplicates": false,
+      "count": 0,
+      "details": []
+    },
+    "last_updated": "2026-05-31 17:29:39",
+    "first_processed": "2026-05-31 17:29:38",
+    "run_history": [
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": false,
+        "status_before": "首次处理",
+        "status_after": "可进入剪辑"
+      },
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": true,
+        "status_before": "已上线",
+        "status_after": "已上线"
+      },
+      {
+        "run_time": "2026-05-31 17:29:39",
+        "is_reprocess": true,
+        "status_before": "已上线",
+        "status_after": "可进入剪辑"
+      }
+    ],
+    "last_checked": "2026-05-31 17:29:38",
+    "skip_count": 1
+  },
+  "fc9ec756c75b_02_缺嘉宾名单": {
+    "status": "缺嘉宾名单",
+    "reasons": [
+      "缺少必要文件: 嘉宾名单"
+    ],
+    "next_steps": [
+      "联系上一班或制作人获取嘉宾名单"
+    ],
+    "file_check": {
+      "exists": true,
+      "missing_files": [
+        "嘉宾名单"
+      ],
+      "file_details": {
+        "subtitle_draft": {
+          "path": "test_data/02_缺嘉宾名单/字幕草稿.txt",
+          "mtime": 1780219778.6788914,
+          "size": 93,
+          "hash": "82ffa9af016d232d506b01a25cb4f8a4a5be27b8a4633e39c575742d3618d5ba"
+        },
+        "recording": {
+          "path": "test_data/02_缺嘉宾名单/录音文件.wav",
+          "mtime": 1780219778.6788054,
+          "size": 13,
+          "hash": "2de135db3df99cbce1b45f3de9160cecb721226437ada15ed5edc38a692d5480"
+        },
+        "clip_points": {
+          "path": "test_data/02_缺嘉宾名单/剪辑点清单.txt",
+          "mtime": 1780219778.6789649,
+          "size": 53,
+          "hash": "9122718a8ff87915913db33f65ac2da61fc595021d3584ad0cf74faf8545190a"
+        }
+      }
+    },
+    "file_details": {
+      "subtitle_draft": {
+        "path": "test_data/02_缺嘉宾名单/字幕草稿.txt",
+        "mtime": 1780219778.6788914,
+        "size": 93,
+        "hash": "82ffa9af016d232d506b01a25cb4f8a4a5be27b8a4633e39c575742d3618d5ba"
+      },
+      "recording": {
+        "path": "test_data/02_缺嘉宾名单/录音文件.wav",
+        "mtime": 1780219778.6788054,
+        "size": 13,
+        "hash": "2de135db3df99cbce1b45f3de9160cecb721226437ada15ed5edc38a692d5480"
+      },
+      "clip_points": {
+        "path": "test_data/02_缺嘉宾名单/剪辑点清单.txt",
+        "mtime": 1780219778.6789649,
+        "size": 53,
+        "hash": "9122718a8ff87915913db33f65ac2da61fc595021d3584ad0cf74faf8545190a"
+      }
+    },
+    "changes": [
+      {
+        "type": "字幕未修改",
+        "reason": "字幕草稿内容与上次记录一致"
+      }
+    ],
+    "clip_check": {
+      "has_duplicates": false,
+      "count": 0,
+      "details": []
+    },
+    "last_updated": "2026-05-31 17:29:38",
+    "first_processed": "2026-05-31 17:29:38",
+    "run_history": [
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": false,
+        "status_before": "首次处理",
+        "status_after": "缺嘉宾名单"
+      },
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": true,
+        "status_before": "缺嘉宾名单",
+        "status_after": "缺嘉宾名单"
+      }
+    ]
+  },
+  "cbb7ab6cc655_03_重复剪辑点": {
+    "status": "有重复剪辑点",
+    "reasons": [
+      "发现 2 处重复剪辑点，需要核对",
+      "  - 剪辑点「话题A」在第 [2, 3] 行重复出现 2 次",
+      "  - 剪辑点「话题B」在第 [4, 5] 行重复出现 2 次"
+    ],
+    "next_steps": [
+      "去重：与制作人确认保留哪个版本",
+      "标记删除重复的剪辑点条目"
+    ],
+    "file_check": {
+      "exists": true,
+      "missing_files": [],
+      "file_details": {
+        "subtitle_draft": {
+          "path": "test_data/03_重复剪辑点/字幕草稿.txt",
+          "mtime": 1780219778.679151,
+          "size": 67,
+          "hash": "ff8df37208eb9c4bf82910b37b4f2c9f0c244265fbc468440ff2672798e26ed4"
+        },
+        "recording": {
+          "path": "test_data/03_重复剪辑点/recording.m4a",
+          "mtime": 1780219778.6790874,
+          "size": 13,
+          "hash": "eeb6f6f7875ec949d23663ba001c41c7f39bcd5c0687f0acba556eb4645ab9f6"
+        },
+        "clip_points": {
+          "path": "test_data/03_重复剪辑点/剪辑点.txt",
+          "mtime": 1780219778.6792128,
+          "size": 154,
+          "hash": "d6bf31b03e064fd6714cddc4be56a6b04cd0035d5c18f9e18c5bb94460a1aef4"
+        },
+        "guest_list": {
+          "path": "test_data/03_重复剪辑点/嘉宾.txt",
+          "mtime": 1780219778.6792727,
+          "size": 16,
+          "hash": "d9ad383eab33c2ff6f78f6316ca708259dc521d9ec44a95ac354267f52e87419"
+        }
+      }
+    },
+    "file_details": {
+      "subtitle_draft": {
+        "path": "test_data/03_重复剪辑点/字幕草稿.txt",
+        "mtime": 1780219778.679151,
+        "size": 67,
+        "hash": "ff8df37208eb9c4bf82910b37b4f2c9f0c244265fbc468440ff2672798e26ed4"
+      },
+      "recording": {
+        "path": "test_data/03_重复剪辑点/recording.m4a",
+        "mtime": 1780219778.6790874,
+        "size": 13,
+        "hash": "eeb6f6f7875ec949d23663ba001c41c7f39bcd5c0687f0acba556eb4645ab9f6"
+      },
+      "clip_points": {
+        "path": "test_data/03_重复剪辑点/剪辑点.txt",
+        "mtime": 1780219778.6792128,
+        "size": 154,
+        "hash": "d6bf31b03e064fd6714cddc4be56a6b04cd0035d5c18f9e18c5bb94460a1aef4"
+      },
+      "guest_list": {
+        "path": "test_data/03_重复剪辑点/嘉宾.txt",
+        "mtime": 1780219778.6792727,
+        "size": 16,
+        "hash": "d9ad383eab33c2ff6f78f6316ca708259dc521d9ec44a95ac354267f52e87419"
+      }
+    },
+    "changes": [
+      {
+        "type": "字幕未修改",
+        "reason": "字幕草稿内容与上次记录一致"
+      }
+    ],
+    "clip_check": {
+      "has_duplicates": true,
+      "count": 2,
+      "details": [
+        {
+          "clip_key": "话题A",
+          "line_numbers": [
+            2,
+            3
+          ],
+          "count": 2
+        },
+        {
+          "clip_key": "话题B",
+          "line_numbers": [
+            4,
+            5
+          ],
+          "count": 2
+        }
+      ]
+    },
+    "last_updated": "2026-05-31 17:29:38",
+    "first_processed": "2026-05-31 17:29:38",
+    "run_history": [
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": false,
+        "status_before": "首次处理",
+        "status_after": "有重复剪辑点"
+      },
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": true,
+        "status_before": "有重复剪辑点",
+        "status_after": "有重复剪辑点"
+      }
+    ]
+  },
+  "c4e80690696d_04_缺录音文件_阻塞": {
+    "status": "阻塞",
+    "reasons": [
+      "缺少必要文件: 录音文件"
+    ],
+    "next_steps": [
+      "必须找到原始录音文件才能继续"
+    ],
+    "file_check": {
+      "exists": true,
+      "missing_files": [
+        "录音文件"
+      ],
+      "file_details": {
+        "subtitle_draft": {
+          "path": "test_data/04_缺录音文件_阻塞/字幕草稿.txt",
+          "mtime": 1780219778.6793807,
+          "size": 29,
+          "hash": "4d48ef38f37d97765c03196723fb7b7cdf819c35943a183f7dd7042eb0c94db4"
+        },
+        "clip_points": {
+          "path": "test_data/04_缺录音文件_阻塞/剪辑点.txt",
+          "mtime": 1780219778.679439,
+          "size": 24,
+          "hash": "b7f3dc6de7123d53a3c98a2202085bcf426d67e662d34e4e9b28111d158ff32d"
+        },
+        "guest_list": {
+          "path": "test_data/04_缺录音文件_阻塞/嘉宾名单.txt",
+          "mtime": 1780219778.6795058,
+          "size": 8,
+          "hash": "3f360166d969ea8361cf149d02af72bd1e18328ba7b5336a3bb428b361a9ed9d"
+        }
+      }
+    },
+    "file_details": {
+      "subtitle_draft": {
+        "path": "test_data/04_缺录音文件_阻塞/字幕草稿.txt",
+        "mtime": 1780219778.6793807,
+        "size": 29,
+        "hash": "4d48ef38f37d97765c03196723fb7b7cdf819c35943a183f7dd7042eb0c94db4"
+      },
+      "clip_points": {
+        "path": "test_data/04_缺录音文件_阻塞/剪辑点.txt",
+        "mtime": 1780219778.679439,
+        "size": 24,
+        "hash": "b7f3dc6de7123d53a3c98a2202085bcf426d67e662d34e4e9b28111d158ff32d"
+      },
+      "guest_list": {
+        "path": "test_data/04_缺录音文件_阻塞/嘉宾名单.txt",
+        "mtime": 1780219778.6795058,
+        "size": 8,
+        "hash": "3f360166d969ea8361cf149d02af72bd1e18328ba7b5336a3bb428b361a9ed9d"
+      }
+    },
+    "changes": [
+      {
+        "type": "字幕未修改",
+        "reason": "字幕草稿内容与上次记录一致"
+      }
+    ],
+    "clip_check": {
+      "has_duplicates": false,
+      "count": 0,
+      "details": []
+    },
+    "last_updated": "2026-05-31 17:29:38",
+    "first_processed": "2026-05-31 17:29:38",
+    "run_history": [
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": false,
+        "status_before": "首次处理",
+        "status_after": "阻塞"
+      },
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": true,
+        "status_before": "阻塞",
+        "status_after": "阻塞"
+      }
+    ]
+  },
+  "87ef8cc7dad9_05_同时缺多个文件": {
+    "status": "阻塞",
+    "reasons": [
+      "缺少必要文件: 录音文件, 剪辑点清单, 嘉宾名单"
+    ],
+    "next_steps": [
+      "联系上一班或制作人获取嘉宾名单",
+      "确认剪辑点清单是否已整理",
+      "必须找到原始录音文件才能继续"
+    ],
+    "file_check": {
+      "exists": true,
+      "missing_files": [
+        "录音文件",
+        "剪辑点清单",
+        "嘉宾名单"
+      ],
+      "file_details": {
+        "subtitle_draft": {
+          "path": "test_data/05_同时缺多个文件/字幕草稿.txt",
+          "mtime": 1780219778.6796398,
+          "size": 22,
+          "hash": "6a6a07da733737f764d752d3d160887c0a901d65eebc0456f8a59b59b7c41d8c"
+        }
+      }
+    },
+    "file_details": {
+      "subtitle_draft": {
+        "path": "test_data/05_同时缺多个文件/字幕草稿.txt",
+        "mtime": 1780219778.6796398,
+        "size": 22,
+        "hash": "6a6a07da733737f764d752d3d160887c0a901d65eebc0456f8a59b59b7c41d8c"
+      }
+    },
+    "changes": [
+      {
+        "type": "字幕未修改",
+        "reason": "字幕草稿内容与上次记录一致"
+      }
+    ],
+    "clip_check": {
+      "has_duplicates": false,
+      "details": "无剪辑点文件"
+    },
+    "last_updated": "2026-05-31 17:29:38",
+    "first_processed": "2026-05-31 17:29:38",
+    "run_history": [
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": false,
+        "status_before": "首次处理",
+        "status_after": "阻塞"
+      },
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": true,
+        "status_before": "阻塞",
+        "status_after": "阻塞"
+      }
+    ]
+  },
+  "c48b057dce8f_06_字幕草稿被修改": {
+    "status": "字幕草稿待审核",
+    "reasons": [
+      "字幕草稿有新改动，需要审核修改内容",
+      "  - 修改时间: 2026-05-31 17:29:39"
+    ],
+    "next_steps": [
+      "打开字幕草稿逐段核对修改内容",
+      "确认修改是修正还是新增内容"
+    ],
+    "file_check": {
+      "exists": true,
+      "missing_files": [],
+      "file_details": {
+        "subtitle_draft": {
+          "path": "test_data/06_字幕草稿被修改/字幕草稿.txt",
+          "mtime": 1780219779.8262076,
+          "size": 73,
+          "hash": "1eb30520351aa29c8f257ba0fb0568d13cb6dcdb726c20766e628d37b1f4cdad"
+        },
+        "recording": {
+          "path": "test_data/06_字幕草稿被修改/录音文件.mp3",
+          "mtime": 1780219778.6798851,
+          "size": 10,
+          "hash": "bb24d9039ce8110cea840a7e6bc521b33448439fd79f119dff175de8796c8574"
+        },
+        "clip_points": {
+          "path": "test_data/06_字幕草稿被修改/剪辑点清单.txt",
+          "mtime": 1780219778.6800117,
+          "size": 21,
+          "hash": "e30d91b3e165cbe8a5859c81b172271bbc1b70a97f085d4a99686bd6b2e46ca9"
+        },
+        "guest_list": {
+          "path": "test_data/06_字幕草稿被修改/嘉宾名单.txt",
+          "mtime": 1780219778.6800706,
+          "size": 8,
+          "hash": "ffb809e49691029a9cafdc486e9926525c6a8cecaabed7ce038d7415d7e3eca2"
+        }
+      }
+    },
+    "file_details": {
+      "subtitle_draft": {
+        "path": "test_data/06_字幕草稿被修改/字幕草稿.txt",
+        "mtime": 1780219779.8262076,
+        "size": 73,
+        "hash": "1eb30520351aa29c8f257ba0fb0568d13cb6dcdb726c20766e628d37b1f4cdad"
+      },
+      "recording": {
+        "path": "test_data/06_字幕草稿被修改/录音文件.mp3",
+        "mtime": 1780219778.6798851,
+        "size": 10,
+        "hash": "bb24d9039ce8110cea840a7e6bc521b33448439fd79f119dff175de8796c8574"
+      },
+      "clip_points": {
+        "path": "test_data/06_字幕草稿被修改/剪辑点清单.txt",
+        "mtime": 1780219778.6800117,
+        "size": 21,
+        "hash": "e30d91b3e165cbe8a5859c81b172271bbc1b70a97f085d4a99686bd6b2e46ca9"
+      },
+      "guest_list": {
+        "path": "test_data/06_字幕草稿被修改/嘉宾名单.txt",
+        "mtime": 1780219778.6800706,
+        "size": 8,
+        "hash": "ffb809e49691029a9cafdc486e9926525c6a8cecaabed7ce038d7415d7e3eca2"
+      }
+    },
+    "changes": [
+      {
+        "type": "字幕草稿已修改",
+        "reason": "字幕草稿文件哈希值与上次记录不同，说明有人编辑过",
+        "modified_at": "2026-05-31 17:29:39"
+      }
+    ],
+    "clip_check": {
+      "has_duplicates": false,
+      "count": 0,
+      "details": []
+    },
+    "last_updated": "2026-05-31 17:29:39",
+    "first_processed": "2026-05-31 17:29:38",
+    "run_history": [
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": false,
+        "status_before": "首次处理",
+        "status_after": "可进入剪辑"
+      },
+      {
+        "run_time": "2026-05-31 17:29:38",
+        "is_reprocess": true,
+        "status_before": "可进入剪辑",
+        "status_after": "可进入剪辑"
+      },
+      {
+        "run_time": "2026-05-31 17:29:39",
+        "is_reprocess": true,
+        "status_before": "可进入剪辑",
+        "status_after": "字幕草稿待审核"
+      }
+    ]
+  }
+}
