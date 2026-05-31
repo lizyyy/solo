@@ -1,0 +1,53 @@
+import type { ReceiptLine, JudgmentResult, RefundItem, RefundChangeRecord, CrossPeriodFeeAlert, ReceiptHistoryEntry, ReconciliationStatement, ProcessingBatch } from '../domain/types.js';
+export interface OverseasReceiptStore {
+    getReceipt(id: string): ReceiptLine | undefined;
+    findReceiptByOrder(platform: string, orderId: string): ReceiptLine | undefined;
+    saveReceipt(receipt: ReceiptLine): void;
+    listReceipts(): ReceiptLine[];
+    saveJudgment(result: JudgmentResult): void;
+    getJudgmentsByReceipt(receiptId: string): JudgmentResult[];
+    getJudgmentByBatch(receiptId: string, batchRunId: string): JudgmentResult | undefined;
+    saveHistoryEntry(entry: ReceiptHistoryEntry): void;
+    getHistory(receiptId: string): ReceiptHistoryEntry[];
+    saveCrossPeriodAlert(alert: CrossPeriodFeeAlert): void;
+    getCrossPeriodAlerts(receiptId: string): CrossPeriodFeeAlert[];
+    saveRefundItem(item: RefundItem): void;
+    getRefundItem(id: string): RefundItem | undefined;
+    getRefundsByReceipt(receiptId: string): RefundItem[];
+    saveRefundChange(record: RefundChangeRecord): void;
+    getRefundChanges(refundItemId: string): RefundChangeRecord[];
+    saveReconciliation(stmt: ReconciliationStatement): void;
+    getReconciliation(receiptId: string, period: string): ReconciliationStatement | undefined;
+    saveBatch(batch: ProcessingBatch): void;
+    getBatch(id: string): ProcessingBatch | undefined;
+}
+export declare class InMemoryStore implements OverseasReceiptStore {
+    private receipts;
+    private judgments;
+    private history;
+    private crossPeriodAlerts;
+    private refundItems;
+    private refundChanges;
+    private reconciliations;
+    private batches;
+    getReceipt(id: string): ReceiptLine | undefined;
+    findReceiptByOrder(platform: string, orderId: string): ReceiptLine | undefined;
+    saveReceipt(receipt: ReceiptLine): void;
+    listReceipts(): ReceiptLine[];
+    saveJudgment(result: JudgmentResult): void;
+    getJudgmentsByReceipt(receiptId: string): JudgmentResult[];
+    getJudgmentByBatch(receiptId: string, batchRunId: string): JudgmentResult | undefined;
+    saveHistoryEntry(entry: ReceiptHistoryEntry): void;
+    getHistory(receiptId: string): ReceiptHistoryEntry[];
+    saveCrossPeriodAlert(alert: CrossPeriodFeeAlert): void;
+    getCrossPeriodAlerts(receiptId: string): CrossPeriodFeeAlert[];
+    saveRefundItem(item: RefundItem): void;
+    getRefundItem(id: string): RefundItem | undefined;
+    getRefundsByReceipt(receiptId: string): RefundItem[];
+    saveRefundChange(record: RefundChangeRecord): void;
+    getRefundChanges(refundItemId: string): RefundChangeRecord[];
+    saveReconciliation(stmt: ReconciliationStatement): void;
+    getReconciliation(receiptId: string, period: string): ReconciliationStatement | undefined;
+    saveBatch(batch: ProcessingBatch): void;
+    getBatch(id: string): ProcessingBatch | undefined;
+}

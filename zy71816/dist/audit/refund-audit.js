@@ -1,0 +1,60 @@
+export class RefundAuditService {
+    store;
+    constructor(store) {
+        this.store = store;
+    }
+    modifyRefundItem(itemId, changedBy, field, newValue, reason) {
+        const item = this.store.getRefundItem(itemId);
+        if (!item) {
+            throw new Error(`退款项 ${itemId} 不存在`);
+        }
+        const oldValue = item[field];
+        const changeRecord = {
+            id: `chg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            refundItemId: itemId,
+            changedBy,
+            changedAt: new Date().toISOString(),
+            field,
+            oldValue,
+            newValue,
+            reason,
+        };
+        item[field] = newValue;
+        this.store.saveRefundItem(item);
+        this.store.saveRefundChange(changeRecord);
+        this.syncReconciliationNote(item.receiptId, changeRecord);
+        return changeRecord;
+    }
+    syncReconciliationNote(receiptId, change) {
+        const existingRefunds = this.store.getRefundsByReceipt(receiptId);
+        const totalRefunds = existingRefunds.reduce((sum, r) => sum + (r.status === 'approved' ? r.refundAmount : 0), 0);
+        const changes = existingRefunds.flatMap(r => this.store.getRefundChanges(r.id));
+        const changeNotes = changes
+            .map(c => `[${c.changedAt}] ${c.changedBy} 将 ${c.field} 从 ${JSON.stringify(c.oldValue)} 改为 ${JSON.stringify(c.newValue)}，原因：${c.reason}`)
+            .join('\n');
+        const receipt = this.store.getReceipt(receiptId);
+        const period = receipt ? receipt.receivedAt.slice(0, 7) : 'unknown';
+        const stmt = {
+            receiptId,
+            period,
+            totalReceived: receipt?.amount ?? 0,
+            totalFees: receipt?.feeAmount ?? 0,
+            totalRefunds,
+            netAmount: (receipt?.netAmount ?? 0) - totalRefunds,
+            changeRecords: changes,
+            notes: changeNotes || '无手动变更记录',
+        };
+        this.store.saveReconciliation(stmt);
+    }
+    getRefundChangeHistory(refundItemId) {
+        return this.store.getRefundChanges(refundItemId);
+    }
+    getReconciliationForReceipt(receiptId) {
+        const receipt = this.store.getReceipt(receiptId);
+        if (!receipt)
+            return undefined;
+        const period = receipt.receivedAt.slice(0, 7);
+        return this.store.getReconciliation(receiptId, period);
+    }
+}
+//# sourceMappingURL=refund-audit.js.map
