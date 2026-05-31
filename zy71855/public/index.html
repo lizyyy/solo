@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工业机械臂示教系统</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>🤖 工业机械臂示教系统</h1>
+      <p class="subtitle">让每一堂公开课都有条不紊</p>
+    </header>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="teach">开始示教</button>
+      <button class="tab-btn" data-tab="videos">视频版本</button>
+      <button class="tab-btn" data-tab="history">历史记录</button>
+      <button class="tab-btn" data-tab="settings">步骤设置</button>
+    </div>
+
+    <div id="teach" class="tab-content active">
+      <div class="card">
+        <h2>📋 课前准备</h2>
+        <div class="form-group">
+          <label>材料批次编号</label>
+          <input type="text" id="batchNumber" placeholder="例如：BATCH-2024-001">
+        </div>
+        <div class="form-group">
+          <label>材料名称</label>
+          <input type="text" id="materialName" placeholder="例如：机械臂零件套件A">
+        </div>
+        <div class="form-group">
+          <label>授课老师</label>
+          <input type="text" id="teacherName" placeholder="您的姓名">
+        </div>
+        <div class="form-group">
+          <label>班级名称</label>
+          <input type="text" id="className" placeholder="例如：2024春季班第3组">
+        </div>
+        <button class="btn btn-primary" id="startSession">开始上课</button>
+      </div>
+
+      <div id="sessionArea" class="card hidden">
+        <div class="session-header">
+          <h2>🎓 课堂进行中</h2>
+          <span class="badge badge-info" id="sessionInfo"></span>
+        </div>
+
+        <div id="errorAlert" class="alert alert-error hidden">
+          <strong>⚠️ 提示：</strong>
+          <span id="errorMessage"></span>
+          <p class="suggestion" id="errorSuggestion"></p>
+        </div>
+
+        <div id="videoAlert" class="alert alert-warning hidden">
+          <strong>📹 视频版本变更提醒：</strong>
+          <div id="videoChanges"></div>
+        </div>
+
+        <div class="steps-container">
+          <h3>步骤进度</h3>
+          <div id="stepsList" class="steps-list"></div>
+        </div>
+
+        <div class="notes-section">
+          <h3>📝 课堂笔记</h3>
+          <div class="form-group">
+            <textarea id="noteContent" rows="3" placeholder="记录课堂要点、学生问题等..."></textarea>
+            <button class="btn btn-secondary" id="addNote">添加笔记</button>
+          </div>
+          <div id="notesList" class="notes-list"></div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-success" id="exportRecord">导出课堂记录</button>
+          <button class="btn btn-secondary" id="exportChecklist">导出简单清单</button>
+          <button class="btn btn-danger" id="endSession">结束课程</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="videos" class="tab-content">
+      <div class="card">
+        <h2>📹 视频版本管理</h2>
+        <div class="form-group">
+          <label>视频名称</label>
+          <input type="text" id="videoName" placeholder="例如：机械臂基础操作教学">
+        </div>
+        <div class="form-group">
+          <label>视频时长（秒）</label>
+          <input type="number" id="videoDuration" placeholder="例如：300">
+        </div>
+        <div class="form-group">
+          <label>步骤描述（每行一个步骤）</label>
+          <textarea id="videoSteps" rows="6" placeholder="1. 检查电源连接&#10;2. 初始化机械臂&#10;3. ..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>所需零件（每行一个）</label>
+          <textarea id="videoParts" rows="4" placeholder="机械臂主体&#10;电源适配器&#10;..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>上传人</label>
+          <input type="text" id="uploadedBy" placeholder="您的姓名">
+        </div>
+        <button class="btn btn-primary" id="uploadVideo">上传/更新视频版本</button>
+      </div>
+
+      <div class="card">
+        <h3>视频列表</h3>
+        <div id="videoList" class="video-list"></div>
+      </div>
+    </div>
+
+    <div id="history" class="tab-content">
+      <div class="card">
+        <h2>📚 历史记录查询</h2>
+        <div class="form-group">
+          <label>输入材料批次编号查看历史</label>
+          <div class="input-group">
+            <input type="text" id="historyBatchNumber" placeholder="例如：BATCH-2024-001">
+            <button class="btn btn-primary" id="searchHistory">查询</button>
+          </div>
+        </div>
+        <div id="historyResults"></div>
+      </div>
+
+      <div class="card">
+        <h3>所有材料批次</h3>
+        <div id="materialsList" class="materials-list"></div>
+      </div>
+    </div>
+
+    <div id="settings" class="tab-content">
+      <div class="card">
+        <h2>⚙️ 步骤设置</h2>
+        <p class="text-muted">在这里配置示教课程的标准步骤</p>
+        <div id="stepsEditor" class="steps-editor"></div>
+        <button class="btn btn-secondary" id="addStep">+ 添加步骤</button>
+        <button class="btn btn-primary" id="saveSteps">保存步骤</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
