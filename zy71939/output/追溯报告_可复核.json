@@ -1,0 +1,360 @@
+{
+  "generated_at": "2026-05-31T19:29:23.123556",
+  "total_pending_items": 18,
+  "trace_links": [
+    {
+      "record_id": "REC0001",
+      "material_name": "品牌名片-标准版",
+      "abnormal_type": "AbnormalType.AUTHORIZATION_EXPIRED",
+      "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 2",
+      "evidence": [
+        "记录提交日期: 2026-05-31",
+        "授权有效期至: 2026-05-26",
+        "超期天数: 5 天",
+        "该物料检测到多种颜色版本混用: C01-经典蓝, C02-活力橙",
+        "各版本数量: C01-经典蓝=2条, C02-活力橙=1条"
+      ]
+    },
+    {
+      "record_id": "REC0001",
+      "material_name": "品牌名片-标准版",
+      "abnormal_type": "AbnormalType.COLOR_VERSION_MIXED",
+      "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 2",
+      "evidence": [
+        "记录提交日期: 2026-05-31",
+        "授权有效期至: 2026-05-26",
+        "超期天数: 5 天",
+        "该物料检测到多种颜色版本混用: C01-经典蓝, C02-活力橙",
+        "各版本数量: C01-经典蓝=2条, C02-活力橙=1条"
+      ]
+    },
+    {
+      "record_id": "REC0002",
+      "material_name": "品牌名片-标准版",
+      "abnormal_type": "AbnormalType.DUPLICATE",
+      "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 3",
+      "evidence": [
+        "记录提交日期: 2026-05-31",
+        "授权有效期至: 2026-05-26",
+        "超期天数: 5 天",
+        "该物料检测到多种颜色版本混用: C01-经典蓝, C02-活力橙",
+        "各版本数量: C01-经典蓝=2条, C02-活力橙=1条"
+      ]
+    },
+    {
+      "record_id": "REC0002",
+      "material_name": "品牌名片-标准版",
+      "abnormal_type": "AbnormalType.AUTHORIZATION_EXPIRED",
+      "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 3",
+      "evidence": [
+        "记录提交日期: 2026-05-31",
+        "授权有效期至: 2026-05-26",
+        "超期天数: 5 天",
+        "该物料检测到多种颜色版本混用: C01-经典蓝, C02-活力橙",
+        "各版本数量: C01-经典蓝=2条, C02-活力橙=1条"
+      ]
+    },
+    {
+      "record_id": "REC0002",
+      "material_name": "品牌名片-标准版",
+      "abnormal_type": "AbnormalType.COLOR_VERSION_MIXED",
+      "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 3",
+      "evidence": [
+        "记录提交日期: 2026-05-31",
+        "授权有效期至: 2026-05-26",
+        "超期天数: 5 天",
+        "该物料检测到多种颜色版本混用: C01-经典蓝, C02-活力橙",
+        "各版本数量: C01-经典蓝=2条, C02-活力橙=1条"
+      ]
+    },
+    {
+      "record_id": "REC0003",
+      "material_name": "信封-大号",
+      "abnormal_type": "AbnormalType.AUTHORIZATION_EXPIRED",
+      "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 4",
+      "evidence": [
+        "记录提交日期: 2026-05-31",
+        "授权有效期至: 2026-05-26",
+        "超期天数: 5 天",
+        "该物料检测到多种颜色版本混用: C02-活力橙, C04-深灰",
+        "各版本数量: C02-活力橙=1条, C04-深灰=1条"
+      ]
+    },
+    {
+      "record_id": "REC0003",
+      "material_name": "信封-大号",
+      "abnormal_type": "AbnormalType.COLOR_VERSION_MIXED",
+      "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 4",
+      "evidence": [
+        "记录提交日期: 2026-05-31",
+        "授权有效期至: 2026-05-26",
+        "超期天数: 5 天",
+        "该物料检测到多种颜色版本混用: C02-活力橙, C04-深灰",
+        "各版本数量: C02-活力橙=1条, C04-深灰=1条"
+      ]
+    },
+    {
+      "record_id": "REC0004",
+      "material_name": "信纸-A4",
+      "abnormal_type": "AbnormalType.MANUAL_CORRECTION",
+      "reason": "导出规格漏改待确认 - 记录规格与授权规格不匹配",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 5",
+      "evidence": [
+        "记录使用规格: 210x297mm",
+        "授权允许的规格: 85x54mm, 90x54mm",
+        "请确认是否漏改导出规格"
+      ]
+    },
+    {
+      "record_id": "REC0004",
+      "material_name": "信纸-A4",
+      "abnormal_type": "AbnormalType.AUTHORIZATION_EXPIRED",
+      "reason": "导出规格漏改待确认 - 记录规格与授权规格不匹配",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 5",
+      "evidence": [
+        "记录使用规格: 210x297mm",
+        "授权允许的规格: 85x54mm, 90x54mm",
+        "请确认是否漏改导出规格"
+      ]
+    },
+    {
+      "record_id": "REC0004",
+      "material_name": "信纸-A4",
+      "abnormal_type": "AbnormalType.COLOR_VERSION_MIXED",
+      "reason": "导出规格漏改待确认 - 记录规格与授权规格不匹配",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 5",
+      "evidence": [
+        "记录使用规格: 210x297mm",
+        "授权允许的规格: 85x54mm, 90x54mm",
+        "请确认是否漏改导出规格"
+      ]
+    },
+    {
+      "record_id": "REC0004",
+      "material_name": "信纸-A4",
+      "abnormal_type": "AbnormalType.EXPORT_SPEC_MISSED",
+      "reason": "导出规格漏改待确认 - 记录规格与授权规格不匹配",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 5",
+      "evidence": [
+        "记录使用规格: 210x297mm",
+        "授权允许的规格: 85x54mm, 90x54mm",
+        "请确认是否漏改导出规格"
+      ]
+    },
+    {
+      "record_id": "REC0005",
+      "material_name": "文件夹-蓝色",
+      "abnormal_type": "AbnormalType.AUTHORIZATION_EXPIRED",
+      "reason": "授权已过期 - 提交时授权已失效 5 天",
+      "source_file": "./test_data/sample_package/打样记录_01.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 6",
+      "evidence": [
+        "记录提交日期: 2026-05-31",
+        "授权有效期至: 2026-05-26",
+        "超期天数: 5 天"
+      ]
+    },
+    {
+      "record_id": "REC0006",
+      "material_name": "品牌名片-标准版",
+      "abnormal_type": "AbnormalType.AUTHORIZATION_EXPIRED",
+      "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+      "source_file": "./test_data/sample_package/打样记录_02.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 2",
+      "evidence": [
+        "记录提交日期: 2026-05-31",
+        "授权有效期至: 2026-05-26",
+        "超期天数: 5 天",
+        "该物料检测到多种颜色版本混用: C01-经典蓝, C02-活力橙",
+        "各版本数量: C01-经典蓝=2条, C02-活力橙=1条"
+      ]
+    },
+    {
+      "record_id": "REC0006",
+      "material_name": "品牌名片-标准版",
+      "abnormal_type": "AbnormalType.COLOR_VERSION_MIXED",
+      "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+      "source_file": "./test_data/sample_package/打样记录_02.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 2",
+      "evidence": [
+        "记录提交日期: 2026-05-31",
+        "授权有效期至: 2026-05-26",
+        "超期天数: 5 天",
+        "该物料检测到多种颜色版本混用: C01-经典蓝, C02-活力橙",
+        "各版本数量: C01-经典蓝=2条, C02-活力橙=1条"
+      ]
+    },
+    {
+      "record_id": "REC0007",
+      "material_name": "工作证-员工",
+      "abnormal_type": "AbnormalType.AUTHORIZATION_EXPIRED",
+      "reason": "授权已过期 - 提交时授权已失效 5 天",
+      "source_file": "./test_data/sample_package/打样记录_02.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 3",
+      "evidence": [
+        "记录提交日期: 2026-05-31",
+        "授权有效期至: 2026-05-26",
+        "超期天数: 5 天"
+      ]
+    },
+    {
+      "record_id": "REC0008",
+      "material_name": "信封-大号",
+      "abnormal_type": "AbnormalType.MANUAL_CORRECTION",
+      "reason": "导出规格待确认 - 缺少授权文件中的规格对照",
+      "source_file": "./test_data/sample_package/打样记录_02.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 4",
+      "evidence": [
+        "记录使用规格: 100x60mm",
+        "未找到对应授权文件中的规格列表",
+        "无法确认导出规格是否正确"
+      ]
+    },
+    {
+      "record_id": "REC0008",
+      "material_name": "信封-大号",
+      "abnormal_type": "AbnormalType.COLOR_VERSION_MIXED",
+      "reason": "导出规格待确认 - 缺少授权文件中的规格对照",
+      "source_file": "./test_data/sample_package/打样记录_02.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 4",
+      "evidence": [
+        "记录使用规格: 100x60mm",
+        "未找到对应授权文件中的规格列表",
+        "无法确认导出规格是否正确"
+      ]
+    },
+    {
+      "record_id": "REC0008",
+      "material_name": "信封-大号",
+      "abnormal_type": "AbnormalType.EXPORT_SPEC_MISSED",
+      "reason": "导出规格待确认 - 缺少授权文件中的规格对照",
+      "source_file": "./test_data/sample_package/打样记录_02.xlsx",
+      "source_location": "工作表: 打样明细, 行号: 4",
+      "evidence": [
+        "记录使用规格: 100x60mm",
+        "未找到对应授权文件中的规格列表",
+        "无法确认导出规格是否正确"
+      ]
+    }
+  ],
+  "pending_summary": {
+    "authorization_expired": [
+      {
+        "record_id": "REC0001",
+        "material_name": "品牌名片-标准版",
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本"
+      },
+      {
+        "record_id": "REC0002",
+        "material_name": "品牌名片-标准版",
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本"
+      },
+      {
+        "record_id": "REC0003",
+        "material_name": "信封-大号",
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本"
+      },
+      {
+        "record_id": "REC0004",
+        "material_name": "信纸-A4",
+        "reason": "导出规格漏改待确认 - 记录规格与授权规格不匹配"
+      },
+      {
+        "record_id": "REC0005",
+        "material_name": "文件夹-蓝色",
+        "reason": "授权已过期 - 提交时授权已失效 5 天"
+      },
+      {
+        "record_id": "REC0006",
+        "material_name": "品牌名片-标准版",
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本"
+      },
+      {
+        "record_id": "REC0007",
+        "material_name": "工作证-员工",
+        "reason": "授权已过期 - 提交时授权已失效 5 天"
+      }
+    ],
+    "color_version_mixed": [
+      {
+        "record_id": "REC0001",
+        "material_name": "品牌名片-标准版",
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本"
+      },
+      {
+        "record_id": "REC0002",
+        "material_name": "品牌名片-标准版",
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本"
+      },
+      {
+        "record_id": "REC0003",
+        "material_name": "信封-大号",
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本"
+      },
+      {
+        "record_id": "REC0004",
+        "material_name": "信纸-A4",
+        "reason": "导出规格漏改待确认 - 记录规格与授权规格不匹配"
+      },
+      {
+        "record_id": "REC0006",
+        "material_name": "品牌名片-标准版",
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本"
+      },
+      {
+        "record_id": "REC0008",
+        "material_name": "信封-大号",
+        "reason": "导出规格待确认 - 缺少授权文件中的规格对照"
+      }
+    ],
+    "duplicate": [
+      {
+        "record_id": "REC0002",
+        "material_name": "品牌名片-标准版",
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本"
+      }
+    ],
+    "manual_correction": [
+      {
+        "record_id": "REC0004",
+        "material_name": "信纸-A4",
+        "reason": "导出规格漏改待确认 - 记录规格与授权规格不匹配"
+      },
+      {
+        "record_id": "REC0008",
+        "material_name": "信封-大号",
+        "reason": "导出规格待确认 - 缺少授权文件中的规格对照"
+      }
+    ],
+    "export_spec_missed": [
+      {
+        "record_id": "REC0004",
+        "material_name": "信纸-A4",
+        "reason": "导出规格漏改待确认 - 记录规格与授权规格不匹配"
+      },
+      {
+        "record_id": "REC0008",
+        "material_name": "信封-大号",
+        "reason": "导出规格待确认 - 缺少授权文件中的规格对照"
+      }
+    ]
+  }
+}

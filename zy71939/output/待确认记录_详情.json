@@ -1,0 +1,314 @@
+{
+  "generated_at": "2026-05-31T19:29:23.123961",
+  "total_pending": 8,
+  "records": [
+    {
+      "record_id": "REC0001",
+      "material_name": "品牌名片-标准版",
+      "color_version": "C01-经典蓝",
+      "spec": "85x54mm",
+      "status": "pending",
+      "abnormal_types": [
+        "AbnormalType.AUTHORIZATION_EXPIRED",
+        "AbnormalType.COLOR_VERSION_MIXED"
+      ],
+      "source": {
+        "file_path": "./test_data/sample_package/打样记录_01.xlsx",
+        "sheet_name": "打样明细",
+        "line_number": 2
+      },
+      "verification": {
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+        "evidence": [
+          "记录提交日期: 2026-05-31",
+          "授权有效期至: 2026-05-26",
+          "超期天数: 5 天",
+          "该物料检测到多种颜色版本混用: C01-经典蓝, C02-活力橙",
+          "各版本数量: C01-经典蓝=2条, C02-活力橙=1条"
+        ]
+      },
+      "related_sources": [
+        {
+          "file_path": "./test_data/sample_package/打样记录_01.xlsx",
+          "sheet_name": "打样明细",
+          "line_number": 2,
+          "original_value": "{'物料名称': '品牌名片-标准版', '颜色版本': 'C01-经典蓝', '规格': '85x54mm', '授权编号': 'AUTH-2024-Q1-001', '授权有效期': '2026-05-26', '提交时间': '2026-05-31 19:28:33', '备注': nan}"
+        },
+        {
+          "file_path": "./test_data/sample_package/品牌授权_2024Q1.xlsx",
+          "sheet_name": null,
+          "line_number": null,
+          "original_value": "授权编号: AUTH-2024-Q1-001, 有效期至: 2026-05-26 00:00:00"
+        }
+      ]
+    },
+    {
+      "record_id": "REC0002",
+      "material_name": "品牌名片-标准版",
+      "color_version": "C01-经典蓝",
+      "spec": "85x54mm",
+      "status": "pending",
+      "abnormal_types": [
+        "AbnormalType.DUPLICATE",
+        "AbnormalType.AUTHORIZATION_EXPIRED",
+        "AbnormalType.COLOR_VERSION_MIXED"
+      ],
+      "source": {
+        "file_path": "./test_data/sample_package/打样记录_01.xlsx",
+        "sheet_name": "打样明细",
+        "line_number": 3
+      },
+      "verification": {
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+        "evidence": [
+          "记录提交日期: 2026-05-31",
+          "授权有效期至: 2026-05-26",
+          "超期天数: 5 天",
+          "该物料检测到多种颜色版本混用: C01-经典蓝, C02-活力橙",
+          "各版本数量: C01-经典蓝=2条, C02-活力橙=1条"
+        ]
+      },
+      "related_sources": [
+        {
+          "file_path": "./test_data/sample_package/打样记录_01.xlsx",
+          "sheet_name": "打样明细",
+          "line_number": 3,
+          "original_value": "{'物料名称': '品牌名片-标准版', '颜色版本': 'C01-经典蓝', '规格': '85x54mm', '授权编号': 'AUTH-2024-Q1-001', '授权有效期': '2026-05-26', '提交时间': '2026-05-31 19:28:33', '备注': '重复提交'}"
+        },
+        {
+          "file_path": "./test_data/sample_package/品牌授权_2024Q1.xlsx",
+          "sheet_name": null,
+          "line_number": null,
+          "original_value": "授权编号: AUTH-2024-Q1-001, 有效期至: 2026-05-26 00:00:00"
+        }
+      ]
+    },
+    {
+      "record_id": "REC0003",
+      "material_name": "信封-大号",
+      "color_version": "C02-活力橙",
+      "spec": "90x54mm",
+      "status": "pending",
+      "abnormal_types": [
+        "AbnormalType.AUTHORIZATION_EXPIRED",
+        "AbnormalType.COLOR_VERSION_MIXED"
+      ],
+      "source": {
+        "file_path": "./test_data/sample_package/打样记录_01.xlsx",
+        "sheet_name": "打样明细",
+        "line_number": 4
+      },
+      "verification": {
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+        "evidence": [
+          "记录提交日期: 2026-05-31",
+          "授权有效期至: 2026-05-26",
+          "超期天数: 5 天",
+          "该物料检测到多种颜色版本混用: C02-活力橙, C04-深灰",
+          "各版本数量: C02-活力橙=1条, C04-深灰=1条"
+        ]
+      },
+      "related_sources": [
+        {
+          "file_path": "./test_data/sample_package/打样记录_01.xlsx",
+          "sheet_name": "打样明细",
+          "line_number": 4,
+          "original_value": "{'物料名称': '信封-大号', '颜色版本': 'C02-活力橙', '规格': '90x54mm', '授权编号': 'AUTH-2024-Q1-001', '授权有效期': '2026-05-26', '提交时间': '2026-05-31 19:28:33', '备注': nan}"
+        },
+        {
+          "file_path": "./test_data/sample_package/品牌授权_2024Q1.xlsx",
+          "sheet_name": null,
+          "line_number": null,
+          "original_value": "授权编号: AUTH-2024-Q1-001, 有效期至: 2026-05-26 00:00:00"
+        }
+      ]
+    },
+    {
+      "record_id": "REC0004",
+      "material_name": "信纸-A4",
+      "color_version": "C99-神秘紫",
+      "spec": "210x297mm",
+      "status": "pending",
+      "abnormal_types": [
+        "AbnormalType.MANUAL_CORRECTION",
+        "AbnormalType.AUTHORIZATION_EXPIRED",
+        "AbnormalType.COLOR_VERSION_MIXED",
+        "AbnormalType.EXPORT_SPEC_MISSED"
+      ],
+      "source": {
+        "file_path": "./test_data/sample_package/打样记录_01.xlsx",
+        "sheet_name": "打样明细",
+        "line_number": 5
+      },
+      "verification": {
+        "reason": "导出规格漏改待确认 - 记录规格与授权规格不匹配",
+        "evidence": [
+          "记录使用规格: 210x297mm",
+          "授权允许的规格: 85x54mm, 90x54mm",
+          "请确认是否漏改导出规格"
+        ]
+      },
+      "related_sources": [
+        {
+          "file_path": "./test_data/sample_package/打样记录_01.xlsx",
+          "sheet_name": "打样明细",
+          "line_number": 5,
+          "original_value": "{'物料名称': '信纸-A4', '颜色版本': 'C99-神秘紫', '规格': '210x297mm', '授权编号': 'AUTH-2024-Q1-001', '授权有效期': '2026-05-26', '提交时间': '2026-05-31 19:28:33', '备注': '人工更正: 颜色调整'}"
+        },
+        {
+          "file_path": "./test_data/sample_package/品牌授权_2024Q1.xlsx",
+          "sheet_name": null,
+          "line_number": null,
+          "original_value": "授权规格: 85x54mm, 90x54mm"
+        }
+      ]
+    },
+    {
+      "record_id": "REC0005",
+      "material_name": "文件夹-蓝色",
+      "color_version": "C03-自然绿",
+      "spec": "85x54mm",
+      "status": "pending",
+      "abnormal_types": [
+        "AbnormalType.AUTHORIZATION_EXPIRED"
+      ],
+      "source": {
+        "file_path": "./test_data/sample_package/打样记录_01.xlsx",
+        "sheet_name": "打样明细",
+        "line_number": 6
+      },
+      "verification": {
+        "reason": "授权已过期 - 提交时授权已失效 5 天",
+        "evidence": [
+          "记录提交日期: 2026-05-31",
+          "授权有效期至: 2026-05-26",
+          "超期天数: 5 天"
+        ]
+      },
+      "related_sources": [
+        {
+          "file_path": "./test_data/sample_package/打样记录_01.xlsx",
+          "sheet_name": "打样明细",
+          "line_number": 6,
+          "original_value": "{'物料名称': '文件夹-蓝色', '颜色版本': 'C03-自然绿', '规格': '85x54mm', '授权编号': 'AUTH-2024-Q1-001', '授权有效期': '2026-05-26', '提交时间': '2026-05-31 19:28:33', '备注': nan}"
+        },
+        {
+          "file_path": "./test_data/sample_package/品牌授权_2024Q1.xlsx",
+          "sheet_name": null,
+          "line_number": null,
+          "original_value": "授权编号: AUTH-2024-Q1-001, 有效期至: 2026-05-26 00:00:00"
+        }
+      ]
+    },
+    {
+      "record_id": "REC0006",
+      "material_name": "品牌名片-标准版",
+      "color_version": "C02-活力橙",
+      "spec": "85x54mm",
+      "status": "pending",
+      "abnormal_types": [
+        "AbnormalType.AUTHORIZATION_EXPIRED",
+        "AbnormalType.COLOR_VERSION_MIXED"
+      ],
+      "source": {
+        "file_path": "./test_data/sample_package/打样记录_02.xlsx",
+        "sheet_name": "打样明细",
+        "line_number": 2
+      },
+      "verification": {
+        "reason": "颜色版本混用待确认 - 同一物料存在多个颜色版本",
+        "evidence": [
+          "记录提交日期: 2026-05-31",
+          "授权有效期至: 2026-05-26",
+          "超期天数: 5 天",
+          "该物料检测到多种颜色版本混用: C01-经典蓝, C02-活力橙",
+          "各版本数量: C01-经典蓝=2条, C02-活力橙=1条"
+        ]
+      },
+      "related_sources": [
+        {
+          "file_path": "./test_data/sample_package/打样记录_02.xlsx",
+          "sheet_name": "打样明细",
+          "line_number": 2,
+          "original_value": "{'物料名称': '品牌名片-标准版', '颜色版本': 'C02-活力橙', '规格': '85x54mm', '授权编号': 'AUTH-2024-Q1-001', '授权有效期': '2026-05-26', '提交时间': '2026-05-31 19:28:33', '备注': nan}"
+        },
+        {
+          "file_path": "./test_data/sample_package/品牌授权_2024Q1.xlsx",
+          "sheet_name": null,
+          "line_number": null,
+          "original_value": "授权编号: AUTH-2024-Q1-001, 有效期至: 2026-05-26 00:00:00"
+        }
+      ]
+    },
+    {
+      "record_id": "REC0007",
+      "material_name": "工作证-员工",
+      "color_version": "C01-经典蓝",
+      "spec": "85x54mm",
+      "status": "pending",
+      "abnormal_types": [
+        "AbnormalType.AUTHORIZATION_EXPIRED"
+      ],
+      "source": {
+        "file_path": "./test_data/sample_package/打样记录_02.xlsx",
+        "sheet_name": "打样明细",
+        "line_number": 3
+      },
+      "verification": {
+        "reason": "授权已过期 - 提交时授权已失效 5 天",
+        "evidence": [
+          "记录提交日期: 2026-05-31",
+          "授权有效期至: 2026-05-26",
+          "超期天数: 5 天"
+        ]
+      },
+      "related_sources": [
+        {
+          "file_path": "./test_data/sample_package/打样记录_02.xlsx",
+          "sheet_name": "打样明细",
+          "line_number": 3,
+          "original_value": "{'物料名称': '工作证-员工', '颜色版本': 'C01-经典蓝', '规格': '85x54mm', '授权编号': 'AUTH-2024-Q1-001', '授权有效期': '2026-05-26', '提交时间': '2026-05-31 19:28:33', '备注': nan}"
+        },
+        {
+          "file_path": "./test_data/sample_package/品牌授权_2024Q1.xlsx",
+          "sheet_name": null,
+          "line_number": null,
+          "original_value": "授权编号: AUTH-2024-Q1-001, 有效期至: 2026-05-26 00:00:00"
+        }
+      ]
+    },
+    {
+      "record_id": "REC0008",
+      "material_name": "信封-大号",
+      "color_version": "C04-深灰",
+      "spec": "100x60mm",
+      "status": "pending",
+      "abnormal_types": [
+        "AbnormalType.MANUAL_CORRECTION",
+        "AbnormalType.COLOR_VERSION_MIXED",
+        "AbnormalType.EXPORT_SPEC_MISSED"
+      ],
+      "source": {
+        "file_path": "./test_data/sample_package/打样记录_02.xlsx",
+        "sheet_name": "打样明细",
+        "line_number": 4
+      },
+      "verification": {
+        "reason": "导出规格待确认 - 缺少授权文件中的规格对照",
+        "evidence": [
+          "记录使用规格: 100x60mm",
+          "未找到对应授权文件中的规格列表",
+          "无法确认导出规格是否正确"
+        ]
+      },
+      "related_sources": [
+        {
+          "file_path": "./test_data/sample_package/打样记录_02.xlsx",
+          "sheet_name": "打样明细",
+          "line_number": 4,
+          "original_value": "{'物料名称': '信封-大号', '颜色版本': 'C04-深灰', '规格': '100x60mm', '授权编号': 'AUTH-2024-Q1-002', '授权有效期': '2026-06-30', '提交时间': '2026-05-31 19:28:33', '备注': 'correction: updated spec'}"
+        }
+      ]
+    }
+  ]
+}
