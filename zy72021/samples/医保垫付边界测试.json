@@ -1,0 +1,59 @@
+[
+  {
+    "id": "rec-empty-004",
+    "pharmacyName": "",
+    "flowNo": "YB-2026-04-004",
+    "flowAmount": null,
+    "contractAmount": null,
+    "insuranceAmount": null,
+    "source": "flow",
+    "paymentFlows": [],
+    "refundRequests": [],
+    "approvalMails": [],
+    "notes": []
+  },
+  {
+    "id": "rec-dup-005",
+    "pharmacyName": "康民大药房（朝阳店）",
+    "flowNo": "YB-2026-04-001",
+    "flowAmount": 128500.0,
+    "contractAmount": 128500.0,
+    "insuranceAmount": 115650.0,
+    "source": "flow",
+    "paymentFlows": [
+      {
+        "id": "pf-005",
+        "flowNo": "SK-20260415-001",
+        "amount": 128500.0,
+        "payDate": "2026-04-15",
+        "payType": "医保垫付",
+        "remark": "重复导入测试"
+      }
+    ],
+    "refundRequests": [],
+    "approvalMails": [],
+    "notes": []
+  },
+  {
+    "id": "rec-boundary-006",
+    "pharmacyName": "惠民药店（东城店）",
+    "flowNo": "YB-2026-04-999",
+    "flowAmount": 0,
+    "contractAmount": 0,
+    "insuranceAmount": 0,
+    "source": "manual",
+    "paymentFlows": [
+      {
+        "id": "pf-006",
+        "flowNo": "SK-20260430-999",
+        "amount": 0,
+        "payDate": "2026-04-30",
+        "payType": "医保垫付",
+        "remark": "边界测试：零金额记录"
+      }
+    ],
+    "refundRequests": [],
+    "approvalMails": [],
+    "notes": []
+  }
+]
