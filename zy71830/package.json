@@ -1,0 +1,31 @@
+{
+  "name": "hex-territory-simulator",
+  "version": "1.0.0",
+  "description": "六边形领地推演系统 - 人性化的战棋推演工具",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "tsx src/cli.ts",
+    "test": "node --test",
+    "demo": "tsx src/demo.ts"
+  },
+  "keywords": [
+    "hex",
+    "territory",
+    "simulator",
+    "game",
+    "wargame"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0"
+  }
+}
