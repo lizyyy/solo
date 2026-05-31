@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>函数图像陷阱 — 判断审计系统</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #181a24;
+  --surface2: #1e2030;
+  --border: #2a2d3e;
+  --text: #e4e6f0;
+  --text2: #9498ad;
+  --accent: #6c8cff;
+  --accent2: #4a6bff;
+  --warn: #ffb347;
+  --danger: #ff6b6b;
+  --success: #51cf8a;
+  --pending: #ff9f43;
+  --normal: #51cf8a;
+  --rollback: #a78bfa;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
+
+.app-header .subtitle {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.alert-banner {
+  background: linear-gradient(90deg, rgba(255,159,67,0.15), rgba(255,107,107,0.1));
+  border-bottom: 1px solid rgba(255,159,67,0.3);
+  padding: 10px 24px;
+  font-size: 13px;
+  color: var(--warn);
+  display: none;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.alert-banner.visible { display: flex; }
+
+.alert-banner .badge {
+  background: var(--warn);
+  color: #000;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 340px;
+  height: calc(100vh - 57px);
+}
+
+.panel {
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.panel-right {
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
+.panel-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.section { margin-bottom: 20px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover { background: var(--accent2); color: #fff; }
+
+.btn-danger { border-color: var(--danger); color: var(--danger); }
+.btn-danger:hover { background: var(--danger); color: #fff; }
+
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+
+.btn-block { width: 100%; justify-content: center; }
+
+.import-zone {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  color: var(--text2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+
+.import-zone:hover { border-color: var(--accent); color: var(--accent); }
+
+.import-zone.dragover { border-color: var(--accent); background: rgba(108,140,255,0.05); }
+
+.filter-group { margin-bottom: 12px; }
+
+.filter-group label {
+  display: block;
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+
+.filter-group select,
+.filter-group input {
+  width: 100%;
+  padding: 6px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+  border-color: var(--accent);
+}
+
+.main-content {
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.records-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.records-count {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.record-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: border-color 0.15s;
+  cursor: pointer;
+}
+
+.record-card:hover { border-color: var(--accent); }
+
+.record-card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+.record-card.pending-confirmation {
+  border-left: 3px solid var(--pending);
+}
+
+.record-card.status-normal {
+  border-left: 3px solid var(--normal);
+}
+
+.record-card.status-rollback {
+  border-left: 3px solid var(--rollback);
+}
+
+.record-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.record-id {
+  font-size: 12px;
+  color: var(--text2);
+  font-family: monospace;
+}
+
+.status-badge {
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.status-badge.normal { background: rgba(81,207,138,0.15); color: var(--normal); }
+.status-badge.pending { background: rgba(255,159,67,0.15); color: var(--pending); }
+.status-badge.rollback { background: rgba(167,139,250,0.15); color: var(--rollback); }
+
+.record-question {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.record-answer-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.answer-box {
+  background: var(--surface2);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.answer-box .label {
+  font-size: 11px;
+  color: var(--text2);
+  margin-bottom: 2px;
+}
+
+.record-reason {
+  background: rgba(108,140,255,0.08);
+  border: 1px solid rgba(108,140,255,0.2);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.record-reason .reason-label {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.record-nextstep {
+  background: rgba(81,207,138,0.08);
+  border: 1px solid rgba(81,207,138,0.2);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.record-nextstep .nextstep-label {
+  font-size: 11px;
+  color: var(--success);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.change-alert-inline {
+  background: rgba(255,159,67,0.1);
+  border: 1px solid rgba(255,159,67,0.25);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--warn);
+}
+
+.change-alert-inline .alert-label {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.record-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.audit-timeline {
+  padding: 0;
+}
+
+.audit-entry {
+  position: relative;
+  padding-left: 20px;
+  padding-bottom: 16px;
+  border-left: 2px solid var(--border);
+  margin-left: 8px;
+}
+
+.audit-entry:last-child { border-left-color: transparent; padding-bottom: 0; }
+
+.audit-entry::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.audit-entry.action-import::before { background: var(--accent); }
+.audit-entry.action-judge::before { background: var(--success); }
+.audit-entry.action-rollback::before { background: var(--rollback); }
+.audit-entry.action-correct::before { background: var(--warn); }
+.audit-entry.action-export::before { background: var(--text2); }
+.audit-entry.action-reupload::before { background: var(--danger); }
+
+.audit-time {
+  font-size: 11px;
+  color: var(--text2);
+  font-family: monospace;
+}
+
+.audit-action {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 2px 0;
+}
+
+.audit-detail {
+  font-size: 12px;
+  color: var(--text2);
+  padding: 6px 8px;
+  background: var(--surface2);
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.audit-diff {
+  margin-top: 4px;
+}
+
+.audit-diff .diff-old {
+  color: var(--danger);
+  text-decoration: line-through;
+  font-size: 12px;
+}
+
+.audit-diff .diff-new {
+  color: var(--success);
+  font-size: 12px;
+}
+
+.change-alert-card {
+  background: var(--surface);
+  border: 1px solid rgba(255,159,67,0.3);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.change-alert-card .alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.change-alert-card .alert-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--warn);
+}
+
+.change-alert-card .alert-time {
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.change-alert-card .alert-body {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.change-alert-card .diff-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.change-alert-card .diff-old { color: var(--danger); text-decoration: line-through; }
+.change-alert-card .diff-new { color: var(--success); }
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--text2);
+  font-size: 14px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.visible { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  width: 520px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal h3 {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.modal .form-group { margin-bottom: 14px; }
+
+.modal label {
+  display: block;
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+
+.modal textarea,
+.modal input,
+.modal select {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.modal textarea:focus,
+.modal input:focus,
+.modal select:focus {
+  border-color: var(--accent);
+}
+
+.modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.toast-container {
+  position: fixed;
+  top: 70px;
+  right: 24px;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  min-width: 280px;
+  animation: slideIn 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast.toast-warn { border-color: var(--warn); }
+.toast.toast-error { border-color: var(--danger); }
+.toast.toast-success { border-color: var(--success); }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.stat-card {
+  background: var(--surface2);
+  border-radius: 6px;
+  padding: 10px;
+  text-align: center;
+}
+
+.stat-card .stat-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.stat-card .stat-label {
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.stat-card.stat-normal .stat-value { color: var(--normal); }
+.stat-card.stat-pending .stat-value { color: var(--pending); }
+.stat-card.stat-rollback .stat-value { color: var(--rollback); }
+
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.history-version {
+  font-size: 11px;
+  color: var(--text2);
+  background: var(--surface2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-left: 4px;
+}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>⚡ 函数图像陷阱</h1>
+  <span class="subtitle">判断审计系统 — 每一步留痕，绝不静默覆盖</span>
+</div>
+
+<div class="alert-banner" id="globalAlertBanner" onclick="scrollToAlerts()">
+  <span>⚠️</span>
+  <span id="alertBannerText">有变更提醒</span>
+  <span class="badge" id="alertBannerCount">0</span>
+</div>
+
+<div class="layout">
+  <div class="panel" id="leftPanel">
+    <div class="section">
+      <div class="panel-title">📥 导入数据</div>
+      <div class="import-zone" id="importZone"
+           ondragover="event.preventDefault(); this.classList.add('dragover')"
+           ondragleave="this.classList.remove('dragover')"
+           ondrop="handleDrop(event)"
+           onclick="document.getElementById('fileInput').click()">
+        拖拽 JSON 文件到此处<br>或点击选择文件
+        <input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileSelect(event)">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="loadDemoData()">载入演示数据</button>
+    </div>
+
+    <div class="section">
+      <div class="panel-title">🔍 筛选</div>
+      <div class="filter-group">
+        <label>判断状态</label>
+        <select id="filterStatus" onchange="applyFilters()">
+          <option value="all">全部</option>
+          <option value="normal">✅ 正常</option>
+          <option value="pending_confirmation">⚠️ 待确认</option>
+          <option value="rollback">↩️ 已撤回</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>陷阱类型</label>
+        <select id="filterTrap" onchange="applyFilters()">
+          <option value="all">全部</option>
+          <option value="equivalent_misjudge">等价答案误判</option>
+          <option value="step_score_bias">分步得分算偏</option>
+          <option value="empty_set_boundary">空集边界漏掉</option>
+          <option value="none">无陷阱</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>题目ID搜索</label>
+        <input type="text" id="filterId" placeholder="输入ID..." oninput="applyFilters()">
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="panel-title">📤 导出</div>
+      <button class="btn btn-block" onclick="exportRecords('all')">导出全部记录</button>
+      <div style="height:6px"></div>
+      <button class="btn btn-block" onclick="exportRecords('filtered')">导出筛选结果</button>
+      <div style="height:6px"></div>
+      <button class="btn btn-block" onclick="exportAuditTrail()">导出审计日志</button>
+    </div>
+
+    <div class="section">
+      <div class="panel-title">📊 统计</div>
+      <div class="stats-row">
+        <div class="stat-card stat-normal">
+          <div class="stat-value" id="statNormal">0</div>
+          <div class="stat-label">正常</div>
+        </div>
+        <div class="stat-card stat-pending">
+          <div class="stat-value" id="statPending">0</div>
+          <div class="stat-label">待确认</div>
+        </div>
+        <div class="stat-card stat-rollback">
+          <div class="stat-value" id="statRollback">0</div>
+          <div class="stat-label">已撤回</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content" id="mainContent">
+    <div class="records-header">
+      <div class="records-count" id="recordsCount">共 0 条记录</div>
+    </div>
+    <div id="recordsList">
+      <div class="empty-state">
+        尚未导入数据<br>请从左侧导入 JSON 或载入演示数据
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-right" id="rightPanel">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchRightTab('audit')">审计轨迹</button>
+      <button class="tab-btn" onclick="switchRightTab('alerts')">变更提醒</button>
+    </div>
+
+    <div id="tabAudit">
+      <div class="panel-title">📝 判断详情与审计轨迹</div>
+      <div id="auditContent">
+        <div class="empty-state" style="padding:20px">点击左侧记录查看审计轨迹</div>
+      </div>
+    </div>
+
+    <div id="tabAlerts" style="display:none">
+      <div class="panel-title">🔔 变更提醒</div>
+      <div id="alertsContent">
+        <div class="empty-state" style="padding:20px">暂无变更提醒</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="correctModal">
+  <div class="modal">
+    <h3>修正判断</h3>
+    <div class="form-group">
+      <label>新判断结果</label>
+      <select id="correctResult">
+        <option value="correct">✅ 正确</option>
+        <option value="wrong">❌ 错误</option>
+        <option value="partial">🔸 部分正确</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>修正原因（必填，将写入审计日志）</label>
+      <textarea id="correctReason" rows="3" placeholder="请说明修正原因..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>下一步建议</label>
+      <textarea id="correctNextStep" rows="2" placeholder="建议备课组如何处理..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeCorrectModal()">取消</button>
+      <button class="btn btn-primary" onclick="submitCorrection()">确认修正</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="reuploadModal">
+  <div class="modal">
+    <h3>⚠️ 检测到旧版本补传</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">
+      以下字段与已有记录不同，系统不会静默覆盖，请逐项确认：
+    </p>
+    <div id="reuploadDiffs"></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" onclick="closeReuploadModal()">放弃导入</button>
+      <button class="btn btn-primary" onclick="confirmReupload()">确认并导入（留痕）</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+let store = {
+  records: [],
+  auditLog: [],
+  changeAlerts: [],
+  selectedId: null,
+  filteredIds: null,
+  importBatchCounter: 0,
+};
+
+function genId() {
+  return 'Q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function now() {
+  return new Date().toLocaleString('zh-CN', { hour12: false });
+}
+
+function addAudit(recordId, action, detail, diff) {
+  const entry = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+    recordId,
+    action,
+    detail,
+    timestamp: now(),
+    diff: diff || null,
+  };
+  store.auditLog.push(entry);
+  return entry;
+}
+
+function addChangeAlert(recordId, field, oldVal, newVal, source) {
+  const alert = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+    recordId,
+    field,
+    oldValue: oldVal,
+    newValue: newVal,
+    source: source || '补传',
+    timestamp: now(),
+    dismissed: false,
+  };
+  store.changeAlerts.push(alert);
+  updateAlertBanner();
+  return alert;
+}
+
+function updateAlertBanner() {
+  const active = store.changeAlerts.filter(a => !a.dismissed);
+  const banner = document.getElementById('globalAlertBanner');
+  const countEl = document.getElementById('alertBannerCount');
+  const textEl = document.getElementById('alertBannerText');
+  if (active.length > 0) {
+    banner.classList.add('visible');
+    countEl.textContent = active.length;
+    textEl.textContent = `有 ${active.length} 条变更需要确认`;
+  } else {
+    banner.classList.remove('visible');
+  }
+}
+
+function showToast(msg, type) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-' + (type || 'info');
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+
+function detectTrapType(record) {
+  const traps = [];
+  if (record.studentAnswer && record.standardAnswer) {
+    const sNorm = normalizeExpr(record.studentAnswer);
+    const aNorm = normalizeExpr(record.standardAnswers ? record.standardAnswers.join(';') : record.standardAnswer);
+    if (sNorm !== aNorm && isEquivalentExpr(record.studentAnswer, record.standardAnswer)) {
+      traps.push('equivalent_misjudge');
+    }
+  }
+  if (record.stepScores && record.stepScores.length > 0) {
+    const total = record.stepScores.reduce((a, b) => a + b, 0);
+    if (Math.abs(total - record.totalScore) > 0.01) {
+      traps.push('step_score_bias');
+    }
+  }
+  if (record.questionType === 'set' || (record.standardAnswer && record.standardAnswer.includes('∅'))) {
+    if (!record.emptySetHandled) {
+      traps.push('empty_set_boundary');
+    }
+  }
+  return traps.length > 0 ? traps : ['none'];
+}
+
+function normalizeExpr(expr) {
+  if (!expr) return '';
+  return expr.replace(/\s+/g, '')
+    .replace(/（/g, '(').replace(/）/g, ')')
+    .replace(/，/g, ',').replace(/；/g, ';')
+    .toLowerCase();
+}
+
+function isEquivalentExpr(a, b) {
+  if (!a || !b) return false;
+  const na = normalizeExpr(a);
+  const nb = normalizeExpr(b);
+  if (na === nb) return true;
+  const stripPrefixes = [
+    /^y[_]?min=/, /^y[_]?max=/, /^x=/, /^a=/, /^b=/, /^n=/,
+    /^f\([^)]*\)=/, /^y=/, /^最小值[：:]/, /^最大值[：:]/,
+  ];
+  let va = na, vb = nb;
+  for (const pat of stripPrefixes) {
+    va = va.replace(pat, '');
+    vb = vb.replace(pat, '');
+  }
+  if (va && vb && va === vb) return true;
+  const swapPairs = [
+    ['a>b', 'b<a'], ['a>=b', 'b<=a'], ['a<b', 'b>a'], ['a<=b', 'b>=a'],
+  ];
+  for (const [p, q] of swapPairs) {
+    if ((na === p && nb === q) || (na === q && nb === p)) return true;
+  }
+  if (na.replace(/[≥]/g, '>=').replace(/[≤]/g, '<=') ===
+      nb.replace(/[≥]/g, '>=').replace(/[≤]/g, '<=')) return true;
+  if (/^[a-z]\s*[><]=?\s*\d/.test(na) && /^[a-z]\s*[><]=?\s*\d/.test(nb)) {
+    if (na.replace(/\s*/g, '') === nb.replace(/\s*/g, '')) return true;
+  }
+  try {
+    const naNum = Number(va);
+    const nbNum = Number(vb);
+    if (!isNaN(naNum) && !isNaN(nbNum) && naNum === nbNum) return true;
+  } catch(e) {}
+  return false;
+}
+
+function autoJudge(record) {
+  const traps = detectTrapType(record);
+  const hasEquivalent = traps.includes('equivalent_misjudge');
+  const hasStepBias = traps.includes('step_score_bias');
+  const hasEmptySet = traps.includes('empty_set_boundary');
+
+  let judgment = record.originalJudgment || 'correct';
+  let reason = '';
+  let nextStep = '';
+  let status = 'normal';
+
+  if (hasEquivalent) {
+    const studentNorm = normalizeExpr(record.studentAnswer);
+    const standardNorm = normalizeExpr(record.standardAnswer);
+    if (studentNorm !== standardNorm) {
+      judgment = 'wrong';
+      reason = `等价答案误判：学生答案 "${record.studentAnswer}" 与标准答案 "${record.standardAnswer}" 表达形式不同但数学等价，系统误判为错误。等价形式包括：交换律、等价写法等。`;
+      nextStep = '请人工确认该答案是否等价，确认后修正为正确或部分正确，并在讲评稿中注明等价形式。';
+      status = 'pending_confirmation';
+    }
+  }
+
+  if (hasStepBias) {
+    const total = record.stepScores.reduce((a, b) => a + b, 0);
+    const existingReason = reason ? reason + '\n' : '';
+    reason = existingReason + `分步得分算偏：各步骤得分之和 ${total.toFixed(1)} 与总分 ${record.totalScore} 不一致，偏差 ${Math.abs(total - record.totalScore).toFixed(1)} 分。`;
+    nextStep = (nextStep ? nextStep + '；' : '') + '请核查各步骤赋分是否正确，修正后重新计算总分。';
+    status = 'pending_confirmation';
+  }
+
+  if (hasEmptySet) {
+    const existingReason = reason ? reason + '\n' : '';
+    reason = existingReason + `空集边界漏掉：题目涉及集合运算，但未检验空集情况。当参数取特定值时，集合可能为空集 ∅，此时结论可能不同。`;
+    nextStep = (nextStep ? nextStep + '；' : '') + '请补充空集边界条件检验，确认参数取值是否导致空集。';
+    status = 'pending_confirmation';
+  }
+
+  if (!reason) {
+    if (judgment === 'correct') {
+      reason = '答案与标准答案一致，未检测到陷阱。';
+      nextStep = '可正常纳入讲评稿。';
+    } else if (judgment === 'wrong') {
+      reason = '答案与标准答案不一致，且未检测到等价关系。';
+      nextStep = '确认为错误，纳入讲评稿错题部分。';
+    } else {
+      reason = '部分正确，得分未满分。';
+      nextStep = '核查部分得分是否合理。';
+    }
+  }
+
+  return { judgment, reason, nextStep, status, trapTypes: traps };
+}
+
+function importRecords(dataArray, source) {
+  const batchId = ++store.importBatchCounter;
+  const importedIds = [];
+  const reuploadConflicts = [];
+
+  for (const item of dataArray) {
+    const existingIdx = store.records.findIndex(r => r.questionId === item.questionId);
+
+    if (existingIdx >= 0) {
+      const existing = store.records[existingIdx];
+      const diffs = [];
+
+      if (item.difficulty !== undefined && item.difficulty !== existing.difficulty) {
+        diffs.push({ field: 'difficulty', oldVal: existing.difficulty, newVal: item.difficulty });
+      }
+      if (item.standardAnswer !== undefined && item.standardAnswer !== existing.standardAnswer) {
+        diffs.push({ field: 'standardAnswer', oldVal: existing.standardAnswer, newVal: item.standardAnswer });
+      }
+      if (item.totalScore !== undefined && item.totalScore !== existing.totalScore) {
+        diffs.push({ field: 'totalScore', oldVal: existing.totalScore, newVal: item.totalScore });
+      }
+
+      if (diffs.length > 0) {
+        reuploadConflicts.push({ item, existingIdx, diffs });
+        continue;
+      }
+
+      addAudit(existing.id, 'import', `重复导入，数据一致，跳过（批次 #${batchId}）`, null);
+      continue;
+    }
+
+    const record = {
+      id: genId(),
+      questionId: item.questionId || genId(),
+      question: item.question || '',
+      questionType: item.questionType || 'general',
+      standardAnswer: item.standardAnswer || '',
+      standardAnswers: item.standardAnswers || null,
+      studentAnswer: item.studentAnswer || '',
+      originalJudgment: item.judgment || null,
+      totalScore: item.totalScore || 0,
+      stepScores: item.stepScores || null,
+      emptySetHandled: item.emptySetHandled || false,
+      difficulty: item.difficulty || '',
+      importBatch: batchId,
+      importSource: source || '手动导入',
+      version: 1,
+      judgment: null,
+      reason: '',
+      nextStep: '',
+      status: 'pending_confirmation',
+      trapTypes: [],
+      createdAt: now(),
+      updatedAt: now(),
+    };
+
+    const result = autoJudge(record);
+    record.judgment = result.judgment;
+    record.reason = result.reason;
+    record.nextStep = result.nextStep;
+    record.status = result.status;
+    record.trapTypes = result.trapTypes;
+
+    store.records.push(record);
+    addAudit(record.id, 'import', `导入题目 "${record.questionId}"（批次 #${batchId}）`, null);
+    addAudit(record.id, 'judge', `自动判断：${result.judgment}，状态：${statusLabel(result.status)}`, null);
+    importedIds.push(record.id);
+  }
+
+  if (reuploadConflicts.length > 0) {
+    showReuploadModal(reuploadConflicts, batchId);
+  }
+
+  applyFilters();
+  updateStats();
+  showToast(`导入完成：新增 ${importedIds.length} 条，冲突 ${reuploadConflicts.length} 条`, reuploadConflicts.length > 0 ? 'warn' : 'success');
+  return importedIds;
+}
+
+function statusLabel(s) {
+  const map = { normal: '正常', pending_confirmation: '待确认', rollback: '已撤回' };
+  return map[s] || s;
+}
+
+function showReuploadModal(conflicts, batchId) {
+  const container = document.getElementById('reuploadDiffs');
+  container.innerHTML = '';
+  for (const c of conflicts) {
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--surface2);border-radius:6px;padding:10px;margin-bottom:8px;';
+    let html = `<div style="font-weight:600;font-size:13px;margin-bottom:6px">题目 ${c.item.questionId}</div>`;
+    for (const d of c.diffs) {
+      html += `<div class="diff-row"><span style="color:var(--text2);width:80px">${fieldLabel(d.field)}</span><span class="diff-old">${d.oldVal}</span><span style="color:var(--text2)">→</span><span class="diff-new">${d.newVal}</span></div>`;
+    }
+    div.innerHTML = html;
+    container.appendChild(div);
+  }
+  store._pendingReupload = { conflicts, batchId };
+  document.getElementById('reuploadModal').classList.add('visible');
+}
+
+function fieldLabel(f) {
+  const map = { difficulty: '难度', standardAnswer: '标准答案', totalScore: '总分' };
+  return map[f] || f;
+}
+
+function closeReuploadModal() {
+  document.getElementById('reuploadModal').classList.remove('visible');
+  store._pendingReupload = null;
+}
+
+function confirmReupload() {
+  if (!store._pendingReupload) return;
+  const { conflicts, batchId } = store._pendingReupload;
+  for (const c of conflicts) {
+    const existing = store.records[c.existingIdx];
+    for (const d of c.diffs) {
+      addChangeAlert(existing.id, d.field, d.oldVal, d.newVal, `批次 #${batchId} 补传`);
+      addAudit(existing.id, 'reupload', `补传变更：${fieldLabel(d.field)} 从 "${d.oldVal}" 变为 "${d.newVal}"`, { old: d.oldVal, new: d.newVal, field: d.field });
+      existing[d.field] = d.newVal;
+    }
+    existing.version++;
+    existing.updatedAt = now();
+
+    const result = autoJudge(existing);
+    const oldJudgment = existing.judgment;
+    const oldStatus = existing.status;
+    existing.judgment = result.judgment;
+    existing.reason = result.reason;
+    existing.nextStep = result.nextStep;
+    existing.status = result.status;
+    existing.trapTypes = result.trapTypes;
+    addAudit(existing.id, 'judge', `补传后重新判断：${oldJudgment} → ${result.judgment}，状态：${statusLabel(oldStatus)} → ${statusLabel(result.status)}`, { oldJudgment, newJudgment: result.judgment, oldStatus, newStatus: result.status });
+  }
+  closeReuploadModal();
+  applyFilters();
+  updateStats();
+  renderAlerts();
+  showToast(`${conflicts.length} 条补传已导入，变更已留痕`, 'warn');
+}
+
+function rollbackRecord(id) {
+  const record = store.records.find(r => r.id === id);
+  if (!record) return;
+  const oldStatus = record.status;
+  const oldJudgment = record.judgment;
+  record.status = 'rollback';
+  record.updatedAt = now();
+  addAudit(id, 'rollback', `撤回判断：${oldJudgment}（${statusLabel(oldStatus)}）→ 已撤回`, { oldJudgment, oldStatus });
+  applyFilters();
+  updateStats();
+  renderAuditTrail(id);
+  showToast('已撤回，可在审计轨迹中查看历史', 'success');
+}
+
+function openCorrectModal(id) {
+  store._correctingId = id;
+  document.getElementById('correctResult').value = 'correct';
+  document.getElementById('correctReason').value = '';
+  document.getElementById('correctNextStep').value = '';
+  document.getElementById('correctModal').classList.add('visible');
+}
+
+function closeCorrectModal() {
+  document.getElementById('correctModal').classList.remove('visible');
+  store._correctingId = null;
+}
+
+function submitCorrection() {
+  const id = store._correctingId;
+  if (!id) return;
+  const reason = document.getElementById('correctReason').value.trim();
+  if (!reason) {
+    showToast('修正原因不能为空，必须留痕', 'error');
+    return;
+  }
+  const record = store.records.find(r => r.id === id);
+  if (!record) return;
+
+  const newJudgment = document.getElementById('correctResult').value;
+  const nextStep = document.getElementById('correctNextStep').value.trim();
+  const oldJudgment = record.judgment;
+  const oldStatus = record.status;
+  const oldReason = record.reason;
+
+  record.judgment = newJudgment;
+  record.status = 'normal';
+  record.reason = reason;
+  record.nextStep = nextStep || '已人工确认，可纳入讲评稿。';
+  record.updatedAt = now();
+  record.version++;
+
+  addAudit(id, 'correct', `人工修正：${oldJudgment}（${statusLabel(oldStatus)}）→ ${newJudgment}（正常）`, {
+    oldJudgment, newJudgment, oldStatus, newStatus: 'normal',
+    correctionReason: reason,
+  });
+
+  closeCorrectModal();
+  applyFilters();
+  updateStats();
+  renderAuditTrail(id);
+  showToast('修正完成，已写入审计日志', 'success');
+}
+
+function applyFilters() {
+  const statusFilter = document.getElementById('filterStatus').value;
+  const trapFilter = document.getElementById('filterTrap').value;
+  const idFilter = document.getElementById('filterId').value.trim().toLowerCase();
+
+  let filtered = store.records;
+  if (statusFilter !== 'all') {
+    filtered = filtered.filter(r => r.status === statusFilter);
+  }
+  if (trapFilter !== 'all') {
+    filtered = filtered.filter(r => r.trapTypes.includes(trapFilter));
+  }
+  if (idFilter) {
+    filtered = filtered.filter(r => r.questionId.toLowerCase().includes(idFilter));
+  }
+  store.filteredIds = filtered.map(r => r.id);
+  renderRecords(filtered);
+  document.getElementById('recordsCount').textContent = `共 ${filtered.length} 条记录（总计 ${store.records.length} 条）`;
+}
+
+function renderRecords(records) {
+  const container = document.getElementById('recordsList');
+  if (records.length === 0) {
+    container.innerHTML = '<div class="empty-state">无匹配记录</div>';
+    return;
+  }
+  container.innerHTML = records.map(r => {
+    const statusClass = r.status === 'pending_confirmation' ? 'pending-confirmation' : r.status === 'rollback' ? 'status-rollback' : 'status-normal';
+    const badgeClass = r.status === 'pending_confirmation' ? 'pending' : r.status === 'rollback' ? 'rollback' : 'normal';
+    const badgeText = statusLabel(r.status);
+
+    const relatedAlerts = store.changeAlerts.filter(a => a.recordId === r.id && !a.dismissed);
+    let alertHtml = '';
+    for (const al of relatedAlerts) {
+      alertHtml += `<div class="change-alert-inline">
+        <div class="alert-label">🔔 变更提醒：${fieldLabel(al.field)}</div>
+        <div>"${al.oldValue}" → "${al.newValue}"（来源：${al.source}）</div>
+      </div>`;
+    }
+
+    return `<div class="record-card ${statusClass} ${store.selectedId === r.id ? 'active' : ''}" onclick="selectRecord('${r.id}')">
+      <div class="record-top">
+        <span class="record-id">${r.questionId} <span class="history-version">v${r.version}</span></span>
+        <span class="status-badge ${badgeClass}">${badgeText}</span>
+      </div>
+      <div class="record-question">${r.question}</div>
+      <div class="record-answer-row">
+        <div class="answer-box">
+          <div class="label">学生答案</div>
+          ${r.studentAnswer || '—'}
+        </div>
+        <div class="answer-box">
+          <div class="label">标准答案</div>
+          ${r.standardAnswer || '—'}
+        </div>
+      </div>
+      ${r.trapTypes.filter(t => t !== 'none').map(t => `<div style="font-size:11px;color:var(--danger);margin-bottom:4px">⚠️ ${trapLabel(t)}</div>`).join('')}
+      ${alertHtml}
+      <div class="record-reason">
+        <div class="reason-label">判断理由</div>
+        ${r.reason}
+      </div>
+      <div class="record-nextstep">
+        <div class="nextstep-label">下一步</div>
+        ${r.nextStep}
+      </div>
+      <div class="record-actions">
+        <button class="btn btn-sm" onclick="event.stopPropagation(); rollbackRecord('${r.id}')">↩️ 撤回</button>
+        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); openCorrectModal('${r.id}')">✏️ 修正</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function trapLabel(t) {
+  const map = {
+    equivalent_misjudge: '等价答案误判',
+    step_score_bias: '分步得分算偏',
+    empty_set_boundary: '空集边界漏掉',
+    none: '',
+  };
+  return map[t] || t;
+}
+
+function selectRecord(id) {
+  store.selectedId = id;
+  applyFilters();
+  renderAuditTrail(id);
+}
+
+function renderAuditTrail(id) {
+  const container = document.getElementById('auditContent');
+  const record = store.records.find(r => r.id === id);
+  if (!record) {
+    container.innerHTML = '<div class="empty-state" style="padding:20px">点击左侧记录查看审计轨迹</div>';
+    return;
+  }
+
+  const entries = store.auditLog.filter(a => a.recordId === id);
+  let html = `<div style="margin-bottom:12px;font-size:14px;font-weight:600">${record.questionId} — 审计轨迹</div>`;
+  html += `<div style="font-size:12px;color:var(--text2);margin-bottom:12px">当前版本 v${record.version} | 状态：${statusLabel(record.status)} | 创建：${record.createdAt}</div>`;
+
+  if (entries.length === 0) {
+    html += '<div class="empty-state" style="padding:20px">暂无审计记录</div>';
+  } else {
+    html += '<div class="audit-timeline">';
+    for (const e of entries.reverse()) {
+      html += `<div class="audit-entry action-${e.action}">
+        <div class="audit-time">${e.timestamp}</div>
+        <div class="audit-action">${actionLabel(e.action)}：${e.detail}</div>`;
+      if (e.diff) {
+        html += '<div class="audit-diff">';
+        if (e.diff.field) {
+          html += `<div><span class="diff-old">${e.diff.old}</span> → <span class="diff-new">${e.diff.new}</span>（${fieldLabel(e.diff.field)}）</div>`;
+        }
+        if (e.diff.oldJudgment !== undefined) {
+          html += `<div>判断：<span class="diff-old">${e.diff.oldJudgment}</span> → <span class="diff-new">${e.diff.newJudgment}</span></div>`;
+        }
+        if (e.diff.oldStatus !== undefined) {
+          html += `<div>状态：<span class="diff-old">${statusLabel(e.diff.oldStatus)}</span> → <span class="diff-new">${statusLabel(e.diff.newStatus)}</span></div>`;
+        }
+        if (e.diff.correctionReason) {
+          html += `<div style="color:var(--accent);margin-top:2px">修正原因：${e.diff.correctionReason}</div>`;
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+function actionLabel(a) {
+  const map = { import: '📥 导入', judge: '⚖️ 判断', rollback: '↩️ 撤回', correct: '✏️ 修正', export: '📤 导出', reupload: '🔄 补传变更' };
+  return map[a] || a;
+}
+
+function renderAlerts() {
+  const container = document.getElementById('alertsContent');
+  const active = store.changeAlerts.filter(a => !a.dismissed);
+  if (active.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="padding:20px">暂无变更提醒</div>';
+    return;
+  }
+  container.innerHTML = active.map(a => {
+    const record = store.records.find(r => r.id === a.recordId);
+    return `<div class="change-alert-card">
+      <div class="alert-header">
+        <span class="alert-title">🔔 ${record ? record.questionId : a.recordId}</span>
+        <span class="alert-time">${a.timestamp}</span>
+      </div>
+      <div class="alert-body">${fieldLabel(a.field)} 发生变更</div>
+      <div class="diff-row">
+        <span class="diff-old">${a.oldValue}</span>
+        <span style="color:var(--text2)">→</span>
+        <span class="diff-new">${a.newValue}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">来源：${a.source}</div>
+      <button class="btn btn-sm" style="margin-top:6px" onclick="dismissAlert('${a.id}')">已确认</button>
+    </div>`;
+  }).join('');
+}
+
+function dismissAlert(id) {
+  const alert = store.changeAlerts.find(a => a.id === id);
+  if (alert) {
+    alert.dismissed = true;
+    addAudit(alert.recordId, 'correct', `变更提醒已确认：${fieldLabel(alert.field)} 从 "${alert.oldValue}" 变为 "${alert.newValue}"`, null);
+  }
+  updateAlertBanner();
+  renderAlerts();
+  applyFilters();
+}
+
+function updateStats() {
+  const normal = store.records.filter(r => r.status === 'normal').length;
+  const pending = store.records.filter(r => r.status === 'pending_confirmation').length;
+  const rollback = store.records.filter(r => r.status === 'rollback').length;
+  document.getElementById('statNormal').textContent = normal;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statRollback').textContent = rollback;
+}
+
+function switchRightTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tabAudit').style.display = tab === 'audit' ? '' : 'none';
+  document.getElementById('tabAlerts').style.display = tab === 'alerts' ? '' : 'none';
+  if (tab === 'alerts') renderAlerts();
+}
+
+function scrollToAlerts() {
+  document.querySelectorAll('.tab-btn')[1].click();
+  renderAlerts();
+}
+
+function exportRecords(scope) {
+  const records = scope === 'filtered' && store.filteredIds
+    ? store.records.filter(r => store.filteredIds.includes(r.id))
+    : store.records;
+
+  const exportData = records.map(r => ({
+    questionId: r.questionId,
+    question: r.question,
+    studentAnswer: r.studentAnswer,
+    standardAnswer: r.standardAnswer,
+    judgment: r.judgment,
+    status: r.status,
+    statusLabel: statusLabel(r.status),
+    reason: r.reason,
+    nextStep: r.nextStep,
+    trapTypes: r.trapTypes.filter(t => t !== 'none').map(trapLabel),
+    difficulty: r.difficulty,
+    totalScore: r.totalScore,
+    version: r.version,
+    importBatch: r.importBatch,
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+  }));
+
+  const json = JSON.stringify(exportData, null, 2);
+  downloadJson(json, `函数图像陷阱_导出_${scope}_${Date.now()}.json`);
+
+  for (const r of records) {
+    addAudit(r.id, 'export', `导出记录（范围：${scope === 'filtered' ? '筛选结果' : '全部'}）`, null);
+  }
+  showToast(`已导出 ${records.length} 条记录`, 'success');
+}
+
+function exportAuditTrail() {
+  const json = JSON.stringify(store.auditLog, null, 2);
+  downloadJson(json, `函数图像陷阱_审计日志_${Date.now()}.json`);
+  showToast('审计日志已导出', 'success');
+}
+
+function downloadJson(json, filename) {
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.target.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) readImportFile(file);
+}
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) readImportFile(file);
+  e.target.value = '';
+}
+
+function readImportFile(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      const arr = Array.isArray(data) ? data : [data];
+      importRecords(arr, file.name);
+    } catch (err) {
+      showToast('JSON 解析失败：' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function loadDemoData() {
+  const demo = [
+    {
+      questionId: 'MATH-F1-001',
+      question: '求函数 y = x² - 2x + 1 在 x ∈ [0, 3] 上的最小值',
+      questionType: 'general',
+      standardAnswer: '0',
+      studentAnswer: 'y_min=0',
+      judgment: 'wrong',
+      totalScore: 5,
+      stepScores: [2, 2, 1],
+      difficulty: '中等',
+    },
+    {
+      questionId: 'MATH-F1-002',
+      question: '求不等式 x² - 4 < 0 的解集',
+      questionType: 'set',
+      standardAnswer: '(-2, 2)',
+      studentAnswer: '{x|-2<x<2}',
+      judgment: 'wrong',
+      totalScore: 4,
+      stepScores: [2, 2],
+      emptySetHandled: false,
+      difficulty: '简单',
+    },
+    {
+      questionId: 'MATH-F1-003',
+      question: '已知 f(x) = 2x + 1，求 f(f(1)) 的值',
+      questionType: 'general',
+      standardAnswer: '5',
+      studentAnswer: '5',
+      judgment: 'correct',
+      totalScore: 3,
+      stepScores: [1, 1, 1],
+      difficulty: '简单',
+    },
+    {
+      questionId: 'MATH-F1-004',
+      question: '已知向量 a = (1, 2)，b = (x, -1)，若 a ⊥ b，求 x 的值',
+      questionType: 'general',
+      standardAnswer: '2',
+      studentAnswer: 'x=2',
+      judgment: 'wrong',
+      totalScore: 5,
+      stepScores: [3, 3],
+      difficulty: '中等',
+    },
+    {
+      questionId: 'MATH-F1-005',
+      question: '设集合 A = {x | x² - 3x + 2 = 0}，B = {x | x < a}，若 A ⊆ B，求 a 的范围',
+      questionType: 'set',
+      standardAnswer: 'a > 2',
+      studentAnswer: 'a ≥ 2',
+      judgment: 'wrong',
+      totalScore: 6,
+      stepScores: [3, 2, 1],
+      emptySetHandled: false,
+      difficulty: '较难',
+    },
+    {
+      questionId: 'MATH-F1-006',
+      question: '求函数 y = -x² + 4x 的值域',
+      questionType: 'general',
+      standardAnswer: '(-∞, 4]',
+      studentAnswer: '(-∞,4]',
+      judgment: 'correct',
+      totalScore: 4,
+      stepScores: [1, 2, 1],
+      difficulty: '中等',
+    },
+  ];
+  importRecords(demo, '演示数据');
+}
+
+applyFilters();
+updateStats();
+</script>
+</body>
+</html>
