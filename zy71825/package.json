@@ -1,0 +1,17 @@
+{
+  "name": "greenhouse-guardian",
+  "version": "1.0.0",
+  "description": "植物温室守护 - 活动记录管理系统",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "phaser": "^3.80.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "serve": "^14.2.0"
+  }
+}

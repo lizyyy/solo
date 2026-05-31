@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌿 植物温室守护 - 活动奖励管理系统</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #1a472a 0%, #2d5a27 50%, #1e3a1e 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      color: #ffffff;
+      font-size: 32px;
+      margin-bottom: 8px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      color: #a7d129;
+      font-size: 14px;
+    }
+
+    #game-container {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      border: 3px solid #4a7c59;
+    }
+
+    .tips {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.1);
+      padding: 16px 24px;
+      border-radius: 12px;
+      max-width: 800px;
+    }
+
+    .tips h3 {
+      color: #a7d129;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .tips ul {
+      color: #d1d5db;
+      font-size: 13px;
+      line-height: 1.8;
+      padding-left: 20px;
+    }
+
+    .loading {
+      color: #ffffff;
+      font-size: 18px;
+      text-align: center;
+      padding: 40px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top-color: #a7d129;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🌿 植物温室守护 🌿</h1>
+    <p>活动奖励管理系统 - 让每一份奖励都清清楚楚</p>
+  </div>
+
+  <div id="game-container">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>系统启动中...</div>
+    </div>
+  </div>
+
+  <div class="tips">
+    <h3>💡 使用提示</h3>
+    <ul>
+      <li><strong>📥 导入关卡草表</strong>：支持CSV/JSON格式，先下载模板填写再导入</li>
+      <li><strong>🔍 记录复核</strong>：查看所有奖励记录，点击可查看来源分析和下一步操作</li>
+      <li><strong>✏️ 修正记录</strong>：处理待确认的奖励，填写处理人后保存</li>
+      <li><strong>📜 操作历史</strong>：查看所有操作记录，支持导出CSV</li>
+      <li><strong>📊 活动复盘</strong>：生成带处理口径的复盘报告，已确认/待补/人工修改分开统计</li>
+    </ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+  <script src="app-bundle.js"></script>
+</body>
+</html>
