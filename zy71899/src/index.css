@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #1a1d23;
+  color: #e4e6eb;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #23272f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3a3f4a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #5a6270;
+}
+
+/* 表格斑马纹 */
+.table-zebra tr:nth-child(even) {
+  background-color: rgba(44, 49, 58, 0.5);
+}
+
+.table-zebra tr:hover {
+  background-color: rgba(58, 63, 74, 0.8);
+}
+
+/* 波形图网格线 */
+.recharts-cartesian-grid line {
+  stroke: #3a3f4a;
+  stroke-dasharray: 3 3;
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+/* 闪烁动画用于异常点 */
+@keyframes blink-warning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-blink-warning {
+  animation: blink-warning 1.5s ease-in-out infinite;
+}
+
+/* 版本差异高亮 */
+.diff-added {
+  background-color: rgba(0, 212, 170, 0.15);
+  border-left: 3px solid #00d4aa;
+}
+
+.diff-removed {
+  background-color: rgba(255, 59, 48, 0.15);
+  border-left: 3px solid #ff3b30;
+}
+
+.diff-modified {
+  background-color: rgba(255, 149, 0, 0.15);
+  border-left: 3px solid #ff9500;
+}
+
+/* 状态指示灯 */
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-indicator.active {
+  animation: pulse 2s infinite;
+}
+
+/* 代码/日志等宽文本 */
+.monospace {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* 工业风按钮 */
+.btn-industrial {
+  @apply px-4 py-2 font-medium transition-all duration-200 border border-industrial-border;
+  @apply bg-industrial-bg-lighter text-industrial-text;
+  @apply hover:bg-industrial-border hover:shadow-glow-blue;
+  @apply active:scale-[0.98];
+}
+
+.btn-primary {
+  @apply px-4 py-2 font-medium transition-all duration-200;
+  @apply bg-tech-blue text-white;
+  @apply hover:bg-tech-blue-hover hover:shadow-glow-blue;
+  @apply active:scale-[0.98];
+}
+
+.btn-danger {
+  @apply px-4 py-2 font-medium transition-all duration-200;
+  @apply bg-danger-red text-white;
+  @apply hover:bg-danger-red-hover hover:shadow-glow-red;
+  @apply active:scale-[0.98];
+}
+
+.btn-success {
+  @apply px-4 py-2 font-medium transition-all duration-200;
+  @apply bg-signal-green text-industrial-bg;
+  @apply hover:bg-signal-green-hover hover:shadow-glow-green;
+  @apply active:scale-[0.98];
+}
