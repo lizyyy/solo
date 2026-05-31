@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+  body {
+    @apply bg-slate-50 text-graphite;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Noto Serif SC', serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-space-deep text-white rounded-md hover:bg-space-dark transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5;
+  }
+  .btn-secondary {
+    @apply px-4 py-2 bg-white border border-space-light text-space-deep rounded-md hover:bg-slate-50 transition-all duration-200;
+  }
+  .btn-gold {
+    @apply px-4 py-2 bg-star-gold text-white rounded-md hover:bg-star-light transition-all duration-200 shadow-sm;
+  }
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-slate-200 p-6;
+  }
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium text-white;
+  }
+  .status-confirmed {
+    @apply bg-status-confirmed;
+  }
+  .status-pending {
+    @apply bg-status-pending;
+  }
+  .status-modified {
+    @apply bg-status-modified;
+  }
+  .table-row-hover {
+    @apply hover:bg-slate-50 transition-colors duration-150;
+  }
+  .input-field {
+    @apply w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-space-blue focus:border-transparent;
+  }
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-space-light hover:bg-space-dark hover:text-white;
+  }
+  .nav-item.active {
+    @apply bg-space-dark text-white;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #8DA9C4 transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #8DA9C4;
+    border-radius: 3px;
+  }
+}
