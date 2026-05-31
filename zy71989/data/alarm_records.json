@@ -1,0 +1,62 @@
+[
+  {
+    "id": "alarm_001",
+    "alarm_time": "2024-01-15T10:30:00",
+    "alarm_level": "ERROR",
+    "alarm_content": "用户创建接口调用超时，请求ID: req_12345",
+    "idempotent_key": "idem_user_create_001",
+    "source_system": "order-service",
+    "handler": "张三",
+    "api_endpoint": "/api/v1/users",
+    "request_params": {"username": "testuser", "email": "test@example.com"},
+    "response_error": "timeout after 30s"
+  },
+  {
+    "id": "alarm_002",
+    "alarm_time": "2024-01-15T11:00:00",
+    "alarm_level": "WARN",
+    "alarm_content": "订单查询接口返回403权限错误",
+    "idempotent_key": "idem_order_query_001",
+    "source_system": "order-service",
+    "handler": "李四",
+    "api_endpoint": "/api/v1/orders",
+    "request_params": {"order_id": "ord_67890"},
+    "response_error": "403 Forbidden: no permission"
+  },
+  {
+    "id": "alarm_003",
+    "alarm_time": "2024-01-15T14:00:00",
+    "alarm_level": "ERROR",
+    "alarm_content": "支付接口返回500错误",
+    "idempotent_key": "idem_pay_001",
+    "source_system": "payment-service",
+    "handler": "王五",
+    "api_endpoint": "/api/v1/payments",
+    "request_params": {"amount": 100.0, "method": "alipay"},
+    "response_error": "500 Internal Server Error"
+  },
+  {
+    "id": "alarm_004",
+    "alarm_time": "2024-01-15T15:30:00",
+    "alarm_level": "ERROR",
+    "alarm_content": "商品查询接口频繁报错",
+    "idempotent_key": null,
+    "source_system": "product-service",
+    "handler": "赵六",
+    "api_endpoint": "/api/v1/products",
+    "request_params": {"product_id": "prod_123"},
+    "response_error": "rate limit exceeded"
+  },
+  {
+    "id": "alarm_005",
+    "alarm_time": "2024-01-16T09:00:00",
+    "alarm_level": "INFO",
+    "alarm_content": "用户信息更新接口报警已恢复",
+    "idempotent_key": "idem_user_update_001",
+    "source_system": "user-service",
+    "handler": "孙七",
+    "api_endpoint": "/api/v1/users/update",
+    "request_params": {"user_id": "user_001"},
+    "response_error": null
+  }
+]

@@ -1,0 +1,169 @@
+[
+  {
+    "task_id": "task_072753bd",
+    "batch_id": "batch_test_001",
+    "idempotent_key": "idem_user_update_001",
+    "api_endpoint": "/api/v1/users/update",
+    "status": "success",
+    "created_at": "2026-05-31T21:39:27.045742",
+    "updated_at": "2026-05-31T21:39:34.189025",
+    "retry_count": 0,
+    "auto_judgment": {
+      "judgment_type": "can_retry",
+      "reason": "接口调用全部成功，无失败记录，可以安全重试",
+      "confidence": 0.9,
+      "evidence": [
+        "所有调用日志均显示成功",
+        "存在报警记录，但调用均成功，可能报警已恢复"
+      ],
+      "suggestion": "标记为成功，可正常调度"
+    },
+    "idempotent_issue": null,
+    "manual_notes": null,
+    "last_attempt_at": "2026-05-31T21:39:27.045809",
+    "last_error": null,
+    "related_alarm_ids": [
+      "alarm_005"
+    ],
+    "related_api_doc_ids": [
+      "doc_005"
+    ],
+    "related_call_log_ids": [
+      "log_006",
+      "log_007"
+    ]
+  },
+  {
+    "task_id": "task_cc767139",
+    "batch_id": "batch_test_001",
+    "idempotent_key": "idem_order_query_001",
+    "api_endpoint": "/api/v1/orders",
+    "status": "confirmed",
+    "created_at": "2026-05-31T21:39:27.045838",
+    "updated_at": "2026-05-31T21:39:51.830332",
+    "retry_count": 1,
+    "auto_judgment": {
+      "judgment_type": "needs_review",
+      "reason": "权限问题导致失败，需要人工检查权限配置",
+      "confidence": 0.95,
+      "evidence": [
+        "检测到 1 次失败调用",
+        "最近一次失败原因: 403 Forbidden",
+        "权限问题需要人工介入处理"
+      ],
+      "suggestion": "需要人工审核：联系系统管理员检查接口权限配置"
+    },
+    "idempotent_issue": null,
+    "manual_notes": "权限问题已解决，确认无误",
+    "last_attempt_at": "2026-05-31T21:39:34.189030",
+    "last_error": "需要人工审核：联系系统管理员检查接口权限配置",
+    "related_alarm_ids": [
+      "alarm_002"
+    ],
+    "related_api_doc_ids": [
+      "doc_002"
+    ],
+    "related_call_log_ids": [
+      "log_003"
+    ]
+  },
+  {
+    "task_id": "task_d0370703",
+    "batch_id": "batch_test_001",
+    "idempotent_key": "idem_user_create_001",
+    "api_endpoint": "/api/v1/users",
+    "status": "success",
+    "created_at": "2026-05-31T21:39:27.045859",
+    "updated_at": "2026-05-31T21:39:34.189027",
+    "retry_count": 0,
+    "auto_judgment": {
+      "judgment_type": "can_retry",
+      "reason": "失败原因为超时，重试通常可以解决",
+      "confidence": 0.7,
+      "evidence": [
+        "检测到 1 次失败调用",
+        "最近一次失败原因: Gateway Timeout"
+      ],
+      "suggestion": "建议重试，超时问题通常可通过重试解决"
+    },
+    "idempotent_issue": null,
+    "manual_notes": null,
+    "last_attempt_at": "2026-05-31T21:39:27.045867",
+    "last_error": null,
+    "related_alarm_ids": [
+      "alarm_001"
+    ],
+    "related_api_doc_ids": [
+      "doc_001"
+    ],
+    "related_call_log_ids": [
+      "log_001",
+      "log_002"
+    ]
+  },
+  {
+    "task_id": "task_b72ff578",
+    "batch_id": "batch_test_001",
+    "idempotent_key": "idem_pay_001",
+    "api_endpoint": "/api/v1/payments",
+    "status": "manually_modified",
+    "created_at": "2026-05-31T21:39:27.045877",
+    "updated_at": "2026-05-31T21:39:58.237351",
+    "retry_count": 1,
+    "auto_judgment": {
+      "judgment_type": "awaiting_supplement",
+      "reason": "服务端内部错误，需要确认服务可用性",
+      "confidence": 0.6,
+      "evidence": [
+        "检测到 1 次失败调用",
+        "最近一次失败原因: 500 Internal Server Error",
+        "服务端错误需要确认服务状态"
+      ],
+      "suggestion": "待补充信息：联系服务端开发人员确认服务状态"
+    },
+    "idempotent_issue": null,
+    "manual_notes": "已联系服务端开发人员，服务已修复，手动标记完成",
+    "last_attempt_at": "2026-05-31T21:39:34.188998",
+    "last_error": "待补充信息：联系服务端开发人员确认服务状态",
+    "related_alarm_ids": [
+      "alarm_003"
+    ],
+    "related_api_doc_ids": [
+      "doc_003"
+    ],
+    "related_call_log_ids": [
+      "log_004"
+    ]
+  },
+  {
+    "task_id": "task_a489bf6c",
+    "batch_id": "batch_test_001",
+    "idempotent_key": null,
+    "api_endpoint": "/api/v1/products",
+    "status": "idempotent_issue",
+    "created_at": "2026-05-31T21:39:27.045893",
+    "updated_at": "2026-05-31T21:39:34.189039",
+    "retry_count": 1,
+    "auto_judgment": null,
+    "idempotent_issue": {
+      "idempotent_key": "MISSING",
+      "source": "old_api_doc",
+      "issue_type": "missing_idempotent_key",
+      "description": "缺少幂等键，来源: old_api_doc, 检测到 1 条相关记录无幂等键",
+      "contact_person": "接口文档维护人",
+      "next_step": "请联系接口文档维护人在旧接口文档中添加幂等键定义"
+    },
+    "manual_notes": null,
+    "last_attempt_at": "2026-05-31T21:39:34.189039",
+    "last_error": "幂等键问题: 缺少幂等键，来源: old_api_doc, 检测到 1 条相关记录无幂等键",
+    "related_alarm_ids": [
+      "alarm_004"
+    ],
+    "related_api_doc_ids": [
+      "doc_004"
+    ],
+    "related_call_log_ids": [
+      "log_005"
+    ]
+  }
+]

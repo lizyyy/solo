@@ -1,0 +1,67 @@
+[
+  {
+    "id": "doc_001",
+    "api_name": "创建用户",
+    "api_endpoint": "/api/v1/users",
+    "http_method": "POST",
+    "version": "v1.0",
+    "deprecated_date": "2024-01-01T00:00:00",
+    "idempotent_key": "idem_user_create_001",
+    "request_schema": {"username": "string", "email": "string"},
+    "response_schema": {"user_id": "string", "status": "string"},
+    "owner": "张三",
+    "remarks": "该接口已废弃，请使用v2版本"
+  },
+  {
+    "id": "doc_002",
+    "api_name": "查询订单",
+    "api_endpoint": "/api/v1/orders",
+    "http_method": "GET",
+    "version": "v1.0",
+    "deprecated_date": "2024-01-05T00:00:00",
+    "idempotent_key": "idem_order_query_001",
+    "request_schema": {"order_id": "string"},
+    "response_schema": {"order": "object"},
+    "owner": "李四",
+    "remarks": "权限控制需要更新"
+  },
+  {
+    "id": "doc_003",
+    "api_name": "支付接口",
+    "api_endpoint": "/api/v1/payments",
+    "http_method": "POST",
+    "version": "v1.0",
+    "deprecated_date": "2024-01-10T00:00:00",
+    "idempotent_key": "idem_pay_001",
+    "request_schema": {"amount": "number", "method": "string"},
+    "response_schema": {"transaction_id": "string"},
+    "owner": "王五",
+    "remarks": "服务端需要排查稳定性问题"
+  },
+  {
+    "id": "doc_004",
+    "api_name": "商品查询",
+    "api_endpoint": "/api/v1/products",
+    "http_method": "GET",
+    "version": "v1.0",
+    "deprecated_date": "2024-01-12T00:00:00",
+    "idempotent_key": null,
+    "request_schema": {"product_id": "string"},
+    "response_schema": {"product": "object"},
+    "owner": "赵六",
+    "remarks": "幂等键待补充"
+  },
+  {
+    "id": "doc_005",
+    "api_name": "用户更新",
+    "api_endpoint": "/api/v1/users/update",
+    "http_method": "PUT",
+    "version": "v1.0",
+    "deprecated_date": "2024-01-14T00:00:00",
+    "idempotent_key": "idem_user_update_001",
+    "request_schema": {"user_id": "string"},
+    "response_schema": {"success": "boolean"},
+    "owner": "孙七",
+    "remarks": "该接口已恢复正常"
+  }
+]
