@@ -1,0 +1,50 @@
+{
+  "batch_id": "BATCH-2026-001",
+  "description": "跨境信用证单证核验样例批次 — 含顺利/挂起/冲突三种场景",
+  "records": [
+    {
+      "lc_number": "LC202605001",
+      "applicant": "深圳远东贸易有限公司",
+      "beneficiary": "Global Trading Co., Ltd.",
+      "amount_raw": "USD 150,000.00",
+      "date_raw": "2026年03月15日",
+      "operator_name": "小张",
+      "source": "import",
+      "source_detail": "业务系统导入，来源：开证行SWIFT MT700报文",
+      "voucher_reference": "VCH-20260315-001"
+    },
+    {
+      "lc_number": "LC202605002",
+      "applicant": "上海海通进出口公司",
+      "beneficiary": "Pacific Merchants GmbH",
+      "amount_raw": "€85,000",
+      "date_raw": "2026/02/28",
+      "operator_name": "阿明",
+      "source": "import",
+      "source_detail": "业务系统导入，来源：通知行转递",
+      "voucher_reference": null
+    },
+    {
+      "lc_number": "LC202605003",
+      "applicant": "北京中盛国际贸易有限公司",
+      "beneficiary": "Asia Pacific Trading Pte. Ltd.",
+      "amount_raw": "CNY 620,000",
+      "date_raw": "2025/12/10",
+      "operator_name": "老王",
+      "source": "import",
+      "source_detail": "业务系统导入，来源：旧口径手工台账补录",
+      "voucher_reference": "VCH-20251210-003"
+    },
+    {
+      "lc_number": "LC202605003",
+      "applicant": "北京中盛国际贸易",
+      "beneficiary": "Asia Pacific Trading Pte Ltd",
+      "amount_raw": "RMB 600,000",
+      "date_raw": "2025-12-08",
+      "operator_name": null,
+      "source": "bank_receipt_screenshot",
+      "source_detail": "银企回单截图，截自旧系统对账单界面，截图文件：receipt_LC202605003.png",
+      "voucher_reference": null
+    }
+  ]
+}
