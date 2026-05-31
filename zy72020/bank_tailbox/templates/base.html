@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}银行网点尾箱调拨{% endblock %}</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+.nav { background: #1a3a5c; padding: 10px 20px; display: flex; gap: 20px; align-items: center; }
+.nav a { color: #c8d8e8; text-decoration: none; font-size: 14px; padding: 4px 8px; border-radius: 4px; }
+.nav a:hover, .nav a.active { color: #fff; background: rgba(255,255,255,0.15); }
+.nav .brand { color: #fff; font-weight: bold; font-size: 16px; margin-right: 20px; }
+.container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+.card { background: #fff; border-radius: 6px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+h1 { font-size: 20px; margin-bottom: 16px; color: #1a3a5c; }
+h2 { font-size: 16px; margin-bottom: 12px; color: #1a3a5c; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e8e8e8; }
+th { background: #f0f4f8; color: #555; font-weight: 600; white-space: nowrap; }
+tr:hover { background: #fafbfc; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 500; }
+.badge-pending { background: #fff3cd; color: #856404; }
+.badge-confirmed { background: #d4edda; color: #155724; }
+.badge-conflict { background: #f8d7da; color: #721c24; }
+.badge-resolved { background: #cce5ff; color: #004085; }
+.btn { display: inline-block; padding: 6px 14px; border: 1px solid #ccc; border-radius: 4px; background: #fff; color: #333; font-size: 13px; cursor: pointer; text-decoration: none; }
+.btn:hover { background: #f0f0f0; }
+.btn-primary { background: #1a3a5c; color: #fff; border-color: #1a3a5c; }
+.btn-primary:hover { background: #2a5a8c; }
+.btn-danger { background: #dc3545; color: #fff; border-color: #dc3545; }
+.btn-danger:hover { background: #c82333; }
+.btn-success { background: #28a745; color: #fff; border-color: #28a745; }
+.btn-success:hover { background: #218838; }
+form { display: inline; }
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; margin-bottom: 4px; font-size: 13px; color: #555; font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea { padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; width: 100%; max-width: 400px; }
+.actions { margin: 12px 0; display: flex; gap: 8px; flex-wrap: wrap; }
+.stats { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat-item { background: #fff; padding: 12px 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.stat-item .label { font-size: 12px; color: #888; }
+.stat-item .value { font-size: 22px; font-weight: bold; color: #1a3a5c; }
+.conflict-box { border: 2px solid #dc3545; border-radius: 6px; padding: 16px; margin: 12px 0; background: #fff5f5; }
+.evidence-side { padding: 10px; border-radius: 4px; margin: 8px 0; }
+.evidence-email { background: #e8f0fe; border-left: 4px solid #1a73e8; }
+.evidence-import { background: #fef7e0; border-left: 4px solid #f9ab00; }
+.audit-timeline { border-left: 2px solid #ddd; padding-left: 16px; margin: 12px 0; }
+.audit-item { margin-bottom: 8px; font-size: 13px; position: relative; }
+.audit-item::before { content: ''; position: absolute; left: -21px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: #1a3a5c; }
+.muted { color: #888; font-size: 12px; }
+.diff-only1 { background: #ffebee; }
+.diff-only2 { background: #e8f5e9; }
+.diff-field { background: #fff3e0; }
+.checkbox-label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <span class="brand">🏦 尾箱调拨</span>
+  <a href="/" class="{% if request.path == '/' %}active{% endif %}">首页</a>
+  <a href="/import" class="{% if request.path == '/import' %}active{% endif %}">导入数据</a>
+  <a href="/conflicts" class="{% if request.path == '/conflicts' %}active{% endif %}">冲突处理</a>
+  <a href="/diff" class="{% if request.path == '/diff' %}active{% endif %}">批次比对</a>
+  <a href="/export/full">全量导出</a>
+  <a href="/export/conflicts">冲突导出</a>
+</nav>
+<div class="container">
+{% block content %}{% endblock %}
+</div>
+</body>
+</html>

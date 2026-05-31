@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}银行网点尾箱调拨 - 冲突列表{% endblock %}
+{% block content %}
+<h1>冲突处理</h1>
+
+<div class="actions">
+  <a href="/conflicts?status=all" class="btn {% if current_filter == 'all' %}btn-primary{% endif %}">全部</a>
+  <a href="/conflicts?status=unresolved" class="btn {% if current_filter == 'unresolved' %}btn-danger{% endif %}">未解决</a>
+  <a href="/conflicts?status=resolved" class="btn {% if current_filter == 'resolved' %}btn-success{% endif %}">已解决</a>
+  <a href="/export/conflicts" class="btn">导出冲突报告</a>
+</div>
+
+{% if conflicts %}
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>冲突ID</th>
+        <th>调拨日期</th>
+        <th>调出网点</th>
+        <th>调入网点</th>
+        <th>金额</th>
+        <th>冲突字段</th>
+        <th>邮件值</th>
+        <th>导入值</th>
+        <th>建议动作</th>
+        <th>处理结果</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for c in conflicts %}
+      <tr>
+        <td>{{ c.id }}</td>
+        <td>{{ c.transfer_date }}</td>
+        <td>{{ c.from_branch }}</td>
+        <td>{{ c.to_branch }}</td>
+        <td>{{ "%.2f"|format(c.amount) }}</td>
+        <td><strong>{{ c.field_name }}</strong></td>
+        <td>{{ c.email_value or '-' }}</td>
+        <td>{{ c.import_value or '-' }}</td>
+        <td>{{ c.suggested_action }}</td>
+        <td>
+          {% if c.resolution %}
+            <span class="badge badge-resolved">{{ c.resolution }}</span>
+          {% else %}
+            <span class="badge badge-conflict">未解决</span>
+          {% endif %}
+        </td>
+        <td><a href="/record/{{ c.record_id }}" class="btn">详情</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card">
+  <p class="muted">暂无冲突记录</p>
+</div>
+{% endif %}
+{% endblock %}

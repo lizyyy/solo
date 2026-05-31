@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}银行网点尾箱调拨 - 批次比对{% endblock %}
+{% block content %}
+<h1>批次比对（差异报告）</h1>
+
+<div class="card">
+  <form method="post" action="/diff">
+    <div class="form-group">
+      <label>批次A</label>
+      <select name="batch_id_1" required>
+        <option value="">选择批次</option>
+        {% for b in batches %}
+        <option value="{{ b.id }}">{{ b.id }} - {{ b.name }} ({{ b.source_type }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>批次B</label>
+      <select name="batch_id_2" required>
+        <option value="">选择批次</option>
+        {% for b in batches %}
+        <option value="{{ b.id }}">{{ b.id }} - {{ b.name }} ({{ b.source_type }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">比对</button>
+  </form>
+</div>
+
+{% if diff %}
+<div class="card">
+  <h2>比对结果：{{ diff.batch_1.name }} vs {{ diff.batch_2.name }}</h2>
+
+  {% if diff.diffs %}
+  <table>
+    <thead>
+      <tr>
+        <th>差异类型</th>
+        <th>调拨日期</th>
+        <th>调出网点</th>
+        <th>调入网点</th>
+        <th>金额</th>
+        <th>差异详情</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for d in diff.diffs %}
+      {% set parts = d.key.split('|') %}
+      <tr class="{% if d.type == 'only_in_batch_1' %}diff-only1{% elif d.type == 'only_in_batch_2' %}diff-only2{% else %}diff-field{% endif %}">
+        <td>
+          {% if d.type == 'only_in_batch_1' %}
+            仅在批次A
+          {% elif d.type == 'only_in_batch_2' %}
+            仅在批次B
+          {% else %}
+            字段差异
+          {% endif %}
+        </td>
+        <td>{{ parts[0] }}</td>
+        <td>{{ parts[1] }}</td>
+        <td>{{ parts[2] }}</td>
+        <td>{{ parts[3] }}</td>
+        <td>
+          {% if d.type == 'field_diff' %}
+            {% for f, fv in d.field_diffs.items() %}
+              <div>{{ f }}: 批次A={{ fv.batch_1 }} → 批次B={{ fv.batch_2 }}</div>
+            {% endfor %}
+          {% elif d.type == 'only_in_batch_1' %}
+            仅存在于批次A
+          {% else %}
+            仅存在于批次B
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>两个批次无差异</p>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

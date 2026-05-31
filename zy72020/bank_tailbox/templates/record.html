@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}银行网点尾箱调拨 - 记录详情{% endblock %}
+{% block content %}
+<h1>调拨记录 #{{ record.id }}</h1>
+
+<div class="card">
+  <h2>基本信息</h2>
+  <table>
+    <tr><th>调拨日期</th><td>{{ record.transfer_date }}</td></tr>
+    <tr><th>调出网点</th><td>{{ record.from_branch }}</td></tr>
+    <tr><th>调入网点</th><td>{{ record.to_branch }}</td></tr>
+    <tr><th>金额</th><td>{{ "%.2f"|format(record.amount) }} {{ record.currency }}</td></tr>
+    <tr><th>经办人</th><td>{{ record.operator or '-' }}</td></tr>
+    <tr><th>调拨类型</th><td>{{ record.transfer_type or '-' }}</td></tr>
+    <tr><th>凭证号</th><td>{{ record.voucher_no or '-' }}</td></tr>
+    <tr><th>审批邮件编号</th><td>{{ record.approval_email_ref or '-' }}</td></tr>
+    <tr><th>状态</th><td><span class="badge badge-{{ record.status }}">{{ record.status }}</span></td></tr>
+    <tr><th>原始来源</th><td>{{ record.original_source }}</td></tr>
+    <tr><th>是否补材料</th><td>{{ '是' if record.is_supplement else '否' }}</td></tr>
+    <tr><th>创建时间</th><td>{{ record.created_at }}</td></tr>
+    <tr><th>最后更新</th><td>{{ record.updated_at }}</td></tr>
+  </table>
+
+  {% if record.status == 'pending' %}
+  <div class="actions">
+    <form method="post" action="/record/{{ record.id }}/confirm">
+      <input type="text" name="operator" placeholder="确认人姓名" required style="padding:6px 10px;border:1px solid #ccc;border-radius:4px;font-size:13px;">
+      <button type="submit" class="btn btn-success">确认此记录</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+{% if conflicts %}
+<div class="card">
+  <h2>⚠️ 冲突记录</h2>
+  {% for c in conflicts %}
+  <div class="conflict-box">
+    <p><strong>冲突字段：</strong>{{ c.field_name }}</p>
+    <div class="evidence-side evidence-email">
+      <strong>审批邮件侧：</strong>{{ c.email_value or '(空)' }}
+      <span class="muted">来源：{{ c.email_source or '-' }}</span>
+    </div>
+    <div class="evidence-side evidence-import">
+      <strong>导入数据侧：</strong>{{ c.import_value or '(空)' }}
+      <span class="muted">来源：{{ c.import_source or '-' }}</span>
+    </div>
+    <p><strong>建议动作：</strong>{{ c.suggested_action }}</p>
+
+    {% if not c.resolution %}
+    <div class="actions">
+      <form method="post" action="/conflict/{{ c.id }}/resolve" style="display:flex;gap:8px;align-items:center;">
+        <input type="text" name="resolved_by" placeholder="处理人" required style="padding:6px 10px;border:1px solid #ccc;border-radius:4px;font-size:13px;width:120px;">
+        <button type="submit" name="resolution" value="use_import" class="btn" onclick="this.form.resolution.value=this.value">采纳导入值</button>
+        <button type="submit" name="resolution" value="use_email" class="btn" onclick="this.form.resolution.value=this.value">采纳邮件值</button>
+        <button type="submit" name="resolution" value="manual_review" class="btn btn-danger" onclick="this.form.resolution.value=this.value">人工复核</button>
+      </form>
+    </div>
+    {% else %}
+    <p><strong>处理结果：</strong>{{ c.resolution }}，处理人：{{ c.resolved_by }}，时间：{{ c.resolved_at }}</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <div class="actions">
+    <a href="/evidence/{{ record.id }}" class="btn btn-primary">查看完整证据链</a>
+  </div>
+</div>
+{% endif %}
+
+{% if audit %}
+<div class="card">
+  <h2>操作记录</h2>
+  <div class="audit-timeline">
+  {% for a in audit %}
+    <div class="audit-item">
+      <strong>{{ a.action }}</strong>
+      {% if a.old_value %} {{ a.old_value }} → {{ a.new_value }} {% endif %}
+      <span class="muted">{{ a.operator }} · {{ a.source }} · {{ a.created_at }}</span>
+    </div>
+  {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

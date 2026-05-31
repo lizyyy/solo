@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}银行网点尾箱调拨 - 首页{% endblock %}
+{% block content %}
+<h1>银行网点尾箱调拨管理</h1>
+
+<div class="stats">
+  <div class="stat-item">
+    <div class="label">待确认</div>
+    <div class="value">{{ status_map.get('pending', 0) }}</div>
+  </div>
+  <div class="stat-item">
+    <div class="label">已确认</div>
+    <div class="value">{{ status_map.get('confirmed', 0) }}</div>
+  </div>
+  <div class="stat-item">
+    <div class="label">有冲突</div>
+    <div class="value" style="color: {% if conflict_count > 0 %}#dc3545{% endif %}">{{ conflict_count }}</div>
+  </div>
+  <div class="stat-item">
+    <div class="label">已解决</div>
+    <div class="value">{{ status_map.get('resolved', 0) }}</div>
+  </div>
+  <div class="stat-item">
+    <div class="label">总记录</div>
+    <div class="value">{{ status_map.values() | sum }}</div>
+  </div>
+</div>
+
+{% if conflict_count > 0 %}
+<div class="conflict-box">
+  ⚠️ 当前有 <strong>{{ conflict_count }}</strong> 条未解决冲突，请前往 <a href="/conflicts?status=unresolved">冲突处理</a> 页面查看
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>导入批次</h2>
+  {% if batches %}
+  <table>
+    <thead>
+      <tr>
+        <th>批次ID</th>
+        <th>批次名称</th>
+        <th>来源类型</th>
+        <th>源文件</th>
+        <th>导入时间</th>
+        <th>记录数</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for b in batches %}
+      <tr>
+        <td>{{ b.id }}</td>
+        <td>{{ b.name }}</td>
+        <td>{{ b.source_type }}</td>
+        <td>{{ b.source_file or '-' }}</td>
+        <td>{{ b.import_time }}</td>
+        <td>{{ b.record_count }}</td>
+        <td>
+          <a href="/batch/{{ b.id }}" class="btn">查看</a>
+          <a href="/export/batch/{{ b.id }}" class="btn">导出</a>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">暂无批次，请先 <a href="/import">导入数据</a></p>
+  {% endif %}
+</div>
+{% endblock %}

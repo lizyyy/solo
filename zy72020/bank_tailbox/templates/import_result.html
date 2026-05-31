@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}银行网点尾箱调拨 - 导入结果{% endblock %}
+{% block content %}
+<h1>导入结果</h1>
+
+<div class="card">
+  <h2>批次 #{{ result.batch_id }}</h2>
+  <table>
+    <tr><th>新增导入</th><td>{{ result.imported }}</td></tr>
+    <tr><th>跳过（重复）</th><td>{{ result.skipped }}</td></tr>
+    <tr><th>更新覆盖</th><td>{{ result.updated }}</td></tr>
+    <tr><th>标记冲突</th><td>{{ result.conflicts }}</td></tr>
+  </table>
+</div>
+
+{% if result.conflict_details %}
+<div class="card">
+  <h2>⚠️ 产生冲突的记录</h2>
+  <table>
+    <thead>
+      <tr><th>记录ID</th><th>调拨日期</th><th>调出网点</th><th>调入网点</th><th>操作</th></tr>
+    </thead>
+    <tbody>
+    {% for cd in result.conflict_details %}
+      <tr>
+        <td>{{ cd.record_id }}</td>
+        <td>{{ cd.transfer_date }}</td>
+        <td>{{ cd.from_branch }}</td>
+        <td>{{ cd.to_branch }}</td>
+        <td><a href="/record/{{ cd.record_id }}" class="btn">查看冲突</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<div class="actions">
+  <a href="/batch/{{ result.batch_id }}" class="btn btn-primary">查看批次详情</a>
+  <a href="/" class="btn">返回首页</a>
+</div>
+{% endblock %}

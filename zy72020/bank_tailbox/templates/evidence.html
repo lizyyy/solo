@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}银行网点尾箱调拨 - 冲突证据{% endblock %}
+{% block content %}
+<h1>冲突证据链 - 记录 #{{ evidence.record.id }}</h1>
+
+<div class="card">
+  <h2>调拨记录概要</h2>
+  <table>
+    <tr><th>调拨日期</th><td>{{ evidence.record.transfer_date }}</td></tr>
+    <tr><th>调出网点</th><td>{{ evidence.record.from_branch }}</td></tr>
+    <tr><th>调入网点</th><td>{{ evidence.record.to_branch }}</td></tr>
+    <tr><th>金额</th><td>{{ "%.2f"|format(evidence.record.amount) }} {{ evidence.record.currency }}</td></tr>
+    <tr><th>原始来源</th><td>{{ evidence.record.original_source }}</td></tr>
+    <tr><th>当前状态</th><td><span class="badge badge-{{ evidence.record.status }}">{{ evidence.record.status }}</span></td></tr>
+  </table>
+</div>
+
+{% for c in evidence.conflicts %}
+<div class="card">
+  <h2>冲突 #{{ c.conflict_id }} - 字段：{{ c.field }}</h2>
+  <table>
+    <tr>
+      <th style="width:50%">审批邮件侧</th>
+      <th style="width:50%">导入数据侧</th>
+    </tr>
+    <tr>
+      <td>
+        <div class="evidence-side evidence-email">
+          <div><strong>值：</strong>{{ c.email_side.value or '(空)' }}</div>
+          <div class="muted">来源：{{ c.email_side.source or '-' }}</div>
+        </div>
+      </td>
+      <td>
+        <div class="evidence-side evidence-import">
+          <div><strong>值：</strong>{{ c.import_side.value or '(空)' }}</div>
+          <div class="muted">来源：{{ c.import_side.source or '-' }}</div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <p style="margin-top:8px"><strong>💡 建议动作：</strong>{{ c.suggested_action }}</p>
+</div>
+{% endfor %}
+
+{% if evidence.audit_trail %}
+<div class="card">
+  <h2>完整操作时间线</h2>
+  <div class="audit-timeline">
+  {% for a in evidence.audit_trail %}
+    <div class="audit-item">
+      <strong>{{ a.action }}</strong>
+      {% if a.old_value %} <code>{{ a.old_value }}</code> → <code>{{ a.new_value }}</code> {% endif %}
+      <span class="muted">{{ a.operator }} · {{ a.source }} · {{ a.created_at }}</span>
+    </div>
+  {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="actions">
+  <a href="/record/{{ evidence.record.id }}" class="btn">返回记录</a>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}银行网点尾箱调拨 - 批次详情{% endblock %}
+{% block content %}
+<h1>批次 #{{ batch.id }} - {{ batch.name }}</h1>
+<div class="card">
+  <table>
+    <tr><th>来源类型</th><td>{{ batch.source_type }}</td></tr>
+    <tr><th>源文件</th><td>{{ batch.source_file or '-' }}</td></tr>
+    <tr><th>导入时间</th><td>{{ batch.import_time }}</td></tr>
+    <tr><th>记录数</th><td>{{ batch.record_count }}</td></tr>
+    <tr><th>备注</th><td>{{ batch.notes or '-' }}</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>调拨记录</h2>
+  <div class="actions">
+    <a href="/export/batch/{{ batch.id }}" class="btn">导出本批次CSV</a>
+  </div>
+  {% if records %}
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>调拨日期</th>
+        <th>调出网点</th>
+        <th>调入网点</th>
+        <th>金额</th>
+        <th>币种</th>
+        <th>经办人</th>
+        <th>凭证号</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for r in records %}
+      <tr>
+        <td>{{ r.id }}</td>
+        <td>{{ r.transfer_date }}</td>
+        <td>{{ r.from_branch }}</td>
+        <td>{{ r.to_branch }}</td>
+        <td>{{ "%.2f"|format(r.amount) }}</td>
+        <td>{{ r.currency }}</td>
+        <td>{{ r.operator or '-' }}</td>
+        <td>{{ r.voucher_no or '-' }}</td>
+        <td><span class="badge badge-{{ r.status }}">{{ r.status }}</span></td>
+        <td><a href="/record/{{ r.id }}" class="btn">详情</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="muted">本批次无记录</p>
+  {% endif %}
+</div>
+{% endblock %}
