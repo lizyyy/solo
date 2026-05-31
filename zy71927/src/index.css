@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-charcoal: #1C1C1E;
+  --color-ivory: #FAF9F6;
+  --color-amber: #C9A84C;
+  --color-coral: #E07A5F;
+  --color-sage: #81B29A;
+
+  font-family: "Noto Sans SC", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Noto Sans SC", sans-serif;
+  background-color: var(--color-ivory);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Noto Serif SC", serif;
+}
