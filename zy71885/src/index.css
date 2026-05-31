@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #e8ecf1;
+  background-color: #1a2332;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #1a2332;
+  color: #e8ecf1;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a2332;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2f3d54;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4c66;
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-lab-accent text-lab-bg font-medium rounded border border-lab-accent hover:bg-lab-accentHover hover:shadow-glow-amber transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-transparent text-lab-text font-medium rounded border border-lab-bgLighter hover:bg-lab-bgLight transition-all duration-200;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-transparent text-lab-danger font-medium rounded border border-lab-danger hover:bg-lab-danger/10 transition-all duration-200;
+  }
+
+  .btn-success {
+    @apply px-4 py-2 bg-lab-success text-white font-medium rounded border border-lab-success hover:opacity-90 transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-lab-bgLight rounded-lg border border-lab-bgLighter p-4;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-lab-bg border border-lab-bgLighter rounded text-lab-text placeholder-lab-textMuted focus:outline-none focus:border-lab-accent focus:shadow-glow-amber transition-all duration-200;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-1 text-xs font-medium rounded;
+  }
+
+  .badge-pending {
+    @apply bg-lab-accent/20 text-lab-accent border border-lab-accent/30;
+  }
+
+  .badge-reviewed {
+    @apply bg-lab-success/20 text-lab-success border border-lab-success/30;
+  }
+
+  .badge-rejected {
+    @apply bg-lab-danger/20 text-lab-danger border border-lab-danger/30;
+  }
+
+  .badge-source-sensor {
+    @apply bg-blue-500/20 text-blue-300 border border-blue-500/30;
+  }
+
+  .badge-source-manual {
+    @apply bg-purple-500/20 text-purple-300 border border-purple-500/30;
+  }
+}
