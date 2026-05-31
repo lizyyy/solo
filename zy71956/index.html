@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外场队长工具 - 飞行记录管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header p { font-size: 14px; opacity: 0.8; margin-top: 5px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 12px 24px; background: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .tab.active { background: #3498db; color: white; }
+        .tab:hover { background: #e8f4fc; }
+        .tab.active:hover { background: #2980b9; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .card-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #229954; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-warning:hover { background: #d68910; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn-secondary:hover { background: #7f8c8d; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .timeline { position: relative; padding-left: 30px; }
+        .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #ddd; }
+        .timeline-item { position: relative; margin-bottom: 20px; padding: 15px; background: #fafafa; border-radius: 6px; border-left: 3px solid #3498db; }
+        .timeline-item::before { content: ''; position: absolute; left: -24px; top: 20px; width: 12px; height: 12px; background: #3498db; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 2px #3498db; }
+        .timeline-item.battery { border-left-color: #e74c3c; }
+        .timeline-item.battery::before { background: #e74c3c; box-shadow: 0 0 0 2px #e74c3c; }
+        .timeline-item.weather { border-left-color: #f39c12; }
+        .timeline-item.weather::before { background: #f39c12; box-shadow: 0 0 0 2px #f39c12; }
+        .timeline-item.note { border-left-color: #9b59b6; }
+        .timeline-item.note::before { background: #9b59b6; box-shadow: 0 0 0 2px #9b59b6; }
+        .timeline-item.inspection { border-left-color: #27ae60; }
+        .timeline-item.inspection::before { background: #27ae60; box-shadow: 0 0 0 2px #27ae60; }
+        .timeline-time { font-size: 12px; color: #7f8c8d; margin-bottom: 5px; font-weight: 500; }
+        .timeline-type { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-bottom: 8px; }
+        .timeline-type.battery { background: #fdeaea; color: #c0392b; }
+        .timeline-type.weather { background: #fef3e0; color: #d68910; }
+        .timeline-type.note { background: #f4eef8; color: #8e44ad; }
+        .timeline-type.inspection { background: #eafaf1; color: #229954; }
+        .timeline-content { font-size: 14px; line-height: 1.6; }
+        .timeline-meta { margin-top: 10px; font-size: 12px; color: #7f8c8d; display: flex; gap: 15px; flex-wrap: wrap; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .badge-normal { background: #eafaf1; color: #229954; }
+        .badge-warning { background: #fef3e0; color: #d68910; }
+        .badge-danger { background: #fdeaea; color: #c0392b; }
+        .badge-info { background: #e8f4fc; color: #2980b9; }
+        .badge-late { background: #feefef; color: #e67e22; }
+        .badge-duplicate { background: #fdf2e9; color: #d35400; }
+        .badge-manual { background: #e8daef; color: #7d3c98; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 200px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #3498db; }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #ecf0f1; }
+        .table th { background: #f8f9fa; font-weight: 600; color: #2c3e50; }
+        .table tr:hover { background: #f8f9fa; }
+        .status-confirmed { color: #229954; font-weight: 500; }
+        .status-pending { color: #d68910; font-weight: 500; }
+        .status-manual { color: #7d3c98; font-weight: 500; }
+        .reason-box { background: #f8f9fa; padding: 10px; border-radius: 4px; margin-top: 8px; font-size: 12px; border-left: 3px solid #3498db; }
+        .reason-box strong { color: #2c3e50; }
+        .next-step { background: #eafaf1; padding: 10px; border-radius: 4px; margin-top: 8px; font-size: 12px; border-left: 3px solid #27ae60; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap; }
+        .filter-bar label { font-size: 13px; font-weight: 500; }
+        .filter-bar select, .filter-bar input { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-value { font-size: 28px; font-weight: 700; color: #2c3e50; }
+        .stat-label { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
+        .stat-card.confirmed .stat-value { color: #27ae60; }
+        .stat-card.pending .stat-value { color: #f39c12; }
+        .stat-card.manual .stat-value { color: #9b59b6; }
+        .stat-card.issues .stat-value { color: #e74c3c; }
+        .guide-box { background: #e8f4fc; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #3498db; }
+        .guide-box h4 { font-size: 14px; margin-bottom: 8px; color: #2c3e50; }
+        .guide-box ol, .guide-box ul { padding-left: 20px; font-size: 13px; line-height: 1.8; }
+        .guide-box li { margin-bottom: 5px; }
+        .hidden { display: none; }
+        .expand-btn { background: none; border: none; color: #3498db; cursor: pointer; font-size: 12px; padding: 0; }
+        .expand-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛩️ 外场队长工具</h1>
+            <p>电池记录 · 气象截图 · 飞手备注 · 矿区边坡巡检 · 飞行复盘</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="timeline">时间线视图</button>
+            <button class="tab" data-tab="inspection">矿区边坡巡检</button>
+            <button class="tab" data-tab="data">数据导入</button>
+            <button class="tab" data-tab="review">飞行复盘</button>
+            <button class="tab" data-tab="guide">使用说明</button>
+        </div>
+
+        <div id="timeline" class="panel active">
+            <div class="card">
+                <div class="card-title">快速添加记录</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>记录类型</label>
+                        <select id="recordType">
+                            <option value="battery">电池记录</option>
+                            <option value="weather">气象截图</option>
+                            <option value="note">飞手备注</option>
+                            <option value="inspection">巡检记录</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>时间</label>
+                        <input type="datetime-local" id="recordTime">
+                    </div>
+                    <div class="form-group">
+                        <label>飞行架次</label>
+                        <input type="text" id="flightNumber" placeholder="如：F001">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label>内容</label>
+                        <textarea id="recordContent" placeholder="输入记录内容..."></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>电池编号</label>
+                        <input type="text" id="batteryId" placeholder="电池记录专用">
+                    </div>
+                    <div class="form-group">
+                        <label>循环次数</label>
+                        <input type="number" id="batteryCycle" placeholder="电池记录专用">
+                    </div>
+                    <div class="form-group">
+                        <label>电压(V)</label>
+                        <input type="text" id="batteryVoltage" placeholder="如：22.8">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="addRecord()">添加记录</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    时间线
+                    <span style="float: right; font-size: 12px; font-weight: normal; color: #7f8c8d;">
+                        共 <span id="timelineCount">0</span> 条记录
+                    </span>
+                </div>
+                <div class="filter-bar">
+                    <label>筛选：</label>
+                    <select id="filterType" onchange="renderTimeline()">
+                        <option value="all">全部类型</option>
+                        <option value="battery">电池记录</option>
+                        <option value="weather">气象截图</option>
+                        <option value="note">飞手备注</option>
+                        <option value="inspection">巡检记录</option>
+                    </select>
+                    <input type="text" id="filterSearch" placeholder="搜索内容..." oninput="renderTimeline()">
+                </div>
+                <div class="timeline" id="timelineContainer"></div>
+            </div>
+        </div>
+
+        <div id="inspection" class="panel">
+            <div class="card">
+                <div class="card-title">矿区边坡巡检 - 智能分析</div>
+                <div class="stats-grid">
+                    <div class="stat-card confirmed">
+                        <div class="stat-value" id="statConfirmed">0</div>
+                        <div class="stat-label">已确认</div>
+                    </div>
+                    <div class="stat-card pending">
+                        <div class="stat-value" id="statPending">0</div>
+                        <div class="stat-label">待补材料</div>
+                    </div>
+                    <div class="stat-card manual">
+                        <div class="stat-value" id="statManual">0</div>
+                        <div class="stat-label">人工更正</div>
+                    </div>
+                    <div class="stat-card issues">
+                        <div class="stat-value" id="statIssues">0</div>
+                        <div class="stat-label">异常记录</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">巡检记录列表</div>
+                <div class="filter-bar">
+                    <label>状态筛选：</label>
+                    <select id="inspectionFilter" onchange="renderInspection()">
+                        <option value="all">全部</option>
+                        <option value="confirmed">已确认</option>
+                        <option value="pending">待补材料</option>
+                        <option value="manual">人工更正</option>
+                    </select>
+                    <button class="btn btn-success" onclick="runAutoAnalysis()">运行自动判断</button>
+                    <button class="btn btn-warning" onclick="loadSampleInspectionData()">加载测试数据包</button>
+                </div>
+                <table class="table" id="inspectionTable">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>架次</th>
+                            <th>内容</th>
+                            <th>状态</th>
+                            <th>判断理由</th>
+                            <th>下一步</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="data" class="panel">
+            <div class="card">
+                <div class="card-title">数据导入与处理</div>
+                <div class="guide-box">
+                    <h4>📦 支持的数据包格式</h4>
+                    <ul>
+                        <li>正常记录：完整的飞行数据</li>
+                        <li>晚到附件：延迟上传的照片/视频</li>
+                        <li>重复项：系统自动检测并合并</li>
+                        <li>人工更正：标记为人工修改的记录</li>
+                    </ul>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>粘贴JSON数据</label>
+                        <textarea id="importData" style="min-height: 200px; font-family: monospace; font-size: 12px;" placeholder='[{"type": "battery", "time": "2024-01-15T08:30:00", ...}]'></textarea>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="importData()">导入数据</button>
+                    <button class="btn btn-success" onclick="loadSampleData()">加载完整示例数据</button>
+                    <button class="btn btn-warning" onclick="detectDuplicates()">检测重复项</button>
+                    <button class="btn btn-danger" onclick="clearAllData()">清空所有数据</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">数据处理日志</div>
+                <div id="dataLog" style="font-family: monospace; font-size: 12px; background: #f8f9fa; padding: 15px; border-radius: 4px; max-height: 300px; overflow-y: auto;">等待操作...</div>
+            </div>
+        </div>
+
+        <div id="review" class="panel">
+            <div class="card">
+                <div class="card-title">飞行复盘 - 项目负责人视图</div>
+                <div class="guide-box">
+                    <h4>📋 处理口径说明</h4>
+                    <ul>
+                        <li><strong>已确认</strong>：数据完整、自动判断通过的记录，直接纳入统计</li>
+                        <li><strong>待补材料</strong>：缺少关键信息或附件延迟的记录，需外场队长补充</li>
+                        <li><strong>人工更正</strong>：经过人工修改的记录，保留修改痕迹和原因</li>
+                    </ul>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="reviewTotal">0</div>
+                        <div class="stat-label">总记录数</div>
+                    </div>
+                    <div class="stat-card confirmed">
+                        <div class="stat-value" id="reviewConfirmed">0</div>
+                        <div class="stat-label">已确认</div>
+                    </div>
+                    <div class="stat-card pending">
+                        <div class="stat-value" id="reviewPending">0</div>
+                        <div class="stat-label">待补材料</div>
+                    </div>
+                    <div class="stat-card manual">
+                        <div class="stat-value" id="reviewManual">0</div>
+                        <div class="stat-label">人工更正</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    已确认记录
+                    <span class="badge badge-normal" style="margin-left: 10px;" id="confirmedCount">0条</span>
+                </div>
+                <table class="table" id="confirmedTable">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>架次</th>
+                            <th>类型</th>
+                            <th>内容摘要</th>
+                            <th>确认理由</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    待补材料记录
+                    <span class="badge badge-warning" style="margin-left: 10px;" id="pendingCount">0条</span>
+                </div>
+                <table class="table" id="pendingTable">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>架次</th>
+                            <th>类型</th>
+                            <th>缺失内容</th>
+                            <th>补充期限</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    人工更正记录
+                    <span class="badge badge-manual" style="margin-left: 10px;" id="manualCount">0条</span>
+                </div>
+                <table class="table" id="manualTable">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>架次</th>
+                            <th>原始内容</th>
+                            <th>更正内容</th>
+                            <th>更正原因</th>
+                            <th>操作人</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">导出复盘报告</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>报告日期范围</label>
+                        <input type="date" id="reportStart"> - <input type="date" id="reportEnd">
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="exportReview()">导出现场版（外场队长）</button>
+                    <button class="btn btn-success" onclick="exportReviewManager()">导出管理版（项目负责人）</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="guide" class="panel">
+            <div class="card">
+                <div class="card-title">📖 外场队长操作指南</div>
+                
+                <div class="guide-box">
+                    <h4>🔋 如何放置电池记录样例</h4>
+                    <ol>
+                        <li>在「时间线视图」选择记录类型为「电池记录」</li>
+                        <li>填写电池编号、循环次数、电压等关键信息</li>
+                        <li>样例格式：<code>电池B001 | 循环: 156 | 电压: 22.8V | 温度: 35℃ | 放电: 85%</code></li>
+                        <li>建议每次飞行前后各记录一次</li>
+                    </ol>
+                </div>
+
+                <div class="guide-box">
+                    <h4>⚠️ 去哪看电池循环错算</h4>
+                    <ol>
+                        <li>进入「矿区边坡巡检」页面</li>
+                        <li>点击「运行自动判断」</li>
+                        <li>状态为「异常」的记录会标红显示</li>
+                        <li>判断理由中会注明「循环次数异常」「电压异常」等具体原因</li>
+                        <li>也可在「飞行复盘」的「待补材料」或「人工更正」中查看</li>
+                    </ol>
+                </div>
+
+                <div class="guide-box">
+                    <h4>✅ 导出飞行复盘前怎么复核</h4>
+                    <ol>
+                        <li><strong>第一步</strong>：进入「矿区边坡巡检」检查所有记录状态</li>
+                        <li><strong>第二步</strong>：确认「待补材料」是否已补充完整</li>
+                        <li><strong>第三步</strong>：核对「人工更正」记录的修改原因是否合理</li>
+                        <li><strong>第四步</strong>：检查电池循环次数是否在正常范围（通常50-300次）</li>
+                        <li><strong>第五步</strong>：确认气象截图和飞手备注是否齐全</li>
+                        <li><strong>第六步</strong>：进入「飞行复盘」点击导出按钮</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">💡 常见问题处理</div>
+                <div class="guide-box">
+                    <h4>晚到附件怎么办？</h4>
+                    <ul>
+                        <li>系统会自动检测并标记为「晚到附件」</li>
+                        <li>附件到达后，点击记录的「补充材料」按钮</li>
+                        <li>补充后状态自动变更为「已确认」</li>
+                    </ul>
+                </div>
+                <div class="guide-box">
+                    <h4>发现重复记录？</h4>
+                    <ul>
+                        <li>在「数据导入」页面点击「检测重复项」</li>
+                        <li>系统会自动合并内容，保留最完整的版本</li>
+                        <li>合并记录会标记为「人工更正」保留痕迹</li>
+                    </ul>
+                </div>
+                <div class="guide-box">
+                    <h4>需要人工修改？</h4>
+                    <ul>
+                        <li>点击记录的「更正」按钮</li>
+                        <li>填写修改原因和操作人</li>
+                        <li>修改记录永久保存，可在复盘时追溯</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let records = [];
+        let inspectionRecords = [];
+        let manualCorrections = [];
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        function init() {
+            const now = new Date();
+            document.getElementById('recordTime').value = now.toISOString().slice(0, 16);
+            document.getElementById('reportStart').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+            document.getElementById('reportEnd').value = now.toISOString().slice(0, 10);
+            
+            loadFromStorage();
+            renderTimeline();
+            renderInspection();
+            updateReviewStats();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('fieldCaptain_records', JSON.stringify(records));
+            localStorage.setItem('fieldCaptain_inspection', JSON.stringify(inspectionRecords));
+            localStorage.setItem('fieldCaptain_corrections', JSON.stringify(manualCorrections));
+        }
+
+        function loadFromStorage() {
+            const r = localStorage.getItem('fieldCaptain_records');
+            const i = localStorage.getItem('fieldCaptain_inspection');
+            const c = localStorage.getItem('fieldCaptain_corrections');
+            if (r) records = JSON.parse(r);
+            if (i) inspectionRecords = JSON.parse(i);
+            if (c) manualCorrections = JSON.parse(c);
+        }
+
+        function addRecord() {
+            const type = document.getElementById('recordType').value;
+            const time = document.getElementById('recordTime').value;
+            const flightNumber = document.getElementById('flightNumber').value;
+            const content = document.getElementById('recordContent').value;
+            const batteryId = document.getElementById('batteryId').value;
+            const batteryCycle = document.getElementById('batteryCycle').value;
+            const batteryVoltage = document.getElementById('batteryVoltage').value;
+
+            if (!content) {
+                alert('请填写记录内容');
+                return;
+            }
+
+            const record = {
+                id: Date.now(),
+                type,
+                time,
+                flightNumber,
+                content,
+                batteryId,
+                batteryCycle: batteryCycle ? parseInt(batteryCycle) : null,
+                batteryVoltage,
+                status: 'pending',
+                reason: '',
+                nextStep: '',
+                isLate: false,
+                isDuplicate: false,
+                isManual: false,
+                createdAt: new Date().toISOString()
+            };
+
+            records.unshift(record);
+            saveToStorage();
+            renderTimeline();
+            
+            document.getElementById('recordContent').value = '';
+            document.getElementById('batteryId').value = '';
+            document.getElementById('batteryCycle').value = '';
+            document.getElementById('batteryVoltage').value = '';
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timelineContainer');
+            const filterType = document.getElementById('filterType').value;
+            const search = document.getElementById('filterSearch').value.toLowerCase();
+
+            let filtered = records;
+            if (filterType !== 'all') {
+                filtered = filtered.filter(r => r.type === filterType);
+            }
+            if (search) {
+                filtered = filtered.filter(r => 
+                    r.content.toLowerCase().includes(search) ||
+                    (r.flightNumber && r.flightNumber.toLowerCase().includes(search))
+                );
+            }
+
+            filtered.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+            document.getElementById('timelineCount').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">暂无记录，请添加第一条记录</div>';
+                return;
+            }
+
+            const typeLabels = {
+                battery: '电池记录',
+                weather: '气象截图',
+                note: '飞手备注',
+                inspection: '巡检记录'
+            };
+
+            container.innerHTML = filtered.map(record => {
+                const meta = [];
+                if (record.flightNumber) meta.push(`架次: ${record.flightNumber}`);
+                if (record.batteryId) meta.push(`电池: ${record.batteryId}`);
+                if (record.batteryCycle) meta.push(`循环: ${record.batteryCycle}次`);
+                if (record.batteryVoltage) meta.push(`电压: ${record.batteryVoltage}V`);
+                
+                const badges = [];
+                if (record.isLate) badges.push('<span class="badge badge-late">晚到附件</span>');
+                if (record.isDuplicate) badges.push('<span class="badge badge-duplicate">重复项</span>');
+                if (record.isManual) badges.push('<span class="badge badge-manual">人工更正</span>');
+
+                return `
+                    <div class="timeline-item ${record.type}">
+                        <span class="timeline-type ${record.type}">${typeLabels[record.type]}</span>
+                        ${badges.join(' ')}
+                        <div class="timeline-time">${formatTime(record.time)}</div>
+                        <div class="timeline-content">${record.content}</div>
+                        ${meta.length > 0 ? `<div class="timeline-meta">${meta.map(m => `<span>${m}</span>`).join('')}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatTime(iso) {
+            const d = new Date(iso);
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        }
+
+        function runAutoAnalysis() {
+            let log = [];
+            let issues = 0;
+            
+            inspectionRecords.forEach(record => {
+                let reasons = [];
+                let status = 'confirmed';
+                let nextStep = '无需处理，记录正常';
+
+                if (!record.content || record.content.length < 5) {
+                    reasons.push('记录内容不完整');
+                    status = 'pending';
+                    nextStep = '请外场队长补充巡检内容描述';
+                }
+
+                if (record.type === 'battery') {
+                    if (record.batteryCycle && (record.batteryCycle < 10 || record.batteryCycle > 400)) {
+                        reasons.push(`电池循环次数异常(${record.batteryCycle}次)，正常范围50-300`);
+                        status = 'pending';
+                        nextStep = '请核对电池循环次数，确认是否错算';
+                        issues++;
+                    }
+                    if (record.batteryVoltage) {
+                        const v = parseFloat(record.batteryVoltage);
+                        if (v < 20 || v > 26) {
+                            reasons.push(`电池电压异常(${record.batteryVoltage}V)，正常范围22-25V`);
+                            status = 'pending';
+                            nextStep = '请检查电池电压读数，必要时更换电池';
+                            issues++;
+                        }
+                    }
+                }
+
+                if (record.isLate) {
+                    reasons.push('附件晚到，已补传');
+                    status = 'confirmed';
+                    nextStep = '材料已补齐，可纳入统计';
+                }
+
+                if (record.isManual) {
+                    reasons.push('经过人工更正');
+                    status = 'manual';
+                    nextStep = '已记录修改痕迹，可供追溯';
+                }
+
+                if (reasons.length === 0) {
+                    reasons.push('数据完整，自动判断通过');
+                }
+
+                record.reason = reasons.join('；');
+                record.nextStep = nextStep;
+                record.status = status;
+                
+                log.push(`架次${record.flightNumber || '未知'}: ${status} - ${record.reason}`);
+            });
+
+            saveToStorage();
+            renderInspection();
+            addLog('自动分析完成，发现' + issues + '个异常\n' + log.join('\n'));
+        }
+
+        function renderInspection() {
+            const filter = document.getElementById('inspectionFilter').value;
+            const tbody = document.querySelector('#inspectionTable tbody');
+
+            let filtered = inspectionRecords;
+            if (filter !== 'all') {
+                filtered = filtered.filter(r => r.status === filter);
+            }
+
+            const stats = { confirmed: 0, pending: 0, manual: 0, issues: 0 };
+            inspectionRecords.forEach(r => {
+                stats[r.status] = (stats[r.status] || 0) + 1;
+                if (r.reason && r.reason.includes('异常')) stats.issues++;
+            });
+
+            document.getElementById('statConfirmed').textContent = stats.confirmed;
+            document.getElementById('statPending').textContent = stats.pending;
+            document.getElementById('statManual').textContent = stats.manual;
+            document.getElementById('statIssues').textContent = stats.issues;
+
+            const statusLabels = {
+                confirmed: '<span class="status-confirmed">已确认</span>',
+                pending: '<span class="status-pending">待补材料</span>',
+                manual: '<span class="status-manual">人工更正</span>'
+            };
+
+            tbody.innerHTML = filtered.map(record => `
+                <tr>
+                    <td>${formatTime(record.time)}</td>
+                    <td>${record.flightNumber || '-'}</td>
+                    <td style="max-width: 200px;">${record.content.substring(0, 50)}${record.content.length > 50 ? '...' : ''}</td>
+                    <td>${statusLabels[record.status] || '-'}</td>
+                    <td style="max-width: 200px;">
+                        ${record.reason ? `<div class="reason-box"><strong>判断理由：</strong>${record.reason}</div>` : '-'}
+                    </td>
+                    <td style="max-width: 200px;">
+                        ${record.nextStep ? `<div class="next-step"><strong>下一步：</strong>${record.nextStep}</div>` : '-'}
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="correctRecord(${record.id})">更正</button>
+                        ${record.status === 'pending' ? `<button class="btn btn-success" style="padding: 4px 8px; font-size: 12px; margin-top: 4px;" onclick="confirmRecord(${record.id})">确认</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #999;">暂无巡检记录，点击"加载测试数据包"开始</td></tr>';
+            }
+        }
+
+        function correctRecord(id) {
+            const record = inspectionRecords.find(r => r.id === id);
+            if (!record) return;
+
+            const newContent = prompt('请输入更正后的内容：', record.content);
+            if (newContent === null) return;
+
+            const reason = prompt('请输入更正原因：');
+            if (reason === null) return;
+
+            const operator = prompt('请输入操作人：');
+            if (operator === null) return;
+
+            manualCorrections.push({
+                id: Date.now(),
+                recordId: id,
+                originalContent: record.content,
+                newContent,
+                reason,
+                operator,
+                time: new Date().toISOString()
+            });
+
+            record.content = newContent;
+            record.isManual = true;
+            record.status = 'manual';
+            record.reason = `人工更正：${reason}`;
+            record.nextStep = '已记录修改痕迹，可供追溯';
+
+            saveToStorage();
+            renderInspection();
+            addLog(`记录已更正: 架次${record.flightNumber} - 操作人: ${operator}`);
+        }
+
+        function confirmRecord(id) {
+            const record = inspectionRecords.find(r => r.id === id);
+            if (!record) return;
+
+            record.status = 'confirmed';
+            record.reason = '外场队长人工确认材料齐全';
+            record.nextStep = '已确认，可纳入统计';
+
+            saveToStorage();
+            renderInspection();
+            updateReviewStats();
+            addLog(`记录已确认: 架次${record.flightNumber}`);
+        }
+
+        function loadSampleInspectionData() {
+            const today = new Date();
+            const samples = [
+                {
+                    id: Date.now() + 1,
+                    type: 'inspection',
+                    time: new Date(today.getTime() - 3600000 * 2).toISOString(),
+                    flightNumber: 'F001',
+                    content: '矿区北坡巡检，边坡稳定，未见异常裂缝，植被覆盖良好',
+                    status: 'pending',
+                    isLate: false,
+                    isDuplicate: false,
+                    isManual: false
+                },
+                {
+                    id: Date.now() + 2,
+                    type: 'battery',
+                    time: new Date(today.getTime() - 3600000 * 4).toISOString(),
+                    flightNumber: 'F001',
+                    content: '飞行前电池检测',
+                    batteryId: 'B001',
+                    batteryCycle: 450,
+                    batteryVoltage: '25.2',
+                    status: 'pending',
+                    isLate: false,
+                    isDuplicate: false,
+                    isManual: false
+                },
+                {
+                    id: Date.now() + 3,
+                    type: 'weather',
+                    time: new Date(today.getTime() - 3600000 * 6).toISOString(),
+                    flightNumber: 'F001',
+                    content: '天气晴朗，风速3m/s，能见度良好，适合飞行',
+                    status: 'pending',
+                    isLate: true,
+                    isDuplicate: false,
+                    isManual: false
+                },
+                {
+                    id: Date.now() + 4,
+                    type: 'note',
+                    time: new Date(today.getTime() - 3600000 * 8).toISOString(),
+                    flightNumber: 'F002',
+                    content: '飞行正常，采集照片156张，视频2段',
+                    status: 'pending',
+                    isLate: false,
+                    isDuplicate: false,
+                    isManual: false
+                },
+                {
+                    id: Date.now() + 5,
+                    type: 'inspection',
+                    time: new Date(today.getTime() - 3600000 * 10).toISOString(),
+                    flightNumber: 'F002',
+                    content: '东坡发现细小裂缝约2cm，已标记位置，建议一周后复查',
+                    status: 'pending',
+                    isLate: false,
+                    isDuplicate: true,
+                    isManual: false
+                },
+                {
+                    id: Date.now() + 6,
+                    type: 'battery',
+                    time: new Date(today.getTime() - 3600000 * 12).toISOString(),
+                    flightNumber: 'F002',
+                    content: '飞行后电池状态',
+                    batteryId: 'B002',
+                    batteryCycle: 128,
+                    batteryVoltage: '22.5',
+                    status: 'pending',
+                    isLate: false,
+                    isDuplicate: false,
+                    isManual: false
+                },
+                {
+                    id: Date.now() + 7,
+                    type: 'inspection',
+                    time: new Date(today.getTime() - 3600000 * 24).toISOString(),
+                    flightNumber: 'F003',
+                    content: '南坡排水系统正常，无堵塞情况',
+                    status: 'pending',
+                    isLate: false,
+                    isDuplicate: false,
+                    isManual: false
+                },
+                {
+                    id: Date.now() + 8,
+                    type: 'battery',
+                    time: new Date(today.getTime() - 3600000 * 26).toISOString(),
+                    flightNumber: 'F003',
+                    content: '电池状态记录',
+                    batteryId: 'B001',
+                    batteryCycle: 5,
+                    batteryVoltage: '19.8',
+                    status: 'pending',
+                    isLate: false,
+                    isDuplicate: false,
+                    isManual: false
+                }
+            ];
+
+            inspectionRecords = samples;
+            saveToStorage();
+            renderInspection();
+            addLog('已加载测试数据包：8条记录（包含正常记录、晚到附件、重复项、异常数据）');
+        }
+
+        function importData() {
+            try {
+                const data = JSON.parse(document.getElementById('importData').value);
+                if (!Array.isArray(data)) throw new Error('数据格式错误');
+                
+                data.forEach(item => {
+                    item.id = Date.now() + Math.random();
+                    if (!item.status) item.status = 'pending';
+                    inspectionRecords.push(item);
+                    records.push(item);
+                });
+
+                saveToStorage();
+                renderTimeline();
+                renderInspection();
+                addLog(`成功导入 ${data.length} 条记录`);
+            } catch (e) {
+                alert('导入失败：' + e.message);
+            }
+        }
+
+        function loadSampleData() {
+            loadSampleInspectionData();
+            records = [...inspectionRecords];
+            saveToStorage();
+            renderTimeline();
+            updateReviewStats();
+            addLog('已加载完整示例数据');
+        }
+
+        function detectDuplicates() {
+            const seen = new Map();
+            const duplicates = [];
+
+            inspectionRecords.forEach((record, index) => {
+                const key = `${record.flightNumber}-${record.type}-${record.time.substring(0, 10)}`;
+                if (seen.has(key)) {
+                    duplicates.push({ index, original: seen.get(key), record });
+                    record.isDuplicate = true;
+                } else {
+                    seen.set(key, index);
+                }
+            });
+
+            if (duplicates.length > 0) {
+                addLog(`检测到 ${duplicates.length} 条重复记录，已标记`);
+                
+                if (confirm(`检测到${duplicates.length}条重复记录，是否自动合并？`)) {
+                    duplicates.forEach(d => {
+                        const original = inspectionRecords[d.original];
+                        original.content += '\n[合并重复] ' + d.record.content;
+                        original.isManual = true;
+                    });
+                    
+                    inspectionRecords = inspectionRecords.filter((r, i) => 
+                        !duplicates.some(d => d.index === i)
+                    );
+                    
+                    saveToStorage();
+                    renderInspection();
+                    addLog(`已合并 ${duplicates.length} 条重复记录`);
+                }
+            } else {
+                addLog('未检测到重复记录');
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('确定要清空所有数据吗？此操作不可撤销。')) {
+                records = [];
+                inspectionRecords = [];
+                manualCorrections = [];
+                saveToStorage();
+                renderTimeline();
+                renderInspection();
+                updateReviewStats();
+                addLog('所有数据已清空');
+            }
+        }
+
+        function addLog(msg) {
+            const log = document.getElementById('dataLog');
+            const time = new Date().toLocaleTimeString();
+            log.innerHTML = `[${time}] ${msg}\n` + log.innerHTML;
+        }
+
+        function updateReviewStats() {
+            const all = [...inspectionRecords, ...records];
+            const unique = Array.from(new Map(all.map(r => [r.id, r])).values());
+            
+            const confirmed = unique.filter(r => r.status === 'confirmed');
+            const pending = unique.filter(r => r.status === 'pending');
+            const manual = unique.filter(r => r.status === 'manual' || r.isManual);
+
+            document.getElementById('reviewTotal').textContent = unique.length;
+            document.getElementById('reviewConfirmed').textContent = confirmed.length;
+            document.getElementById('reviewPending').textContent = pending.length;
+            document.getElementById('reviewManual').textContent = manual.length;
+
+            document.getElementById('confirmedCount').textContent = confirmed.length + '条';
+            document.getElementById('pendingCount').textContent = pending.length + '条';
+            document.getElementById('manualCount').textContent = manual.length + '条';
+
+            const typeLabels = {
+                battery: '电池记录',
+                weather: '气象截图',
+                note: '飞手备注',
+                inspection: '巡检记录'
+            };
+
+            const confirmedTable = document.querySelector('#confirmedTable tbody');
+            confirmedTable.innerHTML = confirmed.map(r => `
+                <tr>
+                    <td>${formatTime(r.time)}</td>
+                    <td>${r.flightNumber || '-'}</td>
+                    <td>${typeLabels[r.type] || r.type}</td>
+                    <td>${r.content.substring(0, 30)}...</td>
+                    <td>${r.reason || '数据完整，自动通过'}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="5" style="text-align: center; color: #999;">暂无数据</td></tr>';
+
+            const pendingTable = document.querySelector('#pendingTable tbody');
+            pendingTable.innerHTML = pending.map(r => `
+                <tr>
+                    <td>${formatTime(r.time)}</td>
+                    <td>${r.flightNumber || '-'}</td>
+                    <td>${typeLabels[r.type] || r.type}</td>
+                    <td>${r.reason || '待补充'}</td>
+                    <td>${formatTime(new Date(new Date(r.time).getTime() + 3*24*3600000).toISOString())}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="5" style="text-align: center; color: #999;">暂无数据</td></tr>';
+
+            const manualTable = document.querySelector('#manualTable tbody');
+            manualTable.innerHTML = manualCorrections.map(c => `
+                <tr>
+                    <td>${formatTime(c.time)}</td>
+                    <td>${inspectionRecords.find(r => r.id === c.recordId)?.flightNumber || '-'}</td>
+                    <td>${c.originalContent.substring(0, 20)}...</td>
+                    <td>${c.newContent.substring(0, 20)}...</td>
+                    <td>${c.reason}</td>
+                    <td>${c.operator}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="6" style="text-align: center; color: #999;">暂无数据</td></tr>';
+        }
+
+        function exportReview() {
+            updateReviewStats();
+            const all = [...inspectionRecords, ...records];
+            const unique = Array.from(new Map(all.map(r => [r.id, r])).values());
+            
+            let content = '飞行复盘报告（外场队长版）\n';
+            content += '=' .repeat(50) + '\n\n';
+            content += `生成时间: ${new Date().toLocaleString()}\n`;
+            content += `总记录数: ${unique.length}\n\n`;
+            
+            unique.sort((a, b) => new Date(a.time) - new Date(b.time)).forEach(r => {
+                content += `[${formatTime(r.time)}] ${r.flightNumber || ''}\n`;
+                content += `  内容: ${r.content}\n`;
+                if (r.batteryId) content += `  电池: ${r.batteryId}, 循环: ${r.batteryCycle}次\n`;
+                if (r.reason) content += `  备注: ${r.reason}\n`;
+                content += '\n';
+            });
+
+            downloadFile(content, '飞行复盘报告_现场版.txt');
+        }
+
+        function exportReviewManager() {
+            updateReviewStats();
+            const all = [...inspectionRecords, ...records];
+            const unique = Array.from(new Map(all.map(r => [r.id, r])).values());
+            
+            const confirmed = unique.filter(r => r.status === 'confirmed');
+            const pending = unique.filter(r => r.status === 'pending');
+            const manual = unique.filter(r => r.status === 'manual' || r.isManual);
+
+            let content = '飞行复盘报告（项目负责人版）\n';
+            content += '=' .repeat(50) + '\n\n';
+            content += `生成时间: ${new Date().toLocaleString()}\n\n`;
+            
+            content += '【处理口径说明】\n';
+            content += '• 已确认：数据完整、自动判断通过，直接纳入统计\n';
+            content += '• 待补材料：缺少关键信息，需外场队长补充\n';
+            content += '• 人工更正：经过人工修改，保留修改痕迹\n\n';
+
+            content += '【统计概览】\n';
+            content += `总记录数: ${unique.length}\n`;
+            content += `已确认: ${confirmed.length} (${((confirmed.length/unique.length)*100).toFixed(1)}%)\n`;
+            content += `待补材料: ${pending.length} (${((pending.length/unique.length)*100).toFixed(1)}%)\n`;
+            content += `人工更正: ${manual.length} (${((manual.length/unique.length)*100).toFixed(1)}%)\n\n`;
+
+            content += '【已确认记录详情】\n';
+            confirmed.forEach(r => {
+                content += `  [${formatTime(r.time)}] ${r.flightNumber || ''}: ${r.content.substring(0, 50)}...\n`;
+                content += `    确认理由: ${r.reason || '数据完整'}\n`;
+            });
+            content += '\n';
+
+            content += '【待补材料记录详情】\n';
+            pending.forEach(r => {
+                content += `  [${formatTime(r.time)}] ${r.flightNumber || ''}: ${r.content.substring(0, 50)}...\n`;
+                content += `    缺失内容: ${r.reason || '待补充'}\n`;
+                content += `    下一步: ${r.nextStep || '请外场队长尽快补充'}\n`;
+            });
+            content += '\n';
+
+            content += '【人工更正记录详情】\n';
+            manualCorrections.forEach(c => {
+                content += `  [${formatTime(c.time)}] 操作人: ${c.operator}\n`;
+                content += `    更正原因: ${c.reason}\n`;
+                content += `    原始: ${c.originalContent.substring(0, 30)}...\n`;
+                content += `    更正: ${c.newContent.substring(0, 30)}...\n`;
+            });
+
+            downloadFile(content, '飞行复盘报告_管理版.txt');
+        }
+
+        function downloadFile(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        init();
+    </script>
+</body>
+</html>
