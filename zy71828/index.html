@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>博物馆闭馆逃脱 · 复盘留痕系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22262f;--border:#2e3340;
+  --text:#e4e6eb;--text2:#9aa0b0;--text3:#6b7280;
+  --accent:#6c8cff;--accent2:#4a6aef;
+  --warn:#f0a040;--danger:#e5534b;--success:#57ab5a;
+  --supplement:#4da6c9;--conclusion:#d4764e;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;line-height:1.6;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-title{font-size:18px;font-weight:700;letter-spacing:0.5px}
+.header-badge{font-size:11px;background:var(--accent2);color:#fff;padding:2px 8px;border-radius:10px;font-weight:500}
+.header-right{display:flex;gap:10px;align-items:center}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--border);border-color:var(--text3)}
+.btn-primary{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.btn-primary:hover{background:var(--accent)}
+.btn-danger{border-color:var(--danger);color:var(--danger)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-warn{border-color:var(--warn);color:var(--warn)}
+.btn-warn:hover{background:var(--warn);color:#fff}
+.btn-sm{padding:4px 10px;font-size:12px}
+
+.main{display:flex;gap:0;height:calc(100vh - 57px)}
+.sidebar{width:260px;min-width:260px;background:var(--surface);border-right:1px solid var(--border);padding:16px;overflow-y:auto}
+.content{flex:1;overflow-y:auto;padding:24px}
+
+.sidebar-section{margin-bottom:20px}
+.sidebar-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px;font-weight:600}
+.filter-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s}
+.filter-item:hover{background:var(--surface2);color:var(--text)}
+.filter-item.active{background:var(--accent2);color:#fff}
+.filter-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.filter-count{margin-left:auto;font-size:11px;background:var(--surface2);padding:1px 6px;border-radius:8px;color:var(--text3)}
+
+.stat-card{background:var(--surface2);border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.stat-label{font-size:11px;color:var(--text3);margin-bottom:2px}
+.stat-value{font-size:22px;font-weight:700}
+
+.timeline{max-width:900px}
+.timeline-item{display:flex;gap:16px;margin-bottom:2px;position:relative}
+.timeline-line{width:2px;background:var(--border);margin-left:15px;flex-shrink:0;position:relative}
+.timeline-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--border);background:var(--bg);position:absolute;left:-5px;top:18px;z-index:1}
+.timeline-dot.supplement{border-color:var(--supplement);background:var(--supplement)}
+.timeline-dot.conclusion{border-color:var(--conclusion);background:var(--conclusion)}
+.timeline-dot.auto-judgment{border-color:var(--accent);box-shadow:0 0 6px var(--accent)}
+.timeline-dot.restart{border-color:var(--danger);background:var(--danger)}
+.timeline-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:8px}
+.timeline-card.supplement{border-left:3px solid var(--supplement)}
+.timeline-card.conclusion{border-left:3px solid var(--conclusion)}
+.timeline-card.auto-judgment{border-left:3px solid var(--accent)}
+.timeline-card.restart{border-left:3px solid var(--danger)}
+
+.card-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.card-time{font-size:12px;color:var(--text3);font-family:monospace}
+.card-tag{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500}
+.tag-supplement{background:rgba(77,166,201,0.15);color:var(--supplement)}
+.tag-conclusion{background:rgba(212,118,78,0.15);color:var(--conclusion)}
+.tag-auto{background:rgba(108,140,255,0.15);color:var(--accent)}
+.tag-restart{background:rgba(229,83,75,0.15);color:var(--danger)}
+.card-subtype{font-size:12px;color:var(--text2)}
+.card-operator{font-size:12px;color:var(--text3);margin-left:auto}
+
+.card-body{font-size:13px;color:var(--text2);margin-bottom:8px;white-space:pre-wrap}
+.card-detail{background:var(--surface2);border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:12px}
+.card-detail-row{display:flex;gap:8px;margin-bottom:4px}
+.card-detail-label{color:var(--text3);min-width:80px;flex-shrink:0}
+.card-detail-value{color:var(--text);word-break:break-all}
+.card-detail-value.before{text-decoration:line-through;color:var(--danger);opacity:0.7}
+.card-detail-value.after{color:var(--success)}
+
+.card-reason{background:rgba(240,160,64,0.08);border:1px solid rgba(240,160,64,0.2);border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:12px}
+.card-reason-title{color:var(--warn);font-weight:600;margin-bottom:2px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
+
+.card-nextsteps{background:rgba(87,171,90,0.08);border:1px solid rgba(87,171,90,0.2);border-radius:6px;padding:10px 12px;font-size:12px}
+.card-nextsteps-title{color:var(--success);font-weight:600;margin-bottom:2px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:560px;max-height:85vh;overflow-y:auto;padding:24px}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:16px}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:500}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-size:13px;font-family:inherit}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--accent)}
+.form-textarea{min-height:60px;resize:vertical}
+.form-row{display:flex;gap:12px}
+.form-row .form-group{flex:1}
+.form-hint{font-size:11px;color:var(--text3);margin-top:2px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+
+.export-area{width:100%;min-height:400px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px;color:var(--text);font-family:monospace;font-size:12px;line-height:1.5;resize:vertical;white-space:pre-wrap}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:48px;margin-bottom:12px;opacity:0.3}
+.empty-text{font-size:14px}
+
+.badge-controversial{display:inline-flex;align-items:center;gap:4px;background:rgba(229,83,75,0.12);color:var(--danger);font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600}
+
+.search-box{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-size:13px;margin-bottom:12px}
+.search-box:focus{outline:none;border-color:var(--accent)}
+.search-box::placeholder{color:var(--text3)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-title">博物馆闭馆逃脱</div>
+    <span class="header-badge">复盘留痕</span>
+  </div>
+  <div class="header-right">
+    <button class="btn" onclick="openExportModal()">📋 导出复盘</button>
+    <button class="btn btn-primary" onclick="openAddModal()">＋ 新增记录</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <input type="text" class="search-box" placeholder="搜索记录内容…" oninput="handleSearch(this.value)">
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">记录分类</div>
+      <div class="filter-item active" data-filter="all" onclick="setFilter('all',this)">
+        全部记录 <span class="filter-count" id="count-all">0</span>
+      </div>
+      <div class="filter-item" data-filter="supplement" onclick="setFilter('supplement',this)">
+        <span class="filter-dot" style="background:var(--supplement)"></span>
+        补材料 <span class="filter-count" id="count-supplement">0</span>
+      </div>
+      <div class="filter-item" data-filter="conclusion" onclick="setFilter('conclusion',this)">
+        <span class="filter-dot" style="background:var(--conclusion)"></span>
+        改结论 <span class="filter-count" id="count-conclusion">0</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">记录子类型</div>
+      <div class="filter-item" data-filter="leaderboard_screenshot" onclick="setFilter('leaderboard_screenshot',this)">
+        📸 排行榜截图早到
+      </div>
+      <div class="filter-item" data-filter="review_late_supplement" onclick="setFilter('review_late_supplement',this)">
+        📝 复盘晚补
+      </div>
+      <div class="filter-item" data-filter="level_draft_change" onclick="setFilter('level_draft_change',this)">
+        ✏️ 关卡草表改动
+      </div>
+      <div class="filter-item" data-filter="restart_score_reset" onclick="setFilter('restart_score_reset',this)">
+        🔄 重开刷分
+      </div>
+      <div class="filter-item" data-filter="auto_judgment" onclick="setFilter('auto_judgment',this)">
+        🤖 自动判断
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">统计概览</div>
+      <div class="stat-card">
+        <div class="stat-label">总记录</div>
+        <div class="stat-value" id="stat-total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">争议记录（重开刷分）</div>
+        <div class="stat-value" id="stat-controversial" style="color:var(--danger)">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">改结论记录</div>
+        <div class="stat-value" id="stat-conclusion" style="color:var(--conclusion)">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="timeline" id="timeline"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-title">新增留痕记录</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">分类 *</label>
+        <select class="form-select" id="f-category" onchange="onCategoryChange()">
+          <option value="supplement">补材料（不影响结论）</option>
+          <option value="conclusion">改结论（影响最终结果）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">子类型 *</label>
+        <select class="form-select" id="f-subtype" onchange="onSubtypeChange()">
+          <option value="leaderboard_screenshot">📸 排行榜截图早到</option>
+          <option value="review_late_supplement">📝 复盘晚补</option>
+          <option value="level_draft_change">✏️ 关卡草表改动</option>
+          <option value="restart_score_reset">🔄 重开刷分</option>
+          <option value="auto_judgment">🤖 自动判断</option>
+          <option value="other">📌 其他</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">操作人 *</label>
+      <input class="form-input" id="f-operator" placeholder="谁操作的">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">事项描述 *</label>
+      <textarea class="form-textarea" id="f-description" placeholder="发生了什么"></textarea>
+    </div>
+
+    <div id="fields-supplement" style="display:none">
+      <div class="form-group">
+        <label class="form-label">补充说明</label>
+        <textarea class="form-textarea" id="f-supplement-note" placeholder="为什么补材料，补了什么"></textarea>
+      </div>
+    </div>
+
+    <div id="fields-conclusion" style="display:none">
+      <div class="form-group">
+        <label class="form-label">原结论</label>
+        <input class="form-input" id="f-original-conclusion" placeholder="改动前的结论">
+      </div>
+      <div class="form-group">
+        <label class="form-label">新结论</label>
+        <input class="form-input" id="f-new-conclusion" placeholder="改动后的结论">
+      </div>
+      <div class="form-group">
+        <label class="form-label">改结论原因 *</label>
+        <textarea class="form-textarea" id="f-change-reason" placeholder="为什么改结论，必须可复核"></textarea>
+      </div>
+    </div>
+
+    <div id="fields-restart" style="display:none">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">改动前数值</label>
+          <input class="form-input" id="f-before-value" placeholder="如：得分 1280">
+        </div>
+        <div class="form-group">
+          <label class="form-label">改动后数值</label>
+          <input class="form-input" id="f-after-value" placeholder="如：得分 0（重置）">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">复核原因 * <span style="color:var(--danger)">争议记录必填</span></label>
+        <textarea class="form-textarea" id="f-verification-reason" placeholder="为什么重开/刷分，必须给出可复核的原因"></textarea>
+        <div class="form-hint">重开刷分记录必须给出可复核原因，比总数更有用</div>
+      </div>
+    </div>
+
+    <div id="fields-auto" style="display:none">
+      <div class="form-group">
+        <label class="form-label">自动判断理由 *</label>
+        <textarea class="form-textarea" id="f-auto-reason" placeholder="系统为什么做出这个判断，写明规则和触发条件"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">判断结果</label>
+        <input class="form-input" id="f-auto-result" placeholder="自动判断的结论">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">下一步</label>
+      <textarea class="form-textarea" id="f-next-steps" placeholder="下一班需要做什么，不看代码也能懂"></textarea>
+      <div class="form-hint">活动负责人不看代码，把原因和下一步写清楚</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveRecord()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="exportModal">
+  <div class="modal" style="width:700px">
+    <div class="modal-title">导出活动复盘</div>
+    <div class="form-group">
+      <label class="form-label">复盘内容（可直接复制，不用排版，重点是下一班能继续查）</label>
+      <textarea class="export-area" id="export-content" readonly></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeExportModal()">关闭</button>
+      <button class="btn btn-primary" onclick="copyExport()">复制到剪贴板</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var records = [];
+var currentFilter = 'all';
+var searchQuery = '';
+
+var SUBTYPE_LABELS = {
+  leaderboard_screenshot: '📸 排行榜截图早到',
+  review_late_supplement: '📝 复盘晚补',
+  level_draft_change: '✏️ 关卡草表改动',
+  restart_score_reset: '🔄 重开刷分',
+  auto_judgment: '🤖 自动判断',
+  other: '📌 其他'
+};
+
+var CATEGORY_LABELS = {
+  supplement: '补材料',
+  conclusion: '改结论'
+};
+
+function generateId() {
+  return 'R' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+}
+
+function formatTime(ts) {
+  var d = new Date(ts);
+  var pad = function(n) { return n < 10 ? '0' + n : n; };
+  return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) +
+    ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+}
+
+function addRecord(data) {
+  var rec = {
+    id: generateId(),
+    timestamp: data.timestamp || new Date().toISOString(),
+    category: data.category,
+    subType: data.subType,
+    operator: data.operator || '',
+    description: data.description || '',
+    supplementNote: data.supplementNote || '',
+    originalConclusion: data.originalConclusion || '',
+    newConclusion: data.newConclusion || '',
+    changeReason: data.changeReason || '',
+    beforeValue: data.beforeValue || '',
+    afterValue: data.afterValue || '',
+    verificationReason: data.verificationReason || '',
+    autoJudgmentReason: data.autoJudgmentReason || '',
+    autoJudgmentResult: data.autoJudgmentResult || '',
+    nextSteps: data.nextSteps || ''
+  };
+  records.push(rec);
+  saveToStorage();
+  renderTimeline();
+  updateStats();
+  return rec;
+}
+
+function saveToStorage() {
+  try { localStorage.setItem('museum_escape_records', JSON.stringify(records)); } catch(e) {}
+}
+
+function loadFromStorage() {
+  try {
+    var s = localStorage.getItem('museum_escape_records');
+    if (s) records = JSON.parse(s);
+  } catch(e) {}
+}
+
+function getFiltered() {
+  var list = records.slice().sort(function(a, b) { return new Date(b.timestamp) - new Date(a.timestamp); });
+  if (currentFilter !== 'all') {
+    list = list.filter(function(r) {
+      if (currentFilter === 'supplement' || currentFilter === 'conclusion') return r.category === currentFilter;
+      return r.subType === currentFilter;
+    });
+  }
+  if (searchQuery) {
+    var q = searchQuery.toLowerCase();
+    list = list.filter(function(r) {
+      return (r.description + r.operator + r.verificationReason + r.changeReason + r.autoJudgmentReason + r.nextSteps + r.originalConclusion + r.newConclusion).toLowerCase().indexOf(q) >= 0;
+    });
+  }
+  return list;
+}
+
+function renderTimeline() {
+  var list = getFiltered();
+  var el = document.getElementById('timeline');
+  if (list.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">没有匹配的记录</div></div>';
+    return;
+  }
+  var html = '';
+  list.forEach(function(r) {
+    var catClass = r.category;
+    if (r.subType === 'restart_score_reset') catClass = 'restart';
+    if (r.subType === 'auto_judgment') catClass = 'auto-judgment';
+
+    var tagClass = r.category === 'supplement' ? 'tag-supplement' : 'tag-conclusion';
+    if (r.subType === 'restart_score_reset') tagClass = 'tag-restart';
+    if (r.subType === 'auto_judgment') tagClass = 'tag-auto';
+
+    html += '<div class="timeline-item">';
+    html += '<div class="timeline-line"><div class="timeline-dot ' + catClass + '"></div></div>';
+    html += '<div class="timeline-card ' + catClass + '">';
+
+    html += '<div class="card-header">';
+    html += '<span class="card-time">' + formatTime(r.timestamp) + '</span>';
+    html += '<span class="card-tag ' + tagClass + '">' + CATEGORY_LABELS[r.category] + '</span>';
+    html += '<span class="card-subtype">' + (SUBTYPE_LABELS[r.subType] || r.subType) + '</span>';
+    if (r.subType === 'restart_score_reset') {
+      html += '<span class="badge-controversial">⚠ 争议</span>';
+    }
+    html += '<span class="card-operator">' + escHtml(r.operator) + '</span>';
+    html += '</div>';
+
+    html += '<div class="card-body">' + escHtml(r.description) + '</div>';
+
+    if (r.category === 'supplement' && r.supplementNote) {
+      html += '<div class="card-detail"><div class="card-detail-row"><span class="card-detail-label">补充说明</span><span class="card-detail-value">' + escHtml(r.supplementNote) + '</span></div></div>';
+    }
+
+    if (r.category === 'conclusion' && (r.originalConclusion || r.newConclusion)) {
+      html += '<div class="card-detail">';
+      if (r.originalConclusion) html += '<div class="card-detail-row"><span class="card-detail-label">原结论</span><span class="card-detail-value before">' + escHtml(r.originalConclusion) + '</span></div>';
+      if (r.newConclusion) html += '<div class="card-detail-row"><span class="card-detail-label">新结论</span><span class="card-detail-value after">' + escHtml(r.newConclusion) + '</span></div>';
+      html += '</div>';
+    }
+
+    if (r.changeReason) {
+      html += '<div class="card-reason"><div class="card-reason-title">改结论原因</div>' + escHtml(r.changeReason) + '</div>';
+    }
+
+    if (r.subType === 'restart_score_reset' && (r.beforeValue || r.afterValue)) {
+      html += '<div class="card-detail">';
+      if (r.beforeValue) html += '<div class="card-detail-row"><span class="card-detail-label">改动前</span><span class="card-detail-value before">' + escHtml(r.beforeValue) + '</span></div>';
+      if (r.afterValue) html += '<div class="card-detail-row"><span class="card-detail-label">改动后</span><span class="card-detail-value after">' + escHtml(r.afterValue) + '</span></div>';
+      html += '</div>';
+    }
+
+    if (r.verificationReason) {
+      html += '<div class="card-reason"><div class="card-reason-title">复核原因（可验证）</div>' + escHtml(r.verificationReason) + '</div>';
+    }
+
+    if (r.autoJudgmentReason) {
+      html += '<div class="card-reason"><div class="card-reason-title">自动判断理由</div>' + escHtml(r.autoJudgmentReason) + '</div>';
+    }
+    if (r.autoJudgmentResult) {
+      html += '<div class="card-detail"><div class="card-detail-row"><span class="card-detail-label">判断结果</span><span class="card-detail-value">' + escHtml(r.autoJudgmentResult) + '</span></div></div>';
+    }
+
+    if (r.nextSteps) {
+      html += '<div class="card-nextsteps"><div class="card-nextsteps-title">下一步</div>' + escHtml(r.nextSteps) + '</div>';
+    }
+
+    html += '</div></div>';
+  });
+  el.innerHTML = html;
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = records.length;
+  var controversial = records.filter(function(r) { return r.subType === 'restart_score_reset'; }).length;
+  var conclusion = records.filter(function(r) { return r.category === 'conclusion'; }).length;
+  document.getElementById('stat-controversial').textContent = controversial;
+  document.getElementById('stat-conclusion').textContent = conclusion;
+
+  document.getElementById('count-all').textContent = records.length;
+  document.getElementById('count-supplement').textContent = records.filter(function(r){ return r.category==='supplement'; }).length;
+  document.getElementById('count-conclusion').textContent = conclusion;
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-item').forEach(function(item) { item.classList.remove('active'); });
+  el.classList.add('active');
+  renderTimeline();
+}
+
+function handleSearch(q) {
+  searchQuery = q;
+  renderTimeline();
+}
+
+function openAddModal() {
+  document.getElementById('addModal').classList.add('show');
+  onCategoryChange();
+  onSubtypeChange();
+}
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('show');
+}
+
+function onCategoryChange() {
+  var cat = document.getElementById('f-category').value;
+  document.getElementById('fields-supplement').style.display = cat === 'supplement' ? 'block' : 'none';
+  document.getElementById('fields-conclusion').style.display = cat === 'conclusion' ? 'block' : 'none';
+  onSubtypeChange();
+}
+
+function onSubtypeChange() {
+  var st = document.getElementById('f-subtype').value;
+  document.getElementById('fields-restart').style.display = st === 'restart_score_reset' ? 'block' : 'none';
+  document.getElementById('fields-auto').style.display = st === 'auto_judgment' ? 'block' : 'none';
+}
+
+function saveRecord() {
+  var cat = document.getElementById('f-category').value;
+  var st = document.getElementById('f-subtype').value;
+  var operator = document.getElementById('f-operator').value.trim();
+  var desc = document.getElementById('f-description').value.trim();
+
+  if (!operator || !desc) { alert('操作人和事项描述必填'); return; }
+
+  if (st === 'restart_score_reset') {
+    var vr = document.getElementById('f-verification-reason').value.trim();
+    if (!vr) { alert('重开刷分记录必须填写复核原因'); return; }
+  }
+  if (st === 'auto_judgment') {
+    var ar = document.getElementById('f-auto-reason').value.trim();
+    if (!ar) { alert('自动判断记录必须填写判断理由'); return; }
+  }
+  if (cat === 'conclusion') {
+    var cr = document.getElementById('f-change-reason').value.trim();
+    if (!cr) { alert('改结论记录必须填写原因'); return; }
+  }
+
+  addRecord({
+    category: cat,
+    subType: st,
+    operator: operator,
+    description: desc,
+    supplementNote: document.getElementById('f-supplement-note').value.trim(),
+    originalConclusion: document.getElementById('f-original-conclusion').value.trim(),
+    newConclusion: document.getElementById('f-new-conclusion').value.trim(),
+    changeReason: document.getElementById('f-change-reason').value.trim(),
+    beforeValue: document.getElementById('f-before-value').value.trim(),
+    afterValue: document.getElementById('f-after-value').value.trim(),
+    verificationReason: document.getElementById('f-verification-reason').value.trim(),
+    autoJudgmentReason: document.getElementById('f-auto-reason').value.trim(),
+    autoJudgmentResult: document.getElementById('f-auto-result').value.trim(),
+    nextSteps: document.getElementById('f-next-steps').value.trim()
+  });
+
+  document.getElementById('f-operator').value = '';
+  document.getElementById('f-description').value = '';
+  document.getElementById('f-supplement-note').value = '';
+  document.getElementById('f-original-conclusion').value = '';
+  document.getElementById('f-new-conclusion').value = '';
+  document.getElementById('f-change-reason').value = '';
+  document.getElementById('f-before-value').value = '';
+  document.getElementById('f-after-value').value = '';
+  document.getElementById('f-verification-reason').value = '';
+  document.getElementById('f-auto-reason').value = '';
+  document.getElementById('f-auto-result').value = '';
+  document.getElementById('f-next-steps').value = '';
+
+  closeAddModal();
+}
+
+function openExportModal() {
+  generateExport();
+  document.getElementById('exportModal').classList.add('show');
+}
+function closeExportModal() {
+  document.getElementById('exportModal').classList.remove('show');
+}
+
+function generateExport() {
+  var sorted = records.slice().sort(function(a, b) { return new Date(a.timestamp) - new Date(b.timestamp); });
+  var lines = [];
+  lines.push('======================================================');
+  lines.push('  博物馆闭馆逃脱 · 活动复盘');
+  lines.push('  导出时间: ' + formatTime(new Date().toISOString()));
+  lines.push('  记录总数: ' + sorted.length);
+  lines.push('======================================================');
+  lines.push('');
+
+  var supplements = sorted.filter(function(r){ return r.category === 'supplement'; });
+  var conclusions = sorted.filter(function(r){ return r.category === 'conclusion'; });
+  var restarts = sorted.filter(function(r){ return r.subType === 'restart_score_reset'; });
+  var autos = sorted.filter(function(r){ return r.subType === 'auto_judgment'; });
+
+  lines.push('【统计概览】');
+  lines.push('  补材料记录: ' + supplements.length);
+  lines.push('  改结论记录: ' + conclusions.length);
+  lines.push('  重开刷分(争议): ' + restarts.length);
+  lines.push('  自动判断: ' + autos.length);
+  lines.push('');
+
+  if (conclusions.length > 0) {
+    lines.push('======================================================');
+    lines.push('  ⚠ 改结论记录（影响最终结果，务必优先复核）');
+    lines.push('======================================================');
+    conclusions.forEach(function(r, i) {
+      lines.push('');
+      lines.push('  [' + (i+1) + '] ' + formatTime(r.timestamp) + ' | ' + r.operator);
+      lines.push('  描述: ' + r.description);
+      if (r.originalConclusion) lines.push('  原结论: ' + r.originalConclusion);
+      if (r.newConclusion) lines.push('  新结论: ' + r.newConclusion);
+      if (r.changeReason) lines.push('  原因: ' + r.changeReason);
+      if (r.nextSteps) lines.push('  下一步: ' + r.nextSteps);
+    });
+    lines.push('');
+  }
+
+  if (restarts.length > 0) {
+    lines.push('======================================================');
+    lines.push('  ⚠ 重开刷分记录（争议高发，每条必须可复核）');
+    lines.push('======================================================');
+    restarts.forEach(function(r, i) {
+      lines.push('');
+      lines.push('  [' + (i+1) + '] ' + formatTime(r.timestamp) + ' | ' + r.operator);
+      lines.push('  描述: ' + r.description);
+      if (r.beforeValue) lines.push('  改动前: ' + r.beforeValue);
+      if (r.afterValue) lines.push('  改动后: ' + r.afterValue);
+      lines.push('  复核原因: ' + (r.verificationReason || '⚠ 未填写'));
+      if (r.nextSteps) lines.push('  下一步: ' + r.nextSteps);
+    });
+    lines.push('');
+  }
+
+  if (autos.length > 0) {
+    lines.push('======================================================');
+    lines.push('  🤖 自动判断记录');
+    lines.push('======================================================');
+    autos.forEach(function(r, i) {
+      lines.push('');
+      lines.push('  [' + (i+1) + '] ' + formatTime(r.timestamp) + ' | ' + r.operator);
+      lines.push('  描述: ' + r.description);
+      lines.push('  判断理由: ' + (r.autoJudgmentReason || '⚠ 未填写'));
+      if (r.autoJudgmentResult) lines.push('  判断结果: ' + r.autoJudgmentResult);
+      if (r.nextSteps) lines.push('  下一步: ' + r.nextSteps);
+    });
+    lines.push('');
+  }
+
+  lines.push('======================================================');
+  lines.push('  全部记录时间线');
+  lines.push('======================================================');
+  sorted.forEach(function(r, i) {
+    lines.push('');
+    lines.push('  [' + (i+1) + '] ' + formatTime(r.timestamp));
+    lines.push('  分类: ' + CATEGORY_LABELS[r.category] + ' / ' + (SUBTYPE_LABELS[r.subType] || r.subType));
+    lines.push('  操作人: ' + r.operator);
+    lines.push('  描述: ' + r.description);
+    if (r.verificationReason) lines.push('  复核原因: ' + r.verificationReason);
+    if (r.changeReason) lines.push('  改结论原因: ' + r.changeReason);
+    if (r.autoJudgmentReason) lines.push('  自动判断理由: ' + r.autoJudgmentReason);
+    if (r.autoJudgmentResult) lines.push('  判断结果: ' + r.autoJudgmentResult);
+    if (r.nextSteps) lines.push('  下一步: ' + r.nextSteps);
+  });
+
+  lines.push('');
+  lines.push('======================================================');
+  lines.push('  复盘结束 — 下一班可直接查，不必翻聊天记录');
+  lines.push('======================================================');
+
+  document.getElementById('export-content').value = lines.join('\n');
+}
+
+function copyExport() {
+  var el = document.getElementById('export-content');
+  el.select();
+  document.execCommand('copy');
+  alert('已复制到剪贴板');
+}
+
+function loadSampleData() {
+  if (records.length > 0) return;
+
+  addRecord({
+    timestamp: '2025-05-17T09:12:00',
+    category: 'supplement',
+    subType: 'leaderboard_screenshot',
+    operator: '小陈',
+    description: '第一关「青铜展厅」排行榜截图，活动当天9点截取，但活动复盘模板要求10点后才截图。截图已附，时间早于模板要求。',
+    supplementNote: '截取时排行榜数据已稳定，无后续变动。补附截图是因为模板收集时段与实际活动结束时段不一致，数据本身无差异。',
+    nextSteps: '下一班确认模板时间是否需要调整，避免下次再出现"早到"截图。'
+  });
+
+  addRecord({
+    timestamp: '2025-05-17T10:30:00',
+    category: 'conclusion',
+    subType: 'auto_judgment',
+    operator: '系统',
+    description: '第二关「瓷器密室」自动判断：玩家"逃逸小队"通关时间3分12秒，低于同关历史最短用时3分45秒，系统判定为异常通关。',
+    autoJudgmentReason: '规则：通关时间 < 历史最短用时的90%即判定异常。3分12秒 < 3分45秒×0.9=3分22秒，触发异常标记。',
+    autoJudgmentResult: '标记为异常通关，该队成绩暂不计入排行榜，待人工复核。',
+    nextSteps: '运营组核实该队是否使用了非正常手段。联系"逃逸小队"队长确认通关过程，如确认正常则手动解除标记。'
+  });
+
+  addRecord({
+    timestamp: '2025-05-17T11:05:00',
+    category: 'conclusion',
+    subType: 'restart_score_reset',
+    operator: '小林',
+    description: '玩家"夜猫战队"在第三关「书画长廊」因系统卡顿导致计时异常，申请重开。经核实后台日志确认卡顿属实，已重开该关并重置计时。',
+    beforeValue: '计时 8分47秒（含卡顿时间约2分钟）',
+    afterValue: '计时重置为0，重开第三关',
+    verificationReason: '后台日志记录 11:02-11:04 服务器响应超时，该时段内该队客户端心跳中断2次。已截图日志，可复核。',
+    nextSteps: '1. 将后台日志截图归档至本记录附件；2. 通知该队重开已生效，可继续挑战；3. 同一时段其他队伍如有类似异常也需排查。'
+  });
+
+  addRecord({
+    timestamp: '2025-05-17T14:20:00',
+    category: 'supplement',
+    subType: 'review_late_supplement',
+    operator: '小赵',
+    description: '第四关「古币迷宫」活动复盘原始提交遗漏了线索卡发放数量统计，现补附。',
+    supplementNote: '第四关共发放线索卡 37 张，回收 35 张，2 张遗失不影响通关判定（遗失的2张为重复线索卡）。此信息不影响任何排名或结论。',
+    nextSteps: '下次活动复盘模板增加线索卡回收必填项，避免遗漏。'
+  });
+
+  addRecord({
+    timestamp: '2025-05-17T15:45:00',
+    category: 'conclusion',
+    subType: 'level_draft_change',
+    operator: '小陈',
+    description: '第五关「青铜密室·终极挑战」关卡草表手工改动：原设计通关线索为3条，现场因道具损坏临时改为2条线索即可通关。改动发生在活动进行中，已有2支队伍按3条线索规则完成。',
+    originalConclusion: '需集齐3条线索方可通关',
+    newConclusion: '2条线索即可通关',
+    changeReason: '第3条线索道具（密封铜盒）在现场开盒时弹簧机构损坏，无法正常展示线索。经活动负责人确认，改为2条线索通关。已按3条完成的队伍成绩不受影响（他们已经满足2条线索条件）。',
+    nextSteps: '1. 通知后续队伍规则变更；2. 记录损坏道具，下次活动前更换；3. 2支已按3条完成的队伍不需额外处理，但复盘时需标注。'
+  });
+
+  addRecord({
+    timestamp: '2025-05-17T16:30:00',
+    category: 'conclusion',
+    subType: 'restart_score_reset',
+    operator: '小林',
+    description: '玩家"解谜达人"在第五关发现线索道具损坏后尝试强行打开，导致计时系统误判为通关，实际未完成解谜。需重置该队第五关成绩。',
+    beforeValue: '第五关成绩：通关（误判），用时4分30秒',
+    afterValue: '第五关成绩：重置为未完成，重开该关',
+    verificationReason: '系统日志显示该队在4分30秒时触发通关信号，但对应线索卡未被正确读取（RFID读取失败）。现场工作人员目击该队物理破坏道具触发信号。有现场照片和监控录像可复核。',
+    nextSteps: '1. 该队重开第五关，按2条线索新规则进行；2. 损坏道具费用是否向该队追偿，待活动负责人决定；3. 系统需增加RFID双重验证防误判。'
+  });
+
+  addRecord({
+    timestamp: '2025-05-17T17:00:00',
+    category: 'supplement',
+    subType: 'leaderboard_screenshot',
+    operator: '小赵',
+    description: '最终排行榜截图补截：17:00活动结束后再次截图，与9:12首次截图对比，排名前三有变动（因重开成绩生效）。',
+    supplementNote: '排行榜变动原因：①"夜猫战队"第三关重开后成绩提升，总排名从第8升至第3；②"解谜达人"第五关重开后成绩下降，总排名从第2降至第6。两张截图均已归档，时间戳清晰。',
+    nextSteps: '复盘报告使用17:00最终截图。9:12截图作为对比材料保留。'
+  });
+
+  addRecord({
+    timestamp: '2025-05-17T18:00:00',
+    category: 'conclusion',
+    subType: 'auto_judgment',
+    operator: '系统',
+    description: '活动结束后系统自动汇总：共5关，参与队伍12支，完整通关8支。系统自动标记2支队伍成绩异常（"逃逸小队"异常通关已人工复核解除，"解谜达人"第五关已重开），最终排行榜无异常标记。',
+    autoJudgmentReason: '自动判断规则：1. 通关时间异常（<历史最短90%）；2. RFID信号与线索卡读取不匹配；3. 重开记录未关联复核原因。本次所有标记均已在活动期间处理完毕，无残留异常。',
+    autoJudgmentResult: '最终排行榜有效，无异常标记。12支队伍成绩均经复核确认。',
+    nextSteps: '1. 活动负责人确认最终排行榜后发布；2. 异常处理记录（本复盘）存档备查；3. 下次活动前更新判断规则阈值（历史最短用时需更新）。'
+  });
+}
+
+loadFromStorage();
+loadSampleData();
+renderTimeline();
+updateStats();
+</script>
+</body>
+</html>
