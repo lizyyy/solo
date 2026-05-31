@@ -1,0 +1,928 @@
+======================================================================
+文本分类争议评审说明
+======================================================================
+生成时间: 2026-05-31T21:05:17.979291
+模型名称: 文本分类模型v1.0
+评审人: 算法工程师A
+争议总数: 13
+  - 已解决: 13
+  - 处理中: 0
+  - 待处理: 0
+  - 已驳回: 0
+
+争议类型统计:
+  - label_missing: 3
+  - label_mismatch: 2
+  - duplicate_conflict: 2
+  - metric_change: 4
+  - late_attachment_issue: 2
+
+----------------------------------------------------------------------
+
+【1】标签漏映射: 军事
+--------------------------------------------------
+争议ID: D_baf44ba5
+类型: label_missing
+状态: resolved
+描述: 标注标签 '军事' 不在标签映射表中。
+创建时间: 2026-05-31T21:05:17.977956
+
+>>> 复核原因:
+  [类型: label_mapping_resolved]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.978533
+  说明: [标签漏映射处理] 检测到标签: '军事', 确认映射为: 'technology'. 已添加到标签映射表. 处理人: 算法工程师A.
+
+>>> 结论:
+  结论: 新增标签映射: 军事 -> technology
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.978542
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_ea6f9814, 类型: normal
+    -> 标注样本:
+       样本ID: S_f857066e
+       文本: 军事演习最新动态
+       标签: 军事
+       标注人: 王十一
+       标注时间: 2026-05-20T20:00:00
+       来源文件: test_materials/label_missing_漏映射.csv
+       来源行号: 2
+       置信度: 1.0
+    -> 备注: 军事不在映射表中
+
+>>> 证据链:
+  1. [annotation_reference] -> annotation_sample:S_f857066e
+     说明: 标注样本来源: test_materials/label_missing_漏映射.csv 第2行
+  2. [conclusion_reference] -> dispute_conclusion:D_baf44ba5
+     说明: 结论: 新增标签映射: 军事 -> technology...
+  3. [复核原因] label_mapping_resolved - 算法工程师A: [标签漏映射处理] 检测到标签: '军事', 确认映射为: 'technology'. 已添加到标签映射表. 处理人: 算法工程师A.
+  4. [结论] resolved - 算法工程师A: 新增标签映射: 军事 -> technology
+
+-- 争议1结束 --
+
+【2】标签漏映射: 游戏
+--------------------------------------------------
+争议ID: D_6e4fd0a2
+类型: label_missing
+状态: resolved
+描述: 标注标签 '游戏' 不在标签映射表中。
+创建时间: 2026-05-31T21:05:17.977975
+
+>>> 复核原因:
+  [类型: label_mapping_resolved]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.978598
+  说明: [标签漏映射处理] 检测到标签: '游戏', 确认映射为: 'entertainment'. 已添加到标签映射表. 处理人: 算法工程师A.
+
+>>> 结论:
+  结论: 新增标签映射: 游戏 -> entertainment
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.978600
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_e6134e42, 类型: normal
+    -> 标注样本:
+       样本ID: S_1b9246e1
+       文本: 游戏行业发展报告
+       标签: 游戏
+       标注人: 李十二
+       标注时间: 2026-05-20T21:00:00
+       来源文件: test_materials/label_missing_漏映射.csv
+       来源行号: 3
+       置信度: 0.95
+    -> 备注: 游戏不在映射表中
+
+>>> 证据链:
+  1. [annotation_reference] -> annotation_sample:S_1b9246e1
+     说明: 标注样本来源: test_materials/label_missing_漏映射.csv 第3行
+  2. [conclusion_reference] -> dispute_conclusion:D_6e4fd0a2
+     说明: 结论: 新增标签映射: 游戏 -> entertainment...
+  3. [复核原因] label_mapping_resolved - 算法工程师A: [标签漏映射处理] 检测到标签: '游戏', 确认映射为: 'entertainment'. 已添加到标签映射表. 处理人: 算法工程师A.
+  4. [结论] resolved - 算法工程师A: 新增标签映射: 游戏 -> entertainment
+
+-- 争议2结束 --
+
+【3】标签漏映射: 旅游
+--------------------------------------------------
+争议ID: D_91b0d727
+类型: label_missing
+状态: resolved
+描述: 标注标签 '旅游' 不在标签映射表中。
+创建时间: 2026-05-31T21:05:17.978048
+
+>>> 复核原因:
+  [类型: label_mapping_resolved]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.978621
+  说明: [标签漏映射处理] 检测到标签: '旅游', 确认映射为: 'other'. 已添加到标签映射表. 处理人: 算法工程师A.
+
+>>> 结论:
+  结论: 新增标签映射: 旅游 -> other
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.978623
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_d2ab7895, 类型: normal
+    -> 标注样本:
+       样本ID: S_4c9fce99
+       文本: 旅游攻略分享
+       标签: 旅游
+       标注人: 张十三
+       标注时间: 2026-05-20T22:00:00
+       来源文件: test_materials/label_missing_漏映射.csv
+       来源行号: 4
+       置信度: 0.9
+    -> 备注: 旅游不在映射表中
+
+>>> 证据链:
+  1. [annotation_reference] -> annotation_sample:S_4c9fce99
+     说明: 标注样本来源: test_materials/label_missing_漏映射.csv 第4行
+  2. [conclusion_reference] -> dispute_conclusion:D_91b0d727
+     说明: 结论: 新增标签映射: 旅游 -> other...
+  3. [复核原因] label_mapping_resolved - 算法工程师A: [标签漏映射处理] 检测到标签: '旅游', 确认映射为: 'other'. 已添加到标签映射表. 处理人: 算法工程师A.
+  4. [结论] resolved - 算法工程师A: 新增标签映射: 旅游 -> other
+
+-- 争议3结束 --
+
+【4】标签不一致: 世界杯决赛精彩进球集锦...
+--------------------------------------------------
+争议ID: D_71f4b628
+类型: label_mismatch
+状态: resolved
+描述: 相同文本存在不同标注: duplicate(体育), duplicate(娱乐), late_attachment(体育), normal(体育)。请确认正确标签。
+创建时间: 2026-05-31T21:05:17.978117
+
+>>> 复核原因:
+  [类型: manual_review]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.978692
+  说明: 经核对原始材料，正确标签为体育。错误标注已标记作废。
+
+>>> 结论:
+  结论: 确认正确标签为: 体育, 已排除错误标注
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.978720
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_47065f67, 类型: duplicate
+    -> 标注样本:
+       样本ID: S_38c444f3
+       文本: 世界杯决赛精彩进球集锦
+       标签: 体育
+       标注人: 张三
+       标注时间: 2026-05-20T10:30:00
+       来源文件: test_materials/duplicate_重复数据.csv
+       来源行号: 2
+       置信度: 1.0
+    -> 备注: 重复记录1
+  【记录2】ID: R_4b95f039, 类型: duplicate
+    -> 标注样本:
+       样本ID: S_562feab9
+       文本: 世界杯决赛精彩进球集锦
+       标签: 娱乐
+       标注人: 李四
+       标注时间: 2026-05-20T10:31:00
+       来源文件: test_materials/duplicate_重复数据.csv
+       来源行号: 3
+       置信度: 0.8
+    -> 备注: 重复记录2 标签错误
+  【记录3】ID: R_151e997b, 类型: late_attachment
+    -> 标注样本:
+       样本ID: S_38c444f3
+       文本: 世界杯决赛精彩进球集锦
+       标签: 体育
+       标注人: 张三
+       标注时间: 2026-05-20T10:30:00
+       来源文件: test_materials/late_attachment_补传数据.csv
+       来源行号: 2
+       置信度: 1.0
+    -> 备注: 晚到的标注数据
+  【记录4】ID: R_c32a1216, 类型: normal
+    -> 标注样本:
+       样本ID: S_38c444f3
+       文本: 世界杯决赛精彩进球集锦
+       标签: 体育
+       标注人: 张三
+       标注时间: 2026-05-20T10:30:00
+       来源文件: test_materials/normal_records.csv
+       来源行号: 2
+       置信度: 1.0
+    -> 备注: nan
+
+>>> 证据链:
+  1. [annotation_reference] -> annotation_sample:S_38c444f3
+     说明: 标注: 体育 (类型: duplicate) 来源: test_materials/duplicate_重复数据.csv 第2行
+  2. [annotation_reference] -> annotation_sample:S_562feab9
+     说明: 标注: 娱乐 (类型: duplicate) 来源: test_materials/duplicate_重复数据.csv 第3行
+  3. [annotation_reference] -> annotation_sample:S_38c444f3
+     说明: 标注: 体育 (类型: late_attachment) 来源: test_materials/late_attachment_补传数据.csv 第2行
+  4. [annotation_reference] -> annotation_sample:S_38c444f3
+     说明: 标注: 体育 (类型: normal) 来源: test_materials/normal_records.csv 第2行
+  5. [conclusion_reference] -> dispute_conclusion:D_71f4b628
+     说明: 结论: 确认正确标签为: 体育, 已排除错误标注...
+  6. [复核原因] manual_review - 算法工程师A: 经核对原始材料，正确标签为体育。错误标注已标记作废。
+  7. [结论] resolved - 算法工程师A: 确认正确标签为: 体育, 已排除错误标注
+
+-- 争议4结束 --
+
+【5】标签不一致: 股市震荡投资者观望...
+--------------------------------------------------
+争议ID: D_01a69ac0
+类型: label_mismatch
+状态: resolved
+描述: 相同文本存在不同标注: manual_correction(财经), manual_correction(科技), normal(财经)。请确认正确标签。
+创建时间: 2026-05-31T21:05:17.978140
+
+>>> 复核原因:
+  [类型: manual_review]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.978824
+  说明: 经核对原始材料，正确标签为财经。错误标注已标记作废。
+
+>>> 结论:
+  结论: 确认正确标签为: 财经, 已排除错误标注
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.978826
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_262cf5ba, 类型: manual_correction
+    -> 标注样本:
+       样本ID: S_6bd29956
+       文本: 股市震荡投资者观望
+       标签: 财经
+       标注人: 赵六
+       标注时间: 2026-05-20T15:30:00
+       来源文件: test_materials/manual_correction_标注返工.csv
+       来源行号: 2
+       置信度: 1.0
+    -> 备注: 原始标注
+  【记录2】ID: R_d871d2aa, 类型: manual_correction
+    -> 标注样本:
+       样本ID: S_e451c518
+       文本: 股市震荡投资者观望
+       标签: 科技
+       标注人: 钱七
+       标注时间: 2026-05-21T10:00:00
+       来源文件: test_materials/manual_correction_标注返工.csv
+       来源行号: 3
+       置信度: 1.0
+    -> 备注: 人工更正：原标签错误，应为科技
+  【记录3】ID: R_bde1ed4e, 类型: normal
+    -> 标注样本:
+       样本ID: S_6bd29956
+       文本: 股市震荡投资者观望
+       标签: 财经
+       标注人: 赵六
+       标注时间: 2026-05-20T15:30:00
+       来源文件: test_materials/normal_records.csv
+       来源行号: 5
+       置信度: 1.0
+    -> 备注: nan
+
+>>> 证据链:
+  1. [annotation_reference] -> annotation_sample:S_6bd29956
+     说明: 标注: 财经 (类型: manual_correction) 来源: test_materials/manual_correction_标注返工.csv 第2行
+  2. [annotation_reference] -> annotation_sample:S_e451c518
+     说明: 标注: 科技 (类型: manual_correction) 来源: test_materials/manual_correction_标注返工.csv 第3行
+  3. [annotation_reference] -> annotation_sample:S_6bd29956
+     说明: 标注: 财经 (类型: normal) 来源: test_materials/normal_records.csv 第5行
+  4. [conclusion_reference] -> dispute_conclusion:D_01a69ac0
+     说明: 结论: 确认正确标签为: 财经, 已排除错误标注...
+  5. [复核原因] manual_review - 算法工程师A: 经核对原始材料，正确标签为财经。错误标注已标记作废。
+  6. [结论] resolved - 算法工程师A: 确认正确标签为: 财经, 已排除错误标注
+
+-- 争议5结束 --
+
+【6】重复项冲突: 世界杯决赛精彩进球集锦...
+--------------------------------------------------
+争议ID: D_fb1be18c
+类型: duplicate_conflict
+状态: resolved
+描述: 检测到4条重复记录存在冲突。标签差异: 娱乐, 体育。评估差异: 无。
+创建时间: 2026-05-31T21:05:17.978205
+
+>>> 复核原因:
+  [类型: manual_review]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.978884
+  说明: 去重策略：保留最新标注时间、置信度最高的记录，其余标记为重复
+
+>>> 结论:
+  结论: 重复记录已合并，保留置信度高的版本
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.978887
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_47065f67, 类型: duplicate
+    -> 标注样本:
+       样本ID: S_38c444f3
+       文本: 世界杯决赛精彩进球集锦
+       标签: 体育
+       标注人: 张三
+       标注时间: 2026-05-20T10:30:00
+       来源文件: test_materials/duplicate_重复数据.csv
+       来源行号: 2
+       置信度: 1.0
+    -> 备注: 重复记录1
+  【记录2】ID: R_4b95f039, 类型: duplicate
+    -> 标注样本:
+       样本ID: S_562feab9
+       文本: 世界杯决赛精彩进球集锦
+       标签: 娱乐
+       标注人: 李四
+       标注时间: 2026-05-20T10:31:00
+       来源文件: test_materials/duplicate_重复数据.csv
+       来源行号: 3
+       置信度: 0.8
+    -> 备注: 重复记录2 标签错误
+  【记录3】ID: R_151e997b, 类型: late_attachment
+    -> 标注样本:
+       样本ID: S_38c444f3
+       文本: 世界杯决赛精彩进球集锦
+       标签: 体育
+       标注人: 张三
+       标注时间: 2026-05-20T10:30:00
+       来源文件: test_materials/late_attachment_补传数据.csv
+       来源行号: 2
+       置信度: 1.0
+    -> 备注: 晚到的标注数据
+  【记录4】ID: R_c32a1216, 类型: normal
+    -> 标注样本:
+       样本ID: S_38c444f3
+       文本: 世界杯决赛精彩进球集锦
+       标签: 体育
+       标注人: 张三
+       标注时间: 2026-05-20T10:30:00
+       来源文件: test_materials/normal_records.csv
+       来源行号: 2
+       置信度: 1.0
+    -> 备注: nan
+
+>>> 证据链:
+  1. [duplicate_reference] -> data_record:R_47065f67
+     说明: 记录类型: duplicate, 标签: 体育, 来源: test_materials/duplicate_重复数据.csv 第2行
+  2. [duplicate_reference] -> data_record:R_4b95f039
+     说明: 记录类型: duplicate, 标签: 娱乐, 来源: test_materials/duplicate_重复数据.csv 第3行
+  3. [duplicate_reference] -> data_record:R_151e997b
+     说明: 记录类型: late_attachment, 标签: 体育, 来源: test_materials/late_attachment_补传数据.csv 第2行
+  4. [duplicate_reference] -> data_record:R_c32a1216
+     说明: 记录类型: normal, 标签: 体育, 来源: test_materials/normal_records.csv 第2行
+  5. [conclusion_reference] -> dispute_conclusion:D_fb1be18c
+     说明: 结论: 重复记录已合并，保留置信度高的版本...
+  6. [复核原因] manual_review - 算法工程师A: 去重策略：保留最新标注时间、置信度最高的记录，其余标记为重复
+  7. [结论] resolved - 算法工程师A: 重复记录已合并，保留置信度高的版本
+
+-- 争议6结束 --
+
+【7】重复项冲突: 股市震荡投资者观望...
+--------------------------------------------------
+争议ID: D_a6ac80b0
+类型: duplicate_conflict
+状态: resolved
+描述: 检测到3条重复记录存在冲突。标签差异: 财经, 科技。评估差异: 无。
+创建时间: 2026-05-31T21:05:17.978217
+
+>>> 复核原因:
+  [类型: manual_review]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.978914
+  说明: 去重策略：保留最新标注时间、置信度最高的记录，其余标记为重复
+
+>>> 结论:
+  结论: 重复记录已合并，保留置信度高的版本
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.978916
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_262cf5ba, 类型: manual_correction
+    -> 标注样本:
+       样本ID: S_6bd29956
+       文本: 股市震荡投资者观望
+       标签: 财经
+       标注人: 赵六
+       标注时间: 2026-05-20T15:30:00
+       来源文件: test_materials/manual_correction_标注返工.csv
+       来源行号: 2
+       置信度: 1.0
+    -> 备注: 原始标注
+  【记录2】ID: R_d871d2aa, 类型: manual_correction
+    -> 标注样本:
+       样本ID: S_e451c518
+       文本: 股市震荡投资者观望
+       标签: 科技
+       标注人: 钱七
+       标注时间: 2026-05-21T10:00:00
+       来源文件: test_materials/manual_correction_标注返工.csv
+       来源行号: 3
+       置信度: 1.0
+    -> 备注: 人工更正：原标签错误，应为科技
+  【记录3】ID: R_bde1ed4e, 类型: normal
+    -> 标注样本:
+       样本ID: S_6bd29956
+       文本: 股市震荡投资者观望
+       标签: 财经
+       标注人: 赵六
+       标注时间: 2026-05-20T15:30:00
+       来源文件: test_materials/normal_records.csv
+       来源行号: 5
+       置信度: 1.0
+    -> 备注: nan
+
+>>> 证据链:
+  1. [duplicate_reference] -> data_record:R_262cf5ba
+     说明: 记录类型: manual_correction, 标签: 财经, 来源: test_materials/manual_correction_标注返工.csv 第2行
+  2. [duplicate_reference] -> data_record:R_d871d2aa
+     说明: 记录类型: manual_correction, 标签: 科技, 来源: test_materials/manual_correction_标注返工.csv 第3行
+  3. [duplicate_reference] -> data_record:R_bde1ed4e
+     说明: 记录类型: normal, 标签: 财经, 来源: test_materials/normal_records.csv 第5行
+  4. [conclusion_reference] -> dispute_conclusion:D_a6ac80b0
+     说明: 结论: 重复记录已合并，保留置信度高的版本...
+  5. [复核原因] manual_review - 算法工程师A: 去重策略：保留最新标注时间、置信度最高的记录，其余标记为重复
+  6. [结论] resolved - 算法工程师A: 重复记录已合并，保留置信度高的版本
+
+-- 争议7结束 --
+
+【8】指标波动异常: v1.1 f1
+--------------------------------------------------
+争议ID: D_f0d4d9c4
+类型: metric_change
+状态: resolved
+描述: 模型 v1.1 的 f1 指标波动超过30%。最大值: 0.9100, 最小值: 0.5600。请确认是否存在口径变更。
+创建时间: 2026-05-31T21:05:17.978255
+
+>>> 复核原因:
+  [类型: caliber_change_confirmed]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.978943
+  说明: [指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。
+  指标变更前: {"precision": 0.85, "recall": 0.82, "f1": 0.83, "accuracy": 0.84}
+  指标变更后: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+  变更详情: accuracy: 0.8400 -> 0.9100 (+8.33%), f1: 0.8300 -> 0.9100 (+9.64%), precision: 0.8500 -> 0.9200 (+8.24%), recall: 0.8200 -> 0.9000 (+9.76%)
+
+>>> 结论:
+  结论: 确认v1.1版本f1指标口径变更，已重新计算
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.978944
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_c631dd72, 类型: normal
+    -> 评估记录:
+       评估ID: E_c8d9222e
+       样本ID: S_normal_001
+       预测标签: sports
+       真值标签: sports
+       是否正确: True
+       评估人: 评A
+       评估时间: 2026-05-22T14:00:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 6
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+  【记录2】ID: R_c2114186, 类型: normal
+    -> 评估记录:
+       评估ID: E_92a47a50
+       样本ID: S_normal_002
+       预测标签: entertainment
+       真值标签: entertainment
+       是否正确: True
+       评估人: 评A
+       评估时间: 2026-05-22T14:05:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 7
+       指标: {"precision": 0.58, "recall": 0.55, "f1": 0.56, "accuracy": 0.57}
+    -> 备注: 口径调整后指标下降
+  【记录3】ID: R_e4476b3e, 类型: normal
+    -> 评估记录:
+       评估ID: E_403337e5
+       样本ID: S_normal_003
+       预测标签: technology
+       真值标签: technology
+       是否正确: True
+       评估人: 评B
+       评估时间: 2026-05-22T14:10:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 8
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+  【记录4】ID: R_a30a1667, 类型: normal
+    -> 评估记录:
+       评估ID: E_9544c8ac
+       样本ID: S_normal_004
+       预测标签: finance
+       真值标签: finance
+       是否正确: True
+       评估人: 评B
+       评估时间: 2026-05-22T14:15:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 9
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+
+>>> 证据链:
+  1. [metric_reference] -> evaluation_record:E_c8d9222e
+     说明: f1: 0.9100, 来源: test_materials/evaluation_records.csv 第6行
+  2. [metric_reference] -> evaluation_record:E_92a47a50
+     说明: f1: 0.5600, 来源: test_materials/evaluation_records.csv 第7行
+  3. [metric_reference] -> evaluation_record:E_403337e5
+     说明: f1: 0.9100, 来源: test_materials/evaluation_records.csv 第8行
+  4. [metric_reference] -> evaluation_record:E_9544c8ac
+     说明: f1: 0.9100, 来源: test_materials/evaluation_records.csv 第9行
+  5. [conclusion_reference] -> dispute_conclusion:D_f0d4d9c4
+     说明: 结论: 确认v1.1版本f1指标口径变更，已重新计算...
+  6. [复核原因] caliber_change_confirmed - 算法工程师A: [指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。
+  7. [结论] resolved - 算法工程师A: 确认v1.1版本f1指标口径变更，已重新计算
+
+-- 争议8结束 --
+
+【9】指标波动异常: v1.1 precision
+--------------------------------------------------
+争议ID: D_cc83e934
+类型: metric_change
+状态: resolved
+描述: 模型 v1.1 的 precision 指标波动超过30%。最大值: 0.9200, 最小值: 0.5800。请确认是否存在口径变更。
+创建时间: 2026-05-31T21:05:17.978266
+
+>>> 复核原因:
+  [类型: caliber_change_confirmed]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.978963
+  说明: [指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。
+  指标变更前: {"precision": 0.85, "recall": 0.82, "f1": 0.83, "accuracy": 0.84}
+  指标变更后: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+  变更详情: accuracy: 0.8400 -> 0.9100 (+8.33%), f1: 0.8300 -> 0.9100 (+9.64%), precision: 0.8500 -> 0.9200 (+8.24%), recall: 0.8200 -> 0.9000 (+9.76%)
+
+>>> 结论:
+  结论: 确认v1.1版本precision指标口径变更，已重新计算
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.978964
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_c631dd72, 类型: normal
+    -> 评估记录:
+       评估ID: E_c8d9222e
+       样本ID: S_normal_001
+       预测标签: sports
+       真值标签: sports
+       是否正确: True
+       评估人: 评A
+       评估时间: 2026-05-22T14:00:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 6
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+  【记录2】ID: R_c2114186, 类型: normal
+    -> 评估记录:
+       评估ID: E_92a47a50
+       样本ID: S_normal_002
+       预测标签: entertainment
+       真值标签: entertainment
+       是否正确: True
+       评估人: 评A
+       评估时间: 2026-05-22T14:05:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 7
+       指标: {"precision": 0.58, "recall": 0.55, "f1": 0.56, "accuracy": 0.57}
+    -> 备注: 口径调整后指标下降
+  【记录3】ID: R_e4476b3e, 类型: normal
+    -> 评估记录:
+       评估ID: E_403337e5
+       样本ID: S_normal_003
+       预测标签: technology
+       真值标签: technology
+       是否正确: True
+       评估人: 评B
+       评估时间: 2026-05-22T14:10:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 8
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+  【记录4】ID: R_a30a1667, 类型: normal
+    -> 评估记录:
+       评估ID: E_9544c8ac
+       样本ID: S_normal_004
+       预测标签: finance
+       真值标签: finance
+       是否正确: True
+       评估人: 评B
+       评估时间: 2026-05-22T14:15:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 9
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+
+>>> 证据链:
+  1. [metric_reference] -> evaluation_record:E_c8d9222e
+     说明: precision: 0.9200, 来源: test_materials/evaluation_records.csv 第6行
+  2. [metric_reference] -> evaluation_record:E_92a47a50
+     说明: precision: 0.5800, 来源: test_materials/evaluation_records.csv 第7行
+  3. [metric_reference] -> evaluation_record:E_403337e5
+     说明: precision: 0.9200, 来源: test_materials/evaluation_records.csv 第8行
+  4. [metric_reference] -> evaluation_record:E_9544c8ac
+     说明: precision: 0.9200, 来源: test_materials/evaluation_records.csv 第9行
+  5. [conclusion_reference] -> dispute_conclusion:D_cc83e934
+     说明: 结论: 确认v1.1版本precision指标口径变更，已重新计算...
+  6. [复核原因] caliber_change_confirmed - 算法工程师A: [指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。
+  7. [结论] resolved - 算法工程师A: 确认v1.1版本precision指标口径变更，已重新计算
+
+-- 争议9结束 --
+
+【10】指标波动异常: v1.1 recall
+--------------------------------------------------
+争议ID: D_92bed71a
+类型: metric_change
+状态: resolved
+描述: 模型 v1.1 的 recall 指标波动超过30%。最大值: 0.9000, 最小值: 0.5500。请确认是否存在口径变更。
+创建时间: 2026-05-31T21:05:17.978276
+
+>>> 复核原因:
+  [类型: caliber_change_confirmed]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.978981
+  说明: [指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。
+  指标变更前: {"precision": 0.85, "recall": 0.82, "f1": 0.83, "accuracy": 0.84}
+  指标变更后: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+  变更详情: accuracy: 0.8400 -> 0.9100 (+8.33%), f1: 0.8300 -> 0.9100 (+9.64%), precision: 0.8500 -> 0.9200 (+8.24%), recall: 0.8200 -> 0.9000 (+9.76%)
+
+>>> 结论:
+  结论: 确认v1.1版本recall指标口径变更，已重新计算
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.978982
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_c631dd72, 类型: normal
+    -> 评估记录:
+       评估ID: E_c8d9222e
+       样本ID: S_normal_001
+       预测标签: sports
+       真值标签: sports
+       是否正确: True
+       评估人: 评A
+       评估时间: 2026-05-22T14:00:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 6
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+  【记录2】ID: R_c2114186, 类型: normal
+    -> 评估记录:
+       评估ID: E_92a47a50
+       样本ID: S_normal_002
+       预测标签: entertainment
+       真值标签: entertainment
+       是否正确: True
+       评估人: 评A
+       评估时间: 2026-05-22T14:05:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 7
+       指标: {"precision": 0.58, "recall": 0.55, "f1": 0.56, "accuracy": 0.57}
+    -> 备注: 口径调整后指标下降
+  【记录3】ID: R_e4476b3e, 类型: normal
+    -> 评估记录:
+       评估ID: E_403337e5
+       样本ID: S_normal_003
+       预测标签: technology
+       真值标签: technology
+       是否正确: True
+       评估人: 评B
+       评估时间: 2026-05-22T14:10:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 8
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+  【记录4】ID: R_a30a1667, 类型: normal
+    -> 评估记录:
+       评估ID: E_9544c8ac
+       样本ID: S_normal_004
+       预测标签: finance
+       真值标签: finance
+       是否正确: True
+       评估人: 评B
+       评估时间: 2026-05-22T14:15:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 9
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+
+>>> 证据链:
+  1. [metric_reference] -> evaluation_record:E_c8d9222e
+     说明: recall: 0.9000, 来源: test_materials/evaluation_records.csv 第6行
+  2. [metric_reference] -> evaluation_record:E_92a47a50
+     说明: recall: 0.5500, 来源: test_materials/evaluation_records.csv 第7行
+  3. [metric_reference] -> evaluation_record:E_403337e5
+     说明: recall: 0.9000, 来源: test_materials/evaluation_records.csv 第8行
+  4. [metric_reference] -> evaluation_record:E_9544c8ac
+     说明: recall: 0.9000, 来源: test_materials/evaluation_records.csv 第9行
+  5. [conclusion_reference] -> dispute_conclusion:D_92bed71a
+     说明: 结论: 确认v1.1版本recall指标口径变更，已重新计算...
+  6. [复核原因] caliber_change_confirmed - 算法工程师A: [指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。
+  7. [结论] resolved - 算法工程师A: 确认v1.1版本recall指标口径变更，已重新计算
+
+-- 争议10结束 --
+
+【11】指标波动异常: v1.1 accuracy
+--------------------------------------------------
+争议ID: D_8afab731
+类型: metric_change
+状态: resolved
+描述: 模型 v1.1 的 accuracy 指标波动超过30%。最大值: 0.9100, 最小值: 0.5700。请确认是否存在口径变更。
+创建时间: 2026-05-31T21:05:17.978285
+
+>>> 复核原因:
+  [类型: caliber_change_confirmed]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.979003
+  说明: [指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。
+  指标变更前: {"precision": 0.85, "recall": 0.82, "f1": 0.83, "accuracy": 0.84}
+  指标变更后: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+  变更详情: accuracy: 0.8400 -> 0.9100 (+8.33%), f1: 0.8300 -> 0.9100 (+9.64%), precision: 0.8500 -> 0.9200 (+8.24%), recall: 0.8200 -> 0.9000 (+9.76%)
+
+>>> 结论:
+  结论: 确认v1.1版本accuracy指标口径变更，已重新计算
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.979004
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_c631dd72, 类型: normal
+    -> 评估记录:
+       评估ID: E_c8d9222e
+       样本ID: S_normal_001
+       预测标签: sports
+       真值标签: sports
+       是否正确: True
+       评估人: 评A
+       评估时间: 2026-05-22T14:00:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 6
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+  【记录2】ID: R_c2114186, 类型: normal
+    -> 评估记录:
+       评估ID: E_92a47a50
+       样本ID: S_normal_002
+       预测标签: entertainment
+       真值标签: entertainment
+       是否正确: True
+       评估人: 评A
+       评估时间: 2026-05-22T14:05:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 7
+       指标: {"precision": 0.58, "recall": 0.55, "f1": 0.56, "accuracy": 0.57}
+    -> 备注: 口径调整后指标下降
+  【记录3】ID: R_e4476b3e, 类型: normal
+    -> 评估记录:
+       评估ID: E_403337e5
+       样本ID: S_normal_003
+       预测标签: technology
+       真值标签: technology
+       是否正确: True
+       评估人: 评B
+       评估时间: 2026-05-22T14:10:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 8
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+  【记录4】ID: R_a30a1667, 类型: normal
+    -> 评估记录:
+       评估ID: E_9544c8ac
+       样本ID: S_normal_004
+       预测标签: finance
+       真值标签: finance
+       是否正确: True
+       评估人: 评B
+       评估时间: 2026-05-22T14:15:00
+       模型版本: v1.1
+       来源文件: test_materials/evaluation_records.csv
+       来源行号: 9
+       指标: {"precision": 0.92, "recall": 0.9, "f1": 0.91, "accuracy": 0.91}
+    -> 备注: 口径调整后
+
+>>> 证据链:
+  1. [metric_reference] -> evaluation_record:E_c8d9222e
+     说明: accuracy: 0.9100, 来源: test_materials/evaluation_records.csv 第6行
+  2. [metric_reference] -> evaluation_record:E_92a47a50
+     说明: accuracy: 0.5700, 来源: test_materials/evaluation_records.csv 第7行
+  3. [metric_reference] -> evaluation_record:E_403337e5
+     说明: accuracy: 0.9100, 来源: test_materials/evaluation_records.csv 第8行
+  4. [metric_reference] -> evaluation_record:E_9544c8ac
+     说明: accuracy: 0.9100, 来源: test_materials/evaluation_records.csv 第9行
+  5. [conclusion_reference] -> dispute_conclusion:D_8afab731
+     说明: 结论: 确认v1.1版本accuracy指标口径变更，已重新计算...
+  6. [复核原因] caliber_change_confirmed - 算法工程师A: [指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。
+  7. [结论] resolved - 算法工程师A: 确认v1.1版本accuracy指标口径变更，已重新计算
+
+-- 争议11结束 --
+
+【12】晚到附件待复核: 世界杯决赛精彩进球集锦...
+--------------------------------------------------
+争议ID: D_385e8a03
+类型: late_attachment_issue
+状态: resolved
+描述: 该记录为晚到附件 (收到时间: 2026-05-23 09:00:00)。相关评估记录: 0条。请确认晚到附件是否影响之前的评估结论。
+创建时间: 2026-05-31T21:05:17.978303
+
+>>> 复核原因:
+  [类型: manual_review]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.979018
+  说明: 晚到附件内容与已有标注一致，无需调整评估结果
+
+>>> 结论:
+  结论: 晚到附件已纳入评估，不影响原有结论
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.979020
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_151e997b, 类型: late_attachment
+    -> 标注样本:
+       样本ID: S_38c444f3
+       文本: 世界杯决赛精彩进球集锦
+       标签: 体育
+       标注人: 张三
+       标注时间: 2026-05-20T10:30:00
+       来源文件: test_materials/late_attachment_补传数据.csv
+       来源行号: 2
+       置信度: 1.0
+    -> 备注: 晚到的标注数据
+
+>>> 证据链:
+  1. [late_attachment] -> annotation_sample:S_38c444f3
+     说明: 晚到附件标注: 体育, 标注时间: 2026-05-20 10:30:00, 收到时间: 2026-05-23 09:00:00, 来源: test_materials/late_attachment_补传数据.csv 第2行
+  2. [conclusion_reference] -> dispute_conclusion:D_385e8a03
+     说明: 结论: 晚到附件已纳入评估，不影响原有结论...
+  3. [复核原因] manual_review - 算法工程师A: 晚到附件内容与已有标注一致，无需调整评估结果
+  4. [结论] resolved - 算法工程师A: 晚到附件已纳入评估，不影响原有结论
+
+-- 争议12结束 --
+
+【13】晚到附件待复核: 奥运会开幕式回顾...
+--------------------------------------------------
+争议ID: D_44352134
+类型: late_attachment_issue
+状态: resolved
+描述: 该记录为晚到附件 (收到时间: 2026-05-23 09:05:00)。相关评估记录: 0条。请确认晚到附件是否影响之前的评估结论。
+创建时间: 2026-05-31T21:05:17.978311
+
+>>> 复核原因:
+  [类型: manual_review]
+  复核人: 算法工程师A
+  时间: 2026-05-31T21:05:17.979037
+  说明: 晚到附件内容与已有标注一致，无需调整评估结果
+
+>>> 结论:
+  结论: 晚到附件已纳入评估，不影响原有结论
+  处理人: 算法工程师A
+  处理时间: 2026-05-31T21:05:17.979038
+
+>>> 关联记录（可追溯）:
+  【记录1】ID: R_1ab036f2, 类型: late_attachment
+    -> 标注样本:
+       样本ID: S_c0372779
+       文本: 奥运会开幕式回顾
+       标签: 体育
+       标注人: 张三
+       标注时间: 2026-05-20T12:00:00
+       来源文件: test_materials/late_attachment_补传数据.csv
+       来源行号: 3
+       置信度: 1.0
+    -> 备注: 晚到的标注数据
+
+>>> 证据链:
+  1. [late_attachment] -> annotation_sample:S_c0372779
+     说明: 晚到附件标注: 体育, 标注时间: 2026-05-20 12:00:00, 收到时间: 2026-05-23 09:05:00, 来源: test_materials/late_attachment_补传数据.csv 第3行
+  2. [conclusion_reference] -> dispute_conclusion:D_44352134
+     说明: 结论: 晚到附件已纳入评估，不影响原有结论...
+  3. [复核原因] manual_review - 算法工程师A: 晚到附件内容与已有标注一致，无需调整评估结果
+  4. [结论] resolved - 算法工程师A: 晚到附件已纳入评估，不影响原有结论
+
+-- 争议13结束 --
+
+======================================================================
+附录：记录类型说明
+  normal - 正常记录
+  late_attachment - 晚到附件
+  duplicate - 重复项
+  manual_correction - 人工更正
+
+争议类型说明:
+  label_missing - 标签漏映射
+  metric_change - 指标口径变更
+  label_mismatch - 标签不一致
+  duplicate_conflict - 重复项冲突
+  late_attachment_issue - 晚到附件待复核
+  correction_conflict - 人工更正冲突
+======================================================================

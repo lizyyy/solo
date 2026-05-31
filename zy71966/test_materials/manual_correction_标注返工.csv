@@ -1,0 +1,5 @@
+text,label,annotator,annotated_at,confidence,note,parent_record_id,label_source
+"股市震荡投资者观望","财经","赵六","2026-05-20 15:30:00",1.0,原始标注,R_original_001,normal
+"股市震荡投资者观望","科技","钱七","2026-05-21 10:00:00",1.0,人工更正：原标签错误，应为科技,R_original_001,manual_correction
+"健康饮食新趋势","健康","周八","2026-05-20 17:00:00",0.9,原始标注,R_original_002,normal
+"健康饮食新趋势","健康","周八","2026-05-21 11:00:00",1.0,人工更正：置信度提升,R_original_002,manual_correction

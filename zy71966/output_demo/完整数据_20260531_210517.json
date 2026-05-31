@@ -1,0 +1,2451 @@
+{
+  "export_time": "2026-05-31T21:05:17.980007",
+  "dispute_count": 13,
+  "record_count": 29,
+  "disputes": [
+    {
+      "dispute_id": "D_baf44ba5",
+      "dispute_type": "label_missing",
+      "status": "resolved",
+      "title": "标签漏映射: 军事",
+      "description": "标注标签 '军事' 不在标签映射表中。",
+      "created_at": "2026-05-31T21:05:17.977956",
+      "resolved_at": "2026-05-31T21:05:17.978542",
+      "conclusion": "新增标签映射: 军事 -> technology",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "detected_label": "军事",
+        "similar_labels": [],
+        "source_file": "test_materials/label_missing_漏映射.csv",
+        "source_line": 2
+      },
+      "record_ids": [
+        "R_ea6f9814"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_2c30d98c",
+          "link_type": "annotation_reference",
+          "target_type": "annotation_sample",
+          "target_id": "S_f857066e",
+          "description": "标注样本来源: test_materials/label_missing_漏映射.csv 第2行",
+          "source_file": "test_materials/label_missing_漏映射.csv",
+          "source_line": "2"
+        },
+        {
+          "link_id": "L_83c9837b",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_baf44ba5",
+          "description": "结论: 新增标签映射: 军事 -> technology...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_fda8c1c8",
+          "reviewer": "算法工程师A",
+          "reason_type": "label_mapping_resolved",
+          "description": "[标签漏映射处理] 检测到标签: '军事', 确认映射为: 'technology'. 已添加到标签映射表. 处理人: 算法工程师A.",
+          "metric_before": null,
+          "metric_after": null,
+          "created_at": "2026-05-31T21:05:17.978533"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_baf44ba5",
+        "dispute_type": "label_missing",
+        "title": "标签漏映射: 军事",
+        "conclusion": "新增标签映射: 军事 -> technology",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.978542",
+        "related_records": [
+          {
+            "record_id": "R_ea6f9814",
+            "record_type": "normal",
+            "note": "军事不在映射表中",
+            "received_at": "2026-05-31T21:05:17.970671",
+            "annotation": {
+              "sample_id": "S_f857066e",
+              "text": "军事演习最新动态",
+              "label": "军事",
+              "annotator": "王十一",
+              "annotated_at": "2026-05-20T20:00:00",
+              "source_file": "test_materials/label_missing_漏映射.csv",
+              "source_line": 2,
+              "confidence": 1.0
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_2c30d98c",
+            "link_type": "annotation_reference",
+            "target_type": "annotation_sample",
+            "target_id": "S_f857066e",
+            "description": "标注样本来源: test_materials/label_missing_漏映射.csv 第2行",
+            "created_at": "2026-05-31T21:05:17.977951"
+          },
+          {
+            "link_id": "L_83c9837b",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_baf44ba5",
+            "description": "结论: 新增标签映射: 军事 -> technology...",
+            "created_at": "2026-05-31T21:05:17.978545"
+          },
+          {
+            "reason_id": "RR_fda8c1c8",
+            "type": "review_reason",
+            "reason_type": "label_mapping_resolved",
+            "reviewer": "算法工程师A",
+            "description": "[标签漏映射处理] 检测到标签: '军事', 确认映射为: 'technology'. 已添加到标签映射表. 处理人: 算法工程师A.",
+            "metric_before": null,
+            "metric_after": null,
+            "created_at": "2026-05-31T21:05:17.978533"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "新增标签映射: 军事 -> technology",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.978542",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_6e4fd0a2",
+      "dispute_type": "label_missing",
+      "status": "resolved",
+      "title": "标签漏映射: 游戏",
+      "description": "标注标签 '游戏' 不在标签映射表中。",
+      "created_at": "2026-05-31T21:05:17.977975",
+      "resolved_at": "2026-05-31T21:05:17.978600",
+      "conclusion": "新增标签映射: 游戏 -> entertainment",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "detected_label": "游戏",
+        "similar_labels": [],
+        "source_file": "test_materials/label_missing_漏映射.csv",
+        "source_line": 3
+      },
+      "record_ids": [
+        "R_e6134e42"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_48a62034",
+          "link_type": "annotation_reference",
+          "target_type": "annotation_sample",
+          "target_id": "S_1b9246e1",
+          "description": "标注样本来源: test_materials/label_missing_漏映射.csv 第3行",
+          "source_file": "test_materials/label_missing_漏映射.csv",
+          "source_line": "3"
+        },
+        {
+          "link_id": "L_26f061e9",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_6e4fd0a2",
+          "description": "结论: 新增标签映射: 游戏 -> entertainment...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_3c07aacb",
+          "reviewer": "算法工程师A",
+          "reason_type": "label_mapping_resolved",
+          "description": "[标签漏映射处理] 检测到标签: '游戏', 确认映射为: 'entertainment'. 已添加到标签映射表. 处理人: 算法工程师A.",
+          "metric_before": null,
+          "metric_after": null,
+          "created_at": "2026-05-31T21:05:17.978598"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_6e4fd0a2",
+        "dispute_type": "label_missing",
+        "title": "标签漏映射: 游戏",
+        "conclusion": "新增标签映射: 游戏 -> entertainment",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.978600",
+        "related_records": [
+          {
+            "record_id": "R_e6134e42",
+            "record_type": "normal",
+            "note": "游戏不在映射表中",
+            "received_at": "2026-05-31T21:05:17.970848",
+            "annotation": {
+              "sample_id": "S_1b9246e1",
+              "text": "游戏行业发展报告",
+              "label": "游戏",
+              "annotator": "李十二",
+              "annotated_at": "2026-05-20T21:00:00",
+              "source_file": "test_materials/label_missing_漏映射.csv",
+              "source_line": 3,
+              "confidence": 0.95
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_48a62034",
+            "link_type": "annotation_reference",
+            "target_type": "annotation_sample",
+            "target_id": "S_1b9246e1",
+            "description": "标注样本来源: test_materials/label_missing_漏映射.csv 第3行",
+            "created_at": "2026-05-31T21:05:17.977973"
+          },
+          {
+            "link_id": "L_26f061e9",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_6e4fd0a2",
+            "description": "结论: 新增标签映射: 游戏 -> entertainment...",
+            "created_at": "2026-05-31T21:05:17.978603"
+          },
+          {
+            "reason_id": "RR_3c07aacb",
+            "type": "review_reason",
+            "reason_type": "label_mapping_resolved",
+            "reviewer": "算法工程师A",
+            "description": "[标签漏映射处理] 检测到标签: '游戏', 确认映射为: 'entertainment'. 已添加到标签映射表. 处理人: 算法工程师A.",
+            "metric_before": null,
+            "metric_after": null,
+            "created_at": "2026-05-31T21:05:17.978598"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "新增标签映射: 游戏 -> entertainment",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.978600",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_91b0d727",
+      "dispute_type": "label_missing",
+      "status": "resolved",
+      "title": "标签漏映射: 旅游",
+      "description": "标注标签 '旅游' 不在标签映射表中。",
+      "created_at": "2026-05-31T21:05:17.978048",
+      "resolved_at": "2026-05-31T21:05:17.978623",
+      "conclusion": "新增标签映射: 旅游 -> other",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "detected_label": "旅游",
+        "similar_labels": [],
+        "source_file": "test_materials/label_missing_漏映射.csv",
+        "source_line": 4
+      },
+      "record_ids": [
+        "R_d2ab7895"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_1065613d",
+          "link_type": "annotation_reference",
+          "target_type": "annotation_sample",
+          "target_id": "S_4c9fce99",
+          "description": "标注样本来源: test_materials/label_missing_漏映射.csv 第4行",
+          "source_file": "test_materials/label_missing_漏映射.csv",
+          "source_line": "4"
+        },
+        {
+          "link_id": "L_3dfae9a4",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_91b0d727",
+          "description": "结论: 新增标签映射: 旅游 -> other...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_85577849",
+          "reviewer": "算法工程师A",
+          "reason_type": "label_mapping_resolved",
+          "description": "[标签漏映射处理] 检测到标签: '旅游', 确认映射为: 'other'. 已添加到标签映射表. 处理人: 算法工程师A.",
+          "metric_before": null,
+          "metric_after": null,
+          "created_at": "2026-05-31T21:05:17.978621"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_91b0d727",
+        "dispute_type": "label_missing",
+        "title": "标签漏映射: 旅游",
+        "conclusion": "新增标签映射: 旅游 -> other",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.978623",
+        "related_records": [
+          {
+            "record_id": "R_d2ab7895",
+            "record_type": "normal",
+            "note": "旅游不在映射表中",
+            "received_at": "2026-05-31T21:05:17.971017",
+            "annotation": {
+              "sample_id": "S_4c9fce99",
+              "text": "旅游攻略分享",
+              "label": "旅游",
+              "annotator": "张十三",
+              "annotated_at": "2026-05-20T22:00:00",
+              "source_file": "test_materials/label_missing_漏映射.csv",
+              "source_line": 4,
+              "confidence": 0.9
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_1065613d",
+            "link_type": "annotation_reference",
+            "target_type": "annotation_sample",
+            "target_id": "S_4c9fce99",
+            "description": "标注样本来源: test_materials/label_missing_漏映射.csv 第4行",
+            "created_at": "2026-05-31T21:05:17.978041"
+          },
+          {
+            "link_id": "L_3dfae9a4",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_91b0d727",
+            "description": "结论: 新增标签映射: 旅游 -> other...",
+            "created_at": "2026-05-31T21:05:17.978625"
+          },
+          {
+            "reason_id": "RR_85577849",
+            "type": "review_reason",
+            "reason_type": "label_mapping_resolved",
+            "reviewer": "算法工程师A",
+            "description": "[标签漏映射处理] 检测到标签: '旅游', 确认映射为: 'other'. 已添加到标签映射表. 处理人: 算法工程师A.",
+            "metric_before": null,
+            "metric_after": null,
+            "created_at": "2026-05-31T21:05:17.978621"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "新增标签映射: 旅游 -> other",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.978623",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_71f4b628",
+      "dispute_type": "label_mismatch",
+      "status": "resolved",
+      "title": "标签不一致: 世界杯决赛精彩进球集锦...",
+      "description": "相同文本存在不同标注: duplicate(体育), duplicate(娱乐), late_attachment(体育), normal(体育)。请确认正确标签。",
+      "created_at": "2026-05-31T21:05:17.978117",
+      "resolved_at": "2026-05-31T21:05:17.978720",
+      "conclusion": "确认正确标签为: 体育, 已排除错误标注",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "text": "世界杯决赛精彩进球集锦",
+        "labels": [
+          {
+            "label": "体育",
+            "type": "duplicate"
+          },
+          {
+            "label": "娱乐",
+            "type": "duplicate"
+          },
+          {
+            "label": "体育",
+            "type": "late_attachment"
+          },
+          {
+            "label": "体育",
+            "type": "normal"
+          }
+        ]
+      },
+      "record_ids": [
+        "R_47065f67",
+        "R_4b95f039",
+        "R_151e997b",
+        "R_c32a1216"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_769e8c37",
+          "link_type": "annotation_reference",
+          "target_type": "annotation_sample",
+          "target_id": "S_38c444f3",
+          "description": "标注: 体育 (类型: duplicate) 来源: test_materials/duplicate_重复数据.csv 第2行",
+          "source_file": "test_materials/duplicate_重复数据.csv",
+          "source_line": "2"
+        },
+        {
+          "link_id": "L_ca67474e",
+          "link_type": "annotation_reference",
+          "target_type": "annotation_sample",
+          "target_id": "S_562feab9",
+          "description": "标注: 娱乐 (类型: duplicate) 来源: test_materials/duplicate_重复数据.csv 第3行",
+          "source_file": "test_materials/duplicate_重复数据.csv",
+          "source_line": "3"
+        },
+        {
+          "link_id": "L_d1c7051a",
+          "link_type": "annotation_reference",
+          "target_type": "annotation_sample",
+          "target_id": "S_38c444f3",
+          "description": "标注: 体育 (类型: late_attachment) 来源: test_materials/late_attachment_补传数据.csv 第2行",
+          "source_file": "test_materials/late_attachment_补传数据.csv",
+          "source_line": "2"
+        },
+        {
+          "link_id": "L_eef33fab",
+          "link_type": "annotation_reference",
+          "target_type": "annotation_sample",
+          "target_id": "S_38c444f3",
+          "description": "标注: 体育 (类型: normal) 来源: test_materials/normal_records.csv 第2行",
+          "source_file": "test_materials/normal_records.csv",
+          "source_line": "2"
+        },
+        {
+          "link_id": "L_40d8c7d9",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_71f4b628",
+          "description": "结论: 确认正确标签为: 体育, 已排除错误标注...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_c61f624e",
+          "reviewer": "算法工程师A",
+          "reason_type": "manual_review",
+          "description": "经核对原始材料，正确标签为体育。错误标注已标记作废。",
+          "metric_before": null,
+          "metric_after": null,
+          "created_at": "2026-05-31T21:05:17.978692"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_71f4b628",
+        "dispute_type": "label_mismatch",
+        "title": "标签不一致: 世界杯决赛精彩进球集锦...",
+        "conclusion": "确认正确标签为: 体育, 已排除错误标注",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.978720",
+        "related_records": [
+          {
+            "record_id": "R_47065f67",
+            "record_type": "duplicate",
+            "note": "重复记录1",
+            "received_at": "2026-05-31T21:05:17.966689",
+            "annotation": {
+              "sample_id": "S_38c444f3",
+              "text": "世界杯决赛精彩进球集锦",
+              "label": "体育",
+              "annotator": "张三",
+              "annotated_at": "2026-05-20T10:30:00",
+              "source_file": "test_materials/duplicate_重复数据.csv",
+              "source_line": 2,
+              "confidence": 1.0
+            }
+          },
+          {
+            "record_id": "R_4b95f039",
+            "record_type": "duplicate",
+            "note": "重复记录2 标签错误",
+            "received_at": "2026-05-31T21:05:17.966956",
+            "annotation": {
+              "sample_id": "S_562feab9",
+              "text": "世界杯决赛精彩进球集锦",
+              "label": "娱乐",
+              "annotator": "李四",
+              "annotated_at": "2026-05-20T10:31:00",
+              "source_file": "test_materials/duplicate_重复数据.csv",
+              "source_line": 3,
+              "confidence": 0.8
+            }
+          },
+          {
+            "record_id": "R_151e997b",
+            "record_type": "late_attachment",
+            "note": "晚到的标注数据",
+            "received_at": "2026-05-23T09:00:00",
+            "annotation": {
+              "sample_id": "S_38c444f3",
+              "text": "世界杯决赛精彩进球集锦",
+              "label": "体育",
+              "annotator": "张三",
+              "annotated_at": "2026-05-20T10:30:00",
+              "source_file": "test_materials/late_attachment_补传数据.csv",
+              "source_line": 2,
+              "confidence": 1.0
+            }
+          },
+          {
+            "record_id": "R_c32a1216",
+            "record_type": "normal",
+            "note": "nan",
+            "received_at": "2026-05-31T21:05:17.975927",
+            "annotation": {
+              "sample_id": "S_38c444f3",
+              "text": "世界杯决赛精彩进球集锦",
+              "label": "体育",
+              "annotator": "张三",
+              "annotated_at": "2026-05-20T10:30:00",
+              "source_file": "test_materials/normal_records.csv",
+              "source_line": 2,
+              "confidence": 1.0
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_769e8c37",
+            "link_type": "annotation_reference",
+            "target_type": "annotation_sample",
+            "target_id": "S_38c444f3",
+            "description": "标注: 体育 (类型: duplicate) 来源: test_materials/duplicate_重复数据.csv 第2行",
+            "created_at": "2026-05-31T21:05:17.978102"
+          },
+          {
+            "link_id": "L_ca67474e",
+            "link_type": "annotation_reference",
+            "target_type": "annotation_sample",
+            "target_id": "S_562feab9",
+            "description": "标注: 娱乐 (类型: duplicate) 来源: test_materials/duplicate_重复数据.csv 第3行",
+            "created_at": "2026-05-31T21:05:17.978106"
+          },
+          {
+            "link_id": "L_d1c7051a",
+            "link_type": "annotation_reference",
+            "target_type": "annotation_sample",
+            "target_id": "S_38c444f3",
+            "description": "标注: 体育 (类型: late_attachment) 来源: test_materials/late_attachment_补传数据.csv 第2行",
+            "created_at": "2026-05-31T21:05:17.978110"
+          },
+          {
+            "link_id": "L_eef33fab",
+            "link_type": "annotation_reference",
+            "target_type": "annotation_sample",
+            "target_id": "S_38c444f3",
+            "description": "标注: 体育 (类型: normal) 来源: test_materials/normal_records.csv 第2行",
+            "created_at": "2026-05-31T21:05:17.978113"
+          },
+          {
+            "link_id": "L_40d8c7d9",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_71f4b628",
+            "description": "结论: 确认正确标签为: 体育, 已排除错误标注...",
+            "created_at": "2026-05-31T21:05:17.978723"
+          },
+          {
+            "reason_id": "RR_c61f624e",
+            "type": "review_reason",
+            "reason_type": "manual_review",
+            "reviewer": "算法工程师A",
+            "description": "经核对原始材料，正确标签为体育。错误标注已标记作废。",
+            "metric_before": null,
+            "metric_after": null,
+            "created_at": "2026-05-31T21:05:17.978692"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "确认正确标签为: 体育, 已排除错误标注",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.978720",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_01a69ac0",
+      "dispute_type": "label_mismatch",
+      "status": "resolved",
+      "title": "标签不一致: 股市震荡投资者观望...",
+      "description": "相同文本存在不同标注: manual_correction(财经), manual_correction(科技), normal(财经)。请确认正确标签。",
+      "created_at": "2026-05-31T21:05:17.978140",
+      "resolved_at": "2026-05-31T21:05:17.978826",
+      "conclusion": "确认正确标签为: 财经, 已排除错误标注",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "text": "股市震荡投资者观望",
+        "labels": [
+          {
+            "label": "财经",
+            "type": "manual_correction"
+          },
+          {
+            "label": "科技",
+            "type": "manual_correction"
+          },
+          {
+            "label": "财经",
+            "type": "normal"
+          }
+        ]
+      },
+      "record_ids": [
+        "R_262cf5ba",
+        "R_d871d2aa",
+        "R_bde1ed4e"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_ac34025f",
+          "link_type": "annotation_reference",
+          "target_type": "annotation_sample",
+          "target_id": "S_6bd29956",
+          "description": "标注: 财经 (类型: manual_correction) 来源: test_materials/manual_correction_标注返工.csv 第2行",
+          "source_file": "test_materials/manual_correction_标注返工.csv",
+          "source_line": "2"
+        },
+        {
+          "link_id": "L_2de2e009",
+          "link_type": "annotation_reference",
+          "target_type": "annotation_sample",
+          "target_id": "S_e451c518",
+          "description": "标注: 科技 (类型: manual_correction) 来源: test_materials/manual_correction_标注返工.csv 第3行",
+          "source_file": "test_materials/manual_correction_标注返工.csv",
+          "source_line": "3"
+        },
+        {
+          "link_id": "L_658a4e4f",
+          "link_type": "annotation_reference",
+          "target_type": "annotation_sample",
+          "target_id": "S_6bd29956",
+          "description": "标注: 财经 (类型: normal) 来源: test_materials/normal_records.csv 第5行",
+          "source_file": "test_materials/normal_records.csv",
+          "source_line": "5"
+        },
+        {
+          "link_id": "L_61ac203b",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_01a69ac0",
+          "description": "结论: 确认正确标签为: 财经, 已排除错误标注...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_a716db28",
+          "reviewer": "算法工程师A",
+          "reason_type": "manual_review",
+          "description": "经核对原始材料，正确标签为财经。错误标注已标记作废。",
+          "metric_before": null,
+          "metric_after": null,
+          "created_at": "2026-05-31T21:05:17.978824"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_01a69ac0",
+        "dispute_type": "label_mismatch",
+        "title": "标签不一致: 股市震荡投资者观望...",
+        "conclusion": "确认正确标签为: 财经, 已排除错误标注",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.978826",
+        "related_records": [
+          {
+            "record_id": "R_262cf5ba",
+            "record_type": "manual_correction",
+            "note": "原始标注",
+            "received_at": "2026-05-31T21:05:17.972838",
+            "annotation": {
+              "sample_id": "S_6bd29956",
+              "text": "股市震荡投资者观望",
+              "label": "财经",
+              "annotator": "赵六",
+              "annotated_at": "2026-05-20T15:30:00",
+              "source_file": "test_materials/manual_correction_标注返工.csv",
+              "source_line": 2,
+              "confidence": 1.0
+            }
+          },
+          {
+            "record_id": "R_d871d2aa",
+            "record_type": "manual_correction",
+            "note": "人工更正：原标签错误，应为科技",
+            "received_at": "2026-05-31T21:05:17.973007",
+            "annotation": {
+              "sample_id": "S_e451c518",
+              "text": "股市震荡投资者观望",
+              "label": "科技",
+              "annotator": "钱七",
+              "annotated_at": "2026-05-21T10:00:00",
+              "source_file": "test_materials/manual_correction_标注返工.csv",
+              "source_line": 3,
+              "confidence": 1.0
+            }
+          },
+          {
+            "record_id": "R_bde1ed4e",
+            "record_type": "normal",
+            "note": "nan",
+            "received_at": "2026-05-31T21:05:17.976717",
+            "annotation": {
+              "sample_id": "S_6bd29956",
+              "text": "股市震荡投资者观望",
+              "label": "财经",
+              "annotator": "赵六",
+              "annotated_at": "2026-05-20T15:30:00",
+              "source_file": "test_materials/normal_records.csv",
+              "source_line": 5,
+              "confidence": 1.0
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_ac34025f",
+            "link_type": "annotation_reference",
+            "target_type": "annotation_sample",
+            "target_id": "S_6bd29956",
+            "description": "标注: 财经 (类型: manual_correction) 来源: test_materials/manual_correction_标注返工.csv 第2行",
+            "created_at": "2026-05-31T21:05:17.978130"
+          },
+          {
+            "link_id": "L_2de2e009",
+            "link_type": "annotation_reference",
+            "target_type": "annotation_sample",
+            "target_id": "S_e451c518",
+            "description": "标注: 科技 (类型: manual_correction) 来源: test_materials/manual_correction_标注返工.csv 第3行",
+            "created_at": "2026-05-31T21:05:17.978133"
+          },
+          {
+            "link_id": "L_658a4e4f",
+            "link_type": "annotation_reference",
+            "target_type": "annotation_sample",
+            "target_id": "S_6bd29956",
+            "description": "标注: 财经 (类型: normal) 来源: test_materials/normal_records.csv 第5行",
+            "created_at": "2026-05-31T21:05:17.978137"
+          },
+          {
+            "link_id": "L_61ac203b",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_01a69ac0",
+            "description": "结论: 确认正确标签为: 财经, 已排除错误标注...",
+            "created_at": "2026-05-31T21:05:17.978827"
+          },
+          {
+            "reason_id": "RR_a716db28",
+            "type": "review_reason",
+            "reason_type": "manual_review",
+            "reviewer": "算法工程师A",
+            "description": "经核对原始材料，正确标签为财经。错误标注已标记作废。",
+            "metric_before": null,
+            "metric_after": null,
+            "created_at": "2026-05-31T21:05:17.978824"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "确认正确标签为: 财经, 已排除错误标注",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.978826",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_fb1be18c",
+      "dispute_type": "duplicate_conflict",
+      "status": "resolved",
+      "title": "重复项冲突: 世界杯决赛精彩进球集锦...",
+      "description": "检测到4条重复记录存在冲突。标签差异: 娱乐, 体育。评估差异: 无。",
+      "created_at": "2026-05-31T21:05:17.978205",
+      "resolved_at": "2026-05-31T21:05:17.978887",
+      "conclusion": "重复记录已合并，保留置信度高的版本",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "content_hash": "a33fac170018e5475ee4004e0999a4da",
+        "duplicate_count": 4,
+        "labels": [
+          "娱乐",
+          "体育"
+        ],
+        "eval_results": []
+      },
+      "record_ids": [
+        "R_47065f67",
+        "R_4b95f039",
+        "R_151e997b",
+        "R_c32a1216"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_d7c375f8",
+          "link_type": "duplicate_reference",
+          "target_type": "data_record",
+          "target_id": "R_47065f67",
+          "description": "记录类型: duplicate, 标签: 体育, 来源: test_materials/duplicate_重复数据.csv 第2行",
+          "source_file": "test_materials/duplicate_重复数据.csv",
+          "source_line": "2"
+        },
+        {
+          "link_id": "L_11bc44ff",
+          "link_type": "duplicate_reference",
+          "target_type": "data_record",
+          "target_id": "R_4b95f039",
+          "description": "记录类型: duplicate, 标签: 娱乐, 来源: test_materials/duplicate_重复数据.csv 第3行",
+          "source_file": "test_materials/duplicate_重复数据.csv",
+          "source_line": "3"
+        },
+        {
+          "link_id": "L_84c75862",
+          "link_type": "duplicate_reference",
+          "target_type": "data_record",
+          "target_id": "R_151e997b",
+          "description": "记录类型: late_attachment, 标签: 体育, 来源: test_materials/late_attachment_补传数据.csv 第2行",
+          "source_file": "test_materials/late_attachment_补传数据.csv",
+          "source_line": "2"
+        },
+        {
+          "link_id": "L_b6cec92d",
+          "link_type": "duplicate_reference",
+          "target_type": "data_record",
+          "target_id": "R_c32a1216",
+          "description": "记录类型: normal, 标签: 体育, 来源: test_materials/normal_records.csv 第2行",
+          "source_file": "test_materials/normal_records.csv",
+          "source_line": "2"
+        },
+        {
+          "link_id": "L_b244da0c",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_fb1be18c",
+          "description": "结论: 重复记录已合并，保留置信度高的版本...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_1758910e",
+          "reviewer": "算法工程师A",
+          "reason_type": "manual_review",
+          "description": "去重策略：保留最新标注时间、置信度最高的记录，其余标记为重复",
+          "metric_before": null,
+          "metric_after": null,
+          "created_at": "2026-05-31T21:05:17.978884"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_fb1be18c",
+        "dispute_type": "duplicate_conflict",
+        "title": "重复项冲突: 世界杯决赛精彩进球集锦...",
+        "conclusion": "重复记录已合并，保留置信度高的版本",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.978887",
+        "related_records": [
+          {
+            "record_id": "R_47065f67",
+            "record_type": "duplicate",
+            "note": "重复记录1",
+            "received_at": "2026-05-31T21:05:17.966689",
+            "annotation": {
+              "sample_id": "S_38c444f3",
+              "text": "世界杯决赛精彩进球集锦",
+              "label": "体育",
+              "annotator": "张三",
+              "annotated_at": "2026-05-20T10:30:00",
+              "source_file": "test_materials/duplicate_重复数据.csv",
+              "source_line": 2,
+              "confidence": 1.0
+            }
+          },
+          {
+            "record_id": "R_4b95f039",
+            "record_type": "duplicate",
+            "note": "重复记录2 标签错误",
+            "received_at": "2026-05-31T21:05:17.966956",
+            "annotation": {
+              "sample_id": "S_562feab9",
+              "text": "世界杯决赛精彩进球集锦",
+              "label": "娱乐",
+              "annotator": "李四",
+              "annotated_at": "2026-05-20T10:31:00",
+              "source_file": "test_materials/duplicate_重复数据.csv",
+              "source_line": 3,
+              "confidence": 0.8
+            }
+          },
+          {
+            "record_id": "R_151e997b",
+            "record_type": "late_attachment",
+            "note": "晚到的标注数据",
+            "received_at": "2026-05-23T09:00:00",
+            "annotation": {
+              "sample_id": "S_38c444f3",
+              "text": "世界杯决赛精彩进球集锦",
+              "label": "体育",
+              "annotator": "张三",
+              "annotated_at": "2026-05-20T10:30:00",
+              "source_file": "test_materials/late_attachment_补传数据.csv",
+              "source_line": 2,
+              "confidence": 1.0
+            }
+          },
+          {
+            "record_id": "R_c32a1216",
+            "record_type": "normal",
+            "note": "nan",
+            "received_at": "2026-05-31T21:05:17.975927",
+            "annotation": {
+              "sample_id": "S_38c444f3",
+              "text": "世界杯决赛精彩进球集锦",
+              "label": "体育",
+              "annotator": "张三",
+              "annotated_at": "2026-05-20T10:30:00",
+              "source_file": "test_materials/normal_records.csv",
+              "source_line": 2,
+              "confidence": 1.0
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_d7c375f8",
+            "link_type": "duplicate_reference",
+            "target_type": "data_record",
+            "target_id": "R_47065f67",
+            "description": "记录类型: duplicate, 标签: 体育, 来源: test_materials/duplicate_重复数据.csv 第2行",
+            "created_at": "2026-05-31T21:05:17.978195"
+          },
+          {
+            "link_id": "L_11bc44ff",
+            "link_type": "duplicate_reference",
+            "target_type": "data_record",
+            "target_id": "R_4b95f039",
+            "description": "记录类型: duplicate, 标签: 娱乐, 来源: test_materials/duplicate_重复数据.csv 第3行",
+            "created_at": "2026-05-31T21:05:17.978199"
+          },
+          {
+            "link_id": "L_84c75862",
+            "link_type": "duplicate_reference",
+            "target_type": "data_record",
+            "target_id": "R_151e997b",
+            "description": "记录类型: late_attachment, 标签: 体育, 来源: test_materials/late_attachment_补传数据.csv 第2行",
+            "created_at": "2026-05-31T21:05:17.978201"
+          },
+          {
+            "link_id": "L_b6cec92d",
+            "link_type": "duplicate_reference",
+            "target_type": "data_record",
+            "target_id": "R_c32a1216",
+            "description": "记录类型: normal, 标签: 体育, 来源: test_materials/normal_records.csv 第2行",
+            "created_at": "2026-05-31T21:05:17.978203"
+          },
+          {
+            "link_id": "L_b244da0c",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_fb1be18c",
+            "description": "结论: 重复记录已合并，保留置信度高的版本...",
+            "created_at": "2026-05-31T21:05:17.978889"
+          },
+          {
+            "reason_id": "RR_1758910e",
+            "type": "review_reason",
+            "reason_type": "manual_review",
+            "reviewer": "算法工程师A",
+            "description": "去重策略：保留最新标注时间、置信度最高的记录，其余标记为重复",
+            "metric_before": null,
+            "metric_after": null,
+            "created_at": "2026-05-31T21:05:17.978884"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "重复记录已合并，保留置信度高的版本",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.978887",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_a6ac80b0",
+      "dispute_type": "duplicate_conflict",
+      "status": "resolved",
+      "title": "重复项冲突: 股市震荡投资者观望...",
+      "description": "检测到3条重复记录存在冲突。标签差异: 财经, 科技。评估差异: 无。",
+      "created_at": "2026-05-31T21:05:17.978217",
+      "resolved_at": "2026-05-31T21:05:17.978916",
+      "conclusion": "重复记录已合并，保留置信度高的版本",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "content_hash": "c8da110237e0f65f7a5d23f14048c1d7",
+        "duplicate_count": 3,
+        "labels": [
+          "财经",
+          "科技"
+        ],
+        "eval_results": []
+      },
+      "record_ids": [
+        "R_262cf5ba",
+        "R_d871d2aa",
+        "R_bde1ed4e"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_0dfe33aa",
+          "link_type": "duplicate_reference",
+          "target_type": "data_record",
+          "target_id": "R_262cf5ba",
+          "description": "记录类型: manual_correction, 标签: 财经, 来源: test_materials/manual_correction_标注返工.csv 第2行",
+          "source_file": "test_materials/manual_correction_标注返工.csv",
+          "source_line": "2"
+        },
+        {
+          "link_id": "L_b5e90876",
+          "link_type": "duplicate_reference",
+          "target_type": "data_record",
+          "target_id": "R_d871d2aa",
+          "description": "记录类型: manual_correction, 标签: 科技, 来源: test_materials/manual_correction_标注返工.csv 第3行",
+          "source_file": "test_materials/manual_correction_标注返工.csv",
+          "source_line": "3"
+        },
+        {
+          "link_id": "L_af036b97",
+          "link_type": "duplicate_reference",
+          "target_type": "data_record",
+          "target_id": "R_bde1ed4e",
+          "description": "记录类型: normal, 标签: 财经, 来源: test_materials/normal_records.csv 第5行",
+          "source_file": "test_materials/normal_records.csv",
+          "source_line": "5"
+        },
+        {
+          "link_id": "L_1c1c9919",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_a6ac80b0",
+          "description": "结论: 重复记录已合并，保留置信度高的版本...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_8c8f59ed",
+          "reviewer": "算法工程师A",
+          "reason_type": "manual_review",
+          "description": "去重策略：保留最新标注时间、置信度最高的记录，其余标记为重复",
+          "metric_before": null,
+          "metric_after": null,
+          "created_at": "2026-05-31T21:05:17.978914"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_a6ac80b0",
+        "dispute_type": "duplicate_conflict",
+        "title": "重复项冲突: 股市震荡投资者观望...",
+        "conclusion": "重复记录已合并，保留置信度高的版本",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.978916",
+        "related_records": [
+          {
+            "record_id": "R_262cf5ba",
+            "record_type": "manual_correction",
+            "note": "原始标注",
+            "received_at": "2026-05-31T21:05:17.972838",
+            "annotation": {
+              "sample_id": "S_6bd29956",
+              "text": "股市震荡投资者观望",
+              "label": "财经",
+              "annotator": "赵六",
+              "annotated_at": "2026-05-20T15:30:00",
+              "source_file": "test_materials/manual_correction_标注返工.csv",
+              "source_line": 2,
+              "confidence": 1.0
+            }
+          },
+          {
+            "record_id": "R_d871d2aa",
+            "record_type": "manual_correction",
+            "note": "人工更正：原标签错误，应为科技",
+            "received_at": "2026-05-31T21:05:17.973007",
+            "annotation": {
+              "sample_id": "S_e451c518",
+              "text": "股市震荡投资者观望",
+              "label": "科技",
+              "annotator": "钱七",
+              "annotated_at": "2026-05-21T10:00:00",
+              "source_file": "test_materials/manual_correction_标注返工.csv",
+              "source_line": 3,
+              "confidence": 1.0
+            }
+          },
+          {
+            "record_id": "R_bde1ed4e",
+            "record_type": "normal",
+            "note": "nan",
+            "received_at": "2026-05-31T21:05:17.976717",
+            "annotation": {
+              "sample_id": "S_6bd29956",
+              "text": "股市震荡投资者观望",
+              "label": "财经",
+              "annotator": "赵六",
+              "annotated_at": "2026-05-20T15:30:00",
+              "source_file": "test_materials/normal_records.csv",
+              "source_line": 5,
+              "confidence": 1.0
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_0dfe33aa",
+            "link_type": "duplicate_reference",
+            "target_type": "data_record",
+            "target_id": "R_262cf5ba",
+            "description": "记录类型: manual_correction, 标签: 财经, 来源: test_materials/manual_correction_标注返工.csv 第2行",
+            "created_at": "2026-05-31T21:05:17.978212"
+          },
+          {
+            "link_id": "L_b5e90876",
+            "link_type": "duplicate_reference",
+            "target_type": "data_record",
+            "target_id": "R_d871d2aa",
+            "description": "记录类型: manual_correction, 标签: 科技, 来源: test_materials/manual_correction_标注返工.csv 第3行",
+            "created_at": "2026-05-31T21:05:17.978214"
+          },
+          {
+            "link_id": "L_af036b97",
+            "link_type": "duplicate_reference",
+            "target_type": "data_record",
+            "target_id": "R_bde1ed4e",
+            "description": "记录类型: normal, 标签: 财经, 来源: test_materials/normal_records.csv 第5行",
+            "created_at": "2026-05-31T21:05:17.978216"
+          },
+          {
+            "link_id": "L_1c1c9919",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_a6ac80b0",
+            "description": "结论: 重复记录已合并，保留置信度高的版本...",
+            "created_at": "2026-05-31T21:05:17.978917"
+          },
+          {
+            "reason_id": "RR_8c8f59ed",
+            "type": "review_reason",
+            "reason_type": "manual_review",
+            "reviewer": "算法工程师A",
+            "description": "去重策略：保留最新标注时间、置信度最高的记录，其余标记为重复",
+            "metric_before": null,
+            "metric_after": null,
+            "created_at": "2026-05-31T21:05:17.978914"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "重复记录已合并，保留置信度高的版本",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.978916",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_f0d4d9c4",
+      "dispute_type": "metric_change",
+      "status": "resolved",
+      "title": "指标波动异常: v1.1 f1",
+      "description": "模型 v1.1 的 f1 指标波动超过30%。最大值: 0.9100, 最小值: 0.5600。请确认是否存在口径变更。",
+      "created_at": "2026-05-31T21:05:17.978255",
+      "resolved_at": "2026-05-31T21:05:17.978944",
+      "conclusion": "确认v1.1版本f1指标口径变更，已重新计算",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "model_version": "v1.1",
+        "metric_key": "f1",
+        "max_value": 0.91,
+        "min_value": 0.56,
+        "diff_ratio": 0.3846153846153846
+      },
+      "record_ids": [
+        "R_c631dd72",
+        "R_c2114186",
+        "R_e4476b3e",
+        "R_a30a1667"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_83513d0b",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_c8d9222e",
+          "description": "f1: 0.9100, 来源: test_materials/evaluation_records.csv 第6行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "6"
+        },
+        {
+          "link_id": "L_e51ddb9d",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_92a47a50",
+          "description": "f1: 0.5600, 来源: test_materials/evaluation_records.csv 第7行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "7"
+        },
+        {
+          "link_id": "L_f207f5b5",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_403337e5",
+          "description": "f1: 0.9100, 来源: test_materials/evaluation_records.csv 第8行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "8"
+        },
+        {
+          "link_id": "L_7c86182d",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_9544c8ac",
+          "description": "f1: 0.9100, 来源: test_materials/evaluation_records.csv 第9行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "9"
+        },
+        {
+          "link_id": "L_0e0afb5a",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_f0d4d9c4",
+          "description": "结论: 确认v1.1版本f1指标口径变更，已重新计算...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_c889c785",
+          "reviewer": "算法工程师A",
+          "reason_type": "caliber_change_confirmed",
+          "description": "[指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。",
+          "metric_before": {
+            "precision": 0.85,
+            "recall": 0.82,
+            "f1": 0.83,
+            "accuracy": 0.84
+          },
+          "metric_after": {
+            "precision": 0.92,
+            "recall": 0.9,
+            "f1": 0.91,
+            "accuracy": 0.91
+          },
+          "created_at": "2026-05-31T21:05:17.978943"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_f0d4d9c4",
+        "dispute_type": "metric_change",
+        "title": "指标波动异常: v1.1 f1",
+        "conclusion": "确认v1.1版本f1指标口径变更，已重新计算",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.978944",
+        "related_records": [
+          {
+            "record_id": "R_c631dd72",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969362",
+            "evaluation": {
+              "eval_id": "E_c8d9222e",
+              "sample_id": "S_normal_001",
+              "predicted_label": "sports",
+              "ground_truth": "sports",
+              "is_correct": true,
+              "evaluator": "评A",
+              "evaluated_at": "2026-05-22T14:00:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 6,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          },
+          {
+            "record_id": "R_c2114186",
+            "record_type": "normal",
+            "note": "口径调整后指标下降",
+            "received_at": "2026-05-31T21:05:17.969531",
+            "evaluation": {
+              "eval_id": "E_92a47a50",
+              "sample_id": "S_normal_002",
+              "predicted_label": "entertainment",
+              "ground_truth": "entertainment",
+              "is_correct": true,
+              "evaluator": "评A",
+              "evaluated_at": "2026-05-22T14:05:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 7,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.58,
+                "recall": 0.55,
+                "f1": 0.56,
+                "accuracy": 0.57
+              }
+            }
+          },
+          {
+            "record_id": "R_e4476b3e",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969701",
+            "evaluation": {
+              "eval_id": "E_403337e5",
+              "sample_id": "S_normal_003",
+              "predicted_label": "technology",
+              "ground_truth": "technology",
+              "is_correct": true,
+              "evaluator": "评B",
+              "evaluated_at": "2026-05-22T14:10:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 8,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          },
+          {
+            "record_id": "R_a30a1667",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969868",
+            "evaluation": {
+              "eval_id": "E_9544c8ac",
+              "sample_id": "S_normal_004",
+              "predicted_label": "finance",
+              "ground_truth": "finance",
+              "is_correct": true,
+              "evaluator": "评B",
+              "evaluated_at": "2026-05-22T14:15:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 9,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_83513d0b",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_c8d9222e",
+            "description": "f1: 0.9100, 来源: test_materials/evaluation_records.csv 第6行",
+            "created_at": "2026-05-31T21:05:17.978248"
+          },
+          {
+            "link_id": "L_e51ddb9d",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_92a47a50",
+            "description": "f1: 0.5600, 来源: test_materials/evaluation_records.csv 第7行",
+            "created_at": "2026-05-31T21:05:17.978250"
+          },
+          {
+            "link_id": "L_f207f5b5",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_403337e5",
+            "description": "f1: 0.9100, 来源: test_materials/evaluation_records.csv 第8行",
+            "created_at": "2026-05-31T21:05:17.978252"
+          },
+          {
+            "link_id": "L_7c86182d",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_9544c8ac",
+            "description": "f1: 0.9100, 来源: test_materials/evaluation_records.csv 第9行",
+            "created_at": "2026-05-31T21:05:17.978254"
+          },
+          {
+            "link_id": "L_0e0afb5a",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_f0d4d9c4",
+            "description": "结论: 确认v1.1版本f1指标口径变更，已重新计算...",
+            "created_at": "2026-05-31T21:05:17.978946"
+          },
+          {
+            "reason_id": "RR_c889c785",
+            "type": "review_reason",
+            "reason_type": "caliber_change_confirmed",
+            "reviewer": "算法工程师A",
+            "description": "[指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。",
+            "metric_before": {
+              "precision": 0.85,
+              "recall": 0.82,
+              "f1": 0.83,
+              "accuracy": 0.84
+            },
+            "metric_after": {
+              "precision": 0.92,
+              "recall": 0.9,
+              "f1": 0.91,
+              "accuracy": 0.91
+            },
+            "created_at": "2026-05-31T21:05:17.978943"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "确认v1.1版本f1指标口径变更，已重新计算",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.978944",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_cc83e934",
+      "dispute_type": "metric_change",
+      "status": "resolved",
+      "title": "指标波动异常: v1.1 precision",
+      "description": "模型 v1.1 的 precision 指标波动超过30%。最大值: 0.9200, 最小值: 0.5800。请确认是否存在口径变更。",
+      "created_at": "2026-05-31T21:05:17.978266",
+      "resolved_at": "2026-05-31T21:05:17.978964",
+      "conclusion": "确认v1.1版本precision指标口径变更，已重新计算",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "model_version": "v1.1",
+        "metric_key": "precision",
+        "max_value": 0.92,
+        "min_value": 0.58,
+        "diff_ratio": 0.36956521739130443
+      },
+      "record_ids": [
+        "R_c631dd72",
+        "R_c2114186",
+        "R_e4476b3e",
+        "R_a30a1667"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_83513d0b",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_c8d9222e",
+          "description": "precision: 0.9200, 来源: test_materials/evaluation_records.csv 第6行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "6"
+        },
+        {
+          "link_id": "L_e51ddb9d",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_92a47a50",
+          "description": "precision: 0.5800, 来源: test_materials/evaluation_records.csv 第7行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "7"
+        },
+        {
+          "link_id": "L_f207f5b5",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_403337e5",
+          "description": "precision: 0.9200, 来源: test_materials/evaluation_records.csv 第8行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "8"
+        },
+        {
+          "link_id": "L_7c86182d",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_9544c8ac",
+          "description": "precision: 0.9200, 来源: test_materials/evaluation_records.csv 第9行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "9"
+        },
+        {
+          "link_id": "L_08b4c796",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_cc83e934",
+          "description": "结论: 确认v1.1版本precision指标口径变更，已重新计算...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_1cfe2d41",
+          "reviewer": "算法工程师A",
+          "reason_type": "caliber_change_confirmed",
+          "description": "[指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。",
+          "metric_before": {
+            "precision": 0.85,
+            "recall": 0.82,
+            "f1": 0.83,
+            "accuracy": 0.84
+          },
+          "metric_after": {
+            "precision": 0.92,
+            "recall": 0.9,
+            "f1": 0.91,
+            "accuracy": 0.91
+          },
+          "created_at": "2026-05-31T21:05:17.978963"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_cc83e934",
+        "dispute_type": "metric_change",
+        "title": "指标波动异常: v1.1 precision",
+        "conclusion": "确认v1.1版本precision指标口径变更，已重新计算",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.978964",
+        "related_records": [
+          {
+            "record_id": "R_c631dd72",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969362",
+            "evaluation": {
+              "eval_id": "E_c8d9222e",
+              "sample_id": "S_normal_001",
+              "predicted_label": "sports",
+              "ground_truth": "sports",
+              "is_correct": true,
+              "evaluator": "评A",
+              "evaluated_at": "2026-05-22T14:00:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 6,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          },
+          {
+            "record_id": "R_c2114186",
+            "record_type": "normal",
+            "note": "口径调整后指标下降",
+            "received_at": "2026-05-31T21:05:17.969531",
+            "evaluation": {
+              "eval_id": "E_92a47a50",
+              "sample_id": "S_normal_002",
+              "predicted_label": "entertainment",
+              "ground_truth": "entertainment",
+              "is_correct": true,
+              "evaluator": "评A",
+              "evaluated_at": "2026-05-22T14:05:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 7,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.58,
+                "recall": 0.55,
+                "f1": 0.56,
+                "accuracy": 0.57
+              }
+            }
+          },
+          {
+            "record_id": "R_e4476b3e",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969701",
+            "evaluation": {
+              "eval_id": "E_403337e5",
+              "sample_id": "S_normal_003",
+              "predicted_label": "technology",
+              "ground_truth": "technology",
+              "is_correct": true,
+              "evaluator": "评B",
+              "evaluated_at": "2026-05-22T14:10:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 8,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          },
+          {
+            "record_id": "R_a30a1667",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969868",
+            "evaluation": {
+              "eval_id": "E_9544c8ac",
+              "sample_id": "S_normal_004",
+              "predicted_label": "finance",
+              "ground_truth": "finance",
+              "is_correct": true,
+              "evaluator": "评B",
+              "evaluated_at": "2026-05-22T14:15:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 9,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_83513d0b",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_c8d9222e",
+            "description": "precision: 0.9200, 来源: test_materials/evaluation_records.csv 第6行",
+            "created_at": "2026-05-31T21:05:17.978260"
+          },
+          {
+            "link_id": "L_e51ddb9d",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_92a47a50",
+            "description": "precision: 0.5800, 来源: test_materials/evaluation_records.csv 第7行",
+            "created_at": "2026-05-31T21:05:17.978262"
+          },
+          {
+            "link_id": "L_f207f5b5",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_403337e5",
+            "description": "precision: 0.9200, 来源: test_materials/evaluation_records.csv 第8行",
+            "created_at": "2026-05-31T21:05:17.978263"
+          },
+          {
+            "link_id": "L_7c86182d",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_9544c8ac",
+            "description": "precision: 0.9200, 来源: test_materials/evaluation_records.csv 第9行",
+            "created_at": "2026-05-31T21:05:17.978265"
+          },
+          {
+            "link_id": "L_08b4c796",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_cc83e934",
+            "description": "结论: 确认v1.1版本precision指标口径变更，已重新计算...",
+            "created_at": "2026-05-31T21:05:17.978966"
+          },
+          {
+            "reason_id": "RR_1cfe2d41",
+            "type": "review_reason",
+            "reason_type": "caliber_change_confirmed",
+            "reviewer": "算法工程师A",
+            "description": "[指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。",
+            "metric_before": {
+              "precision": 0.85,
+              "recall": 0.82,
+              "f1": 0.83,
+              "accuracy": 0.84
+            },
+            "metric_after": {
+              "precision": 0.92,
+              "recall": 0.9,
+              "f1": 0.91,
+              "accuracy": 0.91
+            },
+            "created_at": "2026-05-31T21:05:17.978963"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "确认v1.1版本precision指标口径变更，已重新计算",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.978964",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_92bed71a",
+      "dispute_type": "metric_change",
+      "status": "resolved",
+      "title": "指标波动异常: v1.1 recall",
+      "description": "模型 v1.1 的 recall 指标波动超过30%。最大值: 0.9000, 最小值: 0.5500。请确认是否存在口径变更。",
+      "created_at": "2026-05-31T21:05:17.978276",
+      "resolved_at": "2026-05-31T21:05:17.978982",
+      "conclusion": "确认v1.1版本recall指标口径变更，已重新计算",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "model_version": "v1.1",
+        "metric_key": "recall",
+        "max_value": 0.9,
+        "min_value": 0.55,
+        "diff_ratio": 0.38888888888888884
+      },
+      "record_ids": [
+        "R_c631dd72",
+        "R_c2114186",
+        "R_e4476b3e",
+        "R_a30a1667"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_83513d0b",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_c8d9222e",
+          "description": "recall: 0.9000, 来源: test_materials/evaluation_records.csv 第6行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "6"
+        },
+        {
+          "link_id": "L_e51ddb9d",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_92a47a50",
+          "description": "recall: 0.5500, 来源: test_materials/evaluation_records.csv 第7行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "7"
+        },
+        {
+          "link_id": "L_f207f5b5",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_403337e5",
+          "description": "recall: 0.9000, 来源: test_materials/evaluation_records.csv 第8行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "8"
+        },
+        {
+          "link_id": "L_7c86182d",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_9544c8ac",
+          "description": "recall: 0.9000, 来源: test_materials/evaluation_records.csv 第9行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "9"
+        },
+        {
+          "link_id": "L_cba1cbcb",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_92bed71a",
+          "description": "结论: 确认v1.1版本recall指标口径变更，已重新计算...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_64091cef",
+          "reviewer": "算法工程师A",
+          "reason_type": "caliber_change_confirmed",
+          "description": "[指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。",
+          "metric_before": {
+            "precision": 0.85,
+            "recall": 0.82,
+            "f1": 0.83,
+            "accuracy": 0.84
+          },
+          "metric_after": {
+            "precision": 0.92,
+            "recall": 0.9,
+            "f1": 0.91,
+            "accuracy": 0.91
+          },
+          "created_at": "2026-05-31T21:05:17.978981"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_92bed71a",
+        "dispute_type": "metric_change",
+        "title": "指标波动异常: v1.1 recall",
+        "conclusion": "确认v1.1版本recall指标口径变更，已重新计算",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.978982",
+        "related_records": [
+          {
+            "record_id": "R_c631dd72",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969362",
+            "evaluation": {
+              "eval_id": "E_c8d9222e",
+              "sample_id": "S_normal_001",
+              "predicted_label": "sports",
+              "ground_truth": "sports",
+              "is_correct": true,
+              "evaluator": "评A",
+              "evaluated_at": "2026-05-22T14:00:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 6,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          },
+          {
+            "record_id": "R_c2114186",
+            "record_type": "normal",
+            "note": "口径调整后指标下降",
+            "received_at": "2026-05-31T21:05:17.969531",
+            "evaluation": {
+              "eval_id": "E_92a47a50",
+              "sample_id": "S_normal_002",
+              "predicted_label": "entertainment",
+              "ground_truth": "entertainment",
+              "is_correct": true,
+              "evaluator": "评A",
+              "evaluated_at": "2026-05-22T14:05:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 7,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.58,
+                "recall": 0.55,
+                "f1": 0.56,
+                "accuracy": 0.57
+              }
+            }
+          },
+          {
+            "record_id": "R_e4476b3e",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969701",
+            "evaluation": {
+              "eval_id": "E_403337e5",
+              "sample_id": "S_normal_003",
+              "predicted_label": "technology",
+              "ground_truth": "technology",
+              "is_correct": true,
+              "evaluator": "评B",
+              "evaluated_at": "2026-05-22T14:10:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 8,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          },
+          {
+            "record_id": "R_a30a1667",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969868",
+            "evaluation": {
+              "eval_id": "E_9544c8ac",
+              "sample_id": "S_normal_004",
+              "predicted_label": "finance",
+              "ground_truth": "finance",
+              "is_correct": true,
+              "evaluator": "评B",
+              "evaluated_at": "2026-05-22T14:15:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 9,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_83513d0b",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_c8d9222e",
+            "description": "recall: 0.9000, 来源: test_materials/evaluation_records.csv 第6行",
+            "created_at": "2026-05-31T21:05:17.978270"
+          },
+          {
+            "link_id": "L_e51ddb9d",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_92a47a50",
+            "description": "recall: 0.5500, 来源: test_materials/evaluation_records.csv 第7行",
+            "created_at": "2026-05-31T21:05:17.978272"
+          },
+          {
+            "link_id": "L_f207f5b5",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_403337e5",
+            "description": "recall: 0.9000, 来源: test_materials/evaluation_records.csv 第8行",
+            "created_at": "2026-05-31T21:05:17.978273"
+          },
+          {
+            "link_id": "L_7c86182d",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_9544c8ac",
+            "description": "recall: 0.9000, 来源: test_materials/evaluation_records.csv 第9行",
+            "created_at": "2026-05-31T21:05:17.978275"
+          },
+          {
+            "link_id": "L_cba1cbcb",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_92bed71a",
+            "description": "结论: 确认v1.1版本recall指标口径变更，已重新计算...",
+            "created_at": "2026-05-31T21:05:17.978983"
+          },
+          {
+            "reason_id": "RR_64091cef",
+            "type": "review_reason",
+            "reason_type": "caliber_change_confirmed",
+            "reviewer": "算法工程师A",
+            "description": "[指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。",
+            "metric_before": {
+              "precision": 0.85,
+              "recall": 0.82,
+              "f1": 0.83,
+              "accuracy": 0.84
+            },
+            "metric_after": {
+              "precision": 0.92,
+              "recall": 0.9,
+              "f1": 0.91,
+              "accuracy": 0.91
+            },
+            "created_at": "2026-05-31T21:05:17.978981"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "确认v1.1版本recall指标口径变更，已重新计算",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.978982",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_8afab731",
+      "dispute_type": "metric_change",
+      "status": "resolved",
+      "title": "指标波动异常: v1.1 accuracy",
+      "description": "模型 v1.1 的 accuracy 指标波动超过30%。最大值: 0.9100, 最小值: 0.5700。请确认是否存在口径变更。",
+      "created_at": "2026-05-31T21:05:17.978285",
+      "resolved_at": "2026-05-31T21:05:17.979004",
+      "conclusion": "确认v1.1版本accuracy指标口径变更，已重新计算",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "model_version": "v1.1",
+        "metric_key": "accuracy",
+        "max_value": 0.91,
+        "min_value": 0.57,
+        "diff_ratio": 0.3736263736263737
+      },
+      "record_ids": [
+        "R_c631dd72",
+        "R_c2114186",
+        "R_e4476b3e",
+        "R_a30a1667"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_83513d0b",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_c8d9222e",
+          "description": "accuracy: 0.9100, 来源: test_materials/evaluation_records.csv 第6行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "6"
+        },
+        {
+          "link_id": "L_e51ddb9d",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_92a47a50",
+          "description": "accuracy: 0.5700, 来源: test_materials/evaluation_records.csv 第7行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "7"
+        },
+        {
+          "link_id": "L_f207f5b5",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_403337e5",
+          "description": "accuracy: 0.9100, 来源: test_materials/evaluation_records.csv 第8行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "8"
+        },
+        {
+          "link_id": "L_7c86182d",
+          "link_type": "metric_reference",
+          "target_type": "evaluation_record",
+          "target_id": "E_9544c8ac",
+          "description": "accuracy: 0.9100, 来源: test_materials/evaluation_records.csv 第9行",
+          "source_file": "test_materials/evaluation_records.csv",
+          "source_line": "9"
+        },
+        {
+          "link_id": "L_e86fb06c",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_8afab731",
+          "description": "结论: 确认v1.1版本accuracy指标口径变更，已重新计算...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_342236de",
+          "reviewer": "算法工程师A",
+          "reason_type": "caliber_change_confirmed",
+          "description": "[指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。",
+          "metric_before": {
+            "precision": 0.85,
+            "recall": 0.82,
+            "f1": 0.83,
+            "accuracy": 0.84
+          },
+          "metric_after": {
+            "precision": 0.92,
+            "recall": 0.9,
+            "f1": 0.91,
+            "accuracy": 0.91
+          },
+          "created_at": "2026-05-31T21:05:17.979003"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_8afab731",
+        "dispute_type": "metric_change",
+        "title": "指标波动异常: v1.1 accuracy",
+        "conclusion": "确认v1.1版本accuracy指标口径变更，已重新计算",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.979004",
+        "related_records": [
+          {
+            "record_id": "R_c631dd72",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969362",
+            "evaluation": {
+              "eval_id": "E_c8d9222e",
+              "sample_id": "S_normal_001",
+              "predicted_label": "sports",
+              "ground_truth": "sports",
+              "is_correct": true,
+              "evaluator": "评A",
+              "evaluated_at": "2026-05-22T14:00:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 6,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          },
+          {
+            "record_id": "R_c2114186",
+            "record_type": "normal",
+            "note": "口径调整后指标下降",
+            "received_at": "2026-05-31T21:05:17.969531",
+            "evaluation": {
+              "eval_id": "E_92a47a50",
+              "sample_id": "S_normal_002",
+              "predicted_label": "entertainment",
+              "ground_truth": "entertainment",
+              "is_correct": true,
+              "evaluator": "评A",
+              "evaluated_at": "2026-05-22T14:05:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 7,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.58,
+                "recall": 0.55,
+                "f1": 0.56,
+                "accuracy": 0.57
+              }
+            }
+          },
+          {
+            "record_id": "R_e4476b3e",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969701",
+            "evaluation": {
+              "eval_id": "E_403337e5",
+              "sample_id": "S_normal_003",
+              "predicted_label": "technology",
+              "ground_truth": "technology",
+              "is_correct": true,
+              "evaluator": "评B",
+              "evaluated_at": "2026-05-22T14:10:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 8,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          },
+          {
+            "record_id": "R_a30a1667",
+            "record_type": "normal",
+            "note": "口径调整后",
+            "received_at": "2026-05-31T21:05:17.969868",
+            "evaluation": {
+              "eval_id": "E_9544c8ac",
+              "sample_id": "S_normal_004",
+              "predicted_label": "finance",
+              "ground_truth": "finance",
+              "is_correct": true,
+              "evaluator": "评B",
+              "evaluated_at": "2026-05-22T14:15:00",
+              "source_file": "test_materials/evaluation_records.csv",
+              "source_line": 9,
+              "model_version": "v1.1",
+              "metrics": {
+                "precision": 0.92,
+                "recall": 0.9,
+                "f1": 0.91,
+                "accuracy": 0.91
+              }
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_83513d0b",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_c8d9222e",
+            "description": "accuracy: 0.9100, 来源: test_materials/evaluation_records.csv 第6行",
+            "created_at": "2026-05-31T21:05:17.978280"
+          },
+          {
+            "link_id": "L_e51ddb9d",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_92a47a50",
+            "description": "accuracy: 0.5700, 来源: test_materials/evaluation_records.csv 第7行",
+            "created_at": "2026-05-31T21:05:17.978281"
+          },
+          {
+            "link_id": "L_f207f5b5",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_403337e5",
+            "description": "accuracy: 0.9100, 来源: test_materials/evaluation_records.csv 第8行",
+            "created_at": "2026-05-31T21:05:17.978283"
+          },
+          {
+            "link_id": "L_7c86182d",
+            "link_type": "metric_reference",
+            "target_type": "evaluation_record",
+            "target_id": "E_9544c8ac",
+            "description": "accuracy: 0.9100, 来源: test_materials/evaluation_records.csv 第9行",
+            "created_at": "2026-05-31T21:05:17.978284"
+          },
+          {
+            "link_id": "L_e86fb06c",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_8afab731",
+            "description": "结论: 确认v1.1版本accuracy指标口径变更，已重新计算...",
+            "created_at": "2026-05-31T21:05:17.979005"
+          },
+          {
+            "reason_id": "RR_342236de",
+            "type": "review_reason",
+            "reason_type": "caliber_change_confirmed",
+            "reviewer": "算法工程师A",
+            "description": "[指标口径变更确认] 2026-05-22起评估口径调整，排除了置信度<0.5的样本. 变更前指标: {'precision': 0.85, 'recall': 0.82, 'f1': 0.83, 'accuracy': 0.84}. 变更后指标: {'precision': 0.92, 'recall': 0.9, 'f1': 0.91, 'accuracy': 0.91}. 处理人: 算法工程师A. 该记录已复核，后续评估需使用新口径。",
+            "metric_before": {
+              "precision": 0.85,
+              "recall": 0.82,
+              "f1": 0.83,
+              "accuracy": 0.84
+            },
+            "metric_after": {
+              "precision": 0.92,
+              "recall": 0.9,
+              "f1": 0.91,
+              "accuracy": 0.91
+            },
+            "created_at": "2026-05-31T21:05:17.979003"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "确认v1.1版本accuracy指标口径变更，已重新计算",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.979004",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_385e8a03",
+      "dispute_type": "late_attachment_issue",
+      "status": "resolved",
+      "title": "晚到附件待复核: 世界杯决赛精彩进球集锦...",
+      "description": "该记录为晚到附件 (收到时间: 2026-05-23 09:00:00)。相关评估记录: 0条。请确认晚到附件是否影响之前的评估结论。",
+      "created_at": "2026-05-31T21:05:17.978303",
+      "resolved_at": "2026-05-31T21:05:17.979020",
+      "conclusion": "晚到附件已纳入评估，不影响原有结论",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "received_at": "2026-05-23T09:00:00",
+        "related_eval_count": 0
+      },
+      "record_ids": [
+        "R_151e997b"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_797a9946",
+          "link_type": "late_attachment",
+          "target_type": "annotation_sample",
+          "target_id": "S_38c444f3",
+          "description": "晚到附件标注: 体育, 标注时间: 2026-05-20 10:30:00, 收到时间: 2026-05-23 09:00:00, 来源: test_materials/late_attachment_补传数据.csv 第2行",
+          "source_file": "test_materials/late_attachment_补传数据.csv",
+          "source_line": "2"
+        },
+        {
+          "link_id": "L_e6b6005b",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_385e8a03",
+          "description": "结论: 晚到附件已纳入评估，不影响原有结论...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_bcb28e5a",
+          "reviewer": "算法工程师A",
+          "reason_type": "manual_review",
+          "description": "晚到附件内容与已有标注一致，无需调整评估结果",
+          "metric_before": null,
+          "metric_after": null,
+          "created_at": "2026-05-31T21:05:17.979018"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_385e8a03",
+        "dispute_type": "late_attachment_issue",
+        "title": "晚到附件待复核: 世界杯决赛精彩进球集锦...",
+        "conclusion": "晚到附件已纳入评估，不影响原有结论",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.979020",
+        "related_records": [
+          {
+            "record_id": "R_151e997b",
+            "record_type": "late_attachment",
+            "note": "晚到的标注数据",
+            "received_at": "2026-05-23T09:00:00",
+            "annotation": {
+              "sample_id": "S_38c444f3",
+              "text": "世界杯决赛精彩进球集锦",
+              "label": "体育",
+              "annotator": "张三",
+              "annotated_at": "2026-05-20T10:30:00",
+              "source_file": "test_materials/late_attachment_补传数据.csv",
+              "source_line": 2,
+              "confidence": 1.0
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_797a9946",
+            "link_type": "late_attachment",
+            "target_type": "annotation_sample",
+            "target_id": "S_38c444f3",
+            "description": "晚到附件标注: 体育, 标注时间: 2026-05-20 10:30:00, 收到时间: 2026-05-23 09:00:00, 来源: test_materials/late_attachment_补传数据.csv 第2行",
+            "created_at": "2026-05-31T21:05:17.978301"
+          },
+          {
+            "link_id": "L_e6b6005b",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_385e8a03",
+            "description": "结论: 晚到附件已纳入评估，不影响原有结论...",
+            "created_at": "2026-05-31T21:05:17.979021"
+          },
+          {
+            "reason_id": "RR_bcb28e5a",
+            "type": "review_reason",
+            "reason_type": "manual_review",
+            "reviewer": "算法工程师A",
+            "description": "晚到附件内容与已有标注一致，无需调整评估结果",
+            "metric_before": null,
+            "metric_after": null,
+            "created_at": "2026-05-31T21:05:17.979018"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "晚到附件已纳入评估，不影响原有结论",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.979020",
+            "status": "resolved"
+          }
+        ]
+      }
+    },
+    {
+      "dispute_id": "D_44352134",
+      "dispute_type": "late_attachment_issue",
+      "status": "resolved",
+      "title": "晚到附件待复核: 奥运会开幕式回顾...",
+      "description": "该记录为晚到附件 (收到时间: 2026-05-23 09:05:00)。相关评估记录: 0条。请确认晚到附件是否影响之前的评估结论。",
+      "created_at": "2026-05-31T21:05:17.978311",
+      "resolved_at": "2026-05-31T21:05:17.979038",
+      "conclusion": "晚到附件已纳入评估，不影响原有结论",
+      "resolver": "算法工程师A",
+      "metadata": {
+        "received_at": "2026-05-23T09:05:00",
+        "related_eval_count": 0
+      },
+      "record_ids": [
+        "R_1ab036f2"
+      ],
+      "evidence_links": [
+        {
+          "link_id": "L_fd333eae",
+          "link_type": "late_attachment",
+          "target_type": "annotation_sample",
+          "target_id": "S_c0372779",
+          "description": "晚到附件标注: 体育, 标注时间: 2026-05-20 12:00:00, 收到时间: 2026-05-23 09:05:00, 来源: test_materials/late_attachment_补传数据.csv 第3行",
+          "source_file": "test_materials/late_attachment_补传数据.csv",
+          "source_line": "3"
+        },
+        {
+          "link_id": "L_86ec42f7",
+          "link_type": "conclusion_reference",
+          "target_type": "dispute_conclusion",
+          "target_id": "D_44352134",
+          "description": "结论: 晚到附件已纳入评估，不影响原有结论...",
+          "source_file": "",
+          "source_line": ""
+        }
+      ],
+      "review_reasons": [
+        {
+          "reason_id": "RR_e53c94a1",
+          "reviewer": "算法工程师A",
+          "reason_type": "manual_review",
+          "description": "晚到附件内容与已有标注一致，无需调整评估结果",
+          "metric_before": null,
+          "metric_after": null,
+          "created_at": "2026-05-31T21:05:17.979037"
+        }
+      ],
+      "trace": {
+        "dispute_id": "D_44352134",
+        "dispute_type": "late_attachment_issue",
+        "title": "晚到附件待复核: 奥运会开幕式回顾...",
+        "conclusion": "晚到附件已纳入评估，不影响原有结论",
+        "resolver": "算法工程师A",
+        "resolved_at": "2026-05-31T21:05:17.979038",
+        "related_records": [
+          {
+            "record_id": "R_1ab036f2",
+            "record_type": "late_attachment",
+            "note": "晚到的标注数据",
+            "received_at": "2026-05-23T09:05:00",
+            "annotation": {
+              "sample_id": "S_c0372779",
+              "text": "奥运会开幕式回顾",
+              "label": "体育",
+              "annotator": "张三",
+              "annotated_at": "2026-05-20T12:00:00",
+              "source_file": "test_materials/late_attachment_补传数据.csv",
+              "source_line": 3,
+              "confidence": 1.0
+            }
+          }
+        ],
+        "evidence_chain": [
+          {
+            "link_id": "L_fd333eae",
+            "link_type": "late_attachment",
+            "target_type": "annotation_sample",
+            "target_id": "S_c0372779",
+            "description": "晚到附件标注: 体育, 标注时间: 2026-05-20 12:00:00, 收到时间: 2026-05-23 09:05:00, 来源: test_materials/late_attachment_补传数据.csv 第3行",
+            "created_at": "2026-05-31T21:05:17.978309"
+          },
+          {
+            "link_id": "L_86ec42f7",
+            "link_type": "conclusion_reference",
+            "target_type": "dispute_conclusion",
+            "target_id": "D_44352134",
+            "description": "结论: 晚到附件已纳入评估，不影响原有结论...",
+            "created_at": "2026-05-31T21:05:17.979039"
+          },
+          {
+            "reason_id": "RR_e53c94a1",
+            "type": "review_reason",
+            "reason_type": "manual_review",
+            "reviewer": "算法工程师A",
+            "description": "晚到附件内容与已有标注一致，无需调整评估结果",
+            "metric_before": null,
+            "metric_after": null,
+            "created_at": "2026-05-31T21:05:17.979037"
+          },
+          {
+            "type": "conclusion",
+            "conclusion": "晚到附件已纳入评估，不影响原有结论",
+            "resolver": "算法工程师A",
+            "resolved_at": "2026-05-31T21:05:17.979038",
+            "status": "resolved"
+          }
+        ]
+      }
+    }
+  ]
+}
