@@ -1,0 +1,183 @@
+{
+  "exportedAt": "2026-05-31T13:50:56.763Z",
+  "tool": "batch-image-renamer",
+  "version": "1.0.0",
+  "currentChangeOrder": {
+    "id": "CO-mptu8527mn6y4",
+    "batchName": "change-order-simple",
+    "importedAt": "2026-05-31T13:50:55.902Z",
+    "status": "rolled_back",
+    "items": [
+      {
+        "id": "ITEM-mptu8527vq0as",
+        "seq": 1,
+        "originalName": "IMG_0001.jpg",
+        "newName": "产品A_正面.jpg",
+        "note": "正常测试1",
+        "status": "rolled_back",
+        "history": [
+          {
+            "timestamp": "2026-05-31T13:50:55.902Z",
+            "action": "imported",
+            "status": "pending",
+            "detail": "从变更单导入"
+          },
+          {
+            "timestamp": "2026-05-31T13:50:56.033Z",
+            "action": "reviewed",
+            "status": "reviewed",
+            "detail": "复核通过"
+          },
+          {
+            "timestamp": "2026-05-31T13:50:56.100Z",
+            "action": "success",
+            "status": "success",
+            "detail": "重命名成功: IMG_0001.jpg → 产品A_正面.jpg"
+          },
+          {
+            "timestamp": "2026-05-31T13:50:56.398Z",
+            "action": "rolled_back",
+            "status": "rolled_back",
+            "detail": "回滚成功: 产品A_正面.jpg → IMG_0001.jpg"
+          }
+        ]
+      },
+      {
+        "id": "ITEM-mptu8527h8xgh",
+        "seq": 2,
+        "originalName": "IMG_0002.jpg",
+        "newName": "产品A_背面.jpg",
+        "note": "正常测试2",
+        "status": "rolled_back",
+        "history": [
+          {
+            "timestamp": "2026-05-31T13:50:55.902Z",
+            "action": "imported",
+            "status": "pending",
+            "detail": "从变更单导入"
+          },
+          {
+            "timestamp": "2026-05-31T13:50:56.034Z",
+            "action": "reviewed",
+            "status": "reviewed",
+            "detail": "复核通过"
+          },
+          {
+            "timestamp": "2026-05-31T13:50:56.100Z",
+            "action": "success",
+            "status": "success",
+            "detail": "重命名成功: IMG_0002.jpg → 产品A_背面.jpg"
+          },
+          {
+            "timestamp": "2026-05-31T13:50:56.398Z",
+            "action": "rolled_back",
+            "status": "rolled_back",
+            "detail": "回滚成功: 产品A_背面.jpg → IMG_0002.jpg"
+          }
+        ]
+      },
+      {
+        "id": "ITEM-mptu85271qu9r",
+        "seq": 3,
+        "originalName": "IMG_0003.png",
+        "newName": "产品B_正面.png",
+        "note": "正常测试3",
+        "status": "rolled_back",
+        "history": [
+          {
+            "timestamp": "2026-05-31T13:50:55.902Z",
+            "action": "imported",
+            "status": "pending",
+            "detail": "从变更单导入"
+          },
+          {
+            "timestamp": "2026-05-31T13:50:56.034Z",
+            "action": "reviewed",
+            "status": "reviewed",
+            "detail": "复核通过"
+          },
+          {
+            "timestamp": "2026-05-31T13:50:56.100Z",
+            "action": "success",
+            "status": "success",
+            "detail": "重命名成功: IMG_0003.png → 产品B_正面.png"
+          },
+          {
+            "timestamp": "2026-05-31T13:50:56.398Z",
+            "action": "rolled_back",
+            "status": "rolled_back",
+            "detail": "回滚成功: 产品B_正面.png → IMG_0003.png"
+          }
+        ]
+      }
+    ]
+  },
+  "ledger": {
+    "runs": [
+      {
+        "id": "RUN-mptu857mceh2g",
+        "changeOrderId": "CO-mptu8527mn6y4",
+        "operator": "张三",
+        "startedAt": "2026-05-31T13:50:56.098Z",
+        "status": "rolled_back",
+        "items": [
+          {
+            "itemId": "ITEM-mptu8527vq0as",
+            "originalName": "IMG_0001.jpg",
+            "newName": "产品A_正面.jpg",
+            "status": "rolled_back",
+            "startedAt": "2026-05-31T13:50:56.099Z",
+            "completedAt": "2026-05-31T13:50:56.100Z",
+            "error": null,
+            "rollbackInfo": {
+              "rolledBackAt": "2026-05-31T13:50:56.397Z",
+              "success": true,
+              "detail": "回滚成功: 产品A_正面.jpg → IMG_0001.jpg"
+            }
+          },
+          {
+            "itemId": "ITEM-mptu8527h8xgh",
+            "originalName": "IMG_0002.jpg",
+            "newName": "产品A_背面.jpg",
+            "status": "rolled_back",
+            "startedAt": "2026-05-31T13:50:56.100Z",
+            "completedAt": "2026-05-31T13:50:56.100Z",
+            "error": null,
+            "rollbackInfo": {
+              "rolledBackAt": "2026-05-31T13:50:56.398Z",
+              "success": true,
+              "detail": "回滚成功: 产品A_背面.jpg → IMG_0002.jpg"
+            }
+          },
+          {
+            "itemId": "ITEM-mptu85271qu9r",
+            "originalName": "IMG_0003.png",
+            "newName": "产品B_正面.png",
+            "status": "rolled_back",
+            "startedAt": "2026-05-31T13:50:56.100Z",
+            "completedAt": "2026-05-31T13:50:56.100Z",
+            "error": null,
+            "rollbackInfo": {
+              "rolledBackAt": "2026-05-31T13:50:56.398Z",
+              "success": true,
+              "detail": "回滚成功: 产品B_正面.png → IMG_0003.png"
+            }
+          }
+        ],
+        "summary": {
+          "total": 3,
+          "success": 3,
+          "failed": 0,
+          "skipped": 0
+        },
+        "completedAt": "2026-05-31T13:50:56.100Z",
+        "rolledBackAt": "2026-05-31T13:50:56.398Z",
+        "rollbackSummary": {
+          "total": 3,
+          "success": 3,
+          "failed": 0
+        }
+      }
+    ]
+  }
+}

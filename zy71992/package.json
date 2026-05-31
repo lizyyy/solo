@@ -1,0 +1,18 @@
+{
+  "name": "batch-image-renamer",
+  "version": "1.0.0",
+  "description": "批量图片重命名 CLI 工具 - 支持导入、复核、修正、历史、导出完整工作流",
+  "main": "src/cli.js",
+  "bin": {
+    "bir": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node tests/run-test.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {},
+  "keywords": ["batch", "rename", "image", "cli"]
+}

@@ -1,0 +1,81 @@
+{
+  "batchName": "测试批次-完整边界用例",
+  "note": "包含各种边界情况：正常、文件不存在、重复目标名、重复源名、循环重命名、目标已存在、同名、非法字符、无扩展名",
+  "items": [
+    {
+      "originalName": "IMG_0001.jpg",
+      "newName": "2024_产品图_001.jpg",
+      "note": "正常用例1 - jpg"
+    },
+    {
+      "originalName": "IMG_0002.jpg",
+      "newName": "2024_产品图_002.jpg",
+      "note": "正常用例2 - jpg"
+    },
+    {
+      "originalName": "IMG_0003.png",
+      "newName": "2024_产品图_003.png",
+      "note": "正常用例3 - png"
+    },
+    {
+      "originalName": "IMG_0004.gif",
+      "newName": "2024_动图_001",
+      "note": "边界: 新文件名无扩展名，应自动补充"
+    },
+    {
+      "originalName": "IMG_0005.webp",
+      "newName": "2024_产品图_005.webp",
+      "note": "正常用例4 - webp"
+    },
+    {
+      "originalName": "FILE_NOT_EXIST.jpg",
+      "newName": "2024_不存在_001.jpg",
+      "note": "错误用例: 原始文件不存在"
+    },
+    {
+      "originalName": "duplicate_target.jpg",
+      "newName": "2024_重复目标_001.jpg",
+      "note": "错误用例: 与下一条目标名重复"
+    },
+    {
+      "originalName": "IMG_0006.jpg",
+      "newName": "2024_重复目标_001.jpg",
+      "note": "错误用例: 与上一条目标名重复"
+    },
+    {
+      "originalName": "IMG_0001.jpg",
+      "newName": "2024_重复源_001.jpg",
+      "note": "警告用例: 原始文件名与第一条重复"
+    },
+    {
+      "originalName": "already_exists.jpg",
+      "newName": "IMG_0001.jpg",
+      "note": "警告用例: 目标文件名已存在（第一条执行后会被创建）"
+    },
+    {
+      "originalName": "same_name.jpg",
+      "newName": "same_name.jpg",
+      "note": "边界: 原始名与新名相同"
+    },
+    {
+      "originalName": "circular_a.jpg",
+      "newName": "circular_b.jpg",
+      "note": "错误用例: 与下一条形成循环重命名 A→B, B→A"
+    },
+    {
+      "originalName": "circular_b.jpg",
+      "newName": "circular_a.jpg",
+      "note": "错误用例: 与上一条形成循环重命名"
+    },
+    {
+      "originalName": "IMG_0002.jpg",
+      "newName": "invalid?name.jpg",
+      "note": "错误用例: 文件名包含非法字符 ?"
+    },
+    {
+      "originalName": "IMG_0003.png",
+      "newName": "2024_产品图_003.jpg",
+      "note": "警告用例: 扩展名不一致 png→jpg"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "runs": [
+    {
+      "id": "RUN-mptu857mceh2g",
+      "changeOrderId": "CO-mptu8527mn6y4",
+      "operator": "张三",
+      "startedAt": "2026-05-31T13:50:56.098Z",
+      "status": "rolled_back",
+      "items": [
+        {
+          "itemId": "ITEM-mptu8527vq0as",
+          "originalName": "IMG_0001.jpg",
+          "newName": "产品A_正面.jpg",
+          "status": "rolled_back",
+          "startedAt": "2026-05-31T13:50:56.099Z",
+          "completedAt": "2026-05-31T13:50:56.100Z",
+          "error": null,
+          "rollbackInfo": {
+            "rolledBackAt": "2026-05-31T13:50:56.397Z",
+            "success": true,
+            "detail": "回滚成功: 产品A_正面.jpg → IMG_0001.jpg"
+          }
+        },
+        {
+          "itemId": "ITEM-mptu8527h8xgh",
+          "originalName": "IMG_0002.jpg",
+          "newName": "产品A_背面.jpg",
+          "status": "rolled_back",
+          "startedAt": "2026-05-31T13:50:56.100Z",
+          "completedAt": "2026-05-31T13:50:56.100Z",
+          "error": null,
+          "rollbackInfo": {
+            "rolledBackAt": "2026-05-31T13:50:56.398Z",
+            "success": true,
+            "detail": "回滚成功: 产品A_背面.jpg → IMG_0002.jpg"
+          }
+        },
+        {
+          "itemId": "ITEM-mptu85271qu9r",
+          "originalName": "IMG_0003.png",
+          "newName": "产品B_正面.png",
+          "status": "rolled_back",
+          "startedAt": "2026-05-31T13:50:56.100Z",
+          "completedAt": "2026-05-31T13:50:56.100Z",
+          "error": null,
+          "rollbackInfo": {
+            "rolledBackAt": "2026-05-31T13:50:56.398Z",
+            "success": true,
+            "detail": "回滚成功: 产品B_正面.png → IMG_0003.png"
+          }
+        }
+      ],
+      "summary": {
+        "total": 3,
+        "success": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      "completedAt": "2026-05-31T13:50:56.100Z",
+      "rolledBackAt": "2026-05-31T13:50:56.398Z",
+      "rollbackSummary": {
+        "total": 3,
+        "success": 3,
+        "failed": 0
+      }
+    }
+  ]
+}
