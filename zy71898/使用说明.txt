@@ -1,0 +1,75 @@
+桥梁位移报警工具 - 设备工程师使用说明
+================================================
+
+一、振动曲线样例怎么放
+------------------------
+1. 振动曲线文件统一放在 vibration_data/ 目录下
+2. 文件名格式: vib_YYYYMMDD_HHMM.csv （如: vib_20260528_0830.csv）
+3. CSV文件至少包含: 时间(s), 振动位移(mm) 两列
+4. 导入报警记录时，vibration_file 字段填文件名即可
+5. 样例已放: vibration_data/vib_20260528_0830.csv
+
+二、去哪看阈值跨档
+------------------------
+命令: python3 bridge-alarm thresholds
+显示四级阈值配置:
+  一级: 0.0 ~ 5.0 mm  正常范围
+  二级: 5.0 ~ 10.0 mm  注意范围
+  三级: 10.0 ~ 15.0 mm  警戒范围
+  四级: 15.0 mm 以上   危险范围
+
+三、导出巡检报告前怎么复核
+------------------------
+1. 先看统计: python3 bridge-alarm stats --start 2026-05-01
+2. 检查待处理: python3 bridge-alarm list --status pending
+3. 检查待补记录: python3 bridge-alarm list --status supplement
+4. 核对人工改过: python3 bridge-alarm list --manual
+5. 确认没问题再生成报告:
+   python3 bridge-alarm report 巡检报告.txt --start 2026-05-01 --operator 值班长
+
+四、日常操作速查
+------------------------
+# 设置默认操作人
+export BRIDGE_OPERATOR="张工"
+
+# 1. 导入班组记录
+python3 bridge-alarm import samples/导入模板.csv --source 班组A --operator 张工
+
+# 2. 看待处理列表
+python3 bridge-alarm list --status pending
+
+# 3. 确认记录 (ID=1)
+python3 bridge-alarm confirm 1 --operator 张工 --remark 现场核实无误
+
+# 4. 标记待补 (振动曲线缺失等)
+python3 bridge-alarm supplement 2 --operator 张工 --reason 振动曲线缺失
+
+# 5. 人工修正数值 (读数有误等)
+python3 bridge-alarm revise 3 --field displacement --value 8.5 --operator 张工 --reason 读数有误
+
+# 6. 撤回误报
+python3 bridge-alarm withdraw 4 --operator 张工 --reason 传感器故障误报
+
+# 7. 看记录详情和修改历史
+python3 bridge-alarm show 3
+
+# 8. 筛选导出
+python3 bridge-alarm export 导出.csv --status confirmed --start 2026-05-01
+
+# 9. 生成值班长巡检报告
+python3 bridge-alarm report 巡检报告.txt --start 2026-05-01 --operator 值班长
+
+五、状态说明
+------------------------
+待处理(pending): 刚导入，未处理
+已确认(confirmed): 现场核实无误
+待补(supplement): 信息不全，需补充资料
+人工改过(revised): 已人工修正过字段
+已撤回(withdrawn): 误报或作废，默认不显示
+
+六、数据口径保证
+------------------------
+1. 重复导入: 按 source + record_no 唯一键去重，重复的跳过不报错
+2. 撤回修正: 所有修改都留操作日志，可查谁改了什么、为什么改
+3. 筛选导出: list、export、report 使用同一套筛选条件，口径一致
+4. 人工修改: 修改过的记录自动标记 is_manual_modified=1，状态转为 revised
