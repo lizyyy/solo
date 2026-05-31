@@ -1,0 +1,23 @@
+{
+  "episode_id": "EP001",
+  "version": 1,
+  "saved_at": "2026-05-31T17:13:40.091474",
+  "note": "增加嘉宾王五",
+  "guests": [
+    {
+      "name": "张三",
+      "role": "特邀嘉宾",
+      "segment_notes": "第一部分"
+    },
+    {
+      "name": "李四",
+      "role": "技术专家",
+      "segment_notes": "第二部分"
+    },
+    {
+      "name": "王五",
+      "role": "投资人",
+      "segment_notes": "新增环节"
+    }
+  ]
+}
