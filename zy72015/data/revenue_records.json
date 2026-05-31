@@ -1,0 +1,104 @@
+[
+  {
+    "id": "REC5EFC81D7",
+    "batch_no": "BAT5A39755B",
+    "period": "2026-05",
+    "source": "bank_receipt",
+    "source_ref": "银行回单-20260528-00123",
+    "pile_no": "CDQ-A03",
+    "transaction_date": "2026-05-28",
+    "expected_amount": 1256.8,
+    "actual_amount": 1256.8,
+    "original_remarks": "5月28日快充区营收，已核对充电明细",
+    "processing_notes": "【自动确认】台账金额与银行到账金额一致，已自动归集。",
+    "status": "confirmed",
+    "operator": "门店财务老曹",
+    "created_at": "2026-05-31 22:21:34",
+    "updated_at": "2026-05-31 22:21:34",
+    "processing_history": [
+      {
+        "action": "创建记录",
+        "from_status": "",
+        "to_status": "confirmed",
+        "operator": "门店财务老曹",
+        "timestamp": "2026-05-31 22:21:34",
+        "reason": "从数据源导入",
+        "notes": "来源：银行回单，参考号：银行回单-20260528-00123"
+      }
+    ]
+  },
+  {
+    "id": "REC06334A6A",
+    "batch_no": "BAT5A39755B",
+    "period": "2026-05",
+    "source": "business_ledger",
+    "source_ref": "业务台账-20260525-充电桩B区",
+    "pile_no": "CDQ-B07",
+    "transaction_date": "2026-05-25",
+    "expected_amount": 892.5,
+    "actual_amount": 880.0,
+    "original_remarks": "5月25日B区充电桩，用户反馈有优惠券抵扣，待核实",
+    "processing_notes": "【业务提醒】台账应收892.50元，银行实收880.00元，差异12.50元。请业务同事核对：1) 是否有手续费扣除 2) 是否有退款 3) 是否有优惠活动 4) 是否记账日期跨月。核对后请做人工确认。\n【人工确认】核实为用户使用了12.5元优惠券，台账按原价记账，银行按优惠后到账。已核对优惠券核销记录，用户订单号2026052500178，活动名称'新客首充立减'",
+    "status": "confirmed",
+    "operator": "门店财务老曹",
+    "created_at": "2026-05-31 22:21:34",
+    "updated_at": "2026-05-31 22:21:34",
+    "processing_history": [
+      {
+        "action": "创建记录",
+        "from_status": "",
+        "to_status": "discrepancy",
+        "operator": "门店财务老曹",
+        "timestamp": "2026-05-31 22:21:34",
+        "reason": "从数据源导入",
+        "notes": "来源：业务台账，参考号：业务台账-20260525-充电桩B区"
+      },
+      {
+        "action": "状态变更：有差异 → 已确认",
+        "from_status": "discrepancy",
+        "to_status": "confirmed",
+        "operator": "门店财务老曹",
+        "timestamp": "2026-05-31 22:21:34",
+        "reason": "核实为用户使用了12.5元优惠券，台账按原价记账，银行按优惠后到账",
+        "notes": "【人工确认】核实为用户使用了12.5元优惠券，台账按原价记账，银行按优惠后到账。已核对优惠券核销记录，用户订单号2026052500178，活动名称'新客首充立减'"
+      }
+    ]
+  },
+  {
+    "id": "REC267838E3",
+    "batch_no": "BAT5A39755B",
+    "period": "2026-05",
+    "source": "monthly_statement",
+    "source_ref": "月底对账表-202604-补录-001",
+    "pile_no": "CDQ-C01",
+    "transaction_date": "2026-04-30",
+    "expected_amount": 568.3,
+    "actual_amount": null,
+    "original_remarks": "【4月旧口径补录】原对账表备注：C区充电桩4月下旬营收，当时未走新流程，从月底对账表补录，银行回单暂缺，老曹说等银行6月上旬补打回单",
+    "processing_notes": "【挂起处理】缺少银行回单，原始备注说明6月上旬补打。等银行6月上旬补打4月下旬回单后再确认，已在台账做标记\n【业务提醒】此记录因缺少凭证已挂起，暂不参与收益归集。请补充：1) 银行回单 2) 业务台账截图 3) 相关说明文档。补齐后重新发起确认。",
+    "status": "suspended",
+    "operator": "门店财务老曹",
+    "created_at": "2026-05-31 22:21:34",
+    "updated_at": "2026-05-31 22:21:34",
+    "processing_history": [
+      {
+        "action": "创建记录",
+        "from_status": "",
+        "to_status": "pending",
+        "operator": "门店财务老曹",
+        "timestamp": "2026-05-31 22:21:34",
+        "reason": "从数据源导入",
+        "notes": "来源：月底对账表，参考号：月底对账表-202604-补录-001"
+      },
+      {
+        "action": "状态变更：待确认 → 已挂起",
+        "from_status": "pending",
+        "to_status": "suspended",
+        "operator": "门店财务老曹",
+        "timestamp": "2026-05-31 22:21:34",
+        "reason": "缺少银行回单，原始备注说明6月上旬补打",
+        "notes": "【挂起处理】缺少银行回单，原始备注说明6月上旬补打。等银行6月上旬补打4月下旬回单后再确认，已在台账做标记\n【业务提醒】此记录因缺少凭证已挂起，暂不参与收益归集。请补充：1) 银行回单 2) 业务台账截图 3) 相关说明文档。补齐后重新发起确认。"
+      }
+    ]
+  }
+]
