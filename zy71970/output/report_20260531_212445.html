@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客服知识命中 - 分析报告</title>
+<style>
+:root {
+  --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0;
+  --text: #1e293b; --text-secondary: #64748b;
+  --primary: #3b82f6; --primary-hover: #2563eb;
+  --success: #22c55e; --warning: #f59e0b; --danger: #ef4444;
+  --purple: #8b5cf6; --cyan: #06b6d4;
+  --radius: 8px; --shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+.header { background:linear-gradient(135deg, #1e40af, #3b82f6); color:white; padding:24px 32px; }
+.header h1 { font-size:24px; font-weight:700; margin-bottom:4px; }
+.header .meta { font-size:14px; opacity:0.85; }
+.container { max-width:1400px; margin:0 auto; padding:20px; }
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:24px; }
+.stat-card { background:var(--card); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); border-left:4px solid var(--primary); }
+.stat-card .label { font-size:13px; color:var(--text-secondary); margin-bottom:4px; }
+.stat-card .value { font-size:28px; font-weight:700; }
+.stat-card.exact { border-left-color:var(--success); }
+.stat-card.partial { border-left-color:var(--warning); }
+.stat-card.miss { border-left-color:var(--danger); }
+.stat-card.duplicate { border-left-color:var(--purple); }
+.stat-card.boundary { border-left-color:var(--cyan); }
+.card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:20px; }
+.card-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+.card-header h2 { font-size:16px; font-weight:600; }
+.filters { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.filters select, .filters input { padding:6px 10px; border:1px solid var(--border); border-radius:6px; font-size:13px; background:white; }
+.filters input { width:180px; }
+.btn { padding:6px 14px; border:none; border-radius:6px; font-size:13px; cursor:pointer; font-weight:500; transition:all 0.15s; }
+.btn-primary { background:var(--primary); color:white; }
+.btn-primary:hover { background:var(--primary-hover); }
+.btn-success { background:var(--success); color:white; }
+.btn-warning { background:var(--warning); color:white; }
+.btn-danger { background:var(--danger); color:white; }
+.btn-sm { padding:4px 10px; font-size:12px; }
+.badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:12px; font-weight:500; }
+.badge-exact { background:#dcfce7; color:#166534; }
+.badge-partial { background:#fef3c7; color:#92400e; }
+.badge-miss { background:#fee2e2; color:#991b1b; }
+.badge-duplicate { background:#ede9fe; color:#5b21b6; }
+.badge-boundary { background:#cffafe; color:#155e75; }
+.badge-auto { background:#f0f9ff; color:#0369a1; }
+.badge-confirmed { background:#dcfce7; color:#166534; }
+.badge-overridden { background:#fef3c7; color:#92400e; }
+.badge-pending_review { background:#fee2e2; color:#991b1b; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:#f1f5f9; padding:10px 12px; text-align:left; font-weight:600; border-bottom:2px solid var(--border); white-space:nowrap; }
+td { padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+tr:hover { background:#f8fafc; }
+.confidence-bar { width:60px; height:8px; background:#e2e8f0; border-radius:4px; overflow:hidden; display:inline-block; vertical-align:middle; }
+.confidence-fill { height:100%; border-radius:4px; }
+.detail-expand { cursor:pointer; color:var(--primary); font-size:12px; }
+.detail-row { display:none; }
+.detail-row.show { display:table-row; }
+.detail-content { background:#f8fafc; padding:12px 16px; font-size:12px; line-height:1.8; }
+.detail-content .field-label { color:var(--text-secondary); font-weight:500; margin-right:4px; }
+.override-tag { background:#fef3c7; border:1px solid #fcd34d; border-radius:4px; padding:2px 6px; font-size:11px; color:#92400e; }
+.warning-list { padding:16px 20px; }
+.warning-item { padding:8px 12px; margin-bottom:6px; border-radius:6px; font-size:13px; display:flex; align-items:flex-start; gap:8px; }
+.warning-item.warn { background:#fef3c7; border-left:3px solid var(--warning); }
+.warning-item.err { background:#fee2e2; border-left:3px solid var(--danger); }
+.review-actions { display:flex; gap:4px; flex-wrap:wrap; }
+.modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:1000; }
+.modal-overlay.show { display:flex; align-items:center; justify-content:center; }
+.modal { background:white; border-radius:12px; padding:24px; width:500px; max-width:90vw; max-height:80vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
+.modal h3 { margin-bottom:16px; font-size:18px; }
+.modal label { display:block; font-size:13px; font-weight:500; margin-bottom:4px; color:var(--text-secondary); }
+.modal textarea, .modal select, .modal input { width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; margin-bottom:12px; font-family:inherit; }
+.modal textarea { min-height:80px; resize:vertical; }
+.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:16px; }
+.session-info { padding:16px 20px; background:#f0f9ff; border-radius:var(--radius); margin-bottom:16px; font-size:13px; }
+.session-info strong { color:var(--primary); }
+@media (max-width:768px) { .stats-grid { grid-template-columns:repeat(2, 1fr); } .filters { flex-direction:column; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>客服知识命中 - 分析报告</h1>
+  <div class="meta">生成时间：2026-05-31 21:24:45 | 批次：session_20260531_212445 | 操作人：lzy</div>
+</div>
+
+<div class="container">
+
+<div class="stats-grid">
+<div class="stat-card"><div class="label">总条目</div><div class="value">16</div></div>
+<div class="stat-card exact"><div class="label">精确命中</div><div class="value">0</div></div>
+<div class="stat-card partial"><div class="label">部分命中</div><div class="value">5</div></div>
+<div class="stat-card miss"><div class="label">未命中</div><div class="value">6</div></div>
+<div class="stat-card duplicate"><div class="label">重复改判</div><div class="value">2</div></div>
+<div class="stat-card boundary"><div class="label">边界情况</div><div class="value">3</div></div>
+<div class="stat-card"><div class="label">待复核</div><div class="value" style="color:var(--danger)">16</div></div>
+<div class="stat-card"><div class="label">低置信度</div><div class="value" style="color:var(--warning)">13</div></div>
+</div>
+
+<div class='session-info'><strong>当前批次</strong>：session_20260531_212445 | 操作人：lzy | 已复核 0 条 | 待复核 16 条</div>
+
+<div class='card'><div class='card-header'><h2>提示与警告</h2></div><div class='warning-list'><div class="warning-item warn"><span>⚠</span><span>匹配置信度只有 54%，不够确定，建议人工复核。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>匹配置信度只有 54%，不够确定，建议人工复核。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>匹配置信度只有 54%，不够确定，建议人工复核。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>这条对话属于边界情况，自动判定可能不准确，请人工确认。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>这条对话匹配到多个知识条目（2 个），请确认哪个更合适。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>这条对话属于边界情况，自动判定可能不准确，请人工确认。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>这条对话属于边界情况，自动判定可能不准确，请人工确认。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>这条对话匹配到多个知识条目（3 个），请确认哪个更合适。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。</span></div>
+<div class="warning-item warn"><span>⚠</span><span>这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。</span></div></div></div>
+
+<div class="card">
+  <div class="card-header">
+    <h2>命中详情（16 条）</h2>
+    <div class="filters">
+      <select id="filterType" onchange="applyFilters()">
+        <option value="">全部类型</option>
+        <option value="exact">精确命中</option>
+        <option value="partial">部分命中</option>
+        <option value="miss">未命中</option>
+        <option value="duplicate">重复改判</option>
+        <option value="boundary">边界情况</option>
+      </select>
+      <select id="filterStatus" onchange="applyFilters()">
+        <option value="">全部状态</option>
+        <option value="pending_review">待复核</option>
+        <option value="confirmed">已确认</option>
+        <option value="overridden">已改判</option>
+        <option value="auto">自动判定</option>
+      </select>
+      <input type="text" id="filterSearch" placeholder="搜索对话ID或关键词..." oninput="applyFilters()">
+      <button class="btn btn-primary" onclick="applyFilters()">筛选</button>
+      <button class="btn btn-sm" onclick="resetFilters()">重置</button>
+      <button class="btn btn-success btn-sm" onclick="batchConfirm()">批量确认当前筛选</button>
+      <button class="btn btn-sm" onclick="exportCurrentView()">导出当前视图</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+          <th>对话ID</th>
+          <th>命中类型</th>
+          <th>置信度</th>
+          <th>关联知识</th>
+          <th>复核状态</th>
+          <th>复核人</th>
+          <th>备注</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="hitsBody">
+        <tr data-id="conv_001" data-type="partial" data-status="pending_review" data-keywords="退货,退货流程,申请退货,寄回商品,退货原因">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_001"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_001')">▶</span> conv_001</td>
+          <td><span class="badge badge-partial">部分命中</span></td>
+          <td>73% <div class="confidence-bar"><div class="confidence-fill" style="width:73%;background:#f59e0b"></div></div></td>
+          <td>退货流程说明</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_001')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_001" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 你好，我想咨询一下退货流程</div><div><span class="field-label">[坐席]</span> 您好，退货流程如下：1. 在订单页面点击申请退货；2. 选择退货原因；3. 等待审核通过后寄回商品。</div><div><span class="field-label">[客户]</span> 好的，谢谢</div></div><div><div><span class="field-label">关联知识：</span>退货流程说明</div><div><span class='field-label'>知识内容：</span>退货流程：1. 在订单页面点击申请退货；2. 选择退货原因；3. 等待审核通过；4. 寄回商品；5. 仓库验收后退款。退货需在签收后7天内申请，商品需保持原包装。</div><div><span class="field-label">匹配关键词：</span>退货、退货流程、申请退货、寄回商品、退货原因</div><div><span class="field-label">详细说明：</span>部分匹配，建议人工确认</div></div></div></td></tr>
+        <tr data-id="conv_002" data-type="partial" data-status="pending_review" data-keywords="退款,到账时间,退款多久">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_002"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_002')">▶</span> conv_002</td>
+          <td><span class="badge badge-partial">部分命中</span></td>
+          <td>54% <div class="confidence-bar"><div class="confidence-fill" style="width:54%;background:#f59e0b"></div></div></td>
+          <td>退款到账时间</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_002')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_002" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 退款多久能到账？</div><div><span class="field-label">[坐席]</span> 退款一般3-5个工作日到账，具体到账时间以银行为准。</div></div><div><div><span class="field-label">关联知识：</span>退款到账时间</div><div><span class='field-label'>知识内容：</span>退款一般在3-5个工作日到账，具体到账时间取决于银行处理速度。原路退回至支付账户，不支持更换退款账户。</div><div><span class="field-label">匹配关键词：</span>退款、到账时间、退款多久</div><div><span class="field-label">详细说明：</span>部分匹配，建议人工确认</div></div></div></td></tr>
+        <tr data-id="conv_003" data-type="partial" data-status="pending_review" data-keywords="优惠券,优惠券过期,优惠">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_003"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_003')">▶</span> conv_003</td>
+          <td><span class="badge badge-partial">部分命中</span></td>
+          <td>54% <div class="confidence-bar"><div class="confidence-fill" style="width:54%;background:#f59e0b"></div></div></td>
+          <td>优惠券使用规则</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_003')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_003" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 我的优惠券过期了还能用吗</div><div><span class="field-label">[坐席]</span> 抱歉，优惠券过期后无法继续使用，建议您关注后续活动获取新优惠券。</div><div><span class="field-label">[客户]</span> 那有没有其他优惠</div><div><span class="field-label">[坐席]</span> 目前新用户有首单9折优惠，您可以在活动页面查看详情。</div></div><div><div><span class="field-label">关联知识：</span>优惠券使用规则</div><div><span class='field-label'>知识内容：</span>优惠券有有效期限制，过期后无法使用。每笔订单只能使用一张优惠券，不可叠加。优惠券不可转让或兑换现金。</div><div><span class="field-label">匹配关键词：</span>优惠券、优惠券过期、优惠</div><div><span class="field-label">详细说明：</span>部分匹配，建议人工确认</div></div></div></td></tr>
+        <tr data-id="conv_004" data-type="partial" data-status="pending_review" data-keywords="修改地址,收货地址,修改收货地址">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_004"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_004')">▶</span> conv_004</td>
+          <td><span class="badge badge-partial">部分命中</span></td>
+          <td>71% <div class="confidence-bar"><div class="confidence-fill" style="width:71%;background:#f59e0b"></div></div></td>
+          <td>修改收货地址</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_004')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_004" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 发货后可以修改收货地址吗</div><div><span class="field-label">[坐席]</span> 发货后修改地址需要联系快递公司，我们这边无法直接修改。</div></div><div><div><span class="field-label">关联知识：</span>修改收货地址</div><div><span class='field-label'>知识内容：</span>发货前可在订单详情页修改收货地址。发货后需联系快递公司修改，或联系客服协助处理。不支持跨城市修改地址。</div><div><span class="field-label">匹配关键词：</span>修改地址、收货地址、修改收货地址</div><div><span class="field-label">详细说明：</span>部分匹配，建议人工确认</div></div></div></td></tr>
+        <tr data-id="conv_005" data-type="miss" data-status="pending_review" data-keywords="保修,保修期">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_005"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_005')">▶</span> conv_005</td>
+          <td><span class="badge badge-miss">未命中</span></td>
+          <td>36% <div class="confidence-bar"><div class="confidence-fill" style="width:36%;background:#ef4444"></div></div></td>
+          <td>商品保修政策</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_005')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_005" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 商品保修期是多久？</div><div><span class="field-label">[坐席]</span> 电子产品保修期为1年，服装类保修期为3个月。具体以商品详情页说明为准。</div></div><div><div><span class="field-label">关联知识：</span>商品保修政策</div><div><span class='field-label'>知识内容：</span>电子产品保修期为1年，服装类保修期为3个月，食品类不享受保修。保修期内非人为损坏可免费维修或更换。需提供购买凭证。</div><div><span class="field-label">匹配关键词：</span>保修、保修期</div><div><span class="field-label">详细说明：</span>匹配度太低，可能是知识库缺少相关内容</div></div></div></td></tr>
+        <tr data-id="conv_006" data-type="partial" data-status="pending_review" data-keywords="在线客服,人工客服,客服">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_006"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_006')">▶</span> conv_006</td>
+          <td><span class="badge badge-partial">部分命中</span></td>
+          <td>54% <div class="confidence-bar"><div class="confidence-fill" style="width:54%;background:#f59e0b"></div></div></td>
+          <td>在线客服联系方式</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_006')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_006" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 怎么联系在线客服</div><div><span class="field-label">[坐席]</span> 您可以在APP首页底部点击「在线客服」按钮，或者在帮助中心选择问题类型后进入人工客服。</div></div><div><div><span class="field-label">关联知识：</span>在线客服联系方式</div><div><span class='field-label'>知识内容：</span>在线客服入口：APP首页底部「在线客服」按钮，或帮助中心选择问题类型后进入人工客服。服务时间：9:00-22:00。</div><div><span class="field-label">匹配关键词：</span>在线客服、人工客服、客服</div><div><span class="field-label">详细说明：</span>部分匹配，建议人工确认</div></div></div></td></tr>
+        <tr data-id="conv_007" data-type="miss" data-status="pending_review" data-keywords="">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_007"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_007')">▶</span> conv_007</td>
+          <td><span class="badge badge-miss">未命中</span></td>
+          <td>0% <div class="confidence-bar"><div class="confidence-fill" style="width:0%;background:#ef4444"></div></div></td>
+          <td>无</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_007')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_007" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 请问你们的隐私政策是什么？我的数据会被怎么处理？</div><div><span class="field-label">[坐席]</span> 这个问题我帮您转接相关部门确认，请稍等。</div></div><div><div><span class="field-label">关联知识：</span>无</div><div><span class="field-label">匹配关键词：</span>无</div><div><span class="field-label">详细说明：</span>这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。</div></div></div></td></tr>
+        <tr data-id="conv_008" data-type="miss" data-status="pending_review" data-keywords="">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_008"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_008')">▶</span> conv_008</td>
+          <td><span class="badge badge-miss">未命中</span></td>
+          <td>0% <div class="confidence-bar"><div class="confidence-fill" style="width:0%;background:#ef4444"></div></div></td>
+          <td>无</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_008')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_008" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 跨境订单的关税怎么算？需要我自己交吗？</div><div><span class="field-label">[坐席]</span> 跨境订单的关税政策请您查看订单确认页面的提示，如有疑问可联系海关客服。</div></div><div><div><span class="field-label">关联知识：</span>无</div><div><span class="field-label">匹配关键词：</span>无</div><div><span class="field-label">详细说明：</span>这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。</div></div></div></td></tr>
+        <tr data-id="conv_009" data-type="duplicate" data-status="pending_review" data-keywords="退货,退货流程,申请退货,退货原因">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_009"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_009')">▶</span> conv_009</td>
+          <td><span class="badge badge-duplicate">重复改判</span></td>
+          <td>58% <div class="confidence-bar"><div class="confidence-fill" style="width:58%;background:#f59e0b"></div></div></td>
+          <td>退货流程说明</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_009')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_009" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 退货流程是什么</div><div><span class="field-label">[坐席]</span> 您可以在订单页面申请退货，选择退货原因后等待审核。</div></div><div><div><span class="field-label">关联知识：</span>退货流程说明</div><div><span class='field-label'>知识内容：</span>退货流程：1. 在订单页面点击申请退货；2. 选择退货原因；3. 等待审核通过；4. 寄回商品；5. 仓库验收后退款。退货需在签收后7天内申请，商品需保持原包装。</div><div><span class="field-label">匹配关键词：</span>退货、退货流程、申请退货、退货原因</div><div><span class="field-label">详细说明：</span>这条对话之前已被人工改判过（未知 于 未知时间），再次改判会覆盖原判断。</div></div></div></td></tr>
+        <tr data-id="conv_010" data-type="duplicate" data-status="pending_review" data-keywords="退货,退款">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_010"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_010')">▶</span> conv_010</td>
+          <td><span class="badge badge-duplicate">重复改判</span></td>
+          <td>36% <div class="confidence-bar"><div class="confidence-fill" style="width:36%;background:#ef4444"></div></div></td>
+          <td>退款与退货区别</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_010')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_010" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 我之前退货了，物流显示已签收，为什么还没退款</div><div><span class="field-label">[坐席]</span> 仓库签收后需要1-2个工作日验收，验收通过后自动退款。</div></div><div><div><span class="field-label">关联知识：</span>退款与退货区别</div><div><span class='field-label'>知识内容：</span>退款是仅退钱不退货，适用于未发货或协商一致的情况。退货是退钱同时寄回商品，适用于已签收需要退回的情况。部分退款为差价退回。</div><div><span class="field-label">匹配关键词：</span>退货、退款</div><div><span class="field-label">详细说明：</span>这条对话之前已被人工改判过（未知 于 未知时间），再次改判会覆盖原判断。</div></div></div></td></tr>
+        <tr data-id="conv_011" data-type="boundary" data-status="pending_review" data-keywords="退换货,7天,超过7天">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_011"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_011')">▶</span> conv_011</td>
+          <td><span class="badge badge-boundary">边界情况</span></td>
+          <td>54% <div class="confidence-bar"><div class="confidence-fill" style="width:54%;background:#f59e0b"></div></div></td>
+          <td>退换货时效规定</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_011')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_011" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 我想退换货，但已经超过7天了</div><div><span class="field-label">[坐席]</span> 超过7天一般不支持退换，但如果是质量问题可以申请售后。</div></div><div><div><span class="field-label">关联知识：</span>退换货时效规定</div><div><span class='field-label'>知识内容：</span>退换货需在签收后7天内申请。超过7天不支持退换货，但质量问题可申请售后维修。特殊商品（如内衣、食品）不支持退货。</div><div><span class="field-label">匹配关键词：</span>退换货、7天、超过7天</div><div><span class="field-label">详细说明：</span>这条对话属于边界情况，自动判定可能不准确，请人工确认。</div></div></div></td></tr>
+        <tr data-id="conv_012" data-type="boundary" data-status="pending_review" data-keywords="换货运费,运费,运费谁出,换货">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_012"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_012')">▶</span> conv_012</td>
+          <td><span class="badge badge-boundary">边界情况</span></td>
+          <td>72% <div class="confidence-bar"><div class="confidence-fill" style="width:72%;background:#f59e0b"></div></div></td>
+          <td>换货运费规则</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_012')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_012" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 买的衣服尺码不对，换货的话运费谁出</div><div><span class="field-label">[坐席]</span> 非质量问题的换货运费由买家承担，质量问题由我们承担。</div></div><div><div><span class="field-label">关联知识：</span>换货运费规则</div><div><span class='field-label'>知识内容：</span>非质量问题的换货由买家承担运费，质量问题由商家承担运费。退货运费规则相同。保价商品退换货运费由商家承担。</div><div><span class="field-label">匹配关键词：</span>换货运费、运费、运费谁出、换货</div><div><span class="field-label">详细说明：</span>这条对话属于边界情况，自动判定可能不准确，请人工确认。</div></div></div></td></tr>
+        <tr data-id="conv_013" data-type="boundary" data-status="pending_review" data-keywords="退货,退款">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_013"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_013')">▶</span> conv_013</td>
+          <td><span class="badge badge-boundary">边界情况</span></td>
+          <td>36% <div class="confidence-bar"><div class="confidence-fill" style="width:36%;background:#ef4444"></div></div></td>
+          <td>退款与退货区别</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_013')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_013" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 退款和退货有什么区别？我到底该选哪个？</div><div><span class="field-label">[坐席]</span> 退款是仅退钱不退货，退货是退钱同时寄回商品。根据您的需求选择即可。</div></div><div><div><span class="field-label">关联知识：</span>退款与退货区别</div><div><span class='field-label'>知识内容：</span>退款是仅退钱不退货，适用于未发货或协商一致的情况。退货是退钱同时寄回商品，适用于已签收需要退回的情况。部分退款为差价退回。</div><div><span class="field-label">匹配关键词：</span>退货、退款</div><div><span class="field-label">详细说明：</span>这条对话属于边界情况，自动判定可能不准确，请人工确认。</div></div></div></td></tr>
+        <tr data-id="conv_014" data-type="miss" data-status="pending_review" data-keywords="">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_014"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_014')">▶</span> conv_014</td>
+          <td><span class="badge badge-miss">未命中</span></td>
+          <td>0% <div class="confidence-bar"><div class="confidence-fill" style="width:0%;background:#ef4444"></div></div></td>
+          <td>无</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_014')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_014" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 你好</div><div><span class="field-label">[坐席]</span> 您好，请问有什么可以帮您的？</div><div><span class="field-label">[客户]</span> 没事了</div></div><div><div><span class="field-label">关联知识：</span>无</div><div><span class="field-label">匹配关键词：</span>无</div><div><span class="field-label">详细说明：</span>这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。</div></div></div></td></tr>
+        <tr data-id="conv_015" data-type="miss" data-status="pending_review" data-keywords="会员,会员制度">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_015"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_015')">▶</span> conv_015</td>
+          <td><span class="badge badge-miss">未命中</span></td>
+          <td>36% <div class="confidence-bar"><div class="confidence-fill" style="width:36%;background:#ef4444"></div></div></td>
+          <td>会员权益说明</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_015')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_015" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 你们有会员制度吗？会员有什么权益</div><div><span class="field-label">[坐席]</span> 我们有会员体系，会员可享受专属折扣、免运费、优先客服等权益，详情可在会员中心查看。</div></div><div><div><span class="field-label">关联知识：</span>会员权益说明</div><div><span class='field-label'>知识内容：</span>会员等级：普通会员、银卡会员、金卡会员。权益包括：专属折扣、免运费、优先客服、生日礼包。升级规则：累计消费满额自动升级。</div><div><span class="field-label">匹配关键词：</span>会员、会员制度</div><div><span class="field-label">详细说明：</span>匹配度太低，可能是知识库缺少相关内容</div></div></div></td></tr>
+        <tr data-id="conv_016" data-type="miss" data-status="pending_review" data-keywords="">
+          <td><input type="checkbox" class="row-checkbox" data-conv-id="conv_016"></td>
+          <td><span class="detail-expand" onclick="toggleDetail('conv_016')">▶</span> conv_016</td>
+          <td><span class="badge badge-miss">未命中</span></td>
+          <td>0% <div class="confidence-bar"><div class="confidence-fill" style="width:0%;background:#ef4444"></div></div></td>
+          <td>无</td>
+          <td><span class="badge badge-pending_review">待复核</span></td>
+          <td>—</td>
+          <td title="">—</td>
+          <td class="review-actions">
+            <button class="btn btn-primary btn-sm" onclick="openReview('conv_016')">复核</button>
+          </td>
+        </tr>
+        <tr id="detail-conv_016" class="detail-row"><td colspan="9" class="detail-content"><div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;"><div><div class="field-label">对话内容：</div><div><span class="field-label">[客户]</span> 你们的APP在iOS 18上闪退怎么解决？</div><div><span class="field-label">[坐席]</span> 这个问题我帮您记录反馈，请提供您的手机型号和系统版本。</div></div><div><div><span class="field-label">关联知识：</span>无</div><div><span class="field-label">匹配关键词：</span>无</div><div><span class="field-label">详细说明：</span>这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。</div></div></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <h3>复核操作</h3>
+    <div id="modalConvInfo" style="margin-bottom:12px; font-size:13px; color:var(--text-secondary);"></div>
+    <label>操作</label>
+    <select id="modalAction">
+      <option value="confirm">确认 - 同意自动判定结果</option>
+      <option value="override">改判 - 修改判定结果</option>
+    </select>
+    <div id="overrideFields" style="display:none;">
+      <label>新命中类型</label>
+      <select id="modalNewType">
+        <option value="">不改类型</option>
+        <option value="exact">精确命中</option>
+        <option value="partial">部分命中</option>
+        <option value="miss">未命中</option>
+        <option value="boundary">边界情况</option>
+      </select>
+      <label>新关联知识ID</label>
+      <input type="text" id="modalNewKbId" placeholder="留空则不改">
+    </div>
+    <label>备注（下一班同事可见）</label>
+    <textarea id="modalNote" placeholder="写清楚为什么这么判，方便后面的人接着查..."></textarea>
+    <div id="modalOverrideWarn" style="display:none; background:#fef3c7; padding:8px 12px; border-radius:6px; font-size:12px; color:#92400e; margin-bottom:8px;"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="submitReview()">提交</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const hitsData = [{"conversation_id": "conv_001", "knowledge_id": "kb_001", "hit_type": "partial", "hit_type_label": "部分命中", "confidence": 0.73125, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["退货", "退货流程", "申请退货", "寄回商品", "退货原因"], "detail": "部分匹配，建议人工确认", "override_history": []}, {"conversation_id": "conv_002", "knowledge_id": "kb_002", "hit_type": "partial", "hit_type_label": "部分命中", "confidence": 0.54375, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["退款", "到账时间", "退款多久"], "detail": "部分匹配，建议人工确认", "override_history": []}, {"conversation_id": "conv_003", "knowledge_id": "kb_003", "hit_type": "partial", "hit_type_label": "部分命中", "confidence": 0.54375, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["优惠券", "优惠券过期", "优惠"], "detail": "部分匹配，建议人工确认", "override_history": []}, {"conversation_id": "conv_004", "knowledge_id": "kb_004", "hit_type": "partial", "hit_type_label": "部分命中", "confidence": 0.71875, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["修改地址", "收货地址", "修改收货地址"], "detail": "部分匹配，建议人工确认", "override_history": []}, {"conversation_id": "conv_005", "knowledge_id": "kb_005", "hit_type": "miss", "hit_type_label": "未命中", "confidence": 0.3625, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["保修", "保修期"], "detail": "匹配度太低，可能是知识库缺少相关内容", "override_history": []}, {"conversation_id": "conv_006", "knowledge_id": "kb_006", "hit_type": "partial", "hit_type_label": "部分命中", "confidence": 0.54375, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["在线客服", "人工客服", "客服"], "detail": "部分匹配，建议人工确认", "override_history": []}, {"conversation_id": "conv_007", "knowledge_id": null, "hit_type": "miss", "hit_type_label": "未命中", "confidence": 0.0, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": [], "detail": "这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。", "override_history": []}, {"conversation_id": "conv_008", "knowledge_id": null, "hit_type": "miss", "hit_type_label": "未命中", "confidence": 0.0, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": [], "detail": "这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。", "override_history": []}, {"conversation_id": "conv_009", "knowledge_id": "kb_001", "hit_type": "duplicate", "hit_type_label": "重复改判", "confidence": 0.585, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["退货", "退货流程", "申请退货", "退货原因"], "detail": "这条对话之前已被人工改判过（未知 于 未知时间），再次改判会覆盖原判断。", "override_history": []}, {"conversation_id": "conv_010", "knowledge_id": "kb_009", "hit_type": "duplicate", "hit_type_label": "重复改判", "confidence": 0.3625, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["退货", "退款"], "detail": "这条对话之前已被人工改判过（未知 于 未知时间），再次改判会覆盖原判断。", "override_history": []}, {"conversation_id": "conv_011", "knowledge_id": "kb_007", "hit_type": "boundary", "hit_type_label": "边界情况", "confidence": 0.54375, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["退换货", "7天", "超过7天"], "detail": "这条对话属于边界情况，自动判定可能不准确，请人工确认。", "override_history": []}, {"conversation_id": "conv_012", "knowledge_id": "kb_008", "hit_type": "boundary", "hit_type_label": "边界情况", "confidence": 0.725, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["换货运费", "运费", "运费谁出", "换货"], "detail": "这条对话属于边界情况，自动判定可能不准确，请人工确认。", "override_history": []}, {"conversation_id": "conv_013", "knowledge_id": "kb_009", "hit_type": "boundary", "hit_type_label": "边界情况", "confidence": 0.3625, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["退货", "退款"], "detail": "这条对话属于边界情况，自动判定可能不准确，请人工确认。", "override_history": []}, {"conversation_id": "conv_014", "knowledge_id": null, "hit_type": "miss", "hit_type_label": "未命中", "confidence": 0.0, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": [], "detail": "这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。", "override_history": []}, {"conversation_id": "conv_015", "knowledge_id": "kb_010", "hit_type": "miss", "hit_type_label": "未命中", "confidence": 0.3625, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": ["会员", "会员制度"], "detail": "匹配度太低，可能是知识库缺少相关内容", "override_history": []}, {"conversation_id": "conv_016", "knowledge_id": null, "hit_type": "miss", "hit_type_label": "未命中", "confidence": 0.0, "status": "pending_review", "status_label": "待复核", "reviewer_note": "", "reviewed_by": "", "reviewed_at": "", "matched_keywords": [], "detail": "这条对话没有匹配到任何知识库条目，可能是知识库缺少相关内容，建议考虑新增。", "override_history": []}];
+const conversationsData = {"conv_001": {"id": "conv_001", "customer_id": "cust_1021", "agent_id": "agent_007", "timestamp": "2026-05-26 09:14:32", "messages": [{"role": "customer", "content": "你好，我想咨询一下退货流程"}, {"role": "agent", "content": "您好，退货流程如下：1. 在订单页面点击申请退货；2. 选择退货原因；3. 等待审核通过后寄回商品。"}, {"role": "customer", "content": "好的，谢谢"}], "source": "normal", "manual_label": null}, "conv_002": {"id": "conv_002", "customer_id": "cust_2034", "agent_id": "agent_003", "timestamp": "2026-05-26 10:30:15", "messages": [{"role": "customer", "content": "退款多久能到账？"}, {"role": "agent", "content": "退款一般3-5个工作日到账，具体到账时间以银行为准。"}], "source": "normal", "manual_label": null}, "conv_003": {"id": "conv_003", "customer_id": "cust_3058", "agent_id": "agent_012", "timestamp": "2026-05-26 11:45:00", "messages": [{"role": "customer", "content": "我的优惠券过期了还能用吗"}, {"role": "agent", "content": "抱歉，优惠券过期后无法继续使用，建议您关注后续活动获取新优惠券。"}, {"role": "customer", "content": "那有没有其他优惠"}, {"role": "agent", "content": "目前新用户有首单9折优惠，您可以在活动页面查看详情。"}], "source": "normal", "manual_label": null}, "conv_004": {"id": "conv_004", "customer_id": "cust_4021", "agent_id": "agent_007", "timestamp": "2026-05-27 08:22:11", "messages": [{"role": "customer", "content": "发货后可以修改收货地址吗"}, {"role": "agent", "content": "发货后修改地址需要联系快递公司，我们这边无法直接修改。"}], "source": "normal", "manual_label": null}, "conv_005": {"id": "conv_005", "customer_id": "cust_5003", "agent_id": "agent_003", "timestamp": "2026-05-27 14:05:33", "messages": [{"role": "customer", "content": "商品保修期是多久？"}, {"role": "agent", "content": "电子产品保修期为1年，服装类保修期为3个月。具体以商品详情页说明为准。"}], "source": "normal", "manual_label": null}, "conv_006": {"id": "conv_006", "customer_id": "cust_6077", "agent_id": "agent_012", "timestamp": "2026-05-27 16:18:45", "messages": [{"role": "customer", "content": "怎么联系在线客服"}, {"role": "agent", "content": "您可以在APP首页底部点击「在线客服」按钮，或者在帮助中心选择问题类型后进入人工客服。"}], "source": "normal", "manual_label": null}, "conv_007": {"id": "conv_007", "customer_id": "cust_7088", "agent_id": "agent_007", "timestamp": "2026-05-28 09:30:00", "messages": [{"role": "customer", "content": "请问你们的隐私政策是什么？我的数据会被怎么处理？"}, {"role": "agent", "content": "这个问题我帮您转接相关部门确认，请稍等。"}], "source": "missing_kb", "manual_label": "缺隐私政策知识"}, "conv_008": {"id": "conv_008", "customer_id": "cust_8099", "agent_id": "agent_003", "timestamp": "2026-05-28 10:15:22", "messages": [{"role": "customer", "content": "跨境订单的关税怎么算？需要我自己交吗？"}, {"role": "agent", "content": "跨境订单的关税政策请您查看订单确认页面的提示，如有疑问可联系海关客服。"}], "source": "missing_kb", "manual_label": "缺跨境关税知识"}, "conv_009": {"id": "conv_009", "customer_id": "cust_9100", "agent_id": "agent_012", "timestamp": "2026-05-28 11:00:44", "messages": [{"role": "customer", "content": "退货流程是什么"}, {"role": "agent", "content": "您可以在订单页面申请退货，选择退货原因后等待审核。"}], "source": "duplicate_override", "manual_label": "已改判：精确命中→部分命中"}, "conv_010": {"id": "conv_010", "customer_id": "cust_0111", "agent_id": "agent_007", "timestamp": "2026-05-28 13:22:10", "messages": [{"role": "customer", "content": "我之前退货了，物流显示已签收，为什么还没退款"}, {"role": "agent", "content": "仓库签收后需要1-2个工作日验收，验收通过后自动退款。"}], "source": "duplicate_override", "manual_label": "已改判两次：先未命中→部分命中→精确命中"}, "conv_011": {"id": "conv_011", "customer_id": "cust_1222", "agent_id": "agent_003", "timestamp": "2026-05-29 08:45:30", "messages": [{"role": "customer", "content": "我想退换货，但已经超过7天了"}, {"role": "agent", "content": "超过7天一般不支持退换，但如果是质量问题可以申请售后。"}], "source": "boundary", "manual_label": null}, "conv_012": {"id": "conv_012", "customer_id": "cust_1333", "agent_id": "agent_012", "timestamp": "2026-05-29 09:10:00", "messages": [{"role": "customer", "content": "买的衣服尺码不对，换货的话运费谁出"}, {"role": "agent", "content": "非质量问题的换货运费由买家承担，质量问题由我们承担。"}], "source": "boundary", "manual_label": null}, "conv_013": {"id": "conv_013", "customer_id": "cust_1444", "agent_id": "agent_007", "timestamp": "2026-05-29 10:30:00", "messages": [{"role": "customer", "content": "退款和退货有什么区别？我到底该选哪个？"}, {"role": "agent", "content": "退款是仅退钱不退货，退货是退钱同时寄回商品。根据您的需求选择即可。"}], "source": "boundary", "manual_label": null}, "conv_014": {"id": "conv_014", "customer_id": "cust_1555", "agent_id": "agent_003", "timestamp": "2026-05-29 14:20:00", "messages": [{"role": "customer", "content": "你好"}, {"role": "agent", "content": "您好，请问有什么可以帮您的？"}, {"role": "customer", "content": "没事了"}], "source": "normal", "manual_label": null}, "conv_015": {"id": "conv_015", "customer_id": "cust_1666", "agent_id": "agent_012", "timestamp": "2026-05-29 15:45:00", "messages": [{"role": "customer", "content": "你们有会员制度吗？会员有什么权益"}, {"role": "agent", "content": "我们有会员体系，会员可享受专属折扣、免运费、优先客服等权益，详情可在会员中心查看。"}], "source": "normal", "manual_label": null}, "conv_016": {"id": "conv_016", "customer_id": "cust_1777", "agent_id": "agent_007", "timestamp": "2026-05-30 08:00:00", "messages": [{"role": "customer", "content": "你们的APP在iOS 18上闪退怎么解决？"}, {"role": "agent", "content": "这个问题我帮您记录反馈，请提供您的手机型号和系统版本。"}], "source": "missing_kb", "manual_label": "缺APP故障排查知识"}};
+const knowledgeData = {"kb_001": {"id": "kb_001", "title": "退货流程说明", "content": "退货流程：1. 在订单页面点击申请退货；2. 选择退货原因；3. 等待审核通过；4. 寄回商品；5. 仓库验收后退款。退货需在签收后7天内申请，商品需保持原包装。", "keywords": ["退货", "退货流程", "申请退货", "寄回商品", "退货原因"], "category": "售后", "active": true}, "kb_002": {"id": "kb_002", "title": "退款到账时间", "content": "退款一般在3-5个工作日到账，具体到账时间取决于银行处理速度。原路退回至支付账户，不支持更换退款账户。", "keywords": ["退款", "退款到账", "到账时间", "退款多久"], "category": "售后", "active": true}, "kb_003": {"id": "kb_003", "title": "优惠券使用规则", "content": "优惠券有有效期限制，过期后无法使用。每笔订单只能使用一张优惠券，不可叠加。优惠券不可转让或兑换现金。", "keywords": ["优惠券", "优惠券过期", "优惠", "折扣"], "category": "营销", "active": true}, "kb_004": {"id": "kb_004", "title": "修改收货地址", "content": "发货前可在订单详情页修改收货地址。发货后需联系快递公司修改，或联系客服协助处理。不支持跨城市修改地址。", "keywords": ["修改地址", "收货地址", "换地址"], "category": "物流", "active": true}, "kb_005": {"id": "kb_005", "title": "商品保修政策", "content": "电子产品保修期为1年，服装类保修期为3个月，食品类不享受保修。保修期内非人为损坏可免费维修或更换。需提供购买凭证。", "keywords": ["保修", "保修期", "维修", "售后保修"], "category": "售后", "active": true}, "kb_006": {"id": "kb_006", "title": "在线客服联系方式", "content": "在线客服入口：APP首页底部「在线客服」按钮，或帮助中心选择问题类型后进入人工客服。服务时间：9:00-22:00。", "keywords": ["在线客服", "联系客服", "人工客服", "客服"], "category": "服务", "active": true}, "kb_007": {"id": "kb_007", "title": "退换货时效规定", "content": "退换货需在签收后7天内申请。超过7天不支持退换货，但质量问题可申请售后维修。特殊商品（如内衣、食品）不支持退货。", "keywords": ["退换货", "7天", "退换时效", "超过7天"], "category": "售后", "active": true}, "kb_008": {"id": "kb_008", "title": "换货运费规则", "content": "非质量问题的换货由买家承担运费，质量问题由商家承担运费。退货运费规则相同。保价商品退换货运费由商家承担。", "keywords": ["换货运费", "运费", "运费谁出", "换货"], "category": "售后", "active": true}, "kb_009": {"id": "kb_009", "title": "退款与退货区别", "content": "退款是仅退钱不退货，适用于未发货或协商一致的情况。退货是退钱同时寄回商品，适用于已签收需要退回的情况。部分退款为差价退回。", "keywords": ["退款", "退货", "退款退货区别", "仅退款"], "category": "售后", "active": true}, "kb_010": {"id": "kb_010", "title": "会员权益说明", "content": "会员等级：普通会员、银卡会员、金卡会员。权益包括：专属折扣、免运费、优先客服、生日礼包。升级规则：累计消费满额自动升级。", "keywords": ["会员", "会员权益", "会员制度", "会员等级"], "category": "营销", "active": true}, "kb_011": {"id": "kb_011", "title": "退货验收与退款进度", "content": "仓库签收后1-2个工作日完成验收，验收通过后自动发起退款。退款到账时间3-5个工作日。验收不通过会短信通知原因。", "keywords": ["退货验收", "签收", "退款进度", "验收"], "category": "售后", "active": true}, "kb_012": {"id": "kb_012", "title": "新用户首单优惠", "content": "新用户首单享受9折优惠，需注册后7天内使用。与优惠券不可叠加使用。部分商品不参与活动，以商品详情页标识为准。", "keywords": ["新用户", "首单优惠", "新人优惠", "9折"], "category": "营销", "active": true}, "kb_013": {"id": "kb_013", "title": "跨境购物须知（已停用）", "content": "此知识已停用，跨境业务已暂停。", "keywords": ["跨境", "关税"], "category": "跨境", "active": false}};
+let currentConvId = null;
+const hitTypeLabels = {"exact": "精确命中", "partial": "部分命中", "miss": "未命中", "duplicate": "重复改判", "boundary": "边界情况"};
+
+function applyFilters() {
+  const type = document.getElementById('filterType').value;
+  const status = document.getElementById('filterStatus').value;
+  const search = document.getElementById('filterSearch').value.toLowerCase();
+  const rows = document.querySelectorAll('#hitsBody tr:not(.detail-row)');
+  rows.forEach(row => {
+    const rType = row.dataset.type;
+    const rStatus = row.dataset.status;
+    const rId = row.dataset.id.toLowerCase();
+    const rKw = (row.dataset.keywords || '').toLowerCase();
+    let show = true;
+    if (type && rType !== type) show = false;
+    if (status && rStatus !== status) show = false;
+    if (search && !rId.includes(search) && !rKw.includes(search)) show = false;
+    row.style.display = show ? '' : 'none';
+    const detailRow = row.nextElementSibling;
+    if (detailRow && detailRow.classList.contains('detail-row')) {
+      detailRow.style.display = show && detailRow.classList.contains('show') ? '' : 'none';
+    }
+  });
+}
+
+function resetFilters() {
+  document.getElementById('filterType').value = '';
+  document.getElementById('filterStatus').value = '';
+  document.getElementById('filterSearch').value = '';
+  applyFilters();
+}
+
+function toggleSelectAll() {
+  const checked = document.getElementById('selectAll').checked;
+  document.querySelectorAll('.row-checkbox').forEach(cb => {
+    const row = cb.closest('tr');
+    if (row.style.display !== 'none') cb.checked = checked;
+  });
+}
+
+function toggleDetail(convId) {
+  const row = document.getElementById('detail-' + convId);
+  row.classList.toggle('show');
+  if (row.style.display === 'none' && row.classList.contains('show')) row.style.display = '';
+}
+
+function openReview(convId) {
+  currentConvId = convId;
+  const hit = hitsData.find(h => h.conversation_id === convId);
+  const conv = conversationsData[convId];
+  let info = '<div>对话ID：' + convId + '</div>';
+  if (conv) info += '<div>客户：' + conv.customer_id + ' | 坐席：' + conv.agent_id + '</div>';
+  if (hit) {
+    info += '<div>当前判定：' + hit.hit_type_label + '（置信度 ' + (hit.confidence * 100).toFixed(0) + '%）</div>';
+    info += '<div>关联知识：' + (hit.knowledge_id || '无') + '</div>';
+    if (hit.override_history && hit.override_history.length > 0) {
+      const last = hit.override_history[hit.override_history.length - 1];
+      document.getElementById('modalOverrideWarn').style.display = 'block';
+      document.getElementById('modalOverrideWarn').textContent = '注意：此对话之前已被 ' + (last.reviewer || '未知') + ' 于 ' + (last.time || '未知时间') + ' 改判过，再次改判会覆盖之前的判断。';
+    } else {
+      document.getElementById('modalOverrideWarn').style.display = 'none';
+    }
+  }
+  document.getElementById('modalConvInfo').innerHTML = info;
+  document.getElementById('modalAction').value = 'confirm';
+  document.getElementById('overrideFields').style.display = 'none';
+  document.getElementById('modalNote').value = '';
+  document.getElementById('modalNewType').value = '';
+  document.getElementById('modalNewKbId').value = '';
+  document.getElementById('reviewModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('reviewModal').classList.remove('show');
+  currentConvId = null;
+}
+
+document.getElementById('modalAction').addEventListener('change', function() {
+  document.getElementById('overrideFields').style.display = this.value === 'override' ? 'block' : 'none';
+});
+
+function submitReview() {
+  if (!currentConvId) return;
+  const action = document.getElementById('modalAction').value;
+  const note = document.getElementById('modalNote').value;
+  const newType = document.getElementById('modalNewType').value;
+  const newKbId = document.getElementById('modalNewKbId').value;
+  const hit = hitsData.find(h => h.conversation_id === currentConvId);
+  if (!hit) return;
+
+  if (action === 'confirm') {
+    hit.status = 'confirmed';
+    hit.status_label = '已确认';
+    hit.reviewer_note = note;
+    hit.reviewed_by = '当前操作人';
+    hit.reviewed_at = new Date().toLocaleString('zh-CN');
+  } else {
+    hit.status = 'overridden';
+    hit.status_label = '已改判';
+    hit.reviewer_note = note;
+    hit.reviewed_by = '当前操作人';
+    hit.reviewed_at = new Date().toLocaleString('zh-CN');
+    if (newType) {
+      hit.hit_type = newType;
+      hit.hit_type_label = hitTypeLabels[newType] || newType;
+    }
+    if (newKbId) hit.knowledge_id = newKbId;
+    const overrideEntry = {
+      original_hit_type: hit.hit_type,
+      original_knowledge_id: hit.knowledge_id,
+      original_confidence: hit.confidence,
+      reviewer: '当前操作人',
+      time: new Date().toLocaleString('zh-CN'),
+      note: note
+    };
+    hit.override_history.push(overrideEntry);
+  }
+
+  refreshRow(currentConvId);
+  closeModal();
+}
+
+function refreshRow(convId) {
+  const hit = hitsData.find(h => h.conversation_id === convId);
+  if (!hit) return;
+  const row = document.querySelector('tr[data-id="' + convId + '"]');
+  if (!row) return;
+  const typeBadge = '<span class="badge badge-' + hit.hit_type + '">' + hit.hit_type_label + '</span>';
+  const statusBadge = '<span class="badge badge-' + hit.status + '">' + hit.status_label + '</span>';
+  const confPct = (hit.confidence * 100).toFixed(0);
+  const confColor = confPct >= 80 ? '#22c55e' : confPct >= 50 ? '#f59e0b' : '#ef4444';
+  row.cells[2].innerHTML = typeBadge;
+  row.cells[3].innerHTML = confPct + '% <div class="confidence-bar"><div class="confidence-fill" style="width:' + confPct + '%;background:' + confColor + '"></div></div>';
+  row.cells[5].innerHTML = statusBadge;
+  row.cells[6].textContent = hit.reviewed_by || '—';
+  row.cells[7].textContent = hit.reviewer_note ? (hit.reviewer_note.length > 20 ? hit.reviewer_note.substring(0,20) + '...' : hit.reviewer_note) : '—';
+  row.dataset.status = hit.status;
+}
+
+function batchConfirm() {
+  const selected = document.querySelectorAll('.row-checkbox:checked');
+  if (selected.length === 0) { alert('请先勾选要确认的条目'); return; }
+  if (!confirm('确认批量确认 ' + selected.length + ' 条记录？')) return;
+  selected.forEach(cb => {
+    const convId = cb.dataset.convId;
+    const hit = hitsData.find(h => h.conversation_id === convId);
+    if (hit && hit.status === 'pending_review') {
+      hit.status = 'confirmed';
+      hit.status_label = '已确认';
+      hit.reviewed_by = '当前操作人';
+      hit.reviewed_at = new Date().toLocaleString('zh-CN');
+      refreshRow(convId);
+    }
+  });
+}
+
+function exportCurrentView() {
+  const visibleRows = document.querySelectorAll('#hitsBody tr:not(.detail-row)');
+  const visibleIds = new Set();
+  visibleRows.forEach(row => {
+    if (row.style.display !== 'none') visibleIds.add(row.dataset.id);
+  });
+  const visibleHits = hitsData.filter(h => visibleIds.has(h.conversation_id));
+  let csv = '对话ID,命中类型,置信度,关联知识ID,复核状态,复核人,备注,详细说明\n';
+  visibleHits.forEach(h => {
+    csv += '"' + h.conversation_id + '","' + h.hit_type_label + '","' + (h.confidence*100).toFixed(0) + '%","' + (h.knowledge_id||'无') + '","' + h.status_label + '","' + (h.reviewed_by||'') + '","' + (h.reviewer_note||'') + '","' + (h.detail||'') + '"\n';
+  });
+  const blob = new Blob([String.fromCharCode(0xFEFF) + csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '知识命中_筛选结果_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+document.getElementById('reviewModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+</script>
+
+</body>
+</html>

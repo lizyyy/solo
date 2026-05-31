@@ -1,0 +1,187 @@
+[
+  {
+    "id": "conv_001",
+    "timestamp": "2026-05-26 09:14:32",
+    "customer_id": "cust_1021",
+    "agent_id": "agent_007",
+    "source": "normal",
+    "messages": [
+      {"role": "customer", "content": "你好，我想咨询一下退货流程"},
+      {"role": "agent", "content": "您好，退货流程如下：1. 在订单页面点击申请退货；2. 选择退货原因；3. 等待审核通过后寄回商品。"},
+      {"role": "customer", "content": "好的，谢谢"}
+    ]
+  },
+  {
+    "id": "conv_002",
+    "timestamp": "2026-05-26 10:30:15",
+    "customer_id": "cust_2034",
+    "agent_id": "agent_003",
+    "source": "normal",
+    "messages": [
+      {"role": "customer", "content": "退款多久能到账？"},
+      {"role": "agent", "content": "退款一般3-5个工作日到账，具体到账时间以银行为准。"}
+    ]
+  },
+  {
+    "id": "conv_003",
+    "timestamp": "2026-05-26 11:45:00",
+    "customer_id": "cust_3058",
+    "agent_id": "agent_012",
+    "source": "normal",
+    "messages": [
+      {"role": "customer", "content": "我的优惠券过期了还能用吗"},
+      {"role": "agent", "content": "抱歉，优惠券过期后无法继续使用，建议您关注后续活动获取新优惠券。"},
+      {"role": "customer", "content": "那有没有其他优惠"},
+      {"role": "agent", "content": "目前新用户有首单9折优惠，您可以在活动页面查看详情。"}
+    ]
+  },
+  {
+    "id": "conv_004",
+    "timestamp": "2026-05-27 08:22:11",
+    "customer_id": "cust_4021",
+    "agent_id": "agent_007",
+    "source": "normal",
+    "messages": [
+      {"role": "customer", "content": "发货后可以修改收货地址吗"},
+      {"role": "agent", "content": "发货后修改地址需要联系快递公司，我们这边无法直接修改。"}
+    ]
+  },
+  {
+    "id": "conv_005",
+    "timestamp": "2026-05-27 14:05:33",
+    "customer_id": "cust_5003",
+    "agent_id": "agent_003",
+    "source": "normal",
+    "messages": [
+      {"role": "customer", "content": "商品保修期是多久？"},
+      {"role": "agent", "content": "电子产品保修期为1年，服装类保修期为3个月。具体以商品详情页说明为准。"}
+    ]
+  },
+  {
+    "id": "conv_006",
+    "timestamp": "2026-05-27 16:18:45",
+    "customer_id": "cust_6077",
+    "agent_id": "agent_012",
+    "source": "normal",
+    "messages": [
+      {"role": "customer", "content": "怎么联系在线客服"},
+      {"role": "agent", "content": "您可以在APP首页底部点击「在线客服」按钮，或者在帮助中心选择问题类型后进入人工客服。"}
+    ]
+  },
+  {
+    "id": "conv_007",
+    "timestamp": "2026-05-28 09:30:00",
+    "customer_id": "cust_7088",
+    "agent_id": "agent_007",
+    "source": "missing_kb",
+    "messages": [
+      {"role": "customer", "content": "请问你们的隐私政策是什么？我的数据会被怎么处理？"},
+      {"role": "agent", "content": "这个问题我帮您转接相关部门确认，请稍等。"}
+    ],
+    "manual_label": "缺隐私政策知识"
+  },
+  {
+    "id": "conv_008",
+    "timestamp": "2026-05-28 10:15:22",
+    "customer_id": "cust_8099",
+    "agent_id": "agent_003",
+    "source": "missing_kb",
+    "messages": [
+      {"role": "customer", "content": "跨境订单的关税怎么算？需要我自己交吗？"},
+      {"role": "agent", "content": "跨境订单的关税政策请您查看订单确认页面的提示，如有疑问可联系海关客服。"}
+    ],
+    "manual_label": "缺跨境关税知识"
+  },
+  {
+    "id": "conv_009",
+    "timestamp": "2026-05-28 11:00:44",
+    "customer_id": "cust_9100",
+    "agent_id": "agent_012",
+    "source": "duplicate_override",
+    "messages": [
+      {"role": "customer", "content": "退货流程是什么"},
+      {"role": "agent", "content": "您可以在订单页面申请退货，选择退货原因后等待审核。"}
+    ],
+    "manual_label": "已改判：精确命中→部分命中"
+  },
+  {
+    "id": "conv_010",
+    "timestamp": "2026-05-28 13:22:10",
+    "customer_id": "cust_0111",
+    "agent_id": "agent_007",
+    "source": "duplicate_override",
+    "messages": [
+      {"role": "customer", "content": "我之前退货了，物流显示已签收，为什么还没退款"},
+      {"role": "agent", "content": "仓库签收后需要1-2个工作日验收，验收通过后自动退款。"}
+    ],
+    "manual_label": "已改判两次：先未命中→部分命中→精确命中"
+  },
+  {
+    "id": "conv_011",
+    "timestamp": "2026-05-29 08:45:30",
+    "customer_id": "cust_1222",
+    "agent_id": "agent_003",
+    "source": "boundary",
+    "messages": [
+      {"role": "customer", "content": "我想退换货，但已经超过7天了"},
+      {"role": "agent", "content": "超过7天一般不支持退换，但如果是质量问题可以申请售后。"}
+    ]
+  },
+  {
+    "id": "conv_012",
+    "timestamp": "2026-05-29 09:10:00",
+    "customer_id": "cust_1333",
+    "agent_id": "agent_012",
+    "source": "boundary",
+    "messages": [
+      {"role": "customer", "content": "买的衣服尺码不对，换货的话运费谁出"},
+      {"role": "agent", "content": "非质量问题的换货运费由买家承担，质量问题由我们承担。"}
+    ]
+  },
+  {
+    "id": "conv_013",
+    "timestamp": "2026-05-29 10:30:00",
+    "customer_id": "cust_1444",
+    "agent_id": "agent_007",
+    "source": "boundary",
+    "messages": [
+      {"role": "customer", "content": "退款和退货有什么区别？我到底该选哪个？"},
+      {"role": "agent", "content": "退款是仅退钱不退货，退货是退钱同时寄回商品。根据您的需求选择即可。"}
+    ]
+  },
+  {
+    "id": "conv_014",
+    "timestamp": "2026-05-29 14:20:00",
+    "customer_id": "cust_1555",
+    "agent_id": "agent_003",
+    "source": "normal",
+    "messages": [
+      {"role": "customer", "content": "你好"},
+      {"role": "agent", "content": "您好，请问有什么可以帮您的？"},
+      {"role": "customer", "content": "没事了"}
+    ]
+  },
+  {
+    "id": "conv_015",
+    "timestamp": "2026-05-29 15:45:00",
+    "customer_id": "cust_1666",
+    "agent_id": "agent_012",
+    "source": "normal",
+    "messages": [
+      {"role": "customer", "content": "你们有会员制度吗？会员有什么权益"},
+      {"role": "agent", "content": "我们有会员体系，会员可享受专属折扣、免运费、优先客服等权益，详情可在会员中心查看。"}
+    ]
+  },
+  {
+    "id": "conv_016",
+    "timestamp": "2026-05-30 08:00:00",
+    "customer_id": "cust_1777",
+    "agent_id": "agent_007",
+    "source": "missing_kb",
+    "messages": [
+      {"role": "customer", "content": "你们的APP在iOS 18上闪退怎么解决？"},
+      {"role": "agent", "content": "这个问题我帮您记录反馈，请提供您的手机型号和系统版本。"}
+    ],
+    "manual_label": "缺APP故障排查知识"
+  }
+]
