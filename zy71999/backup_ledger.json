@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-05-31T21:54:30.732905",
+  "records": [
+    {
+      "id": "e2dbb9484df138a0",
+      "command": "python batch_process.py --date 20240526",
+      "cwd": "/Users/lzy/pro/solo/workspaces/zy71999/test_scripts",
+      "args": [],
+      "exit_code": 1,
+      "output_files": [
+        "result_20240526.csv"
+      ],
+      "note": "",
+      "failure_reason": "数据库连接超时",
+      "start_time": 1780222370.71733,
+      "end_time": null,
+      "is_rerun": false,
+      "rerun_of": null,
+      "rollback_to": null,
+      "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8",
+      "file_hashes": {}
+    }
+  ]
+}

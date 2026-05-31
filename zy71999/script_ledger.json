@@ -1,0 +1,175 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-05-31T21:54:30.732568",
+  "records": [
+    {
+      "id": "a9bebb813e4e4c1d",
+      "command": "python batch_process.py --date 20240530",
+      "cwd": "/Users/lzy/pro/solo/workspaces/zy71999/test_scripts",
+      "args": [],
+      "exit_code": 0,
+      "output_files": [
+        "result.csv"
+      ],
+      "note": "正常执行完成",
+      "failure_reason": "",
+      "start_time": 1780221270.71733,
+      "end_time": 1780221390.71733,
+      "is_rerun": false,
+      "rerun_of": null,
+      "rollback_to": null,
+      "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8",
+      "file_hashes": {}
+    },
+    {
+      "id": "3d106b45f3c244fa",
+      "command": "python batch_process.py --date 20240531",
+      "cwd": "/Users/lzy/pro/solo/workspaces/zy71999/test_scripts",
+      "args": [],
+      "exit_code": 1,
+      "output_files": [
+        "result_20240531.csv"
+      ],
+      "note": "",
+      "failure_reason": "网络超时，连接数据库失败",
+      "start_time": 1780221450.71733,
+      "end_time": 1780221460.71733,
+      "is_rerun": false,
+      "rerun_of": null,
+      "rollback_to": null,
+      "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8",
+      "file_hashes": {}
+    },
+    {
+      "id": "6186080a407ac5e6",
+      "command": "python report_gen.py",
+      "cwd": "/Users/lzy/pro/solo/workspaces/zy71999/test_scripts",
+      "args": [],
+      "exit_code": 1,
+      "output_files": [
+        "report.pdf"
+      ],
+      "note": "",
+      "failure_reason": "",
+      "start_time": 1780221570.71733,
+      "end_time": 1780221580.71733,
+      "is_rerun": false,
+      "rerun_of": null,
+      "rollback_to": null,
+      "script_hash": "eab7fb5100b336e1bb7c9d78bdc03222759273ab8a013ebb00aab50673ae9407",
+      "file_hashes": {}
+    },
+    {
+      "id": "6acbf32fb9aad6a1",
+      "command": "sh cleanup.sh",
+      "cwd": "/Users/lzy/pro/solo/workspaces/zy71999/test scripts with space",
+      "args": [],
+      "exit_code": 0,
+      "output_files": [],
+      "note": "路径有空格但执行成功",
+      "failure_reason": "",
+      "start_time": 1780221670.71733,
+      "end_time": 1780221675.71733,
+      "is_rerun": false,
+      "rerun_of": null,
+      "rollback_to": null,
+      "script_hash": null,
+      "file_hashes": {}
+    },
+    {
+      "id": "90145af28bdf455f",
+      "command": "python batch_process.py --date 20240529",
+      "cwd": "/Users/lzy/pro/solo/workspaces/zy71999/test_scripts",
+      "args": [],
+      "exit_code": 0,
+      "output_files": [
+        "result_20240529.csv"
+      ],
+      "note": "",
+      "failure_reason": "",
+      "start_time": 1780221780.71733,
+      "end_time": 1780221800.71733,
+      "is_rerun": false,
+      "rerun_of": null,
+      "rollback_to": null,
+      "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8",
+      "file_hashes": {}
+    },
+    {
+      "id": "16a4c8ee15f950a6",
+      "command": "python data_load.py",
+      "cwd": "/Users/lzy/pro/solo/workspaces/zy71999/test_scripts",
+      "args": [],
+      "exit_code": 1,
+      "output_files": [
+        "loaded_data.txt"
+      ],
+      "note": "",
+      "failure_reason": "SyntaxError: invalid syntax at line 42",
+      "start_time": 1780221970.71733,
+      "end_time": 1780221975.71733,
+      "is_rerun": false,
+      "rerun_of": null,
+      "rollback_to": null,
+      "script_hash": null,
+      "file_hashes": {}
+    },
+    {
+      "id": "34e462614bbb3708",
+      "command": "python report_gen.py",
+      "cwd": "/Users/lzy/pro/solo/workspaces/zy71999/test_scripts",
+      "args": [],
+      "exit_code": 0,
+      "output_files": [
+        "report_weekly.pdf"
+      ],
+      "note": "",
+      "failure_reason": "磁盘空间不足",
+      "start_time": 1780222080.71733,
+      "end_time": 1780222090.71733,
+      "is_rerun": false,
+      "rerun_of": null,
+      "rollback_to": null,
+      "script_hash": "eab7fb5100b336e1bb7c9d78bdc03222759273ab8a013ebb00aab50673ae9407",
+      "file_hashes": {}
+    },
+    {
+      "id": "ce30c16026a86cef",
+      "command": "python batch_process.py --date 20240528",
+      "cwd": "/Users/lzy/pro/solo/workspaces/zy71999/test_scripts",
+      "args": [],
+      "exit_code": 0,
+      "output_files": [
+        "result_20240528.csv"
+      ],
+      "note": "值班人李四补跑，清理锁文件后成功",
+      "failure_reason": "临时文件锁定",
+      "start_time": 1780222190.71733,
+      "end_time": 1780222210.71733,
+      "is_rerun": true,
+      "rerun_of": "e277956cdddfc497",
+      "rollback_to": null,
+      "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8",
+      "file_hashes": {}
+    },
+    {
+      "id": "5ef489f91944725d",
+      "command": "python batch_process.py --date 20240527",
+      "cwd": "/Users/lzy/pro/solo/workspaces/zy71999/test_scripts",
+      "args": [],
+      "exit_code": 0,
+      "output_files": [
+        "result_20240527_missing.csv"
+      ],
+      "note": "",
+      "failure_reason": "",
+      "start_time": 1780222270.71733,
+      "end_time": 1780222290.71733,
+      "is_rerun": false,
+      "rerun_of": null,
+      "rollback_to": null,
+      "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8",
+      "file_hashes": {}
+    }
+  ]
+}

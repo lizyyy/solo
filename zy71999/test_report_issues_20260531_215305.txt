@@ -1,0 +1,133 @@
+============================================================
+脚本运行账本 - 问题清单
+生成时间: 2026-05-31 21:53:05
+============================================================
+
+总计: 9 条记录
+  ✓ 不用动: 4
+  ⚠ 要补跑: 5
+  ✗ 找研发确认: 0
+
+------------------------------------------------------------
+【要补跑】 (5 条)
+------------------------------------------------------------
+
+记录ID: 7c215d1a3e324d84
+执行时间: 2026-05-31 17:53:05
+工作目录: /Users/lzy/pro/solo/workspaces/zy71999/test_scripts
+执行命令: python batch_process.py --date 20240530
+退出码: 0
+备注: 正常执行完成
+判定原因: 脚本退出码为0但输出文件缺失
+  问题列表:
+    - [ERROR] missing_output: 脚本声称成功但输出文件缺失: result.csv
+输出文件: result.csv
+
+记录ID: e0935a8d4ce59458
+执行时间: 2026-05-31 17:58:05
+工作目录: /Users/lzy/pro/solo/workspaces/zy71999/test_scripts
+执行命令: python report_gen.py
+退出码: 1
+判定原因: 脚本执行失败，未记录失败原因
+  问题列表:
+    - [ERROR] script_failed: 脚本执行失败（退出码 1），未记录失败原因
+输出文件: report.pdf
+
+记录ID: 763cad69f820e448
+执行时间: 2026-05-31 18:01:35
+工作目录: /Users/lzy/pro/solo/workspaces/zy71999/test_scripts
+执行命令: python batch_process.py --date 20240529
+退出码: 0
+判定原因: 脚本退出码为0但输出文件缺失
+  问题列表:
+    - [ERROR] missing_output: 脚本声称成功但输出文件缺失: result_20240529.csv
+    - [WARNING] old_script_version: 脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新
+输出文件: result_20240529.csv
+
+记录ID: d03ebca17055b76f
+执行时间: 2026-05-31 18:06:35
+工作目录: /Users/lzy/pro/solo/workspaces/zy71999/test_scripts
+执行命令: python report_gen.py
+退出码: 0
+失败原因: 磁盘空间不足
+判定原因: 脚本退出码为0但输出文件缺失
+  问题列表:
+    - [ERROR] missing_output: 脚本声称成功但输出文件缺失: report_weekly.pdf
+    - [WARNING] duplicate_run: 同一脚本在510秒内被重复执行
+    - [WARNING] old_script_version: 脚本使用的是旧版本（与2026-05-31 17:58版本相同），可能是回滚后未更新
+    - [WARNING] suspicious_success: 该脚本之前510秒内有失败记录，本次成功请确认是否为补跑
+输出文件: report_weekly.pdf
+
+记录ID: 4c439c7c1594bc8d
+执行时间: 2026-05-31 18:09:45
+工作目录: /Users/lzy/pro/solo/workspaces/zy71999/test_scripts
+执行命令: python batch_process.py --date 20240527
+退出码: 0
+判定原因: 脚本退出码为0但输出文件缺失
+  问题列表:
+    - [ERROR] missing_output: 脚本声称成功但输出文件缺失: result_20240527_missing.csv
+    - [WARNING] old_script_version: 脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新
+输出文件: result_20240527_missing.csv
+------------------------------------------------------------
+【不用动】 (4 条)
+------------------------------------------------------------
+
+记录ID: 50f4190f4fa7b798
+执行时间: 2026-05-31 17:56:05
+工作目录: /Users/lzy/pro/solo/workspaces/zy71999/test_scripts
+执行命令: python batch_process.py --date 20240531
+退出码: 1
+失败原因: 网络超时，连接数据库失败
+判定原因: 无明确判定依据
+  问题列表:
+    - [WARNING] old_script_version: 脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新
+    - [WARNING] script_failed: 脚本执行失败（退出码 1），已记录失败原因
+输出文件: result_20240531.csv
+
+记录ID: 44f42751e352e739
+执行时间: 2026-05-31 17:59:45
+工作目录: /Users/lzy/pro/solo/workspaces/zy71999/test scripts with space
+执行命令: sh cleanup.sh
+退出码: 0
+备注: 路径有空格但执行成功
+判定原因: 路径有空格但脚本执行成功，建议后续修复路径
+  问题列表:
+    - [WARNING] space_in_path: 路径包含空格，可能导致脚本执行异常
+
+记录ID: 2441b34786120e86
+执行时间: 2026-05-31 18:04:45
+工作目录: /Users/lzy/pro/solo/workspaces/zy71999/test_scripts
+执行命令: python data_load.py
+退出码: 1
+失败原因: SyntaxError: invalid syntax at line 42
+判定原因: 无明确判定依据
+  问题列表:
+    - [WARNING] script_failed: 脚本执行失败（退出码 1），已记录失败原因
+输出文件: loaded_data.txt
+
+记录ID: 146b1fa729442840
+执行时间: 2026-05-31 18:08:25
+工作目录: /Users/lzy/pro/solo/workspaces/zy71999/test_scripts
+执行命令: python batch_process.py --date 20240528
+退出码: 0
+补跑记录: 是 (原记录: 1b435e7fbb8c2f82)
+备注: 值班人李四补跑，清理锁文件后成功
+失败原因: 临时文件锁定
+判定原因: 补跑成功，已标记为重跑
+  问题列表:
+    - [ERROR] missing_output: 脚本声称成功但输出文件缺失: result_20240528.csv
+    - [WARNING] old_script_version: 脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新
+输出文件: result_20240528.csv
+
+============================================================
+操作建议
+============================================================
+
+【要补跑】的脚本可以尝试重新执行:
+  - 7c215d1a3e324d84: cd /Users/lzy/pro/solo/workspaces/zy71999/test_scripts && python batch_process.py --date 20240530
+  - e0935a8d4ce59458: cd /Users/lzy/pro/solo/workspaces/zy71999/test_scripts && python report_gen.py
+  - 763cad69f820e448: cd /Users/lzy/pro/solo/workspaces/zy71999/test_scripts && python batch_process.py --date 20240529
+  - d03ebca17055b76f: cd /Users/lzy/pro/solo/workspaces/zy71999/test_scripts && python report_gen.py
+  - 4c439c7c1594bc8d: cd /Users/lzy/pro/solo/workspaces/zy71999/test_scripts && python batch_process.py --date 20240527
+
+============================================================

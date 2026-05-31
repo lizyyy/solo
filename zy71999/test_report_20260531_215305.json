@@ -1,0 +1,441 @@
+{
+  "generated_at": "2026-05-31T21:53:05.890987",
+  "summary": {
+    "total": 9,
+    "ok": 4,
+    "rerun": 5,
+    "ask_dev": 0
+  },
+  "classifications": [
+    {
+      "record_id": "7c215d1a3e324d84",
+      "category": "rerun",
+      "category_label": "要补跑",
+      "reasons": [
+        "脚本退出码为0但输出文件缺失"
+      ],
+      "issues": [
+        {
+          "record_id": "7c215d1a3e324d84",
+          "issue_type": "missing_output",
+          "message": "脚本声称成功但输出文件缺失: result.csv",
+          "severity": "error",
+          "details": {
+            "missing_files": [
+              "result.csv"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "50f4190f4fa7b798",
+      "category": "ok",
+      "category_label": "不用动",
+      "reasons": [
+        "无明确判定依据"
+      ],
+      "issues": [
+        {
+          "record_id": "50f4190f4fa7b798",
+          "issue_type": "old_script_version",
+          "message": "脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新",
+          "severity": "warning",
+          "details": {
+            "previous_id": "7c215d1a3e324d84",
+            "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8"
+          }
+        },
+        {
+          "record_id": "50f4190f4fa7b798",
+          "issue_type": "script_failed",
+          "message": "脚本执行失败（退出码 1），已记录失败原因",
+          "severity": "warning",
+          "details": {
+            "exit_code": 1,
+            "failure_reason": "网络超时，连接数据库失败"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "e0935a8d4ce59458",
+      "category": "rerun",
+      "category_label": "要补跑",
+      "reasons": [
+        "脚本执行失败，未记录失败原因"
+      ],
+      "issues": [
+        {
+          "record_id": "e0935a8d4ce59458",
+          "issue_type": "script_failed",
+          "message": "脚本执行失败（退出码 1），未记录失败原因",
+          "severity": "error",
+          "details": {
+            "exit_code": 1,
+            "failure_reason": ""
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "44f42751e352e739",
+      "category": "ok",
+      "category_label": "不用动",
+      "reasons": [
+        "路径有空格但脚本执行成功，建议后续修复路径"
+      ],
+      "issues": [
+        {
+          "record_id": "44f42751e352e739",
+          "issue_type": "space_in_path",
+          "message": "路径包含空格，可能导致脚本执行异常",
+          "severity": "warning",
+          "details": {
+            "affected_paths": [
+              "cwd: /Users/lzy/pro/solo/workspaces/zy71999/test scripts with space"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "763cad69f820e448",
+      "category": "rerun",
+      "category_label": "要补跑",
+      "reasons": [
+        "脚本退出码为0但输出文件缺失"
+      ],
+      "issues": [
+        {
+          "record_id": "763cad69f820e448",
+          "issue_type": "missing_output",
+          "message": "脚本声称成功但输出文件缺失: result_20240529.csv",
+          "severity": "error",
+          "details": {
+            "missing_files": [
+              "result_20240529.csv"
+            ]
+          }
+        },
+        {
+          "record_id": "763cad69f820e448",
+          "issue_type": "old_script_version",
+          "message": "脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新",
+          "severity": "warning",
+          "details": {
+            "previous_id": "7c215d1a3e324d84",
+            "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "2441b34786120e86",
+      "category": "ok",
+      "category_label": "不用动",
+      "reasons": [
+        "无明确判定依据"
+      ],
+      "issues": [
+        {
+          "record_id": "2441b34786120e86",
+          "issue_type": "script_failed",
+          "message": "脚本执行失败（退出码 1），已记录失败原因",
+          "severity": "warning",
+          "details": {
+            "exit_code": 1,
+            "failure_reason": "SyntaxError: invalid syntax at line 42"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "d03ebca17055b76f",
+      "category": "rerun",
+      "category_label": "要补跑",
+      "reasons": [
+        "脚本退出码为0但输出文件缺失"
+      ],
+      "issues": [
+        {
+          "record_id": "d03ebca17055b76f",
+          "issue_type": "missing_output",
+          "message": "脚本声称成功但输出文件缺失: report_weekly.pdf",
+          "severity": "error",
+          "details": {
+            "missing_files": [
+              "report_weekly.pdf"
+            ]
+          }
+        },
+        {
+          "record_id": "d03ebca17055b76f",
+          "issue_type": "duplicate_run",
+          "message": "同一脚本在510秒内被重复执行",
+          "severity": "warning",
+          "details": {
+            "original_id": "e0935a8d4ce59458",
+            "original_time": "2026-05-31T17:58:05.629744",
+            "duplicate_time": "2026-05-31T18:06:35.629744",
+            "time_diff_seconds": 510.0
+          }
+        },
+        {
+          "record_id": "d03ebca17055b76f",
+          "issue_type": "old_script_version",
+          "message": "脚本使用的是旧版本（与2026-05-31 17:58版本相同），可能是回滚后未更新",
+          "severity": "warning",
+          "details": {
+            "previous_id": "e0935a8d4ce59458",
+            "script_hash": "eab7fb5100b336e1bb7c9d78bdc03222759273ab8a013ebb00aab50673ae9407"
+          }
+        },
+        {
+          "record_id": "d03ebca17055b76f",
+          "issue_type": "suspicious_success",
+          "message": "该脚本之前510秒内有失败记录，本次成功请确认是否为补跑",
+          "severity": "warning",
+          "details": {
+            "failed_record_id": "e0935a8d4ce59458",
+            "time_diff_seconds": 510.0,
+            "previous_exit_code": 1
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "146b1fa729442840",
+      "category": "ok",
+      "category_label": "不用动",
+      "reasons": [
+        "补跑成功，已标记为重跑"
+      ],
+      "issues": [
+        {
+          "record_id": "146b1fa729442840",
+          "issue_type": "missing_output",
+          "message": "脚本声称成功但输出文件缺失: result_20240528.csv",
+          "severity": "error",
+          "details": {
+            "missing_files": [
+              "result_20240528.csv"
+            ]
+          }
+        },
+        {
+          "record_id": "146b1fa729442840",
+          "issue_type": "old_script_version",
+          "message": "脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新",
+          "severity": "warning",
+          "details": {
+            "previous_id": "7c215d1a3e324d84",
+            "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8"
+          }
+        }
+      ]
+    },
+    {
+      "record_id": "4c439c7c1594bc8d",
+      "category": "rerun",
+      "category_label": "要补跑",
+      "reasons": [
+        "脚本退出码为0但输出文件缺失"
+      ],
+      "issues": [
+        {
+          "record_id": "4c439c7c1594bc8d",
+          "issue_type": "missing_output",
+          "message": "脚本声称成功但输出文件缺失: result_20240527_missing.csv",
+          "severity": "error",
+          "details": {
+            "missing_files": [
+              "result_20240527_missing.csv"
+            ]
+          }
+        },
+        {
+          "record_id": "4c439c7c1594bc8d",
+          "issue_type": "old_script_version",
+          "message": "脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新",
+          "severity": "warning",
+          "details": {
+            "previous_id": "7c215d1a3e324d84",
+            "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8"
+          }
+        }
+      ]
+    }
+  ],
+  "all_issues": [
+    {
+      "record_id": "e0935a8d4ce59458",
+      "issue_type": "script_failed",
+      "message": "脚本执行失败（退出码 1），未记录失败原因",
+      "severity": "error",
+      "details": {
+        "exit_code": 1,
+        "failure_reason": ""
+      }
+    },
+    {
+      "record_id": "7c215d1a3e324d84",
+      "issue_type": "missing_output",
+      "message": "脚本声称成功但输出文件缺失: result.csv",
+      "severity": "error",
+      "details": {
+        "missing_files": [
+          "result.csv"
+        ]
+      }
+    },
+    {
+      "record_id": "763cad69f820e448",
+      "issue_type": "missing_output",
+      "message": "脚本声称成功但输出文件缺失: result_20240529.csv",
+      "severity": "error",
+      "details": {
+        "missing_files": [
+          "result_20240529.csv"
+        ]
+      }
+    },
+    {
+      "record_id": "d03ebca17055b76f",
+      "issue_type": "missing_output",
+      "message": "脚本声称成功但输出文件缺失: report_weekly.pdf",
+      "severity": "error",
+      "details": {
+        "missing_files": [
+          "report_weekly.pdf"
+        ]
+      }
+    },
+    {
+      "record_id": "146b1fa729442840",
+      "issue_type": "missing_output",
+      "message": "脚本声称成功但输出文件缺失: result_20240528.csv",
+      "severity": "error",
+      "details": {
+        "missing_files": [
+          "result_20240528.csv"
+        ]
+      }
+    },
+    {
+      "record_id": "4c439c7c1594bc8d",
+      "issue_type": "missing_output",
+      "message": "脚本声称成功但输出文件缺失: result_20240527_missing.csv",
+      "severity": "error",
+      "details": {
+        "missing_files": [
+          "result_20240527_missing.csv"
+        ]
+      }
+    },
+    {
+      "record_id": "44f42751e352e739",
+      "issue_type": "space_in_path",
+      "message": "路径包含空格，可能导致脚本执行异常",
+      "severity": "warning",
+      "details": {
+        "affected_paths": [
+          "cwd: /Users/lzy/pro/solo/workspaces/zy71999/test scripts with space"
+        ]
+      }
+    },
+    {
+      "record_id": "d03ebca17055b76f",
+      "issue_type": "duplicate_run",
+      "message": "同一脚本在510秒内被重复执行",
+      "severity": "warning",
+      "details": {
+        "original_id": "e0935a8d4ce59458",
+        "original_time": "2026-05-31T17:58:05.629744",
+        "duplicate_time": "2026-05-31T18:06:35.629744",
+        "time_diff_seconds": 510.0
+      }
+    },
+    {
+      "record_id": "50f4190f4fa7b798",
+      "issue_type": "old_script_version",
+      "message": "脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新",
+      "severity": "warning",
+      "details": {
+        "previous_id": "7c215d1a3e324d84",
+        "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8"
+      }
+    },
+    {
+      "record_id": "763cad69f820e448",
+      "issue_type": "old_script_version",
+      "message": "脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新",
+      "severity": "warning",
+      "details": {
+        "previous_id": "7c215d1a3e324d84",
+        "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8"
+      }
+    },
+    {
+      "record_id": "146b1fa729442840",
+      "issue_type": "old_script_version",
+      "message": "脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新",
+      "severity": "warning",
+      "details": {
+        "previous_id": "7c215d1a3e324d84",
+        "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8"
+      }
+    },
+    {
+      "record_id": "4c439c7c1594bc8d",
+      "issue_type": "old_script_version",
+      "message": "脚本使用的是旧版本（与2026-05-31 17:53版本相同），可能是回滚后未更新",
+      "severity": "warning",
+      "details": {
+        "previous_id": "7c215d1a3e324d84",
+        "script_hash": "d9e9bfbfba240326b943a490438c78cdda594779f9b5f507302ecb5d5b18e7c8"
+      }
+    },
+    {
+      "record_id": "d03ebca17055b76f",
+      "issue_type": "old_script_version",
+      "message": "脚本使用的是旧版本（与2026-05-31 17:58版本相同），可能是回滚后未更新",
+      "severity": "warning",
+      "details": {
+        "previous_id": "e0935a8d4ce59458",
+        "script_hash": "eab7fb5100b336e1bb7c9d78bdc03222759273ab8a013ebb00aab50673ae9407"
+      }
+    },
+    {
+      "record_id": "50f4190f4fa7b798",
+      "issue_type": "script_failed",
+      "message": "脚本执行失败（退出码 1），已记录失败原因",
+      "severity": "warning",
+      "details": {
+        "exit_code": 1,
+        "failure_reason": "网络超时，连接数据库失败"
+      }
+    },
+    {
+      "record_id": "2441b34786120e86",
+      "issue_type": "script_failed",
+      "message": "脚本执行失败（退出码 1），已记录失败原因",
+      "severity": "warning",
+      "details": {
+        "exit_code": 1,
+        "failure_reason": "SyntaxError: invalid syntax at line 42"
+      }
+    },
+    {
+      "record_id": "d03ebca17055b76f",
+      "issue_type": "suspicious_success",
+      "message": "该脚本之前510秒内有失败记录，本次成功请确认是否为补跑",
+      "severity": "warning",
+      "details": {
+        "failed_record_id": "e0935a8d4ce59458",
+        "time_diff_seconds": 510.0,
+        "previous_exit_code": 1
+      }
+    }
+  ]
+}
