@@ -1,0 +1,56 @@
+{
+  "windows": [
+    {
+      "id": "w1",
+      "stationName": "喀什站",
+      "startTime": "2026-06-01T08:00:00Z",
+      "endTime": "2026-06-01T09:30:00Z",
+      "timeSystem": "UTC",
+      "description": "卫星A过境"
+    },
+    {
+      "id": "w2",
+      "stationName": "喀什站",
+      "startTime": "2026-06-01T09:00:00Z",
+      "endTime": "2026-06-01T10:30:00Z",
+      "timeSystem": "UTC",
+      "description": "卫星B过境"
+    },
+    {
+      "id": "w3",
+      "stationName": "文昌站",
+      "startTime": "2026-06-01T10:00:00Z",
+      "endTime": "2026-06-01T11:00:00Z",
+      "timeSystem": "BJT",
+      "description": "卫星C测控"
+    },
+    {
+      "id": "w4",
+      "stationName": "渭南站",
+      "startTime": "2026-06-01T12:00:00Z",
+      "endTime": "2026-06-01T13:00:00Z",
+      "timeSystem": "UTC",
+      "description": "卫星D数传"
+    }
+  ],
+  "telemetrySegments": [
+    {
+      "id": "t1",
+      "stationName": "喀什站",
+      "startTime": "2026-06-01T08:00:00Z",
+      "endTime": "2026-06-01T09:30:00Z",
+      "timeSystem": "UTC",
+      "expectedFrames": 900,
+      "actualFrames": 876
+    },
+    {
+      "id": "t2",
+      "stationName": "文昌站",
+      "startTime": "2026-06-01T10:00:00Z",
+      "endTime": "2026-06-01T11:00:00Z",
+      "timeSystem": "UTC",
+      "expectedFrames": 600,
+      "actualFrames": 600
+    }
+  ]
+}
