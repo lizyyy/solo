@@ -1,0 +1,167 @@
+{
+  "header": {
+    "report_title": "弹簧振子实验批改表",
+    "generated_at": "2026-05-31 15:09:49",
+    "student_name": "王五",
+    "student_id": "2024003"
+  },
+  "processing_policy": "数据处理口径：\n1. 物理有效性检查：质量范围 0-0.5kg，周期范围 0.3-5.0s\n2. 零点漂移检测阈值：1.0mm，检测到自动修正\n3. 异常值检测：3.0σ 原则，标记为待补\n4. 重复数据：自动去重，保留最新记录\n5. 标定校正：如有标定表，自动应用实际质量校正\n6. 人工更正：保留原始值，应用更正后的值，标注更正原因",
+  "summary": {
+    "total_records": 5,
+    "confirmed": 3,
+    "pending": 0,
+    "manual_corrected": 2,
+    "duplicate": 0,
+    "invalid": 0,
+    "used_for_fitting": 5,
+    "data_gaps": 1
+  },
+  "warnings": [
+    "记录 91ae8c7e-1460-4e7b-ac03-7e29911b13d1的振幅 5.0 cm 太大了，超过了建议的 2.0 cm",
+    "已应用 2 条人工更正，原始值已保记录中备查",
+    "拟合效果不太好，R² = 0.2003，建议至少要达到 0.99"
+  ],
+  "errors": [],
+  "confirmed_records": [
+    {
+      "record_id": "34d6a058-3d75-42e5-b2e9-6f9809b09350",
+      "student_id": "2024003",
+      "student_name": "王五",
+      "experiment_date": "2024-03-15T00:00:00",
+      "mass_kg": 0.05,
+      "period_s": 0.3251,
+      "amplitude_cm": 1.8,
+      "spring_extension_mm": 0.0,
+      "status": "confirmed",
+      "status_display": "已确认",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "notes": "",
+      "manual_correction_reason": ""
+    },
+    {
+      "record_id": "a1eafbd0-9735-4002-849a-c73299d5b5f3",
+      "student_id": "2024003",
+      "student_name": "王五",
+      "experiment_date": "2024-03-15T00:00:00",
+      "mass_kg": 0.1,
+      "period_s": 0.4524,
+      "amplitude_cm": 1.9,
+      "spring_extension_mm": 0.0,
+      "status": "confirmed",
+      "status_display": "已确认",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "notes": "",
+      "manual_correction_reason": ""
+    },
+    {
+      "record_id": "141cabac-e3be-4cbb-b16b-198b8b4c5483",
+      "student_id": "2024003",
+      "student_name": "王五",
+      "experiment_date": "2024-03-15T00:00:00",
+      "mass_kg": 0.2,
+      "period_s": 0.6411,
+      "amplitude_cm": 1.7,
+      "spring_extension_mm": 0.0,
+      "status": "confirmed",
+      "status_display": "已确认",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "notes": "",
+      "manual_correction_reason": ""
+    }
+  ],
+  "pending_records": [],
+  "manual_corrected_records": [
+    {
+      "record_id": "91ae8c7e-1460-4e7b-ac03-7e29911b13d1",
+      "student_id": "2024003",
+      "student_name": "王五",
+      "experiment_date": "2024-03-15T00:00:00",
+      "mass_kg": 0.15,
+      "period_s": 1.5,
+      "amplitude_cm": 5.0,
+      "spring_extension_mm": 0.0,
+      "status": "manual_corrected",
+      "status_display": "人工更正",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "notes": "原记录1.2s，笔误更正为1.5s [警告] 记录 91ae8c7e-1460-4e7b-ac03-7e29911b13d1的振幅 5.0 cm 太大了，超过了建议的 2.0 cm",
+      "manual_correction_reason": ""
+    },
+    {
+      "record_id": "d8f5dd64-b6e8-4a34-accc-ebd6742f5115",
+      "student_id": "2024003",
+      "student_name": "王五",
+      "experiment_date": "2024-03-15T00:00:00",
+      "mass_kg": 0.25,
+      "period_s": 0.8,
+      "amplitude_cm": 1.9,
+      "spring_extension_mm": 0.0,
+      "status": "manual_corrected",
+      "status_display": "人工更正",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "notes": "原记录0.8s，单位换算错误",
+      "manual_correction_reason": ""
+    }
+  ],
+  "fit_result": {
+    "spring_constant_k": 9.4552,
+    "spring_constant_uncertainty": 19.5586,
+    "equivalent_mass_kg": -0.009411,
+    "equivalent_mass_uncertainty": 0.24007,
+    "r_squared": 0.200316,
+    "chi_squared": 3.9984,
+    "degrees_of_freedom": 3,
+    "fit_method": "非线性最小二乘拟合 (Levenberg-Marquardt)",
+    "used_records_count": 5,
+    "mass_range_kg": [
+      0.05,
+      0.25
+    ],
+    "period_range_s": [
+      0.3251,
+      1.5
+    ],
+    "formula": "T = 2π√[(m + m₀) / k]",
+    "notes": "弹簧劲度系数 k = 9.455 ± 19.559 N/m, 等效质量 m₀ = -9.41 ± 240.07 g"
+  },
+  "data_gaps": [
+    {
+      "gap_id": "f397a9a6-e5ba-4e98-80f4-8edfa3d73c2c",
+      "gap_type": "mass_point_gap",
+      "gap_type_display": "质量点采样缺口",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "description": "缺少 2 个质量点的测量数据：0.3kg, 0.35kg",
+      "affected_mass_points": [
+        0.3,
+        0.35
+      ],
+      "missing_record_ids": [],
+      "responsible_person": "请联系做实验的同学补充该质量点的测量数据",
+      "next_step": "请补充质量点 0.3kg, 0.35kg 的完整测量数据",
+      "severity": "warning"
+    }
+  ],
+  "gap_summary": {
+    "total": 1,
+    "by_severity": {
+      "warning": 1
+    },
+    "by_type": {
+      "质量点采样缺口": 1
+    }
+  },
+  "calibration_summary": null,
+  "grading_remarks": [
+    "有效数据点偏少（3个），建议补充更多测量数据。",
+    "有 2 条记录被人工更正，请注意核对修改原因。",
+    "存在 1 个数据缺口，建议补充以提高拟合精度。",
+    "拟合效果较差（R² = 0.200316），建议检查实验操作或重新测量。",
+    "测得弹簧劲度系数 k = 9.455 ± 19.559 N/m",
+    "弹簧等效质量 m₀ = -9.41 ± 240.07 g"
+  ]
+}

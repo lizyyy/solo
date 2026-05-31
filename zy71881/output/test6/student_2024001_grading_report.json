@@ -1,0 +1,210 @@
+{
+  "header": {
+    "report_title": "弹簧振子实验批改表",
+    "generated_at": "2026-05-31 15:07:40",
+    "student_name": "张三",
+    "student_id": "2024001"
+  },
+  "processing_policy": "数据处理口径：\n1. 物理有效性检查：质量范围 0-0.5kg，周期范围 0.3-5.0s\n2. 零点漂移检测阈值：1.0mm，检测到自动修正\n3. 异常值检测：3.0σ 原则，标记为待补\n4. 重复数据：自动去重，保留最新记录\n5. 标定校正：如有标定表，自动应用实际质量校正\n6. 人工更正：保留原始值，应用更正后的值，标注更正原因",
+  "summary": {
+    "total_records": 9,
+    "confirmed": 8,
+    "pending": 0,
+    "manual_corrected": 0,
+    "duplicate": 0,
+    "invalid": 1,
+    "used_for_fitting": 8,
+    "data_gaps": 0
+  },
+  "warnings": [
+    "已合并 2 条晚到附件数据，请确认这些数据是否需要覆盖原有记录",
+    "晚到附件处理完成：覆盖 0 条，新增 2 条",
+    "记录 1c3d58ca-4ff5-4385-90f2-eb861cd9ea27的振幅 2.1 cm 太大了，超过了建议的 2.0 cm",
+    "已应用标定校正，共修正 6 条记录的质量值"
+  ],
+  "errors": [
+    "记录 2e616864-d1fb-4e7a-a223-5971235b25a9: 记录 2e616864-d1fb-4e7a-a223-5971235b25a9的周期是负数：0.0 秒"
+  ],
+  "confirmed_records": [
+    {
+      "record_id": "65290d65-eef4-4255-a85f-e6b87c588eeb",
+      "student_id": "2024001",
+      "student_name": "张三",
+      "experiment_date": "2024-03-15T00:00:00",
+      "mass_kg": 0.0498,
+      "period_s": 0.332,
+      "amplitude_cm": 1.8,
+      "spring_extension_mm": 0.0,
+      "status": "confirmed",
+      "status_display": "已确认",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "notes": " [标定校正] 质量从 0.05kg 校正为 0.0498kg",
+      "manual_correction_reason": ""
+    },
+    {
+      "record_id": "06817093-ea53-4f82-906e-1df9e0ff5727",
+      "student_id": "2024001",
+      "student_name": "张三",
+      "experiment_date": "2024-03-15T00:00:00",
+      "mass_kg": 0.1,
+      "period_s": 0.4546,
+      "amplitude_cm": 1.9,
+      "spring_extension_mm": 0.0,
+      "status": "confirmed",
+      "status_display": "已确认",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "notes": "",
+      "manual_correction_reason": ""
+    },
+    {
+      "record_id": "a331acde-5026-40d6-9008-0bb97e65c3c2",
+      "student_id": "2024001",
+      "student_name": "张三",
+      "experiment_date": "2024-03-15T00:00:00",
+      "mass_kg": 0.15,
+      "period_s": 0.5564,
+      "amplitude_cm": 2.0,
+      "spring_extension_mm": 0.0,
+      "status": "confirmed",
+      "status_display": "已确认",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "notes": "",
+      "manual_correction_reason": ""
+    },
+    {
+      "record_id": "ce423c29-9316-415c-be49-a3fd32e2580a",
+      "student_id": "2024001",
+      "student_name": "张三",
+      "experiment_date": "2024-03-15T00:00:00",
+      "mass_kg": 0.1998,
+      "period_s": 0.6437,
+      "amplitude_cm": 1.7,
+      "spring_extension_mm": 0.0,
+      "status": "confirmed",
+      "status_display": "已确认",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "notes": "计时器反应稍慢 [标定校正] 质量从 0.2kg 校正为 0.1998kg",
+      "manual_correction_reason": ""
+    },
+    {
+      "record_id": "1c3d58ca-4ff5-4385-90f2-eb861cd9ea27",
+      "student_id": "2024001",
+      "student_name": "张三",
+      "experiment_date": "2024-03-15T00:00:00",
+      "mass_kg": 0.2502,
+      "period_s": 0.7083,
+      "amplitude_cm": 2.1,
+      "spring_extension_mm": 0.0,
+      "status": "confirmed",
+      "status_display": "已确认",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "notes": " [警告] 记录 1c3d58ca-4ff5-4385-90f2-eb861cd9ea27的振幅 2.1 cm 太大了，超过了建议的 2.0 cm [标定校正] 质量从 0.25kg 校正为 0.2502kg",
+      "manual_correction_reason": ""
+    },
+    {
+      "record_id": "3dec3b21-8ed2-4b86-a836-0966d33ccc7f",
+      "student_id": "2024001",
+      "student_name": "张三",
+      "experiment_date": "2024-03-15T00:00:00",
+      "mass_kg": 0.3503,
+      "period_s": 0.845,
+      "amplitude_cm": 1.9,
+      "spring_extension_mm": 0.0,
+      "status": "confirmed",
+      "status_display": "已确认",
+      "source": "experiment",
+      "source_display": "实验记录",
+      "notes": " [标定校正] 质量从 0.35kg 校正为 0.3503kg",
+      "manual_correction_reason": ""
+    },
+    {
+      "record_id": "1a214a77-d51e-4280-b913-615fdc66f577",
+      "student_id": "2024001",
+      "student_name": "张三",
+      "experiment_date": "2024-03-16T00:00:00",
+      "mass_kg": 0.3002,
+      "period_s": 0.7727,
+      "amplitude_cm": 1.8,
+      "spring_extension_mm": 0.0,
+      "status": "confirmed",
+      "status_display": "已确认",
+      "source": "late_attachment",
+      "source_display": "晚到附件",
+      "notes": "晚交数据 [标定校正] 质量从 0.3kg 校正为 0.3002kg",
+      "manual_correction_reason": ""
+    },
+    {
+      "record_id": "a8c3a08e-feae-40cb-a5e7-250b547c876b",
+      "student_id": "2024001",
+      "student_name": "张三",
+      "experiment_date": "2024-03-16T00:00:00",
+      "mass_kg": 0.3999,
+      "period_s": 0.8971,
+      "amplitude_cm": 1.9,
+      "spring_extension_mm": 0.0,
+      "status": "confirmed",
+      "status_display": "已确认",
+      "source": "late_attachment",
+      "source_display": "晚到附件",
+      "notes": "补充测量 [标定校正] 质量从 0.4kg 校正为 0.3999kg",
+      "manual_correction_reason": ""
+    }
+  ],
+  "pending_records": [],
+  "manual_corrected_records": [],
+  "fit_result": {
+    "spring_constant_k": 19.898,
+    "spring_constant_uncertainty": 36.5537,
+    "equivalent_mass_kg": 0.005456,
+    "equivalent_mass_uncertainty": 0.348122,
+    "r_squared": 0.999563,
+    "chi_squared": 0.0035,
+    "degrees_of_freedom": 6,
+    "fit_method": "非线性最小二乘拟合 (Levenberg-Marquardt)",
+    "used_records_count": 8,
+    "mass_range_kg": [
+      0.0498,
+      0.3999
+    ],
+    "period_range_s": [
+      0.332,
+      0.8971
+    ],
+    "formula": "T = 2π√[(m + m₀) / k]",
+    "notes": "弹簧劲度系数 k = 19.898 ± 36.554 N/m, 等效质量 m₀ = 5.46 ± 348.12 g"
+  },
+  "data_gaps": [],
+  "gap_summary": {
+    "total": 0,
+    "by_severity": {},
+    "by_type": {}
+  },
+  "calibration_summary": {
+    "total_records": 8,
+    "valid_records": 8,
+    "mass_points": [
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.35,
+      0.4
+    ],
+    "spring_ids": [
+      "SPR-001"
+    ]
+  },
+  "grading_remarks": [
+    "数据量充足，可用于可靠拟合。",
+    "拟合效果优秀（R² = 0.999563），数据一致性很好。",
+    "测得弹簧劲度系数 k = 19.898 ± 36.554 N/m",
+    "弹簧等效质量 m₀ = 5.46 ± 348.12 g"
+  ]
+}
