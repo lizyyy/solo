@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>风电场塔筒漫游</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="app-header">
+    <h1>风电场塔筒漫游</h1>
+    <div class="header-info">
+      <span id="point-count">点位: 0</span>
+      <span id="model-count">模型: 0</span>
+      <span id="inspection-count">巡检: 0</span>
+      <span id="flag-count" class="flag-badge">待处理: 0</span>
+    </div>
+  </header>
+
+  <nav id="app-nav">
+    <button class="nav-btn active" data-tab="import">导入</button>
+    <button class="nav-btn" data-tab="review">复核</button>
+    <button class="nav-btn" data-tab="correct">修正</button>
+    <button class="nav-btn" data-tab="history">历史</button>
+    <button class="nav-btn" data-tab="export">导出</button>
+  </nav>
+
+  <main id="app-main">
+    <div id="scene-panel">
+      <canvas id="three-canvas"></canvas>
+      <div id="scene-legend">
+        <span class="legend-item"><span class="dot dot-ok"></span>正常</span>
+        <span class="legend-item"><span class="dot dot-flag"></span>标记</span>
+        <span class="legend-item"><span class="dot dot-warn"></span>边界</span>
+        <span class="legend-item"><span class="dot dot-unknown"></span>未知</span>
+      </div>
+    </div>
+
+    <div id="detail-panel">
+      <div id="tab-import" class="tab-content active">
+        <section class="import-section">
+          <h3>CAD点位数据</h3>
+          <p class="section-desc">支持 JSON 格式，字段: id, name, x, z, elevation, type</p>
+          <input type="file" id="import-cad" accept=".json,.csv" multiple>
+          <button id="btn-load-sample-cad" class="btn btn-sm">加载示例</button>
+        </section>
+        <section class="import-section">
+          <h3>模型清单</h3>
+          <p class="section-desc">支持 JSON 格式，字段: id, name, hubHeight, rotorDiameter, ratedPower</p>
+          <input type="file" id="import-model" accept=".json,.csv" multiple>
+          <button id="btn-load-sample-model" class="btn btn-sm">加载示例</button>
+        </section>
+        <section class="import-section">
+          <h3>巡检照片</h3>
+          <p class="section-desc">支持 JSON 格式或图片文件。JSON 字段: id, pointId, date, result, findings, inspector, photoFiles</p>
+          <input type="file" id="import-inspection" accept=".json,.csv,.jpg,.jpeg,.png" multiple>
+          <button id="btn-load-sample-inspection" class="btn btn-sm">加载示例</button>
+        </section>
+        <section class="import-section">
+          <button id="btn-load-all-sample" class="btn btn-primary">一键加载全部示例数据</button>
+          <button id="btn-clear-all" class="btn btn-danger">清空所有数据</button>
+        </section>
+        <div id="import-log" class="log-area"></div>
+      </div>
+
+      <div id="tab-review" class="tab-content">
+        <div class="review-toolbar">
+          <select id="review-filter">
+            <option value="all">全部</option>
+            <option value="ok">正常</option>
+            <option value="flagged">有标记</option>
+            <option value="no-model">缺模型</option>
+            <option value="no-inspection">未巡检</option>
+            <option value="duplicate-photo">重复照片</option>
+            <option value="boundary">边界</option>
+            <option value="overlap">点位重叠</option>
+          </select>
+          <button id="btn-run-judge" class="btn btn-primary">执行自动判断</button>
+        </div>
+        <div id="review-list" class="review-list"></div>
+      </div>
+
+      <div id="tab-correct" class="tab-content">
+        <div id="correct-empty" class="empty-hint">请先在复核页选择一个点位，或在3D场景中点击点位</div>
+        <div id="correct-form" class="correct-form" style="display:none">
+          <h3 id="correct-point-title"></h3>
+          <div class="form-group">
+            <label>点位ID</label>
+            <input type="text" id="correct-id" readonly>
+          </div>
+          <div class="form-group">
+            <label>点位名称</label>
+            <input type="text" id="correct-name">
+          </div>
+          <div class="form-group">
+            <label>坐标 X</label>
+            <input type="number" id="correct-x" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>坐标 Z</label>
+            <input type="number" id="correct-z" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>高程</label>
+            <input type="number" id="correct-elevation" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>关联模型</label>
+            <select id="correct-model"></select>
+          </div>
+          <div class="form-group">
+            <label>人工确认状态</label>
+            <select id="correct-confirm-status">
+              <option value="pending">待确认</option>
+              <option value="confirmed">已确认</option>
+              <option value="rejected">驳回</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>修正说明（必填）</label>
+            <textarea id="correct-reason" rows="3" placeholder="说明修正原因和下一步操作"></textarea>
+          </div>
+          <div class="form-group">
+            <label>巡检记录</label>
+            <div id="correct-inspections"></div>
+          </div>
+          <div class="form-group">
+            <label>添加巡检照片</label>
+            <input type="file" id="correct-add-photo" accept=".jpg,.jpeg,.png" multiple>
+          </div>
+          <button id="btn-save-correct" class="btn btn-primary">保存修正</button>
+        </div>
+      </div>
+
+      <div id="tab-history" class="tab-content">
+        <div class="history-toolbar">
+          <select id="history-filter">
+            <option value="all">全部操作</option>
+            <option value="import">导入</option>
+            <option value="auto_judge">自动判断</option>
+            <option value="manual_confirm">人工确认</option>
+            <option value="correct">修正</option>
+            <option value="export">导出</option>
+          </select>
+          <input type="text" id="history-search" placeholder="搜索点位ID或操作内容">
+        </div>
+        <div id="history-list" class="history-list"></div>
+      </div>
+
+      <div id="tab-export" class="tab-content">
+        <section class="export-section">
+          <h3>导出完整证据链</h3>
+          <p class="section-desc">包含: CAD点位 + 模型关联 + 巡检记录 + 人工确认 + 自动判断理由</p>
+          <div class="export-options">
+            <label><input type="checkbox" id="export-include-photos" checked> 包含照片数据(base64)</label>
+            <label><input type="checkbox" id="export-include-history" checked> 包含操作历史</label>
+          </div>
+          <button id="btn-export-json" class="btn btn-primary">导出 JSON</button>
+          <button id="btn-export-csv" class="btn btn-primary">导出 CSV (点位汇总)</button>
+          <button id="btn-export-report" class="btn btn-primary">导出判断报告</button>
+        </section>
+        <div id="export-preview" class="log-area"></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="judge-panel" class="judge-panel" style="display:none">
+    <div class="judge-header">
+      <h3>自动判断结果</h3>
+      <button id="btn-close-judge" class="btn-close">&times;</button>
+    </div>
+    <div id="judge-content" class="judge-content"></div>
+  </div>
+
+  <div id="toast-container"></div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

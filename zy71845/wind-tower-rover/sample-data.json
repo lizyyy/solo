@@ -1,0 +1,36 @@
+{
+  "points": [
+    { "id": "P001", "name": "WTG-A01", "x": 0, "z": 0, "elevation": 85.5, "type": "turbine", "linkedModelId": "M001" },
+    { "id": "P002", "name": "WTG-A02", "x": 500, "z": 100, "elevation": 82.3, "type": "turbine", "linkedModelId": "M002" },
+    { "id": "P003", "name": "WTG-B01", "x": 250, "z": 430, "elevation": 91.2, "type": "turbine", "linkedModelId": "M001" },
+    { "id": "P004", "name": "WTG-B02", "x": 750, "z": 430, "elevation": 88.7, "type": "turbine", "linkedModelId": "M003" },
+    { "id": "P005", "name": "WTG-C01", "x": 0, "z": 860, "elevation": 79.4, "type": "turbine" },
+    { "id": "P006", "name": "WTG-C02", "x": 500, "z": 860, "elevation": 83.1, "type": "turbine", "linkedModelId": "M002" },
+    { "id": "P007", "name": "WTG-A01-dup", "x": 0, "z": 0, "elevation": 85.5, "type": "turbine", "linkedModelId": "M001" },
+    { "id": "P008", "name": "WTG-D01", "x": 1200, "z": 1200, "elevation": 76.2, "type": "turbine" }
+  ],
+  "models": [
+    { "id": "M001", "name": "Vestas V90-2.0MW", "hubHeight": 80, "rotorDiameter": 90, "ratedPower": 2000 },
+    { "id": "M002", "name": "Goldwind GW121-2.5MW", "hubHeight": 90, "rotorDiameter": 121, "ratedPower": 2500 },
+    { "id": "M003", "name": "Envision EN-136/4.2", "hubHeight": 100, "rotorDiameter": 136, "ratedPower": 4200 }
+  ],
+  "inspections": [
+    { "id": "I001", "pointId": "P001", "date": "2024-03-15", "result": "pass", "findings": "塔筒外观正常，无锈蚀", "inspector": "张工", "photoFiles": ["tower_base_01.jpg"] },
+    { "id": "I002", "pointId": "P002", "date": "2024-03-16", "result": "pass", "findings": "正常", "inspector": "李工", "photoFiles": ["tower_base_01.jpg"] },
+    { "id": "I003", "pointId": "P006", "date": "2024-03-18", "result": "warning", "findings": "塔筒底部轻微锈蚀", "inspector": "张工", "photoFiles": ["blade_tip_01.jpg", "nacelle_02.jpg"] },
+    { "id": "I004", "pointId": "P005", "date": "2024-03-19", "result": "fail", "findings": "叶片裂纹需更换", "inspector": "王工", "photoFiles": ["blade_crack_01.jpg"] }
+  ],
+  "_readme": {
+    "description": "风电场塔筒漫游 - 测试数据集，覆盖以下边界情况:",
+    "testCases": {
+      "P001": "正常点位，有模型和巡检（但照片名tower_base_01.jpg与P002重复）",
+      "P002": "有模型和巡检，照片名与P001相同 → 触发[重复照片]判断",
+      "P003": "有模型，无巡检 → 触发[未巡检]判断",
+      "P004": "有模型，无巡检 → 触发[未巡检]判断",
+      "P005": "无模型，有巡检(fail) → 触发[缺模型]判断",
+      "P006": "正常点位，有模型和巡检(warning)",
+      "P007": "与P001坐标完全重叠(0,0) → 触发[点位重叠]判断",
+      "P008": "位于风场最远边界(1200,1200)，无模型无巡检 → 触发[边界]+[缺模型]+[未巡检]多重判断"
+    }
+  }
+}
