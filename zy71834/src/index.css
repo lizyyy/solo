@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Noto Sans SC', system-ui, sans-serif;
+    background-color: #1a1a1a;
+    color: #d1d5db;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #262626;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 0;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #525252;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 text-sm font-medium border border-border-default bg-bg-secondary text-text-primary transition-all duration-150 hover:bg-bg-tertiary hover:border-text-muted active:bg-bg-tertiary;
+  }
+
+  .btn-primary {
+    @apply bg-accent-military border-accent-military text-white hover:bg-accent-military-light hover:border-accent-military-light;
+  }
+
+  .btn-warning {
+    @apply bg-accent-warning border-accent-warning text-white hover:bg-accent-warning-light hover:border-accent-warning-light;
+  }
+
+  .card {
+    @apply bg-bg-secondary border border-border-default;
+  }
+
+  .card-header {
+    @apply px-4 py-3 border-b border-border-default font-medium text-text-primary;
+  }
+
+  .card-body {
+    @apply p-4;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-bg-primary border border-border-default text-text-primary text-sm focus:outline-none focus:border-accent-military transition-colors;
+  }
+
+  .label {
+    @apply block text-xs font-medium text-text-secondary mb-1;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium border;
+  }
+
+  .badge-normal {
+    @apply bg-bg-tertiary border-border-default text-text-secondary;
+  }
+
+  .badge-late {
+    @apply bg-amber-900/30 border-amber-700 text-amber-400;
+  }
+
+  .badge-duplicate {
+    @apply bg-purple-900/30 border-purple-700 text-purple-400;
+  }
+
+  .badge-manual {
+    @apply bg-accent-military/30 border-accent-military text-green-400;
+  }
+
+  .badge-pending {
+    @apply bg-accent-warning/20 border-accent-warning text-accent-warning-light animate-pulse-slow;
+  }
+
+  .badge-confirmed {
+    @apply bg-green-900/30 border-green-700 text-green-400;
+  }
+
+  .timeline-node {
+    @apply relative pl-6 pb-6 border-l border-border-default last:border-l-0 last:pb-0;
+  }
+
+  .timeline-node::before {
+    content: '';
+    @apply absolute left-[-5px] top-1 w-2 h-2 bg-text-muted border-2 border-bg-primary;
+  }
+
+  .timeline-node-active::before {
+    @apply bg-accent-military border-accent-military;
+  }
+
+  .timeline-node-anomaly::before {
+    @apply bg-accent-warning border-accent-warning animate-pulse;
+  }
+
+  .scroll-sync-container {
+    @apply overflow-x-auto overflow-y-hidden;
+    scroll-behavior: smooth;
+  }
+
+  .evidence-line {
+    @apply relative;
+  }
+
+  .evidence-line::after {
+    content: '';
+    @apply absolute top-1/2 left-0 w-full h-px bg-border-default;
+  }
+}
+
+@layer utilities {
+  .text-mono {
+    font-family: 'JetBrains Mono', Menlo, Monaco, monospace;
+  }
+
+  .transition-all-150 {
+    transition: all 150ms ease-in-out;
+  }
+
+  .transition-all-300 {
+    transition: all 300ms ease-in-out;
+  }
+
+  .grid-bg {
+    background-image: 
+      linear-gradient(rgba(64, 64, 64, 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(64, 64, 64, 0.3) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .noise-overlay {
+    position: relative;
+  }
+
+  .noise-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+}
