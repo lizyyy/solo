@@ -1,0 +1,448 @@
+{
+  "missions": [
+    {
+      "id": "2024-05-31-迎宾大道-张队长",
+      "date": "2024-05-31",
+      "routeName": "迎宾大道",
+      "pilot": "张队长",
+      "routeHash": "70c879eadd8cecacabcf84e334c8b02b",
+      "batteryHash": "950178eabe9675b1529cc28acb7d4b83",
+      "kmlFile": "sample-route.kml",
+      "batteryFile": "battery-log-modified.txt",
+      "analysis": {
+        "route": {
+          "waypointCount": 12,
+          "totalDistance": 7920.454526328941,
+          "maxAltitude": 125,
+          "waypoints": [
+            {
+              "lat": 30.65,
+              "lng": 104.06,
+              "alt": 120
+            },
+            {
+              "lat": 30.652,
+              "lng": 104.062,
+              "alt": 115
+            },
+            {
+              "lat": 30.654,
+              "lng": 104.064,
+              "alt": 118
+            },
+            {
+              "lat": 30.656,
+              "lng": 104.066,
+              "alt": 122
+            },
+            {
+              "lat": 30.658,
+              "lng": 104.068,
+              "alt": 120
+            },
+            {
+              "lat": 30.66,
+              "lng": 104.07,
+              "alt": 125
+            },
+            {
+              "lat": 30.662,
+              "lng": 104.072,
+              "alt": 118
+            },
+            {
+              "lat": 30.664,
+              "lng": 104.074,
+              "alt": 120
+            },
+            {
+              "lat": 30.666,
+              "lng": 104.076,
+              "alt": 122
+            },
+            {
+              "lat": 30.668,
+              "lng": 104.078,
+              "alt": 119
+            },
+            {
+              "lat": 30.65,
+              "lng": 104.06,
+              "alt": 120
+            },
+            {
+              "lat": 30.668,
+              "lng": 104.078,
+              "alt": 119
+            }
+          ]
+        },
+        "noFlyZone": {
+          "safe": false,
+          "violations": [
+            {
+              "zone": "市政府办公区",
+              "zoneId": "NFZ-001",
+              "level": "critical",
+              "minDistance": 146.67669765835248,
+              "closestPoint": {
+                "lat": 30.656,
+                "lng": 104.066,
+                "alt": 122
+              },
+              "message": "严重！航线进入\"市政府办公区\"禁飞区，最近只有 147 米"
+            },
+            {
+              "zone": "火车站周边",
+              "zoneId": "NFZ-002",
+              "level": "warning",
+              "minDistance": 586.6719371552384,
+              "closestPoint": {
+                "lat": 30.668,
+                "lng": 104.078,
+                "alt": 119
+              },
+              "message": "注意！航线擦到\"火车站周边\"边缘，最近距离 587 米"
+            },
+            {
+              "zone": "医院急救区",
+              "zoneId": "NFZ-003",
+              "level": "critical",
+              "minDistance": 293.36307440675836,
+              "closestPoint": {
+                "lat": 30.65,
+                "lng": 104.06,
+                "alt": 120
+              },
+              "message": "严重！航线进入\"医院急救区\"禁飞区，最近只有 293 米"
+            }
+          ],
+          "warnings": [],
+          "summary": "发现 3 处禁飞区冲突（含 2 个高危区域）"
+        },
+        "battery": {
+          "filename": "battery-log-modified.txt",
+          "records": [
+            {
+              "time": "08:00",
+              "batteryId": "BAT01",
+              "voltage": 23.5,
+              "capacity": 95,
+              "status": "normal"
+            },
+            {
+              "time": "08:30",
+              "batteryId": "BAT01",
+              "voltage": 23.2,
+              "capacity": 88,
+              "status": "normal"
+            },
+            {
+              "time": "09:00",
+              "batteryId": "BAT01",
+              "voltage": 22.9,
+              "capacity": 75,
+              "status": "normal"
+            },
+            {
+              "time": "09:30",
+              "batteryId": "BAT01",
+              "voltage": 22.6,
+              "capacity": 62,
+              "status": "normal"
+            },
+            {
+              "time": "10:00",
+              "batteryId": "BAT01",
+              "voltage": 22,
+              "capacity": 45,
+              "status": "warning"
+            },
+            {
+              "time": "10:30",
+              "batteryId": "BAT02",
+              "voltage": 23.4,
+              "capacity": 92,
+              "status": "normal"
+            },
+            {
+              "time": "11:00",
+              "batteryId": "BAT02",
+              "voltage": 23.1,
+              "capacity": 82,
+              "status": "normal"
+            },
+            {
+              "time": "11:30",
+              "batteryId": "BAT02",
+              "voltage": 22.8,
+              "capacity": 70,
+              "status": "normal"
+            },
+            {
+              "time": "12:00",
+              "batteryId": "BAT02",
+              "voltage": 22.5,
+              "capacity": 58,
+              "status": "normal"
+            }
+          ],
+          "summary": {
+            "batteryCount": 2,
+            "batteries": [
+              "BAT01",
+              "BAT02"
+            ],
+            "recordCount": 9,
+            "criticalCount": 0,
+            "warningCount": 1,
+            "lowestVoltage": 22,
+            "lowestCapacity": 45
+          },
+          "parsedAt": "2026-05-31T12:04:10.937Z"
+        },
+        "batterySafety": {
+          "safe": true,
+          "issues": [],
+          "summary": "电池状态良好"
+        },
+        "weather": {
+          "windSpeed": 3.2,
+          "visibility": 5000,
+          "condition": "晴"
+        },
+        "safe": false,
+        "analyzedAt": "2026-05-31T12:04:10.937Z"
+      },
+      "createdAt": "2026-05-31T12:04:10.904Z",
+      "updatedAt": "2026-05-31T12:04:10.938Z",
+      "version": 2
+    }
+  ],
+  "versions": {
+    "2024-05-31-迎宾大道-张队长": [
+      {
+        "version": 1,
+        "savedAt": "2026-05-31T12:04:10.904Z",
+        "mission": {
+          "id": "2024-05-31-迎宾大道-张队长",
+          "date": "2024-05-31",
+          "routeName": "迎宾大道",
+          "pilot": "张队长",
+          "routeHash": "70c879eadd8cecacabcf84e334c8b02b",
+          "batteryHash": "90b916b77efc73bafd3e18921c8bf139",
+          "kmlFile": "sample-route.kml",
+          "batteryFile": "battery-log.txt",
+          "analysis": {
+            "route": {
+              "waypointCount": 12,
+              "totalDistance": 7920.454526328941,
+              "maxAltitude": 125,
+              "waypoints": [
+                {
+                  "lat": 30.65,
+                  "lng": 104.06,
+                  "alt": 120
+                },
+                {
+                  "lat": 30.652,
+                  "lng": 104.062,
+                  "alt": 115
+                },
+                {
+                  "lat": 30.654,
+                  "lng": 104.064,
+                  "alt": 118
+                },
+                {
+                  "lat": 30.656,
+                  "lng": 104.066,
+                  "alt": 122
+                },
+                {
+                  "lat": 30.658,
+                  "lng": 104.068,
+                  "alt": 120
+                },
+                {
+                  "lat": 30.66,
+                  "lng": 104.07,
+                  "alt": 125
+                },
+                {
+                  "lat": 30.662,
+                  "lng": 104.072,
+                  "alt": 118
+                },
+                {
+                  "lat": 30.664,
+                  "lng": 104.074,
+                  "alt": 120
+                },
+                {
+                  "lat": 30.666,
+                  "lng": 104.076,
+                  "alt": 122
+                },
+                {
+                  "lat": 30.668,
+                  "lng": 104.078,
+                  "alt": 119
+                },
+                {
+                  "lat": 30.65,
+                  "lng": 104.06,
+                  "alt": 120
+                },
+                {
+                  "lat": 30.668,
+                  "lng": 104.078,
+                  "alt": 119
+                }
+              ]
+            },
+            "noFlyZone": {
+              "safe": false,
+              "violations": [
+                {
+                  "zone": "市政府办公区",
+                  "zoneId": "NFZ-001",
+                  "level": "critical",
+                  "minDistance": 146.67669765835248,
+                  "closestPoint": {
+                    "lat": 30.656,
+                    "lng": 104.066,
+                    "alt": 122
+                  },
+                  "message": "严重！航线进入\"市政府办公区\"禁飞区，最近只有 147 米"
+                },
+                {
+                  "zone": "火车站周边",
+                  "zoneId": "NFZ-002",
+                  "level": "warning",
+                  "minDistance": 586.6719371552384,
+                  "closestPoint": {
+                    "lat": 30.668,
+                    "lng": 104.078,
+                    "alt": 119
+                  },
+                  "message": "注意！航线擦到\"火车站周边\"边缘，最近距离 587 米"
+                },
+                {
+                  "zone": "医院急救区",
+                  "zoneId": "NFZ-003",
+                  "level": "critical",
+                  "minDistance": 293.36307440675836,
+                  "closestPoint": {
+                    "lat": 30.65,
+                    "lng": 104.06,
+                    "alt": 120
+                  },
+                  "message": "严重！航线进入\"医院急救区\"禁飞区，最近只有 293 米"
+                }
+              ],
+              "warnings": [],
+              "summary": "发现 3 处禁飞区冲突（含 2 个高危区域）"
+            },
+            "battery": {
+              "filename": "battery-log.txt",
+              "records": [
+                {
+                  "time": "08:00",
+                  "batteryId": "BAT01",
+                  "voltage": 23.5,
+                  "capacity": 95,
+                  "status": "normal"
+                },
+                {
+                  "time": "08:30",
+                  "batteryId": "BAT01",
+                  "voltage": 23.2,
+                  "capacity": 88,
+                  "status": "normal"
+                },
+                {
+                  "time": "09:00",
+                  "batteryId": "BAT01",
+                  "voltage": 22.9,
+                  "capacity": 75,
+                  "status": "normal"
+                },
+                {
+                  "time": "09:30",
+                  "batteryId": "BAT01",
+                  "voltage": 22.6,
+                  "capacity": 62,
+                  "status": "normal"
+                },
+                {
+                  "time": "10:00",
+                  "batteryId": "BAT01",
+                  "voltage": 22.3,
+                  "capacity": 50,
+                  "status": "warning"
+                },
+                {
+                  "time": "10:30",
+                  "batteryId": "BAT02",
+                  "voltage": 23.4,
+                  "capacity": 92,
+                  "status": "normal"
+                },
+                {
+                  "time": "11:00",
+                  "batteryId": "BAT02",
+                  "voltage": 23.1,
+                  "capacity": 82,
+                  "status": "normal"
+                },
+                {
+                  "time": "11:30",
+                  "batteryId": "BAT02",
+                  "voltage": 22.8,
+                  "capacity": 70,
+                  "status": "normal"
+                },
+                {
+                  "time": "12:00",
+                  "batteryId": "BAT02",
+                  "voltage": 22.5,
+                  "capacity": 58,
+                  "status": "normal"
+                }
+              ],
+              "summary": {
+                "batteryCount": 2,
+                "batteries": [
+                  "BAT01",
+                  "BAT02"
+                ],
+                "recordCount": 9,
+                "criticalCount": 0,
+                "warningCount": 1,
+                "lowestVoltage": 22.3,
+                "lowestCapacity": 50
+              },
+              "parsedAt": "2026-05-31T12:04:10.902Z"
+            },
+            "batterySafety": {
+              "safe": true,
+              "issues": [],
+              "summary": "电池状态良好"
+            },
+            "weather": {
+              "windSpeed": 3.2,
+              "visibility": 5000,
+              "condition": "晴"
+            },
+            "safe": false,
+            "analyzedAt": "2026-05-31T12:04:10.903Z"
+          },
+          "createdAt": "2026-05-31T12:04:10.904Z",
+          "updatedAt": "2026-05-31T12:04:10.904Z",
+          "version": 1
+        }
+      }
+    ]
+  }
+}

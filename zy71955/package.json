@@ -1,0 +1,18 @@
+{
+  "name": "disaster-road-recon",
+  "version": "1.0.0",
+  "description": "灾后道路侦察 - 外场飞行复盘系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "demo": "node src/demo.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.3.2",
+    "geolib": "^3.3.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

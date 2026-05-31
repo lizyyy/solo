@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>灾后道路侦察航线 - 迎宾大道</name>
+    <description>2024-05-31 灾后道路侦察任务</description>
+    <Placemark>
+      <name>飞行航线</name>
+      <LineString>
+        <coordinates>
+          104.060,30.650,120
+          104.062,30.652,115
+          104.064,30.654,118
+          104.066,30.656,122
+          104.068,30.658,120
+          104.070,30.660,125
+          104.072,30.662,118
+          104.074,30.664,120
+          104.076,30.666,122
+          104.078,30.668,119
+        </coordinates>
+      </LineString>
+    </Placemark>
+    <Placemark>
+      <name>起飞点</name>
+      <Point>
+        <coordinates>104.060,30.650,120</coordinates>
+      </Point>
+    </Placemark>
+    <Placemark>
+      <name>降落点</name>
+      <Point>
+        <coordinates>104.078,30.668,119</coordinates>
+      </Point>
+    </Placemark>
+  </Document>
+</kml>
