@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  body {
+    @apply bg-mountain-50 text-mountain-800 min-h-screen;
+  }
+  
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-mountain-100 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-mountain-300 rounded-full hover:bg-mountain-400 transition-colors;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-white/50 rounded-xl shadow-card;
+  }
+  
+  .btn-primary {
+    @apply px-4 py-2 bg-mountain-500 text-white rounded-lg font-medium
+           hover:bg-mountain-600 active:scale-95 transition-all duration-200
+           shadow-md hover:shadow-lg;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-mountain-600 rounded-lg font-medium
+           border border-mountain-200 hover:border-mountain-300
+           hover:bg-mountain-50 active:scale-95 transition-all duration-200;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 bg-white border border-mountain-200 rounded-lg
+           focus:outline-none focus:ring-2 focus:ring-ice-400/50 focus:border-ice-400
+           transition-all duration-200;
+  }
+  
+  .status-pill {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .bg-grid {
+    background-image: 
+      linear-gradient(rgba(30, 58, 95, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 58, 95, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .bg-mountain-gradient {
+    background: linear-gradient(135deg, #1e3a5f 0%, #3c76e6 50%, #60a5fa 100%);
+  }
+}
