@@ -1,0 +1,30 @@
+{
+  "snapshot_time": "2026-05-31T22:05:45.563255",
+  "batch_no": "CV-2025-001",
+  "confirmed_count": 3,
+  "confirmed_total": 39600.0,
+  "net_confirmed": 39600.0,
+  "record_checks": [
+    {
+      "policy_no": "P2025001",
+      "status": "confirmed",
+      "cash_value": 12500.0,
+      "confirmation_notes": "[2026-05-31 22:05:45] 小孟: 数据核对无误，与运营系统导出一致，经办人阿强已核实为团队成员王志强",
+      "audit_log_count": 2
+    },
+    {
+      "policy_no": "P2025002",
+      "status": "confirmed",
+      "cash_value": 8600.0,
+      "confirmation_notes": "[2026-05-31 22:05:45] 小孟: 已致电档案室核实，该保单实际生效日期为2022年11月20日。客户为香港居民，港币币种无误。\n[2026-05-31 22:05:45] 小孟: 根据档案室核实结果确认此单，生效日期修正为2022-11-20",
+      "audit_log_count": 4
+    },
+    {
+      "policy_no": "P2025003",
+      "status": "confirmed",
+      "cash_value": 18500.0,
+      "confirmation_notes": "[2026-05-31 22:05:45] 小孟: 按审批邮件APPROVAL-2025-0589指示，采用旧口径计算¥18,500。原始口径¥15,800已在备注中说明差异原因。",
+      "audit_log_count": 2
+    }
+  ]
+}

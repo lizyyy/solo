@@ -1,0 +1,138 @@
+{
+  "export_metadata": {
+    "export_time": "2026-05-31 22:05:45",
+    "exported_by": "小孟",
+    "batch_no": "CV-2025-001",
+    "batch_name": "2025年5月第一批保单现金价值试算"
+  },
+  "summary": {
+    "batch_id": 1,
+    "total_records": 3,
+    "confirmed_count": 3,
+    "suspended_count": 0,
+    "pending_count": 0,
+    "confirmed_total_amount": 39600.0,
+    "suspended_total_amount": 0,
+    "net_confirmed_amount": 39600.0
+  },
+  "records": [
+    {
+      "policy_no": "P2025001",
+      "policy_holder": "张三",
+      "cash_value": 12500.0,
+      "currency": "CNY",
+      "status": "confirmed",
+      "is_suspended": false,
+      "suspension_reason": null,
+      "source_reference": "运营系统202505导出表-第3行",
+      "source_attachment_id": null,
+      "confirmed_by": "小孟",
+      "confirmed_at": "2026-05-31 22:05:45"
+    },
+    {
+      "policy_no": "P2025002",
+      "policy_holder": "李四",
+      "cash_value": 8600.0,
+      "currency": "HKD",
+      "status": "confirmed",
+      "is_suspended": false,
+      "suspension_reason": "生效日期解析失败",
+      "source_reference": "运营系统202505导出表-第7行",
+      "source_attachment_id": null,
+      "confirmed_by": "小孟",
+      "confirmed_at": "2026-05-31 22:05:45"
+    },
+    {
+      "policy_no": "P2025003",
+      "policy_holder": "陈美丽",
+      "cash_value": 18500.0,
+      "currency": "CNY",
+      "status": "confirmed",
+      "is_suspended": false,
+      "suspension_reason": null,
+      "source_reference": "审批邮件APPROVAL-2025-0589",
+      "source_attachment_id": 1,
+      "confirmed_by": "小孟",
+      "confirmed_at": "2026-05-31 22:05:45"
+    }
+  ],
+  "audit_trail": [
+    {
+      "time": "2026-05-31 22:05:33",
+      "action": "batch_created",
+      "operator": "小孟(运营主管)",
+      "record_id": null,
+      "notes": "创建批次: 2025年5月第一批保单现金价值试算",
+      "decision_reasoning": null
+    },
+    {
+      "time": "2026-05-31 22:05:33",
+      "action": "record_created",
+      "operator": "system",
+      "record_id": 1,
+      "notes": "导入保单记录: P2025001",
+      "decision_reasoning": null
+    },
+    {
+      "time": "2026-05-31 22:05:33",
+      "action": "record_created",
+      "operator": "system",
+      "record_id": 2,
+      "notes": "导入保单记录: P2025002",
+      "decision_reasoning": null
+    },
+    {
+      "time": "2026-05-31 22:05:33",
+      "action": "auto_suspend",
+      "operator": "system",
+      "record_id": 2,
+      "notes": "自动挂起: 生效日期解析失败",
+      "decision_reasoning": null
+    },
+    {
+      "time": "2026-05-31 22:05:33",
+      "action": "record_created",
+      "operator": "system",
+      "record_id": 3,
+      "notes": "导入保单记录: P2025003",
+      "decision_reasoning": null
+    },
+    {
+      "time": "2026-05-31 22:05:45",
+      "action": "record_confirmed",
+      "operator": "小孟",
+      "record_id": 1,
+      "notes": "状态: pending -> confirmed",
+      "decision_reasoning": "1. 生效日期2021-06-15格式清晰，解析正确\n2. 现金价值¥12,500.00与系统一致\n3. 经办人外号已正确映射\n4. 来源明确，无需补充材料"
+    },
+    {
+      "time": "2026-05-31 22:05:45",
+      "action": "note_added",
+      "operator": "小孟",
+      "record_id": 2,
+      "notes": "补充备注",
+      "decision_reasoning": "档案室调阅原始投保单，存根编号20221120HK003，确认生效日期为2022-11-20"
+    },
+    {
+      "time": "2026-05-31 22:05:45",
+      "action": "record_confirmed",
+      "operator": "小孟",
+      "record_id": 2,
+      "notes": "状态: suspended -> confirmed; 生效日期: None -> 2022-11-20 00:00:00",
+      "decision_reasoning": "档案室已提供原始投保单存根，生效日期确认为2022-11-20，港币8,600元无误。此单已具备完整凭证链。"
+    },
+    {
+      "time": "2026-05-31 22:05:45",
+      "action": "record_confirmed",
+      "operator": "小孟",
+      "record_id": 3,
+      "notes": "状态: pending -> confirmed",
+      "decision_reasoning": "1. 来源为财务部审批邮件，有李总签字确认\n2. 旧口径适用原因：2020年3月15日前投保按旧条款执行\n3. 金额差异¥2,700已在审批邮件中说明\n4. 邮件附件已完整归档，可追溯"
+    }
+  ],
+  "data_integrity_check": {
+    "record_count_match": true,
+    "source_linked_count": 3,
+    "suspended_not_in_confirmed": true
+  }
+}
