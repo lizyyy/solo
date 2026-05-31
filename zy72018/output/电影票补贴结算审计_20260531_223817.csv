@@ -1,0 +1,30 @@
+﻿时间,记录哈希,动作,详情,操作者
+2026-05-31 22:38:17,2abf2bfc249ba686,跳过(重复),"{""reason"": ""重复导入，数据完全一致"", ""source_file"": ""收款流水_payments.csv"", ""source_line"": 2}",system
+2026-05-31 22:38:17,892e64c85d892aab,跳过(重复),"{""reason"": ""重复导入，数据完全一致"", ""source_file"": ""收款流水_payments.csv"", ""source_line"": 3}",system
+2026-05-31 22:38:17,bf31b92eec7b61e0,跳过(重复),"{""reason"": ""重复导入，核心数据一致，状态已被对账/补录修改，保留现有状态"", ""source_file"": ""收款流水_payments.csv"", ""source_line"": 4, ""existing_status"": ""pending_material"", ""import_status"": ""confirmed""}",system
+2026-05-31 22:38:17,7674a1e0cfab483b,跳过(重复),"{""reason"": ""重复导入，数据完全一致"", ""source_file"": ""退款申请_refunds.csv"", ""source_line"": 2}",system
+2026-05-31 22:38:17,8d7363dc84a236f1,跳过(重复),"{""reason"": ""重复导入，数据完全一致"", ""source_file"": ""审批邮件_approvals.csv"", ""source_line"": 2}",system
+2026-05-31 22:38:17,7a6821905828ea71,跳过(重复),"{""reason"": ""重复导入，数据完全一致"", ""source_file"": ""审批邮件_approvals.csv"", ""source_line"": 3}",system
+2026-05-31 22:38:17,aaf1462df776b9db,跳过(重复),"{""reason"": ""重复导入，核心数据一致，状态已被对账/补录修改，保留现有状态"", ""source_file"": ""审批邮件_approvals.csv"", ""source_line"": 4, ""existing_status"": ""overridden"", ""import_status"": ""old_standard""}",system
+2026-05-31 22:38:17,6c3e9b4250c32bae,跳过(重复),"{""reason"": ""重复导入，数据完全一致"", ""source_file"": ""手写备注_notes.csv"", ""source_line"": 2}",system
+2026-05-31 22:38:16,2abf2bfc249ba686,导入,"{""source_type"": ""payment"", ""source_file"": ""收款流水_payments.csv"", ""source_line"": 2, ""status"": ""confirmed"", ""judgment_reason"": ""收款流水与补贴金额匹配，自动确认""}",system
+2026-05-31 22:38:16,892e64c85d892aab,导入,"{""source_type"": ""payment"", ""source_file"": ""收款流水_payments.csv"", ""source_line"": 3, ""status"": ""confirmed"", ""judgment_reason"": ""收款流水与补贴金额匹配，自动确认""}",system
+2026-05-31 22:38:16,bf31b92eec7b61e0,导入,"{""source_type"": ""payment"", ""source_file"": ""收款流水_payments.csv"", ""source_line"": 4, ""status"": ""confirmed"", ""judgment_reason"": ""收款流水与补贴金额匹配，自动确认""}",system
+2026-05-31 22:38:16,7674a1e0cfab483b,导入,"{""source_type"": ""refund"", ""source_file"": ""退款申请_refunds.csv"", ""source_line"": 2, ""status"": ""pending_manual"", ""judgment_reason"": ""退款申请需人工确认退款合理性""}",system
+2026-05-31 22:38:16,7674a1e0cfab483b,补录,"{""remark"": ""退款原因: 团体退票-场次取消"", ""new_status"": null, ""old_status"": ""pending_manual"", ""operator"": ""manual""}",system
+2026-05-31 22:38:16,8d7363dc84a236f1,导入,"{""source_type"": ""approval_email"", ""source_file"": ""审批邮件_approvals.csv"", ""source_line"": 2, ""status"": ""confirmed"", ""judgment_reason"": ""审批邮件确认: RE: 5月电影票补贴结算确认""}",system
+2026-05-31 22:38:16,8d7363dc84a236f1,补录,"{""remark"": ""邮件主题: RE: 5月电影票补贴结算确认\n邮件日期: 2025-05-09"", ""new_status"": null, ""old_status"": ""confirmed"", ""operator"": ""manual""}",system
+2026-05-31 22:38:16,7a6821905828ea71,导入,"{""source_type"": ""approval_email"", ""source_file"": ""审批邮件_approvals.csv"", ""source_line"": 3, ""status"": ""confirmed"", ""judgment_reason"": ""审批邮件确认: RE: 5月电影票补贴结算确认""}",system
+2026-05-31 22:38:16,7a6821905828ea71,补录,"{""remark"": ""邮件主题: RE: 5月电影票补贴结算确认\n邮件日期: 2025-05-11"", ""new_status"": null, ""old_status"": ""confirmed"", ""operator"": ""manual""}",system
+2026-05-31 22:38:16,aaf1462df776b9db,导入,"{""source_type"": ""approval_email"", ""source_file"": ""审批邮件_approvals.csv"", ""source_line"": 4, ""status"": ""old_standard"", ""judgment_reason"": ""审批邮件标记为旧口径: FW: 4月电影票补贴结算-旧口径调整""}",system
+2026-05-31 22:38:16,aaf1462df776b9db,补录,"{""remark"": ""邮件主题: FW: 4月电影票补贴结算-旧口径调整\n邮件日期: 2025-04-19"", ""new_status"": null, ""old_status"": ""old_standard"", ""operator"": ""manual""}",system
+2026-05-31 22:38:16,6c3e9b4250c32bae,导入,"{""source_type"": ""manual_note"", ""source_file"": ""手写备注_notes.csv"", ""source_line"": 2, ""status"": ""pending_material"", ""judgment_reason"": ""手写备注需补充正式审批材料""}",system
+2026-05-31 22:38:16,6c3e9b4250c32bae,补录,"{""remark"": ""备注: 5月实际收款1800元"", ""new_status"": null, ""old_status"": ""pending_material"", ""operator"": ""manual""}",system
+2026-05-31 22:38:16,2abf2bfc249ba686,确认,"{""status"": ""confirmed"", ""judgment_reason"": ""对账通过: 收款3600.0与审批3600.0一致 [组24d8ce51]""}",system
+2026-05-31 22:38:16,8d7363dc84a236f1,确认,"{""status"": ""confirmed"", ""judgment_reason"": ""对账通过: 收款3600.0与审批3600.0一致 [组24d8ce51]""}",system
+2026-05-31 22:38:16,892e64c85d892aab,确认,"{""status"": ""confirmed"", ""judgment_reason"": ""对账通过: 收款2550.0与审批2550.0一致 [组20523620]""}",system
+2026-05-31 22:38:16,7674a1e0cfab483b,pending_manual,"{""status"": ""pending_manual"", ""judgment_reason"": ""退款待人工确认(同组收款2550.0与审批2550.0已匹配) [组20523620]""}",system
+2026-05-31 22:38:16,7a6821905828ea71,确认,"{""status"": ""confirmed"", ""judgment_reason"": ""对账通过: 收款2550.0与审批2550.0一致 [组20523620]""}",system
+2026-05-31 22:38:16,bf31b92eec7b61e0,pending_material,"{""status"": ""pending_material"", ""judgment_reason"": ""缺少审批邮件对应: 收款1800.0无审批记录 [组7b203ff7]""}",system
+2026-05-31 22:38:16,6c3e9b4250c32bae,补录,"{""remark"": ""老曹补: 此笔5/15已收款，审批邮件预计下周补到"", ""new_status"": null, ""old_status"": ""pending_material"", ""operator"": ""manual""}",system
+2026-05-31 22:38:16,aaf1462df776b9db,补录,"{""remark"": ""老曹确认: 旧口径4月已结转"", ""new_status"": ""overridden"", ""old_status"": ""old_standard"", ""operator"": ""manual""}",system
