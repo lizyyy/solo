@@ -1,0 +1,26 @@
+{
+  "name": "collision-momentum-tools",
+  "version": "1.0.0",
+  "description": "碰撞动量守恒实验数据处理工具 - 实验室助教专用",
+  "main": "dist/index.js",
+  "bin": {
+    "collision-tool": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "xlsx": "^0.18.5",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.0"
+  }
+}

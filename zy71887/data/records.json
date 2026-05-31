@@ -1,0 +1,154 @@
+[
+  {
+    "id": "2024001_20240520",
+    "student": {
+      "studentId": "2024001",
+      "studentName": "张三",
+      "groupId": "A1",
+      "experimentDate": "2024-05-20"
+    },
+    "rawData": {
+      "recordId": "2024001_20240520",
+      "ballMass": 0.067,
+      "ballDiameter": 0.025,
+      "initialHeight": 12.5,
+      "horizontalDisplacement": 35.2,
+      "collisionDisplacement": 28.6,
+      "notes": "第一次实验"
+    },
+    "calculation": {
+      "initialVelocity": 1.5652475842498528,
+      "initialMomentum": 0.10487158814474014,
+      "collisionVelocity": 1.790643236381832,
+      "collisionMomentum": 0.11997309683758275,
+      "momentumLossRate": -14.400000000000034,
+      "kineticEnergyBefore": 0.082075,
+      "kineticEnergyAfter": 0.10741450720000006,
+      "energyLossRate": -30.873600000000085
+    },
+    "anomalies": [],
+    "status": "imported",
+    "createdAt": "2026-05-31T07:19:18.753Z",
+    "updatedAt": "2026-05-31T07:19:18.753Z",
+    "version": 1,
+    "importBatchId": "BATCH_MPTG8IJL"
+  },
+  {
+    "id": "2024002_20240520",
+    "student": {
+      "studentId": "2024002",
+      "studentName": "李四",
+      "groupId": "A1",
+      "experimentDate": "2024-05-20"
+    },
+    "rawData": {
+      "recordId": "2024002_20240520",
+      "ballMass": 0.067,
+      "ballDiameter": 0.025,
+      "initialHeight": 13,
+      "horizontalDisplacement": 36.1,
+      "collisionDisplacement": 29.3
+    },
+    "calculation": {
+      "initialVelocity": 1.5962455951387933,
+      "initialMomentum": 0.10694845487429916,
+      "collisionVelocity": 1.7988459975987168,
+      "collisionMomentum": 0.12052268183911403,
+      "momentumLossRate": -12.692307692307676,
+      "kineticEnergyBefore": 0.08535800000000002,
+      "kineticEnergyAfter": 0.10840087192307692,
+      "energyLossRate": -26.99556213017748
+    },
+    "anomalies": [],
+    "status": "imported",
+    "createdAt": "2026-05-31T07:19:18.755Z",
+    "updatedAt": "2026-05-31T07:19:18.755Z",
+    "version": 1,
+    "importBatchId": "BATCH_MPTG8IJL"
+  },
+  {
+    "id": "2024003_20240520",
+    "student": {
+      "studentId": "2024003",
+      "studentName": "王五",
+      "groupId": "A2",
+      "experimentDate": "2024-05-20"
+    },
+    "rawData": {
+      "recordId": "2024003_20240520",
+      "ballMass": 67,
+      "ballDiameter": 2.5,
+      "initialHeight": 12,
+      "horizontalDisplacement": 15.8,
+      "collisionDisplacement": 5.2,
+      "notes": "注意: 质量和直径单位可能有误"
+    },
+    "calculation": {
+      "initialVelocity": 1.533623161014465,
+      "initialMomentum": 102.75275178796916,
+      "collisionVelocity": 0.3322850182198008,
+      "collisionMomentum": 22.263096220726652,
+      "momentumLossRate": 78.33333333333333,
+      "kineticEnergyBefore": 78.792,
+      "kineticEnergyAfter": 3.698846666666667,
+      "energyLossRate": 95.30555555555556
+    },
+    "anomalies": [
+      {
+        "type": "momentum_loss",
+        "severity": "error",
+        "message": "动量损失率过高: 78.3%",
+        "explanation": "理论上碰撞过程动量守恒，损失率应在5%以内。超过30%可能是实验操作问题（如碰撞角度偏差、轨道不水平）或数据记录错误。",
+        "suggestion": "请检查：1) 碰撞时两球是否对心；2) 轨道是否水平；3) 读数是否准确。建议重新实验或核实原始数据。",
+        "expectedRange": [
+          0,
+          30
+        ],
+        "actualValue": 78.33333333333333
+      },
+      {
+        "type": "energy_loss",
+        "severity": "error",
+        "message": "能量损失率过高: 95.3%",
+        "explanation": "非弹性碰撞会有能量损失，但超过70%可能表明实验问题。可能原因：碰撞不完全、轨道摩擦过大、读数错误。",
+        "suggestion": "请检查钢球表面是否清洁，碰撞位置是否正确，确认数据读数无误。",
+        "expectedRange": [
+          0,
+          70
+        ],
+        "actualValue": 95.30555555555556
+      },
+      {
+        "type": "unit_error",
+        "severity": "error",
+        "message": "钢球质量异常: 67 kg",
+        "explanation": "标准钢球质量通常在0.06-0.1kg范围内。当前值可能存在单位混淆（克误写为千克）。",
+        "suggestion": "请检查单位。若原始记录为67克，则应为0.0670 kg。",
+        "field": "ballMass",
+        "expectedRange": [
+          0.05,
+          0.15
+        ],
+        "actualValue": 67
+      },
+      {
+        "type": "unit_error",
+        "severity": "error",
+        "message": "钢球直径异常: 2.5 m",
+        "explanation": "标准钢球直径通常在0.02-0.03m范围内。当前值可能存在单位混淆（毫米或厘米误写为米）。",
+        "suggestion": "请检查单位。若原始记录为2.5厘米，则应为0.0250 m。",
+        "field": "ballDiameter",
+        "expectedRange": [
+          0.01,
+          0.05
+        ],
+        "actualValue": 2.5
+      }
+    ],
+    "status": "pending",
+    "createdAt": "2026-05-31T07:19:18.755Z",
+    "updatedAt": "2026-05-31T07:19:18.755Z",
+    "version": 1,
+    "importBatchId": "BATCH_MPTG8IJL"
+  }
+]

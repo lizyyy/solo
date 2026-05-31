@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "effectiveDate": "2026-05-31",
+  "configs": [
+    {
+      "id": "mass",
+      "name": "钢球质量",
+      "unit": "kg",
+      "standardValue": 0.067,
+      "tolerance": 0.005,
+      "conversionFactor": 0.001,
+      "description": "克转千克"
+    },
+    {
+      "id": "length",
+      "name": "长度测量",
+      "unit": "cm",
+      "standardValue": 1,
+      "tolerance": 0.1,
+      "conversionFactor": 0.01,
+      "description": "厘米转米"
+    }
+  ],
+  "createdAt": "2026-05-31T07:18:14.590Z",
+  "updatedAt": "2026-05-31T07:18:14.590Z"
+}
