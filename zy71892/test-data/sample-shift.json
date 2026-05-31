@@ -1,0 +1,32 @@
+[
+  {
+    "date": "2026-05-30",
+    "shift": "白班",
+    "trainNo": "G1234",
+    "carriageNo": "03",
+    "brakePosition": "1轴",
+    "temperature": 65,
+    "operator": "张三",
+    "notes": "正常"
+  },
+  {
+    "date": "2026-05-30",
+    "shift": "白班",
+    "trainNo": "G1234",
+    "carriageNo": "03",
+    "brakePosition": "2轴",
+    "temperature": 78,
+    "operator": "张三",
+    "notes": "略高，需关注"
+  },
+  {
+    "date": "2026-05-30",
+    "shift": "夜班",
+    "trainNo": "G5678",
+    "carriageNo": "05",
+    "brakePosition": "3轴",
+    "temperature": 92,
+    "operator": "李四",
+    "notes": "高温报警"
+  }
+]

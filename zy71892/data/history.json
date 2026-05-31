@@ -1,0 +1,208 @@
+{
+  "BT-20260531-QQMJ": [
+    {
+      "timestamp": "2026-05-31T07:35:31.441Z",
+      "action": "import",
+      "details": {
+        "importedFrom": "test-data/sample-shift.json",
+        "recordType": "shift",
+        "initialData": {
+          "date": "2026-05-30",
+          "shift": "白班",
+          "trainNo": "G1234",
+          "carriageNo": "03",
+          "brakePosition": "1轴",
+          "temperature": 65,
+          "operator": "张三",
+          "notes": "正常",
+          "type": "shift",
+          "status": "pending",
+          "createdAt": "2026-05-31T07:35:31.300Z",
+          "updatedAt": "2026-05-31T07:35:31.441Z",
+          "alarmLevel": "normal",
+          "id": "BT-20260531-QQMJ"
+        }
+      },
+      "operator": "import"
+    }
+  ],
+  "BT-20260531-VVCZ": [
+    {
+      "timestamp": "2026-05-31T07:36:06.498Z",
+      "action": "review",
+      "details": {
+        "action": "marked_as_reviewed"
+      },
+      "operator": "reviewer"
+    },
+    {
+      "timestamp": "2026-05-31T07:35:31.457Z",
+      "action": "import",
+      "details": {
+        "importedFrom": "test-data/sample-shift.json",
+        "recordType": "shift",
+        "initialData": {
+          "date": "2026-05-30",
+          "shift": "白班",
+          "trainNo": "G1234",
+          "carriageNo": "03",
+          "brakePosition": "2轴",
+          "temperature": 78,
+          "operator": "张三",
+          "notes": "略高，需关注",
+          "type": "shift",
+          "status": "pending",
+          "createdAt": "2026-05-31T07:35:31.457Z",
+          "updatedAt": "2026-05-31T07:35:31.457Z",
+          "alarmLevel": "warning",
+          "id": "BT-20260531-VVCZ"
+        }
+      },
+      "operator": "import"
+    }
+  ],
+  "BT-20260531-ESMB": [
+    {
+      "timestamp": "2026-05-31T07:36:28.559Z",
+      "action": "correct",
+      "details": {
+        "field": "temperature",
+        "oldValue": 92,
+        "newValue": 88,
+        "reason": "现场复测温度为88°C",
+        "correctionNumber": 1
+      },
+      "operator": "engineer:李工程师"
+    },
+    {
+      "timestamp": "2026-05-31T07:35:31.458Z",
+      "action": "import",
+      "details": {
+        "importedFrom": "test-data/sample-shift.json",
+        "recordType": "shift",
+        "initialData": {
+          "date": "2026-05-30",
+          "shift": "夜班",
+          "trainNo": "G5678",
+          "carriageNo": "05",
+          "brakePosition": "3轴",
+          "temperature": 92,
+          "operator": "李四",
+          "notes": "高温报警",
+          "type": "shift",
+          "status": "pending",
+          "createdAt": "2026-05-31T07:35:31.458Z",
+          "updatedAt": "2026-05-31T07:35:31.458Z",
+          "alarmLevel": "critical",
+          "id": "BT-20260531-ESMB"
+        }
+      },
+      "operator": "import"
+    }
+  ],
+  "BT-20260531-O1X5": [
+    {
+      "timestamp": "2026-05-31T07:36:52.126Z",
+      "action": "correct",
+      "details": {
+        "field": "confirmedBy",
+        "newValue": "王维修",
+        "reason": "未说明",
+        "correctionNumber": 2
+      },
+      "operator": "engineer:unknown"
+    },
+    {
+      "timestamp": "2026-05-31T07:36:51.425Z",
+      "action": "correct",
+      "details": {
+        "field": "confirmSource",
+        "newValue": "maintenance_order",
+        "reason": "维修单已确认此报警",
+        "correctionNumber": 1
+      },
+      "operator": "engineer:unknown"
+    },
+    {
+      "timestamp": "2026-05-31T07:35:44.862Z",
+      "action": "import",
+      "details": {
+        "importedFrom": "test-data/sample-inspection.json",
+        "recordType": "inspection",
+        "initialData": {
+          "date": "2026-05-30",
+          "inspector": "王巡检",
+          "trainNo": "G5678",
+          "carriageNo": "05",
+          "brakePosition": "3轴",
+          "temperature": 92,
+          "threshold": 85,
+          "alarmLevel": "critical",
+          "alarmSource": "vibration_curve",
+          "alarmId": "ALARM-2026-0530-001",
+          "notes": "振动曲线显示异常",
+          "type": "inspection",
+          "status": "pending",
+          "createdAt": "2026-05-31T07:35:44.855Z",
+          "updatedAt": "2026-05-31T07:35:44.861Z",
+          "id": "BT-20260531-O1X5"
+        }
+      },
+      "operator": "import"
+    }
+  ],
+  "BT-20260531-KK8Y": [
+    {
+      "timestamp": "2026-05-31T07:35:46.558Z",
+      "action": "import",
+      "details": {
+        "importedFrom": "test-data/sample-table.md",
+        "recordType": "shift",
+        "initialData": {
+          "date": "2026-05-29",
+          "shift": "白班",
+          "trainNo": "G9012",
+          "carriageNo": "02",
+          "brakePosition": "4轴",
+          "temperature": 58,
+          "operator": "王五",
+          "notes": "正常",
+          "type": "shift",
+          "status": "pending",
+          "createdAt": "2026-05-31T07:35:46.518Z",
+          "updatedAt": "2026-05-31T07:35:46.557Z",
+          "alarmLevel": "normal",
+          "id": "BT-20260531-KK8Y"
+        }
+      },
+      "operator": "import"
+    }
+  ],
+  "BT-20260531-P3UM": [
+    {
+      "timestamp": "2026-05-31T07:35:46.739Z",
+      "action": "import",
+      "details": {
+        "importedFrom": "test-data/sample-table.md",
+        "recordType": "shift",
+        "initialData": {
+          "date": "2026-05-29",
+          "shift": "白班",
+          "trainNo": "G9012",
+          "carriageNo": "02",
+          "brakePosition": "5轴",
+          "temperature": 72,
+          "operator": "王五",
+          "notes": "预警",
+          "type": "shift",
+          "status": "pending",
+          "createdAt": "2026-05-31T07:35:46.739Z",
+          "updatedAt": "2026-05-31T07:35:46.739Z",
+          "alarmLevel": "warning",
+          "id": "BT-20260531-P3UM"
+        }
+      },
+      "operator": "import"
+    }
+  ]
+}
