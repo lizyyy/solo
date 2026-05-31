@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-bg-tertiary: #2d3748;
+  --color-border: #334155;
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-accent: #1e3a5f;
+  --color-status-normal: #38a169;
+  --color-status-pending: #dd6b20;
+  --color-status-corrected: #3182ce;
+  --color-status-duplicate: #805ad5;
+  --color-status-anomaly: #e53e3e;
+}
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    min-height: 100vh;
+  }
+  
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) var(--color-bg-secondary);
+  }
+  
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 3px;
+  }
+}
+
+@layer components {
+  .timeline-line {
+    @apply absolute left-4 top-0 bottom-0 w-px bg-slate-600;
+  }
+  
+  .timeline-dot {
+    @apply absolute left-4 w-3 h-3 rounded-full -translate-x-1/2 border-2 border-slate-800 transition-all duration-200;
+  }
+  
+  .timeline-dot-normal {
+    @apply bg-status-normal;
+  }
+  
+  .timeline-dot-pending {
+    @apply bg-status-pending animate-pulse-slow;
+  }
+  
+  .timeline-dot-corrected {
+    @apply bg-status-corrected;
+  }
+  
+  .timeline-dot-duplicate {
+    @apply bg-status-duplicate;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-200 hover:translate-y-[-2px] hover:shadow-lg;
+  }
+  
+  .status-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+  }
+  
+  .status-badge-normal {
+    @apply bg-green-900/40 text-green-400 border border-green-700/50;
+  }
+  
+  .status-badge-pending {
+    @apply bg-orange-900/40 text-orange-400 border border-orange-700/50;
+  }
+  
+  .status-badge-corrected {
+    @apply bg-blue-900/40 text-blue-400 border border-blue-700/50;
+  }
+  
+  .status-badge-duplicate {
+    @apply bg-purple-900/40 text-purple-400 border border-purple-700/50;
+  }
+  
+  .evidence-connector {
+    @apply relative pl-6 before:content-[''] before:absolute before:left-2 before:top-0 before:bottom-0 before:w-px before:bg-slate-600;
+  }
+  
+  .evidence-connector::before {
+    left: 8px;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
