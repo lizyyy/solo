@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 text-sm font-medium border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 transition-colors duration-150;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-800 text-white border-primary-800 hover:bg-primary-700;
+  }
+  
+  .btn-success {
+    @apply bg-success-500 text-white border-success-500 hover:bg-success-600;
+  }
+  
+  .btn-warning {
+    @apply bg-warning-500 text-white border-warning-500 hover:bg-warning-600;
+  }
+  
+  .btn-adjust {
+    @apply bg-adjust-500 text-white border-adjust-500 hover:bg-adjust-600;
+  }
+  
+  .btn-danger {
+    @apply bg-danger-500 text-white border-danger-500 hover:bg-danger-600;
+  }
+  
+  .btn-ghost {
+    @apply bg-transparent border-transparent hover:bg-neutral-100;
+  }
+  
+  .card {
+    @apply bg-white border border-neutral-200;
+  }
+  
+  .input {
+    @apply w-full px-3 py-2 border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+  
+  .select {
+    @apply w-full px-3 py-2 border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+  
+  .textarea {
+    @apply w-full px-3 py-2 border border-neutral-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none;
+  }
+  
+  .table-header {
+    @apply bg-neutral-50 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider;
+  }
+  
+  .table-row {
+    @apply border-b border-neutral-200 hover:bg-neutral-50 transition-colors;
+  }
+  
+  .table-row-alt {
+    @apply border-b border-neutral-200 bg-neutral-50/50 hover:bg-neutral-50 transition-colors;
+  }
+}
