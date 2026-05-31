@@ -1,0 +1,50 @@
+[
+  {
+    "contract_no": "GPS-GP2024001",
+    "customer_name": "张伟",
+    "plate_no": "京A12345",
+    "vehicle_model": "大众朗逸2023款",
+    "gps_fee": 2800.00,
+    "payment_ref": "PAY20240301001",
+    "payment_date": "2024-03-01",
+    "payment_amount": 2800.00,
+    "refund_applied": 0,
+    "refund_amount": null,
+    "approval_email": "审批通过-2024年3月GPS解押批次",
+    "remarks": "客户现场办理，材料齐全",
+    "receipt_info": null,
+    "is_old_format": 0
+  },
+  {
+    "contract_no": "GPS-GP2024002",
+    "customer_name": "李明",
+    "plate_no": "沪B67890",
+    "vehicle_model": "丰田卡罗拉2022款",
+    "gps_fee": 2800.00,
+    "payment_ref": "PAY20240301002",
+    "payment_date": "2024-03-02",
+    "payment_amount": 3000.00,
+    "refund_applied": 1,
+    "refund_amount": null,
+    "approval_email": null,
+    "remarks": "客户称多缴200元，待核实退款",
+    "receipt_info": null,
+    "is_old_format": 0
+  },
+  {
+    "contract_no": "GPS-GP2024003",
+    "customer_name": "王芳",
+    "plate_no": null,
+    "vehicle_model": null,
+    "gps_fee": null,
+    "payment_ref": null,
+    "payment_date": null,
+    "payment_amount": 2600.00,
+    "refund_applied": 0,
+    "refund_amount": null,
+    "approval_email": null,
+    "remarks": "从银企回单截图补录，部分信息缺失",
+    "receipt_info": "银企回单截图-2024年2月对账单第3页",
+    "is_old_format": 1
+  }
+]
