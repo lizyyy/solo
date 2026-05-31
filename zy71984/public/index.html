@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>账户冻结状态机管理系统</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 40px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-size: 15px;
+      font-weight: 500;
+      color: #666;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.3s;
+    }
+
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab:hover:not(.active) {
+      color: #333;
+      background: #f0f0f0;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card h2::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #555;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #555;
+      white-space: nowrap;
+    }
+
+    tr:hover {
+      background: #f8f9fa;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-FROZEN, .status-AUTO_FREEZE_APPROVED {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .status-PENDING_REVIEW, .status-MANUAL_REVIEW_REQUIRED {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .status-AUTO_FREEZE_REJECTED, .status-CANCELLED {
+      background: #e5e7eb;
+      color: #6b7280;
+    }
+
+    .status-UNFROZEN {
+      background: #d1fae5;
+      color: #059669;
+    }
+
+    .historical-badge {
+      background: #e0e7ff;
+      color: #4f46e5;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-left: 8px;
+    }
+
+    .alert {
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .alert-warning {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .alert-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .alert-info {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    .detail-panel {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .detail-row {
+      display: flex;
+      padding: 8px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      width: 140px;
+      font-weight: 500;
+      color: #666;
+      flex-shrink: 0;
+    }
+
+    .detail-value {
+      flex: 1;
+      color: #333;
+    }
+
+    .audit-log {
+      margin-top: 12px;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      border-left: 3px solid #667eea;
+    }
+
+    .audit-log-header {
+      font-weight: 500;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .audit-log-time {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .audit-log-reason {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .issue-item {
+      padding: 10px;
+      background: white;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      border-left: 3px solid;
+    }
+
+    .issue-item.ERROR {
+      border-left-color: #dc2626;
+      background: #fef2f2;
+    }
+
+    .issue-item.WARNING {
+      border-left-color: #f59e0b;
+      background: #fffbeb;
+    }
+
+    .issue-field {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .issue-contact {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .summary-card h3 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .summary-card p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .summary-card.warning {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .summary-card.success {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .summary-card.info {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+    }
+
+    .close-btn:hover {
+      color: #333;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .filter-bar .form-group {
+      margin-bottom: 0;
+      min-width: 150px;
+    }
+
+    .report-summary {
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .link-btn {
+      color: #667eea;
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      font-size: 14px;
+      padding: 0;
+    }
+
+    .link-btn:hover {
+      color: #764ba2;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>账户冻结状态机管理系统</h1>
+    <p>支持审计追溯、幂等性处理、自动判断留痕、参数完整性校验</p>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab active" data-tab="process">处理冻结请求</button>
+      <button class="tab" data-tab="records">冻结记录列表</button>
+      <button class="tab" data-tab="report">迁移报告</button>
+    </div>
+
+    <div id="process" class="tab-content active">
+      <div class="card">
+        <h2>新建账户冻结申请</h2>
+        <div id="process-alert"></div>
+        <form id="freeze-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>请求ID *</label>
+              <input type="text" id="requestId" placeholder="如: REQ202401010001" required>
+            </div>
+            <div class="form-group">
+              <label>账户ID *</label>
+              <input type="text" id="accountId" placeholder="如: ACC10086" required>
+            </div>
+            <div class="form-group">
+              <label>账户名称 *</label>
+              <input type="text" id="accountName" placeholder="如: 张三" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>冻结原因 *</label>
+              <select id="freezeReason" required>
+                <option value="">请选择</option>
+                <option value="FRAUD_SUSPECTED">涉嫌欺诈</option>
+                <option value="RISK_ALERT">风险告警</option>
+                <option value="COMPLIANCE_VIOLATION">合规违规</option>
+                <option value="MANUAL_REQUEST">人工申请</option>
+                <option value="ABNORMAL_ACTIVITY">异常活动</option>
+                <option value="LEGAL_REQUIREMENT">司法要求</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>风险评分 (0-100)</label>
+              <input type="number" id="riskScore" min="0" max="100" placeholder="如: 85">
+            </div>
+            <div class="form-group">
+              <label>参数来源</label>
+              <select id="parameterSource">
+                <option value="">请选择</option>
+                <option value="ALARM_RECORD">报警记录</option>
+                <option value="OLD_API_DOCUMENT">旧接口文档</option>
+                <option value="NEW_API">新版API</option>
+                <option value="UNKNOWN">未知来源</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>原因详情 *</label>
+            <textarea id="reasonDetail" rows="3" placeholder="请详细描述冻结原因..." required></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>客户端版本</label>
+              <input type="text" id="clientVersion" placeholder="如: v1.0.0 或 v2.0.0">
+            </div>
+            <div class="form-group">
+              <label>操作人ID</label>
+              <input type="text" id="operatorId" placeholder="如: OP001">
+            </div>
+            <div class="form-group">
+              <label>操作人姓名</label>
+              <input type="text" id="operatorName" placeholder="如: 李四">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>客户端参数 (JSON格式，用于测试参数校验)</label>
+            <textarea id="clientParameters" rows="4" placeholder='{"alarmId": "ALM001", "alarmType": "login"}'></textarea>
+          </div>
+          <div class="btn-group">
+            <button type="submit" class="btn btn-primary">提交处理</button>
+            <button type="reset" class="btn btn-secondary">重置表单</button>
+          </div>
+        </form>
+
+        <div id="process-result" style="display:none; margin-top:24px;">
+          <h3 style="margin-bottom:16px;">处理结果</h3>
+          <div class="detail-panel" id="result-detail"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="records" class="tab-content">
+      <div class="card">
+        <h2>冻结记录列表</h2>
+        <div class="filter-bar">
+          <div class="form-group">
+            <label>账户ID</label>
+            <input type="text" id="filter-accountId" placeholder="输入账户ID">
+          </div>
+          <div class="form-group">
+            <label>状态</label>
+            <select id="filter-status">
+              <option value="">全部状态</option>
+              <option value="PENDING_REVIEW">待审核</option>
+              <option value="AUTO_FREEZE_APPROVED">自动冻结通过</option>
+              <option value="AUTO_FREEZE_REJECTED">自动冻结拒绝</option>
+              <option value="MANUAL_REVIEW_REQUIRED">需人工审核</option>
+              <option value="FROZEN">已冻结</option>
+              <option value="UNFROZEN">已解冻</option>
+              <option value="CANCELLED">已取消</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>包含历史记录</label>
+            <select id="filter-historical">
+              <option value="true">是</option>
+              <option value="false">否</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="loadRecords()">查询</button>
+          <button class="btn btn-secondary" onclick="resetFilter()">重置</button>
+        </div>
+
+        <div id="records-table-container" class="table-container">
+          <div class="loading">加载中...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="report" class="tab-content">
+      <div class="card">
+        <h2>迁移报告生成</h2>
+        <div class="filter-bar">
+          <div class="form-group">
+            <label>开始日期</label>
+            <input type="date" id="report-startDate">
+          </div>
+          <div class="form-group">
+            <label>结束日期</label>
+            <input type="date" id="report-endDate">
+          </div>
+          <div class="form-group">
+            <label>状态筛选</label>
+            <select id="report-status">
+              <option value="">全部状态</option>
+              <option value="FROZEN">已冻结</option>
+              <option value="MANUAL_REVIEW_REQUIRED">需人工审核</option>
+              <option value="CANCELLED">已取消</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="generateReport()">生成报告</button>
+        </div>
+
+        <div id="report-result" style="display:none;">
+          <div class="summary-grid" id="report-summary-cards"></div>
+          <div class="btn-group" style="margin-bottom:20px;">
+            <button class="btn btn-success" onclick="exportReport('csv')">导出 CSV</button>
+            <button class="btn btn-success" onclick="exportReport('json')">导出 JSON</button>
+          </div>
+          <h3 style="margin-bottom:12px;">报告摘要</h3>
+          <div class="report-summary" id="report-summary-text"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="detail-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>记录详情</h3>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentRecords = [];
+    let currentFilter = {};
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+        
+        if (tab.dataset.tab === 'records') {
+          loadRecords();
+        }
+      });
+    });
+
+    document.getElementById('freeze-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const alertDiv = document.getElementById('process-alert');
+      const resultDiv = document.getElementById('process-result');
+      const resultDetail = document.getElementById('result-detail');
+      
+      alertDiv.innerHTML = '';
+      resultDiv.style.display = 'none';
+
+      let clientParameters = {};
+      try {
+        const paramText = document.getElementById('clientParameters').value;
+        if (paramText.trim()) {
+          clientParameters = JSON.parse(paramText);
+        }
+      } catch (err) {
+        alertDiv.innerHTML = '<div class="alert alert-error">客户端参数格式错误，请输入有效的JSON</div>';
+        return;
+      }
+
+      const request = {
+        requestId: document.getElementById('requestId').value,
+        accountId: document.getElementById('accountId').value,
+        accountName: document.getElementById('accountName').value,
+        freezeReason: document.getElementById('freezeReason').value,
+        reasonDetail: document.getElementById('reasonDetail').value,
+        riskScore: parseInt(document.getElementById('riskScore').value) || 0,
+        parameterSource: document.getElementById('parameterSource').value || undefined,
+        clientVersion: document.getElementById('clientVersion').value || undefined,
+        operatorId: document.getElementById('operatorId').value || undefined,
+        operatorName: document.getElementById('operatorName').value || undefined,
+        clientParameters
+      };
+
+      try {
+        const res = await fetch('/api/freeze/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(request)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          const record = data.data.record;
+          const isReRun = data.data.isReRun;
+
+          if (isReRun) {
+            alertDiv.innerHTML = '<div class="alert alert-warning">⚠️ 检测到重复请求！系统已返回历史记录，未创建新记录，避免数据重复。</div>';
+          } else {
+            alertDiv.innerHTML = '<div class="alert alert-success">✅ 处理成功！</div>';
+          }
+
+          resultDetail.innerHTML = renderRecordDetail(record);
+          resultDiv.style.display = 'block';
+        } else {
+          alertDiv.innerHTML = `<div class="alert alert-error">❌ ${data.error}</div>`;
+        }
+      } catch (err) {
+        alertDiv.innerHTML = `<div class="alert alert-error">❌ 请求失败: ${err.message}</div>`;
+      }
+    });
+
+    async function loadRecords() {
+      const container = document.getElementById('records-table-container');
+      const accountId = document.getElementById('filter-accountId').value;
+      const status = document.getElementById('filter-status').value;
+      const includeHistorical = document.getElementById('filter-historical').value;
+
+      let url = '/api/records?';
+      if (accountId) url += `accountId=${encodeURIComponent(accountId)}&`;
+      if (status) url += `status=${encodeURIComponent(status)}&`;
+      url += `includeHistorical=${includeHistorical}`;
+
+      currentFilter = { accountId, status, includeHistorical };
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.success) {
+          currentRecords = data.data.records;
+          container.innerHTML = renderRecordsTable(currentRecords);
+        } else {
+          container.innerHTML = `<div class="alert alert-error">加载失败: ${data.error}</div>`;
+        }
+      } catch (err) {
+        container.innerHTML = `<div class="alert alert-error">请求失败: ${err.message}</div>`;
+      }
+    }
+
+    function resetFilter() {
+      document.getElementById('filter-accountId').value = '';
+      document.getElementById('filter-status').value = '';
+      document.getElementById('filter-historical').value = 'true';
+      loadRecords();
+    }
+
+    function renderRecordsTable(records) {
+      if (records.length === 0) {
+        return '<div class="loading">暂无数据</div>';
+      }
+
+      return `
+        <table>
+          <thead>
+            <tr>
+              <th>账户ID</th>
+              <th>账户名称</th>
+              <th>冻结原因</th>
+              <th>当前状态</th>
+              <th>风险评分</th>
+              <th>下一步操作</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${records.map(r => `
+              <tr>
+                <td>${r.accountId}</td>
+                <td>${r.accountName}${r.isHistorical ? '<span class="historical-badge">历史</span>' : ''}</td>
+                <td>${r.reasonDisplayName}</td>
+                <td><span class="status-badge status-${r.status}">${r.statusDisplayName}</span></td>
+                <td>${r.riskScore ?? '-'}</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.nextStep || '-'}">${r.nextStep || '-'}</td>
+                <td>${new Date(r.createdAt).toLocaleString('zh-CN')}</td>
+                <td>
+                  <button class="link-btn" onclick="showDetail('${r.recordId}')">详情</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderRecordDetail(record) {
+      const issuesHtml = record.parameterValidationIssues && record.parameterValidationIssues.length > 0
+        ? `
+          <div style="margin-top:16px;">
+            <h4 style="margin-bottom:12px;">参数问题 (${record.parameterValidationIssues.length})</h4>
+            ${record.parameterValidationIssues.map(issue => `
+              <div class="issue-item ${issue.severity}">
+                <div class="issue-field">${issue.field}: ${issue.issue}</div>
+                <div style="font-size:12px;color:#666;">来源: ${getSourceName(issue.source)}</div>
+                <div class="issue-contact">👉 联系人: ${issue.suggestedContact}</div>
+              </div>
+            `).join('')}
+          </div>
+        `
+        : '';
+
+      return `
+        <div class="detail-row">
+          <span class="detail-label">记录ID</span>
+          <span class="detail-value">${record.recordId}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">请求ID</span>
+          <span class="detail-value">${record.requestId}${record.isHistorical ? ' <span class="historical-badge">历史重复记录</span>' : ''}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">账户信息</span>
+          <span class="detail-value">${record.accountId} - ${record.accountName}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">冻结原因</span>
+          <span class="detail-value">${getReasonName(record.freezeReason)}: ${record.reasonDetail}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">当前状态</span>
+          <span class="detail-value"><span class="status-badge status-${record.status}">${getStatusName(record.status)}</span></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">风险评分</span>
+          <span class="detail-value">${record.riskScore ?? '未设置'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">判断理由</span>
+          <span class="detail-value" style="color:#d97706;font-weight:500;">${record.decisionReason || '暂无'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">👉 下一步操作</span>
+          <span class="detail-value" style="color:#059669;font-weight:500;">${record.nextStep || '暂无'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">👤 负责人</span>
+          <span class="detail-value">${record.nextStepOwner || '系统自动处理'}</span>
+        </div>
+        ${issuesHtml}
+        <div style="margin-top:16px;">
+          <h4 style="margin-bottom:12px;">审计日志 (${record.auditLogs.length}条)</h4>
+          ${record.auditLogs.slice().reverse().map(log => `
+            <div class="audit-log">
+              <div class="audit-log-header">
+                <span>${log.action}</span>
+                <span class="audit-log-time">${new Date(log.timestamp).toLocaleString('zh-CN')}</span>
+              </div>
+              <div class="audit-log-reason">${log.reason}</div>
+              ${log.fromStatus ? `<div style="font-size:12px;color:#666;margin-top:4px;">状态变化: ${getStatusName(log.fromStatus)} → ${getStatusName(log.toStatus)}</div>` : ''}
+              ${log.operatorName ? `<div style="font-size:12px;color:#666;">操作人: ${log.operatorName}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    async function showDetail(recordId) {
+      const modal = document.getElementById('detail-modal');
+      const content = document.getElementById('modal-content');
+      
+      modal.classList.add('active');
+      content.innerHTML = '<div class="loading">加载中...</div>';
+
+      try {
+        const res = await fetch(`/api/records/${recordId}`);
+        const data = await res.json();
+        
+        if (data.success) {
+          content.innerHTML = renderRecordDetail(data.data.record);
+        } else {
+          content.innerHTML = `<div class="alert alert-error">加载失败: ${data.error}</div>`;
+        }
+      } catch (err) {
+        content.innerHTML = `<div class="alert alert-error">请求失败: ${err.message}</div>`;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('detail-modal').classList.remove('active');
+    }
+
+    async function generateReport() {
+      const resultDiv = document.getElementById('report-result');
+      const summaryCards = document.getElementById('report-summary-cards');
+      const summaryText = document.getElementById('report-summary-text');
+
+      const filter = {
+        startDate: document.getElementById('report-startDate').value || undefined,
+        endDate: document.getElementById('report-endDate').value || undefined,
+        status: document.getElementById('report-status').value ? [document.getElementById('report-status').value] : undefined
+      };
+
+      try {
+        const res = await fetch('/api/report/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(filter)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          const report = data.data.report;
+          summaryCards.innerHTML = `
+            <div class="summary-card">
+              <h3>${report.totalRecords}</h3>
+              <p>记录总数</p>
+            </div>
+            <div class="summary-card success">
+              <h3>${report.summary.autoApproved}</h3>
+              <p>自动审批通过</p>
+            </div>
+            <div class="summary-card warning">
+              <h3>${report.summary.manualReviewRequired}</h3>
+              <p>需人工审核</p>
+            </div>
+            <div class="summary-card info">
+              <h3>${report.summary.historicalRecords}</h3>
+              <p>历史重复记录</p>
+            </div>
+          `;
+          summaryText.textContent = report.summaryText;
+          resultDiv.style.display = 'block';
+        }
+      } catch (err) {
+        alert('生成报告失败: ' + err.message);
+      }
+    }
+
+    function exportReport(format) {
+      window.open(`/api/report/export/${format}`, '_blank');
+    }
+
+    function getStatusName(status) {
+      const names = {
+        PENDING_REVIEW: '待审核',
+        AUTO_FREEZE_APPROVED: '自动冻结通过',
+        AUTO_FREEZE_REJECTED: '自动冻结拒绝',
+        MANUAL_REVIEW_REQUIRED: '需人工审核',
+        FROZEN: '已冻结',
+        UNFROZEN: '已解冻',
+        CANCELLED: '已取消',
+        ERROR: '错误'
+      };
+      return names[status] || status;
+    }
+
+    function getReasonName(reason) {
+      const names = {
+        FRAUD_SUSPECTED: '涉嫌欺诈',
+        RISK_ALERT: '风险告警',
+        COMPLIANCE_VIOLATION: '合规违规',
+        MANUAL_REQUEST: '人工申请',
+        ABNORMAL_ACTIVITY: '异常活动',
+        LEGAL_REQUIREMENT: '司法要求'
+      };
+      return names[reason] || reason;
+    }
+
+    function getSourceName(source) {
+      const names = {
+        ALARM_RECORD: '报警记录',
+        OLD_API_DOCUMENT: '旧接口文档',
+        NEW_API: '新版API',
+        UNKNOWN: '未知来源'
+      };
+      return names[source] || source;
+    }
+
+    document.getElementById('detail-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'detail-modal') {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
