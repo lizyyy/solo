@@ -1,0 +1,252 @@
+import type { InspectionRecord, BatchTask, ExportRecord, AppSettings } from './types';
+
+export const mockInspections: InspectionRecord[] = [
+  {
+    id: '1',
+    name: 'B1层东坡道检查',
+    parkingLot: '展览中心停车楼',
+    rampNumber: 'B1-E-01',
+    status: 'pending',
+    coordinates: {
+      points: [
+        { id: 'p1', x: 100, y: 200, label: '起点', type: 'route' },
+        { id: 'p2', x: 300, y: 200, label: '转角1', type: 'cad' },
+        { id: 'p3', x: 300, y: 400, label: '设备A', type: 'device' },
+        { id: 'p4', x: 500, y: 400, label: '终点', type: 'route' },
+      ],
+      centerX: 300,
+      centerY: 300,
+      rotation: 0,
+    },
+    changeHistory: [
+      {
+        id: 'c1',
+        inspectionId: '1',
+        type: 'route_early',
+        affectsConclusion: false,
+        description: '讲解路线提前导入',
+        operator: '张布展',
+        timestamp: '2026-05-20T10:00:00Z',
+      },
+    ],
+    createdAt: '2026-05-20T09:00:00Z',
+    updatedAt: '2026-05-20T10:00:00Z',
+    createdBy: '张布展',
+  },
+  {
+    id: '2',
+    name: 'B1层西坡道检查',
+    parkingLot: '展览中心停车楼',
+    rampNumber: 'B1-W-01',
+    status: 'exception',
+    coordinates: {
+      points: [
+        { id: 'p1', x: 100, y: 200, label: '起点', type: 'route' },
+        { id: 'p2', x: 200, y: 300, label: '转角1', type: 'cad' },
+        { id: 'p3', x: 400, y: 300, label: '设备B', type: 'device' },
+        { id: 'p4', x: 500, y: 400, label: '终点', type: 'route' },
+      ],
+      centerX: 300,
+      centerY: 300,
+      rotation: 180,
+    },
+    flippedCoordinates: {
+      points: [
+        { id: 'p1', x: 500, y: 400, label: '起点', type: 'route' },
+        { id: 'p2', x: 400, y: 300, label: '转角1', type: 'cad' },
+        { id: 'p3', x: 200, y: 300, label: '设备B', type: 'device' },
+        { id: 'p4', x: 100, y: 200, label: '终点', type: 'route' },
+      ],
+      centerX: 300,
+      centerY: 300,
+      rotation: 180,
+    },
+    flipDeviation: 0.05,
+    changeHistory: [
+      {
+        id: 'c1',
+        inspectionId: '2',
+        type: 'cad_manual',
+        affectsConclusion: true,
+        description: 'CAD点位手工调整，X偏移+50',
+        beforeData: { x: 150, y: 300 },
+        afterData: { x: 200, y: 300 },
+        operator: '李工程',
+        timestamp: '2026-05-21T14:30:00Z',
+      },
+      {
+        id: 'c2',
+        inspectionId: '2',
+        type: 'flip',
+        affectsConclusion: true,
+        description: '坐标轴翻转，偏差5%需确认',
+        operator: '李工程',
+        timestamp: '2026-05-21T15:00:00Z',
+      },
+    ],
+    createdAt: '2026-05-20T09:00:00Z',
+    updatedAt: '2026-05-21T15:00:00Z',
+    createdBy: '李工程',
+  },
+  {
+    id: '3',
+    name: 'B2层北坡道检查',
+    parkingLot: '展览中心停车楼',
+    rampNumber: 'B2-N-01',
+    status: 'material_only',
+    coordinates: {
+      points: [
+        { id: 'p1', x: 100, y: 200, label: '起点', type: 'route' },
+        { id: 'p2', x: 300, y: 200, label: '转角1', type: 'cad' },
+        { id: 'p3', x: 500, y: 200, label: '终点', type: 'route' },
+      ],
+      centerX: 300,
+      centerY: 200,
+      rotation: 0,
+    },
+    changeHistory: [
+      {
+        id: 'c1',
+        inspectionId: '3',
+        type: 'note_late',
+        affectsConclusion: false,
+        description: '补充设备备注：消防栓位置确认',
+        operator: '王讲解',
+        timestamp: '2026-05-22T11:00:00Z',
+      },
+    ],
+    createdAt: '2026-05-20T09:00:00Z',
+    updatedAt: '2026-05-22T11:00:00Z',
+    createdBy: '张布展',
+  },
+  {
+    id: '4',
+    name: 'B2层南坡道检查',
+    parkingLot: '展览中心停车楼',
+    rampNumber: 'B2-S-01',
+    status: 'approved',
+    coordinates: {
+      points: [
+        { id: 'p1', x: 100, y: 400, label: '起点', type: 'route' },
+        { id: 'p2', x: 300, y: 400, label: '转角1', type: 'cad' },
+        { id: 'p3', x: 300, y: 200, label: '设备C', type: 'device' },
+        { id: 'p4', x: 500, y: 200, label: '终点', type: 'route' },
+      ],
+      centerX: 300,
+      centerY: 300,
+      rotation: 0,
+    },
+    changeHistory: [
+      {
+        id: 'c1',
+        inspectionId: '4',
+        type: 'route_early',
+        affectsConclusion: false,
+        description: '讲解路线提前导入',
+        operator: '张布展',
+        timestamp: '2026-05-20T10:30:00Z',
+      },
+      {
+        id: 'c2',
+        inspectionId: '4',
+        type: 'note_late',
+        affectsConclusion: false,
+        description: '补充设备备注：应急照明正常',
+        operator: '王讲解',
+        timestamp: '2026-05-22T09:00:00Z',
+      },
+    ],
+    createdAt: '2026-05-20T09:00:00Z',
+    updatedAt: '2026-05-22T09:00:00Z',
+    createdBy: '张布展',
+  },
+];
+
+export const mockBatchTasks: BatchTask[] = [
+  {
+    id: 'bt1',
+    name: '5月第3周批量检查',
+    inspectionIds: ['1', '2', '3', '4'],
+    status: 'completed',
+    runCount: 2,
+    totalChanges: 3,
+    conclusionChanges: 1,
+    materialOnlyChanges: 2,
+    createdAt: '2026-05-25T09:00:00Z',
+    runs: [
+      {
+        id: 'br1',
+        taskId: 'bt1',
+        runNumber: 1,
+        startTime: '2026-05-25T09:00:00Z',
+        endTime: '2026-05-25T09:05:00Z',
+        processedCount: 4,
+        skippedCount: 0,
+        changedCount: 3,
+        idempotentCheckPassed: true,
+        changes: [
+          { inspectionId: '1', changeType: 'route_early', affectsConclusion: false, description: '讲解路线导入' },
+          { inspectionId: '2', changeType: 'cad_manual', affectsConclusion: true, description: 'CAD点位调整' },
+          { inspectionId: '4', changeType: 'route_early', affectsConclusion: false, description: '讲解路线导入' },
+        ],
+      },
+      {
+        id: 'br2',
+        taskId: 'bt1',
+        runNumber: 2,
+        startTime: '2026-05-26T14:00:00Z',
+        endTime: '2026-05-26T14:02:00Z',
+        processedCount: 2,
+        skippedCount: 2,
+        changedCount: 0,
+        idempotentCheckPassed: true,
+        changes: [],
+      },
+    ],
+  },
+];
+
+export const mockExportRecords: ExportRecord[] = [
+  {
+    id: 'e1',
+    inspectionIds: ['1', '2', '3', '4'],
+    template: 'standard',
+    consistencyCheck: {
+      passed: true,
+      totalItems: 4,
+      issues: [],
+    },
+    exportedAt: '2026-05-27T10:00:00Z',
+    exportedBy: '刘经理',
+    fileHash: 'a1b2c3d4e5f6',
+  },
+];
+
+export const defaultSettings: AppSettings = {
+  routeExample: {
+    enabled: true,
+    description: '标准讲解路线：入口→主展区→互动区→出口',
+    coordinates: {
+      points: [
+        { id: 'ep1', x: 100, y: 300, label: '入口', type: 'route' },
+        { id: 'ep2', x: 250, y: 150, label: '主展区', type: 'cad' },
+        { id: 'ep3', x: 400, y: 300, label: '互动区', type: 'device' },
+        { id: 'ep4', x: 550, y: 300, label: '出口', type: 'route' },
+      ],
+      centerX: 325,
+      centerY: 225,
+      rotation: 0,
+    },
+  },
+  flipRules: {
+    deviationThreshold: 0.03,
+    defaultFlipType: 'origin',
+  },
+  changeTypeDefinitions: [
+    { type: 'route_early', label: '讲解路线早到', color: '#10B981', affectsConclusionByDefault: false },
+    { type: 'note_late', label: '设备备注晚补', color: '#6B7280', affectsConclusionByDefault: false },
+    { type: 'cad_manual', label: 'CAD点位改动', color: '#EF4444', affectsConclusionByDefault: true },
+    { type: 'flip', label: '坐标轴翻转', color: '#F59E0B', affectsConclusionByDefault: true },
+    { type: 'export', label: '导出记录', color: '#1E40AF', affectsConclusionByDefault: false },
+  ],
+};
