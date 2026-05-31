@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "name": "线性规划单元测试题库",
+    "subject": "高中数学",
+    "chapter": "线性规划"
+  },
+  "questions": [
+    {
+      "questionNo": 1,
+      "content": "已知变量x, y满足约束条件：x + y ≤ 5, x - 2y ≤ 1, x ≥ 1, y ≥ 0，求目标函数z = 2x + y的最大值。",
+      "standardAnswer": "8",
+      "equivalentAnswers": ["8", "Z=8", "最大值为8", "max=8"],
+      "knowledgePoint": "线性目标函数最值",
+      "difficulty": "easy",
+      "score": 5,
+      "notes": "考查线性目标函数在可行域内的最值求解，注意顶点坐标计算"
+    },
+    {
+      "questionNo": 2,
+      "content": "若实数x, y满足不等式组：x - y + 2 ≥ 0, 2x + y - 5 ≤ 0, y ≥ 1，求z = x² + y²的取值范围。",
+      "standardAnswer": "[2, 10]",
+      "equivalentAnswers": ["[2,10]", "2≤z≤10", "2到10", "z∈[2,10]"],
+      "knowledgePoint": "非线性目标函数最值",
+      "difficulty": "medium",
+      "score": 8,
+      "notes": "几何意义是点到原点距离的平方，注意边界是否可取"
+    },
+    {
+      "questionNo": 3,
+      "content": "设x, y满足约束条件：x ≥ 0, y ≥ 0, x + 3y ≤ 3, 2x + y ≤ 2，求z = (y + 1)/(x + 1)的取值范围。",
+      "standardAnswer": "[1/3, 3]",
+      "equivalentAnswers": ["[1/3,3]", "1/3≤z≤3", "三分之一到3", "z∈[1/3,3]"],
+      "knowledgePoint": "斜率型目标函数",
+      "difficulty": "medium",
+      "score": 8,
+      "notes": "几何意义是可行域内点与定点连线的斜率，注意两个边界点"
+    },
+    {
+      "questionNo": 4,
+      "content": "某企业生产甲、乙两种产品，已知生产每吨甲产品需A原料3吨，B原料2吨；生产每吨乙产品需A原料1吨，B原料3吨。每吨甲产品利润5万元，每吨乙产品利润4万元。现有A原料13吨，B原料18吨，问如何安排生产可获得最大利润？最大利润是多少？",
+      "standardAnswer": "生产甲产品2吨，乙产品4吨，最大利润26万元",
+      "equivalentAnswers": [
+        "生产甲2吨，乙4吨，最大利润26万元",
+        "甲2吨，乙4吨，利润26万元",
+        "安排生产甲2吨乙4吨，最大利润26万",
+        "最大利润26万元，生产甲2吨乙4吨"
+      ],
+      "knowledgePoint": "线性规划实际应用",
+      "difficulty": "hard",
+      "score": 12,
+      "notes": "设未知数建立不等式组，注意整数解问题，本题恰好顶点为整数"
+    },
+    {
+      "questionNo": 5,
+      "content": "已知x, y满足：x + 2y ≥ 4, x - y ≤ 2, x + y ≤ 4，若目标函数z = ax + y (a > 0)仅在点(2, 1)处取得最小值，求a的取值范围。",
+      "standardAnswer": "(0, 1)",
+      "equivalentAnswers": ["0<a<1", "a∈(0,1)", "0到1", "大于0小于1"],
+      "knowledgePoint": "含参数的线性规划",
+      "difficulty": "hard",
+      "score": 12,
+      "notes": "根据目标函数斜率与边界斜率的关系确定参数范围，注意边界是否包含"
+    }
+  ]
+}

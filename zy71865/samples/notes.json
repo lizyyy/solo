@@ -1,0 +1,30 @@
+{
+  "questionNotes": [
+    {
+      "questionNo": 1,
+      "notes": "这道题错误率较高，主要是顶点坐标计算不仔细，讲评时要重点强调画图和代入验证的重要性",
+      "equivalentAnswers": ["最大值是8"]
+    },
+    {
+      "questionNo": 4,
+      "notes": "实际应用题学生容易忽略设未知数和建立不等式组的步骤，讲评时要强调建模过程",
+      "equivalentAnswers": ["甲产品2吨，乙产品4吨，最大利润26万元"]
+    }
+  ],
+  "mistakeNotes": [
+    {
+      "studentId": "S003",
+      "questionNo": 1,
+      "teacherNotes": "该生经常出现计算错误，需要加强计算训练",
+      "errorType": "计算错误",
+      "errorAnalysis": "顶点坐标代入时计算失误"
+    },
+    {
+      "studentId": "S001",
+      "questionNo": 2,
+      "teacherNotes": "区间开闭概念模糊，需要加强这方面的训练",
+      "errorType": "概念误解",
+      "errorAnalysis": "边界点是否包含判断错误"
+    }
+  ]
+}

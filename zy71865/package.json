@@ -1,0 +1,21 @@
+{
+  "name": "lp-review",
+  "version": "1.0.0",
+  "description": "线性规划讲评 - 教研组长专用CLI工具",
+  "main": "bin/index.js",
+  "bin": {
+    "lp-review": "./bin/index.js"
+  },
+  "scripts": {
+    "start": "node bin/index.js",
+    "test": "node test/run.js"
+  },
+  "keywords": ["线性规划", "讲评", "教研", "CLI"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "diff": "^5.1.0",
+    "uuid": "^9.0.1"
+  }
+}
