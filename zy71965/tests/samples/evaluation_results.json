@@ -1,0 +1,99 @@
+[
+  {
+    "image_id": "img_001",
+    "image_path": "samples/scratch_001.jpg",
+    "predicted_class": "scratch",
+    "true_class": "scratch",
+    "bbox": [100, 150, 50, 30],
+    "ground_truth": [102, 148, 48, 32],
+    "iou": 0.89,
+    "confidence": 0.92,
+    "isCorrect": true,
+    "evaluated_at": "2024-01-15T11:00:00Z"
+  },
+  {
+    "image_id": "img_002",
+    "image_path": "samples/crack_002.jpg",
+    "predicted_class": "crack",
+    "true_class": "crack",
+    "bbox": [200, 100, 80, 20],
+    "ground_truth": [250, 120, 60, 15],
+    "iou": 0.21,
+    "confidence": 0.88,
+    "isCorrect": false,
+    "evaluated_at": "2024-01-15T11:00:05Z"
+  },
+  {
+    "image_id": "img_003",
+    "image_path": "samples/stain_003.jpg",
+    "predicted_class": "stain",
+    "true_class": "stain",
+    "bbox": [50, 50, 100, 100],
+    "ground_truth": [52, 48, 98, 102],
+    "iou": 0.92,
+    "confidence": 0.95,
+    "isCorrect": true,
+    "evaluated_at": "2024-01-15T11:00:10Z"
+  },
+  {
+    "image_id": "img_001",
+    "image_path": "samples/scratch_001.jpg",
+    "predicted_class": "scratch",
+    "true_class": "scratch",
+    "bbox": [101, 149, 51, 31],
+    "ground_truth": [102, 148, 48, 32],
+    "iou": 0.91,
+    "confidence": 0.93,
+    "isCorrect": true,
+    "evaluated_at": "2024-01-15T11:00:15Z",
+    "note": "重复评估 - 同一张图"
+  },
+  {
+    "image_id": "img_004",
+    "predicted_class": "dent",
+    "true_class": "dent",
+    "bbox": [300, 200, 40, 40],
+    "ground_truth": null,
+    "iou": null,
+    "confidence": 0.25,
+    "isCorrect": null,
+    "evaluated_at": "2024-01-15T11:00:20Z"
+  },
+  {
+    "image_id": "img_007",
+    "image_path": "samples/border_007.jpg",
+    "predicted_class": "scratch",
+    "true_class": "dent",
+    "bbox": [0, 0, 10, 10],
+    "ground_truth": [5, 5, 15, 15],
+    "iou": -0.5,
+    "confidence": 0.45,
+    "isCorrect": false,
+    "evaluated_at": "2024-01-15T11:00:25Z",
+    "note": "边界情况 - IoU计算异常"
+  },
+  {
+    "image_id": "img_008",
+    "image_path": "samples/multi_defect.jpg",
+    "predicted_class": "scratch",
+    "true_class": "scratch",
+    "bbox": [100, 100, 50, 50],
+    "ground_truth": [100, 100, 50, 50],
+    "iou": 1.0,
+    "confidence": 0.99,
+    "isCorrect": true,
+    "evaluated_at": "2024-01-15T11:00:30Z"
+  },
+  {
+    "image_id": "img_008",
+    "image_path": "samples/multi_defect.jpg",
+    "predicted_class": "stain",
+    "true_class": "stain",
+    "bbox": [200, 200, 30, 30],
+    "ground_truth": [200, 200, 30, 30],
+    "iou": 1.0,
+    "confidence": 0.97,
+    "isCorrect": true,
+    "evaluated_at": "2024-01-15T11:00:30Z"
+  }
+]

@@ -1,0 +1,96 @@
+[
+  {
+    "id": "ann_001",
+    "image_id": "img_001",
+    "image_path": "samples/scratch_001.jpg",
+    "category": "scratch",
+    "bbox": [102, 148, 48, 32],
+    "area": 1536,
+    "confidence": 1.0,
+    "isGroundTruth": true,
+    "annotator": "labeler_a",
+    "status": "verified"
+  },
+  {
+    "id": "ann_002",
+    "image_id": "img_002",
+    "image_path": "samples/crack_002.jpg",
+    "category": "crack",
+    "bbox": [250, 120, 60, 15],
+    "area": 900,
+    "confidence": 1.0,
+    "isGroundTruth": true,
+    "annotator": "labeler_b",
+    "status": "pending",
+    "issues": [
+      {
+        "id": "issue_001",
+        "type": "boundary_ambiguous",
+        "description": "裂纹边界不清晰，需确认",
+        "reporter": "reviewer_1",
+        "resolved": false
+      }
+    ]
+  },
+  {
+    "id": "ann_003",
+    "image_id": "img_003",
+    "image_path": "samples/stain_003.jpg",
+    "category": "stain",
+    "bbox": [52, 48, 98, 102],
+    "area": 9996,
+    "confidence": 1.0,
+    "isGroundTruth": true,
+    "annotator": "labeler_a",
+    "status": "verified"
+  },
+  {
+    "id": "ann_004",
+    "image_id": "img_004",
+    "category": "dent",
+    "bbox": [],
+    "confidence": 1.0,
+    "isGroundTruth": true,
+    "annotator": "labeler_c",
+    "status": "pending",
+    "isMissing": true,
+    "comments": [
+      {"id": "c1", "content": "标注缺失，待补充", "author": "system", "createdAt": "2024-01-15T09:00:00Z"}
+    ]
+  },
+  {
+    "id": "ann_005",
+    "image_id": "img_005",
+    "image_path": "samples/scratch_005.jpg",
+    "category": "scratch",
+    "bbox": [155, 118, 55, 28],
+    "area": 1540,
+    "confidence": 1.0,
+    "isGroundTruth": true,
+    "annotator": "labeler_b",
+    "status": "verified"
+  },
+  {
+    "id": "ann_006",
+    "image_id": "img_001",
+    "image_path": "samples/scratch_001.jpg",
+    "category": "scratch",
+    "bbox": [100, 150, 52, 30],
+    "area": 1560,
+    "confidence": 1.0,
+    "isGroundTruth": true,
+    "annotator": "labeler_d",
+    "status": "pending",
+    "isDuplicate": false
+  },
+  {
+    "id": "ann_007",
+    "image_id": "img_006",
+    "category": "unknown",
+    "bbox": [10, 10, 20, 20],
+    "confidence": 0.5,
+    "isGroundTruth": false,
+    "annotator": "auto_label",
+    "status": "disputed"
+  }
+]

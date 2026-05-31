@@ -1,0 +1,25 @@
+{
+  "name": "defect-review-cli",
+  "version": "1.0.0",
+  "description": "图像缺陷复核工具 - 面向算法工程师的CLI工作流",
+  "main": "src/index.js",
+  "bin": {
+    "defect-review": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-test.js"
+  },
+  "keywords": ["defect", "review", "cli", "ml"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "inquirer": "^8.2.6",
+    "cli-table3": "^0.6.3",
+    "fuzzy": "^0.1.3",
+    "inquirer-fuzzy-path": "^2.3.0",
+    "uuid": "^9.0.1"
+  }
+}
