@@ -1,0 +1,20 @@
+[project]
+name = "offline-eval-trace"
+version = "0.1.0"
+description = "离线评估追溯系统：串起数据集版本、指标脚本、阈值配置与人工排除样本，实现实验可追溯"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.1",
+    "pydantic>=2.5",
+    "rich>=13.0",
+]
+
+[project.scripts]
+et = "offline_eval_trace.cli:cli"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

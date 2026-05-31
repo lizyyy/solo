@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: offline-eval-trace
+Version: 0.1.0
+Summary: 离线评估追溯系统：串起数据集版本、指标脚本、阈值配置与人工排除样本，实现实验可追溯
+Requires-Python: >=3.9
+Requires-Dist: click>=8.1
+Requires-Dist: pydantic>=2.5
+Requires-Dist: rich>=13.0
