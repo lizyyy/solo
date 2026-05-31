@@ -1,0 +1,110 @@
+{
+  "project_id": "971004f4b9f0",
+  "project_name": "Python高级技巧课程_第3期",
+  "export_time": "2026-05-31T17:23:15.509686",
+  "summary": {
+    "total_slices": 2,
+    "ad_slices": 1,
+    "content_slices": 1,
+    "total_duration_seconds": 171.1,
+    "total_duration_formatted": "02:51.100",
+    "pending_silence_issues": 3
+  },
+  "slices": [
+    {
+      "id": "33df18e8a581",
+      "name": "切片_001_片头广告口播",
+      "start_time": 0.0,
+      "end_time": 15.5,
+      "duration": 15.5,
+      "content": "欢迎收听本期课程，本节目由XX品牌独家冠名播出。",
+      "slice_type": "ad",
+      "status": "approved",
+      "reviewed": true,
+      "reviewed_by": "王审核",
+      "reviewed_at": "2026-05-31T17:23:15.506979",
+      "source_type": "ad_spot",
+      "source_id": "f040626be887",
+      "source_ref": "广告口播表 + 原始音轨（双源匹配）",
+      "warnings": [
+        "与原始音轨[音轨_001_片头]重叠15.50秒，已合并来源信息"
+      ],
+      "issues": [],
+      "subtitle_draft": "欢迎收听本期课程，本节目由XX品牌独家冠名播出。",
+      "subtitle_final": "",
+      "export_filename": "slice_001_33df18e8a581.mp3",
+      "notes": "来源：广告口播表，原始时间00:00.000-00:15.500"
+    },
+    {
+      "id": "f32798208cc8",
+      "name": "切片_003_知识点1：装饰器",
+      "start_time": 45.2,
+      "end_time": 200.8,
+      "duration": 155.6,
+      "content": "装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能...",
+      "slice_type": "content",
+      "status": "approved",
+      "reviewed": true,
+      "reviewed_by": "王审核",
+      "reviewed_at": "2026-05-31T17:23:15.507014",
+      "source_type": "ad_spot",
+      "source_id": "543ae3c89fac",
+      "source_ref": "广告口播表 + 原始音轨（双源匹配）",
+      "warnings": [
+        "与原始音轨[音轨_004_装饰器]重叠153.30秒，已合并来源信息"
+      ],
+      "issues": [],
+      "subtitle_draft": "装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能... 【重要】装饰器的本质是高阶函数返回闭包。",
+      "subtitle_final": "装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能... 💡装饰器的本质是高阶函数返回闭包。 建议配合示例代码理解。",
+      "export_filename": "slice_003_f32798208cc8.mp3",
+      "notes": "来源：广告口播表，原始时间00:45.200-03:20.800"
+    }
+  ],
+  "open_silence_issues": [
+    {
+      "id": "e115cda44822",
+      "slice_id": "f32798208cc8",
+      "start_time": 45.2,
+      "end_time": 47.5,
+      "duration": 2.3,
+      "source_type": "raw_track",
+      "source_id": "cbfa022919fc",
+      "source_ref": "原始音轨[音轨_003_静音段1]",
+      "detected_from": "原始音轨静音标记",
+      "action_suggested": "请联系内容审核员确认此静音段是否为误删或需要保留",
+      "contact_person": "内容审核组",
+      "status": "open",
+      "notes": "静音段时长2.30秒，静音置信度0.95，与切片[切片_003_知识点1：装饰器]时间重叠"
+    },
+    {
+      "id": "711d276eb2f1",
+      "slice_id": "64752006ce44",
+      "start_time": 217.3,
+      "end_time": 219.0,
+      "duration": 1.7,
+      "source_type": "raw_track",
+      "source_id": "6d204196bcec",
+      "source_ref": "原始音轨[音轨_006_静音段2]",
+      "detected_from": "原始音轨静音标记",
+      "action_suggested": "请联系内容审核员确认此静音段是否为误删或需要保留",
+      "contact_person": "内容审核组",
+      "status": "open",
+      "notes": "静音段时长1.70秒，静音置信度0.88，与切片[切片_005_知识点2：生成器]时间重叠"
+    },
+    {
+      "id": "019da1d8243a",
+      "slice_id": "63f82a484b2e",
+      "start_time": 374.5,
+      "end_time": 376.8,
+      "duration": 2.3,
+      "source_type": "raw_track",
+      "source_id": "bcc0023e5fe2",
+      "source_ref": "原始音轨[音轨_008_静音段3]",
+      "detected_from": "原始音轨静音标记",
+      "action_suggested": "请联系内容审核员确认此静音段是否为误删或需要保留",
+      "contact_person": "内容审核组",
+      "status": "open",
+      "notes": "静音段时长2.30秒，静音置信度0.92，与切片[切片_006_知识点3：上下文管理器]时间重叠"
+    }
+  ]
+}

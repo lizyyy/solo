@@ -1,0 +1,8 @@
+﻿时间,操作人,操作类型,目标类型,目标ID,字段,原值,新值,变更摘要,原因,记录ID
+2026-05-31T17:23:15.506521,张小明,import,project,971004f4b9f0,slices,,生成7个切片,slices:  → 生成7个切片,导入数据并生成切片，广告口播7条，原始音轨10条,a3740074bf6a
+2026-05-31T17:23:15.506928,李剪辑,subtitle_edit,slice,f32798208cc8,subtitle_draft,装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能...,装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能... 【重要】装饰器的本质是高阶函数返回闭包。,内容变更: 47字 → 68字,播客剪辑手动修改，补充重要提示,1c37324cff28
+2026-05-31T17:23:15.506971,王审核,subtitle_edit,slice,f32798208cc8,subtitle_final,,装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能... 💡装饰器的本质是高阶函数返回闭包。 建议配合示例代码理解。,新增内容 77 字,审核通过，优化表述,9f395f24cd9b
+2026-05-31T17:23:15.506985,王审核,review,slice,33df18e8a581,status,approved,approved,status: approved → approved,复核通过: 内容准确，时间正确,4a3d4e17d77b
+2026-05-31T17:23:15.506994,王审核,review,slice,18671452a0ad,status,rejected,rejected,status: rejected → rejected,复核拒绝: 时间轴需要调整,48cf74f32dac
+2026-05-31T17:23:15.507006,王审核,correct,slice,18671452a0ad,end_time,45.2,45.7,end_time: 00:45.200 → 00:45.700,复核修正,036b34674b7c
+2026-05-31T17:23:15.507020,王审核,review,slice,f32798208cc8,status,approved,approved,status: approved → approved,复核通过: 内容准确，时间正确,1874bb2a0024

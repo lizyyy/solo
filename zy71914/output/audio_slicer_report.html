@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程音频切片报告 - Python高级技巧课程_第3期</title>
+    <style>
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .app { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .project-info { display: flex; gap: 16px; opacity: 0.9; font-size: 14px; }
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-tab {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .nav-tab:hover { background: rgba(255,255,255,0.25); }
+        .nav-tab.active {
+            background: #f5f7fa;
+            color: #667eea;
+            font-weight: 600;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .main { background: white; border-radius: 12px; padding: 24px; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        .stat-card:nth-child(2) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .stat-card:nth-child(3) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .stat-card:nth-child(4) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .stat-card:nth-child(5) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
+        .stat-card:nth-child(6) { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; }
+        .stat-value { font-size: 28px; font-weight: 700; }
+        .stat-label { font-size: 13px; opacity: 0.9; }
+
+        .progress-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 24px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #43e97b, #38f9d7);
+            height: 100%;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 24px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+        th {
+            background: #f5f7fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        tr:hover { background: #f9fafc; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-ad { background: #fff0f0; color: #e74c3c; }
+        .badge-track { background: #e8f5e9; color: #27ae60; }
+        .badge-unknown { background: #fff3e0; color: #f39c12; }
+        .badge-approved { background: #e8f5e9; color: #27ae60; }
+        .badge-rejected { background: #ffebee; color: #e74c3c; }
+        .badge-pending { background: #fff3e0; color: #f39c12; }
+        .badge-content { background: #e3f2fd; color: #1976d2; }
+        .badge-slice { background: #f3e5f5; color: #7b1fa2; }
+        .badge-warning { background: #fff8e1; color: #ff8f00; }
+        .badge-issue { background: #ffebee; color: #c62828; }
+
+        .source-link {
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .source-link:hover { color: #764ba2; }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+        .btn-secondary:hover { background: #d0d0d0; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            margin: 20px;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+        .modal-header h2 { font-size: 18px; }
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        .modal-body { padding: 24px; }
+
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h3 {
+            font-size: 15px;
+            color: #667eea;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .detail-item label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        .detail-item .value { font-size: 14px; color: #333; }
+        .full-width { grid-column: 1 / -1; }
+
+        .source-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: #f9fafc;
+        }
+        .source-card h4 {
+            font-size: 14px;
+            color: #667eea;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-item {
+            border-left: 3px solid #667eea;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: #f9fafc;
+            border-radius: 0 8px 8px 0;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        .history-operator { font-weight: 600; color: #667eea; }
+        .history-time { color: #888; }
+        .history-diff { font-size: 13px; color: #333; }
+        .history-reason { font-size: 12px; color: #888; margin-top: 4px; }
+
+        .timeline-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        .timeline-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+        .timeline-label {
+            width: 80px;
+            font-size: 12px;
+            color: #888;
+            flex-shrink: 0;
+        }
+        .timeline-track {
+            flex: 1;
+            height: 40px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            position: relative;
+            min-width: 600px;
+        }
+        .timeline-segment {
+            position: absolute;
+            height: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            overflow: hidden;
+            transition: opacity 0.2s;
+        }
+        .timeline-segment:hover { opacity: 0.8; }
+        .timeline-segment.ad { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+        .timeline-segment.track { background: linear-gradient(90deg, #3498db, #2980b9); }
+        .timeline-segment.silence { background: repeating-linear-gradient(45deg, #95a5a6, #95a5a6 10px, #7f8c8d 10px, #7f8c8d 20px); }
+        .timeline-segment.slice { background: linear-gradient(90deg, #9b59b6, #8e44ad); }
+        .timeline-segment.slice.approved { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+        .timeline-segment.slice.rejected { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+
+        .silence-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #f39c12;
+        }
+        .silence-card.resolved { border-left-color: #27ae60; opacity: 0.7; }
+        .silence-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .silence-action {
+            background: #fff3e0;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+        }
+        .silence-contact { font-weight: 600; color: #e67e22; }
+
+        .warnings-box {
+            background: #fff8e1;
+            border: 1px solid #ffecb3;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        .warnings-box h4 { color: #ff8f00; margin-bottom: 8px; font-size: 13px; }
+        .warnings-box ul { padding-left: 20px; font-size: 13px; }
+
+        .issues-box {
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        .issues-box h4 { color: #c62828; margin-bottom: 8px; font-size: 13px; }
+        .issues-box ul { padding-left: 20px; font-size: 13px; }
+
+        .subtitle-box {
+            background: #f5f7fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        .subtitle-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        .subtitle-content { font-size: 14px; line-height: 1.6; }
+        .subtitle-diff {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .search-box {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .search-box input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .search-box select {
+            padding: 10px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        @media (max-width: 768px) {
+            .detail-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-content">
+                <h1>🎙️ 课程音频切片系统</h1>
+                <div class="project-info">
+                    <span class="project-name">Python高级技巧课程_第3期</span>
+                    <span class="project-id">ID: 971004f4b9f0</span>
+                </div>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="overview">总览</button>
+                <button class="nav-tab" data-tab="slices">切片清单</button>
+                <button class="nav-tab" data-tab="silence">静音段问题</button>
+                <button class="nav-tab" data-tab="sources">源数据</button>
+                <button class="nav-tab" data-tab="timeline">时间轴</button>
+                <button class="nav-tab" data-tab="history">历史记录</button>
+            </nav>
+        </header>
+
+        <main class="main">
+            <div id="tab-overview" class="tab-content active">
+                
+        <h2 class="section-title">📊 项目总览</h2>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">7</div>
+                <div class="stat-label">切片总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">2</div>
+                <div class="stat-label">已通过</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">4</div>
+                <div class="stat-label">待复核</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">09:00.500</div>
+                <div class="stat-label">总时长</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3</div>
+                <div class="stat-label">待处理静音段</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">7</div>
+                <div class="stat-label">历史操作</div>
+            </div>
+        </div>
+
+        <h3 style="font-size: 14px; color: #666; margin-bottom: 8px;">复核进度</h3>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 42.9%;">
+                42.9%
+            </div>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-item">
+                <label>广告口播条目数</label>
+                <div class="value">7 条</div>
+            </div>
+            <div class="detail-item">
+                <label>原始音轨条目数</label>
+                <div class="value">10 条</div>
+            </div>
+            <div class="detail-item">
+                <label>已通过时长</label>
+                <div class="value">02:51.100</div>
+            </div>
+            <div class="detail-item">
+                <label>已拒绝</label>
+                <div class="value">1 个</div>
+            </div>
+            <div class="detail-item">
+                <label>含警告切片</label>
+                <div class="value">7 个</div>
+            </div>
+            <div class="detail-item">
+                <label>含问题切片</label>
+                <div class="value">0 个</div>
+            </div>
+        </div>
+
+        <h2 class="section-title">⚠️ 待处理静音段问题</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>时间段</th>
+                    <th>时长</th>
+                    <th>来源</th>
+                    <th>来源引用</th>
+                    <th>联系处理</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>00:45.200 - 00:47.500</td>
+                <td>00:02.300</td>
+                <td><span class="badge badge-track">原始音轨</span></td>
+                <td>原始音轨[音轨_003_静音段1]</td>
+                <td><span class="silence-contact">内容审核组</span></td>
+            </tr>
+            
+            <tr>
+                <td>03:37.300 - 03:39.000</td>
+                <td>00:01.700</td>
+                <td><span class="badge badge-track">原始音轨</span></td>
+                <td>原始音轨[音轨_006_静音段2]</td>
+                <td><span class="silence-contact">内容审核组</span></td>
+            </tr>
+            
+            <tr>
+                <td>06:14.500 - 06:16.800</td>
+                <td>00:02.300</td>
+                <td><span class="badge badge-track">原始音轨</span></td>
+                <td>原始音轨[音轨_008_静音段3]</td>
+                <td><span class="silence-contact">内容审核组</span></td>
+            </tr>
+            </tbody>
+        </table>
+        <p style="text-align: right; color: #888; font-size: 12px;">
+            显示前5条，<a href="#" onclick="switchTab('silence')" class="source-link">查看全部</a>
+        </p>
+        
+
+        <h2 class="section-title">📝 最近操作</h2>
+        
+            <div class="history-item">
+                <div class="history-header">
+                    <span class="history-operator">王审核</span>
+                    <span class="history-time">2026-05-31T17:23:15.507020</span>
+                </div>
+                <div class="history-diff">status: approved → approved</div>
+                <div class="history-reason">复核通过: 内容准确，时间正确</div>
+            </div>
+            
+            <div class="history-item">
+                <div class="history-header">
+                    <span class="history-operator">王审核</span>
+                    <span class="history-time">2026-05-31T17:23:15.507006</span>
+                </div>
+                <div class="history-diff">end_time: 00:45.200 → 00:45.700</div>
+                <div class="history-reason">复核修正</div>
+            </div>
+            
+            <div class="history-item">
+                <div class="history-header">
+                    <span class="history-operator">王审核</span>
+                    <span class="history-time">2026-05-31T17:23:15.506994</span>
+                </div>
+                <div class="history-diff">status: rejected → rejected</div>
+                <div class="history-reason">复核拒绝: 时间轴需要调整</div>
+            </div>
+            
+            <div class="history-item">
+                <div class="history-header">
+                    <span class="history-operator">王审核</span>
+                    <span class="history-time">2026-05-31T17:23:15.506985</span>
+                </div>
+                <div class="history-diff">status: approved → approved</div>
+                <div class="history-reason">复核通过: 内容准确，时间正确</div>
+            </div>
+            
+            <div class="history-item">
+                <div class="history-header">
+                    <span class="history-operator">王审核</span>
+                    <span class="history-time">2026-05-31T17:23:15.506971</span>
+                </div>
+                <div class="history-diff">新增内容 77 字</div>
+                <div class="history-reason">审核通过，优化表述</div>
+            </div>
+            
+        
+            </div>
+            <div id="tab-slices" class="tab-content">
+                
+        <h2 class="section-title">🎵 切片清单</h2>
+
+        <div class="search-box">
+            <input type="text" id="slice-search" placeholder="搜索切片名称、内容、来源..." oninput="filterSlices()">
+            <select id="slice-status-filter" onchange="filterSlices()">
+                <option value="">全部状态</option>
+                <option value="pending">待复核</option>
+                <option value="approved">已通过</option>
+                <option value="rejected">已拒绝</option>
+            </select>
+            <select id="slice-type-filter" onchange="filterSlices()">
+                <option value="">全部类型</option>
+                <option value="content">内容</option>
+                <option value="ad">广告</option>
+            </select>
+        </div>
+
+        <div id="slices-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>切片名称</th>
+                        <th>时间</th>
+                        <th>时长</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>来源</th>
+                        <th>字幕</th>
+                        <th>历史</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="slices-table-body">
+                    
+            <tr id="slice-row-33df18e8a581" data-id="33df18e8a581"
+                data-name="切片_001_片头广告口播 欢迎收听本期课程，本节目由XX品牌独家冠名播出。 广告口播表 + 原始音轨（双源匹配）"
+                data-status="approved" data-type="ad">
+                <td>1</td>
+                <td>切片_001_片头广告口播 ⚠️ <span class="badge badge-warning">1</span></td>
+                <td>00:00.000<br><span style="color:#888;font-size:11px;">00:15.500</span></td>
+                <td>00:15.500</td>
+                <td><span class="badge badge-ad">ad</span></td>
+                <td><span class="badge badge-approved">approved</span></td>
+                <td><span class="source-link" onclick="showSliceSource('33df18e8a581')">广告口播表 + 原始音轨（双源匹配）</span></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="欢迎收听本期课程，本节目由XX品牌独家冠名播出。">欢迎收听本期课程，本节目由XX品牌独家冠名播出。</td>
+                <td>1</td>
+                <td><button class="btn btn-primary" onclick="showSliceDetail('33df18e8a581')">详情</button></td>
+            </tr>
+            
+            <tr id="slice-row-18671452a0ad" data-id="18671452a0ad"
+                data-name="切片_002_课程介绍 今天我们来学习Python编程的高级技巧，包括装饰器、生成器和上下文管理器。 广告口播表 + 原始音轨（双源匹配）"
+                data-status="rejected" data-type="content">
+                <td>2</td>
+                <td>切片_002_课程介绍 ⚠️ <span class="badge badge-warning">2</span></td>
+                <td>00:15.500<br><span style="color:#888;font-size:11px;">00:45.700</span></td>
+                <td>00:30.200</td>
+                <td><span class="badge badge-content">content</span></td>
+                <td><span class="badge badge-rejected">rejected</span></td>
+                <td><span class="source-link" onclick="showSliceSource('18671452a0ad')">广告口播表 + 原始音轨（双源匹配）</span></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="今天我们来学习Python编程的高级技巧，包括装饰器、生成器和上下文管理器。">今天我们来学习Python编程的高级技巧，包括装饰器、生成器和上下文管理器。</td>
+                <td>2</td>
+                <td><button class="btn btn-primary" onclick="showSliceDetail('18671452a0ad')">详情</button></td>
+            </tr>
+            
+            <tr id="slice-row-f32798208cc8" data-id="f32798208cc8"
+                data-name="切片_003_知识点1：装饰器 装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能... 广告口播表 + 原始音轨（双源匹配）"
+                data-status="approved" data-type="content">
+                <td>3</td>
+                <td>切片_003_知识点1：装饰器 ⚠️ <span class="badge badge-warning">3</span></td>
+                <td>00:45.200<br><span style="color:#888;font-size:11px;">03:20.800</span></td>
+                <td>02:35.600</td>
+                <td><span class="badge badge-content">content</span></td>
+                <td><span class="badge badge-approved">approved</span></td>
+                <td><span class="source-link" onclick="showSliceSource('f32798208cc8')">广告口播表 + 原始音轨（双源匹配）</span></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能... 【重要】装饰器的本质是高阶函数返回闭包。">装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能... 【重要】装饰器的本质是高阶函数返回闭包。</td>
+                <td>3</td>
+                <td><button class="btn btn-primary" onclick="showSliceDetail('f32798208cc8')">详情</button></td>
+            </tr>
+            
+            <tr id="slice-row-4d23a9da9f78" data-id="4d23a9da9f78"
+                data-name="切片_004_中场广告 感谢XX品牌对本节目的支持，现在购买可享受8折优惠。 广告口播表 + 原始音轨（双源匹配）"
+                data-status="pending" data-type="ad">
+                <td>4</td>
+                <td>切片_004_中场广告 ⚠️</td>
+                <td>03:20.800<br><span style="color:#888;font-size:11px;">03:35.000</span></td>
+                <td>00:14.200</td>
+                <td><span class="badge badge-ad">ad</span></td>
+                <td><span class="badge badge-pending">pending</span></td>
+                <td><span class="source-link" onclick="showSliceSource('4d23a9da9f78')">广告口播表 + 原始音轨（双源匹配）</span></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="感谢XX品牌对本节目的支持，现在购买可享受8折优惠。">感谢XX品牌对本节目的支持，现在购买可享受8折优惠。</td>
+                <td>0</td>
+                <td><button class="btn btn-primary" onclick="showSliceDetail('4d23a9da9f78')">详情</button></td>
+            </tr>
+            
+            <tr id="slice-row-64752006ce44" data-id="64752006ce44"
+                data-name="切片_005_知识点2：生成器 生成器是一种特殊的迭代器，使用yield关键字来返回值... 广告口播表 + 原始音轨（双源匹配）"
+                data-status="pending" data-type="content">
+                <td>5</td>
+                <td>切片_005_知识点2：生成器 ⚠️</td>
+                <td>03:35.000<br><span style="color:#888;font-size:11px;">06:10.500</span></td>
+                <td>02:35.500</td>
+                <td><span class="badge badge-content">content</span></td>
+                <td><span class="badge badge-pending">pending</span></td>
+                <td><span class="source-link" onclick="showSliceSource('64752006ce44')">广告口播表 + 原始音轨（双源匹配）</span></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="生成器是一种特殊的迭代器，使用yield关键字来返回值...">生成器是一种特殊的迭代器，使用yield关键字来返回值...</td>
+                <td>0</td>
+                <td><button class="btn btn-primary" onclick="showSliceDetail('64752006ce44')">详情</button></td>
+            </tr>
+            
+            <tr id="slice-row-63f82a484b2e" data-id="63f82a484b2e"
+                data-name="切片_006_知识点3：上下文管理器 上下文管理器用于资源管理，最常见的是with语句... 广告口播表 + 原始音轨（双源匹配）"
+                data-status="pending" data-type="content">
+                <td>6</td>
+                <td>切片_006_知识点3：上下文管理器 ⚠️</td>
+                <td>06:10.500<br><span style="color:#888;font-size:11px;">08:45.300</span></td>
+                <td>02:34.800</td>
+                <td><span class="badge badge-content">content</span></td>
+                <td><span class="badge badge-pending">pending</span></td>
+                <td><span class="source-link" onclick="showSliceSource('63f82a484b2e')">广告口播表 + 原始音轨（双源匹配）</span></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="上下文管理器用于资源管理，最常见的是with语句...">上下文管理器用于资源管理，最常见的是with语句...</td>
+                <td>0</td>
+                <td><button class="btn btn-primary" onclick="showSliceDetail('63f82a484b2e')">详情</button></td>
+            </tr>
+            
+            <tr id="slice-row-1ab0e6fbdf3c" data-id="1ab0e6fbdf3c"
+                data-name="切片_007_片尾广告 感谢收听本期课程，下期再见！XX品牌，品质保证。 广告口播表 + 原始音轨（双源匹配）"
+                data-status="pending" data-type="ad">
+                <td>7</td>
+                <td>切片_007_片尾广告 ⚠️</td>
+                <td>08:45.300<br><span style="color:#888;font-size:11px;">09:00.000</span></td>
+                <td>00:14.700</td>
+                <td><span class="badge badge-ad">ad</span></td>
+                <td><span class="badge badge-pending">pending</span></td>
+                <td><span class="source-link" onclick="showSliceSource('1ab0e6fbdf3c')">广告口播表 + 原始音轨（双源匹配）</span></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="感谢收听本期课程，下期再见！XX品牌，品质保证。">感谢收听本期课程，下期再见！XX品牌，品质保证。</td>
+                <td>0</td>
+                <td><button class="btn btn-primary" onclick="showSliceDetail('1ab0e6fbdf3c')">详情</button></td>
+            </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+            </div>
+            <div id="tab-silence" class="tab-content">
+                <h2 class="section-title">🔇 静音段问题</h2>
+            <div class="silence-card" id="silence-e115cda44822">
+                <div class="silence-header">
+                    <div>
+                        <strong>时间段:</strong> 00:45.200 - 00:47.500
+                        <strong style="margin-left: 16px;">时长:</strong> 00:02.300
+                    </div>
+                    <span class="badge badge-track">原始音轨</span>
+                </div>
+                <p><strong>检测方式:</strong> 原始音轨静音标记</p>
+                <p><strong>来源引用:</strong> 原始音轨[音轨_003_静音段1]</p>
+                <p><strong>备注:</strong> 静音段时长2.30秒，静音置信度0.95，与切片[切片_003_知识点1：装饰器]时间重叠</p>
+                <div class="silence-action">
+                    <p><strong>建议处理:</strong> 请联系内容审核员确认此静音段是否为误删或需要保留</p>
+                    <p><strong>联系人:</strong> <span class="silence-contact">内容审核组</span></p>
+                    <p style="margin-top: 8px;">
+                        <strong>状态:</strong>
+                        <span class="badge badge-pending">open</span>
+                    </p>
+                    <p style="margin-top:8px;"><button class="btn btn-secondary" onclick="showSourceForSilence(&#39;e115cda44822&#39;)">追溯来源</button></p>
+                </div>
+            </div>
+            
+            <div class="silence-card" id="silence-711d276eb2f1">
+                <div class="silence-header">
+                    <div>
+                        <strong>时间段:</strong> 03:37.300 - 03:39.000
+                        <strong style="margin-left: 16px;">时长:</strong> 00:01.700
+                    </div>
+                    <span class="badge badge-track">原始音轨</span>
+                </div>
+                <p><strong>检测方式:</strong> 原始音轨静音标记</p>
+                <p><strong>来源引用:</strong> 原始音轨[音轨_006_静音段2]</p>
+                <p><strong>备注:</strong> 静音段时长1.70秒，静音置信度0.88，与切片[切片_005_知识点2：生成器]时间重叠</p>
+                <div class="silence-action">
+                    <p><strong>建议处理:</strong> 请联系内容审核员确认此静音段是否为误删或需要保留</p>
+                    <p><strong>联系人:</strong> <span class="silence-contact">内容审核组</span></p>
+                    <p style="margin-top: 8px;">
+                        <strong>状态:</strong>
+                        <span class="badge badge-pending">open</span>
+                    </p>
+                    <p style="margin-top:8px;"><button class="btn btn-secondary" onclick="showSourceForSilence(&#39;711d276eb2f1&#39;)">追溯来源</button></p>
+                </div>
+            </div>
+            
+            <div class="silence-card" id="silence-019da1d8243a">
+                <div class="silence-header">
+                    <div>
+                        <strong>时间段:</strong> 06:14.500 - 06:16.800
+                        <strong style="margin-left: 16px;">时长:</strong> 00:02.300
+                    </div>
+                    <span class="badge badge-track">原始音轨</span>
+                </div>
+                <p><strong>检测方式:</strong> 原始音轨静音标记</p>
+                <p><strong>来源引用:</strong> 原始音轨[音轨_008_静音段3]</p>
+                <p><strong>备注:</strong> 静音段时长2.30秒，静音置信度0.92，与切片[切片_006_知识点3：上下文管理器]时间重叠</p>
+                <div class="silence-action">
+                    <p><strong>建议处理:</strong> 请联系内容审核员确认此静音段是否为误删或需要保留</p>
+                    <p><strong>联系人:</strong> <span class="silence-contact">内容审核组</span></p>
+                    <p style="margin-top: 8px;">
+                        <strong>状态:</strong>
+                        <span class="badge badge-pending">open</span>
+                    </p>
+                    <p style="margin-top:8px;"><button class="btn btn-secondary" onclick="showSourceForSilence(&#39;019da1d8243a&#39;)">追溯来源</button></p>
+                </div>
+            </div>
+            
+            </div>
+            <div id="tab-sources" class="tab-content">
+                
+        <h2 class="section-title">📋 广告口播表</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>名称</th>
+                    <th>时间段</th>
+                    <th>时长(秒)</th>
+                    <th>主讲人</th>
+                    <th>内容</th>
+                    <th>备注</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr id="ad-spot-f040626be887">
+                <td>1</td>
+                <td>片头广告口播</td>
+                <td>00:00.000 - 00:15.500</td>
+                <td>15.5</td>
+                <td>主持人A</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="欢迎收听本期课程，本节目由XX品牌独家冠名播出。">欢迎收听本期课程，本节目由XX品牌独家冠名播出。</td>
+                <td>第5次录制版本</td>
+            </tr>
+            
+            <tr id="ad-spot-768e8c115f6e">
+                <td>2</td>
+                <td>课程介绍</td>
+                <td>00:15.500 - 00:45.200</td>
+                <td>29.7</td>
+                <td>讲师B</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="今天我们来学习Python编程的高级技巧，包括装饰器、生成器和上下文管理器。">今天我们来学习Python编程的高级技巧，包括装饰器、生成器和上下文管理器。</td>
+                <td></td>
+            </tr>
+            
+            <tr id="ad-spot-543ae3c89fac">
+                <td>3</td>
+                <td>知识点1：装饰器</td>
+                <td>00:45.200 - 03:20.800</td>
+                <td>155.6</td>
+                <td>讲师B</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能...">装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能...</td>
+                <td>核心知识点，需重点标记</td>
+            </tr>
+            
+            <tr id="ad-spot-9efa9a979cc5">
+                <td>4</td>
+                <td>中场广告</td>
+                <td>03:20.800 - 03:35.000</td>
+                <td>14.2</td>
+                <td>主持人A</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="感谢XX品牌对本节目的支持，现在购买可享受8折优惠。">感谢XX品牌对本节目的支持，现在购买可享受8折优惠。</td>
+                <td>必须保留，客户要求</td>
+            </tr>
+            
+            <tr id="ad-spot-a3873ac8d3f2">
+                <td>5</td>
+                <td>知识点2：生成器</td>
+                <td>03:35.000 - 06:10.500</td>
+                <td>155.5</td>
+                <td>讲师B</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="生成器是一种特殊的迭代器，使用yield关键字来返回值...">生成器是一种特殊的迭代器，使用yield关键字来返回值...</td>
+                <td></td>
+            </tr>
+            
+            <tr id="ad-spot-68351228721a">
+                <td>6</td>
+                <td>知识点3：上下文管理器</td>
+                <td>06:10.500 - 08:45.300</td>
+                <td>154.8</td>
+                <td>讲师B</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="上下文管理器用于资源管理，最常见的是with语句...">上下文管理器用于资源管理，最常见的是with语句...</td>
+                <td>补充示例代码</td>
+            </tr>
+            
+            <tr id="ad-spot-608c661f0d95">
+                <td>7</td>
+                <td>片尾广告</td>
+                <td>08:45.300 - 09:00.000</td>
+                <td>14.7</td>
+                <td>主持人A</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="感谢收听本期课程，下期再见！XX品牌，品质保证。">感谢收听本期课程，下期再见！XX品牌，品质保证。</td>
+                <td>标准片尾</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h2 class="section-title">🎧 原始音轨</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>名称</th>
+                    <th>时间段</th>
+                    <th>时长(秒)</th>
+                    <th>主讲人</th>
+                    <th>字幕/内容</th>
+                    <th>备注</th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr id="raw-track-0855135e30ad">
+                <td>1</td>
+                <td>音轨_001_片头 </td>
+                <td>00:00.000 - 00:15.500</td>
+                <td>15.5</td>
+                <td>主持人A</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="欢迎收听本期课程，本节目由XX品牌独家冠名播出。">欢迎收听本期课程，本节目由XX品牌独家冠名播出。</td>
+                <td>对应广告口播表第1条</td>
+            </tr>
+            
+            <tr id="raw-track-233b0e0d89ef">
+                <td>2</td>
+                <td>音轨_002_课程介绍 </td>
+                <td>00:15.500 - 00:45.200</td>
+                <td>29.7</td>
+                <td>讲师B</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="今天我们来学习Python编程的高级技巧，包括装饰器、生成器和上下文管理器。">今天我们来学习Python编程的高级技巧，包括装饰器、生成器和上下文管理器。</td>
+                <td></td>
+            </tr>
+            
+            <tr id="raw-track-cbfa022919fc">
+                <td>3</td>
+                <td>音轨_003_静音段1 <span class="badge badge-unknown">静音</span></td>
+                <td>00:45.200 - 00:47.500</td>
+                <td>2.3</td>
+                <td></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title=""></td>
+                <td>疑似剪辑错误，可能误删了内容</td>
+            </tr>
+            
+            <tr id="raw-track-dab58efdf713">
+                <td>4</td>
+                <td>音轨_004_装饰器 </td>
+                <td>00:47.500 - 03:23.100</td>
+                <td>155.6</td>
+                <td>讲师B</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能...">装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能...</td>
+                <td>与广告口播表时间有偏差，漂移约2.3秒</td>
+            </tr>
+            
+            <tr id="raw-track-121bd0705cfb">
+                <td>5</td>
+                <td>音轨_005_中场广告 </td>
+                <td>03:23.100 - 03:37.300</td>
+                <td>14.2</td>
+                <td>主持人A</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="感谢XX品牌对本节目的支持，现在购买可享受8折优惠。">感谢XX品牌对本节目的支持，现在购买可享受8折优惠。</td>
+                <td></td>
+            </tr>
+            
+            <tr id="raw-track-6d204196bcec">
+                <td>6</td>
+                <td>音轨_006_静音段2 <span class="badge badge-unknown">静音</span></td>
+                <td>03:37.300 - 03:39.000</td>
+                <td>1.7</td>
+                <td></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title=""></td>
+                <td>正常呼吸停顿，可保留</td>
+            </tr>
+            
+            <tr id="raw-track-a76c9fbd4fdd">
+                <td>7</td>
+                <td>音轨_007_生成器 </td>
+                <td>03:39.000 - 06:14.500</td>
+                <td>155.5</td>
+                <td>讲师B</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="生成器是一种特殊的迭代器，使用yield关键字来返回值...">生成器是一种特殊的迭代器，使用yield关键字来返回值...</td>
+                <td></td>
+            </tr>
+            
+            <tr id="raw-track-bcc0023e5fe2">
+                <td>8</td>
+                <td>音轨_008_静音段3 <span class="badge badge-unknown">静音</span></td>
+                <td>06:14.500 - 06:16.800</td>
+                <td>2.3</td>
+                <td></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title=""></td>
+                <td>可能误删了过渡语</td>
+            </tr>
+            
+            <tr id="raw-track-62dff0b584f6">
+                <td>9</td>
+                <td>音轨_009_上下文管理器 </td>
+                <td>06:16.800 - 08:51.600</td>
+                <td>154.8</td>
+                <td>讲师B</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="上下文管理器用于资源管理，最常见的是with语句...">上下文管理器用于资源管理，最常见的是with语句...</td>
+                <td></td>
+            </tr>
+            
+            <tr id="raw-track-1f96c07f4ac1">
+                <td>10</td>
+                <td>音轨_010_片尾 </td>
+                <td>08:51.600 - 09:06.300</td>
+                <td>14.7</td>
+                <td>主持人A</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="感谢收听本期课程，下期再见！XX品牌，品质保证。">感谢收听本期课程，下期再见！XX品牌，品质保证。</td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+        
+            </div>
+            <div id="tab-timeline" class="tab-content">
+                
+        <h2 class="section-title">⏱️ 时间轴视图</h2>
+
+        <div class="timeline-container">
+            <div class="timeline-row">
+                <div class="timeline-label">广告口播</div>
+                <div class="timeline-track">
+            <div class="timeline-segment ad"
+                 style="left: 0.0%; width: 2.837268899871866%;"
+                 title="[广告] 片头广告口播\n00:00.000 - 00:15.500"
+                 onclick="scrollToSource(&quot;ad-f040626be887&quot;)">
+                
+            </div>
+            
+            <div class="timeline-segment ad"
+                 style="left: 2.837268899871866%; width: 5.436573311367381%;"
+                 title="[广告] 课程介绍\n00:15.500 - 00:45.200"
+                 onclick="scrollToSource(&quot;ad-768e8c115f6e&quot;)">
+                课程介绍
+            </div>
+            
+            <div class="timeline-segment ad"
+                 style="left: 8.273842211239248%; width: 28.482518762584668%;"
+                 title="[广告] 知识点1：装饰器\n00:45.200 - 03:20.800"
+                 onclick="scrollToSource(&quot;ad-543ae3c89fac&quot;)">
+                知识点1：装饰器
+            </div>
+            
+            <div class="timeline-segment ad"
+                 style="left: 36.75636097382391%; width: 2.5993044114955137%;"
+                 title="[广告] 中场广告\n03:20.800 - 03:35.000"
+                 onclick="scrollToSource(&quot;ad-9efa9a979cc5&quot;)">
+                
+            </div>
+            
+            <div class="timeline-segment ad"
+                 style="left: 39.355665385319426%; width: 28.464213801940332%;"
+                 title="[广告] 知识点2：生成器\n03:35.000 - 06:10.500"
+                 onclick="scrollToSource(&quot;ad-a3873ac8d3f2&quot;)">
+                知识点2：生成器
+            </div>
+            
+            <div class="timeline-segment ad"
+                 style="left: 67.81987918725976%; width: 28.336079077429975%;"
+                 title="[广告] 知识点3：上下文管理器\n06:10.500 - 08:45.300"
+                 onclick="scrollToSource(&quot;ad-68351228721a&quot;)">
+                知识点3：上下文
+            </div>
+            
+            <div class="timeline-segment ad"
+                 style="left: 96.15595826468973%; width: 2.690829214717197%;"
+                 title="[广告] 片尾广告\n08:45.300 - 09:00.000"
+                 onclick="scrollToSource(&quot;ad-608c661f0d95&quot;)">
+                
+            </div>
+            </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">原始音轨</div>
+                <div class="timeline-track">
+            <div class="timeline-segment track"
+                 style="left: 0.0%; width: 2.837268899871866%;"
+                 title="[音轨] 音轨_001_片头\n00:00.000 - 00:15.500"
+                 onclick="scrollToSource(&quot;track-0855135e30ad&quot;)">
+                
+            </div>
+            
+            <div class="timeline-segment track"
+                 style="left: 2.837268899871866%; width: 5.436573311367381%;"
+                 title="[音轨] 音轨_002_课程介绍\n00:15.500 - 00:45.200"
+                 onclick="scrollToSource(&quot;track-233b0e0d89ef&quot;)">
+                音轨_002_课
+            </div>
+            
+            <div class="timeline-segment silence"
+                 style="left: 8.273842211239248%; width: 0.4210140948196957%;"
+                 title="[音轨] 音轨_003_静音段1\n00:45.200 - 00:47.500"
+                 onclick="scrollToSource(&quot;silence-cbfa022919fc&quot;)">
+                
+            </div>
+            
+            <div class="timeline-segment track"
+                 style="left: 8.694856306058943%; width: 28.482518762584665%;"
+                 title="[音轨] 音轨_004_装饰器\n00:47.500 - 03:23.100"
+                 onclick="scrollToSource(&quot;track-dab58efdf713&quot;)">
+                音轨_004_装
+            </div>
+            
+            <div class="timeline-segment track"
+                 style="left: 37.177375068643606%; width: 2.5993044114955186%;"
+                 title="[音轨] 音轨_005_中场广告\n03:23.100 - 03:37.300"
+                 onclick="scrollToSource(&quot;track-121bd0705cfb&quot;)">
+                
+            </div>
+            
+            <div class="timeline-segment silence"
+                 style="left: 39.77667948013912%; width: 0.3111843309536864%;"
+                 title="[音轨] 音轨_006_静音段2\n03:37.300 - 03:39.000"
+                 onclick="scrollToSource(&quot;silence-6d204196bcec&quot;)">
+                
+            </div>
+            
+            <div class="timeline-segment track"
+                 style="left: 40.08786381109281%; width: 28.464213801940332%;"
+                 title="[音轨] 音轨_007_生成器\n03:39.000 - 06:14.500"
+                 onclick="scrollToSource(&quot;track-a76c9fbd4fdd&quot;)">
+                音轨_007_生
+            </div>
+            
+            <div class="timeline-segment silence"
+                 style="left: 68.55207761303313%; width: 0.4210140948196982%;"
+                 title="[音轨] 音轨_008_静音段3\n06:14.500 - 06:16.800"
+                 onclick="scrollToSource(&quot;silence-bcc0023e5fe2&quot;)">
+                
+            </div>
+            
+            <div class="timeline-segment track"
+                 style="left: 68.97309170785284%; width: 28.336079077429986%;"
+                 title="[音轨] 音轨_009_上下文管理器\n06:16.800 - 08:51.600"
+                 onclick="scrollToSource(&quot;track-62dff0b584f6&quot;)">
+                音轨_009_上
+            </div>
+            
+            <div class="timeline-segment track"
+                 style="left: 97.30917078528283%; width: 2.690829214717176%;"
+                 title="[音轨] 音轨_010_片尾\n08:51.600 - 09:06.300"
+                 onclick="scrollToSource(&quot;track-1f96c07f4ac1&quot;)">
+                
+            </div>
+            </div>
+            </div>
+            <div class="timeline-row">
+                <div class="timeline-label">切片结果</div>
+                <div class="timeline-track">
+            <div class="timeline-segment slice approved"
+                 style="left: 0.0%; width: 2.837268899871866%;"
+                 title="切片_001_片头广告口播\n00:00.000 - 00:15.500"
+                 onclick="showSliceDetail(&quot;33df18e8a581&quot;)">
+                
+            </div>
+            
+            <div class="timeline-segment slice rejected"
+                 style="left: 2.837268899871866%; width: 5.528098114589055%;"
+                 title="切片_002_课程介绍\n00:15.500 - 00:45.700"
+                 onclick="showSliceDetail(&quot;18671452a0ad&quot;)">
+                切片_002_课
+            </div>
+            
+            <div class="timeline-segment slice approved"
+                 style="left: 8.273842211239248%; width: 28.482518762584668%;"
+                 title="切片_003_知识点1：装饰器\n00:45.200 - 03:20.800"
+                 onclick="showSliceDetail(&quot;f32798208cc8&quot;)">
+                切片_003_知
+            </div>
+            
+            <div class="timeline-segment slice pending"
+                 style="left: 36.75636097382391%; width: 2.5993044114955137%;"
+                 title="切片_004_中场广告\n03:20.800 - 03:35.000"
+                 onclick="showSliceDetail(&quot;4d23a9da9f78&quot;)">
+                
+            </div>
+            
+            <div class="timeline-segment slice pending"
+                 style="left: 39.355665385319426%; width: 28.464213801940332%;"
+                 title="切片_005_知识点2：生成器\n03:35.000 - 06:10.500"
+                 onclick="showSliceDetail(&quot;64752006ce44&quot;)">
+                切片_005_知
+            </div>
+            
+            <div class="timeline-segment slice pending"
+                 style="left: 67.81987918725976%; width: 28.336079077429975%;"
+                 title="切片_006_知识点3：上下文管理器\n06:10.500 - 08:45.300"
+                 onclick="showSliceDetail(&quot;63f82a484b2e&quot;)">
+                切片_006_知
+            </div>
+            
+            <div class="timeline-segment slice pending"
+                 style="left: 96.15595826468973%; width: 2.690829214717197%;"
+                 title="切片_007_片尾广告\n08:45.300 - 09:00.000"
+                 onclick="showSliceDetail(&quot;1ab0e6fbdf3c&quot;)">
+                
+            </div>
+            </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap;">
+            <div><span class="badge badge-ad">■</span> 广告口播</div>
+            <div><span class="badge badge-content">■</span> 音轨内容</div>
+            <div><span class="badge badge-unknown">■</span> 静音段</div>
+            <div><span class="badge badge-slice">■</span> 待复核切片</div>
+            <div><span class="badge badge-approved">■</span> 已通过</div>
+            <div><span class="badge badge-rejected">■</span> 已拒绝</div>
+        </div>
+
+        <p style="margin-top: 16px; color: #888; font-size: 12px;">
+            总时长: 09:06.300 | 点击时间块可查看详情
+        </p>
+        
+            </div>
+            <div id="tab-history" class="tab-content">
+                
+        <h2 class="section-title">📜 历史记录</h2>
+        <div class="search-box">
+            <input type="text" id="history-search" placeholder="搜索操作人、变更内容..." oninput="filterHistory()">
+            <select id="history-type-filter" onchange="filterHistory()">
+                <option value="">全部操作</option>
+                <option value="import">导入</option>
+                <option value="review">复核</option>
+                <option value="correct">修正</option>
+                <option value="subtitle_edit">字幕编辑</option>
+            </select>
+        </div>
+        <div id="history-list">
+        
+            <div class="history-item" data-id="1874bb2a0024"
+                data-search="王审核 status: approved → approved 复核通过: 内容准确，时间正确 review"
+                data-type="review">
+                <div class="history-header">
+                    <span class="history-operator">王审核</span>
+                    <span class="history-time">2026-05-31T17:23:15.507020</span>
+                </div>
+                <div class="history-diff">status: approved → approved <a href="#slice-f32798208cc8" class="source-link" onclick="scrollToTarget(&#39;#slice-f32798208cc8&#39;); return false;">跳转到目标</a></div>
+                <div class="history-reason">原因: 复核通过: 内容准确，时间正确</div>
+                <div style="margin-top: 8px; font-size: 11px; color: #aaa;">
+                    操作: review | 目标: slice | 字段: status
+                </div>
+            </div>
+            
+            <div class="history-item" data-id="036b34674b7c"
+                data-search="王审核 end_time: 00:45.200 → 00:45.700 复核修正 correct"
+                data-type="correct">
+                <div class="history-header">
+                    <span class="history-operator">王审核</span>
+                    <span class="history-time">2026-05-31T17:23:15.507006</span>
+                </div>
+                <div class="history-diff">end_time: 00:45.200 → 00:45.700 <a href="#slice-18671452a0ad" class="source-link" onclick="scrollToTarget(&#39;#slice-18671452a0ad&#39;); return false;">跳转到目标</a></div>
+                <div class="history-reason">原因: 复核修正</div>
+                <div style="margin-top: 8px; font-size: 11px; color: #aaa;">
+                    操作: correct | 目标: slice | 字段: end_time
+                </div>
+            </div>
+            
+            <div class="history-item" data-id="48cf74f32dac"
+                data-search="王审核 status: rejected → rejected 复核拒绝: 时间轴需要调整 review"
+                data-type="review">
+                <div class="history-header">
+                    <span class="history-operator">王审核</span>
+                    <span class="history-time">2026-05-31T17:23:15.506994</span>
+                </div>
+                <div class="history-diff">status: rejected → rejected <a href="#slice-18671452a0ad" class="source-link" onclick="scrollToTarget(&#39;#slice-18671452a0ad&#39;); return false;">跳转到目标</a></div>
+                <div class="history-reason">原因: 复核拒绝: 时间轴需要调整</div>
+                <div style="margin-top: 8px; font-size: 11px; color: #aaa;">
+                    操作: review | 目标: slice | 字段: status
+                </div>
+            </div>
+            
+            <div class="history-item" data-id="4a3d4e17d77b"
+                data-search="王审核 status: approved → approved 复核通过: 内容准确，时间正确 review"
+                data-type="review">
+                <div class="history-header">
+                    <span class="history-operator">王审核</span>
+                    <span class="history-time">2026-05-31T17:23:15.506985</span>
+                </div>
+                <div class="history-diff">status: approved → approved <a href="#slice-33df18e8a581" class="source-link" onclick="scrollToTarget(&#39;#slice-33df18e8a581&#39;); return false;">跳转到目标</a></div>
+                <div class="history-reason">原因: 复核通过: 内容准确，时间正确</div>
+                <div style="margin-top: 8px; font-size: 11px; color: #aaa;">
+                    操作: review | 目标: slice | 字段: status
+                </div>
+            </div>
+            
+            <div class="history-item" data-id="9f395f24cd9b"
+                data-search="王审核 新增内容 77 字 审核通过，优化表述 subtitle_edit"
+                data-type="subtitle_edit">
+                <div class="history-header">
+                    <span class="history-operator">王审核</span>
+                    <span class="history-time">2026-05-31T17:23:15.506971</span>
+                </div>
+                <div class="history-diff">新增内容 77 字 <a href="#slice-f32798208cc8" class="source-link" onclick="scrollToTarget(&#39;#slice-f32798208cc8&#39;); return false;">跳转到目标</a></div>
+                <div class="history-reason">原因: 审核通过，优化表述</div>
+                <div style="margin-top: 8px; font-size: 11px; color: #aaa;">
+                    操作: subtitle_edit | 目标: slice | 字段: subtitle_final
+                </div>
+            </div>
+            
+            <div class="history-item" data-id="1c37324cff28"
+                data-search="李剪辑 内容变更: 47字 → 68字 播客剪辑手动修改，补充重要提示 subtitle_edit"
+                data-type="subtitle_edit">
+                <div class="history-header">
+                    <span class="history-operator">李剪辑</span>
+                    <span class="history-time">2026-05-31T17:23:15.506928</span>
+                </div>
+                <div class="history-diff">内容变更: 47字 → 68字 <a href="#slice-f32798208cc8" class="source-link" onclick="scrollToTarget(&#39;#slice-f32798208cc8&#39;); return false;">跳转到目标</a></div>
+                <div class="history-reason">原因: 播客剪辑手动修改，补充重要提示</div>
+                <div style="margin-top: 8px; font-size: 11px; color: #aaa;">
+                    操作: subtitle_edit | 目标: slice | 字段: subtitle_draft
+                </div>
+            </div>
+            
+            <div class="history-item" data-id="a3740074bf6a"
+                data-search="张小明 slices:  → 生成7个切片 导入数据并生成切片，广告口播7条，原始音轨10条 import"
+                data-type="import">
+                <div class="history-header">
+                    <span class="history-operator">张小明</span>
+                    <span class="history-time">2026-05-31T17:23:15.506521</span>
+                </div>
+                <div class="history-diff">slices:  → 生成7个切片 <a href="#overview" class="source-link" onclick="scrollToTarget(&#39;#overview&#39;); return false;">跳转到目标</a></div>
+                <div class="history-reason">原因: 导入数据并生成切片，广告口播7条，原始音轨10条</div>
+                <div style="margin-top: 8px; font-size: 11px; color: #aaa;">
+                    操作: import | 目标: project | 字段: slices
+                </div>
+            </div>
+            </div>
+            </div>
+        </main>
+
+        <div id="slice-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">切片详情</h2>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <div id="modal-body" class="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const APP_DATA = {"project": {"id": "971004f4b9f0", "name": "Python高级技巧课程_第3期", "created_at": "2026-05-31T17:23:15.506244", "updated_at": "2026-05-31T17:23:15.507021"}, "summary": {"total": 7, "reviewed": 3, "approved": 2, "rejected": 1, "pending": 4, "has_warnings": 7, "has_issues": 0, "silence_open": 3, "silence_resolved": 0, "progress": 42.9, "total_duration": 540.5, "total_duration_formatted": "09:00.500", "approved_duration": 171.1, "approved_duration_formatted": "02:51.100", "ad_count": 7, "track_count": 10, "slice_count": 7, "silence_issue_count": 3, "history_count": 7}, "ad_spots": [{"id": "f040626be887", "name": "片头广告口播", "start_time": 0.0, "end_time": 15.5, "duration": 15.5, "content": "欢迎收听本期课程，本节目由XX品牌独家冠名播出。", "speaker": "主持人A", "source_file": "", "notes": "第5次录制版本", "start_time_formatted": "00:00.000", "end_time_formatted": "00:15.500"}, {"id": "768e8c115f6e", "name": "课程介绍", "start_time": 15.5, "end_time": 45.2, "duration": 29.7, "content": "今天我们来学习Python编程的高级技巧，包括装饰器、生成器和上下文管理器。", "speaker": "讲师B", "source_file": "", "notes": "", "start_time_formatted": "00:15.500", "end_time_formatted": "00:45.200"}, {"id": "543ae3c89fac", "name": "知识点1：装饰器", "start_time": 45.2, "end_time": 200.8, "duration": 155.6, "content": "装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能...", "speaker": "讲师B", "source_file": "", "notes": "核心知识点，需重点标记", "start_time_formatted": "00:45.200", "end_time_formatted": "03:20.800"}, {"id": "9efa9a979cc5", "name": "中场广告", "start_time": 200.8, "end_time": 215.0, "duration": 14.2, "content": "感谢XX品牌对本节目的支持，现在购买可享受8折优惠。", "speaker": "主持人A", "source_file": "", "notes": "必须保留，客户要求", "start_time_formatted": "03:20.800", "end_time_formatted": "03:35.000"}, {"id": "a3873ac8d3f2", "name": "知识点2：生成器", "start_time": 215.0, "end_time": 370.5, "duration": 155.5, "content": "生成器是一种特殊的迭代器，使用yield关键字来返回值...", "speaker": "讲师B", "source_file": "", "notes": "", "start_time_formatted": "03:35.000", "end_time_formatted": "06:10.500"}, {"id": "68351228721a", "name": "知识点3：上下文管理器", "start_time": 370.5, "end_time": 525.3, "duration": 154.8, "content": "上下文管理器用于资源管理，最常见的是with语句...", "speaker": "讲师B", "source_file": "", "notes": "补充示例代码", "start_time_formatted": "06:10.500", "end_time_formatted": "08:45.300"}, {"id": "608c661f0d95", "name": "片尾广告", "start_time": 525.3, "end_time": 540.0, "duration": 14.7, "content": "感谢收听本期课程，下期再见！XX品牌，品质保证。", "speaker": "主持人A", "source_file": "", "notes": "标准片尾", "start_time_formatted": "08:45.300", "end_time_formatted": "09:00.000"}], "raw_tracks": [{"id": "0855135e30ad", "name": "音轨_001_片头", "start_time": 0.0, "end_time": 15.5, "duration": 15.5, "content": "欢迎收听本期课程，本节目由XX品牌独家冠名播出。", "transcript": "欢迎收听本期课程，本节目由XX品牌独家冠名播出。", "speaker": "主持人A", "source_file": "", "is_silence": false, "silence_confidence": 0.0, "notes": "对应广告口播表第1条", "start_time_formatted": "00:00.000", "end_time_formatted": "00:15.500"}, {"id": "233b0e0d89ef", "name": "音轨_002_课程介绍", "start_time": 15.5, "end_time": 45.2, "duration": 29.7, "content": "今天我们来学习Python编程的高级技巧", "transcript": "今天我们来学习Python编程的高级技巧，包括装饰器、生成器和上下文管理器。", "speaker": "讲师B", "source_file": "", "is_silence": false, "silence_confidence": 0.0, "notes": "", "start_time_formatted": "00:15.500", "end_time_formatted": "00:45.200"}, {"id": "cbfa022919fc", "name": "音轨_003_静音段1", "start_time": 45.2, "end_time": 47.5, "duration": 2.3, "content": "", "transcript": "", "speaker": "", "source_file": "", "is_silence": true, "silence_confidence": 0.95, "notes": "疑似剪辑错误，可能误删了内容", "start_time_formatted": "00:45.200", "end_time_formatted": "00:47.500"}, {"id": "dab58efdf713", "name": "音轨_004_装饰器", "start_time": 47.5, "end_time": 203.1, "duration": 155.6, "content": "装饰器是Python中非常重要的概念", "transcript": "装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能...", "speaker": "讲师B", "source_file": "", "is_silence": false, "silence_confidence": 0.0, "notes": "与广告口播表时间有偏差，漂移约2.3秒", "start_time_formatted": "00:47.500", "end_time_formatted": "03:23.100"}, {"id": "121bd0705cfb", "name": "音轨_005_中场广告", "start_time": 203.1, "end_time": 217.3, "duration": 14.2, "content": "感谢XX品牌对本节目的支持", "transcript": "感谢XX品牌对本节目的支持，现在购买可享受8折优惠。", "speaker": "主持人A", "source_file": "", "is_silence": false, "silence_confidence": 0.0, "notes": "", "start_time_formatted": "03:23.100", "end_time_formatted": "03:37.300"}, {"id": "6d204196bcec", "name": "音轨_006_静音段2", "start_time": 217.3, "end_time": 219.0, "duration": 1.7, "content": "", "transcript": "", "speaker": "", "source_file": "", "is_silence": true, "silence_confidence": 0.88, "notes": "正常呼吸停顿，可保留", "start_time_formatted": "03:37.300", "end_time_formatted": "03:39.000"}, {"id": "a76c9fbd4fdd", "name": "音轨_007_生成器", "start_time": 219.0, "end_time": 374.5, "duration": 155.5, "content": "生成器是一种特殊的迭代器", "transcript": "生成器是一种特殊的迭代器，使用yield关键字来返回值...", "speaker": "讲师B", "source_file": "", "is_silence": false, "silence_confidence": 0.0, "notes": "", "start_time_formatted": "03:39.000", "end_time_formatted": "06:14.500"}, {"id": "bcc0023e5fe2", "name": "音轨_008_静音段3", "start_time": 374.5, "end_time": 376.8, "duration": 2.3, "content": "", "transcript": "", "speaker": "", "source_file": "", "is_silence": true, "silence_confidence": 0.92, "notes": "可能误删了过渡语", "start_time_formatted": "06:14.500", "end_time_formatted": "06:16.800"}, {"id": "62dff0b584f6", "name": "音轨_009_上下文管理器", "start_time": 376.8, "end_time": 531.6, "duration": 154.8, "content": "上下文管理器用于资源管理", "transcript": "上下文管理器用于资源管理，最常见的是with语句...", "speaker": "讲师B", "source_file": "", "is_silence": false, "silence_confidence": 0.0, "notes": "", "start_time_formatted": "06:16.800", "end_time_formatted": "08:51.600"}, {"id": "1f96c07f4ac1", "name": "音轨_010_片尾", "start_time": 531.6, "end_time": 546.3, "duration": 14.7, "content": "感谢收听本期课程", "transcript": "感谢收听本期课程，下期再见！XX品牌，品质保证。", "speaker": "主持人A", "source_file": "", "is_silence": false, "silence_confidence": 0.0, "notes": "", "start_time_formatted": "08:51.600", "end_time_formatted": "09:06.300"}], "slices": [{"id": "33df18e8a581", "name": "切片_001_片头广告口播", "start_time": 0.0, "end_time": 15.5, "duration": 15.5, "content": "欢迎收听本期课程，本节目由XX品牌独家冠名播出。", "slice_type": "ad", "status": "approved", "reviewed": true, "reviewed_by": "王审核", "reviewed_at": "2026-05-31T17:23:15.506979", "source_type": "ad_spot", "source_id": "f040626be887", "source_ref": "广告口播表 + 原始音轨（双源匹配）", "warnings": ["与原始音轨[音轨_001_片头]重叠15.50秒，已合并来源信息"], "issues": [], "subtitle_draft": "欢迎收听本期课程，本节目由XX品牌独家冠名播出。", "subtitle_final": "", "export_filename": "slice_001_33df18e8a581.mp3", "notes": "来源：广告口播表，原始时间00:00.000-00:15.500", "start_time_formatted": "00:00.000", "end_time_formatted": "00:15.500", "duration_formatted": "00:15.500", "history_count": 1}, {"id": "18671452a0ad", "name": "切片_002_课程介绍", "start_time": 15.5, "end_time": 45.7, "duration": 30.2, "content": "今天我们来学习Python编程的高级技巧，包括装饰器、生成器和上下文管理器。", "slice_type": "content", "status": "rejected", "reviewed": true, "reviewed_by": "王审核", "reviewed_at": "2026-05-31T17:23:15.506989", "source_type": "ad_spot", "source_id": "768e8c115f6e", "source_ref": "广告口播表 + 原始音轨（双源匹配）", "warnings": ["与原始音轨[音轨_002_课程介绍]重叠29.70秒，已合并来源信息"], "issues": [], "subtitle_draft": "今天我们来学习Python编程的高级技巧，包括装饰器、生成器和上下文管理器。", "subtitle_final": "", "export_filename": "slice_002_18671452a0ad.mp3", "notes": "来源：广告口播表，原始时间00:15.500-00:45.200", "start_time_formatted": "00:15.500", "end_time_formatted": "00:45.700", "duration_formatted": "00:30.200", "history_count": 2}, {"id": "f32798208cc8", "name": "切片_003_知识点1：装饰器", "start_time": 45.2, "end_time": 200.8, "duration": 155.6, "content": "装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能...", "slice_type": "content", "status": "approved", "reviewed": true, "reviewed_by": "王审核", "reviewed_at": "2026-05-31T17:23:15.507014", "source_type": "ad_spot", "source_id": "543ae3c89fac", "source_ref": "广告口播表 + 原始音轨（双源匹配）", "warnings": ["与原始音轨[音轨_004_装饰器]重叠153.30秒，已合并来源信息"], "issues": [], "subtitle_draft": "装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能... 【重要】装饰器的本质是高阶函数返回闭包。", "subtitle_final": "装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能... 💡装饰器的本质是高阶函数返回闭包。 建议配合示例代码理解。", "export_filename": "slice_003_f32798208cc8.mp3", "notes": "来源：广告口播表，原始时间00:45.200-03:20.800", "start_time_formatted": "00:45.200", "end_time_formatted": "03:20.800", "duration_formatted": "02:35.600", "history_count": 3}, {"id": "4d23a9da9f78", "name": "切片_004_中场广告", "start_time": 200.8, "end_time": 215.0, "duration": 14.2, "content": "感谢XX品牌对本节目的支持，现在购买可享受8折优惠。", "slice_type": "ad", "status": "pending", "reviewed": false, "reviewed_by": "", "reviewed_at": null, "source_type": "ad_spot", "source_id": "9efa9a979cc5", "source_ref": "广告口播表 + 原始音轨（双源匹配）", "warnings": ["与原始音轨[音轨_005_中场广告]重叠11.90秒，已合并来源信息"], "issues": [], "subtitle_draft": "感谢XX品牌对本节目的支持，现在购买可享受8折优惠。", "subtitle_final": "", "export_filename": "slice_004_4d23a9da9f78.mp3", "notes": "来源：广告口播表，原始时间03:20.800-03:35.000", "start_time_formatted": "03:20.800", "end_time_formatted": "03:35.000", "duration_formatted": "00:14.200", "history_count": 0}, {"id": "64752006ce44", "name": "切片_005_知识点2：生成器", "start_time": 215.0, "end_time": 370.5, "duration": 155.5, "content": "生成器是一种特殊的迭代器，使用yield关键字来返回值...", "slice_type": "content", "status": "pending", "reviewed": false, "reviewed_by": "", "reviewed_at": null, "source_type": "ad_spot", "source_id": "a3873ac8d3f2", "source_ref": "广告口播表 + 原始音轨（双源匹配）", "warnings": ["与原始音轨[音轨_007_生成器]重叠151.50秒，已合并来源信息"], "issues": [], "subtitle_draft": "生成器是一种特殊的迭代器，使用yield关键字来返回值...", "subtitle_final": "", "export_filename": "slice_005_64752006ce44.mp3", "notes": "来源：广告口播表，原始时间03:35.000-06:10.500", "start_time_formatted": "03:35.000", "end_time_formatted": "06:10.500", "duration_formatted": "02:35.500", "history_count": 0}, {"id": "63f82a484b2e", "name": "切片_006_知识点3：上下文管理器", "start_time": 370.5, "end_time": 525.3, "duration": 154.8, "content": "上下文管理器用于资源管理，最常见的是with语句...", "slice_type": "content", "status": "pending", "reviewed": false, "reviewed_by": "", "reviewed_at": null, "source_type": "ad_spot", "source_id": "68351228721a", "source_ref": "广告口播表 + 原始音轨（双源匹配）", "warnings": ["与原始音轨[音轨_009_上下文管理器]重叠148.50秒，已合并来源信息"], "issues": [], "subtitle_draft": "上下文管理器用于资源管理，最常见的是with语句...", "subtitle_final": "", "export_filename": "slice_006_63f82a484b2e.mp3", "notes": "来源：广告口播表，原始时间06:10.500-08:45.300", "start_time_formatted": "06:10.500", "end_time_formatted": "08:45.300", "duration_formatted": "02:34.800", "history_count": 0}, {"id": "1ab0e6fbdf3c", "name": "切片_007_片尾广告", "start_time": 525.3, "end_time": 540.0, "duration": 14.7, "content": "感谢收听本期课程，下期再见！XX品牌，品质保证。", "slice_type": "ad", "status": "pending", "reviewed": false, "reviewed_by": "", "reviewed_at": null, "source_type": "ad_spot", "source_id": "608c661f0d95", "source_ref": "广告口播表 + 原始音轨（双源匹配）", "warnings": ["与原始音轨[音轨_010_片尾]重叠8.40秒，已合并来源信息"], "issues": [], "subtitle_draft": "感谢收听本期课程，下期再见！XX品牌，品质保证。", "subtitle_final": "", "export_filename": "slice_007_1ab0e6fbdf3c.mp3", "notes": "来源：广告口播表，原始时间08:45.300-09:00.000", "start_time_formatted": "08:45.300", "end_time_formatted": "09:00.000", "duration_formatted": "00:14.700", "history_count": 0}], "silence_issues": [{"id": "e115cda44822", "slice_id": "f32798208cc8", "start_time": 45.2, "end_time": 47.5, "duration": 2.3, "source_type": "raw_track", "source_id": "cbfa022919fc", "source_ref": "原始音轨[音轨_003_静音段1]", "detected_from": "原始音轨静音标记", "action_suggested": "请联系内容审核员确认此静音段是否为误删或需要保留", "contact_person": "内容审核组", "status": "open", "notes": "静音段时长2.30秒，静音置信度0.95，与切片[切片_003_知识点1：装饰器]时间重叠", "start_time_formatted": "00:45.200", "end_time_formatted": "00:47.500", "duration_formatted": "00:02.300", "source_badge": {"label": "原始音轨", "class": "badge-track"}}, {"id": "711d276eb2f1", "slice_id": "64752006ce44", "start_time": 217.3, "end_time": 219.0, "duration": 1.7, "source_type": "raw_track", "source_id": "6d204196bcec", "source_ref": "原始音轨[音轨_006_静音段2]", "detected_from": "原始音轨静音标记", "action_suggested": "请联系内容审核员确认此静音段是否为误删或需要保留", "contact_person": "内容审核组", "status": "open", "notes": "静音段时长1.70秒，静音置信度0.88，与切片[切片_005_知识点2：生成器]时间重叠", "start_time_formatted": "03:37.300", "end_time_formatted": "03:39.000", "duration_formatted": "00:01.700", "source_badge": {"label": "原始音轨", "class": "badge-track"}}, {"id": "019da1d8243a", "slice_id": "63f82a484b2e", "start_time": 374.5, "end_time": 376.8, "duration": 2.3, "source_type": "raw_track", "source_id": "bcc0023e5fe2", "source_ref": "原始音轨[音轨_008_静音段3]", "detected_from": "原始音轨静音标记", "action_suggested": "请联系内容审核员确认此静音段是否为误删或需要保留", "contact_person": "内容审核组", "status": "open", "notes": "静音段时长2.30秒，静音置信度0.92，与切片[切片_006_知识点3：上下文管理器]时间重叠", "start_time_formatted": "06:14.500", "end_time_formatted": "06:16.800", "duration_formatted": "00:02.300", "source_badge": {"label": "原始音轨", "class": "badge-track"}}], "history": [{"id": "1874bb2a0024", "timestamp": "2026-05-31T17:23:15.507020", "operation": "review", "operator": "王审核", "target_type": "slice", "target_id": "f32798208cc8", "field_name": "status", "old_value": "approved", "new_value": "approved", "diff_summary": "status: approved → approved", "reason": "复核通过: 内容准确，时间正确", "metadata": {"comments": "内容准确，时间正确"}, "target_link": "#slice-f32798208cc8"}, {"id": "036b34674b7c", "timestamp": "2026-05-31T17:23:15.507006", "operation": "correct", "operator": "王审核", "target_type": "slice", "target_id": "18671452a0ad", "field_name": "end_time", "old_value": "45.2", "new_value": "45.7", "diff_summary": "end_time: 00:45.200 → 00:45.700", "reason": "复核修正", "metadata": {}, "target_link": "#slice-18671452a0ad"}, {"id": "48cf74f32dac", "timestamp": "2026-05-31T17:23:15.506994", "operation": "review", "operator": "王审核", "target_type": "slice", "target_id": "18671452a0ad", "field_name": "status", "old_value": "rejected", "new_value": "rejected", "diff_summary": "status: rejected → rejected", "reason": "复核拒绝: 时间轴需要调整", "metadata": {"comments": "时间轴需要调整"}, "target_link": "#slice-18671452a0ad"}, {"id": "4a3d4e17d77b", "timestamp": "2026-05-31T17:23:15.506985", "operation": "review", "operator": "王审核", "target_type": "slice", "target_id": "33df18e8a581", "field_name": "status", "old_value": "approved", "new_value": "approved", "diff_summary": "status: approved → approved", "reason": "复核通过: 内容准确，时间正确", "metadata": {"comments": "内容准确，时间正确"}, "target_link": "#slice-33df18e8a581"}, {"id": "9f395f24cd9b", "timestamp": "2026-05-31T17:23:15.506971", "operation": "subtitle_edit", "operator": "王审核", "target_type": "slice", "target_id": "f32798208cc8", "field_name": "subtitle_final", "old_value": "", "new_value": "装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能... 💡装饰器的本质是高阶函数返回闭包。 建议配合示例代码理解。", "diff_summary": "新增内容 77 字", "reason": "审核通过，优化表述", "metadata": {"is_final": true}, "target_link": "#slice-f32798208cc8"}, {"id": "1c37324cff28", "timestamp": "2026-05-31T17:23:15.506928", "operation": "subtitle_edit", "operator": "李剪辑", "target_type": "slice", "target_id": "f32798208cc8", "field_name": "subtitle_draft", "old_value": "装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能...", "new_value": "装饰器是Python中非常重要的概念，它允许我们在不修改原函数代码的情况下扩展函数的功能... 【重要】装饰器的本质是高阶函数返回闭包。", "diff_summary": "内容变更: 47字 → 68字", "reason": "播客剪辑手动修改，补充重要提示", "metadata": {"is_final": false}, "target_link": "#slice-f32798208cc8"}, {"id": "a3740074bf6a", "timestamp": "2026-05-31T17:23:15.506521", "operation": "import", "operator": "张小明", "target_type": "project", "target_id": "971004f4b9f0", "field_name": "slices", "old_value": "", "new_value": "生成7个切片", "diff_summary": "slices:  → 生成7个切片", "reason": "导入数据并生成切片，广告口播7条，原始音轨10条", "metadata": {"ad_count": 7, "track_count": 10, "slice_count": 7, "drift_correction": 0.0, "silence_issues": 3}, "target_link": "#overview"}], "timeline": {"max_time": 546.3, "max_time_formatted": "09:06.300", "segments": [{"type": "ad", "id": "f040626be887", "name": "片头广告口播", "start": 0.0, "end": 15.5, "label": "[广告] 片头广告口播"}, {"type": "ad", "id": "768e8c115f6e", "name": "课程介绍", "start": 15.5, "end": 45.2, "label": "[广告] 课程介绍"}, {"type": "ad", "id": "543ae3c89fac", "name": "知识点1：装饰器", "start": 45.2, "end": 200.8, "label": "[广告] 知识点1：装饰器"}, {"type": "ad", "id": "9efa9a979cc5", "name": "中场广告", "start": 200.8, "end": 215.0, "label": "[广告] 中场广告"}, {"type": "ad", "id": "a3873ac8d3f2", "name": "知识点2：生成器", "start": 215.0, "end": 370.5, "label": "[广告] 知识点2：生成器"}, {"type": "ad", "id": "68351228721a", "name": "知识点3：上下文管理器", "start": 370.5, "end": 525.3, "label": "[广告] 知识点3：上下文管理器"}, {"type": "ad", "id": "608c661f0d95", "name": "片尾广告", "start": 525.3, "end": 540.0, "label": "[广告] 片尾广告"}, {"type": "track", "id": "0855135e30ad", "name": "音轨_001_片头", "start": 0.0, "end": 15.5, "label": "[音轨] 音轨_001_片头"}, {"type": "track", "id": "233b0e0d89ef", "name": "音轨_002_课程介绍", "start": 15.5, "end": 45.2, "label": "[音轨] 音轨_002_课程介绍"}, {"type": "silence", "id": "cbfa022919fc", "name": "音轨_003_静音段1", "start": 45.2, "end": 47.5, "label": "[音轨] 音轨_003_静音段1"}, {"type": "track", "id": "dab58efdf713", "name": "音轨_004_装饰器", "start": 47.5, "end": 203.1, "label": "[音轨] 音轨_004_装饰器"}, {"type": "track", "id": "121bd0705cfb", "name": "音轨_005_中场广告", "start": 203.1, "end": 217.3, "label": "[音轨] 音轨_005_中场广告"}, {"type": "silence", "id": "6d204196bcec", "name": "音轨_006_静音段2", "start": 217.3, "end": 219.0, "label": "[音轨] 音轨_006_静音段2"}, {"type": "track", "id": "a76c9fbd4fdd", "name": "音轨_007_生成器", "start": 219.0, "end": 374.5, "label": "[音轨] 音轨_007_生成器"}, {"type": "silence", "id": "bcc0023e5fe2", "name": "音轨_008_静音段3", "start": 374.5, "end": 376.8, "label": "[音轨] 音轨_008_静音段3"}, {"type": "track", "id": "62dff0b584f6", "name": "音轨_009_上下文管理器", "start": 376.8, "end": 531.6, "label": "[音轨] 音轨_009_上下文管理器"}, {"type": "track", "id": "1f96c07f4ac1", "name": "音轨_010_片尾", "start": 531.6, "end": 546.3, "label": "[音轨] 音轨_010_片尾"}, {"type": "slice", "id": "33df18e8a581", "name": "切片_001_片头广告口播", "start": 0.0, "end": 15.5, "label": "切片_001_片头广告口播", "status": "approved", "slice_type": "ad"}, {"type": "slice", "id": "18671452a0ad", "name": "切片_002_课程介绍", "start": 15.5, "end": 45.7, "label": "切片_002_课程介绍", "status": "rejected", "slice_type": "content"}, {"type": "slice", "id": "f32798208cc8", "name": "切片_003_知识点1：装饰器", "start": 45.2, "end": 200.8, "label": "切片_003_知识点1：装饰器", "status": "approved", "slice_type": "content"}, {"type": "slice", "id": "4d23a9da9f78", "name": "切片_004_中场广告", "start": 200.8, "end": 215.0, "label": "切片_004_中场广告", "status": "pending", "slice_type": "ad"}, {"type": "slice", "id": "64752006ce44", "name": "切片_005_知识点2：生成器", "start": 215.0, "end": 370.5, "label": "切片_005_知识点2：生成器", "status": "pending", "slice_type": "content"}, {"type": "slice", "id": "63f82a484b2e", "name": "切片_006_知识点3：上下文管理器", "start": 370.5, "end": 525.3, "label": "切片_006_知识点3：上下文管理器", "status": "pending", "slice_type": "content"}, {"type": "slice", "id": "1ab0e6fbdf3c", "name": "切片_007_片尾广告", "start": 525.3, "end": 540.0, "label": "切片_007_片尾广告", "status": "pending", "slice_type": "ad"}]}, "generated_at": "2026-05-31T17:23:15.507500"};
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === 'tab-' + tabName);
+            });
+            window.location.hash = tabName;
+        }
+
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                switchTab(this.dataset.tab);
+            });
+        });
+
+        const hash = window.location.hash.replace('#', '');
+        if (hash && document.querySelector('.nav-tab[data-tab="' + hash + '"]')) {
+            switchTab(hash);
+        }
+
+        function showModal(contentHtml, title) {
+            document.getElementById('modal-title').textContent = title || '详情';
+            document.getElementById('modal-body').innerHTML = contentHtml;
+            document.getElementById('slice-modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('slice-modal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('slice-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        function getSliceById(id) {
+            return APP_DATA.slices.find(s => s.id === id);
+        }
+
+        function showSliceDetail(sliceId) {
+            const s = getSliceById(sliceId);
+            if (!s) return;
+
+            const statusBadge = 'badge-' + s.status;
+            const typeBadge = s.slice_type === 'ad' ? 'badge-ad' : 'badge-content';
+
+            let warningsHtml = '';
+            if (s.warnings && s.warnings.length > 0) {
+                warningsHtml = '<div class="warnings-box"><h4>⚠️ 警告</h4><ul>' +
+                    s.warnings.map(w => '<li>' + w + '</li>').join('') + '</ul></div>';
+            }
+
+            let issuesHtml = '';
+            if (s.issues && s.issues.length > 0) {
+                issuesHtml = '<div class="issues-box"><h4>❌ 问题</h4><ul>' +
+                    s.issues.map(i => '<li>' + i + '</li>').join('') + '</ul></div>';
+            }
+
+            let subtitleHtml = '';
+            if (s.subtitle_draft || s.subtitle_final) {
+                subtitleHtml = '<div class="detail-section"><h3>📝 字幕</h3>';
+                if (s.subtitle_draft !== s.subtitle_final && s.subtitle_draft && s.subtitle_final) {
+                    subtitleHtml += '<div class="subtitle-diff">' +
+                        '<div><div class="subtitle-label">草稿</div><div class="subtitle-content">' + (s.subtitle_draft || '-') + '</div></div>' +
+                        '<div><div class="subtitle-label">最终版</div><div class="subtitle-content">' + (s.subtitle_final || '-') + '</div></div>' +
+                    '</div>';
+                } else {
+                    if (s.subtitle_draft) {
+                        subtitleHtml += '<div class="subtitle-label">字幕草稿</div><div class="subtitle-content">' + s.subtitle_draft + '</div>';
+                    }
+                    if (s.subtitle_final) {
+                        subtitleHtml += '<div class="subtitle-label" style="margin-top:12px;">字幕最终版</div><div class="subtitle-content">' + s.subtitle_final + '</div>';
+                    }
+                }
+                subtitleHtml += '</div>';
+            }
+
+            const traceResult = traceSliceSource(sliceId);
+            let sourcesHtml = '<div class="detail-section"><h3>🔗 数据来源追溯</h3>';
+            if (traceResult.sources && traceResult.sources.length > 0) {
+                traceResult.sources.forEach(src => {
+                    const srcBadge = src.type === 'ad_spot' ? 'badge-ad' : 'badge-track';
+                    const srcName = src.type === 'ad_spot' ? '广告口播表' : '原始音轨';
+                    sourcesHtml += '<div class="source-card">' +
+                        '<h4><span class="badge ' + srcBadge + '">' + srcName + '</span>' +
+                        (src.overlap_seconds ? ' 重叠: ' + src.overlap_seconds + '秒' : '') +
+                        '</h4>' +
+                        '<div class="detail-grid">' +
+                        '<div class="detail-item"><label>名称</label><div class="value">' + src.data.name + '</div></div>' +
+                        '<div class="detail-item"><label>时间</label><div class="value">' + src.data.start_time_formatted + ' - ' + src.data.end_time_formatted + '</div></div>' +
+                        (src.data.content ? '<div class="detail-item full-width"><label>内容</label><div class="value">' + src.data.content + '</div></div>' : '') +
+                        (src.data.transcript ? '<div class="detail-item full-width"><label>字幕</label><div class="value">' + src.data.transcript + '</div></div>' : '') +
+                        '</div>' +
+                        '<button class="btn btn-secondary" onclick="scrollToSource(\'' + src.type + '-' + src.data.id + '\')">在源数据表中查看</button>' +
+                        '</div>';
+                });
+            } else {
+                sourcesHtml += '<p style="color: #888;">未找到关联的源数据</p>';
+            }
+            sourcesHtml += '</div>';
+
+            const historyRecords = getSliceHistory(sliceId);
+            let historyHtml = '<div class="detail-section"><h3>📜 变更历史</h3>';
+            if (historyRecords.length > 0) {
+                historyRecords.forEach(h => {
+                    historyHtml += '<div class="history-item">' +
+                        '<div class="history-header">' +
+                        '<span class="history-operator">' + h.operator + '</span>' +
+                        '<span class="history-time">' + h.timestamp + '</span>' +
+                        '</div>' +
+                        '<div class="history-diff">' + h.diff_summary + '</div>' +
+                        (h.reason ? '<div class="history-reason">原因: ' + h.reason + '</div>' : '') +
+                        '</div>';
+                });
+            } else {
+                historyHtml += '<p style="color: #888;">暂无变更历史</p>';
+            }
+            historyHtml += '</div>';
+
+            const html = '<div class="detail-grid">' +
+                '<div class="detail-item"><label>切片名称</label><div class="value">' + s.name + '</div></div>' +
+                '<div class="detail-item"><label>切片ID</label><div class="value">' + s.id + '</div></div>' +
+                '<div class="detail-item"><label>开始时间</label><div class="value">' + s.start_time_formatted + '</div></div>' +
+                '<div class="detail-item"><label>结束时间</label><div class="value">' + s.end_time_formatted + '</div></div>' +
+                '<div class="detail-item"><label>时长</label><div class="value">' + s.duration_formatted + '</div></div>' +
+                '<div class="detail-item"><label>导出文件名</label><div class="value">' + s.export_filename + '</div></div>' +
+                '<div class="detail-item"><label>类型</label><div class="value"><span class="badge ' + typeBadge + '">' + s.slice_type + '</span></div></div>' +
+                '<div class="detail-item"><label>状态</label><div class="value"><span class="badge ' + statusBadge + '">' + s.status + '</span></div></div>' +
+                '<div class="detail-item full-width"><label>内容摘要</label><div class="value">' + (s.content || '-') + '</div></div>' +
+                '<div class="detail-item full-width"><label>来源引用</label><div class="value">' + s.source_ref + '</div></div>' +
+                (s.notes ? '<div class="detail-item full-width"><label>备注</label><div class="value">' + s.notes + '</div></div>' : '') +
+                (s.reviewed_by ? '<div class="detail-item"><label>复核人</label><div class="value">' + s.reviewed_by + '</div></div>' : '') +
+                (s.reviewed_at ? '<div class="detail-item"><label>复核时间</label><div class="value">' + s.reviewed_at + '</div></div>' : '') +
+                '</div>' +
+                warningsHtml + issuesHtml + subtitleHtml + sourcesHtml + historyHtml;
+
+            showModal(html, '🎵 ' + s.name);
+        }
+
+        function traceSliceSource(sliceId) {
+            const s = getSliceById(sliceId);
+            if (!s) return { error: '未找到切片' };
+
+            const result = {
+                slice: s,
+                source_ref: s.source_ref,
+                source_type: s.source_type,
+                sources: []
+            };
+
+            if (s.source_type === 'ad_spot' || s.source_type === '') {
+                const ad = APP_DATA.ad_spots.find(a => a.id === s.source_id);
+                if (ad) {
+                    result.sources.push({
+                        type: 'ad_spot',
+                        name: '广告口播表',
+                        data: ad,
+                        link: '#ad-spot-' + ad.id
+                    });
+                }
+            }
+
+            if (s.source_type === 'raw_track' || s.source_ref.indexOf('原始音轨') >= 0) {
+                const track = APP_DATA.raw_tracks.find(t => t.id === s.source_id);
+                if (track) {
+                    result.sources.push({
+                        type: 'raw_track',
+                        name: '原始音轨',
+                        data: track,
+                        link: '#raw-track-' + track.id
+                    });
+                }
+            }
+
+            if (s.source_ref.indexOf('双源匹配') >= 0) {
+                APP_DATA.ad_spots.forEach(ad => {
+                    const overlap = timeOverlap(
+                        ad.start_time, ad.end_time,
+                        s.start_time, s.end_time
+                    );
+                    if (overlap > 0.1) {
+                        result.sources.push({
+                            type: 'ad_spot',
+                            name: '广告口播表',
+                            data: ad,
+                            overlap_seconds: overlap.toFixed(3),
+                            link: '#ad-spot-' + ad.id
+                        });
+                    }
+                });
+                APP_DATA.raw_tracks.forEach(track => {
+                    const overlap = timeOverlap(
+                        track.start_time, track.end_time,
+                        s.start_time, s.end_time
+                    );
+                    if (overlap > 0.1) {
+                        result.sources.push({
+                            type: 'raw_track',
+                            name: '原始音轨',
+                            data: track,
+                            overlap_seconds: overlap.toFixed(3),
+                            link: '#raw-track-' + track.id
+                        });
+                    }
+                });
+            }
+
+            return result;
+        }
+
+        function timeOverlap(a_start, a_end, b_start, b_end) {
+            const os = Math.max(a_start, b_start);
+            const oe = Math.min(a_end, b_end);
+            return Math.max(0, oe - os);
+        }
+
+        function getSliceHistory(sliceId) {
+            return APP_DATA.history.filter(h =>
+                h.target_type === 'slice' && h.target_id === sliceId
+            );
+        }
+
+        function showSliceSource(sliceId) {
+            showSliceDetail(sliceId);
+        }
+
+        function scrollToSource(sourceId) {
+            closeModal();
+            switchTab('sources');
+            setTimeout(() => {
+                const el = document.getElementById(sourceId);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.style.background = '#fff9c4';
+                    setTimeout(() => { el.style.background = ''; }, 2000);
+                }
+            }, 100);
+        }
+
+        function scrollToTarget(hash) {
+            const id = hash.replace('#', '');
+            if (id.indexOf('slice-') === 0) {
+                showSliceDetail(id.replace('slice-', ''));
+                return;
+            }
+            if (id.indexOf('ad-spot-') === 0 || id.indexOf('raw-track-') === 0) {
+                scrollToSource(id);
+            }
+        }
+
+        function showSourceForSilence(issueId) {
+            const issue = APP_DATA.silence_issues.find(si => si.id === issueId);
+            if (!issue) return;
+
+            let html = '<div class="detail-section"><h3>🔍 静音段来源追溯</h3>';
+            html += '<p><strong>时间段:</strong> ' + issue.start_time_formatted + ' - ' + issue.end_time_formatted + '</p>';
+            html += '<p><strong>时长:</strong> ' + issue.duration_formatted + '</p>';
+            html += '<p><strong>来源:</strong> <span class="badge ' + issue.source_badge.class + '">' + issue.source_badge.label + '</span> ' + issue.source_ref + '</p>';
+
+            if (issue.source_type === 'ad_spot') {
+                const ad = APP_DATA.ad_spots.find(a => a.id === issue.source_id);
+                if (ad) {
+                    html += '<div class="source-card"><h4>📋 广告口播表详情</h4>' +
+                        '<div class="detail-grid">' +
+                        '<div class="detail-item"><label>名称</label><div class="value">' + ad.name + '</div></div>' +
+                        '<div class="detail-item"><label>时间</label><div class="value">' + ad.start_time_formatted + ' - ' + ad.end_time_formatted + '</div></div>' +
+                        '<div class="detail-item full-width"><label>内容</label><div class="value">' + ad.content + '</div></div>' +
+                        '</div>' +
+                        '<button class="btn btn-secondary" onclick="scrollToSource(\'ad-spot-' + ad.id + '\')">在源数据表中查看</button>' +
+                        '</div>';
+                }
+            } else if (issue.source_type === 'raw_track') {
+                const track = APP_DATA.raw_tracks.find(t => t.id === issue.source_id);
+                if (track) {
+                    html += '<div class="source-card"><h4>🎧 原始音轨详情</h4>' +
+                        '<div class="detail-grid">' +
+                        '<div class="detail-item"><label>名称</label><div class="value">' + track.name + '</div></div>' +
+                        '<div class="detail-item"><label>时间</label><div class="value">' + track.start_time_formatted + ' - ' + track.end_time_formatted + '</div></div>' +
+                        '<div class="detail-item full-width"><label>内容/字幕</label><div class="value">' + (track.transcript || track.content || '-') + '</div></div>' +
+                        '</div>' +
+                        '<button class="btn btn-secondary" onclick="scrollToSource(\'raw-track-' + track.id + '\')">在源数据表中查看</button>' +
+                        '</div>';
+                }
+            }
+
+            html += '<div class="silence-action" style="margin-top: 16px;">' +
+                '<p><strong>建议处理:</strong> ' + issue.action_suggested + '</p>' +
+                '<p><strong>联系人:</strong> <span class="silence-contact">' + issue.contact_person + '</span></p>' +
+                '</div>';
+
+            html += '</div>';
+            showModal(html, '🔇 静音段来源追溯');
+        }
+
+        function filterSlices() {
+            const search = document.getElementById('slice-search').value.toLowerCase();
+            const statusFilter = document.getElementById('slice-status-filter').value;
+            const typeFilter = document.getElementById('slice-type-filter').value;
+
+            document.querySelectorAll('#slices-table-body tr').forEach(row => {
+                const matchesSearch = row.dataset.name.toLowerCase().indexOf(search) >= 0;
+                const matchesStatus = !statusFilter || row.dataset.status === statusFilter;
+                const matchesType = !typeFilter || row.dataset.type === typeFilter;
+
+                row.style.display = (matchesSearch && matchesStatus && matchesType) ? '' : 'none';
+            });
+        }
+
+        function filterHistory() {
+            const search = document.getElementById('history-search').value.toLowerCase();
+            const typeFilter = document.getElementById('history-type-filter').value;
+
+            document.querySelectorAll('#history-list .history-item').forEach(item => {
+                const matchesSearch = item.dataset.search.toLowerCase().indexOf(search) >= 0;
+                const matchesType = !typeFilter || item.dataset.type === typeFilter;
+
+                item.style.display = (matchesSearch && matchesType) ? '' : 'none';
+            });
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+        
+    </script>
+</body>
+</html>
