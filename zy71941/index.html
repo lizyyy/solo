@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>载荷开机编排</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">📡</div>
+        <div class="brand-text">载荷开机编排</div>
+      </div>
+      <nav id="nav" class="sidebar-nav">
+        <button class="nav-item active" data-view="dashboard" role="tab" aria-selected="true">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">编排总览</span>
+        </button>
+        <button class="nav-item" data-view="records" role="tab" aria-selected="false">
+          <span class="nav-icon">📋</span>
+          <span class="nav-label">记录列表</span>
+        </button>
+        <button class="nav-item" data-view="pending" role="tab" aria-selected="false">
+          <span class="nav-icon">⚠️</span>
+          <span class="nav-label">待处理队列</span>
+        </button>
+        <button class="nav-item" data-view="history" role="tab" aria-selected="false">
+          <span class="nav-icon">🕐</span>
+          <span class="nav-label">变更历史</span>
+        </button>
+        <button class="nav-item" data-view="gaps" role="tab" aria-selected="false">
+          <span class="nav-icon">📉</span>
+          <span class="nav-label">遥测缺帧</span>
+        </button>
+        <button class="nav-item" data-view="briefing" role="tab" aria-selected="false">
+          <span class="nav-icon">📄</span>
+          <span class="nav-label">任务简报</span>
+        </button>
+        <div class="nav-divider"></div>
+        <button class="nav-item" data-view="guide" role="tab" aria-selected="false">
+          <span class="nav-icon">📖</span>
+          <span class="nav-label">收尾说明</span>
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost btn-sm" onclick="resetData()">重置样例数据</button>
+      </div>
+    </aside>
+    <main class="main-content">
+      <div id="content" class="content-area"></div>
+    </main>
+  </div>
+  <div id="modal" class="modal" style="display:none;"></div>
+  <script src="app.js"></script>
+</body>
+</html>
