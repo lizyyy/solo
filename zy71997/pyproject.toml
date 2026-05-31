@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "multi-repo-tag"
+version = "1.0.0"
+description = "多仓库版本标记 - 导入/复核/修正/历史/导出全流程"
+requires-python = ">=3.9"
+dependencies = [
+    "pydantic>=2.0",
+    "fastapi>=0.100",
+    "uvicorn>=0.20",
+]
+
+[project.scripts]
+multi-repo-tag = "multi_repo_tag.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["multi_repo_tag*"]
