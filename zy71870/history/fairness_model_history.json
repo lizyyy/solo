@@ -1,0 +1,74 @@
+{
+  "project_name": "fairness_model",
+  "created_at": "2026-05-31 13:11:47",
+  "snapshots": [
+    {
+      "snapshot_id": "ff6e59c9458d",
+      "timestamp": "2026-05-31 13:11:48",
+      "modified_by": "系统初始化",
+      "change_reason": "初始参数配置",
+      "model_description": "赛程公平性模型 v1.0\n休息时间权重: 0.25\n背靠背权重: 0.3\n场地均衡权重: 0.2\n对手强度权重: 0.25\n权重合计: 1.00\n最小休息时间: 24小时\n最大背靠背: 2场",
+      "parameters": {
+        "rest_time_weight": 0.25,
+        "back_to_back_weight": 0.3,
+        "venue_balance_weight": 0.2,
+        "opponent_strength_weight": 0.25,
+        "min_rest_hours": 24,
+        "max_consecutive_games": 2,
+        "fairness_threshold": 0.7
+      },
+      "parameter_changes": [
+        {
+          "parameter": "back_to_back_weight",
+          "change_type": "added",
+          "old_value": null,
+          "new_value": 0.3,
+          "display_text": "新增参数 '背靠背权重' = 0.3"
+        },
+        {
+          "parameter": "rest_time_weight",
+          "change_type": "added",
+          "old_value": null,
+          "new_value": 0.25,
+          "display_text": "新增参数 '休息时间权重' = 0.25"
+        },
+        {
+          "parameter": "min_rest_hours",
+          "change_type": "added",
+          "old_value": null,
+          "new_value": 24,
+          "display_text": "新增参数 '最小休息时间(小时)' = 24"
+        },
+        {
+          "parameter": "venue_balance_weight",
+          "change_type": "added",
+          "old_value": null,
+          "new_value": 0.2,
+          "display_text": "新增参数 '场地均衡权重' = 0.2"
+        },
+        {
+          "parameter": "fairness_threshold",
+          "change_type": "added",
+          "old_value": null,
+          "new_value": 0.7,
+          "display_text": "新增参数 '公平性阈值' = 0.7"
+        },
+        {
+          "parameter": "max_consecutive_games",
+          "change_type": "added",
+          "old_value": null,
+          "new_value": 2,
+          "display_text": "新增参数 '最大连赛场次' = 2"
+        },
+        {
+          "parameter": "opponent_strength_weight",
+          "change_type": "added",
+          "old_value": null,
+          "new_value": 0.25,
+          "display_text": "新增参数 '对手强度权重' = 0.25"
+        }
+      ],
+      "results": {}
+    }
+  ]
+}
