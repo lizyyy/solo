@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+:root {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #e5e5e5;
+  background-color: #1a1a1a;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+@layer components {
+  .btn {
+    @apply px-3 py-1.5 rounded text-sm font-medium transition-colors duration-150 inline-flex items-center gap-1.5;
+  }
+  .btn-primary {
+    @apply btn bg-amber text-surface-50 hover:bg-amber-600 active:bg-amber-800;
+  }
+  .btn-secondary {
+    @apply btn bg-surface-100 text-zinc-300 hover:bg-surface-200 active:bg-surface-300;
+  }
+  .btn-danger {
+    @apply btn bg-danger/20 text-danger hover:bg-danger/30 active:bg-danger/40;
+  }
+  .btn-confirm {
+    @apply btn bg-confirm/20 text-confirm hover:bg-confirm/30 active:bg-confirm/40;
+  }
+
+  .input {
+    @apply bg-surface-50 border border-surface-200 rounded px-3 py-1.5 text-sm text-zinc-200 
+           focus:outline-none focus:border-amber/50 focus:ring-1 focus:ring-amber/30 
+           placeholder:text-zinc-500 transition-colors;
+  }
+
+  .card {
+    @apply bg-surface-50 border border-surface-200 rounded-lg;
+  }
+
+  .badge {
+    @apply text-xs px-2 py-0.5 rounded font-medium;
+  }
+  .badge-confirmed {
+    @apply badge bg-confirm/20 text-confirm;
+  }
+  .badge-pending {
+    @apply badge bg-amber/20 text-amber;
+  }
+  .badge-expired {
+    @apply badge bg-danger/20 text-danger;
+  }
+  .badge-conflict {
+    @apply badge bg-purple-500/20 text-purple-400;
+  }
+
+  .status-dot {
+    @apply w-2 h-2 rounded-full inline-block;
+  }
+}
