@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>空压机能耗诊断系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; background: #f5f5f5; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 10px; }
+        header { background: #2c3e50; color: white; padding: 12px 20px; margin-bottom: 10px; }
+        header h1 { font-size: 18px; font-weight: 500; }
+        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 15px; background: white; }
+        .tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; font-weight: 500; }
+        .tab.active { border-bottom-color: #3498db; color: #3498db; }
+        .tab:hover { background: #f0f0f0; }
+        .panel { display: none; background: white; padding: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .panel.active { display: block; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-size: 12px; color: #666; margin-bottom: 4px; }
+        select, input, button { padding: 6px 10px; border: 1px solid #ddd; border-radius: 3px; font-size: 13px; }
+        button { background: #3498db; color: white; border: none; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        button.secondary { background: #95a5a6; }
+        button.secondary:hover { background: #7f8c8d; }
+        button.danger { background: #e74c3c; }
+        button.danger:hover { background: #c0392b; }
+        button.success { background: #27ae60; }
+        button.success:hover { background: #229954; }
+        button:disabled { background: #bdc3c7; cursor: not-allowed; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px; }
+        .card { background: #f8f9fa; padding: 12px; border-radius: 3px; border-left: 3px solid #3498db; }
+        .card.warning { border-left-color: #f39c12; }
+        .card.danger { border-left-color: #e74c3c; }
+        .card.success { border-left-color: #27ae60; }
+        .card .label { font-size: 11px; color: #999; margin-bottom: 4px; }
+        .card .value { font-size: 20px; font-weight: 600; }
+        .card .sub { font-size: 11px; color: #666; margin-top: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #555; }
+        tr:hover { background: #f8f9fa; }
+        .severity { padding: 2px 6px; border-radius: 2px; font-size: 11px; font-weight: 500; }
+        .severity.critical { background: #fdecea; color: #e74c3c; }
+        .severity.warning { background: #fff4e5; color: #f39c12; }
+        .severity.normal { background: #eafaf1; color: #27ae60; }
+        .severity.overridden { background: #eef2f7; color: #7f8c8d; }
+        .status { padding: 2px 6px; border-radius: 2px; font-size: 11px; }
+        .status.pending { background: #fff4e5; color: #f39c12; }
+        .status.reviewed { background: #eafaf1; color: #27ae60; }
+        .status.rejected { background: #fdecea; color: #e74c3c; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 4px; max-width: 800px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .modal-header h3 { font-size: 16px; }
+        .close { cursor: pointer; font-size: 20px; color: #999; }
+        .detail-section { margin-bottom: 15px; }
+        .detail-section h4 { font-size: 14px; margin-bottom: 8px; color: #2c3e50; }
+        .anomaly-item { padding: 8px; border-left: 3px solid #e74c3c; margin-bottom: 8px; background: #fdfefe; }
+        .anomaly-item.warning { border-left-color: #f39c12; }
+        .anomaly-item.overridden { border-left-color: #95a5a6; opacity: 0.7; }
+        .anomaly-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .anomaly-desc { font-size: 12px; color: #666; margin-bottom: 4px; }
+        .anomaly-rec { font-size: 11px; color: #3498db; }
+        .edit-icon { cursor: pointer; color: #3498db; margin-left: 8px; }
+        .file-upload { border: 2px dashed #ddd; padding: 20px; text-align: center; border-radius: 4px; cursor: pointer; }
+        .file-upload:hover { border-color: #3498db; background: #f8f9fa; }
+        .message { padding: 8px 12px; border-radius: 3px; margin-bottom: 10px; font-size: 12px; }
+        .message.success { background: #eafaf1; color: #27ae60; }
+        .message.error { background: #fdecea; color: #e74c3c; }
+        .message.info { background: #eef2f7; color: #2c3e50; }
+        .view-state { background: #f8f9fa; padding: 8px; border-radius: 3px; font-family: monospace; font-size: 11px; color: #666; margin-top: 10px; }
+        .hash { font-family: monospace; font-size: 11px; color: #999; }
+        textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 13px; resize: vertical; min-height: 60px; }
+        .row-actions { display: flex; gap: 5px; }
+        .row-actions button { padding: 3px 8px; font-size: 11px; }
+        .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 15px; }
+        .pagination button { padding: 5px 10px; }
+        .chart-container { height: 300px; margin: 15px 0; position: relative; }
+        .chart-canvas { width: 100%; height: 100%; }
+        .legend { display: flex; gap: 15px; font-size: 11px; color: #666; margin-top: 5px; }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .legend-color { width: 12px; height: 12px; border-radius: 2px; }
+        .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid #f3f3f3; border-top: 2px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>空压机能耗诊断系统</h1>
+    </header>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="diagnosis">诊断</div>
+            <div class="tab" data-tab="import">数据导入</div>
+            <div class="tab" data-tab="history">历史记录</div>
+            <div class="tab" data-tab="audit">审计追踪</div>
+            <div class="tab" data-tab="export">报告导出</div>
+        </div>
+
+        <div id="message-area"></div>
+
+        <div id="panel-diagnosis" class="panel active">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>选择设备</label>
+                    <select id="compressor-select"></select>
+                </div>
+                <div class="form-group">
+                    <label>开始时间</label>
+                    <input type="datetime-local" id="start-time">
+                </div>
+                <div class="form-group">
+                    <label>结束时间</label>
+                    <input type="datetime-local" id="end-time">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button id="btn-run-diagnosis">运行诊断</button>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button id="btn-refresh" class="secondary">刷新数据</button>
+                </div>
+            </div>
+
+            <div id="diagnosis-summary"></div>
+            <div id="diagnosis-detail"></div>
+
+            <div id="data-preview">
+                <h4 style="margin: 15px 0 10px 0;">数据预览</h4>
+                <div class="tabs" style="margin-bottom: 5px;">
+                    <div class="tab active" data-subtab="energy">能耗数据</div>
+                    <div class="tab" data-subtab="vibration">振动数据</div>
+                </div>
+                <div id="subtab-energy" class="subpanel active">
+                    <div id="energy-chart" class="chart-container">
+                        <canvas class="chart-canvas" id="energy-canvas"></canvas>
+                    </div>
+                    <div id="energy-table-container"></div>
+                </div>
+                <div id="subtab-vibration" class="subpanel" style="display:none;">
+                    <div id="vibration-chart" class="chart-container">
+                        <canvas class="chart-canvas" id="vibration-canvas"></canvas>
+                    </div>
+                    <div id="vibration-table-container"></div>
+                </div>
+            </div>
+
+            <div class="view-state" id="current-view-state"></div>
+        </div>
+
+        <div id="panel-import" class="panel">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>设备编号（可选）</label>
+                    <input type="text" id="import-equipment-no" placeholder="如 AC-001">
+                </div>
+            </div>
+            <h4 style="margin: 15px 0 10px 0;">导入能耗数据</h4>
+            <div class="file-upload" id="energy-upload">
+                <p>点击或拖拽上传能耗数据文件</p>
+                <p style="font-size: 11px; color: #999; margin-top: 5px;">支持 .xlsx, .xls, .csv 格式</p>
+                <input type="file" id="energy-file" accept=".xlsx,.xls,.csv" style="display:none;">
+            </div>
+            <div id="energy-import-result"></div>
+
+            <h4 style="margin: 25px 0 10px 0;">导入振动数据</h4>
+            <div class="file-upload" id="vibration-upload">
+                <p>点击或拖拽上传振动数据文件</p>
+                <p style="font-size: 11px; color: #999; margin-top: 5px;">支持 .xlsx, .xls, .csv 格式</p>
+                <input type="file" id="vibration-file" accept=".xlsx,.xls,.csv" style="display:none;">
+            </div>
+            <div id="vibration-import-result"></div>
+
+            <div class="form-row" style="margin-top: 20px;">
+                <div class="form-group">
+                    <label>新增设备</label>
+                    <input type="text" id="new-equipment-no" placeholder="设备编号">
+                </div>
+                <div class="form-group">
+                    <label>设备名称</label>
+                    <input type="text" id="new-equipment-name" placeholder="设备名称">
+                </div>
+                <div class="form-group">
+                    <label>额定功率(kW)</label>
+                    <input type="number" id="new-rated-power" placeholder="100">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button id="btn-add-compressor" class="success">添加设备</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-history" class="panel">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>设备</label>
+                    <select id="history-compressor-select">
+                        <option value="">全部设备</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select id="history-status">
+                        <option value="">全部状态</option>
+                        <option value="pending">待复核</option>
+                        <option value="reviewed">已通过</option>
+                        <option value="rejected">已驳回</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>开始时间</label>
+                    <input type="datetime-local" id="history-start">
+                </div>
+                <div class="form-group">
+                    <label>结束时间</label>
+                    <input type="datetime-local" id="history-end">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button id="btn-search-history" class="secondary">查询</button>
+                </div>
+            </div>
+            <div id="history-list"></div>
+        </div>
+
+        <div id="panel-audit" class="panel">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>设备</label>
+                    <select id="audit-compressor-select">
+                        <option value="">全部设备</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>开始时间</label>
+                    <input type="datetime-local" id="audit-start">
+                </div>
+                <div class="form-group">
+                    <label>结束时间</label>
+                    <input type="datetime-local" id="audit-end">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button id="btn-search-audit" class="secondary">查询</button>
+                </div>
+            </div>
+            <div id="audit-list"></div>
+        </div>
+
+        <div id="panel-export" class="panel">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>选择设备</label>
+                    <select id="export-compressor-select">
+                        <option value="">全部设备</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>开始时间</label>
+                    <input type="datetime-local" id="export-start">
+                </div>
+                <div class="form-group">
+                    <label>结束时间</label>
+                    <input type="datetime-local" id="export-end">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button id="btn-export-report">导出巡检报告</button>
+                </div>
+            </div>
+
+            <div class="view-state" id="export-view-state">
+                <p><strong>说明：</strong>导出报告将严格按照当前筛选条件生成，与屏幕显示范围保持一致。</p>
+                <p>每次导出会生成唯一的报告哈希和视图状态哈希，用于一致性校验。</p>
+            </div>
+
+            <h4 style="margin: 15px 0 10px 0;">导出历史</h4>
+            <div id="export-history"></div>
+        </div>
+    </div>
+
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">诊断详情</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentViewState = null;
+        let currentViewHash = null;
+        let currentDiagnosis = null;
+
+        function showMessage(message, type = 'info') {
+            const area = document.getElementById('message-area');
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.textContent = message;
+            area.appendChild(div);
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        async function apiCall(url, method = 'GET', body = null) {
+            const options = { method, headers: { 'Content-Type': 'application/json' } };
+            if (body) options.body = JSON.stringify(body);
+            const response = await fetch(API_BASE + url, options);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.detail || '请求失败');
+            return data;
+        }
+
+        async function loadCompressors() {
+            const compressors = await apiCall('/records/compressors');
+            const selects = ['compressor-select', 'history-compressor-select', 'audit-compressor-select', 'export-compressor-select'];
+            selects.forEach(id => {
+                const select = document.getElementById(id);
+                const currentValue = select.value;
+                if (id !== 'compressor-select') {
+                    select.innerHTML = '<option value="">全部设备</option>';
+                } else {
+                    select.innerHTML = '';
+                }
+                compressors.forEach(c => {
+                    const option = document.createElement('option');
+                    option.value = c.id;
+                    option.textContent = `${c.equipment_no} - ${c.name || c.equipment_no}`;
+                    select.appendChild(option);
+                });
+                if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
+                    select.value = currentValue;
+                }
+            });
+            return compressors;
+        }
+
+        function initDateTimeDefaults() {
+            const now = new Date();
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const format = d => d.toISOString().slice(0, 16);
+
+            document.getElementById('start-time').value = format(weekAgo);
+            document.getElementById('end-time').value = format(now);
+            document.getElementById('export-start').value = format(weekAgo);
+            document.getElementById('export-end').value = format(now);
+        }
+
+        function updateViewState() {
+            const compressorId = parseInt(document.getElementById('compressor-select').value);
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+
+            currentViewState = {
+                compressor_id: compressorId || null,
+                start_time: startTime,
+                end_time: endTime,
+                timestamp: Date.now()
+            };
+
+            const viewStateStr = JSON.stringify(currentViewState, Object.keys(currentViewState).sort());
+            currentViewHash = sha256(viewStateStr).slice(0, 16);
+
+            document.getElementById('current-view-state').innerHTML = `
+                <strong>当前视图状态:</strong> ${JSON.stringify(currentViewState)}<br>
+                <strong>视图哈希:</strong> <span class="hash">${currentViewHash}</span>
+            `;
+        }
+
+        function sha256(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(16).padStart(16, '0');
+        }
+
+        async function runDiagnosis() {
+            const btn = document.getElementById('btn-run-diagnosis');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> 诊断中...';
+
+            try {
+                updateViewState();
+                const compressorId = parseInt(document.getElementById('compressor-select').value);
+                const startTime = document.getElementById('start-time').value;
+                const endTime = document.getElementById('end-time').value;
+
+                if (!compressorId || !startTime || !endTime) {
+                    throw new Error('请选择设备和时间范围');
+                }
+
+                const result = await apiCall('/diagnosis/run', 'POST', {
+                    compressor_id: compressorId,
+                    start_time: startTime,
+                    end_time: endTime,
+                    diagnosis_type: 'standard'
+                });
+
+                showMessage(`诊断完成: ${result.message}`, 'success');
+                await loadDiagnosisDetail(result.diagnosis_id);
+                await loadDataPreview();
+
+            } catch (error) {
+                showMessage(error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '运行诊断';
+            }
+        }
+
+        async function loadDiagnosisDetail(diagnosisId) {
+            try {
+                const data = await apiCall(`/diagnosis/${diagnosisId}`);
+                currentDiagnosis = data;
+                renderDiagnosisSummary(data);
+                renderDiagnosisDetail(data);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        function renderDiagnosisSummary(data) {
+            const container = document.getElementById('diagnosis-summary');
+            const severity = data.anomaly_score >= 70 ? 'danger' : (data.anomaly_score >= 30 ? 'warning' : 'success');
+
+            container.innerHTML = `
+                <h4 style="margin-bottom: 10px;">诊断结果 #${data.id}</h4>
+                <div class="grid">
+                    <div class="card ${data.energy_efficiency >= 80 ? 'success' : (data.energy_efficiency >= 65 ? 'warning' : 'danger')}">
+                        <div class="label">能效</div>
+                        <div class="value">${data.energy_efficiency?.toFixed(1) || '-'}%</div>
+                        <div class="sub">${data.energy_efficiency >= 80 ? '优秀' : (data.energy_efficiency >= 65 ? '良好' : '偏低')}</div>
+                    </div>
+                    <div class="card">
+                        <div class="label">总能耗</div>
+                        <div class="value">${data.energy_consumption?.toFixed(2) || '-'} kWh</div>
+                        <div class="sub">${data.start_time?.slice(0, 10)} ~ ${data.end_time?.slice(0, 10)}</div>
+                    </div>
+                    <div class="card">
+                        <div class="label">平均负载率</div>
+                        <div class="value">${data.load_rate_avg?.toFixed(1) || '-'}%</div>
+                        <div class="sub">正常范围 30-80%</div>
+                    </div>
+                    <div class="card ${severity}">
+                        <div class="label">异常分数</div>
+                        <div class="value">${data.anomaly_score?.toFixed(1) || '-'} / 100</div>
+                        <div class="sub">异常点: ${data.abnormal_count} 个</div>
+                    </div>
+                    <div class="card ${data.status === 'reviewed' ? 'success' : (data.status === 'rejected' ? 'danger' : 'warning')}">
+                        <div class="label">状态</div>
+                        <div class="value" style="font-size: 16px;">${getStatusText(data.status)}</div>
+                        <div class="sub">报告哈希: <span class="hash">${data.report_hash?.slice(0, 8) || '-'}</span></div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    ${data.is_manual_corrected ? `<span class="severity warning">已人工修正</span> ` : ''}
+                    ${data.reviewed_by ? `<span class="severity normal">复核人: ${data.reviewed_by} @ ${data.reviewed_at?.slice(0, 16)}</span>` : ''}
+                </div>
+            `;
+        }
+
+        function renderDiagnosisDetail(data) {
+            const container = document.getElementById('diagnosis-detail');
+
+            let anomaliesHtml = '';
+            if (data.anomalies && data.anomalies.length > 0) {
+                data.anomalies.forEach(a => {
+                    const overrideChecked = a.is_manual_override ? 'checked' : '';
+                    anomaliesHtml += `
+                        <div class="anomaly-item ${a.severity} ${a.is_manual_override ? 'overridden' : ''}">
+                            <div class="anomaly-header">
+                                <span><strong>${a.record_time?.slice(0, 19)}</strong> - ${getParamName(a.parameter)}</span>
+                                <span class="severity ${a.is_manual_override ? 'overridden' : a.severity}">
+                                    ${a.is_manual_override ? '已忽略' : getSeverityText(a.severity)}
+                                </span>
+                            </div>
+                            <div class="anomaly-desc">
+                                实际值: <strong>${a.actual_value}</strong> | 
+                                阈值: ${a.threshold_min ?? '-'} ~ ${a.threshold_max ?? '-'} | 
+                                偏差: ${a.deviation?.toFixed(1)}%<br>
+                                ${a.description}
+                            </div>
+                            <div class="anomaly-rec">建议: ${a.recommendation}</div>
+                            <div style="margin-top: 5px; display: flex; align-items: center; gap: 10px;">
+                                <label style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                                    <input type="checkbox" ${overrideChecked} 
+                                           onchange="toggleAnomalyOverride(${a.id}, this.checked)"
+                                           ${data.status === 'reviewed' ? 'disabled' : ''}>
+                                    人工标记为正常
+                                </label>
+                                ${a.is_manual_override ? `<span style="font-size: 11px; color: #666;">${a.override_note || ''}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                anomaliesHtml = '<p style="color: #666; padding: 10px;">未发现异常</p>';
+            }
+
+            container.innerHTML = `
+                <div class="detail-section">
+                    <h4>异常详情 <span style="font-weight: normal; font-size: 12px; color: #999;">(${data.anomalies?.length || 0} 条)</span></h4>
+                    ${anomaliesHtml}
+                </div>
+
+                ${data.status !== 'reviewed' ? `
+                <div class="detail-section">
+                    <h4>复核与修正</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>复核状态</label>
+                            <select id="review-status">
+                                <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>待复核</option>
+                                <option value="reviewed" ${data.status === 'reviewed' ? 'selected' : ''}>通过</option>
+                                <option value="rejected" ${data.status === 'rejected' ? 'selected' : ''}>驳回</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1; min-width: 200px;">
+                            <label>复核意见</label>
+                            <input type="text" id="review-comment" placeholder="输入复核意见..." value="${data.review_comment || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>复核人</label>
+                            <input type="text" id="reviewer" placeholder="您的姓名" value="${data.reviewed_by || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="success" onclick="submitReview()">提交复核</button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label>修正说明（如需整体修正诊断结果）</label>
+                            <textarea id="correction-note" placeholder="说明修正原因...">${data.correction_note || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="secondary" onclick="submitCorrection()">保存修正</button>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+            `;
+        }
+
+        function getParamName(param) {
+            const names = {
+                power: '功率', current: '电流', temperature: '温度',
+                pressure: '压力', load_rate: '负载率',
+                overall_vibration: '总振动', x_vibration: 'X向振动',
+                y_vibration: 'Y向振动', z_vibration: 'Z向振动'
+            };
+            return names[param] || param;
+        }
+
+        function getSeverityText(severity) {
+            const texts = { critical: '严重', warning: '警告', normal: '正常', overridden: '已忽略' };
+            return texts[severity] || severity;
+        }
+
+        function getStatusText(status) {
+            const texts = { pending: '待复核', reviewed: '已通过', rejected: '已驳回' };
+            return texts[status] || status;
+        }
+
+        async function toggleAnomalyOverride(anomalyId, checked) {
+            if (!currentDiagnosis) return;
+
+            const note = checked ? prompt('请输入忽略原因:') : '';
+            if (checked && note === null) return;
+
+            try {
+                const overrides = {};
+                overrides[anomalyId] = {
+                    is_manual_override: checked,
+                    override_note: note
+                };
+
+                await apiCall(`/diagnosis/${currentDiagnosis.id}/correct`, 'PUT', {
+                    correction_note: currentDiagnosis.correction_note || '异常点人工修正',
+                    corrected_by: document.getElementById('reviewer')?.value || 'system',
+                    anomaly_overrides: overrides
+                });
+
+                showMessage(checked ? '已标记为正常' : '已取消标记', 'success');
+                loadDiagnosisDetail(currentDiagnosis.id);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function submitReview() {
+            if (!currentDiagnosis) return;
+
+            try {
+                await apiCall(`/diagnosis/${currentDiagnosis.id}/review`, 'PUT', {
+                    status: document.getElementById('review-status').value,
+                    review_comment: document.getElementById('review-comment').value,
+                    reviewed_by: document.getElementById('reviewer').value || 'system'
+                });
+                showMessage('复核已提交', 'success');
+                loadDiagnosisDetail(currentDiagnosis.id);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function submitCorrection() {
+            if (!currentDiagnosis) return;
+
+            const note = document.getElementById('correction-note').value;
+            if (!note.trim()) {
+                showMessage('请输入修正说明', 'error');
+                return;
+            }
+
+            try {
+                await apiCall(`/diagnosis/${currentDiagnosis.id}/correct`, 'PUT', {
+                    correction_note: note,
+                    corrected_by: document.getElementById('reviewer')?.value || 'system'
+                });
+                showMessage('修正已保存', 'success');
+                loadDiagnosisDetail(currentDiagnosis.id);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function loadDataPreview() {
+            const compressorId = parseInt(document.getElementById('compressor-select').value);
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+
+            if (!compressorId || !startTime || !endTime) return;
+
+            try {
+                const [energyData, vibrationData] = await Promise.all([
+                    apiCall(`/records/energy?compressor_id=${compressorId}&start_time=${encodeURIComponent(startTime)}&end_time=${encodeURIComponent(endTime)}&limit=500`),
+                    apiCall(`/records/vibration?compressor_id=${compressorId}&start_time=${encodeURIComponent(startTime)}&end_time=${encodeURIComponent(endTime)}&limit=500`)
+                ]);
+
+                renderEnergyChart(energyData.records);
+                renderVibrationChart(vibrationData.records);
+                renderDataTable('energy', energyData.records);
+                renderDataTable('vibration', vibrationData.records);
+
+            } catch (error) {
+                console.error('加载数据预览失败:', error);
+            }
+        }
+
+        function renderEnergyChart(records) {
+            const canvas = document.getElementById('energy-canvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            if (!records || records.length === 0) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#999';
+                ctx.font = '13px sans-serif';
+                ctx.fillText('暂无能耗数据', canvas.width / 2 - 50, canvas.height / 2);
+                return;
+            }
+
+            drawLineChart(ctx, records, [
+                { key: 'power', label: '功率(kW)', color: '#3498db' },
+                { key: 'load_rate', label: '负载率(%)', color: '#e74c3c' }
+            ], canvas.width, canvas.height);
+        }
+
+        function renderVibrationChart(records) {
+            const canvas = document.getElementById('vibration-canvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            if (!records || records.length === 0) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#999';
+                ctx.font = '13px sans-serif';
+                ctx.fillText('暂无振动数据', canvas.width / 2 - 50, canvas.height / 2);
+                return;
+            }
+
+            drawLineChart(ctx, records, [
+                { key: 'overall_vibration', label: '总振动(mm/s)', color: '#e74c3c' },
+                { key: 'x_vibration', label: 'X向(mm/s)', color: '#3498db' },
+                { key: 'y_vibration', label: 'Y向(mm/s)', color: '#2ecc71' },
+                { key: 'z_vibration', label: 'Z向(mm/s)', color: '#f39c12' }
+            ], canvas.width, canvas.height);
+        }
+
+        function drawLineChart(ctx, records, series, width, height) {
+            const padding = { top: 20, right: 20, bottom: 30, left: 50 };
+            const chartWidth = width - padding.left - padding.right;
+            const chartHeight = height - padding.top - padding.bottom;
+
+            ctx.clearRect(0, 0, width, height);
+
+            let maxVal = -Infinity, minVal = Infinity;
+            records.forEach(r => {
+                series.forEach(s => {
+                    const val = r[s.key];
+                    if (val !== null && val !== undefined) {
+                        maxVal = Math.max(maxVal, val);
+                        minVal = Math.min(minVal, val);
+                    }
+                });
+            });
+
+            if (maxVal === -Infinity) {
+                ctx.fillStyle = '#999';
+                ctx.fillText('暂无数据', width / 2 - 30, height / 2);
+                return;
+            }
+
+            const range = maxVal - minVal || 1;
+            maxVal = maxVal + range * 0.1;
+            minVal = Math.max(0, minVal - range * 0.1);
+
+            ctx.strokeStyle = '#eee';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding.top + (chartHeight / 4) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.stroke();
+
+                const val = maxVal - ((maxVal - minVal) / 4) * i;
+                ctx.fillStyle = '#999';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(val.toFixed(1), padding.left - 5, y + 3);
+            }
+
+            series.forEach((s, sIdx) => {
+                ctx.strokeStyle = s.color;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+
+                records.forEach((r, i) => {
+                    const val = r[s.key];
+                    if (val === null || val === undefined) return;
+
+                    const x = padding.left + (chartWidth / (records.length - 1 || 1)) * i;
+                    const y = padding.top + chartHeight - ((val - minVal) / (maxVal - minVal || 1)) * chartHeight;
+
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+            });
+
+            ctx.fillStyle = '#333';
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'center';
+            if (records.length > 0) {
+                const step = Math.ceil(records.length / 6);
+                records.forEach((r, i) => {
+                    if (i % step === 0 || i === records.length - 1) {
+                        const x = padding.left + (chartWidth / (records.length - 1 || 1)) * i;
+                        const timeStr = new Date(r.record_time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                        ctx.fillText(timeStr, x, height - 10);
+                    }
+                });
+            }
+
+            let legendX = padding.left;
+            ctx.textAlign = 'left';
+            series.forEach(s => {
+                ctx.fillStyle = s.color;
+                ctx.fillRect(legendX, 5, 12, 12);
+                ctx.fillStyle = '#666';
+                ctx.fillText(s.label, legendX + 16, 15);
+                legendX += ctx.measureText(s.label).width + 40;
+            });
+        }
+
+        function renderDataTable(type, records) {
+            const container = document.getElementById(`${type}-table-container`);
+            if (!records || records.length === 0) {
+                container.innerHTML = '<p style="color: #999; padding: 10px;">暂无数据</p>';
+                return;
+            }
+
+            const columns = type === 'energy'
+                ? [
+                    { key: 'record_time', label: '时间', format: v => new Date(v).toLocaleString('zh-CN').slice(0, 19) },
+                    { key: 'power', label: '功率(kW)' },
+                    { key: 'current', label: '电流(A)' },
+                    { key: 'pressure', label: '压力(MPa)' },
+                    { key: 'temperature', label: '温度(℃)' },
+                    { key: 'load_rate', label: '负载率(%)' },
+                    { key: 'is_manual_edited', label: '状态', format: v => v ? '<span class="severity warning">已修正</span>' : '' }
+                ]
+                : [
+                    { key: 'record_time', label: '时间', format: v => new Date(v).toLocaleString('zh-CN').slice(0, 19) },
+                    { key: 'overall_vibration', label: '总振动(mm/s)' },
+                    { key: 'x_vibration', label: 'X向(mm/s)' },
+                    { key: 'y_vibration', label: 'Y向(mm/s)' },
+                    { key: 'z_vibration', label: 'Z向(mm/s)' },
+                    { key: 'is_manual_edited', label: '状态', format: v => v ? '<span class="severity warning">已修正</span>' : '' }
+                ];
+
+            let html = '<table><thead><tr>';
+            columns.forEach(col => html += `<th>${col.label}</th>`);
+            html += '<th>操作</th></tr></thead><tbody>';
+
+            records.slice(0, 50).forEach(r => {
+                html += '<tr>';
+                columns.forEach(col => {
+                    let val = r[col.key];
+                    if (col.format) val = col.format(val);
+                    else if (typeof val === 'number') val = val.toFixed(2);
+                    html += `<td>${val ?? '-'}</td>`;
+                });
+                html += `<td>
+                    <button class="secondary" style="padding: 2px 8px; font-size: 11px;" onclick="editRecord('${type}', ${r.id})">编辑</button>
+                </td></tr>`;
+            });
+            html += '</tbody></table>';
+            html += `<p style="color: #999; font-size: 11px; margin-top: 5px;">显示前 50 条，共 ${records.length} 条记录</p>`;
+
+            container.innerHTML = html;
+        }
+
+        async function editRecord(type, recordId) {
+            const newValue = prompt('请输入修正后的值:');
+            if (newValue === null) return;
+
+            const parsed = parseFloat(newValue);
+            if (isNaN(parsed)) {
+                showMessage('请输入有效的数字', 'error');
+                return;
+            }
+
+            try {
+                const field = type === 'energy' ? 'power' : 'overall_vibration';
+                const body = {};
+                body[field] = parsed;
+                body.edited_by = prompt('操作人姓名:') || 'system';
+
+                await apiCall(`/records/${type}/${recordId}`, 'PUT', body);
+                showMessage('记录已更新', 'success');
+                loadDataPreview();
+                if (currentDiagnosis) loadDiagnosisDetail(currentDiagnosis.id);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function loadHistory() {
+            const compressorId = document.getElementById('history-compressor-select').value;
+            const status = document.getElementById('history-status').value;
+            const startTime = document.getElementById('history-start').value;
+            const endTime = document.getElementById('history-end').value;
+
+            let url = '/diagnosis/list?limit=100';
+            if (compressorId) url += `&compressor_id=${compressorId}`;
+            if (status) url += `&status=${status}`;
+            if (startTime) url += `&start_time=${encodeURIComponent(startTime)}`;
+            if (endTime) url += `&end_time=${encodeURIComponent(endTime)}`;
+
+            try {
+                const data = await apiCall(url);
+                renderHistoryList(data);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        function renderHistoryList(data) {
+            const container = document.getElementById('history-list');
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p style="color: #999; padding: 20px; text-align: center;">暂无诊断记录</p>';
+                return;
+            }
+
+            let html = '<table><thead><tr>' +
+                '<th>ID</th><th>设备</th><th>时间范围</th><th>能效(%)</th>' +
+                '<th>负载率(%)</th><th>异常分数</th><th>异常数</th><th>状态</th>' +
+                '<th>已修正</th><th>诊断时间</th><th>操作</th>' +
+                '</tr></thead><tbody>';
+
+            data.forEach(d => {
+                html += `<tr>
+                    <td>${d.id}</td>
+                    <td>${d.equipment_no}</td>
+                    <td>${new Date(d.start_time).toLocaleDateString('zh-CN')} ~ ${new Date(d.end_time).toLocaleDateString('zh-CN')}</td>
+                    <td>${d.energy_efficiency?.toFixed(1) || '-'}</td>
+                    <td>${d.load_rate_avg?.toFixed(1) || '-'}</td>
+                    <td>${d.anomaly_score?.toFixed(1) || '-'}</td>
+                    <td>${d.abnormal_count}</td>
+                    <td><span class="status ${d.status}">${getStatusText(d.status)}</span></td>
+                    <td>${d.is_manual_corrected ? '<span class="severity warning">是</span>' : '-'}</td>
+                    <td>${new Date(d.created_at).toLocaleString('zh-CN').slice(0, 16)}</td>
+                    <td><button class="secondary" style="padding: 2px 8px; font-size: 11px;" onclick="viewDiagnosis(${d.id})">查看</button></td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        async function viewDiagnosis(id) {
+            const compressorSelect = document.getElementById('compressor-select');
+            try {
+                const detail = await apiCall(`/diagnosis/${id}`);
+                compressorSelect.value = detail.compressor_id;
+                document.getElementById('start-time').value = detail.start_time.slice(0, 16);
+                document.getElementById('end-time').value = detail.end_time.slice(0, 16);
+
+                switchTab('diagnosis');
+                updateViewState();
+                loadDiagnosisDetail(id);
+                loadDataPreview();
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function loadAuditLog() {
+            const compressorId = document.getElementById('audit-compressor-select').value;
+            const startTime = document.getElementById('audit-start').value;
+            const endTime = document.getElementById('audit-end').value;
+
+            let url = '/records/history/audit';
+            if (compressorId) url += `?compressor_id=${compressorId}`;
+            if (startTime) url += `${compressorId ? '&' : '?'}start_time=${encodeURIComponent(startTime)}`;
+            if (endTime) url += `${compressorId || startTime ? '&' : '?'}end_time=${encodeURIComponent(endTime)}`;
+
+            try {
+                const data = await apiCall(url);
+                renderAuditList(data.audit_log);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        function renderAuditList(logs) {
+            const container = document.getElementById('audit-list');
+            if (!logs || logs.length === 0) {
+                container.innerHTML = '<p style="color: #999; padding: 20px; text-align: center;">暂无操作记录</p>';
+                return;
+            }
+
+            const typeNames = {
+                energy_edit: '能耗数据修正',
+                vibration_edit: '振动数据修正',
+                diagnosis_review: '诊断复核',
+                diagnosis_correction: '诊断结果修正'
+            };
+
+            let html = '<table><thead><tr>' +
+                '<th>时间</th><th>操作类型</th><th>操作人</th><th>记录ID</th>' +
+                '<th>记录时间</th><th>描述</th><th>备注</th>' +
+                '</tr></thead><tbody>';
+
+            logs.forEach(log => {
+                html += `<tr>
+                    <td>${new Date(log.time).toLocaleString('zh-CN').slice(0, 19)}</td>
+                    <td>${typeNames[log.type] || log.type}</td>
+                    <td>${log.operator || '-'}</td>
+                    <td>${log.record_id}</td>
+                    <td>${new Date(log.record_time).toLocaleString('zh-CN').slice(0, 16)}</td>
+                    <td>${log.description}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${log.comment || '-'}</td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        async function exportReport() {
+            const btn = document.getElementById('btn-export-report');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> 生成中...';
+
+            try {
+                updateViewState();
+                const compressorId = document.getElementById('export-compressor-select').value;
+                const startTime = document.getElementById('export-start').value;
+                const endTime = document.getElementById('export-end').value;
+
+                if (!startTime || !endTime) {
+                    throw new Error('请选择时间范围');
+                }
+
+                const result = await apiCall('/export/inspection-report', 'POST', {
+                    compressor_id: compressorId ? parseInt(compressorId) : null,
+                    start_time: startTime,
+                    end_time: endTime,
+                    export_type: 'xlsx',
+                    filters: {},
+                    view_state: currentViewState,
+                    exported_by: prompt('导出人姓名:') || 'system'
+                });
+
+                showMessage(`导出成功: ${result.file_name}`, 'success');
+
+                if (confirm('是否立即下载报告？')) {
+                    window.open(API_BASE + `/export/download-by-hash/${result.report_hash}`, '_blank');
+                }
+
+                loadExportHistory();
+
+            } catch (error) {
+                showMessage(error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '导出巡检报告';
+            }
+        }
+
+        async function loadExportHistory() {
+            try {
+                const data = await apiCall('/export/list?limit=50');
+                renderExportHistory(data);
+            } catch (error) {
+                console.error('加载导出历史失败:', error);
+            }
+        }
+
+        function renderExportHistory(exports) {
+            const container = document.getElementById('export-history');
+            if (!exports || exports.length === 0) {
+                container.innerHTML = '<p style="color: #999; padding: 10px;">暂无导出记录</p>';
+                return;
+            }
+
+            let html = '<table><thead><tr>' +
+                '<th>导出时间</th><th>文件名</th><th>报告哈希</th>' +
+                '<th>记录数</th><th>导出人</th><th>操作</th>' +
+                '</tr></thead><tbody>';
+
+            exports.forEach(e => {
+                html += `<tr>
+                    <td>${new Date(e.export_time).toLocaleString('zh-CN').slice(0, 16)}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${e.file_name}">${e.file_name}</td>
+                    <td><span class="hash">${e.report_hash?.slice(0, 16) || '-'}</span></td>
+                    <td>${e.record_count}</td>
+                    <td>${e.exported_by || '-'}</td>
+                    <td><button class="secondary" style="padding: 2px 8px; font-size: 11px;" onclick="window.open('${API_BASE}/export/download/${e.id}', '_blank')">下载</button></td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab[data-tab]').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`panel-${tabName}`).classList.add('active');
+
+            if (tabName === 'history') loadHistory();
+            if (tabName === 'audit') loadAuditLog();
+            if (tabName === 'export') loadExportHistory();
+        }
+
+        function switchSubTab(subtabName) {
+            document.querySelectorAll('.tab[data-subtab]').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.subpanel').forEach(p => p.style.display = 'none');
+            document.querySelector(`.tab[data-subtab="${subtabName}"]`).classList.add('active');
+            document.getElementById(`subtab-${subtabName}`).style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.remove('active');
+        }
+
+        async function addCompressor() {
+            const equipmentNo = document.getElementById('new-equipment-no').value.trim();
+            const name = document.getElementById('new-equipment-name').value.trim();
+            const ratedPower = parseFloat(document.getElementById('new-rated-power').value);
+
+            if (!equipmentNo) {
+                showMessage('请输入设备编号', 'error');
+                return;
+            }
+
+            try {
+                await apiCall('/records/compressors', 'POST', {
+                    equipment_no: equipmentNo,
+                    name: name || equipmentNo,
+                    rated_power: ratedPower || null
+                });
+                showMessage('设备添加成功', 'success');
+                document.getElementById('new-equipment-no').value = '';
+                document.getElementById('new-equipment-name').value = '';
+                document.getElementById('new-rated-power').value = '';
+                loadCompressors();
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        function setupFileUpload() {
+            document.getElementById('energy-upload').addEventListener('click', () => {
+                document.getElementById('energy-file').click();
+            });
+            document.getElementById('vibration-upload').addEventListener('click', () => {
+                document.getElementById('vibration-file').click();
+            });
+
+            document.getElementById('energy-file').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                await uploadFile('energy', file);
+            });
+            document.getElementById('vibration-file').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                await uploadFile('vibration', file);
+            });
+        }
+
+        async function uploadFile(type, file) {
+            const resultDiv = document.getElementById(`${type}-import-result`);
+            resultDiv.innerHTML = '<div class="message info">上传中...</div>';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const equipmentNo = document.getElementById('import-equipment-no').value.trim();
+                if (equipmentNo) {
+                    formData.append('equipment_no', equipmentNo);
+                }
+
+                const response = await fetch(API_BASE + `/import/${type}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.detail || '导入失败');
+
+                resultDiv.innerHTML = `
+                    <div class="message success">
+                        导入成功！共 ${data.total_records} 条，新增 ${data.inserted_records} 条，
+                        更新 ${data.updated_records} 条，跳过 ${data.skipped_records} 条<br>
+                        批次号: <span class="hash">${data.batch_id}</span>
+                    </div>
+                `;
+
+                loadCompressors();
+
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="message error">导入失败: ${error.message}</div>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initDateTimeDefaults();
+            await loadCompressors();
+            setupFileUpload();
+            updateViewState();
+
+            document.querySelectorAll('.tab[data-tab]').forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+
+            document.querySelectorAll('.tab[data-subtab]').forEach(tab => {
+                tab.addEventListener('click', () => switchSubTab(tab.dataset.subtab));
+            });
+
+            document.getElementById('btn-run-diagnosis').addEventListener('click', runDiagnosis);
+            document.getElementById('btn-refresh').addEventListener('click', () => {
+                updateViewState();
+                loadDataPreview();
+            });
+            document.getElementById('btn-add-compressor').addEventListener('click', addCompressor);
+            document.getElementById('btn-search-history').addEventListener('click', loadHistory);
+            document.getElementById('btn-search-audit').addEventListener('click', loadAuditLog);
+            document.getElementById('btn-export-report').addEventListener('click', exportReport);
+
+            document.getElementById('compressor-select').addEventListener('change', updateViewState);
+            document.getElementById('start-time').addEventListener('change', updateViewState);
+            document.getElementById('end-time').addEventListener('change', updateViewState);
+
+            document.getElementById('detail-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'detail-modal') closeModal();
+            });
+
+            loadExportHistory();
+        });
+
+        window.toggleAnomalyOverride = toggleAnomalyOverride;
+        window.submitReview = submitReview;
+        window.submitCorrection = submitCorrection;
+        window.editRecord = editRecord;
+        window.viewDiagnosis = viewDiagnosis;
+        window.closeModal = closeModal;
+    </script>
+</body>
+</html>
