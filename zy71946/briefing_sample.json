@@ -1,0 +1,106 @@
+{
+  "export_time": "2026-05-31T19:59:42.857023",
+  "statistics": {
+    "total": 8,
+    "by_status": {
+      "normal": 3,
+      "pending": 4,
+      "late_arrival": 1
+    },
+    "by_source": {
+      "manual:人工更正": 1,
+      "telemetry:遥测系统A": 3,
+      "payload_plan:载荷计划系统": 2,
+      "schedule:总体调度系统": 1,
+      "telemetry:遥测系统B": 1
+    },
+    "by_satellite": {
+      "SAT-01": 6,
+      "SAT-02": 2
+    },
+    "pending_reasons": {
+      "人工更正记录，需确认最终执行情况": 1,
+      "时间窗口存在重叠，需要人工确认": 4
+    }
+  },
+  "pending_records": [
+    {
+      "id": "14c59e5bf3ea",
+      "satellite": "SAT-01",
+      "start_time": "2026-05-31T08:00:00",
+      "end_time": "2026-05-31T08:15:00",
+      "pending_reason": "时间窗口存在重叠，需要人工确认",
+      "source": {
+        "type": "telemetry",
+        "system": "遥测系统A",
+        "file": "telemetry_01.json",
+        "import_time": "2026-05-31T08:16:00"
+      },
+      "last_updated": "2026-05-31T19:59:38.514691"
+    },
+    {
+      "id": "8b1adec3b55f",
+      "satellite": "SAT-01",
+      "start_time": "2026-05-31T08:10:00",
+      "end_time": "2026-05-31T08:25:00",
+      "pending_reason": "时间窗口存在重叠，需要人工确认",
+      "source": {
+        "type": "payload_plan",
+        "system": "载荷计划系统",
+        "file": "payload_plan_01.json",
+        "import_time": "2026-05-31T07:00:00"
+      },
+      "last_updated": "2026-05-31T19:59:38.514702"
+    },
+    {
+      "id": "657e3c544a5b",
+      "satellite": "SAT-02",
+      "start_time": "2026-05-31T09:00:00",
+      "end_time": "2026-05-31T09:18:00",
+      "pending_reason": "时间窗口存在重叠，需要人工确认",
+      "source": {
+        "type": "payload_plan",
+        "system": "载荷计划系统",
+        "file": "payload_plan_01.json",
+        "import_time": "2026-05-31T07:00:00"
+      },
+      "last_updated": "2026-05-31T19:59:38.514708"
+    },
+    {
+      "id": "330377307171",
+      "satellite": "SAT-02",
+      "start_time": "2026-05-31T09:00:00",
+      "end_time": "2026-05-31T09:20:00",
+      "pending_reason": "时间窗口存在重叠，需要人工确认",
+      "source": {
+        "type": "telemetry",
+        "system": "遥测系统B",
+        "file": "telemetry_01.json",
+        "import_time": "2026-05-31T09:21:00"
+      },
+      "last_updated": "2026-05-31T19:59:38.514714"
+    }
+  ],
+  "window_overlaps": {
+    "SAT-01": [
+      {
+        "record1_id": "14c59e5bf3ea",
+        "record2_id": "8b1adec3b55f",
+        "record1_time": "2026-05-31T08:00:00 - 2026-05-31T08:15:00",
+        "record2_time": "2026-05-31T08:10:00 - 2026-05-31T08:25:00",
+        "record1_source": "遥测系统A",
+        "record2_source": "载荷计划系统"
+      }
+    ],
+    "SAT-02": [
+      {
+        "record1_id": "657e3c544a5b",
+        "record2_id": "330377307171",
+        "record1_time": "2026-05-31T09:00:00 - 2026-05-31T09:18:00",
+        "record2_time": "2026-05-31T09:00:00 - 2026-05-31T09:20:00",
+        "record1_source": "载荷计划系统",
+        "record2_source": "遥测系统B"
+      }
+    ]
+  }
+}

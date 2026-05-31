@@ -1,0 +1,24 @@
+[
+  {
+    "id": "",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-31T11:00:00",
+    "end_time": "2026-05-31T11:15:00",
+    "status": "pending",
+    "source": {
+      "type": "manual",
+      "system": "人工更正",
+      "file": "manual_correction_01.json",
+      "import_time": "2026-05-31T09:30:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域D-5",
+      "sensor_mode": "高分辨率",
+      "time_system": "UTC",
+      "correction_note": "原计划时间有误，实际执行时间后移1小时"
+    },
+    "pending_reason": "人工更正记录，需确认最终执行情况",
+    "tags": ["人工更正", "成像"]
+  }
+]

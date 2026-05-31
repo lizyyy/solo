@@ -1,0 +1,23 @@
+[
+  {
+    "id": "",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-31T10:00:00",
+    "end_time": "2026-05-31T10:30:00",
+    "status": "pending",
+    "source": {
+      "type": "schedule",
+      "system": "总体调度系统",
+      "file": "schedule_01.json",
+      "import_time": "2026-05-31T06:00:00"
+    },
+    "content": {
+      "task_type": "测控任务",
+      "ground_station": "喀什站",
+      "contact_type": "TT&C",
+      "time_system": "UTC"
+    },
+    "pending_reason": "",
+    "tags": ["测控", "喀什站"]
+  }
+]

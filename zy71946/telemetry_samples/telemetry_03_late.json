@@ -1,0 +1,25 @@
+[
+  {
+    "id": "",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-29T14:00:00",
+    "end_time": "2026-05-29T14:12:00",
+    "status": "pending",
+    "source": {
+      "type": "telemetry",
+      "system": "遥测系统A",
+      "file": "telemetry_03_late.json",
+      "import_time": "2026-05-31T10:30:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域C-7",
+      "sensor_mode": "高分辨率",
+      "data_quality": "good",
+      "time_system": "UTC",
+      "note": "数据补传，链路恢复后补发"
+    },
+    "pending_reason": "",
+    "tags": ["成像", "补传"]
+  }
+]

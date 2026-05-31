@@ -1,0 +1,440 @@
+[
+  {
+    "id": "248ab2cdcef5",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-31T11:00:00",
+    "end_time": "2026-05-31T11:15:00",
+    "status": "normal",
+    "source": {
+      "type": "manual",
+      "system": "人工更正",
+      "file": "manual_correction_01.json",
+      "import_time": "2026-05-31T09:30:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域D-5",
+      "sensor_mode": "高分辨率",
+      "time_system": "UTC",
+      "correction_note": "原计划时间有误，实际执行时间后移1小时"
+    },
+    "audit_log": [
+      {
+        "timestamp": "2026-05-31T19:59:22.654687",
+        "actor": "batch_system",
+        "action": "import",
+        "from_status": null,
+        "to_status": "pending",
+        "reason": "新记录导入",
+        "details": {
+          "source_file": "manual_correction_01.json"
+        }
+      },
+      {
+        "timestamp": "2026-05-31T19:59:22.660975",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "normal",
+        "reason": "自动校验通过",
+        "details": {}
+      }
+    ],
+    "pending_reason": "人工更正记录，需确认最终执行情况",
+    "duplicate_of": null,
+    "tags": [
+      "人工更正",
+      "成像"
+    ],
+    "created_at": "2026-05-31T19:59:22.654633",
+    "updated_at": "2026-05-31T19:59:22.660975"
+  },
+  {
+    "id": "14c59e5bf3ea",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-31T08:00:00",
+    "end_time": "2026-05-31T08:15:00",
+    "status": "pending",
+    "source": {
+      "type": "telemetry",
+      "system": "遥测系统A",
+      "file": "telemetry_01.json",
+      "import_time": "2026-05-31T08:16:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域A-1",
+      "sensor_mode": "高分辨率",
+      "data_quality": "good",
+      "time_system": "UTC"
+    },
+    "audit_log": [
+      {
+        "timestamp": "2026-05-31T19:59:22.656094",
+        "actor": "batch_system",
+        "action": "import",
+        "from_status": null,
+        "to_status": "pending",
+        "reason": "新记录导入",
+        "details": {
+          "source_file": "telemetry_01.json"
+        }
+      },
+      {
+        "timestamp": "2026-05-31T19:59:22.660983",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "pending",
+        "reason": "时间窗口存在重叠，需要人工确认",
+        "details": {}
+      },
+      {
+        "timestamp": "2026-05-31T19:59:38.514691",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "pending",
+        "reason": "时间窗口存在重叠，需要人工确认",
+        "details": {}
+      }
+    ],
+    "pending_reason": "时间窗口存在重叠，需要人工确认",
+    "duplicate_of": null,
+    "tags": [
+      "成像",
+      "高分辨率"
+    ],
+    "created_at": "2026-05-31T19:59:22.656012",
+    "updated_at": "2026-05-31T19:59:38.514691"
+  },
+  {
+    "id": "8b1adec3b55f",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-31T08:10:00",
+    "end_time": "2026-05-31T08:25:00",
+    "status": "pending",
+    "source": {
+      "type": "payload_plan",
+      "system": "载荷计划系统",
+      "file": "payload_plan_01.json",
+      "import_time": "2026-05-31T07:00:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域A-2",
+      "sensor_mode": "高分辨率",
+      "priority": "medium",
+      "time_system": "UTC",
+      "note": "与上一任务重叠，需确认时间制是否为BJT"
+    },
+    "audit_log": [
+      {
+        "timestamp": "2026-05-31T19:59:22.655160",
+        "actor": "batch_system",
+        "action": "import",
+        "from_status": null,
+        "to_status": "pending",
+        "reason": "新记录导入",
+        "details": {
+          "source_file": "payload_plan_01.json"
+        }
+      },
+      {
+        "timestamp": "2026-05-31T19:59:22.660988",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "pending",
+        "reason": "时间窗口存在重叠，需要人工确认",
+        "details": {}
+      },
+      {
+        "timestamp": "2026-05-31T19:59:38.514702",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "pending",
+        "reason": "时间窗口存在重叠，需要人工确认",
+        "details": {}
+      }
+    ],
+    "pending_reason": "时间窗口存在重叠，需要人工确认",
+    "duplicate_of": null,
+    "tags": [
+      "计划",
+      "成像",
+      "待确认"
+    ],
+    "created_at": "2026-05-31T19:59:22.655150",
+    "updated_at": "2026-05-31T19:59:38.514702"
+  },
+  {
+    "id": "657e3c544a5b",
+    "satellite": "SAT-02",
+    "start_time": "2026-05-31T09:00:00",
+    "end_time": "2026-05-31T09:18:00",
+    "status": "pending",
+    "source": {
+      "type": "payload_plan",
+      "system": "载荷计划系统",
+      "file": "payload_plan_01.json",
+      "import_time": "2026-05-31T07:00:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域B-3",
+      "sensor_mode": "宽幅",
+      "priority": "high",
+      "time_system": "BJT"
+    },
+    "audit_log": [
+      {
+        "timestamp": "2026-05-31T19:59:22.655175",
+        "actor": "batch_system",
+        "action": "import",
+        "from_status": null,
+        "to_status": "pending",
+        "reason": "新记录导入",
+        "details": {
+          "source_file": "payload_plan_01.json"
+        }
+      },
+      {
+        "timestamp": "2026-05-31T19:59:22.660993",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "pending",
+        "reason": "时间窗口存在重叠，需要人工确认",
+        "details": {}
+      },
+      {
+        "timestamp": "2026-05-31T19:59:38.514708",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "pending",
+        "reason": "时间窗口存在重叠，需要人工确认",
+        "details": {}
+      }
+    ],
+    "pending_reason": "时间窗口存在重叠，需要人工确认",
+    "duplicate_of": null,
+    "tags": [
+      "计划",
+      "成像",
+      "BJT时间"
+    ],
+    "created_at": "2026-05-31T19:59:22.655166",
+    "updated_at": "2026-05-31T19:59:38.514708"
+  },
+  {
+    "id": "0c05634a8bbb",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-31T10:00:00",
+    "end_time": "2026-05-31T10:30:00",
+    "status": "normal",
+    "source": {
+      "type": "schedule",
+      "system": "总体调度系统",
+      "file": "schedule_01.json",
+      "import_time": "2026-05-31T06:00:00"
+    },
+    "content": {
+      "task_type": "测控任务",
+      "ground_station": "喀什站",
+      "contact_type": "TT&C",
+      "time_system": "UTC"
+    },
+    "audit_log": [
+      {
+        "timestamp": "2026-05-31T19:59:22.655597",
+        "actor": "batch_system",
+        "action": "import",
+        "from_status": null,
+        "to_status": "pending",
+        "reason": "新记录导入",
+        "details": {
+          "source_file": "schedule_01.json"
+        }
+      },
+      {
+        "timestamp": "2026-05-31T19:59:22.661000",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "normal",
+        "reason": "自动校验通过",
+        "details": {}
+      }
+    ],
+    "pending_reason": "",
+    "duplicate_of": null,
+    "tags": [
+      "测控",
+      "喀什站"
+    ],
+    "created_at": "2026-05-31T19:59:22.655578",
+    "updated_at": "2026-05-31T19:59:22.661000"
+  },
+  {
+    "id": "18a55cd5a2aa",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-31T08:30:00",
+    "end_time": "2026-05-31T08:45:00",
+    "status": "normal",
+    "source": {
+      "type": "telemetry",
+      "system": "遥测系统A",
+      "file": "telemetry_01.json",
+      "import_time": "2026-05-31T08:46:00"
+    },
+    "content": {
+      "task_type": "数传任务",
+      "ground_station": "北京站",
+      "data_volume": "250MB",
+      "time_system": "UTC"
+    },
+    "audit_log": [
+      {
+        "timestamp": "2026-05-31T19:59:22.656141",
+        "actor": "batch_system",
+        "action": "import",
+        "from_status": null,
+        "to_status": "pending",
+        "reason": "新记录导入",
+        "details": {
+          "source_file": "telemetry_01.json"
+        }
+      },
+      {
+        "timestamp": "2026-05-31T19:59:22.661006",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "normal",
+        "reason": "自动校验通过",
+        "details": {}
+      }
+    ],
+    "pending_reason": "",
+    "duplicate_of": null,
+    "tags": [
+      "数传",
+      "北京站"
+    ],
+    "created_at": "2026-05-31T19:59:22.656125",
+    "updated_at": "2026-05-31T19:59:22.661006"
+  },
+  {
+    "id": "330377307171",
+    "satellite": "SAT-02",
+    "start_time": "2026-05-31T09:00:00",
+    "end_time": "2026-05-31T09:20:00",
+    "status": "pending",
+    "source": {
+      "type": "telemetry",
+      "system": "遥测系统B",
+      "file": "telemetry_01.json",
+      "import_time": "2026-05-31T09:21:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域B-3",
+      "sensor_mode": "宽幅",
+      "data_quality": "good",
+      "time_system": "UTC"
+    },
+    "audit_log": [
+      {
+        "timestamp": "2026-05-31T19:59:22.656158",
+        "actor": "batch_system",
+        "action": "import",
+        "from_status": null,
+        "to_status": "pending",
+        "reason": "新记录导入",
+        "details": {
+          "source_file": "telemetry_01.json"
+        }
+      },
+      {
+        "timestamp": "2026-05-31T19:59:22.661011",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "pending",
+        "reason": "时间窗口存在重叠，需要人工确认",
+        "details": {}
+      },
+      {
+        "timestamp": "2026-05-31T19:59:38.514714",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "pending",
+        "reason": "时间窗口存在重叠，需要人工确认",
+        "details": {}
+      }
+    ],
+    "pending_reason": "时间窗口存在重叠，需要人工确认",
+    "duplicate_of": null,
+    "tags": [
+      "成像",
+      "宽幅"
+    ],
+    "created_at": "2026-05-31T19:59:22.656148",
+    "updated_at": "2026-05-31T19:59:38.514714"
+  },
+  {
+    "id": "a1f83329e546",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-29T14:00:00",
+    "end_time": "2026-05-29T14:12:00",
+    "status": "late_arrival",
+    "source": {
+      "type": "telemetry",
+      "system": "遥测系统A",
+      "file": "telemetry_03_late.json",
+      "import_time": "2026-05-31T10:30:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域C-7",
+      "sensor_mode": "高分辨率",
+      "data_quality": "good",
+      "time_system": "UTC",
+      "note": "数据补传，链路恢复后补发"
+    },
+    "audit_log": [
+      {
+        "timestamp": "2026-05-31T19:59:22.660867",
+        "actor": "batch_system",
+        "action": "import",
+        "from_status": null,
+        "to_status": "pending",
+        "reason": "新记录导入",
+        "details": {
+          "source_file": "telemetry_03_late.json"
+        }
+      },
+      {
+        "timestamp": "2026-05-31T19:59:22.660955",
+        "actor": "batch_system",
+        "action": "status_change",
+        "from_status": "pending",
+        "to_status": "late_arrival",
+        "reason": "晚到记录，截止时间前 24 小时",
+        "details": {}
+      }
+    ],
+    "pending_reason": "",
+    "duplicate_of": null,
+    "tags": [
+      "成像",
+      "补传"
+    ],
+    "created_at": "2026-05-31T19:59:22.660777",
+    "updated_at": "2026-05-31T19:59:22.660955"
+  }
+]

@@ -1,0 +1,67 @@
+[
+  {
+    "id": "",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-31T08:00:00",
+    "end_time": "2026-05-31T08:15:00",
+    "status": "pending",
+    "source": {
+      "type": "telemetry",
+      "system": "遥测系统A",
+      "file": "telemetry_01.json",
+      "import_time": "2026-05-31T08:16:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域A-1",
+      "sensor_mode": "高分辨率",
+      "data_quality": "good",
+      "time_system": "UTC"
+    },
+    "pending_reason": "",
+    "tags": ["成像", "高分辨率"]
+  },
+  {
+    "id": "",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-31T08:30:00",
+    "end_time": "2026-05-31T08:45:00",
+    "status": "pending",
+    "source": {
+      "type": "telemetry",
+      "system": "遥测系统A",
+      "file": "telemetry_01.json",
+      "import_time": "2026-05-31T08:46:00"
+    },
+    "content": {
+      "task_type": "数传任务",
+      "ground_station": "北京站",
+      "data_volume": "250MB",
+      "time_system": "UTC"
+    },
+    "pending_reason": "",
+    "tags": ["数传", "北京站"]
+  },
+  {
+    "id": "",
+    "satellite": "SAT-02",
+    "start_time": "2026-05-31T09:00:00",
+    "end_time": "2026-05-31T09:20:00",
+    "status": "pending",
+    "source": {
+      "type": "telemetry",
+      "system": "遥测系统B",
+      "file": "telemetry_01.json",
+      "import_time": "2026-05-31T09:21:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域B-3",
+      "sensor_mode": "宽幅",
+      "data_quality": "good",
+      "time_system": "UTC"
+    },
+    "pending_reason": "",
+    "tags": ["成像", "宽幅"]
+  }
+]

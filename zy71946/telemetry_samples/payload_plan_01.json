@@ -1,0 +1,69 @@
+[
+  {
+    "id": "",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-31T08:00:00",
+    "end_time": "2026-05-31T08:15:00",
+    "status": "pending",
+    "source": {
+      "type": "payload_plan",
+      "system": "载荷计划系统",
+      "file": "payload_plan_01.json",
+      "import_time": "2026-05-31T07:00:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域A-1",
+      "sensor_mode": "高分辨率",
+      "priority": "high",
+      "time_system": "UTC"
+    },
+    "pending_reason": "",
+    "tags": ["计划", "成像"]
+  },
+  {
+    "id": "",
+    "satellite": "SAT-01",
+    "start_time": "2026-05-31T08:10:00",
+    "end_time": "2026-05-31T08:25:00",
+    "status": "pending",
+    "source": {
+      "type": "payload_plan",
+      "system": "载荷计划系统",
+      "file": "payload_plan_01.json",
+      "import_time": "2026-05-31T07:00:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域A-2",
+      "sensor_mode": "高分辨率",
+      "priority": "medium",
+      "time_system": "UTC",
+      "note": "与上一任务重叠，需确认时间制是否为BJT"
+    },
+    "pending_reason": "",
+    "tags": ["计划", "成像", "待确认"]
+  },
+  {
+    "id": "",
+    "satellite": "SAT-02",
+    "start_time": "2026-05-31T09:00:00",
+    "end_time": "2026-05-31T09:18:00",
+    "status": "pending",
+    "source": {
+      "type": "payload_plan",
+      "system": "载荷计划系统",
+      "file": "payload_plan_01.json",
+      "import_time": "2026-05-31T07:00:00"
+    },
+    "content": {
+      "task_type": "成像任务",
+      "target_area": "区域B-3",
+      "sensor_mode": "宽幅",
+      "priority": "high",
+      "time_system": "BJT"
+    },
+    "pending_reason": "",
+    "tags": ["计划", "成像", "BJT时间"]
+  }
+]
