@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>光电门测速复核</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f5f0;--surface:#fff;--border:#d4d4c8;--text:#1a1a18;--muted:#6b6b60;--accent:#2d6a4f;--accent-light:#40916c;--danger:#c1121f;--danger-light:#fce4e6;--warn:#e9c46a;--warn-light:#fef9e7;--info:#457b9d;--info-light:#e0f0f8;--radius:4px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+.app-header{background:var(--accent);color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.app-header h1{font-size:16px;font-weight:600;letter-spacing:.5px}
+.header-info{display:flex;align-items:center;gap:12px;font-size:13px}
+.header-info label{opacity:.85}
+.header-info input{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:3px 8px;border-radius:var(--radius);font-size:13px;width:100px}
+.header-info input::placeholder{color:rgba(255,255,255,.5)}
+.layout{display:grid;grid-template-columns:260px 1fr 280px;gap:0;height:calc(100vh - 42px);overflow:hidden}
+.panel{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:14px}
+.panel-right{border-right:none;border-left:1px solid var(--border)}
+.panel-title{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.panel-title .badge{background:var(--accent);color:#fff;font-size:11px;padding:1px 6px;border-radius:10px}
+.section{margin-bottom:16px}
+.section-label{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px}
+textarea{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:8px;font-size:12px;font-family:"SF Mono",Menlo,monospace;resize:vertical;background:var(--bg)}
+textarea:focus{outline:none;border-color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--bg)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent-light)}
+.btn-danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.btn-danger:hover{opacity:.9}
+.btn-sm{padding:3px 8px;font-size:12px}
+.btn-group{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+input[type=file]{display:none}
+.file-label{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer}
+.file-label:hover{background:var(--bg)}
+.main-area{overflow:auto;padding:14px;min-width:0}
+.filter-bar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.filter-bar select,.filter-bar input{padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--surface)}
+.filter-bar select:focus,.filter-bar input:focus{outline:none;border-color:var(--accent)}
+.stats-row{display:flex;gap:10px;margin-bottom:14px}
+.stat-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;text-align:center}
+.stat-card .stat-num{font-size:22px;font-weight:700;color:var(--accent)}
+.stat-card .stat-label{font-size:11px;color:var(--muted);margin-top:2px}
+.stat-card.danger .stat-num{color:var(--danger)}
+.stat-card.warn .stat-num{color:#b5850a}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--bg);color:var(--muted);font-weight:600;text-align:left;padding:7px 8px;border-bottom:2px solid var(--border);position:sticky;top:0;font-size:12px;white-space:nowrap}
+td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover td{background:var(--bg)}
+tr.flagged td{background:var(--warn-light)}
+tr.corrected td{background:var(--info-light)}
+tr.danger-row td{background:var(--danger-light)}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600}
+.tag-normal{background:#d8f3dc;color:#1b4332}
+.tag-drift{background:var(--warn-light);color:#7c5800}
+.tag-outlier{background:var(--danger-light);color:var(--danger)}
+.tag-corrected{background:var(--info-light);color:var(--info)}
+.tag-confirmed{background:#d8f3dc;color:#1b4332}
+.drift-badge{cursor:pointer;border-bottom:1px dashed var(--muted)}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--surface);border-radius:6px;padding:20px;width:560px;max-height:80vh;overflow-y:auto;box-shadow:0 8px 30px rgba(0,0,0,.15)}
+.modal h3{font-size:15px;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.modal-close{float:right;cursor:pointer;font-size:18px;color:var(--muted);background:none;border:none}
+.modal-close:hover{color:var(--text)}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent)}
+.audit-list{list-style:none}
+.audit-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.audit-item:last-child{border-bottom:none}
+.audit-time{color:var(--muted);font-family:"SF Mono",Menlo,monospace;font-size:11px}
+.audit-action{font-weight:600;margin:2px 0}
+.audit-detail{color:var(--muted)}
+.drift-explain{background:var(--warn-light);border:1px solid #e9c46a;border-radius:var(--radius);padding:10px;margin:8px 0;font-size:12px;line-height:1.6}
+.drift-explain strong{color:#7c5800}
+.correction-history{margin-top:10px}
+.correction-entry{background:var(--info-light);border-left:3px solid var(--info);padding:8px 10px;margin:6px 0;border-radius:0 var(--radius) var(--radius) 0;font-size:12px}
+.correction-entry.reverted{opacity:.5;text-decoration:line-through;background:#eee;border-left-color:#999}
+.export-preview{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-family:"SF Mono",Menlo,monospace;font-size:11px;max-height:200px;overflow:auto;white-space:pre;margin:10px 0}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-state .icon{font-size:36px;margin-bottom:10px;opacity:.4}
+.import-batch-info{background:var(--bg);border-radius:var(--radius);padding:8px;margin:6px 0;font-size:12px}
+.import-batch-info strong{color:var(--accent)}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:10px}
+.tab{padding:6px 14px;cursor:pointer;font-size:13px;border-bottom:2px solid transparent;color:var(--muted)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tab:hover{color:var(--text)}
+.settings-row{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12px}
+.settings-row input[type=number]{width:70px;padding:3px 6px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px}
+.pagination{display:flex;justify-content:center;gap:6px;margin-top:12px}
+.pagination .btn{min-width:32px;justify-content:center}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>光电门测速复核</h1>
+  <div class="header-info">
+    <label>操作人</label>
+    <input type="text" id="operator" placeholder="姓名">
+    <span id="recordCount" style="opacity:.7">0 条记录</span>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="panel" id="leftPanel">
+    <div class="section">
+      <div class="panel-title">数据导入</div>
+      <div class="section-label">粘贴 CSV</div>
+      <textarea id="csvInput" rows="8" placeholder="学生姓名,学号,批次,光电门间距(m),测量序号,时间(s)
+张三,2024001,批次1,0.1,1,0.0234
+张三,2024001,批次1,0.1,2,0.0231"></textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="importCSV()">导入</button>
+        <label class="file-label">
+          上传文件
+          <input type="file" id="fileInput" accept=".csv,.txt" onchange="handleFile(event)">
+        </label>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="panel-title">零点漂移检测参数</div>
+      <div class="settings-row">
+        <label>MAD 倍数阈值</label>
+        <input type="number" id="madThreshold" value="2.5" step="0.5" min="1">
+      </div>
+      <div class="settings-row">
+        <label>系统偏移阈值(ms)</label>
+        <input type="number" id="sysDriftMs" value="0.5" step="0.1" min="0">
+      </div>
+      <div class="settings-row">
+        <label>速度偏差允许(%)</label>
+        <input type="number" id="speedDevPct" value="10" step="1" min="1">
+      </div>
+      <button class="btn btn-sm" onclick="reDetectDrift()" style="margin-top:6px">重新检测</button>
+    </div>
+
+    <div class="section">
+      <div class="panel-title">导入历史</div>
+      <div id="importHistory"></div>
+    </div>
+
+    <div class="section">
+      <div class="panel-title">快速操作</div>
+      <div class="btn-group" style="flex-direction:column">
+        <button class="btn btn-primary" onclick="exportReviewTable()" style="width:100%">导出批改表</button>
+        <button class="btn" onclick="exportAuditLog()" style="width:100%">导出操作日志</button>
+        <button class="btn" onclick="clearAll()" style="width:100%">清空所有数据</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-area">
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">总记录</div></div>
+      <div class="stat-card danger"><div class="stat-num" id="statDrift">0</div><div class="stat-label">漂移标记</div></div>
+      <div class="stat-card warn"><div class="stat-num" id="statOutlier">0</div><div class="stat-label">离群值</div></div>
+      <div class="stat-card"><div class="stat-num" id="statCorrected">0</div><div class="stat-label">已修正</div></div>
+      <div class="stat-card"><div class="stat-num" id="statConfirmed">0</div><div class="stat-label">已确认</div></div>
+    </div>
+
+    <div class="filter-bar">
+      <select id="filterStatus" onchange="renderTable()">
+        <option value="">全部状态</option>
+        <option value="normal">正常</option>
+        <option value="drift_flagged">漂移标记</option>
+        <option value="outlier">离群值</option>
+        <option value="corrected">已修正</option>
+        <option value="confirmed">已确认</option>
+      </select>
+      <select id="filterBatch" onchange="renderTable()">
+        <option value="">全部批次</option>
+      </select>
+      <input type="text" id="filterStudent" placeholder="搜索学生姓名/学号" oninput="renderTable()">
+      <span style="color:var(--muted);font-size:12px" id="filterInfo"></span>
+    </div>
+
+    <div id="tableContainer">
+      <div class="empty-state">
+        <div class="icon">📡</div>
+        <div>尚未导入数据</div>
+        <div style="font-size:12px;margin-top:4px">在左侧粘贴 CSV 或上传文件开始复核</div>
+      </div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <div class="panel panel-right">
+    <div class="tab-bar">
+      <div class="tab active" data-tab="audit" onclick="switchRightTab('audit')">操作日志</div>
+      <div class="tab" data-tab="detail" onclick="switchRightTab('detail')">记录详情</div>
+    </div>
+
+    <div id="tabAudit">
+      <div id="auditLogList">
+        <div class="empty-state" style="padding:20px">
+          <div style="font-size:12px">暂无操作记录</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tabDetail" class="hidden">
+      <div id="detailContent">
+        <div class="empty-state" style="padding:20px">
+          <div style="font-size:12px">点击表格行查看详情</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalContainer"></div>
+
+<script>
+const PAGE_SIZE = 50;
+let currentPage = 1;
+let records = [];
+let importBatches = [];
+let auditLog = [];
+let selectedRecordId = null;
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+}
+
+function now() {
+  return new Date().toISOString();
+}
+
+function fmtTime(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  return d.toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+function getOperator() {
+  return document.getElementById('operator').value.trim() || '未署名';
+}
+
+function addAudit(action, target, detail) {
+  auditLog.unshift({
+    id: uid(),
+    action,
+    target,
+    detail,
+    operator: getOperator(),
+    timestamp: now()
+  });
+  renderAuditLog();
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n').map(l => l.trim()).filter(l => l);
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim());
+  const result = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = lines[i].split(',').map(v => v.trim());
+    if (vals.length < 6) continue;
+    const row = {};
+    headers.forEach((h, idx) => { row[h] = vals[idx] || ''; });
+    result.push(row);
+  }
+  return result;
+}
+
+function importCSV() {
+  const text = document.getElementById('csvInput').value.trim();
+  if (!text) return;
+  doImport(text);
+}
+
+function handleFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    doImport(e.target.result);
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function doImport(text) {
+  const rows = parseCSV(text);
+  if (rows.length === 0) {
+    alert('未解析到有效数据行，请检查 CSV 格式');
+    return;
+  }
+  const batchId = uid();
+  const newRecords = [];
+
+  for (const row of rows) {
+    const gateDistance = parseFloat(row['光电门间距(m)'] || row['gate_distance'] || '0.1');
+    const rawTime = parseFloat(row['时间(s)'] || row['time'] || '0');
+    if (isNaN(rawTime) || rawTime <= 0) continue;
+
+    const rec = {
+      id: uid(),
+      studentName: row['学生姓名'] || row['name'] || '',
+      studentId: row['学号'] || row['id'] || '',
+      batch: row['批次'] || row['batch'] || '默认批次',
+      gateDistance: gateDistance,
+      trialIndex: parseInt(row['测量序号'] || row['trial'] || '1') || 1,
+      rawTime: rawTime,
+      correctedTime: null,
+      rawSpeed: gateDistance / rawTime,
+      correctedSpeed: null,
+      status: 'normal',
+      driftInfo: { detected: false, driftValue: 0, threshold: 0, reason: '' },
+      corrections: [],
+      importBatchId: batchId,
+      createdAt: now()
+    };
+    newRecords.push(rec);
+  }
+
+  records = records.concat(newRecords);
+  importBatches.unshift({
+    id: batchId,
+    importTime: now(),
+    recordCount: newRecords.length,
+    operator: getOperator()
+  });
+
+  addAudit('导入', batchId, `导入 ${newRecords.length} 条记录`);
+  detectDrift();
+  renderAll();
+  document.getElementById('csvInput').value = '';
+}
+
+function median(arr) {
+  if (arr.length === 0) return 0;
+  const sorted = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function mad(arr) {
+  if (arr.length === 0) return 0;
+  const med = median(arr);
+  const deviations = arr.map(v => Math.abs(v - med));
+  return median(deviations);
+}
+
+function detectDrift() {
+  const madThresh = parseFloat(document.getElementById('madThreshold').value) || 2.5;
+  const sysDriftMs = parseFloat(document.getElementById('sysDriftMs').value) || 0.5;
+  const speedDevPct = parseFloat(document.getElementById('speedDevPct').value) || 10;
+
+  records.forEach(r => {
+    r.status = 'normal';
+    r.driftInfo = { detected: false, driftValue: 0, threshold: 0, reason: '' };
+  });
+
+  const groups = {};
+  records.forEach(r => {
+    const key = r.studentId + '|' + r.batch + '|' + r.gateDistance;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(r);
+  });
+
+  for (const key in groups) {
+    const group = groups[key];
+    const times = group.map(r => r.rawTime);
+    const med = median(times);
+    const madVal = mad(times);
+    const threshold = madThresh * (madVal || 0.001);
+
+    group.forEach(r => {
+      const deviation = Math.abs(r.rawTime - med);
+      if (deviation > threshold) {
+        r.status = 'outlier';
+        r.driftInfo = {
+          detected: true,
+          driftValue: r.rawTime - med,
+          threshold: threshold,
+          reason: `离群检测: 时间 ${r.rawTime.toFixed(4)}s 偏离组中位数 ${med.toFixed(4)}s 达 ${deviation.toFixed(4)}s (阈值 ${threshold.toFixed(4)}s, ${madThresh}×MAD)`
+        };
+      }
+    });
+
+    const groupMedian = median(times);
+    const allDeviations = times.map(t => Math.abs(t - groupMedian));
+    const avgDev = allDeviations.reduce((s, v) => s + v, 0) / allDeviations.length;
+
+    if (avgDev > sysDriftMs / 1000 && group.length >= 3) {
+      const sortedTimes = [...times].sort((a, b) => a - b);
+      const q1 = sortedTimes[Math.floor(sortedTimes.length * 0.25)];
+      const q3 = sortedTimes[Math.floor(sortedTimes.length * 0.75)];
+      const iqr = q3 - q1;
+
+      group.forEach(r => {
+        if (r.status === 'normal') {
+          if (iqr > 0 && (r.rawTime < q1 - 1.5 * iqr || r.rawTime > q3 + 1.5 * iqr)) {
+            r.status = 'drift_flagged';
+            r.driftInfo = {
+              detected: true,
+              driftValue: r.rawTime - groupMedian,
+              threshold: sysDriftMs / 1000,
+              reason: `零点漂移嫌疑: 该组平均偏差 ${avgDev.toFixed(4)}s 超过系统偏移阈值 ${sysDriftMs}ms, 本记录时间 ${r.rawTime.toFixed(4)}s 偏离中位数 ${groupMedian.toFixed(4)}s`
+            };
+          } else if (avgDev > sysDriftMs / 1000) {
+            r.driftInfo.detected = true;
+            r.driftInfo.driftValue = r.rawTime - groupMedian;
+            r.driftInfo.threshold = sysDriftMs / 1000;
+            r.driftInfo.reason = `组内系统偏移: 该组平均偏差 ${avgDev.toFixed(4)}s 超过系统阈值 ${sysDriftMs}ms, 本记录偏差 ${r.driftInfo.driftValue.toFixed(4)}s`;
+          }
+        }
+      });
+    }
+
+    const speeds = group.map(r => r.gateDistance / r.rawTime);
+    const medSpeed = median(speeds);
+    group.forEach(r => {
+      if (r.status === 'normal' && medSpeed > 0) {
+        const speedDev = Math.abs(r.rawSpeed - medSpeed) / medSpeed * 100;
+        if (speedDev > speedDevPct) {
+          r.status = 'drift_flagged';
+          r.driftInfo = {
+            detected: true,
+            driftValue: r.rawSpeed - medSpeed,
+            threshold: medSpeed * speedDevPct / 100,
+            reason: `速度偏差过大: 计算速度 ${r.rawSpeed.toFixed(3)}m/s 偏离组中位数 ${medSpeed.toFixed(3)}m/s 达 ${speedDev.toFixed(1)}% (允许 ${speedDevPct}%)`
+          };
+        }
+      }
+    });
+  }
+
+  records.forEach(r => {
+    if (r.corrections.length > 0 && r.status !== 'outlier') {
+      const hasActive = r.corrections.some(c => !c.reverted);
+      if (hasActive) r.status = 'corrected';
+    }
+  });
+}
+
+function reDetectDrift() {
+  detectDrift();
+  renderAll();
+  addAudit('重新检测', '', '使用当前参数重新检测零点漂移');
+}
+
+function applyCorrection(recordId, field, newValue, reason) {
+  const rec = records.find(r => r.id === recordId);
+  if (!rec) return;
+
+  const oldVal = field === 'time' ? (rec.correctedTime || rec.rawTime) : (rec.correctedSpeed || rec.rawSpeed);
+  const correction = {
+    id: uid(),
+    field,
+    oldValue: oldVal,
+    newValue: parseFloat(newValue),
+    reason,
+    operator: getOperator(),
+    timestamp: now(),
+    reverted: false,
+    revertedAt: null,
+    revertedBy: null
+  };
+  rec.corrections.push(correction);
+
+  if (field === 'time') {
+    rec.correctedTime = parseFloat(newValue);
+    rec.correctedSpeed = rec.gateDistance / rec.correctedTime;
+  } else {
+    rec.correctedSpeed = parseFloat(newValue);
+  }
+
+  rec.status = 'corrected';
+  addAudit('修正', recordId, `${field === 'time' ? '时间' : '速度'}: ${oldVal.toFixed(4)} → ${parseFloat(newValue).toFixed(4)}, 原因: ${reason}`);
+  renderAll();
+  if (selectedRecordId === recordId) showDetail(recordId);
+}
+
+function revertCorrection(recordId, correctionId) {
+  const rec = records.find(r => r.id === recordId);
+  if (!rec) return;
+  const corr = rec.corrections.find(c => c.id === correctionId);
+  if (!corr || corr.reverted) return;
+
+  corr.reverted = true;
+  corr.revertedAt = now();
+  corr.revertedBy = getOperator();
+
+  const activeTimeCorrs = rec.corrections.filter(c => c.field === 'time' && !c.reverted);
+  const activeSpeedCorrs = rec.corrections.filter(c => c.field === 'speed' && !c.reverted);
+
+  rec.correctedTime = activeTimeCorrs.length > 0 ? activeTimeCorrs[activeTimeCorrs.length - 1].newValue : null;
+  rec.correctedSpeed = activeTimeCorrs.length > 0 ? rec.gateDistance / rec.correctedTime : null;
+
+  if (activeSpeedCorrs.length > 0 && !rec.correctedSpeed) {
+    rec.correctedSpeed = activeSpeedCorrs[activeSpeedCorrs.length - 1].newValue;
+  }
+
+  if (rec.corrections.every(c => c.reverted) && !rec.driftInfo.detected) {
+    rec.status = 'normal';
+  } else if (rec.corrections.some(c => !c.reverted)) {
+    rec.status = 'corrected';
+  } else if (rec.driftInfo.detected) {
+    rec.status = 'drift_flagged';
+  } else {
+    rec.status = 'normal';
+  }
+
+  addAudit('撤回修正', recordId, `撤回 ${corr.field === 'time' ? '时间' : '速度'}修正 ${corr.oldValue.toFixed(4)} → ${corr.newValue.toFixed(4)}`);
+  renderAll();
+  if (selectedRecordId === recordId) showDetail(recordId);
+}
+
+function confirmRecord(recordId) {
+  const rec = records.find(r => r.id === recordId);
+  if (!rec) return;
+  rec.status = 'confirmed';
+  addAudit('确认', recordId, `确认记录, 学生: ${rec.studentName}, 时间: ${(rec.correctedTime || rec.rawTime).toFixed(4)}s`);
+  renderAll();
+  if (selectedRecordId === recordId) showDetail(recordId);
+}
+
+function unconfirmRecord(recordId) {
+  const rec = records.find(r => r.id === recordId);
+  if (!rec) return;
+  if (rec.corrections.some(c => !c.reverted)) {
+    rec.status = 'corrected';
+  } else if (rec.driftInfo.detected) {
+    rec.status = 'drift_flagged';
+  } else {
+    rec.status = 'normal';
+  }
+  addAudit('取消确认', recordId, `取消确认, 学生: ${rec.studentName}`);
+  renderAll();
+  if (selectedRecordId === recordId) showDetail(recordId);
+}
+
+function getFilteredRecords() {
+  const status = document.getElementById('filterStatus').value;
+  const batch = document.getElementById('filterBatch').value;
+  const student = document.getElementById('filterStudent').value.trim().toLowerCase();
+
+  return records.filter(r => {
+    if (status && r.status !== status) return false;
+    if (batch && r.batch !== batch) return false;
+    if (student && !(r.studentName.toLowerCase().includes(student) || r.studentId.toLowerCase().includes(student))) return false;
+    return true;
+  });
+}
+
+function renderTable() {
+  const filtered = getFilteredRecords();
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageRecords = filtered.slice(start, start + PAGE_SIZE);
+
+  document.getElementById('filterInfo').textContent = `${filtered.length} / ${records.length} 条`;
+
+  if (pageRecords.length === 0) {
+    document.getElementById('tableContainer').innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <div>${records.length === 0 ? '尚未导入数据' : '无匹配记录'}</div>
+      </div>`;
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  const statusTag = (s) => {
+    const map = {
+      normal: ['正常', 'tag-normal'],
+      drift_flagged: ['漂移', 'tag-drift'],
+      outlier: ['离群', 'tag-outlier'],
+      corrected: ['已修正', 'tag-corrected'],
+      confirmed: ['已确认', 'tag-confirmed']
+    };
+    const [label, cls] = map[s] || ['未知', 'tag-normal'];
+    return `<span class="tag ${cls}">${label}</span>`;
+  };
+
+  const rowClass = (r) => {
+    if (r.status === 'outlier') return 'danger-row';
+    if (r.status === 'drift_flagged') return 'flagged';
+    if (r.status === 'corrected') return 'corrected';
+    return '';
+  };
+
+  const driftCell = (r) => {
+    if (!r.driftInfo.detected) return '-';
+    return `<span class="drift-badge" onclick="showDriftExplain('${r.id}')" title="点击查看原因">漂移 ${(r.driftInfo.driftValue * 1000).toFixed(2)}ms</span>`;
+  };
+
+  let html = `<div style="overflow-x:auto"><table>
+    <thead><tr>
+      <th>状态</th><th>学生</th><th>学号</th><th>批次</th><th>间距(m)</th>
+      <th>测量序号</th><th>原始时间(s)</th><th>修正时间(s)</th><th>原始速度(m/s)</th>
+      <th>修正速度(m/s)</th><th>漂移信息</th><th>操作</th>
+    </tr></thead><tbody>`;
+
+  pageRecords.forEach(r => {
+    const time = r.correctedTime != null ? r.correctedTime.toFixed(4) : '-';
+    const speed = r.correctedSpeed != null ? r.correctedSpeed.toFixed(3) : '-';
+    html += `<tr class="${rowClass(r)}" onclick="showDetail('${r.id}')">
+      <td>${statusTag(r.status)}</td>
+      <td>${r.studentName}</td><td>${r.studentId}</td><td>${r.batch}</td>
+      <td>${r.gateDistance.toFixed(2)}</td><td>${r.trialIndex}</td>
+      <td>${r.rawTime.toFixed(4)}</td><td>${time}</td>
+      <td>${r.rawSpeed.toFixed(3)}</td><td>${speed}</td>
+      <td>${driftCell(r)}</td>
+      <td onclick="event.stopPropagation()">
+        <button class="btn btn-sm" onclick="openCorrectModal('${r.id}','time')">修正</button>
+        ${r.status !== 'confirmed' ?
+          `<button class="btn btn-sm btn-primary" onclick="confirmRecord('${r.id}')">确认</button>` :
+          `<button class="btn btn-sm" onclick="unconfirmRecord('${r.id}')">取消确认</button>`}
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  document.getElementById('tableContainer').innerHTML = html;
+
+  let pagHtml = '';
+  if (totalPages > 1) {
+    pagHtml += `<button class="btn btn-sm" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+    for (let i = 1; i <= totalPages && i <= 10; i++) {
+      pagHtml += `<button class="btn btn-sm ${i === currentPage ? 'btn-primary' : ''}" onclick="goPage(${i})">${i}</button>`;
+    }
+    if (totalPages > 10) pagHtml += `<span style="color:var(--muted)">...</span><button class="btn btn-sm" onclick="goPage(${totalPages})">${totalPages}</button>`;
+    pagHtml += `<button class="btn btn-sm" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+  }
+  document.getElementById('pagination').innerHTML = pagHtml;
+}
+
+function goPage(p) {
+  const filtered = getFilteredRecords();
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  renderTable();
+}
+
+function updateStats() {
+  const counts = { total: records.length, drift: 0, outlier: 0, corrected: 0, confirmed: 0 };
+  records.forEach(r => {
+    if (r.status === 'drift_flagged') counts.drift++;
+    if (r.status === 'outlier') counts.outlier++;
+    if (r.status === 'corrected') counts.corrected++;
+    if (r.status === 'confirmed') counts.confirmed++;
+  });
+  document.getElementById('statTotal').textContent = counts.total;
+  document.getElementById('statDrift').textContent = counts.drift;
+  document.getElementById('statOutlier').textContent = counts.outlier;
+  document.getElementById('statCorrected').textContent = counts.corrected;
+  document.getElementById('statConfirmed').textContent = counts.confirmed;
+  document.getElementById('recordCount').textContent = `${records.length} 条记录`;
+}
+
+function updateBatchFilter() {
+  const batches = [...new Set(records.map(r => r.batch))];
+  const sel = document.getElementById('filterBatch');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">全部批次</option>';
+  batches.forEach(b => {
+    sel.innerHTML += `<option value="${b}" ${b === current ? 'selected' : ''}>${b}</option>`;
+  });
+}
+
+function renderImportHistory() {
+  const el = document.getElementById('importHistory');
+  if (importBatches.length === 0) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted)">暂无</div>';
+    return;
+  }
+  el.innerHTML = importBatches.map(b => `
+    <div class="import-batch-info">
+      <strong>${b.recordCount}</strong> 条 · ${fmtTime(b.importTime)}<br>
+      <span style="color:var(--muted)">${b.operator}</span>
+      <button class="btn btn-sm btn-danger" style="float:right;margin-top:-4px" onclick="undoImport('${b.id}')">撤回</button>
+    </div>
+  `).join('');
+}
+
+function undoImport(batchId) {
+  const batch = importBatches.find(b => b.id === batchId);
+  if (!batch) return;
+  if (!confirm(`确定撤回该批次导入的 ${batch.recordCount} 条记录？相关修正也将丢失。`)) return;
+
+  const removed = records.filter(r => r.importBatchId === batchId);
+  records = records.filter(r => r.importBatchId !== batchId);
+  importBatches = importBatches.filter(b => b.id !== batchId);
+
+  addAudit('撤回导入', batchId, `撤回 ${removed.length} 条记录`);
+  detectDrift();
+  renderAll();
+}
+
+function renderAuditLog() {
+  const el = document.getElementById('auditLogList');
+  if (auditLog.length === 0) {
+    el.innerHTML = '<div class="empty-state" style="padding:20px"><div style="font-size:12px">暂无操作记录</div></div>';
+    return;
+  }
+  el.innerHTML = `<ul class="audit-list">${auditLog.slice(0, 100).map(a => `
+    <li class="audit-item">
+      <div class="audit-time">${fmtTime(a.timestamp)} · ${a.operator}</div>
+      <div class="audit-action">${a.action}</div>
+      <div class="audit-detail">${a.detail}</div>
+    </li>
+  `).join('')}</ul>`;
+}
+
+function switchRightTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.getElementById('tabAudit').classList.toggle('hidden', tab !== 'audit');
+  document.getElementById('tabDetail').classList.toggle('hidden', tab !== 'detail');
+}
+
+function showDetail(recordId) {
+  selectedRecordId = recordId;
+  switchRightTab('detail');
+  const rec = records.find(r => r.id === recordId);
+  if (!rec) return;
+
+  const displayTime = rec.correctedTime != null ? rec.correctedTime : rec.rawTime;
+  const displaySpeed = rec.correctedSpeed != null ? rec.correctedSpeed : rec.rawSpeed;
+
+  let html = `
+    <div style="margin-bottom:10px">
+      <strong>${rec.studentName}</strong> (${rec.studentId})<br>
+      <span style="color:var(--muted);font-size:12px">${rec.batch} · 测量 ${rec.trialIndex} · 间距 ${rec.gateDistance}m</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+      <div style="background:var(--bg);padding:8px;border-radius:var(--radius)">
+        <div style="font-size:11px;color:var(--muted)">原始时间</div>
+        <div style="font-size:16px;font-weight:600">${rec.rawTime.toFixed(4)}s</div>
+      </div>
+      <div style="background:var(--bg);padding:8px;border-radius:var(--radius)">
+        <div style="font-size:11px;color:var(--muted)">修正时间</div>
+        <div style="font-size:16px;font-weight:600">${rec.correctedTime != null ? rec.correctedTime.toFixed(4) + 's' : '-'}</div>
+      </div>
+      <div style="background:var(--bg);padding:8px;border-radius:var(--radius)">
+        <div style="font-size:11px;color:var(--muted)">原始速度</div>
+        <div style="font-size:16px;font-weight:600">${rec.rawSpeed.toFixed(3)}m/s</div>
+      </div>
+      <div style="background:var(--bg);padding:8px;border-radius:var(--radius)">
+        <div style="font-size:11px;color:var(--muted)">修正速度</div>
+        <div style="font-size:16px;font-weight:600">${rec.correctedSpeed != null ? rec.correctedSpeed.toFixed(3) + 'm/s' : '-'}</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:10px;font-size:12px">
+      当前显示: <strong>${displayTime.toFixed(4)}s / ${displaySpeed.toFixed(3)}m/s</strong>
+    </div>`;
+
+  if (rec.driftInfo.detected) {
+    html += `
+    <div class="drift-explain">
+      <strong>⚠ 漂移检测结果</strong><br>
+      ${rec.driftInfo.reason}<br>
+      <span style="color:#7c5800">偏移值: ${(rec.driftInfo.driftValue * 1000).toFixed(2)}ms · 检测阈值: ${(rec.driftInfo.threshold * 1000).toFixed(2)}ms</span>
+    </div>`;
+  }
+
+  if (rec.corrections.length > 0) {
+    html += `<div class="correction-history"><div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">修正历史</div>`;
+    rec.corrections.forEach(c => {
+      const cls = c.reverted ? 'reverted' : '';
+      html += `
+        <div class="correction-entry ${cls}">
+          <div>${c.field === 'time' ? '时间' : '速度'}: ${c.oldValue.toFixed(4)} → ${c.newValue.toFixed(4)}</div>
+          <div style="color:var(--muted)">原因: ${c.reason}</div>
+          <div style="color:var(--muted);font-size:11px">${fmtTime(c.timestamp)} · ${c.operator}</div>
+          ${c.reverted ? `<div style="color:var(--danger);font-size:11px">已撤回 · ${fmtTime(c.revertedAt)} · ${c.revertedBy}</div>` : ''}
+          ${!c.reverted ? `<button class="btn btn-sm btn-danger" style="margin-top:4px" onclick="revertCorrection('${rec.id}','${c.id}')">撤回此修正</button>` : ''}
+        </div>`;
+    });
+    html += '</div>';
+  }
+
+  html += `
+    <div class="btn-group" style="margin-top:12px">
+      <button class="btn btn-sm" onclick="openCorrectModal('${rec.id}','time')">修正时间</button>
+      <button class="btn btn-sm" onclick="openCorrectModal('${rec.id}','speed')">修正速度</button>
+      ${rec.status !== 'confirmed' ?
+        `<button class="btn btn-sm btn-primary" onclick="confirmRecord('${rec.id}')">确认</button>` :
+        `<button class="btn btn-sm" onclick="unconfirmRecord('${rec.id}')">取消确认</button>`}
+    </div>`;
+
+  document.getElementById('detailContent').innerHTML = html;
+}
+
+function showDriftExplain(recordId) {
+  const rec = records.find(r => r.id === recordId);
+  if (!rec || !rec.driftInfo.detected) return;
+
+  const html = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <h3>零点漂移复核原因</h3>
+        <div class="drift-explain">
+          <strong>学生:</strong> ${rec.studentName} (${rec.studentId})<br>
+          <strong>批次:</strong> ${rec.batch} · 测量 ${rec.trialIndex}<br><br>
+          <strong>检测原因:</strong><br>${rec.driftInfo.reason}<br><br>
+          <strong>偏移值:</strong> ${(rec.driftInfo.driftValue * 1000).toFixed(2)}ms<br>
+          <strong>检测阈值:</strong> ${(rec.driftInfo.threshold * 1000).toFixed(2)}ms<br><br>
+          <strong>原始数据:</strong><br>
+          时间 ${rec.rawTime.toFixed(4)}s → 速度 ${rec.rawSpeed.toFixed(3)}m/s<br>
+          ${rec.correctedTime != null ? `<strong>修正后:</strong><br>时间 ${rec.correctedTime.toFixed(4)}s → 速度 ${rec.correctedSpeed.toFixed(3)}m/s` : ''}
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:10px">
+          此原因将包含在导出的实验批改表中，下一班可直接查看，无需翻聊天记录。
+        </div>
+        <div class="btn-group" style="margin-top:12px;justify-content:flex-end">
+          <button class="btn" onclick="closeModal()">关闭</button>
+          <button class="btn btn-primary" onclick="openCorrectModal('${rec.id}','time');closeModal()">修正此记录</button>
+          <button class="btn btn-primary" onclick="confirmRecord('${rec.id}');closeModal()">确认无误</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modalContainer').innerHTML = html;
+}
+
+function openCorrectModal(recordId, field) {
+  const rec = records.find(r => r.id === recordId);
+  if (!rec) return;
+  const currentVal = field === 'time' ? (rec.correctedTime || rec.rawTime) : (rec.correctedSpeed || rec.rawSpeed);
+
+  const html = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <h3>修正${field === 'time' ? '时间' : '速度'}</h3>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
+          ${rec.studentName} (${rec.studentId}) · ${rec.batch} · 测量 ${rec.trialIndex}
+        </div>
+        <div class="form-group">
+          <label>当前值 (${field === 'time' ? 's' : 'm/s'})</label>
+          <input type="text" value="${currentVal.toFixed(4)}" disabled>
+        </div>
+        <div class="form-group">
+          <label>新值 (${field === 'time' ? 's' : 'm/s'})</label>
+          <input type="text" id="correctNewVal" value="${currentVal.toFixed(4)}">
+        </div>
+        <div class="form-group">
+          <label>修正原因 <span style="color:var(--danger)">*</span></label>
+          <textarea id="correctReason" rows="3" placeholder="如: 零点漂移修正, 扣除系统偏移 0.3ms"></textarea>
+        </div>
+        <div class="btn-group" style="justify-content:flex-end">
+          <button class="btn" onclick="closeModal()">取消</button>
+          <button class="btn btn-primary" onclick="submitCorrection('${recordId}','${field}')">提交修正</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modalContainer').innerHTML = html;
+  setTimeout(() => {
+    const input = document.getElementById('correctNewVal');
+    input.focus();
+    input.select();
+  }, 100);
+}
+
+function submitCorrection(recordId, field) {
+  const newVal = document.getElementById('correctNewVal').value;
+  const reason = document.getElementById('correctReason').value.trim();
+  if (!reason) {
+    alert('请填写修正原因');
+    return;
+  }
+  if (isNaN(parseFloat(newVal)) || parseFloat(newVal) <= 0) {
+    alert('请输入有效的正数');
+    return;
+  }
+  applyCorrection(recordId, field, newVal, reason);
+  closeModal();
+}
+
+function closeModal() {
+  document.getElementById('modalContainer').innerHTML = '';
+}
+
+function exportReviewTable() {
+  const filtered = getFilteredRecords();
+  if (filtered.length === 0) {
+    alert('无数据可导出');
+    return;
+  }
+
+  const header = '学生姓名,学号,批次,光电门间距(m),测量序号,原始时间(s),修正时间(s),原始速度(m/s),修正速度(m/s),状态,漂移偏移(ms),复核原因,修正原因,操作人,导入时间\n';
+
+  const rows = filtered.map(r => {
+    const time = r.correctedTime != null ? r.correctedTime.toFixed(4) : '';
+    const speed = r.correctedSpeed != null ? r.correctedSpeed.toFixed(3) : '';
+    const driftVal = r.driftInfo.detected ? (r.driftInfo.driftValue * 1000).toFixed(2) : '';
+    const driftReason = r.driftInfo.reason.replace(/,/g, '，');
+    const corrReasons = r.corrections.filter(c => !c.reverted).map(c => c.reason.replace(/,/g, '，')).join('; ');
+    const lastCorrOp = r.corrections.filter(c => !c.reverted).map(c => c.operator).join(';') || '';
+
+    return [r.studentName, r.studentId, r.batch, r.gateDistance.toFixed(2),
+      r.trialIndex, r.rawTime.toFixed(4), time, r.rawSpeed.toFixed(3), speed,
+      r.status, driftVal, `"${driftReason}"`, `"${corrReasons}"`, lastCorrOp, fmtTime(r.createdAt)
+    ].join(',');
+  }).join('\n');
+
+  const exportMeta = `# 光电门测速复核批改表\n# 导出时间: ${new Date().toLocaleString('zh-CN')}\n# 操作人: ${getOperator()}\n# 记录数: ${filtered.length}\n# 筛选条件: 状态=${document.getElementById('filterStatus').value || '全部'}, 批次=${document.getElementById('filterBatch').value || '全部'}\n\n`;
+
+  const content = exportMeta + header + rows;
+  downloadFile('光电门测速复核_' + new Date().toISOString().slice(0, 10) + '.csv', content, 'text/csv;charset=utf-8');
+  addAudit('导出', '', `导出 ${filtered.length} 条批改表`);
+}
+
+function exportAuditLog() {
+  if (auditLog.length === 0) {
+    alert('暂无操作日志');
+    return;
+  }
+  const header = '时间,操作人,操作类型,目标,详情\n';
+  const rows = auditLog.map(a =>
+    [fmtTime(a.timestamp), a.operator, a.action, a.target, `"${a.detail.replace(/"/g, '""')}"`].join(',')
+  ).join('\n');
+
+  const content = header + rows;
+  downloadFile('光电门复核操作日志_' + new Date().toISOString().slice(0, 10) + '.csv', content, 'text/csv;charset=utf-8');
+}
+
+function downloadFile(filename, content, mimeType) {
+  const BOM = '\uFEFF';
+  const blob = new Blob([BOM + content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearAll() {
+  if (records.length === 0) return;
+  if (!confirm('确定清空所有数据？此操作不可恢复。')) return;
+  const count = records.length;
+  records = [];
+  importBatches = [];
+  auditLog = [];
+  selectedRecordId = null;
+  addAudit('清空', '', `清空 ${count} 条记录`);
+  renderAll();
+}
+
+function renderAll() {
+  updateStats();
+  updateBatchFilter();
+  renderTable();
+  renderImportHistory();
+  renderAuditLog();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+renderAll();
+</script>
+</body>
+</html>
