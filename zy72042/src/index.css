@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap');
+
+:root {
+  --cafe-brown: #3E2723;
+  --cafe-cream: #FFF8F0;
+  --cafe-latte: #D7CCC8;
+  --risk-red: #D32F2F;
+  --risk-yellow: #FBC02D;
+  --safe-green: #388E3C;
+  --data-blue: #1565C0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  background-color: var(--cafe-cream);
+  color: var(--cafe-brown);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3 {
+  font-family: 'Noto Serif SC', Georgia, serif;
+}
+
+@layer components {
+  .card-cafe {
+    @apply bg-white rounded-2xl shadow-lg border border-cafe-latte/30 p-4;
+  }
+  .btn-primary {
+    @apply bg-cafe-brown text-cafe-cream px-5 py-2.5 rounded-full font-medium transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0;
+  }
+  .btn-secondary {
+    @apply bg-cafe-latte text-cafe-brown px-5 py-2.5 rounded-full font-medium transition-all duration-200 hover:shadow-md hover:bg-cafe-latte/80;
+  }
+  .btn-danger {
+    @apply bg-risk-red text-white px-5 py-2.5 rounded-full font-medium transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
+  }
+  .fund-card-base {
+    @apply rounded-xl p-3 cursor-grab active:cursor-grabbing transition-all duration-200 hover:shadow-lg hover:-translate-y-1 border-2;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D7CCC8;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3E2723;
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
