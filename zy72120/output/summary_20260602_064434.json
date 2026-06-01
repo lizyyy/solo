@@ -1,0 +1,484 @@
+{
+  "data_quality": {
+    "source": "设备巡检表",
+    "load_time": "2026-06-02 06:44:33",
+    "total_rows": 10,
+    "total_columns": 8,
+    "columns": [
+      "timestamp",
+      "object_id",
+      "water_velocity",
+      "object_size",
+      "drift_distance",
+      "x_coordinate",
+      "y_coordinate",
+      "inspection_note"
+    ],
+    "missing_values": {
+      "inspection_note": 5
+    },
+    "outliers": {},
+    "duplicates": 0,
+    "time_gaps": [
+      {
+        "gap_index": 3,
+        "gap_start": "2026-06-02 08:10:00",
+        "gap_end": "2026-06-02 08:25:00",
+        "gap_duration_min": 15.0,
+        "expected_rows_missing": 2
+      }
+    ],
+    "unit_conversions": [
+      {
+        "row_index": 2,
+        "field": "water_velocity",
+        "original_value": 6.0,
+        "original_unit": "km/h",
+        "normalized_value": 1.6667,
+        "target_unit": "m/s"
+      },
+      {
+        "row_index": 4,
+        "field": "water_velocity",
+        "original_value": 120.0,
+        "original_unit": "m/min",
+        "normalized_value": 2.0,
+        "target_unit": "m/s"
+      },
+      {
+        "row_index": 1,
+        "field": "object_size",
+        "original_value": 1.2,
+        "original_unit": "m^2",
+        "normalized_value": 1.2,
+        "target_unit": "m2"
+      },
+      {
+        "row_index": 2,
+        "field": "object_size",
+        "original_value": 15000.0,
+        "original_unit": "cm2",
+        "normalized_value": 1.5,
+        "target_unit": "m2"
+      },
+      {
+        "row_index": 4,
+        "field": "object_size",
+        "original_value": 1.8,
+        "original_unit": "m²",
+        "normalized_value": 1.8,
+        "target_unit": "m2"
+      }
+    ],
+    "unit_conversion_count": 5,
+    "cleaned_rows": 10,
+    "rows_removed": 0
+  },
+  "anomaly_detection": {
+    "detection_time": "2026-06-02 06:44:33",
+    "params_version": "v2",
+    "params_version_note": "汛期调整 - 流速阈值降低，风险阈值提高",
+    "params_created_by": "何工",
+    "params_created_at": "2026-06-02 09:30:00",
+    "thresholds_applied": {
+      "water_velocity_m_s": 2.5,
+      "object_size_m2": 1.5,
+      "drift_distance_m": 400.0,
+      "risk_score": 60.0
+    },
+    "total_records": 10,
+    "anomaly_count": 6,
+    "high_risk_count": 6,
+    "medium_risk_count": 0,
+    "low_risk_count": 4,
+    "anomalies": [
+      {
+        "row_index": 4,
+        "timestamp": "2026-06-02 08:30:00",
+        "anomaly_type": [
+          "尺寸超限(1.80>1.5)",
+          "漂移距离超限(450.0>400.0)"
+        ],
+        "risk_score": 60,
+        "water_velocity": 2.0,
+        "object_size": 1.8,
+        "drift_distance": 450.0,
+        "params_version": "v2",
+        "object_id": "OBJ001"
+      },
+      {
+        "row_index": 5,
+        "timestamp": "2026-06-02 08:35:00",
+        "anomaly_type": [
+          "流速超限(2.80>2.5)",
+          "尺寸超限(2.50>1.5)",
+          "漂移距离超限(520.0>400.0)"
+        ],
+        "risk_score": 100,
+        "water_velocity": 2.8,
+        "object_size": 2.5,
+        "drift_distance": 520.0,
+        "params_version": "v2",
+        "object_id": "OBJ001"
+      },
+      {
+        "row_index": 6,
+        "timestamp": "2026-06-02 08:40:00",
+        "anomaly_type": [
+          "流速超限(3.20>2.5)",
+          "尺寸超限(3.00>1.5)",
+          "漂移距离超限(650.0>400.0)"
+        ],
+        "risk_score": 100,
+        "water_velocity": 3.2,
+        "object_size": 3.0,
+        "drift_distance": 650.0,
+        "params_version": "v2",
+        "object_id": "OBJ001"
+      },
+      {
+        "row_index": 7,
+        "timestamp": "2026-06-02 08:45:00",
+        "anomaly_type": [
+          "流速超限(2.60>2.5)",
+          "尺寸超限(2.80>1.5)",
+          "漂移距离超限(720.0>400.0)"
+        ],
+        "risk_score": 100,
+        "water_velocity": 2.6,
+        "object_size": 2.8,
+        "drift_distance": 720.0,
+        "params_version": "v2",
+        "object_id": "OBJ001"
+      },
+      {
+        "row_index": 8,
+        "timestamp": "2026-06-02 08:50:00",
+        "anomaly_type": [
+          "尺寸超限(2.20>1.5)",
+          "漂移距离超限(780.0>400.0)"
+        ],
+        "risk_score": 60,
+        "water_velocity": 2.4,
+        "object_size": 2.2,
+        "drift_distance": 780.0,
+        "params_version": "v2",
+        "object_id": "OBJ001"
+      },
+      {
+        "row_index": 9,
+        "timestamp": "2026-06-02 08:55:00",
+        "anomaly_type": [
+          "尺寸超限(1.80>1.5)",
+          "漂移距离超限(850.0>400.0)"
+        ],
+        "risk_score": 60,
+        "water_velocity": 2.1,
+        "object_size": 1.8,
+        "drift_distance": 850.0,
+        "params_version": "v2",
+        "object_id": "OBJ001"
+      }
+    ]
+  },
+  "trajectory": {
+    "deduction_time": "2026-06-02 06:44:33",
+    "params_version": "v2",
+    "config_applied": {
+      "prediction_steps": 12,
+      "time_step_min": 5,
+      "drift_coefficient": 0.9
+    },
+    "objects_count": 1,
+    "trajectories": {
+      "OBJ001": {
+        "actual": [
+          {
+            "timestamp": "2026-06-02 08:00:00",
+            "x": 100.5,
+            "y": 200.3,
+            "velocity": 1.5,
+            "drift_distance": 120.0,
+            "object_size": 0.8,
+            "risk_level": "低风险",
+            "anomaly_flags": "正常"
+          },
+          {
+            "timestamp": "2026-06-02 08:05:00",
+            "x": 180.2,
+            "y": 210.5,
+            "velocity": 1.8,
+            "drift_distance": 180.0,
+            "object_size": 1.2,
+            "risk_level": "低风险",
+            "anomaly_flags": "正常"
+          },
+          {
+            "timestamp": "2026-06-02 08:10:00",
+            "x": 260.8,
+            "y": 215.7,
+            "velocity": 1.6666666666666667,
+            "drift_distance": 250.0,
+            "object_size": 1.5,
+            "risk_level": "低风险",
+            "anomaly_flags": "正常"
+          },
+          {
+            "timestamp": "2026-06-02 08:25:00",
+            "x": 420.3,
+            "y": 225.2,
+            "velocity": 2.2,
+            "drift_distance": 380.0,
+            "object_size": 1.1,
+            "risk_level": "低风险",
+            "anomaly_flags": "正常"
+          },
+          {
+            "timestamp": "2026-06-02 08:30:00",
+            "x": 500.7,
+            "y": 230.1,
+            "velocity": 2.0,
+            "drift_distance": 450.0,
+            "object_size": 1.8,
+            "risk_level": "高风险",
+            "anomaly_flags": "尺寸超限(1.80>1.5);漂移距离超限(450.0>400.0)"
+          },
+          {
+            "timestamp": "2026-06-02 08:35:00",
+            "x": 580.5,
+            "y": 235.8,
+            "velocity": 2.8,
+            "drift_distance": 520.0,
+            "object_size": 2.5,
+            "risk_level": "高风险",
+            "anomaly_flags": "流速超限(2.80>2.5);尺寸超限(2.50>1.5);漂移距离超限(520.0>400.0)"
+          },
+          {
+            "timestamp": "2026-06-02 08:40:00",
+            "x": 700.2,
+            "y": 245.3,
+            "velocity": 3.2,
+            "drift_distance": 650.0,
+            "object_size": 3.0,
+            "risk_level": "高风险",
+            "anomaly_flags": "流速超限(3.20>2.5);尺寸超限(3.00>1.5);漂移距离超限(650.0>400.0)"
+          },
+          {
+            "timestamp": "2026-06-02 08:45:00",
+            "x": 780.6,
+            "y": 250.5,
+            "velocity": 2.6,
+            "drift_distance": 720.0,
+            "object_size": 2.8,
+            "risk_level": "高风险",
+            "anomaly_flags": "流速超限(2.60>2.5);尺寸超限(2.80>1.5);漂移距离超限(720.0>400.0)"
+          },
+          {
+            "timestamp": "2026-06-02 08:50:00",
+            "x": 860.1,
+            "y": 255.7,
+            "velocity": 2.4,
+            "drift_distance": 780.0,
+            "object_size": 2.2,
+            "risk_level": "高风险",
+            "anomaly_flags": "尺寸超限(2.20>1.5);漂移距离超限(780.0>400.0)"
+          },
+          {
+            "timestamp": "2026-06-02 08:55:00",
+            "x": 940.4,
+            "y": 260.2,
+            "velocity": 2.1,
+            "drift_distance": 850.0,
+            "object_size": 1.8,
+            "risk_level": "高风险",
+            "anomaly_flags": "尺寸超限(1.80>1.5);漂移距离超限(850.0>400.0)"
+          }
+        ],
+        "predicted": [
+          {
+            "step": 1,
+            "timestamp": "2026-06-02 09:00:00",
+            "predicted_x": 1672.9,
+            "predicted_y": 318.98,
+            "predicted_velocity": 2.659,
+            "predicted_drift": 734.85,
+            "confidence": 0.9
+          },
+          {
+            "step": 2,
+            "timestamp": "2026-06-02 09:05:00",
+            "predicted_x": 2490.26,
+            "predicted_y": 401.07,
+            "predicted_velocity": 2.824,
+            "predicted_drift": 1556.25,
+            "confidence": 0.85
+          },
+          {
+            "step": 3,
+            "timestamp": "2026-06-02 09:10:00",
+            "predicted_x": 3068.98,
+            "predicted_y": 469.38,
+            "predicted_velocity": 2.632,
+            "predicted_drift": 2138.83,
+            "confidence": 0.8
+          },
+          {
+            "step": 4,
+            "timestamp": "2026-06-02 09:15:00",
+            "predicted_x": 3724.5,
+            "predicted_y": 539.91,
+            "predicted_velocity": 2.695,
+            "predicted_drift": 2798.11,
+            "confidence": 0.75
+          },
+          {
+            "step": 5,
+            "timestamp": "2026-06-02 09:20:00",
+            "predicted_x": 4601.59,
+            "predicted_y": 604.59,
+            "predicted_velocity": 2.589,
+            "predicted_drift": 3677.35,
+            "confidence": 0.7
+          },
+          {
+            "step": 6,
+            "timestamp": "2026-06-02 09:25:00",
+            "predicted_x": 5146.29,
+            "predicted_y": 678.12,
+            "predicted_velocity": 2.836,
+            "predicted_drift": 4226.61,
+            "confidence": 0.65
+          },
+          {
+            "step": 7,
+            "timestamp": "2026-06-02 09:30:00",
+            "predicted_x": 6052.42,
+            "predicted_y": 772.74,
+            "predicted_velocity": 2.639,
+            "predicted_drift": 5137.65,
+            "confidence": 0.6
+          },
+          {
+            "step": 8,
+            "timestamp": "2026-06-02 09:35:00",
+            "predicted_x": 6636.23,
+            "predicted_y": 835.0,
+            "predicted_velocity": 2.68,
+            "predicted_drift": 5724.76,
+            "confidence": 0.55
+          },
+          {
+            "step": 9,
+            "timestamp": "2026-06-02 09:40:00",
+            "predicted_x": 7322.58,
+            "predicted_y": 897.45,
+            "predicted_velocity": 2.44,
+            "predicted_drift": 6413.92,
+            "confidence": 0.5
+          },
+          {
+            "step": 10,
+            "timestamp": "2026-06-02 09:45:00",
+            "predicted_x": 8057.85,
+            "predicted_y": 963.9,
+            "predicted_velocity": 2.523,
+            "predicted_drift": 7152.15,
+            "confidence": 0.5
+          },
+          {
+            "step": 11,
+            "timestamp": "2026-06-02 09:50:00",
+            "predicted_x": 8725.28,
+            "predicted_y": 1025.62,
+            "predicted_velocity": 2.367,
+            "predicted_drift": 7822.42,
+            "confidence": 0.5
+          },
+          {
+            "step": 12,
+            "timestamp": "2026-06-02 09:55:00",
+            "predicted_x": 9415.64,
+            "predicted_y": 1108.19,
+            "predicted_velocity": 2.584,
+            "predicted_drift": 8517.56,
+            "confidence": 0.5
+          }
+        ],
+        "summary": {
+          "total_points": 10,
+          "predicted_points": 12,
+          "avg_velocity": 2.226666666666667,
+          "max_drift": 850.0
+        }
+      }
+    }
+  },
+  "processing_suggestions": [
+    {
+      "level": "urgent",
+      "category": "高风险处置",
+      "action_item": "立即调度打捞",
+      "description": "发现 6 条高风险记录，请立即通知河道运维班组前往现场处置。",
+      "details": [
+        "记录4：尺寸超限(1.80>1.5);漂移距离超限(450.0>400.0)",
+        "记录5：流速超限(2.80>2.5);尺寸超限(2.50>1.5);漂移距离超限(520.0>400.0)",
+        "记录6：流速超限(3.20>2.5);尺寸超限(3.00>1.5);漂移距离超限(650.0>400.0)"
+      ],
+      "responsible_role": "值班调度"
+    },
+    {
+      "level": "warning",
+      "category": "流速异常",
+      "action_item": "核实水情",
+      "description": "发现 3 条流速超限记录，请与水文站确认是否处于汛期或上游放水。",
+      "responsible_role": "水文监测员"
+    },
+    {
+      "level": "warning",
+      "category": "大尺寸漂浮物",
+      "action_item": "重点跟踪",
+      "description": "发现 6 条大尺寸漂浮物，可能对水工构筑物造成影响，建议持续跟踪轨迹。",
+      "responsible_role": "设备工程师"
+    },
+    {
+      "level": "info",
+      "category": "数据留痕",
+      "action_item": "导出归档",
+      "description": "本次检测使用v2参数，判定结果已自动标注版本号，建议导出PDF存档。",
+      "responsible_role": "设备工程师"
+    }
+  ],
+  "conflict_report": {
+    "report_time": "2026-06-02 06:44:33",
+    "total_conflicts": 2,
+    "high_severity": 1,
+    "medium_severity": 0,
+    "info_severity": 1,
+    "conflicts": [
+      {
+        "conflict_type": "状态判定冲突",
+        "severity": "high",
+        "inspection_evidence": "巡检备注标注\"正常/无异常\"",
+        "detection_evidence": "系统检测发现 6 条异常记录",
+        "suggested_actions": [
+          "请核对巡检时间与数据采集时间是否一致",
+          "建议复核现场实际情况，确认是否漏检",
+          "如巡检记录有误，请更新巡检表备注"
+        ],
+        "responsible_party": "设备工程师何工"
+      },
+      {
+        "conflict_type": "流速关注点",
+        "severity": "info",
+        "inspection_evidence": "巡检记录中提到了流速相关情况",
+        "detection_evidence": "建议结合系统流速数据分析验证",
+        "suggested_actions": [
+          "请核对巡检描述与流速曲线趋势是否一致",
+          "如有汛期或放水情况，可考虑调整流速阈值"
+        ],
+        "responsible_party": "水文监测员"
+      }
+    ],
+    "disclaimer": "本报告仅列出可能存在的冲突点，最终判定请以人工核实为准。"
+  }
+}

@@ -1,0 +1,23 @@
+{
+    "version": "v1",
+    "version_note": "初始版本 - 默认阈值配置",
+    "created_by": "系统默认",
+    "created_at": "2026-06-01 00:00:00",
+    "thresholds": {
+        "water_velocity_m_s": 3.0,
+        "object_size_m2": 2.0,
+        "drift_distance_m": 500.0,
+        "risk_score": 70.0
+    },
+    "units": {
+        "water_velocity": "m/s",
+        "object_size": "m2",
+        "drift_distance": "m",
+        "time_interval": "min"
+    },
+    "deduction": {
+        "prediction_steps": 10,
+        "time_step_min": 5,
+        "drift_coefficient": 0.85
+    }
+}
