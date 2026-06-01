@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-size: 16px;
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-6 py-3 rounded-lg font-medium transition-all duration-200 inline-flex items-center justify-center gap-2;
+  }
+  .btn-primary {
+    @apply bg-brand-400 text-white hover:bg-brand-500 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-400/30 active:translate-y-0;
+  }
+  .btn-secondary {
+    @apply bg-slate-700 text-slate-100 hover:bg-slate-600 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0;
+  }
+  .btn-outline {
+    @apply border border-slate-600 text-slate-300 hover:bg-slate-800 hover:-translate-y-0.5 active:translate-y-0;
+  }
+  .btn-success {
+    @apply bg-success/20 text-success border border-success/40 hover:bg-success/30;
+  }
+  .btn-danger {
+    @apply bg-danger/20 text-danger border border-danger/40 hover:bg-danger/30;
+  }
+  .card {
+    @apply bg-slate-800/80 backdrop-blur rounded-xl border border-slate-700/50 shadow-xl;
+  }
+  .tag {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  .tag-success {
+    @apply bg-success/20 text-success;
+  }
+  .tag-danger {
+    @apply bg-danger/20 text-danger;
+  }
+  .tag-warning {
+    @apply bg-warning/20 text-warning;
+  }
+  .tag-info {
+    @apply bg-brand-400/20 text-brand-300;
+  }
+}
+
+@layer utilities {
+  .prose-like {
+    line-height: 1.75;
+  }
+}
