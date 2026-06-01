@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-surface text-gray-200;
+  margin: 0;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-surface;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-surface-border rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-surface-overlay;
+}
+
+@layer components {
+  .card {
+    @apply bg-surface-raised border border-surface-border rounded-lg;
+  }
+
+  .btn-primary {
+    @apply bg-brand hover:bg-brand-light text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-overlay hover:bg-surface-border text-gray-300 px-4 py-2 rounded-lg font-medium transition-colors duration-200 border border-surface-border;
+  }
+
+  .btn-danger {
+    @apply bg-data-anomaly/20 hover:bg-data-anomaly/30 text-data-anomaly px-4 py-2 rounded-lg font-medium transition-colors duration-200 border border-data-anomaly/30;
+  }
+
+  .input-field {
+    @apply bg-surface border border-surface-border rounded-lg px-3 py-2 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand/50 transition-colors;
+  }
+
+  .status-badge {
+    @apply px-2 py-0.5 rounded text-xs font-medium;
+  }
+
+  .status-pending {
+    @apply status-badge bg-data-warning/20 text-data-warning;
+  }
+
+  .status-reviewing {
+    @apply status-badge bg-data-info/20 text-data-info;
+  }
+
+  .status-passed {
+    @apply status-badge bg-data-normal/20 text-data-normal;
+  }
+
+  .status-anomaly {
+    @apply status-badge bg-data-anomaly/20 text-data-anomaly;
+  }
+}
