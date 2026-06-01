@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>古典唱片母带归档管理</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>古典唱片母带归档管理</h1>
+            <div class="header-actions">
+                <button id="importBtn" class="btn btn-secondary">导入数据</button>
+                <button id="exportBtn" class="btn btn-primary">导出清单</button>
+                <button id="addTrackBtn" class="btn btn-success">添加曲目</button>
+                <button id="addContractBtn" class="btn btn-info">添加合同</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="panel">
+                    <h3>统计概览</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-label">总曲目</span>
+                            <span class="stat-value" id="totalTracks">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">合同数</span>
+                            <span class="stat-value" id="totalContracts">0</span>
+                        </div>
+                        <div class="stat-item warning">
+                            <span class="stat-label">授权过期</span>
+                            <span class="stat-value" id="expiredCount">0</span>
+                        </div>
+                        <div class="stat-item error">
+                            <span class="stat-label">问题项</span>
+                            <span class="stat-value" id="issueCount">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>快速筛选</h3>
+                    <div class="filter-group">
+                        <label><input type="checkbox" id="filterExpired"> 授权过期</label>
+                        <label><input type="checkbox" id="filterIssues"> 有问题</label>
+                        <label><input type="checkbox" id="filterDuplicates"> 重复曲目</label>
+                        <label><input type="checkbox" id="filterConflicts"> 数据冲突</label>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>问题列表</h3>
+                    <div id="issueList" class="issue-list">
+                        <p class="empty-text">暂无问题</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="tracks">曲目表</button>
+                    <button class="tab-btn" data-tab="contracts">合同备注</button>
+                    <button class="tab-btn" data-tab="conflicts">冲突检测</button>
+                </div>
+
+                <div class="tab-content active" id="tracksTab">
+                    <div class="panel">
+                        <div class="track-list" id="trackList">
+                            <p class="empty-text">暂无曲目，请导入数据或手动添加</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="contractsTab">
+                    <div class="panel">
+                        <div class="contract-list" id="contractList">
+                            <p class="empty-text">暂无合同备注</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="conflictsTab">
+                    <div class="panel">
+                        <div class="conflict-list" id="conflictList">
+                            <p class="empty-text">暂无数据冲突</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="trackModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="trackModalTitle">添加曲目</h2>
+                <button class="close-btn" onclick="closeModal('trackModal')">&times;</button>
+            </div>
+            <form id="trackForm" class="form">
+                <input type="hidden" id="trackId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>曲目名称 *</label>
+                        <input type="text" id="trackName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>作曲家</label>
+                        <input type="text" id="composer">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>表演者</label>
+                        <input type="text" id="performer">
+                    </div>
+                    <div class="form-group">
+                        <label>时长 (时:分:秒)</label>
+                        <input type="text" id="duration" placeholder="00:05:30">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ISRC/编号</label>
+                        <input type="text" id="isrc">
+                    </div>
+                    <div class="form-group">
+                        <label>关联合同ID</label>
+                        <input type="text" id="relatedContractId">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>音频文件名</label>
+                        <input type="text" id="audioFile">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="trackStatus">
+                            <option value="pending">待处理</option>
+                            <option value="approved">已确认</option>
+                            <option value="review">需复核</option>
+                            <option value="rejected">已驳回</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>原始来源</label>
+                    <input type="text" id="source" placeholder="例如：合同扫描件第3页、微信群2024-01-15">
+                </div>
+                <div class="form-group">
+                    <label>人工批注</label>
+                    <textarea id="notes" rows="3" placeholder="林老师批注：注意时长与合同不一致"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('trackModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="contractModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="contractModalTitle">添加合同备注</h2>
+                <button class="close-btn" onclick="closeModal('contractModal')">&times;</button>
+            </div>
+            <form id="contractForm" class="form">
+                <input type="hidden" id="contractId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>合同名称 *</label>
+                        <input type="text" id="contractName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>合同编号</label>
+                        <input type="text" id="contractNumber">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>授权开始日期</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="form-group">
+                        <label>授权结束日期</label>
+                        <input type="date" id="endDate">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>合同扫描件来源</label>
+                    <input type="text" id="contractSource" placeholder="例如：合同扫描件文件名、页码">
+                </div>
+                <div class="form-group">
+                    <label>合同备注（保留原始表述）</label>
+                    <textarea id="contractNotes" rows="4" placeholder="请原样录入合同中的备注内容，不要修改原始表述"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>授权曲目（逗号分隔）</label>
+                    <input type="text" id="authorizedTracks" placeholder="曲目1, 曲目2, ...">
+                </div>
+                <div class="form-group">
+                    <label>内部批注</label>
+                    <textarea id="internalNotes" rows="2" placeholder="林老师批注、群聊补充内容等"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('contractModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>导出归档清单</h2>
+                <button class="close-btn" onclick="closeModal('exportModal')">&times;</button>
+            </div>
+            <div class="form">
+                <div class="form-group">
+                    <label>导出范围</label>
+                    <select id="exportScope">
+                        <option value="all">全部数据</option>
+                        <option value="approved">仅已确认</option>
+                        <option value="issues">仅问题项</option>
+                        <option value="filtered">当前筛选结果</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>导出格式</label>
+                    <select id="exportFormat">
+                        <option value="csv">CSV 表格（适合演出/发行同事）</option>
+                        <option value="json">JSON 数据（完整备份）</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>包含问题说明</label>
+                    <label style="font-weight: normal;"><input type="checkbox" id="includeIssues" checked> 在导出中包含问题原因和建议</label>
+                </div>
+                <div class="preview-area">
+                    <h4>导出预览</h4>
+                    <div id="exportPreview" class="export-preview"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('exportModal')">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="doExport()">确认导出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+
+    <script src="app.js"></script>
+</body>
+</html>
