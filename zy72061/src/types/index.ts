@@ -1,0 +1,133 @@
+export type BoneGroup = 'head' | 'spine' | 'leftArm' | 'rightArm' | 'leftLeg' | 'rightLeg';
+
+export type DataSource = 'cad_export' | 'manual_edit' | 'photo_estimate';
+
+export type AnomalyType = 'coordinate_error' | 'missing_data' | 'outlier' | 'suspicious';
+
+export interface ProcessNote {
+  id: string;
+  pointId: string;
+  content: string;
+  author: string;
+  createdAt: string;
+  diff?: {
+    previous?: Partial<SkeletonPoint>;
+    current?: Partial<SkeletonPoint>;
+  };
+}
+
+export interface SkeletonPoint {
+  id: string;
+  name: string;
+  nameCn: string;
+  boneGroup: BoneGroup;
+  x: number;
+  y: number;
+  z: number;
+  source: DataSource;
+  sourceRow?: number;
+  sourceFile?: string;
+  isAnomaly: boolean;
+  anomalyType?: AnomalyType;
+  anomalyNote?: string;
+  notes: ProcessNote[];
+  createdAt: string;
+  updatedAt: string;
+  processedBy?: string;
+}
+
+export interface GaitFrame {
+  frameId: string;
+  frameNumber: number;
+  timestamp: number;
+  points: SkeletonPoint[];
+  source: string;
+}
+
+export interface CameraState {
+  position: [number, number, number];
+  target: [number, number, number];
+}
+
+export interface ViewState {
+  camera: CameraState;
+  selectedPointId?: string;
+  currentFrame: number;
+  isPlaying: boolean;
+  playSpeed: number;
+}
+
+export interface FilterState {
+  boneGroups: BoneGroup[];
+  dataSources: DataSource[];
+  showAnomalyOnly: boolean;
+  searchQuery: string;
+}
+
+export interface DataQualityReport {
+  totalPoints: number;
+  missingCoordinates: number;
+  outlierPoints: number;
+  suspiciousPoints: number;
+  duplicatePoints: number;
+  warnings: string[];
+}
+
+export interface ImportResult {
+  frames: GaitFrame[];
+  report: DataQualityReport;
+  fileName: string;
+  importedAt: string;
+}
+
+export const BONE_GROUP_LABELS: Record<BoneGroup, string> = {
+  head: '头部',
+  spine: '躯干',
+  leftArm: '左臂',
+  rightArm: '右臂',
+  leftLeg: '左腿',
+  rightLeg: '右腿',
+};
+
+export const DATA_SOURCE_LABELS: Record<DataSource, string> = {
+  cad_export: 'CAD导出',
+  manual_edit: '手改坐标',
+  photo_estimate: '照片估算',
+};
+
+export const ANOMALY_TYPE_LABELS: Record<AnomalyType, string> = {
+  coordinate_error: '坐标错误',
+  missing_data: '数据缺失',
+  outlier: '离群值',
+  suspicious: '可疑数据',
+};
+
+export const ANOMALY_TYPE_SUGGESTIONS: Record<AnomalyType, string> = {
+  coordinate_error: '建议：请核对原始CAD文件第{row}行，确认坐标系是否统一，必要时重新导出数据。',
+  missing_data: '建议：该点位数据缺失，请检查是否有漏采，或根据相邻帧数据进行插值补全。',
+  outlier: '建议：该点位与相邻帧偏差较大，请确认是否为测量误差，或手动修正坐标值。',
+  suspicious: '建议：数据格式或范围存在异常，请与现场采集人员确认数据有效性。',
+};
+
+export const SKELETON_CONNECTIONS: [string, string][] = [
+  ['head_top', 'neck'],
+  ['neck', 'left_shoulder'],
+  ['neck', 'right_shoulder'],
+  ['neck', 'spine_top'],
+  ['spine_top', 'spine_mid'],
+  ['spine_mid', 'spine_bottom'],
+  ['spine_bottom', 'left_hip'],
+  ['spine_bottom', 'right_hip'],
+  ['left_shoulder', 'left_elbow'],
+  ['left_elbow', 'left_wrist'],
+  ['left_wrist', 'left_hand'],
+  ['right_shoulder', 'right_elbow'],
+  ['right_elbow', 'right_wrist'],
+  ['right_wrist', 'right_hand'],
+  ['left_hip', 'left_knee'],
+  ['left_knee', 'left_ankle'],
+  ['left_ankle', 'left_foot'],
+  ['right_hip', 'right_knee'],
+  ['right_knee', 'right_ankle'],
+  ['right_ankle', 'right_foot'],
+];
