@@ -1,0 +1,1927 @@
+{
+  "total": 50,
+  "by_severity": {
+    "high": 12,
+    "medium": 20,
+    "low": 18
+  },
+  "by_type": {
+    "low_score": {
+      "count": 12,
+      "name": "个人综合分过低",
+      "items": [
+        {
+          "id": "fb61fdd9-9b3b-4ba5-b043-456521d1638e",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "nan - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": NaN,
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+        },
+        {
+          "id": "bf367f12-5b10-4842-8c39-cf28d1ff9be2",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "女高音 - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": "女高音",
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+        },
+        {
+          "id": "5526fdce-0687-4b17-80bd-04b1bef37f52",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "女低音 - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": "女低音",
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+        },
+        {
+          "id": "cd4caf2f-15bf-43e6-9dbf-63fc9fac8e08",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "男高音 - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": "男高音",
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+        },
+        {
+          "id": "a5d934a1-5ea9-4bfe-8d2f-49dfee468cdb",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "男低音 - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": "男低音",
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+        },
+        {
+          "id": "f7397285-7557-45b5-83e7-1d59b18fe662",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "nan - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": NaN,
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+        },
+        {
+          "id": "5e1f982b-f109-45e1-9ae3-a44e163f465b",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "nan - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": NaN,
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+        },
+        {
+          "id": "def05c10-57c8-43ef-815a-203e0c276106",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "女高音 - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": "女高音",
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+        },
+        {
+          "id": "f0488ecb-58fa-4e3e-b867-d533dd39b872",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "女低音 - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": "女低音",
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+        },
+        {
+          "id": "290dc0da-7b8f-465c-9ac9-af75128f8456",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "男高音 - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": "男高音",
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+        },
+        {
+          "id": "5fbe58a9-63f9-4b3d-b6d5-9466a76d041f",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "男低音 - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": "男低音",
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+        },
+        {
+          "id": "57be5dde-a496-48c0-bc75-5d161a5aaeaf",
+          "anomaly_type": "low_score",
+          "anomaly_name": "个人综合分过低",
+          "description": "nan - nan 个人综合分0.0低于及格线70",
+          "severity": "high",
+          "values": {
+            "score": 0.0,
+            "threshold": 70,
+            "section": NaN,
+            "member": NaN,
+            "音准得分": NaN,
+            "节奏得分": NaN,
+            "合声得分": NaN,
+            "音量平衡": NaN,
+            "情感表达": NaN
+          },
+          "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+        }
+      ]
+    },
+    "high_std": {
+      "count": 8,
+      "name": "声部内标准差过大",
+      "items": [
+        {
+          "id": "78fcf763-6dd1-498a-b51b-1e01fedcdff5",
+          "anomaly_type": "high_std",
+          "anomaly_name": "声部内标准差过大",
+          "description": "女低音 声部内标准差33.14过大，说明水平差异明显",
+          "severity": "medium",
+          "values": {
+            "section": "女低音",
+            "std": 33.14,
+            "mean": 67.37,
+            "threshold": 20.0,
+            "outlier_count": 1,
+            "outliers": [
+              {
+                "人员": NaN,
+                "个人综合分": 0.0
+              }
+            ]
+          },
+          "record_id": null
+        },
+        {
+          "id": "2e980b9e-9ddb-42fc-a71c-a31cae959a8d",
+          "anomaly_type": "high_std",
+          "anomaly_name": "声部内标准差过大",
+          "description": "女高音 声部内标准差35.27过大，说明水平差异明显",
+          "severity": "medium",
+          "values": {
+            "section": "女高音",
+            "std": 35.27,
+            "mean": 71.68,
+            "threshold": 20.0,
+            "outlier_count": 1,
+            "outliers": [
+              {
+                "人员": NaN,
+                "个人综合分": 0.0
+              }
+            ]
+          },
+          "record_id": null
+        },
+        {
+          "id": "875bb4f7-23f0-4d3a-9c0e-1af3a95c6b48",
+          "anomaly_type": "high_std",
+          "anomaly_name": "声部内标准差过大",
+          "description": "男低音 声部内标准差32.34过大，说明水平差异明显",
+          "severity": "medium",
+          "values": {
+            "section": "男低音",
+            "std": 32.34,
+            "mean": 65.58,
+            "threshold": 20.0,
+            "outlier_count": 1,
+            "outliers": [
+              {
+                "人员": NaN,
+                "个人综合分": 0.0
+              }
+            ]
+          },
+          "record_id": null
+        },
+        {
+          "id": "aeebe9b9-0ad2-4d27-9a57-2a34c242e01a",
+          "anomaly_type": "high_std",
+          "anomaly_name": "声部内标准差过大",
+          "description": "男高音 声部内标准差34.55过大，说明水平差异明显",
+          "severity": "medium",
+          "values": {
+            "section": "男高音",
+            "std": 34.55,
+            "mean": 69.96,
+            "threshold": 20.0,
+            "outlier_count": 1,
+            "outliers": [
+              {
+                "人员": NaN,
+                "个人综合分": 0.0
+              }
+            ]
+          },
+          "record_id": null
+        },
+        {
+          "id": "abc3deb4-f043-4598-95cd-5b4d67129856",
+          "anomaly_type": "high_std",
+          "anomaly_name": "声部内标准差过大",
+          "description": "女低音 声部内标准差33.14过大，说明水平差异明显",
+          "severity": "medium",
+          "values": {
+            "section": "女低音",
+            "std": 33.14,
+            "mean": 67.37,
+            "threshold": 20.0,
+            "outlier_count": 1,
+            "outliers": [
+              {
+                "人员": NaN,
+                "个人综合分": 0.0
+              }
+            ]
+          },
+          "record_id": null
+        },
+        {
+          "id": "fe8a4be2-fd4e-4b4d-8441-0bbf4981d38b",
+          "anomaly_type": "high_std",
+          "anomaly_name": "声部内标准差过大",
+          "description": "女高音 声部内标准差35.27过大，说明水平差异明显",
+          "severity": "medium",
+          "values": {
+            "section": "女高音",
+            "std": 35.27,
+            "mean": 71.68,
+            "threshold": 20.0,
+            "outlier_count": 1,
+            "outliers": [
+              {
+                "人员": NaN,
+                "个人综合分": 0.0
+              }
+            ]
+          },
+          "record_id": null
+        },
+        {
+          "id": "b3c1011b-1293-45af-9076-41e81995b871",
+          "anomaly_type": "high_std",
+          "anomaly_name": "声部内标准差过大",
+          "description": "男低音 声部内标准差32.34过大，说明水平差异明显",
+          "severity": "medium",
+          "values": {
+            "section": "男低音",
+            "std": 32.34,
+            "mean": 65.58,
+            "threshold": 20.0,
+            "outlier_count": 1,
+            "outliers": [
+              {
+                "人员": NaN,
+                "个人综合分": 0.0
+              }
+            ]
+          },
+          "record_id": null
+        },
+        {
+          "id": "012870db-cf12-435c-b8d7-f8b2bc2577fa",
+          "anomaly_type": "high_std",
+          "anomaly_name": "声部内标准差过大",
+          "description": "男高音 声部内标准差34.55过大，说明水平差异明显",
+          "severity": "medium",
+          "values": {
+            "section": "男高音",
+            "std": 34.55,
+            "mean": 69.96,
+            "threshold": 20.0,
+            "outlier_count": 1,
+            "outliers": [
+              {
+                "人员": NaN,
+                "个人综合分": 0.0
+              }
+            ]
+          },
+          "record_id": null
+        }
+      ]
+    },
+    "missing_data": {
+      "count": 12,
+      "name": "数据缺失",
+      "items": [
+        {
+          "id": "674ca7bd-2156-47f6-b0af-1de6b82c3f46",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "nan - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": NaN,
+            "member": NaN,
+            "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+          },
+          "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+        },
+        {
+          "id": "9605268b-2ea5-40ba-9c05-5e2e835a0b7c",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "女高音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": "女高音",
+            "member": NaN,
+            "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+          },
+          "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+        },
+        {
+          "id": "7691a424-506e-4952-ba1b-95114ff53726",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "女低音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": "女低音",
+            "member": NaN,
+            "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+          },
+          "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+        },
+        {
+          "id": "416c3b7c-b3f4-4f23-842d-d08f75b45a9d",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "男高音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": "男高音",
+            "member": NaN,
+            "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+          },
+          "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+        },
+        {
+          "id": "954102b0-8999-4bc0-a17a-bffee1f3bee8",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "男低音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": "男低音",
+            "member": NaN,
+            "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+          },
+          "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+        },
+        {
+          "id": "7b578f54-8c0b-4bf5-a3e9-731d3cd96516",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "nan - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": NaN,
+            "member": NaN,
+            "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+          },
+          "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+        },
+        {
+          "id": "e12bdd2f-52d0-4c9e-8830-6a4382eaab00",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "nan - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": NaN,
+            "member": NaN,
+            "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+          },
+          "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+        },
+        {
+          "id": "24f96cb7-4460-40b9-a173-580b23425975",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "女高音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": "女高音",
+            "member": NaN,
+            "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+          },
+          "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+        },
+        {
+          "id": "8c604f37-fee6-4ee9-9a49-026a0f7f94c1",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "女低音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": "女低音",
+            "member": NaN,
+            "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+          },
+          "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+        },
+        {
+          "id": "49477057-e159-499e-b301-bcbdf3e80451",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "男高音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": "男高音",
+            "member": NaN,
+            "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+          },
+          "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+        },
+        {
+          "id": "f3047b75-2814-42d5-8ea0-959693876eaa",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "男低音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": "男低音",
+            "member": NaN,
+            "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+          },
+          "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+        },
+        {
+          "id": "a778bbdd-362d-4df6-9789-0f7cc113bf9f",
+          "anomaly_type": "missing_data",
+          "anomaly_name": "数据缺失",
+          "description": "nan - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+          "severity": "medium",
+          "values": {
+            "missing_fields": [
+              "音准得分",
+              "节奏得分",
+              "合声得分",
+              "音量平衡",
+              "情感表达"
+            ],
+            "section": NaN,
+            "member": NaN,
+            "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+          },
+          "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+        }
+      ]
+    },
+    "boundary_sample": {
+      "count": 18,
+      "name": "边界样本（接近阈值）",
+      "items": [
+        {
+          "id": "cfe81a75-9d19-4177-b537-a8611f108605",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女高音 - 王芳芳 得分80.7高于达标线80仅0.7分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 80.7,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "高于",
+            "distance": 0.7000000000000028,
+            "section": "女高音",
+            "member": "王芳芳"
+          },
+          "record_id": "75fbc898-50d4-4466-b578-7437f62c8121"
+        },
+        {
+          "id": "bd66595a-f169-4690-93c0-7e5c3679b1ee",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 赵丽娟 得分79.8低于达标线80仅0.2分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 79.8,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 0.20000000000000284,
+            "section": "女低音",
+            "member": "赵丽娟"
+          },
+          "record_id": "51d22f48-2c0c-4a7c-8832-e6c70db039c9"
+        },
+        {
+          "id": "e813606b-c214-4498-bc09-0c9b6d4cd0f1",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 黄静怡 得分77.55低于达标线80仅2.5分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 77.55,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 2.450000000000003,
+            "section": "女低音",
+            "member": "黄静怡"
+          },
+          "record_id": "bb97a691-34db-4198-8ddb-628e1cec424b"
+        },
+        {
+          "id": "2a3fef0f-7b75-4dd6-928c-5accb9bae9a6",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 吴秀兰 得分78.4低于达标线80仅1.6分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 78.4,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 1.5999999999999943,
+            "section": "女低音",
+            "member": "吴秀兰"
+          },
+          "record_id": "125bcbb2-3a8a-4224-820a-c6525dfb29c4"
+        },
+        {
+          "id": "4bcc8a08-bad8-4257-a276-5ecf7fc6436e",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 郑春梅 得分82.6高于达标线80仅2.6分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 82.6,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "高于",
+            "distance": 2.5999999999999943,
+            "section": "女低音",
+            "member": "郑春梅"
+          },
+          "record_id": "c09e75b2-9d2c-4b49-8239-acec6db26665"
+        },
+        {
+          "id": "8dc6e871-1970-49e4-833c-aada649bc4e9",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男高音 - 吴明辉 得分82.15高于达标线80仅2.2分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 82.15,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "高于",
+            "distance": 2.1500000000000057,
+            "section": "男高音",
+            "member": "吴明辉"
+          },
+          "record_id": "50cd1bf4-eff1-4970-8da5-6b6ca6801b0d"
+        },
+        {
+          "id": "f264da2b-9bb0-4549-8056-86b642c6a602",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男低音 - 马晓东 得分79.05低于达标线80仅1.0分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 79.05,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 0.9500000000000028,
+            "section": "男低音",
+            "member": "马晓东"
+          },
+          "record_id": "b4bf28b9-2f09-4bbb-8e3d-6a9dfc26c566"
+        },
+        {
+          "id": "bbf33cab-26ab-4b3e-a288-23bcc3f7bd79",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男低音 - 杜文斌 得分77.8低于达标线80仅2.2分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 77.8,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 2.200000000000003,
+            "section": "男低音",
+            "member": "杜文斌"
+          },
+          "record_id": "b2a9cc7f-cdcc-4bce-ac6a-36758b313335"
+        },
+        {
+          "id": "332a67b0-270a-42e5-8c45-5342eb4e0cc0",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男低音 - 许鹏飞 得分79.9低于达标线80仅0.1分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 79.9,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 0.09999999999999432,
+            "section": "男低音",
+            "member": "许鹏飞"
+          },
+          "record_id": "e0202714-2459-49bb-9ceb-132e9104df0b"
+        },
+        {
+          "id": "15bf7d24-445a-4dc3-b4c9-7d8e28bd7116",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女高音 - 王芳芳 得分80.7高于达标线80仅0.7分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 80.7,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "高于",
+            "distance": 0.7000000000000028,
+            "section": "女高音",
+            "member": "王芳芳"
+          },
+          "record_id": "75fbc898-50d4-4466-b578-7437f62c8121"
+        },
+        {
+          "id": "dd47648e-df0e-45ab-9370-64eb07fef604",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 赵丽娟 得分79.8低于达标线80仅0.2分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 79.8,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 0.20000000000000284,
+            "section": "女低音",
+            "member": "赵丽娟"
+          },
+          "record_id": "51d22f48-2c0c-4a7c-8832-e6c70db039c9"
+        },
+        {
+          "id": "b71e465e-bdf0-43d5-828a-dab31694e3b2",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 黄静怡 得分77.55低于达标线80仅2.5分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 77.55,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 2.450000000000003,
+            "section": "女低音",
+            "member": "黄静怡"
+          },
+          "record_id": "bb97a691-34db-4198-8ddb-628e1cec424b"
+        },
+        {
+          "id": "fe42380c-db4e-44be-a52c-b33f389da786",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 吴秀兰 得分78.4低于达标线80仅1.6分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 78.4,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 1.5999999999999943,
+            "section": "女低音",
+            "member": "吴秀兰"
+          },
+          "record_id": "125bcbb2-3a8a-4224-820a-c6525dfb29c4"
+        },
+        {
+          "id": "d7efd39c-e3cc-46ba-a1bd-def794c9491a",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "女低音 - 郑春梅 得分82.6高于达标线80仅2.6分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 82.6,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "高于",
+            "distance": 2.5999999999999943,
+            "section": "女低音",
+            "member": "郑春梅"
+          },
+          "record_id": "c09e75b2-9d2c-4b49-8239-acec6db26665"
+        },
+        {
+          "id": "2973ed51-0155-42b2-8321-5c199416313d",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男高音 - 吴明辉 得分82.15高于达标线80仅2.2分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 82.15,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "高于",
+            "distance": 2.1500000000000057,
+            "section": "男高音",
+            "member": "吴明辉"
+          },
+          "record_id": "50cd1bf4-eff1-4970-8da5-6b6ca6801b0d"
+        },
+        {
+          "id": "769f5cd1-67f7-416f-9fa9-b55950973069",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男低音 - 马晓东 得分79.05低于达标线80仅1.0分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 79.05,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 0.9500000000000028,
+            "section": "男低音",
+            "member": "马晓东"
+          },
+          "record_id": "b4bf28b9-2f09-4bbb-8e3d-6a9dfc26c566"
+        },
+        {
+          "id": "b7db2d6f-2fea-4656-8d9f-a6d34fad5e36",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男低音 - 杜文斌 得分77.8低于达标线80仅2.2分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 77.8,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 2.200000000000003,
+            "section": "男低音",
+            "member": "杜文斌"
+          },
+          "record_id": "b2a9cc7f-cdcc-4bce-ac6a-36758b313335"
+        },
+        {
+          "id": "a6df2876-3c6d-478d-8ee1-4b78c7fb2a79",
+          "anomaly_type": "boundary_sample",
+          "anomaly_name": "边界样本（接近阈值）",
+          "description": "男低音 - 许鹏飞 得分79.9低于达标线80仅0.1分，属于边界样本",
+          "severity": "low",
+          "values": {
+            "score": 79.9,
+            "threshold": 80,
+            "boundary_range": 3.0,
+            "position": "低于",
+            "distance": 0.09999999999999432,
+            "section": "男低音",
+            "member": "许鹏飞"
+          },
+          "record_id": "e0202714-2459-49bb-9ceb-132e9104df0b"
+        }
+      ]
+    }
+  },
+  "sections_affected": [
+    NaN,
+    "男高音",
+    "女低音",
+    "女高音",
+    "男低音"
+  ],
+  "details": [
+    {
+      "id": "fb61fdd9-9b3b-4ba5-b043-456521d1638e",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "nan - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": NaN,
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+    },
+    {
+      "id": "bf367f12-5b10-4842-8c39-cf28d1ff9be2",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "女高音 - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": "女高音",
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+    },
+    {
+      "id": "5526fdce-0687-4b17-80bd-04b1bef37f52",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "女低音 - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": "女低音",
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+    },
+    {
+      "id": "cd4caf2f-15bf-43e6-9dbf-63fc9fac8e08",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "男高音 - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": "男高音",
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+    },
+    {
+      "id": "a5d934a1-5ea9-4bfe-8d2f-49dfee468cdb",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "男低音 - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": "男低音",
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+    },
+    {
+      "id": "f7397285-7557-45b5-83e7-1d59b18fe662",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "nan - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": NaN,
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+    },
+    {
+      "id": "78fcf763-6dd1-498a-b51b-1e01fedcdff5",
+      "anomaly_type": "high_std",
+      "anomaly_name": "声部内标准差过大",
+      "description": "女低音 声部内标准差33.14过大，说明水平差异明显",
+      "severity": "medium",
+      "values": {
+        "section": "女低音",
+        "std": 33.14,
+        "mean": 67.37,
+        "threshold": 20.0,
+        "outlier_count": 1,
+        "outliers": [
+          {
+            "人员": NaN,
+            "个人综合分": 0.0
+          }
+        ]
+      },
+      "record_id": null
+    },
+    {
+      "id": "2e980b9e-9ddb-42fc-a71c-a31cae959a8d",
+      "anomaly_type": "high_std",
+      "anomaly_name": "声部内标准差过大",
+      "description": "女高音 声部内标准差35.27过大，说明水平差异明显",
+      "severity": "medium",
+      "values": {
+        "section": "女高音",
+        "std": 35.27,
+        "mean": 71.68,
+        "threshold": 20.0,
+        "outlier_count": 1,
+        "outliers": [
+          {
+            "人员": NaN,
+            "个人综合分": 0.0
+          }
+        ]
+      },
+      "record_id": null
+    },
+    {
+      "id": "875bb4f7-23f0-4d3a-9c0e-1af3a95c6b48",
+      "anomaly_type": "high_std",
+      "anomaly_name": "声部内标准差过大",
+      "description": "男低音 声部内标准差32.34过大，说明水平差异明显",
+      "severity": "medium",
+      "values": {
+        "section": "男低音",
+        "std": 32.34,
+        "mean": 65.58,
+        "threshold": 20.0,
+        "outlier_count": 1,
+        "outliers": [
+          {
+            "人员": NaN,
+            "个人综合分": 0.0
+          }
+        ]
+      },
+      "record_id": null
+    },
+    {
+      "id": "aeebe9b9-0ad2-4d27-9a57-2a34c242e01a",
+      "anomaly_type": "high_std",
+      "anomaly_name": "声部内标准差过大",
+      "description": "男高音 声部内标准差34.55过大，说明水平差异明显",
+      "severity": "medium",
+      "values": {
+        "section": "男高音",
+        "std": 34.55,
+        "mean": 69.96,
+        "threshold": 20.0,
+        "outlier_count": 1,
+        "outliers": [
+          {
+            "人员": NaN,
+            "个人综合分": 0.0
+          }
+        ]
+      },
+      "record_id": null
+    },
+    {
+      "id": "cfe81a75-9d19-4177-b537-a8611f108605",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女高音 - 王芳芳 得分80.7高于达标线80仅0.7分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 80.7,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "高于",
+        "distance": 0.7000000000000028,
+        "section": "女高音",
+        "member": "王芳芳"
+      },
+      "record_id": "75fbc898-50d4-4466-b578-7437f62c8121"
+    },
+    {
+      "id": "bd66595a-f169-4690-93c0-7e5c3679b1ee",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 赵丽娟 得分79.8低于达标线80仅0.2分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 79.8,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 0.20000000000000284,
+        "section": "女低音",
+        "member": "赵丽娟"
+      },
+      "record_id": "51d22f48-2c0c-4a7c-8832-e6c70db039c9"
+    },
+    {
+      "id": "e813606b-c214-4498-bc09-0c9b6d4cd0f1",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 黄静怡 得分77.55低于达标线80仅2.5分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 77.55,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 2.450000000000003,
+        "section": "女低音",
+        "member": "黄静怡"
+      },
+      "record_id": "bb97a691-34db-4198-8ddb-628e1cec424b"
+    },
+    {
+      "id": "2a3fef0f-7b75-4dd6-928c-5accb9bae9a6",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 吴秀兰 得分78.4低于达标线80仅1.6分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 78.4,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 1.5999999999999943,
+        "section": "女低音",
+        "member": "吴秀兰"
+      },
+      "record_id": "125bcbb2-3a8a-4224-820a-c6525dfb29c4"
+    },
+    {
+      "id": "4bcc8a08-bad8-4257-a276-5ecf7fc6436e",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 郑春梅 得分82.6高于达标线80仅2.6分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 82.6,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "高于",
+        "distance": 2.5999999999999943,
+        "section": "女低音",
+        "member": "郑春梅"
+      },
+      "record_id": "c09e75b2-9d2c-4b49-8239-acec6db26665"
+    },
+    {
+      "id": "8dc6e871-1970-49e4-833c-aada649bc4e9",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男高音 - 吴明辉 得分82.15高于达标线80仅2.2分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 82.15,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "高于",
+        "distance": 2.1500000000000057,
+        "section": "男高音",
+        "member": "吴明辉"
+      },
+      "record_id": "50cd1bf4-eff1-4970-8da5-6b6ca6801b0d"
+    },
+    {
+      "id": "f264da2b-9bb0-4549-8056-86b642c6a602",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男低音 - 马晓东 得分79.05低于达标线80仅1.0分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 79.05,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 0.9500000000000028,
+        "section": "男低音",
+        "member": "马晓东"
+      },
+      "record_id": "b4bf28b9-2f09-4bbb-8e3d-6a9dfc26c566"
+    },
+    {
+      "id": "bbf33cab-26ab-4b3e-a288-23bcc3f7bd79",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男低音 - 杜文斌 得分77.8低于达标线80仅2.2分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 77.8,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 2.200000000000003,
+        "section": "男低音",
+        "member": "杜文斌"
+      },
+      "record_id": "b2a9cc7f-cdcc-4bce-ac6a-36758b313335"
+    },
+    {
+      "id": "332a67b0-270a-42e5-8c45-5342eb4e0cc0",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男低音 - 许鹏飞 得分79.9低于达标线80仅0.1分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 79.9,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 0.09999999999999432,
+        "section": "男低音",
+        "member": "许鹏飞"
+      },
+      "record_id": "e0202714-2459-49bb-9ceb-132e9104df0b"
+    },
+    {
+      "id": "674ca7bd-2156-47f6-b0af-1de6b82c3f46",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "nan - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": NaN,
+        "member": NaN,
+        "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+      },
+      "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+    },
+    {
+      "id": "9605268b-2ea5-40ba-9c05-5e2e835a0b7c",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "女高音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": "女高音",
+        "member": NaN,
+        "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+      },
+      "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+    },
+    {
+      "id": "7691a424-506e-4952-ba1b-95114ff53726",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "女低音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": "女低音",
+        "member": NaN,
+        "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+      },
+      "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+    },
+    {
+      "id": "416c3b7c-b3f4-4f23-842d-d08f75b45a9d",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "男高音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": "男高音",
+        "member": NaN,
+        "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+      },
+      "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+    },
+    {
+      "id": "954102b0-8999-4bc0-a17a-bffee1f3bee8",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "男低音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": "男低音",
+        "member": NaN,
+        "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+      },
+      "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+    },
+    {
+      "id": "7b578f54-8c0b-4bf5-a3e9-731d3cd96516",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "nan - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": NaN,
+        "member": NaN,
+        "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+      },
+      "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+    },
+    {
+      "id": "5e1f982b-f109-45e1-9ae3-a44e163f465b",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "nan - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": NaN,
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+    },
+    {
+      "id": "def05c10-57c8-43ef-815a-203e0c276106",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "女高音 - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": "女高音",
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+    },
+    {
+      "id": "f0488ecb-58fa-4e3e-b867-d533dd39b872",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "女低音 - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": "女低音",
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+    },
+    {
+      "id": "290dc0da-7b8f-465c-9ac9-af75128f8456",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "男高音 - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": "男高音",
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+    },
+    {
+      "id": "5fbe58a9-63f9-4b3d-b6d5-9466a76d041f",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "男低音 - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": "男低音",
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+    },
+    {
+      "id": "57be5dde-a496-48c0-bc75-5d161a5aaeaf",
+      "anomaly_type": "low_score",
+      "anomaly_name": "个人综合分过低",
+      "description": "nan - nan 个人综合分0.0低于及格线70",
+      "severity": "high",
+      "values": {
+        "score": 0.0,
+        "threshold": 70,
+        "section": NaN,
+        "member": NaN,
+        "音准得分": NaN,
+        "节奏得分": NaN,
+        "合声得分": NaN,
+        "音量平衡": NaN,
+        "情感表达": NaN
+      },
+      "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+    },
+    {
+      "id": "abc3deb4-f043-4598-95cd-5b4d67129856",
+      "anomaly_type": "high_std",
+      "anomaly_name": "声部内标准差过大",
+      "description": "女低音 声部内标准差33.14过大，说明水平差异明显",
+      "severity": "medium",
+      "values": {
+        "section": "女低音",
+        "std": 33.14,
+        "mean": 67.37,
+        "threshold": 20.0,
+        "outlier_count": 1,
+        "outliers": [
+          {
+            "人员": NaN,
+            "个人综合分": 0.0
+          }
+        ]
+      },
+      "record_id": null
+    },
+    {
+      "id": "fe8a4be2-fd4e-4b4d-8441-0bbf4981d38b",
+      "anomaly_type": "high_std",
+      "anomaly_name": "声部内标准差过大",
+      "description": "女高音 声部内标准差35.27过大，说明水平差异明显",
+      "severity": "medium",
+      "values": {
+        "section": "女高音",
+        "std": 35.27,
+        "mean": 71.68,
+        "threshold": 20.0,
+        "outlier_count": 1,
+        "outliers": [
+          {
+            "人员": NaN,
+            "个人综合分": 0.0
+          }
+        ]
+      },
+      "record_id": null
+    },
+    {
+      "id": "b3c1011b-1293-45af-9076-41e81995b871",
+      "anomaly_type": "high_std",
+      "anomaly_name": "声部内标准差过大",
+      "description": "男低音 声部内标准差32.34过大，说明水平差异明显",
+      "severity": "medium",
+      "values": {
+        "section": "男低音",
+        "std": 32.34,
+        "mean": 65.58,
+        "threshold": 20.0,
+        "outlier_count": 1,
+        "outliers": [
+          {
+            "人员": NaN,
+            "个人综合分": 0.0
+          }
+        ]
+      },
+      "record_id": null
+    },
+    {
+      "id": "012870db-cf12-435c-b8d7-f8b2bc2577fa",
+      "anomaly_type": "high_std",
+      "anomaly_name": "声部内标准差过大",
+      "description": "男高音 声部内标准差34.55过大，说明水平差异明显",
+      "severity": "medium",
+      "values": {
+        "section": "男高音",
+        "std": 34.55,
+        "mean": 69.96,
+        "threshold": 20.0,
+        "outlier_count": 1,
+        "outliers": [
+          {
+            "人员": NaN,
+            "个人综合分": 0.0
+          }
+        ]
+      },
+      "record_id": null
+    },
+    {
+      "id": "15bf7d24-445a-4dc3-b4c9-7d8e28bd7116",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女高音 - 王芳芳 得分80.7高于达标线80仅0.7分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 80.7,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "高于",
+        "distance": 0.7000000000000028,
+        "section": "女高音",
+        "member": "王芳芳"
+      },
+      "record_id": "75fbc898-50d4-4466-b578-7437f62c8121"
+    },
+    {
+      "id": "dd47648e-df0e-45ab-9370-64eb07fef604",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 赵丽娟 得分79.8低于达标线80仅0.2分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 79.8,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 0.20000000000000284,
+        "section": "女低音",
+        "member": "赵丽娟"
+      },
+      "record_id": "51d22f48-2c0c-4a7c-8832-e6c70db039c9"
+    },
+    {
+      "id": "b71e465e-bdf0-43d5-828a-dab31694e3b2",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 黄静怡 得分77.55低于达标线80仅2.5分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 77.55,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 2.450000000000003,
+        "section": "女低音",
+        "member": "黄静怡"
+      },
+      "record_id": "bb97a691-34db-4198-8ddb-628e1cec424b"
+    },
+    {
+      "id": "fe42380c-db4e-44be-a52c-b33f389da786",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 吴秀兰 得分78.4低于达标线80仅1.6分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 78.4,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 1.5999999999999943,
+        "section": "女低音",
+        "member": "吴秀兰"
+      },
+      "record_id": "125bcbb2-3a8a-4224-820a-c6525dfb29c4"
+    },
+    {
+      "id": "d7efd39c-e3cc-46ba-a1bd-def794c9491a",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "女低音 - 郑春梅 得分82.6高于达标线80仅2.6分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 82.6,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "高于",
+        "distance": 2.5999999999999943,
+        "section": "女低音",
+        "member": "郑春梅"
+      },
+      "record_id": "c09e75b2-9d2c-4b49-8239-acec6db26665"
+    },
+    {
+      "id": "2973ed51-0155-42b2-8321-5c199416313d",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男高音 - 吴明辉 得分82.15高于达标线80仅2.2分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 82.15,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "高于",
+        "distance": 2.1500000000000057,
+        "section": "男高音",
+        "member": "吴明辉"
+      },
+      "record_id": "50cd1bf4-eff1-4970-8da5-6b6ca6801b0d"
+    },
+    {
+      "id": "769f5cd1-67f7-416f-9fa9-b55950973069",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男低音 - 马晓东 得分79.05低于达标线80仅1.0分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 79.05,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 0.9500000000000028,
+        "section": "男低音",
+        "member": "马晓东"
+      },
+      "record_id": "b4bf28b9-2f09-4bbb-8e3d-6a9dfc26c566"
+    },
+    {
+      "id": "b7db2d6f-2fea-4656-8d9f-a6d34fad5e36",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男低音 - 杜文斌 得分77.8低于达标线80仅2.2分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 77.8,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 2.200000000000003,
+        "section": "男低音",
+        "member": "杜文斌"
+      },
+      "record_id": "b2a9cc7f-cdcc-4bce-ac6a-36758b313335"
+    },
+    {
+      "id": "a6df2876-3c6d-478d-8ee1-4b78c7fb2a79",
+      "anomaly_type": "boundary_sample",
+      "anomaly_name": "边界样本（接近阈值）",
+      "description": "男低音 - 许鹏飞 得分79.9低于达标线80仅0.1分，属于边界样本",
+      "severity": "low",
+      "values": {
+        "score": 79.9,
+        "threshold": 80,
+        "boundary_range": 3.0,
+        "position": "低于",
+        "distance": 0.09999999999999432,
+        "section": "男低音",
+        "member": "许鹏飞"
+      },
+      "record_id": "e0202714-2459-49bb-9ceb-132e9104df0b"
+    },
+    {
+      "id": "e12bdd2f-52d0-4c9e-8830-6a4382eaab00",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "nan - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": NaN,
+        "member": NaN,
+        "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+      },
+      "record_id": "9498a4f2-1915-4dfc-94d6-b4920d027e70"
+    },
+    {
+      "id": "24f96cb7-4460-40b9-a173-580b23425975",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "女高音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": "女高音",
+        "member": NaN,
+        "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+      },
+      "record_id": "73183552-d2ea-4706-adf2-d95ea60dc626"
+    },
+    {
+      "id": "8c604f37-fee6-4ee9-9a49-026a0f7f94c1",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "女低音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": "女低音",
+        "member": NaN,
+        "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+      },
+      "record_id": "9b40b228-fac4-4aa6-98c5-94e5523053fa"
+    },
+    {
+      "id": "49477057-e159-499e-b301-bcbdf3e80451",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "男高音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": "男高音",
+        "member": NaN,
+        "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+      },
+      "record_id": "1697d3a3-68dd-44d3-9fd6-f0162e48fc2f"
+    },
+    {
+      "id": "f3047b75-2814-42d5-8ea0-959693876eaa",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "男低音 - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": "男低音",
+        "member": NaN,
+        "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+      },
+      "record_id": "b4eccde6-d326-4339-92a4-d443b7a61865"
+    },
+    {
+      "id": "a778bbdd-362d-4df6-9789-0f7cc113bf9f",
+      "anomaly_type": "missing_data",
+      "anomaly_name": "数据缺失",
+      "description": "nan - nan 缺少字段: 音准得分, 节奏得分, 合声得分, 音量平衡, 情感表达",
+      "severity": "medium",
+      "values": {
+        "missing_fields": [
+          "音准得分",
+          "节奏得分",
+          "合声得分",
+          "音量平衡",
+          "情感表达"
+        ],
+        "section": NaN,
+        "member": NaN,
+        "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+      },
+      "record_id": "9b77e261-8f5d-45b3-b505-6d78d8bbfeb2"
+    }
+  ]
+}

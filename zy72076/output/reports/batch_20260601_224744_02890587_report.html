@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>合唱声部排练优化分析报告</title>
+    <style>
+        body { font-family: "Microsoft YaHei", Arial, sans-serif; margin: 20px; color: #333; }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2c3e50; margin-top: 30px; border-left: 5px solid #3498db; padding-left: 10px; }
+        h3 { color: #34495e; }
+        .summary-box { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .priority-highlight { font-weight: bold; }
+        .priority-优先排练 { color: #e74c3c; }
+        .priority-加强排练 { color: #f39c12; }
+        .priority-正常排练 { color: #3498db; }
+        .priority-保持状态 { color: #2ecc71; }
+        .severity-high { color: #e74c3c; }
+        .severity-medium { color: #f39c12; }
+        .severity-low { color: #2ecc71; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #3498db; color: white; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        .chart-container { margin: 20px 0; text-align: center; }
+        .chart-container img { max-width: 100%; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; }
+        .chart-container img:hover { box-shadow: 0 0 10px rgba(52, 152, 219, 0.5); }
+        .anomaly-card { border-left: 4px solid; margin: 10px 0; padding: 10px; background: #f8f9fa; }
+        .conflict-card { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 8px; }
+        .supplement-diff { background: #fff3cd; padding: 10px; border-radius: 4px; margin: 5px 0; }
+        .drilldown-link { color: #3498db; cursor: pointer; text-decoration: underline; }
+        .detail-section { display: none; margin-top: 10px; padding: 15px; background: #f0f8ff; border-radius: 8px; }
+        .metadata { font-size: 12px; color: #7f8c8d; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 10px; }
+        .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; margin: 10px 0; }
+        .success { background: #d4edda; border-left: 4px solid #28a745; padding: 10px; margin: 10px 0; }
+        .record-id { font-family: monospace; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; }
+    </style>
+    <script>
+        function toggleDetail(id) {
+            var elem = document.getElementById(id);
+            if (elem.style.display === 'none' || elem.style.display === '') {
+                elem.style.display = 'block';
+            } else {
+                elem.style.display = 'none';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>🎵 合唱声部排练优化分析报告</h1>
+    <div class="metadata">
+        <p><strong>批次号:</strong> <span class="record-id">batch_20260601_224744_02890587</span></p>
+        <p><strong>生成时间:</strong> 2026-06-01 22:47:46</p>
+        <p><strong>参数版本:</strong> default_v1</p>
+    </div>
+
+    <h2>📊 总体概览</h2>
+    <div class="summary-box">
+        <table>
+            <tr>
+                <th>总参与人数</th>
+                <th>整体平均分</th>
+                <th>整体达标率</th>
+                <th>涉及声部数</th>
+                <th>数据源数量</th>
+            </tr>
+            <tr>
+                <td>20 人</td>
+                <td>82.38 分</td>
+                <td>60.00 %</td>
+                <td>4 个</td>
+                <td>3 个</td>
+            </tr>
+        </table>
+<p><strong>数据源:</strong></p><ul><li>[业务表] 业务表_20260530 (20条记录)</li><li>[临时截图转文本] 临时截图_出勤 (5条记录)</li><li>[老师讲义] 老师讲义_声部点评 (1条记录)</li></ul><div class="warning"><strong>⚠️ 本批次使用了 2 个人工调优参数（非默认值）:</strong><ul><li>weights.音准得分: 0.3 → <strong>0.35</strong></li><li>weights.情感表达: 0.1 → <strong>0.05</strong></li></ul></div></div>
+    <h2>📈 分析图表</h2>
+    <p><em>点击图表或链接可查看对应明细</em></p>
+
+    <h2>🎯 各声部排练安排建议</h2>
+<table><tr><th>声部</th><th>排练优先级</th><th>人数</th><th>平均分</th><th>达标率</th><th>优秀率</th><th>标准差</th><th>操作</th></tr>
+            <tr>
+                <td>女低音</td>
+                <td class="priority-优先排练 priority-highlight">优先排练</td>
+                <td>5</td>
+                <td>80.84</td>
+                <td>40.00%</td>
+                <td>0.00%</td>
+                <td>3.39</td>
+                <td><span class="drilldown-link" onclick="toggleDetail('section_女低音')">查看人员明细</span></td>
+            </tr>
+
+            <tr>
+                <td>男低音</td>
+                <td class="priority-优先排练 priority-highlight">优先排练</td>
+                <td>5</td>
+                <td>78.69</td>
+                <td>20.00%</td>
+                <td>0.00%</td>
+                <td>4.18</td>
+                <td><span class="drilldown-link" onclick="toggleDetail('section_男低音')">查看人员明细</span></td>
+            </tr>
+
+            <tr>
+                <td>男高音</td>
+                <td class="priority-正常排练 priority-highlight">正常排练</td>
+                <td>5</td>
+                <td>83.95</td>
+                <td>80.00%</td>
+                <td>0.00%</td>
+                <td>4.87</td>
+                <td><span class="drilldown-link" onclick="toggleDetail('section_男高音')">查看人员明细</span></td>
+            </tr>
+
+            <tr>
+                <td>女高音</td>
+                <td class="priority-保持状态 priority-highlight">保持状态</td>
+                <td>5</td>
+                <td>86.02</td>
+                <td>100.00%</td>
+                <td>0.00%</td>
+                <td>3.65</td>
+                <td><span class="drilldown-link" onclick="toggleDetail('section_女高音')">查看人员明细</span></td>
+            </tr>
+</table><div id="section_女低音" class="detail-section"><h4>女低音 人员明细</h4><table><tr><th>人员</th><th>个人综合分</th><th>音准</th><th>节奏</th><th>合声</th><th>音量</th><th>情感</th><th>出勤</th><th>记录ID</th></tr>
+                    <tr>
+                        <td>赵丽娟</td>
+                        <td><strong>79.80</strong></td>
+                        <td>82.00</td>
+                        <td>78.00</td>
+                        <td>80.00</td>
+                        <td>75.00</td>
+                        <td>82.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_5afbf2cf-160d-4894-aa3d-1f3d59ac69a8')">5afbf2cf...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>黄静怡</td>
+                        <td><strong>77.55</strong></td>
+                        <td>75.00</td>
+                        <td>80.00</td>
+                        <td>77.00</td>
+                        <td>80.00</td>
+                        <td>78.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_d78f5150-e1e0-48df-a8e4-b713b0d63271')">d78f5150...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>周美玲</td>
+                        <td><strong>85.85</strong></td>
+                        <td>88.00</td>
+                        <td>85.00</td>
+                        <td>86.00</td>
+                        <td>83.00</td>
+                        <td>84.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_85c45699-6950-45c4-b82e-59990a76d8cd')">85c45699...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>吴秀兰</td>
+                        <td><strong>78.40</strong></td>
+                        <td>79.00</td>
+                        <td>76.00</td>
+                        <td>78.00</td>
+                        <td>82.00</td>
+                        <td>80.00</td>
+                        <td>迟到</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_f9949e93-a57b-4e6d-9416-c34154de2d9b')">f9949e93...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>郑春梅</td>
+                        <td><strong>82.60</strong></td>
+                        <td>84.00</td>
+                        <td>83.00</td>
+                        <td>81.00</td>
+                        <td>79.00</td>
+                        <td>85.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_3de2f361-a5c6-49f2-99df-609e6c0723e6')">3de2f361...</span></td>
+                    </tr>
+</table></div><div id="section_男低音" class="detail-section"><h4>男低音 人员明细</h4><table><tr><th>人员</th><th>个人综合分</th><th>音准</th><th>节奏</th><th>合声</th><th>音量</th><th>情感</th><th>出勤</th><th>记录ID</th></tr>
+                    <tr>
+                        <td>马晓东</td>
+                        <td><strong>79.05</strong></td>
+                        <td>80.00</td>
+                        <td>75.00</td>
+                        <td>82.00</td>
+                        <td>78.00</td>
+                        <td>80.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_2748aabe-4edb-4f81-9c3d-b5b47fa60724')">2748aabe...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>刘大山</td>
+                        <td><strong>72.55</strong></td>
+                        <td>72.00</td>
+                        <td>70.00</td>
+                        <td>75.00</td>
+                        <td>73.00</td>
+                        <td>74.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_2af94d71-75db-4860-92ec-1d9d6877d828')">2af94d71...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>杨志远</td>
+                        <td><strong>84.15</strong></td>
+                        <td>85.00</td>
+                        <td>83.00</td>
+                        <td>86.00</td>
+                        <td>80.00</td>
+                        <td>84.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_41ac9d08-a7c7-4a84-9627-b05a3f260d83')">41ac9d08...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>杜文斌</td>
+                        <td><strong>77.80</strong></td>
+                        <td>78.00</td>
+                        <td>80.00</td>
+                        <td>76.00</td>
+                        <td>75.00</td>
+                        <td>79.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_861b7962-10af-42da-aa0f-64c3c96ec52b')">861b7962...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>许鹏飞</td>
+                        <td><strong>79.90</strong></td>
+                        <td>82.00</td>
+                        <td>78.00</td>
+                        <td>80.00</td>
+                        <td>77.00</td>
+                        <td>81.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_924c91ad-5cdc-4a2f-a774-ed94e6027588')">924c91ad...</span></td>
+                    </tr>
+</table></div><div id="section_男高音" class="detail-section"><h4>男高音 人员明细</h4><table><tr><th>人员</th><th>个人综合分</th><th>音准</th><th>节奏</th><th>合声</th><th>音量</th><th>情感</th><th>出勤</th><th>记录ID</th></tr>
+                    <tr>
+                        <td>孙志刚</td>
+                        <td><strong>84.30</strong></td>
+                        <td>85.00</td>
+                        <td>82.00</td>
+                        <td>88.00</td>
+                        <td>80.00</td>
+                        <td>83.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_8cf7a845-0baa-4c15-8731-ec40e387315d')">8cf7a845...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>钱伟强</td>
+                        <td><strong>89.30</strong></td>
+                        <td>90.00</td>
+                        <td>88.00</td>
+                        <td>92.00</td>
+                        <td>87.00</td>
+                        <td>86.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_bb12a016-f1ee-45d1-b3f3-6358c06006ca')">bb12a016...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>周建国</td>
+                        <td><strong>76.75</strong></td>
+                        <td>76.00</td>
+                        <td>79.00</td>
+                        <td>74.00</td>
+                        <td>80.00</td>
+                        <td>77.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_fd43224c-97a7-468d-ac02-9de5811d9623')">fd43224c...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>吴明辉</td>
+                        <td><strong>82.15</strong></td>
+                        <td>83.00</td>
+                        <td>85.00</td>
+                        <td>80.00</td>
+                        <td>78.00</td>
+                        <td>82.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_51428cfe-331a-40c2-8da2-38f269892c51')">51428cfe...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>郑海涛</td>
+                        <td><strong>87.25</strong></td>
+                        <td>88.00</td>
+                        <td>90.00</td>
+                        <td>85.00</td>
+                        <td>84.00</td>
+                        <td>87.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_1f14c6ac-9030-4a7a-86fd-82f664c5fd21')">1f14c6ac...</span></td>
+                    </tr>
+</table></div><div id="section_女高音" class="detail-section"><h4>女高音 人员明细</h4><table><tr><th>人员</th><th>个人综合分</th><th>音准</th><th>节奏</th><th>合声</th><th>音量</th><th>情感</th><th>出勤</th><th>记录ID</th></tr>
+                    <tr>
+                        <td>张小红</td>
+                        <td><strong>89.30</strong></td>
+                        <td>92.00</td>
+                        <td>88.00</td>
+                        <td>90.00</td>
+                        <td>85.00</td>
+                        <td>87.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_9e6eff41-715a-413b-ab37-8d784d42ed17')">9e6eff41...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>李美丽</td>
+                        <td><strong>86.00</strong></td>
+                        <td>88.00</td>
+                        <td>85.00</td>
+                        <td>87.00</td>
+                        <td>82.00</td>
+                        <td>84.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_61111b60-1088-4cdc-b808-04fb24563c4e')">61111b60...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>王芳芳</td>
+                        <td><strong>80.70</strong></td>
+                        <td>78.00</td>
+                        <td>82.00</td>
+                        <td>80.00</td>
+                        <td>85.00</td>
+                        <td>83.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_8432ebc6-6a66-4b66-bd19-fed1a4aba9e8')">8432ebc6...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>陈丽华</td>
+                        <td><strong>84.60</strong></td>
+                        <td>85.00</td>
+                        <td>87.00</td>
+                        <td>83.00</td>
+                        <td>80.00</td>
+                        <td>86.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_e2856667-f0f4-4e6f-9a1a-127fb93d49b4')">e2856667...</span></td>
+                    </tr>
+
+                    <tr>
+                        <td>刘云霞</td>
+                        <td><strong>89.50</strong></td>
+                        <td>90.00</td>
+                        <td>92.00</td>
+                        <td>88.00</td>
+                        <td>86.00</td>
+                        <td>89.00</td>
+                        <td>出勤</td>
+                        <td><span class="record-id" onclick="toggleDetail('calc_5e7829d6-46e6-4800-85b8-5578c4bbf5f4')">5e7829d6...</span></td>
+                    </tr>
+</table></div>
+    <h2>⚠️ 异常检测结果</h2>
+<p>共检测到 <strong>9</strong> 个异常: <span class="severity-high">高0个</span>, <span class="severity-medium">中0个</span>, <span class="severity-low">低9个</span></p>
+    <div class="anomaly-card" style="border-color: #2ecc71;">
+        <span class="severity-low"><strong>[低] 边界样本（接近阈值）</strong></span>
+        <p>女高音 - 王芳芳 得分80.7高于达标线80仅0.7分，属于边界样本</p>
+        <p><small>异常ID: <span class="record-id">c1558aec-2b57-42f1-a2af-f5bd339d1846</span></small></p>
+    </div>
+
+    <div class="anomaly-card" style="border-color: #2ecc71;">
+        <span class="severity-low"><strong>[低] 边界样本（接近阈值）</strong></span>
+        <p>女低音 - 赵丽娟 得分79.8低于达标线80仅0.2分，属于边界样本</p>
+        <p><small>异常ID: <span class="record-id">d3a9a429-59ca-4263-9613-284ac4f2d7bf</span></small></p>
+    </div>
+
+    <div class="anomaly-card" style="border-color: #2ecc71;">
+        <span class="severity-low"><strong>[低] 边界样本（接近阈值）</strong></span>
+        <p>女低音 - 黄静怡 得分77.55低于达标线80仅2.5分，属于边界样本</p>
+        <p><small>异常ID: <span class="record-id">eec3e4ec-f112-4bcf-8e07-0f86c9d59b9f</span></small></p>
+    </div>
+
+    <div class="anomaly-card" style="border-color: #2ecc71;">
+        <span class="severity-low"><strong>[低] 边界样本（接近阈值）</strong></span>
+        <p>女低音 - 吴秀兰 得分78.4低于达标线80仅1.6分，属于边界样本</p>
+        <p><small>异常ID: <span class="record-id">f51fe65d-3946-4063-90ed-904aecb779d8</span></small></p>
+    </div>
+
+    <div class="anomaly-card" style="border-color: #2ecc71;">
+        <span class="severity-low"><strong>[低] 边界样本（接近阈值）</strong></span>
+        <p>女低音 - 郑春梅 得分82.6高于达标线80仅2.6分，属于边界样本</p>
+        <p><small>异常ID: <span class="record-id">8c15c8ab-7470-4c81-a630-08fb71d62f22</span></small></p>
+    </div>
+
+    <div class="anomaly-card" style="border-color: #2ecc71;">
+        <span class="severity-low"><strong>[低] 边界样本（接近阈值）</strong></span>
+        <p>男高音 - 吴明辉 得分82.15高于达标线80仅2.2分，属于边界样本</p>
+        <p><small>异常ID: <span class="record-id">d0e92025-607a-48aa-9000-806d1d131679</span></small></p>
+    </div>
+
+    <div class="anomaly-card" style="border-color: #2ecc71;">
+        <span class="severity-low"><strong>[低] 边界样本（接近阈值）</strong></span>
+        <p>男低音 - 马晓东 得分79.05低于达标线80仅1.0分，属于边界样本</p>
+        <p><small>异常ID: <span class="record-id">55ade87a-6887-44a7-8b67-a338355757d3</span></small></p>
+    </div>
+
+    <div class="anomaly-card" style="border-color: #2ecc71;">
+        <span class="severity-low"><strong>[低] 边界样本（接近阈值）</strong></span>
+        <p>男低音 - 杜文斌 得分77.8低于达标线80仅2.2分，属于边界样本</p>
+        <p><small>异常ID: <span class="record-id">0dd744f3-a3ab-43ee-9bd1-f54212c11464</span></small></p>
+    </div>
+
+    <div class="anomaly-card" style="border-color: #2ecc71;">
+        <span class="severity-low"><strong>[低] 边界样本（接近阈值）</strong></span>
+        <p>男低音 - 许鹏飞 得分79.9低于达标线80仅0.1分，属于边界样本</p>
+        <p><small>异常ID: <span class="record-id">670317ff-6b76-46ae-af9e-a13986baed30</span></small></p>
+    </div>
+
+    <h2>🔀 数据冲突检测</h2>
+<div class="success">✅ 未检测到数据冲突</div>
+    <h2>📝 补录记录</h2>
+<p>共 <strong>1</strong> 条补录记录:</p>
+    <div class="supplement-diff">
+        <strong>[补录备注]</strong> 指挥备注<br>
+        原值: <span style="text-decoration: line-through; color: #999;">(空)</span>
+        → 新值: <strong>2026-05-30排练情感表达特别到位，继续保持</strong><br>
+        <small>备注: 2026-05-30排练情感表达特别到位，继续保持 (操作人: 周姐)</small>
+    </div>
+
+    <h2>🔍 计算可复查说明</h2>
+    <div class="summary-box">
+        <p>所有计算过程均可追溯，如需复核：</p>
+        <ol>
+            <li>每个人员的<strong>记录ID</strong>（形如 <span class="record-id">xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>）可用于查询完整计算步骤</li>
+            <li>每个计算步骤包含：输入值、计算公式、输出值</li>
+            <li>参数版本号可用于追溯当时使用的权重和阈值配置</li>
+            <li>所有异常、冲突、补录均有独立ID，可单独查询详情</li>
+        </ol>
+    </div>
+
+    <h2>⚙️ 计算参数配置</h2>
+    <div class="summary-box">
+        <p><strong>权重配置:</strong> {
+  "音准得分": 0.3,
+  "节奏得分": 0.25,
+  "合声得分": 0.25,
+  "音量平衡": 0.1,
+  "情感表达": 0.1
+}</p>
+        <p><strong>阈值配置:</strong> {
+  "excellent": 90,
+  "good": 80,
+  "pass": 70,
+  "anomaly_std": 2.0
+}</p>
+    </div>
+
+</body>
+</html>

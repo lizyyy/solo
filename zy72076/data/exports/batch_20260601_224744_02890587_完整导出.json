@@ -1,0 +1,87 @@
+{
+  "batch_id": "batch_20260601_224744_02890587",
+  "exported_at": "2026-06-01T22:51:56.340251",
+  "params": {
+    "version": "custom_2026-06-01T22-47-44_975728",
+    "values": {
+      "weights": {
+        "音准得分": 0.35,
+        "节奏得分": 0.25,
+        "合声得分": 0.25,
+        "音量平衡": 0.1,
+        "情感表达": 0.05
+      },
+      "thresholds": {
+        "excellent": 90,
+        "good": 80,
+        "pass": 70,
+        "anomaly_std": 2.0
+      },
+      "attendance_weights": {
+        "出勤": 1.0,
+        "迟到": 0.8,
+        "请假": 0.0,
+        "缺勤": 0.0
+      }
+    },
+    "diff_from_default": {
+      "weights.情感表达": {
+        "status": "modified",
+        "default": 0.1,
+        "current": 0.05
+      },
+      "weights.音准得分": {
+        "status": "modified",
+        "default": 0.3,
+        "current": 0.35
+      }
+    }
+  },
+  "sources": [
+    {
+      "id": "f39efe4c-446f-48af-ab2d-9b5fc2607bb2",
+      "source_type": "业务表",
+      "source_name": "业务表_20260530",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy72076/examples/smooth/业务表_20260530.csv",
+      "record_count": 20,
+      "field_mapping": {
+        "声部": "声部",
+        "人员": "人员",
+        "排练日期": "排练日期",
+        "音准得分": "音准得分",
+        "节奏得分": "节奏得分",
+        "合声得分": "合声得分",
+        "音量平衡": "音量平衡",
+        "情感表达": "情感表达",
+        "出勤状态": "出勤状态"
+      }
+    },
+    {
+      "id": "588a6319-128f-48a6-8c71-2e83cce9d225",
+      "source_type": "临时截图转文本",
+      "source_name": "临时截图_出勤",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy72076/examples/smooth/临时截图_出勤.txt",
+      "record_count": 5,
+      "field_mapping": {
+        "排练日期": "排练日期",
+        "声部": "声部",
+        "备注": "指挥备注"
+      }
+    },
+    {
+      "id": "74a3c07b-9377-45f0-aa17-c6dd7ca4d815",
+      "source_type": "老师讲义",
+      "source_name": "老师讲义_声部点评",
+      "file_path": "/Users/lzy/pro/solo/workspaces/zy72076/examples/smooth/老师讲义_声部点评.yaml",
+      "record_count": 1,
+      "field_mapping": {
+        "rehearsal_date": "排练日期",
+        "piece": "曲目"
+      }
+    }
+  ],
+  "calculation_results": null,
+  "anomalies": null,
+  "conflicts": null,
+  "supplements": null
+}
