@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+    background-color: #0f0f0f;
+    color: #e5e5e5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .industrial-panel {
+    @apply bg-industrial-panel border border-industrial-border rounded-lg;
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .industrial-button {
+    @apply px-4 py-3 font-semibold rounded-lg border transition-all duration-200 
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-industrial-bg
+           disabled:opacity-50 disabled:cursor-not-allowed;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .industrial-button-primary {
+    @apply industrial-button bg-amber-600 border-amber-500 text-white
+           hover:bg-amber-500 active:bg-amber-700
+           focus:ring-amber-500;
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 2px 8px rgba(245, 158, 11, 0.3);
+  }
+
+  .industrial-button-secondary {
+    @apply industrial-button bg-industrial-panel border-industrial-border text-industrial-text
+           hover:bg-zinc-800 active:bg-zinc-900
+           focus:ring-industrial-muted;
+  }
+
+  .industrial-button-danger {
+    @apply industrial-button bg-red-600 border-red-500 text-white
+           hover:bg-red-500 active:bg-red-700
+           focus:ring-red-500;
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 2px 8px rgba(239, 68, 68, 0.3);
+  }
+
+  .industrial-button-success {
+    @apply industrial-button bg-emerald-600 border-emerald-500 text-white
+           hover:bg-emerald-500 active:bg-emerald-700
+           focus:ring-emerald-500;
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 2px 8px rgba(16, 185, 129, 0.3);
+  }
+
+  .industrial-button-info {
+    @apply industrial-button bg-blue-600 border-blue-500 text-white
+           hover:bg-blue-500 active:bg-blue-700
+           focus:ring-blue-500;
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 2px 8px rgba(37, 99, 235, 0.3);
+  }
+
+  .status-indicator {
+    @apply w-3 h-3 rounded-full;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  .status-idle {
+    @apply bg-industrial-muted;
+  }
+
+  .status-running {
+    @apply bg-emerald-500 animate-pulse;
+  }
+
+  .status-paused {
+    @apply bg-amber-500;
+  }
+
+  .status-completed {
+    @apply bg-blue-500;
+  }
+
+  .choice-button {
+    @apply w-full p-4 text-left rounded-lg border-2 border-industrial-border 
+           bg-industrial-bg hover:border-amber-500 hover:bg-zinc-800
+           transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .choice-button.correct {
+    @apply border-emerald-500 bg-emerald-900/30;
+  }
+
+  .choice-button.wrong {
+    @apply border-red-500 bg-red-900/30;
+  }
+
+  .timeline-node {
+    @apply relative pl-8 pb-6 border-l-2 border-industrial-border;
+  }
+
+  .timeline-node::before {
+    content: '';
+    @apply absolute left-[-9px] top-0 w-4 h-4 rounded-full border-2 border-industrial-border bg-industrial-panel;
+  }
+
+  .timeline-node.active::before {
+    @apply border-amber-500 bg-amber-500;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+  }
+
+  .timeline-node.success::before {
+    @apply border-emerald-500 bg-emerald-500;
+  }
+
+  .timeline-node.failure::before {
+    @apply border-red-500 bg-red-500;
+  }
+
+  .timeline-node.warning::before {
+    @apply border-amber-500 bg-amber-500;
+  }
+
+  .timeline-node.note::before {
+    @apply border-blue-500 bg-blue-500;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #1a1a1a;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #3d3d3d;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #525252;
+  }
+}
