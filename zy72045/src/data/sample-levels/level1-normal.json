@@ -1,0 +1,148 @@
+{
+  "id": "level-001",
+  "name": "2024年春季学期 第3周训练",
+  "totalRounds": 5,
+  "initialCapital": 1000000,
+  "stocks": [
+    {
+      "symbol": "600519",
+      "name": "贵州茅台",
+      "basePrice": 1680,
+      "volatility": 0.02
+    },
+    {
+      "symbol": "000001",
+      "name": "平安银行",
+      "basePrice": 12.5,
+      "volatility": 0.015
+    },
+    {
+      "symbol": "300750",
+      "name": "宁德时代",
+      "basePrice": 198,
+      "volatility": 0.03
+    }
+  ],
+  "rounds": [
+    {
+      "roundNumber": 1,
+      "marketIndex": 3150,
+      "news": [
+        {
+          "id": "news-001",
+          "title": "茅台一季度净利润同比增长19%，超出市场预期",
+          "content": "贵州茅台发布2024年一季度业绩预告，预计实现净利润同比增长19%左右，主要得益于高端产品销量稳步提升和直销渠道占比持续扩大。",
+          "source": "reuters",
+          "sourceName": "路透社",
+          "publishTime": "2024-04-15 09:30:00",
+          "impactScore": 25,
+          "confidence": "auto",
+          "originalSource": "路透社 2024-04-15 财经版头条",
+          "processTime": "2024-04-15 09:35:00",
+          "processor": "社团老师小林",
+          "suggestion": "同事提醒：茅台业绩超预期，但要注意白酒板块整体估值偏高，建议小仓位试探，不要追高。可以考虑在回调时布局。",
+          "sourceType": "reuters"
+        }
+      ]
+    },
+    {
+      "roundNumber": 2,
+      "marketIndex": 3165,
+      "news": [
+        {
+          "id": "news-002",
+          "title": "央行宣布降准0.5个百分点，释放长期资金约1万亿元",
+          "content": "中国人民银行决定于2024年4月20日下调金融机构存款准备金率0.5个百分点，预计释放长期资金约1万亿元，支持实体经济发展。",
+          "source": "bloomberg",
+          "sourceName": "彭博社",
+          "publishTime": "2024-04-16 18:00:00",
+          "impactScore": 40,
+          "confidence": "auto",
+          "originalSource": "彭博社 2024-04-16 央行政策报道",
+          "processTime": "2024-04-16 18:10:00",
+          "processor": "社团老师小林",
+          "suggestion": "同事提醒：降准利好大金融板块，银行、地产链可能有表现。但降准也反映经济下行压力，注意板块轮动节奏，不要盲目追涨金融股。",
+          "sourceType": "bloomberg"
+        },
+        {
+          "id": "news-003",
+          "title": "【待确认】网传宁德时代将获得欧洲大型储能订单",
+          "content": "市场传闻宁德时代已与欧洲某大型能源公司签订储能电池供应协议，订单金额约50亿欧元。目前公司尚未发布官方公告。",
+          "source": "other",
+          "sourceName": "市场传闻",
+          "publishTime": "2024-04-16 20:30:00",
+          "impactScore": 35,
+          "confidence": "need_confirm",
+          "originalSource": "某财经自媒体 2024-04-16 爆料",
+          "processTime": "2024-04-16 20:45:00",
+          "processor": "社团老师小林",
+          "suggestion": "同事提醒：这条消息还没官方确认，属于小道消息。建议先观望，等公司公告后再做决策，避免踩雷。如果想参与，仓位控制在5%以内。",
+          "sourceType": "other"
+        }
+      ]
+    },
+    {
+      "roundNumber": 3,
+      "marketIndex": 3180,
+      "news": [
+        {
+          "id": "news-004",
+          "title": "【旧口径-投影大屏】2019年央行降准后市场表现回顾",
+          "content": "历史数据显示，2019年1月央行降准1个百分点后，上证指数在随后3个月内累计上涨约25%，银行板块平均涨幅超过30%。（注：此为2019年训练留存数据，仅供历史参考）",
+          "source": "projection_old",
+          "sourceName": "旧口径-投影大屏",
+          "publishTime": "2019-01-15 10:00:00",
+          "impactScore": 15,
+          "confidence": "manual",
+          "originalSource": "2019年春季训练 投影大屏留存数据 编号：PROJ-2019-0017",
+          "processTime": "2019-01-15 10:15:00",
+          "processor": "社团老师小林（2019年）",
+          "suggestion": "同事提醒：这是历史旧数据，只能参考不能直接套用。现在的市场环境和2019年不一样了——当时是贸易战缓和期，现在是经济转型期。历史会押韵但不会重复。",
+          "sourceType": "projection_old"
+        }
+      ]
+    },
+    {
+      "roundNumber": 4,
+      "marketIndex": 3170,
+      "news": [
+        {
+          "id": "news-005",
+          "title": "平安银行2023年年报：不良率下降，零售业务增长强劲",
+          "content": "平安银行发布2023年年报，实现营业收入同比增长8.1%，净利润同比增长10.7%，不良贷款率较年初下降0.08个百分点，零售业务贡献营收占比超60%。",
+          "source": "reuters",
+          "sourceName": "路透社",
+          "publishTime": "2024-04-18 07:00:00",
+          "impactScore": 20,
+          "confidence": "auto",
+          "originalSource": "路透社 2024-04-18 银行财报专题",
+          "processTime": "2024-04-18 07:15:00",
+          "processor": "社团老师小林",
+          "suggestion": "同事提醒：平安银行业绩稳健，估值也不高（PE不到6倍）。但银行板块整体缺乏催化剂，更适合配置型资金，短期爆发力有限。",
+          "sourceType": "reuters"
+        }
+      ]
+    },
+    {
+      "roundNumber": 5,
+      "marketIndex": 3200,
+      "news": [
+        {
+          "id": "news-006",
+          "title": "政治局会议释放积极信号，强调加大宏观调控力度",
+          "content": "中共中央政治局召开会议，分析研究当前经济形势和经济工作，强调要加大宏观调控力度，积极的财政政策要加力提效，稳健的货币政策要灵活适度。",
+          "source": "bloomberg",
+          "sourceName": "彭博社",
+          "publishTime": "2024-04-19 17:00:00",
+          "impactScore": 50,
+          "confidence": "auto",
+          "originalSource": "彭博社 2024-04-19 政治局会议报道",
+          "processTime": "2024-04-19 17:20:00",
+          "processor": "社团老师小林",
+          "suggestion": "同事提醒：政治局会议是重要的政策信号，市场风险偏好可能提升。建议顺势而为，但也要注意追高风险。可以考虑提高仓位，但保留部分现金应对波动。",
+          "sourceType": "bloomberg"
+        }
+      ]
+    }
+  ]
+}

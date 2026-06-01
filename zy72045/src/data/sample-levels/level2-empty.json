@@ -1,0 +1,69 @@
+{
+  "id": "level-002",
+  "name": "测试配置-含空关卡",
+  "totalRounds": 3,
+  "initialCapital": 1000000,
+  "stocks": [
+    {
+      "symbol": "600519",
+      "name": "贵州茅台",
+      "basePrice": 1680,
+      "volatility": 0.02
+    },
+    {
+      "symbol": "000001",
+      "name": "平安银行",
+      "basePrice": 12.5,
+      "volatility": 0.015
+    }
+  ],
+  "rounds": [
+    {
+      "roundNumber": 1,
+      "marketIndex": 3150,
+      "news": [
+        {
+          "id": "news-e001",
+          "title": "测试新闻1",
+          "content": "这是一条测试新闻",
+          "source": "reuters",
+          "sourceName": "路透社",
+          "publishTime": "2024-04-15 09:30:00",
+          "impactScore": 20,
+          "confidence": "auto",
+          "originalSource": "测试来源",
+          "processTime": "2024-04-15 09:35:00",
+          "processor": "测试人员",
+          "suggestion": "测试建议",
+          "sourceType": "reuters"
+        }
+      ]
+    },
+    {
+      "roundNumber": 2,
+      "marketIndex": 3160,
+      "news": []
+    },
+    {
+      "roundNumber": 3,
+      "marketIndex": 3170,
+      "news": [
+        {
+          "id": "news-e002",
+          "title": "测试新闻2",
+          "content": "这是另一条测试新闻",
+          "source": "bloomberg",
+          "sourceName": "彭博社",
+          "publishTime": "2024-04-17 09:30:00",
+          "impactScore": 30,
+          "confidence": "auto",
+          "originalSource": "测试来源2",
+          "processTime": "2024-04-17 09:35:00",
+          "processor": "测试人员",
+          "suggestion": "测试建议2",
+          "sourceType": "bloomberg"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "id": "level-003",
+  "name": "测试配置-含重复事件",
+  "totalRounds": 2,
+  "initialCapital": 1000000,
+  "stocks": [
+    {
+      "symbol": "600519",
+      "name": "贵州茅台",
+      "basePrice": 1680,
+      "volatility": 0.02
+    }
+  ],
+  "rounds": [
+    {
+      "roundNumber": 1,
+      "marketIndex": 3150,
+      "news": [
+        {
+          "id": "news-d001",
+          "title": "重复新闻A",
+          "content": "这是重复的新闻内容",
+          "source": "reuters",
+          "sourceName": "路透社",
+          "publishTime": "2024-04-15 09:30:00",
+          "impactScore": 20,
+          "confidence": "auto",
+          "originalSource": "测试来源",
+          "processTime": "2024-04-15 09:35:00",
+          "processor": "测试人员",
+          "suggestion": "测试建议",
+          "sourceType": "reuters"
+        },
+        {
+          "id": "news-d001",
+          "title": "重复新闻A（重复）",
+          "content": "这是重复的新闻内容",
+          "source": "reuters",
+          "sourceName": "路透社",
+          "publishTime": "2024-04-15 09:30:00",
+          "impactScore": 20,
+          "confidence": "auto",
+          "originalSource": "测试来源",
+          "processTime": "2024-04-15 09:35:00",
+          "processor": "测试人员",
+          "suggestion": "测试建议",
+          "sourceType": "reuters"
+        },
+        {
+          "id": "news-d002",
+          "title": "正常新闻B",
+          "content": "这是正常的新闻",
+          "source": "bloomberg",
+          "sourceName": "彭博社",
+          "publishTime": "2024-04-15 10:00:00",
+          "impactScore": 30,
+          "confidence": "auto",
+          "originalSource": "测试来源2",
+          "processTime": "2024-04-15 10:05:00",
+          "processor": "测试人员",
+          "suggestion": "测试建议2",
+          "sourceType": "bloomberg"
+        }
+      ]
+    },
+    {
+      "roundNumber": 2,
+      "marketIndex": 3160,
+      "news": [
+        {
+          "id": "news-d003",
+          "title": "第二回合新闻",
+          "content": "第二回合正常新闻",
+          "source": "reuters",
+          "sourceName": "路透社",
+          "publishTime": "2024-04-16 09:30:00",
+          "impactScore": 25,
+          "confidence": "auto",
+          "originalSource": "测试来源3",
+          "processTime": "2024-04-16 09:35:00",
+          "processor": "测试人员",
+          "suggestion": "测试建议3",
+          "sourceType": "reuters"
+        }
+      ]
+    }
+  ]
+}

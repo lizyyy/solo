@@ -1,0 +1,106 @@
+/** @type {import('tailwindcss').Config} */
+
+export default {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: {
+    container: {
+      center: true,
+    },
+    extend: {
+      colors: {
+        primary: {
+          50: "#E8F3FF",
+          100: "#B9D8FF",
+          200: "#8ABDFF",
+          300: "#5BA2FF",
+          400: "#2C87FF",
+          500: "#165DFF",
+          600: "#0E42D2",
+          700: "#0A2BA0",
+          800: "#061B6E",
+          900: "#030F3C",
+        },
+        success: {
+          50: "#E8FFEA",
+          100: "#B8F2BE",
+          200: "#8AE593",
+          300: "#5CD969",
+          400: "#2ECC3E",
+          500: "#00B42A",
+          600: "#009A29",
+          700: "#008025",
+          800: "#00661E",
+          900: "#004D16",
+        },
+        danger: {
+          50: "#FFECE8",
+          100: "#FFCDC4",
+          200: "#FFAEA0",
+          300: "#FF8F7C",
+          400: "#FF7058",
+          500: "#F53F3F",
+          600: "#CB2634",
+          700: "#A11529",
+          800: "#770A1E",
+          900: "#4D0513",
+        },
+        warning: {
+          50: "#FFF7E8",
+          100: "#FFE7B8",
+          200: "#FFD68A",
+          300: "#FFC55C",
+          400: "#FFB42E",
+          500: "#FF7D00",
+          600: "#D96A00",
+          700: "#B35700",
+          800: "#8C4400",
+          900: "#663100",
+        },
+        neutral: {
+          50: "#F7F8FA",
+          100: "#F2F3F5",
+          200: "#E5E6EB",
+          300: "#C9CDD4",
+          400: "#86909C",
+          500: "#4E5969",
+          600: "#272E3B",
+          700: "#1D2129",
+          800: "#0F1115",
+          900: "#000000",
+        },
+      },
+      fontFamily: {
+        sans: ['"Source Han Sans CN"', '"Noto Sans SC"', '"PingFang SC"', "sans-serif"],
+        serif: ['"Source Han Serif CN"', '"Noto Serif SC"', '"PingFang SC"', "serif"],
+        mono: ['"JetBrains Mono"', '"Fira Code"', "monospace"],
+      },
+      keyframes: {
+        "slide-in-right": {
+          "0%": { transform: "translateX(100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        "pulse-border": {
+          "0%, 100%": { boxShadow: "0 0 0 0 rgba(245, 63, 63, 0.4)" },
+          "50%": { boxShadow: "0 0 0 8px rgba(245, 63, 63, 0)" },
+        },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "number-scroll": {
+          "0%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10%)" },
+          "100%": { transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        "slide-in-right": "slide-in-right 0.5s ease-out",
+        "pulse-border": "pulse-border 2s infinite",
+        "fade-in": "fade-in 0.3s ease-out",
+        "number-scroll": "number-scroll 0.3s ease-out",
+      },
+    },
+  },
+  plugins: [],
+};

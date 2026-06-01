@@ -1,0 +1,91 @@
+[
+  {
+    "id": "history-001",
+    "gameId": "game-001",
+    "configId": "level-001",
+    "configName": "2024年春季学期 第3周训练",
+    "startTime": "2024-04-15 14:00:00",
+    "endTime": "2024-04-15 15:30:00",
+    "totalRounds": 5,
+    "initialCapital": 1000000,
+    "finalCapital": 1085620,
+    "totalReturn": 85620,
+    "totalReturnPercent": 0.08562,
+    "settlement": {
+      "id": "settle-001",
+      "gameId": "game-001",
+      "totalReturn": 85620,
+      "totalReturnPercent": 0.08562,
+      "annualizedReturn": 1.24,
+      "maxDrawdown": 0.032,
+      "winRate": 0.6667,
+      "tradeCount": 6,
+      "triggerCondition": "round_end",
+      "settleTime": "2024-04-15 15:30:00"
+    },
+    "finalPositions": [
+      {
+        "symbol": "600519",
+        "name": "贵州茅台",
+        "quantity": 200,
+        "avgCost": 1700,
+        "currentPrice": 1780,
+        "marketValue": 356000,
+        "profitLoss": 16000,
+        "profitLossPercent": 0.047
+      },
+      {
+        "symbol": "000001",
+        "name": "平安银行",
+        "quantity": 10000,
+        "avgCost": 12.3,
+        "currentPrice": 13.1,
+        "marketValue": 131000,
+        "profitLoss": 8000,
+        "profitLossPercent": 0.065
+      },
+      {
+        "symbol": "300750",
+        "name": "宁德时代",
+        "quantity": 500,
+        "avgCost": 210,
+        "currentPrice": 195,
+        "marketValue": 97500,
+        "profitLoss": -7500,
+        "profitLossPercent": -0.0714
+      }
+    ],
+    "newsHistory": [],
+    "trades": [],
+    "rounds": []
+  },
+  {
+    "id": "history-002",
+    "gameId": "game-002",
+    "configId": "level-001",
+    "configName": "2024年春季学期 第2周训练",
+    "startTime": "2024-04-08 14:00:00",
+    "endTime": "2024-04-08 15:15:00",
+    "totalRounds": 5,
+    "initialCapital": 1000000,
+    "finalCapital": 958400,
+    "totalReturn": -41600,
+    "totalReturnPercent": -0.0416,
+    "settlement": {
+      "id": "settle-002",
+      "gameId": "game-002",
+      "totalReturn": -41600,
+      "totalReturnPercent": -0.0416,
+      "annualizedReturn": -0.52,
+      "maxDrawdown": 0.058,
+      "winRate": 0.4,
+      "tradeCount": 5,
+      "triggerCondition": "manual",
+      "settleTime": "2024-04-08 15:15:00"
+    },
+    "finalPositions": [],
+    "newsHistory": [],
+    "trades": [],
+    "rounds": []
+  }
+]
