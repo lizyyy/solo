@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地下管廊巡检战</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏗️ 地下管廊巡检战</h1>
+            <p class="subtitle">培训复盘工具 - 老冯专用</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="game">🎮 游戏</button>
+            <button class="tab-btn" data-tab="import">📥 导入数据</button>
+            <button class="tab-btn" data-tab="history">📊 历史记录</button>
+        </nav>
+
+        <section id="game" class="tab-content active">
+            <div class="game-panel">
+                <div class="status-bar">
+                    <div class="status-item">
+                        <span class="label">得分：</span>
+                        <span id="score" class="value">100</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">时间：</span>
+                        <span id="timer" class="value">60</span>秒
+                    </div>
+                    <div class="status-item">
+                        <span class="label">进度：</span>
+                        <span id="progress" class="value">0/5</span>
+                    </div>
+                    <button id="pauseBtn" class="btn btn-small">⏸️ 暂停</button>
+                </div>
+
+                <div id="gameArea" class="game-area">
+                    <div id="startScreen" class="screen">
+                        <h2>准备开始巡检</h2>
+                        <p>你将作为巡检员进入地下管廊，在60秒内完成5个场景的判断。</p>
+                        <div class="rules">
+                            <h3>📋 规则说明</h3>
+                            <ul>
+                                <li>每个场景有3个选项，只有1个正确操作</li>
+                                <li>选错扣20分，超时扣15分</li>
+                                <li>新手误操作会额外记录</li>
+                                <li>最终得分≥60分通过</li>
+                            </ul>
+                        </div>
+                        <button id="startBtn" class="btn btn-primary">开始巡检</button>
+                    </div>
+
+                    <div id="scenarioScreen" class="screen hidden">
+                        <div class="scenario-card">
+                            <h3 id="scenarioTitle">场景 1</h3>
+                            <p id="scenarioDesc" class="scenario-desc"></p>
+                            <div id="options" class="options"></div>
+                        </div>
+                    </div>
+
+                    <div id="pauseScreen" class="screen hidden">
+                        <h2>⏸️ 游戏已暂停</h2>
+                        <p>休息一下，准备好了再继续。</p>
+                        <button id="resumeBtn" class="btn btn-primary">继续巡检</button>
+                    </div>
+
+                    <div id="resultScreen" class="screen hidden">
+                        <div class="result-header">
+                            <h2 id="resultTitle">巡检完成</h2>
+                            <div id="resultScore" class="final-score">最终得分：80分</div>
+                            <div id="resultStatus" class="status-badge">通过</div>
+                        </div>
+
+                        <div class="result-analysis">
+                            <h3>📊 关键选择复盘</h3>
+                            <div id="choicesLog" class="choices-log"></div>
+                        </div>
+
+                        <div class="result-feedback">
+                            <h3>💡 失败原因分析</h3>
+                            <div id="failureReasons" class="failure-reasons"></div>
+                        </div>
+
+                        <div class="result-actions">
+                            <button id="replayBtn" class="btn">🔄 再来一局</button>
+                            <button id="exportBtn" class="btn btn-primary">📤 导出成绩</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="import" class="tab-content">
+            <div class="import-panel">
+                <h2>📥 导入复盘数据</h2>
+                <p class="tip">支持JSON格式导入，将自动检测空值、重复项和边界记录</p>
+                
+                <div class="import-area">
+                    <textarea id="importData" placeholder="粘贴JSON数据..."></textarea>
+                    <div class="import-actions">
+                        <button id="importBtn" class="btn btn-primary">导入数据</button>
+                        <button id="loadSampleBtn" class="btn">加载示例数据</button>
+                    </div>
+                </div>
+
+                <div id="importResult" class="import-result hidden">
+                    <h3>🔍 数据校验结果</h3>
+                    <div id="validationReport"></div>
+                    
+                    <div id="conflictAlert" class="conflict-alert hidden">
+                        <h4>⚠️ 检测到数据冲突</h4>
+                        <div id="conflictDetails"></div>
+                        <div id="conflictSuggestions"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="history" class="tab-content">
+            <div class="history-panel">
+                <h2>📊 历史复盘记录</h2>
+                <div class="history-actions">
+                    <button id="clearHistoryBtn" class="btn btn-danger">清空记录</button>
+                </div>
+                <div id="historyList" class="history-list"></div>
+            </div>
+        </section>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="game.js"></script>
+</body>
+</html>
