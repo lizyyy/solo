@@ -1,0 +1,369 @@
+============================================================
+Wind Tunnel Airfoil Lift-Drag Trial Calculation Report
+============================================================
+Batch:    trial_run_20260601
+Session:  cc484bd3
+Start:    2026-06-01T23:40:26.257343
+Finish:   2026-06-01T23:40:26.260503
+Sources:  /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv, /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+Active Threshold: dce79af6
+
+────────────────────────────────────────
+阈值配置版本链
+────────────────────────────────────────
+  [1] ID=abc29e | 创建者=engineer_zhang | 原因=initial_setup | 时间=2026-06-01T23:40:26.257395
+       Cl=[-1.0, 1.8]  Cd=[0.0, 0.08]  L/D=[0.0, 80.0]  压力上限=150.0kPa  风速上限=100.0m/s
+  [2] ID=dce79a | 创建者=engineer_zhang | 原因=post-stall region allowed | 时间=2026-06-01T23:40:26.261020
+       Cl=[-1.0, 1.8]  Cd=[0.0, 0.15]  L/D=[0.0, 80.0]  压力上限=150.0kPa  风速上限=100.0m/s
+
+────────────────────────────────────────
+数据质量报告
+────────────────────────────────────────
+
+  采样缺口: 3 处
+    缺口 7244644a: 2026-06-01T08:00:04 ~ 2026-06-01T08:00:10 (实际间隔 6.0s, 缺 5 样本)
+    缺口 ee7c163f: 2026-06-01T08:00:20 ~ 2026-06-01T09:00:00 (实际间隔 3580.0s, 缺 3579 样本)
+    缺口 bbf62641: 2026-06-01T09:00:08 ~ 2026-06-01T09:00:14 (实际间隔 6.0s, 缺 5 样本)
+
+  单位混写: 3 处
+    记录 /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L9.lift_force: 142.8 kN -> 142800.0000 N (系数=999.9999999999999)
+    记录 /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L17.lift_force: 98.4 lbf -> 437.7048 N (系数=4.44822)
+    记录 /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L17.temperature: 78.2 °F -> 25.6667 °C (系数=0.32821824381926684)
+
+────────────────────────────────────────
+升阻试算结果明细
+────────────────────────────────────────
+记录ID                     攻角       Cl       Cd      L/D    超阈值 阈值版本               原始备注
+----------------------------------------------------------------------------------------------------
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L2   -4.0  -0.3023   0.4426    -0.68    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L3   -2.0   0.1403   0.2927     0.48    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L2   -2.0   0.1457   0.2044     0.71    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L4    0.0   0.5418   0.2370     2.29    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L3    0.0   0.5065   0.1528     3.31    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L5    2.0   1.0956   0.2691     4.07    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L4    2.0   0.9258   0.1919     4.82    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L6    4.0   1.6520   0.3507     4.71    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L5    4.0   1.3470   0.2346     5.74    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L7    6.0   2.3026   0.4523     5.09    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L6    6.0   1.8197   0.3110     5.85    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L8    8.0   2.8472   0.5839     4.88    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L7    8.0   2.2853   0.3927     5.82    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L9   10.0 3453.9683   0.7159  4824.32    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L8   10.0   2.7597   0.5047     5.47    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L10   12.0   4.0006   0.8756     4.57    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L9   12.0   3.1791   0.6326     5.03    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L11   14.0   4.5642   1.0763     4.24    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L10   14.0   3.5221   0.7606     4.63    !!! vdce79a_202606012340 温升偏大
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L12   16.0   5.0866   1.3497     3.77    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L11   16.0   3.8313   1.0342     3.70    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L13   18.0   5.4806   1.7396     3.15    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L12   18.0   4.1014   1.3434     3.05    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L14   20.0   5.8171   2.3123     2.52    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L13   20.0   4.3022   1.7486     2.46    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L15   22.0   4.4819   2.9122     1.54    !!! vdce79a_202606012340 传感器抖动
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L16   24.0   3.4491   3.5265     0.98    !!! vdce79a_202606012340 
+/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L17   26.0  10.5870   4.1675     2.54    !!! vdce79a_202606012340 
+
+────────────────────────────────────────
+超阈值记录明细 (28 条)
+────────────────────────────────────────
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L2
+    攻角=-4.0°  Cl=-0.3023  Cd=0.4426  L/D=-0.68
+    超阈值详情: Cd=0.443 > 阈值0.15; L/D=-0.7 < 阈值0.0
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261122
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L3
+    攻角=-2.0°  Cl=0.1403  Cd=0.2927  L/D=0.48
+    超阈值详情: Cd=0.293 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261137
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L4
+    攻角=0.0°  Cl=0.5418  Cd=0.2370  L/D=2.29
+    超阈值详情: Cd=0.237 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261148
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L5
+    攻角=2.0°  Cl=1.0956  Cd=0.2691  L/D=4.07
+    超阈值详情: Cd=0.269 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261159
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L6
+    攻角=4.0°  Cl=1.6520  Cd=0.3507  L/D=4.71
+    超阈值详情: Cd=0.351 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 是
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261168
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L7
+    攻角=6.0°  Cl=2.3026  Cd=0.4523  L/D=5.09
+    超阈值详情: Cl=2.303 > 阈值1.8; Cd=0.452 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 是
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261191
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L8
+    攻角=8.0°  Cl=2.8472  Cd=0.5839  L/D=4.88
+    超阈值详情: Cl=2.847 > 阈值1.8; Cd=0.584 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261205
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L9
+    攻角=10.0°  Cl=3453.9683  Cd=0.7159  L/D=4824.32
+    超阈值详情: Cl=3453.968 > 阈值1.8; Cd=0.716 > 阈值0.15; L/D=4824.3 > 阈值80.0
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 是
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261217
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L10
+    攻角=12.0°  Cl=4.0006  Cd=0.8756  L/D=4.57
+    超阈值详情: Cl=4.001 > 阈值1.8; Cd=0.876 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261227
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L11
+    攻角=14.0°  Cl=4.5642  Cd=1.0763  L/D=4.24
+    超阈值详情: Cl=4.564 > 阈值1.8; Cd=1.076 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261238
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L12
+    攻角=16.0°  Cl=5.0866  Cd=1.3497  L/D=3.77
+    超阈值详情: Cl=5.087 > 阈值1.8; Cd=1.350 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261248
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L13
+    攻角=18.0°  Cl=5.4806  Cd=1.7396  L/D=3.15
+    超阈值详情: Cl=5.481 > 阈值1.8; Cd=1.740 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261258
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L14
+    攻角=20.0°  Cl=5.8171  Cd=2.3123  L/D=2.52
+    超阈值详情: Cl=5.817 > 阈值1.8; Cd=2.312 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261268
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L15
+    攻角=22.0°  Cl=4.4819  Cd=2.9122  L/D=1.54
+    超阈值详情: Cl=4.482 > 阈值1.8; Cd=2.912 > 阈值0.15; 压力=160.2kPa > 阈值150.0kPa
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: 传感器抖动
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261279
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L16
+    攻角=24.0°  Cl=3.4491  Cd=3.5265  L/D=0.98
+    超阈值详情: Cl=3.449 > 阈值1.8; Cd=3.527 > 阈值0.15; 压力=175.3kPa > 阈值150.0kPa
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261290
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L17
+    攻角=26.0°  Cl=10.5870  Cd=4.1675  L/D=2.54
+    超阈值详情: Cl=10.587 > 阈值1.8; Cd=4.167 > 阈值0.15; 压力=190.5kPa > 阈值150.0kPa
+    阈值版本: vdce79a_202606012340
+    缺口影响: 是
+    单位换算: 是
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv
+    处理时间: 2026-06-01T23:40:26.261301
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L2
+    攻角=-2.0°  Cl=0.1457  Cd=0.2044  L/D=0.71
+    超阈值详情: Cd=0.204 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 是
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261311
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L3
+    攻角=0.0°  Cl=0.5065  Cd=0.1528  L/D=3.31
+    超阈值详情: Cd=0.153 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261321
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L4
+    攻角=2.0°  Cl=0.9258  Cd=0.1919  L/D=4.82
+    超阈值详情: Cd=0.192 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261331
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L5
+    攻角=4.0°  Cl=1.3470  Cd=0.2346  L/D=5.74
+    超阈值详情: Cd=0.235 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261340
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L6
+    攻角=6.0°  Cl=1.8197  Cd=0.3110  L/D=5.85
+    超阈值详情: Cl=1.820 > 阈值1.8; Cd=0.311 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261350
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L7
+    攻角=8.0°  Cl=2.2853  Cd=0.3927  L/D=5.82
+    超阈值详情: Cl=2.285 > 阈值1.8; Cd=0.393 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261360
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L8
+    攻角=10.0°  Cl=2.7597  Cd=0.5047  L/D=5.47
+    超阈值详情: Cl=2.760 > 阈值1.8; Cd=0.505 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261370
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L9
+    攻角=12.0°  Cl=3.1791  Cd=0.6326  L/D=5.03
+    超阈值详情: Cl=3.179 > 阈值1.8; Cd=0.633 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261379
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L10
+    攻角=14.0°  Cl=3.5221  Cd=0.7606  L/D=4.63
+    超阈值详情: Cl=3.522 > 阈值1.8; Cd=0.761 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 是
+    单位换算: 否
+    原始备注: 温升偏大
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261390
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L11
+    攻角=16.0°  Cl=3.8313  Cd=1.0342  L/D=3.70
+    超阈值详情: Cl=3.831 > 阈值1.8; Cd=1.034 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 是
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261400
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L12
+    攻角=18.0°  Cl=4.1014  Cd=1.3434  L/D=3.05
+    超阈值详情: Cl=4.101 > 阈值1.8; Cd=1.343 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261409
+
+  记录: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv:L13
+    攻角=20.0°  Cl=4.3022  Cd=1.7486  L/D=2.46
+    超阈值详情: Cl=4.302 > 阈值1.8; Cd=1.749 > 阈值0.15
+    阈值版本: vdce79a_202606012340
+    缺口影响: 否
+    单位换算: 否
+    原始备注: (无)
+    数据来源: /Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_02.csv
+    处理时间: 2026-06-01T23:40:26.261419
+
+
+────────────────────────────────────────
+补录备注记录 (1 条)
+────────────────────────────────────────
+  补录ID: 13520685
+    作者: assistant_song
+    时间: 2026-06-01T23:40:26.262311
+    备注: 该数据点经现场工程师确认有效，传感器校准偏差已记录
+    影响记录: ['/Users/lzy/pro/solo/workspaces/zy72100/wind_tunnel/data/sensor_log_01.csv:L2']
+    差异: cl: N/A -> -0.30234315948601664; cd: N/A -> 0.44263038548752837
+
+
+────────────────────────────────────────
+审计轨迹
+────────────────────────────────────────
+  [2026-06-01T23:40:26.257415] threshold_created by=engineer_zhang | 新建阈值配置, 原因: initial_setup
+    变更后: {'config_id': 'abc29e4c', 'created_at': '2026-06-01T23:40:26.257395', 'created_by': 'engineer_zhang', 'reason': 'initial_setup', 'cl_max': 1.8, 'cl_min': -1.0, 'cd_max': 0.08, 'cd_min': 0.0, 'ld_ratio_min': 0.0, 'ld_ratio_max': 80.0, 'pressure_max_kpa': 150.0, 'wind_speed_max_mps': 100.0}
+  [2026-06-01T23:40:26.261089] threshold_overridden by=engineer_zhang | 手动修改阈值 cd_max: 0.08 -> 0.15, 原因: post-stall region allowed
+    变更前: cd_max=0.08
+    变更后: cd_max=0.15
