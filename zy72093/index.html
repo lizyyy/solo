@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>保险赔付尾部风险管理系统</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f5f0;color:#333;font-size:14px;line-height:1.6}
+.header{background:#2c3e50;color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:18px;font-weight:600}
+.header-actions{display:flex;gap:10px}
+.btn{padding:6px 16px;border:1px solid #ccc;background:#fff;border-radius:4px;cursor:pointer;font-size:13px;transition:all .15s}
+.btn:hover{background:#f0f0f0}
+.btn-primary{background:#2980b9;color:#fff;border-color:#2980b9}
+.btn-primary:hover{background:#2471a3}
+.btn-danger{background:#e74c3c;color:#fff;border-color:#e74c3c}
+.btn-danger:hover{background:#c0392b}
+.btn-warning{background:#f39c12;color:#fff;border-color:#f39c12}
+.btn-warning:hover{background:#d68910}
+.container{padding:16px 24px;max-width:1400px;margin:0 auto}
+.summary-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.card{background:#fff;border-radius:6px;padding:16px;border:1px solid #e0e0e0;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.card-label{font-size:12px;color:#888;margin-bottom:4px}
+.card-value{font-size:24px;font-weight:700}
+.card-sub{font-size:11px;color:#aaa;margin-top:4px}
+.card-value.red{color:#e74c3c}
+.card-value.orange{color:#f39c12}
+.card-value.green{color:#27ae60}
+.main-grid{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-bottom:16px}
+.chart-panel{background:#fff;border-radius:6px;padding:16px;border:1px solid #e0e0e0}
+.chart-panel h3{font-size:14px;margin-bottom:12px;color:#555;border-bottom:1px solid #eee;padding-bottom:8px}
+.chart-container{position:relative;height:300px}
+.param-panel{background:#fff;border-radius:6px;padding:16px;border:1px solid #e0e0e0;max-height:440px;overflow-y:auto}
+.param-panel h3{font-size:14px;margin-bottom:12px;color:#555;border-bottom:1px solid #eee;padding-bottom:8px}
+.param-group{margin-bottom:14px;padding:10px;background:#fafaf5;border-radius:4px;border:1px solid #eee}
+.param-group-title{font-size:12px;font-weight:600;color:#555;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.param-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.param-row label{width:90px;color:#666;flex-shrink:0}
+.param-row input[type="number"]{width:80px;padding:3px 6px;border:1px solid #ddd;border-radius:3px;font-size:12px}
+.param-row input[type="number"].manually-adjusted{border-color:#f39c12;background:#fef9e7}
+.lock-btn{font-size:14px;cursor:pointer;user-select:none;background:none;border:1px solid transparent;padding:0 4px;border-radius:3px;line-height:1}
+.lock-btn.locked{color:#f39c12;border-color:#f0d68a;background:#fef9e7}
+.lock-btn.unlocked{color:#bbb;border-color:#eee}
+.lock-btn:hover{border-color:#aaa}
+.param-note{font-size:11px;color:#e67e22;font-style:italic;margin-top:4px}
+.run-section{margin-top:12px;padding-top:12px;border-top:1px solid #eee;display:flex;gap:8px;align-items:center}
+.run-section .btn{width:100%}
+.detail-table-section{background:#fff;border-radius:6px;padding:16px;border:1px solid #e0e0e0;margin-bottom:16px}
+.detail-table-section h3{font-size:14px;margin-bottom:12px;color:#555;border-bottom:1px solid #eee;padding-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:#f8f8f5;text-align:left;padding:8px 10px;border-bottom:2px solid #ddd;color:#555;font-weight:600;white-space:nowrap}
+tbody td{padding:8px 10px;border-bottom:1px solid #eee;vertical-align:top}
+tbody tr{cursor:pointer;transition:background .1s}
+tbody tr:hover{background:#f0f7ff}
+tbody tr.exception-row{background:#fef5f5}
+tbody tr.exception-row:hover{background:#fde8e8}
+tbody tr.confirm-row{background:#fef9e7}
+tbody tr.confirm-row:hover{background:#fef3cd}
+tbody tr.old-method-row{background:#f0f4f8}
+tbody tr.old-method-row:hover{background:#e3edf5}
+.status-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600}
+.status-smooth{background:#d5f5e3;color:#1e8449}
+.status-manual_confirm{background:#fdebd0;color:#b7950b}
+.status-old_methodology{background:#d4e6f1;color:#2471a3}
+.status-exception{background:#fadbd8;color:#c0392b}
+.tag{display:inline-block;padding:1px 6px;border-radius:2px;font-size:10px;margin-right:4px;background:#eee;color:#666}
+.tag-adjusted{background:#fef3cd;color:#856404}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:flex-start;padding:40px 20px;overflow-y:auto}
+.modal-overlay.active{display:flex}
+.modal{background:#fff;border-radius:8px;width:100%;max-width:800px;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.modal-header{padding:16px 20px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.modal-header h2{font-size:16px}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#999;padding:0 4px}
+.modal-close:hover{color:#333}
+.modal-body{padding:20px;max-height:70vh;overflow-y:auto}
+.detail-section{margin-bottom:20px}
+.detail-section h4{font-size:13px;color:#2980b9;margin-bottom:8px;padding-bottom:4px;border-bottom:1px dashed #ddd}
+.detail-grid{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:12px}
+.detail-grid dt{color:#888;font-weight:500}
+.detail-grid dd{color:#333}
+.audit-log{margin-top:16px}
+.audit-log h4{font-size:13px;color:#2980b9;margin-bottom:8px;padding-bottom:4px;border-bottom:1px dashed #ddd}
+.audit-entry{padding:8px 12px;margin-bottom:4px;background:#fafaf5;border-left:3px solid #bbb;font-size:12px;border-radius:0 4px 4px 0}
+.audit-entry.audit-create{border-left-color:#27ae60}
+.audit-entry.audit-adjust{border-left-color:#f39c12}
+.audit-entry.audit-confirm{border-left-color:#2980b9}
+.audit-entry.audit-exception{border-left-color:#e74c3c}
+.audit-time{color:#aaa;font-size:11px}
+.audit-operator{font-weight:600;color:#555}
+.annotations-section{margin-top:12px;padding:10px;background:#fffdf0;border:1px dashed #e6c300;border-radius:4px}
+.annotations-section h5{font-size:12px;color:#856404;margin-bottom:6px}
+.annotation-item{font-size:12px;color:#666;padding:3px 0;border-bottom:1px dotted #eee}
+.annotation-item:last-child{border-bottom:none}
+.annotation-item .ann-source{color:#e67e22;font-weight:600;font-size:10px}
+.explanation-box{padding:10px;background:#eaf2f8;border:1px solid #aed6f1;border-radius:4px;font-size:12px;color:#2c3e50;margin-top:8px}
+.explanation-box strong{color:#2471a3}
+.export-area{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+.filter-bar{display:flex;gap:8px;align-items:center;font-size:12px}
+.filter-bar select{padding:4px 8px;border:1px solid #ddd;border-radius:3px;font-size:12px}
+.footer-note{font-size:11px;color:#aaa;text-align:center;padding:12px}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;background:#27ae60;color:#fff;border-radius:4px;font-size:13px;z-index:2000;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.toast.error{background:#e74c3c}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>保险赔付尾部风险管理系统</h1>
+  <div class="header-actions">
+    <button class="btn" onclick="reRunAnalysis()" title="重新运行分析（已锁定参数不会被覆盖）">重新运行</button>
+    <button class="btn btn-primary" onclick="exportReport()">导出报告</button>
+    <button class="btn" onclick="resetData()" title="清除所有数据，恢复初始样例">重置样例</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="summary-cards" id="summaryCards"></div>
+
+  <div class="main-grid">
+    <div class="chart-panel">
+      <h3>尾部风险分布 <span style="font-weight:400;font-size:11px;color:#aaa">（点击柱体查看明细）</span></h3>
+      <div class="chart-container"><canvas id="riskChart"></canvas></div>
+    </div>
+
+    <div class="param-panel">
+      <h3>分析参数 <span style="font-weight:400;font-size:11px;color:#e67e22">🔒 锁定项不会被重新运行覆盖</span></h3>
+      <div id="paramPanel"></div>
+      <div class="run-section">
+        <button class="btn btn-warning" onclick="reRunAnalysis()">重新运行分析</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-table-section">
+    <h3>
+      风险明细
+      <div class="filter-bar">
+        <select id="filterStatus" onchange="renderTable()">
+          <option value="all">全部状态</option>
+          <option value="smooth">顺利</option>
+          <option value="manual_confirm">人工确认</option>
+          <option value="old_methodology">旧口径</option>
+          <option value="exception">越界</option>
+        </select>
+        <select id="filterSource" onchange="renderTable()">
+          <option value="all">全部来源</option>
+          <option value="historical">历史样本</option>
+          <option value="manual_input">人工录入</option>
+          <option value="old_import">旧系统导入</option>
+        </select>
+      </div>
+    </h3>
+    <table>
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>险种</th>
+          <th>尾部风险值</th>
+          <th>置信度</th>
+          <th>状态</th>
+          <th>来源</th>
+          <th>参数调整</th>
+          <th>备注摘要</th>
+          <th>处理时间</th>
+        </tr>
+      </thead>
+      <tbody id="detailTableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="footer-note">保险赔付尾部风险管理系统 — 所有记录保留原始来源与处理轨迹，例外不会在汇总中消失</div>
+</div>
+
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">记录明细</h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var DB_KEY = 'tail_risk_db';
+var PARAM_KEY = 'tail_risk_params';
+var defaultParams = {
+  var_threshold: { value: 2.5, default_value: 2.5, locked: false, manually_adjusted: false, note: '' },
+  tail_quantile: { value: 0.99, default_value: 0.99, locked: false, manually_adjusted: false, note: '' },
+  sample_window_months: { value: 36, default_value: 36, locked: false, manually_adjusted: false, note: '' },
+  confidence_floor: { value: 0.85, default_value: 0.85, locked: false, manually_adjusted: false, note: '' },
+  outlier_multiplier: { value: 3.0, default_value: 3.0, locked: false, manually_adjusted: false, note: '' }
+};
+
+var sampleRecords = [
+  {
+    id: 'TR-2026-001',
+    claim_type: '财产险-台风',
+    tail_risk_value: 4.12,
+    confidence_level: 'high',
+    status: 'smooth',
+    source: 'historical',
+    source_label: '历史样本-2024Q3批次',
+    original_data: { period: '2024-07~2024-09', sample_count: 1284, region: '华东沿海', event: '台风"格美"系列' },
+    parameters: {
+      var_threshold: 2.5, tail_quantile: 0.99, sample_window_months: 36,
+      confidence_floor: 0.85, outlier_multiplier: 3.0
+    },
+    param_adjustments: {},
+    annotations: [
+      { text: '华东沿海台风季节集中，尾部形态稳定', source: '系统自动', time: '2026-03-15 09:22' }
+    ],
+    processing_history: [
+      { timestamp: '2026-03-15 09:22', operator: '系统', action: 'create', detail: '从历史样本2024Q3批次自动生成，样本量1284条' },
+      { timestamp: '2026-03-15 09:22', operator: '系统', action: 'classify', detail: '置信度0.92>0.85，风险值4.12<VaR阈值2.5×1.65=4.125，判定为顺利记录' }
+    ],
+    explanation: '基于2024Q3华东沿海台风季1284条赔付样本，99%分位尾部风险值4.12，低于VaR阈值4.125，且置信度0.92高于下限0.85。尾部形态符合广义帕累托分布假设，无需人工干预。',
+    created_at: '2026-03-15 09:22',
+    last_processed_at: '2026-03-15 09:22'
+  },
+  {
+    id: 'TR-2026-002',
+    claim_type: '责任险-产品召回',
+    tail_risk_value: 7.83,
+    confidence_level: 'low',
+    status: 'manual_confirm',
+    source: 'historical',
+    source_label: '历史样本-2023年度汇总',
+    original_data: { period: '2023-01~2023-12', sample_count: 67, region: '全国', event: '某品牌汽车召回事件', note: '样本量偏少，尾部估计不稳定' },
+    parameters: {
+      var_threshold: 3.8, tail_quantile: 0.995, sample_window_months: 48,
+      confidence_floor: 0.85, outlier_multiplier: 2.5
+    },
+    param_adjustments: {
+      var_threshold: { original: 2.5, adjusted_to: 3.8, reason: '产品召回事件损失分布右偏严重，2.5阈值误报率过高', adjusted_by: '小岑', adjusted_at: '2026-04-02 14:30' },
+      tail_quantile: { original: 0.99, adjusted_to: 0.995, reason: '极端召回事件需要更高分位数捕获尾部', adjusted_by: '小岑', adjusted_at: '2026-04-02 14:32' },
+      outlier_multiplier: { original: 3.0, adjusted_to: 2.5, reason: '召回事件异常值更密集，3.0倍标准差过滤太多真实极端值', adjusted_by: '小岑', adjusted_at: '2026-04-02 14:35' }
+    },
+    annotations: [
+      { text: '2023年某品牌汽车召回事件导致集中赔付，样本少但单笔金额大', source: '产品同事小岑', time: '2026-04-01 10:15' },
+      { text: '尾部估计不稳定，GPD拟合KS检验p=0.03，勉强通过但不理想', source: '系统自动', time: '2026-03-20 11:45' },
+      { text: '小岑说这类事件历史上出现过2次，但详细数据只剩1次', source: '理赔组老周', time: '2026-04-01 15:30' },
+      { text: '暂时用99.5%分位，后续数据补充后需重新评估', source: '产品同事小岑', time: '2026-04-02 14:40' }
+    ],
+    processing_history: [
+      { timestamp: '2026-03-20 11:45', operator: '系统', action: 'create', detail: '从历史样本2023年度汇总自动生成，样本量仅67条' },
+      { timestamp: '2026-03-20 11:45', operator: '系统', action: 'flag', detail: '置信度0.68<0.85下限，风险值7.83>阈值4.125，标记为需人工确认' },
+      { timestamp: '2026-04-01 10:15', operator: '产品同事小岑', action: 'annotate', detail: '添加备注：2023年某品牌汽车召回事件导致集中赔付' },
+      { timestamp: '2026-04-01 15:30', operator: '理赔组老周', action: 'annotate', detail: '添加备注：这类事件历史上出现过2次，但详细数据只剩1次' },
+      { timestamp: '2026-04-02 14:30', operator: '产品同事小岑', action: 'adjust', detail: '调整VaR阈值从2.5→3.8，原因：产品召回事件损失分布右偏严重' },
+      { timestamp: '2026-04-02 14:32', operator: '产品同事小岑', action: 'adjust', detail: '调整尾部分位数从0.99→0.995，原因：极端召回事件需更高分位数' },
+      { timestamp: '2026-04-02 14:35', operator: '产品同事小岑', action: 'adjust', detail: '调整异常值倍数从3.0→2.5，原因：召回事件异常值更密集' },
+      { timestamp: '2026-04-02 14:40', operator: '产品同事小岑', action: 'annotate', detail: '暂时用99.5%分位，后续数据补充后需重新评估' }
+    ],
+    explanation: '产品召回类责任险样本量仅67条，GPD拟合KS检验p=0.03，置信度0.68低于下限0.85。小岑已将VaR阈值从2.5调至3.8、分位数从0.99调至0.995、异常倍数从3.0调至2.5，以适应召回事件的右偏重尾特征。调整后风险值7.83仍超过新阈值6.27（3.8×1.65），需要持续关注。',
+    created_at: '2026-03-20 11:45',
+    last_processed_at: '2026-04-02 14:40'
+  },
+  {
+    id: 'TR-2026-003',
+    claim_type: '工程险-桥梁坍塌',
+    tail_risk_value: 9.51,
+    confidence_level: 'medium',
+    status: 'old_methodology',
+    source: 'old_import',
+    source_label: '旧系统-2019年口径导入',
+    original_data: { period: '2016~2019', sample_count: 23, region: '华南', event: '跨江桥梁施工期事故', old_methodology: '正态分布假设+2σ截断', note: '旧系统未考虑厚尾，实际风险被低估' },
+    parameters: {
+      var_threshold: 2.5, tail_quantile: 0.99, sample_window_months: 36,
+      confidence_floor: 0.85, outlier_multiplier: 3.0
+    },
+    param_adjustments: {},
+    annotations: [
+      { text: '旧系统用正态假设算出来只有3.2，完全低估了', source: '历史样本导入备注', time: '2026-01-10 08:00' },
+      { text: '桥梁施工期事故属于低频高损，正态分布假设不适用', source: '精算组张工', time: '2026-02-18 16:20' },
+      { text: '已用GPD重新拟合，9.51是校准后结果，旧口径值3.2仅作参考', source: '系统自动', time: '2026-02-20 10:00' },
+      { text: '小岑确认：旧口径的3.2不要删，留作对比', source: '产品同事小岑', time: '2026-02-20 14:10' }
+    ],
+    processing_history: [
+      { timestamp: '2026-01-10 08:00', operator: '系统', action: 'import', detail: '从旧系统导入2019年口径数据，原值3.2（正态+2σ），样本量23条' },
+      { timestamp: '2026-02-18 16:20', operator: '精算组张工', action: 'annotate', detail: '桥梁施工期事故属于低频高损，正态分布假设不适用' },
+      { timestamp: '2026-02-20 10:00', operator: '系统', action: 'recalibrate', detail: '用GPD重新拟合，校准后风险值9.51（旧口径3.2），置信度0.78，标记为旧口径记录' },
+      { timestamp: '2026-02-20 14:10', operator: '产品同事小岑', action: 'annotate', detail: '旧口径的3.2不要删，留作对比' }
+    ],
+    explanation: '此记录来自旧系统2019年口径，原正态+2σ假设下风险值仅3.2，严重低估。用GPD重新校准后风险值为9.51，置信度0.78仍低于0.85下限。旧口径值3.2保留作为对比参照。桥梁施工期事故属于典型低频高损场景，厚尾特征明显，正态假设不适用。',
+    created_at: '2026-01-10 08:00',
+    last_processed_at: '2026-02-20 14:10',
+    old_methodology_value: 3.2,
+    old_methodology_note: '旧系统正态+2σ截断，未考虑厚尾'
+  }
+];
+
+function loadData() {
+  var stored = localStorage.getItem(DB_KEY);
+  if (stored) {
+    try { return JSON.parse(stored); } catch(e) { /* fall through */ }
+  }
+  saveData(sampleRecords);
+  return sampleRecords;
+}
+
+function saveData(records) {
+  localStorage.setItem(DB_KEY, JSON.stringify(records));
+}
+
+function loadParams() {
+  var stored = localStorage.getItem(PARAM_KEY);
+  if (stored) {
+    try { return JSON.parse(stored); } catch(e) { /* fall through */ }
+  }
+  saveParams(JSON.parse(JSON.stringify(defaultParams)));
+  return JSON.parse(JSON.stringify(defaultParams));
+}
+
+function saveParams(params) {
+  localStorage.setItem(PARAM_KEY, JSON.stringify(params));
+}
+
+function now() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+function showToast(msg, isError) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+function renderSummary() {
+  var records = loadData();
+  var total = records.length;
+  var smooth = records.filter(function(r){ return r.status === 'smooth'; }).length;
+  var confirm = records.filter(function(r){ return r.status === 'manual_confirm'; }).length;
+  var oldM = records.filter(function(r){ return r.status === 'old_methodology'; }).length;
+  var exceptions = records.filter(function(r){ return r.tail_risk_value > getEffectiveThreshold(r); }).length;
+  var maxRisk = Math.max.apply(null, records.map(function(r){ return r.tail_risk_value; }));
+
+  document.getElementById('summaryCards').innerHTML =
+    '<div class="card"><div class="card-label">总记录数</div><div class="card-value">' + total + '</div><div class="card-sub">顺利 ' + smooth + ' / 人工确认 ' + confirm + ' / 旧口径 ' + oldM + '</div></div>' +
+    '<div class="card"><div class="card-label">越界记录</div><div class="card-value red">' + exceptions + '</div><div class="card-sub">风险值超过有效阈值，不纳入汇总均值</div></div>' +
+    '<div class="card"><div class="card-label">最大尾部风险值</div><div class="card-value orange">' + maxRisk.toFixed(2) + '</div><div class="card-sub">含越界记录，例外未隐藏</div></div>' +
+    '<div class="card"><div class="card-label">需人工确认</div><div class="card-value orange">' + confirm + '</div><div class="card-sub">置信度不足或参数已手动调整</div></div>';
+}
+
+function getEffectiveThreshold(record) {
+  var vt = record.parameters.var_threshold || 2.5;
+  return vt * 1.65;
+}
+
+function renderChart() {
+  var records = loadData();
+  var ctx = document.getElementById('riskChart').getContext('2d');
+
+  var labels = records.map(function(r){ return r.claim_type; });
+  var values = records.map(function(r){ return r.tail_risk_value; });
+  var thresholds = records.map(function(r){ return getEffectiveThreshold(r); });
+  var bgColors = records.map(function(r){
+    if (r.status === 'manual_confirm') return 'rgba(243,156,18,0.7)';
+    if (r.status === 'old_methodology') return 'rgba(52,152,219,0.7)';
+    if (r.tail_risk_value > getEffectiveThreshold(r)) return 'rgba(231,76,60,0.7)';
+    return 'rgba(39,174,96,0.7)';
+  });
+
+  if (window.riskChartInstance) window.riskChartInstance.destroy();
+
+  window.riskChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: '尾部风险值', data: values, backgroundColor: bgColors, borderColor: bgColors.map(function(c){ return c.replace('0.7','1'); }), borderWidth: 1 },
+        { label: '有效VaR阈值', data: thresholds, type: 'line', borderColor: '#e74c3c', borderDash: [5,5], pointRadius: 4, pointBackgroundColor: '#e74c3c', fill: false }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      onClick: function(evt, elements) {
+        if (elements.length > 0 && elements[0].datasetIndex === 0) {
+          var idx = elements[0].index;
+          openDetail(records[idx].id);
+        }
+      },
+      plugins: {
+        legend: { labels: { font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            afterLabel: function(context) {
+              if (context.datasetIndex === 0) {
+                var r = records[context.dataIndex];
+                var over = r.tail_risk_value > getEffectiveThreshold(r) ? '⚠ 超过阈值' : '正常';
+                return '状态: ' + statusLabel(r.status) + ' | ' + over;
+              }
+              return '';
+            }
+          }
+        }
+      },
+      scales: {
+        y: { beginAtZero: true, title: { display: true, text: '风险值', font: { size: 11 } } },
+        x: { ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+function statusLabel(s) {
+  var map = { smooth: '顺利', manual_confirm: '人工确认', old_methodology: '旧口径', exception: '越界' };
+  return map[s] || s;
+}
+
+function sourceLabel(s) {
+  var map = { historical: '历史样本', manual_input: '人工录入', old_import: '旧系统导入' };
+  return map[s] || s;
+}
+
+function renderTable() {
+  var records = loadData();
+  var filterStatus = document.getElementById('filterStatus').value;
+  var filterSource = document.getElementById('filterSource').value;
+
+  var filtered = records.filter(function(r) {
+    if (filterStatus !== 'all' && r.status !== filterStatus) return false;
+    if (filterSource !== 'all' && r.source !== filterSource) return false;
+    return true;
+  });
+
+  var tbody = document.getElementById('detailTableBody');
+  tbody.innerHTML = filtered.map(function(r) {
+    var rowClass = '';
+    if (r.status === 'manual_confirm') rowClass = 'confirm-row';
+    else if (r.status === 'old_methodology') rowClass = 'old-method-row';
+    else if (r.tail_risk_value > getEffectiveThreshold(r)) rowClass = 'exception-row';
+
+    var adjustedTags = Object.keys(r.param_adjustments || {}).map(function(k) {
+      return '<span class="tag tag-adjusted">' + k + '已调</span>';
+    }).join('');
+
+    var annotationSummary = (r.annotations || []).slice(-1).map(function(a){
+      return a.text.length > 20 ? a.text.substring(0,20) + '...' : a.text;
+    }).join('; ');
+
+    return '<tr class="' + rowClass + '" onclick="openDetail(\'' + r.id + '\')">' +
+      '<td>' + r.id + '</td>' +
+      '<td>' + r.claim_type + '</td>' +
+      '<td><strong>' + r.tail_risk_value.toFixed(2) + '</strong>' + (r.old_methodology_value ? ' <span style="color:#aaa;font-size:10px">(旧:' + r.old_methodology_value + ')</span>' : '') + '</td>' +
+      '<td>' + r.confidence_level + '</td>' +
+      '<td><span class="status-badge status-' + r.status + '">' + statusLabel(r.status) + '</span></td>' +
+      '<td>' + sourceLabel(r.source) + '</td>' +
+      '<td>' + (adjustedTags || '<span style="color:#aaa">默认</span>') + '</td>' +
+      '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + (annotationSummary || '').replace(/"/g,'&quot;') + '">' + (annotationSummary || '—') + '</td>' +
+      '<td style="white-space:nowrap">' + r.last_processed_at + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+function renderParams() {
+  var params = loadParams();
+  var panel = document.getElementById('paramPanel');
+  var html = '<div class="param-group"><div class="param-group-title">全局分析参数</div>';
+
+  var labels = {
+    var_threshold: 'VaR阈值',
+    tail_quantile: '尾部分位数',
+    sample_window_months: '样本窗口(月)',
+    confidence_floor: '置信度下限',
+    outlier_multiplier: '异常值倍数'
+  };
+
+  for (var key in params) {
+    var p = params[key];
+    var inputClass = p.manually_adjusted ? 'manually-adjusted' : '';
+    var lockClass = p.locked ? 'locked' : 'unlocked';
+    var lockSymbol = p.locked ? '🔒' : '🔓';
+
+    html += '<div class="param-row">' +
+      '<label>' + labels[key] + '</label>' +
+      '<input type="number" class="' + inputClass + '" id="param_' + key + '" value="' + p.value + '" step="0.01" onchange="onParamChange(\'' + key + '\')">' +
+      '<button class="lock-btn ' + lockClass + '" onclick="toggleLock(\'' + key + '\')" title="' + (p.locked ? '已锁定：重新运行不会覆盖' : '未锁定：重新运行可能覆盖') + '">' + lockSymbol + '</button>' +
+      '</div>';
+
+    if (p.manually_adjusted && p.note) {
+      html += '<div class="param-note">📐 ' + p.note + '</div>';
+    }
+    if (p.locked) {
+      html += '<div class="param-note">🔒 此参数已锁定，重新运行不会被默认值覆盖</div>';
+    }
+  }
+
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+function onParamChange(key) {
+  var params = loadParams();
+  var input = document.getElementById('param_' + key);
+  var newVal = parseFloat(input.value);
+  if (isNaN(newVal)) return;
+
+  params[key].value = newVal;
+  params[key].manually_adjusted = true;
+  params[key].note = '手动调整为 ' + newVal + '（默认值 ' + params[key].default_value + '）';
+  saveParams(params);
+  renderParams();
+  showToast('参数 ' + key + ' 已更新为 ' + newVal + '，已标记为手动调整');
+}
+
+function toggleLock(key) {
+  var params = loadParams();
+  params[key].locked = !params[key].locked;
+  saveParams(params);
+  renderParams();
+  showToast(params[key].locked ? key + ' 已锁定，重新运行不会被覆盖' : key + ' 已解锁');
+}
+
+function reRunAnalysis() {
+  var params = loadParams();
+  var unlockedCount = 0;
+  var lockedCount = 0;
+
+  for (var key in params) {
+    if (!params[key].locked) {
+      params[key].value = params[key].default_value;
+      params[key].manually_adjusted = false;
+      params[key].note = '';
+      unlockedCount++;
+    } else {
+      lockedCount++;
+    }
+  }
+
+  saveParams(params);
+  renderParams();
+
+  var records = loadData();
+  records.forEach(function(r) {
+    r.processing_history.push({
+      timestamp: now(),
+      operator: '系统',
+      action: 'rerun',
+      detail: '重新运行分析' + (lockedCount > 0 ? '，' + lockedCount + '个锁定参数保持不变' : '') + (unlockedCount > 0 ? '，' + unlockedCount + '个未锁定参数恢复默认' : '')
+    });
+    r.last_processed_at = now();
+  });
+  saveData(records);
+
+  renderSummary();
+  renderChart();
+  renderTable();
+
+  showToast('重新运行完成：' + lockedCount + ' 个参数保持锁定，' + unlockedCount + ' 个恢复默认');
+}
+
+function openDetail(id) {
+  var records = loadData();
+  var r = records.find(function(rec){ return rec.id === id; });
+  if (!r) return;
+
+  document.getElementById('modalTitle').textContent = r.id + ' — ' + r.claim_type;
+
+  var html = '<div class="detail-section"><h4>基本信息</h4><div class="detail-grid">';
+
+  html += '<dt>编号</dt><dd>' + r.id + '</dd>';
+  html += '<dt>险种</dt><dd>' + r.claim_type + '</dd>';
+  html += '<dt>尾部风险值</dt><dd><strong>' + r.tail_risk_value.toFixed(2) + '</strong>' + (r.tail_risk_value > getEffectiveThreshold(r) ? ' <span style="color:#e74c3c;font-weight:700">⚠ 超过有效阈值 ' + getEffectiveThreshold(r).toFixed(2) + '</span>' : '') + '</dd>';
+  if (r.old_methodology_value) {
+    html += '<dt>旧口径值</dt><dd>' + r.old_methodology_value + ' <span style="color:#aaa;font-size:11px">(' + r.old_methodology_note + ')</span></dd>';
+  }
+  html += '<dt>置信度</dt><dd>' + r.confidence_level + '</dd>';
+  html += '<dt>状态</dt><dd><span class="status-badge status-' + r.status + '">' + statusLabel(r.status) + '</span></dd>';
+  html += '<dt>数据来源</dt><dd>' + r.source_label + '（' + sourceLabel(r.source) + '）</dd>';
+  html += '<dt>原始样本期</dt><dd>' + (r.original_data.period || '—') + '</dd>';
+  html += '<dt>样本量</dt><dd>' + (r.original_data.sample_count || '—') + ' 条</dd>';
+  html += '<dt>创建时间</dt><dd>' + r.created_at + '</dd>';
+  html += '<dt>最后处理时间</dt><dd>' + r.last_processed_at + '</dd>';
+  html += '</div></div>';
+
+  html += '<div class="detail-section"><h4>分析解释</h4><div class="explanation-box">' + r.explanation + '</div></div>';
+
+  if (r.param_adjustments && Object.keys(r.param_adjustments).length > 0) {
+    html += '<div class="detail-section"><h4>参数调整记录</h4>';
+    for (var pk in r.param_adjustments) {
+      var adj = r.param_adjustments[pk];
+      html += '<div style="margin-bottom:8px;padding:8px;background:#fef9e7;border:1px solid #f0e0a0;border-radius:3px;font-size:12px">';
+      html += '<strong>' + pk + '</strong>：' + adj.original + ' → ' + adj.adjusted_to;
+      html += '<div style="color:#856404;margin-top:4px">原因：' + adj.reason + '</div>';
+      html += '<div style="color:#aaa;font-size:11px">调整人：' + adj.adjusted_by + ' | 时间：' + adj.adjusted_at + '</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  if (r.annotations && r.annotations.length > 0) {
+    html += '<div class="annotations-section"><h5>备注（原始保留，未清洗）</h5>';
+    r.annotations.forEach(function(a) {
+      html += '<div class="annotation-item"><span class="ann-source">[' + a.source + ' ' + a.time + ']</span> ' + a.text + '</div>';
+    });
+    html += '</div>';
+  }
+
+  if (r.processing_history && r.processing_history.length > 0) {
+    html += '<div class="audit-log"><h4>处理轨迹</h4>';
+    r.processing_history.forEach(function(h) {
+      var actionClass = 'audit-' + h.action;
+      html += '<div class="audit-entry ' + actionClass + '">';
+      html += '<span class="audit-time">' + h.timestamp + '</span> ';
+      html += '<span class="audit-operator">' + h.operator + '</span> ';
+      html += h.detail;
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="export-area" style="margin-top:16px">';
+  html += '<button class="btn btn-primary" onclick="exportSingleRecord(\'' + r.id + '\')">导出此条记录</button>';
+  html += '<button class="btn" onclick="addAnnotation(\'' + r.id + '\')">添加备注</button>';
+  html += '</div>';
+
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('detailModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('active');
+}
+
+function addAnnotation(id) {
+  var text = prompt('输入备注内容：');
+  if (!text || !text.trim()) return;
+  var source = prompt('备注来源（如：产品同事小岑）：', '当前操作人');
+  if (!source) source = '当前操作人';
+
+  var records = loadData();
+  var r = records.find(function(rec){ return rec.id === id; });
+  if (!r) return;
+
+  r.annotations = r.annotations || [];
+  r.annotations.push({ text: text.trim(), source: source.trim(), time: now() });
+  r.processing_history.push({
+    timestamp: now(),
+    operator: source.trim(),
+    action: 'annotate',
+    detail: '添加备注：' + text.trim()
+  });
+  r.last_processed_at = now();
+  saveData(records);
+  openDetail(id);
+  renderTable();
+  showToast('备注已添加');
+}
+
+function exportSingleRecord(id) {
+  var records = loadData();
+  var r = records.find(function(rec){ return rec.id === id; });
+  if (!r) return;
+
+  var exportObj = {
+    export_time: now(),
+    record: r
+  };
+  downloadJSON(exportObj, '保险赔付尾部风险_' + r.id + '.json');
+}
+
+function exportReport() {
+  var records = loadData();
+  var params = loadParams();
+
+  var summary = {
+    total_records: records.length,
+    smooth_count: records.filter(function(r){ return r.status === 'smooth'; }).length,
+    manual_confirm_count: records.filter(function(r){ return r.status === 'manual_confirm'; }).length,
+    old_methodology_count: records.filter(function(r){ return r.status === 'old_methodology'; }).length,
+    exception_count: records.filter(function(r){ return r.tail_risk_value > getEffectiveThreshold(r); }).length,
+    note: '越界记录未纳入汇总均值，但保留在明细中不消失'
+  };
+
+  var report = {
+    title: '保险赔付尾部风险分析报告',
+    export_time: now(),
+    parameters_used: params,
+    summary: summary,
+    records: records.map(function(r) {
+      return {
+        id: r.id,
+        claim_type: r.claim_type,
+        tail_risk_value: r.tail_risk_value,
+        old_methodology_value: r.old_methodology_value || null,
+        confidence_level: r.confidence_level,
+        status: r.status,
+        source: r.source,
+        source_label: r.source_label,
+        original_data: r.original_data,
+        parameters: r.parameters,
+        param_adjustments: r.param_adjustments,
+        annotations: r.annotations,
+        explanation: r.explanation,
+        processing_history: r.processing_history,
+        created_at: r.created_at,
+        last_processed_at: r.last_processed_at,
+        export_note: '原始来源和处理时间已保留，可直接追溯'
+      };
+    })
+  };
+
+  downloadJSON(report, '保险赔付尾部风险报告_' + now().replace(/[: ]/g,'_') + '.json');
+}
+
+function downloadJSON(obj, filename) {
+  var blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('报告已导出：' + filename);
+}
+
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+function resetData() {
+  if (!confirm('确定要重置所有数据为初始样例吗？这将清除所有人工调整和备注。')) return;
+  localStorage.removeItem(DB_KEY);
+  localStorage.removeItem(PARAM_KEY);
+  init();
+  showToast('已重置为初始样例数据');
+}
+
+function init() {
+  renderSummary();
+  renderChart();
+  renderTable();
+  renderParams();
+}
+
+init();
+</script>
+</body>
+</html>
