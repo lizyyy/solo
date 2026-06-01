@@ -1,0 +1,1212 @@
+{
+  "generated_at": "2026-06-01T23:02:58.630079",
+  "sample_count": 15,
+  "samples": [
+    {
+      "sample_id": "H-001",
+      "raw_data": {
+        "sample_id": "H-001",
+        "vertices": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            5,
+            0,
+            0
+          ],
+          [
+            5,
+            5,
+            0
+          ],
+          [
+            0,
+            5,
+            0
+          ],
+          [
+            1,
+            1,
+            0.5
+          ],
+          [
+            4,
+            1,
+            0.3
+          ],
+          [
+            4,
+            4,
+            0.4
+          ],
+          [
+            1,
+            4,
+            0.6
+          ]
+        ],
+        "faces": [
+          [
+            0,
+            1,
+            4
+          ],
+          [
+            1,
+            5,
+            4
+          ],
+          [
+            1,
+            2,
+            5
+          ],
+          [
+            2,
+            6,
+            5
+          ],
+          [
+            2,
+            3,
+            6
+          ],
+          [
+            3,
+            7,
+            6
+          ],
+          [
+            3,
+            0,
+            7
+          ],
+          [
+            0,
+            4,
+            7
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            4,
+            6,
+            7
+          ]
+        ],
+        "quality_score": 0.92,
+        "material_type": "aluminum_alloy",
+        "batch": "A"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 26.678859476104694,
+      "confidence_interval": [
+        25.424459476104694,
+        27.933259476104695
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:02:58.629040",
+      "metadata": {
+        "vertex_count": 8,
+        "face_count": 10,
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.92,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.39765090293857763,
+          "percentile": 34.544376646705786
+        }
+      },
+      "is_anomaly": false,
+      "anomaly_reasons": [],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 26.678859476104694
+    },
+    {
+      "sample_id": "H-002",
+      "raw_data": {
+        "sample_id": "H-002",
+        "contour_points": [
+          [
+            0,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            3,
+            6
+          ],
+          [
+            0,
+            6
+          ],
+          [
+            -2,
+            4
+          ],
+          [
+            -2,
+            2
+          ]
+        ],
+        "quality_score": 0.85,
+        "material_type": "stainless_steel",
+        "batch": "A"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 34.0,
+      "confidence_interval": [
+        31.648,
+        36.352000000000004
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:02:58.629065",
+      "metadata": {
+        "contour_point_count": 8,
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.85,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.1729459984562193,
+          "percentile": 43.13469374219468
+        }
+      },
+      "is_anomaly": false,
+      "anomaly_reasons": [],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 34.0
+    },
+    {
+      "sample_id": "H-003",
+      "raw_data": {
+        "sample_id": "H-003",
+        "vertices": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            10,
+            0,
+            0
+          ],
+          [
+            10,
+            10,
+            0
+          ],
+          [
+            0,
+            10,
+            0
+          ],
+          [
+            1,
+            1,
+            2
+          ],
+          [
+            9,
+            1,
+            1.8
+          ],
+          [
+            9,
+            9,
+            2.1
+          ],
+          [
+            1,
+            9,
+            1.9
+          ]
+        ],
+        "faces": [
+          [
+            0,
+            1,
+            4
+          ],
+          [
+            1,
+            5,
+            4
+          ],
+          [
+            1,
+            2,
+            5
+          ],
+          [
+            2,
+            6,
+            5
+          ],
+          [
+            2,
+            3,
+            6
+          ],
+          [
+            3,
+            7,
+            6
+          ],
+          [
+            3,
+            0,
+            7
+          ],
+          [
+            0,
+            4,
+            7
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            4,
+            6,
+            7
+          ]
+        ],
+        "quality_score": 0.25,
+        "material_type": "aluminum_alloy",
+        "batch": "A",
+        "known_issue": "scan_error_detected"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 142.9663084995317,
+      "confidence_interval": [
+        131.2063084995317,
+        154.72630849953168
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:02:58.629073",
+      "metadata": {
+        "vertex_count": 8,
+        "face_count": 10,
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.25,
+        "above_max_threshold": 100.0,
+        "range_status": "above_max",
+        "statistics_context": {
+          "z_score": 3.171514316608839,
+          "percentile": 99.92417680348181
+        },
+        "retained_manual_override": true,
+        "previous_processed_at": "2026-06-01T23:02:20.523439"
+      },
+      "is_anomaly": true,
+      "anomaly_reasons": [
+        "Z分数 3.17 超过阈值 2.5 (均值=39.63, 标准差=32.58)",
+        "面积 142.97 高于IQR上界 58.49 (Q3=38.04, IQR=11.36)",
+        "面积 142.97 高于业务最大阈值 100.00",
+        "数据质量分数 0.25 过低 (阈值=0.3)"
+      ],
+      "manual_override": 45.2,
+      "manual_note": "扫描故障，已与工程确认",
+      "manual_operator": "小岑",
+      "final_area": 45.2
+    },
+    {
+      "sample_id": "H-004",
+      "raw_data": {
+        "sample_id": "H-004",
+        "measured_diameter": 6.5,
+        "quality_score": 0.78,
+        "material_type": "titanium",
+        "batch": "B"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 33.18307240354219,
+      "confidence_interval": [
+        29.73347240354219,
+        36.63267240354219
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:02:58.629085",
+      "metadata": {
+        "estimation_method": "circle_from_diameter",
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.78,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.1980196378614339,
+          "percentile": 42.151484958098706
+        }
+      },
+      "is_anomaly": false,
+      "anomaly_reasons": [],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 33.18307240354219
+    },
+    {
+      "sample_id": "H-005",
+      "raw_data": {
+        "sample_id": "H-005",
+        "bounding_box": {
+          "width": 4.2,
+          "height": 3.8,
+          "depth": 0.5
+        },
+        "quality_score": 0.65,
+        "material_type": "stainless_steel",
+        "batch": "B"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 15.959999999999999,
+      "confidence_interval": [
+        10.472,
+        21.448
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:02:58.629090",
+      "metadata": {
+        "estimation_method": "bounding_box",
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.65,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.7266406671531308,
+          "percentile": 23.372305449340157
+        }
+      },
+      "is_anomaly": false,
+      "anomaly_reasons": [],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 15.959999999999999
+    },
+    {
+      "sample_id": "H-006",
+      "raw_data": {
+        "sample_id": "H-006",
+        "vertices": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            4,
+            0,
+            0
+          ],
+          [
+            4,
+            4,
+            0
+          ],
+          [
+            0,
+            4,
+            0
+          ],
+          [
+            0.5,
+            0.5,
+            0.3
+          ],
+          [
+            3.5,
+            0.5,
+            0.2
+          ],
+          [
+            3.5,
+            3.5,
+            0.4
+          ],
+          [
+            0.5,
+            3.5,
+            0.3
+          ]
+        ],
+        "faces": [
+          [
+            0,
+            1,
+            4
+          ],
+          [
+            1,
+            5,
+            4
+          ],
+          [
+            1,
+            2,
+            5
+          ],
+          [
+            2,
+            6,
+            5
+          ],
+          [
+            2,
+            3,
+            6
+          ],
+          [
+            3,
+            7,
+            6
+          ],
+          [
+            3,
+            0,
+            7
+          ],
+          [
+            0,
+            4,
+            7
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            4,
+            6,
+            7
+          ]
+        ],
+        "quality_score": 0.88,
+        "material_type": "aluminum_alloy",
+        "batch": "B"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 17.23502147337477,
+      "confidence_interval": [
+        15.353421473374768,
+        19.116621473374767
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:02:58.629094",
+      "metadata": {
+        "vertex_count": 8,
+        "face_count": 10,
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.88,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.6875069314390682,
+          "percentile": 24.588166716559446
+        }
+      },
+      "is_anomaly": false,
+      "anomaly_reasons": [],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 17.23502147337477
+    },
+    {
+      "sample_id": "H-007",
+      "raw_data": {
+        "sample_id": "H-007",
+        "quality_score": 0.55,
+        "material_type": "titanium",
+        "batch": "C",
+        "note": "边界样本，数据不全"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 28.7,
+      "confidence_interval": [
+        21.644,
+        35.756
+      ],
+      "estimation_method": "statistical_approximation",
+      "processed_at": "2026-06-01T23:02:58.629105",
+      "metadata": {
+        "warning": "无精确几何数据，使用统计近似",
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.55,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.33561682684278427,
+          "percentile": 36.85799166636122
+        },
+        "manual_notes": [
+          {
+            "timestamp": "2026-06-01T23:02:20.524191",
+            "operator": "小岑",
+            "note": "需等下周一补充5个同类型样本后再判"
+          }
+        ]
+      },
+      "is_anomaly": false,
+      "anomaly_reasons": [],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 28.7
+    },
+    {
+      "sample_id": "H-008",
+      "raw_data": {
+        "sample_id": "H-008",
+        "contour_points": [
+          [
+            0,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            6,
+            3
+          ],
+          [
+            4,
+            6
+          ],
+          [
+            0,
+            6
+          ],
+          [
+            -2,
+            3
+          ]
+        ],
+        "quality_score": 0.91,
+        "material_type": "titanium",
+        "batch": "C"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 36.0,
+      "confidence_interval": [
+        34.5888,
+        37.4112
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:02:58.629110",
+      "metadata": {
+        "contour_point_count": 6,
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.91,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.11156078019713822,
+          "percentile": 45.558583535128065
+        }
+      },
+      "is_anomaly": false,
+      "anomaly_reasons": [],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 36.0
+    },
+    {
+      "sample_id": "H-009",
+      "raw_data": {
+        "sample_id": "H-009",
+        "vertices": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            6,
+            0,
+            0
+          ],
+          [
+            6,
+            6,
+            0
+          ],
+          [
+            0,
+            6,
+            0
+          ],
+          [
+            0.8,
+            0.8,
+            0.4
+          ],
+          [
+            5.2,
+            0.8,
+            0.3
+          ],
+          [
+            5.2,
+            5.2,
+            0.5
+          ],
+          [
+            0.8,
+            5.2,
+            0.4
+          ]
+        ],
+        "faces": [
+          [
+            0,
+            1,
+            4
+          ],
+          [
+            1,
+            5,
+            4
+          ],
+          [
+            1,
+            2,
+            5
+          ],
+          [
+            2,
+            6,
+            5
+          ],
+          [
+            2,
+            3,
+            6
+          ],
+          [
+            3,
+            7,
+            6
+          ],
+          [
+            3,
+            0,
+            7
+          ],
+          [
+            0,
+            4,
+            7
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            4,
+            6,
+            7
+          ]
+        ],
+        "quality_score": 0.82,
+        "material_type": "stainless_steel",
+        "batch": "C"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 38.04019180887623,
+      "confidence_interval": [
+        35.21779180887623,
+        40.86259180887623
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:02:58.629115",
+      "metadata": {
+        "vertex_count": 8,
+        "face_count": 10,
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.82,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.04894197045800979,
+          "percentile": 48.048277066582465
+        }
+      },
+      "is_anomaly": false,
+      "anomaly_reasons": [],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 38.04019180887623
+    },
+    {
+      "sample_id": "H-010",
+      "raw_data": {
+        "sample_id": "H-010",
+        "vertices": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            4.5,
+            0,
+            0
+          ],
+          [
+            4.5,
+            4.5,
+            0
+          ],
+          [
+            0,
+            4.5,
+            0
+          ],
+          [
+            0.6,
+            0.6,
+            0.35
+          ],
+          [
+            3.9,
+            0.6,
+            0.3
+          ],
+          [
+            3.9,
+            3.9,
+            0.4
+          ],
+          [
+            0.6,
+            3.9,
+            0.35
+          ]
+        ],
+        "faces": [
+          [
+            0,
+            1,
+            4
+          ],
+          [
+            1,
+            5,
+            4
+          ],
+          [
+            1,
+            2,
+            5
+          ],
+          [
+            2,
+            6,
+            5
+          ],
+          [
+            2,
+            3,
+            6
+          ],
+          [
+            3,
+            7,
+            6
+          ],
+          [
+            3,
+            0,
+            7
+          ],
+          [
+            0,
+            4,
+            7
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            4,
+            6,
+            7
+          ]
+        ],
+        "quality_score": 0.9,
+        "material_type": "aluminum_alloy",
+        "batch": "C"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 21.74369410304764,
+      "confidence_interval": [
+        20.17569410304764,
+        23.311694103047643
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:02:58.629126",
+      "metadata": {
+        "vertex_count": 8,
+        "face_count": 10,
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.9,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.5491240047234609,
+          "percentile": 29.14601763287624
+        }
+      },
+      "is_anomaly": false,
+      "anomaly_reasons": [],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 21.74369410304764
+    },
+    {
+      "sample_id": "H-011",
+      "raw_data": {
+        "sample_id": "H-011",
+        "measured_diameter": 8.2,
+        "quality_score": 0.75,
+        "material_type": "titanium",
+        "batch": "C"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 52.81017250684442,
+      "confidence_interval": [
+        48.890172506844415,
+        56.73017250684442
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:02:58.629135",
+      "metadata": {
+        "estimation_method": "circle_from_diameter",
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.75,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": 0.40438727395558627,
+          "percentile": 65.70360215526053
+        }
+      },
+      "is_anomaly": false,
+      "anomaly_reasons": [],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 52.81017250684442
+    },
+    {
+      "sample_id": "H-012",
+      "raw_data": {
+        "sample_id": "H-012",
+        "quality_score": 0.45,
+        "material_type": "aluminum_alloy",
+        "batch": "C",
+        "note": "扫描时部分区域被遮挡"
+      },
+      "source": "batch_may_week4.json",
+      "estimated_area": 28.3,
+      "confidence_interval": [
+        19.676000000000002,
+        36.924
+      ],
+      "estimation_method": "statistical_approximation",
+      "processed_at": "2026-06-01T23:02:58.629139",
+      "metadata": {
+        "warning": "无精确几何数据，使用统计近似",
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.45,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.3478938704946004,
+          "percentile": 36.39599443623654
+        }
+      },
+      "is_anomaly": false,
+      "anomaly_reasons": [],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 28.3
+    },
+    {
+      "sample_id": "T-001",
+      "raw_data": {
+        "sample_id": "T-001",
+        "vertices": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            5.2,
+            0,
+            0
+          ],
+          [
+            5.2,
+            5.2,
+            0
+          ],
+          [
+            0,
+            5.2,
+            0
+          ],
+          [
+            0.7,
+            0.7,
+            0.4
+          ],
+          [
+            4.5,
+            0.7,
+            0.3
+          ],
+          [
+            4.5,
+            4.5,
+            0.4
+          ],
+          [
+            0.7,
+            4.5,
+            0.3
+          ]
+        ],
+        "faces": [
+          [
+            0,
+            1,
+            4
+          ],
+          [
+            1,
+            5,
+            4
+          ],
+          [
+            1,
+            2,
+            5
+          ],
+          [
+            2,
+            6,
+            5
+          ],
+          [
+            2,
+            3,
+            6
+          ],
+          [
+            3,
+            7,
+            6
+          ],
+          [
+            3,
+            0,
+            7
+          ],
+          [
+            0,
+            4,
+            7
+          ],
+          [
+            4,
+            5,
+            6
+          ],
+          [
+            4,
+            6,
+            7
+          ]
+        ],
+        "quality_score": 0.88,
+        "material_type": "aluminum_alloy"
+      },
+      "source": "small_batch_test.json",
+      "estimated_area": 28.57034258517681,
+      "confidence_interval": [
+        26.68874258517681,
+        30.45194258517681
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:01:32.627204",
+      "metadata": {
+        "vertex_count": 8,
+        "face_count": 10,
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.88,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.5151465277898881,
+          "percentile": 30.322531579749594
+        },
+        "is_boundary": true
+      },
+      "is_anomaly": true,
+      "anomaly_reasons": [
+        "样本量不足 (n=3 < 阈值=5)，结果可能存在偏差，建议人工复核"
+      ],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 28.57034258517681
+    },
+    {
+      "sample_id": "T-002",
+      "raw_data": {
+        "sample_id": "T-002",
+        "contour_points": [
+          [
+            0,
+            0
+          ],
+          [
+            3.5,
+            0
+          ],
+          [
+            5.5,
+            2.5
+          ],
+          [
+            5.5,
+            4.5
+          ],
+          [
+            3.5,
+            6.5
+          ],
+          [
+            0,
+            6.5
+          ],
+          [
+            -2,
+            4.5
+          ],
+          [
+            -2,
+            2.5
+          ]
+        ],
+        "quality_score": 0.92,
+        "material_type": "stainless_steel"
+      },
+      "source": "small_batch_test.json",
+      "estimated_area": 39.75,
+      "confidence_interval": [
+        38.4956,
+        41.0044
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:01:32.627225",
+      "metadata": {
+        "contour_point_count": 8,
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.92,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": 1.3981731241349484,
+          "percentile": 91.89694573287431
+        },
+        "is_boundary": true
+      },
+      "is_anomaly": true,
+      "anomaly_reasons": [
+        "样本量不足 (n=3 < 阈值=5)，结果可能存在偏差，建议人工复核"
+      ],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 39.75
+    },
+    {
+      "sample_id": "T-003",
+      "raw_data": {
+        "sample_id": "T-003",
+        "measured_diameter": 5.8,
+        "quality_score": 0.76,
+        "material_type": "titanium"
+      },
+      "source": "small_batch_test.json",
+      "estimated_area": 26.42079421669016,
+      "confidence_interval": [
+        22.65759421669016,
+        30.183994216690163
+      ],
+      "estimation_method": "delaunay",
+      "processed_at": "2026-06-01T23:01:32.627233",
+      "metadata": {
+        "estimation_method": "circle_from_diameter",
+        "smoothing_applied": 3,
+        "confidence_level": 0.95,
+        "quality_score_used": 0.76,
+        "range_status": "within_range",
+        "statistics_context": {
+          "z_score": -0.8830265963450586,
+          "percentile": 18.861095087433494
+        },
+        "is_boundary": true
+      },
+      "is_anomaly": true,
+      "anomaly_reasons": [
+        "样本量不足 (n=3 < 阈值=5)，结果可能存在偏差，建议人工复核"
+      ],
+      "manual_override": null,
+      "manual_note": null,
+      "manual_operator": null,
+      "final_area": 26.42079421669016
+    }
+  ]
+}

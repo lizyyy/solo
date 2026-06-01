@@ -1,0 +1,15 @@
+{
+  "hole_area_estimation": {
+    "normal_distribution_mean": 28.5,
+    "normal_distribution_std": 8.0,
+    "outlier_z_score_threshold": 2.5
+  },
+  "anomaly_detection": {
+    "iqr_multiplier": 1.8
+  },
+  "_meta": {
+    "last_edited_by": "小岑",
+    "last_edited_at": "2026-05-28T14:30:00",
+    "note": "5月批次根据质量部反馈调整了均值和异常阈值"
+  }
+}

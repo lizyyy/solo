@@ -1,0 +1,217 @@
+{
+  "generated_at": "2026-06-01T23:02:58.629669",
+  "previous_result_file": "output/results_full.json",
+  "summary": {
+    "total_previous": 15,
+    "total_new": 15,
+    "added": 0,
+    "removed": 0,
+    "modified": 0,
+    "unchanged": 15
+  },
+  "added_samples": [],
+  "removed_samples": [],
+  "modified_samples": [],
+  "unchanged_samples": [
+    {
+      "sample_id": "H-003",
+      "status": "unchanged",
+      "final_area_new": 45.2,
+      "final_area_old": 45.2,
+      "has_manual_override_new": true,
+      "has_manual_override_old": true,
+      "is_anomaly_new": true,
+      "is_anomaly_old": true,
+      "source": "batch_may_week4.json"
+    },
+    {
+      "sample_id": "H-009",
+      "status": "unchanged",
+      "final_area_new": 38.04019180887623,
+      "final_area_old": 38.04019180887623,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": false,
+      "is_anomaly_old": false,
+      "source": "batch_may_week4.json"
+    },
+    {
+      "sample_id": "T-002",
+      "status": "unchanged",
+      "final_area_new": 39.75,
+      "final_area_old": 39.75,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": true,
+      "is_anomaly_old": true,
+      "source": "small_batch_test.json"
+    },
+    {
+      "sample_id": "H-006",
+      "status": "unchanged",
+      "final_area_new": 17.23502147337477,
+      "final_area_old": 17.23502147337477,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": false,
+      "is_anomaly_old": false,
+      "source": "batch_may_week4.json"
+    },
+    {
+      "sample_id": "H-007",
+      "status": "unchanged",
+      "final_area_new": 28.7,
+      "final_area_old": 28.7,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": false,
+      "is_anomaly_old": false,
+      "source": "batch_may_week4.json"
+    },
+    {
+      "sample_id": "H-004",
+      "status": "unchanged",
+      "final_area_new": 33.18307240354219,
+      "final_area_old": 33.18307240354219,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": false,
+      "is_anomaly_old": false,
+      "source": "batch_may_week4.json"
+    },
+    {
+      "sample_id": "H-010",
+      "status": "unchanged",
+      "final_area_new": 21.74369410304764,
+      "final_area_old": 21.74369410304764,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": false,
+      "is_anomaly_old": false,
+      "source": "batch_may_week4.json"
+    },
+    {
+      "sample_id": "H-012",
+      "status": "unchanged",
+      "final_area_new": 28.3,
+      "final_area_old": 28.3,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": false,
+      "is_anomaly_old": false,
+      "source": "batch_may_week4.json"
+    },
+    {
+      "sample_id": "H-001",
+      "status": "unchanged",
+      "final_area_new": 26.678859476104694,
+      "final_area_old": 26.678859476104694,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": false,
+      "is_anomaly_old": false,
+      "source": "batch_may_week4.json"
+    },
+    {
+      "sample_id": "H-008",
+      "status": "unchanged",
+      "final_area_new": 36.0,
+      "final_area_old": 36.0,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": false,
+      "is_anomaly_old": false,
+      "source": "batch_may_week4.json"
+    },
+    {
+      "sample_id": "H-002",
+      "status": "unchanged",
+      "final_area_new": 34.0,
+      "final_area_old": 34.0,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": false,
+      "is_anomaly_old": false,
+      "source": "batch_may_week4.json"
+    },
+    {
+      "sample_id": "T-001",
+      "status": "unchanged",
+      "final_area_new": 28.57034258517681,
+      "final_area_old": 28.57034258517681,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": true,
+      "is_anomaly_old": true,
+      "source": "small_batch_test.json"
+    },
+    {
+      "sample_id": "T-003",
+      "status": "unchanged",
+      "final_area_new": 26.42079421669016,
+      "final_area_old": 26.42079421669016,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": true,
+      "is_anomaly_old": true,
+      "source": "small_batch_test.json"
+    },
+    {
+      "sample_id": "H-005",
+      "status": "unchanged",
+      "final_area_new": 15.959999999999999,
+      "final_area_old": 15.959999999999999,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": false,
+      "is_anomaly_old": false,
+      "source": "batch_may_week4.json"
+    },
+    {
+      "sample_id": "H-011",
+      "status": "unchanged",
+      "final_area_new": 52.81017250684442,
+      "final_area_old": 52.81017250684442,
+      "has_manual_override_new": false,
+      "has_manual_override_old": false,
+      "is_anomaly_new": false,
+      "is_anomaly_old": false,
+      "source": "batch_may_week4.json"
+    }
+  ],
+  "parameter_changes": {
+    "has_changes": true,
+    "message": "共有 5 个参数被人工调整",
+    "modified_params": {
+      "anomaly_detection.iqr_multiplier": {
+        "default": 1.5,
+        "current": 1.8,
+        "status": "modified"
+      },
+      "_meta": {
+        "default": "<新增参数，无默认值>",
+        "current": {
+          "last_edited_by": "小岑",
+          "last_edited_at": "2026-05-28T14:30:00",
+          "note": "5月批次根据质量部反馈调整了均值和异常阈值"
+        },
+        "status": "added"
+      },
+      "hole_area_estimation.outlier_z_score_threshold": {
+        "default": 3.0,
+        "current": 2.5,
+        "status": "modified"
+      },
+      "hole_area_estimation.normal_distribution_mean": {
+        "default": 25.0,
+        "current": 28.5,
+        "status": "modified"
+      },
+      "hole_area_estimation.normal_distribution_std": {
+        "default": 10.0,
+        "current": 8.0,
+        "status": "modified"
+      }
+    }
+  }
+}

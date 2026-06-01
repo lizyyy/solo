@@ -1,0 +1,37 @@
+{
+  "batch_id": "TEST-BATCH-2026-05-30",
+  "scanned_at": "2026-05-30T14:00:00",
+  "operator": "小岑",
+  "scanner_model": "Scan3D-Pro-X200",
+  "note": "小包测试，先跑3个样本验证参数",
+  "samples": [
+    {
+      "sample_id": "T-001",
+      "vertices": [
+        [0, 0, 0], [5.2, 0, 0], [5.2, 5.2, 0], [0, 5.2, 0],
+        [0.7, 0.7, 0.4], [4.5, 0.7, 0.3], [4.5, 4.5, 0.4], [0.7, 4.5, 0.3]
+      ],
+      "faces": [
+        [0, 1, 4], [1, 5, 4], [1, 2, 5], [2, 6, 5],
+        [2, 3, 6], [3, 7, 6], [3, 0, 7], [0, 4, 7],
+        [4, 5, 6], [4, 6, 7]
+      ],
+      "quality_score": 0.88,
+      "material_type": "aluminum_alloy"
+    },
+    {
+      "sample_id": "T-002",
+      "contour_points": [
+        [0, 0], [3.5, 0], [5.5, 2.5], [5.5, 4.5], [3.5, 6.5], [0, 6.5], [-2, 4.5], [-2, 2.5]
+      ],
+      "quality_score": 0.92,
+      "material_type": "stainless_steel"
+    },
+    {
+      "sample_id": "T-003",
+      "measured_diameter": 5.8,
+      "quality_score": 0.76,
+      "material_type": "titanium"
+    }
+  ]
+}

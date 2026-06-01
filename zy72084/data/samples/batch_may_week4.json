@@ -1,0 +1,141 @@
+{
+  "batch_id": "MAY-WEEK4-2026",
+  "scanned_at": "2026-05-27T09:00:00",
+  "operator": "扫描组-老王",
+  "scanner_model": "Scan3D-Pro-X200",
+  "samples": [
+    {
+      "sample_id": "H-001",
+      "vertices": [
+        [0, 0, 0], [5, 0, 0], [5, 5, 0], [0, 5, 0],
+        [1, 1, 0.5], [4, 1, 0.3], [4, 4, 0.4], [1, 4, 0.6]
+      ],
+      "faces": [
+        [0, 1, 4], [1, 5, 4], [1, 2, 5], [2, 6, 5],
+        [2, 3, 6], [3, 7, 6], [3, 0, 7], [0, 4, 7],
+        [4, 5, 6], [4, 6, 7]
+      ],
+      "quality_score": 0.92,
+      "material_type": "aluminum_alloy",
+      "batch": "A"
+    },
+    {
+      "sample_id": "H-002",
+      "contour_points": [
+        [0, 0], [3, 0], [5, 2], [5, 4], [3, 6], [0, 6], [-2, 4], [-2, 2]
+      ],
+      "quality_score": 0.85,
+      "material_type": "stainless_steel",
+      "batch": "A"
+    },
+    {
+      "sample_id": "H-003",
+      "vertices": [
+        [0, 0, 0], [10, 0, 0], [10, 10, 0], [0, 10, 0],
+        [1, 1, 2], [9, 1, 1.8], [9, 9, 2.1], [1, 9, 1.9]
+      ],
+      "faces": [
+        [0, 1, 4], [1, 5, 4], [1, 2, 5], [2, 6, 5],
+        [2, 3, 6], [3, 7, 6], [3, 0, 7], [0, 4, 7],
+        [4, 5, 6], [4, 6, 7]
+      ],
+      "quality_score": 0.25,
+      "material_type": "aluminum_alloy",
+      "batch": "A",
+      "known_issue": "scan_error_detected"
+    },
+    {
+      "sample_id": "H-004",
+      "measured_diameter": 6.5,
+      "quality_score": 0.78,
+      "material_type": "titanium",
+      "batch": "B"
+    },
+    {
+      "sample_id": "H-005",
+      "bounding_box": {
+        "width": 4.2,
+        "height": 3.8,
+        "depth": 0.5
+      },
+      "quality_score": 0.65,
+      "material_type": "stainless_steel",
+      "batch": "B"
+    },
+    {
+      "sample_id": "H-006",
+      "vertices": [
+        [0, 0, 0], [4, 0, 0], [4, 4, 0], [0, 4, 0],
+        [0.5, 0.5, 0.3], [3.5, 0.5, 0.2], [3.5, 3.5, 0.4], [0.5, 3.5, 0.3]
+      ],
+      "faces": [
+        [0, 1, 4], [1, 5, 4], [1, 2, 5], [2, 6, 5],
+        [2, 3, 6], [3, 7, 6], [3, 0, 7], [0, 4, 7],
+        [4, 5, 6], [4, 6, 7]
+      ],
+      "quality_score": 0.88,
+      "material_type": "aluminum_alloy",
+      "batch": "B"
+    },
+    {
+      "sample_id": "H-007",
+      "quality_score": 0.55,
+      "material_type": "titanium",
+      "batch": "C",
+      "note": "边界样本，数据不全"
+    },
+    {
+      "sample_id": "H-008",
+      "contour_points": [
+        [0, 0], [4, 0], [6, 3], [4, 6], [0, 6], [-2, 3]
+      ],
+      "quality_score": 0.91,
+      "material_type": "titanium",
+      "batch": "C"
+    },
+    {
+      "sample_id": "H-009",
+      "vertices": [
+        [0, 0, 0], [6, 0, 0], [6, 6, 0], [0, 6, 0],
+        [0.8, 0.8, 0.4], [5.2, 0.8, 0.3], [5.2, 5.2, 0.5], [0.8, 5.2, 0.4]
+      ],
+      "faces": [
+        [0, 1, 4], [1, 5, 4], [1, 2, 5], [2, 6, 5],
+        [2, 3, 6], [3, 7, 6], [3, 0, 7], [0, 4, 7],
+        [4, 5, 6], [4, 6, 7]
+      ],
+      "quality_score": 0.82,
+      "material_type": "stainless_steel",
+      "batch": "C"
+    },
+    {
+      "sample_id": "H-010",
+      "vertices": [
+        [0, 0, 0], [4.5, 0, 0], [4.5, 4.5, 0], [0, 4.5, 0],
+        [0.6, 0.6, 0.35], [3.9, 0.6, 0.3], [3.9, 3.9, 0.4], [0.6, 3.9, 0.35]
+      ],
+      "faces": [
+        [0, 1, 4], [1, 5, 4], [1, 2, 5], [2, 6, 5],
+        [2, 3, 6], [3, 7, 6], [3, 0, 7], [0, 4, 7],
+        [4, 5, 6], [4, 6, 7]
+      ],
+      "quality_score": 0.90,
+      "material_type": "aluminum_alloy",
+      "batch": "C"
+    },
+    {
+      "sample_id": "H-011",
+      "measured_diameter": 8.2,
+      "quality_score": 0.75,
+      "material_type": "titanium",
+      "batch": "C"
+    },
+    {
+      "sample_id": "H-012",
+      "quality_score": 0.45,
+      "material_type": "aluminum_alloy",
+      "batch": "C",
+      "note": "扫描时部分区域被遮挡"
+    }
+  ]
+}
