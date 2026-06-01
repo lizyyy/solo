@@ -1,0 +1,185 @@
+{
+  "sensor_records": [
+    {
+      "timestamp": "2024-01-15 08:30:00",
+      "sensor_id": "S001",
+      "location": "隧道入口处100米",
+      "heat_release_rate": 500,
+      "temperature": 35,
+      "co_concentration": 45,
+      "smoke_opacity": 15,
+      "wind_speed": 2.5,
+      "wind_direction": "+"
+    },
+    {
+      "timestamp": "2024-01-15 08:31:00",
+      "sensor_id": "S001",
+      "location": "隧道入口处100米",
+      "heat_release_rate": 800,
+      "temperature": 42,
+      "co_concentration": 78,
+      "smoke_opacity": 28,
+      "wind_speed": 2.3,
+      "wind_direction": "正"
+    },
+    {
+      "timestamp": "2024-01-15 08:32:00",
+      "sensor_id": "S001",
+      "location": "隧道入口处100米",
+      "heat_release_rate": 1200,
+      "temperature": 55,
+      "co_concentration": 125,
+      "smoke_opacity": 45,
+      "wind_speed": 2.0,
+      "wind_direction": "in"
+    },
+    {
+      "timestamp": "2024-01-15 08:33:00",
+      "sensor_id": "S001",
+      "location": "隧道入口处100米",
+      "heat_release_rate": 1500,
+      "temperature": 68,
+      "co_concentration": 180,
+      "smoke_opacity": 62,
+      "wind_speed": 1.8,
+      "wind_direction": "up"
+    },
+    {
+      "timestamp": "2024-01-15 08:34:00",
+      "sensor_id": "S001",
+      "location": "隧道入口处100米",
+      "heat_release_rate": null,
+      "temperature": 75,
+      "co_concentration": 220,
+      "smoke_opacity": 78,
+      "wind_speed": 1.5,
+      "wind_direction": "+"
+    },
+    {
+      "timestamp": "2024-01-15 08:35:00",
+      "sensor_id": "S001",
+      "location": "隧道入口处100米",
+      "heat_release_rate": 2000,
+      "temperature": 82,
+      "co_concentration": 280,
+      "smoke_opacity": 85,
+      "wind_speed": 1.2,
+      "wind_direction": "正方向"
+    },
+    {
+      "timestamp": "2024-01-15 08:35:00",
+      "sensor_id": "S001",
+      "location": "隧道入口处100米",
+      "heat_release_rate": 2000,
+      "temperature": 82,
+      "co_concentration": 280,
+      "smoke_opacity": 85,
+      "wind_speed": 1.2,
+      "wind_direction": "+"
+    },
+    {
+      "timestamp": "2024-01-15 08:36:00",
+      "sensor_id": "S001",
+      "location": "隧道入口处100米",
+      "heat_release_rate": 2500,
+      "temperature": 88,
+      "co_concentration": 350,
+      "smoke_opacity": 92,
+      "wind_speed": 0.8,
+      "wind_direction": "unknown"
+    },
+    {
+      "timestamp": "2024-01-15 08:37:00",
+      "sensor_id": "S001",
+      "location": "隧道入口处100米",
+      "heat_release_rate": 5500,
+      "temperature": 95,
+      "co_concentration": 600,
+      "smoke_opacity": 98,
+      "wind_speed": 0.5,
+      "wind_direction": "-"
+    },
+    {
+      "timestamp": "2024-01-15 08:38:00",
+      "sensor_id": "S001",
+      "location": "隧道入口处100米",
+      "heat_release_rate": 300,
+      "temperature": 65,
+      "co_concentration": 150,
+      "smoke_opacity": 40,
+      "wind_speed": 3.0,
+      "wind_direction": "+"
+    }
+  ],
+  "equipment_params": [
+    {
+      "fan_id": "FAN001",
+      "fan_power": 75,
+      "rated_airflow": 120000,
+      "operational_status": "running",
+      "last_maintenance": "2024-01-10",
+      "notes": ["风机运行正常", "上周刚做过维护"]
+    },
+    {
+      "fan_id": "FAN002",
+      "fan_power": 75,
+      "rated_airflow": 120000,
+      "operational_status": "standby",
+      "last_maintenance": "2024-01-05",
+      "notes": ["备用风机", "待命中"]
+    }
+  ],
+  "on_site_notes": [
+    {
+      "timestamp": "2024-01-15 08:28:00",
+      "author": "张工",
+      "content": "维修微信群: 今天隧道通风系统测试，准备开始了，大家注意观察数据",
+      "category": "wechat",
+      "manual_corrections": {},
+      "is_manual_correction": false
+    },
+    {
+      "timestamp": "2024-01-15 08:35:00",
+      "author": "李工",
+      "content": "维修微信群: 这里HRR好像不对，人工修正一下，HRR: 2200，CO: 250，风速好像也偏低",
+      "category": "wechat",
+      "manual_corrections": {
+        "heat_release_rate": 2200,
+        "co_concentration": 250,
+        "wind_speed": 1.5
+      },
+      "is_manual_correction": true
+    },
+    {
+      "timestamp": "2024-01-15 08:36:00",
+      "author": "王工",
+      "content": "维修微信群: 老唐，隧道通风烟气扩散这块你得盯着点，CO浓度开始上来了",
+      "category": "wechat",
+      "manual_corrections": {},
+      "is_manual_correction": false
+    },
+    {
+      "timestamp": "2024-01-15 08:37:00",
+      "author": "老唐",
+      "content": "维修微信群: 收到，隧道通风烟气扩散确实有问题，风机已经全功率运行了，再等等看",
+      "category": "wechat",
+      "manual_corrections": {},
+      "is_manual_correction": false
+    },
+    {
+      "timestamp": "2024-01-15 08:37:30",
+      "author": "张工",
+      "content": "维修微信群: 修正: 温度: 92，风速确实只有0.5m/s，传感器没问题",
+      "category": "wechat",
+      "manual_corrections": {
+        "temperature": 92
+      },
+      "is_manual_correction": true
+    }
+  ],
+  "wechat_messages": [
+    "【维修群】08:40 老唐: 隧道通风烟气扩散这个问题确实棘手，极端值被平均掉后风险真的看不出来",
+    "【维修群】08:41 李工: 同意，上次就是因为只看平均值差点出事，必须看每个时间点的实际数据",
+    "【维修群】08:42 王工: 隧道通风烟气扩散后面补材料时记得把这些数据都留着，复盘要用"
+  ]
+}
