@@ -1,0 +1,161 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    font-weight: 400;
+    color: #102a43;
+    background-color: #f0f4f8;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .font-mono-num {
+    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  }
+
+  .font-serif-cn {
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .font-sans-cn {
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-engineering-800 text-white px-4 py-2 rounded-engineering font-medium shadow-engineering hover:bg-engineering-700 hover:shadow-engineering-hover transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-engineering-800 border border-engineering-300 px-4 py-2 rounded-engineering font-medium hover:bg-engineering-50 transition-all duration-200;
+  }
+
+  .btn-warning {
+    @apply bg-warning-600 text-white px-4 py-2 rounded-engineering font-medium shadow-engineering hover:bg-warning-500 hover:shadow-engineering-hover transition-all duration-200;
+  }
+
+  .btn-danger {
+    @apply bg-danger-600 text-white px-4 py-2 rounded-engineering font-medium shadow-engineering hover:bg-danger-500 hover:shadow-engineering-hover transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-white border border-engineering-200 rounded-engineering shadow-engineering;
+  }
+
+  .card-header {
+    @apply px-4 py-3 border-b border-engineering-200 bg-engineering-50 font-serif-cn font-semibold text-engineering-800;
+  }
+
+  .card-body {
+    @apply p-4;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 border border-engineering-300 rounded-engineering focus:outline-none focus:ring-2 focus:ring-engineering-500 focus:border-transparent transition-all;
+  }
+
+  .select-field {
+    @apply w-full px-3 py-2 border border-engineering-300 rounded-engineering bg-white focus:outline-none focus:ring-2 focus:ring-engineering-500 focus:border-transparent transition-all;
+  }
+
+  .table-header {
+    @apply bg-engineering-100 text-engineering-700 font-semibold text-sm;
+  }
+
+  .table-cell {
+    @apply px-3 py-2 border-b border-engineering-100 text-sm;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .tooltip {
+    @apply absolute z-50 bg-engineering-900 text-white text-xs px-2 py-1 rounded-engineering shadow-lg whitespace-nowrap;
+  }
+
+  .divider {
+    @apply h-px bg-engineering-200 my-4;
+  }
+
+  .step-indicator {
+    @apply flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm;
+  }
+
+  .step-active {
+    @apply bg-engineering-800 text-white;
+  }
+
+  .step-completed {
+    @apply bg-success-600 text-white;
+  }
+
+  .step-pending {
+    @apply bg-engineering-200 text-engineering-600;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #9fb3c8 #d9e2ec;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #d9e2ec;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #9fb3c8;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #627d98;
+  }
+
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .grid-pattern {
+    background-image: 
+      linear-gradient(rgba(30, 58, 95, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 58, 95, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .blueprint-bg {
+    background-color: #1e3a5f;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+}
