@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-charcoal: #1a1a2e;
+  --color-warning-orange: #ff6b35;
+  --color-calm-blue: #4ecdc4;
+  --color-paper-cream: #f7f3e9;
+  --color-danger-red: #e63946;
+  --color-success-green: #2a9d8f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background-color: var(--color-charcoal);
+  color: var(--color-paper-cream);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(78, 205, 196, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(78, 205, 196, 0.5);
+}
+
+/* 拖拽相关样式 */
+.dragging {
+  opacity: 0.8;
+  transform: scale(1.05);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  cursor: grabbing;
+}
+
+.drag-over {
+  border-color: var(--color-calm-blue) !important;
+  background-color: rgba(78, 205, 196, 0.1) !important;
+}
+
+/* 数字滚动动画 */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.count-animate {
+  animation: countUp 0.3s ease-out;
+}
+
+/* 历史记录原始备注样式 */
+.raw-note {
+  font-style: italic;
+  opacity: 0.85;
+  border-left: 2px solid var(--color-warning-orange);
+  padding-left: 8px;
+  margin-top: 4px;
+}
+
+/* 补录备注差异样式 */
+.supplement-note {
+  background-color: rgba(255, 107, 53, 0.15);
+  border: 1px dashed var(--color-warning-orange);
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+/* 暂停记录标记 */
+.pause-marker {
+  background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.2), transparent);
+  text-align: center;
+  padding: 4px 0;
+  font-size: 12px;
+  color: var(--color-warning-orange);
+  position: relative;
+}
+
+.pause-marker::before,
+.pause-marker::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 30%;
+  height: 1px;
+  background: var(--color-warning-orange);
+  opacity: 0.5;
+}
+
+.pause-marker::before {
+  left: 0;
+}
+
+.pause-marker::after {
+  right: 0;
+}
+
+/* 打印样式 */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
