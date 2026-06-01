@@ -1,0 +1,30 @@
+{
+  "id": "test-out-of-bounds",
+  "name": "边界值测试配置",
+  "levels": [
+    {
+      "id": 1,
+      "name": "难度超标关卡",
+      "waveCount": 3,
+      "difficulty": 15,
+      "remarks": "难度值15，超出1-10的范围"
+    },
+    {
+      "id": 2,
+      "name": "难度为负",
+      "waveCount": 5,
+      "difficulty": -3,
+      "remarks": "难度值为负数的边界测试"
+    }
+  ],
+  "events": [],
+  "resources": {
+    "maxCoins": 50000,
+    "maxHealth": 5000,
+    "startCoins": 60000,
+    "startHealth": 6000,
+    "outOfBounds": true,
+    "remarks": "课堂计分表备注：这是特殊测试场景，起始资源超过最大值"
+  },
+  "remarks": "边界值测试配置 - 包含超出范围的难度值和资源值"
+}

@@ -1,0 +1,50 @@
+{
+  "id": "test-duplicate-events",
+  "name": "重复事件测试配置",
+  "levels": [
+    {
+      "id": 1,
+      "name": "测试关卡",
+      "waveCount": 5,
+      "difficulty": 3
+    }
+  ],
+  "events": [
+    {
+      "id": "event-001",
+      "type": "attack",
+      "timestamp": 1000,
+      "description": "钓鱼邮件攻击开始",
+      "remarks": "课堂记录：学员反应迅速"
+    },
+    {
+      "id": "event-002",
+      "type": "defense",
+      "timestamp": 2000,
+      "description": "建造防火墙",
+      "remarks": "正确操作"
+    },
+    {
+      "id": "event-001",
+      "type": "attack",
+      "timestamp": 1000,
+      "description": "钓鱼邮件攻击开始",
+      "isDuplicate": true,
+      "remarks": "重复导入的事件 - 用于测试重复检测"
+    },
+    {
+      "id": "event-003",
+      "type": "resource",
+      "timestamp": -500,
+      "description": "负数时间戳事件",
+      "remarks": "边界测试用例"
+    }
+  ],
+  "resources": {
+    "maxCoins": 1000,
+    "maxHealth": 100,
+    "startCoins": 500,
+    "startHealth": 100
+  },
+  "remarks": "测试重复事件检测和保留原始备注功能"
+}

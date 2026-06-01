@@ -1,0 +1,36 @@
+{
+  "id": "test-empty-levels",
+  "name": "空关卡测试配置",
+  "levels": [
+    {
+      "id": 1,
+      "name": "正常关卡",
+      "waveCount": 3,
+      "difficulty": 2,
+      "remarks": "这是一个正常的关卡配置"
+    },
+    {
+      "id": 2,
+      "name": "",
+      "waveCount": 0,
+      "difficulty": 3,
+      "isEmpty": true,
+      "remarks": "空关卡 - 用于测试空名称和0波次的异常处理"
+    },
+    {
+      "id": 3,
+      "name": "第三关",
+      "waveCount": 5,
+      "difficulty": 5,
+      "remarks": "课堂计分表中的备注：学员张三在此关卡表现优异"
+    }
+  ],
+  "events": [],
+  "resources": {
+    "maxCoins": 1000,
+    "maxHealth": 100,
+    "startCoins": 500,
+    "startHealth": 100
+  },
+  "remarks": "测试空关卡和保留原始备注的功能"
+}
