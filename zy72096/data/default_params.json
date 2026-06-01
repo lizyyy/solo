@@ -1,0 +1,10 @@
+{
+  "说明": "音乐版权长尾收益默认参数表——仅作为运行时持久化的初始种子",
+  "M003": {
+    "decay_factor": {"value": 0.88, "manually_adjusted": true, "updated_at": "2026-05-20T14:30:00"},
+    "__exception__": {"value": true, "note": "公播渠道特殊合同，衰减系数人工调为0.88", "manually_adjusted": true, "updated_at": "2026-05-20T14:32:00"}
+  },
+  "M005": {
+    "rights_share": {"value": 0.80, "manually_adjusted": true, "updated_at": "2026-05-18T10:15:00"}
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "M003": {
+    "decay_factor": {
+      "value": 0.88,
+      "manually_adjusted": true,
+      "updated_at": "2026-05-20T14:30:00"
+    },
+    "__exception__": {
+      "value": true,
+      "note": "公播渠道特殊合同，衰减系数人工调为0.88",
+      "manually_adjusted": true,
+      "updated_at": "2026-05-20T14:32:00"
+    },
+    "platform_share": {
+      "value": 0.55,
+      "manually_adjusted": true,
+      "updated_at": "2026-06-01T23:33:07.862527"
+    },
+    "rights_share": {
+      "value": 0.75,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.035973"
+    }
+  },
+  "M005": {
+    "rights_share": {
+      "value": 0.8,
+      "manually_adjusted": true,
+      "updated_at": "2026-05-18T10:15:00"
+    },
+    "decay_factor": {
+      "value": 0.95,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.036343"
+    },
+    "platform_share": {
+      "value": 0.5,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.036435"
+    }
+  },
+  "M001": {
+    "decay_factor": {
+      "value": 0.9,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.035406"
+    },
+    "platform_share": {
+      "value": 0.6,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.035531"
+    },
+    "rights_share": {
+      "value": 0.7,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.035609"
+    }
+  },
+  "M002": {
+    "decay_factor": {
+      "value": 0.88,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.035682"
+    },
+    "platform_share": {
+      "value": 0.55,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.035755"
+    },
+    "rights_share": {
+      "value": 0.65,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.035826"
+    }
+  },
+  "M004": {
+    "decay_factor": {
+      "value": 0.85,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.036054"
+    },
+    "platform_share": {
+      "value": 0.65,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.036135"
+    },
+    "rights_share": {
+      "value": 0.7,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.036251"
+    },
+    "__exception__": {
+      "value": true,
+      "note": "下载渠道合约到期，收益按半年折算",
+      "manually_adjusted": true,
+      "updated_at": "2026-06-01T23:33:15.054647"
+    }
+  },
+  "M006": {
+    "decay_factor": {
+      "value": 0.91,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.036532"
+    },
+    "platform_share": {
+      "value": 0.58,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.036627"
+    },
+    "rights_share": {
+      "value": 0.72,
+      "manually_adjusted": false,
+      "updated_at": "2026-06-01T23:32:25.036723"
+    }
+  }
+}
