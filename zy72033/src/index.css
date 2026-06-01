@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  font-family: "Noto Sans SC", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: #0d0d1a;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+@layer base {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #1a1a2e;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #32324d;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #ff6b35;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-space-700/80 border border-space-600/50 rounded-xl p-4 backdrop-blur-sm;
+  }
+  .card-glow {
+    @apply card shadow-lg shadow-flame-500/10;
+  }
+  .btn-primary {
+    @apply bg-flame-500 hover:bg-flame-600 text-white font-medium rounded-lg px-4 py-2 transition-all duration-200 active:scale-95;
+  }
+  .btn-danger {
+    @apply border-2 border-alert-500 text-alert-500 hover:bg-alert-500 hover:text-white font-medium rounded-lg px-4 py-2 transition-all duration-200 active:scale-95;
+  }
+  .btn-secondary {
+    @apply bg-space-600 hover:bg-space-700 text-gray-300 font-medium rounded-lg px-4 py-2 transition-all duration-200 active:scale-95;
+  }
+  .btn-ok {
+    @apply bg-ok-500 hover:bg-ok-400 text-white font-medium rounded-lg px-4 py-2 transition-all duration-200 active:scale-95;
+  }
+  .input-field {
+    @apply bg-space-700 border border-space-600 rounded-lg px-3 py-2 text-gray-200 placeholder-gray-500 focus:border-flame-500 focus:outline-none transition-colors;
+  }
+  .label-text {
+    @apply text-xs text-gray-400 uppercase tracking-wider font-mono;
+  }
+  .badge-normal {
+    @apply text-xs px-2 py-0.5 rounded-full bg-ok-500/20 text-ok-400;
+  }
+  .badge-anomaly {
+    @apply text-xs px-2 py-0.5 rounded-full bg-alert-500/20 text-alert-400;
+  }
+  .badge-projection {
+    @apply text-xs px-2 py-0.5 rounded-full bg-flame-500/20 text-flame-400;
+  }
+}
