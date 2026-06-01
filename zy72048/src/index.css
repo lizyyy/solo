@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --cliff-brown: #8B6914;
+  --rope-orange: #E8712B;
+  --chalk-white: #F5F0E8;
+  --rock-dark: #2C1810;
+  --moss-green: #4A7C59;
+  --amber-warn: #D4A017;
+  --danger-red: #C0392B;
+  --card-bg: #FDF9F3;
+  --border-warm: #D9CDB8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--chalk-white);
+  color: var(--rock-dark);
+  line-height: 1.6;
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'DM Serif Display', Georgia, serif;
+}
+
+.font-display {
+  font-family: 'DM Serif Display', Georgia, serif;
+}
+
+.bg-chalk {
+  background-color: var(--chalk-white);
+}
+
+.bg-card {
+  background-color: var(--card-bg);
+}
+
+.text-cliff {
+  color: var(--cliff-brown);
+}
+
+.text-rope {
+  color: var(--rope-orange);
+}
+
+.text-moss {
+  color: var(--moss-green);
+}
+
+.text-amber {
+  color: var(--amber-warn);
+}
+
+.text-danger {
+  color: var(--danger-red);
+}
+
+.border-warm {
+  border-color: var(--border-warm);
+}
+
+.bg-cliff {
+  background-color: var(--cliff-brown);
+}
+
+.bg-rope {
+  background-color: var(--rope-orange);
+}
+
+.bg-moss {
+  background-color: var(--moss-green);
+}
+
+.grip-btn {
+  position: relative;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.2), 0 4px 8px rgba(0,0,0,0.1);
+  transform: translateY(0);
+}
+
+.grip-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 6px 12px rgba(0,0,0,0.12);
+}
+
+.grip-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.grip-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+}
+
+.chalk-texture {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D9CDB8' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 1.5s ease-in-out infinite;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.card-warm {
+  background: var(--card-bg);
+  border: 1px solid var(--border-warm);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(44, 24, 16, 0.06);
+}
+
+.card-warn {
+  border: 2px solid var(--rope-orange);
+  box-shadow: 0 0 0 1px rgba(232, 113, 43, 0.1);
+}
+
+.card-empty {
+  border: 2px dashed #C4B898;
+  background: rgba(245, 240, 232, 0.5);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-warm);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cliff-brown);
+}
