@@ -1,0 +1,10 @@
+record_id,arrival_rate,service_rate,num_servers,source,legacy_mode,notes
+REC001,5,2,4,运营部-2024年报,False,顺利记录-正常工况
+REC002,14,3,5,课堂讲义案例,False,人工确认-服务强度接近上限
+REC003,8,2.5,4,历史数据-2019版,True,旧口径记录-课堂讲义补来的旧口径
+REC004,,3,4,异常数据,False,空值测试-到达率为空
+REC005,6,-2,4,异常数据,False,越界测试-服务率为负
+REC006,5,2,4,重复数据测试,False,重复参数-与REC001相同
+REC007,0.1,0.1,1,边界测试数据,False,边界记录-最小值边界
+REC008,95,1,50,边界测试数据,False,边界记录-接近经验范围上限
+REC009,20,5,3,越界测试,False,系统不稳定-ρ>=1

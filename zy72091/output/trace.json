@@ -1,0 +1,357 @@
+{
+  "export_time": "2026-06-01T23:13:22.189569",
+  "statistics": {
+    "total_records": 9,
+    "success_count": 4,
+    "failed_count": 5,
+    "exception_count": 5,
+    "manual_review_count": 2,
+    "legacy_count": 1,
+    "exception_records": [
+      "REC004",
+      "REC005",
+      "REC007",
+      "REC008",
+      "REC009"
+    ],
+    "manual_review_records": [
+      "REC002",
+      "REC003"
+    ],
+    "legacy_records": [
+      "REC003"
+    ]
+  },
+  "records": [
+    {
+      "record_id": "REC001",
+      "input_params": {
+        "record_id": "REC001",
+        "arrival_rate": "5",
+        "service_rate": "2",
+        "num_servers": "4",
+        "source": "运营部-2024年报",
+        "legacy_mode": "False",
+        "notes": "顺利记录-正常工况"
+      },
+      "result": {
+        "success": true,
+        "error_reason": null,
+        "rho": 0.625,
+        "Lq": 0.5330945069942,
+        "L": 3.0330945069942,
+        "Wq": 0.10661890139884,
+        "W": 0.60661890139884,
+        "P_wait": 0.31985670419652,
+        "requires_manual_review": false,
+        "review_notes": null,
+        "legacy_calculation": false,
+        "source": "运营部-2024年报",
+        "calculation_method": "M/M/c排队模型"
+      },
+      "validation_issues": [
+        {
+          "issue_type": "duplicate_params",
+          "severity": "warning",
+          "message": "与其他记录参数重复: REC001, REC006",
+          "field_name": "parameters"
+        }
+      ],
+      "timestamp": "2026-06-01T23:13:22.188630",
+      "filter_applied": null
+    },
+    {
+      "record_id": "REC002",
+      "input_params": {
+        "record_id": "REC002",
+        "arrival_rate": "14",
+        "service_rate": "3",
+        "num_servers": "5",
+        "source": "课堂讲义案例",
+        "legacy_mode": "False",
+        "notes": "人工确认-服务强度接近上限"
+      },
+      "result": {
+        "success": true,
+        "error_reason": null,
+        "rho": 0.9333333333333333,
+        "Lq": 11.740099040776364,
+        "L": 16.406765707443032,
+        "Wq": 0.8385785029125975,
+        "W": 1.1719118362459309,
+        "P_wait": 0.8385785029125973,
+        "requires_manual_review": true,
+        "review_notes": "服务强度ρ=0.9333接近稳定上限0.95，需人工确认",
+        "legacy_calculation": false,
+        "source": "课堂讲义案例",
+        "calculation_method": "M/M/c排队模型"
+      },
+      "validation_issues": [],
+      "timestamp": "2026-06-01T23:13:22.188649",
+      "filter_applied": null
+    },
+    {
+      "record_id": "REC003",
+      "input_params": {
+        "record_id": "REC003",
+        "arrival_rate": "8",
+        "service_rate": "2.5",
+        "num_servers": "4",
+        "source": "历史数据-2019版",
+        "legacy_mode": "True",
+        "notes": "旧口径记录-课堂讲义补来的旧口径"
+      },
+      "result": {
+        "success": true,
+        "error_reason": null,
+        "rho": 0.8,
+        "Lq": 2.3857298871496186,
+        "L": 5.585729887149618,
+        "Wq": 0.29821623589370233,
+        "W": 0.6982162358937023,
+        "P_wait": 0.5964324717874044,
+        "requires_manual_review": true,
+        "review_notes": "旧口径计算结果，建议使用新口径复核",
+        "legacy_calculation": true,
+        "source": "历史数据-2019版",
+        "calculation_method": "M/M/c排队模型(旧口径)"
+      },
+      "validation_issues": [],
+      "timestamp": "2026-06-01T23:13:22.188666",
+      "filter_applied": null
+    },
+    {
+      "record_id": "REC004",
+      "input_params": {
+        "record_id": "REC004",
+        "arrival_rate": "",
+        "service_rate": "3",
+        "num_servers": "4",
+        "source": "异常数据",
+        "legacy_mode": "False",
+        "notes": "空值测试-到达率为空"
+      },
+      "result": {
+        "success": false,
+        "error_reason": "必填字段 [arrival_rate] 为空; 字段 [arrival_rate] 类型错误，应为数字，当前值: ",
+        "rho": null,
+        "Lq": null,
+        "L": null,
+        "Wq": null,
+        "W": null,
+        "P_wait": null,
+        "requires_manual_review": false,
+        "review_notes": null,
+        "legacy_calculation": false,
+        "source": "异常数据",
+        "calculation_method": "M/M/c排队模型"
+      },
+      "validation_issues": [
+        {
+          "issue_type": "null_value",
+          "severity": "error",
+          "message": "必填字段 [arrival_rate] 为空",
+          "field_name": "arrival_rate"
+        },
+        {
+          "issue_type": "invalid_type",
+          "severity": "error",
+          "message": "字段 [arrival_rate] 类型错误，应为数字，当前值: ",
+          "field_name": "arrival_rate"
+        }
+      ],
+      "timestamp": "2026-06-01T23:13:22.188674",
+      "filter_applied": null
+    },
+    {
+      "record_id": "REC005",
+      "input_params": {
+        "record_id": "REC005",
+        "arrival_rate": "6",
+        "service_rate": "-2",
+        "num_servers": "4",
+        "source": "异常数据",
+        "legacy_mode": "False",
+        "notes": "越界测试-服务率为负"
+      },
+      "result": {
+        "success": false,
+        "error_reason": "service_rate 必须为正数，当前值: -2",
+        "rho": null,
+        "Lq": null,
+        "L": null,
+        "Wq": null,
+        "W": null,
+        "P_wait": null,
+        "requires_manual_review": false,
+        "review_notes": null,
+        "legacy_calculation": false,
+        "source": "异常数据",
+        "calculation_method": "M/M/c排队模型"
+      },
+      "validation_issues": [
+        {
+          "issue_type": "invalid_value",
+          "severity": "error",
+          "message": "service_rate 必须为正数，当前值: -2",
+          "field_name": "service_rate"
+        }
+      ],
+      "timestamp": "2026-06-01T23:13:22.188678",
+      "filter_applied": null
+    },
+    {
+      "record_id": "REC006",
+      "input_params": {
+        "record_id": "REC006",
+        "arrival_rate": "5",
+        "service_rate": "2",
+        "num_servers": "4",
+        "source": "重复数据测试",
+        "legacy_mode": "False",
+        "notes": "重复参数-与REC001相同"
+      },
+      "result": {
+        "success": true,
+        "error_reason": null,
+        "rho": 0.625,
+        "Lq": 0.5330945069942,
+        "L": 3.0330945069942,
+        "Wq": 0.10661890139884,
+        "W": 0.60661890139884,
+        "P_wait": 0.31985670419652,
+        "requires_manual_review": false,
+        "review_notes": null,
+        "legacy_calculation": false,
+        "source": "重复数据测试",
+        "calculation_method": "M/M/c排队模型"
+      },
+      "validation_issues": [
+        {
+          "issue_type": "duplicate_params",
+          "severity": "warning",
+          "message": "与其他记录参数重复: REC001, REC006",
+          "field_name": "parameters"
+        }
+      ],
+      "timestamp": "2026-06-01T23:13:22.188687",
+      "filter_applied": null
+    },
+    {
+      "record_id": "REC007",
+      "input_params": {
+        "record_id": "REC007",
+        "arrival_rate": "0.1",
+        "service_rate": "0.1",
+        "num_servers": "1",
+        "source": "边界测试数据",
+        "legacy_mode": "False",
+        "notes": "边界记录-最小值边界"
+      },
+      "result": {
+        "success": false,
+        "error_reason": "系统不稳定: ρ=1.0000 ≥ 1，队列将无限增长",
+        "rho": 1.0,
+        "Lq": null,
+        "L": null,
+        "Wq": null,
+        "W": null,
+        "P_wait": null,
+        "requires_manual_review": false,
+        "review_notes": null,
+        "legacy_calculation": false,
+        "source": "边界测试数据",
+        "calculation_method": "M/M/c排队模型"
+      },
+      "validation_issues": [
+        {
+          "issue_type": "boundary_value",
+          "severity": "warning",
+          "message": "字段 [arrival_rate] 值为 0.1，接近边界 [0.1, 100.0]",
+          "field_name": "arrival_rate"
+        },
+        {
+          "issue_type": "boundary_value",
+          "severity": "warning",
+          "message": "字段 [service_rate] 值为 0.1，接近边界 [0.1, 50.0]",
+          "field_name": "service_rate"
+        },
+        {
+          "issue_type": "boundary_value",
+          "severity": "warning",
+          "message": "字段 [num_servers] 值为 1，接近边界 [1, 50]",
+          "field_name": "num_servers"
+        }
+      ],
+      "timestamp": "2026-06-01T23:13:22.188693",
+      "filter_applied": null
+    },
+    {
+      "record_id": "REC008",
+      "input_params": {
+        "record_id": "REC008",
+        "arrival_rate": "95",
+        "service_rate": "1",
+        "num_servers": "50",
+        "source": "边界测试数据",
+        "legacy_mode": "False",
+        "notes": "边界记录-接近经验范围上限"
+      },
+      "result": {
+        "success": false,
+        "error_reason": "系统不稳定: ρ=1.9000 ≥ 1，队列将无限增长",
+        "rho": 1.9,
+        "Lq": null,
+        "L": null,
+        "Wq": null,
+        "W": null,
+        "P_wait": null,
+        "requires_manual_review": false,
+        "review_notes": null,
+        "legacy_calculation": false,
+        "source": "边界测试数据",
+        "calculation_method": "M/M/c排队模型"
+      },
+      "validation_issues": [
+        {
+          "issue_type": "boundary_value",
+          "severity": "warning",
+          "message": "字段 [num_servers] 值为 50，接近边界 [1, 50]",
+          "field_name": "num_servers"
+        }
+      ],
+      "timestamp": "2026-06-01T23:13:22.188697",
+      "filter_applied": null
+    },
+    {
+      "record_id": "REC009",
+      "input_params": {
+        "record_id": "REC009",
+        "arrival_rate": "20",
+        "service_rate": "5",
+        "num_servers": "3",
+        "source": "越界测试",
+        "legacy_mode": "False",
+        "notes": "系统不稳定-ρ>=1"
+      },
+      "result": {
+        "success": false,
+        "error_reason": "系统不稳定: ρ=1.3333 ≥ 1，队列将无限增长",
+        "rho": 1.3333333333333333,
+        "Lq": null,
+        "L": null,
+        "Wq": null,
+        "W": null,
+        "P_wait": null,
+        "requires_manual_review": false,
+        "review_notes": null,
+        "legacy_calculation": false,
+        "source": "越界测试",
+        "calculation_method": "M/M/c排队模型"
+      },
+      "validation_issues": [],
+      "timestamp": "2026-06-01T23:13:22.188701",
+      "filter_applied": null
+    }
+  ]
+}
