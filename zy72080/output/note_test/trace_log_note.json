@@ -1,0 +1,39 @@
+[
+  {
+    "timestamp": "2026-06-01T22:55:30",
+    "action": "fit",
+    "source": "parameter_table_row1@2026-05-20T10:00:00,parameter_table_row2@2026-05-20T10:00:00,parameter_table_row3@2026-05-20T10:00:00",
+    "detail": "拟合完成: f1=293.1174Hz, B=0.00127988, 泛音数=6, 告警=2",
+    "operator": "",
+    "extra": {
+      "result_id": "fit_violin_s1_6h"
+    }
+  },
+  {
+    "timestamp": "2026-06-01T22:55:30",
+    "action": "fit",
+    "source": "parameter_table_row1@2026-05-20T10:00:00,parameter_table_row2@2026-05-20T10:00:00,parameter_table_row3@2026-05-20T10:00:00",
+    "detail": "拟合完成: f1=293.1174Hz, B=0.00127988, 泛音数=6, 告警=2",
+    "operator": "",
+    "extra": {
+      "result_id": "fit_violin_s1_6h"
+    }
+  },
+  {
+    "timestamp": "2026-06-01T22:55:30",
+    "action": "add_note",
+    "source": "manual_note_by_老叶",
+    "detail": "补录备注: 第4泛音换弦后需降权",
+    "operator": "老叶",
+    "extra": {
+      "note_id": "note_003"
+    }
+  },
+  {
+    "timestamp": "2026-06-01T22:55:30",
+    "action": "note_export",
+    "source": "cli_note",
+    "detail": "补录备注 note_003，差异已导出",
+    "operator": ""
+  }
+]

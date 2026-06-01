@@ -1,0 +1,4 @@
+sample_id,instrument,string_index,harmonic_number,observed_freq,expected_low,expected_high,deviation_pct,unit,source,timestamp
+chk_violin_s1_n6,violin,1,6,1802.4,1176.0,1800.0,0.13333333333333838,Hz,parameter_table_row6,2026-05-20T10:00:00
+chk_violin_s2_n5,violin,2,5,2251.2,1465.0,2250.0,0.053333333333325246,Hz,parameter_table_row11,2026-05-20T10:00:00
+chk_violin_s2_n6,violin,2,6,2735.8,1758.0,2700.0,1.3259259259259326,Hz,parameter_table_row12,2026-05-20T10:00:00
