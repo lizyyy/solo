@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: dark;
+}
+
+html {
+  @apply bg-surface text-gray-200;
+}
+
+body {
+  @apply bg-surface min-h-screen;
+}
+
+@layer components {
+  .badge-smooth {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-neon/15 text-neon border border-neon/30;
+  }
+  .badge-needs_confirmation {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-danger/15 text-danger border border-danger/30;
+  }
+  .badge-old_standard {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning/15 text-warning border border-warning/30;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 rounded-lg bg-neon text-surface font-medium
+           hover:bg-neon-dim hover:shadow-neon
+           transition-all duration-200 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 rounded-lg bg-surface-elevated text-gray-300 border border-surface-border
+           hover:bg-surface-border hover:text-white
+           transition-all duration-200 active:scale-95;
+  }
+
+  .card {
+    @apply bg-surface-card border border-surface-border rounded-xl p-4;
+  }
+
+  .input-field {
+    @apply bg-surface-elevated border border-surface-border rounded-lg px-3 py-2
+           text-gray-200 placeholder-muted
+           focus:outline-none focus:border-neon focus:shadow-neon-sm
+           transition-all duration-200;
+  }
+}
