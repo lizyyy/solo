@@ -1,0 +1,295 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-06-01",
+    "author": "培训讲师老冯"
+  },
+  "resourceConfig": {
+    "waterLevel": { "min": 0, "max": 200, "unit": "m", "initial": 150, "warning": 185, "flood": 195 },
+    "storage": { "min": 0, "max": 5000, "unit": "万m³", "initial": 3000, "warning": 4200, "flood": 4800 },
+    "discharge": { "min": 0, "max": 500, "unit": "m³/s", "initial": 50 },
+    "score": { "min": 0, "max": 100, "initial": 100 }
+  },
+  "levels": [
+    {
+      "id": "level_001",
+      "name": "汛期第一轮洪峰",
+      "description": "正常流程：连续降雨导致水位上涨，需要逐步加大下泄流量",
+      "difficulty": "normal",
+      "events": [
+        {
+          "id": "evt_001",
+          "timePoint": 0,
+          "title": "气象预警",
+          "description": "预报未来24小时有中到大雨，累计降雨量80mm",
+          "inflowChange": 20,
+          "decisions": [
+            {
+              "id": "dec_001_a",
+              "label": "加大下泄至100m³/s",
+              "effects": { "discharge": 50, "score": 0 },
+              "explanation": "提前预泄，预留防洪库容"
+            },
+            {
+              "id": "dec_001_b",
+              "label": "维持50m³/s，观察雨情",
+              "effects": { "storage": 200, "score": -5 },
+              "explanation": "未及时预泄，库容占用过多"
+            },
+            {
+              "id": "dec_001_c",
+              "label": "直接开闸至200m³/s",
+              "effects": { "discharge": 150, "score": -10 },
+              "explanation": "下泄过猛，造成下游不必要恐慌"
+            }
+          ]
+        },
+        {
+          "id": "evt_002",
+          "timePoint": 1,
+          "title": "洪峰入境",
+          "description": "上游洪峰到达，入库流量达300m³/s，水位上涨至170m",
+          "inflowChange": 150,
+          "decisions": [
+            {
+              "id": "dec_002_a",
+              "label": "加大下泄至250m³/s",
+              "effects": { "discharge": 150, "score": -5 },
+              "explanation": "下泄不足，水位继续上涨"
+            },
+            {
+              "id": "dec_002_b",
+              "label": "加大下泄至350m³/s",
+              "effects": { "discharge": 250, "score": 0 },
+              "explanation": "削峰错峰，控制水位在安全范围"
+            },
+            {
+              "id": "dec_002_c",
+              "label": "开闸至450m³/s",
+              "effects": { "discharge": 350, "score": -15 },
+              "explanation": "下泄过大，超过下游河道安全标准"
+            }
+          ]
+        },
+        {
+          "id": "evt_003",
+          "timePoint": 2,
+          "title": "洪峰过境",
+          "description": "洪峰开始回落，入库流量降至200m³/s",
+          "inflowChange": -100,
+          "decisions": [
+            {
+              "id": "dec_003_a",
+              "label": "逐步减小下泄至200m³/s",
+              "effects": { "discharge": -150, "score": 0 },
+              "explanation": "平稳回落，避免下游水位骤降"
+            },
+            {
+              "id": "dec_003_b",
+              "label": "立即关闭至50m³/s",
+              "effects": { "storage": 300, "score": -8 },
+              "explanation": "拦蓄过多，水位居高不下"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "level_002",
+      "name": "",
+      "description": "空关卡测试 - 没有事件内容",
+      "difficulty": "test",
+      "events": []
+    },
+    {
+      "id": "level_003",
+      "name": "重复事件测试关",
+      "description": "包含重复事件ID，测试系统鲁棒性",
+      "difficulty": "test",
+      "events": [
+        {
+          "id": "evt_dup_001",
+          "timePoint": 0,
+          "title": "第一次出现",
+          "description": "这是事件第一次出现",
+          "inflowChange": 50,
+          "decisions": [
+            {
+              "id": "dec_dup_001_a",
+              "label": "正常处理",
+              "effects": { "score": 0 },
+              "explanation": "正常处理"
+            }
+          ]
+        },
+        {
+          "id": "evt_dup_001",
+          "timePoint": 1,
+          "title": "重复ID事件",
+          "description": "这个事件ID与上一个重复",
+          "inflowChange": 30,
+          "decisions": [
+            {
+              "id": "dec_dup_001_a",
+              "label": "继续处理",
+              "effects": { "score": -5 },
+              "explanation": "检测到重复事件ID"
+            }
+          ]
+        },
+        {
+          "id": "evt_dup_002",
+          "timePoint": 2,
+          "title": "正常事件",
+          "description": "后面的正常事件",
+          "inflowChange": 0,
+          "decisions": [
+            {
+              "id": "dec_dup_002_a",
+              "label": "确认",
+              "effects": { "score": 0 },
+              "explanation": "流程继续"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "level_004",
+      "name": "边界值压力测试",
+      "description": "包含超出边界的资源值，测试校验逻辑",
+      "difficulty": "test",
+      "events": [
+        {
+          "id": "evt_bound_001",
+          "timePoint": 0,
+          "title": "超量降雨",
+          "description": "入库流量激增，测试资源溢出保护",
+          "inflowChange": 9999,
+          "decisions": [
+            {
+              "id": "dec_bound_001_a",
+              "label": "开闸到最大",
+              "effects": { "discharge": 600, "score": -20 },
+              "explanation": "下泄流量超过最大值500，已触发边界保护"
+            },
+            {
+              "id": "dec_bound_001_b",
+              "label": "尝试负下泄",
+              "effects": { "discharge": -100, "score": -30 },
+              "explanation": "下泄流量不能为负，已触发边界保护"
+            }
+          ]
+        },
+        {
+          "id": "evt_bound_002",
+          "timePoint": 1,
+          "title": "资源负值测试",
+          "description": "测试资源变为负数时的处理",
+          "inflowChange": -9999,
+          "decisions": [
+            {
+              "id": "dec_bound_002_a",
+              "label": "确认负值",
+              "effects": { "storage": -1000, "score": 0 },
+              "explanation": "库容不能为负，系统将标记异常待人工确认"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "level_005",
+      "name": "多阶段综合调度",
+      "description": "模拟真实汛期多轮洪峰，测试完整调度能力",
+      "difficulty": "hard",
+      "events": [
+        {
+          "id": "evt_real_001",
+          "timePoint": 0,
+          "title": "第一轮降雨",
+          "description": "梅雨季节首轮降雨，入库流量增加100m³/s",
+          "inflowChange": 100,
+          "decisions": [
+            {
+              "id": "dec_real_001_a",
+              "label": "预泄至150m³/s",
+              "effects": { "discharge": 100, "score": 0 },
+              "explanation": "正确预判，预留库容"
+            },
+            {
+              "id": "dec_real_001_b",
+              "label": "维持80m³/s",
+              "effects": { "storage": 400, "waterLevel": 10, "score": -10 },
+              "explanation": "未及时预泄，水位快速上涨"
+            }
+          ]
+        },
+        {
+          "id": "evt_real_002",
+          "timePoint": 1,
+          "title": "第二轮强降雨",
+          "description": "遭遇50年一遇强降雨，入库流量达400m³/s",
+          "inflowChange": 250,
+          "decisions": [
+            {
+              "id": "dec_real_002_a",
+              "label": "下泄400m³/s，全力泄洪",
+              "effects": { "discharge": 250, "score": -5 },
+              "explanation": "与上游来水平衡，但下游承压"
+            },
+            {
+              "id": "dec_real_002_b",
+              "label": "控泄300m³/s，削峰错峰",
+              "effects": { "storage": 500, "waterLevel": 15, "score": 5 },
+              "explanation": "科学错峰，兼顾上下游"
+            }
+          ]
+        },
+        {
+          "id": "evt_real_003",
+          "timePoint": 2,
+          "title": "下游告急",
+          "description": "下游河道出现险情，要求控制下泄不超过250m³/s",
+          "inflowChange": 0,
+          "decisions": [
+            {
+              "id": "dec_real_003_a",
+              "label": "服从调度，压减至250",
+              "effects": { "storage": 800, "waterLevel": 20, "score": -15 },
+              "explanation": "水库水位逼近警戒线，需权衡"
+            },
+            {
+              "id": "dec_real_003_b",
+              "label": "启动应急预案，分洪",
+              "effects": { "discharge": -50, "score": -25 },
+              "explanation": "启用分洪区，牺牲局部保全局"
+            }
+          ]
+        },
+        {
+          "id": "evt_real_004",
+          "timePoint": 3,
+          "title": "洪峰过境",
+          "description": "降雨减弱，入库流量降至150m³/s",
+          "inflowChange": -250,
+          "decisions": [
+            {
+              "id": "dec_real_004_a",
+              "label": "有序回落至150m³/s",
+              "effects": { "discharge": -100, "storage": -200, "score": 10 },
+              "explanation": "平稳消落，恢复正常水位"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "level_006",
+      "name": "空配置测试",
+      "description": "",
+      "difficulty": "test",
+      "events": null
+    }
+  ]
+}
