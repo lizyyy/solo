@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  body {
+    @apply bg-primary-50 text-industrial-800 antialiased;
+    background-image: linear-gradient(rgba(15, 43, 74, 0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(15, 43, 74, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-mono font-semibold text-primary-700;
+  }
+}
+
+@layer components {
+  .industrial-card {
+    @apply bg-white border border-primary-200 shadow-sm;
+  }
+
+  .industrial-card-header {
+    @apply bg-primary-50 border-b border-primary-200 px-4 py-3 font-mono text-sm font-semibold text-primary-700;
+  }
+
+  .industrial-btn {
+    @apply px-4 py-2 font-mono text-sm font-medium bg-primary-100 text-primary-700 border border-primary-300 
+           hover:bg-primary-200 active:bg-primary-300 transition-colors shadow-industrial
+           hover:shadow-industrial-hover active:shadow-industrial-active;
+  }
+
+  .industrial-btn-primary {
+    @apply px-4 py-2 font-mono text-sm font-medium bg-primary-600 text-white border border-primary-700
+           hover:bg-primary-700 active:bg-primary-800 transition-colors shadow-industrial
+           hover:shadow-industrial-hover active:shadow-industrial-active;
+  }
+
+  .industrial-btn-danger {
+    @apply px-4 py-2 font-mono text-sm font-medium bg-alert-500 text-white border border-alert-600
+           hover:bg-alert-600 active:bg-alert-700 transition-colors shadow-industrial
+           hover:shadow-industrial-hover active:shadow-industrial-active;
+  }
+
+  .industrial-btn-success {
+    @apply px-4 py-2 font-mono text-sm font-medium bg-success-500 text-white border border-success-600
+           hover:bg-success-600 active:bg-success-700 transition-colors shadow-industrial
+           hover:shadow-industrial-hover active:shadow-industrial-active;
+  }
+
+  .industrial-btn-warning {
+    @apply px-4 py-2 font-mono text-sm font-medium bg-warning-500 text-white border border-warning-600
+           hover:bg-warning-600 active:bg-warning-700 transition-colors shadow-industrial
+           hover:shadow-industrial-hover active:shadow-industrial-active;
+  }
+
+  .industrial-input {
+    @apply px-3 py-2 font-mono text-sm bg-white border border-primary-300 focus:border-primary-500
+           focus:ring-1 focus:ring-primary-500 outline-none transition-colors;
+  }
+
+  .industrial-select {
+    @apply px-3 py-2 font-mono text-sm bg-white border border-primary-300 focus:border-primary-500
+           focus:ring-1 focus:ring-primary-500 outline-none transition-colors cursor-pointer;
+  }
+
+  .industrial-table {
+    @apply w-full border-collapse font-mono text-sm;
+  }
+
+  .industrial-table th {
+    @apply bg-primary-100 border border-primary-300 px-3 py-2 text-left font-semibold text-primary-700;
+  }
+
+  .industrial-table td {
+    @apply border border-primary-200 px-3 py-2 text-industrial-700;
+  }
+
+  .industrial-table tr:hover td {
+    @apply bg-primary-50;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2 py-1 font-mono text-xs font-medium rounded-none border;
+  }
+
+  .status-badge-normal {
+    @apply bg-success-50 text-success-700 border-success-300;
+  }
+
+  .status-badge-pending {
+    @apply bg-warning-50 text-warning-700 border-warning-300;
+  }
+
+  .status-badge-old {
+    @apply bg-industrial-100 text-industrial-700 border-industrial-300;
+  }
+
+  .status-badge-extreme {
+    @apply bg-alert-50 text-alert-700 border-alert-300;
+  }
+
+  .status-badge-conflict {
+    @apply bg-alert-100 text-alert-700 border-alert-400;
+  }
+
+  .data-source-link {
+    @apply text-primary-600 hover:text-primary-800 underline cursor-pointer font-mono text-xs;
+  }
+
+  .formula-box {
+    @apply bg-industrial-50 border border-industrial-300 p-3 font-mono text-sm text-industrial-800;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #9BB2CC #E8EEF4;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #E8EEF4;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #9BB2CC;
+    border: 1px solid #E8EEF4;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #6D8FB5;
+  }
+}
