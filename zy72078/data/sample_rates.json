@@ -1,0 +1,15 @@
+[
+  {"from": "USD", "to": "CNY", "rate": 7.25, "unit": 1, "src_file": "老师讲义-2024Q3", "备注": "基础汇率"},
+  {"from": "CNY", "to": "EUR", "rate": 0.127, "unit": 1, "src_file": "老师讲义-2024Q3", "备注": "间接报价待确认"},
+  {"from": "EUR", "to": "GBP", "rate": 0.856, "unit": 1, "src_file": "业务表-外汇组", "备注": ""},
+  {"from": "GBP", "to": "JPY", "rate": 188.5, "unit": 1, "src_file": "业务表-外汇组", "备注": "日元面额大注意单位"},
+  {"from": "JPY", "to": "USD", "rate": 0.0067, "unit": 1, "src_file": "业务表-外汇组", "备注": ""},
+  {"from": "USD", "to": "EUR", "rate": 0.921, "unit": 1, "src_file": "临时截图-手机拍", "备注": "屏幕反光可能看错"},
+  {"from": "EUR", "to": "JPY", "rate": 162.5, "unit": 1, "src_file": "业务表-外汇组", "备注": ""},
+  {"from": "JPY", "to": "EUR", "rate": 0.0062, "unit": 1, "src_file": "老师讲义-2024Q3", "备注": "值偏小但先保留"},
+  {"from": "AUD", "to": "USD", "rate": 0.65, "unit": 1, "src_file": "老师讲义-2024Q3", "备注": "澳币"},
+  {"from": "USD", "to": "AUD", "rate": 1.538, "unit": 1, "src_file": "老师讲义-2024Q3", "备注": ""},
+  {"from": "AUD", "to": "CNY", "rate": 4.71, "unit": 1, "src_file": "业务表-外汇组", "备注": ""},
+  {"from": "CNY", "to": "AUD", "rate": 0.2123, "unit": 1, "src_file": "业务表-外汇组", "备注": "小数点后四位精算"},
+  {"from": "GBP", "to": "AUD", "rate": 1.935, "unit": 100, "src_file": "老师讲义-2024Q3", "备注": "这个单位是100！别当1用"}
+]
