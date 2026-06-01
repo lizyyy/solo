@@ -1,0 +1,178 @@
+{
+  "exportedAt": "2026-06-01T23:20:20.219Z",
+  "summary": {
+    "总记录数": 6,
+    "处理时间": "2026-06-01T23:20:20.219Z",
+    "失败": 2,
+    "通过": 1,
+    "需人工确认": 1,
+    "旧口径": 2
+  },
+  "records": [
+    {
+      "trackId": "",
+      "title": "",
+      "artist": "",
+      "fileName": "corrupted_file.mp3",
+      "status": "失败",
+      "loudness": null,
+      "metadata": null,
+      "reviewReasons": [
+        "文件过小 (1字节)，可能损坏"
+      ],
+      "notes": [],
+      "source": "文件验证",
+      "processedAt": "2026-06-01T23:20:20.215Z",
+      "isInvalid": true
+    },
+    {
+      "trackId": "",
+      "title": "",
+      "artist": "",
+      "fileName": "empty_file.wav",
+      "status": "失败",
+      "loudness": null,
+      "metadata": null,
+      "reviewReasons": [
+        "文件为空 (0字节)"
+      ],
+      "notes": [],
+      "source": "文件验证",
+      "processedAt": "2026-06-01T23:20:20.215Z",
+      "isInvalid": true
+    },
+    {
+      "trackId": "A001",
+      "title": "品牌开场口播",
+      "artist": "李老师",
+      "fileName": "ad_opening_normal.mp3",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy72129/data/audio/ad_opening_normal.mp3",
+      "status": "通过",
+      "loudness": {
+        "inputLUFS": -16,
+        "inputLRA": 5,
+        "inputPeak": -1.5,
+        "inputThresh": -26
+      },
+      "metadata": {
+        "format": "mp3",
+        "duration": 67.95862175014315,
+        "size": 18,
+        "bitRate": 128000,
+        "sampleRate": 44100,
+        "channels": 2
+      },
+      "reviewReasons": [],
+      "notes": [
+        {
+          "note": "客户确认版本，语速正常",
+          "source": "sample_tracklist.csv"
+        }
+      ],
+      "source": "sample_tracklist.csv",
+      "processedAt": "2026-06-01T23:20:20.215Z"
+    },
+    {
+      "trackId": "A002",
+      "title": "产品介绍口播",
+      "artist": "王老师",
+      "fileName": "ad_product_loud.mp3",
+      "filePath": "/Users/lzy/pro/solo/workspaces/zy72129/data/audio/ad_product_loud.mp3",
+      "status": "需人工确认",
+      "loudness": {
+        "inputLUFS": -10,
+        "inputLRA": 8,
+        "inputPeak": -0.5,
+        "inputThresh": -20
+      },
+      "metadata": {
+        "format": "mp3",
+        "duration": 42.91057494278806,
+        "size": 10,
+        "bitRate": 128000,
+        "sampleRate": 44100,
+        "channels": 2
+      },
+      "reviewReasons": [
+        "响度偏差 6.0 LUFS，目标 -16 LUFS",
+        "音量过高 (-10.0 LUFS)，高于最高阈值 -12 LUFS",
+        "峰值 -0.50 dB 超过限制 -1 dB"
+      ],
+      "notes": [
+        {
+          "note": "音量可能偏高，需确认",
+          "source": "sample_tracklist.csv"
+        },
+        {
+          "trackId": "A002",
+          "note": "群里王老师说这个版本是专门给老年听众录的，音量稍大是故意的",
+          "author": "演出统筹阿蓝",
+          "createdAt": "2024-12-15T10:30:00Z",
+          "source": "微信群聊"
+        }
+      ],
+      "source": "sample_tracklist.csv",
+      "processedAt": "2026-06-01T23:20:20.215Z"
+    },
+    {
+      "trackId": "L001",
+      "title": "品牌主题曲-2024版",
+      "artist": "音乐组",
+      "fileName": "theme_2024_legacy.mp3",
+      "status": "旧口径",
+      "loudness": {
+        "inputLUFS": -18,
+        "inputLRA": 6,
+        "inputPeak": -2,
+        "inputThresh": -28
+      },
+      "reviewReasons": [
+        "从舞台通道表导入",
+        "2024年10月批次，当时执行旧标准-18LUFS",
+        "演出统筹阿蓝确认通过现场验收"
+      ],
+      "notes": [
+        {
+          "note": "已通过现场验收，旧口径无需返工",
+          "source": "舞台通道表_阿蓝_2024-10-15"
+        }
+      ],
+      "source": "舞台通道表",
+      "metadata": {
+        "duration": 180,
+        "format": "mp3"
+      },
+      "processedAt": "2026-06-01T23:20:20.215Z"
+    },
+    {
+      "trackId": "L002",
+      "title": "活动开场-彩排版",
+      "artist": "李老师",
+      "fileName": "opening_rehearsal_v2.mp3",
+      "status": "旧口径",
+      "loudness": {
+        "inputLUFS": -19,
+        "inputLRA": 4,
+        "inputPeak": -2.5,
+        "inputThresh": -30
+      },
+      "reviewReasons": [
+        "从舞台通道表导入",
+        "彩排专用版本，音量特意调低",
+        "已存档，不用于正式播出"
+      ],
+      "notes": [
+        {
+          "note": "彩排使用，音量较低是故意的",
+          "source": "舞台通道表_阿蓝_2024-11-02"
+        }
+      ],
+      "source": "舞台通道表",
+      "metadata": {
+        "duration": 45,
+        "format": "mp3"
+      },
+      "processedAt": "2026-06-01T23:20:20.215Z"
+    }
+  ]
+}

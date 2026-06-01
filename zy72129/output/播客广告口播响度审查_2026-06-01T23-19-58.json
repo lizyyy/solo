@@ -1,0 +1,135 @@
+{
+  "exportedAt": "2026-06-01T23:19:58.734Z",
+  "summary": {
+    "总记录数": 6,
+    "处理时间": "2026-06-01T23:19:58.734Z",
+    "失败": 4,
+    "旧口径": 2
+  },
+  "records": [
+    {
+      "trackId": "",
+      "title": "",
+      "artist": "",
+      "fileName": "ad_opening_normal.mp3",
+      "status": "失败",
+      "loudness": null,
+      "metadata": null,
+      "reviewReasons": [
+        "文件过小 (18字节)，可能损坏"
+      ],
+      "notes": [],
+      "source": "文件验证",
+      "processedAt": "2026-06-01T23:19:58.730Z",
+      "isInvalid": true
+    },
+    {
+      "trackId": "",
+      "title": "",
+      "artist": "",
+      "fileName": "ad_product_loud.mp3",
+      "status": "失败",
+      "loudness": null,
+      "metadata": null,
+      "reviewReasons": [
+        "文件过小 (10字节)，可能损坏"
+      ],
+      "notes": [],
+      "source": "文件验证",
+      "processedAt": "2026-06-01T23:19:58.730Z",
+      "isInvalid": true
+    },
+    {
+      "trackId": "",
+      "title": "",
+      "artist": "",
+      "fileName": "corrupted_file.mp3",
+      "status": "失败",
+      "loudness": null,
+      "metadata": null,
+      "reviewReasons": [
+        "文件过小 (1字节)，可能损坏"
+      ],
+      "notes": [],
+      "source": "文件验证",
+      "processedAt": "2026-06-01T23:19:58.730Z",
+      "isInvalid": true
+    },
+    {
+      "trackId": "",
+      "title": "",
+      "artist": "",
+      "fileName": "empty_file.wav",
+      "status": "失败",
+      "loudness": null,
+      "metadata": null,
+      "reviewReasons": [
+        "文件为空 (0字节)"
+      ],
+      "notes": [],
+      "source": "文件验证",
+      "processedAt": "2026-06-01T23:19:58.730Z",
+      "isInvalid": true
+    },
+    {
+      "trackId": "L001",
+      "title": "品牌主题曲-2024版",
+      "artist": "音乐组",
+      "fileName": "theme_2024_legacy.mp3",
+      "status": "旧口径",
+      "loudness": {
+        "inputLUFS": -18,
+        "inputLRA": 6,
+        "inputPeak": -2,
+        "inputThresh": -28
+      },
+      "reviewReasons": [
+        "从舞台通道表导入",
+        "2024年10月批次，当时执行旧标准-18LUFS",
+        "演出统筹阿蓝确认通过现场验收"
+      ],
+      "notes": [
+        {
+          "note": "已通过现场验收，旧口径无需返工",
+          "source": "舞台通道表_阿蓝_2024-10-15"
+        }
+      ],
+      "source": "舞台通道表",
+      "metadata": {
+        "duration": 180,
+        "format": "mp3"
+      },
+      "processedAt": "2026-06-01T23:19:58.731Z"
+    },
+    {
+      "trackId": "L002",
+      "title": "活动开场-彩排版",
+      "artist": "李老师",
+      "fileName": "opening_rehearsal_v2.mp3",
+      "status": "旧口径",
+      "loudness": {
+        "inputLUFS": -19,
+        "inputLRA": 4,
+        "inputPeak": -2.5,
+        "inputThresh": -30
+      },
+      "reviewReasons": [
+        "从舞台通道表导入",
+        "彩排专用版本，音量特意调低",
+        "已存档，不用于正式播出"
+      ],
+      "notes": [
+        {
+          "note": "彩排使用，音量较低是故意的",
+          "source": "舞台通道表_阿蓝_2024-11-02"
+        }
+      ],
+      "source": "舞台通道表",
+      "metadata": {
+        "duration": 45,
+        "format": "mp3"
+      },
+      "processedAt": "2026-06-01T23:19:58.731Z"
+    }
+  ]
+}

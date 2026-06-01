@@ -1,0 +1,21 @@
+{
+  "name": "podcast-loudness-review",
+  "version": "1.0.0",
+  "description": "播客广告口播响度审查系统",
+  "main": "src/index.js",
+  "scripts": {
+    "scan": "node src/cli.js scan",
+    "export": "node src/cli.js export",
+    "review": "node src/cli.js review"
+  },
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "ffprobe-static": "^3.1.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "lodash": "^4.17.21",
+    "xlsx": "^0.18.5",
+    "yargs": "^17.7.2"
+  },
+  "keywords": ["podcast", "loudness", "audio", "review"]
+}
