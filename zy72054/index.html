@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI特征空间观测台</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <h1>AI特征空间观测台</h1>
+                <span class="version">v1.0</span>
+            </div>
+            <div class="header-right">
+                <button id="savePlanBtn" class="btn btn-primary">保存方案</button>
+                <button id="exportBtn" class="btn btn-success">导出截图</button>
+                <button id="loadPlanBtn" class="btn btn-secondary">加载方案</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="panel">
+                    <h3>图层控制</h3>
+                    <div class="layer-controls">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="layerGIS" checked> GIS底图
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="layerDevices" checked> 设备点位
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="layerAnomalies" checked> 异常高亮
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="layer3D" checked> 3D楼层
+                        </label>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>筛选条件</h3>
+                    <div class="filter-controls">
+                        <div class="filter-item">
+                            <label>楼层</label>
+                            <select id="floorFilter">
+                                <option value="all">全部楼层</option>
+                                <option value="1">1层</option>
+                                <option value="2">2层</option>
+                                <option value="3">3层</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>设备类型</label>
+                            <select id="deviceTypeFilter">
+                                <option value="all">全部类型</option>
+                                <option value="camera">摄像头</option>
+                                <option value="sensor">传感器</option>
+                                <option value="gateway">网关</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>异常等级</label>
+                            <select id="anomalyLevelFilter">
+                                <option value="all">全部等级</option>
+                                <option value="critical">严重</option>
+                                <option value="warning">警告</option>
+                                <option value="info">提示</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>数据冲突检测</h3>
+                    <div id="conflictList" class="conflict-list">
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>备注补录</h3>
+                    <div class="note-controls">
+                        <textarea id="noteInput" placeholder="输入备注内容..."></textarea>
+                        <button id="addNoteBtn" class="btn btn-primary">添加备注</button>
+                    </div>
+                    <div id="noteList" class="note-list">
+                    </div>
+                </div>
+            </aside>
+
+            <main class="content-area">
+                <div class="view-controls">
+                    <button id="view2D" class="btn btn-toggle active">2D视图</button>
+                    <button id="view3D" class="btn btn-toggle">3D视图</button>
+                    <div class="view-info">
+                        <span id="currentFloor">当前楼层: 全部</span>
+                        <span id="deviceCount">设备: 0</span>
+                        <span id="anomalyCount">异常: 0</span>
+                    </div>
+                </div>
+
+                <div id="mapContainer" class="map-container">
+                    <canvas id="mapCanvas"></canvas>
+                    <div id="tooltip" class="tooltip hidden"></div>
+                    <div id="exportWatermark" class="export-watermark hidden"></div>
+                </div>
+
+                <div class="info-panel">
+                    <div class="info-section">
+                        <h4>选中设备</h4>
+                        <div id="selectedDeviceInfo" class="device-info">
+                            <p class="empty-text">点击地图上的设备查看详情</p>
+                        </div>
+                    </div>
+                    <div class="info-section">
+                        <h4>异常列表</h4>
+                        <div id="anomalyList" class="anomaly-list">
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div id="conflictModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>数据冲突检测</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="conflict-detail">
+                        <div class="conflict-source gis-source">
+                            <h4>GIS底图数据</h4>
+                            <div id="gisDataDisplay"></div>
+                        </div>
+                        <div class="conflict-vs">VS</div>
+                        <div class="conflict-source import-source">
+                            <h4>导入数据</h4>
+                            <div id="importDataDisplay"></div>
+                        </div>
+                    </div>
+                    <div class="conflict-suggestions">
+                        <h4>建议操作</h4>
+                        <ul id="suggestionList"></ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="keepGISBtn" class="btn btn-secondary">保留GIS数据</button>
+                    <button id="keepImportBtn" class="btn btn-primary">使用导入数据</button>
+                    <button id="mergeBtn" class="btn btn-success">合并数据</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="planModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>方案管理</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="plan-list" id="planList">
+                    </div>
+                    <div class="plan-input">
+                        <input type="text" id="planNameInput" placeholder="方案名称">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirmSavePlan" class="btn btn-primary">保存</button>
+                    <button id="cancelPlanBtn" class="btn btn-secondary">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
