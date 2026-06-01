@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: #1a1f2e;
+  color: #e2e8f0;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* 标题字体 - 宋体风格 */
+.font-serif-cn {
+  font-family: 'Noto Serif SC', serif;
+}
+
+/* 动画 */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(201, 76, 76, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(201, 76, 76, 0.8);
+  }
+}
+
+.anomaly-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* 过渡动画 */
+.panel-transition {
+  transition: width 0.3s ease, opacity 0.3s ease;
+}
+
+/* 选中效果 */
+.selection-ring {
+  box-shadow: 0 0 0 2px #c9a227, 0 0 10px rgba(201, 162, 39, 0.3);
+}
+
+/* 坐标系标签颜色 */
+.cs-cad {
+  color: #4a90d9;
+  border-color: #4a90d9;
+  background-color: rgba(74, 144, 217, 0.15);
+}
+
+.cs-site {
+  color: #5bb88d;
+  border-color: #5bb88d;
+  background-color: rgba(91, 184, 141, 0.15);
+}
+
+.cs-sketch {
+  color: #9b7cc9;
+  border-color: #9b7cc9;
+  background-color: rgba(155, 124, 201, 0.15);
+}
