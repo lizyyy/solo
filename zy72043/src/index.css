@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0a0e17;
+  --bg-card: #111827;
+  --bg-card-hover: #1a2332;
+  --accent-cyan: #00e5ff;
+  --accent-amber: #ffab00;
+  --accent-red: #ef5350;
+  --accent-green: #4caf50;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-dim: #1e293b;
+  --border-glow: rgba(0, 229, 255, 0.3);
+
+  font-family: 'Noto Sans SC', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  margin: 0;
+  min-height: 100vh;
+}
+
+.font-mono-display {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.glow-cyan {
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.25), inset 0 0 12px rgba(0, 229, 255, 0.05);
+}
+
+.glow-amber {
+  box-shadow: 0 0 12px rgba(255, 171, 0, 0.25), inset 0 0 12px rgba(255, 171, 0, 0.05);
+}
+
+.glow-red {
+  box-shadow: 0 0 12px rgba(239, 83, 80, 0.25), inset 0 0 12px rgba(239, 83, 80, 0.05);
+}
+
+.text-glow-cyan {
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+.text-glow-amber {
+  text-shadow: 0 0 8px rgba(255, 171, 0, 0.5);
+}
+
+.border-glow-cyan {
+  border-color: rgba(0, 229, 255, 0.4);
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dim);
+  border-radius: 8px;
+}
+
+.btn-cyan {
+  background: transparent;
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  color: var(--accent-cyan);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+}
+
+.btn-cyan:hover {
+  background: rgba(0, 229, 255, 0.1);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
+}
+
+.btn-cyan:active {
+  transform: scale(0.97);
+  background: rgba(0, 229, 255, 0.15);
+}
+
+.btn-amber {
+  background: transparent;
+  border: 1px solid rgba(255, 171, 0, 0.4);
+  color: var(--accent-amber);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+}
+
+.btn-amber:hover {
+  background: rgba(255, 171, 0, 0.1);
+  box-shadow: 0 0 12px rgba(255, 171, 0, 0.2);
+}
+
+.btn-amber:active {
+  transform: scale(0.97);
+}
+
+.btn-red {
+  background: transparent;
+  border: 1px solid rgba(239, 83, 80, 0.4);
+  color: var(--accent-red);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+}
+
+.btn-red:hover {
+  background: rgba(239, 83, 80, 0.1);
+  box-shadow: 0 0 12px rgba(239, 83, 80, 0.2);
+}
+
+.btn-red:active {
+  transform: scale(0.97);
+}
+
+.progress-bar {
+  height: 4px;
+  background: var(--border-dim);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent-cyan);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--border-dim);
+  border-radius: 2px;
+}
