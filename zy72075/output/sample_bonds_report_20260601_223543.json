@@ -1,0 +1,622 @@
+{
+  "summary": {
+    "report_time": "2026-06-01 22:35:43",
+    "total_records": 14,
+    "status_breakdown": {
+      "计算成功": 8,
+      "已跳过": 2,
+      "计算失败": 4
+    },
+    "boundary_breakdown": {
+      "边界内 - 建议转股": 3,
+      "无法判断": 4,
+      "边界外 - 不建议转股": 2,
+      "临界点 - 正好触达下边界": 1,
+      "临界点 - 正好触达上边界": 1,
+      "边界内 - 关注转股机会": 1
+    },
+    "premium_rate_stats": {
+      "average": 1239583327.083,
+      "min": -0.3472,
+      "max": 9916666566.6667
+    },
+    "data_cleaning": {
+      "duplicate_count": 2,
+      "duplicate_groups": 1,
+      "empty_field_count": 3,
+      "unit_mixed_count": 1,
+      "duplicate_details": {
+        "110001": [
+          2,
+          8,
+          15
+        ]
+      },
+      "empty_field_details": [
+        [
+          5,
+          "110004",
+          [
+            "转债价格"
+          ]
+        ],
+        [
+          6,
+          "110005",
+          [
+            "转股价格"
+          ]
+        ],
+        [
+          7,
+          "110006",
+          [
+            "正股价格"
+          ]
+        ]
+      ],
+      "unit_mixed_details": [
+        [
+          9,
+          "110007",
+          [
+            "转债价格(万元)"
+          ]
+        ]
+      ]
+    },
+    "calculation_params": {
+      "boundary_premium_rate_low": 0.0,
+      "boundary_premium_rate_high": 2.0,
+      "default_face_value": 100.0,
+      "params_remarks": {
+        "boundary_premium_rate_low": "小岑2025年11月确认：低于0%时转股肯定划算，这是硬边界",
+        "boundary_premium_rate_high": "小岑2025年11月确认：2%是常规操作边界，超过基本不考虑转股",
+        "default_face_value": "可转债面值默认100元，特殊情况看募集说明书",
+        "unit_conversion": "单位换算表，2025年Q4统一，之前有些表用万元做单位坑了不少人",
+        "formula_conversion_value": "转股价值=面值/转股价×正股价，别搞反了，去年有次算反了亏大了",
+        "formula_premium_rate": "转股溢价率=(转债价格-转股价值)/转股价值×100%，分母是转股价值不是转债价格"
+      }
+    }
+  },
+  "results": [
+    {
+      "bond_code": "110001",
+      "bond_name": "示例转债1",
+      "status": "计算成功",
+      "conversion_value": 102.8571,
+      "conversion_premium_rate": -0.3472,
+      "boundary_decision": "边界内 - 建议转股",
+      "boundary_explanation": "转股溢价率(-0.3472%) < 下边界(0.0%)，转股溢价率为负，转股有利可图，处于转股边界内",
+      "formulas": {
+        "conversion_value": "转股价值 = 面值(100.0元) ÷ 转股价(10.5元) × 正股价(10.8元) = 102.8571元",
+        "premium_rate": "转股溢价率 = (转债价(102.5元) - 转股价值(102.8571元)) ÷ 转股价值(102.8571元) × 100% = -0.3472%",
+        "boundary_judge": "边界判断规则: 溢价率<0.0%→转股划算; 0.0%≤溢价率<2.0%→关注; 溢价率≥2.0%→不划算"
+      },
+      "units_used": {
+        "bond_price": "元",
+        "conversion_price": "元",
+        "stock_price": "元",
+        "face_value": "元"
+      },
+      "boundary_values": {
+        "premium_rate_low": 0.0,
+        "premium_rate_high": 2.0
+      },
+      "error_reason": null,
+      "warnings": [
+        "存在重复记录（共3条，行号：[2, 8, 15]），本条作为首条保留计算，其余标记为重复"
+      ],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110001",
+        "bond_name": "示例转债1",
+        "bond_price": "102.5",
+        "bond_price_unit": "元",
+        "conversion_price": "10.5",
+        "conversion_price_unit": "元",
+        "stock_price": "10.8",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "正常数据，边界内"
+      },
+      "remark": "正常数据，边界内",
+      "line_number": 2
+    },
+    {
+      "bond_code": "110001",
+      "bond_name": "示例转债1-重复",
+      "status": "已跳过",
+      "conversion_value": null,
+      "conversion_premium_rate": null,
+      "boundary_decision": null,
+      "boundary_explanation": null,
+      "formulas": {},
+      "units_used": {},
+      "boundary_values": {},
+      "error_reason": "重复记录，已跳过。相同key的记录共3条，行号：[2, 8, 15]，已保留第2行进行计算",
+      "warnings": [],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110001",
+        "bond_name": "示例转债1-重复",
+        "bond_price": "102.5",
+        "bond_price_unit": "元",
+        "conversion_price": "10.5",
+        "conversion_price_unit": "元",
+        "stock_price": "10.8",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "重复记录，代码与第2行相同"
+      },
+      "remark": "重复记录，代码与第2行相同",
+      "line_number": 8
+    },
+    {
+      "bond_code": "110001",
+      "bond_name": "示例转债1-重复2",
+      "status": "已跳过",
+      "conversion_value": null,
+      "conversion_premium_rate": null,
+      "boundary_decision": null,
+      "boundary_explanation": null,
+      "formulas": {},
+      "units_used": {},
+      "boundary_values": {},
+      "error_reason": "重复记录，已跳过。相同key的记录共3条，行号：[2, 8, 15]，已保留第2行进行计算",
+      "warnings": [],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110001",
+        "bond_name": "示例转债1-重复2",
+        "bond_price": "102.5",
+        "bond_price_unit": "元",
+        "conversion_price": "10.5",
+        "conversion_price_unit": "元",
+        "stock_price": "10.8",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "第二条重复记录"
+      },
+      "remark": "第二条重复记录",
+      "line_number": 15
+    },
+    {
+      "bond_code": "110004",
+      "bond_name": "示例转债4",
+      "status": "计算失败",
+      "conversion_value": null,
+      "conversion_premium_rate": null,
+      "boundary_decision": "无法判断",
+      "boundary_explanation": "因计算失败(缺少必要字段: 转债价格，无法进行计算)，无法进行边界判断",
+      "formulas": {},
+      "units_used": {},
+      "boundary_values": {},
+      "error_reason": "缺少必要字段: 转债价格，无法进行计算",
+      "warnings": [],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110004",
+        "bond_name": "示例转债4",
+        "bond_price": "",
+        "bond_price_unit": "元",
+        "conversion_price": "10.0",
+        "conversion_price_unit": "元",
+        "stock_price": "10.0",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "转债价格为空，应该算不出来"
+      },
+      "remark": "转债价格为空，应该算不出来",
+      "line_number": 5
+    },
+    {
+      "bond_code": "110005",
+      "bond_name": "示例转债5",
+      "status": "计算失败",
+      "conversion_value": null,
+      "conversion_premium_rate": null,
+      "boundary_decision": "无法判断",
+      "boundary_explanation": "因计算失败(缺少必要字段: 转股价格，无法进行计算)，无法进行边界判断",
+      "formulas": {},
+      "units_used": {},
+      "boundary_values": {},
+      "error_reason": "缺少必要字段: 转股价格，无法进行计算",
+      "warnings": [],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110005",
+        "bond_name": "示例转债5",
+        "bond_price": "102.0",
+        "bond_price_unit": "元",
+        "conversion_price": "",
+        "conversion_price_unit": "元",
+        "stock_price": "10.0",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "转股价格为空"
+      },
+      "remark": "转股价格为空",
+      "line_number": 6
+    },
+    {
+      "bond_code": "110006",
+      "bond_name": "示例转债6",
+      "status": "计算失败",
+      "conversion_value": null,
+      "conversion_premium_rate": null,
+      "boundary_decision": "无法判断",
+      "boundary_explanation": "因计算失败(缺少必要字段: 正股价格，无法进行计算)，无法进行边界判断",
+      "formulas": {},
+      "units_used": {},
+      "boundary_values": {},
+      "error_reason": "缺少必要字段: 正股价格，无法进行计算",
+      "warnings": [],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110006",
+        "bond_name": "示例转债6",
+        "bond_price": "102.0",
+        "bond_price_unit": "元",
+        "conversion_price": "10.0",
+        "conversion_price_unit": "元",
+        "stock_price": "",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "正股价格为空"
+      },
+      "remark": "正股价格为空",
+      "line_number": 7
+    },
+    {
+      "bond_code": "110001",
+      "bond_name": "示例转债1-重复",
+      "status": "计算成功",
+      "conversion_value": 102.8571,
+      "conversion_premium_rate": -0.3472,
+      "boundary_decision": "边界内 - 建议转股",
+      "boundary_explanation": "转股溢价率(-0.3472%) < 下边界(0.0%)，转股溢价率为负，转股有利可图，处于转股边界内",
+      "formulas": {
+        "conversion_value": "转股价值 = 面值(100.0元) ÷ 转股价(10.5元) × 正股价(10.8元) = 102.8571元",
+        "premium_rate": "转股溢价率 = (转债价(102.5元) - 转股价值(102.8571元)) ÷ 转股价值(102.8571元) × 100% = -0.3472%",
+        "boundary_judge": "边界判断规则: 溢价率<0.0%→转股划算; 0.0%≤溢价率<2.0%→关注; 溢价率≥2.0%→不划算"
+      },
+      "units_used": {
+        "bond_price": "元",
+        "conversion_price": "元",
+        "stock_price": "元",
+        "face_value": "元"
+      },
+      "boundary_values": {
+        "premium_rate_low": 0.0,
+        "premium_rate_high": 2.0
+      },
+      "error_reason": null,
+      "warnings": [],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110001",
+        "bond_name": "示例转债1-重复",
+        "bond_price": "102.5",
+        "bond_price_unit": "元",
+        "conversion_price": "10.5",
+        "conversion_price_unit": "元",
+        "stock_price": "10.8",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "重复记录，代码与第2行相同"
+      },
+      "remark": "重复记录，代码与第2行相同",
+      "line_number": 8
+    },
+    {
+      "bond_code": "110007",
+      "bond_name": "单位混用转债",
+      "status": "计算成功",
+      "conversion_value": 102.8571,
+      "conversion_premium_rate": 9916666566.6667,
+      "boundary_decision": "边界外 - 不建议转股",
+      "boundary_explanation": "转股溢价率(9916666566.6667%) > 上边界(2.0%)，转股溢价率高于边界，转股不划算",
+      "formulas": {
+        "conversion_value": "转股价值 = 面值(100.0元) ÷ 转股价(10.5元) × 正股价(10.8元) = 102.8571元",
+        "premium_rate": "转股溢价率 = (转债价(10200000000.0元) - 转股价值(102.8571元)) ÷ 转股价值(102.8571元) × 100% = 9916666566.6667%",
+        "boundary_judge": "边界判断规则: 溢价率<0.0%→转股划算; 0.0%≤溢价率<2.0%→关注; 溢价率≥2.0%→不划算"
+      },
+      "units_used": {
+        "bond_price": "元",
+        "conversion_price": "元",
+        "stock_price": "元",
+        "face_value": "元"
+      },
+      "boundary_values": {
+        "premium_rate_low": 0.0,
+        "premium_rate_high": 2.0
+      },
+      "error_reason": null,
+      "warnings": [
+        "单位混用：检测到转债价格(万元)，已自动转换为统一单位"
+      ],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110007",
+        "bond_name": "单位混用转债",
+        "bond_price": "1020000",
+        "bond_price_unit": "万元",
+        "conversion_price": "10.5",
+        "conversion_price_unit": "元",
+        "stock_price": "10.8",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "转债价格用万元，其他用元，需要自动转换"
+      },
+      "remark": "转债价格用万元，其他用元，需要自动转换",
+      "line_number": 9
+    },
+    {
+      "bond_code": "110008",
+      "bond_name": "下边界转债",
+      "status": "计算成功",
+      "conversion_value": 100.0,
+      "conversion_premium_rate": 0.0,
+      "boundary_decision": "临界点 - 正好触达下边界",
+      "boundary_explanation": "转股溢价率(0.0000%) = 下边界(0.0%)，处于转股与否的临界点，转股溢价率接近边界，需密切关注价格变动",
+      "formulas": {
+        "conversion_value": "转股价值 = 面值(100.0元) ÷ 转股价(10.0元) × 正股价(10.0元) = 100.0000元",
+        "premium_rate": "转股溢价率 = (转债价(100.0元) - 转股价值(100.0000元)) ÷ 转股价值(100.0000元) × 100% = 0.0000%",
+        "boundary_judge": "边界判断规则: 溢价率<0.0%→转股划算; 0.0%≤溢价率<2.0%→关注; 溢价率≥2.0%→不划算"
+      },
+      "units_used": {
+        "bond_price": "元",
+        "conversion_price": "元",
+        "stock_price": "元",
+        "face_value": "元"
+      },
+      "boundary_values": {
+        "premium_rate_low": 0.0,
+        "premium_rate_high": 2.0
+      },
+      "error_reason": null,
+      "warnings": [
+        "转股溢价率接近0，注意可能存在的计算精度问题"
+      ],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110008",
+        "bond_name": "下边界转债",
+        "bond_price": "100.0",
+        "bond_price_unit": "元",
+        "conversion_price": "10.0",
+        "conversion_price_unit": "元",
+        "stock_price": "10.0",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "溢价率正好0%，下边界"
+      },
+      "remark": "溢价率正好0%，下边界",
+      "line_number": 10
+    },
+    {
+      "bond_code": "110009",
+      "bond_name": "上边界转债",
+      "status": "计算成功",
+      "conversion_value": 100.0,
+      "conversion_premium_rate": 2.0,
+      "boundary_decision": "临界点 - 正好触达上边界",
+      "boundary_explanation": "转股溢价率(2.0000%) = 上边界(2.0%)，转股溢价率接近边界，需密切关注价格变动",
+      "formulas": {
+        "conversion_value": "转股价值 = 面值(100.0元) ÷ 转股价(10.0元) × 正股价(10.0元) = 100.0000元",
+        "premium_rate": "转股溢价率 = (转债价(102.0元) - 转股价值(100.0000元)) ÷ 转股价值(100.0000元) × 100% = 2.0000%",
+        "boundary_judge": "边界判断规则: 溢价率<0.0%→转股划算; 0.0%≤溢价率<2.0%→关注; 溢价率≥2.0%→不划算"
+      },
+      "units_used": {
+        "bond_price": "元",
+        "conversion_price": "元",
+        "stock_price": "元",
+        "face_value": "元"
+      },
+      "boundary_values": {
+        "premium_rate_low": 0.0,
+        "premium_rate_high": 2.0
+      },
+      "error_reason": null,
+      "warnings": [],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110009",
+        "bond_name": "上边界转债",
+        "bond_price": "102.0",
+        "bond_price_unit": "元",
+        "conversion_price": "10.0",
+        "conversion_price_unit": "元",
+        "stock_price": "10.0",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "溢价率正好2%，上边界"
+      },
+      "remark": "溢价率正好2%，上边界",
+      "line_number": 11
+    },
+    {
+      "bond_code": "110010",
+      "bond_name": "结果奇怪转债",
+      "status": "计算成功",
+      "conversion_value": 102.0,
+      "conversion_premium_rate": 47.0588,
+      "boundary_decision": "边界外 - 不建议转股",
+      "boundary_explanation": "转股溢价率(47.0588%) > 上边界(2.0%)，转股溢价率高于边界，转股不划算",
+      "formulas": {
+        "conversion_value": "转股价值 = 面值(100.0元) ÷ 转股价(50.0元) × 正股价(51.0元) = 102.0000元",
+        "premium_rate": "转股溢价率 = (转债价(150.0元) - 转股价值(102.0000元)) ÷ 转股价值(102.0000元) × 100% = 47.0588%",
+        "boundary_judge": "边界判断规则: 溢价率<0.0%→转股划算; 0.0%≤溢价率<2.0%→关注; 溢价率≥2.0%→不划算"
+      },
+      "units_used": {
+        "bond_price": "元",
+        "conversion_price": "元",
+        "stock_price": "元",
+        "face_value": "元"
+      },
+      "boundary_values": {
+        "premium_rate_low": 0.0,
+        "premium_rate_high": 2.0
+      },
+      "error_reason": null,
+      "warnings": [],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110010",
+        "bond_name": "结果奇怪转债",
+        "bond_price": "150.0",
+        "bond_price_unit": "元",
+        "conversion_price": "50.0",
+        "conversion_price_unit": "元",
+        "stock_price": "51.0",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "转股价高得离谱，溢价率-47%，看起来正常但结果怪"
+      },
+      "remark": "转股价高得离谱，溢价率-47%，看起来正常但结果怪",
+      "line_number": 12
+    },
+    {
+      "bond_code": "110011",
+      "bond_name": "空单位转债",
+      "status": "计算成功",
+      "conversion_value": 101.0,
+      "conversion_premium_rate": 1.9802,
+      "boundary_decision": "边界内 - 关注转股机会",
+      "boundary_explanation": "下边界(0.0%) ≤ 转股溢价率(1.9802%) < 上边界(2.0%)，转股溢价率在边界区间内，建议关注转股机会",
+      "formulas": {
+        "conversion_value": "转股价值 = 面值(100.0元) ÷ 转股价(10.0元) × 正股价(10.1元) = 101.0000元",
+        "premium_rate": "转股溢价率 = (转债价(103.0元) - 转股价值(101.0000元)) ÷ 转股价值(101.0000元) × 100% = 1.9802%",
+        "boundary_judge": "边界判断规则: 溢价率<0.0%→转股划算; 0.0%≤溢价率<2.0%→关注; 溢价率≥2.0%→不划算"
+      },
+      "units_used": {
+        "bond_price": "元",
+        "conversion_price": "元",
+        "stock_price": "元",
+        "face_value": "元"
+      },
+      "boundary_values": {
+        "premium_rate_low": 0.0,
+        "premium_rate_high": 2.0
+      },
+      "error_reason": null,
+      "warnings": [
+        "转债价格: 未指定单位，默认按元处理"
+      ],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110011",
+        "bond_name": "空单位转债",
+        "bond_price": "103.0",
+        "bond_price_unit": "",
+        "conversion_price": "10.0",
+        "conversion_price_unit": "元",
+        "stock_price": "10.1",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "转债价格单位为空，应默认元"
+      },
+      "remark": "转债价格单位为空，应默认元",
+      "line_number": 13
+    },
+    {
+      "bond_code": "110012",
+      "bond_name": "除零测试",
+      "status": "计算失败",
+      "conversion_value": null,
+      "conversion_premium_rate": null,
+      "boundary_decision": "无法判断",
+      "boundary_explanation": "因计算失败(转股价格(0.0)必须大于0)，无法进行边界判断",
+      "formulas": {},
+      "units_used": {},
+      "boundary_values": {},
+      "error_reason": "转股价格(0.0)必须大于0",
+      "warnings": [],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110012",
+        "bond_name": "除零测试",
+        "bond_price": "100.0",
+        "bond_price_unit": "元",
+        "conversion_price": "0.0",
+        "conversion_price_unit": "元",
+        "stock_price": "10.0",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "转股价为0，应该报错"
+      },
+      "remark": "转股价为0，应该报错",
+      "line_number": 14
+    },
+    {
+      "bond_code": "110001",
+      "bond_name": "示例转债1-重复2",
+      "status": "计算成功",
+      "conversion_value": 102.8571,
+      "conversion_premium_rate": -0.3472,
+      "boundary_decision": "边界内 - 建议转股",
+      "boundary_explanation": "转股溢价率(-0.3472%) < 下边界(0.0%)，转股溢价率为负，转股有利可图，处于转股边界内",
+      "formulas": {
+        "conversion_value": "转股价值 = 面值(100.0元) ÷ 转股价(10.5元) × 正股价(10.8元) = 102.8571元",
+        "premium_rate": "转股溢价率 = (转债价(102.5元) - 转股价值(102.8571元)) ÷ 转股价值(102.8571元) × 100% = -0.3472%",
+        "boundary_judge": "边界判断规则: 溢价率<0.0%→转股划算; 0.0%≤溢价率<2.0%→关注; 溢价率≥2.0%→不划算"
+      },
+      "units_used": {
+        "bond_price": "元",
+        "conversion_price": "元",
+        "stock_price": "元",
+        "face_value": "元"
+      },
+      "boundary_values": {
+        "premium_rate_low": 0.0,
+        "premium_rate_high": 2.0
+      },
+      "error_reason": null,
+      "warnings": [],
+      "process_time": "2026-06-01 22:35:43",
+      "original_source": "sample_bonds.csv",
+      "raw_data": {
+        "bond_code": "110001",
+        "bond_name": "示例转债1-重复2",
+        "bond_price": "102.5",
+        "bond_price_unit": "元",
+        "conversion_price": "10.5",
+        "conversion_price_unit": "元",
+        "stock_price": "10.8",
+        "stock_price_unit": "元",
+        "face_value": "100",
+        "face_value_unit": "元",
+        "remark": "第二条重复记录"
+      },
+      "remark": "第二条重复记录",
+      "line_number": 15
+    }
+  ]
+}
