@@ -1,0 +1,102 @@
+{
+  "fields": {
+    "practice_duration": {
+      "unit": "duration",
+      "description": "每日练习时长"
+    },
+    "difficulty": {
+      "scale": "1-10",
+      "description": "练习难度"
+    },
+    "accuracy": {
+      "description": "演奏准确率(%)"
+    },
+    "mistake_count": {
+      "description": "错误次数"
+    },
+    "repetition_count": {
+      "description": "重复练习次数"
+    }
+  },
+  "weights": {
+    "main": {
+      "practice_duration": 30,
+      "difficulty": 25,
+      "accuracy": 25,
+      "mistake_count": 10,
+      "repetition_count": 10
+    }
+  },
+  "boundaries": {
+    "practice_duration": {
+      "min": 5,
+      "max": 240,
+      "soft_min": 15,
+      "soft_max": 180,
+      "unit": "分钟"
+    },
+    "difficulty": {
+      "min": 1,
+      "max": 10,
+      "soft_min": 2,
+      "soft_max": 9,
+      "unit": "分"
+    },
+    "accuracy": {
+      "min": 0,
+      "max": 100,
+      "soft_min": 50,
+      "soft_max": 99,
+      "unit": "%"
+    },
+    "mistake_count": {
+      "min": 0,
+      "max": 50,
+      "soft_min": 0,
+      "soft_max": 30,
+      "unit": "次"
+    },
+    "repetition_count": {
+      "min": 1,
+      "max": 20,
+      "soft_min": 2,
+      "soft_max": 15,
+      "unit": "次"
+    }
+  },
+  "normalization": {
+    "practice_duration": {
+      "method": "linear",
+      "min": 0,
+      "max": 180,
+      "inverse": false
+    },
+    "difficulty": {
+      "method": "linear",
+      "min": 1,
+      "max": 10,
+      "inverse": false
+    },
+    "accuracy": {
+      "method": "linear",
+      "min": 60,
+      "max": 100,
+      "inverse": false
+    },
+    "mistake_count": {
+      "method": "log",
+      "min": 0,
+      "max": 30,
+      "inverse": true
+    },
+    "repetition_count": {
+      "method": "linear",
+      "min": 1,
+      "max": 10,
+      "inverse": false
+    }
+  },
+  "analysis": {
+    "max_fluctuation_pct": 25
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "records": [
+    {
+      "record_id": "OLD-001",
+      "date": "2026-04-15",
+      "practice_duration": 40,
+      "difficulty": 4,
+      "accuracy": 78,
+      "mistake_count": 10,
+      "repetition_count": 4,
+      "_source_type": "legacy",
+      "_notes": ["2026年4月旧口径记录，当时权重为时长40/难度20/准确率20/错误10/重复10"],
+      "_old_caliber_version": "v1.0"
+    },
+    {
+      "record_id": "OLD-002",
+      "date": "2026-04-20",
+      "practice_duration": 50,
+      "difficulty": 5,
+      "accuracy": 82,
+      "mistake_count": 8,
+      "repetition_count": 5,
+      "_source_type": "legacy",
+      "_notes": ["2026年4月旧口径记录，练习曲目：巴赫初级钢琴曲集"],
+      "_old_caliber_version": "v1.0"
+    },
+    {
+      "record_id": "OLD-003",
+      "date": "2026-04-25",
+      "practice_duration": 60,
+      "difficulty": 6,
+      "accuracy": 80,
+      "mistake_count": 12,
+      "repetition_count": 6,
+      "_source_type": "legacy",
+      "_notes": ["2026年4月旧口径记录，当时难度系数采用1-5分制，已转换"],
+      "_old_caliber_version": "v1.0",
+      "_old_difficulty_scale": "1-5"
+    },
+    {
+      "record_id": "OLD-004",
+      "date": "2026-05-01",
+      "practice_duration": 55,
+      "difficulty": 5,
+      "accuracy": 85,
+      "mistake_count": 7,
+      "repetition_count": 5,
+      "_source_type": "legacy",
+      "_notes": ["2026年5月初旧口径，权重调整前的最后一批记录"],
+      "_old_caliber_version": "v1.1"
+    },
+    {
+      "record_id": "OLD-005",
+      "date": "2026-05-05",
+      "practice_duration": 45,
+      "difficulty": 5,
+      "accuracy": 83,
+      "mistake_count": 9,
+      "repetition_count": 5,
+      "_source_type": "legacy",
+      "_notes": ["旧口径记录，与REC-001同难度级别可用于对比"],
+      "_old_caliber_version": "v1.1"
+    },
+    {
+      "record_id": "OLD-006",
+      "date": "2026-05-10",
+      "practice_duration": 65,
+      "difficulty": 6,
+      "accuracy": 79,
+      "mistake_count": 14,
+      "repetition_count": 7,
+      "_source_type": "legacy",
+      "_notes": ["旧口径记录，与REC-002练习内容相似"],
+      "_old_caliber_version": "v1.1"
+    }
+  ]
+}

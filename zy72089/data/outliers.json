@@ -1,0 +1,37 @@
+{
+  "records": [
+    {
+      "record_id": "OUT-001",
+      "date": "2026-05-28",
+      "practice_duration": 300,
+      "difficulty": 10,
+      "accuracy": 99,
+      "mistake_count": 1,
+      "repetition_count": 5,
+      "_source_type": "imported",
+      "_notes": ["明显越界：练习时长300分钟超过硬上限240分钟", "系统自动标记为越界样本"]
+    },
+    {
+      "record_id": "OUT-002",
+      "date": "2026-05-29",
+      "practice_duration": 2,
+      "difficulty": 1,
+      "accuracy": 30,
+      "mistake_count": 60,
+      "repetition_count": 0,
+      "_source_type": "imported",
+      "_notes": ["多处越界：时长2分钟<硬下限5分钟", "准确率30%<软下限50%", "错误60次>硬上限50次", "重复0次<硬下限1次"]
+    },
+    {
+      "record_id": "OUT-003",
+      "date": "2026-05-30",
+      "practice_duration": 200,
+      "difficulty": 11,
+      "accuracy": 105,
+      "mistake_count": 45,
+      "repetition_count": 25,
+      "_source_type": "imported",
+      "_notes": ["多处越界：难度11>硬上限10", "准确率105%>硬上限100%", "重复25次>硬上限20次"]
+    }
+  ]
+}

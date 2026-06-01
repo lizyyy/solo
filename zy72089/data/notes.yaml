@@ -1,0 +1,59 @@
+# 人工备注记录
+# 运营分析师阿乔的备注记录
+
+notes:
+  - record_id: "REC-003"
+    timestamp: "2026-05-22 18:30:00"
+    author: "阿乔"
+    content: "难度B是老师打的等级，对应8.5分，已确认换算无误"
+    type: "confirmation"
+
+  - record_id: "REC-005"
+    timestamp: "2026-05-24 20:15:00"
+    author: "阿乔"
+    content: "新曲目肖邦圆舞曲Op.64 No.1，首次练习错误多属正常，无需干预"
+    type: "explanation"
+
+  - record_id: "REC-006"
+    timestamp: "2026-05-25 22:00:00"
+    author: "阿乔"
+    content: "当天学校有考试，练习时间短，已确认是真实情况"
+    type: "confirmation"
+
+  - record_id: "OUT-001"
+    timestamp: "2026-05-28 10:00:00"
+    author: "阿乔"
+    content: "系统导入错误，实际练习时长应为90分钟，已标记待修正"
+    type: "correction_pending"
+
+# 权重变更历史
+weight_history:
+  - version: "v1.0"
+    date: "2026-04-01"
+    weights:
+      practice_duration: 40
+      difficulty: 20
+      accuracy: 20
+      mistake_count: 10
+      repetition_count: 10
+    note: "初始版本"
+
+  - version: "v1.1"
+    date: "2026-05-01"
+    weights:
+      practice_duration: 35
+      difficulty: 25
+      accuracy: 20
+      mistake_count: 10
+      repetition_count: 10
+    note: "提升难度权重，鼓励挑战更难曲目"
+
+  - version: "v2.0"
+    date: "2026-05-15"
+    weights:
+      practice_duration: 30
+      difficulty: 25
+      accuracy: 25
+      mistake_count: 10
+      repetition_count: 10
+    note: "提升准确率权重，平衡练习质量"

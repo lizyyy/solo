@@ -1,0 +1,77 @@
+{
+  "records": [
+    {
+      "record_id": "REC-SMOOTH-001",
+      "date": "2026-05-20",
+      "practice_duration": 60,
+      "difficulty": 5,
+      "accuracy": 85,
+      "mistake_count": 8,
+      "repetition_count": 5,
+      "_source_type": "manual",
+      "_notes": [
+        "【样例-顺利记录】日常练习，所有指标均在正常范围内",
+        "练习曲目：车尔尼599第45条",
+        "练习状态良好，无特殊情况"
+      ]
+    },
+    {
+      "record_id": "REC-CONFIRM-001",
+      "date": "2026-05-24",
+      "practice_duration": 10,
+      "difficulty": 3,
+      "accuracy": 95,
+      "mistake_count": 2,
+      "repetition_count": 3,
+      "_source_type": "manual",
+      "_notes": [
+        "【样例-待人工确认】练习时长10分钟低于软下限15分钟",
+        "当天有期末考试，时间紧张属正常情况",
+        "需要人工确认是否为真实情况"
+      ]
+    },
+    {
+      "record_id": "REC-LEGACY-001",
+      "date": "2026-05-05",
+      "practice_duration": 45,
+      "difficulty": 5,
+      "accuracy": 83,
+      "mistake_count": 9,
+      "repetition_count": 5,
+      "_source_type": "legacy",
+      "_notes": [
+        "【样例-旧口径补录】从2026年4月历史样本中补录",
+        "旧口径版本：v1.1",
+        "原权重：时长35/难度25/准确率20/错误10/重复10",
+        "现权重：时长30/难度25/准确率25/错误10/重复10",
+        "注意：准确率权重已从20提升至25，分数对比时需注意口径差异"
+      ],
+      "_legacy_source": {
+        "record_id": "OLD-005",
+        "date": "2026-05-05",
+        "_old_caliber_version": "v1.1"
+      }
+    },
+    {
+      "record_id": "REC-LEGACY-002",
+      "date": "2026-05-10",
+      "practice_duration": 65,
+      "difficulty": 6,
+      "accuracy": 79,
+      "mistake_count": 14,
+      "repetition_count": 7,
+      "_source_type": "legacy",
+      "_notes": [
+        "【样例-旧口径补录】从历史样本中匹配补录",
+        "旧口径版本：v1.1",
+        "匹配条件：日期2026-05-10，难度6",
+        "与REC-002练习内容相似，可用于纵向对比"
+      ],
+      "_legacy_source": {
+        "record_id": "OLD-006",
+        "date": "2026-05-10",
+        "_old_caliber_version": "v1.1"
+      }
+    }
+  ]
+}
