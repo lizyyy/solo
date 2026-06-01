@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>声波料理节奏战</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#1a1a2e;--surface:#16213e;--card:#0f3460;--accent:#e94560;
+  --ok:#00e676;--warn:#ffc107;--text:#eaeaea;--dim:#8a8a9a;
+  --border:#2a2a4a;--slot-bg:#1b2838;--risk-low:#00e676;--risk-mid:#ffc107;--risk-high:#e94560;
+}
+body{background:var(--bg);color:var(--text);font-family:"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;flex-direction:column}
+#error-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;justify-content:center;align-items:center;flex-direction:column;gap:16px;padding:32px}
+#error-overlay.show{display:flex}
+#error-overlay h2{color:var(--accent);font-size:20px}
+#error-overlay p{color:var(--text);max-width:520px;text-align:center;line-height:1.6;white-space:pre-wrap;font-size:14px}
+#error-overlay button{padding:8px 24px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer;border-radius:4px;font-size:14px}
+header{background:var(--surface);padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+header h1{font-size:18px;letter-spacing:2px;flex-shrink:0}
+.stat{display:flex;align-items:center;gap:6px;font-size:14px;padding:4px 10px;background:var(--card);border-radius:4px}
+.stat .val{font-weight:700;min-width:24px;text-align:right}
+.risk-bar-wrap{flex:1;min-width:140px;max-width:260px;display:flex;align-items:center;gap:8px}
+.risk-bar{flex:1;height:10px;background:var(--border);border-radius:5px;overflow:hidden}
+.risk-fill{height:100%;border-radius:5px;transition:width .3s,background .3s}
+.risk-label{font-size:12px;color:var(--dim);white-space:nowrap}
+main{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto;gap:0;overflow:hidden}
+.game-top{grid-column:1/-1;padding:12px 20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{padding:6px 16px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;border-radius:4px;font-size:13px;transition:background .15s}
+.btn:hover{background:var(--accent);border-color:var(--accent)}
+.btn.danger{border-color:var(--accent);color:var(--accent)}
+.btn.danger:hover{background:var(--accent);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.phase-tag{font-size:12px;padding:2px 10px;border-radius:10px;font-weight:700}
+.phase-tag.playing{background:var(--ok);color:#000}
+.phase-tag.paused{background:var(--warn);color:#000}
+.phase-tag.ended{background:var(--accent);color:#fff}
+.phase-tag.idle{background:var(--dim);color:#000}
+.materials-panel{padding:16px;overflow-y:auto;border-right:1px solid var(--border)}
+.slots-panel{padding:16px;overflow-y:auto}
+.panel-title{font-size:13px;color:var(--dim);margin-bottom:12px;letter-spacing:1px;border-bottom:1px solid var(--border);padding-bottom:6px}
+.material-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:8px;cursor:grab;transition:transform .15s,border-color .15s,opacity .15s;user-select:none;position:relative}
+.material-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.material-card.dragging{opacity:.5;transform:scale(.95)}
+.material-card.selected{border-color:var(--ok);box-shadow:0 0 8px rgba(0,230,118,.3)}
+.material-card.matched{opacity:.4;cursor:default;border-color:var(--dim)}
+.material-card .cat{font-size:11px;color:var(--dim);margin-bottom:2px}
+.material-card .val{font-size:16px;font-weight:700}
+.material-card .desc{font-size:11px;color:var(--dim);margin-top:4px}
+.rhythm-slot{background:var(--slot-bg);border:2px dashed var(--border);border-radius:6px;padding:14px;margin-bottom:10px;min-height:60px;transition:border-color .2s,background .2s}
+.rhythm-slot.drag-over{border-color:var(--ok);background:rgba(0,230,118,.05)}
+.rhythm-slot.filled{border-style:solid;border-color:var(--ok)}
+.rhythm-slot.wrong{border-color:var(--accent);animation:shake .3s}
+.rhythm-slot .slot-label{font-size:13px;color:var(--dim);margin-bottom:4px}
+.rhythm-slot:active{transform:scale(.98)}
+.rhythm-slot.highlight{border-color:var(--ok);box-shadow:0 0 6px rgba(0,230,118,.2)}
+.rhythm-slot .slot-accepts{font-size:11px;color:var(--accent)}
+.rhythm-slot .slot-content{font-size:15px;font-weight:700}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.bottom-panel{grid-column:1/-1;border-top:1px solid var(--border);max-height:220px;display:flex;flex-direction:column}
+.bottom-header{display:flex;gap:8px;padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);align-items:center;flex-shrink:0}
+.tab-btn{padding:4px 12px;background:transparent;border:1px solid var(--border);color:var(--dim);cursor:pointer;border-radius:3px;font-size:12px}
+.tab-btn.active{color:var(--text);border-color:var(--accent);background:rgba(233,69,96,.1)}
+.bottom-body{flex:1;overflow-y:auto;padding:12px 16px}
+.record-item{padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.record-item .time{color:var(--dim);font-size:11px;white-space:nowrap;flex-shrink:0}
+.record-item .raw{flex:1;word-break:break-all}
+.record-item .tag{font-size:10px;padding:1px 6px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.tag-pause{background:var(--warn);color:#000}
+.tag-error{background:var(--accent);color:#fff}
+.tag-boundary{background:#7c4dff;color:#fff}
+.tag-normal{background:var(--card);color:var(--dim)}
+.settlement-item{padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
+.settlement-item .reason{color:var(--accent);font-weight:700}
+.settlement-item .detail{color:var(--dim);font-size:12px}
+.conflict-item{padding:10px;border:1px solid var(--border);border-radius:6px;margin-bottom:8px;background:rgba(233,69,96,.05)}
+.conflict-item .vs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:start;margin:8px 0}
+.conflict-item .side{padding:8px;border-radius:4px;font-size:13px}
+.conflict-item .side.record-side{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2)}
+.conflict-item .side.import-side{background:rgba(255,193,7,.08);border:1px solid rgba(255,193,7,.2)}
+.conflict-item .vs-divider{color:var(--accent);font-weight:700;font-size:14px;align-self:center}
+.conflict-item .suggestion{font-size:12px;color:var(--warn);margin:6px 0}
+.conflict-item .actions{display:flex;gap:6px;margin-top:8px}
+.conflict-item .actions .btn{font-size:11px;padding:3px 10px}
+.supplement-section{padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border)}
+.supplement-section input,.supplement-section textarea{width:100%;padding:6px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:13px;font-family:inherit}
+.supplement-section textarea{min-height:40px;resize:vertical}
+.supplement-section .diff-box{margin-top:8px;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:4px;font-size:12px;line-height:1.6}
+.diff-add{color:var(--ok)}
+.diff-remove{color:var(--accent)}
+.diff-same{color:var(--dim)}
+.import-section{padding:8px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:none}
+.import-section textarea{width:100%;padding:6px 10px;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px;font-family:inherit;min-height:60px;resize:vertical}
+.toast{position:fixed;top:60px;right:20px;padding:10px 20px;border-radius:4px;font-size:13px;z-index:1000;animation:slideIn .3s;max-width:320px}
+.toast.info{background:var(--card);border:1px solid var(--ok);color:var(--ok)}
+.toast.warn{background:var(--card);border:1px solid var(--warn);color:var(--warn)}
+.toast.err{background:var(--card);border:1px solid var(--accent);color:var(--accent)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.round-result{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;justify-content:center;align-items:center}
+.round-result .card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:24px 32px;max-width:400px;width:90%;text-align:center}
+.round-result .card h3{margin-bottom:12px;font-size:18px}
+.round-result .card .detail{font-size:13px;color:var(--dim);line-height:1.8;text-align:left;margin:12px 0}
+.round-result .card .actions{display:flex;gap:8px;justify-content:center;margin-top:16px}
+</style>
+</head>
+<body>
+
+<div id="error-overlay">
+  <h2>⚠ 配置异常</h2>
+  <p id="error-msg"></p>
+  <button onclick="document.getElementById('error-overlay').classList.remove('show')">我知道了</button>
+</div>
+
+<header>
+  <h1>声波料理节奏战</h1>
+  <div class="stat">回合 <span class="val" id="s-round">0</span></div>
+  <div class="stat">分数 <span class="val" id="s-score">0</span></div>
+  <div class="stat">⚡<span class="val" id="s-energy">0</span></div>
+  <div class="stat">🎫<span class="val" id="s-tokens">0</span></div>
+  <div class="risk-bar-wrap">
+    <div class="risk-bar"><div class="risk-fill" id="risk-fill"></div></div>
+    <span class="risk-label">风险 <span id="s-risk">0</span>/100</span>
+  </div>
+  <span class="phase-tag idle" id="phase-tag">未开始</span>
+</header>
+
+<main>
+  <div class="game-top">
+    <button class="btn" id="btn-start" onclick="G.start()">开始</button>
+    <button class="btn" id="btn-pause" onclick="G.pause()" disabled>暂停</button>
+    <button class="btn" id="btn-continue" onclick="G.continue_()" disabled>继续</button>
+    <button class="btn danger" id="btn-restart" onclick="G.restart()" disabled>重开</button>
+    <button class="btn" id="btn-supplement" onclick="UI.toggleSupplement()" disabled>补材料</button>
+    <button class="btn" id="btn-token" onclick="G.useToken()" disabled>🎫用时间券</button>
+    <button class="btn" id="btn-import" onclick="UI.toggleImport()">导入数据</button>
+    <button class="btn" id="btn-conflicts" onclick="UI.switchTab('conflicts')">查看冲突</button>
+  </div>
+
+  <div class="materials-panel">
+    <div class="panel-title">声波材料（拖拽或点击选择）<span id="selection-hint" style="color:var(--ok);display:none;margin-left:8px">→ 已选中，点击右侧槽位放入</span></div>
+    <div id="materials-list"></div>
+  </div>
+
+  <div class="slots-panel">
+    <div class="panel-title">节奏槽位（将材料放入对应槽位）</div>
+    <div id="slots-list"></div>
+  </div>
+
+  <div class="import-section" id="import-section">
+    <div style="font-size:12px;color:var(--dim);margin-bottom:4px">粘贴导入数据（JSON格式，含 materials 数组）</div>
+    <textarea id="import-textarea" placeholder='{"materials":[{"category":"frequency","value":"660Hz","label":"660Hz","targetSlot":"s3"}]}'></textarea>
+    <div style="margin-top:6px;display:flex;gap:6px">
+      <button class="btn" onclick="G.importData()">导入并检查冲突</button>
+      <button class="btn" onclick="UI.toggleImport()">取消</button>
+    </div>
+  </div>
+
+  <div class="supplement-section" id="supplement-section" style="display:none">
+    <div style="font-size:12px;color:var(--dim);margin-bottom:4px">补充材料：添加新的声波材料到当前回合</div>
+    <div style="display:flex;gap:8px;margin-bottom:6px">
+      <input id="sup-cat" placeholder="类别(frequency/amplitude/waveform/rhythm)" style="flex:2">
+      <input id="sup-val" placeholder="值" style="flex:1">
+    </div>
+    <input id="sup-label" placeholder="显示标签">
+    <textarea id="sup-note" placeholder="备注（原样保留，不会清洗）"></textarea>
+    <div style="margin-top:6px;display:flex;gap:6px">
+      <button class="btn" onclick="G.supplement()">补录</button>
+      <button class="btn" onclick="UI.toggleSupplement()">取消</button>
+    </div>
+    <div id="supplement-diff" class="diff-box" style="display:none"></div>
+  </div>
+
+  <div class="bottom-panel">
+    <div class="bottom-header">
+      <button class="tab-btn active" data-tab="records" onclick="UI.switchTab('records')">练习记录</button>
+      <button class="tab-btn" data-tab="settlements" onclick="UI.switchTab('settlements')">回合结算</button>
+      <button class="tab-btn" data-tab="conflicts" onclick="UI.switchTab('conflicts')">冲突(<span id="conflict-count">0</span>)</button>
+    </div>
+    <div class="bottom-body" id="tab-records"></div>
+    <div class="bottom-body" id="tab-settlements" style="display:none"></div>
+    <div class="bottom-body" id="tab-conflicts" style="display:none"></div>
+  </div>
+</main>
+
+<script>
+var DEFAULT_CONFIG = {
+  initialEnergy: 10,
+  initialTimeTokens: 3,
+  maxRisk: 100,
+  correctMatchScore: 10,
+  wrongMatchRisk: 15,
+  wrongMatchScorePenalty: 5,
+  skipRisk: 8,
+  actionEnergyCost: 1,
+  useTokenRiskReduction: 20,
+  useTokenEnergyCost: 0
+};
+
+var MATERIAL_TEMPLATES = [
+  {id:'m1',category:'frequency',value:'220Hz',label:'220Hz 低频',desc:'低频声波，适合缓慢节奏',targetSlot:'s1'},
+  {id:'m2',category:'frequency',value:'440Hz',label:'440Hz 中频',desc:'标准音高A，中等节奏',targetSlot:'s2'},
+  {id:'m3',category:'frequency',value:'880Hz',label:'880Hz 高频',desc:'高频声波，适合快节奏',targetSlot:'s3'},
+  {id:'m4',category:'amplitude',value:'强',label:'强振幅',desc:'大声！节奏感强烈',targetSlot:'s4'},
+  {id:'m5',category:'amplitude',value:'弱',label:'弱振幅',desc:'小声，节奏轻柔',targetSlot:'s5'},
+  {id:'m6',category:'amplitude',value:'渐强',label:'渐强振幅',desc:'越来越大声',targetSlot:'s6'},
+  {id:'m7',category:'waveform',value:'正弦波',label:'正弦波',desc:'平滑圆润的波形',targetSlot:'s7'},
+  {id:'m8',category:'waveform',value:'方波',label:'方波',desc:'棱角分明，电子音色',targetSlot:'s8'},
+  {id:'m9',category:'waveform',value:'锯齿波',label:'锯齿波',desc:'尖锐明亮，粗糙质感',targetSlot:'s9'},
+  {id:'m10',category:'rhythm',value:'4/4拍',label:'4/4拍',desc:'最常见节奏型',targetSlot:'s10'},
+  {id:'m11',category:'rhythm',value:'3/4拍',label:'3/4拍',desc:'华尔兹节奏',targetSlot:'s11'},
+  {id:'m12',category:'rhythm',value:'切分音',label:'切分音',desc:'打破常规的节奏重音',targetSlot:'s12'}
+];
+
+var SLOT_TEMPLATES = [
+  {id:'s1',label:'低频节奏槽',accepts:['frequency'],hint:'需要低频声波'},
+  {id:'s2',label:'中频节奏槽',accepts:['frequency'],hint:'需要中频声波'},
+  {id:'s3',label:'高频节奏槽',accepts:['frequency'],hint:'需要高频声波'},
+  {id:'s4',label:'强节拍槽',accepts:['amplitude'],hint:'需要强振幅'},
+  {id:'s5',label:'弱节拍槽',accepts:['amplitude'],hint:'需要弱振幅'},
+  {id:'s6',label:'渐强节奏槽',accepts:['amplitude'],hint:'需要渐强振幅'},
+  {id:'s7',label:'平滑音色槽',accepts:['waveform'],hint:'需要平滑波形'},
+  {id:'s8',label:'电子音色槽',accepts:['waveform'],hint:'需要方波'},
+  {id:'s9',label:'粗糙音色槽',accepts:['waveform'],hint:'需要锯齿波'},
+  {id:'s10',label:'标准节奏槽',accepts:['rhythm'],hint:'需要4/4拍'},
+  {id:'s11',label:'华尔兹槽',accepts:['rhythm'],hint:'需要3/4拍'},
+  {id:'s12',label:'变奏槽',accepts:['rhythm'],hint:'需要切分音'}
+];
+
+var G = {
+  state: null,
+  config: null,
+  selectedMaterial: null,
+
+  init: function() {
+    try {
+      this.config = this.loadConfig();
+      this.state = this.createInitialState();
+      UI.render();
+    } catch(e) {
+      this.showError('初始化失败：' + e.message);
+    }
+  },
+
+  loadConfig: function() {
+    try {
+      var stored = localStorage.getItem('swr_config');
+      if (stored) {
+        var parsed = JSON.parse(stored);
+        var merged = {};
+        for (var k in DEFAULT_CONFIG) { merged[k] = DEFAULT_CONFIG[k]; }
+        for (var k in parsed) {
+          if (merged[k] !== undefined) {
+            var v = parsed[k];
+            if (typeof v !== 'number' || isNaN(v) || !isFinite(v)) {
+              throw new Error('配置项 "' + k + '" 的值无效: ' + JSON.stringify(v) + '，应为数字');
+            }
+            merged[k] = v;
+          }
+        }
+        return merged;
+      }
+      return Object.assign({}, DEFAULT_CONFIG);
+    } catch(e) {
+      this.showError('配置加载异常:\n' + e.message + '\n\n将使用默认配置。点击"我知道了"后继续。');
+      return Object.assign({}, DEFAULT_CONFIG);
+    }
+  },
+
+  createInitialState: function() {
+    return {
+      round: 0,
+      score: 0,
+      energy: this.config.initialEnergy,
+      timeTokens: this.config.initialTimeTokens,
+      risk: 0,
+      status: 'idle',
+      materials: [],
+      slots: [],
+      matchedMaterials: {},
+      settlements: [],
+      records: [],
+      conflicts: [],
+      roundStartScore: 0,
+      roundStartRisk: 0,
+      roundStartEnergy: this.config.initialEnergy,
+      roundStartTimeTokens: this.config.initialTimeTokens,
+      supplementLog: []
+    };
+  },
+
+  start: function() {
+    if (this.state.status === 'playing') return;
+    if (this.state.status === 'paused') { this.continue_(); return; }
+    this.state.round++;
+    this.state.status = 'playing';
+    this.state.roundStartScore = this.state.score;
+    this.state.roundStartRisk = this.state.risk;
+    this.state.roundStartEnergy = this.state.energy;
+    this.state.roundStartTimeTokens = this.state.timeTokens;
+    this.state.matchedMaterials = {};
+
+    var roundSize = Math.min(4 + this.state.round, 8);
+    var startIdx = ((this.state.round - 1) * 4) % MATERIAL_TEMPLATES.length;
+    var mats = [];
+    var slts = [];
+    for (var i = 0; i < roundSize && i < MATERIAL_TEMPLATES.length; i++) {
+      var idx = (startIdx + i) % MATERIAL_TEMPLATES.length;
+      var tmpl = MATERIAL_TEMPLATES[idx];
+      mats.push({
+        id: tmpl.id + '_r' + this.state.round,
+        category: tmpl.category,
+        value: tmpl.value,
+        label: tmpl.label,
+        desc: tmpl.desc,
+        targetSlot: tmpl.targetSlot,
+        matched: false,
+        fromSupplement: false
+      });
+      slts.push({
+        id: tmpl.targetSlot + '_r' + this.state.round,
+        label: SLOT_TEMPLATES.find(function(s){return s.id===tmpl.targetSlot}).label,
+        accepts: SLOT_TEMPLATES.find(function(s){return s.id===tmpl.targetSlot}).accepts,
+        hint: SLOT_TEMPLATES.find(function(s){return s.id===tmpl.targetSlot}).hint,
+        material: null,
+        correct: null
+      });
+    }
+    this.state.materials = mats;
+    this.state.slots = slts;
+
+    this.addRecord('回合 ' + this.state.round + ' 开始，' + roundSize + ' 个材料', 'normal');
+    UI.render();
+  },
+
+  pause: function() {
+    if (this.state.status !== 'playing') return;
+    this.state.status = 'paused';
+    this.addRecord('⏸ 暂停！回合 ' + this.state.round + ' 中途暂停', 'pause');
+    this.addSettlement(this.state.round, '暂停', 0, 0, 0, 0);
+    UI.render();
+  },
+
+  continue_: function() {
+    if (this.state.status !== 'paused') return;
+    this.state.status = 'playing';
+    this.addRecord('▶ 继续回合 ' + this.state.round, 'normal');
+    UI.render();
+  },
+
+  restart: function() {
+    var prevRound = this.state.round;
+    var prevScore = this.state.score;
+    this.state.status = 'idle';
+    this.state.round = 0;
+    this.state.score = 0;
+    this.state.energy = this.config.initialEnergy;
+    this.state.timeTokens = this.config.initialTimeTokens;
+    this.state.risk = 0;
+    this.state.materials = [];
+    this.state.slots = [];
+    this.state.matchedMaterials = {};
+    this.state.supplementLog = [];
+    this.addRecord('🔄 重开！之前回合=' + prevRound + ' 分数=' + prevScore + '，记录保留', 'error');
+    this.addSettlement(prevRound, '重开', -prevScore, 0, -this.state.energy, -this.state.timeTokens);
+    UI.render();
+  },
+
+  selectMaterial: function(matId) {
+    if (this.state.status !== 'playing') return;
+    var mat = this.state.materials.find(function(m){return m.id===matId});
+    if (!mat || mat.matched) return;
+
+    if (this.selectedMaterial === matId) {
+      this.selectedMaterial = null;
+    } else {
+      this.selectedMaterial = matId;
+    }
+    UI.renderMaterials();
+  },
+
+  placeMaterial: function(slotId) {
+    if (this.state.status !== 'playing') return;
+    if (!this.selectedMaterial) return;
+
+    var mat = this.state.materials.find(function(m){return m.id===G.selectedMaterial});
+    var slot = this.state.slots.find(function(s){return s.id===slotId});
+    if (!mat || !slot) return;
+    if (slot.material) return;
+
+    if (slot.accepts.indexOf(mat.category) === -1) {
+      this.showToast('材料类型不匹配！' + mat.category + ' 不能放入 ' + slot.label, 'warn');
+      return;
+    }
+
+    if (this.state.energy < this.config.actionEnergyCost) {
+      this.showToast('能量不足！需要 ' + this.config.actionEnergyCost + ' ⚡', 'err');
+      return;
+    }
+
+    this.state.energy -= this.config.actionEnergyCost;
+
+    var isCorrect = (mat.targetSlot + '_r' + this.state.round) === slotId;
+
+    if (isCorrect) {
+      mat.matched = true;
+      slot.material = mat;
+      slot.correct = true;
+      this.state.score += this.config.correctMatchScore;
+      this.state.matchedMaterials[mat.id] = {slotId: slotId, correct: true};
+      this.addRecord('✅ ' + mat.label + ' → ' + slot.label + ' 正确！+' + this.config.correctMatchScore + '分', 'normal');
+    } else {
+      slot.material = mat;
+      slot.correct = false;
+      this.state.risk = Math.min(this.state.risk + this.config.wrongMatchRisk, this.config.maxRisk);
+      this.state.score = Math.max(0, this.state.score - this.config.wrongMatchScorePenalty);
+      this.addRecord('❌ ' + mat.label + ' → ' + slot.label + ' 错配！风险+' + this.config.wrongMatchRisk + ' 分-' + this.config.wrongMatchScorePenalty, 'error');
+
+      setTimeout(function(){
+        slot.material = null;
+        slot.correct = null;
+        G.state.risk = Math.min(G.state.risk + 2, G.config.maxRisk);
+        G.addRecord('↩ ' + mat.label + ' 从 ' + slot.label + ' 弹回，风险+2', 'error');
+        UI.render();
+      }, 800);
+    }
+
+    this.selectedMaterial = null;
+
+    if (this.state.risk >= this.config.maxRisk) {
+      this.endRound('风险爆表');
+      return;
+    }
+
+    this.checkRoundComplete();
+    UI.render();
+  },
+
+  useToken: function() {
+    if (this.state.status !== 'playing') return;
+    if (this.state.timeTokens <= 0) {
+      this.showToast('没有时间券了！', 'err');
+      return;
+    }
+    this.state.timeTokens--;
+    this.state.risk = Math.max(0, this.state.risk - this.config.useTokenRiskReduction);
+    this.addRecord('🎫 使用时间券，风险-' + this.config.useTokenRiskReduction, 'boundary');
+    UI.render();
+  },
+
+  skipSlot: function(slotId) {
+    if (this.state.status !== 'playing') return;
+    var slot = this.state.slots.find(function(s){return s.id===slotId});
+    if (!slot || slot.material) return;
+
+    this.state.risk = Math.min(this.state.risk + this.config.skipRisk, this.config.maxRisk);
+    slot.material = {label: '跳过', skip: true};
+    slot.correct = null;
+    this.addRecord('⏭ 跳过 ' + slot.label + '，风险+' + this.config.skipRisk, 'boundary');
+
+    if (this.state.risk >= this.config.maxRisk) {
+      this.endRound('风险爆表');
+      return;
+    }
+    this.checkRoundComplete();
+    UI.render();
+  },
+
+  checkRoundComplete: function() {
+    var allFilled = this.state.slots.every(function(s){return s.material !== null;});
+    if (allFilled) {
+      var allCorrect = this.state.slots.every(function(s){return s.correct === true;});
+      if (allCorrect) {
+        this.endRound('全部匹配');
+      } else {
+        this.endRound('部分匹配');
+      }
+    }
+  },
+
+  endRound: function(reason) {
+    this.state.status = 'ended';
+    var scoreDelta = this.state.score - this.state.roundStartScore;
+    var riskDelta = this.state.risk - this.state.roundStartRisk;
+    var energyDelta = this.state.energy - this.state.roundStartEnergy;
+    var tokenDelta = this.state.timeTokens - this.state.roundStartTimeTokens;
+
+    this.addSettlement(this.state.round, reason, scoreDelta, riskDelta, energyDelta, tokenDelta);
+    this.addRecord('🏁 回合 ' + this.state.round + ' 结束：' + reason + '，得分变化=' + (scoreDelta>=0?'+':'') + scoreDelta, reason === '全部匹配' ? 'normal' : 'error');
+
+    if (this.state.risk > 0 && reason !== '风险爆表') {
+      this.state.risk = Math.max(0, this.state.risk - 5);
+      this.addRecord('回合结束风险衰减-5', 'normal');
+    }
+
+    this.showRoundResult(reason, scoreDelta, riskDelta);
+  },
+
+  showRoundResult: function(reason, scoreDelta, riskDelta) {
+    var overlay = document.createElement('div');
+    overlay.className = 'round-result';
+    overlay.id = 'round-result-overlay';
+    var correctCount = this.state.slots.filter(function(s){return s.correct===true}).length;
+    var totalCount = this.state.slots.length;
+    overlay.innerHTML = '<div class="card">' +
+      '<h3>回合 ' + this.state.round + ' 结算</h3>' +
+      '<div class="detail">' +
+      '结算原因: ' + reason + '<br>' +
+      '匹配: ' + correctCount + '/' + totalCount + '<br>' +
+      '分数变化: ' + (scoreDelta>=0?'+':'') + scoreDelta + '<br>' +
+      '风险变化: ' + (riskDelta>=0?'+':'') + riskDelta + '<br>' +
+      '当前风险: ' + this.state.risk + '/' + this.config.maxRisk + '<br>' +
+      '剩余能量: ' + this.state.energy + '<br>' +
+      '剩余时间券: ' + this.state.timeTokens +
+      '</div>' +
+      '<div class="actions">' +
+      '<button class="btn" onclick="document.getElementById(\'round-result-overlay\').remove();G.start()">下一回合</button>' +
+      '<button class="btn danger" onclick="document.getElementById(\'round-result-overlay\').remove();G.restart()">重开</button>' +
+      '</div></div>';
+    document.body.appendChild(overlay);
+  },
+
+  supplement: function() {
+    if (this.state.status !== 'playing' && this.state.status !== 'paused') {
+      this.showToast('需要先开始游戏才能补录', 'warn');
+      return;
+    }
+
+    var cat = document.getElementById('sup-cat').value.trim();
+    var val = document.getElementById('sup-val').value.trim();
+    var label = document.getElementById('sup-label').value.trim() || val;
+    var note = document.getElementById('sup-note').value.trim();
+
+    if (!cat || !val) {
+      this.showToast('类别和值不能为空', 'warn');
+      return;
+    }
+
+    var validCats = ['frequency','amplitude','waveform','rhythm'];
+    if (validCats.indexOf(cat) === -1) {
+      this.showToast('类别必须是 ' + validCats.join('/') + ' 之一', 'warn');
+      return;
+    }
+
+    var newId = 'sup_' + Date.now();
+    var newSlotId = 'sup_slot_' + Date.now();
+    var newMat = {
+      id: newId,
+      category: cat,
+      value: val,
+      label: label,
+      desc: note || '补录材料',
+      targetSlot: newSlotId,
+      matched: false,
+      fromSupplement: true
+    };
+
+    var newSlot = {
+      id: newSlotId,
+      label: '补录槽: ' + label,
+      accepts: [cat],
+      hint: note || '补录: ' + cat,
+      material: null,
+      correct: null
+    };
+
+    var beforeMaterials = this.state.materials.map(function(m){return m.id});
+    this.state.materials.push(newMat);
+    this.state.slots.push(newSlot);
+    var afterMaterials = this.state.materials.map(function(m){return m.id});
+
+    this.state.supplementLog.push({
+      timestamp: Date.now(),
+      materialId: newId,
+      note: note,
+      before: beforeMaterials,
+      after: afterMaterials
+    });
+
+    this.addRecord('📝 补录材料: ' + label + ' (' + cat + '=' + val + ') 备注: ' + (note||'无'), 'normal');
+
+    if (this.state.status === 'paused') {
+      this.state.status = 'playing';
+      this.addRecord('▶ 补录后自动继续', 'normal');
+    }
+
+    document.getElementById('sup-cat').value = '';
+    document.getElementById('sup-val').value = '';
+    document.getElementById('sup-label').value = '';
+    document.getElementById('sup-note').value = '';
+
+    this.showSupplementDiff(beforeMaterials, afterMaterials, newMat);
+    UI.render();
+  },
+
+  showSupplementDiff: function(before, after, newMat) {
+    var diffBox = document.getElementById('supplement-diff');
+    diffBox.style.display = 'block';
+    var html = '<div style="margin-bottom:4px;font-weight:700">补录差异:</div>';
+    before.forEach(function(id){
+      html += '<div class="diff-same">  原有: ' + id + '</div>';
+    });
+    after.forEach(function(id){
+      if (before.indexOf(id) === -1) {
+        html += '<div class="diff-add">+ 新增: ' + id + ' (' + newMat.label + ')</div>';
+      }
+    });
+    html += '<div class="diff-same" style="margin-top:4px">补录后继续当前回合 ' + this.state.round + '</div>';
+    diffBox.innerHTML = html;
+  },
+
+  importData: function() {
+    var text = document.getElementById('import-textarea').value.trim();
+    if (!text) {
+      this.showToast('导入内容不能为空', 'warn');
+      return;
+    }
+
+    var imported;
+    try {
+      imported = JSON.parse(text);
+    } catch(e) {
+      this.showError('导入数据格式错误，无法解析JSON:\n' + e.message);
+      return;
+    }
+
+    if (!imported.materials || !Array.isArray(imported.materials)) {
+      this.showError('导入数据缺少 materials 数组');
+      return;
+    }
+
+    var newConflicts = [];
+    var self = this;
+
+    imported.materials.forEach(function(im) {
+      if (!im.category || !im.value) {
+        newConflicts.push({
+          id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+          recordId: null,
+          recordClaim: '(导入数据缺少必要字段)',
+          importClaim: JSON.stringify(im),
+          suggestion: '该材料数据不完整，建议跳过或手动补充',
+          resolved: false,
+          resolution: null
+        });
+        return;
+      }
+
+      var existingRecord = self.state.records.find(function(r){
+        return r.raw.indexOf(im.value) !== -1 || r.raw.indexOf(im.category) !== -1;
+      });
+
+      if (existingRecord) {
+        var recordImplies = existingRecord.raw;
+        var importImplies = im.category + '=' + im.value + (im.label ? ' (' + im.label + ')' : '');
+        if (recordImplies.indexOf(im.value) === -1 || (im.targetSlot && recordImplies.indexOf(im.targetSlot) === -1 && im.targetSlot)) {
+          newConflicts.push({
+            id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+            recordId: existingRecord.id,
+            recordClaim: recordImplies,
+            importClaim: importImplies,
+            suggestion: '学生记录与导入数据对材料描述不一致，请确认以哪个为准',
+            resolved: false,
+            resolution: null
+          });
+        }
+      }
+    });
+
+    if (newConflicts.length === 0 && this.state.status === 'playing') {
+      imported.materials.forEach(function(im) {
+        if (!im.category || !im.value) return;
+        var newId = 'imp_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+        var newSlotId = 'imp_slot_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+        self.state.materials.push({
+          id: newId,
+          category: im.category,
+          value: im.value,
+          label: im.label || im.value,
+          desc: im.desc || '导入材料',
+          targetSlot: im.targetSlot ? im.targetSlot + '_r' + self.state.round : newSlotId,
+          matched: false,
+          fromSupplement: true
+        });
+        self.state.slots.push({
+          id: im.targetSlot ? im.targetSlot + '_r' + self.state.round : newSlotId,
+          label: '导入槽: ' + (im.label || im.value),
+          accepts: [im.category],
+          hint: im.desc || '导入: ' + im.category,
+          material: null,
+          correct: null
+        });
+      });
+      this.addRecord('📥 导入 ' + imported.materials.length + ' 条材料（无冲突）', 'normal');
+    }
+
+    newConflicts.forEach(function(c){ self.state.conflicts.push(c); });
+    this.addRecord('📥 导入数据，发现 ' + newConflicts.length + ' 个冲突', newConflicts.length > 0 ? 'boundary' : 'normal');
+
+    UI.toggleImport();
+    UI.render();
+    if (newConflicts.length > 0) {
+      UI.switchTab('conflicts');
+    }
+  },
+
+  resolveConflict: function(conflictId, resolution) {
+    var conflict = this.state.conflicts.find(function(c){return c.id===conflictId});
+    if (!conflict || conflict.resolved) return;
+
+    conflict.resolved = true;
+    conflict.resolution = resolution;
+
+    if (resolution === 'useImport' && this.state.status === 'playing') {
+      try {
+        var importData = JSON.parse(conflict.importClaim);
+        if (importData.category && importData.value) {
+          var newId = 'imp_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+          this.state.materials.push({
+            id: newId,
+            category: importData.category,
+            value: importData.value,
+            label: importData.label || importData.value,
+            desc: importData.desc || '冲突解决后导入',
+            targetSlot: importData.targetSlot ? importData.targetSlot + '_r' + this.state.round : 'imp_slot_' + Date.now(),
+            matched: false,
+            fromSupplement: true
+          });
+        }
+      } catch(e) {}
+    }
+
+    this.addRecord('⚖ 冲突解决: ' + conflictId.substr(0,12) + ' → ' + resolution, 'normal');
+    UI.render();
+  },
+
+  addRecord: function(raw, type) {
+    this.state.records.push({
+      id: 'r_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+      raw: raw,
+      type: type || 'normal',
+      isPause: type === 'pause',
+      isError: type === 'error',
+      isBoundary: type === 'boundary',
+      timestamp: Date.now()
+    });
+  },
+
+  addSettlement: function(round, reason, scoreDelta, riskDelta, energyDelta, tokenDelta) {
+    this.state.settlements.push({
+      round: round,
+      reason: reason,
+      scoreDelta: scoreDelta,
+      riskDelta: riskDelta,
+      energyDelta: energyDelta,
+      tokenDelta: tokenDelta,
+      timestamp: Date.now()
+    });
+  },
+
+  showToast: function(msg, type) {
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + (type||'info');
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(function(){ toast.remove(); }, 2500);
+  },
+
+  showError: function(msg) {
+    document.getElementById('error-msg').textContent = msg;
+    document.getElementById('error-overlay').classList.add('show');
+  }
+};
+
+var UI = {
+  currentTab: 'records',
+
+  render: function() {
+    this.renderStats();
+    this.renderMaterials();
+    this.renderSlots();
+    this.renderTab();
+    this.renderButtons();
+    document.getElementById('conflict-count').textContent = G.state.conflicts.filter(function(c){return !c.resolved}).length;
+  },
+
+  renderStats: function() {
+    document.getElementById('s-round').textContent = G.state.round;
+    document.getElementById('s-score').textContent = G.state.score;
+    document.getElementById('s-energy').textContent = G.state.energy;
+    document.getElementById('s-tokens').textContent = G.state.timeTokens;
+    document.getElementById('s-risk').textContent = G.state.risk;
+
+    var riskPct = Math.min(100, (G.state.risk / G.config.maxRisk) * 100);
+    var fill = document.getElementById('risk-fill');
+    fill.style.width = riskPct + '%';
+    fill.style.background = riskPct < 40 ? 'var(--risk-low)' : riskPct < 70 ? 'var(--risk-mid)' : 'var(--risk-high)';
+
+    var tag = document.getElementById('phase-tag');
+    tag.className = 'phase-tag ' + G.state.status;
+    var labels = {idle:'未开始',playing:'进行中',paused:'已暂停',ended:'已结束'};
+    tag.textContent = labels[G.state.status] || G.state.status;
+  },
+
+  renderMaterials: function() {
+    var hint = document.getElementById('selection-hint');
+    if (hint) hint.style.display = G.selectedMaterial ? '' : 'none';
+    var list = document.getElementById('materials-list');
+    if (G.state.materials.length === 0) {
+      list.innerHTML = '<div style="color:var(--dim);font-size:13px;text-align:center;padding:20px">点击"开始"加载声波材料</div>';
+      return;
+    }
+    var html = '';
+    G.state.materials.forEach(function(m){
+      var cls = 'material-card';
+      if (m.matched) cls += ' matched';
+      else if (G.selectedMaterial === m.id) cls += ' selected';
+      if (m.fromSupplement) cls += ' supplement';
+      html += '<div class="' + cls + '" draggable="' + (!m.matched) + '" data-mat-id="' + m.id + '">' +
+        '<div class="cat">' + m.category + (m.fromSupplement ? ' (补录)' : '') + '</div>' +
+        '<div class="val">' + m.label + '</div>' +
+        '<div class="desc">' + m.desc + '</div>' +
+        '</div>';
+    });
+    list.innerHTML = html;
+
+    list.querySelectorAll('.material-card:not(.matched)').forEach(function(el){
+      el.addEventListener('click', function(){
+        G.selectMaterial(el.dataset.matId);
+      });
+      el.addEventListener('dragstart', function(e){
+        e.dataTransfer.setData('text/plain', el.dataset.matId);
+        el.classList.add('dragging');
+        G.selectedMaterial = el.dataset.matId;
+      });
+      el.addEventListener('dragend', function(){
+        el.classList.remove('dragging');
+      });
+    });
+  },
+
+  renderSlots: function() {
+    var list = document.getElementById('slots-list');
+    if (G.state.slots.length === 0) {
+      list.innerHTML = '<div style="color:var(--dim);font-size:13px;text-align:center;padding:20px">等待游戏开始</div>';
+      return;
+    }
+    var html = '';
+    G.state.slots.forEach(function(s){
+      var cls = 'rhythm-slot';
+      if (s.material && s.correct === true) cls += ' filled';
+      else if (s.material && s.correct === false) cls += ' wrong';
+      else if (s.material && s.material.skip) cls += ' filled';
+
+      var content = '';
+      if (s.material) {
+        if (s.material.skip) {
+          content = '<div class="slot-content" style="color:var(--dim)">⏭ 跳过</div>';
+        } else {
+          content = '<div class="slot-content" style="color:' + (s.correct ? 'var(--ok)' : 'var(--accent)') + '">' +
+            s.material.label + (s.correct ? ' ✓' : ' ✗') + '</div>';
+        }
+      }
+
+      html += '<div class="' + cls + '" tabindex="0" role="button" aria-label="' + s.label + (s.material ? ' 已填' : ' 空槽-点击放入材料') + '" data-slot-id="' + s.id + '">' +
+        '<div class="slot-label">' + s.label + '</div>' +
+        '<div class="slot-accepts">' + s.hint + '</div>' +
+        content +
+        (!s.material ? '<button class="btn" style="margin-top:6px;font-size:11px;padding:2px 8px" onclick="G.skipSlot(\'' + s.id + '\')">跳过</button>' : '') +
+        '</div>';
+    });
+    list.innerHTML = html;
+
+    list.querySelectorAll('.rhythm-slot').forEach(function(el){
+      if (!el.querySelector('.slot-content') && G.selectedMaterial) {
+        el.classList.add('highlight');
+      }
+      el.addEventListener('dragover', function(e){
+        e.preventDefault();
+        el.classList.add('drag-over');
+      });
+      el.addEventListener('dragleave', function(){
+        el.classList.remove('drag-over');
+      });
+      el.addEventListener('drop', function(e){
+        e.preventDefault();
+        el.classList.remove('drag-over');
+        var matId = e.dataTransfer.getData('text/plain');
+        if (matId) {
+          G.selectedMaterial = matId;
+          G.placeMaterial(el.dataset.slotId);
+        }
+      });
+      el.addEventListener('click', function(){
+        if (G.selectedMaterial) {
+          G.placeMaterial(el.dataset.slotId);
+        }
+      });
+    });
+  },
+
+  renderTab: function() {
+    var self = this;
+    ['records','settlements','conflicts'].forEach(function(tab){
+      var el = document.getElementById('tab-' + tab);
+      el.style.display = self.currentTab === tab ? '' : 'none';
+    });
+    document.querySelectorAll('.tab-btn').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.tab === self.currentTab);
+    });
+
+    if (this.currentTab === 'records') this.renderRecords();
+    else if (this.currentTab === 'settlements') this.renderSettlements();
+    else if (this.currentTab === 'conflicts') this.renderConflicts();
+  },
+
+  renderRecords: function() {
+    var el = document.getElementById('tab-records');
+    if (G.state.records.length === 0) {
+      el.innerHTML = '<div style="color:var(--dim);font-size:13px;text-align:center;padding:16px">暂无练习记录</div>';
+      return;
+    }
+    var html = '';
+    G.state.records.slice().reverse().forEach(function(r){
+      var tagClass = 'tag-normal';
+      var tagLabel = '记录';
+      if (r.isPause) { tagClass = 'tag-pause'; tagLabel = '暂停'; }
+      else if (r.isError) { tagClass = 'tag-error'; tagLabel = '误操作'; }
+      else if (r.isBoundary) { tagClass = 'tag-boundary'; tagLabel = '边界'; }
+
+      var t = new Date(r.timestamp);
+      var ts = t.getHours().toString().padStart(2,'0') + ':' + t.getMinutes().toString().padStart(2,'0') + ':' + t.getSeconds().toString().padStart(2,'0');
+
+      html += '<div class="record-item">' +
+        '<span class="time">' + ts + '</span>' +
+        '<span class="raw">' + r.raw.replace(/</g,'&lt;') + '</span>' +
+        '<span class="tag ' + tagClass + '">' + tagLabel + '</span>' +
+        '</div>';
+    });
+    el.innerHTML = html;
+  },
+
+  renderSettlements: function() {
+    var el = document.getElementById('tab-settlements');
+    if (G.state.settlements.length === 0) {
+      el.innerHTML = '<div style="color:var(--dim);font-size:13px;text-align:center;padding:16px">暂无结算记录</div>';
+      return;
+    }
+    var html = '';
+    G.state.settlements.slice().reverse().forEach(function(s){
+      html += '<div class="settlement-item">' +
+        '<span class="reason">回合' + s.round + ' - ' + s.reason + '</span>' +
+        '<div class="detail">' +
+        '分数:' + (s.scoreDelta>=0?'+':'') + s.scoreDelta +
+        ' | 风险:' + (s.riskDelta>=0?'+':'') + s.riskDelta +
+        ' | 能量:' + (s.energyDelta>=0?'+':'') + s.energyDelta +
+        ' | 时间券:' + (s.tokenDelta>=0?'+':'') + s.tokenDelta +
+        '</div></div>';
+    });
+    el.innerHTML = html;
+  },
+
+  renderConflicts: function() {
+    var el = document.getElementById('tab-conflicts');
+    if (G.state.conflicts.length === 0) {
+      el.innerHTML = '<div style="color:var(--dim);font-size:13px;text-align:center;padding:16px">暂无冲突</div>';
+      return;
+    }
+    var html = '';
+    G.state.conflicts.forEach(function(c){
+      var resolvedClass = c.resolved ? ' style="opacity:.5"' : '';
+      html += '<div class="conflict-item"' + resolvedClass + '>' +
+        '<div style="font-size:12px;color:var(--dim)">冲突ID: ' + c.id.substr(0,16) + (c.resolved ? ' (已解决: ' + c.resolution + ')' : '') + '</div>' +
+        '<div class="vs">' +
+          '<div class="side record-side"><div style="font-size:11px;color:var(--ok);margin-bottom:2px">学生记录</div>' + c.recordClaim.replace(/</g,'&lt;') + '</div>' +
+          '<div class="vs-divider">VS</div>' +
+          '<div class="side import-side"><div style="font-size:11px;color:var(--warn);margin-bottom:2px">导入数据</div>' + c.importClaim.replace(/</g,'&lt;') + '</div>' +
+        '</div>' +
+        '<div class="suggestion">💡 ' + c.suggestion + '</div>' +
+        (!c.resolved ?
+          '<div class="actions">' +
+            '<button class="btn" onclick="G.resolveConflict(\'' + c.id + '\',\'useRecord\')">采用记录</button>' +
+            '<button class="btn" onclick="G.resolveConflict(\'' + c.id + '\',\'useImport\')">采用导入</button>' +
+            '<button class="btn" onclick="G.resolveConflict(\'' + c.id + '\',\'manual\')">手动处理</button>' +
+          '</div>'
+          : '') +
+        '</div>';
+    });
+    el.innerHTML = html;
+  },
+
+  renderButtons: function() {
+    var s = G.state.status;
+    document.getElementById('btn-start').disabled = (s === 'playing');
+    document.getElementById('btn-pause').disabled = (s !== 'playing');
+    document.getElementById('btn-continue').disabled = (s !== 'paused');
+    document.getElementById('btn-restart').disabled = (s === 'idle');
+    document.getElementById('btn-supplement').disabled = (s !== 'playing' && s !== 'paused');
+    document.getElementById('btn-token').disabled = (s !== 'playing' || G.state.timeTokens <= 0);
+  },
+
+  switchTab: function(tab) {
+    this.currentTab = tab;
+    this.renderTab();
+    document.querySelectorAll('.tab-btn').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+  },
+
+  toggleSupplement: function() {
+    var sec = document.getElementById('supplement-section');
+    sec.style.display = sec.style.display === 'none' ? '' : 'none';
+    var diff = document.getElementById('supplement-diff');
+    if (sec.style.display === 'none') diff.style.display = 'none';
+  },
+
+  toggleImport: function() {
+    var sec = document.getElementById('import-section');
+    sec.style.display = sec.style.display === 'none' ? '' : 'none';
+  }
+};
+
+window.onerror = function(msg, url, line, col, error) {
+  G.showError('运行时错误:\n' + msg + '\n位置: ' + url + ':' + line);
+  return true;
+};
+
+window.addEventListener('unhandledrejection', function(e) {
+  G.showError('异步错误:\n' + (e.reason ? e.reason.message || String(e.reason) : '未知错误'));
+});
+
+G.init();
+</script>
+</body>
+</html>
