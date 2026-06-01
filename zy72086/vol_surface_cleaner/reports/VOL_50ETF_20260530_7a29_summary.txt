@@ -1,0 +1,34 @@
+============================================================
+期权波动率曲面清洗报告
+============================================================
+标的: 50ETF
+交易日: 2026-05-30
+曲面ID: VOL_50ETF_20260530_7a29
+状态: pending_review
+
+--- 处理摘要 ---
+原始数据点: 18
+有效数据点: 18
+异常值移除: 0
+插值补全: 6
+冲突检测: 0 个
+处理耗时: 0.107秒
+
+--- 参数版本 ---
+  outlier_zscore_threshold: 2.5 (人工修改)
+  outlier_iqr_factor: 1.5
+  vol_min_valid: 0.01
+  vol_max_valid: 2.0
+  arbitrage_max_spread: 0.05
+  interpolation_method: cubic
+  smoothness_lambda: 0.1
+  confidence_weight_source: {'lecture_note': 0.6, 'business_table': 0.9, 'screenshot': 0.4, 'summary_page': 0.8}
+  conflict_tolerance_pct: 3.0 (人工修改)
+  tenor_order: ['1M', '3M', '6M', '1Y', '2Y', '3Y', '5Y', '10Y']
+
+--- 数据来源 ---
+  - lecture_note: 金融工程讲义-第7章
+  - business_table: 期权做市系统导出_20260530
+  - screenshot: 彭博终端截图_15:30
+
+============================================================

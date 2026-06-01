@@ -1,0 +1,2025 @@
+{
+  "version_id": "vaf979077",
+  "surface_id": "VOL_50ETF_20260530_7a29",
+  "underlying": "50ETF",
+  "trade_date": "2026-05-30T00:00:00",
+  "generated_at": "2026-06-01T23:40:45.411795",
+  "status": "pending_review",
+  "status_display": {
+    "text": "待人工确认",
+    "class": "warning",
+    "icon": "⚠"
+  },
+  "comments": "多源导入曲面 - 讲义+业务表+截图",
+  "summary": {
+    "original_points": 18,
+    "cleaned_points": 18,
+    "outliers_removed": 0,
+    "interpolated_points": 6,
+    "conflicts": 0,
+    "processing_time": 0.107,
+    "high_confidence": 6,
+    "medium_confidence": 6,
+    "low_confidence": 12,
+    "needs_review": 6,
+    "legacy_points": 0
+  },
+  "data_sources": [
+    {
+      "source_type": "lecture_note",
+      "source_name": "金融工程讲义-第7章",
+      "source_path": null,
+      "import_time": "2026-06-01T23:40:45.155155",
+      "field_mapping": {
+        "期限": "maturity",
+        "行权价": "strike",
+        "隐含波动率": "implied_vol"
+      },
+      "raw_data_hash": "6ad49ce47eb588408ac462596187ba0c"
+    },
+    {
+      "source_type": "business_table",
+      "source_name": "期权做市系统导出_20260530",
+      "source_path": null,
+      "import_time": "2026-06-01T23:40:45.155294",
+      "field_mapping": {
+        "执行价": "strike",
+        "IV": "implied_vol",
+        "期权类型": "option_type"
+      },
+      "raw_data_hash": "fc736f01b93a36121be37f3792a70769"
+    },
+    {
+      "source_type": "screenshot",
+      "source_name": "彭博终端截图_15:30",
+      "source_path": null,
+      "import_time": "2026-06-01T23:40:45.155543",
+      "field_mapping": {
+        "tenor": "tenor",
+        "strike": "strike",
+        "implied_vol": "implied_vol",
+        "maturity": "maturity"
+      },
+      "raw_data_hash": "47bdc1e61e85a8265b751fb3e82a3ac5"
+    }
+  ],
+  "parameters_used": [
+    {
+      "version_id": "v0bd1d9",
+      "parameter_name": "outlier_zscore_threshold",
+      "value": 2.5,
+      "default_value": 3.0,
+      "is_user_modified": true,
+      "modified_at": "2026-06-01T23:29:12.223723",
+      "modified_by": "小孟",
+      "valid_from": "2026-06-01T23:29:12.223725",
+      "valid_to": null,
+      "comment": "近期市场波动较大，收紧异常检测阈值",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b",
+        "VOL_50ETF_20260530_7a29",
+        "VOL_50ETF_20260528_362a"
+      ]
+    },
+    {
+      "version_id": "v78008a",
+      "parameter_name": "outlier_iqr_factor",
+      "value": 1.5,
+      "default_value": 1.5,
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798280",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b",
+        "VOL_50ETF_20260530_7a29",
+        "VOL_50ETF_20260528_362a"
+      ]
+    },
+    {
+      "version_id": "v559f22",
+      "parameter_name": "vol_min_valid",
+      "value": 0.01,
+      "default_value": 0.01,
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798286",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b",
+        "VOL_50ETF_20260530_7a29",
+        "VOL_50ETF_20260528_362a"
+      ]
+    },
+    {
+      "version_id": "va38fca",
+      "parameter_name": "vol_max_valid",
+      "value": 2.0,
+      "default_value": 2.0,
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798290",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b",
+        "VOL_50ETF_20260530_7a29",
+        "VOL_50ETF_20260528_362a"
+      ]
+    },
+    {
+      "version_id": "v32a858",
+      "parameter_name": "arbitrage_max_spread",
+      "value": 0.05,
+      "default_value": 0.05,
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798294",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b",
+        "VOL_50ETF_20260530_7a29",
+        "VOL_50ETF_20260528_362a"
+      ]
+    },
+    {
+      "version_id": "v69ff9f",
+      "parameter_name": "interpolation_method",
+      "value": "cubic",
+      "default_value": "cubic",
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798299",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b",
+        "VOL_50ETF_20260530_7a29",
+        "VOL_50ETF_20260528_362a"
+      ]
+    },
+    {
+      "version_id": "v4f9a0c",
+      "parameter_name": "smoothness_lambda",
+      "value": 0.1,
+      "default_value": 0.1,
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798303",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b",
+        "VOL_50ETF_20260530_7a29",
+        "VOL_50ETF_20260528_362a"
+      ]
+    },
+    {
+      "version_id": "vaf5bc1",
+      "parameter_name": "confidence_weight_source",
+      "value": {
+        "lecture_note": 0.6,
+        "business_table": 0.9,
+        "screenshot": 0.4,
+        "summary_page": 0.8
+      },
+      "default_value": {
+        "lecture_note": 0.6,
+        "business_table": 0.9,
+        "screenshot": 0.4,
+        "summary_page": 0.8
+      },
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798307",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b",
+        "VOL_50ETF_20260530_7a29",
+        "VOL_50ETF_20260528_362a"
+      ]
+    },
+    {
+      "version_id": "v5b23de",
+      "parameter_name": "conflict_tolerance_pct",
+      "value": 3.0,
+      "default_value": 5.0,
+      "is_user_modified": true,
+      "modified_at": "2026-06-01T23:29:12.224089",
+      "modified_by": "小孟",
+      "valid_from": "2026-06-01T23:29:12.224090",
+      "valid_to": null,
+      "comment": "提高数据一致性要求",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b",
+        "VOL_50ETF_20260530_7a29",
+        "VOL_50ETF_20260528_362a"
+      ]
+    },
+    {
+      "version_id": "v2893bf",
+      "parameter_name": "tenor_order",
+      "value": [
+        "1M",
+        "3M",
+        "6M",
+        "1Y",
+        "2Y",
+        "3Y",
+        "5Y",
+        "10Y"
+      ],
+      "default_value": [
+        "1M",
+        "3M",
+        "6M",
+        "1Y",
+        "2Y",
+        "3Y",
+        "5Y",
+        "10Y"
+      ],
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798315",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b",
+        "VOL_50ETF_20260530_7a29",
+        "VOL_50ETF_20260528_362a"
+      ]
+    }
+  ],
+  "chart_data": {
+    "surface": [
+      {
+        "x": 2.8,
+        "y": 0.0,
+        "z": 0.185,
+        "tenor": "T0",
+        "point_id": "fc9f6b0f",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.0,
+        "y": 0.0,
+        "z": 0.162,
+        "tenor": "T1",
+        "point_id": "55d0f4e7",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.2,
+        "y": 0.0,
+        "z": 0.17800000000000002,
+        "tenor": "T2",
+        "point_id": "ca3c6338",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.8,
+        "y": 0.0,
+        "z": 0.195,
+        "tenor": "T3",
+        "point_id": "874e41eb",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.0,
+        "y": 0.0,
+        "z": 0.17,
+        "tenor": "T4",
+        "point_id": "2825aa14",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.2,
+        "y": 0.0,
+        "z": 0.188,
+        "tenor": "T5",
+        "point_id": "338e5572",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.8,
+        "y": 1.0,
+        "z": 0.205,
+        "tenor": "T0",
+        "point_id": "89e765f1",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.0,
+        "y": 1.0,
+        "z": 0.18,
+        "tenor": "T1",
+        "point_id": "64ba147d",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.2,
+        "y": 1.0,
+        "z": 0.2,
+        "tenor": "T2",
+        "point_id": "bb60156c",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.8,
+        "y": 1.0,
+        "z": 0.215,
+        "tenor": "T3",
+        "point_id": "119fb99f",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.0,
+        "y": 1.0,
+        "z": 0.19,
+        "tenor": "T4",
+        "point_id": "03fc03dd",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.2,
+        "y": 1.0,
+        "z": 0.21,
+        "tenor": "T5",
+        "point_id": "98cccfb3",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.86,
+        "y": 0.08333333333333333,
+        "z": 0.1796,
+        "tenor": "1M",
+        "point_id": "765aaed4",
+        "confidence": 0.56,
+        "is_interpolated": true,
+        "data_source": "interpolation_engine",
+        "review_comment": "自动补充缺失的1M期限点"
+      },
+      {
+        "x": 3.0,
+        "y": 0.08333333333333333,
+        "z": 0.16349999999999998,
+        "tenor": "1M",
+        "point_id": "9fe48cd9",
+        "confidence": 0.56,
+        "is_interpolated": true,
+        "data_source": "interpolation_engine",
+        "review_comment": "自动补充缺失的1M期限点"
+      },
+      {
+        "x": 3.14,
+        "y": 0.08333333333333333,
+        "z": 0.1747,
+        "tenor": "1M",
+        "point_id": "6882edf3",
+        "confidence": 0.56,
+        "is_interpolated": true,
+        "data_source": "interpolation_engine",
+        "review_comment": "自动补充缺失的1M期限点"
+      },
+      {
+        "x": 2.86,
+        "y": 0.25,
+        "z": 0.18259999999999998,
+        "tenor": "3M",
+        "point_id": "37e6911e",
+        "confidence": 0.56,
+        "is_interpolated": true,
+        "data_source": "interpolation_engine",
+        "review_comment": "自动补充缺失的3M期限点"
+      },
+      {
+        "x": 3.0,
+        "y": 0.25,
+        "z": 0.16649999999999998,
+        "tenor": "3M",
+        "point_id": "1f70a7f6",
+        "confidence": 0.56,
+        "is_interpolated": true,
+        "data_source": "interpolation_engine",
+        "review_comment": "自动补充缺失的3M期限点"
+      },
+      {
+        "x": 3.14,
+        "y": 0.25,
+        "z": 0.1777,
+        "tenor": "3M",
+        "point_id": "da437442",
+        "confidence": 0.56,
+        "is_interpolated": true,
+        "data_source": "interpolation_engine",
+        "review_comment": "自动补充缺失的3M期限点"
+      }
+    ],
+    "smile_curves": {
+      "1M": {
+        "strikes": [
+          2.86,
+          3.0,
+          3.14
+        ],
+        "vols": [
+          0.1796,
+          0.16349999999999998,
+          0.1747
+        ],
+        "confidence": [
+          0.56,
+          0.56,
+          0.56
+        ],
+        "point_ids": [
+          "765aaed4",
+          "9fe48cd9",
+          "6882edf3"
+        ]
+      },
+      "3M": {
+        "strikes": [
+          2.86,
+          3.0,
+          3.14
+        ],
+        "vols": [
+          0.18259999999999998,
+          0.16649999999999998,
+          0.1777
+        ],
+        "confidence": [
+          0.56,
+          0.56,
+          0.56
+        ],
+        "point_ids": [
+          "37e6911e",
+          "1f70a7f6",
+          "da437442"
+        ]
+      },
+      "T0": {
+        "strikes": [
+          2.8,
+          2.8
+        ],
+        "vols": [
+          0.185,
+          0.205
+        ],
+        "confidence": [
+          0.36,
+          0.81
+        ],
+        "point_ids": [
+          "fc9f6b0f",
+          "89e765f1"
+        ]
+      },
+      "T1": {
+        "strikes": [
+          3.0,
+          3.0
+        ],
+        "vols": [
+          0.162,
+          0.18
+        ],
+        "confidence": [
+          0.36,
+          0.81
+        ],
+        "point_ids": [
+          "55d0f4e7",
+          "64ba147d"
+        ]
+      },
+      "T2": {
+        "strikes": [
+          3.2,
+          3.2
+        ],
+        "vols": [
+          0.17800000000000002,
+          0.2
+        ],
+        "confidence": [
+          0.36,
+          0.81
+        ],
+        "point_ids": [
+          "ca3c6338",
+          "bb60156c"
+        ]
+      },
+      "T3": {
+        "strikes": [
+          2.8,
+          2.8
+        ],
+        "vols": [
+          0.195,
+          0.215
+        ],
+        "confidence": [
+          0.36,
+          0.81
+        ],
+        "point_ids": [
+          "874e41eb",
+          "119fb99f"
+        ]
+      },
+      "T4": {
+        "strikes": [
+          3.0,
+          3.0
+        ],
+        "vols": [
+          0.17,
+          0.19
+        ],
+        "confidence": [
+          0.36,
+          0.81
+        ],
+        "point_ids": [
+          "2825aa14",
+          "03fc03dd"
+        ]
+      },
+      "T5": {
+        "strikes": [
+          3.2,
+          3.2
+        ],
+        "vols": [
+          0.188,
+          0.21
+        ],
+        "confidence": [
+          0.36,
+          0.81
+        ],
+        "point_ids": [
+          "338e5572",
+          "98cccfb3"
+        ]
+      }
+    },
+    "term_structure": {
+      "1M": {
+        "maturity": 0.08333333333333333,
+        "atm_vol": 0.16349999999999998,
+        "confidence": 0.56,
+        "point_id": "9fe48cd9"
+      },
+      "3M": {
+        "maturity": 0.25,
+        "atm_vol": 0.16649999999999998,
+        "confidence": 0.56,
+        "point_id": "1f70a7f6"
+      },
+      "T0": {
+        "maturity": 0.0,
+        "atm_vol": 0.185,
+        "confidence": 0.36,
+        "point_id": "fc9f6b0f"
+      },
+      "T1": {
+        "maturity": 0.0,
+        "atm_vol": 0.162,
+        "confidence": 0.36,
+        "point_id": "55d0f4e7"
+      },
+      "T2": {
+        "maturity": 0.0,
+        "atm_vol": 0.17800000000000002,
+        "confidence": 0.36,
+        "point_id": "ca3c6338"
+      },
+      "T3": {
+        "maturity": 0.0,
+        "atm_vol": 0.195,
+        "confidence": 0.36,
+        "point_id": "874e41eb"
+      },
+      "T4": {
+        "maturity": 0.0,
+        "atm_vol": 0.17,
+        "confidence": 0.36,
+        "point_id": "2825aa14"
+      },
+      "T5": {
+        "maturity": 0.0,
+        "atm_vol": 0.188,
+        "confidence": 0.36,
+        "point_id": "338e5572"
+      }
+    },
+    "tenors": [
+      "1M",
+      "3M",
+      "T0",
+      "T1",
+      "T2",
+      "T3",
+      "T4",
+      "T5"
+    ],
+    "strikes": [
+      2.8,
+      2.86,
+      3.0,
+      3.14,
+      3.2
+    ],
+    "atm_strike": 3.0
+  },
+  "points_detail": [
+    {
+      "point_id": "765aaed4",
+      "tenor": "1M",
+      "strike": 2.86,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.1796,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的1M期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "9fe48cd9",
+      "tenor": "1M",
+      "strike": 3.0,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.16349999999999998,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的1M期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "6882edf3",
+      "tenor": "1M",
+      "strike": 3.14,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.1747,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的1M期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "1a2ad0ba",
+      "tenor": "2Y",
+      "strike": 2.0,
+      "maturity": 26.5,
+      "option_type": "call",
+      "raw_value": 2.5,
+      "implied_vol": 2.5,
+      "data_source": "screenshot",
+      "confidence": 0.1,
+      "status": "异常值",
+      "status_class": "danger",
+      "is_outlier": true,
+      "is_interpolated": false,
+      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "b07ecf00",
+      "tenor": "2Y",
+      "strike": 2.0,
+      "maturity": 20.0,
+      "option_type": "call",
+      "raw_value": 3.0,
+      "implied_vol": 3.0,
+      "data_source": "screenshot",
+      "confidence": 0.1,
+      "status": "异常值",
+      "status_class": "danger",
+      "is_outlier": true,
+      "is_interpolated": false,
+      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "9b19dbc3",
+      "tenor": "2Y",
+      "strike": 2.0,
+      "maturity": 28.0,
+      "option_type": "call",
+      "raw_value": 3.5,
+      "implied_vol": 3.5,
+      "data_source": "screenshot",
+      "confidence": 0.1,
+      "status": "异常值",
+      "status_class": "danger",
+      "is_outlier": true,
+      "is_interpolated": false,
+      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "37e6911e",
+      "tenor": "3M",
+      "strike": 2.86,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.18259999999999998,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的3M期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "1f70a7f6",
+      "tenor": "3M",
+      "strike": 3.0,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.16649999999999998,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的3M期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "da437442",
+      "tenor": "3M",
+      "strike": 3.14,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": null,
+      "implied_vol": 0.1777,
+      "data_source": "interpolation_engine",
+      "confidence": 0.56,
+      "status": "插值补全",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": true,
+      "outlier_reason": "",
+      "review_comment": "自动补充缺失的3M期限点",
+      "tags": [
+        "synthetic_point",
+        "interpolated"
+      ]
+    },
+    {
+      "point_id": "0be9ed0b",
+      "tenor": "3Y",
+      "strike": 3.0,
+      "maturity": 27.5,
+      "option_type": "call",
+      "raw_value": 2.5,
+      "implied_vol": 2.5,
+      "data_source": "screenshot",
+      "confidence": 0.1,
+      "status": "异常值",
+      "status_class": "danger",
+      "is_outlier": true,
+      "is_interpolated": false,
+      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "aa2676ef",
+      "tenor": "3Y",
+      "strike": 3.0,
+      "maturity": 21.0,
+      "option_type": "call",
+      "raw_value": 3.0,
+      "implied_vol": 3.0,
+      "data_source": "screenshot",
+      "confidence": 0.1,
+      "status": "异常值",
+      "status_class": "danger",
+      "is_outlier": true,
+      "is_interpolated": false,
+      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "eacff8c7",
+      "tenor": "3Y",
+      "strike": 3.0,
+      "maturity": 29.0,
+      "option_type": "call",
+      "raw_value": 3.5,
+      "implied_vol": 3.5,
+      "data_source": "screenshot",
+      "confidence": 0.1,
+      "status": "异常值",
+      "status_class": "danger",
+      "is_outlier": true,
+      "is_interpolated": false,
+      "outlier_reason": "波动率超出有效范围 [0.01, 2.0]",
+      "review_comment": "",
+      "tags": [
+        "screenshot_ocr",
+        "low_confidence"
+      ]
+    },
+    {
+      "point_id": "fc9f6b0f",
+      "tenor": "T0",
+      "strike": 2.8,
+      "maturity": 0.0,
+      "option_type": "call",
+      "raw_value": 0.185,
+      "implied_vol": 0.185,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "89e765f1",
+      "tenor": "T0",
+      "strike": 2.8,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.205,
+      "implied_vol": 0.205,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import",
+        "high_priority"
+      ]
+    },
+    {
+      "point_id": "55d0f4e7",
+      "tenor": "T1",
+      "strike": 3.0,
+      "maturity": 0.0,
+      "option_type": "call",
+      "raw_value": 0.162,
+      "implied_vol": 0.162,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "64ba147d",
+      "tenor": "T1",
+      "strike": 3.0,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.18,
+      "implied_vol": 0.18,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import",
+        "high_priority"
+      ]
+    },
+    {
+      "point_id": "ca3c6338",
+      "tenor": "T2",
+      "strike": 3.2,
+      "maturity": 0.0,
+      "option_type": "call",
+      "raw_value": 0.17800000000000002,
+      "implied_vol": 0.17800000000000002,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "bb60156c",
+      "tenor": "T2",
+      "strike": 3.2,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.2,
+      "implied_vol": 0.2,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import",
+        "high_priority"
+      ]
+    },
+    {
+      "point_id": "874e41eb",
+      "tenor": "T3",
+      "strike": 2.8,
+      "maturity": 0.0,
+      "option_type": "call",
+      "raw_value": 0.195,
+      "implied_vol": 0.195,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "119fb99f",
+      "tenor": "T3",
+      "strike": 2.8,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.215,
+      "implied_vol": 0.215,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import",
+        "high_priority"
+      ]
+    },
+    {
+      "point_id": "2825aa14",
+      "tenor": "T4",
+      "strike": 3.0,
+      "maturity": 0.0,
+      "option_type": "call",
+      "raw_value": 0.17,
+      "implied_vol": 0.17,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "03fc03dd",
+      "tenor": "T4",
+      "strike": 3.0,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.19,
+      "implied_vol": 0.19,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import",
+        "high_priority"
+      ]
+    },
+    {
+      "point_id": "338e5572",
+      "tenor": "T5",
+      "strike": 3.2,
+      "maturity": 0.0,
+      "option_type": "call",
+      "raw_value": 0.188,
+      "implied_vol": 0.188,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "98cccfb3",
+      "tenor": "T5",
+      "strike": 3.2,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.21,
+      "implied_vol": 0.21,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import",
+        "high_priority"
+      ]
+    }
+  ],
+  "conflicts": [],
+  "decision_paths": {
+    "fc9f6b0f": [
+      "1. 原始值导入: 0.1850 (来源: lecture_note)",
+      "2. 最终值: 0.1850 (置信度: 0.360)"
+    ],
+    "55d0f4e7": [
+      "1. 原始值导入: 0.1620 (来源: lecture_note)",
+      "2. 最终值: 0.1620 (置信度: 0.360)"
+    ],
+    "ca3c6338": [
+      "1. 原始值导入: 0.1780 (来源: lecture_note)",
+      "2. 最终值: 0.1780 (置信度: 0.360)"
+    ],
+    "874e41eb": [
+      "1. 原始值导入: 0.1950 (来源: lecture_note)",
+      "2. 最终值: 0.1950 (置信度: 0.360)"
+    ],
+    "2825aa14": [
+      "1. 原始值导入: 0.1700 (来源: lecture_note)",
+      "2. 最终值: 0.1700 (置信度: 0.360)"
+    ],
+    "338e5572": [
+      "1. 原始值导入: 0.1880 (来源: lecture_note)",
+      "2. 最终值: 0.1880 (置信度: 0.360)"
+    ],
+    "89e765f1": [
+      "1. 原始值导入: 0.2050 (来源: business_table)",
+      "2. 最终值: 0.2050 (置信度: 0.810)"
+    ],
+    "64ba147d": [
+      "1. 原始值导入: 0.1800 (来源: business_table)",
+      "2. 最终值: 0.1800 (置信度: 0.810)"
+    ],
+    "bb60156c": [
+      "1. 原始值导入: 0.2000 (来源: business_table)",
+      "2. 最终值: 0.2000 (置信度: 0.810)"
+    ],
+    "119fb99f": [
+      "1. 原始值导入: 0.2150 (来源: business_table)",
+      "2. 最终值: 0.2150 (置信度: 0.810)"
+    ],
+    "03fc03dd": [
+      "1. 原始值导入: 0.1900 (来源: business_table)",
+      "2. 最终值: 0.1900 (置信度: 0.810)"
+    ],
+    "98cccfb3": [
+      "1. 原始值导入: 0.2100 (来源: business_table)",
+      "2. 最终值: 0.2100 (置信度: 0.810)"
+    ],
+    "1a2ad0ba": [
+      "1. 原始值导入: 2.5000 (来源: screenshot)",
+      "2. 范围校验标记: 检查值 2.5000 - 波动率超出有效范围 [0.01, 2.0]",
+      "3. 最终值: 2.5000 (置信度: 0.100)"
+    ],
+    "b07ecf00": [
+      "1. 原始值导入: 3.0000 (来源: screenshot)",
+      "2. 范围校验标记: 检查值 3.0000 - 波动率超出有效范围 [0.01, 2.0]",
+      "3. 最终值: 3.0000 (置信度: 0.100)"
+    ],
+    "9b19dbc3": [
+      "1. 原始值导入: 3.5000 (来源: screenshot)",
+      "2. 范围校验标记: 检查值 3.5000 - 波动率超出有效范围 [0.01, 2.0]",
+      "3. 最终值: 3.5000 (置信度: 0.100)"
+    ],
+    "0be9ed0b": [
+      "1. 原始值导入: 2.5000 (来源: screenshot)",
+      "2. 范围校验标记: 检查值 2.5000 - 波动率超出有效范围 [0.01, 2.0]",
+      "3. 最终值: 2.5000 (置信度: 0.100)"
+    ],
+    "aa2676ef": [
+      "1. 原始值导入: 3.0000 (来源: screenshot)",
+      "2. 范围校验标记: 检查值 3.0000 - 波动率超出有效范围 [0.01, 2.0]",
+      "3. 最终值: 3.0000 (置信度: 0.100)"
+    ],
+    "eacff8c7": [
+      "1. 原始值导入: 3.5000 (来源: screenshot)",
+      "2. 范围校验标记: 检查值 3.5000 - 波动率超出有效范围 [0.01, 2.0]",
+      "3. 最终值: 3.5000 (置信度: 0.100)"
+    ],
+    "765aaed4": [
+      "1. 数据来源: interpolation_engine (无原始值记录)",
+      "2. 补充期限点: 补充缺失期限 1M",
+      "3. 最终值: 0.1796 (置信度: 0.560)"
+    ],
+    "9fe48cd9": [
+      "1. 数据来源: interpolation_engine (无原始值记录)",
+      "2. 补充期限点: 补充缺失期限 1M",
+      "3. 最终值: 0.1635 (置信度: 0.560)"
+    ],
+    "6882edf3": [
+      "1. 数据来源: interpolation_engine (无原始值记录)",
+      "2. 补充期限点: 补充缺失期限 1M",
+      "3. 最终值: 0.1747 (置信度: 0.560)"
+    ],
+    "37e6911e": [
+      "1. 数据来源: interpolation_engine (无原始值记录)",
+      "2. 补充期限点: 补充缺失期限 3M",
+      "3. 最终值: 0.1826 (置信度: 0.560)"
+    ],
+    "1f70a7f6": [
+      "1. 数据来源: interpolation_engine (无原始值记录)",
+      "2. 补充期限点: 补充缺失期限 3M",
+      "3. 最终值: 0.1665 (置信度: 0.560)"
+    ],
+    "da437442": [
+      "1. 数据来源: interpolation_engine (无原始值记录)",
+      "2. 补充期限点: 补充缺失期限 3M",
+      "3. 最终值: 0.1777 (置信度: 0.560)"
+    ]
+  },
+  "audit_trail": [
+    {
+      "log_id": "56a4ab3f",
+      "timestamp": "2026-06-01T23:40:45.176911",
+      "action": "范围校验标记",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "1a2ad0ba",
+      "old_value": 2.5,
+      "new_value": null,
+      "operator": "system",
+      "reason": "波动率超出有效范围 [0.01, 2.0]",
+      "parameters_used": {
+        "vol_min": 0.01,
+        "vol_max": 2.0
+      }
+    },
+    {
+      "log_id": "7c720102",
+      "timestamp": "2026-06-01T23:40:45.184672",
+      "action": "范围校验标记",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "b07ecf00",
+      "old_value": 3.0,
+      "new_value": null,
+      "operator": "system",
+      "reason": "波动率超出有效范围 [0.01, 2.0]",
+      "parameters_used": {
+        "vol_min": 0.01,
+        "vol_max": 2.0
+      }
+    },
+    {
+      "log_id": "df26a8ed",
+      "timestamp": "2026-06-01T23:40:45.190874",
+      "action": "范围校验标记",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "9b19dbc3",
+      "old_value": 3.5,
+      "new_value": null,
+      "operator": "system",
+      "reason": "波动率超出有效范围 [0.01, 2.0]",
+      "parameters_used": {
+        "vol_min": 0.01,
+        "vol_max": 2.0
+      }
+    },
+    {
+      "log_id": "2653b7bd",
+      "timestamp": "2026-06-01T23:40:45.196583",
+      "action": "范围校验标记",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "0be9ed0b",
+      "old_value": 2.5,
+      "new_value": null,
+      "operator": "system",
+      "reason": "波动率超出有效范围 [0.01, 2.0]",
+      "parameters_used": {
+        "vol_min": 0.01,
+        "vol_max": 2.0
+      }
+    },
+    {
+      "log_id": "1093ca84",
+      "timestamp": "2026-06-01T23:40:45.203986",
+      "action": "范围校验标记",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "aa2676ef",
+      "old_value": 3.0,
+      "new_value": null,
+      "operator": "system",
+      "reason": "波动率超出有效范围 [0.01, 2.0]",
+      "parameters_used": {
+        "vol_min": 0.01,
+        "vol_max": 2.0
+      }
+    },
+    {
+      "log_id": "328cd3b3",
+      "timestamp": "2026-06-01T23:40:45.210292",
+      "action": "范围校验标记",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "eacff8c7",
+      "old_value": 3.5,
+      "new_value": null,
+      "operator": "system",
+      "reason": "波动率超出有效范围 [0.01, 2.0]",
+      "parameters_used": {
+        "vol_min": 0.01,
+        "vol_max": 2.0
+      }
+    },
+    {
+      "log_id": "4c7adf1f",
+      "timestamp": "2026-06-01T23:40:45.220039",
+      "action": "补充期限点",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "765aaed4",
+      "old_value": null,
+      "new_value": 0.1796,
+      "operator": "system",
+      "reason": "补充缺失期限 1M",
+      "parameters_used": {
+        "method": "linear",
+        "tenor": "1M"
+      }
+    },
+    {
+      "log_id": "a5beca14",
+      "timestamp": "2026-06-01T23:40:45.227364",
+      "action": "补充期限点",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "9fe48cd9",
+      "old_value": null,
+      "new_value": 0.16349999999999998,
+      "operator": "system",
+      "reason": "补充缺失期限 1M",
+      "parameters_used": {
+        "method": "linear",
+        "tenor": "1M"
+      }
+    },
+    {
+      "log_id": "ae1ab7fc",
+      "timestamp": "2026-06-01T23:40:45.236980",
+      "action": "补充期限点",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "6882edf3",
+      "old_value": null,
+      "new_value": 0.1747,
+      "operator": "system",
+      "reason": "补充缺失期限 1M",
+      "parameters_used": {
+        "method": "linear",
+        "tenor": "1M"
+      }
+    },
+    {
+      "log_id": "bff3c69e",
+      "timestamp": "2026-06-01T23:40:45.242927",
+      "action": "补充期限点",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "37e6911e",
+      "old_value": null,
+      "new_value": 0.18259999999999998,
+      "operator": "system",
+      "reason": "补充缺失期限 3M",
+      "parameters_used": {
+        "method": "linear",
+        "tenor": "3M"
+      }
+    },
+    {
+      "log_id": "d3ef8d02",
+      "timestamp": "2026-06-01T23:40:45.250345",
+      "action": "补充期限点",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "1f70a7f6",
+      "old_value": null,
+      "new_value": 0.16649999999999998,
+      "operator": "system",
+      "reason": "补充缺失期限 3M",
+      "parameters_used": {
+        "method": "linear",
+        "tenor": "3M"
+      }
+    },
+    {
+      "log_id": "3732d0be",
+      "timestamp": "2026-06-01T23:40:45.256595",
+      "action": "补充期限点",
+      "surface_id": "VOL_50ETF_20260530_7a29",
+      "point_id": "da437442",
+      "old_value": null,
+      "new_value": 0.1777,
+      "operator": "system",
+      "reason": "补充缺失期限 3M",
+      "parameters_used": {
+        "method": "linear",
+        "tenor": "3M"
+      }
+    }
+  ],
+  "by_tenor_summary": {
+    "T0": {
+      "count": 2,
+      "valid_count": 2,
+      "avg_vol": 0.195,
+      "min_vol": 0.185,
+      "max_vol": 0.205
+    },
+    "T1": {
+      "count": 2,
+      "valid_count": 2,
+      "avg_vol": 0.171,
+      "min_vol": 0.162,
+      "max_vol": 0.18
+    },
+    "T2": {
+      "count": 2,
+      "valid_count": 2,
+      "avg_vol": 0.189,
+      "min_vol": 0.178,
+      "max_vol": 0.2
+    },
+    "T3": {
+      "count": 2,
+      "valid_count": 2,
+      "avg_vol": 0.205,
+      "min_vol": 0.195,
+      "max_vol": 0.215
+    },
+    "T4": {
+      "count": 2,
+      "valid_count": 2,
+      "avg_vol": 0.18,
+      "min_vol": 0.17,
+      "max_vol": 0.19
+    },
+    "T5": {
+      "count": 2,
+      "valid_count": 2,
+      "avg_vol": 0.199,
+      "min_vol": 0.188,
+      "max_vol": 0.21
+    },
+    "2Y": {
+      "count": 3,
+      "valid_count": 0,
+      "avg_vol": 0.0,
+      "min_vol": 0.0,
+      "max_vol": 0.0
+    },
+    "3Y": {
+      "count": 3,
+      "valid_count": 0,
+      "avg_vol": 0.0,
+      "min_vol": 0.0,
+      "max_vol": 0.0
+    },
+    "1M": {
+      "count": 3,
+      "valid_count": 3,
+      "avg_vol": 0.1726,
+      "min_vol": 0.1635,
+      "max_vol": 0.1796
+    },
+    "3M": {
+      "count": 3,
+      "valid_count": 3,
+      "avg_vol": 0.1756,
+      "min_vol": 0.1665,
+      "max_vol": 0.1826
+    }
+  }
+}

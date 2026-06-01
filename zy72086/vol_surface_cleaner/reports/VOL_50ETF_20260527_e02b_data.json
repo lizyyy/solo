@@ -1,0 +1,3487 @@
+{
+  "version_id": "v4ec267ae",
+  "surface_id": "VOL_50ETF_20260527_e02b",
+  "underlying": "50ETF",
+  "trade_date": "2026-05-27T00:00:00",
+  "generated_at": "2026-06-01T23:40:45.147038",
+  "status": "pending_review",
+  "status_display": {
+    "text": "待人工确认",
+    "class": "warning",
+    "icon": "⚠"
+  },
+  "comments": "【样例3】旧口径记录 - 从老板汇总页补充的历史数据，使用2025年旧版校准口径",
+  "summary": {
+    "original_points": 66,
+    "cleaned_points": 66,
+    "outliers_removed": 0,
+    "interpolated_points": 0,
+    "conflicts": 0,
+    "processing_time": 0.026,
+    "high_confidence": 22,
+    "medium_confidence": 0,
+    "low_confidence": 44,
+    "needs_review": 22,
+    "legacy_points": 22
+  },
+  "data_sources": [
+    {
+      "source_type": "lecture_note",
+      "source_name": "金融工程讲义-第7章",
+      "source_path": "/docs/lectures/vol_surface.pdf",
+      "import_time": "2026-06-01T23:40:44.472493",
+      "field_mapping": {
+        "行权价": "strike",
+        "隐含波动率": "implied_vol",
+        "期限": "tenor"
+      },
+      "raw_data_hash": "a1b2c3d4e5f6"
+    },
+    {
+      "source_type": "business_table",
+      "source_name": "期权做市系统导出_20260530",
+      "source_path": "/data/export/market_data_20260530.csv",
+      "import_time": "2026-06-01T23:40:44.472495",
+      "field_mapping": {
+        "执行价": "strike",
+        "IV": "implied_vol",
+        "到期日": "maturity"
+      },
+      "raw_data_hash": "f6e5d4c3b2a1"
+    },
+    {
+      "source_type": "screenshot",
+      "source_name": "彭博终端截图_15:30",
+      "source_path": "/screenshots/bloomberg_20260530_1530.png",
+      "import_time": "2026-06-01T23:40:44.472496",
+      "field_mapping": {
+        "Strike": "strike",
+        "Vol": "implied_vol",
+        "Expiry": "tenor"
+      },
+      "raw_data_hash": "1234567890ab"
+    }
+  ],
+  "parameters_used": [
+    {
+      "version_id": "v0bd1d9",
+      "parameter_name": "outlier_zscore_threshold",
+      "value": 2.5,
+      "default_value": 3.0,
+      "is_user_modified": true,
+      "modified_at": "2026-06-01T23:29:12.223723",
+      "modified_by": "小孟",
+      "valid_from": "2026-06-01T23:29:12.223725",
+      "valid_to": null,
+      "comment": "近期市场波动较大，收紧异常检测阈值",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b"
+      ]
+    },
+    {
+      "version_id": "v78008a",
+      "parameter_name": "outlier_iqr_factor",
+      "value": 1.5,
+      "default_value": 1.5,
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798280",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b"
+      ]
+    },
+    {
+      "version_id": "v559f22",
+      "parameter_name": "vol_min_valid",
+      "value": 0.01,
+      "default_value": 0.01,
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798286",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b"
+      ]
+    },
+    {
+      "version_id": "va38fca",
+      "parameter_name": "vol_max_valid",
+      "value": 2.0,
+      "default_value": 2.0,
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798290",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b"
+      ]
+    },
+    {
+      "version_id": "v32a858",
+      "parameter_name": "arbitrage_max_spread",
+      "value": 0.05,
+      "default_value": 0.05,
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798294",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b"
+      ]
+    },
+    {
+      "version_id": "v69ff9f",
+      "parameter_name": "interpolation_method",
+      "value": "cubic",
+      "default_value": "cubic",
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798299",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b"
+      ]
+    },
+    {
+      "version_id": "v4f9a0c",
+      "parameter_name": "smoothness_lambda",
+      "value": 0.1,
+      "default_value": 0.1,
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798303",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b"
+      ]
+    },
+    {
+      "version_id": "vaf5bc1",
+      "parameter_name": "confidence_weight_source",
+      "value": {
+        "lecture_note": 0.6,
+        "business_table": 0.9,
+        "screenshot": 0.4,
+        "summary_page": 0.8
+      },
+      "default_value": {
+        "lecture_note": 0.6,
+        "business_table": 0.9,
+        "screenshot": 0.4,
+        "summary_page": 0.8
+      },
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798307",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b"
+      ]
+    },
+    {
+      "version_id": "v5b23de",
+      "parameter_name": "conflict_tolerance_pct",
+      "value": 3.0,
+      "default_value": 5.0,
+      "is_user_modified": true,
+      "modified_at": "2026-06-01T23:29:12.224089",
+      "modified_by": "小孟",
+      "valid_from": "2026-06-01T23:29:12.224090",
+      "valid_to": null,
+      "comment": "提高数据一致性要求",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b"
+      ]
+    },
+    {
+      "version_id": "v2893bf",
+      "parameter_name": "tenor_order",
+      "value": [
+        "1M",
+        "3M",
+        "6M",
+        "1Y",
+        "2Y",
+        "3Y",
+        "5Y",
+        "10Y"
+      ],
+      "default_value": [
+        "1M",
+        "3M",
+        "6M",
+        "1Y",
+        "2Y",
+        "3Y",
+        "5Y",
+        "10Y"
+      ],
+      "is_user_modified": false,
+      "modified_at": null,
+      "modified_by": "system",
+      "valid_from": "2026-06-01T23:28:49.798315",
+      "valid_to": null,
+      "comment": "系统默认参数",
+      "surface_ids_used": [
+        "VOL_50ETF_20260528_dada",
+        "VOL_50ETF_20260529_b83e",
+        "VOL_50ETF_20260527_759a",
+        "VOL_50ETF_20260528_5ad4",
+        "VOL_50ETF_20260529_555a",
+        "VOL_50ETF_20260527_8d88",
+        "VOL_50ETF_20260528_cc03",
+        "VOL_50ETF_20260529_00a3",
+        "VOL_50ETF_20260527_060d",
+        "VOL_50ETF_20260528_8b00",
+        "VOL_50ETF_20260529_575b",
+        "VOL_50ETF_20260527_73b1",
+        "VOL_50ETF_20260528_e191",
+        "VOL_50ETF_20260529_12e5",
+        "VOL_50ETF_20260527_b484",
+        "VOL_50ETF_20260530_2f12",
+        "VOL_50ETF_20260528_cc7b",
+        "VOL_50ETF_20260529_47db",
+        "VOL_50ETF_20260527_070e",
+        "VOL_50ETF_20260530_4f82",
+        "VOL_50ETF_20260528_886f",
+        "VOL_50ETF_20260529_53db",
+        "VOL_50ETF_20260527_220c",
+        "VOL_50ETF_20260530_4acf",
+        "VOL_50ETF_20260528_a9f8",
+        "VOL_50ETF_20260528_9424",
+        "VOL_50ETF_20260529_7e38",
+        "VOL_50ETF_20260527_b14b",
+        "VOL_50ETF_20260530_e893",
+        "VOL_50ETF_20260528_f3e8",
+        "VOL_50ETF_20260528_c18e",
+        "VOL_50ETF_20260529_c841",
+        "VOL_50ETF_20260527_4c71",
+        "VOL_50ETF_20260530_de42",
+        "VOL_50ETF_20260528_d015",
+        "VOL_50ETF_20260528_516c",
+        "VOL_50ETF_20260529_aa42",
+        "VOL_50ETF_20260527_b64b",
+        "VOL_50ETF_20260530_9dc2",
+        "VOL_50ETF_20260528_d2f0",
+        "VOL_50ETF_20260528_6a6f",
+        "VOL_50ETF_20260529_565e",
+        "VOL_50ETF_20260527_0c25",
+        "VOL_50ETF_20260530_a53c",
+        "VOL_50ETF_20260528_30c2",
+        "VOL_50ETF_20260528_2478",
+        "VOL_50ETF_20260529_6ff7",
+        "VOL_50ETF_20260527_e02b"
+      ]
+    }
+  ],
+  "chart_data": {
+    "surface": [
+      {
+        "x": 2.5,
+        "y": 0.08333333333333333,
+        "z": 0.157,
+        "tenor": "1M",
+        "point_id": "a24c629c",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.6,
+        "y": 0.08333333333333333,
+        "z": 0.1537,
+        "tenor": "1M",
+        "point_id": "a6373662",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.7,
+        "y": 0.08333333333333333,
+        "z": 0.1547,
+        "tenor": "1M",
+        "point_id": "b14ed74e",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.8,
+        "y": 0.08333333333333333,
+        "z": 0.1563,
+        "tenor": "1M",
+        "point_id": "0d699849",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.9,
+        "y": 0.08333333333333333,
+        "z": 0.1501,
+        "tenor": "1M",
+        "point_id": "b2a40a8b",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.0,
+        "y": 0.08333333333333333,
+        "z": 0.1493,
+        "tenor": "1M",
+        "point_id": "66492303",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.1,
+        "y": 0.08333333333333333,
+        "z": 0.1542,
+        "tenor": "1M",
+        "point_id": "839c9477",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.2,
+        "y": 0.08333333333333333,
+        "z": 0.1513,
+        "tenor": "1M",
+        "point_id": "3946b836",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.3,
+        "y": 0.08333333333333333,
+        "z": 0.1474,
+        "tenor": "1M",
+        "point_id": "631eea37",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.4,
+        "y": 0.08333333333333333,
+        "z": 0.1504,
+        "tenor": "1M",
+        "point_id": "73573fb0",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.5,
+        "y": 0.08333333333333333,
+        "z": 0.1475,
+        "tenor": "1M",
+        "point_id": "7eb912a5",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.5,
+        "y": 0.25,
+        "z": 0.1642,
+        "tenor": "3M",
+        "point_id": "3776b37d",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.6,
+        "y": 0.25,
+        "z": 0.1648,
+        "tenor": "3M",
+        "point_id": "100b8c41",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.7,
+        "y": 0.25,
+        "z": 0.1571,
+        "tenor": "3M",
+        "point_id": "dac58d24",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.8,
+        "y": 0.25,
+        "z": 0.1565,
+        "tenor": "3M",
+        "point_id": "5435239c",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.9,
+        "y": 0.25,
+        "z": 0.1591,
+        "tenor": "3M",
+        "point_id": "0b55f998",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.0,
+        "y": 0.25,
+        "z": 0.157,
+        "tenor": "3M",
+        "point_id": "d135eeb1",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.1,
+        "y": 0.25,
+        "z": 0.1604,
+        "tenor": "3M",
+        "point_id": "c42dafe3",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.2,
+        "y": 0.25,
+        "z": 0.1563,
+        "tenor": "3M",
+        "point_id": "d3df18d2",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.3,
+        "y": 0.25,
+        "z": 0.1546,
+        "tenor": "3M",
+        "point_id": "3a6a53fa",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.4,
+        "y": 0.25,
+        "z": 0.1632,
+        "tenor": "3M",
+        "point_id": "967eb6ec",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 3.5,
+        "y": 0.25,
+        "z": 0.1582,
+        "tenor": "3M",
+        "point_id": "ff0cb6bf",
+        "confidence": 0.36,
+        "is_interpolated": false,
+        "data_source": "lecture_note",
+        "review_comment": ""
+      },
+      {
+        "x": 2.5,
+        "y": 0.5,
+        "z": 0.1756,
+        "tenor": "6M",
+        "point_id": "9847602a",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.6,
+        "y": 0.5,
+        "z": 0.1727,
+        "tenor": "6M",
+        "point_id": "ac386840",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.7,
+        "y": 0.5,
+        "z": 0.1723,
+        "tenor": "6M",
+        "point_id": "76f2e52a",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.8,
+        "y": 0.5,
+        "z": 0.1718,
+        "tenor": "6M",
+        "point_id": "381e37bb",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.9,
+        "y": 0.5,
+        "z": 0.1696,
+        "tenor": "6M",
+        "point_id": "e45cd211",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.0,
+        "y": 0.5,
+        "z": 0.1704,
+        "tenor": "6M",
+        "point_id": "ae43fef3",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.1,
+        "y": 0.5,
+        "z": 0.1688,
+        "tenor": "6M",
+        "point_id": "31a70813",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.2,
+        "y": 0.5,
+        "z": 0.1687,
+        "tenor": "6M",
+        "point_id": "591ae5e0",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.3,
+        "y": 0.5,
+        "z": 0.1682,
+        "tenor": "6M",
+        "point_id": "862e488e",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.4,
+        "y": 0.5,
+        "z": 0.1706,
+        "tenor": "6M",
+        "point_id": "f61ddf75",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.5,
+        "y": 0.5,
+        "z": 0.1689,
+        "tenor": "6M",
+        "point_id": "ba3806ca",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.5,
+        "y": 1.0,
+        "z": 0.1845,
+        "tenor": "1Y",
+        "point_id": "390a1db4",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.6,
+        "y": 1.0,
+        "z": 0.1849,
+        "tenor": "1Y",
+        "point_id": "9d021994",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.7,
+        "y": 1.0,
+        "z": 0.1816,
+        "tenor": "1Y",
+        "point_id": "dfe0a2cc",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.8,
+        "y": 1.0,
+        "z": 0.1819,
+        "tenor": "1Y",
+        "point_id": "0ed9bbd5",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.9,
+        "y": 1.0,
+        "z": 0.1788,
+        "tenor": "1Y",
+        "point_id": "5f42cec0",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.0,
+        "y": 1.0,
+        "z": 0.1787,
+        "tenor": "1Y",
+        "point_id": "1a70f97e",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.1,
+        "y": 1.0,
+        "z": 0.1796,
+        "tenor": "1Y",
+        "point_id": "095e6e71",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.2,
+        "y": 1.0,
+        "z": 0.1798,
+        "tenor": "1Y",
+        "point_id": "ebf1e192",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.3,
+        "y": 1.0,
+        "z": 0.179,
+        "tenor": "1Y",
+        "point_id": "9bf9123d",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.4,
+        "y": 1.0,
+        "z": 0.1786,
+        "tenor": "1Y",
+        "point_id": "ae367e48",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 3.5,
+        "y": 1.0,
+        "z": 0.1786,
+        "tenor": "1Y",
+        "point_id": "da1092cb",
+        "confidence": 0.81,
+        "is_interpolated": false,
+        "data_source": "business_table",
+        "review_comment": ""
+      },
+      {
+        "x": 2.5,
+        "y": 2.0,
+        "z": 0.1837,
+        "tenor": "2Y",
+        "point_id": "416a5dbe",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 2.6,
+        "y": 2.0,
+        "z": 0.1883,
+        "tenor": "2Y",
+        "point_id": "e327534e",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 2.7,
+        "y": 2.0,
+        "z": 0.1891,
+        "tenor": "2Y",
+        "point_id": "bb9e7193",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 2.8,
+        "y": 2.0,
+        "z": 0.2001,
+        "tenor": "2Y",
+        "point_id": "21d2be24",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 2.9,
+        "y": 2.0,
+        "z": 0.1935,
+        "tenor": "2Y",
+        "point_id": "61004fca",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.0,
+        "y": 2.0,
+        "z": 0.1759,
+        "tenor": "2Y",
+        "point_id": "d5df07d5",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.1,
+        "y": 2.0,
+        "z": 0.192,
+        "tenor": "2Y",
+        "point_id": "5509b75b",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.2,
+        "y": 2.0,
+        "z": 0.1859,
+        "tenor": "2Y",
+        "point_id": "7eefa5a2",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.3,
+        "y": 2.0,
+        "z": 0.1834,
+        "tenor": "2Y",
+        "point_id": "5502c9e7",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.4,
+        "y": 2.0,
+        "z": 0.1936,
+        "tenor": "2Y",
+        "point_id": "4ba014a8",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.5,
+        "y": 2.0,
+        "z": 0.1971,
+        "tenor": "2Y",
+        "point_id": "1937c66b",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 2.5,
+        "y": 3.0,
+        "z": 0.213,
+        "tenor": "3Y",
+        "point_id": "e853736d",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 2.6,
+        "y": 3.0,
+        "z": 0.1974,
+        "tenor": "3Y",
+        "point_id": "0cf354bf",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 2.7,
+        "y": 3.0,
+        "z": 0.2003,
+        "tenor": "3Y",
+        "point_id": "644affeb",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 2.8,
+        "y": 3.0,
+        "z": 0.2043,
+        "tenor": "3Y",
+        "point_id": "4c044f3f",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 2.9,
+        "y": 3.0,
+        "z": 0.2086,
+        "tenor": "3Y",
+        "point_id": "dfd5f682",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.0,
+        "y": 3.0,
+        "z": 0.1962,
+        "tenor": "3Y",
+        "point_id": "1e35ebc5",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.1,
+        "y": 3.0,
+        "z": 0.1979,
+        "tenor": "3Y",
+        "point_id": "0995ea5f",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.2,
+        "y": 3.0,
+        "z": 0.1902,
+        "tenor": "3Y",
+        "point_id": "a903e315",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.3,
+        "y": 3.0,
+        "z": 0.1892,
+        "tenor": "3Y",
+        "point_id": "aacd90c5",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.4,
+        "y": 3.0,
+        "z": 0.2053,
+        "tenor": "3Y",
+        "point_id": "b60f5b0f",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      },
+      {
+        "x": 3.5,
+        "y": 3.0,
+        "z": 0.2097,
+        "tenor": "3Y",
+        "point_id": "4da06485",
+        "confidence": 0.16,
+        "is_interpolated": false,
+        "data_source": "screenshot",
+        "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考"
+      }
+    ],
+    "smile_curves": {
+      "1M": {
+        "strikes": [
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0,
+          3.1,
+          3.2,
+          3.3,
+          3.4,
+          3.5
+        ],
+        "vols": [
+          0.157,
+          0.1537,
+          0.1547,
+          0.1563,
+          0.1501,
+          0.1493,
+          0.1542,
+          0.1513,
+          0.1474,
+          0.1504,
+          0.1475
+        ],
+        "confidence": [
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36
+        ],
+        "point_ids": [
+          "a24c629c",
+          "a6373662",
+          "b14ed74e",
+          "0d699849",
+          "b2a40a8b",
+          "66492303",
+          "839c9477",
+          "3946b836",
+          "631eea37",
+          "73573fb0",
+          "7eb912a5"
+        ]
+      },
+      "1Y": {
+        "strikes": [
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0,
+          3.1,
+          3.2,
+          3.3,
+          3.4,
+          3.5
+        ],
+        "vols": [
+          0.1845,
+          0.1849,
+          0.1816,
+          0.1819,
+          0.1788,
+          0.1787,
+          0.1796,
+          0.1798,
+          0.179,
+          0.1786,
+          0.1786
+        ],
+        "confidence": [
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81
+        ],
+        "point_ids": [
+          "390a1db4",
+          "9d021994",
+          "dfe0a2cc",
+          "0ed9bbd5",
+          "5f42cec0",
+          "1a70f97e",
+          "095e6e71",
+          "ebf1e192",
+          "9bf9123d",
+          "ae367e48",
+          "da1092cb"
+        ]
+      },
+      "2Y": {
+        "strikes": [
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0,
+          3.1,
+          3.2,
+          3.3,
+          3.4,
+          3.5
+        ],
+        "vols": [
+          0.1837,
+          0.1883,
+          0.1891,
+          0.2001,
+          0.1935,
+          0.1759,
+          0.192,
+          0.1859,
+          0.1834,
+          0.1936,
+          0.1971
+        ],
+        "confidence": [
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16
+        ],
+        "point_ids": [
+          "416a5dbe",
+          "e327534e",
+          "bb9e7193",
+          "21d2be24",
+          "61004fca",
+          "d5df07d5",
+          "5509b75b",
+          "7eefa5a2",
+          "5502c9e7",
+          "4ba014a8",
+          "1937c66b"
+        ]
+      },
+      "3M": {
+        "strikes": [
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0,
+          3.1,
+          3.2,
+          3.3,
+          3.4,
+          3.5
+        ],
+        "vols": [
+          0.1642,
+          0.1648,
+          0.1571,
+          0.1565,
+          0.1591,
+          0.157,
+          0.1604,
+          0.1563,
+          0.1546,
+          0.1632,
+          0.1582
+        ],
+        "confidence": [
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36,
+          0.36
+        ],
+        "point_ids": [
+          "3776b37d",
+          "100b8c41",
+          "dac58d24",
+          "5435239c",
+          "0b55f998",
+          "d135eeb1",
+          "c42dafe3",
+          "d3df18d2",
+          "3a6a53fa",
+          "967eb6ec",
+          "ff0cb6bf"
+        ]
+      },
+      "3Y": {
+        "strikes": [
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0,
+          3.1,
+          3.2,
+          3.3,
+          3.4,
+          3.5
+        ],
+        "vols": [
+          0.213,
+          0.1974,
+          0.2003,
+          0.2043,
+          0.2086,
+          0.1962,
+          0.1979,
+          0.1902,
+          0.1892,
+          0.2053,
+          0.2097
+        ],
+        "confidence": [
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16
+        ],
+        "point_ids": [
+          "e853736d",
+          "0cf354bf",
+          "644affeb",
+          "4c044f3f",
+          "dfd5f682",
+          "1e35ebc5",
+          "0995ea5f",
+          "a903e315",
+          "aacd90c5",
+          "b60f5b0f",
+          "4da06485"
+        ]
+      },
+      "6M": {
+        "strikes": [
+          2.5,
+          2.6,
+          2.7,
+          2.8,
+          2.9,
+          3.0,
+          3.1,
+          3.2,
+          3.3,
+          3.4,
+          3.5
+        ],
+        "vols": [
+          0.1756,
+          0.1727,
+          0.1723,
+          0.1718,
+          0.1696,
+          0.1704,
+          0.1688,
+          0.1687,
+          0.1682,
+          0.1706,
+          0.1689
+        ],
+        "confidence": [
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81,
+          0.81
+        ],
+        "point_ids": [
+          "9847602a",
+          "ac386840",
+          "76f2e52a",
+          "381e37bb",
+          "e45cd211",
+          "ae43fef3",
+          "31a70813",
+          "591ae5e0",
+          "862e488e",
+          "f61ddf75",
+          "ba3806ca"
+        ]
+      }
+    },
+    "term_structure": {
+      "1M": {
+        "maturity": 0.08333333333333333,
+        "atm_vol": 0.1493,
+        "confidence": 0.36,
+        "point_id": "66492303"
+      },
+      "1Y": {
+        "maturity": 1.0,
+        "atm_vol": 0.1787,
+        "confidence": 0.81,
+        "point_id": "1a70f97e"
+      },
+      "2Y": {
+        "maturity": 2.0,
+        "atm_vol": 0.1759,
+        "confidence": 0.16,
+        "point_id": "d5df07d5"
+      },
+      "3M": {
+        "maturity": 0.25,
+        "atm_vol": 0.157,
+        "confidence": 0.36,
+        "point_id": "d135eeb1"
+      },
+      "3Y": {
+        "maturity": 3.0,
+        "atm_vol": 0.1962,
+        "confidence": 0.16,
+        "point_id": "1e35ebc5"
+      },
+      "6M": {
+        "maturity": 0.5,
+        "atm_vol": 0.1704,
+        "confidence": 0.81,
+        "point_id": "ae43fef3"
+      }
+    },
+    "tenors": [
+      "1M",
+      "1Y",
+      "2Y",
+      "3M",
+      "3Y",
+      "6M"
+    ],
+    "strikes": [
+      2.5,
+      2.6,
+      2.7,
+      2.8,
+      2.9,
+      3.0,
+      3.1,
+      3.2,
+      3.3,
+      3.4,
+      3.5
+    ],
+    "atm_strike": 3.0
+  },
+  "points_detail": [
+    {
+      "point_id": "a24c629c",
+      "tenor": "1M",
+      "strike": 2.5,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.157,
+      "implied_vol": 0.157,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "a6373662",
+      "tenor": "1M",
+      "strike": 2.6,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.1537,
+      "implied_vol": 0.1537,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "b14ed74e",
+      "tenor": "1M",
+      "strike": 2.7,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.1547,
+      "implied_vol": 0.1547,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "0d699849",
+      "tenor": "1M",
+      "strike": 2.8,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.1563,
+      "implied_vol": 0.1563,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "b2a40a8b",
+      "tenor": "1M",
+      "strike": 2.9,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.1501,
+      "implied_vol": 0.1501,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "66492303",
+      "tenor": "1M",
+      "strike": 3.0,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.1493,
+      "implied_vol": 0.1493,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "839c9477",
+      "tenor": "1M",
+      "strike": 3.1,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.1542,
+      "implied_vol": 0.1542,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "3946b836",
+      "tenor": "1M",
+      "strike": 3.2,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.1513,
+      "implied_vol": 0.1513,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "631eea37",
+      "tenor": "1M",
+      "strike": 3.3,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.1474,
+      "implied_vol": 0.1474,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "73573fb0",
+      "tenor": "1M",
+      "strike": 3.4,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.1504,
+      "implied_vol": 0.1504,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "7eb912a5",
+      "tenor": "1M",
+      "strike": 3.5,
+      "maturity": 0.08333333333333333,
+      "option_type": "call",
+      "raw_value": 0.1475,
+      "implied_vol": 0.1475,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "390a1db4",
+      "tenor": "1Y",
+      "strike": 2.5,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.1845,
+      "implied_vol": 0.1845,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "9d021994",
+      "tenor": "1Y",
+      "strike": 2.6,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.1849,
+      "implied_vol": 0.1849,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "dfe0a2cc",
+      "tenor": "1Y",
+      "strike": 2.7,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.1816,
+      "implied_vol": 0.1816,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "0ed9bbd5",
+      "tenor": "1Y",
+      "strike": 2.8,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.1819,
+      "implied_vol": 0.1819,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "5f42cec0",
+      "tenor": "1Y",
+      "strike": 2.9,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.1788,
+      "implied_vol": 0.1788,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "1a70f97e",
+      "tenor": "1Y",
+      "strike": 3.0,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.1787,
+      "implied_vol": 0.1787,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "095e6e71",
+      "tenor": "1Y",
+      "strike": 3.1,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.1796,
+      "implied_vol": 0.1796,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "ebf1e192",
+      "tenor": "1Y",
+      "strike": 3.2,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.1798,
+      "implied_vol": 0.1798,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "9bf9123d",
+      "tenor": "1Y",
+      "strike": 3.3,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.179,
+      "implied_vol": 0.179,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "ae367e48",
+      "tenor": "1Y",
+      "strike": 3.4,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.1786,
+      "implied_vol": 0.1786,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "da1092cb",
+      "tenor": "1Y",
+      "strike": 3.5,
+      "maturity": 1.0,
+      "option_type": "call",
+      "raw_value": 0.1786,
+      "implied_vol": 0.1786,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "416a5dbe",
+      "tenor": "2Y",
+      "strike": 2.5,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.1837,
+      "implied_vol": 0.1837,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "e327534e",
+      "tenor": "2Y",
+      "strike": 2.6,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.1883,
+      "implied_vol": 0.1883,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "bb9e7193",
+      "tenor": "2Y",
+      "strike": 2.7,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.1891,
+      "implied_vol": 0.1891,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "21d2be24",
+      "tenor": "2Y",
+      "strike": 2.8,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.2001,
+      "implied_vol": 0.2001,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "61004fca",
+      "tenor": "2Y",
+      "strike": 2.9,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.1935,
+      "implied_vol": 0.1935,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "d5df07d5",
+      "tenor": "2Y",
+      "strike": 3.0,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.1759,
+      "implied_vol": 0.1759,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "5509b75b",
+      "tenor": "2Y",
+      "strike": 3.1,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.192,
+      "implied_vol": 0.192,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "7eefa5a2",
+      "tenor": "2Y",
+      "strike": 3.2,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.1859,
+      "implied_vol": 0.1859,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "5502c9e7",
+      "tenor": "2Y",
+      "strike": 3.3,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.1834,
+      "implied_vol": 0.1834,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "4ba014a8",
+      "tenor": "2Y",
+      "strike": 3.4,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.1936,
+      "implied_vol": 0.1936,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "1937c66b",
+      "tenor": "2Y",
+      "strike": 3.5,
+      "maturity": 2.0,
+      "option_type": "call",
+      "raw_value": 0.1971,
+      "implied_vol": 0.1971,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "3776b37d",
+      "tenor": "3M",
+      "strike": 2.5,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.1642,
+      "implied_vol": 0.1642,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "100b8c41",
+      "tenor": "3M",
+      "strike": 2.6,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.1648,
+      "implied_vol": 0.1648,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "dac58d24",
+      "tenor": "3M",
+      "strike": 2.7,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.1571,
+      "implied_vol": 0.1571,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "5435239c",
+      "tenor": "3M",
+      "strike": 2.8,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.1565,
+      "implied_vol": 0.1565,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "0b55f998",
+      "tenor": "3M",
+      "strike": 2.9,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.1591,
+      "implied_vol": 0.1591,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "d135eeb1",
+      "tenor": "3M",
+      "strike": 3.0,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.157,
+      "implied_vol": 0.157,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "c42dafe3",
+      "tenor": "3M",
+      "strike": 3.1,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.1604,
+      "implied_vol": 0.1604,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "d3df18d2",
+      "tenor": "3M",
+      "strike": 3.2,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.1563,
+      "implied_vol": 0.1563,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "3a6a53fa",
+      "tenor": "3M",
+      "strike": 3.3,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.1546,
+      "implied_vol": 0.1546,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "967eb6ec",
+      "tenor": "3M",
+      "strike": 3.4,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.1632,
+      "implied_vol": 0.1632,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "ff0cb6bf",
+      "tenor": "3M",
+      "strike": 3.5,
+      "maturity": 0.25,
+      "option_type": "call",
+      "raw_value": 0.1582,
+      "implied_vol": 0.1582,
+      "data_source": "lecture_note",
+      "confidence": 0.36,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "lecture_import"
+      ]
+    },
+    {
+      "point_id": "e853736d",
+      "tenor": "3Y",
+      "strike": 2.5,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.213,
+      "implied_vol": 0.213,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "0cf354bf",
+      "tenor": "3Y",
+      "strike": 2.6,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.1974,
+      "implied_vol": 0.1974,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "644affeb",
+      "tenor": "3Y",
+      "strike": 2.7,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.2003,
+      "implied_vol": 0.2003,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "4c044f3f",
+      "tenor": "3Y",
+      "strike": 2.8,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.2043,
+      "implied_vol": 0.2043,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "dfd5f682",
+      "tenor": "3Y",
+      "strike": 2.9,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.2086,
+      "implied_vol": 0.2086,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "1e35ebc5",
+      "tenor": "3Y",
+      "strike": 3.0,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.1962,
+      "implied_vol": 0.1962,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "0995ea5f",
+      "tenor": "3Y",
+      "strike": 3.1,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.1979,
+      "implied_vol": 0.1979,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "a903e315",
+      "tenor": "3Y",
+      "strike": 3.2,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.1902,
+      "implied_vol": 0.1902,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "aacd90c5",
+      "tenor": "3Y",
+      "strike": 3.3,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.1892,
+      "implied_vol": 0.1892,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "b60f5b0f",
+      "tenor": "3Y",
+      "strike": 3.4,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.2053,
+      "implied_vol": 0.2053,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "4da06485",
+      "tenor": "3Y",
+      "strike": 3.5,
+      "maturity": 3.0,
+      "option_type": "call",
+      "raw_value": 0.2097,
+      "implied_vol": 0.2097,
+      "data_source": "screenshot",
+      "confidence": 0.16,
+      "status": "待复核",
+      "status_class": "warning",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "旧口径数据 - 来自2025年Q4校准方法，已标注供对比参考",
+      "tags": [
+        "screenshot_ocr",
+        "legacy"
+      ]
+    },
+    {
+      "point_id": "9847602a",
+      "tenor": "6M",
+      "strike": 2.5,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": 0.1756,
+      "implied_vol": 0.1756,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "ac386840",
+      "tenor": "6M",
+      "strike": 2.6,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": 0.1727,
+      "implied_vol": 0.1727,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "76f2e52a",
+      "tenor": "6M",
+      "strike": 2.7,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": 0.1723,
+      "implied_vol": 0.1723,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "381e37bb",
+      "tenor": "6M",
+      "strike": 2.8,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": 0.1718,
+      "implied_vol": 0.1718,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "e45cd211",
+      "tenor": "6M",
+      "strike": 2.9,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": 0.1696,
+      "implied_vol": 0.1696,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "ae43fef3",
+      "tenor": "6M",
+      "strike": 3.0,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": 0.1704,
+      "implied_vol": 0.1704,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "31a70813",
+      "tenor": "6M",
+      "strike": 3.1,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": 0.1688,
+      "implied_vol": 0.1688,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "591ae5e0",
+      "tenor": "6M",
+      "strike": 3.2,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": 0.1687,
+      "implied_vol": 0.1687,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "862e488e",
+      "tenor": "6M",
+      "strike": 3.3,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": 0.1682,
+      "implied_vol": 0.1682,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "f61ddf75",
+      "tenor": "6M",
+      "strike": 3.4,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": 0.1706,
+      "implied_vol": 0.1706,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    },
+    {
+      "point_id": "ba3806ca",
+      "tenor": "6M",
+      "strike": 3.5,
+      "maturity": 0.5,
+      "option_type": "call",
+      "raw_value": 0.1689,
+      "implied_vol": 0.1689,
+      "data_source": "business_table",
+      "confidence": 0.81,
+      "status": "正常",
+      "status_class": "success",
+      "is_outlier": false,
+      "is_interpolated": false,
+      "outlier_reason": "",
+      "review_comment": "",
+      "tags": [
+        "business_import"
+      ]
+    }
+  ],
+  "conflicts": [],
+  "decision_paths": {
+    "a24c629c": [
+      "1. 原始值导入: 0.1570 (来源: lecture_note)",
+      "2. 最终值: 0.1570 (置信度: 0.360)"
+    ],
+    "a6373662": [
+      "1. 原始值导入: 0.1537 (来源: lecture_note)",
+      "2. 最终值: 0.1537 (置信度: 0.360)"
+    ],
+    "b14ed74e": [
+      "1. 原始值导入: 0.1547 (来源: lecture_note)",
+      "2. 最终值: 0.1547 (置信度: 0.360)"
+    ],
+    "0d699849": [
+      "1. 原始值导入: 0.1563 (来源: lecture_note)",
+      "2. 最终值: 0.1563 (置信度: 0.360)"
+    ],
+    "b2a40a8b": [
+      "1. 原始值导入: 0.1501 (来源: lecture_note)",
+      "2. 最终值: 0.1501 (置信度: 0.360)"
+    ],
+    "66492303": [
+      "1. 原始值导入: 0.1493 (来源: lecture_note)",
+      "2. 最终值: 0.1493 (置信度: 0.360)"
+    ],
+    "839c9477": [
+      "1. 原始值导入: 0.1542 (来源: lecture_note)",
+      "2. 最终值: 0.1542 (置信度: 0.360)"
+    ],
+    "3946b836": [
+      "1. 原始值导入: 0.1513 (来源: lecture_note)",
+      "2. 最终值: 0.1513 (置信度: 0.360)"
+    ],
+    "631eea37": [
+      "1. 原始值导入: 0.1474 (来源: lecture_note)",
+      "2. 最终值: 0.1474 (置信度: 0.360)"
+    ],
+    "73573fb0": [
+      "1. 原始值导入: 0.1504 (来源: lecture_note)",
+      "2. 最终值: 0.1504 (置信度: 0.360)"
+    ],
+    "7eb912a5": [
+      "1. 原始值导入: 0.1475 (来源: lecture_note)",
+      "2. 最终值: 0.1475 (置信度: 0.360)"
+    ],
+    "3776b37d": [
+      "1. 原始值导入: 0.1642 (来源: lecture_note)",
+      "2. 最终值: 0.1642 (置信度: 0.360)"
+    ],
+    "100b8c41": [
+      "1. 原始值导入: 0.1648 (来源: lecture_note)",
+      "2. 最终值: 0.1648 (置信度: 0.360)"
+    ],
+    "dac58d24": [
+      "1. 原始值导入: 0.1571 (来源: lecture_note)",
+      "2. 最终值: 0.1571 (置信度: 0.360)"
+    ],
+    "5435239c": [
+      "1. 原始值导入: 0.1565 (来源: lecture_note)",
+      "2. 最终值: 0.1565 (置信度: 0.360)"
+    ],
+    "0b55f998": [
+      "1. 原始值导入: 0.1591 (来源: lecture_note)",
+      "2. 最终值: 0.1591 (置信度: 0.360)"
+    ],
+    "d135eeb1": [
+      "1. 原始值导入: 0.1570 (来源: lecture_note)",
+      "2. 最终值: 0.1570 (置信度: 0.360)"
+    ],
+    "c42dafe3": [
+      "1. 原始值导入: 0.1604 (来源: lecture_note)",
+      "2. 最终值: 0.1604 (置信度: 0.360)"
+    ],
+    "d3df18d2": [
+      "1. 原始值导入: 0.1563 (来源: lecture_note)",
+      "2. 最终值: 0.1563 (置信度: 0.360)"
+    ],
+    "3a6a53fa": [
+      "1. 原始值导入: 0.1546 (来源: lecture_note)",
+      "2. 最终值: 0.1546 (置信度: 0.360)"
+    ],
+    "967eb6ec": [
+      "1. 原始值导入: 0.1632 (来源: lecture_note)",
+      "2. 最终值: 0.1632 (置信度: 0.360)"
+    ],
+    "ff0cb6bf": [
+      "1. 原始值导入: 0.1582 (来源: lecture_note)",
+      "2. 最终值: 0.1582 (置信度: 0.360)"
+    ],
+    "9847602a": [
+      "1. 原始值导入: 0.1756 (来源: business_table)",
+      "2. 最终值: 0.1756 (置信度: 0.810)"
+    ],
+    "ac386840": [
+      "1. 原始值导入: 0.1727 (来源: business_table)",
+      "2. 最终值: 0.1727 (置信度: 0.810)"
+    ],
+    "76f2e52a": [
+      "1. 原始值导入: 0.1723 (来源: business_table)",
+      "2. 最终值: 0.1723 (置信度: 0.810)"
+    ],
+    "381e37bb": [
+      "1. 原始值导入: 0.1718 (来源: business_table)",
+      "2. 最终值: 0.1718 (置信度: 0.810)"
+    ],
+    "e45cd211": [
+      "1. 原始值导入: 0.1696 (来源: business_table)",
+      "2. 最终值: 0.1696 (置信度: 0.810)"
+    ],
+    "ae43fef3": [
+      "1. 原始值导入: 0.1704 (来源: business_table)",
+      "2. 最终值: 0.1704 (置信度: 0.810)"
+    ],
+    "31a70813": [
+      "1. 原始值导入: 0.1688 (来源: business_table)",
+      "2. 最终值: 0.1688 (置信度: 0.810)"
+    ],
+    "591ae5e0": [
+      "1. 原始值导入: 0.1687 (来源: business_table)",
+      "2. 最终值: 0.1687 (置信度: 0.810)"
+    ],
+    "862e488e": [
+      "1. 原始值导入: 0.1682 (来源: business_table)",
+      "2. 最终值: 0.1682 (置信度: 0.810)"
+    ],
+    "f61ddf75": [
+      "1. 原始值导入: 0.1706 (来源: business_table)",
+      "2. 最终值: 0.1706 (置信度: 0.810)"
+    ],
+    "ba3806ca": [
+      "1. 原始值导入: 0.1689 (来源: business_table)",
+      "2. 最终值: 0.1689 (置信度: 0.810)"
+    ],
+    "390a1db4": [
+      "1. 原始值导入: 0.1845 (来源: business_table)",
+      "2. 最终值: 0.1845 (置信度: 0.810)"
+    ],
+    "9d021994": [
+      "1. 原始值导入: 0.1849 (来源: business_table)",
+      "2. 最终值: 0.1849 (置信度: 0.810)"
+    ],
+    "dfe0a2cc": [
+      "1. 原始值导入: 0.1816 (来源: business_table)",
+      "2. 最终值: 0.1816 (置信度: 0.810)"
+    ],
+    "0ed9bbd5": [
+      "1. 原始值导入: 0.1819 (来源: business_table)",
+      "2. 最终值: 0.1819 (置信度: 0.810)"
+    ],
+    "5f42cec0": [
+      "1. 原始值导入: 0.1788 (来源: business_table)",
+      "2. 最终值: 0.1788 (置信度: 0.810)"
+    ],
+    "1a70f97e": [
+      "1. 原始值导入: 0.1787 (来源: business_table)",
+      "2. 最终值: 0.1787 (置信度: 0.810)"
+    ],
+    "095e6e71": [
+      "1. 原始值导入: 0.1796 (来源: business_table)",
+      "2. 最终值: 0.1796 (置信度: 0.810)"
+    ],
+    "ebf1e192": [
+      "1. 原始值导入: 0.1798 (来源: business_table)",
+      "2. 最终值: 0.1798 (置信度: 0.810)"
+    ],
+    "9bf9123d": [
+      "1. 原始值导入: 0.1790 (来源: business_table)",
+      "2. 最终值: 0.1790 (置信度: 0.810)"
+    ],
+    "ae367e48": [
+      "1. 原始值导入: 0.1786 (来源: business_table)",
+      "2. 最终值: 0.1786 (置信度: 0.810)"
+    ],
+    "da1092cb": [
+      "1. 原始值导入: 0.1786 (来源: business_table)",
+      "2. 最终值: 0.1786 (置信度: 0.810)"
+    ],
+    "416a5dbe": [
+      "1. 原始值导入: 0.1837 (来源: screenshot)",
+      "2. 最终值: 0.1837 (置信度: 0.160)"
+    ],
+    "e327534e": [
+      "1. 原始值导入: 0.1883 (来源: screenshot)",
+      "2. 最终值: 0.1883 (置信度: 0.160)"
+    ],
+    "bb9e7193": [
+      "1. 原始值导入: 0.1891 (来源: screenshot)",
+      "2. 最终值: 0.1891 (置信度: 0.160)"
+    ],
+    "21d2be24": [
+      "1. 原始值导入: 0.2001 (来源: screenshot)",
+      "2. 最终值: 0.2001 (置信度: 0.160)"
+    ],
+    "61004fca": [
+      "1. 原始值导入: 0.1935 (来源: screenshot)",
+      "2. 最终值: 0.1935 (置信度: 0.160)"
+    ],
+    "d5df07d5": [
+      "1. 原始值导入: 0.1759 (来源: screenshot)",
+      "2. 最终值: 0.1759 (置信度: 0.160)"
+    ],
+    "5509b75b": [
+      "1. 原始值导入: 0.1920 (来源: screenshot)",
+      "2. 最终值: 0.1920 (置信度: 0.160)"
+    ],
+    "7eefa5a2": [
+      "1. 原始值导入: 0.1859 (来源: screenshot)",
+      "2. 最终值: 0.1859 (置信度: 0.160)"
+    ],
+    "5502c9e7": [
+      "1. 原始值导入: 0.1834 (来源: screenshot)",
+      "2. 最终值: 0.1834 (置信度: 0.160)"
+    ],
+    "4ba014a8": [
+      "1. 原始值导入: 0.1936 (来源: screenshot)",
+      "2. 最终值: 0.1936 (置信度: 0.160)"
+    ],
+    "1937c66b": [
+      "1. 原始值导入: 0.1971 (来源: screenshot)",
+      "2. 最终值: 0.1971 (置信度: 0.160)"
+    ],
+    "e853736d": [
+      "1. 原始值导入: 0.2130 (来源: screenshot)",
+      "2. 最终值: 0.2130 (置信度: 0.160)"
+    ],
+    "0cf354bf": [
+      "1. 原始值导入: 0.1974 (来源: screenshot)",
+      "2. 最终值: 0.1974 (置信度: 0.160)"
+    ],
+    "644affeb": [
+      "1. 原始值导入: 0.2003 (来源: screenshot)",
+      "2. 最终值: 0.2003 (置信度: 0.160)"
+    ],
+    "4c044f3f": [
+      "1. 原始值导入: 0.2043 (来源: screenshot)",
+      "2. 最终值: 0.2043 (置信度: 0.160)"
+    ],
+    "dfd5f682": [
+      "1. 原始值导入: 0.2086 (来源: screenshot)",
+      "2. 最终值: 0.2086 (置信度: 0.160)"
+    ],
+    "1e35ebc5": [
+      "1. 原始值导入: 0.1962 (来源: screenshot)",
+      "2. 最终值: 0.1962 (置信度: 0.160)"
+    ],
+    "0995ea5f": [
+      "1. 原始值导入: 0.1979 (来源: screenshot)",
+      "2. 最终值: 0.1979 (置信度: 0.160)"
+    ],
+    "a903e315": [
+      "1. 原始值导入: 0.1902 (来源: screenshot)",
+      "2. 最终值: 0.1902 (置信度: 0.160)"
+    ],
+    "aacd90c5": [
+      "1. 原始值导入: 0.1892 (来源: screenshot)",
+      "2. 最终值: 0.1892 (置信度: 0.160)"
+    ],
+    "b60f5b0f": [
+      "1. 原始值导入: 0.2053 (来源: screenshot)",
+      "2. 最终值: 0.2053 (置信度: 0.160)"
+    ],
+    "4da06485": [
+      "1. 原始值导入: 0.2097 (来源: screenshot)",
+      "2. 最终值: 0.2097 (置信度: 0.160)"
+    ]
+  },
+  "audit_trail": [],
+  "by_tenor_summary": {
+    "1M": {
+      "count": 11,
+      "valid_count": 11,
+      "avg_vol": 0.152,
+      "min_vol": 0.1474,
+      "max_vol": 0.157
+    },
+    "3M": {
+      "count": 11,
+      "valid_count": 11,
+      "avg_vol": 0.1592,
+      "min_vol": 0.1546,
+      "max_vol": 0.1648
+    },
+    "6M": {
+      "count": 11,
+      "valid_count": 11,
+      "avg_vol": 0.1707,
+      "min_vol": 0.1682,
+      "max_vol": 0.1756
+    },
+    "1Y": {
+      "count": 11,
+      "valid_count": 11,
+      "avg_vol": 0.1805,
+      "min_vol": 0.1786,
+      "max_vol": 0.1849
+    },
+    "2Y": {
+      "count": 11,
+      "valid_count": 11,
+      "avg_vol": 0.1893,
+      "min_vol": 0.1759,
+      "max_vol": 0.2001
+    },
+    "3Y": {
+      "count": 11,
+      "valid_count": 11,
+      "avg_vol": 0.2011,
+      "min_vol": 0.1892,
+      "max_vol": 0.213
+    }
+  }
+}
