@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #0f1923;
+  color: #e2e8f0;
+}
+
+@layer components {
+  .harbor-panel {
+    @apply bg-harbor-panel border border-harbor-border rounded-lg;
+  }
+  .harbor-card {
+    @apply bg-harbor-card border border-harbor-border rounded-lg p-4;
+  }
+  .harbor-input {
+    @apply bg-harbor-bg border border-harbor-border rounded px-3 py-2 text-gray-200 font-mono text-sm
+           focus:border-harbor-amber focus:outline-none focus:ring-1 focus:ring-harbor-amber/50
+           placeholder:text-gray-500 transition-colors;
+  }
+  .harbor-btn {
+    @apply bg-harbor-amber text-harbor-bg font-semibold px-4 py-2 rounded
+           hover:bg-harbor-amber-dim hover:shadow-lg hover:shadow-harbor-amber/20
+           active:translate-y-px transition-all duration-150;
+  }
+  .harbor-btn-secondary {
+    @apply bg-harbor-card border border-harbor-border text-gray-300 px-4 py-2 rounded
+           hover:bg-harbor-border hover:text-white
+           active:translate-y-px transition-all duration-150;
+  }
+  .status-pass { @apply text-harbor-green; }
+  .status-warn { @apply text-harbor-yellow; }
+  .status-fail { @apply text-harbor-red; }
+  .status-supplemented { @apply text-blue-400; }
+}
+
+@keyframes indicator-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+.indicator-pulse {
+  animation: indicator-pulse 2s ease-in-out infinite;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f1923;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a3a4e;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4a5e;
+}
