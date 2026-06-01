@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>太空垃圾回收站 - 课堂活动工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>🛰️ 太空垃圾回收站</h1>
+            <div class="status-bar">
+                <span id="gameStatus" class="status status-ready">准备就绪</span>
+                <span id="timeDisplay" class="time">00:00</span>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <section class="game-area">
+                <div class="resource-panel">
+                    <div class="resource-item" id="fuelResource">
+                        <span class="resource-label">⛽ 燃料</span>
+                        <span class="resource-value" id="fuelValue">100</span>
+                    </div>
+                    <div class="resource-item" id="oxygenResource">
+                        <span class="resource-label">💨 氧气</span>
+                        <span class="resource-value" id="oxygenValue">80</span>
+                    </div>
+                    <div class="resource-item" id="scoreResource">
+                        <span class="resource-label">⭐ 得分</span>
+                        <span class="resource-value" id="scoreValue">0</span>
+                    </div>
+                </div>
+
+                <div class="space-station" id="spaceStation">
+                    <div class="station-inner">
+                        <div class="station-core">🏠</div>
+                        <div class="debris-container" id="debrisContainer"></div>
+                        <div class="collector" id="collector">🤖</div>
+                    </div>
+                </div>
+
+                <div class="control-panel">
+                    <button id="startBtn" class="btn btn-primary">▶ 开始</button>
+                    <button id="pauseBtn" class="btn btn-warning" disabled>⏸ 暂停</button>
+                    <button id="resumeBtn" class="btn btn-success" disabled>▶ 继续</button>
+                    <button id="resetBtn" class="btn btn-secondary">🔄 重开</button>
+                    <button id="settleBtn" class="btn btn-info" disabled>📊 结算</button>
+                </div>
+
+                <div class="action-panel">
+                    <p class="hint">点击太空垃圾进行回收 →</p>
+                    <div class="debris-spawner">
+                        <button id="spawnDebrisBtn" class="btn btn-small" disabled>生成垃圾</button>
+                        <button id="spawnTroubleBtn" class="btn btn-small btn-danger" disabled>制造意外</button>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="side-panel">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="events">📝 事件记录</button>
+                    <button class="tab-btn" data-tab="replay">🎬 回放</button>
+                    <button class="tab-btn" data-tab="report">📋 复盘</button>
+                    <button class="tab-btn" data-tab="samples">📦 样例</button>
+                </div>
+
+                <div class="tab-content">
+                    <div id="eventsTab" class="tab-pane active">
+                        <div class="events-header">
+                            <h3>实时事件流</h3>
+                            <button id="addNoteBtn" class="btn btn-small">➕ 补录备注</button>
+                        </div>
+                        <div class="events-list" id="eventsList">
+                            <p class="empty-hint">活动开始后这里会记录每一步操作</p>
+                        </div>
+                    </div>
+
+                    <div id="replayTab" class="tab-pane">
+                        <div class="replay-controls">
+                            <h3>回放控制</h3>
+                            <div class="replay-buttons">
+                                <button id="replayStartBtn" class="btn btn-small">▶ 播放</button>
+                                <button id="replayPauseBtn" class="btn btn-small" disabled>⏸ 暂停</button>
+                                <button id="replayStopBtn" class="btn btn-small" disabled>⏹ 停止</button>
+                            </div>
+                            <div class="replay-speed">
+                                <label>速度:</label>
+                                <select id="replaySpeed">
+                                    <option value="0.5">0.5x</option>
+                                    <option value="1" selected>1x</option>
+                                    <option value="2">2x</option>
+                                    <option value="4">4x</option>
+                                </select>
+                            </div>
+                            <div class="replay-progress">
+                                <input type="range" id="replaySlider" min="0" max="100" value="0">
+                                <span id="replayTime">00:00 / 00:00</span>
+                            </div>
+                        </div>
+                        <div class="replay-list" id="replayList">
+                            <p class="empty-hint">先完成一局或加载样例才能回放</p>
+                        </div>
+                    </div>
+
+                    <div id="reportTab" class="tab-pane">
+                        <div class="report-header">
+                            <h3>复盘报告</h3>
+                            <button id="exportReportBtn" class="btn btn-small btn-primary">📥 导出</button>
+                        </div>
+                        <div class="report-content" id="reportContent">
+                            <p class="empty-hint">结算后这里会生成一份人能看懂的复盘</p>
+                        </div>
+                    </div>
+
+                    <div id="samplesTab" class="tab-pane">
+                        <h3>内置样例记录</h3>
+                        <div class="samples-list">
+                            <div class="sample-card" data-sample="smooth">
+                                <div class="sample-icon">✅</div>
+                                <div class="sample-info">
+                                    <h4>顺利完成的一局</h4>
+                                    <p>标准流程，没出幺蛾子</p>
+                                </div>
+                                <button class="btn btn-small" onclick="loadSample('smooth')">加载</button>
+                            </div>
+                            <div class="sample-card" data-sample="rework">
+                                <div class="sample-icon">🔄</div>
+                                <div class="sample-info">
+                                    <h4>需要返工的一局</h4>
+                                    <p>中间出了问题，等人工确认</p>
+                                </div>
+                                <button class="btn btn-small" onclick="loadSample('rework')">加载</button>
+                            </div>
+                            <div class="sample-card" data-sample="legacy">
+                                <div class="sample-icon">📺</div>
+                                <div class="sample-info">
+                                    <h4>投影大屏旧记录</h4>
+                                    <p>从老系统补录的，口径有点不一样</p>
+                                </div>
+                                <button class="btn btn-small" onclick="loadSample('legacy')">加载</button>
+                            </div>
+                        </div>
+                        <div class="sample-hint">
+                            <p>💡 提示：先加载样例，再去「回放」或「复盘」页看效果</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <div id="modalOverlay" class="modal-overlay hidden">
+            <div class="modal" id="modal">
+                <div class="modal-header">
+                    <h3 id="modalTitle">提示</h3>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-body" id="modalBody"></div>
+                <div class="modal-footer" id="modalFooter"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
