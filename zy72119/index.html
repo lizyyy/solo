@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鼓房隔音衰减估算 - 实验数据管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>🥁 鼓房隔音衰减估算</h1>
+                <div class="header-meta">
+                    <span class="project-tag">实验数据管理系统 v1.0</span>
+                    <span class="operator-info">当前操作员：训练教练老唐</span>
+                </div>
+            </div>
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-tab="data">数据录入</button>
+                <button class="tab-btn" data-tab="params">参数配置</button>
+                <button class="tab-btn" data-tab="calculate">衰减计算</button>
+                <button class="tab-btn" data-tab="history">历史对比</button>
+                <button class="tab-btn" data-tab="report">报告输出</button>
+            </nav>
+        </header>
+
+        <main class="app-main">
+            <section id="tab-data" class="tab-content active">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>📋 实验数据录入</h2>
+                        <div class="panel-actions">
+                            <button id="btnLoadSample" class="btn btn-secondary">加载鼓房样例数据</button>
+                            <button id="btnImport" class="btn btn-secondary">导入CSV</button>
+                            <button id="btnExport" class="btn btn-secondary">导出JSON</button>
+                            <input type="file" id="fileInput" accept=".csv,.json" hidden>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="source-info">
+                            <div class="form-row">
+                                <label>数据来源：</label>
+                                <input type="text" id="dataSource" value="鼓房隔音实验-2024-06-15现场测量" placeholder="如：实验记录本第37页">
+                            </div>
+                            <div class="form-row">
+                                <label>工况记录：</label>
+                                <textarea id="workCondition" rows="2" placeholder="实验环境、设备状态等补充说明">鼓房尺寸：4m×3m×2.8m；墙体结构：240mm红砖+双面抹灰；测量仪器：AWA6228+声级计；环境温度：23℃；湿度：55%</textarea>
+                            </div>
+                            <div class="form-row">
+                                <label>照片/说明：</label>
+                                <input type="text" id="photoReference" value="IMG_20240615_1423.jpg, IMG_20240615_1445.jpg" placeholder="照片文件名或说明">
+                            </div>
+                        </div>
+
+                        <div class="data-table-container">
+                            <table id="dataTable" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>频率点(Hz)</th>
+                                        <th>室内声压级(dB)</th>
+                                        <th>室外声压级(dB)</th>
+                                        <th>背景噪声(dB)</th>
+                                        <th>测量位置</th>
+                                        <th>测量时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataTableBody">
+                                </tbody>
+                            </table>
+                            <div class="table-actions">
+                                <button id="btnAddRow" class="btn btn-secondary">+ 添加记录</button>
+                                <button id="btnClearData" class="btn btn-danger">清空数据</button>
+                            </div>
+                        </div>
+
+                        <div class="data-quality">
+                            <h3>🔍 数据质量检查</h3>
+                            <div id="qualityReport" class="quality-report">
+                                <span class="quality-item">待检查...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-params" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>⚙️ 估算参数配置</h2>
+                        <div class="panel-actions">
+                            <span class="version-badge" id="currentVersionBadge">当前版本：v1.0 (初始默认)</span>
+                            <button id="btnSaveParams" class="btn btn-primary">💾 保存为新版本</button>
+                            <button id="btnRestoreParams" class="btn btn-secondary">↩️ 恢复选中版本</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="params-grid">
+                            <div class="params-section">
+                                <h3>隔音衰减阈值</h3>
+                                <div class="form-row">
+                                    <label>合格阈值(dB)：</label>
+                                    <input type="number" id="thresholdPass" value="45" step="1" min="0" max="100">
+                                    <small>≥此值判定为合格</small>
+                                </div>
+                                <div class="form-row">
+                                    <label>预警阈值(dB)：</label>
+                                    <input type="number" id="thresholdWarn" value="35" step="1" min="0" max="100">
+                                    <small>&lt;此值判定为异常</small>
+                                </div>
+                                <div class="form-row">
+                                    <label>背景噪声修正阈值(dB)：</label>
+                                    <input type="number" id="thresholdBgNoise" value="10" step="1" min="0" max="30">
+                                    <small>信噪比不足时启用修正</small>
+                                </div>
+                            </div>
+
+                            <div class="params-section">
+                                <h3>材料声学参数</h3>
+                                <div class="form-row">
+                                    <label>墙体面密度(kg/m²)：</label>
+                                    <input type="number" id="wallDensity" value="480" step="10" min="0">
+                                    <small>240mm红砖约480kg/m²</small>
+                                </div>
+                                <div class="form-row">
+                                    <label>隔声量计算系数：</label>
+                                    <input type="number" id="tlCoefficient" value="22" step="1" min="0">
+                                    <small>质量定律经验系数</small>
+                                </div>
+                            </div>
+
+                            <div class="params-section">
+                                <h3>房间参数</h3>
+                                <div class="form-row">
+                                    <label>房间容积(m³)：</label>
+                                    <input type="number" id="roomVolume" value="33.6" step="0.1" min="0">
+                                </div>
+                                <div class="form-row">
+                                    <label>室内平均吸声系数：</label>
+                                    <input type="number" id="avgAbsorption" value="0.15" step="0.01" min="0" max="1">
+                                </div>
+                            </div>
+
+                            <div class="params-section">
+                                <h3>版本备注</h3>
+                                <div class="form-row">
+                                    <label>修改说明：</label>
+                                    <textarea id="paramChangeNote" rows="3" placeholder="说明修改原因，如：根据老唐建议收紧合格阈值"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="param-history">
+                            <h3>📜 参数版本历史</h3>
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>选择</th>
+                                        <th>版本号</th>
+                                        <th>保存时间</th>
+                                        <th>操作员</th>
+                                        <th>合格阈值</th>
+                                        <th>预警阈值</th>
+                                        <th>修改说明</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paramHistoryBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-calculate" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>📊 隔音衰减估算</h2>
+                        <div class="panel-actions">
+                            <span id="calcParamVersion" class="calc-version">使用参数版本：v1.0</span>
+                            <button id="btnCalculate" class="btn btn-primary">▶ 开始计算</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="calc-summary" id="calcSummary">
+                            <div class="summary-card">
+                                <div class="summary-label">平均隔声量</div>
+                                <div class="summary-value" id="avgTL">-- dB</div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-label">加权隔声量(Rw)</div>
+                                <div class="summary-value" id="weightedTL">-- dB</div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-label">合格频率点</div>
+                                <div class="summary-value" id="passCount">-- / --</div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-label">异常记录</div>
+                                <div class="summary-value" id="anomalyCount">--</div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="summary-label">估算时间</div>
+                                <div class="summary-value" id="calcTime">--</div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <h3>隔声量频谱曲线</h3>
+                            <canvas id="tlChart"></canvas>
+                        </div>
+
+                        <div class="calc-results">
+                            <h3>🔬 详细计算结果 & 异常判定</h3>
+                            <table class="result-table">
+                                <thead>
+                                    <tr>
+                                        <th>频率</th>
+                                        <th>室内Lp</th>
+                                        <th>室外Lp</th>
+                                        <th>背景噪声</th>
+                                        <th>信噪比</th>
+                                        <th>修正后TL</th>
+                                        <th>理论TL</th>
+                                        <th>偏差</th>
+                                        <th>判定</th>
+                                        <th>判定依据</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="judgment-trail">
+                            <h3>📝 判断过程追溯</h3>
+                            <div id="judgmentLog" class="judgment-log">
+                                <p class="log-empty">点击"开始计算"查看详细判断过程...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-history" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>📈 历史结果对比</h2>
+                        <div class="panel-actions">
+                            <button id="btnCompare" class="btn btn-primary">🔄 并排对比选中</button>
+                            <button id="btnClearHistory" class="btn btn-danger">🗑 清空历史</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="history-list">
+                            <h3>计算历史记录</h3>
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>对比</th>
+                                        <th>计算编号</th>
+                                        <th>计算时间</th>
+                                        <th>参数版本</th>
+                                        <th>数据来源</th>
+                                        <th>平均TL</th>
+                                        <th>Rw</th>
+                                        <th>异常数</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="compareArea" class="compare-area hidden">
+                            <h3>🔍 并排对比分析</h3>
+                            <div class="compare-charts">
+                                <div class="chart-half">
+                                    <h4 id="compareTitleA">对比A</h4>
+                                    <canvas id="compareChartA"></canvas>
+                                </div>
+                                <div class="chart-half">
+                                    <h4 id="compareTitleB">对比B</h4>
+                                    <canvas id="compareChartB"></canvas>
+                                </div>
+                            </div>
+                            <div class="compare-table-container">
+                                <table class="compare-table">
+                                    <thead>
+                                        <tr>
+                                            <th>频率</th>
+                                            <th colspan="3">对比A</th>
+                                            <th colspan="3">对比B</th>
+                                            <th>变化量</th>
+                                        </tr>
+                                        <tr>
+                                            <th></th>
+                                            <th>TL</th>
+                                            <th>判定</th>
+                                            <th>参数</th>
+                                            <th>TL</th>
+                                            <th>判定</th>
+                                            <th>参数</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="compareTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-report" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>📄 实验报告输出</h2>
+                        <div class="panel-actions">
+                            <select id="reportHistorySelect">
+                                <option value="">选择计算记录生成报告...</option>
+                            </select>
+                            <button id="btnGenerateReport" class="btn btn-primary">📝 生成报告</button>
+                            <button id="btnPrintReport" class="btn btn-secondary">🖨 打印/导出PDF</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div id="reportContent" class="report-content">
+                            <div class="report-empty">
+                                <p>请先进行隔音衰减估算，然后选择一条计算记录生成报告</p>
+                                <p class="report-hint">💡 报告将自动包含：数据来源、参数版本、计算结果、异常判定、判断过程，确保报告与明细口径一致</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
