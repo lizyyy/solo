@@ -35,11 +35,13 @@ interface MatchStore {
   load: () => void
   getAllMatches: () => MatchData[]
   getMatch: (id: string) => MatchData | undefined
+  setActiveMatchId: (id: string | null) => void
   createMatch: (name: string, teamCount: number, totalRounds: number, roundDurationSec: number, resourceLimit: number) => string
   startMatch: (matchId: string) => void
   pauseMatch: (matchId: string, reason: string) => void
   resumeMatch: (matchId: string) => void
   startRound: (matchId: string, roundNumber: number) => void
+  startNextRound: (matchId: string) => boolean
   submitTeamChoice: (matchId: string, roundId: string, teamId: string, fuelChoice: number, timedOut?: boolean) => void
   endRound: (matchId: string, roundId: string) => void
   settleMatch: (matchId: string) => void
@@ -65,6 +67,8 @@ export const useMatchStore = create<MatchStore>((set, get) => ({
   getAllMatches: () => get().matches,
 
   getMatch: (id: string) => get().matches.find((m) => m.match.id === id),
+
+  setActiveMatchId: (id) => set({ activeMatchId: id }),
 
   createMatch: (name, teamCount, totalRounds, roundDurationSec, resourceLimit) => {
     const matchId = uid()
@@ -188,6 +192,22 @@ export const useMatchStore = create<MatchStore>((set, get) => ({
         timerRunning: true,
       }
     })
+  },
+
+  startNextRound: (matchId) => {
+    const matchData = get().matches.find((md) => md.match.id === matchId)
+    if (!matchData) return false
+
+    const completedCount = matchData.rounds.filter((r) => r.status === "completed").length
+    const nextRoundNumber = completedCount + 1
+
+    if (nextRoundNumber > matchData.match.totalRounds) {
+      get().settleMatch(matchId)
+      return false
+    }
+
+    get().startRound(matchId, nextRoundNumber)
+    return true
   },
 
   submitTeamChoice: (matchId, roundId, teamId, fuelChoice, timedOut = false) => {

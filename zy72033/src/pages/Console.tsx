@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react"
 import { useMatchStore } from "@/store/useMatchStore"
 import { useNavigate, useParams } from "react-router-dom"
-import { Rocket, Timer, Pause, Play, AlertTriangle, Plus, Monitor, X, ChevronRight } from "lucide-react"
+import { Rocket, Timer, Pause, Play, AlertTriangle, Plus, Monitor, X, ChevronRight, SkipForward } from "lucide-react"
 
 export default function Console() {
   const navigate = useNavigate()
   useParams()
   const {
     load, getAllMatches, getMatch, createMatch, startMatch,
-    pauseMatch, resumeMatch, submitTeamChoice, endRound,
+    pauseMatch, resumeMatch, submitTeamChoice, endRound, startNextRound,
     confirmAnomaly, addProjectionRecord, timerSeconds, timerRunning,
-    setTimerRunning, decrementTimer, activeMatchId
+    setTimerRunning, decrementTimer, activeMatchId, setActiveMatchId
   } = useMatchStore()
 
   const [name, setName] = useState("")
@@ -40,7 +40,7 @@ export default function Console() {
 
   const matchData = activeMatchId ? getMatch(activeMatchId) : undefined
   const match = matchData?.match
-  const isActive = match && ["setup", "playing", "paused"].includes(match.status)
+  const isActive = !!match
   const activeRound = matchData?.rounds.find(r => r.status === "active" || r.status === "paused")
   const anomalies = (matchData?.teamRounds ?? []).filter(tr => tr.resourceRemaining < 0 && !dismissedAnomalies.has(tr.id))
   const allMatches = getAllMatches()
@@ -66,6 +66,8 @@ export default function Console() {
   const handleResume = () => { if (match) resumeMatch(match.id) }
 
   const handleEndRound = () => { if (match && activeRound) endRound(match.id, activeRound.id) }
+
+  const handleStartNextRound = () => { if (match) startNextRound(match.id) }
 
   const handleFuel = (teamId: string) => {
     if (!match || !activeRound) return
@@ -153,13 +155,16 @@ export default function Console() {
                 {activeRound && (
                   <p className="text-center text-gray-400 text-sm">第 {activeRound.roundNumber} 轮 / 共 {match.totalRounds} 轮</p>
                 )}
+                {!activeRound && match.status === "playing" && (
+                  <p className="text-center text-gray-400 text-sm">等待开始下一轮</p>
+                )}
                 <div className="flex items-center justify-center gap-3 mt-4">
                   {match.status === "setup" && (
                     <button onClick={handleStart} className="btn-primary flex items-center gap-2">
                       <Play className="w-4 h-4" /> 开始比赛
                     </button>
                   )}
-                  {match.status === "playing" && (
+                  {match.status === "playing" && activeRound && (
                     <>
                       <button onClick={handlePause} className="btn-danger flex items-center gap-2">
                         <Pause className="w-4 h-4" /> 暂停
@@ -167,9 +172,19 @@ export default function Console() {
                       <button onClick={handleEndRound} className="btn-secondary flex items-center gap-2">结束本轮</button>
                     </>
                   )}
+                  {match.status === "playing" && !activeRound && (
+                    <button onClick={handleStartNextRound} className="btn-primary flex items-center gap-2">
+                      <SkipForward className="w-4 h-4" /> 开始下一轮
+                    </button>
+                  )}
                   {match.status === "paused" && (
                     <button onClick={handleResume} className="btn-ok flex items-center gap-2">
                       <Play className="w-4 h-4" /> 继续
+                    </button>
+                  )}
+                  {(match.status === "settled" || match.status === "locked") && (
+                    <button onClick={() => navigate(`/match/${match.id}/settlement`)} className="btn-ok flex items-center gap-2">
+                      查看结算
                     </button>
                   )}
                 </div>
@@ -228,11 +243,13 @@ export default function Console() {
             <h3 className="label-text mb-3">对局列表</h3>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {allMatches.map(md => (
-                <button key={md.match.id} onClick={() => useMatchStore.setState({ activeMatchId: md.match.id })} className="w-full text-left px-3 py-2 rounded-lg bg-space-700/50 hover:bg-space-600/50 text-sm text-gray-300 transition-colors flex items-center justify-between">
+                <button key={md.match.id} onClick={() => setActiveMatchId(md.match.id)} className="w-full text-left px-3 py-2 rounded-lg bg-space-700/50 hover:bg-space-600/50 text-sm text-gray-300 transition-colors flex items-center justify-between">
                   <span>{md.match.name}</span>
                   <span className={`text-xs px-1.5 py-0.5 rounded ${
                     md.match.status === "playing" ? "bg-ok-500/20 text-ok-400" :
                     md.match.status === "paused" ? "bg-alert-500/20 text-alert-400" :
+                    md.match.status === "settled" ? "bg-flame-500/20 text-flame-400" :
+                    md.match.status === "locked" ? "bg-ok-500/20 text-ok-400" :
                     "bg-space-600 text-gray-500"
                   }`}>{md.match.status}</span>
                 </button>
