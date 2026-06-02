@@ -1,0 +1,199 @@
+{
+  "records": [
+    {
+      "attribution_id": "a5e2ce63-969b-4e71-a65a-f30d3f576125",
+      "log_id": "log_002",
+      "annotation_id": "ann_001",
+      "error_type": "proper_noun",
+      "confidence": 0.5,
+      "evidence": [
+        "正确词 '阿里巴巴' 是专有名词",
+        "拼写相似度: 0.50"
+      ],
+      "status": "pending",
+      "threshold_version": "threshold_v1",
+      "model_version": "whisper_v1",
+      "created_at": "2026-06-02T20:27:27.018314",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
+    },
+    {
+      "attribution_id": "b91e952c-170c-4389-aede-c2ac4f145585",
+      "log_id": "log_003",
+      "annotation_id": "ann_002",
+      "error_type": "homophone",
+      "confidence": 0.95,
+      "evidence": [
+        "匹配同音词表: 苹果 -> 平果"
+      ],
+      "status": "auto_attributed",
+      "threshold_version": "threshold_v1",
+      "model_version": "whisper_v1",
+      "created_at": "2026-06-02T20:27:27.018341",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
+    },
+    {
+      "attribution_id": "e2ef53d9-b4bd-4a1f-b813-cec60fc6f334",
+      "log_id": "log_004",
+      "annotation_id": "ann_003",
+      "error_type": "unknown",
+      "confidence": 0.0,
+      "evidence": [
+        "未匹配到明确错误类型",
+        "置信度 0.00 低于阈值 0.5"
+      ],
+      "status": "manual_reviewed",
+      "threshold_version": "threshold_v1",
+      "model_version": "whisper_v1",
+      "created_at": "2026-06-02T20:27:27.018359",
+      "reviewed_by": "小孟",
+      "reviewed_at": "2026-06-02T20:28:33.657696",
+      "review_notes": "确认是缩写识别错误，人工修正",
+      "review_action": "revise",
+      "final_error_type": "acronym"
+    },
+    {
+      "attribution_id": "3d561f56-96a0-4d51-b40f-366ebbb695a2",
+      "log_id": "log_005",
+      "annotation_id": "ann_004",
+      "error_type": "homophone",
+      "confidence": 0.95,
+      "evidence": [
+        "匹配同音词表: 北京 -> 背景"
+      ],
+      "status": "auto_attributed",
+      "threshold_version": "threshold_v1",
+      "model_version": "whisper_v1",
+      "created_at": "2026-06-02T20:27:27.018374",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
+    },
+    {
+      "attribution_id": "8445faf2-3366-4ef2-b799-97e87c3bf001",
+      "log_id": "log_006",
+      "annotation_id": "ann_005",
+      "error_type": "homophone",
+      "confidence": 0.95,
+      "evidence": [
+        "匹配同音词表: 会议 -> 回忆"
+      ],
+      "status": "auto_attributed",
+      "threshold_version": "threshold_v1",
+      "model_version": "whisper_v1",
+      "created_at": "2026-06-02T20:27:27.018389",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
+    },
+    {
+      "attribution_id": "d477afea-47ac-4400-96d2-978446ff1e0e",
+      "log_id": "log_007",
+      "annotation_id": "ann_006",
+      "error_type": "proper_noun",
+      "confidence": 0.5,
+      "evidence": [
+        "正确词 '腾讯' 是专有名词",
+        "拼写相似度: 0.50"
+      ],
+      "status": "pending",
+      "threshold_version": "threshold_v1",
+      "model_version": "whisper_v1",
+      "created_at": "2026-06-02T20:27:27.018411",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
+    },
+    {
+      "attribution_id": "1246bdf9-5f00-45a7-80f1-89fd908cf7b8",
+      "log_id": "log_008",
+      "annotation_id": "ann_007",
+      "error_type": "homophone",
+      "confidence": 0.95,
+      "evidence": [
+        "匹配同音词表: 上海 -> 伤害"
+      ],
+      "status": "auto_attributed",
+      "threshold_version": "threshold_v1",
+      "model_version": "whisper_v1",
+      "created_at": "2026-06-02T20:27:27.018425",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
+    },
+    {
+      "attribution_id": "4f7dd38a-cbb2-440c-b08f-6e21febb5b25",
+      "log_id": "log_009",
+      "annotation_id": "ann_008",
+      "error_type": "proper_noun",
+      "confidence": 0.5,
+      "evidence": [
+        "正确词 '华为' 是专有名词",
+        "拼写相似度: 0.50"
+      ],
+      "status": "pending",
+      "threshold_version": "threshold_v1",
+      "model_version": "whisper_v1",
+      "created_at": "2026-06-02T20:27:27.018442",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
+    },
+    {
+      "attribution_id": "6e70a38c-901c-431c-87f4-4d7d178a9e18",
+      "log_id": "log_010",
+      "annotation_id": "ann_009",
+      "error_type": "homophone",
+      "confidence": 0.95,
+      "evidence": [
+        "匹配同音词表: 百度 -> 摆渡"
+      ],
+      "status": "auto_attributed",
+      "threshold_version": "threshold_v1",
+      "model_version": "whisper_v1",
+      "created_at": "2026-06-02T20:27:27.018457",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
+    },
+    {
+      "attribution_id": "a43c2c61-9cf8-45a9-a18d-f2949382eac3",
+      "log_id": "log_001",
+      "annotation_id": "ann_011",
+      "error_type": "homophone",
+      "confidence": 1.0,
+      "evidence": [
+        "发音相似度: 1.00"
+      ],
+      "status": "auto_attributed",
+      "threshold_version": "threshold_v1",
+      "model_version": "whisper_v1",
+      "created_at": "2026-06-02T20:27:27.018475",
+      "reviewed_by": null,
+      "reviewed_at": null,
+      "review_notes": "",
+      "review_action": null,
+      "final_error_type": null
+    }
+  ],
+  "count": 10
+}

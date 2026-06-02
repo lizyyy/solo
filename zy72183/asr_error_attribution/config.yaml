@@ -1,0 +1,30 @@
+data:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  versions_dir: data/versions
+  thresholds_dir: data/thresholds
+
+versioning:
+  version_format: "v{major}.{minor}.{patch}"
+  auto_increment: true
+  preserve_history: true
+
+attribution:
+  default_thresholds:
+    confidence_high: 0.9
+    confidence_medium: 0.7
+    confidence_low: 0.5
+  error_types:
+    - homophone
+    - acronym
+    - proper_noun
+    - background_noise
+    - accent
+    - unknown
+
+export:
+  formats:
+    - csv
+    - json
+    - xlsx
+  include_metadata: true

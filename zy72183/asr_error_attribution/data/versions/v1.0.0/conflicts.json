@@ -1,0 +1,75 @@
+{
+  "records": [
+    {
+      "conflict_id": "fcfbf55b-6b8a-4a6e-9866-aebd1bfb7a5c",
+      "log_id": "log_002",
+      "annotation_id": "ann_001",
+      "attribution_id": "a5e2ce63-969b-4e71-a65a-f30d3f576125",
+      "conflict_type": "confidence_mismatch",
+      "description": "自动归因置信度 0.50 与标注置信度 0.95 存在显著差异",
+      "auto_attribution": "proper_noun",
+      "manual_attribution": "proper_noun",
+      "resolved": false,
+      "resolved_by": null,
+      "resolved_at": null,
+      "resolution_notes": ""
+    },
+    {
+      "conflict_id": "59c06bf4-e37c-43ba-82ac-01ebbcb8f78c",
+      "log_id": "log_004",
+      "annotation_id": "ann_003",
+      "attribution_id": "e2ef53d9-b4bd-4a1f-b813-cec60fc6f334",
+      "conflict_type": "type_mismatch",
+      "description": "自动归因类型 'unknown' 与标注类型 'acronym' 不一致",
+      "auto_attribution": "unknown",
+      "manual_attribution": "acronym",
+      "resolved": true,
+      "resolved_by": "小孟",
+      "resolved_at": "2026-06-02T20:28:33.657689",
+      "resolution_notes": "确认是缩写识别错误，人工修正"
+    },
+    {
+      "conflict_id": "822dbb03-18c2-47fc-aee3-7b6e9b1c1562",
+      "log_id": "log_007",
+      "annotation_id": "ann_006",
+      "attribution_id": "d477afea-47ac-4400-96d2-978446ff1e0e",
+      "conflict_type": "confidence_mismatch",
+      "description": "自动归因置信度 0.50 与标注置信度 0.90 存在显著差异",
+      "auto_attribution": "proper_noun",
+      "manual_attribution": "proper_noun",
+      "resolved": false,
+      "resolved_by": null,
+      "resolved_at": null,
+      "resolution_notes": ""
+    },
+    {
+      "conflict_id": "141f10b9-221b-49dc-a80b-69ae9c3c0504",
+      "log_id": "log_009",
+      "annotation_id": "ann_008",
+      "attribution_id": "4f7dd38a-cbb2-440c-b08f-6e21febb5b25",
+      "conflict_type": "confidence_mismatch",
+      "description": "自动归因置信度 0.50 与标注置信度 0.93 存在显著差异",
+      "auto_attribution": "proper_noun",
+      "manual_attribution": "proper_noun",
+      "resolved": false,
+      "resolved_by": null,
+      "resolved_at": null,
+      "resolution_notes": ""
+    },
+    {
+      "conflict_id": "5d54767e-92ef-4bee-a5d1-806247efced7",
+      "log_id": "log_001",
+      "annotation_id": "ann_011",
+      "attribution_id": "a43c2c61-9cf8-45a9-a18d-f2949382eac3",
+      "conflict_type": "type_mismatch",
+      "description": "自动归因类型 'homophone' 与标注类型 'unknown' 不一致",
+      "auto_attribution": "homophone",
+      "manual_attribution": "homophone",
+      "resolved": true,
+      "resolved_by": "小孟",
+      "resolved_at": "2026-06-02T20:28:02.204600",
+      "resolution_notes": "确认标注正确，自动归因的同音词判断是对的"
+    }
+  ],
+  "count": 5
+}

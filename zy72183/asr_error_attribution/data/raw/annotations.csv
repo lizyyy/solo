@@ -1,0 +1,13 @@
+annotation_id,log_id,error_word,correct_word,error_type,confidence,annotated_by,annotated_at,notes,is_valid
+ann_001,log_002,阿里吧吧,阿里巴巴,proper_noun,0.95,标注员A,2024-01-15T11:00:00,专有名词识别错误,True
+ann_002,log_003,平果,苹果,homophone,0.9,标注员A,2024-01-15T11:01:00,同音词错误,True
+ann_003,log_004,及批爱死,GPS,acronym,0.85,标注员A,2024-01-15T11:02:00,缩写识别错误,True
+ann_004,log_005,背景,北京,homophone,0.92,标注员B,2024-01-15T11:03:00,地名同音错误,True
+ann_005,log_006,回忆,会议,homophone,0.88,标注员B,2024-01-15T11:04:00,同音词错误,True
+ann_006,log_007,藤讯,腾讯,proper_noun,0.9,标注员B,2024-01-15T11:05:00,公司名错误,True
+ann_007,log_008,伤害,上海,homophone,0.0,标注员C,2024-01-15T11:06:00,待确认,True
+ann_008,log_009,化为,华为,proper_noun,0.93,标注员C,2024-01-15T11:07:00,公司名错误,True
+ann_009,log_010,摆渡,百度,homophone,0.91,标注员C,2024-01-15T11:08:00,公司名同音错误,True
+ann_010,log_003,平果,苹果,homophone,0.9,标注员A,2024-01-15T11:09:00,重复标注,True
+ann_011,log_001,,,unknown,0.0,标注员D,2024-01-15T11:10:00,空值测试,True
+ann_012,log_002,阿里吧吧,阿里巴巴,unknown,0.5,标注员D,2024-01-15T11:11:00,冲突测试-类型不同,True
