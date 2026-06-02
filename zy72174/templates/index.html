@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-number text-primary">{{ stats.total }}</div>
+            <div class="stat-label">总点位</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-number text-success">{{ stats.processed }}</div>
+            <div class="stat-label">已处理</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-number text-warning">{{ stats.need_verify }}</div>
+            <div class="stat-label">待核实</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="stat-number text-danger">{{ stats.need_onsite }}</div>
+            <div class="stat-label">需现场复看</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>城市更新拆迁安置清单</span>
+        <div class="d-flex gap-2">
+            <form class="d-flex gap-2" method="GET">
+                <select class="form-select form-select-sm" name="status" style="width: 140px;">
+                    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>全部状态</option>
+                    <option value="processed" {% if status_filter == 'processed' %}selected{% endif %}>已处理</option>
+                    <option value="need_verify" {% if status_filter == 'need_verify' %}selected{% endif %}>待核实</option>
+                    <option value="need_onsite" {% if status_filter == 'need_onsite' %}selected{% endif %}>需现场复看</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>待处理</option>
+                </select>
+                <input type="text" class="form-control form-control-sm" name="keyword" 
+                       placeholder="搜索编号/地址/行政区" value="{{ keyword }}" style="width: 200px;">
+                <button class="btn btn-sm btn-outline-primary" type="submit">筛选</button>
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('index') }}">重置</a>
+            </form>
+            <a class="btn btn-sm btn-success" href="{{ url_for('export_data', status=status_filter) }}">
+                📥 导出Excel
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if stats.unresolved_feedback > 0 %}
+        <div class="alert alert-warning mb-3">
+            <strong>⚠️ 注意：</strong>当前有 <span class="badge bg-warning">{{ stats.unresolved_feedback }}</span> 条待处理的居民反馈，
+            共有 <span class="badge bg-info">{{ stats.version_count }}</span> 条版本变更记录。
+        </div>
+        {% endif %}
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>编号</th>
+                        <th>地址</th>
+                        <th>行政区</th>
+                        <th>性质</th>
+                        <th>面积(㎡)</th>
+                        <th>户数</th>
+                        <th>状态</th>
+                        <th>版本</th>
+                        <th>待处理反馈</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pt in points %}
+                    <tr>
+                        <td><code>{{ pt.point_no }}</code></td>
+                        <td>{{ pt.address }}</td>
+                        <td>{{ pt.district }}</td>
+                        <td>{{ pt.property_type }}</td>
+                        <td>{{ pt.area }}</td>
+                        <td class="text-center">{{ pt.households }}</td>
+                        <td>
+                            <span class="badge badge-status bg-{{ pt.status_color }}">
+                                {{ pt.status_text }}
+                            </span>
+                            {% if pt.unresolved_feedback > 0 %}
+                            <span class="badge bg-danger conflict-badge ms-1">!</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-secondary">v{{ pt.current_version }}</span>
+                        </td>
+                        <td class="text-center">
+                            {% if pt.unresolved_feedback > 0 %}
+                            <span class="badge bg-warning">{{ pt.unresolved_feedback }}</span>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('point_detail', point_id=pt.id) }}">
+                                查看详情
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center text-muted py-5">暂无数据</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">状态说明</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge bg-success me-2 badge-status">已处理</span>
+                    <small class="text-muted">资料齐全，复核通过，可进入下一流程</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge bg-warning me-2 badge-status">待核实</span>
+                    <small class="text-muted">存在异议，需进一步核对材料</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="badge bg-danger me-2 badge-status">需现场复看</span>
+                    <small class="text-muted">需赴现场确认相关情况</small>
+                </div>
+            </div>
+        </div>
+        <div class="text-muted small mt-2">
+            <strong>样例数据说明：</strong>
+            CQ-2026-001（已处理，顺利记录）、
+            CQ-2026-002（待核实，面积异议+违规加建需人工确认）、
+            CQ-2026-003（需现场复看，GIS旧口径面积差异+历史产权纠纷）
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>
+        <a href="{{ url_for('index') }}" class="text-decoration-none text-muted">&larr; 返回列表</a>
+        <span class="mx-2">|</span>
+        点位详情
+        <code class="ms-2">{{ point.point_no }}</code>
+        <span class="badge badge-status bg-{{ point.status_color }} ms-2">{{ point.status_text }}</span>
+        <span class="badge bg-secondary ms-1">v{{ point.current_version }}</span>
+    </h4>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">基本信息</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label text-muted small">点位编号</label>
+                <div class="fw-bold">{{ point.point_no }}</div>
+            </div>
+            <div class="col-md-8 mb-3">
+                <label class="form-label text-muted small">地址</label>
+                <div class="fw-bold">{{ point.address }}</div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label text-muted small">行政区</label>
+                <div>{{ point.district }}</div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label text-muted small">性质</label>
+                <div>{{ point.property_type }}</div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label text-muted small">面积</label>
+                <div class="fw-bold text-primary">{{ point.area }} ㎡</div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label text-muted small">户数</label>
+                <div>{{ point.households }} 户</div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label text-muted small">GIS坐标</label>
+                <div>经度 {{ point.gis_lng }}，纬度 {{ point.gis_lat }}</div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label text-muted small">最后更新</label>
+                <div>{{ point.updated_at }}</div>
+            </div>
+        </div>
+        
+        <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#updateForm">
+            ✏️ 修改信息
+        </button>
+        
+        <div class="collapse mt-3" id="updateForm">
+            <div class="card card-body bg-light">
+                <form method="POST" action="{{ url_for('update_point', point_id=point.id) }}">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">修改字段</label>
+                            <select class="form-select" name="field_name" required>
+                                <option value="address">地址</option>
+                                <option value="area">面积</option>
+                                <option value="property_type">性质</option>
+                                <option value="households">户数</option>
+                                <option value="status">状态</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">新值</label>
+                            <input type="text" class="form-control" name="new_value" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">操作人</label>
+                            <input type="text" class="form-control" name="operator" value="何工">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">修改说明（必填，供后续追溯）</label>
+                            <textarea class="form-control" name="operation_note" rows="2" 
+                                      placeholder="请说明修改原因和依据，例如：根据最新GIS实测数据更新面积" required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">提交修改</button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#updateForm">
+                                取消
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-versions">
+            📜 版本历史 ({{ versions|length }})
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-feedback">
+            💬 居民反馈 ({{ feedback|length }})
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-photos">
+            📷 巡检照片 ({{ photos|length }})
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-notes">
+            📝 街道备注 ({{ notes|length }})
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-reviews">
+            ✅ 复核记录 ({{ reviews|length }})
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="tab-versions">
+        <div class="card">
+            <div class="card-header">版本历史 - 所有变更均留痕，可追溯</div>
+            <div class="card-body">
+                <div class="version-timeline">
+                    {% for v in versions %}
+                    <div class="version-item">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div>
+                                <span class="badge bg-primary me-2">v{{ v.version }}</span>
+                                <span class="fw-bold">{{ v.field_name }}</span>
+                                {% if v.source_type_text %}
+                                <span class="badge source-tag bg-info ms-2">{{ v.source_type_text }}</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">{{ v.created_at }}</small>
+                        </div>
+                        {% if v.old_value %}
+                        <div class="text-muted small mb-1">
+                            <span class="text-decoration-line-through text-danger">{{ v.old_value }}</span>
+                            <span class="mx-2">→</span>
+                            <span class="text-success fw-bold">{{ v.new_value }}</span>
+                        </div>
+                        {% else %}
+                        <div class="text-success small mb-1">初始值: {{ v.new_value }}</div>
+                        {% endif %}
+                        <div class="small">
+                            <span class="text-muted">操作人:</span> {{ v.operator }}
+                            {% if v.operation_note %}
+                            <span class="text-muted ms-3">说明:</span> {{ v.operation_note }}
+                            {% endif %}
+                            {% if v.source_name %}
+                            <div class="text-muted mt-1">
+                                来源: {{ v.source_name }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="tab-feedback">
+        <div class="card">
+            <div class="card-header">居民反馈</div>
+            <div class="card-body">
+                {% for fb in feedback %}
+                <div class="feedback-item {% if fb.is_resolved %}resolved{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <div>
+                            <span class="badge {% if fb.is_resolved %}bg-success{% else %}bg-warning{% endif %} me-2">
+                                {{ fb.feedback_type }}
+                            </span>
+                            {% if fb.is_resolved %}
+                            <span class="badge bg-success">已处理</span>
+                            {% else %}
+                            <span class="badge bg-danger">待处理</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">{{ fb.feedback_time }}</small>
+                    </div>
+                    <p class="mb-2">{{ fb.feedback_content }}</p>
+                    <div class="small text-muted">
+                        来源: {{ fb.feedback_source }}
+                        {% if fb.handler %}
+                        <span class="ms-3">处理人: {{ fb.handler }}</span>
+                        {% endif %}
+                    </div>
+                    {% if fb.handle_note %}
+                    <div class="small bg-light p-2 mt-2 rounded">
+                        <strong>处理意见:</strong> {{ fb.handle_note }}
+                        <span class="text-muted ms-2">{{ fb.handled_at }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-3">暂无反馈</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="tab-photos">
+        <div class="card">
+            <div class="card-header">巡检照片</div>
+            <div class="card-body">
+                <div class="photo-grid">
+                    {% for ph in photos %}
+                    <div class="photo-item">
+                        <div class="photo-placeholder">
+                            📷
+                        </div>
+                        <div class="small fw-bold">{{ ph.photo_desc }}</div>
+                        <div class="small text-muted">{{ ph.taken_at }}</div>
+                        <div class="small text-muted">{{ ph.taken_by }}</div>
+                    </div>
+                    {% else %}
+                    <div class="col-12 text-center text-muted py-3">暂无照片</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="tab-notes">
+        <div class="card">
+            <div class="card-header">街道手改备注</div>
+            <div class="card-body">
+                {% for note in notes %}
+                <div class="note-item">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <span class="fw-bold">{{ note.street_name }}</span>
+                        <small class="text-muted">{{ note.created_at }}</small>
+                    </div>
+                    <p class="mb-1">{{ note.note_content }}</p>
+                    <div class="small text-muted">操作人: {{ note.operator }}</div>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-3">暂无备注</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="tab-reviews">
+        <div class="card">
+            <div class="card-header">复核记录</div>
+            <div class="card-body">
+                {% for r in reviews %}
+                <div class="card mb-3">
+                    <div class="card-header py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="fw-bold">{{ r.reviewer }}</span>
+                                <span class="badge {% if r.review_result == 'pass' %}bg-success{% elif r.review_result == 'need_verify' %}bg-warning{% else %}bg-danger{% endif %} ms-2">
+                                    {% if r.review_result == 'pass' %}复核通过
+                                    {% elif r.review_result == 'need_verify' %}需核实
+                                    {% else %}需现场复看{% endif %}
+                                </span>
+                            </div>
+                            <small class="text-muted">{{ r.review_time }}</small>
+                        </div>
+                    </div>
+                    <div class="card-body py-3">
+                        {{ r.review_note }}
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-3 mb-3">暂无复核记录</div>
+                {% endfor %}
+
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white py-2">
+                        <strong>提交人工复核意见</strong>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('submit_review', point_id=point.id) }}">
+                            <div class="mb-3">
+                                <label class="form-label">复核人</label>
+                                <input type="text" class="form-control" name="reviewer" value="何工">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">复核结果</label>
+                                <select class="form-select" name="review_result" required>
+                                    <option value="">请选择</option>
+                                    <option value="pass">✅ 复核通过，标记为已处理</option>
+                                    <option value="need_verify">⚠️ 需进一步核实</option>
+                                    <option value="need_onsite">📍 需要现场复看</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">复核意见（必填，供后续交接追溯）</label>
+                                <textarea class="form-control" name="review_note" rows="3"
+                                          placeholder="请详细说明复核依据和处理意见，方便后续交接" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">提交复核</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

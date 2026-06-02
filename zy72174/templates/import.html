@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">导入数据</div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">数据源类型</label>
+                        <select class="form-select" name="source_type" required>
+                            <option value="">请选择</option>
+                            <option value="gis_system">GIS系统点位</option>
+                            <option value="gis_old">GIS旧口径数据</option>
+                            <option value="inspection">巡检照片</option>
+                            <option value="manual">街道手改备注</option>
+                            <option value="feedback">居民反馈</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">数据源名称</label>
+                        <input type="text" class="form-control" name="source_name" 
+                               placeholder="例如：2026年城市更新GIS点位普查_第4批" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">操作人</label>
+                        <input type="text" class="form-control" name="operator" value="何工">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">选择数据文件</label>
+                        <input type="file" class="form-control" name="file" accept=".xlsx,.xls,.csv,.json" required>
+                        <div class="form-text">支持 Excel (.xlsx, .xls)、CSV、JSON 格式</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        📤 导入数据
+                    </button>
+                </form>
+                
+                <div class="alert alert-info mt-4">
+                    <strong>💡 数据导入说明</strong>
+                    <ul class="mb-0 mt-2 small">
+                        <li>导入系统会自动按点位编号匹配，新点位自动创建</li>
+                        <li>已有点位若数据冲突（如面积差异）会自动标记为"待核实"</li>
+                        <li>所有导入操作均保留完整历史记录，可追溯</li>
+                        <li>数据来源会记录在版本历史中，交接时清晰可查</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">已导入的数据源</div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for src in sources %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ src.source_name }}</h6>
+                                <small class="text-muted">
+                                    类型: 
+                                    {% if src.source_type == 'gis_system' %}GIS系统
+                                    {% elif src.source_type == 'gis_old' %}GIS旧口径
+                                    {% elif src.source_type == 'inspection' %}巡检照片
+                                    {% elif src.source_type == 'manual' %}人工备注
+                                    {% elif src.source_type == 'feedback' %}居民反馈
+                                    {% else %}{{ src.source_type }}
+                                    {% endif %}
+                                </small>
+                                {% if src.source_file %}
+                                <div class="small text-muted mt-1">
+                                    文件: {{ src.source_file }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">{{ src.imported_at }}</small>
+                                <small class="text-muted">{{ src.imported_by }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center text-muted py-3">暂无导入记录</div>
+                    {% endfor %}
+                </div>
+                
+                {% if sources %}
+                <div class="d-grid mt-3">
+                    <a class="btn btn-outline-primary" href="{{ url_for('index') }}">
+                        查看清单列表
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
