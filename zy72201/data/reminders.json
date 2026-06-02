@@ -1,0 +1,263 @@
+[
+  {
+    "id": "6d41218d",
+    "bond_code": "127123",
+    "bond_name": "21国开01",
+    "institution_full_name": "中国工商银行股份有限公司",
+    "institution_alias": "工商银行",
+    "redemption_date": "2026-06-22",
+    "original_redemption_date": "2026-06-19",
+    "exercise_amount": 10000000.58,
+    "coupon_rate": 3.25,
+    "status": "已完成",
+    "source": "柜台系统",
+    "import_batch": "BATCH-2026-001",
+    "has_alias_mismatch": false,
+    "alias_mismatch_note": "原备注：机构简称不一致：录入为「工行」，标准简称为「工商银行」，请财务复核人确认。财务复核人小王复核确认：经核对工商登记信息，标准简称为'工商银行'，'工行'为非正式简称",
+    "detected_alias": "",
+    "has_holiday_adjustment": true,
+    "holiday_adjustment_note": "原回售日2026-06-19遇节假日/周末，顺延3天至2026-06-22",
+    "has_tail_adjustment": true,
+    "tail_adjustments": [
+      {
+        "id": "97bc23b2",
+        "reminder_id": "6d41218d",
+        "amount_diff": 0.58,
+        "adjustment_reason": "四舍五入尾差调整",
+        "remark": "尾差0.58元，因四舍五入导致，已与对手方确认，详见20260615尾差调整说明.docx。此笔尾差不影响整体损益，属于正常计算差异。",
+        "created_at": "2026-06-03T06:00:15.601223",
+        "created_by": "基金会计林姐",
+        "linked_supplementary_id": "1c4408b5"
+      }
+    ],
+    "supplementary_records": [
+      {
+        "id": "1c4408b5",
+        "reminder_id": "6d41218d",
+        "why_kept": "• 节假日顺延：原回售日2026-06-19遇节假日/周末，顺延3天至2026-06-22\n• 尾差调整条：四舍五入尾差调整，差额0.58元",
+        "missing_materials": "• 确认顺延日期是否正确\n• 复核尾差调整依据（尾差0.58元，因四舍五入导致，已与对手方确认，详见20260615尾差调整说明.docx。此笔尾差不影响整体损益，属于正常计算差异。）",
+        "next_step": "已完成",
+        "notes": "【2026-06-03 06:00】首次导入，系统自动检测完成\n【2026-06-03 06:00】财务复核人小王复核机构简称：经核对工商登记信息，标准简称为'工商银行'，'工行'为非正式简称，确认使用「工商银行」\n【2026-06-03 06:00】基金会计林姐补录尾差调整条：四舍五入尾差调整，差额0.58元。备注：尾差0.58元，因四舍五入导致，已与对手方确认，详见20260615尾差调整说明.docx。此笔尾差不影响整体损益，属于正常计算差异。\n【2026-06-03 06:00】基金会计林姐人工重跑：尾差调整后重新计算应计利息，确认数据一致性\n【2026-06-03 06:00】财务复核人小王转交林姐：机构简称已复核，尾差调整条已补录，请林姐最终确认\n【2026-06-03 06:00】基金会计林姐确认完成：尾差调整合理，机构简称确认无误，数据核对完成，可以记账",
+        "created_at": "2026-06-03T06:00:15.596233",
+        "updated_at": "2026-06-03T06:00:15.603184",
+        "created_by": "财务复核人小王",
+        "updated_by": "基金会计林姐"
+      }
+    ],
+    "audit_logs": [
+      {
+        "id": "9ba7bcf3",
+        "reminder_id": "6d41218d",
+        "action": "导入",
+        "field_changed": "全部字段",
+        "old_value": "无",
+        "new_value": "完整债券回售提醒记录",
+        "reason": "首次导入债券回售提醒数据",
+        "operator": "财务复核人小王",
+        "timestamp": "2026-06-03T06:00:15.596243",
+        "affected_results": "标记为待财务复核; 回售日调整为2026-06-22"
+      },
+      {
+        "id": "da2201d6",
+        "reminder_id": "6d41218d",
+        "action": "机构简称复核",
+        "field_changed": "institution_alias, has_alias_mismatch, status",
+        "old_value": "alias=工行, mismatch=True, status=待财务复核",
+        "new_value": "alias=工商银行, mismatch=False, status=已复核",
+        "reason": "经核对工商登记信息，标准简称为'工商银行'，'工行'为非正式简称",
+        "operator": "财务复核人小王",
+        "timestamp": "2026-06-03T06:00:15.598254",
+        "affected_results": "机构简称由「工行」改为「工商银行」，状态由待财务复核变为已复核"
+      },
+      {
+        "id": "3c03605f",
+        "reminder_id": "6d41218d",
+        "action": "尾差调整",
+        "field_changed": "exercise_amount",
+        "old_value": 10000000.0,
+        "new_value": 10000000.58,
+        "reason": "四舍五入尾差调整",
+        "operator": "基金会计林姐",
+        "timestamp": "2026-06-03T06:00:15.601237",
+        "affected_results": "行权金额由10000000.0调整为10000000.58，差额0.58。备注：尾差0.58元，因四舍五入导致，已与对手方确认，详见20260615尾差调整说明.docx。此笔尾差不影响整体损益，属于正常计算差异。"
+      },
+      {
+        "id": "004c586a",
+        "reminder_id": "6d41218d",
+        "action": "人工重跑",
+        "field_changed": "import_count, last_rerun_at, status",
+        "old_value": "count=1, status=已复核",
+        "new_value": "count=2, status=已重跑",
+        "reason": "尾差调整后重新计算应计利息，确认数据一致性",
+        "operator": "基金会计林姐",
+        "timestamp": "2026-06-03T06:00:15.602409",
+        "affected_results": "第2次重跑，状态由已复核变为已重跑"
+      },
+      {
+        "id": "b9344dc5",
+        "reminder_id": "6d41218d",
+        "action": "转交林姐",
+        "field_changed": "status",
+        "old_value": "已重跑",
+        "new_value": "待林姐确认",
+        "reason": "机构简称已复核，尾差调整条已补录，请林姐最终确认",
+        "operator": "财务复核人小王",
+        "timestamp": "2026-06-03T06:00:15.602820",
+        "affected_results": "记录转交基金会计林姐处理"
+      },
+      {
+        "id": "6d487f3b",
+        "reminder_id": "6d41218d",
+        "action": "林姐确认完成",
+        "field_changed": "status",
+        "old_value": "待林姐确认",
+        "new_value": "已完成",
+        "reason": "尾差调整合理，机构简称确认无误，数据核对完成，可以记账",
+        "operator": "基金会计林姐",
+        "timestamp": "2026-06-03T06:00:15.603178",
+        "affected_results": "记录处理完成"
+      }
+    ],
+    "raw_data": {
+      "original_remark": "尾差0.58元，因四舍五入导致，已与对手方确认，详见20260615尾差调整说明.docx",
+      "contact_person": "张经理",
+      "contact_phone": "13800138000"
+    },
+    "created_at": "2026-06-03T06:00:15.596218",
+    "updated_at": "2026-06-03T06:00:15.603170",
+    "import_count": 2,
+    "last_rerun_at": "2026-06-03T06:00:15.602397"
+  },
+  {
+    "id": "5cfd1fa0",
+    "bond_code": "127456",
+    "bond_name": "21国开05",
+    "institution_full_name": "中国建设银行股份有限公司",
+    "institution_alias": "建设银行",
+    "redemption_date": "2026-07-15",
+    "original_redemption_date": "2026-07-15",
+    "exercise_amount": 5000000.0,
+    "coupon_rate": 3.55,
+    "status": "已修正",
+    "source": "柜台系统",
+    "import_batch": "BATCH-2026-001",
+    "has_alias_mismatch": false,
+    "alias_mismatch_note": "",
+    "detected_alias": "",
+    "has_holiday_adjustment": false,
+    "holiday_adjustment_note": "",
+    "has_tail_adjustment": false,
+    "tail_adjustments": [],
+    "supplementary_records": [
+      {
+        "id": "a9953019",
+        "reminder_id": "5cfd1fa0",
+        "why_kept": "• 新导入记录，等待初步核对",
+        "missing_materials": "• 核对债券基本信息、回售金额、利率等",
+        "next_step": "找基金会计林姐",
+        "notes": "【2026-06-03 06:00】首次导入，系统自动检测完成\n【2026-06-03 06:00】基金会计林姐人工修正coupon_rate：发现票面利率录入错误，债券募集说明书显示为3.55%",
+        "created_at": "2026-06-03T06:00:15.596661",
+        "updated_at": "2026-06-03T06:00:15.601995",
+        "created_by": "财务复核人小王",
+        "updated_by": "基金会计林姐"
+      }
+    ],
+    "audit_logs": [
+      {
+        "id": "4a2325e8",
+        "reminder_id": "5cfd1fa0",
+        "action": "导入",
+        "field_changed": "全部字段",
+        "old_value": "无",
+        "new_value": "完整债券回售提醒记录",
+        "reason": "首次导入债券回售提醒数据",
+        "operator": "财务复核人小王",
+        "timestamp": "2026-06-03T06:00:15.596667",
+        "affected_results": "状态为待处理"
+      },
+      {
+        "id": "8ef7af85",
+        "reminder_id": "5cfd1fa0",
+        "action": "人工修正",
+        "field_changed": "coupon_rate",
+        "old_value": 3.45,
+        "new_value": 3.55,
+        "reason": "发现票面利率录入错误，债券募集说明书显示为3.55%",
+        "operator": "基金会计林姐",
+        "timestamp": "2026-06-03T06:00:15.601987",
+        "affected_results": "票面利率由3.45%修正为3.55%，影响应计利息计算，需重新核对利息金额"
+      }
+    ],
+    "raw_data": {},
+    "created_at": "2026-06-03T06:00:15.596651",
+    "updated_at": "2026-06-03T06:00:15.601971",
+    "import_count": 1,
+    "last_rerun_at": null
+  },
+  {
+    "id": "ad09873c",
+    "bond_code": "127789",
+    "bond_name": "20农发03",
+    "institution_full_name": "中国银行股份有限公司",
+    "institution_alias": "BOC",
+    "redemption_date": "2026-08-20",
+    "original_redemption_date": "2026-08-20",
+    "exercise_amount": 8000000.0,
+    "coupon_rate": 3.15,
+    "status": "已复核",
+    "source": "网银系统",
+    "import_batch": "BATCH-2026-001",
+    "has_alias_mismatch": false,
+    "alias_mismatch_note": "原备注：机构简称不一致：录入为「BOC」，标准简称为「中国银行」，请财务复核人确认。财务复核人小王复核确认：对手方坚持使用BOC作为简称，已在合同中明确约定，保留使用BOC",
+    "detected_alias": "",
+    "has_holiday_adjustment": false,
+    "holiday_adjustment_note": "",
+    "has_tail_adjustment": false,
+    "tail_adjustments": [],
+    "supplementary_records": [
+      {
+        "id": "c9e6d614",
+        "reminder_id": "ad09873c",
+        "why_kept": "",
+        "missing_materials": "",
+        "next_step": "找基金会计林姐",
+        "notes": "【2026-06-03 06:00】首次导入，系统自动检测完成\n【2026-06-03 06:00】财务复核人小王复核机构简称：对手方坚持使用BOC作为简称，已在合同中明确约定，保留使用BOC，确认使用「BOC」",
+        "created_at": "2026-06-03T06:00:15.597136",
+        "updated_at": "2026-06-03T06:00:15.599840",
+        "created_by": "财务复核人小王",
+        "updated_by": "财务复核人小王"
+      }
+    ],
+    "audit_logs": [
+      {
+        "id": "9315e055",
+        "reminder_id": "ad09873c",
+        "action": "导入",
+        "field_changed": "全部字段",
+        "old_value": "无",
+        "new_value": "完整债券回售提醒记录",
+        "reason": "首次导入债券回售提醒数据",
+        "operator": "财务复核人小王",
+        "timestamp": "2026-06-03T06:00:15.597144",
+        "affected_results": "标记为待财务复核"
+      },
+      {
+        "id": "cd30d81a",
+        "reminder_id": "ad09873c",
+        "action": "机构简称复核",
+        "field_changed": "institution_alias, has_alias_mismatch, status",
+        "old_value": "alias=BOC, mismatch=True, status=待财务复核",
+        "new_value": "alias=BOC, mismatch=False, status=已复核",
+        "reason": "对手方坚持使用BOC作为简称，已在合同中明确约定，保留使用BOC",
+        "operator": "财务复核人小王",
+        "timestamp": "2026-06-03T06:00:15.599805",
+        "affected_results": "机构简称由「BOC」改为「BOC」，状态由待财务复核变为已复核"
+      }
+    ],
+    "raw_data": {},
+    "created_at": "2026-06-03T06:00:15.597125",
+    "updated_at": "2026-06-03T06:00:15.599751",
+    "import_count": 1,
+    "last_rerun_at": null
+  }
+]

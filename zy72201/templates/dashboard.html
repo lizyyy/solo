@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>债券回售提醒核对系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f5f7fa;
+            color: #303133;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card.warning {
+            border-left-color: #e6a23c;
+        }
+
+        .stat-card.danger {
+            border-left-color: #f56c6c;
+        }
+
+        .stat-card.success {
+            border-left-color: #67c23a;
+        }
+
+        .stat-card.info {
+            border-left-color: #409eff;
+        }
+
+        .stat-card .label {
+            font-size: 13px;
+            color: #909399;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #303133;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: #409eff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #66b1ff;
+        }
+
+        .btn-success {
+            background: #67c23a;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #85ce61;
+        }
+
+        .btn-warning {
+            background: #e6a23c;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #ebb563;
+        }
+
+        .btn-danger {
+            background: #f56c6c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #f78989;
+        }
+
+        .btn-default {
+            background: #f5f7fa;
+            color: #606266;
+            border: 1px solid #dcdfe6;
+        }
+
+        .btn-default:hover {
+            background: #ecf5ff;
+            color: #409eff;
+            border-color: #c6e2ff;
+        }
+
+        select, input[type="text"], input[type="number"], input[type="date"], textarea {
+            padding: 8px 12px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            border-color: #409eff;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ebeef5;
+        }
+
+        th {
+            background: #fafafa;
+            font-weight: 500;
+            color: #606266;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f5f7fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-pending {
+            background: #fdf6ec;
+            color: #e6a23c;
+        }
+
+        .badge-review {
+            background: #fef0f0;
+            color: #f56c6c;
+        }
+
+        .badge-linjie {
+            background: #ecf5ff;
+            color: #409eff;
+        }
+
+        .badge-reviewed {
+            background: #f0f9eb;
+            color: #67c23a;
+        }
+
+        .badge-resolved {
+            background: #f0f9eb;
+            color: #67c23a;
+        }
+
+        .badge-corrected {
+            background: #faecd8;
+            color: #e6a23c;
+        }
+
+        .badge-rerun {
+            background: #e9e9eb;
+            color: #909399;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-right: 4px;
+        }
+
+        .tag-red {
+            background: #fef0f0;
+            color: #f56c6c;
+            border: 1px solid #fbc4c4;
+        }
+
+        .tag-blue {
+            background: #ecf5ff;
+            color: #409eff;
+            border: 1px solid #b3d8ff;
+        }
+
+        .tag-green {
+            background: #f0f9eb;
+            color: #67c23a;
+            border: 1px solid #c2e7b0;
+        }
+
+        .action-link {
+            color: #409eff;
+            cursor: pointer;
+            margin-right: 10px;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .action-link:hover {
+            text-decoration: underline;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ebeef5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            cursor: pointer;
+            font-size: 24px;
+            color: #909399;
+            border: none;
+            background: none;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #ebeef5;
+            text-align: right;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #606266;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h4 {
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ebeef5;
+            color: #303133;
+            font-size: 16px;
+        }
+
+        .detail-item {
+            display: flex;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .detail-item .label {
+            width: 120px;
+            color: #909399;
+            flex-shrink: 0;
+        }
+
+        .detail-item .value {
+            color: #303133;
+        }
+
+        .audit-item {
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            border-left: 3px solid #409eff;
+        }
+
+        .audit-item .time {
+            color: #909399;
+            font-size: 12px;
+        }
+
+        .audit-item .operator {
+            color: #409eff;
+            font-weight: 500;
+        }
+
+        .audit-item .action {
+            color: #67c23a;
+            font-weight: 500;
+        }
+
+        .tail-item {
+            padding: 12px;
+            background: #fdf6ec;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 3px solid #e6a23c;
+        }
+
+        .supplementary-box {
+            padding: 15px;
+            background: #ecf5ff;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .supplementary-box h5 {
+            color: #409eff;
+            margin-bottom: 8px;
+        }
+
+        .supplementary-box .content {
+            white-space: pre-wrap;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .alert-warning {
+            background: #fdf6ec;
+            color: #e6a23c;
+            border: 1px solid #f5dab1;
+        }
+
+        .alert-danger {
+            background: #fef0f0;
+            color: #f56c6c;
+            border: 1px solid #fbc4c4;
+        }
+
+        .alert-info {
+            background: #ecf5ff;
+            color: #409eff;
+            border: 1px solid #b3d8ff;
+        }
+
+        .alert-success {
+            background: #f0f9eb;
+            color: #67c23a;
+            border: 1px solid #c2e7b0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #909399;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #606266;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: #67c23a;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: #f56c6c;
+        }
+
+        .toast.warning {
+            background: #e6a23c;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📋 债券回售提醒核对系统</h1>
+        <p>服务真实复核 · 保留人工判断 · 完整审计追踪</p>
+    </div>
+
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="label">总记录数</div>
+                <div class="value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="label">待财务复核</div>
+                <div class="value" id="stat-review">0</div>
+            </div>
+            <div class="stat-card info">
+                <div class="label">待林姐处理</div>
+                <div class="value" id="stat-linjie">0</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="label">有尾差调整</div>
+                <div class="value" id="stat-tail">0</div>
+            </div>
+            <div class="stat-card success">
+                <div class="label">已完成</div>
+                <div class="value" id="stat-resolved">0</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-primary" onclick="initDemo()">🎯 初始化演示数据</button>
+            <button class="btn btn-success" onclick="openImportModal()">➕ 导入新记录</button>
+            <button class="btn btn-default" onclick="refreshData()">🔄 刷新</button>
+            <button class="btn btn-default" onclick="generateReport()">📄 生成报告</button>
+            <select id="status-filter" onchange="refreshData()">
+                <option value="">全部状态</option>
+                <option value="待处理">待处理</option>
+                <option value="待财务复核">待财务复核</option>
+                <option value="待林姐确认">待林姐确认</option>
+                <option value="已复核">已复核</option>
+                <option value="已修正">已修正</option>
+                <option value="已重跑">已重跑</option>
+                <option value="已完成">已完成</option>
+            </select>
+        </div>
+
+        <table id="reminders-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>债券代码</th>
+                    <th>债券名称</th>
+                    <th>机构简称</th>
+                    <th>回售日期</th>
+                    <th>行权金额(万)</th>
+                    <th>利率(%)</th>
+                    <th>状态</th>
+                    <th>标记</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="reminders-tbody">
+            </tbody>
+        </table>
+
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <h3>暂无记录</h3>
+            <p>点击"初始化演示数据"按钮加载示例数据，或点击"导入新记录"添加数据</p>
+        </div>
+    </div>
+
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="detail-title">记录详情</h3>
+                <button class="modal-close" onclick="closeModal('detail-modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="detail-body">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('detail-modal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="import-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>导入新记录</h3>
+                <button class="modal-close" onclick="closeModal('import-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>债券代码 *</label>
+                        <input type="text" id="import-bond-code" placeholder="如: 127123">
+                    </div>
+                    <div class="form-group">
+                        <label>债券名称 *</label>
+                        <input type="text" id="import-bond-name" placeholder="如: 21国开01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>机构全称 *</label>
+                    <input type="text" id="import-inst-full" placeholder="如: 中国工商银行股份有限公司">
+                </div>
+                <div class="form-group">
+                    <label>机构简称 *</label>
+                    <input type="text" id="import-inst-alias" placeholder="如: 工商银行">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>回售日期 *</label>
+                        <input type="date" id="import-date">
+                    </div>
+                    <div class="form-group">
+                        <label>行权金额(元) *</label>
+                        <input type="number" id="import-amount" placeholder="如: 10000000" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>票面利率(%) *</label>
+                        <input type="number" id="import-coupon" placeholder="如: 3.25" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>操作人</label>
+                        <input type="text" id="import-operator" placeholder="如: 财务复核人小王">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>原始数据备注 (JSON格式)</label>
+                    <textarea id="import-raw" rows="2" placeholder='{"remark": "尾差说明"}'></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('import-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitImport()">确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="tail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加尾差调整条</h3>
+                <button class="modal-close" onclick="closeModal('tail-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>差额(元) *</label>
+                    <input type="number" id="tail-amount" placeholder="如: 0.58" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>调整原因 *</label>
+                    <input type="text" id="tail-reason" placeholder="如: 四舍五入尾差调整">
+                </div>
+                <div class="form-group">
+                    <label>备注 * (请保留原始材料说明，这很重要！)</label>
+                    <textarea id="tail-remark" rows="4" placeholder="如: 尾差0.58元，因四舍五入导致，已与对手方确认，详见20260615尾差调整说明.docx"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="tail-operator" placeholder="如: 基金会计林姐">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('tail-modal')">取消</button>
+                <button class="btn btn-warning" onclick="submitTail()">添加调整</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="alias-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>复核机构简称</h3>
+                <button class="modal-close" onclick="closeModal('alias-modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="alias-body">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('alias-modal')">取消</button>
+                <button class="btn btn-danger" onclick="submitAlias(false)">保留原简称</button>
+                <button class="btn btn-success" onclick="submitAlias(true)">使用标准简称</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="send-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>转交林姐处理</h3>
+                <button class="modal-close" onclick="closeModal('send-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>转交说明 *</label>
+                    <textarea id="send-message" rows="3" placeholder="请说明需要林姐处理的内容..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="send-operator" placeholder="如: 财务复核人小王">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('send-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitSend()">确认转交</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="confirm-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>林姐确认完成</h3>
+                <button class="modal-close" onclick="closeModal('confirm-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>确认说明 *</label>
+                    <textarea id="confirm-text" rows="3" placeholder="请说明确认内容..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('confirm-modal')">取消</button>
+                <button class="btn btn-success" onclick="submitConfirm()">确认完成</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let currentReminderId = null;
+        let currentAliasStandard = null;
+        let currentAliasCurrent = null;
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        async function apiCall(url, method = 'GET', data = null) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            const response = await fetch(url, options);
+            return await response.json();
+        }
+
+        async function refreshData() {
+            const statusFilter = document.getElementById('status-filter').value;
+            let url = '/api/reminders';
+            if (statusFilter) {
+                url += '?status=' + encodeURIComponent(statusFilter);
+            }
+
+            const reminders = await apiCall(url);
+            const stats = await apiCall('/api/stats');
+
+            updateStats(stats);
+            renderTable(reminders);
+        }
+
+        function updateStats(stats) {
+            document.getElementById('stat-total').textContent = stats.total;
+            document.getElementById('stat-review').textContent = stats.by_status['待财务复核'] || 0;
+            document.getElementById('stat-linjie').textContent = stats.by_status['待林姐确认'] || 0;
+            document.getElementById('stat-tail').textContent = stats.has_tail_adjustment;
+            document.getElementById('stat-resolved').textContent = stats.by_status['已完成'] || 0;
+        }
+
+        function renderTable(reminders) {
+            const tbody = document.getElementById('reminders-tbody');
+            const emptyState = document.getElementById('empty-state');
+
+            if (reminders.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            tbody.innerHTML = reminders.map(r => {
+                const badgeClass = getStatusBadgeClass(r.status);
+                const tags = getTags(r);
+                const actions = getActions(r);
+
+                return `
+                    <tr>
+                        <td><code>${r.id}</code></td>
+                        <td>${r.bond_code}</td>
+                        <td>${r.bond_name}</td>
+                        <td>${r.institution_alias}</td>
+                        <td>${r.redemption_date}</td>
+                        <td style="text-align: right;">${(r.exercise_amount / 10000).toFixed(2)}</td>
+                        <td style="text-align: right;">${r.coupon_rate}</td>
+                        <td><span class="badge ${badgeClass}">${r.status}</span></td>
+                        <td>${tags}</td>
+                        <td>${actions}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getStatusBadgeClass(status) {
+            const map = {
+                '待处理': 'badge-pending',
+                '待财务复核': 'badge-review',
+                '待林姐确认': 'badge-linjie',
+                '已复核': 'badge-reviewed',
+                '已修正': 'badge-corrected',
+                '已重跑': 'badge-rerun',
+                '已完成': 'badge-resolved',
+            };
+            return map[status] || 'badge-pending';
+        }
+
+        function getTags(r) {
+            let tags = '';
+            if (r.has_alias_mismatch) {
+                tags += '<span class="tag tag-red">简称不一致</span>';
+            }
+            if (r.has_holiday_adjustment) {
+                tags += '<span class="tag tag-blue">节假日顺延</span>';
+            }
+            if (r.has_tail_adjustment) {
+                tags += '<span class="tag tag-green">尾差调整</span>';
+            }
+            return tags || '<span style="color:#c0c4cc;">-</span>';
+        }
+
+        function getActions(r) {
+            let actions = `<span class="action-link" onclick="showDetail('${r.id}')">详情</span>`;
+
+            if (r.has_alias_mismatch) {
+                actions += `<span class="action-link" style="color:#f56c6c;" onclick="openAliasModal('${r.id}', '${r.institution_alias}', '${r.detected_alias}')">复核简称</span>`;
+            }
+
+            actions += `<span class="action-link" onclick="openTailModal('${r.id}')">尾差调整</span>`;
+
+            if (r.status !== '待林姐确认') {
+                actions += `<span class="action-link" style="color:#409eff;" onclick="openSendModal('${r.id}')">转交林姐</span>`;
+            }
+
+            if (r.status === '待林姐确认') {
+                actions += `<span class="action-link" style="color:#67c23a;" onclick="openConfirmModal('${r.id}')">林姐确认</span>`;
+            }
+
+            actions += `<span class="action-link" onclick="rerunReminder('${r.id}')">重跑</span>`;
+
+            return actions;
+        }
+
+        async function showDetail(id) {
+            const r = await apiCall('/api/reminders/' + id);
+            const body = document.getElementById('detail-body');
+            document.getElementById('detail-title').textContent = `${r.bond_code} ${r.bond_name}`;
+
+            let alerts = '';
+            if (r.has_alias_mismatch) {
+                alerts += `<div class="alert alert-danger">⚠️ ${r.alias_mismatch_note}</div>`;
+            }
+            if (r.has_holiday_adjustment) {
+                alerts += `<div class="alert alert-info">📅 ${r.holiday_adjustment_note}</div>`;
+            }
+            if (r.has_tail_adjustment) {
+                alerts += `<div class="alert alert-warning">💰 存在 ${r.tail_adjustments.length} 条尾差调整记录</div>`;
+            }
+
+            let tailHtml = '';
+            if (r.tail_adjustments.length > 0) {
+                tailHtml = `
+                    <div class="detail-section">
+                        <h4>💰 尾差调整条</h4>
+                        ${r.tail_adjustments.map((t, i) => `
+                            <div class="tail-item">
+                                <div><strong>调整${i + 1}:</strong> 差额 <span style="color:#e6a23c;font-weight:bold;">${t.amount_diff >= 0 ? '+' : ''}${t.amount_diff.toFixed(2)}</span> 元</div>
+                                <div><strong>原因:</strong> ${t.adjustment_reason}</div>
+                                <div><strong>备注:</strong> ${t.remark}</div>
+                                <div style="color:#909399;font-size:12px;margin-top:5px;">${t.created_by} · ${t.created_at}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            let supHtml = '';
+            if (r.supplementary) {
+                supHtml = `
+                    <div class="detail-section">
+                        <h4>📝 补录记录</h4>
+                        <div class="supplementary-box">
+                            <h5>为什么留下</h5>
+                            <div class="content">${r.supplementary.why_kept}</div>
+                        </div>
+                        <div class="supplementary-box" style="background:#fef0f0;">
+                            <h5 style="color:#f56c6c;">还缺什么材料</h5>
+                            <div class="content">${r.supplementary.missing_materials}</div>
+                        </div>
+                        <div class="supplementary-box" style="background:#f0f9eb;">
+                            <h5 style="color:#67c23a;">下一步</h5>
+                            <div class="content">👉 ${r.supplementary.next_step}</div>
+                        </div>
+                        ${r.supplementary.notes ? `
+                        <div class="supplementary-box" style="background:#f5f7fa;">
+                            <h5 style="color:#606266;">处理日志</h5>
+                            <div class="content">${r.supplementary.notes}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            let auditHtml = '';
+            if (r.audit_logs.length > 0) {
+                auditHtml = `
+                    <div class="detail-section">
+                        <h4>📊 审计追踪 (${r.audit_logs.length}条)</h4>
+                        ${r.audit_logs.map(a => `
+                            <div class="audit-item">
+                                <div class="time">${a.timestamp}</div>
+                                <div>
+                                    <span class="operator">${a.operator}</span>
+                                    <span class="action">${a.action}</span>
+                                </div>
+                                <div style="margin-top:5px;">
+                                    <strong>字段:</strong> ${a.field_changed} | 
+                                    <strong>变更:</strong> ${a.old_value} → ${a.new_value}
+                                </div>
+                                <div style="color:#606266;"><strong>原因:</strong> ${a.reason}</div>
+                                ${a.affected_results ? `<div style="color:#409eff;"><strong>影响:</strong> ${a.affected_results}</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            body.innerHTML = `
+                ${alerts}
+
+                <div class="detail-section">
+                    <h4>📋 基本信息</h4>
+                    <div class="detail-item"><span class="label">ID</span><span class="value"><code>${r.id}</code></span></div>
+                    <div class="detail-item"><span class="label">债券代码</span><span class="value">${r.bond_code}</span></div>
+                    <div class="detail-item"><span class="label">债券名称</span><span class="value">${r.bond_name}</span></div>
+                    <div class="detail-item"><span class="label">机构全称</span><span class="value">${r.institution_full_name}</span></div>
+                    <div class="detail-item"><span class="label">机构简称</span><span class="value">${r.institution_alias}</span></div>
+                    <div class="detail-item"><span class="label">回售日期</span><span class="value">${r.redemption_date} (原: ${r.original_redemption_date})</span></div>
+                    <div class="detail-item"><span class="label">行权金额</span><span class="value">${r.exercise_amount.toLocaleString()} 元</span></div>
+                    <div class="detail-item"><span class="label">票面利率</span><span class="value">${r.coupon_rate}%</span></div>
+                    <div class="detail-item"><span class="label">状态</span><span class="value"><span class="badge ${getStatusBadgeClass(r.status)}">${r.status}</span></span></div>
+                    <div class="detail-item"><span class="label">来源</span><span class="value">${r.source}</span></div>
+                    <div class="detail-item"><span class="label">导入批次</span><span class="value">${r.import_batch}</span></div>
+                    <div class="detail-item"><span class="label">导入次数</span><span class="value">${r.import_count} 次</span></div>
+                    ${r.last_rerun_at ? `<div class="detail-item"><span class="label">最后重跑</span><span class="value">${r.last_rerun_at}</span></div>` : ''}
+                </div>
+
+                ${tailHtml}
+                ${supHtml}
+                ${auditHtml}
+
+                ${Object.keys(r.raw_data).length > 0 ? `
+                <div class="detail-section">
+                    <h4>📎 原始数据</h4>
+                    <pre style="background:#f5f7fa;padding:10px;border-radius:4px;font-size:12px;overflow-x:auto;">${JSON.stringify(r.raw_data, null, 2)}</pre>
+                </div>
+                ` : ''}
+            `;
+
+            openModal('detail-modal');
+        }
+
+        async function initDemo() {
+            if (confirm('初始化演示数据将覆盖现有数据，确认继续吗？')) {
+                await apiCall('/api/init-demo', 'POST');
+                showToast('演示数据初始化成功！');
+                refreshData();
+            }
+        }
+
+        function openImportModal() {
+            document.getElementById('import-bond-code').value = '';
+            document.getElementById('import-bond-name').value = '';
+            document.getElementById('import-inst-full').value = '';
+            document.getElementById('import-inst-alias').value = '';
+            document.getElementById('import-date').value = '';
+            document.getElementById('import-amount').value = '';
+            document.getElementById('import-coupon').value = '';
+            document.getElementById('import-operator').value = '';
+            document.getElementById('import-raw').value = '';
+            openModal('import-modal');
+        }
+
+        async function submitImport() {
+            const data = {
+                bond_code: document.getElementById('import-bond-code').value,
+                bond_name: document.getElementById('import-bond-name').value,
+                institution_full_name: document.getElementById('import-inst-full').value,
+                institution_alias: document.getElementById('import-inst-alias').value,
+                redemption_date: document.getElementById('import-date').value,
+                exercise_amount: parseFloat(document.getElementById('import-amount').value),
+                coupon_rate: parseFloat(document.getElementById('import-coupon').value),
+                operator: document.getElementById('import-operator').value || 'system',
+            };
+
+            const rawText = document.getElementById('import-raw').value;
+            if (rawText) {
+                try {
+                    data.raw_data = JSON.parse(rawText);
+                } catch (e) {
+                    showToast('原始数据格式错误，请输入有效的JSON', 'error');
+                    return;
+                }
+            }
+
+            if (!data.bond_code || !data.bond_name || !data.institution_full_name ||
+                !data.institution_alias || !data.redemption_date ||
+                isNaN(data.exercise_amount) || isNaN(data.coupon_rate)) {
+                showToast('请填写所有必填字段', 'error');
+                return;
+            }
+
+            const result = await apiCall('/api/reminders', 'POST', data);
+            if (result.error) {
+                showToast(result.error, 'error');
+                return;
+            }
+
+            showToast('导入成功！');
+            closeModal('import-modal');
+            refreshData();
+
+            if (result.has_alias_mismatch) {
+                showToast('检测到机构简称不一致，请财务复核人处理', 'warning');
+            }
+            if (result.has_holiday_adjustment) {
+                showToast('检测到节假日顺延，回售日已自动调整', 'warning');
+            }
+        }
+
+        function openTailModal(id) {
+            currentReminderId = id;
+            document.getElementById('tail-amount').value = '';
+            document.getElementById('tail-reason').value = '';
+            document.getElementById('tail-remark').value = '';
+            document.getElementById('tail-operator').value = '';
+            openModal('tail-modal');
+        }
+
+        async function submitTail() {
+            const data = {
+                amount_diff: parseFloat(document.getElementById('tail-amount').value),
+                reason: document.getElementById('tail-reason').value,
+                remark: document.getElementById('tail-remark').value,
+                operator: document.getElementById('tail-operator').value || 'system',
+            };
+
+            if (isNaN(data.amount_diff) || !data.reason || !data.remark) {
+                showToast('请填写所有必填字段', 'error');
+                return;
+            }
+
+            await apiCall(`/api/reminders/${currentReminderId}/tail`, 'POST', data);
+            showToast('尾差调整条已添加，补录记录已自动更新！');
+            closeModal('tail-modal');
+            refreshData();
+        }
+
+        function openAliasModal(id, currentAlias, standardAlias) {
+            currentReminderId = id;
+            currentAliasCurrent = currentAlias;
+            currentAliasStandard = standardAlias;
+
+            const body = document.getElementById('alias-body');
+            body.innerHTML = `
+                <div class="alert alert-danger">
+                    ⚠️ 检测到机构简称前后不一致，请人工判断处理
+                </div>
+                <div class="form-group">
+                    <label>当前录入简称</label>
+                    <input type="text" id="alias-current" value="${currentAlias}" readonly style="background:#f5f7fa;">
+                </div>
+                <div class="form-group">
+                    <label>系统检测到的标准简称</label>
+                    <input type="text" id="alias-standard" value="${standardAlias}" readonly style="background:#f5f7fa;">
+                </div>
+                <div class="form-group">
+                    <label>自定义简称 (选择"保留原简称"时可修改)</label>
+                    <input type="text" id="alias-custom" value="${currentAlias}">
+                </div>
+                <div class="form-group">
+                    <label>复核原因 *</label>
+                    <textarea id="alias-reason" rows="3" placeholder="请说明选择该简称的原因..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="alias-operator" placeholder="如: 财务复核人小王">
+                </div>
+            `;
+            openModal('alias-modal');
+        }
+
+        async function submitAlias(useStandard) {
+            const data = {
+                use_standard: useStandard,
+                confirmed_alias: useStandard ? null : document.getElementById('alias-custom').value,
+                reason: document.getElementById('alias-reason').value,
+                operator: document.getElementById('alias-operator').value || 'system',
+            };
+
+            if (!data.reason) {
+                showToast('请填写复核原因', 'error');
+                return;
+            }
+
+            await apiCall(`/api/reminders/${currentReminderId}/resolve-alias`, 'POST', data);
+            showToast('机构简称已复核！');
+            closeModal('alias-modal');
+            refreshData();
+        }
+
+        function openSendModal(id) {
+            currentReminderId = id;
+            document.getElementById('send-message').value = '';
+            document.getElementById('send-operator').value = '';
+            openModal('send-modal');
+        }
+
+        async function submitSend() {
+            const data = {
+                message: document.getElementById('send-message').value,
+                operator: document.getElementById('send-operator').value || 'system',
+            };
+
+            if (!data.message) {
+                showToast('请填写转交说明', 'error');
+                return;
+            }
+
+            await apiCall(`/api/reminders/${currentReminderId}/send-to-linjie`, 'POST', data);
+            showToast('已转交林姐处理！');
+            closeModal('send-modal');
+            refreshData();
+        }
+
+        function openConfirmModal(id) {
+            currentReminderId = id;
+            document.getElementById('confirm-text').value = '';
+            openModal('confirm-modal');
+        }
+
+        async function submitConfirm() {
+            const data = {
+                confirmation: document.getElementById('confirm-text').value,
+            };
+
+            if (!data.confirmation) {
+                showToast('请填写确认说明', 'error');
+                return;
+            }
+
+            await apiCall(`/api/reminders/${currentReminderId}/linjie-confirm`, 'POST', data);
+            showToast('已确认完成！');
+            closeModal('confirm-modal');
+            refreshData();
+        }
+
+        async function rerunReminder(id) {
+            if (confirm('确认要重跑这条记录吗？')) {
+                const reason = prompt('请输入重跑原因：', '人工重跑');
+                if (reason !== null) {
+                    await apiCall(`/api/reminders/${id}/rerun`, 'POST', { reason: reason });
+                    showToast('重跑成功！');
+                    refreshData();
+                }
+            }
+        }
+
+        async function generateReport() {
+            const result = await apiCall('/api/report', 'POST');
+            const blob = new Blob([result.report], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `债券回售提醒核对报告_${new Date().toISOString().slice(0, 10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('报告已生成并下载！');
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        refreshData();
+    </script>
+</body>
+</html>
