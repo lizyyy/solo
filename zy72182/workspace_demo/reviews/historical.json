@@ -1,0 +1,29 @@
+[
+  {
+    "sample_id": "d41d8cd98f00",
+    "human_label": "划痕",
+    "reviewer": "小乔",
+    "review_time": "2026-05-15T10:30:00",
+    "note": "已确认是划痕缺陷",
+    "source_version": "v1_0_1",
+    "status": "confirmed"
+  },
+  {
+    "sample_id": "a43512cd98f0",
+    "human_label": "灰尘",
+    "reviewer": "小乔",
+    "review_time": "2026-05-15T10:35:00",
+    "note": "旧口径：按灰尘处理，无需返工",
+    "source_version": "v0_9_9_legacy",
+    "status": "confirmed"
+  },
+  {
+    "sample_id": "b523f7ac8e1d",
+    "human_label": "严重气泡",
+    "reviewer": "小乔",
+    "review_time": "2026-05-20T14:20:00",
+    "note": "此样本模型预测与人工不符，需要确认",
+    "source_version": "v1_0_0",
+    "status": "confirmed"
+  }
+]

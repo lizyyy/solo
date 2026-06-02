@@ -1,0 +1,374 @@
+{
+  "report_id": "report_v1_1_0_2_20260602_202737",
+  "generated_at": "2026-06-02T20:27:37.231083",
+  "version_info": {
+    "version_id": "v1_1_0_2",
+    "model_version": "1.0.2",
+    "created_at": "2026-06-02T20:27:37.154607",
+    "description": "图像质检缺陷聚类 - 第一版发布",
+    "status": "created"
+  },
+  "data_cleaning": {
+    "total_rows": 9,
+    "null_rows": 0,
+    "duplicate_rows": 1,
+    "valid_rows": 8,
+    "removed_samples": [
+      {
+        "sample_id": "893179f90c31",
+        "_raw_index": 4
+      }
+    ]
+  },
+  "historical_merge": {
+    "total_samples": 8,
+    "matched_reviews": 0,
+    "conflicting_labels": 0,
+    "applied_labels": 0
+  },
+  "clustering": {
+    "cluster_count": 6,
+    "noise_count": 0,
+    "samples_per_cluster": {
+      "C0": {
+        "count": 2,
+        "defect_types": {
+          "划痕": 2
+        },
+        "avg_confidence": 0.9
+      },
+      "C1": {
+        "count": 2,
+        "defect_types": {
+          "气泡": 2
+        },
+        "avg_confidence": 0.765
+      },
+      "C2": {
+        "count": 1,
+        "defect_types": {
+          "灰尘": 1
+        },
+        "avg_confidence": 0.65
+      },
+      "C3": {
+        "count": 1,
+        "defect_types": {},
+        "avg_confidence": 0.0
+      },
+      "C4": {
+        "count": 1,
+        "defect_types": {
+          "边缘缺陷": 1
+        },
+        "avg_confidence": 0.45
+      },
+      "C5": {
+        "count": 1,
+        "defect_types": {
+          "污点": 1
+        },
+        "avg_confidence": 0.82
+      }
+    }
+  },
+  "metrics": {
+    "total_samples": 8,
+    "review_status": {
+      "pending": 8
+    },
+    "label_distribution": {
+      "predicted_label": {
+        "划痕": 2,
+        "气泡": 2,
+        "灰尘": 1,
+        "边缘缺陷": 1,
+        "污点": 1
+      },
+      "human_label": {},
+      "cluster_label": {
+        "划痕": 2,
+        "气泡": 2,
+        "灰尘": 1,
+        "边缘缺陷": 1,
+        "污点": 1
+      }
+    },
+    "cluster_distribution": {
+      "C0": 2,
+      "C1": 2,
+      "C2": 1,
+      "C3": 1,
+      "C4": 1,
+      "C5": 1
+    },
+    "confidence_stats": {
+      "mean": 0.75,
+      "min": 0.45,
+      "max": 0.92,
+      "low_confidence_count": 1
+    }
+  },
+  "version_comparison": {},
+  "sample_summary": {
+    "total_samples": 8,
+    "by_review_status": {
+      "pending": 8
+    },
+    "by_defect_type": {
+      "划痕": 2,
+      "气泡": 2,
+      "灰尘": 1,
+      "边缘缺陷": 1,
+      "污点": 1
+    },
+    "by_cluster": {
+      "C0": 2,
+      "C1": 2,
+      "C2": 1,
+      "C3": 1,
+      "C4": 1,
+      "C5": 1
+    },
+    "representative_samples": [
+      {
+        "sample_id": "893179f90c31",
+        "cluster_id": "C0",
+        "defect_type": "划痕",
+        "confidence": "0.92"
+      },
+      {
+        "sample_id": "cbeb879cd8f3",
+        "cluster_id": "C2",
+        "defect_type": "灰尘",
+        "confidence": "0.65"
+      },
+      {
+        "sample_id": "575b2c5222e8",
+        "cluster_id": "C3",
+        "defect_type": NaN,
+        "confidence": NaN
+      },
+      {
+        "sample_id": "8fed541a08a0",
+        "cluster_id": "C4",
+        "defect_type": "边缘缺陷",
+        "confidence": "0.45"
+      },
+      {
+        "sample_id": "7da3d420fa0f",
+        "cluster_id": "C5",
+        "defect_type": "污点",
+        "confidence": "0.82"
+      },
+      {
+        "sample_id": "dd6914cffcc3",
+        "cluster_id": "C1",
+        "defect_type": "气泡",
+        "confidence": "0.78"
+      }
+    ]
+  },
+  "decision_trail": [
+    {
+      "sample_id": "893179f90c31",
+      "decisions": [
+        {
+          "step": "data_loading",
+          "action": "loaded",
+          "source": "v1_model_results.csv",
+          "raw_index": 0
+        },
+        {
+          "step": "clustering",
+          "action": "clustered",
+          "cluster_id": "C0",
+          "is_representative": true,
+          "cluster_label": "划痕"
+        },
+        {
+          "step": "review",
+          "action": "pending",
+          "model_label": "划痕",
+          "human_label": null,
+          "note": null
+        }
+      ]
+    },
+    {
+      "sample_id": "6aec3f0af544",
+      "decisions": [
+        {
+          "step": "data_loading",
+          "action": "loaded",
+          "source": "v1_model_results.csv",
+          "raw_index": 1
+        },
+        {
+          "step": "clustering",
+          "action": "clustered",
+          "cluster_id": "C0",
+          "is_representative": false,
+          "cluster_label": "划痕"
+        },
+        {
+          "step": "review",
+          "action": "pending",
+          "model_label": "划痕",
+          "human_label": null,
+          "note": null
+        }
+      ]
+    },
+    {
+      "sample_id": "77f02bedce3a",
+      "decisions": [
+        {
+          "step": "data_loading",
+          "action": "loaded",
+          "source": "v1_model_results.csv",
+          "raw_index": 2
+        },
+        {
+          "step": "clustering",
+          "action": "clustered",
+          "cluster_id": "C1",
+          "is_representative": false,
+          "cluster_label": "气泡"
+        },
+        {
+          "step": "review",
+          "action": "pending",
+          "model_label": "气泡",
+          "human_label": null,
+          "note": null
+        }
+      ]
+    },
+    {
+      "sample_id": "cbeb879cd8f3",
+      "decisions": [
+        {
+          "step": "data_loading",
+          "action": "loaded",
+          "source": "v1_model_results.csv",
+          "raw_index": 3
+        },
+        {
+          "step": "clustering",
+          "action": "clustered",
+          "cluster_id": "C2",
+          "is_representative": true,
+          "cluster_label": "灰尘"
+        },
+        {
+          "step": "review",
+          "action": "pending",
+          "model_label": "灰尘",
+          "human_label": null,
+          "note": null
+        }
+      ]
+    },
+    {
+      "sample_id": "575b2c5222e8",
+      "decisions": [
+        {
+          "step": "data_loading",
+          "action": "loaded",
+          "source": "v1_model_results.csv",
+          "raw_index": 5
+        },
+        {
+          "step": "clustering",
+          "action": "clustered",
+          "cluster_id": "C3",
+          "is_representative": true,
+          "cluster_label": null
+        },
+        {
+          "step": "review",
+          "action": "pending",
+          "model_label": NaN,
+          "human_label": null,
+          "note": null
+        }
+      ]
+    },
+    {
+      "sample_id": "8fed541a08a0",
+      "decisions": [
+        {
+          "step": "data_loading",
+          "action": "loaded",
+          "source": "v1_model_results.csv",
+          "raw_index": 6
+        },
+        {
+          "step": "clustering",
+          "action": "clustered",
+          "cluster_id": "C4",
+          "is_representative": true,
+          "cluster_label": "边缘缺陷"
+        },
+        {
+          "step": "review",
+          "action": "pending",
+          "model_label": "边缘缺陷",
+          "human_label": null,
+          "note": null
+        }
+      ]
+    },
+    {
+      "sample_id": "7da3d420fa0f",
+      "decisions": [
+        {
+          "step": "data_loading",
+          "action": "loaded",
+          "source": "v1_model_results.csv",
+          "raw_index": 7
+        },
+        {
+          "step": "clustering",
+          "action": "clustered",
+          "cluster_id": "C5",
+          "is_representative": true,
+          "cluster_label": "污点"
+        },
+        {
+          "step": "review",
+          "action": "pending",
+          "model_label": "污点",
+          "human_label": null,
+          "note": null
+        }
+      ]
+    },
+    {
+      "sample_id": "dd6914cffcc3",
+      "decisions": [
+        {
+          "step": "data_loading",
+          "action": "loaded",
+          "source": "v1_model_results.csv",
+          "raw_index": 8
+        },
+        {
+          "step": "clustering",
+          "action": "clustered",
+          "cluster_id": "C1",
+          "is_representative": true,
+          "cluster_label": "气泡"
+        },
+        {
+          "step": "review",
+          "action": "pending",
+          "model_label": "气泡",
+          "human_label": null,
+          "note": null
+        }
+      ]
+    }
+  ]
+}

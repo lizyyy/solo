@@ -1,0 +1,9 @@
+image_path,defect_type,defect_location,defect_size,defect_description,confidence,predicted_label
+images/scratch_001.jpg,划痕,左上角,15.2,表面细小划痕,0.95,划痕
+images/scratch_002.jpg,划痕,左上角,12.8,表面细小划痕,0.90,划痕
+images/bubble_001.jpg,气泡,中心区域,8.5,涂层下气泡,0.80,气泡
+images/dust_001.jpg,污渍,右下角,3.2,表面污渍,0.72,污渍
+images/bubble_002.jpg,气泡,边缘,6.2,涂层下气泡,0.82,气泡
+images/edge_001.jpg,边缘缺陷,边缘,25.0,边缘切割不齐,0.55,边缘缺陷
+images/spot_001.jpg,污点,右上角,5.8,表面污渍斑点,0.85,污点
+images/new_crack_001.jpg,裂纹,左下角,18.0,表面微裂纹,0.68,裂纹
