@@ -1,0 +1,1177 @@
+{
+  "model_version": "v1.0",
+  "total_records": 16,
+  "correct_count": 12,
+  "error_count": 4,
+  "precision": 0.8571428571428571,
+  "recall": 0.75,
+  "f1_score": 0.7999999999999999,
+  "by_sensitive_type": {
+    "name": {
+      "group_key": "name",
+      "group_name": "name",
+      "total_count": 7,
+      "correct_count": 7,
+      "error_count": 0,
+      "error_types": {},
+      "records": [
+        {
+          "record_id": "REC001",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "张三",
+          "expected_value": "张三",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC001",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "张三",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L1"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC001",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC001"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821871"
+        },
+        {
+          "record_id": "REC002",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "李四",
+          "expected_value": "李四",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC002",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "李四",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L2"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC002",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC002"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821891"
+        },
+        {
+          "record_id": "REC003",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "王五",
+          "expected_value": "王五",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC003",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "王五",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L3"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC003",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC003"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821900"
+        },
+        {
+          "record_id": "REC004",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "赵六",
+          "expected_value": "赵六",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC004",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "赵六",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L4"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC004",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC004"
+            }
+          ],
+          "note": "2026-06-02 临时补录：13900139000是真实手机号，v2.0已修复，v1.0漏检是因为正则少了139号段",
+          "eval_timestamp": "2026-06-02T21:02:30.821907"
+        },
+        {
+          "record_id": "REC006",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "孙七",
+          "expected_value": "孙七",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC006",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "孙七",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L6"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC006",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC006"
+            }
+          ],
+          "note": "2026-06-02 评审确认：12345678不是有效手机号，模型误报，需要优化正则表达式",
+          "eval_timestamp": "2026-06-02T21:02:30.821917"
+        },
+        {
+          "record_id": "REC008",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "周八",
+          "expected_value": "周八",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC008",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "周八",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L8"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC008",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC008"
+            }
+          ],
+          "note": "2026-06-02 补充说明：身份证号根据最新合规要求必须全脱敏，v1.0模型只做了部分脱敏",
+          "eval_timestamp": "2026-06-02T21:02:30.821925"
+        },
+        {
+          "record_id": "REC009",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "吴九",
+          "expected_value": "吴九",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC009",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "吴九",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L10"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC009",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC009"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821933"
+        }
+      ]
+    },
+    "phone": {
+      "group_key": "phone",
+      "group_name": "phone",
+      "total_count": 4,
+      "correct_count": 1,
+      "error_count": 3,
+      "error_types": {
+        "false_negative": 2,
+        "wrong_level": 1
+      },
+      "records": [
+        {
+          "record_id": "REC001",
+          "sensitive_type": "phone",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "13800138000",
+          "expected_value": "13800138000",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC001",
+              "field": "detected_entities",
+              "value": {
+                "type": "phone",
+                "value": "13800138000",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L1"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC001",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC001"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821882"
+        },
+        {
+          "record_id": "REC004",
+          "sensitive_type": "phone",
+          "is_correct": false,
+          "error_type": "false_negative",
+          "model_level": "not_masked",
+          "expected_level": "partial_mask",
+          "detected_value": null,
+          "expected_value": "13900139000",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC004",
+              "field": "detected_entities",
+              "value": "未检测到",
+              "link": "batch_001.jsonl#L4"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC004",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC004"
+            }
+          ],
+          "note": "漏检：13900139000(phone)未被模型检测到\n2026-06-02 临时补录：13900139000是真实手机号，v2.0已修复，v1.0漏检是因为正则少了139号段",
+          "eval_timestamp": "2026-06-02T21:02:30.821910"
+        },
+        {
+          "record_id": "REC006",
+          "sensitive_type": "phone",
+          "is_correct": false,
+          "error_type": "wrong_level",
+          "model_level": "full_mask",
+          "expected_level": "not_masked",
+          "detected_value": "12345678",
+          "expected_value": "12345678",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC006",
+              "field": "detected_entities",
+              "value": {
+                "type": "phone",
+                "value": "12345678",
+                "level": "full_mask"
+              },
+              "link": "batch_001.jsonl#L6"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC006",
+              "field": "expected_level",
+              "value": "not_masked",
+              "link": "ground_truth.csv#record=REC006"
+            }
+          ],
+          "note": "脱敏级别不匹配：模型输出full_mask，期望not_masked\n2026-06-02 评审确认：12345678不是有效手机号，模型误报，需要优化正则表达式",
+          "eval_timestamp": "2026-06-02T21:02:30.821921"
+        },
+        {
+          "record_id": "REC009",
+          "sensitive_type": "phone",
+          "is_correct": false,
+          "error_type": "false_negative",
+          "model_level": "not_masked",
+          "expected_level": "not_masked",
+          "detected_value": null,
+          "expected_value": "010-12345678",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC009",
+              "field": "detected_entities",
+              "value": "未检测到",
+              "link": "batch_001.jsonl#L10"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC009",
+              "field": "expected_level",
+              "value": "not_masked",
+              "link": "ground_truth.csv#record=REC009"
+            }
+          ],
+          "note": "漏检：010-12345678(phone)未被模型检测到",
+          "eval_timestamp": "2026-06-02T21:02:30.821935"
+        }
+      ]
+    },
+    "id_card": {
+      "group_key": "id_card",
+      "group_name": "id_card",
+      "total_count": 2,
+      "correct_count": 1,
+      "error_count": 1,
+      "error_types": {
+        "wrong_level": 1
+      },
+      "records": [
+        {
+          "record_id": "REC001",
+          "sensitive_type": "id_card",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "full_mask",
+          "expected_level": "full_mask",
+          "detected_value": "110101199003071234",
+          "expected_value": "110101199003071234",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC001",
+              "field": "detected_entities",
+              "value": {
+                "type": "id_card",
+                "value": "110101199003071234",
+                "level": "full_mask"
+              },
+              "link": "batch_001.jsonl#L1"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC001",
+              "field": "expected_level",
+              "value": "full_mask",
+              "link": "ground_truth.csv#record=REC001"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821885"
+        },
+        {
+          "record_id": "REC008",
+          "sensitive_type": "id_card",
+          "is_correct": false,
+          "error_type": "wrong_level",
+          "model_level": "partial_mask",
+          "expected_level": "full_mask",
+          "detected_value": "110101199003075678",
+          "expected_value": "110101199003075678",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC008",
+              "field": "detected_entities",
+              "value": {
+                "type": "id_card",
+                "value": "110101199003075678",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L8"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC008",
+              "field": "expected_level",
+              "value": "full_mask",
+              "link": "ground_truth.csv#record=REC008"
+            }
+          ],
+          "note": "脱敏级别不匹配：模型输出partial_mask，期望full_mask\n2026-06-02 补充说明：身份证号根据最新合规要求必须全脱敏，v1.0模型只做了部分脱敏",
+          "eval_timestamp": "2026-06-02T21:02:30.821929"
+        }
+      ]
+    },
+    "address": {
+      "group_key": "address",
+      "group_name": "address",
+      "total_count": 1,
+      "correct_count": 1,
+      "error_count": 0,
+      "error_types": {},
+      "records": [
+        {
+          "record_id": "REC002",
+          "sensitive_type": "address",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "北京市朝阳区建国路88号",
+          "expected_value": "北京市朝阳区建国路88号",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC002",
+              "field": "detected_entities",
+              "value": {
+                "type": "address",
+                "value": "北京市朝阳区建国路88号",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L2"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC002",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC002"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821894"
+        }
+      ]
+    },
+    "email": {
+      "group_key": "email",
+      "group_name": "email",
+      "total_count": 1,
+      "correct_count": 1,
+      "error_count": 0,
+      "error_types": {},
+      "records": [
+        {
+          "record_id": "REC002",
+          "sensitive_type": "email",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "lisi@example.com",
+          "expected_value": "lisi@example.com",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC002",
+              "field": "detected_entities",
+              "value": {
+                "type": "email",
+                "value": "lisi@example.com",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L2"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC002",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC002"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821896"
+        }
+      ]
+    },
+    "bank_card": {
+      "group_key": "bank_card",
+      "group_name": "bank_card",
+      "total_count": 1,
+      "correct_count": 1,
+      "error_count": 0,
+      "error_types": {},
+      "records": [
+        {
+          "record_id": "REC003",
+          "sensitive_type": "bank_card",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "6222021234567890123",
+          "expected_value": "6222021234567890123",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC003",
+              "field": "detected_entities",
+              "value": {
+                "type": "bank_card",
+                "value": "6222021234567890123",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L3"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC003",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC003"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821903"
+        }
+      ]
+    }
+  },
+  "by_error_type": {
+    "correct": {
+      "group_key": "correct",
+      "group_name": "correct",
+      "total_count": 12,
+      "correct_count": 12,
+      "error_count": 0,
+      "error_types": {},
+      "records": [
+        {
+          "record_id": "REC001",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "张三",
+          "expected_value": "张三",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC001",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "张三",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L1"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC001",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC001"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821871"
+        },
+        {
+          "record_id": "REC001",
+          "sensitive_type": "phone",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "13800138000",
+          "expected_value": "13800138000",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC001",
+              "field": "detected_entities",
+              "value": {
+                "type": "phone",
+                "value": "13800138000",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L1"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC001",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC001"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821882"
+        },
+        {
+          "record_id": "REC001",
+          "sensitive_type": "id_card",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "full_mask",
+          "expected_level": "full_mask",
+          "detected_value": "110101199003071234",
+          "expected_value": "110101199003071234",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC001",
+              "field": "detected_entities",
+              "value": {
+                "type": "id_card",
+                "value": "110101199003071234",
+                "level": "full_mask"
+              },
+              "link": "batch_001.jsonl#L1"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC001",
+              "field": "expected_level",
+              "value": "full_mask",
+              "link": "ground_truth.csv#record=REC001"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821885"
+        },
+        {
+          "record_id": "REC002",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "李四",
+          "expected_value": "李四",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC002",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "李四",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L2"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC002",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC002"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821891"
+        },
+        {
+          "record_id": "REC002",
+          "sensitive_type": "address",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "北京市朝阳区建国路88号",
+          "expected_value": "北京市朝阳区建国路88号",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC002",
+              "field": "detected_entities",
+              "value": {
+                "type": "address",
+                "value": "北京市朝阳区建国路88号",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L2"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC002",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC002"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821894"
+        },
+        {
+          "record_id": "REC002",
+          "sensitive_type": "email",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "lisi@example.com",
+          "expected_value": "lisi@example.com",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC002",
+              "field": "detected_entities",
+              "value": {
+                "type": "email",
+                "value": "lisi@example.com",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L2"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC002",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC002"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821896"
+        },
+        {
+          "record_id": "REC003",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "王五",
+          "expected_value": "王五",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC003",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "王五",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L3"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC003",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC003"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821900"
+        },
+        {
+          "record_id": "REC003",
+          "sensitive_type": "bank_card",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "6222021234567890123",
+          "expected_value": "6222021234567890123",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC003",
+              "field": "detected_entities",
+              "value": {
+                "type": "bank_card",
+                "value": "6222021234567890123",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L3"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC003",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC003"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821903"
+        },
+        {
+          "record_id": "REC004",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "赵六",
+          "expected_value": "赵六",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC004",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "赵六",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L4"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC004",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC004"
+            }
+          ],
+          "note": "2026-06-02 临时补录：13900139000是真实手机号，v2.0已修复，v1.0漏检是因为正则少了139号段",
+          "eval_timestamp": "2026-06-02T21:02:30.821907"
+        },
+        {
+          "record_id": "REC006",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "孙七",
+          "expected_value": "孙七",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC006",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "孙七",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L6"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC006",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC006"
+            }
+          ],
+          "note": "2026-06-02 评审确认：12345678不是有效手机号，模型误报，需要优化正则表达式",
+          "eval_timestamp": "2026-06-02T21:02:30.821917"
+        },
+        {
+          "record_id": "REC008",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "周八",
+          "expected_value": "周八",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC008",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "周八",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L8"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC008",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC008"
+            }
+          ],
+          "note": "2026-06-02 补充说明：身份证号根据最新合规要求必须全脱敏，v1.0模型只做了部分脱敏",
+          "eval_timestamp": "2026-06-02T21:02:30.821925"
+        },
+        {
+          "record_id": "REC009",
+          "sensitive_type": "name",
+          "is_correct": true,
+          "error_type": null,
+          "model_level": "partial_mask",
+          "expected_level": "partial_mask",
+          "detected_value": "吴九",
+          "expected_value": "吴九",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC009",
+              "field": "detected_entities",
+              "value": {
+                "type": "name",
+                "value": "吴九",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L10"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC009",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC009"
+            }
+          ],
+          "note": null,
+          "eval_timestamp": "2026-06-02T21:02:30.821933"
+        }
+      ]
+    },
+    "false_negative": {
+      "group_key": "false_negative",
+      "group_name": "false_negative",
+      "total_count": 2,
+      "correct_count": 0,
+      "error_count": 3,
+      "error_types": {
+        "false_negative": 2,
+        "conflict": 1
+      },
+      "records": [
+        {
+          "record_id": "REC004",
+          "sensitive_type": "phone",
+          "is_correct": false,
+          "error_type": "false_negative",
+          "model_level": "not_masked",
+          "expected_level": "partial_mask",
+          "detected_value": null,
+          "expected_value": "13900139000",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC004",
+              "field": "detected_entities",
+              "value": "未检测到",
+              "link": "batch_001.jsonl#L4"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC004",
+              "field": "expected_level",
+              "value": "partial_mask",
+              "link": "ground_truth.csv#record=REC004"
+            }
+          ],
+          "note": "漏检：13900139000(phone)未被模型检测到\n2026-06-02 临时补录：13900139000是真实手机号，v2.0已修复，v1.0漏检是因为正则少了139号段",
+          "eval_timestamp": "2026-06-02T21:02:30.821910"
+        },
+        {
+          "record_id": "REC009",
+          "sensitive_type": "phone",
+          "is_correct": false,
+          "error_type": "false_negative",
+          "model_level": "not_masked",
+          "expected_level": "not_masked",
+          "detected_value": null,
+          "expected_value": "010-12345678",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC009",
+              "field": "detected_entities",
+              "value": "未检测到",
+              "link": "batch_001.jsonl#L10"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC009",
+              "field": "expected_level",
+              "value": "not_masked",
+              "link": "ground_truth.csv#record=REC009"
+            }
+          ],
+          "note": "漏检：010-12345678(phone)未被模型检测到",
+          "eval_timestamp": "2026-06-02T21:02:30.821935"
+        }
+      ]
+    },
+    "wrong_level": {
+      "group_key": "wrong_level",
+      "group_name": "wrong_level",
+      "total_count": 2,
+      "correct_count": 0,
+      "error_count": 2,
+      "error_types": {
+        "wrong_level": 2
+      },
+      "records": [
+        {
+          "record_id": "REC006",
+          "sensitive_type": "phone",
+          "is_correct": false,
+          "error_type": "wrong_level",
+          "model_level": "full_mask",
+          "expected_level": "not_masked",
+          "detected_value": "12345678",
+          "expected_value": "12345678",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC006",
+              "field": "detected_entities",
+              "value": {
+                "type": "phone",
+                "value": "12345678",
+                "level": "full_mask"
+              },
+              "link": "batch_001.jsonl#L6"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC006",
+              "field": "expected_level",
+              "value": "not_masked",
+              "link": "ground_truth.csv#record=REC006"
+            }
+          ],
+          "note": "脱敏级别不匹配：模型输出full_mask，期望not_masked\n2026-06-02 评审确认：12345678不是有效手机号，模型误报，需要优化正则表达式",
+          "eval_timestamp": "2026-06-02T21:02:30.821921"
+        },
+        {
+          "record_id": "REC008",
+          "sensitive_type": "id_card",
+          "is_correct": false,
+          "error_type": "wrong_level",
+          "model_level": "partial_mask",
+          "expected_level": "full_mask",
+          "detected_value": "110101199003075678",
+          "expected_value": "110101199003075678",
+          "evidences": [
+            {
+              "source_type": "model_output",
+              "source_id": "REC008",
+              "field": "detected_entities",
+              "value": {
+                "type": "id_card",
+                "value": "110101199003075678",
+                "level": "partial_mask"
+              },
+              "link": "batch_001.jsonl#L8"
+            },
+            {
+              "source_type": "annotation",
+              "source_id": "REC008",
+              "field": "expected_level",
+              "value": "full_mask",
+              "link": "ground_truth.csv#record=REC008"
+            }
+          ],
+          "note": "脱敏级别不匹配：模型输出partial_mask，期望full_mask\n2026-06-02 补充说明：身份证号根据最新合规要求必须全脱敏，v1.0模型只做了部分脱敏",
+          "eval_timestamp": "2026-06-02T21:02:30.821929"
+        }
+      ]
+    }
+  },
+  "conflicts": [
+    {
+      "record_id": "REC006",
+      "conflict_type": "false_positive",
+      "description": "模型将8位数字12345678误识别为手机号，但标注认为不是手机号",
+      "evidences": [
+        {
+          "source_type": "model_output",
+          "source_id": "REC006",
+          "field": "detected_entities",
+          "value": {
+            "type": "phone",
+            "value": "12345678",
+            "level": "full_mask"
+          },
+          "link": "samples/model_logs/v1.0/batch_001.jsonl#L6"
+        },
+        {
+          "source_type": "annotation",
+          "source_id": "REC006",
+          "field": "expected_level",
+          "value": "not_masked",
+          "link": "samples/annotations/ground_truth.csv#L12"
+        }
+      ],
+      "resolved": false,
+      "resolution_note": null
+    },
+    {
+      "record_id": "REC009",
+      "conflict_type": "false_negative",
+      "description": "座机号010-12345678是否需要脱敏存在争议",
+      "evidences": [
+        {
+          "source_type": "model_output",
+          "source_id": "REC009",
+          "field": "detected_entities",
+          "value": [],
+          "link": "samples/model_logs/v1.0/batch_001.jsonl#L10"
+        },
+        {
+          "source_type": "annotation",
+          "source_id": "REC009",
+          "field": "expected_level",
+          "value": "not_masked",
+          "link": "samples/annotations/ground_truth.csv#L16"
+        }
+      ],
+      "resolved": false,
+      "resolution_note": null
+    }
+  ],
+  "notes": [
+    "[id_card] 准确率50.00% 低于阈值98.00% - 身份证号要求最高，不能漏也不能错",
+    "[phone] 准确率25.00% 低于阈值90.00% - 手机号要求较高准确率"
+  ]
+}

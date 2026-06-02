@@ -1,0 +1,46 @@
+[
+  {
+    "record_id": "REC006",
+    "conflict_type": "false_positive",
+    "description": "模型将8位数字12345678误识别为手机号，但标注认为不是手机号",
+    "evidences": [
+      {
+        "source_type": "model_output",
+        "source_id": "REC006",
+        "field": "detected_entities",
+        "value": {"type": "phone", "value": "12345678", "level": "full_mask"},
+        "link": "samples/model_logs/v1.0/batch_001.jsonl#L6"
+      },
+      {
+        "source_type": "annotation",
+        "source_id": "REC006",
+        "field": "expected_level",
+        "value": "not_masked",
+        "link": "samples/annotations/ground_truth.csv#L12"
+      }
+    ],
+    "resolved": false
+  },
+  {
+    "record_id": "REC009",
+    "conflict_type": "false_negative",
+    "description": "座机号010-12345678是否需要脱敏存在争议",
+    "evidences": [
+      {
+        "source_type": "model_output",
+        "source_id": "REC009",
+        "field": "detected_entities",
+        "value": [],
+        "link": "samples/model_logs/v1.0/batch_001.jsonl#L10"
+      },
+      {
+        "source_type": "annotation",
+        "source_id": "REC009",
+        "field": "expected_level",
+        "value": "not_masked",
+        "link": "samples/annotations/ground_truth.csv#L16"
+      }
+    ],
+    "resolved": false
+  }
+]

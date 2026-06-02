@@ -1,0 +1,36 @@
+thresholds:
+  - sensitive_type: id_card
+    precision_threshold: 0.98
+    recall_threshold: 0.98
+    f1_threshold: 0.98
+    description: "身份证号要求最高，不能漏也不能错"
+  - sensitive_type: bank_card
+    precision_threshold: 0.95
+    recall_threshold: 0.95
+    f1_threshold: 0.95
+    description: "银行卡号要求高准确率"
+  - sensitive_type: phone
+    precision_threshold: 0.9
+    recall_threshold: 0.9
+    f1_threshold: 0.9
+    description: "手机号要求较高准确率"
+  - sensitive_type: email
+    precision_threshold: 0.85
+    recall_threshold: 0.85
+    f1_threshold: 0.85
+    description: "邮箱标准阈值"
+  - sensitive_type: name
+    precision_threshold: 0.8
+    recall_threshold: 0.8
+    f1_threshold: 0.8
+    description: "姓名识别难度大，阈值适中"
+  - sensitive_type: address
+    precision_threshold: 0.8
+    recall_threshold: 0.8
+    f1_threshold: 0.8
+    description: "地址识别难度大，阈值适中"
+  - sensitive_type: other
+    precision_threshold: 0.7
+    recall_threshold: 0.7
+    f1_threshold: 0.7
+    description: "其他类型阈值较低"
